@@ -1,0 +1,3 @@
+#!/bin/sh
+
+nice -19 tv_grab_na --days 1 | nice -19 tv_sort | nice -19 ./to_mysql

@@ -46,6 +46,8 @@ TV::TV(void)
     nvr = NULL;
     nvp = NULL;
     rbuffer = NULL;
+
+    menurunning = false;
 }
 
 TV::~TV(void)
@@ -125,10 +127,11 @@ void TV::LiveTV(void)
         if ((keypressed = XJ_CheckEvents()))
         {
            switch (keypressed) {
+               case 's': case 'S':
 	       case 'p': case 'P': paused = nvp->TogglePause(); break;
                case 'i': case 'I': nvp->ShowLastOSD(osd_display_time); break;
-               case wsRight: nvp->FastForward(5); break;
-               case wsLeft: nvp->Rewind(5); break;
+               case wsRight: case 'd': case 'D': nvp->FastForward(5); break;
+               case wsLeft: case 'a': case 'A': nvp->Rewind(5); break;
                case wsEscape: nvp->StopPlaying(); break;
                case wsUp: ChangeChannel(true); break; 
                case wsDown: ChangeChannel(false); break;
@@ -138,6 +141,7 @@ void TV::LiveTV(void)
                case '5': case '6': case '7': case '8': case '9':
                              ChannelKey(keypressed); break;
                case wsEnter: ChannelCommit(); break;
+               case 'M': case 'm': LoadMenu(); break;
                default: break;
            }
         }
@@ -396,4 +400,44 @@ bool TV::CheckChannel(int channum)
     }
 
     return ret;
+}
+
+void TV::doLoadMenu(void)
+{
+    string epgname = settings->GetSetting("ProgramGuidePath");
+
+    char runname[512];
+
+    sprintf(runname, "%s %d", epgname.c_str(), channel->GetCurrent());
+    int ret = system(runname);
+
+    if (ret > 0)
+    {
+        ret = WEXITSTATUS(ret);
+        sprintf(channelKeys, "%d", ret);
+        channelqueued = true; 
+    }
+
+    menurunning = false;
+}
+
+void *TV::MenuHandler(void *param)
+{
+    TV *obj = (TV *)param;
+    obj->doLoadMenu();
+
+    return NULL;
+}
+
+void TV::LoadMenu(void)
+{
+    if (menurunning == true)
+        return;
+    menurunning = true;
+    pthread_t tid;
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+
+    pthread_create(&tid, &attr, TV::MenuHandler, this);
 }

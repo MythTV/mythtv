@@ -19,6 +19,11 @@ int main(int argc, char **argv)
 
     int startchannel = 0;
 
+    if (a.argc() > 1)
+    {
+        startchannel = atoi(a.argv()[1]);
+    }
+
     GuideGrid gg(startchannel);
     gg.setGeometry(0, 0, 800, 600);
     gg.setFixedWidth(800);
@@ -28,5 +33,12 @@ int main(int argc, char **argv)
     gg.showFullScreen();
     //gg.show();
 
-    return a.exec();
+    gg.setActiveWindow();
+    gg.raise();
+    gg.setFocus();
+
+    a.exec();
+
+    int chan = gg.getLastChannel();
+    return chan;
 }

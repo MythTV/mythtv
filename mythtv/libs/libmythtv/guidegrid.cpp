@@ -1,5 +1,6 @@
 #include "guidegrid.h"
 
+#include <qapplication.h>
 #include <qpainter.h>
 #include <qfont.h>
 #include <qsqldatabase.h>
@@ -27,9 +28,18 @@ GuideGrid::GuideGrid(int channel, QWidget *parent, const char *name)
             m_programInfos[x][y] = NULL;
     }
 
+    QTime clock = QTime::currentTime();
+    clock.start();
     fillTimeInfos();
+    int filltime = clock.elapsed();
+    clock.restart();
     fillChannelInfos();
+    int fillchannels = clock.elapsed();
+    clock.restart();
     fillProgramInfos();
+    int fillprogs = clock.elapsed();
+
+    //cout << filltime << " " << fillchannels << " " << fillprogs << endl;
 
     QAccel *accel = new QAccel(this);
     accel->connectItem(accel->insertItem(Key_Left), this, SLOT(cursorLeft()));
@@ -41,6 +51,21 @@ GuideGrid::GuideGrid(int channel, QWidget *parent, const char *name)
     accel->connectItem(accel->insertItem(Key_D), this, SLOT(cursorRight()));
     accel->connectItem(accel->insertItem(Key_S), this, SLOT(cursorDown()));
     accel->connectItem(accel->insertItem(Key_W), this, SLOT(cursorUp()));
+
+    connect(this, SIGNAL(killTheApp()), qApp, SLOT(quit()));
+
+    accel->connectItem(accel->insertItem(Key_C), this, SLOT(escape()));
+    accel->connectItem(accel->insertItem(Key_Enter), this, SLOT(enter()));
+    accel->connectItem(accel->insertItem(Key_M), this, SLOT(enter()));
+
+    selectState = false;
+}
+
+int GuideGrid::getLastChannel(void)
+{
+    if (selectState)
+        return m_channelInfos[m_currentRow]->channum;
+    return 0;
 }
 
 ChannelInfo *GuideGrid::getChannelInfo(int channum)
@@ -174,9 +199,8 @@ ProgramInfo *GuideGrid::getProgramInfo(unsigned int row, unsigned int col)
     if (!m_channelInfos[row] || !m_timeInfos[col])
         return NULL;
 
-    sprintf(thequery, "SELECT title,subtitle,description,category,starttime,"
-                      "endtime,channum FROM program WHERE channum = %d AND "
-                      "starttime < %s and endtime > %s;", 
+    sprintf(thequery, "SELECT * FROM program WHERE channum = %d AND "
+                      "endtime > %s AND starttime < %s;", 
                       m_channelInfos[row]->channum, 
                       m_timeInfos[col]->sqltime.ascii(),
                       m_timeInfos[col]->sqltime.ascii());
@@ -188,13 +212,13 @@ ProgramInfo *GuideGrid::getProgramInfo(unsigned int row, unsigned int col)
         query.next();
 
         ProgramInfo *proginfo = new ProgramInfo;
-        proginfo->title = query.value(0).toString();
-        proginfo->subtitle = query.value(1).toString();
-        proginfo->description = query.value(2).toString();
-        proginfo->category = query.value(3).toString();
-        proginfo->starttime = query.value(4).toString();
-        proginfo->endtime = query.value(5).toString();
-        proginfo->channum = query.value(6).toString();
+        proginfo->title = query.value(3).toString();
+        proginfo->subtitle = query.value(4).toString();
+        proginfo->description = query.value(5).toString();
+        proginfo->category = query.value(6).toString();
+        proginfo->starttime = query.value(1).toString();
+        proginfo->endtime = query.value(2).toString();
+        proginfo->channum = query.value(0).toString();
         proginfo->spread = -1;
         proginfo->startCol = col;
  
@@ -668,3 +692,13 @@ void GuideGrid::scrollUp()
     update(programRect().unite(channelRect()));
 }
 
+void GuideGrid::enter()
+{
+    selectState = 1;
+    emit killTheApp();
+}
+
+void GuideGrid::escape()
+{
+    emit killTheApp();
+}

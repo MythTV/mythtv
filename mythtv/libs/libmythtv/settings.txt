@@ -11,7 +11,7 @@ str BufferName=/mnt/store/ringbuf.nuv
 int Width=480
 int Height=480
 # Quality level to capture at (higher better, 255 being best)
-int Quality=140
+int Quality=170
 # Motion Levels (lower better, 0 being best)
 int LumaFilter=0
 int ChromaFilter=0
@@ -31,3 +31,5 @@ str OSDFont=/usr/share/fonts/truetype/Arial.ttf
 # TV options
 str TVFormat=NTSC
 str FreqTable=us-cable
+
+str ProgramGuidePath=../epg/epg

@@ -20,6 +20,10 @@ class TV
 
     bool CheckChannel(int channum);
 
+ protected:
+    void doLoadMenu(void);
+    static void *MenuHandler(void *param);
+
  private:
     void ChangeChannel(bool up);
     void ChangeChannel(char *name);
@@ -33,6 +37,8 @@ class TV
 
     void ConnectDB(void);
     void DisconnectDB(void);
+
+    void LoadMenu(void);
 
     NuppelVideoRecorder *nvr;
     NuppelVideoPlayer *nvp;
@@ -49,6 +55,8 @@ class TV
     int channelkeysstored;
 
     MYSQL *db_conn;
+
+    bool menurunning;
 };
 
 #endif

@@ -51,6 +51,11 @@ class GuideGrid : public QWidget
   public:
     GuideGrid(int channel, QWidget *parent = 0, const char *name = 0);
 
+    int getLastChannel(void);
+
+  signals:
+    void killTheApp();
+
   protected slots:
     void cursorLeft();
     void cursorRight();
@@ -61,6 +66,9 @@ class GuideGrid : public QWidget
     void scrollRight();
     void scrollDown();
     void scrollUp();
+
+    void enter();
+    void escape();
 
   protected:
     void paintEvent(QPaintEvent *);
@@ -95,6 +103,8 @@ class GuideGrid : public QWidget
 
     int m_currentRow;
     int m_currentCol;
+
+    bool selectState;
 };
 
 #define CHANNUM_MAX  128
