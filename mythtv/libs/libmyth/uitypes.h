@@ -461,6 +461,75 @@ class UIImageType : public UIType
 
 };
 
+class UIAnimatedImageType : public UIType
+{
+    Q_OBJECT
+
+  public:
+    UIAnimatedImageType(const QString &, const QString &, int, int, int, int, QPoint);
+    ~UIAnimatedImageType();
+
+    QPoint DisplayPos() { return m_displaypos; }
+    void SetPosition(QPoint pos) { m_displaypos = pos; }
+
+    void SetFlex(bool flex) { m_flex = flex; }
+//    void ResetFilename() { m_filename = orig_filename; };
+    void SetFilename(QString file) { m_filename = file; }
+    void SetSize(int x, int y) { m_force_x = x; m_force_y = y; }
+    void SetSkip(int x, int y) { m_drop_x = x; m_drop_y = y; }
+    void SetImageCount(int count);
+    int  GetImageCount() { return m_imagecount; }
+    void SetInterval(int interval) { m_interval = interval; }
+    int  GetInterval() { return m_interval; }
+    void SetStartInterval(int interval) { m_startinterval = interval; }
+    int  GetStartInterval() { return m_startinterval; }
+    void SetWindow(MythDialog *win) { m_window = win; }
+    void ReloadImages();
+//    int  GetSize() { return m_force_x; } //??
+    void Pause();
+    void UnPause();
+    bool IsPaused() { return !timer.isActive(); }
+    void NextImage();
+    void PreviousImage();
+    virtual void Draw(QPainter *, int, int);
+
+  public slots:
+
+    //
+    //  We have to redefine this, as pixmaps
+    //  are not of a fixed size. And it has to
+    //  be virtual because RepeatedImage does
+    //  it differently.
+    //
+
+    void refresh();
+    void IntervalTimeout();
+
+  protected:
+    void InitImageCache();
+    void ClearImages();
+    bool LoadImage(int imageNo);
+    void AddImage(QPixmap* pixmap, int imageNo);
+
+    QPoint  m_displaypos;
+    QString orig_filename;
+    QString m_filename;
+    bool    m_isvalid;
+    bool    m_flex;
+    bool    m_show;
+    int     m_drop_x;
+    int     m_drop_y;
+    int     m_force_x;
+    int     m_force_y;
+    int     m_imagecount;
+    int     m_currentimage;
+    int     m_interval;
+    int     m_startinterval;
+    vector<QPixmap *> *imageList;
+    QTimer  timer;
+    MythDialog* m_window;
+};
+
 class UIRepeatedImageType : public UIImageType
 {
     Q_OBJECT

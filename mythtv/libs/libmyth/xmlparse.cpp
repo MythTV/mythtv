@@ -305,6 +305,105 @@ void XMLParse::parseImage(LayerSet *container, QDomElement &element)
     container->bumpUpLayers(order.toInt());
 }
 
+void XMLParse::parseAnimatedImage(LayerSet *container, QDomElement &element)
+{
+    int context = -1;
+    QString name = element.attribute("name", "");
+    if (name.isNull() || name.isEmpty())
+    {
+        cerr << "Animated Image needs a name\n";
+        exit(0);
+    }
+
+    QString order = element.attribute("draworder", "");
+    if (order.isNull() || order.isEmpty())
+    {
+        cerr << "Animated Image needs an order\n";
+        exit(0);
+    }
+
+    QString filename = "";
+    QPoint pos = QPoint(0, 0);
+
+    QPoint scale = QPoint(-1, -1);
+    QPoint skipin = QPoint(0, 0);
+    QString interval, startinterval, imagecount;
+
+    for (QDomNode child = element.firstChild(); !child.isNull();
+         child = child.nextSibling())
+    {
+        QDomElement info = child.toElement();
+        if (!info.isNull())
+        {
+            if (info.tagName() == "context")
+            {
+                context = getFirstText(info).toInt();
+            }
+            else if (info.tagName() == "filename")
+            {
+                filename = getFirstText(info);
+            }
+            else if (info.tagName() == "position")
+            {
+                pos = parsePoint(getFirstText(info));
+                pos.setX((int)(pos.x() * wmult));
+                pos.setY((int)(pos.y() * hmult));
+            }
+            else if (info.tagName() == "staticsize")
+            {
+                scale = parsePoint(getFirstText(info));
+            }
+            else if (info.tagName() == "skipin")
+            {
+                skipin = parsePoint(getFirstText(info));
+                skipin.setX((int)(skipin.x() * wmult));
+                skipin.setY((int)(skipin.y() * hmult));
+            }
+            else if (info.tagName() == "interval")
+            {
+                interval = getFirstText(info);
+            }
+            else if (info.tagName() == "startinterval")
+            {
+                startinterval = getFirstText(info);
+            }
+            else if (info.tagName() == "imagecount")
+            {
+                imagecount = getFirstText(info);
+            }
+            else
+            {
+                cerr << "Unknown: " << info.tagName() << " in image\n";
+                exit(0);
+            }
+        }
+    }
+
+    UIAnimatedImageType *image = new UIAnimatedImageType(name, filename, imagecount.toInt(),
+        interval.toInt(), startinterval.toInt(), order.toInt(), pos);
+    image->SetScreen(wmult, hmult);
+    if (scale.x() != -1 || scale.y() != -1)
+        image->SetSize(scale.x(), scale.y());
+    image->SetSkip(skipin.x(), skipin.y());
+    QString flex = element.attribute("fleximage", "");
+    if (!flex.isNull() && !flex.isEmpty())
+    {
+        if (flex.lower() == "yes")
+            image->SetFlex(true);
+        else
+            image->SetFlex(false);
+    }
+
+    //image->LoadImage();
+    if (context != -1)
+    {
+        image->SetContext(context);
+    }
+    image->SetParent(container);
+    container->AddType(image);
+    container->bumpUpLayers(order.toInt());
+}
+
 void XMLParse::parseRepeatedImage(LayerSet *container, QDomElement &element)
 {
     int orientation = 0;
@@ -823,6 +922,10 @@ void XMLParse::parseContainer(QDomElement &element, QString &newname, int &conte
             else if (info.tagName() == "image")
             {
                 parseImage(container, info);
+            }
+            else if (info.tagName() == "animatedimage")
+            {
+                parseAnimatedImage(container, info);
             }
             else if (info.tagName() == "repeatedimage")
             {

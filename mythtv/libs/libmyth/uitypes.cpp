@@ -1371,6 +1371,302 @@ void UIImageType::refresh()
     }
 }
 
+// *****************************************************************
+
+UIAnimatedImageType::UIAnimatedImageType(const QString &name, const QString &filename,
+           int imagecount, int interval, int startinterval, int dorder, QPoint displaypos)
+           : UIType(name)
+{
+    m_isvalid = false;
+    m_flex = false;
+
+    m_filename = filename;
+    orig_filename = filename;
+    m_displaypos = displaypos;
+    m_order = dorder;
+    m_force_x = -1;
+    m_force_y = -1;
+    m_drop_x = 0;
+    m_drop_y = 0;
+    m_show = false;
+    m_imagecount = imagecount;
+    m_interval = interval;
+    m_startinterval = startinterval;
+    m_currentimage = 1;
+
+    // create the image cache
+    imageList = NULL;
+    InitImageCache();
+
+    m_window = NULL;
+    connect( &timer, SIGNAL(timeout()), this, SLOT(IntervalTimeout()));
+    timer.start(m_interval);
+}
+
+UIAnimatedImageType::~UIAnimatedImageType()
+{
+    ClearImages();
+    delete imageList;
+}
+
+void UIAnimatedImageType::InitImageCache()
+{
+    if (imageList)
+    {
+        ClearImages();
+        delete imageList;
+    }
+
+    // create the image cache
+    imageList = new vector<QPixmap*>(m_imagecount);
+    for (int x = 0; x < m_imagecount; x++)
+        imageList->at(x) = NULL;
+}
+
+void UIAnimatedImageType::ClearImages()
+{
+    vector<QPixmap *>::iterator i = imageList->begin();
+    for (; i != imageList->end(); i++)
+    {
+        QPixmap *pixmap = (*i);
+        if (pixmap)
+        {
+            delete pixmap;
+            (*i) = NULL;
+        }
+    }
+}
+
+void UIAnimatedImageType::ReloadImages()
+{
+    ClearImages();
+    refresh();
+}
+
+void UIAnimatedImageType::AddImage(QPixmap* pixmap, int imageNo)
+{
+    if (imageNo > m_imagecount)
+        return;
+
+    vector<QPixmap *>::iterator i = imageList->begin();
+    for (int x = 0; x < imageNo; x++)
+    {
+        i++;
+    }
+
+    (*i) = pixmap;
+}
+
+bool UIAnimatedImageType::LoadImage(int imageNo)
+{
+    if (imageNo > m_imagecount)
+        return false;
+
+    bool bSuccess = false;
+    QString file;
+
+    file = m_filename.arg(imageNo);
+
+    // first try the absolute filename
+    bool  filefound = false;
+    QString filename;
+    QString themeDir = gContext->GetThemeDir();
+    QString baseDir = gContext->GetShareDir() + "themes/default/";
+    QFile checkFile(file);
+
+    if (checkFile.exists())
+    {
+        filefound = true;
+        filename = file;
+    }
+
+    if (!filefound)
+    {
+        checkFile.setName(baseDir + file);
+        if (checkFile.exists())
+        {
+            filefound = true;
+            filename = baseDir + file;
+        }
+    }
+
+    if (!filefound)
+    {
+        checkFile.setName(themeDir + file);
+        if (checkFile.exists())
+        {
+            filefound = true;
+            filename = themeDir + file;
+        }
+    }
+
+    if (!filefound)
+    {
+         return false;
+    }
+
+    if (m_force_x == -1 && m_force_y == -1)
+    {
+        QPixmap *tmppix = gContext->LoadScalePixmap(filename);
+        if (tmppix)
+        {
+            imageList->at(imageNo-1) = tmppix;
+            //AddImage(tmppix, imageNo);
+            bSuccess = true;
+        }
+    }
+
+    if (m_hmult == 1 && m_wmult == 1 && m_force_x == -1 && m_force_y == -1)
+    {
+        QPixmap *img = new QPixmap();
+        if (img->load(filename))
+        {
+            imageList->at(imageNo-1) = img;
+            bSuccess = true;
+        }
+        else
+        {
+           imageList->at(imageNo-1) = NULL;
+           delete img;
+        }
+    }
+    else
+    {
+        QPixmap *img = new QPixmap();
+        QImage *sourceImg = new QImage();
+
+        if (sourceImg->load(filename))
+        {
+            QImage scalerImg;
+            int doX = sourceImg->width();
+            int doY = sourceImg->height();
+            if (m_force_x != -1)
+            {
+                doX = m_force_x;
+            }
+            if (m_force_y != -1)
+            {
+                doY = m_force_y;
+            }
+
+            scalerImg = sourceImg->smoothScale((int)(doX * m_wmult),
+                                               (int)(doY * m_hmult));
+            bSuccess = true;
+            img->convertFromImage(scalerImg);
+            imageList->at(imageNo-1) = img;
+        }
+        delete sourceImg;
+
+        if (bSuccess) 
+            return true;
+    }
+
+    // if we get this far we cannot load the image
+    return false;
+}
+
+void UIAnimatedImageType::Draw(QPainter *dr, int drawlayer, int context)
+{
+    if (m_context == context || m_context == -1)
+    {
+        if (drawlayer == m_order)
+        {
+            if (imageList->at(m_currentimage-1) == NULL)
+            {
+                // try to load the current image
+                if (!LoadImage(m_currentimage))
+                    return;
+            }
+
+            if (!imageList->at(m_currentimage-1)->isNull())
+            {
+                dr->drawPixmap(m_displaypos.x(), m_displaypos.y(), *imageList->at(m_currentimage-1), m_drop_x, m_drop_y);
+            }
+        }
+    }
+}
+
+void UIAnimatedImageType::refresh()
+{
+    if(m_parent && imageList->at(0) != NULL)
+    {
+        QRect r = QRect(m_displaypos.x(),  m_displaypos.y(),
+                    imageList->at(0)->width(), imageList->at(0)->height());
+
+        r.moveBy(m_parent->GetAreaRect().left(),
+                 m_parent->GetAreaRect().top());
+
+        if (m_window)
+            m_window->update(r);
+        else
+            emit requestUpdate(r);
+    }
+    else
+    {
+        if (m_window)
+            m_window->update();
+        else
+            emit requestUpdate();
+    }
+}
+
+void UIAnimatedImageType::IntervalTimeout()
+{
+    timer.stop();
+    m_currentimage++;
+    if (m_currentimage > m_imagecount)
+        m_currentimage = 1;
+
+    refresh();
+
+    if (m_currentimage == m_imagecount)
+        timer.start(m_startinterval, true);
+    else
+        timer.start(m_interval, true);
+}
+
+void UIAnimatedImageType::Pause()
+{
+    timer.stop();
+}
+
+void UIAnimatedImageType::UnPause()
+{
+    if (!timer.isActive())
+        timer.start(m_interval);
+}
+
+void UIAnimatedImageType::NextImage()
+{
+    if (!timer.isActive())
+    {
+        m_currentimage++;
+        if (m_currentimage > m_imagecount)
+            m_currentimage = 1;
+
+        refresh();
+    }
+}
+
+void UIAnimatedImageType::PreviousImage()
+{
+    if (!timer.isActive())
+    {
+        m_currentimage--;
+        if (m_currentimage < 1)
+            m_currentimage = m_imagecount;
+
+        refresh();
+    }
+}
+
+void UIAnimatedImageType::SetImageCount(int count)
+{
+    m_imagecount = count;
+    InitImageCache();
+    refresh();
+}
+
 // ******************************************************************
 
 UIRepeatedImageType::UIRepeatedImageType(const QString &name, const QString &filename, int dorder, QPoint displaypos)
