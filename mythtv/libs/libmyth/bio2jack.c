@@ -675,6 +675,8 @@ static int JACK_bufsize (nframes_t nframes, void *arg)
  */
 int JACK_srate (nframes_t nframes, void *arg)
 {
+    (void)nframes; /* silence compiler warning */
+    (void)arg; /* silence compiler warning */
     TRACE("the sample rate is now %lu/sec\n", (long)nframes);
     return 0;
 }
@@ -1200,7 +1202,7 @@ long JACK_Write(int deviceID, unsigned char *data, unsigned long bytes)
   /* check and see that we have enough space for this audio */
   bytes_free = JACK_GetBytesFreeSpaceFromDriver(drv);
   TRACE("bytes free == %ld\n", bytes_free);
-  if(bytes > bytes_free)
+  if((long)bytes > bytes_free)
   {
     bytes = 0; /* act as if we were told to write 0 bytes */
   }
@@ -1443,8 +1445,6 @@ long JACK_GetInputBytesPerSecond(int deviceID)
 /* NOTE: convert from output bytes to input bytes in here */
 static long JACK_GetBytesStoredFromDriver(jack_driver_t *drv)
 {
-  struct timeval now;
-  long elapsedMS;
   long return_val;
 
   /* get the number of bytes free space */
@@ -1630,6 +1630,7 @@ long JACK_GetBytesPerOutputFrame(int deviceID)
 long JACK_GetMaxBufferedBytes(int deviceID)
 {
   long return_val;
+  (void)deviceID; /* silence compiler warning */
 
   return_val = MAX_BUFFERED_BYTES;
   TRACE("getting MAX_BUFFERED_BYTES of %ld\n", return_val);
@@ -1640,8 +1641,9 @@ long JACK_GetMaxBufferedBytes(int deviceID)
 /* Set the max number of bytes the jack driver should buffer */
 void JACK_SetMaxBufferedBytes(int deviceID, long max_buffered_bytes)
 {
+  (void)deviceID; /* silence compiler warning */
   TRACE("setting MAX_BUFFERED_BYTES to %ld, from %ld\n", max_buffered_bytes, MAX_BUFFERED_BYTES);
-  MAX_BUFFERED_BYTES = max_buffered_bytes;
+  MAX_BUFFERED_BYTES = (unsigned long) max_buffered_bytes;
 }
 
 /* Get the number of output channels */
@@ -1666,6 +1668,8 @@ int JACK_GetNumInputChannels(int deviceID)
  
 int JACK_SetNumOutputChannels(int deviceID, int channels)
 {
+  (void)deviceID; /* silence compiler warning */
+  (void)channels; /* silence compiler warning */
   //FIXME: todo, should we resize buffers here by checking the size in JACK_callback() the next
   // time around??
   return 1;

@@ -313,9 +313,11 @@ uint32_t ac3_frames[3][32] =
      {96,120,144,168,192,240,288,336,384,480,576,672,768,960,1152,1344,
       1536,1728,1920,0,0,0,0,0,0,0,0,0,0,0,0,0}}; 
 
+#if 0
 static uint8_t ac3_channels[8] = {2,1,2,3,3,4,4,5};
 static char ac3_audio_coding[8][8] =
 { "1+1","1/0","2/0","3/0","2/1","3/1","2/2","3/2" };
+#endif
 
 int get_ac3info(uint8_t *mbuf, int count, AudioInfo *ai, int pr)
 {
@@ -454,9 +456,7 @@ void send_ipack(ipack *p)
 
 static void write_ipack(ipack *p, uint8_t *data, int count)
 {
-    AudioInfo ai;
     uint8_t headr[3] = { 0x00, 0x00, 0x01} ;
-    int diff =0;
 
     if (p->count < 6){
         p->count = 0;
@@ -645,9 +645,9 @@ void instant_repack (uint8_t *buf, int count, ipack *p)
                 if (c == count) return;
             }
             
-            while (c < count && p->found < p->plength+6){
+            while (c < count && (long)p->found < (long)p->plength+6){
                 l = count -c;
-                if (l+p->found > p->plength+6)
+                if (l+(long)p->found > (long)p->plength+6)
                     l = p->plength+6-p->found;
                 write_ipack(p, buf+c, l);
                 p->found += l;
@@ -659,7 +659,7 @@ void instant_repack (uint8_t *buf, int count, ipack *p)
 
 
         if ( p->done ){
-            if( p->found + count - c < p->plength+6){
+            if( (long)p->found + count - c < (long)p->plength+6){
                 p->found += count-c;
                 c = count;
             } else {
@@ -668,7 +668,7 @@ void instant_repack (uint8_t *buf, int count, ipack *p)
             }
         }
 
-        if (p->plength && p->found == p->plength+6) {
+        if (p->plength && (long)p->found == (long)p->plength+6) {
             send_ipack(p);
             reset_ipack(p);
             if (c < count)

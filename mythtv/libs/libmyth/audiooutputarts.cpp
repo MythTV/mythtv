@@ -95,12 +95,12 @@ inline int AudioOutputARTS::getSpaceOnSoundcard(void)
     return arts_stream_get(pcm_handle, ARTS_P_BUFFER_SIZE);
 }
 
-int AudioOutputARTS::GetVolumeChannel(int channel)
+int AudioOutputARTS::GetVolumeChannel(int /*channel*/)
 {
     // Do nothing
     return 100;
 }
-void AudioOutputARTS::SetVolumeChannel(int channel, int volume)
+void AudioOutputARTS::SetVolumeChannel(int /*channel*/, int /*volume*/)
 {
     // Do nothing
 }

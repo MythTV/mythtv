@@ -18,6 +18,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <string.h>
 #include "ringbuffy.h"
 
 int ring_init (ringbuffy *rbuf, int size)
