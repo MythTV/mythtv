@@ -415,7 +415,10 @@ void DVDRipBox::readFromServer()
         line_from_server.simplifyWhiteSpace();
         //cout << "Getting \"" << line_from_server << "\"" << endl ;
         QStringList tokens = QStringList::split(" ", line_from_server);
-        parseTokens(tokens);
+        if(tokens.count() > 0)
+        {
+            parseTokens(tokens);
+        }
     }
 }
 
@@ -710,6 +713,7 @@ void DVDRipBox::handleMedia(QStringList tokens)
         if(dvd_info)
         {
             delete dvd_info;
+            dvd_info = NULL;
         }
         if(tokens[3].toUInt() > 0)
         {
@@ -723,6 +727,10 @@ void DVDRipBox::handleMedia(QStringList tokens)
                 }
             }
             dvd_info = new DVDInfo(disc_name);
+        }
+        else
+        {
+            have_disc = false;
         }
         return;
     }
@@ -839,7 +847,14 @@ void DVDRipBox::goRipScreen()
     }
     stopStatusPolling();
     block_media_requests = true;
-    TitleDialog title_dialog(db, client_socket, dvd_info->getName(), dvd_info->getTitles(), gContext->GetMainWindow(), "title dialog");
+    TitleDialog title_dialog(db, 
+                             client_socket, 
+                             dvd_info->getName(), 
+                             dvd_info->getTitles(), 
+                             gContext->GetMainWindow(),
+                             "title_dialog",
+                             "dvd-", 
+                             "title dialog");
     title_dialog.exec();
     block_media_requests = false;
     pollStatus();

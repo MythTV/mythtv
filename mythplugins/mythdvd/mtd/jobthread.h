@@ -148,6 +148,7 @@ class DVDTranscodeThread : public DVDThread
                        const QString &start_string,
                        int nice_priority,
                        int quality_level,
+                       bool do_ac3,
                        QSqlDatabase *ldb,
                        int which_audio,
                        int numb_seconds);
@@ -173,6 +174,7 @@ class DVDTranscodeThread : public DVDThread
     QSqlDatabase *db;
     int          audio_track;
     int          length_in_seconds;
+    bool         ac3_flag;
 };
 
 

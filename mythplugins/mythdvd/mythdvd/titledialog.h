@@ -18,7 +18,7 @@
 
 #include "dvdinfo.h"
 
-class TitleDialog : public MythDialog
+class TitleDialog : public MythThemedDialog
 {
     Q_OBJECT
 
@@ -27,32 +27,59 @@ class TitleDialog : public MythDialog
     TitleDialog(QSqlDatabase *ldb,
                 QSocket *a_socket, 
                 QString d_name, 
-                QPtrList<DVDTitleInfo> *titles, 
+                QPtrList<DVDTitleInfo> *titles,
                 MythMainWindow *parent, 
+                QString window_name,
+                QString theme_filename,
                 const char* name = 0);
    ~TitleDialog();
 
+    void keyPressEvent(QKeyEvent *e);
+
+
   public slots:
   
+    void showCurrentTitle();
     void viewTitle();
-    void setQuality(const QString &a_string);
-    void setAudio(int);
+    void nextTitle();
+    void prevTitle();
+    void gotoTitle(uint title_number);
     void toggleTitle(bool);
     void changeName(QString new_name);
+    void setAudio(int);
+    void setQuality(int which_quality);
+    void toggleAC3(bool);
     void ripTitles();
-
+    void takeFocusAwayFromEditor(bool up_or_down);
+    
   private:
   
-    QVBoxLayout            *bigvb;
-    QVBoxLayout            *vbox;
-    QFrame                 *firstdiag;
-    QLabel                 *info_text;
+    void    wireUpTheme();
+  
     QTimer                 *check_dvd_timer;
-
     QString                disc_name;
     QPtrList<DVDTitleInfo> *dvd_titles;
+    DVDTitleInfo           *current_title;
     QSocket                *socket_to_mtd;
     QSqlDatabase           *db;
+
+    MythRemoteLineEdit     *name_editor;
+
+    //
+    //  GUI "widgets"
+    //
+    
+    UIBlackHoleType     *editor_hack;
+    UISelectorType      *audio_select;
+    UISelectorType      *quality_select;
+    UICheckBoxType      *ripcheck;
+    UICheckBoxType      *ripacthree;
+    UITextType          *playlength_text;
+    UITextType          *numb_titles_text;
+    UIPushButtonType    *view_button;
+    UIPushButtonType    *next_title_button;
+    UIPushButtonType    *prev_title_button;
+    UITextButtonType    *ripaway_button;
 };
 
 #endif

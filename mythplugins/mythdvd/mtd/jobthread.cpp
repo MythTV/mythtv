@@ -469,6 +469,7 @@ DVDTranscodeThread::DVDTranscodeThread(MTD *owner,
                                        const QString &start_string,
                                        int nice_priority,
                                        int quality_level,
+                                       bool do_ac3,
                                        QSqlDatabase *ldb,
                                        int which_audio,
                                        int numb_seconds)
@@ -484,6 +485,7 @@ DVDTranscodeThread::DVDTranscodeThread(MTD *owner,
 {
     db = ldb;
     quality = quality_level;
+    ac3_flag = do_ac3;
     working_directory = NULL;
     tc_process = NULL;
     two_pass = false;
@@ -821,7 +823,7 @@ bool DVDTranscodeThread::buildTranscodeCommandLine()
     }
     
     
-    if(gContext->GetNumSetting("MTDac3Flag") && !name.contains("VCD", false))
+    if(ac3_flag && !name.contains("VCD", false))
     {
         tc_arguments.append("-A");
         tc_arguments.append("-N");

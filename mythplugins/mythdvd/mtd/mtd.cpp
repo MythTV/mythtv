@@ -514,7 +514,7 @@ void MTD::startDVD(const QStringList &tokens)
     QString flat = tokens.join(" ");
     bool ok;
 
-    if(tokens.count() < 7)
+    if(tokens.count() < 8)
     {
         emit writeToLog(QString("bad dvd job request: %1").arg(flat));
         return;
@@ -547,7 +547,19 @@ void MTD::startDVD(const QStringList &tokens)
         return;
     }
 
-    QDir dest_dir(tokens[5]);
+    bool ac3_flag = false;
+    int flag_value = tokens[5].toUInt(&ok);
+    if(!ok)
+    {
+        emit writeToLog(QString("bad ac3 flag in job request: %1").arg(flat));
+        return;
+    }
+    if(flag_value)
+    {
+        ac3_flag = true;
+    }
+
+    QDir dest_dir(tokens[6]);
     if(!dest_dir.exists())
     {
         emit writeToLog(QString("bad destination directory in job request: %1").arg(flat));
@@ -555,7 +567,7 @@ void MTD::startDVD(const QStringList &tokens)
     }
 
     QString file_name = "";
-    for(uint i=6; i < tokens.count(); i++)
+    for(uint i=7; i < tokens.count(); i++)
     {
         file_name += tokens[i];
         if(i != tokens.count() - 1)
@@ -629,6 +641,7 @@ void MTD::startDVD(const QStringList &tokens)
                                                     flat,
                                                     nice_level,
                                                     quality,
+                                                    ac3_flag,
                                                     db,
                                                     audio_track,
                                                     numb_seconds);

@@ -13,6 +13,8 @@ using namespace std;
 
 #include "dvdinfo.h"
 
+#include <mythtv/mythcontext.h>
+
 DVDAudioInfo::DVDAudioInfo(int track_number, const QString &audio_description)
 {
     track = track_number;
@@ -41,6 +43,7 @@ DVDTitleInfo::DVDTitleInfo()
     is_selected = false;
     selected_quality = 0;
     selected_audio = 1;
+    use_ac3 = gContext->GetNumSetting("MTDac3flag");
     name = "";
 }
 

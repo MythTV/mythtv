@@ -145,9 +145,8 @@ public:
         setLabel("Transcode AC3 Audio");
         setValue(false);
         setHelpText("If set, the mtd (Myth Transcoding Daemon) "
-                    "will preserve AC3 (Dolby Digital) audio in "
-                    "transcoded files. If not, it will convert "
-                    "to 2-channel mp3.");
+                    "will, by default, preserve AC3 (Dolby "
+                    "Digital) audio in transcoded files. ");
      };
 };
 
