@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2004-09-08, v0.16.00
+<date>2004-10-18, v0.16.01
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1535,6 +1535,11 @@ Once MythTV is compiled and installed, you must change your
 <tt>/usr/local/share/mythtv/mysql.txt</tt> or <tt>~/.mythtv/mysql.txt</tt>
 file's "DBHostName" field to point to your Master backend's IP address.
 
+<bf>NOTE</bf>: The <tt>/usr/local/share/mythtv/mysql.txt</tt> file is
+overwritten each time you upgrade, so any changes you make there will be
+lost.  Use <tt>~/.mythtv/mysql.txt</tt> to avoid losing your custom
+configuration.
+
 Run the MythTV setup program on your Master backend. Under the "General"
 menu, change the IP address of the current machine (by default, "127.0.0.1")
 to the real external IP address - 127.0.0.1 is the loopback address and no
@@ -2484,13 +2489,18 @@ id="advanced_backend_config" name="Advanced Backend Configurations"> for
 information on configuring multiple backend systems in various ways.
 </caption>
 </figure>
+
 Because MythTV now uses a database to store all configuration variables,
 part of the bootstrap of MythTV is to indicate the location of the MySQL
 database server. If the frontend, backend and MySQL database server are all
 going to be running on the same box, you can continue to the next step.  If
-not, you'll need to edit the <tt>/usr/local/share/mythtv/mysql.txt</tt> file
-and change the first line to the IP address of the database server. 
-All other configuration is within the MythTV GUI screens.
+not, you'll need to edit the <tt>/usr/local/share/mythtv/mysql.txt</tt> or
+<tt>~/.mythtv/mysql.txt</tt> file and change the first line to the IP
+address of the database server.  Customizing <tt>~/.mythtv/mysql.txt</tt> is
+preferred, since changes to <tt>/usr/local/share/mythtv/mysql.txt</tt> will
+be lost the next time you upgrade. All other configuration is within the
+MythTV GUI screens.
+
 
 <figure loc="here">
 <eps file="stop.eps" height="1cm">
@@ -2722,8 +2732,9 @@ name="Automatically starting mythbackend at system boot time">.
 <p>Ensure that you've granted access to the master MySQL database for remote
 backends as discussed in the section titled <ref id="modify_perm_mysql"
 name="Modifying access to the MySQL database for multiple systems"> and that
-you've edited the <tt>/usr/local/share/mythtv/mysql.txt</tt> file and put
-the correct IP address for the database server.
+you've edited the <tt>/usr/local/share/mythtv/mysql.txt</tt> or
+<tt>/usr/local/share/mythtv/mysql.txt</tt> file and put the correct IP
+address for the database server.
 
 Make sure that the IP addresses on the General setup screen are accurate. 
 If the slave backend can't communicate with the master backend due to IP
@@ -3807,6 +3818,284 @@ permission to shutdown. If you cancel the shutdown, simply call
 If you get "nvram-wakeup: /dev/rtc: Device or resource busy" your
 set-wakeuptime-script should stop the program that uses <tt>/dev/rtc</tt> before
 setting the wakeuptime.
+
+<sect1>Scheduling Recordings
+<p>The MythTV master backend is responsible for managing the schedule
+for all TV tuner cards on the master and any slave. It's job is to
+search the TV listing for the shows you have requested and assign
+recording to the TV tuner cards. If none of the shows that you've
+chosen overlap, it simply records all of the shows. However, if
+there are shows where the beginning and end times overlap, the
+scheduler follows rules that you've specified or makes logical
+decisions about what would be best if you haven't express your
+preference. Further, the "Fix Conflicts" page allows you make
+specific decisions about what you really do and don't want to
+record.
+
+<sect2>Record Types
+<p>When you choose a show that you would like to record from the
+Options Page, there are six different types of rules to help the
+scheduler find which showings you would like to record.
+
+<itemize>
+<item>Single -- record only this title at this specific time. This is
+the best way to be sure that a certain showing is recorded. However,
+if the TV listings change and the show is not broadcast at that time,
+the show will not be recorded.
+
+<item>Find One -- this will record a title once from any of the times
+that appear in the TV listings. This is useful for recording a movie
+or special that has multiple showings because it allows the scheduler
+to choose one that doesn't conflict. It is not a good choice for
+recording a single episode of a series because it records the first
+available showing of the title without regard to the episode
+information or duplicate matching.
+
+<item>Week Slot -- this records a show whenever the title is listed on
+the same channel, weekday and time. Note that if the TV station
+changes the schedule for a special episode, it would not be
+recorded. However, you can add a Single record for the special
+episode.
+
+<item>Time Slot -- this records a show whenever the title is listed
+for the time and channel on any day of the week. Here again, a show
+will not be recorded if the time was altered by the station.
+
+<item>Channel -- records a show anytime the title is listed on this
+channel.  This is perhaps the most common rule to use for most
+shows.
+
+<item>All -- record this title on any channel at any time. This can be
+useful if a station has sister stations where shows are rebroadcast
+allowing the scheduler to record rebroadcasts on the other station
+when the original airing cannot be recorded.
+</itemize>
+
+<sect2>Duplicates
+<p>Single and Find One will record without regard to duplicate
+matching.  However, the scheduler uses the duplicate matching
+information for all other types to determine which showings should
+and should not record. Further, if an episode has multiple showings,
+the scheduler may be able to use this information to find ways to
+record episodes that might not otherwise be recorded.
+
+<sect2>Conflicts
+<p>As you add more shows that you would like to record, the scheduler
+will eventually encounter conflicts. If there are two shows at the
+same time and you have two or more TV tuner cards, both shows will
+record. However, if there are more shows than cards, the scheduler
+will have to decide what it thinks it should not record based on the
+information you have given. If you see an unexpected situation you
+are not "stuck" with the scheduler's choice. You can still tell the
+scheduler exactly which shows you do want to record and/or don't
+want to record in any situation.
+
+
+<sect2>Priority
+<p>By default, all shows you select are have equal value to the
+scheduler.  There are a set of rules to to make good choices when
+two or more shows are in conflict. However, priority values let the
+scheduler know what you want so that it can set the schedule based
+on your preferences.
+
+Initially all priority values are set to zero. You may choose to
+leave everything at "0" and let the scheduler follow rules to guess
+what you might prefer when there are conflicts. However, if you have
+one or two favorite shows, you may want to increase the priority
+value so the scheduler will know that you would prefer recording
+these over other shows. You might use certain values to rate shows
+so that all favorites are 2. good shows are 1 and extra 'filler'
+shows are all -1 for example. You could sort each title on the "Set
+Priorities" to have a unique value so the scheduler can always know
+which show you'd prefer verses any other show. The choice and style
+are entirely up to you. However, the more information you give to
+the scheduler, the more likely it will make the choices you would
+like in the first place.
+
+The scheduler choices are based on the total priority for a showing
+by adding up four different priority factors. By default, all of
+these factors are "0" but you may use any combination to express
+your likes and needs.
+
+Per record rule -- this is the "priority" field in the "Scheduling
+Options" section of the options page and this values is included for
+any showings that match the recording rule.  You may choose to only
+use these values and not use the other factors for the sake of
+simplicity and clarity.
+
+Per record type -- Setup->TV Settings->Recording Priorities->General
+allows you to add to the priority based on the type. It may make
+sense to increase the value for "Single" so that by default they
+have an extra advantage over other shows. You may want to decrease
+the value for Find One so that they will be less likely to interfere
+with regular shows and will be more likely to record in a
+non-conflicting time instead.
+
+Per channel -- Setup->TV Settings->Recording Priorities->Channel
+Priorities can be useful if you believe that you prefer any of the
+shows on certain channels. This would give all shows on a channel an
+advantage by default.
+
+Input preference -- in the MythTV "setup" program, the "Input
+Connections" section allows you to add additional priority in the
+"Input preference". This is simply another priority factor but has an
+interesting effect. If a card input has a higher value than the other
+cards, the scheduler will see that you would rather record showings of
+episodes on this card rather than a showing on another card. If you
+have multiple cards of different quality, you may want to set input
+preference to encourage the scheduler to record shows on your best
+card(s) whenever possible. This can also be useful if you have
+multiple video sources which include the same stations. For example,
+with digital and analog cable you could increase the digital cable
+input preference by 1 to tell the scheduler that you want to record
+from the digital station whenever possible but the station on the
+analog input could still be used when the digital input is busy.
+
+For any single showing of any show you've chosen to record, these
+factors are added together to find the "total priority". This is the
+priority that the scheduler uses to decide which shows are given the
+first choice when filling in the schedule.
+
+<sect2>Scheduling decisions
+<p>Here are the actual decisions made by the scheduler as it fills in the
+schedule.
+
+<itemize>
+<item>Currently recording beats not currently recording -- A recording in
+progress can not be moved so it "wins" it's current timeslot.
+
+<item>Higher total priority beats lower total priority -- This is the core of
+the scheduling process. Episodes of the highest priority show are placed
+on the first available card then the next highest priority and so on.
+
+<item>Future start time beats passed start time -- If there is an
+episode in progress and also a later showing of the same episode, it
+is better to record the complete episode. If there isn't another
+showing, start recording now to record the remaining portion. Note:
+this should only happen if you add a new rule while the show is in
+progress or if the is started after the starttime of a scheduled show.
+
+<item>More specific record type beats less specific record type -- If
+two shows are on at the same time and have the same total priority but
+different types they will be sorted by Single then Find One, Week
+Slot, Time Slot, Channel and finally All. This only applies if the
+priorities are the same.
+
+<item>If both start times have passed, later start time beats earlier
+start time -- This attempts to miss the least amount of time.
+
+<item>If neither start time has passed, earlier start time beats later
+start time -- This rule help assure that the earliest showing of an
+episode has the advantage.
+
+<item>Lower input id beats higher input id -- The scheduler fills in
+open time slots on the first available card. The next cards is used
+when there is another show already placed for the first card.
+
+<item>Older record rule beats newer record rule -- If two shows are
+still equal after all of these other checks, the show whose record
+rule was added first is preferred over a more recent addition.
+</itemize>
+
+<sect2>Reschedule Higher Priorities
+
+<p>Setup->TV Settings->Recording Priorities->General has a checkbox for
+"Reschedule Higher Priorities" which tells the scheduler to try to
+be a little smarter in certain situations. If this is checked, the
+scheduler will look for situations where a show cannot record
+because all inputs for the channel are used for higher priority
+shows. It will check to see if any of the other shows could be
+recorded at another time so that the conflicting show can be
+recorded in it's place.
+
+Generally, this is a good strategy but there are tradeoffs. If a
+higher priority show is postponed, you will not get to watch it
+until it is recorded in the later timeslot. There is also a risk
+that the TV listings may change and the later showing may go
+away. In this rare case the higher priority show may never
+record. On the other hand, if you do not use this option you will
+miss recording some lower priority shows unnecessarily unless you
+make similar these changes manually.
+
+By using Reschedule Higher Priorities, the scheduler will do a
+better job of recording as many of your shows as possible when left
+unattended. It will also be easy to see that shows have been marked
+to record at a later time. You can then decide for yourself when you
+would prefer to record the first showing.
+
+<sect2>Controlling Your Schedule
+<p>
+The Manage Recordings->Upcoming Recordings page is your control
+center for the MythTV scheduler. Unlike other DVR systems, this one
+page gives you all of the information and tools you need to see all
+of your alternatives and make whatever adjustments you desire.
+
+The upper half of the screen has a scrollable box listing items that
+match your record rules sorted by time. The lower half shows the
+details for the highlighted item. There are two 'views' available.
+Press "1" to include all of the items that match record rules even
+if they do not need to be recorded. Press "2" to focus on just the
+things that will record and items that may need your attention. The
+message in the upper right-hand corner will remind you when there
+are conflicts that would prevent one or more shows from being
+recorded.
+
+The items in the list are colored white for things that will record,
+gray for those that do not need to record and yellow when there is a
+time conflict. Items at the top of the list may also be highlighted
+indicating that the recording is in progress.
+
+Along with the channels, start times and titles, the right-hand
+column has a status code. Numbers indicate which card number has
+been assigned to record the show. Letters are used to indicate the
+reason that something will not be recorded. Just below the box is a
+short status message for the highlighted item that indicates the
+type of record rule that was matched and a one or two word
+explanation of the status code. If you press SELECT, you will see
+more information about the status.
+
+There are a few status codes that may require your attention. "C"
+indicates that there are more overlapping shows to record than there
+are TV tuners to record them. "L" indicates that the scheduler found
+that it may be better to record a later showing of this
+episode. These states happen as a result of your choices and should
+normally reflect your preferences. However, you may notice situations
+where you would like to modify the scheduler's initial choices.
+
+The first thing you can do is to highlight an item and press INFO
+once or twice to see the Recording Options page. From this page you
+can change the record rule type, the duplicate matching rules, or
+raise or lower the priority to resolve whatever problem you noticed.
+
+Additionally, you can treat any individual showing as an exception
+that you do want to record or don't want to record. To use these
+"override" features, highlight the item and press SELECT. You will
+see a message explaining the current status and at least an "OK"
+button to exit without making changes.
+
+For items scheduled to record, there will be a button for "Don't
+record" which will prevent recording this showing but will still
+allow the same episode to record in the future. If there is episode
+description information, you may also see a button for "Never
+record".  This prevents recording this showing and tells MythTV to
+remember that this is an episode that you've seen or don't need to
+see if it is ever in the TV listings again.
+
+For items that are not scheduled to record, the message will
+describe the reason and in the case of "C" or "L" it will include a
+list of the shows that are scheduled to record instead. For any item
+that could potentially be recorded there will be buttons for "Edit
+Options" and "Add Override". "Edit Options" will allow you to change
+the options for the existing record rule such as raising the priority
+so that the show will record. These changes would apply to this and
+all future showings that match this record rule. "Add Override" will
+allow you to set options that apply to the specific showing without
+affecting the existing record rule.
+
+If you return to an override page after an override has already been
+set, you will also see a "Clear override" to undo your changes. This
+option makes it very easy to try out some "what if" attempts when
+deciding on your best strategy in a difficult situation.
 
 <sect>MythWeb.
 <p>The MythWeb allows you to use a web page to control various
@@ -6941,6 +7230,9 @@ update, update by bline.  David Greaves' suggestion about mythcommflag and
 the seektable. Add a section on differences between a PVR-250 and a 350. Add
 bugzilla pointer.  Add a section on changing channels on STBs.  Add section on
 making mythfrontend SUID root.
+
+v0.16.01, 2004-10-18.  Add stuff about ~/.mythtv directory (Gavin Hurlbut)
+Bruce Markey's scheduler description.
 
 -->
 
