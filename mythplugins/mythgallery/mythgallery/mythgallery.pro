@@ -13,5 +13,5 @@ INSTALLS += target
 LIBS += -L$${PREFIX}/lib -lmyth-$$LIBVERSION -lXinerama
 
 # Input
-HEADERS += embdata.h iconview.h singleview.h gallerysettings.h
+HEADERS += iconview.h singleview.h gallerysettings.h
 SOURCES += iconview.cpp main.cpp singleview.cpp gallerysettings.cpp

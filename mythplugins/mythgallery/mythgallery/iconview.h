@@ -66,7 +66,7 @@ class IconView : public MythDialog
 
     int currow, curcol;
 
-    static QPixmap *foldericon;
+    QPixmap *foldericon;
 
     QSqlDatabase *m_db;
 };

@@ -12,10 +12,6 @@
 
 #include "mythtv/mythcontext.h"
 
-#include "embdata.h"
-
-QPixmap *IconView::foldericon = NULL;
-
 IconView::IconView(QSqlDatabase *db, const QString &startdir, 
                    MythMainWindow *parent, const char *name)
         : MythDialog(parent, name)
@@ -41,13 +37,15 @@ IconView::IconView(QSqlDatabase *db, const QString &startdir,
     currow = 0;
     curcol = 0;
 
-    if (!foldericon)
+    QImage *tmpimage = gContext->LoadScaleImage("galleryfolder.png");
+    if (tmpimage)
     {
-        QImage tmpimage = qembed_findImage("folder");
-        QImage tmp2 = tmpimage.smoothScale(thumbw, thumbh, QImage::ScaleMin);
+        QImage tmp2 = tmpimage->smoothScale(thumbw, thumbh, QImage::ScaleMin);
 
         foldericon = new QPixmap();
         foldericon->convertFromImage(tmp2);
+
+        delete tmpimage;
     }
 
     setNoErase();
@@ -63,6 +61,8 @@ IconView::~IconView()
     }
 
     delete m_font;
+    if (foldericon)
+        delete foldericon;
 }
 
 void IconView::paintEvent(QPaintEvent *e)
@@ -97,8 +97,9 @@ void IconView::paintEvent(QPaintEvent *e)
 
              if (thumb->isdir)
              {
-                 tmp.drawPixmap(xpos + (thumbw - foldericon->width()) / 2,
-                                ypos, *foldericon);
+                 if (foldericon)
+                     tmp.drawPixmap(xpos + (thumbw - foldericon->width()) / 2,
+                                    ypos, *foldericon);
              }
              else
              {
