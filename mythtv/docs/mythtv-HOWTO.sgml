@@ -267,7 +267,7 @@ and replace it with
 <verb>-march=i586</verb> 
 before you compile.
 
-Recent AMD processors, like the Duron, Thunderbird and Athalon don't need this
+Recent AMD processors, like the Duron, Thunderbird and Athlon don't need this
 change.
 
 <sect1>Building LAME.
@@ -739,7 +739,7 @@ Failure to set this variable will result in a lot of UTF-8 errors.
 
 Red Hat 8.0 users, ensure that you do this:
 <tscreen><verb>
-% env LANG=C ./setup 
+% env LANG=C setup 
 </verb></tscreen>
 
 instead of what all the other distributions should use:
@@ -757,7 +757,7 @@ get one week of data inserted into the database.
 
 Red Hat 8.0 users, ensure that you do this:
 <tscreen><verb>
-% env LANG=C ./mythfilldatabase
+% env LANG=C mythfilldatabase
 </verb></tscreen>
 
 All other distributions can execute the following:

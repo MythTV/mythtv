@@ -379,7 +379,7 @@
 
   before you compile.
 
-  Recent AMD processors, like the Duron, Thunderbird and Athalon don't
+  Recent AMD processors, like the Duron, Thunderbird and Athlon don't
   need this change.
 
 
@@ -968,7 +968,7 @@
   Red Hat 8.0 users, ensure that you do this:
 
 
-       % env LANG=C ./setup
+       % env LANG=C setup
 
 
 
@@ -992,7 +992,7 @@
   Red Hat 8.0 users, ensure that you do this:
 
 
-       % env LANG=C ./mythfilldatabase
+       % env LANG=C mythfilldatabase
 
 
 
