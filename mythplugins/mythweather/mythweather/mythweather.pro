@@ -4,10 +4,10 @@
 
 include ( ../settings.pro )
 
-TEMPLATE = app
-CONFIG += thread
+TEMPLATE = lib
+CONFIG += plugin thread
 TARGET = mythweather
-target.path = $${PREFIX}/bin
+target.path = $${PREFIX}/lib/mythtv/plugins
 INSTALLS += target
 
 uifiles.path = $${PREFIX}/share/mythtv/themes/default
@@ -18,8 +18,6 @@ installimages.path = $${PREFIX}/share/mythtv/themes/default
 installimages.files = images/*.png
 
 INSTALLS += installfiles installimages uifiles
-
-LIBS += -L$${PREFIX}/lib -lmyth-$$LIBVERSION
 
 # Input
 

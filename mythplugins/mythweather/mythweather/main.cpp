@@ -19,44 +19,37 @@ using namespace std;
 #include "weather.h"
 #include "weathercomms.h"
 
-#include <mythtv/themedmenu.h>
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythdialogs.h>
+#include <mythtv/mythplugin.h>
 
-MythContext *gContext;
+extern "C" {
+int mythplugin_init(const char *libversion);
+int mythplugin_run(void);
+int mythplugin_config(void);
+}
 
-int main(int argc, char *argv[])
+int mythplugin_init(const char *libversion)
 {
-    QApplication a(argc, argv);
-    QTranslator translator(0);
-
-    gContext = new MythContext(MYTH_BINARY_VERSION);
-
-    QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
-    if (!db)
+    QString lib = libversion;
+    if (lib != MYTH_BINARY_VERSION)
     {
-        printf("Couldn't connect to database\n");
+        cerr << "This plugin was compiled against libmyth version: "
+             << MYTH_BINARY_VERSION
+             << "\nbut the library is version: " << libversion << endl;
+        cerr << "You probably want to recompile everything, and do a\n"
+             << "'make distclean' first.\n";
         return -1;
     }
 
-    if (!gContext->OpenDatabase(db))
-    {
-        printf("couldn't open db\n");
-        return -1;
-    }
+    return 0;
+}
 
-    translator.load(PREFIX + QString("/share/mythtv/i18n/mythweather_") +
-                    QString(gContext->GetSetting("Language").lower()) +
-                    QString(".qm"), ".");
-    a.installTranslator(&translator);
-
-    gContext->LoadQtConfig();
-
-    MythMainWindow *mainWindow = new MythMainWindow();
-    mainWindow->Show();
-    gContext->SetMainWindow(mainWindow);
-
+int mythplugin_run(void)
+{
     int appCode = 0;
 
+/*
     if (argc > 1)
     {
        QString cmdline = QString(argv[1]);
@@ -65,11 +58,41 @@ int main(int argc, char *argv[])
        if (cmdline == "--configure")
            appCode = 2;
     }
+*/
 
-    Weather weatherDat(db, appCode, mainWindow, "weather");
+    QTranslator translator(0);
+    translator.load(PREFIX + QString("/share/mythtv/i18n/mythweather_") +
+                    QString(gContext->GetSetting("Language").lower()) +
+                    QString(".qm"), ".");
+
+    qApp->installTranslator(&translator);
+
+    Weather weatherDat(QSqlDatabase::database(), appCode, 
+                       gContext->GetMainWindow(), "weather");
     weatherDat.exec();
 
-    delete gContext;
+    qApp->removeTranslator(&translator);
 
     return 0;
 }
+
+int mythplugin_config(void)
+{
+    int appCode = 2;
+
+    QTranslator translator(0);
+    translator.load(PREFIX + QString("/share/mythtv/i18n/mythweather_") +
+                    QString(gContext->GetSetting("Language").lower()) +
+                    QString(".qm"), ".");
+
+    qApp->installTranslator(&translator);
+
+    Weather weatherDat(QSqlDatabase::database(), appCode,
+                       gContext->GetMainWindow(), "weather");
+    weatherDat.exec();
+
+    qApp->removeTranslator(&translator);
+
+    return 0;
+}
+

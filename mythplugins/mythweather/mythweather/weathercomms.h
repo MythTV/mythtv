@@ -12,6 +12,8 @@ class WeatherSock : public QObject
   Q_OBJECT
   public:
     WeatherSock(Weather *, bool, int);
+   ~WeatherSock();
+
     QString getData();
     void startConnect();
     int verifyData();

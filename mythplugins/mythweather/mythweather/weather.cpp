@@ -59,6 +59,7 @@ Weather::Weather(QSqlDatabase *db, int appCode, MythMainWindow *parent,
     changeAgg = false;
     noACCID = false;
 
+    wData = NULL;
 
     if (debug == true)
         cerr << "MythWeather: Reading InstallPrefix from context.\n";
@@ -194,6 +195,10 @@ Weather::~Weather()
     accidFile.close();
     delete nextpage_Timer;
     delete update_Timer;
+    delete theme;
+
+    if (wData)
+        delete [] wData;
 }
 
 void Weather::updateBackground(void)

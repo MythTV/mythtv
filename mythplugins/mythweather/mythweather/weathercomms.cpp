@@ -35,6 +35,12 @@ WeatherSock::WeatherSock(Weather *con, bool tDebug, int tAgg)
 	breakout = false;
 }
 
+WeatherSock::~WeatherSock()
+{
+    if (httpSock)
+        delete httpSock;
+}
+
 QString WeatherSock::getData()
 {
 	return weatherData;
