@@ -45,7 +45,7 @@ ParanoiaLevel=full
 # (No effect if libmyth was compiled without lcd support)
 LCDHost=localhost
 
-# Port number LCDproc is listening on (default is 16333)
+# Port number LCDproc is listening on (default is 13666)
 LCDPort=13666
 
 # VisualMode for the player
