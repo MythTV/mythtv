@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-03-31, v2.06
+  2003-04-11, v2.09
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -266,6 +266,9 @@
 
   +o  A dual Celeron/450Mhz is able to view a 480x480 MPEG4/3300Kbps file
      created on a different system with 30% CPU usage.
+
+  +o  A P4 2.4Ghz machine can encode two 3300Kbps 480x480 MPEG4 files and
+     simultaneously serve content to a remote frontend.
 
   [1mNOTE[22m:  You [4mmust[24m use DMA for hard drive access to prevent choppy or
   jittery video.  Red Hat Linux 8.0 apparently does not enable DMA at
@@ -645,7 +648,7 @@
   the tarball to a directory you can find.
 
   Get XMLTV from http://xmltv.sourceforge.net
-  <http://xmltv.sourceforge.net>.  Download version 0.5.8
+  <http://xmltv.sourceforge.net>.  Download version 0.5.9
 
   ______________________________________________________________________
   NOTE for Mandrake users:  If you have added a "PLF" mirror, you may skip the
@@ -742,8 +745,8 @@
 
   Untar the xmltv file:
 
-       $ tar -xjf xmltv-0.5.8.tar.bz2
-       $ cd xmltv-0.5.8
+       $ tar -xjf xmltv-0.5.9.tar.bz2
+       $ cd xmltv-0.5.9
 
   Install the xmltv prerequisites:
 
@@ -758,7 +761,7 @@
 
   Change to the XMLTV directory and compile it:
 
-       $ cd xmltv-0.5.8
+       $ cd xmltv-0.5.9
        $ perl Makefile.PL
 
   You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes"
@@ -1439,25 +1442,33 @@
        begin
            prog = irxevent
            button = channel+
+           repeat = 3
            config = Key Up CurrentWindow
        end
 
        begin
            prog = irxevent
            button = channel-
+           repeat = 3
            config = Key Down CurrentWindow
        end
 
   which took care of basic functionality.  Because the PCTV Studio
   remote has additional buttons, look at the configfiles/lircrc.exam-
-  ple.pinnaclestudiopctv for an example of how to define additional
-  buttons, and how to debug potential button name conflicts between the
+  ple.pinnaclestudiopctv for an example of how to define additional but-
+  tons, and how to debug potential button name conflicts between the
   lircrc.example file and how [1myour [22mremote defines the button names.
 
   By examining the button names defined in /etc/lircd.conf and using the
   [1mirw [22mprogram to make sure that your remote is working, you can create
   the appropriate mappings in .lircrc to get excellent remote
   functionality with MythTV.
+
+  Note the [1mrepeat = [22mparameter.  This informs the irxevent program to
+  pass through every third keypress.  By default, lirc will only send
+  one keypress to the application, even if you're holding down the key.
+  The actual [1mrepeat = [22mnumber will vary from system to system, so
+  experiment and see which value works best for you.
 
   [1m8.7.  Configuring lirc for use with an IR blaster.[0m
 
@@ -1503,8 +1514,8 @@
   command before you load the lirc_sir module. Follow this with the
   install:
 
-  $ su
-  # make install
+       $ su
+       # make install
 
   You will notice that lirc installs the kernel module in
   /lib/modules/uname -a/misc.
@@ -1552,16 +1563,16 @@
   /dev/device. Unlike bourne or bash, csh scripts automatically close
   parent file descriptors before they start.
 
-  $ cd /usr/local/bin
-  # su
-  # cat > change_channel.csh
-  #!/bin/csh
-  echo "changing to $1"
-  /usr/local/bin/channel.pl $1 &
-  ^D
-  # chmod a+x change_channel.csh
-  # exit
-  $ exit
+       $ cd /usr/local/bin
+       # su
+       # cat > change_channel.csh
+       #!/bin/csh
+       echo "changing to $1"
+       /usr/local/bin/channel.pl $1 &
+       ^D
+       # chmod a+x change_channel.csh
+       # exit
+       $ exit
 
   See contrib/channel.pl for the actual file.  Copy it to
   /usr/local/bin/
@@ -1840,19 +1851,19 @@
   If you want to know what time your job will run, you can do the
   following:
 
-  # cat /etc/crontab
-  SHELL=/bin/bash
-  PATH=/sbin:/bin:/usr/sbin:/usr/bin
-  MAILTO=root
-  HOME=/
+       # cat /etc/crontab
+       SHELL=/bin/bash
+       PATH=/sbin:/bin:/usr/sbin:/usr/bin
+       MAILTO=root
+       HOME=/
 
-  # run-parts
-  01 * * * * root nice -n 19 run-parts /etc/cron.hourly
-  02 4 * * * root nice -n 19 run-parts /etc/cron.daily
-  22 4 * * 0 root nice -n 19 run-parts /etc/cron.weekly
-  42 4 1 * * root nice -n 19 run-parts /etc/cron.monthly
-  # exit
-  $
+       # run-parts
+       01 * * * * root nice -n 19 run-parts /etc/cron.hourly
+       02 4 * * * root nice -n 19 run-parts /etc/cron.daily
+       22 4 * * 0 root nice -n 19 run-parts /etc/cron.weekly
+       42 4 1 * * root nice -n 19 run-parts /etc/cron.monthly
+       # exit
+       $
 
   We can see from the display that the cron.daily job will run at 0402
   every morning.
@@ -2000,11 +2011,11 @@
 
   Once it's on your machine, you must move the file and untar it:
 
-       $ su
-       # cp funhouse.tar.gz /usr/local/share/mythtv/themes
-       # cd /usr/local/share/mythtv/themes
-       # tar -xjf funhouse.tar.gz
-       # exit
+  $ su
+  # cp funhouse.tar.gz /usr/local/share/mythtv/themes
+  # cd /usr/local/share/mythtv/themes
+  # tar -xjf funhouse.tar.gz
+  # exit
 
   The theme will now be available in the mythfrontend Appearance
   section.
@@ -2063,13 +2074,13 @@
 
   [1m12.2.  Completing the installation.[0m
 
-  $ tar -xjf mythweb-0.8.tar.bz2
-  $ cd mythweb-0.8
-  $ su
-  # mkdir /var/www/html/mythweb
-  # cp -r . /var/www/html/mythweb
-  # exit
-  $
+       $ tar -xjf mythweb-0.8.tar.bz2
+       $ cd mythweb-0.8
+       $ su
+       # mkdir /var/www/html/mythweb
+       # cp -r . /var/www/html/mythweb
+       # exit
+       $
 
   To access the web page, open a web browser and use [1mhttp://[name or ip[0m
   [1maddress]/mythweb/[0m
@@ -2160,14 +2171,14 @@
   Download FLAC from http://flac.sourceforge.net
   <http://flac.sourceforge.net> and install:
 
-       $ tar -xzf flac-1.1.0.tar.gz
-       $ cd flac-1.1.0
-       $ ./configure
-       $ make
-       $ su
-       # make install
-       # exit
-       $
+  $ tar -xzf flac-1.1.0.tar.gz
+  $ cd flac-1.1.0
+  $ ./configure
+  $ make
+  $ su
+  # make install
+  # exit
+  $
 
   Download libcdaudio from libcdaudio.sourceforge.net
   <http://sourceforge.net/project/showfiles.php?group_id=27134> and
@@ -2256,7 +2267,6 @@
   packages for Vorbis, cdparanoia, SDL, and OpenGL (which you probably
   already have installed). To install these all at once, simply type
   (all on the same line):
-
        $ up2date --solvedeps libvorbis libvorbis-devel vorbis-tools cdparanoia-devel cdparanoia-libs cdparanoia SDL-devel SDL
 
   If you get the following message: "None of the packages you requested

@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-03-31, v2.06
+<date>2003-04-11, v2.09
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -117,6 +117,8 @@ stream using the RTJPEG codec with 480x480 capture resolution and play it back
 simultaneously, thereby allowing live TV watching.
 <item>A dual Celeron/450Mhz is able to view a 480x480 MPEG4/3300Kbps file
 created on a different system with 30% CPU usage.
+<item>A P4 2.4Ghz machine can encode two 3300Kbps 480x480 MPEG4 files and
+simultaneously serve content to a remote frontend.
 </itemize>
 
 <bf>NOTE</bf>:  You <em>must</em> use DMA for hard drive access to prevent
@@ -493,7 +495,7 @@ run it if you get an unexpected error about not finding libraries.
 web site.  Save the tarball to a directory you can find.
 
 Get XMLTV from <url url="http://xmltv.sourceforge.net"
-name="http://xmltv.sourceforge.net">.  Download version 0.5.8
+name="http://xmltv.sourceforge.net">.  Download version 0.5.9
 
 <code>
 NOTE for Mandrake users:  If you have added a "PLF" mirror, you may skip the
@@ -589,8 +591,8 @@ Continuing on:
 
 <label id="untarring_xmltv">Untar the xmltv file:
 <tscreen><verb>
-$ tar -xjf xmltv-0.5.8.tar.bz2
-$ cd xmltv-0.5.8
+$ tar -xjf xmltv-0.5.9.tar.bz2
+$ cd xmltv-0.5.9
 </verb></tscreen>
 Install the xmltv prerequisites:
 <tscreen><verb>
@@ -606,7 +608,7 @@ cpan> exit
 
 Change to the XMLTV directory and compile it:
 <tscreen><verb>
-$ cd xmltv-0.5.8
+$ cd xmltv-0.5.9
 $ perl Makefile.PL
 </verb></tscreen>
 You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes" to
@@ -1309,12 +1311,14 @@ following to my /home/[yourusername]/.lircrc file:
 begin
     prog = irxevent
     button = channel+
+    repeat = 3
     config = Key Up CurrentWindow
 end
 
 begin
     prog = irxevent
     button = channel-
+    repeat = 3
     config = Key Down CurrentWindow
 end
 </verb></tscreen>
@@ -1329,6 +1333,12 @@ By examining the button names defined in <tt>/etc/lircd.conf</tt> and using
 the <bf>irw</bf> program to make sure that your remote is working, you can
 create the appropriate mappings in <tt>.lircrc</tt> to get excellent remote
 functionality with MythTV.
+
+Note the <bf>repeat =</bf> parameter.  This informs the <tt>irxevent</tt>
+program to pass through every third keypress.  By default, <tt>lirc</tt>
+will only send one keypress to the application, even if you're holding down
+the key.  The actual <bf>repeat =</bf> number will vary from system to
+system, so experiment and see which value works best for you.
 
 <sect1>Configuring lirc for use with an IR blaster.
 <p>By Carlos Talbot, <url url="mailto:carlos@talbot.net">
@@ -2854,6 +2864,9 @@ Mandrake 9.1 mythmusic prereq.
 v2.06, 2003-03-27.  grammar error.  Added link to Axel Thimm's RPMs. 
 Expanded on the command line parameters to mythbackend.
 v2.07, 2003-03-31.  more b0rken btaudio.  Added to amixer commands.
+v2.08, 2003-04-07.  Updated XMLTV.
+v2.09, 2003-04-11.  Add spec for P4 2.4Ghz machine.  Added comment on repeat
+= commands for .lircrc file.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

@@ -386,12 +386,14 @@ following to my /home/[yourusername]/.lircrc file:
 begin
     prog = irxevent
     button = channel+
+    repeat = 3
     config = Key Up CurrentWindow
 end
 
 begin
     prog = irxevent
     button = channel-
+    repeat = 3
     config = Key Down CurrentWindow
 end
 </PRE>
@@ -407,6 +409,11 @@ remote defines the button names.</P>
 the <B>irw</B> program to make sure that your remote is working, you can
 create the appropriate mappings in <CODE>.lircrc</CODE> to get excellent remote
 functionality with MythTV.</P>
+<P>Note the <B>repeat =</B> parameter.  This informs the <CODE>irxevent</CODE>
+program to pass through every third keypress.  By default, <CODE>lirc</CODE>
+will only send one keypress to the application, even if you're holding down
+the key.  The actual <B>repeat =</B> number will vary from system to
+system, so experiment and see which value works best for you.</P>
 
 <H2><A NAME="ss8.7">8.7</A> <A HREF="mythtv-HOWTO.html#toc8.7">Configuring lirc for use with an IR blaster.</A>
 </H2>
