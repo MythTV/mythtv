@@ -59,6 +59,7 @@ class DaapInstance: public QThread
     
     void doServerInfoResponse(TagInput& dmap_data);
     void doLoginResponse(TagInput &dmap_data);
+    void doUpdateResponse(TagInput &dmap_data);
 
   private:
 

@@ -22,6 +22,7 @@ DaapResponse::DaapResponse(
                             int length
                           )
 {
+    expected_payload_size = -1;
     parent = owner;
     raw_length = length;
     all_is_well = true;
@@ -110,8 +111,7 @@ DaapResponse::DaapResponse(
                   );
     
     //
-    //  Check that server is sending as many bytes as it said it would in
-    //  the HTTP header
+    //  Make note of how many bytes we expect in total
     //
     
     HttpHeader *content_length_header = headers.find("Content-Length");
@@ -121,21 +121,14 @@ DaapResponse::DaapResponse(
         int content_length = content_length_header->getValue().toInt(&ok);
         if(ok)
         {
-            if(content_length != length - parse_point)
-            {
-                parent->log(QString("daap response payload size mismatch ("
-                                    "Content-Length=%1, actual=%2)")
-                                    .arg(content_length)
-                                    .arg(length - parse_point),3);
-            }
-        }
-        else
-        {
-            parent->warning("daap response got garbage in the returned "
-                            "Content-Length header");
+            expected_payload_size = content_length;
+            return;
         }
     }
     
+    parent->warning("daapresponse could not set the "
+                    "expected payload size ... BAD  ");
+    all_is_well = false;
 }
 
 int DaapResponse::readLine(int *parse_point, char *parsing_buffer, char *raw_response)
@@ -184,6 +177,25 @@ int DaapResponse::readLine(int *parse_point, char *parsing_buffer, char *raw_res
     *parse_point = index;
     return amount_read;
 }
+
+bool DaapResponse::complete()
+{
+    if( ((int) (payload.size())) == expected_payload_size)
+    {
+        return true;
+    }
+    return false;
+}
+
+void DaapResponse::appendToPayload(char *raw_incoming, int length)
+{
+    payload.insert( 
+                    payload.end(), 
+                    raw_incoming, 
+                    raw_incoming + length
+                  );
+}
+
 
 QString DaapResponse::getHeader(const QString& field_label)
 {

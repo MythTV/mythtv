@@ -260,28 +260,110 @@ void DaapInstance::warning(const QString &warn_message)
 
 void DaapInstance::handleIncoming()
 {
-    //
-    //  This just makes a daapresponse object out of the raw incoming socket
-    //  data. NB: assume all the response is here ... probably need to FIX
-    //  that at some point.
-    //
-
-    
     
     //
-    //  Collect the incoming data
+    //  Collect the incoming data. We need to sit here until we get exactly
+    //  as many bytes as the server said we should. Note that this assumes
+    //  that:
+    //
+    //      ! the incoming http (i.e. daap) stuff will *always* include a
+    //        *correct* Content-Length header
+    //
+    //      ! that all the headers and the blank line separating headers
+    //        from payload will arrive in the first block!!!
+    //
+    //      ! that the buffer_size is big enough to get through all the
+    //        headers
     //  
+    //  Obviously, this code could be made far more robust.
+    //
     
-    char incoming[10000];   // FIX this crap soon
+    static int buffer_size = 8192;
+    char incoming[buffer_size];
     int length = 0;
+
+    DaapResponse *new_response = NULL;
     
-    length = client_socket_to_daap_server->readBlock(incoming, 10000 - 1);
-    if(length > 0)
+    length = client_socket_to_daap_server->readBlock(incoming, buffer_size);
+    
+    while(length > 0)
     {
+        if(!new_response)
+        {
+            new_response = new DaapResponse(this, incoming, length);
+        }
+        else
+        {
+            new_response->appendToPayload(incoming, length);
+        }
+
+        if(new_response->complete())
+        {
+            length = 0;
+        }
+        else
+        {
+            if(new_response->allIsWell())
+            {
+                bool wait_a_while = true;
+                while(wait_a_while)
+                {
+                    bool server_still_there = true;
+                    
+                    if(client_socket_to_daap_server->waitForMore(1000, &server_still_there) < 1)
+                    {
+                        if(!server_still_there)
+                        {
+                            new_response->allIsWell(false);
+                            wait_a_while = false;
+                            length = 0;
+                        }
+                    }
+                    else if(!keep_going)
+                    {
+                        new_response->allIsWell(false);
+                        wait_a_while = false;
+                        length = 0;
+                    }
+                    else
+                    {
+                        length = client_socket_to_daap_server->readBlock(incoming, buffer_size);
+                        if(length > 0)
+                        {
+                            wait_a_while = false;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                length = 0;
+            }
+        }
+    }
     
-        DaapResponse *new_response = new DaapResponse(this, incoming, length);
-        processResponse(new_response);
-        delete new_response;
+    if(new_response)
+    {
+        if(new_response->allIsWell())
+        {
+            processResponse(new_response);
+            delete new_response;
+            new_response = NULL;
+        }
+        else
+        {
+            //
+            //  Well, something is borked. Give up on this daap server.
+            //
+            
+            warning(QString("daap instance has given up on "
+                            "\"%1\" (%2:%3)")
+                            .arg(service_name)
+                            .arg(server_address)
+                            .arg(server_port));
+            delete client_socket_to_daap_server;
+            client_socket_to_daap_server = NULL;
+        }
     }
     
 }
@@ -359,7 +441,7 @@ bool DaapInstance::checkServerType(const QString &server_description)
                 {
                     daap_server_type = DAAP_SERVER_ITUNESLESSTHAN401;
                     log(QString("daap instance discovered service "
-                                "named \"%1\" is being served out by "
+                                "named \"%1\" is being served by "
                                 "iTunes (v < 4.1 !!)")
                                 .arg(service_name), 2);
                     return true;
@@ -371,7 +453,7 @@ bool DaapInstance::checkServerType(const QString &server_description)
         {
             daap_server_type = DAAP_SERVER_MYTH;
             log(QString("daap instance discovered service "
-                        "named \"%1\" is being served out by "
+                        "named \"%1\" is being served by "
                         "another myth box :-)")
                         .arg(service_name), 2);
         }
@@ -469,9 +551,14 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
     {
         doLoginResponse(rebuilt_internal);
     }
+    else if(top_level_tag.type == 'mupd')
+    {
+        doUpdateResponse(rebuilt_internal);
+    }
     else
     {
-        warning("daap instance got a top level unknown tag in a dmap payload");
+        warning("daap instance got a top level "
+                "unknown tag in a dmap payload ");
     }
 }
 
@@ -766,6 +853,88 @@ void DaapInstance::doLoginResponse(TagInput& dmap_data)
                         "and is giving up")
                         .arg(service_name));
     }  
+}
+
+void DaapInstance::doUpdateResponse(TagInput& dmap_data)
+{
+    log("code has made it to doUpdateResponse(), that's as far as I've gotten", 1);
+/*
+    bool login_status = false;
+    Tag a_tag;
+    Chunk emergency_throwaway_chunk;
+
+    while(!dmap_data.isFinished())
+    {
+        //
+        //  parse responses to a /login request
+        //
+
+        dmap_data >> a_tag;
+
+        u32 a_u32_variable;
+
+        switch(a_tag.type)
+        {
+            case 'mstt':
+
+                //
+                //  status of login request
+                //
+                
+                dmap_data >> a_u32_variable;
+                if(a_u32_variable == 200)    // like HTTP 200 (OK!)
+                {
+                    login_status = true;
+                }
+                break;
+
+            case 'mlid':
+
+                //
+                //  session id ... important, we definitely need this
+                //
+                
+                dmap_data >> a_u32_variable;
+                session_id = (int) a_u32_variable;
+                break;
+
+            default:
+                warning("daap instance got an unknown tag type "
+                        "while doing doLoginResponse()");
+                dmap_data >> emergency_throwaway_chunk;
+        }
+
+        dmap_data >> end;
+
+    }
+
+    if(session_id != -1 && login_status)
+    {
+        logged_in = true;
+        log(QString("daap instance has managed to log "
+                    "on to \"%1\" and will start loading "
+                    "metadata ... ")
+                    .arg(service_name), 5);
+
+        //
+        //  Time to use our new session id to get ourselves an /update
+        //
+        
+        DaapRequest update_request(this, "/update", server_address);
+        update_request.addGetVariable("session-id", session_id);
+        //update_request.addGetVariable("revision-number", metadata_generation);
+        update_request.send(client_socket_to_daap_server);
+                
+        
+    }
+    else
+    {
+        warning(QString("daap instance could not log on "
+                        "to \"%1\" (password protected?) "
+                        "and is giving up")
+                        .arg(service_name));
+    }  
+*/
 }
 
 DaapInstance::~DaapInstance()
