@@ -768,25 +768,27 @@ void ProgramInfo::ToggleRecord(QSqlDatabase *db)
 {
     RecordingType curType = GetProgramRecordingStatus(db);
 
+    // The number passed to ApplyRecordStateChange is the selection
+    // number in SRRecordingType and not the actual record type.
     switch (curType) 
     {
         case kNotRecording:
-            ApplyRecordStateChange(db, kSingleRecord);
+            ApplyRecordStateChange(db, (RecordingType) 1); // kSingleRecord
             break;
         case kSingleRecord:
-            ApplyRecordStateChange(db, kTimeslotRecord);
-            break;
-        case kTimeslotRecord:
-            ApplyRecordStateChange(db, kWeekslotRecord);
-            break;
-        case kWeekslotRecord:
-            ApplyRecordStateChange(db, kChannelRecord);
-            break;
-        case kChannelRecord:
-            ApplyRecordStateChange(db, kFindOneRecord);
+            ApplyRecordStateChange(db, (RecordingType) 2); // kFindOneRecord
             break;
         case kFindOneRecord:
-            ApplyRecordStateChange(db, kAllRecord);
+            ApplyRecordStateChange(db, (RecordingType) 3); // kWeekslotRecord
+            break;
+        case kWeekslotRecord:
+            ApplyRecordStateChange(db, (RecordingType) 4); // kTimeslotRecord
+            break;
+        case kTimeslotRecord:
+            ApplyRecordStateChange(db, (RecordingType) 5); // kChannelRecord
+            break;
+        case kChannelRecord:
+            ApplyRecordStateChange(db, (RecordingType) 6); // kAllRecord
             break;
         case kAllRecord:
         default:
