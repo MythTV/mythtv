@@ -102,9 +102,10 @@ void EditMetadataDialog::fillWidgets()
                     QString caught_name_three_quarters = caught_name.left((int)(length_compare * 0.75));
                     QString target_name_three_quarters = target_name.left((int)(length_compare * 0.75));
                     
-                    if(caught_name_three_quarters == target_name_three_quarters)
+                    if(caught_name_three_quarters == target_name_three_quarters && working_metadata->ChildID() == 0)
                     {
                         possible_starting_point = a_query.value(0).toInt();
+                        working_metadata->setChildID(possible_starting_point);
                     }
                     trip_catch = false;
                 }
