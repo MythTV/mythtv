@@ -40,7 +40,7 @@ class IvtvDecoder : public DecoderBase
 
     bool isLastFrameKey(void) { return false; }
     void WriteStoredData(RingBuffer *rb, bool storevid, long timecodeOffset)
-                           { (void)rb; (void)storevid; (long)timecodeOffset;}
+                           { (void)rb; (void)storevid; (void)timecodeOffset;}
     void SetRawAudioState(bool state) { (void)state; }
     bool GetRawAudioState(void) { return false; }
     void SetRawVideoState(bool state) { (void)state; }
@@ -56,10 +56,11 @@ class IvtvDecoder : public DecoderBase
     RingBuffer *getRingBuf(void) { return ringBuffer; }
 
   private:
-    int MpegPreProcessPkt(unsigned char *buf, int start, int len, long long startpos);
+    int MpegPreProcessPkt(unsigned char *buf, int len, 
+                          long long startpos, long stopframe);
     void SeekReset(long long newkey = 0, int skipframes = 0,
                    bool needFlush = false);
-    bool ReadWrite(int onlyvideo);
+    bool ReadWrite(int onlyvideo, long stopframe = LONG_MAX);
     bool StepFrames(int start, int count);
 
     int frame_decoded;
@@ -79,14 +80,11 @@ class IvtvDecoder : public DecoderBase
 
     static bool ntsc;
 
-    static const int vidmax = 65536;
+    static const int vidmax = 131072; // must be a power of 2
     unsigned char vidbuf[vidmax];
     int vidread, vidwrite, vidfull;
-    int vidscan, vidpoll, vid2write;
-    int vidanyframes, videndofframe;
-    long long startpos;
+    int vidframes;
     unsigned mpeg_state;
-    long long framesScanned;
     bool needPlay;
     long long videoPlayed;
 
