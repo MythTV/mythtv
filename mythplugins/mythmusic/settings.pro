@@ -11,6 +11,6 @@ INCLUDEPATH *= /usr/local/include
 DEFINES += _GNU_SOURCE
 DEFINES += PREFIX=\"$${PREFIX}\"
 release {
-        QMAKE_CXXFLAGS_RELEASE = -O3 -march=pentiumpro -fomit-frame-pointer -funroll-loops -fexpensive-optimizations -finline-functions
-        QMAKE_CFLAGS_RELEASE = -O3 -march=pentiumpro -fomit-frame-pointer -funroll-loops -fexpensive-optimizations -finline-functions
+        QMAKE_CXXFLAGS_RELEASE = -O3 -march=pentiumpro -fomit-frame-pointer -fexpensive-optimizations -finline-functions
+        QMAKE_CFLAGS_RELEASE = -O3 -march=pentiumpro -fomit-frame-pointer -fexpensive-optimizations -finline-functions
 }
