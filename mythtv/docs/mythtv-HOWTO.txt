@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-06-09, v2.41
+  2003-06-09, v2.42
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -140,6 +140,8 @@
      18.15 My PVR-250 card doesn't show inputs in the setup screen.
      18.16 Where's my "canada-cable" entry gone to?
      18.17 Mythweb is showing a db_open error when I connect to it.
+     18.18 error: can't find a register in class 'BREG' while reloading 'asm'
+     18.19 make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
 
   19. Miscellaneous.
      19.1 I'd like to watch the files without using MythTV / I'd like to convert the files to some other format.
@@ -206,7 +208,6 @@
   <http://www.snowman.net/mailman/listinfo/mythtv-users>.
 
   This HOWTO is for MythTV v0.9.
-
 
 
   [1m2.  Introduction.[0m
@@ -3645,6 +3646,37 @@
   Restart apache for it to take effect.
 
 
+  [1m18.18.  error: can't find a register in class 'BREG' while reloading[0m
+  [1m'asm'[0m
+
+  This is due to the broken Qt that is being distributed by Suse.  To
+  work around this, edit libs/libavcodec/Makefile and remove any "-fPIC"
+  you find there and then recompile.
+
+
+  [1m18.19.  make: *** No rule to make target[0m
+  [1m/usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.[0m
+
+  This error happens when there's a missing link in the
+  /usr/lib/qt3/mkspecs directory.  There are two ways to fix this error:
+  1.  Create the link manually:
+
+
+       # cd /usr/lib/qt3/mkspecs
+       # ln -sf linux-g++ default
+
+
+
+  and then restart the compile,
+
+  or
+
+  2.  Re-run [1mqmake [22min the mythtv directory.  Rerunning [1mqmake [22mwill create
+  a new Makefile for you, however this still doesn't fix the root cause
+  of the issue, which is that your distribution didn't create the
+  symlink for you when the qt3 package was installed.  The first choice
+  is the better solution.
+
   [1m19.  Miscellaneous.[0m
 
   [1m19.1.  I'd like to watch the files without using MythTV / I'd like to[0m
@@ -3706,11 +3738,12 @@
   The following also works with blackbox:
 
 
-       $ cat > .xinitrc
-       xset -dpms s off &
-       irxevent &
-       mythfrontend &
-       blackbox
+
+  $ cat > .xinitrc
+  xset -dpms s off &
+  irxevent &
+  mythfrontend &
+  blackbox
 
 
 
@@ -3771,7 +3804,6 @@
   720x240 is possible, but isn't a good tradeoff relative to the number
   of vertical lines lost.  In a PAL country, the you would use values
   like 720x576 or x288.
-
   The higher resolutions will be more CPU intensive. If the CPU is
   overtaxed, frames will be dropped causing uneven motion. You will
   likely see the best results at resolutions which average at least 10%
@@ -3805,6 +3837,7 @@
 
   The MythTV GUI uses its GUI dimensions regardless of the other two and
   is anchored to the upper left corner of the X Desktop.
+
   The MythTV full screen mode uses the X display size dimensions
   regardless of the other two and is anchored to the upper left corner
   of the X display.
@@ -3965,7 +3998,6 @@
   Once btaudio loads, it should register additional /dev/dsp and
   /dev/mixer devices.  Typing $ dmesg will let you know what's going on.
 
-
   [1m19.9.  Removing unwanted channels.[0m
 
   If [1mmythfilldatabase [22mgrabbed a channel which you do not want to include
@@ -3998,6 +4030,8 @@
        $ mysql -u root mythconverg
        mysql> delete from program where chanid = '1015';
 
+
+
   [1m19.10.  I'd like to use a hardware MPEG-2 encoder.[0m
 
   [1mNOTE[22m:  THE FOLLOWING DOCUMENTATION IS PROVIDED AS-IS AND IS NOT
@@ -4024,6 +4058,7 @@
 
 
   [1mNOTE[22m:  You do not need to recompile your kernel.
+
 
   Download the IVTV driver from CVS:
 
@@ -4060,12 +4095,13 @@
 
   Add the following to /etc/modules.conf:
 
-  alias char-major-81     videodev
-  alias char-major-81-0   ivtv
-  options ivtv debug=1
-  options tuner type=2
-  options msp3400 once=1 simple=1
-  add below ivtv msp3400 saa7115 tuner
+
+       alias char-major-81     videodev
+       alias char-major-81-0   ivtv
+       options ivtv debug=1
+       options tuner type=2
+       options msp3400 once=1 simple=1
+       add below ivtv msp3400 saa7115 tuner
 
 
 
@@ -4148,8 +4184,6 @@
 
        # echo "/sbin/modprobe ivtv" >> /etc/rc.d/rc.local
 
-
-
   By default, the IVTV driver uses a 16Mbps peak rate with a 8Mbps VBR.
   This will create files at about 4GB/hour.  If you wish to adjust these
   parameters, add something like the following to your rc.local:
@@ -4185,8 +4219,7 @@
   To turn off DNR, add the following to your rc.local:
 
 
-
-  /path/to/ivtv/utils/test_ioctl --set-codec-params=dnr_mode=0,dnr_temporal=0
+       /path/to/ivtv/utils/test_ioctl --set-codec-params=dnr_mode=0,dnr_temporal=0
 
 
 
@@ -4307,12 +4340,13 @@
   to edit the /etc/security/msec/perm.local file to include the
   following:
 
-  # /etc/security/msec/perm.local
-  # Local overrides to the msec program
-  #
-  # Full file path                user.group              permissions
-  /var/log/mythtv/                root.mythtv             775
-  /var/log/mythtv/*               root.mythtv             664
+
+       # /etc/security/msec/perm.local
+       # Local overrides to the msec program
+       #
+       # Full file path                user.group              permissions
+       /var/log/mythtv/                root.mythtv             775
+       /var/log/mythtv/*               root.mythtv             664
 
 
 
@@ -4334,8 +4368,6 @@
        # msec
        # exit
        $
-
-
 
   [1mNOTE[22m: msec can only [4mreduce[24m the permissions of files, so if you don't
   get the results you expect, check that you're not asking msec to add
@@ -4433,7 +4465,7 @@
   already been created using [1mfdisk[22m.
 
 
-  # mkfs.ext3 -T largefile4 -m 0 /dev/hdb1
+       # mkfs.ext3 -T largefile4 -m 0 /dev/hdb1
 
 
 

@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-06-09, v2.41
+<date>2003-06-09, v2.42
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -2937,6 +2937,31 @@ more information.
 
 Restart apache for it to take effect.
 
+<sect1>error: can't find a register in class 'BREG' while reloading 'asm'
+<p>This is due to the broken Qt that is being distributed by Suse.  To work
+around this, edit <tt>libs/libavcodec/Makefile</tt> and remove any
+"-fPIC" you find there and then recompile.
+
+<sect1>make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
+
+<p>This error happens when there's a missing link in the
+<tt>/usr/lib/qt3/mkspecs</tt> directory.  There are two ways to fix this
+error:
+1.  Create the link manually:
+<tscreen><verb>
+# cd /usr/lib/qt3/mkspecs
+# ln -sf linux-g++ default
+</verb></tscreen>
+and then restart the compile,
+
+or
+
+2.  Re-run <bf>qmake</bf> in the mythtv directory.  Rerunning <bf>qmake</bf>
+will create a new Makefile for you, however this still doesn't fix the root
+cause of the issue, which is that your distribution didn't create the
+symlink for you when the qt3 package was installed.  The first choice is the
+better solution.
+
 <sect>Miscellaneous. 
 <sect1>I'd like to watch the files without using MythTV / I'd like to convert the files to some other format. 
 <p>Matthew Zimmerman has created a patch for MPlayer / Mencoder <url
@@ -3709,6 +3734,8 @@ modules should have the link to ttySx.  Altered the PVR-250 bitrate example.
 v2.40, 2003-06-09.  Fixed lirc acronym expansion.  sdl vs. SDL in Mandrake
 MythMusic.  Updated MythVideo docs.
 v2.41, 2003-06-09.  Bumped version numbers to 0.9.
+v2.42, 2003-06-09.  Added troubleshooting note on Suse.  Added the mkspecs
+->default error.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
