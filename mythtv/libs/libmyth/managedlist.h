@@ -349,12 +349,24 @@ class BoundedIntegerManagedListItem : public SelectManagedListItem
     public:
         BoundedIntegerManagedListItem(int minValIn, int maxValIn, int _bigStep, int _step = 1,
                                       ManagedListGroup* _group=NULL, ManagedList* parentList=NULL,
-                                      QObject* _parent=NULL, const char* _name=0);
+                                      QObject* _parent=NULL, const char* _name=0, bool _invert = false);
 
 
-        virtual bool hasLeft() { return intValue() > minVal; }
+        virtual bool hasLeft()
+        {
+            if (inverted)
+                return intValue() < maxVal;
+            else
+                return intValue() > minVal;
+        }
 
-        virtual bool hasRight(){ return intValue() < maxVal; }
+        virtual bool hasRight()
+        {
+            if (inverted)
+                return intValue() > minVal;
+            else
+                return intValue() < maxVal;
+        }
 
         void setTemplates(const QString& negStr, const QString& negOneStr, const QString& zeroStr,
                           const QString& oneStr, const QString& posStr);
@@ -370,8 +382,29 @@ class BoundedIntegerManagedListItem : public SelectManagedListItem
 
 
     public slots:
-        virtual void cursorLeft(bool page = false) { if (enabled) changeValue(page ? (0 - bigStep) : (0 - step)); }
-        virtual void cursorRight(bool page = false) { if (enabled) changeValue(page ? bigStep : step); }
+        virtual void cursorLeft(bool page = false)
+        {
+            if (enabled)
+            {
+                if (inverted)
+                    changeValue(page ? bigStep : step);
+                else
+                    changeValue(page ? (0 - bigStep) : (0 - step));
+            }
+        }
+
+        virtual void cursorRight(bool page = false)
+        {
+            if (enabled)
+            {
+                if (inverted)
+                    changeValue(page ? (0 - bigStep) : (0 - step));
+                else
+                    changeValue(page ? bigStep : step);
+            }
+        }
+
+
         virtual void slotGuiActivate(ManagedListGroup*) { generateList(); }
 
     protected:
@@ -388,6 +421,7 @@ class BoundedIntegerManagedListItem : public SelectManagedListItem
         int maxVal;
         int minVal;
         bool listBuilt;
+        bool inverted;
 };
 
 
@@ -585,19 +619,20 @@ class BoundedIntegerManagedListSetting : public ManagedListSetting
     public:
         BoundedIntegerManagedListSetting(int _min, int _max, int _bigStep, int _step, const QString& ItemName,
                                   QString _table, QString _column, ManagedListGroup* _group,
-                                  ManagedList* _parentList=NULL)
+                                  ManagedList* _parentList=NULL, bool _invert = false)
                             : ManagedListSetting(_table, _column, _parentList)
         {
             BoundedIntegerListItem = new BoundedIntegerManagedListItem(_min, _max, _bigStep, _step,
-                                                                       _group, _parentList, this, ItemName);
+                                                                       _group, _parentList, this, ItemName,
+                                                                       _invert);
             listItem = BoundedIntegerListItem;
             connect(listItem, SIGNAL(changed(ManagedListItem*)), this, SLOT(itemChanged(ManagedListItem*)));
         }
 
         operator BoundedIntegerManagedListItem* () { return BoundedIntegerListItem; }
 
-        void setTemplates(const QString& negStr, const QString& negOneStr, const QString& zeroStr, const QString& oneStr,
-                          const QString& posStr)
+        void setTemplates(const QString& negStr, const QString& negOneStr, const QString& zeroStr,
+                          const QString& oneStr, const QString& posStr)
         {
             BoundedIntegerListItem->setTemplates(negStr, negOneStr, zeroStr, oneStr, posStr);
         }

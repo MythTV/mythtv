@@ -131,9 +131,9 @@ class SRBoundedIntegerSetting : public BoundedIntegerManagedListSetting
     public:
         SRBoundedIntegerSetting(int _min, int _max, int _bigStep, int _step, ScheduledRecording& _parent,
                                 const QString& ItemName, QString _column, ManagedListGroup* _group,
-                                ManagedList* _parentList=NULL)
+                                ManagedList* _parentList=NULL,  bool _invert = false)
             : BoundedIntegerManagedListSetting(_min, _max, _bigStep, _step, ItemName, "record",
-                                               _column, _group, _parentList),
+                                               _column, _group, _parentList, _invert),
               parent(_parent)
 
         {
@@ -206,10 +206,12 @@ class SRStartOffset : public SRBoundedIntegerSetting
     public:
         SRStartOffset(ScheduledRecording& _parent, ManagedListGroup* _group, ManagedList* _list)
                      : SRBoundedIntegerSetting( -120, 120, 10, 1, _parent, "startoffsetList", "startoffset",
-                                                _group, _list)
+                                                _group, _list, true)
         {
-            setTemplates("Start recording %1 minutes late", "Start recording %1 minute late",
-                         "Start recording on time", "Start recording %1 minute early",
+            setTemplates("Start recording %1 minutes late",
+                         "Start recording %1 minute late",
+                         "Start recording on time",
+                         "Start recording %1 minute early",
                          "Start recording %1 minutes early");
 
             _parent.setStartOffsetObj(this);

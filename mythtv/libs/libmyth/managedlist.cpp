@@ -151,7 +151,8 @@ void IntegerManagedListItem::syncTextToValue()
 BoundedIntegerManagedListItem::BoundedIntegerManagedListItem(int _minVal, int _maxVal, int _bigStep,
                                                              int _step, ManagedListGroup* _group,
                                                              ManagedList* _list,
-                                                             QObject* _parent, const char* _name)
+                                                             QObject* _parent, const char* _name,
+                                                             bool _invert)
                              : SelectManagedListItem("", _group,  _list, _parent, _name)
 {
     step = _step;
@@ -159,6 +160,7 @@ BoundedIntegerManagedListItem::BoundedIntegerManagedListItem(int _minVal, int _m
     minVal = _minVal;
     maxVal = _maxVal;
     listBuilt = false;
+    inverted = _invert;
 //    setValue(0);
 }
 
