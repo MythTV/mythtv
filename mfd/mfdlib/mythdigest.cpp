@@ -26,8 +26,8 @@ MythDigest::MythDigest(const QString &a_file_name)
 
 QString MythDigest::calculate()
 {
-    //
-    //  Bit of an odd algorithm. 
+    QString the_digest = "";
+    
     //
     //  This code forms a "message" out the first 4096 bytes of the file + a
     //  string representation of the size of the file + the last 4096 bytes
@@ -51,10 +51,41 @@ QString MythDigest::calculate()
 
 
 
-    uint64_t file_size = the_file.size();
-    if(file_size < 8192)
+    long int file_size = the_file.size();
+    if(file_size < 8192 && file_size > 0)
     {
-        //
+        char *full_file = new char [file_size];
+        if(!the_file.at(0))
+        {
+            the_file.close();
+            return QString("");
+        }
+        if(the_file.readBlock(full_file, file_size) != file_size)
+        {
+            the_file.close();
+            return QString("");
+        }
+
+        EVP_MD_CTX mdctx;
+        const EVP_MD *md;
+        unsigned char md_value[EVP_MAX_MD_SIZE];
+        uint md_len;
+
+        OpenSSL_add_all_digests();
+        md = EVP_get_digestbyname("md5");
+        EVP_MD_CTX_init(&mdctx);
+        EVP_DigestInit_ex(&mdctx, md, NULL);
+        EVP_DigestUpdate(&mdctx, full_file, 4096);
+        EVP_DigestFinal_ex(&mdctx, md_value, &md_len);
+        EVP_MD_CTX_cleanup(&mdctx);
+
+        the_digest = "";
+        for(uint i = 0; i < md_len; i++)
+        {
+            QString next_byte ="";
+            next_byte.sprintf("%02x", md_value[i]);
+            the_digest.append(next_byte);
+        }
     }
     else
     {
@@ -95,9 +126,7 @@ QString MythDigest::calculate()
         //  Get string representatin of file size
         //
          
-        //QString file_size_string = QString("%1").arg(file_size);
-
-        //cout << "file_size_string is " << file_size_string.ascii() << endl;
+        QString file_size_string = QString("%1").arg(file_size);
 
         //
         //  Calculate the digest (md5, from openssl)
@@ -113,22 +142,23 @@ QString MythDigest::calculate()
         EVP_MD_CTX_init(&mdctx);
         EVP_DigestInit_ex(&mdctx, md, NULL);
         EVP_DigestUpdate(&mdctx, first_four_kbytes, 4096);
-        //EVP_DigestUpdate(&mdctx, file_size_string.ascii(), strlen(file_size_string.ascii()));
+        EVP_DigestUpdate(&mdctx, file_size_string.ascii(), strlen(file_size_string.ascii()));
         EVP_DigestUpdate(&mdctx, last_four_kbytes, 4096);
         EVP_DigestFinal_ex(&mdctx, md_value, &md_len);
         EVP_MD_CTX_cleanup(&mdctx);
 
-        printf("Digest is: ");
-        for(uint i = 0; i < md_len; i++) printf("%02x", md_value[i]);
-        printf("\n");
-            
+        the_digest = "";
+        for(uint i = 0; i < md_len; i++)
+        {
+            QString next_byte ="";
+            next_byte.sprintf("%02x", md_value[i]);
+            the_digest.append(next_byte);
+        }
+
     }
 
-    
-    
-
     the_file.close();
-    return QString("");
+    return the_digest;
 }
 
 

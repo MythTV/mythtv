@@ -660,7 +660,7 @@ void MetadataServer::doAtomicDataDelta(
                                 .arg(metadata_additions.count())
                                 .arg(metadata_deletions.count())
                                 
-                                .arg(new_playlists->count())
+                                .arg(target->getPlaylistCount())
                                 .arg(playlist_additions.count())
                                 .arg(playlist_deletions.count())
                                 ,4);

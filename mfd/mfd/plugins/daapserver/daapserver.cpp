@@ -913,8 +913,8 @@ void DaapServer::sendDatabase(HttpRequest *http_request, DaapRequest *daap_reque
         //  The client is only off by one, so we can be slightly efficient here and only send the deltas
         //
         
-        QValueList<int> *additions = NULL;
-        QValueList<int> *deletions = NULL;
+        QValueList<int> additions;
+        QValueList<int> deletions;
 
         if(which_collection_id == metadata_server->getLastDestroyedCollection())
         {
@@ -926,11 +926,7 @@ void DaapServer::sendDatabase(HttpRequest *http_request, DaapRequest *daap_reque
             deletions = last_changed_collection->getMetadataDeletions();
         }
 
-        int additions_count = 0;
-        if(additions)
-        {
-            additions_count = additions->count();
-        }
+        int additions_count = additions.count();
 
         TagOutput response;
         response    << Tag( 'adbs' )
@@ -946,9 +942,9 @@ void DaapServer::sendDatabase(HttpRequest *http_request, DaapRequest *daap_reque
         if(additions_count > 0)
         {
              response << Tag('mlcl') ;
-             for(uint i = 0; i < additions->count(); i++)
+             for(uint i = 0; i < additions.count(); i++)
              {
-                Metadata *added_metadata = last_changed_collection->getMetadata((*additions->at(i)));
+                Metadata *added_metadata = last_changed_collection->getMetadata((*additions.at(i)));
                 if(added_metadata->getType() == MDT_audio)
                 {
                     AudioMetadata *added_audio_metadata = (AudioMetadata*)added_metadata;
@@ -967,12 +963,12 @@ void DaapServer::sendDatabase(HttpRequest *http_request, DaapRequest *daap_reque
         //  Send deleted items (delta -)
         //
         
-        if(deletions->count() > 0)
+        if(deletions.count() > 0)
         {
             response << Tag('mudl') ;
-            for(uint i = 0; i < deletions->count(); i++)
+            for(uint i = 0; i < deletions.count(); i++)
             {
-                response << Tag('miid') << (u32) ((*deletions->at(i)) + (which_collection_id * METADATA_UNIVERSAL_ID_DIVIDER )) << end;
+                response << Tag('miid') << (u32) ((*deletions.at(i)) + (which_collection_id * METADATA_UNIVERSAL_ID_DIVIDER )) << end;
             }
             response << end;
         }
@@ -1248,7 +1244,7 @@ void DaapServer::sendContainers(HttpRequest *http_request, DaapRequest *daap_req
 
                 if(do_deletions)
                 {
-                    QValueList<int> *deletions = NULL;
+                    QValueList<int> deletions;
                     if(last_changed_collection)
                     {
                         deletions = last_changed_collection->getPlaylistDeletions();
@@ -1259,9 +1255,9 @@ void DaapServer::sendContainers(HttpRequest *http_request, DaapRequest *daap_req
                     }
 
                     response << Tag('mudl');
-                    for(uint i = 0; i < deletions->count(); i++)
+                    for(uint i = 0; i < deletions.count(); i++)
                     {
-                        int deletion_value = *deletions->at(i);
+                        int deletion_value = *deletions.at(i);
                         deletion_value = (which_collection_id * METADATA_UNIVERSAL_ID_DIVIDER) + deletion_value;
                         response << Tag('miid') << (u32) deletion_value << end;
                     }

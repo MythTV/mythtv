@@ -450,7 +450,7 @@ AudioMetadata* avfDecoder::getMetadata()
                                                 tracknum, 
                                                 length
                                               );
-
+    retdata->setBitrate(ic->bit_rate);
     if(ic)
     {
         av_close_input_file(ic);

@@ -12,6 +12,7 @@
 
 */
 
+#include <qdeepcopy.h>
 #include <qvaluelist.h>
 
 #include "../mfdlib/mfd_plugin.h"
@@ -82,8 +83,8 @@ class MetadataServer : public MFDServicePlugin
                                                  );
 
     int                         getLastDestroyedCollection();
-    QValueList<int>*            getLastDestroyedMetadataList(){return &last_destroyed_metadata;}
-    QValueList<int>*            getLastDestroyedPlaylistList(){return &last_destroyed_playlists;}
+    QValueList<int>             getLastDestroyedMetadataList(){return last_destroyed_metadata;}
+    QValueList<int>             getLastDestroyedPlaylistList(){return last_destroyed_playlists;}
 
 
   private:

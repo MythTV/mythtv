@@ -74,9 +74,9 @@ class MetadataContainer
     Playlist*           getPlaylist(int pl_id);
     QIntDict<Playlist>* getPlaylists(){return current_playlists;}
 
-    QValueList<int>*    getMetadataAdditions(){return &metadata_additions;}
-    QValueList<int>*    getMetadataDeletions(){return &metadata_deletions;}
-    QValueList<int>*    getPlaylistDeletions(){return &playlist_deletions;}
+    QValueList<int>     getMetadataAdditions(){return metadata_additions;}
+    QValueList<int>     getMetadataDeletions(){return metadata_deletions;}
+    QValueList<int>     getPlaylistDeletions(){return playlist_deletions;}
 
     void                dataSwap(   
                                     QIntDict<Metadata>* new_metadata, 
@@ -108,13 +108,13 @@ class MetadataContainer
     MetadataCollectionContentType  content_type;
     MetadataCollectionLocationType location_type;
 
-    QIntDict<Metadata>   *current_metadata;
-    QValueList<int>      metadata_additions;
-    QValueList<int>      metadata_deletions;
+    QIntDict<Metadata>          *current_metadata;
+    QDeepCopy<QValueList<int> > metadata_additions;
+    QDeepCopy<QValueList<int> > metadata_deletions;
 
-    QIntDict<Playlist>   *current_playlists;
-    QValueList<int>       playlist_additions;
-    QValueList<int>       playlist_deletions;
+    QIntDict<Playlist>          *current_playlists;
+    QDeepCopy<QValueList<int> > playlist_additions;
+    QDeepCopy<QValueList<int> > playlist_deletions;
     
     QString my_name;
 };

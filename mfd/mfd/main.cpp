@@ -20,6 +20,8 @@ using namespace std;
 #include "mfd.h"
 #include "settings.h"
 
+#include "dbcheck.h"
+
 //
 //  This is a global object that anyone can ask for a setting value. If
 //  everything was compiled with myth lib support, it basicly wraps calls to
@@ -190,6 +192,13 @@ int main(int argc, char **argv)
         log_stdout = true;
     }
 
+    //
+    //  Make sure database are all up to whack
+    //
+
+#ifdef MYTHLIB_SUPPORT
+    UpgradeMusicDatabaseSchema();
+#endif
 
     the_mfd = new MFD(db, assigned_port, log_stdout, logging_verbosity);
     a.exec();

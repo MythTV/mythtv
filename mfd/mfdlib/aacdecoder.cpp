@@ -807,6 +807,7 @@ AudioMetadata* aacDecoder::getMetadata()
                                               );
     retdata->setComposer(writer);
     retdata->setComment(comment);
+    retdata->setBitrate(mp4ASC.samplingFrequency);
 
     return retdata;
 }    

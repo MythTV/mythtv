@@ -18,16 +18,40 @@
 #include "mfd_plugin.h"
 #include "../../mdserver.h"
 
-enum MusicFileLocation
+
+class MusicFile
 {
-    MFL_on_file_system = 0,
-    MFL_in_myth_database,
-    MFL_both_file_and_database
+
+  public:
+
+    MusicFile();
+    MusicFile(const QString &a_filename, QDateTime last_modified);
+
+    void      calculateMythDigest();    
+    QDateTime lastModified(){ return last_modification; }    
+    bool      checkedDatabase(){return checked_database;}
+    void      checkedDatabase(bool y_or_n){ checked_database = y_or_n; }
+    QString   getMythDigest(){ return myth_digest;}
+
+    void      setMetadataId(int an_int){ metadata_id = an_int; }
+    int       getMetadataId(){return metadata_id; }
+
+    void      setDbId(int an_int){ database_id = an_int; }
+    int       getDbId(){return database_id; }
+
+    void      setMythDigest(QString a_digest){ myth_digest = a_digest; }
+
+  private:
+  
+    QString     file_name;
+    QDateTime   last_modification;
+    QString     myth_digest;
+    bool        checked_database;    
+    int         metadata_id;
+    int         database_id;
 };
-    
-typedef QMap <QString, MusicFileLocation> MusicLoadedMap;
 
-
+typedef QMap <QString, MusicFile> MusicFileMap;
 
 class MMusicWatcher: public MFDServicePlugin
 {
@@ -37,13 +61,31 @@ class MMusicWatcher: public MFDServicePlugin
     MMusicWatcher(MFD *owner, int identity);
     ~MMusicWatcher();
 
-    void    run();
-    bool    checkDataSources(const QString &startdir, QSqlDatabase *a_db);
-    bool    sweepMetadata();
-    void    buildFileList(QString &directory, MusicLoadedMap &music_files);
+    void            run();
+    bool            sweepMetadata();
+    void            checkForDeletions(MusicFileMap &music_files, const QString &startdir);
+    bool            checkDataSources(const QString &startdir, QSqlDatabase *a_db);
+    void            removeAllMetadata();
+    void            buildFileList(const QString &directory, MusicFileMap &music_files);
+    void            compareToMasterList(MusicFileMap &music_files, const QString &startdir);
+    void            checkDatabaseAgainstMaster(const QString &startdir);
+    AudioMetadata*  loadFromDatabase(const QString &file_name, const QString &startdir);
+    AudioMetadata*  checkNewFile(const QString &file_name, const QString &startdir);
+    QDateTime       getQtTimeFromMySqlTime(QString timestamp);
+    bool            updateMetadata(AudioMetadata* an_item);
+    AudioMetadata*  getMetadataFromUrl(QUrl a_url);
+    void            persistMetadata(AudioMetadata* an_item);
+    int             bumpMetadataId();
+
+/*
     bool    checkNewMusicFile(const QString &filename, const QString &startdir);
     void    prepareNewData();
     bool    doDeltas();
+
+    int     updateFileList(const QString &startdir, int how_many);
+    void    checkDatabaseAgainstFileList();
+    void    checkFileListAgainstDatabase();
+*/
 
   private:
 
@@ -81,6 +123,12 @@ class MMusicWatcher: public MFDServicePlugin
     
     QString desired_database_version;
     QTime   sweep_timer;
+
+    MusicFileMap    master_list;
+    MusicFileMap    latest_sweep;
+
+    QMutex  current_metadata_id_mutex;
+    int     current_metadata_id;
 };
 
 
