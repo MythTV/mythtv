@@ -1,27 +1,32 @@
-#ifndef DVBRECORDER_H_
-#define DVBRECORDER_H_
+/*
+ *  Copyright (C) Kenneth Aafloy 2003
+ *  
+ *  Copyright notice is in dvbrecorder.cpp of the MythTV project.
+ */
+
+#ifndef DVBRECORDER_H
+#define DVBRECORDER_H
 
 #include <vector>
+#include <map>
+using namespace std;
+
 #include "recorderbase.h"
+#include "transform.h"
 
-class DVBChannel;
-struct AVFormatContext;
-struct AVPacket;
+#include "dvbtypes.h"
+#include "dvbchannel.h"
 
-/* Grabs the video/audio MPEG data from a DVB (a digital TV standard) card. */
-
-class DVBRecorder : public RecorderBase
+class DVBRecorder: public QObject, public RecorderBase
 {
-  public:
-    DVBRecorder(const DVBChannel* dvbchannel);
+    Q_OBJECT
+public:
+    DVBRecorder(DVBChannel* dvbchannel);
    ~DVBRecorder();
 
-  // Generic MPEG
-  public:
     void SetOption(const QString &name, int value);
     void SetOption(const QString &name, const QString &value)
-                                       { RecorderBase::SetOption(name, value); }
-    void SetPID(const vector<int>& some_pids);
+                                      { RecorderBase::SetOption(name, value); }
     void SetVideoFilters(QString &filters);
 
     void Initialize(void);
@@ -43,49 +48,64 @@ class DVBRecorder : public RecorderBase
     long long GetKeyframePosition(long long desired);
     void GetBlankFrameMap(QMap<long long, int> &blank_frame_map);
 
-  private:
-    bool SetupRecording();
+public slots:
+    void ChannelChanged(dvb_channel_t& chan);
+
+signals:
+    void Paused();
+    void Unpaused();
+    void Started();
+    void Stopped();
+    void Receiving();
+
+private:
+    bool Open();
+    void Close();
+
     void FinishRecording();
 
-    bool PacketHasHeader(unsigned char *buf, int len, unsigned int startcode);
-    void ProcessData(unsigned char *buffer, int len);
+    static void ProcessData(unsigned char *buffer, int len, void *priv);
+    void LocalProcessData(unsigned char *buffer, int len);
+
+    void CloseFilters();
+    void OpenFilters(dvb_pid_t& pid, dmx_pes_type_t type);
+    void SetDemuxFilters(dvb_pids_t& pids);
 
     bool recording;
     bool encoding;
 
     bool paused;
+    bool was_paused;
     bool mainpaused;
     bool cleartimeonpause;
 
     long long framesWritten;
-
-    int width, height;
-
-    AVFormatContext *ic;
-
+    long long keyCount;
     int keyframedist;
-    bool gopset;
+    unsigned char prvpkt[3];
 
-    // Used to signal a 'clean stream' procedure (see ProcessData).
-    bool clean_start;
+    bool gopset;
+    bool wait_for_keyframe;
 
     QMap<long long, long long> positionMap;
-
-  // DVB-specific
-  protected:
-    bool Open();
-    void Close();
-
-    bool isopen;
-    int dvr_fd; // see dvbchannel.h
-    int cardnum; // dito
-    bool was_paused;
-
-    vector<int> pid;
-    bool pid_changed;
-    const DVBChannel* channel;
-
     long long prev_gop_save_pos;
+
+    bool    isopen;
+    int     cardnum;
+    bool    swfilter;
+    bool    swfilter_open;
+    bool    recordts;
+    bool    channel_changed;
+
+    int fd_dvr;
+    vector<int> fd_demux;
+    pid_ipack_t pid_ipack;
+    map<uint8_t,uint8_t> contcounter;
+    QString pid_string;
+
+    dvb_channel_t   chan_opts;
+
+    DVBChannel*     dvbchannel;
 };
 
 #endif

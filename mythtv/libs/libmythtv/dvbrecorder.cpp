@@ -1,77 +1,105 @@
+/*
+ *  Class DVBRecorder
+ *
+ *  Copyright (C) Kenneth Aafloy 2003
+ *
+ *  Description:
+ *      Has the responsibility of opening the Demux device and reading
+ *      data from it. Code for controlling which of the mpeg2 streams
+ *      from the DVB device gets through. In ProcessData there is
+ *      a 'map builder' which saves information about the stream
+ *      to the database.
+ *
+ *  Author(s):
+ *      Isaac Richards
+ *          - Wrote the original class this work derived from.
+ *      Kenneth Aafloy (ke-aa at frisurf.no)
+ *          - Rewritten Recording Functions.
+ *          - Moved PID handling here and rewritten.
+ *      Ben Bucksch
+ *          - Developed the original implementation.
+ *      Dave Chapman (dave at dchapman.com)
+ *          - The dvbstream library, which some code,
+ *            in ::StartRecording, is based upon.
+ *
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation; either version 2 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program; if not, write to the Free Software
+ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+
 #include <iostream>
+using namespace std;
+
 #include <pthread.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <sys/time.h>
-#include <time.h>
-#include <qbuffer.h>
 #include <sys/poll.h>
 
-using namespace std;
-
-#include "dvbrecorder.h"
 #include "RingBuffer.h"
-#include "dvbchannel.h"
-
-#ifdef USING_DVB
-    #include "dvbdev.h"
-#endif
-
-#define MAX_PIDS 50
-
-// Generic MPEG
 #include "programinfo.h"
-extern "C" {
-#include "../libavcodec/avcodec.h"
-#include "../libavformat/avformat.h"
-}
 
+#include "transform.h"
+#include "dvbtypes.h"
+#include "dvbdev.h"
+#include "dvbchannel.h"
+#include "dvbrecorder.h"
 
-DVBRecorder::DVBRecorder(const DVBChannel* dvbchannel)
-           : RecorderBase()
+DVBRecorder::DVBRecorder(DVBChannel* advbchannel): RecorderBase()
 {
     isopen = false;
-    dvr_fd = -1;
     cardnum = 0;
+    swfilter = false;
+    recordts = false;
     was_paused = true;
-    pid_changed = true;
-    channel = dvbchannel;
+    channel_changed = true;
+    dvbchannel = advbchannel;
 
-    // generic MPEG code from MpegRecorder
     paused = false;
     mainpaused = false;
     recording = false;
-    framesWritten = 0;
-    keyframedist = 15;
-    gopset = false;
-    prev_gop_save_pos = -1;
+
 }
 
 DVBRecorder::~DVBRecorder()
 {
-    Close();
+    if (isopen)
+        Close();
 }
 
 void DVBRecorder::SetOption(const QString &name, int value)
 {
     if (name == "cardnum")
         cardnum = value;
+    else if (name == "swfilter")
+        swfilter = (value == 1);
+    else if (name == "recordts")
+        recordts = (value == 1);
     else
         RecorderBase::SetOption(name, value);
 }
 
-/* This Recorder fetches the PIDs itself when the recording starts,
-   but maybe the channel gets changed during a recording?
-   We can't rely on this SetPID either, because that's called by the
-   Channel when the channel changes, and when the initial channel is
-   set, this Recorder doesn't exist yet. */
-void DVBRecorder::SetPID(const vector<int>& some_pids)
+void DVBRecorder::ChannelChanged(dvb_channel_t& chan)
 {
-    pid = some_pids;
-    pid_changed = true;
+    chan_opts = chan;
+    wait_for_keyframe = true;
+    channel_changed = true;
 
-    // Correct the start of the stream on channel change (see ProcessData).
-    clean_start = true;
+    framesWritten = 0;
+    keyframedist = 0;
+    keyCount = 0;
+    gopset = false;
+    prev_gop_save_pos = -1;
+    memset(prvpkt, 0, 3);
 }
 
 bool DVBRecorder::Open()
@@ -79,68 +107,186 @@ bool DVBRecorder::Open()
     if (isopen)
         return true;
 
-#ifdef USING_DVB
-    dvr_fd = open(devicenodename(dvbdev_dvr,cardnum), O_RDONLY|O_NONBLOCK);
-    if(dvr_fd < 0)
+    fd_dvr = open(dvbdevice(DVB_DEV_DVR,cardnum), O_RDONLY | O_NONBLOCK);
+    if(fd_dvr < 0)
     {
-        cerr << "Can't open DVB device "
-             << devicenodename(dvbdev_dvr,cardnum) << endl;
+        ERRNO("Recorder: Failed to open dvb device");
         return false;
     }
+
+    GENERAL("Recorder: Card opened successfully.");
+
+    connect(dvbchannel, SIGNAL(ChannelChanged(dvb_channel_t&)),
+            this, SLOT(ChannelChanged(dvb_channel_t&)));
+
+    dvbchannel->RecorderStarted();
+
+    isopen = true;
     return true;
-#else
-    cerr << "DVB support not compiled in" << endl;
-    return false;
-#endif
 }
 
 void DVBRecorder::Close()
 {
     if (!isopen)
         return;
-    if (dvr_fd > 0)
-        close(dvr_fd);
+
+    CloseFilters();
+
+    if (fd_dvr > 0)
+        close(fd_dvr);
+
+    isopen = false;
+}
+
+void DVBRecorder::CloseFilters()
+{
+    for(unsigned int i=0; i<fd_demux.size(); i++)
+        if (fd_demux[i] > 0)
+            close(fd_demux[i]);
+    fd_demux.clear();
+
+    pid_ipack_t::iterator iter = pid_ipack.begin();
+    for (;iter != pid_ipack.end(); iter++)
+    {
+        free_ipack((*iter).second);
+        free((void*)(*iter).second);
+    }
+    pid_ipack.clear();
+}
+
+void DVBRecorder::OpenFilters(dvb_pid_t& pids, dmx_pes_type_t type)
+{
+    struct dmx_pes_filter_params params;
+    params.input = DMX_IN_FRONTEND;
+    params.output = DMX_OUT_TS_TAP;
+    params.flags = DMX_IMMEDIATE_START;
+    params.pes_type = type;
+    params.pid = 0;
+
+    for (unsigned int i = 0; i < pids.size(); i++)
+    {
+        int this_pid = pids[i];
+
+        if (this_pid < 0x10 || this_pid > 0x1fff)
+            WARNING(QString("PID value (%1) is outside dvb specification.")
+                            .arg(this_pid));
+
+        if ((swfilter && !swfilter_open) || !swfilter)
+        {
+            int fd_tmp = open(dvbdevice(DVB_DEV_DEMUX,cardnum), O_RDWR);
+
+            if (fd_tmp < 0)
+            {
+                ERRNO(QString("Could not open filter device for pid %1.")
+                      .arg(this_pid));
+                continue;
+            }
+
+            params.pid = this_pid;
+
+            if (swfilter)
+            {
+                GENERAL("Using Software Filtering.");
+                params.pes_type = DMX_PES_OTHER;
+                params.pid = DMX_DONT_FILTER;
+                swfilter_open = true;
+            }
+
+            if (ioctl(fd_tmp, DMX_SET_PES_FILTER, &params) < 0)
+            {
+                close(fd_tmp);
+
+                if (swfilter)
+                {
+                    ERRNO("Failed to open pid for Software Filtering.");
+                    break;
+                }
+                else
+                {
+                    ERRNO(QString("Failed to set filter for pid %1.")
+                          .arg(this_pid));
+                    continue;
+                }
+            }
+
+            if (swfilter)
+                params.pid = this_pid;
+
+            fd_demux.push_back(fd_tmp);
+        }
+
+        if (!recordts)
+        {
+            ipack* ip = (ipack*)malloc(sizeof(ipack));
+            if (ip == NULL)
+            {
+                ERROR(QString("Failed to allocate ipack for pid %1.").arg(this_pid));
+                continue;
+            }
+
+            init_ipack(ip, 2048, ProcessData, 1);
+            ip->data = (void*)this;
+
+            pid_ipack[this_pid] = ip;
+        } else
+            pid_ipack[this_pid] = NULL;
+    }
+}
+
+void DVBRecorder::SetDemuxFilters(dvb_pids_t& pids)
+{
+    CloseFilters();
+
+    if (swfilter)
+        swfilter_open = false;
+
+    if (recordts)
+        pids.other.push_back(0);
+
+    OpenFilters(pids.audio,       DMX_PES_AUDIO);
+    OpenFilters(pids.video,       DMX_PES_VIDEO);
+    OpenFilters(pids.teletext,    DMX_PES_TELETEXT);
+    OpenFilters(pids.subtitle,    DMX_PES_SUBTITLE);
+    OpenFilters(pids.pcr,         DMX_PES_PCR);
+    OpenFilters(pids.other,       DMX_PES_OTHER);
 }
 
 void DVBRecorder::StartRecording()
 {
-    if (!SetupRecording())
-        return;
-
-#ifdef USING_DVB
-    channel->GetPID(pid);
-
     if (!Open())
         return;
 
-    // Set up buffers
-    const int IN_BUFFER_SIZE = TS_SIZE;
-    const int OUT_BUFFER_SIZE = 256000;
-    unsigned char buffer_raw[IN_BUFFER_SIZE + 1];
-    unsigned char buffer_filtered[OUT_BUFFER_SIZE + 1];
-    int bytes_read;
-    int filtered_len;
+    int readsz = 0;
+    int ret, dataflow = -1;
+    bool receiving = false;
+    unsigned char pktbuf[MPEG_TS_SIZE];
+    struct pollfd polls;
 
-    // for ts_to_ps()
-    uint16_t pid_array[MAX_PIDS]; // MAX_PIDS is a hack, better use pid.size(),
-    ipack ipacks[MAX_PIDS];       // but that may change at any time when the
-    int npids = 0;                // channel changes in LiveTV.
-    ipack *ipacks_p = ipacks;     // needed for typ-safety?
-
-    // Set up polling of the device
-    struct pollfd pfd[1];
-    pfd[0].fd = dvr_fd;
-    pfd[0].events = POLLIN;
+    polls.fd = fd_dvr;
+    polls.events = POLLIN;
+    polls.revents = 0;
 
     encoding = true;
     recording = true;
 
+    emit Started();
     while (encoding)
     {
+        if (channel_changed)
+        {
+            pthread_mutex_lock(&chan_opts.lock);
+            SetDemuxFilters(chan_opts.pids);
+            pthread_mutex_unlock(&chan_opts.lock);
+            channel_changed = false;
+        }
+
         if (paused)
         {
-            ioctl(dvr_fd, DMX_STOP);
+            if (ioctl(fd_dvr, DMX_STOP) < 0)
+                ERRNO("Pausing DVB filters failed.");
+            receiving = false;
             mainpaused = true;
+            emit Paused();
             pauseWait.wakeAll();
             was_paused = true;
             usleep(50);
@@ -148,147 +294,113 @@ void DVBRecorder::StartRecording()
         }
         else if (was_paused)
         {
-            // Re-open
-            if (ioctl(dvr_fd, DMX_START) < 0)
+            if (ioctl(fd_dvr, DMX_START) < 0)
+            {
                 was_paused = false;
-                // XXX need to set mainpaused = false? mpegrecorder doesn't.
+                mainpaused = false;
+                emit Unpaused();
+            }
             else
             {
-                usleep(500);
+                ERRNO("Unpausing DVB filters failed.");
+                usleep(50);
                 continue;
             }
         }
-        else if (poll(pfd, 1, 1) && (pfd[0].revents & POLLIN))
+
+        ret = poll(&polls, 1, 1000);
+
+        if (ret == 0 && --dataflow < 1)
+            WARNING("No data from card in 1 second.");
+
+        if (ret == 1 && polls.revents & POLLIN)
         {
+            dataflow = 1;
+
             if (paused)
                 continue;
 
-            bytes_read = read(dvr_fd, buffer_raw, IN_BUFFER_SIZE);
-            if (bytes_read > 0)
+            readsz = read(fd_dvr, pktbuf, MPEG_TS_SIZE);
+            if (readsz > 0)
             {
-                if (pid_changed)
+                int pes_offset = 0;
+                int pid = ((pktbuf[1]&0x1f) << 8) | pktbuf[2];
+                uint8_t cc = pktbuf[3] & 0xf;
+                uint8_t content = (pktbuf[3] & 0x30) >> 4;
+
+                if (pid_ipack.find(pid) == pid_ipack.end())
+                    continue;
+            
+                if (!receiving)
                 {
-                    // make |pid| suitable for ts_to_ps()
-                    npids = pid.size(); //Thread-safety: Use threading locks!
-                    if (npids > MAX_PIDS)
-                        npids = MAX_PIDS;
-                    for (int i = 0; i < npids; i++)
+                    receiving = true;
+                    emit Receiving();
+                }
+            
+                if (content & 0x1)
+                {
+                    contcounter[pid]++;
+                    if (contcounter[pid] > 15)
+                        contcounter[pid] = 0;
+            
+                    if (contcounter[pid] != cc)
                     {
-                        pid_array[i] = pid[i];
-                        init_ipack(ipacks + i, IPACKS, ts_to_ps_write_out, 1);
+                        WARNING("Transport Stream Continuity Error.");
+                        contcounter[pid] = cc;
                     }
-                    pid_changed = false;
-
-                    QString msg = QString ("filtering pids:");
-                    for (vector_int::iterator j=pid.begin();j !=pid.end(); j++)
-                      msg += QString(" %1").arg(*j);
-                    VERBOSE(VB_RECORD, msg);
                 }
-
-                /* This function call fulfills 2 purposes:
-                   - Converts MPEG-TS (transport stream for transmission)
-                     to MPEG-PS (what's usually used in MPEG video files)
-                   - Filters out all unneeded program streams.
-                     This is redundant (but cheap) for use_ts==false,
-                     but required for use_ts==true. */
-                ts_to_ps(buffer_raw,
-                         pid_array, npids, &ipacks_p,
-                         buffer_filtered, OUT_BUFFER_SIZE, &filtered_len);
-
-                if (filtered_len > 0)
+            
+                if (recordts)
                 {
-                    // write out data to file, also adding seeking
-                    ProcessData(buffer_filtered, filtered_len);
+                    LocalProcessData(&pktbuf[0], readsz);
+                    continue;
                 }
+            
+                ipack *ip = pid_ipack[pid];
+                if (ip == NULL)
+                    continue;
+            
+                if ( (pktbuf[1] & 0x40) && (ip->plength == MMAX_PLENGTH-6) )
+                {
+                    ip->plength = ip->found-6;
+                    ip->found = 0;
+                    send_ipack(ip);
+                    reset_ipack(ip);
+                }
+            
+                if (content & 0x2)
+                    pes_offset = pktbuf[4] + 1;
+
+                if (pes_offset > 183)
+                    continue;
+            
+                instant_repack(pktbuf + 4 + pes_offset,
+                               MPEG_TS_SIZE - 4 - pes_offset, ip);
             }
-            else if (bytes_read < 0)
+            else if (readsz < 0)
             {
-                cerr << "error reading from DVB device "
-                     << devicenodename(dvbdev_dvr,cardnum)
-                     << ", error code " << bytes_read << endl;
+                if (errno == EOVERFLOW || errno == EAGAIN)
+                    continue;
+
+                ERRNO("Error reading from DVB device.");
                 continue;
             }
-        }
+        } else if (ret < 0)
+                ERRNO("Poll failed waiting for data.");
     }
 
     Close();
 
-
     FinishRecording();
-#else
-    cerr << "DVB support not compiled in" << endl;
-#endif
 
     recording = false;
+
+    emit Stopped();
 }
 
 int DVBRecorder::GetVideoFd(void)
 {
     return -1;
-}
-
-static void mpg_write_packet(void *opaque, uint8_t *buf, int buf_size)
-{
-    (void)opaque;
-    (void)buf;
-    (void)buf_size;
-}
-
-static int mpg_read_packet(void *opaque, uint8_t *buf, int buf_size)
-{
-    (void)opaque;
-    (void)buf;
-    (void)buf_size;
-    return 0;
-}
-
-static int mpg_seek_packet(void *opaque, int64_t offset, int whence)
-{
-    (void)opaque;
-    (void)offset;
-    (void)whence;
-    return 0;
-}
-
-bool DVBRecorder::SetupRecording()
-{
-    AVInputFormat *fmt = &mpegps_demux;
-    fmt->flags |= AVFMT_NOFILE;
-
-    ic = (AVFormatContext *)av_mallocz(sizeof(AVFormatContext));
-    if (!ic)
-    {
-        cerr << "Couldn't allocate context\n";
-        return false;
-    }
-
-    QString filename = "blah.mpg";
-    char *cfilename = (char *)filename.ascii();
-    AVFormatParameters params;
-
-    ic->pb.buffer_size = 256001;
-    ic->pb.buffer = NULL;
-    ic->pb.buf_ptr = NULL;
-    ic->pb.write_flag = 0;
-    ic->pb.buf_end = NULL;
-    ic->pb.opaque = this;
-    ic->pb.read_packet = mpg_read_packet;
-    ic->pb.write_packet = mpg_write_packet;
-    ic->pb.seek = mpg_seek_packet;
-    ic->pb.pos = 0;
-    ic->pb.must_flush = 0;
-    ic->pb.eof_reached = 0;
-    ic->pb.is_streamed = 0;
-    ic->pb.max_packet_size = 0;
-
-    int err = av_open_input_file(&ic, cfilename, fmt, 0, &params);
-    if (err < 0)
-    {
-        cerr << "Couldn't initialize decoder\n";
-        return false;
-    } 
-
-    return true;
 }
 
 void DVBRecorder::FinishRecording()
@@ -317,113 +429,96 @@ void DVBRecorder::Initialize(void)
 #define SLICE_MIN     0x00000101
 #define SLICE_MAX     0x000001af
 
-bool DVBRecorder::PacketHasHeader(unsigned char *buf, int len,
-                                   unsigned int startcode)
+void DVBRecorder::ProcessData(unsigned char *buffer, int len, void *priv)
 {
-    unsigned char *bufptr;
-    unsigned int state = 0xFFFFFFFF, v;
-
-    bufptr = buf;
-
-    while (bufptr < buf + len)
-    {
-        v = *bufptr++;
-        if (state == 0x000001)
-        {
-            state = ((state << 8) | v) & 0xFFFFFF;
-            if (state >= SLICE_MIN && state <= SLICE_MAX)
-                return false;
-            if (state == startcode)
-                return true;
-        }
-        state = ((state << 8) | v) & 0xFFFFFF;
-    }
-
-    return false;
+    ((DVBRecorder*)priv)->LocalProcessData(buffer, len);
 }
 
-void DVBRecorder::ProcessData(unsigned char *buffer, int len)
+void DVBRecorder::LocalProcessData(unsigned char *buffer, int len)
 {
-    AVPacket pkt;
-
-    ic->pb.buffer = buffer;
-    ic->pb.buf_ptr = ic->pb.buffer;
-    ic->pb.buf_end = ic->pb.buffer + len;
-    ic->pb.eof_reached = 0;
-    ic->pb.pos = len;
-
-    bool seq_start = false;
-
-    while (ic->pb.eof_reached == 0)
+    if (recordts)
     {
-        if (av_read_packet(ic, &pkt) < 0)
-            break;
-
-        if (pkt.stream_index > ic->nb_streams)
-        {
-            cerr << "bad stream\n";
-            av_free_packet(&pkt);
-            continue;
-        }
-
-        AVStream *curstream = ic->streams[pkt.stream_index];
-        if (pkt.size > 0 && curstream->codec.codec_type == CODEC_TYPE_VIDEO)
-        {
-            long long startpos = ringBuffer->GetFileWritePosition();
-
-            bool pic_start = PacketHasHeader(pkt.data, pkt.size, PICTURE_START);
-            bool gop_start = PacketHasHeader(pkt.data, pkt.size, GOP_START);
-
-            if (clean_start)
-                seq_start = PacketHasHeader(pkt.data, pkt.size, SEQ_START);
-
-            if (pic_start)
-                framesWritten++;
-
-            if (gop_start)
-            {
-                int frameNum = framesWritten - 1;
-
-                if (!gopset && frameNum > 0)
-                {
-                    keyframedist = frameNum;
-                    gopset = true;
-                }
-
-                startpos += pkt.startpos;
-
-                long long keyCount = frameNum / keyframedist;
-
-                positionMap[keyCount] = startpos;
-
-                if (curRecording && db_lock && db_conn &&
-                    ((positionMap.size() % 30) == 0))
-                {
-                    pthread_mutex_lock(db_lock);
-                    MythContext::KickDatabase(db_conn);
-                    curRecording->SetPositionMap(positionMap, MARK_GOP_START,
-                            db_conn, prev_gop_save_pos, keyCount);
-                    pthread_mutex_unlock(db_lock);
-                    prev_gop_save_pos = keyCount + 1;
-                }
-            }
-        }
-
-        av_free_packet(&pkt);
+        ringBuffer->Write(buffer, len);
+        return;
     }
 
-    /*
-        We deny writing packets until a SEQ_HEADER arrives (above).
-        The reason for doing this is that on a channel change we will
-        (most likely) end up between packets with SEQ_HEADER, which
-        produces bad decoding (skipping/distortion).
-    */
-    if (clean_start && !seq_start)
-        return;
-    else
-        clean_start = false;
+    if (buffer[0] == 0x00 && buffer[1] == 0x00 &&
+        buffer[2] == 0x01 && (buffer[3]>>4) == 0xE)
+    {
+        int pos = 8 + buffer[8];
+        int datalen = len - pos;
 
-    ringBuffer->Write(buffer, len);
+        unsigned char *bufptr = &buffer[pos];
+        unsigned int state = 0xFFFFFFFF, v = 0;
+        int prvcount = -1;
+
+        while (bufptr < &buffer[pos] + datalen)
+        {
+            if (++prvcount < 3)
+                v = prvpkt[prvcount];
+            else
+                v = *bufptr++;
+
+            if (state == 0x000001)
+            {
+                state = ((state << 8) | v) & 0xFFFFFF;
+                if (state >= SLICE_MIN && state <= SLICE_MAX)
+                    continue;
+
+                switch (state)
+                {
+                    case GOP_START:
+                    {
+                        if (wait_for_keyframe)
+                            wait_for_keyframe = false;
+
+                        long long startpos = ringBuffer->GetFileWritePosition();
+
+                        if (!gopset && framesWritten > 0)
+                        {
+                            keyframedist = framesWritten;
+                            GENERAL("Setting KeyFrameDist to " << keyframedist);
+                            gopset = true;
+                        }                          
+
+                        if (!gopset)
+                            keyCount = 1;
+                        else
+                            keyCount++;
+
+                        positionMap[keyCount] = startpos;
+
+                        if (curRecording && db_lock && db_conn &&
+                            ((positionMap.size() % 30) == 0))
+                        {
+                            pthread_mutex_lock(db_lock);
+                            MythContext::KickDatabase(db_conn);
+                            curRecording->SetPositionMap(
+                                            positionMap, MARK_GOP_START,
+                                            db_conn, prev_gop_save_pos,
+                                            keyCount);
+                            pthread_mutex_unlock(db_lock);
+                            prev_gop_save_pos = keyCount + 1;
+                        }
+                    }
+                    break;
+
+                    case PICTURE_START:
+                        if (!wait_for_keyframe)
+                            framesWritten++;
+                    break;
+
+                }
+                continue;
+            }
+            state = ((state << 8) | v) & 0xFFFFFF;
+        }
+
+        memcpy(prvpkt, &buffer[len-3], 3);
+    }
+
+    if (!wait_for_keyframe)
+        ringBuffer->Write(buffer, len);
 }
 
 void DVBRecorder::StopRecording(void)
@@ -433,17 +528,6 @@ void DVBRecorder::StopRecording(void)
 
 void DVBRecorder::Reset(void)
 {
-    AVPacketList *pktl = NULL;
-    while ((pktl = ic->packet_buffer))
-    {
-        ic->packet_buffer = pktl->next;
-        av_free(pktl);
-    }
-
-    ic->pb.pos = 0;
-    ic->pb.buf_ptr = ic->pb.buffer;
-    ic->pb.buf_end = ic->pb.buffer;
-
     framesWritten = 0;
 
     positionMap.clear();
@@ -470,7 +554,7 @@ void DVBRecorder::WaitForPause(void)
 {
     if (!mainpaused)
         if (!pauseWait.wait(1000))
-            cerr << "Waited too long for recorder to pause\n";
+            ERROR("Waited too long for recorder to pause.");
 }
 
 bool DVBRecorder::IsRecording(void)

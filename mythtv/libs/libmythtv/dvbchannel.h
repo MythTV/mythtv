@@ -1,66 +1,108 @@
+/*
+ *  Copyright (C) Kenneth Aafloy 2003
+ *  
+ *  Copyright notice is in dvbchannel.cpp of the MythTV project.
+ */
+
 #ifndef DVBCHANNEL_H
 #define DVBCHANNEL_H
 
-#include <map>
+#include <qobject.h>
 #include <qstring.h>
+#include <qsqldatabase.h>
+
+#include <map>
+using namespace std;
+
 #include "mythcontext.h"
 #include "channelbase.h"
 
-using namespace std;
+#include "dvbtypes.h"
 
 class TVRec;
 
-typedef vector<int> vector_int;
-
-class DVBChannel : public ChannelBase
+class DVBChannel : public QObject, public ChannelBase
 {
-  public:
-    DVBChannel(TVRec *parent, int cardnum, // DVB hw device num, see below
-               bool use_ts, char dvb_type);
-    virtual ~DVBChannel();
+    Q_OBJECT
+public:
+    DVBChannel(int cardnum, TVRec *parent = NULL);
+    ~DVBChannel();
 
-    virtual bool Open();
-    virtual void Close();
-    virtual void GetPID(vector_int& pid) const;
+    bool Open();
+    void Close() {};
 
-    virtual bool SetChannelByString(const QString &chan); // chan is channum?
+    fe_type_t GetCardType() { return info.type; };
 
-    virtual void SetFreqTable(const QString &name);
+    bool SetChannelByString(const QString &chan);
+    bool Tune(dvb_channel_t& channel, bool all=false);
 
+    void SetFreqTable(const QString &name);
     void SwitchToInput(const QString &inputname, const QString &chan);
     void SwitchToInput(int newcapchannel, bool setstarting)
                       { (void)newcapchannel; (void)setstarting; }
 
-    // Empty functions that we don't need
-    virtual void SetFormat(const QString &format) { (void)format; }
-    virtual void ToggleInputs() {}
+    void GetCurrentChannel(dvb_channel_t *& chan)
+        { chan = &chan_opts; };
 
-    enum DVB_Type {DVB_S, DVB_T, DVB_C};
+    bool ParseQPSK(const QString& frequency, const QString& inversion,
+                   const QString& symbol_rate, const QString& fec_inner,
+                   const QString& pol, const QString& lnb_diseqc_port,
+                   const QString& lnb_lof_switch, const QString& lnb_lof_hi,
+                   const QString& lnb_lof_lo, dvb_tuning_t& t);
 
-  protected:
-    virtual bool Open(unsigned int number_of_pids);
-    virtual bool SetPID();
+    bool ParseQAM(const QString& frequency, const QString& inversion,
+                  const QString& symbol_rate, const QString& fec_inner,
+                  const QString& modulation, dvb_tuning_t& t);
 
-    vector_int pid; /* Program IDs, to filter out the right channel from
-                       the transport stream we get from the tuner/card.
-                       Video and audio stream, respectively. */
-    bool use_ts; /* If true, grab the whole transport stream (TS) from the card
-                    and do the filtering/demuxing ourselves. This allows us to
-                    record several channels from the same TS at the same time,
-                    by reading the TS several times in different DVBRecorder
-                    instances. Full (not budget) cards with MPEG decoder
-                    don't give us the full TS, so we have to let the card
-                    filter out the right program streams, and they usually
-                    can do that for one channel at the same time only.
-                    So, set this to false for full cards and true for budget
-                    cards, while the latter ironically gives more
-                    functionality. */
+    bool ParseOFDM(const QString& frequency, const QString& inversion,
+                   const QString& bandwidth, const QString& coderate_hp,
+                   const QString& coderate_lp, const QString& constellation,
+                   const QString& trans_mode, const QString& guard_interval,
+                   const QString& hierarchy, dvb_tuning_t& p);
 
-    enum DVB_Type dvb_type;
-    int cardnum; /* 0..3; for N in /dev/dvb/adapterN/frontend0,
-                                   /dev/dvb/adapterN/dvr0 etc. */
-    int dvr_fd;
-    vector_int demux_fd;
+    void RecorderStarted();
+
+signals:
+    void ChannelChanged(dvb_channel_t& chan);
+    void StatusSignalToNoise(unsigned int val);
+    void StatusSignalStrength(unsigned int val);
+    void StatusBitErrorRate(unsigned int val);
+    void StatusUncorrectedBlocks(unsigned int val);
+    void Status(fe_status_t status);
+
+private:
+    static void* StatusMonitorHelper(void*);
+    void StatusMonitorLoop();
+
+    bool GetChannelOptions(QString channum);
+    bool GetChannelPids(QSqlDatabase*& db_conn, pthread_mutex_t& db_lock,
+                        int chanid);
+    void PrintChannelOptions();
+
+    void CheckOptions();
+    bool CheckModulation(fe_modulation_t& modulation);
+    bool CheckCodeRate(fe_code_rate_t& rate);
+
+    bool TuneQPSK(dvb_tuning_t& tuning, bool reset, bool& havetuned);
+    bool TuneQAM(dvb_tuning_t& tuning, bool reset, bool& havetuned);
+    bool TuneOFDM(dvb_tuning_t& tuning, bool reset, bool& havetuned);
+
+    bool ParseQuery(QSqlQuery& query);
+
+private:
+    int cardnum;
+
+    struct dvb_frontend_info info;
+
+    bool first_tune;
+    dvb_channel_t   chan_opts;
+    dvb_tuning_t    prev_tuning;
+
+    int fd_frontend;
+    bool isOpen;
+
+    pthread_t statusMonitorThread;
+    bool pauseStatusMonitor;
 };
 
 #endif

@@ -18,6 +18,8 @@ using namespace std;
 #include "videoout_ivtv.h"
 #include "videodev_myth.h"
 
+bool IvtvDecoder::ntsc = true;
+
 IvtvDecoder::IvtvDecoder(NuppelVideoPlayer *parent, QSqlDatabase *db,
                          ProgramInfo *pginfo)
            : DecoderBase(parent)
@@ -38,6 +40,7 @@ IvtvDecoder::IvtvDecoder(NuppelVideoPlayer *parent, QSqlDatabase *db,
     firstgoppos = 0;
     prevgoppos = 0;
 
+    ntsc = true;
     fps = 29.97;
     validvpts = false;
 
@@ -73,7 +76,7 @@ bool IvtvDecoder::CanHandle(char testbuf[2048], const QString &filename)
     QString videodev = gContext->GetSetting("PVR350VideoDev");
 
     int testfd = open(videodev.ascii(), O_RDWR);
-    if (testfd <= 0)
+    if (testfd < 0)
         return false;
 
     bool ok = false;
@@ -86,8 +89,15 @@ bool IvtvDecoder::CanHandle(char testbuf[2048], const QString &filename)
             ok = true;
     }
 
-    // probe for pal/ntsc while we're here..
-    
+    v4l2_std_id std = V4L2_STD_NTSC;
+    ntsc = true;
+
+    if (ioctl(testfd, VIDIOC_G_STD, &std) >= 0)
+    {
+        if (std & V4L2_STD_PAL)
+            ntsc = false;
+    }    
+
     close(testfd);
 
     if (!ok)
@@ -118,9 +128,11 @@ int IvtvDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     m_parent->ForceVideoOutputType(kVideoOutput_IVTV);
 
-    // need to probe pal/ntsc
-    m_parent->SetVideoParams(720, 480, 29.97, 15, 1.5);
-             
+    if (ntsc)
+        m_parent->SetVideoParams(720, 480, 29.97, 15, 1.33);
+    else
+        m_parent->SetVideoParams(720, 576, 25.00, 15, 1.33);
+     
     ringBuffer->CalcReadAheadThresh(8000);
 
     if (m_playbackinfo && m_db)

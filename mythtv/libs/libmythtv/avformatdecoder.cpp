@@ -45,11 +45,14 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, QSqlDatabase *db,
     ateof = false;
     gopset = false;
     firstgoppos = 0;
+    prevgoppos = 0;
 
     fps = 29.97;
     validvpts = false;
 
     lastKey = 0;
+
+    memset(prvpkt, 0, 3);
 }
 
 AvFormatDecoder::~AvFormatDecoder()
@@ -107,6 +110,9 @@ void AvFormatDecoder::SeekReset(void)
         av_free_packet(pkt);
         delete pkt;
     }
+
+    prevgoppos = 0;
+    gopset = false;
 }
 
 void AvFormatDecoder::Reset(void)
@@ -679,29 +685,107 @@ void render_slice_via(struct AVCodecContext *s, const AVFrame *src,
 #define SLICE_MIN     0x00000101
 #define SLICE_MAX     0x000001af
 
-int AvFormatDecoder::PacketHasHeader(unsigned char *buf, int len,
-                                     unsigned int startcode)
+void AvFormatDecoder::MpegPreProcessPkt(AVCodecContext *context, AVPacket *pkt)
 {
-    unsigned char *bufptr;
-    unsigned int state = 0xFFFFFFFF, v;
+    unsigned char *bufptr = pkt->data;
+    unsigned int state = 0xFFFFFFFF, v = 0;
     
-    bufptr = buf;
+    int prvcount = -1;
 
-    while (bufptr < buf + len)
+    while (bufptr < pkt->data + pkt->size)
     {
-        v = *bufptr++;
+        if (++prvcount < 3)
+            v = prvpkt[prvcount];
+        else
+            v = *bufptr++;
+
         if (state == 0x000001)
         {
             state = ((state << 8) | v) & 0xFFFFFF;
             if (state >= SLICE_MIN && state <= SLICE_MAX)
-                return 0;
-            if (state == startcode)
-                return (bufptr - buf);
+                continue;
+
+            switch (state)
+            {
+                case SEQ_START:
+                {
+                    unsigned char *test = bufptr;
+                    int width = (test[0] << 4) | (test[1] >> 4);
+                    int height = ((test[1] & 0xff) << 8) | test[2];
+
+                    int aspectratioinfo = (test[3] >> 4);
+
+                    float aspect = GetMpegAspect(context, aspectratioinfo,
+                                                 width, height);
+
+                    if (CheckVideoParams(width, height) ||
+                        aspect != current_aspect)
+                    {
+                        m_parent->SetVideoParams(ALIGN(width,16),
+                                                 ALIGN(height,16), fps,
+                                                 keyframedist, aspect);
+                        m_parent->ReinitVideo();
+                        current_width = width;
+                        current_height = height;
+                        current_aspect = aspect;
+
+                        gopset = false;
+                        prevgoppos = 0;
+                        lastapts = lastvpts = 0;
+                    }
+                }
+                break;
+
+                case GOP_START:
+                {
+                    int tempKeyFrameDist = framesRead - 1 - prevgoppos;
+
+                    if (!gopset)
+                    {
+                        if (prevgoppos > 0 && tempKeyFrameDist > 0)
+                        {
+                            gopset = true;
+                            keyframedist = tempKeyFrameDist;
+                            m_parent->SetVideoParams(-1, -1, -1, keyframedist);
+                        }
+                    }
+                    else
+                    {
+                        if (keyframedist != tempKeyFrameDist && 
+                            tempKeyFrameDist > 0)
+                        {
+                            //cerr << "KeyFrameDistance has changed to "
+                            //     << tempKeyFrameDist << "." << endl;
+                            keyframedist = tempKeyFrameDist;
+                            m_parent->SetVideoParams(-1, -1, -1, keyframedist);
+                        }
+                    }
+
+                    lastKey = prevgoppos = framesRead - 1;
+
+                    if (!hasFullPositionMap)
+                    {
+                        //cerr << "positionMap[" << prevgoppos / keyframedist <<
+                        //        "] = " << pkt->startpos << "." << endl;
+                        positionMap[prevgoppos / keyframedist] = pkt->startpos;
+                    }
+                }
+                break;
+
+                case PICTURE_START:
+                {
+                    framesRead++;
+                    if (exitafterdecoded)
+                        gotvideo = 1;
+                }
+                break;
+            }
+            continue;
         }
         state = ((state << 8) | v) & 0xFFFFFF;
     }
 
-    return 0;
+    memcpy(prvpkt, pkt->data + pkt->size - 3, 3);
 }
 
 static const float avfmpeg1_aspect[16]={
@@ -756,7 +840,7 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
     int data_size = 0;
     long long temppts;
 
-    bool gotvideo = false;
+    gotvideo = false;
 
     frame_decoded = 0;
 
@@ -823,64 +907,13 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
         if (len > 0 && curstream->codec.codec_type == CODEC_TYPE_VIDEO)
         {
             AVCodecContext *context = &(curstream->codec);
+
             if (context->codec_id == CODEC_ID_MPEG1VIDEO ||
                 context->codec_id == CODEC_ID_MPEG2VIDEO ||
                 context->codec_id == CODEC_ID_MPEG2VIDEO_XVMC ||
                 context->codec_id == CODEC_ID_MPEG2VIDEO_VIA)
             {
-                int startpos = 0;
-                if ((startpos = PacketHasHeader(ptr, len, SEQ_START)))
-                {
-                    unsigned char *test = ptr + startpos;
-                    int width = (test[0] << 4) | (test[1] >> 4);
-                    int height = ((test[1] & 0xff) << 8) | test[2];
-
-                    int aspectratioinfo = (test[3] >> 4);
-
-                    float aspect = GetMpegAspect(context, aspectratioinfo, 
-                                                 width, height);
-
-                    if (CheckVideoParams(width, height) || 
-                        aspect != current_aspect)
-                    {
-                        m_parent->SetVideoParams(ALIGN(width, 16), 
-                                                 ALIGN(height, 16), fps,
-                                                 keyframedist, aspect);
-                        m_parent->ReinitVideo();
-                        current_width = width;
-                        current_height = height;
-                        current_aspect = aspect;
-                        lastvpts = lastapts = 0;
-                    }
-                }
-                 
-                if (PacketHasHeader(ptr, len, PICTURE_START))
-                {
-                    framesRead++;
-                    if (exitafterdecoded)
-                        gotvideo = 1;
-                }
-
-                if (PacketHasHeader(ptr, len, GOP_START))
-                {
-                    int frameNum = framesRead - 1;
- 
-                    if (!gopset && frameNum > 0)
-                    {
-                        if (firstgoppos > 0)
-                        {
-                            keyframedist = frameNum - firstgoppos;
-                            gopset = true;
-                            m_parent->SetVideoParams(-1, -1, -1, keyframedist);
-                        }
-                        else
-                            firstgoppos = frameNum;
-                    }
-
-                    lastKey = frameNum;
-                    if (!hasFullPositionMap)
-                        positionMap[lastKey / keyframedist] = pkt->startpos;
-                }
+                MpegPreProcessPkt(context, pkt);
             }
         }
  

@@ -433,6 +433,12 @@ ProgInfo *parseProgram(QDomElement &element, int localTimezoneOffset)
                     if (pginfo->catType == "")
                         pginfo->catType = cat;
                 }
+
+                if (cat == "File" && !isNorthAmerica)
+                {
+                    // Hack for tv_grab_uk_rt
+                    pginfo->catType = cat;
+                }
             }
             else if (info.tagName() == "date" && pginfo->airdate == "")
             {
@@ -1341,6 +1347,11 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
         command.sprintf("nice %s --days 14 --config-file '%s' --output %s",
                         xmltv_grabber.ascii(), configfile.ascii(),
                         filename.ascii());
+    else if (xmltv_grabber == "tv_grab_dk")
+        // Use fixed interval of 7 days for Danish grabber
+        command.sprintf("nice %s --days 7 --config-file '%s' --output %s",
+                        xmltv_grabber.ascii(), configfile.ascii(),
+                        filename.ascii());
     else
     {
         isNorthAmerica = true;
@@ -1356,6 +1367,7 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
          xmltv_grabber == "tv_grab_es" ||
          xmltv_grabber == "tv_grab_nz" ||
          xmltv_grabber == "tv_grab_sn" ||
+         xmltv_grabber == "tv_grab_dk" ||
          xmltv_grabber == "tv_grab_uk" ||
          xmltv_grabber == "tv_grab_uk_rt" ||
          xmltv_grabber == "tv_grab_nl" ||
@@ -1427,6 +1439,11 @@ bool fillData(QValueList<Source> &sourcelist)
             if (!grabData(*it, 0))
                 ++failures;
         }
+        else if (xmltv_grabber == "tv_grab_dk")
+        {
+            if (!grabData(*it, 0))
+                ++failures;
+        }
         else if (xmltv_grabber == "tv_grab_nz")
         {
             // tv_grab_nz only supports a 7-day "grab".
@@ -1463,7 +1480,7 @@ bool fillData(QValueList<Source> &sourcelist)
             }
         }
         else if (xmltv_grabber == "tv_grab_na" || 
-                     xmltv_grabber == "tv_grab_uk_rt")
+                 xmltv_grabber == "tv_grab_uk_rt")
         {
             QDate qCurrentDate = QDate::currentDate();
 
@@ -1488,8 +1505,11 @@ bool fillData(QValueList<Source> &sourcelist)
                     qCurrentDate = newDate;
                 }
 
+                // Check to see if we already downloaded data for this date
+                bool download_needed = false;
                 QString date(qCurrentDate.addDays(i).toString());
                 QString querystr;
+
                 querystr.sprintf("SELECT COUNT(*) as 'hits' "
                                  "FROM channel LEFT JOIN program USING (chanid) "
                                  "WHERE sourceid = %d AND starttime >= "
@@ -1508,21 +1528,55 @@ bool fillData(QValueList<Source> &sourcelist)
                     if (!query.numRowsAffected() ||
                         (query.next() && query.value(0).toInt() <= 1)) 
                     {
-                        if (!quiet)
-                            cout << "Fetching data for " << date << endl;
-                        if (!grabData(*it, i, &qCurrentDate))
-                            ++failures;
-                    }
-                    else
-                    {
-                        if (!quiet)
-                            cout << "Data is already present for " << date
-                                 << ", skipping\n";
+                        download_needed = true;
                     }
                 } 
                 else
                     MythContext::DBError("checking existing program data", 
                                          query);
+
+                // Now look for programs marked as "To Be Announced"
+                if (!download_needed && xmltv_grabber == "tv_grab_uk_rt") 
+                {
+                    querystr.sprintf("SELECT COUNT(*) as 'hits' "
+                                     "FROM channel LEFT JOIN program USING (chanid) "
+                                     "WHERE sourceid = %d AND starttime >= "
+                                     "DATE_ADD(CURRENT_DATE(), INTERVAL '%d 12' DAY_HOUR) "
+                                     "AND starttime < DATE_ADD(CURRENT_DATE(), "
+                                     "INTERVAL 1+%d DAY) "
+                                     "AND category = 'TBA' "
+                                     "GROUP BY channel.chanid "
+                                     "ORDER BY hits DESC LIMIT 1",
+                                      (*it).id, i, i);
+                    QSqlQuery query;
+                    query.exec(querystr);
+
+                    if (query.isActive()) 
+                    {
+                        if (query.numRowsAffected() || 
+                            (query.next() && query.value(0).toInt() >= 1)) 
+                        {
+                            download_needed = true;
+                        }
+                    } 
+                    else
+                        MythContext::DBError("checking existing program data", 
+                                             query);
+                }
+
+                if (download_needed)
+                {
+                    if (!quiet)
+                        cout << "Fetching data for " << date << endl;
+                    if (!grabData(*it, i, &qCurrentDate))
+                        ++failures;
+                }
+                else
+                {
+                    if (!quiet)
+                        cout << "Data is already present for " << date
+                             << ", skipping\n";
+                }
             }
         }
         else

@@ -22,11 +22,14 @@ using namespace std;
 #include "NuppelVideoRecorder.h"
 #include "mpegrecorder.h"
 #include "hdtvrecorder.h"
-#include "dvbrecorder.h"
 #include "NuppelVideoPlayer.h"
 #include "channel.h"
-#include "dvbchannel.h"
 #include "commercial_skip.h"
+
+#ifdef USING_DVB
+#include "dvbchannel.h"
+#include "dvbrecorder.h"
+#endif
 
 void *SpawnEncode(void *param)
 {
@@ -60,21 +63,28 @@ TVRec::TVRec(int capturecardnum)
     audiosamplerate = -1;
 
     QString inputname, startchannel;
-    int use_ts = 0;
-    char dvb_type = '\0';
 
     GetDevices(capturecardnum, videodev, vbidev, audiodev, audiosamplerate,
-               inputname, startchannel, cardtype, use_ts, dvb_type);
+               inputname, startchannel, cardtype, dvb_swfilter, dvb_recordts);
 
     if (cardtype == "DVB")
     {
-        channel = new DVBChannel(this, videodev.toInt(), use_ts == 1, dvb_type);
+#ifdef USING_DVB
+        channel = new DVBChannel(videodev.toInt(), this);
+        channel->Open();
         if (inputname.isEmpty())
             channel->SetChannelByString(startchannel);
         else
             channel->SwitchToInput(inputname, startchannel);
         channel->SetChannelOrdering(chanorder);
         // don't close this channel, otherwise we cannot read data
+#else
+        VERBOSE(VB_IMPORTANT, "ERROR: DVB Card configured, "
+                              "but no DVB support compiled in!");
+        VERBOSE(VB_IMPORTANT, "Remove the card from configuration, "
+                              "or recompile MythTV.");
+        exit(-1);
+#endif
     }
     else // "V4L" or "MPEG", ie, analog TV, or "HDTV"
     {
@@ -550,10 +560,14 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
     }
     else if (cardtype == "DVB")
     {
+#ifdef USING_DVB
         nvr = new DVBRecorder(dynamic_cast<DVBChannel*>(channel));
         nvr->SetRingBuffer(rbuffer);
         nvr->SetOption("cardnum", videodev.toInt());
+        nvr->SetOption("swfilter", dvb_swfilter);
+        nvr->SetOption("recordts", dvb_recordts);
         nvr->Initialize();
+#endif
         return;
     }
 
@@ -1055,8 +1069,8 @@ void TVRec::DisconnectDB(void)
 
 void TVRec::GetDevices(int cardnum, QString &video, QString &vbi, 
                        QString &audio, int &rate, QString &defaultinput,
-                       QString &startchan, QString &type, int &use_ts,
-                       char &dvb_type)
+                       QString &startchan, QString &type, int &dvb_swfilter,
+                       int &dvb_recordts)
 {
     video = "";
     vbi = "";
@@ -1070,8 +1084,8 @@ void TVRec::GetDevices(int cardnum, QString &video, QString &vbi,
     MythContext::KickDatabase(db_conn);
 
     QString thequery = QString("SELECT videodevice,vbidevice,audiodevice,"
-                               "audioratelimit,defaultinput,cardtype, "
-                               "use_ts,dvb_type "
+                               "audioratelimit,defaultinput,cardtype,"
+                               "dvb_swfilter,dvb_recordts "
                                "FROM capturecard WHERE cardid = %1;")
                               .arg(cardnum);
 
@@ -1102,10 +1116,8 @@ void TVRec::GetDevices(int cardnum, QString &video, QString &vbi,
         test = query.value(5).toString();
         if (test != QString::null)
             type = QString::fromUtf8(test);
-        use_ts = query.value(6).toInt();
-        test = query.value(7).toString();
-        if (test != QString::null)
-            dvb_type = test[0].latin1();
+        dvb_swfilter = query.value(6).toInt();
+        dvb_recordts = query.value(7).toInt();
 
         if (testnum > 0)
             rate = testnum;

@@ -83,15 +83,6 @@ void VideoOutputIvtv::ClearOSD(void)
 {
     if (fbfd > 0) 
     {
-        struct ivtvfb_ioctl_get_frame_buffer igfb;
-        memset(&igfb, 0, sizeof(igfb));
-
-        ioctl(fbfd, IVTVFB_IOCTL_GET_FRAME_BUFFER, &igfb);
-
-        width = igfb.sizex;
-        height = igfb.sizey;
-        stride = igfb.sizex * 4;
-
         struct ivtv_osd_coords osdcoords;
         memset(&osdcoords, 0, sizeof(osdcoords));
 
@@ -104,15 +95,15 @@ void VideoOutputIvtv::ClearOSD(void)
         prep.dest_offset = 0;
         prep.count = osdcoords.max_offset;
 
-        memset(osdbuf_aligned, 0x00, 720 * 480 * 4);
+        memset(osdbuf_aligned, 0x00, osdbufsize);
 
         ioctl(fbfd, IVTVFB_IOCTL_PREP_FRAME, &prep);
 
         usleep(20000);
 
-        osdcoords.lines = 480;
+        osdcoords.lines = XJ_height;
         osdcoords.offset = 0;
-        osdcoords.pixel_stride = 720 * 2;
+        osdcoords.pixel_stride = XJ_width * 2;
 
         ioctl(fbfd, IVTVFB_IOCTL_SET_ACTIVE_BUFFER, &osdcoords);
     }
@@ -137,6 +128,9 @@ bool VideoOutputIvtv::Init(int width, int height, float aspect,
 
     VideoOutput::Init(width, height, aspect, winid, winx, winy, winw, winh, 
                       embedid);
+
+    osdbufsize = width * height * 4;
+
     MoveResize();
 
     Reopen();
@@ -195,15 +189,13 @@ bool VideoOutputIvtv::Init(int width, int height, float aspect,
 
         ioctl(fbfd, IVTVFB_IOCTL_GET_FRAME_BUFFER, &igfb);
 
-        width = igfb.sizex;
-        height = igfb.sizey;
         stride = igfb.sizex * 4;
 
-        osdbuffer = new char[720 * 480 * 4 + PAGE_SIZE];
+        osdbuffer = new char[osdbufsize + PAGE_SIZE];
         osdbuf_aligned = (char *)((int)osdbuffer + (PAGE_SIZE - 1));
         osdbuf_aligned = (char *)((int)osdbuf_aligned & PAGE_MASK);
 
-        memset(osdbuf_aligned, 0x00, 720 * 480 * 4);
+        memset(osdbuf_aligned, 0x00, osdbufsize);
 
         ClearOSD();
     }
@@ -361,8 +353,8 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
             usleep(20000);
 
             osdcoords.offset = 0;
-            osdcoords.lines = 480;
-            osdcoords.pixel_stride = 720 * 2;
+            osdcoords.lines = XJ_height;
+            osdcoords.pixel_stride = XJ_width * 2;
 
             ioctl(fbfd, IVTVFB_IOCTL_SET_ACTIVE_BUFFER, &osdcoords);
         }

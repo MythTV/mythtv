@@ -87,6 +87,8 @@ class IvtvDecoder : public DecoderBase
     long long laststartpos;
 
     unsigned char prvpkt[3];
+
+    static bool ntsc;
 };
 
 #endif

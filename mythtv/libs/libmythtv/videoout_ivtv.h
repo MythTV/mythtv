@@ -62,7 +62,7 @@ class VideoOutputIvtv: public VideoOutput
     char *mapped_mem;
     char *pixels;
 
-    int width, height, stride;
+    int stride;
 
     bool lastcleared;
 
@@ -70,6 +70,8 @@ class VideoOutputIvtv: public VideoOutput
     char *osdbuf_aligned;
 
     bool firstframe;
+
+    int osdbufsize;
 };
 
 #endif

@@ -11,6 +11,10 @@ include ( ../../settings.pro )
 INCLUDEPATH += ../libmyth ../  ../libavcodec ../libavformat ../libdvbdev
 DEPENDPATH += ../libmyth ../libvbitext ../libavcodec ../libavformat ../libdvbdev
 
+TARGETDEPS += ../libmyth/libmyth-$${LIBVERSION}.so
+TARGETDEPS += ../libavcodec/libavcodec.a ../libavformat/libavformat.a
+TARGETDEPS += ../libvbitext/libvbitext.a
+
 QMAKE_CXXFLAGS_RELEASE += `freetype-config --cflags`
 QMAKE_CXXFLAGS_DEBUG += `freetype-config --cflags`
 
@@ -22,8 +26,8 @@ HEADERS += osdtypes.h programinfo.h profilegroup.h recordingprofile.h
 HEADERS += remoteencoder.h remoteutil.h RingBuffer.h scheduledrecording.h 
 HEADERS += RTjpegN.h ttfont.h tv_play.h tv_rec.h videosource.h yuv2rgb.h
 HEADERS += progfind.h decoderbase.h nuppeldecoder.h avformatdecoder.h
-HEADERS += recorderbase.h mpegrecorder.h channelbase.h dvbrecorder.h
-HEADERS += dvbchannel.h vsync.h proglist.h hdtvrecorder.h fifowriter.h
+HEADERS += recorderbase.h mpegrecorder.h channelbase.h
+HEADERS += vsync.h proglist.h hdtvrecorder.h fifowriter.h
 HEADERS += videooutbase.h videoout_xv.h videoout_null.h xbox.h
 HEADERS += ivtvdecoder.h videoout_ivtv.h dbcheck.h
 
@@ -34,7 +38,7 @@ SOURCES += osdtypes.cpp programinfo.cpp recordingprofile.cpp remoteencoder.cpp
 SOURCES += remoteutil.cpp RingBuffer.cpp RTjpegN.cpp scheduledrecording.cpp
 SOURCES += ttfont.cpp tv_play.cpp tv_rec.cpp videosource.cpp yuv2rgb.cpp
 SOURCES += progfind.cpp nuppeldecoder.cpp avformatdecoder.cpp recorderbase.cpp
-SOURCES += mpegrecorder.cpp channelbase.cpp dvbrecorder.cpp dvbchannel.cpp
+SOURCES += mpegrecorder.cpp channelbase.cpp
 SOURCES += vsync.c proglist.cpp hdtvrecorder.cpp videooutbase.cpp 
 SOURCES += videoout_xv.cpp fifowriter.cpp videoout_null.cpp xbox.cpp
 SOURCES += ivtvdecoder.cpp videoout_ivtv.cpp dbcheck.cpp profilegroup.cpp
@@ -50,3 +54,10 @@ using_viahwslice {
     SOURCES += videoout_viaslice.h
     DEFINES += USING_VIASLICE
 }
+
+using_dvb {
+    SOURCES += dvbrecorder.cpp dvbchannel.cpp
+    HEADERS += dvbrecorder.h dvbchannel.h
+    TARGETDEPS += ../libdvbdev/libdvbdev.a
+}
+

@@ -8,7 +8,7 @@ using namespace std;
 
 #include "mythcontext.h"
 
-const QString currentDatabaseVersion = "1007";
+const QString currentDatabaseVersion = "1008";
 
 void UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -216,6 +216,59 @@ void UpgradeTVDatabaseSchema(void)
 ""
 };
         performActualUpdate(updates, "1007", dbver);
+    }
+
+    if (dbver == "1007")
+    {
+        const QString updates[] = {
+"ALTER TABLE capturecard CHANGE use_ts dvb_swfilter INT DEFAULT '0';",
+"ALTER TABLE capturecard CHANGE dvb_type dvb_recordts INT DEFAULT '0';",
+"DROP TABLE IF EXISTS channel_dvb;",
+"CREATE TABLE IF NOT EXISTS dvb_channel ("
+"   chanid              SMALLINT NOT NULL,"
+"   serviceid           SMALLINT NULL,"
+"   networkid           SMALLINT NULL,"
+"   providerid          SMALLINT NULL,"
+"   transportid         SMALLINT NULL,"
+"   frequency           INTEGER NULL,"
+"   inversion           CHAR(1) NULL,"
+"   symbolrate          INTEGER NULL,"
+"   fec                 VARCHAR(10) NULL,"
+"   polarity            CHAR(1) NULL,"
+"   satid               SMALLINT NULL,"
+"   modulation          VARCHAR(10) NULL,"
+"   bandwidth           CHAR(1) NULL,"
+"   lp_code_rate        VARCHAR(10) NULL,"
+"   transmission_mode   CHAR(1) NULL,"
+"   guard_interval      VARCHAR(10) NULL,"
+"   hierarchy           CHAR(1) NULL,"
+"   PRIMARY KEY (chanid)"
+");",
+"CREATE TABLE IF NOT EXISTS dvb_sat ("
+"   satid   SMALLINT NOT NULL AUTO_INCREMENT,"
+"   lnbid   SMALLINT NULL,"
+"   cardnum SMALLINT NULL,"
+"   PRIMARY KEY (cardnum,satid,lnbid)"
+");",
+"CREATE TABLE IF NOT EXISTS dvb_lnb ("
+"   lnbid       SMALLINT NOT NULL AUTO_INCREMENT,"
+"   disecqid    SMALLINT NULL,"
+"   diseqc_port SMALLINT NULL,"
+"   lof_switch  INTEGER DEFAULT 11700000 NOT NULL,"
+"   lof_hi      INTEGER DEFAULT 10600000 NOT NULL,"
+"   lof_lo      INTEGER DEFAULT 9750000 NOT NULL,"
+"   PRIMARY KEY (lnbid)"
+");",
+"CREATE TABLE IF NOT EXISTS dvb_pids ("
+"   chanid  SMALLINT NOT NULL,"
+"   pid     SMALLINT NOT NULL,"
+"   type    CHAR(1) DEFAULT 'o' NOT NULL,"
+"   lang    CHAR(3) DEFAULT '' NOT NULL,"
+"   PRIMARY KEY (chanid,pid)"
+");",
+""
+};
+        performActualUpdate(updates, "1008", dbver);
     }
 }
 

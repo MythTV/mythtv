@@ -143,7 +143,7 @@ class TVRec
 
     void GetDevices(int cardnum, QString &video, QString &vbi, QString &audio,
                     int &rate, QString &defaultinput, QString &startchannel,
-                    QString &type, int &use_ts, char &dvb_type);
+                    QString &type, int &dvb_swfilter, int &dvb_recordts);
 
     void ConnectDB(int cardnum);
     void DisconnectDB(void);
@@ -221,6 +221,9 @@ class TVRec
 
     QString profileName;
     int autoTranscode;
+
+    int dvb_swfilter;
+    int dvb_recordts;
 };
 
 #endif

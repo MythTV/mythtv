@@ -72,7 +72,7 @@ class AvFormatDecoder : public DecoderBase
     friend int close_avf(URLContext *h);
 
     void InitByteContext(void);
-    int PacketHasHeader(unsigned char *buf, int len, unsigned int startcode);
+    void MpegPreProcessPkt(AVCodecContext *context, AVPacket *pkt);
     float GetMpegAspect(AVCodecContext *context, int aspect_ratio_info,
                         int width, int height);
 
@@ -139,6 +139,11 @@ class AvFormatDecoder : public DecoderBase
     QPtrList<AVPacket> storedPackets;
 
     int firstgoppos;
+    int prevgoppos;
+
+    bool gotvideo;
+
+    unsigned char prvpkt[3];
 };
 
 #endif
