@@ -72,7 +72,7 @@ extern "C" {
     extern XvImage  *XvShmCreateImage(Display*, XvPortID, int, char*, int, int, XShmSegmentInfo*);
 }
 
-const int kNumBuffers = 7;
+const int kNumBuffers = 8;
 const int kPrebufferFrames = 4;
 const int kNeedFreeFrames = 2;
 const int kKeepPrebuffer = 1;
@@ -193,7 +193,7 @@ void VideoOutputXvMC::InputChanged(int width, int height, float aspect)
         w_mm =  display_res->Width_mm();
         h_mm =  display_res->Height_mm();
 
-        data->display_aspect = static_cast<float>(w_mm/h_mm);
+        data->display_aspect = (float)(w_mm/h_mm);
 
         // Resize X window to fill new resolution
         XMoveResizeWindow(data->XJ_disp, data->XJ_win, 0, 0,
@@ -811,8 +811,16 @@ static void SyncSurface(Display *disp, XvMCSurface *surf)
     int res = 0, status = 0;
 
     res = XvMCGetSurfaceStatus(disp, surf, &status);
+    if (res)
+        VERBOSE(VB_PLAYBACK, QString("Error XvMCGetSurfaceStatus %1").arg(res));
     if (status & XVMC_RENDERING)
         XvMCSyncSurface(disp, surf);
+}
+
+static void FlushSurface(Display *disp, XvMCSurface *surf)
+{
+    if (surf)
+        XvMCFlushSurface(disp, surf);
 }
 
 void VideoOutputXvMC::PrepareFrame(VideoFrame *buffer, FrameScanType t)
@@ -825,17 +833,15 @@ void VideoOutputXvMC::PrepareFrame(VideoFrame *buffer, FrameScanType t)
 
     pthread_mutex_lock(&lock);
 
-    xvmc_render_state_t *render = (xvmc_render_state_t *)buffer->buf;
+    xvmc_render_state_t *render = reinterpret_cast<xvmc_render_state_t *>(buffer->buf);
 
-    SyncSurface(data->XJ_disp, render->p_surface);
+    VideoFrame *osdframe = (VideoFrame *)(render->p_osd_target_surface_render);
+    xvmc_render_state_t * osdrender =
+        (osdframe) ? (xvmc_render_state_t *)(osdframe->buf) : 0;
+    Display *display = data->XJ_disp;
 
-    VideoFrame *osdframe = (VideoFrame *)render->p_osd_target_surface_render;
-
-    if (osdframe)
-    {
-        xvmc_render_state_t *osdren = (xvmc_render_state_t *)osdframe->buf;
-        SyncSurface(data->XJ_disp, osdren->p_surface);
-    }
+    SyncSurface(display, render->p_surface);
+    SyncSurface(display, (osdrender) ? osdrender->p_surface : 0);
 
     render->state |= MP_XVMC_STATE_DISPLAY_PENDING;
     data->p_render_surface_to_show = render;
@@ -867,10 +873,15 @@ void VideoOutputXvMC::Show(FrameScanType scan)
             break;
     }
 
+    pthread_mutex_lock(&lock);
+
     xvmc_render_state_t *render = data->p_render_surface_to_show;
 
     if (render == NULL)
+    {
+        pthread_mutex_unlock(&lock);
         return;
+    }
 
     xvmc_render_state_t *osdren = NULL;
 
@@ -880,8 +891,6 @@ void VideoOutputXvMC::Show(FrameScanType scan)
 
     xvmc_render_state_t *showingsurface = (osdren) ? osdren : render;
     XvMCSurface *surf = showingsurface->p_surface;
-
-    pthread_mutex_lock(&lock);
 
     if (data->p_render_surface_visible != NULL)
         data->p_render_surface_visible->state &= ~MP_XVMC_STATE_DISPLAY_PENDING;
@@ -921,6 +930,36 @@ void VideoOutputXvMC::Show(FrameScanType scan)
     pthread_mutex_unlock(&lock);
 }
 
+void FlushSlice(Display *display, XvMCSurface* current, int pict_type,
+                XvMCSurface* past, XvMCSurface* future)
+{
+    // We always display I and P frames, so flush them
+    if (!past && !future)
+    { // I frame
+        FlushSurface(display, current); // Flush I frame
+        if (FF_I_TYPE!=pict_type)
+            cerr<<"I"<<FF_I_TYPE<<":"<<pict_type;
+    }
+    else if (past && !future)
+    { // P frame
+        FlushSurface(display, past);    // Flush I/P frame
+        FlushSurface(display, current); // Flush P frame
+        if (FF_P_TYPE!=pict_type)
+            cerr<<"P"<<FF_P_TYPE<<":"<<pict_type;
+    }
+    else
+    { // B frame
+        // We don't always display B frames, so forgo flushing...
+        if (FF_B_TYPE!=pict_type) {
+            cerr<<"B"<<FF_B_TYPE<<":"<<pict_type;
+            // error? flush all!
+            FlushSurface(display, past);
+            FlushSurface(display, future);
+            FlushSurface(display, current);
+        }
+    }
+}
+
 void VideoOutputXvMC::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
 {
     (void)x;
@@ -932,10 +971,8 @@ void VideoOutputXvMC::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
 
     pthread_mutex_lock(&lock);
 
-    if (render->p_past_surface != NULL)
-        SyncSurface(data->XJ_disp, render->p_past_surface);
-    if (render->p_future_surface != NULL)
-        SyncSurface(data->XJ_disp, render->p_future_surface);
+    if (render->p_past_surface && !render->p_future_surface)
+        SyncSurface(data->XJ_disp, render->p_past_surface); // Sync prev-I frame
 
     int res = XvMCRenderSurface(data->XJ_disp, &data->ctx, 
                                 render->picture_structure, render->p_surface,
@@ -950,7 +987,8 @@ void VideoOutputXvMC::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
         cerr << "XvMCRenderSurface error\n";
     }
 
-    XvMCFlushSurface(data->XJ_disp, render->p_surface);
+    FlushSlice(data->XJ_disp, render->p_surface, render->pict_type, 
+               render->p_past_surface, render->p_future_surface);
 
     pthread_mutex_unlock(&lock);
 
@@ -1030,7 +1068,8 @@ void VideoOutputXvMC::ProcessFrame(VideoFrame *frame, OSD *osd,
                 XvMCCompositeSubpicture(data->XJ_disp, &data->subpicture, 
                                         data->xvimage, 0, 0, XJ_width, 
                                         XJ_height, 0, 0);
-                XvMCSyncSubpicture(data->XJ_disp, &data->subpicture);
+                // delay sync until after getnextfreeframe...
+                XvMCFlushSubpicture(data->XJ_disp, &data->subpicture);
             }
 
             if (data->subpicture_mode == BLEND_SUBPICTURE)
@@ -1040,6 +1079,7 @@ void VideoOutputXvMC::ProcessFrame(VideoFrame *frame, OSD *osd,
                 xvmc_render_state_t *osdren;
                 osdren = (xvmc_render_state_t *)newframe->buf;
 
+                XvMCSyncSubpicture(data->XJ_disp, &data->subpicture);
                 XvMCBlendSubpicture2(data->XJ_disp, render->p_surface,
                                      osdren->p_surface, &data->subpicture,
                                      0, 0, XJ_width, XJ_height,
@@ -1049,11 +1089,14 @@ void VideoOutputXvMC::ProcessFrame(VideoFrame *frame, OSD *osd,
             }
             else if (data->subpicture_mode == BACKEND_SUBPICTURE)
             {
+                XvMCSyncSubpicture(data->XJ_disp, &data->subpicture);
                 XvMCBlendSubpicture(data->XJ_disp, render->p_surface,
                                     &data->subpicture, 0, 0, XJ_width,
                                     XJ_height, 0, 0, XJ_width, XJ_height);
             }
 
+            FlushSurface(data->XJ_disp, render->p_surface);
+            
             pthread_mutex_unlock(&lock);
         }
     }
