@@ -214,6 +214,9 @@ class MythContext : public QObject
     void DoRestoreScreensaver(void);
     void DoResetScreensaver(void);
 
+    // get the current status
+    bool GetScreensaverEnabled(void);
+
   private slots:
     void EventSocketRead();
     void EventSocketConnected();

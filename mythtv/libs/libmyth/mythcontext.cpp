@@ -92,6 +92,8 @@ class MythContextPrivate
     int m_logenable, m_logmaxcount, m_logprintlevel;
     QMap<QString,int> lastLogCounts;
     QMap<QString,QString> lastLogStrings;
+
+    bool screensaverEnabled;
 };
 
 MythContextPrivate::MythContextPrivate(MythContext *lparent)
@@ -1533,17 +1535,26 @@ void MythContext::ResetScreensaver(void)
 void MythContext::DoDisableScreensaver(void)
 {
     d->screensaver->Disable();
+    d->screensaverEnabled = false;
 }
 
 void MythContext::DoRestoreScreensaver(void)
 {
     d->screensaver->Restore();
+    d->screensaverEnabled = true;
 }
 
 void MythContext::DoResetScreensaver(void)
 {
     d->screensaver->Reset();
+    d->screensaverEnabled = false;
 }
+
+bool MythContext::GetScreensaverEnabled(void)
+{
+    return d->screensaverEnabled;
+}
+
 
 void MythContext::LogEntry(const QString &module, int priority,
                            const QString &message, const QString &details)
