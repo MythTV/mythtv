@@ -641,7 +641,7 @@
     </message>
     <message>
         <source>Begin Transcoding</source>
-        <translation>Börja omkodning</translation>
+        <translation>Starta omkodning</translation>
     </message>
     <message>
         <source>Stop Commercial Flagging</source>
@@ -721,27 +721,27 @@
     </message>
     <message>
         <source>Playlist options</source>
-        <translation type="unfinished"></translation>
+        <translation>Spellistsinställningar</translation>
     </message>
     <message>
         <source>Add this Category/Title Group to Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Lägg till denna kategori/titelgrupp till spellistan</translation>
     </message>
     <message>
         <source>Add this Recording Group to Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Lägg till denna inspelningsgrupp till spellistan</translation>
     </message>
     <message>
         <source>Add this recording to Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Lägg till denna inspelning till spellistan</translation>
     </message>
     <message>
         <source>There are %1 items in the playlist.</source>
-        <translation type="unfinished"></translation>
+        <translation>Det finns %1 objekt i spellistan.</translation>
     </message>
     <message>
         <source>There is %1 item in the playlist.</source>
-        <translation type="unfinished"></translation>
+        <translation>Det finns %1 objekt i spellistan.</translation>
     </message>
     <message>
         <source>Clear Playlist</source>
@@ -749,27 +749,27 @@
     </message>
     <message>
         <source>Toggle playlist for this Category/Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Växla spellista för denna kategori/titel</translation>
     </message>
     <message>
         <source>Toggle playlist for this Recording Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Växla spellista för denna inspelningsgrupp</translation>
     </message>
     <message>
         <source>Toggle playlist for this recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Växla spellista för denna inspelning</translation>
     </message>
     <message>
         <source>These actions affect all items in the playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Dessa handlingar påverkar alla objekt i spellistan</translation>
     </message>
     <message>
         <source>Remove from Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta bort från spellista</translation>
     </message>
     <message>
         <source>Add to Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Lägg till spellista</translation>
     </message>
 </context>
 <context>
@@ -5541,6 +5541,22 @@ Kanalens frekvens i Hz.</translation>
     <message>
         <source>Free to air channels only.</source>
         <translation>Endast &quot;free to air&quot;-kanaler.</translation>
+    </message>
+    <message>
+        <source>Sort Episodes</source>
+        <translation>Sortera avsnitt</translation>
+    </message>
+    <message>
+        <source>Record date</source>
+        <translation>Inspelningsdatum</translation>
+    </message>
+    <message>
+        <source>Selects how to sort a shows episodes</source>
+        <translation>Välj sorteringsmetod för ett programs avsnitt</translation>
+    </message>
+    <message>
+        <source>Sort shows</source>
+        <translation>Sortera program</translation>
     </message>
 </context>
 <context>

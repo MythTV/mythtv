@@ -5500,6 +5500,22 @@ The frequency for this channel in Hz.</source>
         <source>Follow symbolic links when deleting files</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Sort Episodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selects how to sort a shows episodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort shows</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanProgressPopup</name>
