@@ -663,7 +663,10 @@ void TV::HandleStateChange(void)
         gContext->DisableScreensaver();
         StartPlayerAndRecorder(true, false);
         if (recorder->IsRecording())
+        {
             StartPlayerAndRecorder(false, true);
+            UpdateOSDInput();
+        }
         else
         {
             VERBOSE(VB_IMPORTANT, "LiveTV not successfully started");
@@ -2801,10 +2804,12 @@ void TV::UpdateOSDInput(void)
 {
     QString dummy = "";
     QString name = "";
+    QString msg = QString ("%1: ").arg(activerecorder->GetRecorderNumber());
 
     activerecorder->GetInputName(name);
+    msg += name;
 
-    osd->SetInfoText(name, dummy, dummy, dummy, dummy, dummy, dummy, dummy, 
+    osd->SetInfoText(msg, dummy, dummy, dummy, dummy, dummy, dummy, dummy, 
                      osd_display_time);
 }
 
