@@ -49,6 +49,7 @@ void usage(char *progname)
 
 int main(int argc, char *argv[])
 {
+    QString verboseString = QString("");
     QString chanid, starttime, infile;
     QString profilename = QString("autodetect");
     QString fifodir = NULL;
@@ -59,6 +60,8 @@ int main(int argc, char *argv[])
     srand(time(NULL));
 
     QApplication a(argc, argv, false);
+
+    print_verbose_messages = VB_NONE;
 
     //  Load the context
     gContext = NULL;
@@ -133,6 +136,98 @@ int main(int argc, char *argv[])
             else
             {
                 cerr << "Missing argument to -V option\n";
+                return -1;
+            }
+        }
+        else if (!strcmp(a.argv()[argpos],"-v") ||
+                 !strcmp(a.argv()[argpos],"--verbose"))
+        {
+            if (a.argc() > argpos)
+            {
+                QString temp = a.argv()[argpos+1];
+                if (temp.startsWith("-"))
+                {
+                    cerr << "Invalid or missing argument to -v/--verbose option\n";
+                    return -1;
+                }
+                else
+                {
+                    QStringList verboseOpts;
+                    verboseOpts = QStringList::split(',',a.argv()[argpos+1]);
+                    ++argpos;
+                    for (QStringList::Iterator it = verboseOpts.begin(); 
+                         it != verboseOpts.end(); ++it )
+                    {
+                        if (!strcmp(*it,"none"))
+                        {
+                            print_verbose_messages = VB_NONE;
+                            verboseString = "";
+                        }
+                        else if (!strcmp(*it,"all"))
+                        {
+                            print_verbose_messages = VB_ALL;
+                            verboseString = "all";
+                        }
+                        else if (!strcmp(*it,"quiet"))
+                        {
+                            print_verbose_messages = VB_IMPORTANT;
+                            verboseString = "important";
+                        }
+                        else if (!strcmp(*it,"record"))
+                        {
+                            print_verbose_messages |= VB_RECORD;
+                            verboseString += " " + *it;
+                        }
+                        else if (!strcmp(*it,"playback"))
+                        {
+                            print_verbose_messages |= VB_PLAYBACK;
+                            verboseString += " " + *it;
+                        }
+                        else if (!strcmp(*it,"channel"))
+                        {
+                            print_verbose_messages |= VB_CHANNEL;
+                            verboseString += " " + *it;
+                        }
+                        else if (!strcmp(*it,"osd"))
+                        {
+                            print_verbose_messages |= VB_OSD;
+                            verboseString += " " + *it;
+                        }
+                        else if (!strcmp(*it,"file"))
+                        {
+                            print_verbose_messages |= VB_FILE;
+                            verboseString += " " + *it;
+                        }
+                        else if (!strcmp(*it,"schedule"))
+                        {
+                            print_verbose_messages |= VB_SCHEDULE;
+                            verboseString += " " + *it;
+                        }
+                        else if (!strcmp(*it,"network"))
+                        {
+                            print_verbose_messages |= VB_NETWORK;
+                            verboseString += " " + *it;
+                        }
+                        else if (!strcmp(*it,"jobqueue"))
+                        {
+                            print_verbose_messages |= VB_JOBQUEUE;
+                            verboseString += " " + *it;
+                        }
+                        else if (!strcmp(*it,"commflag"))
+                        {
+                            print_verbose_messages |= VB_COMMFLAG;
+                            verboseString += " " + *it;
+                        }
+                        else
+                        {
+                            cerr << "Unknown argument for -v/--verbose: "
+                                 << *it << endl;;
+                        }
+                    }
+                }
+            } else
+            {
+                cerr << "Missing argument to -v/--verbose option\n";
                 return -1;
             }
         }
@@ -246,6 +341,9 @@ int main(int argc, char *argv[])
          cerr << "Must specify --fifodir to use --fifosync\n";
          return -1;
     }
+
+    if (verboseString != "")
+        VERBOSE(VB_ALL, QString("Enabled verbose msgs :%1").arg(verboseString));
 
     //if (!db)
     //{
