@@ -34,7 +34,7 @@ class VideoOutputIvtv: public VideoOutput
                       NuppelVideoPlayer *pipPlayer);
 
     int WriteBuffer(unsigned char *buf, int count);
-    void Poll(int delay);
+    int Poll(int delay);
     void Pause(void);
     void Start(int skip, int mute);
     void Stop(bool hide);
@@ -46,8 +46,10 @@ class VideoOutputIvtv: public VideoOutput
 
     void ClearOSD(void);
 
-    bool Play(float speed, bool normal);
-    bool Play(void) { return Play(last_speed, last_normal); };
+    bool Play(float speed, bool normal, int mask);
+    bool Play(void) { return Play(last_speed, last_normal, last_mask); };
+    void NextPlay(float speed, bool normal, int mask)
+        { last_speed = speed; last_normal = normal; last_mask = mask; };
     void Flush(void);
     void Step(void);
     int GetFramesPlayed(void);
@@ -79,6 +81,7 @@ class VideoOutputIvtv: public VideoOutput
 
     float last_speed;
     bool last_normal;
+    int last_mask;
 };
 
 #endif

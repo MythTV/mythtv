@@ -29,7 +29,8 @@
 // Default numbers of buffers from some of the other videoout modules:
 const int kNumBuffers      = 31;
 const int kNeedFreeFrames  = 1;
-const int kPrebufferFrames = 12;
+const int kPrebufferFramesNormal = 12;
+const int kPrebufferFramesSmall = 4;
 const int kKeepPrebuffer   = 2;
 
 // ****************************************************************************
@@ -1317,7 +1318,8 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
                    .arg(embedid));
 
     VideoOutput::InitBuffers(kNumBuffers, true, kNeedFreeFrames, 
-                             kPrebufferFrames, kKeepPrebuffer);
+                             kPrebufferFramesNormal, kPrebufferFramesSmall, 
+                             kKeepPrebuffer);
     VideoOutput::Init(width, height, aspect, winid,
                       winx, winy, winw, winh, embedid);
 

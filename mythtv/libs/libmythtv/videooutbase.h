@@ -92,9 +92,6 @@ class VideoOutput
     VideoOutput();
     virtual ~VideoOutput();
 
-    void InitBuffers(int numdecode, bool extra_for_pause, int need_free,
-                     int needprebuffer);
-
     virtual bool Init(int width, int height, float aspect,
                       WId winid, int winx, int winy, int winw, 
                       int winh, WId embedid = 0);
@@ -171,9 +168,14 @@ class VideoOutput
 
     virtual bool hasIDCTAcceleration() const { return false; }
 
+    void SetPrebuffering(bool normal) 
+        { needprebufferframes = (normal ? needprebufferframes_normal : 
+                                 needprebufferframes_small); };
+
   protected:
     void InitBuffers(int numdecode, bool extra_for_pause, int need_free,
-                     int needprebuffer, int keepprebuffer);
+                     int needprebuffer_normal, int needprebuffer_small,
+                     int keepprebuffer);
 
     virtual void ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer);
     int DisplayOSD(VideoFrame *frame, OSD *osd, int stride = -1);
@@ -239,6 +241,8 @@ class VideoOutput
 
     int needfreeframes;
     int needprebufferframes;
+    int needprebufferframes_normal;
+    int needprebufferframes_small;;
     int keepprebufferframes;
 
     bool needrepaint;

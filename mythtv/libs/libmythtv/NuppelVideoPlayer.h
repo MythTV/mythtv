@@ -78,6 +78,8 @@ class NuppelVideoPlayer
     bool Play(float speed = 1.0, bool normal = true,
               bool unpauseaudio = true);
     bool GetPause(void);
+    int GetFFRewSkip(void) { return ffrew_skip; }
+    int GetNewFFRewSkip(void) { return new_ffrew_skip; }
 
     bool FastForward(float seconds);
     bool Rewind(float seconds);
@@ -199,6 +201,8 @@ class NuppelVideoPlayer
     bool setCurrentAudioTrack(int trackNo);
     int getCurrentAudioTrack();
 
+    long long CalcMaxFFTime(long long ff);
+
  protected:
     void OutputVideoLoop(void);
     void IvtvVideoLoop(void);
@@ -221,8 +225,6 @@ class NuppelVideoPlayer
     bool DecodeFrame(struct rtframeheader *frameheader,
                      unsigned char *strm, unsigned char *outbuf);
     bool GetFrame(int onlyvideo, bool unsafe = false);
-
-    long long CalcMaxFFTime(long long ff);
 
     bool DoFastForward();
     bool DoRewind();
@@ -418,6 +420,8 @@ class NuppelVideoPlayer
     int frame_interval; // always adjusted for play_speed
     float play_speed;
     bool normal_speed;
+    int ffrew_skip;
+    int new_ffrew_skip;
 
     float warpfactor;
     float warpfactor_avg;

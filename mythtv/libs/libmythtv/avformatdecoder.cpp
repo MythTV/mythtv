@@ -85,7 +85,7 @@ AvFormatDecoder::~AvFormatDecoder()
     }
 }
 
-void AvFormatDecoder::SeekReset(long long, int skipFrames, bool)
+void AvFormatDecoder::SeekReset(long long, int skipFrames, bool doflush)
 {
     lastapts = 0;
     lastvpts = 0;
@@ -97,20 +97,24 @@ void AvFormatDecoder::SeekReset(long long, int skipFrames, bool)
     ic->pb.buf_ptr = ic->pb.buffer;
     ic->pb.buf_end = ic->pb.buffer;
 
-    for (int i = 0; i < ic->nb_streams; i++)
+    if (doflush)
     {
-        AVCodecContext *enc = &ic->streams[i]->codec;
-        if (enc->codec)
-            avcodec_flush_buffers(enc);
-    }
+        for (int i = 0; i < ic->nb_streams; i++)
+        {
+            AVCodecContext *enc = &ic->streams[i]->codec;
+            if (enc->codec)
+                avcodec_flush_buffers(enc);
+        }
 
-    VideoFrame *buffer;
-    for (buffer = inUseBuffers.first(); buffer; buffer = inUseBuffers.next())
-    {
-        m_parent->DiscardVideoFrame(buffer);
-    }
+        VideoFrame *buffer;
+        for (buffer = inUseBuffers.first(); buffer; 
+             buffer = inUseBuffers.next())
+        {
+            m_parent->DiscardVideoFrame(buffer);
+        }
 
-    inUseBuffers.clear();
+        inUseBuffers.clear();
+    }
 
     while (storedPackets.count() > 0)
     {

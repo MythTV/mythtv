@@ -38,46 +38,37 @@ struct SeekSpeedInfo {
 };
 
 #define MAX_REPO_LEVEL 3
-SeekSpeedInfo seek_speed_array[MAX_REPO_LEVEL][10] =
+SeekSpeedInfo seek_speed_array[MAX_REPO_LEVEL][7] =
 {
     // Less adjustment overall, no adjustment on the low end
-    {{"",     0.00,   0.00,  0.00},
-    {"1/4X", 0.25,   0.00,  0.00},
-    {"1/2X", 0.50,   0.00,  0.00},
-    {"1X",   1.00,   2.00,  2.00},
-    {"1.5X", 1.50,   4.00,  4.00},
-    {"2X",   2.24,  12.00,  9.00},
-    {"3X",   3.34,  16.00, 11.50},
-    {"8X",   7.48,  20.00, 14.00},
-    {"10X", 11.18,  28.00, 19.00},
-    {"16X", 16.72,  66.00, 42.00}},
+    {{  "5X",    5.0,   0.00,   0.00},
+     { "10X",   10.0,   0.00,   0.00},
+     { "20X",   20.0,   0.00,   0.00},
+     { "30X",   30.0,   0.00,   0.00},
+     { "60X",   60.0,   0.00,   0.00},
+     {"120X",  120.0,   0.00,   0.00},
+     {"180X",  180.0,   0.00,   0.00}},
     
     // Less adjustment overall
-    {{"",     0.00,   0.00,  0.00},
-    {"1/4X", 0.25,   0.00,  0.00},
-    {"1/2X", 0.50,   2.00,  2.00},
-    {"1X",   1.00,   6.00,  4.50},
-    {"1.5X", 1.50,   8.00,  6.00},
-    {"2X",   2.24,  10.00,  7.00},
-    {"3X",   3.34,  14.00,  9.50},
-    {"8X",   7.48,  34.00, 22.00},
-    {"10X", 11.18,  42.00, 27.00},
-    {"16X", 16.72,  66.00, 42.00}},
+    {{  "5X",    5.0,   0.00,   0.00},
+     { "10X",   10.0,   0.00,   0.00},
+     { "20X",   20.0,   0.00,   0.00},
+     { "30X",   30.0,   0.00,   0.00},
+     { "60X",   60.0,   0.00,   0.00},
+     {"120X",  120.0,   0.00,   0.00},
+     {"180X",  180.0,   0.00,   0.00}},
     
     // More adjustment (this is the default)
-    {{"",     0.00,   0.00,  0.00},
-    {"1/4X", 0.25,   0.00,  0.00},
-    {"1/2X", 0.50,   4.00,  4.00},
-    {"1X",   1.00,  12.00,  9.00},
-    {"1.5X", 1.50,  16.00, 11.50},
-    {"2X",   2.24,  20.00, 14.00},
-    {"3X",   3.34,  28.00, 19.00},
-    {"8X",   7.48,  68.00, 44.00},
-    {"10X", 11.18,  84.00, 54.00},
-    {"16X", 16.72, 132.00, 84.00}}
+    {{  "5X",    5.0,   0.00,   0.00},
+     { "10X",   10.0,   0.00,   0.00},
+     { "20X",   20.0,   0.00,   0.00},
+     { "30X",   30.0,   0.00,   0.00},
+     { "60X",   60.0,   0.00,   0.00},
+     {"120X",  120.0,   0.00,   0.00},
+     {"180X",  180.0,   0.00,   0.00}},
 };
 
-const int SSPEED_NORMAL = 3;
+const int SSPEED_NORMAL = 0;
 const int SSPEED_MAX = sizeof seek_speed_array[0] / sizeof seek_speed_array[0][0];
 
 struct SleepTimer {
@@ -1137,8 +1128,6 @@ void TV::RunTV(void)
                 ProcessKeypress(keypressed);
                 delete keypressed;
             }
-            else
-                RepeatFFRew();
         }
 
         if (StateIsPlaying(internalState))
@@ -1163,6 +1152,13 @@ void TV::RunTV(void)
             nextState = kState_None;
             changeState = true;
             exitPlayer = false;
+        }
+
+        if (doing_ff_rew && activenvp->GetNewFFRewSkip() == 1)
+        {
+            doing_ff_rew = 0;
+            ff_rew_index = SSPEED_NORMAL;
+            UpdatePosOSD(0.0, tr("Play"));
         }
 
         if (++updatecheck >= 20)
@@ -1736,7 +1732,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
 
                 if (ok && val < SSPEED_MAX)
                 {
-                    ff_rew_index = val;
+                    SetFFRew(val);
                     handled = true;
                 }
             }
@@ -2044,7 +2040,7 @@ void TV::DoPause(void)
     if (paused)
     {
         activerbuffer->WaitForPause();
-        UpdatePosOSD(time, tr("Paused"));
+        UpdatePosOSD(time, tr("Paused"), -1);
         gContext->RestoreScreensaver();
     }
     else
@@ -2088,7 +2084,7 @@ void TV::DoInfo(void)
     }
 }
 
-bool TV::UpdatePosOSD(float time, const QString &mesg)
+bool TV::UpdatePosOSD(float time, const QString &mesg, int disptime)
 {
     bool muted = false;
 
@@ -2104,7 +2100,6 @@ bool TV::UpdatePosOSD(float time, const QString &mesg)
         QString desc = "";
         int pos = nvp->calcSliderPos(desc);
         bool slidertype = (internalState == kState_WatchingLiveTV);
-        int disptime = (mesg == tr("Paused")) ? -1 : 2;
         int osdtype = (doSmartForward) ? kOSDFunctionalType_SmartForward :
                                          kOSDFunctionalType_Default;
 
@@ -2183,7 +2178,6 @@ void TV::ChangeSpeed(int direction)
 
     switch (speed_index)
     {
-        case  3: speed = 5.0;      mesg = QString(tr("Speed 5X"));    break;
         case  2: speed = 3.0;      mesg = QString(tr("Speed 3X"));    break;
         case  1: speed = 2.0;      mesg = QString(tr("Speed 2X"));    break;
         case  0: speed = 1.0;      mesg = QString(tr("Play"));        break;
@@ -2230,11 +2224,11 @@ float TV::StopFFRew(void)
 void TV::ChangeFFRew(int direction)
 {
     if (doing_ff_rew == direction)
-        ff_rew_index = (++ff_rew_index % SSPEED_MAX);
+        SetFFRew((ff_rew_index + 1) % SSPEED_MAX);
     else if (!ff_rew_reverse && doing_ff_rew == -direction)
     {
         if (ff_rew_index > SSPEED_NORMAL)
-            ff_rew_index = (--ff_rew_index % SSPEED_MAX);
+            SetFFRew((ff_rew_index - 1) % SSPEED_MAX);
         else
         {
             float time = StopFFRew();
@@ -2244,40 +2238,37 @@ void TV::ChangeFFRew(int direction)
     else
     {
         NormalSpeed();
-
-        doing_ff_rew = direction;
-        ff_rew_index = SSPEED_NORMAL;
-
-        activenvp->Play(1.0, false);
         paused = false;
+        doing_ff_rew = direction;
+        SetFFRew(SSPEED_NORMAL);
     }
 }
 
-void TV::RepeatFFRew(void)
+void TV::SetFFRew(int index)
 {
     if (!doing_ff_rew)
         return;
 
-    float time;
+    ff_rew_index = index;
+    float speed;
+
     QString mesg;
     if (doing_ff_rew > 0)
     {
-        time = seek_speed_array[repoLevel][ff_rew_index].scaling;
-        mesg = tr("Forward ") + seek_speed_array[repoLevel][ff_rew_index].dispString;
+        mesg = tr("Forward ");
+        speed = 1.0;
     }
     else
     {
-        time = -seek_speed_array[repoLevel][ff_rew_index].scaling;
-        mesg = tr("Rewind ") + seek_speed_array[repoLevel][ff_rew_index].dispString;
+        mesg = tr("Rewind ");
+        speed = -1.0;
     }
 
-    if (UpdatePosOSD(time, mesg))
-    {
-        StopFFRew();
-        UpdatePosOSD(time, tr("Play"));
-    }
-    else if (ff_rew_index > SSPEED_NORMAL)
-        usleep(50000);
+    mesg += seek_speed_array[repoLevel][ff_rew_index].dispString;
+    speed *= seek_speed_array[repoLevel][ff_rew_index].scaling;
+
+    activenvp->Play(speed, false);
+    UpdatePosOSD(0.0, mesg, -1);
 }
 
 void TV::DoQueueTranscode(void)

@@ -144,14 +144,14 @@ class TV : public QObject
     void DoInfo(void);
     void DoPlay(void);
     void DoPause(void);
-    bool UpdatePosOSD(float time, const QString &mesg);
+    bool UpdatePosOSD(float time, const QString &mesg, int disptime = 2);
     void DoSeek(float time, const QString &mesg);
     void DoArbSeek(int dir);
     void NormalSpeed(void);
     void ChangeSpeed(int direction);
     float StopFFRew(void);
     void ChangeFFRew(int direction);
-    void RepeatFFRew(void);
+    void SetFFRew(int index);
     void DoToggleCC(int mode);
     void DoSkipCommercials(int direction);
     void DoEditMode(void);

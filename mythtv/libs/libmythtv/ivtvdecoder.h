@@ -17,6 +17,14 @@ extern "C" {
 class ProgramInfo;
 class MythSqlDatabase;
 
+struct IvtvQueuedFrame
+{
+    int raw;
+    long long actual;
+    IvtvQueuedFrame(void) { raw = 0; actual = 0; };
+    IvtvQueuedFrame(int r, long long a) { raw = r; actual = a; };
+};
+
 class IvtvDecoder : public DecoderBase
 {
   public:
@@ -29,7 +37,7 @@ class IvtvDecoder : public DecoderBase
     int OpenFile(RingBuffer *rbuffer, bool novideo, char testbuf[2048]);
     void GetFrame(int onlyvideo);
 
-    bool DoFastForward(long long desiredFrame);
+    bool DoFastForward(long long desiredFrame, bool doflush = true);
 
     bool isLastFrameKey(void) { return false; }
     void WriteStoredData(RingBuffer *rb, bool storevid)
@@ -49,10 +57,10 @@ class IvtvDecoder : public DecoderBase
     RingBuffer *getRingBuf(void) { return ringBuffer; }
 
   private:
-    void MpegPreProcessPkt(unsigned char *buf, int len, long long startpos);
+    int MpegPreProcessPkt(unsigned char *buf, int start, int len, long long startpos);
     void SeekReset(long long newkey = 0, int skipframes = 0,
                    bool needFlush = false);
-    bool ReadWrite(int onlyvideo, int delay);
+    bool ReadWrite(int onlyvideo);
     bool StepFrames(int start, int count);
 
     int frame_decoded;
@@ -70,13 +78,21 @@ class IvtvDecoder : public DecoderBase
 
     long long laststartpos;
 
-    unsigned char prvpkt[3];
-
     static bool ntsc;
 
-    static const int vidmax = 131072; // must be a power of 2
+    static const int vidmax = 65536;
     unsigned char vidbuf[vidmax];
     int vidread, vidwrite, vidfull;
+    int vidscan, vidpoll, vid2write;
+    int vidanyframes, videndofframe;
+    long long startpos;
+    unsigned mpeg_state;
+    long long framesScanned;
+    bool needPlay;
+
+    int nexttoqueue;
+    int lastdequeued;
+    QValueList<IvtvQueuedFrame> queuedlist;
 };
 
 #endif

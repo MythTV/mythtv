@@ -346,7 +346,7 @@ void DecoderBase::SetPositionMap(void)
     }
 }
 
-bool DecoderBase::DoRewind(long long desiredFrame)
+bool DecoderBase::DoRewind(long long desiredFrame, bool doflush)
 {
     if (m_positionMap.empty())
         return false;
@@ -390,22 +390,19 @@ bool DecoderBase::DoRewind(long long desiredFrame)
 
     ringBuffer->Seek(diff, SEEK_CUR);
     
-    framesPlayed = lastKey;
     framesRead = lastKey;
 
-    int normalframes = desiredFrame - framesPlayed;
+    int normalframes = desiredFrame - framesRead;
 
     if (!exactseeks)
         normalframes = 0;
 
-    SeekReset(lastKey, normalframes, true);
-
-    UpdateFramesPlayed();
+    SeekReset(lastKey, normalframes, doflush);
 
     return true;
 }
 
-bool DecoderBase::DoFastForward(long long desiredFrame)
+bool DecoderBase::DoFastForward(long long desiredFrame, bool doflush)
 {
     bool oldrawstate = getrawframes;
     getrawframes = false;
@@ -479,27 +476,25 @@ bool DecoderBase::DoFastForward(long long desiredFrame)
         ringBuffer->Seek(diff, SEEK_CUR);
         needflush = true;
     
-        framesPlayed = lastKey;
         framesRead = lastKey;
     }
 
-    int normalframes = desiredFrame - framesPlayed;
+    int normalframes = desiredFrame - framesRead;
 
     if (!exactseeks)
         normalframes = 0;
 
     if (needflush || normalframes)
-        SeekReset(lastKey, normalframes, needflush);
+        SeekReset(lastKey, normalframes, needflush && doflush);
 
     getrawframes = oldrawstate;
-
-    UpdateFramesPlayed();
 
     return true;
 }
 
 void DecoderBase::UpdateFramesPlayed(void)
 {
+    framesPlayed = framesRead;
     m_parent->SetFramesPlayed(framesPlayed);
 }
 

@@ -6,7 +6,8 @@ using namespace std;
 
 const int kNumBuffers = 31;
 const int kNeedFreeFrames = 1;
-const int kPrebufferFrames = 12;
+const int kPrebufferFramesNormal = 12;
+const int kPrebufferFramesSmall = 4;
 const int kKeepPrebuffer = 2;
 
 VideoOutputNull::VideoOutputNull(void)
@@ -68,7 +69,8 @@ bool VideoOutputNull::Init(int width, int height, float aspect,
                            int winh, WId embedid)
 {
     VideoOutput::InitBuffers(kNumBuffers, true, kNeedFreeFrames, 
-                             kPrebufferFrames, kKeepPrebuffer);
+                             kPrebufferFramesNormal, kPrebufferFramesSmall, 
+                             kKeepPrebuffer);
     VideoOutput::Init(width, height, aspect, winid,
                       winx, winy, winw, winh, embedid);
 

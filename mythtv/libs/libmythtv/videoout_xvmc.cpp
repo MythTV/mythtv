@@ -73,7 +73,8 @@ extern "C" {
 }
 
 const int kNumBuffers = 8;
-const int kPrebufferFrames = 4;
+const int kPrebufferFramesNormal = 4;
+const int kPrebufferFramesSmall = 4;
 const int kNeedFreeFrames = 2;
 const int kKeepPrebuffer = 1;
 
@@ -247,7 +248,8 @@ bool VideoOutputXvMC::Init(int width, int height, float aspect,
     XvAdaptorInfo *ai;
 
     VideoOutput::InitBuffers(kNumBuffers, false, kNeedFreeFrames,
-                             kPrebufferFrames, kKeepPrebuffer);
+                             kPrebufferFramesNormal, kPrebufferFramesSmall, 
+                             kKeepPrebuffer);
     VideoOutput::Init(width, height, aspect, winid, winx, winy, winw, winh, 
                       embedid);
 

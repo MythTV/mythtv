@@ -808,8 +808,8 @@ int VideoOutput::ChangeHue(bool up)
 }
 
 void VideoOutput::InitBuffers(int numdecode, bool extra_for_pause, 
-                              int need_free, int needprebuffer, 
-                              int keepprebuffer)
+                              int need_free, int needprebuffer_normal,
+                              int needprebuffer_small, int keepprebuffer)
 {
     int numcreate = numdecode + ((extra_for_pause) ? 1 : 0);
 
@@ -837,7 +837,9 @@ void VideoOutput::InitBuffers(int numdecode, bool extra_for_pause,
 
     numbuffers = numdecode;
     needfreeframes = need_free;
-    needprebufferframes = needprebuffer;
+    needprebufferframes = needprebuffer_normal;
+    needprebufferframes_normal = needprebuffer_normal;
+    needprebufferframes_small = needprebuffer_small;
     keepprebufferframes = keepprebuffer;
 
     availableVideoBuffers_wait.wakeAll();

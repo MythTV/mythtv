@@ -43,6 +43,7 @@ VideoOutputIvtv::VideoOutputIvtv(void)
     videoDevice = "/dev/video16";
     last_speed = 1.0;
     last_normal = true;
+    last_mask = 2;
     osdbuffer = NULL;
 }
 
@@ -240,7 +241,7 @@ void VideoOutputIvtv::Open(void)
     memset(&ctrl, 0, sizeof(ctrl));
 
     ctrl.id = V4L2_CID_IVTV_DEC_PREBUFFER;
-    ctrl.value = 1;
+    ctrl.value = 0;
 
     if (ioctl(videofd, VIDIOC_S_CTRL, &ctrl) < 0)
         perror("VIDIOC_S_CTRL prebuffer");
@@ -494,15 +495,19 @@ void VideoOutputIvtv::Pause(void)
     }
 }
 
-void VideoOutputIvtv::Poll(int delay)
+int VideoOutputIvtv::Poll(int delay)
 {
     struct pollfd polls;
     polls.fd = videofd;
     polls.events = POLLOUT;
     polls.revents = 0;
 
-    if (poll(&polls, 1, delay) < 0)
+    int res = poll(&polls, 1, delay);
+
+    if (res < 0)
         perror("Polling on videodev");
+
+    return res;
 }
 
 int VideoOutputIvtv::WriteBuffer(unsigned char *buf, int len)
@@ -536,11 +541,8 @@ int VideoOutputIvtv::GetFramesPlayed(void)
     return frameinfo.frame;
 }
 
-bool VideoOutputIvtv::Play(float speed, bool normal)
+bool VideoOutputIvtv::Play(float speed, bool normal, int mask)
 {
-    if (speed > 3.0)
-        return false;
-
     struct ivtv_speed play;
     memset(&play, 0, sizeof play);
     if (speed >= 2.0)
@@ -552,7 +554,7 @@ bool VideoOutputIvtv::Play(float speed, bool normal)
     play.smooth = 0;
     play.speed = (speed > 1.0);
     play.direction = 0;
-    play.fr_mask = 2;
+    play.fr_mask = mask;
     play.b_per_gop = 0;
     play.aud_mute = !normal;
     play.fr_field = 0;
@@ -569,6 +571,7 @@ bool VideoOutputIvtv::Play(float speed, bool normal)
 
     last_speed = speed;
     last_normal = normal;
+    last_mask = mask;
 
     return true;
 }

@@ -31,8 +31,8 @@ class DecoderBase
     virtual void setWatchingRecording(bool mode);
     virtual void GetFrame(int onlyvideo) = 0;
     
-    virtual bool DoRewind(long long desiredFrame);
-    virtual bool DoFastForward(long long desiredFrame);
+    virtual bool DoRewind(long long desiredFrame, bool doflush = true);
+    virtual bool DoFastForward(long long desiredFrame, bool doflush = true);
 
     virtual bool isLastFrameKey() = 0;
     virtual void WriteStoredData(RingBuffer *rb, bool storevid) = 0;
@@ -46,6 +46,7 @@ class DecoderBase
     virtual QString GetEncodingType(void) = 0;
 
     virtual void UpdateFramesPlayed(void);
+    long long GetFramesRead(void) { return framesRead; };
 
     virtual void SetPixelFormat(const int) { }
 
