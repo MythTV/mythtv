@@ -165,15 +165,16 @@ int VideoSync::CalcDelay()
 
 void VideoSync::KeepPhase()
 {
-    m_delay = CalcDelay();
     // Keep our nexttrigger from drifting too close to the exact retrace.
-    // If delay is near 0, some frames will be delay < 0 and others delay > 0.
-    // This will cause continous rapid fire stuttering. Nexttrigger only
-    // needs to be shifted "out of the way" once on the first time delay
-    // falls in the DMZ. Otherwise, nexttrigger should be left alone.
+    // If delay is near zero, some frames will be delay < 0 and others
+    // delay > 0 which would cause continous rapid fire stuttering.
     // This method is only useful for those sync methods where WaitForFrame
     // targets hardware retrace rather than targeting nexttrigger.
-    if (m_delay > -1000)
+
+    // cerr << m_delay << endl;
+    if (m_delay < -(m_refresh_interval/2))
+        OffsetTimeval(m_nexttrigger, 200);
+    else if (m_delay > -500)
         OffsetTimeval(m_nexttrigger, -2000);
 }
 
@@ -269,16 +270,14 @@ void DRMVideoSync::WaitForFrame(int sync_delay)
     // Do the wait
     m_delay = CalcDelay();
     
-    if (m_delay <= 0) 
+    if (m_delay > 0) 
     {
-        UpdateNexttrigger();
-        return; // We're late!
+        drm_wait_vblank_t blank;
+        blank.request.type = DRM_VBLANK_RELATIVE;
+        blank.request.sequence =
+            (int)(ceil((double)m_delay / m_refresh_interval));
+        drmWaitVBlank(m_dri_fd, &blank);
     }
-
-    drm_wait_vblank_t blank;
-    blank.request.type = DRM_VBLANK_RELATIVE;
-    blank.request.sequence = (int)(ceil((double)m_delay / m_refresh_interval));
-    drmWaitVBlank(m_dri_fd, &blank);
 
     KeepPhase();
     
@@ -345,13 +344,7 @@ void nVidiaVideoSync::WaitForFrame(int sync_delay)
     OffsetTimeval(m_nexttrigger, sync_delay);
     
     m_delay = CalcDelay();
-    
-    if (m_delay <= 0) 
-    {
-        UpdateNexttrigger();
-        return; // We're late!
-    }
-    
+
     while (m_delay > 0)
     {
         dopoll();
@@ -472,13 +465,6 @@ void OpenGLVideoSync::WaitForFrame(int sync_delay)
     // Do the wait
     m_delay = CalcDelay();
     //cout << "Delay " << m_delay;
-    
-    if (m_delay <= 0) 
-    {
-        UpdateNexttrigger();
-        //cout << " negative!" << endl;
-        return; // We're late!
-    }
 
     int n = 0;
     while (m_delay > 0) 
@@ -561,13 +547,8 @@ void RTCVideoSync::WaitForFrame(int sync_delay)
 {
     OffsetTimeval(m_nexttrigger, sync_delay);
 
-    // Do the wait
     m_delay = CalcDelay();
-    if (m_delay <= 0)
-    {
-        UpdateNexttrigger();
-        return; // We're late!
-    }
+
     unsigned long rtcdata;
     while (m_delay > 0)
     {
@@ -601,12 +582,7 @@ void BusyWaitVideoSync::WaitForFrame(int sync_delay)
 
     m_delay = CalcDelay();
 
-    if (m_delay <= 0)
-    {
-        UpdateNexttrigger();
-        return;
-    }
-    else
+    if (m_delay > 0)
     {
         int cnt = 0;
         m_cheat += 100;
