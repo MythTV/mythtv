@@ -92,6 +92,7 @@ class NuppelVideoPlayer
 
     int GetVideoWidth(void) { return video_width; }
     int GetVideoHeight(void) { return video_height; }
+    float GetVideoAspect(void) { return video_aspect; }
     float GetFrameRate(void) { return video_frame_rate; }
     long long GetTotalFrameCount(void) { return totalFrames; }
     long long GetFramesPlayed(void) { return framesPlayed; }
