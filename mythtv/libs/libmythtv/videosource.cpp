@@ -51,8 +51,7 @@ QString CISetting::setClause(void) {
 void RegionSelector::fillSelections() {
     clearSelections();
 
-    /*QString command = QString("tv_grab_uk --configure --list-regions")
-        .arg(zipcode);
+    QString command = QString("tv_grab_uk --configure --list-regions");
     FILE* fp = popen(command.ascii(), "r");
 
     if (fp == NULL) {
@@ -63,33 +62,11 @@ void RegionSelector::fillSelections() {
     QFile f;
     f.open(IO_ReadOnly, fp);
     for(QString line ; f.readLine(line, 1024) > 0 ; ) {
-        QStringList fields = QStringList::split(":", line.stripWhiteSpace());
-        addSelection(fields.last(), fields.first());
+        addSelection(line.stripWhiteSpace());
     }
 
     f.close();
-    fclose(fp);*/
-
-    // this would be better read in from tv_grab_uk, moreorless, as above
-    addSelection("Anglia");
-    addSelection("Border");
-    addSelection("Border North");
-    addSelection("Carlton");
-    addSelection("Central");
-    addSelection("Channel");
-    addSelection("East Midlands");
-    addSelection("Grampian");
-    addSelection("Granada");
-    addSelection("HTV Wales");
-    addSelection("HTV West");
-    addSelection("London");
-    addSelection("Meridian");
-    addSelection("Scottish");
-    addSelection("South East");
-    addSelection("Tyne Tees");
-    addSelection("Ulster");
-    addSelection("Westcountry");
-    addSelection("Yorkshire");
+    fclose(fp);
 }
 
 void ProviderSelector::fillSelections(const QString& location) {
