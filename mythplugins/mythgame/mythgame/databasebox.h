@@ -2,26 +2,24 @@
 #define DATABASEBOX_H_
 
 #include <qwidget.h>
-#include <qdialog.h>
 #include <qstringlist.h>
 
 #include "rominfo.h"
+
+#include <mythtv/mythwidgets.h>
 
 class QSqlDatabase;
 class QListViewItem;
 class TreeItem;
 class QLabel;
 class QListView;
-class MythContext;
 
-class DatabaseBox : public QDialog
+class DatabaseBox : public MythDialog
 {
     Q_OBJECT
   public:
     DatabaseBox(MythContext *context, QSqlDatabase *ldb, QString &paths,
                 QWidget *parent = 0, const char *name = 0);
-
-    void Show();
 
   protected slots:
     void handleKey(QListViewItem *, int);
@@ -42,8 +40,6 @@ class DatabaseBox : public QDialog
     QSqlDatabase *db;
 
     QValueList<RomInfo> *rlist;
-
-    MythContext *m_context;
 };
 
 #endif

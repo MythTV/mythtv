@@ -17,27 +17,15 @@ using namespace std;
 
 ScreenBox::ScreenBox(MythContext *context, QSqlDatabase *ldb, QString &paths,
                      QWidget *parent, const char *name)
-           : QDialog(parent, name)
+           : MythDialog(context, parent, name)
 {
     db = ldb;
-    m_context = context;
-
-    int screenheight = 0, screenwidth = 0;
-    float wmult = 0, hmult = 0;
-
-    context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
-
-    setGeometry(0, 0, screenwidth, screenheight);
-    setFixedSize(QSize(screenwidth, screenheight));
-
-    setFont(QFont("Arial", (int)(m_context->GetMediumFontSize() * hmult),
-                  QFont::Bold));
-    setCursor(QCursor(Qt::BlankCursor));
 
     QVBoxLayout *vbox = new QVBoxLayout(this, (int)(5 * wmult), 
                                         (int)(5 * wmult));
 
     mGameLabel = new QLabel(this);
+    mGameLabel->setBackgroundOrigin(WindowOrigin);
     mGameLabel->setFixedHeight((int)(23 * hmult));
     mGameLabel->setAlignment(Qt::AlignHCenter);
     mGameLabel->setText("");
@@ -55,7 +43,8 @@ ScreenBox::ScreenBox(MythContext *context, QSqlDatabase *ldb, QString &paths,
     PicFrame = new SelectFrame(context, this);
     PicFrame->setFixedWidth((int)(790 * wmult));
     PicFrame->setFixedHeight((int)(350 * hmult));
-    PicFrame->setPaletteBackgroundColor(QColor(255,255,255));
+    PicFrame->setPaletteBackgroundColor(palette().color(QPalette::Active,
+                                                        QColorGroup::Base));
     PicFrame->setFocusPolicy(QWidget::NoFocus);
 
     connect(listview, SIGNAL(currentChanged(QListViewItem *)), this,
@@ -77,12 +66,6 @@ ScreenBox::ScreenBox(MythContext *context, QSqlDatabase *ldb, QString &paths,
 
     listview->setCurrentItem(listview->firstChild());
     listview->setSelected(listview->firstChild(), true);
-}
-
-void ScreenBox::Show()
-{
-    showFullScreen();
-    setActiveWindow();
 }
 
 void ScreenBox::fillList(QListView *listview, QString &paths)

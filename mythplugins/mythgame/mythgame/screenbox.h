@@ -2,8 +2,9 @@
 #define SCREENBOX_H_
 
 #include <qwidget.h>
-#include <qdialog.h>
 #include <qframe.h>
+
+#include <mythtv/mythwidgets.h>
 
 #include "selectframe.h"
 #include "rominfo.h"
@@ -13,16 +14,13 @@ class QListViewItem;
 class TreeItem;
 class QLabel;
 class QListView;
-class MythContext;
 
-class ScreenBox : public QDialog
+class ScreenBox : public MythDialog
 {
     Q_OBJECT
   public:
     ScreenBox(MythContext *context, QSqlDatabase *ldb, QString &paths,
               QWidget *parent = 0, const char *name = 0);
-
-    void Show();
 
   protected slots:
     void setImages(QListViewItem *);
@@ -44,8 +42,6 @@ class ScreenBox : public QDialog
     SelectFrame *PicFrame;
     QString leafLevel;
     QLabel* mGameLabel;
-
-    MythContext *m_context;
 };
 
 #endif

@@ -18,22 +18,9 @@ using namespace std;
 
 DatabaseBox::DatabaseBox(MythContext *context, QSqlDatabase *ldb, 
                          QString &paths, QWidget *parent, const char *name)
-           : QDialog(parent, name)
+           : MythDialog(context, parent, name)
 {
     db = ldb;
-    m_context = context;
-
-    int screenheight = 0, screenwidth = 0;
-    float wmult = 0, hmult = 0;
-
-    context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
-
-    setGeometry(0, 0, screenwidth, screenheight);
-    setFixedSize(QSize(screenwidth, screenheight));
-
-    setFont(QFont("Arial", (int)(m_context->GetMediumFontSize() * hmult), 
-                  QFont::Bold));
-    setCursor(QCursor(Qt::BlankCursor));
 
     QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
 
@@ -59,12 +46,6 @@ DatabaseBox::DatabaseBox(MythContext *context, QSqlDatabase *ldb,
 
     listview->setCurrentItem(listview->firstChild());
     listview->setSelected(listview->firstChild(), true);
-}
-
-void DatabaseBox::Show()
-{
-    showFullScreen();
-    setActiveWindow();
 }
 
 void DatabaseBox::fillList(QListView *listview, QString &paths)
