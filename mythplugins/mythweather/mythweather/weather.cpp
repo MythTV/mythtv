@@ -521,16 +521,14 @@ QString Weather::findAccidbyName(QString name)
         while (!accidFile.eof())
         {
                 accidFile.getline(temp, 1023);
+                hold = strtok(temp, "::");
+                hold = strtok(NULL, "::");
+	        accid = hold;
+                hold = strtok(NULL, "::");	
 
-                if (strstr(temp, name) != NULL)
+                if (strcmp(hold, name) == 0)
                 {
-                        hold = strtok(temp, "::");
-                        hold = strtok(NULL, "::");
-			accid = hold;
-                        hold = strtok(NULL, "::");
-
 			accidFile.seekg(startData);
-
                         return accid;
                 }
         }
