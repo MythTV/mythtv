@@ -1,12 +1,14 @@
 begin 
     prog = irxevent
     button = ChannelUp
+    repeat = 3
     config = Key Up CurrentWindow
 end
 
 begin
     prog = irxevent
     button = ChannelDown
+    repeat = 3
     config = Key Down CurrentWindow
 end
 
@@ -25,24 +27,28 @@ end
 begin
     prog = irxevent
     button = MenuUp
+    repeat = 3
     config = Key W CurrentWindow
 end
 
 begin
     prog = irxevent
     button = MenuRight
+    repeat = 3
     config = Key D CurrentWindow
 end
 
 begin
     prog = irxevent
     button = MenuDown
+    repeat = 3
     config = Key S CurrentWindow
 end
 
 begin
     prog = irxevent
     button = MenuLeft
+    repeat = 3
     config = Key A CurrentWindow
 end
 
