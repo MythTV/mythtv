@@ -224,6 +224,7 @@ public:
     SourceID(const CardInput& parent):
         CISetting(parent, "sourceid") {
         setLabel("Video source");
+        addSelection("(None)");
     };
 
     void fillSelections(QSqlDatabase* db) {
@@ -273,30 +274,27 @@ private:
     QSqlDatabase* db;
 };
 
-class CaptureCardDialog: public ConfigurationWizard {
+class CaptureCardDialog: public ConfigurationDialog, public VerticalConfigurationGroup {
 public:
-    CaptureCardDialog(MythContext *context) : ConfigurationWizard(context),
-                                              ConfigurationDialog(context) {
+    CaptureCardDialog(MythContext *context) : ConfigurationDialog(context) {
         CaptureCard* cc = new CaptureCard();
         cc->setLabel("Configure new capture card");
         addChild(cc);
     };
 };
 
-class VideoSourceDialog: public ConfigurationWizard {
+class VideoSourceDialog: public ConfigurationDialog, public VerticalConfigurationGroup {
 public:
-    VideoSourceDialog(MythContext *context) : ConfigurationWizard(context),
-                                              ConfigurationDialog(context) {
+    VideoSourceDialog(MythContext *context) : ConfigurationDialog(context) {
         VideoSource* vs = new VideoSource();
         vs->setLabel("Configure new video source");
         addChild(vs);
     };
 };
 
-class CardInputDialog: public ConfigurationWizard {
+class CardInputDialog: public ConfigurationDialog, public VerticalConfigurationGroup {
 public:
-    CardInputDialog(MythContext *context) : ConfigurationWizard(context),
-                                            ConfigurationDialog(context) {
+    CardInputDialog(MythContext *context) : ConfigurationDialog(context) {
         CardInput* ci = new CardInput();
         ci->setLabel("Configure capture card input");
         addChild(ci);

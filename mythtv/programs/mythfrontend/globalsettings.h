@@ -546,8 +546,7 @@ public:
 
 class PlaybackSettings: virtual public ConfigurationWizard {
 public:
-    PlaybackSettings(MythContext *context) : ConfigurationWizard(context),
-                                             ConfigurationDialog(context) {
+    PlaybackSettings(MythContext *context) : ConfigurationWizard(context) {
         VerticalConfigurationGroup* general = new VerticalConfigurationGroup();
         general->setLabel("General playback");
         general->addChild(new AudioOutputDevice());
