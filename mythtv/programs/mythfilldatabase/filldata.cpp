@@ -3615,8 +3615,6 @@ int main(int argc, char *argv[])
         else if (!quiet)
              cout << update_count << " replacements made.\n";
 
-        ScheduledRecording::signalChange(-1);
-
         gContext->LogEntry("mythfilldatabase", LP_INFO,
                            "Listings Download Finished", "");
     }
@@ -3658,6 +3656,16 @@ int main(int argc, char *argv[])
             query.exec("UPDATE settings SET data = '1' WHERE value = 'HaveRepeats';");
         else
             query.exec("UPDATE settings SET data = '0' WHERE value = 'HaveRepeats';");
+    }
+
+    if (grab_data || mark_repeats)
+    {
+        // sleep a short while before notifying the scheduler to allow
+        // the database to settle.  This probably shouldn't be
+        // necessary, but it might fix an anomaly I saw where the
+        // scheduler missed programs that were just added.
+        sleep(5);
+        ScheduledRecording::signalChange(-1);
     }
 
     delete gContext;
