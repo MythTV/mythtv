@@ -145,7 +145,7 @@ void UpgradeTVDatabaseSchema(void)
 
     if (dbver == "1006")
     {
-        VERBOSE(VB_ALL, "Upgrading to schema version 1006");
+        VERBOSE(VB_ALL, "Upgrading to schema version 1007");
 
         const QString updates[] = {
 "CREATE TABLE IF NOT EXISTS recordingprofiles ("
@@ -169,6 +169,7 @@ void UpgradeTVDatabaseSchema(void)
         }
 
         UpdateDBVersionNumber("1007");
+        dbver = "1007";
     }
 }
 
