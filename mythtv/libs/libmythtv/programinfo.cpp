@@ -196,7 +196,7 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
 {
     QString timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
     QString dateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d");
-	QString shortDateFormat = gContext->GetSetting("ShortDateFormat", "M/d");
+    QString shortDateFormat = gContext->GetSetting("ShortDateFormat", "M/d");
 
     QString length;
     int hours, minutes, seconds;
@@ -282,6 +282,51 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
     if (query.isActive() && query.numRowsAffected() > 0)
         if (query.next())
             progMap["iconpath"] = query.value(0).toString();
+
+    QString recstatus = "";
+    if (recording)
+    {
+        recstatus = QObject::tr("Recording on cardid: ") +
+                    QString::number(cardid);
+    }
+    else
+    {
+        recstatus = QObject::tr("Not Recording: ");
+        switch (norecord)
+        {
+            case nrManualOverride:
+                    recstatus += QObject::tr("Manual Override");
+                    break;
+            case nrPreviousRecording:
+                    recstatus += QObject::tr("Previously Recorded");
+                    break;
+            case nrCurrentRecording:
+                    recstatus += QObject::tr("Currently Recording");
+                    break;
+            case nrOtherShowing:
+                    recstatus += QObject::tr("Other Showing");
+                    break;
+            case nrTooManyRecordings:
+                    recstatus += QObject::tr("Too Many Recordings");
+                    break;
+            case nrDontRecordList:
+                    recstatus += QObject::tr("Don't Record List");
+                    break;
+            case nrLowerRanking:
+                    recstatus += QObject::tr("Lower Ranking");
+                    break;
+            case nrManualConflict:
+                    recstatus += QObject::tr("Manual Conflict");
+                    break;
+            case nrAutoConflict:
+                    recstatus += QObject::tr("Auto Conflict");
+                    break;
+            case nrOverlap:
+                    recstatus += QObject::tr("Overlap");
+                    break;
+        }
+    }
+    progMap["RECSTATUS"] = recstatus;
 }
 
 int ProgramInfo::CalculateLength(void)

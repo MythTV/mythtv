@@ -416,7 +416,7 @@ void Scheduler::PruneOverlaps(void)
 void Scheduler::PruneList(void)
 {
     list<ProgramInfo *>::reverse_iterator i;
-    list<ProgramInfo *>::iterator deliter, q;
+    list<ProgramInfo *>::iterator q;
 
     QDateTime now = QDateTime::currentDateTime();
 

@@ -567,8 +567,6 @@ void PlaybackBox::updateShowTitles(QPainter *p)
     typedef QMap<QString, ProgramInfo> ShowData;
     ProgramInfo *tempInfo;
 
-    QDateTime curtime = QDateTime::currentDateTime();
-
     ShowData::Iterator it;
     ShowData::Iterator start;
     ShowData::Iterator end;
@@ -1512,7 +1510,6 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
     initPopup(popup, program, " ", tr("Select action:"));
 
     QSqlDatabase *db = QSqlDatabase::database();
-    QDateTime curtime = QDateTime::currentDateTime();
 
     QButton *playButton = popup->addButton(tr("Play"), this, SLOT(doPlay()));
 
