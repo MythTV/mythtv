@@ -3254,7 +3254,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Idle timeout (secs)</source>
-        <translation>休止タイムアウト(秒)</translation>
+        <translation>アイドルタイムアウト (秒)</translation>
     </message>
     <message>
         <source>The amount of time the master backend idles before it shuts down all backends. Set to 0 to disable auto shutdown.</source>
@@ -4061,7 +4061,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>This command is executed right after starting the BE. As a parameter &apos;$status&apos; is replaced by either &apos;auto&apos; if the machine was started automatically or &apos;user&apos; if a user switched it on.</source>
-        <translation type="unfinished"></translation>
+        <translation>このコマンドはバックエンドの起動後に実行されます。 パラメータ&apos;$status&apos;はマシーンが自動で開始された時は&apos;auto&apos;が、ユーザーがスタートした時は&apos;user&apos;が設定されます。</translation>
     </message>
     <message>
         <source>Title Search</source>
@@ -5776,7 +5776,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Free to air channels only.</source>
-        <translation type="unfinished"></translation>
+        <translation>無料放送チャンネルのみ.</translation>
     </message>
     <message>
         <source>If set, only free to air channels will be used.</source>
@@ -6118,27 +6118,27 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Enable realtime priority threads</source>
-        <translation type="unfinished"></translation>
+        <translation>リアルタイムプライオリティースレッドを有効</translation>
     </message>
     <message>
         <source>When running mythfrontend with root privileges, some threads can be given enhanced priority. Disable this if mythfrontend freezes during video playback.</source>
-        <translation type="unfinished"></translation>
+        <translation>mythfrontendがroot権限で実行された時、いくつかのスレッドのプライオリティーを引き上げます。mythfrontendが再生中に固まるときは無効にしてください。</translation>
     </message>
     <message>
         <source>Enable LCD device</source>
-        <translation type="unfinished"></translation>
+        <translation>LCDデバイスを有効</translation>
     </message>
     <message>
         <source>Use an LCD display to view MythTV status information. Need to restart mythfrontend to (de)activate it.</source>
-        <translation type="unfinished"></translation>
+        <translation>LCDディスプレイにMythTVのステータスを表示する。mythfrontendの再起動が必要です。</translation>
     </message>
     <message>
         <source>This global setting allows the recorder to start before the scheduled start time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
-        <translation type="unfinished"></translation>
+        <translation>このグローバルな設定は予約録画開始前に有効になります。スケジューラーには影響しません。録画と録画の間に十分な時間がないと時は無視されます。</translation>
     </message>
     <message>
         <source>This global setting allows the recorder to record beyond the scheduled end time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
-        <translation type="unfinished"></translation>
+        <translation>このグローバルな設定は予約録画終了時に有効になります。スケジューラーには影響しません。録画と録画の間に十分な時間がないと時は無視されます。</translation>
     </message>
 </context>
 <context>
@@ -6874,7 +6874,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Select the title of the program you wish to find. When finished return with the left arrow key. Press SELECT to schedule a recording.</source>
-        <translation type="unfinished"></translation>
+        <translation>検索したいタイトルを選択してください。そしてリターンキーと左矢印キーで選択してセレクトキーで予約します。</translation>
     </message>
     <message>
         <source>Airdate:</source>
