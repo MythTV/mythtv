@@ -851,9 +851,12 @@ static int asf_read_header(AVFormatContext *s, AVFormatParameters *ap)
 
             get_le32(pb);
 	    st->codec.codec_type = type;
-            st->codec.frame_rate = 15 * s->pts_den / s->pts_num; // 15 fps default
+            /* 1 fps default (XXX: put 0 fps instead) */
+            st->codec.frame_rate = 1; 
+            st->codec.frame_rate_base = 1;
             if (type == CODEC_TYPE_AUDIO) {
                 get_wav_header(pb, &st->codec, type_specific_size);
+                st->need_parsing = 1;
 		/* We have to init the frame size at some point .... */
 		pos2 = url_ftell(pb);
 		if (gsize > (pos2 + 8 - pos1 + 24)) {
@@ -908,6 +911,22 @@ static int asf_read_header(AVFormatContext *s, AVFormatParameters *ap)
 		    st->codec.extradata = av_mallocz(st->codec.extradata_size);
 		    get_buffer(pb, st->codec.extradata, st->codec.extradata_size);
 		}
+
+        /* Extract palette from extradata if bpp <= 8 */
+        /* This code assumes that extradata contains only palette */
+        /* This is true for all paletted codecs implemented in ffmpeg */
+        if (st->codec.extradata_size && (st->codec.bits_per_sample <= 8)) {
+            st->codec.palctrl = av_mallocz(sizeof(AVPaletteControl));
+#ifdef WORDS_BIGENDIAN
+            for (i = 0; i < FFMIN(st->codec.extradata_size, AVPALETTE_SIZE)/4; i++)
+                st->codec.palctrl->palette[i] = bswap_32(((uint32_t*)st->codec.extradata)[i]);
+#else
+            memcpy(st->codec.palctrl->palette, st->codec.extradata,
+                   FFMIN(st->codec.extradata_size, AVPALETTE_SIZE));
+#endif
+            st->codec.palctrl->palette_changed = 1;
+        }
+
                 st->codec.codec_tag = tag1;
 		st->codec.codec_id = codec_get_id(codec_bmp_tags, tag1);
             }
@@ -1166,7 +1185,7 @@ static int asf_read_packet(AVFormatContext *s, AVPacket *pkt)
 	}
 	if (asf_st->frag_offset == 0) {
 	    /* new packet */
-	    av_new_packet(&asf_st->pkt, asf->packet_obj_size, 0);
+	    av_new_packet(&asf_st->pkt, asf->packet_obj_size);
 	    asf_st->seq = asf->packet_seq;
 	    asf_st->pkt.pts = asf->packet_frag_timestamp - asf->hdr.preroll;
 	    asf_st->pkt.stream_index = asf->stream_index;
@@ -1226,13 +1245,24 @@ static int asf_read_close(AVFormatContext *s)
 	AVStream *st = s->streams[i];
 	av_free(st->priv_data);
 	av_free(st->codec.extradata);
+    av_free(st->codec.palctrl);
     }
     return 0;
 }
 
-static int asf_read_seek(AVFormatContext *s, int64_t pts)
+static int asf_read_seek(AVFormatContext *s, int stream_index, int64_t pts)
 {
-    printf("SEEK TO %lld", pts);
+#if 0
+    ASFContext *asf = s->priv_data;
+    int i;
+
+    for(i = 0;; i++) {
+        url_fseek(&s->pb, asf->data_offset + i * asf->packet_size, SEEK_SET);
+        if (asf_get_packet(s) < 0)
+            break;
+        printf("timestamp=%0.3f\n",  asf->packet_timestamp / 1000.0);
+    }
+#endif
     return -1;
 }
 

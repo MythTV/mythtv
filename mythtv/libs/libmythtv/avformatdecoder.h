@@ -72,7 +72,7 @@ class AvFormatDecoder : public DecoderBase
     friend int close_avf(URLContext *h);
 
     void InitByteContext(void);
-    void MpegPreProcessPkt(AVCodecContext *context, AVPacket *pkt);
+    void MpegPreProcessPkt(AVStream *stream, AVPacket *pkt);
     float GetMpegAspect(AVCodecContext *context, int aspect_ratio_info,
                         int width, int height);
 
@@ -103,9 +103,6 @@ class AvFormatDecoder : public DecoderBase
     int audio_sampling_rate_2nd;
     int audio_channels_2nd;
 
-    long long lastapts;
-    long long lastvpts;
-
     bool hasbframes;
 
     bool hasFullPositionMap;
@@ -126,9 +123,6 @@ class AvFormatDecoder : public DecoderBase
     ProgramInfo *m_playbackinfo;
 
     double fps;
-    bool validvpts;
-
-    double ptsmultiplier;
 
     QPtrList<VideoFrame> inUseBuffers;
 
@@ -144,6 +138,10 @@ class AvFormatDecoder : public DecoderBase
     bool gotvideo;
 
     unsigned char prvpkt[3];
+
+    long long video_last_P_pts;
+    long long lastvpts;
+    long long lastapts; 
 };
 
 #endif

@@ -722,7 +722,7 @@ static int rm_read_packet(AVFormatContext *s, AVPacket *pkt)
     if (rm->old_format) {
         /* just read raw bytes */
         len = RAW_PACKET_SIZE;
-        av_new_packet(pkt, len, 0);
+        av_new_packet(pkt, len);
         pkt->stream_index = 0;
         len = get_buffer(pb, pkt->data, len);
         if (len <= 0) {
@@ -788,7 +788,7 @@ static int rm_read_packet(AVFormatContext *s, AVPacket *pkt)
             st->codec.slice_offset[0]= 0;
         }
         
-        av_new_packet(pkt, len, 0);
+        av_new_packet(pkt, len);
         pkt->stream_index = i;
         get_buffer(pb, pkt->data, len);
     }

@@ -1,6 +1,7 @@
 /*
  * utils for libavcodec
  * Copyright (c) 2001 Fabrice Bellard.
+ * Copyright (c) 2003 Michel Bardiaux for the av_log API
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,6 +26,7 @@
 #include "avcodec.h"
 #include "dsputil.h"
 #include "mpegvideo.h"
+#include <stdarg.h>
 
 void *av_mallocz(unsigned int size)
 {
@@ -123,6 +125,7 @@ typedef struct InternalBuffer{
     int last_pic_num;
     uint8_t *base[4];
     uint8_t *data[4];
+    int linesize[4];
 }InternalBuffer;
 
 #define INTERNAL_BUFFER_SIZE 32
@@ -170,6 +173,7 @@ int avcodec_default_get_buffer(AVCodecContext *s, AVFrame *pic){
     int w= s->width;
     int h= s->height;
     InternalBuffer *buf;
+    int *picture_number;
     
     assert(pic->data[0]==NULL);
     assert(INTERNAL_BUFFER_SIZE > s->internal_buffer_count);
@@ -186,10 +190,12 @@ int avcodec_default_get_buffer(AVCodecContext *s, AVFrame *pic){
 #endif
      
     buf= &((InternalBuffer*)s->internal_buffer)[s->internal_buffer_count];
-
+    picture_number= &(((InternalBuffer*)s->internal_buffer)[INTERNAL_BUFFER_SIZE-1]).last_pic_num; //FIXME ugly hack
+    (*picture_number)++;
+    
     if(buf->base[0]){
-        pic->age= pic->coded_picture_number - buf->last_pic_num;
-        buf->last_pic_num= pic->coded_picture_number;
+        pic->age= *picture_number - buf->last_pic_num;
+        buf->last_pic_num= *picture_number;
     }else{
         int h_chroma_shift, v_chroma_shift;
         int s_align, pixel_size;
@@ -231,24 +237,25 @@ int avcodec_default_get_buffer(AVCodecContext *s, AVFrame *pic){
             const int h_shift= i==0 ? 0 : h_chroma_shift;
             const int v_shift= i==0 ? 0 : v_chroma_shift;
 
-            pic->linesize[i]= ALIGN(pixel_size*w>>h_shift, s_align);
+            buf->linesize[i]= ALIGN(pixel_size*w>>h_shift, s_align);
 
-            buf->base[i]= av_mallocz((pic->linesize[i]*h>>v_shift)+16); //FIXME 16
+            buf->base[i]= av_mallocz((buf->linesize[i]*h>>v_shift)+16); //FIXME 16
             if(buf->base[i]==NULL) return -1;
-            memset(buf->base[i], 128, pic->linesize[i]*h>>v_shift);
+            memset(buf->base[i], 128, buf->linesize[i]*h>>v_shift);
         
             if(s->flags&CODEC_FLAG_EMU_EDGE)
                 buf->data[i] = buf->base[i];
             else
-                buf->data[i] = buf->base[i] + ALIGN((pic->linesize[i]*EDGE_WIDTH>>v_shift) + (EDGE_WIDTH>>h_shift), s_align);
+                buf->data[i] = buf->base[i] + ALIGN((buf->linesize[i]*EDGE_WIDTH>>v_shift) + (EDGE_WIDTH>>h_shift), s_align);
         }
         pic->age= 256*256*256*64;
-        pic->type= FF_BUFFER_TYPE_INTERNAL;
     }
+    pic->type= FF_BUFFER_TYPE_INTERNAL;
 
     for(i=0; i<4; i++){
         pic->base[i]= buf->base[i];
         pic->data[i]= buf->data[i];
+        pic->linesize[i]= buf->linesize[i];
     }
     s->internal_buffer_count++;
 
@@ -318,6 +325,8 @@ void avcodec_get_context_defaults(AVCodecContext *s){
     
     s->intra_quant_bias= FF_DEFAULT_QUANT_BIAS;
     s->inter_quant_bias= FF_DEFAULT_QUANT_BIAS;
+    s->palctrl = NULL;
+    s->cr_available = 0;
 }
 
 /**
@@ -523,6 +532,10 @@ void avcodec_string(char *buf, int buf_size, AVCodecContext *enc, int encode)
             else if (enc->sub_id == 1)
                 codec_name = "mp1";
         }
+    } else if (enc->codec_id == CODEC_ID_MPEG2TS) {
+        /* fake mpeg2 transport stream codec (currently not
+           registered) */
+        codec_name = "mpeg2ts";
     } else if (enc->codec_name[0] != '\0') {
         codec_name = enc->codec_name;
     } else {
@@ -604,6 +617,10 @@ void avcodec_string(char *buf, int buf_size, AVCodecContext *enc, int encode)
             bitrate = enc->bit_rate;
             break;
         }
+        break;
+    case CODEC_TYPE_DATA:
+        snprintf(buf, buf_size, "Data: %s", codec_name);
+        bitrate = enc->bit_rate;
         break;
     default:
         av_abort();
@@ -752,3 +769,57 @@ int64_t av_rescale(int64_t a, int b, int c){
 
     return ((h/c)<<32) + l/c;
 }
+
+/* av_log API */
+
+#ifdef AV_LOG_TRAP_PRINTF
+#undef stderr
+#undef fprintf
+#endif
+
+static int av_log_level = AV_LOG_DEBUG;
+
+static void av_log_default_callback(AVCodecContext* avctx, int level, const char* fmt, va_list vl)
+{
+    static int print_prefix=1;
+
+    if(level>av_log_level)
+	    return;
+    if(avctx && print_prefix)
+        fprintf(stderr, "[%s @ %p]", avctx->codec->name, avctx);
+        
+    print_prefix= (int)strstr(fmt, "\n");
+        
+    vfprintf(stderr, fmt, vl);
+}
+
+static void (*av_log_callback)(AVCodecContext*, int, const char*, va_list) = av_log_default_callback;
+
+void av_log(AVCodecContext* avctx, int level, const char *fmt, ...)
+{
+    va_list vl;
+    va_start(vl, fmt);
+    av_vlog(avctx, level, fmt, vl);
+    va_end(vl);
+}
+
+void av_vlog(AVCodecContext* avctx, int level, const char *fmt, va_list vl)
+{
+    av_log_callback(avctx, level, fmt, vl);
+}
+
+int av_log_get_level(void)
+{
+    return av_log_level;
+}
+
+void av_log_set_level(int level)
+{
+    av_log_level = level;
+}
+
+void av_log_set_callback(void (*callback)(AVCodecContext*, int, const char*, va_list))
+{
+    av_log_callback = callback;
+}
+

@@ -28,17 +28,6 @@
 
 //#define DEBUG
 //#define PRINT_FRAME_TIME
-#ifdef PRINT_FRAME_TIME
-static inline long long rdtsc()
-{
-	long long l;
-	asm volatile(	"rdtsc\n\t"
-		: "=A" (l)
-	);
-//	printf("%d\n", int(l/1000));
-	return l;
-}
-#endif
 
 int ff_h263_decode_init(AVCodecContext *avctx)
 {
@@ -230,11 +219,11 @@ static int decode_slice(MpegEncContext *s){
                     }
                     return 0; 
                 }else if(ret==SLICE_NOEND){
-                    fprintf(stderr,"Slice mismatch at MB: %d\n", xy);
+                    av_log(s->avctx, AV_LOG_ERROR, "Slice mismatch at MB: %d\n", xy);
                     ff_er_add_slice(s, s->resync_mb_x, s->resync_mb_y, s->mb_x+1, s->mb_y, (AC_END|DC_END|MV_END)&part_mask);
                     return -1;
                 }
-                fprintf(stderr,"Error at MB: %d\n", xy);
+                av_log(s->avctx, AV_LOG_ERROR, "Error at MB: %d\n", xy);
                 ff_er_add_slice(s, s->resync_mb_x, s->resync_mb_y, s->mb_x, s->mb_y, (AC_ERROR|DC_ERROR|MV_ERROR)&part_mask);
     
                 return -1;
@@ -292,17 +281,17 @@ static int decode_slice(MpegEncContext *s){
             max_extra+= 256*256*256*64;
         
         if(left>max_extra){
-            fprintf(stderr, "discarding %d junk bits at end, next would be %X\n", left, show_bits(&s->gb, 24));
+            av_log(s->avctx, AV_LOG_ERROR, "discarding %d junk bits at end, next would be %X\n", left, show_bits(&s->gb, 24));
         }
         else if(left<0){
-            fprintf(stderr, "overreading %d bits\n", -left);
+            av_log(s->avctx, AV_LOG_ERROR, "overreading %d bits\n", -left);
         }else
             ff_er_add_slice(s, s->resync_mb_x, s->resync_mb_y, s->mb_x-1, s->mb_y, AC_END|DC_END|MV_END);
         
         return 0;
     }
 
-    fprintf(stderr, "slice end not reached but screenspace end (%d left %06X, score= %d)\n", 
+    av_log(s->avctx, AV_LOG_ERROR, "slice end not reached but screenspace end (%d left %06X, score= %d)\n", 
             s->gb.size_in_bits - get_bits_count(&s->gb),
             show_bits(&s->gb, 24), s->padding_bug_score);
             
@@ -426,7 +415,7 @@ uint64_t time= rdtsc();
         }else if(s->codec_id==CODEC_ID_H263){
             next= h263_find_frame_end(s, buf, buf_size);
         }else{
-            fprintf(stderr, "this codec doesnt support truncated bitstreams\n");
+            av_log(s->avctx, AV_LOG_ERROR, "this codec doesnt support truncated bitstreams\n");
             return -1;
         }
         
@@ -445,6 +434,12 @@ retry:
     if (!s->context_initialized) {
         if (MPV_common_init(s) < 0) //we need the idct permutaton for reading a custom matrix
             return -1;
+    }
+    
+    //we need to set current_picture_ptr before reading the header, otherwise we cant store anyting im there
+    if(s->current_picture_ptr==NULL || s->current_picture_ptr->data[0]){
+        int i= ff_find_unused_picture(s, 0);
+        s->current_picture_ptr= &s->picture[i];
     }
       
     /* let's go :-) */
@@ -475,7 +470,7 @@ retry:
 
     /* skip if the header was thrashed */
     if (ret < 0){
-        fprintf(stderr, "header damaged\n");
+        av_log(s->avctx, AV_LOG_ERROR, "header damaged\n");
         return -1;
     }
     
@@ -585,7 +580,7 @@ retry:
     }
 
     if(avctx->debug & FF_DEBUG_BUGS)
-        printf("bugs: %X lavc_build:%d xvid_build:%d divx_version:%d divx_build:%d %s\n", 
+        av_log(s->avctx, AV_LOG_DEBUG, "bugs: %X lavc_build:%d xvid_build:%d divx_version:%d divx_build:%d %s\n", 
                s->workaround_bugs, s->lavc_build, s->xvid_build, s->divx_version, s->divx_build,
                s->divx_packed ? "p" : "");
     

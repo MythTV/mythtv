@@ -230,7 +230,7 @@ static void mpeg1_encode_sequence_header(MpegEncContext *s)
             for(i=1; i<15; i++){
                 float error= aspect_ratio;
                 if(s->codec_id == CODEC_ID_MPEG1VIDEO || i <=1)
-                    error-= mpeg1_aspect[i];
+                    error-= 1.0/mpeg1_aspect[i];
                 else
                     error-= av_q2d(mpeg2_aspect[i])*s->height/s->width;
              
@@ -1001,7 +1001,7 @@ static int mpeg_decode_mb(MpegEncContext *s,
 
     if (s->mb_skip_run-- != 0) {
         if(s->pict_type == I_TYPE){
-            fprintf(stderr, "skiped MB in I frame at %d %d\n", s->mb_x, s->mb_y);
+            av_log(s->avctx, AV_LOG_ERROR, "skiped MB in I frame at %d %d\n", s->mb_x, s->mb_y);
             return -1;
         }
     
@@ -1041,7 +1041,7 @@ static int mpeg_decode_mb(MpegEncContext *s,
     case I_TYPE:
         if (get_bits1(&s->gb) == 0) {
             if (get_bits1(&s->gb) == 0){
-                fprintf(stderr, "invalid mb type in I Frame at %d %d\n", s->mb_x, s->mb_y);
+                av_log(s->avctx, AV_LOG_ERROR, "invalid mb type in I Frame at %d %d\n", s->mb_x, s->mb_y);
                 return -1;
             }
             mb_type = MB_TYPE_QUANT | MB_TYPE_INTRA;
@@ -1052,7 +1052,7 @@ static int mpeg_decode_mb(MpegEncContext *s,
     case P_TYPE:
         mb_type = get_vlc2(&s->gb, mb_ptype_vlc.table, MB_PTYPE_VLC_BITS, 1);
         if (mb_type < 0){
-            fprintf(stderr, "invalid mb type in P Frame at %d %d\n", s->mb_x, s->mb_y);
+            av_log(s->avctx, AV_LOG_ERROR, "invalid mb type in P Frame at %d %d\n", s->mb_x, s->mb_y);
             return -1;
         }
         mb_type = ptype2mb_type[ mb_type ];
@@ -1060,7 +1060,7 @@ static int mpeg_decode_mb(MpegEncContext *s,
     case B_TYPE:
         mb_type = get_vlc2(&s->gb, mb_btype_vlc.table, MB_BTYPE_VLC_BITS, 1);
         if (mb_type < 0){
-            fprintf(stderr, "invalid mb type in B Frame at %d %d\n", s->mb_x, s->mb_y);
+            av_log(s->avctx, AV_LOG_ERROR, "invalid mb type in B Frame at %d %d\n", s->mb_x, s->mb_y);
             return -1;
         }
         mb_type = btype2mb_type[ mb_type ];
@@ -1275,7 +1275,7 @@ static int mpeg_decode_mb(MpegEncContext *s,
         if (IS_PAT(mb_type)) {
             cbp = get_vlc2(&s->gb, mb_pat_vlc.table, MB_PAT_VLC_BITS, 1);
             if (cbp < 0){
-                fprintf(stderr, "invalid cbp at %d %d\n", s->mb_x, s->mb_y);
+                av_log(s->avctx, AV_LOG_ERROR, "invalid cbp at %d %d\n", s->mb_x, s->mb_y);
                 return -1;
             }
             cbp++;
@@ -1287,7 +1287,7 @@ static int mpeg_decode_mb(MpegEncContext *s,
                 if(s->swap_uv){
                     exchange_uv(s);
                 }
-            }
+            }    
 #endif
 
             if (s->codec_id == CODEC_ID_MPEG2VIDEO) {
@@ -1363,7 +1363,7 @@ static inline int decode_dc(GetBitContext *gb, int component)
         code = get_vlc2(gb, dc_chroma_vlc.table, DC_VLC_BITS, 2);
     }
     if (code < 0){
-        fprintf(stderr, "invalid dc code at\n");
+        av_log(NULL, AV_LOG_ERROR, "invalid dc code at\n");
         return 0xffff;
     }
     if (code == 0) {
@@ -1435,7 +1435,7 @@ static inline int mpeg1_decode_block_intra(MpegEncContext *s,
                 }
             }
             if (i > 63){
-                fprintf(stderr, "ac-tex damaged at %d %d\n", s->mb_x, s->mb_y);
+                av_log(s->avctx, AV_LOG_ERROR, "ac-tex damaged at %d %d\n", s->mb_x, s->mb_y);
                 return -1;
             }
 
@@ -1511,7 +1511,7 @@ static inline int mpeg1_decode_block_inter(MpegEncContext *s,
                 }
             }
             if (i > 63){
-                fprintf(stderr, "ac-tex damaged at %d %d\n", s->mb_x, s->mb_y);
+                av_log(s->avctx, AV_LOG_ERROR, "ac-tex damaged at %d %d\n", s->mb_x, s->mb_y);
                 return -1;
             }
 
@@ -1589,7 +1589,7 @@ static inline int mpeg2_decode_block_non_intra(MpegEncContext *s,
                 }
             }
             if (i > 63){
-                fprintf(stderr, "ac-tex damaged at %d %d\n", s->mb_x, s->mb_y);
+                av_log(s->avctx, AV_LOG_ERROR, "ac-tex damaged at %d %d\n", s->mb_x, s->mb_y);
                 return -1;
             }
             
@@ -1669,7 +1669,7 @@ static inline int mpeg2_decode_block_intra(MpegEncContext *s,
                 }
             }
             if (i > 63){
-                fprintf(stderr, "ac-tex damaged at %d %d\n", s->mb_x, s->mb_y);
+                av_log(s->avctx, AV_LOG_ERROR, "ac-tex damaged at %d %d\n", s->mb_x, s->mb_y);
                 return -1;
             }
             
@@ -1817,7 +1817,7 @@ static void mpeg_decode_sequence_extension(MpegEncContext *s)
     }
     
     if(s->avctx->debug & FF_DEBUG_PICT_INFO)
-        printf("profile: %d, level: %d \n", profile, level);
+        av_log(s->avctx, AV_LOG_DEBUG, "profile: %d, level: %d \n", profile, level);
 }
 
 static void mpeg_decode_sequence_display_extension(Mpeg1Context *s1)
@@ -1848,7 +1848,7 @@ static void mpeg_decode_sequence_display_extension(Mpeg1Context *s1)
             );
     
     if(s->avctx->debug & FF_DEBUG_PICT_INFO)
-        printf("sde w:%d, h:%d\n", w, h);
+        av_log(s->avctx, AV_LOG_DEBUG, "sde w:%d, h:%d\n", w, h);
 }
 
 static void mpeg_decode_picture_display_extension(Mpeg1Context *s1)
@@ -1864,7 +1864,7 @@ static void mpeg_decode_picture_display_extension(Mpeg1Context *s1)
     }
    
     if(s->avctx->debug & FF_DEBUG_PICT_INFO)
-        printf("pde (%d,%d) (%d,%d) (%d,%d)\n", 
+        av_log(s->avctx, AV_LOG_DEBUG, "pde (%d,%d) (%d,%d) (%d,%d)\n", 
             s1->pan_scan.position[0][0], s1->pan_scan.position[0][1], 
             s1->pan_scan.position[1][0], s1->pan_scan.position[1][1], 
             s1->pan_scan.position[2][0], s1->pan_scan.position[2][1]
@@ -2021,7 +2021,7 @@ static int mpeg_decode_slice(AVCodecContext *avctx,
     
     start_code = (start_code - 1) & 0xff;
     if (start_code >= s->mb_height){
-        fprintf(stderr, "slice below image (%d >= %d)\n", start_code, s->mb_height);
+        av_log(s->avctx, AV_LOG_ERROR, "slice below image (%d >= %d)\n", start_code, s->mb_height);
         return -1;
     }
     
@@ -2054,7 +2054,7 @@ static int mpeg_decode_slice(AVCodecContext *avctx,
         //printf("%d\n", s->current_picture_ptr->repeat_pict);
 
         if(s->avctx->debug&FF_DEBUG_PICT_INFO){
-             printf("qp:%d fc:%2d%2d%2d%2d %s %s %s %s dc:%d pstruct:%d fdct:%d cmv:%d qtype:%d ivlc:%d rff:%d %s\n", 
+             av_log(s->avctx, AV_LOG_DEBUG, "qp:%d fc:%2d%2d%2d%2d %s %s %s %s dc:%d pstruct:%d fdct:%d cmv:%d qtype:%d ivlc:%d rff:%d %s\n", 
                  s->qscale, s->mpeg_f_code[0][0],s->mpeg_f_code[0][1],s->mpeg_f_code[1][0],s->mpeg_f_code[1][1],
                  s->pict_type == I_TYPE ? "I" : (s->pict_type == P_TYPE ? "P" : (s->pict_type == B_TYPE ? "B" : "S")), 
                  s->progressive_sequence ? "pro" :"", s->alternate_scan ? "alt" :"", s->top_field_first ? "top" :"", 
@@ -2065,7 +2065,7 @@ static int mpeg_decode_slice(AVCodecContext *avctx,
             int i;
             
             if(!s->current_picture_ptr){
-                fprintf(stderr, "first field missing\n");
+                av_log(s->avctx, AV_LOG_ERROR, "first field missing\n");
                 return -1;
             }
             
@@ -2101,7 +2101,7 @@ static int mpeg_decode_slice(AVCodecContext *avctx,
 
     s->qscale = get_qscale(s);
     if(s->qscale == 0){
-        fprintf(stderr, "qscale == 0\n");
+        av_log(s->avctx, AV_LOG_ERROR, "qscale == 0\n");
         return -1;
     }
     
@@ -2115,7 +2115,7 @@ static int mpeg_decode_slice(AVCodecContext *avctx,
     for(;;) {
         int code = get_vlc2(&s->gb, mbincr_vlc.table, MBINCR_VLC_BITS, 2);
         if (code < 0){
-            fprintf(stderr, "first mb_incr damaged\n");
+            av_log(s->avctx, AV_LOG_ERROR, "first mb_incr damaged\n");
             return -1;
         }
         if (code >= 33) {
@@ -2192,7 +2192,7 @@ static int mpeg_decode_slice(AVCodecContext *avctx,
 
                 if(left < 0 || (left && show_bits(&s->gb, FFMIN(left, 23)))
                    || (avctx->error_resilience >= FF_ER_AGGRESSIVE && left>8)){
-                    fprintf(stderr, "end missmatch left=%d\n", left);
+                    av_log(avctx, AV_LOG_ERROR, "end mismatch left=%d\n", left);
                     return -1;
                 }else
                     goto eos;
@@ -2208,7 +2208,7 @@ static int mpeg_decode_slice(AVCodecContext *avctx,
             for(;;) {
                 int code = get_vlc2(&s->gb, mbincr_vlc.table, MBINCR_VLC_BITS, 2);
                 if (code < 0){
-                    fprintf(stderr, "mb incr damaged\n");
+                    av_log(s->avctx, AV_LOG_ERROR, "mb incr damaged\n");
                     return -1;
                 }
                 if (code >= 33) {
@@ -2216,7 +2216,7 @@ static int mpeg_decode_slice(AVCodecContext *avctx,
                         s->mb_skip_run += 33;
                     }else if(code == 35){
                         if(s->mb_skip_run != 0 || show_bits(&s->gb, 15) != 0){
-                            fprintf(stderr, "slice missmatch\n");
+                            av_log(s->avctx, AV_LOG_ERROR, "slice mismatch\n");
                             return -1;
                         }
                         goto eos; /* end of slice */
@@ -2302,7 +2302,7 @@ static int mpeg1_decode_sequence(AVCodecContext *avctx,
     height = get_bits(&s->gb, 12);
     s->aspect_ratio_info= get_bits(&s->gb, 4);
     if(s->codec_id == CODEC_ID_MPEG1VIDEO){
-        aspect= mpeg1_aspect[s->aspect_ratio_info];
+        aspect= 1.0/mpeg1_aspect[s->aspect_ratio_info];
         if(aspect!=0.0) avctx->sample_aspect_ratio= av_d2q(aspect, 255);
     }
 
@@ -2340,7 +2340,7 @@ static int mpeg1_decode_sequence(AVCodecContext *avctx,
         //get_format() or set_video(width,height,aspect,pix_fmt);
         //until then pix_fmt may be changed right after codec init
         if( avctx->pix_fmt == PIX_FMT_XVMC_MPEG2_IDCT )
-            if( avctx->idct_algo == FF_IDCT_AUTO)
+            if( avctx->idct_algo == FF_IDCT_AUTO )
                 avctx->idct_algo = FF_IDCT_SIMPLE;
         if( avctx->via_hwslice == 1)
             avctx->idct_algo = FF_IDCT_LIBMPEG2MMX;
@@ -2433,10 +2433,11 @@ static int vcr2_init_sequence(AVCodecContext *avctx)
     if( avctx->via_hwslice == 1)
         avctx->idct_algo = FF_IDCT_LIBMPEG2MMX;
 
+    
     if (MPV_common_init(s) < 0)
         return -1;
     exchange_uv(s);//common init reset pblocks, so we swap them here
-    s->swap_uv = 1;// in case of xvmc we need to swap uv for each MB
+    s->swap_uv = 1;// in case of xvmc we need to swap uv for each MB 
     s1->mpeg_enc_ctx_allocated = 1;
 
     for(i=0;i<64;i++) {
@@ -2592,7 +2593,7 @@ static int mpeg_decode_frame(AVCodecContext *avctx,
         input_size = buf_end - buf_ptr;
 
         if(avctx->debug & FF_DEBUG_STARTCODE){
-            printf("%3X at %d left %d\n", start_code, buf_ptr-buf, input_size);
+            av_log(avctx, AV_LOG_DEBUG, "%3X at %d left %d\n", start_code, buf_ptr-buf, input_size);
         }
 
                 /* prepare data for next start code */

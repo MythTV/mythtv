@@ -274,17 +274,17 @@ static int alloc_picture(MpegEncContext *s, Picture *pic, int shared){
         r= s->avctx->get_buffer(s->avctx, (AVFrame*)pic);
         
         if(r<0 || !pic->age || !pic->type || !pic->data[0]){
-            fprintf(stderr, "get_buffer() failed (%d %d %d %p)\n", r, pic->age, pic->type, pic->data[0]);
+	    av_log(s->avctx, AV_LOG_ERROR, "get_buffer() failed (%d %d %d %p)\n", r, pic->age, pic->type, pic->data[0]);
             return -1;
         }
 
         if(s->linesize && (s->linesize != pic->linesize[0] || s->uvlinesize != pic->linesize[1])){
-            fprintf(stderr, "get_buffer() failed (stride changed)\n");
+            av_log(s->avctx, AV_LOG_ERROR, "get_buffer() failed (stride changed)\n");
             return -1;
         }
 
         if(pic->linesize[1] != pic->linesize[2]){
-            fprintf(stderr, "get_buffer() failed (uv stride missmatch)\n");
+            av_log(s->avctx, AV_LOG_ERROR, "get_buffer() failed (uv stride missmatch)\n");
             return -1;
         }
 
@@ -458,6 +458,11 @@ int MPV_common_init(MpegEncContext *s)
         CHECKED_ALLOCZ(s->q_inter_matrix16, 64*32*2 * sizeof(uint16_t))
         CHECKED_ALLOCZ(s->input_picture, MAX_PICTURE_COUNT * sizeof(Picture*))
         CHECKED_ALLOCZ(s->reordered_input_picture, MAX_PICTURE_COUNT * sizeof(Picture*))
+        
+        if(s->avctx->noise_reduction){
+            CHECKED_ALLOCZ(s->dct_error_sum, 2 * 64 * sizeof(int))
+            CHECKED_ALLOCZ(s->dct_offset, 2 * 64 * sizeof(uint16_t))
+        }
     }
     CHECKED_ALLOCZ(s->blocks, 64*6*2 * sizeof(DCTELEM))
         
@@ -588,6 +593,8 @@ void MPV_common_end(MpegEncContext *s)
     av_freep(&s->blocks);
     av_freep(&s->input_picture);
     av_freep(&s->reordered_input_picture);
+    av_freep(&s->dct_error_sum);
+    av_freep(&s->dct_offset);
 
     if(s->picture){
         for(i=0; i<MAX_PICTURE_COUNT; i++){
@@ -618,7 +625,7 @@ int MPV_encode_init(AVCodecContext *avctx)
     s->width = avctx->width;
     s->height = avctx->height;
     if(avctx->gop_size > 600){
-        fprintf(stderr, "Warning keyframe interval too large! reducing it ...\n");
+	av_log(avctx, AV_LOG_ERROR, "Warning keyframe interval too large! reducing it ...\n");
         avctx->gop_size=600;
     }
     s->gop_size = avctx->gop_size;
@@ -663,32 +670,32 @@ int MPV_encode_init(AVCodecContext *avctx)
     s->progressive_sequence= !(avctx->flags & CODEC_FLAG_INTERLACED_DCT);
 
     if((s->flags & CODEC_FLAG_4MV) && s->codec_id != CODEC_ID_MPEG4){
-        fprintf(stderr, "4MV not supporetd by codec\n");
+        av_log(avctx, AV_LOG_ERROR, "4MV not supported by codec\n");
         return -1;
     }
     
     if(s->quarter_sample && s->codec_id != CODEC_ID_MPEG4){
-        fprintf(stderr, "qpel not supporetd by codec\n");
+        av_log(avctx, AV_LOG_ERROR, "qpel not supported by codec\n");
         return -1;
     }
 
     if(s->data_partitioning && s->codec_id != CODEC_ID_MPEG4){
-        fprintf(stderr, "data partitioning not supporetd by codec\n");
+        av_log(avctx, AV_LOG_ERROR, "data partitioning not supported by codec\n");
         return -1;
     }
     
     if(s->max_b_frames && s->codec_id != CODEC_ID_MPEG4 && s->codec_id != CODEC_ID_MPEG1VIDEO && s->codec_id != CODEC_ID_MPEG2VIDEO){
-        fprintf(stderr, "b frames not supporetd by codec\n");
+        av_log(avctx, AV_LOG_ERROR, "b frames not supported by codec\n");
         return -1;
     }
     
     if(s->mpeg_quant && s->codec_id != CODEC_ID_MPEG4){ //FIXME mpeg2 uses that too
-        fprintf(stderr, "mpeg2 style quantization not supporetd by codec\n");
+        av_log(avctx, AV_LOG_ERROR, "mpeg2 style quantization not supporetd by codec\n");
         return -1;
     }
         
     if((s->flags & CODEC_FLAG_CBP_RD) && !(s->flags & CODEC_FLAG_TRELLIS_QUANT)){
-        fprintf(stderr, "CBP RD needs trellis quant\n");
+        av_log(avctx, AV_LOG_ERROR, "CBP RD needs trellis quant\n");
         return -1;
     }
 
@@ -746,7 +753,7 @@ int MPV_encode_init(AVCodecContext *avctx)
 #ifdef CONFIG_RISKY
     case CODEC_ID_H263:
         if (h263_get_picture_format(s->width, s->height) == 7) {
-            printf("Input picture size isn't suitable for h263 codec! try h263+\n");
+            av_log(avctx, AV_LOG_INFO, "Input picture size isn't suitable for h263 codec! try h263+\n");
             return -1;
         }
         s->out_format = FMT_H263;
@@ -1014,32 +1021,50 @@ static void draw_edges_c(uint8_t *buf, int wrap, int width, int height, int w)
     }
 }
 
-static int find_unused_picture(MpegEncContext *s, int shared){
+int ff_find_unused_picture(MpegEncContext *s, int shared){
     int i;
     
     if(shared){
         for(i=0; i<MAX_PICTURE_COUNT; i++){
-            if(s->picture[i].data[0]==NULL && s->picture[i].type==0) break;
+            if(s->picture[i].data[0]==NULL && s->picture[i].type==0) return i;
         }
     }else{
         for(i=0; i<MAX_PICTURE_COUNT; i++){
-            if(s->picture[i].data[0]==NULL && s->picture[i].type!=0) break; //FIXME
+            if(s->picture[i].data[0]==NULL && s->picture[i].type!=0) return i; //FIXME
         }
         for(i=0; i<MAX_PICTURE_COUNT; i++){
-            if(s->picture[i].data[0]==NULL) break;
+            if(s->picture[i].data[0]==NULL) return i;
         }
     }
 
-    assert(i<MAX_PICTURE_COUNT);
-    return i;
+    assert(0);
+    return -1;
 }
 
-/* generic function for encode/decode called before a frame is coded/decoded */
+static void update_noise_reduction(MpegEncContext *s){
+    int intra, i;
+
+    for(intra=0; intra<2; intra++){
+        if(s->dct_count[intra] > (1<<16)){
+            for(i=0; i<64; i++){
+                s->dct_error_sum[intra][i] >>=1;
+            }
+            s->dct_count[intra] >>= 1;
+        }
+        
+        for(i=0; i<64; i++){
+            s->dct_offset[intra][i]= (s->avctx->noise_reduction * s->dct_count[intra] + s->dct_error_sum[intra][i]/2) / (s->dct_error_sum[intra][i]+1);
+        }
+    }
+}
+
+/**
+ * generic function for encode/decode called after coding/decoding the header and before a frame is coded/decoded
+ */
 int MPV_frame_start(MpegEncContext *s, AVCodecContext *avctx)
 {
     int i;
     AVFrame *pic;
-
     s->mb_skiped = 0;
 
     assert(s->last_picture_ptr==NULL || s->out_format != FMT_H264 || s->codec_id == CODEC_ID_SVQ3);
@@ -1053,7 +1078,7 @@ int MPV_frame_start(MpegEncContext *s, AVCodecContext *avctx)
         if(!s->encoding){
             for(i=0; i<MAX_PICTURE_COUNT; i++){
                 if(s->picture[i].data[0] && &s->picture[i] != s->next_picture_ptr && s->picture[i].reference){
-                    fprintf(stderr, "releasing zombie picture\n");
+                    av_log(avctx, AV_LOG_ERROR, "releasing zombie picture\n");
                     avctx->release_buffer(avctx, (AVFrame*)&s->picture[i]);                
                 }
             }
@@ -1068,18 +1093,22 @@ alloc:
             }
         }
 
-        i= find_unused_picture(s, 0);
-    
-        pic= (AVFrame*)&s->picture[i];
+        if(s->current_picture_ptr && s->current_picture_ptr->data[0]==NULL)
+            pic= (AVFrame*)s->current_picture_ptr; //we allready have a unused image (maybe it was set before reading the header)
+        else{
+            i= ff_find_unused_picture(s, 0);
+            pic= (AVFrame*)&s->picture[i];
+        }
+
         pic->reference= s->pict_type != B_TYPE ? 3 : 0;
 
-        if(s->current_picture_ptr)
+        if(s->current_picture_ptr) //FIXME broken, we need a coded_picture_number in MpegEncContext
             pic->coded_picture_number= s->current_picture_ptr->coded_picture_number+1;
         
         if( alloc_picture(s, (Picture*)pic, 0) < 0)
             return -1;
 
-        s->current_picture_ptr= &s->picture[i];
+        s->current_picture_ptr= (Picture*)pic;
     }
 
     s->current_picture_ptr->pict_type= s->pict_type;
@@ -1099,7 +1128,7 @@ alloc:
     if(s->next_picture_ptr) copy_picture(&s->next_picture, s->next_picture_ptr);
     
     if(s->pict_type != I_TYPE && (s->last_picture_ptr==NULL || s->last_picture_ptr->data[0]==NULL)){
-        fprintf(stderr, "warning: first frame is no keyframe\n");
+        av_log(avctx, AV_LOG_ERROR, "warning: first frame is no keyframe\n");
         assert(s->pict_type != B_TYPE); //these should have been dropped if we dont have a reference
         goto alloc;
     }
@@ -1131,6 +1160,12 @@ alloc:
     else 
         s->dct_unquantize = s->dct_unquantize_mpeg1;
 
+    if(s->dct_error_sum){
+        assert(s->avctx->noise_reduction && s->encoding);
+
+        update_noise_reduction(s);
+    }
+        
 #ifdef HAVE_XVMC
     if(s->avctx->xvmc_acceleration)
         return XVMC_field_start(s, avctx);
@@ -1280,63 +1315,63 @@ void ff_print_debug_info(MpegEncContext *s, Picture *pict){
                 if(s->avctx->debug&FF_DEBUG_SKIP){
                     int count= s->mbskip_table[x + y*s->mb_stride];
                     if(count>9) count=9;
-                    printf("%1d", count);
+                    av_log(s->avctx, AV_LOG_DEBUG, "%1d", count);
                 }
                 if(s->avctx->debug&FF_DEBUG_QP){
-                    printf("%2d", pict->qscale_table[x + y*s->mb_stride]);
+                    av_log(s->avctx, AV_LOG_DEBUG, "%2d", pict->qscale_table[x + y*s->mb_stride]);
                 }
                 if(s->avctx->debug&FF_DEBUG_MB_TYPE){
                     int mb_type= pict->mb_type[x + y*s->mb_stride];
                     
                     //Type & MV direction
                     if(IS_PCM(mb_type))
-                        printf("P");
+                        av_log(s->avctx, AV_LOG_DEBUG, "P");
                     else if(IS_INTRA(mb_type) && IS_ACPRED(mb_type))
-                        printf("A");
+                        av_log(s->avctx, AV_LOG_DEBUG, "A");
                     else if(IS_INTRA4x4(mb_type))
-                        printf("i");
+                        av_log(s->avctx, AV_LOG_DEBUG, "i");
                     else if(IS_INTRA16x16(mb_type))
-                        printf("I");
+                        av_log(s->avctx, AV_LOG_DEBUG, "I");
                     else if(IS_DIRECT(mb_type) && IS_SKIP(mb_type))
-                        printf("d");
+                        av_log(s->avctx, AV_LOG_DEBUG, "d");
                     else if(IS_DIRECT(mb_type))
-                        printf("D");
+                        av_log(s->avctx, AV_LOG_DEBUG, "D");
                     else if(IS_GMC(mb_type) && IS_SKIP(mb_type))
-                        printf("g");
+                        av_log(s->avctx, AV_LOG_DEBUG, "g");
                     else if(IS_GMC(mb_type))
-                        printf("G");
+                        av_log(s->avctx, AV_LOG_DEBUG, "G");
                     else if(IS_SKIP(mb_type))
-                        printf("S");
+                        av_log(s->avctx, AV_LOG_DEBUG, "S");
                     else if(!USES_LIST(mb_type, 1))
-                        printf(">");
+                        av_log(s->avctx, AV_LOG_DEBUG, ">");
                     else if(!USES_LIST(mb_type, 0))
-                        printf("<");
+                        av_log(s->avctx, AV_LOG_DEBUG, "<");
                     else{
                         assert(USES_LIST(mb_type, 0) && USES_LIST(mb_type, 1));
-                        printf("X");
+                        av_log(s->avctx, AV_LOG_DEBUG, "X");
                     }
                     
                     //segmentation
                     if(IS_8X8(mb_type))
-                        printf("+");
+                        av_log(s->avctx, AV_LOG_DEBUG, "+");
                     else if(IS_16X8(mb_type))
-                        printf("-");
+                        av_log(s->avctx, AV_LOG_DEBUG, "-");
                     else if(IS_8X16(mb_type))
-                        printf("¦");
+                        av_log(s->avctx, AV_LOG_DEBUG, "¦");
                     else if(IS_INTRA(mb_type) || IS_16X16(mb_type))
-                        printf(" ");
+                        av_log(s->avctx, AV_LOG_DEBUG, " ");
                     else
-                        printf("?");
+                        av_log(s->avctx, AV_LOG_DEBUG, "?");
                     
                         
                     if(IS_INTERLACED(mb_type) && s->codec_id == CODEC_ID_H264)
-                        printf("=");
+                        av_log(s->avctx, AV_LOG_DEBUG, "=");
                     else
-                        printf(" ");
+                        av_log(s->avctx, AV_LOG_DEBUG, " ");
                 }
-//                printf(" ");
+//                av_log(s->avctx, AV_LOG_DEBUG, " ");
             }
-            printf("\n");
+            av_log(s->avctx, AV_LOG_DEBUG, "\n");
         }
     }
     
@@ -1422,10 +1457,10 @@ static int load_input_picture(MpegEncContext *s, AVFrame *pic_arg){
     if(pic_arg->linesize[1] != s->uvlinesize) direct=0;
     if(pic_arg->linesize[2] != s->uvlinesize) direct=0;
   
-//    printf("%d %d %d %d\n",pic_arg->linesize[0], pic_arg->linesize[1], s->linesize, s->uvlinesize);
+//    av_log(AV_LOG_DEBUG, "%d %d %d %d\n",pic_arg->linesize[0], pic_arg->linesize[1], s->linesize, s->uvlinesize);
     
     if(direct){
-        i= find_unused_picture(s, 1);
+        i= ff_find_unused_picture(s, 1);
 
         pic= (AVFrame*)&s->picture[i];
         pic->reference= 3;
@@ -1437,7 +1472,7 @@ static int load_input_picture(MpegEncContext *s, AVFrame *pic_arg){
         alloc_picture(s, (Picture*)pic, 1);
     }else{
         int offset= 16;
-        i= find_unused_picture(s, 0);
+        i= ff_find_unused_picture(s, 0);
 
         pic= (AVFrame*)&s->picture[i];
         pic->reference= 3;
@@ -1529,7 +1564,7 @@ static void select_input_picture(MpegEncContext *s){
                 }
             
                 if(b_frames > s->max_b_frames){
-                    fprintf(stderr, "warning, too many bframes in a row\n");
+                    av_log(s->avctx, AV_LOG_ERROR, "warning, too many bframes in a row\n");
                     b_frames = s->max_b_frames;
                 }
             }else if(s->b_frame_strategy==0){
@@ -1554,14 +1589,14 @@ static void select_input_picture(MpegEncContext *s){
                     s->input_picture[i]->b_frame_score=0;
                 }
             }else{
-                fprintf(stderr, "illegal b frame strategy\n");
+                av_log(s->avctx, AV_LOG_ERROR, "illegal b frame strategy\n");
                 b_frames=0;
             }
 
             emms_c();
 //static int b_count=0;
 //b_count+= b_frames;
-//printf("b_frames: %d\n", b_count);
+//av_log(s->avctx, AV_LOG_DEBUG, "b_frames: %d\n", b_count);
                         
             s->reordered_input_picture[0]= s->input_picture[b_frames];
             if(   s->picture_in_gop_number + b_frames >= s->gop_size 
@@ -1587,7 +1622,7 @@ static void select_input_picture(MpegEncContext *s){
         if(s->reordered_input_picture[0]->type == FF_BUFFER_TYPE_SHARED){
             // input is a shared pix, so we cant modifiy it -> alloc a new one & ensure that the shared one is reuseable
         
-            int i= find_unused_picture(s, 0);
+            int i= ff_find_unused_picture(s, 0);
             Picture *pic= &s->picture[i];
 
             /* mark us unused / free shared pic */
@@ -1633,7 +1668,7 @@ int MPV_encode_picture(AVCodecContext *avctx,
     int i;
 
     if(avctx->pix_fmt != PIX_FMT_YUV420P){
-        fprintf(stderr, "this codec supports only YUV420P\n");
+        av_log(avctx, AV_LOG_ERROR, "this codec supports only YUV420P\n");
         return -1;
     }
     
@@ -3180,7 +3215,7 @@ void ff_mpegcontext_flush(MpegEncContext *s){
                                     || s->picture[i].type == FF_BUFFER_TYPE_USER))
         s->avctx->release_buffer(s->avctx, (AVFrame*)&s->picture[i]);
     }
-    s->last_picture_ptr = s->next_picture_ptr = NULL;
+    s->current_picture_ptr = s->last_picture_ptr = s->next_picture_ptr = NULL;
     
     s->parse_context.state= -1;
     s->parse_context.frame_start_found= 0;
@@ -3972,7 +4007,7 @@ static void encode_picture(MpegEncContext *s, int picture_number)
                     break;
                 default:
                     motion_x=motion_y=0; //gcc warning fix
-                    printf("illegal MB type\n");
+                    av_log(s->avctx, AV_LOG_ERROR, "illegal MB type\n");
                 }
 
                 encode_mb(s, motion_x, motion_y);
@@ -4042,6 +4077,30 @@ static void encode_picture(MpegEncContext *s, int picture_number)
     }
 }
 
+void ff_denoise_dct(MpegEncContext *s, DCTELEM *block){
+    const int intra= s->mb_intra;
+    int i;
+
+    s->dct_count[intra]++;
+
+    for(i=0; i<64; i++){
+        int level= block[i];
+
+        if(level){
+            if(level>0){
+                s->dct_error_sum[intra][i] += level;
+                level -= s->dct_offset[intra][i];
+                if(level<0) level=0;
+            }else{
+                s->dct_error_sum[intra][i] -= level;
+                level += s->dct_offset[intra][i];
+                if(level>0) level=0;
+            }
+            block[i]= level;
+        }
+    }
+}
+
 static int dct_quantize_trellis_c(MpegEncContext *s, 
                         DCTELEM *block, int n,
                         int qscale, int *overflow){
@@ -4070,7 +4129,10 @@ static int dct_quantize_trellis_c(MpegEncContext *s,
     const int patch_table= s->out_format == FMT_MPEG1 && !s->mb_intra;
         
     s->dsp.fdct (block);
-
+    
+    if(s->dct_error_sum)
+        ff_denoise_dct(s, block);
+    
     qmul= qscale*16;
     qadd= ((qscale-1)|1)*8;
 
@@ -4361,6 +4423,9 @@ static int dct_quantize_c(MpegEncContext *s,
     unsigned int threshold1, threshold2;
 
     s->dsp.fdct (block);
+
+    if(s->dct_error_sum)
+        ff_denoise_dct(s, block);
 
     if (s->mb_intra) {
         if (!s->h263_aic) {

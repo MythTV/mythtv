@@ -116,7 +116,7 @@ static int flv_read_packet(AVFormatContext *s, AVPacket *pkt)
     goto skip;
  found:
 
-    if (av_new_packet(pkt, size, 0) < 0)
+    if (av_new_packet(pkt, size) < 0)
         return -EIO;
 
     ret = get_buffer(&s->pb, pkt->data, size);

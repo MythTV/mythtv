@@ -16,7 +16,7 @@ extern "C" {
 
 #define FFMPEG_VERSION_INT     0x000408
 #define FFMPEG_VERSION         "0.4.8"
-#define LIBAVCODEC_BUILD       4687
+#define LIBAVCODEC_BUILD       4692
 
 #define LIBAVCODEC_VERSION_INT FFMPEG_VERSION_INT
 #define LIBAVCODEC_VERSION     FFMPEG_VERSION
@@ -84,6 +84,8 @@ enum CodecID {
     CODEC_ID_MSRLE,
     CODEC_ID_MSVIDEO1,
     CODEC_ID_IDCIN,
+    CODEC_ID_8BPS,
+    CODEC_ID_SMC,
 
     /* various pcm "codecs" */
     CODEC_ID_PCM_S16LE,
@@ -118,6 +120,9 @@ enum CodecID {
     CODEC_ID_ROQ_DPCM,
     CODEC_ID_INTERPLAY_DPCM,
     CODEC_ID_XAN_DPCM,
+    
+    CODEC_ID_MPEG2TS, /* _FAKE_ codec to indicate a raw MPEG2 transport
+                         stream (only used by libavformat) */
 };
 
 /* CODEC_ID_MP3LAME is absolete */
@@ -127,6 +132,7 @@ enum CodecType {
     CODEC_TYPE_UNKNOWN = -1,
     CODEC_TYPE_VIDEO,
     CODEC_TYPE_AUDIO,
+    CODEC_TYPE_DATA,
 };
 
 /**
@@ -272,6 +278,10 @@ static const __attribute__((unused)) int Motion_Est_QTab[] =
    used */
 #define CODEC_CAP_PARSE_ONLY      0x0004
 #define CODEC_CAP_TRUNCATED       0x0008
+/*
+ * Codec can use conditional replenishment if available.
+ */
+#define CODEC_CAP_CR              0x0010
 
 /**
  * Pan Scan area.
@@ -450,7 +460,20 @@ typedef struct AVPanScan{
      * - decoding: set by lavc\
      */\
     AVPanScan *pan_scan;\
-    
+    \
+    /**\
+     * tell user application that palette has changed from previous frame.\
+     * - encoding: ??? (no palette-enabled encoder yet)\
+     * - decoding: set by lavc (default 0)\
+     */\
+    int palette_has_changed;\
+    \
+    /**\
+     * Codec suggestion on buffer type if != 0\
+     * - encoding: unused\
+     * - decoding: set by lavc (before get_buffer() call))\
+     */\
+    int buffer_hints;\
 
 #define FF_QSCALE_TYPE_MPEG1	0
 #define FF_QSCALE_TYPE_MPEG2	1
@@ -467,6 +490,11 @@ typedef struct AVPanScan{
 #define FF_S_TYPE 4 // S(GMC)-VOP MPEG4
 #define FF_SI_TYPE 5
 #define FF_SP_TYPE 6
+
+#define FF_BUFFER_HINTS_VALID    0x01 // Buffer hints value is meaningful (if 0 ignore)
+#define FF_BUFFER_HINTS_READABLE 0x02 // Codec will read from buffer
+#define FF_BUFFER_HINTS_PRESERVE 0x04 // User must not alter buffer content
+#define FF_BUFFER_HINTS_REUSABLE 0x08 // Codec will reuse the buffer (update)
 
 /**
  * Audio Video Frame.
@@ -1342,14 +1370,35 @@ typedef struct AVCodecContext {
      * - decoding: unused
      */
     int lmax;
-   
+
+    /**
+     * Palette control structure
+     * - encoding: ??? (no palette-enabled encoder yet)
+     * - decoding: set by user.
+     */
+    struct AVPaletteControl *palctrl;
+
+    /**
+     * noise reduction strength
+     * - encoding: set by user.
+     * - decoding: unused
+     */
+    int noise_reduction;
+    
+    /**
+     * Conditional replenishment support
+     * - encoding: unused
+     * - decoding: set by user, if 1 user can allocate reusable buffers
+     */
+    int cr_available;
+
     /**
      * VIA CLE266 Hardware MPEG decoding
      * - encoding: forbidden
      * - decoding: set by decoder
      */
     int via_hwslice;
- 
+    
 } AVCodecContext;
 
 
@@ -1430,17 +1479,19 @@ typedef struct AVPicture {
  * This structure defines a method for communicating palette changes
  * between and demuxer and a decoder.
  */
+#define AVPALETTE_SIZE 1024
+#define AVPALETTE_COUNT 256
 typedef struct AVPaletteControl {
 
     /* demuxer sets this to 1 to indicate the palette has changed;
      * decoder resets to 0 */
     int palette_changed;
 
-    /* 256 3-byte RGB palette entries; the components should be
-     * formatted in the buffer as "RGBRGB..." and should be scaled to
-     * 8 bits if they originally represented 6-bit VGA palette
-     * components */
-    unsigned char palette[256 * 3];
+    /* 4-byte ARGB palette entries, stored in native byte order; note that
+     * the individual palette components should be on a 8-bit scale; if
+     * the palette data comes from a IBM VGA native format, the component
+     * data is probably 6 bits in size and needs to be scaled */
+    unsigned int palette[AVPALETTE_COUNT];
 
 } AVPaletteControl;
 
@@ -1526,6 +1577,8 @@ extern AVCodec msrle_decoder;
 extern AVCodec msvideo1_decoder;
 extern AVCodec vqa_decoder;
 extern AVCodec idcin_decoder;
+extern AVCodec eightbps_decoder;
+extern AVCodec smc_decoder;
 extern AVCodec ra_144_decoder;
 extern AVCodec ra_288_decoder;
 extern AVCodec roq_dpcm_decoder;
@@ -1795,6 +1848,50 @@ typedef enum {
  */
 int avcodec(void* handle, avc_cmd_t cmd, void* pin, void* pout);
 
+/* frame parsing */
+typedef struct AVCodecParserContext {
+    void *priv_data;
+    struct AVCodecParser *parser;
+    int64_t frame_offset; /* offset of the current frame */
+    int64_t cur_offset; /* current offset 
+                           (incremented by each av_parser_parse()) */
+    int64_t last_frame_offset; /* offset of the last frame */
+    /* video info */
+    int pict_type; /* XXX: put it back in AVCodecContext */
+    int repeat_pict; /* XXX: put it back in AVCodecContext */
+    int64_t pts;     /* in us, if given by the codec (used by raw mpeg4) */
+    int64_t dts;     /* in us, if given by the codec (used by raw mpeg4) */
+} AVCodecParserContext;
+
+typedef struct AVCodecParser {
+    int codec_ids[3]; /* several codec IDs are permitted */
+    int priv_data_size;
+    int (*parser_init)(AVCodecParserContext *s);
+    int (*parser_parse)(AVCodecParserContext *s, 
+                        AVCodecContext *avctx,
+                        uint8_t **poutbuf, int *poutbuf_size, 
+                        const uint8_t *buf, int buf_size);
+    void (*parser_close)(AVCodecParserContext *s);
+    struct AVCodecParser *next;
+} AVCodecParser;
+
+extern AVCodecParser *av_first_parser;
+
+void av_register_codec_parser(AVCodecParser *parser);
+AVCodecParserContext *av_parser_init(int codec_id);
+int av_parser_parse(AVCodecParserContext *s, 
+                    AVCodecContext *avctx,
+                    uint8_t **poutbuf, int *poutbuf_size, 
+                    const uint8_t *buf, int buf_size);
+void av_parser_close(AVCodecParserContext *s);
+
+extern AVCodecParser mpegvideo_parser;
+extern AVCodecParser mpeg4video_parser;
+extern AVCodecParser h263_parser;
+extern AVCodecParser h264_parser;
+extern AVCodecParser mpegaudio_parser;
+extern AVCodecParser ac3_parser;
+
 /* memory */
 void *av_malloc(unsigned int size);
 void *av_mallocz(unsigned int size);
@@ -1812,6 +1909,28 @@ void *__av_mallocz_static(void** location, unsigned int size);
 
 /* add by bero : in adx.c */
 int is_adx(const unsigned char *buf,size_t bufsize);
+
+/* av_log API */
+
+#include <stdarg.h>
+
+#define AV_LOG_ERROR 0
+#define AV_LOG_INFO 1
+#define AV_LOG_DEBUG 2
+
+extern void av_log(AVCodecContext*, int level, const char *fmt, ...) __attribute__ ((__format__ (__printf__, 3, 4)));
+extern void av_vlog(AVCodecContext*, int level, const char *fmt, va_list);
+extern int av_log_get_level(void);
+extern void av_log_set_level(int);
+extern void av_log_set_callback(void (*)(AVCodecContext*, int, const char*, va_list));
+
+#undef  AV_LOG_TRAP_PRINTF
+#ifdef AV_LOG_TRAP_PRINTF
+#define printf DO NOT USE
+#define fprintf DO NOT USE
+#undef stderr
+#define stderr DO NOT USE
+#endif
 
 #ifdef __cplusplus
 }

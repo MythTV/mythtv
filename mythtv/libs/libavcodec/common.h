@@ -84,6 +84,22 @@ extern const struct AVOption avoptions_workaround_bug[11];
 #    define always_inline inline
 #endif
 
+#ifdef EMULATE_FAST_INT
+/* note that we don't emulate 64bit ints */
+typedef signed char int_fast8_t;
+typedef signed int  int_fast16_t;
+typedef signed int  int_fast32_t;
+typedef unsigned char uint_fast8_t;
+typedef unsigned int  uint_fast16_t;
+typedef unsigned int  uint_fast32_t;
+#endif
+
+#if defined(CONFIG_OS2) || defined(CONFIG_SUNOS)
+static inline float floorf(float f) { 
+    return floor(f); 
+}
+#endif
+
 #ifdef CONFIG_WIN32
 
 /* windows */
@@ -194,7 +210,7 @@ inline void dprintf(const char* fmt,...) {}
 
 #    endif /* !CONFIG_WIN32 */
 
-#    define av_abort()      do { fprintf(stderr, "Abort at %s:%d\n", __FILE__, __LINE__); abort(); } while (0)
+#    define av_abort()      do { av_log(NULL, AV_LOG_ERROR, "Abort at %s:%d\n", __FILE__, __LINE__); abort(); } while (0)
 
 //rounded divison & shift
 #define RSHIFT(a,b) ((a) > 0 ? ((a) + (1<<((b)-1)))>>(b) : ((a) + (1<<((b)-1))-1)>>(b))

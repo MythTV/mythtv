@@ -120,7 +120,7 @@ typedef struct VqaContext {
     unsigned char *buf;
     int size;
 
-    unsigned char palette[PALETTE_COUNT * 4];
+    unsigned int palette[PALETTE_COUNT];
 
     int width;   /* width of a frame */
     int height;   /* height of a frame */
@@ -155,7 +155,7 @@ static int vqa_decode_init(AVCodecContext *avctx)
 
     /* make sure the extradata made it */
     if (s->avctx->extradata_size != VQA_HEADER_SIZE) {
-        printf("  VQA video: expected extradata size of %d\n", VQA_HEADER_SIZE);
+        av_log(s->avctx, AV_LOG_ERROR, "  VQA video: expected extradata size of %d\n", VQA_HEADER_SIZE);
         return -1;
     }
 
@@ -206,8 +206,8 @@ static int vqa_decode_init(AVCodecContext *avctx)
 
 #define CHECK_COUNT() \
     if (dest_index + count > dest_size) { \
-        printf ("  VQA video: decode_format80 problem: next op would overflow dest_index\n"); \
-        printf ("  VQA video: current dest_index = %d, count = %d, dest_size = %d\n", \
+        av_log(NULL, AV_LOG_ERROR, "  VQA video: decode_format80 problem: next op would overflow dest_index\n"); \
+        av_log(NULL, AV_LOG_ERROR, "  VQA video: current dest_index = %d, count = %d, dest_size = %d\n", \
             dest_index, count, dest_size); \
         return; \
     }
@@ -231,7 +231,7 @@ static void decode_format80(unsigned char *src, int src_size,
             return;
 
         if (dest_index >= dest_size) {
-            printf ("  VQA video: decode_format80 problem: dest_index (%d) exceeded dest_size (%d)\n",
+            av_log(NULL, AV_LOG_ERROR, "  VQA video: decode_format80 problem: dest_index (%d) exceeded dest_size (%d)\n",
                 dest_index, dest_size);
             return;
         }
@@ -299,7 +299,7 @@ static void decode_format80(unsigned char *src, int src_size,
      * not every entry needs to be filled */
     if (check_size)
         if (dest_index < dest_size)
-            printf ("  VQA video: decode_format80 problem: decode finished with dest_index (%d) < dest_size (%d)\n",
+            av_log(NULL, AV_LOG_ERROR, "  VQA video: decode_format80 problem: decode finished with dest_index (%d) < dest_size (%d)\n",
                 dest_index, dest_size);
 }
 
@@ -311,7 +311,6 @@ static void vqa_decode_chunk(VqaContext *s)
     unsigned int index = 0;
     int i;
     unsigned char r, g, b;
-    unsigned int *palette32;
     int index_shift;
 
     int cbf0_chunk = -1;
@@ -368,7 +367,7 @@ static void vqa_decode_chunk(VqaContext *s)
             break;
 
         default:
-            printf ("  VQA video: Found unknown chunk type: %c%c%c%c (%08X)\n",
+            av_log(s->avctx, AV_LOG_ERROR, "  VQA video: Found unknown chunk type: %c%c%c%c (%08X)\n",
             (chunk_type >> 24) & 0xFF,
             (chunk_type >> 16) & 0xFF,
             (chunk_type >>  8) & 0xFF,
@@ -385,7 +384,7 @@ static void vqa_decode_chunk(VqaContext *s)
     if ((cpl0_chunk != -1) && (cplz_chunk != -1)) {
 
         /* a chunk should not have both chunk types */
-        printf ("  VQA video: problem: found both CPL0 and CPLZ chunks\n");
+        av_log(s->avctx, AV_LOG_ERROR, "  VQA video: problem: found both CPL0 and CPLZ chunks\n");
         return;
     }
 
@@ -402,18 +401,17 @@ static void vqa_decode_chunk(VqaContext *s)
         chunk_size = BE_32(&s->buf[cpl0_chunk + 4]);
         /* sanity check the palette size */
         if (chunk_size / 3 > 256) {
-            printf ("  VQA video: problem: found a palette chunk with %d colors\n",
+            av_log(s->avctx, AV_LOG_ERROR, "  VQA video: problem: found a palette chunk with %d colors\n",
                 chunk_size / 3);
             return;
         }
         cpl0_chunk += CHUNK_PREAMBLE_SIZE;
-        palette32 = (unsigned int *)s->palette;
         for (i = 0; i < chunk_size / 3; i++) {
             /* scale by 4 to transform 6-bit palette -> 8-bit */
             r = s->buf[cpl0_chunk++] * 4;
             g = s->buf[cpl0_chunk++] * 4;
             b = s->buf[cpl0_chunk++] * 4;
-            palette32[i] = (r << 16) | (g << 8) | (b);
+            s->palette[i] = (r << 16) | (g << 8) | (b);
         }
     }
 
@@ -421,7 +419,7 @@ static void vqa_decode_chunk(VqaContext *s)
     if ((cbf0_chunk != -1) && (cbfz_chunk != -1)) {
 
         /* a chunk should not have both chunk types */
-        printf ("  VQA video: problem: found both CBF0 and CBFZ chunks\n");
+        av_log(s->avctx, AV_LOG_ERROR, "  VQA video: problem: found both CBF0 and CBFZ chunks\n");
         return;
     }
 
@@ -440,7 +438,7 @@ static void vqa_decode_chunk(VqaContext *s)
         chunk_size = BE_32(&s->buf[cbf0_chunk + 4]);
         /* sanity check the full codebook size */
         if (chunk_size > MAX_CODEBOOK_SIZE) {
-            printf ("  VQA video: problem: CBF0 chunk too large (0x%X bytes)\n",
+            av_log(s->avctx, AV_LOG_ERROR, "  VQA video: problem: CBF0 chunk too large (0x%X bytes)\n",
                 chunk_size);
             return;
         }
@@ -453,7 +451,7 @@ static void vqa_decode_chunk(VqaContext *s)
     if (vptz_chunk == -1) {
 
         /* something is wrong if there is no VPTZ chunk */
-        printf ("  VQA video: problem: no VPTZ chunk found\n");
+        av_log(s->avctx, AV_LOG_ERROR, "  VQA video: problem: no VPTZ chunk found\n");
         return;
     }
 
@@ -510,7 +508,7 @@ static void vqa_decode_chunk(VqaContext *s)
     /* handle partial codebook */
     if ((cbp0_chunk != -1) && (cbpz_chunk != -1)) {
         /* a chunk should not have both chunk types */
-        printf ("  VQA video: problem: found both CBP0 and CBPZ chunks\n");
+        av_log(s->avctx, AV_LOG_ERROR, "  VQA video: problem: found both CBP0 and CBPZ chunks\n");
         return;
     }
 
@@ -575,7 +573,7 @@ static int vqa_decode_frame(AVCodecContext *avctx,
         avctx->release_buffer(avctx, &s->frame);
 
     if (avctx->get_buffer(avctx, &s->frame)) {
-        printf ("  VQA Video: get_buffer() failed\n");
+        av_log(s->avctx, AV_LOG_ERROR, "  VQA Video: get_buffer() failed\n");
         return -1;
     }
 
@@ -583,6 +581,7 @@ static int vqa_decode_frame(AVCodecContext *avctx,
 
     /* make the palette available on the way out */
     memcpy(s->frame.data[1], s->palette, PALETTE_COUNT * 4);
+    s->frame.palette_has_changed = 1;
 
     *data_size = sizeof(AVFrame);
     *(AVFrame*)data = s->frame;

@@ -269,7 +269,7 @@ static int fourxm_read_packet(AVFormatContext *s,
 
             /* allocate 8 more bytes than 'size' to account for fourcc
              * and size */
-            if (av_new_packet(pkt, size + 8, 0))
+            if (av_new_packet(pkt, size + 8))
                 return -EIO;
             pkt->stream_index = fourxm->video_stream_index;
             pkt->pts = fourxm->pts;
@@ -289,7 +289,7 @@ static int fourxm_read_packet(AVFormatContext *s,
             size-=8;
 
             if (track_number == fourxm->selected_track) {
-                if (av_new_packet(pkt, size, 0))
+                if (av_new_packet(pkt, size))
                     return -EIO;
                 pkt->stream_index = 
                     fourxm->tracks[fourxm->selected_track].stream_index;
