@@ -2547,9 +2547,12 @@ void ProgramInfo::handleRecording(QSqlDatabase *db)
         RemoteReactivateRecording(this);
     else if (ret == stop)
     {
-        ProgramInfo *p = GetProgramFromRecorded(db, chanid, startts);
-        RemoteStopRecording(p);
-        delete p;
+        ProgramInfo *p = GetProgramFromRecorded(db, chanid, recstartts);
+        if (p)
+        {
+            RemoteStopRecording(p);
+            delete p;
+        }
     }
     else if (ret == addov)
         ApplyRecordStateChange(db, kDontRecord);
