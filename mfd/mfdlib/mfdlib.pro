@@ -4,6 +4,8 @@ include (../settings.pro)
     error(Missing config.pro: please run the configure script)
 }
 
+include (../options.pro)
+
 INCLUDEPATH *= /usr/include/cdda
 
 TEMPLATE = lib
@@ -34,8 +36,12 @@ SOURCES += flacdecoder.cpp cddecoder.cpp
 HEADERS += metadata.h   mdcontainer.h   settings.h
 SOURCES += metadata.cpp mdcontainer.cpp settings.cpp
 
-HEADERS += avfdecoder.h   wavdecoder.h
-SOURCES += avfdecoder.cpp wavdecoder.cpp
+HEADERS += avfdecoder.h   wavdecoder.h   aacdecoder.h
+SOURCES += avfdecoder.cpp wavdecoder.cpp aacdecoder.cpp
 
 LIBS += -logg -lvorbisfile -lvorbis  -lmad -lid3tag -lcdaudio \
         -lFLAC -lcdda_interface -lcdda_paranoia
+
+!isEmpty(USE_AAC_AUDIO) {
+LIBS += -lfaad -lmp4ff
+}

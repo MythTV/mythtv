@@ -140,6 +140,9 @@ static void checkFactories()
 #ifdef WMA_AUDIO_SUPPORT
         Decoder::registerFactory(new avfDecoderFactory);
 #endif
+#ifdef AAC_AUDIO_SUPPORT
+        Decoder::registerFactory(new aacDecoderFactory);
+#endif
     }
 }
 

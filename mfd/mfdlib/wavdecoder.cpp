@@ -465,7 +465,7 @@ void WavDecoder::run()
             //  sample boundary or get our channels switched .. so correct for block_align.
             //
             
-            while(go_to_where % block_align != 1)
+            while(go_to_where % block_align != 0)
             {
                 ++go_to_where;
             }

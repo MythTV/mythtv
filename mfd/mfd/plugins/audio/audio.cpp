@@ -665,7 +665,8 @@ void AudioPlugin::handleInternalMessage(QString the_message)
         //  Well, ok ... stop means we really stopped (not that we just
         //  reached the end of a file), nothing to do
         //
-        
+
+        sendMessage("stop");
     }
     if(the_message == "decoder finish")
     {
@@ -681,6 +682,7 @@ void AudioPlugin::handleInternalMessage(QString the_message)
         else
         {
             stopAudio();
+            sendMessage("stop");
         }
     }
 }
@@ -742,6 +744,7 @@ void AudioPlugin::playFromPlaylist(bool augment_index)
         metadata_server->unlockMetadata();
         playlist_mode_mutex.unlock();
         stopPlaylistMode();
+        sendMessage("stop");
         return;
     }
         
@@ -760,6 +763,7 @@ void AudioPlugin::playFromPlaylist(bool augment_index)
         metadata_server->unlockMetadata();
         playlist_mode_mutex.unlock();
         stopPlaylistMode();
+        sendMessage("stop");
         return;
     }
         
@@ -776,6 +780,7 @@ void AudioPlugin::playFromPlaylist(bool augment_index)
     if(!playMetadata(collection_to_play_from, song_to_play))
     {
         stopPlaylistMode();
+        sendMessage("stop");
     }
 }
 

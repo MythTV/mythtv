@@ -211,8 +211,7 @@ bool VorbisDecoder::initialize()
     {
         if (! input()->open(IO_ReadOnly))
         {
-            error("DecoderOgg: Failed to open input. Error " +
-                  QString::number(input()->status()) + ".");
+            warning("DecoderOgg: failed to open input");
             return FALSE;
         }
     }

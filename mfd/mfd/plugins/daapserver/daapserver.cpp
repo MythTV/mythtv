@@ -1079,8 +1079,6 @@ void DaapServer::sendDatabaseItem(HttpRequest *http_request, u32 song_id, DaapRe
                 
                 if(
                     file_path.section('.', -1,-1) == "mp3" ||
-                    file_path.section('.', -1,-1) == "mp4" ||
-                    file_path.section('.', -1,-1) == "aac" ||
                     file_path.section('.', -1,-1) == "m4a"
                   )
                 {

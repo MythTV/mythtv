@@ -15,6 +15,7 @@ daapserver="yes"
 daapclient="yes"
 mmusic="yes"
 wmasupport="yes"
+aacsupport="no"
 
 for opt do
   case "$opt" in
@@ -46,6 +47,10 @@ for opt do
   ;;
   --disable-wmasupport) wmasupport="no"
   ;;
+  --enable-aacsupport) aacsupport="yes"
+  ;;
+  --disable-aacsupport) aacsupport="no"
+  ;;
   --enable-all)
       zeroconfig="yes"
       audio="yes"
@@ -54,6 +59,7 @@ for opt do
       mythlib="yes"
       mmusic="yes"
       wmasupport="yes"
+      aacsupport="yes"
   ;;
   --disable-all)
       zeroconfig="no"
@@ -63,6 +69,7 @@ for opt do
       mythlib="no"
       mmusic="no"
       wmasupport="no"
+      aacsupport="no"
   ;;
   esac
 done
@@ -88,6 +95,7 @@ Standard options:
   --enable-zeroconfig  enable auto discovery of services       [default=yes]
   --enable-audio       enable audio playing                    [default=yes]
   --enable-wmasupport  include ability to play wma audio files [default=yes]
+  --enable-aacsupport  include ability to play aac audio files [default=no ]
   --enable-daapserver  enable serving audio via daap           [default=yes]
   --enable-daapclient  enable consuming audio via daap         [default=yes]
   --enable-mythmusic   enable serving mythmusic audio content  [default=yes]
@@ -208,6 +216,23 @@ fi
 
 if test "$wmasupport" = "no" ; then
     echo "                        wma support: no"
+fi
+
+#
+#   AAC support
+#
+
+if test "$aacsupport" = "yes" ; then
+    echo "                        aac support: yes"        
+    echo "//  Include aac support " >> ./config.h
+    echo " " >> ./config.h
+    echo "#define AAC_AUDIO_SUPPORT 1" >> ./config.h
+    echo " " >> ./config.h
+    echo "USE_AAC_AUDIO = 1 " >> ./options.pro
+fi
+
+if test "$aacsupport" = "no" ; then
+    echo "                        aac support: no"
 fi
 
 #

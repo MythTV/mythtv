@@ -5,7 +5,7 @@
 GENERAL INFO
 ------------
 
-INSTALL:
+INSTALL (see DEPENDENCIES):
 
     ./configure
     qmake
@@ -21,6 +21,24 @@ RUN:
     You can just CTRL-C the daemon, but other zeroconfig-aware applications
 will not know that it has gone away.
 
+
+
+DEPENDENCIES
+------------
+
+    The mfd essentially has all the dependencies of MythTV plus MythMusic
+and (probably by the time you read this) MythDVD. In addition, you will also
+need:
+
+        FAAD2 library
+        http://www.audiocoding.com/
+
+    __NB__: As of February 2, 2004, you must the CVS version of libfaad2.
+Version 2.0 release candidate 3 will not work. In addition, you have to
+manually copy mp4ff_int_types.h from faad2/common/mp4ff/ to your
+/usr/local/include/ directory.
+
+    This is fairly annoying, but not insurmountable.            
 
 
 INFORMATION FOR DEVELOPERS
