@@ -340,8 +340,8 @@ void VideoBrowser::SetCurrentItem()
     if(curitem)
     {
         delete curitem;
-        curitem = NULL;
     }
+    curitem = NULL;
     
     
     //
@@ -371,7 +371,6 @@ void VideoBrowser::SetCurrentItem()
 
         curitem = new Metadata(*(it));
     }
-    curitem = new Metadata(*(it));
 }
 
 void VideoBrowser::updateBrowsing(QPainter *p)
