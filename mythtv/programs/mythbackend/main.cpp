@@ -57,7 +57,7 @@ int main(int argc, char **argv)
 
     QString logfile = "";
     QString pidfile = "";
-    bool daemonize = true;
+    bool daemonize = false;
     for(int argpos = 1; argpos < a.argc(); ++argpos)
         if (!strcmp(a.argv()[argpos],"-l") ||
             !strcmp(a.argv()[argpos],"--logfile")) {
