@@ -559,7 +559,11 @@ void TVRec::TeardownRecorder(bool killFile)
             (gContext->GetNumSetting("AutoCommercialFlag", 0)))
         {
             flagthreadstarted = false;
-            pthread_create(&commercials, NULL, FlagCommercialsThread, this);
+
+            pthread_attr_t attr;
+            pthread_attr_init(&attr);
+            pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+            pthread_create(&commercials, &attr, FlagCommercialsThread, this);
 
             while (!flagthreadstarted)
                 usleep(50);
