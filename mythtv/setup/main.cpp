@@ -97,6 +97,14 @@ void SetupMenu(void)
 
 int main(int argc, char *argv[])
 {
+    QString geometry = "";
+#ifdef Q_WS_X11
+    // Remember any -geometry argument which QApplication init will remove
+    for(int argpos = 1; argpos + 1 < argc; ++argpos)
+        if (!strcmp(argv[argpos],"-geometry"))
+            geometry = argv[argpos+1];
+#endif
+
 #ifdef Q_WS_MACX
     // Without this, we can't set focus to any of the CheckBoxSetting, and most
     // of the MythPushButton widgets, and they don't use the themed background.
@@ -104,9 +112,56 @@ int main(int argc, char *argv[])
 #endif
     QApplication a(argc, argv);
 
+    for(int argpos = 1; argpos < a.argc(); ++argpos)
+    {
+        if (!strcmp(a.argv()[argpos],"-geometry") ||
+            !strcmp(a.argv()[argpos],"--geometry"))      
+        {
+            if (a.argc()-1 > argpos)
+            {
+                geometry = a.argv()[argpos+1];
+                if (geometry.startsWith("-"))
+                {
+                    cerr << "Invalid or missing argument to --geometry option\n";                    return -1;
+                }                      
+                else
+                    ++argpos;
+            }            
+            else
+            {            
+                cerr << "Missing argument to --geometry option\n"; 
+                return -1;
+            }            
+        }
+        else
+        {
+            if (!(!strcmp(a.argv()[argpos],"-h") ||    
+                !strcmp(a.argv()[argpos],"--help") ||
+                !strcmp(a.argv()[argpos],"--usage")))
+                cerr << "Invalid argument: " << a.argv()[argpos] << endl;
+            cerr << "Valid options are: \n" << 
+#ifdef Q_WS_X11 
+                    "-display X-server     Create GUI on X-server, not localhost\n" <<
+                    "-geometry WxH+X+Y     Override window size settings\n" <<
+#endif          
+                    "--geometry WxH+X+Y    Override window size settings\n";
+            return -1;
+        }
+    }
+
     gContext = NULL;
     gContext = new MythContext(MYTH_BINARY_VERSION);
-    gContext->Init(true);
+
+    if (geometry != "")
+        if (!gContext->ParseGeometryOverride(geometry))
+            cerr << "Illegal -geometry argument '"
+                 << geometry << "' (ignored)\n";
+
+    if (!gContext->Init(true))
+    {
+        VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
+        return -1;
+    }
 
     if (!MSqlQuery::testDBConnection())
     {
