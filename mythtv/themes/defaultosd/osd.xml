@@ -162,12 +162,24 @@
       <font>infofont</font>
       <altfont>infofontgray</altfont>
     </textarea>
-    <positionrects name="selector">
+    <positionrects name="selector"> <!-- draws a white rectangle at these 
+                                         coords indicating the current 
+                                         selection -->
       <area>80,296,480,30</area>
       <area>80,326,480,30</area>
       <area>80,356,480,30</area>
       <area>80,386,480,30</area>
     </positionrects>
+<!-- Alternatively, this form will show an image (instead of the drawn white 
+     rectangle) at the given positions to indicate the current selection 
+    <positionimage name="selector">
+      <filename>cut-start.png</filename>
+      <position>60,296</position>
+      <position>60,326</position>
+      <position>60,356</position>
+      <position>60,386</position>
+    </positionimage>
+-->
   </container>
 
 </mythosdtheme>

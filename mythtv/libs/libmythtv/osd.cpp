@@ -640,6 +640,59 @@ void OSD::parsePositionRects(OSDSet *container, QDomElement &element)
     container->AddType(rects);
 }
 
+void OSD::parsePositionImage(OSDSet *container, QDomElement &element)
+{
+    QString name = element.attribute("name", "");
+    if (name.isNull() || name.isEmpty())
+    {
+        cerr << "positionimage needs a name\n";
+        exit(0);
+    }
+
+    QString filename = "";
+    QPoint scale = QPoint(-1, -1);
+
+    OSDTypePositionImage *image = new OSDTypePositionImage(name);
+
+    for (QDomNode child = element.firstChild(); !child.isNull();
+         child = child.nextSibling())
+    {
+        QDomElement info = child.toElement();
+        if (!info.isNull())
+        {
+            if (info.tagName() == "filename")
+            {
+                filename = getFirstText(info);
+            }
+            else if (info.tagName() == "position")
+            {
+                QPoint pos = parsePoint(getFirstText(info));
+                pos.setX((int)(pos.x() * wmult + xoffset));
+                pos.setY((int)(pos.y() * hmult + yoffset));
+
+                image->AddPosition(pos);
+            }
+            else if (info.tagName() == "staticsize")
+            {
+                scale = parsePoint(getFirstText(info));
+            }
+            else
+            {
+                cerr << "Unknown: " << info.tagName() << " in positionimage\n";
+                exit(0);
+            }
+        }
+    }
+
+    if (filename != "")
+        filename = themepath + filename;
+
+    image->SetStaticSize(scale.x(), scale.y());
+    image->LoadImage(filename, wmult, hmult, scale.x(), scale.y());
+
+    container->AddType(image);
+}
+
 void OSD::parseContainer(QDomElement &element)
 {
     QString name = element.attribute("name", "");
@@ -703,6 +756,10 @@ void OSD::parseContainer(QDomElement &element)
             else if (info.tagName() == "positionrects")
             {
                 parsePositionRects(container, info);
+            }
+            else if (info.tagName() == "positionimage")
+            {
+                parsePositionImage(container, info);
             }
             else
             {
@@ -1059,13 +1116,12 @@ void OSD::NewDialogBox(const QString &name, const QString &message,
         text->SetText(option);
         text->SetUseAlt(true);
     }
- 
-    OSDTypePositionRectangle *opr = 
-                   (OSDTypePositionRectangle *)container->GetType("selector");
 
+    OSDTypePositionIndicator *opr = 
+        dynamic_cast<OSDTypePositionIndicator*>(container->GetType("selector"));
     if (!opr)
     {
-        cerr << "Need a positionrects named 'selector' in the basedialog\n";
+        cerr << "Need a positionindicator named 'selector' in the basedialog\n";
         exit(0);
     }
 
@@ -1128,8 +1184,9 @@ void OSD::DialogUp(const QString &name)
     OSDSet *container = GetSet(name);
     if (container)
     {
-        OSDTypePositionRectangle *type;
-        type = (OSDTypePositionRectangle *)container->GetType("selector");
+        OSDType *basetype = container->GetType("selector");
+        OSDTypePositionIndicator *type = 
+                            dynamic_cast<OSDTypePositionIndicator*>(basetype);
         if (type)
         {
             type->PositionUp();
@@ -1148,8 +1205,9 @@ void OSD::DialogDown(const QString &name)
     OSDSet *container = GetSet(name);
     if (container)
     {
-        OSDTypePositionRectangle *type;
-        type = (OSDTypePositionRectangle *)container->GetType("selector");
+        OSDType *basetype = container->GetType("selector");
+        OSDTypePositionIndicator *type =
+                            dynamic_cast<OSDTypePositionIndicator*>(basetype);
         if (type)
         {
             type->PositionDown();

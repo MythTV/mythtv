@@ -76,6 +76,12 @@ OSDSet::OSDSet(const OSDSet &other)
             OSDTypeText *newtext = new OSDTypeText(*item);
             AddType(newtext);
         }
+        else if (OSDTypePositionImage *item =
+                  dynamic_cast<OSDTypePositionImage*>(type))
+        {
+            OSDTypePositionImage *newrect = new OSDTypePositionImage(*item);
+            AddType(newrect);
+        }
         else if (OSDTypeImage *item = dynamic_cast<OSDTypeImage*>(type))
         {
             OSDTypeImage *newimage = new OSDTypeImage(*item);
@@ -427,6 +433,13 @@ OSDTypeImage::OSDTypeImage(const OSDTypeImage &other)
 OSDTypeImage::OSDTypeImage(const QString &name)
             : OSDType(name)
 {
+    m_yuv = NULL;
+    m_alpha = NULL;
+    m_ybuffer = NULL;
+    m_ubuffer = NULL;
+    m_vbuffer = NULL;
+    m_isvalid = false;
+    m_filename = "";
 }
 
 OSDTypeImage::~OSDTypeImage()
@@ -1050,22 +1063,56 @@ void OSDTypeBox::Draw(unsigned char *screenptr, int vid_width, int vid_height,
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-OSDTypePositionRectangle::OSDTypePositionRectangle(const QString &name)
-          : OSDType(name)
+OSDTypePositionIndicator::OSDTypePositionIndicator(void)
 {
     m_numpositions = 0;
     m_curposition = -1;
     m_offset = 0;
-}       
-   
-OSDTypePositionRectangle::OSDTypePositionRectangle(
-                                        const OSDTypePositionRectangle &other) 
-                        : OSDType(other.m_name)
+}
+
+OSDTypePositionIndicator::OSDTypePositionIndicator(
+                                      const OSDTypePositionIndicator &other)
 {
     m_numpositions = other.m_numpositions;
     m_curposition = other.m_curposition;
     m_offset = other.m_offset;
+}
 
+OSDTypePositionIndicator::~OSDTypePositionIndicator()
+{
+}
+
+void OSDTypePositionIndicator::SetPosition(int pos)
+{
+    m_curposition = pos + m_offset;
+    if (m_curposition >= m_numpositions)
+        m_curposition = m_numpositions - 1;
+}
+
+void OSDTypePositionIndicator::PositionUp(void)
+{
+    if (m_curposition > m_offset)
+        m_curposition--;
+}
+
+void OSDTypePositionIndicator::PositionDown(void)
+{
+    if (m_curposition < m_numpositions - 1)
+        m_curposition++;
+}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+OSDTypePositionRectangle::OSDTypePositionRectangle(const QString &name)
+                        : OSDType(name), OSDTypePositionIndicator()
+{
+}       
+   
+OSDTypePositionRectangle::OSDTypePositionRectangle(
+                                        const OSDTypePositionRectangle &other) 
+                        : OSDType(other.m_name), OSDTypePositionIndicator(other)
+{
     for (int i = 0; i < m_numpositions; i++)
     {
         QRect tmp = other.positions[i];
@@ -1081,25 +1128,6 @@ void OSDTypePositionRectangle::AddPosition(QRect rect)
 {
     positions.push_back(rect);
     m_numpositions++;
-}
-
-void OSDTypePositionRectangle::SetPosition(int pos)
-{
-    m_curposition = pos + m_offset;
-    if (m_curposition >= m_numpositions)
-        m_curposition = m_numpositions - 1;
-}
-
-void OSDTypePositionRectangle::PositionUp(void)
-{
-    if (m_curposition > m_offset)
-        m_curposition--;
-}
-
-void OSDTypePositionRectangle::PositionDown(void)
-{
-    if (m_curposition < m_numpositions - 1)
-        m_curposition++;
 }
 
 void OSDTypePositionRectangle::Draw(unsigned char *screenptr, int vid_width, 
@@ -1150,6 +1178,47 @@ void OSDTypePositionRectangle::Draw(unsigned char *screenptr, int vid_width,
             *src = 255;
         }
     }
+}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+OSDTypePositionImage::OSDTypePositionImage(const QString &name)
+                    : OSDTypeImage(name), OSDTypePositionIndicator()
+{
+}
+
+OSDTypePositionImage::OSDTypePositionImage(const OSDTypePositionImage &other)
+                    : OSDTypeImage(other), OSDTypePositionIndicator(other)
+{
+    for (int i = 0; i < m_numpositions; i++)
+    {
+        QPoint tmp = other.positions[i];
+        positions.push_back(tmp);
+    }
+}
+
+OSDTypePositionImage::~OSDTypePositionImage()
+{
+}
+
+void OSDTypePositionImage::AddPosition(QPoint pos)
+{
+    positions.push_back(pos);
+    m_numpositions++;
+}
+
+void OSDTypePositionImage::Draw(unsigned char *screenptr, int vid_width,
+                                int vid_height, int fade, int maxfade,
+                                int xoff, int yoff)
+{
+    if (m_curposition < 0 || m_curposition >= m_numpositions)
+        return;
+
+    QPoint pos = positions[m_curposition];
+
+    OSDTypeImage::SetPosition(pos);
+    OSDTypeImage::Draw(screenptr, vid_width, vid_height, fade, maxfade, xoff, 
+                       yoff);
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -16,6 +16,7 @@ class QImage;
 class TTFFont;
 class OSDSet;
 class OSDTypeImage;
+class OSDTypePositionIndicator;
  
 class OSD
 {
@@ -97,6 +98,7 @@ class OSD
     void parseBox(OSDSet *container, QDomElement &element);
     void parseEditArrow(OSDSet *container, QDomElement &element);
     void parsePositionRects(OSDSet *container, QDomElement &element);
+    void parsePositionImage(OSDSet *container, QDomElement &element);
 
     QString fontname;
     QString ccfontname;

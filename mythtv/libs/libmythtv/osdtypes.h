@@ -155,7 +155,7 @@ class OSDTypeImage : public OSDType
                  int scaleh = -1);
     OSDTypeImage(const OSDTypeImage &other);
     OSDTypeImage(const QString &name);    
-   ~OSDTypeImage();
+    virtual ~OSDTypeImage();
 
     void LoadImage(const QString &filename, float wmult, float hmult, 
                    int scalew = -1, int scaleh = -1);
@@ -168,8 +168,8 @@ class OSDTypeImage : public OSDType
 
     QRect ImageSize() { return m_imagesize; }
 
-    void Draw(unsigned char *screenptr, int vid_width, int vid_height, 
-              int fade, int maxfade, int xoff, int yoff);
+    virtual void Draw(unsigned char *screenptr, int vid_width, int vid_height, 
+                      int fade, int maxfade, int xoff, int yoff);
 
   protected:
     QRect m_imagesize;
@@ -285,32 +285,60 @@ class OSDTypeBox : public OSDType
     QRect size;
 };
 
-class OSDTypePositionRectangle : public OSDType
+class OSDTypePositionIndicator
+{
+  public:
+    OSDTypePositionIndicator(void);
+    OSDTypePositionIndicator(const OSDTypePositionIndicator &other);
+   ~OSDTypePositionIndicator();
+
+    void SetOffset(int offset) { m_offset = offset; }
+    int GetOffset(void) { return m_offset; }
+
+    int GetPosition() { return m_curposition - m_offset; }
+    void SetPosition(int pos);
+
+    void PositionUp();
+    void PositionDown();
+
+  protected:
+    int m_numpositions;
+    int m_curposition;
+    int m_offset;
+};
+
+class OSDTypePositionRectangle : public OSDType,
+                                 public OSDTypePositionIndicator
 {
   public:
     OSDTypePositionRectangle(const QString &name);
     OSDTypePositionRectangle(const OSDTypePositionRectangle &other);
    ~OSDTypePositionRectangle();
 
-    void SetOffset(int offset) { m_offset = offset; }
-    int GetOffset(void) { return m_offset; }
-
     void AddPosition(QRect rect);
-
-    int GetPosition() { return m_curposition - m_offset; }
-    void SetPosition(int pos);
-
-    void PositionUp();  
-    void PositionDown();
 
     void Draw(unsigned char *screenptr, int vid_width, int vid_height,
               int fade, int maxfade, int xoff, int yoff);
 
   private:
     vector<QRect> positions; 
-    int m_numpositions;
-    int m_curposition;
-    int m_offset;
+};
+
+class OSDTypePositionImage : public virtual OSDTypeImage, 
+                             public OSDTypePositionIndicator
+{
+  public:
+    OSDTypePositionImage(const QString &name);
+    OSDTypePositionImage(const OSDTypePositionImage &other);
+   ~OSDTypePositionImage();
+
+    void AddPosition(QPoint pos);
+
+    void Draw(unsigned char *screenptr, int vid_width, int vid_height,
+              int fade, int maxfade, int xoff, int yoff);
+
+  private:
+    vector<QPoint> positions;
 };
 
 class ccText
