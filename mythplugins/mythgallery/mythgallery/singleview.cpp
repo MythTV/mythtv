@@ -556,7 +556,7 @@ void SingleView::registerTrans()
 SingleView::transMethod SingleView::getRandomTrans()
 {
     QStringList t = m_transMap.keys();
-    t.remove("None");
+    t.remove("none");
 
     int count = t.count();
 
