@@ -7,8 +7,8 @@
 
    <button>
       <type>SETUP</type>
-      <text>Themes</text>
-      <action>SETTINGS THEMES</action>
+      <text>Theme</text>
+      <action>SETTINGS THEME</action>
    </button>
 
    <button>
