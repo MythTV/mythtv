@@ -48,6 +48,7 @@ static void checkVisFactories(void)
         MainVisual::registerVisFactory(new StereoScopeFactory);
         MainVisual::registerVisFactory(new SynaesthesiaFactory);
         MainVisual::registerVisFactory(new SpectrumFactory);
+        MainVisual::registerVisFactory(new AlbumArtFactory);
 #ifdef OPENGL_SUPPORT
         MainVisual::registerVisFactory(new GearsFactory);
 #endif

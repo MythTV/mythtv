@@ -83,6 +83,8 @@ class Decoder : public QThread
 
     static void SetLocationFormatUseTags(void);
 
+    QString getFilename(void) { return filename; }
+
   protected:
     Decoder(DecoderFactory *, QIODevice *, Output *);
 

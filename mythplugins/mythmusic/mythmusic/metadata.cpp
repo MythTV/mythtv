@@ -48,6 +48,7 @@ void Metadata::persist(QSqlDatabase *db)
 {
 
     QString sqlfilename = filename;
+    sqlfilename.replace(QRegExp("\\\\"), QString("\\\\"));
     sqlfilename.replace(QRegExp("\""), QString("\\\""));
 
     QString thequery = QString("UPDATE musicmetadata set "
@@ -75,6 +76,7 @@ bool Metadata::isInDatabase(QSqlDatabase *db, QString startdir)
 
     QString sqlfilename = filename;
     sqlfilename = filename.remove(0, startdir.length());
+    sqlfilename.replace(QRegExp("\\\\"), QString("\\\\"));
     sqlfilename.replace(QRegExp("\""), QString("\\\""));
 
     QString thequery = QString("SELECT artist,album,title,genre,year,tracknum,"
@@ -117,14 +119,34 @@ void Metadata::dumpToDatabase(QSqlDatabase *db, QString startdir)
     if (genre == "")
         genre = QObject::tr("Unknown Genre");
 
+    title.replace(QRegExp("\\\\"), QString("\\\\"));
     title.replace(QRegExp("\""), QString("\\\""));
+    artist.replace(QRegExp("\\\\"), QString("\\\\"));
     artist.replace(QRegExp("\""), QString("\\\""));
+    album.replace(QRegExp("\\\\"), QString("\\\\"));
     album.replace(QRegExp("\""), QString("\\\""));
+    genre.replace(QRegExp("\\\\"), QString("\\\\"));
     genre.replace(QRegExp("\""), QString("\\\""));
 
     QString sqlfilename = filename;
     sqlfilename = filename.remove(0, startdir.length());
+    sqlfilename.replace(QRegExp("\\\\"), QString("\\\\"));
     sqlfilename.replace(QRegExp("\""), QString("\\\""));
+
+    // Don't update the database if a song with the exact same
+    // metadata is already there
+    QString checkquery = QString("SELECT filename FROM musicmetadata WHERE "
+                                 "( ( artist = \"%1\" ) AND "
+                                 "( album = \"%2\" ) AND ( title = \"%3\" ) "
+                                 "AND ( genre = \"%4\" ) AND "
+                                 "( year = \"%5\" ) AND ( tracknum = \"%6\" ) "
+                                 "AND ( length = \"%7\" ) );")
+                                 .arg(artist.latin1()).arg(album.latin1())
+                                 .arg(title.latin1()).arg(genre).arg(year)
+                                 .arg(tracknum).arg(length).arg(sqlfilename);
+    QSqlQuery query = db->exec(checkquery);
+    if (query.isActive() && query.numRowsAffected() > 0)
+        return;
 
     QString thequery = QString("INSERT INTO musicmetadata (artist,album,title,"
                                "genre,year,tracknum,length,filename) VALUES "
@@ -230,6 +252,7 @@ void Metadata::fillData(QSqlDatabase *db)
         return;
 
     QString sqltitle = title;
+    sqltitle.replace(QRegExp("\\\\"), QString("\\\\"));
     sqltitle.replace(QRegExp("\""), QString("\\\""));
 
     QString thequery = "SELECT artist,album,title,genre,year,tracknum,length,"
@@ -239,12 +262,14 @@ void Metadata::fillData(QSqlDatabase *db)
     if (album != "")
     {
         QString temp = album;
+        temp.replace(QRegExp("\\\\"), QString("\\\\"));
         temp.replace(QRegExp("\""), QString("\\\""));
         thequery += " AND album=\"" + temp + "\"";
     }
     if (artist != "")
     {
         QString temp = artist;
+        temp.replace(QRegExp("\\\\"), QString("\\\\"));
         temp.replace(QRegExp("\""), QString("\\\""));
         thequery += " AND artist=\"" + temp + "\"";
     }

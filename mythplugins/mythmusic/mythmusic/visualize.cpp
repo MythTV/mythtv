@@ -1,22 +1,24 @@
 /*
-	visualize.cpp
+        visualize.cpp
 
     (c) 2003 Thor Sigvaldason and Isaac Richards
-	VERY closely based on code from mq3 by Brad Hughes
-		
-	Part of the mythTV project
-	
-	music visualizers
+        VERY closely based on code from mq3 by Brad Hughes
+                
+        Part of the mythTV project
+        
+        music visualizers
 */
 
 #include "mainvisual.h"
 #include "visualize.h"
 #include "math.h"
 #include "inlines.h"
+#include "decoder.h"
 
 #include <qpainter.h>
 #include <qpixmap.h>
 #include <qimage.h>
+#include <qdir.h>
 
 #include <iostream>
 using namespace std;
@@ -31,7 +33,7 @@ Spectrum::Spectrum()
     scaleFactor = 2.0;
     falloff = 3.0;
     fps = 20;
-	
+        
 #ifdef FFTW_SUPPORT
     plan =  rfftw_create_plan(512, FFTW_REAL_TO_COMPLEX, FFTW_ESTIMATE);
 #endif
@@ -82,7 +84,7 @@ bool Spectrum::process(VisualNode *node)
     // and break it down into spectrum
     // values
     bool allZero = TRUE;
-#ifdef FFTW_SUPPORT	// Don't do any real processing if libfftw isn't available
+#ifdef FFTW_SUPPORT        // Don't do any real processing if libfftw isn't available
     uint i;
     long w = 0, index;
     QRect *rectsp = rects.data();
@@ -195,8 +197,8 @@ bool Spectrum::draw(QPainter *p, const QColor &back)
     {
         per = double( rectsp[i].height() - 2 ) / double( size.height() );
 
-        per = clamp(per, 1.0, 0.0);	
-		
+        per = clamp(per, 1.0, 0.0);        
+                
         r = startColor.red() + 
             (targetColor.red() - startColor.red()) * (per * per);
         g = startColor.green() + 
@@ -207,7 +209,7 @@ bool Spectrum::draw(QPainter *p, const QColor &back)
         r = clamp(r, 255.0, 0.0);
         g = clamp(g, 255.0, 0.0);
         b = clamp(b, 255.0, 0.0);
-		
+                
         if(rectsp[i].height() > 4)
             p->fillRect(rectsp[i], QColor(int(r), int(g), int(b)));
     }
@@ -245,6 +247,94 @@ VisualBase *SpectrumFactory::create(MainVisual *parent, long int winid)
     return new Spectrum();
 }
 
+AlbumArt::AlbumArt(MainVisual *parent)
+{
+    pParent = parent;
+    Decoder *dec = pParent->decoder();
+    if (dec)
+    {
+        filename = dec->getFilename();
+        directory = filename.left(filename.findRev("/"));
+    }
+
+    fps = 20;
+}
+
+AlbumArt::~AlbumArt()
+{
+}
+
+void AlbumArt::resize(const QSize &newsize)
+{
+    size = newsize;
+}
+
+bool AlbumArt::process(VisualNode *node)
+{
+    node = node;
+    return true;
+}
+
+bool AlbumArt::draw(QPainter *p, const QColor &back)
+{
+    if (!pParent->decoder())
+        return false;
+
+    QString curfile = pParent->decoder()->getFilename();
+    QString curdir = curfile.left(curfile.findRev("/"));
+    QImage art;
+ 
+    // If the directory has changed (new album) or the size, reload
+    if ((directory.compare(curdir) != 0) || (cursize != size))
+    {
+        // Directory has changed
+        directory = curdir;
+        // Get filter
+        QString namefilter = gContext->GetSetting("AlbumArtFilter",
+                                                  "*.png;*.jpg;*.jpeg;*.gif");
+        // Get directory contents based on filter
+        QDir folder(curdir, namefilter, QDir::Name | QDir::IgnoreCase, 
+                    QDir::Files | QDir::Hidden);
+
+        QString fileart = "";
+
+        if (folder.count())
+            fileart = folder[rand() % folder.count()];
+
+        curdir.append("/");
+        curdir.append(fileart);
+        art.load(curdir);
+        if (art.isNull())
+            return false;
+
+        // Paint the image
+        p->fillRect(0, 0, size.width(), size.height(), back);
+        p->drawPixmap(0, 0, art.smoothScale(size));
+        // Store our new size
+        cursize = art.smoothScale(size).size();
+        return true;
+    }
+    art.reset();
+    return true;
+}
+
+const QString &AlbumArtFactory::name(void) const
+{
+    static QString name("AlbumArt");
+    return name;
+}
+
+const QString &AlbumArtFactory::description(void) const
+{
+    static QString name("Displays album art from .folder.png during playback");
+    return name;
+}
+
+VisualBase *AlbumArtFactory::create(MainVisual *parent, long int winid)
+{
+    (void)winid;
+    return new AlbumArt(parent);
+}
 
 
 Blank::Blank()
@@ -297,9 +387,9 @@ VisualBase *BlankFactory::create(MainVisual *parent, long int winid)
 
 #ifdef OPENGL_SUPPORT
 
-//	Need this for the Gears Object (below)
+//        Need this for the Gears Object (below)
 static void gear( GLfloat inner_radius, GLfloat outer_radius, GLfloat width,
-		  GLint teeth, GLfloat tooth_depth )
+                  GLint teeth, GLfloat tooth_depth )
 {
     GLint i;
     GLfloat r0, r1, r2;
@@ -320,11 +410,11 @@ static void gear( GLfloat inner_radius, GLfloat outer_radius, GLfloat width,
     /* draw front face */
     glBegin( GL_QUAD_STRIP );
     for (i=0;i<=teeth;i++) {
-	angle = i * 2.0*pi / teeth;
-	glVertex3f( r0*cos(angle), r0*sin(angle), width*0.5 );
-	glVertex3f( r1*cos(angle), r1*sin(angle), width*0.5 );
-	glVertex3f( r0*cos(angle), r0*sin(angle), width*0.5 );
-	glVertex3f( r1*cos(angle+3*da), r1*sin(angle+3*da), width*0.5 );
+        angle = i * 2.0*pi / teeth;
+        glVertex3f( r0*cos(angle), r0*sin(angle), width*0.5 );
+        glVertex3f( r1*cos(angle), r1*sin(angle), width*0.5 );
+        glVertex3f( r0*cos(angle), r0*sin(angle), width*0.5 );
+        glVertex3f( r1*cos(angle+3*da), r1*sin(angle+3*da), width*0.5 );
     }
     glEnd();
 
@@ -332,12 +422,12 @@ static void gear( GLfloat inner_radius, GLfloat outer_radius, GLfloat width,
     glBegin( GL_QUADS );
     da = 2.0*pi / teeth / 4.0;
     for (i=0;i<teeth;i++) {
-	angle = i * 2.0*pi / teeth;
+        angle = i * 2.0*pi / teeth;
 
-	glVertex3f( r1*cos(angle),      r1*sin(angle),	  width*0.5 );
-	glVertex3f( r2*cos(angle+da),   r2*sin(angle+da),	  width*0.5 );
-	glVertex3f( r2*cos(angle+2*da), r2*sin(angle+2*da), width*0.5 );
-	glVertex3f( r1*cos(angle+3*da), r1*sin(angle+3*da), width*0.5 );
+        glVertex3f( r1*cos(angle),      r1*sin(angle),          width*0.5 );
+        glVertex3f( r2*cos(angle+da),   r2*sin(angle+da),          width*0.5 );
+        glVertex3f( r2*cos(angle+2*da), r2*sin(angle+2*da), width*0.5 );
+        glVertex3f( r1*cos(angle+3*da), r1*sin(angle+3*da), width*0.5 );
     }
     glEnd();
 
@@ -347,11 +437,11 @@ static void gear( GLfloat inner_radius, GLfloat outer_radius, GLfloat width,
     /* draw back face */
     glBegin( GL_QUAD_STRIP );
     for (i=0;i<=teeth;i++) {
-	angle = i * 2.0*pi / teeth;
-	glVertex3f( r1*cos(angle), r1*sin(angle), -width*0.5 );
-	glVertex3f( r0*cos(angle), r0*sin(angle), -width*0.5 );
-	glVertex3f( r1*cos(angle+3*da), r1*sin(angle+3*da), -width*0.5 );
-	glVertex3f( r0*cos(angle), r0*sin(angle), -width*0.5 );
+        angle = i * 2.0*pi / teeth;
+        glVertex3f( r1*cos(angle), r1*sin(angle), -width*0.5 );
+        glVertex3f( r0*cos(angle), r0*sin(angle), -width*0.5 );
+        glVertex3f( r1*cos(angle+3*da), r1*sin(angle+3*da), -width*0.5 );
+        glVertex3f( r0*cos(angle), r0*sin(angle), -width*0.5 );
     }
     glEnd();
 
@@ -359,12 +449,12 @@ static void gear( GLfloat inner_radius, GLfloat outer_radius, GLfloat width,
     glBegin( GL_QUADS );
     da = 2.0*pi / teeth / 4.0;
     for (i=0;i<teeth;i++) {
-	angle = i * 2.0*pi / teeth;
+        angle = i * 2.0*pi / teeth;
 
-	glVertex3f( r1*cos(angle+3*da), r1*sin(angle+3*da), -width*0.5 );
-	glVertex3f( r2*cos(angle+2*da), r2*sin(angle+2*da), -width*0.5 );
-	glVertex3f( r2*cos(angle+da),   r2*sin(angle+da),	  -width*0.5 );
-	glVertex3f( r1*cos(angle),      r1*sin(angle),	  -width*0.5 );
+        glVertex3f( r1*cos(angle+3*da), r1*sin(angle+3*da), -width*0.5 );
+        glVertex3f( r2*cos(angle+2*da), r2*sin(angle+2*da), -width*0.5 );
+        glVertex3f( r2*cos(angle+da),   r2*sin(angle+da),          -width*0.5 );
+        glVertex3f( r1*cos(angle),      r1*sin(angle),          -width*0.5 );
     }
     glEnd();
 
@@ -372,27 +462,27 @@ static void gear( GLfloat inner_radius, GLfloat outer_radius, GLfloat width,
     /* draw outward faces of teeth */
     glBegin( GL_QUAD_STRIP );
     for (i=0;i<teeth;i++) {
-	angle = i * 2.0*pi / teeth;
+        angle = i * 2.0*pi / teeth;
 
-	glVertex3f( r1*cos(angle),      r1*sin(angle),	   width*0.5 );
-	glVertex3f( r1*cos(angle),      r1*sin(angle),	  -width*0.5 );
-	u = r2*cos(angle+da) - r1*cos(angle);
-	v = r2*sin(angle+da) - r1*sin(angle);
-	len = sqrt( u*u + v*v );
-	u /= len;
-	v /= len;
-	glNormal3f( v, -u, 0.0 );
-	glVertex3f( r2*cos(angle+da),   r2*sin(angle+da),	   width*0.5 );
-	glVertex3f( r2*cos(angle+da),   r2*sin(angle+da),	  -width*0.5 );
-	glNormal3f( cos(angle), sin(angle), 0.0 );
-	glVertex3f( r2*cos(angle+2*da), r2*sin(angle+2*da),  width*0.5 );
-	glVertex3f( r2*cos(angle+2*da), r2*sin(angle+2*da), -width*0.5 );
-	u = r1*cos(angle+3*da) - r2*cos(angle+2*da);
-	v = r1*sin(angle+3*da) - r2*sin(angle+2*da);
-	glNormal3f( v, -u, 0.0 );
-	glVertex3f( r1*cos(angle+3*da), r1*sin(angle+3*da),  width*0.5 );
-	glVertex3f( r1*cos(angle+3*da), r1*sin(angle+3*da), -width*0.5 );
-	glNormal3f( cos(angle), sin(angle), 0.0 );
+        glVertex3f( r1*cos(angle),      r1*sin(angle),           width*0.5 );
+        glVertex3f( r1*cos(angle),      r1*sin(angle),          -width*0.5 );
+        u = r2*cos(angle+da) - r1*cos(angle);
+        v = r2*sin(angle+da) - r1*sin(angle);
+        len = sqrt( u*u + v*v );
+        u /= len;
+        v /= len;
+        glNormal3f( v, -u, 0.0 );
+        glVertex3f( r2*cos(angle+da),   r2*sin(angle+da),           width*0.5 );
+        glVertex3f( r2*cos(angle+da),   r2*sin(angle+da),          -width*0.5 );
+        glNormal3f( cos(angle), sin(angle), 0.0 );
+        glVertex3f( r2*cos(angle+2*da), r2*sin(angle+2*da),  width*0.5 );
+        glVertex3f( r2*cos(angle+2*da), r2*sin(angle+2*da), -width*0.5 );
+        u = r1*cos(angle+3*da) - r2*cos(angle+2*da);
+        v = r1*sin(angle+3*da) - r2*sin(angle+2*da);
+        glNormal3f( v, -u, 0.0 );
+        glVertex3f( r1*cos(angle+3*da), r1*sin(angle+3*da),  width*0.5 );
+        glVertex3f( r1*cos(angle+3*da), r1*sin(angle+3*da), -width*0.5 );
+        glNormal3f( cos(angle), sin(angle), 0.0 );
     }
 
     glVertex3f( r1*cos(0.0), r1*sin(0.0), width*0.5 );
@@ -406,18 +496,18 @@ static void gear( GLfloat inner_radius, GLfloat outer_radius, GLfloat width,
     /* draw inside radius cylinder */
     glBegin( GL_QUAD_STRIP );
     for (i=0;i<=teeth;i++) {
-	angle = i * 2.0*pi / teeth;
-	glNormal3f( -cos(angle), -sin(angle), 0.0 );
-	glVertex3f( r0*cos(angle), r0*sin(angle), -width*0.5 );
-	glVertex3f( r0*cos(angle), r0*sin(angle), width*0.5 );
+        angle = i * 2.0*pi / teeth;
+        glNormal3f( -cos(angle), -sin(angle), 0.0 );
+        glVertex3f( r0*cos(angle), r0*sin(angle), -width*0.5 );
+        glVertex3f( r0*cos(angle), r0*sin(angle), width*0.5 );
     }
     glEnd();
 
 }
 
-//	Want to clean this up at some point,
-//	but I need to get some CVS checked in
-//	before we end up with a code fork
+//        Want to clean this up at some point,
+//        but I need to get some CVS checked in
+//        before we end up with a code fork
 
 static GLfloat view_rotx=20.0, view_rotz=0.0;
 static GLint gear1, gear2, gear3;
@@ -522,7 +612,7 @@ bool Gears::process(VisualNode *node)
         magR = (log(rout[index] * rout[index] + rout[512 - index] * rout[512 - index]) - 22.0) * scaleFactor;
 
         if (magL > size.height() / 2)
-        {	
+        {        
             magL = size.height() / 2;
         }
         if (magL < magnitudesp[i])
@@ -586,12 +676,12 @@ bool Gears::draw(QPainter *p, const QColor &back)
 
 void Gears::drawTheGears()
 {
-    angle += 2.0;	
+    angle += 2.0;        
     view_roty += 1.0;
     //view_rotx += 1.0;
 
     float spreader = 3.0 - ((rects[2].top() / 255.0) * 3.0);
-	
+        
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     glPushMatrix();

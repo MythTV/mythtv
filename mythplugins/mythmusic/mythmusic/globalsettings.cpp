@@ -395,7 +395,8 @@ public:
                     QObject::tr("Spectrum") + ", " + 
                     QObject::tr("BumpScope") + ", " + 
                     QObject::tr("Goom") + ", " + 
-                    QObject::tr("Synaesthesia") + ", " + 
+                    QObject::tr("Synaesthesia") + ", " +
+                    QObject::tr("AlbumArt") + ", " +
                     QObject::tr("Gears") + ", " + QObject::tr("and") + " " + 
                     QObject::tr("Blank"));
     };

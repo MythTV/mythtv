@@ -65,6 +65,31 @@ class SpectrumFactory : public VisFactory
     VisualBase *create(MainVisual *parent, long int winid);
 };
 
+class AlbumArt : public VisualBase
+{
+  public:
+    AlbumArt(MainVisual *parent);
+    virtual ~AlbumArt();
+
+    void resize(const QSize &size);
+    bool process(VisualNode *node = 0);
+    bool draw(QPainter *p, const QColor &back = Qt::black);
+
+  private:
+    QSize size, cursize;
+    QString filename;
+    QString directory;
+    MainVisual *pParent;
+};
+
+class AlbumArtFactory : public VisFactory
+{
+  public:
+    const QString &name(void) const;
+    const QString &description(void) const;
+    VisualBase *create(MainVisual *parent, long int winid);
+};
+
 class Blank : public VisualBase
 {
     // This draws ... well ... nothing	
