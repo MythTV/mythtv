@@ -544,7 +544,10 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                     if (!query.exec(querystr))
                         break;
 
-                    chanid++;
+                    if (query.isActive() && query.numRowsAffected() > 0)
+                        chanid++;
+                    else
+                        break;
                 }
 
                 querystr.sprintf("INSERT INTO channel (chanid,name,callsign,"
