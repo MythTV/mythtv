@@ -40,19 +40,19 @@ title,subtitle,description,profile
 FROM singlerecord;
 
 INSERT INTO record
-(type,chanid,starttime,endtime,title,profile)
-SELECT 2, chanid, starttime, endtime, title, profile
+(type,chanid,starttime,endtime,title)
+SELECT 2, chanid, starttime, endtime, title
 FROM timeslotrecord;
 
 INSERT INTO record
-(type,chanid,title,profile)
-SELECT 3, chanid, title, profile
+(type,chanid,title)
+SELECT 3, chanid, title
 FROM allrecord
 WHERE chanid IS NOT NULL;
 
 INSERT INTO record
-(type,chanid,title,profile)
-SELECT 4, chanid, title, profile
+(type,chanid,title)
+SELECT 4, chanid, title
 FROM allrecord
 WHERE chanid IS NULL;
 
@@ -61,14 +61,7 @@ ALTER TABLE settings ADD COLUMN hostname VARCHAR(255) NULL;
 ALTER TABLE capturecard ADD COLUMN hostname VARCHAR(255);
 ALTER TABLE recorded ADD COLUMN hostname VARCHAR(255);
 
-ALTER TABLE allrecord ADD COLUMN profile INT UNSIGNED NOT NULL DEFAULT 0 REFERENCES recordingprofiles(id);
-ALTER TABLE singlerecord ADD COLUMN profile INT UNSIGNED NOT NULL DEFAULT 0 REFERENCES recordingprofiles(id);
-ALTER TABLE timeslotrecord ADD COLUMN profile INT UNSIGNED NOT NULL DEFAULT 0 REFERENCES recordingprofiles(id);
 ALTER TABLE videosource ADD COLUMN xmltvgrabber VARCHAR(128);
-
-UPDATE allrecord SET profile = 0;
-UPDATE singlerecord SET profile = 0;
-UPDATE timeslotrecord SET profile = 0;
 
 INSERT INTO recordingprofiles (name) VALUES ('Default');
 INSERT INTO recordingprofiles (name) VALUES ('Live TV');
