@@ -970,7 +970,7 @@ if (dbver == "1052")
         const QString updates[] = {
 "ALTER TABLE recorded ADD COLUMN stars FLOAT UNSIGNED NOT NULL DEFAULT 0;",
 "ALTER TABLE recorded ADD COLUMN previouslyshown TINYINT(1) DEFAULT 0;",
-"ALTER TABLE recorded ADD COLUMN originalairdate DATE;"
+"ALTER TABLE recorded ADD COLUMN originalairdate DATE;",
 "INSERT INTO settings VALUES ('HaveRepeats', '0', NULL);",
 ""
 };

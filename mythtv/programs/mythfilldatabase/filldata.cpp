@@ -3226,16 +3226,20 @@ int main(int argc, char *argv[])
        if (!quiet)
              cout << "Marking repeats...";
        
+        int newEpiWindow = gContext->GetNumSetting( "NewEpisodeWindow", 14);
         
-        query.exec( "UPDATE program SET previouslyshown = 1 "
+        query.exec( QString( "UPDATE program SET previouslyshown = 1 "
                     "WHERE previouslyshown = 0 "
                     "AND originalairdate is not null "
-                    "AND to_days(starttime) > to_days(originalairdate);");
+                    "AND (to_days(starttime) - to_days(originalairdate)) > %1;")
+                    .arg(newEpiWindow));
         
         if (!quiet)
             cout << "found " << query.numRowsAffected() << endl;
     }
-
+    
+    
+    
     query.exec( "SELECT count(previouslyshown) FROM program WHERE previouslyshown = 1;");
     if (query.isActive() && query.numRowsAffected() > 0)
     {
