@@ -110,6 +110,7 @@ class GuideGrid : public QDialog
 
     bool selectState;
     bool showInfo;
+    bool showIcon;
 
     int screenwidth, screenheight;
     float wmult, hmult;

@@ -37,6 +37,7 @@ GuideGrid::GuideGrid(MythContext *context, const QString &channel,
 
     usetheme = m_settings->GetNumSetting("ThemeQt");
     showtitle = m_settings->GetNumSetting("EPGShowTitle");
+    showIcon = m_settings->GetNumSetting("EPGShowChannelIcon");
 
     m_context->ThemeWidget(this, screenwidth, screenheight, wmult, hmult);
 
@@ -472,7 +473,7 @@ void GuideGrid::paintChannels(QPainter *p)
             break;
 
         ChannelInfo *chinfo = &(m_channelInfos[chanNumber]);
-        if (chinfo->iconpath != "none" && chinfo->iconpath != "")
+        if (chinfo->iconpath != "none" && chinfo->iconpath != "" && showIcon)
         {
             if (!chinfo->icon)
                 chinfo->LoadIcon(m_context);
@@ -489,7 +490,9 @@ void GuideGrid::paintChannels(QPainter *p)
         int width = lfm.width(chinfo->chanstr);
         int bheight = lfm.height();
        
-        int yoffset = (int)(43 * hmult); 
+        int yoffset = 0;
+        if (showIcon)
+            yoffset = (int)(43 * hmult); 
         tmp.drawText((cr.width() - width) / 2, 
                      ydifference * y + yoffset + bheight, chinfo->chanstr);
 

@@ -381,24 +381,25 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
 
     if (usingextradata && extradata.seektable_offset > 0 && !disablevideo)
     {
-        long long currentpos = ringBuffer->Seek(0, SEEK_CUR) - FRAMEHEADERSIZE;
+        long long currentpos = ringBuffer->Seek(0, SEEK_CUR);
+        struct rtframeheader seek_frameheader;
 
         ringBuffer->Seek(extradata.seektable_offset, SEEK_SET);
 
-        ringBuffer->Read(&frameheader, FRAMEHEADERSIZE);
+        ringBuffer->Read(&seek_frameheader, FRAMEHEADERSIZE);
     
-        if (frameheader.frametype != 'Q')
+        if (seek_frameheader.frametype != 'Q')
         {
             cerr << "Invalid seektable\n";
         }
         else
         {
-            if (frameheader.packetlength > 0)
+            if (seek_frameheader.packetlength > 0)
             {
-                char *seekbuf = new char[frameheader.packetlength];
-                ringBuffer->Read(seekbuf, frameheader.packetlength);
+                char *seekbuf = new char[seek_frameheader.packetlength];
+                ringBuffer->Read(seekbuf, seek_frameheader.packetlength);
 
-                int numentries = frameheader.packetlength / 
+                int numentries = seek_frameheader.packetlength / 
                                  sizeof(struct seektable_entry);
                 struct seektable_entry ste;
                 int offset = 0;
@@ -418,7 +419,6 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
         }
 
         ringBuffer->Seek(currentpos, SEEK_SET);
-        ringBuffer->Read(&frameheader, FRAMEHEADERSIZE);
     }
 
     while (frameheader.frametype != 'A' && frameheader.frametype != 'V' &&
