@@ -277,7 +277,7 @@ int RemoteFile::Read(void *data, int size, bool singlefile)
 
 bool RemoteFile::SaveAs(QByteArray &data, bool events)
 {
-    Start(true);
+    Start(events);
 
     if (filesize < 0)
         return false;
