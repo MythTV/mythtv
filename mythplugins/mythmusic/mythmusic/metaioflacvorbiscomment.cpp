@@ -20,7 +20,7 @@ MetaIOFLACVorbisComment::~MetaIOFLACVorbisComment(void)
 
 //==========================================================================
 /*!
- * \brief Writes metadata back to a file
+ * \irief Writes metadata back to a file
  *
  * \param mdata A pointer to a Metadata object
  * \param exclusive Flag to indicate if only the data in mdata should be
@@ -110,7 +110,7 @@ bool MetaIOFLACVorbisComment::write(Metadata* mdata, bool exclusive)
 
 //==========================================================================
 /*!
- * \brief Reads Metadata from a file.
+ * \rief Reads Metadata from a file.
  *
  * \param filename The filename to read metadata from.
  * \returns Metadata pointer or NULL on error
@@ -139,11 +139,7 @@ Metadata* MetaIOFLACVorbisComment::read(QString filename)
     FLAC__ASSERT(0 != block);
     FLAC__ASSERT(block->type == FLAC__METADATA_TYPE_STREAMINFO);
 
-    int samplerate = block->data.stream_info.sample_rate;
-    int totalsamples = block->data.stream_info.total_samples;
-    int bytesperms = (samplerate) / 1000;
-
-    length = totalsamples / bytesperms;
+    length = getTrackLength(block);
 
     do {
         block = FLAC__metadata_iterator_get_block(iterator);
@@ -179,8 +175,6 @@ Metadata* MetaIOFLACVorbisComment::read(QString filename)
     FLAC__metadata_chain_delete(chain);
     FLAC__metadata_iterator_delete(iterator);
 
-    length = getTrackLength(filename);
-
     Metadata *retdata = new Metadata(filename, artist, album, title, genre,
                                      year, tracknum, length);
 
@@ -197,10 +191,50 @@ Metadata* MetaIOFLACVorbisComment::read(QString filename)
  */
 int MetaIOFLACVorbisComment::getTrackLength(QString filename)
 {
-    filename=filename; // -Wall annoyance
-    return 0;
+    FLAC__Metadata_Chain *chain = FLAC__metadata_chain_new();
+    if (!FLAC__metadata_chain_read(chain, filename.local8Bit()) ||
+        !FLAC__metadata_chain_read(chain, filename.ascii()))
+    {
+        FLAC__metadata_chain_delete(chain); 
+        return 0;
+    }
+ 
+    FLAC__StreamMetadata *block = 0;
+    FLAC__Metadata_Iterator *iterator = FLAC__metadata_iterator_new();
+    
+    FLAC__metadata_iterator_init(iterator, chain);
+
+    block = FLAC__metadata_iterator_get_block(iterator);
+
+    FLAC__ASSERT(0 != block);
+    FLAC__ASSERT(block->type == FLAC__METADATA_TYPE_STREAMINFO);
+
+    int length = getTrackLength(block);
+
+    FLAC__metadata_chain_delete(chain);
+    FLAC__metadata_iterator_delete(iterator);
+
+    return length;
 }
 
+
+//==========================================================================
+/*!
+ * \brief Find the length of the track (in seconds)
+ *
+ * \note The FLAC StreamMetadata block must be asserted FLAC__METADATA_TYPE_STREAMINFO
+ *
+ * \param pBlock Pointer to a FLAC Metadata block 
+ * \returns An integer (signed!) to represent the length in seconds.
+ */
+inline int MetaIOFLACVorbisComment::getTrackLength(FLAC__StreamMetadata* pBlock)
+{
+    if (!pBlock)
+        return 0;
+
+    return pBlock->data.stream_info.total_samples / 
+          (pBlock->data.stream_info.sample_rate / 1000);
+}
 
 //==========================================================================
 /*!

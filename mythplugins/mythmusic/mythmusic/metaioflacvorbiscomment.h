@@ -4,8 +4,6 @@
 #include "metaio.h"
 
 #include <FLAC/all.h>
-// No need to include all the Flac stuff just for the abstract pointer....
-//class FLAC__StreamMetadata;
 
 class MetaIOFLACVorbisComment : public MetaIO
 {
@@ -18,6 +16,7 @@ public:
     
 private:
     int getTrackLength(QString filename);
+    int getTrackLength(FLAC__StreamMetadata* pBlock);
 
     QString getComment(FLAC__StreamMetadata* pBlock, const char* pLabel);
     void setComment(FLAC__StreamMetadata* pBlock, const char* pLabel,
