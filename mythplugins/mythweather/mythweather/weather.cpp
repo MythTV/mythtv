@@ -196,34 +196,75 @@ void Weather::keyPressEvent(QKeyEvent *e)
     if (!allowkeys)
         return;
 
-    switch (e->key())
+    bool handled = false;
+    QStringList actions;
+    gContext->GetMainWindow()->TranslateKeyPress("Weather", e, actions);
+
+    for (unsigned int i = 0; i < actions.size(); i++)
     {
-        case Key_Left: cursorLeft(); break;
-        case Key_Right: cursorRight(); break;
-        case Key_Up: upKey(); break;
-        case Key_Down: dnKey(); break;
-        case Key_PageUp: pgupKey(); break;
-        case Key_PageDown: pgdnKey(); break;
-
-        case Key_Space: case Key_Enter: case Key_Return: resetLocale(); break;
-
-        case Key_P: holdPage(); break;
-        case Key_M: convertFlip(); break;
-        case Key_I: setupPage(); break;
-
-        case Key_0: newLocaleX(0); break;
-        case Key_1: newLocaleX(1); break;
-        case Key_2: newLocaleX(2); break;
-        case Key_3: newLocaleX(3); break;
-        case Key_4: newLocaleX(4); break;
-        case Key_5: newLocaleX(5); break;
-        case Key_6: newLocaleX(6); break;
-        case Key_7: newLocaleX(7); break;
-        case Key_8: newLocaleX(8); break;
-        case Key_9: newLocaleX(9); break;
- 
-        default: MythDialog::keyPressEvent(e); break;
+        QString action = actions[i];
+        if (action == "LEFT")
+        {
+            handled = true;
+            cursorLeft();
+        }
+        else if (action == "RIGHT")
+        {
+            handled = true;
+            cursorRight();
+        }
+        else if (action == "UP")
+        {
+            handled = true;
+            upKey();
+        }
+        else if (action == "DOWN")
+        {
+            handled = true;
+            dnKey();
+        }
+        else if (action == "PAGEUP")
+        {
+            handled = true;
+            pgupKey();
+        }
+        else if (action == "PAGEDOWN")
+        {
+            handled = true;
+            pgdnKey();
+        }
+        else if (action == "SELECT")
+        {
+            handled = true;
+            resetLocale();
+        }
+        else if (action == "PAUSE")
+        {
+            handled = true;
+            holdPage();
+        }
+        else if (action == "MENU")
+        {
+            handled = true;
+            setupPage();
+        }
+        else if (action == "INFO")
+        {
+            handled = true;
+            convertFlip();
+        }
+        else if (action == "0" || action == "1" || action == "2" ||
+                 action == "3" || action == "4" || action == "5" ||
+                 action == "6" || action == "7" || action == "8" ||
+                 action == "9")
+        {
+            handled = true;
+            newLocaleX(action.toInt());
+        }
     }
+
+    if (!handled)
+        MythDialog::keyPressEvent(e);
 }
 
 void Weather::updateBackground(void)

@@ -28,29 +28,29 @@ int mythplugin_run(void);
 int mythplugin_config(void);
 }
 
+void runWeather(void);
+
+void setupKeys(void)
+{
+    REG_JUMP("MythWeather", "Weather forcasts", "", runWeather);
+
+    REG_KEY("Weather", "PAUSE", "Pause current page", "P");
+}
+
 int mythplugin_init(const char *libversion)
 {
     if (!gContext->TestPopupVersion("mythweather", libversion,
                                     MYTH_BINARY_VERSION))
         return -1;
 
+    setupKeys();
+
     return 0;
 }
 
-int mythplugin_run(void)
+void runWeather(void)
 {
     int appCode = 0;
-
-/*
-    if (argc > 1)
-    {
-       QString cmdline = QString(argv[1]);
-       if (cmdline == "--debug")
-           appCode = 1;
-       if (cmdline == "--configure")
-           appCode = 2;
-    }
-*/
 
     QTranslator translator(0);
     translator.load(PREFIX + QString("/share/mythtv/i18n/mythweather_") +
@@ -64,7 +64,11 @@ int mythplugin_run(void)
     weatherDat.exec();
 
     qApp->removeTranslator(&translator);
+}
 
+int mythplugin_run(void)
+{
+    runWeather();
     return 0;
 }
 
