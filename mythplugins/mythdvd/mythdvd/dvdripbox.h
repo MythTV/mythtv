@@ -85,6 +85,7 @@ class DVDRipBox : public MythThemedDialog
   
     void connectionError(int error_id);
     void connectionMade();
+    void connectionClosed();
     void readFromServer();
     void parseTokens(QStringList tokens);
     void sendToServer(const QString &some_text);

@@ -166,6 +166,19 @@ void DVDRipBox::createSocket()
     connect(client_socket, SIGNAL(error(int)), this, SLOT(connectionError(int)));
     connect(client_socket, SIGNAL(connected()), this, SLOT(connectionMade()));
     connect(client_socket, SIGNAL(readyRead()), this, SLOT(readFromServer()));
+    connect(client_socket, SIGNAL(connectionClosed()), this, SLOT(connectionClosed()));
+}
+
+void DVDRipBox::connectionClosed()
+{
+    setContext(0);
+    have_disc = false;
+    ripscreen_button->SetContext(-2);
+    QString warning = "Your connection to the Myth "
+                      "Transcoding Daemon has gone "
+                      "away. This is not a good thing.";
+    warning_text->SetText(warning);
+    update();
 }
 
 void DVDRipBox::connectToMtd(bool try_to_run_mtd)
