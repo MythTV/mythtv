@@ -1059,6 +1059,8 @@ void MythListBox::keyPressEvent(QKeyEvent* e)
                     key = Key_Prior;
                 else if (action == "PAGEDOWN")
                     key = Key_Next;
+                else
+                    key = Key_unknown;
 
                 QKeyEvent ev(QEvent::KeyPress, key, 0, Qt::NoButton);
                 QListBox::keyPressEvent(&ev);
