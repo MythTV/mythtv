@@ -424,6 +424,9 @@ void AudioOutputOSS::AddSamples(char *buffers[], int samples,
         {
             VERBOSE(VB_IMPORTANT, "Audio buffer overflow, audio data lost!");
             samples = afree / audio_bytes_per_sample;
+            pthread_mutex_unlock(&audio_buflock);
+            Reset();
+            return;
         }
     }
     
@@ -474,6 +477,9 @@ void AudioOutputOSS::AddSamples(char *buffer, int samples, long long timecode)
         {
             VERBOSE(VB_IMPORTANT, "Audio buffer overflow, audio data lost!");
             len = afree;
+            pthread_mutex_unlock(&audio_buflock);
+            Reset();
+            return;
         }
     }
 
