@@ -7,6 +7,7 @@
 
         Note: Portions of this code taken from MythMusic
 
+
 */
 
 
@@ -21,6 +22,7 @@
 #include <qlayout.h>
 
 #include "libmyth/mythwidgets.h"
+#include "guidegrid.h"
 #include "tv.h"
 
 class QLabel;
@@ -28,8 +30,7 @@ class QListView;
 class MythContext;
 class ProgramInfo;
 
-void RunProgramFind(MythContext *context, bool thread = false,
-                        TV *player = NULL);
+void RunProgramFind(MythContext *context, bool thread = false);
 
 class ProgFinder : public MythDialog
 {
@@ -63,9 +64,12 @@ struct recordingRecord {
 };
     Q_OBJECT
   public:
-    ProgFinder(MythContext *context, TV *player,
+    ProgFinder(MythContext *context,
 	    QWidget *parent = 0, const char *name = 0);
     ~ProgFinder();
+
+  protected:
+    void hideEvent(QHideEvent *e);
 
   signals:
     void killTheApp();
@@ -78,10 +82,12 @@ struct recordingRecord {
     void cursorDown();
     void cursorUp();
     void getInfo();
+    void showGuide();
     void pageUp();
     void pageDown();
 
   private:
+    int showProgramBar;
     int showsPerListing;
     int curSearch;
     int curProgram;
@@ -93,6 +99,7 @@ struct recordingRecord {
     int inSearch;
     bool showInfo;
     bool pastInitial;
+    bool running;
     int *gotInitData;
 
     QTimer *update_Timer;

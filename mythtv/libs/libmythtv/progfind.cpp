@@ -20,6 +20,7 @@
 #include <qheader.h>
 #include <qpixmap.h>
 #include <unistd.h>
+#include <time.h>
 
 #include "progfind.h"
 #include "infodialog.h"
@@ -33,13 +34,12 @@ using namespace std;
 #include "libmyth/mythcontext.h"
 
 
-void RunProgramFind(MythContext *context, bool thread,
-                        TV *player)
+void RunProgramFind(MythContext *context, bool thread)
 {
     if (thread)
         qApp->lock();
 
-    ProgFinder programFind(context, player);
+    ProgFinder programFind(context);
 
     if (thread)
     {
@@ -56,17 +56,18 @@ void RunProgramFind(MythContext *context, bool thread,
 }
 
 
-ProgFinder::ProgFinder(MythContext *context, TV *player,
+ProgFinder::ProgFinder(MythContext *context, 
                          QWidget *parent, const char *name)
            : MythDialog(context, parent, name)
 {
+    running = true;
     m_context = context;
-    m_player = player;
     m_db = QSqlDatabase::database();
 
-    context->KickDatabase(m_db);
-
     baseDir = context->GetInstallPrefix();
+
+    // The 'Current Listings' and 'Future Programs' bar at the bottom of the screen.
+    showProgramBar = m_context->GetNumSetting("EPGProgramBar", 1);
 
     accel = new QAccel(this);
     accel->connectItem(accel->insertItem(Key_Left), this, SLOT(cursorLeft()));
@@ -79,6 +80,7 @@ ProgFinder::ProgFinder(MythContext *context, TV *player,
     accel->connectItem(accel->insertItem(Key_PageUp), this, SLOT(pageUp()));
     accel->connectItem(accel->insertItem(Key_PageDown), this, SLOT(pageDown()));
     accel->connectItem(accel->insertItem(Key_I), this, SLOT(getInfo()));
+    accel->connectItem(accel->insertItem(Key_4), this, SLOT(showGuide()));
     accel->connectItem(accel->insertItem(Key_Escape), this, SLOT(escape()));
     connect(this, SIGNAL(killTheApp()), this, SLOT(accept()));
 
@@ -90,8 +92,10 @@ ProgFinder::ProgFinder(MythContext *context, TV *player,
     progData = new QString[1];
     listCount = 1;
     showsPerListing = m_context->GetNumSetting("showsPerListing");;
-    if (showsPerListing == 0 || (showsPerListing % 2) == 0)
-	showsPerListing = 9;
+    if (showsPerListing % 2 == 0)
+	showsPerListing = showsPerListing + 1;
+    if (showsPerListing < 1)
+	showsPerListing = 7;
 
     inSearch = 0;
     pastInitial = false;
@@ -131,21 +135,22 @@ ProgFinder::ProgFinder(MythContext *context, TV *player,
 
     update_Timer->start((int)(100));
 
-    WFlags flags = getWFlags();
-    flags |= WRepaintNoErase;
-    setWFlags(flags);
+//    WFlags flags = getWFlags();
+//    flags |= WRepaintNoErase;
+//    setWFlags(flags);
 
     showInfo = false;
 
     showFullScreen();
     setActiveWindow();
-    raise();
-    setFocus();
+//    raise();
+//    setFocus();
 
 }
 
 ProgFinder::~ProgFinder()
 {
+
     if (inSearch > 0)
         delete [] progData;
     if (inSearch == 2)
@@ -172,14 +177,31 @@ ProgFinder::~ProgFinder()
     delete main;
 
     delete accel;
+
 }
 
 void ProgFinder::escape()
 {
+    running = false;
+    hide();
+
     unsetCursor();
     emit killTheApp();
 }
 
+void ProgFinder::hideEvent(QHideEvent *e)
+{
+    QDialog::hideEvent(e);
+}
+
+void ProgFinder::showGuide()
+{
+    running = false;
+    hide();
+
+    unsetCursor();
+    emit killTheApp();
+}
 
 void ProgFinder::getInfo()
 {
@@ -319,7 +341,7 @@ void ProgFinder::setupLayout()
 {
 	 QFont callFont("Arial", (int)(24 * hmult), QFont::Bold);
 
-	QFont titleFont("Arial", (int)(22 * hmult), QFont::Bold);
+	QFont titleFont("Arial", (int)(20 * hmult), QFont::Bold);
 	QFontMetrics titleMetric(titleFont);
 
 	QFont subtFont("Arial", (int)(20 * hmult), QFont::Bold);
@@ -335,13 +357,62 @@ void ProgFinder::setupLayout()
 	QFrame *topDataFrame = new QFrame(this);
 	programFrame->setBackgroundOrigin(WindowOrigin);
 
-	main = new QVBoxLayout(this, (int)(30 * hmult), (int)(15 * hmult));
+        QVBoxLayout *superLayout = new QVBoxLayout(this, 0, 0);
+
+	main = new QVBoxLayout(0, (int)(30 * hmult), (int)(10 * hmult));
+	superLayout->addLayout(main, 0);
+        
 	topDataLayout = new QHBoxLayout(topDataFrame, 0, 0);
 	topDataFrame->setPaletteBackgroundColor(prog_bgColor);
 
 	topDataFrame->setMaximumWidth((int)(735*wmult));
   	topDataFrame->setMinimumWidth((int)(735*wmult));
 	topDataFrame->setFrameStyle( QFrame::Panel | QFrame::Raised );
+
+	if (showProgramBar == 1)
+	{
+
+   		QLabel *leftFiller = new QLabel("   ", this);
+    		QLabel *currentButton = new QLabel("   (4) Current Programs   ", this);
+    		QLabel *futureButton = new QLabel("   (6) Program Finder   ", this);
+    		QLabel *rightFiller = new QLabel("   ", this);
+
+    		leftFiller->setMaximumWidth((int)(800*wmult));
+    		leftFiller->setMaximumHeight((int)(1.5*25*hmult));
+    		leftFiller->setMinimumHeight((int)(1.5*25*hmult));
+    		leftFiller->setPaletteForegroundColor(abc_fgColor);
+    		leftFiller->setPaletteBackgroundColor(abc_bgColor);
+    		leftFiller->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+
+    		currentButton->setMaximumWidth((int)(800*wmult));
+    		currentButton->setMaximumHeight((int)(1.5*25*hmult));
+    		currentButton->setMinimumHeight((int)(1.5*25*hmult));
+    		currentButton->setPaletteForegroundColor(abc_fgColor);
+    		currentButton->setPaletteBackgroundColor(abc_bgColor);
+    		currentButton->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+
+    		futureButton->setMaximumWidth((int)(800*wmult));
+    		futureButton->setMaximumHeight((int)(1.5*25*hmult));
+    		futureButton->setMinimumHeight((int)(1.5*25*hmult));
+    		futureButton->setPaletteForegroundColor(time_fgColor);
+    		futureButton->setPaletteBackgroundColor(time_bgColor);
+    		futureButton->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+
+    		rightFiller->setMaximumWidth((int)(800*wmult));
+    		rightFiller->setMaximumHeight((int)(1.5*25*hmult));
+    		rightFiller->setMinimumHeight((int)(1.5*25*hmult));
+    		rightFiller->setPaletteForegroundColor(abc_fgColor);
+    		rightFiller->setPaletteBackgroundColor(abc_bgColor);
+    		rightFiller->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+
+    		QHBoxLayout *bottomInfo = new QHBoxLayout(0, 0, 0);
+    		bottomInfo->addWidget(leftFiller, 0, 0);
+    		bottomInfo->addWidget(currentButton, 0, 0);
+    		bottomInfo->addWidget(futureButton, 0, 0);
+    		bottomInfo->addWidget(rightFiller, 0, 0);
+
+ 		superLayout->addLayout(bottomInfo, 0);
+	}
 
 	main->addWidget(topDataFrame, 0, 0);
 	main->addWidget(programFrame, 0, 0);
@@ -367,7 +438,7 @@ void ProgFinder::setupLayout()
     	description = new QLabel("Pick the letter in which the show starts with, then hit ENTER or the right arrow.", topDataFrame);
 	description->setFont(descFont);
 	description->setMaximumWidth((int)(500*wmult));
-	description->setMaximumHeight((int)(140*hmult));
+	description->setMaximumHeight((int)(130*hmult));
 	description->setAlignment(Qt::WordBreak);
 	description->setPaletteForegroundColor(prog_fgColor);
 	description->setPaletteBackgroundColor(prog_bgColor);
@@ -411,7 +482,11 @@ void ProgFinder::setupLayout()
 	programListLayout->addLayout(abcVert, 0);
 	programListLayout->addLayout(progVert, 0);
 	programListLayout->addLayout(showVert, 0);
-	programListLayout->addStrut((int)(310*hmult));
+	
+	if (showProgramBar == 1)
+		programListLayout->addStrut((int)(278*hmult));
+	else
+		programListLayout->addStrut((int)(310*hmult));
 
 	QLabel *BlankLbl = new QLabel(" ", programFrame);
 	QLabel *ProgramTitleLbl = new QLabel("Program Title", programFrame);
@@ -884,6 +959,9 @@ void ProgFinder::showShowingList()
 
 void ProgFinder::selectSearchData()
 {
+    if (running == false)
+	return;
+
     accel->setEnabled(false);
     QDateTime progStart = QDateTime::currentDateTime();
     QString thequery;
@@ -931,14 +1009,14 @@ void ProgFinder::selectSearchData()
                progData[i] = "**!0";
     }
     else
-    {
     	progData = new QString[(int)query.numRowsAffected()];
-    }
 
     if (query.isActive() && query.numRowsAffected() > 0)
     {
         while (query.next())
         {
+		if (running == false)
+			return;
 		data = QString::fromUtf8(query.value(0).toString());
 
 		progData[listCount] = data;
@@ -1052,6 +1130,8 @@ int ProgFinder::checkRecordingStatus(int showNum)
 
 void ProgFinder::getRecordingInfo()
 {
+    if (running == false)
+	return;
     QDateTime recDateTime;
     QString thequery;
     QString data;
@@ -1104,6 +1184,8 @@ void ProgFinder::getRecordingInfo()
 
 void ProgFinder::selectShowData(QString progTitle)
 {
+    if (running == false)
+	return;
     accel->setEnabled(false);
     QDateTime progStart = QDateTime::currentDateTime();
     QDateTime progEnd;
@@ -1238,6 +1320,8 @@ void ProgFinder::getInitialProgramData()
 
 void ProgFinder::getSearchData(int charNum)
 {
+    if (running == false)
+	return;
     int cnts = 0;
     int dataNum = 0;
     int startPlace = 0;

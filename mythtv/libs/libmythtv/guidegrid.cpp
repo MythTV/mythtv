@@ -29,23 +29,34 @@ using namespace std;
 QString RunProgramGuide(MythContext *context, QString startchannel, bool thread,
                         TV *player)
 {
-    if (thread)
-        qApp->lock();
+   QString chanstr;
+   {
+        if (thread)
+                qApp->lock();
 
-    GuideGrid gg(context, startchannel, player);
+	if (startchannel == QString::null)
+		startchannel = "";
 
-    if (thread)
-    {
-        gg.show();
-        qApp->unlock();
+        GuideGrid gg(context, startchannel, player);
 
-        while (gg.isVisible())
-            usleep(50);
+        if (thread)
+        {
+                gg.show();
+               qApp->unlock();
+
+               while (gg.isVisible())
+                    usleep(50);
+        }
+        else
+               gg.exec();
+
+        chanstr = gg.getLastChannel();
+        if (thread)
+                qApp->lock();
     }
-    else
-        gg.exec();
 
-    QString chanstr = gg.getLastChannel();
+    if (thread)
+        qApp->unlock();
     if (chanstr == QString::null)
         chanstr = "";
 
@@ -82,6 +93,9 @@ GuideGrid::GuideGrid(MythContext *context, const QString &channel, TV *player,
 
     bgcolor = paletteBackgroundColor();
     fgcolor = paletteForegroundColor();
+
+    // The 'Current Listings' and 'Future Programs' bar at the bottom of the screen.
+    showProgramBar = m_context->GetNumSetting("EPGProgramBar", 1);
 
     programGuideType = m_context->GetNumSetting("EPGType");
     if (programGuideType == 1)
@@ -173,6 +187,24 @@ GuideGrid::GuideGrid(MythContext *context, const QString &channel, TV *player,
 
     if (programGuideType == 1)
         createProgramLabel(titlefontsize, progfontsize);
+    else
+    {
+	if (showProgramBar == 1)
+	{
+		setupColorScheme();
+		QBoxLayout *mainHold = new QVBoxLayout( this );
+    		mainHold->setResizeMode(QLayout::Minimum);
+    		mainHold->addStrut((int)(800*wmult));
+
+    		QHBoxLayout *holdA = new QHBoxLayout(0, 0, 0);
+
+		holdA->addStrut( (int)((int)(600*hmult) - (int)(1.5*25*hmult)) );
+
+    		mainHold->addLayout(holdA, 0);
+
+		createProgramBar(mainHold);
+	}
+    }
 
     QAccel *accel = new QAccel(this);
     accel->connectItem(accel->insertItem(Key_Left), this, SLOT(cursorLeft()));
@@ -200,6 +232,7 @@ GuideGrid::GuideGrid(MythContext *context, const QString &channel, TV *player,
 
     accel->connectItem(accel->insertItem(Key_7), this, SLOT(dayLeft()));
     accel->connectItem(accel->insertItem(Key_1), this, SLOT(dayRight()));
+    accel->connectItem(accel->insertItem(Key_6), this, SLOT(showProgFinder()));
     accel->connectItem(accel->insertItem(Key_9), this, SLOT(pageUp()));
     accel->connectItem(accel->insertItem(Key_3), this, SLOT(pageDown()));
 
@@ -222,6 +255,15 @@ GuideGrid::GuideGrid(MythContext *context, const QString &channel, TV *player,
         timeCheck = new QTimer(this);
         connect(timeCheck, SIGNAL(timeout()), SLOT(timeout()) );
         timeCheck->start(1000);
+    }
+
+    if (programGuideType == 0 && showProgramBar == 1)
+    {
+	// One second timer for clock
+        timeCheck = new QTimer(this);
+        connect(timeCheck, SIGNAL(timeout()), SLOT(timeout()) );
+        timeCheck->start(1000);
+
     }
 
     selectState = false;
@@ -352,6 +394,69 @@ void GuideGrid::setupColorScheme()
     progArrow_Type = themed->GetNumSetting("progArrow_Type");
 }
 
+void GuideGrid::createProgramBar(QBoxLayout *holdingTank)
+{
+	QLabel *leftFiller;
+        QLabel *currentButton = new QLabel("   (4) Current Programs   ", this);
+        QLabel *futureButton = new QLabel("   (6) Program Finder   ", this);
+        QLabel *rightFiller = new QLabel("   ", this);
+
+	QTime new_time = QTime::currentTime();
+    	QString curTime = new_time.toString("h:mm:ss ap");
+
+	if (programGuideType ==0 && showProgramBar == 1)
+	{
+ 		currentTime = new QLabel("  " + curTime, this);
+    		currentTime->setMaximumHeight((int)(1.5*25*hmult));
+		currentTime->setMinimumHeight((int)(1.5*25*hmult));
+    		currentTime->setMaximumWidth((int)(800*wmult));
+    		currentTime->setPaletteBackgroundColor(chan_bgColor);
+    		currentTime->setPaletteForegroundColor(chan_fgColor);
+		currentTime->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+	}
+	else
+	{
+		leftFiller = new QLabel("   ", this);
+		leftFiller->setMaximumWidth((int)(800*wmult));
+        	leftFiller->setMaximumHeight((int)(1.5*25*hmult));
+        	leftFiller->setMinimumHeight((int)(1.5*25*hmult));
+        	leftFiller->setPaletteForegroundColor(chan_fgColor);
+        	leftFiller->setPaletteBackgroundColor(chan_bgColor);
+        	leftFiller->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+	}
+
+        currentButton->setMaximumWidth((int)(800*wmult));
+        currentButton->setMaximumHeight((int)(1.5*25*hmult));
+        currentButton->setMinimumHeight((int)(1.5*25*hmult));
+        currentButton->setPaletteForegroundColor(time_fgColor);
+        currentButton->setPaletteBackgroundColor(time_bgColor);
+        currentButton->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+
+        futureButton->setMaximumWidth((int)(800*wmult));
+        futureButton->setMaximumHeight((int)(1.5*25*hmult));
+        futureButton->setMinimumHeight((int)(1.5*25*hmult));
+        futureButton->setPaletteForegroundColor(chan_fgColor);
+        futureButton->setPaletteBackgroundColor(chan_bgColor);
+        futureButton->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+
+        rightFiller->setMaximumWidth((int)(800*wmult));
+        rightFiller->setMaximumHeight((int)(1.5*25*hmult));
+        rightFiller->setMinimumHeight((int)(1.5*25*hmult));
+        rightFiller->setPaletteForegroundColor(chan_fgColor);
+        rightFiller->setPaletteBackgroundColor(chan_bgColor);
+        rightFiller->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+
+        QHBoxLayout *bottomInfo = new QHBoxLayout(0, 0, 0);
+	if (programGuideType ==0 && showProgramBar == 1)
+        	bottomInfo->addWidget(currentTime, 0, 0);
+	else
+		bottomInfo->addWidget(leftFiller, 0, 0);
+        bottomInfo->addWidget(currentButton, 0, 0);
+        bottomInfo->addWidget(futureButton, 0, 0);
+        bottomInfo->addWidget(rightFiller, 0, 0);
+        holdingTank->addLayout(bottomInfo, 0);
+}
+
 void GuideGrid::createProgramLabel(int titlefontsize, int progfontsize)
 {
     QBoxLayout *mainHold = new QVBoxLayout( this );
@@ -362,8 +467,16 @@ void GuideGrid::createProgramLabel(int titlefontsize, int progfontsize)
     QHBoxLayout *holdB = new QHBoxLayout(0, 0, 0);
 
     holdA->addStrut((int)(300*hmult));
+
     mainHold->addLayout(holdA, 0);
     mainHold->addLayout(holdB, 0);
+
+    if (showProgramBar == 1)
+    {
+    	holdB->addStrut( (int)((int)(300*hmult) - (int)(1.5*25*hmult)) );
+
+	createProgramBar(mainHold);
+    }
 
     QVBoxLayout *holdC = new QVBoxLayout(0, (int)(10 * wmult), -1);
     QVBoxLayout *holdD = new QVBoxLayout(0, 0, 0);
@@ -410,8 +523,11 @@ void GuideGrid::createProgramLabel(int titlefontsize, int progfontsize)
     holdD->addWidget(forvideo, 0, 0);
     holdD->addLayout(curInfo, 0);
     holdD->addWidget(filler, 0, 0);
+ 
+    QTime new_time = QTime::currentTime();
+    QString curTime = new_time.toString("h:mm:ss ap");
 
-    currentTime = new QLabel("", this);
+    currentTime = new QLabel("  " + curTime, this);
     currentTime->setMaximumHeight((int)(30*hmult));
     currentTime->setMinimumWidth((int)(180*wmult));
     // CURRENT TIME AND CHANNEL BACKGROUND COLOR
@@ -513,11 +629,18 @@ void GuideGrid::timeout()
 {
     QTime new_time = QTime::currentTime();
     QString curTime = new_time.toString("h:mm:ss ap");
-    currentTime->setText("  " + curTime);
+
+    if (currentTime != NULL)
+    	currentTime->setText("  " + curTime);
+
+    if (programGuideType == 1)
+    {
 
     if (m_player)
         m_player->EmbedOutput(forvideo->winId(), 0, 0, 
                               forvideo->width(), forvideo->height());
+
+    }
 }
 
 void GuideGrid::fillChannelInfos(int &maxchannel)
@@ -1725,14 +1848,28 @@ QRect GuideGrid::programRect() const
 
         unsigned int programheight = (int)((600 - min_dateheight - 
                                            titleheight) * wmult);
-        programheight = DISPLAY_CHANS * (int)(programheight / DISPLAY_CHANS);
+
+	if (showProgramBar == 0)
+        	programheight = DISPLAY_CHANS * (int)(programheight / DISPLAY_CHANS);
+	else
+		programheight = (DISPLAY_CHANS * (int)(programheight / DISPLAY_CHANS)) - 
+				(int)(25 * 1.5);
 
         unsigned int programwidth = (int)((800 - min_datewidth) * hmult);
         programwidth = DISPLAY_TIMES * (int)(programwidth / DISPLAY_TIMES);
 
-        r = QRect((int)(800 * wmult) - programwidth, 
-                  (int)(600 * hmult) - programheight - titleheight,
-                  programwidth, programheight);
+	if (showProgramBar == 0)
+	{
+        	r = QRect((int)(800 * wmult) - programwidth, 
+                    (int)(600 * hmult) - programheight - titleheight,
+                    programwidth, programheight);
+	}
+	else
+	{
+		r = QRect((int)(800 * wmult) - programwidth,
+                    (int)(600 * hmult) - programheight - titleheight - (int)(hmult*1.5*25),
+                    programwidth, programheight);
+	}
     }
     else
     {
@@ -1740,17 +1877,34 @@ QRect GuideGrid::programRect() const
         unsigned int min_dateheight = 25;  // also min_timeheight
         unsigned int min_datewidth = 100;   // also min_chanwidth
 
-        unsigned int programheight = (int)((300 - min_dateheight + 1) *
-                                           wmult);
+        unsigned int programheight;
+
+	if (showProgramBar == 1)
+        {
+		programheight = (int)((300*hmult - (min_dateheight * 2.5) + 1) * hmult);
+	}
+	else
+	{
+		programheight = (int)((int)(300*hmult) - (int)(min_dateheight*hmult));;;
+	}
 
         programheight = DISPLAY_CHANS * (int)(programheight / DISPLAY_CHANS);
 
         unsigned int programwidth = (int)((800 - min_datewidth) * hmult);
         programwidth = DISPLAY_TIMES * (int)(programwidth / DISPLAY_TIMES);
 
-        r = QRect((int)(800 * wmult) - programwidth,
+        if (showProgramBar == 1)
+	{
+             r = QRect((int)(800 * wmult) - programwidth,
+                  (int)(600 * hmult) - programheight - (int)(hmult*1.5*min_dateheight),
+                  programwidth, programheight);
+	}
+	else
+	{
+	     r = QRect((int)(800 * wmult) - programwidth,
                   (int)(600 * hmult) - programheight,
                   programwidth, programheight);
+	}
     }
 
     return r;
@@ -1764,8 +1918,17 @@ QRect GuideGrid::infoRect() const
 
 QRect GuideGrid::titleRect() const
 {
-    QRect r(0, programRect().bottom() + 1, fullRect().width(), 
-            fullRect().height() - programRect().bottom());
+    QRect r;
+    if (showProgramBar == 0)
+    {
+    	r = QRect(0, programRect().bottom() + 1, fullRect().width(), 
+                  fullRect().height() - programRect().bottom());
+    }
+    else
+    {
+        r = QRect(0, programRect().bottom() + 1, fullRect().width(),
+                  fullRect().height() - (int)(25*1.5*hmult) - programRect().bottom());
+    }
     return r;
 }
 
@@ -2069,6 +2232,31 @@ void GuideGrid::pageUp()
         update(titleRect());
     if (programGuideType == 1)
         update(infoRect());
+}
+ 
+void GuideGrid::showProgFinder()
+{
+    showInfo = 1;
+
+/*
+    ProgFinder pFind(m_context, this, "ProgramFinder");
+    pFind.setCaption("BLAH!!!");
+    pFind.exec();
+*/
+    RunProgramFind(m_context);
+
+    showInfo = 0;
+
+    setActiveWindow();
+    setFocus();
+
+    if (programGuideType == 1)
+    {
+    	if (m_player)
+        	m_player->EmbedOutput(forvideo->winId(), 0, 0,
+                              forvideo->width(), forvideo->height());
+    }
+
 }
 
 void GuideGrid::enter()

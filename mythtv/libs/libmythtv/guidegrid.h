@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "libmyth/mythwidgets.h"
+#include "progfind.h"
 
 using namespace std;
 
@@ -65,6 +66,7 @@ class GuideGrid : public MythDialog
     void enter();
     void escape();
 
+    void showProgFinder();
     void channelUpdate();
 
     void quickRecord();
@@ -105,6 +107,7 @@ class GuideGrid : public MythDialog
     void updateTopInfo();
     void createProgramLabel(int, int);
     void setupColorScheme();
+    void createProgramBar(QBoxLayout *);
 
     QString getDateLabel(ProgramInfo *pginfo);
 
@@ -136,6 +139,7 @@ class GuideGrid : public MythDialog
     
     int m_currentRow;
     int m_currentCol;
+    int showProgramBar;
 
     bool selectState;
     bool showInfo;
