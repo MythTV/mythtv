@@ -1,11 +1,11 @@
                                    MythVideo
-                                  Version 0.9
+                                  Version 0.10
 
 BUILD/CONFIGURATION INSTRUCTIONS
 --------------------------------
 
 Requirements:
-	MythTV 0.9 installed and working
+	MythTV 0.10 installed and working
 
 If you have met the requirements above, simply type 'make' in the main directory
 to begin compiling.
@@ -20,7 +20,7 @@ Compiling note:  If you get an error on building this, that says something
 
 Once the make is completed, you should switch to root and do a 'make install'.  
 
-- mythvideo will go into /usr/local/bin
+- libmythvideo.so will go into /usr/local/lib/mythtv/plugins/
 
 
 
