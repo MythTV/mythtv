@@ -11,6 +11,7 @@
 
 // Convert a RecordingType to a simple integer so it's specificity can
 // be compared to another.  Lower number means more specific.
+// NOTE: This _MUST_ match the order in the SRRecordingType class.
 int RecTypePriority(RecordingType rectype)
 {
     switch (rectype) {
@@ -50,6 +51,7 @@ protected:
     const ScheduledRecording& parent;
 };
 
+// NOTE: if this changes, you _MUST_ update the RecTypePriority function above.
 class SRRecordingType: public ComboBoxSetting, public SRSetting {
 public:
     SRRecordingType(const ScheduledRecording& parent):
@@ -409,7 +411,7 @@ RecordingType ScheduledRecording::getRecordingType(void) const {
 }
 
 void ScheduledRecording::setRecordingType(RecordingType newType) {
-    type->setValue((int)newType);
+    type->setValue(RecTypePriority(newType));
 }
 
 bool ScheduledRecording::GetAutoExpire(void) const {
