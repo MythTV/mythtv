@@ -61,6 +61,7 @@ class MythContext : public QObject
 
     int OpenDatabase(QSqlDatabase *db);
     static void KickDatabase(QSqlDatabase *db);
+    static void DBError(QString where, const QSqlQuery& query);
 
     Settings *settings() { return m_settings; }
     Settings *qtconfig() { return m_qtThemeSettings; }

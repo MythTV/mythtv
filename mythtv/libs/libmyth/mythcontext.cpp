@@ -255,6 +255,16 @@ void MythContext::KickDatabase(QSqlDatabase *db)
     }
 }
 
+void MythContext::DBError(QString where, const QSqlQuery& query) {
+    cerr << "DB Error (" << where << "):\n"
+         << "was:" << endl
+         << query.lastQuery() << endl
+         << "Driver error was:" << endl
+         << query.lastError().driverText() << endl
+         << "Database error was:" << endl
+         << query.lastError().databaseText() << endl;
+}
+
 QString MythContext::GetSetting(const QString &key, const QString &defaultval) 
 {
     bool found = false;
