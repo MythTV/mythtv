@@ -442,6 +442,17 @@ int MythContext::OpenDatabase(QSqlDatabase *db)
 
 void MythContext::KickDatabase(QSqlDatabase *db)
 {
+    // Some explanation is called for.  This exists because the mysql
+    // driver does not gracefully handle the situation where a TCP
+    // socketconnection is dropped (for example due to a timeout).  If
+    // a Unix domain socket connection is lost, the driver
+    // transparently reestablishes the connection and we don't even
+    // notice.  However, when this happens with a TCP connection, the
+    // driver returns an error for the next query to be executed, and
+    // THEN reestablishes the connection (so the second query succeeds
+    // with no intervention).
+    // mdz, 2003/08/11
+
     QString query("SELECT NULL;");
     for(unsigned int i = 0 ; i < 2 ; ++i, usleep(50000)) {
         QSqlQuery result = db->exec(query);
