@@ -151,7 +151,7 @@
       <area>300,90,480,300</area>
 
          <textarea name="help" draworder="0">
-          <area>50,50,400,70</area>
+          <area>0,50,480,70</area>
           <font>title</font>
           <multiline>yes</multiline>
          </textarea>
