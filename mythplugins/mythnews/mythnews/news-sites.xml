@@ -73,8 +73,8 @@
 
 <item>
 <title>Linux Weekly News</title>
-<url>http://www.lwn.net/headlines/rss</url>
-<ico>http://www.lwn.net/favicon.ico"</ico>
+<url>http://lwn.net/headlines/rss</url>
+<ico>http://lwn.net/favicon.ico"</ico>
 </item>
 
 <item>
@@ -91,8 +91,8 @@
 
 <item> 
 <title>Kuro5hin</title>
-<url>http://kuro5hin.org/backend.rdf</url>
-<ico>http://kuro5hin.org/favicon.ico</ico>
+<url>http://www.kuro5hin.org/backend.rdf</url>
+<ico>http://www.kuro5hin.org/favicon.ico</ico>
 </item>
 
 <item> 
@@ -120,12 +120,6 @@
 </item>
 
 <item> 
-<title>BSD Today</title>
-<url>http://bsdtoday.com/backend/bt.rdf</url>
-<ico></ico>
-</item>
-
-<item> 
 <title>Daemon News</title>
 <url>http://daily.daemonnews.org/ddn.rdf.php3</url>
 <ico></ico>
@@ -150,15 +144,15 @@
 </item>
 
 <item> 
-<title>SecurityFocus</title>
-<url>http://www.securityfocus.com/topnews-rdf.html</url>
+<title>SecurityFocus News</title>
+<url>http://www.securityfocus.com/rss/news.xml</url>
 <ico>http://www.securityfocus.com/favicon.ico</ico>
 </item>
 
 <item> 
-<title>LinuxNewbie</title>
-<url>http://www.linuxnewbie.org/news.cdf</url>
-<ico>http://www.linuxnewbie.org/favicon.ico</ico>
+<title>SecurityFocus Bugtraq</title>
+<url>http://www.securityfocus.com/rss/vulnerabilities.xml</url>
+<ico>http://www.securityfocus.com/favicon.ico</ico>
 </item>
 
 <item> 
@@ -169,7 +163,7 @@
 
 <item> 
 <title>FreshPorts - the place for ports</title>
-<url>http://www.freshports.org/news.php3</url>
+<url>http://www.freshports.org/news.php</url>
 <ico>http://www.freshports.org/favicon.ico</ico>
 </item>
 
@@ -179,7 +173,7 @@
 
 <item> 
 <title>HotWired</title>
-<url>http://www.hotwired.com/webmonkey/meta/headlines.rdf</url>
+<url>http://hotwired.lycos.com/webmonkey/meta/headlines.rdf</url>
 <ico>http://www.hotwired.com/favicon.ico</ico>
 </item> 
 
@@ -198,15 +192,21 @@
 <category name="News">
 
 <item>
-<title>CNN</title>
-<url>http://www.cnn.com/cnn.rss</url>
+<title>CNN (World Edition)</title>
+<url>http://csociety.purdue.org/~jacoby/XML/CNN_WORLD.xml</url>
 <ico>http://www.cnn.com/favicon.ico</ico>
 </item>
 
 <item>
-<title>CNN Europe</title>
-<url>http://europe.cnn.com/cnn.rss</url>
-<ico>http://europe.cnn.com/favicon.ico</ico>
+<title>CNN (US Edition)</title>
+<url>http://csociety.purdue.org/~jacoby/XML/CNN_US.xml</url>
+<ico>http://www.cnn.com/favicon.ico</ico>
+</item>
+
+<item>
+<title>BBC (World Edition)</title>
+<url>http://news.bbc.co.uk/rss/newsonline_world_edition/front_page/rss091.xml</url>
+<ico></ico>
 </item>
 
 </category>
