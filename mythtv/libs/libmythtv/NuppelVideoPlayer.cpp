@@ -632,7 +632,9 @@ VideoFrame *NuppelVideoPlayer::GetCurrentFrame(int &w, int &h)
     w = video_width;
     h = video_height;
 
-    return videoOutput->GetLastShownFrame();
+    if (videoOutput)
+        return videoOutput->GetLastShownFrame();
+    return NULL;
 }
 
 void NuppelVideoPlayer::EmbedInWidget(unsigned long wid, int x, int y, int w, 
@@ -655,9 +657,7 @@ void NuppelVideoPlayer::EmbedInWidget(unsigned long wid, int x, int y, int w,
 void NuppelVideoPlayer::StopEmbedding(void)
 {
     if (videoOutput)
-    {
         videoOutput->StopEmbedding();
-    }
 }
 
 void NuppelVideoPlayer::ToggleCC(void)
