@@ -109,7 +109,7 @@ void VideoInputSelector::probeInputs(const QString& videoDevice, QString cardID)
     }
 
     InputName* name = new InputName(parent);
-    addTrigger(cardID, name);
+    addTarget(cardID, name);
 
     struct video_capability vidcap;
     memset(&vidcap, 0, sizeof(vidcap));
