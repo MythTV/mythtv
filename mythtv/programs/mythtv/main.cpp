@@ -14,6 +14,8 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     MythContext *context = new MythContext();
+    context->ConnectServer("localhost", 6543);
+
     QString themename = context->GetSetting("Theme");
     QString themedir = context->FindThemeDir(themename);
     if (themedir == "")
@@ -41,10 +43,13 @@ int main(int argc, char *argv[])
 
     tv->LiveTV();
 
-    while (tv->GetState() == kState_None)
-        usleep(1000);
-
     qApp->unlock();
+    while (tv->GetState() == kState_None)
+    {
+        usleep(1000);
+        qApp->processEvents();
+    }
+
     while (tv->GetState() != kState_None)
     {
         usleep(1000);

@@ -33,6 +33,7 @@ TVRec::TVRec(MythContext *lcontext, const QString &startchannel,
     nvr = NULL;
     readthreadSock = NULL;
     readrequest = 0;
+    readthreadlive = false;
 
     ConnectDB(capturecardnum);
 
@@ -427,6 +428,9 @@ void TVRec::TeardownRecorder(bool killFile)
 
     if (rbuffer)
     {
+        if (readthreadlive)
+            KillReadThread();
+
         delete rbuffer;
         rbuffer = NULL;
     }
@@ -912,12 +916,18 @@ void TVRec::SpawnLiveTV(void)
 {
     nextState = kState_WatchingLiveTV;
     changeState = true;
+
+    while (changeState)
+        usleep(50);
 }
 
 void TVRec::StopLiveTV(void)
 {
     nextState = kState_None;
     changeState = true;
+
+    while (changeState)
+        usleep(50);
 }
 
 void TVRec::PauseRecorder(void)
@@ -1017,6 +1027,8 @@ long long TVRec::SeekRingBuffer(long long curpos, long long pos, int whence)
 {
     if (!rbuffer)
         return -1;
+    if (!readthreadlive)
+        return -1;
 
     if (whence == SEEK_CUR)
     {
@@ -1036,7 +1048,7 @@ long long TVRec::SeekRingBuffer(long long curpos, long long pos, int whence)
 
 void TVRec::SpawnReadThread(QSocket *sock)
 {
-    if (readthreadSock)
+    if (readthreadlive)
         return;
 
     pthread_mutex_init(&readthreadLock, NULL);
@@ -1044,17 +1056,26 @@ void TVRec::SpawnReadThread(QSocket *sock)
     readthreadlive = false;
 
     pthread_create(&readthread, NULL, ReadThread, this);
+
+    while (!readthreadlive)
+        usleep(50);
 }
 
 void TVRec::KillReadThread(void)
 {
-    readthreadlive = false;
-    rbuffer->StopReads();
-    pthread_join(readthread, NULL);
+    if (readthreadlive)
+    {
+        readthreadlive = false;
+        rbuffer->StopReads();
+        pthread_join(readthread, NULL);
+    }
 }
 
 void TVRec::RequestRingBufferBlock(int size)
 {
+    if (!readthreadlive)
+        return;
+
     if (size > 128000)
         size = 128000;
 
@@ -1062,7 +1083,7 @@ void TVRec::RequestRingBufferBlock(int size)
     readrequest = size; 
     pthread_mutex_unlock(&readthreadLock);
 
-    while (readrequest > 0)
+    while (readrequest > 0 && readthreadlive)
         usleep(500);
 }
 
@@ -1072,10 +1093,13 @@ void TVRec::DoReadThread(void)
 
     char *buffer = new char[128001];
 
-    while (readthreadlive)
+    while (readthreadlive && rbuffer)
     {
-        while (readrequest == 0)
+        while (readrequest == 0 && readthreadlive)
             usleep(5000);
+
+        if (!readthreadlive)
+            break;
 
         pthread_mutex_lock(&readthreadLock);
 
