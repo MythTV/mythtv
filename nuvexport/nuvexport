@@ -18,6 +18,18 @@ nuvexport supports mpeg-based nuv files like those saved from the Hauppauge PVR
 cards.  In order to get at the mpeg info, however, you will need either mpgtx
 or tcprobe (part of transcode).  Either program should work fine.
 
+=head1 SEARCHING
+
+nuvexport will search shows and return data if used with the --title, --subtitle
+or --description command line parameters.  Each parameter further restricts the
+search (AND, as opposed to OR matching), and are optional (of course, if you
+don't use any of them, you won't be searching).  The parameter values should be
+a perl compatible regular expression (see `man perlre` for details), and the
+searches are performed in a case insensitive fashion.
+
+The results from these searches will someday aid you in setting up automated
+non-interactive nuv conversions.
+
 =head1 FORMATS/REQUIREMENTS
 
 Except for the basic raw nuv/sql export, all formats require ffmpeg.
@@ -82,7 +94,8 @@ format and use Microsoft's Windows Media Encoder to encode a WMV file.
 	our %Prog;
 	our %Shows;
 	our @Functions;
-	our %Args;
+	our %Args;			# Edit this to store command line arguments in individual variables
+	our @Arg_str;		# Edit this to add more command line parse strings
 	our $DEBUG;
 	our $gui;
 	our $video_dir;
@@ -120,9 +133,22 @@ format and use Microsoft's Windows Media Encoder to encode a WMV file.
 
 # Load the commandline options
 	%Args = ('debug' => \$DEBUG);
-	GetOptions(\%Args, 'help', 'debug',
-					   'gui|ui:s',
-					   'function|export:s');
+	@Arg_str = ('help',
+				'debug',
+			# GUI override - not really needed at this point
+				'gui|ui=s',
+			# Used for searching
+				'title=s',
+				'subtitle|episode=s',
+				'description=s',
+			# CLI for which export mode to use
+				'function|export|mode=s',
+			# Used to specify a program
+				'chanid|channel=i',
+				'starttime|start_time=i',
+				'endtime|end_time=i',
+			   );
+	GetOptions(\%Args, @Arg_str);
 
 # Print the help - for now, this is just perldoc
 	if ($Args{help}) {
@@ -145,9 +171,9 @@ format and use Microsoft's Windows Media Encoder to encode a WMV file.
 					 export_DivX->new,
 					 export_WMV->new,
 					 export_VCD->new,
-                                         export_Trans_XviD->new,
-                                         export_Trans_VCD->new,
-                                         export_Trans_SVCD->new;
+					 export_Trans_XviD->new,
+					 export_Trans_VCD->new,
+					 export_Trans_SVCD->new;
 
 # Set up the signal handlers
 	$SIG{INT}  = \&Quit;
@@ -236,13 +262,46 @@ format and use Microsoft's Windows Media Encoder to encode a WMV file.
 # We now have a hash of show names, containing an array of episodes
 # We should probably do some sorting by timestamp (and also count how many shows there are)
 	$num_shows = 0;
-	foreach $show (sort keys %Shows) {
+	foreach my $show (sort keys %Shows) {
 		@{$Shows{$show}} = sort {$a->{start_time} <=> $b->{start_time} || $a->{channel} <=> $b->{channel}} @{$Shows{$show}};
 		$num_shows++;
 	}
 
 # No shows found?
 	die 'Found '.@Files." files, but no matching database entries.\n\n" unless ($num_shows);
+
+# Command line search?
+	if ($Args{title} || $Args{subtitle} || $Args{description}) {
+		my @matches;
+		foreach my $show (sort keys %Shows) {
+		# Title search?
+			next unless (!$Args{title} || $show =~ /$Args{title}/si);
+		# Search episodes
+			foreach my $episode (@{$Shows{$show}}) {
+				next unless (!$Args{subtitle}    || $episode->{title}       =~ /$Args{subtitle}/si);
+				next unless (!$Args{description} || $episode->{description} =~ /$Args{description}/si);
+				push @matches, $episode;
+			}
+		}
+	# Display matching shows
+		if (@matches) {
+			print "\nMatching Shows:\n\n";
+			foreach my $episode (@matches) {
+				print "     title:  $episode->{show_name}\n",
+					  "  subtitle:  $episode->{title}\n",
+					  "    chanid:  $episode->{channel}\n",
+					  "    starts:  $episode->{start_time}\n",
+					  "      ends:  $episode->{end_time}\n",
+					  "  filename:  $video_dir/$episode->{filename}\n\n";
+			}
+		}
+	# No matches?
+		else {
+			print "\nNo matching shows were found.\n\n";
+		}
+	# Exit gracefully
+		Quit();
+	}
 
 # Load the chosen gui
 	$gui = gui_text->new;
