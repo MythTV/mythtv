@@ -98,31 +98,31 @@
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Couldn&apos;t create CD</source>
-        <translation type="unfinished"></translation>
+        <translation>CDを作成できませんでした</translation>
     </message>
     <message>
         <source>CD Created</source>
-        <translation type="unfinished"></translation>
+        <translation>CDを作成しました</translation>
     </message>
     <message>
         <source>CD-RW Blanking Progress</source>
-        <translation type="unfinished"></translation>
+        <translation>CD-RW削除中</translation>
     </message>
     <message>
         <source>Create Audio CD from Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>プレイリストからオーディオCDを作成する</translation>
     </message>
     <message>
         <source>Create MP3 CD from Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>プレイリストからMP3 CDを作成する</translation>
     </message>
     <message>
         <source>Clear CD-RW Disk</source>
-        <translation type="unfinished"></translation>
+        <translation>CD-RWディスクを消去する</translation>
     </message>
 </context>
 <context>
@@ -280,7 +280,7 @@
     </message>
     <message>
         <source>BumpScope</source>
-        <translation type="unfinished"></translation>
+        <translation>衝突範囲</translation>
     </message>
     <message>
         <source>Various Artists</source>
@@ -488,7 +488,7 @@
     </message>
     <message>
         <source>Show entire music tree</source>
-        <translation type="unfinished">全体のミュージックリストを表示する</translation>
+        <translation>ミュージックリスト全体を表示する</translation>
     </message>
     <message>
         <source>If selected, you can navigate your entire music tree from the playing screen.</source>
@@ -496,19 +496,19 @@
     </message>
     <message>
         <source>Play mode</source>
-        <translation type="unfinished">プレイモード</translation>
+        <translation>プレイモード</translation>
     </message>
     <message>
         <source>Normal</source>
-        <translation type="unfinished">ノーマル</translation>
+        <translation>ノーマル</translation>
     </message>
     <message>
         <source>Random</source>
-        <translation type="unfinished">ランダム</translation>
+        <translation>ランダム</translation>
     </message>
     <message>
         <source>Intelligent</source>
-        <translation type="unfinished">インテリジェント</translation>
+        <translation>インテリジェント</translation>
     </message>
     <message>
         <source>Starting shuffle mode for the player.  Can be either normal, random, or intelligent (random).</source>
@@ -516,23 +516,23 @@
     </message>
     <message>
         <source>Delay before Visualizations start (seconds)</source>
-        <translation type="unfinished">ビジュアリゼーション開始前の延滞</translation>
+        <translation>ビジュアリゼーション開始前の延滞(秒)</translation>
     </message>
     <message>
         <source>If set to 0, visualizations will never automatically start.</source>
-        <translation type="unfinished"></translation>
+        <translation>0にセットすると自動的に開始されません。</translation>
     </message>
     <message>
         <source>Change Visualizer on each song</source>
-        <translation type="unfinished">ビジュアリゼーションを曲ごとに変える</translation>
+        <translation>ビジュアリゼーションを曲ごとに変える</translation>
     </message>
     <message>
         <source>Change the visualizer when the song change.</source>
-        <translation type="unfinished"></translation>
+        <translation>曲が変わる後とにビジュアリゼーションを変更します。</translation>
     </message>
     <message>
         <source>Width for Visual Scaling</source>
-        <translation type="unfinished">ビジュアリゼーションの幅</translation>
+        <translation>ビジュアリゼーション幅のスケーリング</translation>
     </message>
     <message>
         <source>If set to &quot;2&quot;, visualizations will be scaled in half.  Currently only used by the goom visualization.  Reduces CPU load on slower machines.</source>
@@ -540,11 +540,11 @@
     </message>
     <message>
         <source>Height for Visual Scaling</source>
-        <translation type="unfinished">ビジュアリゼーションの高さ</translation>
+        <translation>ビジュアリゼーション高さのスケーリング</translation>
     </message>
     <message>
         <source>Visualizations</source>
-        <translation type="unfinished">ビジュアリゼーション</translation>
+        <translation>ビジュアリゼーション</translation>
     </message>
     <message>
         <source>List of visualizations to use during playback. Possible values are space-separated list of </source>
@@ -580,43 +580,43 @@
     </message>
     <message>
         <source>Default Rip Quality</source>
-        <translation type="unfinished">既定のリッピングクオリティ</translation>
+        <translation>既定のリッピングクオリティ</translation>
     </message>
     <message>
         <source>Low</source>
-        <translation type="unfinished">低</translation>
+        <translation>低</translation>
     </message>
     <message>
         <source>Medium</source>
-        <translation type="unfinished">中</translation>
+        <translation>中</translation>
     </message>
     <message>
         <source>High</source>
-        <translation type="unfinished">高</translation>
+        <translation>高</translation>
     </message>
     <message>
         <source>Perfect</source>
-        <translation type="unfinished">完璧</translation>
+        <translation>完璧</translation>
     </message>
     <message>
         <source>Default quality for new CD rips.</source>
-        <translation type="unfinished">新規CDリッピングの既定のクオリティ</translation>
+        <translation>新規CDリッピングの既定のクオリティ。</translation>
     </message>
     <message>
         <source>General Settings</source>
-        <translation type="unfinished">全般設定</translation>
+        <translation>全体設定</translation>
     </message>
     <message>
         <source>Playback Settings</source>
-        <translation type="unfinished">再生設定</translation>
+        <translation>再生設定</translation>
     </message>
     <message>
         <source>Visualization Settings</source>
-        <translation type="unfinished">ビジュアリゼーション設定</translation>
+        <translation>ビジュアリゼーション設定</translation>
     </message>
     <message>
         <source>CD Ripper Settings</source>
-        <translation type="unfinished">CDリッピング設定</translation>
+        <translation>CDリッピング設定</translation>
     </message>
     <message>
         <source>MPEG Layer 1/2/3 Audio (MAD decoder)</source>
@@ -644,91 +644,91 @@ You have no MythMusic tables in your database.</source>
     </message>
     <message>
         <source>Unknown Artist</source>
-        <translation type="unfinished">不明なアーティスト</translation>
+        <translation>不明なアーティスト</translation>
     </message>
     <message>
         <source>Unknown Album</source>
-        <translation type="unfinished">不明なアルバム</translation>
+        <translation>不明なアルバム</translation>
     </message>
     <message>
         <source>Unknown Genre</source>
-        <translation type="unfinished">不明なジャンル</translation>
+        <translation>不明なジャンル</translation>
     </message>
     <message>
         <source>CD -- none</source>
-        <translation type="unfinished">CD -- 無し</translation>
+        <translation>CD -- 無し</translation>
     </message>
     <message>
         <source>All My Music</source>
-        <translation type="unfinished">全てのマイミュージック</translation>
+        <translation>全てのマイミュージック</translation>
     </message>
     <message>
         <source>%1 - %2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>title</source>
-        <translation type="unfinished">タイトル</translation>
+        <translation>タイトル</translation>
     </message>
     <message>
         <source>Missing database entry: %1</source>
-        <translation type="unfinished">データベースに無し: %1</translation>
+        <translation>データベースに無し: %1</translation>
     </message>
     <message>
         <source> ~ </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Ooops</source>
-        <translation type="unfinished"></translation>
+        <translation>う！</translation>
     </message>
     <message>
         <source>%1 ~ %2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Not Initialized</source>
-        <translation type="unfinished">未初期化</translation>
+        <translation>未初期化</translation>
     </message>
     <message>
         <source>oops</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>,%1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>All My Playlists</source>
-        <translation type="unfinished">全てのマイプレイリスト</translation>
+        <translation>全てのマイプレイリスト</translation>
     </message>
     <message>
         <source>Active Play Queue</source>
-        <translation type="unfinished">アクティブプレイキュー</translation>
+        <translation>アクティブプレイキュー</translation>
     </message>
     <message>
         <source>Active Play Queue (%1)</source>
-        <translation type="unfinished">アクティブプレイキュー (%1)</translation>
+        <translation>アクティブプレイキュー (%1)</translation>
     </message>
     <message>
         <source>Something is Wrong</source>
-        <translation type="unfinished">本題発生</translation>
+        <translation>問題発生</translation>
     </message>
     <message>
         <source>Visualization requires FFT library</source>
-        <translation type="unfinished">ビジュアリゼーションはFFTライブラリが必要です｡</translation>
+        <translation>ビジュアリゼーションはFFTライブラリが必要です｡</translation>
     </message>
     <message>
         <source>Did you run configure?</source>
-        <translation type="unfinished">コンフィギュレーションを実行しましたか？</translation>
+        <translation>コンフィギュレーションを実行しましたか?</translation>
     </message>
     <message>
         <source>and</source>
-        <translation type="unfinished"></translation>
+        <translation>と</translation>
     </message>
     <message>
         <source>Use variable bitrates</source>
-        <translation type="unfinished"></translation>
+        <translation>可変ビットレートを使用</translation>
     </message>
     <message>
         <source>If set, the MP3 encoder will use variable bitrates (VBR) except for the low quality setting. The Ogg encoder will always use variable bitrates.</source>
@@ -736,23 +736,23 @@ You have no MythMusic tables in your database.</source>
     </message>
     <message>
         <source>AlbumArt</source>
-        <translation type="unfinished"></translation>
+        <translation>アルバムアート</translation>
     </message>
     <message>
         <source>CD Ripper Settings (part 2)</source>
-        <translation type="unfinished"></translation>
+        <translation>CDリッパーセティング(パート2)</translation>
     </message>
     <message>
         <source>Enable CD Writing.</source>
-        <translation type="unfinished"></translation>
+        <translation>CD書き込み有効。</translation>
     </message>
     <message>
         <source>Requires a SCSI or an IDE-SCSI CD Writer.</source>
-        <translation type="unfinished"></translation>
+        <translation>SCSIかIDE-SCSIのCD-R/RWドライブが必要です。</translation>
     </message>
     <message>
         <source>CD-Writer Device</source>
-        <translation type="unfinished"></translation>
+        <translation>CD-R/RWデバイス</translation>
     </message>
     <message>
         <source>Select the SCSI Device for CD Writing.  If your IDE device is not present, try adding hdd(or hdc/hdb)=ide-scsi to your boot options</source>
@@ -760,19 +760,19 @@ You have no MythMusic tables in your database.</source>
     </message>
     <message>
         <source>Disk Size</source>
-        <translation type="unfinished"></translation>
+        <translation>ディスクサイズ</translation>
     </message>
     <message>
         <source>650MB/75min</source>
-        <translation type="unfinished"></translation>
+        <translation>650MB/75分</translation>
     </message>
     <message>
         <source>700MB/80min</source>
-        <translation type="unfinished"></translation>
+        <translation>700MB/80分</translation>
     </message>
     <message>
         <source>Default CD Capacity.</source>
-        <translation type="unfinished"></translation>
+        <translation>規定のCD容量。</translation>
     </message>
     <message>
         <source>Enable directories on MP3 Creation</source>
@@ -780,71 +780,71 @@ You have no MythMusic tables in your database.</source>
     </message>
     <message>
         <source>CD Write Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>CD書き込みスピード</translation>
     </message>
     <message>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
+        <translation>自動</translation>
     </message>
     <message>
         <source>1x</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>2x</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>4x</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>8x</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>16x</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>CD Writer speed. Auto will use the recomended speed.</source>
-        <translation type="unfinished"></translation>
+        <translation>CD書き込みスピード。自動は推奨のスピードを使用します。</translation>
     </message>
     <message>
         <source>CD Blanking Type</source>
-        <translation type="unfinished"></translation>
+        <translation>CD削除タイプ</translation>
     </message>
     <message>
         <source>Fast</source>
-        <translation type="unfinished"></translation>
+        <translation>高速</translation>
     </message>
     <message>
         <source>Complete</source>
-        <translation type="unfinished"></translation>
+        <translation>完全</translation>
     </message>
     <message>
         <source>Blanking Method. Fast takes 1 minute. Complete can take up to 20 minutes.</source>
-        <translation type="unfinished"></translation>
+        <translation>削除方法。高速は１分かかります。完全は20分かかります。</translation>
     </message>
     <message>
         <source>CD Recording Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>CD記録設定</translation>
     </message>
     <message>
         <source>Artists</source>
-        <translation type="unfinished"></translation>
+        <translation>アーティスト</translation>
     </message>
     <message>
         <source>Creating CD File System</source>
-        <translation type="unfinished"></translation>
+        <translation>CDファイルシステムを作成中</translation>
     </message>
     <message>
         <source>Burning CD</source>
-        <translation type="unfinished"></translation>
+        <translation>CD書き込み中</translation>
     </message>
     <message>
         <source>?</source>
-        <translation type="unfinished"></translation>
+        <translation>?</translation>
     </message>
     <message>
         <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
@@ -899,11 +899,11 @@ You have no MythMusic tables in your database.</source>
     </message>
     <message>
         <source>Genre: </source>
-        <translation type="unfinished">ジャンル:</translation>
+        <translation>ジャンル:</translation>
     </message>
     <message>
         <source>Ripping...</source>
-        <translation type="unfinished">リッピング...</translation>
+        <translation>リッピング...</translation>
     </message>
 </context>
 <context>
