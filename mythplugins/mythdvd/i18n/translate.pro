@@ -8,5 +8,5 @@ SOURCES += ./themestrings.h
 
 TRANSLATIONS  = mythdvd_it.ts mythdvd_es.ts mythdvd_ca.ts
 TRANSLATIONS += mythdvd_nl.ts mythdvd_de.ts mythdvd_dk.ts
-TRANSLATIONS += mythdvd_pt.ts mythdvd_sv.ts mythdvd_fr.ts
-TRANSLATIONS += mythdvd_ja.ts
+TRANSLATIONS += mythdvd_pt.ts mythdvd_sv.ts mythdvd_ja.ts
+TRANSLATIONS += mythdvd_fr.ts mythdvd_si.ts

@@ -4,7 +4,7 @@ TEMPLATE = app
 CONFIG -= moc qt
 
 trans.path = $${PREFIX}/share/mythtv/i18n/
-trans.files += mythbrowser_de.qm
+trans.files += mythbrowser_de.qm mythbrowser_si.qm
 
 INSTALLS += trans
 
