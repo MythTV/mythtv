@@ -17,6 +17,8 @@
 #include <qdatetime.h>
 #include <qlistview.h>
 #include <qtimer.h>
+#include <qimage.h>
+#include <qregexp.h>
 #include <qapplication.h>
 #include <qsqldatabase.h>
 #include <qcursor.h>
@@ -1692,7 +1694,8 @@ void Weather::setWeatherIcon(QString txtType)
 {
 	for (int j = 0; j < 128; j++)
 	{
-		if (txtType.remove(" ") == (wData[j].typeName).remove(" "))
+		if (txtType.replace(QRegExp("  "),  "" ) == 
+		    (wData[j].typeName).replace(QRegExp("  "),  "" ))
 		{
 			curIcon = wData[j].typeIcon;
 			return;
