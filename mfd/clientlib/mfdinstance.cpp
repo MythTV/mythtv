@@ -165,7 +165,7 @@ void MfdInstance::run()
         FD_ZERO(&fds);
 
         //
-        //  Watch out main socket to the mfd
+        //  Watch our main socket to the mfd
         //
         
         if(client_socket_to_mfd)
@@ -419,6 +419,15 @@ void MfdInstance::addAudioClient(const QString &address, uint a_port)
     if(new_audio->connect())
     {
         my_service_clients->append(new_audio);
+        
+        //
+        //  Sound out an event to let this library's main thread send a
+        //  signal that an audio plugin exists on this mfd
+        //
+        
+        MfdAudioPluginExistsEvent *apee = new MfdAudioPluginExistsEvent(mfd_id);
+        QApplication::postEvent(mfd_interface, apee);
+        
     }
     else
     {

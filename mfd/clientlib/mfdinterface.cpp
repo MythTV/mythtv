@@ -388,9 +388,14 @@ void MfdInterface::customEvent(QCustomEvent *ce)
         MfdMetadataChangedEvent *mce = (MfdMetadataChangedEvent*)ce;
         swapMetadata(mce->getMfd(), mce->getNewCollection());
     }
+    else if(ce->type() == MFD_CLIENTLIB_EVENT_AUDIOPLUGIN_EXISTS)
+    {
+        MfdAudioPluginExistsEvent *apee = (MfdAudioPluginExistsEvent*)ce;
+        emit audioPluginDiscovery(apee->getMfd());
+    }
     else
     {
-        cerr << "mfdinterface is getting CustomEvent's it does not understand" 
+        cerr << "mfdinterface is getting CustomEvents it does not understand" 
              << endl;
     }
 }

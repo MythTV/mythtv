@@ -14,11 +14,12 @@
 
 #include "mfdcontent.h"
 
-#define MFD_CLIENTLIB_EVENT_DISCOVERY  65432
-#define MFD_CLIENTLIB_EVENT_AUDIOPAUSE 65431
-#define MFD_CLIENTLIB_EVENT_AUDIOSTOP  65430
-#define MFD_CLIENTLIB_EVENT_AUDIOPLAY  65429
-#define MFD_CLIENTLIB_EVENT_METADATA   65428
+#define MFD_CLIENTLIB_EVENT_DISCOVERY           65432
+#define MFD_CLIENTLIB_EVENT_AUDIOPAUSE          65431
+#define MFD_CLIENTLIB_EVENT_AUDIOSTOP           65430
+#define MFD_CLIENTLIB_EVENT_AUDIOPLAY           65429
+#define MFD_CLIENTLIB_EVENT_METADATA            65428
+#define MFD_CLIENTLIB_EVENT_AUDIOPLUGIN_EXISTS  65427
 
 
 class MfdDiscoveryEvent: public QCustomEvent
@@ -158,6 +159,23 @@ class MfdMetadataChangedEvent: public QCustomEvent
   
     int                mfd_id;
     MfdContentCollection *new_mfd_collection;   
+};
+
+class MfdAudioPluginExistsEvent: public QCustomEvent
+{
+    //
+    //  Sent by mfdinstance when it discovers an audio plugin in it's mfd
+    //
+    
+  public:
+  
+    MfdAudioPluginExistsEvent(int which_mfd);
+
+    int                getMfd();
+
+  private:
+  
+    int                mfd_id;
 };
 
 

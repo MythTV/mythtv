@@ -145,3 +145,22 @@ MfdContentCollection* MfdMetadataChangedEvent::getNewCollection()
 {
     return new_mfd_collection;
 }
+
+/*
+---------------------------------------------------------------------
+*/
+
+MfdAudioPluginExistsEvent::MfdAudioPluginExistsEvent(
+                                                        int which_mfd
+                                                    )
+                    :QCustomEvent(MFD_CLIENTLIB_EVENT_AUDIOPLUGIN_EXISTS)
+
+{
+    mfd_id = which_mfd;
+}
+
+int MfdAudioPluginExistsEvent::getMfd()
+{
+    return mfd_id;
+}
+

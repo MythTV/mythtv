@@ -52,6 +52,7 @@ class MfdInterface : public QObject
     //
 
     void mfdDiscovery(int, QString, QString, bool);
+    void audioPluginDiscovery(int);
     void audioPaused(int, bool);
     void audioStopped(int);
     void audioPlaying(int, int, int, int, int, int, int, int, int);
