@@ -104,7 +104,7 @@ TVState TV::LiveTV(void)
     {
         RemoteEncoder *testrec = RemoteRequestRecorder(m_context);
 
-        if (testrec < 0)
+        if (!testrec->IsValidRecorder())
         {
             QString title = "MythTV is already using all available inputs for "
                             "recording.  If you want to watch an in-progress "
@@ -120,7 +120,9 @@ TVState TV::LiveTV(void)
         
             nextState = kState_None;
             changeState = false;
-        
+       
+            delete testrec;
+ 
             return nextState;
         }
 
