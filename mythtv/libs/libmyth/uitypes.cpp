@@ -2370,6 +2370,7 @@ UIManagedTreeListType::UIManagedTreeListType(const QString & name)
     active_bin = 0;
     tree_order = -1;
     visual_order = -1;
+    iconAttr = -1;
     show_whole_tree = false;
     scrambled_parents = false;
     color_selectables = false;
@@ -2383,7 +2384,8 @@ void UIManagedTreeListType::drawText(QPainter *p,
                                     QString the_text,
                                     QString font_name,
                                     int x, int y,
-                                    int bin_number)
+                                    int bin_number,
+                                    int icon_number)
 {
     fontProp *temp_font = NULL;
     QString a_string = QString("bin%1-%2").arg(bin_number).arg(font_name);
@@ -2398,8 +2400,16 @@ void UIManagedTreeListType::drawText(QPainter *p,
     }
     else if (bin_number == bins)
     {
-        the_text = cutDown(the_text, &(temp_font->face), false, bin_corners[bin_number].width() - right_arrow_image.width(), bin_corners[bin_number].height());
-        p->drawText(x, y, the_text);
+        // See if we should leave room for an icon to the left of the text
+        int iconDim = 0;
+        if (iconAttr >= 0)
+            iconDim = QFontMetrics(temp_font->face).height(); 
+    
+        the_text = cutDown(the_text, &(temp_font->face), false, bin_corners[bin_number].width() - right_arrow_image.width()-iconDim, bin_corners[bin_number].height());
+        p->drawText(x+iconDim, y, the_text);
+        if ((icon_number >= 0) && (iconMap.contains(icon_number)))
+            p->drawPixmap(x, y-iconDim+QFontMetrics(temp_font->face).descent(),
+                          *iconMap[icon_number]);
     }
     else if (bin_number == 1)
     {
@@ -2632,7 +2642,10 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
             //
 
             QString msg = hotspot_node->getString();
-            drawText(p, msg, font_name, x_location, y_location, i);
+            int icn = -1;
+            if (iconAttr >= 0)
+                icn = hotspot_node->getAttribute(iconAttr);
+            drawText(p, msg, font_name, x_location, y_location, i, icn);
 
             if (i == bins)
             {
@@ -2705,7 +2718,10 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
                         font_name = "inactive";
                     }
                     msg = above->getString();
-                    drawText(p, msg, font_name, x_location, still_yet_another_y_location, i);
+                    int icn = -1;
+                    if (iconAttr >= 0)
+                        icn = above->getAttribute(iconAttr);
+                    drawText(p, msg, font_name, x_location, still_yet_another_y_location, i, icn);
                 }
                 still_yet_another_y_location -= QFontMetrics(tmpfont->face).height();
                 numb_above++;
@@ -2745,7 +2761,10 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
                         font_name = "inactive";
                     }
                     msg = below->getString();
-                    drawText(p, msg, font_name, x_location, y_location, i);
+                    int icn = -1;
+                    if (iconAttr >= 0)
+                        icn = below->getAttribute(iconAttr);
+                    drawText(p, msg, font_name, x_location, y_location, i, icn);
                 }
                 y_location += QFontMetrics(tmpfont->face).height();
                 numb_below++;
@@ -3510,7 +3529,6 @@ void UIManagedTreeListType::calculateScreenArea()
 
     screen_area = m_parent->GetAreaRect();
 }
-
 
 // ********************************************************************
 

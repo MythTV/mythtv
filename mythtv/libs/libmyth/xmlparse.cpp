@@ -1443,7 +1443,6 @@ void XMLParse::parseListArea(LayerSet *container, QDomElement &element)
                 }
 
 
-
                 imgpoint = info.attribute("location", "");
                 if (imgpoint.isNull() && imgpoint.isEmpty())
                 {
@@ -1487,7 +1486,6 @@ void XMLParse::parseListArea(LayerSet *container, QDomElement &element)
                     rightarrow_loc.setX((int)(rightarrow_loc.x() * wmult));
                     rightarrow_loc.setY((int)(rightarrow_loc.y() * hmult));
                 }
-
             }
             else if (info.tagName() == "column")
             {
@@ -1755,6 +1753,7 @@ void XMLParse::parseStatusBar(LayerSet *container, QDomElement &element)
     container->bumpUpLayers(order.toInt());
 }
 
+struct TreeIcon { int i; QPixmap *img;};
 void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
 {
     QRect area;
@@ -1766,6 +1765,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
     QPixmap *downarrow_img = NULL;
     QPixmap *leftarrow_img = NULL;
     QPixmap *rightarrow_img = NULL;
+    QPixmap *icon_img = NULL;
     QPixmap *select_img = NULL;
 
     //
@@ -1774,6 +1774,8 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
     //
 
     typedef QMap<int, QRect> CornerMap;
+    QPtrList<TreeIcon> iconList;
+    iconList.setAutoDelete(true);
     CornerMap bin_corners;
     bin_corners.clear();
 
@@ -1819,6 +1821,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
             {
                 QString imgname = "";
                 QString file = "";
+                int     imgnumber = -1;
 
                 imgname = info.attribute("function", "");
                 if (imgname.isNull() || imgname.isEmpty())
@@ -1833,6 +1836,9 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                     cerr << "Image needs a filename\n";
                     return;
                 }
+
+                QString imgNumStr = info.attribute("number", "");
+                imgnumber = atoi(imgNumStr);
 
                 if (info.tagName() == "context")
                 {
@@ -1877,6 +1883,21 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                     if (!rightarrow_img)
                     {
                         cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                    }
+                }
+                else if ((imgname.lower() == "icon") && (imgnumber != -1))
+                {
+                    icon_img = gContext->LoadScalePixmap(file);
+                    if (!icon_img)
+                    {
+                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                    }
+                    else
+                    {
+                        TreeIcon *icn = new TreeIcon;
+                        icn->img = icon_img;
+                        icn->i = imgnumber;
+                        iconList.append(icn);
                     }
                 }
                 else
@@ -1997,6 +2018,14 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
     delete leftarrow_img;
     delete rightarrow_img;
 
+    // Add in the icon images
+    TreeIcon *icon;
+    while ((icon=iconList.first()) != 0)
+    {
+        mtl->addIcon(icon->i, icon->img);
+        iconList.remove();
+    }
+    
     mtl->makeHighlights();
     mtl->calculateScreenArea();
     container->AddType(mtl);

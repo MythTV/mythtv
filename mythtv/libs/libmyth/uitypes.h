@@ -740,9 +740,10 @@ class UIManagedTreeListType : public UIType
                             left_arrow_image = left;
                             right_arrow_image = right;
                           }
+    void    addIcon(int i, QPixmap *img) { iconMap[i] = img; }
     void    setFonts(QMap<QString, QString> fonts, QMap<QString, fontProp> fontfcn) {
                           m_fonts = fonts; m_fontfcns = fontfcn; }
-    void    drawText(QPainter *p, QString the_text, QString font_name, int x, int y, int bin_number);
+    void    drawText(QPainter *p, QString the_text, QString font_name, int x, int y, int bin_number, int icon_number);
     void    setJustification(int jst) { m_justification = jst; }
     int     getJustification() { return m_justification; }
     void    makeHighlights();
@@ -751,6 +752,7 @@ class UIManagedTreeListType : public UIType
     void    calculateScreenArea();
     void    setTreeOrdering(int an_int){tree_order = an_int;}
     void    setVisualOrdering(int an_int){visual_order = an_int;}
+    void    setIconSelector(int an_int){iconAttr = an_int;}
     void    showWholeTree(bool yes_or_no){ show_whole_tree = yes_or_no; }
     void    scrambleParents(bool yes_or_no){ scrambled_parents = yes_or_no; }
     void    colorSelectables(bool yes_or_no){color_selectables = yes_or_no; }
@@ -797,6 +799,7 @@ class UIManagedTreeListType : public UIType
     GenericTree *active_node;
     int         tree_order;
     int         visual_order;
+    int         iconAttr;
 
     QMap<QString, QString>  m_fonts;
     QMap<QString, fontProp> m_fontfcns;
@@ -812,7 +815,7 @@ class UIManagedTreeListType : public UIType
     bool                    show_whole_tree;
     bool                    scrambled_parents;
     bool                    color_selectables;
-
+    QMap<int, QPixmap*>     iconMap;
 };
 
 class UIPushButtonType : public UIType
