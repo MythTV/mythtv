@@ -135,11 +135,11 @@ package mythtv::nuvinfo;
         ($info{'mpeg_stream_type'})      = $data =~ m/^ID_VIDEO_FPS=(\d+(?:\.\d*)?)/m;
         ($info{'aspect'})                = $data =~ m/^ID_VIDEO_ASPECT=(\d+(?:\.\d*)?)/m;
         ($info{'audio_type'})            = $data =~ m/^ID_AUDIO_CODEC=(\d+(?:\.\d*)?)/m;
-        if ($data =~ m/^MPEG-PS file format detected/m) {
-            $info{'mpeg_stream_type'} = 'program';
+        if ($data =~ m/^MPEG-(PE?S) file format detected/m) {
+            $info{'mpeg_stream_type'} = $1;
         }
         elsif ($data =~ m/^TS file format detected/m) {
-            $info{'mpeg_stream_type'} = 'transport';
+            $info{'mpeg_stream_type'} = 'TS';
         }
         else {
             $info{'mpeg_stream_type'} = 'system';   # ?????
