@@ -189,7 +189,7 @@ void DatabaseBox::doSelected(QListViewItem *item)
 {
     TreeItem *tcitem = (TreeItem *)item;
 
-    if (tcitem->childCount() <= 0)
+    if (tcitem->childCount() <= 0 && tcitem->parent())
     {
         GameHandler::Launchgame(tcitem->getRomInfo());
     }
