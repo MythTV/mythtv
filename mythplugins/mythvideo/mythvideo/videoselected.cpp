@@ -80,10 +80,11 @@ void VideoSelected::keyPressEvent(QKeyEvent *e)
     for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
-        handled = true;
+
 
         if (action == "SELECT" && allowselect)
         {
+            handled = true;
             selected(curitem);
             return;
 
