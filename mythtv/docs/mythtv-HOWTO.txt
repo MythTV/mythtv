@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-03-04, v1.101
+  2003-03-06, v1.102
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -125,7 +125,8 @@
         18.5.3 Overscan Dimensions
         18.5.4 MythTV on the Desktop
      18.6 I'd like to delete the mysql database.
-     18.7 I'd like to start using the development version of MythTV.
+     18.7 I'd like to save or restore my database
+     18.8 I'd like to start using the development version of MythTV.
 
   ______________________________________________________________________
 
@@ -2557,7 +2558,17 @@
   mysql> drop database mythconverg;
   mysql> quit
 
-  [1m18.7.  I'd like to start using the development version of MythTV.[0m
+  [1m18.7.  I'd like to save or restore my database[0m
+
+  See the [1mmysqldump [22mmanpage for more information.
+
+       $ mysqldump -u mythtv --password=mythtv mythconverg > mythtv_backup.sql
+
+  To restore:
+
+       $ mysql -u mythtv --password=mythtv mythconverg < mythtv_backup.sql
+
+  [1m18.8.  I'd like to start using the development version of MythTV.[0m
 
   [Content under development]
 
@@ -2613,8 +2624,8 @@
 
   Once you're done editing the file, start the setup program:
 
-  $ cd setup
-  $ ./setup
+       $ cd setup
+       $ ./setup
 
   This will open the setup wizard which will allow you to graphically
   configure your system.

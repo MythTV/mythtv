@@ -213,7 +213,26 @@ mysql> quit
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss18.7">18.7</A> <A HREF="mythtv-HOWTO.html#toc18.7">I'd like to start using the development version of MythTV.</A>
+<H2><A NAME="ss18.7">18.7</A> <A HREF="mythtv-HOWTO.html#toc18.7">I'd like to save or restore my database</A>
+</H2>
+
+<P>See the <B>mysqldump</B> manpage for more information.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mysqldump -u mythtv --password=mythtv mythconverg > mythtv_backup.sql
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>To restore:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mysql -u mythtv --password=mythtv mythconverg &lt; mythtv_backup.sql
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H2><A NAME="ss18.8">18.8</A> <A HREF="mythtv-HOWTO.html#toc18.8">I'd like to start using the development version of MythTV.</A>
 </H2>
 
 <P>[Content under development]</P>

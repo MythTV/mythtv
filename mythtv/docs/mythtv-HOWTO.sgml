@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-03-04, v1.101
+<date>2003-03-06, v1.102
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -2427,6 +2427,18 @@ mysql> drop database mythconverg;
 mysql> quit
 </verb></tscreen>
 
+<sect1>I'd like to save or restore my database
+<p>See the <bf>mysqldump</bf> manpage for more information.
+
+<tscreen><verb>
+$ mysqldump -u mythtv --password=mythtv mythconverg > mythtv_backup.sql
+</verb></tscreen>
+
+To restore:
+<tscreen><verb>
+$ mysql -u mythtv --password=mythtv mythconverg < mythtv_backup.sql
+</verb></tscreen>
+
 <sect1>I'd like to start using the development version of MythTV.
 <p>[Content under development]
 <p><bf>NOTE</bf>:It should be clear that using the development version of
@@ -2671,6 +2683,7 @@ v1.100, 2003-02-28.  Changes to mythtv-0.8 section of docs.
 v1.101, 2003-03-04.  Typo on the theme.txt.  Changed some text on RH8 and
 OSS/ALSA.  Added some information about the NonID3FileFormat in mythmusic. 
 Added link to mythtv-users list.  More developers.
+v1.102, 2003-03-06.  MySQL dump command.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
