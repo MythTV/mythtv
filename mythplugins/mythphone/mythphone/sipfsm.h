@@ -67,6 +67,11 @@ public:
 #define SIP_WATCH_STOPPING      0x22
 #define SIP_WATCH_HOLDOFF       0x23
 
+// IM States
+#define SIP_IM_IDLE             SIP_IDLE
+#define SIP_IM_ACTIVE           0x30
+
+
 // Events
 #define SIP_OUTCALL             0x100
 #define SIP_INVITE              0x200
@@ -95,9 +100,12 @@ public:
 #define SIP_STOPWATCH           0x1900
 #define SIP_MESSAGE             0x1A00
 #define SIP_MESSAGESTATUS       0x1B00
+#define SIP_INFO                0x1C00
+#define SIP_INFOSTATUS          0x1D00
+#define SIP_IM_TIMEOUT          0x1E00
 
-#define SIP_CMD(s)              (((s)==SIP_INVITE) || ((s)==SIP_ACK) || ((s)==SIP_BYE) || ((s)==SIP_CANCEL) || ((s)==SIP_REGISTER) || ((s)==SIP_SUBSCRIBE) || ((s)==SIP_NOTIFY) || ((s)==SIP_MESSAGE))
-#define SIP_STATUS(s)           (((s)==SIP_INVITESTATUS_2xx) || ((s)==SIP_INVITESTATUS_1xx) || ((s)==SIP_INVITESTATUS_3456xx) || ((s)==SIP_BYTESTATUS) || ((s)==SIP_CANCELSTATUS) || ((s)==SIP_SUBSTATUS) || ((s)==SIP_NOTSTATUS) )
+#define SIP_CMD(s)              (((s)==SIP_INVITE) || ((s)==SIP_ACK) || ((s)==SIP_BYE) || ((s)==SIP_CANCEL) || ((s)==SIP_REGISTER) || ((s)==SIP_SUBSCRIBE) || ((s)==SIP_NOTIFY) || ((s)==SIP_MESSAGE) || ((s)==SIP_INFO))
+#define SIP_STATUS(s)           (((s)==SIP_INVITESTATUS_2xx) || ((s)==SIP_INVITESTATUS_1xx) || ((s)==SIP_INVITESTATUS_3456xx) || ((s)==SIP_BYTESTATUS) || ((s)==SIP_CANCELSTATUS) || ((s)==SIP_SUBSTATUS) || ((s)==SIP_NOTSTATUS) || ((s)==SIP_MESSAGESTATUS) || ((s)==SIP_INFOSTATUS) )
 #define SIP_MSG(s)              (SIP_CMD(s) || SIP_STATUS(s))
 
 // Call FSM Actions - combination of event and state to give a "switch"able value
