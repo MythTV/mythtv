@@ -451,6 +451,66 @@ void ThemedMenu::parseLogo(QString dir, QDomElement &element)
                      logo->height());
 }
 
+void ThemedMenu::parseTitle(QString dir, QDomElement &element)
+{
+    bool hasimage = false;
+    bool hasposition = false;
+
+    for (QDomNode child = element.firstChild(); !child.isNull();
+         child = child.nextSibling())
+    {
+        QDomElement info = child.toElement();
+        if (!info.isNull())
+        {
+            if (info.tagName() == "image")
+            {
+                QString titlepath = dir + getFirstText(info);
+                QPixmap *tmppix = m_context->LoadScalePixmap(titlepath);
+
+                QString name = info.attribute("mode", "");
+                if (name != "")
+                {
+                    titleIcons[name] = *tmppix;
+                }
+                else
+                {
+                    cerr << "Missing mode in titles/image\n";
+                    exit(0);
+                }
+
+                delete tmppix;
+
+                hasimage = true;
+            }
+            else if (info.tagName() == "position")
+            {
+                titlePos = parsePoint(getFirstText(info));
+                hasposition = true;
+            }
+            else
+            {
+                cerr << "Unknown tag " << info.tagName() << " in logo\n";
+                exit(0);
+            }
+        }
+    }
+
+    if (!hasimage)
+    {
+        cerr << "Missing image tag in titles\n";
+        exit(0);
+    }
+
+    if (!hasposition)
+    {
+        cerr << "Missing position tag in titles\n";
+        exit(0);
+    }
+
+    titlePos.setX((int)(titlePos.x() * wmult));
+    titlePos.setY((int)(titlePos.y() * hmult));
+}
+
 void ThemedMenu::parseButton(QString dir, QDomElement &element)
 {
     bool hasname = false;
@@ -534,6 +594,9 @@ void ThemedMenu::setDefaults(void)
     textColor = QColor(white);
     hasoutline = false;
     hasshadow = false;
+    titleIcons.clear();
+    curTitle = NULL;
+    drawTitle = false;
 }
 
 void ThemedMenu::parseSettings(QString dir, QString menuname)
@@ -544,9 +607,20 @@ void ThemedMenu::parseSettings(QString dir, QString menuname)
     QFile f(filename);
 
     if (!f.open(IO_ReadOnly))
-        return;
-    if (!doc.setContent(&f))
     {
+        cout << "Can't open: " << filename << endl;
+        return;
+    }
+
+    QString errorMsg;
+    int errorLine = 0;
+    int errorColumn = 0;
+
+    if (!doc.setContent(&f, false, &errorMsg, &errorLine, &errorColumn))
+    {
+        cout << "Error parsing: " << filename << endl;
+        cout << "at line: " << errorLine << "  column: " << errorColumn << endl;
+        cout << errorMsg << endl;
         f.close();
         return;
     }
@@ -582,6 +656,10 @@ void ThemedMenu::parseSettings(QString dir, QString menuname)
             else if (e.tagName() == "buttondef")
             {
                 parseButton(dir, e);
+            }
+            else if (e.tagName() == "titles")
+            {
+                parseTitle(dir, e);
             }
             else
             {
@@ -673,8 +751,16 @@ void ThemedMenu::parseMenu(QString menuname)
         cerr << "Couldn't read menu file " << menuname << endl;
         exit(0);
     }
-    if (!doc.setContent(&f))
+
+    QString errorMsg;
+    int errorLine = 0;
+    int errorColumn = 0;
+
+    if (!doc.setContent(&f, false, &errorMsg, &errorLine, &errorColumn))
     {
+        cout << "Error parsing: " << filename << endl;
+        cout << "at line: " << errorLine << "  column: " << errorColumn << endl;
+        cout << errorMsg << endl;
         f.close();
         return;
     }
@@ -685,6 +771,9 @@ void ThemedMenu::parseMenu(QString menuname)
     buttonRows.clear();
 
     QDomElement docElem = doc.documentElement();
+
+    QString menumode = docElem.attribute("name", "");
+
     QDomNode n = docElem.firstChild();
     while (!n.isNull())
     {
@@ -717,6 +806,18 @@ void ThemedMenu::parseMenu(QString menuname)
 
     menulevel++;
     menufiles.push_back(menuname);
+
+    if (titleIcons.contains(menumode))
+    {
+        drawTitle = true;
+        curTitle = &(titleIcons[menumode]);
+        titleRect = QRect(titlePos.x(), titlePos.y(), curTitle->width(), 
+                          curTitle->height());
+    }
+    else
+    {
+        drawTitle = false;
+    }
 
     selection = "";
     update(menuRect());
@@ -896,9 +997,10 @@ void ThemedMenu::paintEvent(QPaintEvent *e)
     QPainter p(this);
 
     if (r.intersects(logoRect))
-    {
         paintLogo(&p);
-    }
+
+    if (drawTitle && r.intersects(titleRect))
+        paintTitle(&p);
 
     for (unsigned int i = 0; i < buttonList.size(); i++)
     {
@@ -922,6 +1024,24 @@ void ThemedMenu::paintLogo(QPainter *p)
         tmp.end();
 
         p->drawPixmap(logoRect.topLeft(), pix);
+    }
+}
+
+void ThemedMenu::paintTitle(QPainter *p)
+{
+    if (curTitle)
+    {
+        QPixmap pix(titleRect.size());
+        pix.fill(this, titleRect.topLeft());
+
+        QPainter tmp;
+        tmp.begin(&pix, this);
+    
+        tmp.drawPixmap(0, 0, *curTitle);
+
+        tmp.end();
+
+        p->drawPixmap(titleRect.topLeft(), pix);
     }
 }
 
@@ -1097,6 +1217,8 @@ void ThemedMenu::ReloadTheme(void)
     if (logo)
         delete logo;
     logo = NULL;
+
+    titleIcons.clear();
 
     if (buttonnormal)
         delete buttonnormal;

@@ -22,6 +22,6 @@ SOURCES += util.cpp mythwizard.cpp
 
 inc.path = $${PREFIX}/include/mythtv/
 inc.files  = dialogbox.h lcddevice.h themedmenu.h mythcontext.h 
-inc.files += mythwidgets.h remotefile.h util.h
+inc.files += mythwidgets.h remotefile.h util.h oldsettings.h
 
 INSTALLS += inc

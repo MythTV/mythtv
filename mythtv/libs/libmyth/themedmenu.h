@@ -76,6 +76,7 @@ class ThemedMenu : public MythDialog
 
     void parseBackground(QString dir, QDomElement &element);
     void parseLogo(QString dir, QDomElement &element);
+    void parseTitle(QString dir, QDomElement &element);
     void parseButtonDefinition(QString dir, QDomElement &element);
     void parseButton(QString dir, QDomElement &element);
     void parseThemeButton(QDomElement &element);
@@ -100,6 +101,7 @@ class ThemedMenu : public MythDialog
     QRect menuRect() const;
 
     void paintLogo(QPainter *p);
+    void paintTitle(QPainter *p);
     void paintButton(unsigned int button, QPainter *p, bool erased);
 
     void drawText(QPainter *p, QRect &rect, int textflags, QString text);
@@ -151,6 +153,12 @@ class ThemedMenu : public MythDialog
     int exitModifier;
 
     bool spreadbuttons;
+
+    QMap<QString, QPixmap> titleIcons;
+    QPixmap *curTitle;
+    QPoint titlePos;
+    QRect titleRect;
+    bool drawTitle;
 };
 
 #endif

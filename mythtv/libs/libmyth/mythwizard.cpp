@@ -103,6 +103,7 @@ MythWizard::MythWizard(MythContext *context, QWidget *parent,
     d->ws = new QWidgetStack( this, "qt_widgetstack" );
     d->pages.setAutoDelete( TRUE );
     d->title = new QLabel( this, "title label" );
+    d->title->setBackgroundOrigin(QWidget::WindowOrigin);
 
     // create in nice tab order
     d->nextButton = new MythPushButton( this, "next" );
