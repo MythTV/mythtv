@@ -8,8 +8,11 @@ static XvMCSurface* findPastSurface(MpegEncContext *s,
     if (NULL!=lastp) {
         last = (xvmc_render_state_t*)(lastp->data[2]);
         if (B_TYPE==last->pict_type)
+        {
+            last = NULL;
             av_log(s->avctx, AV_LOG_ERROR, "Past frame is a B frame in findPastSurface");
-        assert(B_TYPE!=last->pict_type);
+        }
+        //assert(B_TYPE!=last->pict_type);
     }
 
     if (NULL==last)
@@ -32,11 +35,17 @@ static XvMCSurface* findFutureSurface(MpegEncContext *s)
     if (NULL!=nextp) {
         next = (xvmc_render_state_t*)(nextp->data[2]);
         if (B_TYPE==next->pict_type)
+        {
+            next = NULL;
             av_log(s->avctx, AV_LOG_ERROR, "Next frame is a B frame in findFutureSurface");
-        assert(B_TYPE!=next->pict_type);
+        }
+        //assert(B_TYPE!=next->pict_type);
     }
 
-    assert(NULL!=next);
+    if (NULL==next)
+        return 0;
+
+    //assert(NULL!=next);
 
     if (next->magic != MP_XVMC_RENDER_MAGIC)
         return 0;
