@@ -1108,8 +1108,6 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
     int data_size = 0;
     long long pts;
     bool firstloop = false, have_err = false;
-    bool preProcessed = false;
-
 
     gotvideo = false;
 
@@ -1206,7 +1204,22 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                 context->codec_id == CODEC_ID_MPEG2VIDEO_VIA)
             {
                 MpegPreProcessPkt(curstream, pkt);
-                preProcessed = true;
+            }
+            else
+            {
+                if (pkt->flags & PKT_FLAG_KEY)
+                {
+                    HandleGopStart(pkt);
+                    seen_gop = true;
+                }
+                else
+                {
+                    seq_count++;
+                    if (!seen_gop && seq_count > 1)
+                    {
+                        HandleGopStart(pkt);
+                    }
+                }
             }
         }
 
@@ -1229,7 +1242,8 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                     if (firstloop && pkt->pts != (int64_t)AV_NOPTS_VALUE)
                         lastapts = pkt->pts / (AV_TIME_BASE / 1000);
 
-                    if (onlyvideo != 0 || (pkt->stream_index != wantedAudioStream))
+                    if (onlyvideo != 0 || 
+                        (pkt->stream_index != wantedAudioStream))
                     {
                         ptr += pkt->size;
                         len -= pkt->size;
@@ -1260,8 +1274,6 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                         if (CheckAudioParams(curstream->codec.sample_rate,
                                              curstream->codec.channels))
                         {
-                            extendeddata* edata;
-
                             audio_sampling_rate = curstream->codec.sample_rate;
                             audio_channels = curstream->codec.channels;
                             audio_sample_size = audio_channels * 2;
@@ -1286,13 +1298,13 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                 }
                 case CODEC_TYPE_VIDEO:
                 {
-                    /*if (onlyvideo < 0)
+                    if (onlyvideo < 0)
                     {
                         ptr += pkt->size;
                         len -= pkt->size;
                         continue;
                     }
-                        */
+
                     AVCodecContext *context = &(curstream->codec);
                     AVFrame mpa_pic;
 
@@ -1309,26 +1321,6 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                         have_err = true;
                         continue;
                     }
-
-
-                    if (preProcessed == false)
-                    {
-
-                        if  (mpa_pic.key_frame)
-                        {
-                            HandleGopStart(pkt);
-                            seen_gop = true;
-                        }
-                        else
-                        {
-                            seq_count++;
-                            if (!seen_gop && seq_count > 1)
-                            {
-                                HandleGopStart(pkt);
-                            }
-                        }
-                    }
-
 
                     if (!gotpicture)
                     {
