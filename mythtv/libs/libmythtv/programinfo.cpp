@@ -29,6 +29,8 @@ ProgramInfo::ProgramInfo(void)
     conflicting = false;
     recording = true;
     duplicate = false;
+    suppressed = false;
+    reasonsuppressed = QObject::tr("Not Currently Suppressed");
 
     sourceid = -1;
     inputid = -1;
@@ -61,6 +63,8 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other)
     conflicting = other.conflicting;
     recording = other.recording;
     duplicate = other.duplicate;
+    suppressed = other.suppressed;
+    reasonsuppressed = other.reasonsuppressed;
 
     sourceid = other.sourceid;
     inputid = other.inputid;
@@ -102,6 +106,8 @@ void ProgramInfo::ToStringList(QStringList &list)
         pathname = " ";
     if (rank == "")
         rank = " ";
+    if (reasonsuppressed == "")
+        reasonsuppressed = " ";
 
     list << title;
     list << subtitle;
@@ -123,6 +129,8 @@ void ProgramInfo::ToStringList(QStringList &list)
     list << QString::number(cardid);
     list << QString::number(inputid);
     list << rank;
+    list << QString::number(suppressed);
+    list << reasonsuppressed;
 }
 
 void ProgramInfo::FromStringList(QStringList &list, int offset)
@@ -154,6 +162,8 @@ void ProgramInfo::FromStringList(QStringList &list, int offset)
     cardid = list[offset + 18].toInt();
     inputid = list[offset + 19].toInt();
     rank = list[offset + 20];
+    suppressed = list[offset + 21].toInt();
+    reasonsuppressed = list[offset + 22];
 
     if (title == " ")
         title = "";
@@ -179,6 +189,8 @@ void ProgramInfo::FromStringList(QStringList &list, int offset)
         chansign = "";
     if (rank == " ")
         rank = "";
+    if (reasonsuppressed == " ")
+        reasonsuppressed = "";
 }
 
 void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
@@ -490,6 +502,40 @@ RecordingType ProgramInfo::GetProgramRecordingStatus(QSqlDatabase *db)
     }
 
     return record->getRecordingType();
+}
+
+bool ProgramInfo::AllowRecordingNewEpisodes(QSqlDatabase *db)
+{
+    if (record == NULL) 
+    {
+        record = new ScheduledRecording();
+        record->loadByProgram(db, this);
+    }
+
+    int maxEpisodes = record->GetMaxEpisodes();
+
+    if (!maxEpisodes || record->GetMaxNewest())
+        return true;
+
+    QString thequery;
+    QString sqltitle = title;
+
+    sqltitle.replace(QRegExp("\""), QString("\\\""));
+
+    thequery = QString("SELECT count(*) FROM recorded WHERE title = \"%1\";")
+                       .arg(sqltitle);
+
+    QSqlQuery query = db->exec(thequery);
+
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        query.next();
+
+        if (query.value(0).toInt() >= maxEpisodes)
+            return false;
+    }
+
+    return true;
 }
 
 int ProgramInfo::GetChannelRank(QSqlDatabase *db, const QString &chanid)

@@ -440,14 +440,16 @@ void CommDetect::BuildBlankFrameCommList(void)
                   (abs((int)(gap_length - (30 * frame_rate))) < 12 ) ||
                   (abs((int)(gap_length - (45 * frame_rate))) < 13 ) ||
                   (abs((int)(gap_length - (60 * frame_rate))) < 15 ) ||
-                  (abs((int)(gap_length - (90 * frame_rate))) < 10 ))) ||
+                  (abs((int)(gap_length - (90 * frame_rate))) < 10 ) ||
+                  (abs((int)(gap_length - (120 * frame_rate))) < 10 ))) ||
                 ((!aggressiveDetection) &&
                  ((abs((int)(gap_length - (15 * frame_rate))) < 13 ) ||
                   (abs((int)(gap_length - (20 * frame_rate))) < 15 ) ||
                   (abs((int)(gap_length - (30 * frame_rate))) < 17 ) ||
                   (abs((int)(gap_length - (45 * frame_rate))) < 19 ) ||
                   (abs((int)(gap_length - (60 * frame_rate))) < 20 ) ||
-                  (abs((int)(gap_length - (90 * frame_rate))) < 20 ))))
+                  (abs((int)(gap_length - (90 * frame_rate))) < 20 ) ||
+                  (abs((int)(gap_length - (120 * frame_rate))) < 20 ))))
             {
                 c_start[commercials] = bframes[i];
                 c_end[commercials] = bframes[x] - 1;

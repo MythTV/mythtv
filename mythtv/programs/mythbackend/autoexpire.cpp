@@ -73,6 +73,7 @@ void AutoExpire::RunExpirer(void)
             while ((freespace < minFree) &&
                    (expireList.size() > 0))
             {
+                // delete the "first" item on our list (really off the end)
                 ProgramInfo *pginfo = expireList.back();
 
                 QString msg = QString("AutoExpiring: %1 %2 %3 MBytes")

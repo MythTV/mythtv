@@ -33,6 +33,9 @@ public:
     bool GetAutoExpire(void) const;
     void SetAutoExpire(bool expire);
 
+    int GetMaxEpisodes(void) const;
+    bool GetMaxNewest(void) const;
+
     void setStart(const QDateTime& start);
     void setEnd(const QDateTime& end);
     void setRank(const QString& rank);
@@ -85,8 +88,10 @@ private:
     ID* id;
     class SRRecordingType* type;
     class SRProfileSelector* profile;
+    class SRRecordDups* recorddups;
     class SRAutoExpire* autoexpire;
     class SRMaxEpisodes* maxepisodes;
+    class SRMaxNewest* maxnewest;
     class SRChannel* channel;
     class SRTitle* title;
     class SRSubtitle* subtitle;

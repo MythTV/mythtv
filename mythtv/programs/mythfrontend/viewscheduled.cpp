@@ -719,6 +719,10 @@ void ViewScheduled::selected()
     {
          handleDuplicate(rec);
     }
+    else if (rec->suppressed)
+    {
+         handleSuppressed(rec);
+    } 
     else if (!rec->recording)
     {
          handleNotRecording(rec);
@@ -848,6 +852,17 @@ void ViewScheduled::handleDuplicate(ProgramInfo *rec)
         FillList();
         update(fullRect);
     }
+}
+
+void ViewScheduled::handleSuppressed(ProgramInfo *rec)
+{
+    QString message = tr("Recording this program has been suppressed because: ");
+
+    message += rec->reasonsuppressed;
+
+    DialogBox diag(gContext->GetMainWindow(), message);
+    diag.AddButton(tr("OK"));
+    diag.exec();
 }
 
 void ViewScheduled::chooseConflictingProgram(ProgramInfo *rec)

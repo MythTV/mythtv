@@ -73,11 +73,20 @@ public:
     };
 };
 
+class SRRecordDups: public CheckBoxSetting, public SRSetting {
+public:
+    SRRecordDups(const ScheduledRecording& parent):
+        SRSetting(parent, "recorddups") {
+        setLabel(QObject::tr("Allow recording even if duplicate episode"));
+        setValue(false);
+    };
+};
+
 class SRAutoExpire: public CheckBoxSetting, public SRSetting {
 public:
     SRAutoExpire(const ScheduledRecording& parent):
         SRSetting(parent, "autoexpire") {
-        setLabel(QObject::tr("Auto-Expire recordings"));
+        setLabel(QObject::tr("Allow recordings to be Auto-Expired"));
     };
 };
 
@@ -86,8 +95,18 @@ public:
     SRMaxEpisodes(const ScheduledRecording& parent):
         SpinBoxSetting(0, 60, 1),
         SRSetting(parent, "maxepisodes") {
-        setLabel(QObject::tr("Number of most recent episodes to keep "
+        setLabel(QObject::tr("Maximum number of episodes to keep "
                              "(set to 0 for ALL)"));
+    };
+};
+
+class SRMaxNewest: public CheckBoxSetting, public SRSetting {
+public:
+    SRMaxNewest(const ScheduledRecording& parent):
+        SRSetting(parent, "maxnewest") {
+        setLabel(QObject::tr("Record new episodes and delete oldest once "
+                             "maximum count is reached"));
+        setValue(false);
     };
 };
 
@@ -176,8 +195,10 @@ ScheduledRecording::ScheduledRecording() {
     addChild(id = new ID());
     addChild(type = new SRRecordingType(*this));
     addChild(profile = new SRProfileSelector(*this));
+    addChild(recorddups = new SRRecordDups(*this));
     addChild(autoexpire = new SRAutoExpire(*this));
     addChild(maxepisodes = new SRMaxEpisodes(*this));
+    addChild(maxnewest = new SRMaxNewest(*this));
     addChild(channel = new SRChannel(*this));
     addChild(title = new SRTitle(*this));
     addChild(subtitle = new SRSubtitle(*this));
@@ -214,8 +235,9 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
 "program.starttime, program.endtime, "
 "program.title, program.subtitle, program.description, "
 "channel.channum, channel.callsign, channel.name, "
-"oldrecorded.starttime IS NOT NULL AS duplicate, program.category, "
-"record.rank "
+"oldrecorded.starttime IS NOT NULL AS oldrecduplicate, program.category, "
+"record.rank, record.recorddups, "
+"recorded.starttime IS NOT NULL as recduplicate "
 "FROM record "
 " INNER JOIN channel ON (channel.chanid = program.chanid) "
 " INNER JOIN program ON (program.title = record.title) "
@@ -226,6 +248,14 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
 "    oldrecorded.subtitle IS NOT NULL AND oldrecorded.subtitle <> '' AND program.subtitle = oldrecorded.subtitle "
 "     AND "
 "    oldrecorded.description IS NOT NULL AND oldrecorded.description <> '' AND program.description = oldrecorded.description"
+"  ) "
+" LEFT JOIN recorded ON "
+"  ( "
+"    recorded.title IS NOT NULL AND recorded.title <> '' AND program.title = recorded.title "
+"     AND "
+"    recorded.subtitle IS NOT NULL AND recorded.subtitle <> '' AND program.subtitle = recorded.subtitle "
+"     AND "
+"    recorded.description IS NOT NULL AND recorded.description <> '' AND program.description = recorded.description"
 "  ) "
 "WHERE "
 "((record.type = %1) " // allrecord
@@ -277,7 +307,17 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
              proginfo->chanstr = result.value(7).toString();
              proginfo->chansign = result.value(8).toString();
              proginfo->channame = result.value(9).toString();
-             proginfo->duplicate = result.value(10).toInt();
+
+             // if recorddups is set then check if recording still exists
+             // in recorded table otherwise check for dup in oldrecorded.
+             if (result.value(13).toInt())
+                 proginfo->duplicate = result.value(14).toInt();
+             else
+                 proginfo->duplicate = result.value(10).toInt();
+
+             if (proginfo->duplicate)
+                 proginfo->recording = false;
+
              proginfo->category = QString::fromUtf8(result.value(11).toString());
              proginfo->rank = result.value(12).toString();
 
@@ -467,6 +507,14 @@ void ScheduledRecording::SetAutoExpire(bool expire) {
     autoexpire->setValue(expire);
 }
 
+int ScheduledRecording::GetMaxEpisodes(void) const {
+    return(maxepisodes->getValue().toInt());
+}
+
+bool ScheduledRecording::GetMaxNewest(void) const {
+    return(maxnewest->getValue().toInt());
+}
+
 void ScheduledRecording::save(QSqlDatabase* db) {
     if (type->isChanged() && getRecordingType() == kNotRecording)
         remove(db);
@@ -605,10 +653,12 @@ MythDialog* ScheduledRecording::dialogWidget(MythMainWindow *parent,
     vbox->addWidget(f);    
 
     vbox->addWidget(type->configWidget(this, dialog));
+    vbox->addWidget(recorddups->configWidget(this, dialog));
     vbox->addWidget(profile->configWidget(this, dialog));
     vbox->addWidget(rank->configWidget(this, dialog));
     vbox->addWidget(autoexpire->configWidget(this, dialog));
     vbox->addWidget(maxepisodes->configWidget(this, dialog));
+    vbox->addWidget(maxnewest->configWidget(this, dialog));
 
     MythPushButton *button = new MythPushButton(tr("See a list of all up-coming"
                                                    " episodes/playtimes."),

@@ -9,6 +9,9 @@
 #include <algorithm>
 using namespace std;
 
+#include <sys/stat.h>
+#include <sys/vfs.h>
+
 #include "scheduler.h"
 
 #include "libmythtv/programinfo.h"
@@ -206,6 +209,8 @@ void Scheduler::PrintList(void)
 {
     cout << "--- print list start ---\n";
     list<ProgramInfo *>::iterator i = recordingList.begin();
+    cout << "Title               Chan  ChID StartTime                  S I C "
+            "-- C R D S Rank" << endl;
     for (; i != recordingList.end(); i++)
     {
         ProgramInfo *first = (*i);
@@ -214,7 +219,8 @@ void Scheduler::PrintList(void)
              << " \"" << first->startts.toString() << "\" " << first->sourceid 
              << " " << first->inputid << " " << first->cardid << " -- "  
              << first->conflicting << " " << first->recording << " "
-             << first->duplicate << " " << first->rank.rightJustify(4, ' ')
+             << first->duplicate << " " << first->suppressed << " "
+             << first->rank.rightJustify(4, ' ')
              << endl;
     }
 
@@ -343,6 +349,22 @@ void Scheduler::PruneList(void)
     list<ProgramInfo *>::iterator deliter, q;
 
     QDateTime now = QDateTime::currentDateTime();
+
+    q = recordingList.begin();
+    while (q != recordingList.end())
+    {
+        ProgramInfo *rec = (*q);
+
+        if (!rec->AllowRecordingNewEpisodes(db))
+        {
+            rec->suppressed = true;
+            rec->recording = false;
+            rec->reasonsuppressed = tr("Maximum number of episodes have "
+                                       "already been recorded");
+        }
+
+        q++;
+    }
 
     q = recordingList.begin();
     while (q != recordingList.end())
@@ -871,7 +893,7 @@ list<ProgramInfo *> *Scheduler::CopyList(list<ProgramInfo *> *sourcelist)
             {
                 second->inputid = sourceToInput[first->sourceid][z];
                 second->cardid = inputToCard[second->inputid];
- 
+
                 if (!m_tvList->contains(second->cardid))
                 {
                     cerr << "missing: " << second->cardid << " in tvList\n";
@@ -1090,6 +1112,11 @@ void Scheduler::RunScheduler(void)
     QDateTime curtime;
     QDateTime lastupdate = QDateTime::currentDateTime().addDays(-1);
 
+    QString recordfileprefix = gContext->GetFilePrefix();
+    struct statfs statbuf;
+    int freespace = -1;
+    bool lastFreeStatus = true;
+
     list<ProgramInfo *>::iterator recIter;
 
     // wait for slaves to connect
@@ -1111,6 +1138,38 @@ void Scheduler::RunScheduler(void)
             // Determine if the user wants us to start recording early
             // and by how many seconds
             prerollseconds = gContext->GetNumSetting("RecordPreRoll");
+        }
+
+        if (statfs(recordfileprefix.ascii(), &statbuf) == 0) {
+            freespace = statbuf.f_bfree / (1024*1024/statbuf.f_bsize);
+        }
+
+        if (freespace < 250)
+        {
+            pthread_mutex_unlock(&schedulerLock);
+
+            if (lastFreeStatus)
+            {
+                QString msg = QString("WARNING: Recording Scheduling Halted! "
+                                      "Free disk space has fallen to %1 Megs.")
+                                      .arg(freespace);
+                VERBOSE(msg);
+                lastFreeStatus = false;
+            }
+
+            sleep(1);
+            continue;
+        }
+        else
+        {
+            if (!lastFreeStatus)
+            {
+                QString msg = QString("Recording Scheduling Resumed.  Free "
+                                      "disk space has risen to %1 Megs.")
+                                      .arg(freespace);
+                VERBOSE(msg);
+                lastFreeStatus = true;
+            }
         }
 
         recIter = recordingList.begin();

@@ -94,6 +94,8 @@ CREATE TABLE IF NOT EXISTS record
     rank INT(10) DEFAULT '0' NOT NULL,
     autoexpire INT DEFAULT 0 NOT NULL,
     maxepisodes INT DEFAULT 0 NOT NULL,
+    maxnewest INT DEFAULT 0 NOT NULL,
+    recorddups INT DEFAULT 0 NOT NULL,
     INDEX (chanid, starttime),
     INDEX (title)
 );
