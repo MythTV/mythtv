@@ -1349,7 +1349,8 @@ void TV::ChannelCommit(void)
 
 void TV::ChangeChannelByString(QString &name)
 {
-    if (!CheckChannel(name))
+    int finetuning = 0;
+    if (!CheckChannel(name, finetuning))
         return;
 
     if (activenvp == nvp)
@@ -1542,8 +1543,10 @@ void TV::GetDevices(int cardnum, QString &video, QString &audio, int &rate)
     }
 }
 
-bool TV::CheckChannel(QString &channum)
+bool TV::CheckChannel(QString &channum, int &finetuning)
 {
+    finetuning = 0;
+
     if (!db_conn)
         return true;
 
@@ -1552,7 +1555,8 @@ bool TV::CheckChannel(QString &channum)
     QString channelinput = channel->GetCurrentInput();
     QString device = channel->GetDevice();
 
-    QString thequery = QString("SELECT NULL FROM channel,capturecard,cardinput "
+    QString thequery = QString("SELECT channel.finetune FROM "
+                               "channel,capturecard,cardinput "
                                "WHERE channel.channum = \"%1\" AND "
                                "channel.sourceid = cardinput.sourceid AND "
                                "cardinput.inputname = \"%2\" AND "
@@ -1563,7 +1567,12 @@ bool TV::CheckChannel(QString &channum)
     QSqlQuery query = db_conn->exec(thequery);
 
     if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        query.next();
+
+        finetuning = query.value(0).toInt();
         return true;
+    }
 
     thequery = "SELECT NULL FROM channel;";
     query = db_conn->exec(thequery);

@@ -53,7 +53,7 @@ class TV
     TVState GetState(void) { return internalState; }
     bool ChangingState(void) { return changeState; }
     
-    bool CheckChannel(QString &channum); 
+    bool CheckChannel(QString &channum, int &finetuning); 
     bool ChangeExternalChannel(QString &channum);
 
     QString GetFilePrefix() { return settings->GetSetting("RecordFilePrefix"); }

@@ -154,11 +154,13 @@ bool Channel::SetChannel(int i)
  
     channame = curList[i].name;
 
-    if (pParent->CheckChannel(channame))
+    int finetune = 0;
+
+    if (pParent->CheckChannel(channame, finetune))
     {
         if (currentcapchannel == 0)
         {
-            int frequency = curList[i].freq * 16 / 1000;
+            int frequency = curList[i].freq * 16 / 1000 + finetune;
             if (ioctl(videofd, VIDIOCSFREQ, &frequency) == -1)
                 perror("channel set:");
 
