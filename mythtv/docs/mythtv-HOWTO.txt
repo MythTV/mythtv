@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-04-25, v2.19
+  2003-04-25, v2.20
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -386,6 +386,9 @@
      approximately 30% for Live TV at 416x480.
 
   +o  A P3-550 can decode a 480x480 16Mbps MPEG-2 file with 55% CPU.
+
+  +o  A Celeron 450 (no SSE) can decode a 480x480 16Mbps MPEG-2 file with
+     80% CPU.
 
   ______________________________________________________________________
   NOTE:  As of 2003-04-15 the current IVTV driver does not support multiple

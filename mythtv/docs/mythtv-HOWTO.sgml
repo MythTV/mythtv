@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-04-25, v2.19
+<date>2003-04-25, v2.20
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -223,6 +223,8 @@ Here are some data points for decoding:
 CPU, can decode a 480x480 16Mbps MPEG-2 using 30% CPU and approximately 30%
 for Live TV at 416x480.
 <item>A P3-550 can decode a 480x480 16Mbps MPEG-2 file with 55% CPU.
+<item>A Celeron 450 (no SSE) can decode a 480x480 16Mbps MPEG-2 file with
+80% CPU.
 </itemize>
 
 <code>
@@ -3371,6 +3373,7 @@ PVR-250 not showing inputs.  Updated mythweather debug (runtime option now),
 updated mythvideo settings file.
 v2.19, 2003-04-25.  Mythmusic playlist addition.  Mythmusic adjustments
 since it's now graphically setup.
+v2.20, 2003-04-25.  More CPU stats.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
