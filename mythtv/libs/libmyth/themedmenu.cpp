@@ -182,7 +182,7 @@ class ThemedMenuPrivate
 
     QString selection;
     bool foundtheme;
-
+    bool balancerows;
     int menulevel;
     vector<MenuState> menufiles;
 
@@ -330,6 +330,12 @@ void ThemedMenuPrivate::parseBackground(const QString &dir,
                 QString val = getFirstText(info);
                 if (val == "no")
                     spreadbuttons = false;
+            }
+            else if (info.tagName() == "balancerows")
+            {
+                QString val = getFirstText(info);
+                if (val == "no")
+                    balancerows = false;
             }
             else if (info.tagName() == "columns")
             {
@@ -1203,7 +1209,7 @@ void ThemedMenuPrivate::setDefaults(void)
 {
     logo = NULL;
     buttonnormal = buttonactive = NULL;
-
+    balancerows = true;
     normalAttributes.textflags = Qt::AlignTop | Qt::AlignLeft | Qt::WordBreak;
     normalAttributes.textColor = QColor(QWidget::white);
     normalAttributes.hasoutline = false;
@@ -1662,17 +1668,20 @@ void ThemedMenuPrivate::layoutButtons(void)
         exit(-44);
     }
 
-    // keep the rows balanced
-    if (numbuttons <= 4)
+    if (balancerows)
     {
-        if (columns > 2)
-            columns = 2;
+        // keep the rows balanced
+        if (numbuttons <= 4)
+        {
+            if (columns > 2)
+                columns = 2;
+        }
+        else
+        {
+            if (columns > 3)
+                columns = 3;
+        }    
     }
-    else
-    {
-        if (columns > 3)
-            columns = 3;
-    }    
 
     // limit it to 6 items displayed at one time
     if (columns * maxrows > visiblerowlimit)
@@ -2113,6 +2122,7 @@ void ThemedMenuPrivate::drawText(QPainter *p, const QRect &rect,
 
 void ThemedMenuPrivate::ReloadTheme(void)
 {
+    
     globalFontMap.clear();
     parseFonts = true;
     buttonList.clear();
@@ -2154,6 +2164,8 @@ void ThemedMenuPrivate::ReloadTheme(void)
         delete downarrow;
     downarrow = NULL;
 
+    QString themedir = gContext->GetThemeDir();
+    
     gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
     parent->setFixedSize(QSize(screenwidth, screenheight));
 
@@ -2162,7 +2174,7 @@ void ThemedMenuPrivate::ReloadTheme(void)
 
     gContext->ThemeWidget(parent);
 
-    QString themedir = gContext->GetThemeDir();
+    
     parseSettings(themedir, "theme.xml");
 
     QString file = menufiles.back().name;
