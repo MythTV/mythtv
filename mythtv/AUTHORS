@@ -33,7 +33,7 @@ EPG/filldatabase enhancements:
 Setup enhancements:
     Dan Schwarz <dschwarz at bellatlantic.net>
 Large amount of documentation:
-    Robert Kulagowski <rkulagowski at thrupoint.net>
+    Robert Kulagowski <bob at smalltime.com>
 Alternative EPG layout, Program Finder:
     John Danner <johndanner at psu.edu>
 Graphical setup UI, database backend for configuration, initial direct rendering support
