@@ -16,7 +16,7 @@ installfiles.files = mythexplorer-settings.txt videomenu.xml
 INSTALLS += installfiles
 
 LIBS += 
-LIBS += -L/usr/local/lib -lmyth-$$LIBVERSION
+LIBS += -L$${PREFIX}/lib -lmyth-$$LIBVERSION
 
 # Input
 
