@@ -35,12 +35,18 @@
 
 OSDGenericTree::OSDGenericTree(OSDGenericTree *parent, const QString &name, 
                                const QString &action, int check, 
-                               OSDTypeImage *image)
+                               OSDTypeImage *image, QString group)
               : GenericTree(name)
 {
     m_checkable = check;
     m_action = action;
     m_image = image;
+    m_parentButton = NULL;
+
+    if (group != "")
+        m_group = group;
+    else
+        m_group = action;
 
     if (!action.isEmpty() && !action.isNull())
         setSelectable(true);
@@ -117,6 +123,17 @@ void OSDListTreeType::Reinit(float wchange, float hchange, float wmult,
     while ((child = it.current()) != 0)
     {
         child->Reinit(wchange, hchange, wmult, hmult);
+        ++it;
+    }
+}
+
+void OSDListTreeType::SetGroupCheckState(QString group, int newState)
+{
+    QPtrListIterator<OSDListBtnType> it(listLevels);
+    OSDListBtnType *child;
+    while ((child = it.current()) != 0)
+    {
+        child->SetGroupCheckState(group, newState);
         ++it;
     }
 }
@@ -298,13 +315,23 @@ bool OSDListTreeType::HandleKeypress(QKeyEvent *e)
                 }
                 else if (m_arrowAccel)
                 {
+                    SetGroupCheckState(currentpos->getGroup(),
+                                       OSDListBtnTypeItem::NotChecked);
+                    currentpos->getParentButton()->setChecked(
+                                       OSDListBtnTypeItem::FullChecked);
                     emit itemSelected(this, currentpos);
                 }
             }
             else if (action == "ESCAPE" || action == "MENU")
                 m_visible = false;
             else if (action == "SELECT")
+            {
+                SetGroupCheckState(currentpos->getGroup(),
+                                   OSDListBtnTypeItem::NotChecked);
+                currentpos->getParentButton()->setChecked(
+                                   OSDListBtnTypeItem::FullChecked);
                 emit itemSelected(this, currentpos);
+            }
             else
                 handled = false;
         }
@@ -347,7 +374,9 @@ void OSDListTreeType::FillLevelFromTree(OSDGenericTree *item,
                                          (child->childCount() > 0));
         if (osdchild->getCheckable() == 1)
             newitem->setChecked(OSDListBtnTypeItem::FullChecked);
+        newitem->setGroup(osdchild->getGroup());
         newitem->setData(osdchild);
+        osdchild->setParentButton(newitem);
 
         ++it;
     }
@@ -444,6 +473,14 @@ void OSDListBtnType::Reinit(float wchange, float hchange, float wmult,
         item->Reinit(wchange, hchange, wmult, hmult);
     }
 
+}
+
+void OSDListBtnType::SetGroupCheckState(QString group, int newState)
+{
+    OSDListBtnTypeItem* item = 0;
+    for (item = m_itemList.first(); item; item = m_itemList.next()) {
+        item->setChecked((OSDListBtnTypeItem::CheckState)newState);
+    }
 }
 
 void OSDListBtnType::SetItemRegColor(const QColor& beg, const QColor& end, 
