@@ -1231,14 +1231,13 @@ bool NuppelDecoder::DoFastForward(long long desiredFrame)
         if (needflush)
         {
             lastKey = desiredKey;
-            keyPos = positionMap[desiredKey / keyframedist];
+            keyPos = (*positionMap)[desiredKey / keyframedist];
             long long diff = keyPos - ringBuffer->GetTotalReadPosition();
 
             ringBuffer->Seek(diff, SEEK_CUR);
         }
 
         framesPlayed = lastKey;
-        framesRead = lastKey;
     }
 
     normalframes = desiredFrame - framesPlayed;
