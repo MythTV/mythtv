@@ -347,7 +347,8 @@ void VideoOutput::DoneDisplayingFrame(void)
 {
     video_buflock.lock();
     VideoFrame *buf = usedVideoBuffers.dequeue();
-    availableVideoBuffers.enqueue(buf);
+    if (buf)
+        availableVideoBuffers.enqueue(buf);
     video_buflock.unlock();
 }
 

@@ -2701,11 +2701,11 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
     }
 
     QString audsetting = profile.byName("audiocodec")->getValue();
+    nvr->SetOption("samplerate", audio_samplerate);
     if (audsetting == "MP3") 
     {
         nvr->SetOption("audiocompression", 1);
         SetProfileOption(profile, "mp3quality");
-        SetProfileOption(profile, "samplerate");
         decoder->SetRawAudioState(true);
     } 
     else if (audsetting == "Uncompressed")
@@ -2765,6 +2765,10 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
            unlink(outputname);
            return REENCODE_ERROR;
         }
+        VERBOSE(VB_GENERAL, QString("Video %1x%2@%3fps Audio rate: %4")
+                                   .arg(video_width).arg(video_height)
+                                   .arg(video_frame_rate)
+                                   .arg(audio_samplerate));
         VERBOSE(VB_GENERAL, "Created fifos. Waiting for connection.");
     }
 
@@ -2805,7 +2809,8 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
     long lastKeyFrame = 0;
     long totalAudio = 0;
     int dropvideo = 0;
-    int rateTimeConv = audio_samplerate * audio_bits * audio_channels / 8000;
+    float rateTimeConv = audio_samplerate * audio_bits * audio_channels / 
+                         8000.0;
     float vidFrameTime = 1000.0 / video_frame_rate;
     int wait_recover = 0;
 
@@ -2850,13 +2855,11 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
 
         if (fifow)
         {
-            int audbufTime = arb->audiobuffer_len / rateTimeConv;
-            totalAudio += audbufTime;
-            int auddelta = arb->last_audiotime - totalAudio;
+            totalAudio += arb->audiobuffer_len;
+            int audbufTime = (int)(totalAudio / rateTimeConv);
+            int auddelta = arb->last_audiotime - audbufTime;
             int vidTime = (int) (frame.frameNumber * vidFrameTime + 0.5);
-            videoOutput->StartDisplayingFrame();
-            VideoFrame *dispFrame = videoOutput->GetLastShownFrame();
-            int viddelta = dispFrame->timecode - vidTime;
+            int viddelta = frame.timecode - vidTime;
             int delta = viddelta - auddelta;
             if (abs(delta) < 500 && abs(delta) >= vidFrameTime)
             {
@@ -2881,7 +2884,7 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
                     int count = 0;
                     while (delta > vidFrameTime)
                     {
-                        fifow->FIFOWrite(0, dispFrame->buf, frame.size);
+                        fifow->FIFOWrite(0, frame.buf, frame.size);
                         count++;
                         delta -= (int)vidFrameTime;
                     }
@@ -2900,11 +2903,13 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
                 wait_recover = 0;
             }
 
+            // int buflen = (int)(arb->audiobuffer_len / rateTimeConv);
             // cout << frame.frameNumber << ": video time: " << frame.timecode
             //      << " audio time: " << arb->last_audiotime << " buf: "
-            //      << audbufTime << " exp: "
-            //      << totalAudio << endl;
-            fifow->FIFOWrite(1, arb->audiobuffer, arb->audiobuffer_len);
+            //      << buflen << " exp: "
+            //      << audbufTime << " delta: " << delta << endl;
+            if (arb->audiobuffer_len)
+                fifow->FIFOWrite(1, arb->audiobuffer, arb->audiobuffer_len);
             if (dropvideo < 0)
             {
                 dropvideo++;
@@ -2912,10 +2917,10 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
             }
             else
             {
-                fifow->FIFOWrite(0, dispFrame->buf, frame.size);
+                fifow->FIFOWrite(0, frame.buf, frame.size);
                 if (dropvideo)
                 {
-                    fifow->FIFOWrite(0, dispFrame->buf, frame.size);
+                    fifow->FIFOWrite(0, frame.buf, frame.size);
                     frame.frameNumber++;
                     dropvideo--;
                 }
@@ -3009,11 +3014,9 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
             }
 
             if (forceKeyFrames)
-                writekeyframe = true;
+                nvr->WriteVideo(&frame, true, true);
             else
-                writekeyframe = decoder->isLastFrameKey();
-
-            nvr->WriteVideo(&frame, true, writekeyframe);
+                nvr->WriteVideo(&frame);
         }
 
         if (QDateTime::currentDateTime() > curtime) 
