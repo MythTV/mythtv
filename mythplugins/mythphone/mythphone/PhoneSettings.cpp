@@ -291,6 +291,17 @@ public:
     }
 };
 
+class SipAutoanswer: public CheckBoxSetting, public GlobalSetting {
+public:
+    SipAutoanswer():
+        GlobalSetting("SipAutoanswer") {
+        setLabel(QObject::tr("Auto-Answer"));
+        setValue(false);
+        setHelpText(QObject::tr("When the MythFrontend is in the MythPhone plugin, "
+                    "setting this automatically answers all incoming calls. There is no security yet."));
+    };
+};
+
 
 
 
@@ -323,6 +334,7 @@ MythPhoneSettings::MythPhoneSettings()
 
     VerticalConfigurationGroup* vxmlSet = new VerticalConfigurationGroup(false);
     vxmlSet->setLabel(QObject::tr("VXML Settings"));
+    vxmlSet->addChild(new SipAutoanswer());
     vxmlSet->addChild(new TimeToAnswer());
     vxmlSet->addChild(new DefaultVxmlUrl());
     vxmlSet->addChild(new DefaultVoicemailPrompt());

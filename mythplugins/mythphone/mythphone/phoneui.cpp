@@ -686,15 +686,21 @@ void PhoneUIBox::fsmTimerExpiry()
                 delete currentCallEntry;
             currentCallEntry = new CallRecord(callerName, callerUrl, true, ts);
 
-            // Popup the caller's details
             DirEntry *entry = DirContainer->FindMatchingDirectoryEntry(currentCallEntry->getUri());
-            closeCallPopup(); // Check we were not displaying one (e.g. user was getting ready to dial)
-            if (entry)
-                doCallPopup(entry, "Answer", inAudioOnly);
+            bool AutoanswerEnabled = gContext->GetNumSetting("SipAutoanswer",1);
+            if (AutoanswerEnabled)
+                PlaceorAnswerCall(entry->getUri(), entry->getNickName(), txVideoMode, true);
             else
             {
-                DirEntry dummyEntry(callerDisplay, callerUrl, "", "", "");
-                doCallPopup(&dummyEntry, "Answer", inAudioOnly);
+                // Popup the caller's details
+                closeCallPopup(); // Check we were not displaying one (e.g. user was getting ready to dial)
+                if (entry)
+                    doCallPopup(entry, "Answer", inAudioOnly);
+                else
+                {
+                    DirEntry dummyEntry(callerDisplay, callerUrl, "", "", "");
+                    doCallPopup(&dummyEntry, "Answer", inAudioOnly);
+                }
             }
         }
         else if (State == SIP_IDLE)
