@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2004-01-05, v0.13.07
+<date>2004-01-07, v0.13.08
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1030,7 +1030,7 @@ url="http://www.mythtv.org/mailman/listinfo/mythtv-dev/"
 name="http://www.mythtv.org/mailman/listinfo/mythtv-dev/"> mailing lists.
 
 Get XMLTV from <url url="http://xmltv.sourceforge.net"
-name="http://xmltv.sourceforge.net">.  Download version 0.5.25 if you're in
+name="http://xmltv.sourceforge.net">.  Download version 0.5.27 if you're in
 North America.
 
 <code>
@@ -1156,7 +1156,7 @@ Continuing on:
 
 <label id="untarring_xmltv">Untar the xmltv file:
 <tscreen><verb>
-$ tar -xjf xmltv-0.5.25.tar.bz2
+$ tar -xjf xmltv-0.5.27.tar.bz2
 </verb></tscreen>
 Install the xmltv prerequisites:
 
@@ -1173,7 +1173,7 @@ cpan> exit
 
 Change to the XMLTV directory and compile it:
 <tscreen><verb>
-$ cd xmltv-0.5.25
+$ cd xmltv-0.5.27
 $ perl Makefile.PL
 </verb></tscreen>
 You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes" to
@@ -4315,8 +4315,8 @@ SEE THE IVTV MAILING LIST.  <url
 url="https://lists.sourceforge.net/lists/listinfo/ivtv-devel"
 name="https://lists.sourceforge.net/lists/listinfo/ivtv-devel">  SEE THE
 IVTV FAQ IF YOU HAVE QUESTIONS OR ISSUES.  <url
-url="http://ivtv.sourceforge.net/FAQ.html"
-name="http://ivtv.sourceforge.net/FAQ.html">
+url="http://ivtv.sourceforge.net/"
+name="http://ivtv.sourceforge.net/">
 
 These instructions work for Mandrake 9.1 on a backend machine which is
 hosting a single PVR-250 capture card.
@@ -4335,20 +4335,19 @@ $ su
 
 <bf>NOTE</bf>:  You do not need to recompile your kernel.
 
-Download the IVTV driver from CVS:
+Download the IVTV driver from Sourceforge:
 <tscreen><verb>
-$ cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/ivtv login
-<enter> as password
-$ cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/ivtv co ivtv
+$ wget http://ivtv.sourceforge.net/CVS-LATEST.tar.gz
+$ tar -xzf CVS-LATEST.tar.gz
 </verb></tscreen>
 
 This should create an ivtv directory.  Switch to it and perform the
 following commands:
 <tscreen><verb>
 $ cd ivtv/ivtv/utils
-$ wget http://hauppauge.lightpath.net/software/pvr250/pvr250_17_21226.exe
+$ wget http://hauppauge.lightpath.net/software/pvr250/pvr250_17_21288.exe
 $ su
-# ./ivtvfwextract.pl pvr250_17_21226.exe
+# ./ivtvfwextract.pl pvr250_17_21288.exe
 # exit
 </verb></tscreen>
 
@@ -4375,6 +4374,8 @@ $ su
 them.
 
 Add the following to <tt>/etc/modules.conf</tt>:
+<bf>NOTE</bf>:  You do not need to add the last line "<tt>add above...</tt>"
+if you will not be using the IR remote that came with the card.
 <tscreen><verb>
 alias char-major-81     videodev
 alias char-major-81-0   ivtv
@@ -4942,6 +4943,9 @@ warning which is sure to be ignored.
 v0.13.06, 2004-01-01.  Remove the hang comment from xmltv setup; there's now
 a status window.  Update Jarod's website info.
 v0.13.07, 2004-01-05.  Fix typo.  Edit URL for i2c stuff.
+v0.13.08, 2004-01-07.  Change ivtv to CVS-LATEST tarball instead of cvs because
+sourceforge sucks.  Update some other stuff in the PVR-250 example section. 
+Update XMLTV version.
 -->
 
 <!--

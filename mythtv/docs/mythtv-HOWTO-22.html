@@ -22,7 +22,7 @@ NOT GUARANTEED TO WORK WITH YOUR DISTRIBUTION.  FOR IVTV DRIVER ASSISTANCE,
 SEE THE IVTV MAILING LIST.  
 <A HREF="https://lists.sourceforge.net/lists/listinfo/ivtv-devel">https://lists.sourceforge.net/lists/listinfo/ivtv-devel</A>  SEE THE
 IVTV FAQ IF YOU HAVE QUESTIONS OR ISSUES.  
-<A HREF="http://ivtv.sourceforge.net/FAQ.html">http://ivtv.sourceforge.net/FAQ.html</A></P>
+<A HREF="http://ivtv.sourceforge.net/">http://ivtv.sourceforge.net/</A></P>
 <P>These instructions work for Mandrake 9.1 on a backend machine which is
 hosting a single PVR-250 capture card.</P>
 <P>Install the Mandrake kernel source.  If you are using a different Mandrake
@@ -40,12 +40,11 @@ $ su
 </CODE></BLOCKQUOTE>
 </P>
 <P><B>NOTE</B>:  You do not need to recompile your kernel.</P>
-<P>Download the IVTV driver from CVS:
+<P>Download the IVTV driver from Sourceforge:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/ivtv login
-&lt;enter> as password
-$ cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/ivtv co ivtv
+$ wget http://ivtv.sourceforge.net/CVS-LATEST.tar.gz
+$ tar -xzf CVS-LATEST.tar.gz
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -54,9 +53,9 @@ following commands:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ cd ivtv/ivtv/utils
-$ wget http://hauppauge.lightpath.net/software/pvr250/pvr250_17_21226.exe
+$ wget http://hauppauge.lightpath.net/software/pvr250/pvr250_17_21288.exe
 $ su
-# ./ivtvfwextract.pl pvr250_17_21226.exe
+# ./ivtvfwextract.pl pvr250_17_21288.exe
 # exit
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -86,6 +85,8 @@ $ su
 <P><B>NOTE</B>: You may get warnings about i2c during the compile.  Ignore
 them.</P>
 <P>Add the following to <CODE>/etc/modules.conf</CODE>:
+<B>NOTE</B>:  You do not need to add the last line "<CODE>add above...</CODE>"
+if you will not be using the IR remote that came with the card.
 <BLOCKQUOTE><CODE>
 <PRE>
 alias char-major-81     videodev
