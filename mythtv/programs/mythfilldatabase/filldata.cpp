@@ -268,11 +268,8 @@ QString expandURLString(const QString &url)
 void UpdateSourceIcons(int sourceid)
 {
     if (!quiet)
-    {
-        QString m = QString("Updating icons for sourceid: %1")
-                .arg(sourceid);
-        cout << m << endl;
-    }
+        cout << QString("Updating icons for sourceid: %1").arg(sourceid) << endl;
+
     QString fileprefix = SetupIconCacheDirectory();
 
     QSqlQuery query;
@@ -298,18 +295,21 @@ void UpdateSourceIcons(int sourceid)
             {
                 QString icon_get_command = QString("wget --timestamping "
                         "--directory-prefix=") + fileprefix + " " + icon_url;
-                QString m = QString("Attempting to fetch icon with: %1")
-                        .arg(icon_get_command);
-                cerr << m << endl;
+                if (!quiet)
+                    cout << QString("Attempting to fetch icon with: %1").arg(icon_get_command) << endl;
+
                 system(icon_get_command);
             }
 
             if (localfile.exists())
             {
                 int chanid = query.value(0).toInt();
-                QString m = QString("Updating channel icon for chanid: %1")
+                if (!quiet)
+                {
+                    QString m = QString("Updating channel icon for chanid: %1")
                         .arg(chanid);
-                cerr << m << endl;
+                    cout << m << endl;
+                }
                 QSqlQuery icon_update_query;
                 icon_update_query.prepare("UPDATE channel SET icon = :ICON "
                         "WHERE chanid = :CHANID AND sourceid = :SOURCEID");
@@ -323,12 +323,11 @@ void UpdateSourceIcons(int sourceid)
             }
             else
             {
-                QString em = QString(
+                cerr << QString(
                         "Error retrieving icon from '%1' to file '%2'")
                         .arg(icon_url)
-                        .arg(localfile.name());
-
-                cerr << em << endl;
+                        .arg(localfile.name())
+                     << endl;
             }
         }
     }
@@ -525,30 +524,30 @@ void ImportIconMap(const QString &filename)
                 }
                 catch (DOMException &e)
                 {
-                    QString em = QString("Error while processing %1: %2")
+                    cerr << QString("Error while processing %1: %2")
                             .arg(node.nodeName())
-                            .arg(e.getMessage());
-                    cerr << em << endl;
+                            .arg(e.getMessage())
+                         << endl;
                 }
                 node = node.nextSibling();
             }
         }
         else
         {
-            QString em = QString(
+            cerr << QString(
                     "Error unable to set document content: %1:%2c%3 %4")
                     .arg(filename)
                     .arg(de_ln)
                     .arg(de_column)
-                    .arg(de_msg);
-            cerr << em << endl;
+                    .arg(de_msg)
+                 << endl;
         }
     }
     else
     {
-        QString em = QString("Error unable to open '%1' for reading.")
-                .arg(filename);
-        cerr << em << endl;
+        cerr << QString("Error unable to open '%1' for reading.")
+                .arg(filename)
+             << endl;
     }
 }
 
@@ -556,9 +555,8 @@ void ExportIconMap(const QString &filename)
 {
     if (!quiet)
     {
-        QString msg = QString("Exporting icon mapping to %1...")
-                .arg(filename);
-        cout << msg << endl;
+        cout << QString("Exporting icon mapping to %1...").arg(filename)
+             << endl;
     }
     QFile xml_file(filename);
     if (dash_open(xml_file, filename, IO_WriteOnly))
@@ -657,9 +655,7 @@ void ExportIconMap(const QString &filename)
     }
     else
     {
-        QString em = QString("Error unable to open '%1' for writing.")
-                .arg(filename);
-        cerr << em << endl;
+        cerr << QString("Error unable to open '%1' for writing.") << endl;
     }
 }
 
@@ -881,23 +877,27 @@ bool grabDDData(Source source, int poffset, QDate pdate)
 
     if (needtoretrieve)
     {
-        cerr << "Retrieving datadirect data... \n";
+        if (!quiet)
+            cout << "Retrieving datadirect data... \n";
         if (dd_grab_all) 
         {
-            cerr << "Grabbing ALL available data...\n";
+            if (!quiet)
+                cout << "Grabbing ALL available data...\n";
             ddprocessor.grabAllData();
         }
         else
         {
-            cerr << "Grabbing data for " << pdate.toString() 
-                 << " offset " << poffset << "\n";
+            if (!quiet)
+                cout << "Grabbing data for " << pdate.toString() 
+                     << " offset " << poffset << "\n";
             QDateTime fromdatetime = QDateTime(pdate);
             QDateTime todatetime;
             fromdatetime.setTime_t(QDateTime(pdate).toTime_t(),Qt::UTC);
             fromdatetime = fromdatetime.addDays(poffset);
             todatetime = fromdatetime.addDays(1);
-            cerr << "From : " << fromdatetime.toString() 
-                 << " To : " << todatetime.toString() << " (UTC)\n";
+            if (!quiet)
+                cout << "From : " << fromdatetime.toString() 
+                     << " To : " << todatetime.toString() << " (UTC)\n";
             ddprocessor.grabData(false, fromdatetime, todatetime);
         }
 
@@ -906,20 +906,23 @@ bool grabDDData(Source source, int poffset, QDate pdate)
     }
     else
     {
-        cerr << "Using existing grabbed data in temp tables..\n";
+        if (!quiet)
+            cout << "Using existing grabbed data in temp tables..\n";
     }
 
-    cerr << "Grab complete.  Actual data from " 
-         << ddprocessor.getActualListingsFrom().toString() << " "
-         << "to " << ddprocessor.getActualListingsTo().toString() 
-         << " (UTC) \n";
+    if (!quiet)
+        cout << "Grab complete.  Actual data from " 
+             << ddprocessor.getActualListingsFrom().toString() << " "
+             << "to " << ddprocessor.getActualListingsTo().toString() 
+             << " (UTC) \n";
 
     qdtNow = QDateTime::currentDateTime();
     query.exec(QString("UPDATE settings SET data ='%1' "
                        "WHERE value='mythfilldatabaseLastRunEnd'")
                        .arg(qdtNow.toString("yyyy-MM-dd hh:mm")));
 
-    cerr << "Clearing data for source...\n";
+    if (!quiet)
+        cout << "Clearing data for source...\n";
     QDateTime basedt = QDateTime(QDate(1970, 1, 1));
     QDateTime fromlocaldt;
     int timesecs = basedt.secsTo(ddprocessor.getActualListingsFrom());
@@ -928,15 +931,20 @@ bool grabDDData(Source source, int poffset, QDate pdate)
     timesecs = basedt.secsTo(ddprocessor.getActualListingsTo());
     tolocaldt.setTime_t(timesecs);
 
-    cerr << "Clearing from " << fromlocaldt.toString() 
-         << " to " << tolocaldt.toString() << " (localtime)\n";
+    if (!quiet)
+        cout << "Clearing from " << fromlocaldt.toString() 
+             << " to " << tolocaldt.toString() << " (localtime)\n";
 
     clearDataBySource(source.id, fromlocaldt,tolocaldt);
-    cerr << "Data for source cleared...\n";
+    if (!quiet)
+        cout << "Data for source cleared...\n";
 
-    cerr << "Main temp tables populated.  Updating myth channels...\n";
+    if (!quiet)
+        cout << "Main temp tables populated.  Updating myth channels...\n";
     DataDirectStationUpdate(source);
-    cerr << "Channels updated..  Updating programs...\n";
+
+    if (!quiet)
+        cout << "Channels updated..  Updating programs...\n";
     DataDirectProgramUpdate(source);
 
     return true;
@@ -1366,7 +1374,7 @@ void parseFile(QString filename, QValueList<ChanInfo> *chanlist,
 
     if (!doc.setContent(&f, &errorMsg, &errorLine, &errorColumn))
     {
-        cout << "Error in " << errorLine << ":" << errorColumn << ": "
+        cerr << "Error in " << errorLine << ":" << errorColumn << ": "
              << errorMsg << endl;
 
         f.close();
@@ -1552,15 +1560,18 @@ void fixProgramList(QValueList<ProgInfo> *fixlist)
             else
                 tokeep = i, todelete = cur;
 
-            cerr << "removing conflicting program: "
-                 << (*todelete).channel << " "
-                 << (*todelete).title.local8Bit() << " "
-                 << (*todelete).startts << "-" << (*todelete).endts << endl;
-            cerr << "conflicted with             : "
-                 << (*tokeep).channel << " "
-                 << (*tokeep).title.local8Bit() << " "
-                 << (*tokeep).startts << "-" <<   (*tokeep).endts << endl;
-            cerr << endl;
+            if (!quiet)
+            {
+                cerr << "removing conflicting program: "
+                     << (*todelete).channel << " "
+                     << (*todelete).title.local8Bit() << " "
+                     << (*todelete).startts << "-" << (*todelete).endts << endl;
+                cerr << "conflicted with             : "
+                     << (*tokeep).channel << " "
+                     << (*tokeep).title.local8Bit() << " "
+                     << (*tokeep).startts << "-" <<   (*tokeep).endts << endl;
+                cerr << endl;
+            }
 
             if (todelete == i)
                 i = cur;
@@ -1807,11 +1818,7 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                                      localfile.ascii(), chanid.ascii());
 
                     if (!query.exec(querystr))
-                    {
-                        cerr << "DB Error: Channel icon change failed, SQL query "
-                             << "was:" << endl;
-                        cerr << querystr << endl;
-                    }
+                        MythContext::DBError("Channel icon change", query);
                 }
             }
         }
@@ -1857,9 +1864,7 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
 
                     if (!query.exec(querystr))
                     {
-                        cerr << "DB Error: Channel insert failed, SQL query "
-                             << "was:" << endl;
-                        cerr << querystr << endl;
+                        MythContext::DBError("Channel insert", query);
                     }
                     else
                     {
