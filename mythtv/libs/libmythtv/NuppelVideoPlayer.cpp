@@ -2172,7 +2172,7 @@ void NuppelVideoPlayer::SetDeleteIter(void)
     {
         while (deleteIter != deleteMap.end())
         {
-            if (framesPlayed > deleteIter.key())
+            if ((framesPlayed + 2) > deleteIter.key())
             {
                 ++deleteIter;
             }
@@ -2195,7 +2195,7 @@ void NuppelVideoPlayer::SetBlankIter(void)
     {
         while (blankIter != blankMap.end())
         {
-            if (framesPlayed > blankIter.key())
+            if ((framesPlayed + 2) > blankIter.key())
             {
                 ++blankIter;
             }
@@ -2215,7 +2215,7 @@ void NuppelVideoPlayer::SetCommBreakIter(void)
     {
         while (commBreakIter != commBreakMap.end())
         {
-            if (framesPlayed > commBreakIter.key())
+            if ((framesPlayed + 2) > commBreakIter.key())
             {
                 commBreakIter++;
             }
