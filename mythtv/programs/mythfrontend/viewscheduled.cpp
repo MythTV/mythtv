@@ -647,7 +647,7 @@ void ViewScheduled::updateInfo(QPainter *p)
 
 void ViewScheduled::edit()
 {
-    if (doingSel)
+    if (doingSel || !curitem)
         return;
 
     doingSel = true;
@@ -656,33 +656,30 @@ void ViewScheduled::edit()
 
     MythContext::KickDatabase(db);
 
-    if (rec)
+    if ((gContext->GetNumSetting("AdvancedRecord", 0)) ||
+        (rec->GetProgramRecordingStatus(db) > kAllRecord))
     {
-        if ((gContext->GetNumSetting("AdvancedRecord", 0)) ||
-            (rec->GetProgramRecordingStatus(db) > kAllRecord))
-        {
-            ScheduledRecording record;
-            record.loadByProgram(db, rec);
-            record.exec(db);
-        }
-        else
-        {
-            InfoDialog diag(rec, gContext->GetMainWindow(), "Program Info");
-            diag.exec();
-        }
-
-        ScheduledRecording::signalChange(db);
-
-        FillList();
-        update(fullRect);
+        ScheduledRecording record;
+        record.loadByProgram(db, rec);
+        record.exec(db);
     }
+    else
+    {
+        InfoDialog diag(rec, gContext->GetMainWindow(), "Program Info");
+        diag.exec();
+    }
+
+    ScheduledRecording::signalChange(db);
+
+    FillList();
+    update(fullRect);
 
     doingSel = false;
 }
 
 void ViewScheduled::selected()
 {
-    if (doingSel)
+    if (doingSel || !curitem)
         return;
 
     doingSel = true;
@@ -707,7 +704,7 @@ void ViewScheduled::selected()
     {
         handleConflicting(rec);
     }
-    else if (rec)
+    else
     {
         if ((gContext->GetNumSetting("AdvancedRecord", 0)) ||
             (rec->GetProgramRecordingStatus(db) > kAllRecord))

@@ -48,6 +48,7 @@
       <action>TV_PROGFIND</action>
    </button>
 
+<!--
    <button>
       <type>TV_SCHEDULE</type>
       <text>Instant Recording</text>
@@ -70,6 +71,7 @@
       <alttext lang="SV">Omedelbar</alttext>
       <action>TV_MANUAL</action>
    </button>
+-->
 
    <button>
       <type>TV_SCHEDULE</type>
