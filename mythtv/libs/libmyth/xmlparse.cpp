@@ -512,6 +512,8 @@ void XMLParse::parseListArea(LayerSet *container, QDomElement &element)
     int draworder = 0;
     QMap<int, int> columnWidths;
     QMap<int, int> columnContexts;
+    QMap<QString, QString> fontFunctions;
+    QMap<QString, fontProp> theFonts;
     int colCnt = -1;
 
     QRect fill_select_area = QRect(0, 0, 0, 0);
@@ -555,10 +557,6 @@ void XMLParse::parseListArea(LayerSet *container, QDomElement &element)
                 area = parseRect(getFirstText(info));
                 normalizeRect(area);
             }
-            else if (info.tagName() == "forcecolor")
-            {
-                force_color = getFirstText(info);
-            }
             else if (info.tagName() == "activefont")
             {
                 act_font = getFirstText(info);
@@ -574,6 +572,27 @@ void XMLParse::parseListArea(LayerSet *container, QDomElement &element)
             else if (info.tagName() == "columnpadding")
             {
                 padding = getFirstText(info).toInt();
+            }
+            else if (info.tagName() == "fcnfont")
+            {
+                QString fontname = "";
+                QString fontfcn = "";
+
+                fontname = info.attribute("name", "");
+                fontfcn = info.attribute("function", "");
+
+                if (fontname.isNull() || fontname.isEmpty())
+                {   
+                    cerr << "FcnFont needs a name\n";
+                    exit(0);
+                }
+
+                if (fontfcn.isNull() || fontfcn.isEmpty())
+                {   
+                    cerr << "FcnFont needs a function\n";
+                    exit(0);
+                }
+                fontFunctions[fontfcn] = fontname;
             }
             else if (info.tagName() == "fill")
             {
@@ -702,30 +721,23 @@ void XMLParse::parseListArea(LayerSet *container, QDomElement &element)
         }
     }
 
-    fontProp *testactfont = GetFont(act_font);
-    if (!testactfont)
-    {
-        cerr << "Unknown font: " << act_font << " in listarea: " << name << endl;
-        exit(0);
-    }
-    fontProp *testinfont = GetFont(in_font);
-    if (!testinfont)
-    {
-        cerr << "Unknown font: " << in_font << " in listarea: " << name << endl;
-        exit(0);
-    }
-
-    UIFontPairType *text = new UIFontPairType(testactfont, testinfont);
-
-    UIListType *list = new UIListType(name, area, draworder, text);
+    UIListType *list = new UIListType(name, area, draworder);
     list->SetCount(item_cnt);
     list->SetScreen(wmult, hmult);
     list->SetColumnPad(padding);
-    if (force_color.length() > 0)
-        list->SetForceColor(force_color);
     list->SetImageSelection(select_img, select_loc);
     list->SetImageUpArrow(uparrow_img, uparrow_loc);
     list->SetImageDownArrow(dnarrow_img, dnarrow_loc);
+    typedef QMap<QString,QString> fontdata;
+    fontdata::Iterator it;
+    for ( it = fontFunctions.begin(); it != fontFunctions.end(); ++it )
+    {   
+        fontProp *testFont = GetFont(it.data());
+        if (testFont)
+            theFonts[it.data()] = *testFont;
+    }
+    if (theFonts.size() > 0)
+        list->SetFonts(fontFunctions, theFonts);
     if (fill_type != -1)
         list->SetFill(fill_select_area, fill_select_color, fill_type);
     if (context != -1)

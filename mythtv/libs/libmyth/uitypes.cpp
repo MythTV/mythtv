@@ -105,12 +105,11 @@ UIFontPairType::~UIFontPairType()
 
 // ***************************************************************
 
-UIListType::UIListType(const QString &name, QRect area, int dorder, UIFontPairType *text)
+UIListType::UIListType(const QString &name, QRect area, int dorder)
           : UIType(name)
 {
     m_name = name;
     m_area = area;
-    m_text = text;
     m_order = dorder;
     m_active = false;
     m_columns = 0;
@@ -123,8 +122,6 @@ UIListType::UIListType(const QString &name, QRect area, int dorder, UIFontPairTy
 
 UIListType::~UIListType()
 {
-    if (m_text)
-        delete m_text;
 }
 
 void UIListType::Draw(QPainter *dr, int drawlayer, int context)
@@ -140,9 +137,9 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
             int left = 0;
         fontProp *tmpfont = NULL;
         if (m_active == true)
-            tmpfont = m_text->getActive();
+            tmpfont = &m_fontfcns[m_fonts["active"]];
         else
-            tmpfont = m_text->getInactive();
+            tmpfont = &m_fontfcns[m_fonts["inactive"]];
         bool lastShown = true;
         QPoint fontdrop = tmpfont->shadowOffset;
 
@@ -190,14 +187,16 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
                     }
                     dr->setBrush(tmpfont->color);
                     dr->setPen(QPen(tmpfont->color, (int)(2 * m_wmult)));
-                    if (forceColors[i] != "")
+                    if (forceFonts[i] != "")
                     {
-                        QColor myColor = QColor(forceColors[i]);
+                        dr->setFont(m_fontfcns[forceFonts[i]].face);
+                        QColor myColor = m_fontfcns[forceFonts[i]].color;
                         dr->setBrush(myColor);
                         dr->setPen(QPen(myColor, (int)(2 * m_wmult)));
                     }
                     dr->drawText(left, m_area.top() + (int)(i*m_selheight),
                                  m_area.width(), m_selheight, m_justification, tempWrite);
+                    dr->setFont(tmpfont->face);
                     if (m_debug == true)
                         cerr << "   +UIListType::Draw() Data: " << tempWrite << "\n";
                     lastShown = true;
@@ -217,9 +216,9 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
         int i = m_current;
         fontProp *tmpfont = NULL;
         if (m_active == true)
-            tmpfont = m_text->getActive();
+            tmpfont = &m_fontfcns[m_fonts["selected"]];
         else
-            tmpfont = m_text->getInactive();
+            tmpfont = &m_fontfcns[m_fonts["inactive"]];
         bool lastShown = true;
         QPoint fontdrop = tmpfont->shadowOffset;
 
@@ -260,14 +259,18 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
                  }
                  dr->setBrush(tmpfont->color);
                  dr->setPen(QPen(tmpfont->color, (int)(2 * m_wmult)));
-                 if (forceColors[i] != "")
-                 {
-                     QColor myColor = QColor(forceColors[i]);
+                 if (forceFonts[i] != "")
+                 {   
+                     dr->setFont(m_fontfcns[forceFonts[i]].face);
+                     QColor myColor = m_fontfcns[forceFonts[i]].color;
                      dr->setBrush(myColor);
                      dr->setPen(QPen(myColor, (int)(2 * m_wmult)));
                  }
+
                  dr->drawText(left, m_area.top() + (int)(i*m_selheight),
                               m_area.width(), m_selheight, m_justification, tempWrite);
+
+                 dr->setFont(tmpfont->face);
              }
         }
     }

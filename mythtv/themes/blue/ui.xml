@@ -1,5 +1,202 @@
 <mythuitheme>
  
+   <window name="conflict">
+
+    <font name="active_font" face="Arial">
+      <color>#ffffff</color>
+      <size>16</size>
+      <bold>yes</bold>
+    </font>
+
+    <font name="inactive_font" face="Arial">
+      <color>#9999cc</color>
+      <size>16</size>
+      <bold>yes</bold>
+    </font>
+
+    <font name="norecordfnt" face="Arial">
+      <color>#999999</color>
+      <size>16</size>
+      <bold>yes</bold>
+    </font>
+
+    <font name="conflictfnt" face="Arial">
+      <color>#ffff33</color>
+      <size>16</size>
+      <bold>yes</bold>
+    </font>
+
+    <font name="currenttitle" face="Arial">
+      <color>#ffff33</color>
+      <size>18</size>
+      <bold>yes</bold>
+    </font>
+
+    <font name="title" face="Arial">
+      <color>#ffffff</color>
+      <dropcolor>#000000</dropcolor>
+      <size>27</size>
+      <shadow>3,3</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="info" face="Arial">
+      <color>#ffffff</color>
+      <size>17</size>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="message" face="Arial">
+      <color>#ffffff</color>
+      <size>16</size>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="messagegray" face="Arial">
+      <color>#999999</color>
+      <size>16</size>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="messageyellow" face="Arial">
+      <color>#ffff33</color>
+      <size>16</size>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <container name="background">
+      <textarea name="sched" draworder="0">
+        <area>20,10,800,40</area>
+        <font>info</font>
+        <value>Scheduled Recordings:</value>
+      </textarea>
+      <image name="filler" draworder="0" fleximage="yes">
+        <filename>cr-background.png</filename>
+        <position>0,39</position>
+      </image>
+      <textarea name="coninyellow" draworder="0">
+        <area>20,330,800,40</area>
+        <font>message</font>
+        <value>Conflicting recordings are highlighted in</value>
+      </textarea>
+      <textarea name="conyellow" draworder="0">
+        <area>452,330,800,40</area>
+        <font>messageyellow</font>
+        <value>yellow</value>
+      </textarea>
+      <textarea name="disingray" draworder="0">
+        <area>20,357,800,40</area>
+        <font>message</font>
+        <value>Deactivated recordings are highlighted in</value>
+      </textarea>
+      <textarea name="disgray" draworder="0">
+        <area>458,357,800,40</area>
+        <font>messagegray</font>
+        <value>gray</value>
+      </textarea>
+    </container>
+ 
+    <container name="conflict_info">
+      <area>400,10,380,30</area>
+      <textarea name="status" align="right" draworder="4">
+        <area>0,0,380,30</area>
+        <font>info</font>
+      </textarea>
+    </container>
+
+    <container name="selector">
+      <area>0,39,800,310</area>
+      <listarea name="conflictlist" draworder="4">
+        <area>20,18,760,265</area>
+        <fcnfont name="conflictfnt" function="conflictingrecording"></fcnfont>
+        <fcnfont name="norecordfnt" function="disabledrecording"></fcnfont>
+        <fcnfont name="active_font" function="active"></fcnfont>
+        <fcnfont name="inactive_font" function="inactive"></fcnfont>
+        <fcnfont name="active_font" function="selected"></fcnfont>
+        <columnpadding>10</columnpadding>
+        <column number="1" width="60" context="-1"></column>
+        <column number="2" width="150" context="-1"></column>
+        <column number="3" width="400" context="-1"></column>
+        <items>9</items>
+        <image function="selectionbar" filename="cr-selectbar.png" location="-14,-5"></image>
+        <image function="uparrow" filename="uparrow.png" location="755,22"></image>
+        <image function="downarrow" filename="downarrow.png" location="755,230"></image>
+      </listarea>
+      <image name="showinglines" draworder="5" fleximage="no">
+        <filename>cr-lines.png</filename>
+        <position>0,0</position>
+      </image>
+    </container>
+
+    <container name="program_info">
+      <area>0,390,800,240</area>
+      <textarea name="title" draworder="6">
+        <area>20,0,800,40</area>
+        <font>title</font>
+      </textarea>
+      <textarea name="subtitle" draworder="6">
+        <area>20,40,579,30</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="infotime" draworder="6">
+        <area>20,70,160,30</area>
+        <font>info</font>
+        <value>Airdate:</value>
+      </textarea>
+      <textarea name="timedate" draworder="6">
+        <area>180,70,430,30</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="infochan" draworder="6">
+        <area>20,100,160,30</area>
+        <font>info</font>
+        <value>Channel:</value>
+      </textarea>
+      <textarea name="channel" draworder="6">
+        <area>180,100,400,30</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="infodesc" draworder="6">
+        <area>20,130,160,30</area>
+        <font>info</font>
+        <value>Description:</value>
+      </textarea>
+      <textarea name="description" draworder="6">
+        <area>180,130,600,120</area>
+        <font>info</font>
+        <multiline>yes</multiline>
+      </textarea>
+    </container>
+ 
+
+   <container name="norecordings_list">
+      <textarea name="msg" align="center" draworder="8">
+         <area>0,110,800,70</area>
+         <font>info</font>
+         <value>You Haven't Scheduled Any Programs To Be Recorded</value>
+         <multiline>yes</multiline> 
+      </textarea>
+    </container>
+
+    <container name="norecordings_info">
+      <textarea name="topline" align="center" draworder="8">
+         <area>20,40,760,30</area>
+         <font>info</font>
+         <value>To schedule a recording, exit this screen and</value>
+      </textarea>
+      <textarea name="botline" align="center" draworder="8">
+         <area>20,70,760,30</area>
+         <font>info</font>
+         <value>Select 'Program Guide' or 'Program Finder'</value>
+      </textarea>
+    </container>
+
+  </window>
+
   <window name="playback">
 
     <font name="active" face="Arial">
@@ -10,6 +207,12 @@
 
     <font name="inactive" face="Arial">
       <color>#9999cc</color>
+      <size>16</size>
+      <bold>yes</bold>
+    </font>
+  
+    <font name="recfont" face="Arial">
+      <color>#ffff33</color>
       <size>16</size>
       <bold>yes</bold>
     </font>
@@ -65,8 +268,9 @@
       <area>0,50,800,310</area>
       <listarea name="toptitles" draworder="2">
         <area>30,22,190,105</area>
-        <activefont>active</activefont>
-        <inactivefont>inactive</inactivefont>
+        <fcnfont name="active" function="active"></fcnfont>
+        <fcnfont name="active" function="selected"></fcnfont>
+        <fcnfont name="inactive" function="inactive"></fcnfont>
         <items>3</items>
       </listarea>
       <image name="titlelines" draworder="3" fleximage="no">
@@ -75,15 +279,17 @@
       </image>
       <listarea name="bottomtitles" draworder="2">
         <area>30,172,190,105</area>
-        <activefont>active</activefont>
-        <inactivefont>inactive</inactivefont>
+        <fcnfont name="active" function="active"></fcnfont>
+        <fcnfont name="active" function="selected"></fcnfont>
+        <fcnfont name="inactive" function="inactive"></fcnfont>
         <items>3</items>
       </listarea>
       <listarea name="showing" draworder="4">
         <area>240,18,600,265</area>
-        <forcecolor>#ff3333</forcecolor>
-        <activefont>active</activefont>
-        <inactivefont>inactive</inactivefont>
+        <fcnfont name="recfnt" function="recording"></fcnfont>
+        <fcnfont name="active" function="active"></fcnfont>
+        <fcnfont name="active" function="selected"></fcnfont>
+        <fcnfont name="inactive" function="inactive"></fcnfont>
         <columnpadding>10</columnpadding>
         <column number="1" width="320" context="-1"></column>
         <column number="2" width="60" context="-1"></column>
@@ -246,6 +452,12 @@
       <bold>yes</bold>
     </font>
 
+    <font name="recfnt" face="Arial">
+      <color>#ffff33</color>
+      <size>16</size>
+      <bold>yes</bold>
+    </font>
+
     <font name="titleinfo" face="Arial">
       <color>#ffffff</color>
       <dropcolor>#000000</dropcolor>
@@ -295,24 +507,27 @@
       <area>25,260,770,310</area>
       <listarea name="alphabet" draworder="2">
         <area>23,8,65,295</area>
-        <activefont>active</activefont>
-        <inactivefont>inactive</inactivefont>
+        <fcnfont name="active" function="active"></fcnfont>
+        <fcnfont name="active" function="selected"></fcnfont>
+        <fcnfont name="inactive" function="inactive"></fcnfont>
         <items>9</items>
         <image function="selectionbar" filename="pf-sel1.png" location="-14,-7"></image>
       </listarea>
       <listarea name="shows" draworder="2">
         <area>88,8,380,295</area>
-        <activefont>active</activefont>
-        <inactivefont>inactive</inactivefont>
+        <fcnfont name="active" function="active"></fcnfont>
+        <fcnfont name="active" function="selected"></fcnfont>
+        <fcnfont name="inactive" function="inactive"></fcnfont>
         <column number="1" width="380" context="-1"></column>
         <items>9</items>
         <image function="selectionbar" filename="pf-sel2.png" location="-14,-7"></image>
       </listarea>
       <listarea name="times" draworder="2">
         <area>470,8,280,295</area>
-        <activefont>active</activefont>
-        <inactivefont>inactive</inactivefont>
-        <forcecolor>#ffff33</forcecolor>
+        <fcnfont name="active" function="active"></fcnfont>
+        <fcnfont name="active" function="selected"></fcnfont>
+        <fcnfont name="inactive" function="inactive"></fcnfont>
+        <fcnfont name="recfnt" function="recording"></fcnfont>
         <items>9</items>
         <image function="selectionbar" filename="pf-sel3.png" location="-8,-7"></image>
       </listarea>

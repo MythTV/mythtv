@@ -918,7 +918,7 @@ void ProgFinder::showShowingList()
 			
 		  	     if (curLabel != (int)(showsPerListing / 2) &&
                                  showData[t].recording > 0)
-                                 ltype->EnableForcedColor(curLabel);
+                                 ltype->EnableForcedFont(curLabel, "recording");
 
                          }  
 		         else
