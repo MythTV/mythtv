@@ -50,9 +50,12 @@ void startTV(TV *tv)
 {
     tv->LiveTV();
 
-    while (tv->GetState() == kState_None)
+    TVState tvstate;
+
+    while ((tvstate = tv->GetState()) == kState_None)
         usleep(1000);
-    while (tv->GetState() != kState_None)
+    tvstate = tv->GetState();
+    while (tv->GetState() == tvstate)
         usleep(1000);
 }
 
@@ -198,6 +201,8 @@ int main(int argc, char **argv)
             case 3: startDelete(tv, prefix); break;
             default: break;
         }
+
+        delete diag;
     }
 
     return 0;
