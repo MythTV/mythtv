@@ -11,11 +11,8 @@ VERSION = 0.15.0
 INCLUDEPATH += ../libmyth ../ dvbdev/ ../libavcodec
 DEPENDPATH += ../libmyth ../libavcodec ../libavformat
 
-# Win32 needs to resolve all import symbols when linking DLLs
-win32 {
-    LIBS += -L ../libmyth -L ../libavcodec -L ../libavformat
-    LIBS += -lmyth-$${LIBVERSION} -lmythavcodec-$${LIBVERSION} -lmythavformat-$${LIBVERSION} $$EXTRA_LIBS
-}
+LIBS += -L../libmyth -L../libavcodec -L../libavformat
+LIBS += -lmyth-$${LIBVERSION} -lmythavcodec-$${LIBVERSION} -lmythavformat-$${LIBVERSION} $$EXTRA_LIBS
 
 TARGETDEPS += ../libmyth/libmyth-$${LIBVERSION}.so
 TARGETDEPS += ../libavcodec/libmythavcodec-$${LIBVERSION}.so

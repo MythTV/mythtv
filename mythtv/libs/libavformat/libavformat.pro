@@ -52,8 +52,5 @@ inc.files = avformat.h avio.h
 
 INSTALLS += inc
 
-# Win32 needs to resolve all import symbols when linking DLLs
-win32 {
-    LIBS += -L ../libavcodec -lmythavcodec-$$LIBVERSION
-}
+LIBS += -L ../libavcodec -lmythavcodec-$$LIBVERSION
 

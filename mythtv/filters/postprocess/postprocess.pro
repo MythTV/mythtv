@@ -13,13 +13,9 @@ INSTALLS = target
 INCLUDEPATH += ../../libs/libmythtv ../../libs/libavcodec
 DEPENDPATH += ../../libs/libmythtv ../../libs/libavcodec
 
-# Win32 needs to resolve all import symbols when linking DLLs
-win32 {
-    LIBS += -L ../../libs/libmythtv -L ../../libs/libavcodec
-    LIBS += -lmythtv-$${LIBVERSION} -lmythavcodec-$${LIBVERSION}
-}
+LIBS += -L../../libs/libavcodec
+LIBS += -lmythavcodec-$${LIBVERSION}
 
-TARGETDEPS += ../../libs/libmythtv/libmythtv-$${LIBVERSION}.so
 TARGETDEPS += ../../libs/libavcodec/libmythavcodec-$${LIBVERSION}.so
 
 QMAKE_CFLAGS_RELEASE += -Wno-missing-prototypes
