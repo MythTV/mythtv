@@ -28,16 +28,14 @@ ProgLister::ProgLister(const QString &ltitle, QSqlDatabase *ldb,
 {
     title = ltitle;
     db = ldb;
-    curTime = QDateTime::currentDateTime();
+    startTime = QDateTime::currentDateTime();
     timeFormat = gContext->GetSetting("ShortDateFormat") +
 	" " + gContext->GetSetting("TimeFormat");
 
-    progList.setAutoDelete(true);
-    dataCount = 0;
-    curProg = -1;
-
-    doingSel = false;
-    allowKeys = true;
+    allowEvents = true;
+    allowUpdates = true;
+    updateAll = false;
+    refillAll = false;
 
     fullRect = QRect(0, 0, size().width(), size().height());
     listRect = QRect(0, 0, 0, 0);
@@ -66,9 +64,7 @@ ProgLister::ProgLister(const QString &ltitle, QSqlDatabase *ldb,
     {
         UIListType *ltype = (UIListType *)container->GetType("proglist");
         if (ltype)
-        {
             listsize = ltype->GetItems();
-        }
     }
     else
     {
@@ -78,11 +74,11 @@ ProgLister::ProgLister(const QString &ltitle, QSqlDatabase *ldb,
 
     updateBackground();
 
-    fillProgList();
+    curItem = 0;
+    itemCount = 0;
+    itemList.setAutoDelete(true);
+    fillItemList();
 
-    pageDowner = false;
-    inList = 0;
-    inData = 0;
     setNoErase();
 
     gContext->addListener(this);
@@ -96,23 +92,36 @@ ProgLister::~ProgLister()
 
 void ProgLister::keyPressEvent(QKeyEvent *e)
 {
-    if (!allowKeys)
+    if (!allowEvents)
         return;
+
+    allowEvents = false;
 
     switch (e->key())
     {
-        case Key_Left: case Key_Right: break;
         case Key_Up: cursorUp(false); break;
         case Key_Down: cursorDown(false); break;
         case Key_PageUp: case Key_9: cursorUp(true); break;
         case Key_PageDown: case Key_3: cursorDown(true); break;
-	case Key_Space: case Key_Enter: case Key_Return:
-                select(); break;
-        case Key_I: case Key_M:  edit(); break;
+	case Key_Space: case Key_Enter: case Key_Return: select(); break;
+        case Key_I: case Key_M: edit(); break;
         case Key_R: quickRecord(); break;
-        case Key_Escape: done(0); break;
-        default: /*MythDialog::keyPressEvent(e);*/ break;
+        default: MythDialog::keyPressEvent(e); break;
     }
+
+    if (refillAll)
+    {
+        allowUpdates = false;
+        do
+        {
+            refillAll = false;
+            fillItemList();
+        } while (refillAll);
+        allowUpdates = true;
+        update(fullRect);
+    }
+
+    allowEvents = true;
 }
 
 void ProgLister::LoadWindow(QDomElement &element)
@@ -164,192 +173,105 @@ void ProgLister::updateBackground(void)
 
 void ProgLister::paintEvent(QPaintEvent *e)
 {
-    if (doingSel)
+    if (!allowUpdates)
+    {
+        updateAll = true;
         return;
+    }
 
     QRect r = e->rect();
     QPainter p(this);
  
-    if (r.intersects(listRect))
+    if (updateAll || r.intersects(listRect))
         updateList(&p);
-    if (r.intersects(infoRect))
+    if (updateAll || r.intersects(infoRect))
         updateInfo(&p);
+
+    updateAll = false;
 }
 
 void ProgLister::cursorDown(bool page)
 {
-    if (page == false)
+    if (curItem < itemCount - 1)
     {
-        if (inList > (int)((int)(listsize / 2) - 1)
-            && ((int)(inData + listsize) <= (int)(dataCount - 1))
-            && pageDowner == true)
-        {
-            inData++;
-            inList = (int)(listsize / 2);
-        }
-        else
-        {
-            inList++;
-
-            if (inList >= listCount)
-                inList = listCount - 1;
-        }
+        curItem += (page ? listsize : 1);
+        if (curItem > itemCount - 1)
+            curItem = itemCount - 1;
+        update(fullRect);
     }
-    else if (page == true && pageDowner == true)
-    {
-        if (inList >= (int)(listsize / 2) || inData != 0)
-        {
-            inData = inData + listsize;
-        }
-        else if (inList < (int)(listsize / 2) && inData == 0)
-        {
-            inData = (int)(listsize / 2) + inList;
-            inList = (int)(listsize / 2);
-        }
-    }
-    else if (page == true && pageDowner == false)
-    {
-        inList = listsize - 1;
-    }
-
-    if ((int)(inData + inList) >= (int)(dataCount))
-    {
-        inData = dataCount - listsize;
-        inList = listsize - 1;
-    }
-    else if ((int)(inData + listsize) >= (int)dataCount)
-    {
-        inData = dataCount - listsize;
-    }
-
-    if (inList >= listCount)
-        inList = listCount - 1;
-
-    update(fullRect);
 }
 
 void ProgLister::cursorUp(bool page)
 {
-    if (page == false)
+    if (curItem > 0)
     {
-        if (inList < ((int)(listsize / 2) + 1) && inData > 0)
-        {
-            inList = (int)(listsize / 2);
-            inData--;
-            if (inData < 0)
-	    {
-                inData = 0;
-                inList--;
-            }
-	}
-	else
-        {
-	    inList--;
-        }
+        curItem -= (page ? listsize : 1);
+        if (curItem < 0)
+            curItem = 0;
+        update(fullRect);
     }
-    else if (page == true && inData > 0)
-    {
-	inData = inData - listsize;
-	if (inData < 0)
-        {
-	    inList = inList + inData;
-	    inData = 0;
-	    if (inList < 0)
-		inList = 0;
-        }
-
-	if (inList > (int)(listsize / 2))
-        {
-	    inList = (int)(listsize / 2);
-	    inData = inData + (int)(listsize / 2) - 1;
-        }
-    }
-    else if (page == true)
-    {
-	inData = 0;
-	inList = 0;
-    }
-
-    if (inList > -1)
-    {
-	update(fullRect);
-    }
-    else
-	inList = 0;
 }
 
 void ProgLister::quickRecord()
 {
-    ProgramInfo *pi = progList.at(curProg);
+    ProgramInfo *pi = itemList.at(curItem);
+
+    if (!pi)
+        return;
 
     pi->ToggleRecord(db);
-
-    fillProgList();
-    update(fullRect);
 }
 
 void ProgLister::select()
 {
-    ProgramInfo *pi = progList.at(curProg);
+    ProgramInfo *pi = itemList.at(curItem);
 
-    doingSel = true;
+    if (!pi)
+        return;
 
-    allowKeys = false;
     pi->EditRecording(db);
-    allowKeys = true;
-
-    fillProgList();
-    update(fullRect);
-
-    doingSel = false;
 }
 
 void ProgLister::edit()
 {
-    ProgramInfo *pi = progList.at(curProg);
+    ProgramInfo *pi = itemList.at(curItem);
 
-    doingSel = true;
+    if (!pi)
+        return;
 
-    allowKeys = false;
     pi->EditScheduled(db);
-    allowKeys = true;
-
-    fillProgList();
-    update(fullRect);
-
-    doingSel = false;
 }
 
-void ProgLister::fillProgList(void)
+void ProgLister::fillItemList(void)
 {
     QString where = QString("WHERE program.title = \"%1\" AND "
 			    "program.chanid = channel.chanid "
 			    "AND program.endtime > %2 "
 			    "ORDER BY program.starttime,channel.channum;")
 	                    .arg(title.utf8())
-	                    .arg(curTime.toString("yyyyMMddhhmm50"));
+	                    .arg(startTime.toString("yyyyMMddhhmm50"));
 
-    allowKeys = false;
+    itemList.clear();
+    ProgramInfo::GetProgramListByQuery(db, &itemList, where);
+    itemCount = itemList.count();
 
-    progList.clear();
-    ProgramInfo::GetProgramListByQuery(db, &progList, where);
-    dataCount = progList.count();
+    if (curItem >= itemCount - 1)
+        curItem = itemCount - 1;
 
-    ProgramInfo *p;
     vector<ProgramInfo *> recList;
     RemoteGetAllPendingRecordings(recList);
 
-    for (p = progList.first(); p; p = progList.next())
-        p->FillInRecordInfo(recList);
+    ProgramInfo *pi;
+
+    for (pi = itemList.first(); pi; pi = itemList.next())
+        pi->FillInRecordInfo(recList);
 
     while (!recList.empty())
     {
-        p = recList.back();
-        delete p;
+        pi = recList.back();
+        delete pi;
         recList.pop_back();
     }
-
-    allowKeys = true;
 }
 
 void ProgLister::updateList(QPainter *p)
@@ -359,66 +281,51 @@ void ProgLister::updateList(QPainter *p)
     pix.fill(this, pr.topLeft());
     QPainter tmp(&pix);
     
-    int pastSkip = inData;
-    pageDowner = false;
-    listCount = 0;
-
-    ProgramInfo *pi;
-
-    LayerSet *container = NULL;
-    container = theme->GetSet("selector");
+    LayerSet *container = theme->GetSet("selector");
     if (container)
     {
         UIListType *ltype = (UIListType *)container->GetType("proglist");
         if (ltype)
         {
-            int cnt = 0;
             ltype->ResetList();
             ltype->SetActive(true);
 
-            for (int i = 0; i < dataCount; i++)
+            int skip;
+            if (itemCount <= listsize || curItem <= listsize / 2)
+                skip = 0;
+            else if (curItem >= itemCount - listsize + listsize / 2)
+                skip = itemCount - listsize;
+            else
+                skip = curItem - listsize / 2;
+            ltype->SetUpArrow(skip > 0);
+            ltype->SetDownArrow(skip + listsize < itemCount);
+
+            int i;
+            for (i = 0; i < listsize; i++)
             {
-                if (cnt < listsize)
-                {
-                    if (pastSkip <= 0)
-                    {
-                        pi = progList.at(i);
+                if (i + skip >= itemCount)
+                    break;
 
-                        if (cnt == inList)
-                        {
-                            curProg = i;
-                            ltype->SetItemCurrent(cnt);
-                        }
+                ProgramInfo *pi = itemList.at(i+skip);
 
-			ltype->SetItemText(cnt, 1, pi->startts.toString(timeFormat));
-                        ltype->SetItemText(cnt, 2, pi->chanstr + " " + pi->chansign);
-			if (pi->subtitle == "")
-			    ltype->SetItemText(cnt, 3, title);
-			else
-			    ltype->SetItemText(cnt, 3, pi->subtitle);
-                        if (pi->conflicting)
-                            ltype->EnableForcedFont(cnt, "conflicting");
-                        else if (pi->recording)
-                            ltype->EnableForcedFont(cnt, "recording");
-
-                        cnt++;
-                        listCount++;
-                    }
-                    pastSkip--;
-                }
+                ltype->SetItemText(i, 1, pi->startts.toString(timeFormat));
+                ltype->SetItemText(i, 2, pi->chanstr + " " + pi->chansign);
+                if (pi->subtitle == "")
+                    ltype->SetItemText(i, 3, pi->title);
                 else
-                    pageDowner = true;
+                    ltype->SetItemText(i, 3, pi->subtitle);
+                if (pi->conflicting)
+                    ltype->EnableForcedFont(i, "conflicting");
+                else if (pi->recording)
+                    ltype->EnableForcedFont(i, "recording");
+
+                if (i + skip == curItem)
+                    ltype->SetItemCurrent(i);
             }
         }
-
-        ltype->SetDownArrow(pageDowner);
-        if (inData > 0)
-            ltype->SetUpArrow(true);
-        else
-            ltype->SetUpArrow(false);
     }
 
-    if (dataCount <= 0)
+    if (itemCount == 0)
         container = theme->GetSet("noprograms_list");
 
     if (container)
@@ -440,56 +347,67 @@ void ProgLister::updateList(QPainter *p)
 
 void ProgLister::updateInfo(QPainter *p)
 {
-    int rectyperecpriority, chanrecpriority, progrecpriority, totalrecpriority;
     QRect pr = infoRect;
     QPixmap pix(pr.size());
     pix.fill(this, pr.topLeft());
     QPainter tmp(&pix);
-    RecordingType rectype; 
-    QMap<QString, QString> regexpMap;
 
-    if (dataCount > 0)
-    {  
-        progrecpriority = 0;
-        rectype = kSingleRecord;
-        rectyperecpriority = 0;
-        chanrecpriority = 0;
-        totalrecpriority = progrecpriority + rectyperecpriority + 
-                           chanrecpriority;
-        LayerSet *container;
-        ProgramInfo *pi = progList.at(curProg);
+    LayerSet *container = NULL;
+    ProgramInfo *pi = itemList.at(curItem);
 
-        QSqlDatabase *m_db = QSqlDatabase::database();
-
-        pi->ToMap(m_db, regexpMap);
-
+    if (pi)
+    {
         container = theme->GetSet("program_info");
         if (container)
-        {
+        {  
+            QMap<QString, QString> regexpMap;
+            pi->ToMap(db, regexpMap);
             container->ClearAllText();
             container->SetTextByRegexp(regexpMap);
-
-            container->Draw(&tmp, 4, 0);
-            container->Draw(&tmp, 5, 0);
-            container->Draw(&tmp, 6, 0);
-            container->Draw(&tmp, 7, 0);
-            container->Draw(&tmp, 8, 0);
         }
     }
     else
+        container = theme->GetSet("norecordings_info");
+
+    if (container)
     {
-        LayerSet *norec = theme->GetSet("norecordings_info");
-        if (norec)
-        {
-            norec->Draw(&tmp, 4, 0);
-            norec->Draw(&tmp, 5, 0);
-            norec->Draw(&tmp, 6, 0);
-            norec->Draw(&tmp, 7, 0);
-            norec->Draw(&tmp, 8, 0);
-        }
+        container->Draw(&tmp, 4, 0);
+        container->Draw(&tmp, 5, 0);
+        container->Draw(&tmp, 6, 0);
+        container->Draw(&tmp, 7, 0);
+        container->Draw(&tmp, 8, 0);
     }
 
     tmp.end();
     p->drawPixmap(pr.topLeft(), pix);
+}
+
+void ProgLister::customEvent(QCustomEvent *e)
+{
+    if ((MythEvent::Type)(e->type()) != MythEvent::MythEventMessage)
+        return;
+
+    MythEvent *me = (MythEvent *)e;
+    QString message = me->Message();
+    if (message != "SCHEDULE_CHANGE")
+        return;
+
+    refillAll = true;
+
+    if (!allowEvents)
+        return;
+
+    allowEvents = false;
+
+    allowUpdates = false;
+    do
+    {
+        refillAll = false;
+        fillItemList();
+    } while (refillAll);
+    allowUpdates = true;
+    update(fullRect);
+
+    allowEvents = true;
 }
 

@@ -28,35 +28,36 @@ class ProgLister : public MythDialog
   protected:
     void paintEvent(QPaintEvent *);
     void keyPressEvent(QKeyEvent *e);
+    void customEvent(QCustomEvent *e);
     void quickRecord(void);
 
   private:
     QString title;
     QSqlDatabase *db;
-    QDateTime curTime;
+    QDateTime startTime;
     QString timeFormat;
 
-    QPtrList<ProgramInfo> progList;
-    int curProg;
+    int curItem;
+    int itemCount;
+    QPtrList<ProgramInfo> itemList;
 
     XMLParse *theme;
     QDomElement xmldata;
-    bool pageDowner;
-    int inList;
-    int inData;
-    int listCount;
-    int dataCount;
+
     QRect listRect;
     QRect infoRect;
     QRect fullRect;
     int listsize;
-    bool allowKeys;
-    bool doingSel;
+
+    bool allowEvents;
+    bool allowUpdates;
+    bool updateAll;
+    bool refillAll;
 
     void updateBackground(void);
     void updateList(QPainter *);
     void updateInfo(QPainter *);
-    void fillProgList(void);
+    void fillItemList(void);
     void LoadWindow(QDomElement &);
 };
 
