@@ -574,7 +574,8 @@
         <columnpadding>10</columnpadding>
         <column number="1" width="60" context="-1"></column>
         <column number="2" width="150" context="-1"></column>
-        <column number="3" width="525" context="-1"></column>
+        <column number="3" width="460" context="-1"></column>
+        <column number="4" width="30" context="-1"></column>
         <items>9</items>
         <image function="selectionbar" filename="cr-selectbar.png" location="-14,-5"></image>
         <image function="uparrow" filename="uparrow.png" location="755,22"></image>
@@ -760,7 +761,7 @@
         <columnpadding>1</columnpadding>
         <column number="1" width="75" context="-1"></column>
         <column number="2" width="590" context="-1"></column>
-        <column number="3" width="13" context="-1"></column>
+        <column number="3" width="17" context="-1"></column>
         <column number="4" width="50" context="-1"></column>
         <items>11</items>
         <image function="selectionbar" filename="rk-selectbar.png" location="-6,-2"></image>
@@ -947,9 +948,9 @@
         <fcnfont name="active_font" function="selected"></fcnfont>
         <columnpadding>1</columnpadding>
         <column number="1" width="608" context="-1"></column>
-        <column number="2" width="13" context="-1"></column>
-        <column number="3" width="64" context="-1"></column>
-        <column number="4" width="13" context="-1"></column>
+        <column number="2" width="17" context="-1"></column>
+        <column number="3" width="56" context="-1"></column>
+        <column number="4" width="17" context="-1"></column>
         <column number="5" width="50" context="-1"></column>
         <items>11</items>
         <image function="selectionbar" filename="rk-selectbar.png" location="-6,-2"></image>

@@ -407,6 +407,7 @@ void ViewScheduled::updateList(QPainter *p)
     QString tempDate = "";
     QString tempTime = "";
     QString tempChan = "";
+    QString tempCard = "";
 
     ConflictData::Iterator it;
     ConflictData::Iterator start;
@@ -447,6 +448,11 @@ void ViewScheduled::updateList(QPainter *p)
                         else
                             tempChan = tempInfo->chanstr;
 
+                        if (tempInfo->recording)
+                            tempCard = QString::number(tempInfo->cardid);
+                        else
+                            tempCard = "-";
+
                         if (cnt == inList)
                         {
                             if (curitem)
@@ -458,6 +464,7 @@ void ViewScheduled::updateList(QPainter *p)
                         ltype->SetItemText(cnt, 1, tempChan);
                         ltype->SetItemText(cnt, 2, tempDate + " " + tempTime);
                         ltype->SetItemText(cnt, 3, tempSubTitle);
+                        ltype->SetItemText(cnt, 4, tempCard);
 
                         if (tempInfo->conflicting)
                         {
