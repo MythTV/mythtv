@@ -474,7 +474,6 @@ class UIAnimatedImageType : public UIType
     void SetPosition(QPoint pos) { m_displaypos = pos; }
 
     void SetFlex(bool flex) { m_flex = flex; }
-//    void ResetFilename() { m_filename = orig_filename; };
     void SetFilename(QString file) { m_filename = file; }
     void SetSize(int x, int y) { m_force_x = x; m_force_y = y; }
     void SetSkip(int x, int y) { m_drop_x = x; m_drop_y = y; }
@@ -485,8 +484,7 @@ class UIAnimatedImageType : public UIType
     void SetStartInterval(int interval) { m_startinterval = interval; }
     int  GetStartInterval() { return m_startinterval; }
     void SetWindow(MythDialog *win) { m_window = win; }
-    void ReloadImages();
-//    int  GetSize() { return m_force_x; } //??
+    void LoadImages();
     void Pause();
     void UnPause();
     bool IsPaused() { return !timer.isActive(); }
@@ -495,14 +493,6 @@ class UIAnimatedImageType : public UIType
     virtual void Draw(QPainter *, int, int);
 
   public slots:
-
-    //
-    //  We have to redefine this, as pixmaps
-    //  are not of a fixed size. And it has to
-    //  be virtual because RepeatedImage does
-    //  it differently.
-    //
-
     void refresh();
     void IntervalTimeout();
 
@@ -510,7 +500,6 @@ class UIAnimatedImageType : public UIType
     void InitImageCache();
     void ClearImages();
     bool LoadImage(int imageNo);
-    void AddImage(QPixmap* pixmap, int imageNo);
 
     QPoint  m_displaypos;
     QString orig_filename;

@@ -58,7 +58,6 @@ void HttpComms::init(QUrl &url, QHttpRequestHeader &header)
     m_debug = 0;
     m_redirectedURL = "";
     m_done = false;
-    m_data = "";
     m_statusCode = 0;
     m_responseReason = "";
     m_timer = NULL;
@@ -91,10 +90,12 @@ void HttpComms::done(bool error)
             << m_url.latin1() << endl;
     }
     else if (http->bytesAvailable())
-        m_data = QString(http->readAll());
-
+    {
+        m_data.resize(http->bytesAvailable());
+        m_data = http->readAll();
+    }
     if (m_debug > 1)
-        cerr << "done: " << m_data.length() << " bytes.\n";
+        cerr << "done: " << m_data.size() << " bytes.\n";
 
     m_done = true;
 
@@ -235,3 +236,109 @@ QString HttpComms::getHttp(QString& url, int timeoutMS, int maxRetries,
     return res;
 }
 
+// getHttpFile - static function for grabbing a file from an http url
+//      this is a synchronous function, it will block according to the vars
+bool HttpComms::getHttpFile(QString& filename, QString& url, int timeoutMS, 
+                            int maxRetries, int maxRedirects)
+{
+    int redirectCount = 0;
+    int timeoutCount = 0;
+    QByteArray data(0);
+    bool res = false;
+    HttpComms *httpGrabber = NULL;
+    int m_debug = 0;
+    QString hostname = "";
+
+    while (1)
+    {
+        QUrl qurl(url);
+        if (hostname == "")
+            hostname = qurl.host();  // hold onto original host
+        if (!qurl.hasHost())        // can occur on redirects to partial paths
+            qurl.setHost(hostname);
+        if (m_debug > 0)
+            cerr << "getHttp: grabbing: " << qurl.toString() << endl;
+
+        if (httpGrabber != NULL)
+            delete httpGrabber;
+        httpGrabber = new HttpComms(qurl, timeoutMS);
+
+        while (!httpGrabber->isDone())
+        {
+            qApp->processEvents();
+            usleep(10000);
+        }
+
+        // Handle timeout
+        if (httpGrabber->isTimedout())
+        {
+            if (m_debug > 0)
+                cerr << "timeout for url:" << url.latin1() << endl;
+
+            // Increment the counter and check were not over the limit
+            if (timeoutCount++ >= maxRetries)
+            {
+                cerr << "Failed to contact server for url: " << url.latin1()
+                     << endl;
+                break;
+            }
+
+            // Try again
+            if (m_debug > 0)
+               cerr << "attempt # " << (timeoutCount+1) << "/" << maxRetries
+                    << " for url:" << url.latin1() << endl;
+
+            continue;
+        }
+
+        // Check for redirection
+        if (!httpGrabber->getRedirectedURL().isEmpty())
+        {
+            if (m_debug > 0)
+                cerr << "redirection:"
+                     << httpGrabber->getRedirectedURL().latin1() << " count:"
+                     << redirectCount << " max:" << maxRedirects << endl;
+            if (redirectCount++ < maxRedirects)
+                url = httpGrabber->getRedirectedURL();
+
+            // Try again
+            timeoutCount = 0;
+            continue;
+        }
+
+        data = httpGrabber->getRawData();
+
+        if (data.size() > 0)
+        {
+            if (m_debug > 0)
+                cerr << "getHttpFile: saving to file: " << filename << endl;
+
+            QFile file(filename);
+            if (file.open( IO_WriteOnly ))
+            {
+                QDataStream stream(& file);
+                stream.writeRawBytes( (const char*) (data), data.size() );
+                file.close();
+                res = true;
+                if (m_debug > 0)
+                    cerr << "getHttpFile: File saved OK" << endl;
+            }
+            else
+                if (m_debug > 0)
+                    cerr << "getHttpFile: Failed to open file for writing" << endl;
+        }
+        else
+           if (m_debug > 0)
+               cerr << "getHttpFile: nothing to save to file!" << endl;
+
+        break;
+    }
+
+    if (m_debug > 1)
+        cerr << "Got " << data.size() << " bytes from url: '"
+             << url.latin1() << "'" << endl;
+
+    delete httpGrabber;
+
+    return res;
+}

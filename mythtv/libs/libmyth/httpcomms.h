@@ -22,7 +22,9 @@ class HttpComms : public QObject
     int getStatusCode(void) { return m_statusCode; }
     QString getResponseReason(void) { return m_responseReason; }
 
-    QString getData(void) { return m_data; }
+    QString getData(void) { return QString(m_data); }
+    QByteArray getRawData(void) { return m_data; }
+
     QString getRedirectedURL(void)  { return m_redirectedURL; }
 
     void stop();
@@ -31,7 +33,8 @@ class HttpComms : public QObject
 
     static QString getHttp(QString& url, int timeoutMS = 10000, 
                            int maxRetries = 3, int maxRedirects = 3);
-
+    static bool getHttpFile(QString& file, QString& url, int timeoutMS = 10000,
+                           int maxRetries = 3, int maxRedirects = 3);
   protected:
     void init(QUrl &url);
     void init(QUrl &url, QHttpRequestHeader &header);
@@ -49,7 +52,7 @@ class HttpComms : public QObject
     QString m_responseReason;
     QHttp *http;
     bool m_done;
-    QString m_data;
+    QByteArray m_data;
     QString m_url;
     QTimer* m_timer;
     bool m_timeout;

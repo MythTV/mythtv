@@ -1418,13 +1418,13 @@ void UIAnimatedImageType::InitImageCache()
     }
 
     // create the image cache
-    imageList = new vector<QPixmap*>(m_imagecount);
-    for (int x = 0; x < m_imagecount; x++)
-        imageList->at(x) = NULL;
+    imageList = new vector<QPixmap*>;
 }
 
 void UIAnimatedImageType::ClearImages()
 {
+    if (imageList)
+    {
     vector<QPixmap *>::iterator i = imageList->begin();
     for (; i != imageList->end(); i++)
     {
@@ -1435,26 +1435,20 @@ void UIAnimatedImageType::ClearImages()
             (*i) = NULL;
         }
     }
+    }
 }
 
-void UIAnimatedImageType::ReloadImages()
+void UIAnimatedImageType::LoadImages()
 {
-    ClearImages();
-    refresh();
-}
+    InitImageCache();
 
-void UIAnimatedImageType::AddImage(QPixmap* pixmap, int imageNo)
-{
-    if (imageNo > m_imagecount)
-        return;
-
-    vector<QPixmap *>::iterator i = imageList->begin();
-    for (int x = 0; x < imageNo; x++)
+    for (int x = 1; x <= m_imagecount; x++)
     {
-        i++;
+        if (!LoadImage(x))
+            cerr << "UIAnimatedImage: LoadImages() Failed to load image No.: " << x << endl;
     }
 
-    (*i) = pixmap;
+    refresh();
 }
 
 bool UIAnimatedImageType::LoadImage(int imageNo)
@@ -1510,8 +1504,7 @@ bool UIAnimatedImageType::LoadImage(int imageNo)
         QPixmap *tmppix = gContext->LoadScalePixmap(filename);
         if (tmppix)
         {
-            imageList->at(imageNo-1) = tmppix;
-            //AddImage(tmppix, imageNo);
+            imageList->push_back(tmppix);
             bSuccess = true;
         }
     }
@@ -1521,12 +1514,11 @@ bool UIAnimatedImageType::LoadImage(int imageNo)
         QPixmap *img = new QPixmap();
         if (img->load(filename))
         {
-            imageList->at(imageNo-1) = img;
+            imageList->push_back(img);
             bSuccess = true;
         }
         else
         {
-           imageList->at(imageNo-1) = NULL;
            delete img;
         }
     }
@@ -1553,32 +1545,30 @@ bool UIAnimatedImageType::LoadImage(int imageNo)
                                                (int)(doY * m_hmult));
             bSuccess = true;
             img->convertFromImage(scalerImg);
-            imageList->at(imageNo-1) = img;
+            imageList->push_back(img);
         }
         delete sourceImg;
-
-        if (bSuccess) 
-            return true;
     }
 
-    // if we get this far we cannot load the image
-    return false;
+    return bSuccess;
 }
 
 void UIAnimatedImageType::Draw(QPainter *dr, int drawlayer, int context)
 {
+    if(hidden)
+    {
+        return;
+    }
+
     if (m_context == context || m_context == -1)
     {
         if (drawlayer == m_order)
         {
-            if (imageList->at(m_currentimage-1) == NULL)
-            {
-                // try to load the current image
-                if (!LoadImage(m_currentimage))
+            // sanity check
+            if ( !imageList || m_currentimage < 1 || m_currentimage > (int) imageList->size() )
                     return;
-            }
 
-            if (!imageList->at(m_currentimage-1)->isNull())
+            if (!((*imageList)[m_currentimage-1])->isNull())
             {
                 dr->drawPixmap(m_displaypos.x(), m_displaypos.y(), *imageList->at(m_currentimage-1), m_drop_x, m_drop_y);
             }
@@ -1588,10 +1578,10 @@ void UIAnimatedImageType::Draw(QPainter *dr, int drawlayer, int context)
 
 void UIAnimatedImageType::refresh()
 {
-    if (m_parent && imageList->at(0) != NULL)
+    if (m_parent && imageList->size() > 0 && !((*imageList)[0])->isNull())
     {
         QRect r = QRect(m_displaypos.x(),  m_displaypos.y(),
-                    imageList->at(0)->width(), imageList->at(0)->height());
+                        (*imageList)[0]->width(), (*imageList)[0]->height());
 
         r.moveBy(m_parent->GetAreaRect().left(),
                  m_parent->GetAreaRect().top());
@@ -1664,7 +1654,7 @@ void UIAnimatedImageType::SetImageCount(int count)
 {
     m_imagecount = count;
     InitImageCache();
-    refresh();
+    LoadImages();
 }
 
 // ******************************************************************
