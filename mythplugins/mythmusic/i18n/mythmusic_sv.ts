@@ -15,7 +15,7 @@
     </message>
     <message>
         <source>Blechy Blech Blah</source>
-        <translation type="unfinished"></translation>
+        <translation>Blechy Blech Blah</translation>
     </message>
     <message>
         <source>All My Music</source>
@@ -55,35 +55,37 @@
     </message>
     <message>
         <source>The theme you are using does not contain a &apos;musictree&apos; element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Escape out of it to return to the menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Temat du använder innehåller inte &apos;musictree&apos;-elementet. Vänligen kontakta upphovsmannen till temat och be dem uppdatera det.
+
+Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till menyn.</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Couldn&apos;t create CD</source>
-        <translation type="unfinished"></translation>
+        <translation>Kunde inte skapa CD</translation>
     </message>
     <message>
         <source>CD Created</source>
-        <translation type="unfinished"></translation>
+        <translation>CD skapad</translation>
     </message>
     <message>
         <source>CD-RW Blanking Progress</source>
-        <translation type="unfinished"></translation>
+        <translation>CD-RW raderingsförlopp</translation>
     </message>
     <message>
         <source>Create Audio CD from Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Skapa musik-CD från spellista</translation>
     </message>
     <message>
         <source>Create MP3 CD from Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Skapa MP3-CD från spellista</translation>
     </message>
     <message>
         <source>Clear CD-RW Disk</source>
-        <translation type="unfinished"></translation>
+        <translation>Radera CD-RW skiva</translation>
     </message>
 </context>
 <context>
@@ -178,7 +180,7 @@
     </message>
     <message>
         <source>ch</source>
-        <translation type="unfinished"></translation>
+        <translation>ch</translation>
     </message>
     <message>
         <source>Output error.</source>
@@ -221,11 +223,11 @@
     </message>
     <message>
         <source>Directory to hold music</source>
-        <translation>Bibliotek för musikfiler</translation>
+        <translation>Katalog för musikfiler</translation>
     </message>
     <message>
         <source>This directory must exist, and the user running MythMusic needs to have write permission to the directory.</source>
-        <translation>Detta bibliotek måste finnas och användaren som kör Musikspelaren måste ha skrivrättigheter till det.</translation>
+        <translation>Denna katalog måste finnas och användaren som kör MythMusik måste ha skrivrättigheter till den.</translation>
     </message>
     <message>
         <source>Audio device</source>
@@ -249,9 +251,9 @@
     </message>
     <message>
         <source>Order in which to sort the Music Selection Tree. Possible values are space-separated list of genre, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the actual directory tree.</source>
-        <translation type="obsolete">Den ordning som trädet för musikval sorteras i. Möjliga värden är:
+        <translation>Den ordning som trädet för musikval sorteras i. Möjliga värden är:
 * Mellanslagsseparerad lista med &apos;genre&apos;, &apos;artist&apos;, &apos;album&apos; och &apos;title&apos;
-* &apos;directory&apos; (=bibliotek), vilket betyder att trädet speglar den faktiska biblioteksstrukturen.</translation>
+* &apos;directory&apos; (=katalog), vilket betyder att trädet speglar den faktiska katalogstrukturen.</translation>
     </message>
     <message>
         <source>Script Path</source>
@@ -427,7 +429,7 @@
     </message>
     <message>
         <source>Random</source>
-        <translation type="unfinished"></translation>
+        <translation>Slumpvis</translation>
     </message>
     <message>
         <source>Intelligent</source>
@@ -459,7 +461,7 @@
     </message>
     <message>
         <source>If set to &quot;2&quot;, visualizations will be scaled in half.  Currently only used by the goom visualization.  Reduces CPU load on slower machines.</source>
-        <translation>Om skalningsfaktorn sätts till 2 kommer visualiseringar att bli hälften så stora. Fungerar för tillfället bara med visualiseringen &apos;goom&apos;. Reducerar lasten på datorn, vilket kan vara bra på långsamma datorer.</translation>
+        <translation>Om skalningsfaktorn sätts till 2 kommer visualiseringar att bli hälften så stora. Fungerar för tillfället bara med visualiseringen &apos;goom&apos;. Reducerar processorbelastningen på datorn, vilket kan vara bra på långsamma datorer.</translation>
     </message>
     <message>
         <source>Height for Visual Scaling</source>
@@ -531,11 +533,11 @@
     </message>
     <message>
         <source>Playback Settings</source>
-        <translation>Inställningar för avspelning</translation>
+        <translation>Uppspelningsinställningar</translation>
     </message>
     <message>
         <source>Visualization Settings</source>
-        <translation>Inställningar för visualisering</translation>
+        <translation>Visualiseringsinställningar</translation>
     </message>
     <message>
         <source>CD Ripper Settings</source>
@@ -659,127 +661,123 @@ Du har inga tabeller för Musikspelaren (MythMusic) i din databas.</translation>
     </message>
     <message>
         <source>Use variable bitrates</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd variabel bithastighet</translation>
     </message>
     <message>
         <source>If set, the MP3 encoder will use variable bitrates (VBR) except for the low quality setting. The Ogg encoder will always use variable bitrates.</source>
-        <translation type="unfinished"></translation>
+        <translation>MP3-kodaren kommer att använda variabel bithastighet (VBR) förutom då lägsta kvaliteten väljs. Ogg-kodaren använder alltid variabel bithastighet.</translation>
     </message>
     <message>
         <source>AlbumArt</source>
-        <translation type="unfinished"></translation>
+        <translation>AlbumArt</translation>
     </message>
     <message>
         <source>CD Ripper Settings (part 2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Inställningar för CD-kopiering (del 2)</translation>
     </message>
     <message>
         <source>Enable CD Writing.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivera CD-bränning.</translation>
     </message>
     <message>
         <source>Requires a SCSI or an IDE-SCSI CD Writer.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kräver en SCSI eller IDE-SCSI CD-brännare.</translation>
     </message>
     <message>
         <source>CD-Writer Device</source>
-        <translation type="unfinished"></translation>
+        <translation>CD-brännarenhet</translation>
     </message>
     <message>
         <source>Select the SCSI Device for CD Writing.  If your IDE device is not present, try adding hdd(or hdc/hdb)=ide-scsi to your boot options</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj en SCSI-enhet för CD-bränning. Om idin IDE-enhet inte finns tillgänglig, testa lägga till hdd (eller hdc/hdb)=ide-scsi till dina startinstälningar</translation>
     </message>
     <message>
         <source>Disk Size</source>
-        <translation type="unfinished"></translation>
+        <translation>Skivstorlek</translation>
     </message>
     <message>
         <source>650MB/75min</source>
-        <translation type="unfinished"></translation>
+        <translation>650Mb/74min</translation>
     </message>
     <message>
         <source>700MB/80min</source>
-        <translation type="unfinished"></translation>
+        <translation>700Mb/80min</translation>
     </message>
     <message>
         <source>Default CD Capacity.</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard CD-kapacitet.</translation>
     </message>
     <message>
         <source>Enable directories on MP3 Creation</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivera kataloger vid MP3-bränning</translation>
     </message>
     <message>
         <source>CD Write Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>CD-bränningshastighet</translation>
     </message>
     <message>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
+        <translation>Audo</translation>
     </message>
     <message>
         <source>1x</source>
-        <translation type="unfinished"></translation>
+        <translation>1x</translation>
     </message>
     <message>
         <source>2x</source>
-        <translation type="unfinished"></translation>
+        <translation>2x</translation>
     </message>
     <message>
         <source>4x</source>
-        <translation type="unfinished"></translation>
+        <translation>4x</translation>
     </message>
     <message>
         <source>8x</source>
-        <translation type="unfinished"></translation>
+        <translation>8x</translation>
     </message>
     <message>
         <source>16x</source>
-        <translation type="unfinished"></translation>
+        <translation>16x</translation>
     </message>
     <message>
         <source>CD Writer speed. Auto will use the recomended speed.</source>
-        <translation type="unfinished"></translation>
+        <translation>CD-bränningshastighet. Auto använder rekommenderad hastighet.</translation>
     </message>
     <message>
         <source>CD Blanking Type</source>
-        <translation type="unfinished"></translation>
+        <translation>CDRW-raderingsmetod</translation>
     </message>
     <message>
         <source>Fast</source>
-        <translation type="unfinished"></translation>
+        <translation>Snabb</translation>
     </message>
     <message>
         <source>Complete</source>
-        <translation type="unfinished"></translation>
+        <translation>Komplett</translation>
     </message>
     <message>
         <source>Blanking Method. Fast takes 1 minute. Complete can take up to 20 minutes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Raderingsmetod för CDRW. Snabb tar cirka 1 minut. Komplett kan ta upp till 20 minuter.</translation>
     </message>
     <message>
         <source>CD Recording Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>CD-bränningsinställningar</translation>
     </message>
     <message>
         <source>Artists</source>
-        <translation type="unfinished"></translation>
+        <translation>Artister</translation>
     </message>
     <message>
         <source>Creating CD File System</source>
-        <translation type="unfinished"></translation>
+        <translation>Skapar filsystem för CD</translation>
     </message>
     <message>
         <source>Burning CD</source>
-        <translation type="unfinished"></translation>
+        <translation>Bränner CD</translation>
     </message>
     <message>
         <source>?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
-        <translation type="unfinished"></translation>
+        <translation>?</translation>
     </message>
 </context>
 <context>
