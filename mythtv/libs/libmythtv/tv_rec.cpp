@@ -425,7 +425,7 @@ void TVRec::HandleStateChange(void)
     }
     else
     {
-        QString trans = QString("Changing from %1 to %2\n")
+        QString trans = QString("Changing from %1 to %2")
                                .arg(origname).arg(statename);
         VERBOSE(VB_GENERAL, trans);
     }

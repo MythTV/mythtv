@@ -272,31 +272,31 @@
     <name>ProgLister</name>
     <message>
         <source>Recording just this showing</source>
-        <translation type="unfinished">Optager kun denne sending</translation>
+        <translation>Optager kun denne sending</translation>
     </message>
     <message>
         <source>Recording every day when shown in this timeslot</source>
-        <translation type="unfinished">Optager hver dag når programmet vises på dette klokkeslet</translation>
+        <translation>Optager hver dag når programmet vises på dette klokkeslet</translation>
     </message>
     <message>
         <source>Recording every week when shown in this timeslot</source>
-        <translation type="unfinished">Optager hver uge når programmet vises på dette klokkeslet</translation>
+        <translation>Optager hver uge når programmet vises på dette klokkeslet</translation>
     </message>
     <message>
         <source>Recording when shown on this channel</source>
-        <translation type="unfinished">Optager når programmet vises på denne kanal</translation>
+        <translation>Optager når programmet vises på denne kanal</translation>
     </message>
     <message>
         <source>Recording all showings</source>
-        <translation type="unfinished">Optager alle sendinger af programmet</translation>
+        <translation>Optager alle sendinger af programmet</translation>
     </message>
     <message>
         <source>Not recording this showing</source>
-        <translation type="unfinished">Optager ikke denne sending</translation>
+        <translation>Optager ikke denne sending</translation>
     </message>
     <message>
         <source>Error!</source>
-        <translation type="unfinished">Fejl!</translation>
+        <translation>Fejl!</translation>
     </message>
 </context>
 <context>
@@ -487,75 +487,75 @@
     </message>
     <message>
         <source>%02d:%02d:%02d behind  --  %.2f%% full</source>
-        <translation type="unfinished">%02d:%02d:%02d bagud  --  %.2f%% fuld</translation>
+        <translation>%02d:%02d:%02d bagud  --  %.2f%% fuld</translation>
     </message>
     <message>
         <source>%02d:%02d:%02d behind</source>
-        <translation type="unfinished">%02d:%02d:%02d bagud</translation>
+        <translation>%02d:%02d:%02d bagud</translation>
     </message>
     <message>
         <source>%02d:%02d behind  --  %.2f%% full</source>
-        <translation type="unfinished">%02d:%02d bagud  --  %.2f%% fuld</translation>
+        <translation>%02d:%02d bagud  --  %.2f%% fuld</translation>
     </message>
     <message>
         <source>%02d:%02d behind</source>
-        <translation type="unfinished">%02d:%02d bagud</translation>
+        <translation>%02d:%02d bagud</translation>
     </message>
     <message>
         <source>%02d:%02d:%02d of %02d:%02d:%02d</source>
-        <translation type="unfinished">%02d:%02d:%02d af %02d:%02d:%02d</translation>
+        <translation>%02d:%02d:%02d af %02d:%02d:%02d</translation>
     </message>
     <message>
         <source>%02d:%02d of %02d:%02d</source>
-        <translation type="unfinished">%02d:%02d af %02d:%02d</translation>
+        <translation>%02d:%02d af %02d:%02d</translation>
     </message>
     <message>
         <source>Skip %1 seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>Hop %1 sekunder</translation>
     </message>
     <message>
         <source>Not Currently Suppressed</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikke udeladt i øjeblikket</translation>
     </message>
     <message>
         <source>Not Recording</source>
-        <translation type="unfinished">Optag ikke</translation>
+        <translation>Optager ikke</translation>
     </message>
     <message>
         <source>Recording Once</source>
-        <translation type="unfinished">Enkelt optagelse</translation>
+        <translation>Enkelt optagelse</translation>
     </message>
     <message>
         <source>Timeslot Recording</source>
-        <translation type="unfinished">Klokkeslet optagelse</translation>
+        <translation>Klokkeslet optagelse</translation>
     </message>
     <message>
         <source>Weekslot Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Ugentlig optagelse</translation>
     </message>
     <message>
         <source>Channel Recording</source>
-        <translation type="unfinished">Optag på denne kanal</translation>
+        <translation>Optag på denne kanal</translation>
     </message>
     <message>
         <source>All Recording</source>
-        <translation type="unfinished">Optag altid</translation>
+        <translation>Optag altid</translation>
     </message>
     <message>
         <source>Air Date:</source>
-        <translation type="unfinished"></translation>
+        <translation>Sendt:</translation>
     </message>
     <message>
         <source>Record Schedule:</source>
-        <translation type="unfinished"></translation>
+        <translation>Optagelsestype:</translation>
     </message>
     <message>
         <source>Episode:</source>
-        <translation type="unfinished"></translation>
+        <translation>Afsnit:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation type="unfinished">Beskrivelse:</translation>
+        <translation>Beskrivelse:</translation>
     </message>
     <message>
         <source>Pre-scaling theme images</source>
@@ -1011,59 +1011,59 @@
     </message>
     <message>
         <source>Forward</source>
-        <translation type="unfinished"></translation>
+        <translation>Spol forlæns</translation>
     </message>
     <message>
         <source>Skip Ahead</source>
-        <translation type="unfinished"></translation>
+        <translation>Hop fremad</translation>
     </message>
     <message>
         <source>Rewind</source>
-        <translation type="unfinished"></translation>
+        <translation>Spol baglæns</translation>
     </message>
     <message>
         <source>Skip Back</source>
-        <translation type="unfinished"></translation>
+        <translation>Hop tilbage</translation>
     </message>
     <message>
         <source>Play</source>
-        <translation type="unfinished"></translation>
+        <translation>Afspil</translation>
     </message>
     <message>
         <source>Speed 5X</source>
-        <translation type="unfinished"></translation>
+        <translation>5X hastighed</translation>
     </message>
     <message>
         <source>Speed 3X</source>
-        <translation type="unfinished"></translation>
+        <translation>3X hastighed</translation>
     </message>
     <message>
         <source>Speed 2X</source>
-        <translation type="unfinished"></translation>
+        <translation>2X hastighed</translation>
     </message>
     <message>
         <source>Speed 1/3X</source>
-        <translation type="unfinished"></translation>
+        <translation>1/3X hastighed</translation>
     </message>
     <message>
         <source>Speed 1/8X</source>
-        <translation type="unfinished"></translation>
+        <translation>1/8X hastighed</translation>
     </message>
     <message>
         <source>Speed 1/16X</source>
-        <translation type="unfinished"></translation>
+        <translation>1/16X hastighed</translation>
     </message>
     <message>
         <source>Skip</source>
-        <translation type="unfinished"></translation>
+        <translation>Hop</translation>
     </message>
     <message>
         <source>16:9</source>
-        <translation type="unfinished"></translation>
+        <translation>16:9</translation>
     </message>
     <message>
         <source>4:3</source>
-        <translation type="unfinished"></translation>
+        <translation>4:3</translation>
     </message>
 </context>
 <context>

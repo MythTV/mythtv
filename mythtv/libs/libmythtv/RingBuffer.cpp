@@ -677,7 +677,7 @@ void RingBuffer::WaitForPause(void)
     if  (!readaheadpaused)
     {
         if (!pauseWait.wait(1000))
-            VERBOSE(VB_IMPORTANT, "Waited to long for ringbuffer pause..\n");
+            VERBOSE(VB_IMPORTANT, "Waited too long for ringbuffer pause..");
     }
 }
 
