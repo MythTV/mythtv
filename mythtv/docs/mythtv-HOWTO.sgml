@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2004-01-01, v0.13.06
+<date>2004-01-05, v0.13.07
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -2501,7 +2501,7 @@ shouldn't have any issues with deinterlacing.
 The following types of hardware encoding cards are supported:
 <itemize>
 <item>MJPEG - Zoran-based cards; see <url url="http://mjpeg.sourceforge.net" name="http://mjpeg.sourceforge.net">
-<item>MPEG2 - iTVC15 based cards (Hauppague PVR-250/PVR-350); see <url url="http://ivtv.sourceforce.net" name="http://ivtv.sourceforce.net">
+<item>MPEG2 - iTVC15 based cards (Hauppague PVR-250/PVR-350); see <url url="http://ivtv.sourceforge.net" name="http://ivtv.sourceforge.net">
 <item>HDTV - pcHDTV cards; see <url url="http://pchdtv.com" name="http://pchdtv.com">
 <item>DVB - cards supporting DVB; see <url url="http://linuxtv.org" name="http://linuxtv.org">
 </itemize>
@@ -4590,7 +4590,7 @@ low-level calls.  You will need to patch LIRC in order for it to work
 correctly.  Download the patch and install:
 <tscreen><verb>
 $ cd lirc-0.7.0pre2
-$ wget http://delvare.free.fr/i2c/other/lirc-CVS-i2c-2.8.0.patch
+$ wget http://delvare.nerim.net/i2c/other/lirc-CVS-i2c-2.8.0.patch
 $ patch -p1 < lirc-CVS-i2c-2.8.0.patch
 </verb></tscreen>
 
@@ -4610,6 +4610,14 @@ $ su
 # make
 # make install
 </verb></tscreen>
+
+<bf>NOTE</bf>:  If you receive a compile error stating:
+<tt>lirc_i2c.c:296: unknown field 'owner' specified in initializer</tt>, you
+will need to edit the file and comment out a line in the source code.  See
+message <url
+url="http://www.gossamer-threads.com/perl/mailarc/gforum.cgi?post=86696"
+name="http://www.gossamer-threads.com/perl/mailarc/gforum.cgi?post=86696">
+for detailed instructions.
 
 As a part of the <tt>make install</tt> process, LIRC will create the
 appropriate device for you in <tt>/dev</tt>.  Check to make sure:
@@ -4933,6 +4941,7 @@ v0.13.05, 2003-12-22.  Add more information to the LVM example.  And a
 warning which is sure to be ignored.
 v0.13.06, 2004-01-01.  Remove the hang comment from xmltv setup; there's now
 a status window.  Update Jarod's website info.
+v0.13.07, 2004-01-05.  Fix typo.  Edit URL for i2c stuff.
 -->
 
 <!--

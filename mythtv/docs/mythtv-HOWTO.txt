@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2004-01-01, v0.13.06
+  2004-01-05, v0.13.07
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -3198,7 +3198,7 @@
      <http://mjpeg.sourceforge.net>
 
   +o  MPEG2 - iTVC15 based cards (Hauppague PVR-250/PVR-350); see
-     http://ivtv.sourceforce.net <http://ivtv.sourceforce.net>
+     http://ivtv.sourceforge.net <http://ivtv.sourceforge.net>
 
   +o  HDTV - pcHDTV cards; see http://pchdtv.com <http://pchdtv.com>
 
@@ -5662,7 +5662,7 @@
 
 
   $ cd lirc-0.7.0pre2
-  $ wget http://delvare.free.fr/i2c/other/lirc-CVS-i2c-2.8.0.patch
+  $ wget http://delvare.nerim.net/i2c/other/lirc-CVS-i2c-2.8.0.patch
   $ patch -p1 < lirc-CVS-i2c-2.8.0.patch
 
 
@@ -5689,6 +5689,13 @@
 
 
 
+  [1mNOTE[22m:  If you receive a compile error stating: lirc_i2c.c:296: unknown
+  field 'owner' specified in initializer, you will need to edit the file
+  and comment out a line in the source code.  See message
+  http://www.gossamer-threads.com/perl/mailarc/gforum.cgi?post=86696
+  <http://www.gossamer-threads.com/perl/mailarc/gforum.cgi?post=86696>
+  for detailed instructions.
+
   As a part of the make install process, LIRC will create the
   appropriate device for you in /dev.  Check to make sure:
 
@@ -5705,21 +5712,22 @@
   your /var/log/messages and /var/log/lircd files.
 
 
-       $ su
-       # modprobe lirc_i2c
-       # lsmod
-       Module                  Size  Used by    Not tainted
-       lirc_i2c                5124   0
-       lirc_dev               10096   1  [lirc_i2c]
-       ...
-       # lircd
-       # tail /var/log/messages
-       Sep 18 15:38:26 frontend kernel: lirc_i2c: chip found @ 0x18 (Hauppauge IR)
-       Sep 18 15:38:26 frontend kernel: lirc_dev: lirc_register_plugin:sample_rate:
-       10
-       ...
-       # tail /var/log/lircd
-       Sep 18 15:24:52 frontend lircd 0.7.0pre2: lircd(hauppauge) ready
+
+  $ su
+  # modprobe lirc_i2c
+  # lsmod
+  Module                  Size  Used by    Not tainted
+  lirc_i2c                5124   0
+  lirc_dev               10096   1  [lirc_i2c]
+  ...
+  # lircd
+  # tail /var/log/messages
+  Sep 18 15:38:26 frontend kernel: lirc_i2c: chip found @ 0x18 (Hauppauge IR)
+  Sep 18 15:38:26 frontend kernel: lirc_dev: lirc_register_plugin:sample_rate:
+  10
+  ...
+  # tail /var/log/lircd
+  Sep 18 15:24:52 frontend lircd 0.7.0pre2: lircd(hauppauge) ready
 
 
 
@@ -5768,9 +5776,10 @@
   this:
 
 
-       # Native lirc support
-       CONFIG += using_lirc
-       EXTRA_LIBS += -llirc_client
+
+  # Native lirc support
+  CONFIG += using_lirc
+  EXTRA_LIBS += -llirc_client
 
 
 
@@ -5829,6 +5838,7 @@
   partition type you should stop and look at documentation on how to
   perform these steps.
 
+
   [1mBIG FAT WARNING[22m:  Using an incorrect parameter can make your files
   inaccessible, prevent your computer from booting, etc.  Be careful!
 
@@ -5850,7 +5860,6 @@
 
   +o  VG (Volume Group).  The aggregation of all the PVs make a VG.
 
-
   +o  LV (Logical Volume).  Subdivision of the pool of space available in
      the VG into individual chunks, like /usr, /var/video, etc.
 
@@ -5871,44 +5880,44 @@
 
 
 
-       # fdisk /dev/hda
+  # fdisk /dev/hda
 
-       The number of cylinders for this disk is set to 1823.
-       There is nothing wrong with that, but this is larger than 1024,
-       and could in certain setups cause problems with:
-       1) software that runs at boot time (e.g., old versions of LILO)
-       2) booting and partitioning software from other OSs
-          (e.g., DOS FDISK, OS/2 FDISK)
+  The number of cylinders for this disk is set to 1823.
+  There is nothing wrong with that, but this is larger than 1024,
+  and could in certain setups cause problems with:
+  1) software that runs at boot time (e.g., old versions of LILO)
+  2) booting and partitioning software from other OSs
+     (e.g., DOS FDISK, OS/2 FDISK)
 
-       Command (m for help): p
+  Command (m for help): p
 
-       Disk /dev/hda: 15.0 GB, 15000330240 bytes
-       255 heads, 63 sectors/track, 1823 cylinders
-       Units = cylinders of 16065 * 512 = 8225280 bytes
+  Disk /dev/hda: 15.0 GB, 15000330240 bytes
+  255 heads, 63 sectors/track, 1823 cylinders
+  Units = cylinders of 16065 * 512 = 8225280 bytes
 
-          Device Boot    Start       End    Blocks   Id  System
-       /dev/hda1   *         1       764   6136798+  83  Linux
-       /dev/hda2           765      1823   8506417+   5  Extended
-       /dev/hda5           765      1823   8506417   83  Linux
+     Device Boot    Start       End    Blocks   Id  System
+  /dev/hda1   *         1       764   6136798+  83  Linux
+  /dev/hda2           765      1823   8506417+   5  Extended
+  /dev/hda5           765      1823   8506417   83  Linux
 
-       Command (m for help): t
-       Partition number (1-6): 5
-       Hex code (type L to list codes): 8e
+  Command (m for help): t
+  Partition number (1-6): 5
+  Hex code (type L to list codes): 8e
 
-       Command (m for help): p
+  Command (m for help): p
 
-       Disk /dev/hda: 15.0 GB, 15000330240 bytes
-       255 heads, 63 sectors/track, 1823 cylinders
-       Units = cylinders of 16065 * 512 = 8225280 bytes
+  Disk /dev/hda: 15.0 GB, 15000330240 bytes
+  255 heads, 63 sectors/track, 1823 cylinders
+  Units = cylinders of 16065 * 512 = 8225280 bytes
 
-          Device Boot    Start       End    Blocks   Id  System
-       /dev/hda1   *         1       764   6136798+  83  Linux
-       /dev/hda2           765      1823   8506417+   5  Extended
-       /dev/hda5           765      1823   8506417   8e  Linux LVM
+     Device Boot    Start       End    Blocks   Id  System
+  /dev/hda1   *         1       764   6136798+  83  Linux
+  /dev/hda2           765      1823   8506417+   5  Extended
+  /dev/hda5           765      1823   8506417   8e  Linux LVM
 
-       Command (m for help): w
+  Command (m for help): w
 
-       #
+  #
 
 
 
@@ -5916,7 +5925,7 @@
   multiple partitions to use):
 
 
-  # pvcreate /dev/hda5
+       # pvcreate /dev/hda5
 
 
 
@@ -5932,9 +5941,10 @@
   reiserfs filesystem and mount it:
 
 
-       # lvcreate --name video --size 5G VGforMyth
-       # mkreiserfs /dev/VGforMyth/video
-       # mount /dev/VGforMyth/video /var/video
+
+  # lvcreate --name video --size 5G VGforMyth
+  # mkreiserfs /dev/VGforMyth/video
+  # mount /dev/VGforMyth/video /var/video
 
 
 
@@ -5973,7 +5983,6 @@
 
   Once you've completed one of the following two procedures, use [1mdf [22mto
   check that you've got more space.
-
 
 
   [1m22.3.1.  ReiserFS[0m
@@ -6037,7 +6046,8 @@
   You may also modify some aspects of a filesystem such as the reserved
   block percentage after it has been created using the [1mtune2fs [22mprogram:
 
-  # tune2fs -m 0 /dev/hdb1
+
+       # tune2fs -m 0 /dev/hdb1
 
 
 

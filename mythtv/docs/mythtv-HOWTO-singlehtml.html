@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2004-01-01, v0.13.06
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2004-01-05, v0.13.07
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -2929,7 +2929,7 @@ The following types of hardware encoding cards are supported:
 <LI>MJPEG - Zoran-based cards; see 
 <A HREF="http://mjpeg.sourceforge.net">http://mjpeg.sourceforge.net</A></LI>
 <LI>MPEG2 - iTVC15 based cards (Hauppague PVR-250/PVR-350); see 
-<A HREF="http://ivtv.sourceforce.net">http://ivtv.sourceforce.net</A></LI>
+<A HREF="http://ivtv.sourceforge.net">http://ivtv.sourceforge.net</A></LI>
 <LI>HDTV - pcHDTV cards; see 
 <A HREF="http://pchdtv.com">http://pchdtv.com</A></LI>
 <LI>DVB - cards supporting DVB; see 
@@ -5224,7 +5224,7 @@ correctly.  Download the patch and install:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ cd lirc-0.7.0pre2
-$ wget http://delvare.free.fr/i2c/other/lirc-CVS-i2c-2.8.0.patch
+$ wget http://delvare.nerim.net/i2c/other/lirc-CVS-i2c-2.8.0.patch
 $ patch -p1 &lt; lirc-CVS-i2c-2.8.0.patch
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -5249,6 +5249,12 @@ $ su
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+<P><B>NOTE</B>:  If you receive a compile error stating:
+<CODE>lirc_i2c.c:296: unknown field 'owner' specified in initializer</CODE>, you
+will need to edit the file and comment out a line in the source code.  See
+message 
+<A HREF="http://www.gossamer-threads.com/perl/mailarc/gforum.cgi?post=86696">http://www.gossamer-threads.com/perl/mailarc/gforum.cgi?post=86696</A>
+for detailed instructions.</P>
 <P>As a part of the <CODE>make install</CODE> process, LIRC will create the
 appropriate device for you in <CODE>/dev</CODE>.  Check to make sure:
 <BLOCKQUOTE><CODE>

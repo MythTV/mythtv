@@ -321,7 +321,7 @@ correctly.  Download the patch and install:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ cd lirc-0.7.0pre2
-$ wget http://delvare.free.fr/i2c/other/lirc-CVS-i2c-2.8.0.patch
+$ wget http://delvare.nerim.net/i2c/other/lirc-CVS-i2c-2.8.0.patch
 $ patch -p1 &lt; lirc-CVS-i2c-2.8.0.patch
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -346,6 +346,12 @@ $ su
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+<P><B>NOTE</B>:  If you receive a compile error stating:
+<CODE>lirc_i2c.c:296: unknown field 'owner' specified in initializer</CODE>, you
+will need to edit the file and comment out a line in the source code.  See
+message 
+<A HREF="http://www.gossamer-threads.com/perl/mailarc/gforum.cgi?post=86696">http://www.gossamer-threads.com/perl/mailarc/gforum.cgi?post=86696</A>
+for detailed instructions.</P>
 <P>As a part of the <CODE>make install</CODE> process, LIRC will create the
 appropriate device for you in <CODE>/dev</CODE>.  Check to make sure:
 <BLOCKQUOTE><CODE>
