@@ -504,6 +504,11 @@
             <bold>yes</bold>
         </font>
         
+        <font name="selectable" face="Arial">
+            <color>#8cdeff</color>
+            <size>18</size>
+            <bold>yes</bold>
+        </font>
         <font name="largetitle" face="Arial">
             <color>#ffffff</color>
             <dropcolor>#000000</dropcolor>
@@ -555,12 +560,14 @@
                     <fcnfont name="active" function="active"></fcnfont>
                     <fcnfont name="inactive" function="inactive"></fcnfont>
                     <fcnfont name="active" function="selected"></fcnfont>
+                    <fcnfont name="selectable" function="selectable"></fcnfont>
                 </bin>
                 <bin number="2">
                     <area>235,10,535,270</area>
                     <fcnfont name="active" function="active"></fcnfont>
                     <fcnfont name="active" function="selected"></fcnfont>
                     <fcnfont name="inactive" function="inactive"></fcnfont>
+                    <fcnfont name="selectable" function="selectable"></fcnfont>
                 </bin>
             </managedtreelist>
 

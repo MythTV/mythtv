@@ -128,6 +128,8 @@ void VideoTree::buildVideoList()
         }
     }
     video_tree_list->assignTreeData(video_tree_root);
+    video_tree_list->sortTreeByString();
+    video_tree_list->sortTreeBySelectable();
 }
 
 
@@ -215,6 +217,7 @@ void VideoTree::wireUpTheme()
         exit(0);
     }
     video_tree_list->showWholeTree(true);
+    video_tree_list->colorSelectables(true);
     connect(video_tree_list, SIGNAL(nodeSelected(int, IntVector*)), this, SLOT(handleTreeListSelection(int, IntVector*)));
     connect(video_tree_list, SIGNAL(nodeEntered(int, IntVector*)), this, SLOT(handleTreeListEntry(int, IntVector*)));
 
