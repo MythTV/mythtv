@@ -2691,7 +2691,7 @@ void NuppelVideoPlayer::DisableEdit(void)
 
     QMap<long long, int>::Iterator i = deleteMap.begin();
     for (; i != deleteMap.end(); ++i)
-        osd->HideEditArrow(i.key());
+        osd->HideEditArrow(i.key(), i.data());
     osd->HideText("seek_desc");
     osd->HideText("deletemarker");
     osd->HideText("edittime_display");
@@ -2789,7 +2789,7 @@ void NuppelVideoPlayer::DoKeypress(int keypress)
         {
             QMap<long long, int>::Iterator it;
             for (it = deleteMap.begin(); it != deleteMap.end(); ++it)
-                osd->HideEditArrow(it.key());
+                osd->HideEditArrow(it.key(), it.data());
 
             deleteMap.clear();
             UpdateEditSlider();
@@ -3006,8 +3006,8 @@ void NuppelVideoPlayer::AddMark(long long frames, int type)
 
 void NuppelVideoPlayer::DeleteMark(long long frames)
 {
+    osd->HideEditArrow(frames, deleteMap[frames]);
     deleteMap.remove(frames);
-    osd->HideEditArrow(frames);
     UpdateEditSlider();
 }
 

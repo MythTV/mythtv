@@ -59,7 +59,7 @@ class OSD
     void HideText(const QString &name);
 
     void ShowEditArrow(long long number, long long totalframes, int type);
-    void HideEditArrow(long long number);
+    void HideEditArrow(long long number, int type);
 
     void AddSet(OSDSet *set, QString name, bool withlock = true);
 

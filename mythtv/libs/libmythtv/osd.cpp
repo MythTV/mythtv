@@ -1037,7 +1037,7 @@ void OSD::ShowEditArrow(long long number, long long totalframes, int type)
         return;
 
     char name[128];
-    sprintf(name, "%lld", number);
+    sprintf(name, "%lld-%d", number, type);
 
     int xpos = (int)((editarrowRect.width() * 1.0 / totalframes) * number);
     xpos = editarrowRect.left() + xpos;
@@ -1068,10 +1068,10 @@ void OSD::ShowEditArrow(long long number, long long totalframes, int type)
     pthread_mutex_unlock(&osdlock);
 }
 
-void OSD::HideEditArrow(long long number)
+void OSD::HideEditArrow(long long number, int type)
 {
     char name[128];
-    sprintf(name, "%lld", number);
+    sprintf(name, "%lld-%d", number, type);
 
     pthread_mutex_lock(&osdlock);
     OSDSet *set = GetSet(name);
