@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.02.06 (xris)
+#Last Updated: 2005.02.11 (xris)
 #
 #  transcode.pm
 #
@@ -136,7 +136,13 @@ package export::transcode;
         }
     # Figure out the input files
         if ($episode->{'finfo'}{'is_mpeg'}) {
-    		$transcode .= " -i $episode->{'filename'} -x mpeg2";
+    		$transcode .= " -i $episode->{'filename'} -x ";
+            if ($episode->{'finfo'}{'mpeg_stream_type'} == 'pes') {
+                $transcode .= 'vob';
+            }
+            else {
+                $transcode .= 'mpeg2';
+            }
         }
         else {
             $transcode .= " -i /tmp/fifodir_$$/vidout -p /tmp/fifodir_$$/audout"

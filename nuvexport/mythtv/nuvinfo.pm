@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.01.23 (xris)
+#Last Updated: 2005.02.11 (xris)
 #
 #  mythtv::nuvinfo.pm
 #
@@ -137,10 +137,10 @@ package mythtv::nuvinfo;
         ($info{'aspect'})                = $data =~ m/^ID_VIDEO_ASPECT=(\d+(?:\.\d*)?)/m;
         ($info{'audio_type'})            = $data =~ m/^ID_AUDIO_CODEC=(\d+(?:\.\d*)?)/m;
         if ($data =~ m/\bMPEG-(PE?S) file format detected/m) {
-            $info{'mpeg_stream_type'} = $1;
+            $info{'mpeg_stream_type'} = lc($1);
         }
         elsif ($data =~ m/^TS file format detected/m) {
-            $info{'mpeg_stream_type'} = 'TS';
+            $info{'mpeg_stream_type'} = 'ts';
         }
         else {
             die "Unrecognized mpeg stream type.  Please execute the following and see if you\n"
