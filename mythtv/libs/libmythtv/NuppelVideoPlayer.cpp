@@ -3481,15 +3481,18 @@ bool NuppelVideoPlayer::LastFrameIsBlank(void)
 }
 
 int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
-                                       int *controlFlag, bool inJobQueue)
+                                       bool inJobQueue)
 {
-    (void)controlFlag;
     int comms_found = 0;
     int percentage = 0;
     int jobID = -1;
     bool flaggingPaused = false;
-    int flagFPS = 0;
+    float flagFPS = 0.0;
     float elapsed = 0.0;
+    long usecPerFrame = 0;
+    long usecSleep = 0;
+    struct timeval startTime;
+    struct timeval endTime;
     VideoFrame *currentFrame;
 
     killplayer = false;
@@ -3500,10 +3503,8 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
 
     disablevideo = true;
 
-    if (OpenFile() < 0)
+    if (ringBuffer && !ringBuffer->IsOpen())
         return(254);
-
-    m_playbackinfo->SetCommFlagged(COMM_FLAG_PROCESSING);
 
     if (inJobQueue)
     {
@@ -3514,11 +3515,72 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
                                   "0% " + QObject::tr("Completed"));
     }
 
-    playing = true;
+    QTime flagTime;
+    flagTime.start();
+
+    if (m_playbackinfo->recendts < QDateTime::currentDateTime())
+        SetWatchingRecording(false);
+
+    // if we're running flagging during recording sleep a while to let the
+    // recorder get a little ways ahead of us.  We need this buffer in order
+    // to run logo detection.  flagging will be allowed to catch back up
+    // later.
+    if (watchingrecording)
+    {
+        int i = 0;
+        int initialSleep = 30;
+        int additionalSleep = 0;
+        int curCmd;
+
+        if (commercialskipmethod & COMM_DETECT_LOGO)
+            additionalSleep = LOGO_SECONDS_NEEDED;
+
+        if (jobID != -1)
+        {
+            JobQueue::ChangeJobStatus(jobID, JOB_RUNNING,
+                                      QObject::tr("Building Detection Buffer"));
+        }
+
+        while(i < (initialSleep + additionalSleep))
+        {
+            if ((jobID != -1) &&
+                ((i % 5) == 0))
+            {
+                curCmd = JobQueue::GetJobCmd(jobID);
+
+                if (curCmd == JOB_STOP)
+                    return(255);
+            }
+
+            if (i == initialSleep)
+                flagTime.start();
+
+            sleep(1);
+            i++;
+        }
+    }
+
+    if (OpenFile() < 0)
+        return(254);
+
+    // if we know the total length, how can be be flagging an in-progress
+    // recording??  This also handles cases where the recording finished
+    // before we got a goot start like when called from the JobQueue.
+    if (totalLength)
+    {
+        watchingrecording = false;
+        SetWatchingRecording(false);
+    }
+
+    if (watchingrecording)
+        commDetect->SetWatchingRecording(true, nvr_enc, this);
+
+    m_playbackinfo->SetCommFlagged(COMM_FLAG_PROCESSING);
 
     if (!InitVideo())
     {
-        VERBOSE(VB_IMPORTANT, "NVP: Unable to initialize video for FlagCommercials.");
+        VERBOSE(VB_IMPORTANT,
+                "NVP: Unable to initialize video for FlagCommercials.");
         playing = false;
         m_playbackinfo->SetCommFlagged(COMM_FLAG_NOT_FLAGGED);
         return(254);
@@ -3532,7 +3594,8 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
     commDetect->SetCommSkipAllBlanks(
         gContext->GetNumSetting("CommSkipAllBlanks", 1));
 
-    if (commercialskipmethod & COMM_DETECT_LOGO)
+    if ((commercialskipmethod & COMM_DETECT_LOGO) &&
+        ((totalLength == 0) || (totalLength > LOGO_SECONDS_NEEDED)))
     {
         if (inJobQueue)
         {
@@ -3554,10 +3617,6 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
         }
     }
 
-
-    QTime flagTime;
-    flagTime.start();
-
     // the meat of the offline commercial detection code, scan through whole
     // file looking for indications of commercial breaks
     GetFrame(1,true);
@@ -3566,14 +3625,21 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
         if (totalFrames)
             printf( "%3d%%/      ", 0 );
         else
-            printf( "%6lld", 0LL );
+            printf( "%6lld/      ", 0LL );
     }
+
+    usecPerFrame = (long)(1.0 / video_frame_rate * 1000000);
 
     while (!eof)
     {
+        if (watchingrecording)
+            gettimeofday(&startTime, NULL);
+
         currentFrame = videoOutput->GetLastDecodedFrame();
 
-        if ((jobID != -1) && ((currentFrame->frameNumber % 500) == 0))
+        if ((jobID != -1) &&
+            (((currentFrame->frameNumber % 500) == 0)) ||
+             (((currentFrame->frameNumber % 100) == 0) && (watchingrecording)))
         {
             int curCmd;
 
@@ -3612,18 +3678,20 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
         }
 
         // sleep a little so we don't use all cpu even if we're niced
-        if (!fullSpeed)
+        if (!fullSpeed && !watchingrecording)
             usleep(10000);
 
-        if (((jobID != -1) && ((currentFrame->frameNumber % 500) == 0)) ||
-            ((showPercentage) && (currentFrame->frameNumber % 100) == 0))
+        if (((jobID != -1) &&
+            ((currentFrame->frameNumber % 500) == 0)) ||
+             ((showPercentage || watchingrecording) &&
+              (currentFrame->frameNumber % 100) == 0))
         {
             elapsed = flagTime.elapsed() / 1000.0;
 
             if (elapsed)
-                flagFPS = (int)(currentFrame->frameNumber / elapsed);
+                flagFPS = currentFrame->frameNumber / elapsed;
             else
-                flagFPS = 0;
+                flagFPS = 0.0;
 
             if (totalFrames)
                 percentage = currentFrame->frameNumber * 100 / totalFrames;
@@ -3635,28 +3703,69 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
                 if (totalFrames)
                 {
                     printf( "\b\b\b\b\b\b\b\b\b\b\b" );
-                    printf( "%3d%%/%3dfps", percentage, flagFPS );
+                    printf( "%3d%%/%3dfps", percentage, (int)flagFPS );
                 }
                 else
                 {
-                    printf( "\b\b\b\b\b\b" );
-                    printf( "%6lld", currentFrame->frameNumber );
+                    printf( "\b\b\b\b\b\b\b\b\b\b\b\b\b" );
+                    printf( "%6lld/%3dfps", currentFrame->frameNumber,
+                            (int)flagFPS);
                 }
                 fflush( stdout );
             }
 
-            if ((jobID != -1) && ((currentFrame->frameNumber % 500) == 0))
+            if ((jobID != -1) &&
+                (((currentFrame->frameNumber % 500) == 0)) ||
+                 (((currentFrame->frameNumber % 100) == 0) &&
+                  (watchingrecording)))
             {
-                JobQueue::ChangeJobComment(jobID,
-                                          QObject::tr("%1% Completed @ %2 fps.")
-                                                      .arg(percentage)
-                                                      .arg(flagFPS));
+                if (totalFrames)
+                {
+                    JobQueue::ChangeJobComment(jobID, QObject::tr(
+                                               "%1% Completed @ %2 fps.")
+                                               .arg(percentage)
+                                               .arg(flagFPS));
+                }
+                else
+                {
+                    JobQueue::ChangeJobComment(jobID, QObject::tr(
+                                               "%1 Frames Completed @ %2 fps.")
+                                               .arg(currentFrame->frameNumber)
+                                               .arg(flagFPS));
+                }
             }
         }
 
         commDetect->ProcessNextFrame(currentFrame, currentFrame->frameNumber);
 
         GetFrame(1,true);
+
+        if (watchingrecording)
+        {
+            qApp->processEvents();
+            usecPerFrame = (long)(1.0 / video_frame_rate * 1000000);
+            gettimeofday(&endTime, NULL);
+
+            usecSleep = usecPerFrame -
+                            (((endTime.tv_sec - startTime.tv_sec) * 1000000) +
+                              (endTime.tv_usec - startTime.tv_usec));
+
+            elapsed = flagTime.elapsed() / 1000.0;
+
+            if (elapsed)
+            {
+                flagFPS = currentFrame->frameNumber / elapsed;
+
+                if ((flagFPS < (video_frame_rate - 1.0)) &&
+                    (usecSleep > 0))
+                    usecSleep = (long)(usecSleep * 0.33);
+                else if (flagFPS > (video_frame_rate * 0.99))
+                    usecSleep = (long)(usecPerFrame * 1.5);
+            }
+
+            if (usecSleep > 0)
+                usleep(usecSleep);
+        }
     }
 
     if (showPercentage)
@@ -3664,14 +3773,15 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
         elapsed = flagTime.elapsed() / 1000.0;
 
         if (elapsed)
-            flagFPS = (int)(currentFrame->frameNumber / elapsed);
+            flagFPS = currentFrame->frameNumber / elapsed;
         else
-            flagFPS = 0;
+            flagFPS = 0.0;
 
         if (totalFrames)
             printf( "\b\b\b\b\b\b      \b\b\b\b\b\b" );
         else
-            printf( "\b\b\b\b\b\b\b\b\b\b\b           \b\b\b\b\b\b\b\b\b\b\b" );
+            printf( "\b\b\b\b\b\b\b\b\b\b\b\b\b             "
+                    "\b\b\b\b\b\b\b\b\b\b\b\b\b" );
     }
 
     if (commercialskipmethod & COMM_DETECT_BLANKS)
@@ -3696,7 +3806,6 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
     playing = false;
     killplayer = true;
 
-
     if (!hasFullPositionMap)
         decoder->SetPositionMap();
 
@@ -3704,19 +3813,18 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
 
     if (jobID != -1)
     {
-        flagFPS = 0;
         elapsed = flagTime.elapsed() / 1000.0;
 
         if (elapsed)
-            flagFPS = (int)(totalFrames / elapsed);
+            flagFPS = totalFrames / elapsed;
+        else
+            flagFPS = 0.0;
 
         JobQueue::ChangeJobStatus(jobID, JOB_STOPPING,
-                                  QString("100% ") +
                                   QObject::tr("Completed, %1 FPS").arg(flagFPS)
                                   + ", " + QString("%1").arg(comms_found) + " "
                                   + QObject::tr("Commercial Breaks Found"));
     }
-
 
     return(comms_found);
 }

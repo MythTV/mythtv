@@ -18,6 +18,7 @@
 #include "libmythtv/commercial_skip.h"
 #include "libmythtv/NuppelVideoPlayer.h"
 #include "libmythtv/programinfo.h"
+#include "libmythtv/remoteutil.h"
 #include "libmyth/mythdbcon.h"
 
 using namespace std;
@@ -33,6 +34,7 @@ bool fullSpeed = true;
 bool rebuildSeekTable = false;
 bool beNice = true;
 bool inJobQueue = false;
+bool stillRecording = false;
 bool copyToCutlist = false;
 
 double fps = 29.97; 
@@ -299,8 +301,19 @@ int FlagCommercials(QString chanid, QString starttime)
     }
     else
     {
+        if (stillRecording)
+        {
+            RemoteEncoder *recorder;
+
+            nvp->SetWatchingRecording(true);
+            gContext->ConnectToMasterServer();
+
+            recorder = RemoteGetExistingRecorder(program_info);
+            if (recorder)
+                nvp->SetRecorder(recorder);
+        }
         breaksFound = nvp->FlagCommercials(showPercentage, fullSpeed,
-                                               NULL, inJobQueue);
+                                           inJobQueue);
 
         if (!quiet)
             printf( "%d\n", breaksFound );
@@ -398,6 +411,10 @@ int main(int argc, char *argv[])
         {
             inJobQueue = true;
         }
+        else if (!strcmp(a.argv()[argpos], "-l"))
+        {
+            stillRecording = true;
+        }
         else if (!strcmp(a.argv()[argpos], "--all"))
         {
             allRecorded = true;
@@ -434,6 +451,19 @@ int main(int argc, char *argv[])
         else if (!strcmp(a.argv()[argpos], "--hogcpu"))
         {
             beNice = false;
+        }
+        else if (!strcmp(a.argv()[argpos],"-V"))
+        {
+            if (a.argc() > argpos)
+            {
+                QString temp = a.argv()[++argpos];
+                print_verbose_messages = temp.toInt();
+            }
+            else
+            {
+                cerr << "Missing argument to -V option\n";
+                return -1;
+            }
         }
         else if (!strcmp(a.argv()[argpos],"-v") ||
                  !strcmp(a.argv()[argpos],"--verbose"))

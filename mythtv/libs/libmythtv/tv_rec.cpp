@@ -594,6 +594,27 @@ void TVRec::HandleStateChange(void)
             if (channel)
                 channel->SetFd(nvr->GetVideoFd());
             frameRate = nvr->GetFrameRate();
+
+            int jobTypes = curRecording->GetAutoRunJobs();
+            int transcodeFirst =
+                  gContext->GetNumSetting("AutoTranscodeBeforeAutoCommflag", 0);
+
+            if ((tmpInternalState != kState_WatchingLiveTV) &&
+                (!curRecording->chancommfree) &&
+                (jobTypes & JOB_COMMFLAG) &&
+                (gContext->GetNumSetting("AutoCommflagWhileRecording", 0)) &&
+                ((autoTranscode && !transcodeFirst) || (!autoTranscode)))
+            {
+
+
+                QString jobHost = "";
+                if (gContext->GetNumSetting("JobsRunOnRecordHost", 0))
+                    jobHost = gContext->GetHostName();
+
+                JobQueue::QueueJob(JOB_COMMFLAG, curRecording->chanid,
+                                   curRecording->recstartts, "", "",
+                                   jobHost, JOB_LIVE_REC);
+            }
         }
         else
         {
@@ -781,8 +802,12 @@ void TVRec::TeardownRecorder(bool killFile)
             int jobTypes;
 
             jobTypes = prevRecording->GetAutoRunJobs();
+            int transcodeFirst =
+                  gContext->GetNumSetting("AutoTranscodeBeforeAutoCommflag", 0);
 
-            if (prevRecording->chancommfree)
+            if ((prevRecording->chancommfree) ||
+                ((gContext->GetNumSetting("AutoCommflagWhileRecording", 0)) &&
+                 ((!autoTranscode) || (autoTranscode && !transcodeFirst))))
                 jobTypes = jobTypes & (~JOB_COMMFLAG);
 
             if (autoTranscode)

@@ -5,6 +5,7 @@
 
 #include "NuppelVideoPlayer.h"
 #include "mythcontext.h"
+#include "remoteencoder.h"
 
 enum commMapValues {
     MARK_START = 0,
@@ -45,22 +46,30 @@ enum frameFormats {
 // Set max comm break length to 00:08:05 minutes & max comm length to 00:02:05
 #define MIN_COMM_BREAK_LENGTH   60
 #define MAX_COMM_BREAK_LENGTH  485
-#define MAX_COMM_LENGTH  125
-#define MIN_SHOW_LENGTH  65
+#define MAX_COMM_LENGTH        125
+#define MIN_SHOW_LENGTH         65
+#define LOGO_SAMPLES_NEEDED    240
+#define LOGO_SAMPLE_SPACING      2
+#define LOGO_SECONDS_NEEDED    (LOGO_SAMPLES_NEEDED * LOGO_SAMPLE_SPACING)
 
 extern "C" {
 #include "frame.h"
 }
 
-class CommDetect
+class CommDetect : public QObject
 {
+    Q_OBJECT
   public:
     CommDetect(int w, int h, double frame_rate, int method);
     ~CommDetect(void);
 
+    void customEvent(QCustomEvent *e);
+
     void Init(int w, int h, double frame_rate, int method);
     void SetVideoParams(float aspect);
     void SetCommDetectMethod(int method) { commDetectMethod = method; };
+    void SetWatchingRecording(bool watching, RemoteEncoder *rec,
+                              NuppelVideoPlayer *nvp);
 
     void ProcessNextFrame(VideoFrame *frame, long long frame_number = -1);
     void SetVerboseDebugging(bool beVerbose = true)
@@ -183,6 +192,10 @@ class CommDetect
 
     bool skipAllBlanks;
 
+    NuppelVideoPlayer *m_parent;
+    bool watchingRecording;
+    RemoteEncoder *recorder;
+
     EdgeMaskEntry *edgeMask;
 
     unsigned char *logoMaxValues;
@@ -201,7 +214,7 @@ class CommDetect
     int logoMinY;
     int logoMaxY;
 
-    unsigned char *frame_ptr;
+    unsigned char *framePtr;
 
     QMap<long long, FrameInfoEntry> frameInfo;
     QMap<long long, int> blankFrameMap;

@@ -45,7 +45,8 @@ enum JobCmds {
 
 enum JobFlags {
     JOB_REG_FLAGS    = 0x0000,
-    JOB_USE_CUTLIST  = 0x0001
+    JOB_USE_CUTLIST  = 0x0001,
+    JOB_LIVE_REC     = 0x0002
 };
 
 enum JobLists {

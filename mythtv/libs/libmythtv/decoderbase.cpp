@@ -145,6 +145,15 @@ bool DecoderBase::PosMapFromEnc(void)
         start = m_positionMap[size-1].index + 1;
 
     int end = nvr_enc->GetFramesWritten();
+
+    if (!end)
+    {
+        VERBOSE(VB_PLAYBACK, QString("PosMapFromEnc: Warning, tried to fetch "
+                                     "PositionMap from Encoder but encoder "
+                                     "returned framesWritten == 0"));
+        return false;
+    }
+
     if (size > 0 && keyframedist > 0) 
         end /= keyframedist;
 

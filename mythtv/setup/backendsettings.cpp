@@ -424,6 +424,26 @@ static HostComboBox *JobQueueCPU()
     return gc;
 };
 
+static HostTimeBox *JobQueueWindowStart()
+{
+    HostTimeBox *gc = new HostTimeBox("JobQueueWindowStart", "00:00");
+    gc->setLabel(QObject::tr("Job Queue Start Time"));
+    gc->setHelpText(QObject::tr("This setting controls the start of the "
+                    "Job Queue time window which determines when new jobs will "
+                    "be started."));
+    return gc;
+};
+
+static HostTimeBox *JobQueueWindowEnd()
+{
+    HostTimeBox *gc = new HostTimeBox("JobQueueWindowEnd", "23:59");
+    gc->setLabel(QObject::tr("Job Queue End Time"));
+    gc->setHelpText(QObject::tr("This setting controls the end of the "
+                    "Job Queue time window which determines when new jobs will "
+                    "be started."));
+    return gc;
+};
+
 static GlobalCheckBox *JobsRunOnRecordHost()
 {
     GlobalCheckBox *gc = new GlobalCheckBox("JobsRunOnRecordHost");
@@ -432,6 +452,31 @@ static GlobalCheckBox *JobsRunOnRecordHost()
     gc->setHelpText(QObject::tr("If set, jobs in the queue will be required "
                                 "to run on the backend that made the "
                                 "original recording."));
+    return gc;
+};
+
+static GlobalCheckBox *AutoTranscodeBeforeAutoCommflag()
+{
+    GlobalCheckBox *gc = new GlobalCheckBox("AutoTranscodeBeforeAutoCommflag");
+    gc->setLabel(QObject::tr("Run Transcode Jobs before Auto-Commercial Flagging"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("If set, if both auto-transcode and "
+                                "auto commercial flagging are turned ON for a "
+                                "recording, transcoding will run first, "
+                                "otherwise, commercial flagging runs first."));
+    return gc;
+};
+
+static GlobalCheckBox *AutoCommflagWhileRecording()
+{
+    GlobalCheckBox *gc = new GlobalCheckBox("AutoCommflagWhileRecording");
+    gc->setLabel(QObject::tr("Start Auto-Commercial Flagging jobs when the "
+                             "recording starts"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("If set and Auto Commercial Flagging is ON for "
+                                "a recording, the flagging job will be started "
+                                "as soon as the recording starts.  NOT "
+                                "recommended on underpowered systems"));
     return gc;
 };
 
@@ -620,20 +665,21 @@ BackendSettings::BackendSettings() {
     VerticalConfigurationGroup* group5 = new VerticalConfigurationGroup(false);
     group5->setLabel(QObject::tr("Job Queue (Host-Specific)"));
     group5->addChild(JobQueueMaxSimultaneousJobs());
-    group5->addChild(JobsRunOnRecordHost());
     group5->addChild(JobQueueCheckFrequency());
 
     HorizontalConfigurationGroup* group5a =
               new HorizontalConfigurationGroup(false, false);
     VerticalConfigurationGroup* group5a1 =
               new VerticalConfigurationGroup(false, false);
+    group5a1->addChild(JobQueueWindowStart());
+    group5a1->addChild(JobQueueWindowEnd());
     group5a1->addChild(JobQueueCPU());
     group5a1->addChild(JobAllowCommFlag());
-    group5a1->addChild(JobAllowUserJob1());
     group5a->addChild(group5a1);
 
     VerticalConfigurationGroup* group5a2 =
             new VerticalConfigurationGroup(false, false);
+    group5a2->addChild(JobAllowUserJob1());
     group5a2->addChild(JobAllowUserJob2());
     group5a2->addChild(JobAllowUserJob3());
     group5a2->addChild(JobAllowUserJob4());
@@ -643,14 +689,21 @@ BackendSettings::BackendSettings() {
 
     VerticalConfigurationGroup* group6 = new VerticalConfigurationGroup(false);
     group6->setLabel(QObject::tr("Job Queue (Global)"));
-    group6->addChild(UserJobDesc1());
-    group6->addChild(UserJob1());
-    group6->addChild(UserJobDesc2());
-    group6->addChild(UserJob2());
-    group6->addChild(UserJobDesc3());
-    group6->addChild(UserJob3());
-    group6->addChild(UserJobDesc4());
-    group6->addChild(UserJob4());
+    group6->addChild(JobsRunOnRecordHost());
+    group6->addChild(AutoTranscodeBeforeAutoCommflag());
+    group6->addChild(AutoCommflagWhileRecording());
     addChild(group6);    
+
+    VerticalConfigurationGroup* group7 = new VerticalConfigurationGroup(false);
+    group7->setLabel(QObject::tr("Job Queue (Job Commands)"));
+    group7->addChild(UserJobDesc1());
+    group7->addChild(UserJob1());
+    group7->addChild(UserJobDesc2());
+    group7->addChild(UserJob2());
+    group7->addChild(UserJobDesc3());
+    group7->addChild(UserJob3());
+    group7->addChild(UserJobDesc4());
+    group7->addChild(UserJob4());
+    addChild(group7);    
 }
 

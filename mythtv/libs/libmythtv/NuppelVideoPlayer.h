@@ -119,8 +119,8 @@ class NuppelVideoPlayer
                                int *did_ff, bool *is_key, bool honorCutList);
     void TranscodeWriteText(void (*func)(void *, unsigned char *, int, int, int), void *ptr);
 
-    int FlagCommercials(bool showPercentage = false, bool fullSpeed = false,
-                        int *controlFlag = NULL, bool inJobQueue = false);
+    int FlagCommercials(bool showPercentage, bool fullSpeed,
+                        bool inJobQueue);
     bool RebuildSeekTable(bool showPercentage = true, StatusCallback cb = NULL,
                           void* cbData = NULL);
 

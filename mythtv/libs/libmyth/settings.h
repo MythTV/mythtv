@@ -753,6 +753,27 @@ class HostComboBox: public ComboBoxSetting, public HostSetting {
         HostSetting(name) { }
 };
 
+class HostTimeBox: public ComboBoxSetting, public HostSetting {
+  public:
+    HostTimeBox(const QString &name, const QString &defaultTime = "00:00") :
+        ComboBoxSetting(),
+        HostSetting(name)
+    {
+        int hour;
+        int minute;
+        QString timeStr;
+
+        for (hour = 0; hour < 24; hour++)
+        {
+            for (minute = 0; minute < 60; minute++)
+            {
+                timeStr = timeStr.sprintf("%02d:%02d", hour, minute);
+                addSelection(timeStr, timeStr, timeStr == defaultTime);
+            }
+        }
+    }
+};
+
 class HostLineEdit: public LineEditSetting, public HostSetting {
   public:
     HostLineEdit(const QString &name, bool rw = true) :

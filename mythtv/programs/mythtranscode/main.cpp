@@ -122,7 +122,20 @@ int main(int argc, char *argv[])
                 usage(a.argv()[0]);
                 return -1;
             }
-        } 
+        }
+        else if (!strcmp(a.argv()[argpos],"-V"))
+        {
+            if (a.argc() > argpos)
+            {
+                QString temp = a.argv()[++argpos];
+                print_verbose_messages = temp.toInt();
+            }
+            else
+            {
+                cerr << "Missing argument to -V option\n";
+                return -1;
+            }
+        }
         else if (!strcmp(a.argv()[argpos],"-p") ||
                  !strcmp(a.argv()[argpos],"--profile")) 
         {

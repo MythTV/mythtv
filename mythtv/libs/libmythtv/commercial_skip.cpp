@@ -41,7 +41,7 @@ CommDetect::CommDetect(int w, int h, double fps, int method)
 
 CommDetect::~CommDetect(void)
 {
-    frame_ptr = NULL;
+    framePtr = NULL;
 
     if (edgeMask)
         delete [] edgeMask;
@@ -140,7 +140,7 @@ void CommDetect::Init(int w, int h, double frame_rate, int method)
 
     skipAllBlanks = true;
 
-    frame_ptr = NULL;
+    framePtr = NULL;
 
     if (edgeMask)
         delete [] edgeMask;
@@ -174,6 +174,58 @@ void CommDetect::Init(int w, int h, double frame_rate, int method)
     logoInfoAvailable = false;
 
     ClearAllMaps();
+}
+
+void CommDetect::customEvent(QCustomEvent *e)
+{
+    if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
+    {
+        MythEvent *me = (MythEvent *)e;
+        QString message = me->Message();
+
+        if ((watchingRecording) &&
+            (message.left(14) == "DONE_RECORDING"))
+        {
+            message = message.simplifyWhiteSpace();
+            QStringList tokens = QStringList::split(" ", message);
+            int cardnum = tokens[1].toInt();
+            int filelen = tokens[2].toInt();
+
+            message = QString("CommDetect::CustomEvent - Recieved a "
+                              "DONE_RECORDING event for card %1.  ")
+                              .arg(cardnum);
+
+            if (cardnum == recorder->GetRecorderNumber())
+            {
+                m_parent->SetWatchingRecording(false);
+                m_parent->SetLength(filelen);
+                watchingRecording = false;
+
+                message += "This is the recording we are flagging, turning "
+                           "watchingRecording OFF.";
+            }
+            else
+            {
+                message += "Ignoring event, this is not the recording we are "
+                           "flaggign.";
+            }
+
+            VERBOSE(VB_COMMFLAG, message);
+        }
+    }
+}
+
+void CommDetect::SetWatchingRecording(bool watching, RemoteEncoder *rec,
+                                      NuppelVideoPlayer *nvp)
+{
+    watchingRecording = watching;
+    recorder = rec;
+    m_parent = nvp;
+
+    if (watching)
+        gContext->addListener(this);
+    else
+        gContext->removeListener(this);
 }
 
 void CommDetect::SetVideoParams(float aspect)
@@ -222,7 +274,7 @@ void CommDetect::ProcessNextFrame(VideoFrame *frame, long long frame_number)
         return;
 
     curFrameNumber = frame_number;
-    frame_ptr = frame->buf;
+    framePtr = frame->buf;
 
     lastFrameWasBlank = frameIsBlank;
     lastFrameWasSceneChange = sceneHasChanged;
@@ -322,7 +374,7 @@ bool CommDetect::CheckFrameIsBlank(void)
                 (x >= logoMinX) && (x <= logoMaxX))
                 continue;
 
-            pixel = frame_ptr[y * width + x];
+            pixel = framePtr[y * width + x];
 
             pixelsChecked++;
             totBrightness += pixel;
@@ -419,7 +471,7 @@ bool CommDetect::CheckSceneHasChanged(void)
         memset(lastHistogram, 0, sizeof(lastHistogram));
         for(int y = border; y < (height - border); y += vertSpacing)
             for(int x = border; x < (width - border); x += horizSpacing)
-                lastHistogram[frame_ptr[y * width + x]]++;
+                lastHistogram[framePtr[y * width + x]]++;
 
         return(false);
     }
@@ -430,7 +482,7 @@ bool CommDetect::CheckSceneHasChanged(void)
     memset(histogram, 0, sizeof(histogram));
     for(int y = border; y < (height - border); y += vertSpacing)
         for(int x = border; x < (width - border); x += horizSpacing)
-            histogram[frame_ptr[y * width + x]]++;
+            histogram[framePtr[y * width + x]]++;
 
     if (lastFrameWasSceneChange)
     {
@@ -492,7 +544,7 @@ bool CommDetect::CheckStationLogo(void)
             {
                 index = (y + y2) * width + x;
                 unsigned char *maskPtr = &logoMask[index];
-                unsigned char *fPtr = &frame_ptr[index];
+                unsigned char *fPtr = &framePtr[index];
                 for (int x2 = 0; x2 < 5; x2++)
                 {
                     if (*maskPtr == 1)
@@ -531,7 +583,7 @@ bool CommDetect::CheckStationLogo(void)
     {
         int index = y * width + logoMinX - 2;
         unsigned char *maskPtr = &logoMask[index];
-        unsigned char *fPtr = &frame_ptr[index];
+        unsigned char *fPtr = &framePtr[index];
         for (int x = logoMinX - 2; x <= (logoMaxX + 2); x++)
         {
             if (*maskPtr == 1)
@@ -573,8 +625,8 @@ bool CommDetect::CheckRatingSymbol(void)
     int Y, U, V;
     int index, offset, yOffset;
     int whitePixels = 0;
-    unsigned char *uPtr = &frame_ptr[width * height];
-    unsigned char *vPtr = &frame_ptr[width * height * 5 / 4];
+    unsigned char *uPtr = &framePtr[width * height];
+    unsigned char *vPtr = &framePtr[width * height * 5 / 4];
 
     memset(tmpBuf, ' ', width * height);
 
@@ -591,7 +643,7 @@ bool CommDetect::CheckRatingSymbol(void)
         {
             index = y * width + x;
             offset = yOffset + (x / 2);
-            Y = frame_ptr[index];
+            Y = framePtr[index];
             U = uPtr[offset];
             V = vPtr[offset];
 
@@ -1462,11 +1514,19 @@ void CommDetect::BuildAllMethodsCommList(void)
                     breakStart = lastStart;
 
                     if (verboseDebugging)
-                        VERBOSE(VB_COMMFLAG,
-                                QString("ReOpening commercial block at "
-                                        "frame %1 because show less than %2 "
-                                        "seconds")
-                                        .arg(breakStart).arg(MIN_SHOW_LENGTH));
+                    {
+                        if (breakStart)
+                            VERBOSE(VB_COMMFLAG,
+                                    QString("ReOpening commercial block at "
+                                            "frame %1 because show less than "
+                                            "%2 seconds")
+                                            .arg(breakStart)
+                                            .arg(MIN_SHOW_LENGTH));
+                        else
+                            VERBOSE(VB_COMMFLAG,
+                                    QString("Opening initial commercial block "
+                                            "at start of recording, block 0."));
+                    }
                 }
                 else
                 {
@@ -2001,7 +2061,7 @@ void CommDetect::DumpLogo(bool fromCurrentFrame)
         {
             if (fromCurrentFrame)
             {
-                printf( "%c", scrPixels[frame_ptr[y * width + x] / 50]);
+                printf( "%c", scrPixels[framePtr[y * width + x] / 50]);
             }
             else
             {
@@ -2307,34 +2367,34 @@ bool CommDetect::CheckEdgeLogo(void)
             pos2 = (y - radius) * width + x;
             pos3 = (y + radius) * width + x;
 
-            pixel = frame_ptr[pos1];
+            pixel = framePtr[pos1];
 
             if (edgeMask[pos1].horiz)
             {
-                if ((abs(frame_ptr[pos1 - radius] - pixel) >= logoEdgeDiff) ||
-                    (abs(frame_ptr[pos1 + radius] - pixel) >= logoEdgeDiff))
+                if ((abs(framePtr[pos1 - radius] - pixel) >= logoEdgeDiff) ||
+                    (abs(framePtr[pos1 + radius] - pixel) >= logoEdgeDiff))
                     goodEdges++;
                 testEdges++;
             }
             else
             {
-                if ((abs(frame_ptr[pos1 - radius] - pixel) >= logoEdgeDiff) ||
-                    (abs(frame_ptr[pos1 + radius] - pixel) >= logoEdgeDiff))
+                if ((abs(framePtr[pos1 - radius] - pixel) >= logoEdgeDiff) ||
+                    (abs(framePtr[pos1 + radius] - pixel) >= logoEdgeDiff))
                     badEdges++;
                 testNotEdges++;
             }
 
             if (edgeMask[pos1].vert)
             {
-                if ((abs(frame_ptr[pos2] - pixel) >= logoEdgeDiff) ||
-                    (abs(frame_ptr[pos3] - pixel) >= logoEdgeDiff))
+                if ((abs(framePtr[pos2] - pixel) >= logoEdgeDiff) ||
+                    (abs(framePtr[pos3] - pixel) >= logoEdgeDiff))
                     goodEdges++;
                 testEdges++;
             }
             else
             {
-                if ((abs(frame_ptr[pos2] - pixel) >= logoEdgeDiff) ||
-                    (abs(frame_ptr[pos3] - pixel) >= logoEdgeDiff))
+                if ((abs(framePtr[pos2] - pixel) >= logoEdgeDiff) ||
+                    (abs(framePtr[pos3] - pixel) >= logoEdgeDiff))
                     badEdges++;
                 testNotEdges++;
             }
@@ -2353,10 +2413,10 @@ bool CommDetect::CheckEdgeLogo(void)
 
 void CommDetect::SearchForLogo(NuppelVideoPlayer *nvp, bool fullSpeed)
 {
-    int seekIncrement = (int)(2 * fps);
+    int seekIncrement = (int)(LOGO_SAMPLE_SPACING * fps);
     long long seekFrame;
     int loops;
-    int maxLoops = 240;
+    int maxLoops = LOGO_SAMPLES_NEEDED;
     EdgeMaskEntry *edgeCounts;
     int pos, i, x, y, dx, dy;
     int edgeDiffs[] = { 5, 7, 10, 15, 20, 30, 40, 50, 60, 0 };
