@@ -8,10 +8,12 @@ HttpComms::HttpComms(QUrl &url)
     init(url);
 }
 
+#ifndef ANCIENT_QT
 HttpComms::HttpComms(QUrl &url, QHttpRequestHeader &header)
 {
     init(url, header);
 }
+#endif
 
 HttpComms::~HttpComms()
 {
@@ -20,6 +22,7 @@ HttpComms::~HttpComms()
 
 void HttpComms::init(QUrl &url)
 {
+#ifndef ANCIENT_QT
     QHttpRequestHeader header("GET", url.encodedPathAndQuery());
     QString userAgent = "Mozilla/9.876 (X11; U; Linux 2.2.12-20 i686, en) "
                         "Gecko/25250101 Netscape/5.432b1";
@@ -28,8 +31,12 @@ void HttpComms::init(QUrl &url)
     header.setValue("User-Agent", userAgent);
 
     init(url, header);
+#else
+    cerr << "HttpComms does not work on QT 3.0 (No IMDB grabbing for you)\n";
+#endif
 }
 
+#ifndef ANCIENT_QT
 void HttpComms::init(QUrl &url, QHttpRequestHeader &header)
 {
     http = new QHttp();
@@ -48,15 +55,19 @@ void HttpComms::init(QUrl &url, QHttpRequestHeader &header)
 
     http->request(header);
 }
+#endif
 
 void HttpComms::stop()
 {
+#ifndef ANCIENT_QT
     disconnect(http, 0, 0, 0);
     http->abort();
+#endif
 }
 
 void HttpComms::done(bool error)
 {
+#ifndef ANCIENT_QT
     if (error)
     {
        cout << "MythVideo: NetworkOperation Error on Finish: "
@@ -65,7 +76,8 @@ void HttpComms::done(bool error)
     else
         m_data = QString(http->readAll());
 
-    m_done = true; 
+    m_done = true;
+#endif 
 }
 
 void HttpComms::stateChanged(int state)
