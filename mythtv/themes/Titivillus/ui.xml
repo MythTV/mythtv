@@ -948,7 +948,7 @@
         <value>Channel Recording Priorities</value>
       </textarea>
       <image name="filler" draworder="0" fleximage="yes">
-        <filename>rec_priorities/rk-background.png</filename>
+        <filename>rec_priorities/rk-background.jpg</filename>
         <position>0,35</position>
       </image>
       <textarea name="keyinstr" align="center" draworder="0">
@@ -1032,7 +1032,8 @@
 
     <font name="active_font" face="Trebuchet Ms">
       <color>#ffffff</color>
-      <size>15</size>
+      <size>17</size>
+      <bold>yes</bold>
       <size:small>13</size:small>
       <size:big>17</size:big>
       <shadow>1,1</shadow>
@@ -1040,7 +1041,8 @@
 
     <font name="inactive_font" face="Trebuchet Ms">
       <color>#9999cc</color>
-      <size>15</size>
+      <size>17</size>
+      <bold>yes</bold>
       <size:small>13</size:small>
       <size:big>17</size:big>
       <shadow>1,1</shadow>
@@ -1052,6 +1054,7 @@
       <size:small>13</size:small>
       <size:big>17</size:big>
       <shadow>1,1</shadow>
+      <bold>yes</bold>
     </font>
 
     <font name="title" face="Trebuchet Ms">
@@ -1080,13 +1083,14 @@
       <size:small>10</size:small>
       <size:big>19</size:big>
       <shadow>1,1</shadow>
+      <bold>yes</bold>
     </font>
 
     <font name="tinyinfo" face="Trebuchet Ms">
       <color>#cccccc</color>
-      <size>10</size>
-      <size:small>8</size:small>
-      <size:big>12</size:big>
+      <size>14</size>
+      <size:small>10</size:small>
+      <size:big>14</size:big>
       <shadow>1,1</shadow>
       <bold>yes</bold>
     </font>
@@ -1115,11 +1119,12 @@
       <size:small>13</size:small>
       <size:big>17</size:big>
       <shadow>1,1</shadow>
+      <bold>yes</bold>
     </font>
 
     <container name="background">
       <image name="backgroundimg" draworder="0" fleximage="no">
-        <filename>rec_priority/rk-background.png</filename>
+        <filename>rec_priority/rk-background.jpg</filename>
         <position>0,0</position>
       </image>
 
@@ -1129,7 +1134,7 @@
         <value>Program Recording Priorities</value>
       </textarea>
       <textarea name="recprioritylabel" draworder="0">
-        <area>625,20,800,40</area>
+        <area>621,20,800,40</area>
         <font>tinyinfo</font>
         <value>Priority</value>
       </textarea>
@@ -1138,12 +1143,9 @@
         <font>tinyinfo</font>
         <value>Final Priority</value>
       </textarea>
-      <image name="filler" draworder="0" fleximage="yes">
-        <filename>rec_priority/rk-background.png</filename>
-        <position>0,35</position>
-      </image>
+      
       <textarea name="keyinstr" align="center" draworder="0">
-        <area>0,565,800,30</area>
+        <area>0,563,800,30</area>
         <font>message</font>
         <value>(1) Sort by Title    (2) Sort by Priority</value>
       </textarea>
@@ -1157,11 +1159,12 @@
         <fcnfont name="inactive_font" function="inactive"></fcnfont>
         <fcnfont name="active_font" function="selected"></fcnfont>
         <columnpadding>1</columnpadding>
-        <column number="1" width="615" context="-1"></column>
-        <column number="2" width="17" context="-1"></column>
-        <column number="3" width="56" context="-1"></column>
-        <column number="4" width="17" context="-1"></column>
-        <column number="5" width="50" context="-1"></column>
+        <column number="1" width="35" context="-1"></column>
+        <column number="2" width="570" context="-1"></column>
+        <column number="3" width="17" context="-1"></column>
+        <column number="4" width="55" context="-1"></column>
+        <column number="5" width="17" context="-1"></column>
+        <column number="6" width="50" context="-1"></column>
         <items>11</items>
         <image function="selectionbar" filename="rec_priority/tit-trk-selectbar.png" location="-6,-2"></image>
         <image function="uparrow" filename="shared/up_arrow.png" location="755,22"></image>
@@ -1433,8 +1436,8 @@
         <column number="4" width="110" context="1"></column>
         <items>7</items>
         <image function="selectionbar" filename="shared/long_bar.png" location="-13,-2"></image>
-        <image function="uparrow" filename="shared/up_arrow.png" location="752,18"></image>
-        <image function="downarrow" filename="shared/down_arrow.png" location="752,249"></image>
+        <image function="uparrow" draworder="6" filename="shared/up_arrow.png" location="752,18"></image>
+        <image function="downarrow" draworder="6" filename="shared/down_arrow.png" location="752,249"></image>
       </listarea>
       <image name="showinglines" draworder="5" fleximage="yes">
         <filename>playback_box/showings.png</filename>
@@ -1914,7 +1917,7 @@
 
     <container name="background">
       <image name="backgroundimg" draworder="0" fleximage="no">
-        <filename>rec_priority/rk-background.png</filename>
+        <filename>rec_priority/rk-background.jpg</filename>
         <position>0,0</position>
       </image>
  
