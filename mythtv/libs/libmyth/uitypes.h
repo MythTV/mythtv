@@ -376,6 +376,7 @@ class UIListType : public UIType
  
     void Draw(QPainter *, int drawlayer, int);
     bool ShowSelAlways() const { return m_showSelAlways; }
+    void ShowSelAlways(bool bnew) { m_showSelAlways = bnew; }
   private:
     //QString cutDown(QString, QFont *, int);
     int m_selheight;

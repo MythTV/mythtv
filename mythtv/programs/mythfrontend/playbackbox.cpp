@@ -106,7 +106,10 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     showDateFormat = gContext->GetSetting("ShortDateFormat", "M/d");
     showTimeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
 
+
+    
     bgTransBackup = gContext->LoadScalePixmap("trans-backup.png");
+
     if (!bgTransBackup)
         bgTransBackup = new QPixmap();
 
@@ -118,11 +121,12 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     LoadWindow(xmldata);
 
     LayerSet *container = theme->GetSet("selector");
+    UIListType *listtype = NULL;
     if (container)
     {
-        UIListType *ltype = (UIListType *)container->GetType("showing");
-        if (ltype)
-            listsize = ltype->GetItems();
+        listtype = (UIListType *)container->GetType("showing");
+        if (listtype)
+            listsize = listtype->GetItems();
     }
     else
     {
@@ -132,11 +136,13 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
 
     if(theme->GetSet("group_info") && gContext->GetNumSetting("ShowGroupInfo", 0) == 1)
     {
-        cerr << "got it" << endl;
         haveGroupInfoSet = true;
+        if(listtype)
+            listtype->ShowSelAlways(false);
     }
     else
         haveGroupInfoSet = false;
+
 
     connected = FillList();
 
@@ -176,6 +182,9 @@ PlaybackBox::~PlaybackBox(void)
     delete bgTransBackup;
     if (curitem)
         delete curitem;
+    if(delitem)
+        delete delitem;
+        
     if (titleData)
         delete [] titleData;
 }
@@ -375,6 +384,7 @@ void PlaybackBox::updateGroupInfo(QPainter *p, QRect& pr, QPixmap& pix)
     if (haveGroupInfoSet)
     {
         LayerSet *container = theme->GetSet("group_info");
+        container->ClearAllText();
         QPainter tmp(&pix);
         QMap<QString, QString> infoMap;
         if(titleData[curTitle] == groupDisplayName)
@@ -508,14 +518,15 @@ void PlaybackBox::updateInfo(QPainter *p)
 {
     QRect pr = infoRect;
     QPixmap pix(pr.size());
+    bool updateGroup = (inTitle && haveGroupInfoSet);
     pix.fill(this, pr.topLeft());
     
 
-    if (showData.count() > 0 && curitem && !inTitle)
+    if (showData.count() > 0 && curitem && !updateGroup)
     {
         updateProgramInfo(p, pr, pix);
     }
-    else if( inTitle )
+    else if(updateGroup)
     {
         updateGroupInfo(p, pr, pix);
     }
@@ -535,10 +546,11 @@ void PlaybackBox::updateInfo(QPainter *p)
 
 void PlaybackBox::updateVideo(QPainter *p)
 {
-    // If we're displaying group infor don't update the video.
+    // If we're displaying group info don't update the video.
     if(inTitle && haveGroupInfoSet)
         return;
-        
+
+
     /* show a still frame if the user doesn't want a video preview or nvp 
      * hasn't started playing the video preview yet */
     if (((playbackPreview == 0) || !playingVideo || (state == kStarting) || 
@@ -978,6 +990,7 @@ void PlaybackBox::cursorLeft()
             killPlayerSafe();
         inTitle = true;
         skipUpdate = false;
+        updateBackground();
         update(fullRect);
         leftRight = true;
     }
@@ -1444,6 +1457,9 @@ void PlaybackBox::showActionsSelected()
     if (!curitem)
         return;
 
+    if(inTitle && haveGroupInfoSet)
+        return;
+
     showActions(curitem);
 }
 
@@ -1581,6 +1597,9 @@ void PlaybackBox::remove(ProgramInfo *toDel)
 {
     state = kStopping;
 
+    if(delitem)
+        delete delitem;
+
     delitem = new ProgramInfo(*toDel);
     showDeletePopup(delitem, DeleteRecording);
 }
@@ -1589,7 +1608,10 @@ void PlaybackBox::expire(ProgramInfo *toExp)
 {
     state = kStopping;
 
+    if(delitem)
+        delete delitem;
     delitem = new ProgramInfo(*toExp);
+
     showDeletePopup(delitem, AutoExpireRecording);
 }
 
@@ -1597,7 +1619,11 @@ void PlaybackBox::showActions(ProgramInfo *toExp)
 {
     killPlayer();
 
+    if(delitem)
+        delete delitem;
+
     delitem = new ProgramInfo(*toExp);
+
     showActionPopup(delitem);
 }
 
@@ -1719,7 +1745,7 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
     if (RemoteGetRecordingStatus(program, overrectime, underrectime) > 0)
         popup->addButton(tr("Stop Recording"), this, SLOT(askStop()));
 
-    if (delitem->GetAutoExpireFromRecorded(db))
+    if (delitem && delitem->GetAutoExpireFromRecorded(db))
         popup->addButton(tr("Don't Auto Expire"), this, SLOT(noAutoExpire()));
     else
         popup->addButton(tr("Auto Expire"), this, SLOT(doAutoExpire()));
@@ -1803,9 +1829,6 @@ void PlaybackBox::doPlay(void)
     cancelPopup();
 
     play(delitem);
-
-    delete delitem;
-    delitem = NULL;
 }
 
 void PlaybackBox::askStop(void)
@@ -1825,9 +1848,6 @@ void PlaybackBox::noStop(void)
 
     cancelPopup();
 
-    delete delitem;
-    delitem = NULL;
-
     state = kChanging;
 
     timer->start(500);
@@ -1841,9 +1861,6 @@ void PlaybackBox::doStop(void)
     cancelPopup();
 
     stop(delitem);
-
-    delete delitem;
-    delitem = NULL;
 
     state = kChanging;
 
@@ -1894,9 +1911,6 @@ void PlaybackBox::noDelete(void)
 
     cancelPopup();
 
-    delete delitem;
-    delitem = NULL;
-
     state = kChanging;
 
     timer->start(500);
@@ -1910,9 +1924,6 @@ void PlaybackBox::doDelete(void)
     cancelPopup();
 
     doRemove(delitem, false);
-
-    delete delitem;
-    delitem = NULL;
 
     state = kChanging;
 
@@ -1928,9 +1939,6 @@ void PlaybackBox::doDeleteForgetHistory(void)
 
     doRemove(delitem, true);
 
-    delete delitem;
-    delitem = NULL;
-
     state = kChanging;
 
     timer->start(500);
@@ -1938,16 +1946,13 @@ void PlaybackBox::doDeleteForgetHistory(void)
 
 void PlaybackBox::noAutoExpire(void)
 {
-    if (!expectingPopup)
+    if (!expectingPopup && delitem)
         return;
 
     cancelPopup();
 
     QSqlDatabase *db = QSqlDatabase::database();
     delitem->SetAutoExpire(false, db);
-
-    delete delitem;
-    delitem = NULL;
 
     state = kChanging;
 }
@@ -1962,9 +1967,6 @@ void PlaybackBox::doAutoExpire(void)
     QSqlDatabase *db = QSqlDatabase::database();
     delitem->SetAutoExpire(true, db);
 
-    delete delitem;
-    delitem = NULL;
-
     state = kChanging;
 }
 
@@ -1974,9 +1976,6 @@ void PlaybackBox::doCancel(void)
         return;
 
     cancelPopup();
-
-    delete delitem;
-    delitem = NULL;
 
     state = kChanging;
 }
@@ -1991,6 +1990,9 @@ void PlaybackBox::promptEndOfRecording(ProgramInfo *rec)
     if (!rec)
         return;
 
+    if(delitem)
+        delete delitem;
+        
     delitem = new ProgramInfo(*rec);
     showDeletePopup(delitem, EndOfRecording);
 }
@@ -2610,7 +2612,8 @@ void PlaybackBox::showRecGroupChanger(void)
     delete chooseComboBox;
     chooseComboBox = NULL;
 
-    delete delitem;
+    if(delitem)
+        delete delitem;
     delitem = NULL;
 }
 

@@ -934,7 +934,7 @@ UIListType::UIListType(const QString &name, QRect area, int dorder)
     m_uarrow = false;
     m_darrow = false;
     m_fill_type = -1;
-    m_showSelAlways = gContext->GetNumSetting("ShowSelAlways", 1);
+    m_showSelAlways = true;
 }
 
 UIListType::~UIListType()

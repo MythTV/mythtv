@@ -273,8 +273,19 @@ public:
         GlobalSetting("PlaybackBoxStartInTitle") {
         setLabel(QObject::tr("Start in title section."));
         setValue(true);
-        setHelpText(QObject::tr("If set focus will initially be on the "
+        setHelpText(QObject::tr("If set, focus will initially be on the "
                     "show titles otherwise focus will be on the recordings."));
+    };
+};
+
+
+class PBBShowGroupSummary: public CheckBoxSetting, public GlobalSetting {
+public:
+    PBBShowGroupSummary():
+        GlobalSetting("ShowGroupInfo") {
+        setLabel(QObject::tr("Show group summary."));
+        setValue(false);
+        setHelpText(QObject::tr("While selecting a group, show a group summary instead of showing info about the first episode in that group."));
     };
 };
 
@@ -2186,6 +2197,7 @@ PlaybackSettings::PlaybackSettings()
     pbox->addChild(new UseCategoriesAsRecGroups());
     pbox->addChild(new UseGroupNameAsAllPrograms());
     pbox->addChild(new PBBStartInTitle());
+    pbox->addChild(new PBBShowGroupSummary());
     addChild(pbox);
 
     addChild(new HwDecSettings());
