@@ -318,7 +318,7 @@ bool MetadataMonitor::sweepAudio()
 
             AudioMetadata *new_audio = new AudioMetadata
                                     (
-                                        bumpMetadataItem(),
+                                        query.value(0).toInt(),
                                         query.value(0).toInt(),
                                         QUrl(query.value(8).toString()),
                                         query.value(9).toInt(),
