@@ -83,7 +83,7 @@ private:
     QString        dateFormat;
 
 private slots:
-
+    void slotViewArticle();
     void slotRetrieveNews();
     void slotNewsRetrieved(NewsSite* site);
 

@@ -759,14 +759,14 @@ bool MythNewsSpinBox::eventFilter(QObject* o, QEvent* e)
                 stepUp();
             else if (action == "PAGEDOWN")
                 stepDown();
-            else if (action == "LEFT") {
+            else if (action == "SELECT" || action == "LEFT") {
                 QKeyEvent *ev = (QKeyEvent*)e;
                 QApplication::postEvent(parentWidget(),
                                         new QKeyEvent(ev->type(),ev->key(),
                                                       ev->ascii(),
                                                       ev->state()));
             }
-            else if (action == "SELECT" || action == "ESCAPE")
+            else if (action == "ESCAPE")
                 return false;
             else
                 handled = false;

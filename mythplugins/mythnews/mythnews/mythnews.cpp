@@ -358,6 +358,8 @@ void MythNews::keyPressEvent(QKeyEvent *e)
             cursorRight();
         else if (action == "RETRIEVENEWS")
             slotRetrieveNews();
+        else if(action == "SELECT")
+            slotViewArticle();
         else if (action == "CANCEL")
         {
             cancelRetrieve();
@@ -525,4 +527,15 @@ void MythNews::slotArticleSelected(UIListBtnTypeItem*)
 {
     update(m_ArticlesRect);
     update(m_InfoRect);
+}
+
+void MythNews::slotViewArticle()
+{
+    NewsArticle *article  = NULL;
+    UIListBtnTypeItem *articleUIItem = m_UIArticles->GetItemCurrent();
+
+    if (articleUIItem && articleUIItem->getData())
+        article = (NewsArticle*) articleUIItem->getData();
+    if(article)
+        myth_system( QString( "mythbrowser %1").arg(article->articleURL()));
 }

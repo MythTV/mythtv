@@ -35,12 +35,13 @@ extern "C" {
 using namespace std;
 
 NewsArticle::NewsArticle(NewsSite *parent, const QString& title,
-                         const QString& desc)
+                         const QString& desc, const QString& articleURL)
 {
     parent->insertNewsArticle(this);
     m_title  = title;
     m_desc   = desc;
     m_parent = parent;
+    m_articleURL = articleURL;
 }
 
 NewsArticle::~NewsArticle()
@@ -207,19 +208,19 @@ void NewsSite::process()
 
     QFile xmlFile(m_destDir+QString("/")+m_name);
     if (!xmlFile.exists()) {
-        new NewsArticle(this, tr("Failed to retrieve news"), "");
+        new NewsArticle(this, tr("Failed to retrieve news"), "", "");
         m_errorString += tr("No Cached News");
         return;
     }
 
     if (!xmlFile.open(IO_ReadOnly)) {
-        new NewsArticle(this, tr("Failed to retrieve news"), "");
+        new NewsArticle(this, tr("Failed to retrieve news"), "", "");
         cerr << "MythNews: NewsEngine: failed to open xmlfile" << endl;
         return;
     }
 
     if (!domDoc.setContent(&xmlFile)) {
-        new NewsArticle(this, tr("Failed to retrieve news"), "");
+        new NewsArticle(this, tr("Failed to retrieve news"), "", "");
         cerr << "MythNews: NewsEngine: failed to set content from xmlfile" << endl;
         m_errorString += tr("Failed to read downloaded file");
         return;
@@ -236,7 +237,7 @@ void NewsSite::process()
     QDomNodeList items = domDoc.elementsByTagName(QString::fromLatin1("item"));
 
     QDomNode itemNode;
-    QString title, description;
+    QString title, description, url;
     for (unsigned int i = 0; i < items.count(); i++) {
         itemNode = items.item(i);
         title    = itemNode.namedItem(QString::fromLatin1("title")).toElement().text().simplifyWhiteSpace();
@@ -245,7 +246,14 @@ void NewsSite::process()
             description = descNode.toElement().text().simplifyWhiteSpace();
         else
             description = QString::null;
-        new NewsArticle(this, title, description);
+        QDomNode linkNode = itemNode.namedItem(QString::fromLatin1("link"));
+        if (!linkNode.isNull())
+            url = linkNode.toElement().text().simplifyWhiteSpace();
+        else
+            url = QString::null;
+
+            
+        new NewsArticle(this, title, description, url);
     }
 
     xmlFile.close();

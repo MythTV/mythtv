@@ -41,17 +41,19 @@ public:
     typedef QPtrList<NewsArticle> List;
 
     NewsArticle(NewsSite *parent, const QString& title,
-                const QString& desc);
+                const QString& desc, const QString& artURL);
     ~NewsArticle();
 
     const QString& title() const;
     const QString& description() const;
+    const QString& articleURL() const { return m_articleURL; }
 
 private:
 
     QString   m_title;
     QString   m_desc;
     NewsSite *m_parent;
+    QString m_articleURL;
 };
 
 // -------------------------------------------------------
