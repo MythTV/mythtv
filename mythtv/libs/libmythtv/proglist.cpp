@@ -45,6 +45,7 @@ ProgLister::ProgLister(ProgListType pltype, const QString &view,
         case plKeywordSearch: searchtype = kKeywordSearch; break;
         case plPeopleSearch:  searchtype = kPeopleSearch;  break;
         case plPowerSearch:   searchtype = kPowerSearch;   break;
+        case plSQLSearch:     searchtype = kPowerSearch;   break;
         default:              searchtype = kNoSearch;      break;
     }
 
@@ -242,8 +243,9 @@ void ProgLister::updateBackground(void)
                 case plKeywordSearch: value = tr("Keyword Search"); break;
                 case plPeopleSearch: value = tr("People Search"); break;
                 case plPowerSearch: value = tr("Power Search"); break;
-                case plChannel: value = tr("Channel Search"); break;
+                case plSQLSearch: value = tr("Power Search"); break;
                 case plCategory: value = tr("Category Search"); break;
+                case plChannel: value = tr("Channel Search"); break;
                 case plMovies: value = tr("Movie Search"); break;
                 case plTime: value = tr("Time Search"); break;
                 default: value = tr("Unknown Search"); break;
@@ -1255,7 +1257,12 @@ void ProgLister::fillViewList(const QString &view)
         viewList[curView] = searchTime.toString(fullDateFormat);
         viewTextList[curView] = viewList[curView];
     }
-
+    else if (type == plSQLSearch)
+    {
+        curView = 0;
+        viewList << view;
+        viewTextList << tr("Power Recording Rule");
+    }
     if (curView >= (int)viewList.count())
         curView = viewList.count() - 1;
 }
@@ -1338,6 +1345,13 @@ void ProgLister::fillItemList(void)
                         "  AND program.endtime > %1 "
                         "  %2 ")
                         .arg(startstr).arg(powerStringToSQL(qphrase));
+    }
+    else if (type == plSQLSearch) // complex search
+    {
+        where = QString("WHERE channel.visible = 1 "
+                        "  AND program.endtime > %1 "
+                        "  %2 ")
+                        .arg(startstr).arg(qphrase);
     }
     else if (type == plChannel) // list by channel
     {

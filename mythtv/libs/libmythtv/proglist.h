@@ -15,6 +15,7 @@ enum ProgListType {
     plKeywordSearch,
     plPeopleSearch,
     plPowerSearch,
+    plSQLSearch,
     plNewListings,
     plMovies,
     plCategory,
