@@ -867,6 +867,15 @@ QRect OSD::parseRect(QString text)
     return retval;
 }
 
+void OSD::ClearAllText(const QString &name)
+{
+    pthread_mutex_lock(&osdlock);
+    OSDSet *container = GetSet(name);
+    if (container)
+        container->ClearAllText();
+
+    pthread_mutex_unlock(&osdlock);
+}
 
 void OSD::SetTextByRegexp(const QString &name,
                      QMap<QString, QString> &regexpMap, int length)

@@ -769,12 +769,14 @@ void NuppelVideoPlayer::AddAudioData(char *buffer, int len, long long timecode)
 void NuppelVideoPlayer::AddTextData(char *buffer, int len, 
                                     long long timecode, char type)
 {
-    if (!tbuffer_numfree())
+    if (cc)
     {
-        cerr << "text buffer overflow\n";
-    }
-    else if (cc)
-    {
+        if (!tbuffer_numfree())
+        {
+            cerr << "text buffer overflow\n";
+            return;
+        }
+
         memcpy(tbuffer[wtxt], buffer, len);
         txttimecodes[wtxt] = timecode;
         txttype[wtxt] = type;
@@ -958,8 +960,8 @@ void NuppelVideoPlayer::ToggleCC(void)
 {
     if (cc)
     {
-        osd->ClearAllCCText();
         cc = false;
+        osd->ClearAllCCText();
     }
     else
     {
@@ -1225,7 +1227,8 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
             if (pipplayer)
                 ShowPip(vbuffer[rpos]);
 
-            ShowText();
+            if (cc)
+                ShowText();
 
             osd->Display(vbuffer[rpos]);
         }

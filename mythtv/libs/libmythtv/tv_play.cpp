@@ -1276,6 +1276,7 @@ void TV::DoInfo(void)
 
         QMap<QString, QString> regexpMap;
         playbackinfo->ToMap(m_db, regexpMap);
+        osd->ClearAllText("program_info");
         osd->SetTextByRegexp("program_info", regexpMap, osd_display_time);
     }
     else
@@ -1490,6 +1491,7 @@ void TV::ChannelKey(int key)
 
         regexpMap["channum"] = channelKeys;
         regexpMap["callsign"] = "";
+        osd->ClearAllText("channel_number");
         osd->SetTextByRegexp("channel_number", regexpMap, 2);
     }
 
@@ -1598,6 +1600,7 @@ void TV::PreviousChannel(void)
 
         regexpMap["channum"] = channame_vector[vector];
         regexpMap["callsign"] = "";
+        osd->ClearAllText("channel_number");
         osd->SetTextByRegexp("channel_number", regexpMap, 1);
     }
 
@@ -1657,7 +1660,9 @@ void TV::UpdateOSD(void)
 
     GetChannelInfo(activerecorder, regexpMap);
 
+    osd->ClearAllText("program_info");
     osd->SetTextByRegexp("program_info", regexpMap, osd_display_time);
+    osd->ClearAllText("channel_number");
     osd->SetTextByRegexp("channel_number", regexpMap, osd_display_time);
 }
 
@@ -2080,6 +2085,7 @@ void TV::BrowseDispInfo(int direction)
                                       browsechanid, startts );
     program_info->ToMap(m_db, regexpMap);
 
+    osd->ClearAllText("browse_info");
     osd->SetTextByRegexp("browse_info", regexpMap, -1);
 
     delete program_info;
@@ -2096,6 +2102,7 @@ void TV::BrowseToggleRecord(void)
 
     program_info->ToMap(m_db, regexpMap);
 
+    osd->ClearAllText("browse_info");
     osd->SetTextByRegexp("browse_info", regexpMap, -1);
 
     delete program_info;

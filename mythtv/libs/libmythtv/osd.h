@@ -29,6 +29,7 @@ class OSD
 
     void Display(unsigned char *yuvptr);
 
+    void ClearAllText(const QString &name);
     void SetTextByRegexp(const QString &name, QMap<QString, QString> &regexpMap,
                          int length);
     void SetInfoText(QMap<QString, QString> regexpMap, int length);

@@ -136,6 +136,17 @@ OSDType *OSDSet::GetType(const QString &name)
     return ret;
 }
 
+void OSDSet::ClearAllText(void)
+{
+    vector<OSDType *>::iterator iter = allTypes->begin();
+    for (; iter != allTypes->end(); iter++)
+    {
+        OSDType *type = (*iter);
+        if (OSDTypeText *item = dynamic_cast<OSDTypeText *>(type))
+            item->SetText(QString(""));
+    }
+}
+
 void OSDSet::SetTextByRegexp(QMap<QString, QString> &regexpMap)
 {
     vector<OSDType *>::iterator iter = allTypes->begin();

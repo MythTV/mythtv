@@ -1318,6 +1318,10 @@ void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
         fromfavorites = ",favorites";
         wherefavorites = "AND favorites.chanid = channel.chanid";
     }
+    else if (channeldirection == CHANNEL_DIRECTION_SAME)
+    {
+        comp = "=";
+    }
 
     QString wherepart = QString("channel.sourceid = cardinput.sourceid AND "
                                 "cardinput.inputname = \"%1\" AND "
@@ -1661,6 +1665,12 @@ void TVRec::GetNextProgram(int direction,
 
     switch (direction)
     {
+        case BROWSE_SAME:
+                chanid = GetNextRelativeChanID(channelname,
+                                               CHANNEL_DIRECTION_SAME);
+                compare = "=";
+                sortorder = "asc";
+                break;
         case BROWSE_UP:
                 chanid = GetNextRelativeChanID(channelname,
                                                CHANNEL_DIRECTION_UP);

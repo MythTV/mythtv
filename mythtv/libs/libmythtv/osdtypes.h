@@ -50,6 +50,7 @@ class OSDSet
     void SetFrameRate(int framerate) { m_framerate = framerate; }
     int GetFrameRate() { return m_framerate; }
 
+    void ClearAllText(void);
     void SetTextByRegexp(QMap<QString, QString> &regexpMap);
 
   private:
