@@ -71,13 +71,12 @@ void ServiceRequestThread::run()
         {
             wait_condition.wait(&do_stuff_mutex);
         }
-        if (do_stuff)
+
+        if(do_stuff)
         {
             parent->processRequest(client_socket);
-            //do_stuff_mutex.lock();
-                do_stuff = false;
-                client_socket = NULL;
-            //do_stuff_mutex.unlock();
+            do_stuff = false;
+            client_socket = NULL;
             parent->markUnused(this);
             parent->wakeUp();
         }
