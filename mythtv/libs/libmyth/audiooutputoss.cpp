@@ -84,7 +84,8 @@ void AudioOutputOSS::Reconfigure(int audio_bits, int audio_channels,
                      << "\nFix this, then run mythfrontend again\n";
                 exit(0);
             }
-            perror("open");
+            cerr << "Error opening audio device (" << audiodevice << "):\n";
+            perror(audiodevice.ascii());
         }
         if (audiofd < 0)
             usleep(50);

@@ -57,7 +57,7 @@ void RegionSelector::fillSelections() {
     FILE* fp = popen(command.ascii(), "r");
 
     if (fp == NULL) {
-        perror("open");
+        perror(command.ascii());
         return;
     }
 
@@ -81,7 +81,7 @@ void ProviderSelector::fillSelections(const QString& location) {
     FILE* fp = popen(command.ascii(), "r");
 
     if (fp == NULL) {
-        perror("open");
+        perror(command.ascii());
         return;
     }
 
