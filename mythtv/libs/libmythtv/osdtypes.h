@@ -14,7 +14,7 @@ class OSDSet
 {
   public:
     OSDSet(const QString &name, bool cache, int screenwidth, int screenheight, 
-           float wmult, float hmult);
+           float wmult, float hmult, int frint);
     OSDSet(const OSDSet &other);
    ~OSDSet();
 
@@ -35,31 +35,32 @@ class OSDSet
 
     void SetFadeMovement(int x, int y) { m_xmove = x; m_ymove = y; }
 
-    int GetFramesLeft() { return m_framesleft; }
+    int GetTimeLeft() { return m_timeleft; }
 
     bool Displaying() { return m_displaying; }
     bool HasDisplayed() { return m_hasdisplayed; }
 
     void Display(bool onoff = true);
-    void DisplayFor(int frames);
-    void FadeFor(int frames);
+    void DisplayFor(int time);
+    void FadeFor(int time);
     void Hide(void);
 
     OSDType *GetType(const QString &name);
 
-    void SetFrameRate(int framerate) { m_framerate = framerate; }
-    int GetFrameRate() { return m_framerate; }
+    void SetFrameInterval(int frint) { m_frameint = frint; }
+    int GetFrameInterval() { return m_frameint; }
 
     void ClearAllText(void);
     void SetTextByRegexp(QMap<QString, QString> &regexpMap);
 
     void Reinit(int screenwidth, int screenheight, int xoff, int yoff, 
-                int displaywidth, int displayheight, float wmult, float hmult);
+                int displaywidth, int displayheight, float wmult, float hmult,
+                int frint);
 
   private:
     int m_screenwidth;
     int m_screenheight;
-    int m_framerate;
+    int m_frameint;
     float m_wmult;
     float m_hmult;
 
@@ -69,9 +70,9 @@ class OSDSet
     bool m_notimeout;
 
     bool m_hasdisplayed;
-    int m_framesleft;
+    int m_timeleft;
     bool m_displaying;
-    int m_fadeframes;
+    int m_fadetime;
     int m_maxfade;
 
     int m_priority;

@@ -80,10 +80,10 @@ class OSD
 
     int getTimeType(void) { return timeType; }
 
-    void Reinit(int width, int height, int fps, int dispx, int dispy, 
+    void Reinit(int width, int height, int frint, int dispx, int dispy, 
                 int dispw, int disph);
 
-    void SetFPS(int newfps);
+    void SetFrameInterval(int frint);
  
  private:
     void SetDefaults();
@@ -115,7 +115,7 @@ class OSD
 
     int vid_width;
     int vid_height;
-    int fps;
+    int frameint;
 
     QString fontprefix;
     QString themepath;
@@ -127,7 +127,7 @@ class OSD
 
     bool m_setsvisible;
 
-    int totalfadeframes;
+    int totalfadetime;
     int timeType;
 
     QString timeFormat;

@@ -284,7 +284,7 @@ void NuppelVideoPlayer::SetPlaySpeed(float speed)
     normal_speed = (speed == 1.0);
     frame_interval = (int)(1000000.0 / video_frame_rate / speed);
     if (osd)
-        osd->SetFPS((int)ceil(video_frame_rate * speed));
+        osd->SetFrameInterval(frame_interval);
 }
 
 void NuppelVideoPlayer::setPrebuffering(bool prebuffer)
@@ -353,8 +353,7 @@ void NuppelVideoPlayer::ReinitVideo(void)
 
     videoOutput->GetDrawSize(dispx, dispy, dispw, disph);
 
-    osd->Reinit(video_width, video_height, 
-                (int)ceil(video_frame_rate * play_speed),
+    osd->Reinit(video_width, video_height, frame_interval,
                 dispx, dispy, dispw, disph);
 
     VideoFrame *scratchFrame = &(vbuffers[MAXVBUFFER]);
@@ -1442,8 +1441,7 @@ void NuppelVideoPlayer::StartPlaying(void)
         InitVideo();
         int dispx = 0, dispy = 0, dispw = video_width, disph = video_height;
         videoOutput->GetDrawSize(dispx, dispy, dispw, disph);
-        osd = new OSD(video_width, video_height, 
-                      (int)ceil(video_frame_rate * play_speed),
+        osd = new OSD(video_width, video_height, frame_interval,
                       osdfontname, osdccfontname, osdprefix, osdtheme,
                       dispx, dispy, dispw, disph);
     }
@@ -1742,7 +1740,10 @@ bool NuppelVideoPlayer::DoRewind(void)
     if (desiredFrame < video_frame_rate)
         limitKeyRepeat = true;
 
+    if (paused && !editmode)
+        decoder->setExactSeeks(true);
     decoder->DoRewind(desiredFrame);
+    decoder->setExactSeeks(exactseeks);
 
     ClearAfterSeek();
     return true;
@@ -1789,7 +1790,10 @@ bool NuppelVideoPlayer::DoFastForward(void)
     long long number = fftime - 1;
     long long desiredFrame = framesPlayed + number;
 
+    if (paused && !editmode)
+        decoder->setExactSeeks(true);
     decoder->DoFastForward(desiredFrame);
+    decoder->setExactSeeks(exactseeks);
 
     ClearAfterSeek();
     return true;

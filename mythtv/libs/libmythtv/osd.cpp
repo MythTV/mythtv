@@ -19,7 +19,7 @@ using namespace std;
 #include "osdtypes.h"
 #include "libmyth/oldsettings.h"
 
-OSD::OSD(int width, int height, int framerate, const QString &font, 
+OSD::OSD(int width, int height, int frint, const QString &font, 
          const QString &ccfont, const QString &prefix, const QString &osdtheme,
          int dispx, int dispy, int dispw, int disph)
 {
@@ -27,7 +27,7 @@ OSD::OSD(int width, int height, int framerate, const QString &font,
 
     vid_width = width;
     vid_height = height;
-    fps = framerate;
+    frameint = frint;
 
     editarrowleft = editarrowright = NULL;
 
@@ -40,7 +40,7 @@ OSD::OSD(int width, int height, int framerate, const QString &font,
     displayheight = disph;
 
     timeType = 0; 
-    totalfadeframes = 0;
+    totalfadetime = 0;
     fontname = font;
     ccfontname = ccfont;
     fontprefix = prefix;
@@ -95,12 +95,17 @@ OSD::~OSD(void)
     delete setList;
 }
 
-void OSD::SetFPS(int newfps)
+void OSD::SetFrameInterval(int frint)
 {
-    float change = (newfps * 1.0 / fps);
-    
-    fps = newfps;
-    totalfadeframes = (int)(totalfadeframes * change);
+    frameint = frint;
+
+    QMap<QString, OSDSet *>::iterator sets = setMap.begin();
+    for (; sets != setMap.end(); ++sets)
+    {
+        OSDSet *set = (*sets);
+        if (set)
+           set->SetFrameInterval(frameint);
+    }
 }
 
 void OSD::SetDefaults(void)
@@ -125,7 +130,8 @@ void OSD::SetDefaults(void)
     if (!container)
     {
         QString name = "cc_page";
-        container = new OSDSet(name, true, vid_width, vid_height, wmult, hmult);
+        container = new OSDSet(name, true, vid_width, vid_height, wmult, hmult,
+                               frameint);
         AddSet(container, name);
 
         OSDTypeCC *ccpage = new OSDTypeCC(name, ccfont, xoffset, yoffset,
@@ -134,13 +140,13 @@ void OSD::SetDefaults(void)
     }
 }
 
-void OSD::Reinit(int width, int height, int fps, int dispx, int dispy, 
+void OSD::Reinit(int width, int height, int frint, int dispx, int dispy, 
                  int dispw, int disph)
 {
     vid_width = width;
     vid_height = height;
-    if (fps != -1)
-       this->fps = fps;
+    if (frint != -1)
+        frameint = frint;
 
     wmult = dispw / 640.0;
     hmult = disph / 480.0;
@@ -164,7 +170,7 @@ void OSD::Reinit(int width, int height, int fps, int dispx, int dispy,
         OSDSet *set = (*sets);
         if (set)
             set->Reinit(vid_width, vid_height, dispx, dispy, dispw, disph, 
-                        wmult, hmult);
+                        wmult, hmult, frameint);
     }
 }
 
@@ -756,7 +762,8 @@ void OSD::parseContainer(QDomElement &element)
         exit(0);
     }
 
-    container = new OSDSet(name, true, vid_width, vid_height, wmult, hmult);
+    container = new OSDSet(name, true, vid_width, vid_height, wmult, hmult,
+                           frameint);
 
     QString prio = element.attribute("priority", "");
     if (!prio.isNull() && !prio.isEmpty())
@@ -858,7 +865,7 @@ bool OSD::LoadTheme(void)
             }
             else if (e.tagName() == "fadeaway")
             {
-                totalfadeframes = getFirstText(e).toInt();
+                totalfadetime = (getFirstText(e).toInt() * 1000000) / 30;
             }
             else if (e.tagName() == "font")
             {
@@ -926,7 +933,7 @@ void OSD::SetTextByRegexp(const QString &name,
     {
         container->SetTextByRegexp(regexpMap);
         if (length >= 0)
-            container->DisplayFor(length * fps);
+            container->DisplayFor(length * 1000000);
         else
             container->Display();
 
@@ -957,7 +964,7 @@ void OSD::SetInfoText(QMap<QString, QString> regexpMap, int length)
             (regexpMap["iconpath"] != ""))
             cs->LoadImage(regexpMap["iconpath"], wmult, hmult, 30, 30);
 
-        container->DisplayFor(length * fps);
+        container->DisplayFor(length * 1000000);
         m_setsvisible = true;
     }
     pthread_mutex_unlock(&osdlock);
@@ -1009,7 +1016,7 @@ void OSD::SetInfoText(const QString &text, const QString &subtitle,
         if (cs)
             cs->LoadImage(iconpath, wmult, hmult, 30, 30);
 
-        container->DisplayFor(length * fps);
+        container->DisplayFor(length * 1000000);
         m_setsvisible = true;
     }
     pthread_mutex_unlock(&osdlock);
@@ -1036,7 +1043,7 @@ void OSD::StartPause(int position, bool fill, QString msgtext,
             slider->SetPosition(position);
 
         if (displaytime > 0)
-            container->DisplayFor(displaytime * fps);
+            container->DisplayFor(displaytime * 1000000);
         else
             container->Display();
         m_setsvisible = true;
@@ -1085,7 +1092,7 @@ void OSD::SetChannumText(const QString &text, int length)
         if (type)
             type->SetText(text);
 
-        container->DisplayFor(length * fps);
+        container->DisplayFor(length * 1000000);
         m_setsvisible = true;
     }
 
@@ -1137,7 +1144,7 @@ void OSD::SetSettingsText(const QString &text, int length)
         if (type)
             type->SetText(text);
 
-        container->DisplayFor(length * fps);
+        container->DisplayFor(length * 1000000);
         m_setsvisible = true;
     }
 
@@ -1167,7 +1174,6 @@ void OSD::NewDialogBox(const QString &name, const QString &message,
     container->SetCache(false);
     container->SetPriority(0);
     container->SetAllowFade(false);
-    container->SetFrameRate(fps);
     AddSet(container, name, false);
 
     OSDTypeText *question = (OSDTypeText *)container->GetType("message");
@@ -1217,7 +1223,7 @@ void OSD::NewDialogBox(const QString &name, const QString &message,
     HighlightDialogSelection(container, availoptions - numoptions);
 
     if (length > 0)
-        container->DisplayFor(length * fps);
+        container->DisplayFor(length * 1000000);
     else
         container->Display();
     m_setsvisible = true;
@@ -1344,7 +1350,8 @@ void OSD::ShowEditArrow(long long number, long long totalframes, int type)
 
     pthread_mutex_lock(&osdlock);
 
-    OSDSet *set = new OSDSet(name, false, vid_width, vid_height, wmult, hmult);
+    OSDSet *set = new OSDSet(name, false, vid_width, vid_height, wmult, hmult,
+                             frameint);
     set->SetAllowFade(false);
     AddSet(set, name, false);
 
@@ -1494,7 +1501,7 @@ void OSD::SetVisible(OSDSet *set, int length)
 {
     pthread_mutex_lock(&osdlock);
     if (length > 0)
-        set->DisplayFor(length * fps);
+        set->DisplayFor(length * 1000000);
     else
         set->Display();
     m_setsvisible = true;
@@ -1527,9 +1534,9 @@ void OSD::Display(VideoFrame *frame)
 
             container->Draw(yuvptr);
             anytodisplay = true;
-            if (container->GetFramesLeft() == 0 && totalfadeframes > 0)
+            if (container->GetTimeLeft() == 0 && totalfadetime > 0)
             {
-                container->FadeFor(totalfadeframes);
+                container->FadeFor(totalfadetime);
             }
         }
         else if (container->HasDisplayed())

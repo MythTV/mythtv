@@ -13,16 +13,16 @@ using namespace std;
 #include "mythcontext.h"
 
 OSDSet::OSDSet(const QString &name, bool cache, int screenwidth, 
-               int screenheight, float wmult, float hmult)
+               int screenheight, float wmult, float hmult, int frint)
 {
     m_name = name;
     m_cache = cache;
 
-    m_framerate = 30;
+    m_frameint = frint;
 
     m_hasdisplayed = false;
     m_displaying = false;
-    m_framesleft = 0;
+    m_timeleft = 0;
     m_allowfade = true;
 
     m_screenwidth = screenwidth;
@@ -31,7 +31,7 @@ OSDSet::OSDSet(const QString &name, bool cache, int screenwidth,
     m_hmult = hmult;
 
     m_notimeout = false;
-    m_fadeframes = -1;
+    m_fadetime = -1;
     m_maxfade = -1;
  
     m_xmove = 0;
@@ -49,16 +49,16 @@ OSDSet::OSDSet(const OSDSet &other)
 {
     m_screenwidth = other.m_screenwidth;
     m_screenheight = other.m_screenheight;
-    m_framerate = other.m_framerate;
+    m_frameint = other.m_frameint;
     m_wmult = other.m_wmult;
     m_hmult = other.m_hmult;
     m_cache = other.m_cache;
     m_name = other.m_name;
     m_notimeout = other.m_notimeout;
     m_hasdisplayed = other.m_hasdisplayed;
-    m_framesleft = other.m_framesleft;
+    m_timeleft = other.m_timeleft;
     m_displaying = other.m_displaying;
-    m_fadeframes = other.m_fadeframes;
+    m_fadetime = other.m_fadetime;
     m_maxfade = other.m_maxfade;
     m_priority = other.m_priority;
     m_xmove = other.m_xmove;
@@ -129,10 +129,12 @@ void OSDSet::AddType(OSDType *type)
 
 void OSDSet::Reinit(int screenwidth, int screenheight, int xoff, int yoff,
                     int displaywidth, int displayheight, 
-                    float wmult, float hmult)
+                    float wmult, float hmult, int frint)
 {
     float wchange = wmult / m_wmult;
     float hchange = hmult / m_hmult;
+
+    m_frameint = frint;
 
     m_screenwidth = screenwidth;
     m_screenheight = screenheight;
@@ -247,8 +249,8 @@ void OSDSet::Display(bool onoff)
     {
         m_notimeout = true;
         m_displaying = true;
-        m_framesleft = 1;
-        m_fadeframes = -1;
+        m_timeleft = 1;
+        m_fadetime = -1;
         m_xoff = 0;
         m_yoff = 0;
     }
@@ -258,23 +260,23 @@ void OSDSet::Display(bool onoff)
     }
 }
 
-void OSDSet::DisplayFor(int frames)
+void OSDSet::DisplayFor(int time)
 {
-    m_framesleft = frames;
+    m_timeleft = time;
     m_displaying = true;
-    m_fadeframes = -1;
+    m_fadetime = -1;
     m_notimeout = false;
     m_xoff = 0;
     m_yoff = 0;
 }
  
-void OSDSet::FadeFor(int frames)
+void OSDSet::FadeFor(int time)
 {
     if (m_allowfade)
     {
-        m_framesleft = -1;
-        m_fadeframes = frames;
-        m_maxfade = frames;
+        m_timeleft = -1;
+        m_fadetime = time;
+        m_maxfade = time;
         m_displaying = true;
         m_notimeout = false;
     }
@@ -282,7 +284,7 @@ void OSDSet::FadeFor(int frames)
 
 void OSDSet::Hide(void)
 {
-    m_framesleft = 1;
+    m_timeleft = 1;
     m_notimeout = false;
 }
 
@@ -292,7 +294,7 @@ void OSDSet::Draw(unsigned char *yuvptr)
     for (; i != allTypes->end(); i++)
     {
         OSDType *type = (*i);
-        type->Draw(yuvptr, m_screenwidth, m_screenheight, m_fadeframes, 
+        type->Draw(yuvptr, m_screenwidth, m_screenheight, m_fadetime, 
                    m_maxfade, m_xoff, m_yoff);
     }
 
@@ -301,19 +303,29 @@ void OSDSet::Draw(unsigned char *yuvptr)
     if (m_notimeout)
         return;
 
-    if (m_framesleft >= 0)
-        m_framesleft--;
-    if (m_fadeframes >= 0)
+    if (m_timeleft > 0)
     {
-        m_fadeframes--;
+        m_timeleft -= m_frameint;
+        if (m_timeleft < 0)
+            m_timeleft = 0;
+    }
+
+    if (m_fadetime > 0)
+    {
+        m_fadetime -= m_frameint;
+
         if (m_xmove || m_ymove)
         {
-            m_xoff += m_xmove;
-            m_yoff += m_ymove;
-            m_fadeframes -= 4;
+            m_xoff += (m_xmove * m_frameint * 30) / 1000000;
+            m_yoff += (m_ymove * m_frameint * 30) / 1000000;
+            m_fadetime -= (4 * m_frameint);
         }
+
+        if (m_fadetime < 0)
+            m_fadetime = 0;
     }
-    if (m_framesleft <= 0 && m_fadeframes <= 0)
+
+    if (m_timeleft <= 0 && m_fadetime <= 0)
         m_displaying = false;
 }
 
@@ -421,8 +433,7 @@ void OSDTypeText::Draw(unsigned char *screenptr, int vid_width, int vid_height,
             {
                 if (word[1] == 'd')
                 {
-                    int timeleft = (int)(ceil(m_parent->GetFramesLeft() * 1.0 / 
-                                              m_parent->GetFrameRate()));
+                    int timeleft = (m_parent->GetTimeLeft() + 999999) / 1000000;
                     if (timeleft > 99)
                         timeleft = 99;
                     if (timeleft < 0)
@@ -630,6 +641,7 @@ void OSDTypeImage::LoadImage(const QString &filename, float wmult, float hmult,
 
     QImage tmpimage(filename);
 
+/*
     if (tmpimage.width() == 0)
     {
         QString url = gContext->GetMasterHostPrefix();
@@ -642,6 +654,7 @@ void OSDTypeImage::LoadImage(const QString &filename, float wmult, float hmult,
         if (cached)
             tmpimage = *cached;
     }
+*/
 
     if (tmpimage.width() == 0)
         return;
