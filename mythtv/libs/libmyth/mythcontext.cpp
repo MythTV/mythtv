@@ -308,7 +308,7 @@ int MythContext::GetNumSetting(const QString &key, int defaultval)
 
         if (result.isActive() && result.numRowsAffected() > 0) {
             result.next();
-            value = result.value(0).toInt();
+            value = result.value(0).toString().toInt();
             found = true;
         }
     }
