@@ -266,6 +266,8 @@ void OSD::parseFont(QDomElement &element)
         exit(0); 
     }
 
+    size = (int)(size * hmult);
+
     font = LoadFont(fontfile, size);
     if (!font)
     {
