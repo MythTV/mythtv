@@ -76,6 +76,8 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     popup = NULL;
     curitem = NULL;
     delitem = NULL;
+ 
+    titleView = true;
 
     if (gContext->GetNumSetting("UseArrowAccels", 1))
         arrowAccel = true;
@@ -932,14 +934,14 @@ void PlaybackBox::updateShowTitles(QPainter *p)
                 tempCurrent = RemoteGetRecordingStatus(tempInfo, overrectime,
                                                      underrectime);
 
-                if (titleList[titleIndex] == "")
+                if ((titleList[titleIndex] == "") || (!(titleView)))
                     tempSubTitle = tempInfo->title; 
                 else
                     tempSubTitle = tempInfo->subtitle;
                 if (tempSubTitle.stripWhiteSpace().length() == 0)
                     tempSubTitle = tempInfo->title;
                 if ((tempInfo->subtitle).stripWhiteSpace().length() > 0 
-                    && titleList[titleIndex] == "")
+                    && ((titleList[titleIndex] == "") || (!(titleView))))
                 {
                     tempSubTitle = tempSubTitle + " - \"" + 
                         tempInfo->subtitle + "\"";
@@ -1155,11 +1157,26 @@ bool PlaybackBox::FillList()
                  (p->category == recGroup ) &&
                  ( !recGroupPwCache.contains(p->recgroup))))
             {
-                progLists[""].prepend(p);
-                progLists[p->title].prepend(p);
-                sTitle = p->title;
-                sTitle.remove(prefixes);
-                sortedList[sTitle] = p->title;
+                if (titleView) // Normal title view 
+                {
+                    progLists[""].prepend(p);
+                    progLists[p->title].prepend(p);
+                    sTitle = p->title;
+                    sTitle.remove(prefixes);
+                    sortedList[sTitle] = p->title;
+                } else { 
+                    progLists[""].prepend(p);
+                    progLists[p->recgroup].prepend(p);
+                    sortedList[p->recgroup] = p->recgroup;
+                    // If categories are used as recording groups...
+                    if (gContext->GetNumSetting("UseCategoriesAsRecGroups"))
+                    {
+                        // Recording groups and categories overlap so set flag
+                        progLists[p->category].setAutoDelete(false);
+                        progLists[p->category].prepend(p);
+                        sortedList[p->category] = p->category;
+                    }
+                }
             }
             else
                 delete p;
@@ -1460,6 +1477,13 @@ void PlaybackBox::showMenu()
     if (recGroupType[recGroup] == "recgroup")
         popup->addButton(tr("Change Group Password"), this,
                          SLOT(showRecGroupPasswordChanger()));
+
+    if (titleView)
+        popup->addButton(tr("Show group list as recording groups"), this,
+                         SLOT(toggleTitleView()));
+    else
+        popup->addButton(tr("Show group list as titles"), this,
+                         SLOT(toggleTitleView()));
 
     popup->addButton(tr("Cancel"), this, SLOT(doCancel()));
 
@@ -2294,6 +2318,20 @@ void PlaybackBox::doCancel(void)
     state = kChanging;
 }
 
+void PlaybackBox::toggleTitleView(void)
+{
+    if (expectingPopup)
+        cancelPopup();
+
+    if (titleView) titleView = false;
+    else titleView = true;
+
+    playList.clear();
+    connected = FillList();      
+    skipUpdate = false;
+    update(fullRect);
+}
+
 void PlaybackBox::promptEndOfRecording(ProgramInfo *rec)
 {
     if (!rec)
@@ -2403,6 +2441,15 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
         {
             playList.clear();
             connected = FillList();      
+            skipUpdate = false;
+            update(fullRect);
+        }
+        else if (action == "TOGGLERECORD")
+        {
+            if (titleView) titleView = false;
+            else titleView = true;
+            playList.clear();
+            connected = FillList();
             skipUpdate = false;
             update(fullRect);
         }

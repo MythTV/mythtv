@@ -79,6 +79,7 @@ class PlaybackBox : public MythDialog
     void noPreserveEpisode();
 
     void doCancel();
+    void toggleTitleView();
 
     void exitWin();
 
@@ -262,6 +263,7 @@ class PlaybackBox : public MythDialog
     int underrectime;
 
     bool playingSomething;
+    bool titleView;
 };
 
 #endif
