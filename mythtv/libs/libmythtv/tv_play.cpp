@@ -845,6 +845,8 @@ void TV::ProcessKeypress(int keypressed)
 
             case Key_BracketLeft: case Key_BracketRight:
             case Key_Bar: passThru = 1; break;
+
+            case Key_W: passThru = 1; break;
         }
 
         if (!passThru)
@@ -1009,7 +1011,8 @@ void TV::ProcessKeypress(int keypressed)
         }
         case Key_BracketLeft: case Key_F10: ChangeVolume(false); break;
         case Key_BracketRight: case Key_F11: ChangeVolume(true); break;
-        case Key_Bar:  case Key_F9: ToggleMute(); break;
+        case Key_Bar: case Key_F9: ToggleMute(); break;
+        case Key_W: ToggleLetterbox(); break;
 
         default: 
         {
@@ -1632,6 +1635,9 @@ void TV::ChangeChannelByString(QString &name)
 {
     bool muted = false;
 
+    if (!channame_vector.isEmpty() && channame_vector.last() == name)
+        return;
+
     if (!activerecorder->CheckChannel(name))
         return;
 
@@ -2046,6 +2052,20 @@ void TV::ToggleMute(void)
  
     if (osd && !browsemode)
         osd->SetSettingsText(text, 5);
+}
+
+void TV::ToggleLetterbox(void)
+{
+    nvp->ToggleLetterbox();
+    bool letterbox = nvp->GetLetterbox();
+    QString text;
+    if (letterbox)
+        text = tr("16:9");
+    else
+        text = tr("4:3");
+
+    if (osd && !browsemode )
+        osd->SetSettingsText(text, 3);
 }
 
 void TV::EPGChannelUpdate(QString chanstr)

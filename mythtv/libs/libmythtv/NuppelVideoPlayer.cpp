@@ -2197,6 +2197,19 @@ void NuppelVideoPlayer::DoKeypress(int keypress)
     decoder->setExactSeeks(exactstore);
 }
 
+bool NuppelVideoPlayer::GetLetterbox(void)
+{
+    if (videoOutput)
+        return videoOutput->GetLetterbox();
+    return false;
+}
+
+void NuppelVideoPlayer::ToggleLetterbox(void)
+{
+    if (videoOutput)
+        videoOutput->ToggleLetterbox();
+}
+
 void NuppelVideoPlayer::UpdateSeekAmount(bool up)
 {
     if (seekamountpos > 0 && !up)

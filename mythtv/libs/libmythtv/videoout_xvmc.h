@@ -18,6 +18,7 @@ class VideoOutputXvMC : public VideoOutput
     void Show(void);
 
     void InputChanged(int width, int height, float aspect);
+    void AspectChanged(float aspect);
 
     void EmbedInWidget(unsigned long wid, int x, int y, int w, int h);
     void StopEmbedding(void);
@@ -25,6 +26,8 @@ class VideoOutputXvMC : public VideoOutput
     int GetRefreshRate(void);
 
     void DrawSlice(VideoFrame *frame, int x, int y, int w, int h);
+
+    void DrawUnusedRects(void);
 
   private:
     void Exit(void);
@@ -46,6 +49,8 @@ class VideoOutputXvMC : public VideoOutput
     int colorid;
 
     pthread_mutex_t lock;
+
+    int colorkey;
 };
 
 #endif

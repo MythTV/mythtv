@@ -18,6 +18,7 @@ class VideoOutput
     virtual void Show(void) = 0;
 
     virtual void InputChanged(int width, int height, float aspect);
+    virtual void AspectChanged(float aspect);
 
     virtual void EmbedInWidget(unsigned long wid, int x, int y, int w, int h);
     virtual void StopEmbedding(void);
@@ -29,6 +30,11 @@ class VideoOutput
     virtual int GetRefreshRate(void) = 0;
 
     virtual void DrawSlice(VideoFrame *frame, int x, int y, int w, int h);
+
+    virtual void DrawUnusedRects(void) = 0;
+
+    bool GetLetterbox(void) { return letterbox; }
+    void ToggleLetterbox(void);
 
   protected:
     int XJ_width, XJ_height;
@@ -46,6 +52,8 @@ class VideoOutput
 
     int numbuffers;
     VideoFrame *videoframes;
+
+    bool letterbox;
 };
 
 #endif

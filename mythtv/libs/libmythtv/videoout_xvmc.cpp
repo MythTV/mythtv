@@ -62,6 +62,7 @@ int XJ_error_catcher(Display * d, XErrorEvent * xeev)
 }
 
 VideoOutputXvMC::VideoOutputXvMC(void)
+               : VideoOutput()
 {
     XJ_started = 0; 
     xv_port = -1; 
@@ -74,6 +75,16 @@ VideoOutputXvMC::~VideoOutputXvMC()
 {
     Exit();
     delete data;
+}
+
+void VideoOutputXvMC::AspectChanged(float aspect)
+{
+    pthread_mutex_lock(&lock);
+
+    VideoOutput::AspectChanged(aspect);
+    MoveResize();
+
+    pthread_mutex_unlock(&lock);
 }
 
 void VideoOutputXvMC::InputChanged(int width, int height, float aspect)
@@ -264,11 +275,8 @@ bool VideoOutputXvMC::Init(int width, int height, float aspect, int num_buffers,
         return false;
     }
 
-    MoveResize();
-
     Atom xv_atom;  
     XvAttribute *attributes;
-    int colorkey;
     int attrib_count;
     bool needdrawcolor = true;
 
@@ -303,9 +311,7 @@ bool VideoOutputXvMC::Init(int width, int height, float aspect, int num_buffers,
         }
     }
 
-    XSetForeground(data->XJ_disp, data->XJ_gc, colorkey);
-    XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, 0, 0, 
-                   dispw, disph);
+    MoveResize();
 
     XJ_started = true;
 
@@ -557,3 +563,17 @@ void VideoOutputXvMC::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
     render->filled_mv_blocks_num = 0;
     render->next_free_data_block_num = 0;
 }
+
+void VideoOutputXvMC::DrawUnusedRects(void)
+{
+    XSetForeground(data->XJ_disp, data->XJ_gc, colorkey);
+    XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, 0, 0,
+                   dispw, disph);
+
+    XSetForeground(data->XJ_disp, data->XJ_gc, XJ_black);
+    XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, 0, 0, dispw,
+                   dispyoff);
+    XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, 0,
+                   dispyoff + disphoff, dispw, dispyoff);
+}
+

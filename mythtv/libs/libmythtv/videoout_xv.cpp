@@ -67,6 +67,7 @@ int XJ_error_catcher(Display * d, XErrorEvent * xeev)
 }
 
 VideoOutputXv::VideoOutputXv(void)
+             : VideoOutput()
 {
     XJ_started = 0; 
     xv_port = -1; 
@@ -79,6 +80,16 @@ VideoOutputXv::~VideoOutputXv()
 {
     Exit();
     delete data;
+}
+
+void VideoOutputXv::AspectChanged(float aspect)
+{
+    pthread_mutex_lock(&lock);
+
+    VideoOutput::AspectChanged(aspect);
+    MoveResize();
+
+    pthread_mutex_unlock(&lock);
 }
 
 void VideoOutputXv::InputChanged(int width, int height, float aspect)
@@ -101,7 +112,7 @@ void VideoOutputXv::InputChanged(int width, int height, float aspect)
     else
     {
         DeleteXBuffers();
-        CreateShmBuffers();
+        CreateXBuffers();
     }
 
     MoveResize();
@@ -672,4 +683,14 @@ void VideoOutputXv::PrepareFrame(VideoFrame *buffer)
 void VideoOutputXv::Show()
 {
     XSync(data->XJ_disp, False);
+}
+
+void VideoOutputXv::DrawUnusedRects(void)
+{
+    XSetForeground(data->XJ_disp, data->XJ_gc, XJ_black);
+  
+    XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, 0, 0, dispw,
+                   dispyoff);
+    XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, 0, 
+                   dispyoff + disphoff, dispw, dispyoff);
 }

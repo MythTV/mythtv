@@ -167,6 +167,9 @@ class NuppelVideoPlayer
     void ReinitVideo(void);
     void ReinitAudio(void);
 
+    void ToggleLetterbox(void);
+    bool GetLetterbox(void);
+
  protected:
     void OutputVideoLoop(void);
 

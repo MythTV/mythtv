@@ -6,6 +6,7 @@
 
 VideoOutput::VideoOutput()
 {
+    letterbox = false;
 }
 
 VideoOutput::~VideoOutput()
@@ -57,6 +58,11 @@ bool VideoOutput::Init(int width, int height, float aspect, int num_buffers,
     embedding = false;
 
     return true;
+}
+
+void VideoOutput::AspectChanged(float aspect)
+{
+    XJ_aspect = aspect;
 }
 
 void VideoOutput::InputChanged(int width, int height, float aspect)
@@ -233,6 +239,17 @@ void VideoOutput::MoveResize(void)
         disphoff = (int)(dispwoff / XJ_aspect);
         dispyoff = (oldheight - disphoff) / 2;
     }
+
+    DrawUnusedRects();
 }
 
+void VideoOutput::ToggleLetterbox(void)
+{
+    if (letterbox)
+        AspectChanged(4.0 / 3);
+    else
+        AspectChanged(16.0 / 9);
+
+    letterbox = !letterbox;
+}
 

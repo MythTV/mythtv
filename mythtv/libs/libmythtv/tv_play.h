@@ -107,6 +107,7 @@ class TV : public QObject
 
     void ChangeVolume(bool up);
     void ToggleMute(void);
+    void ToggleLetterbox(void);
     void ChangeContrast(bool up);
     void ChangeBrightness(bool up);
     void ChangeColour(bool up);
