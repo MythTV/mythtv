@@ -1,0 +1,51 @@
+README for mythname.pl and mythencode.pl
+
+WARNING: Both are released as is, don't come to me if they destroy your
+computer.  You have been warned.
+
+OVERVIEW
+I needed a couple of tools to allow me to convert MythTV .nuv files to
+something that was usable by the rest of the world (non-linux, non-patched
+mencoder/mplayer, etc.) So I wrote these scripts to solve the problem.
+mythname.pl is a simple program to take a MythTV named file and return the
+actual name of the show (and optionally the sub-title/episode).  In its
+simplest form it takes as input a MythTV filename and return the show name.
+
+    mythname.pl /mnt/store/1032_20030404220000_20030404223000.nuv
+
+might return 'The Daily Show'.  It has several switches which you can
+read more about by running the command with no arguments. mythencode.pl is a
+perl script which takes the same input as mythname.pl and then runs a
+patched mencoder on the filename to convert it to a .avi file usable by programs
+outside the Myth world. mythencode.pl has quite a few options, including one
+to call mythname.pl to automatically name the output file with a human
+readable name i.e. 'The DailyShow.avi'.  Again, run mythencode.pl with no
+options to see the command lineoptions.
+
+CUSTOMIZING
+mythencode.pl has a couple of items that will probably need editing at the
+top of the file: the name/path/commandline options to mythname.pl and
+name/path to mencoder.  You should set these before running the script since
+they aren't configurable by the commandline.  You should really only need to
+edit the settings once.
+
+USING WITH CRON
+One thing I have found useful is using these scripts inside a cron job to
+automatically convert files which are still around after 3 days to a
+transferable format.  I use something like this:
+
+    0 4 * * * mythtransfer.sh
+
+Where mythtransfer.sh is:
+
+    #!/bin/sh
+    for i in `find /mnt/store -mtime +3`; do
+	mythencode.pl -hours 4 -cdsize 700 -getname $i
+    done
+
+This will take all my files that are over 36 hours old in /mnt/store and
+convert them to fit 4 hours per CD and rename them to the original show name.
+
+CONTACT
+I can be contacted at rsnow@dympna.com if you have any questions or
+suggestions.
