@@ -16,9 +16,9 @@ CREATE TABLE IF NOT EXISTS codecparams
     PRIMARY KEY (profile, name)
 );
 
-ALTER TABLE allrecord ADD COLUMN profile INT UNSIGNED NOT NULL DEFAULT 0 REFERENCES recordingprofile(id);
-ALTER TABLE singlerecord ADD COLUMN profile INT UNSIGNED NOT NULL DEFAULT 0 REFERENCES recordingprofile(id);
-ALTER TABLE timeslotrecord ADD COLUMN profile INT UNSIGNED NOT NULL DEFAULT 0 REFERENCES recordingprofile(id);
+ALTER TABLE allrecord ADD COLUMN profile INT UNSIGNED NOT NULL DEFAULT 0 REFERENCES recordingprofiles(id);
+ALTER TABLE singlerecord ADD COLUMN profile INT UNSIGNED NOT NULL DEFAULT 0 REFERENCES recordingprofiles(id);
+ALTER TABLE timeslotrecord ADD COLUMN profile INT UNSIGNED NOT NULL DEFAULT 0 REFERENCES recordingprofiles(id);
 
 UPDATE allrecord SET profile = 0;
 UPDATE singlerecord SET profile = 0;
