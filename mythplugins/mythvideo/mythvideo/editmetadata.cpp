@@ -254,6 +254,10 @@ void EditMetadataDialog::toggleBrowse(bool yes_or_no)
 void EditMetadataDialog::findCoverArt()
 {
     QString *new_coverart_file = new QString("");
+    if(working_metadata->CoverFile() != "No Cover")
+    {
+        *new_coverart_file = working_metadata->CoverFile();
+    }
 
     MythImageFileDialog *nca = 
         new MythImageFileDialog(new_coverart_file,
