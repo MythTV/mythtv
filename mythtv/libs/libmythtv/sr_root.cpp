@@ -5,12 +5,12 @@ RootSRGroup::RootSRGroup(ScheduledRecording& _rec,ManagedList* _parentList, QObj
                   : ManagedListGroup( "rootGroup", NULL, _parentList, _parent, "rootGroup"),
                     schedRec(_rec)
 {
-    cancelItem = new DialogDoneListItem( QObject::tr("Go back..."), MythDialog::Rejected, NULL, parentList, this, "cancel");
+    cancelItem = new DialogDoneListItem( QObject::tr("Cancel..."), MythDialog::Rejected, NULL, _parentList, this, "cancel");
     cancelItem->setState(MLS_BOLD);
     addItem(cancelItem);
     
     recordAsShownItem = new DialogDoneListItem( QObject::tr("Record this program as shown below..."), MythDialog::Accepted, NULL,
-                                                parentList, this, "recordAsShown");
+                                                _parentList, this, "recordAsShown");
     recordAsShownItem->setState(MLS_BOLD);
     addItem(recordAsShownItem);
     
@@ -24,20 +24,25 @@ RootSRGroup::RootSRGroup(ScheduledRecording& _rec,ManagedList* _parentList, QObj
     offsetGroup = new SROffsetGroup(_rec, _parentList, this);
     addItem(offsetGroup, -1);
     
-    recGroup = new SRRecGroup(_rec, _parentList, this);
-    addItem(recGroup->getItem(), -1);
-    
     recPriority = new SRRecPriority(_rec, _parentList);
     addItem(recPriority->getItem(), -1);
-    
-    autoExpire = new SRAutoExpire(_rec, _parentList);
-    addItem(autoExpire->getItem(), -1);
     
     dupSettings = new SRDupSettingsGroup(_rec, _parentList, this, this);
     addItem(dupSettings, -1);
     
+    recGroup = new SRRecGroup(_rec, _parentList, this);
+    addItem(recGroup->getItem(), -1);
+    
+    autoExpire = new SRAutoExpire(_rec, _parentList);
+    addItem(autoExpire->getItem(), -1);
+    
     episodes = new SREpisodesGroup(_rec, _parentList, this, this);
     addItem(episodes, -1);
+
+
+    upcomingButton = new ManagedListItem(QObject::tr("View upcoming episodes..."), _parentList, this, "viewUpcoming");
+    addItem(upcomingButton, -1);
+    connect(upcomingButton, SIGNAL(selected(ManagedListItem*)), &_rec, SLOT(runProgList()));
 }
        
 void RootSRGroup::setDialog(MythDialog* dlg) 

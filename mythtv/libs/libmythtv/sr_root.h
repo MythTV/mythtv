@@ -20,7 +20,7 @@ class RootSRGroup : public ManagedListGroup
          ScheduledRecording& schedRec;
          DialogDoneListItem* cancelItem;
          DialogDoneListItem* recordAsShownItem;
-         
+         ManagedListItem* upcomingButton;         
          class SRRecordingType* recType;
          class SRProfileSelector* profile;
          class SRDupSettingsGroup* dupSettings;

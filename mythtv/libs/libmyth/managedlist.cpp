@@ -264,7 +264,7 @@ void ManagedListGroup::clear()
     
     if(parentGroup)
     {
-        goBack = new ManagedListItem(tr("Go Back"), parentList, this, "goBack");
+        goBack = new ManagedListItem(tr("Go Back..."), parentList, this, "goBack");
         goBack->setValue("__NO_VALUE__");
         addItem(goBack);
         connect(goBack, SIGNAL(selected(ManagedListItem*)), this, SLOT(doGoBack()));
@@ -436,7 +436,7 @@ void SelectManagedListItem::itemSelected(ManagedListItem* itm)
     if(curItem == 0)
         curItem = lastItem;
     else
-        text = itm->getText();
+        text = itm->getText() + "...";
     
     changed();    
     doGoBack();
@@ -557,17 +557,18 @@ void ManagedList::cursorDown(bool page)
     if (curGroup)
     {
         int newIndex = curGroup->getCurIndex();
+        int itemCount = curGroup->getItemCount();
+                
+        newIndex += (page ? itemCount : 1);
         
-        newIndex += (page ? listSize : 1);
-        
-        if(newIndex >= listSize)
-            newIndex = newIndex - listSize;
+        if(newIndex >= itemCount)
+            newIndex = newIndex - itemCount;
         
         
         while(curGroup->getItem(newIndex)->getEnabled() == false)
         {
             ++newIndex;
-            if(newIndex >= listSize )
+            if(newIndex >= itemCount )
                 newIndex = 0;
         }
 
@@ -582,16 +583,17 @@ void ManagedList::cursorUp(bool page)
     if (curGroup)
     {
         int newIndex = curGroup->getCurIndex();
+        int itemCount = curGroup->getItemCount();
         
-        newIndex -= (page ? listSize : 1);
+        newIndex -= (page ? itemCount : 1);
         if(newIndex < 0)
-            newIndex = listSize + newIndex;
+            newIndex = itemCount + newIndex;
                 
         while(curGroup->getItem(newIndex)->getEnabled() == false)
         {
             --newIndex;
             if(newIndex <= 0 )
-                newIndex = listSize - 1;
+                newIndex = itemCount - 1;
         }
         
         curGroup->setCurIndex(newIndex);
