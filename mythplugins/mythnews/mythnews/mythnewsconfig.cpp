@@ -28,6 +28,7 @@
 #include <qdom.h>
 #include <qtimer.h>
 
+#include "mythtv/mythcontext.h"
 #include "mythtv/mythdbcon.h"
 
 #include "mythnewsconfig.h"
@@ -94,12 +95,10 @@ public:
 
 // ---------------------------------------------------
 
-MythNewsConfig::MythNewsConfig(QSqlDatabase *db,
-                               MythMainWindow *parent,
+MythNewsConfig::MythNewsConfig(MythMainWindow *parent,
                                const char *name)
     : MythDialog(parent, name)
 {
-    m_db              = db;
     m_priv            = new MythNewsConfigPriv;
     m_updateFreqTimer = new QTimer(this);
     m_updateFreq      = gContext->GetNumSetting("NewsUpdateFrequency", 30);
@@ -114,9 +113,11 @@ MythNewsConfig::MythNewsConfig(QSqlDatabase *db,
                          "  url  VARCHAR(255) NOT NULL,"
                          "  ico  VARCHAR(255),"
                          "  updated INT UNSIGNED );");
-    MSqlQuery query(QString::null, m_db);
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
     if (!query.exec(queryString)) {
-	    cerr << "MythNewsConfig: Error in creating sql table" << endl;
+        cerr << "MythNewsConfig: Error in creating sql table" << endl;
     }
 
     m_Theme       = 0;
@@ -451,7 +452,7 @@ bool MythNewsConfig::findInDB(const QString& name)
 {
     bool val = false;
 
-    MSqlQuery query(QString::null, m_db);
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT name FROM newssites WHERE name = :NAME ;");
     query.bindValue(":NAME", name.utf8());
     if (!query.exec() || !query.isActive()) {
@@ -471,7 +472,7 @@ bool MythNewsConfig::insertInDB(NewsSiteItem* site)
     if (findInDB(site->name))
         return false;
 
-    MSqlQuery query(QString::null, m_db);
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("INSERT INTO newssites (name,category,url,ico) "
                   " VALUES( :NAME, :CATEGORY, :URL, :ICON );");
     query.bindValue(":NAME", site->name.utf8());
@@ -490,7 +491,7 @@ bool MythNewsConfig::removeFromDB(NewsSiteItem* site)
 {
     if (!site) return false;
 
-    MSqlQuery query(QString::null, m_db);
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM newssites WHERE name = :NAME ;");
     query.bindValue(":NAME", site->name.utf8());
     if (!query.exec() || !query.isActive()) {

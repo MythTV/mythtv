@@ -22,7 +22,6 @@
 #ifndef MYTHNEWS_H
 #define MYTHNEWS_H
 
-#include <qsqldatabase.h>
 
 #include <mythtv/uitypes.h>
 #include <mythtv/uilistbtntype.h>
@@ -40,8 +39,7 @@ class MythNews : public MythDialog
 
 public:
 
-    MythNews(QSqlDatabase *db, MythMainWindow *parent,
-             const char *name = 0);
+    MythNews(MythMainWindow *parent, const char *name = 0);
     ~MythNews();
 
 private:
@@ -63,7 +61,6 @@ private:
     void cancelRetrieve();
     void processAndShowNews(NewsSite *site);
 
-    QSqlDatabase  *m_DB;
     XMLParse      *m_Theme;
 
     UIListBtnType *m_UISites;

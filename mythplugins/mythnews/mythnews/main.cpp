@@ -22,7 +22,6 @@
 #include <iostream>
 
 #include <qapplication.h>
-#include <qsqldatabase.h>
 #include <unistd.h>
 
 #include "mythnews.h"
@@ -65,8 +64,7 @@ int mythplugin_init(const char *libversion)
 
 void runNews(void)
 {
-    MythNews news(QSqlDatabase::database(),
-                  gContext->GetMainWindow(), "news");
+    MythNews news(gContext->GetMainWindow(), "news");
     news.exec();
 }
 
@@ -78,8 +76,7 @@ int mythplugin_run(void)
 
 int mythplugin_config(void)
 {
-    MythNewsConfig config(QSqlDatabase::database(),
-                          gContext->GetMainWindow(), "news");
+    MythNewsConfig config(gContext->GetMainWindow(), "news");
     config.exec();
 
     return 0;

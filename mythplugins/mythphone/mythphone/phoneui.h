@@ -10,7 +10,6 @@
 #ifndef PHONEUI_H_
 #define PHONEUI_H_
 
-#include <qsqldatabase.h>
 #include <qregexp.h>
 #include <qtimer.h>
 #include <qptrlist.h>
@@ -48,9 +47,8 @@ class PhoneUIBox : public MythThemedDialog
 
     typedef QValueVector<int> IntVector;
     
-    PhoneUIBox(QSqlDatabase *ldb,
-              MythMainWindow *parent, QString window_name,
-              QString theme_filename, const char *name = 0);
+    PhoneUIBox(MythMainWindow *parent, QString window_name,
+               QString theme_filename, const char *name = 0);
 
     ~PhoneUIBox(void);
 

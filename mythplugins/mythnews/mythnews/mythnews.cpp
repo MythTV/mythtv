@@ -22,20 +22,19 @@
 #include <iostream>
 
 #include <qnetwork.h>
-#include <qsqlquery.h>
 #include <qdatetime.h>
 #include <qpainter.h>
 #include <qdir.h>
 #include <qtimer.h>
 #include <qregexp.h>
 
+#include "mythtv/mythcontext.h"
 #include "mythtv/mythdbcon.h"
 
 #include "mythnews.h"
 
-MythNews::MythNews(QSqlDatabase *db, MythMainWindow *parent,
-                   const char *name )
-    : MythDialog(parent, name), m_DB(db)
+MythNews::MythNews(MythMainWindow *parent, const char *name )
+    : MythDialog(parent, name)
 {
     qInitNetworkProtocols ();
 
@@ -71,8 +70,9 @@ MythNews::MythNews(QSqlDatabase *db, MythMainWindow *parent,
 
     // Load sites from database
 
-    MSqlQuery query("SELECT name, url, updated FROM newssites ORDER BY name",
-                    db);
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.exec("SELECT name, url, updated FROM newssites ORDER BY name");
+
     if (!query.isActive()) {
         cerr << "MythNews: Error in loading Sites from DB" << endl;
     }
@@ -469,7 +469,7 @@ void MythNews::slotNewsRetrieved(NewsSite* site)
 {
     unsigned int updated = site->lastUpdated().toTime_t();
 
-    MSqlQuery query(QString::null, m_DB);
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("UPDATE newssites SET updated = :UPDATED "
                   "WHERE name = :NAME ;");
     query.bindValue(":UPDATED", updated);

@@ -33,9 +33,8 @@ using namespace std;
 
 
 
-PhoneUIBox::PhoneUIBox(QSqlDatabase *db,
-                     MythMainWindow *parent, QString window_name,
-                     QString theme_filename, const char *name)
+PhoneUIBox::PhoneUIBox(MythMainWindow *parent, QString window_name,
+                       QString theme_filename, const char *name)
 
            : MythThemedDialog(parent, window_name, theme_filename, name)
 {
@@ -64,7 +63,7 @@ PhoneUIBox::PhoneUIBox(QSqlDatabase *db,
         phoneUIStatusBar->DisplayNotification("Not Registered", 5);
   
     // Read the directory into the object structures
-    DirContainer = new DirectoryContainer(db);
+    DirContainer = new DirectoryContainer();
     DirContainer->Load();
     DirContainer->createTree();
 

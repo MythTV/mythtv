@@ -11,7 +11,6 @@
 #include <qvaluelist.h>
 #include <qlistview.h>
 #include <qptrlist.h>
-#include <qsqldatabase.h>
 #include <qthread.h>
 
 #include <mythtv/uitypes.h>
@@ -62,8 +61,8 @@ class DirEntry
         bool    isSpeedDial() { return SpeedDial; }
         bool    urlMatches(QString s);
         void    setDBUpToDate() { changed=false; inDatabase=true; }
-        void    updateYourselfInDB(QSqlDatabase *db, QString Dir);
-        void    deleteYourselfFromDB(QSqlDatabase *db);
+        void    updateYourselfInDB(QString Dir);
+        void    deleteYourselfFromDB();
         GenericTree *getTreeNode()       { return TreeNode; };
         GenericTree *getSpeeddialNode()  { return SpeeddialNode; };
     
@@ -105,8 +104,8 @@ class Directory : public QPtrList<DirEntry>
     virtual int compareItems(QPtrCollection::Item s1, QPtrCollection::Item s2);
     DirEntry *getDirEntrybyDbId(int dbId);
     DirEntry *getDirEntrybyUrl(QString Url);
-    void saveChangesinDB(QSqlDatabase *db);
-    void deleteEntry(QSqlDatabase *db, DirEntry *Entry);
+    void saveChangesinDB();
+    void deleteEntry(DirEntry *Entry);
     void AddAllEntriesToList(QStrList &l, bool SpeeddialsOnly);
     void ChangePresenceStatus(QString Uri, int Status, QString StatusString, bool SpeeddialsOnly);
 
@@ -134,8 +133,8 @@ class CallRecord
     void    setDBUpToDate() { changed=false; inDatabase=true; }
     bool    isIncoming() { return DirectionIn; }
     void    writeTree(GenericTree *tree_to_write_to);
-    void    updateYourselfInDB(QSqlDatabase *db);
-    void    deleteYourselfFromDB(QSqlDatabase *db);
+    void    updateYourselfInDB();
+    void    deleteYourselfFromDB();
 
   private:
 
@@ -161,8 +160,8 @@ class CallHistory : public QPtrList<CallRecord>
         void writeTree(GenericTree *placed_tree, GenericTree *received_tree);
         CallRecord *fetchById(int id);
         virtual int compareItems(QPtrCollection::Item s1, QPtrCollection::Item s2);
-        void saveChangesinDB(QSqlDatabase *db);
-        void deleteRecords(QSqlDatabase *db);
+        void saveChangesinDB();
+        void deleteRecords();
   private:
 };
 
@@ -172,7 +171,7 @@ class DirectoryContainer
 {
   public:
   
-    DirectoryContainer(QSqlDatabase *db_ptr);
+    DirectoryContainer();
     ~DirectoryContainer();
     void Load();
     void writeTree();
@@ -186,7 +185,7 @@ class DirectoryContainer
     void AddToCallHistory(CallRecord *entry, bool addToUITree);
     void clearCallHistory();
     DirEntry *getDirEntrybyDbId(int dbId);
-    void saveChangesinDB(QSqlDatabase *db);
+    void saveChangesinDB();
     void addToTree(DirEntry *newEntry, QString Dir);
     void deleteFromTree(GenericTree *treeObject, DirEntry *entry);
     void createTree();
@@ -213,7 +212,6 @@ class DirectoryContainer
                         *receivedcallsTree,
                         *placedcallsTree,
                         *speeddialTree;               
-    QSqlDatabase        *sqlDB;
 };
 
 

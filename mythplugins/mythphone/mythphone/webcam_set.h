@@ -11,7 +11,6 @@
 #ifndef WEBCAMSETTINGS_H_
 #define WEBCAMSETTINGS_H_
 
-#include <qsqldatabase.h>
 #include <qregexp.h>
 #include <qtimer.h>
 #include <qptrlist.h>
@@ -61,9 +60,8 @@ class WebcamSettingsBox : public MythThemedDialog
 
     typedef QValueVector<int> IntVector;
     
-    WebcamSettingsBox(QSqlDatabase *ldb,
-              MythMainWindow *parent, QString window_name,
-              QString theme_filename, const char *name = 0);
+    WebcamSettingsBox(MythMainWindow *parent, QString window_name,
+                      QString theme_filename, const char *name = 0);
 
     ~WebcamSettingsBox(void);
 

@@ -11,6 +11,7 @@ using namespace std;
 #include "qdatetime.h"
 #include "qdir.h"
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythdbcon.h>
 
 
 static int counter = 0;
@@ -109,9 +110,10 @@ void DirEntry::writeTree(GenericTree *tree_to_write_to, GenericTree *sdTree)
 }
 
 
-void DirEntry::updateYourselfInDB(QSqlDatabase *db, QString Dir)
+void DirEntry::updateYourselfInDB(QString Dir)
 {
-QString thequery;
+    QString thequery;
+    MSqlQuery query(MSqlQuery::InitCon());
 
     if (!inDatabase)
     {
@@ -122,10 +124,12 @@ QString thequery;
                               .arg(Surname.latin1()).arg(Uri.latin1())
                               .arg(Dir.latin1()).arg(PhotoFile.latin1())
                               .arg(SpeedDial).arg(onHomeLan);
-        db->exec(thequery);
+        query.exec(thequery);
+
         thequery = QString("SELECT MAX(intid) FROM phonedirectory ;");
-        QSqlQuery query = db->exec(thequery);
-        if ((query.isActive()) && (query.numRowsAffected() == 1))
+        query.exec(thequery);
+
+        if ((query.isActive()) && (query.size() == 1))
         {
             query.next();
             dbId = query.value(0).toUInt();
@@ -151,20 +155,22 @@ QString thequery;
                            .arg(Surname.latin1()).arg(Dir.latin1()).arg(Uri.latin1())
                            .arg(PhotoFile.latin1()).arg(SpeedDial).arg(onHomeLan)
                            .arg(dbId);
-        db->exec(thequery);
+        query.exec(thequery);
         changed = false;
     }
 }
 
 
-void DirEntry::deleteYourselfFromDB(QSqlDatabase *db)
+void DirEntry::deleteYourselfFromDB()
 {
-QString thequery;
+    QString thequery;
+    MSqlQuery query(MSqlQuery::InitCon());
+
     if (inDatabase)
     {
         thequery = QString("DELETE FROM phonedirectory "
                            "WHERE intid=%1 ;").arg(dbId);
-        db->exec(thequery);
+        query.exec(thequery);
     }
 }
 
@@ -233,18 +239,18 @@ DirEntry *Directory::getDirEntrybyUrl(QString Url)
     return 0;
 }
 
-void Directory::saveChangesinDB(QSqlDatabase *db)
+void Directory::saveChangesinDB()
 {
     DirEntry *it;
     for (it=first(); it; it=next())
     {
-        it->updateYourselfInDB(db, name);
+        it->updateYourselfInDB(name);
     }
 }
 
-void Directory::deleteEntry(QSqlDatabase *db, DirEntry *Entry)
+void Directory::deleteEntry(DirEntry *Entry)
 {
-    Entry->deleteYourselfFromDB(db);
+    Entry->deleteYourselfFromDB();
 
     if (find(Entry) != -1)
     {
@@ -363,9 +369,11 @@ void CallRecord::writeTree(GenericTree *tree_to_write_to)
 }
 
 
-void CallRecord::updateYourselfInDB(QSqlDatabase *db)
+void CallRecord::updateYourselfInDB()
 {
-QString thequery;
+    QString thequery;
+    MSqlQuery query(MSqlQuery::InitCon());
+
     if (!inDatabase)
     {
         thequery = QString("INSERT INTO phonecallhistory (displayname,url,timestamp,"
@@ -374,10 +382,12 @@ QString thequery;
                               .arg(DisplayName.latin1()).arg(Uri.latin1())
                               .arg(timestamp.latin1()).arg(Duration)
                               .arg(DirectionIn).arg(0);
-        db->exec(thequery);
+        query.exec(thequery);
+
         thequery = QString("SELECT MAX(recid) FROM phonecallhistory ;");
-        QSqlQuery query = db->exec(thequery);
-        if ((query.isActive()) && (query.numRowsAffected() == 1))
+        query.exec(thequery);
+
+        if ((query.isActive()) && (query.size() == 1))
         {
             query.next();
             dbId = query.value(0).toUInt();
@@ -401,20 +411,22 @@ QString thequery;
                            .arg(timestamp.latin1()).arg(Duration)
                            .arg(DirectionIn).arg(0)
                            .arg(dbId);
-        db->exec(thequery);
+        query.exec(thequery);
         changed = false;
     }
 }
 
 
-void CallRecord::deleteYourselfFromDB(QSqlDatabase *db)
+void CallRecord::deleteYourselfFromDB()
 {
-QString thequery;
+    QString thequery;
+    MSqlQuery query(MSqlQuery::InitCon());
+
     if (inDatabase)
     {
         thequery = QString("DELETE FROM phonecallhistory "
                            "WHERE recid=%1 ;").arg(dbId);
-        db->exec(thequery);
+        query.exec(thequery);
     }
 }
 
@@ -472,21 +484,21 @@ int CallHistory::compareItems(QPtrCollection::Item s1, QPtrCollection::Item s2)
     return ((dt1 < dt2) ? 1 : -1);
 }
 
-void CallHistory::saveChangesinDB(QSqlDatabase *db)
+void CallHistory::saveChangesinDB()
 {
     CallRecord *it;
     for (it=first(); it; it=next())
     {
-        it->updateYourselfInDB(db);
+        it->updateYourselfInDB();
     }
 }
 
-void CallHistory::deleteRecords(QSqlDatabase *db)
+void CallHistory::deleteRecords()
 {
     CallRecord *it;
     for (it=first(); it; it=current())
     {
-        it->deleteYourselfFromDB(db);
+        it->deleteYourselfFromDB();
         remove();
         delete it;
     }
@@ -499,10 +511,8 @@ void CallHistory::deleteRecords(QSqlDatabase *db)
 ///////////////////////////////////////////////////////
 
 
-DirectoryContainer::DirectoryContainer(QSqlDatabase *db)
+DirectoryContainer::DirectoryContainer()
 {
-    sqlDB = db;
-
     // Create the Call History directory
     callHistory = new CallHistory();
 }
@@ -510,7 +520,7 @@ DirectoryContainer::DirectoryContainer(QSqlDatabase *db)
 
 DirectoryContainer::~DirectoryContainer()
 {
-    saveChangesinDB(sqlDB);
+    saveChangesinDB();
 
     Directory *p;
     while ((p = AllDirs.first()) != 0)
@@ -527,12 +537,14 @@ DirectoryContainer::~DirectoryContainer()
 void DirectoryContainer::Load()
 {
     // First load the phone directory
+    MSqlQuery query(MSqlQuery::InitCon());
     QString thequery = QString("SELECT intid, nickname,firstname,surname,"
                                "url,directory,photofile,speeddial,onhomelan "
                                "FROM phonedirectory "
                                "ORDER BY intid ;");
-    QSqlQuery query = sqlDB->exec(thequery);
-    if(query.isActive() && query.numRowsAffected() > 0)
+    query.exec(thequery);
+
+    if(query.isActive() && query.size() > 0)
     {
         while(query.next())
         {
@@ -561,8 +573,9 @@ void DirectoryContainer::Load()
                                "duration, directionin, directoryref "
                                "FROM phonecallhistory "
                                "ORDER BY recid ;");
-    query = sqlDB->exec(thequery);
-    if(query.isActive() && query.numRowsAffected() > 0)
+    query.exec(thequery);
+
+    if(query.isActive() && query.size() > 0)
     {
         while(query.next())
         {
@@ -670,7 +683,7 @@ void DirectoryContainer::AddToCallHistory(CallRecord *entry, bool addToUITree)
 void DirectoryContainer::clearCallHistory()
 {
     // Remove from memory and SQL databases
-    callHistory->deleteRecords(sqlDB);
+    callHistory->deleteRecords();
 
     // Now remove from tree
     receivedcallsTree->deleteAllChildren();
@@ -840,7 +853,7 @@ void DirectoryContainer::deleteFromTree(GenericTree *treeObject, DirEntry *entry
         {
             if (it->fetchById(entry->getId()))
             {
-                it->deleteEntry(sqlDB, entry);
+                it->deleteEntry(entry);
 
                 // Cannot delete single items in the tree; so delete all items under this items parent 
                 // then add the remaining items back in
@@ -878,12 +891,12 @@ DirEntry *DirectoryContainer::getDirEntrybyDbId(int dbId)
     return entry;
 }
 
-void DirectoryContainer::saveChangesinDB(QSqlDatabase *db)
+void DirectoryContainer::saveChangesinDB()
 {
     Directory *it;
     for (it=AllDirs.first(); it; it=AllDirs.next())
-        it->saveChangesinDB(db);
-    callHistory->saveChangesinDB(db);
+        it->saveChangesinDB();
+    callHistory->saveChangesinDB();
 }
 
 

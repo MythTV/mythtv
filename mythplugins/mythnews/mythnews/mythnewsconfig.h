@@ -22,8 +22,6 @@
 #ifndef MYTHNEWSCONFIG_H
 #define MYTHNEWSCONFIG_H
 
-#include <qsqldatabase.h>
-
 #include <mythtv/uitypes.h>
 #include <mythtv/uilistbtntype.h>
 #include <mythtv/xmlparse.h>
@@ -54,8 +52,7 @@ class MythNewsConfig : public MythDialog
 
 public:
 
-    MythNewsConfig(QSqlDatabase *db,
-                   MythMainWindow *parent,
+    MythNewsConfig(MythMainWindow *parent,
                    const char *name = 0);
     ~MythNewsConfig();
 
@@ -82,7 +79,6 @@ private:
     bool insertInDB(NewsSiteItem* site);
     bool removeFromDB(NewsSiteItem* site);
 
-    QSqlDatabase       *m_db;
     MythNewsConfigPriv *m_priv;
 
     XMLParse           *m_Theme;

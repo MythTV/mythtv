@@ -11,7 +11,6 @@
 using namespace std;
 
 #include <qapplication.h>
-#include <qsqldatabase.h>
 #include <qdir.h>
 #include <qmutex.h>
 #include <qregexp.h>
@@ -22,6 +21,7 @@ using namespace std;
 #include <linux/videodev.h>
 #include <mythtv/themedmenu.h>
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythdbcon.h>
 #include <mythtv/mythplugin.h>
 #include <mythtv/dialogbox.h>
 #include <mythtv/util.h>
@@ -41,9 +41,8 @@ void PhoneUI(void)
 {
     PhoneUIBox *puib;
 
-    puib = new PhoneUIBox(QSqlDatabase::database(),
-                                gContext->GetMainWindow(),
-                                "phone_ui", "phone-");
+    puib = new PhoneUIBox(gContext->GetMainWindow(),
+                          "phone_ui", "phone-");
     qApp->unlock();
     puib->exec();
     qApp->lock();
@@ -58,8 +57,7 @@ void startWebcamSettings(void)
 {
     WebcamSettingsBox *wsb;
 
-    wsb = new WebcamSettingsBox(QSqlDatabase::database(),
-                                gContext->GetMainWindow(),
+    wsb = new WebcamSettingsBox(gContext->GetMainWindow(),
                                 "webcam_settings", "webcam-");
     qApp->unlock();
     wsb->exec();
@@ -77,7 +75,7 @@ void PhoneCallback(void *data, QString &selection)
     if (sel == "phone_settings_general")
     {
         MythPhoneSettings settings;
-        settings.exec(QSqlDatabase::database());
+        settings.exec();
     }
     else if (sel == "webcam_settings")
     {
@@ -194,15 +192,16 @@ char myHostname[64];
 
 
     // First check if an entry already exists; and if it is up-to-date (IP address etc)
-    QSqlDatabase *db_conn = QSqlDatabase::database();
+    MSqlQuery query(MSqlQuery::InitCon());
     thequery = QString("SELECT intid,nickname,url "
                        "FROM phonedirectory "
                        "WHERE directory = \"%1\" and "
                        "firstname = \"%2\" and "
                        "surname = \"%3\";")
                        .arg(Dir.latin1()).arg(FirstName.latin1()).arg(myHostname);
-    QSqlQuery query = db_conn->exec(thequery);
-    if(query.isActive() && query.numRowsAffected() > 0)
+    query.exec(thequery);
+
+    if(query.isActive() && query.size() > 0)
     {
         while(query.next())
         {
@@ -211,12 +210,14 @@ char myHostname[64];
                 (query.value(2).toString() != Uri))
             {
                 cout << "SIP: Updating out-of-date autogen directory entry; " << query.value(1).toString() << ", " << query.value(2).toString() << endl;
+
+                MSqlQuery query2(MSqlQuery::InitCon());
                 thequery = QString("UPDATE phonedirectory "
                                    "SET nickname=\"%1\", "
                                    "url=\"%2\" "
                                    "WHERE intid=%3 ;")
                            .arg(NickName.latin1()).arg(Uri.latin1()).arg(query.value(0).toInt());
-                db_conn->exec(thequery);
+                query2.exec(thequery);
             }
         }
     }
@@ -230,7 +231,7 @@ char myHostname[64];
                               .arg(Surname.latin1()).arg(Uri.latin1())
                               .arg(Dir.latin1())
                               ;
-        db_conn->exec(thequery);
+        query.exec(thequery);
     }
 }
 
@@ -246,8 +247,8 @@ int mythplugin_init(const char *libversion)
     UpgradePhoneDatabaseSchema();
 
     MythPhoneSettings mpSettings;
-    mpSettings.load(QSqlDatabase::database());
-    mpSettings.save(QSqlDatabase::database());
+    mpSettings.load();
+    mpSettings.save();
 
     // Make sure all the required directories exist
     QString dirName = MythContext::GetConfDir();
@@ -288,7 +289,7 @@ int mythplugin_config(void)
     // Was several options under here; and probably will be again so just comment this out for now
     //runMenu("phone_settings.xml");
     MythPhoneSettings settings;
-    settings.exec(QSqlDatabase::database());
+    settings.exec();
 
     return 0;
 }

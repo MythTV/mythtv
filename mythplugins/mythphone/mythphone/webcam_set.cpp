@@ -26,9 +26,8 @@ using namespace std;
 
 
 
-WebcamSettingsBox::WebcamSettingsBox(QSqlDatabase *,
-                     MythMainWindow *parent, QString window_name,
-                     QString theme_filename, const char *name)
+WebcamSettingsBox::WebcamSettingsBox(MythMainWindow *parent, QString window_name,
+                                     QString theme_filename, const char *name)
 
            : MythThemedDialog(parent, window_name, theme_filename, name)
 {
