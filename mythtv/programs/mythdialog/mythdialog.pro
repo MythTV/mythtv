@@ -7,10 +7,10 @@ CONFIG += thread
 target.path = /usr/local/bin
 INSTALLS = target
 
-include (../settings.pro)
+include (../../settings.pro)
 
-INCLUDEPATH += ../libNuppelVideo ../
-LIBS += -lmyth -L/usr/local/lib -L../libmyth
+INCLUDEPATH += ../../libs/libNuppelVideo ../../libs
+LIBS += -lmyth -L/usr/local/lib -L../../libs/libmyth
 
 # Input
 SOURCES += main.cpp

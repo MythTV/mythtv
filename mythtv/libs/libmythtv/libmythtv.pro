@@ -6,7 +6,7 @@ TEMPLATE = lib
 TARGET = mythtv
 CONFIG += thread staticlib 
 
-include ( ../settings.pro )
+include ( ../../settings.pro )
 
 INCLUDEPATH += ../libNuppelVideo ../
 TARGETDEPS = ../libNuppelVideo/libNuppelVideo.a 

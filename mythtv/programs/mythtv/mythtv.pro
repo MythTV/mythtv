@@ -8,16 +8,17 @@ TARGET = mythtv
 target.path = /usr/local/bin
 INSTALLS = target
 
-include ( ../settings.pro )
+include ( ../../settings.pro )
 
-INCLUDEPATH += ../libNuppelVideo ../libmythtv ../
-LIBS += -L../libNuppelVideo -L../libmythtv -L../libavcodec
-LIBS += -lmythtv -lNuppelVideo -lXv -lttf -lmp3lame -lavcodec
-LIBS += -lmyth -L/usr/local/lib -L../libmyth
+INCLUDEPATH += ../../libs/libNuppelVideo ../../libs/libmythtv ../../libs
+LIBS += -L../../libs/libNuppelVideo -L../../libs/libmythtv 
+LIBS += -L../../libs/libavcodec -L../../libs/libmyth
 
-TARGETDEPS  = ../libNuppelVideo/libNuppelVideo.a ../libmythtv/libmythtv.a
-TARGETDEPS += ../libavcodec/libavcodec.a
+LIBS += -lmythtv -lNuppelVideo -lXv -lttf -lmp3lame -lavcodec -lmyth
+
+TARGETDEPS  = ../../libs/libNuppelVideo/libNuppelVideo.a
+TARGETDEPS += ../../libs/libmythtv/libmythtv.a
+TARGETDEPS += ../../libs/libavcodec/libavcodec.a
 
 # Input
-HEADERS += ../libmythtv/tv.h
 SOURCES += main.cpp

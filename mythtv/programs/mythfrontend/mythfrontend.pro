@@ -8,7 +8,7 @@ TARGET = mythfrontend
 target.path = /usr/local/bin
 INSTALLS = target
 
-include ( ../settings.pro )
+include ( ../../settings.pro )
 
 setting.path = /usr/local/share/mythtv/
 setting.files += theme.txt mysql.txt mainmenu.xml tvmenu.xml
@@ -16,13 +16,17 @@ setting.extra = ldconfig
 
 INSTALLS += setting
 
-INCLUDEPATH += ../mythepg ../mythdialog ../libNuppelVideo ../libmythtv ../
-LIBS += -L../libmythtv -L../libNuppelVideo -L../libavcodec
-LIBS += -lmythtv -lNuppelVideo -lXv -lttf -lmp3lame -lavcodec
-LIBS += -L../libmyth -L/usr/local/lib -lmyth
+INCLUDEPATH += ../mythepg ../../libs/libNuppelVideo ../../libs/libmythtv 
+INCLUDEPATH += ../../libs
 
-TARGETDEPS  = ../libNuppelVideo/libNuppelVideo.a ../libmythtv/libmythtv.a
-TARGETDEPS += ../libavcodec/libavcodec.a
+LIBS += -L../../libs/libmythtv -L../../libs/libNuppelVideo 
+LIBS += -L../../libs/libavcodec -L../../libs/libmyth
+
+LIBS += -lmythtv -lNuppelVideo -lXv -lttf -lmp3lame -lavcodec -lmyth
+
+TARGETDEPS  = ../../libs/libNuppelVideo/libNuppelVideo.a 
+TARGETDEPS += ../../libs/libmythtv/libmythtv.a
+TARGETDEPS += ../../libs/libavcodec/libavcodec.a
 
 # Input
 HEADERS += ../mythepg/guidegrid.h ../mythepg/infodialog.h 

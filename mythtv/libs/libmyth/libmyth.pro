@@ -10,7 +10,7 @@ INSTALLS = target
 
 VERSION = 0.6.0
 
-include ( ../settings.pro )
+include ( ../../settings.pro )
 
 # Input
 HEADERS += dialogbox.h lcddevice.h programinfo.h settings.h themedmenu.h 

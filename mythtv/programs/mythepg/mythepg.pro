@@ -7,10 +7,10 @@ CONFIG += thread
 target.path = /usr/local/bin
 INSTALLS = target
 
-include (../settings.pro)
+include (../../settings.pro)
 
-INCLUDEPATH += ../
-LIBS += -lmyth -L/usr/local/lib -L../libmyth
+INCLUDEPATH += ../../libs
+LIBS += -lmyth -L/usr/local/lib -L../../libs/libmyth
 
 # Input
 HEADERS += guidegrid.h infodialog.h infostructs.h

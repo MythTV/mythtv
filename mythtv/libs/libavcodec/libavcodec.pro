@@ -6,12 +6,14 @@ TEMPLATE = lib
 TARGET = avcodec
 CONFIG += thread staticlib warn_off
 
-include ( ../settings.pro )
-include ( ../config.mak )
+include ( ../../settings.pro )
+include ( ../../config.mak )
 
-!exists( ../config.mak ) {
+!exists( ../../config.mak ) {
     error(Please run the configure script first)
 }
+
+INCLUDEPATH = ../../
 
 QMAKE_CFLAGS_RELEASE = $$OPTFLAGS -DHAVE_AV_CONFIG_H -I.. -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE
 QMAKE_CFLAGS_DEBUG = -g -DHAVE_AV_CONFIG_H -I.. -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE

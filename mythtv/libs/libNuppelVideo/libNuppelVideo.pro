@@ -6,7 +6,7 @@ TEMPLATE = lib
 TARGET = NuppelVideo
 CONFIG += thread staticlib
 
-include ( ../settings.pro )
+include ( ../../settings.pro )
 
 INCLUDEPATH += ../
 

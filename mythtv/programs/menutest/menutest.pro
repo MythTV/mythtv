@@ -6,10 +6,10 @@ TEMPLATE = app
 CONFIG += thread
 TARGET = menutest
 
-include ( ../settings.pro )
+include ( ../../settings.pro )
 
-INCLUDEPATH += ../libmyth
-LIBS += -lmyth -L/usr/local/lib -L../libmyth
+INCLUDEPATH += ../../libs/libmyth
+LIBS += -lmyth -L/usr/local/lib -L../../libs/libmyth
 
 # Input
 SOURCES += main.cpp
