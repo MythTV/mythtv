@@ -121,13 +121,13 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
     QPtrList<FilterInfo> FiltInfoChain;
     FilterChain *FiltChain = new FilterChain;
     QPtrList<FmtConv> FmtList;
-    FilterInfo *FI;
+    FilterInfo *FI, *FI2;
     QString Opts;
     FilterInfo *Convert = GetFilterInfoByName("convert");
     QStrList OptsList (TRUE);
     QStringList FilterList = QStringList::split(",", Filters);
     VideoFilter *NewFilt = NULL;
-    FmtConv *FC;
+    FmtConv *FC, *FC2;
     VideoFrameType ofmt;
     unsigned int i;
     int nbufsize;
@@ -176,21 +176,31 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
         Opts = OptsList.at(i);
         if (!i)
         {
-            for (FC = FI->formats;
-                 FC->in != -1 && (FC->out != ofmt || FC->in != inpixfmt); FC++)
-                ;
+            for (FC = FI->formats; FC->in != -1; FC++)
+                if (FC->out == ofmt && FC->in == inpixfmt)
+                    break;
 
             if (FC->in == -1)
-                for (FC = FI->formats; FC->in != -1 && FC->in != inpixfmt; FC++)
-                    ;
-
-            if (FC->in == -1)
-                for (FC = FI->formats; FC->in != -1 && FC->out != ofmt; FC++)
-                    ;
+                for (FC = FI->formats; FC->in != -1; FC++)
+                    if (FC->in == inpixfmt)
+                        break;
         }
         else
-            for (FC = FI->formats; FC->in != -1 && FC->out != ofmt; FC++)
-                ;
+        {
+            FI2 = FiltInfoChain.at(i-1);
+            for (FC = FI->formats; FC->in != -1; FC++)
+            {
+                for (FC2 = FI2->formats; FC2->in != -1; FC++)
+                    if (FC2->out == FC->in)
+                        break;
+                if (FC2->out == FC->in)
+                    break;
+            }
+        }
+        if (FC->in == -1)
+            for (FC = FI->formats; FC->in != -1; FC++)
+                if (FC->out == ofmt)
+                    break;
 
         if (FC->in == -1)
             FC = FI->formats;
@@ -302,13 +312,22 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
         if (cbufsize > nbufsize)
             nbufsize = cbufsize;
 
-        if (NewFilt)
-            FiltChain->append(NewFilt);
-        else
+        if (!NewFilt)
         {
             delete FiltChain;
             FiltChain = NULL;
             break;
+        }
+        if (NewFilt->filter)
+            FiltChain->append(NewFilt);
+        else
+        {
+            if (NewFilt->opts)
+                free (NewFilt->opts);
+            if (NewFilt->cleanup)
+                NewFilt->cleanup(NewFilt);
+            dlclose (NewFilt->handle);
+            free (NewFilt);
         }
     }
 

@@ -10,7 +10,7 @@
 #include "frame.h"
 
 #define ABS(A) ( (A) > 0 ? (A) : -(A) )
-#define CLAMP(A,U,L) ((A)>(U)?(U):((A)<(L)?(L):(A)))
+#define CLAMP(A,L,U) ((A)>(U)?(U):((A)<(L)?(L):(A)))
 
 #ifdef TIME_FILTER
 #include <sys/time.h>
@@ -21,8 +21,10 @@
 
 #include "mmx.h"
 
-static const mmx_t m0 = { 0x0LL };
-static const mmx_t m1 = { 0xFFFFFFFFFFFFFFFFLL };
+static const mmx_t mm_cpool[] =
+{
+    { 0x0000000000000000LL },
+};
 
 #define cpuid(index,eax,ebx,ecx,edx)\
     __asm __volatile\
@@ -143,22 +145,17 @@ typedef struct ThisFilter
     int width;
     int height;
     int uoff;
-    int ivoff;
-    int ovoff;
+    int voff;
     int cwidth;
     int cheight;
     int threshold;
-    int bttv_broken;
+    int skipchroma;
     int mm_flags;
-    int isize;
-    int osize;
-    void (*yfilt)(uint8_t*, uint8_t*, uint8_t*, int, int, int);
-    void (*cfilt)(uint8_t*, uint8_t*, uint8_t*, int, int, int);
-    int first;
+    int size;
+    void (*filtfunc)(uint8_t*, uint8_t*, int, int, int);
     mmx_t threshold_low;
     mmx_t threshold_high;
-    uint8_t *prev;
-    uint8_t *cur;
+    uint8_t *line;
 #ifdef TIME_FILTER
     int frames;
     double seconds;
@@ -166,146 +163,219 @@ typedef struct ThisFilter
 } ThisFilter;
 
 void
-KDP (uint8_t *PlanePrev, uint8_t *PlaneCur, uint8_t *PlaneOut, int W, int H,
-     int Threshold)
+KDP (uint8_t *Plane, uint8_t *Line, int W, int H, int Threshold)
 {
     int X, Y;
-    uint8_t *LineCur, *LineCur1U, *LineCur1D;
-    uint8_t *LinePrev, *LinePrev2U, *LinePrev2D;
-    PlaneCur = PlaneOut;
-    LineCur = PlaneCur+W;
-    LineCur1U = PlaneCur;
-    LineCur1D = PlaneCur+2*W;
-    LinePrev = PlanePrev+W;
-    LinePrev2U = PlanePrev-W;
-    LinePrev2D = PlanePrev+3*W;
+    uint8_t *LineCur, *LineCur1U, *LineCur1D, *LineCur2D, tmp;
+
+    LineCur = Plane+W;
+    LineCur1U = Plane;
+    LineCur1D = Plane+2*W;
+    LineCur2D = Plane+3*W;
 
     for (X = 0; X < W ; X++)
     {
+        Line[X] = LineCur[X];
         if (Threshold == 0 || ABS((int)LineCur[X]-(int)LineCur1U[X])
-            > Threshold)
+            > Threshold - 1)
             LineCur[X] = (LineCur1U[X] + LineCur1D[X]) / 2;
     }
     LineCur += 2 * W;
     LineCur1U += 2 * W;
     LineCur1D += 2 * W;
-    LinePrev += 2 * W;
-    LinePrev2U += 2 * W;
-    LinePrev2D += 2 * W;
+    LineCur2D += 2 * W;
     for (Y = 3; Y < H / 2 - 1; Y++)
     {
         for (X = 0; X < W; X++)
+        {
+            tmp = Line[X];
+            Line[X] = LineCur[X];
             if (Threshold == 0 || ABS((int)LineCur[X] - (int)LineCur1U[X])
-                > Threshold)
+                > Threshold-1)
                 LineCur[X] = CLAMP((LineCur1U[X] * 4 + LineCur1D[X] * 4
-                        + LinePrev[X] * 2 - LinePrev2U[X] - LinePrev2D[X])
-                         / 8, 255, 0);
+                        + LineCur[X] * 2 - tmp - LineCur2D[X])
+                         / 8, 0, 255);
+        }
         LineCur += 2 * W;
         LineCur1U += 2 * W;
         LineCur1D += 2 * W;
-        LinePrev += 2 * W;
-        LinePrev2U += 2 * W;
-        LinePrev2D += 2 * W;
+        LineCur2D += 2 * W;
     }
     for (X = 0; X < W; X++)
         if (Threshold == 0 || ABS((int)LineCur[X] - (int)LineCur1U[X])
-            > Threshold)
+            > Threshold - 1)
             LineCur[X] = LineCur1U[X];
 }
 
 void
-KDPD (uint8_t *PlanePrev, uint8_t *PlaneCur, uint8_t *PlaneOut, int W, int H,
-      int Threshold)
+KDP_MMX (uint8_t *Plane, uint8_t *Line, int W, int H, int Threshold)
 {
     int X, Y;
-    uint8_t *LineCur, *LineCur1U, *LineCur1D, *LinePrev, *LinePrev2U,
-            *LinePrev2D, *LineOut;
-    LineCur = PlaneCur+W;
-    LineCur1U = PlaneCur;
-    LineCur1D = PlaneCur+2*W;
-    LinePrev = PlanePrev+W;
-    LinePrev2U = PlanePrev-W;
-    LinePrev2D = PlanePrev+3*W;
-    LineOut = PlaneOut;
+    uint8_t *LineCur, *LineCur1U, *LineCur1D, *LineCur2D, tmp;
+    mmx_t mm_lthr = { w:{-Threshold,-Threshold,-Threshold,-Threshold} };
+    mmx_t mm_hthr = { w:{Threshold-(Threshold>0),Threshold-(Threshold>0),
+                         Threshold-(Threshold>0),Threshold-(Threshold>0)} };
+    
+    LineCur = Plane+W;
+    LineCur1U = Plane;
+    LineCur1D = Plane+2*W;
+    LineCur2D = Plane+3*W;
 
-    for (X = 0; X < W ; X++)
+    for (X = 0; X < W - 7; X += 8)
     {
+        movq_m2r (LineCur1U[X], mm0);
+        movq_m2r (LineCur1U[X], mm1);
+        movq_m2r (LineCur1D[X], mm2);
+        movq_m2r (LineCur1D[X], mm3);
+        movq_m2r (LineCur[X], mm4);
+        movq_m2r (LineCur[X], mm5);
+        punpcklbw_m2r (mm_cpool[0], mm0);
+        punpckhbw_m2r (mm_cpool[0], mm1);
+        punpcklbw_m2r (mm_cpool[0], mm2);
+        punpckhbw_m2r (mm_cpool[0], mm3);
+        movq_r2r (mm0, mm6);
+        movq_r2r (mm1, mm7);
+        punpcklbw_m2r (mm_cpool[0], mm4);
+        punpckhbw_m2r (mm_cpool[0], mm5);
+        paddw_r2r (mm2, mm0);
+        paddw_r2r (mm3, mm1);
+        psrlw_i2r (1, mm0);
+        psrlw_i2r (1, mm1);
+        psubw_r2r (mm6, mm4);
+        psubw_r2r (mm7, mm5);
+        packuswb_r2r (mm1,mm0);
+        movq_r2r (mm4, mm6);
+        movq_r2r (mm5, mm7);
+        pcmpgtw_m2r (mm_lthr, mm4);
+        pcmpgtw_m2r (mm_lthr, mm5);
+        pcmpgtw_m2r (mm_hthr, mm6);
+        pcmpgtw_m2r (mm_hthr, mm7);
+        packsswb_r2r (mm5, mm4);
+        packsswb_r2r (mm7, mm6);
+        pxor_r2r (mm6, mm4);
+        movq_r2r (mm4, mm5);
+        pandn_r2r (mm0, mm4);
+        pand_m2r (LineCur[X], mm5);
+        por_r2r (mm4, mm5);
+        movq_r2m (mm5, LineCur[X]);
+    } 
+
+    for (/*X*/; X < W ; X++)
+    {
+        Line[X] = LineCur[X];
         if (Threshold == 0 || ABS((int)LineCur[X]-(int)LineCur1U[X])
-            > Threshold)
-            LineOut[X] = (LineCur1U[X] * 3 + LineCur1D[X]) / 4;
-        else
-            LineOut[X] = (LineCur1U[X] + LineCur[X]) / 2;
+            > Threshold - 1)
+            LineCur[X] = (LineCur1U[X] + LineCur1D[X]) / 2;
     }
+
     LineCur += 2 * W;
     LineCur1U += 2 * W;
     LineCur1D += 2 * W;
-    LinePrev += 2 * W;
-    LinePrev2U += 2 * W;
-    LinePrev2D += 2 * W;
-    LineOut += W;
-    for (Y = 3; Y < H / 2 - 1; Y++)
+    LineCur2D += 2 * W;
+    for (Y = 0; Y < H / 2 - 2; Y++)
     {
-        for (X = 0; X < W; X++)
+        for (X = 0; X < W - 7; X += 8)
+        {
+            movq_m2r (LineCur1U[X], mm0);
+            movq_m2r (LineCur1U[X], mm1);
+            movq_m2r (LineCur1D[X], mm2);
+            movq_m2r (LineCur1D[X], mm3);
+            movq_m2r (LineCur[X], mm4);
+            movq_m2r (LineCur[X], mm5);
+            punpcklbw_m2r (mm_cpool[0], mm0);
+            punpckhbw_m2r (mm_cpool[0], mm1);
+            punpcklbw_m2r (mm_cpool[0], mm2);
+            punpckhbw_m2r (mm_cpool[0], mm3);
+            movq_r2r (mm0, mm6);
+            movq_r2r (mm1, mm7);
+            paddw_r2r (mm2, mm0);
+            paddw_r2r (mm3, mm1);
+            movq_m2r (LineCur[X], mm2);
+            movq_m2r (LineCur[X], mm3);
+            psllw_i2r (2, mm0);
+            psllw_i2r (2, mm1);
+            punpcklbw_m2r (mm_cpool[0], mm2);
+            punpckhbw_m2r (mm_cpool[0], mm3);
+            psllw_i2r (1, mm2);
+            psllw_i2r (1, mm3);
+            paddw_r2r (mm2, mm0);
+            paddw_r2r (mm3, mm1);
+            movq_m2r (Line[X], mm2);
+            movq_m2r (Line[X], mm3);
+            punpcklbw_m2r (mm_cpool[0], mm2);
+            punpckhbw_m2r (mm_cpool[0], mm3);
+            movq_r2m (mm4, Line[X]);
+            punpcklbw_m2r (mm_cpool[0], mm4);
+            punpckhbw_m2r (mm_cpool[0], mm5);
+            psubusw_r2r (mm2, mm0);
+            psubusw_r2r (mm3, mm1);
+            movq_m2r (LineCur2D[X], mm2);
+            movq_m2r (LineCur2D[X], mm3);
+            punpcklbw_m2r (mm_cpool[0], mm2);
+            punpckhbw_m2r (mm_cpool[0], mm3);
+            psubusw_r2r (mm2, mm0);
+            psubusw_r2r (mm3, mm1);
+            psrlw_i2r (3, mm0);
+            psrlw_i2r (3, mm1);
+            psubw_r2r (mm6, mm4);
+            psubw_r2r (mm7, mm5);
+            packuswb_r2r (mm1,mm0);
+            movq_r2r (mm4, mm6);
+            movq_r2r (mm5, mm7);
+            pcmpgtw_m2r (mm_lthr, mm4);
+            pcmpgtw_m2r (mm_lthr, mm5);
+            pcmpgtw_m2r (mm_hthr, mm6);
+            pcmpgtw_m2r (mm_hthr, mm7);
+            packsswb_r2r (mm5, mm4);
+            packsswb_r2r (mm7, mm6);
+            pxor_r2r (mm6, mm4);
+            movq_r2r (mm4, mm5);
+            pandn_r2r (mm0, mm4);
+            pand_m2r (LineCur[X], mm5);
+            por_r2r (mm4, mm5);
+            movq_r2m (mm5, LineCur[X]);
+        } 
+
+        for (/*X*/; X < W; X++)
+        {
+            tmp = Line[X];
+            Line[X] = LineCur[X];
             if (Threshold == 0 || ABS((int)LineCur[X] - (int)LineCur1U[X])
-                > Threshold)
-                LineOut[X] = CLAMP((LineCur1U[X] * 12 + LineCur1D[X] * 4
-                        + LinePrev[X] * 2 - LinePrev2U[X] - LinePrev2D[X])
-                         / 16, 255, 0);
-            else
-                LineOut[X] = (LineCur1U[X] + LineCur[X]) / 2;
+                > Threshold-1)
+                LineCur[X] = CLAMP((LineCur1U[X] * 4 + LineCur1D[X] * 4
+                        + LineCur[X] * 2 - tmp - LineCur2D[X])
+                         / 8, 0, 255);
+        }
         LineCur += 2 * W;
         LineCur1U += 2 * W;
         LineCur1D += 2 * W;
-        LinePrev += 2 * W;
-        LinePrev2U += 2 * W;
-        LinePrev2D += 2 * W;
-        LineOut += W;
+        LineCur2D += 2 * W;
     }
     for (X = 0; X < W; X++)
         if (Threshold == 0 || ABS((int)LineCur[X] - (int)LineCur1U[X])
-            > Threshold)
-            LineOut[X] = LineCur1U[X];
-        else
-            LineOut[X] = (LineCur1U[X] + LineCur[X]) / 2;
+            > Threshold - 1)
+            LineCur[X] = LineCur1U[X];
 }
-
 
 static int
 KernelDeint (VideoFilter * f, VideoFrame * frame)
 {
     ThisFilter *filter = (ThisFilter *) f;
-    uint8_t * tmp = filter->cur;
-
 #ifdef TIME_FILTER
     struct timeval t1;
     gettimeofday (&t1, NULL);
 #endif /* TIME_FILTER */
-/* swap prev and cur buffers */
-    filter->cur = filter->prev;
-    filter->prev = tmp;
-
-    if(filter->first)
+        (filter->filtfunc)(frame->buf, filter->line, filter->width,
+                           filter->height, filter->threshold);
+    if (!filter->skipchroma)
     {
-        memcpy (filter->prev, frame->buf, filter->isize);
-        filter->first = 0;
+        (filter->filtfunc)(frame->buf + filter->uoff, filter->line,
+                           filter->cwidth, filter->cheight, filter->threshold);
+        (filter->filtfunc)(frame->buf + filter->voff, filter->line,
+                           filter->cwidth, filter->cheight, filter->threshold);
     }
-    memcpy (filter->cur, frame->buf, filter->isize);
-
-    if (filter->yfilt)
-        (filter->yfilt)(filter->prev, filter->cur, frame->buf, filter->width,
-                        filter->height, filter->threshold);
-    if (filter->cfilt)
-    {
-        (filter->cfilt)(filter->prev + filter->uoff,
-                        filter->cur + filter->uoff, frame->buf + filter->uoff,
-                        filter->cwidth, filter->cheight, filter->threshold);
-        (filter->cfilt)(filter->prev + filter->ivoff,
-                        filter->cur + filter->ivoff,
-                        frame->buf + filter->ovoff,
-                        filter->cwidth, filter->cheight, filter->threshold);
-    }
-    frame->codec = FMT_YV12;
-    frame->size = filter->osize;
+    if (filter->mm_flags)
+        emms();
 #ifdef TIME_FILTER
     struct timeval t2;
     gettimeofday (&t2, NULL);
@@ -327,8 +397,7 @@ KernelDeint (VideoFilter * f, VideoFrame * frame)
 void
 CleanupKernelDeintFilter (VideoFilter * filter)
 {
-    free (((ThisFilter *)filter)->prev);
-    free (((ThisFilter *)filter)->cur);
+    free (((ThisFilter *)filter)->line);
 }
 
 VideoFilter *
@@ -337,18 +406,12 @@ NewKernelDeintFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
 {
     ThisFilter *filter;
     int numopts;
-    int bttv_broken;
-    (void) options;
 
-    if (outpixfmt != FMT_YV12)
+    if ( inpixfmt != outpixfmt ||
+        (inpixfmt != FMT_YV12 && inpixfmt != FMT_YUV422P) )
     {
-        fprintf (stderr, "KernelDeint: only YV12 output supported\n");
-        return NULL;
-    }
-
-    if (inpixfmt != FMT_YV12 && inpixfmt != FMT_YUV422P)
-    {
-        fprintf (stderr, "KernelDeint: only YV12 and YUV422P input supported\n");
+        fprintf (stderr, "KernelDeint: valid format conversions are"
+                 " YV12->YV12 or YUV422P->YUV422P\n");
         return NULL;
     }
 
@@ -359,53 +422,41 @@ NewKernelDeintFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
         return NULL;
     }
     
-    numopts = sscanf(options, "%d:%d", &(filter->threshold), &bttv_broken);
+    numopts = options ? sscanf(options, "%d:%d", &(filter->threshold), &(filter->skipchroma)) : 0;
     if (numopts < 2)
-        bttv_broken = 0;
+        filter->skipchroma = 1;
     if (numopts < 1)
         filter->threshold = 12;
 
+    filter->mm_flags = mm_support();
     filter->width = *width;
     filter->height = *height;
     filter->cwidth = *width / 2;
     filter->uoff = *width * *height;
-    filter->osize = *width * *height * 3 / 2;
-    filter->yfilt = &KDP;
+    if (filter->mm_flags & MM_MMX)
+        filter->filtfunc = &KDP_MMX;
+    else
+        filter->filtfunc = &KDP;
     switch (inpixfmt)
     {
         case FMT_YUV422P:
-            filter->ivoff = filter->uoff + *width * *height / 2;
-            filter->ovoff = filter->uoff + *width * *height / 4;
-            filter->isize = *width * *height * 2;
+            filter->voff = filter->uoff + *width * *height / 2;
+            filter->size = *width * *height * 2;
             filter->cheight = *height;
-            filter->cfilt = &KDPD;
             break;
         case FMT_YV12:
-            filter->ivoff = filter->uoff + *width * *height / 4;
-            filter->ovoff = filter->ivoff;
-            filter->isize = *width * *height * 3 / 2;
+            filter->voff = filter->uoff + *width * *height / 4;
+            filter->size = *width * *height * 3 / 2;
             filter->cheight = *height / 2;
-            if (bttv_broken)
-                filter->cfilt = NULL;
-            else
-                filter->cfilt = &KDP;
             break;
         default:
             ;
     }
 
-    filter->prev = malloc(filter->isize);
-    if (filter->prev == NULL)
+    filter->line = malloc(*width);
+    if (filter->line == NULL)
     {
-        fprintf (stderr, "KernelDeint: failed to allocate frame buffer.\n");
-        free (filter);
-        return NULL;
-    }
-    filter->cur = malloc(filter->isize);
-    if (filter->cur == NULL)
-    {
-        fprintf (stderr, "KernelDeint: failed to allocate frame buffer.\n");
-        free (filter->prev);
+        fprintf (stderr, "KernelDeint: failed to allocate line buffer.\n");
         free (filter);
         return NULL;
     }
@@ -421,8 +472,8 @@ NewKernelDeintFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
 
 static FmtConv FmtList[] =
 {
-    { FMT_YUV422P, FMT_YV12 },
     { FMT_YV12, FMT_YV12 },
+    { FMT_YUV422P, FMT_YUV422P },
     FMT_NULL
 };
 

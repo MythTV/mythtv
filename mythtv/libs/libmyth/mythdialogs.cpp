@@ -118,7 +118,13 @@ void MythMainWindow::ExitToMainMenu(void)
     {
         if (current->name() != QString("mainmenu"))
         {
-            if (MythDialog *dial = dynamic_cast<MythDialog*>(current))
+            if (current->name() == QString("video playback window"))
+            {
+                MythEvent *me = new MythEvent("EXIT_TO_MENU");
+                QApplication::postEvent(current, me);
+                exitingtomain = true;
+            }
+            else if (MythDialog *dial = dynamic_cast<MythDialog*>(current))
             {
                 QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, Key_Escape, 
                                                0, Qt::NoButton);

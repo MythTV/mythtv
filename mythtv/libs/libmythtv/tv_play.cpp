@@ -129,7 +129,8 @@ void TV::Init(bool createWindow)
 
     if (createWindow)
     {
-        myWindow = new MythDialog(gContext->GetMainWindow(), "tv playback");
+        myWindow = new MythDialog(gContext->GetMainWindow(), 
+                                  "video playback window");
         myWindow->installEventFilter(this);
         myWindow->setNoErase();
         myWindow->show();
@@ -848,6 +849,11 @@ bool TV::eventFilter(QObject *o, QEvent *e)
         {
             if (nvp)
                 nvp->ExposeEvent();
+            return true;
+        }
+        case MythEvent::MythEventMessage:
+        {
+            customEvent((QCustomEvent *)e);
             return true;
         }
         default:
@@ -2398,6 +2404,11 @@ void TV::customEvent(QCustomEvent *e)
                 wantsToQuit = false;
                 exitPlayer = true;
             }
+        }
+        else if (message.left(12) == "EXIT_TO_MENU")
+        {
+            wantsToQuit = true;
+            exitPlayer = true;
         }
     }
 }
