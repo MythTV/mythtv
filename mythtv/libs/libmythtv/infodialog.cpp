@@ -100,7 +100,7 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, MythMainWindow *parent,
         recordstatus == kWeekslotRecord)
     {
         msg = tr("Record this program in this timeslot every week");
-        rt = kWeekslotRecord;
+        rt = kTimeslotRecord;
     }
     else if (programtype == 1)
     {
