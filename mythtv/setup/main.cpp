@@ -362,8 +362,15 @@ int main(int argc, char *argv[])
 
     setupSources();
 
+    cout << endl << endl;
     cout << "Now, please run mythfilldatabase to populate the database with "
             "info.\n";
+    cout << endl;
+    cout << "If your xmltv grabber doesn't provide channel numbers "
+            "(like tv_grab_uk),\n";
+    cout << "or you want more options on how channels are inserted into the "
+         << "database, please\n";
+    cout << "run 'mythfilldatabase --manual' instead.\n";
 
     return 0;
 }
