@@ -442,7 +442,6 @@ void MfdInterface::swapMetadata(int which_mfd, MfdContentCollection *new_collect
     
     if(old_collection)
     {
-        //cout << "swapped in new collection for old" << endl;
         mfd_collections.remove(which_mfd);
     }
     else

@@ -39,6 +39,7 @@ DaapInput::DaapInput(MFDServicePlugin *owner, QUrl a_url, DaapServerType l_daap_
     range_begin = 0;
     range_end = 0;
     connection_count = 0;
+    headers.setAutoDelete(true);
     
     //
     //  parse out my url
@@ -388,6 +389,12 @@ void DaapInput::eatThroughHeadersAndGetToPayload()
 {
 
     //
+    //  Clean out any headers that might be lying around from a previous open/seek/whatever
+    //
+    
+    headers.clear();
+
+    //
     //  NB. This code assumes all the headers will be in the first block. If
     //  you think that sucks, you're probably right. Feel free to improve
     //  it.
@@ -632,6 +639,7 @@ void DaapInput::eatThroughHeadersAndGetToPayload()
         range_begin = 0;
         range_end = 0;
     }
+    
 }
 
 int DaapInput::readLine(int *parse_point, char *parsing_buffer, char *raw_response, int raw_length)
@@ -711,5 +719,6 @@ DaapInput::~DaapInput()
         delete socket_to_daap_server;
         socket_to_daap_server = NULL;
     }
+    headers.clear();
 }
 

@@ -69,6 +69,8 @@ void DaapServer::handleIncoming(HttpInRequest *http_request, int client_id)
 
     //
     //  Start to build up the request by parsing the path of the request.
+    //  This also figures out the User Agent (ie. client is another mythbox,
+    //  iTunes, etc.)
     //
     
     parsePath(http_request, daap_request);
@@ -90,7 +92,7 @@ void DaapServer::handleIncoming(HttpInRequest *http_request, int client_id)
     
     else if( daap_request->getRequestType() == DAAP_REQUEST_SERVINFO )
     {
-        sendServerInfo(http_request);
+        sendServerInfo(http_request, daap_request);
         delete daap_request;
         daap_request = NULL;
         return;
@@ -316,23 +318,94 @@ void DaapServer::parsePath(HttpInRequest *http_request, DaapRequest *daap_reques
         http_request->getResponse()->setError(400);
 
     }
+    
+    //
+    //  Check the user agent header that httpd returns to take note of which
+    //  kind of client this is (for iTunes we (will) need to re-encode some
+    //  content on the fly.)
+    //
+
+    QString user_agent = http_request->getHeader("User-Agent");
+
+    if(user_agent.contains("iTunes/4"))
+    {
+
+        daap_request->setClientType(DAAP_CLIENT_ITUNES4X);
+
+        //
+        //  Try and set a specific iTunes minor version
+        //
+
+        QString sub_version_string = user_agent.section(" ",0,0);
+        sub_version_string = sub_version_string.section("/4.",1,1);
+        bool ok = true;
+        int itunes_sub_version = sub_version_string.toInt(&ok);
+        if(ok)
+        {
+            if(itunes_sub_version == 1)
+            {
+                daap_request->setClientType(DAAP_CLIENT_ITUNES41);
+            }
+            else if(itunes_sub_version == 2)
+            {
+                daap_request->setClientType(DAAP_CLIENT_ITUNES42);
+            }
+            else if(itunes_sub_version == 5)
+            {
+                daap_request->setClientType(DAAP_CLIENT_ITUNES45);
+            }
+            else
+            {
+                warning(QString("daapserver does not yet have "
+                                "specific code for this version of "
+                                "iTunes: 4.%1").arg(itunes_sub_version));
+            }
+        }
+        else
+        {
+            warning("could not determine iTunes minor version");
+        }
+
+    }
+    else if(user_agent.contains("MythTV/1"))
+    {
+        daap_request->setClientType(DAAP_CLIENT_MFDDAAPCLIENT);
+    }
+
+
+    
 }
 
 
 
 
-void DaapServer::sendServerInfo(HttpInRequest *http_request)
+void DaapServer::sendServerInfo(HttpInRequest *http_request, DaapRequest *daap_request)
 {
-    Version daapVersion( 3, 0 );
-    Version dmapVersion( 1, 0 );
+    Version daapVersion3( 3, 0 );
+    Version daapVersion2( 2, 0 );
+    Version dmapVersion1( 1, 0 );
  
     TagOutput response;
     
     response << Tag('msrv') 
                 << Tag('mstt') << (u32) DAAP_OK << end 
-                << Tag('mpro') << dmapVersion << end 
-                << Tag('apro') << daapVersion << end 
-                << Tag('minm') << service_name.utf8() << end 
+                << Tag('mpro') << dmapVersion1 << end;
+                
+                //
+                //  Send a daap version number that the client _wants_ to
+                //  get
+                //
+                
+                if(daap_request->getClientType() == DAAP_CLIENT_ITUNES45)
+                {
+                    response << Tag('apro') << daapVersion3 << end ;
+                }
+                else
+                {
+                    response << Tag('apro') << daapVersion2 << end ;
+                }
+                
+    response    << Tag('minm') << service_name.utf8() << end 
                 << Tag('mslr') << (u8) 0 << end 
                 << Tag('msal') << (u8) 0 << end 
                 << Tag('mstm') << (u32) 1800 << end 
@@ -398,38 +471,6 @@ void DaapServer::sendLogin(HttpInRequest *http_request, u32 session_id)
 
 void DaapServer::parseVariables(HttpInRequest *http_request, DaapRequest *daap_request)
 {
-    //
-    //  Check the user agent header that httpd returns to take note of which
-    //  kind of client this is (for iTunes we (will) need to re-encode some
-    //  content on the fly.)
-    //
-
-    QString user_agent = http_request->getHeader("User-Agent");
-
-    if(user_agent.contains("iTunes/4"))
-    {
-
-        daap_request->setClientType(DAAP_CLIENT_ITUNES4X);
-
-        //
-        //  See if it's version 4.5
-        //
-        
-        QString version_string = user_agent.section(" ",0,0);
-        version_string = version_string.section("/",1,1);
-        bool ok = true;
-        float itunes_version = version_string.toFloat(&ok);
-        if(ok && itunes_version == 4.5)
-        {
-            daap_request->setClientType(DAAP_CLIENT_ITUNES45);
-        }
-    }
-    else if(user_agent.contains("MythTV/1"))
-    {
-        daap_request->setClientType(DAAP_CLIENT_MFDDAAPCLIENT);
-    }
-
-
     //
     //  This goes through the data that came in on the client request and
     //  assigns useful data to our DaapRequest object
@@ -1129,15 +1170,15 @@ void DaapServer::sendDatabaseItem(HttpInRequest *http_request, u32 song_id, Daap
     {
         if(which_one->getType() == MDT_audio)
         {
-            //
-            //  Although it makes little sense to set the Content-Type to
-            //  application/x-dmap-tagged when we're about to stream a file,
-            //  that's what iTunes does ... so that's what we do
-            //
+            // http_request->printHeaders();   //  If you want to see the request
 
-            //  http_request->printHeaders();   //  If you want to see the request
+            //
+            //  All daap responses must be dmap-tagged, even those (such as
+            //  this) where we are _not_ sending and DMAP.
+            //
 
             http_request->getResponse()->addHeader("Content-Type: application/x-dmap-tagged");
+
 
             AudioMetadata *which_audio = (AudioMetadata*)which_one;
             QString file_path = which_audio->getFilePath();
@@ -1163,6 +1204,7 @@ void DaapServer::sendDatabaseItem(HttpInRequest *http_request, u32 song_id, Daap
                             .arg(http_request->getHeader("Range")));
                     skip = 0;
                 }
+                
             }
             
             //

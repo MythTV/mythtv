@@ -251,10 +251,17 @@ void HttpInRequest::printHeaders()
     cout << "==============================Debugging output==============================" << endl;
     cout << "HTTP request contained the following headers:" << endl;
 
-    QDictIterator<HttpHeader> iterator( headers );
-    for( ; iterator.current(); ++iterator )
+    if(headers.count() > 0)
     {
-        cout << "\t" << iterator.currentKey() << ": " << iterator.current()->getValue() << endl;
+        QDictIterator<HttpHeader> iterator( headers );
+        for( ; iterator.current(); ++iterator )
+        {
+            cout << "\t" << iterator.currentKey() << ": " << iterator.current()->getValue() << endl;
+        }
+    }
+    else
+    {
+        cout << "\t" << "NO HEADERS" << endl;
     }
     cout << "============================================================================" << endl;
     

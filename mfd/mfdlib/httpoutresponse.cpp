@@ -305,7 +305,7 @@ void HttpOutResponse::createHeaderBlock(
                 total_possible_range > -1
               )
             {
-                QString file_range_header = QString("Content-Range: %1-%2/%3\r\n")
+                QString file_range_header = QString("Content-Range: bytes %1-%2/%3\r\n")
                                             .arg(range_begin)
                                             .arg(range_end)
                                             .arg(total_possible_range);
@@ -363,11 +363,15 @@ void HttpOutResponse::createHeaderBlock(
     addText(header_block, blank_line);
     
     
-    /*
-        Debuggin Output:
+    
+    /*    Debuggin Output:  */
    
-
-    my_request->printHeaders();
+    /*
+    
+    if(my_request)
+    {
+        my_request->printHeaders();
+    }
     cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& " << endl;
     for(uint i = 0; i < header_block->size(); i++)
     {

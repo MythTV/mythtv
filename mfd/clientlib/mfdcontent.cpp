@@ -34,6 +34,15 @@ MfdContentCollection::MfdContentCollection(int an_id)
     audio_genre_tree = new UIListGenericTree(NULL, "All by Genre");
     audio_playlist_tree = new UIListGenericTree(NULL, "All Playlists");
     audio_collection_tree =  new UIListGenericTree(NULL, "Grouped by Collection");
+
+    //
+    //  Set some core attributes
+    //
+    
+    audio_artist_tree->setAttribute(1, 1);
+    audio_genre_tree->setAttribute(1, 1);
+    audio_playlist_tree->setAttribute(1, 2);
+
 }
 
 void MfdContentCollection::addMetadata(Metadata *new_item, const QString &collection_name)
@@ -106,7 +115,7 @@ void MfdContentCollection::addPlaylist(ClientPlaylist *new_playlist, const QStri
 
     UIListGenericTree *playlist_node = new UIListGenericTree(audio_playlist_tree, new_playlist->getName());
     playlist_node->setAttribute(0, 0);  //  collection id is 0
-    playlist_node->setAttribute(1, 0); 
+    playlist_node->setAttribute(1, 2); 
     playlist_node->setAttribute(2, 0); 
 
     //
@@ -130,7 +139,6 @@ void MfdContentCollection::addPlaylist(ClientPlaylist *new_playlist, const QStri
     GenericTree *collection_node = audio_collection_tree->getChildByName(collection_name);
     if(!collection_node)
     {
-        //cout << "created collection_node" << endl;
         collection_node = new UIListGenericTree(audio_collection_tree, collection_name);
         
         //
@@ -138,7 +146,7 @@ void MfdContentCollection::addPlaylist(ClientPlaylist *new_playlist, const QStri
         //
 
         by_playlist_node = new UIListGenericTree((UIListGenericTree *)collection_node, "Playlist");
-        //cout << "created by_playlist_node" << endl;
+        by_playlist_node->setAttribute(1, 2);
     }
     else
     {
@@ -146,11 +154,13 @@ void MfdContentCollection::addPlaylist(ClientPlaylist *new_playlist, const QStri
         if(!by_playlist_node)
         {
             by_playlist_node = by_playlist_node = new UIListGenericTree((UIListGenericTree *)collection_node, "Playlist");
+            by_playlist_node->setAttribute(1, 2);
         }
     }
 
     UIListGenericTree *collection_playlist_node = new UIListGenericTree((UIListGenericTree *)by_playlist_node, new_playlist->getName());
-
+    collection_playlist_node->setAttribute(1, 2);
+    
     //
     //  Iterate over the entries in this playlist
     //
@@ -192,7 +202,7 @@ void MfdContentCollection::addItemToAudioArtistTree(AudioMetadata *item, Generic
     {
         artist_node = new UIListGenericTree((UIListGenericTree *) starting_point, artist);
         artist_node->setAttribute(0, 0);
-        artist_node->setAttribute(1, 0);
+        artist_node->setAttribute(1, 1);
         artist_node->setAttribute(2, 0);
     }
 
@@ -202,7 +212,7 @@ void MfdContentCollection::addItemToAudioArtistTree(AudioMetadata *item, Generic
     {
         album_node = new UIListGenericTree((UIListGenericTree *) artist_node, album);
         album_node->setAttribute(0, 0);
-        album_node->setAttribute(1, 0);
+        album_node->setAttribute(1, 1);
         album_node->setAttribute(2, 0);
     }
             
@@ -231,7 +241,7 @@ void MfdContentCollection::addItemToAudioGenreTree(AudioMetadata *item, GenericT
     {
         genre_node = new UIListGenericTree((UIListGenericTree *)starting_point, genre);
         genre_node->setAttribute(0, 0);
-        genre_node->setAttribute(1, 0);
+        genre_node->setAttribute(1, 1);
         genre_node->setAttribute(2, 0);
     }
 
@@ -240,7 +250,7 @@ void MfdContentCollection::addItemToAudioGenreTree(AudioMetadata *item, GenericT
     {
         artist_node = new UIListGenericTree((UIListGenericTree *)genre_node, artist);
         artist_node->setAttribute(0, 0);
-        artist_node->setAttribute(1, 0);
+        artist_node->setAttribute(1, 1);
         artist_node->setAttribute(2, 0);
     }
 
@@ -249,7 +259,7 @@ void MfdContentCollection::addItemToAudioGenreTree(AudioMetadata *item, GenericT
     {
         album_node = new UIListGenericTree((UIListGenericTree *) artist_node, album);
         album_node->setAttribute(0, 0);
-        album_node->setAttribute(1, 0);
+        album_node->setAttribute(1, 1);
         album_node->setAttribute(2, 0);
     }
             
@@ -276,7 +286,7 @@ void MfdContentCollection::addItemToAudioCollectionTree(AudioMetadata *item, con
     //
     // By Collection --> Genre/Artist, etc.
     //
-            
+    
     GenericTree *collection_node = audio_collection_tree->getChildByName(collection_name);
     if(!collection_node)
     {
@@ -287,7 +297,9 @@ void MfdContentCollection::addItemToAudioCollectionTree(AudioMetadata *item, con
         //
 
         by_artist_node = new UIListGenericTree((UIListGenericTree *)collection_node, "By Artist");
+        by_artist_node->setAttribute(1, 1);
         by_genre_node = new UIListGenericTree((UIListGenericTree *)collection_node, "By Genre");
+        by_genre_node->setAttribute(1, 1);
     }
     else
     {

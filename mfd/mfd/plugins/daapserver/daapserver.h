@@ -35,7 +35,7 @@ class DaapServer: public MFDHttpPlugin
 
     void    handleIncoming(HttpInRequest *request, int client_id);
     void    parsePath(HttpInRequest *http_request, DaapRequest *daap_request);
-    void    sendServerInfo(HttpInRequest *http_request);
+    void    sendServerInfo(HttpInRequest *http_request, DaapRequest *daap_request);
     void    sendContentCodes(HttpInRequest *http_request);
     void    sendTag(HttpInRequest *http_request, const Chunk& c);
     void    sendLogin(HttpInRequest *http_request, u32 session_id);
