@@ -479,8 +479,9 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         m_parent->SetFileLength((int)(secs), (int)(secs * fps));
 
         // we will not see a position map from db or remote encoder,
-        // so might as well use index by frames
-        keyframedist = 1;
+        // set the gop interval to 15 frames.  if we guess wrong, the
+        // auto detection will change it.
+        keyframedist = 15;
     }
 
     //if (livetv || watchingrecording)
