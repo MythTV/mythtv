@@ -99,7 +99,7 @@ Metadata* MetaIO::readFromFilename(QString filename, bool blnLength)
     if (blnLength)
         length = getTrackLength(filename);
  
-    Metadata *retdata = new Metadata(filename, artist, album, title, genre,
+    Metadata *retdata = new Metadata(filename, artist, "", album, title, genre,
                                      0, tracknum, length);
 
     return retdata;
