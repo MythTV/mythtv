@@ -427,6 +427,8 @@ class SelectManagedListSetting : public ManagedListSetting
                 else
                     return selectItem->addSelection(label, value);
             }
+            
+            return NULL;
         }
 
         ManagedListItem* addSelection(const QString& label, int value, bool trans = true ) 
