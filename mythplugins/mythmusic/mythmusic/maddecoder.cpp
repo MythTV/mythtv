@@ -694,7 +694,7 @@ Metadata *MadDecoder::getMetadata(QSqlDatabase *db)
                 {
                     vbr = true;
                 }
-                if(amount_checked == 32)
+                if(amount_checked == 32 && !vbr)
                 {
                     alt_length = (s.st_size * 8) / (old_bitrate / 1000);
                     loop_de_doo = false;
