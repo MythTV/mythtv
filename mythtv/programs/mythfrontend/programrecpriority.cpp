@@ -186,6 +186,8 @@ void ProgramRecPriority::keyPressEvent(QKeyEvent *e)
                 changeRecPriority(1);
             else if (action == "LEFT")
                 changeRecPriority(-1);
+            else if ((action == "PAUSE") || (action == "PLAYBACK"))
+                deactivate();
             else if (action == "ESCAPE")
             {
                 saveRecPriority();
@@ -470,7 +472,7 @@ void ProgramRecPriority::edit(void)
             recid = rec->getRecordID(db);
 
         thequery = QString(
-                   "SELECT recpriority, type FROM record WHERE recordid = %1;")
+                   "SELECT recpriority, type, inactive FROM record WHERE recordid = %1;")
                            .arg(recid);
         QSqlQuery query = db->exec(thequery);
 
@@ -480,6 +482,7 @@ void ProgramRecPriority::edit(void)
                 query.next();
                 int recPriority = query.value(0).toInt();
                 int rectype = query.value(1).toInt();
+                int inactive = query.value(2).toInt();
 
                 int cnt;
                 QMap<QString, ProgramRecPriorityInfo>::Iterator it;
@@ -513,6 +516,9 @@ void ProgramRecPriority::edit(void)
                 QString key = progInfo->MakeUniqueKey(); 
                 origRecPriorityData[key] = progInfo->recpriority;
 
+                // also set the active/inactive state
+                progInfo->recstatus = inactive ? rsInactive : rsWillRecord;
+
                 SortList();
             }
             else
@@ -543,6 +549,64 @@ void ProgramRecPriority::edit(void)
         else
             MythContext::DBError("Get new recording priority query", query);
 
+        update(fullRect);
+    }
+}
+
+void ProgramRecPriority::deactivate(void)
+{
+    if (!curitem)
+        return;
+
+    ProgramRecPriorityInfo *rec = curitem;
+
+    MythContext::KickDatabase(db);
+
+    if (rec)
+    {
+        QString thequery;
+
+        thequery = QString("SELECT inactive FROM record WHERE recordid = %1")
+                           .arg(rec->recordid);
+
+        QSqlQuery query = db->exec(thequery);
+
+        int inactive = 0;
+        if (query.isActive())
+            if (query.numRowsAffected() > 0)
+            {
+                query.next();
+                inactive = query.value(0).toInt();
+                if (inactive)
+                    inactive = 0;
+                else
+                    inactive = 1;
+
+                QString theupdatequery;
+                theupdatequery = QString("UPDATE record SET inactive = %1 WHERE recordid = %2")
+                                         .arg(inactive).arg(rec->recordid);
+
+                QSqlQuery uquery = db->exec(theupdatequery);
+
+                if (uquery.isActive())
+                {
+                    ScheduledRecording::signalChange(db);
+                    int cnt;
+                    QMap<QString, ProgramRecPriorityInfo>::Iterator it;
+                    ProgramRecPriorityInfo *progInfo;
+
+                    // iterate through programData till we hit the line where
+                    // the cursor currently is
+                    for (cnt = 0, it = programData.begin(); cnt < inList+inData;
+                         cnt++, ++it);
+                    progInfo = &(it.data());
+                    progInfo->recstatus = inactive ? rsInactive : rsWillRecord;
+                } else
+                    MythContext::DBError("Update recording schedule inactive query", uquery);
+            }
+
+        QPainter p(this);
+        updateInfo(&p);
         update(fullRect);
     }
 }
@@ -646,7 +710,8 @@ void ProgramRecPriority::FillList(void)
     // it all at once than once per program)
     QString query = QString("SELECT recordid, record.title, record.chanid, "
                             "record.starttime, record.startdate, "
-                            "record.type, channel.recpriority "
+                            "record.type, channel.recpriority,  "
+                            "record.inactive "
                             "FROM record "
                             "LEFT JOIN channel ON "
                             "(record.chanid = channel.chanid);");
@@ -669,6 +734,7 @@ void ProgramRecPriority::FillList(void)
             RecordingType recType = (RecordingType)result.value(5).toInt();
             int channelRecPriority = result.value(6).toInt();
             int recTypeRecPriority = rtRecPriors[recType-1];
+            int inactive = result.value(7).toInt();
 
             if (recType == kAllRecord || recType == kFindOneRecord ||
                 recType == kFindDailyRecord || recType == kFindWeeklyRecord)
@@ -689,6 +755,7 @@ void ProgramRecPriority::FillList(void)
                     progInfo->channelRecPriority = channelRecPriority;
                     progInfo->recTypeRecPriority = recTypeRecPriority;
                     progInfo->recType = recType;
+                    progInfo->recstatus = inactive ? rsInactive : rsWillRecord;
                     matches++;
                     break;
                 }
@@ -929,6 +996,9 @@ void ProgramRecPriority::updateList(QPainter *p)
                             curitem = new ProgramRecPriorityInfo(*progInfo);
                             ltype->SetItemCurrent(cnt);
                         }
+
+                        if (progInfo->recstatus == rsInactive)
+                            ltype->EnableForcedFont(cnt, "inactive");
 
                         ltype->SetItemText(cnt, 1, progInfo->RecTypeChar());
                         ltype->SetItemText(cnt, 2, tempSubTitle);

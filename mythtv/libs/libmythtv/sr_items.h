@@ -320,6 +320,7 @@ class SRSchedOptionsGroup : public ManagedListGroup
     protected:
 
         friend class SRRootGroup;
+        class SRInactive* inactive;
         class SRRecPriority* recPriority;
         class SRStartOffset* startOffset;
         class SREndOffset* endOffset;
@@ -623,7 +624,17 @@ class SRAutoExpire: public SRBoolSetting
         }
 };
 
-
+class SRInactive: public SRBoolSetting
+{
+    public:
+        SRInactive(ScheduledRecording& _parent, ManagedListGroup* _group, ManagedList* _list)
+                    : SRBoolSetting(_parent, QObject::tr("This recording schedule is inactive"), 
+                                     QObject::tr("This recording schedule is active"),
+                                    "inactiveItem", "inactive", _group, _list )
+        {
+            _parent.setInactiveObj(this);
+        }
+};
 
 class SRMaxNewest: public SRBoolSetting
 {

@@ -11,6 +11,9 @@ SRSchedOptionsGroup::SRSchedOptionsGroup(ScheduledRecording& _rec, ManagedList* 
                                        _parent, "schedOpts"),
                      schedRec(_rec)
 {
+    inactive = new SRInactive(_rec, this, _parentList);
+    addItem(inactive->getItem(), -1);
+
     recPriority = new SRRecPriority(_rec, this, _parentList);
     addItem(recPriority->getItem(), -1);
 

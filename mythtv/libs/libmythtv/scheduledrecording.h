@@ -15,7 +15,7 @@ class QSqlDatabase;
 class RootSRGroup;
 class RecOptDialog;
 
-
+class SRInactive;
 class SRRecordingType;
 class SRRecSearchType;
 class SRProfileSelector;
@@ -117,6 +117,7 @@ public:
 
     static void signalChange(QSqlDatabase* db);
     
+    void setInactiveObj(SRInactive* val) {inactive = val;}
     void setRecTypeObj(SRRecordingType* val) {type = val;}
     void setSearchTypeObj(SRRecSearchType* val) {search = val;}
     void setProfileObj( SRProfileSelector* val) {profile = val;}
@@ -179,6 +180,7 @@ protected:
     };
 
     ID* id;
+    class SRInactive* inactive;
     class SRRecordingType* type;
     class SRRecSearchType* search;
     class SRProfileSelector* profile;

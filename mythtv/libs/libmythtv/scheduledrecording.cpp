@@ -38,6 +38,7 @@ ScheduledRecording::ScheduledRecording()
     m_dialog = NULL;
     recpriority = NULL;
     recgroup = NULL;
+    inactive = NULL;
     searchType = "";
     searchForWhat = "";
         
@@ -731,6 +732,8 @@ void ScheduledRecording::setDefault(QSqlDatabase *db, bool haschannel)
 
     recgroup->fillSelections(db);    
     recgroup->setValue("Default");
+
+    inactive->setValue(0);
 }
 
 void ScheduledRecording::setProgram(ProgramInfo *proginfo, QSqlDatabase* db)
@@ -791,6 +794,7 @@ void ScheduledRecording::makeOverride(void)
     endoffset->setChanged();
     recpriority->setChanged();
     recgroup->setChanged();
+    inactive->setChanged();
 }
 
 

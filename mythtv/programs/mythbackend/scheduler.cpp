@@ -1401,7 +1401,7 @@ void Scheduler::AddNewRecords(void) {
 "channel.commfree, capturecard.cardid, "
 "cardinput.cardinputid, UPPER(cardinput.shareable) = 'Y' AS shareable, "
 "program.seriesid, program.programid, program.category_type, "
-"program.airdate, program.stars, program.originalairdate, ")
+"program.airdate, program.stars, program.originalairdate, record.inactive, ")
 + progfindid + QString(
 
 "FROM record, program ") + fromclauses[clause] + QString(
@@ -1565,7 +1565,8 @@ void Scheduler::AddNewRecords(void) {
         else
             p->originalAirDate = QDate::fromString(result.value(30).toString(), Qt::ISODate);
 
-        p->findid = result.value(33).toInt();
+        bool inactive = result.value(33).toInt();
+        p->findid = result.value(34).toInt();
 
         if (!recTypeRecPriorityMap.contains(p->rectype))
             recTypeRecPriorityMap[p->rectype] = 
@@ -1633,6 +1634,10 @@ void Scheduler::AddNewRecords(void) {
                 result.value(14).toInt())
                 p->recstatus = rsCurrentRecording;
         }
+
+        if (inactive)
+            p->recstatus = rsInactive;
+
         tmpList.push_back(p);
     }
 

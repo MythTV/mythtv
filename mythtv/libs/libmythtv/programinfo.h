@@ -72,7 +72,7 @@ enum RecStatusType {
     rsConflict = 7,
     rsLaterShowing = 8,
     rsRepeat = 9,
-    //rsUnused = 10,
+    rsInactive = 10,
     rsLowDiskSpace = 11,
     rsTunerBusy = 12
 };

@@ -1899,6 +1899,8 @@ QString ProgramInfo::RecStatusChar(void)
         return QObject::tr("K", "RecStatusChar");
     case rsTunerBusy:
         return QObject::tr("B", "RecStatusChar");
+    case rsInactive:
+        return QObject::tr("i", "RecStatusChar");
     default:
         return "-";
     }
@@ -1944,6 +1946,8 @@ QString ProgramInfo::RecStatusText(void)
             return QObject::tr("Tuner Busy");
         case rsRepeat:
             return QObject::tr("Repeat");            
+        case rsInactive:
+            return QObject::tr("Inactive");
         default:
             return QObject::tr("Unknown");
         }
@@ -2012,6 +2016,9 @@ QString ProgramInfo::RecStatusDesc(void)
         case rsRepeat:
             message += QObject::tr("this episode is a repeat.");
             break;            
+        case rsInactive:
+            message += QObject::tr("this recording schedule is inactive.");
+            break;
         case rsTooManyRecordings:
             message += QObject::tr("too many recordings of this program have "
                                    "already been recorded.");
@@ -2631,6 +2638,7 @@ void ProgramInfo::handleNotRecording(QSqlDatabase *db)
              recstatus == rsCurrentRecording ||
              recstatus == rsEarlierShowing ||
              recstatus == rsRepeat ||
+             recstatus == rsInactive ||
              recstatus == rsLaterShowing))
         {
             diag.AddButton(QObject::tr("Record anyway"));
