@@ -67,8 +67,8 @@ void AutoExpire::RunExpirer(void)
 
             FillExpireList();
 
-            while ((freespace < minFree) &&
-                   (expireList.size() > 0))
+            if ((freespace < minFree) &&
+                (expireList.size() > 0))
             {
                 // delete the "first" item on our list (really off the end)
                 ProgramInfo *pginfo = expireList.back();
@@ -84,7 +84,7 @@ void AutoExpire::RunExpirer(void)
                                    .arg(pginfo->chanid)
                                    .arg(pginfo->startts.toString(Qt::ISODate));
                 MythEvent me(message);
-                gContext->dispatchNow(me);
+                gContext->dispatch(me);
 
                 delete pginfo;
                 expireList.erase(expireList.end() - 1);
@@ -98,13 +98,13 @@ void AutoExpire::RunExpirer(void)
 
             if (freespace < minFree)
             {
-                msg = QString("WARNING: Unable to free enough space, only %1 "
+                msg = QString("WARNING: Not enough space freed, only %1 "
                               "Gigs free but need %2.")
                               .arg(freespace).arg(minFree);
             }
             else
             {
-                msg = QString("Done AutoExpire, %1 Gigs now free.")
+                msg = QString("AutoExpire successful, %1 Gigs now free.")
                               .arg(freespace);
             }
 
