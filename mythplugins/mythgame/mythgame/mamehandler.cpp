@@ -908,8 +908,19 @@ void MameHandler::makecmd_line(const char * game, QString *exec, MameRomInfo * r
         {
           if (xmame_minor < 62) {
             *exec+= " -spooldir ";
-            *exec+= general_prefs.highscore_dir;
+         } else {
+            *exec+= " -hiscore_directory ";
+         }
+         *exec+= general_prefs.highscore_dir;
+        }
+        if (!general_prefs.highscore_file.isEmpty())
+        {
+          if (xmame_minor < 62) {
+            *exec+= " -hiscorefile ";
+          } else {
+            *exec+= " -hiscore_file ";
           }
+          *exec+= general_prefs.highscore_file;
         }
 
         // The .65 builds of mame finally allow you to turn off the disclaimer
@@ -985,7 +996,8 @@ void MameHandler::SetGeneralPrefs()
     general_prefs.xmame_exe = gContext->GetSetting("XMameBinary");
     //general_prefs.rom_dir = gContext->GetSetting("MameRomLocation");
     general_prefs.screenshot_dir = gContext->GetSetting("MameScreensLocation");
-    general_prefs.highscore_dir = gContext->GetSetting("MameScoresLocation");
+    general_prefs.highscore_dir = gContext->GetSetting("MameScoresDirectory");
+    general_prefs.highscore_file = gContext->GetSetting("MameScoresFile");
     general_prefs.flyer_dir = gContext->GetSetting("MameFlyersLocation");
     general_prefs.cabinet_dir = gContext->GetSetting("MameCabinetsLocation");
     general_prefs.game_history_file = gContext->GetSetting("MameHistoryLocation");

@@ -19,6 +19,7 @@ class Prefs
     QString rom_dir;
     QString screenshot_dir;
     QString highscore_dir;
+    QString highscore_file;
     QString flyer_dir;
     QString cabinet_dir;
     QString game_history_file;

@@ -72,14 +72,24 @@ public:
     };
 };
 
-class MameScoresLocation: public LineEditSetting, public GlobalSetting {
+class MameScoresDirectory: public LineEditSetting, public GlobalSetting {
 public:
-    MameScoresLocation():
-        GlobalSetting("MameScoresLocation") {
+    MameScoresDirectory():
+        GlobalSetting("MameScoresDirectory") {
         setLabel(QObject::tr("MAME hiscores path"));
-        setValue("/var/lib/mythgame/hiscore.dat");
-        setHelpText(QObject::tr("The path to the MAME hiscore.dat file"));
+        setValue("/var/lib/mythgame/hiscore");
+        setHelpText(QObject::tr("Directory where MAME hiscores are kept."));
     };
+};
+
+class MameScoresFile: public LineEditSetting, public GlobalSetting {
+public:
+    MameScoresFile():
+            GlobalSetting("MameScoresFile") {
+            setLabel(QObject::tr("MAME hiscores file"));
+            setValue("/var/lib/mythgame/hiscore.dat");
+            setHelpText(QObject::tr("Path to the MAME hiscore.dat file"));
+        };
 };
 
 class MameFlyersLocation: public LineEditSetting, public GlobalSetting {
@@ -285,7 +295,8 @@ MythGameSettings::MythGameSettings()
     mame->addChild(new MameRomPath());
     mame->addChild(new MameCatFile());
     mame->addChild(new MameScreensLocation());
-    mame->addChild(new MameScoresLocation());
+    mame->addChild(new MameScoresDirectory());
+    mame->addChild(new MameScoresFile());
     mame->addChild(new MameFlyersLocation());
     addChild(mame);
 
