@@ -21,7 +21,7 @@ SOURCES += common.c utils.c mem.c allcodecs.c mpegvideo.c h263.c jrevdct.c
 SOURCES += jfdctfst.c mpegaudio.c ac3enc.c mjpeg.c resample.c dsputil.c
 SOURCES += motion_est.c imgconvert.c imgresample.c msmpeg4.c mpeg12.c
 SOURCES += h263dec.c svq1.c rv10.c mpegaudiodec.c pcm.c simple_idct.c
-SOURCES += ratecontrol.c adpcm.c
+SOURCES += ratecontrol.c adpcm.c eval.c
 
 contains( CONFIG_AC3, yes ) {
     SOURCES += a52dec.c
@@ -60,4 +60,9 @@ contains( TARGET_ARCH_ALPHA, yes ) {
     OBJS += alpha/dsputil_alpha.c alpha/mpegvideo_alpha.c 
     OBJS += alpha/motion_est_alpha.c alpha/dsputil_alpha_asm.S
     QMAKE_CFLAGS_RELEASE += -Wa,-mpca56 --finline-limit=8000 -fforce-addr -freduce-all-givs
+}
+
+contains( TARGET_ARCH_POWERPC, yes ) {
+    OBJS += ppc/dsputil_altivec.c
+    QMAKE_CFLAGS_RELEASE += -faltivec
 }

@@ -56,6 +56,8 @@ extern void (*put_pixels_clamped)(const DCTELEM *block, UINT8 *pixels, int line_
 extern void (*add_pixels_clamped)(const DCTELEM *block, UINT8 *pixels, int line_size);
 extern void (*gmc1)(UINT8 *dst, UINT8 *src, int srcStride, int h, int x16, int y16, int rounder);
 extern void (*clear_blocks)(DCTELEM *blocks);
+extern int (*pix_sum)(UINT8 * pix, int line_size);
+extern int (*pix_norm1)(UINT8 * pix, int line_size);
 
 
 void get_pixels_c(DCTELEM *block, const UINT8 *pixels, int line_size);
@@ -155,6 +157,13 @@ void dsputil_init_mlib(void);
 #define __align8 __attribute__ ((aligned (8)))
 
 void dsputil_init_alpha(void);
+
+#elif defined(ARCH_POWERPC)
+
+#define emms_c()
+#define __align8 __attribute__ ((aligned (16)))
+
+void dsputil_init_altivec(void);
 
 #else
 

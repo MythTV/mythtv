@@ -22,6 +22,8 @@ using namespace std;
 pthread_mutex_t NuppelVideoRecorder::avcodeclock = PTHREAD_MUTEX_INITIALIZER;
 int NuppelVideoRecorder::numencoders = 0;
 
+static char *video_rc_eq = "tex^qComp";
+
 NuppelVideoRecorder::NuppelVideoRecorder(void)
 {
     sfilename = "output.nuv";
@@ -193,7 +195,15 @@ bool NuppelVideoRecorder::SetupAVCodec(void)
     mpa_ctx.flags = CODEC_FLAG_TYPE;
     mpa_ctx.me_method = 5;
     mpa_ctx.key_frame = -1;
-
+    mpa_ctx.rc_eq = video_rc_eq;
+    mpa_ctx.rc_max_rate = 0;
+    mpa_ctx.rc_min_rate = 0;
+    mpa_ctx.rc_buffer_size = 0;
+    mpa_ctx.i_quant_factor = 1.25;
+    mpa_ctx.b_quant_factor = 1.25;
+    mpa_ctx.i_quant_offset = 0.8;
+    mpa_ctx.b_quant_offset = 0;
+    
     if (avcodec_open(&mpa_ctx, mpa_codec) < 0)
     {
         cerr << "Unable to open FFMPEG/MPEG4 codex\n" << endl;
