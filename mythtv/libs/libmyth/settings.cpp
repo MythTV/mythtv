@@ -347,7 +347,7 @@ QWidget* RadioSetting::configWidget(QWidget* parent,
 QWidget* CheckBoxSetting::configWidget(QWidget* parent,
                                        const char* widgetName) {
     
-    QCheckBox* widget = new QCheckBox(parent, widgetName);
+    QCheckBox* widget = new MythCheckBox(parent, widgetName);
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
     widget->setText(getLabel());
     widget->setChecked(boolValue());

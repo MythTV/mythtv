@@ -13,6 +13,7 @@
 #include <qtable.h>
 #include <qbuttongroup.h>
 #include <qlistbox.h>
+#include <qcheckbox.h>
 
 #include <map>
 
@@ -110,6 +111,15 @@ class MythPushButton : public QPushButton
 
   private:
     QColor origcolor;
+};
+
+class MythCheckBox: public QCheckBox
+{
+public:
+    MythCheckBox(QWidget* parent = 0, const char* name = 0):
+        QCheckBox(parent, name) {};
+protected:
+    virtual void keyPressEvent(QKeyEvent* e);
 };
 
 class MythDialog : public QDialog

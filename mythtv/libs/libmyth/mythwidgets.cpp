@@ -33,7 +33,18 @@ void MythComboBox::keyPressEvent(QKeyEvent *e)
         break;
     default:
         e->ignore();
-        return;
+    }
+}
+
+void MythCheckBox::keyPressEvent(QKeyEvent* e)
+{
+    switch (e->key()) {
+    case Key_Left:
+    case Key_Right:
+        toggle();
+        break;
+    default:
+        e->ignore();
     }
 }
 
