@@ -3025,6 +3025,8 @@ void NuppelVideoPlayer::InitForTranscode(bool copyaudio, bool copyvideo)
     // Are these really needed?
     playing = true;
     keyframedist = 30;
+    warpfactor = 1;
+    warpfactor_avg = 1;
 
     InitVideo();
     for (int i = 0; i < MAXTBUFFER; i++)
