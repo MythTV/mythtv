@@ -1,4 +1,5 @@
 <!DOCTYPE TS><TS>
+<defaultcodec>iso8859-1</defaultcodec>
 <context>
     <name>IconView</name>
     <message>
@@ -27,42 +28,42 @@
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Fel</translation>
     </message>
     <message>
         <source>Sorry: OpenGL support not available</source>
-        <translation type="unfinished"></translation>
+        <translation>OpenGL-stöd inte tillgängligt</translation>
     </message>
     <message>
         <source>SlideShow</source>
-        <translation type="unfinished"></translation>
+        <translation>Bildspel</translation>
     </message>
     <message>
         <source>Rotate CW</source>
-        <translation type="unfinished"></translation>
+        <translation>Rotera medsols</translation>
     </message>
     <message>
         <source>Rotate CCW</source>
-        <translation type="unfinished"></translation>
+        <translation>Rotera motsols</translation>
     </message>
     <message>
         <source>Import</source>
-        <translation type="unfinished"></translation>
+        <translation>Importera</translation>
     </message>
     <message>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Inställningar</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
         <source>Directory that holds images</source>
-        <translation>Bibliotek som innehåller bilder</translation>
+        <translation>Katalog som innehåller bilder</translation>
     </message>
     <message>
         <source>This directory must exist and MythGallery needs to have read permission.</source>
-        <translation>Detta bibliotek måste finnas och Bildvisaren måste ha läsrättigheter.</translation>
+        <translation>Denna katalog måste finnas och MythGallery måste ha läsrättigheter.</translation>
     </message>
     <message>
         <source>Paths to import images from</source>
@@ -70,7 +71,7 @@
     </message>
     <message>
         <source>This is a colon separated list of paths. If the path in the list is a directory, its contents will be copied. If it is an executable, it will be run.</source>
-        <translation>Detta är en kolonseparerad lista med sökvägar. Om en sökväg i listan är ett bibliotek, kommer innehållet att kopieras från det. Om sökvägen pekar på en körbar fil, kommer den att köras.</translation>
+        <translation>Detta är en kolonseparerad lista med sökvägar. Om en sökväg i listan är en katalog kommer innehållet att kopieras från den. Om sökvägen pekar på en körbar fil, kommer den att köras.</translation>
     </message>
     <message>
         <source>Type of transition</source>
@@ -78,11 +79,11 @@
     </message>
     <message>
         <source>This is the type of transition used between pictures in slideshow mode.</source>
-        <translation>Detta är den typ av övergångseffekt som används vid uppspelning av bildspel.</translation>
+        <translation>Detta är den typ av övergångseffekt som används mellan bilder vid uppspelning av bildspel.</translation>
     </message>
     <message>
         <source>Type of background</source>
-        <translation>Bakgrund</translation>
+        <translation>Bakgrundstyp</translation>
     </message>
     <message>
         <source>This is the type of background for each picture in single view mode.</source>
@@ -98,7 +99,7 @@
     </message>
     <message>
         <source>MythGallery Settings</source>
-        <translation>Inställningar för Bildvisaren</translation>
+        <translation>Inställningar för Galleriet</translation>
     </message>
     <message>
         <source>Slideshow Delay</source>
@@ -106,27 +107,27 @@
     </message>
     <message>
         <source>Use OpenGL transitions</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd OpenGL-övergångseffekt</translation>
     </message>
     <message>
         <source>Check this to enable OpenGL based slideshow transitions</source>
-        <translation type="unfinished"></translation>
+        <translation>Kryssa i för att aktivera OpenGL-övergångseffekter</translation>
     </message>
     <message>
         <source>Type of OpenGL transition</source>
-        <translation type="unfinished"></translation>
+        <translation>Typ av OpenGL-övergångseffekt</translation>
     </message>
     <message>
         <source>This is the type of OpenGL transition used between pictures in slideshow mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Detta är den typ av OpenGL-övergångseffekt som används mellan bilder vid uppspelning av bildspel.</translation>
     </message>
     <message>
         <source>Gallery Directory does not exist or is unreadable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Katalogen med bilder existerar inte eller är oläsbar.</translation>
     </message>
     <message>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
@@ -149,7 +150,7 @@
     </message>
     <message>
         <source>Width</source>
-        <translation>Vidd</translation>
+        <translation>Bredd</translation>
     </message>
     <message>
         <source>pixels</source>
@@ -181,7 +182,7 @@
     </message>
     <message>
         <source>Folder: </source>
-        <translation type="unfinished"></translation>
+        <translation>Katalog:</translation>
     </message>
 </context>
 </TS>
