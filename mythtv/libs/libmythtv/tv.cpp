@@ -694,6 +694,9 @@ void TV::SetupRecorder(void)
     nvr->SetAudioDevice(audiodev);
     nvr->SetAudioCompression(!context->GetNumSetting("DontCompressAudio"));
 
+    nvr->SetHMJPGQuality(context->GetNumSetting("HardwareMJPEGQuality"));
+    nvr->SetHMJPGDecimation(context->GetNumSetting("HardwareMJPEGDecimation"));
+    
     nvr->Initialize();
 }
 

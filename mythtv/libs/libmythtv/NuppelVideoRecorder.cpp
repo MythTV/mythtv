@@ -286,6 +286,24 @@ void NuppelVideoRecorder::Initialize(void)
     {
         codec = "mjpeg";
         hardware_encode = true;
+        if (ntsc)
+        {
+            switch (hmjpg_decimation)
+            {
+                case 2: w = 352; h = 240; break;
+                case 4: w = 176; h = 120; break;
+                default: w = 720; h = 480; break;
+            }
+        }
+        else
+        {
+            switch (hmjpg_decimation)
+            {
+                case 2: w = 352; h = 288; break;
+                case 4: w = 176; h = 144; break;
+                default: w = 720; h = 576; break;
+            }
+        }
     }
 
     if (picture_format == PIX_FMT_YUV422P)
@@ -778,17 +796,9 @@ void NuppelVideoRecorder::DoMJPEG(void)
         return;
     }
 
-//    cout << bparm.img_width << " " << bparm.img_height << endl;
-//    cout << bparm.HorDcm << " " << bparm.VerDcm << " " << bparm.TmpDcm << endl;
-//    cout << bparm.field_per_buff << " " << bparm.img_x << " " << bparm.img_y << " " << bparm.decimation << " " << endl;
-//
-//    cout << bparm.input << " " << bparm.norm << " " << bparm.quality << endl;
-//    cout << bparm.APPn << " " << bparm.APP_len << " " << bparm.odd_even << endl;
-
-    bparm.input = 2;
-    bparm.norm = 1;
+    //bparm.input = 2;
+    //bparm.norm = 1;
     bparm.quality = hmjpg_quality;
-
     bparm.decimation = hmjpg_decimation;
 
     for (int n = 0; n < 14; n++)

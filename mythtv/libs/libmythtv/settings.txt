@@ -51,7 +51,11 @@ int MinQuality=15
 int QualDiff=3
 #
 # Hardware MJPEG specific settings
-int HardwareMJPEGQuality=90
+#
+# Quality level (0 - 100)
+int HardwareMJPEGQuality=100
+# Decimation (as in lavrec) -- overrides the video size set above.
+# 1 is 720x480, 2 is 352x240 (at least in NTSC-land).
 int HardwareMJPEGDecimation=2
 # 
 # Audio settings
