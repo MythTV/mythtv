@@ -69,10 +69,16 @@ void HttpResponse::setError(int error_number)
     all_is_well = false;
     
     //
-    //  These are all HTTP 1.1 status responses
+    //  These are all HTTP 1.1 status responses. Not strictly all *errors*,
+    //  but you get the idea.
     //
 
-    if(error_number == 400)
+    if(error_number == 204)
+    {
+        status_code = error_number;
+        status_string = "No Content";
+    }
+    else if(error_number == 400)
     {
         status_code = error_number;
         status_string = "Bad Request";
@@ -435,8 +441,16 @@ bool HttpResponse::sendBlock(MFDServiceClientSocket *which_client, std::vector<c
     {
         if(parent)
         {
-            parent->warning("httpresponse asked to sendBlock(), "
-                            "but given block of zero size");
+            if(all_is_well)
+            {
+                //
+                //  Hmmm ... we're not in an error state, but something
+                //  still tried to send an empty payload
+                //
+
+                parent->warning("httpresponse asked to sendBlock(), "
+                                "but given block of zero size");
+            }
         }
         keep_going = false;
     }
@@ -1126,6 +1140,22 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
                 {
                     parent->warning(QString("httpresponse found a hole in an "
                                             "ogg file, will try to keep going"));
+                    //
+                    //  Try up to 3 (?) times
+                    //
+                    int numb_tries = 0;
+                    while(numb_tries < 3)
+                    {
+                        len = ov_read(&ov_file, buf, buflen, 0, bits/8, 1, &section);
+                        if(len > 0)
+                        {
+                            numb_tries = 4;
+                        }
+                        else
+                        {
+                            len = 0;
+                        }
+                    }
                 }
             }
         }
