@@ -555,15 +555,12 @@ void MythNews::slotViewArticle()
         if(article)
         {
             QString cmdUrl(article->articleURL());
-            cmdUrl = QRegExp::escape(cmdUrl);
-            int i = cmdUrl.find(QRegExp("[;&]"), 0);
-            while (i != -1)
-            {
-                cmdUrl = cmdUrl.insert(i, "\\");
-                i = cmdUrl.find(QRegExp("[;&]"), i + 2); 
-            }
-            QString cmd = QString("%1 %2 %3")
-                                 .arg(browser).arg(zoom).arg(cmdUrl);
+            cmdUrl.replace('\'', "%27");
+
+            QString cmd = QString("%1 %2 '%3'")
+                 .arg(browser)
+                 .arg(zoom)
+                 .arg(cmdUrl);
             myth_system(cmd);
         }
     } 
