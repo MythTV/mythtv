@@ -3,19 +3,12 @@
 <HEAD>
  <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.20">
  <TITLE>Installing and using mythtv</TITLE>
- <LINK HREF="mythtv-HOWTO-1.html" REL=next>
-
-
 </HEAD>
 <BODY>
-<A HREF="mythtv-HOWTO-1.html">Next</A>
-Previous
-Contents
-<HR>
 <H1>Installing and using mythtv</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2003-01-01, v1.061
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2003-01-06, v1.063
 <HR>
 <EM>Initially, installation of mythtv seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -23,132 +16,2355 @@ different ways.  This document will attempt to give general installation
 instructions, as well as including distribution-specific instructions where
 necessary.</EM>
 <HR>
-<P>
-<H2><A NAME="toc1">1.</A> <A HREF="mythtv-HOWTO-1.html">How to obtain this document.</A></H2>
+<H2><A NAME="s1">1. How to obtain this document.</A></H2>
 
-<P>
-<H2><A NAME="toc2">2.</A> <A HREF="mythtv-HOWTO-2.html">Introduction.</A></H2>
+<P>This HOWTO document is maintained at the primary mythtv website:  
+<A HREF=" http://www.mythtv.org">http://www.mythtv.org</A>.  The latest version of
+this document can be found in CVS, accessible either through the 
+<A HREF="http://www.mythtv.org/cgi-bin/viewcvs.cgi/">ViewCVS</A> web interface, or directly from the
+CVS repository.  You may download the latest copy of mythtv and the 
+documentation from CVS this way:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mkdir mythtv
+$ cd mythtv
+$ cvs -d :pserver:mythtv@cvs.mythtv.org:/var/lib/cvs login
+Logging in to :pserver:mythtv@cvs.mythtv.org:/var/lib/cvs
+CVS password: mythtv
+$ cvs -z3 -d :pserver:mythtv@cvs.mythtv.org:/var/lib/cvs checkout MC
+</PRE>
+</CODE></BLOCKQUOTE>
 
-<P>
-<H2><A NAME="toc3">3.</A> <A HREF="mythtv-HOWTO-3.html">Checking prerequisites. </A></H2>
+This documentation will be in the <CODE>docs/</CODE> subdirectory.</P>
+<P><B>NOTE</B>: If you are going to use CVS to compile mythtv rather than using
+the distribution tarballs, it is <B>strongly</B> recommended that you 
+<A HREF="http://www.snowman.net/mailman/listinfo/mythtv-commits/">join</A>
+the mythtv-dev mailing list.</P>
+<P>This HOWTO is for mythtv v0.7.</P>
 
+<H2><A NAME="s2">2. Introduction.</A></H2>
+
+<P>This HOWTO document will focus on mythtv in a North American environment.
+If you have installation instructions for a different region or Linux
+distribution, please send them to the author so that it can be included in other
+versions of this document.</P>
+<P>The contributors for this document are:
 <UL>
-<LI><A NAME="toc3.1">3.1</A> <A HREF="mythtv-HOWTO-3.html#ss3.1">Hardware. </A>
-<LI><A NAME="toc3.2">3.2</A> <A HREF="mythtv-HOWTO-3.html#ss3.2">Software.</A>
+<LI>Overall structure and Mandrake 9.0: Robert Kulagowski, 
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></LI>
+<LI>Red Hat Linux 8.0: Cedar McKay, 
+<A HREF="mailto:mythhowto.3.ohthetrees@spamgourmet.com">mailto:mythhowto.3.ohthetrees@spamgourmet.com</A></LI>
+<LI>Gentoo: Tony Clark, 
+<A HREF="mailto:tclark@telia.com">mailto:tclark@telia.com</A></LI>
+<LI>Debian: Matthew Zimmerman, 
+<A HREF="mailto:mdz@debian.org">mailto:mdz@debian.org</A></LI>
+<LI>Mandrake 8.2: Harondel J. Sibble, 
+<A HREF="mailto:help@pdscc.com">mailto:help@pdscc.com</A></LI>
 </UL>
-<P>
-<H2><A NAME="toc4">4.</A> <A HREF="mythtv-HOWTO-4.html">Setting up paths, ldconfig and other shell variables. </A></H2>
+</P>
 
+<H2><A NAME="s3">3. Checking prerequisites. </A></H2>
+
+<H2><A NAME="ss3.1">3.1 Hardware. </A>
+</H2>
+
+<P>mythtv is a software video encoder, which means that it uses a fairly
+generic "dumb" video capture card to get frames of video, encodes them using
+the CPU on your motherboard and writes them to disk.  High-end video capture
+cards and devices like the Tivo and RePlay have dedicated encoder chips
+which use specialized hardware to convert the video stream to the MPEG-2
+format without using the motherboard CPU.  The main CPU has the
+responsibility of running the Operating System and reading and writing the
+encoded frames to the disk.  These tasks have fairly low CPU requirements
+compared to encoding video, which is why a device like a Series 1 Tivo can
+run with only 16MB of RAM and a 54Mhz CPU.</P>
+<P>Currently, there are no known MPEG-2 encoder cards that have video4linux
+drivers which would be suitable for use with mythtv.  Once the drivers are
+written, support for hardware MPEG-2 encoders can be integrated.</P>
+<P>There are many variables that go into the question: "How fast a CPU do I
+need to run mythtv"?  Obviously, the faster your CPU, the better your
+experience will be with mythtv.  Performing the "Watch TV" function, where
+the CPU is both encoding and decoding video simultaneously to allow Pause,
+Fast Forward and Rewind functions for live TV requires more CPU then just
+encoding or decoding.  mythtv also supports multiple encoder cards in a
+single PC, increasing the CPU requirements if you are going to
+simultaneously encode multiple programs.</P>
+<P>Here are a few data points:
 <UL>
-<LI><A NAME="toc4.1">4.1</A> <A HREF="mythtv-HOWTO-4.html#ss4.1">Distribution-specific information. </A>
-<LI><A NAME="toc4.2">4.2</A> <A HREF="mythtv-HOWTO-4.html#ss4.2">Checking that it worked. </A>
-<LI><A NAME="toc4.3">4.3</A> <A HREF="mythtv-HOWTO-4.html#ss4.3">Modifying <CODE>/etc/ld.so.conf</CODE></A>
+<LI>A PIII/733Mhz system can encode one video stream using the RTJPEG
+codec using 512x480 capture resolution.  This does not allow for live TV
+watching, but does allow for encoding video and then watching it later.</LI>
+<LI>The developer states that his AMD1800+ system can <B>almost</B>
+encode two MPEG4 video streams and watch one program simultaneously.</LI>
+<LI>A PIII/800Mhz system with 512MB RAM can encode one video
+stream using the RTJPEG codec with 480x480 capture resolution and play it back
+simultaneously, thereby allowing live TV watching.</LI>
+<LI>A dual Celeron/450Mhz is able to view a 480x480 MPEG4/3300Kbps file
+created on a different system with 30% CPU usage.</LI>
 </UL>
-<P>
-<H2><A NAME="toc5">5.</A> <A HREF="mythtv-HOWTO-5.html">Downloading and compiling.</A></H2>
+</P>
+<P><B>NOTE</B>:  You <EM>must</EM> use DMA for hard drive access to prevent
+choppy or jittery video.  Red Hat Linux 8.0 apparently does not enable DMA
+at boot time.  See the Troubleshooting Section for 
+<A HREF="#Setting_DMA">instructions</A> on how to do this.</P>
 
+<H2><A NAME="ss3.2">3.2 Software.</A>
+</H2>
+
+<P>There are a few ways of installing programs on Linux systems; you can either
+use the graphical tools that come with your distribution, or you can use
+command-line utilities.  Either system will get the job done, and it all
+depends on your comfort level with Linux.</P>
+<P><B>NOTE</B>: If you are using mythtv on multiple systems, at least one of
+them will maintain the master database and will need mysql installed.  </P>
+<P>In order to compile mythtv, we need to make sure that the software it needs
+is installed.  As of 2002-12-17, this list includes <B>perl</B>,
+<B>mysql</B>, <B>gcc</B>, <B>freetype2-devel</B>,
+<B>XFree86-devel</B> and <B>qt-devel</B>.  If you're going to use a
+remote control with mythtv, you're going to need the <B>cdialog</B>
+package in order to compile <B>lircd</B>.</P>
+<P>There appears to be issues with ALSA and simultaneously recording and playing 
+sound, which is a core requirement for mythtv.  If you are not running 
+ALSA 0.9.0rc6 and experience lock-ups of your system when trying to use mythtv, 
+then please check the main ALSA website and upgrade to the latest version,
+or see if your distribution has already packaged the latest ALSA drivers.</P>
+
+<H3><A NAME="graphicinstalltools_"></A> Graphical installation tools. </H3>
+
+<H3>Mandrake 9.0</H3>
+
+<P>On systems running KDE, a tool which will allow you to see what packages
+are available and if they're installed on your system can be accessed by
+clicking K->Configuration->Packaging->KPackage</P>
+<P>There are many inter-related modules, so make sure that you've got the
+main package for each one, and not a sub package for an unrelated item.  For
+example, there are many modules that have "perl" in them; some are a part of
+the apache web server, others are a part of the perl distribution.  In each
+case, we're looking to make sure that the primary module is getting
+installed.</P>
+<P>Click the magnifying glass or press <B>CTRL-F</B> and enter "perl" as your
+search term.  You should find it under the "Perl" folder.  You need at least
+the perl 5.80 base package installed.  If not, click on the "Mark" button.</P>
+<P>If you are going to be installing mysql on this system, search for mysql -
+it should be under "Databases".  Make sure that mysql and mysql-clients are
+installed.  If not, click on "Mark".</P>
+<P>Search for gcc.  You're going to need gcc and gcc-c++ installed.</P>
+<P>Search for freetype2.  Make sure that you've got freetype2 and
+freetype2-devel installed.</P>
+<P>Search for XFree86-devel.</P>
+<P>Finally, check for qt.  You'll need libqt3-devel (under folder "KDE and
+Qt") and libqt3 ("Libraries").</P>
+<P>Make sure that cdialog is installed if you want to use mythtv with a remote
+control.</P>
+<P>alsa-utils is needed for setting the volume.</P>
+<P>If you marked anything to install, click on Install Marked.  Click "Yes" or
+OK if you get a message about satisfying dependencies.</P>
+
+<H3>Red Hat Linux 8.0 </H3>
+
+<P>Red Hat Linux 8.0 does not have the same graphical package manager used
+by other distributions, so you will need to use Red Hat's package
+manager.  This is the same utility you saw upon installation from the Red
+Hat Linux 8.0 installation CD, and it allows you to select packages at
+installation time, or once the system is up and running.  You can access
+this program by selecting 
+<PRE>
+RedHatMenu>System Settings>Packages
+</PRE>
+</P>
+<P>If you did a typical Desktop install of Red Hat Linux 8.0 make sure you have
+selected:</P>
+<P>
 <UL>
-<LI><A NAME="toc5.1">5.1</A> <A HREF="mythtv-HOWTO-5.html#ss5.1">Notes on compiling on a system with non-Intel processors. </A>
-<LI><A NAME="toc5.2">5.2</A> <A HREF="mythtv-HOWTO-5.html#ss5.2">Building LAME.</A>
-<LI><A NAME="toc5.3">5.3</A> <A HREF="mythtv-HOWTO-5.html#ss5.3">Building XMLTV. </A>
-<LI><A NAME="toc5.4">5.4</A> <A HREF="mythtv-HOWTO-5.html#ss5.4">Manually building mythtv.</A>
-<LI><A NAME="toc5.5">5.5</A> <A HREF="mythtv-HOWTO-5.html#ss5.5">Gentoo. </A>
-<LI><A NAME="toc5.6">5.6</A> <A HREF="mythtv-HOWTO-5.html#ss5.6">Debian.</A>
+<LI>KDE Desktop Environment</LI>
+<LI>SQL Database Server -  you will have to click on "details" and make 
+sure "mysql-server" is checked.  (only required on the master system)</LI>
+<LI>Development Tools</LI>
+<LI>X Software Development</LI>
+<LI>KDE Software Development</LI>
+<LI>Kernel Development</LI>
 </UL>
+</P>
+<P>Click Install to continue.</P>
+<P>You can not install qt-MySQL, a necessary prerequisite, graphically. To  
+install this package using the command line do</P>
 <P>
-<H2><A NAME="toc6">6.</A> <A HREF="mythtv-HOWTO-6.html">MySQL.</A></H2>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ up2date --solvedeps qt-MySQL
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 
+<H3><A NAME="CLIinstalltools_"></A> Command-line installation. </H3>
+
+<P> This section details the various methods for installing pre-requisites
+from the command line.</P>
+
+<H3>Mandrake</H3>
+
+<P><B>urpmi</B> is the simplest tool for installation of packages from the
+command line.  The difficult part is the configuration aspect.  The
+following website 
+<A HREF="http://plf.zarb.org/~nanardon/urpmiweb.php">http://plf.zarb.org/~nanardon/urpmiweb.php</A> will allow you to choose
+a mirror site and then present the command-line configuration text for that
+mirror.  You will most likely need to add a "Contrib" mirror to your setup.</P>
+
+<H3>Special instructions for Mandrake 8.2</H3>
+
+<P>Mandrake 8.2 does not have a pre-packaged libqt3-devel, so you must compile and
+install this manually.  The following command will install the
+pre-requisites for qt3, so don't skip this step.  
+The simplest tool for installing packages from the command line is
+<B>urpmi</B>.</P>
+<P>Open a shell, and execute the following.  You may get asked a number of
+questions regarding dependencies.  It's best to answer "YES".</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ urpmi mesa-common-devel libmng1-devel mysql-devel libunixodbc2-devel
+$ urpmi postgresql-devel xfree86-static-libs
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Once all of the pre-requisites have been installed, the next step is to
+obtain and compile the source RPM.</P>
+<P>Go to 
+<A HREF="http://www.rpmfind.net">http://www.rpmfind.net</A> and search for
+<CODE>qt3</CODE>.  There will be a number of different versions available.  As
+of 2002-12-02, the latest version for Mandrake is called
+<CODE>qt3-3.0.5-7mdk.src.rpm</CODE>. Unless you are running <B>Mandrake
+Cooker</B> (the beta version of the next release of Mandrake), make sure to
+download the standard "Mandrake" release.  Download the <CODE>.src.rpm</CODE>
+file to a directory that you can find.  
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# cp qt3-3.0.5-7mdk.src.rpm /usr/src/RPMS/SRPMS
+# cd /usr/src/RPMS/SRPMS
+# rpm --rebuild qt3-3.0.5-7mdk.src.rpm
+# cd ../RPMS
+# ls -l
+</PRE>
+</CODE></BLOCKQUOTE>
+
+The "ls -l" command will show you a directory listing.  There should be two
+files, one will be named "qt3" and the other will be "qt3-devel".  The full
+filenames will vary, so one you know the filename, you can install them with
+<BLOCKQUOTE><CODE>
+<PRE>
+# rpm -Uvh [filename1]
+# rpm -Uvh [filename2]
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Once this has completed (it can take a while, so please be patient),
+continue by following the Mandrake 9.0 instructions.</P>
+
+<H3>Mandrake 8.2 and 9.0</H3>
+
+<P>The simplest tool for installing packages from the command line is
+<B>urpmi</B>.</P>
+<P>Open a shell, and execute the following, all on the same line. You may get
+asked a number of questions regarding dependencies.  It's best to answer
+"YES".</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# urpmi perl mysql gcc gcc-c++ freetype2-devel cdialog alsa-utils
+# urpmi XFree86-devel
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P><B>NOTE</B>: Mandrake 8.2 users, <EM>do not</EM> execute the following
+command.  You've already manually installed the files in the previous
+section.
+<BLOCKQUOTE><CODE>
+<PRE>
+# urpmi libqt3-devel
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>However, you might get this when you execute the command above:
+<BLOCKQUOTE><CODE>
+<PRE>
+[root@pvr root]# urpmi perl mysql gcc gcc-c++ freetype2-devel libqt3-devel cdialog alsa-utils XFree86-devel
+everything already installed
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>In that case, you're ready to move to the next 
+<A HREF="#Setting_up_paths">section</A>.</P>
+<H3>Red Hat Linux 8.0</H3>
+
+<P>[Please submit instructions]</P>
+
+<H3>Gentoo. </H3>
+
+<P>If KDE has not been installed on your system: Edit
+<CODE>/etc/make.conf</CODE> and locate the "USE" variable. If the line is
+commented out, remove the comment. The line should have at least:
+<BLOCKQUOTE><CODE>
+<PRE>
+USE="mysql qt alsa"
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Next you need to build KDE. If you don't plan on using the ebuilds as 
+described in the Gentoo section then you also need to install lame.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ emerge kde lame mysql
+</PRE>
+</CODE></BLOCKQUOTE>
+
+If KDE has already been installed, by default, QT libraries with SQL support 
+are not built. To enable SQL support, add "mysql qt" to your USE variable in 
+<CODE>/etc/make.conf</CODE> and rebuild QT by running
+<BLOCKQUOTE><CODE>
+<PRE>
+$ emerge qt
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Install MySQL if this is the master system:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ emerge mysql
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>All the necessary files will be downloaded and built. This will take a lot
+of time, even on a fast machine if you have to do a full KDE build.</P>
+
+<H2><A NAME="Setting_up_paths"></A> <A NAME="s4">4. Setting up paths, ldconfig and other shell variables. </A></H2>
+
+<P>There are some paths that need to be modified before starting the main
+compile of mythtv, otherwise you will get errors.</P>
+
+<H2><A NAME="Distribution-specific_information"></A> <A NAME="ss4.1">4.1 Distribution-specific information. </A>
+</H2>
+
+<H3>Mandrake 9.0</H3>
+
+<P>As root, create the following file in <CODE>/etc/profile.d</CODE>  On my system
+I call it "mythtv.sh".</P>
+<P>Open a shell, and switch to superuser mode.
+<B>NOTE: ^D</B> means press <B>CTRL</B> and <B>d</B> at the same time.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# cd /etc/profile.d
+cat > mythtv.sh
+export QTDIR=/usr/lib/qt3
+export PATH=$PATH:/usr/lib/qt3/bin
+^D
+
+# chmod a+x mythtv.sh
+# exit
+$ exit
+</PRE>
+</CODE></BLOCKQUOTE>
+
+The last two commands are to exit out of the shell.  This way, when you next
+open a shell your new commands will take effect.</P>
+
+<H3><A NAME="RH80-LANG"></A> Red Hat Linux 8.0 </H3>
+
+<P>Red Hat Linux 8.0 uses an unusual character encoding scheme which causes
+problems when running certain programs. As a result, whenever you run setup
+or mythfilldatabase you will have to set a variable to correct this problem.
+Failure to set this variable will result in a lot of UTF-8 errors.</P>
+<P>There are two modifications that you can make to your system to avoid 
+this problem. The first is a system wide solution, the second will only 
+apply to your current user.</P>
+<P>The global change is to modify the <CODE>/etc/sysconfig/i18n</CODE> file and set
+<CODE>LANG="en_US"</CODE>.  If you want the change to only affect a single user,
+you could create a file called <CODE>~/.i18n</CODE>:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cat > ~/.i18n
+LANG="en_US"
+^D
+$ exit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H2><A NAME="Checking_that_it_worked"></A> <A NAME="ss4.2">4.2 Checking that it worked. </A>
+</H2>
+
+<P>Open a shell and switch to superuser mode.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# set
+
+[lots of text]
+QTDIR=/usr/lib/qt3
+PATH=/usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/games:/usr/lib/qt3/bin:/home/mythtv/bin:/usr/lib/qt3/bin
+</PRE>
+</CODE></BLOCKQUOTE>
+
+You should see QTDIR and the path changes you made.</P>
+<P>Next, we need to make sure that the libraries that we're building will be
+found when we need them.</P>
+
+<H2><A NAME="ss4.3">4.3 Modifying <CODE>/etc/ld.so.conf</CODE></A>
+</H2>
+
+<P>Switch to /etc and execute the following:
+<BLOCKQUOTE><CODE>
+<PRE>
+# cd /etc
+# cat >> ld.so.conf
+/usr/local/lib
+^D
+
+# /sbin/ldconfig
+# exit
+$ 
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P><B>NOTE</B>:  It appears that Red Hat Linux 8.0 requires that the
+<B>ldconfig</B> command needs to be run twice. Red Hat will also
+frequently "forget" about the path. It's recommended to run
+<B>/sbin/ldconfig</B> after installing every package. Failing that, always
+run it if you get an unexpected error about not finding libraries.</P>
+
+<H2><A NAME="s5">5. Downloading and compiling.</A></H2>
+
+<P>Get mythtv from the 
+<A HREF="http://www.mythtv.org">mythtv.org</A>
+web site.  Save the tarball to a directory you can find.</P>
+<P>Get XMLTV from 
+<A HREF="http://xmltv.sourceforge.net">http://xmltv.sourceforge.net</A>.  Download version 0.5.4</P>
+<P>Get lame from 
+<A HREF="http://www.mp3dev.org/mp3">http://www.mp3dev.org/mp3</A>.  Download the source code to v3.93.1 by
+following the links to sourceforge.net</P>
+
+<H2><A NAME="nonintelcpu_"></A> <A NAME="ss5.1">5.1 Notes on compiling on a system with non-Intel processors. </A>
+</H2>
+
+<P>If
+you've got a system with an AMD K6-2 or a VIA C3 processor, make the
+following change in the <CODE>settings.pro</CODE> file.</P>
+<P>Look for 
+<PRE>
+-march=pentiumpro
+</PRE>
+ 
+and replace it with
+<PRE>
+-march=i586
+</PRE>
+ 
+before you compile.</P>
+<P>Recent AMD processors, like the Duron, Thunderbird and Athlon don't need this
+change.</P>
+
+<H2><A NAME="ss5.2">5.2 Building LAME.</A>
+</H2>
+
+<P>Open a shell and switch to the directory where you saved lame.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ tar -xzf lame-3.93.1.tar.gz
+$ cd lame-3.93.1
+$ ./configure
+$ make
+$ make test
+$ su
+# make install
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Check that it worked:
+<BLOCKQUOTE><CODE>
+<PRE>
+# ls -l /usr/local/lib
+-rw-r--r--    1 root     root       381706 Nov  4 14:22 libmp3lame.a
+-rwxr-xr-x    1 root     root          674 Nov  4 14:22 libmp3lame.la*
+lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so ->
+libmp3lame.so.0.0.0*
+lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so.0 ->
+libmp3lame.so.0.0.0*
+-rwxr-xr-x    1 root     root       360197 Nov  4 14:22
+libmp3lame.so.0.0.0*
+
+# exit
+$ 
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H2><A NAME="ss5.3">5.3 Building XMLTV. </A>
+</H2>
+
+<P><B>NOTE</B>: Red Hat Linux 8.0 and Suse 8.1 users, you <EM>must</EM>
+download and install an updated version of libexpat.  The version that ships
+with Red Hat Linux 8.0 and Suse 8.1 (version 1.95.4) is buggy, and will
+cause problems with XML::Twig. All other distributions may skip this step
+and proceed with 
+<A HREF="#untarring_xmltv">untar'ing</A> the xmltv file.</P>
+<P>If you get errors installing XML::Twig or other XMLTV prerequisites,  
+try deleting the old versions of libexpat
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# rm -f /usr/lib/libexpat*
+# /sbin/ldconfig
+# exit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Download version 1.95.5 from sourceforge.net:  
+<A HREF="http://sourceforge.net/projects/expat/">http://sourceforge.net/projects/expat/</A></P>
+<P>Open a shell prompt:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ tar -xzf expat-1.95.5.tar.gz
+$ cd expat-1.95.5
+$ ./configure
+$ make
+$ su
+# make install
+# exit
+$ 
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P><B>NOTE</B>:  Red Hat Linux 8.0 users, make sure that you set your LANG as
+described in 
+<A HREF="#RH80-LANG">Section 4</A>.</P>
+<P>Continuing on:</P>
+<P>
+<A NAME="untarring_xmltv"></A> Untar the xmltv file:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ tar -xjf xmltv-0.5.4.tar.bz2
+$ cd xmltv-0.5.4
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Install the xmltv prerequisites:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# perl -MCPAN -e shell
+cpan> install XML::Twig
+cpan> install Date::Manip
+Date::Manip is up to date.
+cpan> install LWP
+cpan> install XML::Writer
+cpan> exit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Change to the XMLTV directory and compile it:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cd xmltv-0.5.4
+$ perl Makefile.PL
+</PRE>
+</CODE></BLOCKQUOTE>
+
+You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes" to
+the grabber required for your location.</P>
+<P>You may get errors about modules not being installed.  They shouldn't matter
+if you're installing North America and have followed the instructions to
+this point.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ make
+$ make test
+$ su
+# make install
+# exit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H2><A NAME="ss5.4">5.4 Manually building mythtv.</A>
+</H2>
+
+<P>Unpack mythtv
+<BLOCKQUOTE><CODE>
+<PRE>
+$ tar -xjf mythtv-0.7.tar.bz2
+$ cd mythtv-0.7
+$ ./configure
+$ make
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P><B>NOTE for Red Hat 8 users only</B>: You must manually modify a Makefile
+within the themes directory, otherwise your on screen display (OSD) will be
+"generic" rather than themed.  The solution is to edit the Makefile within
+the themes directory and comment out (using a # symbol before each line)
+every line that starts with the word "strip". Make sure you switch back to
+the mythtv build directory before executing the next step.</P>
+<P>Switch to superuser:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# make install
+# exit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H2><A NAME="Gentoo_build"></A> <A NAME="ss5.5">5.5 Gentoo. </A>
+</H2>
+
+<P>[Documentation being finalized]</P>
+<P>There are ebuilds setup for mythtv and for XMLTV.  To use them, do the
+following, add the following to your <CODE>/etc/make.conf</CODE>:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+# PORTDIR_OVERLAY is a directory where local ebuilds may be stored without
+#     concern that they will be deleted by rsync updates. Default is not
+#     defined.
+PORTDIR_OVERLAY=/home/[yourusername]/portage
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Next, create the following directories:
+<BLOCKQUOTE><CODE>
+<PRE>
+mkdir -p /home/[yourusername]/portage/video-media/mythtv
+mkdir -p /home/[yourusername]/portage/dev-perl/xmltv
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Download the ebuilds and save them to their respective directories made
+above.  Make sure the downloaded file names are the same as those on
+bugs.gentoo.org.  The correct source files will fail to download if the
+ebuild names are wrong.  The two ebuilds are:</P>
+<P>
 <UL>
-<LI><A NAME="toc6.1">6.1</A> <A HREF="mythtv-HOWTO-6.html#ss6.1">Mandrake 9.0</A>
-<LI><A NAME="toc6.2">6.2</A> <A HREF="mythtv-HOWTO-6.html#ss6.2">Red Hat Linux 8.0</A>
-<LI><A NAME="toc6.3">6.3</A> <A HREF="mythtv-HOWTO-6.html#ss6.3">Gentoo.</A>
-<LI><A NAME="toc6.4">6.4</A> <A HREF="mythtv-HOWTO-6.html#ss6.4">Setting up the initial database.</A>
+<LI>mythtv: 
+<A HREF="http://bugs.gentoo.org/show_bug.cgi?id=10533">http://bugs.gentoo.org/show_bug.cgi?id=10533</A></LI>
+<LI>XMLTV: 
+<A HREF="http://bugs.gentoo.org/show_bug.cgi?id=10536">http://bugs.gentoo.org/show_bug.cgi?id=10536</A></LI>
 </UL>
+</P>
+<P>emerge mythtv:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ emerge /home/[yourusername]/portage/video-media/mythtv/mythtv-0.7.0
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>It should download the source then complain about a missing digest.  To fix
+this,</P>
 <P>
-<H2><A NAME="toc7">7.</A> <A HREF="mythtv-HOWTO-7.html">Setting up ALSA and the mixer.</A></H2>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ ebuild /home/[yourusername]/portage/video-media/mythtv/mythtv-0.7.0.ebuild digest
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>emerge mythtv again and it should compile and install.</P>
+<P>Do the same for xmltv but an additional step will be required first to fool
+it into thinking XML-Twig is installed.  </P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# emerge inject dev-perl/XML-Twig
+# emerge /home/[yourusername]/portage/dev-perl/xmltv/xmltv-0.5.2
+# ebuild /home/[yourusername]/portage/dev-perl/xmltv/xmltv-0.5.2.ebuild digest
+# emerge /home/[yourusername]/portage/dev-perl/xmltv/xmltv-0.5.2
+# exit
+$ 
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 
+<H2><A NAME="ss5.6">5.6 Debian.</A>
+</H2>
+
+<P>Debian packages for MythTV and some of its add-on modules have been
+packaged by Matt Zimmerman 
+<A HREF="mailto:mdz@debian.org">mailto:mdz@debian.org</A> and are
+available at 
+<A HREF="http://dijkstra.csh.rit.edu:8088/~mdz/debian/dists/woody/mythtv/">http://dijkstra.csh.rit.edu:8088/~mdz/debian/dists/woody/mythtv/</A>, including installation instructions.  All of the prerequisites for
+MythTV are available as Debian packages.</P>
+<P>The mailing list message for this announcement can be accessed at 
+<A HREF="http://www.snowman.net/pipermail/mythtv-dev/2002-November/001116.html">http://www.snowman.net/pipermail/mythtv-dev/2002-November/001116.html</A>.</P>
+
+<H2><A NAME="s6">6. MySQL.</A></H2>
+
+<H2><A NAME="ss6.1">6.1 Mandrake 9.0</A>
+</H2>
+
+<P>If this is the master system, make sure that mysql is running and started
+at boot.  Click on Mandrake Control Center->System->Services, find mysql and
+click the "On Boot" button and the "Start" button if the mysql status shows
+that it isn't running yet.</P>
+
+<H2><A NAME="ss6.2">6.2 Red Hat Linux 8.0</A>
+</H2>
+
+<P>If this is the master system, make sure that mysql is running and started at boot. Click on
+Redhat menu>Server Settings>Services and enter the root password when asked.
+Check "mysqld" and then click Start. Click Save, then close the window.</P>
+<H2><A NAME="ss6.3">6.3 Gentoo.</A>
+</H2>
+
+<P>After installing mysql you need to initialise the database by running
+mysql_install_db as root. </P>
+
+<H2><A NAME="ss6.4">6.4 Setting up the initial database.</A>
+</H2>
+
+<P>This step is only required for systems that will be maintaining a
+database of listings.  If you are running multiple mythtv systems you can
+either have one master database read by all the other systems, or you can
+have each system maintaining its own.  To setup the initial mysql databases:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cd database
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<H3>Mandrake 9.0</H3>
+
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mysql -u root &lt; mc.sql
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<H3>Debian 3.0</H3>
+
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mysql &lt; mc.sql
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<H3>Red Hat Linux 8.0</H3>
+
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# mysql &lt; mc.sql
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<H3>Gentoo</H3>
+
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# mysql &lt; /usr/share/mythtv/database/mc.sql
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H2><A NAME="s7">7. Setting up ALSA and the mixer.</A></H2>
+
+<P>If your video doesn't appear to be in-sync with your audio, it could be
+because you are listening to the real-time audio from your video card rather
+than after it's been processed and synchronized to the video by mythtv.</P>
+<P>What you need to do is to mute the "line-in" of your sound card and also
+set it as the recording source.</P>
+<P>There are two ways to do this.  Graphically, and from the command line.</P>
+
+<H2><A NAME="ss7.1">7.1 Graphically setting up the mixer.</A>
+</H2>
+
+<H3>Mandrake 9.0</H3>
+
+<P>Open Kmix by K->Multimedia->Sound->Kmix</P>
+<P>Click on Settings->Configure  Make sure that "Tick Marks" and "Show
+labels" have "X"'s in them.  This will make it easier to find the correct
+audio source.  Click OK.</P>
+<P>On the mixer page, look for Line-In on your sound card.  You should see
+two LED's - a green one at the top, and a red one at the bottom.  The green
+one at the top is for muting; you want to make sure that the green LED is a
+dark green, meaning that it's "off".  You also want to click on the red LED
+so that it turns bright red, indicating that it's "ON"; this insures that
+the Line-in is used as the source.  Click OK, and make sure that you save
+the settings so that this is your default.</P>
+
+<H3>Red Hat Linux 8.0</H3>
+
+<H3>Using OSS drivers.</H3>
+
+<P>Red Hat Linux 8.0 ships with OSS sound drivers rather than the ALSA
+drivers recommended by the mythtv team. The OSS drivers do work for some
+people, and for some cards, but others report problems (sync and jitter)
+with OSS. In addition, OSS does not support full duplex on some cards, which
+is required if you want to record and play sound using just one sound card.
+ALSA has good full duplex support, and also has drivers for some built-in
+(motherboard) sound cards that OSS does not. Installing ALSA is less painful
+than you might think, so we encourgage you to go that route. For those of
+you who do not wish to install ALSA you must do this:</P>
+<P>To configure sound to work with mythtv, select 
+<PRE>
+RedHat Menu>Sound &amp; Video>Volume Control
+</PRE>
+
+to open up a mixer. Make sure your global volume (on the far left)
+is up. Also make sure that the "line in" section has "mute" and "record"
+checked and that the gain is turned up. You may have to experiment with
+volume/gain levels to get the best sound.  If you experience difficulty with
+sound try moving your patch cord from "Line in" to "Mic in". You will need
+to go back to the mixer and select "mute" and "record" on the "Mic in" and
+turn up the gain for the Mic rather than Line.</P>
+
+<H3>Using ALSA drivers.</H3>
+
+<P>For those of you who do want to install ALSA please follow the 
+directions below, compiled with much assistance from Gregorio Gervasio.</P>
+<P>First you must find out the name of your driver, which isn't necessarily the
+same as the name of your sound card. Go to 
+<A HREF="http://www.alsa-project.org/alsa-doc/">http://www.alsa-project.org/alsa-doc/</A>, find your sound card on the
+list and click "details". Near the top it will say something like "The
+module options for snd-XXX", where XXX is the name of your driver. In the
+instructions below, replace "XXX" with the name of your driver.</P>
+<P>Download the development release (0.9.x) from the ALSA web site 
+<A HREF="http://www.alsa-project.org">http://www.alsa-project.org</A>.  You
+need at least three files:
 <UL>
-<LI><A NAME="toc7.1">7.1</A> <A HREF="mythtv-HOWTO-7.html#ss7.1">Graphically setting up the mixer.</A>
-<LI><A NAME="toc7.2">7.2</A> <A HREF="mythtv-HOWTO-7.html#ss7.2">Setting the mixer from the command line.</A>
+<LI>alsa-driver-0.9.x.tar.bz2</LI>
+<LI>alsa-lib-0.9.x.tar.bz2</LI>
+<LI>alsa-utils-0.9.x.tar.bz2</LI>
 </UL>
+</P>
+<P>Start with the alsa-driver package:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ tar -xjf alsa-driver-0.9.x.tar.bz2
+$ cd alsa-driver-0.9.x
+$ ./configure --with-cards=XXX --with-sequencer=yes
+$ make
+$ su
+# make install
+# ./snddevices
+# exit
+$
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>This will compile and install the kernel modules and initialization
+scripts, as well as create device nodes in /dev.</P>
+<P>Install the rest of the packages:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cd ~
+$ tar -xjf alsa-lib-0.9.x.tar.bz2
+$ cd alsa-lib-0.9.x
+$ ./configure
+$ make
+$ su
+# make install
+# exit
+$ cd ..
+$ tar -xjf alsa-utils-0.9.x.tar.bz2
+$ cd alsa-utils-0.9.x
+$ ./configure
+$ make
+$ su
+# make install
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Next, you must edit <CODE>/etc/modules.conf</CODE> so that the ALSA modules are
+loaded automatically. The first step is to remove your old OSS
+configuration to ensure that you don't end up with mysterious conflicts in
+the future.  You should end up with a <CODE>/etc/modules.conf</CODE> file that has
+this configuration:</P>
 <P>
-<H2><A NAME="toc8">8.</A> <A HREF="mythtv-HOWTO-8.html">Setting up a remote control.</A></H2>
+<BLOCKQUOTE><CODE>
+<PRE>
+alias char-major-116 snd
+alias snd-card-0 snd-XXX
+# module options should go here
+# OSS/Free portion
+alias char-major-14 soundcore
+alias sound-slot-0 snd-card-0
+# card #1
+alias sound-service-0-0 snd-mixer-oss
+alias sound-service-0-1 snd-seq-oss
+alias sound-service-0-3 snd-pcm-oss
+alias sound-service-0-8 snd-seq-oss
+alias sound-service-0-12 snd-pcm-oss
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>"XXX" should be the ALSA driver name for your sound card/chip. In some rare
+cases you need to supply extra options to the driver. These options are
+descried in the "INSTALL" file in the alsa-driver directory or at 
+<A HREF="http://www.alsa-project.org/alsa-doc/">http://www.alsa-project.org/alsa-doc/</A>.</P>
+<P>For now we will assume that no extra options are required.  The next step is
+to ensure that the ALSA drivers are started during boot-up.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# cd /etc/rc.d/init.d
+# /sbin/chkconfig --add alsasound
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The next set of instructions will cause the ALSA volume/mixer/etc. state to
+be saved when the machine is shut down properly. Note that the mixer
+settings won't get restored the next time you boot unless you ran the
+shutdown script or you've explicitly saved the state which you can do
+as root with:
+<BLOCKQUOTE><CODE>
+<PRE>
+# alsactl -f /etc/asound.state store
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Reboot your machine.  Login and adjust the sound levels using "alsamixer". 
+You should increase the main volume (the first slider) and the PCM volume,
+and unmute them by hitting "m".  For MythTV, if your tuner card audio output
+is patched to the Line-In input of your sound card, set the Line input for
+capture by pressing SPACE at the slider and mute it by pressing "M". If
+you've patched your tuner card to the Mic-In port of your soundcard, follow
+the same instructions but make sure that you're on the Mic slider.</P>
+<P>Test the driver by playing a simple file:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ aplay /usr/share/sounds/info.wav
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>If it works, you're done installing ALSA!</P>
 
+<H2><A NAME="ss7.2">7.2 Setting the mixer from the command line.</A>
+</H2>
+
+<P>If you're running Mandrake 9.0 and have installed the alsa-utils package,
+then the <B>amixer</B> program can be used to setup the mixer.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ amixer set Master,0 100%,100% unmute
+$ amixer set Line,0 100%,100% mute capture
+$ su
+# alsactl store
+# exit
+$ 
+</PRE>
+</CODE></BLOCKQUOTE>
+
+That takes care of setting the volume correctly, and the ALSA startup script
+will restore the volume after a reboot.</P>
+<P>You may also use the <B>alsamixer</B> program to set the volume.  First,
+start <B>alsamixer</B> from the command line.  You should start out on the
+"Master" volume control slider.  Use the up and down cursor to set the
+master volume to around 75%.  Next, use the left and right cursor keys to
+move around on the screen until you find the "Line" slider.  Press SPACE to
+set it as the capture source, set the level to around 50-75% and press "M"
+to mute it.  You can now press ESC to exit out of the <B>alsamixer</B>
+program.</P>
+
+<H2><A NAME="s8">8. Setting up a remote control.</A></H2>
+
+<P>mythtv does not have native remote control receiver and decoder software
+built-in.  Instead, remote control functions are implemented by cooperating
+with <B>lirc</B>, the Linux Infra Red Control program.  <B>lirc</B>
+handles the IR hardware and passes keystrokes to mythtv, which then acts as
+if the user had pressed the keys on the keyboard.</P>
+<P>Some IR devices require a kernel recompile, and some don't. However, all at
+least require having the kernel source available as a resource for the lirc
+build process. </P>
+
+<H2><A NAME="ss8.1">8.1 Mandrake</A>
+</H2>
+
+<P>lircd has two prerequisites:  <B>dialog</B>, available in Mandrake through the
+"cdialog" RPM, and the kernel source.  Mandrake 9.0 is using the 2.4.19
+kernel, so the easiest thing is to go to 
+<A HREF="http://www.kernel.org">http://www.kernel.org</A> and download
+the full 2.4.19 tar file from 
+<A HREF="http://www.kernel.org/pub/linux/kernel/v2.4/">http://www.kernel.org/pub/linux/kernel/v2.4/</A>.</P>
+
+<H3>Obtaining the kernel.</H3>
+
+<P>An easy way is to use the wget command:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ wget http://www.kernel.org/pub/linux/kernel/v2.4/linux-2.4.19.tar.bz2
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Next, open a shell and login as superuser.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su 
+# mkdir /usr/src
+# mv linux-2.4.19.tar.bz2 /usr/src
+# cd /usr/src
+# tar -xjf linux-2.4.19.tar.bz2
+# chown -R root.root linux-2.4.19
+# ln -sf linux-2.4.19 linux
+# exit
+$ 
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H2><A NAME="ss8.2">8.2 Red Hat Linux 8.0</A>
+</H2>
+
+<P>You should already have the source from the "Kernel Development" package
+you installed in section 3.2. Ensure that a symlink has been created:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cd /usr/src
+$ su
+# ln -s linux-2.4.18-x.x.x linux
+# exit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H2><A NAME="ss8.3">8.3 Obtaining and compiling lirc.</A>
+</H2>
+
+<P>You're going to need to download and compile lircd.  Go to 
+<A HREF="http://www.lirc.org">http://www.lirc.org</A> and download lirc; as
+of 2002-11-07, the version available is 0.6.6.  Grab the remotes.tgz file as
+well. 
+<BLOCKQUOTE><CODE>
+<PRE>
+$ tar -xjf lirc-0.6.6.tar.bz2
+$ cd lirc-0.6.6
+$ ./setup.sh
+</PRE>
+</CODE></BLOCKQUOTE>
+
+You're going to need to know what sort of receiver you have and where it's
+connected.  In the case of the Pinnacle Studio TV card, with the IR receiver
+connected to COM1 (/dev/ttys0), once the configuration menu comes up,
+perform the configuration by going to Driver Configuration->Other Serial
+Port Devices->Pinnacle Systems Receiver->OK and on the next page select
+COM1->OK.</P>
+<P>Each remote is different; some remote receivers connect directly to your
+capture card and not to a serial port, so make sure that you've got the
+correct one.</P>
+<P>You then click "Save Configuration and run configure" to continue.</P>
+<P>Make sure you read the last text generated by the configure step. It will
+tell you if you require a kernel recompile, and what the name of your kernel
+module will be (if necessary). For instance a home-built receiver may
+require a kernel recompile, so you would be notified that you will have to
+load the lirc_serial module. If you did not get any such messages skip the
+kernel recompile steps below and go directly to making and installing the
+lirc driver.</P>
+<P>Once the configuration step is complete:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ make
+$ su
+# make install
+# chmod 666 /dev/lircd
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H3>Recompiling your kernel on Red Hat Linux</H3>
+
+<P>Don't Panic! Red Hat makes a kernel recompile very easy. They provide  
+configuration files that make it so you can recompile your kernel with  
+Red Hat defaults. And as a side benefit, your kernel will be compiled  
+specifically for your architecture. For a more detailed description (or  
+if you run into trouble) of how to do this go to  
+<A HREF="http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/  ch-custom-kernel.html">http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/  ch-custom-kernel.html</A></P>
+<P>For the impatient:
+Make sure you have an emergency floppy boot disk available!
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cd /usr/src/linux
+$ su
+# make mrproper
+# cd configs
+# ls
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>at this point you must look at the file names and determine which  
+config file is right for you. For instance if you have an Athlon XP you  
+should choose "kernel-2.4.18-athlon.config" but if you have a dual  
+processor P4 you might choose "kernel-2.4.18-i686-smp.config"</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+# cp yourconfig.config ../.config
+# cd ../
+# make xconfig
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>At this point you will get a graphical configuration utility. All that  
+you must do to make lirc work is go to the "character devices" section  
+and change "Standard/generic (8250/16550 and compatible UARTs) serial  
+support" from "y" to "m". Now if you want you can have a look around.  
+For instance, you might wish to turn off ham radio support, or perhaps  
+turn off pcmcia support if you are not on a laptop. But be careful!  
+Only change things you know you can change. If you are not sure, just  
+stick to the one required change. Click "save and exit".
+Next:
+<BLOCKQUOTE><CODE>
+<PRE>
+# make dep
+# make clean
+# make bzImage modules
+# make modules_install
+# make install
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>if you are using <B>grub</B>, that should be it, reboot and select your custom  
+kernel upon boot. If you are using <B>lilo</B>, change your lilo configuration  
+according to  
+<A HREF="http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/  s1-custom-kernel-bootloader.html">http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/  s1-custom-kernel-bootloader.html</A> Remember, if you have any custom  
+kernel modules (alsa, etc) you will have to recompile/reinstall those.</P>
+
+<H2><A NAME="ss8.4">8.4 Completing the lirc install.</A>
+</H2>
+
+<P>If configure did not mention anything about a kernel module, then you  
+are finished. If it did mention a kernel module, you must edit  
+the <CODE>/etc/modules.conf</CODE> file. Add this line as the first thing in the file.  
+It must come first, or it may not work.
+<BLOCKQUOTE><CODE>
+<PRE>
+alias char-major-61 XXX
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>replace XXX with the name which you determined earlier, which in this
+example was "lirc_serial"</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# modprobe lirc_serial
+# /sbin/ldconfig
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Next, we're going to manually start lircd the first time:
+<BLOCKQUOTE><CODE>
+<PRE>
+# /usr/local/sbin/lircd
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>If this fails, complaining of a missing <CODE>lircd.conf</CODE> file, then you
+must find or make one. First look for a premade configuration file at 
+<A HREF="http://lirc.sourceforge.net/remotes/">http://lirc.sourceforge.net/remotes/</A>.  If you find one your remote
+there, download the file, name it <CODE>lircd.conf</CODE> and put it in your
+<CODE>/etc</CODE> directory. If you couldn't find your remote, you must make
+your own <CODE>lircd.conf</CODE> file.</P>
+<P>To make your own <CODE>lircd.conf</CODE> file
+<BLOCKQUOTE><CODE>
+<PRE>
+$ irrecord myremote
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Follow the on-screen directions to train your remote and define keys. If  
+your remote ends up working well, you should consider submitting your  
+<CODE>lircd.conf</CODE> file back to the lirc developers. Once finished:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# cp myremote /etc/lircd.conf
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>now try to start lircd again:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+# /usr/local/sbin/lircd
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Now, we're going to add the commands necessary for lircd to run each time
+we boot:
+<BLOCKQUOTE><CODE>
+<PRE>
+# cd /etc/rc.d
+# cat >> rc.local
+echo "Starting lircd"
+/usr/local/sbin/lircd
+^D
+# exit
+$ 
+</PRE>
+</CODE></BLOCKQUOTE>
+ This takes care of the lircd portion, which "listens" for
+the IR signals. If everything went well, the install script for lircd put an
+appropriate configuration file for your remote into <CODE>/etc/lircd.conf</CODE> This
+file maps the buttons on the remote control to the IR pulses coming from the
+receiver.</P>
+<P>The next step is to convert those signals into something that can be used
+to control mythtv.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cd ~/mythtv-0.7/configfiles
+$ cp lircrc.example ~/.lircrc
+</PRE>
+</CODE></BLOCKQUOTE>
+ 
+or
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cp lircrc.example.pinnaclestudiopctv ~/.lircrc
+</PRE>
+</CODE></BLOCKQUOTE>
+
+if you've got a Pinnacle Studio PCTV remote.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ irw
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Start pressing the keys on your remote; <B>irw</B> will
+print the name of the button as it is defined in your
+<CODE>/etc/lircd.conf</CODE>. If you don't see anything at this point, you need
+to troubleshoot further by going back to the lirc home page and investigating
+from there.</P>
+<P>If it is working, then press <B>CTRL-C</B> to abort the program.  Once you
+know that your remote is working, you need to run the <B>irxevent</B>
+program, which takes the key presses and sends them to mythtv. 
+<B>irxevent</B>
+isn't a daemon, so if you know that your remote is working you need to
+invoke it like this: 
+<BLOCKQUOTE><CODE>
+<PRE>
+$ irxevent &amp;
+</PRE>
+</CODE></BLOCKQUOTE>
+
+If <B>irxevent</B> isn't running, then mythtv will not respond to your remote
+control.</P>
+<P>Currently, mythtv doesn't have native support for controlling the mixer
+volume and mute settings.  A workaround at this time is to invoke the
+<B>amixer</B> program.  If you wish to define keys to control the mixer,
+the <B>irexec</B> program can accomplish this fairly easily.  The
+configfiles/lircrc.example.pinnaclestudiopctv file has an example of calling
+an external program from a remote control button.</P>
+
+<H2><A NAME="ss8.5">8.5 Additional information for lirc.</A>
+</H2>
+
+<P>Take a look at the lircrc.example files in the <CODE>configfiles/</CODE>
+directory.  In my case, (Pinnacle Studio card) the channel up and down functions
+weren't working, due to the fact that the button names were different than
+the default <CODE>lircrc.example</CODE> file that came with mythtv.</P>
+<P>The <CODE>lircrc.example</CODE> file has this:
+<BLOCKQUOTE><CODE>
+<PRE>
+begin
+    prog = irxevent
+    button = ChannelUp
+    config = Key Up CurrentWindow
+end
+
+begin
+    prog = irxevent
+    button = ChannelDown
+    config = Key Down CurrentWindow
+end
+</PRE>
+</CODE></BLOCKQUOTE>
+
+but the <CODE>/etc/lircd.conf</CODE> that comes in the lircd package 
+defines the buttons for the Pinnacle Studio PCTV as:
+<BLOCKQUOTE><CODE>
+<PRE>
+          channel+                 0x0000000000000017
+          channel-                 0x000000000000001C
+</PRE>
+</CODE></BLOCKQUOTE>
+
+rather than "ChannelUp" and "ChannelDown".  I added the 
+following to my /home/[yourusername]/.lircrc file:
+<BLOCKQUOTE><CODE>
+<PRE>
+begin
+    prog = irxevent
+    button = channel+
+    config = Key Up CurrentWindow
+end
+
+begin
+    prog = irxevent
+    button = channel-
+    config = Key Down CurrentWindow
+end
+</PRE>
+</CODE></BLOCKQUOTE>
+
+which took care of basic functionality.  Because the PCTV Studio remote
+has additional buttons, look at the
+<CODE>configfiles/lircrc.example.pinnaclestudiopctv</CODE> for an example of how
+to define additional buttons, and how to debug potential button name
+conflicts between the <CODE>lircrc.example</CODE> file and how <B>your</B>
+remote defines the button names.</P>
+<P>By examining the button names defined in <CODE>/etc/lircd.conf</CODE> and using
+the <B>irw</B> program to make sure that your remote is working, you can
+create the appropriate mappings in <CODE>.lircrc</CODE> to get excellent remote
+functionality with mythtv.</P>
+
+<H2><A NAME="ss8.6">8.6 Configuring lirc for use with an IR blaster.</A>
+</H2>
+
+<P>By Carlos Talbot, 
+<A HREF="mailto:carlos@talbot.net">mailto:carlos@talbot.net</A></P>
+<P>Lirc has support for various IR transmitters. A popular model is the Actisys
+IR-200L 
+<A HREF="http://store.yahoo.com/snapstreammedia/irblasbun.html">http://store.yahoo.com/snapstreammedia/irblasbun.html</A>. It was
+originally designed for IRDA communication, but can be used to transmit A/V remote
+control codes. By using the lirc SIR driver, this device can easily be
+integrated with mythtv. I have tested this device with an AT&amp;T DCT2000
+digital cable box but the instructions can be used to configure other IRDA
+devices and A/V remotes.</P>
+<P>Follow the steps in the previous section.  When you run setup.sh, select
+option 1, driver configuration. From here select option 6, IrDA hardware.
+Select your appropriate device and the corresponding serial port, then Save
+configuration &amp; run configure from the main menu. Once configure is done
+type:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ make
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Please note: unlike the Pinnacle receiver above you will be compiling lircd
+in addition to a kernel module for the SIR transmitter. Depending on whether
+you have your serial port driver configured as a kernel module you might see
+the following message during make:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+lirc_sir.c:56:2: warning: #warning
+"******************************************"
+
+lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
+
+lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
+
+lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
+
+lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
+
+lirc_sir.c:61:2: warning: #warning
+"******************************************"
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>If you do receive this statement make sure to run the <B>setserial</B> command
+before you load the lirc_sir module. Follow this with the install:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# make install
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>You will notice that lirc installs the kernel module in
+<CODE>/lib/modules/uname -a/misc</CODE>. </P>
+<P>The configuration for starting <B>lircd</B> differs if you're going to be
+sending and receiving IR versus just receiving.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+ 
+# cd /etc/rc.d
+# cat >> rc.local
+echo "Starting lircd"
+setserial /dev/ttySx uart none        # (if required)
+modprobe lirc_sir
+/usr/local/sbin/lircd
+^D
+# exit
+$ 
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>At this point you have to populate the <CODE>/etc/lircd.conf</CODE> file with the proper
+codes for your A/V remote. You should be able to find your remote within the
+lirc remote tar file located at 
+<A HREF="http://www.lirc.org/remotes.tar.bz2">http://www.lirc.org/remotes.tar.bz2</A>. In my case I
+extracted the file from remotes/motorola/DCT2000 (gi-motorola-dct2000)</P>
+<P>To test the lirc_sir module you can run <B>irw</B> to verify the codes are being
+received. If everything is configured correctly
+you should see something similar to the following:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ irw
+0000000000007ff0 00 1 gi-motorola-dct2000
+000000000000bff8 00 2 gi-motorola-dct2000
+000000000000f7f0 00 ENTER gi-motorola-dct2000
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Once you've verified lirc is working you can press <B>CTRL-C</B> to exit
+<B>irw</B> and configure the channel changing script.</P>
+<P>Within <CODE>/usr/local/share/mythtv/settings.txt</CODE>  (or
+<CODE>~/.mythtv/settings.txt</CODE>) you
+need to add the following line:
+<BLOCKQUOTE><CODE>
+<PRE>
+str ExternalChannelCommand=/usr/local/bin/change_channel
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>This csh script will be called each time mythtv needs to change the channel.
+Below is a copy of the script followed by the corresponding perl script.
+Make sure both are in your path. Also make sure you leave the #!/bin/csh
+setting and not change it to bourne or bash. This will create a frustrating
+symptom to diagnose where mythtv cannot open /dev/device. Unlike bourne or
+bash, csh scripts automatically close parent file descriptors before they
+start.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cd /usr/local/bin
+# su
+# cat > change_channel.csh
+#!/bin/csh
+echo "changing to $1"
+/usr/local/bin/channel.pl $1 &amp;
+^D
+# chmod a+x change_channel.csh
+# exit
+$ exit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The following file should be saved as /usr/local/bin/channel.pl
+<BLOCKQUOTE><CODE>
+<PRE>
+#!/usr/bin/perl
+ 
+# make sure to set this string to
+# the corresponding remote in /etc/lircd.conf
+$remote_name = "gi-motorola-dct2000";   
+ 
+sub change_channel {
+        my($channel_digit) = @_;
+        system ("rc SEND_ONCE $remote_name $channel_digit");
+        sleep 1;
+}
+ 
+$channel=$ARGV[0];
+sleep 1;
+if (length($channel) > 2) {
+        change_channel(substr($channel,0,1));
+        change_channel(substr($channel,1,1));
+        change_channel(substr($channel,2,1));
+} elsif (length($channel) > 1) {
+        change_channel(substr($channel,0,1));
+        change_channel(substr($channel,1,1));
+} else {
+        change_channel(substr($channel,0,1));
+}
+system ("rc SEND_ONCE $remote_name ENTER");
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The last statement within the perl script is the lirc rc command. This is
+the command that transmits the code to your cable/dss box. Make sure to have
+the IRDA device within a few feet of the box.</P>
+
+<H2><A NAME="Configuring_mythtv"></A> <A NAME="s9">9. Configuring mythtv. </A></H2>
+
+<P>By this point, all of the prerequisites have been installed,
+<B>mysql</B> is running and has had its initial database setup.  It's now
+time to configure mythtv.</P>
+
+<H2><A NAME="ss9.1">9.1 Editing the settings.txt file.</A>
+</H2>
+
+<P>Open a shell and switch to the <CODE>/usr/local/share/mythtv</CODE> directory. 
+You <B>MUST</B> edit the <CODE>settings.txt</CODE> file so that it's
+appropriate for your system.  At a minimum, ensure that the BufferName, RecordFilePrefix
+and PIPBuffername variables are set to directories that exist on your system. 
+By default, these point to <CODE>/mnt/store</CODE>.  For example, you may wish to create
+a <CODE>/var/video</CODE> subdirectory, so you would change <CODE>/mnt/store</CODE>
+to <CODE>/var/video</CODE>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# mkdir /var/video
+# chmod a+rwx /var/video
+# exit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The <CODE>settings.txt</CODE> file is fairly self-explanatory. 
+Currently, mythtv supports two different video encoders, MPEG4 and RTJPEG. 
+Take note that RTJPEG has lower CPU demands, but makes large files, and MPEG4
+has high CPU demands, but makes smaller files.</P>
+<P><B>NOTE</B>: although the width and height can be changed to almost
+anything, if you start mythtv and don't see video or you get "segmentation
+fault" errors, it is likely that the video4linux (v4l) subsystem did not
+like the height and width parameters specified.  It's best to leave the
+default as-is until you're sure that mythtv is operational.</P>
+<P>
+<A NAME="deinterlace_"></A> <B>NOTE</B>: the <CODE>int Deinterlace=1</CODE>
+variable controls the deinterlacer.  Support for deinterlacing requires that
+your processor has SSE (Streaming SIMD Extensions, aka "MMX2").  Early Intel
+Celeron (those that don't use the Coppermine 0.18um core and are usually
+&lt;600Mhz), Pentium Pro and Pentium II CPUs do not have SSE, so make sure that
+you've got this set to "0" if you have one of these.  If you don't, you will
+get "Illegal Instruction" errors.</P>
+<P>To determine if you've got SSE, you can:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cat /proc/cpuinfo
+[snip]
+flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca
+cmov pat pse36 mmx fxsr sse
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Notice the <B>sse</B> at the end of the line.</P>
+<P>Users in North America can now exit and save the file.  Users in other parts
+of the world need to modify the first line and modify the XMLTVGrabber
+variable to the correct grabber for their region.  <B>tv_grab_uk</B> for the
+UK, etc.  Use the name from the xmltv directory.</P>
+
+<H2><A NAME="ss9.2">9.2 Running setup.</A>
+</H2>
+
+<P>Now that you've edited your <CODE>settings.txt</CODE> file, it's time to run the
+setup program and perform the initial configuration.</P>
+<P><B>NOTE</B>: Red Hat 8.0 users, if you haven't followed 
+<A HREF="#RH80-LANG">these</A>
+steps, you <EM>must</EM> do so before continuing.</P>
+<P>Open a shell, and switch to the setup directory:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cd setup
+$ ./setup
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The setup program will ask you a few questions and then proceed to run the
+XMLTV grabber program.</P>
+
+<H2><A NAME="ss9.3">9.3 Running mythfilldatabase.</A>
+</H2>
+
+<P>Now that the setup program has completed, run <B>mythfilldatabase</B> to
+get one week of data inserted into the database.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mythfilldatabase
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P><B>NOTE</B>:  <B>mythfilldatabase</B> might take a while to complete,
+depending on any number of factors, most of which you can't control.  It's
+best to just let the program run to completion.</P>
+<P><B>mythfilldatabase --manual</B> is another option; the manual option will
+allow you to fine tune channel frequencies and specify which channels will
+be added to the database.  If you are not using the tv_grab_na grabber, you
+must use the <B>--manual</B> option.</P>
+<P><B>mythfilldatabse --file</B> is an option if there isn't an XMLTV grabber
+for your country, but you <B>do</B> have an XML formatted listings file
+created by some other program.</P>
+<P><B>mythfilldatabase --xawchannels</B> is an option if you have used
+<B>xawtv</B> to fine-tune your channels and would like to import the fine
+tuning offsets into mythtv.</P>
+
+
+<H3>Setting <B>mythfilldatabase</B> to run from <B>cron</B></H3>
+
+<P>In order to keep your database filled, <B>mythfilldatabase</B> should be
+run once a day.</P>
+<P>There are two ways to accomplish this:  either as a user-based cron job, or
+as a system based cron.  If you use a user-based cron, you can select the
+time that the cron job will be run.  A system-based cron job will run at the
+same time as any other system cron jobs.</P>
+<P>If you are a Mandrake 9.0 user and wish to use a system cron job, you can
+perform the following steps:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cd configfiles
+$ su
+# cp mythfilldatabasecron /etc/cron.daily
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>If you want to know what time your job will run, you can do the following:
+<BLOCKQUOTE><CODE>
+<PRE>
+# cat /etc/crontab
+SHELL=/bin/bash
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+MAILTO=root
+HOME=/
+
+# run-parts
+01 * * * * root nice -n 19 run-parts /etc/cron.hourly
+02 4 * * * root nice -n 19 run-parts /etc/cron.daily
+22 4 * * 0 root nice -n 19 run-parts /etc/cron.weekly
+42 4 1 * * root nice -n 19 run-parts /etc/cron.monthly
+# exit
+$ 
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>We can see from the display that the cron.daily job will run at 0402 every
+morning.</P>
+<P>If you wish to specify a custom time, then the user-based cron job is the
+better method.</P>
+<P>The default <B>configfiles/mythcrontab</B> file will run the <B>mythfilldatabase</B> program every day at 0430.  If you want to change this,
+then open the <CODE>configfiles/mythcrontab</CODE> file in your favorite editor and
+modify it as you like.  Once you're satisfied with the time that <B>mythfilldatabase</B> will run, save and exit, and return to the shell prompt.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cd configfiles
+$ crontab mythcrontab
+$ crontab -l  NOTE: this is a lowercase L.
+# The following will run the mythfilldatabase shell script at 0430
+# every day.  Format is
+# minutes hour day_of_month month day_of_week
+# man 5 crontab for more information
+# Need to use a shell script because the QTDIR environment variable isn't
+# being honored by crontab?
+# The next text should be all on the same line.
+30 04 * * * /bin/bash $HOME/mythtv-0.7/MC/configfiles/mythfilldatabasecron
+$ 
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>As you can see, <B>mythfilldatabase</B> will now be run at 0430
+every day.</P>
+<P>If you decide to alter the time that the <B>mythfilldatabase</B> runs,
+you can use the crontab command to open your existing job and edit it in
+place.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ crontab -e
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The <B>crontab -e</B> command will allow you to edit the existing crontab.
+<B>NOTE</B>:  By default, the crontab will use <B>vi</B> as your
+editor.  If you don't like to use <B>vi</B>, make sure that you've set
+<CODE>VISUAL</CODE> to something other than <B>vi</B>.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ export VISUAL=/usr/bin/joe
+$ crontab -e
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>This will cause <B>crontab</B> to use <B>joe</B>, a visual editor that
+uses the Wordstar command sequence.  You may use <B>emacs</B>, or any
+other editor that you're comfortable with.  You may also add the
+<CODE>EXPORT</CODE> command to your <CODE>.bashrc</CODE> or to the
+<CODE>/etc/profile.d/mythtv.sh</CODE> file.</P>
+<P>Once you've completed this step, run the <B>mythepg</B> program to check
+that the database has been filled.  The cursor keys will move you around the
+grid, the "I" key will give you more information on a program and ESC will
+exit out back to the shell.</P>
+
+<H2><A NAME="s10">10. Using mythtv.</A></H2>
+
+<P><B>mythfrontend</B> is the main interface to the mythtv program.  This
+program allows you to choose which of the other modules you'd like to run
+and ensures that programs that you've scheduled for recording actually get
+recorded, so it's important that this program is always running.</P>
+
+
+<H2><A NAME="ss10.1">10.1 Using themes with mythtv.</A>
+</H2>
+
+<P>mythtv is "themeable", meaning that the visual appearance of the program
+can be modified by the user without re-compiling or altering the program
+functionality.
+<CODE>/usr/local/share/mythtv/theme.txt</CODE> allows you to alter the theme
+for mythtv.  The default theme is called "blue".  Other themes that ship
+with mythtv can be found in the <CODE>/usr/local/share/mythtv/themes</CODE>
+directory.  Change the first variable in the <CODE>theme.txt</CODE> file and
+exit and restart <B>mythfrontend</B> for it to take effect.</P>
+<P><B>NOTE</B>: Exiting <B>mythfrontend</B> will stop any recordings you
+have in progress, so make sure that the system isn't busy if you modify the
+theme while <B>mythfrontend</B> is still running.</P>
+
+<H2><A NAME="ss10.2">10.2 Adding DirecTV information to the database.</A>
+</H2>
+
+<P>A script for adding DirecTV information into the database has been
+written by tarek Lubani 
+<A HREF="mailto:tarek@tarek.2y.net">mailto:tarek@tarek.2y.net</A> and is
+available at 
+<A HREF="http://tarek.2y.net/myth/ppv.pl">http://tarek.2y.net/myth/ppv.pl</A>.  This is currently an external
+user-supplied program, so if you have issues with the script, please contact
+the author.</P>
+
+<H2><A NAME="ss10.3">10.3 Adding support for an external tuner.</A>
+</H2>
+
+<P>mythtv supports changing the channel on an external tuner.  If you have
+an external tuner, such as a DirecTV or digital cable set top box, the
+following command should be added to your settings.txt file:
+<BLOCKQUOTE><CODE>
+<PRE>
+str ExternalChannelCommand=/usr/local/bin/changechannel
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The <B>changechannel</B> program is not supplied with mythtv, so this is
+going to be dependant on what sort of external tuner you have.  Example
+scripts for Sony and RCA receivers can be obtained from 
+<A HREF="http://tarek.2y.net/myth/">http://tarek.2y.net/myth/</A>.  This is currently an external
+user-supplied program, so if you have issues with the script, please contact
+the author.</P>
+<P>Feel free to browse some of what sort of hardware is available at 
+<A HREF="http://shop.store.yahoo.com/snapstreammedia/cablepacks.html">http://shop.store.yahoo.com/snapstreammedia/cablepacks.html</A>, or if
+you wish to assemble your own, rather than purchase, the following may be
+helpful: 
+<A HREF="http://www.snapstream.com/products/irblaster/sonydss.htm">http://www.snapstream.com/products/irblaster/sonydss.htm</A> for cable
+pinouts for RCA DSS receivers.</P>
+
+<H2><A NAME="s11">11. mythweb.</A></H2>
+
+<P>mythweb allows you to use a web page to control various aspects of your
+mythtv system.  mythweb is a separate application, but it's dependant on
+mythtv being installed and operational.</P>
+
+<H2><A NAME="ss11.1">11.1 Installation and pre-requisites.</A>
+</H2>
+
+<P>Download mythweb from 
+<A HREF="http://www.mythtv.org/">http://www.mythtv.org/</A> and save it to a location where you can find
+it.  The next step depends on whether your distribution has a web server and
+if you have php support.</P>
+
+<H3>Mandrake 9.0</H3>
+
+<P>Mandrake 9.0 has <B>apache</B> and <B>php</B> pre-packaged, so
+installation is quite simple.  Once you have installed the two programs,
+either with the graphical installer (see instructions in 
+<A HREF="#graphicinstalltools_">Graphic Install Tools</A>) or through the
+command line (section 
+<A HREF="#CLIinstalltools_">Command Line</A>), and
+you've ensured that the <B>apache</B> server will start at boot using the
+Mandrake Control Center.</P>
+
+<H2><A NAME="ss11.2">11.2 Completing the installation.</A>
+</H2>
+
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ tar -xjf mythweb-0.7.tar.bz2
+$ cd mythweb-0.7
+$ su
+# mkdir /var/www/html/mythweb
+# cp -r . /var/www/html/mythweb
+# exit
+$ 
+</PRE>
+</CODE></BLOCKQUOTE>
+
+To access the web page, open a web browser and use <B>http://[name or ip
+address]/mythweb/</B></P>
+<P><B>NOTE</B>: Make sure that you have a trailing slash on the URL,
+otherwise you will get a <CODE>404 Page not Found</CODE> error.</P>
+
+<H2><A NAME="s12">12. mythgallery.</A></H2>
+
+<P>mythgallery is a photo and slideshow application.  mythgallery is a
+separate application, but it's dependant on mythtv being installed and
+operational.</P>
+<H2><A NAME="ss12.1">12.1 Installation and pre-requisites.</A>
+</H2>
+
+<P>Download mythgallery from 
+<A HREF="http://www.mythtv.org/">http://www.mythtv.org/</A> and save it to a location where you can find
+it.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ tar -xjf mythgallery-0.7.tar.bz2
+$ cd mythgallery-0.7
+$ make
+# su
+# make install
+# exit
+$ 
+</PRE>
+</CODE></BLOCKQUOTE>
+
+The configuration file for mythgallery is located in
+<CODE>/usr/local/share/mythtv</CODE>.  This file needs to be edited:  ensure
+that your GalleryDir variable is set to the directory where your pictures are
+stored.</P>
+<P>
 <UL>
-<LI><A NAME="toc8.1">8.1</A> <A HREF="mythtv-HOWTO-8.html#ss8.1">Obtaining the kernel.</A>
-<LI><A NAME="toc8.2">8.2</A> <A HREF="mythtv-HOWTO-8.html#ss8.2">Obtaining and compiling lirc.</A>
-<LI><A NAME="toc8.3">8.3</A> <A HREF="mythtv-HOWTO-8.html#ss8.3">Additional information for lirc.</A>
-<LI><A NAME="toc8.4">8.4</A> <A HREF="mythtv-HOWTO-8.html#ss8.4">Configuring lirc for use with an IR blaster.</A>
-</UL>
-<P>
-<H2><A NAME="toc9">9.</A> <A HREF="mythtv-HOWTO-9.html">Configuring mythtv. </A></H2>
-
+<LI>Use the arrow keys to move around the thumbnails.</LI>
+<LI>Use SPACE or ENTER to maximize a photo.
 <UL>
-<LI><A NAME="toc9.1">9.1</A> <A HREF="mythtv-HOWTO-9.html#ss9.1">Editing the settings.txt file.</A>
-<LI><A NAME="toc9.2">9.2</A> <A HREF="mythtv-HOWTO-9.html#ss9.2">Running setup.</A>
-<LI><A NAME="toc9.3">9.3</A> <A HREF="mythtv-HOWTO-9.html#ss9.3">Running mythfilldatabase.</A>
+<LI>Use p or P to start the slideshow of all the files in the
+directory.  "Play" or "Pause" on your remote may also work.</LI>
+<LI>Use SPACE or ENTER to advance to the next photo.</LI>
 </UL>
-<P>
-<H2><A NAME="toc10">10.</A> <A HREF="mythtv-HOWTO-10.html">Using mythtv.</A></H2>
+</LI>
+<LI>Use ESC to go up one level, or to exit out of the module if
+you're at the first level.</LI>
+</UL>
+</P>
 
+<H2><A NAME="s13">13. mythgame.</A></H2>
+
+<H2><A NAME="s14">14. mythmusic. </A></H2>
+
+<P>[Documentation still being developed.]</P>
+<P>mythmusic has a number of pre-requisites that must be satisfied before it
+is operational.  Depending on your distribution, some of these prerequisites can
+be satisfied through the various package managers.  If your distribution doesn't
+offer pre-compiled versions of the software below, then follow the generic
+instructions for manually compiling and installing the software.</P>
+<P>The pre-requisites for mythmusic are:
 <UL>
-<LI><A NAME="toc10.1">10.1</A> <A HREF="mythtv-HOWTO-10.html#ss10.1">Using themes with mythtv.</A>
-<LI><A NAME="toc10.2">10.2</A> <A HREF="mythtv-HOWTO-10.html#ss10.2">Adding DirecTV information to the database.</A>
-<LI><A NAME="toc10.3">10.3</A> <A HREF="mythtv-HOWTO-10.html#ss10.3">Adding support for an external tuner.</A>
+<LI>MAD</LI>
+<LI>libvorbis-devel</LI>
+<LI>FLAC</LI>
+<LI>libcdaudio</LI>
+<LI>CDParanoia</LI>
 </UL>
-<P>
-<H2><A NAME="toc11">11.</A> <A HREF="mythtv-HOWTO-11.html">mythweb.</A></H2>
+</P>
 
+<H2><A NAME="ss14.1">14.1 Manual installation of pre-requisites</A>
+</H2>
+
+<P>These instructions are for distributions which don't have pre-compiled
+versions of the software necessary to run mythtv.</P>
+<P>Download MAD from 
+<A HREF="http://www.mars.org/home/rob/proj/mpeg/">http://www.mars.org/home/rob/proj/mpeg/</A>  Save it to a directory you
+can find later.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ tar -xzf mad-0.14.2b.tar.gz
+$ cd mad-0.14.2b
+$ ./configure
+$ make
+$ su
+# make install
+# exit
+$ 
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Download FLAC from 
+<A HREF="http://flac.sourceforge.net">http://flac.sourceforge.net</A> and install:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ tar -xzf flac-1.0.4.tar.gz
+$ cd flac-1.0.4
+$ ./configure
+$ make
+$ su
+# make install
+# exit
+$ 
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Download libcdaudio from 
+<A HREF="http://sourceforge.net/project/showfiles.php?group_id=27134">libcdaudio.sourceforge.net</A> and
+install:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ tar -xzf libcdaudio-0.99-6.tar.gz
+$ cd libcdaudio-0.99.6
+$ ./configure
+$ make
+$ su
+# make install
+# exit
+$ 
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Download cdparanoia from 
+<A HREF="http://www.xiph.org/paranoia/download/cdparanoia-III-alpha9.8.src.tgz">http://www.xiph.org/paranoia/down.html</A>.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ tar -xzf cdparanoia-III-alpha9.8.src.tgz
+$ cd cdparanoia-III-alpha9.8
+$ ./configure
+$ make
+$ su
+# make install
+&lt;!-- see if the next step is a Mandrake only issue -->
+# cp interface/cdda_interface.h /usr/local/include
+# cd /usr/lib
+# ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
+# ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
+# exit
+$ 
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<H2><A NAME="ss14.2">14.2 Mandrake 9.0</A>
+</H2>
+
+<P>Mandrake 9.0 has a number of the pre-requisites available on the
+installation CD.  Some of the software you're going to need will have to be
+obtained from the "contrib" or "cooker" development repositories. 
+Applications downloaded from "cooker" come from the development branch, so
+there may be issues with some software.</P>
+
+<P><B>urpmi</B> is the simplest tool for installation of packages from the
+command line.  The difficult part is the configuration aspect.  The
+following website 
+<A HREF="http://plf.zarb.org/~nanardon/urpmiweb.php">http://plf.zarb.org/~nanardon/urpmiweb.php</A> will allow you to choose
+a mirror site and then present the command-line configuration text for that
+mirror.  You will most likely need to add a "Contrib" mirror to your setup. 
+Once you have done that, you can proceed.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+# urpmi mad flac libcdaudio cdparanoia libvorbis-devel libcdda0-devel
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H2><A NAME="ss14.3">14.3 Compiling mythmusic.</A>
+</H2>
+
+<P>Once all the pre-requisites have been installed, you can proceed with
+getting mythmusic going.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ make
+$ su
+# make install
+# exit
+$ cd musicdb
+$ mysql -u root &lt; metadata.sql
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Edit the <CODE>/usr/local/share/mythtv/mythmusic-settings.txt</CODE> file for
+your particular system.</P>
+
+<H2><A NAME="s15">15. Troubleshooting.</A></H2>
+
+<H2><A NAME="ss15.1">15.1 Illegal Instruction.</A>
+</H2>
+
+<P>This error can happen for the following reasons:
 <UL>
-<LI><A NAME="toc11.1">11.1</A> <A HREF="mythtv-HOWTO-11.html#ss11.1">Installation and pre-requisites.</A>
-<LI><A NAME="toc11.2">11.2</A> <A HREF="mythtv-HOWTO-11.html#ss11.2">Completing the installation.</A>
+<LI>You have an AMD K6-2 or VIA C3 processor.  If you have either of
+these, make sure that you you followed the instructions in this 
+<A HREF="#nonintelcpu_">section</A>.</LI>
+<LI>You have an early production Intel Celeron, Pentium Pro or Pentium II.  If you have any
+of these processors, make sure that your 
+<A HREF="#deinterlace_">deinterlace</A>
+variable is set correctly.  Your CPU needs to support SSE instructions for
+deinterlace support.  You may check this by doing a <CODE>$ cat
+/proc/cpuinfo</CODE> and looking for "sse" in the processor flags section.</LI>
 </UL>
-<P>
-<H2><A NAME="toc12">12.</A> <A HREF="mythtv-HOWTO-12.html">mythgallery.</A></H2>
+</P>
+<H2><A NAME="ss15.2">15.2 mythfilldatabase failing.</A>
+</H2>
 
+<P>If mythtvfilldatabase suddenly appears to be failing, check to see what version of
+XMLTV you're running.  Versions prior to 0.5.4 need to have the following
+change made: edit the
+<CODE>/usr/lib/perl5/site_perl/5.8.0/XMLTV/ZapListings.pm</CODE> file and
+perform a global search and replace, searching for "tvlistings2" and
+replacing it with "tvlistings".</P>
+<H2><A NAME="ss15.3">15.3 mythtv seems to disappear; can't see video</A>
+</H2>
+
+<P>If you're using Gnome as your window manager, try switching to KDE.  For
+Red Hat Linux 8.0 users, edit <CODE>/etc/sysconfig/desktop</CODE> and
+change "GNOME" to "KDE".</P>
+<H2><A NAME="Setting_DMA"></A> <A NAME="ss15.4">15.4 Fast CPU, choppy or jittery video. </A>
+</H2>
+
+<P>This is most likely because your hard drive isn't setup to use DMA.  Use
+the <B>hdparm</B> program to check and enable DMA.
+<BLOCKQUOTE><CODE>
+<PRE>
+# hdparm -d /dev/hd?
+</PRE>
+</CODE></BLOCKQUOTE>
+ will tell you the DMA status for your hard drives.  If you run
+<B>hdparm</B> with the <CODE>-d1</CODE> parameter, it will turn DMA on.</P>
+<H2><A NAME="ss15.5">15.5 I keep losing all of my settings every time I compile!</A>
+</H2>
+
+<P>mythtv will overwrite any settings in <CODE>/usr/local/share/mythtv</CODE>.
+If you want to make sure that you don't lose your modifications, make a
+directory <CODE>~/.mythtv</CODE> and copy your settings.txt file to this
+location.</P>
+<H2><A NAME="ss15.6">15.6 Compile errors.</A>
+</H2>
+
+<P>Some compile errors are worse than others.  If you get an error that
+doesn't abort the compilation, and says something like:
+<BLOCKQUOTE><CODE>
+<PRE>
+cc1plus: warning: changing search order for system directory
+"/usr/local/include"
+cc1plus: warning:   as it has already been specified as a non-system
+directory
+</PRE>
+</CODE></BLOCKQUOTE>
+
+then it shouldn't be a problem.</P>
+<P>If you get an error like <CODE>/usr/bin/ld: cannot find -lXext</CODE>, the
+compiler is telling you that you don't have XFree86-devel installed, and
+this needs to be fixed before mythtv will work correctly.</P>
+<H2><A NAME="ss15.7">15.7 My screen goes blank, but comes back when I wiggle the mouse or use the keyboard.</A>
+</H2>
+
+<P>This is due to DPMS, the Display Power Management System, which is used
+to save power by turning off your monitor when the system decides that it's
+not being used.  Since it's likely that watching TV will not generate
+keyboard or mouse events for a time, you need to turn off DPMS.  There are a
+few ways to do this.</P>
+<P>You can edit your <CODE>/etc/X11/XF86Config-4</CODE> file, and look for:
+<BLOCKQUOTE><CODE>
+<PRE>
+Section "Device"
+    Identifier "device1"
+    VendorName "nVidia Corporation"
+    BoardName "NVIDIA GeForce 256 (generic)"
+    Driver "nv"
+    Option "DPMS"
+EndSection
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>In this case, you would need to either delete the <CODE>Option "DPMS"</CODE>
+line, or change it to <CODE># Option "DPMS"</CODE> to comment it out.  The next
+time you start XFree this change will take effect.</P>
+<P>You can also turn off DPMS from the Command Line, but this will not survive
+a reboot.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ xset -DPMS
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Using <CODE>xset +DPMS</CODE> will turn it back on.</P>
+<P>Finally, depending on your distribution, you may be able to turn it off from
+within the control panel.</P>
+
+<H2><A NAME="ss15.8">15.8 I can't checkout using CVS anymore!</A>
+</H2>
+
+<P>Isaac has changed some things around.  The CVS repository is now known as
+<CODE>cvs.mythtv.org</CODE>, rather than <CODE>www.mythtv.org</CODE> or
+<CODE>mythtv.org</CODE>.  Make sure you change your <CODE>CVSROOT</CODE> to point to
+the new server, delete your old tree, and re-do the checkout.</P>
+
+<H2><A NAME="ss15.9">15.9 I get segfaults / mythtv isn't doing anything.</A>
+</H2>
+
+<P>Without details, the developers will not be able to determine if you have
+discovered a genuine code-bug,  or it the problem is with your system.  In
+order to determine what's going on, you must recompile mythtv with debugging
+support and run mythtv within <B>gdb</B>, the GNU debugger.</P>
+<P>Edit the settings.pro file.  Make sure that the top of the file looks like this:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cat settings.pro
+CONFIG += debug
+#CONFIG += release
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Now, you need to clear out the old versions of the software to ensure that
+you're running with the debugging code, then compile and install.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ make clean
+$ make distclean
+$ ./configure
+$ make
+$ su
+# make install
+# exit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>At this point, you now have debug-enabled software ready.  Let's assume that
+the problem you're having is in the <CODE>setup</CODE> program.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cd setup
+$ gdb ./setup
+
+GNU gdb 5.2.1-2mdk (Mandrake Linux)
+Copyright 2002 Free Software Foundation, Inc.
+GDB is free software, covered by the GNU General Public License, and you are
+welcome to change it and/or distribute copies of it under certain
+conditions.
+Type "show copying" to see the conditions.
+There is absolutely no warranty for GDB.  Type "show warranty" for details.
+This GDB was configured as "i586-mandrake-linux-gnu"...
+(gdb)
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P><B>gdb</B> has a number of options, read the <CODE>man</CODE> page for more
+information.</P>
+<P>Once at the <CODE>(gdb)</CODE> prompt, type <CODE>run</CODE> to start program
+execution.  When the program segfaults, type <CODE>bt</CODE> to get the
+backtrace.  The backtrace should be posted to the mythtv-dev mailing list,
+along with the steps you followed to get the program to crash.</P>
+<P>If you <B>gdb</B> keeps pausing during the debug, printing things like
+"SIG32", you need to type in:
+<BLOCKQUOTE><CODE>
+<PRE>
+(gdb) handle SIG32 nostop
+(gdb) handle SIG33 nostop
+</PRE>
+</CODE></BLOCKQUOTE>
+ so that the program will continue to execute rather than
+stopping.</P>
+
+<H2><A NAME="ss15.10">15.10 Mythtv makes my system crash. </A>
+</H2>
+
+<P>mythtv <EM>can not</EM> crash your system - it is a user-level program. 
+If your system is crashing when you run mythtv, then you have some
+issue with the drivers for your capture card or other hardware, or the CPU
+fan has fallen off/broken and your system is overheating when asked to
+perform a CPU intensive task like encoding video.</P>
+
+<H2><A NAME="ss15.11">15.11 Troubleshooting audio</A>
+</H2>
+
+<P>By Bruce Markey, 
+<A HREF="mailto:bjm@lvcm.com">mailto:bjm@lvcm.com</A></P>
+<P>Audio appears to be one of the bigger issues that users run into on the
+mailing list.  If the audio isn't configured correctly, then mythtv will
+often appear to hang, when in fact it is trying to manipulate the audio
+subsystem and failing.  You may or may not receive error messages indicating
+that the source of the error is the audio subsystem.</P>
+<P>You can not use <B>xawtv</B> to determine if your audio is working
+correctly, since <B>xawtv</B> is simply using the the analog sound patched
+through line-in to line-out. It doesn't need to digitize the sound unless
+you are using the recording function.</P>
+<P>A better test to verify that sound will work for MythTV (and recording with
+<B>xawtv</B> for that matter) is to startup <B>xawtv</B>, mute the
+line-in then run <CODE>aplay /dev/dsp</CODE>. Once this test succeeds, MythTV
+should also work correctly because it writes to and read from /dev/dsp in
+the same way that <B>aplay</B> does.</P>
+<P>To record audio along with video the audio signal must be digitized by a DSP
+so that the audio data can be stored in a file. On playback, the audio data
+is written to /dev/dsp and converted back to an analog signal. This analog
+signal should then be sent to your speakers. Here is what is needed in
+alsamixer:</P>
+<P>CAPTUR source - the analog source to be sent to the DSP. This should be set
+to the input source from the tuner card to the sound card. In most cases
+this is Line but this could also be Aux, CD, Mic, etc., depending on how you
+connect the input cable. This source should be muted to prevent patching
+through the analog sound. The volume of this source will not affect the
+record level.</P>
+<P>Capture mixer - this sets the level for the analog to digital recording.
+While a volume of 100% is recommended for testing, distortion may occur.
+Lowering this level to 75% to 85% may result in better audio quality.
+"Capture" should be marked as the CAPTUR destination.</P>
+<P>PCM mixer - this sets the level for the digital to analog playback. While a
+volume of 100% is recommended for testing, distortion may occur. Lowering
+this level to 75% to 85% may result in better audio quality.</P>
+<P>Master mixer - sets the level for the analog signal sent to line-out or the
+speakers.</P>
+<P>You may also want to ensure that <CODE>/dev/dsp</CODE> hasn't already been
+grabbed by another process, like <B>esd</B>.  If <CODE>/dev/dsp</CODE> isn't
+available, then mythtv won't work.</P>
+
+<H2><A NAME="s16">16. Miscellaneous.</A></H2>
+
+<H2><A NAME="ss16.1">16.1 I'd like to watch the files without using mythtv / I'd like to convert the files to some other format.</A>
+</H2>
+
+<P>Matthew Zimmerman has created a patch for MPlayer / Mencoder
+<A HREF="http://www.mplayerhq.hu">http://www.mplayerhq.hu</A> that allows
+you view the files created by mythtv.  Mythtv doesn't use standard
+Nupplevideo files, which is why you MPlayer complains if you try to view
+them.</P>
+<P>Download the patch to MPlayer from Matt's website. 
+<A HREF="http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/">http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/</A>.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ wget http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/mplayer-0.90pre10+mythtv.patch
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Download the source to MPlayer and patch:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90rc1.tar.bz2
+$ tar -xjf MPlayer-0.90rc1.tar.bz2
+$ cp mplayer-0.90pre10+mythtv.patch MPlayer-0.90rc1
+$ cd MPlayer-0.90rc1
+$ patch -p1 &lt; mplayer-0.90pre10+mythtv.patch
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>At this point, you can read the MPlayer documentation and start the compile
+process.</P>
+
+<H2><A NAME="ss16.2">16.2 I'd like to use some other window manager.</A>
+</H2>
+
+<P>mythtv is not dependent on any particular window manager.  If you wish to
+run a lightweight window manager, the <CODE>configfiles/</CODE> directory has an
+example of a <CODE>.twmrc</CODE> file you may use.</P>
+
+<H2><A NAME="ss16.3">16.3 I'd like mythtv to automatically startup.</A>
+</H2>
+
+<P>Here's an example submitted to the mythtv-dev list by Pat Pflaum
+<A HREF="mailto:pat@netburp.com">mailto:pat@netburp.com</A> using fvwm:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cat > .xinitrc
+fvwm &amp;
+mythfrontend
+^D
+$ cat > .fvwmrc
+Style "myth*"      NoTitle, NoHandles, Sticky, WindowListSkip, BorderWidth 0
+^D
+$
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H2><A NAME="ss16.4">16.4 I'd like to delete the mysql database.</A>
+</H2>
+
+<P><B>NOTE</B>:  Performing this step will remove the entire database. 
+You will lose all of your settings and will need to re-run the mc.sql script
+to setup the database structure before running the setup program.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mysql -u root
+mysql> drop database mythconverg;
+mysql> quit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H2><A NAME="ss16.5">16.5 I'd like to start using the development version of mythtv.</A>
+</H2>
+
+<P>[Content under development]</P>
+<P><B>NOTE</B>:It should be clear that using the development version of
+mythtv may cause loss of data on your system.  There is no guarantee that the development
+version of mythtv will work for you.</P>
+<P><B>THERE IS NO GUARANTEE THAT THESE INSTRUCTIONS WILL WORK.  USE AT YOUR
+OWN RISK.</B></P>
+<P>Here are some of the features in version 0.8:
 <UL>
-<LI><A NAME="toc12.1">12.1</A> <A HREF="mythtv-HOWTO-12.html#ss12.1">Installation and pre-requisites.</A>
+<LI>A front-end and back-end system.  The back-end is responsible for
+maintaining the database and capturing and encoding the video.  The
+front-end is responsible for displaying the video.  This allows you to put a
+lightweight, quiet, diskless and fanless machine in "the living room", with a large server-type
+machine in "the basement".  The front-end and back-end communicate over TCP
+on a specified port.</LI>
+<LI>GUI-based configuration.  Much of the configuration of mythtv can now
+be done using a GUI-based setup, avoiding the necessity to edit the
+<CODE>settings.txt</CODE> file.</LI>
+<LI>Themes.  mythtv now has more themes for the user to choose from.</LI>
+<LI>Recording profiles.  You may now setup various encoder profiles from
+the GUI, giving you the flexibility to record programs using various quality
+levels.</LI>
+<LI>Increased hardware encoder support.  mythtv can now use the MJPEG
+encoder/decoder found on Matrox G200 series cards.  This greatly reduces the
+CPU utilization.</LI>
 </UL>
+</P>
+<P><B>NOTE</B>:  Problem reports for version 0.8 posted to the mailing list
+should have accompanying solutions.</P>
+<P>Before you begin, shutdown all running instances of 0.7.  You should perform
+a <CODE>make clean distclean</CODE> before starting the compile process.</P>
+<P>Compile and install the system as you would mythtv 0.7 by following the
+instructions found in this HOWTO.  If you are installing mythtv on a new
+machine, install the database by running the <CODE>database/mc.sql</CODE>
+script as detailed in earlier sections of this document.</P>
+<P>However, if you are upgrading an existing 0.7 system, you <EM>must</EM> run the
+<CODE>database/0-7-to-0-8.sql</CODE> script before running the setup program to
+ensure that the database structure is up to date.</P>
+<P>Next, you must edit the
+<CODE>/usr/local/share/mythtv/backend_settings.txt</CODE> file.  Specify the IP
+address or hostname of the back-end server and port.  You may specify
+<CODE>localhost</CODE> if the front-end and back-end programs will be running on
+the same machine.  This file is read by the backend server during start-up.</P>
+<P>Once you're done editing the file, start the setup program:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cd setup
+$ ./setup
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>This will open the setup wizard which will allow you to graphically
+configure your system.</P>
+<P>Once the setup wizard is done: to run the new version of mythtv, you must
+first start the back-end server:</P>
 <P>
-<H2><A NAME="toc13">13.</A> <A HREF="mythtv-HOWTO-13.html">mythgame.</A></H2>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mythbackend &amp;
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>and then run the front-end client:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mythfrontend
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>You should see the connection established between the front-end and back-end
+systems by examining the mythbackend window; it will display the client
+connection attempts.</P>
 
-<P>
-<H2><A NAME="toc14">14.</A> <A HREF="mythtv-HOWTO-14.html">mythmusic. </A></H2>
-
-<UL>
-<LI><A NAME="toc14.1">14.1</A> <A HREF="mythtv-HOWTO-14.html#ss14.1">Manual installation of pre-requisites</A>
-<LI><A NAME="toc14.2">14.2</A> <A HREF="mythtv-HOWTO-14.html#ss14.2">Mandrake 9.0</A>
-<LI><A NAME="toc14.3">14.3</A> <A HREF="mythtv-HOWTO-14.html#ss14.3">Compiling mythmusic.</A>
-</UL>
-<P>
-<H2><A NAME="toc15">15.</A> <A HREF="mythtv-HOWTO-15.html">Troubleshooting.</A></H2>
-
-<UL>
-<LI><A NAME="toc15.1">15.1</A> <A HREF="mythtv-HOWTO-15.html#ss15.1">Illegal Instruction.</A>
-<LI><A NAME="toc15.2">15.2</A> <A HREF="mythtv-HOWTO-15.html#ss15.2">mythfilldatabase failing.</A>
-<LI><A NAME="toc15.3">15.3</A> <A HREF="mythtv-HOWTO-15.html#ss15.3">mythtv seems to disappear; can't see video</A>
-<LI><A NAME="toc15.4">15.4</A> <A HREF="mythtv-HOWTO-15.html#ss15.4">Fast CPU, choppy or jittery video.</A>
-<LI><A NAME="toc15.5">15.5</A> <A HREF="mythtv-HOWTO-15.html#ss15.5">I keep losing all of my settings every time I compile!</A>
-<LI><A NAME="toc15.6">15.6</A> <A HREF="mythtv-HOWTO-15.html#ss15.6">Compile errors.</A>
-<LI><A NAME="toc15.7">15.7</A> <A HREF="mythtv-HOWTO-15.html#ss15.7">My screen goes blank, but comes back when I wiggle the mouse or use the keyboard.</A>
-<LI><A NAME="toc15.8">15.8</A> <A HREF="mythtv-HOWTO-15.html#ss15.8">I can't checkout using CVS anymore!</A>
-<LI><A NAME="toc15.9">15.9</A> <A HREF="mythtv-HOWTO-15.html#ss15.9">I get segfaults / mythtv isn't doing anything.</A>
-<LI><A NAME="toc15.10">15.10</A> <A HREF="mythtv-HOWTO-15.html#ss15.10">Mythtv makes my system crash. </A>
-<LI><A NAME="toc15.11">15.11</A> <A HREF="mythtv-HOWTO-15.html#ss15.11">Troubleshooting audio</A>
-</UL>
-<P>
-<H2><A NAME="toc16">16.</A> <A HREF="mythtv-HOWTO-16.html">Miscellaneous.</A></H2>
-
-<UL>
-<LI><A NAME="toc16.1">16.1</A> <A HREF="mythtv-HOWTO-16.html#ss16.1">I'd like to watch the files without using mythtv / I'd like to convert the files to some other format.</A>
-<LI><A NAME="toc16.2">16.2</A> <A HREF="mythtv-HOWTO-16.html#ss16.2">I'd like to use some other window manager.</A>
-<LI><A NAME="toc16.3">16.3</A> <A HREF="mythtv-HOWTO-16.html#ss16.3">I'd like mythtv to automatically startup.</A>
-<LI><A NAME="toc16.4">16.4</A> <A HREF="mythtv-HOWTO-16.html#ss16.4">I'd like to delete the mysql database.</A>
-<LI><A NAME="toc16.5">16.5</A> <A HREF="mythtv-HOWTO-16.html#ss16.5">I'd like to start using the development version of mythtv.</A>
-</UL>
-<HR>
-<A HREF="mythtv-HOWTO-1.html">Next</A>
-Previous
-Contents
 </BODY>
 </HTML>

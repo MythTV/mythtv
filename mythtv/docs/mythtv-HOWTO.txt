@@ -1,6 +1,6 @@
   Installing and using mythtv
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-01-05, v1.062
+  2003-01-06, v1.063
 
   Initially, installation of mythtv seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -44,7 +44,7 @@
   6. MySQL.
      6.1 Mandrake 9.0
      6.2 Red Hat Linux 8.0
-     6.3 Gentoo. After installing mysql you need to initialise the database by running mysql_install_db as root.
+     6.3 Gentoo.
      6.4 Setting up the initial database.
         6.4.1 Mandrake 9.0
         6.4.2 Debian 3.0
@@ -187,10 +187,10 @@
   your experience will be with mythtv.  Performing the "Watch TV"
   function, where the CPU is both encoding and decoding video
   simultaneously to allow Pause, Fast Forward and Rewind functions for
-  live TV requires twice as much CPU as just encoding or decoding.
-  mythtv also supports multiple encoder cards in a single PC, increasing
-  the CPU requirements if you are going to simultaneously encode
-  multiple programs.
+  live TV requires more CPU then just encoding or decoding.  mythtv also
+  supports multiple encoder cards in a single PC, increasing the CPU
+  requirements if you are going to simultaneously encode multiple
+  programs.
 
   Here are a few data points:
 
@@ -208,6 +208,11 @@
 
   +o  A dual Celeron/450Mhz is able to view a 480x480 MPEG4/3300Kbps file
      created on a different system with 30% CPU usage.
+
+  [1mNOTE[22m:  You [4mmust[24m use DMA for hard drive access to prevent choppy or
+  jittery video.  Red Hat Linux 8.0 apparently does not enable DMA at
+  boot time.  See the Troubleshooting Section for ``instructions'' on
+  how to do this.
 
   [1m3.2.  Software.[0m
 
@@ -566,11 +571,19 @@
 
   [1m5.3.  Building XMLTV.[0m
 
-  [1mNOTE[22m: Red Hat Linux 8.0 users, you [4mmust[24m download and install an
-  updated version of libexpat.  The version that ships with Red Hat
-  Linux 8.0 (version 1.95.4) is buggy, and will cause problems with
-  XML::Twig.  All other distributions may skip the step and proceed with
-  untar'ing the xmltv file.
+  [1mNOTE[22m: Red Hat Linux 8.0 and Suse 8.1 users, you [4mmust[24m download and
+  install an updated version of libexpat.  The version that ships with
+  Red Hat Linux 8.0 and Suse 8.1 (version 1.95.4) is buggy, and will
+  cause problems with XML::Twig. All other distributions may skip this
+  step and proceed with ``untar'ing'' the xmltv file.
+
+  If you get errors installing XML::Twig or other XMLTV prerequisites,
+  try deleting the old versions of libexpat
+
+       $ su
+       # rm -f /usr/lib/libexpat*
+       # /sbin/ldconfig
+       # exit
 
   Download version 1.95.5 from sourceforge.net:
   http://sourceforge.net/projects/expat/
@@ -586,14 +599,6 @@
        # make install
        # exit
        $
-
-  If you get errors installing XML::Twig or other XMLTV prerequisites,
-  try deleting the old versions of libexpat
-
-       $ su
-       # rm -f /usr/lib/libexpat*
-       # /sbin/ldconfig
-       # exit
 
   [1mNOTE[22m:  Red Hat Linux 8.0 users, make sure that you set your LANG as
   described in ``Section 4''.
@@ -642,6 +647,14 @@
        $ cd mythtv-0.7
        $ ./configure
        $ make
+
+  [1mNOTE for Red Hat 8 users only[22m: You must manually modify a Makefile
+  within the themes directory, otherwise your on screen display (OSD)
+  will be "generic" rather than themed.  The solution is to edit the
+  Makefile within the themes directory and comment out (using a # symbol
+  before each line) every line that starts with the word "strip". Make
+  sure you switch back to the mythtv build directory before executing
+  the next step.
 
   Switch to superuser:
 
@@ -725,12 +738,14 @@
   [1m6.2.  Red Hat Linux 8.0[0m
 
   If this is the master system, make sure that mysql is running and
-  started at boot. Click on GNOME menu>Server Settings>Services and
+  started at boot. Click on Redhat menu>Server Settings>Services and
   enter the root password when asked.  Check "mysqld" and then click
   Start. Click Save, then close the window.
 
-  [1m6.3.  Gentoo. After installing mysql you need to initialise the[0m
-  [1mdatabase by running mysql_install_db as root.[0m
+  [1m6.3.  Gentoo.[0m
+
+  After installing mysql you need to initialise the database by running
+  mysql_install_db as root.
 
   [1m6.4.  Setting up the initial database.[0m
 
@@ -748,7 +763,7 @@
 
   [1m6.4.2.  Debian 3.0[0m
 
-       $ mysql < mc.sql
+  $ mysql < mc.sql
 
   [1m6.4.3.  Red Hat Linux 8.0[0m
 
@@ -757,8 +772,8 @@
 
   [1m6.4.4.  Gentoo[0m
 
-  $ su
-  # mysql < /usr/share/mythtv/database/mc.sql
+       $ su
+       # mysql < /usr/share/mythtv/database/mc.sql
 
   [1m7.  Setting up ALSA and the mixer.[0m
 
@@ -927,7 +942,7 @@
 
   Test the driver by playing a simple file:
 
-  $ aplay /usr/share/sounds/info.wav
+       $ aplay /usr/share/sounds/info.wav
 
   If it works, you're done installing ALSA!
 
@@ -980,7 +995,7 @@
 
   An easy way is to use the wget command:
 
-  $ wget http://www.kernel.org/pub/linux/kernel/v2.4/linux-2.4.19.tar.bz2
+       $ wget http://www.kernel.org/pub/linux/kernel/v2.4/linux-2.4.19.tar.bz2
 
   Next, open a shell and login as superuser.
 
@@ -1204,23 +1219,23 @@
 
   The lircrc.example file has this:
 
-       begin
-           prog = irxevent
-           button = ChannelUp
-           config = Key Up CurrentWindow
-       end
+  begin
+      prog = irxevent
+      button = ChannelUp
+      config = Key Up CurrentWindow
+  end
 
-       begin
-           prog = irxevent
-           button = ChannelDown
-           config = Key Down CurrentWindow
-       end
+  begin
+      prog = irxevent
+      button = ChannelDown
+      config = Key Down CurrentWindow
+  end
 
   but the /etc/lircd.conf that comes in the lircd package defines the
   buttons for the Pinnacle Studio PCTV as:
 
-            channel+                 0x0000000000000017
-            channel-                 0x000000000000001C
+                 channel+                 0x0000000000000017
+                 channel-                 0x000000000000001C
 
   rather than "ChannelUp" and "ChannelDown".  I added the following to
   my /home/[yourusername]/.lircrc file:
@@ -1301,15 +1316,15 @@
   The configuration for starting [1mlircd [22mdiffers if you're going to be
   sending and receiving IR versus just receiving.
 
-       # cd /etc/rc.d
-       # cat >> rc.local
-       echo "Starting lircd"
-       setserial /dev/ttySx uart none        # (if required)
-       modprobe lirc_sir
-       /usr/local/sbin/lircd
-       ^D
-       # exit
-       $
+  # cd /etc/rc.d
+  # cat >> rc.local
+  echo "Starting lircd"
+  setserial /dev/ttySx uart none        # (if required)
+  modprobe lirc_sir
+  /usr/local/sbin/lircd
+  ^D
+  # exit
+  $
 
   At this point you have to populate the /etc/lircd.conf file with the
   proper codes for your A/V remote. You should be able to find your
@@ -1343,44 +1358,44 @@
   /dev/device. Unlike bourne or bash, csh scripts automatically close
   parent file descriptors before they start.
 
-       $ cd /usr/local/bin
-       # su
-       # cat > change_channel.csh
-       #!/bin/csh
-       echo "changing to $1"
-       /usr/local/bin/channel.pl $1 &
-       ^D
-       # chmod a+x change_channel.csh
-       # exit
-       $ exit
+  $ cd /usr/local/bin
+  # su
+  # cat > change_channel.csh
+  #!/bin/csh
+  echo "changing to $1"
+  /usr/local/bin/channel.pl $1 &
+  ^D
+  # chmod a+x change_channel.csh
+  # exit
+  $ exit
 
   The following file should be saved as /usr/local/bin/channel.pl
 
-  #!/usr/bin/perl
+       #!/usr/bin/perl
 
-  # make sure to set this string to
-  # the corresponding remote in /etc/lircd.conf
-  $remote_name = "gi-motorola-dct2000";
+       # make sure to set this string to
+       # the corresponding remote in /etc/lircd.conf
+       $remote_name = "gi-motorola-dct2000";
 
-  sub change_channel {
-          my($channel_digit) = @_;
-          system ("rc SEND_ONCE $remote_name $channel_digit");
-          sleep 1;
-  }
+       sub change_channel {
+               my($channel_digit) = @_;
+               system ("rc SEND_ONCE $remote_name $channel_digit");
+               sleep 1;
+       }
 
-  $channel=$ARGV[0];
-  sleep 1;
-  if (length($channel) > 2) {
-          change_channel(substr($channel,0,1));
-          change_channel(substr($channel,1,1));
-          change_channel(substr($channel,2,1));
-  } elsif (length($channel) > 1) {
-          change_channel(substr($channel,0,1));
-          change_channel(substr($channel,1,1));
-  } else {
-          change_channel(substr($channel,0,1));
-  }
-  system ("rc SEND_ONCE $remote_name ENTER");
+       $channel=$ARGV[0];
+       sleep 1;
+       if (length($channel) > 2) {
+               change_channel(substr($channel,0,1));
+               change_channel(substr($channel,1,1));
+               change_channel(substr($channel,2,1));
+       } elsif (length($channel) > 1) {
+               change_channel(substr($channel,0,1));
+               change_channel(substr($channel,1,1));
+       } else {
+               change_channel(substr($channel,0,1));
+       }
+       system ("rc SEND_ONCE $remote_name ENTER");
 
   The last statement within the perl script is the lirc rc command. This
   is the command that transmits the code to your cable/dss box. Make
@@ -1500,25 +1515,26 @@
   If you want to know what time your job will run, you can do the
   following:
 
-       # cat /etc/crontab
-       SHELL=/bin/bash
-       PATH=/sbin:/bin:/usr/sbin:/usr/bin
-       MAILTO=root
-       HOME=/
+  # cat /etc/crontab
+  SHELL=/bin/bash
+  PATH=/sbin:/bin:/usr/sbin:/usr/bin
+  MAILTO=root
+  HOME=/
 
-       # run-parts
-       01 * * * * root nice -n 19 run-parts /etc/cron.hourly
-       02 4 * * * root nice -n 19 run-parts /etc/cron.daily
-       22 4 * * 0 root nice -n 19 run-parts /etc/cron.weekly
-       42 4 1 * * root nice -n 19 run-parts /etc/cron.monthly
-       # exit
-       $
+  # run-parts
+  01 * * * * root nice -n 19 run-parts /etc/cron.hourly
+  02 4 * * * root nice -n 19 run-parts /etc/cron.daily
+  22 4 * * 0 root nice -n 19 run-parts /etc/cron.weekly
+  42 4 1 * * root nice -n 19 run-parts /etc/cron.monthly
+  # exit
+  $
 
   We can see from the display that the cron.daily job will run at 0402
   every morning.
 
   If you wish to specify a custom time, then the user-based cron job is
   the better method.
+
   The default [1mconfigfiles/mythcrontab [22mfile will run the [1mmythfilldatabase[0m
   program every day at 0430.  If you want to change this, then open the
   configfiles/mythcrontab file in your favorite editor and modify it as
@@ -1661,7 +1677,6 @@
   mythgallery is a photo and slideshow application.  mythgallery is a
   separate application, but it's dependant on mythtv being installed and
   operational.
-
   [1m12.1.  Installation and pre-requisites.[0m
 
   Download mythgallery from http://www.mythtv.org/
@@ -1765,19 +1780,19 @@
   <http://www.xiph.org/paranoia/download/cdparanoia-III-
   alpha9.8.src.tgz>.
 
-       $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
-       $ cd cdparanoia-III-alpha9.8
-       $ ./configure
-       $ make
-       $ su
-       # make install
-       <!-- see if the next step is a Mandrake only issue -->
-       # cp interface/cdda_interface.h /usr/local/include
-       # cd /usr/lib
-       # ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
-       # ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
-       # exit
-       $
+  $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
+  $ cd cdparanoia-III-alpha9.8
+  $ ./configure
+  $ make
+  $ su
+  # make install
+  <!-- see if the next step is a Mandrake only issue -->
+  # cp interface/cdda_interface.h /usr/local/include
+  # cd /usr/lib
+  # ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
+  # ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
+  # exit
+  $
 
   [1m14.2.  Mandrake 9.0[0m
 
@@ -1927,15 +1942,16 @@
   Edit the settings.pro file.  Make sure that the top of the file looks
   like this:
 
-       $ cat settings.pro
-       CONFIG += debug
-       #CONFIG += release
+  $ cat settings.pro
+  CONFIG += debug
+  #CONFIG += release
 
   Now, you need to clear out the old versions of the software to ensure
   that you're running with the debugging code, then compile and install.
 
        $ make clean
        $ make distclean
+       $ ./configure
        $ make
        $ su
        # make install
@@ -1944,18 +1960,18 @@
   At this point, you now have debug-enabled software ready.  Let's
   assume that the problem you're having is in the setup program.
 
-  $ cd setup
-  $ gdb ./setup
+       $ cd setup
+       $ gdb ./setup
 
-  GNU gdb 5.2.1-2mdk (Mandrake Linux)
-  Copyright 2002 Free Software Foundation, Inc.
-  GDB is free software, covered by the GNU General Public License, and you are
-  welcome to change it and/or distribute copies of it under certain
-  conditions.
-  Type "show copying" to see the conditions.
-  There is absolutely no warranty for GDB.  Type "show warranty" for details.
-  This GDB was configured as "i586-mandrake-linux-gnu"...
-  (gdb)
+       GNU gdb 5.2.1-2mdk (Mandrake Linux)
+       Copyright 2002 Free Software Foundation, Inc.
+       GDB is free software, covered by the GNU General Public License, and you are
+       welcome to change it and/or distribute copies of it under certain
+       conditions.
+       Type "show copying" to see the conditions.
+       There is absolutely no warranty for GDB.  Type "show warranty" for details.
+       This GDB was configured as "i586-mandrake-linux-gnu"...
+       (gdb)
 
   [1mgdb [22mhas a number of options, read the man page for more information.
 
@@ -2129,7 +2145,7 @@
   should have accompanying solutions.
 
   Before you begin, shutdown all running instances of 0.7.  You should
-  perform a make clean before starting the compile process.
+  perform a make clean distclean before starting the compile process.
 
   Compile and install the system as you would mythtv 0.7 by following
   the instructions found in this HOWTO.  If you are installing mythtv on
@@ -2151,8 +2167,8 @@
        $ cd setup
        $ ./setup
 
-  This will open the setup wizard which will allow you to configure your
-  system.
+  This will open the setup wizard which will allow you to graphically
+  configure your system.
 
   Once the setup wizard is done: to run the new version of mythtv, you
   must first start the back-end server:

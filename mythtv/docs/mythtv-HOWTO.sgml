@@ -3,7 +3,7 @@
 
 <title>Installing and using mythtv
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-01-05, v1.062
+<date>2003-01-06, v1.063
 <abstract>
 Initially, installation of mythtv seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -74,8 +74,8 @@ There are many variables that go into the question: "How fast a CPU do I
 need to run mythtv"?  Obviously, the faster your CPU, the better your
 experience will be with mythtv.  Performing the "Watch TV" function, where
 the CPU is both encoding and decoding video simultaneously to allow Pause,
-Fast Forward and Rewind functions for live TV requires twice as much CPU as
-just encoding or decoding.  mythtv also supports multiple encoder cards in a
+Fast Forward and Rewind functions for live TV requires more CPU then just
+encoding or decoding.  mythtv also supports multiple encoder cards in a
 single PC, increasing the CPU requirements if you are going to
 simultaneously encode multiple programs.
 
@@ -92,6 +92,11 @@ simultaneously, thereby allowing live TV watching.
 <item>A dual Celeron/450Mhz is able to view a 480x480 MPEG4/3300Kbps file
 created on a different system with 30% CPU usage.
 </itemize>
+
+<bf>NOTE</bf>:  You <em>must</em> use DMA for hard drive access to prevent
+choppy or jittery video.  Red Hat Linux 8.0 apparently does not enable DMA
+at boot time.  See the Troubleshooting Section for <ref id="Setting_DMA"
+name="instructions"> on how to do this.
 
 <sect1>Software.
 <p>There are a few ways of installing programs on Linux systems; you can either
@@ -439,11 +444,20 @@ $
 </verb></tscreen>
 
 <sect1>Building XMLTV. 
-<p><bf>NOTE</bf>: Red Hat Linux 8.0 users, you <em>must</em> download and
-install an updated version of libexpat.  The version that ships with Red Hat
-Linux 8.0 (version 1.95.4) is buggy, and will cause problems with XML::Twig.
-All other distributions may skip the step and proceed with untar'ing the
-xmltv file.
+<p><bf>NOTE</bf>: Red Hat Linux 8.0 and Suse 8.1 users, you <em>must</em>
+download and install an updated version of libexpat.  The version that ships
+with Red Hat Linux 8.0 and Suse 8.1 (version 1.95.4) is buggy, and will
+cause problems with XML::Twig. All other distributions may skip this step
+and proceed with <ref id="untarring_xmltv" name="untar'ing"> the xmltv file.
+
+If you get errors installing XML::Twig or other XMLTV prerequisites,  
+try deleting the old versions of libexpat
+<tscreen><verb>
+$ su
+# rm -f /usr/lib/libexpat*
+# /sbin/ldconfig
+# exit
+</verb></tscreen>
 
 Download version 1.95.5 from sourceforge.net:  <url
 url="http://sourceforge.net/projects/expat/"
@@ -461,21 +475,12 @@ $ su
 $ 
 </verb></tscreen>
 
-If you get errors installing XML::Twig or other XMLTV prerequisites,  
-try deleting the old versions of libexpat
-<tscreen><verb>
-$ su
-# rm -f /usr/lib/libexpat*
-# /sbin/ldconfig
-# exit
-</verb></tscreen>
-
 <bf>NOTE</bf>:  Red Hat Linux 8.0 users, make sure that you set your LANG as
 described in <ref id="RH80-LANG" name="Section 4">.
 
 Continuing on:
 
-Untar the xmltv file:
+<label id="untarring_xmltv">Untar the xmltv file:
 <tscreen><verb>
 $ tar -xjf xmltv-0.5.4.tar.bz2
 $ cd xmltv-0.5.4
@@ -519,6 +524,14 @@ $ cd mythtv-0.7
 $ ./configure
 $ make
 </verb></tscreen>
+
+<bf>NOTE for Red Hat 8 users only</bf>: You must manually modify a Makefile
+within the themes directory, otherwise your on screen display (OSD) will be
+"generic" rather than themed.  The solution is to edit the Makefile within
+the themes directory and comment out (using a # symbol before each line)
+every line that starts with the word "strip". Make sure you switch back to
+the mythtv build directory before executing the next step.
+
 Switch to superuser:
 <tscreen><verb>
 $ su
@@ -604,11 +617,11 @@ click the "On Boot" button and the "Start" button if the mysql status shows
 that it isn't running yet.
 
 <sect1>Red Hat Linux 8.0
-<p>If this is the master system, make sure that mysql is running and started at boot. Click on GNOME
-menu>Server Settings>Services and enter the root password when asked.
+<p>If this is the master system, make sure that mysql is running and started at boot. Click on
+Redhat menu>Server Settings>Services and enter the root password when asked.
 Check "mysqld" and then click Start. Click Save, then close the window.
 <sect1>Gentoo.
-After installing mysql you need to initialise the database by running
+<p>After installing mysql you need to initialise the database by running
 mysql_install_db as root. 
 
 <sect1>Setting up the initial database.
@@ -1744,7 +1757,7 @@ replacing it with "tvlistings".
 <p>If you're using Gnome as your window manager, try switching to KDE.  For
 Red Hat Linux 8.0 users, edit <tt>/etc/sysconfig/desktop</tt> and
 change "GNOME" to "KDE".
-<sect1>Fast CPU, choppy or jittery video.
+<sect1>Fast CPU, choppy or jittery video. <label id="Setting_DMA">
 <p>This is most likely because your hard drive isn't setup to use DMA.  Use
 the <bf>hdparm</bf> program to check and enable DMA.<tscreen><verb>
 # hdparm -d /dev/hd?
@@ -1828,6 +1841,7 @@ you're running with the debugging code, then compile and install.
 <tscreen><verb>
 $ make clean
 $ make distclean
+$ ./configure
 $ make
 $ su
 # make install
@@ -2017,7 +2031,7 @@ CPU utilization.
 should have accompanying solutions.
 
 Before you begin, shutdown all running instances of 0.7.  You should perform
-a <tt>make clean</tt> before starting the compile process.
+a <tt>make clean distclean</tt> before starting the compile process.
 
 Compile and install the system as you would mythtv 0.7 by following the
 instructions found in this HOWTO.  If you are installing mythtv on a new
@@ -2040,8 +2054,8 @@ $ cd setup
 $ ./setup
 </verb></tscreen>
 
-This will open the setup wizard which will allow you to configure your
-system.
+This will open the setup wizard which will allow you to graphically
+configure your system.
 
 Once the setup wizard is done: to run the new version of mythtv, you must
 first start the back-end server:
@@ -2138,8 +2152,12 @@ Added instruction for deleting the database.
 v1.062, 2003-01-05.  A little more on sound troubleshooting.  Added "handle"
 instructions for GDB.  Modified RH8 docs per Cedar.  Added more lircd
 information from Cedar.
+v1.063, 2003-01-06.  More modifications from Cedar on RH8.0.  Slight tweak on
+debugging instructions.  Slight change to CPU requirements.  Added Suse 8.1
+to distros with buggy libexpat.  Added DMA requirement in Hardware
+Prerequisites.  Changed to single HTML file vs 17 seperate HTML subfiles.
 -->
 <!--
-To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
+To create documentation, execute "$ linuxdoc -B html -s 0 mythtv-HOWTO.sgml" or
 "$ linuxdoc -B txt -b 1 mythtv-HOWTO.sgml"  
 -->
