@@ -695,6 +695,12 @@ void OSDTypePositionRectangle::Draw(unsigned char *screenptr, int vid_width,
                                     int vid_height, int fade, int maxfade, 
                                     int xoff, int yoff)
 {
+    vid_height = vid_height;
+    fade = fade;
+    maxfade = maxfade;
+    xoff = xoff;
+    yoff = yoff;
+
     if (m_curposition < 0 || m_curposition >= m_numpositions)
         return;
 

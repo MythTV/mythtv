@@ -558,6 +558,10 @@ void OSD::SetInfoText(const QString &text, const QString &subtitle,
                       const QString &callsign, const QString &iconpath,
                       int length)
 {
+    QString tmp = category;
+    tmp = start;
+    tmp = end;
+
     pthread_mutex_lock(&osdlock);
     OSDSet *container = GetSet("program_info");
     if (container)
@@ -587,6 +591,8 @@ void OSD::SetInfoText(const QString &text, const QString &subtitle,
 void OSD::StartPause(int position, bool fill, QString msgtext,
                      QString slidertext, int displaytime)
 {
+    fill = fill;
+
     pthread_mutex_lock(&osdlock);
     OSDSet *container = GetSet("status");
     if (container)
