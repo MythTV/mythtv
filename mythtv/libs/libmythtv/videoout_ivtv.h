@@ -63,6 +63,9 @@ class VideoOutputIvtv: public VideoOutput
     int width, height, stride;
 
     bool lastcleared;
+
+    char *osdbuffers[2];
+    int bufferuse;
 };
 
 #endif

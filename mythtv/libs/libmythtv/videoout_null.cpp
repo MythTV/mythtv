@@ -66,6 +66,9 @@ bool VideoOutputNull::Init(int width, int height, float aspect,
     VideoOutput::Init(width, height, aspect, winid,
                       winx, winy, winw, winh, embedid);
 
+    if (!CreateNullBuffers())
+        return false;
+
     scratchFrame = &(vbuffers[kNumBuffers]);
 
     pauseFrame.height = scratchFrame->height;
@@ -73,9 +76,6 @@ bool VideoOutputNull::Init(int width, int height, float aspect,
     pauseFrame.bpp = scratchFrame->bpp;
     pauseFrame.size = scratchFrame->size;
     pauseFrame.buf = new unsigned char[pauseFrame.size];
-
-    if (!CreateNullBuffers())
-        return false;
 
     MoveResize();
     XJ_started = true;

@@ -29,10 +29,14 @@ VideoOutputIvtv::VideoOutputIvtv(void)
 {
     videofd = -1;
     fbfd = -1;
-    mapped_mem = NULL;
     pixels = NULL;
     lastcleared = false;
     videoDevice = "/dev/video16";
+
+    osdbuffers[0] = NULL;
+    osdbuffers[1] = NULL;
+
+    bufferuse = 0;
 }
 
 VideoOutputIvtv::~VideoOutputIvtv()
@@ -76,14 +80,16 @@ VideoOutputIvtv::~VideoOutputIvtv()
             return;
         }
 
-        if (mapped_mem)
-        {
-            memset(pixels, 0x00, 720 * 480 * 4);
-            munmap(mapped_mem, mapped_memlen);
-        }
-
+        // clear osd here
+        
         close(fbfd);
     }
+
+    if (osdbuffers[0])
+        delete [] osdbuffers[0];
+
+    if (osdbuffers[1])
+        delete [] osdbuffers[1];
 }
 
 void VideoOutputIvtv::InputChanged(int width, int height, float aspect)
@@ -107,9 +113,74 @@ bool VideoOutputIvtv::Init(int width, int height, float aspect,
 
     Reopen();
 
-    if (videofd >= 0)
+    if (videofd <= 0)
         return false;
 
+    if (fbfd == -1)
+    {
+        int fbno = 0;
+
+        if (ioctl(videofd, IVTV_IOC_GET_FB, &fbno) < 0)
+        {
+            perror("IVTV_IOC_GET_FB");
+            return false;
+        }
+
+        if (fbno < 0)
+        {
+            cerr << "invalid fb, are you using the ivtv-fb module?\n";
+            return false;
+        }
+
+        QString fbdev = QString("/dev/fb%1").arg(fbno);
+        fbfd = open(fbdev.ascii(), O_RDWR);
+        if (fbfd < 0)
+        {
+            cerr << "Unable to open the ivtv framebuffer\n";
+            return false;
+        }
+
+        struct ivtvfb_ioctl_state_info fbstate;
+        memset(&fbstate, 0, sizeof(fbstate));
+
+        if (ioctl(fbfd, IVTVFB_IOCTL_GET_STATE, &fbstate) < 0)
+        {
+            perror("IVTVFB_IOCTL_GET_STATE");
+            return false;
+        }
+
+        initglobalalpha = fbstate.status & IVTVFB_STATUS_GLOBAL_ALPHA;
+        storedglobalalpha = fbstate.alpha;
+
+        fbstate.status &= ~IVTVFB_STATUS_GLOBAL_ALPHA;
+        fbstate.status |= IVTVFB_STATUS_LOCAL_ALPHA;
+        fbstate.alpha = 0;
+
+        if (ioctl(fbfd, IVTVFB_IOCTL_SET_STATE, &fbstate) < 0)
+        {
+            perror("IVTVFB_IOCTL_SET_STATE");
+            return false;
+        }
+
+        struct ivtvfb_ioctl_get_frame_buffer igfb;
+        memset(&igfb, 0, sizeof(igfb));
+
+        ioctl(fbfd, IVTVFB_IOCTL_GET_FRAME_BUFFER, &igfb);
+
+        width = igfb.sizex;
+        height = igfb.sizey;
+        stride = igfb.sizex * 4;
+
+        osdbuffers[0] = new char[720 * 480 * 4 + 20];
+        osdbuffers[1] = new char[720 * 480 * 4 + 20];
+
+        memset(osdbuffers[0], 0x00, 720 * 480 * 4);
+        memset(osdbuffers[1], 0x00, 720 * 480 * 4);
+
+        // should set one fo them active here
+    }
+
+    cout << "Using the PVR-350 decoder/TV-out\n";
     return true;
 }
 
@@ -150,82 +221,6 @@ void VideoOutputIvtv::Reopen(int skipframes, int newstartframe)
     }
 
     startframenum = newstartframe;
-
-    if (fbfd == -1)
-    {
-        int fbno = 0;
-        
-        if (ioctl(videofd, IVTV_IOC_GET_FB, &fbno) < 0)
-        {
-            perror("IVTV_IOC_GET_FB");
-            return;
-        }
-
-        if (fbno < 0)
-        {
-            cerr << "invalid fb, are you using the ivtv-fb module?\n";
-            return;
-        }
-
-        QString fbdev = QString("/dev/fb%1").arg(fbno);
-        fbfd = open(fbdev.ascii(), O_RDWR);
-        if (fbfd < 0)
-        {
-            cerr << "Unable to open the ivtv framebuffer\n";
-            return;
-        }
-
-        struct ivtvfb_ioctl_state_info fbstate;
-        memset(&fbstate, 0, sizeof(fbstate));
-
-        if (ioctl(fbfd, IVTVFB_IOCTL_GET_STATE, &fbstate) < 0)
-        {
-            perror("IVTVFB_IOCTL_GET_STATE");
-            return;
-        }
-
-        initglobalalpha = fbstate.status & IVTVFB_STATUS_GLOBAL_ALPHA;
-        storedglobalalpha = fbstate.alpha;
-
-        fbstate.status &= ~IVTVFB_STATUS_GLOBAL_ALPHA;
-        fbstate.status |= IVTVFB_STATUS_LOCAL_ALPHA;
-        fbstate.alpha = 0;
-
-        if (ioctl(fbfd, IVTVFB_IOCTL_SET_STATE, &fbstate) < 0)
-        {
-            perror("IVTVFB_IOCTL_SET_STATE");
-            return;
-        }
-
-        struct ivtvfb_ioctl_get_frame_buffer igfb;
-        memset(&igfb, 0, sizeof(igfb));
-
-        ioctl(fbfd, IVTVFB_IOCTL_GET_FRAME_BUFFER, &igfb);
-
-        struct ivtv_osd_coords osdcoords;
-        memset(&osdcoords, 0, sizeof(osdcoords));
-
-        ioctl(fbfd, IVTVFB_IOCTL_GET_ACTIVE_BUFFER, &osdcoords);
-
-        mapped_offset = osdcoords.offset;
-        mapped_memlen = osdcoords.max_offset;
-
-        mapped_mem = (char *)mmap(0, mapped_memlen, PROT_READ|PROT_WRITE,
-                                  MAP_SHARED, fbfd, mapped_offset);
-        if (mapped_mem == (char *)-1)
-        {
-            perror("Unable to mmap ivtv-fb buffer");
-            mapped_mem = NULL;
-            return;
-        }
-
-        pixels = mapped_mem;
-        width = igfb.sizex;
-        height = igfb.sizey;
-        stride = igfb.sizex * 4;
-
-        memset(pixels, 0x00, 720 * 480 * 4);
-    }
 }
 
 void VideoOutputIvtv::EmbedInWidget(unsigned long wid, int x, int y, int w, 
@@ -270,22 +265,63 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
     (void)frame;
     (void)pipPlayer;
 
-    if (mapped_mem && osd)
+    if (fbfd && osd)
     {
+        bool drawanyway = false;
+
+        struct ivtv_osd_coords osdcoords;
+        struct ivtvfb_ioctl_dma_host_to_ivtv_args prep;
+        char *fbuf = NULL;
+
+        memset(&osdcoords, 0, sizeof(osdcoords));
+        memset(&prep, 0, sizeof(prep));
+
+        ioctl(fbfd, IVTVFB_IOCTL_GET_ACTIVE_BUFFER, &osdcoords);
+
+        if (bufferuse)
+        {
+            osdcoords.offset = 0;
+            fbuf = osdbuffers[0];
+        }
+        else
+        {
+            int offset = (height * stride + (PAGE_SIZE - 1));
+            offset &= PAGE_MASK;
+
+            osdcoords.offset = offset;
+            fbuf = osdbuffers[1];
+        }
+
         VideoFrame tmpframe;
         tmpframe.codec = FMT_ARGB32;
-        tmpframe.buf = (unsigned char *)pixels;
+        tmpframe.buf = (unsigned char *)fbuf;
 
         int ret = DisplayOSD(&tmpframe, osd, stride);
 
         if (ret < 0 && !lastcleared)
         {
-            memset(pixels, 0x0, XJ_height * stride);
+            memset(tmpframe.buf, 0x0, XJ_height * stride);
             lastcleared = true;
+            drawanyway = true;
         }
 
         if (ret >= 0)
             lastcleared = false;
+
+        if (ret > 0 || drawanyway)
+        {
+            prep.source = fbuf;
+            prep.dest_offset = osdcoords.offset;
+            prep.count = XJ_height * stride;
+
+            ioctl(fbfd, IVTVFB_IOCTL_PREP_FRAME, &prep);
+
+            usleep(20000);
+
+            ioctl(fbfd, IVTVFB_IOCTL_SET_ACTIVE_BUFFER, &osdcoords);
+
+            bufferuse = !bufferuse;
+        }
     }
 }
 

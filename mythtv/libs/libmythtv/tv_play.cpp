@@ -1587,7 +1587,7 @@ void TV::ChangeChannel(int direction)
     activerbuffer->WaitForPause();    
 
     // Save the current channel if this is the first time
-    if (channame_vector.size() == 0)
+    if (channame_vector.size() == 0 && activenvp == nvp)
         AddPreviousChannel();
 
     activerecorder->Pause();

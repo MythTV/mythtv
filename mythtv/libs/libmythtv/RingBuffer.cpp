@@ -364,6 +364,7 @@ void RingBuffer::Init(void)
     totalreadpos = readpos = 0;
 
     stopreads = false;
+    wanttoread = 0;
 
     pthread_rwlock_init(&rwlock, NULL);
 }
