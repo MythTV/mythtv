@@ -1610,6 +1610,9 @@ void VideoManager::slotAutoIMDB()
 
 void VideoManager::slotEditMeta()
 {
+    if (!curitem)
+        return;
+        
     EditMetadataDialog* md_editor = new EditMetadataDialog(db, curitem, gContext->GetMainWindow(),
                                                            "edit_metadata", "video-",
                                                            "edit metadata dialog");

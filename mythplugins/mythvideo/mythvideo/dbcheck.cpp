@@ -8,7 +8,7 @@ using namespace std;
 
 #include "mythtv/mythcontext.h"
 
-const QString currentDatabaseVersion = "1004";
+const QString currentDatabaseVersion = "1005";
 
 static void UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -166,8 +166,17 @@ void UpgradeVideoDatabaseSchema(void)
 ");",
 ""
 };
-        cerr << updates[0] << endl;
         performActualUpdate(updates, "1004", dbver);
+    }
+
+    if (dbver == "1004")
+    {
+        const QString updates[] = {
+"UPDATE keybindings SET keylist = \"[,{,F10\" WHERE action = \"DECPARENT\" AND keylist = \"Left\";",
+"UPDATE keybindings SET keylist = \"],},F11\" WHERE action = \"INCPARENT\" AND keylist = \"Right\";",
+""
+};
+        performActualUpdate(updates, "1005", dbver);
     }
 
 }
