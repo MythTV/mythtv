@@ -212,7 +212,7 @@ void GuideGrid::fillProgramInfos(void)
 
     for (int y = 0; y < 6; y++)
     {
-        for (int x = 0; x < 6; x++)
+        for (int x = 0; x < 5; x++)
         {
             ProgramInfo *pginfo = getProgramInfo(y, x);
             if (!pginfo)
@@ -378,7 +378,7 @@ void GuideGrid::paintPrograms(QPainter *p)
                 int maxwidth = spread * 145 - 15;
 
                 tmp.drawText(10 + x * 145, 
-                             height / 2 + 92 * y, maxwidth, 92,
+                             height / 8 + 92 * y, maxwidth, 92,
                              AlignLeft | WordBreak,
                              pginfo->title);
 
@@ -490,7 +490,30 @@ void GuideGrid::scrollLeft()
     m_currentStartTime = t;
 
     fillTimeInfos();
-    fillProgramInfos();
+
+    for (int x = 0; x < 6; x++)
+    {
+        ProgramInfo *pginfo = m_programInfos[x][4];
+        if (pginfo)
+            delete pginfo;
+        m_programInfos[x][4] = NULL;
+    }
+
+    for (int y = 4; y > 0; y--)
+    {
+        for (int x = 0; x < 6; x++)
+        {
+            m_programInfos[x][y] = m_programInfos[x][y - 1];
+            m_programInfos[x][y]->spread = -1;
+            m_programInfos[x][y]->startCol = y;
+        }
+    }
+
+    for (int x = 0; x < 6; x++)
+    {
+        ProgramInfo *pginfo = getProgramInfo(x, 0);
+        m_programInfos[x][0] = pginfo;
+    }
 
     update(programRect().unite(timeRect()));
 }
@@ -504,25 +527,100 @@ void GuideGrid::scrollRight()
     m_currentStartTime = t;
 
     fillTimeInfos();
-    fillProgramInfos();
+
+    for (int x = 0; x < 6; x++)
+    {
+        ProgramInfo *pginfo = m_programInfos[x][0];
+        if (pginfo)
+            delete pginfo;
+        m_programInfos[x][0] = NULL;
+    }
+
+    for (int y = 0; y < 4; y++)
+    {
+        for (int x = 0; x < 6; x++)
+        {
+            m_programInfos[x][y] = m_programInfos[x][y + 1];
+            m_programInfos[x][y]->spread = -1;
+            m_programInfos[x][y]->startCol = y;
+        }
+    }
+
+    for (int x = 0; x < 6; x++)
+    {
+        ProgramInfo *pginfo = getProgramInfo(x, 4);
+        m_programInfos[x][4] = pginfo;
+    }
 
     update(programRect().unite(timeRect()));
 }
 
 void GuideGrid::scrollDown()
 {
-    m_currentStartChannel++;
+    ChannelInfo *chinfo = m_channelInfos[0];
+    if (chinfo)
+        delete chinfo;
 
-    fillChannelInfos();
-    fillProgramInfos();
+    for (int x = 0; x < 5; x++)
+        m_channelInfos[x] = m_channelInfos[x + 1];
+
+    m_channelInfos[5] = NULL;
+
+    m_currentStartChannel = m_channelInfos[0]->channum;
+
+    bool done = false;
+    while (!done)
+    {
+        m_currentEndChannel++;
+
+        if (m_currentEndChannel > CHANNUM_MAX)
+            m_currentEndChannel = 0;
+
+        chinfo = getChannelInfo(m_currentEndChannel);
+        if (chinfo)
+        {
+            done = true;
+            m_channelInfos[5] = chinfo;
+        }
+    }
+
+    for (int y = 0; y < 5; y++)
+    {
+        ProgramInfo *pginfo = m_programInfos[0][y];
+        if (pginfo)
+            delete pginfo;
+        m_programInfos[0][y] = NULL;
+    }
+
+    for (int x = 0; x < 5; x++)
+    {
+        for (int y = 0; y < 5; y++)
+        {
+            m_programInfos[x][y] = m_programInfos[x + 1][y];
+        }
+    } 
+
+    for (int y = 0; y < 5; y++)
+    {
+        ProgramInfo *pginfo = getProgramInfo(5, y);
+        m_programInfos[5][y] = pginfo;
+    }
 
     update(programRect().unite(channelRect()));
 }
 
 void GuideGrid::scrollUp()
 {
-    bool done = false;
- 
+    ChannelInfo *chinfo = m_channelInfos[5];
+    if (chinfo)
+        delete chinfo;
+
+    for (int x = 5; x > 0; x--)
+        m_channelInfos[x] = m_channelInfos[x - 1];
+
+    m_channelInfos[0] = NULL;
+
+    bool done = false; 
     while (!done)
     {
         m_currentStartChannel--;
@@ -530,16 +628,37 @@ void GuideGrid::scrollUp()
         if (m_currentStartChannel < 2)
             m_currentStartChannel = CHANNUM_MAX;
 
-        ChannelInfo *chinfo = getChannelInfo(m_currentStartChannel);
+        chinfo = getChannelInfo(m_currentStartChannel);
         if (chinfo)
         {
             done = true;
-            delete chinfo;
+            m_channelInfos[0] = chinfo;
         }
     }
 
-    fillChannelInfos();
-    fillProgramInfos();
+    m_currentEndChannel = m_channelInfos[5]->channum;
+
+    for (int y = 0; y < 5; y++)
+    {
+        ProgramInfo *pginfo = m_programInfos[5][y];
+        if (pginfo)
+            delete pginfo;
+        m_programInfos[5][y] = NULL;
+    }
+
+    for (int x = 5; x > 0; x--)
+    {
+        for (int y = 0; y < 5; y++)
+        {
+            m_programInfos[x][y] = m_programInfos[x - 1][y];
+        }
+    } 
+
+    for (int y = 0; y < 5; y++)
+    {
+        ProgramInfo *pginfo = getProgramInfo(0, y);
+        m_programInfos[0][y] = pginfo;
+    }
 
     update(programRect().unite(channelRect()));
 }

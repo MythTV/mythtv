@@ -23,7 +23,8 @@ int main(int argc, char **argv)
     gg.setFixedHeight(600);
     a.setMainWidget(&gg);
 
-    gg.show();
+    gg.showFullScreen();
+    //gg.show();
 
     return a.exec();
 }
