@@ -148,6 +148,17 @@ $ up2date --solvedeps qt-MySQL
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+<P>
+<A NAME="RH_XFree86-devel"></A> <B>NOTE</B>:  Red Hat Linux users, ensure that the correct symlinks have
+been created for the XFree-86 development libraries:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+# ln -s /usr/X11R6/lib/libXext.so.6 /usr/X11R6/lib/libXext.so
+# ln -s /usr/X11R6/lib/libX11.so.6 /usr/X11R6/lib/libX11.so
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 
 <H3><A NAME="CLIinstalltools_"></A> Command-line installation. </H3>
 

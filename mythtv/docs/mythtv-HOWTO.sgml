@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-02-12, v1.092
+<date>2003-02-14, v1.093
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -195,6 +195,14 @@ install this package using the command line do
 
 <tscreen><verb>
 $ up2date --solvedeps qt-MySQL
+</verb></tscreen>
+
+<label id="RH_XFree86-devel"><bf>NOTE</bf>:  Red Hat Linux users, ensure that the correct symlinks have
+been created for the XFree-86 development libraries:
+
+<tscreen><verb>
+# ln -s /usr/X11R6/lib/libXext.so.6 /usr/X11R6/lib/libXext.so
+# ln -s /usr/X11R6/lib/libX11.so.6 /usr/X11R6/lib/libX11.so
 </verb></tscreen>
 
 <sect2>Command-line installation. <label id="CLIinstalltools_">
@@ -1948,8 +1956,10 @@ directory
 then it shouldn't be a problem.
 
 If you get an error like <tt>/usr/bin/ld: cannot find -lXext</tt>, the
-compiler is telling you that you don't have XFree86-devel installed, and
-this needs to be fixed before MythTV will work correctly.
+compiler is telling you that you don't have XFree86-devel installed, or that
+your distribution hasn't set it up <ref id="RH_XFree86-devel"
+name="correctly">.  This needs to be fixed before MythTV will compile.
+
 <sect1>My screen goes blank, but comes back when I wiggle the mouse or use the keyboard.
 <p>This is due to DPMS, the Display Power Management System, which is used
 to save power by turning off your monitor when the system decides that it's
@@ -2602,6 +2612,8 @@ v1.090, 2003-02-10.  Added stuff on MythWeather aggressiveness setting.
 v1.091, 2003-02-10.  Update XMLTV version.
 v1.092, 2003-02-12.  Bruce Markey submission on MythTV GUI and X Display
 Sizes
+v1.093, 2003-02-14.  Updated troubleshooting text about RedHat 7.2 and 8.0
+not symlinking correctly.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

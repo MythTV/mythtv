@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-02-12, v1.092
+  2003-02-14, v1.093
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -338,6 +338,12 @@
 
        $ up2date --solvedeps qt-MySQL
 
+  [1mNOTE[22m:  Red Hat Linux users, ensure that the correct symlinks have been
+  created for the XFree-86 development libraries:
+
+       # ln -s /usr/X11R6/lib/libXext.so.6 /usr/X11R6/lib/libXext.so
+       # ln -s /usr/X11R6/lib/libX11.so.6 /usr/X11R6/lib/libX11.so
+
   [1m3.2.2.  Command-line installation.[0m
 
   This section details the various methods for installing pre-requisites
@@ -376,6 +382,7 @@
   beta version of the next release of Mandrake), make sure to download
   the standard "Mandrake" release.  Download the .src.rpm file to a
   directory that you can find.
+
        $ su
        # cp qt3-3.0.5-7mdk.src.rpm /usr/src/RPMS/SRPMS
        # cd /usr/src/RPMS/SRPMS
@@ -466,6 +473,7 @@
   The following instructions work for Mandrake 9.0 using bash as the
   shell, and may be applicable for a distribution which uses
   /etc/profile.d.
+
   As root, create the following file in /etc/profile.d  The example
   filename is "mythtv.sh".  Use what you feel is appropriate.
 
@@ -562,7 +570,6 @@
 
   If you've got a system with an AMD K6-2 or a VIA C3 processor, make
   the following change in the settings.pro file.
-
   Look for
 
   -march=pentiumpro
@@ -575,6 +582,7 @@
 
   Recent AMD processors, like the Duron, Thunderbird and Athlon don't
   need this change.
+
   [1m5.2.  Building LAME.[0m
 
   Open a shell and switch to the directory where you saved lame.
@@ -613,10 +621,10 @@
   If you get errors installing XML::Twig or other XMLTV prerequisites,
   try deleting the old versions of libexpat
 
-       $ su
-       # rm -f /usr/lib/libexpat*
-       # /sbin/ldconfig
-       # exit
+  $ su
+  # rm -f /usr/lib/libexpat*
+  # /sbin/ldconfig
+  # exit
 
   Download version 1.95.5 from sourceforge.net:
   http://sourceforge.net/projects/expat/
@@ -624,15 +632,15 @@
 
   Open a shell prompt:
 
-  $ tar -xzf expat-1.95.5.tar.gz
-  $ cd expat-1.95.5
-  $ ./configure
-  $ make
-  $ su
-  # make install
-  # /sbin/ldconfig
-  # exit
-  $
+       $ tar -xzf expat-1.95.5.tar.gz
+       $ cd expat-1.95.5
+       $ ./configure
+       $ make
+       $ su
+       # make install
+       # /sbin/ldconfig
+       # exit
+       $
 
   [1mNOTE[22m:  Red Hat Linux 8.0 users, make sure that you set your LANG as
   described in ``Section 4''.
@@ -707,11 +715,11 @@
 
   Once you have downloaded the portage file, installation is simple.
 
-       $ su -
-       # emerge rsync # make sure portage is up to date.
-       # cd /usr/local
-       # tar xvfjp Path_To/mythtv-gentoo-portage.tar.bz2
-       # vi /etc/make.conf
+  $ su -
+  # emerge rsync # make sure portage is up to date.
+  # cd /usr/local
+  # tar xvfjp Path_To/mythtv-gentoo-portage.tar.bz2
+  # vi /etc/make.conf
 
   Add mysql to your USE variable.  ie USE="mysql ...."
 
@@ -877,15 +885,15 @@
 
   Start with the alsa-driver package:
 
-  $ tar -xjf alsa-driver-0.9.x.tar.bz2
-  $ cd alsa-driver-0.9.x
-  $ ./configure --with-cards=XXX --with-sequencer=yes
-  $ make
-  $ su
-  # make install
-  # ./snddevices
-  # exit
-  $
+       $ tar -xjf alsa-driver-0.9.x.tar.bz2
+       $ cd alsa-driver-0.9.x
+       $ ./configure --with-cards=XXX --with-sequencer=yes
+       $ make
+       $ su
+       # make install
+       # ./snddevices
+       # exit
+       $
 
   This will compile and install the kernel modules and initialization
   scripts, as well as create device nodes in /dev.
@@ -914,18 +922,18 @@
   conflicts in the future.  You should end up with a /etc/modules.conf
   file that has this configuration:
 
-       alias char-major-116 snd
-       alias snd-card-0 snd-XXX
-       # module options should go here
-       # OSS/Free portion
-       alias char-major-14 soundcore
-       alias sound-slot-0 snd-card-0
-       # card #1
-       alias sound-service-0-0 snd-mixer-oss
-       alias sound-service-0-1 snd-seq-oss
-       alias sound-service-0-3 snd-pcm-oss
-       alias sound-service-0-8 snd-seq-oss
-       alias sound-service-0-12 snd-pcm-oss
+  alias char-major-116 snd
+  alias snd-card-0 snd-XXX
+  # module options should go here
+  # OSS/Free portion
+  alias char-major-14 soundcore
+  alias sound-slot-0 snd-card-0
+  # card #1
+  alias sound-service-0-0 snd-mixer-oss
+  alias sound-service-0-1 snd-seq-oss
+  alias sound-service-0-3 snd-pcm-oss
+  alias sound-service-0-8 snd-seq-oss
+  alias sound-service-0-12 snd-pcm-oss
 
   "XXX" should be the ALSA driver name for your sound card/chip. In some
   rare cases you need to supply extra options to the driver. These
@@ -1022,15 +1030,15 @@
 
   Next, open a shell and login as superuser.
 
-  $ su
-  # mkdir /usr/src
-  # mv linux-2.4.19.tar.bz2 /usr/src
-  # cd /usr/src
-  # tar -xjf linux-2.4.19.tar.bz2
-  # chown -R root.root linux-2.4.19
-  # ln -sf linux-2.4.19 linux
-  # exit
-  $
+       $ su
+       # mkdir /usr/src
+       # mv linux-2.4.19.tar.bz2 /usr/src
+       # cd /usr/src
+       # tar -xjf linux-2.4.19.tar.bz2
+       # chown -R root.root linux-2.4.19
+       # ln -sf linux-2.4.19 linux
+       # exit
+       $
 
   [1m8.3.  Red Hat Linux 8.0[0m
 
@@ -1074,6 +1082,7 @@
   you will have to load the lirc_serial module. If you did not get any
   such messages skip the kernel recompile steps below and go directly to
   making and installing the lirc driver.
+
   Once the configuration step is complete:
 
        $ make
@@ -1163,7 +1172,7 @@
   /etc/modules.conf file. Add this line as the first thing in the file.
   It must come first, or it may not work.
 
-       alias char-major-61 XXX
+  alias char-major-61 XXX
 
   replace XXX with the name which you determined earlier, which in this
   example was "lirc_serial"
@@ -1202,13 +1211,13 @@
   Now, we're going to add the commands necessary for lircd to run each
   time we boot:
 
-       # cd /etc/rc.d
-       # cat >> rc.local
-       echo "Starting lircd"
-       /usr/local/sbin/lircd
-       ^D
-       # exit
-       $
+  # cd /etc/rc.d
+  # cat >> rc.local
+  echo "Starting lircd"
+  /usr/local/sbin/lircd
+  ^D
+  # exit
+  $
 
   This takes care of the lircd portion, which "listens" for the IR sig-
   nals. If everything went well, the install script for lircd put an
@@ -1262,17 +1271,17 @@
 
   The lircrc.example file has this:
 
-  begin
-      prog = irxevent
-      button = ChannelUp
-      config = Key Up CurrentWindow
-  end
+       begin
+           prog = irxevent
+           button = ChannelUp
+           config = Key Up CurrentWindow
+       end
 
-  begin
-      prog = irxevent
-      button = ChannelDown
-      config = Key Down CurrentWindow
-  end
+       begin
+           prog = irxevent
+           button = ChannelDown
+           config = Key Down CurrentWindow
+       end
 
   but the /etc/lircd.conf that comes in the lircd package defines the
   buttons for the Pinnacle Studio PCTV as:
@@ -1359,15 +1368,15 @@
   The configuration for starting [1mlircd [22mdiffers if you're going to be
   sending and receiving IR versus just receiving.
 
-  # cd /etc/rc.d
-  # cat >> rc.local
-  echo "Starting lircd"
-  setserial /dev/ttySx uart none        # (if required)
-  modprobe lirc_sir
-  /usr/local/sbin/lircd
-  ^D
-  # exit
-  $
+       # cd /etc/rc.d
+       # cat >> rc.local
+       echo "Starting lircd"
+       setserial /dev/ttySx uart none        # (if required)
+       modprobe lirc_sir
+       /usr/local/sbin/lircd
+       ^D
+       # exit
+       $
 
   At this point you have to populate the /etc/lircd.conf file with the
   proper codes for your A/V remote. You should be able to find your
@@ -2062,8 +2071,9 @@
   then it shouldn't be a problem.
 
   If you get an error like /usr/bin/ld: cannot find -lXext, the compiler
-  is telling you that you don't have XFree86-devel installed, and this
-  needs to be fixed before MythTV will work correctly.
+  is telling you that you don't have XFree86-devel installed, or that
+  your distribution hasn't set it up ``correctly''.  This needs to be
+  fixed before MythTV will compile.
 
   [1m17.7.  My screen goes blank, but comes back when I wiggle the mouse or[0m
   [1muse the keyboard.[0m
@@ -2151,9 +2161,9 @@
   Edit the settings.pro file.  Make sure that the top of the file looks
   like this:
 
-       $ cat settings.pro
-       CONFIG += debug
-       #CONFIG += release
+  $ cat settings.pro
+  CONFIG += debug
+  #CONFIG += release
 
   Now, you need to clear out the old versions of the software to ensure
   that you're running with the debugging code, then compile and install.
@@ -2306,14 +2316,14 @@
   Here's an example submitted to the mythtv-dev list by Pat Pflaum
   mailto:pat@netburp.com <mailto:pat@netburp.com> using fvwm:
 
-       $ cat > .xinitrc
-       fvwm &
-       mythfrontend
-       ^D
-       $ cat > .fvwmrc
-       Style "myth*"      NoTitle, NoHandles, Sticky, WindowListSkip, BorderWidth 0
-       ^D
-       $
+  $ cat > .xinitrc
+  fvwm &
+  mythfrontend
+  ^D
+  $ cat > .fvwmrc
+  Style "myth*"      NoTitle, NoHandles, Sticky, WindowListSkip, BorderWidth 0
+  ^D
+  $
 
   [1m18.4.  What capture resolution should I use?  How does video work?[0m
 
