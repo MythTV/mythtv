@@ -553,7 +553,7 @@ void AudioOutputOSS::OutputAudioLoop(void)
             // should this use ioctl(audio_fd, SNDCTL_DSP_POST, 0) instead ?
             
             space_on_soundcard = getSpaceOnSoundcard();
-            if (fragment_size < space_on_soundcard)
+            if (fragment_size <= space_on_soundcard)
             {
                 WriteAudio(zeros, fragment_size);
             }
@@ -573,7 +573,7 @@ void AudioOutputOSS::OutputAudioLoop(void)
         /* do audio output */
         
         // wait for the buffer to fill with enough to play
-        if (fragment_size >= audiolen(true))
+        if (fragment_size > audiolen(true))
         {
             VERBOSE(VB_AUDIO, QString("audio thread waiting for buffer to fill"
                                       " fragment_size=%1, audiolen=%2")
@@ -607,7 +607,7 @@ void AudioOutputOSS::OutputAudioLoop(void)
 
         // re-check audiolen() in case things changed.
         // for example, ClearAfterSeek() might have run
-        if (fragment_size < audiolen(false))
+        if (fragment_size <= audiolen(false))
         {
             int bdiff = AUDBUFSIZE - raud;
             if (fragment_size > bdiff)
