@@ -1777,6 +1777,7 @@ void PlaybackBox::doEditScheduled()
     }
     
     ScheduledRecording::signalChange(db);
+
     connected = FillList();
     update(fullRect);
 }    
