@@ -32,7 +32,7 @@ class SortableGenericTreeList : public QPtrList<GenericTree>
             QString twos = two->getString().lower();
             return QString::localeAwareCompare(ones, twos);
         }
-        else
+        else if (sort_type == 2)
         {
             bool onesel = one->isSelectable();
             bool twosel = two->isSelectable();
@@ -44,10 +44,42 @@ class SortableGenericTreeList : public QPtrList<GenericTree>
             else
                 return -1;
         }
+        if(sort_type == 3)
+        {
+            //
+            //  Sort by attribute (ordering index), but, it if those are
+            //  equal, then sort by string
+            //
+
+            int onea = one->getAttribute(ordering_index);
+            int twoa = two->getAttribute(ordering_index);
+
+            if (onea == twoa)
+            {
+                QString ones = one->getString().lower();
+                QString twos = two->getString().lower();
+                return QString::localeAwareCompare(ones, twos);
+            }
+            else if (onea < twoa)
+                return -1;
+            else
+                return 1;
+        }
+        else
+        {
+            cerr << "generictree.o: SortableGenericTreeList was asked to "
+                 << "compare items (probably inside a sort()), but the "
+                 << "sort_type is not set to anything recognizable"
+                 << endl;
+            return 0;
+        }
     }
 
   private:
-    int sort_type; // 0 - getAttribute, 1 - getString, 2 - isSelectable
+    int sort_type; // 0 - getAttribute
+                   // 1 - getString
+                   // 2 - isSelectable
+                   // 3 - attribute, then string
     int ordering_index; // for getAttribute
 };
 
@@ -487,6 +519,21 @@ void GenericTree::sortByString()
     }
 }
 
+void GenericTree::sortByAttributeThenByString(int which_attribute)
+{
+    m_ordered_subnodes->SetSortType(3);
+    m_ordered_subnodes->SetOrderingIndex(which_attribute);
+    m_ordered_subnodes->sort();
+
+    QPtrListIterator<GenericTree> it(*m_subnodes);
+    GenericTree *child;
+    while ((child = it.current()) != 0)
+    {
+        child->sortByAttributeThenByString(which_attribute);
+        ++it;
+    }
+}
+
 void GenericTree::sortBySelectable()
 {
     m_ordered_subnodes->SetSortType(2);
@@ -521,6 +568,37 @@ void GenericTree::pruneAllChildren()
     m_subnodes->setAutoDelete(false);
     deleteAllChildren();
     m_subnodes->setAutoDelete(true);
+}
+
+void GenericTree::reOrderAsSorted()
+{
+    //
+    //  Arrange (recursively) my subnodes in the same order as my ordered
+    //  subnodes
+    //
+    
+    if(m_subnodes->count() != m_ordered_subnodes->count())
+    {
+        cerr << "generictree.o: Can't reOrderAsSorted(), because the number "
+             << "of subnodes is different than the number of ordered subnodes"
+             << endl;
+        return;
+    }
+
+    m_subnodes->setAutoDelete(false);
+    m_subnodes->clear();    
+    m_subnodes->setAutoDelete(true);
+    m_current_ordering_index = -1;
+    
+
+    QPtrListIterator<GenericTree> it(*m_ordered_subnodes);
+    GenericTree *child;
+    while ((child = it.current()) != 0)
+    {
+        m_subnodes->append(child);
+        child->reOrderAsSorted();
+        ++it;
+    }
 }
 
 void GenericTree::MoveItemUpDown(GenericTree *item, bool flag)

@@ -82,9 +82,11 @@ class GenericTree
                                       GenericTree *active);
 
     void sortByString();
+    void sortByAttributeThenByString(int which_attribute);
     void sortBySelectable();
     void deleteAllChildren();
     void pruneAllChildren();
+    void reOrderAsSorted();
 
     // only changes m_subnodes.  resort it if you want the others to change
     void MoveItemUpDown(GenericTree *item, bool flag);
