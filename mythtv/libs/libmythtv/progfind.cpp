@@ -73,6 +73,8 @@ ProgFinder::ProgFinder(QWidget *parent, const char *name)
     accel->connectItem(accel->insertItem(Key_Down), this, SLOT(cursorDown()));
     accel->connectItem(accel->insertItem(Key_PageUp), this, SLOT(pageUp()));
     accel->connectItem(accel->insertItem(Key_PageDown), this, SLOT(pageDown()));
+    accel->connectItem(accel->insertItem(Key_3), this, SLOT(pageUp()));
+    accel->connectItem(accel->insertItem(Key_9), this, SLOT(pageDown()));
     accel->connectItem(accel->insertItem(Key_I), this, SLOT(getInfo()));
     accel->connectItem(accel->insertItem(Key_4), this, SLOT(showGuide()));
     accel->connectItem(accel->insertItem(Key_Escape), this, SLOT(escape()));
@@ -603,11 +605,11 @@ void ProgFinder::cursorLeft()
 
 void ProgFinder::cursorRight()
 {
-	inSearch++;
-	if (inSearch == 3)
-		inSearch = 2;
-	else
+	if (inSearch == 2) {
+             getInfo();
+	} else
 	{
+            inSearch++;
 		if (inSearch == 1)
 		{
 		    if (gotInitData[curSearch] == 0)
