@@ -592,6 +592,7 @@ class UIManagedTreeListType : public UIType
     void    colorSelectables(bool yes_or_no){color_selectables = yes_or_no; }
     void    sortTreeByString(){if(my_tree_data) my_tree_data->sortByString(); }
     void    sortTreeBySelectable(){if(my_tree_data) my_tree_data->sortBySelectable();}
+    GenericTree *getCurrentNode() { return current_node; }
 
   public slots:
 
