@@ -1530,7 +1530,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
     videoOutput = NULL;
 
     if (usevideotimebase)
-        VTAVSync();
+        ShutdownVTAVSync();
     else if (experimentalsync)
         ShutdownExAVSync();
 }
