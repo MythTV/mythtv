@@ -1105,6 +1105,9 @@ void NuppelDecoder::GetFrame(int avignore)
                                   frameheader.timecode, frameheader.comptype);
         }
     }
+
+    // temporary fix until framesRead conversion is finished
+    framesRead = framesPlayed;
 }
 
 void NuppelDecoder::SeekReset(long long, int skipFrames,
