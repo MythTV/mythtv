@@ -343,9 +343,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     if (-1 == ret)
         return ret;
 
-    // Scan for audio tracks and pick one to use.
-    if (scanAudioTracks())
-        autoSelectAudioTrack();
+    autoSelectAudioTrack();
 
     ringBuffer->CalcReadAheadThresh(bitrate);
 
@@ -391,8 +389,11 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
 int AvFormatDecoder::ScanStreams(bool novideo)
 {
+    int scanerror = 0;
     bitrate = 0;
     fps = 0;
+
+    audioStreams.clear();
 
     for (int i = 0; i < ic->nb_streams; i++)
     {
@@ -491,17 +492,20 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             case CODEC_TYPE_DATA:
             {
                 bitrate += enc->bit_rate;
-                // otherwise, ignore it
-                continue;
+                VERBOSE(VB_PLAYBACK, QString("AvFormatDecoder: data codec, ignoring (%1).")
+                                             .arg(enc->codec_type));
                 break;
             }
             default:
             {
+                bitrate += enc->bit_rate;
                 VERBOSE(VB_PLAYBACK, QString("AvFormatDecoder: Unknown codec type (%1).")
                                              .arg(enc->codec_type));
                 break;
             }
         }
+	if (enc->codec_type!=CODEC_TYPE_AUDIO && enc->codec_type!=CODEC_TYPE_VIDEO)
+	    continue;
 
         VERBOSE(VB_PLAYBACK, QString("AVFD: Looking for decoder for %1").arg(enc->codec_id));
         AVCodec *codec = avcodec_find_decoder(enc->codec_id);
@@ -511,7 +515,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                                   .arg(enc->codec_id));
             av_close_input_file(ic);
             ic = NULL;
-            return -1;
+            scanerror = -1;
+	    continue;
         }
 
         if (enc->codec) {
@@ -525,13 +530,21 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             VERBOSE(VB_IMPORTANT, QString("AvFormatDecoder: Could not open codec aborting. reason %1").arg(open_val));
             av_close_input_file(ic);
             ic = NULL;
-            return -1;
+            scanerror = -1;
+	    continue;
+        }
+
+        if (enc->codec_type == CODEC_TYPE_AUDIO)
+        {
+            audioStreams.push_back( i );
+            VERBOSE(VB_AUDIO, QString("Stream #%1 (audio track #%2) is an audio stream with %3 channels.")
+                              .arg(i).arg(audioStreams.size()).arg(enc->channels));
         }
     }
 
     // Select a new track at the next opportunity.
     currentAudioTrack = -1;
-    return 0;
+    return scanerror;
 }
 
 bool AvFormatDecoder::CheckVideoParams(int width, int height)
@@ -965,28 +978,6 @@ float AvFormatDecoder::GetMpegAspect(AVCodecContext *context,
     return retval;
 }
 
-bool AvFormatDecoder::scanAudioTracks()
-{
-    audioStreams.clear();
-
-    int trackNo = 0;
-    for (int i = 0; i < ic->nb_streams; i++)
-    {
-        AVCodecContext *enc = &ic->streams[i]->codec;
-        if (enc->codec_type == CODEC_TYPE_AUDIO)
-        {
-            ++trackNo;
-            audioStreams.push_back( i );
-
-            VERBOSE(VB_AUDIO, QString("Stream #%1 (audio track #%2) is an audio stream with %3 channels.")
-                              .arg(i).arg(trackNo).arg(enc->channels));
-
-        }
-    }
-
-    return (audioStreams.size() > 0);
-}
-
 void AvFormatDecoder::incCurrentAudioTrack()
 {
     if (audioStreams.size())
@@ -1132,14 +1123,8 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
     bool allowedquit = false;
     bool storevideoframes = false;
 
-    if (currentAudioTrack == -1 )
-    {
-        // Scan for audio tracks and pick one to use.
-        if (scanAudioTracks())
-        {
-            autoSelectAudioTrack();
-        }
-    }
+    if (currentAudioTrack==-1 || currentAudioTrack>=(int)audioStreams.size())
+	autoSelectAudioTrack();
 
     while (!allowedquit)
     {

@@ -75,9 +75,6 @@ class AvFormatDecoder : public DecoderBase
     int ScanStreams(bool novideo);
 
   protected:
-    /// Loop through the streams in the file to identify audio streams.
-    bool scanAudioTracks();
-
     /// Attempt to find the optimal audio stream to use based on the number of channels,
     /// and if we're doing AC3 passthrough.  This will select the highest stream number
     /// that matches our criteria.
