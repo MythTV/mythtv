@@ -312,8 +312,8 @@ void MythNewsConfig::loadTheme()
     connect(m_UICategory, SIGNAL(itemSelected(UIListBtnTypeItem*)),
             SLOT(slotCategoryChanged(UIListBtnTypeItem*)));
 
-    new UIListBtnTypeItem(m_UISelector, "Select News Feed");
-    new UIListBtnTypeItem(m_UISelector, "Set Update Frequency");
+    new UIListBtnTypeItem(m_UISelector, tr("Select News Feeds"));
+    new UIListBtnTypeItem(m_UISelector, tr("Set Update Frequency"));
     
     m_UISelector->SetActive(true);
 }
