@@ -638,6 +638,8 @@ void OSDListBtnType::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
 
 void OSDListBtnType::Init()
 {
+    qApp->lock();
+
     int sz1 = m_fontActive->Size() * 3 / 2;
     int sz2 = m_fontInactive->Size() * 3 / 2;
     m_itemHeight = QMAX(sz1, sz2) + (int)(2 * m_itemMargin);
@@ -788,6 +790,8 @@ void OSDListBtnType::Init()
         m_showDnArrow = false;
 
     m_initialized = true;
+
+    qApp->unlock();
 }
 
 void OSDListBtnType::LoadPixmap(OSDTypeImage& pix, const QString& fileName)
