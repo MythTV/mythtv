@@ -1576,6 +1576,7 @@ void CommDetect::BuildSceneChangeCommList(void)
 
 void CommDetect::BuildLogoCommList()
 {
+    GetLogoCommBreakMap(logoCommBreakMap);
     CondenseMarkMap(logoCommBreakMap, (int)(25 * fps), (int)(30 * fps));
     ConvertShowMapToCommMap(logoCommBreakMap);
 
@@ -2114,7 +2115,7 @@ void CommDetect::SearchForLogo(NuppelVideoPlayer *nvp, bool fullSpeed)
     int maxLoops = 240;
     EdgeMaskEntry *edgeCounts;
     int pos, i, x, y, dx, dy;
-    int edgeDiffs[] = { 5, 7, 10, 0 };
+    int edgeDiffs[] = { 5, 7, 10, 15, 20, 30, 40, 50, 60, 0 };
 
  
     VERBOSE(VB_COMMFLAG, "Searching for Station Logo");
@@ -2460,6 +2461,37 @@ void CommDetect::DetectEdges(VideoFrame *frame, EdgeMaskEntry *edges,
                 edges[pos].isedge++;
         }
     }
+}
+
+void CommDetect::GetLogoCommBreakMap(QMap<long long, int> &map)
+{
+    VERBOSE(VB_COMMFLAG, "CommDetect::GetLogoCommBreakMap()");
+
+    map.clear();
+
+    int curFrame;
+    bool PrevFrameLogo;
+    bool CurrentFrameLogo;
+    
+    curFrame = 1;    
+    PrevFrameLogo = false;
+    
+    while (curFrame <= framesProcessed)
+    {
+        if (frameInfo[curFrame].flagMask & COMM_FRAME_LOGO_PRESENT)
+            CurrentFrameLogo = true;
+        else
+            CurrentFrameLogo = false;
+
+        if (!PrevFrameLogo && CurrentFrameLogo)
+            map[curFrame] = MARK_START;
+        else if (PrevFrameLogo && !CurrentFrameLogo)
+            map[curFrame] = MARK_END;
+
+        curFrame++;
+        PrevFrameLogo = CurrentFrameLogo;
+    }
+
 }
 
 

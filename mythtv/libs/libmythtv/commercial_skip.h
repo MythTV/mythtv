@@ -68,6 +68,7 @@ class CommDetect
     void GetBlankCommBreakMap(QMap<long long, int> &breaks);
     void GetSceneChangeMap(QMap<long long, int> &scenes,
                            long long start_frame = -1);
+    void GetLogoCommBreakMap(QMap<long long, int> &map);
 
     void BuildMasterCommList(void);
     void BuildAllMethodsCommList(void);
