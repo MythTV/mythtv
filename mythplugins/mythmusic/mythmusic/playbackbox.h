@@ -56,7 +56,8 @@ class PlaybackBox : public QDialog
     void toggleRepeat();
     void editPlaylist();
     void nextAuto();
-
+    void visEnable();
+    
   private slots:
     void startseek();
     void doneseek();

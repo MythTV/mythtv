@@ -104,7 +104,6 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
     QVBoxLayout *vbox = new QVBoxLayout(this, 20 * wmult);
 
     mainvisual = new MainVisual();
-    //mainvisual->setVisual("Synaesthesia");
     
     QVBoxLayout *vbox2 = new QVBoxLayout(vbox, 2 * wmult);
 
@@ -206,6 +205,13 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
     pledit->setFont(QFont("Arial", 14 * hmult, QFont::Bold));
     secondcontrol->addWidget(pledit);
     connect(pledit, SIGNAL(clicked()), this, SLOT(editPlaylist()));
+
+    MyButton *vis = new MyButton(this);
+    vis->setAutoRaise(true);
+    vis->setText("Visualize");
+    vis->setFont(QFont("Arial", 14 * hmult, QFont::Bold));
+    secondcontrol->addWidget(vis);
+    connect(vis, SIGNAL(clicked()), this, SLOT(visEnable()));
 
     playview = new QListView(this);
     playview->addColumn("#");
@@ -475,8 +481,12 @@ void PlaybackBox::play()
 
         isplaying = true;
     }
+}
 
-    //mainvisual->showFullScreen();
+void PlaybackBox::visEnable(void)
+{
+    mainvisual->setVisual("Synaesthesia");
+    mainvisual->showFullScreen();
 }
 
 void PlaybackBox::pause(void)

@@ -73,7 +73,8 @@ public:
     void paintEvent( QPaintEvent * );
     void resizeEvent( QResizeEvent * );
     void customEvent( QCustomEvent * );
-
+    void hideEvent( QHideEvent * );
+    
     void setFrameRate( int newfps );
     int frameRate() const { return fps; }
 

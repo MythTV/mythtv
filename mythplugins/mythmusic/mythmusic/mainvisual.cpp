@@ -210,6 +210,12 @@ void MainVisual::customEvent(QCustomEvent *event)
     }
 }
 
+void MainVisual::hideEvent(QHideEvent *e)
+{
+    setVisual(0);
+    QDialog::hideEvent(e);
+}
+
 StereoScope::StereoScope()
     : rubberband( true ), falloff( 1.0 ), fps( 30 )
 {
