@@ -40,7 +40,10 @@ VideoGallery::VideoGallery(MythMainWindow *parent, QSqlDatabase *ldb, const char
     // load default settings from the database 
     currentParentalLevel = gContext->GetNumSetting("VideoDefaultParentalLevel", 4);
     curView              = gContext->GetNumSetting("VideoDefaultView",0);
-    smallIcons           = gContext->GetNumSetting("VideoDefaultSmallIcons",0);
+    nCols                = gContext->GetNumSetting("VideoGalleryColsPerPage",4);
+    nRows                = gContext->GetNumSetting("VideoGalleryRowsPerPage",3);
+    subtitleOn           = gContext->GetNumSetting("VideoGallerySubtitle",1);
+    keepAspectRatio      = gContext->GetNumSetting("VideoGalleryAspectRatio",1);
 
     theme = new XMLParse();
     theme->SetWMult(wmult);
@@ -67,7 +70,6 @@ VideoGallery::~VideoGallery()
 {
     // save current settings as default
     gContext->SaveSetting("VideoDefaultView", curView);
-    gContext->SaveSetting("VideoDefaultSmallIcons", smallIcons);
 
     // delete menu items
     UIListBtnTypeItem* item = menuType->GetItemFirst();
@@ -257,7 +259,7 @@ void VideoGallery::keyPressEvent(QKeyEvent *e)
  		update(menuRect);
             }
             else
-                cursorUp();
+                moveCursor(action);
         }
         else if (action == "DOWN") {
             if (inMenu) {
@@ -265,15 +267,14 @@ void VideoGallery::keyPressEvent(QKeyEvent *e)
                 update(menuRect);
             }
             else
-                cursorDown();
+                moveCursor(action);
         }
-        else if (action == "LEFT") {
+        else if ((action == "LEFT") 
+             ||  (action == "RIGHT")
+             ||  (action == "PAGEUP")
+             ||  (action == "PAGEDOWN")) {
             if (!inMenu)
-                cursorLeft();
-        }
-        else if (action == "RIGHT") {
-            if (!inMenu)
-                cursorRight();
+                moveCursor(action);
         }
         else if (action == "1" || action == "2" || action == "3" ||
                  action == "4")
@@ -671,11 +672,7 @@ void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos, in
         
             // load folder icon
             QString prefix = gContext->GetSetting("VideoStartupDir");
-            prefix.append('/');
-
-            QString filename = curTreePos->getString();
-            filename.prepend(prefix + curPath);
-            filename.append("folder");
+            QString filename = QString("%1/%2%3folder").arg(prefix).arg(curPath).arg(curTreePos->getString());
 
             image = new QImage();
             // folder.[png|jpg|gif]
@@ -702,7 +699,8 @@ void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos, in
 
         image = new QImage();
         if (!image->load(curitem->CoverFile()))
-            VERBOSE(VB_ALL, QString("Unable to load file %1.").arg(curitem->CoverFile()));
+            if (curitem->CoverFile() != "No Cover")
+                VERBOSE(VB_ALL, QString("Unable to load file %1.").arg(curitem->CoverFile()));
 
         delete curitem;
     }
@@ -715,7 +713,7 @@ void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos, in
     if (!image->isNull()) {
         QPixmap *pixmap = new QPixmap(image->smoothScale((int)(thumbW-2*sw),
                                                          (int)(thumbH-2*sh-yoffset),
-                                                         QImage::ScaleMin));
+                           (keepAspectRatio ? QImage::ScaleMin : QImage::ScaleFree) ));
 
         if (!pixmap->isNull())
             p->drawPixmap(xpos + sw, ypos + sh + yoffset,
@@ -724,7 +722,7 @@ void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos, in
                           (pixmap->height()-bh+yoffset)/2+sh,
                           bw-2*sw, bh-2*sh-yoffset);
 
-       delete pixmap;
+        delete pixmap;
     }
 
     UITextType *itype = (UITextType*)0;
@@ -755,7 +753,7 @@ void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos, in
     }
 
     // text underneath an icon
-    if (ttype && !smallIcons) {
+    if (ttype && subtitleOn) {
         QRect area = ttype->DisplayArea();
 
         area.setX(xpos + sw);
@@ -828,12 +826,6 @@ void VideoGallery::LoadWindow(QDomElement &element)
         item = new UIListBtnTypeItem(menuType, tr("Folder view"));
     item->setData(new Action(&VideoGallery::actionChangeView));
 
-    if (smallIcons)
-        item = new UIListBtnTypeItem(menuType, tr("Large icons"));
-    else
-        item = new UIListBtnTypeItem(menuType, tr("Small icons"));
-    item->setData(new Action(&VideoGallery::actionChangeIcons));
-
     item = new UIListBtnTypeItem(menuType, tr("Filters video list"));
     item->setData(new Action(&VideoGallery::actionFilter));
 
@@ -844,6 +836,8 @@ void VideoGallery::LoadWindow(QDomElement &element)
 
 void VideoGallery::LoadIconWindow()
 {
+    const float margin = 0.05;
+
     //
     // parse ui definition in xml file and load the icon settings
     //
@@ -868,60 +862,44 @@ void VideoGallery::LoadIconWindow()
     //
 
     spaceH = 0;
-    if (!smallIcons) {
+    if (subtitleOn) {
       UITextType *ttype = (UITextType*)container->GetType("subtext");
       if (ttype) {
           QRect area = ttype->DisplayArea();
           spaceH = area.height();
       }
     }
-    
-    QString size = (smallIcons ? "small" : "big");
 
+    // nr of rows and columns are given by the setup menu
+    thumbW = (int)floorf((float)(viewRect.width()) / ((float)nCols * (1 + margin) - margin));
+    thumbH = (int)floorf((float)(viewRect.height() - nRows * spaceH) / ((float)nRows * (1 + margin)));
+    spaceW = (nCols <= 1 ? 0 : (viewRect.width()  - (nCols * thumbW)) / (nCols - 1));
+    spaceH = (viewRect.height() - (nRows * thumbH)) / nRows;
+    
     // 
     // download icon and folder backgrounds
     //
 
-    QImage *img = gContext->LoadScaleImage(QString("mv_gallery_back_reg_%1.png").arg(size));
-    if (!img) {
-        std::cerr << "Failed to load mv_gallery_back_reg_" << size << ".png"
-                  << std::endl;
-        exit(-1);
-    }
-    backRegPix = QPixmap(*img);
-    delete img;
-    img = gContext->LoadScaleImage(QString("mv_gallery_back_sel_%1.png").arg(size));
-    if (!img) {
-        std::cerr << "Failed to load mv_gallery_back_sel_" << size << ".png"
-                  << std::endl;
-        exit(-1);
-    }
-    backSelPix = QPixmap(*img);
-    delete img;
-    img = gContext->LoadScaleImage(QString("mv_gallery_folder_reg_%1.png").arg(size));
-    if (!img) {
-        std::cerr << "Failed to load mv_gallery_folder_reg_" << size << ".png"
-                  << std::endl;
-        exit(-1);
-    }
-    folderRegPix = QPixmap(*img);
-    delete img;
-    img = gContext->LoadScaleImage(QString("mv_gallery_folder_sel_%1.png").arg(size));
-    if (!img) {
-        std::cerr << "Failed to load mv_gallery_folder_sel_" << size << ".png"
-                  << std::endl;
-        exit(-1);
-    }
-    folderSelPix = QPixmap(*img);
-    delete img;
+    struct {
+        char *filename;
+        QPixmap *name;
+    } const backgrounds[4] = {
+        { "mv_gallery_back_reg.png",   &backRegPix   },
+        { "mv_gallery_back_sel.png",   &backSelPix   },
+        { "mv_gallery_folder_reg.png", &folderRegPix },
+        { "mv_gallery_folder_sel.png", &folderSelPix }
+    };
 
-    // calculate nr of rows and columns and the spacing in between
-    thumbW = backRegPix.width();
-    thumbH = backRegPix.height();
-    nCols  = (int)floorf((float)viewRect.width()/(float)thumbW);
-    nRows  = (int)floorf((float)viewRect.height()/(float)(thumbH + spaceH));
-    spaceW = (nCols <= 1 ? 0 : (viewRect.width()  - (nCols * thumbW)) / (nCols - 1));
-    spaceH = (viewRect.height() - (nRows * thumbH)) / nRows;
+    QImage *img;
+    for (unsigned int i = 0; i < 4; i++) {
+        img = gContext->LoadScaleImage(QString(backgrounds[i].filename));
+        if (!img) {
+            std::cerr << "Failed to load " << backgrounds[i].filename << std::endl;
+            exit(-1);
+        }
+        *(backgrounds[i].name) = QPixmap(img->smoothScale((int)thumbW,(int)thumbH,QImage::ScaleFree));
+        delete img;
+    }
 }
 
 void VideoGallery::parseContainer(QDomElement &element)
@@ -946,134 +924,92 @@ void VideoGallery::exitWin()
     emit accept();
 }
 
-void VideoGallery::cursorLeft()
+void VideoGallery::moveCursor(QString action)
 {
-    if (currRow == 0 && currCol == 0)
-        return;
-
     int prevCol = currCol;
     int prevRow = currRow;
-    bool updateScreen = false;
+    int oldRow  = topRow;
 
-    currCol--;
-    if (currCol < 0) {
-        currCol = nCols - 1;
-        currRow--;
-        if (currRow < topRow) {
-            topRow = currRow;
-            updateScreen = true;
+    if (action == "LEFT") {
+        if (currRow == 0 && currCol == 0) 
+            return;
+
+        currCol--;
+        if (currCol < 0) {
+            currCol = nCols - 1;
+            currRow--;
+            if (currRow < topRow)
+                topRow = currRow;
         }
     }
+    else if (action == "RIGHT") {
+        if (currRow*nCols+currCol >= (int)(where_we_are->siblingCount())-1)
+            return;
+
+        currCol++;
+        if (currCol >= nCols) {
+            currCol = 0;
+            currRow++;
+            if (currRow >= topRow+nRows)
+                topRow++;
+        }
+    }
+    else if (action == "UP") {
+        if (currRow == 0) {
+            currRow = lastRow;
+            currCol = QMIN(currCol,lastCol);
+            topRow  = QMAX(currRow - nRows + 1,0);
+        } else {
+            currRow--;
+            if (currRow < topRow)
+                topRow = currRow;
+        }
+    }
+    else if (action == "DOWN") {
+        if (currRow == lastRow) {
+            currRow = 0;
+            topRow = 0;
+        } else {
+            currRow++;
+
+            if (currRow == lastRow)
+                currCol = QMIN(currCol,lastCol);
+ 
+            if (currRow >= topRow+nRows)
+                topRow++;
+        }
+    }
+    else if (action == "PAGEUP") {
+        if (currRow == 0)
+            return; // or wrap around: currRow = QMAX(lastRow - nRows + 1, 0);
+        else
+            currRow = QMAX(currRow - nRows, 0);
+
+        topRow = currRow;
+    }
+    else if (action == "PAGEDOWN") {
+        if (currRow == lastRow)
+            return; // or wrap around: currRow = QMAX(nRows - 1,0);
+        else
+            currRow += nRows;
+
+        if (currRow >= lastRow) {
+            currRow = lastRow;
+            currCol = QMIN(currCol,lastCol);
+        }
+
+        topRow = QMAX(currRow - nRows + 1,0);
+    }
+    else 
+        return;
 
     GenericTree *parent = where_we_are->getParent();
     if (parent)
         where_we_are = parent->getChildAt(currRow * nCols + currCol,0);
 
-    if (updateScreen)     // renew the whole screen
+    if (topRow != oldRow)     // renew the whole screen
         update();
-    else {                // partial update only
-        QPainter p(this);
-        updateSingleIcon(&p,prevCol,prevRow);
-        updateSingleIcon(&p,currCol,currRow);
-        updateText(&p);
-    }
-}
-
-void VideoGallery::cursorRight()
-{
-    if (currRow*nCols+currCol >= (int)(where_we_are->siblingCount())-1)
-        return;
-
-    int prevCol = currCol;
-    int prevRow = currRow;
-    bool updateScreen = false;
-
-    currCol++;
-    if (currCol >= nCols) {
-        currCol = 0;
-        currRow++;
-        if (currRow >= topRow+nRows) {
-            topRow++;
-            updateScreen = true;
-        }
-    }
-
-    GenericTree *parent = where_we_are->getParent();
-    if (parent) 
-	where_we_are = parent->getChildAt(currRow * nCols + currCol,0);
-
-    if (updateScreen)     // renew the whole screen
-        update();
-    else {                // partial update only
-        QPainter p(this);
-        updateSingleIcon(&p,prevCol,prevRow);
-        updateSingleIcon(&p,currCol,currRow);
-        updateText(&p);
-    }
-}
-
-void VideoGallery::cursorUp()
-{
-    int prevCol = currCol;
-    int prevRow = currRow;
-    bool updateScreen = false;
-
-    if (currRow == 0) {
-        currRow = lastRow;
-        currCol = QMIN(currCol,lastCol);
-        topRow  = QMAX(currRow - nRows + 1,0);
-        updateScreen = true;
-    } else {
-        currRow--;
-        if (currRow < topRow) {
-            topRow = currRow;
-            updateScreen = true;
-        }
-    }
-
-    GenericTree *parent = where_we_are->getParent();
-    if (parent) 
-	where_we_are = parent->getChildAt(currRow * nCols + currCol,0);
-
-    if (updateScreen)     // renew the whole screen
-        update();
-    else {                // partial update only
-        QPainter p(this);
-        updateSingleIcon(&p,prevCol,prevRow);
-        updateSingleIcon(&p,currCol,currRow);
-        updateText(&p);
-    }
-}
-
-void VideoGallery::cursorDown()
-{
-    int prevCol = currCol;
-    int prevRow = currRow;
-    bool updateScreen = false;
-
-    if (currRow == lastRow) {
-        currRow = 0;
-        topRow = 0;
-        updateScreen = true;
-    } else {
-        currRow++;
-
-        if (currRow == lastRow)
-            currCol = QMIN(currCol,lastCol);
-
-        if (currRow >= topRow+nRows) {
-            topRow++;
-            updateScreen = true;
-        }             
-    }
-
-    GenericTree *parent = where_we_are->getParent();
-    if (parent) 
-	where_we_are = parent->getChildAt(currRow * nCols + currCol,0);
-
-    if (updateScreen)     // renew the whole screen
-        update();
-    else {                // partial update only
+    else {                    // partial update only
         QPainter p(this);
         updateSingleIcon(&p,prevCol,prevRow);
         updateSingleIcon(&p,currCol,currRow);
@@ -1097,28 +1033,6 @@ void VideoGallery::actionChangeView(UIListBtnTypeItem* item)
     BuildVideoList(); // reload videos
     
     update();         // renew the screen
-}
-
-void VideoGallery::actionChangeIcons(UIListBtnTypeItem* item)
-{
-    //
-    // menu option to toggle between plain and folder view
-    //
-
-    smallIcons = !smallIcons;
-
-    // set menu text
-    if (smallIcons)
-        item->setText(tr("Large icons"));
-    else
-        item->setText(tr("Small icons"));
-
-    LoadIconWindow(); // reload icon settings
-
-    // nCols, nRows changed, so determine the x,y position of the current icon anew
-    positionIcon();
-
-    update(); // renew the screen
 }
 
 void VideoGallery::actionFilter(UIListBtnTypeItem*)

@@ -165,6 +165,46 @@ public:
     };
 };
 
+class VideoGalleryRows: public SpinBoxSetting, public GlobalSetting {
+public:
+    VideoGalleryRows():
+        SpinBoxSetting(2, 5, 1), GlobalSetting("VideoGalleryRowsPerPage") {
+        setLabel(QObject::tr("Rows to display"));
+        setValue(3);
+    };
+};
+
+class VideoGalleryColumns: public SpinBoxSetting, public GlobalSetting {
+public:
+    VideoGalleryColumns():
+        SpinBoxSetting(2, 5, 1), GlobalSetting("VideoGalleryColsPerPage") {
+        setLabel(QObject::tr("Columns to display"));
+        setValue(4);
+    };
+};
+
+class VideoGallerySubtitle: public CheckBoxSetting, public GlobalSetting {
+public:
+    VideoGallerySubtitle():
+        GlobalSetting("VideoGallerySubtitle") {
+        setLabel(QObject::tr("Show title below thumbnails"));
+        setValue(true);
+        setHelpText(QObject::tr("If set, the additional text will make the thumbnails smaller."));
+    };
+};
+
+class VideoGalleryAspectRatio: public CheckBoxSetting, public GlobalSetting {
+public:
+    VideoGalleryAspectRatio():
+        GlobalSetting("VideoGalleryAspectRatio") {
+        setLabel(QObject::tr("Maintain aspect ratio of thumbnails"));
+        setValue(true);
+        setHelpText(QObject::tr("If set, the scaled thumbnails will maintain their "
+                                "original aspect ratio. If not set, they are scaled "
+                                "to match the size of the background icon."));
+    };
+};
+
 VideoGeneralSettings::VideoGeneralSettings()
 {
     VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
@@ -185,6 +225,14 @@ VideoGeneralSettings::VideoGeneralSettings()
     vman->addChild(new GetPostersCommand());
     vman->addChild(new GetDataCommand());
     addChild(vman);
+
+    VerticalConfigurationGroup * vgal = new VerticalConfigurationGroup(false);
+    vgal->setLabel(QObject::tr("Video Gallery"));
+    vgal->addChild(new VideoGalleryColumns());
+    vgal->addChild(new VideoGalleryRows());
+    vgal->addChild(new VideoGallerySubtitle());
+    vgal->addChild(new VideoGalleryAspectRatio());
+    addChild(vgal);
 }
 
 VideoPlayerSettings::VideoPlayerSettings()

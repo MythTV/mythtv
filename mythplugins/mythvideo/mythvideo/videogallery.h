@@ -41,10 +41,7 @@ class VideoGallery : public MythDialog
     
 
   protected slots:
-    void cursorLeft();
-    void cursorRight();
-    void cursorDown();
-    void cursorUp();
+    void moveCursor(QString action);
     void exitWin();
     void setParentalLevel(int which_level);
     bool checkParentPassword();
@@ -82,13 +79,13 @@ class VideoGallery : public MythDialog
     void drawIcon(QPainter *,GenericTree*,int,int,int);
 
     void actionChangeView(UIListBtnTypeItem*);
-    void actionChangeIcons(UIListBtnTypeItem*);
     void actionFilter(UIListBtnTypeItem*);
 
     void positionIcon();
 
     int curView;
-    bool smallIcons;
+    bool subtitleOn;
+    bool keepAspectRatio;
     QString curPath;
 
     QRect fullRect;
