@@ -866,7 +866,13 @@ void MythListView::keyPressEvent(QKeyEvent *e)
             //  focus to move to other widgets
             //
             clearSelection();
-            focusNextPrevChild(false);
+            if(!focusNextPrevChild(false))
+            {
+                // BUT (if we get here) there
+                // was no other widget to take
+                // the focus 
+                setSelected(currentItem(), true);
+            }
         }
         if(e->key() == Key_Down && currentItem() == lastItem())
         {
@@ -875,7 +881,10 @@ void MythListView::keyPressEvent(QKeyEvent *e)
             //  focus to move to other widgets
             //
             clearSelection();
-            focusNextPrevChild(true);
+            if(!focusNextPrevChild(true))
+            {
+                setSelected(currentItem(), true);
+            }
         }
         if (e->key() == Key_Space && fixspace)
         {
