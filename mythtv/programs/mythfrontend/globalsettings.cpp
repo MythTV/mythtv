@@ -568,6 +568,18 @@ static BackendSpinBox *MinRecordDiskThreshold()
     return bs;
 }
 
+static BackendCheckBox *RerecordAutoExpired()
+{
+    BackendCheckBox *bc = new BackendCheckBox("RerecordAutoExpired");
+    bc->setLabel(QObject::tr("Re-record programs which have been "
+                             "automatically expired"));
+    bc->setValue(false);
+    bc->setHelpText(QObject::tr("If set, programs that are automatically "
+                                "deleted (expired) will be allowed to "
+                                "re-recorded if they are shown again."));
+    return bc;
+}
+
 static BackendSpinBox *RecordPreRoll()
 {
     BackendSpinBox *bs = new BackendSpinBox("RecordPreRoll", 0, 600, 60, true);
@@ -2515,10 +2527,11 @@ GeneralSettings::GeneralSettings()
     VerticalConfigurationGroup* autoexp = new VerticalConfigurationGroup(false);
     autoexp->setLabel(QObject::tr("Global Auto Expire Settings"));
     autoexp->addChild(AutoExpireDiskThreshold());
+    autoexp->addChild(MinRecordDiskThreshold());
     autoexp->addChild(AutoExpireFrequency());
     autoexp->addChild(AutoExpireMethod());
     autoexp->addChild(AutoExpireDefault());
-    autoexp->addChild(MinRecordDiskThreshold());
+    autoexp->addChild(RerecordAutoExpired());
     addChild(autoexp);
 
 #if USING_DVB

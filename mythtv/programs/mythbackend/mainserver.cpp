@@ -433,6 +433,8 @@ void MainServer::customEvent(QCustomEvent *e)
             dblock.unlock();
             if (pinfo)
             {
+                if (gContext->GetSetting("RerecordAutoExpired", 0))
+                    pinfo->DeleteHistory(m_db);
                 DoHandleDeleteRecording(pinfo, NULL);
             }
             else
