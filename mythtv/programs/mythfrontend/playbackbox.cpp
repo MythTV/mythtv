@@ -1988,7 +1988,8 @@ void PlaybackBox::showJobPopup()
         jobButton = popup->addButton(tr("Begin Transcoding"), this,
                          SLOT(doBeginTranscoding()));
 
-    if (curitem->IsCommProcessing(db))
+    if (JobQueue::IsJobRunning(db, JOB_COMMFLAG, curitem->chanid,
+                                                  curitem->startts))
         popup->addButton(tr("Stop Commercial Flagging"), this,
                          SLOT(doBeginFlagging()));
     else
@@ -2277,11 +2278,11 @@ void PlaybackBox::doBeginFlagging()
 
     ProgramInfo *tmpItem = findMatchingProg(curitem);
 
-    if (curitem->IsCommProcessing(db))
+    if (JobQueue::IsJobRunning(db, JOB_COMMFLAG, curitem->chanid,
+                                                  curitem->startts))
     {
-        int jobID = JobQueue::GetJobID(db, JOB_COMMFLAG, curitem->chanid,
-                                       curitem->startts);
-        JobQueue::StopJob(db, jobID);
+        JobQueue::ChangeJobCmds(db, JOB_COMMFLAG,
+                                curitem->chanid, curitem->startts, JOB_STOP);
 
         if (tmpItem)
         {
@@ -2292,18 +2293,11 @@ void PlaybackBox::doBeginFlagging()
     else
     {
         QString jobHost = "";
-
         if (gContext->GetNumSetting("JobsRunOnRecordHost", 0))
             jobHost = tmpItem->hostname;
 
         JobQueue::QueueJob(db, JOB_COMMFLAG, curitem->chanid, curitem->startts,
                            jobHost);
-
-        if (tmpItem)
-        {
-            tmpItem->programflags |= FL_EDITING;
-            tmpItem->programflags &= ~FL_COMMFLAG;
-        }
     }
 
     update(listRect);
