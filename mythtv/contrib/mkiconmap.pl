@@ -12,6 +12,12 @@ my $SHARE_DIRECTORY="/tmp";
 my $opt_help = 0;
 my $opt_grab = 1;
 my $opt_output_file = "iconmap.xml";
+my $opt_zip = "";
+my $opt_lineup = "";
+my $opt_noprefix = 0;
+my $opt_nograb = 0;
+
+my $gen_prefix = "dni_";
 
 my $ICONGRABBER="tv_grab_na_icons";
 
@@ -67,10 +73,22 @@ GetOptions(
 	'share=s'  => \$SHARE_DIRECTORY,
 	'out=s'  => \$opt_output_file,
 	'grab'  => \$opt_grab,
+	'zip=s' => \$opt_zip,
+	'lineup=s' => \$opt_lineup,
+	'noprefix' => \$opt_noprefix,
+	'nograb' => \$opt_nograb,
 ) or usage(1);
 
 if ($opt_help) {
 	usage(1);
+}
+
+if ($opt_noprefix) {
+	$gen_prefix = "";
+}
+
+if ($opt_nograb) {
+	$opt_grab = 0;
 }
 
 if ($opt_grab) {
@@ -79,7 +97,14 @@ if ($opt_grab) {
 		exit 1;
 	}
 	qprint("Calling $ICONGRABBER...\n");
-	qsystem("$ICONGRABBER --share=$SHARE_DIRECTORY --links");
+	my $command = "$ICONGRABBER --share=$SHARE_DIRECTORY --links";
+	if (length($opt_zip)) {
+		$command = "$command --zip=$opt_zip";
+	}
+	if (length($opt_lineup)) {
+		$command = "$command --lineup=$opt_lineup";
+	}
+	qsystem($command);
 }
 
 open(XMLOUT, "> $opt_output_file") or die("Error unable to open outfile file: '$opt_output_file' for writting.");
@@ -146,7 +171,7 @@ sub get_unique_stub {
 foreach my $url_key (keys(%master_urls)) {
 	my $uri = URI->new($url_key);
 	my $hostname = $uri->host();
-	my $stubbase = "dni_" . stubbase_from_host($hostname);
+	my $stubbase = "$gen_prefix" . stubbase_from_host($hostname);
 
 	$master_urls{$url_key} = get_unique_stub($stubbase);
 }
@@ -168,7 +193,7 @@ print(XMLOUT "<iconmappings>\n");
 foreach my $callsign_key (keys(%callsign_to_url)) {
 	print(XMLOUT "\t<callsigntonetwork>\n");
 	print(XMLOUT "\t\t<callsign>$callsign_key</callsign>\n");
-	print(XMLOUT "\t\t<network>dni_$callsign_key</network>\n");
+	print(XMLOUT "\t\t<network>$gen_prefix$callsign_key</network>\n");
 	print(XMLOUT "\t</callsigntonetwork>\n");
 }
 
@@ -176,7 +201,7 @@ print(XMLOUT "\n");
 
 foreach my $callsign_key (keys(%callsign_to_url)) {
 	print(XMLOUT "\t<networktourl>\n");
-	print(XMLOUT "\t\t<network>dni_$callsign_key</network>\n");
+	print(XMLOUT "\t\t<network>$gen_prefix$callsign_key</network>\n");
 	my $full_url = $callsign_to_url{$callsign_key};
 	print(XMLOUT "\t\t<url>" . stubbed_url($full_url) . "</url>\n");
 	print(XMLOUT "\t</networktourl>\n");
