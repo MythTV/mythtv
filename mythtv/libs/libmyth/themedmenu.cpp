@@ -191,6 +191,8 @@ void ThemedMenu::parseShadow(QDomElement &element)
             else if (info.tagName() == "offset")
             {
                 shadowOffset = parsePoint(getFirstText(info));
+                shadowOffset.setX((int)(shadowOffset.x() * wmult));
+                shadowOffset.setY((int)(shadowOffset.y() * hmult));
                 hasoffset = true;
             }
             else if (info.tagName() == "alpha")
