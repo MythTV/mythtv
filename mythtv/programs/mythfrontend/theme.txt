@@ -44,6 +44,8 @@ int EPGChanFontSize=13
 int EPGChanCallsignFontSize=11
 int EPGProgFontSize=13
 int EPGTitleFontSize=19
+# Display a red line indicating the current time in the EPG
+int EPGShowCurrentTime=0
 #
 # Display order of channels.  Meaningful values are chanid, callsign, and 
 # "channum + 0".

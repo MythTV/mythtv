@@ -13,6 +13,9 @@
 #include <qpainter.h>
 #include <unistd.h>
 
+#include <iostream>
+using namespace std;
+
 #include "playbackbox.h"
 #include "tv.h"
 #include "programlistitem.h"

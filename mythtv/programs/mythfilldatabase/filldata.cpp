@@ -175,22 +175,92 @@ ChanInfo *parseChannel(QDomElement &element)
     return chaninfo;
 }
 
+void addTimeOffset(QString &timestr, int config_off, QString offset )
+{
+    bool ok;
+    int off = offset.stripWhiteSpace().left(3).toInt(&ok, 10);
+               
+    if (ok && (off != config_off))
+    {
+        int diff = config_off - off;
+        int year = 0, month = 0, day = 0, hour = 0, min = 0, sec = 0;
+                
+        if (timestr.length() == 14)
+        {
+            year  = timestr.left(4).toInt(&ok, 10);
+            month = timestr.mid(4,2).toInt(&ok, 10);
+            day   = timestr.mid(6,2).toInt(&ok, 10);
+            hour  = timestr.mid(8,2).toInt(&ok, 10);
+            min   = timestr.mid(10,2).toInt(&ok, 10);
+            sec   = timestr.mid(12,2).toInt(&ok, 10);
+        }
+        else if (timestr.length() == 12)
+        {
+            year  = timestr.left(2).toInt(&ok, 10);
+            month = timestr.mid(2,2).toInt(&ok, 10);
+            day   = timestr.mid(4,2).toInt(&ok, 10);
+            hour  = timestr.mid(6,2).toInt(&ok, 10);
+            min   = timestr.mid(8,2).toInt(&ok, 10);
+            sec   = timestr.mid(10,2).toInt(&ok, 10);
+        }
+        else
+        {
+            cerr << "Unknown timestamp format: " << timestr << endl;
+        }
+                
+        QDateTime dt = QDateTime(QDate(year, month, day),QTime(hour, min, sec));
+        dt = dt.addSecs(diff * 60 * 60);
+        timestr = dt.toString("yyyyMMddhhmmss");
+    }
+}
+
 ProgInfo *parseProgram(QDomElement &element)
 {
+    QString config_offset = context->GetSetting("TimeOffset");
+    
+    bool ok;
+    int config_off = 0;
+
+    if (config_offset != "")
+        config_off = config_offset.left(3).toInt(&ok, 10);
+
     ProgInfo *pginfo = new ProgInfo;
  
     QString text = element.attribute("start", "");
     QStringList split = QStringList::split(" ", text);
 
-    pginfo->startts = split[0];
+    QString st = split[0];
+    QString offset;
+    if (split.size() > 1)
+        offset = split[1];
+    else
+        offset = config_offset;
+
+    if (config_off >= 0 && config_off <= 24 && offset != "")
+        addTimeOffset(st, config_off, offset);
+
+    pginfo->startts = st;
 
     text = element.attribute("stop", "");
     split = QStringList::split(" ", text);
 
+    QString et;
+
     if (split.size() > 0)
-        pginfo->endts = split[0]; 
+    {
+        et = split[0];
+        if (split.size() > 1)
+            offset = split[1];
+        else
+            offset = config_offset;
+    }
     else
-        pginfo->endts = "";
+        et = "";
+
+    if (config_off >= 0 && config_off <= 24 && offset != "")
+        addTimeOffset(et, config_off, offset);
+
+    pginfo->endts = et;
 
     text = element.attribute("channel", "");
     split = QStringList::split(" ", text);

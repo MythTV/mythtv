@@ -302,6 +302,15 @@ void setupSources(void)
             QStringList inputlist = probeCard(videodev); 
             QStringList::Iterator it;
 
+            if (inputlist.isEmpty())
+            {
+                cout << "\nSetup could not detect any capture card inputs.\n";
+                cout << "This will prevent MythTV from running properly.\n\n";
+                if (getResponse("Exit setup and correct this problem?", "y") ==
+                    "y")
+                    exit(1);
+            }
+
             for (it = inputlist.begin(); it != inputlist.end(); ++it)
             {
                 selectSource(idnum, videodev, *it, sourcelist); 
@@ -359,12 +368,16 @@ int main(int argc, char *argv[])
     cout << "Now, please run 'mythfilldatabase' to populate the database\n";
     cout << "with channel information.\n";
     cout << endl;
-    cout << "If you are are using the following xmltv grabbers:\n";
-    cout << "  tv_grab_uk, tv_grab_de, tv_grab_sn\n\n";
-    cout << "You _MUST_ run 'mythfilldatabase --manual the first time, "
-         << "instead\n";
-    cout << "of just 'mythfilldatabase'.  These grabbers do not provide\n";
-    cout << "channel numbers, so you have to set them manually.\n";
+
+    QString xmltv_grabber = context->GetSetting("XMLTVGrab");
+    if (xmltv_grabber == "tv_grab_uk" || xmltv_grabber == "tv_grab_de" ||
+        xmltv_grabber == "tv_grab_sn")
+    {
+        cout << "You _MUST_ run 'mythfilldatabase --manual the first time, "
+             << "instead\n";
+        cout << "of just 'mythfilldatabase'.  Your grabber does not provide\n";
+        cout << "channel numbers, so you have to set them manually.\n";
+    }
 
     return 0;
 }

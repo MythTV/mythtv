@@ -529,6 +529,8 @@ void GuideGrid::paintTimes(QPainter *p)
     tmp.setFont(*m_timeFont);
 
     int xdifference = (int)(tr.width() / DISPLAY_TIMES); 
+    QDateTime now = QDateTime::currentDateTime();
+    int nowpos = -1;
 
     for (int x = 0; x < DISPLAY_TIMES; x++)
     {
@@ -552,10 +554,22 @@ void GuideGrid::paintTimes(QPainter *p)
             int xpos = (x * xdifference) + (xdifference * 6 - width) / 2; 
             tmp.drawText(xpos, (tr.bottom() - height) / 2 + height, 
                          tinfo->usertime);
+
+            int t = now.secsTo(QDateTime(m_currentStartTime.date(),
+                                         QTime(tinfo->hour, tinfo->min)));
+            if (nowpos < 0 && t < 0)
+                nowpos = x + (t / -60 / 5);
         }
     }
 
     tmp.drawLine(0, tr.height() - 1, tr.right(), tr.height() - 1);
+
+    if (nowpos >= 0 && m_settings->GetNumSetting("EPGShowCurrentTime"))
+    {
+        tmp.setPen(QPen(QColor(255, 0, 0), (int)(2 * wmult)));
+        tmp.drawLine((nowpos) * xdifference, 0, (nowpos) * xdifference, 
+                     tr.bottom());
+    }
 
     tmp.end();
 
