@@ -34,18 +34,34 @@
 
    <button>
       <type>DVD_RIP</type>
-      <text>Archive DVD</text>
-      <text lang="DE">DVD archivieren</text>
-      <text lang="SV">Arkivera DVD</text>
+      <text>Import DVD</text>
+      <text lang="IT">Importa un DVD</text>
+      <text lang="ES">Importar DVD</text>
+      <text lang="CA">Importar DVD</text>
+      <text lang="DE">DVD importieren</text>
+      <text lang="DK">Importér DVD</text>
+      <text lang="NL">DVD Importeren</text>
+      <text lang="PT">Ler do DVD</text>
+      <text lang="SV">Importera DVD</text>
+      <text lang="FR">Importer un DVD</text>
+      <text lang="JA">DVD取込</text>
       <action>JUMP Rip DVD</action>
       <depends>mythdvd</depends>
    </button>
 
    <button>
       <type>MUSIC_RIP</type>
-      <text>Archive CD</text>
-      <text lang="DE">CD archivieren</text>
-      <text lang="SV">Arkivera CD</text>
+      <text>Import CD</text>
+      <text lang="IT">Importa un CD</text>
+      <text lang="ES">Importar CD</text>
+      <text lang="CA">Importar CD</text>
+      <text lang="DE">CD importieren</text>
+      <text lang="DK">Importér CD</text>
+      <text lang="NL">CD Importeren</text>
+      <text lang="PT">Ler do CD</text>
+      <text lang="SV">Importera CD</text>
+      <text lang="FR">Importer un CD</text>
+      <text lang="JA">CD取込</text>
       <action>JUMP Rip CD</action>
       <depends>mythmusic</depends>
    </button>
