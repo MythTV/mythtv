@@ -33,7 +33,9 @@ const int MpegRecorder::audRateL2[] = { 32, 48, 56, 64, 80, 96, 112, 128,
                                         160, 192, 224, 256, 320, 384, 0 };
 const char* MpegRecorder::streamType[] = { "MPEG-2 PS", "MPEG-2 TS", 
                                            "MPEG-1 VCD", "PES AV", "", "PES V", 
-                                           "", "PES A", "", "", "DVD"};
+                                           "", "PES A", "", "", "DVD", "VCD",
+                                           "SVCD", "DVD-Special 1", 
+                                           "DVD-Special 2", 0 };
 const char* MpegRecorder::aspectRatio[] = { "Square", "4:3", "16:9", 
                                             "2.21:1", 0 };
 
@@ -206,6 +208,10 @@ void MpegRecorder::StartRecording(void)
         return;
     }
 
+    // only 48kHz works properly.
+    int audio_rate = 1;
+
+/*
     int audio_rate;
     if (audsamplerate == 44100)
         audio_rate = 0;
@@ -213,23 +219,34 @@ void MpegRecorder::StartRecording(void)
         audio_rate = 1;
     // 32kHz doesn't seem to work, let's force 44.1kHz instead.
     else if (audsamplerate == 32000)
-        audio_rate = 0;
+        audio_rate = 2;
     else
     {
         cerr << "Error setting audio sample rate\n";
         cerr << audsamplerate << " is not a valid sampling rate\n";
         return;
     }
+*/
 
     ivtvcodec.aspect = aspectratio;
     if (audtype == 2)
+    {
+        if (audbitratel2 < 10)
+            audbitratel2 = 10;
         ivtvcodec.audio_bitmask = audio_rate + (audtype << 2) + 
                                   (audbitratel2 << 4);
+    }
     else
+    {
+        if (audbitratel1 < 6)
+            audbitratel1 = 6;
         ivtvcodec.audio_bitmask = audio_rate + (audtype << 2) + 
                                   (audbitratel1 << 4);
+    }
+
     ivtvcodec.bitrate = bitrate * 1000;
     ivtvcodec.bitrate_peak = maxbitrate * 1000;
+
     // framerate (1 = 25fps, 0 = 30fps)
     ivtvcodec.framerate = (!ntsc);
     ivtvcodec.stream_type = streamtype;

@@ -71,7 +71,8 @@ public:
         else
         {
             addSelection("48000");
-            addSelection("44100");
+            //addSelection("44100");
+            //addSelection("32000");
         }
 	setHelpText("Sets the audio sampling rate for your DSP. "
                     "Ensure that you choose a sampling rate appropriate "

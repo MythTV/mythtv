@@ -42,6 +42,13 @@ int main(int argc, char *argv[])
 
     gContext->LoadQtConfig();
 
+    QString auddevice = gContext->GetSetting("AudioOutputDevice");
+    if (auddevice == "" || auddevice == QString::null)
+    {
+        cerr << "You need to run 'mythfrontend', not 'mythtv'.\n";
+        exit(-1);
+    }
+
     MythMainWindow *mainWindow = new MythMainWindow();
     mainWindow->Show();
     gContext->SetMainWindow(mainWindow);

@@ -2320,31 +2320,45 @@ void MainServer::PrintStatus(QSocket *socket)
     {
         EncoderLink *elink = iter.data();
 
-        if (elink->isLocal())
+        bool bIsLocal = elink->isLocal();
+
+        if (bIsLocal)
         {
-            os << "Encoder: " << elink->getCardId() << " is local and ";
+            os << "Encoder: " << elink->getCardId() << " is local ";
         }
         else
         {
-            os << "Encoder: " << elink->getCardId() << " is remote and ";
+            os << "Encoder: " << elink->getCardId() << " is remote ";
             if (elink->isConnected())
-                os << "is connected ";
+                os << "(currently connected) ";
             else
-                os << "is not connected ";
+                os << "(currently not connected) ";
         }
 
-        if (elink->IsBusyRecording())
+        TVState encstate = elink->GetState();
+
+        if (encstate == kState_WatchingLiveTV)
         {
-            os << "is recording";
-            if (elink->isLocal())
+            os << "and is watching Live TV.\r\n";
+        }
+        else if (encstate == kState_RecordingOnly || 
+                 encstate == kState_WatchingRecording)
+        {
+            os << "and is recording";
+            if (bIsLocal)
             {
                 ProgramInfo *pi = elink->GetRecording();
-                os << " '" << pi->title << "'";
+                if (pi)
+                {
+                    os << " '" << pi->title << "'.  This recording will end "
+                       << "at " << (pi->endts).toString(timeformat);
+                    delete pi;
+                }
             }
             os << ".\r\n";
         }
         else
-            os << "is not recording.\r\n";
+            os << "and is not recording.\r\n";
 
         os << "<br>\r\n";
     }
@@ -2395,6 +2409,8 @@ void MainServer::PrintStatus(QSocket *socket)
        os << "</TABLE>";
     }
 
+    delete sched;
+
     os << "<P>Machine Information:\r\n";
     os << "<TABLE WIDTH =100% BGCOLOR=EEEEEE>";
     os << "<TR><TD>";
@@ -2423,13 +2439,14 @@ void MainServer::PrintStatus(QSocket *socket)
     os << "</TD><TD>";
     
     // load average ---------------------
-    os << "This machine's load average:";
-
     double rgdAverages[3];
-    getloadavg(rgdAverages, 3);
-    os << "<UL><LI>1 Minute: " << rgdAverages[0] << "\r\n";
-    os << "<LI>5 Minute: " << rgdAverages[1] << "\r\n";
-    os << "<LI>15 Minute: " << rgdAverages[2] << "\r\n</UL>";
+    if (getloadavg(rgdAverages, 3) != -1)
+    {
+        os << "This machine's load average:";
+        os << "<UL><LI>1 Minute: " << rgdAverages[0] << "\r\n";
+        os << "<LI>5 Minute: " << rgdAverages[1] << "\r\n";
+        os << "<LI>15 Minute: " << rgdAverages[2] << "\r\n</UL>";
+    }
 
     os << "</TD></TR></TABLE>";    // end the machine information table
 

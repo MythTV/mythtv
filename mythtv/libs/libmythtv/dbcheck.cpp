@@ -20,16 +20,31 @@ void UpdateDBVersionNumber(const QString &newnumber)
                          .arg(newnumber));
 }
 
-void InitializeDatabase(void)
-{
-    cerr << "Not written yet.\n";
-    // set up all of the database tables.
-}
-
-void UpgradeTVDatabaseSchema(void)
+void performActualUpdate(const QString updates[], QString version,
+                         QString &dbver)
 {
     QSqlDatabase *db_conn = QSqlDatabase::database();
 
+    VERBOSE(VB_ALL, QString("Upgrading to schema version ") + version);
+
+    int counter = 0;
+    QString thequery = updates[counter];
+
+    while (thequery != "")
+    {
+        db_conn->exec(thequery);
+        counter++;
+        thequery = updates[counter];
+    }
+
+    UpdateDBVersionNumber(version);
+    dbver = version;
+}
+
+void InitializeDatabase(void);
+
+void UpgradeTVDatabaseSchema(void)
+{
     QString dbver = gContext->GetSetting("DBSchemaVer");
     
     if (dbver == currentDatabaseVersion)
@@ -38,24 +53,91 @@ void UpgradeTVDatabaseSchema(void)
     if (dbver == "")
     {
         InitializeDatabase();        
-        return;
+        dbver = "1003";
     }
 
+    if (dbver == "900")
+    {
+        const QString updates[] = {
+"ALTER TABLE program ADD COLUMN category_type VARCHAR(64) NULL;",
+"DROP TABLE IF EXISTS transcoding;",
+"CREATE TABLE transcoding (chanid INT UNSIGNED, starttime TIMESTAMP, status INT, hostname VARCHAR(255));",
+""
+};
+        performActualUpdate(updates, "901", dbver);
+    }
 
-    // insert older upgrades here, later
+    if (dbver == "901")
+    {
+        const QString updates[] = {
+"ALTER TABLE record ADD COLUMN category VARCHAR(64) NULL;",
+"ALTER TABLE recorded ADD COLUMN category VARCHAR(64) NULL;",
+"ALTER TABLE oldrecorded ADD COLUMN category VARCHAR(64) NULL;",
+""
+};
+        performActualUpdate(updates, "902", dbver);
+    }
 
+    if (dbver == "902")
+    {
+        const QString updates[] = {
+"ALTER TABLE record ADD rank INT(10) DEFAULT '0' NOT NULL;",
+"ALTER TABLE channel ADD rank INT(10) DEFAULT '0' NOT NULL;",
+""
+};
+        performActualUpdate(updates, "903", dbver);
+    }
+
+    if (dbver == "903")
+    {
+        const QString updates[] = {
+"ALTER TABLE channel ADD COLUMN freqid VARCHAR(5) NOT NULL;",
+"UPDATE channel set freqid=channum;",
+"ALTER TABLE channel ADD hue INT DEFAULT '32768';",
+""
+};
+        performActualUpdate(updates, "1000", dbver);
+    }
+
+    if (dbver == "1000")
+    {
+        const QString updates[] = {
+"ALTER TABLE record ADD autoexpire INT DEFAULT 0 NOT NULL;",
+"ALTER TABLE recorded ADD autoexpire INT DEFAULT 0 NOT NULL;",
+""
+};
+        performActualUpdate(updates, "1001", dbver);
+    }
+
+    if (dbver == "1001")
+    {
+        const QString updates[] = {
+"ALTER TABLE record ADD maxepisodes INT DEFAULT 0 NOT NULL;",
+""
+};
+        performActualUpdate(updates, "1002", dbver);
+    }
+
+    if (dbver == "1002")
+    {
+        const QString updates[] = {
+"ALTER TABLE record ADD recorddups INT DEFAULT 0 NOT NULL;",
+"ALTER TABLE record ADD maxnewest INT DEFAULT 0 NOT NULL;",
+""
+};
+        performActualUpdate(updates, "1003", dbver);
+    }
 
     if (dbver == "1003")
     {
-        VERBOSE(VB_ALL, "Upgrading to schema version 1004");
-        UpdateDBVersionNumber("1004");
-        dbver = "1004";    
+        const QString updates[] = {
+""
+};
+        performActualUpdate(updates, "1004", dbver);
     }
 
     if (dbver == "1004")
     {
-        VERBOSE(VB_ALL, "Upgrading to schema version 1005");
-
         const QString updates[] = {
 "DROP TABLE IF EXISTS profilegroups;",
 "CREATE TABLE profilegroups ("
@@ -105,48 +187,23 @@ void UpgradeTVDatabaseSchema(void)
 "INSERT INTO recordingprofiles SET name = \"RTjpeg/MPEG4\", profilegroup = 6;",
 "INSERT INTO recordingprofiles SET name = \"MPEG2\", profilegroup = 6;",
 "DELETE FROM codecparams;",
-"",
+""
 };
-
-        int counter = 0;
-        QString thequery = updates[counter];
-        while (thequery != "")
-        {
-            db_conn->exec(thequery);
-            counter++;
-            thequery = updates[counter];
-        }
-
-        UpdateDBVersionNumber("1005");
-        dbver = "1005";
+        performActualUpdate(updates, "1005", dbver);
     }
 
     if (dbver == "1005")
     {
-        VERBOSE(VB_ALL, "Upgrading to schema version 1006");
-
         const QString updates[] = {
 "DELETE FROM settings where value = 'TranscoderAutoRun';",
 "ALTER TABLE record CHANGE profile profile VARCHAR(128);",
-"",
+""
 };
-        int counter = 0;
-        QString thequery = updates[counter];
-        while (thequery != "")
-        {
-            db_conn->exec(thequery);
-            counter++;
-            thequery = updates[counter];
-        }
-
-        UpdateDBVersionNumber("1006");
-        dbver = "1006";
+        performActualUpdate(updates, "1006", dbver);
     }
 
     if (dbver == "1006")
     {
-        VERBOSE(VB_ALL, "Upgrading to schema version 1007");
-
         const QString updates[] = {
 "CREATE TABLE IF NOT EXISTS recordingprofiles ("
 "  id int(10) unsigned NOT NULL auto_increment,"
@@ -158,18 +215,267 @@ void UpgradeTVDatabaseSchema(void)
 ");",
 ""
 };
-
-        int counter = 0;
-        QString thequery = updates[counter];
-        while (thequery != "")
-        {
-            db_conn->exec(thequery);
-            counter++;
-            thequery = updates[counter];
-        }
-
-        UpdateDBVersionNumber("1007");
-        dbver = "1007";
+        performActualUpdate(updates, "1007", dbver);
     }
+}
+
+void InitializeDatabase(void)
+{
+    QSqlDatabase *db_conn = QSqlDatabase::database();
+    QSqlQuery qQuery = db_conn->exec("SHOW TABLES;");
+    if (qQuery.isActive() && (qQuery.numRowsAffected() > 0))
+    {
+        cerr << "Told to create a NEW database schema, but the database already"
+             << "\r\nhas " << qQuery.numRowsAffected() << " tables.\r\n";
+        cerr << "If you are sure this is a good mythtv database, verify\r\n"
+             << "that the settings table has the DBSchemaVer variable.\r\n";
+        exit(1);
+    }
+
+    VERBOSE(VB_ALL, "Inserting MythTV initial database information.");
+
+    const QString updates[] = {
+"CREATE TABLE IF NOT EXISTS recordingprofiles"
+"("
+"    id INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,"
+"    name VARCHAR(128),"
+"    videocodec VARCHAR(128),"
+"    audiocodec VARCHAR(128),"
+"    UNIQUE(name)"
+");",
+"CREATE TABLE IF NOT EXISTS codecparams"
+"("
+"    profile INT UNSIGNED NOT NULL,"
+"    name VARCHAR(128) NOT NULL,"
+"    value VARCHAR(128),"
+"    PRIMARY KEY (profile, name)"
+");",
+"CREATE TABLE IF NOT EXISTS channel"
+"("
+"    chanid INT UNSIGNED NOT NULL PRIMARY KEY,"
+"    channum VARCHAR(5) NOT NULL,"
+"    freqid VARCHAR(5) NOT NULL,"
+"    sourceid INT UNSIGNED,"
+"    callsign VARCHAR(20) NULL,"
+"    name VARCHAR(20) NULL,"
+"    icon VARCHAR(255) NULL,"
+"    finetune INT,"
+"    videofilters VARCHAR(255) NULL,"
+"    xmltvid VARCHAR(64) NULL,"
+"    rank INT(10) DEFAULT '0' NOT NULL,"
+"    contrast INT DEFAULT 32768,"
+"    brightness INT DEFAULT 32768,"
+"    colour INT DEFAULT 32768,"
+"    hue INT DEFAULT 32768"
+");",
+"CREATE TABLE IF NOT EXISTS channel_dvb"
+"("
+"    chanid INT UNSIGNED NOT NULL PRIMARY KEY,"
+"    listingid VARCHAR(20) NULL,"
+"    pids VARCHAR(50),"
+"    freq INT UNSIGNED,"
+"    pol CHAR DEFAULT 'V',"
+"    symbol_rate INT UNSIGNED NULL,"
+"    tone INT UNSIGNED NULL,"
+"    diseqc INT UNSIGNED NULL,"
+"    inversion VARCHAR(10) NULL,"
+"    bandwidth VARCHAR(10) NULL,"
+"    hp_code_rate VARCHAR(10) NULL,"
+"    lp_code_rate VARCHAR(10) NULL,"
+"    modulation VARCHAR(10) NULL,"
+"    transmission_mode VARCHAR(10) NULL,"
+"    guard_interval VARCHAR(10) NULL,"
+"    hierarchy VARCHAR(10) NULL"
+");",
+"CREATE TABLE IF NOT EXISTS program"
+"("
+"    chanid INT UNSIGNED NOT NULL,"
+"    starttime TIMESTAMP NOT NULL,"
+"    endtime TIMESTAMP NOT NULL,"
+"    title VARCHAR(128) NULL,"
+"    subtitle VARCHAR(128) NULL,"
+"    description TEXT NULL,"
+"    category VARCHAR(64) NULL,"
+"    category_type VARCHAR(64) NULL,"
+"    airdate YEAR NOT NULL,"
+"    stars FLOAT UNSIGNED NOT NULL,"
+"    previouslyshown TINYINT NOT NULL default '0',"
+"    PRIMARY KEY (chanid, starttime),"
+"    INDEX (endtime),"
+"    INDEX (title)"
+");",
+"CREATE TABLE IF NOT EXISTS record"
+"("
+"    recordid INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,"
+"    type INT UNSIGNED NOT NULL,"
+"    chanid INT UNSIGNED NULL,"
+"    starttime TIME NOT NULL,"
+"    startdate DATE NOT NULL,"
+"    endtime TIME NOT NULL,"
+"    enddate DATE NOT NULL,"
+"    title VARCHAR(128) NULL,"
+"    subtitle VARCHAR(128) NULL,"
+"    description TEXT NULL,"
+"    category VARCHAR(64) NULL,"
+"    profile INT UNSIGNED NOT NULL DEFAULT 0,"
+"    rank INT(10) DEFAULT '0' NOT NULL,"
+"    autoexpire INT DEFAULT 0 NOT NULL,"
+"    maxepisodes INT DEFAULT 0 NOT NULL,"
+"    maxnewest INT DEFAULT 0 NOT NULL,"
+"    recorddups INT DEFAULT 0 NOT NULL,"
+"    INDEX (chanid, starttime),"
+"    INDEX (title)"
+");",
+"CREATE TABLE IF NOT EXISTS recorded"
+"("
+"    chanid INT UNSIGNED NOT NULL,"
+"    starttime TIMESTAMP NOT NULL,"
+"    endtime TIMESTAMP NOT NULL,"
+"    title VARCHAR(128) NULL,"
+"    subtitle VARCHAR(128) NULL,"
+"    description TEXT NULL,"
+"    category VARCHAR(64) NULL,"
+"    hostname VARCHAR(255),"
+"    bookmark VARCHAR(128) NULL,"
+"    editing INT UNSIGNED NOT NULL DEFAULT 0,"
+"    cutlist TEXT NULL,"
+"    autoexpire INT DEFAULT 0 NOT NULL,"
+"    PRIMARY KEY (chanid, starttime),"
+"    INDEX (endtime)"
+");",
+"CREATE TABLE IF NOT EXISTS settings"
+"("
+"    value VARCHAR(128) NOT NULL,"
+"    data TEXT NULL,"
+"    hostname VARCHAR(255) NULL,"
+"    INDEX (value, hostname)"
+");",
+"CREATE TABLE IF NOT EXISTS conflictresolutionoverride"
+"("
+"    chanid INT UNSIGNED NOT NULL,"
+"    starttime TIMESTAMP NOT NULL,"
+"    endtime TIMESTAMP NOT NULL,"
+"    INDEX (chanid, starttime),"
+"    INDEX (endtime)"
+");",
+"CREATE TABLE IF NOT EXISTS conflictresolutionsingle"
+"("
+"    preferchanid INT UNSIGNED NOT NULL,"
+"    preferstarttime TIMESTAMP NOT NULL,"
+"    preferendtime TIMESTAMP NOT NULL,"
+"    dislikechanid INT UNSIGNED NOT NULL,"
+"    dislikestarttime TIMESTAMP NOT NULL,"
+"    dislikeendtime TIMESTAMP NOT NULL,"
+"    INDEX (preferchanid, preferstarttime),"
+"    INDEX (preferendtime)"
+");",
+"CREATE TABLE IF NOT EXISTS conflictresolutionany"
+"("
+"    prefertitle VARCHAR(128) NOT NULL,"
+"    disliketitle VARCHAR(128) NOT NULL,"
+"    INDEX (prefertitle),"
+"    INDEX (disliketitle)"
+");",
+"CREATE TABLE IF NOT EXISTS oldrecorded"
+"("
+"    chanid INT UNSIGNED NOT NULL,"
+"    starttime TIMESTAMP NOT NULL,"
+"    endtime TIMESTAMP NOT NULL,"
+"    title VARCHAR(128) NULL,"
+"    subtitle VARCHAR(128) NULL,"
+"    description TEXT NULL,"
+"    category VARCHAR(64) NULL,"
+"    PRIMARY KEY (chanid, starttime),"
+"    INDEX (endtime),"
+"    INDEX (title)"
+");",
+"CREATE TABLE IF NOT EXISTS capturecard"
+"("
+"    cardid INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,"
+"    videodevice VARCHAR(128),"
+"    audiodevice VARCHAR(128),"
+"    vbidevice VARCHAR(128),"
+"    cardtype VARCHAR(32) DEFAULT 'V4L',"
+"    defaultinput VARCHAR(32) DEFAULT 'Television',"
+"    audioratelimit INT,"
+"    hostname VARCHAR(255),"
+"    use_ts INT NULL,"
+"    dvb_type CHAR NULL"
+");",
+"CREATE TABLE IF NOT EXISTS videosource"
+"("
+"    sourceid INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,"
+"    name VARCHAR(128) NOT NULL,"
+"    xmltvgrabber VARCHAR(128),"
+"    userid VARCHAR(128) NOT NULL DEFAULT '',"
+"    UNIQUE(name)"
+");",
+"CREATE TABLE IF NOT EXISTS cardinput"
+"("
+"    cardinputid INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,"
+"    cardid INT UNSIGNED NOT NULL,"
+"    sourceid INT UNSIGNED NOT NULL,"
+"    inputname VARCHAR(32) NOT NULL,"
+"    externalcommand VARCHAR(128) NULL,"
+"    preference INT,"
+"    shareable CHAR DEFAULT 'N',"
+"    tunechan CHAR(5) NOT NULL,"
+"    startchan CHAR(5) NOT NULL"
+");",
+"CREATE TABLE IF NOT EXISTS favorites ("
+"    favid int(11) unsigned NOT NULL auto_increment,"
+"    userid int(11) unsigned NOT NULL default '0',"
+"    chanid int(11) unsigned NOT NULL default '0',"
+"    PRIMARY KEY (favid)"
+");",
+"CREATE TABLE IF NOT EXISTS recordedmarkup"
+"("
+"    chanid INT UNSIGNED NOT NULL,"
+"    starttime TIMESTAMP NOT NULL,"
+"    mark BIGINT(20) NOT NULL,"
+"    offset VARCHAR(32) NULL,"
+"    type INT NOT NULL,"
+"    primary key (chanid,starttime, mark, type )"
+");",
+"CREATE TABLE IF NOT EXISTS programrating"
+"("
+"    chanid INT UNSIGNED NOT NULL,"
+"    starttime TIMESTAMP NOT NULL,"
+"    system CHAR(8) NOT NULL default '',"
+"    rating CHAR(8) NOT NULL default '',"
+"    UNIQUE KEY chanid (chanid,starttime,system,rating),"
+"    INDEX (starttime, system)"
+");",
+"CREATE TABLE IF NOT EXISTS people"
+"("
+"    person MEDIUMINT(8) UNSIGNED NOT NULL AUTO_INCREMENT,"
+"    name CHAR(128) NOT NULL default '',"
+"    PRIMARY KEY (person),"
+"    KEY name (name(20))"
+") TYPE=MyISAM;",
+"CREATE TABLE IF NOT EXISTS credits"
+"("
+"    person MEDIUMINT(8) UNSIGNED NOT NULL default '0',"
+"    chanid INT UNSIGNED NOT NULL default '0',"
+"    starttime TIMESTAMP NOT NULL,"
+"    role SET('actor','director','producer','executive_producer','writer','guest_star','host','adapter','presenter','commentator','guest') NOT NULL default '',"
+"    UNIQUE KEY chanid (chanid, starttime, person),"
+"    KEY person (person, role)"
+") TYPE=MyISAM;",
+"CREATE TABLE IF NOT EXISTS transcoding ("
+"    chanid INT UNSIGNED,"
+"    starttime TIMESTAMP,"
+"    status INT,"
+"    hostname VARCHAR(255)"
+");",
+"INSERT INTO settings VALUES ('DBSchemaVer', 1003, NULL);",
+"INSERT INTO recordingprofiles (name) VALUES ('Default');",
+"INSERT INTO recordingprofiles (name) VALUES ('Live TV');",
+"INSERT INTO recordingprofiles (name) VALUES ('Transcode');",
+""
+};
+
+    QString dbver = "";
+    performActualUpdate(updates, "1003", dbver);
 }
 
