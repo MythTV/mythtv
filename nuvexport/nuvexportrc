@@ -43,7 +43,14 @@
     #
     #  Setting underscores to yes will convert whitespace in filenames to an
     #    underscore character (which some people seem to prefer)
+    #
     underscores=no
+
+    #
+    #  Setting require_cutlist to yes will tell nuvexport to show only those
+    #    recordings that have a cutlist
+    #
+    require_cutlist=yes
 
 </nuvexport>
 

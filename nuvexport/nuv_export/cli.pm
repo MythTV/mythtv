@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.03.09 (xris)
+#Last Updated: 2005.03.31 (xris)
 #
 #  cli.pm
 #
@@ -169,7 +169,14 @@ package nuv_export::cli;
 # Retrieve the value of a commandline argument
     sub arg {
         my ($arg, $default) = @_;
-        return defined($args{$arg}) ? $args{$arg} : $default;
+    # Commandline preference/override
+        return $args{$arg} if (defined($args{$arg}));
+    # Load rc preference
+        $args{$arg} = rc_arg($arg);
+    # Return the rc preference, or the passed-in default value
+        return defined($args{$arg})
+                ? $args{$arg}
+                : $default;
     }
 
 # Retrieve the value of a nuvexportrc argument

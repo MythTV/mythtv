@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.03.07 (xris)
+#Last Updated: 2005.03.31 (xris)
 #
 #  generic.pm
 #
@@ -265,12 +265,8 @@ package export::generic;
         my $self = shift;
         my $arg  = shift;
         if (!defined $self->{$arg}) {
-        # Config option?
-            my $val = rc_arg($arg, $self);
-        # Use the default for this object
-            $val = $self->{'defaults'}{$arg} unless (defined $val);
-        # Look for a config option, or a commandline option
-            $self->{$arg} = arg($arg, $val);
+        # Look for a config option, a commandline option, or the code-specified default
+            $self->{$arg} = arg($arg, $self->{'defaults'}{$arg});
         }
         return $self->{$arg};
     }
