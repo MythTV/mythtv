@@ -267,7 +267,7 @@ bool DecoderBase::SyncPositionMap(void)
             m_positionMap[m_positionMap.size()-1].index * keyframedist;
         int length = (int)((totframes * 1.0) / fps);
         m_parent->SetFileLength(length, totframes);
-        m_parent->SetVideoParams(-1, -1, -1, keyframedist, current_aspect);
+        m_parent->SetKeyframeDistance(keyframedist);
         posmapStarted = true;
     }
     return ret_val;

@@ -1050,6 +1050,9 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
                         int align_width = width;
                         int align_height = height;
 
+                        fps = (double)context->frame_rate / 
+                                      context->frame_rate_base;
+
                         if (directrendering)
                             avcodec_align_dimensions(context, &align_width, 
                                                      &align_height);

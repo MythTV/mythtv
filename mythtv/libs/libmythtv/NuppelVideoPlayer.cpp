@@ -516,6 +516,15 @@ void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps,
                                        int keyframedistance, float aspect,
                                        FrameScanType scan, bool reinit)
 {
+    if (width == 0 || height == 0 || isnan(aspect) || isnan(fps))
+        return;
+
+    if (video_width == width && video_height == height && 
+        aspect == video_aspect && fps == video_frame_rate)
+    {
+        return;
+    }
+
     if (width > 0)
         video_width = width;
     if (height > 0)
