@@ -2144,7 +2144,7 @@ void TV::customEvent(QCustomEvent *e)
             }
         }
         else if (GetState() == kState_WatchingLiveTV &&
-                 message.left(13) == "QUIT_LIVETV")
+                 message.left(11) == "QUIT_LIVETV")
         {
             message = message.simplifyWhiteSpace();
             QStringList tokens = QStringList::split(" ", message);

@@ -199,8 +199,8 @@ int TVRec::StartRecording(ProgramInfo *rcinfo)
 
         timeout = QDateTime::currentDateTime().addSecs(3);
 
-        while (internalState != kState_None ||
-               QDateTime::currentDateTime().secsTo(timeout) <= 0)
+        while (internalState != kState_None &&
+               QDateTime::currentDateTime().secsTo(timeout) > 0)
             usleep(100);
 
         if (internalState != kState_None)
@@ -209,8 +209,8 @@ int TVRec::StartRecording(ProgramInfo *rcinfo)
 
             timeout = QDateTime::currentDateTime().addSecs(3);
 
-            while (internalState != kState_None ||
-                   QDateTime::currentDateTime().secsTo(timeout) <= 0)
+            while (internalState != kState_None &&
+                   QDateTime::currentDateTime().secsTo(timeout) > 0)
                 usleep(100);
         }
 
@@ -218,8 +218,8 @@ int TVRec::StartRecording(ProgramInfo *rcinfo)
         {
             exitPlayer = true;
             timeout = QDateTime::currentDateTime().addSecs(5);
-            while (internalState != kState_None ||
-                   QDateTime::currentDateTime().secsTo(timeout) <= 0)
+            while (internalState != kState_None &&
+                   QDateTime::currentDateTime().secsTo(timeout) > 0)
                 usleep(100);
         }
     }
@@ -234,7 +234,7 @@ int TVRec::StartRecording(ProgramInfo *rcinfo)
         changeState = true;
         retval = 1;
     }
-    else
+    else if (!cancelNextRecording)
     {
         cerr << QDateTime::currentDateTime().toString() 
              << ":  wanted to record: " << endl;

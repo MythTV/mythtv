@@ -1220,19 +1220,21 @@ void Scheduler::RunScheduler(void)
                 }
             }
 
-            if (recording && secsleft <= 0)
+            if (recording && secsleft <= -2)
             {
+                QString msg;
                 if (nexttv->StartRecording(nextRecording))
-                {
-                    VERBOSE("Started recording");
-                }
+                    msg = "Started recording";
                 else
-                    VERBOSE("Canceled recording");
+                    msg = "Canceled recording"; 
 
-                VERBOSE(nextRecording->title << "\" on channel: "
-                        << nextRecording->chanid.toInt()-1000
-                        << " on cardid: " << nextRecording->cardid
-                        << ", sourceid: " << nextRecording->sourceid);
+                msg += QString(" \"%1\" on channel: %2 on cardid: %3, "
+                               "sourceid %4").arg(nextRecording->title)
+                                             .arg(nextRecording->chanid)
+                                             .arg(nextRecording->cardid)
+                                             .arg(nextRecording->sourceid);
+
+                VERBOSE(msg);
 
                 AddToDontRecord(nextRecording);
                 RemoveRecording(nextRecording);
