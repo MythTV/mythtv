@@ -171,8 +171,8 @@ void Scheduler::FillEncoderFreeSpaceCache()
 
 bool Scheduler::FillRecordLists(bool doautoconflicts)
 {
-    doRecPriority = (bool)gContext->GetNumSetting("RecPriorityingActive");
-    doRecPriorityFirst = (bool)gContext->GetNumSetting("RecPriorityingOrder");
+    doRecPriority = (bool)gContext->GetNumSetting("RecPriorityActive");
+    doRecPriorityFirst = (bool)gContext->GetNumSetting("RecPriorityOrder");
 
     if (recpriorityMap.size() > 0)
         recpriorityMap.clear();

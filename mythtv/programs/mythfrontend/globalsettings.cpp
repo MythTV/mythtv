@@ -1121,7 +1121,7 @@ public:
 class GRUseRecPriorities: public CheckBoxSetting, public BackendSetting {
 public:
     GRUseRecPriorities():
-        BackendSetting("RecPrioritiesActive") {
+        BackendSetting("RecPriorityActive") {
         setLabel(QObject::tr("Use Recording Priorities"));
         setHelpText(QObject::tr("Use program recording priorities to resolve "
                     "conflicts."));
@@ -1132,7 +1132,7 @@ public:
 class GRRecPrioritiesFirst: public CheckBoxSetting, public BackendSetting {
 public:
     GRRecPrioritiesFirst():
-        BackendSetting("RecPrioritiesOrder") {
+        BackendSetting("RecPriorityOrder") {
         setLabel(QObject::tr("Recording Priorities First."));
         setHelpText(QObject::tr("Use recording priorities to resolve conflicts "
                     "before using traditional conflict resolution."));
