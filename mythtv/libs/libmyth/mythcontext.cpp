@@ -1113,6 +1113,10 @@ QImage *MythContext::LoadScaleImage(QString filename, bool fromcache)
             if (!checkFile.exists())
                 filename = baseDir + fi.fileName();
         }
+        else
+        {
+            filename = fileTemp;
+        }
     }
 
 
@@ -1197,6 +1201,11 @@ QPixmap *MythContext::LoadScalePixmap(QString filename, bool fromcache)
             if (!checkFile.exists())
                 filename = baseDir + fi.fileName();
         }
+        else
+        {
+            filename = fileTemp;
+        }
+
     }
         
     QPixmap *ret = new QPixmap();
