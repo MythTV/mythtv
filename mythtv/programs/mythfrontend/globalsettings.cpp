@@ -175,15 +175,15 @@ public:
 class DeinterlaceSettings: public HorizontalConfigurationGroup,
                            public TriggeredConfigurationGroup {
 public:
-    DeinterlaceSettings(): 
-        HorizontalConfigurationGroup(false, false), 
+    DeinterlaceSettings():
+        HorizontalConfigurationGroup(false, false),
         TriggeredConfigurationGroup(false) {
         setLabel(QObject::tr("Deinterlace settings"));
         setUseLabel(false);
         Setting *deinterlace = new Deinterlace();
         addChild(deinterlace);
         setTrigger(deinterlace);
-        
+
         Setting *filter = new DeinterlaceFilter();
         addTarget("1", filter);
         addTarget("0", new HorizontalConfigurationGroup(false, false));
@@ -248,7 +248,7 @@ public:
 
         addSelection(QObject::tr("All Programs"), QString("All Programs"));
         addSelection(QObject::tr("Default"), QString("Default"));
-        
+
         QSqlDatabase *db = QSqlDatabase::database();
         QString thequery = QString("SELECT DISTINCT recgroup from recorded");
         QSqlQuery query = db->exec(thequery);
@@ -427,7 +427,7 @@ public:
         setLabel(QObject::tr("Commercial Detection Processing Host"));
 
         addSelection(QObject::tr("Default"), "Default");
-        
+
         QSqlDatabase *db = QSqlDatabase::database();
         QString thequery = QString("SELECT DISTINCT hostname from settings");
         QSqlQuery query = db->exec(thequery);
@@ -1108,7 +1108,7 @@ public:
                     "be used, with LEFT performing an exit action and "
                     "RIGHT selecting the current item."));
     };
-}; 
+};
 
 class SetupPinCode: public LineEditSetting, public GlobalSetting {
 public:
@@ -1288,7 +1288,7 @@ class VidModeWidth: public SpinBoxSetting, public GlobalSetting {
     VidModeWidth(int idx):
         SpinBoxSetting(0, 1920, 8),
         GlobalSetting(QString("VidModeWidth%1").arg(idx)) {
-        
+
         setLabel(QObject::tr("X"));
         setValue(0);
         setHelpText(QObject::tr("Horizontal resolution of video mode "
@@ -1301,7 +1301,7 @@ class VidModeHeight: public SpinBoxSetting, public GlobalSetting {
     VidModeHeight(int idx):
         SpinBoxSetting(0, 1200, 4),
         GlobalSetting(QString("VidModeHeight%1").arg(idx)) {
-        
+
         setLabel(QObject::tr("Y"));
         setValue(0);
         setHelpText(QObject::tr("Vertical resolution of video mode "
@@ -1313,7 +1313,7 @@ class TVVidModeWidth: public SpinBoxSetting, public GlobalSetting {
   public:
     TVVidModeWidth():
         SpinBoxSetting(0, 1920, 8), GlobalSetting("TVVidModeWidth") {
-        
+
         setLabelAboveWidget(true);
         setLabel(QObject::tr("Width"));
         setValue(0);
@@ -1349,7 +1349,7 @@ class TVVidModeHeight: public SpinBoxSetting, public GlobalSetting {
     TVVidModeHeight(int idx):
         SpinBoxSetting(0, 1200, 4),
         GlobalSetting(QString("TVVidModeHeight%1").arg(idx)) {
-        
+
         setLabel(QObject::tr("Y"));
         setValue(0);
         setHelpText(QObject::tr("Vertical resolution for playback video mode. "
@@ -1371,10 +1371,10 @@ class TVVidModeAltAspect: public CheckBoxSetting, public GlobalSetting {
     };
     TVVidModeAltAspect(int idx):
         GlobalSetting(QString("TVVidModeAltAspect%1").arg(idx)) {
-        
+
         setLabelAboveWidget(true);
         setLabel(QObject::tr("Alt Aspect"));
-        
+
         setValue(false);
         setHelpText(QObject::tr("If X's DisplaySize indicates 16:9, "
                                 "fudge vertical size into 4:3, "
@@ -1390,50 +1390,50 @@ class VideoModeSettings: public VerticalConfigurationGroup,
         TriggeredConfigurationGroup(false) {
         setLabel(QObject::tr("Video Mode Settings"));
         setUseLabel(false);
-        
+
         Setting *videomode = new UseVideoModes();
         addChild(videomode);
         setTrigger(videomode);
-        
-        ConfigurationGroup* settings = 
+
+        ConfigurationGroup* settings =
             new VerticalConfigurationGroup(false);
-        ConfigurationGroup* defaultsettings = 
+        ConfigurationGroup* defaultsettings =
             new HorizontalConfigurationGroup(false, false);
-        ConfigurationGroup *xres = 
+        ConfigurationGroup *xres =
             new HorizontalConfigurationGroup(true, false);
-        ConfigurationGroup *yres = 
+        ConfigurationGroup *yres =
             new HorizontalConfigurationGroup(true, false);
-        ConfigurationGroup *zres = 
+        ConfigurationGroup *zres =
             new HorizontalConfigurationGroup(true, false);
-        
+
         xres->setLabel(QObject::tr("GUI Size (px)"));
         xres->addChild(new GuiVidModeWidth());
         xres->addChild(new GuiVidModeHeight());
-        
+
         yres->setLabel(QObject::tr("Default Display (px)"));
         yres->addChild(new TVVidModeWidth());
         yres->addChild(new TVVidModeHeight());
-        
+
         zres->setLabel(QObject::tr("Physical Size"));
         zres->addChild(new TVVidModeAltAspect());
-        
+
         defaultsettings->addChild(xres);
         defaultsettings->addChild(yres);
         defaultsettings->addChild(zres);
-        
+
         settings->addChild(defaultsettings);
-        
+
         for (int idx = 0; idx < 2; ++idx) {
-            
-            ConfigurationGroup *xres = 
+
+            ConfigurationGroup *xres =
                 new HorizontalConfigurationGroup(true, false);
 
             xres->addChild(new VidModeWidth(idx));
             xres->addChild(new VidModeHeight(idx));
-            
+
             xres->addChild(new TVVidModeWidth(idx));
             xres->addChild(new TVVidModeHeight(idx));
-            
+
             xres->addChild(new TVVidModeAltAspect(idx));
 
             xres->setLabel(QString("Video Size ---> Display Size  "
@@ -1496,7 +1496,7 @@ public:
         setLabel(QObject::tr("Short Date format"));
 
         QDate sampdate(2004, 1, 31);
-   
+
         addSelection(sampdate.toString("M/d"), "M/d");
         addSelection(sampdate.toString("d/M"), "d/M");
         addSelection(sampdate.toString("MM/dd"), "MM/dd");
@@ -1650,7 +1650,7 @@ public:
                     "when you tune into a HDTV or other over-the-air "
                     "digital station. This value is the number of "
                     "milliseconds to allow before MythTV gives up "
-                    "trying to get an acceptable signal.")); 
+                    "trying to get an acceptable signal."));
        setValue(5000);
     };
 };
@@ -1745,13 +1745,13 @@ public:
         GlobalSetting("EPGFillType") {
         setLabel(QObject::tr("Guide Shading Method"));
         QString val = "";
-        addSelection(QObject::tr("Alpha - Transparent (CPU Usage - High)"), 
+        addSelection(QObject::tr("Alpha - Transparent (CPU Usage - High)"),
                      val.left(0).setNum((int)UIGuideType::Alpha));
-        addSelection(QObject::tr("Blender - Transparent (CPU Usage - Middle)"), 
+        addSelection(QObject::tr("Blender - Transparent (CPU Usage - Middle)"),
                      val.left(0).setNum((int)UIGuideType::Dense));
-        addSelection(QObject::tr("Eco - Transparent (CPU Usage - Low)"), 
+        addSelection(QObject::tr("Eco - Transparent (CPU Usage - Low)"),
                      val.left(0).setNum((int)UIGuideType::Eco));
-        addSelection(QObject::tr("Solid (CPU Usage - Middle)"), 
+        addSelection(QObject::tr("Solid (CPU Usage - Middle)"),
                      val.left(0).setNum((int)UIGuideType::Solid));
     };
 };
@@ -1992,7 +1992,7 @@ public:
          settings->addChild(new PCMVolume());
          settings->addChild(new IndividualMuteControl());
          addTarget("1", settings);
-         
+
          // show nothing if volumeControl is off
          addTarget("0", new VerticalConfigurationGroup(true));
      };
@@ -2081,7 +2081,7 @@ public:
         setLabel(QObject::tr("Recording Check Frequency"));
         setValue(5);
         setHelpText(QObject::tr("This specifies how frequently "
-                    "(in seconds) to check if a recording is in " 
+                    "(in seconds) to check if a recording is in "
                     "progress in order to update the Xbox LED."));
     };
 };
@@ -2136,7 +2136,7 @@ public:
 #ifdef USING_XVMC
 class UseXVMC: public CheckBoxSetting, public GlobalSetting {
 public:
-    UseXVMC(): 
+    UseXVMC():
         GlobalSetting("UseXVMC") {
         setLabel(QObject::tr("Use hardware XvMC MPEG Decoding"));
         setValue(true);
@@ -2147,7 +2147,7 @@ public:
 #ifdef USING_VIASLICE
 class UseViaSlice: public CheckBoxSetting, public GlobalSetting {
 public:
-    UseViaSlice(): 
+    UseViaSlice():
         GlobalSetting("UseViaSlice") {
         setLabel(QObject::tr("Use VIA hardware MPEG Decoding"));
         setValue(true);
@@ -2417,7 +2417,7 @@ public:
          settings->addChild(new LogCleanDays());
          settings->addChild(new LogCleanMax());
          addTarget("1", settings);
-         
+
          // show nothing if logEnabled is off
          addTarget("0", new VerticalConfigurationGroup(true));
      };
@@ -2444,7 +2444,7 @@ public:
          settings->addChild(new MythFillMinHour());
          settings->addChild(new MythFillMaxHour());
          addTarget("1", settings);
-         
+
          // show nothing if fillEnabled is off
          addTarget("0", new VerticalConfigurationGroup(true));
      };
@@ -2452,7 +2452,7 @@ public:
 
 class LCDShowTime: public CheckBoxSetting, public GlobalSetting {
 public:
-    LCDShowTime(): 
+    LCDShowTime():
         GlobalSetting("LCDShowTime") {
         setLabel(QObject::tr("LCD Displays Time"));
         setHelpText(QObject::tr("Display current time on idle LCD display. "
@@ -2463,7 +2463,7 @@ public:
 
 class LCDShowMenu: public CheckBoxSetting, public GlobalSetting {
 public:
-    LCDShowMenu(): 
+    LCDShowMenu():
         GlobalSetting("LCDShowMenu") {
         setLabel(QObject::tr("LCD Displays Menus"));
         setHelpText(QObject::tr("Display selected menu on LCD display. "
@@ -2474,7 +2474,7 @@ public:
 
 class LCDShowMusic: public CheckBoxSetting, public GlobalSetting {
 public:
-    LCDShowMusic(): 
+    LCDShowMusic():
         GlobalSetting("LCDShowMusic") {
         setLabel(QObject::tr("LCD Displays Music Artist and Title"));
         setHelpText(QObject::tr("Display playing artist and song title in "
@@ -2486,7 +2486,7 @@ public:
 
 class LCDShowChannel: public CheckBoxSetting, public GlobalSetting {
 public:
-    LCDShowChannel(): 
+    LCDShowChannel():
         GlobalSetting("LCDShowChannel") {
         setLabel(QObject::tr("LCD Displays Channel Information"));
         setHelpText(QObject::tr("Display tuned channel information. Need to "
@@ -2497,7 +2497,7 @@ public:
 
 class LCDShowVolume: public CheckBoxSetting, public GlobalSetting {
 public:
-    LCDShowVolume(): 
+    LCDShowVolume():
         GlobalSetting("LCDShowVolume") {
         setLabel(QObject::tr("LCD Displays Volume Information"));
         setHelpText(QObject::tr("Display volume level information. Need to "
@@ -2508,7 +2508,7 @@ public:
 
 class LCDShowGeneric: public CheckBoxSetting, public GlobalSetting {
 public:
-    LCDShowGeneric(): 
+    LCDShowGeneric():
         GlobalSetting("LCDShowGeneric") {
         setLabel(QObject::tr("LCD Displays Generic Information"));
         setHelpText(QObject::tr("Display generic information. Need to "
@@ -2521,7 +2521,7 @@ class WatchTVGuide: public CheckBoxSetting, public GlobalSetting {
 public:
     WatchTVGuide():
         GlobalSetting("WatchTVGuide") {
-        setLabel(QObject::tr("Shows Program Guide when starting Live TV"));
+        setLabel(QObject::tr("Show the program guide when starting Live TV"));
         setHelpText(QObject::tr("This starts the program guide immediately "
              "upon starting to watch Live TV."));
         setValue(false);
@@ -2530,7 +2530,7 @@ public:
 
 class LCDBacklightOn: public CheckBoxSetting, public GlobalSetting {
 public:
-    LCDBacklightOn(): 
+    LCDBacklightOn():
         GlobalSetting("LCDBacklightOn") {
         setLabel(QObject::tr("LCD Backlight Always On"));
         setHelpText(QObject::tr("Turn on the backlight permanently. Need to "
@@ -2746,7 +2746,7 @@ AppearanceSettings::AppearanceSettings()
     theme->addChild(new StyleSetting());
     theme->addChild(new ThemeFontSizeType());
     theme->addChild(new RandomTheme());
-    theme->addChild(new MenuTheme());    
+    theme->addChild(new MenuTheme());
     addChild(theme);
 
     VerticalConfigurationGroup* screen = new VerticalConfigurationGroup(false);
@@ -2767,7 +2767,7 @@ AppearanceSettings::AppearanceSettings()
 #endif
 
     VerticalConfigurationGroup* dates = new VerticalConfigurationGroup(false);
-    dates->setLabel(QObject::tr("Localization"));    
+    dates->setLabel(QObject::tr("Localization"));
     dates->addChild(new MythLanguage());
     dates->addChild(new MythDateFormat());
     dates->addChild(new MythShortDateFormat());
