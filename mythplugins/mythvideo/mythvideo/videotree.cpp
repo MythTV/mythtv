@@ -36,11 +36,14 @@ VideoTree::VideoTree(MythMainWindow *parent, QSqlDatabase *ldb,
     
     //  
     //  Tell the tree list to highlight the 
-    //  first leaf and then draw the GUI as
-    //  it now stands
+    //  first entry and then display it
     //
     
-    video_tree_list->enter();
+    video_tree_list->setCurrentNode(video_tree_data);
+    if(video_tree_data->childCount() > 0)
+    {
+        video_tree_list->setCurrentNode(video_tree_data->getChildAt(0, 0));
+    }
     updateForeground();
 }
 
