@@ -171,7 +171,7 @@ QString VideoFilterSettings::BuildClauseWhere()
 		if (where)
 			where += QString(" AND browse >= %1").arg(browse);
 		else 
-			where = QString(" WHERE browse = %1").arg(browse);
+			where = QString(" WHERE browse >= %1").arg(browse);
 return where;
 }
 
