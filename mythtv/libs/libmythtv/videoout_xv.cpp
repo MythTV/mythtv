@@ -100,7 +100,7 @@ int XvVideoOutput::GetRefreshRate(void)
     return (int)rate;
 }
 
-bool XvVideoOutput::Init(int width, int height, int num_buffers, 
+bool XvVideoOutput::Init(int width, int height, float aspect, int num_buffers, 
                          unsigned char **out_buffers, unsigned int winid,
                          int winx, int winy, int winw, int winh, 
                          unsigned int embedid)
@@ -119,6 +119,8 @@ bool XvVideoOutput::Init(int width, int height, int num_buffers,
 
     XJ_width = width;
     XJ_height = height;
+
+    XJ_aspect = aspect;
 
     XInitThreads();
 
@@ -154,7 +156,7 @@ bool XvVideoOutput::Init(int width, int height, int num_buffers,
     printf("Over/underscanning. V: %f, H: %f, XOff: %d, YOff: %d\n", 
            img_vscanf, img_hscanf, img_xoff, img_yoff);
  
-    XJ_aspect = gContext->GetNumSetting("FixedAspectRatio", 0);
+    XJ_fixedaspect = gContext->GetNumSetting("FixedAspectRatio", 0);
 
     XJ_white = XWhitePixel(data->XJ_disp, XJ_screen_num);
     XJ_black = XBlackPixel(data->XJ_disp, XJ_screen_num);
@@ -722,7 +724,7 @@ void XvVideoOutput::ResizeVideo(int x, int y, int w, int h)
     if (oldx == (x+1) && oldy == (y+1) && oldw == w && oldh == h)
         return;
 
-    if (XJ_aspect)
+    if (XJ_fixedaspect)
     {
         if (w * 3 / 4 > h)
         {
@@ -854,4 +856,10 @@ void XvVideoOutput::MoveResize(void)
         }
     }
 
+    if (XJ_aspect >= 1.34)
+    {
+        int oldheight = disphoff;
+        disphoff = (int)(dispwoff / XJ_aspect);
+        dispyoff = (oldheight - disphoff) / 2;
+    }
 }

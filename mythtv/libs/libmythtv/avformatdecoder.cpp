@@ -260,8 +260,12 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                 if (fps < 26 && fps > 24)
                     keyframedist = 12;
 
+                float aspect_ratio = enc->aspect_ratio;
+                if (aspect_ratio <= 0.0)
+                    aspect_ratio = (float)enc->width / (float)enc->height;
+
                 m_parent->SetVideoParams(enc->width, enc->height, fps, 
-                                         keyframedist);
+                                         keyframedist, aspect_ratio);
              
                 enc->error_resilience = 2;
                 enc->workaround_bugs = FF_BUG_AUTODETECT;
@@ -318,6 +322,8 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
             exit(0);
         }
     }
+
+    ptsmultiplier = ((double)ic->pts_num) / (ic->pts_den / 1000.0);
 
     ringBuffer->CalcReadAheadThresh(bitrate);
 
@@ -432,6 +438,7 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
     unsigned char *ptr;
     short samples[AVCODEC_MAX_AUDIO_FRAME_SIZE / 2];
     int data_size = 0;
+    long long temppts;
 
     bool gotvideo = false;
 
@@ -516,18 +523,19 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                         continue;
                     }
 
-                    if (lastapts != pkt.pts && pkt.pts > 0 && validvpts)
+                    temppts = (long long)((double)pkt.pts * ptsmultiplier); 
+
+                    if (lastapts != temppts && temppts > 0 && validvpts)
                     {
-                        lastapts = pkt.pts;
+                        lastapts = temppts;
                     }
                     else
                     {
-                        lastapts += (long long)((double)((data_size * 90.0) / 
-                                    audio_sample_size / audio_sampling_rate)
-                                    * 1000);
+                        lastapts += (long long)((double)(data_size * 1000) / 
+                                    audio_sample_size / audio_sampling_rate);
                     }
                     m_parent->AddAudioData((char *)samples, data_size, 
-                                           lastapts / 90);
+                                           lastapts);
                     break;
                 }
                 case CODEC_TYPE_VIDEO:
@@ -590,14 +598,14 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                         if (pkt.pts > 0)
                         {
                             validvpts = true;
-                            newvpts = (long long int)(pkt.pts * 1.0 * 
-                                       ic->pts_num / (ic->pts_den / 1000));
+                            newvpts = (long long)((double)pkt.pts * 
+                                                  ptsmultiplier); 
                         }
-                        else
+                        else if (context->codec_id == CODEC_ID_MPEG1VIDEO)
                         {
                             // guess, based off of the audio timestamp and 
                             // the prebuffer size
-                            newvpts = lastapts / 90 + (int)(1000.0 / fps) * 3;
+                            newvpts = lastapts + (int)(1000.0 / fps) * 3;
                         }
 
                         if (newvpts <= lastvpts)

@@ -132,7 +132,7 @@ class NuppelVideoPlayer
 
     // decoder stuff..
     void SetVideoParams(int width, int height, double fps, 
-                        int keyframedistance);
+                        int keyframedistance, float aspect = 1.33333);
     void SetAudioParams(int bps, int channels, int samplerate);
     void SetEffDsp(int dsprate);
     void SetFileLength(int total, int frames);
@@ -226,6 +226,7 @@ class NuppelVideoPlayer
     int video_height;
     int video_size;
     double video_frame_rate;
+    float video_aspect;
 
     int filesize;
     int startpos;

@@ -53,6 +53,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
     video_width = 0;
     video_size = 0;
     text_size = 0;
+    video_aspect = 1.33333;
 
     decoder = NULL;
 
@@ -282,8 +283,9 @@ void NuppelVideoPlayer::InitVideo(void)
     }
 
     videoOutput = new XvVideoOutput();
-    videoOutput->Init(video_width, video_height, MAXVBUFFER + 1, vbuffer, 
-                      widget->winId(), 0, 0, widget->width(), widget->height(),
+    videoOutput->Init(video_width, video_height, video_aspect,
+                      MAXVBUFFER + 1, vbuffer, widget->winId(), 
+                      0, 0, widget->width(), widget->height(),
                       embedid);
     if (embedid > 0)
     {
@@ -292,7 +294,7 @@ void NuppelVideoPlayer::InitVideo(void)
 }
 
 void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps, 
-                                       int keyframedistance)
+                                       int keyframedistance, float aspect)
 {
     if (width > 0)
         video_width = width; 
@@ -303,6 +305,8 @@ void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps,
 
     video_size = video_height * video_width * 3 / 2;
     keyframedist = keyframedistance;
+
+    video_aspect = aspect;
 }
 
 void NuppelVideoPlayer::SetFileLength(int total, int frames)

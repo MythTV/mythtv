@@ -138,6 +138,7 @@ void TV::Init(bool createWindow)
         myWindow->installEventFilter(this);
         myWindow->setNoErase();
         myWindow->show();
+        myWindow->setBackgroundColor(Qt::black);
         qApp->processEvents();
     }
 

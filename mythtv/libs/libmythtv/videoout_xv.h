@@ -9,7 +9,7 @@ class XvVideoOutput
     XvVideoOutput();
    ~XvVideoOutput();
 
-    bool Init(int width, int height, int num_buffers, 
+    bool Init(int width, int height, float aspect, int num_buffers, 
               unsigned char **out_buffers, unsigned int winid,
               int winx, int winy, int winw, int winh, unsigned int embedid = 0);
     void PrepareFrame(unsigned char *buffer, int width, int height);
@@ -41,7 +41,7 @@ class XvVideoOutput
     int XJ_screenx, XJ_screeny;
     int XJ_screenwidth, XJ_screenheight;
     int XJ_fullscreen;
-    int XJ_aspect;
+    int XJ_fixedaspect;
 
     int oldx, oldy, oldw, oldh;
     int curx, cury, curw, curh;
@@ -61,6 +61,8 @@ class XvVideoOutput
     unsigned char *scratchspace;
 
     pthread_mutex_t lock;
+
+    float XJ_aspect;
 };
 
 #endif

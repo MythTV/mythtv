@@ -99,6 +99,8 @@ class AvFormatDecoder : public DecoderBase
 
     double fps;
     bool validvpts;
+
+    double ptsmultiplier;
 };
 
 #endif

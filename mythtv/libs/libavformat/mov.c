@@ -1442,6 +1442,9 @@ static int mov_read_header(AVFormatContext *s, AVFormatParameters *ap)
     else
 	atom.size = 0x7FFFFFFFFFFFFFFFLL;
 
+    if (atom.size == 0)
+         atom.size = 0x7FFFFFFFFFFFFFFFLL;
+
 #ifdef DEBUG
     printf("filesz=%Ld\n", atom.size);
 #endif
