@@ -1935,7 +1935,7 @@ static HostCheckBox *RealtimePriority()
                     "privileges, some threads can be given enhanced priority. "
                     "Disable this if mythfrontend freezes during video "
                     "playback."));
-    gc->setValue(false);
+    gc->setValue(true);
     return gc;
 }
 

@@ -692,6 +692,8 @@ static void *run_priv_thread(void *data)
                                 "for MythPrivRequest::MythRealtime");
                     }
                 }
+                else
+                    VERBOSE(VB_GENERAL, "The realtime priority setting is not enabled.");
                 break;
             case MythPrivRequest::MythExit:
                 pthread_exit(NULL);
