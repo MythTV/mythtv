@@ -2722,7 +2722,7 @@ int NuppelVideoPlayer::FlagCommercials(int show_percentage)
     m_playbackinfo->SetBlankFrameList(blankMap, m_db);
 
     BuildCommListFromBlanks(blankMap, video_frame_rate, commBlankMap);
-    MergeCommList(commBlankMap, commBlankBreakMap);
+    MergeCommList(commBlankMap, video_frame_rate, commBlankBreakMap);
 
     // Merge/resolve differences between the lists here
 
@@ -2860,7 +2860,7 @@ void NuppelVideoPlayer::SkipCommercialsByBlanks(void)
         QMap<long long, int> commBlankMap;
 
         BuildCommListFromBlanks(blankMap, video_frame_rate, commBlankMap);
-        MergeCommList(commBlankMap, commBreakMap);
+        MergeCommList(commBlankMap, video_frame_rate, commBreakMap);
         if (!commBreakMap.isEmpty())
         {
             hascommbreaktable = true;
@@ -3054,7 +3054,7 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
             QMap<long long, int> commBlankMap;
 
             BuildCommListFromBlanks(blankMap, video_frame_rate, commBlankMap);
-            MergeCommList(commBlankMap, commBreakMap);
+            MergeCommList(commBlankMap, video_frame_rate, commBreakMap);
             if (!commBreakMap.isEmpty())
             {
                 hascommbreaktable = true;
