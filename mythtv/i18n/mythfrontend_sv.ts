@@ -155,19 +155,19 @@
     <name>MythWizard</name>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Avbryt</translation>
     </message>
     <message>
         <source>&lt; &amp;Back</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt; &amp;Bakåt</translation>
     </message>
     <message>
         <source>&amp;Next &gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Framåt &gt;</translation>
     </message>
     <message>
         <source>&amp;Finish</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Slutför</translation>
     </message>
 </context>
 <context>
@@ -222,47 +222,47 @@
     </message>
     <message>
         <source>Are you sure you want to stop:</source>
-        <translation type="unfinished"></translation>
+        <translation>Är du säker på att du vill avsluta:</translation>
     </message>
     <message>
         <source>Yes, stop recording it</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja, avsluta inspelningen</translation>
     </message>
     <message>
         <source>No, do not AutoExpire</source>
-        <translation type="unfinished"></translation>
+        <translation>Nej, autoradera inte</translation>
     </message>
     <message>
         <source>No, continue recording it</source>
-        <translation type="unfinished"></translation>
+        <translation>Nej, fortsätt spela in</translation>
     </message>
     <message>
         <source>Select action:</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj åtgärd:</translation>
     </message>
     <message>
         <source>Play</source>
-        <translation type="unfinished">Spela</translation>
+        <translation>Spela av</translation>
     </message>
     <message>
         <source>Stop Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Avsluta inspelning</translation>
     </message>
     <message>
         <source>Don&apos;t Auto Expire</source>
-        <translation type="unfinished"></translation>
+        <translation>Autoradera inte</translation>
     </message>
     <message>
         <source>Auto Expire</source>
-        <translation type="unfinished"></translation>
+        <translation>Autoradera</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Radera</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Avbryt</translation>
+        <translation>Avbryt</translation>
     </message>
 </context>
 <context>
@@ -587,251 +587,251 @@
     </message>
     <message>
         <source>Pre-scaling theme images</source>
-        <translation type="unfinished"></translation>
+        <translation>Skalar om bilder för temat</translation>
     </message>
     <message>
         <source>Audio output device</source>
-        <translation type="unfinished"></translation>
+        <translation>Ljudenhet</translation>
     </message>
     <message>
         <source>Use internal volume controls</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd interna volymkontroller</translation>
     </message>
     <message>
         <source>MythTV can control the PCM and master mixer volume.  If you prefer to use an external mixer program, uncheck this box.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV kan kontrollera PCM- och huvudvolymen. Om du föredrar att justera volymen med ett externt program, deaktivera denna funktion.</translation>
     </message>
     <message>
         <source>Mixer Device</source>
-        <translation type="unfinished"></translation>
+        <translation>Enhet för ljudmixern</translation>
     </message>
     <message>
         <source>Changing the volume adjusts the selected mixer.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ändring av volym justerar den valda mixern.</translation>
     </message>
     <message>
         <source>Master Mixer Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>Huvudvolym</translation>
     </message>
     <message>
         <source>Initial volume for the Master Mixer.  This affects all sound created by the soundcard.  Note: Do not set this too low.</source>
-        <translation type="unfinished"></translation>
+        <translation>Initiellt värde för huvudvolymen. Denna påverkar volymen på alla ljudkällor på ljudkortet. Not: Sätt inte denna för lågt.</translation>
     </message>
     <message>
         <source>PCM Mixer Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>PCM-volym</translation>
     </message>
     <message>
         <source>Initial volume for PCM output.  Use of the volume keys in MythTV will adjust this parameter.</source>
-        <translation type="unfinished"></translation>
+        <translation>Initialt värde för PCM-volymen. Volymjustering i MythTV kommer ett påverka denna parameter.</translation>
     </message>
     <message>
         <source>Deinterlace playback</source>
-        <translation type="unfinished"></translation>
+        <translation>Gör &apos;deinterlace&apos; vid avspelning</translation>
     </message>
     <message>
         <source>Make the video look normal on a progressive display (i.e. monitor).  Deinterlace requires that your CPU supports SSE instructions.  Enabling this without proper CPU support will cause the program to segfault. See the HOWTO document for more information.</source>
-        <translation type="unfinished"></translation>
+        <translation>Gör så att video ser normal ut i de fall den visas på en monitor. Om inte denna funktion slås på vid visning på monitor kommer bilden att dela upp sig vid snabba rörelser i bilden. Vid visning på TV skall denna funktion vara avslagen. OBS: Kräver att CPUn stödjer SSE-instruktioner. Om den inte stödjer SSE kommer programmet att krasha. Se dokumentationen för mer information.</translation>
     </message>
     <message>
         <source>Extra audio buffering</source>
-        <translation type="unfinished"></translation>
+        <translation>Extra ljudbuffring</translation>
     </message>
     <message>
         <source>This attempts to keep extra audio data in the internal buffers.  Try setting this if you&apos;re getting crackly audio. (Not used for software encoded video.)</source>
-        <translation type="unfinished"></translation>
+        <translation>Denna funktion gör att extra mycket ljud buffras i de interna buffrarna. Försök att slå på denna funktion om du har problem med hack i ljudet. (Funktionen används inte vid mjukvarukodad video.)</translation>
     </message>
     <message>
         <source>Jump amount (in minutes)</source>
-        <translation type="unfinished"></translation>
+        <translation>Hopplängd (minuter)</translation>
     </message>
     <message>
         <source>How many minutes to jump forward or backward when the jump keys are pressed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Antal minuter operationen framåthopp/bakåthopp (Framåt &gt;&gt;/Bakåt &lt;&lt;) flyttar uppspelningspunkten.</translation>
     </message>
     <message>
         <source>Fast forward amount (in seconds)</source>
-        <translation type="unfinished"></translation>
+        <translation>Steglängd vid framåtspolning (sekunder)</translation>
     </message>
     <message>
         <source>How many seconds to skip forward on a fast forward.</source>
-        <translation type="unfinished"></translation>
+        <translation>Antal sekunder som operationen &quot;Framåt&quot; flyttar avspelningspunkten.</translation>
     </message>
     <message>
         <source>Rewind amount (in seconds)</source>
-        <translation type="unfinished"></translation>
+        <translation>Steglängd vid bakåtspolning (sekunder)</translation>
     </message>
     <message>
         <source>How many seconds to skip backward on a rewind.</source>
-        <translation type="unfinished"></translation>
+        <translation>Antal sekunder som operationen &quot;Bakåt&quot; flyttar avspelningspunkten.</translation>
     </message>
     <message>
         <source>Seek to exact frame</source>
-        <translation type="unfinished"></translation>
+        <translation>Sök till exakt ruta</translation>
     </message>
     <message>
         <source>If enabled, seeking is frame exact, but slower.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om funktionen är aktiverad kommer sökning att vara exakt på bildrutor men långsammare.</translation>
     </message>
     <message>
         <source>Commercial Skip Method</source>
-        <translation type="unfinished"></translation>
+        <translation>Metod för reklamdetektering</translation>
     </message>
     <message>
         <source>Blank Frame Detection (default)</source>
-        <translation type="unfinished"></translation>
+        <translation>Svart bild (standard)</translation>
     </message>
     <message>
         <source>Blank Frame + Scene Change Detection</source>
-        <translation type="unfinished"></translation>
+        <translation>Svart bild + scenbyte</translation>
     </message>
     <message>
         <source>Scene Change Detection</source>
-        <translation type="unfinished"></translation>
+        <translation>Scenbyte</translation>
     </message>
     <message>
         <source>This determines the method used by MythTV to detect when commercials start and end.  You must have automatic commercial turned on to use anything other than &apos;Blank Frame&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Detta bestämmer metoden som används för att detektera när reklam börjar och slutar. &apos;Automatisk reklamdetektering&apos; måste vara påslagen för att använda något annant än &apos;Svart bild&apos;.</translation>
     </message>
     <message>
         <source>Automatically Skip Commercials</source>
-        <translation type="unfinished"></translation>
+        <translation>Hoppa över reklam automatiskt</translation>
     </message>
     <message>
         <source>Automatically skip commercial breaks that have been flagged during Automatic Commercial Flagging or by the mythcommflag program.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hoppar automatiskt över reklam som har flaggats under automatisk reklamdeteltering eller m h a programmet mythcommflag.</translation>
     </message>
     <message>
         <source>Automatically Flag Commercials</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatisk reklamdetektering</translation>
     </message>
     <message>
         <source>Automatically flag commercials after a recording completes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Flagga reklampauser efter att varje inspelning har avslutats.</translation>
     </message>
     <message>
         <source>Strict Commercial Detection</source>
-        <translation type="unfinished"></translation>
+        <translation>Strikt reklamdetektering</translation>
     </message>
     <message>
         <source>Turn on stricter Commercial Detection code.  If some commercials are not being detected, try turning this setting OFF.</source>
-        <translation type="unfinished"></translation>
+        <translation>Slå på mer strikt reklamdetektering. Slå av denna om du upplever att viss reklam inte detekteras.</translation>
     </message>
     <message>
         <source>Auto Expire Free Disk Space Threshold (in Gigabytes)</source>
-        <translation type="unfinished"></translation>
+        <translation>Tröskelvärde för automatisk radering (Gigabyte)</translation>
     </message>
     <message>
         <source>Trigger AutoExpire when free space in Gigabytes goes below this value.  Turn OFF AutoExpire by setting to 0.</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatisk radering av filer startas när ledigt diskutrymme har gått under den specifierade nivån. För att slå av funktionen, sätt värdet till 0.</translation>
     </message>
     <message>
         <source>Auto Expire Frequency (in minutes)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kontrollintervall för autoradering (minuter)</translation>
     </message>
     <message>
         <source>Number of minutes the AutoExpire process will wait between each time that it checks for free disk space.</source>
-        <translation type="unfinished"></translation>
+        <translation>Antalet minuter mellan två kontroller av befintligt diskutrymme.</translation>
     </message>
     <message>
         <source>Auto Expire Method</source>
-        <translation type="unfinished"></translation>
+        <translation>Metod för autoradering</translation>
     </message>
     <message>
         <source>Oldest Show First</source>
-        <translation type="unfinished"></translation>
+        <translation>Äldst program först</translation>
     </message>
     <message>
         <source>Method used to determine which recorded shows to AutoExpire first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Metod som används för att bestämma vilka inspelningar som raderas först.</translation>
     </message>
     <message>
         <source>Auto-Expire Default</source>
-        <translation type="unfinished"></translation>
+        <translation>Schemalägg inspelningar med autoradering påslagen som standard</translation>
     </message>
     <message>
         <source>Turn Auto-Expire ON by default when creating new scheduled recordings.  Existing scheduled recordings will keep their current value.</source>
-        <translation type="unfinished"></translation>
+        <translation>Slå på autoradering på nya schemalagda inspelningar. Autoradering går att slå av för enskilda inspelningar om så önskas. Befintliga schemalagda inspelningar kommer inte att påverkas.</translation>
     </message>
     <message>
         <source>New Recording Free Disk Space Threshold (in Megabytes)</source>
-        <translation type="unfinished"></translation>
+        <translation>Tröskelvärde för diskutrymme vid ny inspelning (Megabytes)</translation>
     </message>
     <message>
         <source>MythTV will stop scheduling new recordings on a backend when its free disk space falls below this value.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nya inspelningar kommer inte att startas på en videoserver när ledigt diskutrymme faller under den specificerade gränsen.</translation>
     </message>
     <message>
         <source>Time to record before start of show (in seconds)</source>
-        <translation type="unfinished"></translation>
+        <translation>Antalet sekunder innan ett program startar som inspelning påbörjas</translation>
     </message>
     <message>
         <source>Time to record past end of show (in seconds)</source>
-        <translation type="unfinished"></translation>
+        <translation>Antalet sekunder inspelning fortsätter efter programslut</translation>
     </message>
     <message>
         <source>List Newest Recording First</source>
-        <translation type="unfinished"></translation>
+        <translation>Lista nyaste inspelningar först</translation>
     </message>
     <message>
         <source>If checked (default) the most recent recording will be listed first in the &apos;Watch Recordings&apos; screen. If unchecked the oldest recording will be listed first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om funktionen är aktiverad kommer de inspelningar som gjordes senast att listas först under &apos;Titta på inspelningar&apos;.</translation>
     </message>
     <message>
         <source>Sticky keys</source>
-        <translation type="unfinished"></translation>
+        <translation>Klistriga tangenter</translation>
     </message>
     <message>
         <source>If this is set, fast forward and rewind continue after the key is released.  Pressing the key again increases the fast forward or rewind speed.  The alternate fast forward and rewind keys always behave in this way.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om funktionen är aktiverad kommer ett tryck på framspolnings- eller återsplningstangenterna att göra att funktionen fastnar i aktiverat läge. Ytterligare tryck ökar/minskar spolhastigheten. De alternativa snabbspolningstangenterna fungerar alltid på detta sätt.</translation>
     </message>
     <message>
         <source>Language</source>
-        <translation type="unfinished"></translation>
+        <translation>Språk</translation>
     </message>
     <message>
         <source>English</source>
-        <translation type="unfinished"></translation>
+        <translation>Engelska (English)</translation>
     </message>
     <message>
         <source>Italian</source>
-        <translation type="unfinished"></translation>
+        <translation>Italienska (Italian)</translation>
     </message>
     <message>
         <source>Catalan</source>
-        <translation type="unfinished"></translation>
+        <translation>Katalanska (Catalan)</translation>
     </message>
     <message>
         <source>Spanish</source>
-        <translation type="unfinished"></translation>
+        <translation>Spanska (Spanish)</translation>
     </message>
     <message>
         <source>Dutch</source>
-        <translation type="unfinished"></translation>
+        <translation>Holländska (Dutch)</translation>
     </message>
     <message>
         <source>French</source>
-        <translation type="unfinished"></translation>
+        <translation>Franska (French)</translation>
     </message>
     <message>
         <source>German</source>
-        <translation type="unfinished"></translation>
+        <translation>Tyska (German)</translation>
     </message>
     <message>
         <source>Danish</source>
-        <translation type="unfinished"></translation>
+        <translation>Danska (Danish)</translation>
     </message>
     <message>
         <source>Swedish</source>
-        <translation type="unfinished"></translation>
+        <translation>Svenska (Swedish)</translation>
     </message>
     <message>
         <source>Portuguese</source>
-        <translation type="unfinished"></translation>
+        <translation>Portugisiska (Portuguese)</translation>
     </message>
     <message>
         <source>Your preferred language.</source>
-        <translation type="unfinished"></translation>
+        <translation>Det språk som skall användas.</translation>
     </message>
 </context>
 <context>
@@ -876,7 +876,7 @@
     <name>Scheduler</name>
     <message>
         <source>the maximum number of episodes have already been recorded.</source>
-        <translation type="unfinished"></translation>
+        <translation>maximalt antal avsnitt har redan spelats in.</translation>
     </message>
 </context>
 <context>
@@ -907,7 +907,7 @@
     </message>
     <message>
         <source>Skip Ahead</source>
-        <translation>Hoppa fram</translation>
+        <translation>Framåt</translation>
     </message>
     <message>
         <source>Rewind</source>
@@ -915,15 +915,15 @@
     </message>
     <message>
         <source>Skip Back</source>
-        <translation>Hoppa tillbaka</translation>
+        <translation>Bakåt</translation>
     </message>
     <message>
         <source>Jump Back</source>
-        <translation>Kliv bakåt</translation>
+        <translation>Bakåt &lt;&lt;</translation>
     </message>
     <message>
         <source>Jump Ahead</source>
-        <translation>Kliv framåt</translation>
+        <translation>Framåt &gt;&gt;</translation>
     </message>
     <message>
         <source>You are exiting this recording</source>
@@ -991,11 +991,11 @@
     </message>
     <message>
         <source>Stopping Transcode</source>
-        <translation>Avslutar omkodning</translation>
+        <translation>Avbryter omkodning</translation>
     </message>
     <message>
         <source>Transcoding</source>
-        <translation>Omkodar</translation>
+        <translation>Startar omkodning</translation>
     </message>
     <message>
         <source>Searching...</source>
@@ -1031,7 +1031,7 @@
     </message>
     <message>
         <source>Adjust Volume</source>
-        <translation>Justera volym</translation>
+        <translation>Volym +/-</translation>
     </message>
     <message>
         <source>Mute On</source>
@@ -1051,15 +1051,15 @@
     </message>
     <message>
         <source>This program is currently being edited</source>
-        <translation type="unfinished"></translation>
+        <translation>Detta program redigeras för tillfället</translation>
     </message>
     <message>
         <source>Continue Editing</source>
-        <translation type="unfinished"></translation>
+        <translation>Fortsätt redigera</translation>
     </message>
     <message>
         <source>Do not edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Redigera inte</translation>
     </message>
 </context>
 <context>

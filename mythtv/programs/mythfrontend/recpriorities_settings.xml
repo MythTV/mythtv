@@ -14,8 +14,8 @@
    <button>
       <type>TV_RANKINGS</type>
       <text>Set Channel Rankings</text>
-      <text lang="ES">Prioridades de Canales</text>
-      <text lang="CA">Prioritats de Canals</text>
+      <text lang="ES">Ránkings por canales</text>
+      <text lang="CA">Rànquings per canals</text>
       <text lang="DE">Sender bewerten</text>
       <text lang="DK">Sæt kanal rangering</text>
       <text lang="NL">Kanalen Rangeren</text>

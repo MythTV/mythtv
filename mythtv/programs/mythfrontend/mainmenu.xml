@@ -100,6 +100,8 @@
      <type>NEWS</type>
      <text>News Feeds</text>
      <text lang="DE">Nachrichten</text>
+     <text lang="CA">Notícies</text>
+     <text lang="ES">Noticias</text>
      <action>PLUGIN mythnews</action>
      <depends>mythnews</depends>
    </button>

@@ -119,6 +119,8 @@
      <text lang="DE">DVD Einstellungen</text>
      <text lang="PT">Configurar DVD</text>
      <text lang="SV">Inställningar för DVD</text>
+     <text lang="ES">Configurar DVD</text>
+     <text lang="CA">Configurar DVD</text>
      <action>CONFIGPLUGIN mythdvd</action>
      <depends>mythdvd</depends>
    </button>
@@ -127,6 +129,8 @@
      <type>NEWS</type>
      <text>News Settings</text>
      <text lang="DE">Nachrichten Einstellungen</text>
+     <text lang="CA">Configurar Notícies</text>
+     <text lang="ES">Configurar Noticias</text>
      <action>CONFIGPLUGIN mythnews</action>
      <depends>mythnews</depends>
    </button>
@@ -135,6 +139,8 @@
      <type>SETUP</type>
      <text>Xbox</text>
      <text lang="PT">Configurar XBox</text>
+     <text lang="CA">Configurar XBox</text>
+     <text lang="ES">Configurar XBox</text>
      <action>SETTINGS XBOXSETTINGS</action>
      <dependssetting>EnableXbox</dependssetting>
    </button>

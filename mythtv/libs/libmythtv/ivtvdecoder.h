@@ -68,6 +68,7 @@ class IvtvDecoder : public DecoderBase
     long long lastKey;
 
     int keyframedist;
+    int prevgoppos;
 
     bool exitafterdecoded;
 
@@ -84,6 +85,8 @@ class IvtvDecoder : public DecoderBase
     bool gotvideo;
 
     long long laststartpos;
+
+    unsigned char prvpkt[3];
 };
 
 #endif

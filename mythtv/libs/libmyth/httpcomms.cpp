@@ -4,6 +4,7 @@ using namespace std;
 #include "httpcomms.h"
 
 HttpComms::HttpComms(QUrl &url)
+    : http(0)
 {
     init(url);
 }

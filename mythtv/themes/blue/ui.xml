@@ -510,8 +510,8 @@
         <filename>cr-background.png</filename>
         <position>0,39</position>
       </image>
-      <textarea name="coninyellow" draworder="0">
-        <area>20,330,800,40</area>
+      <textarea name="coninyellow" draworder="0" align="right">
+        <area>20,330,700,40</area>
         <font>message</font>
         <value>Conflicting recordings are highlighted in</value>
         <value lang="IT">Le registrazioni in conflitto sono evidenziate in</value>
@@ -521,10 +521,10 @@
         <value lang="DE">Überschneidungen sind markiert in</value>
         <value lang="DK">Optagelser med konflikter er markeret med</value>
         <value lang="PT">As gravações em conflito estão salientadas a</value>
-        <value lang="SV">Inspelningar med konflikter visas med</value>
+        <value lang="SV">Inspelningar med konflikter visas i</value>
       </textarea>
       <textarea name="conyellow" draworder="0">
-        <area>452,330,800,40</area>
+        <area>725,330,800,40</area>
         <font>messageyellow</font>
         <value>yellow</value>
         <value lang="IT">giallo</value>
@@ -536,8 +536,8 @@
         <value lang="PT">amarelo</value>
         <value lang="SV">gult</value>
       </textarea>
-      <textarea name="disingray" draworder="0">
-        <area>20,357,800,40</area>
+      <textarea name="disingray" draworder="0" align="right">
+        <area>20,357,700,40</area>
         <font>message</font>
         <value>Deactivated recordings are highlighted in</value>
         <value lang="IT">Le registrazioni disattivate sono evidenziate in</value>
@@ -547,10 +547,10 @@
         <value lang="DE">Blockierte Aufnahmen sind markiert in</value>
         <value lang="DK">Deaktiverede optagelser er markeret med</value>
         <value lang="PT">As gravaçoes desactivadas estão salientadas a</value>
-        <value lang="SV">Deaktiverade inspelningar visas med</value>
+        <value lang="SV">Deaktiverade inspelningar visas i</value>
       </textarea>
       <textarea name="disgray" draworder="0">
-        <area>458,357,800,40</area>
+        <area>725,357,800,40</area>
         <font>messagegray</font>
         <value>gray</value>
         <value lang="IT">grigio</value>

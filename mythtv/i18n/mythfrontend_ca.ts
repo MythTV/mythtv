@@ -23,7 +23,7 @@
     </message>
     <message>
         <source>Weekly Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Gravar setmanalment</translation>
     </message>
 </context>
 <context>
@@ -38,11 +38,11 @@
     </message>
     <message>
         <source>Record this program whenever it&apos;s shown anywhere</source>
-        <translation>Grava aquest programa sempre que el trovi</translation>
+        <translation>Grava aquest programa sempre que el trobi</translation>
     </message>
     <message>
         <source>Record this program whenever it&apos;s shown on this channel</source>
-        <translation>Grava aquest programa sempre que el trovi en aquest canal</translation>
+        <translation>Grava aquest programa sempre que el trobi en aquest canal</translation>
     </message>
     <message>
         <source>Record this program in this timeslot every day</source>
@@ -62,11 +62,11 @@
     </message>
     <message>
         <source>To go to the advanced recordings screen, press &apos;i&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Per anar a les opcions avençades de gravació premi &apos;i&apos;</translation>
     </message>
     <message>
         <source>To see a list of all up-coming showings of this program, press &apos;5&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Per veure una llista de quan esdevindrà aquest programa premi &apos;5&apos;</translation>
     </message>
 </context>
 <context>
@@ -104,78 +104,78 @@
     <name>ManualSchedule</name>
     <message>
         <source>Manual Recording Scheduler</source>
-        <translation type="unfinished"></translation>
+        <translation>Programació de gravacions manual</translation>
     </message>
     <message>
         <source>Channel:</source>
-        <translation type="unfinished"></translation>
+        <translation>Canal:</translation>
     </message>
     <message>
         <source>Date:</source>
-        <translation type="unfinished"></translation>
+        <translation>Data:</translation>
     </message>
     <message>
         <source>Time:</source>
-        <translation type="unfinished"></translation>
+        <translation>Hora:</translation>
     </message>
     <message>
         <source>hr</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>min</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Duration:</source>
-        <translation type="unfinished">Duració:</translation>
+        <translation>Duració:</translation>
     </message>
     <message>
         <source>Title:</source>
-        <translation type="unfinished">Programa:</translation>
+        <translation>Programa:</translation>
     </message>
     <message>
         <source>Subtitle:</source>
-        <translation type="unfinished">Títol:</translation>
+        <translation>Títol:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation type="unfinished">Descripció:</translation>
+        <translation>Descripció:</translation>
     </message>
     <message>
         <source>Save this scheduled recording and exit</source>
-        <translation type="unfinished"></translation>
+        <translation>Confirmar aquesta programació i sortir</translation>
     </message>
     <message>
         <source>Save this scheduled recording and set another</source>
-        <translation type="unfinished"></translation>
+        <translation>Confirmar aquesta gravació i establir-ne una altra</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Cancel·lar</translation>
+        <translation>Cancel·lar</translation>
     </message>
     <message>
         <source>Manual recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Pogramació manual</translation>
     </message>
 </context>
 <context>
     <name>MythWizard</name>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Cancel.lar</translation>
     </message>
     <message>
         <source>&lt; &amp;Back</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt; &amp;Enrera</translation>
     </message>
     <message>
         <source>&amp;Next &gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Següent &gt;</translation>
     </message>
     <message>
         <source>&amp;Finish</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Finalitzar</translation>
     </message>
 </context>
 <context>
@@ -222,7 +222,7 @@
     </message>
     <message>
         <source>Found %1 sec. commercial</source>
-        <translation type="obsolete">He trovat %1 seg. d&apos;anuncis</translation>
+        <translation type="obsolete">He trobat %1 seg. d&apos;anuncis</translation>
     </message>
     <message>
         <source>At Start of program.</source>
@@ -281,59 +281,59 @@
     </message>
     <message>
         <source>Delete this recording?</source>
-        <translation type="unfinished"></translation>
+        <translation>Esborrar aquesta gravació?</translation>
     </message>
     <message>
         <source>Allow this program to AutoExpire?</source>
-        <translation type="unfinished"></translation>
+        <translation>Permetre que aquest programa auto-expiri?</translation>
     </message>
     <message>
         <source>Yes, AutoExpire</source>
-        <translation type="unfinished"></translation>
+        <translation>Si, autoexpira</translation>
     </message>
     <message>
         <source>Are you sure you want to stop:</source>
-        <translation type="unfinished"></translation>
+        <translation>Està segur que vol aturar:</translation>
     </message>
     <message>
         <source>Yes, stop recording it</source>
-        <translation type="unfinished"></translation>
+        <translation>Si, no atura la gravació</translation>
     </message>
     <message>
         <source>No, do not AutoExpire</source>
-        <translation type="unfinished"></translation>
+        <translation>No, no auto-expira</translation>
     </message>
     <message>
         <source>No, continue recording it</source>
-        <translation type="unfinished"></translation>
+        <translation>No, continua gravant-lo</translation>
     </message>
     <message>
         <source>Select action:</source>
-        <translation type="unfinished"></translation>
+        <translation>Esculli una acció:</translation>
     </message>
     <message>
         <source>Play</source>
-        <translation type="unfinished"></translation>
+        <translation>Reproduïr</translation>
     </message>
     <message>
         <source>Stop Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Parar la gravació</translation>
     </message>
     <message>
         <source>Don&apos;t Auto Expire</source>
-        <translation type="unfinished"></translation>
+        <translation>No auto-expira</translation>
     </message>
     <message>
         <source>Auto Expire</source>
-        <translation type="unfinished"></translation>
+        <translation>Auto-expira</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Esborra</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Cancel·lar</translation>
+        <translation>Cancel·lar</translation>
     </message>
 </context>
 <context>
@@ -376,42 +376,42 @@
     </message>
     <message>
         <source>Recording every day when shown in this timeslot</source>
-        <translation type="unfinished"></translation>
+        <translation>Gravar cada dia en aquesta hora</translation>
     </message>
     <message>
         <source>Recording every week when shown in this timeslot</source>
-        <translation type="unfinished"></translation>
+        <translation>Gravar cada setmana en aquesta hora</translation>
     </message>
 </context>
 <context>
     <name>ProgLister</name>
     <message>
         <source>Recording just this showing</source>
-        <translation type="unfinished">Gravar només aquest programa</translation>
+        <translation>Gravar només aquest programa</translation>
     </message>
     <message>
         <source>Recording every day when shown in this timeslot</source>
-        <translation type="unfinished"></translation>
+        <translation>Gravar cada dia quan s&apos;emeti en aquesta hora</translation>
     </message>
     <message>
         <source>Recording every week when shown in this timeslot</source>
-        <translation type="unfinished"></translation>
+        <translation>Gravar setmanalment quan s&apos;emeti en aquesta hora</translation>
     </message>
     <message>
         <source>Recording when shown on this channel</source>
-        <translation type="unfinished">Gravar quan aparegui en aquest canal</translation>
+        <translation>Gravar quan aparegui en aquest canal</translation>
     </message>
     <message>
         <source>Recording all showings</source>
-        <translation type="unfinished">Gravar sempre que aparegui</translation>
+        <translation>Gravar sempre que aparegui</translation>
     </message>
     <message>
         <source>Not recording this showing</source>
-        <translation type="unfinished">No gravar aquest programa</translation>
+        <translation>No gravar aquest programa</translation>
     </message>
     <message>
         <source>Error!</source>
-        <translation type="unfinished">Error!</translation>
+        <translation>Error!</translation>
     </message>
 </context>
 <context>
@@ -526,7 +526,7 @@
     </message>
     <message>
         <source>Found %1 sec. commercial</source>
-        <translation>He trovat %1 seg. d&apos;anuncis</translation>
+        <translation>He trobat %1 seg. d&apos;anuncis</translation>
     </message>
     <message>
         <source>At Start of program.</source>
@@ -546,410 +546,410 @@
     </message>
     <message>
         <source>Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Programació</translation>
     </message>
     <message>
         <source>Do not record this program</source>
-        <translation type="unfinished"></translation>
+        <translation>No gravar aquest programa</translation>
     </message>
     <message>
         <source>Record only this showing of the program</source>
-        <translation type="unfinished">Grava aquest programa només aquesta vegada</translation>
+        <translation>Grava aquest programa només aquesta vegada</translation>
     </message>
     <message>
         <source>Record this program in this timeslot every day</source>
-        <translation type="unfinished">Grava aquest programa in aquesta hora cada dia</translation>
+        <translation>Grava aquest programa in aquesta hora cada dia</translation>
     </message>
     <message>
         <source>Record this program whenever it&apos;s shown on this channel</source>
-        <translation type="unfinished">Grava aquest programa sempre que el trovi en aquest canal</translation>
+        <translation>Grava aquest programa sempre que el trobi en aquest canal</translation>
     </message>
     <message>
         <source>Record this program whenever it&apos;s shown anywhere</source>
-        <translation type="unfinished">Grava aquest programa sempre que el trovi</translation>
+        <translation>Grava aquest programa sempre que el trobi</translation>
     </message>
     <message>
         <source>Record this program in this timeslot every week</source>
-        <translation type="unfinished">Grava aquest programa en aquesta hora cada setmana</translation>
+        <translation>Grava aquest programa en aquesta hora cada setmana</translation>
     </message>
     <message>
         <source>Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Perfil</translation>
     </message>
     <message>
         <source>(unspecified)</source>
-        <translation type="unfinished"></translation>
+        <translation>(no especificat)</translation>
     </message>
     <message>
         <source>Rank</source>
-        <translation type="unfinished"></translation>
+        <translation>Rànquing</translation>
     </message>
     <message>
         <source>Allow recording even if duplicate episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Permetre gravar encara que estigui duplicat</translation>
     </message>
     <message>
         <source>Allow recordings to be Auto-Expired</source>
-        <translation type="unfinished"></translation>
+        <translation>Permetre que les gravacions auto-expirin</translation>
     </message>
     <message>
         <source>Maximum number of episodes to keep (set to 0 for ALL)</source>
-        <translation type="unfinished"></translation>
+        <translation>Màxim nombre d&apos;episodis a guardar (0 per a tots)</translation>
     </message>
     <message>
         <source>Record new episodes and delete oldest once maximum count is reached</source>
-        <translation type="unfinished"></translation>
+        <translation>Gravar nous episodis i esborrar el més antic quan s&apos;arribi al nombre màxim</translation>
     </message>
     <message>
         <source>%02d:%02d:%02d behind  --  %.2f%% full</source>
-        <translation type="unfinished">%02d:%02d:%02d enrera -- %.2f%% ple</translation>
+        <translation>%02d:%02d:%02d enrera -- %.2f%% ple</translation>
     </message>
     <message>
         <source>%02d:%02d:%02d behind</source>
-        <translation type="unfinished">%02d:%02d:%02d enrera</translation>
+        <translation>%02d:%02d:%02d enrera</translation>
     </message>
     <message>
         <source>%02d:%02d behind  --  %.2f%% full</source>
-        <translation type="unfinished">%02d:%02d enrera -- %.2f%% ple</translation>
+        <translation>%02d:%02d enrera -- %.2f%% ple</translation>
     </message>
     <message>
         <source>%02d:%02d behind</source>
-        <translation type="unfinished">%02d:%02d enrera</translation>
+        <translation>%02d:%02d enrera</translation>
     </message>
     <message>
         <source>%02d:%02d:%02d of %02d:%02d:%02d</source>
-        <translation type="unfinished">%02d:%02d:%02d de %02d:%02d:%02d</translation>
+        <translation>%02d:%02d:%02d de %02d:%02d:%02d</translation>
     </message>
     <message>
         <source>%02d:%02d of %02d:%02d</source>
-        <translation type="unfinished">%02d:%02d de %02d:%02d</translation>
+        <translation>%02d:%02d de %02d:%02d</translation>
     </message>
     <message>
         <source>Skip %1 seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>Salta %1 segons</translation>
     </message>
     <message>
         <source>Not Currently Suppressed</source>
-        <translation type="unfinished"></translation>
+        <translation>Sense suprimir</translation>
     </message>
     <message>
         <source>Not Recording</source>
-        <translation type="unfinished">No gravar</translation>
+        <translation>No gravar</translation>
     </message>
     <message>
         <source>Recording Once</source>
-        <translation type="unfinished">Gravar una sola vegada</translation>
+        <translation>Gravar una sola vegada</translation>
     </message>
     <message>
         <source>Timeslot Recording</source>
-        <translation type="unfinished">Gravar en la franja horària</translation>
+        <translation>Gravar en la franja horària</translation>
     </message>
     <message>
         <source>Weekslot Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Gravació setmanal</translation>
     </message>
     <message>
         <source>Channel Recording</source>
-        <translation type="unfinished">Gravar en aquest canal</translation>
+        <translation>Gravar en aquest canal</translation>
     </message>
     <message>
         <source>All Recording</source>
-        <translation type="unfinished">Gravar sempre</translation>
+        <translation>Gravar sempre</translation>
     </message>
     <message>
         <source>Air Date:</source>
-        <translation type="unfinished"></translation>
+        <translation>Data d&apos;emisió:</translation>
     </message>
     <message>
         <source>Record Schedule:</source>
-        <translation type="unfinished"></translation>
+        <translation>Grava programació:</translation>
     </message>
     <message>
         <source>Episode:</source>
-        <translation type="unfinished">Episodi:</translation>
+        <translation>Episodi:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation type="unfinished">Descripció:</translation>
+        <translation>Descripció:</translation>
     </message>
     <message>
         <source>Pre-scaling theme images</source>
-        <translation type="unfinished"></translation>
+        <translation>Pre-dimensionant imatges</translation>
     </message>
     <message>
         <source>Audio output device</source>
-        <translation type="unfinished"></translation>
+        <translation>Dispositiu de só</translation>
     </message>
     <message>
         <source>Use internal volume controls</source>
-        <translation type="unfinished"></translation>
+        <translation>Util·litza els controls interns del volum</translation>
     </message>
     <message>
         <source>MythTV can control the PCM and master mixer volume.  If you prefer to use an external mixer program, uncheck this box.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV pot controlar els ajustaments del volum PCM. Si prefereix utilitzar un programa extern, desactivi aquesta opció.</translation>
     </message>
     <message>
         <source>Mixer Device</source>
-        <translation type="unfinished"></translation>
+        <translation>Dispositiu de mescla</translation>
     </message>
     <message>
         <source>Changing the volume adjusts the selected mixer.</source>
-        <translation type="unfinished"></translation>
+        <translation>Canviant el valor ajusta el mesclador sel·leccionat.</translation>
     </message>
     <message>
         <source>Master Mixer Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>Volum de mescla Original</translation>
     </message>
     <message>
         <source>Initial volume for the Master Mixer.  This affects all sound created by the soundcard.  Note: Do not set this too low.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajustament del volum inicial del mesclador. Això afecta a tot el só creat per la seva tarja. Nota: No ajustar un valor massa baix.</translation>
     </message>
     <message>
         <source>PCM Mixer Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>Volum del PCM</translation>
     </message>
     <message>
         <source>Initial volume for PCM output.  Use of the volume keys in MythTV will adjust this parameter.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajustament de volum PCM inicial. Les tecles de volum a MythTV ajustaran aquest valor.</translation>
     </message>
     <message>
         <source>Deinterlace playback</source>
-        <translation type="unfinished"></translation>
+        <translation>Reproducció sense interlineat</translation>
     </message>
     <message>
         <source>Make the video look normal on a progressive display (i.e. monitor).  Deinterlace requires that your CPU supports SSE instructions.  Enabling this without proper CPU support will cause the program to segfault. See the HOWTO document for more information.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fa que el vídeo es visualitzi normalment en un monitor progressiu (p.ex.: un monitor). Requereix que el processador suporti instruccions SSE. Activant aixo sense disposar del processador adeqüat abortarà l&apos;execució. Per a més informació consulti la documentació.</translation>
     </message>
     <message>
         <source>Extra audio buffering</source>
-        <translation type="unfinished"></translation>
+        <translation>Bufrfers d&apos;àudio addicionals</translation>
     </message>
     <message>
         <source>This attempts to keep extra audio data in the internal buffers.  Try setting this if you&apos;re getting crackly audio. (Not used for software encoded video.)</source>
-        <translation type="unfinished"></translation>
+        <translation>Intenta mantenir un espai extra en els buffers interns d&apos;àudio. Provi d&apos;activar aquesta opció si està obtenint un só defectuós. (Només per la codificació per maquinari)</translation>
     </message>
     <message>
         <source>Jump amount (in minutes)</source>
-        <translation type="unfinished"></translation>
+        <translation>Minuts a saltar</translation>
     </message>
     <message>
         <source>How many minutes to jump forward or backward when the jump keys are pressed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Minuts a saltar endavant o enrera al prèmer les tecles de salt.</translation>
     </message>
     <message>
         <source>Fast forward amount (in seconds)</source>
-        <translation type="unfinished"></translation>
+        <translation>Avanç ràpid (segons)</translation>
     </message>
     <message>
         <source>How many seconds to skip forward on a fast forward.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nombre se segons a saltar en mode d&apos;avanç ràpid.</translation>
     </message>
     <message>
         <source>Rewind amount (in seconds)</source>
-        <translation type="unfinished"></translation>
+        <translation>Retrocedir (en segons)</translation>
     </message>
     <message>
         <source>How many seconds to skip backward on a rewind.</source>
-        <translation type="unfinished"></translation>
+        <translation>Quants segons salta enrera al rebobinar.</translation>
     </message>
     <message>
         <source>Seek to exact frame</source>
-        <translation type="unfinished"></translation>
+        <translation>Cerca un fotograma exacte</translation>
     </message>
     <message>
         <source>If enabled, seeking is frame exact, but slower.</source>
-        <translation type="unfinished"></translation>
+        <translation>Si s&apos;activa, cerca un fotograma exacte, però és mes lent.</translation>
     </message>
     <message>
         <source>Commercial Skip Method</source>
-        <translation type="unfinished"></translation>
+        <translation>Mètode de detecció d&apos;anuncis</translation>
     </message>
     <message>
         <source>Blank Frame Detection (default)</source>
-        <translation type="unfinished"></translation>
+        <translation>Fotograma negre</translation>
     </message>
     <message>
         <source>Blank Frame + Scene Change Detection</source>
-        <translation type="unfinished"></translation>
+        <translation>Fotograma negre + Canvi d&apos;escena</translation>
     </message>
     <message>
         <source>Scene Change Detection</source>
-        <translation type="unfinished"></translation>
+        <translation>Detecció de canvi d&apos;escena</translation>
     </message>
     <message>
         <source>This determines the method used by MythTV to detect when commercials start and end.  You must have automatic commercial turned on to use anything other than &apos;Blank Frame&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Determina el mètode util·litzat per MythTV per detectar quan comencen i acaven els anuncis. És necessari activar la detecció automàtica d&apos;anuncis en qualsevol altre valor de &quot;Fotograma negre&quot;.</translation>
     </message>
     <message>
         <source>Automatically Skip Commercials</source>
-        <translation type="unfinished"></translation>
+        <translation>Saltar-se els anuncis</translation>
     </message>
     <message>
         <source>Automatically skip commercial breaks that have been flagged during Automatic Commercial Flagging or by the mythcommflag program.</source>
-        <translation type="unfinished"></translation>
+        <translation>Saltar-se els anuncis trobats a la detecció automàtica o amb el programa mythcommflag.</translation>
     </message>
     <message>
         <source>Automatically Flag Commercials</source>
-        <translation type="unfinished"></translation>
+        <translation>Detectar els anuncis</translation>
     </message>
     <message>
         <source>Automatically flag commercials after a recording completes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Detectar els anuncis quan finalitzi una gravació.</translation>
     </message>
     <message>
         <source>Strict Commercial Detection</source>
-        <translation type="unfinished"></translation>
+        <translation>Detecció d&apos;anuncis estricte</translation>
     </message>
     <message>
         <source>Turn on stricter Commercial Detection code.  If some commercials are not being detected, try turning this setting OFF.</source>
-        <translation type="unfinished"></translation>
+        <translation>Activa la detecció d&apos;anuncis estricte. Si alguns anuncis no es detecten, provi de desactivar aquesta opció.</translation>
     </message>
     <message>
         <source>Auto Expire Free Disk Space Threshold (in Gigabytes)</source>
-        <translation type="unfinished"></translation>
+        <translation>Espai mínim de disc lliure per activar l&apos;auto-expiració (Gigabytes)</translation>
     </message>
     <message>
         <source>Trigger AutoExpire when free space in Gigabytes goes below this value.  Turn OFF AutoExpire by setting to 0.</source>
-        <translation type="unfinished"></translation>
+        <translation>Activa l&apos;auto-expiració quan l&apos;espai lliure en Gigabytes sigui inferior a aquest valor. Desactivi l&apos;auto-expiració posant el valor 0.</translation>
     </message>
     <message>
         <source>Auto Expire Frequency (in minutes)</source>
-        <translation type="unfinished"></translation>
+        <translation>Freqüència de l&apos;auto-expiració (minuts)</translation>
     </message>
     <message>
         <source>Number of minutes the AutoExpire process will wait between each time that it checks for free disk space.</source>
-        <translation type="unfinished"></translation>
+        <translation>Interval de minuts en el que el procés d&apos;autoexpiració esperarà entre comprovacions d&apos;espai lliure en el disc.</translation>
     </message>
     <message>
         <source>Auto Expire Method</source>
-        <translation type="unfinished"></translation>
+        <translation>Mètode d&apos;auto-expiració</translation>
     </message>
     <message>
         <source>Oldest Show First</source>
-        <translation type="unfinished"></translation>
+        <translation>El més antic primer</translation>
     </message>
     <message>
         <source>Method used to determine which recorded shows to AutoExpire first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mètode per a determinar quina gravació auto-expira primer.</translation>
     </message>
     <message>
         <source>Auto-Expire Default</source>
-        <translation type="unfinished"></translation>
+        <translation>Auto-Expiració per omisió</translation>
     </message>
     <message>
         <source>Turn Auto-Expire ON by default when creating new scheduled recordings.  Existing scheduled recordings will keep their current value.</source>
-        <translation type="unfinished"></translation>
+        <translation>Posa l&apos;auto-expiració activada per omisió en les noves gravacions. Les existents mantindran el seu valor actual.</translation>
     </message>
     <message>
         <source>New Recording Free Disk Space Threshold (in Megabytes)</source>
-        <translation type="unfinished"></translation>
+        <translation>Espai en disc lliure mínim per a noves gravacions (en Megabytes)</translation>
     </message>
     <message>
         <source>MythTV will stop scheduling new recordings on a backend when its free disk space falls below this value.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV no programarà noves gravacions quan l&apos;espai en disc sigui inferior a aquiest valor.</translation>
     </message>
     <message>
         <source>Time to record before start of show (in seconds)</source>
-        <translation type="unfinished"></translation>
+        <translation>Temps a gravar avans de començar el programa (segons)</translation>
     </message>
     <message>
         <source>Time to record past end of show (in seconds)</source>
-        <translation type="unfinished"></translation>
+        <translation>Temps a gravar un cop finalitzat el programa (segons)</translation>
     </message>
     <message>
         <source>List Newest Recording First</source>
-        <translation type="unfinished"></translation>
+        <translation>Llista la gravació més recent primer</translation>
     </message>
     <message>
         <source>If checked (default) the most recent recording will be listed first in the &apos;Watch Recordings&apos; screen. If unchecked the oldest recording will be listed first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Si esta activat (per omissió) la llista  &apos;Veure gravacions&apos; s&apos;ordena amb els més recents primer, en cas contrari, el més antic apareix primer.</translation>
     </message>
     <message>
         <source>Sticky keys</source>
-        <translation type="unfinished"></translation>
+        <translation>Tecles actives</translation>
     </message>
     <message>
         <source>If this is set, fast forward and rewind continue after the key is released.  Pressing the key again increases the fast forward or rewind speed.  The alternate fast forward and rewind keys always behave in this way.</source>
-        <translation type="unfinished"></translation>
+        <translation>Quan està activat, l&apos;avanç/retrocès ràpid continua desprès de prèmer la tecla. Tornant-la a presionar, incrementa la velocitat. Les tecles alternatives d&apos;avanç i retrocés sempre actuen d&apos;aquesta forma.</translation>
     </message>
     <message>
         <source>Language</source>
-        <translation type="unfinished"></translation>
+        <translation>Idioma</translation>
     </message>
     <message>
         <source>English</source>
-        <translation type="unfinished"></translation>
+        <translation>Anglès</translation>
     </message>
     <message>
         <source>Italian</source>
-        <translation type="unfinished"></translation>
+        <translation>Italià</translation>
     </message>
     <message>
         <source>Catalan</source>
-        <translation type="unfinished"></translation>
+        <translation>Català</translation>
     </message>
     <message>
         <source>Spanish</source>
-        <translation type="unfinished"></translation>
+        <translation>Español</translation>
     </message>
     <message>
         <source>Dutch</source>
-        <translation type="unfinished"></translation>
+        <translation>Holandès</translation>
     </message>
     <message>
         <source>French</source>
-        <translation type="unfinished"></translation>
+        <translation>Francès</translation>
     </message>
     <message>
         <source>German</source>
-        <translation type="unfinished"></translation>
+        <translation>Alemany</translation>
     </message>
     <message>
         <source>Danish</source>
-        <translation type="unfinished"></translation>
+        <translation>Danès</translation>
     </message>
     <message>
         <source>Swedish</source>
-        <translation type="unfinished"></translation>
+        <translation>Suec</translation>
     </message>
     <message>
         <source>Portuguese</source>
-        <translation type="unfinished"></translation>
+        <translation>Portuguès</translation>
     </message>
     <message>
         <source>Your preferred language.</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;idioma de la seva preferència.</translation>
     </message>
 </context>
 <context>
     <name>RankPrograms</name>
     <message>
         <source>Recording just this showing</source>
-        <translation type="unfinished">Gravar només aquest programa</translation>
+        <translation>Gravar només aquest programa</translation>
     </message>
     <message>
         <source>Recording every week</source>
-        <translation type="unfinished"></translation>
+        <translation>Gravar cada setmana</translation>
     </message>
     <message>
         <source>Recording when shown in this timeslot</source>
-        <translation type="unfinished">Gravar en aquesta hora</translation>
+        <translation>Gravar en aquesta hora</translation>
     </message>
     <message>
         <source>Recording when shown on this channel</source>
-        <translation type="unfinished">Gravar quan aparegui en aquest canal</translation>
+        <translation>Gravar quan aparegui en aquest canal</translation>
     </message>
     <message>
         <source>Recording all showings</source>
-        <translation type="unfinished">Gravar sempre que aparegui</translation>
+        <translation>Gravar sempre que aparegui</translation>
     </message>
     <message>
         <source>Not recording this showing</source>
-        <translation type="unfinished">No gravar aquest programa</translation>
+        <translation>No gravar aquest programa</translation>
     </message>
     <message>
         <source>Error!</source>
-        <translation type="unfinished">Error!</translation>
+        <translation>Error!</translation>
     </message>
 </context>
 <context>
@@ -964,14 +964,14 @@
     </message>
     <message>
         <source>See a list of all up-coming episodes/playtimes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Veure quan s&apos;edevenen els episodis.</translation>
     </message>
 </context>
 <context>
     <name>Scheduler</name>
     <message>
         <source>the maximum number of episodes have already been recorded.</source>
-        <translation type="unfinished"></translation>
+        <translation>s&apos;ha assolit el màxim nombre d&apos;episodis a gravar.</translation>
     </message>
 </context>
 <context>
@@ -1129,83 +1129,83 @@
     </message>
     <message>
         <source>Hue %1 %</source>
-        <translation type="unfinished"></translation>
+        <translation>Tonalitat %1 %</translation>
     </message>
     <message>
         <source>Stopping Transcode</source>
-        <translation type="unfinished"></translation>
+        <translation>Parar la Trascodificació</translation>
     </message>
     <message>
         <source>Transcoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Trascodificació</translation>
     </message>
     <message>
         <source>Forward</source>
-        <translation type="unfinished"></translation>
+        <translation>Endavant</translation>
     </message>
     <message>
         <source>Skip Ahead</source>
-        <translation type="unfinished"></translation>
+        <translation>Salt endavant</translation>
     </message>
     <message>
         <source>Rewind</source>
-        <translation type="unfinished"></translation>
+        <translation>Enrera</translation>
     </message>
     <message>
         <source>Skip Back</source>
-        <translation type="unfinished"></translation>
+        <translation>Salt enera</translation>
     </message>
     <message>
         <source>Play</source>
-        <translation type="unfinished"></translation>
+        <translation>Reproducció</translation>
     </message>
     <message>
         <source>Speed 5X</source>
-        <translation type="unfinished"></translation>
+        <translation>Velocitat 5X</translation>
     </message>
     <message>
         <source>Speed 3X</source>
-        <translation type="unfinished"></translation>
+        <translation>Velolcitat 3X</translation>
     </message>
     <message>
         <source>Speed 2X</source>
-        <translation type="unfinished"></translation>
+        <translation>Velocitat 2X</translation>
     </message>
     <message>
         <source>Speed 1/3X</source>
-        <translation type="unfinished"></translation>
+        <translation>Velocitat 1/3X</translation>
     </message>
     <message>
         <source>Speed 1/8X</source>
-        <translation type="unfinished"></translation>
+        <translation>Velocitat 1/8X</translation>
     </message>
     <message>
         <source>Speed 1/16X</source>
-        <translation type="unfinished"></translation>
+        <translation>Velocitat 1/16X</translation>
     </message>
     <message>
         <source>Skip</source>
-        <translation type="unfinished"></translation>
+        <translation>Salt</translation>
     </message>
     <message>
         <source>16:9</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>4:3</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>This program is currently being edited</source>
-        <translation type="unfinished"></translation>
+        <translation>Aquest progama s&apos;està editant</translation>
     </message>
     <message>
         <source>Continue Editing</source>
-        <translation type="unfinished"></translation>
+        <translation>Continua editant</translation>
     </message>
     <message>
         <source>Do not edit</source>
-        <translation type="unfinished"></translation>
+        <translation>No editar</translation>
     </message>
 </context>
 <context>
@@ -1252,7 +1252,7 @@
     </message>
     <message>
         <source>Recording this program has been suppressed because: </source>
-        <translation type="unfinished"></translation>
+        <translation>Aquesta gravació ha estat suspesa per la següent raó: </translation>
     </message>
 </context>
 </TS>

@@ -95,16 +95,16 @@
    <button>
       <type>TV_RANKINGS</type>
       <text>Set Program Rankings</text>
-      <text lang="ES">Prioridades de programas</text>
-      <text lang="CA">Prioritats de programes</text>
+      <text lang="ES">Ránkings por programas</text>
+      <text lang="CA">Rànquings per programes</text>
       <text lang="DE">Sendungen bewerten</text>
       <text lang="DK">Sæt program rangering</text>
       <text lang="NL">Programma's Rangeren</text>
       <text lang="PT">Ordenação de Canais</text>
       <text lang="SV">Sätt upp programrankning</text>
       <alttext>Set Rankings</alttext>
-      <alttext lang="ES">Por programas</alttext>
-      <alttext lang="CA">Per programes</alttext>
+      <alttext lang="ES">Poner Ránkings</alttext>
+      <alttext lang="CA">Posar Rànquings</alttext>
       <alttext lang="DE">Bewertungen</alttext>
       <alttext lang="DK">Sæt rangering</alttext>
       <alttext lang="NL">Rangeren</alttext>

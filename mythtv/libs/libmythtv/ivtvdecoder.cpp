@@ -36,11 +36,14 @@ IvtvDecoder::IvtvDecoder(NuppelVideoPlayer *parent, QSqlDatabase *db,
     ateof = false;
     gopset = false;
     firstgoppos = 0;
+    prevgoppos = 0;
 
     fps = 29.97;
     validvpts = false;
 
     lastKey = 0;
+
+    prvpkt[0] = prvpkt[1] = prvpkt[2] = 0;
 }
 
 IvtvDecoder::~IvtvDecoder()
@@ -161,9 +164,15 @@ void IvtvDecoder::MpegPreProcessPkt(unsigned char *buf, int len,
     unsigned char *bufptr = buf;
     unsigned int state = 0xFFFFFFFF, v = 0;
     
+    int prvcount = -1;
+
     while (bufptr < buf + len)
     {
-        v = *bufptr++;
+        if (++prvcount < 3)
+            v = prvpkt[prvcount];
+        else
+            v = *bufptr++;
+
         if (state == 0x000001)
         {
             state = ((state << 8) | v) & 0xFFFFFF;
@@ -197,6 +206,7 @@ void IvtvDecoder::MpegPreProcessPkt(unsigned char *buf, int len,
                     lastKey = frameNum;
                     if (!hasFullPositionMap)
                         positionMap[lastKey / keyframedist] = laststartpos;
+
                     break;
                 }
                 case PICTURE_START:
@@ -213,6 +223,8 @@ void IvtvDecoder::MpegPreProcessPkt(unsigned char *buf, int len,
         }
         state = ((state << 8) | v) & 0xFFFFFF;
     }
+
+    memcpy(prvpkt, buf + len - 3, 3);
 }
 
 void IvtvDecoder::GetFrame(int onlyvideo)

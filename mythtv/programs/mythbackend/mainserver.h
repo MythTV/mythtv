@@ -80,6 +80,8 @@ class MainServer : public QObject
 
     void SendResponse(QSocket *pbs, QStringList &commands);
 
+    void getFreeSpace(int &total, int &used);
+
     PlaybackSock *getSlaveByHostname(QString &hostname);
     PlaybackSock *getPlaybackBySock(QSocket *socket);
     FileTransfer *getFileTransferByID(int id);

@@ -73,6 +73,8 @@
       <type>TV_PLAYBACK</type>
       <text>Passthrough Mode</text>
       <text lang="PT">Modo Directo de TV</text>
+      <text lang="ES">TV directo</text>
+      <text lang="CA">TV directe</text>
       <action>EXECTV xawtv -f -device %s -dspdev %s -vbidev %s</action>
    </button>
 -->

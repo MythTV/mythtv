@@ -1046,12 +1046,9 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
     delete pginfo;
 }
 
-void MainServer::HandleQueryFreeSpace(PlaybackSock *pbs)
+void MainServer::getFreeSpace(int &totalspace, int &usedspace)
 {
-    QSocket *pbssock = pbs->getSocket();
-
     struct statfs statbuf;
-    int totalspace = -1, usedspace = -1;
     if (statfs(recordfileprefix.ascii(), &statbuf) == 0) 
     {
         // total space available to user is total blocks - reserved blocks
@@ -1077,8 +1074,8 @@ void MainServer::HandleQueryFreeSpace(PlaybackSock *pbs)
         }
     }
 
-    QStringList strlist;
-    QString filename = gContext->GetSetting("RecordFilePrefix") + "/nfslockfile.lock";
+    QString filename = gContext->GetSetting("RecordFilePrefix") + 
+                                             "/nfslockfile.lock";
     QFile checkFile(filename);
 
     if (!ismaster)
@@ -1089,7 +1086,17 @@ void MainServer::HandleQueryFreeSpace(PlaybackSock *pbs)
             usedspace = 0;
         }
     }
+}
 
+void MainServer::HandleQueryFreeSpace(PlaybackSock *pbs)
+{
+    QSocket *pbssock = pbs->getSocket();
+
+    int totalspace = -1, usedspace = -1;
+
+    getFreeSpace(totalspace, usedspace);
+
+    QStringList strlist;
     strlist << QString::number(totalspace) << QString::number(usedspace);
     SendResponse(pbssock, strlist);
 }
@@ -2288,7 +2295,12 @@ void MainServer::reconnectTimeout(void)
 void MainServer::PrintStatus(QSocket *socket)
 {
     QTextStream os(socket);
+    QString shortdateformat = gContext->GetSetting("ShortDateFormat", "M/d");
+    QString timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
+
     os.setEncoding(QTextStream::UnicodeUTF8);
+
+    QDateTime qdtNow = QDateTime::currentDateTime();
 
     os << "HTTP/1.0 200 Ok\r\n"
        << "Content-Type: text/html; charset=\"utf-8\"\r\n"
@@ -2296,10 +2308,13 @@ void MainServer::PrintStatus(QSocket *socket)
 
     os << "<HTTP>\r\n"
        << "<HEAD>\r\n"
-       << "  <TITLE>MythTV Status</TITLE>\r\n"
+       << "  <TITLE>MythTV Status - " 
+       << qdtNow.toString(shortdateformat) 
+       << " " << qdtNow.toString(timeformat) << "</TITLE>\r\n"
        << "</HEAD>\r\n"
        << "<BODY>\r\n";
 
+    // encoder information ---------------------
     QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
     for (; iter != encoderList->end(); ++iter)
     {
@@ -2319,13 +2334,106 @@ void MainServer::PrintStatus(QSocket *socket)
         }
 
         if (elink->IsBusyRecording())
-            os << "is recording.\r\n";
+        {
+            os << "is recording";
+            if (elink->isLocal())
+            {
+                ProgramInfo *pi = elink->GetRecording();
+                os << " '" << pi->title << "'";
+            }
+            os << ".\r\n";
+        }
         else
             os << "is not recording.\r\n";
 
         os << "<br>\r\n";
     }
 
+    // upcoming shows ---------------------
+    dblock.lock();
+    MythContext::KickDatabase(m_db);
+    Scheduler *sched = new Scheduler(false, encoderList, m_db);
+    sched->FillRecordLists(false);
+    list<ProgramInfo *> *recordinglist = sched->getAllPending();
+    dblock.unlock();
+
+    unsigned int iNum = 5;
+    if (recordinglist->size() < iNum) 
+    {
+        iNum = recordinglist->size();
+    }
+
+    if (iNum == 0)
+    {
+        os << "<P>There are no shows scheduled for recording.\r\n";
+    }
+    else
+    {
+       os << "<P>The next " << iNum << " show" << (iNum == 1 ? "" : "s" )
+          << " that " << (iNum == 1 ? "is" : "are") 
+          << " scheduled for recording:<BR>\r\n";
+
+       os << "<TABLE BORDER WIDTH=80%>\r\n"; 
+       os << "<TR><TH>Start Time</TH><TH>Show</TH><TH>Encoder</TH></TR>\r\n";
+       list<ProgramInfo *>::iterator iter = recordinglist->begin();
+       for (unsigned int i = 0; (iter != recordinglist->end()) && i < iNum; 
+            iter++, i++)
+       {
+           if (!(*iter)->recording) // skip it, and don't count it as
+           {                         // one of our number
+               i--;
+           }
+           else
+           {
+               os << "<TR " << ((i % 2 == 0) ? "BGCOLOR=EEEEEE" : "") << ">" 
+                  << "<TD>" << ((*iter)->startts).toString(shortdateformat) 
+                  << " " << ((*iter)->startts).toString(timeformat) << "</TD>" 
+                  << "<TD>" << (*iter)->title << "</TD>"
+                  << "<TD>" << (*iter)->cardid << "</TD></TR>\r\n";
+           }
+       }
+       os << "</TABLE>";
+    }
+
+    os << "<P>Machine Information:\r\n";
+    os << "<TABLE WIDTH =100% BGCOLOR=EEEEEE>";
+    os << "<TR><TD>";
+
+    // drive space   ---------------------
+    int iTotal = -1, iUsed = -1;
+    QString rep;
+
+    getFreeSpace(iTotal, iUsed);
+
+    os << "Disk Usage:\r\n";
+
+    os << "<UL><LI>Total Space: ";
+    rep.sprintf(tr("%d,%03d MB "), (iTotal) / 1000, (iTotal) % 1000);
+    os << rep << "\r\n";
+
+    os << "<LI>Space Used: ";
+    rep.sprintf(tr("%d,%03d MB "), (iUsed) / 1000, (iUsed) % 1000);
+    os << rep << "\r\n";
+
+    os << "<LI>Space Free: ";
+    rep.sprintf(tr("%d,%03d MB "), (iTotal - iUsed) / 1000,
+                (iTotal - iUsed) % 1000);
+    os << rep << "</UL>\r\n";
+
+    os << "</TD><TD>";
+    
+    // load average ---------------------
+    os << "This machine's load average:";
+
+    double rgdAverages[3];
+    getloadavg(rgdAverages, 3);
+    os << "<UL><LI>1 Minute: " << rgdAverages[0] << "\r\n";
+    os << "<LI>5 Minute: " << rgdAverages[1] << "\r\n";
+    os << "<LI>15 Minute: " << rgdAverages[2] << "\r\n</UL>";
+
+    os << "</TD></TR></TABLE>";    // end the machine information table
+
     os << "</BODY>\r\n"
        << "</HTTP>\r\n";
 }
+
