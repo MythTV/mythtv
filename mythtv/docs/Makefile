@@ -3,6 +3,7 @@
 #  - mdz
 
 TARGETS = mythtv-HOWTO.txt mythtv-HOWTO.html mythtv-HOWTO-singlehtml.html mythtv-HOWTO.pdf
+LINUXDOC_HTML_SPLIT := 1
 
 all: $(TARGETS)
 clean:
@@ -19,9 +20,8 @@ validate: mythtv-HOWTO.sgml
 	linuxdoc -B latex -o pdf $<
 
 %.html: %.sgml
-	linuxdoc -B html --split=1 --toc=2 $<
+	linuxdoc -B html --split=$(LINUXDOC_HTML_SPLIT) --toc=2 $<
 
-%-singlehtml.html: %.sgml
-	cp $< $*-singlehtml.sgml
-	linuxdoc -B html --split=0 --toc=2 $*-singlehtml.sgml
-	rm $*-singlehtml.sgml
+%-singlehtml.html: LINUXDOC_HTML_SPLIT=0
+%-singlehtml.sgml: %.sgml
+	cp $< $@
