@@ -1149,7 +1149,7 @@ void ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
             MythPopupBox::showOkPopup(gContext->GetMainWindow(), QObject::tr("No Menu File"),
                                       QObject::tr(QString("Myth could not locate the menu file %1.\n\n"
                                       "We will now return to the main menu.").arg(menuname)));
-
+            menulevel = 0;
             parseMenu("mainmenu.xml");
             return;
         }
