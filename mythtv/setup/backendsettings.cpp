@@ -224,7 +224,7 @@ class DeletesFollowLinks: public CheckBoxSetting, public BackendSetting {
 public:
     DeletesFollowLinks():
         BackendSetting("DeletesFollowLinks") {
-        setLabel(QObject::tr("Follow Symlinks when deleting files"));
+        setLabel(QObject::tr("Follow symbolic links when deleting files"));
         setValue(false);
         setHelpText(QObject::tr("This will cause Myth to follow symlinks "
                     "when recordings and related files are deleted, instead "
