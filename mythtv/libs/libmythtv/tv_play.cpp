@@ -213,6 +213,11 @@ TV::TV(void)
 
     myWindow = NULL;
     udpnotify = NULL;
+    
+    if (gContext->GetNumSetting("Deinterlace"))
+        baseFilters += "linearblend,";
+
+    baseFilters += gContext->GetSetting("CustomFilters");
 
     gContext->addListener(this);
 
@@ -848,7 +853,7 @@ void TV::SetupPlayer(void)
     }
 
     QString filters = "";
-    QString chanFilters = "";
+    
     
     nvp = new NuppelVideoPlayer(m_db, playbackinfo);
     nvp->SetParentWidget(myWindow);
@@ -876,35 +881,7 @@ void TV::SetupPlayer(void)
     if (gContext->GetNumSetting("DefaultCCMode"))
         nvp->ToggleCC(vbimode, 0);
 
-    if(playbackinfo)
-        chanFilters = playbackinfo->chanOutputFilters;
-    
-    if((chanFilters.length() > 1) && (chanFilters[0] != '+'))
-    {
-        filters = chanFilters;
-    }
-    else
-    {
-        if (gContext->GetNumSetting("Deinterlace"))
-        {
-            if (filters.length() > 1)
-                filters += ",";
-            filters += "linearblend";
-        }
-
-        if (filters.length() > 1)
-            filters += ",";
-
-        filters += gContext->GetSetting("CustomFilters");
-
-        if ((filters.length() > 1) && (filters.right(1) != ","))
-            filters += ",";
-
-        filters += chanFilters.mid(1);
-    }
-    
-    VERBOSE(VB_PLAYBACK, QString("Output filters for this recording are: '%1'").arg(filters));
-
+    filters = getFiltersForChannel();
     nvp->SetVideoFilters(filters);
 
     if (embedid > 0)
@@ -920,6 +897,40 @@ void TV::SetupPlayer(void)
         udpnotify = new UDPNotify(this, udp_port);
     else
         udpnotify = NULL;
+}
+
+
+QString TV::getFiltersForChannel()
+{
+    QString filters;
+    QString chanFilters;
+    
+    QString chan_name;
+    
+    if(playbackinfo) // Recordings have this info already.
+        chanFilters = playbackinfo->chanOutputFilters;
+    else if(activerecorder)
+    {
+        // Live TV requires a lookup
+        activerecorder->GetOutputFilters(chanFilters);
+    }
+    
+    if((chanFilters.length() > 1) && (chanFilters[0] != '+'))
+    {
+        filters = chanFilters;
+    }
+    else
+    {
+        filters = baseFilters;
+
+        if ((filters.length() > 1) && (filters.right(1) != ","))
+            filters += ",";
+
+        filters += chanFilters.mid(1);
+    }
+    
+    VERBOSE(VB_CHANNEL, QString("Output filters for this channel are: '%1'").arg(filters));
+    return filters;
 }
 
 void TV::SetupPipPlayer(void)
@@ -2279,6 +2290,10 @@ void TV::ChangeChannel(int direction, bool force)
     activerecorder->ChangeChannel(direction);
 
     activenvp->ResetPlaying();
+    
+    QString filters = getFiltersForChannel();
+    activenvp->SetVideoFilters(filters);
+    
     activenvp->Play(1.0, true, false);
 
     if (activenvp == nvp)
@@ -2474,6 +2489,10 @@ void TV::ChangeChannelByString(QString &name, bool force)
     activerecorder->SetChannel(name);
 
     activenvp->ResetPlaying();
+    
+    QString filters = getFiltersForChannel();
+    activenvp->SetVideoFilters(filters);
+    
     activenvp->Play(1.0, true, false);
 
     if (activenvp == nvp)
@@ -2624,7 +2643,7 @@ void TV::UpdateLCD(void)
     if (internalState == kState_WatchingLiveTV)
     {
         QString title, subtitle, callsign, dummy;
-        GetChannelInfo(recorder, title, subtitle, dummy, dummy, dummy, dummy, callsign, dummy, dummy, dummy, dummy, dummy);
+        GetChannelInfo(recorder, title, subtitle, dummy, dummy, dummy, dummy, callsign, dummy, dummy, dummy, dummy, dummy, dummy);
         if ((callsign != lcdCallsign) || (title != lcdTitle) || (subtitle != lcdSubtitle))
         {
             gContext->GetLCDDevice()->switchToChannel(callsign, title, subtitle);
@@ -2722,10 +2741,11 @@ void TV::GetChannelInfo(RemoteEncoder *enc, QMap<QString, QString> &infoMap)
 
     QString title, subtitle, description, category, starttime, endtime;
     QString callsign, iconpath, channum, chanid, seriesid, programid;
+    QString outputFilters;
 
     enc->GetChannelInfo(title, subtitle, description, category, starttime,
                         endtime, callsign, iconpath, channum, chanid,
-                        seriesid, programid);
+                        seriesid, programid, outputFilters);
 
     QString tmFmt = gContext->GetSetting("TimeFormat");
     QString dtFmt = gContext->GetSetting("ShortDateFormat");
@@ -2766,14 +2786,14 @@ void TV::GetChannelInfo(RemoteEncoder *enc, QString &title, QString &subtitle,
                         QString &desc, QString &category, QString &starttime, 
                         QString &endtime, QString &callsign, QString &iconpath,
                         QString &channelname, QString &chanid,
-                        QString &seriesid, QString &programid)
+                        QString &seriesid, QString &programid, QString &outFilters)
 {
     if (!enc)
         enc = activerecorder;
 
     enc->GetChannelInfo(title, subtitle, desc, category, starttime, endtime, 
                         callsign, iconpath, channelname, chanid,
-                        seriesid, programid);
+                        seriesid, programid, outFilters);
 }
 
 void TV::EmbedOutput(WId wid, int x, int y, int w, int h)
@@ -3180,10 +3200,11 @@ void TV::BrowseStart(void)
 
     QString title, subtitle, desc, category, starttime, endtime;
     QString callsign, iconpath, channum, chanid, seriesid, programid;
+    QString chanFilters;
 
     GetChannelInfo(activerecorder, title, subtitle, desc, category, 
                    starttime, endtime, callsign, iconpath, channum, chanid,
-                   seriesid, programid);
+                   seriesid, programid, chanFilters);
 
     browsechannum = channum;
     browsechanid = chanid;
@@ -3266,10 +3287,11 @@ void TV::ToggleRecord(void)
     {
         QString title, subtitle, desc, category, starttime, endtime;
         QString callsign, iconpath, channum, chanid, seriesid, programid;
+        QString outFilters;
 
         GetChannelInfo(activerecorder, title, subtitle, desc, category, 
                        starttime, endtime, callsign, iconpath, channum, chanid,
-                       seriesid, programid);
+                       seriesid, programid, outFilters);
 
         QDateTime startts = QDateTime::fromString(starttime, Qt::ISODate);
 

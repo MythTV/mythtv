@@ -72,7 +72,7 @@ class TV : public QObject
                         QString &desc, QString &category, QString &starttime,
                         QString &endtime, QString &callsign, QString &iconpath,
                         QString &channelname, QString &chanid,
-                        QString &seriesid, QString &programid);
+                        QString &seriesid, QString &programid, QString &outFilters);
 
     // for the guidegrid to use
     void EmbedOutput(WId wid, int x, int y, int w, int h);
@@ -115,8 +115,9 @@ class TV : public QObject
   private:
     void StartPlayerAndRecorder(bool StartPlayer, bool StartRecorder);
     void StopPlayerAndRecorder(bool StopPlayer, bool StopRecorder);
-
+    
     void SetChannel(bool needopen = false);
+    QString getFiltersForChannel();
 
     void ToggleChannelFavorite(void);
     void ChangeChannel(int direction, bool force = false);
@@ -323,6 +324,8 @@ class TV : public QObject
 
     QTimer *lcdTimer;
     QString lcdTitle, lcdSubtitle, lcdCallsign;
+    
+    QString baseFilters;
 };
 
 #endif

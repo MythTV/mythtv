@@ -2055,10 +2055,11 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         QString title = "", subtitle = "", desc = "", category = "";
         QString starttime = "", endtime = "", callsign = "", iconpath = "";
         QString channelname = "", chanid = "", seriesid = "", programid = "";
+        QString chanOutputFilters = "";
 
         enc->GetChannelInfo(title, subtitle, desc, category, starttime,
                             endtime, callsign, iconpath, channelname, chanid,
-                            seriesid, programid);
+                            seriesid, programid, chanOutputFilters);
 
         if (title == "")
             title = " ";
@@ -2084,6 +2085,8 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
             seriesid = " ";
         if (programid == "")
             programid = " ";
+        if (chanOutputFilters == "")
+            chanOutputFilters = " ";    
 
         retlist << title;
         retlist << subtitle;
@@ -2097,6 +2100,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         retlist << chanid;
         retlist << seriesid;
         retlist << programid;
+        retlist << chanOutputFilters;
     }
     else if (command == "GET_INPUT_NAME")
     {
@@ -3034,7 +3038,7 @@ void MainServer::PrintStatus(QSocket *socket)
                 QString title, callsign, dummy;
                 elink->GetChannelInfo(title, dummy, dummy, dummy, dummy,
                                       dummy, callsign, dummy, dummy,
-                                      dummy, dummy, dummy);
+                                      dummy, dummy, dummy, dummy);
                 os << ": '" << title << "' on "  << callsign;
             }
             os << ".";

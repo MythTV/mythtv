@@ -122,7 +122,8 @@ class TVRec
                         QString &category, QString &starttime, 
                         QString &endtime, QString &callsign, QString &iconpath,
                         QString &channelname, QString &chanid,
-                        QString &seriesid, QString &programid);
+                        QString &seriesid, QString &programid,
+                        QString &chanFilters);
     void GetInputName(QString &inputname);
 
     QSocket *GetReadThreadSocket(void);
@@ -147,8 +148,8 @@ class TVRec
     void GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle, 
                         QString &desc, QString &category, QString &starttime, 
                         QString &endtime, QString &callsign, QString &iconpath,
-                        QString &channelname, QString &chanid,
-                        QString &seriesid, QString &programid);
+                        QString &channelname, QString &chanid, QString &seriesid, 
+                        QString &programid, QString &outputFilters);
 
     void GetDevices(int cardnum, QString &video, QString &vbi, QString &audio,
                     int &rate, QString &defaultinput, QString &startchannel,

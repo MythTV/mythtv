@@ -907,7 +907,8 @@ void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
                            QString &starttime, QString &endtime, 
                            QString &callsign, QString &iconpath, 
                            QString &channelname, QString &chanid,
-                           QString &seriesid, QString &programid)
+                           QString &seriesid, QString &programid,
+                           QString &outputFilters)
 {
     title = "";
     subtitle = "";
@@ -921,6 +922,7 @@ void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
     chanid = "";
     seriesid = "";
     programid = "";
+    outputFilters = "";
 
     if (!db_conn)
         return;
@@ -945,7 +947,8 @@ void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
  
     QString thequery = QString("SELECT starttime,endtime,title,subtitle,"
                                "description,category,callsign,icon,"
-                               "channel.chanid, seriesid, programid "
+                               "channel.chanid, seriesid, programid, "
+                               "channel.outputfilters "
                                "FROM program,channel,capturecard,cardinput "
                                "WHERE channel.channum = \"%1\" "
                                "AND starttime < %2 AND endtime > %3 AND "
@@ -974,12 +977,14 @@ void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
         chanid = query.value(8).toString();
         seriesid = query.value(9).toString();
         programid = query.value(10).toString();
+        outputFilters = query.value(11).toString();
     }
     else
     {
         // couldn't find a matching program for the current channel.
         // get the information about the channel anyway
-        QString thequery = QString("SELECT callsign,icon,channel.chanid "
+        QString thequery = QString("SELECT callsign,icon, channel.chanid, "
+                                   "channel.outputfilters "
                                    "FROM channel,capturecard,cardinput "
                                    "WHERE channel.channum = \"%1\" AND "
                                    "channel.sourceid = cardinput.sourceid AND "
@@ -999,6 +1004,7 @@ void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
             callsign = query.value(0).toString();
             iconpath = query.value(1).toString();
             chanid = query.value(2).toString();
+            outputFilters = query.value(3).toString();
         }
      }
 
@@ -2052,14 +2058,15 @@ void TVRec::GetChannelInfo(QString &title, QString &subtitle, QString &desc,
                         QString &category, QString &starttime,
                         QString &endtime, QString &callsign, QString &iconpath,
                         QString &channelname, QString &chanid,
-                        QString &seriesid, QString &programid)
+                        QString &seriesid, QString &programid,
+                        QString &outputFilters)
 {
     if (!channel)
         return;
 
     GetChannelInfo(channel, title, subtitle, desc, category, starttime,
                    endtime, callsign, iconpath, channelname, chanid,
-                   seriesid, programid);
+                   seriesid, programid, outputFilters);
 }
 
 void TVRec::GetInputName(QString &inputname)
