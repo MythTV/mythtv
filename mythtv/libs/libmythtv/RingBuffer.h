@@ -18,7 +18,7 @@ class RingBuffer
     int Read(void *buf, int count);
     int Write(const void *buf, int count);
 
-    long long Seek(long pos, int whence);
+    long long Seek(long long pos, int whence);
 
     long long GetReadPosition(void) { return readpos; }
     long long GetTotalReadPosition(void) { return totalreadpos; }

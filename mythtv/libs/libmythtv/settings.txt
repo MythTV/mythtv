@@ -11,10 +11,12 @@ str BufferName=/mnt/store/ringbuf.nuv
 int Width=640
 int Height=480
 # Quality level to capture at (higher better, 255 being best)
-int Quality=120
+int Quality=150
 # Motion Levels (lower better, 0 being best)
 int LumaFilter=0
 int ChromaFilter=0
+# Quality level for the MP3 compression (0 best - 9 worst)
+int MP3Quality=7
 
 # Playback options
 # Deinterlace playback (1 for on, 0 for no) -- adds to CPU usage

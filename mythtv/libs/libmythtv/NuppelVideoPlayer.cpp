@@ -10,6 +10,7 @@
 #include <time.h>
 
 #include "NuppelVideoPlayer.h"
+#include "NuppelVideoRecorder.h"
 #include "minilzo.h"
 #include "XJ.h"
 #include "linearBlend.h"
@@ -150,7 +151,10 @@ int NuppelVideoPlayer::OpenFile(void)
     {
         ringBuffer = new RingBuffer(filename.c_str(), true, false);
         weMadeBuffer = true;
+	livetv = false;
     }
+    else 
+        livetv = true;
 
     if (!ringBuffer->IsOpen())
     {
@@ -315,13 +319,19 @@ unsigned char *NuppelVideoPlayer::GetFrame(int *timecode, int onlyvideo,
     unsigned char *ret;
     int gotvideo = 0;
     int gotaudio = 0;
-    int seeked = 0;
     int bytesperframe;
 
     int tcshift;
     int shiftcorrected = 0;
     int ashift;
     int i;
+    int seeked = 0;
+
+    if (weseeked)
+    {
+        seeked = 1;
+        weseeked = 0;
+    }
 
     if (buf==NULL) {
         buf = new unsigned char[video_width *video_height * 3 / 2];
@@ -360,63 +370,64 @@ unsigned char *NuppelVideoPlayer::GetFrame(int *timecode, int onlyvideo,
         {
             if (shiftcorrected || onlyvideo > 0)
                 continue;
-            if (!seeked)
+            if (!seeked) 
             {
-                  if (!seeked) 
-                  {
-                      tcshift = (int)(((double)(audiotimecode - 
-                                timecodes[rpos]) * (double)effdsp)/100000)*4;
-                      if (tcshift > 1000) 
-                          tcshift= 1000;
-                      if (tcshift < -1000) 
-                          tcshift=-1000;
-                      bytesperframe -= tcshift;
-                      if (bytesperframe < 100) 
-                          bytesperframe=100;
-                  } 
-                  else 
-                  {
-                      if (timecodes[rpos] > audiotimecode) {
-                          ashift = (int)(((double)(audiotimecode - 
-                                   timecodes[rpos]) * (double)effdsp) / 
-                                   100000)*4;
-                          if (ashift>audiolen)
-                              audiolen = 0;
-                          else 
-                          {
-                              memcpy(tmpaudio, audiobuffer, audiolen);
-                              memcpy(audiobuffer, tmpaudio + ashift, audiolen);
-                              audiolen -= ashift;
-                          }
-                      }
-                      else if (timecodes[rpos] < audiotimecode) 
-                      {
-                          ashift = (int)(((double)(audiotimecode - 
-                                   timecodes[rpos]) * (double)effdsp) / 
-                                   100000)*4;
-                          if (ashift > (30 * bytesperframe)) 
-                          {
-                              fprintf(stderr, "Warning: should never happen, "
-                                      "huge timecode gap gap=%d atc=%d "
-                                      "vtc=%d\n",
-                                      ashift, audiotimecode, timecodes[rpos]);
-                          } 
-                          else 
-                          {
-                              memcpy(tmpaudio, audiobuffer, audiolen);
-                              bzero(audiobuffer, ashift); // silence!
-                              memcpy(audiobuffer + ashift, tmpaudio, audiolen);
-                              audiolen += ashift;
-                          }
-                      }
-                  }
-                  shiftcorrected=1;  
-                  if (audiolen >= bytesperframe) 
-                      continue;
-                  else
-                      gotaudio = 0;
-              }
+                tcshift = (int)(((double)(audiotimecode - 
+                          timecodes[rpos]) * (double)effdsp)/100000)*4;
+                if (tcshift > 1000) 
+                    tcshift = 1000;
+                if (tcshift < -1000) 
+                    tcshift = -1000;
+                bytesperframe -= tcshift;
+                if (bytesperframe < 100) 
+                    bytesperframe=100;
+            } 
+            else
+            {
+                if (timecodes[rpos] > audiotimecode) 
+                {
+                    ashift = (int)(((double)(audiotimecode - 
+                             timecodes[rpos]) * (double)effdsp) / 
+                             100000)*4;
+                    if (ashift > audiolen)
+                        audiolen = 0;
+                    else 
+                    {
+                        memcpy(tmpaudio, audiobuffer, audiolen);
+                        memcpy(audiobuffer, tmpaudio + ashift, audiolen);
+                        audiolen -= ashift;
+                    }
+                }
+
+                if (timecodes[rpos] < audiotimecode) 
+                {
+                    ashift = (int)(((double)(audiotimecode - 
+                             timecodes[rpos]) * (double)effdsp) / 
+                             100000) * 4;
+                    if (ashift > (30 * bytesperframe)) 
+                    {
+                        fprintf(stderr, "Warning: should never happen, "
+                                "huge timecode gap gap=%d atc=%d "
+                                "vtc=%d\n",
+                                ashift, audiotimecode, timecodes[rpos]);
+                    } 
+                    else 
+                    {
+                        memcpy(tmpaudio, audiobuffer, audiolen);
+                        bzero(audiobuffer, ashift); // silence!
+                        memcpy(audiobuffer + ashift, tmpaudio, audiolen);
+                        audiolen += ashift;
+                    }
+                }
+            }
+            shiftcorrected=1;  
+            if (audiolen >= bytesperframe) 
+                continue;
+            else
+                gotaudio = 0;
         }
+
+	long long currentposition = ringBuffer->GetReadPosition();
 
         if (ringBuffer->Read(&frameheader, FRAMEHEADERSIZE) != FRAMEHEADERSIZE)
         {
@@ -436,8 +447,13 @@ unsigned char *NuppelVideoPlayer::GetFrame(int *timecode, int onlyvideo,
                     effdsp = frameheader.timecode;
 		}
 	    }
-	}
-
+	    else if (frameheader.comptype == 'V')
+            {
+		positionList[framesPlayed / 30] = currentposition;
+		lastKey = framesPlayed;
+	    }
+        }
+	    
         if (frameheader.packetlength!=0) {
             if (ringBuffer->Read(strm, frameheader.packetlength) != 
                 frameheader.packetlength) 
@@ -595,7 +611,15 @@ void NuppelVideoPlayer::StartPlaying(void)
     killplayer = false;
   
     framesPlayed = 0;
-    
+    framesSkipped = 0;
+
+    weseeked = 0;
+    rewindtime = 0;
+    fftime = 0;
+
+    //if (getuid() == 0)
+    //    nice(-10);
+
     while (!eof && !killplayer)
     {
         if (paused)
@@ -607,6 +631,30 @@ void NuppelVideoPlayer::StartPlaying(void)
                 usleep(50);
                 continue;
             }
+	}
+	if (rewindtime > 0)
+	{
+	    CalcMaxRWTime();
+
+	    rewindtime *= video_frame_rate;
+	    DoRewind();
+
+	    rewindtime = 0;
+            prebuffered = 0;
+            actpre = 0;
+            now.tv_sec = 0;
+	}
+	if (fftime > 0)
+	{
+            CalcMaxFFTime();
+
+	    fftime *= video_frame_rate;
+	    DoFastForward();
+
+	    fftime = 0;
+            prebuffered = 0;
+            actpre = 0;
+            now.tv_sec = 0;
 	}
 
         videobuf = GetFrame(&timecode, audiofd <= 0, &audiodata, &audiodatalen);
@@ -674,10 +722,15 @@ void NuppelVideoPlayer::StartPlaying(void)
             XJ_show(video_width, video_height);
 	    framesPlayed++;
         }
+	else
+	{
+	    framesPlayed++;
+	    framesSkipped++;
+	}
 
         if (usecs > 0)
         {
-            //usleep(usecs/4);
+    //        usleep(usecs);
         }
 
         tf++;
@@ -695,8 +748,208 @@ bool NuppelVideoPlayer::TogglePause(void)
 }
 void NuppelVideoPlayer::FastForward(float seconds)
 {
+    fftime = seconds;
 }
 
 void NuppelVideoPlayer::Rewind(float seconds)
 {
+    rewindtime = seconds;
+}
+
+void NuppelVideoPlayer::CalcMaxRWTime(void)
+{
+    if (livetv)
+    {
+    }
+    else
+    {
+    }
+}
+
+void NuppelVideoPlayer::DoRewind(void)
+{
+    if (rewindtime < 5)
+        return;
+
+    int number = (int)rewindtime;
+
+    long long desiredFrame = framesPlayed - number;
+    while (lastKey > desiredFrame)
+    {
+        lastKey -= 30;
+    }
+
+    int normalframes = desiredFrame - lastKey;
+
+    long long keyPos = positionList[lastKey / 30];
+
+    ringBuffer->Seek(keyPos, SEEK_SET);
+    framesPlayed = lastKey;
+
+    int fileend = 0;
+    
+    while (normalframes > 0)
+    {
+        fileend = (FRAMEHEADERSIZE != ringBuffer->Read(&frameheader,
+                                                       FRAMEHEADERSIZE));
+
+        if (fileend)
+            continue;
+        if (frameheader.frametype == 'R')
+            continue;
+
+        if (frameheader.frametype == 'S') 
+        {
+            if (frameheader.comptype == 'A')
+            {
+                if (frameheader.timecode > 0)
+                {
+                    effdsp = frameheader.timecode;
+                }
+            }
+        }
+
+        fileend = (ringBuffer->Read(strm, frameheader.packetlength) !=
+                                    frameheader.packetlength);
+
+        if (fileend)
+            continue;
+        if (frameheader.frametype == 'V')
+        {
+            framesPlayed++;
+            normalframes--;
+
+            DecodeFrame(&frameheader, strm);
+        }
+    }
+    ClearAfterSeek();
+}
+
+
+void NuppelVideoPlayer::CalcMaxFFTime(void)
+{
+    if (livetv)
+    {
+        float behind = (float)(nvr->GetFramesWritten() - framesPlayed) / 
+                       video_frame_rate;
+	if (behind < 1.0)
+	    fftime = 0.0;
+	else if (behind - fftime <= 1.0)
+	{
+            fftime = behind - 1.0;
+	}
+    }
+    else
+    {
+    }
+}
+
+void NuppelVideoPlayer::DoFastForward(void)
+{
+    if (fftime < 5)
+        return;
+
+    int number = (int)fftime;
+
+    long long desiredFrame = framesPlayed + number;
+    long long desiredKey = lastKey;
+
+    while (desiredKey < desiredFrame)
+    {
+        desiredKey += 30;
+    }
+    desiredKey -= 30;
+
+    int normalframes = desiredFrame - desiredKey;
+    int fileend = 0;
+
+    if (positionList.find(desiredKey / 30) != positionList.end())
+    {
+        lastKey = desiredKey;
+        long long keyPos = positionList[lastKey / 30];
+
+        ringBuffer->Seek(keyPos, SEEK_SET);
+        framesPlayed = lastKey;
+    }
+    else  
+    {
+        while (lastKey < desiredKey && !fileend)
+        {
+            fileend = (FRAMEHEADERSIZE != ringBuffer->Read(&frameheader,
+                                                       FRAMEHEADERSIZE));
+
+            if (frameheader.frametype == 'S')
+            {
+                if (frameheader.comptype == 'V')
+                {
+                    positionList[framesPlayed / 30] = 
+                                                 ringBuffer->GetReadPosition();
+                    lastKey = framesPlayed;
+                }
+                if (frameheader.comptype == 'A')
+                    if (frameheader.timecode > 0)
+                        effdsp = frameheader.timecode;
+            }
+            else if (frameheader.frametype == 'V')
+            {
+                framesPlayed++;
+            }
+
+            if (frameheader.frametype != 'R' && frameheader.packetlength > 0)
+            {
+                fileend = (ringBuffer->Read(strm, frameheader.packetlength) !=
+                           frameheader.packetlength);
+            }
+        }
+    } 
+
+    while (normalframes > 0 && !fileend)
+    {
+        fileend = (FRAMEHEADERSIZE != ringBuffer->Read(&frameheader,
+                                                       FRAMEHEADERSIZE));
+
+        if (fileend)
+            continue;
+        if (frameheader.frametype == 'R')
+            continue;
+        else if (frameheader.frametype == 'S') 
+        {
+            if (frameheader.comptype == 'A')
+            {
+                if (frameheader.timecode > 0)
+                {
+                    effdsp = frameheader.timecode;
+                }
+            }
+        }
+
+        fileend = (ringBuffer->Read(strm, frameheader.packetlength) !=
+                                    frameheader.packetlength);
+
+        if (frameheader.frametype == 'V')
+        {
+            framesPlayed++;
+            normalframes--;
+            DecodeFrame(&frameheader, strm);
+        }
+    }
+
+    ClearAfterSeek();
+}
+
+void NuppelVideoPlayer::ClearAfterSeek(void)
+{
+    int i;
+    for (i = 0; i < MAXVBUFFER; i++)
+    {
+        bufstat[i] = 0;
+        timecodes[i] = 0;
+    }
+
+    wpos = 0;
+    rpos = 0;
+    audiolen = 0;
+    weseeked = 1;
+    fafterseek = 0;
+    audiotimecode = 0;
 }

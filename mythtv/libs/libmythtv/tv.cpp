@@ -49,10 +49,12 @@ int main(int argc, char *argv[])
   nvr->SetQuality(settings.GetNumSetting("Quality"));
   nvr->SetResolution(settings.GetNumSetting("Width"),
                      settings.GetNumSetting("Height"));
+  nvr->SetMP3Quality(settings.GetNumSetting("MP3Quality"));
   nvr->Initialize();
   
   NuppelVideoPlayer *nvp = new NuppelVideoPlayer();
   nvp->SetRingBuffer(rbuffer);
+  nvp->SetRecorder(nvr);
   nvp->SetDeinterlace((bool)settings.GetNumSetting("Deinterlace"));
   
   pthread_create(&encode, NULL, SpawnEncode, nvr);
@@ -74,7 +76,7 @@ int main(int argc, char *argv[])
 
   while (nvp->IsPlaying())
   {
-      usleep(50);
+      usleep(500);
       if ((keypressed = XJ_CheckEvents()))
       {
            switch (keypressed) {
@@ -93,7 +95,7 @@ int main(int argc, char *argv[])
       else
       {
 	  fprintf(stderr, "\r                                                                      ");
-          fprintf(stderr, "\r Playing: %f seconds behind realtime", (float)(nvr->GetFramesWritten() - nvp->GetFramesPlayed()) / frameRate);
+          fprintf(stderr, "\r Playing: %f seconds behind realtime (%lld skipped frames)", (float)(nvr->GetFramesWritten() - nvp->GetFramesPlayed()) / frameRate, nvp->GetFramesSkipped());
       }
   }
       

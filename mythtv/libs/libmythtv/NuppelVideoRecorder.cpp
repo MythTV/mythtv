@@ -31,6 +31,7 @@ NuppelVideoRecorder::NuppelVideoRecorder(void)
     w = 352;
     h = 240;
 
+    mp3quality = 3;
     gf = NULL;
     rtjc = NULL;
     strm = NULL;   
@@ -100,7 +101,7 @@ void NuppelVideoRecorder::Initialize(void)
         gf = lame_init();
         lame_set_out_samplerate(gf, 44100);
 	lame_set_bWriteVbrTag(gf, 0);
-	lame_set_quality(gf, 3);
+	lame_set_quality(gf, mp3quality);
 	lame_set_compression_ratio(gf, 11);
 	lame_init_params(gf);
     }
@@ -887,6 +888,7 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
   
     while (dropped > 0) 
     {
+	    printf("dropped frames\n");
         frameheader.timecode = lasttimecode + timeperframe;
         lasttimecode = frameheader.timecode;
         frameheader.keyframe  = frameofgop;             // no keyframe defaulted
@@ -897,7 +899,6 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
         // we don't calculate sizes for lost frames for compression computation
         dropped--;
         frameofgop++;
-	framesWritten++;
     }
 
     // now we reset the last frame number so that we can find out

@@ -148,7 +148,7 @@ int RingBuffer::Write(const void *buf, int count)
     return ret;
 }
 
-long long RingBuffer::Seek(long pos, int whence)
+long long RingBuffer::Seek(long long pos, int whence)
 {
     long long ret = -1;
     if (normalfile)

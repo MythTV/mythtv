@@ -48,6 +48,8 @@ class NuppelVideoRecorder
    
     long long GetFramesWritten(void) { return framesWritten; } 
 
+    void SetMP3Quality(int quality) { mp3quality = quality; }
+
  protected:
     static void *WriteThread(void *param);
     static void *AudioThread(void *param);
@@ -91,6 +93,7 @@ class NuppelVideoRecorder
     int usebttv;
     struct video_audio origaudio;
 
+    int mp3quality;
     char *mp3buf;
     int mp3buf_size;
     lame_global_flags *gf;

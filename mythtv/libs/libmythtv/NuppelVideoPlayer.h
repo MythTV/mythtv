@@ -2,6 +2,7 @@
 #define NUPPELVIDEOPLAYER
 
 #include <string>
+#include <map>
 
 #ifdef MMX
 #undef MMX
@@ -19,6 +20,8 @@
 using namespace std;
 
 #define MAXVBUFFER 20
+
+class NuppelVideoRecorder;
 
 class NuppelVideoPlayer
 {
@@ -45,7 +48,10 @@ class NuppelVideoPlayer
 
     float GetFrameRate(void) { return video_frame_rate; } 
     long long GetFramesPlayed(void) { return framesPlayed; }
-    
+    long long GetFramesSkipped(void) { return framesSkipped; }
+
+    void SetRecorder(NuppelVideoRecorder *nvcr) { nvr = nvcr; }
+
  private:
     void InitSound(void);
     void WriteAudio(unsigned char *aubuf, int size);
@@ -61,7 +67,14 @@ class NuppelVideoPlayer
                             unsigned char **audiodata, int *alen);
     
     long long CalcMaxPausePosition(void);
-
+    void CalcMaxRWTime();
+    void CalcMaxFFTime();
+   
+    void DoFastForward();
+    void DoRewind();
+   
+    void ClearAfterSeek();
+    
     int deinterlace;
     
     int audiofd;
@@ -96,6 +109,8 @@ class NuppelVideoPlayer
     int fafterseek;
     int audiotimecode;
 
+    int weseeked;
+
     struct rtfileheader fileheader;
     lame_global_flags *gf;
 
@@ -111,8 +126,15 @@ class NuppelVideoPlayer
     bool killplayer;
 
     long long framesPlayed;
-
+    long long framesSkipped;
+    
     bool livetv;
+
+    map<long long, long long> positionList;
+    long long lastKey;
+    
+    float rewindtime, fftime;
+    NuppelVideoRecorder *nvr;
 };
 
 #endif
