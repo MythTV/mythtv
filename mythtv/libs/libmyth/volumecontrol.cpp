@@ -91,6 +91,10 @@ void VolumeControl::SetCurrentVolume(int value)
     }
 
     mute = false;
+
+    QString controlLabel = gContext->GetSetting("MixerControl", "PCM");
+    controlLabel += "MixerVolume";
+    gContext->SaveSetting(controlLabel, volume);
 }
 
 void VolumeControl::AdjustCurrentVolume(int change)

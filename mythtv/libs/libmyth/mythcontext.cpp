@@ -262,6 +262,41 @@ void MythContext::DBError(QString where, const QSqlQuery& query) {
          << query.lastError().databaseText() << endl;
 }
 
+void MythContext::SaveSetting(QString key, int newValue)
+{
+    QString strValue = QString("%1").arg(newValue);
+
+    SaveSetting(key, strValue);
+}
+
+void MythContext::SaveSetting(QString key, QString newValue)
+{
+    pthread_mutex_lock(&dbLock);
+
+    if (m_db->isOpen()) 
+    {
+        KickDatabase(m_db);
+
+        QString querystr = QString("DELETE FROM settings WHERE value = '%1' "
+                                "AND hostname = '%2';")
+                               .arg(key).arg(m_localhostname);
+
+        QSqlQuery result = m_db->exec(querystr);
+        if (!result.isActive())
+            MythContext::DBError("Clear setting", querystr);
+
+        querystr = QString("INSERT settings ( value, data, hostname ) "
+                           "VALUES ( '%1', '%2', '%3' );")
+                           .arg(key).arg(newValue).arg(m_localhostname);
+
+        result = m_db->exec(querystr);
+        if (!result.isActive())
+            MythContext::DBError("Save new setting", querystr);
+    }
+
+    pthread_mutex_unlock(&dbLock);
+}
+
 QString MythContext::GetSetting(const QString &key, const QString &defaultval) 
 {
     bool found = false;

@@ -76,6 +76,8 @@ class MythContext : public QObject
     Settings *settings() { return m_settings; }
     Settings *qtconfig() { return m_qtThemeSettings; }
 
+    void SaveSetting(QString key, int newValue);
+    void SaveSetting(QString key, QString newValue);
     QString GetSetting(const QString &key, const QString &defaultval = "");
     int GetNumSetting(const QString &key, int defaultval = 0);
 
