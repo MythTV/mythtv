@@ -13,7 +13,6 @@
 #include "playbackbox.h"
 #include "deletebox.h"
 #include "viewscheduled.h"
-#include "menubox.h"
 
 char installprefix[] = "/usr/local";
 

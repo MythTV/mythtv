@@ -57,6 +57,8 @@ class ThemedMenu : public QDialog
                                         { callback = lcallback;
                                           callbackdata = data;
                                         }
+    void setKillable(void) { killable = true; }
+
     QString getSelection() { return selection; }
 
   protected:
@@ -145,6 +147,8 @@ class ThemedMenu : public QDialog
 
     void (*callback)(void *, QString &);
     void *callbackdata;
+
+    bool killable;
 };
 
 QString findThemeDir(QString themename, QString prefix);

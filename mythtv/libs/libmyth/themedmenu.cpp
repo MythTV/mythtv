@@ -55,7 +55,8 @@ ThemedMenu::ThemedMenu(const char *cdir, const char *cprefix,
     menulevel = 0;
 
     callback = NULL;
-
+    killable = false;
+    
     parseSettings(dir, "theme.xml");
 
     parseMenu(menufile);
@@ -1142,6 +1143,8 @@ void ThemedMenu::keyPressEvent(QKeyEvent *e)
             QString action = "UPMENU";
             if (menulevel > 1)
                 handleAction(action);
+            else if (killable)
+                done(0);
             handled = true;
         }
         default: break;
