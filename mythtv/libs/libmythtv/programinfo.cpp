@@ -204,11 +204,17 @@ RecordingType ProgramInfo::GetProgramRecordingStatus(void)
 
         if (query.value(0).toInt() > 0)
         {
-            recordtype = kChannelRecord;
+            if (query.value(0).toString() == chanid)
+            {
+                recordtype = kChannelRecord;
+                return recordtype;
+            }
+        }
+        else
+        {    
+            recordtype = kAllRecord;
             return recordtype;
-        }    
-        recordtype = kAllRecord;
-        return recordtype;
+        }
     }
 
     recordtype = kNotRecording;

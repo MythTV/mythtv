@@ -40,15 +40,8 @@
 ) Is it possible to have MythTV change the channel on my digital cable/satellite
   box, instead of my tuner card?
 - Not quite yet.  See here:
-
   http://www.snowman.net/pipermail/mythtv-dev/2002-July/000020.html
-
   This feature is unfinished, and waiting for someone who wants it to finish it.
-
-) Does the program guide only work in US?
-- No, the program guide is built using xmltv 
-  (http://www.doc.ic.ac.uk/~epa98/work/apps/xmltv/). 
-  It current works in the US, Canada, UK, Germany, and Austria.
 
 ) Whenever I 'make install', it copies over my settings files?
 - Simply copy the files you want to save to ~/.mythtv/ and they won't get
@@ -56,5 +49,5 @@
   need to watch for these changes.
 
 ) Colors are all messed up, people's faces are blue!
-- Using the binary nvidia drivers?  Make sure you're using version 1.0-2960 of
-  their drivers.
+- Using the binary nvidia drivers?  Make sure you're using at least version
+  1.0-2960 of their drivers.
