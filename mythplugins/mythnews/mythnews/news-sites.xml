@@ -137,6 +137,12 @@
     </item>
 
     <item>
+        <title>Planet Ubuntu</title>
+        <url>http://planet.ubuntu.com/rss10.xml</url>
+        <ico>http://www.ubuntu.com/favicon.ico</ico>
+    </item>
+
+    <item>
         <title>heise online news</title>
         <url>http://www.heise.de/newsticker/heise.rdf</url>
         <ico>http://www.heise.de/favicon.ico</ico>
