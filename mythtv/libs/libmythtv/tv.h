@@ -68,6 +68,8 @@ class TV
     static void *EventThread(void *param);
 
  private:
+    void SetChannel(bool needopen = false);
+
     void ChangeChannel(bool up);
     void ChangeChannelByString(QString &name);
     

@@ -439,11 +439,8 @@ void TV::HandleStateChange(void)
               nextState == kState_RecordingOnly) || 
              (internalState == kState_WatchingPreRecorded &&
               nextState == kState_WatchingOtherRecording))
-    {   
-        channel->Open();
-        channel->SetChannelByString(curRecording->chanstr);
-        channel->Close();
-
+    {
+        SetChannel(true);  
         rbuffer = new RingBuffer(outputFilename, true);
 
         internalState = nextState;
@@ -536,7 +533,7 @@ void TV::HandleStateChange(void)
 
         rbuffer->Reset();
 
-        channel->SetChannelByString(curRecording->chanstr);
+        SetChannel();
 
         rbuffer->TransitionToFile(outputFilename);
         nvr->WriteHeader(true);
@@ -882,6 +879,41 @@ char *TV::GetScreenGrab(ProgramInfo *rcinfo, int secondsin, int &bufferlen,
     delete tmprbuf;
 
     return retbuf;
+}
+
+void TV::SetChannel(bool needopen)
+{
+    if (needopen)
+        channel->Open();
+
+    QString thequery = QString("SELECT channel.channum,cardinput.inputname "
+                               "FROM channel,capturecard,cardinput WHERE "
+                               "channel.chanid = %1 AND "
+                               "cardinput.cardid = capturecard.cardid AND "
+                               "cardinput.sourceid = %2 AND "
+                               "capturecard.cardid = %3;")
+                               .arg(curRecording->chanid)
+                               .arg(curRecording->sourceid)
+                               .arg(curRecording->cardid);
+
+    QSqlQuery query = db_conn->exec(thequery);
+    
+    QString inputname = "";
+    QString chanstr = "";
+  
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        query.next();
+
+        chanstr = query.value(0).toString();
+        inputname = query.value(1).toString();
+    }
+
+    channel->SwitchToInput(inputname);
+    channel->SetChannelByString(chanstr);
+
+    if (needopen)
+        channel->Close();
 }
 
 void *TV::EventThread(void *param)

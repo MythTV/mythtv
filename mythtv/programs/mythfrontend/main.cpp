@@ -1,9 +1,8 @@
 #include <qapplication.h>
 #include <qsqldatabase.h>
 #include <qfile.h>
+#include <qmap.h>
 #include <unistd.h>
-
-#include <vector>
 
 using namespace std;
 
@@ -22,7 +21,7 @@ using namespace std;
 char installprefix[] = "/usr/local";
 
 QString prefix;
-vector<TV *> tvList;
+QMap<int, TV *> tvList;
 Settings *globalsettings;
 
 QString startGuide(void)
@@ -41,7 +40,7 @@ QString startGuide(void)
 int startManaged(void)
 {
     QSqlDatabase *db = QSqlDatabase::database();
-    ViewScheduled vsb(prefix, tvList.front(), db);
+    ViewScheduled vsb(prefix, tvList.begin().data(), db);
 
     vsb.Show();
     vsb.exec();
@@ -52,7 +51,7 @@ int startManaged(void)
 int startPlayback(void)
 {
     QSqlDatabase *db = QSqlDatabase::database();  
-    PlaybackBox pbb(prefix, tvList.front(), db);
+    PlaybackBox pbb(prefix, tvList.begin().data(), db);
 
     pbb.Show();
 
@@ -64,7 +63,7 @@ int startPlayback(void)
 int startDelete(void)
 {
     QSqlDatabase *db = QSqlDatabase::database();
-    DeleteBox delbox(prefix, tvList.front(), db);
+    DeleteBox delbox(prefix, tvList.begin().data(), db);
    
     delbox.Show();
     
@@ -75,7 +74,7 @@ int startDelete(void)
 
 void startTV(void)
 {
-    TV *tv = tvList.front();
+    TV *tv = tvList.begin().data();
     TVState nextstate = tv->LiveTV();
 
     if (nextstate == kState_WatchingLiveTV ||
@@ -132,12 +131,12 @@ void *runScheduler(void *dummy)
     {
         nextrectime = nextRecording->startts;
         asked = false;
-        if (nextRecording->cardid > tvList.size() || nextRecording->cardid < 1)
+        if (tvList.find(nextRecording->cardid) == tvList.end())
         {
             cerr << "cardid is higher than number of cards.\n";
             exit(0);
         }
-        nexttv = tvList[nextRecording->cardid - 1];
+        nexttv = tvList[nextRecording->cardid];
     }
     QDateTime curtime = QDateTime::currentDateTime();
 
@@ -157,13 +156,12 @@ void *runScheduler(void *dummy)
             {
                 nextrectime = nextRecording->startts;
                 asked = false;
-                if (nextRecording->cardid > tvList.size() || 
-                    nextRecording->cardid < 1)
+                if (tvList.find(nextRecording->cardid) == tvList.end())
                 {
                     cerr << "invalid cardid " << nextRecording->cardid << endl;
                     exit(0);
                 }
-                nexttv = tvList[nextRecording->cardid - 1];
+                nexttv = tvList[nextRecording->cardid];
             }
         }
 
@@ -191,14 +189,13 @@ void *runScheduler(void *dummy)
                         nextrectime = nextRecording->startts;
                         curtime = QDateTime::currentDateTime();
                         secsleft = curtime.secsTo(nextrectime);
-                        if (nextRecording->cardid > tvList.size() ||
-                            nextRecording->cardid < 1)
+                        if (tvList.find(nextRecording->cardid) == tvList.end())
                         {
                             cerr << "invalid cardid " << nextRecording->cardid 
                                  << endl;
                             exit(0);
                         }
-                        nexttv = tvList[nextRecording->cardid - 1];
+                        nexttv = tvList[nextRecording->cardid];
                     }
                 }
             }
@@ -216,14 +213,13 @@ void *runScheduler(void *dummy)
                     nextrectime = nextRecording->startts;
                     curtime = QDateTime::currentDateTime();
                     secsleft = curtime.secsTo(nextrectime);
-                    if (nextRecording->cardid > tvList.size() ||
-                        nextRecording->cardid < 1)
+                    if (tvList.find(nextRecording->cardid) == tvList.end())
                     {
                         cerr << "invalid cardid " << nextRecording->cardid 
                              << endl;
                         exit(0);
                     }
-                    nexttv = tvList[nextRecording->cardid - 1];
+                    nexttv = tvList[nextRecording->cardid];
                 }
             }
 //            else 
@@ -276,28 +272,29 @@ bool RunMenu(QString themedir)
 
 void setupTVs(void)
 {
-    QSqlQuery query;
-
-    int numcards = -1;
-    query.exec("SELECT NULL FROM capturecard;");
-
-    if (query.isActive())
-        numcards = query.numRowsAffected();
-
-    if (numcards < 0)
-    {
-        cerr << "ERROR: no capture cards are defined in the database.\n";
-        exit(0);
-    }
-
     QString startchannel = globalsettings->GetSetting("DefaultTVChannel");
     if (startchannel == "")
         startchannel = "3";
 
-    for (int i = 0; i < numcards; i++)
+    QSqlQuery query;
+
+    query.exec("SELECT cardid FROM capturecard ORDER BY cardid;");
+
+    if (query.isActive() && query.numRowsAffected())
     {
-        TV *tv = new TV(startchannel, i+1, i+2);
-        tvList.push_back(tv);
+        while (query.next())
+        {
+            int cardid = query.value(0).toInt();
+
+            // not correct, but it'll do for now
+            TV *tv = new TV(startchannel, cardid, cardid + 1);
+            tvList[cardid] = tv;
+        }
+    }
+    else
+    {
+        cerr << "ERROR: no capture cards are defined in the database.\n";
+        exit(0);
     }
 }
     
@@ -341,8 +338,8 @@ int main(int argc, char **argv)
 
     setupTVs();
 
-    prefix = (tvList.front())->GetFilePrefix();
-    QString theprefix = (tvList.front())->GetInstallPrefix();
+    prefix = (tvList.begin().data())->GetFilePrefix();
+    QString theprefix = (tvList.begin().data())->GetInstallPrefix();
 
     QString themename = globalsettings->GetSetting("Theme");
 
