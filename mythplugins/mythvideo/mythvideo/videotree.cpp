@@ -61,6 +61,9 @@ void VideoTree::keyPressEvent(QKeyEvent *e)
         case Key_Left: video_tree_list->popUp(); break;
         case Key_Right: video_tree_list->pushDown(); break;
        
+        case Key_PageUp: video_tree_list->pageUp(); break;
+        case Key_PageDown: video_tree_list->pageDown(); break;
+       
         default: MythThemedDialog::keyPressEvent(e); break;
     }
 }
