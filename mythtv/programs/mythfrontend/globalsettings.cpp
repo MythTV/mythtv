@@ -22,39 +22,6 @@ protected:
     };
 };
 
-class BufferName: public LineEditSetting, public GlobalSetting {
-public:
-    BufferName():
-        GlobalSetting("BufferName") {
-        setLabel("Live TV buffer");
-        setValue("/mnt/store/ringbuf.nuv");
-        setHelpText("Create the live tv buffer at this pathname");
-    }
-};
-
-class BufferSize: public SliderSetting, public GlobalSetting {
-public:
-    BufferSize():
-        SliderSetting(1, 100, 1),
-        GlobalSetting("BufferSize") {
-
-        setLabel("Live TV buffer (GB)");
-        setValue(5);
-        setHelpText("How large the live tv buffer is allowed to grow");
-    };
-};
-
-class MaxBufferFill: public SliderSetting, public GlobalSetting {
-public:
-    MaxBufferFill():
-        SliderSetting(1, 100, 1),
-        GlobalSetting("MaxBufferFill") {
-        setValue(50);
-        setHelpText("How full the live tv buffer is allowed to grow before "
-                    "forcing an unpause");
-    };
-};
-
 class AudioOutputDevice: public ComboBoxSetting, public GlobalSetting {
 public:
     AudioOutputDevice();
@@ -598,36 +565,6 @@ public:
     };
 };
 
-// PIP settings
-
-
-class PIPBufferSize: public SpinBoxSetting, public GlobalSetting {
-public:
-    PIPBufferSize():
-        SpinBoxSetting(1, 1024, 1), GlobalSetting("PIPBufferSize") {
-        setLabel("Buffer size");
-        setValue(1);
-    };
-};
-
-class PIPMaxBufferFill: public SpinBoxSetting, public GlobalSetting {
-public:
-    PIPMaxBufferFill():
-        SpinBoxSetting(1, 100, 1), GlobalSetting("PIPMaxBufferFill") {
-        setLabel("Max buffer fill (%)");
-        setValue(50);
-    };
-};
-
-class PIPBufferName: public LineEditSetting, public GlobalSetting {
-public:
-    PIPBufferName():
-        GlobalSetting("PIPBufferName") {
-        setLabel("Buffer name");
-        setValue("/mnt/store/ringbuf2.nuv");
-    };
-};
-
 PlaybackSettings::PlaybackSettings(MythContext *context)
                 : ConfigurationWizard(context)
 {
@@ -661,20 +598,6 @@ PlaybackSettings::PlaybackSettings(MythContext *context)
     osd->addChild(new OSDTheme());
     osd->addChild(new OSDFont());
     addChild(osd);
-
-    VerticalConfigurationGroup* liveTV = new VerticalConfigurationGroup(false);
-    liveTV->setLabel("Live TV");
-    liveTV->addChild(new BufferName());
-    liveTV->addChild(new BufferSize());
-    liveTV->addChild(new MaxBufferFill());
-    addChild(liveTV);
-
-    VerticalConfigurationGroup* PIP = new VerticalConfigurationGroup(false);
-    PIP->setLabel("Picture-in-picture");
-    PIP->addChild(new PIPBufferSize());
-    PIP->addChild(new PIPMaxBufferFill());
-    PIP->addChild(new PIPBufferName());
-    addChild(PIP);
 }
 
 GeneralSettings::GeneralSettings(MythContext *context)
