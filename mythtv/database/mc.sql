@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS recordingprofiles
 );
 CREATE TABLE IF NOT EXISTS codecparams
 (
-    profile INT UNSIGNED NOT NULL REFERENCES recordingprofiles(id),
+    profile INT UNSIGNED NOT NULL,
     name VARCHAR(128) NOT NULL,
     value VARCHAR(128),
     PRIMARY KEY (profile, name)
@@ -42,33 +42,19 @@ CREATE TABLE IF NOT EXISTS program
     PRIMARY KEY (chanid, starttime),
     INDEX (endtime)
 );
-CREATE TABLE IF NOT EXISTS singlerecord
+CREATE TABLE IF NOT EXISTS record
 (
-    chanid INT UNSIGNED NOT NULL,
-    starttime TIMESTAMP NOT NULL,
-    endtime TIMESTAMP NOT NULL,
+    recordid INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
+    type INT UNSIGNED NOT NULL,
+    chanid INT UNSIGNED NULL,
+    starttime TIME NULL,
+    startdate DATE NULL,
+    endtime TIME NULL,
+    enddate DATE NULL,
     title VARCHAR(128) NULL,
     subtitle VARCHAR(128) NULL,
     description TEXT NULL,
-    profile INT UNSIGNED NOT NULL DEFAULT 0 REFERENCES recordingprofiles(id),
-    PRIMARY KEY (chanid, starttime),
-    INDEX (endtime)
-);
-CREATE TABLE IF NOT EXISTS timeslotrecord
-(
-    chanid INT UNSIGNED NOT NULL,
-    starttime TIME NOT NULL,
-    endtime TIME NOT NULL,
-    title VARCHAR(128) NULL,
-    profile INT UNSIGNED NOT NULL DEFAULT 0 REFERENCES recordingprofiles(id),
-    PRIMARY KEY(chanid, starttime),
-    INDEX (endtime)
-);
-CREATE TABLE IF NOT EXISTS allrecord
-(
-    title VARCHAR(128) NULL,
-    chanid INT UNSIGNED NULL,
-    profile INT UNSIGNED NOT NULL DEFAULT 0 REFERENCES recordingprofiles(id)
+    profile INT UNSIGNED NOT NULL DEFAULT 0
 );
 CREATE TABLE IF NOT EXISTS recorded
 (

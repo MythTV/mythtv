@@ -11,6 +11,7 @@ using namespace std;
 #include "scheduler.h"
 
 #include "libmythtv/programinfo.h"
+#include "libmythtv/scheduledrecording.h"
 
 Scheduler::Scheduler(QSqlDatabase *ldb)
 {
@@ -112,30 +113,7 @@ void Scheduler::setupCards(void)
 
 bool Scheduler::CheckForChanges(void)
 {
-    QSqlQuery query;
-    QString thequery;
-    
-    bool retval = false;
-
-    thequery = "SELECT data FROM settings WHERE value = \"RecordChanged\";";
-    query = db->exec(thequery);
-
-    if (query.isActive() && query.numRowsAffected() > 0)
-    {
-        query.next();
-
-        QString value = query.value(0).toString();
-        if (value == "yes")
-        {
-            thequery = "UPDATE settings SET data = \"no\" WHERE value = "
-                       "\"RecordChanged\";";
-            query = db->exec(thequery);
-
-            retval = true;
-        }
-    }
-
-    return retval;
+    return ScheduledRecording::hasChanged(db);
 }
 
 class comp_proginfo 
@@ -156,226 +134,8 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
         recordingList.pop_back();
     }
 
-    QString thequery;
-    QSqlQuery query;
-    QSqlQuery subquery;
-
-    QDateTime curDateTime = QDateTime::currentDateTime().addSecs(-60);
-
-    thequery = "SELECT channel.chanid,sourceid,starttime,endtime,title,"
-               "subtitle,description,channel.channum,channel.callsign,"
-               "channel.name,profile FROM singlerecord,channel "
-               "WHERE channel.chanid = singlerecord.chanid;";
-
-    query = db->exec(thequery);
-    if (query.isActive() && query.numRowsAffected() > 0)
-    {
-        while (query.next())
-        {
-            ProgramInfo *proginfo = new ProgramInfo;
-            proginfo->chanid = query.value(0).toString();
-            proginfo->sourceid = query.value(1).toInt();
-            proginfo->startts = QDateTime::fromString(query.value(2).toString(),
-                                                      Qt::ISODate);
-            proginfo->endts = QDateTime::fromString(query.value(3).toString(),
-                                                    Qt::ISODate);
-            proginfo->title = query.value(4).toString();
-            proginfo->subtitle = query.value(5).toString();
-            proginfo->description = query.value(6).toString();
-            proginfo->chanstr = query.value(7).toString();
-            proginfo->chansign = query.value(8).toString();
-            proginfo->channame = query.value(9).toString();
-            proginfo->recordingprofileid = query.value(10).toInt();
-            proginfo->recordtype = kSingleRecord;
-
-            if (proginfo->title == QString::null)
-                proginfo->title = "";
-            if (proginfo->subtitle == QString::null)
-                proginfo->subtitle = "";
-            if (proginfo->description == QString::null)
-                proginfo->description = "";
-
-            if (proginfo->endts < curDateTime)
-                delete proginfo;
-            else 
-                recordingList.push_back(proginfo);
-        }
-    }
-
-    thequery = "SELECT channel.chanid,sourceid,starttime,endtime,title,profile"
-               " FROM timeslotrecord,channel WHERE "
-               "channel.chanid = timeslotrecord.chanid;";
-
-    query = db->exec(thequery);
-    if (query.isActive() && query.numRowsAffected() > 0)
-    {
-        while (query.next())
-        {
-            QString chanid = query.value(0).toString();
-            int sourceid = query.value(1).toInt();
-            QString starttime = query.value(2).toString();
-            QString endtime = query.value(3).toString();
-            QString title = query.value(4).toString();
-            int profile = query.value(5).toInt();
-
-            if (title == QString::null)
-                continue;
-
-            int hour, min;
-
-            hour = starttime.mid(0, 2).toInt();
-            min = starttime.mid(3, 2).toInt();
-
-            QDate curdate = curDateTime.date();
-            QTime curtime = curDateTime.time();
-
-            char startquery[128], endquery[128];
-
-            for (int dateoffset = 0; dateoffset <= 7; dateoffset++)
-            {
-                sprintf(startquery, "%4d%02d%02d%02d%02d00", curdate.year(),
-                        curdate.month(), curdate.day(), hour, min);
-
-                curdate = curdate.addDays(1);
-                sprintf(endquery, "%4d%02d%02d%02d%02d00", curdate.year(),
-                        curdate.month(), curdate.day(), hour, min);
-
-                if (dateoffset == 0 && (curtime.hour() > hour ||
-                    (curtime.hour() == hour && curtime.minute() > min)))
-                    continue;
-
-                thequery = QString("SELECT channel.chanid,starttime,"
-                                   "endtime,title,subtitle,description,"
-                                   "channel.channum,channel.callsign,"
-                                   "channel.name "
-                                   "FROM program,channel WHERE "
-                                   "program.chanid = %1 AND "
-                                   "starttime = %2 AND endtime < %3 AND "
-                                   "title = \"%4\" AND "
-                                   "channel.chanid = program.chanid AND "
-                                   "channel.sourceid = %5;") 
-                                   .arg(chanid).arg(startquery).arg(endquery)
-                                   .arg(title).arg(sourceid);
-                subquery = db->exec(thequery);
-
-                if (subquery.isActive() && subquery.numRowsAffected() > 0)
-                {
-                    while (subquery.next())
-                    {
-                        ProgramInfo *proginfo = new ProgramInfo;
-
-                        proginfo->sourceid = sourceid;
- 
-                        proginfo->chanid = subquery.value(0).toString();
-                        proginfo->startts = 
-                             QDateTime::fromString(subquery.value(1).toString(),
-                                                   Qt::ISODate);
-                        proginfo->endts = 
-                             QDateTime::fromString(subquery.value(2).toString(),
-                                                   Qt::ISODate);
-                        proginfo->title = subquery.value(3).toString();
-                        proginfo->subtitle = subquery.value(4).toString();
-                        proginfo->description = subquery.value(5).toString();
-                        proginfo->chanstr = subquery.value(6).toString();
-                        proginfo->chansign = subquery.value(7).toString();
-                        proginfo->channame = subquery.value(8).toString();
-                        proginfo->recordingprofileid = profile;
-                        proginfo->recordtype = kTimeslotRecord;
-
-                        if (proginfo->title == QString::null)
-                            proginfo->title = "";
-                        if (proginfo->subtitle == QString::null)
-                            proginfo->subtitle = "";
-                        if (proginfo->description == QString::null)
-                            proginfo->description = "";
-
-                        recordingList.push_back(proginfo);
-                    }
-                }
-            }
-        }
-    }
-
-    thequery = "SELECT title,chanid,profile FROM allrecord;";
-    query = db->exec(thequery);
-
-    if (query.isActive() && query.numRowsAffected() > 0)
-    {
-        while (query.next())
-        {
-            QString title = query.value(0).toString();
-            int chanid = query.value(1).toInt();   
-            int profile = query.value(2).toInt();
-
-            if (title == QString::null)
-                continue;
-
-            QTime curtime = curDateTime.time();
-            QDate curdate = curDateTime.date();
-            char startquery[128], endquery[128];
-
-            sprintf(startquery, "%4d%02d%02d%02d%02d00", curdate.year(),
-                    curdate.month(), curdate.day(), curtime.hour(), 
-                    curtime.minute());
-
-            curdate = curdate.addDays(7);
-            sprintf(endquery, "%4d%02d%02d%02d%02d00", curdate.year(),
-                    curdate.month(), curdate.day(), curtime.hour(), 
-                    curtime.minute());
-
-            thequery = QString("SELECT channel.chanid,sourceid,starttime,"
-                               "endtime,title,subtitle,description,"
-                               "channel.channum,channel.callsign,channel.name "
-                               "FROM program,channel WHERE starttime >= %1 AND "
-                               "endtime < %2 AND title = \"%3\" AND "
-                               "channel.chanid = program.chanid")
-                               .arg(startquery).arg(endquery).arg(title);
-
-            if (chanid > 0)
-                thequery += QString(" AND channel.chanid = %1").arg(chanid);
-            thequery += ";";
-
-            subquery = db->exec(thequery);
-
-            if (subquery.isActive() && subquery.numRowsAffected() > 0)
-            {
-                while (subquery.next())
-                {
-                    ProgramInfo *proginfo = new ProgramInfo;
-
-                    proginfo->chanid = subquery.value(0).toString();
-                    proginfo->sourceid = subquery.value(1).toInt();
-                    proginfo->startts = 
-                             QDateTime::fromString(subquery.value(2).toString(),
-                                                   Qt::ISODate);
-                    proginfo->endts = 
-                             QDateTime::fromString(subquery.value(3).toString(),
-                                                   Qt::ISODate);
-                    proginfo->title = subquery.value(4).toString();
-                    proginfo->subtitle = subquery.value(5).toString();
-                    proginfo->description = subquery.value(6).toString();
-                    proginfo->chanstr = subquery.value(7).toString();
-                    proginfo->chansign = subquery.value(8).toString();
-                    proginfo->channame = subquery.value(9).toString();
-                    proginfo->recordingprofileid = profile;
-
-                    if (chanid > 0)
-                        proginfo->recordtype = kChannelRecord;
-                    else
-                        proginfo->recordtype = kAllRecord;
-
-                    if (proginfo->title == QString::null)
-                        proginfo->title = "";
-                    if (proginfo->subtitle == QString::null)
-                        proginfo->subtitle = "";
-                    if (proginfo->description == QString::null)
-                        proginfo->description = "";
-
-                    recordingList.push_back(proginfo);
-                }
-            }
-        }
-    }
+    ScheduledRecording::findAllProgramsToRecord(QSqlDatabase::database(),
+                                                recordingList);
 
     if (recordingList.size() > 0)
     {
@@ -410,7 +170,7 @@ void Scheduler::PrintList(void)
     for (; i != recordingList.end(); i++)
     {
         ProgramInfo *first = (*i);
-        cout << first->title << " " << first->chanstr << " " << first->chanid << " " << first->recordtype << " \"" << first->startts.toString() << "\" " << first->sourceid << " " << first->inputid << " " << first->cardid << " --\t"  << first->conflicting << " " << first->recording << endl;
+        cout << first->title << " " << first->chanstr << " " << first->chanid << " \"" << first->startts.toString() << "\" " << first->sourceid << " " << first->inputid << " " << first->cardid << " --\t"  << first->conflicting << " " << first->recording << endl;
     }
 
     cout << endl << endl;
@@ -535,7 +295,7 @@ void Scheduler::PruneList(void)
 
         ProgramInfo *first = (*i);
 
-        if (first->recordtype > kSingleRecord &&
+        if (first->GetProgramRecordingStatus() > ScheduledRecording::SingleRecord &&
             (first->subtitle.length() > 2 && first->description.length() > 2))
         {
             if (FindInOldRecordings(first))
@@ -799,20 +559,22 @@ void Scheduler::RemoveConflicts(void)
 ProgramInfo *Scheduler::GetBest(ProgramInfo *info, 
                                 list<ProgramInfo *> *conflictList)
 {
-    RecordingType type = info->recordtype;
+    ScheduledRecording::RecordingType type = info->GetProgramRecordingStatus();
     ProgramInfo *best = info;
 
     list<ProgramInfo *>::iterator i;
     for (i = conflictList->begin(); i != conflictList->end(); i++)
     {
         ProgramInfo *test = (*i);
-        if (test->recordtype < type)
+        ScheduledRecording::RecordingType testtype = test->GetProgramRecordingStatus();
+        cerr << (int)type << " vs. " << (int)testtype << endl;
+        if (testtype < type)
         {
             best = test;
-            type = test->recordtype;
+            type = testtype;
             break;
         }
-        else if (test->recordtype == type)
+        else if (testtype == type)
         {
             if (test->startts < info->startts)
             {

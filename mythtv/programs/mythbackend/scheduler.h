@@ -27,6 +27,8 @@ class Scheduler
                                           bool removenonplaying = true,
                                           list<ProgramInfo *> *uselist = NULL);
 
+      void PrintList(void);
+
   private:
       void setupCards(void);
 
@@ -47,8 +49,6 @@ class Scheduler
       bool Conflict(ProgramInfo *a, ProgramInfo *b);
 
       bool FindInOldRecordings(ProgramInfo *pginfo);      
-
-      void PrintList(void);
 
       ProgramInfo *GetBest(ProgramInfo *info, 
                            list<ProgramInfo *> *conflictList);

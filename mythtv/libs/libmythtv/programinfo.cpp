@@ -1,4 +1,5 @@
 #include "programinfo.h"
+#include "scheduledrecording.h"
 #include "util.h"
 #include <iostream>
 #include <qsocket.h>
@@ -17,14 +18,13 @@ ProgramInfo::ProgramInfo(void)
     pathname = "";
     filesize = 0;
 
-    recordtype = kUnknown;
     conflicting = false;
     recording = true;
 
     sourceid = -1;
     inputid = -1;
     cardid = -1;
-    recordingprofileid = -1;
+    record = NULL;
 }   
         
 ProgramInfo::ProgramInfo(const ProgramInfo &other)
@@ -45,15 +45,19 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other)
     spread = other.spread;
     startCol = other.startCol;
  
-    recordtype = other.recordtype;
     conflicting = other.conflicting;
     recording = other.recording;
 
     sourceid = other.sourceid;
     inputid = other.inputid;
     cardid = other.cardid;
-    recordingprofileid = other.recordingprofileid;
-}   
+    record = NULL;
+}
+
+ProgramInfo::~ProgramInfo() {
+    if (record != NULL)
+        delete record;
+}
 
 void ProgramInfo::ToStringList(QStringList &list)
 {
@@ -86,7 +90,6 @@ void ProgramInfo::ToStringList(QStringList &list)
     encodeLongLong(list, filesize);
     list << startts.toString();
     list << endts.toString();
-    list << QString::number((int)recordtype);
     list << QString::number(conflicting);
     list << QString::number(recording);
 }
@@ -112,9 +115,8 @@ void ProgramInfo::FromStringList(QStringList &list, int offset)
     filesize = decodeLongLong(list, offset + 9);
     startts = QDateTime::fromString(list[offset + 11]);
     endts = QDateTime::fromString(list[offset + 12]);
-    recordtype = (RecordingType)(list[offset + 13].toInt());
-    conflicting = list[offset + 14].toInt();
-    recording = list[offset + 15].toInt();
+    conflicting = list[offset + 13].toInt();
+    recording = list[offset + 14].toInt();
 
     if (title == " ")
         title = "";
@@ -141,8 +143,8 @@ int ProgramInfo::CalculateLength(void)
     return startts.secsTo(endts);
 }
 
-void GetProgramRangeDateTime(QPtrList<ProgramInfo> *proglist, QString channel, 
-                             const QString &ltime, const QString &rtime)
+void ProgramInfo::GetProgramRangeDateTime(QPtrList<ProgramInfo> *proglist, QString channel, 
+                                          const QString &ltime, const QString &rtime)
 {
     QSqlQuery query;
     QString thequery;
@@ -175,7 +177,6 @@ void GetProgramRangeDateTime(QPtrList<ProgramInfo> *proglist, QString channel,
             proginfo->chansign = query.value(8).toString();
             proginfo->channame = query.value(9).toString();
             proginfo->spread = -1;
-            proginfo->recordtype = kUnknown;
 
             if (proginfo->title == QString::null)
                 proginfo->title = "";
@@ -191,7 +192,7 @@ void GetProgramRangeDateTime(QPtrList<ProgramInfo> *proglist, QString channel,
     }
 }    
 
-ProgramInfo *GetProgramAtDateTime(QString channel, const QString &ltime)
+ProgramInfo *ProgramInfo::GetProgramAtDateTime(QString channel, const QString &ltime)
 {
     QSqlQuery query;
     QString thequery;
@@ -223,7 +224,6 @@ ProgramInfo *GetProgramAtDateTime(QString channel, const QString &ltime)
         proginfo->chansign = query.value(8).toString();
         proginfo->channame = query.value(9).toString();
         proginfo->spread = -1;
-        proginfo->recordtype = kUnknown;
 
         if (proginfo->title == QString::null)
             proginfo->title = "";
@@ -240,7 +240,7 @@ ProgramInfo *GetProgramAtDateTime(QString channel, const QString &ltime)
     return NULL;
 }
 
-ProgramInfo *GetProgramAtDateTime(QString channel, QDateTime &dtime)
+ProgramInfo *ProgramInfo::GetProgramAtDateTime(QString channel, QDateTime &dtime)
 {
     QString sqltime = dtime.toString("yyyyMMddhhmm");
     sqltime += "50"; 
@@ -294,403 +294,32 @@ int ProgramInfo::IsProgramRecurring(void)
     return 0;
 }
 
-RecordingType ProgramInfo::GetProgramRecordingStatus(void)
+ScheduledRecording::RecordingType ProgramInfo::GetProgramRecordingStatus()
 {
-    QString starts = startts.toString("yyyyMMddhhmm");
-    QString ends = endts.toString("yyyyMMddhhmm");
-
-    char sqlstarttime[128];
-    sprintf(sqlstarttime, "%s00", starts.ascii());
-
-    char sqlendtime[128];
-    sprintf(sqlendtime, "%s00", ends.ascii());
-
-    QString thequery;
-    QSqlQuery query;
-
-    thequery = QString("SELECT NULL FROM singlerecord WHERE chanid = %1 AND "
-                       "starttime = %2 AND endtime = %3 AND title = \"%4\";")
-                       .arg(chanid).arg(sqlstarttime).arg(sqlendtime)
-                       .arg(title);
-
-    query.exec(thequery);
-
-    if (query.isActive() && query.numRowsAffected() > 0)
-    {
-        query.next();
-        recordtype = kSingleRecord;
-        return recordtype;
+    if (record == NULL) {
+        record = new ScheduledRecording();
+        record->loadByProgram(QSqlDatabase::database(), *this);
     }
 
-    for (int i = 0; i < 8; i++)
-    {
-        sqlstarttime[i] = '0';
-        sqlendtime[i] = '0';
-    }
-
-    thequery = QString("SELECT NULL FROM timeslotrecord WHERE chanid = %1 AND "
-                       "starttime = %2 AND endtime = %3 AND title = \"%4\";")
-                       .arg(chanid).arg(sqlstarttime).arg(sqlendtime)
-                       .arg(title);
-
-    query.exec(thequery);
-
-    if (query.isActive() && query.numRowsAffected() > 0)
-    {
-        query.next();
-        recordtype = kTimeslotRecord;
-        return recordtype;
-    }
-
-    thequery = QString("SELECT chanid FROM allrecord WHERE title = \"%1\";")
-                       .arg(title);
-
-    query.exec(thequery);
-
-    if (query.isActive() && query.numRowsAffected() > 0)
-    {
-        query.next();
-
-        if (query.value(0).toInt() > 0)
-        {
-            if (query.value(0).toString() == chanid)
-            {
-                recordtype = kChannelRecord;
-                return recordtype;
-            }
-        }
-        else
-        {    
-            recordtype = kAllRecord;
-            return recordtype;
-        }
-    }
-
-    recordtype = kNotRecording;
-    return recordtype;
+    return record->getRecordingType();
 }
 
 // newstate uses same values as return of GetProgramRecordingState
-void ProgramInfo::ApplyRecordStateChange(RecordingType newstate)
+void ProgramInfo::ApplyRecordStateChange(ScheduledRecording::RecordingType newstate)
 {
-    QString starts = startts.toString("yyyyMMddhhmm");
-    QString ends = endts.toString("yyyyMMddhhmm");
-
-    char sqlstarttime[128];
-    sprintf(sqlstarttime, "%s00", starts.ascii());
-
-    char sqlendtime[128];
-    sprintf(sqlendtime, "%s00", ends.ascii());
-
-    QString thequery;
-    QSqlQuery query;
-
-    if (recordtype == kSingleRecord)
-    {
-        thequery = QString("DELETE FROM singlerecord WHERE "
-                           "chanid = %1 AND starttime = %2 AND "
-                           "endtime = %3;").arg(chanid).arg(sqlstarttime)
-                           .arg(sqlendtime);
-        if (!query.exec(thequery))
-        {
-            cerr << "DB Error: record deletion failed, SQL query was:" << endl;
-            cerr << thequery << endl;
-            cerr << "Driver error was:" << endl;
-            cerr << query.lastError().driverText() << endl;
-            cerr << "Database error was:" << endl;
-            cerr << query.lastError().databaseText() << endl;
-        }
-    }
-    else if (recordtype == kTimeslotRecord)
-    {
-        char tempstarttime[512], tempendtime[512];
-        strcpy(tempstarttime, sqlstarttime);
-        strcpy(tempendtime, sqlendtime);
-
-        for (int i = 0; i < 8; i++)
-        {
-            tempstarttime[i] = '0';
-            tempendtime[i] = '0';
-        }
-
-        thequery = QString("DELETE FROM timeslotrecord WHERE chanid = %1 "
-                           "AND starttime = %2 AND endtime = %3;")
-                           .arg(chanid).arg(tempstarttime).arg(tempendtime);
-
-        if (!query.exec(thequery))
-        {
-            cerr << "DB Error: record deletion failed, SQL query was:" << endl;
-            cerr << thequery << endl;
-            cerr << "Driver error was:" << endl;
-            cerr << query.lastError().driverText() << endl;
-            cerr << "Database error was:" << endl;
-            cerr << query.lastError().databaseText() << endl;
-        }
-    }
-    else if (recordtype == kChannelRecord)
-    {
-        thequery = QString("DELETE FROM allrecord WHERE title = \"%1\" AND "
-                           "chanid = %2;").arg(title).arg(chanid);
-
-        if (!query.exec(thequery))
-        {
-            cerr << "DB Error: record deletion failed, SQL query was:" << endl;
-            cerr << thequery << endl;
-            cerr << "Driver error was:" << endl;
-            cerr << query.lastError().driverText() << endl;
-            cerr << "Database error was:" << endl;
-            cerr << query.lastError().databaseText() << endl;
-        }
-    }
-    else if (recordtype == kAllRecord)
-    {
-        thequery = QString("DELETE FROM allrecord WHERE title = \"%1\";")
-                          .arg(title);
-
-        if (!query.exec(thequery))
-        {
-            cerr << "DB Error: record deletion failed, SQL query was:" << endl;
-            cerr << thequery << endl;
-            cerr << "Driver error was:" << endl;
-            cerr << query.lastError().driverText() << endl;
-            cerr << "Database error was:" << endl;
-            cerr << query.lastError().databaseText() << endl;
-        }
-    }
-
-    QString sqltitle = title;
-    QString sqlsubtitle = subtitle;
-    QString sqldescription = description;
-
-    sqltitle.replace(QRegExp("\""), QString("\\\""));
-    sqlsubtitle.replace(QRegExp("\""), QString("\\\""));
-    sqldescription.replace(QRegExp("\""), QString("\\\""));
-
-    if (newstate == kSingleRecord)
-    {
-        thequery = QString("INSERT INTO singlerecord (chanid,starttime,"
-                           "endtime,title,subtitle,description) "
-                           "VALUES(%1, %2, %3, \"%4\", \"%5\", \"%6\");")
-                           .arg(chanid).arg(sqlstarttime).arg(sqlendtime)
-                           .arg(sqltitle).arg(sqlsubtitle).arg(sqldescription);
-        if (!query.exec(thequery))
-        {
-            cerr << "DB Error: record insertion failed, SQL query was:" << endl;
-            cerr << thequery << endl;
-            cerr << "Driver error was:" << endl;
-            cerr << query.lastError().driverText() << endl;
-            cerr << "Database error was:" << endl;
-            cerr << query.lastError().databaseText() << endl;
-        }
-    }
-    else if (newstate == kTimeslotRecord)
-    {
-        for (int i = 0; i < 8; i++)
-        {
-            sqlstarttime[i] = '0';
-            sqlendtime[i] = '0';
-        }
-
-        thequery = QString("INSERT INTO timeslotrecord (chanid,starttime,"
-                           "endtime,title) VALUES(%1,%2,%3,\"%4\");")
-                           .arg(chanid).arg(sqlstarttime).arg(sqlendtime)
-                           .arg(sqltitle);
-        if (!query.exec(thequery))
-        {
-            cerr << "DB Error: record insertion failed, SQL query was:" << endl;
-            cerr << thequery << endl;
-            cerr << "Driver error was:" << endl;
-            cerr << query.lastError().driverText() << endl;
-            cerr << "Database error was:" << endl;
-            cerr << query.lastError().databaseText() << endl;
-        }
-    }
-    else if (newstate == kChannelRecord)
-    {
-        thequery = QString("INSERT INTO allrecord (title,chanid) VALUES("
-                           "\"%1\",%2);").arg(sqltitle).arg(chanid);
-        if (!query.exec(thequery))
-        {
-            cerr << "DB Error: record insertion failed, SQL query was:" << endl;
-            cerr << thequery << endl;
-            cerr << "Driver error was:" << endl;
-            cerr << query.lastError().driverText() << endl;
-            cerr << "Database error was:" << endl;
-            cerr << query.lastError().databaseText() << endl;
-        }
-    }
-    else if (newstate == kAllRecord)
-    {
-        thequery = QString("INSERT INTO allrecord (title) VALUES(\"%1\");")
-                           .arg(sqltitle);
-        if (!query.exec(thequery))
-        {
-            cerr << "DB Error: record insertion failed, SQL query was:" << endl;
-            cerr << thequery << endl;
-            cerr << "Driver error was:" << endl;
-            cerr << query.lastError().driverText() << endl;
-            cerr << "Database error was:" << endl;
-            cerr << query.lastError().databaseText() << endl;
-        }
-    }
-
-    if (newstate != recordtype)
-    {
-        thequery = "SELECT NULL FROM settings WHERE value = \"RecordChanged\";";
-        query.exec(thequery);
-
-        if (query.isActive() && query.numRowsAffected() > 0)
-        {
-            thequery = "UPDATE settings SET data = \"yes\" WHERE "
-                       "value = \"RecordChanged\";";
-        }
-        else
-        {
-            thequery = "INSERT settings (value,data) "
-                       "VALUES(\"RecordChanged\", \"yes\");";
-        }
-        query.exec(thequery);
-    }
-
-    recordtype = newstate;
+    GetProgramRecordingStatus();
+    record->setRecordingType(newstate);
+    record->save(QSqlDatabase::database());
 }
 
 void ProgramInfo::ApplyRecordTimeChange(const QDateTime &newstartts, 
                                         const QDateTime &newendts)
 {
-    QString starts = startts.toString("yyyyMMddhhmm");
-    QString ends = endts.toString("yyyyMMddhhmm");
-    QString newstarts = newstartts.toString("yyyyMMddhhmm");
-    QString newends = newendts.toString("yyyyMMddhhmm");
-
-    char sqlstarttime[128];
-    sprintf(sqlstarttime, "%s00", starts.ascii());
-
-    char sqlendtime[128];
-    sprintf(sqlendtime, "%s00", ends.ascii());
-
-    char sqlnewstarttime[128];
-    sprintf(sqlnewstarttime, "%s00", newstarts.ascii());
-
-    char sqlnewendtime[128];
-    sprintf(sqlnewendtime, "%s00", newends.ascii());
-
-    QString sqltitle = title;
-    QString sqlsubtitle = subtitle;
-    QString sqldescription = description;
-
-    sqltitle.replace(QRegExp("\""), QString("\\\""));
-    sqlsubtitle.replace(QRegExp("\""), QString("\\\""));
-    sqldescription.replace(QRegExp("\""), QString("\\\""));
-
-    QString thequery;
-    QSqlQuery query;
-
-    if (recordtype == kSingleRecord)
-    {
-        thequery = QString("DELETE FROM singlerecord WHERE "
-                           "chanid = %1 AND starttime = %2 AND "
-                           "endtime = %3;").arg(chanid).arg(sqlstarttime)
-                           .arg(sqlendtime);
-        if (!query.exec(thequery))
-        {
-            cerr << "DB Error: record deletion failed, SQL query was:" << endl;
-            cerr << thequery << endl;
-            cerr << "Driver error was:" << endl;
-            cerr << query.lastError().driverText() << endl;
-            cerr << "Database error was:" << endl;
-            cerr << query.lastError().databaseText() << endl;
-        }
-
-        thequery = QString("INSERT INTO singlerecord (chanid,starttime,"
-                           "endtime,title,subtitle,description) "
-                           "VALUES(%1, %2, %3, \"%4\", \"%5\", \"%6\");")
-                           .arg(chanid).arg(sqlnewstarttime).arg(sqlnewendtime)
-                           .arg(sqltitle).arg(sqlsubtitle).arg(sqldescription);
-        if (!query.exec(thequery))
-        {
-            cerr << "DB Error: record insertion failed, SQL query was:" << endl;
-            cerr << thequery << endl;
-            cerr << "Driver error was:" << endl;
-            cerr << query.lastError().driverText() << endl;
-            cerr << "Database error was:" << endl;
-            cerr << query.lastError().databaseText() << endl;
-        }
+    GetProgramRecordingStatus();
+    if (record->getRecordingType() != ScheduledRecording::NotRecording) {
+        record->setStart(newstartts);
+        record->setEnd(newendts);
     }
-    else if (recordtype == kTimeslotRecord)
-    {
-        char tempstarttime[512], tempendtime[512];
-        strcpy(tempstarttime, sqlstarttime);
-        strcpy(tempendtime, sqlendtime);
-
-        for (int i = 0; i < 8; i++)
-        {
-            tempstarttime[i] = '0';
-            tempendtime[i] = '0';
-        }
-
-        thequery = QString("DELETE FROM timeslotrecord WHERE chanid = %1 "
-                           "AND starttime = %2 AND endtime = %3;")
-                           .arg(chanid).arg(tempstarttime).arg(tempendtime);
-
-        if (!query.exec(thequery))
-        {
-            cerr << "DB Error: record deletion failed, SQL query was:" << endl;
-            cerr << thequery << endl;
-            cerr << "Driver error was:" << endl;
-            cerr << query.lastError().driverText() << endl;
-            cerr << "Database error was:" << endl;
-            cerr << query.lastError().databaseText() << endl;
-        }
-
-        strcpy(tempstarttime, sqlnewstarttime);
-        strcpy(tempendtime, sqlnewendtime);
-
-        for (int i = 0; i < 8; i++)
-        {
-            tempstarttime[i] = '0';
-            tempendtime[i] = '0';
-        }
-
-        thequery = QString("INSERT INTO timeslotrecord (chanid,starttime,"
-                           "endtime,title) VALUES(%1,%2,%3,\"%4\");")
-                           .arg(chanid).arg(tempstarttime).arg(tempendtime)
-                           .arg(sqltitle);
-        if (!query.exec(thequery))
-        {
-            cerr << "DB Error: record insertion failed, SQL query was:" << endl;
-            cerr << thequery << endl;
-            cerr << "Driver error was:" << endl;
-            cerr << query.lastError().driverText() << endl;
-            cerr << "Database error was:" << endl;
-            cerr << query.lastError().databaseText() << endl;
-        }
-    }
-
-    /*
-     This operation is a nop for recordtype == kChannelRecord and kAllRecord
-     TODO: in those cases, create a new kSingleInstance recording with the
-     proper times and fix up the scheduler so it prefers that
-     to the repeating recordings.
-    */
-
-    thequery = "SELECT NULL FROM settings WHERE value = \"RecordChanged\";";
-    query.exec(thequery);
-
-    if (query.isActive() && query.numRowsAffected() > 0)
-    {
-        thequery = "UPDATE settings SET data = \"yes\" WHERE "
-                   "value = \"RecordChanged\";";
-    }
-    else
-    {
-        thequery = "INSERT settings (value,data) "
-                   "VALUES(\"RecordChanged\", \"yes\");";
-    }
-    query.exec(thequery);
-
-    startts = newstartts;
-    endts = newendts;
 }
 
 
@@ -789,23 +418,6 @@ void ProgramInfo::WriteRecordedToDB(QSqlDatabase *db)
         cerr << qquery.lastError().databaseText() << endl;
     }
 
-    if (recordtype == kSingleRecord)
-    {
-        query = QString("DELETE FROM singlerecord WHERE chanid = %1 AND "
-                        "starttime = %2 AND endtime = %3;").arg(chanid)
-                        .arg(starts).arg(ends);
-
-        qquery = db->exec(query);
-        if (!qquery.isActive())
-        {
-            cerr << "DB Error: recorded program deletion from singlerecord "
-                 << "failed, SQL query was:" << endl;
-            cerr << query << endl;
-            cerr << "Driver error was:" << endl;
-            cerr << qquery.lastError().driverText() << endl;
-            cerr << "Database error was:" << endl;
-            cerr << qquery.lastError().databaseText() << endl;
-        }
-    }
-
+    GetProgramRecordingStatus();
+    record->doneRecording(QSqlDatabase::database(), *this);
 }

@@ -316,13 +316,15 @@ void TVRec::HandleStateChange(void)
         context->KickDatabase(db_conn);
 
         RecordingProfile profile;
-        if (curRecording)
-            if (curRecording->recordingprofileid > 0)
-                profile.loadByID(db_conn, curRecording->recordingprofileid);
+        if (curRecording) {
+	    int profileID = curRecording->GetScheduledRecording()->getProfileID();
+	    if (profileID > 0)
+                profile.loadByID(db_conn, profileID);
             else
                 profile.loadByName(db_conn, "Default");
-        else
+	} else {
             profile.loadByName(db_conn, "Live TV");
+	}
 
         pthread_mutex_unlock(&db_lock);
 

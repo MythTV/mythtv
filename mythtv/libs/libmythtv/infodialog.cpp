@@ -21,16 +21,16 @@ using namespace std;
 class RecListItem : public QListViewItem
 {
   public:
-    RecListItem(QListView *parent, QString text, RecordingType type)
+    RecListItem(QListView *parent, QString text, ScheduledRecording::RecordingType type)
                : QListViewItem(parent, text)
              { m_type = type; }
 
    ~RecListItem() { }
 
-    RecordingType GetType(void) { return m_type; }
+    ScheduledRecording::RecordingType GetType(void) { return m_type; }
  
   private:
-    RecordingType m_type;
+    ScheduledRecording::RecordingType m_type;
 };
 
 InfoDialog::InfoDialog(MythContext *context, ProgramInfo *pginfo, 
@@ -96,11 +96,11 @@ InfoDialog::InfoDialog(MythContext *context, ProgramInfo *pginfo,
 
     recordstatus = pginfo->GetProgramRecordingStatus();
 
-    if (recordstatus == kTimeslotRecord && programtype == 0)
+    if (recordstatus == ScheduledRecording::TimeslotRecord && programtype == 0)
     {
         cerr << "error, somehow set to record timeslot and it doesn't seem to "
                 "have one\n";
-        recordstatus = kSingleRecord;
+        recordstatus = ScheduledRecording::SingleRecord;
     }
 
     RecListItem *selectItem = NULL;
@@ -120,13 +120,13 @@ InfoDialog::InfoDialog(MythContext *context, ProgramInfo *pginfo,
             SLOT(selected(QListViewItem *)));
 
     RecListItem *item = new RecListItem(lview, "Record this program whenever "
-                                        "it's shown anywhere", kAllRecord);
-    if (recordstatus == kAllRecord)
+                                        "it's shown anywhere", ScheduledRecording::AllRecord);
+    if (recordstatus == ScheduledRecording::AllRecord)
         selectItem = item;
 
     item = new RecListItem(lview, "Record this program whenever it's shown "
-                                  "on this channel", kChannelRecord);
-    if (recordstatus == kChannelRecord)
+                                  "on this channel", ScheduledRecording::ChannelRecord);
+    if (recordstatus == ScheduledRecording::ChannelRecord)
         selectItem = item;
 
     programtype = pginfo->IsProgramRecurring();
@@ -138,17 +138,17 @@ InfoDialog::InfoDialog(MythContext *context, ProgramInfo *pginfo,
         msg = "Record this program in this timeslot every week";
     if (programtype != 0)
     {
-        item = new RecListItem(lview, msg, kTimeslotRecord);
-        if (recordstatus == kTimeslotRecord)
+        item = new RecListItem(lview, msg, ScheduledRecording::TimeslotRecord);
+        if (recordstatus == ScheduledRecording::TimeslotRecord)
             selectItem = item;
     }
 
     item = new RecListItem(lview, "Record only this showing of the program",
-                           kSingleRecord);
-    if (recordstatus == kSingleRecord)
+                           ScheduledRecording::SingleRecord);
+    if (recordstatus == ScheduledRecording::SingleRecord)
         selectItem = item;
 
-    item = new RecListItem(lview, "Don't record this program", kNotRecording);
+    item = new RecListItem(lview, "Don't record this program", ScheduledRecording::NotRecording);
     if (selectItem == NULL)
         selectItem = item;
 
@@ -192,7 +192,7 @@ void InfoDialog::hideEvent(QHideEvent *e)
 
 void InfoDialog::selected(QListViewItem *selitem)
 {
-    RecordingType currentSelected = kNotRecording;
+    ScheduledRecording::RecordingType currentSelected = ScheduledRecording::NotRecording;
 
     QListViewItem *item = lview->firstChild();
 
@@ -207,7 +207,7 @@ void InfoDialog::selected(QListViewItem *selitem)
     currentSelected = realitem->GetType();
 
     if (currentSelected != recordstatus)
-        myinfo->ApplyRecordStateChange(currentSelected);   
+        myinfo->ApplyRecordStateChange(currentSelected);
 
     if (selitem)
         accept();

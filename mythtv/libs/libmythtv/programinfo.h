@@ -5,24 +5,18 @@
 #include <qstring.h>
 #include <qregexp.h>
 #include <qdatetime.h>
+#include "scheduledrecording.h"
 
-enum RecordingType
-{
-    kUnknown = -1,
-    kNotRecording = 0,
-    kSingleRecord = 1,
-    kTimeslotRecord,
-    kChannelRecord,
-    kAllRecord
-};
+#define NUMPROGRAMLINES 15
 
-#define NUMPROGRAMLINES 16
+class MythContext;
 
 class ProgramInfo
 {
   public:
     ProgramInfo();
     ProgramInfo(const ProgramInfo &other);
+    ~ProgramInfo();
 
     // returns 0 for one-time, 1 for weekdaily, 2 for weekly
     int IsProgramRecurring(void);
@@ -30,10 +24,14 @@ class ProgramInfo
     bool IsSameProgram(const ProgramInfo& other) const;
     bool IsSameTimeslot(const ProgramInfo& other) const;
 
-    RecordingType GetProgramRecordingStatus(void);
-    void ApplyRecordStateChange(RecordingType newstate);
+    ScheduledRecording::RecordingType GetProgramRecordingStatus(void);
+    void ApplyRecordStateChange(ScheduledRecording::RecordingType newstate);
     void ApplyRecordTimeChange(const QDateTime &newstartts,
                                const QDateTime &newendts);
+    ScheduledRecording* GetScheduledRecording(void) {
+        GetProgramRecordingStatus();
+        return record;
+    };
 
     void WriteRecordedToDB(QSqlDatabase *db);
 
@@ -43,6 +41,12 @@ class ProgramInfo
 
     void ToStringList(QStringList &list);
     void FromStringList(QStringList &list, int offset);
+
+
+    static void GetProgramRangeDateTime(QPtrList<ProgramInfo> *proglist, QString channel, 
+                                        const QString &ltime, const QString &rtime);
+    static ProgramInfo *GetProgramAtDateTime(QString channel, const QString &time);
+    static ProgramInfo *GetProgramAtDateTime(QString channel, QDateTime &dtime);
 
     QString title;
     QString subtitle;
@@ -63,20 +67,16 @@ class ProgramInfo
     int spread;
     int startCol;
 
-    RecordingType recordtype;
     bool conflicting;
     bool recording;
 
     int sourceid;
     int inputid;
     int cardid;
-    int recordingprofileid;
     bool conflictfixed;
-};
 
-void GetProgramRangeDateTime(QPtrList<ProgramInfo> *proglist, QString channel, 
-                             const QString &ltime, const QString &rtime);
-ProgramInfo *GetProgramAtDateTime(QString channel, const QString &time);
-ProgramInfo *GetProgramAtDateTime(QString channel, QDateTime &dtime);
+private:
+    class ScheduledRecording* record;
+};
 
 #endif

@@ -10,7 +10,7 @@
 #include <qptrlist.h>
 #include <vector>
 
-#include "mythwidgets.h"
+#include "libmyth/mythwidgets.h"
 
 using namespace std;
 
