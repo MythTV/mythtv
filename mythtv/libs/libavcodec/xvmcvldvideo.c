@@ -27,8 +27,6 @@
 #include "mpegvideo.h"
 #include "xvmc_render.h"
 
-#undef fprintf
-
 #include "xvmccommon.c"
 
 int XVMC_VLD_field_start(MpegEncContext* s, AVCodecContext* avctx)
@@ -167,14 +165,11 @@ int XVMC_VLD_field_start(MpegEncContext* s, AVCodecContext* avctx)
     if (status)
         av_log(avctx, AV_LOG_ERROR, "XvMCLoadQMatrix: Error: %d\n", status);
 
-    do 
-    {
-        status = XvMCBeginSurface(render->disp, render->ctx, render->p_surface, 
-                                  render->p_past_surface, render->p_future_surface,
-                                  &binfo);
-        if (status)
-            av_log(avctx, AV_LOG_ERROR, "XvMCBeginSurface: Error: %d\n", status);
-    } while (status);
+    status = XvMCBeginSurface(render->disp, render->ctx, render->p_surface, 
+                              render->p_past_surface, render->p_future_surface,
+                              &binfo);
+    if (status)
+        av_log(avctx, AV_LOG_ERROR, "XvMCBeginSurface: Error: %d\n", status);
 
     return 0;
 }
@@ -185,9 +180,6 @@ void XVMC_VLD_field_end(MpegEncContext* s)
 
     render = (xvmc_render_state_t *)s->current_picture.data[2];
     assert(render != NULL);
-
-    XvMCFlushSurface(render->disp, render->p_surface);
-    XvMCSyncSurface(render->disp, render->p_surface);
 
     s->error_count = 0;
 }
