@@ -198,14 +198,14 @@ class ManagedListGroup : public ManagedListItem
         ManagedListItem* getItem(int index) { return itemList.at(index); }
         ManagedListItem* getCurItem() { return itemList.at(curItem); }
 
-        const QString& getCurItemValue() { return getItemValue(curItem); }
-        const QString& getItemValue(int which) { return getItem(which)->getValue(); }
+        const QString getCurItemValue() { return getItemValue(curItem); }
+        const QString getItemValue(int which) { ManagedListItem *itm = getItem(which);
+                                                return itm ? itm->getValue() : 0; }
 
-        const QString& getCurItemText() { return getItemText(curItem); }
-        const QString& getItemText(int which) { return getItem(which)->getText(); }
+        const QString getCurItemText() { return getItemText(curItem); }
+        const QString getItemText(int which) { ManagedListItem *itm = getItem(which);
+                                               return itm ? itm->getText() : ""; }
 
-        virtual const QString& getItemLabel(int which) { return getItem(which)->getText(); }
-        virtual const QString& getSelectionLabel(void) { return getItemLabel(curItem); }
         virtual void setParentList(ManagedList* _parent);
 
         virtual void clear();
@@ -675,6 +675,8 @@ class ManagedList : public QObject
         bool goBack();
         bool getLocked() const { return locked; }
         void setLocked(bool val = true) { locked = val; }
+        
+        
 
     public slots:
         void cursorDown(bool page = false);
@@ -683,6 +685,9 @@ class ManagedList : public QObject
         void cursorRight(bool page = false);
         void select();
         void itemChanged(ManagedListItem* itm);
+        //void itemCanceled(ManagedListItem* itm);
+        //void itemSelected(ManagedListItem* itm);
+        
 
     protected:
         QGuardedPtr<ManagedListGroup> curGroup;
