@@ -4,6 +4,12 @@
 
 include ( ../settings.pro )
 
+include (config.pro)
+
+!exists( config.pro ) {
+   error(Missing config.pro: please run the configure script)
+}
+
 TEMPLATE = lib
 CONFIG += plugin thread
 TARGET = mythgallery
@@ -20,6 +26,6 @@ INSTALLS += installimages uifiles
 
 # Input
 HEADERS += iconview.h singleview.h gallerysettings.h dbcheck.h \
-           thumbgenerator.h qtiffio.h
+           thumbgenerator.h qtiffio.h regslideshow.h
 SOURCES += iconview.cpp main.cpp singleview.cpp gallerysettings.cpp dbcheck.cpp \
-           thumbgenerator.cpp qtiffio.cpp
+           thumbgenerator.cpp qtiffio.cpp regslideshow.cpp

@@ -30,7 +30,14 @@ extern "C" {
 #include "gallerysettings.h"
 #include "thumbgenerator.h"
 #include "singleview.h"
+#include "regslideshow.h"
 #include "iconview.h"
+
+#include "config.h"
+
+#ifdef OPENGL_SUPPORT
+#include "glslideshow.h"
+#endif
 
 IconView::IconView(QSqlDatabase *db, const QString& galleryDir,
                      MythMainWindow* parent, const char* name )
@@ -274,23 +281,48 @@ void IconView::keyPressEvent(QKeyEvent *e)
             else {
                 int pos = m_currRow * m_nCols + m_currCol;
                 ThumbItem *item = m_itemList.at(pos);
-                if (!item) 
+                if (!item) {
                     std::cerr << "The impossible happened" << std::endl;
+                    break;
+                }
+
                 if (item->isDir) {
                     loadDirectory(item->path);
                     handled = true;
                 }
                 else {
+
+                    handled = true;
+                    
                     bool slideShow = (action == "PLAY");
-                    SingleView iv(m_db, m_itemList, pos, m_thumbGen,
-                                  slideShow, gContext->GetMainWindow());
-                    iv.exec();
+                    if (slideShow) {
+#ifdef OPENGL_SUPPORT
+                        int useOpenGL = gContext->GetNumSetting("SlideshowUseOpenGL");
+                        if (useOpenGL) {
+                            GLSSDialog gv(m_db, m_itemList, pos,
+                                          gContext->GetMainWindow());
+                            gv.exec();
+                        }
+                        else 
+#endif
+                            
+                        {
+                            RegSlideShow rv(m_db, m_itemList, pos, 
+                                            gContext->GetMainWindow());
+                            rv.exec();
+                        }
+                    }
+                    else {
+                        SingleView sv(m_db, m_itemList, pos, m_thumbGen,
+                                      gContext->GetMainWindow());
+                        sv.exec();
+                    }                         
                 }
             }
         }
         
     }
-
+    
     if (!handled && !menuHandled) {
         gContext->GetMainWindow()->TranslateKeyPress("Global", e, actions);
         for (unsigned int i = 0; i < actions.size() && !handled; i++)
@@ -719,9 +751,21 @@ void IconView::actionSlideShow()
         return;
 
     int pos = m_currRow * m_nCols + m_currCol;
-    SingleView iv(m_db, m_itemList, pos, m_thumbGen, true,
-                 gContext->GetMainWindow());
-    iv.exec();
+
+#ifdef OPENGL_SUPPORT
+    int useOpenGL = gContext->GetNumSetting("SlideshowUseOpenGL");
+    if (useOpenGL) {
+        GLSSDialog gv(m_db, m_itemList, pos,
+                      gContext->GetMainWindow());
+        gv.exec();
+    }
+    else 
+#endif
+    {
+        RegSlideShow rv(m_db, m_itemList, pos, 
+                        gContext->GetMainWindow());
+        rv.exec();
+    }
 }
 
 void IconView::actionSettings()

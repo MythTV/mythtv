@@ -16,6 +16,7 @@
  * 
  * ============================================================ */
 
+
 #ifndef ICONVIEW_H
 #define ICONVIEW_H
 
@@ -54,7 +55,9 @@ public:
     QString  path;
     bool     isDir;
 };
-    
+
+typedef QPtrList<ThumbItem> ThumbList;
+
 class IconView : public MythDialog
 {
     Q_OBJECT
@@ -62,7 +65,7 @@ class IconView : public MythDialog
 public:
 
     IconView(QSqlDatabase *db, const QString& galleryDir,
-              MythMainWindow* parent, const char* name = 0);
+             MythMainWindow* parent, const char* name = 0);
     ~IconView();
 
 protected:

@@ -7,6 +7,8 @@
 #include <qdir.h>
 #include <qimage.h>
 
+#include "config.h"
+
 // General Settings
 
 class MythGalleryDir: public LineEditSetting, public GlobalSetting {
@@ -31,6 +33,39 @@ public:
                     "be copied. If it is an executable, it will be run."));
     };
 };
+
+#ifdef OPENGL_SUPPORT
+
+class SlideshowUseOpenGL: public CheckBoxSetting, public GlobalSetting {
+public:
+
+    SlideshowUseOpenGL() :
+        GlobalSetting("SlideshowUseOpenGL") {
+        setLabel(QObject::tr("Use OpenGL transitions"));
+        setHelpText(QObject::tr("Check this to enable OpenGL "
+                                "based slideshow transitions"));
+    }
+};
+
+class SlideshowOpenGLTransition: public ComboBoxSetting, public GlobalSetting {
+public:
+    SlideshowOpenGLTransition() : 
+        GlobalSetting("SlideshowOpenGLTransition") {
+        setLabel(QObject::tr("Type of OpenGL transition"));
+        addSelection("blend (gl)");
+        addSelection("fade (gl)");
+        addSelection("rotate (gl)");
+        addSelection("bend (gl)");
+        addSelection("inout (gl)");
+        addSelection("slide (gl)");
+        addSelection("flutter (gl)");
+        addSelection("random (gl)");
+        setHelpText(QObject::tr("This is the type of OpenGL transition used "
+                    "between pictures in slideshow mode."));
+    }
+};
+
+#endif /* OPENGL_SUPPORT */
 
 class SlideshowTransition: public ComboBoxSetting, public GlobalSetting {
 public:
@@ -83,15 +118,54 @@ public:
 };
 
 
+class GalleryConfigurationGroup: public VerticalConfigurationGroup,
+                                 public TriggeredConfigurationGroup {
+public:
+
+    GalleryConfigurationGroup():
+        VerticalConfigurationGroup(false),
+        TriggeredConfigurationGroup(false) {
+        
+        setLabel(QObject::tr("MythGallery Settings"));
+        setUseLabel(false);
+
+        addChild(new MythGalleryDir());
+        addChild(new MythGalleryImportDirs());
+
+#ifdef OPENGL_SUPPORT
+        
+        SlideshowUseOpenGL* useOpenGL = new SlideshowUseOpenGL();
+        addChild(useOpenGL);
+        setTrigger(useOpenGL);
+    
+        ConfigurationGroup* openGLConfig = new VerticalConfigurationGroup(false);
+        openGLConfig->addChild(new SlideshowOpenGLTransition());
+        addTarget("1", openGLConfig);
+
+        ConfigurationGroup* regularConfig = new VerticalConfigurationGroup(false);
+        regularConfig->addChild(new SlideshowTransition());
+        regularConfig->addChild(new SlideshowBackground());
+        addTarget("0", regularConfig);
+
+#else
+        
+        addChild(new SlideshowTransition());
+        addChild(new SlideshowBackground());
+        
+#endif
+
+        
+        
+        addChild(new SlideshowDelay());
+
+    }
+
+};
+
+
 GallerySettings::GallerySettings()
 {
-    VerticalConfigurationGroup* settings = new VerticalConfigurationGroup(false);
-    settings->setLabel(QObject::tr("MythGallery Settings"));
-    settings->addChild(new MythGalleryDir());
-    settings->addChild(new MythGalleryImportDirs());
-    settings->addChild(new SlideshowTransition());
-    settings->addChild(new SlideshowBackground());
-    settings->addChild(new SlideshowDelay());
-    addChild(settings);
+    GalleryConfigurationGroup* config = new GalleryConfigurationGroup();
+    addChild(config);
 }
 

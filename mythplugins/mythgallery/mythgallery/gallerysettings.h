@@ -27,8 +27,11 @@ protected:
 // The real work.
 
 class GallerySettings: virtual public ConfigurationWizard {
+
 public:
+    
     GallerySettings();
+
 };
 
 #endif
