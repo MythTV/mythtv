@@ -328,6 +328,81 @@ unsigned char *NuppelVideoPlayer::DecodeFrame(struct rtframeheader *frameheader,
     return(buf);
 }
 
+int NuppelVideoPlayer::ComputeByteShift(void)
+{
+    double tcshift;
+    int byteshift;
+    int audio_delay, video_delay;
+
+    /* We want to calculate 'tcshift'.  The audio is playing 'tcshift'
+       milliseconds ahead of the video.  Negative tcshift means the video 
+       is ahead of the audio.
+
+       We use these variables:
+
+       'effdsp' is samples/sec, multiplied by 100.
+       Bytes per sample is assumed to be 4.
+
+       'audiotimecode' is the timecode of the audio that has just 
+       been written into the buffer.
+
+       'audiolen' is the # of bytes stored in the audio buffer
+
+       'timecodes[rpos]' is the timecode of video about to be read 
+       out of the buffer, ideally the timecode of audio about to be read
+       out of the buffer will match this...
+
+       Begin algebra:
+ 
+       tcshift = <timecode of audio about to be read from buffer> - 
+                 <timecode of video about to be read from buffer>
+
+       tcshift = (audiotimecode - (audiolen * (ms/byte))) -
+                 timecodes[rpos]
+
+       'ms/byte' is given by '25000/effdsp'...
+
+       tcshift = (audiotimecode - (audiolen * 25000 / effdsp)) -
+                 timecodes[rpos]
+    */
+
+    tcshift = (double)audiotimecode - 
+              (double)audiolen * 25000.0 / (double)effdsp -
+              (double)timecodes[rpos];
+
+    /* The tcshift computed above describes the time shift between audio and
+       video output from GetFrame().  Now we adjust this to find the time shift
+       between audio and video data leaving the computer.  Fortunately, each
+       stream has a predictable delay, between leaving GetFrame() and 
+       reaching a DAC...
+    */
+
+    ioctl(audiofd, SNDCTL_DSP_GETODELAY, &audio_delay); // bytes
+    // convert bytes to ms :
+    audio_delay = (int)((double)audio_delay * 25000.0 / (double)effdsp);
+
+    video_delay = usepre * 1000 / (int)video_frame_rate; // ms stuck in prebuf
+ 
+    tcshift -= audio_delay;
+    tcshift += video_delay;
+
+    if (tcshift > 100)
+    {
+        printf("ACK, audio more than 100ms ahead of video...\n");
+        tcshift = 100;
+    }
+    else if (tcshift < -100)
+    {
+        printf("ACK, audio more than 100ms behind video...\n");
+        tcshift = -100;
+    }
+
+    // The '8.0' means we correct 1/8 of the shift on each frame
+    byteshift = 4 * (int)(tcshift * (double)effdsp / (8.0 * 100000.0));
+
+    return byteshift;
+}
+
 unsigned char *NuppelVideoPlayer::GetFrame(int *timecode, int onlyvideo,
                                            unsigned char **audiodata, int *alen)
 {
@@ -336,7 +411,6 @@ unsigned char *NuppelVideoPlayer::GetFrame(int *timecode, int onlyvideo,
     int gotaudio = 0;
     int bytesperframe;
 
-    int tcshift;
     int shiftcorrected = 0;
     int ashift;
     int i;
@@ -361,6 +435,7 @@ unsigned char *NuppelVideoPlayer::GetFrame(int *timecode, int onlyvideo,
         wpos = 0;
         rpos = 0;
         audiolen=0;
+        audiotimecode = 0;
         seeked = 1;
     }
 
@@ -387,15 +462,11 @@ unsigned char *NuppelVideoPlayer::GetFrame(int *timecode, int onlyvideo,
                 continue;
             if (!seeked) 
             {
-                tcshift = (int)(((double)(audiotimecode - 
-                          timecodes[rpos]) * (double)effdsp)/100000)*4;
-                if (tcshift > 1000) 
-                    tcshift = 1000;
-                if (tcshift < -1000) 
-                    tcshift = -1000;
-                bytesperframe -= tcshift;
+                bytesperframe -= ComputeByteShift();
                 if (bytesperframe < 100) 
-                    bytesperframe=100;
+                    bytesperframe = 100;
+                if (bytesperframe > audiolen)
+                    bytesperframe = audiolen;
             } 
             else
             {
@@ -531,17 +602,15 @@ unsigned char *NuppelVideoPlayer::GetFrame(int *timecode, int onlyvideo,
                         }
                         sampleswritten += lameret;
                     }
+                    else if (lameret < 0)
+                    {
+                        printf("lame decode error\n");
+                        exit(-1);
+                    }
                     packetlen = 0;
                 } while (lameret > 0);
 
                 audiotimecode = frameheader.timecode + audiodelay; // untested
-                if (audiolen > 0) 
-                {
-                    audiotimecode -= (int)(1000 * (((double)audiolen * 25.0) / 
-                                     (double)effdsp));
-                    if (audiotimecode < 0)
-                        audiotimecode = 0;
-                }
 
                 audiolen += sampleswritten * 4;
                 lastaudiolen = audiolen;
@@ -550,13 +619,7 @@ unsigned char *NuppelVideoPlayer::GetFrame(int *timecode, int onlyvideo,
             {
                 memcpy(audiobuffer+audiolen, strm, frameheader.packetlength);
                 audiotimecode = frameheader.timecode + audiodelay;
-                if (audiolen>0) 
-                {
-                    audiotimecode -= (int)(1000 * (((double)audiolen * 25.0) / 
-                                     (double)effdsp));
-                    if (audiotimecode<0) 
-                    audiotimecode = 0;
-                }
+
                 audiolen += frameheader.packetlength;
                 lastaudiolen = audiolen;
             }
@@ -595,7 +658,6 @@ void NuppelVideoPlayer::StartPlaying(void)
 
     long tf;
     long usecs;
-    int usepre = 8;
     unsigned char *audiodata;
     int audiodatalen;
 
@@ -608,7 +670,9 @@ void NuppelVideoPlayer::StartPlaying(void)
     unsigned char *prebuf[MAXPREBUFFERS];
     
     int videosize; 
-    
+   
+    usepre = 8;
+ 
     now.tv_sec = 0;
 
     InitSubs();
@@ -701,10 +765,14 @@ void NuppelVideoPlayer::StartPlaying(void)
 	}
 
         videobuf = GetFrame(&timecode, audiofd <= 0, &audiodata, &audiodatalen);
+        // GetFrmae has used SNDCTL_DSP_GETODELAY to figure out the latency
+        // through the sound output system, and it also considered whether we
+        // are prebuffering.  All we do here is display the video frame first,
+        // and then play the audio.  We play the audio second because it might
+        // block.
+
 	if (eof)
             continue;
-        if (audiodatalen != 0)
-            WriteAudio(audiodata, audiodatalen);
 
         if (usepre != 0)
         {
@@ -751,6 +819,7 @@ void NuppelVideoPlayer::StartPlaying(void)
                 usecs = (long int)((1000000/video_frame_rate)/2);
         }
 
+        // play video
         if (1 || usecs > -1000000/video_frame_rate) 
         {
             if (deinterlace)
@@ -768,12 +837,16 @@ void NuppelVideoPlayer::StartPlaying(void)
 	    framesSkipped++;
 	}
 
+        // play audio
+        if (audiodatalen != 0)
+            WriteAudio(audiodata, audiodatalen);
+
         if (framesdisplayed == 60)
         {
             gettimeofday(&nowt, NULL);
 
-            double timediff = (nowt.tv_sec - startt.tv_sec) * 1000000 +
-                             (nowt.tv_usec - startt.tv_usec);
+            //double timediff = (nowt.tv_sec - startt.tv_sec) * 1000000 +
+            //                 (nowt.tv_usec - startt.tv_usec);
 
             //printf("FPS played: %f\n", 60000000.0 / timediff);
 

@@ -80,6 +80,7 @@ class NuppelVideoPlayer
     int OpenFile(bool skipDsp = false);
     int CloseFile(void);
 
+    int ComputeByteShift(void);
     unsigned char *DecodeFrame(struct rtframeheader *frameheader,
                                unsigned char *strm);
     unsigned char *GetFrame(int *timecode, int onlyvideo, 
@@ -112,6 +113,7 @@ class NuppelVideoPlayer
     int filesize;
     int startpos;
     int audiodelay;
+    int usepre;
 
     int lastaudiolen;
     unsigned char *strm;

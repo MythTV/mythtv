@@ -599,7 +599,7 @@ void NuppelVideoRecorder::BufferIt(unsigned char *buf)
 {
     int act;
     long tcres;
-    static int oldtc = 0;
+    static long int oldtc = 0;
     int fn;
 
     act = act_video_buffer;
@@ -662,7 +662,10 @@ void NuppelVideoRecorder::BufferIt(unsigned char *buf)
     }
 	
     videobuffer[act]->sample = tf;
-    videobuffer[act]->timecode = tcres;
+
+    // record the time at the start of this frame.
+    // 'tcres' is at the end of the frame, so subtract the right # of ms
+    videobuffer[act]->timecode = (ntsc) ? (tcres - 33) : (tcres - 40);
 
     memcpy(videobuffer[act]->buffer, buf, video_buffer_size);
 
@@ -861,6 +864,10 @@ void NuppelVideoRecorder::doAudioThread(void)
         }
 
         gettimeofday(&anow, &tzone);
+        // In steady state, we get here very soon after the previous call
+        // to 'read' returned. So, the timecode for the current chunk of audio
+        // is recorded near the start of the chunk, when most of the chunk
+        // hasn't been recorded yet.  This is what we want.
 
         if (audio_buffer_size != (lastread = read(afd, buffer,
                                                   audio_buffer_size))) 
@@ -1204,10 +1211,20 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
                                                  audio_buffer_size / 4,
                                                  (unsigned char *)mp3buf,
                                                  mp3buf_size);
+        if (lameret < 0)
+        {
+            printf("lame error '%d'\n", lameret);
+            exit(-1); 
+        }
         compressedsize = lameret;
 
         lameret = lame_encode_flush_nogap(gf, (unsigned char *)mp3gapless, 
                                           7200);
+        if (lameret < 0)
+        {
+            printf("lame error '%d'\n", lameret);
+            exit(-1);
+        }
         gaplesssize = lameret;
 
         frameheader.packetlength = compressedsize + gaplesssize;
