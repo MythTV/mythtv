@@ -4,6 +4,11 @@
 #include "visual.h"
 #include "polygon.h"
 #include "mainvisual.h"
+#include "config.h"
+
+#ifdef SDL_SUPPORT
+#include <SDL.h>
+#endif
 
 class QImage;
 
@@ -21,7 +26,7 @@ class QImage;
 class Synaesthesia : public VisualBase
 {
 public:
-    Synaesthesia();
+    Synaesthesia(long int winid);
     virtual ~Synaesthesia();
 
     void resize(const QSize &size);
@@ -47,7 +52,6 @@ private:
     void fade(void);
 
     QSize size;
-    int fps;
 
     double cosTable[NumSamples];
     double negSinTable[NumSamples];
@@ -67,6 +71,18 @@ private:
 
     unsigned char palette[768];
     double fgRedSlider, fgGreenSlider, bgRedSlider, bgGreenSlider;
+
+#ifdef SDL_SUPPORT
+    SDL_Surface *surface;
+#endif
 };
+
+class SynaesthesiaFactory : public VisFactory
+{
+  public:
+    const QString &name(void) const;
+    VisualBase *create(MainVisual *parent, long int winid);
+};
+
 
 #endif // __mainvisual_h

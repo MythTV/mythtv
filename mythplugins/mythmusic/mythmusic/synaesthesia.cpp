@@ -12,10 +12,17 @@
 #include <qimage.h>
 
 #include <math.h>
+#include <stdlib.h>
 
-Synaesthesia::Synaesthesia()
-    : fps(30), fadeMode(Stars), pointsAreDiamonds(true)
+#include <iostream>
+using namespace std;
+
+Synaesthesia::Synaesthesia(long int winid)
 {
+    fps = 20;
+    fadeMode = Stars;
+    pointsAreDiamonds = true;
+
     coreInit();
     starSize = 0.125;
     setStarSize(starSize);
@@ -26,6 +33,20 @@ Synaesthesia::Synaesthesia()
     bgRedSlider = 1.0;
     bgGreenSlider = 0.2;
 
+#ifdef SDL_SUPPORT
+    surface = NULL;
+
+    static char SDL_windowhack[32];
+    sprintf(SDL_windowhack, "SDL_WINDOWID=%ld", winid);
+    putenv(SDL_windowhack);
+
+    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    {
+        cerr << "Unable to init SDL\n";
+        return;
+    }
+#endif
+
     setupPalette();
 }
 
@@ -33,6 +54,9 @@ Synaesthesia::~Synaesthesia()
 {
     if (outputImage)
         delete outputImage;
+#ifdef SDL_SUPPORT
+    SDL_Quit();
+#endif
 }
 
 void Synaesthesia::setupPalette(void)
@@ -87,6 +111,27 @@ void Synaesthesia::resize(const QSize &newsize)
     for (int i = 0; i < 256; i++)
         outputImage->setColor(i, qRgb(palette[i * 3], palette[i * 3 + 1],
                                       palette[i * 3 + 2]));
+
+#ifdef SDL_SUPPORT
+    surface = SDL_SetVideoMode(size.width(), size.height(), 8, 0);
+
+    if (!surface)
+    {
+        cerr << "Couldn't get SDL surface\n";
+        return;
+    }
+
+    SDL_Color sdlPalette[256];
+    
+    for (int i = 0; i < 256; i++)
+    {
+        sdlPalette[i].r = palette[i * 3];
+        sdlPalette[i].g = palette[i * 3 + 1];
+        sdlPalette[i].b = palette[i * 3 + 2];
+    }
+
+    SDL_SetColors(surface, sdlPalette, 0, 256);
+#endif
 }
 
 int Synaesthesia::bitReverser(int i)
@@ -488,6 +533,52 @@ bool Synaesthesia::process(VisualNode *node)
 
 bool Synaesthesia::draw(QPainter *p, const QColor &back)
 {
+    (void)p;
+    (void)back;
+#ifdef SDL_SUPPORT
+    if (!surface)
+    {
+        cerr << "No sdl surface\n";
+        return false;
+    }
+
+    SDL_LockSurface(surface);
+
+    register unsigned long *ptr2 = (unsigned long*)output;
+
+    for (int j = 0; j < outHeight * 2; j += 2)
+    {
+        unsigned long *ptr1 = (unsigned long *)(surface->pixels) + 
+                              outWidth / 4 * j;
+        unsigned long *ptr12 = (unsigned long *)(surface->pixels) + 
+                               outWidth / 4 * (j + 1);
+        int i = outWidth / 4;
+        do
+        {
+            register unsigned int const r1 = *(ptr2++);
+            register unsigned int const r2 = *(ptr2++);
+
+            register unsigned int const v = ((r1 & 0x000000f0ul) >> 4) |
+                                            ((r1 & 0x0000f000ul) >> 8) |
+                                            ((r1 & 0x00f00000ul) >> 12) |
+                                            ((r1 & 0xf0000000ul) >> 16);
+            *(ptr1++) = v | (((r2 & 0x000000f0ul) << 12) |
+                             ((r2 & 0x0000f000ul) << 8) |
+                             ((r2 & 0x00f00000ul) << 4) |
+                             ((r2 & 0xf0000000ul)));
+            *(ptr12++) = v | (((r2 & 0x000000f0ul) << 12) |
+                             ((r2 & 0x0000f000ul) << 8) |
+                             ((r2 & 0x00f00000ul) << 4) |
+                             ((r2 & 0xf0000000ul)));
+        } while (--i);
+    }
+
+    SDL_UnlockSurface(surface);
+    SDL_UpdateRect(surface, 0, 0, 0, 0);
+
+    return false;
+#else
+
     if (!outputImage)
         return false;
 
@@ -521,4 +612,18 @@ bool Synaesthesia::draw(QPainter *p, const QColor &back)
     p->drawImage(QRect(0, 0, 800, 600), *outputImage);
     
     return true;
+#endif
 }
+
+const QString &SynaesthesiaFactory::name(void) const
+{
+    static QString name("Synaesthesia");
+    return name;
+}
+
+VisualBase *SynaesthesiaFactory::create(MainVisual *parent, long int winid)
+{
+    (void)parent;
+    return new Synaesthesia(winid);
+}
+

@@ -6,12 +6,15 @@
 # default parameters
 opengl="no"
 fftw_lib="no"
+sdl="no"
 
 for opt do
   case "$opt" in
   --enable-opengl) opengl="yes"
   ;;
   --enable-fftw) fftw_lib="yes"
+  ;;
+  --enable-sdl) sdl="yes"
   ;;
   esac
 done
@@ -22,10 +25,11 @@ cat << EOF
 Usage: configure [options]
 Options: [defaults in brackets after descriptions]
 
-echo "Standard options:"
-echo "  --help                   print this message"
-echo "  --enable-fftw            enable fftw visualizers [default=no]"
-echo "  --enable-opengl          enable OpenGL visualizers [default=no]"
+Standard options:
+  --help                   print this message
+  --enable-fftw            enable fftw visualizers [default=no]
+  --enable-opengl          enable OpenGL visualizers [default=no]
+  --enable-sdl             use SDL for the synaesthesia output [default=no]
 
 EOF
 exit 1
@@ -48,7 +52,7 @@ echo "#" >> ./mythmusic/config.pro
 if test "$opengl" = "yes" ; then
   echo "        OpenGL support will be included"
   echo "#define OPENGL_SUPPORT 1" >> ./mythmusic/config.h
-  echo "LIBS += -lGL -lGLU" >> ./mythmusic/config.pro
+  echo "CONFIG += opengl" >> ./mythmusic/config.pro
 fi
 
 if test "$opengl" = "no" ; then
@@ -65,5 +69,16 @@ if test "$fftw_lib" = "no" ; then
   echo "        FFTW support will not be included"
 fi
 
+if test "$sdl" = "yes" ; then
+  echo "        SDL support will be included"
+  echo "#define SDL_SUPPORT 1" >> ./mythmusic/config.h
+  echo "LIBS += `sdl-config --libs`" >> ./mythmusic/config.pro
+  echo "QMAKE_CXXFLAGS_RELEASE += `sdl-config --cflags`" >> ./mythmusic/config.pro
+  echo "QMAKE_CXXFLAGS_DEBUG += `sdl-config --cflags`" >> ./mythmusic/config.pro
+fi
+
+if test "$sdl" = "no" ; then
+  echo "        SDL support will not be included"
+fi
 echo ""
 

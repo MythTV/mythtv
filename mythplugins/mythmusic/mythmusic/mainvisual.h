@@ -22,6 +22,7 @@ class Output;
 class VisualNode;
 class LogScale;
 class QTimer;
+class VisFactory;
 
 class VisualNode
 {
@@ -46,16 +47,18 @@ public:
 
 class VisualBase
 {
-public:
-	virtual ~VisualBase();
+  public:
+    virtual ~VisualBase();
 
     // return true if the output should stop
     virtual bool process( VisualNode *node ) = 0;
     virtual bool draw( QPainter *, const QColor & ) = 0;
     virtual void resize( const QSize &size ) = 0;
+    virtual int getDesiredFPS(void) { return fps; }
+
+  protected:
+    int fps;
 };
-
-
 
 // base class to handle things like frame rate...
 class MainVisual : public QDialog, public Visual
@@ -84,11 +87,16 @@ public:
     void setFrameRate( int newfps );
     int frameRate() const { return fps; }
 
+    static void registerVisFactory(VisFactory *);
+    static VisualBase *createVis(const QString &name,
+                                 MainVisual *parent, long int winid);
+    static VisualBase *randomVis(MainVisual *parent, long int winid);
+
 public slots:
     void timeout();
 
 signals:
-	void hidingVisualization();
+    void hidingVisualization();
 
 private:
     VisualBase *vis;
@@ -97,7 +105,13 @@ private:
     QTimer *timer;
     bool playing;
     int fps;
+};
 
+class VisFactory
+{
+  public:
+    virtual const QString &name(void) const = 0;
+    virtual VisualBase *create(MainVisual *parent, long int winid) = 0;
 };
 
 class StereoScope : public VisualBase
@@ -116,7 +130,6 @@ protected:
     QSize size;
     bool rubberband;
     double falloff;
-    int fps;
 };
 
 class MonoScope : public StereoScope
@@ -128,6 +141,20 @@ public:
    bool process( VisualNode *node );
    bool draw( QPainter *p, const QColor &back );
 };  
+
+class StereoScopeFactory : public VisFactory
+{
+  public:
+    const QString &name(void) const;
+    VisualBase *create(MainVisual *parent, long int winid);
+};
+
+class MonoScopeFactory : public VisFactory
+{
+  public:
+    const QString &name(void) const;
+    VisualBase *create(MainVisual *parent, long int winid);
+};
 
 class LogScale
 {

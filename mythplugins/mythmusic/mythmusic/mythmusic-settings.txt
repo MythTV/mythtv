@@ -49,9 +49,9 @@ LCDHost=localhost
 LCDPort=13666
 
 # VisualMode for the player
-# Can be one of: Synaesthesia Spectrum Gears Blank Random
+# Can be one of: Synaesthesia Spectrum MonoScope StereoScope Gears Blank Random
 # (Random chooses anything but Blank)
-VisualMode=Synaesthesia
+VisualMode=Random
 
 # How many seconds to wait before turning on the visualizer automatically
 # (0 = no automatic, manual button press only)

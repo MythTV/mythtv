@@ -242,6 +242,8 @@ void runMenu(QString themedir, QSqlDatabase *db, QString paths,
 
 int main(int argc, char *argv[])
 {
+    srand(time(NULL));
+
     QApplication a(argc, argv);
 
     gContext = new MythContext();

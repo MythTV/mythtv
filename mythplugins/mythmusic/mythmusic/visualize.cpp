@@ -1,5 +1,4 @@
 /*
-
 	visualize.cpp
 
     (c) 2003 Thor Sigvaldason and Isaac Richards
@@ -8,8 +7,6 @@
 	Part of the mythTV project
 	
 	music visualizers
-
-
 */
 
 #include "mainvisual.h"
@@ -21,23 +18,25 @@
 #include <qpixmap.h>
 #include <qimage.h>
 
+#include <iostream>
+using namespace std;
+
 #include <mythtv/mythcontext.h>
 
-
 Spectrum::Spectrum()
-    : scaleFactor( 2.0 ), falloff( 3.0 ), analyzerBarWidth( 6 ), fps( 20 )
 {
-
-	//
-	//	Setup the "magical" audio data transformations
-	//	provided by the Fast Fourier Transforms library
-	//
+    // Setup the "magical" audio data transformations
+    // provided by the Fast Fourier Transforms library
+    analyzerBarWidth = 6;
+    scaleFactor = 2.0;
+    falloff = 3.0;
+    fps = 60;
 	
 #ifdef FFTW_SUPPORT
     plan =  rfftw_create_plan(512, FFTW_REAL_TO_COMPLEX, FFTW_ESTIMATE);
 #endif
-	startColor 	= QColor(0,0,255);
-	targetColor = QColor(255,0,0); 
+    startColor = QColor(0,0,255);
+    targetColor = QColor(255,0,0); 
 }
 
 Spectrum::~Spectrum()
@@ -49,13 +48,11 @@ Spectrum::~Spectrum()
 
 void Spectrum::resize(const QSize &newsize)
 {
-	//
-	//	Just change internal data about the
-	//	size of the pixmap to be drawn (ie. the
-	//	size of the screen) and the logically
-	//	ensuing number of up/down bars to hold
-	//	the audio magnitudes
-	//
+    // Just change internal data about the
+    // size of the pixmap to be drawn (ie. the
+    // size of the screen) and the logically
+    // ensuing number of up/down bars to hold
+    // the audio magnitudes
 
     size = newsize;
 
@@ -65,15 +62,15 @@ void Spectrum::resize(const QSize &newsize)
     int i = 0, w = 0;
     for (; (unsigned) i < rects.count(); i++, w += analyzerBarWidth)
     {
-		rects[i].setRect(w, size.height() / 2, analyzerBarWidth - 1, 1);
-	}
+        rects[i].setRect(w, size.height() / 2, analyzerBarWidth - 1, 1);
+    }
 
     int os = magnitudes.size();
     magnitudes.resize( scale.range() * 2 );
     for (; (unsigned) os < magnitudes.size(); os++)
     {
-		magnitudes[os] = 0.0;
-	}
+        magnitudes[os] = 0.0;
+    }
 
     scaleFactor = double( size.height() / 2 ) / log( 512.0 );
 }
@@ -81,34 +78,26 @@ void Spectrum::resize(const QSize &newsize)
 
 bool Spectrum::process(VisualNode *node)
 {
-	//
-	//	Take a bunch of data in *node
-	//	and break it down into spectrum
-	//	values
-	//
+    // Take a bunch of data in *node
+    // and break it down into spectrum
+    // values
     bool allZero = TRUE;
-#ifdef FFTW_SUPPORT		// Don't do any real processing if libfftw isn't available
+#ifdef FFTW_SUPPORT	// Don't do any real processing if libfftw isn't available
     uint i;
     long w = 0, index;
     QRect *rectsp = rects.data();
     double *magnitudesp = magnitudes.data();
     double magL, magR, tmp;
 
-
-
     if (node) 
     {
-		i = node->length;
-		fast_real_set_from_short(lin, node->left, node->length);
-		if (node->right)
-		{
-	    	fast_real_set_from_short(rin, node->right, node->length);
-	    }
+        i = node->length;
+        fast_real_set_from_short(lin, node->left, node->length);
+        if (node->right)
+            fast_real_set_from_short(rin, node->right, node->length);
     } 
     else
-	{
-		i = 0;
-	}
+        i = 0;
 
     fast_reals_set(lin + i, rin + i, 0, 512 - i);
 
@@ -118,75 +107,84 @@ bool Spectrum::process(VisualNode *node)
     index = 1;
     for (i = 0; i < rects.count(); i++, w += analyzerBarWidth)
     {
-		magL = (log(lout[index] * lout[index] + lout[512 - index] * lout[512 - index]) - 22.0) * scaleFactor;
-		magR = (log(rout[index] * rout[index] + rout[512 - index] * rout[512 - index]) - 22.0) * scaleFactor;
+        magL = (log(lout[index] * lout[index] + 
+                    lout[512 - index] * lout[512 - index]) - 22.0) * 
+               scaleFactor;
+        magR = (log(rout[index] * rout[index] + 
+                    rout[512 - index] * rout[512 - index]) - 22.0) * 
+               scaleFactor;
 
-		if (magL > size.height() / 2)
-		{
-			magL = size.height() / 2;
-		}
-		if (magL < magnitudesp[i])
-		{
-			tmp = magnitudesp[i] - falloff;
-			if ( tmp < magL )
-			{
-				tmp = magL;
-			}
-		    magL = tmp;
-		}
-		if (magL < 1.)
-		{
-			magL = 1.;
-		}
+        if (magL > size.height() / 2)
+        {
+            magL = size.height() / 2;
+        }
+        if (magL < magnitudesp[i])
+        {
+            tmp = magnitudesp[i] - falloff;
+            if ( tmp < magL )
+            {
+                tmp = magL;
+            }
+            magL = tmp;
+        }
+        if (magL < 1.)
+        {
+            magL = 1.;
+        }
 
-		if (magR > size.height() / 2)
-		{
-			magR = size.height() / 2;
-		}
-		if (magR < magnitudesp[i + scale.range()])
-		{
-			tmp = magnitudesp[i + scale.range()] - falloff;
-			if ( tmp < magR )
-			{
-				tmp = magR;
-			}
-			magR = tmp;
-		}
-		if (magR < 1.)
-		{
-			magR = 1.;
-		}
+        if (magR > size.height() / 2)
+        {
+            magR = size.height() / 2;
+        }
+        if (magR < magnitudesp[i + scale.range()])
+        {
+            tmp = magnitudesp[i + scale.range()] - falloff;
+            if ( tmp < magR )
+            {
+                tmp = magR;
+            }
+            magR = tmp;
+        }
+        if (magR < 1.)
+        {
+            magR = 1.;
+        }
 
-		if (magR != 1 || magL != 1)
-		{
-			allZero = FALSE;
-		}
+        if (magR != 1 || magL != 1)
+        {
+            allZero = FALSE;
+        }
 
-		magnitudesp[i] = magL;
-		magnitudesp[i + scale.range()] = magR;
+        magnitudesp[i] = magL;
+        magnitudesp[i + scale.range()] = magR;
+ 
+        rectsp[i].setTop( size.height() / 2 - int( magL ) );
+        rectsp[i].setBottom( size.height() / 2 + int( magR ) );
 
-		rectsp[i].setTop( size.height() / 2 - int( magL ) );
-		rectsp[i].setBottom( size.height() / 2 + int( magR ) );
-
-		index = scale[i];
+        index = scale[i];
     }
 #else
-	node = node;
+    node = node;
 #endif
     return allZero;
+}
 
+double Spectrum::clamp(double cur, double max, double min)
+{
+    if (cur > max)
+        cur = max;
+    if (cur < min)
+        cur = min;
+    return cur;
 }
 
 bool Spectrum::draw(QPainter *p, const QColor &back)
 {
-
-	//
-	//	This draws on a pixmap owned by MainVisual.
-	//	
-	//	In other words, this is not a Qt Widget, it
-	//	just uses some Qt methods to draw on a pixmap.
-	//	MainVisual then bitblts that onto the screen.
-	//
+    // This draws on a pixmap owned by MainVisual.
+    //
+    // In other words, this is not a Qt Widget, it
+    // just uses some Qt methods to draw on a pixmap.
+    // MainVisual then bitblts that onto the screen.
 
 #ifdef FFTW_SUPPORT
     QRect *rectsp = rects.data();
@@ -195,61 +193,30 @@ bool Spectrum::draw(QPainter *p, const QColor &back)
     p->fillRect(0, 0, size.width(), size.height(), back);
     for (uint i = 0; i < rects.count(); i++)
     {
-		per = double( rectsp[i].height() - 2 ) / double( size.height() );
-	
-		if (per > 1.0)
-		{
-			per = 1.0;
-		}
-		else if (per < 0.0)
-		{
-	    	per = 0.0;
-	    }
+        per = double( rectsp[i].height() - 2 ) / double( size.height() );
+
+        per = clamp(per, 1.0, 0.0);	
 		
-		r = startColor.red() + (targetColor.red() - startColor.red()) * (per * per);
-		g = startColor.green() + (targetColor.green() - startColor.green()) * (per * per);
-		b = startColor.blue() + (targetColor.blue() - startColor.blue()) * (per * per);
+        r = startColor.red() + 
+            (targetColor.red() - startColor.red()) * (per * per);
+        g = startColor.green() + 
+            (targetColor.green() - startColor.green()) * (per * per);
+        b = startColor.blue() + 
+            (targetColor.blue() - startColor.blue()) * (per * per);
 
-		if (r > 255.0)
-		{
-			r = 255.0;
-		}
-		else if (r < 0.0)
-		{
-			r = 0;
-		}
-
-		if (g > 255.0)
-		{
-			g = 255.0;
-		}
-		else if (g < 0.0)
-		{
-			g = 0;
-		}
-
-		if (b > 255.0)
-		{
-			b = 255.0;
-		}
-		else if (b < 0.0)
-		{
-			b = 0;
-		}
+        r = clamp(r, 255.0, 0.0);
+        g = clamp(g, 255.0, 0.0);
+        b = clamp(b, 255.0, 0.0);
 		
-		if(rectsp[i].height() > 4)
-		{
-			p->fillRect(rectsp[i], QColor(int(r), int(g), int(b)));
-		}
+        if(rectsp[i].height() > 4)
+            p->fillRect(rectsp[i], QColor(int(r), int(g), int(b)));
     }
 
 #else
-	//
-	//	Oops ... user doesn't have a Fast Fourier Library
-	//
+    // Oops ... user doesn't have a Fast Fourier Library
     p->fillRect(0, 0, size.width(), size.height(), back);
-	p->setPen(Qt::white);
-	p->setFont(QFont("Helvetica", 20));
+    p->setPen(Qt::white);
+    p->setFont(QFont("Helvetica", 20));
     p->drawText(size.width() / 2 - 200, size.height() / 2 - 20, 400, 20, Qt::AlignCenter, "Visualization requires FFT library");
     p->drawText(size.width() / 2 - 200, size.height() / 2, 400, 20, Qt::AlignCenter, "Did you run configure?");
 #endif
@@ -257,10 +224,24 @@ bool Spectrum::draw(QPainter *p, const QColor &back)
     return true;
 }
 
+const QString &SpectrumFactory::name(void) const
+{
+    static QString name("Spectrum");
+    return name;
+}
+
+VisualBase *SpectrumFactory::create(MainVisual *parent, long int winid)
+{
+    (void)parent;
+    (void)winid;
+    return new Spectrum();
+}
+
+
 
 Blank::Blank()
-	: fps(20)
 {
+    fps = 20;
 }
 
 Blank::~Blank()
@@ -269,33 +250,40 @@ Blank::~Blank()
 
 void Blank::resize(const QSize &newsize)
 {
-	size = newsize;
+    size = newsize;
 }
 
 
 bool Blank::process(VisualNode *node)
 {
-	node = node;	// Sometimes I hate -Wall
-	return true;
+    node = node; // Sometimes I hate -Wall
+    return true;
 }
 
 bool Blank::draw(QPainter *p, const QColor &back)
 {
-
-	//
-	//	Took me hours to work out this algorithm
-	//
+    // Took me hours to work out this algorithm
     p->fillRect(0, 0, size.width(), size.height(), back);
     return true;
+}
+
+const QString &BlankFactory::name(void) const
+{
+    static QString name("Blank");
+    return name;
+}
+
+VisualBase *BlankFactory::create(MainVisual *parent, long int winid)
+{
+    (void)parent;
+    (void)winid;
+    return new Blank();
 }
 
 
 #ifdef OPENGL_SUPPORT
 
-
-//
 //	Need this for the Gears Object (below)
-//
 static void gear( GLfloat inner_radius, GLfloat outer_radius, GLfloat width,
 		  GLint teeth, GLfloat tooth_depth )
 {
@@ -413,42 +401,41 @@ static void gear( GLfloat inner_radius, GLfloat outer_radius, GLfloat width,
 
 }
 
-
-
-//
 //	Want to clean this up at some point,
 //	but I need to get some CVS checked in
 //	before we end up with a code fork
-//
 
 static GLfloat view_rotx=20.0, view_rotz=0.0;
 static GLint gear1, gear2, gear3;
 
-
 Gears::Gears(QWidget *parent, const char *name)
-	: QGLWidget(parent, name), falloff( 4.0 ), analyzerBarWidth( 10 ), fps( 20 )
+     : QGLWidget(parent, name)
 {
-	//
-	//	Slightly trick bit: This *is* a Qt Qidget 
-	//	(unlike spectrum, above) so we just use
-	//	the Qt GL class.
-	//
+    falloff = 4.0;
+    analyzerBarWidth = 10;
+    fps = 60;
+
+    // Slightly trick bit: This *is* a Qt Qidget 
+    // (unlike spectrum, above) so we just use
+    // the Qt GL class.
 
     int screenwidth = 0, screenheight = 0;
     float wmult = 0.0, hmult = 0.0;
+
     gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
-    this->setGeometry(0, 0, screenwidth, screenheight);
-    this->setFixedSize(QSize(screenwidth, screenheight));
-	angle = 0.0;
-	view_roty = 30.0;
+    setGeometry(0, 0, screenwidth, screenheight);
+    setFixedSize(QSize(screenwidth, screenheight));
+
+    angle = 0.0;
+    view_roty = 30.0;
 
 #ifdef FFTW_SUPPORT
     plan =  rfftw_create_plan(512, FFTW_REAL_TO_COMPLEX, FFTW_ESTIMATE);
 #endif
-	startColor 	= QColor(0,0,255);
-	targetColor = QColor(255,0,0); 
-	
-	
+    startColor = QColor(0,0,255);
+    targetColor = QColor(255,0,0); 
+
+    show();
 }
 
 Gears::~Gears()
@@ -460,7 +447,6 @@ Gears::~Gears()
 
 void Gears::resize(const QSize &newsize)
 {
-
     size = newsize;
     scale.setMax(192, size.width() / analyzerBarWidth);
 
@@ -468,15 +454,15 @@ void Gears::resize(const QSize &newsize)
     int i = 0, w = 0;
     for (; (unsigned) i < rects.count(); i++, w += analyzerBarWidth)
     {
-		rects[i].setRect(w, size.height() / 2, analyzerBarWidth - 1, 1);
-	}
+        rects[i].setRect(w, size.height() / 2, analyzerBarWidth - 1, 1);
+    }
 
     int os = magnitudes.size();
     magnitudes.resize( scale.range() * 2 );
     for (; (unsigned) os < magnitudes.size(); os++)
     {
-		magnitudes[os] = 0.0;
-	}
+        magnitudes[os] = 0.0;
+    }
 
     scaleFactor = double( size.height() / 2 ) / log( 512.0 );
 }
@@ -494,17 +480,17 @@ bool Gears::process(VisualNode *node)
 
     if (node) 
     {
-		i = node->length;
-		fast_real_set_from_short(lin, node->left, node->length);
-		if (node->right)
-		{
-	    	fast_real_set_from_short(rin, node->right, node->length);
-	    }
+        i = node->length;
+        fast_real_set_from_short(lin, node->left, node->length);
+        if (node->right)
+        {
+            fast_real_set_from_short(rin, node->right, node->length);
+        }
     } 
     else
-	{
-		i = 0;
-	}
+    {
+        i = 0;
+    }
 
     fast_reals_set(lin + i, rin + i, 0, 512 - i);
 
@@ -514,60 +500,60 @@ bool Gears::process(VisualNode *node)
     index = 1;
     for (i = 0; i < rects.count(); i++, w += analyzerBarWidth)
     {
-		magL = (log(lout[index] * lout[index] + lout[512 - index] * lout[512 - index]) - 22.0) * scaleFactor;
-		magR = (log(rout[index] * rout[index] + rout[512 - index] * rout[512 - index]) - 22.0) * scaleFactor;
+        magL = (log(lout[index] * lout[index] + lout[512 - index] * lout[512 - index]) - 22.0) * scaleFactor;
+        magR = (log(rout[index] * rout[index] + rout[512 - index] * rout[512 - index]) - 22.0) * scaleFactor;
 
-		if (magL > size.height() / 2)
-		{
-			magL = size.height() / 2;
-		}
-		if (magL < magnitudesp[i])
-		{
-			tmp = magnitudesp[i] - falloff;
-			if ( tmp < magL )
-			{
-				tmp = magL;
-			}
-		    magL = tmp;
-		}
-		if (magL < 1.)
-		{
-			magL = 1.;
-		}
+        if (magL > size.height() / 2)
+        {	
+            magL = size.height() / 2;
+        }
+        if (magL < magnitudesp[i])
+        {
+            tmp = magnitudesp[i] - falloff;
+            if ( tmp < magL )
+            {
+                tmp = magL;
+            }
+            magL = tmp;
+        }
+        if (magL < 1.)
+        {
+            magL = 1.;
+        }
 
-		if (magR > size.height() / 2)
-		{
-			magR = size.height() / 2;
-		}
-		if (magR < magnitudesp[i + scale.range()])
-		{
-			tmp = magnitudesp[i + scale.range()] - falloff;
-			if ( tmp < magR )
-			{
-				tmp = magR;
-			}
-			magR = tmp;
-		}
-		if (magR < 1.)
-		{
-			magR = 1.;
-		}
+        if (magR > size.height() / 2)
+        {
+            magR = size.height() / 2;
+        }
+        if (magR < magnitudesp[i + scale.range()])
+        {
+            tmp = magnitudesp[i + scale.range()] - falloff;
+            if ( tmp < magR )
+            {
+                tmp = magR;
+            }
+            magR = tmp;
+        }
+        if (magR < 1.)
+        {
+            magR = 1.;
+        }
 
-		if (magR != 1 || magL != 1)
-		{
-			allZero = FALSE;
-		}
+        if (magR != 1 || magL != 1)
+        {
+            allZero = FALSE;
+        }
 
-		magnitudesp[i] = magL;
-		magnitudesp[i + scale.range()] = magR;
+        magnitudesp[i] = magL;
+        magnitudesp[i + scale.range()] = magR;
 
-		rectsp[i].setTop( size.height() / 2 - int( magL ) );
-		rectsp[i].setBottom( size.height() / 2 + int( magR ) );
+        rectsp[i].setTop( size.height() / 2 - int( magL ) );
+        rectsp[i].setBottom( size.height() / 2 + int( magR ) );
 
-		index = scale[i];
+        index = scale[i];
     }
 #else
-	node = node;
+    node = node;
 #endif
     return allZero;
 
@@ -575,25 +561,18 @@ bool Gears::process(VisualNode *node)
 
 bool Gears::draw(QPainter *p, const QColor &back)
 {
-
-	updateGL();
-	p->fillRect(0, 0, 1, 1, back);	// argh   -Wall
+    updateGL();
+    p->fillRect(0, 0, 1, 1, back);
     return false;
-    p->fillRect(0, 0, size.width(), size.height(), back);
-	p->setPen(Qt::white);
-	p->setFont(QFont("Helvetica", 20));
-    p->drawText(size.width() / 2 - 200, size.height() / 2 - 20, 400, 20, Qt::AlignCenter, "Visualization requires FFT and OpenGL libraries");
-    p->drawText(size.width() / 2 - 200, size.height() / 2, 400, 20, Qt::AlignCenter, "Did you run configure?");
-	return true;
 }
 
 void Gears::drawTheGears()
 {
     angle += 2.0;	
     view_roty += 1.0;
-	//view_rotx += 1.0;
+    //view_rotx += 1.0;
 
-	float spreader = 3.0 - ((rects[2].top() / 255.0) * 3.0);
+    float spreader = 3.0 - ((rects[2].top() / 255.0) * 3.0);
 	
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
@@ -602,7 +581,7 @@ void Gears::drawTheGears()
     glRotatef( view_roty, 0.0, 1.0, 0.0 );
     glRotatef( view_rotz, 0.0, 0.0, 1.0 );
 
-	glTranslatef(0.0, 2.0, 0.0);
+    glTranslatef(0.0, 2.0, 0.0);
 
     glPushMatrix();
 //    glTranslatef( -3.0, -2.0, 0.0 );
@@ -628,9 +607,6 @@ void Gears::drawTheGears()
 
     glPopMatrix();
 }
-
-
-
 
 void Gears::initializeGL()
 {
@@ -681,11 +657,21 @@ void Gears::resizeGL( int width, int height )
     glTranslatef( 0.0, 0.0, -40.0 );
 }
 
-
 void Gears::paintGL()
 {
     drawTheGears();
 }
 
+const QString &GearsFactory::name(void) const
+{
+    static QString name("Gears");
+    return name;
+}
+
+VisualBase *GearsFactory::create(MainVisual *parent, long int winid)
+{
+    (void)winid;
+    return new Gears(parent);
+}
 
 #endif

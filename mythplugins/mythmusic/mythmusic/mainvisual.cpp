@@ -31,8 +31,13 @@
 
 #include <mythtv/mythcontext.h>
 
+#include <iostream>
+using namespace std;
+
+static QPtrList<VisFactory> *visfactories = 0;
+
 MainVisual::MainVisual(QWidget *parent, const char *name)
-    : QDialog( parent, name ), vis( 0 ), playing( FALSE ), fps( 30 )
+    : QDialog( parent, name ), vis( 0 ), playing( FALSE ), fps( 20 )
 {
     int screenwidth = 0, screenheight = 0;
     float wmult = 0, hmult = 0;
@@ -66,30 +71,10 @@ void MainVisual::setVisual( const QString &visualname )
 
     if(visualname == "Random")
     {
-#ifdef OPENGL_SUPPORT
-        int i = rand() % 3;
-#else
-        int i = rand() % 2;
-#endif
-        if(i == 0)
-            newvis = new Spectrum;
-#ifdef OPENGL_SUPPORT
-        else if(i == 1)
-            newvis = new Gears(this);
-#endif
-        else
-            newvis = new Synaesthesia;
+        newvis = randomVis(this, winId());
     }
-#ifdef OPENGL_SUPPORT
-    else if(visualname == "Gears")
-        newvis = new Gears(this);
-#endif
-    else if (visualname == "Spectrum")
-        newvis = new Spectrum;
-    else if (visualname == "Synaesthesia")
-        newvis = new Synaesthesia;
-    else
-    	newvis = new Blank;
+    else 
+        newvis = createVis(visualname, this, winId());
     	
     setVis( newvis );
 }
@@ -105,6 +90,7 @@ void MainVisual::setVis( VisualBase *newvis )
     if ( vis )
     {
         vis->resize( size() );
+        fps = vis->getDesiredFPS();
     }
 
     // force an update
@@ -246,10 +232,76 @@ void MainVisual::hideEvent(QHideEvent *e)
     QDialog::hideEvent(e);
 }
 
-StereoScope::StereoScope()
-    : rubberband( true ), falloff( 1.0 ), fps( 30 )
+void MainVisual::registerVisFactory(VisFactory *vis)
 {
-    startColor = Qt::black;
+    visfactories->append(vis);
+}
+
+static void checkVisFactories(void)
+{
+    if (!visfactories)
+    {
+        visfactories = new QPtrList<VisFactory>;
+
+        MainVisual::registerVisFactory(new BlankFactory);
+
+        MainVisual::registerVisFactory(new MonoScopeFactory);
+        MainVisual::registerVisFactory(new StereoScopeFactory);
+        MainVisual::registerVisFactory(new SynaesthesiaFactory);
+        MainVisual::registerVisFactory(new SpectrumFactory);
+#ifdef OPENGL_SUPPORT
+        MainVisual::registerVisFactory(new GearsFactory);
+#endif
+    }
+}
+
+VisualBase *MainVisual::createVis(const QString &name, MainVisual *parent,
+                                  long int winid)
+{
+    checkVisFactories();
+
+    VisualBase *vis = 0;
+
+    VisFactory *fact = visfactories->first();
+    while (fact)
+    {
+        if (fact->name() == name)
+        {
+            vis = fact->create(parent, winid);
+            break;
+        }
+        fact = visfactories->next();
+    }
+
+    return vis;
+}
+
+VisualBase *MainVisual::randomVis(MainVisual *parent, long int winid)
+{
+    checkVisFactories();
+
+    VisualBase *vis = 0;
+
+    int numvis = visfactories->count() - 1;
+    int i = 1 + (int)((double)rand() / (RAND_MAX + 1.0) * numvis);
+
+    VisFactory *fact = visfactories->at(i);
+
+    if (fact)
+    {
+        vis = fact->create(parent, winid);
+    }    
+
+    return vis;
+}
+
+StereoScope::StereoScope()
+{
+    fps = 30;
+    rubberband = false;
+    falloff = 1.0;
+
+    startColor = Qt::green;
     targetColor = Qt::red;
 }
 
@@ -271,14 +323,17 @@ bool StereoScope::process( VisualNode *node )
 {
     bool allZero = TRUE;
     int i;
-    long s, index, indexTo, step = 512 / size.width();
+    long s, indexTo;
     double *magnitudesp = magnitudes.data();
     double valL, valR, tmpL, tmpR;
+    double index, step = 512.0 / size.width();
 
     if (node) {
 	index = 0;
 	for ( i = 0; i < size.width(); i++) {
-	    indexTo = index + step;
+	    indexTo = (int)(index + step);
+            if (indexTo == (int)(index))
+                indexTo = (int)(index + 1);
 
 	    if ( rubberband ) {
 		valL = magnitudesp[ i ];
@@ -304,7 +359,7 @@ bool StereoScope::process( VisualNode *node )
 	    } else
 		valL = valR = 0.;
 
-	    for (s = index; s < indexTo && s < node->length; s++) {
+	    for (s = (int)index; s < indexTo && s < node->length; s++) {
 		tmpL = ( ( node->left ?
 			   double( node->left[s] ) : 0.) *
 			 double( size.height() / 4 ) ) / 32768.;
@@ -327,7 +382,7 @@ bool StereoScope::process( VisualNode *node )
 	    magnitudesp[ i ] = valL;
 	    magnitudesp[ i + size.width() ] = valR;
 
-	    index = indexTo;
+	    index = index + step;
 	}
     } else if (rubberband) {
 	for ( i = 0; i < size.width(); i++) {
@@ -407,6 +462,7 @@ bool StereoScope::draw( QPainter *p, const QColor &back )
 	    b = 0;
 
 	p->setPen( QColor( int(r), int(g), int(b) ) );
+        p->setPen(Qt::red);
 	p->drawLine( i - 1, (int)((size.height() / 4) + magnitudesp[i - 1]),
 		     i, (int)((size.height() / 4) + magnitudesp[i]));
 
@@ -443,6 +499,7 @@ bool StereoScope::draw( QPainter *p, const QColor &back )
 	    b = 0;
 
 	p->setPen( QColor( int(r), int(g), int(b) ) );
+        p->setPen(Qt::red);
 	p->drawLine( i - 1, (int)((size.height() * 3 / 4) +
 		     magnitudesp[i + size.width() - 1]),
 		     i, (int)((size.height() * 3 / 4) + 
@@ -464,16 +521,20 @@ bool MonoScope::process( VisualNode *node )
 {       
     bool allZero = TRUE;
     int i;  
-    long s, index, indexTo, step = 512 / size.width();
+    long s, indexTo;
     double *magnitudesp = magnitudes.data();
     double val, tmp;
+
+    double index, step = 512.0 / size.width();
 
     if (node) 
     {
         index = 0;
         for ( i = 0; i < size.width(); i++) 
         {
-            indexTo = index + step;
+            indexTo = (int)(index + step);
+            if (indexTo == (int)index)
+                indexTo = (int)(index + 1);
 
             if ( rubberband ) 
             {
@@ -500,7 +561,7 @@ bool MonoScope::process( VisualNode *node )
                 val = 0.;
             }
 
-            for (s = index; s < indexTo && s < node->length; s++) 
+            for (s = (int)index; s < indexTo && s < node->length; s++) 
             {
                 tmp = ( double( node->left[s] ) +
                         (node->right ? double( node->right[s] ) : 0) *
@@ -520,7 +581,7 @@ bool MonoScope::process( VisualNode *node )
                 allZero = FALSE;
             }
             magnitudesp[ i ] = val;
-            index = indexTo;
+            index = index + step;
         }
     } 
     else if (rubberband) 
@@ -596,6 +657,32 @@ bool MonoScope::draw( QPainter *p, const QColor &back )
     }
 
     return true;
+}
+
+const QString &StereoScopeFactory::name(void) const
+{
+    static QString name("StereoScope");
+    return name;
+}
+
+VisualBase *StereoScopeFactory::create(MainVisual *parent, long int winid)
+{
+    (void)parent;
+    (void)winid;
+    return new StereoScope();
+}
+
+const QString &MonoScopeFactory::name(void) const
+{
+    static QString name("MonoScope");
+    return name;
+}
+
+VisualBase *MonoScopeFactory::create(MainVisual *parent, long int winid)
+{
+    (void)parent;
+    (void)winid;
+    return new MonoScope();
 }
 
 LogScale::LogScale(int maxscale, int maxrange)
