@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-08-18, v2.57
+<date>2003-08-19, v2.58
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -79,6 +79,7 @@ The contributors to MythTV are:<label id="contributors">
 <item>Overall structure of HOWTO and Mandrake 9.x documentation: Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
 <item>Red Hat Linux 8.0 documentation: Cedar McKay, <url url="mailto:mythhowto.3.ohthetrees@spamgourmet.com">
 <item>Gentoo documentation and package: Tony Clark, <url url="mailto:tclark@telia.com">
+<item>Gentoo documentation and package: Max Kalika, <url url="mailto:max@gentoo.org">
 <item>Debian package: Matthew Zimmerman, <url url="mailto:mdz@debian.org">
 <item>Mandrake 8.2 documentation: Harondel J. Sibble, <url url="mailto:help@pdscc.com">
 <item>Mandrake 9.0 and 9.1 packages: Thac, <url url="mailto:thac@nyvalls.se">
@@ -721,23 +722,19 @@ id="Setting_up_paths" name="section">.
 <tt>/etc/make.conf</tt> and locate the "USE" variable. If the line is
 commented out, remove the comment. The line should have at least:
 <tscreen><verb>
-USE="mysql qt alsa"
+USE="mysql alsa"
 </verb></tscreen>
 Next you need to build Qt. If you don't plan on using the ebuilds as 
 described in the Gentoo section then you also need to install lame.
 <tscreen><verb>
-$ emerge qt lame mysql
+# emerge lame mysql qt
 </verb></tscreen>
 <p>If you have already installed Qt: you will need to rebuild because the
 default installation doesn't include mysql support, a requirement for MythTV.  
-To enable SQL support, add "mysql qt" to your USE variable in 
+To enable SQL support, add "mysql" to your USE variable in 
 <tt>/etc/make.conf</tt> and rebuild Qt by running
 <tscreen><verb>
-$ emerge qt
-</verb></tscreen>
-Install MySQL if this is the master system:
-<tscreen><verb>
-$ emerge mysql
+# emerge qt
 </verb></tscreen>
 
 All the necessary files will be downloaded and built. Even on a fast machine
@@ -1055,31 +1052,20 @@ $ su
 the MythTV directory that you <tt>cd</tt>'d to above.
 
 <sect1>Gentoo. <label id="Gentoo_build">
-<p>Installation of MythTV on Gentoo consists of making a local portage
-directory with the necessary ebuild and digest files.  Tony Clark <url
-url="mailto:tclark@telia.net"> has
-created a portage file which can be downloaded from
-<url url="http://smalltime.com/mythtv/mythtv-gentoo-portage.tar.bz2"
-name="http://smalltime.com/mythtv/mythtv-gentoo-portage.tar.bz2">
+<p>Installation of MythTV on Gentoo consists of simply emerging the desired
+ebuild because all of the packages are now part of the official Portage tree.
 
-Once you have downloaded the portage file, installation is simple.
 <tscreen><verb>
 $ su -
-# emerge rsync # make sure portage is up to date.
-# cd /usr/local
-# tar xvfjp Path_To/mythtv-gentoo-portage.tar.bz2
+# emerge --sync # make sure portage is up to date.
 # vi /etc/make.conf
 </verb></tscreen>
 
 Add mysql to your USE variable.  i.e. <tt>USE="mysql ...."</tt>
 
-Locate the line that contains: <tt>#/usr/local/portage</tt> and remove the #
 <tscreen><verb>
 # ACCEPT_KEYWORDS="~x86" emerge mythtv
 </verb></tscreen>
-
-<bf>NOTE</bf>: If you have perl dependency problems update to >=ExtUtils-MakeMaker-6.05-r4
-
 
 <sect>MySQL.<label id="mysql">
 <sect1>Mandrake 9.0
@@ -1428,7 +1414,7 @@ build process.
 <sect1>Gentoo
 <p>To install lirc on Gentoo, all you need to do is:
 <tscreen><verb>
-$ emerge lirc
+# emerge lirc
 </verb></tscreen>
 
 <sect1>Mandrake 9.0
@@ -4200,7 +4186,7 @@ More information on saving the mysql database.
 v2.23, 2003-04-28.  XMLTV version.  mythbackend startup as a daemon.
 Normalized spacing between tscreen tag and text.
 v2.24, 2003-04-28.  canada-cable.
-v2.25, 2003-04-29.  Additional btaudio card.  Added instructions for gentoo
+v2.25, 2003-04-29.  Additional btaudio card.  Added instructions for Gentoo
 mythbackend auto-start.
 v2.26, 2003-04-29.  Debugging info for threads.  Get rid of videodev2.h
 instructions; it's now in the Myth CVS.  Remove gist.com; they've shutdown. 
@@ -4278,6 +4264,7 @@ remote option to lirc section.
 v2.56, 2003-08-03.  version 2^8.  ATI All-in-Wonder doesn't work as a capture
 device, so quit asking.  Don't use a FAT filesystem and expect things to
 magically work when creating a 2GB file.
+v2.58, 2003-08-19.  Gentoo updates from Max Kalika <max@gentoo.org>.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

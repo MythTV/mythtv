@@ -217,8 +217,8 @@ $ su
 <P>Unpack MythTV
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf mythtv-0.10.tar.bz2
-$ cd mythtv-0.10
+$ tar -xjf mythtv-0.11.tar.bz2
+$ cd mythtv-0.11
 $ ./configure
 $ make
 </PRE>
@@ -252,32 +252,25 @@ the MythTV directory that you <CODE>cd</CODE>'d to above.</P>
 <H2><A NAME="Gentoo_build"></A> <A NAME="ss5.5">5.5</A> <A HREF="mythtv-HOWTO.html#toc5.5">Gentoo. </A>
 </H2>
 
-<P>Installation of MythTV on Gentoo consists of making a local portage
-directory with the necessary ebuild and digest files.  Tony Clark 
-<A HREF="mailto:tclark@telia.net">mailto:tclark@telia.net</A> has
-created a portage file which can be downloaded from
-<A HREF="http://smalltime.com/mythtv/mythtv-gentoo-portage.tar.bz2">http://smalltime.com/mythtv/mythtv-gentoo-portage.tar.bz2</A></P>
-<P>Once you have downloaded the portage file, installation is simple.
+<P>Installation of MythTV on Gentoo consists of simply emerging the desired
+ebuild because all of the packages are now part of the official Portage tree.</P>
+<P>
 <BLOCKQUOTE><CODE>
 <PRE>
 $ su -
-# emerge rsync # make sure portage is up to date.
-# cd /usr/local
-# tar xvfjp Path_To/mythtv-gentoo-portage.tar.bz2
+# emerge --sync # make sure portage is up to date.
 # vi /etc/make.conf
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
 <P>Add mysql to your USE variable.  i.e. <CODE>USE="mysql ...."</CODE></P>
-<P>Locate the line that contains: <CODE>#/usr/local/portage</CODE> and remove the #
+<P>
 <BLOCKQUOTE><CODE>
 <PRE>
 # ACCEPT_KEYWORDS="~x86" emerge mythtv
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P><B>NOTE</B>: If you have perl dependency problems update to >=ExtUtils-MakeMaker-6.05-r4</P>
-
 
 <HR>
 <A HREF="mythtv-HOWTO-6.html">Next</A>

@@ -679,7 +679,7 @@ everything already installed
 commented out, remove the comment. The line should have at least:
 <BLOCKQUOTE><CODE>
 <PRE>
-USE="mysql qt alsa"
+USE="mysql alsa"
 </PRE>
 </CODE></BLOCKQUOTE>
 
@@ -687,24 +687,17 @@ Next you need to build Qt. If you don't plan on using the ebuilds as
 described in the Gentoo section then you also need to install lame.
 <BLOCKQUOTE><CODE>
 <PRE>
-$ emerge qt lame mysql
+# emerge lame mysql qt
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
 <P>If you have already installed Qt: you will need to rebuild because the
 default installation doesn't include mysql support, a requirement for MythTV.  
-To enable SQL support, add "mysql qt" to your USE variable in 
+To enable SQL support, add "mysql" to your USE variable in 
 <CODE>/etc/make.conf</CODE> and rebuild Qt by running
 <BLOCKQUOTE><CODE>
 <PRE>
-$ emerge qt
-</PRE>
-</CODE></BLOCKQUOTE>
-
-Install MySQL if this is the master system:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ emerge mysql
+# emerge qt
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>

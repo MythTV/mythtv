@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2003-08-03, v2.56
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2003-08-19, v2.58
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -260,6 +260,8 @@ American environment.  See the website at
 <A HREF="mailto:mythhowto.3.ohthetrees@spamgourmet.com">mailto:mythhowto.3.ohthetrees@spamgourmet.com</A></LI>
 <LI>Gentoo documentation and package: Tony Clark, 
 <A HREF="mailto:tclark@telia.com">mailto:tclark@telia.com</A></LI>
+<LI>Gentoo documentation and package: Max Kalika, 
+<A HREF="mailto:max@gentoo.org">mailto:max@gentoo.org</A></LI>
 <LI>Debian package: Matthew Zimmerman, 
 <A HREF="mailto:mdz@debian.org">mailto:mdz@debian.org</A></LI>
 <LI>Mandrake 8.2 documentation: Harondel J. Sibble, 
@@ -938,7 +940,7 @@ everything already installed
 commented out, remove the comment. The line should have at least:
 <BLOCKQUOTE><CODE>
 <PRE>
-USE="mysql qt alsa"
+USE="mysql alsa"
 </PRE>
 </CODE></BLOCKQUOTE>
 
@@ -946,24 +948,17 @@ Next you need to build Qt. If you don't plan on using the ebuilds as
 described in the Gentoo section then you also need to install lame.
 <BLOCKQUOTE><CODE>
 <PRE>
-$ emerge qt lame mysql
+# emerge lame mysql qt
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
 <P>If you have already installed Qt: you will need to rebuild because the
 default installation doesn't include mysql support, a requirement for MythTV.  
-To enable SQL support, add "mysql qt" to your USE variable in 
+To enable SQL support, add "mysql" to your USE variable in 
 <CODE>/etc/make.conf</CODE> and rebuild Qt by running
 <BLOCKQUOTE><CODE>
 <PRE>
-$ emerge qt
-</PRE>
-</CODE></BLOCKQUOTE>
-
-Install MySQL if this is the master system:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ emerge mysql
+# emerge qt
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -1308,8 +1303,8 @@ $ su
 <P>Unpack MythTV
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf mythtv-0.10.tar.bz2
-$ cd mythtv-0.10
+$ tar -xjf mythtv-0.11.tar.bz2
+$ cd mythtv-0.11
 $ ./configure
 $ make
 </PRE>
@@ -1343,32 +1338,25 @@ the MythTV directory that you <CODE>cd</CODE>'d to above.</P>
 <H2><A NAME="Gentoo_build"></A> <A NAME="ss5.5">5.5</A> <A HREF="#toc5.5">Gentoo. </A>
 </H2>
 
-<P>Installation of MythTV on Gentoo consists of making a local portage
-directory with the necessary ebuild and digest files.  Tony Clark 
-<A HREF="mailto:tclark@telia.net">mailto:tclark@telia.net</A> has
-created a portage file which can be downloaded from
-<A HREF="http://smalltime.com/mythtv/mythtv-gentoo-portage.tar.bz2">http://smalltime.com/mythtv/mythtv-gentoo-portage.tar.bz2</A></P>
-<P>Once you have downloaded the portage file, installation is simple.
+<P>Installation of MythTV on Gentoo consists of simply emerging the desired
+ebuild because all of the packages are now part of the official Portage tree.</P>
+<P>
 <BLOCKQUOTE><CODE>
 <PRE>
 $ su -
-# emerge rsync # make sure portage is up to date.
-# cd /usr/local
-# tar xvfjp Path_To/mythtv-gentoo-portage.tar.bz2
+# emerge --sync # make sure portage is up to date.
 # vi /etc/make.conf
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
 <P>Add mysql to your USE variable.  i.e. <CODE>USE="mysql ...."</CODE></P>
-<P>Locate the line that contains: <CODE>#/usr/local/portage</CODE> and remove the #
+<P>
 <BLOCKQUOTE><CODE>
 <PRE>
 # ACCEPT_KEYWORDS="~x86" emerge mythtv
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P><B>NOTE</B>: If you have perl dependency problems update to >=ExtUtils-MakeMaker-6.05-r4</P>
-
 
 <H2><A NAME="mysql"></A> <A NAME="s6">6.</A> <A HREF="#toc6">MySQL.</A></H2>
 
@@ -1469,11 +1457,11 @@ version of MythTV, or because you're moving from one release to another,
 you'll need to run the appropriate <B>mysql</B> script found in
 the <CODE>database/</CODE> directory.  Use the same format as above, replacing
 "mc.sql" with the appropriate .sql file:</P>
-<P>So, if you're upgrading from MythTV 0.9 to 0.10 on a Mandrake system:
+<P>So, if you're upgrading from MythTV 0.10 to 0.11 on a Mandrake system:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ cd database
-$ mysql -u root &lt; 0.9-to-0.10.sql
+$ mysql -u root &lt; 0.10-to-0.11.sql
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -1772,7 +1760,7 @@ build process. </P>
 <P>To install lirc on Gentoo, all you need to do is:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ emerge lirc
+# emerge lirc
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -2080,7 +2068,7 @@ receiver.</P>
 to control MythTV.
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd ~/mythtv-0.10/configfiles
+$ cd ~/mythtv-0.11/configfiles
 $ cp lircrc.example ~/.lircrc
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -2616,7 +2604,7 @@ $ crontab -l  NOTE: this is a lowercase L.
 # Need to use a shell script because the QTDIR environment variable isn't
 # being honored by crontab?
 # The next text should be all on the same line.
-30 04 * * * /bin/bash $HOME/mythtv-0.10/configfiles/mythfilldatabasecron
+30 04 * * * /bin/bash $HOME/mythtv-0.11/configfiles/mythfilldatabasecron
 $ 
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -2833,8 +2821,8 @@ Mandrake Control Center.</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf mythweb-0.10.tar.bz2
-$ cd mythweb-0.10
+$ tar -xjf mythweb-0.11.tar.bz2
+$ cd mythweb-0.11
 $ su
 # mkdir /var/www/html/mythweb
 # cp -r . /var/www/html/mythweb
@@ -2861,8 +2849,8 @@ operational.</P>
 it.
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf mythgallery-0.10.tar.bz2
-$ cd mythgallery-0.10
+$ tar -xjf mythgallery-0.11.tar.bz2
+$ cd mythgallery-0.11
 $ make
 # su
 # make install
@@ -3275,8 +3263,8 @@ will be rebuilt as you use CDs.</P>
 <H2><A NAME="s16">16.</A> <A HREF="#toc16">MythWeather.</A></H2>
 
 <P>The MythWeather module will obtain the weather information for the
-location that you specify.  You must be running MythTV v0.10 in order to use
-MythWeather.</P>
+location that you specify.  You must be running MythTV v0.10 or later 
+in order to use MythWeather.</P>
 <P>
 <HR>
 <PRE>
@@ -4024,10 +4012,10 @@ restart X.</P>
 
 <H3>MythTV Dimensions</H3>
 
-<P>In 0.10, from "mythfrontend" go to Setup->Appearance.  The default for the
-height and width on 0.10 is "0" - this will cause MythTV to automatically
-size itself to full screen. To ensure that your new dimension settings take
-effect, exit and restart MythTV.</P>
+<P>In 0.10 and later, from "mythfrontend" go to Setup->Appearance.
+The default for the height and width is "0" - this will cause
+MythTV to automatically size itself to full screen. To ensure that
+your new dimension settings take effect, exit and restart MythTV.</P>
 <P><B>NOTE</B>: When the GUI is full screen, you may need to set your window
 manager to 'Click to Focus' for windows to stack properly.</P>
 <P>The fonts for the GUI and OSD will scale to whatever sizes you use. Most
