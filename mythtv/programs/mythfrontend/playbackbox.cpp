@@ -1053,13 +1053,13 @@ void PlaybackBox::killPlayer(void)
 
     if (nvp)
     {
-        QDateTime curtime = QDateTime::currentDateTime();
-        curtime = curtime.addSecs(2);
+        QTime timeout;
+        timeout.start();
 
         ignoreevents = true;
         while (!nvp->IsPlaying())
         {
-            if (QDateTime::currentDateTime() > curtime)
+            if (timeout.elapsed() > 2000)
             {
                 cerr << "Took too long to start playing\n";
                 break;
@@ -1069,13 +1069,12 @@ void PlaybackBox::killPlayer(void)
             usleep(50);
             qApp->lock();
         }
-        curtime = QDateTime::currentDateTime();
-        curtime = curtime.addSecs(2);
+        timeout.restart();
 
         rbuffer->Pause();
         while (!rbuffer->isPaused())
         {
-            if (QDateTime::currentDateTime() > curtime)
+            if (timeout.elapsed() > 2000)
             {
                 cerr << "Took too long to pause ringbuffer\n";
                 break;
@@ -1090,7 +1089,7 @@ void PlaybackBox::killPlayer(void)
 
         while (nvp->IsPlaying())
         {
-            if (QDateTime::currentDateTime() > curtime)
+            if (timeout.elapsed() > 2000)
             {
                 cerr << "Took too long to stop playing\n";
                 break;
@@ -1139,14 +1138,14 @@ void PlaybackBox::startPlayer(ProgramInfo *rec)
  
         pthread_create(&decoder, NULL, SpawnDecoder, nvp);
 
-        QDateTime curtime = QDateTime::currentDateTime();
-        curtime = curtime.addSecs(2);
+        QTime timeout;
+        timeout.start();
  
         ignoreevents = true;
 
         while (nvp && !nvp->IsPlaying())
         {
-            if (QDateTime::currentDateTime() > curtime)
+            if (timeout.elapsed() > 2000)
                 break;
             usleep(50);
             qApp->unlock();

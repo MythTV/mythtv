@@ -42,9 +42,11 @@ enum VerboseMask {
 };
 
 #define VERBOSE(mask,args...) \
+do { \
 if ((print_verbose_messages & mask) != 0) \
     cout << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") \
-         << " " << args << endl;
+         << " " << args << endl; \
+} while (0)
 
 class MythEvent : public QCustomEvent
 {

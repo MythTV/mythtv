@@ -158,8 +158,7 @@ void MainServer::readSocket(void)
 
         if (!prt)
         {
-            cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-                 << " waiting for a thread.." << endl;
+            VERBOSE(VB_ALL, "waiting for a thread..");
             usleep(50);
         }
     }
@@ -186,8 +185,7 @@ void MainServer::ProcessRequest(QSocket *sock)
     if (command == "ANN")
     {
         if (tokens.size() < 3 || tokens.size() > 4)
-            cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-                 << " Bad ANN query" << endl;
+            VERBOSE(VB_ALL, "Bad ANN query");
         else
             HandleAnnounce(listline, tokens, sock);
         return;
@@ -201,16 +199,14 @@ void MainServer::ProcessRequest(QSocket *sock)
     PlaybackSock *pbs = getPlaybackBySock(sock);
     if (!pbs)
     {
-        cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-             << " Unknown socket" << endl;
+        VERBOSE(VB_ALL, "unknown socket");
         return;
     }
 
     if (command == "QUERY_RECORDINGS")
     {
         if (tokens.size() != 2)
-            cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-                 << " Bad QUERY_RECORDINGS query" << endl;
+            VERBOSE(VB_ALL, "Bad QUERY_RECORDINGS query");
         else
             HandleQueryRecordings(tokens[1], pbs);
     }
@@ -262,8 +258,7 @@ void MainServer::ProcessRequest(QSocket *sock)
     else if (command == "QUERY_GETCONFLICTING")
     {
         if (tokens.size() != 2)
-            cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-                 << " Bad QUERY_GETCONFLICTING" << endl;
+            VERBOSE(VB_ALL, "Bad QUERY_GETCONFLICTING");
         else
             HandleGetConflictingRecordings(listline, tokens[1], pbs);
     }
@@ -274,16 +269,14 @@ void MainServer::ProcessRequest(QSocket *sock)
     else if (command == "QUERY_RECORDER")
     {
         if (tokens.size() != 2)
-            cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-                 << " Bad QUERY_RECORDER" << endl;
+            VERBOSE(VB_ALL, "Bad QUERY_RECORDER");
         else
             HandleRecorderQuery(listline, tokens, pbs);
     }
     else if (command == "QUERY_REMOTEENCODER")
     {
         if (tokens.size() != 2)
-            cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-                 << " Bad QUERY_REMOTEENCODER" << endl;
+            VERBOSE(VB_ALL, "Bad QUERY_REMOTEENCODER");
         else
             HandleRemoteEncoder(listline, tokens, pbs);
     }
@@ -298,8 +291,7 @@ void MainServer::ProcessRequest(QSocket *sock)
     else if (command == "QUERY_FILETRANSFER")
     {
         if (tokens.size() != 2)
-            cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-                 << " Bad QUERY_FILETRANSFER" << endl;
+            VERBOSE(VB_ALL, "Bad QUERY_FILETRANSFER");
         else
             HandleFileTransferQuery(listline, tokens, pbs);
     }
@@ -326,16 +318,14 @@ void MainServer::ProcessRequest(QSocket *sock)
     else if (command == "FREE_TUNER")
     {
         if (tokens.size() != 2)
-            cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-                 << " Bad FREE_TUNER query" << endl;
+            VERBOSE(VB_ALL, "Bad FREE_TUNER query");
         else
             HandleFreeTuner(tokens[1].toInt(), pbs);
     }
     else if (command == "QUERY_IS_ACTIVE_BACKEND")
     {
         if (tokens.size() != 1)
-            cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-                 << " Bad QUERY_IS_ACTIVE_BACKEND" << endl;
+            VERBOSE(VB_ALL, "Bad QUERY_IS_ACTIVE_BACKEND");
         else
             HandleIsActiveBackendQuery(listline, pbs);
         
@@ -343,8 +333,7 @@ void MainServer::ProcessRequest(QSocket *sock)
     else if (command == "SHUTDOWN_NOW")
     {
         if (tokens.size() != 1)
-            cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-                 << " Bad SHUTDOWN_NOW request" << endl;
+            VERBOSE(VB_ALL, "Bad SHUTDOWN_NOW query");
         else if (!ismaster)
         {
             VERBOSE(VB_ALL, "Going down now as of Mainserver request!");
@@ -360,10 +349,7 @@ void MainServer::ProcessRequest(QSocket *sock)
         gContext->dispatch(me);
     }
     else
-    {
-        cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-             << " unknown command: " << command << endl;
-    }
+        VERBOSE(VB_ALL, "Unknown command: " + command);
 }
 
 void MainServer::MarkUnused(ProcessRequestThread *prt)
@@ -437,17 +423,15 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
     {
         bool wantevents = commands[3].toInt();
         VERBOSE(VB_GENERAL, "MainServer::HandleAnnounce Playback");
-        cout << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") 
-             << " adding: " << commands[2] << " as a player " 
-             << wantevents << endl;
+        VERBOSE(VB_ALL, QString("adding: %1 as a client (events: %2)")
+                               .arg(commands[2]).arg(wantevents));
         PlaybackSock *pbs = new PlaybackSock(socket, commands[2], wantevents);
         playbackList.push_back(pbs);
     }
     else if (commands[1] == "SlaveBackend")
     {
-        cout << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") 
-             << " adding: " << commands[2] << " as a slave backend server" 
-             << endl;
+        VERBOSE(VB_ALL, QString("adding: %1 as a slave backend server")
+                               .arg(commands[2]));
         PlaybackSock *pbs = new PlaybackSock(socket, commands[2], false);
         pbs->setAsSlaveBackend();
         pbs->setIP(commands[3]);
@@ -468,16 +452,15 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
     }
     else if (commands[1] == "RingBuffer")
     {
-        cout << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-             << " adding: " << commands[2] << " as a remote ringbuffer" << endl;
+        VERBOSE(VB_ALL, QString("adding: %1 as a remote ringbuffer")
+                               .arg(commands[2]));
         ringBufList.push_back(socket);
         int recnum = commands[3].toInt();
 
         QMap<int, EncoderLink *>::Iterator iter = encoderList->find(recnum);
         if (iter == encoderList->end())
         {
-            cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-                 << " Unknown encoder." << endl;
+            VERBOSE(VB_ALL, "Unknown encoder.");
             exit(0);
         }
 
@@ -521,24 +504,25 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
                     if (dsp_status != -1)
                     {
                         if (!(soundcardcaps & DSP_CAP_DUPLEX))
-                            cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-                                 << " WARNING:  Capture device " << audiodevice 
-                                 << " is not reporting full duplex "
-                                 << "capability.\nSee docs/mythtv-HOWTO, "
-                                 << "section 20.13 for more information." << endl;
+                            VERBOSE(VB_ALL, QString(" WARNING:  Capture device"
+                                                    " %1 is not reporting full "
+                                                    "duplex capability.\nSee "
+                                                    "docs/mythtv-HOWTO, section"
+                                                    " 20.13 for more "
+                                                    "information.")
+                                                    .arg(audiodevice));
                     }
                     else 
-                        cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-                             << " Could not get capabilities for "
-                             << "audio device: " << audiodevice << endl;
+                        VERBOSE(VB_ALL, QString("Could not get capabilities for"
+                                                " audio device: %1")
+                                               .arg(audiodevice));
                     close(dsp_fd);
                 }
                 else 
                 {
-                    cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-                         << " Could not open audio device: " 
-                         << audiodevice << endl;
                     perror("open");
+                    VERBOSE(VB_ALL, QString("Could not open audio device: %1")
+                                           .arg(audiodevice));
                 }
             }
         }
@@ -546,9 +530,8 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
     else if (commands[1] == "FileTransfer")
     {
         VERBOSE(VB_GENERAL, "MainServer::HandleAnnounce FileTransfer");
-        cout << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-             << " adding: " << commands[2] << " as a remote file transfer"
-             << endl;
+        VERBOSE(VB_ALL, QString("adding: %1 as a remote file transfer")
+                               .arg(commands[2]));
         QUrl qurl = slist[1];
         QString filename = LocalFilePath(qurl);
 
@@ -684,9 +667,9 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             {
                 if (!slave)
                 {
-                    cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-                         << " Couldn't find backend for: " << proginfo->title
-                         << " : " << proginfo->subtitle << endl;
+                    VERBOSE(VB_ALL, QString("Couldn't find backend for: %1 : "
+                                            "%2").arg(proginfo->title)
+                                                 .arg(proginfo->subtitle));
                     proginfo->filesize = 0;
                     proginfo->pathname = "file not found";
                 }
@@ -1069,12 +1052,7 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
     QSqlQuery query = m_db->exec(thequery);
 
     if (!query.isActive())
-    {
-        cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-             << " DB Error: recorded program deletion failed, SQL query "
-             << "was:" << endl;
-        cerr << thequery << endl;
-    }
+        MythContext::DBError("Recorded program deletion", query);
 
     // now delete any markups for this program
     thequery = QString("DELETE FROM recordedmarkup WHERE chanid = %1 "
@@ -1083,12 +1061,7 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
 
     query = m_db->exec(thequery);
     if (!query.isActive())
-    {
-        cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-             << " DB Error: recorded program deletion failed, SQL query "
-             << "was:" << endl;
-        cerr << thequery << endl;
-    }
+        MythContext::DBError("Recorded program deletion (2)", query);
 
     dblock.unlock();
 
@@ -1110,8 +1083,8 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
     }
     else
     {
-        cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-             << " Strange.  File: " << filename << " doesn't exist." << endl;
+        VERBOSE(VB_ALL, QString("Strange, file: %1 doesn't exist.")
+                               .arg(filename));
 
         if (pbssock)
         {
@@ -1382,8 +1355,7 @@ void MainServer::HandleFreeTuner(int cardid, PlaybackSock *pbs)
     QMap<int, EncoderLink *>::Iterator iter = encoderList->find(cardid);
     if (iter == encoderList->end())
     {
-        cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-        << " Unknown encoder " << cardid << endl;
+        VERBOSE(VB_ALL, QString("Unknown encoder: %1").arg(cardid));
         strlist << "FAILED";
     }
     else
@@ -1482,8 +1454,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     QMap<int, EncoderLink *>::Iterator iter = encoderList->find(recnum);
     if (iter == encoderList->end())
     {
-        cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-             << " Unknown encoder." << endl;
+        VERBOSE(VB_ALL, QString("Unknown encoder: %1").arg(recnum));
         QStringList retlist = "bad";
         SendResponse(pbssock, retlist);
         return;
@@ -1784,8 +1755,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     }
     else
     {
-        cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-             << " unknown command: " << command << endl;
+        VERBOSE(VB_ALL, QString("Unknown command: %1").arg(command));
         retlist << "ok";
     }
 
@@ -1802,8 +1772,7 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
     QMap<int, EncoderLink *>::Iterator iter = encoderList->find(recnum);
     if (iter == encoderList->end())
     {
-        cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-             << " Unknown encoder." << endl;
+        VERBOSE(VB_ALL, QString("Unknown encoder: %1").arg(recnum));
         exit(0);
     }
 
@@ -1884,8 +1853,8 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
     FileTransfer *ft = getFileTransferByID(recnum);
     if (!ft)
     {
-        cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-             << " Unknown file transfer socket" << endl;
+        VERBOSE(VB_ALL, QString("Unknown file transfer socket: %1")
+                               .arg(recnum));
         exit(0);
     }
 
@@ -1921,8 +1890,7 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
     }
     else 
     {
-        cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-             << " Unknown command: " << command << endl;
+        VERBOSE(VB_ALL, QString("Unknown command: %1").arg(command));
         retlist << "ok";
     }
 
@@ -2064,9 +2032,8 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
         PlaybackSock *slave = getSlaveByHostname(pginfo->hostname);
 
         if (!slave)
-            cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-                 << " Couldn't find backend for: " << pginfo->title
-                 << " : " << pginfo->subtitle << endl;
+            VERBOSE(VB_ALL, QString("Couldn't find backend for: %1 : %2")
+                                   .arg(pginfo->title).arg(pginfo->subtitle));
         else
             slave->GenPreviewPixmap(pginfo);
 
@@ -2078,9 +2045,8 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
 
     if (pginfo->hostname != gContext->GetHostName())
     {
-        cout << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-             << " Somehow we got a request to generate a preview pixmap for: "
-             << pginfo->hostname << endl;
+        VERBOSE(VB_ALL, QString("Got requested to generate preview pixmap "
+                                "for %1").arg(pginfo->hostname));
 
         QStringList outputlist = "BAD";
         SendResponse(pbssock, outputlist);
@@ -2132,9 +2098,8 @@ void MainServer::endConnection(QSocket *socket)
         {
             if (ismaster && (*it)->isSlaveBackend())
             {
-                cout << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-                     << " Slave backend: " << (*it)->getHostname() 
-                     << " has left the building\n";
+                VERBOSE(VB_ALL, QString("Slave backend: %1 has left the "
+                                        "building").arg((*it)->getHostname()));
 
                 QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
                 for (; iter != encoderList->end(); ++iter)
@@ -2200,8 +2165,7 @@ void MainServer::endConnection(QSocket *socket)
         }
     }
 
-    cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-         << " unknown socket" << endl;
+    VERBOSE(VB_ALL, "unknown socket");
 }
 
 PlaybackSock *MainServer::getSlaveByHostname(QString &hostname)
@@ -2337,9 +2301,8 @@ void MainServer::reconnectTimeout(void)
     QString server = gContext->GetSetting("MasterServerIP", "localhost");
     int port = gContext->GetNumSetting("MasterServerPort", 6543);
 
-    cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") 
-         << " - Connecting to master server: " << server << ":" << 
-            port << endl;
+    VERBOSE(VB_ALL, QString("Connecting to master server: %1:%2")
+                           .arg(server).arg(port));
 
     masterServerSock->connectToHost(server, port);
 
@@ -2352,8 +2315,7 @@ void MainServer::reconnectTimeout(void)
         num++;
         if (num > 100)
         {
-            cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-                 << " - Connection to master server timed out." << endl;
+            VERBOSE(VB_ALL, "Connection to master server timed out.");
             masterServerReconnect->start(1000, true);
             delete masterServerSock;
             return;
@@ -2362,15 +2324,13 @@ void MainServer::reconnectTimeout(void)
 
     if (masterServerSock->state() != QSocket::Connected)
     {
-        cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-             << " - Could not connect to master server." << endl;
+        VERBOSE(VB_ALL, "Could not connect to master server.");
         masterServerReconnect->start(1000, true);
         delete masterServerSock;
         return;
     }
 
-    cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") 
-         << " - Connected." << endl;
+    VERBOSE(VB_ALL, "Connected successfully");
 
     QString str = QString("ANN SlaveBackend %1 %2")
                           .arg(gContext->GetHostName())

@@ -457,7 +457,7 @@ int main(int argc, char **argv)
     QSqlDatabase *trandb = QSqlDatabase::database("TRANSDB");
     trans = new Transcoder(&tvList, trandb);
 
-    VERBOSE(VB_ALL, QString("%1 version: %2 GPL www.mythtv.org")
+    VERBOSE(VB_ALL, QString("%1 version: %2 www.mythtv.org")
                             .arg(binname).arg(MYTH_BINARY_VERSION));
 
     VERBOSE(VB_ALL, QString("Enabled verbose msgs :%1").arg(verboseString));

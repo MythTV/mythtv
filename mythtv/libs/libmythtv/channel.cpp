@@ -111,7 +111,7 @@ void Channel::SetFormat(const QString &format)
         {
             QString msg = QString("Probed: %1 - %2").arg(device)
                             .arg((char *)vin.name);
-            VERBOSE(VB_CHANNEL, msg)
+            VERBOSE(VB_CHANNEL, msg);
             channelnames[vin.index] = (char *)vin.name;
             inputChannel[vin.index] = "";
             inputTuneTo[vin.index] = "";

@@ -75,13 +75,13 @@ void AudioOutputOSS::Reconfigure(int laudio_bits, int laudio_channels,
     numbadioctls = 0;
     numlowbuffer = 0;
 
-    QDateTime curtime = QDateTime::currentDateTime();
-    curtime = curtime.addSecs(2);
-    
+    QTime timer;
+    timer.start();
+
     VERBOSE(VB_GENERAL, QString("Opening OSS audio device '%1'.")
             .arg(audiodevice));
     
-    while (QDateTime::currentDateTime() < curtime && audiofd == -1)
+    while (timer.elapsed() < 2000 && audiofd == -1)
     {
         audiofd = open(audiodevice.ascii(), O_WRONLY | O_NONBLOCK);
         if (audiofd < 0 && errno != EAGAIN && errno != EINTR)

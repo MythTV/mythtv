@@ -137,7 +137,8 @@ void startTV(void)
     QSqlDatabase *db = QSqlDatabase::database();
     TV *tv = new TV(db);
 
-    QDateTime timeout;
+    QTime timer;
+    timer.start();
 
     tv->Init();
 
@@ -154,13 +155,13 @@ void startTV(void)
 
     while (!quitAll)
     {
-        timeout = QDateTime::currentDateTime().addSecs(2);
+        timer.restart();
         while (tryRecorder)
         { //try to play recording, if filenotfound retry until timeout
 
             if (tv->PlayFromRecorder(tv->GetLastRecorderNum()) == 1)
                 tryRecorder = false;
-            else if (QDateTime::currentDateTime().secsTo(timeout) <= 0)
+            else if (timer.elapsed() > 2000)
             {
                 tryRecorder = false;
                 tryTV = true;
@@ -174,13 +175,13 @@ void startTV(void)
              }
         }
 
-        timeout = QDateTime::currentDateTime().addSecs(2);
+        timer.restart();
         while (tryTV)
         {//try to start livetv
             bool showDialogs = false;
             if (tv->LiveTV(showDialogs) == 1) //1 == livetv ok
                 tryTV = false;
-            else if (QDateTime::currentDateTime().secsTo(timeout) <= 0)
+            else if (timer.restart() > 2000)
             {
                 tryTV = false;
                 quitAll = true;
@@ -703,7 +704,7 @@ int main(int argc, char **argv)
 
     UpgradeTVDatabaseSchema();
 
-    VERBOSE(VB_ALL, QString("%1 version: %2 GPL www.mythtv.org")
+    VERBOSE(VB_ALL, QString("%1 version: %2 www.mythtv.org")
                             .arg(binname).arg(MYTH_BINARY_VERSION));
 
     VERBOSE(VB_ALL, QString("Enabled verbose msgs :%1").arg(verboseString));

@@ -188,8 +188,8 @@ void ThreadedFileWriter::Sync(void)
 void ThreadedFileWriter::DiskLoop()
 {
     int size;
-    QDateTime lastsynctime = QDateTime::currentDateTime();
-    QDateTime curtime = lastsynctime;
+    QTime timer;
+    timer.start();
 
     while (!in_dtor || BufUsed() > 0)
     {
@@ -201,11 +201,10 @@ void ThreadedFileWriter::DiskLoop()
             continue;
         }
 
-        curtime = QDateTime::currentDateTime();
-        if (curtime > lastsynctime.addSecs(1))
+        if (timer.elapsed() > 1000)
         {
             Sync();
-            lastsynctime = curtime;
+            timer.restart();
         }
 
         /* cap the max. write size. Prevents the situation where 90% of the

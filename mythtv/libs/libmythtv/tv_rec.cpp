@@ -203,36 +203,32 @@ int TVRec::StartRecording(ProgramInfo *rcinfo)
 
     if (internalState == kState_WatchingLiveTV && !cancelNextRecording)
     {
-        QDateTime timeout;
-
         QString message = QString("QUIT_LIVETV %1").arg(m_capturecardnum);
 
         MythEvent me(message);
         gContext->dispatch(me);
 
-        timeout = QDateTime::currentDateTime().addSecs(10);
+        QTime timer;
+        timer.start();
 
-        while (internalState != kState_None &&
-               QDateTime::currentDateTime().secsTo(timeout) > 0)
+        while (internalState != kState_None && timer.elapsed() < 10000)
             usleep(100);
 
         if (internalState != kState_None)
         {
             gContext->dispatch(me);
 
-            timeout = QDateTime::currentDateTime().addSecs(10);
+            timer.restart();
 
-            while (internalState != kState_None &&
-                   QDateTime::currentDateTime().secsTo(timeout) > 0)
+            while (internalState != kState_None && timer.elapsed() < 10000)
                 usleep(100);
         }
 
         if (internalState != kState_None)
         {
             exitPlayer = true;
-            timeout = QDateTime::currentDateTime().addSecs(5);
-            while (internalState != kState_None &&
-                   QDateTime::currentDateTime().secsTo(timeout) > 0)
+            timer.restart();
+            while (internalState != kState_None && timer.elapsed() < 5000)
                 usleep(100);
         }
     }
