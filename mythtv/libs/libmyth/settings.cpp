@@ -82,10 +82,9 @@ QWidget* VerticalConfigurationGroup::configWidget(ConfigurationGroup *cg,
 
     QVBoxLayout *layout = NULL;
 
-    int width = 0, height = 0;
     float wmult = 0, hmult = 0;
 
-    gContext->GetScreenSettings(width, wmult, height, hmult);
+    gContext->GetScreenSettings(wmult, hmult);
 
     if (uselabel)
     {
@@ -119,10 +118,9 @@ QWidget* HorizontalConfigurationGroup::configWidget(ConfigurationGroup *cg,
 
     QHBoxLayout *layout = NULL;
 
-    int width = 0, height = 0;
     float wmult = 0, hmult = 0;
 
-    gContext->GetScreenSettings(width, wmult, height, hmult);
+    gContext->GetScreenSettings(wmult, hmult);
 
     if (uselabel)
     {
@@ -547,10 +545,9 @@ MythDialog* ConfigurationDialog::dialogWidget(MythMainWindow *parent,
 {
     MythDialog* dialog = new ConfigurationDialogWidget(parent, widgetName);
 
-    int width = 0, height = 0;
     float wmult = 0, hmult = 0;
 
-    gContext->GetScreenSettings(width, wmult, height, hmult);
+    gContext->GetScreenSettings(wmult, hmult);
 
     QVBoxLayout* layout = new QVBoxLayout(dialog, (int)(20 * hmult));
     layout->addWidget(configWidget(NULL, dialog));

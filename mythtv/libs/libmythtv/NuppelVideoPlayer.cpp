@@ -208,7 +208,7 @@ void NuppelVideoPlayer::Pause(bool waitvideo)
     paused = true;
     if (!actuallypaused)
     {
-        if (!decoderThreadPaused.wait(1000))
+        while (!decoderThreadPaused.wait(1000))
             VERBOSE(VB_IMPORTANT, "Waited too long for decoder to pause");
     }
 
@@ -251,7 +251,7 @@ void NuppelVideoPlayer::PauseVideo(bool wait)
 
     if (wait && !video_actually_paused)
     {
-        if (!videoThreadPaused.wait(1000))
+        while (!videoThreadPaused.wait(1000))
             VERBOSE(VB_IMPORTANT, "Waited too long for video out to pause");
     }
 }

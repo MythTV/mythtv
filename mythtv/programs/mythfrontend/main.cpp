@@ -30,6 +30,7 @@ using namespace std;
 #include "mythplugin.h"
 #include "remoteutil.h"
 #include "xbox.h"
+#include "dbcheck.h"
 
 #define QUIT     1
 #define HALTWKUP 2
@@ -582,6 +583,8 @@ int main(int argc, char **argv)
         printf("couldn't open db\n");
         return -1;
     }
+
+    UpgradeTVDatabaseSchema();
 
     VERBOSE(VB_ALL, QString("Enabled verbose msgs :%1").arg(verboseString));
 

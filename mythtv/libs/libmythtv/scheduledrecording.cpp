@@ -638,8 +638,7 @@ MythDialog* ScheduledRecording::dialogWidget(MythMainWindow *parent,
                                              const char *name)
 {
     float wmult, hmult;
-    int screenwidth, screenheight;
-    gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
+    gContext->GetScreenSettings(wmult, hmult);
 
     MythDialog* dialog = new ConfigurationDialogWidget(parent, name);
     QVBoxLayout* vbox = new QVBoxLayout(dialog, (int)(20 * wmult));

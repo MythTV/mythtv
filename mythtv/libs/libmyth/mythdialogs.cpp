@@ -53,20 +53,10 @@ MythMainWindow::MythMainWindow(QWidget *parent, const char *name, bool modal)
 
 void MythMainWindow::Init(void)
 {
-    gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
-
-    int x = 0, y = 0, w = 0, h = 0;
-#ifndef QWS
-    GetMythTVGeometry(qt_xdisplay(), qt_xscreen(), &x, &y, &w, &h);
-#endif
-
-    int xoff = gContext->GetNumSetting("GuiOffsetX", 0);
-    int yoff = gContext->GetNumSetting("GuiOffsetY", 0);
-
-    x += xoff;
-    y += yoff;
-
-    setGeometry(x, y, screenwidth, screenheight);
+    
+    gContext->GetScreenSettings(xbase, screenwidth, wmult,
+                                ybase, screenheight, hmult);
+    setGeometry(xbase, ybase, screenwidth, screenheight);
     setFixedSize(QSize(screenwidth, screenheight));
 
     setFont(QFont("Arial", (int)(gContext->GetMediumFontSize() * hmult),
@@ -219,7 +209,8 @@ MythDialog::MythDialog(MythMainWindow *parent, const char *name, bool setsize)
 
     in_loop = false;
 
-    gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
+    gContext->GetScreenSettings(xbase, screenwidth, wmult,
+                                ybase, screenheight, hmult);
 
     setFont(QFont("Arial", (int)(gContext->GetMediumFontSize() * hmult),
             QFont::Bold));
@@ -342,10 +333,9 @@ void MythDialog::keyPressEvent( QKeyEvent *e )
 MythPopupBox::MythPopupBox(MythMainWindow *parent, const char *name)
             : MythDialog(parent, name, false)
 {
-    int w, h;
     float wmult, hmult;
 
-    gContext->GetScreenSettings(w, wmult, h, hmult);
+    gContext->GetScreenSettings(wmult, hmult);
 
     setLineWidth(3);
     setMidLineWidth(3);

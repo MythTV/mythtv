@@ -59,6 +59,8 @@ MythContext::MythContext(const QString &binversion, bool gui, bool lcd)
         m_localhostname = localhostname;
     }
 
+    m_xbase = m_ybase = 0;
+
     if (gui)
     {
         m_height = QApplication::desktop()->height();
@@ -178,13 +180,17 @@ void MythContext::LoadQtConfig(void)
     language = "";
     themecachedir = "";
 
-    m_height = QApplication::desktop()->height();
-    m_width = QApplication::desktop()->width();
+    m_xbase = GetNumSetting("GuiOffsetX", 0);
+    m_ybase = GetNumSetting("GuiOffsetY", 0);
 
-    if (GetNumSetting("GuiWidth") > 0)
-        m_width = GetNumSetting("GuiWidth");
-    if (GetNumSetting("GuiHeight") > 0)
-        m_height = GetNumSetting("GuiHeight");
+    m_width = GetNumSetting("GuiWidth", 0);
+    m_height = GetNumSetting("GuiHeight", 0);
+
+    if (m_width <= 0 || m_height <= 0)
+    {
+        m_height = QApplication::desktop()->height();
+        m_width = QApplication::desktop()->width();
+    }
 
     if (m_qtThemeSettings)
         delete m_qtThemeSettings;
@@ -361,6 +367,13 @@ void MythContext::CacheThemeImagesDirectory(const QString &dir)
     delete caching;
 }
 
+
+void MythContext::GetScreenSettings(float &wmult, float &hmult)
+{
+    wmult = m_wmult;
+    hmult = m_hmult;
+}
+
 void MythContext::GetScreenSettings(int &width, float &wmult, 
                                     int &height, float &hmult)
 {
@@ -371,16 +384,47 @@ void MythContext::GetScreenSettings(int &width, float &wmult,
     hmult = m_hmult;
 }
 
-void MythContext::InitializeScreenSettings(void)
+
+void MythContext::GetScreenSettings(int &xbase, int &width, float &wmult, 
+                                    int &ybase, int &height, float &hmult)
 {
+    xbase  = m_xbase;
+    ybase  = m_ybase;
+    
+    height = m_screenheight;
+    width = m_screenwidth;
+
+    wmult = m_wmult;
+    hmult = m_hmult;
+}
+
+void MythContext::InitializeScreenSettings()
+{
+    int x = 0, y = 0, w = 0, h = 0;
+
+#ifndef QWS
+    GetMythTVGeometry(qt_xdisplay(), qt_xscreen(), &x, &y, &w, &h);
+#endif
+
+    m_xbase = x + GetNumSetting("GuiOffsetX", 0);
+    m_ybase = y + GetNumSetting("GuiOffsetY", 0);
+
     int height = GetNumSetting("GuiHeight", m_height);
     int width = GetNumSetting("GuiWidth", m_width);
 
-    if (height == 0)
-        height = m_height;
-    if (width == 0)
-        width = m_width;
-
+    if (w != 0 && h != 0 && height == 0 && width == 0)
+    {
+        width = w;
+        height = h;
+    }
+    else
+    {
+        if (height == 0)
+            height = m_height;
+        if (width == 0)
+            width = m_width;
+    }
+    
     if (height < 160 || width < 160)
     {
         cerr << "Somehow, your screen size settings are bad.\n";
@@ -494,28 +538,6 @@ QString MythContext::DBErrorMessage(const QSqlError& err)
         .arg(err.number())
         .arg(err.driverText())
         .arg(err.databaseText());
-}
-
-bool MythContext::CheckDBVersion(void)
-{
-    QString DBSchemaVer = GetSetting("DBSchemaVer", "0");
-
-    int dbversion = DBSchemaVer.toInt();
-
-    int appschema = atoi(MYTH_SCHEMA_VERSION);
-
-    if (dbversion < appschema)
-    {
-        cerr << "Your current database schema version is: " << dbversion
-             << "\nbut this application requires version "
-             << MYTH_SCHEMA_VERSION << " or higher.\n";
-        cerr << "You should update your database with the latest\n"
-             << "changes in the 'database' directory. See section 6\n"
-             << "of the MythTV documentation for more information.\n\n";
-
-        return false;
-    }
-    return true;
 }
 
 void MythContext::SaveSetting(QString key, int newValue)

@@ -67,8 +67,7 @@ class MythEvent : public QCustomEvent
     QString extradata;
 };
 
-#define MYTH_BINARY_VERSION "0.12.09082003-1"
-#define MYTH_SCHEMA_VERSION "1003"
+#define MYTH_BINARY_VERSION "0.12.09162003-1"
 
 extern int print_verbose_messages;
 
@@ -95,7 +94,11 @@ class MythContext : public QObject
     void LoadQtConfig(void);
     void UpdateImageCache(void);
 
-    void GetScreenSettings(int &width, float &wmult, int &height, float &hmult);
+    void GetScreenSettings(float &wmult, float &hmult);
+    void GetScreenSettings(int &width, float &wmult,
+                           int &height, float &hmult);
+    void GetScreenSettings(int &xbase, int &width, float &wmult,
+                           int &ybase, int &height, float &hmult);
    
     QString FindThemeDir(QString themename);
     QString GetThemeDir(void) { return m_themepathname; }
@@ -104,8 +107,6 @@ class MythContext : public QObject
     static void KickDatabase(QSqlDatabase *db);
     static void DBError(QString where, const QSqlQuery& query);
     static QString DBErrorMessage(const QSqlError& err);
-
-    bool CheckDBVersion(void);
 
     Settings *settings() { return m_settings; }
     Settings *qtconfig() { return m_qtThemeSettings; }
@@ -171,6 +172,7 @@ class MythContext : public QObject
     QPixmap m_backgroundimage;
     QPalette m_palette;
 
+    int m_xbase, m_ybase;
     int m_height, m_width;
 
     QSocket *serverSock;

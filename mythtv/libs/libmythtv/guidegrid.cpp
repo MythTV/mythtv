@@ -213,6 +213,9 @@ GuideGrid::GuideGrid(MythMainWindow *parent, const QString &channel, TV *player,
 
     setNoErase();
     gContext->addListener(this);
+    
+    keyDown = false;
+    setFocusPolicy(QWidget::StrongFocus); //get keyRelease events after refocus
 }
 
 GuideGrid::~GuideGrid()
@@ -237,6 +240,20 @@ GuideGrid::~GuideGrid()
 
 void GuideGrid::keyPressEvent(QKeyEvent *e)
 {
+    //keyDown limits keyrepeats to prevent continued scrolling
+    //after key is released. Note: Qt's keycompress should handle
+    //this but will fail with fast key strokes and keyboard repeat
+    //enabled. Keys will not be marked as autorepeat and flood buffer.
+    //setFocusPolicy(QWidget::StrongFocus) in constructor is important 
+    //or keyRelease events will not be received after a refocus.
+    
+    if(keyDown && e->key() != Key_Escape && e->key() != Key_C)
+        return; //check for Key_Escape incase something goes wrong 
+                //with KeyRelease events, shouldn't happen.
+       
+    if(e->key() != Key_Control)
+        keyDown = true;    
+    
     if (e->state() == Qt::ControlButton)
     {
         switch (e->key())
@@ -277,6 +294,14 @@ void GuideGrid::keyPressEvent(QKeyEvent *e)
 
         default: MythDialog::keyPressEvent(e);
     }
+}
+
+void GuideGrid::keyReleaseEvent(QKeyEvent *e)
+{
+    //note: KeyRelease events may not reflect the released 
+    //key if delayed (key==0 instead).
+    e->key(); //stop compiler warning
+    keyDown = false;
 }
 
 void GuideGrid::updateBackground(void)
@@ -1170,9 +1195,9 @@ void GuideGrid::cursorLeft()
     else
     {
         fillProgramRowInfos(m_currentRow);
-        update(programRect);
-        update(infoRect);
-        update(timeRect);
+        repaint(programRect, false);
+        repaint(infoRect, false);
+        repaint(timeRect, false);
     }
 }
 
@@ -1199,9 +1224,9 @@ void GuideGrid::cursorRight()
     else
     {
         fillProgramRowInfos(m_currentRow);
-        update(programRect);
-        update(infoRect);
-        update(timeRect);
+        repaint(programRect, false);
+        repaint(infoRect, false);
+        repaint(timeRect, false); 
     }
 }
 
@@ -1219,8 +1244,8 @@ void GuideGrid::cursorDown()
         else
         {
             fillProgramRowInfos(m_currentRow);
-            update(programRect);
-            update(infoRect);
+            repaint(programRect, false);
+            repaint(infoRect, false);
         }
     }
     else
@@ -1241,8 +1266,8 @@ void GuideGrid::cursorUp()
         else
         {
             fillProgramRowInfos(m_currentRow);
-            update(programRect);
-            update(infoRect);
+            repaint(programRect, false);
+            repaint(infoRect, false);
         }
     }
     else
@@ -1265,10 +1290,10 @@ void GuideGrid::scrollLeft()
     fillTimeInfos();
     fillProgramInfos();
 
-    update(infoRect);
-    update(timeRect);
-    update(dateRect);
-    update(programRect);
+    repaint(programRect, false);
+    repaint(infoRect, false);
+    repaint(dateRect, false);
+    repaint(timeRect, false);
 }
 
 void GuideGrid::scrollRight()
@@ -1286,10 +1311,10 @@ void GuideGrid::scrollRight()
     fillTimeInfos();
     fillProgramInfos();
 
-    update(infoRect);
-    update(dateRect);
-    update(timeRect);
-    update(programRect);
+    repaint(programRect, false);
+    repaint(infoRect, false);
+    repaint(dateRect, false);
+    repaint(timeRect, false);
 }
 
 void GuideGrid::setStartChannel(int newStartChannel)
@@ -1318,9 +1343,9 @@ void GuideGrid::scrollDown()
     m_programs[DISPLAY_CHANS - 1] = proglist;
     fillProgramInfos();
 
-    update(infoRect);
-    update(channelRect);
-    update(programRect);
+    repaint(programRect, false);
+    repaint(infoRect, false);
+    repaint(channelRect, false);
 }
 
 void GuideGrid::scrollUp()
@@ -1339,9 +1364,9 @@ void GuideGrid::scrollUp()
     m_programs[0] = proglist;
     fillProgramInfos();
 
-    update(infoRect);
-    update(channelRect);
-    update(programRect);
+    repaint(programRect, false);
+    repaint(infoRect, false);
+    repaint(channelRect, false);
 }
 
 void GuideGrid::dayLeft()
@@ -1351,7 +1376,7 @@ void GuideGrid::dayLeft()
     fillTimeInfos();
     fillProgramInfos();
 
-    update(fullRect);
+    repaint(fullRect, false);
 }
 
 void GuideGrid::dayRight()
@@ -1361,7 +1386,7 @@ void GuideGrid::dayRight()
     fillTimeInfos();
     fillProgramInfos();
 
-    update(fullRect);
+    repaint(fullRect, false);
 }
 
 void GuideGrid::pageLeft()
@@ -1380,7 +1405,7 @@ void GuideGrid::pageLeft()
     fillTimeInfos();
     fillProgramInfos();
 
-    update(fullRect);
+    repaint(fullRect, false);
 }
 
 void GuideGrid::pageRight()
@@ -1399,7 +1424,7 @@ void GuideGrid::pageRight()
     fillTimeInfos();
     fillProgramInfos();
 
-    update(fullRect);
+    repaint(fullRect, false);
 }
 
 void GuideGrid::pageDown()
@@ -1408,7 +1433,7 @@ void GuideGrid::pageDown()
 
     fillProgramInfos();
 
-    update(fullRect);
+    repaint(fullRect, false);
 }
 
 void GuideGrid::pageUp()
@@ -1417,7 +1442,7 @@ void GuideGrid::pageUp()
 
     fillProgramInfos();
 
-    update(fullRect);
+    repaint(fullRect, false);
 }
  
 void GuideGrid::showProgFinder()

@@ -25,7 +25,7 @@ HEADERS += progfind.h decoderbase.h nuppeldecoder.h avformatdecoder.h
 HEADERS += recorderbase.h mpegrecorder.h channelbase.h dvbrecorder.h
 HEADERS += dvbchannel.h vsync.h proglist.h hdtvrecorder.h fifowriter.h
 HEADERS += videooutbase.h videoout_xv.h videoout_null.h xbox.h
-HEADERS += ivtvdecoder.h videoout_ivtv.h
+HEADERS += ivtvdecoder.h videoout_ivtv.h dbcheck.h
 
 SOURCES += channel.cpp commercial_skip.cpp filter.c frequencies.c guidegrid.cpp
 SOURCES += infodialog.cpp infostructs.cpp jitterometer.cpp minilzo.cpp 
@@ -37,7 +37,7 @@ SOURCES += progfind.cpp nuppeldecoder.cpp avformatdecoder.cpp recorderbase.cpp
 SOURCES += mpegrecorder.cpp channelbase.cpp dvbrecorder.cpp dvbchannel.cpp
 SOURCES += vsync.c proglist.cpp hdtvrecorder.cpp videooutbase.cpp 
 SOURCES += videoout_xv.cpp fifowriter.cpp videoout_null.cpp xbox.cpp
-SOURCES += ivtvdecoder.cpp videoout_ivtv.cpp
+SOURCES += ivtvdecoder.cpp videoout_ivtv.cpp dbcheck.cpp
 
 using_xvmc {
     SOURCES += videoout_xvmc.cpp

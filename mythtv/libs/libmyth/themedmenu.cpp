@@ -1651,6 +1651,7 @@ void ThemedMenu::keyPressEvent(QKeyEvent *e)
         case Key_Space:
         {
             handleAction(activebutton->action);
+            lastbutton = NULL;
             handled = true;
             break;
         }
@@ -1662,6 +1663,7 @@ void ThemedMenu::keyPressEvent(QKeyEvent *e)
             else if (killable || e->state() == exitModifier)
                 done(0);
             handled = true;
+            lastbutton = NULL;
             break;
         }
         default: break;
@@ -1670,7 +1672,10 @@ void ThemedMenu::keyPressEvent(QKeyEvent *e)
     if (handled)
     {
         if (!buttonRows[currentrow].visible)
+        {
             makeRowVisible(currentrow, oldrow);
+            lastbutton = NULL;
+        }
 
         activebutton = buttonRows[currentrow].buttons[currentcolumn];
         if (lcddev)
@@ -1688,14 +1693,15 @@ void ThemedMenu::keyPressEvent(QKeyEvent *e)
 
                 if (currentcolumn < buttonRows[r].numitems)
                     menuItems.append(new LCDMenuItem(selected, NOTCHECKABLE,
-                                     buttonRows[r].buttons[currentcolumn]->text));
+                                   buttonRows[r].buttons[currentcolumn]->text));
             }
 
             if (!menuItems.isEmpty())
                 lcddev->switchToMenu(&menuItems, titleText);
         }
         update(watermarkRect);
-        update(lastbutton->posRect);
+        if (lastbutton)
+            update(lastbutton->posRect);
         update(activebutton->posRect);
     }
     else

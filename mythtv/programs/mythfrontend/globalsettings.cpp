@@ -70,8 +70,6 @@ protected:
     static const char* controlNames[];
 };
 
-const char* MixerControl::controlNames[] = { QObject::tr("PCM"),
-        QObject::tr("Master") };
 const char* MixerControl::controls[] = { "PCM",
                                          "Master" };
 
@@ -81,7 +79,7 @@ MixerControl::MixerControl():
 
     setLabel("Mixer Controls");
     for(unsigned int i = 0; i < sizeof(controls) / sizeof(char*); ++i) {
-        addSelection(controlNames[i], controls[i]);
+        addSelection(QObject::tr(controls[i]), controls[i]);
     }
     setHelpText(QObject::tr("Changing the volume adjusts the selected mixer."));
 }
@@ -773,6 +771,7 @@ public:
         addSelection("MM/dd");
         addSelection("MM.dd");
         addSelection("ddd d MMM");
+        addSelection("dd.MM.yyyy");
 	setHelpText("Your preferred date format.");
     };
 };
@@ -787,6 +786,8 @@ public:
         addSelection("MM/dd");
         addSelection("dd/MM");
         addSelection("MM.dd");
+        addSelection("d.M.");
+        addSelection("dd.MM.");
         setHelpText("Your preferred short date format.");
     };
 };
@@ -800,8 +801,8 @@ public:
         addSelection("h:mm ap");
         addSelection("hh:mm AP");
         addSelection("hh:mm ap");
-        addSelection("hh:mm");
         addSelection("h:mm");
+        addSelection("hh:mm");
 	setHelpText("Your preferred time format.  Choose a format "
                     "with \"AP\" in it for an AM/PM display, otherwise "
                     "your time display will be 24-hour or \"military\" "
@@ -920,7 +921,7 @@ public:
 class EPGChanDisplay: public SpinBoxSetting, public GlobalSetting {
 public:
     EPGChanDisplay():
-        SpinBoxSetting(3, 8, 1), GlobalSetting("chanPerPage") {
+        SpinBoxSetting(3, 12, 1), GlobalSetting("chanPerPage") {
         setLabel("Channels to Display");
 	setValue(5);
 	

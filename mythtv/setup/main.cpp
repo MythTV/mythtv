@@ -20,6 +20,8 @@
 #include "libmyth/themedmenu.h"
 #include "backendsettings.h"
 
+#include "libmythtv/dbcheck.h"
+
 using namespace std;
 
 MythContext* gContext;
@@ -119,6 +121,8 @@ int main(int argc, char *argv[])
 
         return -1;
     }
+
+    UpgradeTVDatabaseSchema();
 
     gContext->SetSetting("Theme", "blue");
     gContext->LoadQtConfig();

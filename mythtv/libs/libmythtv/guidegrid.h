@@ -23,7 +23,7 @@ class TV;
 class QTimer;
 class QWidget;
 
-#define MAX_DISPLAY_CHANS 8
+#define MAX_DISPLAY_CHANS 12
 #define MAX_DISPLAY_TIMES 30
 
 // Use this function to instantiate a guidegrid instance.
@@ -81,6 +81,7 @@ class GuideGrid : public MythDialog
 
   private:
     void keyPressEvent(QKeyEvent *e);
+    void keyReleaseEvent(QKeyEvent *e);
 
     void updateBackground(void);
     void paintDate(QPainter *);
@@ -163,6 +164,7 @@ class GuideGrid : public MythDialog
     QSqlDatabase *m_db;
 
     bool ignoreevents;
+    bool keyDown;
 };
 
 #endif

@@ -67,6 +67,7 @@ class MythMainWindow : public QDialog
 
     float wmult, hmult;
     int screenwidth, screenheight;
+    int xbase, ybase;
 
     vector<QWidget *> widgetList;
 
@@ -105,6 +106,7 @@ class MythDialog : public QFrame
 
     float wmult, hmult;
     int screenwidth, screenheight;
+    int xbase, ybase;
  
     MythMainWindow *m_parent;
 

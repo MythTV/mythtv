@@ -10,11 +10,6 @@
 
 void ChannelInfo::LoadIcon(int size)
 {
-    int screenheight = 0, screenwidth = 0;
-    float wmult = 0, hmult = 0;
-
-    gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
-
     icon = new QPixmap();
 
     QImage tempimage(iconpath);
