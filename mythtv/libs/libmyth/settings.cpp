@@ -1,4 +1,5 @@
 #include "settings.h"
+#include "mythwidgets.h"
 #include <qsqldatabase.h>
 #include <qlineedit.h>
 #include <qhbox.h>
@@ -83,7 +84,7 @@ QWidget* SliderSetting::configWidget(QWidget* parent,
     QLabel* label = new QLabel(widget, QString(widgetName) + "-label");
     label->setText(getLabel() + ":");
 
-    QSlider* slider = new QSlider(widget, QString(widgetName) + "-slider");
+    QSlider* slider = new MythSlider(widget, QString(widgetName) + "-slider");
     slider->setMinValue(min);
     slider->setMaxValue(max);
     slider->setOrientation(QSlider::Horizontal);
@@ -110,7 +111,7 @@ QWidget* SpinBoxSetting::configWidget(QWidget* parent,
     QLabel* label = new QLabel(widget, QString(widgetName) + "-label");
     label->setText(getLabel() + ":");
 
-    QSpinBox* spinbox = new QSpinBox(widget, QString(widgetName) + "-spinbox");
+    QSpinBox* spinbox = new MythSpinBox(widget, QString(widgetName) + "-spinbox");
     spinbox->setMinValue(min);
     spinbox->setMaxValue(max);
     spinbox->setLineStep(step);
@@ -124,7 +125,7 @@ QWidget* SpinBoxSetting::configWidget(QWidget* parent,
 
 QWidget* ComboBoxSetting::configWidget(QWidget* parent,
                                        const char* widgetName) {
-    QComboBox* widget = new QComboBox(rw, parent, widgetName);
+    QComboBox* widget = new MythComboBox(rw, parent, widgetName);
 
     for(unsigned int i = 0 ; i < labels.size() ; ++i) {
         widget->insertItem(labels[i]);
