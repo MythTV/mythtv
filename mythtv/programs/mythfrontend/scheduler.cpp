@@ -8,7 +8,7 @@
 using namespace std;
 
 #include "scheduler.h"
-#include "infostructs.h"
+
 #include "libmyth/programinfo.h"
 
 Scheduler::Scheduler(QSqlDatabase *ldb)

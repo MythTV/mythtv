@@ -2,7 +2,7 @@
 #include <qsqldatabase.h>
 #include <stdlib.h>
 
-#include "guidegrid.h"
+#include "libmyth/guidegrid.h"
 #include "libmyth/settings.h"
 #include "libmyth/themedmenu.h"
 

@@ -8,7 +8,6 @@
 #include <stdio.h>
 
 #include "tv.h"
-#include "infostructs.h"
 #include "programlistitem.h"
 
 #include "libmyth/settings.h"

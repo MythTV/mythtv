@@ -14,8 +14,8 @@ using namespace std;
 #include "guidegrid.h"
 #include "infodialog.h"
 #include "infostructs.h"
-#include "libmyth/programinfo.h"
-#include "libmyth/settings.h"
+#include "programinfo.h"
+#include "settings.h"
 
 extern Settings *globalsettings;
 

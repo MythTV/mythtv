@@ -10,9 +10,7 @@ INSTALLS = target
 include (../../settings.pro)
 
 INCLUDEPATH += ../../libs
-LIBS += -lmyth -L/usr/local/lib -L../../libs/libmyth
+LIBS += -L../../libs/libmyth -lmyth
 
 # Input
-HEADERS += guidegrid.h infodialog.h infostructs.h
-
-SOURCES += guidegrid.cpp infodialog.cpp infostructs.cpp main.cpp
+SOURCES += main.cpp

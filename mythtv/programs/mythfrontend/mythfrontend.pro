@@ -16,8 +16,7 @@ setting.extra = ldconfig
 
 INSTALLS += setting
 
-INCLUDEPATH += ../mythepg ../../libs/libNuppelVideo ../../libs/libmythtv 
-INCLUDEPATH += ../../libs
+INCLUDEPATH += ../../libs/libNuppelVideo ../../libs/libmythtv ../../libs
 
 LIBS += -L../../libs/libmythtv -L../../libs/libNuppelVideo 
 LIBS += -L../../libs/libavcodec -L../../libs/libmyth
@@ -29,12 +28,8 @@ TARGETDEPS += ../../libs/libmythtv/libmythtv.a
 TARGETDEPS += ../../libs/libavcodec/libavcodec.a
 
 # Input
-HEADERS += ../mythepg/guidegrid.h ../mythepg/infodialog.h 
-HEADERS += ../mythepg/infostructs.h 
 HEADERS += scheduler.h playbackbox.h deletebox.h programlistitem.h 
 HEADERS += viewscheduled.h
 
-SOURCES += ../mythepg/guidegrid.cpp ../mythepg/infodialog.cpp 
-SOURCES += ../mythepg/infostructs.cpp main.cpp 
-SOURCES += scheduler.cpp playbackbox.cpp deletebox.cpp 
+SOURCES += main.cpp scheduler.cpp playbackbox.cpp deletebox.cpp 
 SOURCES += programlistitem.cpp viewscheduled.cpp

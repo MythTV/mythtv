@@ -10,7 +10,6 @@
 #include <qregexp.h>
 
 #include "viewscheduled.h"
-#include "infostructs.h"
 #include "tv.h"
 #include "programlistitem.h"
 #include "scheduler.h"

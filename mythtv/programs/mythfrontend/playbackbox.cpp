@@ -13,7 +13,6 @@
 #include <unistd.h>
 
 #include "playbackbox.h"
-#include "infostructs.h"
 #include "tv.h"
 #include "programlistitem.h"
 #include "NuppelVideoPlayer.h"

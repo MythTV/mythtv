@@ -2,5 +2,7 @@
 Makefile
 libmyth.so.*
 moc_dialogbox.cpp
+moc_guidegrid.cpp
+moc_infodialog.cpp
 moc_lcddevice.cpp
 moc_themedmenu.cpp

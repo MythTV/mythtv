@@ -17,7 +17,6 @@
 #include <stdio.h>
 
 #include "deletebox.h"
-#include "infostructs.h"
 #include "tv.h"
 #include "programlistitem.h"
 #include "NuppelVideoPlayer.h"

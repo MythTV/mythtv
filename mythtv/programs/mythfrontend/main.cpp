@@ -3,14 +3,14 @@
 #include <qfile.h>
 #include <unistd.h>
 
-#include "guidegrid.h"
 #include "tv.h"
 #include "scheduler.h"
-#include "infostructs.h"
 #include "playbackbox.h"
 #include "deletebox.h"
 #include "viewscheduled.h"
 
+#include "libmyth/infostructs.h"
+#include "libmyth/guidegrid.h"
 #include "libmyth/settings.h"
 #include "libmyth/themedmenu.h"
 #include "libmyth/programinfo.h"
