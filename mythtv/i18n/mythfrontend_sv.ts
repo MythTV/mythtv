@@ -3936,31 +3936,31 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Program Menu</source>
-        <translation>Programmeny</translation>
+        <translation type="obsolete">Programmeny</translation>
     </message>
     <message>
         <source>Set Commercial Auto-Skip OFF</source>
-        <translation>Reklamöverhoppning: AV</translation>
+        <translation type="obsolete">Reklamöverhoppning: AV</translation>
     </message>
     <message>
         <source>Set Commercial Auto-Skip ON</source>
-        <translation>Reklamöverhoppning: PÅ</translation>
+        <translation type="obsolete">Reklamöverhoppning: PÅ</translation>
     </message>
     <message>
         <source>Set Commercial Auto-Skip to Notify</source>
-        <translation>Meddela vid automatisk reklamöverhoppning</translation>
+        <translation type="obsolete">Meddela vid automatisk reklamöverhoppning</translation>
     </message>
     <message>
         <source>Don&apos;t Auto Expire</source>
-        <translation>Autoradera inte</translation>
+        <translation type="obsolete">Autoradera inte</translation>
     </message>
     <message>
         <source>Auto Expire</source>
-        <translation>Autoradera</translation>
+        <translation type="obsolete">Autoradera</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Avbryt</translation>
+        <translation type="obsolete">Avbryt</translation>
     </message>
     <message>
         <source>Auto-Skip OFF</source>
@@ -4004,7 +4004,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Activate Zoom Mode</source>
-        <translation>Aktivera zoomläge</translation>
+        <translation type="obsolete">Aktivera zoomläge</translation>
     </message>
     <message>
         <source>Auto-Expire OFF</source>
@@ -4080,6 +4080,26 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>CC%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commercial Auto-Skip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn Auto-Expire OFF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn Auto-Expire ON</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Aspect Ratio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manual Zoom Mode</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

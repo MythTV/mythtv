@@ -26,6 +26,15 @@
       <action>TV_SCHEDULE</action>
    </button>
 
+
+   <button>
+      <type>TV_SCHEDULE</type>
+      <text>Update Program Guide</text>
+      <text lang="NL">Update Programmagids</text>
+      <alttext>Update</alttext>
+      <action>EXEC /etc/cron.daily/haaltvdata</action>
+   </button>
+
    <button>
       <type>TV_PROGFIND</type>
       <text>Program Finder</text>
@@ -57,9 +66,11 @@
       <text>Search Listings</text>
       <text lang="DE">Suche</text>
       <text lang="SV">Sök i TV-tablå</text>
+      <text lang="NL">Zoekfunctie</text>
       <text lang="JA">リスト検索</text>
       <alttext>Search</alttext>
       <alttext lang="SV">Sök tablå</alttext>
+      <alttext lang="NL">Zoek</alttext>      
       <action>MENU tv_search.xml</action>
    </button>
 
@@ -117,10 +128,13 @@
       <type>TV_RECPRIORITIES</type>
       <text>Recording Priorities</text>
       <text lang="DE">Aufnahme- prioritäten</text>
+      <text lang="NL">Opname Prioriteiten</text>      
       <text lang="SV">Inspelningsprioriteter</text>
       <text lang="JA">録画優先順位</text>
       <alttext>Priorities</alttext>
       <alttext lang="SV">Prioriteter</alttext>
+      <alttext lang="NL">Prioriteiten</alttext>
+      
       <action>TV_SET_RECPRIORITIES</action>
    </button>
 

@@ -3978,31 +3978,31 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Program Menu</source>
-        <translation>Menu programmazione</translation>
+        <translation type="obsolete">Menu programmazione</translation>
     </message>
     <message>
         <source>Set Commercial Auto-Skip OFF</source>
-        <translation>Imposta l&apos;autoselezione degli spot OFF</translation>
+        <translation type="obsolete">Imposta l&apos;autoselezione degli spot OFF</translation>
     </message>
     <message>
         <source>Set Commercial Auto-Skip ON</source>
-        <translation>Imposta l&apos;autoselezione degli spot ON</translation>
+        <translation type="obsolete">Imposta l&apos;autoselezione degli spot ON</translation>
     </message>
     <message>
         <source>Set Commercial Auto-Skip to Notify</source>
-        <translation>Imposta l&apos;autImposta l&apos;autoselezione degli spot NOTIFICA</translation>
+        <translation type="obsolete">Imposta l&apos;autImposta l&apos;autoselezione degli spot NOTIFICA</translation>
     </message>
     <message>
         <source>Don&apos;t Auto Expire</source>
-        <translation>Non autocancellare</translation>
+        <translation type="obsolete">Non autocancellare</translation>
     </message>
     <message>
         <source>Auto Expire</source>
-        <translation>Autocancellazione</translation>
+        <translation type="obsolete">Autocancellazione</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Annulla</translation>
+        <translation type="obsolete">Annulla</translation>
     </message>
     <message>
         <source>Auto-Skip OFF</source>
@@ -4018,10 +4018,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Zoom Mode OFF</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Activate Zoom Mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4098,6 +4094,26 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>CC%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commercial Auto-Skip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn Auto-Expire OFF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn Auto-Expire ON</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Aspect Ratio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manual Zoom Mode</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

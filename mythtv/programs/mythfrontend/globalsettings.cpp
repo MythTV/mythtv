@@ -958,6 +958,17 @@ public:
     };
 };
 
+class LircKeyPressedApp: public LineEditSetting, public GlobalSetting {
+public:
+    LircKeyPressedApp():
+        GlobalSetting("LircKeyPressedApp") {
+        setLabel(QObject::tr("Keypress Application"));
+        setValue("halt");
+        setHelpText(QObject::tr("External application or script to run when "
+                    "a keypress is received by lirc"));
+    };
+};
+
 class SetupPinCode: public LineEditSetting, public GlobalSetting {
 public:
     SetupPinCode():
@@ -1937,6 +1948,7 @@ MainGeneralSettings::MainGeneralSettings()
     general->addChild(new AllowQuitShutdown());
     general->addChild(new NoPromptOnExit());
     general->addChild(new HaltCommand());
+    general->addChild(new LircKeyPressedApp());
     general->addChild(new SetupPinCodeRequired());
     general->addChild(new SetupPinCode());
     general->addChild(new EnableMediaMon());

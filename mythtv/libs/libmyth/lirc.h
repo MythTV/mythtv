@@ -18,9 +18,12 @@ class LircClient : public QObject
     void Process(void);
 
   private:
+    void SpawnApp(void);
+
     struct lirc_config *lircConfig;
     QObject *mainWindow;
     pthread_t pth;
+    QString external_app;
 };
 
 #endif

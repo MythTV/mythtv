@@ -77,6 +77,7 @@ DVBRecorder::DVBRecorder(DVBChannel* advbchannel): RecorderBase()
 
     signal_monitor_interval = 0;
     expire_data_days = 3;
+    signal_monitor_quit = false;
 
     wait_for_seqstart = true;
     wait_for_seqstart_enabled = true;
@@ -349,7 +350,10 @@ void DVBRecorder::SetDemuxFilters(dvb_pids_t& pids)
     OpenFilters(pids.other,       DMX_PES_OTHER);
 
     if (fd_demux.size() == 0 && pid_ipack.size() == 0)
+    {
         ERROR("No PIDS set, please correct your channel setup.");
+        return;
+    }
 
     pid_ipack[pids.audio[0]]->pv = (struct ipack_s *)pid_ipack[pids.video[0]];
     pid_ipack[pids.video[0]]->pa = (struct ipack_s *)pid_ipack[pids.audio[0]];
@@ -377,6 +381,7 @@ void DVBRecorder::StartRecording()
 
     pthread_t qualthread;
     bool qthreadexists = false;
+    signal_monitor_quit = false;
 
     polls.fd = fd_dvr;
     polls.events = POLLIN;
@@ -459,8 +464,7 @@ void DVBRecorder::StartRecording()
 
     if (qthreadexists)
     {
-        pthread_cancel(qualthread);
-        RECORD("DVB Quality monitor thread is stopping for card " << cardnum);
+        signal_monitor_quit = true;
     }
 
     ExpireQualityData();
@@ -808,11 +812,12 @@ void *DVBRecorder::QualityMonitorThread()
 
     // loop until cancelled, wake at intervals and log data
 
-    while (true)
+    while (!signal_monitor_quit)
     {
         sleep(signal_monitor_interval);
 
-        pthread_testcancel();
+        if (signal_monitor_quit)
+            break;
 
         if (cardid >= 0 &&
             db_conn != NULL && db_lock != NULL && dvbchannel != NULL &&
@@ -826,6 +831,7 @@ void *DVBRecorder::QualityMonitorThread()
         }
     }
 
+    RECORD("DVB Quality monitor thread stopped for card " << cardnum);
     return NULL;
 }
 

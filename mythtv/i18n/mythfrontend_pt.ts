@@ -3885,32 +3885,12 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Program Menu</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Set Commercial Auto-Skip OFF</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Set Commercial Auto-Skip ON</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Set Commercial Auto-Skip to Notify</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Don&apos;t Auto Expire</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Auto Expire</source>
-        <translation type="unfinished">Permitir que a gravação seja apagada automaticamente</translation>
+        <translation type="obsolete">Permitir que a gravação seja apagada automaticamente</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Cancelar</translation>
+        <translation type="obsolete">Cancelar</translation>
     </message>
     <message>
         <source>Auto-Skip OFF</source>
@@ -3954,10 +3934,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Zoom Mode OFF</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Activate Zoom Mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4034,6 +4010,26 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>CC%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commercial Auto-Skip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn Auto-Expire OFF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn Auto-Expire ON</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Aspect Ratio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manual Zoom Mode</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -113,36 +113,43 @@ static int length_to_next_start(uint8_t *pbuf_ptr, int buf_size)
 {
     uint8_t *buf_ptr;
     unsigned int state = 0xFFFFFFFF, v;
-    int val;
 
     buf_ptr = pbuf_ptr;
     while (buf_ptr < pbuf_ptr + buf_size) {
        v = *buf_ptr++;
        if (state == 0x000001) {
             state = ((state << 8) | v) & 0xffffff;
-            val = state;
             goto found;
         }
         state = ((state << 8) | v) & 0xffffff;
     }
-    val = -1;
+    return -1;
  found:
     return buf_ptr - pbuf_ptr;
 }
 
-int VIA_decode_slice(MpegEncContext *s, int start_code, uint8_t *buffer, 
+#define SLICE_MIN_START_CODE   0x00000101
+#define SLICE_MAX_START_CODE   0x000001af
+int VIA_decode_slice(MpegEncContext *s, int mb_y, uint8_t *buffer,
                      int buf_size)
 {
-    via_slice_state_t  *slicestate;
     int slicelen = length_to_next_start(buffer, buf_size) - 4;
+    if (slicelen < 0)
+    {
+        if (mb_y == s->mb_height - 1)
+            slicelen = buf_size;
+        else
+            return -1;
+    }
 
+    via_slice_state_t *slicestate;
     slicestate = (via_slice_state_t *)s->current_picture.data[0];
     slicestate->slice_data = buffer;
     slicestate->slice_datalen = slicelen;
-    slicestate->code = start_code;
-    slicestate->maxcode = s->mb_height;
+    slicestate->code = SLICE_MIN_START_CODE + mb_y;
+    slicestate->maxcode = SLICE_MIN_START_CODE + s->mb_height - 1;
 
-    if (start_code == s->mb_height)
+    if (slicestate->code == slicestate->maxcode)
         slicestate->slice_datalen += 4;
 
     ff_draw_horiz_band(s, 0, 0);

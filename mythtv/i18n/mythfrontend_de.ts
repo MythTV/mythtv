@@ -3975,31 +3975,31 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Program Menu</source>
-        <translation>Programmenü</translation>
+        <translation type="obsolete">Programmenü</translation>
     </message>
     <message>
         <source>Set Commercial Auto-Skip OFF</source>
-        <translation>Werbung überspringen AUS</translation>
+        <translation type="obsolete">Werbung überspringen AUS</translation>
     </message>
     <message>
         <source>Set Commercial Auto-Skip ON</source>
-        <translation>Werbung überspringen EIN</translation>
+        <translation type="obsolete">Werbung überspringen EIN</translation>
     </message>
     <message>
         <source>Set Commercial Auto-Skip to Notify</source>
-        <translation>Bei Werbung nur hinweisen</translation>
+        <translation type="obsolete">Bei Werbung nur hinweisen</translation>
     </message>
     <message>
         <source>Don&apos;t Auto Expire</source>
-        <translation>Nicht autom. löschen</translation>
+        <translation type="obsolete">Nicht autom. löschen</translation>
     </message>
     <message>
         <source>Auto Expire</source>
-        <translation>Automatisch löschen</translation>
+        <translation type="obsolete">Automatisch löschen</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Abbrechen</translation>
+        <translation type="obsolete">Abbrechen</translation>
     </message>
     <message>
         <source>Auto-Skip OFF</source>
@@ -4043,7 +4043,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Activate Zoom Mode</source>
-        <translation>Zoom aktivieren</translation>
+        <translation type="obsolete">Zoom aktivieren</translation>
     </message>
     <message>
         <source>Auto-Expire OFF</source>
@@ -4119,6 +4119,26 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>CC%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commercial Auto-Skip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn Auto-Expire OFF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn Auto-Expire ON</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Aspect Ratio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manual Zoom Mode</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

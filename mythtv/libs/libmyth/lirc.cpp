@@ -3,6 +3,9 @@
 #include <qkeysequence.h>
 #include <cstdio>
 #include <cerrno>
+#include <sys/wait.h>
+
+#include "mythcontext.h"
 
 #include <iostream>
 using namespace std;
@@ -40,6 +43,9 @@ int LircClient::Init(QString &config_file, QString &program)
         lirc_deinit();
         return -1;
     }
+
+    external_app = gContext->GetSetting("LircKeyPressedApp") + " &";
+
     return 0;
 }
 
@@ -82,12 +88,44 @@ void LircClient::Process(void)
                                         keycode, true));
                 QApplication::postEvent(mainWindow, new LircKeycodeEvent(code, 
                                         keycode, false));
+
+                SpawnApp();
             }
         }
 
         free(ir);
         if (ret == -1)
             break;
+    }
+}
+
+void LircClient::SpawnApp(void)
+{
+    // Spawn app to thwap led (or what ever the user has picked if
+    // anything) to give positive feedback that a key was received
+    if (external_app != " &")
+    {
+        pid_t child = fork();
+        if (child < 0)
+            perror("fork");
+        else if (child == 0)
+        {
+            for (int i = 3; i < sysconf(_SC_OPEN_MAX) - 1; ++i)
+                close(i);
+            execl("/bin/sh", "sh", "-c", external_app.ascii(), NULL);
+            _exit(1);
+        }
+        else
+        {
+            int status;
+            if (waitpid(child, &status, 0) < 0)
+                perror("waitpid");
+            else if (status != 0)
+            {
+                cerr << "External key pressed command exited with status "
+                     << status << endl;
+            }
+        }
     }
 }
 

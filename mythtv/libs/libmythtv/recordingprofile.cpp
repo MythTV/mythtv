@@ -57,6 +57,17 @@ public:
     };
 };
 
+class BTTVVolume: public CodecParam, public SliderSetting {
+public:
+    BTTVVolume(const RecordingProfile& parent):
+       CodecParam(parent, "volume"),
+       SliderSetting(0,100,1) {
+       setLabel(QObject::tr("Volume (%)"));
+       setValue(90);
+       setHelpText(QObject::tr("Recording volume of the capture card"));
+    };
+};
+
 class SampleRate: public CodecParam, public ComboBoxSetting {
 public:
     SampleRate(const RecordingProfile& parent, bool analog = true):
@@ -200,6 +211,7 @@ public:
         params->setLabel("MP3");
         params->addChild(new SampleRate(parent));
         params->addChild(new MP3Quality(parent));
+        params->addChild(new BTTVVolume(parent));
         addTarget("MP3", params);
 
         params = new VerticalConfigurationGroup(false);
@@ -212,6 +224,7 @@ public:
         params = new VerticalConfigurationGroup(false);
         params->setLabel("Uncompressed");
         params->addChild(new SampleRate(parent));
+        params->addChild(new BTTVVolume(parent));
         addTarget("Uncompressed", params);
     };
 

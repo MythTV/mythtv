@@ -149,6 +149,8 @@ NuppelVideoRecorder::NuppelVideoRecorder(ChannelBase *channel)
 
     prev_bframe_save_pos = -1;
     prev_keyframe_save_pos = -1;
+
+    volume = 100;
 }
 
 NuppelVideoRecorder::~NuppelVideoRecorder(void)
@@ -264,6 +266,8 @@ void NuppelVideoRecorder::SetOption(const QString &opt, int value)
         inpixfmt = (VideoFrameType)value;
     else if (opt == "skipbtaudio")
         skip_btaudio = value;
+    else if (opt == "volume")
+        volume = value;
     else
         RecorderBase::SetOption(opt, value);
 }
@@ -337,6 +341,8 @@ void NuppelVideoRecorder::SetOptionsFromProfile(RecordingProfile *profile,
         cerr << "Unknown audio codec\n";
         SetOption("audiocompression", 0);
     }
+
+    SetIntOption(profile, "volume");
 
     SetIntOption(profile, "width");
     SetIntOption(profile, "height");
@@ -996,8 +1002,6 @@ void NuppelVideoRecorder::StartRecording(void)
         return;
     }
 
-    int volume = -1;
-
     int channelinput = 0;
  
     if (channelObj)
@@ -1015,13 +1019,7 @@ void NuppelVideoRecorder::StartRecording(void)
 
         va.flags &= ~VIDEO_AUDIO_MUTE; // now this really has to work
 
-        if ((volume == -1 && va.volume < 32768) || volume != -1)
-        {
-            if (volume == -1)
-                va.volume = 65535;
-            else
-                va.volume = volume;
-        }
+        va.volume = volume * 65535 / 100;
 
         if (ioctl(fd, VIDIOCSAUDIO, &va) < 0) 
             perror("VIDIOCSAUDIO");

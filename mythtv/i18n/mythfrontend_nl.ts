@@ -7,7 +7,7 @@
     </message>
     <message>
         <source>Yes, save now</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja, bewaar nu.</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
@@ -123,7 +123,7 @@
     </message>
     <message>
         <source>Record one showing of this program</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit programma eenmalig opnemen.</translation>
     </message>
 </context>
 <context>
@@ -381,27 +381,27 @@
     </message>
     <message>
         <source>Recording List Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Opname lijst menu</translation>
     </message>
     <message>
         <source>Change Group View</source>
-        <translation type="unfinished"></translation>
+        <translation>Wijzig groepweergave</translation>
     </message>
     <message>
         <source>Change Group Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Wijzig wachtwoord van groep</translation>
     </message>
     <message>
         <source>Change Recording Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Wijzig opnamegroep</translation>
     </message>
     <message>
         <source>Edit Recording Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Wijzig opnameschema</translation>
     </message>
     <message>
         <source>Recording Group View</source>
-        <translation type="unfinished"></translation>
+        <translation>Groepsweergave</translation>
     </message>
     <message>
         <source>OK</source>
@@ -409,27 +409,27 @@
     </message>
     <message>
         <source>Change Recording Group Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Wijzig opnameegroep wachtwoord</translation>
     </message>
     <message>
         <source>Recording Group:</source>
-        <translation type="unfinished"></translation>
+        <translation>Opname groep:</translation>
     </message>
     <message>
         <source>Old Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>Oud Wachtwoord:</translation>
     </message>
     <message>
         <source>New Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieuw wachtwoord:</translation>
     </message>
     <message>
         <source>, %1 GB free</source>
-        <translation type="unfinished"></translation>
+        <translation>, %1 GB vrij</translation>
     </message>
     <message>
         <source>Yes, but allow future recordings of this episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja, maar neem deze aflevering opnieuw op in de toekomst.</translation>
     </message>
 </context>
 <context>
@@ -476,7 +476,7 @@
     </message>
     <message>
         <source>Recording one showing of this program</source>
-        <translation type="unfinished"></translation>
+        <translation>Neem dit programma eenmalig op</translation>
     </message>
 </context>
 <context>
@@ -503,7 +503,7 @@
     </message>
     <message>
         <source>Category Search</source>
-        <translation>Zoeken om categorie</translation>
+        <translation>Zoeken op categorie</translation>
     </message>
     <message>
         <source>Movie Search</source>
@@ -582,11 +582,11 @@
     </message>
     <message>
         <source>Recording one showing of this program</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit programma wordt eenmalig opgenomen</translation>
     </message>
     <message>
         <source>Any</source>
-        <translation type="unfinished"></translation>
+        <translation>Elke</translation>
     </message>
 </context>
 <context>
@@ -1501,7 +1501,7 @@
     </message>
     <message>
         <source>Program Guide</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Programmagids</translation>
     </message>
     <message>
         <source>Screen settings</source>
@@ -1850,35 +1850,35 @@
     </message>
     <message>
         <source>Single Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Enkele opname</translation>
     </message>
     <message>
         <source>Daily Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Dagelijkse opname</translation>
     </message>
     <message>
         <source>Weekly Recording</source>
-        <translation type="unfinished">Wekelijks Opnemen</translation>
+        <translation>Wekelijkse Opname</translation>
     </message>
     <message>
         <source>Conflicting</source>
-        <translation type="unfinished">Conflicterende</translation>
+        <translation>Conflicterende</translation>
     </message>
     <message>
         <source>Will Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Wordt opgenomen</translation>
     </message>
     <message>
         <source>Don&apos;t record it</source>
-        <translation type="unfinished"></translation>
+        <translation>Neem niet op</translation>
     </message>
     <message>
         <source>Never record this episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Nooit opnemen</translation>
     </message>
     <message>
         <source>Record it anyway</source>
-        <translation type="unfinished"></translation>
+        <translation>Altijd openemen</translation>
     </message>
     <message>
         <source>Remember this choice and use it automatically in the future</source>
@@ -1886,11 +1886,11 @@
     </message>
     <message>
         <source>Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Prioriteit</translation>
     </message>
     <message>
         <source>Enable AC3 to SPDIF passthrough</source>
-        <translation type="unfinished"></translation>
+        <translation>AC3 naar SPDIF geluid</translation>
     </message>
     <message>
         <source>Enable sending AC3 sound directly to your sound card&apos;s SPDIF output, on sources which contain AC3 soundtracks (usually digital TV).  Requires that the audio output device be set to something suitable.</source>
@@ -2022,7 +2022,7 @@
     </message>
     <message>
         <source>Not Flagged</source>
-        <translation type="unfinished"></translation>
+        <translation>Net gemarkeerd</translation>
     </message>
     <message>
         <source>Use video as timebase</source>
@@ -2106,115 +2106,115 @@
     </message>
     <message>
         <source>Deleted</source>
-        <translation type="unfinished"></translation>
+        <translation>Gewist</translation>
     </message>
     <message>
         <source>Stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>Gestopt</translation>
     </message>
     <message>
         <source>Recorded</source>
-        <translation type="unfinished"></translation>
+        <translation>Opgenomen</translation>
     </message>
     <message>
         <source>Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Opname</translation>
     </message>
     <message>
         <source>Previous Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Vorige opname</translation>
     </message>
     <message>
         <source>Current Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Huidige opname</translation>
     </message>
     <message>
         <source>Max Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Maximum # opnames</translation>
     </message>
     <message>
         <source>Manual Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Manueel anuleren</translation>
     </message>
     <message>
         <source>Low Disk Space</source>
-        <translation type="unfinished"></translation>
+        <translation>Weinig diskruimte</translation>
     </message>
     <message>
         <source>Tuner Busy</source>
-        <translation type="unfinished"></translation>
+        <translation>TVkaart in gebruik</translation>
     </message>
     <message>
         <source>This showing will be recorded.</source>
-        <translation type="unfinished"></translation>
+        <translation>Deze uitzending zal opgenomen worden.</translation>
     </message>
     <message>
         <source>This showing is being recorded.</source>
-        <translation type="unfinished"></translation>
+        <translation>Deze uitzending wordt opgenomen.</translation>
     </message>
     <message>
         <source>This showing was recorded.</source>
-        <translation type="unfinished"></translation>
+        <translation>Deze uitzending werd opgenomen.</translation>
     </message>
     <message>
         <source>This showing was recorded but was stopped before recording was completed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Deze uitzending werd opgenomen maar gestopt voordat ze afgelopen was.</translation>
     </message>
     <message>
         <source>This showing was recorded but was deleted before recording was completed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Deze uitzending werd opgenomen maar was verwijderd voordat ze afgelopen was.</translation>
     </message>
     <message>
         <source>The status of this showing is unknown.</source>
-        <translation type="unfinished"></translation>
+        <translation>Geen statusinfo over deze uitzending.</translation>
     </message>
     <message>
         <source>This showing will not be recorded because </source>
-        <translation type="unfinished"></translation>
+        <translation>Deze uitzending zal niet opgenomen worden omdat </translation>
     </message>
     <message>
         <source>This showing was not recorded because </source>
-        <translation type="unfinished"></translation>
+        <translation>Deze uitzending werd niet opgenomen omdat </translation>
     </message>
     <message>
         <source>it was manually set to not record.</source>
-        <translation type="unfinished"></translation>
+        <translation>er manueel ingesteld is om niet op te nemen.</translation>
     </message>
     <message>
         <source>this episode was previously recorded according to the duplicate policy chosen for this title.</source>
-        <translation type="unfinished"></translation>
+        <translation>deze aflevering al opgenomen is.</translation>
     </message>
     <message>
         <source>this episode was previously recorded and is still available in the list of recordings.</source>
-        <translation type="unfinished"></translation>
+        <translation>deze aflevering al opgenomen is en ze nog bij de opnames staat.</translation>
     </message>
     <message>
         <source>too many recordings of this program have already been recorded.</source>
-        <translation type="unfinished"></translation>
+        <translation>er al te veel afleveringen van deze uitzending opgenomen zijn.</translation>
     </message>
     <message>
         <source>it was manually cancelled.</source>
-        <translation type="unfinished"></translation>
+        <translation>ze handmating onderbroken is.</translation>
     </message>
     <message>
         <source>it is covered by another scheduled recording for the same program.</source>
-        <translation type="unfinished"></translation>
+        <translation>ze op een ander tijdstip opgenomen wordt.</translation>
     </message>
     <message>
         <source>there wasn&apos;t enough disk space available.</source>
-        <translation type="unfinished"></translation>
+        <translation>er onvoldoende diskruimtte beschikbaar was.</translation>
     </message>
     <message>
         <source>the tuner card was already being used.</source>
-        <translation type="unfinished"></translation>
+        <translation>de TVkaart in gebruik was.</translation>
     </message>
     <message>
         <source>you should never see this.</source>
-        <translation type="unfinished"></translation>
+        <translation>dit zou je niet mogen zien.</translation>
     </message>
     <message>
         <source>ProfileGroup</source>
-        <translation type="unfinished"></translation>
+        <translation>Profielgroep</translation>
     </message>
     <message>
         <source>Transcoders</source>
@@ -3195,7 +3195,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Record one showing of this program</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dit programma eenmalig opnemen.</translation>
     </message>
     <message>
         <source>Do not adjust BT audio volume.</source>
@@ -3355,19 +3355,19 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>%1 behind  --  %2 full</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 achter  --  %2 vol</translation>
     </message>
     <message>
         <source>%1 behind</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 achter</translation>
     </message>
     <message>
         <source>%1 of %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 van %2</translation>
     </message>
     <message>
         <source>All Programs</source>
-        <translation type="unfinished">Alle programma&apos;s</translation>
+        <translation>Alle programma&apos;s</translation>
     </message>
     <message>
         <source>Commercial Skip Auto-Rewind Amount</source>
@@ -3379,11 +3379,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Skip %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Sla %1 over</translation>
     </message>
     <message>
         <source>Commercial: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Reclameblok : %1</translation>
     </message>
     <message>
         <source>Logo Detection</source>
@@ -3415,15 +3415,15 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>this episode will be recorded at an earlier time instead.</source>
-        <translation type="unfinished"></translation>
+        <translation>deze aflevering zal op een vroeger tijdstip opgenomen worden.</translation>
     </message>
     <message>
         <source>another program with a higher priority will be recorded instead.</source>
-        <translation type="unfinished"></translation>
+        <translation>een ander programma met een hogere prioriteit zal opgenomen worden.</translation>
     </message>
     <message>
         <source>this episode will be recorded at a later time instead.</source>
-        <translation type="unfinished"></translation>
+        <translation>deze aflevering zal later opgenomen worden.</translation>
     </message>
     <message>
         <source>Clear Override</source>
@@ -3432,7 +3432,8 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>The following programs will be recorded instead:
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Dit programma wordt in de plaats opgenomen: 
+</translation>
     </message>
     <message>
         <source>30m</source>
@@ -3440,15 +3441,15 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>1h</source>
-        <translation type="unfinished"></translation>
+        <translation>1u</translation>
     </message>
     <message>
         <source>1h30m</source>
-        <translation type="unfinished"></translation>
+        <translation>1u30</translation>
     </message>
     <message>
         <source>2h</source>
-        <translation type="unfinished"></translation>
+        <translation>2u</translation>
     </message>
     <message>
         <source>Input preference</source>
@@ -3687,15 +3688,15 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <name>ScheduledRecording</name>
     <message>
         <source>List upcoming episodes</source>
-        <translation type="unfinished"></translation>
+        <translation>Lijst van volgende afleveringen</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Anuleer</translation>
+        <translation>&amp;Anuleer</translation>
     </message>
     <message>
         <source>&amp;Finish</source>
-        <translation type="unfinished">&amp;Beeindig</translation>
+        <translation>&amp;Beeindig</translation>
     </message>
 </context>
 <context>
@@ -3806,59 +3807,59 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Stopping Transcode</source>
-        <translation type="unfinished"></translation>
+        <translation>Stop van transcode</translation>
     </message>
     <message>
         <source>Transcoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Transcode</translation>
     </message>
     <message>
         <source>Forward</source>
-        <translation type="unfinished"></translation>
+        <translation>Spoel Verder</translation>
     </message>
     <message>
         <source>Skip Ahead</source>
-        <translation type="unfinished"></translation>
+        <translation>Sla over</translation>
     </message>
     <message>
         <source>Rewind</source>
-        <translation type="unfinished"></translation>
+        <translation>Spoel terug</translation>
     </message>
     <message>
         <source>Skip Back</source>
-        <translation type="unfinished"></translation>
+        <translation>Spring terug</translation>
     </message>
     <message>
         <source>Play</source>
-        <translation type="unfinished">Afspelen</translation>
+        <translation>Afspelen</translation>
     </message>
     <message>
         <source>Speed 5X</source>
-        <translation type="unfinished"></translation>
+        <translation>Snelheid 5X</translation>
     </message>
     <message>
         <source>Speed 3X</source>
-        <translation type="unfinished"></translation>
+        <translation>Snelheid 3X</translation>
     </message>
     <message>
         <source>Speed 2X</source>
-        <translation type="unfinished"></translation>
+        <translation>Snelheid 2X</translation>
     </message>
     <message>
         <source>Speed 1/3X</source>
-        <translation type="unfinished"></translation>
+        <translation>Snelheid 1/3X</translation>
     </message>
     <message>
         <source>Speed 1/8X</source>
-        <translation type="unfinished"></translation>
+        <translation>Snelheid 1/8X</translation>
     </message>
     <message>
         <source>Speed 1/16X</source>
-        <translation type="unfinished"></translation>
+        <translation>Snelheid 1/16X</translation>
     </message>
     <message>
         <source>Skip</source>
-        <translation type="unfinished"></translation>
+        <translation>Sla over</translation>
     </message>
     <message>
         <source>16:9</source>
@@ -3870,59 +3871,47 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>This program is currently being edited</source>
-        <translation type="unfinished"></translation>
+        <translation>Deze opname wordt momenteel bewerkt</translation>
     </message>
     <message>
         <source>Continue Editing</source>
-        <translation type="unfinished"></translation>
+        <translation>Blijf bewerken</translation>
     </message>
     <message>
         <source>Do not edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Niet bewerken</translation>
     </message>
     <message>
         <source>Brightness (REC) %1 %</source>
-        <translation type="unfinished"></translation>
+        <translation>Helderheid (REC) %1 %</translation>
     </message>
     <message>
         <source>Contrast (REC) %1 %</source>
-        <translation type="unfinished"></translation>
+        <translation>Contrast (REC) %1 %</translation>
     </message>
     <message>
         <source>Colour (REC) %1 %</source>
-        <translation type="unfinished"></translation>
+        <translation>Kleur (REC) %1 %</translation>
     </message>
     <message>
         <source>Hue (REC) %1 %</source>
-        <translation type="unfinished"></translation>
+        <translation>Hue (REC) %1 %</translation>
     </message>
     <message>
         <source>Program Menu</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Set Commercial Auto-Skip OFF</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Set Commercial Auto-Skip ON</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Set Commercial Auto-Skip to Notify</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Opnamemenu</translation>
     </message>
     <message>
         <source>Don&apos;t Auto Expire</source>
-        <translation type="unfinished">Niet automatisch laten vervallen</translation>
+        <translation type="obsolete">Niet automatisch laten vervallen</translation>
     </message>
     <message>
         <source>Auto Expire</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Automatisch laten vervallen</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Annuleer</translation>
+        <translation type="obsolete">Annuleer</translation>
     </message>
     <message>
         <source>Auto-Skip OFF</source>
@@ -3946,99 +3935,99 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Adjust Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Pas opname aan</translation>
     </message>
     <message>
         <source>Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Neem op</translation>
     </message>
     <message>
         <source>Jump To</source>
-        <translation type="unfinished"></translation>
+        <translation>Spring naar</translation>
     </message>
     <message>
         <source>You are currently behind real time. If you change channels now, you will lose any unwatched video.</source>
-        <translation type="unfinished"></translation>
+        <translation>U loopt momenteel achter op live. Als u nu van zender wijzigt, zal u het onbekeken stuk kwijt raken.</translation>
     </message>
     <message>
         <source>Change the channel anyway</source>
-        <translation type="unfinished"></translation>
+        <translation>Verander toch van zender</translation>
     </message>
     <message>
         <source>Zoom Mode OFF</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoom Mode AF</translation>
     </message>
     <message>
         <source>Activate Zoom Mode</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Zoom Mode AAN</translation>
     </message>
     <message>
         <source>Auto-Expire OFF</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatisch vervallen AF</translation>
     </message>
     <message>
         <source>Auto-Expire ON</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatisch vervallen AAN</translation>
     </message>
     <message>
         <source>Zoom Mode ON</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoom Mode AAN</translation>
     </message>
     <message>
         <source>Left Channel Muted</source>
-        <translation type="unfinished"></translation>
+        <translation>Links Kanaal Stil</translation>
     </message>
     <message>
         <source>Right Channel Muted</source>
-        <translation type="unfinished"></translation>
+        <translation>Rechts Kanaal Stil</translation>
     </message>
     <message>
         <source>Sleep </source>
-        <translation type="unfinished"></translation>
+        <translation>Slaap timer </translation>
     </message>
     <message>
         <source>16:9 Stretch</source>
-        <translation type="unfinished"></translation>
+        <translation>16:9 Uitgerekt</translation>
     </message>
     <message>
         <source>Program Guide</source>
-        <translation type="unfinished"></translation>
+        <translation>Programmagids</translation>
     </message>
     <message>
         <source>Picture-in-Picture</source>
-        <translation type="unfinished"></translation>
+        <translation>Beeld in Beeld</translation>
     </message>
     <message>
         <source>Enable/Disable</source>
-        <translation type="unfinished"></translation>
+        <translation>AAN/AF</translation>
     </message>
     <message>
         <source>Swap Channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Wissel zenders</translation>
     </message>
     <message>
         <source>Change Active Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Wissel actief venster</translation>
     </message>
     <message>
         <source>Enable Browse Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Gebruik Browse Mode</translation>
     </message>
     <message>
         <source>Previous Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Vorige zender</translation>
     </message>
     <message>
         <source>Edit Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Editeer opname</translation>
     </message>
     <message>
         <source>Toggle CC</source>
-        <translation type="unfinished"></translation>
+        <translation>Ondertitels AAN/UIT</translation>
     </message>
     <message>
         <source>Toggle Teletext</source>
-        <translation type="unfinished"></translation>
+        <translation>Teletext AAN/UIT</translation>
     </message>
     <message>
         <source>Closed Captioning</source>
@@ -4046,6 +4035,26 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>CC%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commercial Auto-Skip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn Auto-Expire OFF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn Auto-Expire ON</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Aspect Ratio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manual Zoom Mode</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4141,43 +4150,43 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Show  (1) All  (2) Important</source>
-        <translation type="unfinished"></translation>
+        <translation>Filter (1) Alles  (2) Belangrijke</translation>
     </message>
     <message>
         <source>Showing:</source>
-        <translation type="unfinished"></translation>
+        <translation>Filter:</translation>
     </message>
     <message>
         <source>Channel Recording Priorities</source>
-        <translation type="unfinished"></translation>
+        <translation>Opnameprioriteit per kanaal</translation>
     </message>
     <message>
         <source>(1) Sort by Channel    (2) Sort by Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>(1) Sorteer op zender   (2) Sorteer op prioriteit</translation>
     </message>
     <message>
         <source>Priority:</source>
-        <translation type="unfinished"></translation>
+        <translation>Prioriteit:</translation>
     </message>
     <message>
         <source>Program Recording Priorities</source>
-        <translation type="unfinished"></translation>
+        <translation>Opnameprioriteit</translation>
     </message>
     <message>
         <source>Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Prioriteit</translation>
     </message>
     <message>
         <source>Final Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Eindprioriteit</translation>
     </message>
     <message>
         <source>(1) Sort by Title    (2) Sort by Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>(1) Sorteer op titel   (2) Sorteer op Prioriteit</translation>
     </message>
     <message>
         <source>Record Type:</source>
-        <translation type="unfinished"></translation>
+        <translation>Opnametype:</translation>
     </message>
     <message>
         <source>[</source>
@@ -4193,11 +4202,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Program Listings</source>
-        <translation type="unfinished">Programmaoverzicht</translation>
+        <translation>Programmaoverzicht</translation>
     </message>
     <message>
         <source>No listings found for this program. </source>
-        <translation type="unfinished"></translation>
+        <translation>Dit programma komt niet voor in de gids. </translation>
     </message>
 </context>
 <context>
@@ -4212,11 +4221,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Edit..</source>
-        <translation type="unfinished">Bewerk..</translation>
+        <translation>Bewerk..</translation>
     </message>
     <message>
         <source>Delete..</source>
-        <translation type="unfinished">Verwijder..</translation>
+        <translation>Verwijder..</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this video source?</source>

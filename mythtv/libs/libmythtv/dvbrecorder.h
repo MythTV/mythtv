@@ -101,6 +101,8 @@ private:
     bool wait_for_seqstart;
     bool wait_for_seqstart_enabled;
 
+    bool signal_monitor_quit;
+
     QMap<long long, long long> positionMap;
     long long prev_gop_save_pos;
 

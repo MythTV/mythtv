@@ -185,10 +185,13 @@ MythMainWindow::MythMainWindow(QWidget *parent, const char *name, bool modal)
     RegisterKey("Global", "7", "7", "7");
     RegisterKey("Global", "8", "8", "8");
     RegisterKey("Global", "9", "9", "9");
+
+    qApp->setOverrideCursor(QCursor(Qt::BlankCursor));
 }
 
 MythMainWindow::~MythMainWindow()
 {
+    qApp->restoreOverrideCursor();
     delete d;
 }
 
@@ -207,7 +210,6 @@ void MythMainWindow::Init(void)
 
     setFont(gContext->GetMediumFont());
     setCursor(QCursor(Qt::BlankCursor));
-    qApp->setOverrideCursor(QCursor(Qt::BlankCursor));
 
 #ifdef QWS
 #if QT_VERSION >= 0x030300

@@ -2270,8 +2270,10 @@ static int mpeg_decode_slice(Mpeg1Context *s1, int mb_y,
 #ifdef HAVE_VIASLICE
     if (s->avctx->via_hwslice){
         int used = VIA_decode_slice(s, mb_y, *buf, buf_size);
+        if (used < 0)
+            return DECODE_SLICE_ERROR;
         *buf += used - 1;
-        return 0;
+        return DECODE_SLICE_OK;
     }
 #endif
     

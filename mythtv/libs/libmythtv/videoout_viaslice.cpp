@@ -59,8 +59,6 @@ struct ViaData
     unsigned char *current;
     unsigned char *subp_buffer;
    
-    unsigned char *tempbuffer;
-
     DDLOCK ddLock;
     VIASUBPICT VIASubPict;
     int fd;
@@ -236,8 +234,6 @@ bool VideoOutputVIA::Init(int width, int height, float aspect,
     data->subp_buffer = new unsigned char[1920 * 1080];
     memset(data->subp_buffer, 0, 1920 * 1080);
    
-    data->tempbuffer = new unsigned char[720 * 576 * 2];
-    
     VIADriverProc(CREATEDRIVER, NULL);
 
     if (!CreateViaBuffers())
@@ -331,14 +327,13 @@ void VideoOutputVIA::Exit(void)
 
         DeleteViaBuffers();
 
-	VIADriverProc(DESTROYDRIVER, NULL);
+        VIADriverProc(DESTROYDRIVER, NULL);
 	
         XFreeGC(data->XJ_disp, data->XJ_gc);
         XCloseDisplay(data->XJ_disp);
 
         delete [] data->buffer;
         delete [] data->subp_buffer;
-        delete [] data->tempbuffer;
     }
 }
 
@@ -426,48 +421,32 @@ void VideoOutputVIA::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
     if (curdata->slicecount == 1)
         data->current = data->buffer;
 
-    memset(data->tempbuffer + curdata->slice_datalen, 0, 32);
-    memcpy(data->tempbuffer, curdata->slice_data, curdata->slice_datalen);
+    /* VIA Mpeg Slice Layout:
+     *  uint32_t size
+     *  uint32_t startcode
+     *  uint8_t  slice_data[slice_datalen]
+     *  uint8_t  padding[ 8 - (slice_datalen % 4) ]
+     */
 
-    unsigned char *lpDataTmp;
-    unsigned char *lpData = data->tempbuffer;
-    unsigned long dwCount = curdata->slice_datalen;
+    uint8_t padding = 8 - (curdata->slice_datalen % 4);
 
-   //Padding bitstream & recount byte count, do alignment by Kevin 2002/1/22
-    lpDataTmp = lpData + dwCount;
-    *(unsigned long *)lpDataTmp = 0;
-    lpDataTmp = lpData + dwCount + (4-( dwCount % 4 ));
-    *(unsigned long *)lpDataTmp = 0;
-    *(unsigned long *)(lpDataTmp+4) = 0;
-    *(unsigned long *)(lpDataTmp+8) = 0;
+    // XXX Overflow/Reallocate...
 
-    if ( dwCount % 4 )
-        dwCount += (4 - ( dwCount%4))+8;
-    else
-        dwCount += 8;
-    // Padding end
-
-    /* KevinH: +4 is to add the size of start code */
-    *(unsigned long *)data->current = dwCount + 4;
+    *(uint32_t*)data->current = curdata->slice_datalen + padding + 4;
     data->current += 4;
 
-    /* KevinH: add start code here, coz the lpData
-     * doesn't contain the start code, be careful
-    * about byte order
-     */
-   //*(unsigned long *)this->current = 0x00010000 | (this->slicecount + 1)<<24; 
-    *(unsigned long *)data->current = 0x00010000 | curdata->code<<24;
+    *(uint32_t*)data->current = 0x00010000 | curdata->code << 24;
     data->current += 4;
 
-    memcpy((void *) data->current, (void *) lpData, dwCount);
+    memcpy(data->current, curdata->slice_data, curdata->slice_datalen);
+    data->current += curdata->slice_datalen;
 
-    data->current += dwCount;
+    memset(data->current, 0, padding);
+    data->current += padding;
 
-    /*  KevinH: After we have collected all slices of a frame,
-     *  we send to H/W mpeg engine
-     */
     if (curdata->code == curdata->maxcode)
     {
+        // Send slices to HW Decoder
         VIASliceReceiveData(curdata->slicecount, data->buffer);
         curdata->slicecount = 1;
         curdata->lastcode = 0;

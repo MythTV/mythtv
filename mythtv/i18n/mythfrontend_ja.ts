@@ -3983,31 +3983,31 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Program Menu</source>
-        <translation>番組メニュー</translation>
+        <translation type="obsolete">番組メニュー</translation>
     </message>
     <message>
         <source>Set Commercial Auto-Skip OFF</source>
-        <translation>自動CMスキップを無効にする</translation>
+        <translation type="obsolete">自動CMスキップを無効にする</translation>
     </message>
     <message>
         <source>Set Commercial Auto-Skip ON</source>
-        <translation>自動CMスキップを有効にする</translation>
+        <translation type="obsolete">自動CMスキップを有効にする</translation>
     </message>
     <message>
         <source>Set Commercial Auto-Skip to Notify</source>
-        <translation>自動CMスキップを通知する</translation>
+        <translation type="obsolete">自動CMスキップを通知する</translation>
     </message>
     <message>
         <source>Don&apos;t Auto Expire</source>
-        <translation>自動削除しない</translation>
+        <translation type="obsolete">自動削除しない</translation>
     </message>
     <message>
         <source>Auto Expire</source>
-        <translation>自動削除する</translation>
+        <translation type="obsolete">自動削除する</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>キャンセル</translation>
+        <translation type="obsolete">キャンセル</translation>
     </message>
     <message>
         <source>Auto-Skip OFF</source>
@@ -4051,7 +4051,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Activate Zoom Mode</source>
-        <translation>ズームモード有効</translation>
+        <translation type="obsolete">ズームモード有効</translation>
     </message>
     <message>
         <source>Auto-Expire OFF</source>
@@ -4127,6 +4127,26 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>CC%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commercial Auto-Skip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn Auto-Expire OFF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn Auto-Expire ON</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Aspect Ratio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manual Zoom Mode</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
