@@ -386,12 +386,6 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
 int AvFormatDecoder::ScanStreams(bool novideo)
 {
-    // Scan for audio tracks and pick one to use.
-    if (scanAudioTracks())
-    {
-        autoSelectAudioTrack();
-    }
-
     bitrate = 0;
     fps = 0;
 
@@ -401,16 +395,13 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         VERBOSE(VB_PLAYBACK, "AVFD");
         VERBOSE(VB_PLAYBACK, QString("AVFD: Opening Stream #%1: codec id %2").
                 arg(i).arg(enc->codec_id));
+
         switch (enc->codec_type)
         {
             case CODEC_TYPE_VIDEO:
             {
-                VERBOSE(VB_PLAYBACK, QString("AVFD: Video Codec -- codec id %1").arg(enc->codec_id));
-                if (!enc->codec_id)
-                { // default to MPEG2 video
-                    VERBOSE(VB_IMPORTANT, "AVFD: Error, video has no codec_id");
-                    enc->codec_id = CODEC_ID_MPEG2VIDEO;
-                }
+                assert(enc->codec_id);
+
                 bitrate += enc->bit_rate;
 
                 fps = (double)enc->frame_rate / enc->frame_rate_base;
@@ -488,12 +479,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             }
             case CODEC_TYPE_AUDIO:
             {
-                VERBOSE(VB_PLAYBACK, QString("AVFD: Audio Codec -- codec id %1").arg(enc->codec_id));
-                if (!enc->codec_id)
-                { // default to AC3 audio
-                    VERBOSE(VB_IMPORTANT, "AVFD: Error, audio has no codec_id"); 
-                    enc->codec_id = CODEC_ID_AC3;
-                }
+                assert(enc->codec_id);
+
                 if (i == wantedAudioStream)
                 {
                     VERBOSE(VB_AUDIO, QString("Initializing audio parms from stream #%1.").arg(i));
@@ -561,6 +548,12 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             return -1;
         }
     }
+
+    currentAudioTrack = -1;
+    // Scan for audio tracks and pick one to use.
+    if (scanAudioTracks())
+        autoSelectAudioTrack();
+
     return 0;
 }
 
