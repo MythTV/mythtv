@@ -971,10 +971,9 @@
         <fcnfont name="inactive_font" function="inactive"></fcnfont>
         <fcnfont name="active_font" function="selected"></fcnfont>
         <columnpadding>1</columnpadding>
-        <column number="1" width="75" context="-1"></column>
-        <column number="2" width="590" context="-1"></column>
-        <column number="3" width="17" context="-1"></column>
-        <column number="4" width="50" context="-1"></column>
+        <column number="1" width="665" context="-1"></column>
+        <column number="2" width="17" context="-1"></column>
+        <column number="3" width="50" context="-1"></column>
         <items>9</items>
         <image function="selectionbar" filename="tit-trk-selectbar.png" location="-6,-2"></image>
         <image function="uparrow" filename="uparrow.png" location="755,22"></image>
@@ -987,23 +986,26 @@
     </container>
 
     <container name="channel_info">
-      <area>0,414,800,240</area>
-      <image name="icon" draworder="6">
-        <position>20,0</position>
-               <filename>blankicon.jpg</filename>
-        <staticsize>60,60</staticsize>
-      </image>
+      <area>0,410,740,240</area>
       <textarea name="title" draworder="6">
-        <area>120,12,800,40</area>
+        <area>30,12,740,40</area>
         <font>title</font>
       </textarea>
-      <textarea name="inforecpriority" draworder="6">
-        <area>20,90,160,30</area>
+      <textarea name="infosource" draworder="6">
+        <area>30,65,100,30</area>
+        <font>info</font>
+        <value>Source:</value>
+      </textarea>
+      <textarea name="source" draworder="6">
+        <area>150,65,400,30</area>
+        <font>info</font>
+      </textarea>      <textarea name="inforecpriority" draworder="6">
+        <area>20,100,100,30</area>
         <font>info</font>
         <value>Priority:</value>
       </textarea>
       <textarea name="recpriority" draworder="6">
-        <area>200,90,400,30</area>
+        <area>150,100,400,30</area>
         <font>info</font>
       </textarea>
     </container>
@@ -1134,12 +1136,12 @@
         <value>Program Recording Priorities</value>
       </textarea>
       <textarea name="recprioritylabel" draworder="0">
-        <area>625,20,800,40</area>
+        <area>615,20,65,20</area>
         <font>tinyinfo</font>
         <value>Priority</value>
       </textarea>
       <textarea name="finalrecprioritylabel" draworder="0">
-        <area>690,20,800,40</area>
+        <area>680,20,110,20</area>
         <font>tinyinfo</font>
         <value>Final Priority</value>
       </textarea>
@@ -1162,11 +1164,12 @@
         <fcnfont name="inactive_font" function="inactive"></fcnfont>
         <fcnfont name="active_font" function="selected"></fcnfont>
         <columnpadding>1</columnpadding>
-        <column number="1" width="615" context="-1"></column>
-        <column number="2" width="17" context="-1"></column>
-        <column number="3" width="56" context="-1"></column>
-        <column number="4" width="17" context="-1"></column>
-        <column number="5" width="50" context="-1"></column>
+        <column number="1" width="35" context="-1"></column>
+        <column number="2" width="575" context="-1"></column>
+        <column number="3" width="17" context="-1"></column>
+        <column number="4" width="50" context="-1"></column>
+        <column number="5" width="17" context="-1"></column>
+        <column number="6" width="50" context="-1"></column>
         <items>11</items>
         <image function="selectionbar" filename="tit-trk-selectbar.png" location="-6,-2"></image>
         <image function="uparrow" filename="uparrow.png" location="755,22"></image>
@@ -1179,22 +1182,22 @@
     </container>
 
     <container name="program_info">
-      <area>0,410,800,240</area>
+      <area>20,410,800,240</area>
       <textarea name="title" draworder="6">
-        <area>20,0,800,50</area>
+        <area>0,0,800,50</area>
         <font>title</font>
       </textarea>
       <textarea name="subtitle" draworder="6">
-        <area>20,40,579,30</area>
+        <area>0,40,579,30</area>
         <font>subtitle</font>
       </textarea>
       <textarea name="infotype" draworder="6">
-        <area>20,70,280,30</area>
+        <area>0,70,280,30</area>
         <font>info</font>
         <value>Record Type:</value>
       </textarea>
       <textarea name="type" draworder="6">
-        <area>180,70,430,30</area>
+        <area>160,70,430,30</area>
         <font>info</font>
       </textarea>
       <textarea name="typebracketA" draworder="6">
@@ -1216,12 +1219,12 @@
         <value>]</value>
       </textarea>
       <textarea name="infochannel" draworder="6">
-        <area>20,100,160,30</area>
+        <area>0,100,160,30</area>
         <font>info</font>
         <value>Channel:</value>
       </textarea>
       <textarea name="channel" draworder="6">
-        <area>180,100,400,30</area>
+        <area>160,100,400,30</area>
         <font>info</font>
       </textarea>
       <textarea name="channelbracketA" draworder="6">
@@ -1243,12 +1246,12 @@
         <value>]</value>
       </textarea>
       <textarea name="inforecpriority" draworder="6">
-        <area>20,130,160,30</area>
+        <area>0,130,160,30</area>
         <font>info</font>
         <value>Priority:</value>
       </textarea>
       <textarea name="recpriority" draworder="6">
-        <area>180,130,400,30</area>
+        <area>160,130,400,30</area>
         <font>info</font>
       </textarea>
       <textarea name="recprioritybracketA" draworder="6">

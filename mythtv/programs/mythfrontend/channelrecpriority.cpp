@@ -408,8 +408,8 @@ void ChannelRecPriority::FillList(void)
 
     channelData.clear();
 
-    QString query = QString("SELECT chanid, channum, callsign, icon, "
-                            "recpriority, name FROM channel;");
+    QString query = QString("SELECT chanid, channum, sourceid, callsign, "
+                            "icon, recpriority, name FROM channel;");
 
     QSqlQuery result = db->exec(query);
 
@@ -419,10 +419,11 @@ void ChannelRecPriority::FillList(void)
             ChannelInfo *chaninfo = new ChannelInfo;
             chaninfo->chanid = result.value(0).toInt();
             chaninfo->chanstr = result.value(1).toString();
-            chaninfo->callsign = QString::fromUtf8(result.value(2).toString());
-            chaninfo->iconpath = result.value(3).toString();
-            chaninfo->recpriority = result.value(4).toString();
-            chaninfo->channame = QString::fromUtf8(result.value(5).toString());
+            chaninfo->sourceid = result.value(2).toInt();
+            chaninfo->callsign = QString::fromUtf8(result.value(3).toString());
+            chaninfo->iconpath = result.value(4).toString();
+            chaninfo->recpriority = result.value(5).toString();
+            chaninfo->channame = QString::fromUtf8(result.value(6).toString());
             channelData[QString::number(cnt)] = *chaninfo;
 
             // save recording priority value in map so we don't have to save 
@@ -654,6 +655,10 @@ void ChannelRecPriority::updateInfo(QPainter *p)
             if (type)
                 type->SetText(curitem->Text(longchannelformat));
  
+            type = (UITextType *)container->GetType("source");
+            if (type)
+                type->SetText(QString("%1").arg(curitem->sourceid));
+
             type = (UITextType *)container->GetType("recpriority");
             if (type) {
                 if (curitem->recpriority.toInt() > 0)

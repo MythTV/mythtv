@@ -169,9 +169,9 @@ EPG
   Successive keypresses cycle through the scheduled recording type list.
 - Pressing X will change the channel to the currently selected channel without
   leaving the EPG (Most useful in the alternate EPG)
-- Pressing '/' will mark/unmark the current channel as a "favorite"
-- Pressing 4 will toggle the guide listing between all channels and filtered
-  "favorites".
+- Pressing '?' will mark/unmark the current channel as a "favorite"
+- Pressing '/' or 4 will toggle the guide listing between all channels and
+  and "favorites".
 
 Set Program Recording Priorities and Set Channel Recording Priorities
 ---------------------------------------------

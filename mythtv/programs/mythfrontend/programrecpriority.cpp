@@ -879,22 +879,23 @@ void ProgramRecPriority::updateList(QPainter *p)
                             ltype->SetItemCurrent(cnt);
                         }
 
-                        ltype->SetItemText(cnt, 1, tempSubTitle);
+                        ltype->SetItemText(cnt, 1, progInfo->RecTypeChar());
+                        ltype->SetItemText(cnt, 2, tempSubTitle);
 
-                        if (progRecPriority >= 0)
-                            ltype->SetItemText(cnt, 2, "+");
-                        else if (progRecPriority < 0)
-                            ltype->SetItemText(cnt, 2, "-");
-                        ltype->SetItemText(cnt, 3, 
-                                        QString::number(abs(progRecPriority)));
+                        if (progRecPriority < 0)
+                            ltype->SetItemText(cnt, 3, "-");
+                        else
+                            ltype->SetItemText(cnt, 3, "+");
+                        ltype->SetItemText(cnt, 4, 
+                                QString::number(abs(progRecPriority)));
 
-                        if (finalRecPriority >= 0)
-                            ltype->SetItemText(cnt, 4, "+");
-                        else if (finalRecPriority < 0)
-                            ltype->SetItemText(cnt, 4, "-");
+                        if (finalRecPriority < 0)
+                            ltype->SetItemText(cnt, 5, "-");
+                        else
+                            ltype->SetItemText(cnt, 5, "+");
 
-                        ltype->SetItemText(cnt, 5, 
-                                           QString::number(abs(finalRecPriority)));
+                        ltype->SetItemText(cnt, 6, 
+                                QString::number(abs(finalRecPriority)));
 
                         if (progInfo->rectype == kDontRecord)
                             ltype->EnableForcedFont(cnt, "inactive");
@@ -982,25 +983,25 @@ void ProgramRecPriority::updateInfo(QPainter *p)
                         text = tr("Recording just this showing");
                         break;
                     case kOverrideRecord:
-                        text = tr("Recording this showing with override options");
+                        text = tr("Recording with override options");
                         break;
                     case kWeekslotRecord:
                         text = tr("Recording every week");
                         break;
                     case kTimeslotRecord:
-                        text = tr("Recording when shown in this timeslot");
+                        text = tr("Recording in this timeslot");
                         break;
                     case kChannelRecord:
-                        text = tr("Recording when shown on this channel");
+                        text = tr("Recording on this channel");
                         break;
                     case kAllRecord:
                         text = tr("Recording all showings");
                         break;
                     case kFindOneRecord:
-                        text = tr("Recording one showing of this program");
+                        text = tr("Recording one showing");
                         break;
                     case kDontRecord:
-                        text = tr("Manually not recording this showing");
+                        text = tr("Not allowed to record this showing");
                         break;
                     case kNotRecording:
                         text = tr("Not recording this showing");

@@ -19,6 +19,7 @@ class ChannelInfo
     QString chanstr;
     QString channame;
     int chanid;
+    int sourceid;
     int favid;
     QString recpriority;
 
