@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2004-01-17, v0.13.11
+  2004-01-21, v0.13.12
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -48,8 +48,7 @@
            3.2.3.2 Red Hat Linux 8.0
         3.2.4 Command-line installation.
            3.2.4.1 Mandrake
-              3.2.4.1.1 Special instructions for Mandrake 8.2
-              3.2.4.1.2 Mandrake 8.2 and 9.0
+              3.2.4.1.1 Mandrake 9.0
            3.2.4.2 Gentoo.
 
   4. System Configuration Requirements for Compiling MythTV
@@ -190,6 +189,8 @@
      20.28 Troubleshooting the Hauppauge PVR-250 IR remote
      20.29 MySQL not connecting correctly.
      20.30 My screen goes black when I try to play something.
+     20.31 Poor performance with NVidia cards and XVMC.
+     20.32 My computer is loading a media player application when I insert a CD or DVD.
 
   21. Miscellaneous.
      21.1 I'd like to watch the files without using MythTV / I'd like to convert the files to some other format.
@@ -1073,63 +1074,7 @@
   source.
 
 
-  [1m3.2.4.1.1.  Special instructions for Mandrake 8.2[0m
-
-  [1mNOTE: These instructions will be removed on 2004-01-15.  Contact the[0m
-  [1mHOWTO maintainer if you wish to create up-to-date docs for Mandrake[0m
-  [1m8.2.[0m
-
-  Mandrake 8.2 does not have a pre-packaged libqt3-devel, so you must
-  compile and install this manually.  The following command will install
-  the prerequisites for qt3, so don't skip this step.  The simplest tool
-  for installing packages from the command line is urpmi.
-
-  Open a shell, and execute the following.  You may get asked a number
-  of questions regarding dependencies.  It's best to answer "YES".
-
-
-
-       $ urpmi mesa-common-devel libmng1-devel mysql-devel libunixodbc2-devel
-       $ urpmi postgresql-devel xfree86-static-libs
-
-
-
-  Once all of the prerequisites have been installed, the next step is to
-  obtain and compile the source RPM.
-
-  Go to http://www.rpmfind.net <http://www.rpmfind.net> and search for
-  qt3.  There will be a number of different versions available.  As of
-  2002-12-02, the latest version for Mandrake is called
-  qt3-3.0.5-7mdk.src.rpm. Unless you are running [1mMandrake Cooker [22m(the
-  beta version of the next release of Mandrake), make sure to download
-  the standard "Mandrake" release.  Download the .src.rpm file to a
-  directory that you can find.
-
-
-       $ su
-       # cp qt3-3.0.5-7mdk.src.rpm /usr/src/RPMS/SRPMS
-       # cd /usr/src/RPMS/SRPMS
-       # rpm --rebuild qt3-3.0.5-7mdk.src.rpm
-       # cd ../RPMS
-       # ls -l
-
-
-
-  The "ls -l" command will show you a directory listing.  There should
-  be two files, one will be named "qt3" and the other will be
-  "qt3-devel".  The full filenames will vary, so one you know the
-  filename, you can install them with
-
-
-       # rpm -Uvh [filename1]
-       # rpm -Uvh [filename2]
-
-
-
-  Once this has completed (it can take a while, so please be patient),
-  continue by following the Mandrake 9.0 instructions.
-
-  [1m3.2.4.1.2.  Mandrake 8.2 and 9.0[0m
+  [1m3.2.4.1.1.  Mandrake 9.0[0m
 
   The simplest tool for installing packages from the command line is
   [1murpmi[22m.
@@ -1142,9 +1087,6 @@
        $ su
        # urpmi mysql gcc gcc-c++ freetype2-devel cdialog alsa-utils
        # urpmi XFree86-devel perl
-
-
-
        # urpmi libqt3-devel
 
 
@@ -1174,7 +1116,6 @@
 
 
        USE="mysql alsa"
-
 
 
   Next you need to build Qt. If you don't plan on using the ebuilds as
@@ -1552,7 +1493,7 @@
   "contrib".  If you have added a contrib mirror, try installing [1mXMLTV[22m:
 
 
-       # urpmi xmltv
+       # urpmi xmltv xmltv-grabbers
 
 
 
@@ -3503,11 +3444,22 @@
 
   Download MythGallery from http://www.mythtv.org/
   <http://www.mythtv.org/> and save it to a location where you can find
-  it.
+  it.  There are a number of transitions available, some requiring
+  OpenGL support.  You will also need to install a TIFF library.  Under
+  Mandrake, you would perform the following command:
+
+
+       # urpmi libtiff3-devel
+
+
+
+  Once you have satisfied the prerequisites for your distribution, down-
+  load and install the application:
 
 
        $ tar -xjf mythgallery-0.13.tar.bz2
        $ cd mythgallery-0.13
+       $ ./configure --enable-opengl
        $ qmake mythgallery.pro
        $ make
        # su
@@ -3613,6 +3565,7 @@
 
   +o  MAD
 
+
   +o  id3tag
 
   +o  libvorbis-devel
@@ -3622,7 +3575,6 @@
   +o  libcdaudio
 
   +o  CDParanoia
-
 
 
   [1m15.1.  Manual installation of prerequisites.[0m
@@ -3683,15 +3635,14 @@
   install:
 
 
-
-  $ tar -xzf libcdaudio-0.99.9.tar.gz
-  $ cd libcdaudio-0.99.9
-  $ ./configure
-  $ make
-  $ su
-  # make install
-  # exit
-  $
+       $ tar -xzf libcdaudio-0.99.9.tar.gz
+       $ cd libcdaudio-0.99.9
+       $ ./configure
+       $ make
+       $ su
+       # make install
+       # exit
+       $
 
 
 
@@ -3740,7 +3691,6 @@
        # urpmi libmad0 libmad0-devel libflac4 libflac4-devel libcdaudio1 cdparanoia
        # urpmi libcdda0 libcdda0-devel libvorbis0 libvorbis0-devel
        # urpmi libcdaudio1-devel libid3tag0 libid3tag0-devel
-
 
 
   [1m15.2.1.  Additional options with MythMusic[0m
@@ -4502,9 +4452,17 @@
 
   You may also want to ensure that /dev/dsp hasn't already been grabbed
   by another process, like [1mesd [22mor [1martsd[22m.  If /dev/dsp isn't available,
-  then MythTV won't work.  Check your window manager documentation for
-  instructions on disabling the sound manager.  If you wish to see what
-  application is grabbing a resource, you can use the fuser command:
+  then MythTV won't work.
+
+  [1mNOTE[22m: The CVS version of MythTV now has support for using [1martsd[22m.  This
+  is a compile-time option, so you will need to edit the settings.pro
+  file in the mythtv directory then perform a make distclean; make, and
+  re-run make install as root to add this support.  Otherwise, check
+  your window manager documentation for instructions on disabling the
+  sound manager.
+
+  If you wish to see what application is grabbing a resource, you can
+  use the fuser command:
 
 
        # fuser -v /dev/dsp
@@ -4562,6 +4520,7 @@
   will eventually cause [1mlircd [22mto stop responding; even though [1mlircd [22mis
   configured for the Pinnacle Systems remote, the Tivo remote IR
   patterns are being seen by the IR receiver.
+
   If your remote has been properly configured, and [1mirw [22mand [1mirxevent [22mare
   working correctly, then it's highly likely that your window manager is
   not giving focus correctly to the various Myth programs as they run.
@@ -4681,6 +4640,7 @@
   support.'' for examples on finding and removing old versions of lirc.
 
 
+
   [1m20.29.  MySQL not connecting correctly.[0m
 
   Your [1mMySQL [22minstallation may have networking turned off.  Check that
@@ -4693,6 +4653,29 @@
   start the application.  If nothing seems to be happening when you try
   to view a program, try switching back to the shell and look for error
   messages there.
+
+
+  [1m20.31.  Poor performance with NVidia cards and XVMC.[0m
+
+  XVMC is a NVidia driver feature which is supposed to help with
+  decoding video.  Users have reported that rather than speeding up
+  their video it appears to be doing the opposite.  You may want to
+  check that your color depth is set for 24bpp.
+
+
+  [1m20.32.  My computer is loading a media player application when I[0m
+  [1minsert a CD or DVD.[0m
+
+  You need to disable any sort of auto-running media player in your
+  environment, otherwise MythDVD or MythMusic will not be able to work
+  properly.
+
+  In KDE, you may want to perform the following:
+
+
+       $ rm ~/.kde/Autostart/Autorun.desktop
+
+
 
   [1m21.  Miscellaneous.[0m
 
@@ -4723,8 +4706,6 @@
   independently, and there is no rate control between them which means
   that the two programs don't coordinate their efforts to maintain
   synchronization.
-
-
   [1m21.1.1.  mythtranscode example[0m
 
   First, start [1mmythtranscode[22m.  You will need to determine the channel
@@ -4758,8 +4739,9 @@
 
   Using ffmepg:
 
-  ffmpeg -f u16le -ar 32000 -ac 2 -i audout -f rawvideo -s 640x480 -r 29.97 \
-  -i vidout -vcodec mpeg4 -b 2000 -acodec mp3 -ab 128 out.avi
+
+       ffmpeg -f u16le -ar 32000 -ac 2 -i audout -f rawvideo -s 640x480 -r 29.97 \
+       -i vidout -vcodec mpeg4 -b 2000 -acodec mp3 -ab 128 out.avi
 
 
 
@@ -4914,6 +4896,7 @@
   image inside the screen. Underscan is useful for computer monitors so
   that toolbars and scrollbars at the edges can be seen.
 
+
   For best results, match the X display area as close as possible to the
   edges of the physical screen. This can only be adjusted by your tv-out
   device or by the settings for the television set. Many sets have these
@@ -4950,6 +4933,8 @@
   You may need to alter the mysql permissions if this database is being
   shared with multiple systems.  See the ``Modifying access to the MySQL
   database for multiple systems'' section for more information.
+
+
   [1m21.6.  I'd like to delete the mysql database.[0m
 
   [1mNOTE[22m:  Performing this step will remove the entire database.  You will
@@ -5039,8 +5024,8 @@
   the channel that has been removed:
 
 
-       $ mysql -u root mythconverg
-       mysql> delete from program where chanid = '1015';
+  $ mysql -u root mythconverg
+  mysql> delete from program where chanid = '1015';
 
 
 
@@ -5095,11 +5080,12 @@
   The following also works with blackbox:
 
 
-       $ cat > .xinitrc
-       xset -dpms s off &
-       irxevent &
-       mythfrontend &
-       blackbox
+
+  $ cat > .xinitrc
+  xset -dpms s off &
+  irxevent &
+  mythfrontend &
+  blackbox
 
 
 
@@ -5155,10 +5141,11 @@
   runlevels 3, 4 or 5:
 
 
-       $ su
-       # chkconfig --level 345 mythbackend on
-       # exit
-       $
+
+  $ su
+  # chkconfig --level 345 mythbackend on
+  # exit
+  $
 
 
 
@@ -5199,12 +5186,13 @@
   to edit the /etc/security/msec/perm.local file to include the
   following:
 
-  # /etc/security/msec/perm.local
-  # Local overrides to the msec program
-  #
-  # Full file path                user.group              permissions
-  /var/log/mythtv/                root.mythtv             775
-  /var/log/mythtv/*               root.mythtv             664
+
+       # /etc/security/msec/perm.local
+       # Local overrides to the msec program
+       #
+       # Full file path                user.group              permissions
+       /var/log/mythtv/                root.mythtv             775
+       /var/log/mythtv/*               root.mythtv             664
 
 
 
@@ -5212,10 +5200,11 @@
   may add it by typing:
 
 
-       $ cd contrib
-       $ su
-       # cat etc.security.msec.perm.local >> /etc/security/msec/perm.local
-       # exit
+
+  $ cd contrib
+  $ su
+  # cat etc.security.msec.perm.local >> /etc/security/msec/perm.local
+  # exit
 
 
 
@@ -5337,6 +5326,7 @@
   program under the host-specific settings: set the Transcoder Auto-run
   checkbox
 
+
   For either manual or automatic transcoding: start mythbackend start
   mythfrontend select setup, and the Transcoding recording profile.  now
   select either RTJPEG or MPEG-4 (selecting any of the hardware encoders
@@ -5389,8 +5379,7 @@
   hostname in the current session, run:
 
 
-
-  # hostname kidsroom
+       # hostname kidsroom
 
 
 
@@ -5448,6 +5437,7 @@
 
   8.  Quit and restart all frontends.  Delete the mythtv_backup.sql and
   mythtv_restore.sql
+
 
   [1m22.  Example Configurations.[0m
 
@@ -5511,20 +5501,20 @@
   Next, compile the driver:
 
 
-
-  $ cd ~/ivtv/ivtv/driver
-  $ make
+       $ cd ~/ivtv/ivtv/driver
+       $ make
 
 
 
   Compile the [1mtest_ioctl [22mprogram:
 
 
-       $ cd ../utils
-       $ make
-       $ su
-       # cp test_ioctl /usr/local/bin
-       # exit
+
+  $ cd ../utils
+  $ make
+  $ su
+  # cp test_ioctl /usr/local/bin
+  # exit
 
 
 
@@ -5571,6 +5561,7 @@
 
 
   Check that the card is being recognized on the PCI bus:
+
 
 
   $ lspci -v

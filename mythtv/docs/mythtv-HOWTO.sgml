@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2004-01-17, v0.13.11
+<date>2004-01-21, v0.13.12
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -737,54 +737,7 @@ mirror.  You will most likely need to add a "Contrib" mirror to your setup.
 If you add a site from the "Penguin Liberation Front", you will be able to
 load the <tt>lame</tt> library without compiling from source.
 
-<!-- Not sure if anyone is still using 8.2, and the minimum is now QT 3.1
-Drop this section by 2004-01-15 if no one complains.
--->
-<sect4>Special instructions for Mandrake 8.2  
-<p><bf>NOTE: These instructions will be removed on 2004-01-15.  Contact the
-HOWTO maintainer if you wish to create up-to-date docs for Mandrake
-8.2.</bf>
-<p>Mandrake 8.2 does not have a pre-packaged libqt3-devel, so you must compile
-and install this manually.  The following command will install the
-prerequisites for qt3, so don't skip this step.  The simplest tool for
-installing packages from the command line is urpmi.
-
-Open a shell, and execute the following.  You may get asked a number of
-questions regarding dependencies.  It's best to answer "YES".
-
-<tscreen><verb>
-$ urpmi mesa-common-devel libmng1-devel mysql-devel libunixodbc2-devel
-$ urpmi postgresql-devel xfree86-static-libs
-</verb></tscreen>
-Once all of the prerequisites have been installed, the next step is to
-obtain and compile the source RPM.
-
-Go to <url url="http://www.rpmfind.net"
-name="http://www.rpmfind.net"> and search for
-<tt>qt3</tt>.  There will be a number of different versions available.  As
-of 2002-12-02, the latest version for Mandrake is called
-<tt>qt3-3.0.5-7mdk.src.rpm</tt>. Unless you are running <bf>Mandrake
-Cooker</bf> (the beta version of the next release of Mandrake), make sure to
-download the standard "Mandrake" release.  Download the <tt>.src.rpm</tt>
-file to a directory that you can find.  
-<tscreen><verb>
-$ su
-# cp qt3-3.0.5-7mdk.src.rpm /usr/src/RPMS/SRPMS
-# cd /usr/src/RPMS/SRPMS
-# rpm --rebuild qt3-3.0.5-7mdk.src.rpm
-# cd ../RPMS
-# ls -l
-</verb></tscreen>
-The "ls -l" command will show you a directory listing.  There should be two
-files, one will be named "qt3" and the other will be "qt3-devel".  The full
-filenames will vary, so one you know the filename, you can install them with
-<tscreen><verb>
-# rpm -Uvh [filename1]
-# rpm -Uvh [filename2]
-</verb></tscreen>
-Once this has completed (it can take a while, so please be patient),
-continue by following the Mandrake 9.0 instructions.
-<sect4>Mandrake 8.2 and 9.0
+<sect4>Mandrake 9.0
 <p>The simplest tool for installing packages from the command line is
 <bf>urpmi</bf>.
 
@@ -795,15 +748,6 @@ asked a number of questions regarding dependencies.  It's best to answer
 $ su
 # urpmi mysql gcc gcc-c++ freetype2-devel cdialog alsa-utils
 # urpmi XFree86-devel perl
-</verb></tscreen>
-<!--
-<code>
-NOTE for Mandrake 8.2 users: do not execute the following
-command.  You've already manually installed the files in the previous
-section.
-</code>
--->
-<tscreen><verb>
 # urpmi libqt3-devel
 </verb></tscreen>
 
@@ -1134,7 +1078,7 @@ name="Manually building MythTV">.
 Mandrake's "contrib".  If you have added a contrib mirror, try installing
 <bf>XMLTV</bf>:
 <tscreen><verb>
-# urpmi xmltv
+# urpmi xmltv xmltv-grabbers
 </verb></tscreen>
 If this does not work, it is possible that contrib for your Mandrake version
 does not have <bf>XMLTV</bf>, so you may install the XMLTV prerequisites by typing:
@@ -2760,10 +2704,18 @@ operational.
 <sect1>Installation and prerequisites.
 <p>Download MythGallery from <url url="http://www.mythtv.org/"
 name="http://www.mythtv.org/"> and save it to a location where you can find
-it.
+it.  There are a number of transitions available, some requiring OpenGL
+support.  You will also need to install a TIFF library.  Under Mandrake, you 
+would perform the following command:
+<tscreen><verb>
+# urpmi libtiff3-devel
+</verb></tscreen>
+Once you have satisfied the prerequisites for your distribution, download
+and install the application:
 <tscreen><verb>
 $ tar -xjf mythgallery-0.13.tar.bz2
 $ cd mythgallery-0.13
+$ ./configure --enable-opengl
 $ qmake mythgallery.pro
 $ make
 # su
@@ -3602,8 +3554,15 @@ speakers.
 
 You may also want to ensure that <tt>/dev/dsp</tt> hasn't already been
 grabbed by another process, like <bf>esd</bf> or <bf>artsd</bf>.  If
-<tt>/dev/dsp</tt> isn't available, then MythTV won't work.  Check your
-window manager documentation for instructions on disabling the sound manager.
+<tt>/dev/dsp</tt> isn't available, then MythTV won't work.  
+
+<bf>NOTE</bf>: The CVS version of MythTV now has support for using
+<bf>artsd</bf>.  This is a compile-time option, so you will need to edit the
+<tt>settings.pro</tt> file in the mythtv directory then perform a <tt>make
+distclean; make</tt>, and re-run <tt>make install</tt> as root to add this
+support.  Otherwise, check your window manager documentation for
+instructions on disabling the sound manager.
+
 If you wish to see what application is grabbing a resource, you can use the
 <tt>fuser</tt> command:
 <tscreen><verb>
@@ -3758,6 +3717,21 @@ start the application.  If nothing seems to be happening when you try to
 view a program, try switching back to the shell and look for error messages
 there.
 
+<sect1>Poor performance with NVidia cards and XVMC.
+<p>XVMC is a NVidia driver feature which is supposed to help with decoding
+video.  Users have reported that rather than speeding up their video it
+appears to be doing the opposite.  You may want to check that your color
+depth is set for 24bpp.
+
+<sect1>My computer is loading a media player application when I insert a CD or DVD.
+<p>You need to disable any sort of auto-running media player in your
+environment, otherwise MythDVD or MythMusic will not be able to work
+properly.
+
+In KDE, you may want to perform the following:
+<tscreen><verb>
+$ rm ~/.kde/Autostart/Autorun.desktop
+</verb></tscreen>
 <sect>Miscellaneous. 
 <sect1>I'd like to watch the files without using MythTV / I'd like to convert the files to some other format.  
 <p>MythTV comes with a utility called <bf>mythtranscode</bf> which can
@@ -5051,6 +5025,9 @@ v0.13.10, 2004-01-13.  Add instructions on changing hostname.  Add link to DVB
 docs.  Break some hearts in the video capture card section.
 v0.13.11, 2004-01-17.  Fix typo.  Update ivtv version.  Pointer to DVB
 cardlist.  Fix some wording.
+v0.13.12, 2004-01-21.  Add xmltv-grabbers to Mandrake section.  Add tiff-devel
+for mythgallery.  Add 24bpp for NVidia XvMC.  Add section for auto-running
+media players.  Add note on artsd support in CVS.  Remove Mandrake 8.2.
 -->
 
 <!--

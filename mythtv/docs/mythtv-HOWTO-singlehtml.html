@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2004-01-17, v0.13.11
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2004-01-21, v0.13.12
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -182,6 +182,8 @@ necessary.</EM>
 <LI><A NAME="toc20.28">20.28</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.28">Troubleshooting the Hauppauge PVR-250 IR remote</A>
 <LI><A NAME="toc20.29">20.29</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.29">MySQL not connecting correctly.</A>
 <LI><A NAME="toc20.30">20.30</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.30">My screen goes black when I try to play something.</A>
+<LI><A NAME="toc20.31">20.31</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.31">Poor performance with NVidia cards and XVMC.</A>
+<LI><A NAME="toc20.32">20.32</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.32">My computer is loading a media player application when I insert a CD or DVD.</A>
 </UL>
 <P>
 <H2><A NAME="toc21">21.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s21">Miscellaneous. </A></H2>
@@ -931,59 +933,7 @@ mirror.  You will most likely need to add a "Contrib" mirror to your setup.
 If you add a site from the "Penguin Liberation Front", you will be able to
 load the <CODE>lame</CODE> library without compiling from source.</P>
 
-<H3>Special instructions for Mandrake 8.2 </H3>
-
-<P><B>NOTE: These instructions will be removed on 2004-01-15.  Contact the
-HOWTO maintainer if you wish to create up-to-date docs for Mandrake
-8.2.</B></P>
-<P>Mandrake 8.2 does not have a pre-packaged libqt3-devel, so you must compile
-and install this manually.  The following command will install the
-prerequisites for qt3, so don't skip this step.  The simplest tool for
-installing packages from the command line is urpmi.</P>
-<P>Open a shell, and execute the following.  You may get asked a number of
-questions regarding dependencies.  It's best to answer "YES".</P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-$ urpmi mesa-common-devel libmng1-devel mysql-devel libunixodbc2-devel
-$ urpmi postgresql-devel xfree86-static-libs
-</PRE>
-</CODE></BLOCKQUOTE>
-
-Once all of the prerequisites have been installed, the next step is to
-obtain and compile the source RPM.</P>
-<P>Go to 
-<A HREF="http://www.rpmfind.net">http://www.rpmfind.net</A> and search for
-<CODE>qt3</CODE>.  There will be a number of different versions available.  As
-of 2002-12-02, the latest version for Mandrake is called
-<CODE>qt3-3.0.5-7mdk.src.rpm</CODE>. Unless you are running <B>Mandrake
-Cooker</B> (the beta version of the next release of Mandrake), make sure to
-download the standard "Mandrake" release.  Download the <CODE>.src.rpm</CODE>
-file to a directory that you can find.  
-<BLOCKQUOTE><CODE>
-<PRE>
-$ su
-# cp qt3-3.0.5-7mdk.src.rpm /usr/src/RPMS/SRPMS
-# cd /usr/src/RPMS/SRPMS
-# rpm --rebuild qt3-3.0.5-7mdk.src.rpm
-# cd ../RPMS
-# ls -l
-</PRE>
-</CODE></BLOCKQUOTE>
-
-The "ls -l" command will show you a directory listing.  There should be two
-files, one will be named "qt3" and the other will be "qt3-devel".  The full
-filenames will vary, so one you know the filename, you can install them with
-<BLOCKQUOTE><CODE>
-<PRE>
-# rpm -Uvh [filename1]
-# rpm -Uvh [filename2]
-</PRE>
-</CODE></BLOCKQUOTE>
-
-Once this has completed (it can take a while, so please be patient),
-continue by following the Mandrake 9.0 instructions.</P>
-<H3>Mandrake 8.2 and 9.0</H3>
+<H3>Mandrake 9.0</H3>
 
 <P>The simplest tool for installing packages from the command line is
 <B>urpmi</B>.</P>
@@ -995,11 +945,6 @@ asked a number of questions regarding dependencies.  It's best to answer
 $ su
 # urpmi mysql gcc gcc-c++ freetype2-devel cdialog alsa-utils
 # urpmi XFree86-devel perl
-</PRE>
-</CODE></BLOCKQUOTE>
-
-<BLOCKQUOTE><CODE>
-<PRE>
 # urpmi libqt3-devel
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -1386,7 +1331,7 @@ Mandrake's "contrib".  If you have added a contrib mirror, try installing
 <B>XMLTV</B>:
 <BLOCKQUOTE><CODE>
 <PRE>
-# urpmi xmltv
+# urpmi xmltv xmltv-grabbers
 </PRE>
 </CODE></BLOCKQUOTE>
 
@@ -3194,11 +3139,22 @@ operational.</P>
 
 <P>Download MythGallery from 
 <A HREF="http://www.mythtv.org/">http://www.mythtv.org/</A> and save it to a location where you can find
-it.
+it.  There are a number of transitions available, some requiring OpenGL
+support.  You will also need to install a TIFF library.  Under Mandrake, you 
+would perform the following command:
+<BLOCKQUOTE><CODE>
+<PRE>
+# urpmi libtiff3-devel
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Once you have satisfied the prerequisites for your distribution, download
+and install the application:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ tar -xjf mythgallery-0.13.tar.bz2
 $ cd mythgallery-0.13
+$ ./configure --enable-opengl
 $ qmake mythgallery.pro
 $ make
 # su
@@ -4123,9 +4079,14 @@ this level to 75% to 85% may result in better audio quality.</P>
 speakers.</P>
 <P>You may also want to ensure that <CODE>/dev/dsp</CODE> hasn't already been
 grabbed by another process, like <B>esd</B> or <B>artsd</B>.  If
-<CODE>/dev/dsp</CODE> isn't available, then MythTV won't work.  Check your
-window manager documentation for instructions on disabling the sound manager.
-If you wish to see what application is grabbing a resource, you can use the
+<CODE>/dev/dsp</CODE> isn't available, then MythTV won't work.  </P>
+<P><B>NOTE</B>: The CVS version of MythTV now has support for using
+<B>artsd</B>.  This is a compile-time option, so you will need to edit the
+<CODE>settings.pro</CODE> file in the mythtv directory then perform a <CODE>make
+distclean; make</CODE>, and re-run <CODE>make install</CODE> as root to add this
+support.  Otherwise, check your window manager documentation for
+instructions on disabling the sound manager.</P>
+<P>If you wish to see what application is grabbing a resource, you can use the
 <CODE>fuser</CODE> command:
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -4307,6 +4268,27 @@ start the application.  If nothing seems to be happening when you try to
 view a program, try switching back to the shell and look for error messages
 there.</P>
 
+<H2><A NAME="ss20.31">20.31</A> <A HREF="#toc20.31">Poor performance with NVidia cards and XVMC.</A>
+</H2>
+
+<P>XVMC is a NVidia driver feature which is supposed to help with decoding
+video.  Users have reported that rather than speeding up their video it
+appears to be doing the opposite.  You may want to check that your color
+depth is set for 24bpp.</P>
+
+<H2><A NAME="ss20.32">20.32</A> <A HREF="#toc20.32">My computer is loading a media player application when I insert a CD or DVD.</A>
+</H2>
+
+<P>You need to disable any sort of auto-running media player in your
+environment, otherwise MythDVD or MythMusic will not be able to work
+properly.</P>
+<P>In KDE, you may want to perform the following:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ rm ~/.kde/Autostart/Autorun.desktop
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 <H2><A NAME="s21">21.</A> <A HREF="#toc21">Miscellaneous. </A></H2>
 
 <H2><A NAME="ss21.1">21.1</A> <A HREF="#toc21.1">I'd like to watch the files without using MythTV / I'd like to convert the files to some other format. </A>

@@ -355,9 +355,14 @@ this level to 75% to 85% may result in better audio quality.</P>
 speakers.</P>
 <P>You may also want to ensure that <CODE>/dev/dsp</CODE> hasn't already been
 grabbed by another process, like <B>esd</B> or <B>artsd</B>.  If
-<CODE>/dev/dsp</CODE> isn't available, then MythTV won't work.  Check your
-window manager documentation for instructions on disabling the sound manager.
-If you wish to see what application is grabbing a resource, you can use the
+<CODE>/dev/dsp</CODE> isn't available, then MythTV won't work.  </P>
+<P><B>NOTE</B>: The CVS version of MythTV now has support for using
+<B>artsd</B>.  This is a compile-time option, so you will need to edit the
+<CODE>settings.pro</CODE> file in the mythtv directory then perform a <CODE>make
+distclean; make</CODE>, and re-run <CODE>make install</CODE> as root to add this
+support.  Otherwise, check your window manager documentation for
+instructions on disabling the sound manager.</P>
+<P>If you wish to see what application is grabbing a resource, you can use the
 <CODE>fuser</CODE> command:
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -539,6 +544,27 @@ start the application.  If nothing seems to be happening when you try to
 view a program, try switching back to the shell and look for error messages
 there.</P>
 
+<H2><A NAME="ss20.31">20.31</A> <A HREF="mythtv-HOWTO.html#toc20.31">Poor performance with NVidia cards and XVMC.</A>
+</H2>
+
+<P>XVMC is a NVidia driver feature which is supposed to help with decoding
+video.  Users have reported that rather than speeding up their video it
+appears to be doing the opposite.  You may want to check that your color
+depth is set for 24bpp.</P>
+
+<H2><A NAME="ss20.32">20.32</A> <A HREF="mythtv-HOWTO.html#toc20.32">My computer is loading a media player application when I insert a CD or DVD.</A>
+</H2>
+
+<P>You need to disable any sort of auto-running media player in your
+environment, otherwise MythDVD or MythMusic will not be able to work
+properly.</P>
+<P>In KDE, you may want to perform the following:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ rm ~/.kde/Autostart/Autorun.desktop
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 <HR>
 <A HREF="mythtv-HOWTO-21.html">Next</A>
 <A HREF="mythtv-HOWTO-19.html">Previous</A>

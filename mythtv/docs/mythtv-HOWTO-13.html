@@ -22,11 +22,22 @@ operational.</P>
 
 <P>Download MythGallery from 
 <A HREF="http://www.mythtv.org/">http://www.mythtv.org/</A> and save it to a location where you can find
-it.
+it.  There are a number of transitions available, some requiring OpenGL
+support.  You will also need to install a TIFF library.  Under Mandrake, you 
+would perform the following command:
+<BLOCKQUOTE><CODE>
+<PRE>
+# urpmi libtiff3-devel
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Once you have satisfied the prerequisites for your distribution, download
+and install the application:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ tar -xjf mythgallery-0.13.tar.bz2
 $ cd mythgallery-0.13
+$ ./configure --enable-opengl
 $ qmake mythgallery.pro
 $ make
 # su

@@ -691,59 +691,7 @@ mirror.  You will most likely need to add a "Contrib" mirror to your setup.
 If you add a site from the "Penguin Liberation Front", you will be able to
 load the <CODE>lame</CODE> library without compiling from source.</P>
 
-<H3>Special instructions for Mandrake 8.2 </H3>
-
-<P><B>NOTE: These instructions will be removed on 2004-01-15.  Contact the
-HOWTO maintainer if you wish to create up-to-date docs for Mandrake
-8.2.</B></P>
-<P>Mandrake 8.2 does not have a pre-packaged libqt3-devel, so you must compile
-and install this manually.  The following command will install the
-prerequisites for qt3, so don't skip this step.  The simplest tool for
-installing packages from the command line is urpmi.</P>
-<P>Open a shell, and execute the following.  You may get asked a number of
-questions regarding dependencies.  It's best to answer "YES".</P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-$ urpmi mesa-common-devel libmng1-devel mysql-devel libunixodbc2-devel
-$ urpmi postgresql-devel xfree86-static-libs
-</PRE>
-</CODE></BLOCKQUOTE>
-
-Once all of the prerequisites have been installed, the next step is to
-obtain and compile the source RPM.</P>
-<P>Go to 
-<A HREF="http://www.rpmfind.net">http://www.rpmfind.net</A> and search for
-<CODE>qt3</CODE>.  There will be a number of different versions available.  As
-of 2002-12-02, the latest version for Mandrake is called
-<CODE>qt3-3.0.5-7mdk.src.rpm</CODE>. Unless you are running <B>Mandrake
-Cooker</B> (the beta version of the next release of Mandrake), make sure to
-download the standard "Mandrake" release.  Download the <CODE>.src.rpm</CODE>
-file to a directory that you can find.  
-<BLOCKQUOTE><CODE>
-<PRE>
-$ su
-# cp qt3-3.0.5-7mdk.src.rpm /usr/src/RPMS/SRPMS
-# cd /usr/src/RPMS/SRPMS
-# rpm --rebuild qt3-3.0.5-7mdk.src.rpm
-# cd ../RPMS
-# ls -l
-</PRE>
-</CODE></BLOCKQUOTE>
-
-The "ls -l" command will show you a directory listing.  There should be two
-files, one will be named "qt3" and the other will be "qt3-devel".  The full
-filenames will vary, so one you know the filename, you can install them with
-<BLOCKQUOTE><CODE>
-<PRE>
-# rpm -Uvh [filename1]
-# rpm -Uvh [filename2]
-</PRE>
-</CODE></BLOCKQUOTE>
-
-Once this has completed (it can take a while, so please be patient),
-continue by following the Mandrake 9.0 instructions.</P>
-<H3>Mandrake 8.2 and 9.0</H3>
+<H3>Mandrake 9.0</H3>
 
 <P>The simplest tool for installing packages from the command line is
 <B>urpmi</B>.</P>
@@ -755,11 +703,6 @@ asked a number of questions regarding dependencies.  It's best to answer
 $ su
 # urpmi mysql gcc gcc-c++ freetype2-devel cdialog alsa-utils
 # urpmi XFree86-devel perl
-</PRE>
-</CODE></BLOCKQUOTE>
-
-<BLOCKQUOTE><CODE>
-<PRE>
 # urpmi libqt3-devel
 </PRE>
 </CODE></BLOCKQUOTE>
