@@ -1973,6 +1973,8 @@ void TVRec::SetReadThreadSock(QSocket *sock)
 
 void TVRec::RequestRingBufferBlock(int size)
 {
+    readthreadLock.lock();
+
     if (!readthreadlive || !rbuffer)
         return;
 
@@ -1980,8 +1982,6 @@ void TVRec::RequestRingBufferBlock(int size)
 
     if (size > 256000)
         size = 256000;
-
-    readthreadLock.lock();
 
     while (size > 0 && !rbuffer->GetStopReads() && readthreadlive)
     {
