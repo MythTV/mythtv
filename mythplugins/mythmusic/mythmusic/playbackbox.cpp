@@ -271,8 +271,13 @@ void PlaybackBox::setupListView(void)
     if (curItem)
     {
         playview->setCurrentItem(curItem);
-        playview->ensureItemVisible(curItem);
         playview->setSelected(curItem, true);
+
+        if (curItem->itemBelow())
+            playview->ensureItemVisible(curItem->itemBelow());
+        if (curItem->itemAbove())
+            playview->ensureItemVisible(curItem->itemAbove());
+        playview->ensureItemVisible(curItem);
     }
 }
 
@@ -403,8 +408,13 @@ void PlaybackBox::play()
 
     QListViewItem *curItem = listlist.at(playlistindex);
     playview->setCurrentItem(curItem);
-    playview->ensureItemVisible(curItem);
     playview->setSelected(curItem, true);
+
+    if (curItem->itemBelow())
+        playview->ensureItemVisible(curItem->itemBelow());
+    if (curItem->itemAbove())
+        playview->ensureItemVisible(curItem->itemAbove());
+    playview->ensureItemVisible(curItem);
 
     currentTime = 0;
     maxTime = curMeta.Length() / 1000;
