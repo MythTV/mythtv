@@ -256,7 +256,7 @@
       </textarea>
       <textarea name="description" draworder="6">
         <area>4,86,760,60</area>
-        <font>description</font>
+        <font>metadata</font>
         <multiline>yes</multiline>
         <value>%LONGREPEAT%%STARS%%DESCRIPTION%</value>
       </textarea>
@@ -513,7 +513,7 @@
       </textarea>
       <textarea name="description" draworder="6">
         <area>4,100,500,159</area>
-        <font>description</font>
+        <font>metadata</font>
         <multiline>yes</multiline>
         <value>%LONGREPEAT%%STARS%%DESCRIPTION%</value>
       </textarea>
@@ -953,16 +953,25 @@
         <position>0,50</position>
       </image>
       <textarea name="messagedel" draworder="0">
-        <area>20,15,800,35</area>
+        <area>320,15,800,35</area>
         <font>info</font>
-        <value>Select a recording to permanently erase:</value>
+        <value>Select a recording to permanently erase</value>
         <context>1</context>
       </textarea>
       <textarea name="messageplay" draworder="0">
-        <area>20,15,800,35</area>
+        <area>320,15,800,35</area>
         <font>info</font>
-        <value>Select a recording to watch:</value>
+        <value>Select a recording to watch</value>
         <context>0</context>
+      </textarea>
+    </container>
+    
+    <container name="cur_group">
+      <context>0</context>  
+      <area>20,10,280,35</area>
+      <textarea name="title" draworder="6">
+        <area>0,0,290,35</area>
+        <font>title</font>
       </textarea>
     </container>
 
@@ -1013,12 +1022,9 @@
       </textarea>
     </container>
 
-        <container name="group_info">
+    <container name="group_info">
       <context>0</context>
       <area>0,360,799,240</area>
-
-      
-
       <textarea name="title" draworder="6">
         <area>23,12,779,45</area>
         <font>title</font>
