@@ -1856,10 +1856,27 @@ void OSDTypeCC::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
             if (maxy > surface->height)
                 maxy = surface->height;
 
-            QRect rect = QRect(0, 0, textlength + 4, 
-                               (m_font->Size() * 3 / 2) + 3);
-            m_box->SetRect(rect);
-            m_box->Draw(surface, 0, 0, x - 2, y - 2);
+            if (0 && !cc->teletextmode)
+            {
+                QRect rect = QRect(0, 0, textlength + 4, 
+                                   (m_font->Size() * 3 / 2) + 3);
+                m_box->SetRect(rect);
+                m_box->Draw(surface, 0, 0, x - 2, y - 2);
+            }
+
+            m_font->setOutline(TRUE);
+
+            switch (cc->color)
+            {
+                case 1: m_font->setColor((Qt::red), kTTF_Normal); break;
+                case 2: m_font->setColor((Qt::green), kTTF_Normal); break;
+                case 3: m_font->setColor((Qt::yellow), kTTF_Normal); break;
+                case 4: m_font->setColor((Qt::blue), kTTF_Normal); break;
+                case 5: m_font->setColor((Qt::magenta), kTTF_Normal); break;
+                case 6: m_font->setColor((Qt::cyan), kTTF_Normal); break;
+                case 7: m_font->setColor((Qt::white), kTTF_Normal); break;
+                default: m_font->setColor((Qt::white), kTTF_Normal); break;
+            }
 
             m_font->DrawString(surface, x, y + 2, cc->text, maxx, maxy, 255); 
         }

@@ -909,7 +909,7 @@ void NuppelVideoPlayer::ShowText(void)
                     inpos += sizeof(st);
                     printf("%s\n", (char*) inpos);
                     QString s((const char*) inpos);
-                    osd->AddCCText(s, st.row, st.col, 1, true);
+                    osd->AddCCText(s, st.row, st.col, st.fg, true);
                     inpos += st.len;
                 }
             }
@@ -1020,7 +1020,7 @@ void NuppelVideoPlayer::UpdateCC(unsigned char *inpos)
                 tmpcc->text = ccline;
                 tmpcc->x = cccol;
                 tmpcc->y = ccrow;
-                tmpcc->color = 1;
+                tmpcc->color = 0;
                 tmpcc->teletextmode = false;
                 ccbuf->push_back(tmpcc);
 #if 0
