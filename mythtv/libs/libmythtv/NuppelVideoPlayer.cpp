@@ -71,6 +71,8 @@ NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
     video_size = 0;
     text_size = 0;
 
+    bookmarkseek = 0;
+
     eof = 0;
     buf = NULL;
     buf2 = NULL;

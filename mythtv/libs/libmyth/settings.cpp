@@ -698,6 +698,9 @@ void ImageSelectSetting::imageSet(int num)
     if (num >= (int)images.size())
         return;
 
+    if (!images[current])
+        return;
+
     QImage temp = *(images[current]);
     temp = temp.smoothScale((int)(184 * m_hmult), (int)(138 * m_hmult),
                             QImage::ScaleMin);
@@ -738,13 +741,23 @@ QWidget* ImageSelectSetting::configWidget(ConfigurationGroup *cg,
         widget->setCurrentItem(current);
     else
         current = 0;
-    
-    QImage temp = *(images[current]);
-    temp = temp.smoothScale((int)(184 * m_hmult), (int)(138 * m_hmult), 
-                            QImage::ScaleMin);
+   
+    if (images[current])
+    { 
+        QImage temp = *(images[current]);
+        temp = temp.smoothScale((int)(184 * m_hmult), (int)(138 * m_hmult), 
+                                QImage::ScaleMin);
+ 
+        QPixmap tmppix(temp);
+        imagelabel->setPixmap(tmppix);
+    }
+    else
+    {
+        QPixmap tmppix((int)(184 * m_hmult), (int)(138 * m_hmult));
+        tmppix.fill(black);
 
-    QPixmap tmppix(temp);
-    imagelabel->setPixmap(tmppix);
+        imagelabel->setPixmap(tmppix);
+    }
 
     connect(widget, SIGNAL(highlighted(int)), this, SLOT(setValue(int)));
     connect(widget, SIGNAL(highlighted(int)), this, SLOT(imageSet(int)));
