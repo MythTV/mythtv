@@ -94,8 +94,6 @@
     <image>recpriorities.png</image>
     <offset>20,10</offset>
   </buttondef>
-    <offset>20,10</offset>
-  </buttondef>
 
   <buttondef name="TV_PROGFIND">
     <image>record.png</image>
