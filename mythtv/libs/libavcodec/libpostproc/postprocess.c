@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2001-2002 Michael Niedermayer (michaelni@gmx.at)
+    Copyright (C) 2001-2003 Michael Niedermayer (michaelni@gmx.at)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ Horizontal X1#		a		E	E
 LinIpolDeinterlace	e		E	E*
 CubicIpolDeinterlace	a		e	e*
 LinBlendDeinterlace	e		E	E*
-MedianDeinterlace#	 	Ec	Ec
+MedianDeinterlace#	E	Ec	Ec
 TempDeNoiser#		E		e	e
 
 * i dont have a 3dnow CPU -> its untested, but noone said it doesnt work so it seems to work
@@ -47,41 +47,45 @@ c = checked against the other implementations (-vo md5)
 
 /*
 TODO:
-remove global/static vars
 reduce the time wasted on the mem transfer
-implement everything in C at least (done at the moment but ...)
 unroll stuff if instructions depend too much on the prior one
-we use 8x8 blocks for the horizontal filters, opendivx seems to use 8x4?
 move YScale thing to the end instead of fixing QP
 write a faster and higher quality deblocking filter :)
 make the mainloop more flexible (variable number of blocks at once
 	(the if/else stuff per block is slowing things down)
 compare the quality & speed of all filters
 split this huge file
-border remover
 optimize c versions
 try to unroll inner for(x=0 ... loop to avoid these damn if(x ... checks
-smart blur
-commandline option for   the deblock / dering thresholds
-put fastmemcpy back
-dont use #ifdef ARCH_X86 for the asm stuff ... cross compilers? (note cpudetect uses ARCH_X86)
 ...
 */
 
 //Changelog: use the CVS log
 
-#define RUNTIME_CPUDETECT 1
-#define ARCH_X86 1
-
+#include "config.h"
 #include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
+#ifdef HAVE_MALLOC_H
 #include <malloc.h>
+#endif
+//#undef HAVE_MMX2
+//#define HAVE_3DNOW
+//#undef HAVE_MMX
+//#undef ARCH_X86
+//#define DEBUG_BRIGHTNESS
+#ifdef USE_FASTMEMCPY
+#include "libvo/fastmemcpy.h"
+#endif
 #include "postprocess.h"
-#include "cpudetect.h"
-#include "mangle.h"
+#include "postprocess_internal.h"
+
+#include "mangle.h" //FIXME should be supressed
+
+#ifndef HAVE_MEMALIGN
+#define memalign(a,b) malloc(b)
+#endif
 
 #define MIN(a,b) ((a) > (b) ? (b) : (a))
 #define MAX(a,b) ((a) < (b) ? (b) : (a))
@@ -90,79 +94,31 @@ dont use #ifdef ARCH_X86 for the asm stuff ... cross compilers? (note cpudetect 
 
 #define GET_MODE_BUFFER_SIZE 500
 #define OPTIONS_ARRAY_SIZE 10
+#define BLOCK_SIZE 8
+#define TEMP_STRIDE 8
+//#define NUM_BLOCKS_AT_ONCE 16 //not used yet
 
 #ifdef ARCH_X86
-#define CAN_COMPILE_X86_ASM 1
-#endif
-
-#ifdef CAN_COMPILE_X86_ASM
-static volatile uint64_t __attribute__((aligned(8))) packedYOffset=	0x0000000000000000LL;
-static volatile uint64_t __attribute__((aligned(8))) packedYScale=	0x0100010001000100LL;
 static uint64_t __attribute__((aligned(8))) w05=		0x0005000500050005LL;
 static uint64_t __attribute__((aligned(8))) w20=		0x0020002000200020LL;
-static uint64_t __attribute__((aligned(8))) w1400=		0x1400140014001400LL;
-static uint64_t __attribute__((aligned(8))) bm00000001=		0x00000000000000FFLL;
-static uint64_t __attribute__((aligned(8))) bm00010000=		0x000000FF00000000LL;
-static uint64_t __attribute__((aligned(8))) bm00001000=		0x00000000FF000000LL;
-static uint64_t __attribute__((aligned(8))) bm10000000=		0xFF00000000000000LL;
-static uint64_t __attribute__((aligned(8))) bm10000001=		0xFF000000000000FFLL;
-static uint64_t __attribute__((aligned(8))) bm11000011=		0xFFFF00000000FFFFLL;
-static uint64_t __attribute__((aligned(8))) bm00000011=		0x000000000000FFFFLL;
-static uint64_t __attribute__((aligned(8))) bm11111110=		0xFFFFFFFFFFFFFF00LL;
-static uint64_t __attribute__((aligned(8))) bm11000000=		0xFFFF000000000000LL;
-static uint64_t __attribute__((aligned(8))) bm00011000=		0x000000FFFF000000LL;
-static uint64_t __attribute__((aligned(8))) bm00110011=		0x0000FFFF0000FFFFLL;
-static uint64_t __attribute__((aligned(8))) bm11001100=		0xFFFF0000FFFF0000LL;
 static uint64_t __attribute__((aligned(8))) b00= 		0x0000000000000000LL;
 static uint64_t __attribute__((aligned(8))) b01= 		0x0101010101010101LL;
 static uint64_t __attribute__((aligned(8))) b02= 		0x0202020202020202LL;
-static uint64_t __attribute__((aligned(8))) b0F= 		0x0F0F0F0F0F0F0F0FLL;
-static uint64_t __attribute__((aligned(8))) b04= 		0x0404040404040404LL;
 static uint64_t __attribute__((aligned(8))) b08= 		0x0808080808080808LL;
-static uint64_t __attribute__((aligned(8))) bFF= 		0xFFFFFFFFFFFFFFFFLL;
-static uint64_t __attribute__((aligned(8))) b20= 		0x2020202020202020LL;
 static uint64_t __attribute__((aligned(8))) b80= 		0x8080808080808080LL;
-static uint64_t __attribute__((aligned(8))) mmxDCOffset= 	0x7E7E7E7E7E7E7E7ELL;
-static uint64_t __attribute__((aligned(8))) mmxDCThreshold=	0x7C7C7C7C7C7C7C7CLL;
-static uint64_t __attribute__((aligned(8))) b3F= 		0x3F3F3F3F3F3F3F3FLL;
-static uint64_t __attribute__((aligned(8))) temp0=0;
-static uint64_t __attribute__((aligned(8))) temp1=0;
-static uint64_t __attribute__((aligned(8))) temp2=0;
-static uint64_t __attribute__((aligned(8))) temp3=0;
-static uint64_t __attribute__((aligned(8))) temp4=0;
-static uint64_t __attribute__((aligned(8))) temp5=0;
-static uint64_t __attribute__((aligned(8))) pQPb=0;
-static uint64_t __attribute__((aligned(8))) pQPb2=0;
-static uint8_t __attribute__((aligned(8))) tempBlocks[8*16*2]; //used for the horizontal code
-static uint32_t __attribute__((aligned(4))) maxTmpNoise[4];
-#else
-static uint64_t packedYOffset=	0x0000000000000000LL;
-static uint64_t packedYScale=	0x0100010001000100LL;
 #endif
 
-extern int divx_quality;
-int newPPFlag=0; //is set if -npp is used
-struct PPMode gPPMode[GET_PP_QUALITY_MAX+1];
-static int firstTime = 0, firstTime2 = 0;
+static int verbose= 0;
 
-extern int verbose;
+static const int deringThreshold= 20;
 
-int hFlatnessThreshold= 56 - 16;
-int vFlatnessThreshold= 56 - 16;
-int deringThreshold= 20;
-
-static int dcOffset;
-static int dcThreshold;
-
-//amount of "black" u r willing to loose to get a brightness corrected picture
-double maxClippedThreshold= 0.01;
 
 static struct PPFilter filters[]=
 {
 	{"hb", "hdeblock", 		1, 1, 3, H_DEBLOCK},
 	{"vb", "vdeblock", 		1, 2, 4, V_DEBLOCK},
-	{"hr", "rkhdeblock", 		1, 1, 3, H_RK1_FILTER},
-	{"vr", "rkvdeblock", 		1, 2, 4, V_RK1_FILTER},
+/*	{"hr", "rkhdeblock", 		1, 1, 3, H_RK1_FILTER},
+	{"vr", "rkvdeblock", 		1, 2, 4, V_RK1_FILTER},*/
 	{"h1", "x1hdeblock", 		1, 1, 3, H_X1_FILTER},
 	{"v1", "x1vdeblock", 		1, 2, 4, V_X1_FILTER},
 	{"dr", "dering", 		1, 5, 6, DERING},
@@ -171,12 +127,13 @@ static struct PPFilter filters[]=
 	{"li", "linipoldeint", 		1, 1, 4, LINEAR_IPOL_DEINT_FILTER},
 	{"ci", "cubicipoldeint",	1, 1, 4, CUBIC_IPOL_DEINT_FILTER},
 	{"md", "mediandeint", 		1, 1, 4, MEDIAN_DEINT_FILTER},
+	{"fd", "ffmpegdeint", 		1, 1, 4, FFMPEG_DEINT_FILTER},
 	{"tn", "tmpnoise", 		1, 7, 8, TEMP_NOISE_FILTER},
 	{"fq", "forcequant", 		1, 0, 0, FORCE_QUANT},
 	{NULL, NULL,0,0,0,0} //End Marker
 };
 
-static const char *replaceTable[]=
+static char *replaceTable[]=
 {
 	"default", 	"hdeblock:a,vdeblock:a,dering:a,autolevels,tmpnoise:a:150:200:400",
 	"de", 		"hdeblock:a,vdeblock:a,dering:a,autolevels,tmpnoise:a:150:200:400",
@@ -185,31 +142,15 @@ static const char *replaceTable[]=
 	NULL //End Marker
 };
 
-#ifdef CAN_COMPILE_X86_ASM
+#ifdef ARCH_X86
 static inline void unusedVariableWarningFixer()
 {
-if(
- packedYOffset + packedYScale + w05 + w20 + w1400 + bm00000001 + bm00010000
- + bm00001000 + bm10000000 + bm10000001 + bm11000011 + bm00000011 + bm11111110
- + bm11000000 + bm00011000 + bm00110011 + bm11001100 + b00 + b01 + b02 + b0F
- + bFF + b20 + b04+ b08 + pQPb2 + b80 + mmxDCOffset + mmxDCThreshold + b3F + temp0 + temp1 + temp2 + temp3 + temp4
- + temp5 + pQPb== 0) b00=0;
+	if(w05 + w20 + b00 + b01 + b02 + b08 + b80 == 0) b00=0;
 }
 #endif
 
-#ifdef TIMING
-static inline long long rdtsc()
-{
-	long long l;
-	asm volatile(	"rdtsc\n\t"
-		: "=A" (l)
-	);
-//	printf("%d\n", int(l/1000));
-	return l;
-}
-#endif
 
-#ifdef CAN_COMPILE_X86_ASM
+#ifdef ARCH_X86
 static inline void prefetchnta(void *p)
 {
 	asm volatile(	"prefetchnta (%0)\n\t"
@@ -244,22 +185,48 @@ static inline void prefetcht2(void *p)
 /**
  * Check if the given 8x8 Block is mostly "flat"
  */
-static inline int isHorizDC(uint8_t src[], int stride)
+static inline int isHorizDC(uint8_t src[], int stride, PPContext *c)
 {
 	int numEq= 0;
 	int y;
+	const int dcOffset= ((c->QP*c->ppMode.baseDcDiff)>>8) + 1;
+	const int dcThreshold= dcOffset*2 + 1;
 	for(y=0; y<BLOCK_SIZE; y++)
 	{
-		if(((src[0] - src[1] + dcOffset) & 0xFFFF) < dcThreshold) numEq++;
-		if(((src[1] - src[2] + dcOffset) & 0xFFFF) < dcThreshold) numEq++;
-		if(((src[2] - src[3] + dcOffset) & 0xFFFF) < dcThreshold) numEq++;
-		if(((src[3] - src[4] + dcOffset) & 0xFFFF) < dcThreshold) numEq++;
-		if(((src[4] - src[5] + dcOffset) & 0xFFFF) < dcThreshold) numEq++;
-		if(((src[5] - src[6] + dcOffset) & 0xFFFF) < dcThreshold) numEq++;
-		if(((src[6] - src[7] + dcOffset) & 0xFFFF) < dcThreshold) numEq++;
+		if(((unsigned)(src[0] - src[1] + dcOffset)) < dcThreshold) numEq++;
+		if(((unsigned)(src[1] - src[2] + dcOffset)) < dcThreshold) numEq++;
+		if(((unsigned)(src[2] - src[3] + dcOffset)) < dcThreshold) numEq++;
+		if(((unsigned)(src[3] - src[4] + dcOffset)) < dcThreshold) numEq++;
+		if(((unsigned)(src[4] - src[5] + dcOffset)) < dcThreshold) numEq++;
+		if(((unsigned)(src[5] - src[6] + dcOffset)) < dcThreshold) numEq++;
+		if(((unsigned)(src[6] - src[7] + dcOffset)) < dcThreshold) numEq++;
 		src+= stride;
 	}
-	return numEq > hFlatnessThreshold;
+	return numEq > c->ppMode.flatnessThreshold;
+}
+
+/**
+ * Check if the middle 8x8 Block in the given 8x16 block is flat
+ */
+static inline int isVertDC_C(uint8_t src[], int stride, PPContext *c){
+	int numEq= 0;
+	int y;
+	const int dcOffset= ((c->QP*c->ppMode.baseDcDiff)>>8) + 1;
+	const int dcThreshold= dcOffset*2 + 1;
+	src+= stride*4; // src points to begin of the 8x8 Block
+	for(y=0; y<BLOCK_SIZE-1; y++)
+	{
+		if(((unsigned)(src[0] - src[0+stride] + dcOffset)) < dcThreshold) numEq++;
+		if(((unsigned)(src[1] - src[1+stride] + dcOffset)) < dcThreshold) numEq++;
+		if(((unsigned)(src[2] - src[2+stride] + dcOffset)) < dcThreshold) numEq++;
+		if(((unsigned)(src[3] - src[3+stride] + dcOffset)) < dcThreshold) numEq++;
+		if(((unsigned)(src[4] - src[4+stride] + dcOffset)) < dcThreshold) numEq++;
+		if(((unsigned)(src[5] - src[5+stride] + dcOffset)) < dcThreshold) numEq++;
+		if(((unsigned)(src[6] - src[6+stride] + dcOffset)) < dcThreshold) numEq++;
+		if(((unsigned)(src[7] - src[7+stride] + dcOffset)) < dcThreshold) numEq++;
+		src+= stride;
+	}
+	return numEq > c->ppMode.flatnessThreshold;
 }
 
 static inline int isHorizMinMaxOk(uint8_t src[], int stride, int QP)
@@ -416,7 +383,7 @@ static inline void horizX1Filter(uint8_t *src, int stride, int QP)
 #define COMPILE_C
 #endif
 
-#ifdef CAN_COMPILE_X86_ASM
+#ifdef ARCH_X86
 
 #if (defined (HAVE_MMX) && !defined (HAVE_3DNOW) && !defined (HAVE_MMX2)) || defined (RUNTIME_CPUDETECT)
 #define COMPILE_MMX
@@ -429,7 +396,7 @@ static inline void horizX1Filter(uint8_t *src, int stride, int QP)
 #if (defined (HAVE_3DNOW) && !defined (HAVE_MMX2)) || defined (RUNTIME_CPUDETECT)
 #define COMPILE_3DNOW
 #endif
-#endif //CAN_COMPILE_X86_ASM
+#endif //ARCH_X86
 
 #undef HAVE_MMX
 #undef HAVE_MMX2
@@ -481,70 +448,66 @@ static inline void horizX1Filter(uint8_t *src, int stride, int QP)
 // minor note: the HAVE_xyz is messed up after that line so dont use it
 
 static inline void postProcess(uint8_t src[], int srcStride, uint8_t dst[], int dstStride, int width, int height,
-	QP_STORE_T QPs[], int QPStride, int isColor, struct PPMode *ppMode)
+	QP_STORE_T QPs[], int QPStride, int isColor, pp_mode_t *vm, pp_context_t *vc)
 {
+	PPContext *c= (PPContext *)vc;
+	PPMode *ppMode= (PPMode *)vm;
+	c->ppMode= *ppMode; //FIXME
+
 	// useing ifs here as they are faster than function pointers allthough the
 	// difference wouldnt be messureable here but its much better because
 	// someone might exchange the cpu whithout restarting mplayer ;)
 #ifdef RUNTIME_CPUDETECT
-#ifdef CAN_COMPILE_X86_ASM
+#ifdef ARCH_X86
 	// ordered per speed fasterst first
-	if(gCpuCaps.hasMMX2)
-		postProcess_MMX2(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, ppMode);
-	else if(gCpuCaps.has3DNow)
-		postProcess_3DNow(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, ppMode);
-	else if(gCpuCaps.hasMMX)
-		postProcess_MMX(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, ppMode);
+	if(c->cpuCaps & PP_CPU_CAPS_MMX2)
+		postProcess_MMX2(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
+	else if(c->cpuCaps & PP_CPU_CAPS_3DNOW)
+		postProcess_3DNow(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
+	else if(c->cpuCaps & PP_CPU_CAPS_MMX)
+		postProcess_MMX(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
 	else
-		postProcess_C(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, ppMode);
+		postProcess_C(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
 #else
-		postProcess_C(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, ppMode);
+		postProcess_C(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
 #endif
 #else //RUNTIME_CPUDETECT
 #ifdef HAVE_MMX2
-		postProcess_MMX2(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, ppMode);
+		postProcess_MMX2(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
 #elif defined (HAVE_3DNOW)
-		postProcess_3DNow(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, ppMode);
+		postProcess_3DNow(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
 #elif defined (HAVE_MMX)
-		postProcess_MMX(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, ppMode);
+		postProcess_MMX(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
 #else
-		postProcess_C(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, ppMode);
+		postProcess_C(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
 #endif
 #endif //!RUNTIME_CPUDETECT
 }
-
-#ifdef HAVE_ODIVX_POSTPROCESS
-#include "../opendivx/postprocess.h"
-int use_old_pp=0;
-#endif
 
 //static void postProcess(uint8_t src[], int srcStride, uint8_t dst[], int dstStride, int width, int height,
 //	QP_STORE_T QPs[], int QPStride, int isColor, struct PPMode *ppMode);
 
 /* -pp Command line Help
-NOTE/FIXME: put this at an appropriate place (--help, html docs, man mplayer)?
 */
-const char *help=
-"-npp <filterName>[:<option>[:<option>...]][,[-]<filterName>[:<option>...]]...\n"
+char *pp_help=
+"<filterName>[:<option>[:<option>...]][[,|/][-]<filterName>[:<option>...]]...\n"
 "long form example:\n"
-"-npp vdeblock:autoq,hdeblock:autoq,linblenddeint	-npp default,-vdeblock\n"
+"vdeblock:autoq/hdeblock:autoq/linblenddeint	default,-vdeblock\n"
 "short form example:\n"
-"-npp vb:a,hb:a,lb					-npp de,-vb\n"
+"vb:a/hb:a/lb					de,-vb\n"
 "more examples:\n"
-"-npp tn:64:128:256\n"
+"tn:64:128:256\n"
 "Filters			Options\n"
 "short	long name	short	long option	Description\n"
 "*	*		a	autoq		cpu power dependant enabler\n"
 "			c	chrom		chrominance filtring enabled\n"
 "			y	nochrom		chrominance filtring disabled\n"
 "hb	hdeblock	(2 Threshold)		horizontal deblocking filter\n"
-"                        1. Threshold: default=1, higher -> more deblocking\n"
-"                        2. Threshold: default=40, lower -> more deblocking\n"
+"	1. difference factor: default=64, higher -> more deblocking\n"
+"	2. flatness threshold: default=40, lower -> more deblocking\n"
 "			the h & v deblocking filters share these\n"
 "			so u cant set different thresholds for h / v\n"
 "vb	vdeblock	(2 Threshold)		vertical deblocking filter\n"
-"hr	rkhdeblock\n"
-"vr	rkvdeblock\n"
 "h1	x1hdeblock				Experimental h deblock filter 1\n"
 "v1	x1vdeblock				Experimental v deblock filter 1\n"
 "dr	dering					Deringing filter\n"
@@ -554,6 +517,7 @@ const char *help=
 "li	linipoldeint				linear interpolating deinterlace\n"
 "ci	cubicipoldeint				cubic interpolating deinterlacer\n"
 "md	mediandeint				median deinterlacer\n"
+"fd	ffmpegdeint				ffmpeg deinterlacer\n"
 "de	default					hb:a,vb:a,dr:a,al\n"
 "fa	fast					h1:a,v1:a,dr:a,al\n"
 "tn	tmpnoise	(3 Thresholds)		Temporal Noise Reducer\n"
@@ -561,19 +525,28 @@ const char *help=
 "fq	forceQuant	<quantizer>		Force quantizer\n"
 ;
 
-/**
- * returns a PPMode struct which will have a non 0 error variable if an error occured
- * name is the string after "-pp" on the command line
- * quality is a number from 0 to GET_PP_QUALITY_MAX
- */
-struct PPMode getPPModeByNameAndQuality(char *name, int quality)
+pp_mode_t *pp_get_mode_by_name_and_quality(char *name, int quality)
 {
 	char temp[GET_MODE_BUFFER_SIZE];
 	char *p= temp;
-	const char *filterDelimiters= ",";
-	const char *optionDelimiters= ":";
-	struct PPMode ppMode= {0,0,0,0,0,0,{150,200,400}};
+	char *filterDelimiters= ",/";
+	char *optionDelimiters= ":";
+	struct PPMode *ppMode;
 	char *filterToken;
+
+	ppMode= memalign(8, sizeof(PPMode));
+	
+	ppMode->lumMode= 0;
+	ppMode->chromMode= 0;
+	ppMode->maxTmpNoise[0]= 700;
+	ppMode->maxTmpNoise[1]= 1500;
+	ppMode->maxTmpNoise[2]= 3000;
+	ppMode->maxAllowedY= 234;
+	ppMode->minAllowedY= 16;
+	ppMode->baseDcDiff= 256/4;
+	ppMode->flatnessThreshold= 56-16;
+	ppMode->maxClippedThreshold= 0.01;
+	ppMode->error=0;
 
 	strncpy(temp, name, GET_MODE_BUFFER_SIZE);
 
@@ -581,7 +554,7 @@ struct PPMode getPPModeByNameAndQuality(char *name, int quality)
 
 	for(;;){
 		char *filterName;
-		int q= 1000000; //GET_PP_QUALITY_MAX;
+		int q= 1000000; //PP_QUALITY_MAX;
 		int chrom=-1;
 		char *option;
 		char *options[OPTIONS_ARRAY_SIZE];
@@ -635,7 +608,7 @@ struct PPMode getPPModeByNameAndQuality(char *name, int quality)
 				spaceLeft= p - temp + plen;
 				if(spaceLeft + newlen  >= GET_MODE_BUFFER_SIZE)
 				{
-					ppMode.error++;
+					ppMode->error++;
 					break;
 				}
 				memmove(p + newlen, p, plen+1);
@@ -650,30 +623,30 @@ struct PPMode getPPModeByNameAndQuality(char *name, int quality)
 			if(   !strcmp(filters[i].longName, filterName)
 			   || !strcmp(filters[i].shortName, filterName))
 			{
-				ppMode.lumMode &= ~filters[i].mask;
-				ppMode.chromMode &= ~filters[i].mask;
+				ppMode->lumMode &= ~filters[i].mask;
+				ppMode->chromMode &= ~filters[i].mask;
 
 				filterNameOk=1;
 				if(!enable) break; // user wants to disable it
 
 				if(q >= filters[i].minLumQuality)
-					ppMode.lumMode|= filters[i].mask;
+					ppMode->lumMode|= filters[i].mask;
 				if(chrom==1 || (chrom==-1 && filters[i].chromDefault))
 					if(q >= filters[i].minChromQuality)
-						ppMode.chromMode|= filters[i].mask;
+						ppMode->chromMode|= filters[i].mask;
 
 				if(filters[i].mask == LEVEL_FIX)
 				{
 					int o;
-					ppMode.minAllowedY= 16;
-					ppMode.maxAllowedY= 234;
+					ppMode->minAllowedY= 16;
+					ppMode->maxAllowedY= 234;
 					for(o=0; options[o]!=NULL; o++)
 					{
 						if(  !strcmp(options[o],"fullyrange")
 						   ||!strcmp(options[o],"f"))
 						{
-							ppMode.minAllowedY= 0;
-							ppMode.maxAllowedY= 255;
+							ppMode->minAllowedY= 0;
+							ppMode->maxAllowedY= 255;
 							numOfUnknownOptions--;
 						}
 					}
@@ -682,14 +655,11 @@ struct PPMode getPPModeByNameAndQuality(char *name, int quality)
 				{
 					int o;
 					int numOfNoises=0;
-					ppMode.maxTmpNoise[0]= 150;
-					ppMode.maxTmpNoise[1]= 200;
-					ppMode.maxTmpNoise[2]= 400;
 
 					for(o=0; options[o]!=NULL; o++)
 					{
 						char *tail;
-						ppMode.maxTmpNoise[numOfNoises]=
+						ppMode->maxTmpNoise[numOfNoises]=
 							strtol(options[o], &tail, 0);
 						if(tail!=options[o])
 						{
@@ -702,9 +672,6 @@ struct PPMode getPPModeByNameAndQuality(char *name, int quality)
 				else if(filters[i].mask == V_DEBLOCK || filters[i].mask == H_DEBLOCK)
 				{
 					int o;
-					ppMode.maxDcDiff=1;
-//					hFlatnessThreshold= 40;
-//					vFlatnessThreshold= 40;
 
 					for(o=0; options[o]!=NULL && o<2; o++)
 					{
@@ -713,15 +680,14 @@ struct PPMode getPPModeByNameAndQuality(char *name, int quality)
 						if(tail==options[o]) break;
 
 						numOfUnknownOptions--;
-						if(o==0) ppMode.maxDcDiff= val;
-						else hFlatnessThreshold=
-						     vFlatnessThreshold= val;
+						if(o==0) ppMode->baseDcDiff= val;
+						else ppMode->flatnessThreshold= val;
 					}
 				}
 				else if(filters[i].mask == FORCE_QUANT)
 				{
 					int o;
-					ppMode.forcedQuant= 15;
+					ppMode->forcedQuant= 15;
 
 					for(o=0; options[o]!=NULL && o<1; o++)
 					{
@@ -730,281 +696,183 @@ struct PPMode getPPModeByNameAndQuality(char *name, int quality)
 						if(tail==options[o]) break;
 
 						numOfUnknownOptions--;
-						ppMode.forcedQuant= val;
+						ppMode->forcedQuant= val;
 					}
 				}
 			}
 		}
-		if(!filterNameOk) ppMode.error++;
-		ppMode.error += numOfUnknownOptions;
+		if(!filterNameOk) ppMode->error++;
+		ppMode->error += numOfUnknownOptions;
 	}
 
-#ifdef HAVE_ODIVX_POSTPROCESS
-	if(ppMode.lumMode & H_DEBLOCK) ppMode.oldMode |= PP_DEBLOCK_Y_H;
-	if(ppMode.lumMode & V_DEBLOCK) ppMode.oldMode |= PP_DEBLOCK_Y_V;
-	if(ppMode.chromMode & H_DEBLOCK) ppMode.oldMode |= PP_DEBLOCK_C_H;
-	if(ppMode.chromMode & V_DEBLOCK) ppMode.oldMode |= PP_DEBLOCK_C_V;
-	if(ppMode.lumMode & DERING) ppMode.oldMode |= PP_DERING_Y;
-	if(ppMode.chromMode & DERING) ppMode.oldMode |= PP_DERING_C;
-#endif
-
-	if(verbose>1) printf("pp: lumMode=%X, chromMode=%X\n", ppMode.lumMode, ppMode.chromMode);
+	if(verbose>1) printf("pp: lumMode=%X, chromMode=%X\n", ppMode->lumMode, ppMode->chromMode);
+	if(ppMode->error)
+	{
+		fprintf(stderr, "%d errors in postprocess string \"%s\"\n", ppMode->error, name);
+		free(ppMode);
+		return NULL;
+	}
 	return ppMode;
 }
 
-/**
- * Check and load the -npp part of the cmd line
- */
-int readNPPOpt(void *conf, char *arg)
-{
-	int quality;
+void pp_free_mode(pp_mode_t *mode){
+    if(mode) free(mode);
+}
+
+static void reallocAlign(void **p, int alignment, int size){
+	if(*p) free(*p);
+	*p= memalign(alignment, size);
+	memset(*p, 0, size);
+}
+
+static void reallocBuffers(PPContext *c, int width, int height, int stride){
+	int mbWidth = (width+15)>>4;
+	int mbHeight= (height+15)>>4;
+	int i;
+
+	c->stride= stride;
+
+	reallocAlign((void **)&c->tempDst, 8, stride*24);
+	reallocAlign((void **)&c->tempSrc, 8, stride*24);
+	reallocAlign((void **)&c->tempBlocks, 8, 2*16*8);
+	reallocAlign((void **)&c->yHistogram, 8, 256*sizeof(uint64_t));
+	for(i=0; i<256; i++)
+		c->yHistogram[i]= width*height/64*15/256;
+
+	for(i=0; i<3; i++)
+	{
+		//Note:the +17*1024 is just there so i dont have to worry about r/w over te end
+		reallocAlign((void **)&c->tempBlured[i], 8, stride*mbHeight*16 + 17*1024);
+		reallocAlign((void **)&c->tempBluredPast[i], 8, 256*((height+7)&(~7))/2 + 17*1024);//FIXME size
+	}
+
+	reallocAlign((void **)&c->deintTemp, 8, width+16);
+	reallocAlign((void **)&c->nonBQPTable, 8, mbWidth*mbHeight*sizeof(QP_STORE_T));
+	reallocAlign((void **)&c->forcedQPTable, 8, mbWidth*sizeof(QP_STORE_T));
+}
+
+pp_context_t *pp_get_context(int width, int height, int cpuCaps){
+	PPContext *c= memalign(32, sizeof(PPContext));
+	int stride= (width+15)&(~15); //assumed / will realloc if needed
+        
+	memset(c, 0, sizeof(PPContext));
+	c->cpuCaps= cpuCaps;
+	if(cpuCaps&PP_FORMAT){
+		c->hChromaSubSample= cpuCaps&0x3;
+		c->vChromaSubSample= (cpuCaps>>4)&0x3;
+	}else{
+		c->hChromaSubSample= 1;
+		c->vChromaSubSample= 1;
+	}
+
+	reallocBuffers(c, width, height, stride);
+        
+	c->frameNum=-1;
+
+	return c;
+}
+
+void pp_free_context(void *vc){
+	PPContext *c = (PPContext*)vc;
+	int i;
 	
-	if(!strcmp("help", arg))
-	{
-		printf("%s", help);
-		exit(1);
-	}
+	for(i=0; i<3; i++) free(c->tempBlured[i]);
+	for(i=0; i<3; i++) free(c->tempBluredPast[i]);
 	
-	for(quality=0; quality<GET_PP_QUALITY_MAX+1; quality++)
-	{
-		gPPMode[quality]= getPPModeByNameAndQuality(arg, quality);
+	free(c->tempBlocks);
+	free(c->yHistogram);
+	free(c->tempDst);
+	free(c->tempSrc);
+	free(c->deintTemp);
+	free(c->nonBQPTable);
+	free(c->forcedQPTable);
+        
+	memset(c, 0, sizeof(PPContext));
 
-		if(gPPMode[quality].error) return -1;
-	}
-	newPPFlag=1;
-
-//divx_quality is passed to postprocess if autoq if off
-	divx_quality= GET_PP_QUALITY_MAX;
-	firstTime = firstTime2 = 1;
-	return 1;
+	free(c);
 }
 
-int readPPOpt(void *conf, char *arg)
+void  pp_postprocess(uint8_t * src[3], int srcStride[3],
+                 uint8_t * dst[3], int dstStride[3],
+                 int width, int height,
+                 QP_STORE_T *QP_store,  int QPStride,
+		 pp_mode_t *vm,  void *vc, int pict_type)
 {
-  int val;
-
-  if(arg == NULL)
-    return -2; // ERR_MISSING_PARAM
-  errno = 0;
-  val = (int)strtol(arg,NULL,0);
-  if(errno != 0)
-    return -4;  // What about include cfgparser.h and use ERR_* defines */
-  if(val < 0)
-    return -3; // ERR_OUT_OF_RANGE
-
-  divx_quality = val;
-  firstTime = firstTime2 = 1;
-
-  return 1;
-}
-  
-void revertPPOpt(void *conf, char* opt) 
-{
-  newPPFlag=0;
-  divx_quality=0;
-}
-
-
-/**
- * Obsolete, dont use it, use postprocess2() instead
- * this will check newPPFlag automatically and use postprocess2 if it is set
- * mode = quality if newPPFlag
- */
-void  postprocess(unsigned char * src[], int src_stride,
-                 unsigned char * dst[], int dst_stride,
-                 int horizontal_size,   int vertical_size,
-                 QP_STORE_T *QP_store,  int QP_stride,
-					  int mode)
-{
-	struct PPMode ppMode;
-	static QP_STORE_T zeroArray[2048/8];
-
-	if(newPPFlag)
-	{
-		ppMode= gPPMode[mode];
-//		printf("%d \n",QP_store[5]);
-		postprocess2(src, src_stride, dst, dst_stride,
-			horizontal_size, vertical_size, QP_store, QP_stride, &ppMode);
-
-		return;
-	}
-
-	if(firstTime && verbose)
-	{
-		printf("using pp filters 0x%X\n", mode);
-		firstTime=0;
-	}
-
-	if(QP_store==NULL)
-	{
-		QP_store= zeroArray;
-		QP_stride= 0;
-	}
-
-	ppMode.lumMode= mode;
-	mode= ((mode&0xFF)>>4) | (mode&0xFFFFFF00);
-	ppMode.chromMode= mode;
-	ppMode.maxTmpNoise[0]= 700;
-	ppMode.maxTmpNoise[1]= 1500;
-	ppMode.maxTmpNoise[2]= 3000;
-	ppMode.maxAllowedY= 234;
-	ppMode.minAllowedY= 16;
-	ppMode.maxDcDiff= 1;
-
-#ifdef HAVE_ODIVX_POSTPROCESS
-// Note: I could make this shit outside of this file, but it would mean one
-// more function call...
-	if(use_old_pp){
-	    odivx_postprocess(src,src_stride,dst,dst_stride,horizontal_size,vertical_size,QP_store,QP_stride,mode);
-	    return;
-	}
-#endif
-
-	postProcess(src[0], src_stride, dst[0], dst_stride,
-		horizontal_size, vertical_size, QP_store, QP_stride, 0, &ppMode);
-
-	horizontal_size >>= 1;
-	vertical_size   >>= 1;
-	src_stride      >>= 1;
-	dst_stride      >>= 1;
-
-	if(ppMode.chromMode)
-	{
-		postProcess(src[1], src_stride, dst[1], dst_stride,
-			horizontal_size, vertical_size, QP_store, QP_stride, 1, &ppMode);
-		postProcess(src[2], src_stride, dst[2], dst_stride,
-			horizontal_size, vertical_size, QP_store, QP_stride, 2, &ppMode);
-	}
-	else if(src_stride == dst_stride)
-	{
-		memcpy(dst[1], src[1], src_stride*vertical_size);
-		memcpy(dst[2], src[2], src_stride*vertical_size);
-	}
-	else
-	{
-		int y;
-		for(y=0; y<vertical_size; y++)
-		{
-			memcpy(&(dst[1][y*dst_stride]), &(src[1][y*src_stride]), horizontal_size);
-			memcpy(&(dst[2][y*dst_stride]), &(src[2][y*src_stride]), horizontal_size);
-		}
-	}
-
-#if 0
-		memset(dst[1], 128, dst_stride*vertical_size);
-		memset(dst[2], 128, dst_stride*vertical_size);
-#endif
-}
-
-void  postprocess2(unsigned char * src[], int src_stride,
-                 unsigned char * dst[], int dst_stride,
-                 int horizontal_size,   int vertical_size,
-                 QP_STORE_T *QP_store,  int QP_stride,
-		 struct PPMode *mode)
-{
-
-	QP_STORE_T quantArray[2048/8];
+	int mbWidth = (width+15)>>4;
+	int mbHeight= (height+15)>>4;
+	PPMode *mode = (PPMode*)vm;
+	PPContext *c = (PPContext*)vc;
+        int minStride= MAX(srcStride[0], dstStride[0]);
 	
+	if(c->stride < minStride)
+		reallocBuffers(c, width, height, minStride);
+
 	if(QP_store==NULL || (mode->lumMode & FORCE_QUANT)) 
 	{
 		int i;
-		QP_store= quantArray;
-		QP_stride= 0;
+		QP_store= c->forcedQPTable;
+		QPStride= 0;
 		if(mode->lumMode & FORCE_QUANT)
-			for(i=0; i<2048/8; i++) quantArray[i]= mode->forcedQuant;
+			for(i=0; i<mbWidth; i++) QP_store[i]= mode->forcedQuant;
 		else
-			for(i=0; i<2048/8; i++) quantArray[i]= 1;
+			for(i=0; i<mbWidth; i++) QP_store[i]= 1;
+	}
+if(0){
+int x,y;
+for(y=0; y<mbHeight; y++){
+	for(x=0; x<mbWidth; x++){
+		printf("%2d ", QP_store[x + y*QPStride]);
+	}
+	printf("\n");
+}
+	printf("\n");
+}
+//printf("pict_type:%d\n", pict_type);
+
+	if(pict_type!=3)
+	{
+		int x,y;
+		for(y=0; y<mbHeight; y++){
+			for(x=0; x<mbWidth; x++){
+				int qscale= QP_store[x + y*QPStride];
+				if(qscale&~31)
+				    qscale=31;
+				c->nonBQPTable[y*mbWidth + x]= qscale;
+			}
+		}
 	}
 
-	if(firstTime2 && verbose)
+	if(verbose>2)
 	{
 		printf("using npp filters 0x%X/0x%X\n", mode->lumMode, mode->chromMode);
-		firstTime2=0;
 	}
 
-#ifdef HAVE_ODIVX_POSTPROCESS
-// Note: I could make this shit outside of this file, but it would mean one
-// more function call...
-	if(use_old_pp){
-	    odivx_postprocess(src,src_stride,dst,dst_stride,horizontal_size,vertical_size,QP_store,QP_stride,
-	    mode->oldMode);
-	    return;
-	}
-#endif
+	postProcess(src[0], srcStride[0], dst[0], dstStride[0],
+		width, height, QP_store, QPStride, 0, mode, c);
 
-	postProcess(src[0], src_stride, dst[0], dst_stride,
-		horizontal_size, vertical_size, QP_store, QP_stride, 0, mode);
-
-	horizontal_size >>= 1;
-	vertical_size   >>= 1;
-	src_stride      >>= 1;
-	dst_stride      >>= 1;
+	width  = (width )>>c->hChromaSubSample;
+	height = (height)>>c->vChromaSubSample;
 
 	if(mode->chromMode)
 	{
-		postProcess(src[1], src_stride, dst[1], dst_stride,
-			horizontal_size, vertical_size, QP_store, QP_stride, 1, mode);
-		postProcess(src[2], src_stride, dst[2], dst_stride,
-			horizontal_size, vertical_size, QP_store, QP_stride, 2, mode);
+		postProcess(src[1], srcStride[1], dst[1], dstStride[1],
+			width, height, QP_store, QPStride, 1, mode, c);
+		postProcess(src[2], srcStride[2], dst[2], dstStride[2],
+			width, height, QP_store, QPStride, 2, mode, c);
 	}
-	else if(src_stride == dst_stride)
+	else if(srcStride[1] == dstStride[1] && srcStride[2] == dstStride[2])
 	{
-		memcpy(dst[1], src[1], src_stride*vertical_size);
-		memcpy(dst[2], src[2], src_stride*vertical_size);
+		memcpy(dst[1], src[1], srcStride[1]*height);
+		memcpy(dst[2], src[2], srcStride[2]*height);
 	}
 	else
 	{
 		int y;
-		for(y=0; y<vertical_size; y++)
+		for(y=0; y<height; y++)
 		{
-			memcpy(&(dst[1][y*dst_stride]), &(src[1][y*src_stride]), horizontal_size);
-			memcpy(&(dst[2][y*dst_stride]), &(src[2][y*src_stride]), horizontal_size);
+			memcpy(&(dst[1][y*dstStride[1]]), &(src[1][y*srcStride[1]]), width);
+			memcpy(&(dst[2][y*dstStride[2]]), &(src[2][y*srcStride[2]]), width);
 		}
 	}
 }
-
-
-/**
- * gets the mode flags for a given quality (larger values mean slower but better postprocessing)
- * with -npp it simply returns quality 
- * 0 <= quality <= 6
- */
-int getPpModeForQuality(int quality){
-	int modes[1+GET_PP_QUALITY_MAX]= {
-		0,
-#if 1
-		// horizontal filters first
-		LUM_H_DEBLOCK,
-		LUM_H_DEBLOCK | LUM_V_DEBLOCK,
-		LUM_H_DEBLOCK | LUM_V_DEBLOCK | CHROM_H_DEBLOCK,
-		LUM_H_DEBLOCK | LUM_V_DEBLOCK | CHROM_H_DEBLOCK | CHROM_V_DEBLOCK,
-		LUM_H_DEBLOCK | LUM_V_DEBLOCK | CHROM_H_DEBLOCK | CHROM_V_DEBLOCK | LUM_DERING,
-		LUM_H_DEBLOCK | LUM_V_DEBLOCK | CHROM_H_DEBLOCK | CHROM_V_DEBLOCK | LUM_DERING | CHROM_DERING
-#else
-		// vertical filters first
-		LUM_V_DEBLOCK,
-		LUM_V_DEBLOCK | LUM_H_DEBLOCK,
-		LUM_V_DEBLOCK | LUM_H_DEBLOCK | CHROM_V_DEBLOCK,
-		LUM_V_DEBLOCK | LUM_H_DEBLOCK | CHROM_V_DEBLOCK | CHROM_H_DEBLOCK,
-		LUM_V_DEBLOCK | LUM_H_DEBLOCK | CHROM_V_DEBLOCK | CHROM_H_DEBLOCK | LUM_DERING,
-		LUM_V_DEBLOCK | LUM_H_DEBLOCK | CHROM_V_DEBLOCK | CHROM_H_DEBLOCK | LUM_DERING | CHROM_DERING
-#endif
-	};
-
-#ifdef HAVE_ODIVX_POSTPROCESS
-	int odivx_modes[1+GET_PP_QUALITY_MAX]= {
-		0,
-		PP_DEBLOCK_Y_H,
-		PP_DEBLOCK_Y_H|PP_DEBLOCK_Y_V,
-		PP_DEBLOCK_Y_H|PP_DEBLOCK_Y_V|PP_DEBLOCK_C_H,
-		PP_DEBLOCK_Y_H|PP_DEBLOCK_Y_V|PP_DEBLOCK_C_H|PP_DEBLOCK_C_V,
-		PP_DEBLOCK_Y_H|PP_DEBLOCK_Y_V|PP_DEBLOCK_C_H|PP_DEBLOCK_C_V|PP_DERING_Y,
-		PP_DEBLOCK_Y_H|PP_DEBLOCK_Y_V|PP_DEBLOCK_C_H|PP_DEBLOCK_C_V|PP_DERING_Y|PP_DERING_C
-	};
-	if(use_old_pp) return odivx_modes[quality];
-#endif
-	if(newPPFlag)	return quality;
-	else		return modes[quality];
-}
-
 
