@@ -223,11 +223,27 @@ void ProgramRecPriority::keyPressEvent(QKeyEvent *e)
                 SortList();
                 update(fullRect);
             }
+            else if (action == "4")
+            {
+                if (sortType != byRecType)
+                {
+                    sortType = byRecType;
+                    reverseSort = false;
+                }
+                else
+                {
+                    reverseSort = !reverseSort;
+                }
+                SortList();
+                update(fullRect);
+            }
             else if (action == "PREVVIEW" || action == "NEXTVIEW")
             {
                 reverseSort = false;
                 if (sortType == byTitle)
                     sortType = byRecPriority;
+                else if (sortType == byRecPriority)
+                    sortType = byRecType;
                 else
                     sortType = byTitle;
                 SortList();
@@ -732,15 +748,50 @@ class programRecPrioritySort
                          b.prog->recTypeRecPriority;
 
             if (finalA == finalB)
+            {
+                int typeA = RecTypePriority(a.prog->recType);
+                int typeB = RecTypePriority(b.prog->recType);
+                if (typeA == typeB)
+                    if (m_reverse)
+                        return (a.prog->title < b.prog->title);
+                    else
+                        return (a.prog->title > b.prog->title);
+
+                if (m_reverse)
+                    return (typeA < typeB);
+                else
+                    return (typeA > typeB);
+            }
+            if (m_reverse)
+                return (finalA > finalB);
+            else
+                return (finalA < finalB);
+        }
+
+    private:
+        bool m_reverse;
+};
+
+class programRecTypeSort 
+{
+    public:
+        programRecTypeSort(bool reverseSort = false)
+                               {m_reverse = reverseSort;}
+
+        bool operator()(const RecPriorityInfo a, const RecPriorityInfo b) 
+        {
+            int typeA = RecTypePriority(a.prog->recType);
+            int typeB = RecTypePriority(b.prog->recType);
+            if (typeA == typeB)
                 if (m_reverse)
                     return (a.prog->title < b.prog->title);
                 else
                     return (a.prog->title > b.prog->title);
 
             if (m_reverse)
-                return (finalA > finalB);
+                return (typeA < typeB);
             else
-                return (finalA < finalB);
+                return (typeA > typeB);
         }
 
     private:
@@ -785,6 +836,14 @@ void ProgramRecPriority::SortList()
                  else
                      sort(sortedList.begin(), sortedList.end(), 
                           programRecPrioritySort());
+                 break;
+        case byRecType :
+                 if (reverseSort)
+                     sort(sortedList.begin(), sortedList.end(), 
+                          programRecTypeSort(true));
+                 else
+                     sort(sortedList.begin(), sortedList.end(), 
+                          programRecTypeSort());
                  break;
     }
 

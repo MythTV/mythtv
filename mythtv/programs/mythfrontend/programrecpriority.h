@@ -33,6 +33,7 @@ class ProgramRecPriority : public MythDialog
     {
         byTitle,
         byRecPriority,
+        byRecType
     };
 
     ProgramRecPriority(QSqlDatabase *ldb, MythMainWindow *parent, 
