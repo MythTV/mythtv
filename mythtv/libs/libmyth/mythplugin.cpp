@@ -13,6 +13,7 @@ MythPlugin::MythPlugin(const QString &libname)
           : QLibrary(libname)
 {
     enabled = true;
+    position = 0;
 }
 
 MythPlugin::~MythPlugin()
@@ -60,9 +61,30 @@ MythPluginType MythPlugin::type(void)
     return kPluginType_Module;
 }
 
+int MythPlugin::setupMenuPlugin(void)
+{
+    typedef int (*PluginSetup)();
+    PluginSetup rfunc = (PluginSetup)QLibrary::resolve("mythplugin_setupMenu");
+
+    if (rfunc)
+        return rfunc();
+
+    return -1;
+}
+
+void MythPlugin::drawMenuPlugin(QPainter *painter, int x, int y, int w, int h)
+{
+    typedef void (*PluginDrawMenu)(QPainter *, int, int, int, int);
+    PluginDrawMenu rfunc = (PluginDrawMenu)QLibrary::resolve("mythplugin_drawMenu");
+
+    if (rfunc)
+        rfunc(painter, x, y, w, h);
+}
+
 QDict<MythPlugin> MythPluginManager::m_dict;
-QMap<QString, MythPlugin *> MythPluginManager::moduleList;
-QMap<QString, MythPlugin *> MythPluginManager::menuPluginList;
+QMap<QString, MythPlugin *> MythPluginManager::moduleMap;
+QMap<QString, MythPlugin *> MythPluginManager::menuPluginMap;
+QPtrList<MythPlugin> MythPluginManager::menuPluginList;
 
 void MythPluginManager::init(void)
 {
@@ -94,6 +116,8 @@ void MythPluginManager::init(void)
     }
 
     gContext->SetDisableLibraryPopup(false);
+
+    orderMenuPlugins();
 }
 
 bool MythPluginManager::init_plugin(const QString &plugname)
@@ -108,7 +132,7 @@ bool MythPluginManager::init_plugin(const QString &plugname)
     }
    
     int result = m_dict[newname]->init(MYTH_BINARY_VERSION);
-   
+  
     if (result == -1)
     {
         m_dict.remove(newname);
@@ -119,11 +143,11 @@ bool MythPluginManager::init_plugin(const QString &plugname)
     switch (m_dict[newname]->type())
     {
         case kPluginType_MenuPlugin:
-            menuPluginList[newname] = m_dict[newname];
+            menuPluginMap[newname] = m_dict[newname];
             break;
         case kPluginType_Module:
         default:
-            moduleList[newname] = m_dict[newname];
+            moduleMap[newname] = m_dict[newname];
             break;
     }
 
@@ -162,4 +186,47 @@ bool MythPluginManager::config_plugin(const QString &plugname)
     return true;
 }
 
+MythPlugin *MythPluginManager::GetPlugin(const QString &plugname)
+{
+    QString newname = QString(PREFIX) + "/lib/mythtv/plugins/lib" + plugname +
+                      ".so";
+
+    if (moduleMap.find(newname) == moduleMap.end())
+        return NULL;
+
+    return moduleMap[newname];
+}
+
+MythPlugin *MythPluginManager::GetMenuPlugin(const QString &plugname)
+{
+    QString newname = QString(PREFIX) + "/lib/mythtv/plugins/lib" + plugname +
+                      ".so";
+
+    if (menuPluginMap.find(newname) == menuPluginMap.end())
+        return NULL;
+
+    return menuPluginMap[newname];
+}
+
+MythPlugin *MythPluginManager::GetMenuPluginAt(int pos)
+{
+    if (pos >= (int)menuPluginList.count())
+        return NULL;
+
+    return menuPluginList.at(pos);
+}
+
+void MythPluginManager::orderMenuPlugins(void)
+{
+    // This needs to hit a db table for persistant ordering
+    // For now, just use whatever order the map iterator returns
+
+    menuPluginList.clear();
+
+    QMap<QString, MythPlugin *>::iterator iter = menuPluginMap.begin();
+    for (; iter != menuPluginMap.end(); ++iter)
+    {
+        menuPluginList.append(iter.data());
+    }
+}
 

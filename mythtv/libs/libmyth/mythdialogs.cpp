@@ -1893,24 +1893,27 @@ MythPasswordDialog::MythPasswordDialog(QString message,
                                        bool)
                    :MythDialog(parent, name, false)
 {
+    int textWidth =  fontMetrics().width(message);
+    int totalWidth = textWidth + 175;
+
     success_flag = success;
     target_text = target;
 
     gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
     this->setGeometry((screenwidth - 250 ) / 2,
                       (screenheight - 50 ) / 2,
-                      300,50);
+                      totalWidth,50);
     QFrame *outside_border = new QFrame(this);
-    outside_border->setGeometry(0,0,300,50);
+    outside_border->setGeometry(0,0,totalWidth,50);
     outside_border->setFrameStyle(QFrame::Panel | QFrame::Raised );
     outside_border->setLineWidth(4);
     QLabel *message_label = new QLabel(message, this);
     message_label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-    message_label->setGeometry(15,10,130,30);
+    message_label->setGeometry(15,10,textWidth,30);
     message_label->setBackgroundOrigin(ParentOrigin);
     password_editor = new MythLineEdit(this);
     password_editor->setEchoMode(QLineEdit::Password);
-    password_editor->setGeometry(150,10,135,30);
+    password_editor->setGeometry(textWidth + 20,10,135,30);
     password_editor->setBackgroundOrigin(ParentOrigin);
     connect(password_editor, SIGNAL(textChanged(const QString &)),
             this, SLOT(checkPassword(const QString &)));

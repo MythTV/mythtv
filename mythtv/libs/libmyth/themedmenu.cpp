@@ -21,38 +21,219 @@ using namespace std;
 #include "mythplugin.h"
 #include "dialogbox.h"
 
-ThemedMenu::ThemedMenu(const char *cdir, const char *menufile, 
-                       MythMainWindow *parent, const char *name)
-          : MythDialog(parent, name)
+struct TextAttributes
 {
+    QRect textRect;
+    QColor textColor;
+    QFont font;
+    int textflags;
+
+    bool hasshadow;
+    QColor shadowColor;
+    QPoint shadowOffset;
+    int shadowalpha;
+
+    bool hasoutline;
+    QColor outlineColor;
+    int outlinesize;
+};
+
+struct ButtonIcon
+{
+    QString name;
+    QImage *icon;
+    QImage *activeicon;
+    QImage *watermark;
+    QPoint offset;
+};
+
+struct ThemedButton
+{
+    QPoint pos;
+    QRect  posRect;
+
+    ButtonIcon *buttonicon;
+    QPoint iconPos;
+    QRect iconRect;
+
+    QString text;
+    QString altText;
+    QString action;
+
+    int row;
+    int col;
+
+    int status;
+    bool visible;
+};
+
+struct MenuRow
+{
+    int numitems;
+    bool visible;
+    vector<ThemedButton *> buttons;
+};
+
+struct MenuState
+{
+    QString name;
+    int row;
+    int col;
+};
+
+class ThemedMenuPrivate
+{
+  public:
+    ThemedMenuPrivate(ThemedMenu *lparent, float lwmult, float lhmult,
+                      int lscreenwidth, int lscreenheight);
+   ~ThemedMenuPrivate();
+
+    bool keyPressHandler(QKeyEvent *e);
+    void ReloadTheme(void);
+
+    void parseMenu(const QString &menuname, int row = -1, int col = -1);
+
+    void parseSettings(const QString &dir, const QString &menuname);
+
+    void parseBackground(const QString &dir, QDomElement &element);
+    void parseLogo(const QString &dir, QDomElement &element);
+    void parseArrow(const QString &dir, QDomElement &element, bool up);
+    void parseTitle(const QString &dir, QDomElement &element);
+    void parseButtonDefinition(const QString &dir, QDomElement &element);
+    void parseButton(const QString &dir, QDomElement &element);
+    void parseThemeButton(QDomElement &element);
+
+    void parseText(TextAttributes &attributes, QDomElement &element);
+    void parseOutline(TextAttributes &attributes, QDomElement &element);
+    void parseShadow(TextAttributes &attributes, QDomElement &element);
+
+    void setDefaults(void);
+
+    void addButton(const QString &type, const QString &text,
+                   const QString &alttext, const QString &action);
+    void layoutButtons(void);
+    void positionButtons(bool resetpos);
+    bool makeRowVisible(int newrow, int oldrow, bool forcedraw = true);
+
+    void handleAction(const QString &action);
+    bool findDepends(const QString &file);
+    QString findMenuFile(const QString &menuname);
+
+    QString getFirstText(QDomElement &element);
+    QPoint parsePoint(const QString &text);
+    QRect parseRect(const QString &text);
+
+    QRect menuRect() const;
+
+    void paintLogo(QPainter *p);
+    void paintTitle(QPainter *p);
+    void paintWatermark(QPainter *p);
+    void paintButton(unsigned int button, QPainter *p, bool erased,
+                     bool drawinactive = false);
+
+    void drawText(QPainter *p, const QRect &rect,
+                  const TextAttributes &attributes, const QString &text);
+
+    void clearToBackground(void);
+    void drawInactiveButtons(void);
+    void drawScrollArrows(QPainter *p);
+    bool checkPinCode(const QString &timestamp_setting,
+                      const QString &password_setting,
+                      const QString &text);
+
+    ThemedMenu *parent;
+
+    float wmult;
+    float hmult;
+
+    int screenwidth;
+    int screenheight;
+    
+    QString prefix;
+
+    QRect buttonArea;
+
+    QRect logoRect;
+    QPixmap *logo;
+
+    QImage *buttonnormal;
+    QImage *buttonactive;
+
+    QMap<QString, ButtonIcon> allButtonIcons;
+
+    vector<ThemedButton> buttonList;
+    ThemedButton *activebutton;
+    int currentrow;
+    int currentcolumn;
+
+    vector<MenuRow> buttonRows;
+
+    TextAttributes normalAttributes;
+    TextAttributes activeAttributes;
+
+    QString selection;
+    bool foundtheme;
+
+    int menulevel;
+    vector<MenuState> menufiles;
+
+    void (*callback)(void *, QString &);
+    void *callbackdata;
+
+    bool killable;
+    int exitModifier;
+
+    bool spreadbuttons;
+
+    QMap<QString, QPixmap> titleIcons;
+    QPixmap *curTitle;
+    QString titleText;
+    QPoint titlePos;
+    QRect titleRect;
+    bool drawTitle;
+
+    QPixmap backgroundPixmap;
+
+    bool ignorekeys;
+
+    int visiblerowlimit;
+    int maxrows;
+    int visiblerows;
+    int columns;
+
+    QPixmap *uparrow;
+    QRect uparrowRect;
+    QPixmap *downarrow;
+    QRect downarrowRect;
+
+    QPoint watermarkPos;
+    QRect watermarkRect;
+
+    LCD *lcddev;
+};
+
+ThemedMenuPrivate::ThemedMenuPrivate(ThemedMenu *lparent, float lwmult, 
+                                     float lhmult, int lscreenwidth, 
+                                     int lscreenheight)
+{
+    parent = lparent;
+    wmult = lwmult;
+    hmult = lhmult;
+    screenwidth = lscreenwidth;
+    screenheight = lscreenheight;
+
+    logo = NULL;
+    buttonnormal = NULL;
+    buttonactive = NULL;
+    uparrow = NULL;
+    downarrow = NULL;
+
     ignorekeys = false;
 
     lcddev = gContext->GetLCDDevice();
-
-    QString dir = QString(cdir) + "/";
-    QString filename = dir + "theme.xml";
-
-    foundtheme = true;
-    QFile filetest(filename);
-    if (!filetest.exists())
-    {
-        foundtheme = false;
-        return;
-    }
-
-    prefix = gContext->GetInstallPrefix();
-    menulevel = 0;
-
-    callback = NULL;
-
-    ReloadExitKey();
-    
-    parseSettings(dir, "theme.xml");
-
-    parseMenu(menufile);
 }
 
-ThemedMenu::~ThemedMenu(void)
+ThemedMenuPrivate::~ThemedMenuPrivate()
 {
     if (logo)
         delete logo;
@@ -77,22 +258,7 @@ ThemedMenu::~ThemedMenu(void)
     }
 }
 
-void ThemedMenu::ReloadExitKey(void)
-{
-    int allowsd = gContext->GetNumSetting("AllowQuitShutdown");
-    killable = (allowsd == 4);
-
-    if (allowsd == 1)
-        exitModifier = Qt::ControlButton;
-    else if (allowsd == 2)
-        exitModifier = Qt::MetaButton;
-    else if (allowsd == 3)
-        exitModifier = Qt::AltButton;
-    else
-        exitModifier = -1;
-}
-
-QString ThemedMenu::getFirstText(QDomElement &element)
+QString ThemedMenuPrivate::getFirstText(QDomElement &element)
 {
     for (QDomNode dname = element.firstChild(); !dname.isNull();
          dname = dname.nextSibling())
@@ -104,7 +270,8 @@ QString ThemedMenu::getFirstText(QDomElement &element)
     return "";
 }
 	
-void ThemedMenu::parseBackground(QString dir, QDomElement &element)
+void ThemedMenuPrivate::parseBackground(const QString &dir, 
+                                        QDomElement &element)
 {
     bool tiledbackground = false;
     QPixmap *bground = NULL;    
@@ -132,11 +299,14 @@ void ThemedMenu::parseBackground(QString dir, QDomElement &element)
             }
             else if (info.tagName() == "buttonarea")
             {
-                buttonArea = parseRect(getFirstText(info));
-                buttonArea.moveTopLeft(QPoint((int)(buttonArea.x() * wmult),
-                                              (int)(buttonArea.y() * hmult)));
-                buttonArea.setWidth((int)(buttonArea.width() * wmult));
-                buttonArea.setHeight((int)(buttonArea.height() * hmult));
+                QRect tmpArea = parseRect(getFirstText(info));
+
+                tmpArea.moveTopLeft(QPoint((int)(tmpArea.x() * wmult), 
+                                           (int)(tmpArea.y() * hmult)));
+                tmpArea.setWidth((int)(tmpArea.width() * wmult));
+                tmpArea.setHeight((int)(tmpArea.height() * hmult));
+
+                buttonArea = tmpArea;
                 hasarea = true;
             }
             else if (info.tagName() == "buttonspread")
@@ -176,8 +346,8 @@ void ThemedMenu::parseBackground(QString dir, QDomElement &element)
 
         tmp.end();
 
-        setPaletteBackgroundPixmap(background);
-        erase(menuRect());
+        parent->setPaletteBackgroundPixmap(background);
+        parent->erase(menuRect());
 
         backgroundPixmap = background;
 
@@ -185,7 +355,8 @@ void ThemedMenu::parseBackground(QString dir, QDomElement &element)
     }
 }
 
-void ThemedMenu::parseShadow(TextAttributes &attributes, QDomElement &element)
+void ThemedMenuPrivate::parseShadow(TextAttributes &attributes, 
+                                    QDomElement &element)
 {
     attributes.hasshadow = true;
 
@@ -245,7 +416,8 @@ void ThemedMenu::parseShadow(TextAttributes &attributes, QDomElement &element)
     }
 }
 
-void ThemedMenu::parseOutline(TextAttributes &attributes, QDomElement &element)
+void ThemedMenuPrivate::parseOutline(TextAttributes &attributes, 
+                                     QDomElement &element)
 {
     attributes.hasoutline = true;
 
@@ -290,7 +462,8 @@ void ThemedMenu::parseOutline(TextAttributes &attributes, QDomElement &element)
     }
 }
 
-void ThemedMenu::parseText(TextAttributes &attributes, QDomElement &element)
+void ThemedMenuPrivate::parseText(TextAttributes &attributes, 
+                                  QDomElement &element)
 {
     bool hasarea = false;
 
@@ -351,7 +524,7 @@ void ThemedMenu::parseText(TextAttributes &attributes, QDomElement &element)
             {
                 if (getFirstText(info) == "yes")
                     attributes.textflags = Qt::AlignTop | Qt::AlignHCenter | 
-                                           WordBreak;
+                                           Qt::WordBreak;
             } 
             else if (info.tagName() == "outline")
             {
@@ -379,7 +552,8 @@ void ThemedMenu::parseText(TextAttributes &attributes, QDomElement &element)
     }
 }
 
-void ThemedMenu::parseButtonDefinition(QString dir, QDomElement &element)
+void ThemedMenuPrivate::parseButtonDefinition(const QString &dir, 
+                                              QDomElement &element)
 {
     bool hasnormal = false;
     bool hasactive = false;
@@ -462,7 +636,7 @@ void ThemedMenu::parseButtonDefinition(QString dir, QDomElement &element)
     watermarkRect = QRect(watermarkPos, QSize(0, 0));
 }
 
-void ThemedMenu::parseLogo(QString dir, QDomElement &element)
+void ThemedMenuPrivate::parseLogo(const QString &dir, QDomElement &element)
 {
     bool hasimage = false;
     bool hasposition = false;
@@ -512,7 +686,7 @@ void ThemedMenu::parseLogo(QString dir, QDomElement &element)
                      logo->height());
 }
 
-void ThemedMenu::parseTitle(QString dir, QDomElement &element)
+void ThemedMenuPrivate::parseTitle(const QString &dir, QDomElement &element)
 {
     bool hasimage = false;
     bool hasposition = false;
@@ -572,7 +746,8 @@ void ThemedMenu::parseTitle(QString dir, QDomElement &element)
     titlePos.setY((int)(titlePos.y() * hmult));
 }
 
-void ThemedMenu::parseArrow(QString dir, QDomElement &element, bool up)
+void ThemedMenuPrivate::parseArrow(const QString &dir, QDomElement &element, 
+                                   bool up)
 {
     QRect arrowrect;
     QPoint arrowpos;
@@ -635,7 +810,7 @@ void ThemedMenu::parseArrow(QString dir, QDomElement &element, bool up)
     }
 }
 
-void ThemedMenu::parseButton(QString dir, QDomElement &element)
+void ThemedMenuPrivate::parseButton(const QString &dir, QDomElement &element)
 {
     bool hasname = false;
     bool hasoffset = false;
@@ -726,18 +901,18 @@ void ThemedMenu::parseButton(QString dir, QDomElement &element)
     allButtonIcons[name] = newbutton;
 }
 
-void ThemedMenu::setDefaults(void)
+void ThemedMenuPrivate::setDefaults(void)
 {
     logo = NULL;
     buttonnormal = buttonactive = NULL;
 
-    normalAttributes.textflags = Qt::AlignTop | Qt::AlignLeft | WordBreak;
-    normalAttributes.textColor = QColor(white);
+    normalAttributes.textflags = Qt::AlignTop | Qt::AlignLeft | Qt::WordBreak;
+    normalAttributes.textColor = QColor(QWidget::white);
     normalAttributes.hasoutline = false;
     normalAttributes.hasshadow = false;
 
-    activeAttributes.textflags = Qt::AlignTop | Qt::AlignLeft | WordBreak;
-    activeAttributes.textColor = QColor(white);
+    activeAttributes.textflags = Qt::AlignTop | Qt::AlignLeft | Qt::WordBreak;
+    activeAttributes.textColor = QColor(QWidget::white);
     activeAttributes.hasoutline = false;
     activeAttributes.hasshadow = false;
 
@@ -751,7 +926,8 @@ void ThemedMenu::setDefaults(void)
     watermarkRect = QRect(0, 0, 0, 0);
 }
 
-void ThemedMenu::parseSettings(QString dir, QString menuname)
+void ThemedMenuPrivate::parseSettings(const QString &dir, 
+                                      const QString &menuname)
 {
     QString filename = dir + menuname;
 
@@ -760,7 +936,7 @@ void ThemedMenu::parseSettings(QString dir, QString menuname)
 
     if (!f.open(IO_ReadOnly))
     {
-        cerr << "ThemedMenu::parseSettings(): Can't open: " << filename << endl;
+        cerr << "ThemedMenuPrivate::parseSettings(): Can't open: " << filename << endl;
         return;
     }
 
@@ -845,7 +1021,7 @@ void ThemedMenu::parseSettings(QString dir, QString menuname)
     return;
 }
 
-void ThemedMenu::parseThemeButton(QDomElement &element)
+void ThemedMenuPrivate::parseThemeButton(QDomElement &element)
 {
     QString type = "";
     QString text = "";
@@ -926,7 +1102,7 @@ void ThemedMenu::parseThemeButton(QDomElement &element)
         addButton(type, text, alttext, action);
 }
 
-void ThemedMenu::parseMenu(QString menuname, int row, int col)
+void ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
 {
     QString filename = findMenuFile(menuname);
 
@@ -1009,7 +1185,7 @@ void ThemedMenu::parseMenu(QString menuname, int row, int col)
     }
 
 #ifndef QWS
-    setNoErase();
+    parent->setNoErase();
 #endif
 
     menulevel++;
@@ -1059,10 +1235,10 @@ void ThemedMenu::parseMenu(QString menuname, int row, int col)
     }
 
     selection = "";
-    update(menuRect());
+    parent->update(menuRect());
 }
 
-QPoint ThemedMenu::parsePoint(QString text)
+QPoint ThemedMenuPrivate::parsePoint(const QString &text)
 {
     int x, y;
     QPoint retval;
@@ -1071,7 +1247,7 @@ QPoint ThemedMenu::parsePoint(QString text)
     return retval;
 }
 
-QRect ThemedMenu::parseRect(QString text)
+QRect ThemedMenuPrivate::parseRect(const QString &text)
 {
     int x, y, w, h;
     QRect retval;
@@ -1081,8 +1257,8 @@ QRect ThemedMenu::parseRect(QString text)
     return retval;
 }
 
-void ThemedMenu::addButton(QString &type, QString &text, QString &alttext,
-                           QString &action)
+void ThemedMenuPrivate::addButton(const QString &type, const QString &text, 
+                                  const QString &alttext, const QString &action)
 {
     ThemedButton newbutton;
 
@@ -1099,7 +1275,7 @@ void ThemedMenu::addButton(QString &type, QString &text, QString &alttext,
     buttonList.push_back(newbutton);
 }
 
-void ThemedMenu::layoutButtons(void)
+void ThemedMenuPrivate::layoutButtons(void)
 {
     int numbuttons = buttonList.size();
   
@@ -1171,7 +1347,7 @@ void ThemedMenu::layoutButtons(void)
     }            
 }
 
-void ThemedMenu::positionButtons(bool resetpos)
+void ThemedMenuPrivate::positionButtons(bool resetpos)
 {
     int rows = visiblerows;
     int yspacing = (buttonArea.height() - buttonnormal->height() * rows) /
@@ -1246,7 +1422,7 @@ void ThemedMenu::positionButtons(bool resetpos)
     }
 }
 
-bool ThemedMenu::makeRowVisible(int newrow, int oldrow, bool forcedraw)
+bool ThemedMenuPrivate::makeRowVisible(int newrow, int oldrow, bool forcedraw)
 {
     if (buttonRows[newrow].visible)
         return true;
@@ -1282,18 +1458,18 @@ bool ThemedMenu::makeRowVisible(int newrow, int oldrow, bool forcedraw)
     return true;
 }
 
-QRect ThemedMenu::menuRect() const
+QRect ThemedMenuPrivate::menuRect() const
 {
     QRect r(0, 0, screenwidth, screenheight);
     return r;
 }
 
-void ThemedMenu::clearToBackground(void)
+void ThemedMenuPrivate::clearToBackground(void)
 {
     drawInactiveButtons();
 }
 
-void ThemedMenu::drawInactiveButtons(void)
+void ThemedMenuPrivate::drawInactiveButtons(void)
 {
     QPixmap bground = backgroundPixmap;
 
@@ -1316,17 +1492,17 @@ void ThemedMenu::drawInactiveButtons(void)
 
     tmp.end();
 
-    setPaletteBackgroundPixmap(bground);
+    parent->setPaletteBackgroundPixmap(bground);
 
-    erase(buttonArea);
-    erase(uparrowRect);
-    erase(downarrowRect);
-    erase(logoRect);
+    parent->erase(buttonArea);
+    parent->erase(uparrowRect);
+    parent->erase(downarrowRect);
+    parent->erase(logoRect);
     if (drawTitle)
-        erase(titleRect);
+        parent->erase(titleRect);
 }
 
-void ThemedMenu::drawScrollArrows(QPainter *p)
+void ThemedMenuPrivate::drawScrollArrows(QPainter *p)
 {
     if (!uparrow || !downarrow)
         return;
@@ -1348,34 +1524,19 @@ void ThemedMenu::drawScrollArrows(QPainter *p)
         p->drawPixmap(downarrowRect.topLeft(), *downarrow);
 }
 
-void ThemedMenu::paintEvent(QPaintEvent *e)
-{
-    QRect r = e->rect();
-    QPainter p(this);
-
-    if (r.intersects(watermarkRect))
-        paintWatermark(&p);
-
-    for (unsigned int i = 0; i < buttonList.size(); i++)
-    {
-        if (r.intersects(buttonList[i].posRect))
-            paintButton(i, &p, e->erased());
-    }
-}
-
-void ThemedMenu::paintLogo(QPainter *p)
+void ThemedMenuPrivate::paintLogo(QPainter *p)
 {
     if (logo)
         p->drawPixmap(logoRect.topLeft(), *logo);
 }
 
-void ThemedMenu::paintTitle(QPainter *p)
+void ThemedMenuPrivate::paintTitle(QPainter *p)
 {
     if (curTitle)
         p->drawPixmap(titleRect.topLeft(), *curTitle);
 }
 
-void ThemedMenu::paintWatermark(QPainter *p)
+void ThemedMenuPrivate::paintWatermark(QPainter *p)
 {
     QPixmap pix(watermarkRect.size());
 
@@ -1392,8 +1553,8 @@ void ThemedMenu::paintWatermark(QPainter *p)
     p->drawPixmap(watermarkPos, pix);
 }
 
-void ThemedMenu::paintButton(unsigned int button, QPainter *p, bool erased,
-                             bool drawinactive)
+void ThemedMenuPrivate::paintButton(unsigned int button, QPainter *p, 
+                                    bool erased, bool drawinactive)
 {
     TextAttributes attributes;
     ThemedButton *tbutton = &(buttonList[button]);
@@ -1432,7 +1593,7 @@ void ThemedMenu::paintButton(unsigned int button, QPainter *p, bool erased,
 
         if (!drawinactive)
         {
-            erase(cr);
+            parent->erase(cr);
             return;
         }
         buttonback = buttonnormal;
@@ -1462,7 +1623,7 @@ void ThemedMenu::paintButton(unsigned int button, QPainter *p, bool erased,
     if (attributes.hasshadow && attributes.shadowalpha > 0)
     {
         QPixmap textpix(buttonTextRect.size());
-        textpix.fill(QColor(color0));
+        textpix.fill(QColor(QWidget::color0));
         textpix.setMask(textpix.createHeuristicMask());
 
         QRect myrect = buttonTextRect;
@@ -1526,8 +1687,9 @@ void ThemedMenu::paintButton(unsigned int button, QPainter *p, bool erased,
     p->drawPixmap(cr.topLeft(), pix);
 }
 
-void ThemedMenu::drawText(QPainter *p, QRect &rect, TextAttributes attributes, 
-                          QString text)
+void ThemedMenuPrivate::drawText(QPainter *p, const QRect &rect, 
+                                 const TextAttributes &attributes, 
+                                 const QString &text)
 {
     if (attributes.hasoutline)
     {
@@ -1576,12 +1738,12 @@ void ThemedMenu::drawText(QPainter *p, QRect &rect, TextAttributes attributes,
     }
 }
 
-void ThemedMenu::ReloadTheme(void)
+void ThemedMenuPrivate::ReloadTheme(void)
 {
     buttonList.clear();
     buttonRows.clear();
 
-    ReloadExitKey();
+    parent->ReloadExitKey();
   
     QMap<QString, ButtonIcon>::Iterator it;
     for (it = allButtonIcons.begin(); it != allButtonIcons.end(); ++it)
@@ -1618,12 +1780,12 @@ void ThemedMenu::ReloadTheme(void)
     downarrow = NULL;
 
     gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
-    setFixedSize(QSize(screenwidth, screenheight));
+    parent->setFixedSize(QSize(screenwidth, screenheight));
 
-    setFont(gContext->GetMediumFont());
-    setCursor(QCursor(Qt::BlankCursor));
+    parent->setFont(gContext->GetMediumFont());
+    parent->setCursor(QCursor(Qt::BlankCursor));
 
-    gContext->ThemeWidget(this);
+    gContext->ThemeWidget(parent);
 
     QString themedir = gContext->GetThemeDir();
     parseSettings(themedir, "theme.xml");
@@ -1637,13 +1799,8 @@ void ThemedMenu::ReloadTheme(void)
     parseMenu(file, row, col);
 }
 
-void ThemedMenu::keyPressEvent(QKeyEvent *e)
+bool ThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
 {
-    if (ignorekeys)
-        return;
-
-    ignorekeys = true;
-
     ThemedButton *lastbutton = activebutton;
     int oldrow = currentrow;
     bool handled = false;
@@ -1695,7 +1852,7 @@ void ThemedMenu::keyPressEvent(QKeyEvent *e)
         else if (action == "PAGEDOWN")
         {
             currentrow = min(currentrow + visiblerowlimit,
-                             (int)buttonRows.size() - 1);
+                                (int)buttonRows.size() - 1);
 
             if (currentcolumn >= buttonRows[currentrow].numitems)
                 currentcolumn = buttonRows[currentrow].numitems - 1;
@@ -1709,7 +1866,7 @@ void ThemedMenu::keyPressEvent(QKeyEvent *e)
         {
             lastbutton = activebutton;
             activebutton = NULL;
-            repaint(lastbutton->posRect);
+            parent->repaint(lastbutton->posRect);
             handleAction(lastbutton->action);
             lastbutton = NULL;
         }
@@ -1719,7 +1876,7 @@ void ThemedMenu::keyPressEvent(QKeyEvent *e)
             if (menulevel > 1)
                 handleAction(action);
             else if (killable || e->state() == exitModifier)
-                done(0);
+                parent->done(0);
             lastbutton = NULL;
         }
         else
@@ -1727,11 +1884,7 @@ void ThemedMenu::keyPressEvent(QKeyEvent *e)
     }
 
     if (!handled)
-    {
-        MythDialog::keyPressEvent(e);
-        ignorekeys = false;
-        return;
-    }
+        return false;
 
     if (!buttonRows[currentrow].visible)
     {
@@ -1762,15 +1915,15 @@ void ThemedMenu::keyPressEvent(QKeyEvent *e)
             lcddev->switchToMenu(&menuItems, titleText);
     }
 
-    update(watermarkRect);
+    parent->update(watermarkRect);
     if (lastbutton)
-        update(lastbutton->posRect);
-    update(activebutton->posRect);
+        parent->update(lastbutton->posRect);
+    parent->update(activebutton->posRect);
 
-    ignorekeys = false;
+    return true;
 } 
 
-QString ThemedMenu::findMenuFile(QString menuname)
+QString ThemedMenuPrivate::findMenuFile(const QString &menuname)
 {
     QString testdir = QDir::homeDirPath() + "/.mythtv/" + menuname;
    
@@ -1791,7 +1944,7 @@ QString ThemedMenu::findMenuFile(QString menuname)
     return "";
 }
 
-void ThemedMenu::handleAction(QString &action)
+void ThemedMenuPrivate::handleAction(const QString &action)
 {
     if (action.left(5) == "EXEC ")
     {
@@ -1873,7 +2026,7 @@ void ThemedMenu::handleAction(QString &action)
     else if (action.left(8) == "SHUTDOWN")
     {
         if (menulevel == 1)
-            done(0);
+            parent->done(0);
     }
     else
     {
@@ -1885,7 +2038,7 @@ void ThemedMenu::handleAction(QString &action)
     }   
 }
 
-bool ThemedMenu::findDepends(QString file)
+bool ThemedMenuPrivate::findDepends(const QString &file)
 {
     QString filename = findMenuFile(file);
     if (filename != "")
@@ -1901,8 +2054,9 @@ bool ThemedMenu::findDepends(QString file)
     return false;
 }
 
-bool ThemedMenu::checkPinCode(QString timestamp_setting, 
-                              QString password_setting, QString text)
+bool ThemedMenuPrivate::checkPinCode(const QString &timestamp_setting, 
+                              const QString &password_setting,
+                              const QString &text)
 {
     QDateTime curr_time = QDateTime::currentDateTime();
     QString last_time_stamp = gContext->GetSetting(timestamp_setting);
@@ -1950,5 +2104,109 @@ bool ThemedMenu::checkPinCode(QString timestamp_setting,
     }
 
     return false;
+}
+
+ThemedMenu::ThemedMenu(const char *cdir, const char *menufile,
+                       MythMainWindow *parent, const char *name)
+          : MythDialog(parent, name)
+{
+    d = new ThemedMenuPrivate(this, wmult, hmult, screenwidth, screenheight);
+
+    QString dir = QString(cdir) + "/";
+    QString filename = dir + "theme.xml";
+
+    d->foundtheme = true;
+    QFile filetest(filename);
+    if (!filetest.exists())
+    {
+        d->foundtheme = false;
+        return;
+    }
+
+    d->prefix = gContext->GetInstallPrefix();
+    d->menulevel = 0;
+
+    d->callback = NULL;
+
+    ReloadExitKey();
+
+    d->parseSettings(dir, "theme.xml");
+
+    d->parseMenu(menufile);
+}
+
+ThemedMenu::~ThemedMenu(void)
+{
+    if (d)
+        delete d;
+}
+
+bool ThemedMenu::foundTheme(void)
+{
+    return d->foundtheme;
+}
+
+void ThemedMenu::setCallback(void (*lcallback)(void *, QString &), void *data)
+{
+    d->callback = lcallback;
+    d->callbackdata = data;
+}
+
+void ThemedMenu::setKillable(void)
+{
+    d->killable = true;
+}
+
+QString ThemedMenu::getSelection(void)
+{
+    return d->selection;
+}
+
+void ThemedMenu::ReloadExitKey(void)
+{
+    int allowsd = gContext->GetNumSetting("AllowQuitShutdown");
+    d->killable = (allowsd == 4);
+
+    if (allowsd == 1)
+        d->exitModifier = Qt::ControlButton;
+    else if (allowsd == 2)
+        d->exitModifier = Qt::MetaButton;
+    else if (allowsd == 3)
+        d->exitModifier = Qt::AltButton;
+    else
+        d->exitModifier = -1;
+}
+
+void ThemedMenu::paintEvent(QPaintEvent *e)
+{
+    QRect r = e->rect();
+    QPainter p(this);
+
+    if (r.intersects(d->watermarkRect))
+        d->paintWatermark(&p);
+
+    for (unsigned int i = 0; i < d->buttonList.size(); i++)
+    {
+        if (r.intersects(d->buttonList[i].posRect))
+            d->paintButton(i, &p, e->erased());
+    }
+}
+
+void ThemedMenu::ReloadTheme(void)
+{
+    d->ReloadTheme();
+}
+
+void ThemedMenu::keyPressEvent(QKeyEvent *e)
+{
+    if (d->ignorekeys)
+        return;
+
+    d->ignorekeys = true;
+
+    if (!d->keyPressHandler(e))
+        MythDialog::keyPressEvent(e);
+
+    d->ignorekeys = false;
 }
 

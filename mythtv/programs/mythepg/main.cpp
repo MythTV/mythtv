@@ -35,7 +35,7 @@ int main(int argc, char **argv)
     gContext->LoadQtConfig();
 
     MythMainWindow *mainWindow = new MythMainWindow();
-    mainWindow->Show();
+    mainWindow->Init();
     gContext->SetMainWindow(mainWindow);
 
     TV::InitKeys();

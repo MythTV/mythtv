@@ -22,6 +22,7 @@
 struct options opt[] = {
 	{ 'p', "port", "port", "serial port (default: /dev/ttyS0)" },
 	{ 'f', "force", NULL, "keep going after communication errors" },
+	{ 'o', "ok", NULL, "send OK after channel number" },
 	{ 'b', "blind", NULL, "send keys blindly and ignore returned data" },
 	{ 'n', "nopower", NULL, "never attempt to turn box on" },
 	{ 't', "timeout", "scale", "scale all timeouts by this much "
@@ -34,9 +35,11 @@ struct options opt[] = {
 };	
 
 int verb_count = 0;
+int send_ok = 0;
 
 /* Timeouts, in msec. */
 double timeout_scale = 1.0;
+
 
 #define TIMEOUT_TINY (int)(timeout_scale*250)	/* Messages that may not
 						   some (status, etc) */
@@ -141,11 +144,12 @@ int set_channel(int chan)
 
 	if((send_keypress(KEY_0+((chan/100)%10)))<0 ||
 	   (send_keypress(KEY_0+((chan/10)%10)))<0 ||
-	   (send_keypress(KEY_0+((chan/1)%10)))<0) {
+	   (send_keypress(KEY_0+((chan/1)%10)))<0 ||
+	   (send_ok && send_keypress(KEY_OK)<0)) {
 		verb("Error sending channel keypresses\n");
 		return -1;
 	}
-	
+
 	/* Now the DCT should send us channel status */
 	if(serial_getpacket(&p,TIMEOUT_LONG)<0) {
 		verb("Didn't get channel status message\n");
@@ -198,6 +202,10 @@ void blind_channel(int chan)
 	blind_key(KEY_0+((chan/10)%10));
 	usleep(BLIND_SLEEP * 1000);
 	blind_key(KEY_0+((chan/1)%10));
+	if(send_ok) {
+		usleep(BLIND_SLEEP * 1000);
+		blind_key(KEY_OK);
+	}
 	usleep(BLIND_SLEEP * 1000 * 2);
 	blind_key(KEY_EXIT);
 	usleep(BLIND_SLEEP * 1000);
@@ -232,6 +240,9 @@ int main(int argc, char *argv[])
 			break;
 		case 'n':
 			nopower++;
+			break;
+		case 'o':
+			send_ok++;
 			break;
 		case 'b':
 			blind++;

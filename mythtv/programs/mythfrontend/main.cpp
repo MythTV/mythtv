@@ -379,6 +379,9 @@ void TVMenuCallback(void *data, QString &selection)
 
 int handleExit(void)
 {
+    if (gContext->GetNumSetting("NoPromptOnExit") == 1)
+        return QUIT;
+
     // first of all find out, if a backend runs on this host...
     bool backendOnLocalhost = false;
 

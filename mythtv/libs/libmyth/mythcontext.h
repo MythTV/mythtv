@@ -75,9 +75,11 @@ class MythEvent : public QCustomEvent
     QString extradata;
 };
 
-#define MYTH_BINARY_VERSION "0.14.20040102-1"
+#define MYTH_BINARY_VERSION "0.14.20040114-1"
 
 extern int print_verbose_messages;
+
+class MythContextPrivate;
 
 class MythContext : public QObject
 {
@@ -88,16 +90,16 @@ class MythContext : public QObject
 
     QString GetMasterHostPrefix(void);
 
-    QString GetHostName(void) { return m_localhostname; }
+    QString GetHostName(void);
 
     bool ConnectToMasterServer(void);
     bool ConnectServer(const QString &hostname, int port);
-    bool IsConnectedToMaster(void) { return serverSock; }
+    bool IsConnectedToMaster(void);
 
-    QString GetInstallPrefix() { return m_installprefix; }
-    QString GetShareDir() { return m_installprefix + "/share/mythtv/"; }
+    QString GetInstallPrefix(void);
+    QString GetShareDir(void);
 
-    QString GetFilePrefix();
+    QString GetFilePrefix(void);
 
     bool LoadSettingsFiles(const QString &filename);
     void LoadQtConfig(void);
@@ -109,19 +111,19 @@ class MythContext : public QObject
     void GetScreenSettings(int &xbase, int &width, float &wmult,
                            int &ybase, int &height, float &hmult);
    
-    QString FindThemeDir(QString themename);
-    QString GetThemeDir(void) { return m_themepathname; }
+    QString FindThemeDir(const QString &themename);
+    QString GetThemeDir(void);
 
     int OpenDatabase(QSqlDatabase *db);
     static void KickDatabase(QSqlDatabase *db);
-    static void DBError(QString where, const QSqlQuery& query);
+    static void DBError(const QString &where, const QSqlQuery& query);
     static QString DBErrorMessage(const QSqlError& err);
 
-    Settings *settings() { return m_settings; }
-    Settings *qtconfig() { return m_qtThemeSettings; }
+    Settings *settings(void);
+    Settings *qtconfig(void);
 
-    void SaveSetting(QString key, int newValue);
-    void SaveSetting(QString key, QString newValue);
+    void SaveSetting(const QString &key, int newValue);
+    void SaveSetting(const QString &key, const QString &newValue);
     QString GetSetting(const QString &key, const QString &defaultval = "");
     int GetNumSetting(const QString &key, int defaultval = 0);
 
@@ -131,10 +133,6 @@ class MythContext : public QObject
                             int defaultval = 0);
 
     void SetSetting(const QString &key, const QString &newValue);
-
-    int GetBigFontSize() { return bigfontsize; }
-    int GetMediumFontSize() { return mediumfontsize; }
-    int GetSmallFontSize() { return smallfontsize; }
 
     QFont GetBigFont();
     QFont GetMediumFont();
@@ -159,12 +157,12 @@ class MythContext : public QObject
     void SetMainWindow(MythMainWindow *mainwin);
     MythMainWindow *GetMainWindow(void);
 
-    LCD *GetLCDDevice(void) { return lcd_device; }
+    LCD *GetLCDDevice(void);
 
     bool TestPopupVersion(const QString &name, const QString &libversion,
                           const QString &pluginversion);
 
-    void SetDisableLibraryPopup(bool check) { disablelibrarypopup = check; }
+    void SetDisableLibraryPopup(bool check);
     
   private slots:
     void EventSocketRead();
@@ -177,50 +175,10 @@ class MythContext : public QObject
 
     void ClearOldImageCache(void);
     void CacheThemeImages(void);
-    void CacheThemeImagesDirectory(const QString &dir);
-    void RemoveCacheDir(const QString &dir);
+    void CacheThemeImagesDirectory(const QString &dirname);
+    void RemoveCacheDir(const QString &dirname);
 
-    Settings *m_settings;
-    Settings *m_qtThemeSettings;
-
-    QString m_installprefix;
-
-    bool m_themeloaded;
-    QString m_themepathname;
-    QPixmap *m_backgroundimage;
-    QPalette m_palette;
-
-    int m_xbase, m_ybase;
-    int m_height, m_width;
-
-    QString m_localhostname;
-
-    QMutex serverSockLock;
-
-    QPtrList<QObject> listeners;
-
-    QSqlDatabase* m_db;
-    QMutex dbLock;
-
-    QMap<QString, QImage> imageCache;
-
-    LCD *lcd_device;
-
-    QString language;
-
-    MythMainWindow *mainWindow;
-
-    float m_wmult, m_hmult;
-    int m_screenwidth, m_screenheight;
-
-    QString themecachedir;
-
-    int bigfontsize, mediumfontsize, smallfontsize; 
-
-    QSocketDevice *serverSock;
-    QSocket *eventSock;
-
-    bool disablelibrarypopup;
+    MythContextPrivate *d;
 };
 
 extern MythContext *gContext;

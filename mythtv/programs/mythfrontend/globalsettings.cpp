@@ -819,6 +819,17 @@ public:
     };
 };
 
+class NoPromptOnExit: public CheckBoxSetting, public GlobalSetting {
+public:
+    NoPromptOnExit():
+        GlobalSetting("NoPromptOnExit") {
+        setLabel(QObject::tr("No Prompt on Exit"));
+        setValue(false);
+        setHelpText(QObject::tr("If set, you will not be prompted when pressing"
+                    " the exit key.  Instead, MythTV will immediately exit."));
+    };
+};
+
 class HaltCommand: public LineEditSetting, public GlobalSetting {
 public:
     HaltCommand():
@@ -1459,6 +1470,7 @@ MainGeneralSettings::MainGeneralSettings()
 
     VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
     general->addChild(new AllowQuitShutdown());
+    general->addChild(new NoPromptOnExit());
     general->addChild(new HaltCommand());
     general->addChild(new SetupPinCodeRequired());
     general->addChild(new SetupPinCode());

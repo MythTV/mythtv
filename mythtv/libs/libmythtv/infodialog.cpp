@@ -40,7 +40,7 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, MythMainWindow *parent,
 {
     myinfo = new ProgramInfo(*pginfo);
 
-    int mediumfont = gContext->GetMediumFontSize();
+    QFont mediumfont = gContext->GetMediumFont();
 
     QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
 
@@ -72,7 +72,7 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, MythMainWindow *parent,
     lview->setColumnWidth(0, (int)(750 * wmult));
     lview->setSorting(-1, false);
     lview->setAllColumnsShowFocus(true);
-    lview->setItemMargin((int)(hmult * mediumfont / 2));
+    lview->setItemMargin((int)(hmult * mediumfont.pointSize() / 2));
     lview->setFixedHeight((int)(225 * hmult));
     lview->header()->hide();
 

@@ -4,9 +4,11 @@
 #include <qlibrary.h>
 #include <qdict.h>
 #include <qmap.h>
+#include <qptrlist.h>
 
 class QSqlDatabase;
 class MythContext;
+class QPainter;
 
 typedef enum {
     kPluginType_Module = 0,
@@ -35,12 +37,20 @@ class MythPlugin : public QLibrary
     bool isEnabled() { return enabled; }
     void setEnabled(bool enable) { enabled = enable; }
 
+    int getPosition() { return position; }
+    void setPosition(int pos) { position = pos; }
+
     // mainmenu plugins, probably should separate out
 
     // setup the plugin -- returns how often (in ms) the plugin wants updated
+    int setupMenuPlugin(void);
+
+    // draw the plugin
+    void drawMenuPlugin(QPainter *painter, int x, int y, int w, int h);
 
   private:
     bool enabled;
+    int position;
 };
 
 class MythPluginManager
@@ -51,16 +61,23 @@ class MythPluginManager
     static bool run_plugin(const QString &plugname);
     static bool config_plugin(const QString &plugname);
     static void unload_plugin(const QString &plugname);
+
+    static MythPlugin *GetPlugin(const QString &plugname);
+    static MythPlugin *GetMenuPlugin(const QString &plugname);
+    static MythPlugin *GetMenuPluginAt(int pos);
      
   private:
     static QDict<MythPlugin> m_dict;
    
-    static QMap<QString, MythPlugin *> moduleList;
-    static QMap<QString, MythPlugin *> menuPluginList;
+    static QMap<QString, MythPlugin *> moduleMap;
+    static QMap<QString, MythPlugin *> menuPluginMap;
+    static QPtrList<MythPlugin> menuPluginList;
 
     // Default constructor declared private and
     // left as abstract to prevent instantiation
     MythPluginManager();
+
+    static void orderMenuPlugins();
 };
 
 #endif
