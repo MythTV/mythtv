@@ -323,7 +323,7 @@
     </message>
     <message>
         <source>Automatically eject CDs after ripping</source>
-        <translation>Skjut ut CDn automatiskt efter kopiering</translation>
+        <translation>Mata ut CDn automatiskt efter kopiering</translation>
     </message>
     <message>
         <source>If set, the CD tray will automatically open after the CD has been ripped.</source>

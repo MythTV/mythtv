@@ -82,15 +82,15 @@
     </message>
     <message>
         <source>Blechy Blech Blah</source>
-        <translation type="unfinished"></translation>
+        <translation>Bla bla bla</translation>
     </message>
     <message>
         <source>All My Music ~ Loading Music Data </source>
-        <translation type="unfinished"></translation>
+        <translation>Tota la música ~ Carregant les dades</translation>
     </message>
     <message>
         <source>Loading Music Data</source>
-        <translation type="unfinished"></translation>
+        <translation>Carregant la base de dades de música</translation>
     </message>
 </context>
 <context>
@@ -213,35 +213,35 @@
     </message>
     <message>
         <source>1 Shuffle: Smart</source>
-        <translation type="unfinished"></translation>
+        <translation>1 Aleatori: Preferit</translation>
     </message>
     <message>
         <source>Shuffle: Smart</source>
-        <translation type="unfinished"></translation>
+        <translation>Aleatori: Preferit</translation>
     </message>
     <message>
         <source>1 Shuffle: Rand</source>
-        <translation type="unfinished"></translation>
+        <translation>1 Aleatori: Variable</translation>
     </message>
     <message>
         <source>Shuffle: Rand</source>
-        <translation type="unfinished"></translation>
+        <translation>Aleatori: Variable</translation>
     </message>
     <message>
         <source>playlist root</source>
-        <translation type="unfinished"></translation>
+        <translation>Llista arrel</translation>
     </message>
     <message>
         <source>kbps</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>kHz</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>ch</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -256,449 +256,451 @@
     </message>
     <message>
         <source>BumpScope</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Various Artists</source>
-        <translation type="unfinished"></translation>
+        <translation>Varis artistes</translation>
     </message>
     <message>
         <source>Ogg Vorbis Audio</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Desconegut</translation>
     </message>
     <message>
         <source>FLAC Audio</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Directory to hold music</source>
-        <translation type="unfinished"></translation>
+        <translation>Directori on es guarda la música</translation>
     </message>
     <message>
         <source>This directory must exist, and the user running MythMusic needs to have write permission to the directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aquest directori (carpeta) ha d&apos;existir, i l&apos;usuari que fa servir el MythMusic n&apos;ha de tenir permís d&apos;escriptura.</translation>
     </message>
     <message>
         <source>Audio device</source>
-        <translation type="unfinished"></translation>
+        <translation>Dispositiu de sò</translation>
     </message>
     <message>
         <source>Audio Device used for playback.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dispositiu de sò durant la reproducció.</translation>
     </message>
     <message>
         <source>CD device</source>
-        <translation type="unfinished"></translation>
+        <translation>Dispositiu de CD</translation>
     </message>
     <message>
         <source>CDRom device used for ripping/playback.</source>
-        <translation type="unfinished"></translation>
+        <translation>CDRom que es farà servir per a la reproducció/volcat.</translation>
     </message>
     <message>
         <source>Tree Sorting</source>
-        <translation type="unfinished"></translation>
+        <translation>Ordenació per arbre</translation>
     </message>
     <message>
         <source>Order in which to sort the Music Selection Tree. Possible values are space-separated list of genre, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the actual directory tree.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ordenació a fer servir en l&apos;arbre de sel·lecció. Es poden fer servir diferents valors separats per espais (genre, artist, album, title o la paraula &quot;directori&quot; per a indicar que l&apos;arbre representa l&apos;arbre de directoris).</translation>
     </message>
     <message>
         <source>Script Path</source>
-        <translation type="unfinished"></translation>
+        <translation>Fitxer de comandes</translation>
     </message>
     <message>
         <source>If present this script will be executed after a CD Rip is completed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Si es trova present, s&apos;executa al finalitzar un volcat de CD.</translation>
     </message>
     <message>
         <source>Filename Format</source>
-        <translation type="unfinished"></translation>
+        <translation>Format del nom de fitxer</translation>
     </message>
     <message>
         <source>Directory and filename Format used to grab information if no ID3 information is found.</source>
-        <translation type="unfinished"></translation>
+        <translation>El directori i el nom de fitxer són util·litzats quan no hi ha informació ID3.</translation>
     </message>
     <message>
         <source>Ignore ID3 Tags</source>
-        <translation type="unfinished"></translation>
+        <translation>Ignorar les marques ID3</translation>
     </message>
     <message>
         <source>If set, MythMusic will skip checking ID3 tags in files and just try to determine Genre, Artist, Album, and Track number and title from the filename.</source>
-        <translation type="unfinished"></translation>
+        <translation>Si s&apos;activa, MythMusic no comprovarà les marques ID3 dels fitxers i intentarà determinar el Gènere, Artista, Àlbum, Pista i Títol en funció del nom de l&apos;arxiu.</translation>
     </message>
     <message>
         <source>Automatically lookup CDs</source>
-        <translation type="unfinished"></translation>
+        <translation>Automàticament mira els CDs</translation>
     </message>
     <message>
         <source>Automatically lookup an audio CD if it is present and show its information in the Music Selection Tree.</source>
-        <translation type="unfinished"></translation>
+        <translation>Automàticament mira si hi ha un CD d&apos;àudio i visualitza la seva informació en l&apos;arbre de sel·lecció de música.</translation>
     </message>
     <message>
         <source>Use Keyboard/Remote Accelerated Buttons</source>
-        <translation type="unfinished"></translation>
+        <translation>Dreceres de tecles de comandament</translation>
     </message>
     <message>
         <source>If this is not set, you will need to use arrow keys to select and activate various functions.</source>
-        <translation type="unfinished"></translation>
+        <translation>Si no s&apos;activa, necessitará les fletxes per a sel·leccionar i activar vàries funcions.</translation>
     </message>
     <message>
         <source>Encoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Codificació</translation>
     </message>
     <message>
         <source>Ogg Vorbis</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Lame (MP3)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Audio encoder to use for CD ripping. Note that the quality level &apos;Perfect&apos; will use the FLAC encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>Còdec d&apos;àudio per al volcat de CD. El nivell &apos;Perfecte&apos; util.litzarà el còdec FLAC.</translation>
     </message>
     <message>
         <source>File storage location</source>
-        <translation type="unfinished"></translation>
+        <translation>On es guarden els arxius</translation>
     </message>
     <message>
         <source>Defines the location/name for new songs. Valid tokens are: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR, / and -. &apos;-&apos; will be replaced by the Token separator</source>
-        <translation type="unfinished"></translation>
+        <translation>Defineix la carpeta/nom per a les noves cançons. GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR, / i - són valors vàlids. &apos;-&apos; serà substituït pel caràcter separador</translation>
     </message>
     <message>
         <source>Token separator</source>
-        <translation type="unfinished"></translation>
+        <translation>Caràcter separador</translation>
     </message>
     <message>
         <source> - </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Filename tokens will be separated by this string.</source>
-        <translation type="unfinished"></translation>
+        <translation>Els noms dels arxius seràn separats per aquesta marca.</translation>
     </message>
     <message>
         <source>Replace &apos; &apos; with &apos;_&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Substitueix &apos; &apos; amb &apos;_&apos;</translation>
     </message>
     <message>
         <source>If set, whitespace characters in filenames will be replaced with underscore characters.</source>
-        <translation type="unfinished"></translation>
+        <translation>Quan està actiu, els blancs en els noms dels arxius es substitueixen pel subratllat.</translation>
     </message>
     <message>
         <source>Paranoia Level</source>
-        <translation type="unfinished"></translation>
+        <translation>Nivell de Paranoia</translation>
     </message>
     <message>
         <source>Full</source>
-        <translation type="unfinished"></translation>
+        <translation>Complert</translation>
     </message>
     <message>
         <source>Faster</source>
-        <translation type="unfinished"></translation>
+        <translation>Rápid</translation>
     </message>
     <message>
         <source>Paranoia level of the CD ripper. Set to faster if you&apos;re not concerned about possible errors in the audio.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nivell Paranoia del volcador de CD. Si no li preocupen els errors en els volcats, posi el rápid.</translation>
     </message>
     <message>
         <source>Automatically eject CDs after ripping</source>
-        <translation type="unfinished"></translation>
+        <translation>Expulsa automàticament el CD després del volcat</translation>
     </message>
     <message>
         <source>If set, the CD tray will automatically open after the CD has been ripped.</source>
-        <translation type="unfinished"></translation>
+        <translation>Quan s&apos;activa, el CD s&apos;expulsa automàticament quan finalitza el volcat.</translation>
     </message>
     <message>
         <source>Rating Weight</source>
-        <translation type="unfinished"></translation>
+        <translation>Pes de puntuació</translation>
     </message>
     <message>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to your rating of a given track when ordering a group of songs.</source>
-        <translation type="unfinished"></translation>
+        <translation>Es fa servir en la reproducció segons &quot;Preferit&quot;. És el pès assignat en el moment d&apos;ordenar grups de cançons.</translation>
     </message>
     <message>
         <source>Play Count Weight</source>
-        <translation type="unfinished"></translation>
+        <translation>Pes del comptador de reproduccions</translation>
     </message>
     <message>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to how many times a given track has been played when ordering a group of songs.</source>
-        <translation type="unfinished"></translation>
+        <translation>En el mode de reproducció &apos;Preferit&apos;. Aquest valor afecta a la puntuació atorgada segons el nombre de reproduccions de la cançó.</translation>
     </message>
     <message>
         <source>Last Play Weight</source>
-        <translation type="unfinished"></translation>
+        <translation>Pes per la última reproducció</translation>
     </message>
     <message>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to how long it has been since a given track was played when ordering a group of songs.</source>
-        <translation type="unfinished"></translation>
+        <translation>En el mode de reproducció &apos;Preferit&apos;. Aquest valor puntúa segons el temps que fa que ha estat reproduida la cançó.</translation>
     </message>
     <message>
         <source>Random Weight</source>
-        <translation type="unfinished"></translation>
+        <translation>Puntuació aleatoria</translation>
     </message>
     <message>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to good old (peudo-)randomness when ordering a group of songs.</source>
-        <translation type="unfinished"></translation>
+        <translation>En el mode de reproducció &apos;Preferit&apos;. Aquest valor és el que s&apos;assigna al reproduïr aleatòriament les cançons.</translation>
     </message>
     <message>
         <source>Show Song Ratings</source>
-        <translation type="unfinished"></translation>
+        <translation>Visualitzar puntuacions</translation>
     </message>
     <message>
         <source>Show song ratings on the playback screen.</source>
-        <translation type="unfinished"></translation>
+        <translation>Visualitzar puntuacions en la pantalla de reproducció.</translation>
     </message>
     <message>
         <source>List as Shuffled</source>
-        <translation type="unfinished"></translation>
+        <translation>Llista barrejat</translation>
     </message>
     <message>
         <source>List songs on the playback screen in the order they will be played.</source>
-        <translation type="unfinished"></translation>
+        <translation>Llistar les cançons en l&apos;ordre que seran reproduides.</translation>
     </message>
     <message>
         <source>Show entire music tree</source>
-        <translation type="unfinished"></translation>
+        <translation>Visualitzar l&apos;arbre complert</translation>
     </message>
     <message>
         <source>If selected, you can navigate your entire music tree from the playing screen.</source>
-        <translation type="unfinished"></translation>
+        <translation>Si es trova actiu, podrà navegar per tot l&apos;arbre des de la pantalla de reproducció.</translation>
     </message>
     <message>
         <source>Play mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Mode de reproducció</translation>
     </message>
     <message>
         <source>Normal</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Random</source>
-        <translation type="unfinished"></translation>
+        <translation>Aleatori</translation>
     </message>
     <message>
         <source>Intelligent</source>
-        <translation type="unfinished"></translation>
+        <translation>Intel·ligent</translation>
     </message>
     <message>
         <source>Starting shuffle mode for the player.  Can be either normal, random, or intelligent (random).</source>
-        <translation type="unfinished"></translation>
+        <translation>Mode inicial del reproductor: Pot ser normal, aleatori o intel·ligent.</translation>
     </message>
     <message>
         <source>Delay before Visualizations start (seconds)</source>
-        <translation type="unfinished"></translation>
+        <translation>Espera avans d&apos;iniciar les visualitzacions (segons)</translation>
     </message>
     <message>
         <source>If set to 0, visualizations will never automatically start.</source>
-        <translation type="unfinished"></translation>
+        <translation>So s&apos;hi posa 0, les visualitzacions no s&apos;inicien mai.</translation>
     </message>
     <message>
         <source>Change Visualizer on each song</source>
-        <translation type="unfinished"></translation>
+        <translation>Canviar la visualització en cada cançó</translation>
     </message>
     <message>
         <source>Change the visualizer when the song change.</source>
-        <translation type="unfinished"></translation>
+        <translation>Canviar la visualitzación quan una cançó canvii.</translation>
     </message>
     <message>
         <source>Width for Visual Scaling</source>
-        <translation type="unfinished"></translation>
+        <translation>Amplada per la visualització</translation>
     </message>
     <message>
         <source>If set to &quot;2&quot;, visualizations will be scaled in half.  Currently only used by the goom visualization.  Reduces CPU load on slower machines.</source>
-        <translation type="unfinished"></translation>
+        <translation>Amb valor &quot;2&quot; les visualtzacions són redimensionades a la meitat. Disponible només amb la visualització &apos;goom&apos;. Redueix l&apos;ús de processador en sistemes antics i lents.</translation>
     </message>
     <message>
         <source>Height for Visual Scaling</source>
-        <translation type="unfinished"></translation>
+        <translation>Alçada de la visualització</translation>
     </message>
     <message>
         <source>Visualizations</source>
-        <translation type="unfinished"></translation>
+        <translation>Visualitzacions</translation>
     </message>
     <message>
         <source>List of visualizations to use during playback. Possible values are space-separated list of </source>
-        <translation type="unfinished"></translation>
+        <translation>Llista de visualitzacións durant la reproducció. Els valors possibles s&apos;especifiquen separats per espais en blanc de </translation>
     </message>
     <message>
         <source>MonoScope</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>StereoScope</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Spectrum</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Goom</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Synaesthesia</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Gears</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Blank</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Default Rip Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Qualitat de volcat per omisió</translation>
     </message>
     <message>
         <source>Low</source>
-        <translation type="unfinished">Baixa</translation>
+        <translation>Baixa</translation>
     </message>
     <message>
         <source>Medium</source>
-        <translation type="unfinished">Mitjana</translation>
+        <translation>Mitjana</translation>
     </message>
     <message>
         <source>High</source>
-        <translation type="unfinished">Alta</translation>
+        <translation>Alta</translation>
     </message>
     <message>
         <source>Perfect</source>
-        <translation type="unfinished">Perfecte</translation>
+        <translation>Perfecte</translation>
     </message>
     <message>
         <source>Default quality for new CD rips.</source>
-        <translation type="unfinished"></translation>
+        <translation>Qualitat de volcat per a CDs nous.</translation>
     </message>
     <message>
         <source>General Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Configuració General</translation>
     </message>
     <message>
         <source>Playback Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Configuració de Reproducció</translation>
     </message>
     <message>
         <source>Visualization Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Configuració de visualització</translation>
     </message>
     <message>
         <source>CD Ripper Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Configuració de volcat</translation>
     </message>
     <message>
         <source>MPEG Layer 1/2/3 Audio (MAD decoder)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>music database</source>
-        <translation type="unfinished"></translation>
+        <translation>Base de dades de música</translation>
     </message>
     <message>
         <source>cd ripper</source>
-        <translation type="unfinished"></translation>
+        <translation>volcador de CD</translation>
     </message>
     <message>
         <source>
 
 You have no MythMusic tables in your database.</source>
-        <translation type="unfinished"></translation>
+        <translation>
+
+No disposa de les taules de MythMusic en la seva Base de Dades.</translation>
     </message>
     <message>
         <source>OK, I&apos;ll read the documentation</source>
-        <translation type="unfinished"></translation>
+        <translation>OK, llegiré la documentació</translation>
     </message>
     <message>
         <source>Unknown Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Artista desconegut</translation>
     </message>
     <message>
         <source>Unknown Album</source>
-        <translation type="unfinished"></translation>
+        <translation>Àlbum desconegut</translation>
     </message>
     <message>
         <source>Unknown Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>Gènere desconegut</translation>
     </message>
     <message>
         <source>CD -- none</source>
-        <translation type="unfinished"></translation>
+        <translation>CD - cap CD</translation>
     </message>
     <message>
         <source>All My Music</source>
-        <translation type="unfinished">Tota la música</translation>
+        <translation>Tota la música</translation>
     </message>
     <message>
         <source>%1 - %2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>title</source>
-        <translation type="unfinished"></translation>
+        <translation>títol</translation>
     </message>
     <message>
         <source>Missing database entry: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Falta entrada a la basde de dades: %1</translation>
     </message>
     <message>
         <source> ~ </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Ooops</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>%1 ~ %2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Not Initialized</source>
-        <translation type="unfinished"></translation>
+        <translation>No inicialitzat</translation>
     </message>
     <message>
         <source>oops</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>,%1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>All My Playlists</source>
-        <translation type="unfinished">Totes les llistes</translation>
+        <translation>Totes les llistes</translation>
     </message>
     <message>
         <source>Active Play Queue</source>
-        <translation type="unfinished">Activar la cua de llistes</translation>
+        <translation>Llista de reproducció activa</translation>
     </message>
     <message>
         <source>Active Play Queue (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Llista de reproducció activa (%1)</translation>
     </message>
     <message>
         <source>Something is Wrong</source>
-        <translation type="unfinished"></translation>
+        <translation>Alguna cosa va malament</translation>
     </message>
     <message>
         <source>Visualization requires FFT library</source>
-        <translation type="unfinished"></translation>
+        <translation>La visualització requereix la llibreria FFT</translation>
     </message>
     <message>
         <source>Did you run configure?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ha executat configure?</translation>
     </message>
     <message>
         <source>and</source>
-        <translation type="unfinished"></translation>
+        <translation> i </translation>
     </message>
 </context>
 <context>
@@ -749,11 +751,11 @@ You have no MythMusic tables in your database.</source>
     </message>
     <message>
         <source>Genre: </source>
-        <translation type="unfinished"></translation>
+        <translation>Gènere: </translation>
     </message>
     <message>
         <source>Ripping...</source>
-        <translation type="unfinished"></translation>
+        <translation>Volcant...</translation>
     </message>
 </context>
 </TS>

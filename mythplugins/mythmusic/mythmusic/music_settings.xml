@@ -33,6 +33,8 @@
       <text>Ripper Settings</text>
       <text lang="PT">Configurações de Cópia de CD</text>
       <text lang="SV">Inställningar för kopiering</text>
+      <text lang="CA">Configuració de volcat</text>
+      <text lang="ES">Configuració del riper</text>
       <action>MUSIC_SET_RIPPER</action>
    </button>
 </mythmenu>

@@ -175,6 +175,8 @@
                 <value lang="NL">Gelieve te wachten...</value>
                 <value lang="PT">Aguarde um Momento...</value>
                 <value lang="SV">Vänta...</value>
+                <value lang="ES">Aguarde un momento...</value>
+                <value lang="CA">Esperi uns moments...</value>
             </textarea>
 
             <!--
