@@ -71,7 +71,7 @@ struct ivtv_cfg_start_decode {
 	uint32_t     muted_audio_frames;/* #of audio frames to mute */
 };
 
-struct vtv_cfg_stop_decode {
+struct ivtv_cfg_stop_decode {
 	int		hide_last;/* 1 = show black after stop,0 = show last frame */
 	uint64_t	pts_stop; /* PTS to stop at */
 };

@@ -31,7 +31,15 @@ VideoOutputIvtv::VideoOutputIvtv(void)
 VideoOutputIvtv::~VideoOutputIvtv()
 {
     if (videofd)
+    {
+        ivtv_cfg_stop_decode sd;
+        memset(&sd, 0, sizeof(sd));
+
+        sd.hide_last = 1;
+        ioctl(videofd, IVTV_IOC_S_STOP_DECODE, &sd);
+
         close(videofd);
+    }
     videofd = -1;
 }
 
@@ -62,16 +70,32 @@ bool VideoOutputIvtv::Init(int width, int height, float aspect,
     return true;
 }
 
-void VideoOutputIvtv::Reopen(void)
+void VideoOutputIvtv::Reopen(int skipframes)
 {
     if (videofd >= 0)
+    {
+        ivtv_cfg_stop_decode sd;
+        memset(&sd, 0, sizeof(sd));
+
+        ioctl(videofd, IVTV_IOC_S_STOP_DECODE, &sd);
         close(videofd);
+    }
 
     videofd = -1;
 
     /* needs to be #defined*/
     if ((videofd = open(videoDevice.ascii(), O_WRONLY | O_LARGEFILE, 0555)) < 0)
         perror("Cannot open ivtv video out device");
+    else
+    {
+        if (skipframes > 0)
+        {
+            ivtv_cfg_start_decode sd;
+            memset(&sd, 0, sizeof(sd));
+
+            ioctl(videofd, IVTV_IOC_S_START_DECODE, &sd);
+        }
+    }
 }
 
 void VideoOutputIvtv::EmbedInWidget(unsigned long wid, int x, int y, int w, 

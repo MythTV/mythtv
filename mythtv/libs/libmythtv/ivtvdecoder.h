@@ -53,7 +53,7 @@ class IvtvDecoder : public DecoderBase
 
   private:
     void MpegPreProcessPkt(unsigned char *buf, int len, long long startpos);
-    void SeekReset(void);
+    void SeekReset(int skipframes = 0);
 
     RingBuffer *ringBuffer;
 

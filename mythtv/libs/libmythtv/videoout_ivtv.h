@@ -37,7 +37,7 @@ class VideoOutputIvtv: public VideoOutput
     void Pause(void);
     void Play(void);
 
-    void Reopen(void);
+    void Reopen(int skipframes = 0);
 
     void SetFPS(float lfps) { fps = lfps; }
 

@@ -46,10 +46,10 @@ IvtvDecoder::~IvtvDecoder()
 {
 }
 
-void IvtvDecoder::SeekReset(void)
+void IvtvDecoder::SeekReset(int skipframes)
 {
     VideoOutputIvtv *videoout = (VideoOutputIvtv *)m_parent->getVideoOutput();
-    videoout->Reopen();
+    videoout->Reopen(skipframes);
 }
 
 void IvtvDecoder::Reset(void)
@@ -291,9 +291,7 @@ bool IvtvDecoder::DoRewind(long long desiredFrame)
     if (!exactseeks)
         normalframes = 0;
 
-    SeekReset();
-
-    // skip normalframes frames
+    SeekReset(normalframes);
 
     m_parent->SetFramesPlayed(framesPlayed);
     return true;
@@ -318,7 +316,7 @@ bool IvtvDecoder::DoFastForward(long long desiredFrame)
 
     long long keyPos = -1;
 
-    if (desiredKey != lastKey)
+    //if (desiredKey != lastKey)
     {
         int desiredIndex = desiredKey / keyframedist;
 
@@ -353,11 +351,11 @@ bool IvtvDecoder::DoFastForward(long long desiredFrame)
     }
     else if (desiredKey != lastKey && !livetv && !watchingrecording)
     {
+        needflush = true;
+
         while (framesRead < desiredKey + 1 || 
                !positionMap.contains(desiredKey / keyframedist))
         {
-            needflush = true;
-
             exitafterdecoded = true;
             GetFrame(-1);
             exitafterdecoded = false;
@@ -384,11 +382,8 @@ bool IvtvDecoder::DoFastForward(long long desiredFrame)
     if (!exactseeks)
         normalframes = 0;
 
-    if (needflush)
-        SeekReset();
+    SeekReset(normalframes);
 
-    // skip normalframes frames
-    
     m_parent->SetFramesPlayed(framesPlayed);
     return true;
 }
