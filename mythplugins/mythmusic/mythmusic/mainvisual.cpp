@@ -79,20 +79,6 @@ MainVisual::MainVisual(QWidget *parent, const char *name)
     timer->start(1000 / fps);
 }
 
-/*
-void MainVisual::keyPressEvent(QKeyEvent *e)
-{
-    if(e->key() == Key_Escape)
-    {
-        QWidget::keyPressEvent(e);
-    }
-    else
-    {
-        emit keyPress(e);
-    }
-}
-*/
-
 MainVisual::~MainVisual()
 {
     if(vis)

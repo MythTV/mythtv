@@ -171,14 +171,15 @@ void SavePending(QSqlDatabase *db, int pending)
     }
 }
 
-void SearchDir(QSqlDatabase *db, QString &directory)
+void SearchDir(QString &directory)
 {
     MusicLoadedMap music_files;
     MusicLoadedMap::Iterator iter;
 
     BuildFileList(directory, music_files);
 
-    QSqlQuery query("SELECT filename FROM musicmetadata;", db);
+    QSqlQuery query("SELECT filename FROM musicmetadata;", 
+                    QSqlDatabase::database());
 
     int counter = 0;
 
@@ -251,15 +252,16 @@ void startPlayback(PlaylistsContainer *all_playlists, AllMusic *all_music)
 void startDatabaseTree(PlaylistsContainer *all_playlists, AllMusic *all_music)
 {
     DatabaseBox dbbox(all_playlists, all_music, gContext->GetMainWindow(),
-                      QObject::tr("music database"));
+                      "music database");
     qApp->unlock();
     dbbox.exec();
     qApp->lock();
 }
 
-void startRipper(QSqlDatabase *db)
+void startRipper(void)
 {
-    Ripper rip(db, gContext->GetMainWindow(), QObject::tr("cd ripper"));
+    Ripper rip(QSqlDatabase::database(), gContext->GetMainWindow(), 
+               "cd ripper");
 
     qApp->unlock();
     rip.exec();
@@ -269,10 +271,10 @@ void startRipper(QSqlDatabase *db)
 struct MusicData
 {
     QString paths;
-    QSqlDatabase *db;
     QString startdir;
     PlaylistsContainer *all_playlists;
     AllMusic *all_music;
+    QTranslator *trans;
 };
 
 void MusicCallback(void *data, QString &selection)
@@ -287,9 +289,9 @@ void MusicCallback(void *data, QString &selection)
         startPlayback(mdata->all_playlists, mdata->all_music);
     else if (sel == "music_rip")
     {
-        startRipper(mdata->db);
+        startRipper();
         //  Reconcile with the database
-        SearchDir(mdata->db, mdata->startdir);
+        SearchDir(mdata->startdir);
         //  Tell the metadata to reset itself
         mdata->all_music->resync();
         mdata->all_playlists->postLoad();
@@ -298,7 +300,7 @@ void MusicCallback(void *data, QString &selection)
     {
         if ("" != mdata->startdir)
         {
-            SearchDir(mdata->db, mdata->startdir);
+            SearchDir(mdata->startdir);
             mdata->all_music->resync();
             mdata->all_playlists->postLoad();
         }
@@ -320,25 +322,13 @@ void MusicCallback(void *data, QString &selection)
     }
 }
 
-void runMenu(QString paths, QString startdir,
-             PlaylistsContainer *all_playlists, AllMusic *all_music,
-             QString which_menu)
+void runMenu(MusicData *mdata, QString which_menu)
 {
     QString themedir = gContext->GetThemeDir();
-    QSqlDatabase *db = QSqlDatabase::database();
-
     ThemedMenu *diag = new ThemedMenu(themedir.ascii(), which_menu, 
                                       gContext->GetMainWindow(), "music menu");
 
-    MusicData data;
-
-    data.paths = paths;
-    data.db = db;
-    data.startdir = startdir;
-    data.all_playlists = all_playlists;
-    data.all_music = all_music;
-
-    diag->setCallback(MusicCallback, &data);
+    diag->setCallback(MusicCallback, mdata);
     diag->setKillable();
 
     if (diag->foundTheme())
@@ -360,6 +350,19 @@ int mythplugin_run(void);
 int mythplugin_config(void);
 }
 
+void runMusicPlayback(void);
+void runMusicSelection(void);
+void runRipCD(void);
+
+void setupKeys(void)
+{
+    REG_JUMP("Play music", "", "", runMusicPlayback);
+    REG_JUMP("Select music playlists", "", "", runMusicSelection);
+    REG_JUMP("Rip CD", "", "", runRipCD);
+
+    REG_KEY("Music", "DELETE", "Delete track from playlist", "D");
+}
+
 int mythplugin_init(const char *libversion)
 {
     if (!gContext->TestPopupVersion("mythmusic", libversion,
@@ -375,16 +378,18 @@ int mythplugin_init(const char *libversion)
     settings.load(QSqlDatabase::database());
     settings.save(QSqlDatabase::database());
 
+    setupKeys();
+
     return 0;
 }
 
-int mythplugin_run(void)
+static void preMusic(MusicData *mdata)
 {
-    QTranslator translator( 0 );
-    translator.load(PREFIX + QString("/share/mythtv/i18n/mythmusic_") +
-                    QString(gContext->GetSetting("Language").lower()) +
-                    QString(".qm"), ".");
-    qApp->installTranslator(&translator);
+    mdata->trans = new QTranslator(0);
+    mdata->trans->load(PREFIX + QString("/share/mythtv/i18n/mythmusic_") +
+                       QString(gContext->GetSetting("Language").lower()) +
+                       QString(".qm"), ".");
+    qApp->installTranslator(mdata->trans);
 
     srand(time(NULL));
 
@@ -403,16 +408,6 @@ int mythplugin_run(void)
             musicdata_exists = true;
         }
     }
-    else
-    {
-        DialogBox *no_db_dialog = new DialogBox(gContext->GetMainWindow(),
-             QObject::tr("\n\nYou have no MythMusic tables in your database."));
-        no_db_dialog->AddButton(QObject::tr("OK, I'll read the documentation"));
-        no_db_dialog->exec();
-
-        delete no_db_dialog;
-        return -1;
-    }
 
     //  Load all available info about songs (once!)
     QString startdir = gContext->GetSetting("MusicLocation");
@@ -421,7 +416,7 @@ int mythplugin_run(void)
     // is no data in the database yet (first run).  Otherwise, user
     // can choose "Setup" option from the menu to force it.
     if (startdir != "" && !musicdata_exists)
-        SearchDir(db, startdir);
+        SearchDir(startdir);
 
     QString paths = gContext->GetSetting("TreeLevels");
     AllMusic *all_music = new AllMusic(db, paths, startdir);
@@ -429,27 +424,43 @@ int mythplugin_run(void)
     //  Load all playlists into RAM (once!)
     PlaylistsContainer *all_playlists = new PlaylistsContainer(db, all_music);
     all_playlists->setHost(gContext->GetHostName());
-    //  And away we go ...
-    runMenu(paths, startdir, all_playlists, all_music, "musicmenu.xml");
 
-    //  Automagically save all playlists and metadata (ratings) that have changed
+    mdata->paths = paths;
+    mdata->startdir = startdir;
+    mdata->all_playlists = all_playlists;
+    mdata->all_music = all_music;
+}
 
+static void postMusic(MusicData *mdata)
+{
+    // Automagically save all playlists and metadata (ratings) that have changed
 
-    if (all_music->cleanOutThreads())
+    if (mdata->all_music->cleanOutThreads())
     {
-        all_music->save();
+        mdata->all_music->save();
     }
-    if(all_playlists->cleanOutThreads())
+
+    if (mdata->all_playlists->cleanOutThreads())
     {
-        all_playlists->save();
-        int x = all_playlists->getPending();
-        SavePending(db, x);
+        mdata->all_playlists->save();
+        int x = mdata->all_playlists->getPending();
+        SavePending(QSqlDatabase::database(), x);
     }
 
-    delete all_music;
-    delete all_playlists;
+    delete mdata->all_music;
+    delete mdata->all_playlists;
 
-    qApp->removeTranslator(&translator);
+    qApp->removeTranslator(mdata->trans);
+    delete mdata->trans;
+}
+
+int mythplugin_run(void)
+{
+    MusicData mdata;
+
+    preMusic(&mdata);
+    runMenu(&mdata, "musicmenu.xml");
+    postMusic(&mdata);
 
     return 0;
 }
@@ -462,13 +473,43 @@ int mythplugin_config(void)
                     QString(".qm"), ".");
     qApp->installTranslator(&translator);
 
-    QString paths = gContext->GetSetting("TreeLevels");
-    QString startdir = gContext->GetSetting("MusicLocation");
+    MusicData mdata;
+    mdata.paths = gContext->GetSetting("TreeLevels");
+    mdata.startdir = gContext->GetSetting("MusicLocation");
 
-    runMenu(paths, startdir, NULL, NULL, "music_settings.xml");
+    runMenu(&mdata, "music_settings.xml");
 
     qApp->removeTranslator(&translator);
 
     return 0;
 }
 
+void runMusicPlayback(void)
+{
+    MusicData mdata;
+
+    preMusic(&mdata);
+    startPlayback(mdata.all_playlists, mdata.all_music);
+    postMusic(&mdata);
+}
+
+void runMusicSelection(void)
+{
+    MusicData mdata;
+
+    preMusic(&mdata);
+    startDatabaseTree(mdata.all_playlists, mdata.all_music);
+    postMusic(&mdata);
+}
+
+void runRipCD(void)
+{
+    MusicData mdata;
+
+    preMusic(&mdata);
+    startRipper();
+    SearchDir(mdata.startdir);
+    mdata.all_music->resync();
+    mdata.all_playlists->postLoad();
+    postMusic(&mdata);
+}

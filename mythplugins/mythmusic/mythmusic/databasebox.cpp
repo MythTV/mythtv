@@ -11,7 +11,6 @@ using namespace std;
 #include <qregexp.h>
 #include <qframe.h>
 #include <qlayout.h>
-#include <qaccel.h>
 #include <qevent.h>
 
 #include "metadata.h"
@@ -47,7 +46,6 @@ DatabaseBox::DatabaseBox(PlaylistsContainer *all_playlists,
     QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
 
     listview = new MythListView(this);
-    listview->DontFixSpaceBar();
     listview->addColumn(tr("Select music to be played:"));
     listview->setSorting(-1);
     listview->setRootIsDecorated(true);
@@ -55,18 +53,7 @@ DatabaseBox::DatabaseBox(PlaylistsContainer *all_playlists,
     listview->setColumnWidth(0, (int)(730 * wmult));
     listview->setColumnWidthMode(0, QListView::Manual);
 
-    connect(listview, SIGNAL(returnPressed(QListViewItem *)), this,
-            SLOT(selected(QListViewItem *)));
-    connect(listview, SIGNAL(spacePressed(QListViewItem *)), this,
-            SLOT(selected(QListViewItem *)));
-    connect(listview, SIGNAL(infoPressed(QListViewItem *)), this,
-            SLOT(doMenus(QListViewItem *)));
-    connect(listview, SIGNAL(numberPressed(QListViewItem *, int)), this,
-            SLOT(alternateDoMenus(QListViewItem *, int)));
-    connect(listview, SIGNAL(deletePressed(QListViewItem *)), this,
-            SLOT(deleteTrack(QListViewItem *)));
-    connect(listview, SIGNAL(unhandledKeyPress(QKeyEvent *)), this,
-            SLOT(updateLCDMenu(QKeyEvent *)));
+    listview->installEventFilter(this);
 
     active_popup = NULL;
     active_pl_edit = NULL;
@@ -139,6 +126,54 @@ DatabaseBox::~DatabaseBox()
     all_music->resetListings();
 
     gContext->GetLCDDevice()->switchToTime();
+}
+
+bool DatabaseBox::eventFilter(QObject *o, QEvent *e)
+{
+    (void)o;
+
+    if (e->type() != QEvent::KeyPress)
+        return false;
+
+    QKeyEvent *ke = (QKeyEvent *)e;
+
+    bool handled = false;
+    QStringList actions;
+    gContext->GetMainWindow()->TranslateKeyPress("Music", ke, actions);
+
+    for (unsigned int i = 0; i < actions.size(); i++)
+    {
+        QString action = actions[i];
+        if (action == "DELETE")
+        {
+            handled = true;
+            deleteTrack(listview->currentItem());
+        }
+        else if (action == "MENU" || action == "INFO")
+        {
+            handled = true;
+            doMenus(listview->currentItem());
+        }
+        else if (action == "SELECT")
+        {
+            handled = true;
+            selected(listview->currentItem());
+        }
+        else if (action == "0" || action == "1" || action == "2" ||
+                 action == "3" || action == "4" || action == "5" ||
+                 action == "6" || action == "7" || action == "8" ||
+                 action == "9")
+        {
+            handled = true;
+            alternateDoMenus(listview->currentItem(), action.toInt());
+        }
+    }
+
+    if (handled)
+        return true;
+
+    updateLCDMenu(ke);
+    return false;    
 }
 
 void DatabaseBox::showWaiting()
@@ -501,80 +536,36 @@ void DatabaseBox::doPlaylistPopup(TreeCheckItem *item_ptr)
     if (playlist_popup)
         return;
 
-    MythPushButton *playlist_mac_b;
-    MythPushButton *playlist_del_b;
-    MythPushButton *playlist_rename_button;
-
     // Popup for all other playlists (up top)
     playlist_popup = new MythPopupBox(gContext->GetMainWindow(), 
                                       "playlist_popup");
 
-    playlist_mac_b = new MythPushButton(tr("Move to Active Play Queue"),
-                                        playlist_popup);
-    playlist_popup->addWidget(playlist_mac_b);
-    connect(playlist_mac_b, SIGNAL(clicked()), this, SLOT(copyToActive()));
+    QButton *mac_b = playlist_popup->addButton(tr("Move to Active Play Queue"),
+                                               this, SLOT(copyToActive()));
 
-    playlist_del_b = new MythPushButton(tr("Delete This Playlist"),
-                                        playlist_popup);
-    playlist_popup->addWidget(playlist_del_b);
-    connect(playlist_del_b, SIGNAL(clicked()), this, SLOT(deletePlaylist()));
+    playlist_popup->addButton(tr("Delete This Playlist"), this, 
+                              SLOT(deletePlaylist()));
 
     playlist_rename = new MythRemoteLineEdit(playlist_popup);
     playlist_popup->addWidget(playlist_rename);
 
-    playlist_rename_button = new MythPushButton(tr("Rename This Playlist"),
-                                                playlist_popup);
-    playlist_popup->addWidget(playlist_rename_button);
-    connect(playlist_rename_button, SIGNAL(clicked()), this,
-            SLOT(renamePlaylist()));
+    playlist_popup->addButton(tr("Rename This Playlist"), this,
+                              SLOT(renamePlaylist()));
 
-    QAccel *plistaccel = new QAccel(playlist_popup);
-    plistaccel->connectItem(plistaccel->insertItem(Key_Escape), this,
-                            SLOT(closePlaylistPopup()));
-
-    playlist_mac_b->adjustSize();
-    playlist_del_b->adjustSize();
-    playlist_rename->adjustSize();
-    playlist_rename_button->adjustSize();
-
-    playlist_popup->polish();
-
-    int x, y, maxw, poph;
+    int x, y;
     QRect r;
 
-    poph = playlist_mac_b->height() + playlist_del_b->height() +
-           playlist_rename->height() + playlist_rename_button->height() +
-           (int)(60 * hmult);
-
-    playlist_popup->setMaximumHeight(poph);
-
-    maxw = 0;
-
-    if (playlist_mac_b->width() > maxw)
-        maxw = playlist_mac_b->width();
-    if (playlist_del_b->width() > maxw)
-        maxw = playlist_del_b->width();
-    if (playlist_rename_button->width() > maxw)
-        maxw = playlist_rename_button->width();
-
-    maxw += (int)(80 * wmult);
-
-    x = item_ptr->width(listview->fontMetrics(), listview, 0) +
+    x = item_ptr->width(listview->fontMetrics(), listview, 0) + 
         (int)(40 * wmult);
     r = item_ptr->listView()->itemRect(item_ptr);
     y = r.top() + listview->header()->height() + (int)(24 * hmult);
 
     // If there isn't enough room to show it, move it up the hight of the frame
 
-    if (poph + y > height())
-        y = height() - poph - (int)(8 * hmult);
-
-    playlist_popup->setFixedSize(maxw, poph);
-    playlist_popup->setGeometry(x, y, maxw, poph);
-    playlist_popup->Show();
+    playlist_popup->ShowPopupAtXY(x, y, this, SLOT(closePlaylistPopup()));
 
     playlist_rename->setText(item_ptr->text(0));
-    playlist_mac_b->setFocus();
+    mac_b->setFocus();
 
     listview->setFocusPolicy(NoFocus);
 }
@@ -603,72 +594,32 @@ void DatabaseBox::doActivePopup(PlaylistTitle *item_ptr)
     active_pl_edit = new MythRemoteLineEdit(active_popup);
     active_popup->addWidget(active_pl_edit);
     active_pl_edit->setFocus();
-    MythPushButton *active_b = new MythPushButton(tr("Copy To New Playlist"),
-                                                  active_popup);
-    active_popup->addWidget(active_b);
-    connect(active_b, SIGNAL(clicked()), this, SLOT(copyNewPlaylist()));
-    MythPushButton *active_clear_b = new MythPushButton(tr("Clear the Active "
-                                                           "Play Queue"),
-                                                        active_popup);
-    active_popup->addWidget(active_clear_b);
-    connect(active_clear_b, SIGNAL(clicked()), this, SLOT(clearActive()));
-    MythPushButton *pop_back_button;
-    pop_back_button = new MythPushButton(tr("Save Back to Playlist Tree"),
-                                         active_popup);
-    active_popup->addWidget(pop_back_button);
-    connect(pop_back_button, SIGNAL(clicked()), this, SLOT(popBackPlaylist()));
 
-    QAccel *activeaccel = new QAccel(active_popup);
-    activeaccel->connectItem(activeaccel->insertItem(Key_Escape), this,
-                             SLOT(closeActivePopup()));
+    active_popup->addButton(tr("Copy To New Playlist"), this, 
+                            SLOT(copyNewPlaylist()));
 
-    active_pl_edit->adjustSize();
-    active_b->adjustSize();
-    active_clear_b->adjustSize();
-    pop_back_button->adjustSize();
-    
-    active_popup->polish();
+    active_popup->addButton(tr("Clear the Active Play Queue"), this, 
+                            SLOT(clearActive()));
 
-    int x, y, maxw, poph;
+    QButton *pb = active_popup->addButton(tr("Save Back to Playlist Tree"), 
+                                          this, SLOT(popBackPlaylist()));
+
+    int x, y;
     QRect r;
-
-    poph = active_pl_edit->height() + active_b->height() + 
-           active_clear_b->height() + pop_back_button->height() + 
-           (int)(60 * hmult);
- 
-    active_popup->setMaximumHeight(poph);
-
-    maxw = 0;
- 
-    if (active_b->width() > maxw)
-        maxw = active_b->width();
-    if (active_clear_b->width() > maxw)
-        maxw = active_clear_b->width();
-    if (pop_back_button->width() > maxw)
-        maxw = pop_back_button->width();
-
-    maxw += (int)(80 * wmult);
 
     x = item_ptr->width(listview->fontMetrics(), listview, 0) + 
         (int)(40 * wmult);
     r = item_ptr->listView()->itemRect(item_ptr);
     y = r.top() + listview->header()->height() + (int)(24 * hmult);
     
-    // If there isn't enough room to show it, move it up the hight of the frame
-    
-    if (poph + y > height())
-        y = height() - poph - (int)(8 * hmult);
-
     active_pl_edit->setText("");
 
-    active_popup->setFixedSize(maxw, poph);
-    active_popup->setGeometry(x, y, maxw, poph);
-    active_popup->Show();
+    active_popup->ShowPopupAtXY(x, y, this, SLOT(closeActivePopup()));
 
-    if(the_playlists->pendingWriteback())
-        pop_back_button->setEnabled(true);
+    if (the_playlists->pendingWriteback())
+        pb->setEnabled(true);
     else
-        pop_back_button->setEnabled(false);
+        pb->setEnabled(false);
 
     listview->setFocusPolicy(NoFocus);
 }
@@ -871,25 +822,30 @@ void DatabaseBox::keyPressEvent(QKeyEvent *e)
 {
     // This is a bit wonky, but it works (more or less)
 
-    if(holding_track)
+    if (holding_track)
     {
-        if (e->key() == Key_Space || e->key() == Key_Enter ||
-            e->key() == Key_Return || e->key() == Key_Escape)
+        QStringList actions;
+        gContext->GetMainWindow()->TranslateKeyPress("Qt", e, actions);
+        for (unsigned int i = 0; i < actions.size(); i++)
         {
-            //  Done holding this track
-            holding_track = false;
-            track_held->beMoving(false);
-            releaseKeyboard();
-        }
-        else if (e->key() == Key_Up)
-        {
-            //  move track up
-            moveHeldUpDown(true);
-        }
-        else if (e->key() == Key_Down)
-        {
-            //  move track down
-            moveHeldUpDown(false);
+            QString action = actions[i];
+            if (action == "SELECT" || action == "ESCAPE")
+            {
+                //  Done holding this track
+                holding_track = false;
+                track_held->beMoving(false);
+                releaseKeyboard();
+            }
+            else if (action == "UP")
+            {
+                //  move track up
+                moveHeldUpDown(true);
+            }
+            else if (action == "DOWN")
+            {
+                //  move track down
+                moveHeldUpDown(false);
+            }
         }
     }
     else

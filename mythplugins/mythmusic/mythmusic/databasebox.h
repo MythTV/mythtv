@@ -66,7 +66,10 @@ class DatabaseBox : public MythDialog
     void keepFilling();
     void showWaiting();
     void updateLCDMenu(QKeyEvent *e);
-  
+
+  protected:
+    bool eventFilter(QObject *o, QEvent *e);
+ 
   private:
     void doSelected(QListViewItem *, bool cd_flag);
     void doPlaylistPopup(TreeCheckItem *item_ptr);
