@@ -731,13 +731,13 @@ void NuppelVideoPlayer::AddTextData(char *buffer, int len,
     }
 }
 
-void NuppelVideoPlayer::GetFrame(int onlyvideo, bool unsafe)
+bool NuppelVideoPlayer::GetFrame(int onlyvideo, bool unsafe)
 {
 #ifdef USING_IVTV
     if (forceVideoOutput == kVideoOutput_IVTV)
     {
         decoder->GetFrame(onlyvideo);
-        return;
+        return true;
     }
 #endif
 
@@ -746,13 +746,23 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo, bool unsafe)
         //cout << "waiting for video buffer to drain.\n";
         setPrebuffering(false);
         if (!videoOutput->availableVideoBuffersWait()->wait(2000))
-            cerr << "waiting for free video buffers timed out\n";
+        {
+            VERBOSE(VB_IMPORTANT, "Timed out waiting for free video buffers.");
+
+            if (videosync==NULL && tryingVideoSync)
+            {
+                VERBOSE(VB_IMPORTANT, "Attempting video sync thread restart");
+                return false;
+            }
+        }
     }
 
     decoder->GetFrame(onlyvideo);
 
     if (videoOutput->EnoughDecodedFrames())
         setPrebuffering(false);
+
+    return true;
 }
 
 VideoFrame *NuppelVideoPlayer::GetCurrentFrame(int &w, int &h)
@@ -1706,7 +1716,8 @@ void NuppelVideoPlayer::StartPlaying(void)
 
     if (bookmarkseek > 30)
     {
-        GetFrame(audioOutput == NULL || !normal_speed);
+        if (!GetFrame(audioOutput == NULL || !normal_speed))
+	    pthread_create(&output_video, NULL, kickoffOutputVideoLoop, this);	    
 
         bool seeks = exactseeks;
 
@@ -1785,7 +1796,8 @@ void NuppelVideoPlayer::StartPlaying(void)
             {
                 DoRewind();
 
-                GetFrame(audioOutput == NULL || !normal_speed);
+                if (!GetFrame(audioOutput == NULL || !normal_speed))
+		    pthread_create(&output_video, NULL, kickoffOutputVideoLoop, this);	    
                 resetvideo = true;
                 while (resetvideo)
                     usleep(50);
@@ -1798,7 +1810,8 @@ void NuppelVideoPlayer::StartPlaying(void)
                 fftime = CalcMaxFFTime(fftime);
                 DoFastForward();
 
-                GetFrame(audioOutput == NULL || !normal_speed);
+		if (!GetFrame(audioOutput == NULL || !normal_speed))
+		    pthread_create(&output_video, NULL, kickoffOutputVideoLoop, this);	    
                 resetvideo = true;
                 while (resetvideo)
                     usleep(50);
@@ -1869,7 +1882,8 @@ void NuppelVideoPlayer::StartPlaying(void)
             continue;
         }
 
-        GetFrame(audioOutput == NULL || !normal_speed);
+        if (!GetFrame(audioOutput == NULL || !normal_speed))
+	    pthread_create(&output_video, NULL, kickoffOutputVideoLoop, this);	    
 
         if (!hasdeletetable && autocommercialskip)
             AutoCommercialSkip();

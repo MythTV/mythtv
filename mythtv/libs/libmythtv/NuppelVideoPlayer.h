@@ -219,7 +219,7 @@ class NuppelVideoPlayer
 
     bool DecodeFrame(struct rtframeheader *frameheader,
                      unsigned char *strm, unsigned char *outbuf);
-    void GetFrame(int onlyvideo, bool unsafe = false);
+    bool GetFrame(int onlyvideo, bool unsafe = false);
 
     long long CalcMaxFFTime(long long ff);
 

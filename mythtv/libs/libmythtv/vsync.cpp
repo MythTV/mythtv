@@ -48,36 +48,49 @@
 using namespace std;
 #include "vsync.h"
 
+bool tryingVideoSync = false;
+int VideoSync::m_forceskip = 0;
+
+#define TESTVIDEOSYNC(NAME) \
+    if (++m_forceskip > skip) \
+    { \
+        trial = new NAME (frame_interval, refresh_interval, interlaced); \
+        if (trial->TryInit()) \
+        { \
+	    m_forceskip = skip; \
+	    tryingVideoSync=false; \
+	    return trial; \
+        } \
+        delete trial; \
+    }
+
 VideoSync *VideoSync::BestMethod(int frame_interval, int refresh_interval,
                                  bool interlaced)
 {
     VideoSync *trial;
-    trial = new nVidiaVideoSync(frame_interval, refresh_interval, interlaced);
-    if (trial->TryInit())
-        return trial;
-    delete trial;
-    trial = new DRMVideoSync(frame_interval, refresh_interval, interlaced);
-    if (trial->TryInit())
-        return trial;
-    delete trial;
+
+    tryingVideoSync=true;
+    int skip=0;
+    if (m_forceskip!=0)
+    {
+        VERBOSE(VB_PLAYBACK, QString("A previous trial crashed,"
+		" skipping %1").arg(m_forceskip));
+    
+	skip=m_forceskip;
+	m_forceskip=0;
+    }
+    
+    TESTVIDEOSYNC(nVidiaVideoSync)
+    TESTVIDEOSYNC(DRMVideoSync)
 #ifdef USING_OPENGL_VSYNC
-    trial = new OpenGLVideoSync(frame_interval, refresh_interval, interlaced);
-    if (trial->TryInit())
-        return trial;
-    delete trial;
+    TESTVIDEOSYNC(OpenGLVideoSync)
 #endif
 #ifdef __linux__
-    trial = new RTCVideoSync(frame_interval, refresh_interval, interlaced);
-    if (trial->TryInit())
-        return trial;
-    delete trial;
+    TESTVIDEOSYNC(RTCVideoSync)
 #endif
-    trial = new BusyWaitVideoSync(frame_interval, refresh_interval, 
-                                  interlaced);
-    if (trial->TryInit())
-        return trial;
-    delete trial;
+    TESTVIDEOSYNC(BusyWaitVideoSync)
 
+    tryingVideoSync=false;
     return NULL;
 }
 

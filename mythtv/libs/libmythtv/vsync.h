@@ -51,6 +51,8 @@ typedef struct __GLXcontextRec *GLXContext;
 typedef struct _XDisplay Display;
 #endif
 
+extern bool tryingVideoSync;
+
 class VideoSync
 // virtual base class
 {
@@ -81,6 +83,8 @@ class VideoSync
     bool m_interlaced;
     struct timeval m_nexttrigger;
     int m_delay;
+    
+    static int m_forceskip;
 };
 
 class DRMVideoSync : public VideoSync
