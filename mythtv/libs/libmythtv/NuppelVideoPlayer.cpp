@@ -1402,6 +1402,7 @@ void NuppelVideoPlayer::StartPlaying(void)
         hascommbreaktable = true;
         commBreakIter = commBreakMap.begin();
     }
+    SetCommBreakIter();
 
     while (!eof && !killplayer)
     {
