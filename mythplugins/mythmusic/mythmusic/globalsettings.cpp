@@ -12,32 +12,12 @@
 #include <qprocess.h>
 #include <qapplication.h>
 
-class GlobalSetting: public SimpleDBStorage, virtual public Configurable {
-public:
-    GlobalSetting(QString name):
-        SimpleDBStorage("settings", "data") {
-        setName(name);
-    };
-
-protected:
-    virtual QString whereClause(void) {
-        return QString("value = '%1' AND hostname = '%2'")
-                       .arg(getName()).arg(gContext->GetHostName());
-    };
-
-    virtual QString setClause(void) {
-        return QString("value = '%1', data = '%2', hostname = '%3'")
-                       .arg(getName()).arg(getValue())
-                       .arg(gContext->GetHostName());
-    };
-};
-
 // General Settings
 
-class SetMusicDirectory: public LineEditSetting, public GlobalSetting {
+class SetMusicDirectory: public GlobalLineEdit {
 public:
     SetMusicDirectory():
-        GlobalSetting("MusicLocation") {
+        GlobalLineEdit("MusicLocation") {
         setLabel(QObject::tr("Directory to hold music"));
         setValue("/mnt/store/music/");
         setHelpText(QObject::tr("This directory must exist, and the user "
@@ -46,10 +26,9 @@ public:
     };
 };
 
-class MusicAudioDevice: public ComboBoxSetting, public GlobalSetting {
+class MusicAudioDevice: public GlobalComboBox {
 public:
-    MusicAudioDevice() : ComboBoxSetting(true),
-                         GlobalSetting("AudioDevice") 
+    MusicAudioDevice() : GlobalComboBox("AudioDevice", true) 
     {
         setLabel(QObject::tr("Audio device"));
         QDir dev("/dev", "dsp*", QDir::Name, QDir::System);
@@ -66,10 +45,9 @@ public:
     }
 };
 
-class CDDevice: public ComboBoxSetting, public GlobalSetting {
+class CDDevice: public GlobalComboBox {
 public:
-    CDDevice() : ComboBoxSetting(true),
-      GlobalSetting("CDDevice") {
+    CDDevice() : GlobalComboBox("CDDevice", true) {
         setLabel(QObject::tr("CD device"));
         QDir dev("/dev", "cdrom*", QDir::Name, QDir::System);
         fillSelectionsFromDir(dev);
@@ -85,10 +63,10 @@ public:
     }
 };
 
-class TreeLevels: public LineEditSetting, public GlobalSetting {
+class TreeLevels: public GlobalLineEdit {
 public:
     TreeLevels():
-        GlobalSetting("TreeLevels") {
+        GlobalLineEdit("TreeLevels", true) {
         setLabel(QObject::tr("Tree Sorting"));
         setValue("splitartist artist album title");
         setHelpText(QObject::tr("Order in which to sort the Music "
@@ -99,10 +77,10 @@ public:
     };
 };
 
-class PostCDRipScript: public LineEditSetting, public GlobalSetting {
+class PostCDRipScript: public GlobalLineEdit {
 public:
     PostCDRipScript():
-        GlobalSetting("PostCDRipScript") {
+        GlobalLineEdit("PostCDRipScript") {
         setLabel(QObject::tr("Script Path"));
         setValue("");
         setHelpText(QObject::tr("If present this script will be executed "
@@ -110,10 +88,10 @@ public:
     };
 };
 
-class NonID3FileNameFormat: public LineEditSetting, public GlobalSetting {
+class NonID3FileNameFormat: public GlobalLineEdit {
 public:
     NonID3FileNameFormat():
-        GlobalSetting("NonID3FileNameFormat") {
+        GlobalLineEdit("NonID3FileNameFormat") {
         setLabel(QObject::tr("Filename Format"));
         setValue("GENRE/ARTIST/ALBUM/TRACK_TITLE");
         setHelpText(QObject::tr("Directory and filename Format used to grab "
@@ -122,10 +100,10 @@ public:
 };
 
 
-class IgnoreID3Tags: public CheckBoxSetting, public GlobalSetting {
+class IgnoreID3Tags: public GlobalCheckBox {
 public:
     IgnoreID3Tags():
-        GlobalSetting("Ignore_ID3") {
+        GlobalCheckBox("Ignore_ID3") {
         setLabel(QObject::tr("Ignore ID3 Tags"));
         setValue(false);
         setHelpText(QObject::tr("If set, MythMusic will skip checking ID3 tags "
@@ -135,10 +113,10 @@ public:
     };
 };
 
-class AutoLookupCD: public CheckBoxSetting, public GlobalSetting {
+class AutoLookupCD: public GlobalCheckBox {
 public:
     AutoLookupCD():
-        GlobalSetting("AutoLookupCD") {
+        GlobalCheckBox("AutoLookupCD") {
         setLabel(QObject::tr("Automatically lookup CDs"));
         setValue(true);
         setHelpText(QObject::tr("Automatically lookup an audio CD if it is "
@@ -147,10 +125,10 @@ public:
     };
 };
 
-class KeyboardAccelerators: public CheckBoxSetting, public GlobalSetting {
+class KeyboardAccelerators: public GlobalCheckBox {
 public:
     KeyboardAccelerators():
-        GlobalSetting("KeyboardAccelerators") {
+        GlobalCheckBox("KeyboardAccelerators") {
         setLabel(QObject::tr("Use Keyboard/Remote Accelerated Buttons"));
         setValue(true);
         setHelpText(QObject::tr("If this is not set, you will need "
@@ -161,10 +139,10 @@ public:
 
 // Encoder settings
 
-class EncoderType: public ComboBoxSetting, public GlobalSetting {
+class EncoderType: public GlobalComboBox {
 public:
     EncoderType():
-        GlobalSetting("EncoderType") {
+        GlobalComboBox("EncoderType") {
         setLabel(QObject::tr("Encoding"));
         addSelection(QObject::tr("Ogg Vorbis"), "ogg");
         addSelection(QObject::tr("Lame (MP3)"), "mp3");
@@ -174,10 +152,10 @@ public:
     };
 };
 
-class DefaultRipQuality: public ComboBoxSetting, public GlobalSetting {
+class DefaultRipQuality: public GlobalComboBox {
 public:
     DefaultRipQuality():
-        GlobalSetting("DefaultRipQuality") {
+        GlobalComboBox("DefaultRipQuality") {
         setLabel(QObject::tr("Default Rip Quality"));
         addSelection(QObject::tr("Low"), "0");
         addSelection(QObject::tr("Medium"), "1");
@@ -187,10 +165,10 @@ public:
     };
 };
 
-class Mp3UseVBR: public CheckBoxSetting, public GlobalSetting {
+class Mp3UseVBR: public GlobalCheckBox {
 public:
     Mp3UseVBR():
-        GlobalSetting("Mp3UseVBR") {
+        GlobalCheckBox("Mp3UseVBR") {
         setLabel(QObject::tr("Use variable bitrates"));
         setValue(false);
         setHelpText(QObject::tr("If set, the MP3 encoder will use variable "
@@ -199,10 +177,10 @@ public:
     };
 };
 
-class FilenameTemplate: public LineEditSetting, public GlobalSetting {
+class FilenameTemplate: public GlobalLineEdit {
 public:
     FilenameTemplate():
-        GlobalSetting("FilenameTemplate") {
+        GlobalLineEdit("FilenameTemplate") {
         setLabel(QObject::tr("File storage location"));
         setValue("ARTIST/ALBUM/TRACK-TITLE"); // Don't translate
         setHelpText(QObject::tr("Defines the location/name for new songs. "
@@ -212,10 +190,10 @@ public:
     };
 };
 
-class TagSeparator: public LineEditSetting, public GlobalSetting {
+class TagSeparator: public GlobalLineEdit {
 public:
     TagSeparator():
-        GlobalSetting("TagSeparator") {
+        GlobalLineEdit("TagSeparator") {
         setLabel(QObject::tr("Token separator"));
         setValue(QObject::tr(" - "));
         setHelpText(QObject::tr("Filename tokens will be separated by "
@@ -223,10 +201,10 @@ public:
     };
 };
 
-class NoWhitespace: public CheckBoxSetting, public GlobalSetting {
+class NoWhitespace: public GlobalCheckBox {
 public:
     NoWhitespace():
-    GlobalSetting("NoWhitespace") {
+    GlobalCheckBox("NoWhitespace") {
         setLabel(QObject::tr("Replace ' ' with '_'"));
         setValue(false);
         setHelpText(QObject::tr("If set, whitespace characters in filenames "
@@ -234,10 +212,10 @@ public:
     };
 };
 
-class ParanoiaLevel: public ComboBoxSetting, public GlobalSetting {
+class ParanoiaLevel: public GlobalComboBox {
 public:
     ParanoiaLevel():
-        GlobalSetting("ParanoiaLevel") {
+        GlobalComboBox("ParanoiaLevel") {
         setLabel(QObject::tr("Paranoia Level"));
         addSelection(QObject::tr("Full"), "Full");
         addSelection(QObject::tr("Faster"), "Faster");
@@ -247,10 +225,10 @@ public:
     };
 };
 
-class EjectCD: public CheckBoxSetting, public GlobalSetting {
+class EjectCD: public GlobalCheckBox {
 public:
     EjectCD():
-        GlobalSetting("EjectCDAfterRipping") {
+        GlobalCheckBox("EjectCDAfterRipping") {
         setLabel(QObject::tr("Automatically eject CDs after ripping"));
         setValue(true);
         setHelpText(QObject::tr("If set, the CD tray will automatically open "
@@ -258,11 +236,10 @@ public:
     };
 };
 
-class SetRatingWeight: public SpinBoxSetting, public GlobalSetting {
+class SetRatingWeight: public GlobalSpinBox {
 public:
     SetRatingWeight():
-        SpinBoxSetting(0, 100, 1),
-        GlobalSetting("IntelliRatingWeight") {
+        GlobalSpinBox("IntelliRatingWeight", 0, 100, 1) {
         setLabel(QObject::tr("Rating Weight"));
         setValue(35);
         setHelpText(QObject::tr("Used in \"Smart\" Shuffle mode. "
@@ -272,11 +249,10 @@ public:
     };
 };
 
-class SetPlayCountWeight: public SpinBoxSetting, public GlobalSetting {
+class SetPlayCountWeight: public GlobalSpinBox {
 public:
     SetPlayCountWeight():
-        SpinBoxSetting(0, 100, 1),
-        GlobalSetting("IntelliPlayCountWeight") {
+        GlobalSpinBox("IntelliPlayCountWeight", 0, 100, 1) {
         setLabel(QObject::tr("Play Count Weight"));
         setValue(25);
         setHelpText(QObject::tr("Used in \"Smart\" Shuffle mode. "
@@ -286,11 +262,10 @@ public:
     };
 };
 
-class SetLastPlayWeight: public SpinBoxSetting, public GlobalSetting {
+class SetLastPlayWeight: public GlobalSpinBox {
 public:
     SetLastPlayWeight():
-        SpinBoxSetting(0, 100, 1),
-        GlobalSetting("IntelliLastPlayWeight") {
+        GlobalSpinBox("IntelliLastPlayWeight", 0, 100, 1) {
         setLabel(QObject::tr("Last Play Weight"));
         setValue(25);
         setHelpText(QObject::tr("Used in \"Smart\" Shuffle mode. "
@@ -300,11 +275,10 @@ public:
     };
 };
 
-class SetRandomWeight: public SpinBoxSetting, public GlobalSetting {
+class SetRandomWeight: public GlobalSpinBox {
 public:
     SetRandomWeight():
-        SpinBoxSetting(0, 100, 1),
-        GlobalSetting("IntelliRandomWeight") {
+        GlobalSpinBox("IntelliRandomWeight", 0, 100, 1) {
         setLabel(QObject::tr("Random Weight"));
         setValue(15);
         setHelpText(QObject::tr("Used in \"Smart\" Shuffle mode. "
@@ -314,20 +288,20 @@ public:
     };
 };
 
-class UseShowRatings: public CheckBoxSetting, public GlobalSetting {
+class UseShowRatings: public GlobalCheckBox {
 public:
     UseShowRatings():
-        GlobalSetting("MusicShowRatings") {
+        GlobalCheckBox("MusicShowRatings") {
         setLabel(QObject::tr("Show Song Ratings"));
         setValue(false);
         setHelpText(QObject::tr("Show song ratings on the playback screen."));
     };
 };
 
-class UseListShuffled: public CheckBoxSetting, public GlobalSetting {
+class UseListShuffled: public GlobalCheckBox {
 public:
     UseListShuffled():
-        GlobalSetting("ListAsShuffled") {
+        GlobalCheckBox("ListAsShuffled") {
         setLabel(QObject::tr("List as Shuffled"));
         setValue(false);
         setHelpText(QObject::tr("List songs on the playback screen "
@@ -335,10 +309,10 @@ public:
     };
 };
 
-class UseShowWholeTree: public CheckBoxSetting, public GlobalSetting {
+class UseShowWholeTree: public GlobalCheckBox {
 public:
     UseShowWholeTree():
-        GlobalSetting("ShowWholeTree") {
+        GlobalCheckBox("ShowWholeTree") {
         setLabel(QObject::tr("Show entire music tree"));
         setValue(false);
         setHelpText(QObject::tr("If selected, you can navigate your entire music "
@@ -348,10 +322,10 @@ public:
 
 //Player Settings
 
-class PlayMode: public ComboBoxSetting, public GlobalSetting {
+class PlayMode: public GlobalComboBox {
 public:
     PlayMode():
-        GlobalSetting("PlayMode") {
+        GlobalComboBox("PlayMode") {
         setLabel(QObject::tr("Play mode"));
         addSelection(QObject::tr("Normal"), "Normal");
         addSelection(QObject::tr("Random"), "Random");
@@ -361,11 +335,10 @@ public:
     };
 };
 
-class VisualModeDelay: public SliderSetting, public GlobalSetting {
+class VisualModeDelay: public GlobalSlider {
 public:
     VisualModeDelay():
-	SliderSetting(0, 100, 1),
-        GlobalSetting("VisualModeDelay") {
+        GlobalSlider("VisualModeDelay", 0, 100, 1) {
         setLabel(QObject::tr("Delay before Visualizations start (seconds)"));
         setValue(0);
         setHelpText(QObject::tr("If set to 0, visualizations will never "
@@ -373,10 +346,10 @@ public:
         };
 };
 
-class VisualCycleOnSongChange: public CheckBoxSetting, public GlobalSetting {
+class VisualCycleOnSongChange: public GlobalCheckBox {
 public:
     VisualCycleOnSongChange():
-        GlobalSetting("VisualCycleOnSongChange") {
+        GlobalCheckBox("VisualCycleOnSongChange") {
         setLabel(QObject::tr("Change Visualizer on each song"));
         setValue(false);
         setHelpText(QObject::tr("Change the visualizer when the song "
@@ -384,11 +357,10 @@ public:
     };
 };
 
-class VisualScaleWidth: public SpinBoxSetting, public GlobalSetting {
+class VisualScaleWidth: public GlobalSpinBox {
 public:
     VisualScaleWidth():
-        SpinBoxSetting(1, 2, 1),
-        GlobalSetting("VisualScaleWidth") {
+        GlobalSpinBox("VisualScaleWidth", 1, 2, 1) {
         setLabel(QObject::tr("Width for Visual Scaling"));
         setValue(1);
         setHelpText(QObject::tr("If set to \"2\", visualizations will be "
@@ -398,11 +370,10 @@ public:
     };
 };
 
-class VisualScaleHeight: public SpinBoxSetting, public GlobalSetting {
+class VisualScaleHeight: public GlobalSpinBox {
 public:
     VisualScaleHeight():
-        SpinBoxSetting(1, 2, 1),
-        GlobalSetting("VisualScaleHeight") {
+        GlobalSpinBox("VisualScaleHeight", 1, 2, 1) {
         setLabel(QObject::tr("Height for Visual Scaling"));
         setValue(1);
         setHelpText(QObject::tr("If set to \"2\", visualizations will be "
@@ -412,10 +383,10 @@ public:
     };
 };
 
-class VisualizationMode: public LineEditSetting, public GlobalSetting {
+class VisualizationMode: public GlobalLineEdit {
 public:
     VisualizationMode():
-        GlobalSetting("VisualMode") {
+        GlobalLineEdit("VisualMode") {
         setLabel(QObject::tr("Visualizations"));
         setValue(QObject::tr("Random"));
         setHelpText(QObject::tr("List of visualizations to use during playback."
@@ -435,20 +406,20 @@ public:
 
 // CD Writer Settings
 
-class CDWriterEnabled: public CheckBoxSetting, public GlobalSetting {
+class CDWriterEnabled: public GlobalCheckBox {
 public:
     CDWriterEnabled():
-        GlobalSetting("CDWriterEnabled") {
+        GlobalCheckBox("CDWriterEnabled") {
         setLabel(QObject::tr("Enable CD Writing."));
         setValue(true);
         setHelpText(QObject::tr("Requires a SCSI or an IDE-SCSI CD Writer."));
     };
 };
 
-class CDWriterDevice: public ComboBoxSetting, public GlobalSetting {
+class CDWriterDevice: public GlobalComboBox {
 public:
     CDWriterDevice():
-        GlobalSetting("CDWriterDevice") {
+        GlobalComboBox("CDWriterDevice") {
 
         QStringList args;
         QStringList result;
@@ -503,10 +474,10 @@ public:
     };
 };
 
-class CDDiskSize: public ComboBoxSetting, public GlobalSetting {
+class CDDiskSize: public GlobalComboBox {
 public:
     CDDiskSize():
-        GlobalSetting("CDDiskSize") {
+        GlobalComboBox("CDDiskSize") {
         setLabel(QObject::tr("Disk Size"));
         addSelection(QObject::tr("650MB/75min"), "1");
         addSelection(QObject::tr("700MB/80min"), "2");
@@ -514,20 +485,20 @@ public:
     };
 };
 
-class CDCreateDir: public CheckBoxSetting, public GlobalSetting {
+class CDCreateDir: public GlobalCheckBox {
 public:
     CDCreateDir():
-        GlobalSetting("CDCreateDir") {
+        GlobalCheckBox("CDCreateDir") {
         setLabel(QObject::tr("Enable directories on MP3 Creation"));
         setValue(true);
         setHelpText("");
     };
 };
 
-class CDWriteSpeed: public ComboBoxSetting, public GlobalSetting {
+class CDWriteSpeed: public GlobalComboBox {
 public:
     CDWriteSpeed():
-        GlobalSetting("CDWriteSpeed") {
+        GlobalComboBox("CDWriteSpeed") {
         setLabel(QObject::tr("CD Write Speed"));
         addSelection(QObject::tr("Auto"), "0");
         addSelection(QObject::tr("1x"), "1");
@@ -540,10 +511,10 @@ public:
     };
 };
 
-class CDBlankType: public ComboBoxSetting, public GlobalSetting {
+class CDBlankType: public GlobalComboBox {
 public:
     CDBlankType():
-        GlobalSetting("CDBlankType") {
+        GlobalComboBox("CDBlankType") {
         setLabel(QObject::tr("CD Blanking Type"));
         addSelection(QObject::tr("Fast"), "fast");
         addSelection(QObject::tr("Complete"), "all");
