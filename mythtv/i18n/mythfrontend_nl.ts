@@ -1,5 +1,78 @@
 <!DOCTYPE TS><TS>
 <context>
+    <name>CaptureCardEditor</name>
+    <message>
+        <source>Capture cards</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Capture Card Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit..</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete..</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete this capture card?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, delete capture card</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No, don&apos;t</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ChannelEditor</name>
+    <message>
+        <source>Channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you would like to delete this channel?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, delete the channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No, don&apos;t</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit..</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete..</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ChannelRecPriority</name>
+    <message>
+        <source>The theme you are using does not contain a &apos;recprioritychannels&apos; element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Escape out of it to return to the menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
+    </message>
+</context>
+<context>
     <name>GuideGrid</name>
     <message>
         <source>Recording Once</source>
@@ -171,6 +244,17 @@
     </message>
 </context>
 <context>
+    <name>MythPopupBox</name>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Annuleer</translation>
+    </message>
+</context>
+<context>
     <name>MythWizard</name>
     <message>
         <source>&amp;Cancel</source>
@@ -304,6 +388,34 @@
     </message>
     <message>
         <source>Yes, delete it</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Status Icons</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commercials are flagged</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An editing cutlist is present</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The program is able to auto-expire</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commercials are being flagged</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A bookmark is set</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ok</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -470,6 +582,14 @@
     <message>
         <source>Error!</source>
         <translation type="unfinished">Fout!</translation>
+    </message>
+    <message>
+        <source>The theme you are using does not contain a &apos;recpriorityprograms&apos; element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Escape out of it to return to the menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
     </message>
 </context>
 <context>
@@ -664,7 +784,7 @@
     </message>
     <message>
         <source>Rank</source>
-        <translation type="obsolete">Rang</translation>
+        <translation type="unfinished">Rang</translation>
     </message>
     <message>
         <source>Record duplicates</source>
@@ -2247,6 +2367,963 @@
         <source>you should never see this.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>ProfileGroup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transcoders</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Profile Group Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete profile group:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, delete group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No, Don&apos;t delete group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skip Unflagged Commercials</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Try to skip commercial breaks even if they have not been flagged.  This does not always work well and can disrupt playback if commercial breaks aren&apos;t detected properly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This global setting is ignored in case of conflicts with other scheduled programs.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Guide Alpha</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>How much to blend the program guide over the live TV image.  Higher numbers mean more guide and less TV.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>QT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Xbox</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide channels without channel number.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[Not Selected]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Callsign</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TV Format</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If this channel uses a format other than TV Format in the General Backend Setup screen, set it here.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Icon</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video filters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>XMLTV ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frequency ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Finetune</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Contrast</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Brightness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Color</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[Common] Frequency (Option has no default)
+The frequency for this channel in hz.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Symbol Rate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[DVB-S/C] Symbol Rate (Option has no default)
+???</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Satellite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[NONE CONFIGURED]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Polarity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[DVB-S] Polarity (Option has no default)
+???</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Horizontal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vertical</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Right Circular</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Left Circular</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Inversion</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[Common] Inversion (Default: Auto):
+Most cards can autodetect this now, so leave it at Auto unless it won&apos;t work.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandwidth</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[DVB-C/T] Bandwidth (Default: Auto)
+???</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>6 Mhz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>7 Mhz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>8 Mhz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modulation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[DVB-C] Modulation (Default: Auto)
+???</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Constellation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[DVB-T] Constellation (Default: Auto)
+???</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FEC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[DVB-S/C] Forward Error Correction (Default: Auto)
+???</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LP Coderate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[DVB-T] Low Priority Code Rate (Default: Auto)
+???</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HP Coderate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[DVB-T] High Priority Code Rate (Default: Auto)
+???</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Guard Interval</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[DVB-T] Guard Interval (Default: Auto)
+???</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Trans. Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[DVB-T] Transmission Mode (Default: Auto)
+???</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hierarchy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[DVB-T] Hierarchy (Default: Auto)
+???</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Teletext</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subtitle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pcr</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Service ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Provider ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transport ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Network ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Options - Common</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Options - Video 4 Linux</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Options - DVB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Options - DVB Pids &amp; IDs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A comma separated list of pids for each type. Note that currently MythTV only supports recording and not playback of multiple audio or video pids. It does not support showing teletext or subtitles either, but these do not crash the player as audio and video might.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Profile Group Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hostname</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Card-Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to retrieve provider list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You probably need to update XMLTV.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please wait while MythTV retrieves the list of available channels.
+You may wish to check the output as it
+runs by switching to the terminal from which you started
+this program.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to retrieve channel information.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV was unable to retrieve channel information for your provider.
+Please check the terminal window for more information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please wait while MythTV retrieves the list of available channels
+.  You might want to check the output as it
+runs by switching to the terminal from which you started
+this program.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please wait while MythTV retrieves the list of available channels.
+You might want to check the output as it
+runs by switching to the terminal from which you started
+this program.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You MUST run &apos;mythfilldatabase --manual the first time,
+ instead of just &apos;mythfilldatabase&apos;.
+Your grabber does not provide channel numbers, so you have to set them manually.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Card type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change the cardtype to the appropriate type for the capture card you are configuring.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Standard V4L capture card</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MJPEG capture card (Matrox G200, DC10)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MPEG-2 Encoder card (PVR-250, PVR-350)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>pcHDTV ATSC capture card</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Digital Video Broadcast card (DVB)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(New capture card)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(New video source)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ERROR, No inputs found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ERROR, V4L support unavailable on Windows</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[All VideoSources]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[No VideoSources Defined]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[No Channels Defined]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load &amp; Tune</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Will load the selected channel above into the previous screen, and try to tune it. If it fails to tune the channel, press back and check the settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tune Only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Will ONLY try to tune the previous screen, not alter it. If it fails to tune, press back and check the settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Card Verification Wizard (DVB#</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bit Error Rate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Uncorrected Blocks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Signal/Noise</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Signal Strength</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FAILED TO OPEN CARD, CHECK CONSOLE!!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Advanced Configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>XMLTV listings grabber</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ZIP/postal code</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Region</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Provider</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel frequency table</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use default unless this source uses a different frequency table than the system wide table defined in the General settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>tv_grab_na configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>tv_grab_uk configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Configuration will run in the terminal window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video source setup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video source name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>VBI device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(None)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio sampling rate limit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVB Card Number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When you change this setting, the text below should change to the name and type of your card. If the card cannot be opened, an error message will be displayed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Card Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Card Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do NOT use DVB driver for filtering.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(BROKEN) This option is used to get around filtering limitations on some DVB cards.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record the TS, not PS.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This will make the backend not perform Transport Stream to Program Stream conversion.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not wait for SEQ start header.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Normally the dvb-recording will drop packets from the card untill a sequence start header is seen. This option turns off this feature.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Per PID driver buffer size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Packet buffer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This box contains all channels from the selected video source. Select a channel here and press the &apos;Load and Tune&apos; button to load the channel settings into the previous screen and try to tune it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the type of satellite equipment you have. Selecting &apos;Finish&apos; on this screen will only save the type, and not the individual satellite, move down to the list to do this.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Satellites</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the satellite you want to configure and press the &apos;menu&apos; key, and edit the satellite, when you are done configuring, press &apos;OK&apos; to leave this wizard.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Satellite Configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Satellite Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A textual representation of this satellite or cluster of satellites.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Satellite Position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A textual representation of which position the satellite is located at (&apos;1W&apos;)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LNB LOF Switch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This defines at what frequency (in hz) the LNB will do a switch from high to low setting, and vice versa.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LNB LOF High</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This defines the offset (in hz) the frequency coming from the lnb will be in high setting.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LNB LOF Low</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This defines the offset (in hz) the frequency coming from the lnb will be in low setting.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recorder Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Configuration Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Card Verification Wizard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Capture device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>External channel change command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If specified, this command will be run to change the channel for inputs which do not have a tuner.  The first argument will be the channel number.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preset tuner to channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If specified, the tuner will change to this channel when the input is selected.  This is only useful if you use your tuner input with an external channel changer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Starting channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LiveTV will change to the above channel when the input is first selected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect source to input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input connections</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IP address for</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter the IP address of this machine.  Use an externally accessible address (ie, not 127.0.0.1) if you are going to be running a frontend on a different machine than this one.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Port the server runs on</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unless you&apos;ve got good reason to, don&apos;t change this.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Port the server shows status on</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Port which the server will listen to for HTTP requests.  Currently, it shows a little status information.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Master Server IP address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The IP address of the master backend server. All frontend and non-master backend machines will connect to this server.  If you only have one backend, this should be the same IP address as above.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Port the master server runs on</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Directory to hold recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All recordings get stored in this directory.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Directory to hold the Live-TV buffers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All Live-TV buffers will get stored in this directory. These buffers are used to allow you to pause, fast forward and rewind through live TV.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TV format</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The TV standard to use for viewing TV.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>VBI format</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>VBI stands for Vertical Blanking Interrupt.  VBI is used to carry Teletext and Closed Captioning data.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the appropriate frequency table for your system.  If you have an antenna, use a &quot;-bcast&quot; frequency.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Live TV buffer (GB)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>How large the live TV buffer is allowed to grow.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Minimum free Live TV buffer (MB)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>How full the live TV buffer is allowed to grow before forcing an unpause.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save original files after transcoding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When set and the transcoder is active, the original nuv files will be renamed to nuv.old once the transcoding is complete.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time offset for XMLTV listings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If your local timezone does not match the timezone returned by XMLTV, use this setting to have mythfilldatabase adjust the program start and end times.None will disable this feature, Auto will automatically detect your local timezone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Master Backend Override</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, the master backend will stream and delete files if it finds them in the video directory. Useful if you are using a central storage location, like an NFS share, and your slave backend isn&apos;t running.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reconnect wait time (secs)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Length of time the frontend waits between the tries to wake up the master backend. This should be the time your masterbackend needs to startup. Set 0 to disable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Count of reconnect tries</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Number of times the frontend will try to wake up the master backend.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wake Command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The command used to wake up your master backend server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wake command for slaves</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The command used to wakeup your slave backends. Leave empty to disable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Idle timeout (secs)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The amount of time the master backend idles before it shuts down all backends. Set to 0 to disable auto shutdown.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max. wait for recording (min)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The amount of time the master backend waits for a recording.  If it&apos;s idle but a recording starts within this time period, the backends won&apos;t shut down.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Startup before rec. (secs)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The amount of time the master backend will be woken up before a recording starts.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wakeup time format</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The format of the time string passed to the &apos;setWakeuptime Command&apos; as $time. See QT::QDateTime.toString() for details. Set to &apos;time_t&apos; for seconds since epoch.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set wakeuptime command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The command used to set the time (passed as $time) to wake up the masterbackend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server halt command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The command used to halt the backends.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Host Address Backend Setup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Host-specific Backend Setup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Global Backend Setup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shutdown/Wakeup Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>WakeOnLan settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MasterBackend</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RankPrograms</name>
@@ -2609,6 +3686,37 @@
     </message>
     <message>
         <source>Jump To</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>VideoSourceEditor</name>
+    <message>
+        <source>Video sources</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Source Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit..</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete..</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete this video source?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, delete video source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No, don&apos;t</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

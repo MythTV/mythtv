@@ -110,7 +110,7 @@ public:
         addSelection("416 kbps", "416");
         addSelection("448 kbps", "448");
         setValue(13);
-        setHelpText("Sets the audio bitrate");
+        setHelpText(QObject::tr("Sets the audio bitrate"));
     };
 };
 

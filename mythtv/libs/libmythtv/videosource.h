@@ -32,26 +32,22 @@ protected:
 class XMLTVGrabber: public ComboBoxSetting, public VSSetting {
 public:
     XMLTVGrabber(const VideoSource& parent): VSSetting(parent, "xmltvgrabber") {
-        setLabel("XMLTV listings grabber");
-    };
-};
-
-class UserID: public LineEditSetting, public VSSetting {
-public:
-    UserID(const VideoSource& parent): VSSetting(parent, "userid") {
-        setLabel("Gist.com user id");
+        setLabel(QObject::tr("XMLTV listings grabber"));
     };
 };
 
 class PostalCode: public LineEditSetting, public TransientStorage {
-public: PostalCode() { setLabel("ZIP/postal code"); };
+public: 
+    PostalCode() { 
+        setLabel(QObject::tr("ZIP/postal code")); 
+    };
 };
 
 class RegionSelector: public ComboBoxSetting, public TransientStorage {
     Q_OBJECT
 public:
     RegionSelector() {
-        setLabel("Region");
+        setLabel(QObject::tr("Region"));
         fillSelections();
     };
 
@@ -63,7 +59,7 @@ class ProviderSelector: public ComboBoxSetting, public TransientStorage {
     Q_OBJECT
 public:
     ProviderSelector(const QString& _grabber) :
-        grabber(_grabber) { setLabel("Provider"); };
+        grabber(_grabber) { setLabel(QObject::tr("Provider")); };
 
 public slots:
     void fillSelections(const QString& location);
@@ -77,7 +73,7 @@ class FreqTableSelector: public ComboBoxSetting, public VSSetting {
 public:
     FreqTableSelector(const VideoSource& parent) : VSSetting(parent, "freqtable")
     {
-        setLabel("Channel frequency table");
+        setLabel(QObject::tr("Channel frequency table"));
         addSelection("default");
         addSelection("us-cable");
         addSelection("us-bcast");
@@ -95,9 +91,9 @@ public:
         addSelection("southafrica");
         addSelection("argentina");
         addSelection("australia-optus");
-        setHelpText("Use default unless this source uses a different "
-                    "frequency table than the system wide table "
-                    "defined in the General settings.");
+        setHelpText(QObject::tr("Use default unless this source uses a "
+                    "different frequency table than the system wide table "
+                    "defined in the General settings."));
     }
 
 protected:
@@ -108,7 +104,7 @@ class XMLTV_na_config: public VerticalConfigurationGroup {
     Q_OBJECT
 public:
     XMLTV_na_config(const VideoSource& _parent): parent(_parent) {
-        setLabel("tv_grab_na configuration");
+        setLabel(QObject::tr("tv_grab_na configuration"));
         postalcode = new PostalCode();
         addChild(postalcode);
 
@@ -141,7 +137,7 @@ protected:
 class XMLTV_uk_config: public VerticalConfigurationGroup {
 public:
     XMLTV_uk_config(const VideoSource& _parent): parent(_parent) {
-        setLabel("tv_grab_uk configuration");
+        setLabel(QObject::tr("tv_grab_uk configuration"));
         region = new RegionSelector();
         addChild(region);
 
@@ -160,24 +156,13 @@ protected:
     ProviderSelector* provider;
 };
 
-class Grabber_gist_config: public VerticalConfigurationGroup {
-public:
-    Grabber_gist_config(const VideoSource& _parent): parent(_parent) {
-        setLabel("gist.com listings configuration");
-        addChild(new UserID(parent));
-    };
-
-protected:
-    const VideoSource& parent;
-};
-
 class XMLTV_generic_config: public LabelSetting {
 public:
     XMLTV_generic_config(const VideoSource& _parent, QString _grabber):
         parent(_parent),
         grabber(_grabber) {
         setLabel(grabber);
-        setValue("Configuration will run in the terminal window");
+        setValue(QObject::tr("Configuration will run in the terminal window"));
     };
 
     virtual void load(QSqlDatabase* db) { (void)db; };
@@ -200,9 +185,6 @@ public:
 
         addTarget("tv_grab_na", new XMLTV_na_config(parent));
         grabber->addSelection("North America (xmltv)", "tv_grab_na");
-
-        //addTarget("gist", new Grabber_gist_config(parent));
-        //grabber->addSelection("North America (gist)", "gist");
 
         addTarget("tv_grab_de", new XMLTV_generic_config(parent, "tv_grab_de"));
         grabber->addSelection("Germany/Austria", "tv_grab_de");
@@ -249,7 +231,7 @@ public:
         addChild(id = new ID());
 
         ConfigurationGroup *group = new VerticalConfigurationGroup(false);
-        group->setLabel("Video source setup");
+        group->setLabel(QObject::tr("Video source setup"));
         group->addChild(name = new Name(*this));
         group->addChild(new XMLTVConfig(*this));
         group->addChild(new FreqTableSelector(*this));
@@ -291,7 +273,7 @@ private:
     public:
         Name(const VideoSource& parent):
             VSSetting(parent, "name") {
-            setLabel("Video source name");
+            setLabel(QObject::tr("Video source name"));
         };
     };
 
@@ -342,7 +324,7 @@ public:
     VideoDevice(const CaptureCard& parent):
         PathSetting(true),
         CCSetting(parent, "videodevice") {
-        setLabel("Video device");
+        setLabel(QObject::tr("Video device"));
         QDir dev("/dev", "video*", QDir::Name, QDir::System);
         fillSelectionsFromDir(dev);
         dev.setPath("/dev/v4l");
@@ -359,7 +341,7 @@ public:
     VbiDevice(const CaptureCard& parent):
         PathSetting(true),
         CCSetting(parent, "vbidevice") {
-        setLabel("VBI device");
+        setLabel(QObject::tr("VBI device"));
         QDir dev("/dev", "vbi*", QDir::Name, QDir::System);
         fillSelectionsFromDir(dev);
         dev.setPath("/dev/v4l");
@@ -372,12 +354,12 @@ public:
     AudioDevice(const CaptureCard& parent):
         PathSetting(true),
         CCSetting(parent, "audiodevice") {
-        setLabel("Audio device");
+        setLabel(QObject::tr("Audio device"));
         QDir dev("/dev", "dsp*", QDir::Name, QDir::System);
         fillSelectionsFromDir(dev);
         dev.setPath("/dev/sound");
         fillSelectionsFromDir(dev);
-        addSelection("(None)", "/dev/null");
+        addSelection(QObject::tr("(None)"), "/dev/null");
     };
 };
 
@@ -385,8 +367,8 @@ class AudioRateLimit: public ComboBoxSetting, public CCSetting {
 public:
     AudioRateLimit(const CaptureCard& parent):
         CCSetting(parent, "audioratelimit") {
-        setLabel("Audio sampling rate limit");
-        addSelection("(None)", "0");
+        setLabel(QObject::tr("Audio sampling rate limit"));
+        addSelection(QObject::tr("(None)"), "0");
         addSelection("32000");
         addSelection("44100");
         addSelection("48000");
@@ -398,7 +380,7 @@ class TunerCardInput: public ComboBoxSetting, public CCSetting {
 public:
     TunerCardInput(const CaptureCard& parent):
         CCSetting(parent, "defaultinput") {
-        setLabel("Default input");
+        setLabel(QObject::tr("Default input"));
     };
 
 public slots:
@@ -410,24 +392,25 @@ public:
     DVBCardNum(const CaptureCard& parent):
         SpinBoxSetting(0,3,1),
         CCSetting(parent, "videodevice") {
-        setLabel("DVB Card Number");
-        setHelpText("When you change this setting, the text below should change"
-                    " to the name and type of your card. If the card cannot be"
-                    " opened, an error message will be displayed.");
+        setLabel(QObject::tr("DVB Card Number"));
+        setHelpText(QObject::tr("When you change this setting, the text below "
+                    "should change to the name and type of your card. If the "
+                    "card cannot be opened, an error message will be "
+                    "displayed."));
     };
 };
 
 class DVBCardType: public LabelSetting, public TransientStorage {
 public:
     DVBCardType() {
-        setLabel("Card Type");
+        setLabel(QObject::tr("Card Type"));
     };
 };
 
 class DVBCardName: public LabelSetting, public TransientStorage {
 public:
     DVBCardName() {
-        setLabel("Card Name");
+        setLabel(QObject::tr("Card Name"));
     };
 };
 
@@ -435,9 +418,9 @@ class DVBSwFilter: public CheckBoxSetting, public CCSetting {
 public:
     DVBSwFilter(const CaptureCard& parent):
         CCSetting(parent, "use_swfilter") {
-        setLabel("Do NOT use DVB driver for filtering.");
-        setHelpText("(BROKEN) This option is used to get around filtering"
-                    " limitations on some DVB cards.");
+        setLabel(QObject::tr("Do NOT use DVB driver for filtering."));
+        setHelpText(QObject::tr("(BROKEN) This option is used to get around "
+                    "filtering limitations on some DVB cards."));
     };
 };
 
@@ -445,9 +428,9 @@ class DVBRecordTS: public CheckBoxSetting, public CCSetting {
 public:
     DVBRecordTS(const CaptureCard& parent):
         CCSetting(parent, "record_ts") {
-        setLabel("Record the TS, not PS.");
-        setHelpText("This will make the backend not perform Transport Stream"
-                    " to Program Stream conversion.");
+        setLabel(QObject::tr("Record the TS, not PS."));
+        setHelpText(QObject::tr("This will make the backend not perform "
+                    "Transport Stream to Program Stream conversion."));
     };
 };
 
@@ -455,10 +438,10 @@ class DVBNoSeqStart: public CheckBoxSetting, public CCSetting {
 public:
     DVBNoSeqStart(const CaptureCard& parent):
         CCSetting(parent, "no_seq_start") {
-        setLabel("Do not wait for SEQ start header.");
-        setHelpText("Normally the dvb-recording will drop packets from the card"
-            " untill a sequence start header is seen. This option turns"
-            " off this feature.");
+        setLabel(QObject::tr("Do not wait for SEQ start header."));
+        setHelpText(QObject::tr("Normally the dvb-recording will drop packets "
+                    "from the card untill a sequence start header is seen. "
+                    "This option turns off this feature."));
     };
 };
 
@@ -467,9 +450,8 @@ public:
     DVBPidBufferSize(const CaptureCard& parent):
         SpinBoxSetting(0, 180000, 188),
         CCSetting(parent, "dmx_buf_size") {
-        setLabel("Per PID driver buffer size.");
+        setLabel(QObject::tr("Per PID driver buffer size"));
         setValue(188*50);
-        setHelpText("");
     };
 };
 
@@ -478,9 +460,8 @@ public:
     DVBBufferSize(const CaptureCard& parent):
         SpinBoxSetting(0, 188000, 188),
         CCSetting(parent, "pkt_buf_size") {
-        setLabel("Packet buffer.");
+        setLabel(QObject::tr("Packet buffer"));
         setValue(188*100);
-        setHelpText("");
     };
 };
 
@@ -542,11 +523,11 @@ class DVBChannels: public ComboBoxSetting {
 public:
     DVBChannels() : db(NULL)
     {
-        setLabel("Channels");
-        setHelpText("This box contains all channels from the selected video"
-                    " source. Select a channel here and press the 'Load and"
-                    " Tune' button to load the channel settings into the"
-                    " previous screen and try to tune it.");
+        setLabel(QObject::tr("Channels"));
+        setHelpText(QObject::tr("This box contains all channels from the "
+                    "selected video source. Select a channel here and press "
+                    "the 'Load and Tune' button to load the channel settings "
+                    "into the previous screen and try to tune it."));
     }
 
     void save(QSqlDatabase* db) { (void)db; };
@@ -578,7 +559,7 @@ class DVBStatusLabel: public LabelSetting, public TransientStorage {
     Q_OBJECT
 public:
     DVBStatusLabel() {
-        setLabel("Status");
+        setLabel(QObject::tr("Status"));
     };
 public slots:
     void set(QString str) {
@@ -590,7 +571,7 @@ class DVBSatelliteConfigType: public ComboBoxSetting, public CCSetting {
 public:
     DVBSatelliteConfigType(CaptureCard& parent):
         CCSetting(parent, "dvb_sat_type") {
-        setLabel("Type");
+        setLabel(QObject::tr("Type"));
         addSelection("Single LNB","0");
         addSelection("Tone Switch aka Mini DiSEqC (2-Way)","1");
         addSelection("DiSEq v1.0 Switch (2-Way)","2");
@@ -598,9 +579,10 @@ public:
         addSelection("DiSEq v1.0 Switch (4-Way)","4");
         addSelection("DiSEq v1.1 Switch (4-Way)","5");
 //        addSelection("DiSEqC Positioner","6");
-        setHelpText("Select the type of satellite equipment you have. Selecting"
-                    " 'Finish' on this screen will only save the type, and not"
-                    " the individual satellite, move down to the list to do this.");
+        setHelpText(QObject::tr("Select the type of satellite equipment you "
+                    "have. Selecting 'Finish' on this screen will only save "
+                    "the type, and not the individual satellite, move down to "
+                    "the list to do this."));
     };
 };
 
@@ -608,12 +590,13 @@ class DVBSatelliteList: public ListBoxSetting, public TransientStorage {
     Q_OBJECT
 public:
     DVBSatelliteList(CaptureCard& _parent): parent(_parent) {
-        setLabel("Satellites");
+        setLabel(QObject::tr("Satellites"));
         db = NULL;
         satellites = 1;
-        setHelpText("Select the satellite you want to configure and press the"
-                    " 'menu' key, and edit the satellite, when you are done"
-                    " configuring, press 'OK' to leave this wizard.");
+        setHelpText(QObject::tr("Select the satellite you want to configure "
+                    "and press the 'menu' key, and edit the satellite, when "
+                    "you are done configuring, press 'OK' to leave this "
+                    "wizard."));
     };
 
     void load(QSqlDatabase* _db);
@@ -640,7 +623,7 @@ public:
     DVBSatelliteWizard(CaptureCard& _parent):
         parent(_parent) {
         VerticalConfigurationGroup* g = new VerticalConfigurationGroup(false);
-        g->setLabel("Satellite Configuration");
+        g->setLabel(QObject::tr("Satellite Configuration"));
         g->setUseLabel(false);
         DVBSatelliteConfigType* type = new DVBSatelliteConfigType(parent);
         list = new DVBSatelliteList(parent);
@@ -657,10 +640,10 @@ public:
     public:
         SatName(const CaptureCard& parent, int satnum):
             DvbSatSetting(parent, satnum, "name") {
-            setLabel("Satellite Name");
+            setLabel(QObject::tr("Satellite Name"));
             setValue("Unnamed");
-            setHelpText("A textual representation of this satellite or cluster"
-                        " of satellites.");
+            setHelpText(QObject::tr("A textual representation of this "
+                        "satellite or cluster of satellites."));
         };
     };
 
@@ -668,10 +651,10 @@ public:
     public:
         SatPos(const CaptureCard& parent, int satnum):
             DvbSatSetting(parent, satnum, "pos") {
-            setLabel("Satellite Position");
+            setLabel(QObject::tr("Satellite Position"));
             setValue("");
-            setHelpText("A textual representation of which position the satellite"
-                        " is located at ('1W')");
+            setHelpText(QObject::tr("A textual representation of which "
+                        "position the satellite is located at ('1W')"));
         };
     };
 
@@ -679,10 +662,11 @@ public:
     public:
         LofSwitch(const CaptureCard& parent, int satnum):
             DvbSatSetting(parent, satnum, "lnb_lof_switch") {
-            setLabel("LNB LOF Switch");
+            setLabel(QObject::tr("LNB LOF Switch"));
             setValue("11700000");
-            setHelpText("This defines at what frequency (in hz) the LNB will"
-                        " do a switch from high to low setting, and vice versa.");
+            setHelpText(QObject::tr("This defines at what frequency (in hz) "
+                        "the LNB will do a switch from high to low setting, "
+                        "and vice versa."));
         };
     };
 
@@ -690,10 +674,11 @@ public:
     public:
         LofHigh(const CaptureCard& parent, int satnum):
             DvbSatSetting(parent, satnum, "lnb_lof_hi") {
-            setLabel("LNB LOF High");
+            setLabel(QObject::tr("LNB LOF High"));
             setValue("10600000");
-            setHelpText("This defines the offset (in hz) the frequency coming"
-                        " from the lnb will be in high setting.");
+            setHelpText(QObject::tr("This defines the offset (in hz) the "
+                        "frequency coming from the lnb will be in high "
+                        "setting."));
         };
     };
 
@@ -701,10 +686,11 @@ public:
     public:
         LofLow(const CaptureCard& parent, int satnum):
             DvbSatSetting(parent, satnum, "lnb_lof_lo") {
-            setLabel("LNB LOF Low");
+            setLabel(QObject::tr("LNB LOF Low"));
             setValue("9750000");
-            setHelpText("This defines the offset (in hz) the frequency coming"
-                        " from the lnb will be in low setting.");
+            setHelpText(QObject::tr("This defines the offset (in hz) the "
+                        "frequency coming from the lnb will be in low "
+                        "setting."));
         };
     };
 
@@ -771,7 +757,7 @@ class DVBAdvConfigurationWizard: public ConfigurationWizard {
 public:
     DVBAdvConfigurationWizard(CaptureCard& parent) {
         VerticalConfigurationGroup* rec = new VerticalConfigurationGroup(false);
-        rec->setLabel("Recorder Options");
+        rec->setLabel(QObject::tr("Recorder Options"));
         rec->setUseLabel(false);
 
         rec->addChild(new DVBSwFilter(parent));
@@ -788,14 +774,14 @@ class DVBAdvancedConfigMenu: public ConfigurationPopupDialog,
     Q_OBJECT
 public:
     DVBAdvancedConfigMenu(CaptureCard& a_parent): parent(a_parent) {
-        setLabel("Configuration Options");
+        setLabel(QObject::tr("Configuration Options"));
         TransButtonSetting* advcfg = new TransButtonSetting();
         TransButtonSetting* verify = new TransButtonSetting();
         TransButtonSetting* satellite = new TransButtonSetting();
 
-        advcfg->setLabel("Advanced Configuration");
-        verify->setLabel("Card Verification Wizard");
-        satellite->setLabel("Satellite Configuration");
+        advcfg->setLabel(QObject::tr("Advanced Configuration"));
+        verify->setLabel(QObject::tr("Card Verification Wizard"));
+        satellite->setLabel(QObject::tr("Satellite Configuration"));
 
         addChild(advcfg);
         addChild(verify);
@@ -975,7 +961,7 @@ class CardID: public SelectLabelSetting, public CISetting {
 public:
     CardID(const CardInput& parent):
         CISetting(parent, "cardid") {
-        setLabel("Capture device");
+        setLabel(QObject::tr("Capture device"));
     };
 
     virtual void load(QSqlDatabase* db) {
@@ -993,8 +979,8 @@ class SourceID: public ComboBoxSetting, public CISetting {
 public:
     SourceID(const CardInput& parent):
         CISetting(parent, "sourceid") {
-        setLabel("Video source");
-        addSelection("(None)", "0");
+        setLabel(QObject::tr("Video source"));
+        addSelection(QObject::tr("(None)"), "0");
     };
 
     virtual void load(QSqlDatabase* db) {
@@ -1004,7 +990,7 @@ public:
 
     void fillSelections(QSqlDatabase* db) {
         clearSelections();
-        addSelection("(None)", "0");
+        addSelection(QObject::tr("(None)"), "0");
         VideoSource::fillSelections(db, this);
     };
 };
@@ -1013,7 +999,7 @@ class InputName: public LabelSetting, public CISetting {
 public:
     InputName(const CardInput& parent):
         CISetting(parent, "inputname") {
-        setLabel("Input");
+        setLabel(QObject::tr("Input"));
     };
 };
 
@@ -1021,11 +1007,11 @@ class ExternalChannelCommand: public LineEditSetting, public CISetting {
 public:
     ExternalChannelCommand(const CardInput& parent):
         CISetting(parent,"externalcommand") {
-        setLabel("External channel change command");
+        setLabel(QObject::tr("External channel change command"));
         setValue("");
-        setHelpText("If specified, this command will be run to change the "
-                    "channel for inputs which do not have a tuner.  The "
-                    "first argument will be the channel number.");
+        setHelpText(QObject::tr("If specified, this command will be run to "
+                    "change the channel for inputs which do not have a tuner.  "
+                    "The first argument will be the channel number."));
     };
 };
 
@@ -1033,11 +1019,12 @@ class PresetTuner: public LineEditSetting, public CISetting {
 public:
     PresetTuner(const CardInput& parent):
         CISetting(parent, "tunechan") {
-        setLabel("Preset tuner to channel");
+        setLabel(QObject::tr("Preset tuner to channel"));
         setValue("");
-        setHelpText("If specified, the tuner will change to this channel "
-                    "when the input is selected.  This is only useful if you "
-                    "use your tuner input with an external channel changer.");
+        setHelpText(QObject::tr("If specified, the tuner will change to this "
+                    "channel when the input is selected.  This is only "
+                    "useful if you use your tuner input with an external "
+                    "channel changer."));
     };
 };
 
@@ -1045,10 +1032,10 @@ class StartingChannel: public LineEditSetting, public CISetting {
 public:
     StartingChannel(const CardInput& parent):
         CISetting(parent, "startchan") {
-        setLabel("Starting channel");
+        setLabel(QObject::tr("Starting channel"));
         setValue("3");
-        setHelpText("LiveTV will change to the above channel when the "
-                    "input is first selected.");
+        setHelpText(QObject::tr("LiveTV will change to the above channel when "
+                    "the input is first selected."));
     };
 };
 
@@ -1058,7 +1045,7 @@ public:
         addChild(id = new ID());
 
         ConfigurationGroup *group = new VerticalConfigurationGroup(false);
-        group->setLabel("Connect source to input");
+        group->setLabel(QObject::tr("Connect source to input"));
         group->addChild(cardid = new CardID(*this));
         group->addChild(inputname = new InputName(*this));
         group->addChild(sourceid = new SourceID(*this));
@@ -1105,7 +1092,7 @@ class CaptureCardEditor: public ListBoxSetting, public ConfigurationDialog {
 public:
     CaptureCardEditor(QSqlDatabase* _db):
         db(_db) {
-        setLabel("Capture cards");
+        setLabel(tr("Capture cards"));
     };
 
     virtual MythDialog* dialogWidget(MythMainWindow* parent,
@@ -1127,9 +1114,9 @@ public slots:
         } else {
             int val = MythPopupBox::show2ButtonPopup(gContext->GetMainWindow(),
                                                      "",
-                                                     "Capture Card Menu", 
-                                                     "Edit..",
-                                                     "Delete..", 1);
+                                                     tr("Capture Card Menu"), 
+                                                     tr("Edit.."),
+                                                     tr("Delete.."), 1);
 
             if (val == 0)
                 edit();
@@ -1147,10 +1134,10 @@ public slots:
 
     void del() {
         int val = MythPopupBox::show2ButtonPopup(gContext->GetMainWindow(), "",
-                                           "Are you sure you want to delete "
-                                           "this capture card?", 
-                                           "Yes, delete capture card",
-                                           "No, don't", 2);
+                                          tr("Are you sure you want to delete "
+                                             "this capture card?"), 
+                                             tr("Yes, delete capture card"),
+                                             tr("No, don't"), 2);
         if (val == 0)
         {
             QSqlQuery query;
@@ -1177,7 +1164,7 @@ class VideoSourceEditor: public ListBoxSetting, public ConfigurationDialog {
 public:
     VideoSourceEditor(QSqlDatabase* _db):
         db(_db) {
-        setLabel("Video sources");
+        setLabel(tr("Video sources"));
     };
 
     virtual MythDialog* dialogWidget(MythMainWindow* parent,
@@ -1199,9 +1186,9 @@ public slots:
         } else {
             int val = MythPopupBox::show2ButtonPopup(gContext->GetMainWindow(),
                                                      "",
-                                                     "Video Source Menu",
-                                                     "Edit..",
-                                                     "Delete..", 1);
+                                                     tr("Video Source Menu"),
+                                                     tr("Edit.."),
+                                                     tr("Delete.."), 1);
 
             if (val == 0)
                 emit edit();
@@ -1220,10 +1207,10 @@ public slots:
 
     void del() {
         int val = MythPopupBox::show2ButtonPopup(gContext->GetMainWindow(), "",
-                                           "Are you sure you want to delete "
-                                           "this video source?",
-                                           "Yes, delete video source",
-                                           "No, don't", 2);
+                                           tr("Are you sure you want to delete "
+                                              "this video source?"),
+                                           tr("Yes, delete video source"),
+                                           tr("No, don't"), 2);
 
         if (val == 0)
         {
@@ -1244,7 +1231,7 @@ class CardInputEditor: public ListBoxSetting, public ConfigurationDialog {
 public:
     CardInputEditor(QSqlDatabase* _db):
         db(_db) {
-        setLabel("Input connections");
+        setLabel(QObject::tr("Input connections"));
     };
     virtual ~CardInputEditor();
 

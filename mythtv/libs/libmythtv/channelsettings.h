@@ -110,11 +110,10 @@ class DvbPidSetting: public LineEditSetting, public DBStorage {
 public:
     DvbPidSetting(const ChannelID& id, QString name):
       LineEditSetting(), DBStorage("dvb_pids", name), id(id) {
-        setHelpText("A comma separated list of pids for each type. Note that"
-                    " currently MythTV only supports recording and not playback"
-                    " of multiple audio or video pids. It does not support"
-                    " showing teletext or subtitles either, but these do not"
-                    " crash the player as audio and video might do.");
+        setHelpText(QObject::tr("A comma separated list of pids for each type. "
+                    "Note that currently MythTV only supports recording and "
+                    "not playback of multiple audio or video pids. It does not "                    "support showing teletext or subtitles either, but these "
+                    "do not crash the player as audio and video might."));
     };
 
     void load(QSqlDatabase* db);

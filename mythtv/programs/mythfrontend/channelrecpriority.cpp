@@ -45,12 +45,12 @@ ChannelRecPriority::ChannelRecPriority(QSqlDatabase *ldb,
     theme->SetHMult(hmult);
     if (!theme->LoadTheme(xmldata, "recprioritychannels"))
     {
-        DialogBox diag(gContext->GetMainWindow(), "The theme you are using "
+        DialogBox diag(gContext->GetMainWindow(), tr("The theme you are using "
                        "does not contain a 'recprioritychannels' element.  "
                        "Please contact the theme creator and ask if they could "
                        "please update it.<br><br>The next screen will be empty."
-                       "  Escape out of it to return to the menu.");
-        diag.AddButton("OK");
+                       "  Escape out of it to return to the menu."));
+        diag.AddButton(tr("OK"));
         diag.exec();
 
         return;

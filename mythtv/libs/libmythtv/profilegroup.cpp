@@ -37,7 +37,7 @@ ProfileGroup::ProfileGroup(QSqlDatabase *_db)
     addChild(is_default = new Is_default(*this));
 
     ConfigurationGroup* profile = new VerticalConfigurationGroup(false);
-    profile->setLabel("ProfileGroup");
+    profile->setLabel(QObject::tr("ProfileGroup"));
     profile->addChild(name = new Name(*this));
     CardInfo *cardInfo = new CardInfo(*this);
     profile->addChild(cardInfo);
@@ -85,7 +85,7 @@ void ProfileGroup::fillSelections(QSqlDatabase* db, SelectSetting* setting) {
             setting->addSelection(value, result.value(1).toString());
         }
     if (! transcodeID.isNull())
-        setting->addSelection("Transcoders", transcodeID);
+        setting->addSelection(QObject::tr("Transcoders"), transcodeID);
 }
 
 QString ProfileGroup::getName(QSqlDatabase *db, int group)
@@ -140,7 +140,7 @@ void ProfileGroupEditor::open(int id) {
     }
     else
     {
-        pgName = QString("New Profile Group Name");
+        pgName = QString(QObject::tr("New Profile Group Name"));
         profilegroup->setName(pgName);
         newgroup = true;
     }
@@ -237,13 +237,13 @@ void ProfileGroupEditor::callDelete(void)
     if (result.isActive() && result.numRowsAffected() > 0)
     {
         result.next();
-        QString message = QString("Delete profile group:\n'%1'?")
-                                  .arg(ProfileGroup::getName(db, id));
+        QString message = QObject::tr("Delete profile group:") + 
+                          QString("\n'%1'?").arg(ProfileGroup::getName(db, id));
 
         int value = MythPopupBox::show2ButtonPopup(gContext->GetMainWindow(),
                                                    "", message, 
-                                                   "Yes, delete group",
-                                                   "No, Don't delete group", 2);
+                                     QObject::tr("Yes, delete group"),
+                                     QObject::tr("No, Don't delete group"), 2);
 
         if (value == 0)
         {

@@ -44,13 +44,14 @@ public:
     LocalServerIP():
         BackendHostSetting("BackendServerIP") {
             QString hostname = gContext->GetHostName();
-            QString label = "IP address for " + gContext->GetHostName();
+            QString label = QObject::tr("IP address for") + QString(" ") + 
+                            gContext->GetHostName();
             setLabel(label);
             setValue("127.0.0.1");
-            setHelpText("Enter the IP address of this machine.  Use an "
-                        "externally accessible address (ie, not 127.0.0.1) "
-                        "if you are going to be running a frontend on a "
-                        "different machine than this one.");
+            setHelpText(QObject::tr("Enter the IP address of this machine.  "
+                        "Use an externally accessible address (ie, not "
+                        "127.0.0.1) if you are going to be running a frontend "
+                        "on a different machine than this one."));
     };
 };
 
@@ -58,9 +59,10 @@ class LocalServerPort: public LineEditSetting, public BackendHostSetting {
 public:
     LocalServerPort():
         BackendHostSetting("BackendServerPort") {
-            setLabel("Port the server runs on");
+            setLabel(QObject::tr("Port the server runs on"));
             setValue("6543");
-            setHelpText("Unless you've got good reason to, don't change this.");
+            setHelpText(QObject::tr("Unless you've got good reason to, don't "
+                        "change this."));
     };
 };
 
@@ -68,11 +70,11 @@ class LocalStatusPort: public LineEditSetting, public BackendHostSetting {
 public:
     LocalStatusPort():
         BackendHostSetting("BackendStatusPort") {
-            setLabel("Port the server shows status on");
+            setLabel(QObject::tr("Port the server shows status on"));
             setValue("6544");
-            setHelpText("Port which the server will listen to for HTTP "
-                        "requests.  Currently, it shows a little status "
-                        "information.");
+            setHelpText(QObject::tr("Port which the server will listen to for "
+                        "HTTP requests.  Currently, it shows a little status "
+                        "information."));
     };
 };
 
@@ -80,12 +82,13 @@ class MasterServerIP: public LineEditSetting, public BackendSetting {
 public:
     MasterServerIP():
         BackendSetting("MasterServerIP") {
-            setLabel("Master Server IP address");
+            setLabel(QObject::tr("Master Server IP address"));
             setValue("127.0.0.1");
-            setHelpText("The IP address of the master backend server. All "
-                        "frontend and non-master backend machines will connect "
-                        "to this server.  If you only have one backend, this "
-                        "should be the same IP address as above.");
+            setHelpText(QObject::tr("The IP address of the master backend "
+                        "server. All frontend and non-master backend machines "
+                        "will connect to this server.  If you only have one "
+                        "backend, this should be the same IP address as "
+                        "above."));
     };
 };
 
@@ -93,9 +96,10 @@ class MasterServerPort: public LineEditSetting, public BackendSetting {
 public:
     MasterServerPort():
         BackendSetting("MasterServerPort") {
-            setLabel("Port the master server runs on");
+            setLabel(QObject::tr("Port the master server runs on"));
             setValue("6543");
-            setHelpText("Unless you've got good reason to, don't change this.");
+            setHelpText(QObject::tr("Unless you've got good reason to, "
+                        "don't change this."));
     };
 };
 
@@ -103,9 +107,10 @@ class RecordFilePrefix: public LineEditSetting, public BackendHostSetting {
 public:
     RecordFilePrefix():
         BackendHostSetting("RecordFilePrefix") {
-        setLabel("Directory to hold recordings");
+        setLabel(QObject::tr("Directory to hold recordings"));
         setValue("/mnt/store/");
-        setHelpText("All recordings get stored in this directory.");
+        setHelpText(QObject::tr("All recordings get stored in this "
+                    "directory."));
     };
 };
 
@@ -113,11 +118,11 @@ class LiveBufferPrefix: public LineEditSetting, public BackendHostSetting {
 public:
     LiveBufferPrefix():
         BackendHostSetting("LiveBufferDir") {
-        setLabel("Directory to hold the Live-TV buffers");
+        setLabel(QObject::tr("Directory to hold the Live-TV buffers"));
         setValue("/mnt/store/");
-        setHelpText("All Live-TV buffers will get stored in this directory. "
-                    "These buffers are used to allow you to pause, fast "
-                    "forward and rewind through live TV.");
+        setHelpText(QObject::tr("All Live-TV buffers will get stored in this "
+                    "directory. These buffers are used to allow you to pause, "
+                    "fast forward and rewind through live TV."));
     };
 };
 
@@ -125,7 +130,7 @@ class TVFormat: public ComboBoxSetting, public BackendSetting {
 public:
     TVFormat():
         BackendSetting("TVFormat") {
-        setLabel("TV format");
+        setLabel(QObject::tr("TV format"));
         addSelection("NTSC");
         addSelection("ATSC");
         addSelection("PAL");
@@ -134,6 +139,7 @@ public:
         addSelection("PAL-M");
         addSelection("PAL-N");
         addSelection("NTSC-JP");
+        setHelpText(QObject::tr("The TV standard to use for viewing TV."));
     };
 };
 
@@ -141,12 +147,13 @@ class VbiFormat: public ComboBoxSetting, public BackendSetting {
 public:
     VbiFormat():
         BackendSetting("VbiFormat") {
-        setLabel("VBI format");
+        setLabel(QObject::tr("VBI format"));
         addSelection("None");
         addSelection("PAL Teletext");
         addSelection("NTSC Closed Caption");
-        setHelpText("VBI stands for Vertical Blanking Interrupt.  VBI is used "
-                    "to carry Teletext and Closed Captioning data.");
+        setHelpText(QObject::tr("VBI stands for Vertical Blanking Interrupt.  "
+                    "VBI is used to carry Teletext and Closed Captioning "
+                    "data."));
     };
 };
 
@@ -154,7 +161,7 @@ class FreqTable: public ComboBoxSetting, public BackendSetting {
 public:
     FreqTable():
         BackendSetting("FreqTable") {
-        setLabel("Channel frequency table");
+        setLabel(QObject::tr("Channel frequency table"));
         addSelection("us-cable");
         addSelection("us-bcast");
         addSelection("us-cable-hrc");
@@ -171,9 +178,9 @@ public:
         addSelection("southafrica");
         addSelection("argentina");
         addSelection("australia-optus");
-        setHelpText("Select the appropriate frequency table for your "
-                    "system.  If you have an antenna, use a \"-bcast\" "
-                    "frequency.");
+        setHelpText(QObject::tr("Select the appropriate frequency table for "
+                    "your system.  If you have an antenna, use a \"-bcast\" "
+                    "frequency."));
     };
 };
 
@@ -182,10 +189,10 @@ public:
     BufferSize():
         SliderSetting(1, 100, 1),
         BackendHostSetting("BufferSize") {
-
-        setLabel("Live TV buffer (GB)");
+        setLabel(QObject::tr("Live TV buffer (GB)"));
         setValue(5);
-        setHelpText("How large the live TV buffer is allowed to grow.");
+        setHelpText(QObject::tr("How large the live TV buffer is allowed to "
+                    "grow."));
     };
 };
 
@@ -194,9 +201,10 @@ public:
     MaxBufferFill():
         SliderSetting(1, 100, 1),
         BackendHostSetting("MaxBufferFill") {
+        setLabel(QObject::tr("Minimum free Live TV buffer (MB)"));
         setValue(50);
-        setHelpText("How full the live TV buffer is allowed to grow before "
-                    "forcing an unpause.");
+        setHelpText(QObject::tr("How full the live TV buffer is allowed to "
+                    "grow before forcing an unpause."));
     };
 };
 
@@ -204,11 +212,11 @@ class SaveTranscoding: public CheckBoxSetting, public BackendSetting {
 public:
     SaveTranscoding():
         BackendSetting("SaveTranscoding") {
-        setLabel("Save original files after transcoding");
+        setLabel(QObject::tr("Save original files after transcoding"));
         setValue(false);
-        setHelpText("When set and the transcoder is active, the original "
-                    "nuv files will be renamed to nuv.old once the "
-                    "transcoding is complete.");
+        setHelpText(QObject::tr("When set and the transcoder is active, the "
+                    "original nuv files will be renamed to nuv.old once the "
+                    "transcoding is complete."));
     };
 };
 
@@ -216,7 +224,7 @@ class TimeOffset: public ComboBoxSetting, public BackendSetting {
 public:
     TimeOffset():
         BackendSetting("TimeOffset") {
-        setLabel("Time offset for XMLTV listings");
+        setLabel(QObject::tr("Time offset for XMLTV listings"));
         addSelection("None");
         addSelection("Auto");
         addSelection("+0030");
@@ -265,11 +273,11 @@ public:
         addSelection("-0130");
         addSelection("-0100");
         addSelection("-0030");
-        setHelpText("If your local timezone does not match the timezone "
-                    "returned by XMLTV, use this setting to have "
+        setHelpText(QObject::tr("If your local timezone does not match the "
+                    "timezone returned by XMLTV, use this setting to have "
                     "mythfilldatabase adjust the program start and end times."
                     "None will disable this feature, Auto will automatically "
-                    "detect your local timezone");
+                    "detect your local timezone"));
     };
 };
 
@@ -277,12 +285,12 @@ class MasterBackendOverride: public CheckBoxSetting, public BackendSetting {
 public:
     MasterBackendOverride():
         BackendSetting("MasterBackendOverride") {
-        setLabel("Master Backend Override");
+        setLabel(QObject::tr("Master Backend Override"));
         setValue(true);
-        setHelpText("If enabled, the master backend will stream and "
-                    "delete files if it finds them in the video directory. "
+        setHelpText(QObject::tr("If enabled, the master backend will stream and"
+                    " delete files if it finds them in the video directory. "
                     "Useful if you are using a central storage location, like "
-                    "an NFS share, and your slave backend isn't running.");
+                    "an NFS share, and your slave backend isn't running."));
     };
 };
 
@@ -291,11 +299,12 @@ public:
     WOLbackendReconnectWaitTime():
         SpinBoxSetting(0,1200, 5), 
         BackendSetting("WOLbackendReconnectWaitTime") {
-        setLabel("reconnect wait time (secs)");
+        setLabel(QObject::tr("Reconnect wait time (secs)"));
         setValue(0);
-        setHelpText("Length of time the frontend waits between the tries to "
-                    "wake up the master backend. This should be the time your "
-                    "masterbackend needs to startup. Set 0 to disable.");
+        setHelpText(QObject::tr("Length of time the frontend waits between the "
+                    "tries to wake up the master backend. This should be the "
+                    "time your masterbackend needs to startup. Set 0 to "
+                    "disable."));
     };
 };
 
@@ -304,9 +313,9 @@ public:
     WOLbackendConnectRetry():
         SpinBoxSetting(1, 60, 1), 
         BackendSetting("WOLbackendConnectRetry") {
-        setLabel("Count of reconnect tries");
-        setHelpText("Number of times the frontend will try to wake up the "
-                    "master backend.");
+        setLabel(QObject::tr("Count of reconnect tries"));
+        setHelpText(QObject::tr("Number of times the frontend will try to wake "
+                    "up the master backend."));
         setValue(5);
     };
 };
@@ -315,9 +324,10 @@ class WOLbackendCommand: public LineEditSetting, public BackendSetting {
 public:
     WOLbackendCommand():
         BackendSetting("WOLbackendCommand") {
-        setLabel("Wake Command");
+        setLabel(QObject::tr("Wake Command"));
         setValue("");
-        setHelpText("The command used to wake up your master backend server.");
+        setHelpText(QObject::tr("The command used to wake up your master "
+                    "backend server."));
     };
 };
 
@@ -325,10 +335,10 @@ class WOLslaveBackendsCommand: public LineEditSetting, public BackendSetting {
 public:
     WOLslaveBackendsCommand():
         BackendSetting("WOLslaveBackendsCommand") {
-        setLabel("Wake command for slaves");
+        setLabel(QObject::tr("Wake command for slaves"));
         setValue("");
-        setHelpText("The command used to wakeup your slave Backends. Leave "
-                    "empty to disable.");
+        setHelpText(QObject::tr("The command used to wakeup your slave "
+                    "backends. Leave empty to disable."));
     };
 };
 
@@ -337,11 +347,11 @@ public:
     idleTimeoutSecs():
         SpinBoxSetting(0, 1200, 5), 
         BackendSetting("idleTimeoutSecs") {
-        setLabel("Idle timeout (secs)");
+        setLabel(QObject::tr("Idle timeout (secs)"));
         setValue(0);
-        setHelpText("The amount of time the master backend idles before it "
-                    "shuts down all backends. Set to 0 to disable auto "
-                    "shutdown.");
+        setHelpText(QObject::tr("The amount of time the master backend idles "
+                    "before it shuts down all backends. Set to 0 to disable "
+                    "auto shutdown."));
     };
 };
     
@@ -349,11 +359,11 @@ class idleWaitForRecordingTime: public SpinBoxSetting, public BackendSetting {
 public:
     idleWaitForRecordingTime():
         SpinBoxSetting(0, 120, 1), BackendSetting("idleWaitForRecordingTime") {
-        setLabel("Max. wait for recording (min)");
+        setLabel(QObject::tr("Max. wait for recording (min)"));
         setValue(15);
-        setHelpText("The amount of time the master backend waits for a "
-                    "recording.  If it's idle but a recording starts "
-                    "within this time period, the backends won't shut down.");
+        setHelpText(QObject::tr("The amount of time the master backend waits "
+                    "for a recording.  If it's idle but a recording starts "
+                    "within this time period, the backends won't shut down."));
     };
 };
 
@@ -362,10 +372,10 @@ public:
     StartupSecsBeforeRecording():
         SpinBoxSetting(0, 1200, 5), 
         BackendSetting("StartupSecsBeforeRecording") {
-        setLabel("Startup before rec. (secs)");
+        setLabel(QObject::tr("Startup before rec. (secs)"));
         setValue(120);
-        setHelpText("The amount of time the master backend will be woken up "
-                    "before a recording starts.");
+        setHelpText(QObject::tr("The amount of time the master backend will be "
+                    "woken up before a recording starts."));
     };
 };
 
@@ -373,12 +383,12 @@ class WakeupTimeFormat: public LineEditSetting, public BackendSetting {
 public:
     WakeupTimeFormat():
         BackendSetting("WakeupTimeFormat") {
-        setLabel("wakeup time format");
+        setLabel(QObject::tr("Wakeup time format"));
         setValue("hh:mm yyyy-MM-dd");
-        setHelpText("The format of the time string passed to the "
+        setHelpText(QObject::tr("The format of the time string passed to the "
                     "\'setWakeuptime Command\' as $time. See "
                     "QT::QDateTime.toString() for details. Set to 'time_t' for "
-                    "seconds since epoch.");
+                    "seconds since epoch."));
     };
 };
 
@@ -386,10 +396,10 @@ class SetWakeuptimeCommand: public LineEditSetting, public BackendSetting {
 public:
     SetWakeuptimeCommand():
         BackendSetting("SetWakeuptimeCommand") {
-        setLabel("set wakeuptime command");
+        setLabel(QObject::tr("Set wakeuptime command"));
         setValue("");
-        setHelpText("The command used to set the time (passed as $time) to "
-                    "wake up the masterbackend");
+        setHelpText(QObject::tr("The command used to set the time (passed as "
+                    "$time) to wake up the masterbackend"));
     };
 };
 
@@ -397,15 +407,15 @@ class ServerHaltCommand: public LineEditSetting, public BackendSetting {
 public:
     ServerHaltCommand():
         BackendSetting("ServerHaltCommand") {
-        setLabel("server halt command");
+        setLabel(QObject::tr("Server halt command"));
         setValue("sudo /sbin/halt -p");
-        setHelpText("The command used to halt the backends.");
+        setHelpText(QObject::tr("The command used to halt the backends."));
     };
 };
 
 BackendSettings::BackendSettings() {
     VerticalConfigurationGroup* server = new VerticalConfigurationGroup(false);
-    server->setLabel("Host Address Backend Setup");
+    server->setLabel(QObject::tr("Host Address Backend Setup"));
     server->addChild(new LocalServerIP());
     server->addChild(new LocalServerPort());
     server->addChild(new LocalStatusPort());
@@ -414,7 +424,7 @@ BackendSettings::BackendSettings() {
     addChild(server);
 
     VerticalConfigurationGroup* group1 = new VerticalConfigurationGroup(false);
-    group1->setLabel("Host-specific Backend Setup");
+    group1->setLabel(QObject::tr("Host-specific Backend Setup"));
     group1->addChild(new RecordFilePrefix());
     group1->addChild(new LiveBufferPrefix());
     group1->addChild(new BufferSize());
@@ -423,7 +433,7 @@ BackendSettings::BackendSettings() {
     addChild(group1);
 
     VerticalConfigurationGroup* group2 = new VerticalConfigurationGroup(false);
-    group2->setLabel("Global Backend Setup");
+    group2->setLabel(QObject::tr("Global Backend Setup"));
     group2->addChild(new TVFormat());
     group2->addChild(new VbiFormat());
     group2->addChild(new FreqTable());
@@ -432,7 +442,7 @@ BackendSettings::BackendSettings() {
     addChild(group2);
 
     VerticalConfigurationGroup* group3 = new VerticalConfigurationGroup(false);
-    group3->setLabel("Shutdown/Wakeup Options");
+    group3->setLabel(QObject::tr("Shutdown/Wakeup Options"));
     group3->addChild(new idleTimeoutSecs());
     group3->addChild(new idleWaitForRecordingTime());
     group3->addChild(new StartupSecsBeforeRecording());
@@ -442,10 +452,10 @@ BackendSettings::BackendSettings() {
     addChild(group3);    
 
     VerticalConfigurationGroup* group4 = new VerticalConfigurationGroup(false);
-    group4->setLabel("WakeOnLan settings");
+    group4->setLabel(QObject::tr("WakeOnLan settings"));
 
     VerticalConfigurationGroup* backend = new VerticalConfigurationGroup();
-    backend->setLabel("MasterBackend");
+    backend->setLabel(QObject::tr("MasterBackend"));
     backend->addChild(new WOLbackendReconnectWaitTime());
     backend->addChild(new WOLbackendConnectRetry());
     backend->addChild(new WOLbackendCommand());

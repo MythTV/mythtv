@@ -58,7 +58,7 @@ protected:
     class Name: public LineEditSetting, public ProfileGroupParam {
     public:
         Name(const ProfileGroup& parent): ProfileGroupParam(parent, "name") {
-            setLabel("Profile Group Name");
+            setLabel(QObject::tr("Profile Group Name"));
         };
     };
 
@@ -66,7 +66,7 @@ protected:
     public:
         HostName(const ProfileGroup& parent):
             ProfileGroupParam(parent, "hostname") {
-            setLabel("Hostname");
+            setLabel(QObject::tr("Hostname"));
         };
         void fillSelections(QSqlDatabase *db);
     };
@@ -75,7 +75,7 @@ protected:
     public:
         CardInfo(const ProfileGroup& parent):
             ProfileGroupParam(parent, "cardtype") {
-            setLabel("Card-Type");
+            setLabel(QObject::tr("Card-Type"));
         };
     };
 

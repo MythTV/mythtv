@@ -18,7 +18,7 @@
 
 ChannelWizard::ChannelWizard(int id, QSqlDatabase* _db)
              : ConfigurationWizard(), db(_db) {
-    setLabel("Channel Options");
+    setLabel(QObject::tr("Channel Options"));
 
     // Must be first.
     addChild(cid = new ChannelID());
@@ -141,7 +141,7 @@ void ChannelListSetting::fillSelections(const QString& sourceid)
 class SourceSetting: public ComboBoxSetting {
 public:
     SourceSetting(): ComboBoxSetting() {
-        setLabel("Video Source");
+        setLabel(QObject::tr("Video Source"));
         addSelection("(All)","");
     };
 
@@ -160,7 +160,7 @@ public:
 class SortMode: public ComboBoxSetting, public TransientStorage {
 public:
     SortMode(): ComboBoxSetting() {
-        setLabel("Sort Mode");
+        setLabel(QObject::tr("Sort Mode"));
         addSelection("Channel Name");
         addSelection("Channel Number");
     };
@@ -169,14 +169,14 @@ public:
 class NoChanNumHide: public CheckBoxSetting, public TransientStorage {
 public:
     NoChanNumHide() {
-        setLabel("Hide channels without channel number.");
+        setLabel(QObject::tr("Hide channels without channel number."));
     };
 };
 
 ChannelEditor::ChannelEditor():
     VerticalConfigurationGroup(), ConfigurationDialog() {
 
-    setLabel("Channels");
+    setLabel(tr("Channels"));
     addChild(list = new ChannelListSetting());
 
     SortMode* sort = new SortMode();
@@ -219,10 +219,10 @@ void ChannelEditor::edit(int /*iSelected*/) {
 
 void ChannelEditor::del() {
     int val = MythPopupBox::show2ButtonPopup(gContext->GetMainWindow(), "",
-                                             "Are you sure you would like to "
-                                             "delete this channel?", 
-                                             "Yes, delete the channel", 
-                                             "No, don't", 2);
+                                             tr("Are you sure you would like to"
+                                             " delete this channel?"), 
+                                             tr("Yes, delete the channel"), 
+                                             tr("No, don't"), 2);
 
     if (val == 0) {
         QSqlQuery query;
@@ -247,9 +247,9 @@ void ChannelEditor::menu(int /*iSelected*/) {
     } else {
         int val = MythPopupBox::show2ButtonPopup(gContext->GetMainWindow(),
                                                  "",
-                                                 "Channel Menu",
-                                                 "Edit..",
-                                                 "Delete..", 1);
+                                                 tr("Channel Menu"),
+                                                 tr("Edit.."),
+                                                 tr("Delete.."), 1);
 
         if (val == 0)
             emit edit();

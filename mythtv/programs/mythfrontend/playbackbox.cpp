@@ -1995,7 +1995,7 @@ void PlaybackBox::showIconHelp(void)
     UIImageType *itype;
     bool displayme = false;
 
-    label = iconhelp->addLabel("Status Icons", MythPopupBox::Large,
+    label = iconhelp->addLabel(tr("Status Icons"), MythPopupBox::Large,
                                false);
 
     label->setAlignment(Qt::AlignCenter | Qt::WordBreak);
@@ -2003,7 +2003,7 @@ void PlaybackBox::showIconHelp(void)
     itype = (UIImageType *)container->GetType("commflagged");
     if (itype)
     {
-        label = new QLabel("Commercials are flagged", iconhelp);
+        label = new QLabel(tr("Commercials are flagged"), iconhelp);
         label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
         label->setBackgroundOrigin(ParentOrigin);
         label->setPaletteForegroundColor(popupForeground);
@@ -2025,7 +2025,7 @@ void PlaybackBox::showIconHelp(void)
     itype = (UIImageType *)container->GetType("cutlist");
     if (itype)
     {
-        label = new QLabel("An editing cutlist is present", iconhelp);
+        label = new QLabel(tr("An editing cutlist is present"), iconhelp);
         label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
         label->setBackgroundOrigin(ParentOrigin);
         label->setPaletteForegroundColor(popupForeground);
@@ -2047,7 +2047,7 @@ void PlaybackBox::showIconHelp(void)
     itype = (UIImageType *)container->GetType("autoexpire");
     if (itype)
     {
-        label = new QLabel("The program is able to auto-expire", iconhelp);
+        label = new QLabel(tr("The program is able to auto-expire"), iconhelp);
         label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
         label->setBackgroundOrigin(ParentOrigin);
         label->setPaletteForegroundColor(popupForeground);
@@ -2069,7 +2069,7 @@ void PlaybackBox::showIconHelp(void)
     itype = (UIImageType *)container->GetType("processing");
     if (itype)
     {
-        label = new QLabel("Commercials are being flagged", iconhelp);
+        label = new QLabel(tr("Commercials are being flagged"), iconhelp);
         label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
         label->setBackgroundOrigin(ParentOrigin);
         label->setPaletteForegroundColor(popupForeground);
@@ -2091,7 +2091,7 @@ void PlaybackBox::showIconHelp(void)
     itype = (UIImageType *)container->GetType("bookmark");
     if (itype)
     {
-        label = new QLabel("A bookmark is set", iconhelp);
+        label = new QLabel(tr("A bookmark is set"), iconhelp);
         label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
         label->setBackgroundOrigin(ParentOrigin);
         label->setPaletteForegroundColor(popupForeground);
@@ -2124,7 +2124,7 @@ void PlaybackBox::showIconHelp(void)
 
     iconhelp->addLayout(grid);
 
-    QButton *button = iconhelp->addButton("Ok");
+    QButton *button = iconhelp->addButton(tr("Ok"));
     button->setFocus();
 
     iconhelp->ExecPopup();

@@ -272,12 +272,12 @@ class TryUnflaggedSkip: public CheckBoxSetting, public GlobalSetting {
 public:
     TryUnflaggedSkip():
         GlobalSetting("TryUnflaggedSkip") {
-        setLabel("Skip Unflagged Commercials");
+        setLabel(QObject::tr("Skip Unflagged Commercials"));
         setValue(false);
-        setHelpText("Try to skip commercial breaks even if they have not "
-                    "been flagged.  This does not always work well and can "
-                    "disrupt playback if commercial breaks aren't detected "
-                    "properly.");
+        setHelpText(QObject::tr("Try to skip commercial breaks even if they "
+                    "have not been flagged.  This does not always work well "
+                    "and can disrupt playback if commercial breaks aren't "
+                    "detected properly."));
     };
 };
 
@@ -387,6 +387,8 @@ public:
         BackendSetting("RecordPreRoll") {
         setLabel(QObject::tr("Time to record before start of show "
                  "(in seconds)"));
+        setHelpText(QObject::tr("This global setting is ignored in case of "
+                    "conflicts with other scheduled programs."));
         setValue(0);
     };
 };
@@ -398,6 +400,8 @@ public:
         BackendSetting("RecordOverTime") {
         setLabel(QObject::tr("Time to record past end of show (in seconds)"));
         setValue(0);
+        setHelpText(QObject::tr("This global setting is ignored in case of "
+                    "conflicts with other scheduled programs."));
     };
 };
 
@@ -1693,7 +1697,7 @@ AppearanceSettings::AppearanceSettings()
     addChild(dates);
 
     VerticalConfigurationGroup* qttheme = new VerticalConfigurationGroup(false);
-    qttheme->setLabel("QT");
+    qttheme->setLabel(QObject::tr("QT"));
     qttheme->addChild(new QtFontSmall());
     qttheme->addChild(new QtFontMedium());
     qttheme->addChild(new QtFontBig());
@@ -1706,7 +1710,7 @@ XboxSettings::XboxSettings()
 {
     VerticalConfigurationGroup* xboxset = new VerticalConfigurationGroup(false);
 
-    xboxset->setLabel("Xbox");
+    xboxset->setLabel(QObject::tr("Xbox"));
     xboxset->addChild(new XboxBlinkBIN());
     xboxset->addChild(new XboxLEDDefault());
     xboxset->addChild(new XboxLEDRecording());

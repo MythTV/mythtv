@@ -335,19 +335,22 @@ void CaptureCard::loadByID(QSqlDatabase* db, int cardid) {
 CardType::CardType(const CaptureCard& parent)
         : CCSetting(parent, "cardtype") 
 {
-    setLabel("Card type");
-    setHelpText("Change the cardtype to the appropriate type for the capture "
-                "card you are configuring.");
+    setLabel(QObject::tr("Card type"));
+    setHelpText(QObject::tr("Change the cardtype to the appropriate type for "
+                "the capture card you are configuring."));
     fillSelections(this);
 }
 
 void CardType::fillSelections(SelectSetting* setting)
 {
-    setting->addSelection("Standard V4L capture card", "V4L");
-    setting->addSelection("MJPEG capture card (Matrox G200, DC10)", "MJPEG");
-    setting->addSelection("MPEG-2 Encoder card (PVR-250, PVR-350)", "MPEG");
-    setting->addSelection("pcHDTV ATSC capture card", "HDTV");
-    setting->addSelection("Digital Video Broadcast card (DVB)", "DVB");
+    setting->addSelection(QObject::tr("Standard V4L capture card"), "V4L");
+    setting->addSelection(QObject::tr("MJPEG capture card (Matrox G200, DC10)"),
+                          "MJPEG");
+    setting->addSelection(QObject::tr("MPEG-2 Encoder card (PVR-250, PVR-350)"),
+                          "MPEG");
+    setting->addSelection(QObject::tr("pcHDTV ATSC capture card"), "HDTV");
+    setting->addSelection(QObject::tr("Digital Video Broadcast card (DVB)"), 
+                          "DVB");
 }
 
 void CardInput::loadByID(QSqlDatabase* db, int inputid) {
@@ -403,7 +406,7 @@ int CaptureCardEditor::exec(QSqlDatabase* db) {
 
 void CaptureCardEditor::load(QSqlDatabase* db) {
     clearSelections();
-    addSelection("(New capture card)", "0");
+    addSelection(QObject::tr("(New capture card)"), "0");
     CaptureCard::fillSelections(db, this);
 }
 
@@ -416,7 +419,7 @@ int VideoSourceEditor::exec(QSqlDatabase* db) {
 
 void VideoSourceEditor::load(QSqlDatabase* db) {
     clearSelections();
-    addSelection("(New video source)", "0");
+    addSelection(QObject::tr("(New video source)"), "0");
     VideoSource::fillSelections(db, this);
 }
 
@@ -534,12 +537,12 @@ QStringList VideoDevice::probeInputs(QString device) {
     }
 
     if (ret.size() == 0)
-        ret += "ERROR, No inputs found";
+        ret += QObject::tr("ERROR, No inputs found");
 
     close(videofd);
 
 #else
-    ret += "ERROR, V4L support unavailable on Windows";
+    ret += QObject::tr("ERROR, V4L support unavailable on Windows");
 #endif
 
     return ret;
@@ -624,12 +627,12 @@ public:
             MythContext::DBError("VideoSource", query);
 
         if (query.numRowsAffected() > 0) {
-            addSelection("[All VideoSources]", "ALL");
+            addSelection(QObject::tr("[All VideoSources]"), "ALL");
             while(query.next())
                 addSelection(query.value(0).toString(),
                               query.value(1).toString());
         } else
-            addSelection("[No VideoSources Defined]", "0");
+            addSelection(QObject::tr("[No VideoSources Defined]"), "0");
     };
 
 private:
@@ -656,25 +659,26 @@ void DVBChannels::fillSelections(const QString& videoSource)
             addSelection(query.value(0).toString(),
                          query.value(1).toString());
     } else
-        addSelection("[No Channels Defined]", "0");
+        addSelection(QObject::tr("[No Channels Defined]"), "0");
 }
 
 class DVBLoadTuneButton: public ButtonSetting, public TransientStorage {
 public:
     DVBLoadTuneButton() {
-        setLabel("Load & Tune");
-        setHelpText("Will load the selected channel above into the previous"
-                    " screen, and try to tune it. If it fails to tune the"
-                    " channel, press back and check the settings.");
+        setLabel(QObject::tr("Load & Tune"));
+        setHelpText(QObject::tr("Will load the selected channel above into "
+                    "the previous screen, and try to tune it. If it fails to "
+                    "tune the channel, press back and check the settings."));
     };
 };
 
 class DVBTuneOnlyButton: public ButtonSetting, public TransientStorage {
 public:
     DVBTuneOnlyButton() {
-        setLabel("Tune Only");
-        setHelpText("Will ONLY try to tune the previous screen, not alter it."
-                    " If it fails to tune, press back and check the settings.");
+        setLabel(QObject::tr("Tune Only"));
+        setHelpText(QObject::tr("Will ONLY try to tune the previous screen, "
+                    "not alter it. If it fails to tune, press back and check "
+                    "the settings."));
     };
 };
 
@@ -705,7 +709,7 @@ DVBCardVerificationWizard::DVBCardVerificationWizard(int cardNum) {
     addChild(dvbopts = new DVBSignalChannelOptions(cid));
 
     VerticalConfigurationGroup* testGroup = new VerticalConfigurationGroup(false,true);
-    testGroup->setLabel(QString("Card Verification Wizard (DVB#%1)").arg(cardNum));
+    testGroup->setLabel(QObject::tr("Card Verification Wizard (DVB#") + QString("%1)").arg(cardNum));
     testGroup->setUseLabel(false);
 
     DVBVideoSource* source;
@@ -718,8 +722,8 @@ DVBCardVerificationWizard::DVBCardVerificationWizard(int cardNum) {
     testGroup->addChild(ss);
 
     HorizontalConfigurationGroup* lblGroup = new HorizontalConfigurationGroup(false,true);
-    DVBInfoLabel* ber = new DVBInfoLabel("Bit Error Rate");
-    DVBInfoLabel* un  = new DVBInfoLabel("Uncorrected Blocks");
+    DVBInfoLabel* ber = new DVBInfoLabel(QObject::tr("Bit Error Rate"));
+    DVBInfoLabel* un  = new DVBInfoLabel(QObject::tr("Uncorrected Blocks"));
     lblGroup->addChild(ber);
     lblGroup->addChild(un);
     testGroup->addChild(lblGroup);
@@ -736,8 +740,8 @@ DVBCardVerificationWizard::DVBCardVerificationWizard(int cardNum) {
     btnGroup->addChild(tuneonly);
     testGroup->addChild(btnGroup);
 
-    sn->setLabel("Signal/Noise");
-    ss->setLabel("Signal Strength");
+    sn->setLabel(QObject::tr("Signal/Noise"));
+    ss->setLabel(QObject::tr("Signal Strength"));
 
     addChild(testGroup);
 
@@ -764,7 +768,7 @@ void DVBCardVerificationWizard::tuneConfigscreen() {
 
     if (!chan->Open())
     {
-        setLabel("FAILED TO OPEN CARD, CHECK CONSOLE!!");
+        setLabel(QObject::tr("FAILED TO OPEN CARD, CHECK CONSOLE!!"));
         return;
     }
 
@@ -813,7 +817,7 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent):
     setUseLabel(false);
 
     advcfg = new TransButtonSetting();
-    advcfg->setLabel("Advanced Configuration");
+    advcfg->setLabel(QObject::tr("Advanced Configuration"));
 
     DVBCardNum* cardnum = new DVBCardNum(parent);
     cardname = new DVBCardName();
