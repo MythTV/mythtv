@@ -234,6 +234,8 @@ bool VideoOutput::Init(int width, int height, float aspect, unsigned int winid,
     img_xoff = gContext->GetNumSetting("xScanDisplacement", 0);
     img_yoff = gContext->GetNumSetting("yScanDisplacement", 0);
 
+    PIPLocation = gContext->GetNumSetting("PIPLocation", 0);
+
     if (VertScanMode == "underscan")
     {
         img_vscanf = 0 - img_vscanf;
@@ -742,9 +744,29 @@ void VideoOutput::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
     if (!pipimage || !pipimage->buf || pipimage->codec != FMT_YV12)
         return;
 
-    int xoff = 50;
-    int yoff = 50;
+    int xoff;
+    int yoff;
 
+    switch (PIPLocation)
+    {
+        default:
+        case kPIPTopLeft:
+                xoff = 30;
+                yoff = 40;
+                break;
+        case kPIPBottomLeft:
+                xoff = 30;
+                yoff = frame->height - piph - 40;
+                break;
+        case kPIPTopRight:
+                xoff = frame->width - pipw - 30;
+                yoff = 40;
+                break;
+        case kPIPBottomRight:
+                xoff = frame->width - pipw - 30;
+                yoff = frame->height - piph - 40;
+                break;
+    }
 
     for (int i = 0; i < piph; i++)
     {

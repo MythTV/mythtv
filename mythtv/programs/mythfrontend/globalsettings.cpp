@@ -152,6 +152,19 @@ public:
     };
 };
 
+class PIPLocation: public ComboBoxSetting, public GlobalSetting {
+public:
+    PIPLocation():
+        GlobalSetting("PIPLocation") {
+        setLabel(QObject::tr("PIP Video Location"));
+        addSelection(QObject::tr("Top Left"), "0");
+        addSelection(QObject::tr("Bottom Left"), "1");
+        addSelection(QObject::tr("Top Right"), "2");
+        addSelection(QObject::tr("Bottom Right"), "3");
+        setHelpText(QObject::tr("Location of PIP Video window."));
+    };
+};
+
 class JumpAmount: public SpinBoxSetting, public GlobalSetting {
 public:
     JumpAmount():
@@ -1362,6 +1375,7 @@ PlaybackSettings::PlaybackSettings()
     general->addChild(new ReduceJitter());
     general->addChild(new ExperimentalSync());
     general->addChild(new DecodeExtraAudio());
+    general->addChild(new PIPLocation());
     addChild(general);
 
     VerticalConfigurationGroup* gen2 = new VerticalConfigurationGroup(false);

@@ -31,6 +31,14 @@ enum PictureAttribute
     kPictureAttribute_Hue
 };
 
+enum PIPLocations
+{
+    kPIPTopLeft = 0,
+    kPIPBottomLeft,
+    kPIPTopRight,
+    kPIPBottomRight
+};
+
 class VideoOutput
 {
   public:
@@ -142,6 +150,8 @@ class VideoOutput
     int numbuffers;
 
     int letterbox;
+
+    int PIPLocation;
 
     VideoFrame *vbuffers;
 
