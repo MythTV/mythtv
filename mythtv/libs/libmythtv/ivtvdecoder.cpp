@@ -290,7 +290,7 @@ int IvtvDecoder::MpegPreProcessPkt(unsigned char *buf, int start, int len,
                                 positionMapType = MARK_GOP_BYFRAME;
 
                             gopset = true;
-                            m_parent->SetVideoParams(-1, -1, -1, keyframedist);
+                            m_parent->SetKeyframeDistance(keyframedist);
                             VERBOSE(VB_PLAYBACK,
                                     QString("keyframedist changed to %1")
                                     .arg(keyframedist));

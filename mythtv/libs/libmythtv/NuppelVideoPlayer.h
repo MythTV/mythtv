@@ -154,6 +154,7 @@ class NuppelVideoPlayer
     // decoder stuff..
     void ForceVideoOutputType(VideoOutputType type);
 
+    void SetKeyframeDistance(int keyframedistance);
     void SetVideoParams(int width, int height, double fps,
                         int keyframedistance, float aspect = 1.33333,
                         FrameScanType scan = kScan_Ignore, bool reinit = false);
@@ -467,6 +468,8 @@ class NuppelVideoPlayer
     QMutex videofiltersLock;
 
     bool errored;
+
+    int m_DeintSetting;
 };
 
 #endif

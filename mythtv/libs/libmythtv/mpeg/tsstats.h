@@ -22,11 +22,11 @@ class TSStats
 
 inline QString TSStats::toString() {
     QString str("Transport Stream Statistics\n");
-    str.append(QString("TSPacket Count: %1").arg(_tspacket_count));
+    str.append(QString("TSPacket Count: %1").arg((long)_tspacket_count));
     QMapIterator<int, long long> it = _pid_counts.begin();
     for (; it != _pid_counts.end(); it++)
         str.append(QString("\nPID 0x%1 Count: %2").
-                   arg((int)it.key(),0,16).arg((long long)it.data(),10,10));
+                   arg((int)it.key(),0,16).arg((long)it.data(),10,10));
     return str;
 }
 

@@ -903,8 +903,7 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
                     positionMapType = MARK_GOP_BYFRAME;
 
                 VERBOSE(VB_PLAYBACK, QString("Stream initial keyframedist: %1.").arg(keyframedist));
-                m_parent->SetVideoParams(-1, -1, -1, keyframedist,
-                                         current_aspect);
+                m_parent->SetKeyframeDistance(keyframedist);
             }
         }
         else
@@ -922,8 +921,8 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
                 else
                     positionMapType = MARK_GOP_BYFRAME;
 
-                m_parent->SetVideoParams(-1, -1, -1, keyframedist,
-                                         current_aspect);
+                m_parent->SetKeyframeDistance(keyframedist);
+
                 // also reset length
                 long long index = m_positionMap[m_positionMap.size() - 1].index;
                 long long totframes = index * keyframedist;

@@ -170,6 +170,8 @@ NuppelVideoPlayer::NuppelVideoPlayer(MythSqlDatabase *ldb,
     commrewindamount = gContext->GetNumSetting("CommRewindAmount",0);
     commnotifyamount = gContext->GetNumSetting("CommNotifyAmount",0);
 
+    m_DeintSetting = gContext->GetNumSetting("Deinterlace", 0);
+
     timedisplay = NULL;
     seekamount = 30;
     seekamountpos = 4;
@@ -501,6 +503,11 @@ FrameScanType NuppelVideoPlayer::detectInterlace(FrameScanType newScan,
     return scan;
 }
 
+void NuppelVideoPlayer::SetKeyframeDistance(int keyframedistance)
+{
+    if (keyframedistance > 0)
+        keyframedist = keyframedistance;
+}
 
 void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps,
                                        int keyframedistance, float aspect,
@@ -534,8 +541,7 @@ void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps,
     m_double_framerate = false;
     if (videoOutput)
         videoOutput->SetupDeinterlace(false);
-    if (m_scan == kScan_Interlaced &&
-        gContext->GetNumSetting("Deinterlace")) {
+    if (m_scan == kScan_Interlaced && m_DeintSetting) {
         if (videoOutput && videoOutput->SetupDeinterlace(true)) {
             if (videoOutput->NeedsDoubleFramerate())
                 m_double_framerate = true;
@@ -1480,8 +1486,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
     {
         // Set up deinterlacing in the video output method
         m_double_framerate = false;
-        if (m_scan == kScan_Interlaced &&
-            gContext->GetNumSetting("Deinterlace")) {
+        if (m_scan == kScan_Interlaced && m_DeintSetting) {
             if (videoOutput && videoOutput->SetupDeinterlace(true)) {
                 if (videoOutput->NeedsDoubleFramerate())
                     m_double_framerate = true;
