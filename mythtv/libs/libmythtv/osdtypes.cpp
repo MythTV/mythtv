@@ -162,6 +162,8 @@ OSDTypeText::OSDTypeText(const QString &name, TTFFont *font,
     m_multiline = false;
     m_centered = false;
     m_outline = true;
+
+    m_color = COL_WHITE;
 }
 
 OSDTypeText::~OSDTypeText()
@@ -278,20 +280,20 @@ void OSDTypeText::DrawString(unsigned char *screenptr, int vid_width,
     if (m_outline)
     {
         m_font->DrawString(screenptr, x - 1, y - 1, text, maxx, maxy, alphamod, 
-                         false, false);
+                           COL_BLACK, false);
 
         m_font->DrawString(screenptr, x + 1, y - 1, text, maxx, maxy, alphamod,
-                         false, false);
+                           COL_BLACK, false);
 
         m_font->DrawString(screenptr, x - 1, y + 1, text, maxx, maxy, alphamod,
-                         false, false);
+                           COL_BLACK, false);
 
         m_font->DrawString(screenptr, x + 1, y + 1, text, maxx, maxy, alphamod,
-                         false, false);
+                           COL_BLACK, false);
     }
 
-    m_font->DrawString(screenptr, x, y, text, maxx, maxy, alphamod, true,
-                     false);
+    m_font->DrawString(screenptr, x, y, text, maxx, maxy, alphamod, m_color,
+                       false);
 } 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

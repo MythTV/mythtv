@@ -120,6 +120,9 @@ class OSDTypeText : public OSDType
 
     QRect DisplayArea() { return m_displaysize; }
 
+    void SetColor(int color) { m_color = color; }
+    int GetColor() { return m_color; }
+
     void Draw(unsigned char *screenptr, int vid_width, int vid_height,
               int fade, int maxfade, int xoff, int yoff);
 
@@ -136,6 +139,8 @@ class OSDTypeText : public OSDType
     bool m_outline;
     bool m_centered;
     bool m_multiline;
+
+    int m_color;
 };
     
 class OSDTypeImage : public OSDType

@@ -2015,6 +2015,15 @@ void NuppelVideoPlayer::UpdateTimeDisplay(void)
 
         osd->SetVisible(timedisplay, -1);
     }
+
+    if (IsInDelete())
+    {
+        osd->ShowText("deletemarker", "cut", video_width / 8, 
+                      video_height / 16, video_width / 2, 
+                      video_height / 8, -1, 2);
+    }
+    else
+        osd->HideText("deletemarker");
 }
 
 void NuppelVideoPlayer::HandleSelect(void)
@@ -2173,6 +2182,50 @@ void NuppelVideoPlayer::HandleArbSeek(bool right)
     }
 
     UpdateEditSlider();
+}
+
+bool NuppelVideoPlayer::IsInDelete(void)
+{
+    long long startpos = 0;
+    long long endpos = 0;
+    bool first = true;
+    bool indelete = false;
+    bool ret = false;
+
+    QMap<long long, int>::Iterator i = deleteMap.begin();
+    for (; i != deleteMap.end(); ++i)
+    {
+        if (ret)
+            break;
+
+        long long frame = i.key();
+        int direction = i.data();
+
+        if (direction == 0 && !indelete && first)
+        {
+            startpos = 0;
+            endpos = frame;
+            first = false;
+            if (startpos <= framesPlayed && endpos >= framesPlayed)
+                ret = true;
+        }
+        else if (direction == 0)
+        {
+            endpos = frame;
+            indelete = false;
+            first = false;
+            if (startpos <= framesPlayed && endpos >= framesPlayed)
+                ret = true;
+        }
+        else if (direction == 1 && !indelete)
+        {
+            startpos = frame;
+            indelete = true;
+            first = false;
+        }
+    }
+
+    return ret;
 }
 
 char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,

@@ -161,6 +161,7 @@ class NuppelVideoPlayer
     void HandleSelect(void);
     void HandleResponse(void);
     void HandleArbSeek(bool right);
+    bool IsInDelete(void);
 
     int audiofd;
 

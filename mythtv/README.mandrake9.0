@@ -1,0 +1,217 @@
+Installing mythtv on Mandrake 9.0
+Robert Kulagowski, rkulagow@rocketmail.com
+2002-11-04, v1.00
+
+o  Introduction.
+
+Installing on Mandrake 9.0 is made fairmly simple since a lot of the
+prerequisites are already packaged.  This README focuses mainly on getting
+mythtv operational in North America.  Other sections will be added once I
+get interested in mythweb, etc.
+
+o  Checking prerequisites.
+
+Make sure that you've got perl-5.8, mysql, gcc, freetype2-devel and qt-devel
+installed on your system.  You can do this by clicking
+K->Configuration->Packaging->KPackage
+
+There are many inter-related modules, so make sure that you've got the main
+package for each one, and not a sub package for an unrelated item.  For
+example, there are many modules that have "perl" in them, some are a part of
+the apache webserver, others are a part of the perl distribution.  In each
+case, we're looking to make sure that the primary module is getting
+installed.
+
+Click the magnifying glass or press CTRL-F and enter "perl" as your search
+term.  You should find it under the "Perl" folder.  You need at least the
+perl 5.80 base package installed.  If not, click on the "Mark" button.
+
+Next, search for mysql - it should be under "Databases".  Make sure that
+mysql
+and mysql-clients are installed.  If not, click on "Mark".
+
+Search for gcc.  You're going to need gcc and gcc-c++ installed.
+
+Search for freetype2.  Make sure that you've got freetype2 and
+freetype2-devel installed.
+
+Finally, check for qt.  You'll need libqt3-devel (under folder "KDE and
+Qt") and libqt3 ("Libraries").
+
+If you marked anything to install, click on Install Marked.  Click "Yes" or
+OK if you get a message about satisfying dependencies.
+
+o  Setting up paths and ldconfig
+
+There are some paths that need to be modified before starting the main
+compile of mythtv.  It's best to get them out of the way first.
+
+As root, create the following file in /etc/profile.d.  On my system I call
+it "mythtv.sh".
+
+Open a shell, and switch to superuser mode.
+NOTE: ^D means press CTRL and d at the same time.
+
+% su -
+# cd /etc/profile.d
+cat > mythtv.sh
+export QTDIR=/usr/lib/qt3
+export PATH=$PATH:/usr/lib/qt3/bin
+^D
+
+# chmod a+x mythtv.sh
+# exit
+% exit
+
+The last two commands are to exit out of the shell.  This way, when you next
+open a shell your new commands will take effect.
+
+Open a shell and switch to superuser mode again.
+
+% su -
+# set
+
+You should see QTDIR and the path changes you made.
+
+Next, we need to make sure that the libraries that we're building will be
+found when we need them.
+
+Switch to /etc and execute the following:
+
+# cd /etc
+# cat >> ld.so.conf
+/usr/local/lib
+^D
+
+# ldconfig
+# exit
+%
+
+o  Downloading and compiling.
+
+Get mythtv from the mythtv.org website.  Save the tarball to a directory you
+can find.
+
+Get XMLTV from http://xmltv.sourceforge.net.  Download version 0.5.2
+
+Get lame from http://www.mp3dev.org/mp3.  Download the sourcecode to v3.92
+by following the links to sourceforge.net
+
+Build LAME first.
+
+Open a shell and switch to the directory where you saved lame.
+
+% tar -xzf lame-3.92.tar.gz
+% cd lame-3.92
+% ./configure
+% make
+% su -
+
+Switch to the directory where you unpacked lame
+
+# cd /home/[yourusername]/lame-3.92
+# make install
+
+Check that it worked:
+
+# ls -l /usr/local/lib
+-rw-r--r--    1 root     root       381706 Nov  4 14:22 libmp3lame.a
+-rwxr-xr-x    1 root     root          674 Nov  4 14:22 libmp3lame.la*
+lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so ->
+libmp3lame.so.0.0.0*
+lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so.0 ->
+libmp3lame.so.0.0.0*
+-rwxr-xr-x    1 root     root       360197 Nov  4 14:22 libmp3lame.so.0.0.0*
+
+# exit
+%
+
+Untar the xmltv file:
+
+% tar -xjf xmltv-0.5.2.tar.bz2
+% cd xmltv-0.5.2
+
+Install the xmltv prerequisites:
+
+% su -
+# perl -MCPAN -e shell
+
+Check to see which version of TWIG is being offered by CPAN.  If it's 3.08,
+we need to download it from the author's webiste, because 3.08 has a problem
+with perl 5.8. As of 2002-11-02:
+
+cpan> i /TWIG/
+Author          STWIGGER ("Simon Twigger" <simont@mcw.edu>)
+Distribution    M/MI/MIROD/XML-Twig-3.08.tar.gz
+Module          XML::Twig       (M/MI/MIROD/XML-Twig-3.08.tar.gz)
+3 items found
+
+cpan>
+
+This means that we need to do something a little different later on.  If
+it's 3.09 or better, then execute:
+
+cpan> install XML::Twig
+
+and then the rest of the commands (no matter what the TWIG version was):
+
+cpan> install Date::Manip
+Date::Manip is up to date.
+cpan> install LWP
+cpan> install XML::Writer
+cpan> exit
+
+Download the 3.09 version of XMLTWIG from http://www.xmltwig.com/xmltwig/
+
+% tar -xzf XML-Twig-3.09.tar.gz
+% cd XML-Twig-3.09
+% perl Makefile.PL
+% make
+% make test
+% su -
+# cd /home/[yourusername]/XML-Twig-3.09
+# make install
+# exit
+
+Change to the XMLTV directory and compile it:
+% cd xmltv-0.5.2
+% perl Makefile.PL
+
+You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes" to
+the grabber required for your location.
+
+You may get errors about modules not being installed.  They shouldn't
+matter if you're installing North America and have followed the instructions
+to this point.
+
+% make
+% make test
+% su -
+% cd /home/[yourusername]/xmltv-0.5.2
+# make install
+# exit
+
+Unpack mythtv
+
+% tar -xjf mythtv-0.6.tar.bz2
+% cd mythtv-0.6
+% ./configure
+% make
+
+Change to superuser:
+% su -
+# cd /home/[yourusername]/mythtv-0.6
+# make install
+# exit
+
+Make sure that mysql is running and started at boot.  Click on Mandrake
+Control Center->System->Services
+
+Setup the initial mysql databases:
+
+% cd database
+% mysql -u root < mc.sql
+
+That's it.  Now, you can just follow the rest of the README and continue
+from there.
+

@@ -51,7 +51,8 @@ class OSD
     bool Visible(void);
 
     OSDSet *ShowText(const QString &name, const QString &message, int xpos,
-                     int ypos, int width, int height, int secs);
+                     int ypos, int width, int height, int secs, int color = 1);
+    void HideText(const QString &name);
 
     void ShowEditArrow(long long number, long long totalframes, int type);
     void HideEditArrow(long long number);

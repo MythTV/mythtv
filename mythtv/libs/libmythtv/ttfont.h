@@ -7,6 +7,10 @@
 
 #include <qstring.h>
 
+#define COL_BLACK 0
+#define COL_WHITE 1
+#define COL_RED   2
+
 struct Raster_Map;
 
 class TTFFont
@@ -18,8 +22,8 @@ class TTFFont
      bool isValid(void) { return valid; }
 
      void DrawString(unsigned char *yuvptr, int x, int y, const QString &text,
-                     int maxx, int maxy, int alphamod = 255, bool white = true, 
-                     bool rightjustify = false); 
+                     int maxx, int maxy, int alphamod = 255, 
+                     int color = COL_WHITE, bool rightjustify = false); 
      void CalcWidth(const QString &text, int *width_return);
 
      int SpaceWidth() { return spacewidth; }
@@ -35,7 +39,7 @@ class TTFFont
                       int *xorblah, int *yor);
      void merge_text(unsigned char *yuv, Raster_Map *rmap, int offset_x, 
                      int offset_y, int xstart, int ystart, int width, 
-                     int height, int video_width, int video_height, bool white,
+                     int height, int video_width, int video_height, int color,
                      int alphamod);
 
      bool         valid;

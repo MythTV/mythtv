@@ -944,7 +944,7 @@ void OSD::HideEditArrow(long long number)
 }
 
 OSDSet *OSD::ShowText(const QString &name, const QString &message, int xpos,
-                      int ypos, int width, int height, int secs)
+                      int ypos, int width, int height, int secs, int color)
 {
     pthread_mutex_lock(&osdlock);
 
@@ -980,16 +980,33 @@ OSDSet *OSD::ShowText(const QString &name, const QString &message, int xpos,
     QRect rect = QRect(xpos, ypos, width, height); 
     OSDTypeText *text = new OSDTypeText("message", font, message, rect);
     text->SetMultiLine(true);
+    text->SetColor(color);
     set->AddType(text);
 
     if (secs > 0)
         set->DisplayFor(secs * fps);
     else
+    {
+        set->SetAllowFade(false);
         set->Display();
+    }
+
     m_setsvisible = true;
 
     pthread_mutex_unlock(&osdlock);
     return set;
+}
+
+void OSD::HideText(const QString &name)
+{
+    pthread_mutex_lock(&osdlock);
+
+    OSDSet *set = GetSet(name);
+    if (set)
+    {
+        set->Hide();
+    }
+    pthread_mutex_unlock(&osdlock);
 }
 
 void OSD::DoEditSlider(QMap<long long, int> deleteMap, long long curFrame,
@@ -1022,6 +1039,7 @@ void OSD::DoEditSlider(QMap<long long, int> deleteMap, long long curFrame,
                     startpos = 0;
                     endpos = frame * 1000 / totalFrames;
                     tes->SetRange(startpos, endpos);
+                    first = false;
                 }
                 else if (direction == 0)
                 {

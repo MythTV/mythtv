@@ -294,7 +294,7 @@ void TTFFont::render_text(Raster_Map *rmap, Raster_Map *rchr, char *text,
 void TTFFont::merge_text(unsigned char *yuv, Raster_Map * rmap, int offset_x, 
                          int offset_y, int xstart, int ystart, int width, 
                          int height, int video_width, int video_height, 
-                         bool white, int alphamod)
+                         int color, int alphamod)
 {
    int                 x, y;
    unsigned char      *ptr, *src;
@@ -302,6 +302,8 @@ void TTFFont::merge_text(unsigned char *yuv, Raster_Map * rmap, int offset_x,
 
    unsigned char *uptr, *usrc;
    unsigned char *vptr, *vsrc;
+ 
+   int ucol, vcol;
 
    uptr = yuv + video_height * video_width;
    vptr = uptr + (video_height * video_width) / 4;   
@@ -322,19 +324,27 @@ void TTFFont::merge_text(unsigned char *yuv, Raster_Map * rmap, int offset_x,
 	       {
                   a = ((a * alphamod) + 0x80) >> 8;
 		  src = yuv + (y + ystart) * video_width + (x + xstart);
-		  if (white)
+		  if (color != COL_BLACK)
                   {
                       tmp1 = (255 - *src) * a;
                       tmp2 = *src + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
                       *src = tmp2 & 0xff;
                       if (a >= 230)
                       {
-                          offset = ((y + ystart) / 2) * (video_width / 2) + 
-                                   (x + xstart) / 2;
+                          offset = ((y + ystart + 1) / 2) * (video_width / 2) + 
+                                   (x + xstart + 1) / 2;
                           usrc = uptr + offset; 
                           vsrc = vptr + offset; 
-                          *usrc = 128;
-                          *vsrc = 128;
+                          ucol = 128;
+                          vcol = 128;
+
+                          tmp1 = (ucol - *usrc) * a;
+                          tmp2 = *usrc + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
+                          *usrc = tmp2 & 0xff;
+
+                          tmp1 = (vcol - *vsrc) * a;
+                          tmp2 = *vsrc + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
+                          *vsrc = tmp2 & 0xff;
                       }
                   }
 		  else
@@ -351,7 +361,7 @@ void TTFFont::merge_text(unsigned char *yuv, Raster_Map * rmap, int offset_x,
 
 void TTFFont::DrawString(unsigned char *yuvptr, int x, int y, 
                          const QString &text, int maxx, int maxy, 
-                         int alphamod, bool white, bool rightjustify)
+                         int alphamod, int color, bool rightjustify)
 {
    int                  width, height, w, h, inx, iny, clipx, clipy;
    Raster_Map          *rmap, *rtmp;
@@ -423,7 +433,7 @@ void TTFFont::DrawString(unsigned char *yuvptr, int x, int y,
    }
 
    merge_text(yuvptr, rmap, clipx, clipy, x, y, width, height, 
-              video_width, video_height, white, alphamod);
+              video_width, video_height, color, alphamod);
 
    destroy_font_raster(rmap);
    destroy_font_raster(rtmp);
