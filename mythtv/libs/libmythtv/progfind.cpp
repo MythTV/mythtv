@@ -153,27 +153,69 @@ void ProgFinder::keyPressEvent(QKeyEvent *e)
     if (!allowkeypress)
         return;
 
-    switch (e->key())
+    bool handled = false;
+
+    QStringList actions;
+    gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e, actions);
+
+    for (unsigned int i = 0; i < actions.size(); i++)
     {
-        case Key_Left: case Key_A: cursorLeft(); break;
-        case Key_Right: case Key_D: cursorRight(); break;
-        case Key_Down: case Key_S: cursorDown(); break;
-        case Key_Up: case Key_W: cursorUp(); break;
+        QString action = actions[i];
 
-        case Key_I: case Key_Space:
-        case Key_Enter: case Key_Return: select(); break;
-
-        case Key_R: quickRecord(); break;
-
-        case Key_PageUp: case Key_3: pageUp(); break;
-        case Key_PageDown: case Key_9: pageDown(); break;
-
-        case Key_4: showGuide(); break;
-
-        case Key_C: case Key_M: case Key_Escape: escape(); break;
- 
-        default: MythDialog::keyPressEvent(e);
+        if (action == "UP")
+        {
+            cursorUp();
+            handled = true;
+        }
+        else if (action == "DOWN")
+        {
+            cursorDown();
+            handled = true;
+        }
+        else if (action == "LEFT")
+        {
+            cursorLeft();
+            handled = true;
+        }
+        else if (action == "RIGHT")
+        {
+            cursorRight();
+            handled = true;
+        }
+        else if (action == "PAGEUP")
+        {
+            pageUp();
+            handled = true;
+        }
+        else if (action == "PAGEDOWN")
+        {
+            pageDown();
+            handled = true;
+        }
+        else if (action == "SELECT" || action == "INFO")
+        {
+            select();
+            handled = true;
+        }
+        else if (action == "MENU" || action == "ESCAPE")
+        {
+            escape();
+            handled = true;
+        }
+        else if (action == "TOGGLERECORD")
+        {
+            quickRecord();
+            handled = true;
+        }
+        else if (action == "4")
+        {
+            showGuide();
+            handled = true;
+        }
     }
+
+    if (!handled)
+        MythDialog::keyPressEvent(e);
 }
 
 void ProgFinder::updateBackground(void)

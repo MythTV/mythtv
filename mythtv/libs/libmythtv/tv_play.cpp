@@ -57,6 +57,10 @@ void TV::InitKeys(void)
     REG_KEY("TV Frontend", "PAGEDOWN", "Page Down", "9");
     REG_KEY("TV Frontend", "DELETE", "Delete Program", "D");
     REG_KEY("TV Frontend", "PLAYBACK", "Play Program", "P");
+    REG_KEY("TV Frontend", "TOGGLERECORD", "Toggle recording status of current "
+            "program", "R");
+
+
 
     REG_KEY("TV Playback", "PAUSE", "Pause", "P");
     REG_KEY("TV Playback", "SEEKFFWD", "Fast Forward", "Right");
@@ -111,6 +115,8 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "HUEDOWN", "Decrease the recording hue", "F7");
     REG_KEY("TV Playback", "HUEUP", "Increase the recording hue", "F8");
     REG_KEY("TV Playback", "TOGGLEEDIT", "Start Edit Mode", "E");
+
+
 
     REG_KEY("TV Editing", "CLEARMAP", "Clear editing cut points", "C,Q,Home");
     REG_KEY("TV Editing", "LOADCOMMSKIP", "Load cut list from commercial skips",
