@@ -907,7 +907,8 @@ void MythDialog::Show(void)
 MythProgressDialog::MythProgressDialog(const QString &message, int totalSteps)
                   : MythDialog(NULL, 0, true)
 {
-    int yoff = screenheight / 3; int xoff = screenwidth / 10;
+    int yoff = screenheight / 3; 
+    int xoff = screenwidth / 10;
     setGeometry(xoff, yoff, screenwidth - xoff * 2, yoff);
     setFixedSize(QSize(screenwidth - xoff * 2, yoff));
 
@@ -936,13 +937,15 @@ MythProgressDialog::MythProgressDialog(const QString &message, int totalSteps)
     if (steps == 0)
         steps = 1;
   
+    reparent(NULL, WType_TopLevel | WStyle_Customize | WStyle_NoBorder |
+             (getWFlags() & 0xffff0000), QPoint(xoff, yoff));
+    raise();
+    show();
+    setActiveWindow();
 
-    Show();
     gContext->LCDswitchToChannel(message);
 
     qApp->processEvents();
-
-    setGeometry(xoff, yoff, screenwidth - xoff * 2, yoff);
 }
 
 void MythProgressDialog::Close(void)
