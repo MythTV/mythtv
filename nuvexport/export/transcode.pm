@@ -110,7 +110,8 @@ package export::transcode;
             $transcode .= " -i /tmp/fifodir_$$/vidout -p /tmp/fifodir_$$/audout"
                          .' -H 0 -x raw'
                          .' -g '.join('x', $episode->{'finfo'}{'width'}, $episode->{'finfo'}{'height'})
-                         .' -f '.$episode->{'finfo'}{'fps'}.',4'
+                         .' -f '.$episode->{'finfo'}{'fps'}.',' 
+                         . (($episode->{'finfo'}{'fps'} =~ /^2(?:5|4\.9)/) ? 3 : 4)
                          .' -n 0x1'
                          .' -e '.join(',', $episode->{'finfo'}{'audio_sample_rate'}, $episode->{'finfo'}{'audio_bits_per_sample'}, $episode->{'finfo'}{'audio_channels'})
                          ;
