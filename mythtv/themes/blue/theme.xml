@@ -98,6 +98,21 @@
     <offset>20,20</offset>
   </buttondef>
 
+  <buttondef name="VIDEO_MANAGER">
+    <image>mv-vmanager.png</image>
+    <offset>20,20</offset>
+  </buttondef>
+
+  <buttondef name="VIDEO_BROWSER">
+    <image>mv-vbrowser.png</image>
+    <offset>20,20</offset>
+  </buttondef>
+
+  <buttondef name="VIDEO_LIST">
+    <image>mv-vlist.png</image>
+    <offset>20,20</offset>
+  </buttondef>
+
   <buttondef name="GAME">
     <image>game.png</image>
     <offset>15,10</offset>
