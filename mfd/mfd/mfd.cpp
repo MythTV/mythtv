@@ -63,16 +63,6 @@ MFD::MFD(QSqlDatabase *ldb, int port, bool log_stdout, int logging_verbosity)
            
     
     //
-    //  Create the plugin manager, which will
-    //  automatically load the plugins
-    //
-    
-    plugin_manager = new MFDPluginManager(this);
-    connect(plugin_manager, SIGNAL(allPluginsLoaded(void)),
-            this, SLOT(registerMFDService(void)));
-    registerMFDService();
-    
-    //
     //  Create the server socket
     //
     
@@ -82,6 +72,16 @@ MFD::MFD(QSqlDatabase *ldb, int port, bool log_stdout, int logging_verbosity)
     connect(server_socket, SIGNAL(endConnect(MFDClientSocket *)),
             this, SLOT(endConnection(MFDClientSocket *)));
 
+    //
+    //  Create the plugin manager, which will
+    //  automatically load the plugins
+    //
+    
+    plugin_manager = new MFDPluginManager(this);
+    connect(plugin_manager, SIGNAL(allPluginsLoaded(void)),
+            this, SLOT(registerMFDService(void)));
+    registerMFDService();
+    
     
 }
 

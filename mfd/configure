@@ -11,6 +11,7 @@
 zeroconfig="yes"
 audio="yes"
 daapserver="yes"
+daapclient="yes"
 
 for opt do
   case "$opt" in
@@ -24,17 +25,23 @@ for opt do
   ;;
   --enable-daapserver) daapserver="yes"
   ;;
-  --disable-daapsever) daapserver="no"
+  --disable-daapserver) daapserver="no"
+  ;;
+  --enable-daapclient) daapclient="yes"
+  ;;
+  --disable-daapclient) daapclient="no"
   ;;
   --enable-all)
       zeroconfig="yes"
       audio="yes"
       daapserver="yes"
+      daapclient="yes"
   ;;
   --disable-all)
       zeroconfig="no"
       audio="no"
       daapserver="no"
+      daapclient="no"
   ;;
   esac
 done
@@ -134,6 +141,26 @@ fi
 
 if test "$daapserver" = "no" ; then
     echo "                daap server support: no"
+fi
+
+
+#
+#   daapclient
+#
+
+if test "$daapclient" = "yes" ; then
+    echo "                daap client support: yes"
+
+    #
+    #   Conditional build and link stuff for daap server
+    #
+
+    echo "SUBDIRS += ./mfd/plugins/daapclient "   >> ./config.pro
+
+fi
+
+if test "$daapserver" = "no" ; then
+    echo "                daap client support: no"
 fi
 
 

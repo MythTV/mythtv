@@ -1,0 +1,9 @@
+
+    The daapclient plugin looks for daap services, ignores ones running on
+the same host as this client, and keeps dynamically building a list of audio
+metadata that is available on the local network.
+
+    The point is that the metadata held by the mfd will always reflect all
+audio content available anywhere on the network (whether from other mfd's,
+or from anything else that happens to be serving it, e.g. iTunes).
+
