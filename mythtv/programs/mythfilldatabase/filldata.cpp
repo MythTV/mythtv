@@ -1272,6 +1272,11 @@ bool grabData(Source source, int offset)
         command.sprintf("nice -19 %s --days=4 --offset %d --config-file '%s' --output %s",
                         xmltv_grabber.ascii(), offset,
                         configfile.ascii(), filename.ascii());
+    else if (xmltv_grabber == "tv_grab_sn")
+        // Use fixed interval of 14 days for Swedish/Norwegian grabber
+        command.sprintf("nice -19 %s --days 14 --config-file '%s' --output %s",
+                        xmltv_grabber.ascii(), configfile.ascii(),
+                        filename.ascii());
     else
     {
         isNorthAmerica = true;
@@ -1351,6 +1356,16 @@ bool fillData(QValueList<Source> &sourcelist)
             if (!grabData(*it, -1))
                 ++failures;
         }
+        else if (xmltv_grabber == "tv_grab_sn")
+        {
+            // tv_grab_sn has problems grabbing one day at a time as the site
+            // (dagenstv.com) "wraps" the day-listings at 06:00am. This means
+            // that programs starting at 02:00am on jul 19 gets "grabbed" in
+            // the xmltv-file for jul 18, causing all sorts of trouble.
+            // The simple solution is to grab the full two weeks every time.
+            if (!grabData(*it, 0))
+                ++failures;
+        }
         else if (xmltv_grabber == "tv_grab_nz")
         {
 	    // tv_grab_nz only supports a 7-day "grab".
@@ -1387,8 +1402,7 @@ bool fillData(QValueList<Source> &sourcelist)
             }
         }
         else if (xmltv_grabber == "tv_grab_na" || 
-                 xmltv_grabber == "tv_grab_aus" ||
-                 xmltv_grabber == "tv_grab_sn")
+                 xmltv_grabber == "tv_grab_aus")
         {
             if (!grabData(*it, 1))
                 ++failures;
