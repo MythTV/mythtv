@@ -19,10 +19,6 @@
 #include "videoout_xvmc.h"
 #endif
 
-#ifdef USING_VIASLICE
-#include "videoout_viaslice.h"
-#endif
-
 #ifdef USING_DIRECTFB
 #include "videoout_directfb.h"
 #endif
@@ -55,11 +51,6 @@ VideoOutput *VideoOutput::InitVideoOut(VideoOutputType type)
 #ifdef USING_XVMC
     if (type == kVideoOutput_XvMC)
         return new VideoOutputXvMC();
-#endif
-
-#ifdef USING_VIASLICE
-    if (type == kVideoOutput_VIA)
-        return new VideoOutputVIA();
 #endif
 
 #ifdef USING_DIRECTFB

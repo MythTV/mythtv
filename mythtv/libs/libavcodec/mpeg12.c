@@ -80,11 +80,11 @@ extern void XVMC_pack_pblocks(MpegEncContext *s,int cbp);
 extern void XVMC_init_block(MpegEncContext *s);//set s->block
 #endif
 
-#ifdef HAVE_VIASLICE
-extern int VIA_field_start(MpegEncContext *s, AVCodecContext *avctx);
-extern int VIA_field_end(MpegEncContext *s);
-extern int VIA_decode_slice(MpegEncContext *s, int start_code, uint8_t *buffer,
-                            int buf_size);
+#ifdef HAVE_XVMC_VLD
+extern int XVMC_VLD_field_start(MpegEncContext *s, AVCodecContext *avctx);
+extern int XVMC_VLD_field_end(MpegEncContext *s);
+extern int XVMC_VLD_decode_slice(MpegEncContext *s, int start_code, 
+                                 uint8_t *buffer, int buf_size);
 #endif
 
 const enum PixelFormat pixfmt_yuv_420[]= {PIX_FMT_YUV420P,-1};
@@ -1896,7 +1896,7 @@ uint8_t old_permutation[64];
         if( avctx->pix_fmt == PIX_FMT_XVMC_MPEG2_IDCT )
             if( avctx->idct_algo == FF_IDCT_AUTO )
                 avctx->idct_algo = FF_IDCT_SIMPLE;
-        if( avctx->via_hwslice == 1)
+        if( avctx->xvmc_vld_hwslice == 1)
             avctx->idct_algo = FF_IDCT_LIBMPEG2MMX;
 
         //quantization matrixes may need reordering 
@@ -2247,9 +2247,9 @@ static int mpeg_field_start(MpegEncContext *s){
     if(s->avctx->xvmc_acceleration)
          XVMC_field_start(s,avctx);
 #endif
-#ifdef HAVE_VIASLICE
-      if(s->avctx->via_hwslice)
-        VIA_field_start(s, avctx);
+#ifdef HAVE_XVMC_VLD
+    if(s->avctx->xvmc_vld_hwslice)
+         XVMC_VLD_field_start(s, avctx);
 #endif
 
     return 0;
@@ -2279,9 +2279,9 @@ static int mpeg_decode_slice(Mpeg1Context *s1, int mb_y,
         return -1;
     }
 
-#ifdef HAVE_VIASLICE
-    if (s->avctx->via_hwslice){
-        int used = VIA_decode_slice(s, mb_y, *buf, buf_size);
+#ifdef HAVE_XVMC_VLD
+    if (s->avctx->xvmc_vld_hwslice){
+        int used = XVMC_VLD_decode_slice(s, mb_y, *buf, buf_size);
         if (used < 0)
             return DECODE_SLICE_ERROR;
         *buf += used - 1;
@@ -2499,9 +2499,9 @@ static int slice_end(AVCodecContext *avctx, AVFrame *pict)
     if(s->avctx->xvmc_acceleration)
         XVMC_field_end(s);
 #endif
-#ifdef HAVE_VIASLICE
-    if(s->avctx->via_hwslice)
-        VIA_field_end(s);
+#ifdef HAVE_XVMC_VLD
+    if(s->avctx->xvmc_vld_hwslice)
+        XVMC_VLD_field_end(s);
 #endif
 
     /* end of slice reached */
@@ -2664,7 +2664,7 @@ static int vcr2_init_sequence(AVCodecContext *avctx)
     if( avctx->pix_fmt == PIX_FMT_XVMC_MPEG2_IDCT )
         if( avctx->idct_algo == FF_IDCT_AUTO )
             avctx->idct_algo = FF_IDCT_SIMPLE;
-    if( avctx->via_hwslice == 1)
+    if( avctx->xvmc_vld_hwslice == 1)
         avctx->idct_algo = FF_IDCT_LIBMPEG2MMX;
     
     if (MPV_common_init(s) < 0)
@@ -3076,8 +3076,8 @@ AVCodec mpeg_xvmc_decoder = {
 
 #endif
 
-#ifdef HAVE_VIASLICE
-static int mpeg_via_decode_init(AVCodecContext *avctx){
+#ifdef HAVE_XVMC_VLD
+static int mpeg_xvmc_vld_decode_init(AVCodecContext *avctx){
     Mpeg1Context *s;
 
     if( avctx->thread_count > 1)
@@ -3085,22 +3085,22 @@ static int mpeg_via_decode_init(AVCodecContext *avctx){
     if( !(avctx->slice_flags & SLICE_FLAG_CODED_ORDER) )
         return -1;
     if( !(avctx->slice_flags & SLICE_FLAG_ALLOW_FIELD) )
-        dprintf("mpeg12.c: VIA decoder will work better if SLICE_FLAG_ALLOW_FIELD is set\n");
+        dprintf("mpeg12.c: XVMC_VLD decoder will work better if SLICE_FLAG_ALLOW_FIELD is set\n");
 
     mpeg_decode_init(avctx);
     s = avctx->priv_data;
 
-    avctx->via_hwslice = 1;
+    avctx->xvmc_vld_hwslice = 1;
 
     return 0;
 }
 
-AVCodec mpeg_via_decoder = {
-    "mpegvideo_via",
+AVCodec mpeg_xvmc_vld_decoder = {
+    "mpegvideo_xvmc_vld",
     CODEC_TYPE_VIDEO,
-    CODEC_ID_MPEG2VIDEO_VIA,
+    CODEC_ID_MPEG2VIDEO_XVMC_VLD,
     sizeof(Mpeg1Context),
-    mpeg_via_decode_init,
+    mpeg_xvmc_vld_decode_init,
     NULL,
     mpeg_decode_end,
     mpeg_decode_frame,

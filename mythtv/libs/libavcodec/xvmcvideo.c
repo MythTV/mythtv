@@ -62,8 +62,6 @@ static const char* mv_ffmpeg_to_string[8];
 static inline xvmc_render_state_t *render_state(const MpegEncContext *s);
 static inline int calc_cbp(MpegEncContext *s);
 static void set_block_pattern(const MpegEncContext *, XvMCMacroBlock *);
-static XvMCSurface* find_past_surface(MpegEncContext *, xvmc_render_state_t *);
-static XvMCSurface* find_future_surface(MpegEncContext *);
 static void setup_pmv(MpegEncContext *, XvMCMacroBlock *);
 static void setup_pmv_frame(MpegEncContext *, XvMCMacroBlock *);
 static void setup_pmv_field(MpegEncContext *, XvMCMacroBlock *);
@@ -75,6 +73,8 @@ static inline void handle_intra_block(const MpegEncContext *, const XvMCMacroBlo
                                       xvmc_render_state_t *render);
 static inline void handle_p_b_block(const MpegEncContext *, const XvMCMacroBlock *,
                                     xvmc_render_state_t *render);
+
+#include "xvmccommon.c"
 
 //set s->block
 void XVMC_init_block(MpegEncContext *s)
@@ -98,48 +98,6 @@ const int mb_block_count = 4+(1<<s->chroma_format);
         cbp+=cbp;
 //        printf("s->pblocks[%d]=%p ,s->block=%p cbp=%d\n",i,s->pblocks[i],s->block,cbp);
     }
-}
-
-XvMCSurface* findPastSurface(MpegEncContext *s, xvmc_render_state_t *render) {
-    Picture *lastp = s->last_picture_ptr;
-    xvmc_render_state_t *last = NULL;
-    
-    if (NULL!=lastp) {
-        last = (xvmc_render_state_t*)(lastp->data[2]);
-        if (B_TYPE==last->pict_type)
-            fprintf(stderr, "Past frame is a B frame in findPastSurface, this is bad.\n");
-        //assert(B_TYPE!=last->pict_type);
-    }
-
-    if (NULL==last) 
-        if (!s->first_field)
-            last = render; // predict second field from the first
-        else
-            return 0;
-    
-    if (last->magic != MP_XVMC_RENDER_MAGIC) 
-        return 0;
-
-    return (last->state & MP_XVMC_STATE_PREDICTION) ? last->p_surface : 0;
-}
-
-XvMCSurface* findFutureSurface(MpegEncContext *s) {
-    Picture *nextp = s->next_picture_ptr;
-    xvmc_render_state_t *next = NULL;
-    
-    if (NULL!=nextp) {
-        next = (xvmc_render_state_t*)(nextp->data[2]);
-        if (B_TYPE==next->pict_type)
-            fprintf(stderr, "Next frame is a B frame in findFutureSurface, this is bad.\n");
-        //assert(B_TYPE!=next->pict_type);
-    }
-
-    assert(NULL!=next);
-
-    if (next->magic != MP_XVMC_RENDER_MAGIC)
-        return 0;
-
-    return (next->state & MP_XVMC_STATE_PREDICTION) ? next->p_surface : 0;
 }
 
 //these functions should be called on every new field or/and frame

@@ -20,11 +20,6 @@ using namespace std;
 #include "../libmyth/util.h"
 #include "../libmyth/mythcontext.h"
 
-extern "C" {
-#include "../libavcodec/avcodec.h"
-#include "../libavcodec/xvmc_render.h"
-}
-
 #include <X11/keysym.h>
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>
@@ -34,6 +29,14 @@ extern "C" {
 #include <X11/extensions/Xvlib.h>
 #define XMD_H 1
 #include <X11/extensions/xf86vmode.h>
+
+extern "C" {
+#ifdef USING_XVMC_VLD
+#include <X11/extensions/viaXvMC.h>
+#endif
+#include "../libavcodec/avcodec.h"
+#include "../libavcodec/xvmc_render.h"
+}
 
 /**********************************************************
  *  The DisplayRes module allows for the display resolution to be
@@ -380,18 +383,35 @@ bool VideoOutputXvMC::Init(int width, int height, float aspect,
                 XvPortID p = 0;
                 int s;
                 XvMCSurfaceTypes::find(width, height, chroma,
-                                       true, 2, 0, 0,
+                                       true, false, 2, 0, 0,
                                        data->XJ_disp, ai[i].base_id,
                                        ai[i].base_id + ai[i].num_ports - 1,
                                        p, s);
+                if (p != 0)
+                    printf("XvMC found and using VLD surface\n");
+
+                if (0 == p)
+                {
+                    // No VLD surface found, try to find IDCT surface
+                    XvMCSurfaceTypes::find(width, height, chroma,
+                                           false, true, 2, 0, 0,
+                                           data->XJ_disp, ai[i].base_id,
+                                           ai[i].base_id + ai[i].num_ports - 1,
+                                           p, s);
+                    if (p != 0)
+                        printf("XvMC found and using IDCT surface\n");
+                }
+
                 if (0 == p) 
                 {
                     // No IDCT surface found, try to find MC surface
                     XvMCSurfaceTypes::find(width, height, chroma,
-                                           false, 2, 0, 0,
+                                           false, false, 2, 0, 0,
                                            data->XJ_disp, ai[i].base_id,
                                            ai[i].base_id + ai[i].num_ports - 1,
                                            p, s);
+                    if (p != 0)
+                        printf("XvMC found and using MC surface\n");
                 }
 
                 if (p != 0) 
@@ -577,26 +597,29 @@ bool VideoOutputXvMC::CreateXvMCBuffers(void)
     int numblocks = ((XJ_width + 15) / 16) * ((XJ_height + 15) / 16);
     int blocks_per_macroblock = 6;
 
-    for (int i = 0; i < 8; i++)
+    if (!hasVLDAcceleration())
     {
-        ret = XvMCCreateBlocks(data->XJ_disp, &data->ctx,
-                               numblocks * blocks_per_macroblock,
-                               &(data->data_blocks[i]));
-        if (ret != Success)
+        for (int i = 0; i < 8; i++)
         {
-            cerr << "Unable to create XvMC Blocks\n";
-            XvMCDestroyContext(data->XJ_disp, &data->ctx);
-            return false;
-        }
+            ret = XvMCCreateBlocks(data->XJ_disp, &data->ctx,
+                                   numblocks * blocks_per_macroblock,
+                                   &(data->data_blocks[i]));
+            if (ret != Success)
+            {
+                cerr << "Unable to create XvMC Blocks\n";
+                XvMCDestroyContext(data->XJ_disp, &data->ctx);
+                return false;
+            }
 
-        ret = XvMCCreateMacroBlocks(data->XJ_disp, &data->ctx, numblocks,
-                                    &(data->mv_blocks[i]));
-        if (ret != Success)
-        {
-            cerr << "Unable to create XvMC Macro Blocks\n";
-            XvMCDestroyBlocks(data->XJ_disp,&(data->data_blocks[i]));
-            XvMCDestroyContext(data->XJ_disp, &data->ctx);
-            return false;
+            ret = XvMCCreateMacroBlocks(data->XJ_disp, &data->ctx, numblocks,
+                                        &(data->mv_blocks[i]));
+            if (ret != Success)
+            {
+                cerr << "Unable to create XvMC Macro Blocks\n";
+                XvMCDestroyBlocks(data->XJ_disp,&(data->data_blocks[i]));
+                XvMCDestroyContext(data->XJ_disp, &data->ctx);
+                return false;
+            }
         }
     }
 
@@ -627,6 +650,9 @@ bool VideoOutputXvMC::CreateXvMCBuffers(void)
                                   XVMC_INTRA_UNSIGNED) == XVMC_INTRA_UNSIGNED;
         render->p_surface = surface;
         render->state = 0;
+
+        render->disp = data->XJ_disp;
+        render->ctx = &data->ctx;
 
         vbuffers[i].buf = (unsigned char *)render;
         vbuffers[i].priv[0] = (unsigned char *)&(data->data_blocks[i]);
@@ -722,10 +748,13 @@ void VideoOutputXvMC::Exit(void)
 
 void VideoOutputXvMC::DeleteXvMCBuffers()
 {
-    for (int i = 0; i < 8; i++)
+    if (!hasVLDAcceleration()) 
     {
-        XvMCDestroyMacroBlocks(data->XJ_disp, &data->mv_blocks[i]);
-        XvMCDestroyBlocks(data->XJ_disp, &data->data_blocks[i]);
+        for (int i = 0; i < 8; i++)
+        {
+            XvMCDestroyMacroBlocks(data->XJ_disp, &data->mv_blocks[i]);
+            XvMCDestroyBlocks(data->XJ_disp, &data->data_blocks[i]);
+        }
     }
 
     for (int i = 0; i < numbuffers; i++)
@@ -859,18 +888,22 @@ void VideoOutputXvMC::PrepareFrame(VideoFrame *buffer, FrameScanType t)
 
 void VideoOutputXvMC::Show(FrameScanType scan)
 {
-    int field;
-    switch (scan) 
+    int field = 3;
+
+    if (m_deinterlacing)
     {
-        case kScan_Interlaced:
-            field = 1;
-            break;
-        case kScan_Intr2ndField:
-            field = 2;
-            break;
-        default:
-            field = 3;
-            break;
+        switch (scan) 
+        {
+            case kScan_Interlaced:
+                field = 1;
+                break;
+            case kScan_Intr2ndField:
+                field = 2;
+                break;
+            default:
+                field = 3;
+                break;
+        }
     }
 
     pthread_mutex_lock(&lock);
@@ -971,24 +1004,39 @@ void VideoOutputXvMC::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
 
     pthread_mutex_lock(&lock);
 
-    if (render->p_past_surface && !render->p_future_surface)
-        SyncSurface(data->XJ_disp, render->p_past_surface); // Sync prev-I frame
-
-    int res = XvMCRenderSurface(data->XJ_disp, &data->ctx, 
-                                render->picture_structure, render->p_surface,
-                                render->p_past_surface, 
-                                render->p_future_surface,
-                                render->flags, render->filled_mv_blocks_num,
-                                render->start_mv_blocks_num,
-                                (XvMCMacroBlockArray *)frame->priv[1], 
-                                (XvMCBlockArray *)frame->priv[0]);
-    if (res != Success)
+    if (hasVLDAcceleration())
     {
-        cerr << "XvMCRenderSurface error\n";
+#ifdef USING_XVMC_VLD
+        Status status = XvMCPutSlice2(data->XJ_disp, &data->ctx, 
+                                      (char*)render->slice_data, 
+                                      render->slice_datalen, 
+                                      render->slice_code);
+        if (status)
+            printf("XvMCPutSlice: Error: %d\n", status);
+#endif
     }
+    else
+    {
+        if (render->p_past_surface && !render->p_future_surface)
+            SyncSurface(data->XJ_disp, render->p_past_surface); // Sync prev-I frame
 
-    FlushSlice(data->XJ_disp, render->p_surface, render->pict_type, 
-               render->p_past_surface, render->p_future_surface);
+        int res = XvMCRenderSurface(data->XJ_disp, &data->ctx, 
+                                    render->picture_structure, 
+                                    render->p_surface,
+                                    render->p_past_surface, 
+                                    render->p_future_surface,
+                                    render->flags, render->filled_mv_blocks_num,
+                                    render->start_mv_blocks_num,
+                                    (XvMCMacroBlockArray *)frame->priv[1], 
+                                    (XvMCBlockArray *)frame->priv[0]);
+        if (res != Success)
+        {
+            cerr << "XvMCRenderSurface error\n";
+        }
+
+        FlushSlice(data->XJ_disp, render->p_surface, render->pict_type, 
+                   render->p_past_surface, render->p_future_surface);
+    }
 
     pthread_mutex_unlock(&lock);
 
@@ -1169,5 +1217,13 @@ int VideoOutputXvMC::ChangePictureAttribute(int attributeType, int newValue)
 bool VideoOutputXvMC::hasIDCTAcceleration() const 
 {
     return XVMC_IDCT == (data->surface_info.mc_type & XVMC_IDCT);
+}
+
+bool VideoOutputXvMC::hasVLDAcceleration() const
+{
+#if USING_XVMC_VLD
+    return XVMC_VLD == (data->surface_info.mc_type & XVMC_VLD);
+#endif
+    return 0;
 }
 

@@ -382,15 +382,16 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                         //enc->get_format = getFormat;
                     }
 #endif
-#ifdef USING_VIASLICE
-                    if (gContext->GetNumSetting("UseViaSlice", 1))
-                        enc->codec_id = CODEC_ID_MPEG2VIDEO_VIA;
+#ifdef USING_XVMC_VLD
+                    if (gContext->GetNumSetting("UseXvMcVld", 1))
+                        enc->codec_id = CODEC_ID_MPEG2VIDEO_XVMC_VLD;
 #endif
                 }
 
                 AVCodec *codec = avcodec_find_decoder(enc->codec_id);
 
-                if (codec && codec->id == CODEC_ID_MPEG2VIDEO_XVMC)
+                if (codec && (codec->id == CODEC_ID_MPEG2VIDEO_XVMC ||
+                              codec->id == CODEC_ID_MPEG2VIDEO_XVMC_VLD))
                 {
                     enc->flags |= CODEC_FLAG_EMU_EDGE;
                     enc->get_buffer = get_avf_buffer_xvmc;
@@ -402,19 +403,6 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                                        SLICE_FLAG_ALLOW_FIELD;
                     setLowBuffers();
                     m_parent->ForceVideoOutputType(kVideoOutput_XvMC);
-                }
-                else if (codec && codec->id == CODEC_ID_MPEG2VIDEO_VIA)
-                {
-                    enc->flags |= CODEC_FLAG_EMU_EDGE;
-                    enc->get_buffer = get_avf_buffer_via;
-                    enc->release_buffer = release_avf_buffer_via;
-                    enc->draw_horiz_band = render_slice_via;
-                    enc->opaque = (void *)this;
-                    directrendering = true;
-                    enc->slice_flags = SLICE_FLAG_CODED_ORDER |
-                                       SLICE_FLAG_ALLOW_FIELD;
-                    setLowBuffers();
-                    m_parent->ForceVideoOutputType(kVideoOutput_VIA);
                 }
                 else if (codec && codec->capabilities & CODEC_CAP_DR1 &&
                     !(enc->width % 16))
@@ -719,58 +707,6 @@ void render_slice_xvmc(struct AVCodecContext *s, const AVFrame *src,
 {
     (void)offset;
     (void)type;
-
-    AvFormatDecoder *nd = (AvFormatDecoder *)(s->opaque);
-
-    int width = s->width;
-
-    VideoFrame *frame = (VideoFrame *)src->opaque;
-    nd->m_parent->DrawSlice(frame, 0, y, width, height);
-}
-
-int get_avf_buffer_via(struct AVCodecContext *c, AVFrame *pic)
-{
-    AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
-
-    VideoFrame *frame = nd->m_parent->GetNextVideoFrame();
-
-    pic->data[0] = frame->buf;
-    pic->data[1] = NULL;
-    pic->data[2] = NULL;
-
-    pic->linesize[0] = 0;
-    pic->linesize[1] = 0;
-    pic->linesize[2] = 0;
-
-    pic->opaque = frame;
-    pic->type = FF_BUFFER_TYPE_USER;
-
-    pic->age = 256 * 256 * 256 * 64;
-
-    nd->inUseBuffers.append(frame);
-
-    return 1;
-}
-
-void release_avf_buffer_via(struct AVCodecContext *c, AVFrame *pic)
-{
-    (void)c;
-
-    assert(pic->type == FF_BUFFER_TYPE_USER);
-
-    int i;
-    for (i = 0; i < 4; i++)
-        pic->data[i] = NULL;
-}
-
-void render_slice_via(struct AVCodecContext *s, const AVFrame *src,
-                      int offset[4], int y, int type, int height)
-{
-    (void)offset;
-    (void)type;
-
-    if (!s || !src)
-        return;
 
     AvFormatDecoder *nd = (AvFormatDecoder *)(s->opaque);
 
@@ -1218,7 +1154,7 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
             if (context->codec_id == CODEC_ID_MPEG1VIDEO ||
                 context->codec_id == CODEC_ID_MPEG2VIDEO ||
                 context->codec_id == CODEC_ID_MPEG2VIDEO_XVMC ||
-                context->codec_id == CODEC_ID_MPEG2VIDEO_VIA)
+                context->codec_id == CODEC_ID_MPEG2VIDEO_XVMC_VLD)
             {
                 MpegPreProcessPkt(curstream, pkt);
             }

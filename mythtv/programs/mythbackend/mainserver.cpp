@@ -2615,7 +2615,7 @@ void MainServer::endConnection(RefSocket *socket)
                 MythEvent me(message);
                 gContext->dispatch(me);
             }
-            socket->DownRef();
+            delete (*it);
             playbackList.erase(it);
             return;
         }
@@ -2628,6 +2628,7 @@ void MainServer::endConnection(RefSocket *socket)
         if (sock == socket)
         {
             socket->DownRef();
+            delete (*ft);
             fileTransferList.erase(ft);
             return;
         }

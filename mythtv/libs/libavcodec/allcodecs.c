@@ -117,8 +117,8 @@ void avcodec_register_all(void)
 #ifdef HAVE_XVMC
     register_avcodec(&mpeg_xvmc_decoder);
 #endif
-#ifdef HAVE_VIASLICE
-    register_avcodec(&mpeg_via_decoder);
+#ifdef HAVE_XVMC_VLD
+    register_avcodec(&mpeg_xvmc_vld_decoder);
 #endif
     register_avcodec(&dvvideo_decoder);
     register_avcodec(&mjpeg_decoder);

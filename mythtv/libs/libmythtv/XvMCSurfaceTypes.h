@@ -6,6 +6,9 @@
 #include <X11/extensions/XvMC.h>
 
 extern "C" {
+#ifdef USING_XVMC_VLD
+#include <X11/extensions/viaXvMC.h>
+#endif
 #include "../libavcodec/xvmc_render.h"
 }
 
@@ -23,8 +26,8 @@ class XvMCSurfaceTypes
     }
 
     /// Find an appropriate surface on the current port.
-    inline int find(int pminWidth, int pminHeight, int chroma, bool idct, 
-                    int mpeg, int pminSubpictureWidth, 
+    inline int find(int pminWidth, int pminHeight, int chroma, bool vld,
+                    bool idct, int mpeg, int pminSubpictureWidth, 
                     int pminSubpictureHeight);
         
     bool hasChroma420(int surface) const 
@@ -77,6 +80,14 @@ class XvMCSurfaceTypes
     bool hasIDCTAcceleration(int surface) const 
     {
         return XVMC_IDCT == (surfaces[surface].mc_type & XVMC_IDCT);
+    }
+
+    bool hasVLDAcceleration(int surface) const
+    {
+#ifdef USING_XVMC_VLD
+        return XVMC_VLD == (surfaces[surface].mc_type & XVMC_VLD);
+#endif
+        return 0;
     }
 
     bool hasMPEG1Support(int surface) const 
@@ -132,8 +143,8 @@ class XvMCSurfaceTypes
     int size() const { return num; }
 
     /// Find an appropriate surface on the current display.
-    static void find(int minWidth, int minHeight, int chroma, bool idct,
-                     int mpeg, int minSubpictureWidth, 
+    static void find(int minWidth, int minHeight, int chroma, bool vld,
+                     bool idct, int mpeg, int minSubpictureWidth, 
                      int minSubpictureHeight, Display *dpy, 
                      XvPortID portMin, XvPortID portMax,
                      XvPortID& port, int& surfNum);

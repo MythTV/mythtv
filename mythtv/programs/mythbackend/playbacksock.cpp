@@ -30,8 +30,7 @@ PlaybackSock::PlaybackSock(RefSocket *lsock, QString lhostname, bool wantevents)
 
 PlaybackSock::~PlaybackSock()
 {
-    if (sock)
-        delete sock;
+    sock->DownRef();
 }
 
 bool PlaybackSock::SendReceiveStringList(QStringList &strlist)

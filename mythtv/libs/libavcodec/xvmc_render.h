@@ -8,6 +8,10 @@
 #include <X11/extensions/Xvlib.h>
 #include <X11/extensions/XvMClib.h>
 
+#ifdef USING_XVMC_VLD
+#include <stdint.h>
+#include <X11/extensions/viaXvMC.h>
+#endif
 
 //the surface should be shown, video driver manipulate this
 #define MP_XVMC_STATE_DISPLAY_PENDING 1
@@ -50,6 +54,15 @@ typedef   struct{
   
   int next_free_data_block_num;//used in add_mv_block, pointer to next free block
   int pict_type; //this is for skipping frames
+
+  // These are for the XVMC VLD slice interface
+  int      slice_code;
+  unsigned char *slice_data;
+  int      slice_datalen;
+
+  Display *disp;
+  XvMCContext *ctx;
+
 } xvmc_render_state_t;
 
 #endif

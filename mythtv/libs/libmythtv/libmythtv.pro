@@ -97,11 +97,6 @@ using_ivtv {
     HEADERS += mpegrecorder.h ivtvdecoder.h videoout_ivtv.h
 }
 
-using_viahwslice {
-    SOURCES += videoout_viaslice.cpp
-    HEADERS += videoout_viaslice.h
-}
-
 using_dvb {
     SOURCES += dvbrecorder.cpp dvbchannel.cpp dvbdiseqc.cpp dvbsections.cpp 
     SOURCES += dvbcam.cpp

@@ -34,7 +34,7 @@ enum CodecID {
     CODEC_ID_MPEG1VIDEO,
     CODEC_ID_MPEG2VIDEO, /* prefered ID for MPEG Video 1 or 2 decoding */
     CODEC_ID_MPEG2VIDEO_XVMC,
-    CODEC_ID_MPEG2VIDEO_VIA,
+    CODEC_ID_MPEG2VIDEO_XVMC_VLD,
     CODEC_ID_H261,
     CODEC_ID_H263,
     CODEC_ID_RV10,
@@ -1648,11 +1648,11 @@ typedef struct AVCodecContext {
 #define FF_LEVEL_UNKNOWN -99
 
     /**
-     * VIA CLE266 Hardware MPEG decoding
+     * XVMC_VLD (VIA CLE266) Hardware MPEG decoding
      * - encoding: forbidden
      * - decoding: set by decoder
      */
-    int via_hwslice;
+    int xvmc_vld_hwslice;
 
 } AVCodecContext;
 
@@ -1799,7 +1799,7 @@ extern AVCodec mpeg1video_decoder;
 extern AVCodec mpeg2video_decoder;
 extern AVCodec mpegvideo_decoder;
 extern AVCodec mpeg_xvmc_decoder;
-extern AVCodec mpeg_via_decoder;
+extern AVCodec mpeg_xvmc_vld_decoder;
 extern AVCodec h263i_decoder;
 extern AVCodec flv_decoder;
 extern AVCodec rv10_decoder;

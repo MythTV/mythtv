@@ -1687,7 +1687,7 @@ void NuppelVideoPlayer::StartPlaying(void)
         gContext->addPrivRequest(MythPrivRequest::MythRealtime, &output_video);
 
         // Use realtime prio for decoder thread as well
-       gContext->addPrivRequest(MythPrivRequest::MythRealtime, &decoder_thread);
+        //gContext->addPrivRequest(MythPrivRequest::MythRealtime, &decoder_thread);
     }
 
     int pausecheck = 0;
@@ -1887,6 +1887,7 @@ void NuppelVideoPlayer::StartPlaying(void)
         delete audioOutput;
     audioOutput = NULL;
 
+/*
     if (!disablevideo)
     {
         // Reset to default scheduling
@@ -1895,6 +1896,7 @@ void NuppelVideoPlayer::StartPlaying(void)
         if (status)
             perror("pthread_setschedparam");
     }
+*/
 
     playing = false;
 }

@@ -2146,13 +2146,14 @@ public:
 };
 #endif
 
-#ifdef USING_VIASLICE
-class UseViaSlice: public CheckBoxSetting, public GlobalSetting {
+#ifdef USING_XVMC_VLD
+class UseXvMcVld: public CheckBoxSetting, public GlobalSetting {
 public:
-    UseViaSlice():
-        GlobalSetting("UseViaSlice") {
-        setLabel(QObject::tr("Use VIA hardware MPEG Decoding"));
+    UseXvMcVld(): GlobalSetting("UseXvMcVld") {
+        setLabel(QObject::tr("Use HW XVMC VLD Decoding (Via only)"));
         setValue(true);
+        setHelpText(QObject::tr("Enables the use of viaXvMC HW Mpeg decoding "
+                    "for the Via Unichome Chipset"));
     };
 };
 #endif
@@ -2180,8 +2181,8 @@ public:
 #ifdef USING_XVMC
          addChild(new UseXVMC());
 #endif
-#ifdef USING_VIASLICE
-         addChild(new UseViaSlice());
+#ifdef USING_XVMC_VLD
+         addChild(new UseXvMcVld());
 #endif
     };
 };

@@ -54,9 +54,9 @@ using_xvmc {
     DEFINES += HAVE_XVMC
 }
 
-using_viahwslice {
-    SOURCES += viaslice.c
-    DEFINES += HAVE_VIASLICE
+using_xvmc_vld {
+    SOURCES += xvmcvldvideo.c
+    DEFINES += HAVE_XVMC_VLD
 }
 
 contains( AMR_NB, yes) {

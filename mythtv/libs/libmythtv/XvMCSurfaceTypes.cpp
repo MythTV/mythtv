@@ -37,7 +37,7 @@ static inline Display* createXvMCDisplay()
 }
 
 int XvMCSurfaceTypes::find(int pminWidth, int pminHeight, 
-                           int chroma, bool idct, int mpeg,
+                           int chroma, bool vld, bool idct, int mpeg,
                            int pminSubpictureWidth,
                            int pminSubpictureHeight) 
 {
@@ -55,6 +55,10 @@ int XvMCSurfaceTypes::find(int pminWidth, int pminHeight,
         if (idct && !hasIDCTAcceleration(s))
             continue;
         if (!idct && hasIDCTAcceleration(s))
+            continue;
+        if (vld && !hasVLDAcceleration(s))
+            continue;
+        if (!vld && hasVLDAcceleration(s))
             continue;
         if (1 == mpeg && !hasMPEG1Support(s))
             continue;
@@ -76,7 +80,7 @@ int XvMCSurfaceTypes::find(int pminWidth, int pminHeight,
 }
 
 void XvMCSurfaceTypes::find(int minWidth, int minHeight,
-                            int chroma, bool idct, int mpeg,
+                            int chroma, bool vld, bool idct, int mpeg,
                             int minSubpictureWidth, 
                             int minSubpictureHeight,
                             Display *dpy, XvPortID portMin, 
@@ -96,7 +100,7 @@ void XvMCSurfaceTypes::find(int minWidth, int minHeight,
     {
         VERBOSE(VB_PLAYBACK, QString("Trying XvMC port %1").arg(p));
         XvMCSurfaceTypes surf(dpy, p);
-        int s = surf.find(minWidth, minHeight, chroma, idct, mpeg,
+        int s = surf.find(minWidth, minHeight, chroma, vld, idct, mpeg,
                           minSubpictureWidth, minSubpictureHeight);
         if (s >= 0) 
         {
@@ -144,7 +148,7 @@ inline bool XvMCSurfaceTypes::hasIDCT(int width, int height,
         if (ai[i].type == 0)
             continue;
         XvMCSurfaceTypes::find(width, height, chroma,
-                               true, 2, 0, 0,
+                               false, true, 2, 0, 0,
                                disp, ai[i].base_id, 
                                ai[i].base_id + ai[i].num_ports - 1,
                                p, s);

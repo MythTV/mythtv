@@ -41,7 +41,8 @@ class VideoOutputXvMC : public VideoOutput
 
     int ChangePictureAttribute(int attributeType, int newValue);
 
-    bool hasIDCTAcceleration() const;
+    inline bool hasIDCTAcceleration() const;
+    inline bool hasVLDAcceleration() const;
 
   private:
     void Exit(void);

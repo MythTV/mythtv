@@ -82,10 +82,10 @@ DEFINES += USING_OSS
 #DEFINES += USING_XVMC
 #EXTRA_LIBS += -lXvMCNVIDIA -lXvMC
 
-# VIA cle266 support
-#CONFIG += using_viahwslice
-#DEFINES += USING_VIASLICE
-#EXTRA_LIBS += -lddmpeg
+# XvMC_VLD support, modify as necessary. Incompatible with normal XvMC support.
+#CONFIG += using_xvmc using_xvmc_vld
+#DEFINES += USING_XVMC USING_XVMC_VLD
+#EXTRA_LIBS += -lviaXvMC -lXvMC
 
 # DirectFB support
 #CONFIG += using_directfb
