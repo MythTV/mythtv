@@ -163,7 +163,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>VideoDefaultPlayer</source>
+        <source>Default Player</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

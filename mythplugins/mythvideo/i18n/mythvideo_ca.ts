@@ -112,10 +112,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>VideoDefaultPlayer</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>This is the command used for any file that the extension is not specifically defined.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -157,6 +153,10 @@
     </message>
     <message>
         <source>Unknown Rating</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default Player</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
