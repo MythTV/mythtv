@@ -170,13 +170,15 @@ int JoystickMenuClient::ReadConfig(QString config_file)
         if (tokens.count() < 1)
             continue;
 
-        if (tokens[0].startsWith("devicename", FALSE) && tokens.count() == 2)
+        QString firstTok = tokens[0].lower();
+
+        if (firstTok.startsWith("devicename") && tokens.count() == 2)
             devicename = tokens[1];
-        else if (tokens[0].startsWith("button", FALSE) && tokens.count() == 3)
+        else if (firstTok.startsWith("button") && tokens.count() == 3)
             map.AddButton(tokens[1].toInt(), tokens[2]);
-        else if (tokens[0].startsWith("axis", FALSE) && tokens.count() == 5)
+        else if (firstTok.startsWith("axis") && tokens.count() == 5)
             map.AddAxis(tokens[1].toInt(), tokens[2].toInt(), tokens[3].toInt(), tokens[4]);
-        else if (tokens[0].startsWith("chord", FALSE) && tokens.count() == 4)
+        else if (firstTok.startsWith("chord") && tokens.count() == 4)
             map.AddButton(tokens[2].toInt(), tokens[3], tokens[1].toInt());
         else
             cerr << config_file << "(" << line << "): unrecognized or malformed line: '" << rawline << "'\n";
