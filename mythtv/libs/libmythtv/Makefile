@@ -18,7 +18,7 @@ NUVLIBS = `lib/nuppelvideo-config --libs`
 .cpp.o:
 	$(CXXCOMPILE) -c $< -o $@
 
-all: libNuppelVideo nuvplay nuvrec tv 
+all: libNuppelVideo.a nuvplay nuvrec tv 
 
 NUVPLAYOBJ = nuvplay.o 
 NUVPLAYLDF =-Llib/ -lNuppelVideo $(NUVLIBS)
@@ -29,18 +29,18 @@ NUVRECLDF = -Llib/ -lNuppelVideo $(NUVLIBS)
 TVOBJ = tv.o settings.o
 TVLDF = -Llib/ -lNuppelVideo $(NUVLIBS)
 
-libNuppelVideo:
+libNuppelVideo.a:
 	$(MAKE) -C lib
 
-nuvplay: $(NUVPLAYOBJ)
+nuvplay: $(NUVPLAYOBJ) libNuppelVideo.a
 	@rm -f nuvplay
 	$(CXXLINK) $(NUVPLAYOBJ) $(NUVPLAYLDF)
 
-nuvrec: $(NUVRECOBJ)
+nuvrec: $(NUVRECOBJ) libNuppelVideo.a
 	@rm -f nuvrec
 	$(CXXLINK) $(NUVRECOBJ) $(NUVRECLDF)
 
-tv: $(TVOBJ)
+tv: $(TVOBJ) libNuppelVideo.a
 	@rm -f tv
 	$(CXXLINK) $(TVOBJ) $(TVLDF)
 

@@ -53,6 +53,7 @@ int main(int argc, char *argv[])
   
   NuppelVideoPlayer *nvp = new NuppelVideoPlayer();
   nvp->SetRingBuffer(rbuffer);
+  nvp->SetDeinterlace((bool)settings.GetNumSetting("Deinterlace"));
   
   pthread_create(&encode, NULL, SpawnEncode, nvr);
 

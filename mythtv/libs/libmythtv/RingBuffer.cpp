@@ -32,7 +32,6 @@ RingBuffer::RingBuffer(const string &lfilename, bool actasnormalfile,
 RingBuffer::RingBuffer(const string &lfilename, long long size, 
                        long long smudge)
 {
-	printf("%s\n", lfilename.c_str());
     normalfile = false;
     filename = (string)lfilename;
     filesize = size;

@@ -36,6 +36,9 @@ class NuppelVideoPlayer
 
     void SetRingBuffer(RingBuffer *rbuf) { ringBuffer = rbuf; }
 
+    void SetDeinterlace(bool set) { deinterlace = set; }
+    bool GetDeinterlace(void) { return deinterlace; }
+
     bool TogglePause(void);
     void FastForward(float seconds);
     void Rewind(float seconds);

@@ -661,8 +661,8 @@ void NuppelVideoPlayer::StartPlaying(void)
 
         if (usecs > -1000000/video_frame_rate) 
         {
-            //if (deinterlace)
-            //    linearBlendYUV420(videobuf3, video_width, video_height);
+            if (deinterlace)
+                linearBlendYUV420(videobuf3, video_width, video_height);
             memcpy(X11videobuf, videobuf3, video_width * video_height);
             memcpy(X11videobuf + video_width * video_height, videobuf3 +
                    video_width * video_height * 5 / 4, video_width * 

@@ -9,7 +9,6 @@
 #include <sys/mman.h>
 
 #include "NuppelVideoRecorder.h"
-#include "linearBlend.h"
 
 #define KEYFRAMEDISTEND   30
 #define KEYFRAMEDISTSTART 5
@@ -808,8 +807,6 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
                 keyframedist = KEYFRAMEDISTEND;
 	}    
     }
-
-    linearBlendYUV420(buf, w, h);
 
     if (!raw) 
         tmp = rtjc->Compress(strm, planes);
