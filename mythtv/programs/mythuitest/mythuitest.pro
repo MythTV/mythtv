@@ -11,7 +11,7 @@ isEmpty(QMAKE_EXTENSION_SHLIB) {
 isEmpty(QMAKE_EXTENSION_LIB) {
   QMAKE_EXTENSION_LIB=a
 }
-TARGETDEPS += ../../libs/libmyth/libmythui-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
+TARGETDEPS += ../../libs/libmythui/libmythui-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 
 macx {
     # OS X complains about indirectly linked libraries
