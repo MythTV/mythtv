@@ -167,7 +167,8 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     }
 
     m_parent->SetVideoParams(fileheader.width, fileheader.height,
-                             fileheader.fps, fileheader.keyframedist);
+                             fileheader.fps, fileheader.keyframedist,
+                             4.0 / 3, kScan_Detect);
 
     video_width = fileheader.width;
     video_height = fileheader.height;
