@@ -376,7 +376,7 @@ void TVRec::HandleStateChange(void)
         {
             if (curRecording) 
             {
-	        int profileID = curRecording->GetScheduledRecording(db_conn)
+                int profileID = curRecording->GetScheduledRecording(db_conn)
                                             ->getProfileID();
                 if (profileID > 0)
                     profile.loadByID(db_conn, profileID);
@@ -697,9 +697,11 @@ void TVRec::GetChannelInfo(Channel *chan, QString &title, QString &subtitle,
                                "channel.sourceid = cardinput.sourceid AND "
                                "cardinput.inputname = \"%4\" AND "
                                "cardinput.cardid = capturecard.cardid AND "
-                               "capturecard.videodevice = \"%5\";")
+                               "capturecard.videodevice = \"%5\" AND "
+                               "capturecard.hostname = \"%6\";")
                                .arg(channelname).arg(curtimestr).arg(curtimestr)
-                               .arg(channelinput).arg(device);
+                               .arg(channelinput).arg(device)
+                               .arg(gContext->GetHostName());
 
     QSqlQuery query = db_conn->exec(thequery);
 
@@ -840,8 +842,10 @@ bool TVRec::CheckChannel(Channel *chan, const QString &channum, int &finetuning)
                                "channel.sourceid = cardinput.sourceid AND "
                                "cardinput.inputname = \"%2\" AND "
                                "cardinput.cardid = capturecard.cardid AND "
-                               "capturecard.videodevice = \"%3\";")
-                               .arg(channum).arg(channelinput).arg(device);
+                               "capturecard.videodevice = \"%3\" AND "
+                               "capturecard.hostname = \"%4\";")
+                               .arg(channum).arg(channelinput).arg(device)
+                               .arg(gContext->GetHostName());
 
     QSqlQuery query = db_conn->exec(thequery);
 
@@ -870,6 +874,7 @@ bool TVRec::CheckChannel(Channel *chan, const QString &channum, int &finetuning)
 
 bool TVRec::SetVideoFiltersForChannel(Channel *chan, const QString &channum)
 {
+
     if (!db_conn)
         return true;
 
@@ -889,8 +894,10 @@ bool TVRec::SetVideoFiltersForChannel(Channel *chan, const QString &channum)
                                "channel.sourceid = cardinput.sourceid AND "
                                "cardinput.inputname = \"%2\" AND "
                                "cardinput.cardid = capturecard.cardid AND "
-                               "capturecard.videodevice = \"%3\";")
-                              .arg(channum).arg(channelinput).arg(device);
+                               "capturecard.videodevice = \"%3\" AND "
+                               "capturecard.hostname = \"%4\";")
+                               .arg(channum).arg(channelinput).arg(device)
+                               .arg(gContext->GetHostName());
 
     QSqlQuery query = db_conn->exec(thequery);
 
@@ -902,7 +909,7 @@ bool TVRec::SetVideoFiltersForChannel(Channel *chan, const QString &channum)
 
         videoFilters = query.value(0).toString();
 
-        if (videoFilters == QString::null)
+        if (videoFilters == QString::null) 
             videoFilters = "";
 
         if (nvr != NULL)
@@ -926,6 +933,107 @@ bool TVRec::SetVideoFiltersForChannel(Channel *chan, const QString &channum)
     return ret;
 }
 
+int TVRec::GetChannelValue(const QString &channel_field,Channel *chan, 
+                           const QString &channum)
+{
+    if (!db_conn)
+        return true;
+
+    pthread_mutex_lock(&db_lock);
+
+    MythContext::KickDatabase(db_conn);
+
+    QString channelinput = chan->GetCurrentInput();
+    QString device = chan->GetDevice();
+   
+    QString thequery = QString("SELECT channel.%1 FROM "
+                               "channel,capturecard,cardinput "
+                               "WHERE channel.channum = \"%2\" AND "
+                               "channel.sourceid = cardinput.sourceid AND "
+                               "cardinput.inputname = \"%3\" AND "
+                               "cardinput.cardid = capturecard.cardid AND "
+                               "capturecard.videodevice = \"%4\" AND "
+                               "capturecard.hostname = \"%5\";")
+                               .arg(channel_field).arg(channum)
+                               .arg(channelinput).arg(device)
+                               .arg(gContext->GetHostName());
+
+    QSqlQuery query = db_conn->exec(thequery);
+
+    if (!query.isActive())
+        MythContext::DBError("getcontrastforchannel", query);
+    else if (query.numRowsAffected() > 0)
+    {
+        query.next();
+
+        if (query.value(0).isNull())
+        {
+            pthread_mutex_unlock(&db_lock);
+            return -1;
+        }
+        else
+        {
+            pthread_mutex_unlock(&db_lock);
+            return query.value(0).toInt();
+        }
+    }
+
+    pthread_mutex_unlock(&db_lock);
+
+    return -1;
+}
+
+void TVRec::SetChannelValue(QString &field_name,int value, Channel *chan,
+                            const QString &channum)
+{
+
+    if (!db_conn)
+        return;
+
+    pthread_mutex_lock(&db_lock);
+
+    MythContext::KickDatabase(db_conn);
+
+    QString channelinput = chan->GetCurrentInput();
+    QString device = chan->GetDevice();
+
+    // Only mysql 4.x can do multi table updates so we need two steps to get 
+    // the sourceid from the table join.
+    QString thequery = QString("SELECT channel.sourceid FROM "
+                               "channel,cardinput,capturecard "
+                               "WHERE channel.channum = \"%1\" AND "
+                               "channel.sourceid = cardinput.sourceid AND "
+                               "cardinput.inputname = \"%2\" AND "
+                               "cardinput.cardid = capturecard.cardid AND "
+                               "capturecard.videodevice = \"%3\" AND "
+                               "capturecard.hostname = \"%4\";")
+                               .arg(channum).arg(channelinput).arg(device)
+                               .arg(gContext->GetHostName());
+
+    QSqlQuery query = db_conn->exec(thequery);
+    int sourceid = -1;
+
+    if (!query.isActive())
+        MythContext::DBError("setchannelvalue", query);
+    else if (query.numRowsAffected() > 0)
+    {
+        query.next();
+        sourceid = query.value(0).toInt();
+    }
+
+    if (sourceid != -1)
+    {
+        thequery = QString("UPDATE channel SET channel.%1=\"%2\" "
+                           "WHERE channel.channum = \"%3\" AND "
+                           "channel.sourceid = \"%4\";")
+                           .arg(field_name).arg(value).arg(channum)
+                           .arg(sourceid);
+        query = db_conn->exec(thequery);
+    }
+
+    pthread_mutex_unlock(&db_lock);
+}
+
 QString TVRec::GetNextChannel(Channel *chan, int channeldirection)
 {
     QString ret = "";
@@ -947,9 +1055,11 @@ QString TVRec::GetNextChannel(Channel *chan, int channeldirection)
                                "channel.sourceid = cardinput.sourceid AND "
                                "cardinput.inputname = \"%3\" AND "
                                "cardinput.cardid = capturecard.cardid AND "
-                               "capturecard.videodevice = \"%4\";")
+                               "capturecard.videodevice = \"%4\" AND "
+                               "capturecard.hostname = \"%5\";")
                                .arg(channelorder).arg(channum)
-                               .arg(channelinput).arg(device);
+                               .arg(channelinput).arg(device)
+                               .arg(gContext->GetHostName());
 
     QSqlQuery query = db_conn->exec(thequery);
 
@@ -970,9 +1080,11 @@ QString TVRec::GetNextChannel(Channel *chan, int channeldirection)
                            "WHERE channel.sourceid = cardinput.sourceid AND "
                            "cardinput.inputname = \"%2\" AND "
                            "cardinput.cardid = capturecard.cardid AND "
-                           "capturecard.videodevice = \"%3\" ORDER BY %4 "
+                           "capturecard.videodevice = \"%3\" AND "
+                           "capturecard.hostname = \"%4\" ORDER BY %5 "
                            "LIMIT 1;").arg(channelorder).arg(channelinput)
-                           .arg(device).arg(channelorder);
+                           .arg(device).arg(gContext->GetHostName())
+                           .arg(channelorder);
        
         query = db_conn->exec(thequery);
 
@@ -1007,20 +1119,21 @@ QString TVRec::GetNextChannel(Channel *chan, int channeldirection)
         wherefavorites = "AND favorites.chanid = channel.chanid";
     }
 
-    // Just a note, %9 is the limit here.
+    QString wherepart = QString("channel.sourceid = cardinput.sourceid AND "
+                                "cardinput.inputname = \"%1\" AND "
+                                "cardinput.cardid = capturecard.cardid AND "
+                                "capturecard.videodevice = \"%2\" AND "
+                                "capturecard.hostname = \"%3\" ")
+                                .arg(channelinput).arg(device)
+                                .arg(gContext->GetHostName());
+
     thequery = QString("SELECT channel.channum FROM channel,capturecard,"
                        "cardinput%1 WHERE "
-                       "channel.%2 %3 \"%4\" %5 AND "
-                       "channel.sourceid = cardinput.sourceid AND "
-                       "cardinput.inputname = \"%6\" AND "
-                       "cardinput.cardid = capturecard.cardid AND "
-                       "capturecard.videodevice = \"%7\" "
-                       "ORDER BY %8 %9 "
-                       "LIMIT 1;")
+                       "channel.%2 %3 \"%4\" %5 AND %6 "
+                       "ORDER BY %7 %8 LIMIT 1;")
                        .arg(fromfavorites).arg(channelorder)
                        .arg(comp).arg(id).arg(wherefavorites)
-                       .arg(channelinput).arg(device)
-                       .arg(channelorder).arg(ordering);
+                       .arg(wherepart).arg(channelorder).arg(ordering);
 
     query = db_conn->exec(thequery);
 
@@ -1043,17 +1156,11 @@ QString TVRec::GetNextChannel(Channel *chan, int channeldirection)
         // again, %9 is the limit for this
         thequery = QString("SELECT channel.channum FROM channel,capturecard,"
                            "cardinput%1 WHERE "
-                           "channel.%2 %3 \"%4\" %5 AND "
-                           "channel.sourceid = cardinput.sourceid AND "
-                           "cardinput.inputname = \"%6\" AND "
-                           "cardinput.cardid = capturecard.cardid AND "
-                           "capturecard.videodevice = \"%7\" "
-                           "ORDER BY %8 %9 "
-                           "LIMIT 1;")
+                           "channel.%2 %3 \"%4\" %5 AND %6 "
+                           "ORDER BY %7 %8 LIMIT 1;")
                            .arg(fromfavorites).arg(channelorder)
                            .arg(comp).arg(id).arg(wherefavorites)
-                           .arg(channelinput).arg(device)
-                           .arg(channelorder).arg(ordering);
+                           .arg(wherepart).arg(channelorder).arg(ordering);
 
         query = db_conn->exec(thequery);
  
@@ -1080,10 +1187,11 @@ bool TVRec::ChangeExternalChannel(const QString& channum)
                             "AND channel.sourceid = cardinput.sourceid "
                             "AND cardinput.inputname = '%2' "
                             "AND cardinput.cardid = capturecard.cardid "
-                            "AND capturecard.videodevice = '%3' ")
-        .arg(channum)
-        .arg(channel->GetCurrentInput())
-        .arg(channel->GetDevice());
+                            "AND capturecard.videodevice = '%3' "
+                            "AND capturecard.hostname = \"%4\";")
+                           .arg(channum).arg(channel->GetCurrentInput())
+                           .arg(channel->GetDevice())
+                           .arg(gContext->GetHostName());
 
     QString command(QString::null);
 
@@ -1263,8 +1371,10 @@ void TVRec::ToggleChannelFavorite(void)
                                "channel.sourceid = cardinput.sourceid AND "
                                "cardinput.inputname = \"%2\" AND "
                                "cardinput.cardid = capturecard.cardid AND "
-                               "capturecard.videodevice = \"%3\";")
-                               .arg(channum).arg(channelinput).arg(device);
+                               "capturecard.videodevice = \"%3\" AND "
+                               "capturecard.hostname = \"%4\";")
+                               .arg(channum).arg(channelinput).arg(device)
+                               .arg(gContext->GetHostName());
 
     QSqlQuery query = db_conn->exec(thequery);
 

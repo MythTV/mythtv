@@ -149,7 +149,8 @@ void XMLTV_generic_config::save(QSqlDatabase* db) {
     if (ret != 0)
         cout << command << endl << "exited with status " << ret << endl;
 
-    if (grabber == "tv_grab_de" || grabber == "tv_grab_sn") {
+    if (grabber == "tv_grab_de" || grabber == "tv_grab_sn" || 
+        grabber == "tv_grab_fi") {
         cout << "You _MUST_ run 'mythfilldatabase --manual the first time, "
              << "instead\n";
         cout << "of just 'mythfilldatabase'.  Your grabber does not provide\n";

@@ -39,6 +39,8 @@ class TVRec
     bool IsRecording(void) { return StateIsRecording(internalState); }
 
     bool CheckChannel(Channel *chan, const QString &channum, int &finetuning); 
+    void SetChannelValue(QString &field_name,int value, Channel *chan, const QString &channum);
+    int GetChannelValue(const QString &channel_field,Channel *chan, const QString &channum);
     bool ChangeExternalChannel(const QString &channum);
     bool SetVideoFiltersForChannel(Channel *chan, const QString &channum);
     QString GetNextChannel(Channel *chan, int channeldirection);

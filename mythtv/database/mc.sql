@@ -28,7 +28,10 @@ CREATE TABLE IF NOT EXISTS channel
     icon VARCHAR(255) NULL,
     finetune INT,
     videofilters VARCHAR(255) NULL,
-    xmltvid VARCHAR(64) NULL
+    xmltvid VARCHAR(64) NULL,
+    contrast INT DEFAULT 32768,
+    brightness INT DEFAULT 32768,
+    colour INT DEFAULT 32768
 );
 CREATE TABLE IF NOT EXISTS program
 (

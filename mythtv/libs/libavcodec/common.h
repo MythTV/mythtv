@@ -6,9 +6,6 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-#define FFMPEG_VERSION_INT 0x000406
-#define FFMPEG_VERSION     "0.4.6"
-
 #define CONFIG_RISKY 1
 
 #if defined(WIN32) && !defined(__MINGW32__) && !defined(__CYGWIN__)
@@ -59,8 +56,16 @@
     { name, help, offsetof(AVCodecContext, field), FF_OPT_TYPE_STRING, .defval = val, .defstr = str }
 #define AVOPTION_CODEC_RCOVERRIDE(name, help, field) \
     { name, help, offsetof(AVCodecContext, field), FF_OPT_TYPE_RCOVERRIDE, .defval = 0, .defstr = NULL }
-#define AVOPTION_SUB(ptr) { .name = NULL, .sub = ptr }
+#define AVOPTION_SUB(ptr) { .name = NULL, .help = (const char*)ptr }
 #define AVOPTION_END() AVOPTION_SUB(NULL)
+
+struct AVOption;
+#ifdef HAVE_MMX
+extern const struct AVOption avoptions_common[3 + 5];
+#else
+extern const struct AVOption avoptions_common[3];
+#endif
+extern const struct AVOption avoptions_workaround_bug[11];
 
 #endif /* HAVE_AV_CONFIG_H */
 

@@ -1,5 +1,9 @@
 USE mythconverg;
 
+ALTER TABLE channel ADD COLUMN contrast INT DEFAULT 32768;
+ALTER TABLE channel ADD COLUMN brightness INT DEFAULT 32768;
+ALTER TABLE channel ADD COLUMN colour INT DEFAULT 32768;
+
 CREATE TABLE IF NOT EXISTS programrating
 (
     chanid INT UNSIGNED NOT NULL,

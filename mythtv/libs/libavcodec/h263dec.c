@@ -488,16 +488,16 @@ retry:
         else
             s->workaround_bugs &= ~FF_BUG_NO_PADDING;
 
-        if(s->avctx->fourcc == ff_get_fourcc("XVIX")) 
+        if(s->avctx->codec_tag == ff_get_fourcc("XVIX")) 
             s->workaround_bugs|= FF_BUG_XVID_ILACE;
 #if 0
-        if(s->avctx->fourcc == ff_get_fourcc("MP4S")) 
+        if(s->avctx->codec_tag == ff_get_fourcc("MP4S")) 
             s->workaround_bugs|= FF_BUG_AC_VLC;
         
-        if(s->avctx->fourcc == ff_get_fourcc("M4S2")) 
+        if(s->avctx->codec_tag == ff_get_fourcc("M4S2")) 
             s->workaround_bugs|= FF_BUG_AC_VLC;
 #endif
-        if(s->avctx->fourcc == ff_get_fourcc("UMP4")){
+        if(s->avctx->codec_tag == ff_get_fourcc("UMP4")){
             s->workaround_bugs|= FF_BUG_UMP4;
             s->workaround_bugs|= FF_BUG_AC_VLC;
         }
@@ -510,10 +510,10 @@ retry:
             s->workaround_bugs|= FF_BUG_QPEL_CHROMA2;
         }
 
-        if(s->avctx->fourcc == ff_get_fourcc("XVID") && s->xvid_build==0)
+        if(s->avctx->codec_tag == ff_get_fourcc("XVID") && s->xvid_build==0)
             s->workaround_bugs|= FF_BUG_QPEL_CHROMA;
         
-        if(s->avctx->fourcc == ff_get_fourcc("XVID") && s->xvid_build==0)
+        if(s->avctx->codec_tag == ff_get_fourcc("XVID") && s->xvid_build==0)
             s->padding_bug_score= 256*256*256*64;
         
         if(s->xvid_build && s->xvid_build<=3)
@@ -792,6 +792,12 @@ printf("%Ld\n", rdtsc()-time);
     return get_consumed_bytes(s, buf_size);
 }
 
+static const AVOption mpeg4_decoptions[] =
+{
+    AVOPTION_SUB(avoptions_workaround_bug),
+    AVOPTION_END()
+};
+
 AVCodec mpeg4_decoder = {
     "mpeg4",
     CODEC_TYPE_VIDEO,
@@ -802,6 +808,7 @@ AVCodec mpeg4_decoder = {
     ff_h263_decode_end,
     ff_h263_decode_frame,
     CODEC_CAP_DRAW_HORIZ_BAND | CODEC_CAP_DR1 | CODEC_CAP_TRUNCATED,
+    .options = mpeg4_decoptions,
 };
 
 AVCodec h263_decoder = {
@@ -826,6 +833,7 @@ AVCodec msmpeg4v1_decoder = {
     ff_h263_decode_end,
     ff_h263_decode_frame,
     CODEC_CAP_DRAW_HORIZ_BAND | CODEC_CAP_DR1,
+    mpeg4_decoptions,
 };
 
 AVCodec msmpeg4v2_decoder = {
@@ -838,6 +846,7 @@ AVCodec msmpeg4v2_decoder = {
     ff_h263_decode_end,
     ff_h263_decode_frame,
     CODEC_CAP_DRAW_HORIZ_BAND | CODEC_CAP_DR1,
+    mpeg4_decoptions,
 };
 
 AVCodec msmpeg4v3_decoder = {
@@ -850,6 +859,7 @@ AVCodec msmpeg4v3_decoder = {
     ff_h263_decode_end,
     ff_h263_decode_frame,
     CODEC_CAP_DRAW_HORIZ_BAND | CODEC_CAP_DR1,
+    .options = mpeg4_decoptions,
 };
 
 AVCodec wmv1_decoder = {
@@ -862,6 +872,7 @@ AVCodec wmv1_decoder = {
     ff_h263_decode_end,
     ff_h263_decode_frame,
     CODEC_CAP_DRAW_HORIZ_BAND | CODEC_CAP_DR1,
+    mpeg4_decoptions,
 };
 
 AVCodec h263i_decoder = {
@@ -874,5 +885,6 @@ AVCodec h263i_decoder = {
     ff_h263_decode_end,
     ff_h263_decode_frame,
     CODEC_CAP_DRAW_HORIZ_BAND | CODEC_CAP_DR1,
+    mpeg4_decoptions,
 };
 

@@ -339,10 +339,10 @@ int MPV_common_init(MpegEncContext *s)
     yc_size = y_size + 2 * c_size;
 
     /* convert fourcc to upper case */
-    s->avctx->fourcc=   toupper( s->avctx->fourcc     &0xFF)          
-                     + (toupper((s->avctx->fourcc>>8 )&0xFF)<<8 )
-                     + (toupper((s->avctx->fourcc>>16)&0xFF)<<16) 
-                     + (toupper((s->avctx->fourcc>>24)&0xFF)<<24);
+    s->avctx->codec_tag=   toupper( s->avctx->codec_tag     &0xFF)          
+                        + (toupper((s->avctx->codec_tag>>8 )&0xFF)<<8 )
+                        + (toupper((s->avctx->codec_tag>>16)&0xFF)<<16) 
+                        + (toupper((s->avctx->codec_tag>>24)&0xFF)<<24);
 
     CHECKED_ALLOCZ(s->allocated_edge_emu_buffer, (s->width+64)*2*17*2); //(width + edge + align)*interlaced*MBsize*tolerance
     s->edge_emu_buffer= s->allocated_edge_emu_buffer + (s->width+64)*2*17;
@@ -3905,7 +3905,6 @@ char ff_get_pict_type_char(int pict_type){
     }
 }
 
-extern const AVOption common_options[2];
 static const AVOption mpeg4_options[] =
 {
     AVOPTION_CODEC_INT("bitrate", "desired video bitrate", bit_rate, 4, 240000000, 800000),
@@ -3925,7 +3924,7 @@ static const AVOption mpeg4_options[] =
 		        flags, CODEC_FLAG_PSNR, 0),
     AVOPTION_CODEC_RCOVERRIDE("rc_override", "ratecontrol override (=startframe,endframe,qscale,quality_factor)",
 			      rc_override),
-    AVOPTION_SUB(common_options),
+    AVOPTION_SUB(avoptions_common),
     AVOPTION_END()
 };
 

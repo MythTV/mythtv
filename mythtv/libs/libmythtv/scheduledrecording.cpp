@@ -251,6 +251,7 @@ bool ScheduledRecording::loadByProgram(QSqlDatabase* db,
     QString sqltitle(proginfo.title);
     // this doesn't have to be a QRegexp in qt 3.1+
     sqltitle.replace(QRegExp("\'"), "\\'");
+    sqltitle.replace(QRegExp("\""), "\\\"");
 
     // prevent the SQL from breaking if chanid is null
     QString chanid = proginfo.chanid;
