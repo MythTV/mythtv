@@ -2395,8 +2395,9 @@ void MainServer::PrintStatus(QSocket *socket)
        for (unsigned int i = 0; (iter != recordinglist->end()) && i < iNum; 
             iter++, i++)
        {
-           if (!(*iter)->recording) // skip it, and don't count it as
-           {                         // one of our number
+           if (!(*iter)->recording ||     // bad entry, don't show as upcoming
+               ((*iter)->startts) < QDateTime::currentDateTime()) // recording
+           {                       
                i--;
            }
            else

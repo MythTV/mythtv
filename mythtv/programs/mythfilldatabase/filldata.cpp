@@ -980,10 +980,17 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
     }
 }
 
-void clearDBAtOffset(int offset, int chanid)
+void clearDBAtOffset(int offset, int chanid, QDate *qCurrentDate)
 {
     if (no_delete)
         return;
+
+    QDate newDate; 
+    if (qCurrentDate == 0)
+    {
+        newDate = QDate::currentDate();
+        qCurrentDate = &newDate;
+    }
 
     int nextoffset = offset + 1;
 
@@ -997,26 +1004,35 @@ void clearDBAtOffset(int offset, int chanid)
     QString querystr;
 
     querystr.sprintf("DELETE FROM program WHERE starttime >= "
-                     "DATE_ADD(CURRENT_DATE, INTERVAL %d DAY) "
-                     "AND starttime < DATE_ADD(CURRENT_DATE, INTERVAL "
-                     "%d DAY) AND chanid = %d;", offset, nextoffset, chanid);
+                     "DATE_ADD('%s', INTERVAL %d DAY) "
+                     "AND starttime < DATE_ADD('%s', INTERVAL "
+                     "%d DAY) AND chanid = %d;", 
+                     qCurrentDate->toString("yyyyMMdd").ascii(), offset, 
+                     qCurrentDate->toString("yyyyMMdd").ascii(), nextoffset, 
+                     chanid);
     query.exec(querystr);
 
     querystr.sprintf("DELETE FROM programrating WHERE starttime >= "
-                     "DATE_ADD(CURRENT_DATE, INTERVAL %d DAY) "
-                     "AND starttime < DATE_ADD(CURRENT_DATE, INTERVAL "
-                     "%d DAY) AND chanid = %d;", offset, nextoffset, chanid);
+                     "DATE_ADD('%s', INTERVAL %d DAY) "
+                     "AND starttime < DATE_ADD('%s', INTERVAL "
+                     "%d DAY) AND chanid = %d;", 
+                     qCurrentDate->toString("yyyyMMdd").ascii(), offset, 
+                     qCurrentDate->toString("yyyyMMdd").ascii(), nextoffset, 
+                     chanid);
     query.exec(querystr);
 
     querystr.sprintf("DELETE FROM credits WHERE starttime >= "
-                     "DATE_ADD(CURRENT_DATE, INTERVAL %d DAY) "
-                     "AND starttime < DATE_ADD(CURRENT_DATE, INTERVAL "
-                     "%d DAY) AND chanid = %d;", offset, nextoffset, chanid);
+                     "DATE_ADD('%s', INTERVAL %d DAY) "
+                     "AND starttime < DATE_ADD('%s', INTERVAL "
+                     "%d DAY) AND chanid = %d;", 
+                     qCurrentDate->toString("yyyyMMdd").ascii(), offset, 
+                     qCurrentDate->toString("yyyyMMdd").ascii(), nextoffset, 
+                     chanid);
     query.exec(querystr);
 }
 
 void handlePrograms(int id, int offset, QMap<QString, 
-                    QValueList<ProgInfo> > *proglist)
+                    QValueList<ProgInfo> > *proglist, QDate *qCurrentDate)
 {
     QMap<QString, QValueList<ProgInfo> >::Iterator mapiter;
     for (mapiter = proglist->begin(); mapiter != proglist->end(); ++mapiter)
@@ -1048,7 +1064,7 @@ void handlePrograms(int id, int offset, QMap<QString,
             continue;
         }
 
-        clearDBAtOffset(offset, chanid);
+        clearDBAtOffset(offset, chanid, qCurrentDate);
 
         QValueList<ProgInfo> *sortlist = &((*proglist)[mapiter.key()]);
 
@@ -1242,7 +1258,8 @@ void handlePrograms(int id, int offset, QMap<QString,
 }
 
 
-void grabDataFromFile(int id, int offset, QString &filename)
+void grabDataFromFile(int id, int offset, QString &filename, 
+                      QDate *qCurrentDate = 0)
 {
     QValueList<ChanInfo> chanlist;
     QMap<QString, QValueList<ProgInfo> > proglist;
@@ -1250,7 +1267,7 @@ void grabDataFromFile(int id, int offset, QString &filename)
     parseFile(filename, &chanlist, &proglist);
 
     handleChannels(id, &chanlist);
-    handlePrograms(id, offset, &proglist);
+    handlePrograms(id, offset, &proglist, qCurrentDate);
 }
 
 time_t toTime_t(QDateTime &dt)
@@ -1269,7 +1286,7 @@ time_t toTime_t(QDateTime &dt)
     return secsSince1Jan1970UTC;
 }
 
-bool grabData(Source source, int offset)
+bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
 {
     char tempfilename[] = "/tmp/mythXXXXXX";
     if (mkstemp(tempfilename) == -1) {
@@ -1350,7 +1367,7 @@ bool grabData(Source source, int offset)
     if (!quiet)
          cout << "------------------ End of XMLTV output ------------------" << endl;
 
-    grabDataFromFile(source.id, offset, filename);
+    grabDataFromFile(source.id, offset, filename, qCurrentDate);
 
     QFile thefile(filename);
     thefile.remove();
@@ -1443,12 +1460,26 @@ bool fillData(QValueList<Source> &sourcelist)
         }
         else if (xmltv_grabber == "tv_grab_na")
         {
-            if (!grabData(*it, 1))
+            QDate qCurrentDate = QDate::currentDate();
+
+            if (!grabData(*it, 1, &qCurrentDate))
                 ++failures;
 
             for (int i = 0; i < 9; i++)
             {
-                QString date(QDate::currentDate().addDays(i).toString());
+                // we need to check and see if the current date has changed 
+                // since we started in this loop.  If it has, we need to adjust
+                // the value of 'i' to compensate for this.
+                if (QDate::currentDate() != qCurrentDate)
+                {
+                    QDate newDate = QDate::currentDate();
+                    i += (newDate.daysTo(qCurrentDate));
+                    if (i < 0) 
+                        i = 0;
+                    qCurrentDate = newDate;
+                }
+
+                QString date(qCurrentDate.addDays(i).toString());
                 QString querystr;
                 querystr.sprintf("SELECT COUNT(*) as 'hits' "
                                  "FROM channel LEFT JOIN program USING (chanid) "
@@ -1469,7 +1500,7 @@ bool fillData(QValueList<Source> &sourcelist)
                     {
                         if (!quiet)
                             cout << "Fetching data for " << date << endl;
-                        if (!grabData(*it, i))
+                        if (!grabData(*it, i, &qCurrentDate))
                             ++failures;
                     }
                     else
@@ -1716,7 +1747,8 @@ int main(int argc, char *argv[])
              quiet = true;
              ++argpos;
         }
-        else if (!strcmp(a.argv()[argpos], "--help"))
+        else if (!strcmp(a.argv()[argpos], "-h") ||
+                 !strcmp(a.argv()[argpos], "--help"))
         {
             cout << "usage:\n";
             cout << "--manual\n";
@@ -1729,8 +1761,8 @@ int main(int argc, char *argv[])
             cout << "\n";
             cout << "--preset\n";
             cout << "   Use it in case that you want to assign a preset number for\n";
-            cout << "   each channel, useful for non US countries where the people\n";
-            cout << "   is used to assign a sequenced number for each channel, i.e.:\n";
+            cout << "   each channel, useful for non US countries where people\n";
+            cout << "   are used to assigning a sequenced number for each channel, i.e.:\n";
             cout << "   1->TVE1(S41), 2->La 2(SE18), 3->TV3(21), 4->Canal 33(60)...\n";
             cout << "\n";
             cout << "--no-delete\n";

@@ -156,6 +156,21 @@
     </message>
 </context>
 <context>
+    <name>MythContext</name>
+    <message>
+        <source>Connection to the master backend server timed out.  You probably should modify the Mater Server setting in the setup program and set the proper IP address there.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not connect to the master backend server -- is it running?  Is the IP address set for it in the setup program correct?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The connection to the master backend server has gone away for some reason.. Is it running?</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MythWizard</name>
     <message>
         <source>&amp;Cancel</source>
@@ -807,43 +822,43 @@
     </message>
     <message>
         <source>English</source>
-        <translation>Engelsk</translation>
+        <translation type="obsolete">Engelsk</translation>
     </message>
     <message>
         <source>Italian</source>
-        <translation>Italiensk</translation>
+        <translation type="obsolete">Italiensk</translation>
     </message>
     <message>
         <source>Catalan</source>
-        <translation>Katalansk(?)</translation>
+        <translation type="obsolete">Katalansk(?)</translation>
     </message>
     <message>
         <source>Spanish</source>
-        <translation>Spansk</translation>
+        <translation type="obsolete">Spansk</translation>
     </message>
     <message>
         <source>Dutch</source>
-        <translation>Hollandsk</translation>
+        <translation type="obsolete">Hollandsk</translation>
     </message>
     <message>
         <source>French</source>
-        <translation>Fransk</translation>
+        <translation type="obsolete">Fransk</translation>
     </message>
     <message>
         <source>German</source>
-        <translation>Tysk</translation>
+        <translation type="obsolete">Tysk</translation>
     </message>
     <message>
         <source>Danish</source>
-        <translation>Dansk</translation>
+        <translation type="obsolete">Dansk</translation>
     </message>
     <message>
         <source>Swedish</source>
-        <translation>Svensk</translation>
+        <translation type="obsolete">Svensk</translation>
     </message>
     <message>
         <source>Portuguese</source>
-        <translation>Portugisisk</translation>
+        <translation type="obsolete">Portugisisk</translation>
     </message>
     <message>
         <source>Your preferred language.</source>
@@ -1112,6 +1127,10 @@
     <message>
         <source>Do not edit</source>
         <translation>Unlad at redigere</translation>
+    </message>
+    <message>
+        <source>4:3 Zoom</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

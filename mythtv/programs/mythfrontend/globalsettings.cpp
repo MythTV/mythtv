@@ -1078,16 +1078,16 @@ public:
     MythLanguage():
         ComboBoxSetting(true), GlobalSetting("Language") {
         setLabel(QObject::tr("Language"));
-        addSelection(QObject::tr("English"), "EN");
-        addSelection(QObject::tr("Italian"), "IT");
-        addSelection(QObject::tr("Catalan"), "CA");
-        addSelection(QObject::tr("Spanish"), "ES");
-        addSelection(QObject::tr("Dutch"), "NL");
-        addSelection(QObject::tr("French"), "FR");
-        addSelection(QObject::tr("German"), "DE");
-        addSelection(QObject::tr("Danish"), "DK");
-        addSelection(QObject::tr("Swedish"), "SV");
-        addSelection(QObject::tr("Portuguese"), "PT");
+        addSelection(QString::fromUtf8("English"), "EN");     // English
+        addSelection(QString::fromUtf8("Italiano"), "IT");    // Italian
+        addSelection(QString::fromUtf8("Català"), "CA");      // Catalan
+        addSelection(QString::fromUtf8("Español"), "ES");     // Spanish
+        addSelection(QString::fromUtf8("Nederlands"), "NL");  // Dutch
+        addSelection(QString::fromUtf8("Français"), "FR");    // French
+        addSelection(QString::fromUtf8("Deutsch"), "DE");     // German
+        addSelection(QString::fromUtf8("Dansk"), "DK");       // Danish
+        addSelection(QString::fromUtf8("Svenska"), "SV");     // Swedish
+        addSelection(QString::fromUtf8("Português"), "PT");   // Portuguese
         setHelpText(QObject::tr("Your preferred language.") );
     };
 };

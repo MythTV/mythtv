@@ -152,6 +152,21 @@
     </message>
 </context>
 <context>
+    <name>MythContext</name>
+    <message>
+        <source>Connection to the master backend server timed out.  You probably should modify the Mater Server setting in the setup program and set the proper IP address there.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not connect to the master backend server -- is it running?  Is the IP address set for it in the setup program correct?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The connection to the master backend server has gone away for some reason.. Is it running?</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MythWizard</name>
     <message>
         <source>&amp;Cancel</source>
@@ -791,43 +806,43 @@
     </message>
     <message>
         <source>English</source>
-        <translation>Engelska (English)</translation>
+        <translation type="obsolete">Engelska (English)</translation>
     </message>
     <message>
         <source>Italian</source>
-        <translation>Italienska (Italian)</translation>
+        <translation type="obsolete">Italienska (Italian)</translation>
     </message>
     <message>
         <source>Catalan</source>
-        <translation>Katalanska (Catalan)</translation>
+        <translation type="obsolete">Katalanska (Catalan)</translation>
     </message>
     <message>
         <source>Spanish</source>
-        <translation>Spanska (Spanish)</translation>
+        <translation type="obsolete">Spanska (Spanish)</translation>
     </message>
     <message>
         <source>Dutch</source>
-        <translation>Holländska (Dutch)</translation>
+        <translation type="obsolete">Holländska (Dutch)</translation>
     </message>
     <message>
         <source>French</source>
-        <translation>Franska (French)</translation>
+        <translation type="obsolete">Franska (French)</translation>
     </message>
     <message>
         <source>German</source>
-        <translation>Tyska (German)</translation>
+        <translation type="obsolete">Tyska (German)</translation>
     </message>
     <message>
         <source>Danish</source>
-        <translation>Danska (Danish)</translation>
+        <translation type="obsolete">Danska (Danish)</translation>
     </message>
     <message>
         <source>Swedish</source>
-        <translation>Svenska (Swedish)</translation>
+        <translation type="obsolete">Svenska (Swedish)</translation>
     </message>
     <message>
         <source>Portuguese</source>
-        <translation>Portugisiska (Portuguese)</translation>
+        <translation type="obsolete">Portugisiska (Portuguese)</translation>
     </message>
     <message>
         <source>Your preferred language.</source>
@@ -1060,6 +1075,10 @@
     <message>
         <source>Do not edit</source>
         <translation>Redigera inte</translation>
+    </message>
+    <message>
+        <source>4:3 Zoom</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
