@@ -28,13 +28,21 @@ static void *run_priv_thread(void *data)
                     pthread_t *target_thread = (pthread_t *)(req.getData());
                     // Raise the given thread to realtime priority
                     struct sched_param sp = {1};
-                    int status = pthread_setschedparam(
-                        *target_thread, SCHED_FIFO, &sp);
-                    if (status) {
-                        perror("pthread_setschedparam");
-                        VERBOSE(VB_GENERAL, "Running as SUID root would allow "
-                                "some threads to run with realtime priority, "
-                                "improving video smoothness.");
+                    if (target_thread)
+                    {
+                        int status = pthread_setschedparam(
+                            *target_thread, SCHED_FIFO, &sp);
+                        if (status) {
+                            perror("pthread_setschedparam");
+                            VERBOSE(VB_GENERAL, "Running as SUID root would allow "
+                                    "some threads to run with realtime priority, "
+                                    "improving video smoothness.");
+                        }
+                    }
+                    else
+                    {
+                        VERBOSE(VB_IMPORTANT, "Something sus here. NULL thread ptr "
+                                "for MythPrivRequest::MythRealtime");
                     }
                 }
                 break;
