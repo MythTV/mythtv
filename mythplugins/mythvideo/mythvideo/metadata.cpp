@@ -173,18 +173,18 @@ void Metadata::fillData(QSqlDatabase *db)
     {
         query.next();
 
-        title = query.value(0).toString();
-        director = query.value(1).toString();
-        plot = query.value(2).toString();
-        rating = query.value(3).toString();
+        title = QString::fromUtf8(query.value(0).toString());
+        director = QString::fromUtf8(query.value(1).toString());
+        plot = QString::fromUtf8(query.value(2).toString());
+        rating = QString::fromUtf8(query.value(3).toString());
         year = query.value(4).toInt();
         userrating = (float)query.value(5).toDouble();
         length = query.value(6).toInt();
-        filename = query.value(7).toString();
+        filename = QString::fromUtf8(query.value(7).toString());
         showlevel = query.value(8).toInt();
         id = query.value(9).toUInt();
-        coverfile = query.value(10).toString();
-        inetref = query.value(11).toString();
+        coverfile = QString::fromUtf8(query.value(10).toString());
+        inetref = QString::fromUtf8(query.value(11).toString());
         childID = query.value(12).toUInt();
         browse = query.value(13).toBool();
         playcommand = query.value(14).toString();
@@ -211,17 +211,17 @@ void Metadata::fillDataFromID(QSqlDatabase *db)
     {
         query.next();
 
-        title = query.value(0).toString();
-        director = query.value(1).toString();
-        plot = query.value(2).toString();
+        title = QString::fromUtf8(query.value(0).toString());
+        director = QString::fromUtf8(query.value(1).toString());
+        plot = QString::fromUtf8(query.value(2).toString());
         rating = query.value(3).toString();
         year = query.value(4).toInt();
         userrating = (float)query.value(5).toDouble();
         length = query.value(6).toInt();
-        filename = query.value(7).toString();
+        filename = QString::fromUtf8(query.value(7).toString());
         showlevel = query.value(8).toInt();
-        coverfile = query.value(9).toString();
-        inetref = query.value(10).toString();
+        coverfile = QString::fromUtf8(query.value(9).toString());
+        inetref = QString::fromUtf8(query.value(10).toString());
         childID = query.value(11).toUInt();
         browse = query.value(12).toBool();
         playcommand = query.value(13).toString();

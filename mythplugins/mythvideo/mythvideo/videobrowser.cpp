@@ -580,7 +580,7 @@ void VideoBrowser::updateInfo(QPainter *p)
        {
            UITextType *type = (UITextType *)container->GetType("title");
            if (type)
-               type->SetText(QString::fromUtf8(title));
+               type->SetText(title);
 
            type = (UITextType *)container->GetType("filename");
            if (type)
@@ -588,7 +588,7 @@ void VideoBrowser::updateInfo(QPainter *p)
 
            type = (UITextType *)container->GetType("director");
            if (type)
-               type->SetText(QString::fromUtf8(director));
+               type->SetText(director);
  
            type = (UITextType *)container->GetType("year");
            if (type)
@@ -611,7 +611,7 @@ void VideoBrowser::updateInfo(QPainter *p)
 
            type = (UITextType *)container->GetType("plot");
            if (type)
-               type->SetText(QString::fromUtf8(plot));
+               type->SetText(plot);
  
            type = (UITextType *)container->GetType("userrating");
            if (type)
@@ -708,7 +708,7 @@ void VideoBrowser::jumpSelection(int amount)
     inData += amount;
      
     if (inData < 0)
-        inData = m_list.count() - abs(1 - inData);
+        inData = m_list.count() + inData - 1;
     else if(inData >= (int)m_list.count())
         inData = inData - m_list.count();
      
