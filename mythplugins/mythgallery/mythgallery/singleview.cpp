@@ -40,27 +40,37 @@ SingleView::SingleView(vector<Thumbnail> *imagelist, int pos, QWidget *parent,
         bgcolor = QColor(globalsettings->GetSetting("BackgroundColor"));
         fgcolor = QColor(globalsettings->GetSetting("ForegroundColor"));
 
+        QPixmap *bgpixmap = NULL;
+
         if (globalsettings->GetSetting("BackgroundPixmap") != "")
         {
             QString pmapname = globalsettings->GetSetting("ThemePathName") +
                                globalsettings->GetSetting("BackgroundPixmap");
-            setPaletteBackgroundPixmap(QPixmap(pmapname));
+
+            bgpixmap = loadScalePixmap(pmapname, screenwidth, screenheight,
+                                       wmult, hmult);
+            setPaletteBackgroundPixmap(*bgpixmap);
         }
         else if (globalsettings->GetSetting("TiledBackgroundPixmap") != "")
         { 
             QString pmapname = globalsettings->GetSetting("ThemePathName") +
                           globalsettings->GetSetting("TiledBackgroundPixmap");
+
+            bgpixmap = loadScalePixmap(pmapname, screenwidth, screenheight,
+                                       wmult, hmult);
     
             QPixmap background(screenwidth, screenheight);
             QPainter tmp(&background);
 
-            tmp.drawTiledPixmap(0, 0, screenwidth, screenheight,
-                                QPixmap(pmapname));
+            tmp.drawTiledPixmap(0, 0, screenwidth, screenheight, *bgpixmap);
             tmp.end();
             setPaletteBackgroundPixmap(background);
         }
         else
             setPalette(QPalette(bgcolor));
+
+        if (bgpixmap)
+            delete bgpixmap;
     }   
     else
     {       
@@ -117,8 +127,7 @@ void SingleView::paintEvent(QPaintEvent *e)
         QString filename = (*images)[imagepos].filename;
 
         QImage tmpimage(filename);
-        QImage tmp2 = tmpimage.smoothScale((int)(screenwidth * wmult),
-                                           (int)(screenheight * hmult),
+        QImage tmp2 = tmpimage.smoothScale(screenwidth, screenheight,
                                            QImage::ScaleMin);
 
         if (image)
