@@ -43,7 +43,7 @@
    </button>
 
    <button>
-      <type>SETUP</type>
+      <type>MUSIC_SCAN</type>
       <text>Scan for New Music</text>
       <text lang="IT">Rileggi lista brani</text>
       <text lang="ES">Actualizar lista</text>
