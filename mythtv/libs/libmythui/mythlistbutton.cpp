@@ -8,6 +8,7 @@
 #include "mythlistbutton.h"
 #include "mythmainwindow.h"
 #include "mythcontext.h"
+#include "mythfontproperties.h"
 
 MythListButton::MythListButton(MythUIType *parent, const char *name, 
                                const QRect& area, bool showArrow, 
@@ -59,9 +60,12 @@ MythListButton::MythListButton(MythUIType *parent, const char *name,
     m_checkNonePix = NULL;
     m_checkHalfPix = NULL;
     m_checkFullPix = NULL;
+    
+    m_fontActive = new MythFontProperties();
+    m_fontInactive = new MythFontProperties();
 }
 
-MythListButton::~MythListButton()
+    MythListButton::~MythListButton()
 {    
     Reset();
     delete m_topIterator;
@@ -89,6 +93,11 @@ MythListButton::~MythListButton()
         delete m_checkHalfPix;
     if (m_checkFullPix)
         delete m_checkFullPix;
+    if (m_fontActive)
+       delete m_fontActive; 
+    if (m_fontInactive)
+       delete m_fontInactive; 
+    
 }
 
 void MythListButton::SetItemRegColor(const QColor& beg, 
@@ -111,12 +120,12 @@ void MythListButton::SetItemSelColor(const QColor& beg,
 
 void MythListButton::SetFontActive(const MythFontProperties &font)
 {
-    m_fontActive   = font;
+    *m_fontActive   = font;
 }
 
 void MythListButton::SetFontInactive(const MythFontProperties &font)
 {
-    m_fontInactive = font;
+    *m_fontInactive = font;
 }
 
 void MythListButton::SetSpacing(int spacing)
@@ -593,10 +602,10 @@ void MythListButton::Draw(MythPainter *p, int xoffset, int yoffset,
 
     int alpha = CalcAlpha(alphaMod);
 
-    MythFontProperties *font = (m_active) ? &m_fontActive : &m_fontInactive;
+    MythFontProperties *font = (m_active) ? m_fontActive : m_fontInactive;
     
     if (!active_on)
-        font = &m_fontInactive;
+        font = m_fontInactive;
     
     int x = m_rect.x() + xoffset + m_drawoffset.x();
     int y = m_rect.y() + yoffset + m_drawoffset.y();
@@ -617,9 +626,9 @@ void MythListButton::Draw(MythPainter *p, int xoffset, int yoffset,
     {
         if (active_on && it.current()->getOverrideInactive())
         {
-            font = &m_fontInactive;
+            font = m_fontInactive;
             it.current()->paint(p, font, x, y, active_on, alpha);
-            font = (m_active) ? &m_fontActive : &m_fontInactive;;
+            font = (m_active) ? m_fontActive : m_fontInactive;;
         }
         else
             it.current()->paint(p, font, x, y, active_on, alpha);
@@ -660,9 +669,9 @@ void MythListButton::Init()
 
     MythPainter *painter = GetMythPainter();
 
-    QFontMetrics fm(m_fontActive.face);
+    QFontMetrics fm(m_fontActive->face);
     QSize sz1 = fm.size(Qt::SingleLine, "XXXXX");
-    fm = QFontMetrics(m_fontInactive.face);
+    fm = QFontMetrics(m_fontInactive->face);
     QSize sz2 = fm.size(Qt::SingleLine, "XXXXX");
     m_itemHeight = QMAX(sz1.height(), sz2.height()) + (int)(2 * m_itemMargin);
 

@@ -3,6 +3,7 @@
 #include "dialogbox.h"
 #include "mythlistbutton.h"
 #include "mythmainwindow.h"
+#include "mythfontproperties.h"
 
 MythDialogBox::MythDialogBox(const QString &text,
                      MythScreenStack *parent, const char *name) 

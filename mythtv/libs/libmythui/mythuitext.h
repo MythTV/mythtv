@@ -5,8 +5,10 @@
 
 #include <qimage.h>
 
+
 #include "mythuitype.h"
-#include "mythfontproperties.h"
+
+class MythFontProperties;
 
 class MythUIText : public MythUIType
 {
@@ -14,6 +16,7 @@ class MythUIText : public MythUIType
     MythUIText(const QString &text, const MythFontProperties &font,
                QRect displayRect, QRect altDisplayRect,
                MythUIType *parent, const char *name);
+    ~MythUIText();
 
     void SetText(const QString &text);
     QString GetText(void);
@@ -48,7 +51,7 @@ class MythUIText : public MythUIType
 
     bool m_Cutdown;
 
-    MythFontProperties m_Font;
+    MythFontProperties* m_Font;
 
     bool m_colorCycling;
     QColor m_startColor, m_endColor;

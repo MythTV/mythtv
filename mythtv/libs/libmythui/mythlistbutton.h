@@ -6,6 +6,7 @@
 #include "mythuitext.h"
 
 class MythListButtonItem;
+class MythFontProperties;
 
 class MythListButton : public MythUIType
 {
@@ -111,8 +112,8 @@ class MythListButton : public MythUIType
     uint m_itemRegAlpha;
     uint m_itemSelAlpha;
 
-    MythFontProperties m_fontActive;
-    MythFontProperties m_fontInactive;
+    MythFontProperties *m_fontActive;
+    MythFontProperties *m_fontInactive;
 
     bool m_initialized;
     bool m_clearing;

@@ -2,6 +2,7 @@
 #include <qpainter.h>
 #include <qpixmap.h>
 #include "mythpainter_qt.h"
+#include "mythfontproperties.h"
 
 class MythQtImage : public MythImage
 {

@@ -8,6 +8,7 @@
 #include <qintcache.h>
 
 #include "mythpainter_ogl.h"
+#include "mythfontproperties.h"
 
 class StringImageCache : public QCache<MythImage>
 {

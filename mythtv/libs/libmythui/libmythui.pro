@@ -31,7 +31,7 @@ inc.files += mythpainter_ogl.h mythpainter_qt.h
 inc.files += mythscreenstack.h mythscreentype.h mythuitype.h mythuiimage.h 
 inc.files += mythuitext.h mythuianimatedimage.h mythlistbutton.h
 inc.files += mythcontext.h oldsettings.h remotefile.h util.h themedmenu.h
-inc.files += dialogbox.h
+inc.files += dialogbox.h mythfontproperties.h
 
 INSTALLS += inc
 

@@ -1,6 +1,7 @@
 #include "mythuitext.h"
 #include "mythpainter.h"
 #include "mythmainwindow.h"
+#include "mythfontproperties.h"
 
 MythUIText::MythUIText(const QString &text, const MythFontProperties &font,
                        QRect displayRect, QRect altDisplayRect,
@@ -10,7 +11,8 @@ MythUIText::MythUIText(const QString &text, const MythFontProperties &font,
     m_Message = text;
     m_DefaultMessage = text;
 
-    m_Font = font;
+    m_Font = new MythFontProperties();
+    *m_Font = font;
 
     m_OrigDisplayRect = m_Area = displayRect;
     m_AltDisplayRect = altDisplayRect;
@@ -44,7 +46,7 @@ QString MythUIText::GetDefaultText(void)
 
 void MythUIText::SetFontProperties(const MythFontProperties &fontProps)
 {
-    m_Font = fontProps;
+    *m_Font = fontProps;
     SetRedraw();
 }
 
@@ -98,13 +100,13 @@ void MythUIText::Draw(MythPainter *p, int xoffset, int yoffset,
         bool multiline = (m_Justification & Qt::WordBreak);
 
         if (m_Cutdown)
-            m_CutMessage = cutDown(m_Message, &(m_Font.face), multiline,
+            m_CutMessage = cutDown(m_Message, &(m_Font->face), multiline,
                                    m_Area.width(), m_Area.height());
         else
             m_CutMessage = m_Message;
     }
 
-    p->DrawText(area, m_CutMessage, m_Justification, m_Font, alpha);
+    p->DrawText(area, m_CutMessage, m_Justification, *m_Font, alpha);
 
     MythUIType::Draw(p, xoffset, yoffset, alphaMod);
 }
@@ -128,9 +130,9 @@ void MythUIText::Pulse(void)
     }
 
     QColor newColor = QColor((int)curR, (int)curG, (int)curB);
-    if (newColor != m_Font.color)
+    if (newColor != m_Font->color)
     {
-        m_Font.color = newColor;
+        m_Font->color = newColor;
         SetRedraw();
     }
 }
@@ -161,8 +163,16 @@ void MythUIText::StopCycling(void)
     if (!m_colorCycling)
         return;
 
-    m_Font.color = m_startColor;
+    m_Font->color = m_startColor;
     m_colorCycling = false;
     SetRedraw();
 }
 
+MythUIText::~MythUIText()
+{
+    if(m_Font)
+    {
+        delete m_Font;
+        m_Font = NULL;
+    }
+}

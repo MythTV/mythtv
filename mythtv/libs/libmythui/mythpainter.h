@@ -5,8 +5,10 @@
 #include <qstring.h>
 #include <qwidget.h>
 
-#include "mythfontproperties.h"
+//  #include "mythfontproperties.h"
 
+
+class MythFontProperties;
 class MythImage;
 
 class MythPainter

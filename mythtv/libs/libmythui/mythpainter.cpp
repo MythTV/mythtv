@@ -1,4 +1,5 @@
 #include "mythpainter.h"
+#include "mythfontproperties.h"
 #include <cassert>
 #include "mythimage.h"
 
