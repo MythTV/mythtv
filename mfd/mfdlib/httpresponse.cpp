@@ -277,6 +277,19 @@ void HttpResponse::createHeaderBlock(
                                             .arg(range_end)
                                             .arg(total_possible_range);
                 addText(header_block, file_range_header);
+                if((range_end - range_begin) + 1 != payload_size)
+                {
+                    if(parent)
+                    {
+                        parent->warning(QString("httpresponse is sending a range from "
+                                                "%1 to % 2 (size of %3), but "
+                                                "the payload size is set to %4")
+                                                .arg(range_begin)
+                                                .arg(range_end)
+                                                .arg((range_end - range_begin) + 1)
+                                                .arg(payload_size));
+                    }
+                }
             }
         }
 
@@ -687,9 +700,7 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
                                         "not open file: %1")
                                         .arg(file_to_send->name().ascii()));
             }
-            setError(404);
-            createHeaderBlock(&header_block, 0);
-            sendBlock(which_client, header_block);
+            streamEmptyWav(which_client);
             return;
         }
         
@@ -705,10 +716,7 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
                                         "this file is an ogg: %1 ")
                                         .arg(file_to_send->name().ascii()));
             }
-            setError(404);
-            createHeaderBlock(&header_block, 0);
-            sendBlock(which_client, header_block);
-            fclose(input_file);
+            streamEmptyWav(which_client);
             return;
         }
         
@@ -758,6 +766,7 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
         //  Now that we know the size, we can make and send the header block
         //
         
+        header_block.clear();
         createHeaderBlock(&header_block, ((int) (range_end - range_begin) + 1));
         if(!sendBlock(which_client, header_block))
         {
@@ -802,9 +811,7 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
             WRITE_U32(headbuf+40, final_file_size - 44);
 
             payload.clear();
-        
             payload.insert(payload.begin(), headbuf, headbuf + 44);
-        
             if(!sendBlock(which_client, payload))
             {
                 if(parent)
@@ -812,8 +819,8 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
                     parent->warning("httpresponse was not able to send "
                                     "a wav header");
                 }
-                fclose(input_file);
                 ov_clear(&ov_file);
+                fclose(input_file);
                 return;
             }
         }
@@ -834,18 +841,22 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
                                ) / 8 );
         }
         
-        int seek_result = ov_pcm_seek(&ov_file, ogg_seek_location);
-        
-        if(seek_result != 0)
+        if( ogg_seek_location > 0 && 
+            ogg_seek_location < ov_pcm_total(&ov_file, 0))
         {
-                if(parent)
-                {
-                    parent->warning("httpresponse was not able to seek "
-                                    "in an ogg file");
-                }
-                fclose(input_file);
-                ov_clear(&ov_file);
-                return;
+            int seek_result = ov_pcm_seek(&ov_file, ogg_seek_location);
+    
+            if(seek_result != 0)
+            {
+                    if(parent)
+                    {
+                        parent->warning("httpresponse was not able to seek "
+                                        "in an ogg file");
+                    }
+                    ov_clear(&ov_file);
+                    fclose(input_file);
+                    return;
+            }
         }
 
 
@@ -923,8 +934,73 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
         ov_clear(&ov_file);
         fclose(input_file);
     }
+    else
+    {
+        if(parent)
+        {
+            parent->warning(QString("httpresponse does not know how to "
+                                    "decode the following file: %1 ")
+                                    .arg(file_to_send->name().ascii()));
+        }
+
+        streamEmptyWav(which_client);
+        return;
+    }
     
 }
+
+void HttpResponse::streamEmptyWav(MFDServiceClientSocket *which_client)
+{
+    //
+    //  If we get an error while trying to set up a file for conversion to a
+    //  wav, we call this function which just sends an empty (actually, a
+    //  realitvely small) wav file. We do this because iTunes pukes if you try and
+    //  send it a 404 or any other http error when it's expecting a wav
+    //  file.
+    //
+    
+    static int file_size = 8192;
+    std::vector<char> header_block;
+    header_block.clear();
+    createHeaderBlock(&header_block, file_size);
+    if(sendBlock(which_client, header_block))
+    {
+        if(range_begin == 0)
+        {
+            //
+            //  Build the wav header, but only if the client hasn't already
+            //  asked to seek to a point beyond it
+            //
+        
+            char headbuf[file_size];
+
+            memcpy(headbuf, "RIFF", 4);
+            WRITE_U32(headbuf+4, file_size - 4);
+            memcpy(headbuf+8, "WAVE", 4);
+            memcpy(headbuf+12, "fmt ", 4);
+            WRITE_U32(headbuf+16, 16);
+            WRITE_U16(headbuf+20, 1);
+            WRITE_U16(headbuf+22, 1);
+            WRITE_U32(headbuf+24, 8000);
+            WRITE_U32(headbuf+28, 16000);
+            WRITE_U16(headbuf+32, 2);
+            WRITE_U16(headbuf+34, 16);
+            memcpy(headbuf+36, "data", 4);
+            WRITE_U32(headbuf+40, file_size - 44);
+            
+            for(int i = 44; i < file_size; i = i + 2)
+            {
+                WRITE_U16(headbuf + i, 0);
+            }
+
+            payload.clear();
+            payload.insert(payload.begin(), headbuf, headbuf + file_size);
+            sendBlock(which_client, payload);
+        }
+    }
+    
+}
+
 
 HttpResponse::~HttpResponse()
 {

@@ -306,6 +306,7 @@ void MFDServicePlugin::run()
 bool MFDServicePlugin::initServerSocket()
 {
     core_server_socket = new QSocketDevice();
+    core_server_socket->setAddressReusable(true);
     if(!core_server_socket->bind(QHostAddress(), port_number))
     {
         return false;

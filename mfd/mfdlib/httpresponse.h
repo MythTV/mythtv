@@ -53,6 +53,7 @@ class HttpResponse
     bool sendBlock(MFDServiceClientSocket *which_client, std::vector<char> block_to_send);
     void streamFile(MFDServiceClientSocket *which_client);
     void convertToWavAndStreamFile(MFDServiceClientSocket *which_client);
+    void streamEmptyWav(MFDServiceClientSocket *which_client);
 
     int     status_code;
     QString status_string;

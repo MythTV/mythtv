@@ -11,7 +11,7 @@
 #include "dummy.h"
 
 Dummy::Dummy(MFD *owner, int identity)
-      :MFDCapabilityPlugin(owner, identity)
+      :MFDCapabilityPlugin(owner, identity, "dummy")
 {
 
     //
@@ -26,7 +26,7 @@ Dummy::Dummy(MFD *owner, int identity)
     //  Send a highest verbosity log message
     //
 
-    log("a dummy plugin is being created", 10);
+    log("being created", 10);
 
 
 }
@@ -89,6 +89,6 @@ Dummy::~Dummy()
     //  Announce our demise, in a verbose kind of way.
     //
 
-    log("a dummy plugin is being destroyed", 10);
+    log("being destroyed", 10);
 }
 
