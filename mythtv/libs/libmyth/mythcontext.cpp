@@ -239,6 +239,18 @@ int MythContext::OpenDatabase(QSqlDatabase *db)
     return db->open();
 }
 
+void MythContext::KickDatabase(QSqlDatabase *db)
+{
+    QString query("SELECT NULL");
+    for(unsigned int i = 0 ; i < 2 ; ++i, usleep(50000)) {
+        QSqlQuery result = db->exec(query);
+        if (result.isActive())
+            break;
+        else
+            cout << "KickDatabase: "
+                 << result.lastError().databaseText() << endl;
+    }
+}
 QString MythContext::GetSetting(const QString &key, const QString &defaultval) 
 {
     return m_settings->GetSetting(key, defaultval); 

@@ -39,6 +39,7 @@ class MythContext
     QString FindThemeDir(QString themename);
 
     int OpenDatabase(QSqlDatabase *db);
+    static void KickDatabase(QSqlDatabase *db);
 
     Settings *settings() { return m_settings; }
     Settings *qtconfig() { return m_qtThemeSettings; }

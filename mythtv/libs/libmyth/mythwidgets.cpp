@@ -307,6 +307,7 @@ MythListView::MythListView(QWidget *parent)
             : QListView(parent)
 {
     allowkeypress = true;
+    fixspace = true;
 
     viewport()->setPalette(palette());
     horizontalScrollBar()->setPalette(palette());
@@ -331,7 +332,11 @@ void MythListView::keyPressEvent(QKeyEvent *e)
         {
             case 'd': case 'D': emit deletePressed(currentItem()); return;
             case 'p': case 'P': emit playPressed(currentItem()); return;
-            case Key_Space: emit spacePressed(currentItem()); return;
+        }
+        if (e->key() == Key_Space && fixspace)
+        {
+            emit spacePressed(currentItem());
+            return;
         }
     }
 

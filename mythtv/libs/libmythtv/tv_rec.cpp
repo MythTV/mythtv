@@ -240,6 +240,8 @@ void TVRec::WriteRecordedRecord(void)
     if (!curRecording)
         return;
 
+    context->KickDatabase(db_conn);
+
     curRecording->WriteRecordedToDB(db_conn);
     delete curRecording;
     curRecording = NULL;
@@ -336,6 +338,8 @@ void TVRec::HandleStateChange(void)
  
     if (startRecorder)
     {
+        context->KickDatabase(db_conn);
+
         RecordingProfile profile(context);
         if (curRecording)
             if (curRecording->recordingprofileid > 0)
@@ -471,6 +475,8 @@ void TVRec::SetChannel(bool needopen)
     if (needopen)
         channel->Open();
 
+    context->KickDatabase(db_conn);
+
     QString thequery = QString("SELECT channel.channum,cardinput.inputname "
                                "FROM channel,capturecard,cardinput WHERE "
                                "channel.chanid = %1 AND "
@@ -587,6 +593,7 @@ void TVRec::GetChannelInfo(Channel *chan, QString &title, QString &subtitle,
 
     if (!db_conn)
         return;
+    context->KickDatabase(db_conn);
 
     char curtimestr[128];
     time_t curtime;
@@ -674,6 +681,8 @@ void TVRec::GetDevices(int cardnum, QString &video, QString &audio, int &rate)
     video = "";
     audio = "";
 
+    context->KickDatabase(db_conn);
+
     QString thequery = QString("SELECT videodevice,audiodevice,audioratelimit "
                                "FROM capturecard WHERE cardid = %1;")
                               .arg(cardnum);
@@ -708,6 +717,8 @@ bool TVRec::CheckChannel(Channel *chan, const QString &channum, int &finetuning)
 
     if (!db_conn)
         return true;
+
+    context->KickDatabase(db_conn);
 
     bool ret = false;
 
@@ -749,6 +760,8 @@ QString TVRec::GetNextChannel(Channel *chan, bool direction)
     QString channum = chan->GetCurrentName();
     QString channelinput = chan->GetCurrentInput();
     QString device = chan->GetDevice();
+
+    context->KickDatabase(db_conn);
 
     QString channelorder = chan->GetOrdering();
 

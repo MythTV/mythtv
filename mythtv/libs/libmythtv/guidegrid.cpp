@@ -38,6 +38,8 @@ GuideGrid::GuideGrid(MythContext *context, const QString &channel,
     callbackdata = data;
     m_settings = context->settings();
 
+    context->KickDatabase(QSqlDatabase::database());
+
     usetheme = m_settings->GetNumSetting("ThemeQt");
     showtitle = m_settings->GetNumSetting("EPGShowTitle");
     showIcon = m_settings->GetNumSetting("EPGShowChannelIcon");

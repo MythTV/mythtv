@@ -200,6 +200,8 @@ void ViewScheduled::selected(QListViewItem *lvitem)
     ProgramListItem *pgitem = (ProgramListItem *)lvitem;
     ProgramInfo *rec = pgitem->getProgramInfo();
 
+    m_context->KickDatabase(db);
+
     if (!rec->recording)
     {
         handleNotRecording(rec);

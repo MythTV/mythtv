@@ -182,6 +182,8 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
     QSqlQuery query;
     QString thequery;
 
+    m_context->KickDatabase(QSqlDatabase::database());
+
     thequery = "SELECT chanid,starttime,endtime,title,subtitle,description "
                "FROM recorded ORDER BY starttime";
 
@@ -309,6 +311,8 @@ void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs)
     QString endts = pginfo.endts.toString("yyyyMMddhhmm");
     endts += "00";
 
+    m_context->KickDatabase(QSqlDatabase::database());
+
     thequery = QString("DELETE FROM recorded WHERE chanid = %1 AND title "
                        "= \"%2\" AND starttime = %3 AND endtime = %4;")
                        .arg(pginfo.chanid).arg(pginfo.title).arg(startts)
@@ -370,6 +374,8 @@ void MainServer::HandleQueryFreeSpace(PlaybackSock *pbs)
 
 void MainServer::HandleGetPendingRecordings(PlaybackSock *pbs)
 {
+    m_context->KickDatabase(QSqlDatabase::database());
+
     Scheduler *sched = new Scheduler(QSqlDatabase::database());
 
     bool conflicts = sched->FillRecordLists(false);
@@ -393,6 +399,8 @@ void MainServer::HandleGetConflictingRecordings(QStringList &slist,
                                                 QString purge,
                                                 PlaybackSock *pbs)
 {
+    m_context->KickDatabase(QSqlDatabase::database());
+
     Scheduler *sched = new Scheduler(QSqlDatabase::database());
 
     bool removenonplaying = purge.toInt();
