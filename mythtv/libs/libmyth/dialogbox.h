@@ -73,8 +73,12 @@ class MythThemedDialog : public MythDialog
   public slots:
 
     virtual void updateBackground();
+    virtual void initForeground();
     virtual void updateForeground();
     virtual void updateForeground(const QRect &);
+    virtual bool assignFirstFocus();
+    virtual bool nextPrevWidgetFocus(bool up_or_down);
+    virtual void activateCurrent();
     
   protected:
   
@@ -89,6 +93,8 @@ class MythThemedDialog : public MythDialog
     int         context;
     
     QPtrList<LayerSet>  my_containers;
+    UIType              *widget_with_current_focus;
+    QPtrList<UIType>    focus_taking_widgets;
 };
 
 #endif

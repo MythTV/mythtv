@@ -65,10 +65,12 @@ MythThemedDialog::MythThemedDialog(QString window_name,
                                    QString theme_filename,
                                    QWidget *parent,
                                    const char* name)
-                : MythDialog(parent, name)
+                : MythDialog(parent, name, Qt::WRepaintNoErase)
 {
     context = 0;
     my_containers.clear();
+    widget_with_current_focus = NULL;
+    focus_taking_widgets.clear();
     
     //
     //  Load the theme. Crap out if we can't find it.
@@ -82,6 +84,7 @@ MythThemedDialog::MythThemedDialog(QString window_name,
         cerr << "dialogbox.o: Couldn't find your theme. I'm outta here" << endl;
         exit(0);
     }
+
     loadWindow(xmldata);
 
     //
@@ -106,9 +109,32 @@ MythThemedDialog::MythThemedDialog(QString window_name,
         ++an_it;
     }
     
+    //
+    //  Build a list of widgets that will take focus
+    //
+    
+
+    //  Loop over containers
+    QPtrListIterator<LayerSet> another_it(my_containers);
+    while( (looper = another_it.current()) != 0)
+    {
+        //  Loop over UITypes within each container
+        vector<UIType *> *all_ui_type_objects = looper->getAllTypes();
+        vector<UIType *>::iterator i = all_ui_type_objects->begin();
+        for (; i != all_ui_type_objects->end(); i++)
+        {
+            UIType *type = (*i);
+            if(type->canTakeFocus())
+            {
+                focus_taking_widgets.append(type);
+            }
+        }
+        ++another_it;
+    }
+    
 
     updateBackground();
-    updateForeground();
+    initForeground();
 }
 
 void MythThemedDialog::loadWindow(QDomElement &element)
@@ -187,6 +213,12 @@ void MythThemedDialog::parsePopup(QDomElement &element)
 }
 
 
+void MythThemedDialog::initForeground()
+{
+    my_foreground = my_background;
+    updateForeground();
+}
+
 void MythThemedDialog::updateBackground()
 {
     //
@@ -248,7 +280,9 @@ void MythThemedDialog::updateForeground(const QRect &r)
     //  and then BitBlt it over
     //
 
-    my_foreground = my_background;
+//    my_foreground = my_background;
+//    my_foreground.fill(this, 0, 0);
+//    my_foreground = my_background;
     QPainter whole_dialog_painter(&my_foreground);
     
     QPtrListIterator<LayerSet> an_it(my_containers);
@@ -318,13 +352,112 @@ void MythThemedDialog::updateForeground(const QRect &r)
     {
         whole_dialog_painter.end();
     }
-    repaint(r);
+    update(r);
 }
 
 void MythThemedDialog::paintEvent(QPaintEvent *e)
 {
     MythDialog::paintEvent(e);
-    bitBlt(this, 0, 0, &my_foreground);
+
+    bitBlt( this, 
+            e->rect().left(), e->rect().top(), 
+            &my_foreground,
+            e->rect().left(), e->rect().top(), 
+            e->rect().width(), e->rect().height()
+            );
+}
+
+
+bool MythThemedDialog::assignFirstFocus()
+{
+    if(widget_with_current_focus)
+    {
+        widget_with_current_focus->looseFocus();
+    }
+    if(focus_taking_widgets.count() > 0)
+    {
+        widget_with_current_focus = focus_taking_widgets.first();
+        widget_with_current_focus->takeFocus();
+        return true;
+    }
+    return false;
+}
+
+bool MythThemedDialog::nextPrevWidgetFocus(bool up_or_down)
+{
+    if(up_or_down)
+    {
+        bool reached_current = false;
+        QPtrListIterator<UIType> an_it(focus_taking_widgets);
+        UIType *looper;
+
+        while( (looper = an_it.current()) != 0)
+        {
+            if(reached_current)
+            {
+                widget_with_current_focus->looseFocus();
+                widget_with_current_focus = looper;
+                widget_with_current_focus->takeFocus();
+                return true;    
+            }
+            if(looper == widget_with_current_focus)
+            {
+                reached_current= true;
+            }
+            ++an_it;
+        }
+    
+        if(assignFirstFocus())
+        {
+            return true;
+        }
+        return false;
+    }
+    else
+    {
+        bool reached_current = false;
+        QPtrListIterator<UIType> an_it(focus_taking_widgets);
+        an_it.toLast();
+        UIType *looper;
+
+        while( (looper = an_it.current()) != 0)
+        {
+            if(reached_current)
+            {
+                widget_with_current_focus->looseFocus();
+                widget_with_current_focus = looper;
+                widget_with_current_focus->takeFocus();
+                return true;    
+            }
+            if(looper == widget_with_current_focus)
+            {
+                reached_current= true;
+            }
+            --an_it;
+        }
+        
+        if(reached_current)
+        {
+            widget_with_current_focus->looseFocus();
+            widget_with_current_focus = focus_taking_widgets.last();
+            widget_with_current_focus->takeFocus();
+            return true;
+        }
+        return false;
+    }
+    return false;
+}
+
+void MythThemedDialog::activateCurrent()
+{
+    if(widget_with_current_focus)
+    {
+        widget_with_current_focus->activate();
+    }
+    else
+    {
+        cerr << "dialogbox.o: Something asked me activate the current widget, but there is no current widget" << endl;
+    }
 }
 
 UIType* MythThemedDialog::getUIObject(QString name)

@@ -838,7 +838,7 @@ void XMLParse::parseTextArea(LayerSet *container, QDomElement &element)
             text->SetJustification(jst | Qt::AlignVCenter);
     }
     align = "";
-
+    text->SetParent(container);
     container->AddType(text);
 }
 
@@ -1307,7 +1307,6 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
             else if(info.tagName() == "image")
             {
                 QString imgname = "";
-                QString imgpoint = "";
                 QString file = "";
 
                 imgname = info.attribute("function", "");
@@ -1343,6 +1342,10 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                     {
                         cerr << "xmparse.o: I can't find a file called " << file << endl ;
                     }
+                }
+                else
+                {
+                    cerr << "xmlparse.o: I don't know what to do with an image tag who's function is " << imgname << endl;
                 }
             }
             else if(info.tagName() == "bin")
@@ -1414,7 +1417,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
     mtl->setBins(bins);
     mtl->setBinAreas(bin_corners);
     mtl->SetOrder(order.toInt());
-    mtl->setHighlightImage(select_img);
+    mtl->SetParent(container);
 
     //
     //  Perform moegreen/jdanner font magic
@@ -1433,6 +1436,8 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
     {
         mtl->setFonts(fontFunctions, theFonts);
     }
+    mtl->setHighlightImage(select_img);
+    mtl->makeHighlights();
     container->AddType(mtl);
 }
 
@@ -1559,6 +1564,7 @@ void XMLParse::parsePushButton(LayerSet *container, QDomElement &element)
     UIPushButtonType *pbt = new UIPushButtonType(name, image_on, image_off, image_pushed);
     pbt->setPosition(pos);
     pbt->SetOrder(order.toInt());
+    pbt->SetParent(container);
     container->AddType(pbt);
 }
 
@@ -1697,6 +1703,7 @@ void XMLParse::parseTextButton(LayerSet *container, QDomElement &element)
     tbt->setPosition(pos);
     tbt->setFont(testfont);
     tbt->SetOrder(order.toInt());
+    tbt->SetParent(container);
     container->AddType(tbt);
 }
 

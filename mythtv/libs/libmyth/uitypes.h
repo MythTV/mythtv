@@ -75,6 +75,7 @@ class UIType : public QObject
     void SetScreen(double wmult, double hmult) { m_wmult = wmult; m_hmult = hmult; }
     void SetContext(int con) { m_context = con; }
     void SetDebug(bool db) { m_debug = db; }
+    bool canTakeFocus(){ return takes_focus;}
 
     virtual void Draw(QPainter *, int, int);
 
@@ -82,8 +83,10 @@ class UIType : public QObject
     
   public slots:
   
-    bool takeFocus();
-    void looseFocus();
+    virtual bool takeFocus();
+    virtual void looseFocus();
+    virtual void activate(){}
+    
 
   signals:
   
@@ -393,12 +396,14 @@ class GenericTree
     GenericTree();
     GenericTree(const QString a_string);
     GenericTree(int an_int);
-    GenericTree(QString a_string, QString a_type, int);
+    GenericTree(QString a_string, QString a_type, int an_int);
+    GenericTree(QString a_string, QString a_type, int an_int, bool selectable_flag);
     ~GenericTree();
 
     GenericTree*  addNode(QString a_string);
     GenericTree*  addNode(QString a_string, int an_int);
     GenericTree*  addNode(QString a_string, QString a_type, int an_int);
+    GenericTree*  addNode(QString a_string, QString a_type, int an_int, bool selectable_flag);
     GenericTree*  findLeaf();
     GenericTree*  findNode(QValueList<int> route_of_branches);
     GenericTree*  recursiveNodeFinder(QValueList<int> route_of_branches);
@@ -421,6 +426,8 @@ class GenericTree
     int           calculateDepth(int start);
     int           childCount(){return my_subnodes.count();}
     int           siblingCount();
+    void          setSelectable(bool flag){selectable = flag;}
+    bool          isSelectable(){return selectable;}
 
   private:
 
@@ -430,6 +437,7 @@ class GenericTree
     int                    my_int;
     QPtrList <GenericTree> my_subnodes;
     GenericTree*           my_parent;
+    bool                   selectable;
 };
 
 class UIManagedTreeListType : public UIType
@@ -464,16 +472,21 @@ class UIManagedTreeListType : public UIType
     QString cutDown(QString, QFont *, int, int);
     void    setJustification(int jst) { m_justification = jst; }
     int     getJustification() { return m_justification; }
+    void    makeHighlights();
     
 
   public slots:
 
     void    sayHelloWorld(); // debugging;
-    void    popUp();
-    void    pushDown();
-    void    moveUp();
-    void    moveDown();
-
+    bool    popUp();
+    bool    pushDown();
+    bool    moveUp();
+    bool    moveDown();
+    bool    nextActive();
+    bool    prevActive();
+    void    select();
+    void    activate();
+    
   signals:
 
     void    nodeSelected(QString, int); //  emit type and int when user selects a node
@@ -483,17 +496,19 @@ class UIManagedTreeListType : public UIType
 
     QRect area;
     int   bins;
-    int   tree_depth;
     int   active_bin;
 
     CornerMap   bin_corners;
     GenericTree *my_tree_data;
     GenericTree *current_node;
+    GenericTree *active_node;
 
-    QMap<QString, QString> m_fonts;
+    QMap<QString, QString>  m_fonts;
     QMap<QString, fontProp> m_fontfcns;
-    int m_justification;
-    QPixmap highlight_image;
+    int                     m_justification;
+    QPixmap                 highlight_image;
+    QPtrList<QPixmap>       resized_highlight_images;
+    QMap<int, QPixmap*>     highlight_map;
 
 };
 
@@ -511,6 +526,8 @@ class UIPushButtonType : public UIType
   public slots:  
   
     void    push();
+    void    unPush();
+    void    activate(){push();}
  
   signals:
   
@@ -522,6 +539,8 @@ class UIPushButtonType : public UIType
     QPixmap on_pixmap;
     QPixmap off_pixmap;
     QPixmap pushed_pixmap;
+    bool    currently_pushed;
+    QTimer  push_timer;
     
 };
 
@@ -535,12 +554,14 @@ class UITextButtonType : public UIType
 
     void    Draw(QPainter *, int drawlayer, int context);
     void    setPosition(QPoint pos){m_displaypos = pos;}
-    void    setText(const QString some_text){m_text = some_text;}
+    void    setText(const QString some_text);
     void    setFont(fontProp *font) { m_font = font; }
     
   public slots:  
   
     void    push();
+    void    unPush();
+    void    activate(){push();}
  
   signals:
   
@@ -554,6 +575,8 @@ class UITextButtonType : public UIType
     QPixmap  pushed_pixmap;
     QString  m_text;
     fontProp *m_font;
+    bool     currently_pushed;
+    QTimer   push_timer;
     
 };
 

@@ -63,7 +63,9 @@ void LayerSet::Draw(QPainter *dr, int drawlayer, int context)
 // **************************************************************
 
 UIType::UIType(const QString &name)
+       : QObject(NULL, name)
 {
+    m_parent = NULL;
     m_name = name;
     m_debug = false;
     m_context = -1;
@@ -1307,6 +1309,17 @@ UITextType::~UITextType()
 void UITextType::SetText(const QString &text)
 {
     m_message = text;
+    if(!m_parent)
+    {
+        cerr << "uitypes.o: Going to be hard to request an update without a parent" << endl;
+        return;
+    }
+
+    QRect redraw_coords = m_displaysize;
+    redraw_coords.moveBy(m_parent->GetAreaRect().left(),
+                         m_parent->GetAreaRect().top());
+
+    emit requestUpdate(redraw_coords);
 }
 
 void UITextType::Draw(QPainter *dr, int drawlayer, int context)
@@ -1451,6 +1464,12 @@ GenericTree::GenericTree(const QString a_string)
     my_string = a_string;
 }
 
+GenericTree::GenericTree(int an_int)
+{
+    init();
+    my_int = an_int;
+}
+
 GenericTree::GenericTree(QString a_string, QString a_type, int an_int)
 {
     init();
@@ -1459,10 +1478,13 @@ GenericTree::GenericTree(QString a_string, QString a_type, int an_int)
     my_int = an_int;
 }
 
-GenericTree::GenericTree(int an_int)
+GenericTree::GenericTree(QString a_string, QString a_type, int an_int, bool selectable_flag)
 {
     init();
+    my_string = a_string;
+    my_type = a_type;
     my_int = an_int;
+    selectable = selectable_flag;
 }
 
 void GenericTree::init()
@@ -1473,6 +1495,7 @@ void GenericTree::init()
     my_stringlist.clear();
     my_int = 0;
     my_subnodes.clear();
+    selectable = false;
     //my_subnodes.setAutoDelete(true);
 }
 
@@ -1500,6 +1523,17 @@ GenericTree* GenericTree::addNode(QString a_string, QString a_type, int an_int)
     new_node->setInt(an_int);
     new_node->setType(a_type);
     new_node->setParent(this);
+    my_subnodes.append(new_node);
+    return new_node;
+}
+
+GenericTree* GenericTree::addNode(QString a_string, QString a_type, int an_int, bool selectable_flag)
+{
+    GenericTree *new_node = new GenericTree(a_string);
+    new_node->setInt(an_int);
+    new_node->setType(a_type);
+    new_node->setParent(this);
+    new_node->setSelectable(selectable_flag);
     my_subnodes.append(new_node);
     return new_node;
 }
@@ -1730,7 +1764,7 @@ UIManagedTreeListType::UIManagedTreeListType(const QString & name)
     bin_corners.clear();
     my_tree_data = NULL;
     current_node = NULL;
-    tree_depth = 0;
+    active_node = NULL;
     m_justification = (Qt::AlignLeft | Qt::AlignVCenter);
     active_bin = 0;
 }
@@ -1756,7 +1790,7 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
 
     if(!current_node)
     {
-        cerr << "uitypes.o: I can't draw a UIManagedTreeListType if there is no current_node" << endl;
+        //cerr << "uitypes.o: I can't draw a UIManagedTreeListType if there is no current_node" << endl;
         return;
     }
 
@@ -1807,7 +1841,7 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
 
             if(i == active_bin)
             {
-                tmpfont = &m_fontfcns[m_fonts["selected"]];
+                tmpfont = &m_fontfcns[m_fonts["active"]];
                 p->setFont(tmpfont->face);
                 p->setPen(QPen(tmpfont->color, (int)(2 * m_wmult)));
             }
@@ -1871,6 +1905,12 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
                 
             }
             
+            if(hotspot_node == active_node)
+            {
+                tmpfont = &m_fontfcns[m_fonts["selected"]];
+                p->setFont(tmpfont->face);
+                p->setPen(QPen(tmpfont->color, (int)(2 * m_wmult)));
+            }
 
             QString msg = hotspot_node->getString();
             msg = cutDown(msg, &(tmpfont->face), bin_corners[i].width(), bin_corners[i].height());
@@ -1879,15 +1919,11 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
             if(i == active_bin)
             {
                 //
-                //  Draw the highlight pixmap
-                //  NB: should be resizing this elsewhere
+                //  Draw the highlight pixmap for this bin
                 //
-
-                QImage temp_image = highlight_image.convertToImage();
-                QPixmap temp_pixmap;
-                temp_pixmap.convertFromImage(temp_image.smoothScale(bin_corners[i].width(), QFontMetrics(tmpfont->face).height()));
-                p->drawPixmap(x_location, y_location - QFontMetrics(tmpfont->face).height() + QFontMetrics(tmpfont->face).descent(), temp_pixmap);
+                p->drawPixmap(x_location, y_location - QFontMetrics(tmpfont->face).height() + QFontMetrics(tmpfont->face).descent(), (*highlight_map[i]));
             }
+            
 
             
             
@@ -1917,6 +1953,26 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
                 GenericTree *above = hotspot_node->prevSibling(numb_above);
                 if(above)
                 {
+                    if(i == active_bin)
+                    {
+                        tmpfont = &m_fontfcns[m_fonts["active"]];
+                        p->setFont(tmpfont->face);
+                        p->setPen(QPen(tmpfont->color, (int)(2 * m_wmult)));
+                    }
+                    else
+                    {
+                        tmpfont = &m_fontfcns[m_fonts["inactive"]];
+                        p->setFont(tmpfont->face);
+                        p->setPen(QPen(tmpfont->color, (int)(2 * m_wmult)));
+                    }
+            
+                    if(above == active_node)
+                    {
+                        tmpfont = &m_fontfcns[m_fonts["selected"]];
+                        p->setFont(tmpfont->face);
+                        p->setPen(QPen(tmpfont->color, (int)(2 * m_wmult)));
+                    }
+
                     msg = above->getString();
                     msg = cutDown(msg, &(tmpfont->face), bin_corners[i].width(), bin_corners[i].height());
                     p->drawText(x_location, still_yet_another_y_location, msg);
@@ -1937,6 +1993,26 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
                 GenericTree *below = hotspot_node->nextSibling(numb_below);
                 if(below)
                 {
+                    if(i == active_bin)
+                    {
+                        tmpfont = &m_fontfcns[m_fonts["active"]];
+                        p->setFont(tmpfont->face);
+                        p->setPen(QPen(tmpfont->color, (int)(2 * m_wmult)));
+                    }
+                    else
+                    {
+                        tmpfont = &m_fontfcns[m_fonts["inactive"]];
+                        p->setFont(tmpfont->face);
+                        p->setPen(QPen(tmpfont->color, (int)(2 * m_wmult)));
+                    }
+            
+
+                    if(below == active_node)
+                    {
+                        tmpfont = &m_fontfcns[m_fonts["selected"]];
+                        p->setFont(tmpfont->face);
+                        p->setPen(QPen(tmpfont->color, (int)(2 * m_wmult)));
+                    }
                     msg = below->getString();
                     msg = cutDown(msg, &(tmpfont->face), bin_corners[i].width(), bin_corners[i].height());
                     p->drawText(x_location, y_location, msg);
@@ -2024,29 +2100,28 @@ void UIManagedTreeListType::moveToNode(QValueList<int> route_of_branches)
     {
         current_node = my_tree_data->findLeaf();
     }
+    active_node = current_node;
     emit nodeSelected(current_node->getType(), current_node->getInt());
 }
 
 void UIManagedTreeListType::assignTreeData(GenericTree *a_tree)
 {
-    my_tree_data = a_tree;
-    
-    //
-    //  Trying to keep this as generic as possible, we
-    //  need to figure out depth from the root node of this
-    //  tree. That way, draw() knows what to draw.
-    //
+    if(a_tree)
+    {
+        my_tree_data = a_tree;
 
-    tree_depth = my_tree_data->calculateDepth(0);
-
-    //
-    //  By default, current_node is first branch at every
-    //  level down till we hit a leaf node.
-    //
+        //
+        //  By default, current_node is first branch at every
+        //  level down till we hit a leaf node.
+        //
     
-    current_node = my_tree_data->findLeaf();
-    active_bin = bins;
-    //current_node->printTree(0);
+        current_node = my_tree_data->findLeaf();
+        active_bin = bins;
+    }
+    else
+    {
+        cerr << "uitypes.o: somebody just assigned me to assign tree data, but they gave me no data" << endl;
+    }
 
 }
 
@@ -2055,7 +2130,28 @@ void UIManagedTreeListType::sayHelloWorld()
     cout << "From a UIManagedTreeListType Object: Hello World" << endl ;
 }
 
-void UIManagedTreeListType::popUp()
+void UIManagedTreeListType::makeHighlights()
+{
+    resized_highlight_images.clear();
+    highlight_map.clear();
+    //
+    //  Draw the highlight pixmap
+    //  NB: should be resizing this elsewhere
+    //
+
+    for(int i = 1; i <= bins; i++)
+    {
+        QImage temp_image = highlight_image.convertToImage();
+        QPixmap *temp_pixmap = new QPixmap();
+        fontProp *tmpfont = NULL;
+        tmpfont = &m_fontfcns[m_fonts["active"]];
+        temp_pixmap->convertFromImage(temp_image.smoothScale(bin_corners[i].width(), QFontMetrics(tmpfont->face).height() ));
+        resized_highlight_images.append(temp_pixmap);
+        highlight_map[i] = temp_pixmap;
+    }
+}
+
+bool UIManagedTreeListType::popUp()
 {
     //
     //  Move the active node to the
@@ -2068,7 +2164,8 @@ void UIManagedTreeListType::popUp()
         //  I be ultimate root
         //
         
-        return;
+        return false;
+        
     }
     
     if(active_bin > 1)
@@ -2091,9 +2188,11 @@ void UIManagedTreeListType::popUp()
     redraw_coords.moveBy(area.left(),area.top());
     emit requestUpdate(redraw_coords);
 
+    return true;
+
 }
 
-void UIManagedTreeListType::pushDown()
+bool UIManagedTreeListType::pushDown()
 {
     //
     //  Move the active node to the
@@ -2104,7 +2203,7 @@ void UIManagedTreeListType::pushDown()
     {
         //
         //  I be leaf
-        return;
+        return false;
     }
 
     if(active_bin < bins)
@@ -2125,10 +2224,11 @@ void UIManagedTreeListType::pushDown()
     redraw_coords = bin_corners[1];
     redraw_coords.moveBy(area.left(),area.top());
     emit requestUpdate(redraw_coords);
-
+    
+    return true;
 }
 
-void UIManagedTreeListType::moveUp()
+bool UIManagedTreeListType::moveUp()
 {
     //
     //  Move the active node to the
@@ -2146,12 +2246,14 @@ void UIManagedTreeListType::moveUp()
             QRect redraw_coords = bin_corners[i];
             redraw_coords.moveBy(area.left(),area.top());
             emit requestUpdate(redraw_coords);
-            emit nodeEntered(current_node->getType(), current_node->getInt());
         }
+        emit nodeEntered(current_node->getType(), current_node->getInt());
+        return true;
     }
+    return false;
 }
 
-void UIManagedTreeListType::moveDown()
+bool UIManagedTreeListType::moveDown()
 {
     //
     //  Move the active node to the
@@ -2168,10 +2270,65 @@ void UIManagedTreeListType::moveDown()
             QRect redraw_coords = bin_corners[i];
             redraw_coords.moveBy(area.left(),area.top());
             emit requestUpdate(redraw_coords);
-            emit nodeEntered(current_node->getType(), current_node->getInt());
+        }
+        emit nodeEntered(current_node->getType(), current_node->getInt());
+        return true;
+    }
+    return false;
+}
+
+void UIManagedTreeListType::select()
+{
+    if(current_node)
+    {
+        if(current_node->isSelectable())
+        {
+            active_node = current_node;
+            emit requestUpdate(area);
+            emit nodeSelected(current_node->getType(), current_node->getInt());
         }
     }
 }
+
+void UIManagedTreeListType::activate()
+{
+    if(active_node)
+    {
+        emit requestUpdate(area);
+        emit nodeSelected(active_node->getType(), active_node->getInt());
+    }
+}
+
+bool UIManagedTreeListType::nextActive()
+{
+    if(active_node)
+    {
+        GenericTree *test_node = active_node->nextSibling(1);
+        if(test_node)
+        {
+            active_node = test_node;
+            emit requestUpdate(area);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool UIManagedTreeListType::prevActive()
+{
+    if(active_node)
+    {
+        GenericTree *test_node = active_node->prevSibling(1);
+        if(test_node)
+        {
+            active_node = test_node;
+            emit requestUpdate(area);
+            return true;
+        }
+    }
+    return false;
+}
+
 
 // ********************************************************************
 
@@ -2181,6 +2338,9 @@ UIPushButtonType::UIPushButtonType(const QString &name, QPixmap on, QPixmap off,
     on_pixmap = on;
     off_pixmap = off;
     pushed_pixmap = pushed;
+    currently_pushed = false;
+    takes_focus = true;
+    connect(&push_timer, SIGNAL(timeout()), this, SLOT(unPush()));
 }
 
 
@@ -2194,20 +2354,50 @@ void UIPushButtonType::Draw(QPainter *p, int drawlayer, int context)
         return;
     }
 
-    if(has_focus)
+    if(currently_pushed)
     {
-        p->drawPixmap(m_displaypos.x(), m_displaypos.y(), on_pixmap);
+        p->drawPixmap(m_displaypos.x(), m_displaypos.y(), pushed_pixmap);
     }
     else
     {
-        p->drawPixmap(m_displaypos.x(), m_displaypos.y(), off_pixmap);
+        if(has_focus)
+        {
+            p->drawPixmap(m_displaypos.x(), m_displaypos.y(), on_pixmap);
+        }
+        else
+        {
+            p->drawPixmap(m_displaypos.x(), m_displaypos.y(), off_pixmap);
+        }
     }
     
 }
 
 void UIPushButtonType::push()
 {
-    cout << "Yamma been pushed" << endl ;
+    currently_pushed = true;
+    push_timer.start(300, TRUE);
+    QRect redraw_coords = QRect(    m_displaypos.x(),
+                                    m_displaypos.y(),
+                                    off_pixmap.width(),
+                                    off_pixmap.height());
+    redraw_coords.moveBy(m_parent->GetAreaRect().left(),
+                         m_parent->GetAreaRect().top());
+
+    emit requestUpdate(redraw_coords);
+    emit pushed();
+}
+
+void UIPushButtonType::unPush()
+{
+    currently_pushed = false;    
+    QRect redraw_coords = QRect(    m_displaypos.x(),
+                                    m_displaypos.y(),
+                                    off_pixmap.width(),
+                                    off_pixmap.height());
+    redraw_coords.moveBy(m_parent->GetAreaRect().left(),
+                         m_parent->GetAreaRect().top());
+
+    emit requestUpdate(redraw_coords);
 }
 
 // ********************************************************************
@@ -2219,6 +2409,9 @@ UITextButtonType::UITextButtonType(const QString &name, QPixmap on, QPixmap off,
     off_pixmap = off;
     pushed_pixmap = pushed;
     m_text = "";
+    currently_pushed = false;
+    takes_focus = true;
+    connect(&push_timer, SIGNAL(timeout()), this, SLOT(unPush()));
 }
 
 
@@ -2232,32 +2425,76 @@ void UITextButtonType::Draw(QPainter *p, int drawlayer, int context)
         return;
     }
 
-    if(has_focus)
+    if(currently_pushed)
     {
-        p->drawPixmap(m_displaypos.x(), m_displaypos.y(), on_pixmap);
+        p->drawPixmap(m_displaypos.x(), m_displaypos.y(), pushed_pixmap);
     }
     else
     {
-        p->drawPixmap(m_displaypos.x(), m_displaypos.y(), off_pixmap);
-    }
-    p->setFont(m_font->face);
-    p->setBrush(m_font->color);
-    p->setPen(QPen(m_font->color, (int)(2 * m_wmult)));
-    p->drawText(m_displaypos.x(),
+        if(has_focus)
+        {
+            p->drawPixmap(m_displaypos.x(), m_displaypos.y(), on_pixmap);
+        }
+        else
+        {
+            p->drawPixmap(m_displaypos.x(), m_displaypos.y(), off_pixmap);
+        }
+        p->setFont(m_font->face);
+        p->setBrush(m_font->color);
+        p->setPen(QPen(m_font->color, (int)(2 * m_wmult)));
+        p->drawText(m_displaypos.x(),
                 m_displaypos.y(),
                 off_pixmap.width(),
                 off_pixmap.height(),
                 Qt::AlignCenter,
                 m_text);
-/*
-    p->drawText(area.left(), area.top(), area.width(), area.height(),
-                 m_justification, msg);
-*/
-    
+    }    
 }
 
 void UITextButtonType::push()
 {
-    cout << "Yamma been pushed" << endl ;
+    currently_pushed = true;
+    push_timer.start(300, TRUE);
+    QRect redraw_coords = QRect(    m_displaypos.x(),
+                                    m_displaypos.y(),
+                                    off_pixmap.width(),
+                                    off_pixmap.height());
+    redraw_coords.moveBy(m_parent->GetAreaRect().left(),
+                         m_parent->GetAreaRect().top());
+
+    emit requestUpdate(redraw_coords);
+    emit pushed();
 }
 
+void UITextButtonType::unPush()
+{
+    currently_pushed = false;    
+    QRect redraw_coords = QRect(    m_displaypos.x(),
+                                    m_displaypos.y(),
+                                    off_pixmap.width(),
+                                    off_pixmap.height());
+    redraw_coords.moveBy(m_parent->GetAreaRect().left(),
+                         m_parent->GetAreaRect().top());
+
+    emit requestUpdate(redraw_coords);
+}
+
+void UITextButtonType::setText(const QString some_text)
+{
+    m_text = some_text;
+    
+    if(!m_parent)
+    {
+        cerr << "uitypes.o: Going to be hard to request an update without a parent" << endl;
+        return;
+    }
+
+    QRect redraw_coords = QRect(    m_displaypos.x(),
+                                    m_displaypos.y(),
+                                    off_pixmap.width(),
+                                    off_pixmap.height());
+    redraw_coords.moveBy(m_parent->GetAreaRect().left(),
+                         m_parent->GetAreaRect().top());
+
+    emit requestUpdate(redraw_coords);
+}
