@@ -202,6 +202,7 @@ class ProgramInfo
     static ProgramInfo *GetProgramFromRecorded(QSqlDatabase *db,
                                                const QString &channel, 
                                                QDateTime &dtime);
+    int SecsTillStart() const { return QDateTime::currentDateTime().secsTo(startts); }
 
     QString title;
     QString subtitle;

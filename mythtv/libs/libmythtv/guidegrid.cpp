@@ -351,13 +351,26 @@ void GuideGrid::keyPressEvent(QKeyEvent *e)
             else if (action == "6")
                 showProgFinder();
             else if (action == "MENU")
-                enter();                
+                enter();                    
             else if (action == "ESCAPE")
                 escape();
             else if (action == "SELECT")
             {                         
-                if( m_player && gContext->GetNumSetting("SelectChangesChannel", 0) )
-                    enter();
+                if(m_player && gContext->GetNumSetting("SelectChangesChannel", 0))
+                {
+                    // See if this show is far enough into the future that it's probable
+                    // that the user wanted to schedule it to record instead of changing the channel.
+                    ProgramInfo *pginfo = m_programInfos[m_currentRow][m_currentCol];
+                    if (pginfo && (pginfo->title != unknownTitle) &&
+                        pginfo->SecsTillStart() >= gContext->GetNumSetting("SelChangeRecThreshold", 960))
+                    {
+                        editRecording();
+                    }
+                    else
+                    {
+                        enter();
+                    }
+                }
                 else
                     editRecording();
             }
