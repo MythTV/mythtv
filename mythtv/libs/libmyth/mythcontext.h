@@ -94,7 +94,7 @@ do { \
         QDateTime dtmp = QDateTime::currentDateTime(); \
         QString dtime = dtmp.toString("yyyy-MM-dd hh:mm:ss.zzz"); \
         MythContext::verbose_mutex.lock(); \
-        cout << dtime << " " << args << endl; \
+        cout << dtime << " " << args << "\n"; \
         MythContext::verbose_mutex.unlock(); \
     } \
 } while (0)
