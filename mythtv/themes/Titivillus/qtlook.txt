@@ -3,7 +3,7 @@ str BackgroundColor=SteelBlue
 # Color of lines, text, etc
 str ForegroundColor=white
 # Pixmap to use for the background
-str BackgroundPixmap=background.jpeg
+str BackgroundPixmap=background.jpg
 
 # Colors for the different program categories
 str Cat_Comedy=DarkOrchid
