@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-09-18, v2.78
+<date>2003-09-19, v2.79
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -176,6 +176,12 @@ information.
 filesystem that will allow you to create large files.  Filesystems known to
 have problems with large files are FAT and FAT32.
 
+Because of these large files, it may be useful to plan for future expansion
+right from the beginning.  If your case and power supply have the capability
+for additional hard drives, read through the <ref id="LVM"
+name="LVM"> and <ref id="advancedpartitionformatting" name="Advanced
+Partition Formatting"> sections for some pointers.
+
 <label id="video_capture_device">
 <sect2>Video Capture Device 
 <p>In order to watch live TV, MythTV will need one or more video capture
@@ -234,7 +240,7 @@ for Live TV at 416x480.
 80% CPU.
 </itemize>
 
-See the <ref id="pvr250" name="I'd like to use a hardware MPEG-2 encoder">
+See the <ref id="pvr250" name="Hauppauge PVR-250/350 hardware MPEG-2 encoder.">
 section for information on installing a PVR-250 on Mandrake 9.1.
 
 <bf>NOTE</bf>: The ATI All-in-Wonder cards <em>will not</em> work as a
@@ -1530,8 +1536,8 @@ configure lircd.
 
 <bf>NOTE</bf>:  If you wish to use the remote control that comes with the
 Hauppauge PVR-250/350 cards, you will need to run the lirc 0.7.0pre2 code. 
-See the example installation in the "I'd like to use the remote that came
-with my Hauppauge PVR-250 and use MythTV's native LIRC support." <ref
+See the example installation in the "Hauppauge PVR-250 remote and MythTV's
+native LIRC support" <ref
 id="hauppauge_remote" name="section">.
 
 Some IR devices require a kernel recompile, and some don't. However, all at
@@ -3103,6 +3109,9 @@ $ cd dvddb
 $ mysql -u root < metadata.sql
 </verb></tscreen>
 
+<sect>MythNews
+<p>
+
 <sect>Troubleshooting.
 <sect1>Illegal Instruction.
 <p>This error can happen for the following reasons:
@@ -3429,9 +3438,10 @@ into issues when you try to record and play sound at the same time.  If your
 backend is a separate machine than your frontend, then there's no problem,
 since you're only going to be doing one thing at a time with the card. 
 Likewise, if you're running the frontend and backend on the same machine,
-but you're using btaudio as your recording source, and using the playback
-function of your soundcard, then you also shouldn't have an issue, since the
-sound card isn't being asked to perform two functions at once.
+but you're using btaudio or a Hauppauge PVR-250 as your recording source,
+and using the playback function of your soundcard, then you also shouldn't
+have an issue, since the sound card isn't being asked to perform two
+functions at once.
 
 If you can't get your soundcard to go full duplex and need it to, then check
 your distribution for updated sound drivers.  If your soundcard is not
@@ -3534,14 +3544,9 @@ libmp3lame library.
 <p>Something's wrong with your program database.  Did mythfilldatabase run
 with no major errors?
 
-<sect1>Colors are wrong, people have blue faces.
-<p>If you are using the binary nVidia drivers, make sure you're using at
-least version 1.0-2960.
-
 <sect1>When trying to run setup, I get an error like this: "./setup: error while loading shared libraries:"
 <p>You didn't add <tt>/usr/local/lib</tt> to <tt>/etc/ld.so.conf</tt>.  See the
 section on modifying <ref id="modifying_ld.so.conf" name="/etc/ld.so.conf">.
-
 
 <sect>Miscellaneous. 
 <sect1>I'd like to watch the files without using MythTV / I'd like to convert the files to some other format. 
@@ -3553,7 +3558,7 @@ them.
 
 <bf>NOTE</bf>:  If you're using a hardware MPEG2 encoder like the
 PVR-250/350 you don't need to convert - the files are actually standard
-MPEG2 with a <tt>.nuv</tt> extension.  Change it to <tt>.mpg</tt> and the
+MPEG-2 with a <tt>.nuv</tt> extension.  Change it to <tt>.mpg</tt> and the
 files should display properly in other media players.
 
 Download the patch to MPlayer from Matt's website. 
@@ -3580,34 +3585,6 @@ process.
 run a lightweight window manager, the <tt>configfiles/</tt> directory has an
 example of a <tt>.twmrc</tt> and <tt>.fvwmrc</tt> file you may use.
 
-<sect1>I'd like MythTV to automatically startup.
-<p>Here's an example submitted to the mythtv-dev list by Pat Pflaum
-<url url="mailto:pat@netburp.com" name="mailto:pat@netburp.com"> using fvwm:
-<tscreen><verb>
-$ cat > .xinitrc
-fvwm &
-mythfrontend
-^D
-$ cat > .fvwmrc
-Style myth* NoTitle, NoHandles, Sticky, WindowListSkip, SloppyFocus, GrabFocus, BorderWidth 0
-^D
-$
-</verb></tscreen>
-
-The following also works with blackbox:
-<tscreen><verb>
-$ cat > .xinitrc
-xset -dpms s off &
-irxevent &
-mythfrontend &
-blackbox
-</verb></tscreen>
-
-Make sure that your <tt>.blackboxrc</tt> file has:
-<tscreen><verb>
-session.screen0.focusNewWindows:        True
-session.screen0.focusModel:     SloppyFocus
-</verb></tscreen> in it.
 
 <sect1>What capture resolution should I use?  How does video work?
 <label id="capture_resolution_">
@@ -3649,13 +3626,15 @@ As you can see, the lower quality values are half of the better ones.
 vertical lines lost.  In a PAL country, the you would use values like
 720x576 or x288.
 
-The higher resolutions will be more CPU intensive. If the CPU is overtaxed,
-frames will be dropped causing uneven motion. You will likely see the best
-results at resolutions which average at least 10% CPU idle time.  You can
-use system tools such as <tt>top</tt> or <tt>sar</tt> to check the CPU %
-idle while recording.  If the CPU average usage is consistently exceeding
-90%, frames will need to be dropped during peak times when more than 100% of
-the available CPU would be needed to process all of the frames.
+The higher resolutions will be more CPU intensive if you're using software
+encoding (PVR-250/350 will have minimal host CPU impact even if you're using
+720x480). If the CPU is overtaxed, frames will be dropped causing uneven
+motion. You will likely see the best results at resolutions which average at
+least 10% CPU idle time.  You can use system tools such as <tt>top</tt> or
+<tt>sar</tt> to check the CPU % idle while recording.  If the CPU average
+usage is consistently exceeding 90%, frames will need to be dropped during
+peak times when more than 100% of the available CPU would be needed to
+process all of the frames.
 
 If you'd like to read more on this, go to the vcdhelp website at <url
 url="http://www.vcdhelp.com/forum/userguides/94382.php"
@@ -3846,8 +3825,283 @@ $ mysql -u root mythconverg
 mysql> delete from program where chanid = '1015';
 </verb></tscreen>
 
-<label id="pvr250">
-<sect1>I'd like to use a hardware MPEG-2 encoder (ie, a PVR-250/350).
+<sect1>I'd like to use NFS.
+<p>You may want to use a central server to store your files.  
+
+On the host machine, (in this case, the hostname is "masterbackend") you'll
+want to edit your <tt>/etc/exports</tt> file and use something like:
+<tscreen><verb>
+/var/video (rw)
+</verb></tscreen>
+
+To export the <tt>/var/video</tt> directory with read / write privileges.
+
+On the "slave" machine, you'll want to edit the <tt>/etc/fstab</tt> file and
+add something like:
+<tscreen><verb>
+masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,soft,nfsvers=3
+</verb></tscreen>
+
+Then run <tt># fstab -a</tt> to re-read the file to mount the file system.
+
+In this case, the source is a machine called "masterbackend" which is
+exporting the directory "/var/video", which we're mounting locally at
+"/var/video".  The rsize and wsize options are used to increase the
+performance of NFS; soft mean that NFS will eventually timeout on an error,
+and the nfsvers is required for filesizes over 2GB.
+
+<sect1>Automatically starting mythfrontend at system boot time.
+<p>Here's an example submitted to the mythtv-dev list by Pat Pflaum
+<url url="mailto:pat@netburp.com" name="mailto:pat@netburp.com"> using fvwm:
+<tscreen><verb>
+$ cat > .xinitrc
+fvwm &
+mythfrontend
+^D
+$ cat > .fvwmrc
+Style myth* NoTitle, NoHandles, Sticky, WindowListSkip, SloppyFocus, GrabFocus, BorderWidth 0
+^D
+$
+</verb></tscreen>
+
+The following also works with blackbox:
+<tscreen><verb>
+$ cat > .xinitrc
+xset -dpms s off &
+irxevent &
+mythfrontend &
+blackbox
+</verb></tscreen>
+
+Make sure that your <tt>.blackboxrc</tt> file has:
+<tscreen><verb>
+session.screen0.focusNewWindows:        True
+session.screen0.focusModel:     SloppyFocus
+</verb></tscreen> in it.
+
+<label id="mythbackend_autostart">
+<sect1>Automatically starting mythbackend at system boot time.
+<sect2>Red Hat And Mandrake
+<p>Here's a method for automatically starting mythbackend submitted by Mike
+Thomson (<url url="mailto:linux@m-thomson.net" name="mailto:linux@m-thomson.net">) and Stu Tomlinson (<url
+url="mailto:stu@nosnilmot.com" name="mailto:stu@nosnilmot.com">).
+
+Copy the files from the MythTV <tt>contrib</tt> directory or from Mike's web
+site (<url url="http://m-thomson.net/mythtv/"
+name="http://m-thomson.net/mythtv/">) as follows:
+
+<tt>etc.rc.d.init.mythbackend</tt> should be made executable and copied to
+<tt>/etc/rc.d/init.d/</tt>:
+<tscreen><verb>
+$ cd contrib
+$ su
+# chmod a+x etc.rc.d.init.d.mythbackend
+# cp etc.rc.d.init.d.mythbackend /etc/rc.d/init.d/mythbackend
+</verb></tscreen>
+
+<tt>etc.sysconfig.mythbackend</tt> should be copied to
+<tt>/etc/sysconfig/</tt>:
+<tscreen><verb>
+$ cd contrib
+$ su
+# cp etc.sysconfig.mythbackend /etc/sysconfig/mythbackend
+</verb></tscreen>
+
+Edit <tt>/etc/sysconfig/mythbackend</tt> if you want to change the defaults
+(the userid that should start mythbackend, location of the logfile and (if
+required) the name and location of the mythbackend binary).
+
+Use <bf>chkconfig</bf> to make sure the script is called when
+entering runlevels 3, 4 or 5:
+<tscreen><verb>
+$ su
+# chkconfig --level 345 mythbackend on
+# exit
+$
+</verb></tscreen>
+
+<sect3>Log files 
+<p>By default, the log file for mythbackend will be written to
+<tt>/var/tmp/mythbackend.log</tt>. This has been tested and is known to work
+on Mandrake and Red Hat, but many people prefer to place logs under
+<tt>/var/log/</tt>.
+
+To do this, create a group called <tt>mythtv</tt> (or anything you prefer)
+and add your usual MythTV users to that group. If you changed the user that
+starts mythbackend from the default of root you <em>must</em> perform this
+step.
+
+Create the directory <tt>/var/log/mythtv</tt> and set its
+permissions as follows:
+<tscreen><verb>
+$ su
+# mkdir /var/log/mythtv
+# chown root:mythtv /var/log/mythtv
+# chmod 0775 /var/log/mythtv
+# exit
+$ ls -ld /var/log/mythtv
+drwxrwxr-x    2 root     mythtv       4096 Apr 28 21:58 /var/log/mythtv/
+$
+</verb></tscreen>
+
+<sect3>Mandrake 9.x
+<p>Mandrake adds one more twist in the form of the <tt>msec</tt> utility,
+which runs regularly and (at the default or any higher security level) sets
+permissions on many files, including those under <tt>/var/log</tt>.
+
+To tell msec about the MythTV log files and their directory, you need to
+edit the <tt>/etc/security/msec/perm.local</tt> file to include the
+following:
+<tscreen><verb>
+# /etc/security/msec/perm.local
+# Local overrides to the msec program
+#
+# Full file path                user.group              permissions
+/var/log/mythtv/                root.mythtv             775
+/var/log/mythtv/*               root.mythtv             664
+</verb></tscreen>
+
+A copy of the above has been included in the contrib/ directory.  You may
+add it by typing:
+<tscreen><verb>
+$ cd contrib
+$ su
+# cat etc.security.msec.perm.local >> /etc/security/msec/perm.local
+# exit
+</verb></tscreen>
+
+Finally run the <tt>msec</tt> tool to check and implement your
+changes.
+<tscreen><verb>
+$ su
+# msec
+# exit
+$
+</verb></tscreen>
+
+<bf>NOTE</bf>: msec can only <em>reduce</em> the permissions of files, so if
+you don't get the results you expect, check that you're not asking
+<tt>msec</tt> to add missing permissions to the files or directories you
+created.
+<sect2>Gentoo
+<p>The portage file for MythTV has scripts that will allow you to run
+mythbackend at startup.
+
+To run mythbackend as a daemon which starts at boot time:
+<tscreen><verb>
+# rc-update add mythbackend default
+</verb></tscreen>
+
+To stop mythbackend as a daemon:
+<tscreen><verb>
+# /etc/init.d/mythbackend stop
+</verb></tscreen>
+
+To obtain a list of options:
+<tscreen><verb>
+# /etc/init.d/mythbackend
+</verb></tscreen>
+
+<sect1>Advanced Backend Configurations. <label id="advanced_backend_config">
+<p>MythTV is flexible in the way that you define multiple backend tuner
+configurations.  The only hard-and-fast rule is that the Master Backend
+<em>must</em> have a capture device defined, but shouldn't imply that the
+capture device in the MBE must be the first capture card defined in the
+database.
+
+One example of an advanced configuration is the round-robin scheme.  Rather
+than defining all of the cards on the master, you could first go into setup
+on the master to define globals such as the general configuration and the
+channel lineup but not the host-specific configuration item like the capture
+card.  In this example, we will use a 4 tuner configuration, where two
+slaves have one card each and the master has two.
+<enum>
+<item>Add the first capture card on one of the slaves.  Complete the
+configuration, connecting the input source to the card.  This will get
+cardid #1 in the database.  Exit setup.
+<item>Configure the first capture card on the master backend.  This will get
+cardid #2 in the database.  Exit setup.
+<item>Configure the first capture card on the second slave.  This will be
+cardid #3 in the database.  Exit setup.
+<item>Configure the second capture card on the master backend.  This will
+get cardid #4 in the database.  Exit setup.
+</enum>
+
+Using this scheme, the master backend will not use both capture cards until
+one of the following happens:
+<itemize>
+<item>There are four recordings scheduled for the same time
+<item>Both slaves are not available
+</itemize>
+
+The scheduler in MythTV checks whether an encoder is available; if a slave
+backend isn't running, its encoder isn't available, so the scheduler will
+look for the next available encoder.  This makes MythTV very flexible; slave
+tuners can come and go, and as long as there are enough tuners for what
+you'd like to record it doesn't matter which tuner in particular is going to
+be used.
+
+Using this round-robin scheme along with a shared storage directory like
+NFS and enabling the Master Backend Override setting will allow you to view
+content even if the slave backend that recorded a program is not available.
+
+
+<sect1>What is this transcoder thing, and how do I use it?
+<p>The transcoder re-encodes files from one MythTV format to another.  The
+main purpose of the transcoder is to allow users with hardware
+encoders (PVR-250) or systems that can only record in RTJpeg due to
+performance reasons (multiple capture cards, slow system, etc) to create
+MPEG4 streams to save space.
+
+The transcoder can be used in two ways:
+<itemize>
+<item>Automatically re-encode every file once it has completed recording
+<item> After marking commercials, the transcoder can be run manually to
+delete the commercials from the file (thus further saving space)
+</itemize>
+The two methods are independent.  The first is an automatic process that can be
+enabled/disabled through the setup program; the second is a manual method which
+must be invoked on each recording individually.
+
+The second method can be used on files that have already been transcoded (or
+files which were are already in the correct format), so only the frames
+immediately following a cut section will be re-encoded, resultiing in a very
+minimal loss of quality.
+
+To enable automatic transcoding, do the following:
+   start the setup program
+   under the host-specific settings:
+      set the Transcoder Auto-run checkbox
+
+For either manual or automatic transcoding:
+   start mythbackend
+   start mythfrontend
+   select setup, and the Transcoding recording profile.
+      now select either RTJPEG or MPEG4 (selecting any of the hardware
+      encoders will result in the transcoder not working).
+      set the other parameters as you'd like.  For best performance, you
+      should match the audio to the 'Default' profile.  If you plan to
+      only use the manual transcoder, you can choose to set the video to
+      be the same as the default profile too (as long as it is MPEG4 or
+      RTJpeg)
+
+Everything should now be setup properly.  If you elected to use the
+Auto-Run feature, the transcoder will automatically launch after each
+recording is complete.  The transcoder thread runs at a low priority, so it
+should not impact any critical tasks or other recordings.
+
+If you want to manually transcode a program, simply press 'X' while
+watching a recording (you should have already finished marking all
+commercials).  If you change your mind, hitting 'X' again will stop the
+transcoding.
+
+Once the transcode is complete, mythbackend will replace the old file
+with the new as soon as it is no longer in use.
+
+<sect>Example Configurations
+<p>This section contains configurations which you may find useful.
+<sect1>Hauppauge PVR-250/350 hardware MPEG-2 encoder.
+I'd like to use a hardware MPEG-2 encoder (ie, a PVR-250/350). <label id="pvr250">
 <p><bf>NOTE</bf>:  THE FOLLOWING DOCUMENTATION IS PROVIDED AS-IS AND IS
 NOT GUARANTEED TO WORK WITH YOUR DISTRIBUTION.  FOR IVTV DRIVER ASSISTANCE,
 SEE THE IVTV MAILING LIST.  <url
@@ -4030,7 +4284,7 @@ To turn off DNR, add the following to your <tt>rc.local</tt>:
 /path/to/ivtv/utils/test_ioctl --set-codec-params=dnr_mode=0,dnr_temporal=0
 </verb></tscreen>
 
-<sect1>I'd like to use the remote that came with my Hauppauge PVR-250 and use MythTV's native LIRC support.
+<sect1>Hauppauge PVR-250 remote and MythTV's native LIRC support.
 <label id="hauppauge_remote">
 <p><bf>NOTE</bf>:  THE FOLLOWING DOCUMENTATION IS PROVIDED AS-IS AND IS
 NOT GUARANTEED TO WORK WITH YOUR DISTRIBUTION.  FOR LIRC DRIVER ASSISTANCE,
@@ -4205,228 +4459,7 @@ $ su
 
 You should now have native LIRC support within MythTV.
 
-<sect1>I'd like to use NFS.
-<p>You may want to use a central server to store your files.  
-
-On the host machine, (in this case, the hostname is "masterbackend") you'll
-want to edit your <tt>/etc/exports</tt> file and use something like:
-<tscreen><verb>
-/var/video (rw)
-</verb></tscreen>
-
-To export the <tt>/var/video</tt> directory with read / write privileges.
-
-On the "slave" machine, you'll want to edit the <tt>/etc/fstab</tt> file and
-add something like:
-<tscreen><verb>
-masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,soft,nfsvers=3
-</verb></tscreen>
-
-Then run <tt># fstab -a</tt> to re-read the file to mount the file system.
-
-In this case, the source is a machine called "masterbackend" which is
-exporting the directory "/var/video", which we're mounting locally at
-"/var/video".  The rsize and wsize options are used to increase the
-performance of NFS; soft mean that NFS will eventually timeout on an error,
-and the nfsvers is required for filesizes over 2GB.
-
-<label id="mythbackend_autostart">
-<sect1>I'd like to automatically start mythbackend at system boot time.
-<sect2>Red Hat And Mandrake
-<p>Here's a method for automatically starting mythbackend submitted by Mike
-Thomson (<url url="mailto:linux@m-thomson.net" name="mailto:linux@m-thomson.net">) and Stu Tomlinson (<url
-url="mailto:stu@nosnilmot.com" name="mailto:stu@nosnilmot.com">).
-
-Copy the files from the MythTV <tt>contrib</tt> directory or from Mike's web
-site (<url url="http://m-thomson.net/mythtv/"
-name="http://m-thomson.net/mythtv/">) as follows:
-
-<tt>etc.rc.d.init.mythbackend</tt> should be made executable and copied to
-<tt>/etc/rc.d/init.d/</tt>:
-<tscreen><verb>
-$ cd contrib
-$ su
-# chmod a+x etc.rc.d.init.d.mythbackend
-# cp etc.rc.d.init.d.mythbackend /etc/rc.d/init.d/mythbackend
-</verb></tscreen>
-
-<tt>etc.sysconfig.mythbackend</tt> should be copied to
-<tt>/etc/sysconfig/</tt>:
-<tscreen><verb>
-$ cd contrib
-$ su
-# cp etc.sysconfig.mythbackend /etc/sysconfig/mythbackend
-</verb></tscreen>
-
-Edit <tt>/etc/sysconfig/mythbackend</tt> if you want to change the defaults
-(the userid that should start mythbackend, location of the logfile and (if
-required) the name and location of the mythbackend binary).
-
-Use <bf>chkconfig</bf> to make sure the script is called when
-entering runlevels 3, 4 or 5:
-<tscreen><verb>
-$ su
-# chkconfig --level 345 mythbackend on
-# exit
-$
-</verb></tscreen>
-
-<sect3>Log files 
-<p>By default, the log file for mythbackend will be written to
-<tt>/var/tmp/mythbackend.log</tt>. This has been tested and is known to work
-on Mandrake and Red Hat, but many people prefer to place logs under
-<tt>/var/log/</tt>.
-
-To do this, create a group called <tt>mythtv</tt> (or anything you prefer)
-and add your usual MythTV users to that group. If you changed the user that
-starts mythbackend from the default of root you <em>must</em> perform this
-step.
-
-Create the directory <tt>/var/log/mythtv</tt> and set its
-permissions as follows:
-<tscreen><verb>
-$ su
-# mkdir /var/log/mythtv
-# chown root:mythtv /var/log/mythtv
-# chmod 0775 /var/log/mythtv
-# exit
-$ ls -ld /var/log/mythtv
-drwxrwxr-x    2 root     mythtv       4096 Apr 28 21:58 /var/log/mythtv/
-$
-</verb></tscreen>
-
-<sect3>Mandrake 9.x
-<p>Mandrake adds one more twist in the form of the <tt>msec</tt> utility,
-which runs regularly and (at the default or any higher security level) sets
-permissions on many files, including those under <tt>/var/log</tt>.
-
-To tell msec about the MythTV log files and their directory, you need to
-edit the <tt>/etc/security/msec/perm.local</tt> file to include the
-following:
-<tscreen><verb>
-# /etc/security/msec/perm.local
-# Local overrides to the msec program
-#
-# Full file path                user.group              permissions
-/var/log/mythtv/                root.mythtv             775
-/var/log/mythtv/*               root.mythtv             664
-</verb></tscreen>
-
-A copy of the above has been included in the contrib/ directory.  You may
-add it by typing:
-<tscreen><verb>
-$ cd contrib
-$ su
-# cat etc.security.msec.perm.local >> /etc/security/msec/perm.local
-# exit
-</verb></tscreen>
-
-Finally run the <tt>msec</tt> tool to check and implement your
-changes.
-<tscreen><verb>
-$ su
-# msec
-# exit
-$
-</verb></tscreen>
-
-<bf>NOTE</bf>: msec can only <em>reduce</em> the permissions of files, so if
-you don't get the results you expect, check that you're not asking
-<tt>msec</tt> to add missing permissions to the files or directories you
-created.
-<sect2>Gentoo
-<p>The portage file for MythTV has scripts that will allow you to run
-mythbackend at startup.
-
-To run mythbackend as a daemon which starts at boot time:
-<tscreen><verb>
-# rc-update add mythbackend default
-</verb></tscreen>
-
-To stop mythbackend as a daemon:
-<tscreen><verb>
-# /etc/init.d/mythbackend stop
-</verb></tscreen>
-
-To obtain a list of options:
-<tscreen><verb>
-# /etc/init.d/mythbackend
-</verb></tscreen>
-
-<sect1>Advanced Backend Configurations. <label id="advanced_backend_config">
-<p>MythTV is flexible in the way that you define multiple backend tuner
-configurations.  The only hard-and-fast rule is that the Master Backend
-<em>must</em> have a capture device defined, but shouldn't imply that the
-capture device in the MBE must be the first capture card defined in the
-database.
-
-One example of an advanced configuration is the round-robin scheme.  Rather
-than defining all of the cards on the master, you could first go into setup
-on the master to define globals such as the general configuration and the
-channel lineup but not the host-specific configuration item like the capture
-card.  In this example, we will use a 4 tuner configuration, where two
-slaves have one card each and the master has two.
-<enum>
-<item>Add the first capture card on one of the slaves.  Complete the
-configuration, connecting the input source to the card.  This will get
-cardid #1 in the database.  Exit setup.
-<item>Configure the first capture card on the master backend.  This will get
-cardid #2 in the database.  Exit setup.
-<item>Configure the first capture card on the second slave.  This will be
-cardid #3 in the database.  Exit setup.
-<item>Configure the second capture card on the master backend.  This will
-get cardid #4 in the database.  Exit setup.
-</enum>
-
-Using this scheme, the master backend will not use both capture cards until
-one of the following happens:
-<itemize>
-<item>There are four recordings scheduled for the same time
-<item>Both slaves are not available
-</itemize>
-
-The scheduler in MythTV checks whether an encoder is available; if a slave
-backend isn't running, its encoder isn't available, so the scheduler will
-look for the next available encoder.  This makes MythTV very flexible; slave
-tuners can come and go, and as long as there are enough tuners for what
-you'd like to record it doesn't matter which tuner in particular is going to
-be used.
-
-Using this round-robin scheme along with a shared storage directory like
-NFS and enabling the Master Backend Override setting will allow you to view
-content even if the slave backend that recorded a program is not available.
-
-<sect1>Advanced Partition Formatting. <label
-id="advancedpartitionformatting">
-<p>MythTV creates large files.  The partitions that your distribution sets
-up for you may not be optimized for large files.
-<sect2>Ext3
-<p>With Ext3, your biggest gain is that in case of a crash and reboot you
-don't have to wait very long for your partition to be remounted.  With Ext2,
-the <bf>fsck</bf> may take a long time to run on multi-gigabyte partitions.
-
-When formatting the partition, the following command line should be better
-than the default.  This example assumes that <tt>/dev/hdb1</tt> has already
-been created using <bf>fdisk</bf>.
-<tscreen><verb>
-# mkfs.ext3 -T largefile4 -m 0 /dev/hdb1
-</verb></tscreen>
-
-The "-T largefile4" option creates one inode per 4 megabytes.  The "-m 0"
-(zero, not "oh") parameter sets the amount of spaced reserved for root to
-zero. By default, this is 5%, which on a multi-gigabyte drive is a lot of
-reserved space.
-
-You may also modify some aspects of a filesystem such as the reserved block
-percentage after it has been created using the <bf>tune2fs</bf> program:
-<tscreen><verb>
-# tune2fs -m 0 /dev/hdb1
-</verb></tscreen>
-
-You can check on your filesystem using the <bf>dumpe2fs</bf> program.  See
-the <bf>man</bf> page for details.
-
-<sect1>I'd like to have more flexible disk storage with LVM. 
+<sect1>Linux Volume Manager (LVM). <label id="LVM">
 <!-- Contributed by Martin Smith martin at spamcop.net -->
 <p>LVM greatly increases the flexibility you have in managing your storage
 than traditional physical partitions. This section will provide some brief
@@ -4544,58 +4577,38 @@ unmounted during this procedure.
 # mount /dev/VGforMyth/video /var/video
 </verb></tscreen>
 
-<sect1>What is this transcoder thing, and how do I use it?
-<p>The transcoder re-encodes files from one MythTV format to another.  The
-main purpose of the transcoder is to allow users with hardware
-encoders (PVR-250) or systems that can only record in RTJpeg due to
-performance reasons (multiple capture cards, slow system, etc) to create
-MPEG4 streams to save space.
+<sect1>Advanced Partition Formatting. <label
+id="advancedpartitionformatting">
+<p>MythTV creates large files.  The partitions that your distribution sets
+up for you may not be optimized for large files.  Using <ref id="LVM"
+name="LVM"> in conjunction with the following techniques can be quite
+useful.
+<sect2>Ext3
+<p>With Ext3, your biggest gain is that in case of a crash and reboot you
+don't have to wait very long for your partition to be remounted.  With Ext2,
+the <bf>fsck</bf> may take a long time to run on multi-gigabyte partitions.
 
-The transcoder can be used in two ways:
-<itemize>
-<item>Automatically re-encode every file once it has completed recording
-<item> After marking commercials, the transcoder can be run manually to
-delete the commercials from the file (thus further saving space)
-</itemize>
-The two methods are independent.  The first is an automatic process that can be
-enabled/disabled through the setup program; the second is a manual method which
-must be invoked on each recording individually.
+When formatting the partition, the following command line should be better
+than the default.  This example assumes that <tt>/dev/hdb1</tt> has already
+been created using <bf>fdisk</bf>.  If you're using LVM, <tt>/dev/hdb1</tt>
+may be something like <tt>/dev/VGforMyth/video</tt>.
+<tscreen><verb>
+# mkfs.ext3 -T largefile4 -m 0 /dev/hdb1
+</verb></tscreen>
 
-The second method can be used on files that have already been transcoded (or
-files which were are already in the correct format), so only the frames
-immediately following a cut section will be re-encoded, resultiing in a very
-minimal loss of quality.
+The "-T largefile4" option creates one inode per 4 megabytes.  The "-m 0"
+(zero, not "oh") parameter sets the amount of spaced reserved for root to
+zero. By default, this is 5%, which on a multi-gigabyte drive is a lot of
+reserved space.
 
-To enable automatic transcoding, do the following:
-   start the setup program
-   under the host-specific settings:
-      set the Transcoder Auto-run checkbox
+You may also modify some aspects of a filesystem such as the reserved block
+percentage after it has been created using the <bf>tune2fs</bf> program:
+<tscreen><verb>
+# tune2fs -m 0 /dev/hdb1
+</verb></tscreen>
 
-For either manual or automatic transcoding:
-   start mythbackend
-   start mythfrontend
-   select setup, and the Transcoding recording profile.
-      now select either RTJPEG or MPEG4 (selecting any of the hardware
-      encoders will result in the transcoder not working).
-      set the other parameters as you'd like.  For best performance, you
-      should match the audio to the 'Default' profile.  If you plan to
-      only use the manual transcoder, you can choose to set the video to
-      be the same as the default profile too (as long as it is MPEG4 or
-      RTJpeg)
-
-Everything should now be setup properly.  If you elected to use the
-Auto-Run feature, the transcoder will automatically launch after each
-recording is complete.  The transcoder thread runs at a low priority, so it
-should not impact any critical tasks or other recordings.
-
-If you want to manually transcode a program, simply press 'X' while
-watching a recording (you should have already finished marking all
-commercials).  If you change your mind, hitting 'X' again will stop the
-transcoding.
-
-Once the transcode is complete, mythbackend will replace the old file
-with the new as soon as it is no longer in use.
-
+You can check on your filesystem using the <bf>dumpe2fs</bf> program.  See
+the <bf>man</bf> page for details.
 
 </article>
 <!-- Revision History
@@ -4766,6 +4779,9 @@ Stupid Mandrake.  Add section for lirc-0.7.0/Hauppauge remotes.  Discuss
 native lirc support.  Start thinking about a re-write of the lirc section -
 it's confusing.
 v2.78, 2003-09-18.  Fix a dangling pointer and a split header.
+v2.79, 2003-09-19.  Create a dedicated "examples" section, move stuff to it. 
+Get rid of some old crap.  Talk about LVM sooner in the doc.  Add a section
+for MythNews.
 -->
 
 <!--

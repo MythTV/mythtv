@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-09-18, v2.78
+  2003-09-19, v2.79
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -151,65 +151,65 @@
      18.1 Manual Compilation of Prerequisites.
      18.2 Pre-compiled binaries.
 
-  19. Troubleshooting.
-     19.1 Illegal Instruction.
-     19.2 mythfilldatabase failing.
-     19.3 MythTV seems to disappear; can't see video.
-     19.4 Fast CPU, choppy or jittery video.
-     19.5 I keep losing all of my settings every time I compile!
-     19.6 Compile errors.
-     19.7 My screen goes blank, but comes back when I wiggle the mouse or use the keyboard.
-     19.8 I get segfaults / MythTV isn't doing anything.
-     19.9 Debugging with GDB.
-     19.10 MythTV makes my system crash.
-     19.11 Troubleshooting audio.
-     19.12 I can't see parts of the On Screen Display.
-     19.13 The mythbackend program told me to look at this section.
-     19.14 My remote doesn't work / works sometimes and not others / "ghost" keypresses.
-     19.15 My PVR-250 card doesn't show inputs in the setup screen.
-     19.16 Where's my "canada-cable" entry gone to?
-     19.17 My channels are off by one.
-     19.18 Mythweb is showing a db_open error when I connect to it.
-     19.19 error: can't find a register in class 'BREG' while reloading 'asm'
-     19.20 make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
-     19.21 make: *** No rule to make target /mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
-     19.22 My mouse pointer disappears when placed over the MythTV windows.
-     19.23 What does "strange error flushing buffer" mean on my console?
-     19.24 I can't change the channel when watching Live TV.
-     19.25 Colors are wrong, people have blue faces.
-     19.26 When trying to run setup, I get an error like this: "./setup: error while loading shared libraries:"
+  19. MythNews
+  20. Troubleshooting.
+     20.1 Illegal Instruction.
+     20.2 mythfilldatabase failing.
+     20.3 MythTV seems to disappear; can't see video.
+     20.4 Fast CPU, choppy or jittery video.
+     20.5 I keep losing all of my settings every time I compile!
+     20.6 Compile errors.
+     20.7 My screen goes blank, but comes back when I wiggle the mouse or use the keyboard.
+     20.8 I get segfaults / MythTV isn't doing anything.
+     20.9 Debugging with GDB.
+     20.10 MythTV makes my system crash.
+     20.11 Troubleshooting audio.
+     20.12 I can't see parts of the On Screen Display.
+     20.13 The mythbackend program told me to look at this section.
+     20.14 My remote doesn't work / works sometimes and not others / "ghost" keypresses.
+     20.15 My PVR-250 card doesn't show inputs in the setup screen.
+     20.16 Where's my "canada-cable" entry gone to?
+     20.17 My channels are off by one.
+     20.18 Mythweb is showing a db_open error when I connect to it.
+     20.19 error: can't find a register in class 'BREG' while reloading 'asm'
+     20.20 make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
+     20.21 make: *** No rule to make target /mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
+     20.22 My mouse pointer disappears when placed over the MythTV windows.
+     20.23 What does "strange error flushing buffer" mean on my console?
+     20.24 I can't change the channel when watching Live TV.
+     20.25 When trying to run setup, I get an error like this: "./setup: error while loading shared libraries:"
 
-  20. Miscellaneous.
-     20.1 I'd like to watch the files without using MythTV / I'd like to convert the files to some other format.
-     20.2 I'd like to use some other window manager.
-     20.3 I'd like MythTV to automatically startup.
-     20.4 What capture resolution should I use?  How does video work?
-     20.5 MythTV GUI and X Display Sizes.
-        20.5.1 X Dimensions
-        20.5.2 MythTV Dimensions
-        20.5.3 Overscan Dimensions
-        20.5.4 MythTV on the Desktop
-     20.6 I'd like to save or restore my database.
-     20.7 I'd like to delete the mysql database.
-     20.8 btaudio
-     20.9 Removing unwanted channels.
-     20.10 I'd like to use a hardware MPEG-2 encoder (ie, a PVR-250/350).
-     20.11 I'd like to use the remote that came with my Hauppauge PVR-250 and use MythTV's native LIRC support.
-     20.12 I'd like to use NFS.
-     20.13 I'd like to automatically start mythbackend at system boot time.
-        20.13.1 Red Hat And Mandrake
-           20.13.1.1 Log files
-           20.13.1.2 Mandrake 9.x
-        20.13.2 Gentoo
-     20.14 Advanced Backend Configurations.
-     20.15 Advanced Partition Formatting.
-        20.15.1 Ext3
-     20.16 I'd like to have more flexible disk storage with LVM.
-        20.16.1 ReiserFS
-        20.16.2 ext2 or ext3
-     20.17 What is this transcoder thing, and how do I use it?
+  21. Miscellaneous.
+     21.1 I'd like to watch the files without using MythTV / I'd like to convert the files to some other format.
+     21.2 I'd like to use some other window manager.
+     21.3 What capture resolution should I use?  How does video work?
+     21.4 MythTV GUI and X Display Sizes.
+        21.4.1 X Dimensions
+        21.4.2 MythTV Dimensions
+        21.4.3 Overscan Dimensions
+        21.4.4 MythTV on the Desktop
+     21.5 I'd like to save or restore my database.
+     21.6 I'd like to delete the mysql database.
+     21.7 btaudio
+     21.8 Removing unwanted channels.
+     21.9 I'd like to use NFS.
+     21.10 Automatically starting mythfrontend at system boot time.
+     21.11 Automatically starting mythbackend at system boot time.
+        21.11.1 Red Hat And Mandrake
+           21.11.1.1 Log files
+           21.11.1.2 Mandrake 9.x
+        21.11.2 Gentoo
+     21.12 Advanced Backend Configurations.
+     21.13 What is this transcoder thing, and how do I use it?
 
-
+  22. Example Configurations
+     22.1 Hauppauge PVR-250/350 hardware MPEG-2 encoder. I'd like to use a hardware MPEG-2 encoder (ie, a PVR-250/350).
+     22.2 Hauppauge PVR-250 remote and MythTV's native LIRC support.
+     22.3 Linux Volume Manager (LVM).
+        22.3.1 ReiserFS
+        22.3.2 ext2 or ext3
+     22.4 Advanced Partition Formatting.
+        22.4.1 Ext3
 
   ______________________________________________________________________
 
@@ -415,6 +415,12 @@
   filesystem that will allow you to create large files.  Filesystems
   known to have problems with large files are FAT and FAT32.
 
+  Because of these large files, it may be useful to plan for future
+  expansion right from the beginning.  If your case and power supply
+  have the capability for additional hard drives, read through the
+  ``LVM'' and ``Advanced Partition Formatting'' sections for some
+  pointers.
+
 
   [1m3.1.5.  Video Capture Device[0m
 
@@ -467,6 +473,7 @@
   Here are some data points for decoding:
 
 
+
   +o  An Athlon 1800XP can decode a 720x480 8Mbps MPEG-2 file using 10%
      CPU
 
@@ -479,8 +486,8 @@
   +o  A Celeron 450 (no SSE) can decode a 480x480 16Mbps MPEG-2 file with
      80% CPU.
 
-  See the ``I'd like to use a hardware MPEG-2 encoder'' section for
-  information on installing a PVR-250 on Mandrake 9.1.
+  See the ``Hauppauge PVR-250/350 hardware MPEG-2 encoder.''  section
+  for information on installing a PVR-250 on Mandrake 9.1.
 
   [1mNOTE[22m: The ATI All-in-Wonder cards [4mwill[24m [4mnot[24m work as a MythTV capture
   device, as the GATOS <http://gatos.sourceforge.net> drivers that are
@@ -533,13 +540,13 @@
   card.  You may also run xvinfo; look for your video card to be listed
   as one of the adapters.
 
-
   If you want to use MythTV with a standard television, you will need a
   physical connection from your video card to your TV set, which can
   either be a TV-out port on the card itself, or an external adapter
   that converts the VGA signal to an appropriate video signal.
   "Appropriate" depends on a number of factors, such as video standard
   (NTSC vs PAL) type of input connection (Composite vs SVideo), etc.
+
   Note that with some video cards and X drivers, Xvideo extensions are
   only supported on the VGA output, and not on the TV output.
 
@@ -672,6 +679,7 @@
   on a television screen. Please consult the mythtv-users mailing list
   for messages that report the details of these special arrangements.
 
+
   [1m3.1.9.  External Adapters[0m
 
   External adapters convert standard VGA output to a form suitable for
@@ -728,6 +736,7 @@
   to perform.  See your package documentation.
 
 
+
   [1m3.2.1.1.  Red Hat Linux 9[0m
 
   Red Hat Linux 9 packages for MythTV and most of its add-on modules and
@@ -738,6 +747,7 @@
   prerequisites for MythTV (such as XMLTV) are available as RPM
   packages. If you have problems with the RPMs, please send him email
   directly.
+
   Given the large number of dependent RPMs you are advised to use tools
   like apt or yum for automatic retrieval and installation of the
   required RPMs.  (http://atrpms.physik.fu-berlin.de/install.html
@@ -787,6 +797,7 @@
   obtained from http://rpm.nyvalls.se/ <http://rpm.nyvalls.se/> If you
   have problems with the RPMs, please send him email directly at
   thac@nyvalls.se <thac@nyvalls.se>.
+
 
 
   [1m3.2.1.3.  Debian[0m
@@ -919,6 +930,7 @@
   "Yes" or OK if you get a message about satisfying dependencies.
 
 
+
   [1m3.2.3.2.  Red Hat Linux 8.0[0m
 
   Red Hat Linux 8.0 does not have the same graphical package manager
@@ -1043,6 +1055,7 @@
   continue by following the Mandrake 9.0 instructions.
 
 
+
   [1m3.2.4.1.2.  Mandrake 8.2 and 9.0[0m
 
   The simplest tool for installing packages from the command line is
@@ -1056,6 +1069,8 @@
        $ su
        # urpmi mysql gcc gcc-c++ freetype2-devel cdialog alsa-utils
        # urpmi XFree86-devel perl
+
+
 
   ______________________________________________________________________
   NOTE for Mandrake 8.2 users: do not execute the following
@@ -1101,7 +1116,6 @@
        USE="mysql alsa"
 
 
-
   Next you need to build Qt. If you don't plan on using the ebuilds as
   described in the Gentoo section then you also need to install lame.
 
@@ -1116,8 +1130,7 @@
   /etc/make.conf and rebuild Qt by running
 
 
-
-  # emerge qt
+       # emerge qt
 
 
 
@@ -1182,6 +1195,8 @@
        # exit
        $
 
+
+
   [1m4.2.2.  Distribution-Specific Notes[0m
 
   [1m4.2.2.1.  Red Hat[0m
@@ -1227,6 +1242,8 @@
   called default. If not, you'll get errors during the compile. See the
   Troubleshooting Section for more information.
 
+
+
   [1m4.3.2.  Distribution-Specific Notes[0m
 
   [1m4.3.2.1.  Mandrake[0m
@@ -1242,17 +1259,16 @@
   and d at the same time.
 
 
+       $ su
+       # cd /etc/profile.d
+       cat > mythtv.sh
+       export QTDIR=/usr/lib/qt3
+       export PATH=$PATH:/usr/lib/qt3/bin
+       ^D
 
-  $ su
-  # cd /etc/profile.d
-  cat > mythtv.sh
-  export QTDIR=/usr/lib/qt3
-  export PATH=$PATH:/usr/lib/qt3/bin
-  ^D
-
-  # chmod a+x mythtv.sh
-  # exit
-  $ exit
+       # chmod a+x mythtv.sh
+       # exit
+       $ exit
 
 
 
@@ -2046,9 +2062,8 @@
 
   [1mNOTE[22m:  If you wish to use the remote control that comes with the
   Hauppauge PVR-250/350 cards, you will need to run the lirc 0.7.0pre2
-  code.  See the example installation in the "I'd like to use the remote
-  that came with my Hauppauge PVR-250 and use MythTV's native LIRC
-  support." ``section''.
+  code.  See the example installation in the "Hauppauge PVR-250 remote
+  and MythTV's native LIRC support" ``section''.
 
   Some IR devices require a kernel recompile, and some don't. However,
   all at least require having the kernel source available as a resource
@@ -3909,9 +3924,13 @@
 
 
 
-  [1m19.  Troubleshooting.[0m
+  [1m19.  MythNews[0m
 
-  [1m19.1.  Illegal Instruction.[0m
+
+
+  [1m20.  Troubleshooting.[0m
+
+  [1m20.1.  Illegal Instruction.[0m
 
   This error can happen for the following reasons:
 
@@ -3926,7 +3945,7 @@
      this by doing a $ cat /proc/cpuinfo and looking for "sse" in the
      processor flags section.
 
-  [1m19.2.  mythfilldatabase failing.[0m
+  [1m20.2.  mythfilldatabase failing.[0m
 
   If mythfilldatabase suddenly appears to be failing, check to see what
   version of XMLTV you're running.  Versions prior to 0.5.4 need to have
@@ -3938,22 +3957,25 @@
   listings provider, has been making numerous changes to their website
   which negatively impact XMLTV.
 
-  [1m19.3.  MythTV seems to disappear; can't see video.[0m
+  [1m20.3.  MythTV seems to disappear; can't see video.[0m
 
   If you're using Gnome as your window manager, try switching to KDE.
   For Red Hat Linux 8.0 users, edit /etc/sysconfig/desktop and change
   "GNOME" to "KDE".
 
-  [1m19.4.  Fast CPU, choppy or jittery video.[0m
+  [1m20.4.  Fast CPU, choppy or jittery video.[0m
 
   First, you should check that your kernel has been enabled for DMA:
 
 
-       [mythtv@pvr mythtv]$ dmesg |grep DMA
-           ide0: BM-DMA at 0xd800-0xd807, BIOS settings: hda:DMA, hdb:DMA
-           ide1: BM-DMA at 0xd808-0xd80f, BIOS settings: hdc:DMA, hdd:pio
-       hda: 156301488 sectors (80026 MB) w/2048KiB Cache, CHS=9729/255/63, UDMA(33)
-       hdb: 80043264 sectors (40982 MB) w/2048KiB Cache, CHS=4982/255/63, UDMA(33)
+
+  [mythtv@pvr mythtv]$ dmesg |grep DMA
+      ide0: BM-DMA at 0xd800-0xd807, BIOS settings: hda:DMA, hdb:DMA
+      ide1: BM-DMA at 0xd808-0xd80f, BIOS settings: hdc:DMA, hdd:pio
+  hda: 156301488 sectors (80026 MB) w/2048KiB Cache, CHS=9729/255/63, UDMA(33)
+  hdb: 80043264 sectors (40982 MB) w/2048KiB Cache, CHS=4982/255/63, UDMA(33)
+
+
 
   From the listing above, you can see that hda, hdb and hdc are set for
   DMA, and hdd is set for pio.  If your kernel is not reporting DMA
@@ -3987,13 +4009,13 @@
   your setting will be preserved.
 
 
-  [1m19.5.  I keep losing all of my settings every time I compile![0m
+  [1m20.5.  I keep losing all of my settings every time I compile![0m
 
   MythTV will overwrite any settings in /usr/local/share/mythtv.  If you
   want to make sure that you don't lose your modifications, make a
   directory ~/.mythtv and copy your mysql.txt file to this location.
 
-  [1m19.6.  Compile errors.[0m
+  [1m20.6.  Compile errors.[0m
 
   Some compile errors are worse than others.  If you get an error that
   doesn't abort the compilation, and says something like:
@@ -4014,7 +4036,7 @@
   fixed before MythTV will compile.
 
 
-  [1m19.7.  My screen goes blank, but comes back when I wiggle the mouse or[0m
+  [1m20.7.  My screen goes blank, but comes back when I wiggle the mouse or[0m
   [1muse the keyboard.[0m
 
   This is due to DPMS, the Display Power Management System, which is
@@ -4060,28 +4082,28 @@
   Finally, check:
 
 
-       Section "Monitor"
-           Identifier "monitor1"
-           VendorName "Plug'n Play"
-           HorizSync 30-85
-           VertRefresh 50-160
 
-           # Sony Vaio C1(X,XS,VE,VN)?
-           # 1024x480 @ 85.6 Hz, 48 kHz hsync
-           ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
+  Section "Monitor"
+      Identifier "monitor1"
+      VendorName "Plug'n Play"
+      HorizSync 30-85
+      VertRefresh 50-160
 
-           # TV fullscreen mode or DVD fullscreen output.
-           # 768x576 @ 79 Hz, 50 kHz hsync
-           ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
+      # Sony Vaio C1(X,XS,VE,VN)?
+      # 1024x480 @ 85.6 Hz, 48 kHz hsync
+      ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
 
-           # 768x576 @ 100 Hz, 61.6 kHz hsync
-           ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
-       EndSection
+      # TV fullscreen mode or DVD fullscreen output.
+      # 768x576 @ 79 Hz, 50 kHz hsync
+      ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
+
+      # 768x576 @ 100 Hz, 61.6 kHz hsync
+      ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
+  EndSection
 
 
 
   Ensure that there isn't an Option "DPMS" in the Monitor configuration.
-
 
   You can also turn off DPMS from the Command Line, but this will not
   survive a reboot.
@@ -4111,9 +4133,9 @@
   off from within the control panel.
 
 
-  [1m19.8.  I get segfaults / MythTV isn't doing anything.[0m
+  [1m20.8.  I get segfaults / MythTV isn't doing anything.[0m
 
-  [1m19.9.  Debugging with GDB.[0m
+  [1m20.9.  Debugging with GDB.[0m
 
   Without details, the developers will not be able to determine if you
   have discovered a genuine code-bug,  or if the problem is with your
@@ -4123,8 +4145,6 @@
 
   Edit the settings.pro file.  Make sure that the top of the file looks
   like this:
-
-
        $ cat settings.pro
        CONFIG += debug
        #CONFIG += release
@@ -4193,7 +4213,7 @@
   instructions.
 
 
-  [1m19.10.  MythTV makes my system crash.[0m
+  [1m20.10.  MythTV makes my system crash.[0m
 
   MythTV [4mcan[24m [4mnot[24m crash your system - it is a user-level program.  If
   your system is crashing when you run MythTV, then you have some issue
@@ -4202,7 +4222,7 @@
   perform a CPU intensive task like encoding video.
 
 
-  [1m19.11.  Troubleshooting audio.[0m
+  [1m20.11.  Troubleshooting audio.[0m
 
   By Bruce Markey, mailto:bjm@lvcm.com <mailto:bjm@lvcm.com> [1mNOTE[22m:  the
   following instructions do not apply to PVR-250/350 encoders; the
@@ -4276,14 +4296,14 @@
   #0, the second card is #1, etc.
 
 
-  [1m19.12.  I can't see parts of the On Screen Display.[0m
+  [1m20.12.  I can't see parts of the On Screen Display.[0m
 
   If you're a Red Hat 8.0 user, make sure that you've followed the
   instructions which tell you how to modify the Themes makefile.
   ``Link''.
 
 
-  [1m19.13.  The mythbackend program told me to look at this section.[0m
+  [1m20.13.  The mythbackend program told me to look at this section.[0m
 
   mythbackend does a check to see if your sound device is capable of
   full duplex operation.  If it's not, it's most likely that you're
@@ -4291,10 +4311,10 @@
   same time.  If your backend is a separate machine than your frontend,
   then there's no problem, since you're only going to be doing one thing
   at a time with the card.  Likewise, if you're running the frontend and
-  backend on the same machine, but you're using btaudio as your
-  recording source, and using the playback function of your soundcard,
-  then you also shouldn't have an issue, since the sound card isn't
-  being asked to perform two functions at once.
+  backend on the same machine, but you're using btaudio or a Hauppauge
+  PVR-250 as your recording source, and using the playback function of
+  your soundcard, then you also shouldn't have an issue, since the sound
+  card isn't being asked to perform two functions at once.
 
   If you can't get your soundcard to go full duplex and need it to, then
   check your distribution for updated sound drivers.  If your soundcard
@@ -4304,7 +4324,7 @@
   will need to get btaudio ``operational''.
 
 
-  [1m19.14.  My remote doesn't work / works sometimes and not others /[0m
+  [1m20.14.  My remote doesn't work / works sometimes and not others /[0m
   [1m"ghost" keypresses.[0m
 
   This can be due to a number of factors.  The simplest case is the
@@ -4318,7 +4338,6 @@
   will eventually cause [1mlircd [22mto stop responding; even though [1mlircd [22mis
   configured for the Pinnacle Systems remote, the Tivo remote IR
   patterns are being seen by the IR receiver.
-
   If your remote has been properly configured, and [1mirw [22mand [1mirxevent [22mare
   working correctly, then it's highly likely that your window manager is
   not giving focus correctly to the various Myth programs as they run.
@@ -4330,7 +4349,7 @@
   +o  blackbox  (using "Sloppy Focus" and "Focus New Windows")
 
 
-  [1m19.15.  My PVR-250 card doesn't show inputs in the setup screen.[0m
+  [1m20.15.  My PVR-250 card doesn't show inputs in the setup screen.[0m
 
   See message http://lists.snowman.net/pipermail/mythtv-
   users/2003-April/002527.html
@@ -4338,10 +4357,9 @@
   users/2003-April/002527.html>
 
 
+  [1m20.16.  Where's my "canada-cable" entry gone to?[0m
 
-  [1m19.16.  Where's my "canada-cable" entry gone to?[0m
-
-  [1m19.17.  My channels are off by one.[0m
+  [1m20.17.  My channels are off by one.[0m
 
   There is no such thing as "Canada Cable"; Canada uses the same
   frequencies as the United States.  "Canada Cable" was a hack that some
@@ -4355,7 +4373,7 @@
   more information.
 
 
-  [1m19.18.  Mythweb is showing a db_open error when I connect to it.[0m
+  [1m20.18.  Mythweb is showing a db_open error when I connect to it.[0m
 
   Find your php.ini file. Make sure you've got a line in it like this:
 
@@ -4364,7 +4382,7 @@
   Restart apache for it to take effect.
 
 
-  [1m19.19.  error: can't find a register in class 'BREG' while reloading[0m
+  [1m20.19.  error: can't find a register in class 'BREG' while reloading[0m
   [1m'asm'[0m
 
   This is due to the broken Qt that is being distributed by Suse.  To
@@ -4372,7 +4390,7 @@
   you find there and then recompile.
 
 
-  [1m19.20.  make: *** No rule to make target[0m
+  [1m20.20.  make: *** No rule to make target[0m
   [1m/usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.[0m
 
   This error happens when there's a missing link in the
@@ -4386,7 +4404,6 @@
        # ln -sf linux-g++ default
 
 
-
   and then restart the compile,
 
   or
@@ -4398,49 +4415,43 @@
   choice is the better solution.
 
 
-  [1m19.21.  make: *** No rule to make target /mkspecs/default/qmake.conf',[0m
+  [1m20.21.  make: *** No rule to make target /mkspecs/default/qmake.conf',[0m
   [1mneeded by Makefile'.  Stop.[0m
 
   You didn't set your QTDIR.  Re-read the section on ``Setting up
   paths''.
 
-  [1m19.22.  My mouse pointer disappears when placed over the MythTV win-[0m
+
+  [1m20.22.  My mouse pointer disappears when placed over the MythTV win-[0m
   [1mdows.[0m
 
   This is the intended behavior.  The MythTV interface is meant for use
   with a remote control or a keyboard.
 
 
-  [1m19.23.  What does "strange error flushing buffer" mean on my console?[0m
+  [1m20.23.  What does "strange error flushing buffer" mean on my console?[0m
 
   Nothing, really.  It's just lame (the mp3 encoder) complaining for
   some obscure reason.  This seems to be fixed in more recent versions
   of the libmp3lame library.
 
 
-  [1m19.24.  I can't change the channel when watching Live TV.[0m
+  [1m20.24.  I can't change the channel when watching Live TV.[0m
 
   Something's wrong with your program database.  Did mythfilldatabase
   run with no major errors?
 
 
-  [1m19.25.  Colors are wrong, people have blue faces.[0m
-
-  If you are using the binary nVidia drivers, make sure you're using at
-  least version 1.0-2960.
-
-
-  [1m19.26.  When trying to run setup, I get an error like this: "./setup:[0m
+  [1m20.25.  When trying to run setup, I get an error like this: "./setup:[0m
   [1merror while loading shared libraries:"[0m
 
   You didn't add /usr/local/lib to /etc/ld.so.conf.  See the section on
   modifying ``/etc/ld.so.conf''.
 
 
+  [1m21.  Miscellaneous.[0m
 
-  [1m20.  Miscellaneous.[0m
-
-  [1m20.1.  I'd like to watch the files without using MythTV / I'd like to[0m
+  [1m21.1.  I'd like to watch the files without using MythTV / I'd like to[0m
   [1mconvert the files to some other format.[0m
 
   Matthew Zimmerman has created a patch for MPlayer / Mencoder
@@ -4449,8 +4460,8 @@
   files, which is why you MPlayer complains if you try to view them.
 
   [1mNOTE[22m:  If you're using a hardware MPEG2 encoder like the PVR-250/350
-  you don't need to convert - the files are actually standard MPEG2 with
-  a .nuv extension.  Change it to .mpg and the files should display
+  you don't need to convert - the files are actually standard MPEG-2
+  with a .nuv extension.  Change it to .mpg and the files should display
   properly in other media players.
 
   Download the patch to MPlayer from Matt's website.
@@ -4458,19 +4469,19 @@
   <http://dijkstra.csh.rit.edu/~mdz/mythtv/>.
 
 
-       $ wget http://dijkstra.csh.rit.edu/~mdz/mythtv/mplayer-0.90rc5-mythtv-20030407.diff
+
+  $ wget http://dijkstra.csh.rit.edu/~mdz/mythtv/mplayer-0.90rc5-mythtv-20030407.diff
 
 
 
   Download the source to MPlayer and patch:
 
 
-
-  $ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90.tar.bz2
-  $ tar -xjf MPlayer-0.90.tar.bz2
-  $ cp mplayer-0.90rc5-mythtv-20030407.diff MPlayer-0.90
-  $ cd MPlayer-0.90
-  $ patch -p1 < mplayer-0.90rc5-mythtv-20030407.diff
+       $ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90.tar.bz2
+       $ tar -xjf MPlayer-0.90.tar.bz2
+       $ cp mplayer-0.90rc5-mythtv-20030407.diff MPlayer-0.90
+       $ cd MPlayer-0.90
+       $ patch -p1 < mplayer-0.90rc5-mythtv-20030407.diff
 
 
 
@@ -4478,53 +4489,15 @@
   compile process.
 
 
-  [1m20.2.  I'd like to use some other window manager.[0m
+  [1m21.2.  I'd like to use some other window manager.[0m
 
   MythTV is not dependent on any particular window manager.  If you wish
   to run a lightweight window manager, the configfiles/ directory has an
   example of a .twmrc and .fvwmrc file you may use.
 
 
-  [1m20.3.  I'd like MythTV to automatically startup.[0m
 
-  Here's an example submitted to the mythtv-dev list by Pat Pflaum
-  mailto:pat@netburp.com <mailto:pat@netburp.com> using fvwm:
-
-
-       $ cat > .xinitrc
-       fvwm &
-       mythfrontend
-       ^D
-       $ cat > .fvwmrc
-       Style myth* NoTitle, NoHandles, Sticky, WindowListSkip, SloppyFocus, GrabFocus, BorderWidth 0
-       ^D
-       $
-
-
-
-  The following also works with blackbox:
-
-
-       $ cat > .xinitrc
-       xset -dpms s off &
-       irxevent &
-       mythfrontend &
-       blackbox
-
-
-
-  Make sure that your .blackboxrc file has:
-
-
-       session.screen0.focusNewWindows:        True
-       session.screen0.focusModel:     SloppyFocus
-
-
-
-  in it.
-
-
-  [1m20.4.  What capture resolution should I use?  How does video work?[0m
+  [1m21.3.  What capture resolution should I use?  How does video work?[0m
 
   While MythTV allows you to set various GUI and capture resolutions,
   not all combinations make sense.
@@ -4560,6 +4533,7 @@
 
   +o  544x240
 
+
   +o  480x240
 
   +o  352x240
@@ -4571,21 +4545,22 @@
   of vertical lines lost.  In a PAL country, the you would use values
   like 720x576 or x288.
 
-  The higher resolutions will be more CPU intensive. If the CPU is
-  overtaxed, frames will be dropped causing uneven motion. You will
-  likely see the best results at resolutions which average at least 10%
-  CPU idle time.  You can use system tools such as top or sar to check
-  the CPU % idle while recording.  If the CPU average usage is
-  consistently exceeding 90%, frames will need to be dropped during peak
-  times when more than 100% of the available CPU would be needed to
-  process all of the frames.
+  The higher resolutions will be more CPU intensive if you're using
+  software encoding (PVR-250/350 will have minimal host CPU impact even
+  if you're using 720x480). If the CPU is overtaxed, frames will be
+  dropped causing uneven motion. You will likely see the best results at
+  resolutions which average at least 10% CPU idle time.  You can use
+  system tools such as top or sar to check the CPU % idle while
+  recording.  If the CPU average usage is consistently exceeding 90%,
+  frames will need to be dropped during peak times when more than 100%
+  of the available CPU would be needed to process all of the frames.
 
   If you'd like to read more on this, go to the vcdhelp website at
   http://www.vcdhelp.com/forum/userguides/94382.php
   <http://www.vcdhelp.com/forum/userguides/94382.php>.
 
 
-  [1m20.5.  MythTV GUI and X Display Sizes.[0m
+  [1m21.4.  MythTV GUI and X Display Sizes.[0m
 
   MythTV is designed to be run as dedicated full screen TV application
   but can also be run as a desktop application on a computer monitor.
@@ -4594,6 +4569,7 @@
 
   There are three sizes that are important for matching the MythTV GUI
   and full screen TV playback to fit the screen:
+
 
   +o  the X display size
 
@@ -4609,7 +4585,7 @@
   of the X display.
 
 
-  [1m20.5.1.  X Dimensions[0m
+  [1m21.4.1.  X Dimensions[0m
 
   For output to a Television, common resolutions are 640x480, 800x600,
   and some rare devices support 1024x768. Generally, higher resolutions
@@ -4624,9 +4600,7 @@
   the mouse to the edge will scroll around a desktop area which is
   larger than the display size. If this happens, edit your X
   configuration file to match the display size then restart X.
-
-
-  [1m20.5.2.  MythTV Dimensions[0m
+  [1m21.4.2.  MythTV Dimensions[0m
 
   In 0.10 and later, from "mythfrontend" go to Setup->Appearance.  The
   default for the height and width is "0" - this will cause MythTV to
@@ -4646,7 +4620,7 @@
   resolutions'' used.
 
 
-  [1m20.5.3.  Overscan Dimensions[0m
+  [1m21.4.3.  Overscan Dimensions[0m
 
   Because picture edges can be ragged and screen edges aren't straight,
   Television is designed to project an image larger than the physical
@@ -4666,7 +4640,7 @@
   size as a normal overscanned TV picture.
 
 
-  [1m20.5.4.  MythTV on the Desktop[0m
+  [1m21.4.4.  MythTV on the Desktop[0m
 
   When using MythTV on a high resolution desktop monitor, set the MythTV
   GUI dimensions to something much smaller than your X display
@@ -4681,7 +4655,7 @@
   will always be resized to normal 4:3 shape.
 
 
-  [1m20.6.  I'd like to save or restore my database.[0m
+  [1m21.5.  I'd like to save or restore my database.[0m
 
   See the [1mmysqldump [22mmanpage for more information.
 
@@ -4705,7 +4679,7 @@
   database for multiple systems'' section for more information.
 
 
-  [1m20.7.  I'd like to delete the mysql database.[0m
+  [1m21.6.  I'd like to delete the mysql database.[0m
 
   [1mNOTE[22m:  Performing this step will remove the entire database.  You will
   lose all of your settings and will need to re-run the mc.sql script to
@@ -4718,7 +4692,7 @@
 
 
 
-  [1m20.8.  btaudio[0m
+  [1m21.7.  btaudio[0m
 
   btaudio allows you to obtain the audio data from your tuner card
   directly over the PCI bus without using a soundcard.  This is useful
@@ -4765,7 +4739,7 @@
   /dev/mixer devices.  Typing $ dmesg will let you know what's going on.
 
 
-  [1m20.9.  Removing unwanted channels.[0m
+  [1m21.8.  Removing unwanted channels.[0m
 
   If [1mmythfilldatabase [22mgrabbed a channel which you do not want to include
   in your TV listings, you can remove the entries from the xmltv config
@@ -4799,7 +4773,323 @@
 
 
 
-  [1m20.10.  I'd like to use a hardware MPEG-2 encoder (ie, a PVR-250/350).[0m
+  [1m21.9.  I'd like to use NFS.[0m
+
+  You may want to use a central server to store your files.
+
+  On the host machine, (in this case, the hostname is "masterbackend")
+  you'll want to edit your /etc/exports file and use something like:
+
+
+       /var/video (rw)
+
+
+
+  To export the /var/video directory with read / write privileges.
+
+  On the "slave" machine, you'll want to edit the /etc/fstab file and
+  add something like:
+       masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,soft,nfsvers=3
+
+
+
+  Then run # fstab -a to re-read the file to mount the file system.
+
+  In this case, the source is a machine called "masterbackend" which is
+  exporting the directory "/var/video", which we're mounting locally at
+  "/var/video".  The rsize and wsize options are used to increase the
+  performance of NFS; soft mean that NFS will eventually timeout on an
+  error, and the nfsvers is required for filesizes over 2GB.
+
+
+  [1m21.10.  Automatically starting mythfrontend at system boot time.[0m
+
+  Here's an example submitted to the mythtv-dev list by Pat Pflaum
+  mailto:pat@netburp.com <mailto:pat@netburp.com> using fvwm:
+
+
+       $ cat > .xinitrc
+       fvwm &
+       mythfrontend
+       ^D
+       $ cat > .fvwmrc
+       Style myth* NoTitle, NoHandles, Sticky, WindowListSkip, SloppyFocus, GrabFocus, BorderWidth 0
+       ^D
+       $
+
+
+
+  The following also works with blackbox:
+
+
+       $ cat > .xinitrc
+       xset -dpms s off &
+       irxevent &
+       mythfrontend &
+       blackbox
+
+
+
+  Make sure that your .blackboxrc file has:
+
+
+       session.screen0.focusNewWindows:        True
+       session.screen0.focusModel:     SloppyFocus
+
+
+
+  in it.
+
+
+  [1m21.11.  Automatically starting mythbackend at system boot time.[0m
+
+  [1m21.11.1.  Red Hat And Mandrake[0m
+
+  Here's a method for automatically starting mythbackend submitted by
+  Mike Thomson (mailto:linux@m-thomson.net <mailto:linux@m-thomson.net>)
+  and Stu Tomlinson (mailto:stu@nosnilmot.com
+  <mailto:stu@nosnilmot.com>).
+
+  Copy the files from the MythTV contrib directory or from Mike's web
+  site (http://m-thomson.net/mythtv/ <http://m-thomson.net/mythtv/>) as
+  follows:
+
+  etc.rc.d.init.mythbackend should be made executable and copied to
+  /etc/rc.d/init.d/:
+
+
+       $ cd contrib
+       $ su
+       # chmod a+x etc.rc.d.init.d.mythbackend
+       # cp etc.rc.d.init.d.mythbackend /etc/rc.d/init.d/mythbackend
+
+
+
+  etc.sysconfig.mythbackend should be copied to /etc/sysconfig/:
+
+
+       $ cd contrib
+       $ su
+       # cp etc.sysconfig.mythbackend /etc/sysconfig/mythbackend
+
+
+
+  Edit /etc/sysconfig/mythbackend if you want to change the defaults
+  (the userid that should start mythbackend, location of the logfile and
+  (if required) the name and location of the mythbackend binary).
+
+  Use [1mchkconfig [22mto make sure the script is called when entering
+  runlevels 3, 4 or 5:
+
+
+       $ su
+       # chkconfig --level 345 mythbackend on
+       # exit
+       $
+
+
+
+  [1m21.11.1.1.  Log files[0m
+
+  By default, the log file for mythbackend will be written to
+  /var/tmp/mythbackend.log. This has been tested and is known to work on
+  Mandrake and Red Hat, but many people prefer to place logs under
+  /var/log/.
+
+  To do this, create a group called mythtv (or anything you prefer) and
+  add your usual MythTV users to that group. If you changed the user
+  that starts mythbackend from the default of root you [4mmust[24m perform this
+  step.
+
+  Create the directory /var/log/mythtv and set its permissions as
+  follows:
+
+
+       $ su
+       # mkdir /var/log/mythtv
+       # chown root:mythtv /var/log/mythtv
+       # chmod 0775 /var/log/mythtv
+       # exit
+       $ ls -ld /var/log/mythtv
+       drwxrwxr-x    2 root     mythtv       4096 Apr 28 21:58 /var/log/mythtv/
+       $
+
+  [1m21.11.1.2.  Mandrake 9.x[0m
+
+  Mandrake adds one more twist in the form of the msec utility, which
+  runs regularly and (at the default or any higher security level) sets
+  permissions on many files, including those under /var/log.
+
+  To tell msec about the MythTV log files and their directory, you need
+  to edit the /etc/security/msec/perm.local file to include the
+  following:
+
+
+       # /etc/security/msec/perm.local
+       # Local overrides to the msec program
+       #
+       # Full file path                user.group              permissions
+       /var/log/mythtv/                root.mythtv             775
+       /var/log/mythtv/*               root.mythtv             664
+
+
+
+  A copy of the above has been included in the contrib/ directory.  You
+  may add it by typing:
+
+
+       $ cd contrib
+       $ su
+       # cat etc.security.msec.perm.local >> /etc/security/msec/perm.local
+       # exit
+
+
+
+  Finally run the msec tool to check and implement your changes.
+
+
+       $ su
+       # msec
+       # exit
+       $
+
+
+
+  [1mNOTE[22m: msec can only [4mreduce[24m the permissions of files, so if you don't
+  get the results you expect, check that you're not asking msec to add
+  missing permissions to the files or directories you created.
+
+  [1m21.11.2.  Gentoo[0m
+
+  The portage file for MythTV has scripts that will allow you to run
+  mythbackend at startup.
+
+  To run mythbackend as a daemon which starts at boot time:
+
+
+       # rc-update add mythbackend default
+
+
+
+  To stop mythbackend as a daemon:
+
+
+       # /etc/init.d/mythbackend stop
+
+  To obtain a list of options:
+
+
+       # /etc/init.d/mythbackend
+
+
+
+  [1m21.12.  Advanced Backend Configurations.[0m
+
+  MythTV is flexible in the way that you define multiple backend tuner
+  configurations.  The only hard-and-fast rule is that the Master
+  Backend [4mmust[24m have a capture device defined, but shouldn't imply that
+  the capture device in the MBE must be the first capture card defined
+  in the database.
+
+  One example of an advanced configuration is the round-robin scheme.
+  Rather than defining all of the cards on the master, you could first
+  go into setup on the master to define globals such as the general
+  configuration and the channel lineup but not the host-specific
+  configuration item like the capture card.  In this example, we will
+  use a 4 tuner configuration, where two slaves have one card each and
+  the master has two.
+
+  1. Add the first capture card on one of the slaves.  Complete the
+     configuration, connecting the input source to the card.  This will
+     get cardid #1 in the database.  Exit setup.
+
+  2. Configure the first capture card on the master backend.  This will
+     get cardid #2 in the database.  Exit setup.
+
+  3. Configure the first capture card on the second slave.  This will be
+     cardid #3 in the database.  Exit setup.
+
+  4. Configure the second capture card on the master backend.  This will
+     get cardid #4 in the database.  Exit setup.
+
+  Using this scheme, the master backend will not use both capture cards
+  until one of the following happens:
+
+  +o  There are four recordings scheduled for the same time
+
+  +o  Both slaves are not available
+
+  The scheduler in MythTV checks whether an encoder is available; if a
+  slave backend isn't running, its encoder isn't available, so the
+  scheduler will look for the next available encoder.  This makes MythTV
+  very flexible; slave tuners can come and go, and as long as there are
+  enough tuners for what you'd like to record it doesn't matter which
+  tuner in particular is going to be used.
+
+  Using this round-robin scheme along with a shared storage directory
+  like NFS and enabling the Master Backend Override setting will allow
+  you to view content even if the slave backend that recorded a program
+  is not available.
+
+
+
+  [1m21.13.  What is this transcoder thing, and how do I use it?[0m
+
+  The transcoder re-encodes files from one MythTV format to another.
+  The main purpose of the transcoder is to allow users with hardware
+  encoders (PVR-250) or systems that can only record in RTJpeg due to
+  performance reasons (multiple capture cards, slow system, etc) to
+  create MPEG4 streams to save space.
+  The transcoder can be used in two ways:
+
+  +o  Automatically re-encode every file once it has completed recording
+
+  +o  After marking commercials, the transcoder can be run manually to
+     delete the commercials from the file (thus further saving space)
+
+     The two methods are independent.  The first is an automatic process
+     that can be enabled/disabled through the setup program; the second
+     is a manual method which must be invoked on each recording
+     individually.
+
+  The second method can be used on files that have already been
+  transcoded (or files which were are already in the correct format), so
+  only the frames immediately following a cut section will be re-
+  encoded, resultiing in a very minimal loss of quality.
+
+  To enable automatic transcoding, do the following: start the setup
+  program under the host-specific settings: set the Transcoder Auto-run
+  checkbox
+
+  For either manual or automatic transcoding: start mythbackend start
+  mythfrontend select setup, and the Transcoding recording profile.  now
+  select either RTJPEG or MPEG4 (selecting any of the hardware encoders
+  will result in the transcoder not working).  set the other parameters
+  as you'd like.  For best performance, you should match the audio to
+  the 'Default' profile.  If you plan to only use the manual transcoder,
+  you can choose to set the video to be the same as the default profile
+  too (as long as it is MPEG4 or RTJpeg)
+
+  Everything should now be setup properly.  If you elected to use the
+  Auto-Run feature, the transcoder will automatically launch after each
+  recording is complete.  The transcoder thread runs at a low priority,
+  so it should not impact any critical tasks or other recordings.
+
+  If you want to manually transcode a program, simply press 'X' while
+  watching a recording (you should have already finished marking all
+  commercials).  If you change your mind, hitting 'X' again will stop
+  the transcoding.
+
+  Once the transcode is complete, mythbackend will replace the old file
+  with the new as soon as it is no longer in use.
+
+
+  [1m22.  Example Configurations[0m
+
+  This section contains configurations which you may find useful.
+
+  [1m22.1.  Hauppauge PVR-250/350 hardware MPEG-2 encoder. I'd like to use[0m
+  [1ma hardware MPEG-2 encoder (ie, a PVR-250/350).[0m
 
   [1mNOTE[22m:  THE FOLLOWING DOCUMENTATION IS PROVIDED AS-IS AND IS NOT
   GUARANTEED TO WORK WITH YOUR DISTRIBUTION.  FOR IVTV DRIVER
@@ -4816,8 +5106,6 @@
   Install the Mandrake kernel source.  If you are using a different
   Mandrake kernel level (ie, not 2.4.21-0.16mdk as in the example below,
   then alter the [1murpmi [22mcommand appropriately.)
-
-
        $ uname -a
        Linux pvr 2.4.21-0.16mdk #1 Fri Apr 11 06:51:54 CEST 2003 i686 unknown
        unknown GNU/Linux
@@ -4905,16 +5193,15 @@
   Check that the card is being recognized on the PCI bus:
 
 
+       $ lspci -v
+       <snip>
 
-  $ lspci -v
-  <snip>
-
-  00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
-  Encoder (rev 01)
-          Subsystem: Hauppauge computer works Inc.: Unknown device 4801
-          Flags: bus master, medium devsel, latency 32, IRQ 11
-          Memory at d0000000 (32-bit, prefetchable) [size=64M]
-          Capabilities: <available only to root>
+       00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
+       Encoder (rev 01)
+               Subsystem: Hauppauge computer works Inc.: Unknown device 4801
+               Flags: bus master, medium devsel, latency 32, IRQ 11
+               Memory at d0000000 (32-bit, prefetchable) [size=64M]
+               Capabilities: <available only to root>
 
 
 
@@ -5005,10 +5292,7 @@
 
        /path/to/ivtv/utils/test_ioctl --set-codec-params=dnr_mode=0,dnr_temporal=0
 
-
-
-  [1m20.11.  I'd like to use the remote that came with my Hauppauge PVR-250[0m
-  [1mand use MythTV's native LIRC support.[0m
+  [1m22.2.  Hauppauge PVR-250 remote and MythTV's native LIRC support.[0m
 
   [1mNOTE[22m:  THE FOLLOWING DOCUMENTATION IS PROVIDED AS-IS AND IS NOT
   GUARANTEED TO WORK WITH YOUR DISTRIBUTION.  FOR LIRC DRIVER
@@ -5027,12 +5311,12 @@
 
 
 
-  $ su
-  # uname -a
-  Linux frontend 2.4.22-9mdk #1 sam sep 13 06:54:11 CEST 2003 i686 unknown
-  unknown GNU/Linux
-  # rpm -qa|grep kernel-source
-  kernel-source-2.4.22-9mdk
+       $ su
+       # uname -a
+       Linux frontend 2.4.22-9mdk #1 sam sep 13 06:54:11 CEST 2003 i686 unknown
+       unknown GNU/Linux
+       # rpm -qa|grep kernel-source
+       kernel-source-2.4.22-9mdk
 
 
 
@@ -5069,9 +5353,10 @@
   work correctly.  Download the patch and install:
 
 
-       $ cd lirc-0.7.0pre2
-       $ wget http://delvare.free.fr/i2c/other/lirc-CVS-i2c-2.8.0.patch
-       $ patch -p1 < lirc-CVS-i2c-2.8.0.patch
+
+  $ cd lirc-0.7.0pre2
+  $ wget http://delvare.free.fr/i2c/other/lirc-CVS-i2c-2.8.0.patch
+  $ patch -p1 < lirc-CVS-i2c-2.8.0.patch
 
 
 
@@ -5194,6 +5479,7 @@
   .lircrc file is in your home directory and has a "." as the first
   character.
 
+
   Since we're using native LIRC support within MythTV, copy the
   configfiles/hauppauge-lircrc-nativelirc file into your .mythtv/
   directory and call it lircrc.  It has a slightly different format than
@@ -5210,284 +5496,17 @@
   your rc.local:
 
 
-
-  $ su
-  # echo "modprobe lirc_i2c" >> /etc/rc.d/rc.local
-  # echo "lircd" >> /etc/rc.d/rc.local
-  # exit
+       $ su
+       # echo "modprobe lirc_i2c" >> /etc/rc.d/rc.local
+       # echo "lircd" >> /etc/rc.d/rc.local
+       # exit
 
 
 
   You should now have native LIRC support within MythTV.
 
 
-  [1m20.12.  I'd like to use NFS.[0m
-
-  You may want to use a central server to store your files.
-
-  On the host machine, (in this case, the hostname is "masterbackend")
-  you'll want to edit your /etc/exports file and use something like:
-
-
-       /var/video (rw)
-
-
-
-  To export the /var/video directory with read / write privileges.
-
-  On the "slave" machine, you'll want to edit the /etc/fstab file and
-  add something like:
-
-
-       masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,soft,nfsvers=3
-
-
-
-  Then run # fstab -a to re-read the file to mount the file system.
-
-  In this case, the source is a machine called "masterbackend" which is
-  exporting the directory "/var/video", which we're mounting locally at
-  "/var/video".  The rsize and wsize options are used to increase the
-  performance of NFS; soft mean that NFS will eventually timeout on an
-  error, and the nfsvers is required for filesizes over 2GB.
-
-
-  [1m20.13.  I'd like to automatically start mythbackend at system boot[0m
-  [1mtime.[0m
-
-  [1m20.13.1.  Red Hat And Mandrake[0m
-
-  Here's a method for automatically starting mythbackend submitted by
-  Mike Thomson (mailto:linux@m-thomson.net <mailto:linux@m-thomson.net>)
-  and Stu Tomlinson (mailto:stu@nosnilmot.com
-  <mailto:stu@nosnilmot.com>).
-
-  Copy the files from the MythTV contrib directory or from Mike's web
-  site (http://m-thomson.net/mythtv/ <http://m-thomson.net/mythtv/>) as
-  follows:
-
-  etc.rc.d.init.mythbackend should be made executable and copied to
-  /etc/rc.d/init.d/:
-
-
-
-  $ cd contrib
-  $ su
-  # chmod a+x etc.rc.d.init.d.mythbackend
-  # cp etc.rc.d.init.d.mythbackend /etc/rc.d/init.d/mythbackend
-
-
-
-  etc.sysconfig.mythbackend should be copied to /etc/sysconfig/:
-
-
-       $ cd contrib
-       $ su
-       # cp etc.sysconfig.mythbackend /etc/sysconfig/mythbackend
-
-
-
-  Edit /etc/sysconfig/mythbackend if you want to change the defaults
-  (the userid that should start mythbackend, location of the logfile and
-  (if required) the name and location of the mythbackend binary).
-
-  Use [1mchkconfig [22mto make sure the script is called when entering
-  runlevels 3, 4 or 5:
-
-
-       $ su
-       # chkconfig --level 345 mythbackend on
-       # exit
-       $
-
-
-
-  [1m20.13.1.1.  Log files[0m
-
-  By default, the log file for mythbackend will be written to
-  /var/tmp/mythbackend.log. This has been tested and is known to work on
-  Mandrake and Red Hat, but many people prefer to place logs under
-  /var/log/.
-
-  To do this, create a group called mythtv (or anything you prefer) and
-  add your usual MythTV users to that group. If you changed the user
-  that starts mythbackend from the default of root you [4mmust[24m perform this
-  step.
-
-  Create the directory /var/log/mythtv and set its permissions as
-  follows:
-
-
-       $ su
-       # mkdir /var/log/mythtv
-       # chown root:mythtv /var/log/mythtv
-       # chmod 0775 /var/log/mythtv
-       # exit
-       $ ls -ld /var/log/mythtv
-       drwxrwxr-x    2 root     mythtv       4096 Apr 28 21:58 /var/log/mythtv/
-       $
-
-
-
-  [1m20.13.1.2.  Mandrake 9.x[0m
-
-  Mandrake adds one more twist in the form of the msec utility, which
-  runs regularly and (at the default or any higher security level) sets
-  permissions on many files, including those under /var/log.
-
-  To tell msec about the MythTV log files and their directory, you need
-  to edit the /etc/security/msec/perm.local file to include the
-  following:
-
-
-       # /etc/security/msec/perm.local
-       # Local overrides to the msec program
-       #
-       # Full file path                user.group              permissions
-       /var/log/mythtv/                root.mythtv             775
-       /var/log/mythtv/*               root.mythtv             664
-
-
-
-  A copy of the above has been included in the contrib/ directory.  You
-  may add it by typing:
-
-
-       $ cd contrib
-       $ su
-       # cat etc.security.msec.perm.local >> /etc/security/msec/perm.local
-       # exit
-
-
-
-  Finally run the msec tool to check and implement your changes.
-
-
-       $ su
-       # msec
-       # exit
-       $
-
-
-
-  [1mNOTE[22m: msec can only [4mreduce[24m the permissions of files, so if you don't
-  get the results you expect, check that you're not asking msec to add
-  missing permissions to the files or directories you created.
-
-  [1m20.13.2.  Gentoo[0m
-
-  The portage file for MythTV has scripts that will allow you to run
-  mythbackend at startup.
-
-  To run mythbackend as a daemon which starts at boot time:
-
-
-       # rc-update add mythbackend default
-
-
-
-  To stop mythbackend as a daemon:
-
-
-       # /etc/init.d/mythbackend stop
-
-  To obtain a list of options:
-
-
-       # /etc/init.d/mythbackend
-
-
-
-  [1m20.14.  Advanced Backend Configurations.[0m
-
-  MythTV is flexible in the way that you define multiple backend tuner
-  configurations.  The only hard-and-fast rule is that the Master
-  Backend [4mmust[24m have a capture device defined, but shouldn't imply that
-  the capture device in the MBE must be the first capture card defined
-  in the database.
-
-  One example of an advanced configuration is the round-robin scheme.
-  Rather than defining all of the cards on the master, you could first
-  go into setup on the master to define globals such as the general
-  configuration and the channel lineup but not the host-specific
-  configuration item like the capture card.  In this example, we will
-  use a 4 tuner configuration, where two slaves have one card each and
-  the master has two.
-
-  1. Add the first capture card on one of the slaves.  Complete the
-     configuration, connecting the input source to the card.  This will
-     get cardid #1 in the database.  Exit setup.
-
-  2. Configure the first capture card on the master backend.  This will
-     get cardid #2 in the database.  Exit setup.
-
-  3. Configure the first capture card on the second slave.  This will be
-     cardid #3 in the database.  Exit setup.
-
-  4. Configure the second capture card on the master backend.  This will
-     get cardid #4 in the database.  Exit setup.
-
-  Using this scheme, the master backend will not use both capture cards
-  until one of the following happens:
-
-  +o  There are four recordings scheduled for the same time
-
-  +o  Both slaves are not available
-
-  The scheduler in MythTV checks whether an encoder is available; if a
-  slave backend isn't running, its encoder isn't available, so the
-  scheduler will look for the next available encoder.  This makes MythTV
-  very flexible; slave tuners can come and go, and as long as there are
-  enough tuners for what you'd like to record it doesn't matter which
-  tuner in particular is going to be used.
-
-  Using this round-robin scheme along with a shared storage directory
-  like NFS and enabling the Master Backend Override setting will allow
-  you to view content even if the slave backend that recorded a program
-  is not available.
-
-
-  [1m20.15.  Advanced Partition Formatting.[0m
-
-  MythTV creates large files.  The partitions that your distribution
-  sets up for you may not be optimized for large files.
-
-
-
-  [1m20.15.1.  Ext3[0m
-
-  With Ext3, your biggest gain is that in case of a crash and reboot you
-  don't have to wait very long for your partition to be remounted.  With
-  Ext2, the [1mfsck [22mmay take a long time to run on multi-gigabyte
-  partitions.
-
-  When formatting the partition, the following command line should be
-  better than the default.  This example assumes that /dev/hdb1 has
-  already been created using [1mfdisk[22m.
-
-
-       # mkfs.ext3 -T largefile4 -m 0 /dev/hdb1
-
-
-
-  The "-T largefile4" option creates one inode per 4 megabytes.  The "-m
-  0" (zero, not "oh") parameter sets the amount of spaced reserved for
-  root to zero. By default, this is 5%, which on a multi-gigabyte drive
-  is a lot of reserved space.
-
-  You may also modify some aspects of a filesystem such as the reserved
-  block percentage after it has been created using the [1mtune2fs [22mprogram:
-
-
-       # tune2fs -m 0 /dev/hdb1
-
-
-
-  You can check on your filesystem using the [1mdumpe2fs [22mprogram.  See the
-  [1mman [22mpage for details.
-
-
-  [1m20.16.  I'd like to have more flexible disk storage with LVM.[0m
+  [1m22.3.  Linux Volume Manager (LVM).[0m
 
   LVM greatly increases the flexibility you have in managing your
   storage than traditional physical partitions. This section will
@@ -5579,7 +5598,6 @@
 
   Create the new LVM physical volume:
 
-
   # pvcreate /dev/hdb1
 
   Add the new physical volume to the volume group:
@@ -5595,7 +5613,7 @@
   check that you've got more space.
 
 
-  [1m20.16.1.  ReiserFS[0m
+  [1m22.3.1.  ReiserFS[0m
 
   Make the logical volume used for video bigger:
 
@@ -5611,7 +5629,7 @@
 
 
 
-  [1m20.16.2.  ext2 or ext3[0m
+  [1m22.3.2.  ext2 or ext3[0m
 
   LVM comes with a program called [1me2fsadm[22m.
 
@@ -5625,56 +5643,44 @@
 
 
 
-  [1m20.17.  What is this transcoder thing, and how do I use it?[0m
+  [1m22.4.  Advanced Partition Formatting.[0m
 
-  The transcoder re-encodes files from one MythTV format to another.
-  The main purpose of the transcoder is to allow users with hardware
-  encoders (PVR-250) or systems that can only record in RTJpeg due to
-  performance reasons (multiple capture cards, slow system, etc) to
-  create MPEG4 streams to save space.
+  MythTV creates large files.  The partitions that your distribution
+  sets up for you may not be optimized for large files.  Using ``LVM''
+  in conjunction with the following techniques can be quite useful.
 
-  The transcoder can be used in two ways:
+  [1m22.4.1.  Ext3[0m
 
-  +o  Automatically re-encode every file once it has completed recording
+  With Ext3, your biggest gain is that in case of a crash and reboot you
+  don't have to wait very long for your partition to be remounted.  With
+  Ext2, the [1mfsck [22mmay take a long time to run on multi-gigabyte
+  partitions.
 
-  +o  After marking commercials, the transcoder can be run manually to
-     delete the commercials from the file (thus further saving space)
+  When formatting the partition, the following command line should be
+  better than the default.  This example assumes that /dev/hdb1 has
+  already been created using [1mfdisk[22m.  If you're using LVM, /dev/hdb1 may
+  be something like /dev/VGforMyth/video.
 
-     The two methods are independent.  The first is an automatic process
-     that can be enabled/disabled through the setup program; the second
-     is a manual method which must be invoked on each recording
-     individually.
 
-  The second method can be used on files that have already been
-  transcoded (or files which were are already in the correct format), so
-  only the frames immediately following a cut section will be re-
-  encoded, resultiing in a very minimal loss of quality.
+       # mkfs.ext3 -T largefile4 -m 0 /dev/hdb1
 
-  To enable automatic transcoding, do the following: start the setup
-  program under the host-specific settings: set the Transcoder Auto-run
-  checkbox
 
-  For either manual or automatic transcoding: start mythbackend start
-  mythfrontend select setup, and the Transcoding recording profile.  now
-  select either RTJPEG or MPEG4 (selecting any of the hardware encoders
-  will result in the transcoder not working).  set the other parameters
-  as you'd like.  For best performance, you should match the audio to
-  the 'Default' profile.  If you plan to only use the manual transcoder,
-  you can choose to set the video to be the same as the default profile
-  too (as long as it is MPEG4 or RTJpeg)
 
-  Everything should now be setup properly.  If you elected to use the
-  Auto-Run feature, the transcoder will automatically launch after each
-  recording is complete.  The transcoder thread runs at a low priority,
-  so it should not impact any critical tasks or other recordings.
+  The "-T largefile4" option creates one inode per 4 megabytes.  The "-m
+  0" (zero, not "oh") parameter sets the amount of spaced reserved for
+  root to zero. By default, this is 5%, which on a multi-gigabyte drive
+  is a lot of reserved space.
 
-  If you want to manually transcode a program, simply press 'X' while
-  watching a recording (you should have already finished marking all
-  commercials).  If you change your mind, hitting 'X' again will stop
-  the transcoding.
+  You may also modify some aspects of a filesystem such as the reserved
+  block percentage after it has been created using the [1mtune2fs [22mprogram:
 
-  Once the transcode is complete, mythbackend will replace the old file
-  with the new as soon as it is no longer in use.
+
+       # tune2fs -m 0 /dev/hdb1
+
+
+
+  You can check on your filesystem using the [1mdumpe2fs [22mprogram.  See the
+  [1mman [22mpage for details.
 
 
 

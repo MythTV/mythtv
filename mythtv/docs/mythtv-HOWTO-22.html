@@ -1,0 +1,570 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.21">
+ <TITLE>Installing and using MythTV: Example Configurations</TITLE>
+ <LINK HREF="mythtv-HOWTO-21.html" REL=previous>
+ <LINK HREF="mythtv-HOWTO.html#toc22" REL=contents>
+</HEAD>
+<BODY>
+Next
+<A HREF="mythtv-HOWTO-21.html">Previous</A>
+<A HREF="mythtv-HOWTO.html#toc22">Contents</A>
+<HR>
+<H2><A NAME="s22">22.</A> <A HREF="mythtv-HOWTO.html#toc22">Example Configurations</A></H2>
+
+<P>This section contains configurations which you may find useful.</P>
+<H2><A NAME="pvr250"></A> <A NAME="ss22.1">22.1</A> <A HREF="mythtv-HOWTO.html#toc22.1">Hauppauge PVR-250/350 hardware MPEG-2 encoder.</A>
+I'd like to use a hardware MPEG-2 encoder (ie, a PVR-250/350). </H2>
+
+<P><B>NOTE</B>:  THE FOLLOWING DOCUMENTATION IS PROVIDED AS-IS AND IS
+NOT GUARANTEED TO WORK WITH YOUR DISTRIBUTION.  FOR IVTV DRIVER ASSISTANCE,
+SEE THE IVTV MAILING LIST.  
+<A HREF="https://lists.sourceforge.net/lists/listinfo/ivtv-devel">https://lists.sourceforge.net/lists/listinfo/ivtv-devel</A>  SEE THE
+IVTV FAQ IF YOU HAVE QUESTIONS OR ISSUES.  
+<A HREF="http://ivtv.sourceforge.net/FAQ.html">http://ivtv.sourceforge.net/FAQ.html</A></P>
+<P>These instructions work for Mandrake 9.1 on a backend machine which is
+hosting a single PVR-250 capture card.</P>
+<P>Install the Mandrake kernel source.  If you are using a different Mandrake
+kernel level (ie, not 2.4.21-0.16mdk as in the example below, then alter the
+<B>urpmi</B> command appropriately.)
+<BLOCKQUOTE><CODE>
+<PRE>
+$ uname -a
+Linux pvr 2.4.21-0.16mdk #1 Fri Apr 11 06:51:54 CEST 2003 i686 unknown
+unknown GNU/Linux
+
+$ su
+# urpmi kernel-source
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P><B>NOTE</B>:  You do not need to recompile your kernel.</P>
+<P>Download the IVTV driver from CVS:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/ivtv login
+&lt;enter> as password
+$ cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/ivtv co ivtv
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>This should create an ivtv directory.  Switch to it and perform the
+following commands:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cd ivtv/ivtv/utils
+$ wget http://hauppauge.lightpath.net/software/pvr250/pvr250_17_21199.exe
+$ su
+# ./ivtvfwextract.pl pvr250_17_21199.exe
+# exit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The <B>ivtvfwextract</B> program extracts the firmware required for the
+card.  You may want to go to the Hauppauge website and download the latest
+Windows driver if the <B>wget</B> command fails.</P>
+<P>Next, compile the driver:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cd ~/ivtv/ivtv/driver
+$ make
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P><B>NOTE</B>: You may get warnings about i2c during the compile.  Ignore
+them.</P>
+<P>Add the following to <CODE>/etc/modules.conf</CODE>:
+<BLOCKQUOTE><CODE>
+<PRE>
+alias char-major-81     videodev
+alias char-major-81-0   ivtv
+alias char-major-61 lirc_i2c
+options ivtv debug=1
+options tuner type=2
+options msp3400 once=1 simple=1
+add below ivtv msp3400 saa7115 tuner
+add above ivtv lirc_dev lirc_i2c
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P><B>NOTE</B>:  You must specify the tuner type manually.  See
+<CODE>~/ivtv/ivtv/driver/tuner.h</CODE> for a listing of tuners.  In the above
+example, <CODE>tuner type=2</CODE> is a Phillips NTSC.  Use an appropriate tuner
+type for your system and video standard.  The <CODE>debug=1</CODE> parameter on
+the ivtv line actually means less debugging output will be printed.</P>
+<P>Next, copy the files that were compiled in the driver directory into the
+appropriate modules directory:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# make install
+# depmod -a
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Finally, load the ivtv driver:
+<BLOCKQUOTE><CODE>
+<PRE>
+# modprobe ivtv
+# exit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Check that the card is being recognized on the PCI bus:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ lspci -v
+&lt;snip>
+
+00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
+Encoder (rev 01)
+        Subsystem: Hauppauge computer works Inc.: Unknown device 4801
+        Flags: bus master, medium devsel, latency 32, IRQ 11
+        Memory at d0000000 (32-bit, prefetchable) [size=64M]
+        Capabilities: &lt;available only to root>
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>If you don't see your card on the PCI bus, make sure that it's been
+installed in a bus-master slot.  For some motherboards, only the PCI slots
+closest to the AGP slot are bus-mastering.</P>
+<P>Check that the ivtv driver has created a new video device:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ ls -l /dev/v4l/vi*
+crw-------    1 mythtv   sys       81, 224 Dec 31  1969 vbi0
+crw-------    1 mythtv   sys       81,   0 Dec 31  1969 video0
+crw-------    1 mythtv   sys       81,  32 Dec 31  1969 video32
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>In this case, the ivtv device is <CODE>video0</CODE>.</P>
+<P>Go into <CODE>setup/setup</CODE> on the machine hosting the hardware MPEG-2 card.
+When you add a new capture card, ensure that you are using the
+<CODE>video0</CODE> device.  </P>
+<P><B>NOTE</B>:  As of 2003-04-25 the ivtv driver does not support VBI, so
+closed-captioning is not available.</P>
+<P>Leave the VBI device, audio device and audio sampling rate limit at the
+default values.  Change the default input to an appropriate setting for your
+configuration.  Change the card type to "Hardware MPEG Encoder Card" and
+press ENTER.</P>
+<P>The remaining setup is just like a standard V4L card; define a video source
+if you have not already done so, and assign the video source to a video card
+input on the Input Connections screen.</P>
+<P>Some people report issues with the ivtv module not being loaded when
+required by MythTV.  To get around this, you can <B>modprobe</B> the ivtv driver
+before using it.  The simplest technique is to add the <B>modprobe</B>
+command to <CODE>/etc/rc.d/rc.local</CODE>:
+<BLOCKQUOTE><CODE>
+<PRE>
+# echo "/sbin/modprobe ivtv" >> /etc/rc.d/rc.local
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>By default, the IVTV driver uses a 16Mbps peak rate with a 8Mbps VBR.  This
+will create files at about 4GB/hour.  If you wish to adjust these
+parameters, add something like the following to your <CODE>rc.local</CODE>:
+<BLOCKQUOTE><CODE>
+<PRE>
+/path/to/ivtv/utils/test_ioctl -c bitrate=4500000,bitrate_peak=6000000
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The actual values to use should be adjusted to your liking and in part
+depend on the capture resolution.  The above example is more than adequate
+for 480x480.  Once the IVTV API has settled down MythTV will incorporate the
+ability to modify the bitrate internally.</P>
+<P>
+<A NAME="troubleshooting_pvraudio"></A> <B>NOTE</B>:  some people complain
+that their PVR-250/350 card is not capturing audio.  The most likely source
+for this is that your system is not loading the correct msp3400.o file; ivtv
+uses a custom msp3400.c, and if the resulting module isn't loaded you will
+not get sound.  Switch to your <CODE>/lib/modules</CODE> directory and rename
+the existing msp3400.o file, then copy the <CODE>msp3400.o</CODE> from the ivtv
+driver directory and re-run <B>depmod</B>.  If that still doesn't work,
+then check the ivtv mailing list for more information.  You may wish to
+perform an <B>updatedb</B> as root and then do a <CODE>locate msp3400</CODE>
+to find all the <CODE>msp3400.o.gz</CODE> files that may be on your system.  For
+example, Mandrake has a <CODE>msp3400.o.gz</CODE> in the <CODE>3rdparty</CODE>
+subdirectory which will take precedence over the custom version created by
+ivtv.  You can check if you have the correct msp3400 loaded by typing (as
+root): <CODE>modinfo msp3400 | grep "parm: *standard"</CODE>.  If you don't get
+a line that says: "parm:        standard int", then you're not loading the
+correct msp3400.</P>
+<P><B>NOTE</B>:  Some people report "ghosting" issues with their PVR-250s,
+where there is a faint copy of whatever is on the screen appearing to the
+right of the image.  If you have this issue, it's fairly obvious.  This is a
+firmware issue, apparently.  There are two ways around this:
+<OL>
+<LI>Run at 720x480 resolution</LI>
+<LI>Turn off DNR</LI>
+</OL>
+</P>
+<P>To turn off DNR, add the following to your <CODE>rc.local</CODE>:
+<BLOCKQUOTE><CODE>
+<PRE>
+/path/to/ivtv/utils/test_ioctl --set-codec-params=dnr_mode=0,dnr_temporal=0
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H2><A NAME="hauppauge_remote"></A> <A NAME="ss22.2">22.2</A> <A HREF="mythtv-HOWTO.html#toc22.2">Hauppauge PVR-250 remote and MythTV's native LIRC support.</A>
+</H2>
+
+<P><B>NOTE</B>:  THE FOLLOWING DOCUMENTATION IS PROVIDED AS-IS AND IS
+NOT GUARANTEED TO WORK WITH YOUR DISTRIBUTION.  FOR LIRC DRIVER ASSISTANCE,
+SEE THE LIRC MAILING LIST.  
+<A HREF="http://lists.sourceforge.net/lists/listinfo/lirc-list">http://lists.sourceforge.net/lists/listinfo/lirc-list</A></P>
+<P>These instructions work for Mandrake 9.2 on a frontend machine which is
+hosting a single PVR-250 capture card using MythTV's native LIRC support.</P>
+<P>First, you need to ensure that you've installed the kernel source
+appropriate for the kernel that you're running.  In this case, we're using
+kernel 2.4.22-9, so when installing the kernel-source ensure that you've got
+the correct version.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# uname -a
+Linux frontend 2.4.22-9mdk #1 sam sep 13 06:54:11 CEST 2003 i686 unknown
+unknown GNU/Linux
+# rpm -qa|grep kernel-source
+kernel-source-2.4.22-9mdk
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Next, you need to remove the kernel modules for LIRC that Mandrake has
+packaged for you.  They won't work, and will cause problems later.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+# rm -rf /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>If you've already installed LIRC from the Mandrake packages, it's going to
+be version 0.6.6, and that won't work.  Uninstall it:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# urpme lirc lirc-remotes liblirc-devel
+# rm -rf /dev/lirc*
+# exit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Download the lirc-0.7.0pre2 tarball:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ wget http://lirc.sourceforge.net/software/snapshots/lirc-0.7.0pre2.tar.bz2
+$ tar -xjf lirc-0.7.0pre2.tar.bz2
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Mandrake now includes i2c version 2.8.0 which changes the semantics of some
+low-level calls.  You will need to patch LIRC in order for it to work
+correctly.  Download the patch and install:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cd lirc-0.7.0pre2
+$ wget http://delvare.free.fr/i2c/other/lirc-CVS-i2c-2.8.0.patch
+$ patch -p1 &lt; lirc-CVS-i2c-2.8.0.patch
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Next, run the LIRC setup program:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ ./setup.sh
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Select "1" (Driver configuration), then scroll down to "5" (TV Card), press
+ENTER, then scroll down to "f" (Hauppauge TV card) and press ENTER again. 
+Once back at the main menu, press "3" for Save and run configure.</P>
+<P>If your build environment is ready, LIRC will create a Makefile for you. 
+Switch to root and compile:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# make
+# make install
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>As a part of the <CODE>make install</CODE> process, LIRC will create the
+appropriate device for you in <CODE>/dev</CODE>.  Check to make sure:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ ls -l /dev/lirc*
+crw-r--r--    1 root     root      61,   0 Sep 18 15:36 /dev/lirc
+srw-rw-rw-    1 root     root            0 Sep 18 15:38 /dev/lircd=
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Your <CODE>modules.conf</CODE> file should have already been modified if you've
+followed the instructions 
+<A HREF="#pvr250">above</A> for installing the PVR-250. 
+<B>modprobe</B> the lirc_i2c driver, run the <B>lircd</B> program and
+then check your <CODE>/var/log/messages</CODE> and <CODE>/var/log/lircd</CODE>
+files.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# modprobe lirc_i2c
+# lsmod
+Module                  Size  Used by    Not tainted
+lirc_i2c                5124   0
+lirc_dev               10096   1  [lirc_i2c]
+...
+# lircd
+# tail /var/log/messages
+Sep 18 15:38:26 frontend kernel: lirc_i2c: chip found @ 0x18 (Hauppauge IR)
+Sep 18 15:38:26 frontend kernel: lirc_dev: lirc_register_plugin:sample_rate:
+10
+...
+# tail /var/log/lircd
+Sep 18 15:24:52 frontend lircd 0.7.0pre2: lircd(hauppauge) ready
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>To check that your remote is working correctly, run the <B>irw</B> program
+and start pressing buttons.  If nothing is happening, you must begin
+troubleshooting.  Things to check:
+<UL>
+<LI>Are there batteries in the remote?  </LI>
+<LI>Does the remote work?  You may be able to see the
+flashes of IR coming from the remote if you look at it with a video camera.</LI>
+<LI>Is the IR dongle cable plugged in?</LI>
+<LI>Did you remove all of the old LIRC device drivers?  Run "updatedb" as
+root, then "locate lirc_i2c".  The only lirc_i2c should be the one in the
+misc/ directory for your kernel version.</LI>
+<LI>Did you run depmod?</LI>
+<LI>Is your modules.conf setup correctly?</LI>
+<LI>Did you modprobe lirc_i2c?</LI>
+<LI>Did you run lircd?</LI>
+<LI>Do you have an /etc/lircd.conf?</LI>
+<LI>Is /dev/lirc a character mode file, major 61, minor 0?  Is it readable
+by all groups?</LI>
+<LI>If you think you may have had old LIRC device drivers you may need to
+reboot to ensure that they're totally out of the system.  Try running
+modprobe -r lirc_i2c as root first, then modprobe lirc_i2c and try again.</LI>
+</UL>
+</P>
+<P>If none of the above works, and <B>irw</B> still isn't showing keypresses,
+then you will need to ask your question on the LIRC list.</P>
+<P>Assuming that <B>irw</B> is showing keypresses, you can continue:
+To enable native LIRC support within MythTV, you will need to modify your
+<CODE>settings.pro</CODE> file and recompile.  Your <CODE>settings.pro</CODE> should
+look like this:
+<BLOCKQUOTE><CODE>
+<PRE>
+# Native lirc support
+CONFIG += using_lirc
+EXTRA_LIBS += -llirc_client
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Recompile and install:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ make distclean; make
+$ su
+# make install
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>If you're not using native LIRC support, ensure that the button names that
+come up with <B>irw</B> match the ones in the <CODE>.lircrc</CODE> file in
+your home directory.  Note that if you are not using native LIRC support,
+the <CODE>.lircrc</CODE> file is in your home directory and has a "." as the first
+character.</P>
+<P>Since we're using native LIRC support within MythTV, copy the
+<CODE>configfiles/hauppauge-lircrc-nativelirc</CODE> file into your
+<CODE>.mythtv/</CODE> directory and call it <CODE>lircrc</CODE>.  It has a slightly
+different format than what you would use if you were using
+<B>irxevent</B>.  Also note that it is in your <CODE>.mythtv</CODE> directory
+and does <EM>not</EM> have a "." in the filename.  </P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cp configfiles/hauppauge-lircrc-nativelirc ~/.mythtv/lircrc
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Add the commands to load the LIRC device drivers and start <B>lircd</B> to
+your <CODE>rc.local</CODE>:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# echo "modprobe lirc_i2c" >> /etc/rc.d/rc.local
+# echo "lircd" >> /etc/rc.d/rc.local
+# exit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>You should now have native LIRC support within MythTV.</P>
+
+<H2><A NAME="LVM"></A> <A NAME="ss22.3">22.3</A> <A HREF="mythtv-HOWTO.html#toc22.3">Linux Volume Manager (LVM). </A>
+</H2>
+
+<P>LVM greatly increases the flexibility you have in managing your storage
+than traditional physical partitions. This section will provide some brief
+notes on how to use LVM to create storage space for your video files and how
+to add additional disk space in the future. There's lots more that can be
+done with LVM, so check the LVM HOWTO 
+<A HREF="http://tldp.org/HOWTO/lvm-HOWTO/">http://tldp.org/HOWTO/lvm-HOWTO/</A> document for details.</P>
+<P>Make sure your kernel configuration includes LVM support or that it's
+available as a module. Today, most vendors include this by default. You'll
+also want to ensure that you have a copy of the LVM utilities; check your
+distribution, or get the latest versions from 
+<A HREF="http://www.sistina.com/products_lvm.htm">http://www.sistina.com/products_lvm.htm</A> and build them manually.</P>
+<P>Check that the <B>vgscan</B> program is being run at some point during
+your boot sequence - most distributions do this by default. Look for a
+message during boot up that looks like this:
+<CODE>vgscan -- reading all physical volumes (this may take a while...)</CODE></P>
+<P>LVM uses a few concepts you should be familiar with before starting.
+<UL>
+<LI>PV (Physical Volume).  The actual partition on the hard drive.</LI>
+<LI>VG (Volume Group).  The aggregation of all the PVs make a VG.</LI>
+<LI>LV (Logical Volume).  Subdivision of the pool of space available in
+the VG into individual chunks, like /usr, /var/video, etc.</LI>
+</UL>
+</P>
+<P>The following example assumes that you want to create a LVM partition from a
+chunk of space in /dev/hda5, using a reiserfs filesystem and mounted on
+/var/video. You later decide to extend this filesystem by adding a new disk:
+/dev/hdb.</P>
+<P>You need to create at least one LVM partition for a physical volume. Use
+<B>fdisk</B> or your favorite partition editor to set the type to LVM
+(0x8e). If you're using an entire disk, create one big partition rather than
+using the device itself. e.g. use /dev/hdb1 not /dev/hdb.</P>
+<P><CODE># fdisk /dev/hda</CODE>
+.... create partition 5, save partition table and reboot if you have to</P>
+<P>Create the LVM physical volume from the partitions (repeat if you have
+multiple partitions to use):
+<BLOCKQUOTE><CODE>
+<PRE>
+# pvcreate /dev/hda5
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Create a LVM volume group out of this physical volume called "VGforMyth" that is
+allocated in chunks that are a multiple of 64MB
+<BLOCKQUOTE><CODE>
+<PRE>
+# vgcreate --name VGforMyth -s 64m /dev/hda5
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Create a logical volume of 20GB called "video" and then create the reiserfs
+filesystem and mount it:
+<BLOCKQUOTE><CODE>
+<PRE>
+# lvcreate --name video --size 20G VGforMyth
+# mkreiserfs /dev/VGforMyth/video
+# mount /dev/VGforMyth/video /var/video
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Now create a 5GB volume for mythmusic files if you like:
+<BLOCKQUOTE><CODE>
+<PRE>
+# lvcreate --name music --size 5G VGforMyth
+# mkreiserfs /dev/VGforMyth/music
+# mount /dev/VGforMyth/music /var/music
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Display the volume group status:
+<CODE># vgdisplay -v</CODE></P>
+<P>Now, lets suppose you want to add a 60GB hard disk to the system as hdb and
+allocate 50GB of it to video storage.</P>
+<P>First, create a single partition /dev/hdb1 covering the whole disk and make
+it type 0x8e using your partition editor.</P>
+<P><CODE># fdisk /dev/hdb</CODE>
+.... create partition, set type, save and reboot if it says you have to</P>
+<P>Create the new LVM physical volume:</P>
+<P><CODE># pvcreate /dev/hdb1</CODE></P>
+<P>Add the new physical volume to the volume group:</P>
+<P><CODE># vgextend VGforMyth /dev/hdb1</CODE></P>
+<P><B>NOTE</B>:  You may get errors at this point stating that there are no
+physical volumes available for adding to the LV, even though you know for a
+fact that there are.  You may need to specify the physical volume in the 
+<CODE>/dev/ide/host/bus/target/lun/etc</CODE> format.</P>
+<P>Once you've completed one of the following two procedures, use <B>df</B>
+to check that you've got more space.</P>
+
+<H3>ReiserFS</H3>
+
+<P>Make the logical volume used for video bigger:</P>
+<P><CODE># lvextend --size +50G /dev/VGforMyth/video</CODE></P>
+<P>Unmount, resize and remount the filesystem.  Technically, you don't need to
+unmount and remount the ReiserFS. 
+<BLOCKQUOTE><CODE>
+<PRE>
+# umount /var/video
+# resize_reiserfs /dev/VGforMyth/video
+# mount /dev/VGforMyth/video /var/video
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H3>ext2 or ext3</H3>
+
+<P>LVM comes with a program called <B>e2fsadm</B>.</P>
+<P>Unmount, resize and remount the filesystem.  The filesystem <EM>must</EM> be
+unmounted during this procedure.
+<BLOCKQUOTE><CODE>
+<PRE>
+# umount /var/video
+# e2fsadm --size +50G /dev/VGforMyth/video
+# mount /dev/VGforMyth/video /var/video
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H2><A NAME="advancedpartitionformatting"></A> <A NAME="ss22.4">22.4</A> <A HREF="mythtv-HOWTO.html#toc22.4">Advanced Partition Formatting. </A>
+</H2>
+
+<P>MythTV creates large files.  The partitions that your distribution sets
+up for you may not be optimized for large files.  Using 
+<A HREF="#LVM">LVM</A> in conjunction with the following techniques can be quite
+useful.</P>
+<H3>Ext3</H3>
+
+<P>With Ext3, your biggest gain is that in case of a crash and reboot you
+don't have to wait very long for your partition to be remounted.  With Ext2,
+the <B>fsck</B> may take a long time to run on multi-gigabyte partitions.</P>
+<P>When formatting the partition, the following command line should be better
+than the default.  This example assumes that <CODE>/dev/hdb1</CODE> has already
+been created using <B>fdisk</B>.  If you're using LVM, <CODE>/dev/hdb1</CODE>
+may be something like <CODE>/dev/VGforMyth/video</CODE>.
+<BLOCKQUOTE><CODE>
+<PRE>
+# mkfs.ext3 -T largefile4 -m 0 /dev/hdb1
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The "-T largefile4" option creates one inode per 4 megabytes.  The "-m 0"
+(zero, not "oh") parameter sets the amount of spaced reserved for root to
+zero. By default, this is 5%, which on a multi-gigabyte drive is a lot of
+reserved space.</P>
+<P>You may also modify some aspects of a filesystem such as the reserved block
+percentage after it has been created using the <B>tune2fs</B> program:
+<BLOCKQUOTE><CODE>
+<PRE>
+# tune2fs -m 0 /dev/hdb1
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>You can check on your filesystem using the <B>dumpe2fs</B> program.  See
+the <B>man</B> page for details.</P>
+
+<HR>
+Next
+<A HREF="mythtv-HOWTO-21.html">Previous</A>
+<A HREF="mythtv-HOWTO.html#toc22">Contents</A>
+</BODY>
+</HTML>
