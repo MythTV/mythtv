@@ -59,7 +59,8 @@ class RemoteEncoder
                         QString &callsign, QString &iconpath,
                         QString &channelname, QString &chanid,
                         QString &seriesid, QString &programid,
-                        QString &outputFilters);
+                        QString &outputFilters, QString &repeat, QString &airdate,
+                        QString &stars);
                         
     void GetInputName(QString &inputname);
     void GetOutputFilters(QString& filters);

@@ -454,7 +454,8 @@ void RemoteEncoder::GetChannelInfo(QString &title, QString &subtitle,
                                    QString &callsign, QString &iconpath,
                                    QString &channelname, QString &chanid,
                                    QString &seriesid, QString &programid,
-                                   QString &outputFilters)
+                                   QString &outputFilters, QString &repeat, 
+                                   QString &airdate, QString &stars)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
     strlist << "GET_PROGRAM_INFO";
@@ -474,6 +475,9 @@ void RemoteEncoder::GetChannelInfo(QString &title, QString &subtitle,
     seriesid = strlist[10];
     programid = strlist[11];
     outputFilters = strlist[12];
+    repeat = strlist[13];
+    airdate = strlist[14];
+    stars = strlist[15];
 
     if (title == " ")
         title = "";
@@ -501,7 +505,13 @@ void RemoteEncoder::GetChannelInfo(QString &title, QString &subtitle,
         programid = "";
     if (outputFilters == " ")
         outputFilters = "";        
-
+    if (repeat == " ")
+        repeat = "0";
+    if (airdate == " ")
+        airdate = "";
+    if (stars == " ")
+        stars = "";
+         
     lastchannel = channelname;
 }
 
@@ -521,7 +531,8 @@ QString RemoteEncoder::GetCurrentChannel(void)
     {
         QString dummy;
         GetChannelInfo(dummy, dummy, dummy, dummy, dummy, dummy,
-                       dummy, dummy, lastchannel, dummy, dummy, dummy, dummy);
+                       dummy, dummy, lastchannel, dummy, dummy, 
+                       dummy, dummy, dummy, dummy, dummy);
     }
 
     return lastchannel;
@@ -531,6 +542,7 @@ void RemoteEncoder::GetOutputFilters(QString& filters)
 {
     QString dummy;
     GetChannelInfo(dummy, dummy, dummy, dummy, dummy, dummy,
-                   dummy, dummy, dummy, dummy, dummy, dummy, filters);
+                   dummy, dummy, dummy, dummy, dummy, dummy, filters,
+                   dummy, dummy, dummy);
 }
 

@@ -35,9 +35,35 @@ struct SeekSpeedInfo {
     float rew_repos;
 };
 
-SeekSpeedInfo seek_speed_array[] =
+#define MAX_REPO_LEVEL 3
+SeekSpeedInfo seek_speed_array[MAX_REPO_LEVEL][10] =
 {
-    {"",     0.00,   0.00,  0.00},
+    // Less adjustment overall, no adjustment on the low end
+    {{"",     0.00,   0.00,  0.00},
+    {"1/4X", 0.25,   0.00,  0.00},
+    {"1/2X", 0.50,   0.00,  0.00},
+    {"1X",   1.00,   2.00,  2.00},
+    {"1.5X", 1.50,   4.00,  4.00},
+    {"2X",   2.24,  12.00,  9.00},
+    {"3X",   3.34,  16.00, 11.50},
+    {"8X",   7.48,  20.00, 14.00},
+    {"10X", 11.18,  28.00, 19.00},
+    {"16X", 16.72,  66.00, 42.00}},
+    
+    // Less adjustment overall
+    {{"",     0.00,   0.00,  0.00},
+    {"1/4X", 0.25,   0.00,  0.00},
+    {"1/2X", 0.50,   2.00,  2.00},
+    {"1X",   1.00,   6.00,  4.50},
+    {"1.5X", 1.50,   8.00,  6.00},
+    {"2X",   2.24,  10.00,  7.00},
+    {"3X",   3.34,  14.00,  9.50},
+    {"8X",   7.48,  34.00, 22.00},
+    {"10X", 11.18,  42.00, 27.00},
+    {"16X", 16.72,  66.00, 42.00}},
+    
+    // More adjustment (this is the default)
+    {{"",     0.00,   0.00,  0.00},
     {"1/4X", 0.25,   0.00,  0.00},
     {"1/2X", 0.50,   4.00,  4.00},
     {"1X",   1.00,  12.00,  9.00},
@@ -46,11 +72,11 @@ SeekSpeedInfo seek_speed_array[] =
     {"3X",   3.34,  28.00, 19.00},
     {"8X",   7.48,  68.00, 44.00},
     {"10X", 11.18,  84.00, 54.00},
-    {"16X", 16.72, 132.00, 84.00}
+    {"16X", 16.72, 132.00, 84.00}}
 };
 
 const int SSPEED_NORMAL = 3;
-const int SSPEED_MAX = sizeof seek_speed_array / sizeof seek_speed_array[0];
+const int SSPEED_MAX = sizeof seek_speed_array[0] / sizeof seek_speed_array[0][0];
 
 struct SleepTimer {
     QString   dispString;
@@ -186,7 +212,13 @@ TV::TV(void)
         VERBOSE(VB_ALL, "Couldn't open DB connection in player, exiting");
         exit(-1);
     }
-
+    
+    repoLevel = gContext->GetNumSetting("TVRepositionLevel", 2);
+    
+    if((repoLevel >= MAX_REPO_LEVEL) || (repoLevel < 0) )
+        repoLevel = MAX_REPO_LEVEL - 1;
+    
+    
     treeMenu = NULL;
     switchingCards = false;
     dialogname = "";
@@ -1857,16 +1889,19 @@ void TV::DoPause(void)
     speed_index = 0;
     float time = 0.0;
 
-    if (doing_ff_rew)
-    {
-        time = StopFFRew();
-        activenvp->Play(1.0, true);
-    }
-
     if (paused)
         activenvp->Play(1.0, true);
-    else
+    else 
+    {
+        if (doing_ff_rew)
+        {
+            time = StopFFRew();
+            activenvp->Play(1.0, true);
+            usleep(1000);
+        }
+        
         activenvp->Pause();
+    }
 
     paused = !paused;
 
@@ -2044,9 +2079,9 @@ float TV::StopFFRew(void)
     if (ff_rew_repos)
     {
         if (doing_ff_rew > 0)
-            time = -seek_speed_array[ff_rew_index].ff_repos;
+            time = -seek_speed_array[repoLevel][ff_rew_index].ff_repos;
         else
-            time = seek_speed_array[ff_rew_index].rew_repos;
+            time = seek_speed_array[repoLevel][ff_rew_index].rew_repos;
     }
 
     doing_ff_rew = 0;
@@ -2092,13 +2127,13 @@ void TV::RepeatFFRew(void)
     QString mesg;
     if (doing_ff_rew > 0)
     {
-        time = seek_speed_array[ff_rew_index].scaling;
-        mesg = tr("Forward ") + seek_speed_array[ff_rew_index].dispString;
+        time = seek_speed_array[repoLevel][ff_rew_index].scaling;
+        mesg = tr("Forward ") + seek_speed_array[repoLevel][ff_rew_index].dispString;
     }
     else
     {
-        time = -seek_speed_array[ff_rew_index].scaling;
-        mesg = tr("Rewind ") + seek_speed_array[ff_rew_index].dispString;
+        time = -seek_speed_array[repoLevel][ff_rew_index].scaling;
+        mesg = tr("Rewind ") + seek_speed_array[repoLevel][ff_rew_index].dispString;
     }
 
     if (UpdatePosOSD(time, mesg))
@@ -2651,7 +2686,8 @@ void TV::ShowLCDChannelInfo(void)
 {
     QString title, subtitle, callsign, dummy;
     GetChannelInfo(recorder, title, subtitle, dummy, dummy, dummy, dummy, 
-                   callsign, dummy, dummy, dummy, dummy, dummy, dummy);
+                   callsign, dummy, dummy, dummy, dummy, dummy, dummy,
+                   dummy, dummy, dummy);
 
     if ((callsign != lcdCallsign) || (title != lcdTitle) || 
         (subtitle != lcdSubtitle))
@@ -2682,7 +2718,8 @@ void TV::GetNextProgram(RemoteEncoder *enc, int direction,
                         title, subtitle, description, category, starttime,
                         endtime, callsign, iconpath, channum, chanid,
                         seriesid, programid);
-
+    
+          
     QString tmFmt = gContext->GetSetting("TimeFormat");
     QString dtFmt = gContext->GetSetting("ShortDateFormat");
     QDateTime startts = QDateTime::fromString(starttime, Qt::ISODate);
@@ -2714,6 +2751,7 @@ void TV::GetNextProgram(RemoteEncoder *enc, int direction,
     minutes = minutes % 60;
     length.sprintf("%d:%02d", hours, minutes);
     infoMap["lentime"] = length;
+    
 }
 
 void TV::GetNextProgram(RemoteEncoder *enc, int direction,
@@ -2740,11 +2778,15 @@ void TV::GetChannelInfo(RemoteEncoder *enc, QMap<QString, QString> &infoMap)
     QString title, subtitle, description, category, starttime, endtime;
     QString callsign, iconpath, channum, chanid, seriesid, programid;
     QString outputFilters;
+    QString repeat, airdate, stars;
 
     enc->GetChannelInfo(title, subtitle, description, category, starttime,
                         endtime, callsign, iconpath, channum, chanid,
-                        seriesid, programid, outputFilters);
-
+                        seriesid, programid, outputFilters,
+                        repeat, airdate, stars);
+    
+    QString dateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d");
+    QString oldDateFormat = gContext->GetSetting("OldDateFormat", "M/d/yyyy");
     QString tmFmt = gContext->GetSetting("TimeFormat");
     QString dtFmt = gContext->GetSetting("ShortDateFormat");
     QDateTime startts = QDateTime::fromString(starttime, Qt::ISODate);
@@ -2777,21 +2819,60 @@ void TV::GetChannelInfo(RemoteEncoder *enc, QMap<QString, QString> &infoMap)
     hours   = minutes / 60;
     minutes = minutes % 60;
     length.sprintf("%d:%02d", hours, minutes);
+    
     infoMap["lentime"] = length;
+    
+    
+    if (stars.toFloat())
+        infoMap["stars"] = QString("(%1 %2) ").arg(4.0 * stars.toFloat()).arg(QObject::tr("stars"));
+    else
+        infoMap["stars"] = "";
+
+    QDate originalAirDate;       
+    
+    if (airdate.isEmpty())
+    {
+        cerr << " 1" << endl;
+        originalAirDate = startts.date();
+    }
+    else
+    {
+        originalAirDate = QDate::fromString(airdate, Qt::ISODate);
+    }        
+
+    
+    if (!repeat.isEmpty())
+    {
+        infoMap["REPEAT"] = QString("(%1) ").arg(QObject::tr("Repeat"));
+        infoMap["LONGREPEAT"] = QString("(%1 %2) ")
+                                .arg(QObject::tr("Repeat"))
+                                .arg(originalAirDate.toString(oldDateFormat));
+    }
+    else
+    {
+        infoMap["REPEAT"] = "";
+        infoMap["LONGREPEAT"] = "";
+    }
+                
+    infoMap["originalairdate"]= originalAirDate.toString(dateFormat);
+    infoMap["shortoriginalairdate"]= originalAirDate.toString(dtFmt);
+
 }
 
 void TV::GetChannelInfo(RemoteEncoder *enc, QString &title, QString &subtitle, 
                         QString &desc, QString &category, QString &starttime, 
                         QString &endtime, QString &callsign, QString &iconpath,
                         QString &channelname, QString &chanid,
-                        QString &seriesid, QString &programid, QString &outFilters)
+                        QString &seriesid, QString &programid, QString &outFilters,
+                        QString &repeat, QString &airdate, QString &stars)
 {
     if (!enc)
         enc = activerecorder;
 
     enc->GetChannelInfo(title, subtitle, desc, category, starttime, endtime, 
                         callsign, iconpath, channelname, chanid,
-                        seriesid, programid, outFilters);
+                        seriesid, programid, outFilters, repeat, airdate,
+                        stars);
 }
 
 void TV::EmbedOutput(WId wid, int x, int y, int w, int h)
@@ -3198,11 +3279,11 @@ void TV::BrowseStart(void)
 
     QString title, subtitle, desc, category, starttime, endtime;
     QString callsign, iconpath, channum, chanid, seriesid, programid;
-    QString chanFilters;
+    QString chanFilters, repeat, airdate, stars;
 
     GetChannelInfo(activerecorder, title, subtitle, desc, category, 
                    starttime, endtime, callsign, iconpath, channum, chanid,
-                   seriesid, programid, chanFilters);
+                   seriesid, programid, chanFilters, repeat, airdate, stars);
 
     browsechannum = channum;
     browsechanid = chanid;
@@ -3288,11 +3369,11 @@ void TV::ToggleRecord(void)
     {
         QString title, subtitle, desc, category, starttime, endtime;
         QString callsign, iconpath, channum, chanid, seriesid, programid;
-        QString outFilters;
+        QString outFilters, repeat, airdate, stars;
 
         GetChannelInfo(activerecorder, title, subtitle, desc, category, 
                        starttime, endtime, callsign, iconpath, channum, chanid,
-                       seriesid, programid, outFilters);
+                       seriesid, programid, outFilters, repeat, airdate, stars);
 
         QDateTime startts = QDateTime::fromString(starttime, Qt::ISODate);
 

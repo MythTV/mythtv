@@ -72,7 +72,8 @@ class TV : public QObject
                         QString &desc, QString &category, QString &starttime,
                         QString &endtime, QString &callsign, QString &iconpath,
                         QString &channelname, QString &chanid,
-                        QString &seriesid, QString &programid, QString &outFilters);
+                        QString &seriesid, QString &programid, QString &outFilters, 
+                        QString &repeat, QString &airdate, QString &stars);
 
     // for the guidegrid to use
     void EmbedOutput(WId wid, int x, int y, int w, int h);
@@ -328,6 +329,7 @@ class TV : public QObject
     QString lcdTitle, lcdSubtitle, lcdCallsign;
     
     QString baseFilters;
+    int repoLevel;
 };
 
 #endif

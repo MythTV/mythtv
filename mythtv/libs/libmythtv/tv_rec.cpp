@@ -909,7 +909,8 @@ void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
                            QString &callsign, QString &iconpath, 
                            QString &channelname, QString &chanid,
                            QString &seriesid, QString &programid,
-                           QString &outputFilters)
+                           QString &outputFilters, QString &repeat, QString &airdate,
+                           QString &stars)
 {
     title = "";
     subtitle = "";
@@ -924,7 +925,10 @@ void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
     seriesid = "";
     programid = "";
     outputFilters = "";
-
+    repeat = "";
+    airdate = "";
+    stars = "";
+    
     if (!db_conn)
         return;
     pthread_mutex_lock(&db_lock);
@@ -949,7 +953,7 @@ void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
     QString thequery = QString("SELECT starttime,endtime,title,subtitle,"
                                "description,category,callsign,icon,"
                                "channel.chanid, seriesid, programid, "
-                               "channel.outputfilters "
+                               "channel.outputfilters, previouslyshown, originalairdate, stars "
                                "FROM program,channel,capturecard,cardinput "
                                "WHERE channel.channum = \"%1\" "
                                "AND starttime < %2 AND endtime > %3 AND "
@@ -979,6 +983,10 @@ void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
         seriesid = query.value(9).toString();
         programid = query.value(10).toString();
         outputFilters = query.value(11).toString();
+        
+        repeat = query.value(12).toString();
+        airdate = query.value(13).toString();
+        stars = query.value(14).toString();
     }
     else
     {
@@ -2061,14 +2069,15 @@ void TVRec::GetChannelInfo(QString &title, QString &subtitle, QString &desc,
                         QString &endtime, QString &callsign, QString &iconpath,
                         QString &channelname, QString &chanid,
                         QString &seriesid, QString &programid,
-                        QString &outputFilters)
+                        QString &outputFilters, QString &repeat, QString &airdate,
+                        QString &stars)
 {
     if (!channel)
         return;
 
     GetChannelInfo(channel, title, subtitle, desc, category, starttime,
                    endtime, callsign, iconpath, channelname, chanid,
-                   seriesid, programid, outputFilters);
+                   seriesid, programid, outputFilters, repeat, airdate, stars);
 }
 
 void TVRec::GetInputName(QString &inputname)

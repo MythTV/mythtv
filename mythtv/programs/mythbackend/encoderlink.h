@@ -86,7 +86,8 @@ class EncoderLink
                         QString &category, QString &starttime,
                         QString &endtime, QString &callsign, QString &iconpath,
                         QString &channelname, QString &chanid,
-                        QString &seriesid, QString &programid, QString &chanFilters);
+                        QString &seriesid, QString &programid, QString &chanFilters, 
+                        QString &repeat, QString &airdate, QString &stars);
     void GetInputName(QString &inputname);
 
     void SetReadThreadSock(QSocket *rsock);

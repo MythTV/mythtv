@@ -2111,10 +2111,12 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         QString starttime = "", endtime = "", callsign = "", iconpath = "";
         QString channelname = "", chanid = "", seriesid = "", programid = "";
         QString chanOutputFilters = "";
+        QString repeat = "", airdate = "", stars = "";
 
         enc->GetChannelInfo(title, subtitle, desc, category, starttime,
                             endtime, callsign, iconpath, channelname, chanid,
-                            seriesid, programid, chanOutputFilters);
+                            seriesid, programid, chanOutputFilters,
+                            repeat, airdate, stars);
 
         if (title == "")
             title = " ";
@@ -2142,6 +2144,12 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
             programid = " ";
         if (chanOutputFilters == "")
             chanOutputFilters = " ";    
+        if (repeat = "" )
+            repeat = "0";
+        if (airdate = "")
+            airdate = starttime;
+        if (stars = "")
+            stars = " ";
 
         retlist << title;
         retlist << subtitle;
@@ -2156,6 +2164,9 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         retlist << seriesid;
         retlist << programid;
         retlist << chanOutputFilters;
+        retlist << repeat;
+        retlist << airdate;
+        retlist << stars;
     }
     else if (command == "GET_INPUT_NAME")
     {
@@ -3093,7 +3104,8 @@ void MainServer::PrintStatus(QSocket *socket)
                 QString title, callsign, dummy;
                 elink->GetChannelInfo(title, dummy, dummy, dummy, dummy,
                                       dummy, callsign, dummy, dummy,
-                                      dummy, dummy, dummy, dummy);
+                                      dummy, dummy, dummy, dummy,
+                                      dummy, dummy, dummy);
                 os << ": '" << title << "' on "  << callsign;
             }
             os << ".";

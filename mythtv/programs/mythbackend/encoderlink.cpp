@@ -568,13 +568,14 @@ void EncoderLink::GetChannelInfo(QString &title, QString &subtitle,
                                  QString &callsign, QString &iconpath,
                                  QString &channelname, QString &chanid,
                                  QString &seriesid, QString &programid, 
-                                 QString &chanFilters)
+                                 QString &chanFilters, QString &repeat, QString &airdate,
+                                 QString &stars)
 {
     if (local)
     {
         tv->GetChannelInfo(title, subtitle, desc, category, starttime,
                            endtime, callsign, iconpath, channelname, chanid,
-                           seriesid, programid, chanFilters);
+                           seriesid, programid, chanFilters, repeat, airdate, stars);
         return;
     }
 
