@@ -1,55 +1,50 @@
 /*
-	daaprequest.h
+	httpoutrequest.h
 
 	(c) 2003 Thor Sigvaldason and Isaac Richards
 	Part of the mythTV project
 	
-    A little object for making daap requests
 
 */
 
-#include "../../../config.h"
-
-#include <vector>
 #include <iostream>
 using namespace std;
 
-#include "daaprequest.h"
 
-DaapRequest::DaapRequest(
-                            DaapInstance *owner,
-                            const QString& l_base_url, 
-                            const QString& l_host_address,
-                            DaapServerType l_server_type
-                        )
+#include "httpoutrequest.h"
+
+
+
+HttpOutRequest::HttpOutRequest(
+                                const QString &l_base_url,
+                                const QString &l_host_address
+                              )
 {
-    parent = owner;
     base_url = l_base_url;
     host_address = l_host_address;
     get_variables.setAutoDelete(true);
     stored_request = "";
-    server_type = l_server_type;
 }
 
-void DaapRequest::addGetVariable(const QString& label, int value)
+void HttpOutRequest::addGetVariable(const QString& label, int value)
 {
     QString int_string = QString("%1").arg(value);
     HttpGetVariable *new_get = new HttpGetVariable(label, int_string);
     get_variables.insert( label, new_get);
 }
 
-void DaapRequest::addGetVariable(const QString& label, const QString &value)
+void HttpOutRequest::addGetVariable(const QString& label, const QString &value)
 {
     HttpGetVariable *new_get = new HttpGetVariable(label, value);
     get_variables.insert( label, new_get);
 }
 
-void DaapRequest::addText(std::vector<char> *buffer, QString text_to_add)
+void HttpOutRequest::addText(std::vector<char> *buffer, QString text_to_add)
 {
     buffer->insert(buffer->end(), text_to_add.ascii(), text_to_add.ascii() + text_to_add.length());
 }
 
-bool DaapRequest::send(QSocketDevice *where_to_send, bool ignore_shutdown)
+bool HttpOutRequest::send(QSocketDevice *where_to_send)
 {
     std::vector<char>  the_request;
     
@@ -92,56 +87,7 @@ bool DaapRequest::send(QSocketDevice *where_to_send, bool ignore_shutdown)
     stored_request = base_url;
     
     //
-    //  Add another "standard" daap header (ie. things that iTunes sends
-    //  when it is a client)
-    //
-
-    addText(&the_request, "Cache-Control: no-cache\r\n");
-    
-    //
-    //  If the server is an actual mfd, tell it precisely what formats we
-    //  understand (it will try and convert other to wav if we ask for them)
-    //
-
-    if(server_type == DAAP_SERVER_MYTH)
-    {
-        QString accept_string = "Accept: audio/wav,audio/mpg,audio/ogg,audio/flac";
-#ifdef AAC_AUDIO_SUPPORT
-        accept_string.append(",audio/m4a");
-#endif
-        accept_string.append("\r\n");
-        addText(&the_request, accept_string);
-    }
-    else
-    {
-        addText(&the_request, "Accept: */*\r\n");
-    }
-
-    /*
-        Might want to add these at some point
-        
-        x-audiocast-udpport:49154
-        icy-metadata:1
-    */
-    
-    //
-    //  More standard headers
-    //
-    
-    addText(&the_request, "Client-DAAP-Version: 2.0\r\n");
-    addText(&the_request, "User-Agent: MythTV/1.0 (Probably Linux)\r\n");
-
-    //
-    //  Add the server address (which the HTTP 1.1 spec is fairly adamant
-    //  *must* be in there)
-    // 
-   
-    QString host_line = QString("Host: %1\r\n").arg(host_address);
-    addText(&the_request, host_line);
-
-    
-    //
-    //  Add any additional headers that the calling program set
+    //  Add headers that the calling code set
     //
     
     QDictIterator<HttpHeader> an_it( headers );
@@ -152,26 +98,24 @@ bool DaapRequest::send(QSocketDevice *where_to_send, bool ignore_shutdown)
                            .arg(an_it.current()->getValue());
         addText(&the_request, a_header);
     }
-    
-
-
+   
     //
     //  Add the final blank line
     //
 
     addText(&the_request, "\r\n");
 
-    sendBlock(the_request, where_to_send, ignore_shutdown);
+    sendBlock(the_request, where_to_send);
 
     return true;
 }
 
-bool DaapRequest::sendBlock(std::vector<char> block_to_send, QSocketDevice *where_to_send, bool ignore_shutdown)
+bool HttpOutRequest::sendBlock(std::vector<char> block_to_send, QSocketDevice *where_to_send)
 {
         
     //  Debugging:
     /*
-    cout << "=========== Debugging Output - DAAP request being sent  ==================" << endl;
+    cout << "=========== Debugging Output - HTTP request being sent  ==================" << endl;
     for(uint i = 0; i < block_to_send.size(); i++)
     {
         cout << block_to_send.at(i);
@@ -199,7 +143,7 @@ bool DaapRequest::sendBlock(std::vector<char> block_to_send, QSocketDevice *wher
 
     if(block_to_send.size() < 1)
     {
-        warning("daap request was asked to sendBlock() "
+        warning("http out request was asked to sendBlock() "
                 "of zero size ");
         keep_going = false;
     }
@@ -207,20 +151,6 @@ bool DaapRequest::sendBlock(std::vector<char> block_to_send, QSocketDevice *wher
 
     while(keep_going)
     {
-        if(parent)
-        {
-            if(!parent->keepGoing() && !ignore_shutdown)
-            {
-                //
-                //  time to escape out of this
-                //
-
-                parent->log("daap request aborted a sendBlock() "
-                        "as it's time to go", 6);
-
-                return false;
-            }
-        }
 
         FD_ZERO(&writefds);
         if(where_to_send)
@@ -240,32 +170,23 @@ bool DaapRequest::sendBlock(std::vector<char> block_to_send, QSocketDevice *wher
         int result = select(nfds, NULL, &writefds, NULL, &timeout);
         if(result < 0)
         {
-            if(parent)
-            {
-                parent->warning("daap request got an error from "
-                                "select() ... not sure what to do");
-            }
+            warning("http out request got an error from "
+                    "select() ... not sure what to do");
         }
         else
         {
             if(!where_to_send)
             {
-                if(parent)
-                {
-                    parent->warning("daap request's socket to the "
-                                    "server went away in the middle "
-                                    "of sending something");
-                }
+                warning("http out request's socket to a "
+                        "server went away in the middle "
+                        "of sending something");
                 return false;
             }
             if(where_to_send->socket() < 1)
             {
-                if(parent)
-                {
-                    parent->warning("daap request's socket to the "
-                                    "server got closed in the middle "
-                                    "of sending something");
-                }
+                warning("http out request's socket to the "
+                        "server got closed in the middle "
+                        "of sending something");
                 return false;
             }
 
@@ -286,11 +207,8 @@ bool DaapRequest::sendBlock(std::vector<char> block_to_send, QSocketDevice *wher
                     //  getting an error ... server has gone away?
                     //
                     
-                    if(parent)
-                    {
-                        parent->warning("daap request seems to have "
-                                        "lost contact with the server ");
-                    }
+                    warning("http out request seems to have "
+                            "lost contact with the server ");
                     return false;
                 
                 }
@@ -319,7 +237,7 @@ bool DaapRequest::sendBlock(std::vector<char> block_to_send, QSocketDevice *wher
     return true;
 }
 
-QString DaapRequest::getRequestString()
+QString HttpOutRequest::getRequestString()
 {
     QString return_value;
     if(stored_request.length() < 1)
@@ -333,14 +251,20 @@ QString DaapRequest::getRequestString()
     return return_value;
 }
 
-void DaapRequest::addHeader(const QString &new_header)
+void HttpOutRequest::addHeader(const QString &new_header)
 {
     HttpHeader *a_new_header = new HttpHeader(new_header);
     headers.insert(a_new_header->getField(), a_new_header);
 }
 
-
-
-DaapRequest::~DaapRequest()
+void HttpOutRequest::warning(const QString &warn_text)
 {
+    cerr << "WARNING httpoutrequest.o: " << warn_text << endl;
 }
+                  
+HttpOutRequest::~HttpOutRequest()
+{
+    get_variables.clear();
+}
+
+

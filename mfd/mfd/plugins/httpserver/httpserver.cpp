@@ -13,7 +13,7 @@
 #include "../../mdserver.h"
 
 #include "httpserver.h"
-#include "httprequest.h"
+#include "httpinrequest.h"
 #include "httpresponse.h"
 
 
@@ -373,7 +373,7 @@ void ClientHttpServer::removeMHttpServer(QString server_address, uint server_por
 
 
 
-void ClientHttpServer::handleIncoming(HttpRequest *http_request, int)
+void ClientHttpServer::handleIncoming(HttpInRequest *http_request, int)
 {
     //
     //  Get the branches of the get, and default to /audio/playlists if there's nothing there
@@ -453,7 +453,7 @@ void ClientHttpServer::handleIncoming(HttpRequest *http_request, int)
     QTime page_build_time;
     page_build_time.start();
     
-    HttpResponse *response = http_request->getResponse();
+    HttpOutResponse *response = http_request->getResponse();
     
     addTopHTML(response);
     startCoreTable(response);
@@ -470,7 +470,7 @@ void ClientHttpServer::handleIncoming(HttpRequest *http_request, int)
     //
 }
 
-void ClientHttpServer::addTopHTML(HttpResponse *response)
+void ClientHttpServer::addTopHTML(HttpOutResponse *response)
 {
     response->addHeader("Content-Type: text/html");
     response->clearPayload();
@@ -490,13 +490,13 @@ void ClientHttpServer::addTopHTML(HttpResponse *response)
     response->addToPayload("<hr><br><br>");
 }
 
-void ClientHttpServer::startCoreTable(HttpResponse *response)
+void ClientHttpServer::startCoreTable(HttpOutResponse *response)
 {
     response->addToPayload("<center>");
     response->addToPayload("<table>");
 }
 
-void ClientHttpServer::listMFDs(HttpResponse *response)
+void ClientHttpServer::listMFDs(HttpOutResponse *response)
 {
     response->addToPayload("<tr>");
     response->addToPayload(QString("<td colspan=\"%1\" align=\"left\">").arg(core_table_columns));
@@ -522,7 +522,7 @@ void ClientHttpServer::listMFDs(HttpResponse *response)
     response->addToPayload("</tr>");
 }
 
-void ClientHttpServer::listSections(HttpResponse *response, const QString &branch_one)
+void ClientHttpServer::listSections(HttpOutResponse *response, const QString &branch_one)
 {
     response->addToPayload("<tr>");
     response->addToPayload(QString("<td colspan=\"%1\" align=\"left\">").arg(core_table_columns));
@@ -578,7 +578,7 @@ void ClientHttpServer::listSections(HttpResponse *response, const QString &branc
 
 }
 
-void ClientHttpServer::showCurrentSection(HttpResponse *response, const QString &branch_one, const QString &branch_two)
+void ClientHttpServer::showCurrentSection(HttpOutResponse *response, const QString &branch_one, const QString &branch_two)
 {
 
     //
@@ -670,7 +670,7 @@ void ClientHttpServer::showCurrentSection(HttpResponse *response, const QString 
 
 }
 
-void ClientHttpServer::showPlaylists(HttpResponse *response)
+void ClientHttpServer::showPlaylists(HttpOutResponse *response)
 {
     //
     //  Lock the metadata
@@ -746,7 +746,7 @@ void ClientHttpServer::showPlaylists(HttpResponse *response)
 
 }
 
-void ClientHttpServer::showTracks(HttpResponse *response)
+void ClientHttpServer::showTracks(HttpOutResponse *response)
 {
     //
     //  Lock the metadata
@@ -840,13 +840,13 @@ void ClientHttpServer::showTracks(HttpResponse *response)
 
 }
 
-void ClientHttpServer::endCoreTable(HttpResponse *response)
+void ClientHttpServer::endCoreTable(HttpOutResponse *response)
 {
     response->addToPayload("</table>");
     response->addToPayload("</center>");
 }
 
-void ClientHttpServer::addBottomHTML(HttpResponse *response)
+void ClientHttpServer::addBottomHTML(HttpOutResponse *response)
 {
     response->addToPayload("<br><br><hr>");
     response->addToPayload("<font size=\"-2\">");

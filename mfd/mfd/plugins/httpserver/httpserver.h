@@ -53,21 +53,21 @@ class ClientHttpServer: public MFDHttpPlugin
     void    readFromMFD();
     void    addMHttpServer(QString server_address, uint server_port, QString service_name);
     void    removeMHttpServer(QString server_address, uint server_port, QString service_name);
-    void    handleIncoming(HttpRequest *http_request, int client_id);
+    void    handleIncoming(HttpInRequest *http_request, int client_id);
     
     //
     //  Stuff that builds the HTML
     //
 
-    void    addTopHTML(HttpResponse *response);
-    void    startCoreTable(HttpResponse *response);
-    void    listMFDs(HttpResponse *response);
-    void    listSections(HttpResponse *response, const QString &branch_one);
-    void    showCurrentSection(HttpResponse *response, const QString &branch_one, const QString &branch_two);
-    void    showPlaylists(HttpResponse *response);
-    void    showTracks(HttpResponse *response);
-    void    endCoreTable(HttpResponse *response);
-    void    addBottomHTML(HttpResponse *response);     
+    void    addTopHTML(HttpOutResponse *response);
+    void    startCoreTable(HttpOutResponse *response);
+    void    listMFDs(HttpOutResponse *response);
+    void    listSections(HttpOutResponse *response, const QString &branch_one);
+    void    showCurrentSection(HttpOutResponse *response, const QString &branch_one, const QString &branch_two);
+    void    showPlaylists(HttpOutResponse *response);
+    void    showTracks(HttpOutResponse *response);
+    void    endCoreTable(HttpOutResponse *response);
+    void    addBottomHTML(HttpOutResponse *response);     
 
     //
     //  Stuff to do stuff (well that's helpful)

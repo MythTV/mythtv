@@ -30,6 +30,10 @@ MetadataClient::MetadataClient(
 {
 }
 
+void MetadataClient::sendFirstRequest()
+{
+}
+
 void MetadataClient::handleIncoming()
 {
     cout << "metadata client is getting something on handleIncoming() " << endl;

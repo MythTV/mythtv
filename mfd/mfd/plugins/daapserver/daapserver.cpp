@@ -11,7 +11,7 @@
 #include <qvaluelist.h>
 
 #include "mfd_events.h"
-#include "httprequest.h"
+#include "httpinrequest.h"
 #include "httpresponse.h"
 
 #include "daapserver.h"
@@ -58,7 +58,7 @@ DaapServer::DaapServer(MFD *owner, int identity)
 }
 
 
-void DaapServer::handleIncoming(HttpRequest *http_request, int client_id)
+void DaapServer::handleIncoming(HttpInRequest *http_request, int client_id)
 {
     //
     //  Create a DaapRequest object that will be built up to understand the
@@ -253,7 +253,7 @@ void DaapServer::handleIncoming(HttpRequest *http_request, int client_id)
 }
 
 
-void DaapServer::parsePath(HttpRequest *http_request, DaapRequest *daap_request)
+void DaapServer::parsePath(HttpInRequest *http_request, DaapRequest *daap_request)
 {
          
     QString the_path = http_request->getUrl();
@@ -319,7 +319,7 @@ void DaapServer::parsePath(HttpRequest *http_request, DaapRequest *daap_request)
 
 
 
-void DaapServer::sendServerInfo(HttpRequest *http_request)
+void DaapServer::sendServerInfo(HttpInRequest *http_request)
 {
     Version daapVersion( 2, 0 );
     Version dmapVersion( 1, 0 );
@@ -354,7 +354,7 @@ void DaapServer::sendServerInfo(HttpRequest *http_request)
 
 
 
-void DaapServer::sendTag( HttpRequest *http_request, const Chunk& c ) 
+void DaapServer::sendTag( HttpInRequest *http_request, const Chunk& c ) 
 {
     //
     //  Note the function name is a bit of a mismomer as we are not actually
@@ -378,7 +378,7 @@ void DaapServer::sendTag( HttpRequest *http_request, const Chunk& c )
 
 
 
-void DaapServer::sendLogin(HttpRequest *http_request, u32 session_id)
+void DaapServer::sendLogin(HttpInRequest *http_request, u32 session_id)
 {
     TagOutput response;
     response << Tag('mlog') << Tag('mstt') << (u32) DAAP_OK << end 
@@ -389,7 +389,7 @@ void DaapServer::sendLogin(HttpRequest *http_request, u32 session_id)
 
 
 
-void DaapServer::parseVariables(HttpRequest *http_request, DaapRequest *daap_request)
+void DaapServer::parseVariables(HttpInRequest *http_request, DaapRequest *daap_request)
 {
     //
     //  Check the user agent header that httpd returns to take note of which
@@ -468,7 +468,7 @@ void DaapServer::parseVariables(HttpRequest *http_request, DaapRequest *daap_req
 
 
 
-void DaapServer::sendUpdate(HttpRequest *http_request, u32 database_version)
+void DaapServer::sendUpdate(HttpInRequest *http_request, u32 database_version)
 {
 
     TagOutput response;
@@ -483,7 +483,7 @@ void DaapServer::sendUpdate(HttpRequest *http_request, u32 database_version)
 }
 
 
-void DaapServer::sendMetadata(HttpRequest *http_request, QString request_path, DaapRequest *daap_request)
+void DaapServer::sendMetadata(HttpInRequest *http_request, QString request_path, DaapRequest *daap_request)
 {
     //
     //  The request_path is the key here. The client specifies what is
@@ -565,7 +565,7 @@ void DaapServer::sendMetadata(HttpRequest *http_request, QString request_path, D
     }    
 }
 
-void DaapServer::sendDatabaseList(HttpRequest *http_request)
+void DaapServer::sendDatabaseList(HttpInRequest *http_request)
 {
 
     //
@@ -596,7 +596,7 @@ void DaapServer::sendDatabaseList(HttpRequest *http_request)
 }
 
 void DaapServer::addItemToResponse(
-                                    HttpRequest *http_request,
+                                    HttpInRequest *http_request,
                                     DaapRequest *daap_request, 
                                     TagOutput &response, 
                                     AudioMetadata *which_item, 
@@ -897,7 +897,7 @@ void DaapServer::addItemToResponse(
     
 }
 
-void DaapServer::sendDatabase(HttpRequest *http_request, DaapRequest *daap_request, int which_database)
+void DaapServer::sendDatabase(HttpInRequest *http_request, DaapRequest *daap_request, int which_database)
 { 
     if(which_database != 1)
     {
@@ -1083,7 +1083,7 @@ void DaapServer::sendDatabase(HttpRequest *http_request, DaapRequest *daap_reque
     }
 }
 
-void DaapServer::sendDatabaseItem(HttpRequest *http_request, u32 song_id, DaapRequest *daap_request)
+void DaapServer::sendDatabaseItem(HttpInRequest *http_request, u32 song_id, DaapRequest *daap_request)
 {
     Metadata *which_one = metadata_server->getMetadataByUniversalId(song_id);
 
@@ -1199,7 +1199,7 @@ void DaapServer::sendDatabaseItem(HttpRequest *http_request, u32 song_id, DaapRe
 
 }
 
-void DaapServer::sendContainers(HttpRequest *http_request, DaapRequest *daap_request, int which_database)
+void DaapServer::sendContainers(HttpInRequest *http_request, DaapRequest *daap_request, int which_database)
 {
     if(which_database != 1)
     {
@@ -1329,7 +1329,7 @@ void DaapServer::sendContainers(HttpRequest *http_request, DaapRequest *daap_req
     sendTag( http_request, response.data() );
 }
 
-void DaapServer::sendContainer(HttpRequest *http_request, u32 container_id, int which_database)
+void DaapServer::sendContainer(HttpInRequest *http_request, u32 container_id, int which_database)
 {
     if(which_database != 1)
     {
@@ -1487,7 +1487,7 @@ void DaapServer::handleMetadataChange(int which_collection)
         response << end;
         
 
-        HttpResponse *hu_response = new HttpResponse(this, NULL);
+        HttpOutResponse *hu_response = new HttpOutResponse(this, NULL);
         hu_response->addHeader("DAAP-Server: MythTV/1.0 (Probably Linux)");
         hu_response->addHeader("Content-Type: application/x-dmap-tagged");
         Chunk c = response.data();
@@ -1518,7 +1518,7 @@ DaapServer::~DaapServer()
     //  iTunes sends
     //
         
-    HttpResponse *going_away_response = new HttpResponse(this, NULL);
+    HttpOutResponse *going_away_response = new HttpOutResponse(this, NULL);
     going_away_response->setError(404);
 
     hanging_updates_mutex.lock();

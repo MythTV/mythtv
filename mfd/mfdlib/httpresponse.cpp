@@ -52,7 +52,7 @@ extern "C" {
 
 
 
-HttpResponse::HttpResponse(MFDHttpPlugin *owner, HttpRequest *requestor)
+HttpOutResponse::HttpOutResponse(MFDHttpPlugin *owner, HttpInRequest *requestor)
 {
     parent = owner;
     my_request = requestor;
@@ -80,7 +80,7 @@ HttpResponse::HttpResponse(MFDHttpPlugin *owner, HttpRequest *requestor)
     flac_client = NULL;
 }
 
-void HttpResponse::setError(int error_number)
+void HttpOutResponse::setError(int error_number)
 {
     all_is_well = false;
     
@@ -220,12 +220,12 @@ void HttpResponse::setError(int error_number)
     }
 }
 
-void HttpResponse::addText(std::vector<char> *buffer, QString text_to_add)
+void HttpOutResponse::addText(std::vector<char> *buffer, QString text_to_add)
 {
     buffer->insert(buffer->end(), text_to_add.ascii(), text_to_add.ascii() + text_to_add.length()); 
 }
 
-void HttpResponse::createHeaderBlock(
+void HttpOutResponse::createHeaderBlock(
                                         std::vector<char> *header_block,
                                         int payload_size
                                     )
@@ -379,7 +379,7 @@ void HttpResponse::createHeaderBlock(
 }
 
 
-void HttpResponse::send(MFDServiceClientSocket *which_client)
+void HttpOutResponse::send(MFDServiceClientSocket *which_client)
 {
 
     if(file_to_send)
@@ -436,7 +436,7 @@ void HttpResponse::send(MFDServiceClientSocket *which_client)
 }
 
 
-bool HttpResponse::sendBlock(MFDServiceClientSocket *which_client, std::vector<char> &block_to_send)
+bool HttpOutResponse::sendBlock(MFDServiceClientSocket *which_client, std::vector<char> &block_to_send)
 {
     int nfds = 0;
     fd_set writefds;
@@ -565,13 +565,13 @@ bool HttpResponse::sendBlock(MFDServiceClientSocket *which_client, std::vector<c
     return true;
 }
 
-void HttpResponse::addHeader(const QString &new_header)
+void HttpOutResponse::addHeader(const QString &new_header)
 {
     HttpHeader *a_new_header = new HttpHeader(new_header);
     headers.insert(a_new_header->getField(), a_new_header);
 }
 
-void HttpResponse::setPayload(char *new_payload, int new_payload_size)
+void HttpOutResponse::setPayload(char *new_payload, int new_payload_size)
 {
     if(new_payload_size > MAX_CLIENT_OUTGOING)
     {
@@ -585,12 +585,12 @@ void HttpResponse::setPayload(char *new_payload, int new_payload_size)
     payload.insert(payload.end(), new_payload, new_payload + new_payload_size);
 }
 
-void HttpResponse::clearPayload()
+void HttpOutResponse::clearPayload()
 {
     payload.clear();
 }
 
-void HttpResponse::addToPayload(const QString &new_content)
+void HttpOutResponse::addToPayload(const QString &new_content)
 {
 
     for(uint i = 0; i < new_content.length(); i++)
@@ -599,7 +599,7 @@ void HttpResponse::addToPayload(const QString &new_content)
     }
 }
 
-void HttpResponse::sendFile(QString file_path, int skip, FileSendTransformation transform)
+void HttpOutResponse::sendFile(QString file_path, int skip, FileSendTransformation transform)
 {
     //
     //  Store the skip value (in case we need it later for a transformed file stream)
@@ -678,7 +678,7 @@ void HttpResponse::sendFile(QString file_path, int skip, FileSendTransformation 
 }
 
 
-void HttpResponse::streamFile(MFDServiceClientSocket *which_client)
+void HttpOutResponse::streamFile(MFDServiceClientSocket *which_client)
 {
 
     std::vector<char> header_block;
@@ -763,7 +763,7 @@ extern "C" FLAC__StreamDecoderWriteStatus flacWriteCallback(
                                                            )
 {
     flac_decoder = flac_decoder;
-    HttpResponse *http_response = (HttpResponse *)client_data;
+    HttpOutResponse *http_response = (HttpOutResponse *)client_data;
     return http_response->flacWrite(frame, buffer);
 }
 
@@ -775,7 +775,7 @@ extern "C" void flacMetadataCallback(
                                     )
 {
     decoder = decoder;
-    HttpResponse *http_response = (HttpResponse *)client_data;
+    HttpOutResponse *http_response = (HttpOutResponse *)client_data;
     http_response->flacMetadata(metadata);
 }
 
@@ -786,7 +786,7 @@ extern "C" void flacErrorCallback(
                                  )
 {
     decoder = decoder;
-    HttpResponse *http_response = (HttpResponse *)client_data;
+    HttpOutResponse *http_response = (HttpOutResponse *)client_data;
     http_response->flacError(status);
 }
 
@@ -797,7 +797,7 @@ extern "C" void flacErrorCallback(
 //
 
 
-FLAC__StreamDecoderWriteStatus HttpResponse::flacWrite(
+FLAC__StreamDecoderWriteStatus HttpOutResponse::flacWrite(
                                                         const FLAC__Frame *frame, 
                                                         const FLAC__int32 *const buffer[]
                                                       )
@@ -898,7 +898,7 @@ FLAC__StreamDecoderWriteStatus HttpResponse::flacWrite(
     return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
 }
 
-void HttpResponse::flacMetadata(const FLAC__StreamMetadata *metadata)
+void HttpOutResponse::flacMetadata(const FLAC__StreamMetadata *metadata)
 {
     flac_bitspersample = metadata->data.stream_info.bits_per_sample;
     flac_channels      = metadata->data.stream_info.channels;
@@ -906,7 +906,7 @@ void HttpResponse::flacMetadata(const FLAC__StreamMetadata *metadata)
     flac_totalsamples  = metadata->data.stream_info.total_samples;
 }
 
-void HttpResponse::flacError(FLAC__StreamDecoderErrorStatus status)
+void HttpOutResponse::flacError(FLAC__StreamDecoderErrorStatus status)
 {
     status = status;
     
@@ -916,7 +916,7 @@ void HttpResponse::flacError(FLAC__StreamDecoderErrorStatus status)
 
 
 
-void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_client)
+void HttpOutResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_client)
 {
     std::vector<char> header_block;
 
@@ -2000,7 +2000,7 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
     
 }
 
-void HttpResponse::streamEmptyWav(MFDServiceClientSocket *which_client)
+void HttpOutResponse::streamEmptyWav(MFDServiceClientSocket *which_client)
 {
 
     //
@@ -2060,7 +2060,7 @@ void HttpResponse::streamEmptyWav(MFDServiceClientSocket *which_client)
 }
 
 
-void HttpResponse::log(const QString &log_text, int verbosity)
+void HttpOutResponse::log(const QString &log_text, int verbosity)
 {
     if(parent)
     {
@@ -2068,7 +2068,7 @@ void HttpResponse::log(const QString &log_text, int verbosity)
     }
 }
 
-void HttpResponse::warning(const QString &warn_text)
+void HttpOutResponse::warning(const QString &warn_text)
 {
     if(parent)
     {
@@ -2080,7 +2080,7 @@ void HttpResponse::warning(const QString &warn_text)
     }
 }
 
-HttpResponse::~HttpResponse()
+HttpOutResponse::~HttpOutResponse()
 {
     if(file_to_send)
     {

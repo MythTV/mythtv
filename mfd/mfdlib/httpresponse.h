@@ -18,7 +18,7 @@ using namespace std;
 #include <qfile.h>
 #include <FLAC/all.h>
 
-#include "httprequest.h"
+#include "httpinrequest.h"
 #include "clientsocket.h"
 
 enum FileSendTransformation {
@@ -28,13 +28,13 @@ enum FileSendTransformation {
 
 
 
-class HttpResponse
+class HttpOutResponse
 {
 
   public:
 
-    HttpResponse(MFDHttpPlugin *owner, HttpRequest *requestor);
-    ~HttpResponse();
+    HttpOutResponse(MFDHttpPlugin *owner, HttpInRequest *requestor);
+    ~HttpOutResponse();
     
     void setError(int error_number);
     void send(MFDServiceClientSocket *which_client);
@@ -77,7 +77,7 @@ class HttpResponse
     std::vector<char> payload;
 
     QDict<HttpHeader> headers;
-    HttpRequest       *my_request;
+    HttpInRequest       *my_request;
     MFDHttpPlugin     *parent; 
     
     

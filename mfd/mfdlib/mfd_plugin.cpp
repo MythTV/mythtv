@@ -1038,7 +1038,7 @@ void MFDHttpPlugin::processRequest(MFDServiceClientSocket *a_client)
             length = MAX_CLIENT_INCOMING;
         }
 
-        HttpRequest *new_request = new HttpRequest(this, incoming, length);
+        HttpInRequest *new_request = new HttpInRequest(this, incoming, length);
         if(new_request->allIsWell())
         {
             //
@@ -1057,12 +1057,12 @@ void MFDHttpPlugin::processRequest(MFDServiceClientSocket *a_client)
 }
 
 
-void MFDHttpPlugin::handleIncoming(HttpRequest *, int)
+void MFDHttpPlugin::handleIncoming(HttpInRequest *, int)
 {
     warning("(httpd) called base class handleIncoming()");
 }
 
-void MFDHttpPlugin::sendResponse(int client_id, HttpResponse *http_response)
+void MFDHttpPlugin::sendResponse(int client_id, HttpOutResponse *http_response)
 {
     MFDServiceClientSocket *which_client = NULL;
 

@@ -24,10 +24,10 @@ class MetadataClient : public ServiceClient
                     const QString &l_ip_address,
                     uint l_port
                   );
+    ~MetadataClient();
 
     void handleIncoming();
-
-    ~MetadataClient();
+    void sendFirstRequest();
 
 };
 

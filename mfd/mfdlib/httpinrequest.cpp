@@ -1,5 +1,5 @@
 /*
-	httprequest.h
+	httpinrequest.h
 
 	(c) 2003 Thor Sigvaldason and Isaac Richards
 	Part of the mythTV project
@@ -13,11 +13,11 @@ using namespace std;
 
 #include <qstringlist.h>
 
-#include "httprequest.h"
+#include "httpinrequest.h"
 #include "httpresponse.h"
 #include "mfd_plugin.h"
 
-HttpRequest::HttpRequest(MFDHttpPlugin *owner, char *raw_incoming, int incoming_length)
+HttpInRequest::HttpInRequest(MFDHttpPlugin *owner, char *raw_incoming, int incoming_length)
 {
     parent = owner;
     raw_request = NULL;
@@ -32,16 +32,8 @@ HttpRequest::HttpRequest(MFDHttpPlugin *owner, char *raw_incoming, int incoming_
     //  Every request gets a response
     //
     
-    my_response = new HttpResponse(parent, this);
+    my_response = new HttpOutResponse(parent, this);
     
-    if(incoming_length > MAX_CLIENT_INCOMING)
-    {
-        parent->warning("http request too big .. this should not happen");
-        all_is_well = false;
-        return;
-    }
-
-
     //
     //  Make and fill storage for the raw incoming data
     //
@@ -61,7 +53,7 @@ HttpRequest::HttpRequest(MFDHttpPlugin *owner, char *raw_incoming, int incoming_
     
     int parse_point = 0;
     bool first_line = true;
-    char parsing_buffer[MAX_CLIENT_INCOMING];
+    char *parsing_buffer = new char[incoming_length + 1];
     while(readLine(&parse_point, parsing_buffer))
     {
         if(first_line)
@@ -165,10 +157,10 @@ HttpRequest::HttpRequest(MFDHttpPlugin *owner, char *raw_incoming, int incoming_
         }
     }
 
-
+    delete [] parsing_buffer;
 }
 
-int HttpRequest::readLine(int *parse_point, char *parsing_buffer)
+int HttpInRequest::readLine(int *parse_point, char *parsing_buffer)
 {
     int  amount_read = 0;
     bool keep_reading = true;
@@ -216,12 +208,12 @@ int HttpRequest::readLine(int *parse_point, char *parsing_buffer)
     return amount_read;
 }
 
-QString HttpRequest::getRequest()
+QString HttpInRequest::getRequest()
 {
     return raw_request_line;
 }
 
-QString HttpRequest::getHeader(const QString& field_label)
+QString HttpInRequest::getHeader(const QString& field_label)
 {
     HttpHeader *which_one = headers.find(field_label);
     if(which_one)
@@ -231,7 +223,7 @@ QString HttpRequest::getHeader(const QString& field_label)
     return NULL;
 }
 
-QString HttpRequest::getVariable(const QString& variable_name)
+QString HttpInRequest::getVariable(const QString& variable_name)
 {
     HttpGetVariable *which_one = get_variables.find(variable_name);
     if(which_one)
@@ -241,7 +233,7 @@ QString HttpRequest::getVariable(const QString& variable_name)
     return NULL;
 }
 
-void HttpRequest::printRequest()
+void HttpInRequest::printRequest()
 {
     cout << "==============================Debugging output==============================" << endl;
     cout << "HTTP request line was:" << endl;
@@ -250,7 +242,7 @@ void HttpRequest::printRequest()
     
 }
 
-void HttpRequest::printHeaders()
+void HttpInRequest::printHeaders()
 {
     //
     //  Debugging code to print all the headers that came in on this request
@@ -268,7 +260,7 @@ void HttpRequest::printHeaders()
     
 }
 
-void HttpRequest::printGetVariables()
+void HttpInRequest::printGetVariables()
 {
     //
     //  Debugging code to print all the headers that came in on this request
@@ -286,7 +278,7 @@ void HttpRequest::printGetVariables()
     
 }
 
-HttpRequest::~HttpRequest()
+HttpInRequest::~HttpInRequest()
 {
     if(raw_request)
     {

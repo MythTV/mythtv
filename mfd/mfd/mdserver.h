@@ -19,12 +19,12 @@
 
 class MFD;
 
-class MetadataServer : public MFDServicePlugin
+class MetadataServer : public MFDHttpPlugin
 {
     //
     //  Don't be confused by the fact that this inherits from
-    //  MFDServcePlugin. It is not dynamically loaded, but is part of the
-    //  mfd core (just so happens that MFDServicePlugin has most of the bits
+    //  MFDHttpPlugin. It is not dynamically loaded, but is part of the
+    //  mfd core (just so happens that MFDHttpPlugin has most of the bits
     //  and pieces we need for a metadata serving object already built in).
     //
 
@@ -34,7 +34,7 @@ class MetadataServer : public MFDServicePlugin
     ~MetadataServer();
 
     void    run();
-    void    doSomething(const QStringList &tokens, int socket_identifier);
+    void    handleIncoming(HttpInRequest *request, int client_id);
 
     void                         lockMetadata();
     void                         unlockMetadata();

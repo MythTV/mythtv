@@ -24,7 +24,7 @@ using namespace std;
 #include "../mfd/mfd.h"
 #include "requestthread.h"
 #include "clientsocket.h"
-#include "httprequest.h"
+#include "httpinrequest.h"
  
 class SocketBuffer
 {
@@ -252,8 +252,8 @@ class MFDHttpPlugin : public MFDServicePlugin
     ~MFDHttpPlugin();
 
     virtual void    processRequest(MFDServiceClientSocket *a_client);
-    virtual void    handleIncoming(HttpRequest *request, int client_id);
-    virtual void    sendResponse(int client_id, HttpResponse *http_response);
+    virtual void    handleIncoming(HttpInRequest *request, int client_id);
+    virtual void    sendResponse(int client_id, HttpOutResponse *http_response);
 };
 
 #endif

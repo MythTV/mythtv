@@ -33,20 +33,20 @@ class DaapServer: public MFDHttpPlugin
     DaapServer(MFD *owner, int identity);
     ~DaapServer();
 
-    void    handleIncoming(HttpRequest *request, int client_id);
-    void    parsePath(HttpRequest *http_request, DaapRequest *daap_request);
-    void    sendServerInfo(HttpRequest *http_request);
-    void    sendTag(HttpRequest *http_request, const Chunk& c);
-    void    sendLogin(HttpRequest *http_request, u32 session_id);
-    void    parseVariables(HttpRequest *http_request, DaapRequest *daap_request);
-    void    sendUpdate(HttpRequest *http_request, u32 database_version);
-    void    sendMetadata(HttpRequest *http_request, QString request_path, DaapRequest *daap_request);
-    void    sendDatabaseList(HttpRequest *http_request);
-    void    addItemToResponse(HttpRequest *http_request, DaapRequest *daap_request, TagOutput &response, AudioMetadata *which_item, u64 meta_codes);
-    void    sendDatabase(HttpRequest *http_request, DaapRequest *daap_request, int which_database);
-    void    sendDatabaseItem(HttpRequest *http_request, u32 song_id, DaapRequest *daap_request);
-    void    sendContainers(HttpRequest *http_request, DaapRequest *daap_request, int which_database);
-    void    sendContainer(HttpRequest *http_request, u32 container_id, int which_database);
+    void    handleIncoming(HttpInRequest *request, int client_id);
+    void    parsePath(HttpInRequest *http_request, DaapRequest *daap_request);
+    void    sendServerInfo(HttpInRequest *http_request);
+    void    sendTag(HttpInRequest *http_request, const Chunk& c);
+    void    sendLogin(HttpInRequest *http_request, u32 session_id);
+    void    parseVariables(HttpInRequest *http_request, DaapRequest *daap_request);
+    void    sendUpdate(HttpInRequest *http_request, u32 database_version);
+    void    sendMetadata(HttpInRequest *http_request, QString request_path, DaapRequest *daap_request);
+    void    sendDatabaseList(HttpInRequest *http_request);
+    void    addItemToResponse(HttpInRequest *http_request, DaapRequest *daap_request, TagOutput &response, AudioMetadata *which_item, u64 meta_codes);
+    void    sendDatabase(HttpInRequest *http_request, DaapRequest *daap_request, int which_database);
+    void    sendDatabaseItem(HttpInRequest *http_request, u32 song_id, DaapRequest *daap_request);
+    void    sendContainers(HttpInRequest *http_request, DaapRequest *daap_request, int which_database);
+    void    sendContainer(HttpInRequest *http_request, u32 container_id, int which_database);
     void    handleMetadataChange(int which_collection);
 
     DaapSessions daap_sessions;

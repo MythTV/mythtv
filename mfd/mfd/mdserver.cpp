@@ -20,7 +20,7 @@ using namespace std;
 #include "../mfdlib/mfd_events.h"
 
 MetadataServer::MetadataServer(MFD* owner, int port)
-               :MFDServicePlugin(owner, -1, port, "metadata server")
+               :MFDHttpPlugin(owner, -1, port, "metadata server", 2)
 {
     metadata_containers = new QPtrList<MetadataContainer>;
     metadata_containers->setAutoDelete(true);
@@ -81,25 +81,20 @@ void MetadataServer::run()
     }
 }
 
-void MetadataServer::doSomething(const QStringList &tokens, int socket_identifier)
+
+void MetadataServer::handleIncoming(HttpInRequest *request, int client_id)
 {
-    bool ok = false;
-
-    if(tokens.count() < 1)
-    {
-        ok = false;
-    }
-    else if(tokens[0] == "check" && tokens.count() == 1)
-    {
-        ok = true;
-        //checkMetadata();
-    }
-
-    if(!ok)
-    {
-        warning(QString("did not understand these tokens: %1").arg(tokens.join(" ")));
-        huh(tokens, socket_identifier);
-    }
+    //
+    //  The MfdHttpPlugin class ensures that this function gets called in
+    //  it's own thread (from a dynamic pool). So we have to be very careful
+    //  about anything that gets called from here!
+    //
+    
+    //  MdcapRequest *mdcap_request = new MdcapRequest();
+    
+    cout << " we are in handleIncoming with an httpRequest " << endl;
+    
+    
 }
 
 void MetadataServer::lockMetadata()
