@@ -28,6 +28,13 @@
    </button>
 
    <button>
+     <type>VIDEO</type>
+     <text>Videos</text>
+     <action>EXEC mythvideo</action>
+     <depends>mythexplorer-settings.txt</depends>
+   </button>
+
+   <button>
      <type>WEATHER</type>
      <text>Weather</text>
      <action>EXEC mythweather</action>
