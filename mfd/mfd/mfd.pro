@@ -1,8 +1,8 @@
+include ( ../settings.pro )
+
 INCLUDEPATH += ../mfdlib
 DEPENDPATH += ../mfdlib
-LIBS += -Wl,--export-dynamic $$EXTRA_LIBS -L../mfdlib/ -lmfdlib -Wl,-rpath,${PREFIX}/lib
-
-include ( ../settings.pro )
+LIBS += -Wl,--export-dynamic $$EXTRA_LIBS -L../mfdlib/ -lmfdlib -Wl,-rpath,$${PREFIX}/lib
 
 !exists(../config.pro ) {
     error(Missing config.pro: please run the configure script)

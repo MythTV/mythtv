@@ -5,5 +5,5 @@ metadata that is available on the local network.
 
     The point is that the metadata held by the mfd will always reflect all
 audio content available anywhere on the network (whether from other mfd's,
-or from anything else that happens to be serving it, e.g. iTunes).
+or from anything else that happens to be serving it).
 

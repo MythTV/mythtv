@@ -532,7 +532,7 @@ void DaapInstance::doServerInfoResponse(TagInput& dmap_data)
                 
                 dmap_data >> a_string;
                 {
-                    QString q_string = QString(a_string);
+                    QString q_string = QString(a_string.c_str());
                     if(q_string != service_name)
                     {
                         warning(QString("daap instance got conflicting names for "
