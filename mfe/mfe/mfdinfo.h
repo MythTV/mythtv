@@ -48,6 +48,8 @@ class MfdInfo
     bool                    getPauseState(){return pause_state;}
 
     bool                    knowsWhatsPlaying(){return knows_whats_playing;}
+    bool                    isStopped(){return is_stopped;}
+    void                    isStopped(bool yon){is_stopped = yon;}
     
   private:
   
@@ -65,6 +67,7 @@ class MfdInfo
     QString playing_string;
     double      played_percentage;
     bool        pause_state;
+    bool        is_stopped;
 };
 
 

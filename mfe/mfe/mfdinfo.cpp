@@ -24,6 +24,7 @@ MfdInfo::MfdInfo( int an_id, const QString &a_name, const QString &a_host)
     current_container = -1;
     current_item = -1;
     current_elapsed = -1;
+    is_stopped = true;
 }
 
 AudioMetadata*  MfdInfo::getAudioMetadata(int collection_id, int item_id)

@@ -525,11 +525,16 @@ void MfeDialog::paused(int which_mfd, bool paused)
     if(relevant_mfd)
     {
         relevant_mfd->setPauseState(paused);
+        if(paused)
+        {
+            relevant_mfd->isStopped(false);
+        }
         if(relevant_mfd == current_mfd)
         {
             if(paused)
             {
                 pause_button->show();
+                
             }
             else
             {
@@ -552,6 +557,7 @@ void MfeDialog::stopped(int which_mfd)
     {
         relevant_mfd->clearCurrentPlayingData();
         relevant_mfd->setPauseState(false);
+        relevant_mfd->isStopped(true);
         if(relevant_mfd == current_mfd)
         {
             now_playing_text->SetText("");
@@ -597,6 +603,7 @@ void MfeDialog::playing(
     if(relevant_mfd)
     {
         relevant_mfd->setCurrentPlayingData(container_id, metadata_id, seconds);
+        relevant_mfd->isStopped(false);
         if(relevant_mfd == current_mfd)
         {
             now_playing_text->SetText(current_mfd->getPlayingString());
@@ -657,12 +664,34 @@ void MfeDialog::syncToCurrentMfd()
         //  Update the now playing text
         //
         
-        if(!current_mfd->knowsWhatsPlaying())
+        if(current_mfd->isStopped())
         {
-            current_mfd->setCurrentPlayingData();
+            play_button->hide();
+            pause_button->hide();
+            stop_button->show();
+            now_playing_text->SetText("");
+            time_progress->SetUsed(0);
         }
-        now_playing_text->SetText(current_mfd->getPlayingString());
-        time_progress->SetUsed((int)(current_mfd->getPercentPlayed() * 1000));
+        else
+        {
+            stop_button->hide();
+            play_button->show();
+            if(!current_mfd->knowsWhatsPlaying())
+            {
+                current_mfd->setCurrentPlayingData();
+            }
+            now_playing_text->SetText(current_mfd->getPlayingString());
+            time_progress->SetUsed((int)(current_mfd->getPercentPlayed() * 1000));
+            if(current_mfd->getPauseState())
+            {
+                pause_button->show();
+            }
+            else
+            {
+                pause_button->hide();
+            }
+        }
+        
     }
     else
     {
