@@ -10,7 +10,12 @@
 using namespace std;
 
 #include <sys/stat.h>
+#ifdef linux
 #include <sys/vfs.h>
+#else
+#include <sys/param.h>
+#include <sys/mount.h>
+#endif
 
 #include "autoexpire.h"
 
