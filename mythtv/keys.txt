@@ -222,6 +222,11 @@ Watch Recordings Screen
 -----------------------
 
 - "1" or F1 to get a popup on the meaning of the icons
+- / to tag a recording.  Tagged recordings can be played (in order or
+    shuffled) and deleted as a group.  You can also change the
+    recording group for several recordings at once by tagging them and
+    using the popup INFO menu to change the recording group.
+- ? to clear the tagged list.
 
 Remote Controls
 ---------------
