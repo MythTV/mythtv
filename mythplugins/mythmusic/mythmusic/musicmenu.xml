@@ -1,4 +1,4 @@
-<mythmenu>
+<mythmenu name="MUSIC">
 
    <button>
       <type>MUSIC_PLAYLIST</type>
