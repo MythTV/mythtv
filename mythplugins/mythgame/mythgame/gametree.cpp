@@ -117,7 +117,7 @@ void GameTree::buildGameList(void)
 
                 rinfo->setGamename(query.value(0).toString());
                 rinfo->setSystem(query.value(1).toString());
-                rinfo->fillData(db);
+                rinfo->fillData();
             }
             else
             {
