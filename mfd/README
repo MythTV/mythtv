@@ -14,7 +14,7 @@ INSTALL:
 
 RUN:
 
-    to start it: mfd
+    to start it: mfd -l 10  (log with verbosity equal to 10)
     to stop it:  mfdctl stop
 
     You can just CTRL-C the daemon, but other zeroconfig-aware applications

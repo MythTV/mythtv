@@ -1,10 +1,10 @@
 /*
-	httpresponse.h
+    httpresponse.h
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
-	Part of the mythTV project
-	
-	Methods for an object to buildup http responses
+    (c) 2003 Thor Sigvaldason and Isaac Richards
+    Part of the mythTV project
+    
+    Methods for an object to buildup http responses
 
 */
 
@@ -15,8 +15,26 @@ using namespace std;
 
 #include <qdatetime.h>
 
+#include <vorbis/vorbisfile.h>
+
 #include "httpresponse.h"
 #include "mfd_plugin.h"
+
+
+
+//
+//  Couple of WRITE_ macros that help us create WAV headers 
+//
+
+#define WRITE_U32(buf, x) *(buf)     = (unsigned char)((x)&0xff);\
+                          *((buf)+1) = (unsigned char)(((x)>>8)&0xff);\
+                          *((buf)+2) = (unsigned char)(((x)>>16)&0xff);\
+                          *((buf)+3) = (unsigned char)(((x)>>24)&0xff);
+
+#define WRITE_U16(buf, x) *(buf)     = (unsigned char)((x)&0xff);\
+                          *((buf)+1) = (unsigned char)(((x)>>8)&0xff);
+
+
 
 HttpResponse::HttpResponse(MFDHttpPlugin *owner, HttpRequest *requestor)
 {
@@ -30,6 +48,7 @@ HttpResponse::HttpResponse(MFDHttpPlugin *owner, HttpRequest *requestor)
     range_begin = -1;
     range_end = -1;
     total_possible_range = -1;
+    stored_skip = 0;
     file_to_send = NULL;
     file_transformation = FILE_TRANSFORM_NONE;
 }
@@ -240,14 +259,14 @@ void HttpResponse::createHeaderBlock(
         addText(header_block, content_ranges_header);
         
         //
-        //  If the request that lead to this response was an Accept-Ranges:
-        //  request (eg. seeking in an mp3) explain the byte ranges returned
+        //  If the request that lead to this response was a Range: request
+        //  (eg. seeking in a file) explain the byte ranges returned
         //
         
         if(my_request)
         {
             if(
-                // my_request->getHeader("Range") &&
+                my_request->getHeader("Range") &&
                 range_begin          > -1 &&
                 range_end            > -1 &&
                 total_possible_range > -1
@@ -305,98 +324,38 @@ void HttpResponse::createHeaderBlock(
 
 void HttpResponse::send(MFDServiceClientSocket *which_client)
 {
-    std::vector<char> header_block;
 
     if(file_to_send)
     {
         //
-        //  We are sending a file, not the payload in memory
+        //  We are sending a file, not the payload in memory!
+        //  Call the relevant function to stream this file
         //
-
-        createHeaderBlock(&header_block, (range_end - range_begin) + 1);
-
-        //
-        //  Seek to where we need to be
-        //
-
-        if(!file_to_send->at(range_begin))
+        
+        if(file_transformation == FILE_TRANSFORM_NONE)
         {
-            if(parent)
-            {
-    	        parent->warning("httpresponse could not seek in a "
-	                            "file it was asked to send. This is bad.");
-	        }
-	        
-	        //
-	        //  This is bad. We're already in send() ... oh well
-	        //
-	        
-            file_to_send->close();
-            delete file_to_send;
-            file_to_send = NULL;
-            return;
+            streamFile(which_client);
         }
-    
-        if(!sendBlock(which_client, header_block))
+        else if(file_transformation == FILE_TRANSFORM_TOWAV)
         {
-            if(parent)
-            {
-                parent->warning("httpresponse could not send header block to client");
-            }
-
-            file_to_send->close();
-            delete file_to_send;
-            file_to_send = NULL;
-            return;
+            convertToWavAndStreamFile(which_client);
+        }
+        else
+        {
+            //
+            //  Should not happen
+            //
             
-        }
-
-        int  len;
-	    char buf[10000];
-
-        len = file_to_send->readBlock(buf, 10000);
-        while(len > 0)
-        {
-            payload.clear();
-            payload.insert(payload.begin(), buf, buf + len);
-            if(!sendBlock(which_client, payload))
+            if(parent)
             {
-                //
-                //  Stop sending 
-                //
-                
-                if(parent)
-                {
-                    parent->log("httpresponse failed to send block "
-                                "while streaming file (client gone?)", 9);
-                }
-
-                len = 0;
+                parent->warning("httpresponse got an invalid conversion value");
             }
-            else
-            {
-        		len = file_to_send->readBlock(buf, 10000);
-            }
-	
-	        if(parent)
-		    {
-    		    if(!parent->keepGoing())
-	    	    {
-		            //
-		            //  Oh crap, we're shutting down
-		            //
-
-                    parent->log("httpresponse aborted reading a file to send because it thinks its time to shut down", 6);
-		            file_to_send->close();
-		            delete file_to_send;
-		            file_to_send = NULL;
-		            return;
-		        }
-		    }
         }
+        
         file_to_send->close();
         delete file_to_send;
         file_to_send = NULL;
+
     }
     else
     {
@@ -404,6 +363,7 @@ void HttpResponse::send(MFDServiceClientSocket *which_client)
         //  Send already created payload
         //
 
+        std::vector<char> header_block;
         createHeaderBlock(&header_block, payload.size());
 
         //
@@ -545,8 +505,20 @@ void HttpResponse::setPayload(char *new_payload, int new_payload_size)
     payload.insert(payload.end(), new_payload, new_payload + new_payload_size);
 }
 
-void HttpResponse::sendFile(QString file_path, int skip)
+void HttpResponse::sendFile(QString file_path, int skip, FileSendTransformation transform)
 {
+    //
+    //  Store the skip value (in case we need it later for a transformed file stream)
+    //
+    
+    stored_skip = skip;
+    
+    //
+    //  Store whatever transformation has been requested
+    //
+    
+    file_transformation = transform;
+    
     //
     //  Because we're sending a file, we need to fill in the boundaries of
     //  the file size, so that the client can send seeking requests.
@@ -557,11 +529,13 @@ void HttpResponse::sendFile(QString file_path, int skip)
     {
         if(parent)
         {
-    	    parent->warning(QString("httpresponse was asked to send "
-	                                "a file that does not exist: %1")
-	                                .arg(file_path.local8Bit()));
-	    }
-	    setError(404);
+            parent->warning(QString("httpresponse was asked to send "
+                                    "a file that does not exist: %1")
+                                    .arg(file_path.local8Bit()));
+        }
+        setError(404);
+        delete file_to_send;
+        file_to_send = NULL;
         return;
     }
 
@@ -583,14 +557,18 @@ void HttpResponse::sendFile(QString file_path, int skip)
 
     total_possible_range = file_to_send->size();
 
+    //
+    //  Do some checking to see if the file is actually available
+    //
+
     if(!file_to_send->open(IO_ReadOnly | IO_Raw))
     {
         if(parent)
         {
-    	    parent->warning(QString("httpresponse could not open (permissions?) a "
-	                                "file it was asked to send: %1")
-	                                .arg(file_path.local8Bit()));
-	    }
+            parent->warning(QString("httpresponse could not open (permissions?) a "
+                                    "file it was asked to send: %1")
+                                    .arg(file_path.local8Bit()));
+        }
         setError(404);
         delete file_to_send;
         file_to_send = NULL;
@@ -603,7 +581,351 @@ void HttpResponse::sendFile(QString file_path, int skip)
 
 
 }
+
+
+void HttpResponse::streamFile(MFDServiceClientSocket *which_client)
+{
+
+    std::vector<char> header_block;
+
+    //
+    //  Seek to where we need to be
+    //
+
+    if(!file_to_send->at(range_begin))
+    {
+        if(parent)
+        {
+            parent->warning("httpresponse could not seek in a "
+                            "file it was asked to send. This is bad.");
+        }
+            
+        setError(404);
+        createHeaderBlock(&header_block, 0);
+        sendBlock(which_client, header_block);
+        return;
+    }
     
+    createHeaderBlock(&header_block, (range_end - range_begin) + 1);
+    if(!sendBlock(which_client, header_block))
+    {
+        if(parent)
+        {
+            parent->warning("httpresponse could not send header block to client");
+        }
+
+        return;
+            
+    }
+
+    int  len;
+    char buf[8192];
+
+    len = file_to_send->readBlock(buf, 8192);
+    while(len > 0)
+    {
+        payload.clear();
+        payload.insert(payload.begin(), buf, buf + len);
+        if(!sendBlock(which_client, payload))
+        {
+            //
+            //  Stop sending 
+            //
+                
+            if(parent)
+            {
+                parent->log("httpresponse failed to send block "
+                            "while streaming file (client gone?)", 9);
+            }
+
+            return;
+        }
+        else
+        {
+            len = file_to_send->readBlock(buf, 8192);
+        }
+
+        if(parent)
+        {
+            //
+            //  Check to see if our parent is trying to stop 
+            //
+            
+            if(!parent->keepGoing())
+            {
+                //
+                //  Oh crap, we're shutting down
+                //
+
+                parent->log("httpresponse aborted reading a file to send because it thinks its time to shut down", 6);
+                return;
+            }
+        }
+    }
+}
+
+void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_client)
+{
+    std::vector<char> header_block;
+
+    if(file_to_send->name().section(".", -1, -1) == "ogg")
+    {
+        //
+        //  Decode and send an ogg. This is pretty much taken from the
+        //  vorbistools example program oggdec, which is Copyright 2002,
+        //  Michael Smith <msmith@labyrinth.net.au>
+        //
+        
+        OggVorbis_File ov_file;
+        FILE *input_file = fopen(file_to_send->name().ascii(), "rb");
+        if(!input_file)
+        {
+            if(parent)
+            {
+                parent->warning(QString("while trying to convert ogg to wav "
+                                        "and stream it, httpresponse could "
+                                        "not open file: %1")
+                                        .arg(file_to_send->name().ascii()));
+            }
+            setError(404);
+            createHeaderBlock(&header_block, 0);
+            sendBlock(which_client, header_block);
+            return;
+        }
+        
+        if(ov_open(input_file, &ov_file, NULL, 0) < 0)
+        {
+            //
+            //  Crap, this is not really an ogg file.
+            //
+
+            if(parent)
+            {
+                parent->warning(QString("httpresponse does not really think "
+                                        "this file is an ogg: %1 ")
+                                        .arg(file_to_send->name().ascii()));
+            }
+            setError(404);
+            createHeaderBlock(&header_block, 0);
+            sendBlock(which_client, header_block);
+            fclose(input_file);
+            return;
+        }
+        
+        //
+        //  Figure out the PCM length of this file with the 44 bytes
+        //  required for a WAV header. Note that this assumes the bits per
+        //  sample will always be 16.
+        //
+        
+        int64_t final_file_size = 44 +
+                                ((
+                                ov_pcm_total(&ov_file, 0) *
+                                ov_info(&ov_file, 0)->channels *
+                                16
+                                ) / 8 );
+
+        //
+        //  Do some calculations to deal with range requests. 
+        //
+        
+        range_begin = stored_skip;
+
+        range_begin = stored_skip;
+        range_end = final_file_size - 1;
+        if(range_end < 0)
+        {
+            range_end = 0;
+        }
+        if(range_begin > range_end)
+        {
+            range_begin = 0;
+        }
+
+        total_possible_range = final_file_size;
+        if(range_begin > 0 && range_begin < 44)
+        {
+            if(parent)
+            {
+                parent->warning("client asked to seek in an wav "
+                                "stream to somewhere inside the "
+                                "header");
+            }
+            range_begin = 44;
+        }
+        
+        //
+        //  Now that we know the size, we can make and send the header block
+        //
+        
+        createHeaderBlock(&header_block, ((int) (range_end - range_begin) + 1));
+        if(!sendBlock(which_client, header_block))
+        {
+            if(parent)
+            {
+                parent->warning("httpresponse was not able to send "
+                                "an http header for an ogg stream");
+            }
+            ov_clear(&ov_file);
+            fclose(input_file);
+            return;
+        }
+
+        int bits = 16;
+        if(range_begin == 0)
+        {
+            //
+            //  Build the wav header, but only if the client hasn't already
+            //  asked to seek to a point beyond it
+            //
+        
+            unsigned char headbuf[44];
+
+            int channels = ov_info(&ov_file,0)->channels;
+            int samplerate = ov_info(&ov_file,0)->rate;
+            int bytespersec = channels*samplerate*bits/8;
+            int align = channels*bits/8;
+            int samplesize = bits;
+                   
+            memcpy(headbuf, "RIFF", 4);
+            WRITE_U32(headbuf+4, final_file_size-8);
+            memcpy(headbuf+8, "WAVE", 4);
+            memcpy(headbuf+12, "fmt ", 4);
+            WRITE_U32(headbuf+16, 16);
+            WRITE_U16(headbuf+20, 1); /* format */
+            WRITE_U16(headbuf+22, channels);
+            WRITE_U32(headbuf+24, samplerate);
+            WRITE_U32(headbuf+28, bytespersec);
+            WRITE_U16(headbuf+32, align);
+            WRITE_U16(headbuf+34, samplesize);
+            memcpy(headbuf+36, "data", 4);
+            WRITE_U32(headbuf+40, final_file_size - 44);
+
+            payload.clear();
+        
+            payload.insert(payload.begin(), headbuf, headbuf + 44);
+        
+            if(!sendBlock(which_client, payload))
+            {
+                if(parent)
+                {
+                    parent->warning("httpresponse was not able to send "
+                                    "a wav header");
+                }
+                fclose(input_file);
+                ov_clear(&ov_file);
+                return;
+            }
+        }
+        
+        //
+        //  Seek to where we need to be
+        //
+
+        ogg_int64_t ogg_seek_location = 0;
+        
+        if(range_begin > 43 && ov_info(&ov_file, 0)->channels > 0)
+        {
+            ogg_seek_location= (range_begin - 44) 
+                               / 
+                               ((
+                                ov_info(&ov_file, 0)->channels *
+                                16
+                               ) / 8 );
+        }
+        
+        int seek_result = ov_pcm_seek(&ov_file, ogg_seek_location);
+        
+        if(seek_result != 0)
+        {
+                if(parent)
+                {
+                    parent->warning("httpresponse was not able to seek "
+                                    "in an ogg file");
+                }
+                fclose(input_file);
+                ov_clear(&ov_file);
+                return;
+        }
+
+
+        //
+        //  Decode and stream it out
+        //
+        
+        char buf[8192];
+        int buflen = 8192;
+        int section = 0;
+        int len;
+
+        len = ov_read(&ov_file, buf, buflen, 0, bits/8, 1, &section);
+        while(len != 0)
+        {
+            payload.clear();
+            payload.insert(payload.begin(), buf, buf + len);
+            if(!sendBlock(which_client, payload))
+            {
+                //
+                //  Stop sending 
+                //
+                
+                if(parent)
+                {
+                    parent->log("httpresponse failed to send block "
+                                "while streaming ogg file (client gone?)", 9);
+                }
+
+                len = 0;
+            }
+            else
+            {
+                len = ov_read(&ov_file, buf, buflen, 0, bits/8, 1, &section);
+            }
+
+            if(parent)
+            {
+                //
+                //  Check to see if our parent is trying to stop 
+                //
+            
+                if(!parent->keepGoing())
+                {
+                    //
+                    //  Oh crap, we're shutting down
+                    //
+
+                    parent->log(QString("httpresponse aborted reading a file "
+                                        "to send because it thinks its time "
+                                        "to shut down"), 6);
+                    len = 0;
+                }
+            }
+            if(section != 0)
+            {
+                if(parent)
+                {
+                    parent->warning(QString("httpresponse encountered multiple "
+                                            "sections in an ogg file and doesn't "
+                                            "really know what it should do ..."));
+                }
+                len = 0;
+            }
+            if(len < 0)
+            {
+                if(parent)
+                {
+                    parent->warning(QString("httpresponse found hole in an ogg "
+                                            "file ... will try to keep going"));
+                }
+            }
+        }
+        
+        ov_clear(&ov_file);
+        fclose(input_file);
+    }
+    
+}
+
 HttpResponse::~HttpResponse()
 {
     headers.clear();

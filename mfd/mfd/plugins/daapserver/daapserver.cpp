@@ -483,7 +483,7 @@ void DaapServer::sendMetadata(HttpRequest *http_request, QString request_path, D
                 u32 song_id = cut_down.toULong(&ok);
                 if(ok)
                 {
-                    sendDatabaseItem(http_request, song_id);
+                    sendDatabaseItem(http_request, song_id, daap_request);
                 }
                 else
                 {
@@ -689,20 +689,8 @@ void DaapServer::sendDatabase(HttpRequest *http_request, DaapRequest *daap_reque
                         
                                 if(meta_codes & DAAP_META_SONGDISABLED)
                                 {
-                                    //
-                                    //  Change this soon
-                                    //
-
-                                    if(which_item->getUrl().fileName().section('.', -1,-1) == "mp3")
-                                    {
-                                        response << Tag('asdb') << (u8) 0 << end;
-                                    }
-                                    else
-                                    {
-                                        response << Tag('asdb') << (u8) 1 << end;
-                                    }
+                                    response << Tag('asdb') << (u8) 0 << end;
                                 }
-
                                 if(meta_codes & DAAP_META_SONGEQPRESET)
                                 {
                                     //
@@ -710,19 +698,28 @@ void DaapServer::sendDatabase(HttpRequest *http_request, DaapRequest *daap_reque
 
                                 if(meta_codes & DAAP_META_SONGFORMAT)
                                 {
-                                    //
-                                    //  Change this soon
-                                    //
-
                                     if(which_item->getUrl().fileName().section('.', -1,-1) == "mp3")
                                     {
                                         response << Tag('asfm') << "mp3" << end;
+                                    }
+                                    else if(which_item->getUrl().fileName().section('.', -1,-1) == "mp4")
+                                    {
+                                        response << Tag('asfm') << "mp4" << end;
+                                    }
+                                    else if(which_item->getUrl().fileName().section('.', -1,-1) == "aac")
+                                    {
+                                        response << Tag('asfm') << "aac" << end;
+                                    }
+                                    else if(which_item->getUrl().fileName().section('.', -1,-1) == "m4a")
+                                    {
+                                        response << Tag('asfm') << "m4a" << end;
                                     }
                                     else
                                     {
                                         response << Tag('asfm') << "wav" << end;
                                     }
                                 }
+
                         
                                 if(meta_codes & DAAP_META_SONGGENRE)
                                 {
@@ -817,7 +814,7 @@ void DaapServer::sendDatabase(HttpRequest *http_request, DaapRequest *daap_reque
     sendTag( http_request, response.data() );
 }
 
-void DaapServer::sendDatabaseItem(HttpRequest *http_request, u32 song_id)
+void DaapServer::sendDatabaseItem(HttpRequest *http_request, u32 song_id, DaapRequest *daap_request)
 {
     
 
@@ -863,7 +860,40 @@ void DaapServer::sendDatabaseItem(HttpRequest *http_request, u32 song_id)
                 }
             }
             
-            http_request->getResponse()->sendFile(file_path, skip);
+            //
+            //  Now, to send the actual file. If the client is not of type
+            //  DAAP_CLIENT_MFDDAAPCLIENT (ie. another mfd's daap client),
+            //  then we need to decode some file formats on the fly before
+            //  sending them.
+            //
+            
+            if(daap_request->getClientType() == DAAP_CLIENT_MFDDAAPCLIENT)
+            {
+                http_request->getResponse()->sendFile(file_path, skip);
+            }
+            else
+            {
+                //
+                //  The client is iTunes or an iTunes clone, translate non
+                //  mp3, ac3, etc. to wav format
+                //
+                
+                if(
+                    file_path.section('.', -1,-1) == "mp3" ||
+                    file_path.section('.', -1,-1) == "mp4" ||
+                    file_path.section('.', -1,-1) == "aac" ||
+                    file_path.section('.', -1,-1) == "m4a"
+                  )
+                {
+                    http_request->getResponse()->sendFile(file_path, skip);
+                }
+                else
+                {
+                    http_request->getResponse()->sendFile(file_path, skip, FILE_TRANSFORM_TOWAV);
+                }
+
+            }
+
 
         }
         else

@@ -40,13 +40,19 @@ class HttpResponse
     void send(MFDServiceClientSocket *which_client);
     void addHeader(const QString &new_header);
     void setPayload(char *new_payload, int new_payload_size);
-    void sendFile(QString file_path, int skip);
+    void sendFile(
+                    QString file_path, 
+                    int skip, 
+                    FileSendTransformation transform = FILE_TRANSFORM_NONE
+                 );
     
   private:
     
     void addText(std::vector<char> *buffer, QString text_to_add);
     void createHeaderBlock(std::vector<char> *header_block, int payload_size);
     bool sendBlock(MFDServiceClientSocket *which_client, std::vector<char> block_to_send);
+    void streamFile(MFDServiceClientSocket *which_client);
+    void convertToWavAndStreamFile(MFDServiceClientSocket *which_client);
 
     int     status_code;
     QString status_string;
@@ -63,9 +69,11 @@ class HttpResponse
     int     range_begin;
     int     range_end;
     int     total_possible_range;
+    int     stored_skip;
     
     QFile                  *file_to_send;
     FileSendTransformation file_transformation;
+    
 };
 
 #endif
