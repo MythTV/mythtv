@@ -273,14 +273,20 @@ bool HDTVRecorder::SetupRecording(void)
 
 void HDTVRecorder::FinishRecording(void)
 {
-    if (curRecording && positionMapDelta.size() && db_lock && db_conn)
+    if (curRecording && db_lock && db_conn)
     {
         pthread_mutex_lock(db_lock);
         MythContext::KickDatabase(db_conn);
-        curRecording->SetPositionMapDelta(positionMapDelta, MARK_GOP_BYFRAME,
-                                          db_conn);
+
+        curRecording->SetFilesize(ringBuffer->GetRealFileSize(), db_conn);
+        if (positionMapDelta.size())
+        {
+            curRecording->SetPositionMapDelta(positionMapDelta,
+                                              MARK_GOP_BYFRAME, db_conn);
+            positionMapDelta.clear();
+        }
+
         pthread_mutex_unlock(db_lock);
-        positionMapDelta.clear();
     }
 }
 
@@ -411,6 +417,8 @@ void HDTVRecorder::FindKeyframes(const unsigned char *buffer,
                                     curRecording->SetPositionMapDelta(
                                         positionMapDelta, MARK_GOP_BYFRAME,
                                         db_conn);
+                                    curRecording->SetFilesize(startpos,
+                                                              db_conn);
                                     pthread_mutex_unlock(db_lock);
                                     positionMapDelta.clear();
                                 }

@@ -7,7 +7,7 @@
 #include <qmap.h>
 #include "scheduledrecording.h"
 
-#define NUMPROGRAMLINES 35
+#define NUMPROGRAMLINES 36
 
 enum MarkTypes {
     MARK_UPDATED_CUT = -3,
@@ -141,6 +141,8 @@ class ProgramInfo
     bool FromStringList(QStringList &list, QStringList::iterator &it);
     void ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap);
 
+    void SetFilesize(long long fsize, QSqlDatabase *db);
+    long long GetFilesize(QSqlDatabase *db);
     void SetBookmark(long long pos, QSqlDatabase *db);
     long long GetBookmark(QSqlDatabase *db);
     bool IsEditing(QSqlDatabase *db);
@@ -227,6 +229,7 @@ class ProgramInfo
     QDateTime endts;
     QDateTime recstartts;
     QDateTime recendts;
+    QDateTime lastmodified;
 
     bool repeat;
 

@@ -8,7 +8,7 @@ using namespace std;
 
 #include "mythcontext.h"
 
-const QString currentDatabaseVersion = "1050";
+const QString currentDatabaseVersion = "1051";
 
 void UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -928,6 +928,30 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 ""
 };
         performActualUpdate(updates, "1050", dbver);
+    }
+
+    if (dbver == "1050")
+    {
+        const QString updates[] = {
+"ALTER TABLE recorded CHANGE starttime starttime DATETIME NOT NULL;",
+"ALTER TABLE recorded CHANGE endtime endtime DATETIME NOT NULL;",
+"ALTER TABLE recorded ADD COLUMN lastmodified TIMESTAMP NOT NULL;",
+"ALTER TABLE recorded ADD COLUMN filesize BIGINT(20) DEFAULT 0 NOT NULL;",
+"ALTER TABLE credits CHANGE starttime starttime DATETIME NOT NULL;",
+"ALTER TABLE oldprogram CHANGE airdate airdate DATETIME NOT NULL;",
+"ALTER TABLE oldrecorded CHANGE starttime starttime DATETIME NOT NULL;",
+"ALTER TABLE oldrecorded CHANGE endtime endtime DATETIME NOT NULL;",
+"ALTER TABLE program CHANGE starttime starttime DATETIME NOT NULL;",
+"ALTER TABLE program CHANGE endtime endtime DATETIME NOT NULL;",
+"ALTER TABLE programgenres CHANGE starttime starttime DATETIME NOT NULL;",
+"ALTER TABLE programrating CHANGE starttime starttime DATETIME NOT NULL;",
+"ALTER TABLE recordedmarkup CHANGE starttime starttime DATETIME NOT NULL;",
+"ALTER TABLE recordoverride CHANGE starttime starttime DATETIME NOT NULL;",
+"ALTER TABLE recordoverride CHANGE endtime endtime DATETIME NOT NULL;",
+"ALTER TABLE transcoding CHANGE starttime starttime DATETIME NOT NULL;",
+""
+};
+        performActualUpdate(updates, "1051", dbver);
     }
 }
 

@@ -660,6 +660,10 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
     bool islocal = pbs->isLocal();
     QString playbackhost = pbs->getHostname();
 
+    QString fs_db_name = "";
+    MythSqlDatabase *updatefs_mdb = NULL;
+    QSqlDatabase *updatefs_db = NULL;
+
     QString thequery;
 
     QString ip = gContext->GetSetting("BackendServerIP");
@@ -674,7 +678,8 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                "recorded.autoexpire,editing,bookmark,recorded.category,"
                "recorded.recgroup,record.dupin,record.dupmethod,"
                "record.recordid,outputfilters,"
-               "recorded.seriesid,recorded.programid "
+               "recorded.seriesid,recorded.programid,recorded.filesize, "
+               "recorded.lastmodified "
                "FROM recorded "
                "LEFT JOIN record ON recorded.recordid = record.recordid "
                "LEFT JOIN channel ON recorded.chanid = channel.chanid "
@@ -684,12 +689,12 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
         thequery += " DESC";
     thequery += ";";
 
-    
-    
     QSqlQuery query = m_db->exec(thequery);
 
     QStringList outputlist;
     QString fileprefix = gContext->GetFilePrefix();
+    QMap<QString, QString> backendIpMap;
+    QMap<QString, QString> backendPortMap;
 
     if (query.isActive() && query.numRowsAffected() > 0)
     {
@@ -717,6 +722,10 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             proginfo->chanOutputFilters = query.value(20).toString();
             proginfo->seriesid = query.value(21).toString();
             proginfo->programid = query.value(22).toString();
+            proginfo->filesize = query.value(23).toInt();
+            proginfo->lastmodified =
+                      QDateTime::fromString(query.value(24).toString(),
+                                            Qt::ISODate);
 
             if (proginfo->hostname.isEmpty() || proginfo->hostname.isNull())
                 proginfo->hostname = gContext->GetHostName();
@@ -768,13 +777,25 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                     proginfo->pathname = QString("myth://") + ip + ":" + port
                                          + "/" + proginfo->GetRecordBasename();
 
-                struct stat st;
+                if (proginfo->filesize == 0)
+                {
+                    struct stat st;
 
-                long long size = 0;
-                if (stat(lpath.ascii(), &st) == 0)
-                    size = st.st_size;
+                    long long size = 0;
+                    if (stat(lpath.ascii(), &st) == 0)
+                        size = st.st_size;
 
-                proginfo->filesize = size;
+                    proginfo->filesize = size;
+
+                    if (!updatefs_db)
+                    {
+                        fs_db_name = QString("updatefilesize%1%2")
+                                             .arg(getpid()).arg(rand());
+                        updatefs_mdb = new MythSqlDatabase(fs_db_name);
+                        updatefs_db = updatefs_mdb->db();
+                    }
+                    proginfo->SetFilesize(size, updatefs_db);
+                }
             }
             else
             {
@@ -788,7 +809,35 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                 }
                 else
                 {
-                    slave->FillProgramInfo(proginfo, playbackhost);
+                    if (proginfo->filesize == 0)
+                    {
+                        slave->FillProgramInfo(proginfo, playbackhost);
+
+                        if (!updatefs_db)
+                        {
+                            fs_db_name = QString("updatefilesize%1%2")
+                                                 .arg(getpid()).arg(rand());
+                            updatefs_mdb = new MythSqlDatabase(fs_db_name);
+                            updatefs_db = updatefs_mdb->db();
+                        }
+                        proginfo->SetFilesize(proginfo->filesize, updatefs_db);
+                    }
+                    else
+                    {
+                        ProgramInfo *p = proginfo;
+                        if (!backendIpMap.contains(p->hostname))
+                            backendIpMap[p->hostname] =
+                                gContext->GetSettingOnHost("BackendServerIp",
+                                                           p->hostname);
+                        if (!backendPortMap.contains(p->hostname))
+                            backendPortMap[p->hostname] =
+                                gContext->GetSettingOnHost("BackendServerPort",
+                                                           p->hostname);
+                        p->pathname = QString("myth://") +
+                                      backendIpMap[p->hostname] + ":" +
+                                      backendPortMap[p->hostname] + "/" +
+                                      p->GetRecordBasename();
+                    }
                 }
             }
 
@@ -801,6 +850,9 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
         outputlist << "0";
 
     dblock.unlock();
+
+    if (updatefs_mdb)
+        delete updatefs_mdb;
 
     SendResponse(pbssock, outputlist);
 }

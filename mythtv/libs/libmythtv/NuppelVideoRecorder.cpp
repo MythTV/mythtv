@@ -1760,15 +1760,22 @@ void NuppelVideoRecorder::WriteSeekTable(void)
 
     ringBuffer->WriterSeek(0, SEEK_END);
 
-    if (curRecording && positionMapDelta.size() && db_lock && db_conn)
+    if (curRecording && db_lock && db_conn)
     {
         pthread_mutex_lock(db_lock);
         MythContext::KickDatabase(db_conn);
-        curRecording->SetPositionMapDelta(positionMapDelta, MARK_KEYFRAME,
-                                          db_conn);
+
+        curRecording->SetFilesize(ringBuffer->GetRealFileSize(), db_conn);
+        if (positionMapDelta.size())
+        {
+            curRecording->SetPositionMapDelta(positionMapDelta, MARK_KEYFRAME,
+                                              db_conn);
+            positionMapDelta.clear();
+        } 
+
         pthread_mutex_unlock(db_lock);
-        positionMapDelta.clear();
     }
+
     delete [] seekbuf;
 }
 
@@ -1831,6 +1838,7 @@ void NuppelVideoRecorder::UpdateSeekTable(int frame_num, bool use_db, long offse
             MythContext::KickDatabase(db_conn);
             curRecording->SetPositionMapDelta(positionMapDelta, MARK_KEYFRAME,
                                               db_conn);
+            curRecording->SetFilesize(position, db_conn);
             pthread_mutex_unlock(db_lock);
             positionMapDelta.clear();
         }

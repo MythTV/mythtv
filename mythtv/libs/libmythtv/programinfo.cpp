@@ -35,6 +35,7 @@ ProgramInfo::ProgramInfo(void)
     endts = startts;
     recstartts = startts;
     recendts = startts;
+    lastmodified = startts;
 
     recstatus = rsUnknown;
     savedrecstatus = rsUnknown;
@@ -80,6 +81,7 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other)
     endts = other.endts;
     recstartts = other.recstartts;
     recendts = other.recendts;
+    lastmodified = other.lastmodified;
     spread = other.spread;
     startCol = other.startCol;
  
@@ -134,6 +136,7 @@ ProgramInfo &ProgramInfo::operator=(const ProgramInfo &other)
     endts = other.endts;
     recstartts = other.recstartts;
     recendts = other.recendts;
+    lastmodified = other.lastmodified;
     spread = other.spread;
     startCol = other.startCol;
 
@@ -213,6 +216,7 @@ void ProgramInfo::ToStringList(QStringList &list)
     list << ((chanOutputFilters != "") ? chanOutputFilters : QString(" "));
     list << ((seriesid != "") ? seriesid : QString(" "));
     list << ((programid != "") ? programid : QString(" "));
+    list << lastmodified.toString(Qt::ISODate);
 }
 
 bool ProgramInfo::FromStringList(QStringList &list, int offset)
@@ -265,6 +269,7 @@ bool ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
     chanOutputFilters = *(it++);
     seriesid = *(it++);
     programid = *(it++);
+    lastmodified = QDateTime::fromString(*(it++), Qt::ISODate);
 
     if (title == " ")
         title = "";
@@ -330,11 +335,25 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
     progMap["recstartdate"] = recstartts.toString(shortDateFormat);
     progMap["recendtime"] = recendts.toString(timeFormat);
     progMap["recenddate"] = recendts.toString(shortDateFormat);
+    progMap["lastmodifiedtime"] = lastmodified.toString(timeFormat);
+    progMap["lastmodifieddate"] = lastmodified.toString(dateFormat);
+    progMap["lastmodified"] = lastmodified.toString(dateFormat) + " " +
+                              lastmodified.toString(timeFormat);
+
     progMap["channum"] = chanstr;
     progMap["chanid"] = chanid;
     progMap["channel"] = ChannelText(channelFormat);
     progMap["longchannel"] = ChannelText(longChannelFormat);
     progMap["iconpath"] = "";
+
+    QString tmpSize;
+
+    tmpSize.sprintf("%0.2f ", filesize / 1024.0 / 1024.0 / 1024.0);
+    tmpSize += QObject::tr("GB", "GigaBytes");
+    progMap["filesize_str"] = tmpSize;
+
+    tmpSize.sprintf("%lld", filesize);
+    progMap["filesize"] = tmpSize;
 
     seconds = recstartts.secsTo(recendts);
     minutes = seconds / 60;
@@ -435,7 +454,8 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
     thequery = QString("SELECT recorded.chanid,starttime,endtime,title, "
                        "subtitle,description,channel.channum, "
                        "channel.callsign,channel.name,channel.commfree, "
-                       "channel.outputfilters,seriesid,programid "
+                       "channel.outputfilters,seriesid,programid,filesize, "
+                       "lastmodified "
                        "FROM recorded "
                        "LEFT JOIN channel "
                        "ON recorded.chanid = channel.chanid "
@@ -471,6 +491,10 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
         proginfo->chanOutputFilters = query.value(10).toString();
         proginfo->seriesid = query.value(11).toString();
         proginfo->programid = query.value(12).toString();
+        proginfo->filesize = query.value(13).toInt();
+        proginfo->lastmodified =
+                  QDateTime::fromString(query.value(14).toString(),
+                                        Qt::ISODate);
 
         proginfo->spread = -1;
 
@@ -862,6 +886,60 @@ void ProgramInfo::FinishedRecording(QSqlDatabase* db, bool prematurestop)
     GetProgramRecordingStatus(db);
     if (!prematurestop)
         record->doneRecording(db, *this);
+}
+
+void ProgramInfo::SetFilesize(long long fsize, QSqlDatabase *db)
+{
+    MythContext::KickDatabase(db);
+
+    char size[21];
+
+    filesize = fsize;
+    sprintf(size, "%lld", filesize);
+
+    QString starts = recstartts.toString("yyyyMMddhhmm");
+    starts += "00";
+
+    QString querystr;
+
+    querystr = QString("UPDATE recorded SET filesize = %1 "
+                       "WHERE chanid = '%2' AND starttime = '%3';")
+                       .arg(size)
+                       .arg(chanid)
+                       .arg(starts);
+
+    QSqlQuery query = db->exec(querystr);
+    if (!query.isActive())
+        MythContext::DBError("File size update", querystr);
+}
+
+long long ProgramInfo::GetFilesize(QSqlDatabase *db)
+{
+    MythContext::KickDatabase(db);
+
+    long long size = 0;
+
+    QString starts = recstartts.toString("yyyyMMddhhmm");
+    starts += "00";
+
+    QString querystr = QString("SELECT filesize FROM recorded WHERE "
+                               "chanid = '%1' AND starttime = '%2';")
+                              .arg(chanid).arg(starts);
+
+    QSqlQuery query = db->exec(querystr);
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        query.next();
+
+        QString result = query.value(0).toString();
+        if (result != QString::null)
+        {
+            sscanf(result.ascii(), "%lld", &size);
+        }
+    }
+
+    filesize = size;
+    return size;
 }
 
 void ProgramInfo::SetBookmark(long long pos, QSqlDatabase *db)
@@ -1434,8 +1512,8 @@ void ProgramInfo::SetPositionMap(QMap<long long, long long> &posMap, int type,
     }
 }
 
-void ProgramInfo::SetPositionMapDelta(QMap<long long, long long> &posMap, int type,
-                                      QSqlDatabase *db)
+void ProgramInfo::SetPositionMapDelta(QMap<long long, long long> &posMap,
+                                      int type, QSqlDatabase *db)
 {
     QMap<long long, long long>::Iterator i;
 
@@ -1455,8 +1533,8 @@ void ProgramInfo::SetPositionMapDelta(QMap<long long, long long> &posMap, int ty
        
         QString offset_str = tempc;
 
-        QString querystr = QString("INSERT INTO recordedmarkup (chanid, starttime, "
-                           "mark, type, offset) values "
+        QString querystr = QString("INSERT INTO recordedmarkup "
+                           "(chanid, starttime, mark, type, offset) VALUES "
                            "( '%1', '%2', %3, %4, \"%5\");")
                            .arg(chanid).arg(starts)
                            .arg(frame_str).arg(type)
@@ -2189,6 +2267,7 @@ bool ProgramList::FromProgram(QSqlDatabase *db, const QString sql,
                                          Qt::ISODate);
         p->recstartts = p->startts;
         p->recendts = p->endts;
+        p->lastmodified = p->startts;
         p->title = QString::fromUtf8(query.value(3).toString());
         p->subtitle = QString::fromUtf8(query.value(4).toString());
         p->description = QString::fromUtf8(query.value(5).toString());
