@@ -2098,14 +2098,15 @@ void TVRec::FlagCommercials(void)
 
 void TVRec::RetrieveInputChannels(map<int, QString> &inputChannel,
                                   map<int, QString> &inputTuneTo,
-                                  map<int, QString> &externalChanger)
+                                  map<int, QString> &externalChanger,
+                                  map<int, QString> &sourceid)
 {
     pthread_mutex_lock(&db_lock);
     MythContext::KickDatabase(db_conn);
 
     QString query = QString("SELECT inputname, trim(externalcommand), "
                             "if(tunechan='', 'Undefined', tunechan), "
-                            "if(startchan, startchan, '') "
+                            "if(startchan, startchan, ''), sourceid "
                             "FROM capturecard, cardinput "
                             "WHERE capturecard.cardid = %1 "
                             "AND capturecard.cardid = cardinput.cardid;")
@@ -2130,6 +2131,7 @@ void TVRec::RetrieveInputChannels(map<int, QString> &inputChannel,
             externalChanger[cap] = result.value(1).toString();
             inputTuneTo[cap] = result.value(2).toString();
             inputChannel[cap] = result.value(3).toString();
+            sourceid[cap] = result.value(4).toString();
         }
     }
 

@@ -117,6 +117,7 @@ void Channel::SetFormat(const QString &format)
             inputChannel[vin.index] = "";
             inputTuneTo[vin.index] = "";
             externalChanger[vin.index] = "";
+            sourceid[vin.index] = "";
             vin.index++;
 
             capchannels = vin.index;
@@ -140,7 +141,7 @@ void Channel::SetFormat(const QString &format)
             videomode = V4L2_STD_NTSC_M_JP;
 
         pParent->RetrieveInputChannels(inputChannel, inputTuneTo, 
-                                       externalChanger);
+                                       externalChanger, sourceid);
         return;
     }
  
@@ -189,6 +190,7 @@ void Channel::SetFormat(const QString &format)
         inputChannel[i] = "";
         inputTuneTo[i] = "";
         externalChanger[i] = "";
+        sourceid[i] = "";
     }
 
     struct video_channel vc;
@@ -199,7 +201,8 @@ void Channel::SetFormat(const QString &format)
 
     videomode = mode;
 
-    pParent->RetrieveInputChannels(inputChannel, inputTuneTo, externalChanger);
+    pParent->RetrieveInputChannels(inputChannel, inputTuneTo, externalChanger,
+                                   sourceid);
 }
 
 int Channel::SetDefaultFreqTable(const QString &name)
@@ -342,8 +345,10 @@ bool Channel::SetChannelByString(const QString &chan)
     QString thequery = QString("SELECT finetune, freqid, tvformat, freqtable "
                                "FROM channel "
                                "LEFT JOIN videosource USING (sourceid) "
-                               "WHERE channum = \"%1\";")
-                               .arg(chan);
+                               "WHERE channum = \"%1\" AND "
+                               "channel.sourceid = \"%2\";")
+                               .arg(chan)
+                               .arg(sourceid[currentcapchannel]);
 
     QSqlQuery query = db_conn->exec(thequery);
     if (!query.isActive())

@@ -83,7 +83,8 @@ class TVRec
 
     void RetrieveInputChannels(map<int, QString> &inputChannel,
                                map<int, QString> &inputTuneTo,
-                               map<int, QString> &externalChanger);
+                               map<int, QString> &externalChanger,
+                               map<int, QString> &sourceid);
     void StoreInputChannels(map<int, QString> &inputChannel);
 
     bool IsBusy(void);

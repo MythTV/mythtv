@@ -69,7 +69,7 @@ class ChannelBase
     map<int, QString> inputChannel;
     map<int, QString> inputTuneTo;
     map<int, QString> externalChanger;
-    // returns index of channame (channel.channum) in curList
+    map<int, QString> sourceid;
 
     QString channelorder;
 
