@@ -153,6 +153,7 @@ void FirewireRecorder::StartRecording(void) {
        FD_ZERO (&rfds);
        FD_SET (fwfd, &rfds);
        tv.tv_sec = FIREWIRE_TIMEOUT;
+       tv.tv_usec = 0;
 
        if(select (fwfd + 1, &rfds, NULL, NULL, &tv) > 0) {
             if(raw1394_loop_iterate(fwhandle) != 0) {
