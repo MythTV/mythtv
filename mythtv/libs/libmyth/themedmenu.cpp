@@ -19,6 +19,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "util.h"
 #include "mythplugin.h"
+#include "dialogbox.h"
 
 ThemedMenu::ThemedMenu(const char *cdir, const char *menufile, 
                        MythMainWindow *parent, const char *name)
@@ -1691,6 +1692,40 @@ void ThemedMenu::handleAction(QString &action)
     {
         QString rest = action.right(action.length() - 5);
         system(rest);
+    }
+    else if (action.left(7) == "EXECTV ")
+    {
+        QString rest = action.right(action.length() - 7).stripWhiteSpace();
+        QStringList strlist = QString("LOCK_TUNER");
+        gContext->SendReceiveStringList(strlist);
+        int cardid = strlist[0].toInt();
+
+        if (cardid >= 0)
+        {
+            rest = rest.sprintf(rest,
+                                (const char*)strlist[1],
+                                (const char*)strlist[2],
+                                (const char*)strlist[3]);
+
+            system(rest);
+
+            strlist = QString("FREE_TUNER %1").arg(cardid);
+            gContext->SendReceiveStringList(strlist);
+            QString ret = strlist[0];
+        }
+        else
+        {
+            if (cardid == -2)
+                cerr << "themedmenu.o: Tuner already locked" << endl;
+            
+            DialogBox *error_dialog = new DialogBox(gContext->GetMainWindow(),
+                    "\n\nAll tuners are currently in use. If you want to watch "
+                    "TV, you can cancel one of the in-progress recordings from "
+                    "the delete menu");
+            error_dialog->AddButton("OK");
+            error_dialog->exec();
+            delete error_dialog;
+        }
     }
     else if (action.left(5) == "MENU ")
     {

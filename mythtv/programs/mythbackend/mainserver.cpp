@@ -286,6 +286,18 @@ void MainServer::ProcessRequest(QSocket *sock)
     {
         HandleFillProgramInfo(listline, pbs);
     }
+    else if (command == "LOCK_TUNER")
+    {
+        HandleLockTuner(pbs);
+    }
+    else if (command == "FREE_TUNER")
+    {
+        if (tokens.size() != 2)
+            cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+                 << " Bad FREE_TUNER query" << endl;
+        else
+            HandleFreeTuner(tokens[1].toInt(), pbs);
+    }
     else if (command == "BACKEND_MESSAGE")
     {
         QString message = listline[1];
@@ -1042,6 +1054,122 @@ void MainServer::HandleGetConflictingRecordings(QStringList &slist,
     delete pginfo;
 }
 
+void MainServer::HandleLockTuner(PlaybackSock *pbs)
+{
+    QSocket *pbssock = pbs->getSocket();
+    QString pbshost = pbs->getHostname();
+
+    QStringList strlist;
+    int retval;
+    
+    EncoderLink *encoder = NULL;
+    QString enchost;
+    
+    QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
+    for (; iter != encoderList->end(); ++iter)
+    {
+        EncoderLink *elink = iter.data();
+
+        if (elink->isLocal())
+            enchost = gContext->GetHostName();
+        else
+            enchost = elink->getHostname();
+
+        if ((enchost == pbshost) &&
+            (elink->isConnected()) &&
+            (!elink->IsBusy()) &&
+            (!elink->isTunerLocked()))
+        {
+            encoder = elink;
+            break;
+        }
+    }
+    
+    if (encoder)
+    {
+        retval = encoder->LockTuner();
+
+        if (retval != -1)
+        {
+            QString msg = QString("Cardid %1 LOCKed for external use by '%2'.")
+                                  .arg(retval).arg(pbshost);
+            VERBOSE(msg);
+
+            QString querystr = QString("SELECT videodevice, audiodevice, "
+                                            "vbidevice "
+                                          "FROM capturecard "
+                                          "WHERE cardid = %1;")
+                                          .arg(retval);
+
+            QSqlQuery query = m_db->exec(querystr);
+
+            if (query.isActive() && query.numRowsAffected())
+            {
+                // Success
+                query.next();
+                strlist << QString::number(retval)
+                        << query.value(0).toString()
+                        << query.value(1).toString()
+                        << query.value(2).toString();
+
+                dblock.lock();
+                ScheduledRecording::signalChange(m_db);
+                dblock.unlock();
+
+                SendResponse(pbssock, strlist);
+                return;
+            }
+            else
+            {
+                cerr << "mainserver.o: Failed querying the db for a videodevice"
+                     << endl;
+            }
+        }
+        else
+        {
+            // Tuner already locked
+            strlist << "-2" << "" << "" << "";
+            SendResponse(pbssock, strlist);
+            return;
+        }
+    }
+
+    strlist << "-1" << "" << "" << "";
+    SendResponse(pbssock, strlist);
+}
+
+void MainServer::HandleFreeTuner(int cardid, PlaybackSock *pbs)
+{
+    QSocket *pbssock = pbs->getSocket();
+    QStringList strlist;
+    EncoderLink *encoder = NULL;
+    
+    QMap<int, EncoderLink *>::Iterator iter = encoderList->find(cardid);
+    if (iter == encoderList->end())
+    {
+        cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+        << " Unknown encoder " << cardid << endl;
+        strlist << "FAILED";
+    }
+    else
+    {
+        encoder = iter.data();
+        encoder->FreeTuner();
+        
+        QString msg = QString("Cardid %1 FREED from external use by '%2'.")
+                              .arg(cardid).arg(pbs->getHostname());
+        VERBOSE(msg);
+
+        dblock.lock();
+        ScheduledRecording::signalChange(m_db);
+        dblock.unlock();
+        
+        strlist << "OK";
+    }
+    
+    SendResponse(pbssock, strlist);
+}
+
 void MainServer::HandleGetFreeRecorder(PlaybackSock *pbs)
 {
     QSocket *pbssock = pbs->getSocket();
@@ -1063,13 +1191,19 @@ void MainServer::HandleGetFreeRecorder(PlaybackSock *pbs)
         else
             enchost = elink->getHostname();
 
-        if (enchost == pbshost && elink->isConnected() && !elink->IsBusy())
+        if ((enchost == pbshost) &&
+            (elink->isConnected()) &&
+            (!elink->IsBusy()) &&
+            (!elink->isTunerLocked()))
         {
             encoder = elink;
             retval = iter.key();
             break;
         }
-        if (retval == -1 && elink->isConnected() && !elink->IsBusy())
+        if ((retval == -1) &&
+            (elink->isConnected()) &&
+            (!elink->IsBusy()) &&
+            (!elink->isTunerLocked()))
         {
             encoder = elink;
             retval = iter.key();

@@ -20,6 +20,7 @@ EncoderLink::EncoderLink(int capturecardnum, PlaybackSock *lsock,
     hostname = lhostname;
     tv = NULL;
     local = false;
+    locked = false;
     m_capturecardnum = capturecardnum;
 
     endRecordingTime = QDateTime::currentDateTime().addDays(-2);
@@ -32,6 +33,7 @@ EncoderLink::EncoderLink(int capturecardnum, TVRec *ltv)
     sock = NULL;
     tv = ltv;
     local = true;
+    locked = false;
     m_capturecardnum = capturecardnum;
 
     recordfileprefix = gContext->GetSetting("RecordFilePrefix");
@@ -197,6 +199,25 @@ void EncoderLink::cacheFreeSpace()
     {
         freeSpace = 0;
     }
+}
+
+int EncoderLink::LockTuner()
+{
+    if (locked)
+        return -2;
+
+    locked = true;  
+    return m_capturecardnum;
+}
+
+void EncoderLink::FreeTuner()
+{
+    locked = false;
+}
+
+bool EncoderLink::isTunerLocked()
+{
+    return locked;
 }
 
 bool EncoderLink::isLowOnFreeSpace()

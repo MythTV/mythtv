@@ -58,4 +58,12 @@
       <action>TV_DELETE</action>
    </button> 
 
+<!-- EXECTV sample.  %s args in order are video, audio, and vbi devices
+   <button>
+      <type>TV_PLAYBACK</type>
+      <text>Passthrough Mode</text>
+      <action>EXECTV xawtv -f -device %s -dspdev %s -vbidev %s</action>
+   </button>
+-->
+
 </mythmenu>

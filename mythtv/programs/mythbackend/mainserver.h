@@ -71,6 +71,8 @@ class MainServer : public QObject
     void HandleQueueTranscode(QStringList &slist, PlaybackSock *pbs);
     void HandleRemoteEncoder(QStringList &slist, QStringList &commands,
                              PlaybackSock *pbs);
+    void HandleLockTuner(PlaybackSock *pbs);
+    void HandleFreeTuner(int cardid, PlaybackSock *pbs);
 
     void SendResponse(QSocket *pbs, QStringList &commands);
 

@@ -379,8 +379,8 @@ void Scheduler::PruneList(void)
         {
             rec->suppressed = true;
             rec->recording = false;
-            rec->reasonsuppressed = tr("Maximum number of episodes have "
-                                       "already been recorded");
+            rec->reasonsuppressed = tr("the maximum number of episodes have "
+                                       "already been recorded.");
         }
 
         q++;
@@ -912,6 +912,8 @@ list<ProgramInfo *> *Scheduler::CopyList(list<ProgramInfo *> *sourcelist)
                     continue;
                 if (enc->isLowOnFreeSpace())
                     continue;
+                if (enc->isTunerLocked())
+                    continue;
                 placed = true;
                 break;
             }
@@ -1013,12 +1015,10 @@ void Scheduler::DoMultiCard(void)
                         continue;
                     }
 
-                    if (((*m_tvList)[lower->cardid])->WouldConflict(lower))
-                    {
-                        continue;
-                    }
-
-                    if (((*m_tvList)[lower->cardid])->isLowOnFreeSpace())
+                    EncoderLink *this_encoder = (*m_tvList)[lower->cardid];
+                    if ((this_encoder->WouldConflict(lower)) ||
+                        (this_encoder->isLowOnFreeSpace()) ||
+                        (this_encoder->isTunerLocked()))
                         continue;
 
                     if (!Conflict(higher, lower))
@@ -1065,12 +1065,10 @@ void Scheduler::DoMultiCard(void)
                         continue;
                     }
 
-                    if (((*m_tvList)[higher->cardid])->WouldConflict(higher))
-                    {
-                        continue;
-                    }
-
-                    if (((*m_tvList)[higher->cardid])->isLowOnFreeSpace())
+                    EncoderLink *this_encoder = (*m_tvList)[higher->cardid];
+                    if ((this_encoder->WouldConflict(higher)) ||
+                        (this_encoder->isLowOnFreeSpace()) ||
+                        (this_encoder->isTunerLocked()))
                         continue;
 
                     if (!Conflict(higher, second))
@@ -1203,6 +1201,24 @@ void Scheduler::RunScheduler(void)
                                       .arg(nextRecording->cardid)
                                       .arg(nextRecording->sourceid)
                                       .arg(nexttv->getFreeSpace());
+
+                VERBOSE(msg);
+
+                RemoveRecording(nextRecording);
+                nextRecording = NULL;
+                recIter = recordingList.begin();
+                continue;
+            }
+
+            if (recording && nexttv->isTunerLocked())
+            {
+                QString msg = QString("SUPPRESSED recording \"%1\" on channel: "
+                                      "%2 on cardid: %3, sourceid %4. Tuner "
+                                      "is locked by an external application.")
+                                      .arg(nextRecording->title)
+                                      .arg(nextRecording->chanid)
+                                      .arg(nextRecording->cardid)
+                                      .arg(nextRecording->sourceid);
 
                 VERBOSE(msg);
 

@@ -30,6 +30,10 @@ class EncoderLink
     bool isConnected();
     int getCardId() { return m_capturecardnum; }
 
+    int LockTuner();
+    void FreeTuner();
+    bool isTunerLocked();
+    
     void cacheFreeSpace();
     bool isLowOnFreeSpace();
     int getFreeSpace() { return freeSpace; }
@@ -106,6 +110,7 @@ class EncoderLink
     TVRec *tv;
 
     bool local;
+    bool locked;
 
     QDateTime endRecordingTime;
     QDateTime startRecordingTime;
