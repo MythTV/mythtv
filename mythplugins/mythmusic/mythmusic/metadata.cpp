@@ -73,7 +73,12 @@ bool Metadata::isInDatabase(QSqlDatabase *db)
 {
     bool retval = false;
 
+    QString startdir = gContext->GetSetting("MusicLocation");
+    if (!startdir.endsWith("/"))
+        startdir += "/";
+
     QString sqlfilename = filename;
+    sqlfilename = filename.remove(0, startdir.length());
     sqlfilename.replace(QRegExp("\""), QString("\\\""));
 
     QString thequery = QString("SELECT artist,album,title,genre,year,tracknum,"
@@ -107,6 +112,10 @@ bool Metadata::isInDatabase(QSqlDatabase *db)
 
 void Metadata::dumpToDatabase(QSqlDatabase *db)
 {
+    QString startdir = gContext->GetSetting("MusicLocation");
+    if (!startdir.endsWith("/"))
+        startdir += "/";
+
     if (artist == "")
         artist = QObject::tr("Unknown Artist");
     if (album == "")
@@ -122,6 +131,7 @@ void Metadata::dumpToDatabase(QSqlDatabase *db)
     genre.replace(QRegExp("\""), QString("\\\""));
 
     QString sqlfilename = filename;
+    sqlfilename = filename.remove(0, startdir.length());
     sqlfilename.replace(QRegExp("\""), QString("\\\""));
 
     QString thequery = QString("INSERT INTO musicmetadata (artist,album,title,"
@@ -420,7 +430,12 @@ void AllMusic::resync()
     QString aquery =    "SELECT intid, artist, album, title, genre, "
                         "year, tracknum, length, filename, rating, "
                         "lastplay, playcount FROM musicmetadata "
-                        "ORDER BY intid  ";
+                        "ORDER BY intid;";
+
+    QString filename;
+    QString startdir = gContext->GetSetting("MusicLocation");
+    if (!startdir.endsWith("/"))
+        startdir += "/";
 
     QSqlQuery query = db->exec(aquery);
 
@@ -430,9 +445,13 @@ void AllMusic::resync()
     {
         while(query.next())
         {
+            filename = query.value(8).toString();
+            if (!filename.contains("://"))
+                filename = startdir + filename;
+
             Metadata *temp = new Metadata
                                     (
-                                        query.value(8).toString(),
+                                        filename,
                                         query.value(1).toString(),
                                         query.value(2).toString(),
                                         query.value(3).toString(),

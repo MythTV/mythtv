@@ -3,6 +3,8 @@
 #include "metadata.h"
 #include "encoder.h"
 
+#include <mythtv/mythcontext.h> 
+
 using namespace std;
 
 Encoder::Encoder(const QString &outfile, int qualitylevel, Metadata *metadata) 
@@ -11,7 +13,7 @@ Encoder::Encoder(const QString &outfile, int qualitylevel, Metadata *metadata)
     {
         out = fopen(outfile.ascii(), "w");
         if (!out) 
-            cout << "ERROR opening output file " << outfile << "\n";
+            VERBOSE(VB_GENERAL, QString("Error opening output file: %1").arg(outfile));
     } 
     else 
         out = NULL;

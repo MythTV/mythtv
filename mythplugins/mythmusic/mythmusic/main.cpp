@@ -179,8 +179,8 @@ void SearchDir(QString &directory)
 
     BuildFileList(directory, music_files);
 
-    QSqlQuery query("SELECT filename FROM musicmetadata;", 
-                    QSqlDatabase::database());
+    QSqlQuery query("SELECT filename FROM musicmetadata WHERE filename NOT LIKE ('%://%');",
+        QSqlDatabase::database());
 
     int counter = 0;
 
@@ -192,7 +192,7 @@ void SearchDir(QString &directory)
     {
         while (query.next())
         {
-            QString name = query.value(0).toString();
+            QString name = directory + query.value(0).toString();
             if (name != QString::null)
             {
                 if ((iter = music_files.find(name)) != music_files.end())
@@ -220,6 +220,7 @@ void SearchDir(QString &directory)
         else if (*iter == kDatabase)
         {
             QString name(iter.key());
+            name.remove(0, directory.length());
             name.replace(quote_regex, "\"\"");
 
             QString querystr = QString("DELETE FROM musicmetadata WHERE "
@@ -433,6 +434,8 @@ static void preMusic(MusicData *mdata)
 
     //  Load all available info about songs (once!)
     QString startdir = gContext->GetSetting("MusicLocation");
+    if (!startdir.endsWith("/"));
+        startdir += "/";
 
     // Only search music files if a directory was specified & there
     // is no data in the database yet (first run).  Otherwise, user

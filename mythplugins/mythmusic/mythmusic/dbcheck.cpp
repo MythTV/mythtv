@@ -8,7 +8,7 @@ using namespace std;
 
 #include "mythtv/mythcontext.h"
 
-const QString currentDatabaseVersion = "1000";
+const QString currentDatabaseVersion = "1001";
 
 static void UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -82,5 +82,49 @@ void UpgradeMusicDatabaseSchema(void)
 };
         performActualUpdate(updates, "1000", dbver);
     }
+
+    if (dbver == "1000")
+    {
+        QString startdir = gContext->GetSetting("MusicLocation");
+        if (!startdir.endsWith("/"))
+            startdir += "/";
+
+        QSqlDatabase *db_conn = QSqlDatabase::database();
+        // urls as filenames are NOT officially supported yet
+        QSqlQuery query("SELECT filename, intid FROM musicmetadata WHERE "
+                        "filename NOT LIKE ('%://%');", db_conn);
+        QSqlQuery modify;
+
+        if (query.isActive() && query.numRowsAffected() > 0)
+        {
+            int i = 0;
+            QString intid, name, newname;
+
+            while (query.next())
+            {
+                name = query.value(0).toString();
+                newname = name;
+                intid = query.value(1).toString();
+
+                if (newname.startsWith(startdir))
+                { 
+                    newname.remove(0, startdir.length());
+                    modify.exec(QString("UPDATE musicmetadata SET "
+                                "filename = \"%1\" "
+                                "WHERE filename = \"%2\" AND intid = %3;")
+                                .arg(newname, name, intid));
+                    if (modify.isActive())
+                        i += modify.numRowsAffected();
+                }
+            }
+            VERBOSE(VB_ALL, QString("Modified %1 entries for db schema 1001").arg(i));
+        }
+
+        const QString updates[] = {
+""
+};
+        performActualUpdate(updates, "1001", dbver);
+    }
+
 }
 

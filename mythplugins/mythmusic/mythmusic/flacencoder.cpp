@@ -12,6 +12,7 @@ using namespace std;
 
 #include <FLAC/file_encoder.h>
 #include <FLAC/assert.h>
+#include <mythtv/mythcontext.h>
 
 FlacEncoder::FlacEncoder(const QString &outfile, int qualitylevel,
                          Metadata *metadata)
@@ -53,9 +54,11 @@ FlacEncoder::FlacEncoder(const QString &outfile, int qualitylevel,
 
     FLAC__file_encoder_set_filename(encoder, outfile.ascii());
 
-    if (FLAC__file_encoder_init(encoder) != FLAC__FILE_ENCODER_OK)
+    int ret = FLAC__file_encoder_init(encoder);
+    if (ret != FLAC__FILE_ENCODER_OK)
     {
-        cout << "Couldn't init encoder.\n";
+        VERBOSE(VB_GENERAL, QString("Error initializing FLAC encoder."
+                                    " Got return code: %1").arg(ret));
     }
 
     for (int i = 0; i < NUM_CHANNELS; i++)
@@ -102,6 +105,8 @@ int FlacEncoder::addSamples(int16_t *bytes, unsigned int length)
                                             (const FLAC__int32 * const *) input,
                                             sampleindex))
             {
+                VERBOSE(VB_GENERAL, QString("Failed to write flac data."
+                                            " Aborting."));
                 return EENCODEERROR;
             }
             sampleindex = 0;

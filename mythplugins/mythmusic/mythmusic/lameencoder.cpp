@@ -33,6 +33,9 @@
 #include "lameencoder.h"
 
 #include <iostream>
+
+#include <mythtv/mythcontext.h>
+
 using namespace std;
 
 int write_buffer(char *buf, int bufsize, FILE *fp)
@@ -123,9 +126,11 @@ LameEncoder::LameEncoder(const QString &outfile, int qualitylevel,
 
     init_id3tags(gf, metadata);
 
-    if (init_encoder(gf, qualitylevel, vbr) < 0)
+    int lameret = init_encoder(gf, qualitylevel, vbr);
+    if (lameret < 0)
     {
-        cout << "Couldn't initialize lame encoder\n";
+        VERBOSE(VB_GENERAL, QString("Error initializing LAME encoder. "
+                                    "Got return code: %1").arg(lameret));
         return;
     }
 }
@@ -161,13 +166,16 @@ int LameEncoder::addSamples(int16_t * bytes, unsigned int length)
 
     if (lameret < 0)
     {
-        cout << "Lame encoder error '" << lameret << "', aborting.\n";
-        return EENCODEERROR;
+        VERBOSE(VB_ALL, QString("LAME encoder error."));
     } 
     else if (lameret > 0 && out)
     {
         if (write_buffer(mp3buf, lameret, out) != lameret)
-            cout << "Failed to write mp3 data to output file\n";
+        {
+            VERBOSE(VB_GENERAL, QString("Failed to write mp3 data."
+                                        " Aborting."));
+            return EENCODEERROR;
+        }
     }
 
     return 0;

@@ -10,6 +10,9 @@
 #include <vorbis/vorbisfile.h>
 
 #include <iostream>
+
+#include <mythtv/mythcontext.h>
+
 using namespace std;
 
 int write_page(ogg_page *page, FILE *fp)
@@ -57,10 +60,12 @@ VorbisEncoder::VorbisEncoder(const QString &outfile, int qualitylevel,
         quality = 0.4;
     if (qualitylevel == 1)
         quality = 0.7;
-   
-    if (vorbis_encode_setup_vbr(&vi, 2, 44100, quality))
+  
+    int ret = vorbis_encode_setup_vbr(&vi, 2, 44100, quality);
+    if (ret)
     {
-        cout << "Couldn't initialize vorbis encoder\n";
+        VERBOSE(VB_GENERAL, QString("Error initializing VORBIS encoder."
+                                    " Got return code: %1").arg(ret));
         vorbis_info_clear(&vi);
         return;
     }
@@ -90,7 +95,8 @@ VorbisEncoder::VorbisEncoder(const QString &outfile, int qualitylevel,
         int ret = write_page(&og, out);
         if (ret != og.header_len + og.body_len)
         {
-            cout << "Failed to write header to output stream\n";
+            VERBOSE(VB_ALL, QString("Failed to write header"
+                                    " to output stream."));
         }
     }
 }
@@ -148,6 +154,8 @@ int VorbisEncoder::addSamples(int16_t * bytes, unsigned int length)
                 int ret = write_page(&og, out);
                 if (ret != og.header_len + og.body_len)
                 {
+                    VERBOSE(VB_GENERAL, QString("Failed to write ogg data."
+                                            " Aborting."));
                     return EENCODEERROR;
                 }
                 bytes_written += ret;

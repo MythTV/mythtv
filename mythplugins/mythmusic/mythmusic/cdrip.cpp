@@ -362,7 +362,7 @@ void Ripper::handleFileTokens(QString &filename, Metadata *track)
         QString tempstr = QString::number(track->Track(), 10);
         tempstr += " - " + track->Title();
         filename += fixFileToken(tempstr);
-        cout << "Invalid file storage definition.\n";
+        VERBOSE(VB_GENERAL, QString("Invalid file storage definition."));
     }
 
     if (no_ws)
@@ -514,7 +514,7 @@ void Ripper::ripthedisc(void)
 
     if (!PostRipCDScript.isEmpty()) 
     {
-        cout << "PostCDRipScript: " << PostRipCDScript << endl;
+        VERBOSE(VB_ALL, QString("PostCDRipScript: %1").arg(PostRipCDScript));
         pid_t child = fork();
         if (child < 0)
         {

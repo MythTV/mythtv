@@ -232,7 +232,7 @@ PlaylistItem::PlaylistItem(QListViewItem *parent, QListViewItem *after, const QS
 bool PlaylistTitle::isDefault()
 {
 //    return ptr_to_owner->isDefault();
-    cout << "Why are you asking " << endl;
+    VERBOSE(VB_ALL, QString("Why are you asking?"));
     return false;
 }
 
