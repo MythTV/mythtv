@@ -34,7 +34,7 @@ public:
 
 class SlideshowTransition: public ComboBoxSetting, public GlobalSetting {
 public:
-    SlideshowTransition() : ComboBoxSetting(true),
+    SlideshowTransition() : 
       GlobalSetting("SlideshowTransition") {
         setLabel(QObject::tr("Type of transition"));
         addSelection("none");
@@ -47,7 +47,7 @@ public:
 
 class SlideshowBackground: public ComboBoxSetting, public GlobalSetting {
 public:
-    SlideshowBackground() : ComboBoxSetting(true),
+    SlideshowBackground() :
       GlobalSetting("SlideshowBackground") {
         setLabel(QObject::tr("Type of background"));
         // use names from /etc/X11/rgb.txt
@@ -78,7 +78,7 @@ GallerySettings::GallerySettings()
     settings->setLabel(QObject::tr("MythGallery Settings"));
     settings->addChild(new MythGalleryDir());
     settings->addChild(new MythGalleryImportDirs());
-    settings->addChild(new SlideshowTransition());
+    //settings->addChild(new SlideshowTransition());
     settings->addChild(new SlideshowBackground());
     settings->addChild(new SlideshowDelay());
     addChild(settings);
