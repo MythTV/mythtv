@@ -92,8 +92,6 @@ class MfeDialog : public MythThemedDialog
     UIListGenericTree   *connect_node;
     UIListGenericTree   *setup_node;
     
-    UIListGenericTree   *new_playlist_node;
-    
     //
     //  GUI widgets
     //

@@ -271,6 +271,26 @@ void MfeDialog::handleTreeSignals(UIListGenericTree *node)
             }
         }
     }
+    else if(node->getAttribute(1) == 5)
+    {
+        //
+        //  Use wants to edit a playlist
+        //
+        
+        if(node->getInt() > 0)
+        {
+            //
+            //  It's a real playlist to edit, not something higher up the
+            //  edit playlist tree
+            //
+            
+            cout << "You want to edit playlist with id of "
+                 << node->getInt()
+                 << " in collection with id of "
+                 << node->getAttribute(0)
+                 << endl;
+        }
+    }
 }
 
 
@@ -323,16 +343,11 @@ void MfeDialog::wireUpTheme()
 
     menu_root_node = new UIListGenericTree(NULL, "Menu Root Node");
 
-    browse_node =  new UIListGenericTree(menu_root_node, "Browse Music");
-    manage_node =  new UIListGenericTree(menu_root_node, "Manage Content and Playlists");
-    connect_node = new UIListGenericTree(menu_root_node, "Control other Myth Boxes");
-    setup_node   = new UIListGenericTree(menu_root_node, "Settings and Controls");
+    browse_node =  new UIListGenericTree(menu_root_node, " Browse Music");
+    manage_node =  new UIListGenericTree(menu_root_node, " Manage Content");
+    connect_node = new UIListGenericTree(menu_root_node, " Control other Myth Boxes");
+    setup_node   = new UIListGenericTree(menu_root_node, " Settings");
     
-    //
-    //  Some preset subnodes
-    //
-    
-    new_playlist_node = new UIListGenericTree((UIListGenericTree *) manage_node, "Create New Playlist");
     menu->SetTree(menu_root_node);
 
 }
@@ -455,6 +470,27 @@ void MfeDialog::changeMetadata(int which_mfd, MfdContentCollection *new_collecti
             browse_node->addNode(new_collection->getAudioPlaylistTree());
             browse_node->addNode(new_collection->getAudioCollectionTree());
             browse_node->setDrawArrow(true);
+
+            //
+            //  Add nodes that let us manage content
+            //
+            
+            manage_node->setDrawArrow(false);
+            manage_node->pruneAllChildren();
+
+            UIListGenericTree *new_nodes = new_collection->getNewPlaylistTree();
+            if(new_nodes)
+            {
+                manage_node->addNode(new_nodes);
+                manage_node->setDrawArrow(true);
+            }
+
+            UIListGenericTree *edit_nodes = new_collection->getEditablePlaylistTree();
+            if(edit_nodes)
+            {
+                manage_node->addNode(edit_nodes);
+                manage_node->setDrawArrow(true);
+            }
 
             //
             //  Set the current position back to where the user was
