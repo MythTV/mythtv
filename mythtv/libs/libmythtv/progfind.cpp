@@ -7,18 +7,12 @@
 
 #include <qlabel.h>
 #include <qaccel.h>
-#include <fstream>
-#include <iostream>
 #include <qlayout.h>
 #include <qdatetime.h>
 #include <qtimer.h>
-#include <qimage.h>
 #include <qapplication.h>
 #include <qsqldatabase.h>
-#include <qstringlist.h>
 #include <qcursor.h>
-#include <qheader.h>
-#include <qpixmap.h>
 #include <unistd.h>
 #include <time.h>
 
@@ -1003,23 +997,21 @@ void ProgFinder::selectSearchData()
 
     if (searchData[curSearch] == "T")
     {
-    thequery = QString("SELECT title "
-                       "FROM program,channel "
-                       "WHERE program.title LIKE '%1%' AND program.title NOT LIKE 'The %' "
-		       "AND program.chanid = channel.chanid "
-                       "AND program.starttime > %2 "
-                       "GROUP BY program.title "
-                       "ORDER BY program.title;")
+    thequery = QString("SELECT DISTINCT title "
+                       "FROM program "
+                       "WHERE title LIKE '%1%' AND title NOT LIKE 'The %' "
+                       "AND starttime > %2 "
+                       "ORDER BY title;")
                         .arg(searchData[curSearch]).arg(progStart.toString("yyyyMMddhhmm50"));
     }
     else
     {
-    thequery = QString("SELECT title "
-                       "FROM program,channel "
-                       "WHERE program.title LIKE '%1%' AND program.chanid = channel.chanid "
-		       "AND program.starttime > %2 "
-		       "GROUP BY program.title "
-                       "ORDER BY program.title;")
+    thequery = QString("SELECT DISTINCT title "
+                       "FROM program "
+                       "WHERE title LIKE '%1%' "
+		       "AND starttime > %2 "
+		       "GROUP BY title "
+                       "ORDER BY title;")
                         .arg(searchData[curSearch]).arg(progStart.toString("yyyyMMddhhmm50"));
     }
 
@@ -1369,12 +1361,11 @@ void ProgFinder::getSearchData(int charNum)
     QString thequery;
     QString data;
 
-    thequery = QString("SELECT title "
-                       "FROM program,channel "
-                       "WHERE program.title LIKE '%1%' AND program.chanid = channel.chanid "
-		       "AND program.starttime > %3 "
-		       "GROUP BY program.title "
-                       "ORDER BY program.title LIMIT %2;")
+    thequery = QString("SELECT DISTINCT title "
+                       "FROM program "
+                       "WHERE title LIKE '%1%' "
+		       "AND starttime > %3 "
+                       "ORDER BY title LIMIT %2;")
 			.arg(searchData[charNum]).arg((int)(showsPerListing / 2) + 1).arg(progStart.toString("yyyyMMddhhmm50"));
 
     QSqlQuery query = m_db->exec(thequery);
@@ -1407,12 +1398,11 @@ void ProgFinder::getSearchData(int charNum)
     if (rows >= (int)(showsPerListing / 2))
     {
 
-    thequery = QString("SELECT title "
-                       "FROM program,channel "
-                       "WHERE program.title LIKE '%1%' AND program.chanid = channel.chanid "
-		       "AND program.starttime > %3 "
-                       "GROUP BY program.title "
-                       "ORDER BY program.title DESC LIMIT %2;")
+    thequery = QString("SELECT DISTINCT title "
+                       "FROM program "
+                       "WHERE title LIKE '%1%' "
+		       "AND starttime > %3 "
+                       "ORDER BY title DESC LIMIT %2;")
                         .arg(searchData[charNum]).arg((int)(showsPerListing / 2)).arg(progStart.toString("yyyyMMddhhmm50"));
 
     query = m_db->exec(thequery);
