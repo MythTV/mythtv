@@ -29,24 +29,19 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <string.h>
-#include "nuppelvideo.h"
+#include "format.h"
+#include "RTjpegN.h"
+#include "zlib.h"
+
 #undef MMX
 #include "lame/lame.h"
-
 #define RTJPEG_INTERNAL 1
  #include "rtjpeg_plugin.h"
 #undef RTJPEG_INTERNAL
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-#include "RTjpegN.h"
-#ifdef __cplusplus
-}
-#endif
 #include "minilzo.h"
 
-RTjpeg_t *rtjd;
+RTjpeg *rtjd;
 uint8_t *planes[3];
 
 /* ------------------------------------------------- */
@@ -104,9 +99,9 @@ int rtjpeg_open(char *tplorg)
     exit(1);
   }
 
-  rtjd = RTjpeg_init();
+  rtjd = new RTjpeg();
   i = RTJ_YUV420;
-  RTjpeg_set_format(rtjd, &i);
+  rtjd->SetFormat(&i);
 
   if ((rtjpeg_video_height & 1) == 1) {
     // this won't ever happen, since RTjpeg can only handle n*8 for w and h
@@ -171,7 +166,7 @@ unsigned char *decode_frame(struct rtframeheader *frameheader,unsigned char *str
 {
   int r;
   int keyframe;
-  unsigned int out_len;
+  unsigned int out_len = rtjpeg_video_width * rtjpeg_video_height + (rtjpeg_video_width * rtjpeg_video_height)/2;
   static unsigned char *buf2 = 0;
   static char lastct='1';
   int compoff = 0;
@@ -229,6 +224,7 @@ unsigned char *decode_frame(struct rtframeheader *frameheader,unsigned char *str
 
   // lzo decompression ------------------
   if (!compoff) {
+	  
     r = lzo1x_decompress(strm,frameheader->packetlength,buf2,&out_len,NULL);
     if (r != LZO_E_OK) {
       // if decompression fails try raw format :-)
@@ -254,9 +250,9 @@ unsigned char *decode_frame(struct rtframeheader *frameheader,unsigned char *str
   // rtjpeg decompression
 
   if (compoff) {
-    RTjpeg_decompress(rtjd, strm, planes); 
+    rtjd->Decompress((int8_t*)strm, planes); 
   } else {
-    RTjpeg_decompress(rtjd, buf2, planes);
+    rtjd->Decompress((int8_t*)buf2, planes);
   }
 
   return(rtjpeg_buf);
@@ -551,6 +547,7 @@ int rtjpeg_close()
 {
   close(rtjpeg_file);
   lame_close(gf);
+  delete rtjd;
   return(0);
 }
 

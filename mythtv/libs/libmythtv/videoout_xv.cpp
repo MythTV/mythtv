@@ -18,9 +18,11 @@
 #include <X11/extensions/Xvlib.h>
 #include <X11/extensions/XShm.h>
 
+extern "C" {
 extern int      XShmQueryExtension(Display*);
 extern int      XShmGetEventBase(Display*);
 extern XvImage  *XvShmCreateImage(Display*, XvPortID, int, char*, int, int, XShmSegmentInfo*);
+}
 
 XShmSegmentInfo XJ_SHMInfo;
 Screen *XJ_screen;
@@ -56,8 +58,6 @@ int XJ_error_catcher(Display * d, XErrorEvent * xeev)
   return 0;
 }
 
-XSizeHints hints;
-
 void sizehint(int x, int y, int width, int height, int max)
 {
    hints.flags = PPosition | PSize | PWinGravity | PBaseSize;
@@ -81,7 +81,7 @@ char *XJ_init(int width, int height, char *window_name, char *icon_name)
   XWMHints wmhints;
   char *sbuf;
   XTextProperty windowName, iconName;
-  int (*old_handler)();
+  int (*old_handler)(Display *, XErrorEvent *);
   int i, ret;
   
   unsigned int p_version, p_release, p_request_base, p_event_base, p_error_base;
@@ -146,7 +146,7 @@ char *XJ_init(int width, int height, char *window_name, char *icon_name)
   }
 
   ret = XvQueryAdaptors(XJ_disp, DefaultRootWindow(XJ_disp),
-                        &p_num_adaptors, &ai);
+                        (unsigned int *)&p_num_adaptors, &ai);
 
   if (ret != Success) {
     printf("XvQueryAdaptors failed.\n");
@@ -239,7 +239,7 @@ char *XJ_init(int width, int height, char *window_name, char *icon_name)
     return (NULL);
   }
  
-  sbuf = XJ_image->data = XJ_SHMInfo.shmaddr = shmat(XJ_SHMInfo.shmid, 0, 0);
+  sbuf = XJ_image->data = XJ_SHMInfo.shmaddr = (char *)shmat(XJ_SHMInfo.shmid, 0, 0);
   XJ_SHMInfo.readOnly = False;
   
   XShmAttach(XJ_disp, &XJ_SHMInfo);
@@ -283,7 +283,7 @@ static void hide_cursor(void)
   Pixmap bm_no;
   XColor black, dummy;
   Colormap colormap;
-  static unsigned char no_data[] = { 0,0,0,0,0,0,0,0 };
+  static char no_data[] = { 0,0,0,0,0,0,0,0 };
 
   colormap = DefaultColormap(XJ_disp, DefaultScreen(XJ_disp));
   XAllocNamedColor(XJ_disp, colormap, "black", &black, &dummy);

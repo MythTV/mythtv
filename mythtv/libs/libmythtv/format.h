@@ -1,4 +1,4 @@
-/* nuppelvideo.h  rh */
+/* format.h  rh */
 
 typedef struct rtfileheader
 {

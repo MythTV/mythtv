@@ -44,7 +44,7 @@
 	 they be truncated by the compiler)
 */
 typedef	union {
-	long long		q;	/* Quadword (64-bit) value */
+	long long int		q;	/* Quadword (64-bit) value */
 	unsigned long long	uq;	/* Unsigned Quadword */
 	int			d[2];	/* 2 Doubleword (32-bit) values */
 	unsigned int		ud[2];	/* 2 Unsigned Doubleword */
@@ -54,8 +54,6 @@ typedef	union {
 	unsigned char		ub[8];	/* 8 Unsigned Byte */
 	float			s[2];	/* Single-precision (32-bit) value */
 } __attribute__ ((aligned (8))) mmx_t;	/* On an 8-byte (64-bit) boundary */
-
-
 
 /*	Function to test if multimedia instructions are supported...
 */

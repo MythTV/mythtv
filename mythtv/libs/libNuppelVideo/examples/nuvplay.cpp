@@ -12,7 +12,7 @@
 #include <termios.h>
 #include <sys/time.h>
 #include "minilzo.h"
-#include "nuppelvideo.h"
+#include "format.h"
 #include <sys/ioctl.h>
 #include <sys/soundcard.h>
 #include "linearBlend.h"
@@ -139,11 +139,7 @@ void usage()
 }
 
 
-#ifdef NUVPLAY
 int main(int argc, char *argv[])
-#else
-int PlayVideo(int argc, char *argv[])
-#endif
 {
   int key = 0;
   int w=384, h=288;
@@ -178,7 +174,6 @@ int PlayVideo(int argc, char *argv[])
 
   unsigned char *prebuf[MAXPREBUFFERS];
 
-#ifdef NUVPLAY  
   while ((c=getopt(argc,argv,"w:b:da:fsVZh")) != -1) {
     switch(c) {
       case 'w': playfast=atoi(optarg); if(playfast<=1) playfast=2;  playaudio=usepre=0; break;
@@ -196,9 +191,6 @@ int PlayVideo(int argc, char *argv[])
 
   if (optind==argc) usage();
   else filename=argv[optind];
-#else
- filename = argv[1];
-#endif
  
  tzone.tz_minuteswest=-60;
  tzone.tz_dsttime=0;
@@ -239,7 +231,7 @@ int PlayVideo(int argc, char *argv[])
 
  sbuf=XJ_init(w, h, "NuppelVideo Player (experimental)", "NuppelVideo");
 
- buf3=malloc(w*h+(w*h)/2);
+ buf3=(unsigned char *)malloc(w*h+(w*h)/2);
 
  while(!rtjpeg_eof)
  {
@@ -257,7 +249,7 @@ int PlayVideo(int argc, char *argv[])
 
   if (usepre!=0) {
     if (prebuffered<usepre) {
-      prebuf[prebuffered]=malloc(w*h+(w*h)/2);
+      prebuf[prebuffered]=(unsigned char*)malloc(w*h+(w*h)/2);
       memcpy(prebuf[prebuffered], buf, w*h+(w*h)/2);
       prebuffered++;
       fnum++;
@@ -280,7 +272,7 @@ int PlayVideo(int argc, char *argv[])
     if (now.tv_sec==0) {
       gettimeofday(&now, &tzone);
       last=now;
-      usecs= (1000000.0/rtjpeg_video_frame_rate)/2;
+      usecs= (int)(1000000.0/rtjpeg_video_frame_rate)/2;
       if (usecs>0) usleep(usecs); 
     } else {
       gettimeofday(&now, &tzone);

@@ -26,22 +26,20 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <sys/time.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include <sys/resource.h>
 #include <sys/soundcard.h>
 #include <linux/videodev.h>
-#include <linux/wait.h>
 #include <errno.h>
 #include "minilzo.h"
 #include "RTjpegN.h"
-#include "nuppelvideo.h"
+#include "format.h"
+#include "zlib.h"
 #undef MMX
 #include <lame/lame.h>
 
-#ifdef NUVREC
 int encoding;
-#else
-#include "tv.h"
-#endif
 
 // #define TESTINPUT 1
 // #define TESTSPLIT 1
@@ -89,13 +87,10 @@ char *mp3buf;
 int mp3buf_size;
 lame_global_flags *gf;
 
-RTjpeg_t *rtjc;
+RTjpeg *rtjc;
 
 //#define DP(DSTRING) fprintf(stderr, "%s\n", DSTRING);
 #define DP(DSTRING)
-
-pid_t waitpid(pid_t pid, int *status, int options);
-
 
 // lzo static vars -----------------/////////////////////////////////
 #define IN_LEN          (1024*1024L)
@@ -109,7 +104,7 @@ HEAP_ALLOC(wrkmem,LZO1X_1_MEM_COMPRESS);
 // lzo static vars end -------------/////////////////////////////////
 
 int shmid;
-void *sharedbuffer;
+char *sharedbuffer;
 
 #define ERROR(PARAM) { fprintf(stderr, "\n%s\n", PARAM); exit(1); }
 
@@ -117,9 +112,7 @@ void *sharedbuffer;
 
 #include <signal.h>
 #include <sys/ipc.h>
-//#include <sys/sem.h>
 #include <sys/shm.h>
-// #include <sys/wait.h>
 
 char *audiodevice = "/dev/dsp";
 
@@ -224,7 +217,7 @@ void init_shm(int init_shm)
       if (shmid == -1)
   	  ERROR("shmget");
     } 
-    sharedbuffer = shmat(shmid, IPC_RMID, SHM_RND);
+    sharedbuffer = (char *)shmat(shmid, IPC_RMID, SHM_RND);
     if (sharedbuffer == (char*)-1)
     {
   	perror("shmat");
@@ -236,7 +229,7 @@ void init_shm(int init_shm)
 	ERROR("shmctl");
 
     videobuffer    = (struct vidbuffertype *)sharedbuffer;
-    startaudiodesc = (char *)(sharedbuffer + video_buffer_count*sizeof(vidbuffertyp));
+    startaudiodesc = (unsigned char *)(sharedbuffer + video_buffer_count*sizeof(vidbuffertyp));
     audiobuffer    = (struct audbuffertype *)startaudiodesc;
 
     // start addr of raw video data THESE ARE OFFSETS!!!
@@ -271,7 +264,7 @@ void init_shm(int init_shm)
 
 void writeit(unsigned char *buf, int fnum, int timecode, int w, int h)
 {
-  int tmp, r=0, out_len;
+  int tmp, r=0, out_len = OUT_LEN;
   struct rtframeheader frameheader;
   int xaa, freecount=0, compressthis; 
   static int startnum=0;
@@ -326,7 +319,7 @@ void writeit(unsigned char *buf, int fnum, int timecode, int w, int h)
   }
 
   if (!raw) {
-    tmp=RTjpeg_compress(rtjc, strm, planes);
+    tmp=rtjc->Compress(strm, planes);
   } else {
     tmp = video_buffer_size;
   }
@@ -335,19 +328,16 @@ void writeit(unsigned char *buf, int fnum, int timecode, int w, int h)
   if (compressthis) {
     if (raw) {
       // compress raw yuv420 probably not very fast nor effective
-      //r = lzo1x_1_compress(buf,video_buffer_size,out,&out_len,wrkmem);
-   printf("compressing raw!!\n\n");
+      r = lzo1x_1_compress((unsigned char*)buf,video_buffer_size,out,(lzo_uint *)&out_len,wrkmem);
+      printf("compressing raw!!\n\n");
     } else {
-      printf("ori %d\n", tmp);
-      printf("bz2 %d\n", out_len);
-      r = lzo1x_1_compress(strm,tmp,out,&out_len,wrkmem);
-      printf("lzo %d\n", out_len);
+      r = lzo1x_1_compress((unsigned char *)strm,tmp,out,(lzo_uint *)&out_len,wrkmem);
     }
 
-    //if (r!=LZO_E_OK) {
-    //  fprintf(stderr,"%s\n","lzo compression failed");
-    //  exit(3);
-    //}
+    if (r!=LZO_E_OK) {
+      fprintf(stderr,"%s\n","lzo compression failed");
+      exit(3);
+    }
   }
 
   // fprintf(stderr, "inputlen: %6d    outputlen: %6d  \n",tmp,out_len);
@@ -544,11 +534,12 @@ void writeitaudio(unsigned char *buf, int fnum, int timecode)
     int lameret = 0;
     
     lameret = lame_encode_buffer_interleaved(gf, (short int *)buf, 
-                                             audio_buffer_size / 4, mp3buf, 
+                                             audio_buffer_size / 4, 
+					     (unsigned char *)mp3buf, 
                                              mp3buf_size);
     compressedsize = lameret;
 
-    lameret = lame_encode_flush_nogap(gf, mp3gapless, 7200);
+    lameret = lame_encode_flush_nogap(gf, (unsigned char *)mp3gapless, 7200);
     gaplesssize = lameret;
     
     frameheader.packetlength = compressedsize + gaplesssize;
@@ -660,7 +651,7 @@ void audio_capture_process()
   ioctl(afd, SNDCTL_DSP_SETFMT, &afmt);
   if (afmt != AFMT_S16_LE) {
     fprintf(stderr, "\n%s\n", "Can't get 16 bit DSP, exiting");
-    exit;
+    exit(0);
   }
 
   channels = 2;
@@ -672,7 +663,7 @@ void audio_capture_process()
 
   if (-1 == ioctl(afd, SNDCTL_DSP_GETBLKSIZE,  &blocksize)) {
     fprintf(stderr, "\n%s\n", "Can't get DSP blocksize, exiting");
-    exit;
+    exit(0);
   }
 
   blocksize*=4;  // allways read 4*blocksize
@@ -684,7 +675,7 @@ void audio_capture_process()
   } 
 
 
-  buffer = (char *)malloc(audio_buffer_size);
+  buffer = (unsigned char *)malloc(audio_buffer_size);
   /* trigger record */
   trigger = ~PCM_ENABLE_INPUT;
   ioctl(afd,SNDCTL_DSP_SETTRIGGER,&trigger);
@@ -759,13 +750,13 @@ int create_nuppelfile(char *fname, int number, int w, int h)
 
   if (number==0) { 
     int i;
-    rtjc = RTjpeg_init();
+    rtjc = new RTjpeg();
     i = RTJ_YUV420;
-    RTjpeg_set_format(rtjc, &i);
-    RTjpeg_set_size(rtjc, &w, &h);
-    RTjpeg_set_quality(rtjc, &Q);
-    i = 15;
-    RTjpeg_set_intra(rtjc, &i, &M1, &M2);
+    rtjc->SetFormat(&i);
+    rtjc->SetSize(&w, &h);
+    rtjc->SetQuality(&Q);
+    i = 1;
+    rtjc->SetIntra(&i, &M1, &M2);
     snprintf(realfname, 250, "%s.nuv", fname);
   } else {
     snprintf(realfname, 250, "%s-%d.nuv", fname, number);
@@ -833,7 +824,7 @@ void write_process(char *fname, int w, int h)
   }
 
   init_shm(0); // only attach to the existing shm
-  strm=malloc(w*h+(w*h)/2+10);
+  strm=(__s8*)malloc(w*h+(w*h)/2+10);
 
   if (0 != create_nuppelfile(fname, 0, w, h)) {
     fprintf(stderr, "cannot open %s.nuv for writing\n", fname);
@@ -1117,11 +1108,7 @@ void RecordUsage()
 // ----------------------------------------------------------
 // -- MAIN --------------------------------------------------
 
-#ifdef NUVREC
 int main(int argc, char** argv)
-#else
-int RecordVideo(int argc, char** argv)
-#endif
 {
   struct video_mmap mm;
   struct video_mbuf vm;
@@ -1223,7 +1210,7 @@ int RecordVideo(int argc, char** argv)
     gf = lame_init();
     lame_set_out_samplerate(gf, 44100);
     lame_set_bWriteVbrTag(gf, 0);
-    lame_set_quality(gf, 8);
+    lame_set_quality(gf, 5);
     lame_set_compression_ratio(gf, 11);
     lame_init_params(gf);
   } else {
@@ -1263,8 +1250,8 @@ int RecordVideo(int argc, char** argv)
   else 
     audio_buffer_count = 0;
 
-  mp3buf_size = 1.25 * 8192 + 7200;
-  mp3buf = malloc(mp3buf_size * sizeof(char));
+  mp3buf_size = (int)(1.25 * 8192 + 7200);
+  mp3buf = (char *)malloc(mp3buf_size * sizeof(char));
  
   fprintf(stderr, 
           "we are using %dx%ldB video (frame-) buffers and %dx%ldB audio blocks\n", 
@@ -1442,7 +1429,6 @@ int RecordVideo(int argc, char** argv)
 
   free(mp3buf);
 
-  RTjpeg_close(rtjc);
-
+  delete rtjc;
   return 0;
 }
