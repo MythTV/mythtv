@@ -627,7 +627,7 @@ public:
 class GuiWidth: public SpinBoxSetting, public GlobalSetting {
 public:
     GuiWidth():
-        SpinBoxSetting(0, 1600, 8), GlobalSetting("GuiWidth") {
+        SpinBoxSetting(0, 1920, 8), GlobalSetting("GuiWidth") {
         setLabel("GUI width");
         setValue(0);
 	setHelpText("The width of the GUI.  Do not make the GUI "
