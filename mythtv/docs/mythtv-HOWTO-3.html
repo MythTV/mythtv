@@ -512,23 +512,27 @@ additional configuration steps in this HOWTO.  The next logical step is
 <A HREF="mythtv-HOWTO-6.html#mysql">configuring MySQL</A>, which you may or may not have to
 perform.  See your package documentation.</P>
 
-<H3><A NAME="atrpms"></A> Red Hat Linux</H3>
+<H3><A NAME="atrpms"></A> Red Hat Linux/Fedora Core</H3>
 
-<P>Red Hat Linux 9 packages for MythTV and most of its add-on modules and
+<P>Red Hat Linux (9, 8.0 and 7.3) and Fedora Core (2 and 1) packages
+for MythTV and all of its add-on modules and
 some themes have been packaged by 
-<A HREF="mailto:Axel.Thimm@physik.fu-berlin.de">mailto:Axel.Thimm@physik.fu-berlin.de</A> and are available at 
-<A HREF="http://atrpms.physik.fu-berlin.de/topic/multimedia/">http://atrpms.physik.fu-berlin.de/topic/multimedia/</A>. All of the
+<A HREF="mailto:Axel.Thimm@ATrpms.net">mailto:Axel.Thimm@ATrpms.net</A> and are available at 
+<A HREF="http://ATrpms.net/topic/multimedia/">http://ATrpms.net/topic/multimedia/</A>. All of the
 prerequisites for MythTV (such as XMLTV) are available as RPM packages. If
-you have problems with the RPMs, please send him email directly.</P>
+you have problems with the RPMs, please contact the ATrpms lists at 
+<A HREF="http://lists.ATrpms.net/">http://lists.ATrpms.net/</A> or file a bug
+against 
+<A HREF="http://bugzilla.ATrpms.net/">http://bugzilla.ATrpms.net/</A>.</P>
 <P>Given the large number of dependent RPMs you are advised to use tools like
 apt or yum for automatic retrieval and installation of the required RPMs.
 (
-<A HREF="http://atrpms.physik.fu-berlin.de/install.html">http://atrpms.physik.fu-berlin.de/install.html</A>) In this case a
+<A HREF="http://ATrpms.net/install.html">http://ATrpms.net/install.html</A>) In this case a
 special meta-package called mythtv-suite will allow you to install all of
 MythTV and its add-ons, plus all dependencies.</P>
 <P>If you don't have <B>apt</B> or <B>yum</B> on your machine, download and
-install the 
-<A HREF="http://atrpms.physik.fu-berlin.de/dist/rh9/atrpms-kickstart/">atrpms-kickstart package</A>.
+install the atrpms-kickstart package from 
+<A HREF="http://ATrpms.net/name/atrpms-kickstart/">http://ATrpms.net/name/atrpms-kickstart/</A>.
 Install the package with:
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -536,9 +540,11 @@ Install the package with:
 </PRE>
 </CODE></BLOCKQUOTE>
 
-Then update your <B>apt</B> package listings:
+Then run:
 <BLOCKQUOTE><CODE>
 <PRE>
+# apt-get update
+# apt-get dist-upgrade
 # apt-get update
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -551,19 +557,16 @@ And finally:
 </CODE></BLOCKQUOTE>
         
 These steps however, do NOT perform the installation of any drivers required
-for <B>ALSA</B>, capture cards, <B>lirc</B>, etc., nor do they set up
+for <B>ALSA</B>, capture cards, <B>lirc kernel modules</B>, etc., nor do they set up
 your MythTV database. Check 
-<A HREF="http://atrpms.physik.fu-berlin.de/topic/multimedia/">ATrpms</A> for
+<A HREF="http://ATrpms.net/topic/multimedia/">ATrpms</A> for
 the drivers you need.</P>
 <P>Further documentation on using ATrpms packages can be found in Jarod
 Wilson's 
-<A HREF="mailto:jcw@wilsonet.com">mailto:jcw@wilsonet.com</A>
-"HOWTO Build a MythTV System on Red Hat Linux 9 w/ATrpms" document, 
-<A HREF="http://pvrhw.goldfish.org/tiki-page.php?pageName=rh9pvr250">http://pvrhw.goldfish.org/tiki-page.php?pageName=rh9pvr250</A>.
-Instructions for Fedora may be found at 
-<A HREF="http://wilsonet.com/mythtv/">http://wilsonet.com/mythtv/</A> Just
-like 3rd-party packages, any 3rd-party documentation problems should be
-brought up with the maintainer.</P>
+<A HREF="mailto:jcw@wilsonet.com">mailto:jcw@wilsonet.com</A> at 
+<A HREF="http://wilsonet.com/mythtv/">http://wilsonet.com/mythtv/</A>
+Just like 3rd-party packages, any 3rd-party documentation problems
+should be brought up with the 3rd-parties (maintainer, lists, bugzillas etc.).</P>
 
 <H3>Mandrake</H3>
 

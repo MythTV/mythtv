@@ -58,7 +58,7 @@ necessary.</EM>
 
 <UL>
 <LI><A NAME="toc6.1">6.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss6.1">Mandrake 9.0</A>
-<LI><A NAME="toc6.2">6.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss6.2">Red Hat Linux</A>
+<LI><A NAME="toc6.2">6.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss6.2">Red Hat Linux and Fedora Core</A>
 <LI><A NAME="toc6.3">6.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss6.3">Gentoo</A>
 <LI><A NAME="toc6.4">6.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss6.4">Setting up the initial database.</A>
 </UL>
@@ -75,7 +75,7 @@ necessary.</EM>
 <UL>
 <LI><A NAME="toc8.1">8.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss8.1">Gentoo</A>
 <LI><A NAME="toc8.2">8.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss8.2">Mandrake 9.0</A>
-<LI><A NAME="toc8.3">8.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss8.3">Red Hat Linux</A>
+<LI><A NAME="toc8.3">8.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss8.3">Red Hat Linux/Fedora Core</A>
 <LI><A NAME="toc8.4">8.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss8.4">Obtaining and compiling lirc.</A>
 <LI><A NAME="toc8.5">8.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss8.5">Completing the lirc install. </A>
 <LI><A NAME="toc8.6">8.6</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss8.6">Additional information for lirc.</A>
@@ -804,23 +804,27 @@ additional configuration steps in this HOWTO.  The next logical step is
 <A HREF="#mysql">configuring MySQL</A>, which you may or may not have to
 perform.  See your package documentation.</P>
 
-<H3><A NAME="atrpms"></A> Red Hat Linux</H3>
+<H3><A NAME="atrpms"></A> Red Hat Linux/Fedora Core</H3>
 
-<P>Red Hat Linux 9 packages for MythTV and most of its add-on modules and
+<P>Red Hat Linux (9, 8.0 and 7.3) and Fedora Core (2 and 1) packages
+for MythTV and all of its add-on modules and
 some themes have been packaged by 
-<A HREF="mailto:Axel.Thimm@physik.fu-berlin.de">mailto:Axel.Thimm@physik.fu-berlin.de</A> and are available at 
-<A HREF="http://atrpms.physik.fu-berlin.de/topic/multimedia/">http://atrpms.physik.fu-berlin.de/topic/multimedia/</A>. All of the
+<A HREF="mailto:Axel.Thimm@ATrpms.net">mailto:Axel.Thimm@ATrpms.net</A> and are available at 
+<A HREF="http://ATrpms.net/topic/multimedia/">http://ATrpms.net/topic/multimedia/</A>. All of the
 prerequisites for MythTV (such as XMLTV) are available as RPM packages. If
-you have problems with the RPMs, please send him email directly.</P>
+you have problems with the RPMs, please contact the ATrpms lists at 
+<A HREF="http://lists.ATrpms.net/">http://lists.ATrpms.net/</A> or file a bug
+against 
+<A HREF="http://bugzilla.ATrpms.net/">http://bugzilla.ATrpms.net/</A>.</P>
 <P>Given the large number of dependent RPMs you are advised to use tools like
 apt or yum for automatic retrieval and installation of the required RPMs.
 (
-<A HREF="http://atrpms.physik.fu-berlin.de/install.html">http://atrpms.physik.fu-berlin.de/install.html</A>) In this case a
+<A HREF="http://ATrpms.net/install.html">http://ATrpms.net/install.html</A>) In this case a
 special meta-package called mythtv-suite will allow you to install all of
 MythTV and its add-ons, plus all dependencies.</P>
 <P>If you don't have <B>apt</B> or <B>yum</B> on your machine, download and
-install the 
-<A HREF="http://atrpms.physik.fu-berlin.de/dist/rh9/atrpms-kickstart/">atrpms-kickstart package</A>.
+install the atrpms-kickstart package from 
+<A HREF="http://ATrpms.net/name/atrpms-kickstart/">http://ATrpms.net/name/atrpms-kickstart/</A>.
 Install the package with:
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -828,9 +832,11 @@ Install the package with:
 </PRE>
 </CODE></BLOCKQUOTE>
 
-Then update your <B>apt</B> package listings:
+Then run:
 <BLOCKQUOTE><CODE>
 <PRE>
+# apt-get update
+# apt-get dist-upgrade
 # apt-get update
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -843,19 +849,16 @@ And finally:
 </CODE></BLOCKQUOTE>
         
 These steps however, do NOT perform the installation of any drivers required
-for <B>ALSA</B>, capture cards, <B>lirc</B>, etc., nor do they set up
+for <B>ALSA</B>, capture cards, <B>lirc kernel modules</B>, etc., nor do they set up
 your MythTV database. Check 
-<A HREF="http://atrpms.physik.fu-berlin.de/topic/multimedia/">ATrpms</A> for
+<A HREF="http://ATrpms.net/topic/multimedia/">ATrpms</A> for
 the drivers you need.</P>
 <P>Further documentation on using ATrpms packages can be found in Jarod
 Wilson's 
-<A HREF="mailto:jcw@wilsonet.com">mailto:jcw@wilsonet.com</A>
-"HOWTO Build a MythTV System on Red Hat Linux 9 w/ATrpms" document, 
-<A HREF="http://pvrhw.goldfish.org/tiki-page.php?pageName=rh9pvr250">http://pvrhw.goldfish.org/tiki-page.php?pageName=rh9pvr250</A>.
-Instructions for Fedora may be found at 
-<A HREF="http://wilsonet.com/mythtv/">http://wilsonet.com/mythtv/</A> Just
-like 3rd-party packages, any 3rd-party documentation problems should be
-brought up with the maintainer.</P>
+<A HREF="mailto:jcw@wilsonet.com">mailto:jcw@wilsonet.com</A> at 
+<A HREF="http://wilsonet.com/mythtv/">http://wilsonet.com/mythtv/</A>
+Just like 3rd-party packages, any 3rd-party documentation problems
+should be brought up with the 3rd-parties (maintainer, lists, bugzillas etc.).</P>
 
 <H3>Mandrake</H3>
 
@@ -1390,7 +1393,7 @@ next step and type:
 
 NOTE for Red Hat users: If you are installing with apt or yum, you may skip
 this step, it will be taken care of. Otherwise get lame and lame-devel from
-FreshRPMS: http://freshrpms.net/rpm/lame/
+&lt;url url="http://ATrpms.net/name/lame/" name="http://ATrpms.net/name/lame/">.
 
 After downloading, be sure to install both:
 # rpm -Uvh lame*
@@ -1458,10 +1461,10 @@ $
 <H2><A NAME="ss5.3">5.3</A> <A HREF="#toc5.3">XMLTV. </A>
 </H2>
 
-<H3>Red Hat Linux 9:</H3>
+<H3>Red Hat Linux and Fedora Core:</H3>
 
 <P>RPMs for <B>XMLTV</B> and all of its dependencies can be obtained from
-<A HREF="http://atrpms.physik.fu-berlin.de/name/xmltv/">http://atrpms.physik.fu-berlin.de/name/xmltv/</A>. The web page has a
+<A HREF="http://ATrpms.net/name/xmltv/">http://ATrpms.net/name/xmltv/</A>. The web page has a
 list of all the dependent packages you must download and install.
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -1743,7 +1746,7 @@ $ su
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss6.2">6.2</A> <A HREF="#toc6.2">Red Hat Linux</A>
+<H2><A NAME="ss6.2">6.2</A> <A HREF="#toc6.2">Red Hat Linux and Fedora Core</A>
 </H2>
 
 <P>If this is the system maintaining the database, make sure that MySQL is
@@ -1778,7 +1781,7 @@ $ cd database
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<H3>Mandrake 9.0 and Red Hat Linux</H3>
+<H3>Mandrake 9.0 and Red Hat Linux/Fedora Core</H3>
 
 <P>
 <BLOCKQUOTE><CODE>
@@ -1883,13 +1886,13 @@ set it as the recording source.</P>
 <H2><A NAME="ss7.1">7.1</A> <A HREF="#toc7.1">Graphically setting up the mixer.</A>
 </H2>
 
-<H3>Mandrake 9.0 and Red Hat Linux</H3>
+<H3>Mandrake 9.0 and Red Hat Linux/Fedora Core</H3>
 
 <P>Open Kmix by clicking K->Multimedia->Sound->Kmix for Mandrake, or
 <PRE>
 RedHat Menu>Sound &amp; Video>Volume Control
 </PRE>
- on Red Hat.</P>
+ on Red Hat/Fedora.</P>
 <P>Click on Settings->Configure  Make sure that "Tick Marks" and "Show
 labels" have "X"'s in them.  This will make it easier to find the correct
 audio source.  Click OK.</P>
@@ -1903,10 +1906,10 @@ the settings so that this is your default.</P>
 
 <H3>Using OSS drivers.</H3>
 
-<P>Red Hat Linux 8.0 ships with OSS sound drivers rather than the ALSA
+<P>Red Hat Linux and Fedora Core 1 ship with OSS sound drivers rather than the ALSA
 drivers recommended by the MythTV team. The OSS drivers do work for many
 people, and for many cards. We recommend that you give OSS a try since it is
-already included in Red Hat 8. However, some people report problems (sync
+already included in the vendor distribution. However, some people report problems (sync
 and jitter) with OSS, and in addition it does not support full duplex on
 some cards.  Full duplex is required if you want to record and play sound
 using just one sound card. ALSA has good full duplex support, and also has
@@ -1955,7 +1958,7 @@ $ ./configure --with-cards=XXX --with-sequencer=yes
 <FIGURE>
 <EPS FILE="stop.eps">
 <IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>: Red Hat users, you may need to perform the following step to
+<CAPTION><B>NOTE</B>: Red Hat/Fedora users, you may need to perform the following step to
 allow the compile to continue:</CAPTION>
 </FIGURE>
 
@@ -2179,7 +2182,7 @@ $ su
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss8.3">8.3</A> <A HREF="#toc8.3">Red Hat Linux</A>
+<H2><A NAME="ss8.3">8.3</A> <A HREF="#toc8.3">Red Hat Linux/Fedora Core</A>
 </H2>
 
 <P>You should already have the source from the "Kernel Development" package
@@ -2307,7 +2310,7 @@ to emulate the various keystrokes from <CODE>keys.txt</CODE> of your IR
 keyboard.  Using this method removes lirc entirely from the picture - your
 remote will be sending keypresses that your PC "sees" on the keyboard port.</P>
 
-<H3>Recompiling your kernel on Red Hat Linux</H3>
+<H3>Recompiling your kernel on Red Hat Linux/Fedora Core</H3>
 
 <P>Don't Panic! Red Hat makes a kernel recompile very easy. They provide  
 configuration files that make it so you can recompile your kernel with  
@@ -2321,10 +2324,10 @@ if you run into trouble) of how to do this go to
 <IMG SRC="warning.png">
 <CAPTION><B>NOTE</B>: Suitable Red Hat kernels for MythTV (i2c update, v4l2 API,
 CONFIG_SERIAL modularized) are available from ATrpms: 
-<A HREF="http://atrpms.physik.fu-berlin.de/name/kernel/">http://atrpms.physik.fu-berlin.de/name/kernel/</A>. You will also find
+<A HREF="http://ATrpms.net/name/kernel/">http://ATrpms.net/name/kernel/</A>. You will also find
 suitable kernel modules for ALSA, lirc, bttv, ivtv, saa7134 etc. there. See
 also the 
-<A HREF="#atrpms">main Red Hat section</A>.</CAPTION>
+<A HREF="#atrpms">main Red Hat/Fedora Core section</A>.</CAPTION>
 </FIGURE>
 
 For the impatient:
@@ -3506,7 +3509,8 @@ the frontend should poll the backend to determine if the status has changed.</P>
 <FIGURE>
 <EPS FILE="stop.eps">
 <IMG SRC="stop.png">
-<CAPTION><B>NOTE to Red Hat users</B>:Red Hat Linux 9 ships with Gnome as
+<CAPTION><B>NOTE to Red Hat/Fedora users</B>:Red Hat Linux and Fedora Core
+ship with Gnome as
 the default desktop environment.  However, Gnome seems to have issues with
 window focus and window switching which sometimes cause mythfrontend to
 obscure the video. KDE does not seem to have any such issues. Therefore you
@@ -7014,7 +7018,7 @@ under one second, even files as large as 10 gigabytes.</P>
 
 <P>XFS is a journaling file system originally developed by SGI for Irix, and
 later released as open source.  While not a part of the default RedHat Linux
-9 or Fedora Core installation (although it is a part of Mandrake), it can be
+9 or Fedora Core installation (although it is a part of Mandrake and Fedora Core 2), it can be
 easily installed via ATrpms.  XFS provides deletion speeds for large files
 only slightly slower than JFS.  According to the test results shown at (
 <A HREF="http://aurora.zemris.fer.hr/filesystems/big.html">http://aurora.zemris.fer.hr/filesystems/big.html</A>), XFS provide

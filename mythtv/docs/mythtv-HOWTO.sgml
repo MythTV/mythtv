@@ -588,34 +588,39 @@ additional configuration steps in this HOWTO.  The next logical step is
 <ref id="mysql" name="configuring MySQL">, which you may or may not have to
 perform.  See your package documentation.
 
-<sect3>Red Hat Linux
+<sect3>Red Hat Linux/Fedora Core
 <label id="atrpms">
-<p>Red Hat Linux 9 packages for MythTV and most of its add-on modules and
+<p>Red Hat Linux (9, 8.0 and 7.3) and Fedora Core (2 and 1) packages
+for MythTV and all of its add-on modules and
 some themes have been packaged by <url
-url="mailto:Axel.Thimm@physik.fu-berlin.de"
-name="mailto:Axel.Thimm@physik.fu-berlin.de"> and are available at <url
-url="http://atrpms.physik.fu-berlin.de/topic/multimedia/"
-name="http://atrpms.physik.fu-berlin.de/topic/multimedia/">. All of the
+url="mailto:Axel.Thimm@ATrpms.net"
+name="mailto:Axel.Thimm@ATrpms.net"> and are available at <url
+url="http://ATrpms.net/topic/multimedia/"
+name="http://ATrpms.net/topic/multimedia/">. All of the
 prerequisites for MythTV (such as XMLTV) are available as RPM packages. If
-you have problems with the RPMs, please send him email directly.
- 
+you have problems with the RPMs, please contact the ATrpms lists at <url
+url="http://lists.ATrpms.net/" name="http://lists.ATrpms.net/"> or file a bug
+against <url url="http://bugzilla.ATrpms.net/" name="http://bugzilla.ATrpms.net/">.
+
 Given the large number of dependent RPMs you are advised to use tools like
 apt or yum for automatic retrieval and installation of the required RPMs.
-(<url url="http://atrpms.physik.fu-berlin.de/install.html"
-name="http://atrpms.physik.fu-berlin.de/install.html">) In this case a
+(<url url="http://ATrpms.net/install.html"
+name="http://ATrpms.net/install.html">) In this case a
 special meta-package called mythtv-suite will allow you to install all of
 MythTV and its add-ons, plus all dependencies.
 
 If you don't have <bf>apt</bf> or <bf>yum</bf> on your machine, download and
-install the <url
-url="http://atrpms.physik.fu-berlin.de/dist/rh9/atrpms-kickstart/"
-name="atrpms-kickstart package">.
+install the atrpms-kickstart package from <url
+url="http://ATrpms.net/name/atrpms-kickstart/"
+name="http://ATrpms.net/name/atrpms-kickstart/">.
 Install the package with:
 <tscreen><verb>
 # rpm -Uvh atrpms-kickstart*
 </verb></tscreen>
-Then update your <bf>apt</bf> package listings:
+Then run:
 <tscreen><verb>
+# apt-get update
+# apt-get dist-upgrade
 # apt-get update
 </verb></tscreen>
 And finally:
@@ -623,20 +628,17 @@ And finally:
 # apt-get install mythtv-suite
 </verb></tscreen>	
 These steps however, do NOT perform the installation of any drivers required
-for <bf>ALSA</bf>, capture cards, <bf>lirc</bf>, etc., nor do they set up
+for <bf>ALSA</bf>, capture cards, <bf>lirc kernel modules</bf>, etc., nor do they set up
 your MythTV database. Check <url
-url="http://atrpms.physik.fu-berlin.de/topic/multimedia/" name="ATrpms"> for
+url="http://ATrpms.net/topic/multimedia/" name="ATrpms"> for
 the drivers you need.
 
 Further documentation on using ATrpms packages can be found in Jarod
-Wilson's <url url="mailto:jcw@wilsonet.com" name="mailto:jcw@wilsonet.com">
-"HOWTO Build a MythTV System on Red Hat Linux 9 w/ATrpms" document, <url
-url="http://pvrhw.goldfish.org/tiki-page.php?pageName=rh9pvr250"
-name="http://pvrhw.goldfish.org/tiki-page.php?pageName=rh9pvr250">.
-Instructions for Fedora may be found at <url
-url="http://wilsonet.com/mythtv/" name="http://wilsonet.com/mythtv/"> Just
-like 3rd-party packages, any 3rd-party documentation problems should be
-brought up with the maintainer.
+Wilson's <url url="mailto:jcw@wilsonet.com"
+name="mailto:jcw@wilsonet.com"> at <url
+url="http://wilsonet.com/mythtv/" name="http://wilsonet.com/mythtv/">
+Just like 3rd-party packages, any 3rd-party documentation problems
+should be brought up with the 3rd-parties (maintainer, lists, bugzillas etc.).
 
 <sect3>Mandrake
 <p>Thac has created RPMs for MythTV for Mandrake 9.0, 9.1 and 9.2 which may
@@ -1122,7 +1124,7 @@ next step and type:
 
 NOTE for Red Hat users: If you are installing with apt or yum, you may skip
 this step, it will be taken care of. Otherwise get lame and lame-devel from
-FreshRPMS: http://freshrpms.net/rpm/lame/
+<url url="http://ATrpms.net/name/lame/" name="http://ATrpms.net/name/lame/">.
 
 After downloading, be sure to install both:
 # rpm -Uvh lame*
@@ -1175,10 +1177,10 @@ $
 </verb></tscreen>
 
 <sect1>XMLTV. 
-<sect2>Red Hat Linux 9:
+<sect2>Red Hat Linux and Fedora Core:
 <p>RPMs for <bf>XMLTV</bf> and all of its dependencies can be obtained from
-<url url="http://atrpms.physik.fu-berlin.de/name/xmltv/"
-name="http://atrpms.physik.fu-berlin.de/name/xmltv/">. The web page has a
+<url url="http://ATrpms.net/name/xmltv/"
+name="http://ATrpms.net/name/xmltv/">. The web page has a
 list of all the dependent packages you must download and install.
 <tscreen><verb>
 # rpm -Uvh xmltv* perl*
@@ -1459,7 +1461,7 @@ $ su
 # exit
 </verb></tscreen>
 
-<sect1>Red Hat Linux
+<sect1>Red Hat Linux and Fedora Core
 <p>If this is the system maintaining the database, make sure that MySQL is
 running and started at boot. Click on Redhat menu>Server Settings>Services
 and enter the root password when asked. Check "mysqld" and then click Start.
@@ -1484,7 +1486,7 @@ To setup the initial MySQL databases:
 <tscreen><verb>
 $ cd database
 </verb></tscreen>
-<sect2>Mandrake 9.0 and Red Hat Linux
+<sect2>Mandrake 9.0 and Red Hat Linux/Fedora Core
 <p><tscreen><verb>
 $ mysql -u root < mc.sql
 </verb></tscreen>
@@ -1569,9 +1571,9 @@ set it as the recording source.
 There are two ways to do this.  Graphically, and from the command line.
 
 <sect1>Graphically setting up the mixer.
-<sect2>Mandrake 9.0 and Red Hat Linux
+<sect2>Mandrake 9.0 and Red Hat Linux/Fedora Core
 <p>Open Kmix by clicking K->Multimedia->Sound->Kmix for Mandrake, or
-<verb>RedHat Menu>Sound & Video>Volume Control</verb> on Red Hat.
+<verb>RedHat Menu>Sound & Video>Volume Control</verb> on Red Hat/Fedora.
 
 Click on Settings->Configure  Make sure that "Tick Marks" and "Show
 labels" have "X"'s in them.  This will make it easier to find the correct
@@ -1586,10 +1588,10 @@ the Line-in is used as the source.  Click OK, and make sure that you save
 the settings so that this is your default.
 
 <sect3>Using OSS drivers.
-<p>Red Hat Linux 8.0 ships with OSS sound drivers rather than the ALSA
+<p>Red Hat Linux and Fedora Core 1 ship with OSS sound drivers rather than the ALSA
 drivers recommended by the MythTV team. The OSS drivers do work for many
 people, and for many cards. We recommend that you give OSS a try since it is
-already included in Red Hat 8. However, some people report problems (sync
+already included in the vendor distribution. However, some people report problems (sync
 and jitter) with OSS, and in addition it does not support full duplex on
 some cards.  Full duplex is required if you want to record and play sound
 using just one sound card. ALSA has good full duplex support, and also has
@@ -1634,7 +1636,7 @@ $ ./configure --with-cards=XXX --with-sequencer=yes
 <figure loc="here">
 <eps file="stop.eps" height="1cm">
 <img src="stop.png">
-<caption><bf>NOTE</bf>: Red Hat users, you may need to perform the following step to
+<caption><bf>NOTE</bf>: Red Hat/Fedora users, you may need to perform the following step to
 allow the compile to continue:
 </caption>
 </figure>
@@ -1832,7 +1834,7 @@ $ su
 # urpmi kernel-source
 </verb></tscreen>
 
-<sect1>Red Hat Linux
+<sect1>Red Hat Linux/Fedora Core
 <p>You should already have the source from the "Kernel Development" package
 you installed in section 3.2. Ensure that a symlink has been created:
 <tscreen><verb>
@@ -1945,7 +1947,7 @@ to emulate the various keystrokes from <tt>keys.txt</tt> of your IR
 keyboard.  Using this method removes lirc entirely from the picture - your
 remote will be sending keypresses that your PC "sees" on the keyboard port.
 
-<sect2>Recompiling your kernel on Red Hat Linux
+<sect2>Recompiling your kernel on Red Hat Linux/Fedora Core
 <p>Don't Panic! Red Hat makes a kernel recompile very easy. They provide  
 configuration files that make it so you can recompile your kernel with  
 Red Hat defaults. And as a side benefit, your kernel will be compiled  
@@ -1959,10 +1961,10 @@ name="http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/ch-cu
 <img src="warning.png">
 <caption><bf>NOTE</bf>: Suitable Red Hat kernels for MythTV (i2c update, v4l2 API,
 CONFIG_SERIAL modularized) are available from ATrpms: <url
-url="http://atrpms.physik.fu-berlin.de/name/kernel/"
-name="http://atrpms.physik.fu-berlin.de/name/kernel/">. You will also find
+url="http://ATrpms.net/name/kernel/"
+name="http://ATrpms.net/name/kernel/">. You will also find
 suitable kernel modules for ALSA, lirc, bttv, ivtv, saa7134 etc. there. See
-also the <ref id="atrpms" name="main Red Hat section">.
+also the <ref id="atrpms" name="main Red Hat/Fedora Core section">.
 </caption>
 </figure>
 For the impatient:
@@ -3107,7 +3109,8 @@ the frontend should poll the backend to determine if the status has changed.
 <p><figure loc="here">
 <eps file="stop.eps" height="1cm">
 <img src="stop.png">
-<caption><bf>NOTE to Red Hat users</bf>:Red Hat Linux 9 ships with Gnome as
+<caption><bf>NOTE to Red Hat/Fedora users</bf>:Red Hat Linux and Fedora Core
+ship with Gnome as
 the default desktop environment.  However, Gnome seems to have issues with
 window focus and window switching which sometimes cause mythfrontend to
 obscure the video. KDE does not seem to have any such issues. Therefore you
@@ -6325,7 +6328,7 @@ under one second, even files as large as 10 gigabytes.
 <sect2>XFS
 <p>XFS is a journaling file system originally developed by SGI for Irix, and
 later released as open source.  While not a part of the default RedHat Linux
-9 or Fedora Core installation (although it is a part of Mandrake), it can be
+9 or Fedora Core installation (although it is a part of Mandrake and Fedora Core 2), it can be
 easily installed via ATrpms.  XFS provides deletion speeds for large files
 only slightly slower than JFS.  According to the test results shown at (<url
 url="http://aurora.zemris.fer.hr/filesystems/big.html"
@@ -6341,7 +6344,7 @@ archive.  Add statement that XFS or JFS are really the way to go.  Add Bruce
 Markey's update to the filter docs.  Modify non-master backend config based
 on Scott Rowe's suggestion. Initial version for v00.15.00.  Bruce's mod to
 removing unwanted DD channels.  Chris Pinkham's save icon thing for MySQL
-v3.  Update rest of gossamer-threads links.
+v3.  Update rest of gossamer-threads links. Axel Thimms' Fedora update.
 
 -->
 

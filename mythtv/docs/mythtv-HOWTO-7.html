@@ -36,13 +36,13 @@ set it as the recording source.</P>
 <H2><A NAME="ss7.1">7.1</A> <A HREF="mythtv-HOWTO.html#toc7.1">Graphically setting up the mixer.</A>
 </H2>
 
-<H3>Mandrake 9.0 and Red Hat Linux</H3>
+<H3>Mandrake 9.0 and Red Hat Linux/Fedora Core</H3>
 
 <P>Open Kmix by clicking K->Multimedia->Sound->Kmix for Mandrake, or
 <PRE>
 RedHat Menu>Sound &amp; Video>Volume Control
 </PRE>
- on Red Hat.</P>
+ on Red Hat/Fedora.</P>
 <P>Click on Settings->Configure  Make sure that "Tick Marks" and "Show
 labels" have "X"'s in them.  This will make it easier to find the correct
 audio source.  Click OK.</P>
@@ -56,10 +56,10 @@ the settings so that this is your default.</P>
 
 <H3>Using OSS drivers.</H3>
 
-<P>Red Hat Linux 8.0 ships with OSS sound drivers rather than the ALSA
+<P>Red Hat Linux and Fedora Core 1 ship with OSS sound drivers rather than the ALSA
 drivers recommended by the MythTV team. The OSS drivers do work for many
 people, and for many cards. We recommend that you give OSS a try since it is
-already included in Red Hat 8. However, some people report problems (sync
+already included in the vendor distribution. However, some people report problems (sync
 and jitter) with OSS, and in addition it does not support full duplex on
 some cards.  Full duplex is required if you want to record and play sound
 using just one sound card. ALSA has good full duplex support, and also has
@@ -108,7 +108,7 @@ $ ./configure --with-cards=XXX --with-sequencer=yes
 <FIGURE>
 <EPS FILE="stop.eps">
 <IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>: Red Hat users, you may need to perform the following step to
+<CAPTION><B>NOTE</B>: Red Hat/Fedora users, you may need to perform the following step to
 allow the compile to continue:</CAPTION>
 </FIGURE>
 
