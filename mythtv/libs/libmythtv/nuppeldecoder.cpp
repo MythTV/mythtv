@@ -851,7 +851,10 @@ void NuppelDecoder::WriteStoredData(RingBuffer *rb, bool storevid,
     RawDataList *data;
     while(! StoredData.isEmpty()) {
         data = StoredData.first();
-        data->frameheader.timecode -= timecodeOffset;
+
+        if (data->frameheader.frametype != 'S')
+            data->frameheader.timecode -= timecodeOffset;
+
         if (storevid || data->frameheader.frametype != 'V')
         {
             rb->Write(&(data->frameheader), FRAMEHEADERSIZE);
