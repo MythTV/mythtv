@@ -2110,7 +2110,7 @@ void NuppelVideoPlayer::UpdateTimeDisplay(void)
     char framestr[128];
     sprintf(framestr, "%lld", framesPlayed);
 
-    QString cutmarker = "";
+    QString cutmarker = " ";
     if (IsInDelete(framesPlayed))
         cutmarker = QObject::tr("cut");
 
@@ -2223,6 +2223,8 @@ void NuppelVideoPlayer::HandleResponse(void)
                 break;
         }
     }
+    UpdateEditSlider();
+    UpdateTimeDisplay();
 }
 
 void NuppelVideoPlayer::UpdateEditSlider(void)
@@ -2234,14 +2236,12 @@ void NuppelVideoPlayer::AddMark(long long frames, int type)
 {
     deleteMap[frames] = type;
     osd->ShowEditArrow(frames, totalFrames, type);
-    UpdateEditSlider();
 }
 
 void NuppelVideoPlayer::DeleteMark(long long frames)
 {
     osd->HideEditArrow(frames, deleteMap[frames]);
     deleteMap.remove(frames);
-    UpdateEditSlider();
 }
 
 void NuppelVideoPlayer::HandleArbSeek(bool right)

@@ -79,6 +79,7 @@ class TV : public QObject
 
   protected slots:
     void SetPreviousChannel(void);
+    void UnMute(void);
 
   protected:
     void doLoadMenu(void);
@@ -219,6 +220,7 @@ class TV : public QObject
     PrevChannelVector channame_vector;
     unsigned int times_pressed;
     QTimer *prevChannelTimer;
+    QTimer *muteTimer;
     QString last_channel;
 
     MythDialog *myWindow;

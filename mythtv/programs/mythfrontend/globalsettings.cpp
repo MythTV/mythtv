@@ -50,26 +50,16 @@ protected:
     static const char* paths[];
 };
 
-const char* MixerDevice::paths[] = { "/dev/mixer",
-                                     "/dev/mixer1",
-                                     "/dev/mixer2",
-                                     "/dev/mixer3",
-                                     "/dev/mixer4",
-                                     "/dev/sound/mixer",
-                                     "/dev/sound/mixer1",
-                                     "/dev/sound/mixer2",
-                                     "/dev/sound/mixer3",
-                                     "/dev/sound/mixer4" };
-
 MixerDevice::MixerDevice():
     ComboBoxSetting(true),
     GlobalSetting("MixerDevice") {
 
     setLabel("Mixer Device");
-    for(unsigned int i = 0; i < sizeof(paths) / sizeof(char*); ++i) {
-        if (QFile(paths[i]).exists())
-            addSelection(paths[i]);
-    }
+    QDir dev("/dev", "mixer*", QDir::Name, QDir::System);
+    fillSelectionsFromDir(dev);
+
+    dev.setPath("/dev/sound");
+    fillSelectionsFromDir(dev);
 }
 
 class MixerControl: public ComboBoxSetting, public GlobalSetting {

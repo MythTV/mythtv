@@ -111,6 +111,9 @@ TV::TV(QSqlDatabase *db)
 
     prevChannelTimer = new QTimer(this);
     connect(prevChannelTimer, SIGNAL(timeout()), SLOT(SetPreviousChannel()));
+
+    muteTimer = new QTimer(this);
+    connect(muteTimer, SIGNAL(timeout()), SLOT(UnMute()));
 }
 
 void TV::Init(bool createWindow)
@@ -1336,6 +1339,14 @@ void TV::DoInfo(void)
 
 void TV::DoFF(int time)
 {
+    bool muted = false;
+
+    if (volumeControl && !volumeControl->GetMute())
+    {
+        volumeControl->ToggleMute();
+        muted = true;
+    }
+
     bool slidertype = false;
     if (internalState == kState_WatchingLiveTV)
         slidertype = true;
@@ -1352,10 +1363,21 @@ void TV::DoFF(int time)
     }
 
     activenvp->FastForward(time * ff_rew_scaling);
+
+    if (muted) 
+        muteTimer->start(600, true);
 }
 
 void TV::DoRew(int time)
 {
+    bool muted = false;
+
+    if (volumeControl && !volumeControl->GetMute())
+    {
+        volumeControl->ToggleMute();
+        muted = true;
+    }
+
     bool slidertype = false;
     if (internalState == kState_WatchingLiveTV)
         slidertype = true;
@@ -1372,10 +1394,21 @@ void TV::DoRew(int time)
     }
 
     activenvp->Rewind(time * ff_rew_scaling);
+
+    if (muted) 
+        muteTimer->start(600, true);
 }
 
 void TV::DoJumpAhead(void)
 {
+    bool muted = false;
+
+    if (volumeControl && !volumeControl->GetMute())
+    {
+        volumeControl->ToggleMute();
+        muted = true;
+    }
+
     bool slidertype = false;
     if (internalState == kState_WatchingLiveTV)
         slidertype = true;
@@ -1388,10 +1421,21 @@ void TV::DoJumpAhead(void)
     }
 
     activenvp->FastForward(jumptime * 60);
+
+    if (muted) 
+        muteTimer->start(600, true);
 }
 
 void TV::DoJumpBack(void)
 {
+    bool muted = false;
+
+    if (volumeControl && !volumeControl->GetMute())
+    {
+        volumeControl->ToggleMute();
+        muted = true;
+    }
+
     bool slidertype = false;
     if (internalState == kState_WatchingLiveTV)
         slidertype = true;
@@ -1404,6 +1448,9 @@ void TV::DoJumpBack(void)
     }
 
     activenvp->Rewind(jumptime * 60);
+
+    if (muted) 
+        muteTimer->start(600, true);
 }
 
 void TV::DoQueueTranscode(void)
@@ -1425,6 +1472,14 @@ void TV::DoQueueTranscode(void)
 
 void TV::DoSkipCommercials(int direction)
 {
+    bool muted = false;
+
+    if (volumeControl && !volumeControl->GetMute())
+    {
+        volumeControl->ToggleMute();
+        muted = true;
+    }
+
     bool slidertype = false;
     if (internalState == kState_WatchingLiveTV)
         slidertype = true;
@@ -1438,6 +1493,9 @@ void TV::DoSkipCommercials(int direction)
     }
 
     activenvp->SkipCommercials(direction);
+
+    if (muted) 
+        muteTimer->start(600, true);
 }
 
 void TV::ToggleInputs(void)
@@ -1521,7 +1579,7 @@ void TV::ChangeChannel(int direction)
     channelkeysstored = 0;
 
     if (muted)
-        volumeControl->ToggleMute();
+        muteTimer->start(600, true);
 }
 
 void TV::ChannelKey(int key)
@@ -2016,6 +2074,13 @@ void TV::EPGChannelUpdate(QString chanstr)
         sprintf(channelKeys, "%s", chanstr.ascii());
         channelqueued = true; 
     }
+}
+
+void TV::UnMute(void)
+{
+    // If muted, unmute
+    if (volumeControl && volumeControl->GetMute())
+        volumeControl->ToggleMute();
 }
 
 void TV::customEvent(QCustomEvent *e)

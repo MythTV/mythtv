@@ -878,7 +878,7 @@ void OSD::ClearAllText(const QString &name)
 }
 
 void OSD::SetTextByRegexp(const QString &name,
-                     QMap<QString, QString> &regexpMap, int length)
+                          QMap<QString, QString> &regexpMap, int length)
 {
     pthread_mutex_lock(&osdlock);
     OSDSet *container = GetSet(name);

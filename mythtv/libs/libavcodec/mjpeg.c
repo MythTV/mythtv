@@ -808,6 +808,7 @@ typedef struct MJpegDecodeContext {
 
     int16_t quant_matrixes[4][64];
     VLC vlcs[2][4];
+    int qscale[4];      ///< quantizer scale calculated from quant_matrixes
 
     int org_width, org_height;  /* size given at codec init */
     int first_picture;    /* true if decoding first picture */
@@ -829,6 +830,7 @@ typedef struct MJpegDecodeContext {
     int last_dc[MAX_COMPONENTS]; /* last DEQUANTIZED dc (XXX: am I right to do that ?) */
     uint8_t *current_picture[MAX_COMPONENTS]; /* picture structure */
     int linesize[MAX_COMPONENTS];
+    uint8_t *qscale_table;
     DCTELEM block[64] __align8;
     ScanTable scantable;
     void (*idct_put)(uint8_t *dest/*align 8*/, int line_size, DCTELEM *block/*align 16*/);
@@ -842,7 +844,7 @@ typedef struct MJpegDecodeContext {
 
 static int mjpeg_decode_dht(MJpegDecodeContext *s);
 
-static void build_vlc(VLC *vlc, const uint8_t *bits_table, const uint8_t *val_table, 
+static int build_vlc(VLC *vlc, const uint8_t *bits_table, const uint8_t *val_table, 
                       int nb_codes)
 {
     uint8_t huff_size[256];
@@ -851,7 +853,7 @@ static void build_vlc(VLC *vlc, const uint8_t *bits_table, const uint8_t *val_ta
     memset(huff_size, 0, sizeof(huff_size));
     build_huffman_codes(huff_size, huff_code, bits_table, val_table);
     
-    init_vlc(vlc, 9, nb_codes, huff_size, 1, 1, huff_code, 2, 2);
+    return init_vlc(vlc, 9, nb_codes, huff_size, 1, 1, huff_code, 2, 2);
 }
 
 static int mjpeg_decode_init(AVCodecContext *avctx)
@@ -924,6 +926,11 @@ static int mjpeg_decode_dqt(MJpegDecodeContext *s)
             j = s->scantable.permutated[i];
 	    s->quant_matrixes[index][j] = get_bits(&s->gb, 8);
         }
+
+        //XXX FIXME finetune, and perhaps add dc too
+        s->qscale[index]= FFMAX(
+            s->quant_matrixes[index][s->scantable.permutated[1]],
+            s->quant_matrixes[index][s->scantable.permutated[8]]) >> 1;
         len -= 65;
     }
     
@@ -970,7 +977,9 @@ static int mjpeg_decode_dht(MJpegDecodeContext *s)
         free_vlc(&s->vlcs[class][index]);
         dprintf("class=%d index=%d nb_codes=%d\n",
                class, index, code_max + 1);
-        build_vlc(&s->vlcs[class][index], bits_table, val_table, code_max + 1);
+        if(build_vlc(&s->vlcs[class][index], bits_table, val_table, code_max + 1) < 0){
+            return -1;
+        }
     }
     return 0;
 }
@@ -1025,6 +1034,9 @@ static int mjpeg_decode_sof(MJpegDecodeContext *s)
     if (width != s->width || height != s->height) {
         for(i=0;i<MAX_COMPONENTS;i++)
             av_freep(&s->current_picture[i]);
+            
+        av_freep(&s->qscale_table);
+            
         s->width = width;
         s->height = height;
         /* test interlaced mode */
@@ -1063,6 +1075,8 @@ static int mjpeg_decode_sof(MJpegDecodeContext *s)
 	    }
           }
         }
+        s->qscale_table= av_mallocz((s->width+15)/16);
+
         s->first_picture = 0;
     }
 
@@ -1693,7 +1707,7 @@ static int mjpeg_decode_frame(AVCodecContext *avctx,
     MJpegDecodeContext *s = avctx->priv_data;
     uint8_t *buf_end, *buf_ptr;
     int i, start_code;
-    AVPicture *picture = data;
+    AVFrame *picture = data;
 
     *data_size = 0;
 
@@ -1778,7 +1792,10 @@ static int mjpeg_decode_frame(AVCodecContext *avctx,
                     mjpeg_decode_dqt(s);
                     break;
                 case DHT:
-                    mjpeg_decode_dht(s);
+                    if(mjpeg_decode_dht(s) < 0){
+                        fprintf(stderr, "huffman table decode error\n");
+                        return -1;
+                    }
                     break;
                 case SOF0:
                     s->lossless=0;
@@ -1791,6 +1808,8 @@ static int mjpeg_decode_frame(AVCodecContext *avctx,
 			return -1;
                     break;
 		case EOI:
+		    if ((s->buggy_avid && !s->interlaced) || s->restart_interval) 
+                        break;
 eoi_parser:
 		    {
                         if (s->interlaced) {
@@ -1804,7 +1823,7 @@ eoi_parser:
 			    picture->linesize[i] = (s->interlaced) ?
 				s->linesize[i] >> 1 : s->linesize[i];
                         }
-                        *data_size = sizeof(AVPicture);
+                        *data_size = sizeof(AVFrame);
                         avctx->height = s->height;
                         if (s->interlaced)
                             avctx->height *= 2;
@@ -1825,9 +1844,16 @@ eoi_parser:
                             avctx->pix_fmt = PIX_FMT_YUV420P;
                             break;
                         }
-                        /* dummy quality */
-                        /* XXX: infer it with matrix */
-//                    	avctx->quality = 3; 
+
+                        if(!s->lossless){
+                            picture->quality= FFMAX(FFMAX(s->qscale[0], s->qscale[1]), s->qscale[2]); 
+                            picture->qstride= 0;
+                            picture->qscale_table= s->qscale_table;
+                            memset(picture->qscale_table, picture->quality, (s->width+15)/16);
+                            if(avctx->debug & FF_DEBUG_QP)
+                                printf("QP: %d\n", (int)picture->quality);
+                        }
+                        
                         goto the_end;
                     }
 		    break;
@@ -1881,7 +1907,7 @@ static int mjpegb_decode_frame(AVCodecContext *avctx,
     MJpegDecodeContext *s = avctx->priv_data;
     uint8_t *buf_end, *buf_ptr;
     int i;
-    AVPicture *picture = data;
+    AVFrame *picture = data;
     GetBitContext hgb; /* for the header */
     uint32_t dqt_offs, dht_offs, sof_offs, sos_offs, second_field_offs;
     uint32_t field_size;
@@ -1968,12 +1994,14 @@ read_header:
     	}
     }
 
+    //XXX FIXME factorize, this looks very similar to the EOI code
+    
     for(i=0;i<3;i++) {
         picture->data[i] = s->current_picture[i];
         picture->linesize[i] = (s->interlaced) ?
     	    s->linesize[i] >> 1 : s->linesize[i];
     }
-    *data_size = sizeof(AVPicture);
+    *data_size = sizeof(AVFrame);
     avctx->height = s->height;
     if (s->interlaced)
         avctx->height *= 2;
@@ -1991,9 +2019,15 @@ read_header:
             avctx->pix_fmt = PIX_FMT_YUV420P;
             break;
     }
-    /* dummy quality */
-    /* XXX: infer it with matrix */
-//    avctx->quality = 3; 
+    
+    if(!s->lossless){
+        picture->quality= FFMAX(FFMAX(s->qscale[0], s->qscale[1]), s->qscale[2]); 
+        picture->qstride= 0;
+        picture->qscale_table= s->qscale_table;
+        memset(picture->qscale_table, picture->quality, (s->width+15)/16);
+        if(avctx->debug & FF_DEBUG_QP)
+            printf("QP: %d\n", picture->quality);
+    }
 
     return buf_ptr - buf;
 }
@@ -2005,6 +2039,7 @@ static int mjpeg_decode_end(AVCodecContext *avctx)
     int i, j;
 
     av_free(s->buffer);
+    av_free(s->qscale_table);
     for(i=0;i<MAX_COMPONENTS;i++)
         av_free(s->current_picture[i]);
     for(i=0;i<2;i++) {
