@@ -899,14 +899,6 @@ void OSDTypeImage::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
     ystart = (ystart / 2) * 2;
     xstart = ((xstart + 1) / 2) * 2;
 
-    if (height + ystart > surface->height)
-        height = surface->height - ystart - 1;
-    if (width + xstart > surface->width)
-        width = surface->width - xstart - 1;
-
-    if (width == 0 || height == 0)
-        return;
-
     int startline = 0;
     int startcol = 0;
 
@@ -921,6 +913,14 @@ void OSDTypeImage::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
         startcol = 0 - xstart;
         xstart = 0;
     }
+
+    if (height + ystart > surface->height)
+        height = surface->height - ystart - 1;
+    if (width + xstart > surface->width)
+        width = surface->width - xstart - 1;
+
+    if (width == 0 || height == 0)
+        return;
 
     QRect destRect = QRect(xstart, ystart, width, height);
     bool needblend = false;
@@ -994,7 +994,7 @@ void OSDTypeImage::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
         startingx = 0;
 
     ysrcwidth = startline * iwidth;
-    ydestwidth = (ystart - startline) * surface->width;
+    ydestwidth = ystart * surface->width;
 
     dest = surface->y + xstart + ydestwidth;
     destalpha = surface->alpha + xstart + ydestwidth;
@@ -1326,7 +1326,7 @@ void OSDTypeEditSlider::Draw(OSDSurface *surface, int fade, int maxfade,
 
     ysrcwidth = startline * iwidth; 
     rysrcwidth = startline * riwidth;
-    ydestwidth = (startline + ystart - startline) * surface->width;
+    ydestwidth = ystart * surface->width;
 
     dest = surface->y + xstart + ydestwidth;
     destalpha = surface->alpha + xstart + ydestwidth;
