@@ -1485,6 +1485,14 @@
       <shadow>1,1</shadow>
       <bold>yes</bold>
     </font>
+    
+    <font name="subtitle" face="Arial">
+      <color>#ffffee</color>
+      <size>17</size>
+      <size:small>13</size:small>
+      <shadow>3,3</shadow>
+      <bold>yes</bold>
+    </font>
 
     <font name="info" face="Arial">
       <color>#ffffff</color>
@@ -1510,12 +1518,13 @@
     </font>
 
     <container name="background">
-      <image name="filler" draworder="0" fleximage="no">
-        <filename>pf-top.png</filename>
+     <image name="filler" draworder="0" fleximage="no">
+        <filename>progfind_top.png</filename>
         <position>26,28</position>
       </image>
+ 
       <image name="lineback" draworder="0" fleximage="no">
-        <filename>pf-background.png</filename>
+        <filename>progfind_background.png</filename>
         <position>25,265</position>
       </image>
       <textarea name="prgrambar" align="center">
@@ -1534,7 +1543,7 @@
         <fcnfont name="active" function="selected"></fcnfont>
         <fcnfont name="inactive" function="inactive"></fcnfont>
         <items>9</items>
-        <image function="selectionbar" filename="pf-sel1.png" location="-14,-7"></image>
+        <image function="selectionbar" filename="progfind_sel1.png" location="-14,-9"></image>
       </listarea>
       <listarea name="shows" draworder="2">
         <area>88,8,380,295</area>
@@ -1543,7 +1552,7 @@
         <fcnfont name="inactive" function="inactive"></fcnfont>
         <column number="1" width="380" context="-1"></column>
         <items>9</items>
-        <image function="selectionbar" filename="pf-sel2.png" location="-14,-7"></image>
+        <image function="selectionbar" filename="progfind_sel2.png" location="-14,-9"></image>
       </listarea>
       <listarea name="times" draworder="2">
         <area>470,8,280,295</area>
@@ -1552,10 +1561,10 @@
         <fcnfont name="inactive" function="inactive"></fcnfont>
         <fcnfont name="record_font" function="recording"></fcnfont>
         <items>9</items>
-        <image function="selectionbar" filename="pf-sel3.png" location="-8,-7"></image>
+        <image function="selectionbar" filename="progfind_sel3.png" location="-6,-9"></image>
       </listarea>
       <image name="lines" draworder="5" fleximage="no">
-        <filename>pf-lines.png</filename>
+        <filename>progfind_lines.png</filename>
         <position>0,0</position>
       </image>
     </container>
@@ -1563,41 +1572,42 @@
     <container name="program_info">
       <area>25,25,750,220</area>
       <textarea name="title" draworder="6">
-        <area>13,5,500,30</area>
+        <area>25,15,515,45</area>
         <font>titleinfo</font>
       </textarea>
       <textarea name="subtitle" draworder="6">
-        <area>13,35,500,27</area>
-        <font>info</font>
+        <area>25,48,700,35</area>
+        <font>subtitle</font>
       </textarea>
-      <textarea name="timedate" draworder="6">
-        <area>13,62,500,27</area>
+      <textarea name="timedate" draworder="6" align="right">
+        <area>290,155,440,27</area>
        <font>info</font>
       </textarea>
-      <textarea name="channel" draworder="6" align="center">
-        <area>500,80,250,40</area>
-        <font>channel</font>
+      <textarea name="channel" draworder="6" align="right">
+        <area>290,180,440,40</area>
+        <font>info</font>
       </textarea>
       <textarea name="description" draworder="6">
-        <area>13,89,500,85</area>
+        <area>25,75,715,90</area>
         <font>info</font>
         <multiline>yes</multiline>
+        <value>%LONGREPEAT%%STARS%%DESCRIPTION%</value>
       </textarea>
-      <textarea name="rec_str" draworder="6">
-        <area>13,185,500,27</area>
+      <textarea name="recordingstatus" draworder="6">
+        <area>25,180,500,35</area>
         <font>recinfo</font>
       </textarea>
     </container>
 
     <container name="help_info_1">
-      <area>25,25,750,220</area>
+      <area>40,40,750,220</area>
       <textarea name="selectinfo" draworder="6">
-        <area>10,5,500,30</area>
+        <area>20,20,500,30</area>
         <font>info</font>
         <value>Select a letter...</value>
       </textarea>
       <textarea name="pickinfo" draworder="6">
-        <area>10,75,500,60</area>
+        <area>20,75,720,120</area>
         <font>info</font>
         <value>Pick the letter in which the show starts with, then press SELECT or the right arrow</value>
         <multiline>yes</multiline>
@@ -1607,12 +1617,12 @@
     <container name="help_info_2">
       <area>25,25,750,220</area>
       <textarea name="selectprog" draworder="6">
-        <area>10,5,500,30</area>
+        <area>20,20,500,30</area>
         <font>info</font>
         <value>Select a program...</value>
       </textarea>
       <textarea name="pickprog" draworder="6">
-        <area>10,75,500,120</area>
+        <area>20,75,720,120</area>
         <font>info</font>
         <value>Select the title of the program you wish to find. When finished return with the left arrow key. Press SELECT to schedule a recording.</value>
         <multiline>yes</multiline>
