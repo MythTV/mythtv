@@ -39,6 +39,12 @@ void MythComboBox::keyPressEvent(QKeyEvent *e)
 void MythCheckBox::keyPressEvent(QKeyEvent* e)
 {
     switch (e->key()) {
+    case Key_Up:
+        focusNextPrevChild(false);
+        break;
+    case Key_Down:
+        focusNextPrevChild(true);
+        break;
     case Key_Left:
     case Key_Right:
         toggle();
