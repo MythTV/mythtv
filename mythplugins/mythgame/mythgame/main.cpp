@@ -14,6 +14,7 @@ using namespace std;
 
 #include <mythtv/themedmenu.h>
 #include <mythtv/mythcontext.h>
+#include <mythtv/lcddevice.h>
 
 struct GameData
 {
@@ -54,7 +55,10 @@ void runMenu(QString which_menu)
 
     if (diag->foundTheme())
     {
-        gContext->GetLCDDevice()->switchToTime();
+        if (class LCD * lcd = LCD::Get())
+        {
+            lcd->switchToTime();
+        }
         diag->exec();
     }
     else
