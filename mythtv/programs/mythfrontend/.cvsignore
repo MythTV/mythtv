@@ -12,4 +12,5 @@ moc_setrectime.cpp
 moc_manualschedule.cpp
 moc_channelrecpriority.cpp
 moc_programrecpriority.cpp
+moc_search.cpp
 mythfrontend
