@@ -152,7 +152,7 @@ void DaapClient::addDaapServer(QString server_address, uint server_port, QString
         .arg(server_address)
         .arg(server_port), 10);
         
-    DaapInstance *new_daap_instance = new DaapInstance(this, server_address, server_port, service_name);
+    DaapInstance *new_daap_instance = new DaapInstance(parent, this, server_address, server_port, service_name);
     new_daap_instance->start();
     daap_instances.append(new_daap_instance);
 }

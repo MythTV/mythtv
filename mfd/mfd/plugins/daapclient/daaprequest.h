@@ -33,6 +33,7 @@ class DaapRequest
 
     bool send(QSocketDevice *where_to_send, bool ignore_shutdown=false);
     void addGetVariable(const QString &label, int value);
+    void addGetVariable(const QString &label, const QString &value);
     
   private:
 

@@ -208,6 +208,15 @@ void DaapServer::handleIncoming(HttpRequest *http_request, int client_id)
             }
         }
     }
+    else if(daap_request->getRequestType() == DAAP_REQUEST_LOGOUT)
+    {
+        //
+        //  Don't do much of anything but say that's just fine
+        //
+        
+        http_request->getResponse()->setError(204);
+        
+    }
 
     
     delete daap_request;
@@ -438,8 +447,9 @@ void DaapServer::sendUpdate(HttpRequest *http_request, u32 database_version)
 
     TagOutput response;
 
-    response << Tag( 'mupd' ) << Tag('mstt') << (u32) DAAP_OK << end 
-             << Tag('musr') << (u32) database_version << end 
+    response << Tag( 'mupd' ) 
+                << Tag('mstt') << (u32) DAAP_OK << end 
+                << Tag('musr') << (u32) database_version << end 
              << end;
 
     sendTag( http_request, response.data() );
@@ -587,7 +597,7 @@ void DaapServer::sendDatabase(HttpRequest *http_request, DaapRequest *daap_reque
     response << Tag( 'adbs' ) << Tag('mstt') << (u32) DAAP_OK << end 
              << Tag('muty') << (u8) 0 << end 
              << Tag('mtco') << (u32) parent->getAllAudioMetadataCount() << end 
-             << Tag('mrco') << (u32) parent->getAllAudioPlaylistCount() << end 
+             << Tag('mrco') << (u32) parent->getAllAudioMetadataCount() << end 
              << Tag('mlcl') ;
              
              //
@@ -627,29 +637,23 @@ void DaapServer::sendDatabase(HttpRequest *http_request, DaapRequest *daap_reque
 
                                 response << Tag('mlit');
                     
-                                if(meta_codes & DAAP_META_ITEMKIND)
-                                {
-                                    response << Tag('mikd') << (u8) 2 << end;
-                                }
-
-                                if(meta_codes & DAAP_META_SONGDATAKIND)
-                                {
-                                    //
-                                    //  NB ... I think 1 is an internet radio stream
-                                    //
-                                    response << Tag('asdk') << (u8) 0 << end;
-                                }
+                                //
+                                //  As per what we know of the "standard", 
+                                //  item kind, item data kind (2 = file, 1 = stream?),
+                                //  item id, and item name must _always_ be sent
+                                //
                     
-                                if(meta_codes & DAAP_META_ITEMNAME)
-                                {
-                                    response << Tag('minm') << which_item->getTitle().utf8() << end;
-                                }
+                                response << Tag('mikd') << (u8) 2 << end;
+                                response << Tag('asdk') << (u8) 0 << end;
+                                response << Tag('miid') << (u32) which_item->getId() << end;
+                                response << Tag('minm') << which_item->getTitle().utf8() << end;
 
-                                if(meta_codes & DAAP_META_ITEMID)
-                                {
-                                    response << Tag('miid') << (u32) which_item->getId() << end;
-                                }
-                    
+                                //
+                                //  Everything else is optional depending on
+                                //  what the client passed in its meta=foo
+                                //  GET variable
+                                //
+
                                 if(meta_codes & DAAP_META_PERSISTENTID)
                                 {
                                     //

@@ -34,6 +34,12 @@ void DaapRequest::addGetVariable(const QString& label, int value)
     get_variables.insert( label, new_get);
 }
 
+void DaapRequest::addGetVariable(const QString& label, const QString &value)
+{
+    HttpGetVariable *new_get = new HttpGetVariable(label, value);
+    get_variables.insert( label, new_get);
+}
+
 void DaapRequest::addText(std::vector<char> *buffer, QString text_to_add)
 {
     buffer->insert(buffer->end(), text_to_add.ascii(), text_to_add.ascii() + text_to_add.length());
@@ -115,19 +121,15 @@ bool DaapRequest::send(QSocketDevice *where_to_send, bool ignore_shutdown)
 
 bool DaapRequest::sendBlock(std::vector<char> block_to_send, QSocketDevice *where_to_send, bool ignore_shutdown)
 {
-    /*
-    
-        Debugging:
         
-    
-    
+    //  Debugging:
+    /*
     cout << "=========== Debugging Output - DAAP request being sent  ==================" << endl;
     for(uint i = 0; i < block_to_send.size(); i++)
     {
         cout << block_to_send.at(i);
     }
     cout << "==========================================================================" << endl;
-    
     */
 
 

@@ -15,8 +15,10 @@ INSTALLS += target
 
 
 
-HEADERS +=          daapclient.h   daapinstance.h   daaprequest.h   daapresponse.h
-SOURCES += main.cpp daapclient.cpp daapinstance.cpp daaprequest.cpp daapresponse.cpp
+HEADERS +=          daapclient.h   daapinstance.h   daaprequest.h
+SOURCES += main.cpp daapclient.cpp daapinstance.cpp daaprequest.cpp
 
+HEADERS += daapresponse.h   database.h
+SOURCES += daapresponse.cpp database.cpp
 
 LIBS += -L../daapserver/daaplib/ -ldaaplib

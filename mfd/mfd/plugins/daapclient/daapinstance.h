@@ -12,9 +12,13 @@
 
 #include <qthread.h>
 #include <qsocketdevice.h>
+#include <qptrlist.h>
 
 #include "../daapserver/daaplib/taginput.h"
 #include "../daapserver/daaplib/tagoutput.h"
+
+
+#include "database.h"
 
 class DaapClient;
 class DaapResponse;
@@ -34,6 +38,7 @@ class DaapInstance: public QThread
   public:
 
     DaapInstance(
+                    MFD *my_mfd,
                     DaapClient *owner, 
                     const QString &l_server_address, 
                     uint l_server_port,
@@ -60,12 +65,17 @@ class DaapInstance: public QThread
     void doServerInfoResponse(TagInput& dmap_data);
     void doLoginResponse(TagInput &dmap_data);
     void doUpdateResponse(TagInput &dmap_data);
-
+    void doDatabaseListResponse(TagInput &dmap_data);
+    void parseDatabaseListings(TagInput &dmap_data, int how_many);
+    void doDatabaseItemsResponse(TagInput &dmap_data);
+    void parseItems(TagInput &dmap_Data, int how_many);
+    
   private:
 
   
     bool        keep_going;
     QMutex      keep_going_mutex;
+    MFD         *the_mfd;
     DaapClient  *parent;
     QString     server_address;
     uint        server_port;
@@ -75,6 +85,8 @@ class DaapInstance: public QThread
 
     DaapServerType daap_server_type;
     QSocketDevice  *client_socket_to_daap_server;
+
+    QPtrList<Database>  databases;
 
     //
     //  A WHOLE bunch of values that are filled in by talking to the server

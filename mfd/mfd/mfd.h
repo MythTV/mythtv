@@ -49,6 +49,8 @@ class MFD : public QObject
     void                         unlockPlaylists();
     Metadata*                    getMetadata(int id);
     Playlist*                    getPlaylist(int id);
+
+    int  bumpMetadataContainerIdentifier();
     
   public slots:
   
@@ -81,7 +83,7 @@ class MFD : public QObject
     void doListCapabilities(const QStringList &tokens, MFDClientSocket *socket);
     void makeMetadataContainers();
 
-    int  bumpMetadataContainerIdentifier();
+    //int  bumpMetadataContainerIdentifier();
     int  bumpMetadataAudioGeneration();
     int  bumpMetadataVideoGeneration();
     

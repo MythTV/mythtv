@@ -12,12 +12,15 @@
 #include <string>
 using namespace std;
 
+#include <qdatetime.h>
+
 #include "daapclient.h"
 #include "daaprequest.h"
 #include "daapresponse.h"
 
 
 DaapInstance::DaapInstance(
+                            MFD *my_mfd,
                             DaapClient *owner, 
                             const QString &l_server_address, 
                             uint l_server_port,
@@ -29,6 +32,7 @@ DaapInstance::DaapInstance(
     //  instance is supposed to talk to
     //
     
+    the_mfd = my_mfd;
     parent = owner;
     server_address = l_server_address;
     server_port = l_server_port;
@@ -42,7 +46,7 @@ DaapInstance::DaapInstance(
     daap_server_type = DAAP_SERVER_UNKNOWN;
 
     //
-    //  Server supplied information
+    //  Server supplied information:
     //
 
 
@@ -78,6 +82,12 @@ DaapInstance::DaapInstance(
     //
     
     metadata_generation = 1;
+
+    //
+    //  Everything else is held in database objects: 
+    //
+
+    databases.setAutoDelete(true);
 }                           
 
 void DaapInstance::run()
@@ -555,11 +565,64 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
     {
         doUpdateResponse(rebuilt_internal);
     }
+    else if(top_level_tag.type == 'avdb')
+    {
+        doDatabaseListResponse(rebuilt_internal);
+    }
+    else if(top_level_tag.type == 'adbs')
+    {
+        doDatabaseItemsResponse(rebuilt_internal);
+    }
     else
     {
         warning("daap instance got a top level "
                 "unknown tag in a dmap payload ");
     }
+
+    //
+    //  OK, something came through and was processed, see if there's
+    //  anything our databases want to know? Note that we only send out one
+    //  of these at a time ...
+    //
+    
+
+    Database *a_database = NULL;
+    for ( a_database = databases.first(); a_database; a_database = databases.next() )
+    {
+        if(!a_database->hasItems())
+        {
+            int which_database = a_database->getId();
+            QString request_string = QString("/databases/%1/items").arg(which_database);
+            DaapRequest update_request(this, request_string, server_address);
+            update_request.addGetVariable("session-id", session_id);
+            update_request.addGetVariable("revision-number", metadata_generation);
+            
+            //
+            //  We have to add a meta GET variable listing all the
+            //  information (content codes) about songs that we want to get
+            //  back
+            //
+            
+            update_request.addGetVariable("meta", 
+                                          QString(
+                                                    "dmap.itemname,"
+                                                    "dmap.itemid,"
+                                                    "daap.songbeatsperminute"
+                                                 ));
+            
+            update_request.send(client_socket_to_daap_server);
+            
+            //
+            //  We've already sent a request, don't send another one
+            //
+
+            a_database = databases.last();
+        }
+    }
+
+    //
+    //  If there's nothing to send, do a hanging update request
+    //
 }
 
 
@@ -841,7 +904,7 @@ void DaapInstance::doLoginResponse(TagInput& dmap_data)
         
         DaapRequest update_request(this, "/update", server_address);
         update_request.addGetVariable("session-id", session_id);
-        //update_request.addGetVariable("revision-number", metadata_generation);
+        update_request.addGetVariable("revision-number", metadata_generation);
         update_request.send(client_socket_to_daap_server);
                 
         
@@ -857,9 +920,13 @@ void DaapInstance::doLoginResponse(TagInput& dmap_data)
 
 void DaapInstance::doUpdateResponse(TagInput& dmap_data)
 {
-    log("code has made it to doUpdateResponse(), that's as far as I've gotten", 1);
-/*
-    bool login_status = false;
+    //
+    //  This is telling us either about the initial state of the data or
+    //  some revision
+    //
+
+    bool update_status = false;
+    int new_metadata_generation = metadata_generation;
     Tag a_tag;
     Chunk emergency_throwaway_chunk;
 
@@ -878,66 +945,452 @@ void DaapInstance::doUpdateResponse(TagInput& dmap_data)
             case 'mstt':
 
                 //
-                //  status of login request
+                //  status of update request
                 //
                 
                 dmap_data >> a_u32_variable;
                 if(a_u32_variable == 200)    // like HTTP 200 (OK!)
                 {
-                    login_status = true;
+                    update_status = true;
                 }
                 break;
 
-            case 'mlid':
+            case 'musr':
 
                 //
-                //  session id ... important, we definitely need this
+                //  the database version (metadata generation on the server
+                //  end)
                 //
                 
                 dmap_data >> a_u32_variable;
-                session_id = (int) a_u32_variable;
+                new_metadata_generation = (int) a_u32_variable;
                 break;
 
             default:
                 warning("daap instance got an unknown tag type "
-                        "while doing doLoginResponse()");
+                        "while doing doUpdateResponse()");
                 dmap_data >> emergency_throwaway_chunk;
         }
 
         dmap_data >> end;
 
     }
-
-    if(session_id != -1 && login_status)
+    
+    if(update_status)
     {
-        logged_in = true;
-        log(QString("daap instance has managed to log "
-                    "on to \"%1\" and will start loading "
-                    "metadata ... ")
-                    .arg(service_name), 5);
-
+        metadata_generation = new_metadata_generation;
+        
         //
-        //  Time to use our new session id to get ourselves an /update
+        //  time of see what kind of databases are available
         //
         
-        DaapRequest update_request(this, "/update", server_address);
-        update_request.addGetVariable("session-id", session_id);
-        //update_request.addGetVariable("revision-number", metadata_generation);
-        update_request.send(client_socket_to_daap_server);
-                
+        log(QString("daap instance has now figured out that "
+                    "\"%1\" (%2:%3) is on generation %4")
+                    .arg(service_name)
+                    .arg(server_address)
+                    .arg(server_port)
+                    .arg(metadata_generation), 4);
+        
+        DaapRequest database_request(this, "/databases", server_address);
+        database_request.addGetVariable("session-id", session_id);
+        database_request.addGetVariable("revision-number", metadata_generation);
+        database_request.send(client_socket_to_daap_server);
+        
         
     }
     else
     {
-        warning(QString("daap instance could not log on "
-                        "to \"%1\" (password protected?) "
-                        "and is giving up")
-                        .arg(service_name));
-    }  
-*/
+        //
+        //  Crap ... 
+        //
+    }
 }
+
+void DaapInstance::doDatabaseListResponse(TagInput& dmap_data)
+{
+
+    Tag a_tag;
+    Chunk a_chunk;
+    
+    bool database_list_status = false;
+    
+    int new_numb_databases = 0;
+    int new_received_count_of_databases = 0;
+
+    while(!dmap_data.isFinished())
+    {
+        //
+        //  parse responses to a /database request
+        //
+
+        dmap_data >> a_tag;
+
+        u32 a_u32_variable;
+        u8  a_u8_variable;
+
+        switch(a_tag.type)
+        {
+            case 'mstt':
+
+                //
+                //  status of update request
+                //
+                
+                dmap_data >> a_u32_variable;
+                if(a_u32_variable == 200)    // like HTTP 200 (OK!)
+                {
+                    database_list_status = true;
+                }
+                break;
+
+            case 'muty':
+            
+                //
+                //  update type ... only ever seen 0 here ... dunno ?
+                //
+                
+                dmap_data >> a_u8_variable;
+                break;
+                
+            case 'mtco':
+                
+                //
+                //  number of databases
+                //
+                
+                dmap_data >> a_u32_variable;
+                new_numb_databases = a_u32_variable;
+                break;
+                
+            case 'mrco':
+            
+                //
+                //  received count of databases (how many of them are
+                //  described in this datastream)
+                //                
+                
+                dmap_data >> a_u32_variable;
+                new_received_count_of_databases = a_u32_variable;
+                break;
+                
+            case 'mlcl':
+
+                //
+                //  This is "listing" tag, saying there's a list of other tags to come
+                //
+                
+                dmap_data >> a_chunk;
+                {
+                    TagInput re_rebuilt_internal(a_chunk);
+                    parseDatabaseListings(re_rebuilt_internal, new_received_count_of_databases);
+                }
+                break;
+
+            default:
+                warning("daap instance got an unknown tag type "
+                        "while doing doDatabaseListResponse()");
+                dmap_data >> a_chunk;
+        }
+
+        dmap_data >> end;
+
+    }
+}    
+
+void DaapInstance::parseDatabaseListings(TagInput& dmap_data, int how_many)
+{
+    Tag a_tag;
+    u32 a_u32_variable;
+    u64 a_u64_variable;
+    std::string a_string;
+    Chunk listing;
+    
+    
+    for(int i = 0; i < how_many; i++)
+    {
+        int new_database_id = -1;
+        int new_database_persistent_id = 1;
+        QString new_database_name = "";
+        int new_database_expected_item_count = -1;
+        int new_database_expected_container_count = -1;
+        Chunk emergency_throwaway_chunk;
+
+        dmap_data >> a_tag >> listing >> end;
+    
+        if(a_tag.type != 'mlit')
+        {
+            //
+            //  this should not happen
+            //
+            warning("daap instance got a non mlit tag "
+                    "where one absolutely has to be.");
+        }
+        
+        TagInput internal_listing(listing);
+        while(!internal_listing.isFinished())
+        {
+    
+            internal_listing >> a_tag;
+        
+            switch(a_tag.type)
+            {
+                case 'miid':
+                
+                    //
+                    //  ID for this database
+                    //
+
+                    internal_listing >> a_u32_variable;
+                    new_database_id = a_u32_variable;
+                    break;
+
+                case 'mper':
+            
+                    //
+                    //  persistent id for this database
+                    //
+                
+                    internal_listing >> a_u64_variable;
+                    new_database_persistent_id = a_u64_variable;
+                    break;
+                
+                case 'minm':
+            
+                    //
+                    //  name for this database (usually same as service name if
+                    //  there is only one)
+                    //
+                
+                    internal_listing >> a_string;
+                    new_database_name = QString(a_string.c_str());
+                    break;
+
+                case 'mimc':
+            
+                    //
+                    //  item count (number of songs)
+                    //
+                
+                    internal_listing >> a_u32_variable;
+                    new_database_expected_item_count = a_u32_variable;
+                    break;
+                
+                case 'mctc':
+            
+                    //
+                    //  container count (number of playlists)
+                    //
+                
+                    internal_listing >> a_u32_variable;
+                    new_database_expected_container_count = a_u32_variable;
+                    break;
+
+                default:
+                    
+                    warning("unkown tag while parsing for database listing");
+                    internal_listing >> emergency_throwaway_chunk;
+            }
+            internal_listing >> end;
+        }    
+
+        //
+        //  Create a new database for this ...
+        //
+            
+        Database *new_database = new Database(
+                                                new_database_id,
+                                                new_database_persistent_id,
+                                                new_database_name,
+                                                new_database_expected_item_count,
+                                                new_database_expected_container_count,
+                                                the_mfd
+                                             );
+        databases.append(new_database);
+    }
+}
+
+void DaapInstance::doDatabaseItemsResponse(TagInput& dmap_data)
+{
+
+    Tag a_tag;
+    Chunk a_chunk;
+
+    bool database_items_status = false;
+    int new_numb_items = -1;
+    int new_received_numb_items = -1;
+
+    while(!dmap_data.isFinished())
+    {
+        //
+        //  parse responses to a /database/x/items request
+        //
+
+        dmap_data >> a_tag;
+
+        u32 a_u32_variable;
+        u8  a_u8_variable;
+
+        switch(a_tag.type)
+        {
+            case 'mstt':
+
+                //
+                //  status of request
+                //
+                
+                dmap_data >> a_u32_variable;
+                if(a_u32_variable == 200)    // like HTTP 200 (OK!)
+                {
+                    database_items_status = true;
+                }
+                break;
+
+            case 'muty':
+            
+                //
+                //  update type ... only ever seen 0 here ... dunno ?
+                //
+                
+                dmap_data >> a_u8_variable;
+                break;
+                
+            case 'mtco':
+                
+                //
+                //  number of total items
+                //
+                
+                dmap_data >> a_u32_variable;
+                new_numb_items = a_u32_variable;
+                break;
+                
+            case 'mrco':
+            
+                //
+                //  received number of items
+                //                
+                
+                dmap_data >> a_u32_variable;
+                new_received_numb_items = a_u32_variable;
+                break;
+                
+            case 'mlcl':
+
+                //
+                //  This is "listing" tag, saying there's a list of other tags to come
+                //
+                
+                dmap_data >> a_chunk;
+                {
+                    TagInput re_rebuilt_internal(a_chunk);
+                    parseItems(re_rebuilt_internal, new_received_numb_items);
+                }
+                break;
+
+            default:
+                warning("daap instance got an unknown tag type "
+                        "while doing doDatabaseItemsResponse()");
+                dmap_data >> a_chunk;
+        }
+
+        dmap_data >> end;
+
+    }
+}    
+
+void DaapInstance::parseItems(TagInput& dmap_data, int how_many)
+{
+
+    Tag a_tag;
+
+    u8  a_u8_variable;
+    u32 a_u32_variable;
+    std::string a_string;
+    Chunk listing;
+
+    QTime loading_time;
+    loading_time.start();    
+    
+    for(int i = 0; i < how_many; i++)
+    {
+        Chunk emergency_throwaway_chunk;
+
+        dmap_data >> a_tag >> listing >> end;
+    
+        if(a_tag.type != 'mlit')
+        {
+            //
+            //  this should not happen
+            //
+            warning("daap instance got a non mlit tag "
+                    "where one simply must be.");
+        }
+        
+        TagInput internal_listing(listing);
+        while(!internal_listing.isFinished())
+        {
+    
+            internal_listing >> a_tag;
+        
+            switch(a_tag.type)
+            {
+                case 'mikd':
+                
+                    //
+                    //  item kind 
+                    //
+
+                    internal_listing >> a_u8_variable;
+                    break;
+
+                case 'mper':
+            
+                    //
+                    //  data kind ... I think this is file vs. network
+                    //  stream or something
+                    //
+                
+                    internal_listing >> a_u8_variable;
+                    break;
+                
+                case 'miid':
+            
+                    //
+                    //  item id !
+                    //
+                
+                    internal_listing >> a_u32_variable;
+                    break;
+
+                case 'minm':
+            
+                    //
+                    //   Item name
+                    //
+                
+                    internal_listing >> a_string;
+                    break;
+                
+                default:
+                    
+                    warning("unkown tag while parsing for database listing");
+                    internal_listing >> emergency_throwaway_chunk;
+            }
+            internal_listing >> end;
+        }    
+    }
+    
+    double elapsed_time = loading_time.elapsed() / 1000.0;
+    log(QString("daap instance parsed and loaded metadata for %1 "
+                "items in %2 seconds")
+                .arg(how_many)
+                .arg(elapsed_time), 4);
+    
+}
+
 
 DaapInstance::~DaapInstance()
 {
+    databases.clear();
 }
 
