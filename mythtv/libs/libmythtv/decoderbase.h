@@ -30,8 +30,6 @@ class DecoderBase
     virtual bool DoRewind(long long desiredFrame) = 0;
     virtual bool DoFastForward(long long desiredFrame) = 0;
 
-    virtual char *GetScreenGrab(int secondsin) = 0; 
-
     virtual bool isLastFrameKey() = 0;
     virtual void WriteStoredData(RingBuffer *rb) = 0;
     virtual void SetRawFrameState(bool state) = 0;

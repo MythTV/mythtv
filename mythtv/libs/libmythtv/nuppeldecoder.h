@@ -52,8 +52,6 @@ class NuppelDecoder : public DecoderBase
     bool DoRewind(long long desiredFrame);
     bool DoFastForward(long long desiredFrame);
 
-    char *GetScreenGrab(int secondsin);
-
     bool isLastFrameKey(void) { return (lastKey == framesPlayed); }
     void WriteStoredData(RingBuffer *rb);
     void SetRawFrameState(bool state) { getrawframes = state; }

@@ -31,8 +31,6 @@ class AvFormatDecoder : public DecoderBase
     bool DoRewind(long long desiredFrame);
     bool DoFastForward(long long desiredFrame);
 
-    char *GetScreenGrab(int secondsin);
-
     bool isLastFrameKey(void) { return false; }
     void WriteStoredData(RingBuffer *rb) { (void)rb; }
     void SetRawFrameState(bool state) { (void)state; }

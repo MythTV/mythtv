@@ -82,7 +82,8 @@ class EncoderLink
     void RequestRingBufferBlock(int size);
     long long SeekRingBuffer(long long curpos, long long pos, int whence);
 
-    char *GetScreenGrab(QString filename, int secondsin, int &bufferlen,
+    char *GetScreenGrab(ProgramInfo *pginfo, const QString &filename, 
+                        int secondsin, int &bufferlen,
                         int &video_width, int &video_height);
 
     bool isParsingCommercials(ProgramInfo *pginfo);

@@ -548,13 +548,13 @@ long long EncoderLink::SeekRingBuffer(long long curpos, long long pos,
     return -1;
 }
 
-char *EncoderLink::GetScreenGrab(QString filename, int secondsin, 
-                                 int &bufferlen, int &video_width, 
-                                 int &video_height)
+char *EncoderLink::GetScreenGrab(ProgramInfo *pginfo, const QString &filename, 
+                                 int secondsin, int &bufferlen, 
+                                 int &video_width, int &video_height)
 {
     if (local)
-        return tv->GetScreenGrab(filename, secondsin, bufferlen, video_width,
-                                 video_height);
+        return tv->GetScreenGrab(pginfo, filename, secondsin, bufferlen, 
+                                 video_width, video_height);
 
     cerr << "Should be local only query: GetScreenGrab\n";
     return NULL;

@@ -809,11 +809,6 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame)
     return true;
 }
 
-char *AvFormatDecoder::GetScreenGrab(int secondsin)
-{
-    return NULL;
-}
-
 void AvFormatDecoder::SetPositionMap(void)
 {
     if (m_playbackinfo && m_db)

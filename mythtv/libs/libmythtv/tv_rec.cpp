@@ -722,12 +722,28 @@ void TVRec::TeardownRecorder(bool killFile)
     }
 }    
 
-char *TVRec::GetScreenGrab(QString filename, int secondsin, int &bufferlen,
+char *TVRec::GetScreenGrab(ProgramInfo *pginfo, const QString &filename, 
+                           int secondsin, int &bufferlen,
                            int &video_width, int &video_height)
 {
     RingBuffer *tmprbuf = new RingBuffer(filename, false);
 
-    NuppelVideoPlayer *nupvidplay = new NuppelVideoPlayer();
+    QString name = QString("screen%1%2").arg(getpid()).arg(rand());
+
+    QSqlDatabase *screendb = QSqlDatabase::addDatabase("QMYSQL3", name);
+    if (!screendb)
+    {
+        cerr << "Couldn't initialize mysql connection for comm thread\n";
+        return NULL;
+    }
+    if (!gContext->OpenDatabase(screendb))
+    {
+        cerr << "Couldn't open database connection for comm thread\n";
+        QSqlDatabase::removeDatabase(name);
+        return NULL;
+    }
+
+    NuppelVideoPlayer *nupvidplay = new NuppelVideoPlayer(screendb, pginfo);
     nupvidplay->SetRingBuffer(tmprbuf);
     nupvidplay->SetAudioSampleRate(gContext->GetNumSetting("AudioSampleRate"));
 
@@ -736,6 +752,8 @@ char *TVRec::GetScreenGrab(QString filename, int secondsin, int &bufferlen,
 
     delete nupvidplay;
     delete tmprbuf;
+
+    QSqlDatabase::removeDatabase(name);
 
     return retbuf;
 }

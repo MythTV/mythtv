@@ -2663,6 +2663,8 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
         return NULL;
     if (!decoder)
         return NULL;
+    if (!hasFullPositionMap)
+        return NULL;
 
     pthread_mutex_init(&audio_buflock, NULL);
     pthread_mutex_init(&video_buflock, NULL);
@@ -2680,7 +2682,19 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
     wpos = 0;
     ClearAfterSeek();
 
-    unsigned char *frame = (unsigned char *)decoder->GetScreenGrab(secondsin); 
+    int number = (int)(secondsin * video_frame_rate);
+    if (number >= totalFrames)
+        number = totalFrames / 2;
+
+    GetFrame(1, true);
+
+    fftime = number;
+    DoFastForward();
+    fftime = 0;
+
+    GetFrame(1, true);
+
+    unsigned char *frame = vbuffer[vpos];
 
     if (!frame)
     {

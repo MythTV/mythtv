@@ -1493,7 +1493,8 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
 
     EncoderLink *elink = encoderList->begin().data();
 
-    unsigned char *data = (unsigned char *)elink->GetScreenGrab(filename, 64,
+    unsigned char *data = (unsigned char *)elink->GetScreenGrab(pginfo, 
+                                                                filename, 64,
                                                                 len, width,
                                                                 height);
 
