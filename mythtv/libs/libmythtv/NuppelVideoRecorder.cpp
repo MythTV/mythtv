@@ -871,7 +871,7 @@ void NuppelVideoRecorder::StartRecording(void)
         return;
     }
 
-    if ((!pip_mode) && (curRecording->chancommfree == 0))
+    if ((!pip_mode) && (curRecording) && (curRecording->chancommfree == 0))
     {
         int commDetectMethod = gContext->GetNumSetting("CommercialSkipMethod",
                                                        COMM_DETECT_BLANKS);
