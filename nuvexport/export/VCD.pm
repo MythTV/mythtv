@@ -71,7 +71,7 @@ package export::VCD;
         $self->SUPER::export($episode, ".$$");
     # Create the split file?
         my $split_file;
-        if ((-s $self->get_outfile($episode, ".$$.m2v") + -s $self->get_outfile($episode, ".$$.mpa") / 0.97 > $self->{'split_every'} * 1024 * 1024) {
+        if ((-s $self->get_outfile($episode, ".$$.m2v") + -s $self->get_outfile($episode, ".$$.mpa")) / 0.97 > $self->{'split_every'} * 1024 * 1024) {
             $split_file = "/tmp/nuvexport-svcd.split.$$.$self->{'split_every'}";
             open(DATA, ">$split_file") or die "Can't write to $split_file:  $!\n\n";
             print DATA "maxFileSize = $self->{'split_every'}\n";
