@@ -860,6 +860,10 @@ void ThemedMenu::parseThemeButton(QDomElement &element)
             {
                 addit = findDepends(getFirstText(info));
             }
+            else if (info.tagName() == "dependssetting")
+            {
+                addit = gContext->GetNumSetting(getFirstText(info));
+            }
             else
             {
                 cerr << "Unknown tag " << info.tagName() << " in button\n";

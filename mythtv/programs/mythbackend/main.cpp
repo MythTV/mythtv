@@ -120,93 +120,124 @@ int main(int argc, char **argv)
     bool printexpire = false;
     for(int argpos = 1; argpos < a.argc(); ++argpos)
         if (!strcmp(a.argv()[argpos],"-l") ||
-            !strcmp(a.argv()[argpos],"--logfile")) {
-            if (a.argc() > argpos) {
+            !strcmp(a.argv()[argpos],"--logfile"))
+        {
+            if (a.argc() > argpos)
+            {
                 logfile = a.argv()[argpos+1];
-                ++argpos;
-            } else {
-                cerr << "Missing argument to -l/--logfile option\n";
-                return -1;
+                if (logfile.startsWith("-"))
+                {
+                    cerr << "Invalid or missing argument to -l/--logfile option\n";
+                    return -1;
+                }
+                else
+                {
+                    ++argpos;
+                }
             }
         } else if (!strcmp(a.argv()[argpos],"-p") ||
-                   !strcmp(a.argv()[argpos],"--pidfile")) {
-            if (a.argc() > argpos) {
+                   !strcmp(a.argv()[argpos],"--pidfile"))
+        {
+            if (a.argc() > argpos)
+            {
                 pidfile = a.argv()[argpos+1];
-                ++argpos;
-            } else {
-                cerr << "Missing argument to -p/--pidfile option\n";
-                return -1;
+                if (pidfile.startsWith("-"))
+                {
+                    cerr << "Invalid or missing argument to -p/--pidfile option\n";
+                    return -1;
+                } else
+                {
+                   ++argpos;
+                }
             }
         } else if (!strcmp(a.argv()[argpos],"-d") ||
-                   !strcmp(a.argv()[argpos],"--daemon")) {
+                   !strcmp(a.argv()[argpos],"--daemon"))
+        {
             daemonize = true;
         } else if (!strcmp(a.argv()[argpos],"-v") ||
-                   !strcmp(a.argv()[argpos],"--verbose")) {
-            if (a.argc() > argpos) {
-                QStringList verboseOpts;
-                verboseOpts.split(',',a.argv()[argpos+1]);
-                ++argpos;
-                for (QStringList::Iterator it = verboseOpts.begin(); 
-                     it != verboseOpts.end(); ++it )
+                   !strcmp(a.argv()[argpos],"--verbose"))
+        {
+            if (a.argc() > argpos)
+            {
+                QString temp = a.argv()[argpos+1];
+                if (temp.startsWith("-"))
                 {
-                    if(!strcmp(*it,"none"))
+                    cerr << "Invalid or missing argument to -v/--verbose option\n";
+                    return -1;
+                } else
+                {
+                    QStringList verboseOpts;
+                    verboseOpts.split(',',a.argv()[argpos+1]);
+                    ++argpos;
+                    for (QStringList::Iterator it = verboseOpts.begin(); 
+                         it != verboseOpts.end(); ++it )
                     {
-                        print_verbose_messages = VB_NONE;
-                        verboseString = "";
-                    }
-                    else if(!strcmp(*it,"all"))
-                    {
-                        print_verbose_messages = VB_ALL;
-                        verboseString = "all";
-                    }
-                    else if(!strcmp(*it,"quiet"))
-                    {
-                        print_verbose_messages = VB_IMPORTANT;
-                        verboseString = "important";
-                    }
-                    else if(!strcmp(*it,"record"))
-                    {
-                        print_verbose_messages |= VB_RECORD;
-                        verboseString += " " + *it;
-                    }
-                    else if(!strcmp(*it,"playback"))
-                    {
-                        print_verbose_messages |= VB_PLAYBACK;
-                        verboseString += " " + *it;
-                    }
-                    else if(!strcmp(*it,"channel"))
-                    {
-                        print_verbose_messages |= VB_CHANNEL;
-                        verboseString += " " + *it;
-                    }
-                    else if(!strcmp(*it,"osd"))
-                    {
-                        print_verbose_messages |= VB_OSD;
-                        verboseString += " " + *it;
-                    }
-                    else if(!strcmp(*it,"file"))
-                    {
-                        print_verbose_messages |= VB_FILE;
-                        verboseString += " " + *it;
+                        if(!strcmp(*it,"none"))
+                        {
+                            print_verbose_messages = VB_NONE;
+                            verboseString = "";
+                        }
+                        else if(!strcmp(*it,"all"))
+                        {
+                            print_verbose_messages = VB_ALL;
+                            verboseString = "all";
+                        }
+                        else if(!strcmp(*it,"quiet"))
+                        {
+                            print_verbose_messages = VB_IMPORTANT;
+                            verboseString = "important";
+                        }
+                        else if(!strcmp(*it,"record"))
+                        {
+                            print_verbose_messages |= VB_RECORD;
+                            verboseString += " " + *it;
+                        }
+                        else if(!strcmp(*it,"playback"))
+                        {
+                            print_verbose_messages |= VB_PLAYBACK;
+                            verboseString += " " + *it;
+                        }
+                        else if(!strcmp(*it,"channel"))
+                        {
+                            print_verbose_messages |= VB_CHANNEL;
+                            verboseString += " " + *it;
+                        }
+                        else if(!strcmp(*it,"osd"))
+                        {
+                            print_verbose_messages |= VB_OSD;
+                            verboseString += " " + *it;
+                        }
+                        else if(!strcmp(*it,"file"))
+                        {
+                            print_verbose_messages |= VB_FILE;
+                            verboseString += " " + *it;
+                        }
                     }
                 }
-            } else {
+            } else
+            {
                 cerr << "Missing argument to -v/--verbose option\n";
                 return -1;
             }
-        } else if (!strcmp(a.argv()[argpos],"--printsched")) {
+        } else if (!strcmp(a.argv()[argpos],"--printsched"))
+        {
             printsched = true;
-        } else if (!strcmp(a.argv()[argpos],"--printexpire")) {
+        } else if (!strcmp(a.argv()[argpos],"--printexpire"))
+        {
             printexpire = true;
-        } else {
-            cerr << "Invalid argument: " << a.argv()[argpos] << endl <<
-                    "Valid options are: " << endl <<
+        } else
+        {
+            if (!(!strcmp(a.argv()[argpos],"-h") ||
+                !strcmp(a.argv()[argpos],"--help")))
+                cerr << "Invalid argument: " << a.argv()[argpos] << endl;
+            cerr << "Valid options are: " << endl <<
                     "-l or --logfile filename       Writes STDERR and STDOUT messages to filename" << endl <<
                     "-p or --pidfile filename       Write PID of mythbackend " <<
                                                     "to filename" << endl <<
                     "-d or --daemon                 Runs mythbackend as a daemon" << endl <<
                     "-v or --verbose debug-level    Prints more information" << endl <<
-                    "                               Allowed values are all,none,quiet,record," << endl <<
+                    "                               Allowed is any combination (separated by comma)" << endl << 
+                    "                               of all,none,quiet,record," << endl <<
                     "                               playback,channel,osd,file" << endl <<
                     "--printexpire                  List of auto-expire programs" << endl <<
                     "--printsched                   Upcoming scheduled programs" << endl;
@@ -215,19 +246,23 @@ int main(int argc, char **argv)
 
     int logfd = -1;
 
-    if (logfile != "") {
+    if (logfile != "")
+    {
         logfd = open(logfile.ascii(), O_WRONLY|O_CREAT|O_APPEND, 0664);
          
-        if (logfd < 0) {
+        if (logfd < 0)
+        {
             perror("open(logfile)");
             return -1;
         }
     }
     
     ofstream pidfs;
-    if (pidfile != "") {
+    if (pidfile != "")
+    {
         pidfs.open(pidfile.ascii());
-        if (!pidfs) {
+        if (!pidfs)
+        {
             perror("open(pidfile)");
             return -1;
         }
@@ -239,18 +274,21 @@ int main(int argc, char **argv)
         cerr << "Unable to ignore SIGPIPE\n";
 
     if (daemonize)
-        if (daemon(0, 1) < 0) {
+        if (daemon(0, 1) < 0)
+        {
             perror("daemon");
             return -1;
         }
 
 
-    if (pidfs) {
+    if (pidfs)
+    {
         pidfs << getpid() << endl;
         pidfs.close();
     }
 
-    if (logfd != -1) {
+    if (logfd != -1)
+    {
         // Send stdout and stderr to the logfile
         dup2(logfd, 1);
         dup2(logfd, 2);
@@ -308,7 +346,8 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    if (printsched) {
+    if (printsched)
+    {
         sched = new Scheduler(false, &tvList, db);
         sched->FillRecordLists(false);
         sched->PrintList();
@@ -316,7 +355,8 @@ int main(int argc, char **argv)
         exit(0);
     }
 
-    if (printexpire) {
+    if (printexpire)
+    {
         expirer = new AutoExpire(false, false, db);
         expirer->FillExpireList();
         expirer->PrintExpireList();
