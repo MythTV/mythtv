@@ -396,7 +396,7 @@ static inline void blendtoargb_8_c(OSDSurface *surf, unsigned char *src,
 
 #if i386
 #define movntq(src, dest) movq_r2m(src, dest);
-static inline void blendtoargb_8_mmx(OSDSurface *surf, unsigned char *src,
+static inline void blendtoargb_8_mmx(OSDSurface * /*surf*/, unsigned char *src,
                                      unsigned char *usrc, unsigned char *vsrc,
                                      unsigned char *alpha, unsigned char *dest)
 {
@@ -606,7 +606,7 @@ static inline void dithertoia44_8_mmx(unsigned char *src, unsigned char *dest,
 }
 #endif
 
-dithertoia44_8_fun dithertoia44_8_init(OSDSurface *surface)
+dithertoia44_8_fun dithertoia44_8_init(OSDSurface* /*surface*/)
 {
 #if i386
 // mmx version seems to be about the same speed, no reason to use it.
