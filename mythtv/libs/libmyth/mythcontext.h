@@ -31,7 +31,10 @@ class MythContext
 
     void GetScreenSettings(int &width, float &wmult, int &height, float &hmult);
    
-    QString RunProgramGuide(QString startchannel, bool thread = false);
+    QString RunProgramGuide(QString startchannel, bool thread = false,
+                            void (*embedcb)(void *data, unsigned long wid,
+                                            int x, int y, int w, int h) = NULL,
+                            void *data = NULL);
  
     QString FindThemeDir(QString themename);
 

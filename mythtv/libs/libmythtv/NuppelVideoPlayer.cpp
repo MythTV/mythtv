@@ -1281,6 +1281,23 @@ int NuppelVideoPlayer::CheckEvents(void)
     return ret;
 }
 
+void NuppelVideoPlayer::EmbedInWidget(unsigned long wid, int x, int y, int w, 
+                                      int h)
+{
+    if (videoOutput)
+    {
+        videoOutput->EmbedInWidget(wid, x, y, w, h);
+    }
+}
+
+void NuppelVideoPlayer::StopEmbedding(void)
+{
+    if (videoOutput)
+    {
+        videoOutput->StopEmbedding();
+    }
+}
+
 void NuppelVideoPlayer::ToggleFullScreen(void)
 {
     if (videoOutput)

@@ -15,6 +15,7 @@ RemoteFile::RemoteFile(QString &url, bool needevents, int lrecordernum)
     type = 0;
     path = url;
     readposition = 0;
+    pthread_mutex_init(&lock, NULL);
 
     if (lrecordernum > 0)
     {
@@ -149,8 +150,10 @@ void RemoteFile::Close(void)
     QStringList strlist = QString(query).arg(recordernum);
     strlist << "DONE" + append;
 
+    pthread_mutex_lock(&lock);
     WriteStringList(controlSock, strlist);
     ReadStringList(controlSock, strlist);
+    pthread_mutex_unlock(&lock);
 
     if (sock)
         sock->close();
@@ -164,8 +167,10 @@ bool RemoteFile::RequestBlock(int size)
     strlist << "REQUEST_BLOCK" + append;
     strlist << QString::number(size);
 
+    pthread_mutex_lock(&lock);
     WriteStringList(controlSock, strlist);
     ReadStringList(controlSock, strlist);
+    pthread_mutex_unlock(&lock);
 
     return strlist[0].toInt();
 }
@@ -175,8 +180,10 @@ long long RemoteFile::Seek(long long pos, int whence, long long curpos)
     QStringList strlist = QString(query).arg(recordernum);
     strlist << "PAUSE" + append;
 
+    pthread_mutex_lock(&lock);
     WriteStringList(controlSock, strlist);
     ReadStringList(controlSock, strlist);
+    pthread_mutex_unlock(&lock);
 
     strlist.clear();
 
@@ -196,8 +203,10 @@ long long RemoteFile::Seek(long long pos, int whence, long long curpos)
     else
         encodeLongLong(strlist, readposition);
 
+    pthread_mutex_lock(&lock);
     WriteStringList(controlSock, strlist);
     ReadStringList(controlSock, strlist);
+    pthread_mutex_unlock(&lock);
 
     long long retval = decodeLongLong(strlist, 0);
     readposition = retval;

@@ -116,6 +116,9 @@ class NuppelVideoPlayer
 
     bool GetEditMode(void) { return editmode; }
 
+    void EmbedInWidget(unsigned long wid, int x, int y, int w, int h);
+    void StopEmbedding(void);
+
  protected:
     void OutputAudioLoop(void);
     void OutputVideoLoop(void);

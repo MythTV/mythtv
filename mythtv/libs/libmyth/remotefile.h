@@ -2,6 +2,7 @@
 #define REMOTEFILE_H_
 
 #include <qstring.h>
+#include <pthread.h>
 
 class MythContext;
 class QSocket;
@@ -38,6 +39,8 @@ class RemoteFile
 
     QString query;
     QString append;
+
+    pthread_mutex_t lock;
 };
 
 #endif

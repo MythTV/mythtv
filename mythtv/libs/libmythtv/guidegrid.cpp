@@ -27,11 +27,15 @@ using namespace std;
 using namespace libmyth;
 
 GuideGrid::GuideGrid(MythContext *context, const QString &channel, 
+                     void (*embedcb)(void *data, unsigned long wid, int x, 
+                                     int y, int w, int h), void *data,
                      QWidget *parent, const char *name)
          : QDialog(parent, name)
 {
     DISPLAY_CHANS = 6;
 
+    embedcallback = embedcb;
+    callbackdata = data;
     m_context = context;
     m_settings = context->settings();
 
@@ -338,7 +342,7 @@ void GuideGrid::createProgramLabel(int titlefontsize, int progfontsize)
     QPixmap temp((int)(360 * wmult), (int)(267 * hmult));
     temp.fill(black);
 
-    QLabel *forvideo = new QLabel("", this);
+    forvideo = new QLabel("", this);
     forvideo->setMinimumHeight((int)(267*hmult));
     forvideo->setMaximumHeight((int)(267*hmult));
     forvideo->setMinimumWidth((int)(360*wmult));
@@ -420,8 +424,6 @@ void GuideGrid::createProgramLabel(int titlefontsize, int progfontsize)
     holdCGA->addWidget(recordingfield, 1, 1, 0);
     holdCGA->addWidget(descriptionlabel, 2, 0, 0);
     holdCGA->addWidget(blankfield, 2, 1, 0);
-
-    timeout();
 }
 
 QString GuideGrid::getDateLabel(ProgramInfo *pginfo)
@@ -460,6 +462,9 @@ void GuideGrid::timeout()
     QString curTime = new_time.toString("h:mm:ss ap");
     currentTime->setText("  " + curTime);
 
+    if (embedcallback)
+        embedcallback(callbackdata, forvideo->winId(), 0, 0, 
+                      forvideo->width(), forvideo->height());
 }
 
 void GuideGrid::fillChannelInfos()

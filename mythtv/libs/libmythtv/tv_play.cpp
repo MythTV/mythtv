@@ -1239,11 +1239,33 @@ void TV::GetChannelInfo(int recnum, QString &title, QString &subtitle,
                                       iconpath, channelname);
 }
 
+void TV::EmbedOutput(unsigned long wid, int x, int y, int w, int h)
+{
+    if (nvp)
+        nvp->EmbedInWidget(wid, x, y, w, h);
+}
+
+void TV::StopEmbeddingOutput(void)
+{
+    if (nvp)
+        nvp->StopEmbedding();
+}
+
+static void embedcb(void *data, unsigned long wid, int x, int y, int w, int h)
+{
+    TV *tv = (TV *)data;
+    tv->EmbedOutput(wid, x, y, w, h);
+}
+
 void TV::doLoadMenu(void)
 {
-// FIXME
-    QString chanstr = m_context->RunProgramGuide("3", //channel->GetCurrentName(), 
-                                               true);
+    QString dummy;
+    QString channame;
+
+    m_context->GetRecorderChannelInfo(recorder_num, dummy, dummy, dummy, dummy,
+                                      dummy, dummy, dummy, dummy, channame);
+    QString chanstr = m_context->RunProgramGuide(channame, true, embedcb,
+                                                 this);
 
     if (chanstr != "")
     {
@@ -1251,6 +1273,8 @@ void TV::doLoadMenu(void)
         sprintf(channelKeys, "%s", chanstr.ascii());
         channelqueued = true; 
     }
+
+    StopEmbeddingOutput();
 
     menurunning = false;
 }

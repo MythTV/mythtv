@@ -30,7 +30,9 @@ class GuideGrid : public QDialog
 {
     Q_OBJECT
   public:
-    GuideGrid(MythContext *context, const QString &channel, 
+    GuideGrid(MythContext *context, const QString &channel,
+              void (*embedcb)(void *data, unsigned long wid, int x, int y, 
+                              int w, int h) = NULL, void *data = NULL,
               QWidget *parent = 0, const char *name = 0);
    ~GuideGrid();
 
@@ -141,6 +143,8 @@ class GuideGrid : public QDialog
     QColor fgcolor;
     QColor bgcolor;
 
+    QLabel *forvideo;
+
     int startChannel;
     int programGuideType;
     int DISPLAY_CHANS;
@@ -173,6 +177,10 @@ class GuideGrid : public QDialog
 
     MythContext *m_context;
     Settings *m_settings;
+
+    void (*embedcallback)(void *data, unsigned long wid, int x, int y,
+                          int w, int h);
+    void *callbackdata;
 };
 
 }

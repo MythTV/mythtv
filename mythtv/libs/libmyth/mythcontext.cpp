@@ -201,12 +201,15 @@ QString MythContext::FindThemeDir(QString themename)
     return "";
 }
 
-QString MythContext::RunProgramGuide(QString startchannel, bool thread)
+QString MythContext::RunProgramGuide(QString startchannel, bool thread,
+                             void (*embedcb)(void *data, unsigned long wid,
+                                             int x, int y, int w, int h),
+                                     void *data)
 {
     if (thread)
         qApp->lock();
  
-    GuideGrid gg(this, startchannel);
+    GuideGrid gg(this, startchannel, embedcb, data);
 
     if (thread)
     {

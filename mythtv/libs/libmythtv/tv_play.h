@@ -40,6 +40,9 @@ class TV
     bool IsPlaying(void) { return StateIsPlaying(internalState); }
     bool IsRecording(void) { return StateIsRecording(internalState); }
 
+    void EmbedOutput(unsigned long wid, int x, int y, int w, int h);
+    void StopEmbeddingOutput(void);
+
  protected:
     void doLoadMenu(void);
     static void *MenuHandler(void *param);

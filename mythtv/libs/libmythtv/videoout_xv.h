@@ -20,6 +20,10 @@ class XvVideoOutput
 
     void ToggleFullScreen();
 
+    void EmbedInWidget(unsigned long wid, int x, int y, int w, int h);
+    void StopEmbedding(void);
+
+
   private:
     void sizehint(int x, int y, int width, int height, int max);
     void Exit(void);
@@ -42,10 +46,16 @@ class XvVideoOutput
     int oldx, oldy, oldw, oldh;
     int curx, cury, curw, curh;
 
+    int dispx, dispy, dispw, disph;
+    int olddispx, olddispy, olddispw, olddisph;
+    bool embedding;
+
     int xv_port;
     int colorid;
 
     unsigned char *scratchspace;
+
+    pthread_mutex_t lock;
 };
 
 #endif

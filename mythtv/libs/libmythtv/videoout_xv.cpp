@@ -36,6 +36,7 @@ struct XvData
 {
     Window XJ_root;
     Window XJ_win;
+    Window XJ_curwin;
     GC XJ_gc;
     XSizeHints hints;
     Screen *XJ_screen;
@@ -97,6 +98,8 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
                          char *icon_name, int num_buffers, 
                          unsigned char **out_buffers)
 {
+    pthread_mutex_init(&lock, NULL);
+
     XWMHints wmhints;
     XTextProperty windowName, iconName;
     XClassHint hint;
@@ -141,6 +144,7 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
     data->XJ_win = XCreateSimpleWindow(data->XJ_disp, data->XJ_root, 0, 0,
                                        XJ_width, XJ_height, 0, XJ_white,
                                        XJ_black);
+    data->XJ_curwin = data->XJ_win;
 
     if (!data->XJ_win) 
     {  
@@ -152,7 +156,12 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
  
     curx = 0; cury = 0;
     curw = XJ_width; curh = XJ_height;
-  
+
+    dispx = 0; dispy = 0;
+    dispw = curw; disph = curh; 
+
+    embedding = false;
+ 
     /* tell window manager about our window */
 
     sizehint(curx, cury, curw, curh, 0);
@@ -350,6 +359,8 @@ void XvVideoOutput::show_cursor(void)
 
 void XvVideoOutput::ToggleFullScreen(void)
 {
+    pthread_mutex_lock(&lock);
+
     float HorizScanFactor, VertScanFactor;
     int xScanDisp, yScanDisp;
     char *prefix = (char *)PREFIX;
@@ -422,6 +433,11 @@ void XvVideoOutput::ToggleFullScreen(void)
     curh = (int)((rintf(curh) / hclamp) * hclamp) + 4;
     curw = ((curw) / 2) * 2 + 4;
 
+    dispx = 0;
+    dispy = 0;
+    dispw = curw;
+    disph = curh;
+
     delete settings;
 
     sizehint(curx, cury, curw, curh, 0);
@@ -431,8 +447,52 @@ void XvVideoOutput::ToggleFullScreen(void)
 
     XRaiseWindow(data->XJ_disp, data->XJ_win);
     XFlush(data->XJ_disp);
+
+    pthread_mutex_unlock(&lock);
 }
-   
+  
+void XvVideoOutput::EmbedInWidget(unsigned long wid, int x, int y, int w, int h)
+{
+    if (embedding)
+        return;
+
+    pthread_mutex_lock(&lock);
+    data->XJ_curwin = wid;
+
+    olddispx = dispx;
+    olddispy = dispy;
+    olddispw = dispw;
+    olddisph = disph;
+
+    dispx = x;
+    dispy = y;
+    dispw = w;
+    disph = h;
+
+    embedding = true;
+
+    pthread_mutex_unlock(&lock);
+}
+ 
+void XvVideoOutput::StopEmbedding(void)
+{
+    if (!embedding)
+        return;
+
+    pthread_mutex_lock(&lock);
+
+    dispx = olddispx;
+    dispy = olddispy;
+    dispw = olddispw;
+    disph = olddisph;
+
+    data->XJ_curwin = data->XJ_win;
+
+    embedding = false;
+
+    pthread_mutex_unlock(&lock);
+}
+
 void XvVideoOutput::Show(unsigned char *buffer, int width, int height)
 {
     XvImage *image = data->buffers[buffer];
@@ -447,10 +507,14 @@ void XvVideoOutput::Show(unsigned char *buffer, int width, int height)
         memcpy((unsigned char *)image->data + (width * height) * 5 / 4,
                scratchspace, width * height / 4);
     }
-    
-    XvShmPutImage(data->XJ_disp, xv_port, data->XJ_win, data->XJ_gc, image, 
-                  0, 0, width, height, 0, 0, curw, curh, False);
+   
+    pthread_mutex_lock(&lock);
+ 
+    XvShmPutImage(data->XJ_disp, xv_port, data->XJ_curwin, data->XJ_gc, image, 
+                  0, 0, width, height, dispx, dispy, dispw, disph, False);
     XSync(data->XJ_disp, False);
+
+    pthread_mutex_unlock(&lock);
 }
 
 int XvVideoOutput::CheckEvents(void)
