@@ -33,10 +33,6 @@
 #endif
 #include <time.h>
 
-#ifndef HAVE_STRPTIME
-#include "strptime.h"
-#endif
-
 AVInputFormat *first_iformat;
 AVOutputFormat *first_oformat;
 
@@ -934,116 +930,6 @@ static time_t mktimegm(struct tm *tm)
 
     t += 3600 * tm->tm_hour + 60 * tm->tm_min + tm->tm_sec;
 
-    return t;
-}
-
-/* Syntax:
- * - If not a duration:
- *  [{YYYY-MM-DD|YYYYMMDD}]{T| }{HH[:MM[:SS[.m...]]][Z]|HH[MM[SS[.m...]]][Z]}
- * Time is localtime unless Z is suffixed to the end. In this case GMT
- * Return the date in micro seconds since 1970 
- * - If duration:
- *  HH[:MM[:SS[.m...]]]
- *  S+[.m...]
- */
-int64_t parse_date(const char *datestr, int duration)
-{
-    const char *p;
-    int64_t t;
-    struct tm dt;
-    int i;
-    static const char *date_fmt[] = {
-        "%Y-%m-%d",
-        "%Y%m%d",
-    };
-    static const char *time_fmt[] = {
-        "%H:%M:%S",
-        "%H%M%S",
-    };
-    const char *q;
-    int is_utc, len;
-    char lastch;
-    time_t now = time(0);
-
-    len = strlen(datestr);
-    if (len > 0)
-        lastch = datestr[len - 1];
-    else
-        lastch = '\0';
-    is_utc = (lastch == 'z' || lastch == 'Z');
-
-    memset(&dt, 0, sizeof(dt));
-
-    p = datestr;
-    q = NULL;
-    if (!duration) {
-        for (i = 0; i < sizeof(date_fmt) / sizeof(date_fmt[0]); i++) {
-            q = strptime(p, date_fmt[i], &dt);
-            if (q) {
-                break;
-            }
-        }
-
-        if (!q) {
-            if (is_utc) {
-                dt = *gmtime(&now);
-            } else {
-                dt = *localtime(&now);
-            }
-            dt.tm_hour = dt.tm_min = dt.tm_sec = 0;
-        } else {
-            p = q;
-        }
-
-        if (*p == 'T' || *p == 't' || *p == ' ')
-            p++;
-
-        for (i = 0; i < sizeof(time_fmt) / sizeof(time_fmt[0]); i++) {
-            q = strptime(p, time_fmt[i], &dt);
-            if (q) {
-                break;
-            }
-        }
-    } else {
-        q = strptime(p, time_fmt[0], &dt);
-        if (!q) {
-            dt.tm_sec = strtol(p, (char **)&q, 10);
-            dt.tm_min = 0;
-            dt.tm_hour = 0;
-        }
-    }
-
-    /* Now we have all the fields that we can get */
-    if (!q) {
-        if (duration)
-            return 0;
-        else
-            return now * int64_t_C(1000000);
-    }
-
-    if (duration) {
-        t = dt.tm_hour * 3600 + dt.tm_min * 60 + dt.tm_sec;
-    } else {
-        dt.tm_isdst = -1;       /* unknown */
-        if (is_utc) {
-            t = mktimegm(&dt);
-        } else {
-            t = mktime(&dt);
-        }
-    }
-
-    t *= 1000000;
-
-    if (*q == '.') {
-        int val, n;
-        q++;
-        for (val = 0, n = 100000; n >= 1; n /= 10, q++) {
-            if (!isdigit(*q)) 
-                break;
-            val += n * (*q - '0');
-        }
-        t += val;
-    }
     return t;
 }
 
