@@ -1099,7 +1099,7 @@ void TV::RunTV(void)
             while (osd->DialogShowing(dialogname))
             {
                 osd->DialogAbort(dialogname);
-                usleep(500);
+                osd->TurnDialogOff(dialogname);
             }
             nextState = kState_None;
             changeState = true;
