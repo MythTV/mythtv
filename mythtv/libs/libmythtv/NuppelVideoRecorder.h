@@ -1,3 +1,6 @@
+#ifndef NUPPELVIDEORECORDER
+#define NUPPELVIDEORECORDER
+
 #include <string>
 #include <vector>
 #include <linux/videodev.h>
@@ -17,6 +20,7 @@
 #include "RTjpegN.h"
 #include "minilzo.h"
 #include "format.h"
+#include "RingBuffer.h"
 
 using namespace std;
 
@@ -25,6 +29,8 @@ class NuppelVideoRecorder
  public:
     NuppelVideoRecorder();
    ~NuppelVideoRecorder();
+
+    void SetRingBuffer(RingBuffer *rbuf) { ringBuffer = rbuf; }
 
     void SetMotionLevels(int lM1, int lM2) { M1 = lM1; M2 = lM2; }
     void SetQuality(int quality) { Q = quality; }
@@ -36,7 +42,10 @@ class NuppelVideoRecorder
    
     void Initialize(void);
     void StartRecording(void);
- 
+    void StopRecording(void) { encoding = false; }
+    
+    bool IsRecording(void) { return encoding; }
+    
  protected:
     static void *WriteThread(void *param);
     static void *AudioThread(void *param);
@@ -62,7 +71,6 @@ class NuppelVideoRecorder
     bool encoding;
     
     int fd; // v4l input file handle
-    int ostr;
     signed char *strm;
     long dropped;
     unsigned int lf, tf;
@@ -93,9 +101,6 @@ class NuppelVideoRecorder
     long __LZO_MMODEL var [ ((size) + (sizeof(long) - 1)) / sizeof(long) ]    
     HEAP_ALLOC(wrkmem, LZO1X_1_MEM_COMPRESS);
 
-    int shmid;
-    char *sharedbuffer;
-
     string audiodevice;
     string videodevice;
     
@@ -121,4 +126,11 @@ class NuppelVideoRecorder
 
     pthread_t write_tid;
     pthread_t audio_tid;
+
+    bool recording;
+
+    RingBuffer *ringBuffer;
+    bool weMadeBuffer;
 };
+
+#endif

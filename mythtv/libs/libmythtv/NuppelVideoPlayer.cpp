@@ -16,10 +16,10 @@
 
 NuppelVideoPlayer::NuppelVideoPlayer(void)
 {
+    playing = false;
     audiofd = -1;
     filename = "output.nuv";
 
-    file = 0;
     eof = 0;
     buf = NULL;
     buf2 = NULL;
@@ -38,16 +38,19 @@ NuppelVideoPlayer::NuppelVideoPlayer(void)
     deinterlace = 0;
 
     audiodevice = "/dev/dsp";
+
+    ringBuffer = NULL;
+    weMadeBuffer = false;
 }
 
 NuppelVideoPlayer::~NuppelVideoPlayer(void)
 {
-    if (file > 0)
-        close(file);
     if (gf)
         lame_close(gf);
     if (rtjd)
         delete rtjd;
+    if (weMadeBuffer)
+        delete ringBuffer;
 }
 
 void NuppelVideoPlayer::InitSound(void)
@@ -143,15 +146,19 @@ int NuppelVideoPlayer::OpenFile(void)
     char   ftype;
     char   *space;
 
-    file = open(filename.c_str(), O_RDONLY|O_LARGEFILE);
+    if (!ringBuffer)
+    {
+        ringBuffer = new RingBuffer(filename.c_str(), true, false);
+        weMadeBuffer = true;
+    }
 
-    if (file == -1)
+    if (!ringBuffer->IsOpen())
     {
         fprintf(stderr, "File not found: %s\n", filename.c_str());
         return -1;
     }
 
-    read(file, &fileheader, FILEHEADERSIZE);
+    ringBuffer->Read(&fileheader, FILEHEADERSIZE);
 
     video_width = fileheader.width;
     video_height = fileheader.height;
@@ -160,35 +167,33 @@ int NuppelVideoPlayer::OpenFile(void)
 
     space = new char[video_width * video_height * 3 / 2];
 
-    if (FRAMEHEADERSIZE != read(file, &frameheader, FRAMEHEADERSIZE))
+    if (FRAMEHEADERSIZE != ringBuffer->Read(&frameheader, FRAMEHEADERSIZE))
     {
         fprintf(stderr, "File not big enough for a header\n");
-        close(file);
         return -1;
     }
     if (frameheader.frametype != 'D') 
     {
         fprintf(stderr, "Illegal file format\n");
-        close(file);
         return -1;
     }
-    if (frameheader.packetlength != read(file, space, frameheader.packetlength))
+    if (frameheader.packetlength != ringBuffer->Read(space, 
+                                                     frameheader.packetlength))
     {
         fprintf(stderr, "File not big enough for first frame data\n");
-        close(file);
         return -1;
     }
 
     if ((video_height & 1) == 1)
     {
         video_height--;
-        fprintf(stderr, "Incompatible video height, reducint to %d\n", 
+        fprintf(stderr, "Incompatible video height, reducing to %d\n", 
                 video_height);
     }
 
-    startpos = lseek(file, 0, SEEK_CUR);
+    startpos = ringBuffer->Seek(0, SEEK_CUR);
 
-    read(file, &frameheader, FRAMEHEADERSIZE);
+    ringBuffer->Read(&frameheader, FRAMEHEADERSIZE);
 
     foundit = 0;
     effdsp = 44100;
@@ -210,7 +215,7 @@ int NuppelVideoPlayer::OpenFile(void)
         }
         if (frameheader.frametype != 'R' && frameheader.packetlength != 0)
         {
-            if (frameheader.packetlength != read(file, space, 
+            if (frameheader.packetlength != ringBuffer->Read(space, 
                                                  frameheader.packetlength))
             {
                 foundit = 1;
@@ -218,13 +223,13 @@ int NuppelVideoPlayer::OpenFile(void)
             }
         }
 
-        foundit = (FRAMEHEADERSIZE != read(file, &frameheader, 
-                                           FRAMEHEADERSIZE));
+        foundit = (FRAMEHEADERSIZE != ringBuffer->Read(&frameheader, 
+                                                       FRAMEHEADERSIZE));
     }
 
     delete [] space;
 
-    lseek(file, startpos, SEEK_SET);
+    ringBuffer->Seek(startpos, SEEK_SET);
 
     return 0;
 }
@@ -412,7 +417,7 @@ unsigned char *NuppelVideoPlayer::GetFrame(int *timecode, int onlyvideo,
               }
         }
 
-        if (read(file, &frameheader, FRAMEHEADERSIZE) != FRAMEHEADERSIZE)
+        if (ringBuffer->Read(&frameheader, FRAMEHEADERSIZE) != FRAMEHEADERSIZE)
         {
             eof=1;
             return (buf);
@@ -427,7 +432,7 @@ unsigned char *NuppelVideoPlayer::GetFrame(int *timecode, int onlyvideo,
                     effdsp = frameheader.timecode;
 
         if (frameheader.packetlength!=0) {
-            if (read(file, strm, frameheader.packetlength) != 
+            if (ringBuffer->Read(strm, frameheader.packetlength) != 
                 frameheader.packetlength) 
             {
                 eof=1;
@@ -456,7 +461,7 @@ unsigned char *NuppelVideoPlayer::GetFrame(int *timecode, int onlyvideo,
         {
             if (frameheader.comptype=='N' && lastaudiolen!=0) 
             {
-                memset(strm,   0, lastaudiolen);
+                memset(strm, 0, lastaudiolen);
             }
             else if (frameheader.comptype=='3') 
             {
@@ -580,7 +585,9 @@ void NuppelVideoPlayer::StartPlaying(void)
                           "NuppelVideo");
     videobuf3 = new unsigned char[videosize];
 
-    while (!eof)
+    playing = true;
+   
+    while (!eof && playing)
     {
         if (paused)
             goto endofloop;
@@ -674,6 +681,7 @@ endofloop:
         }
     }
 
+    playing = false;
     XJ_exit();
 }
 

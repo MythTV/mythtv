@@ -1,5 +1,8 @@
 /* format.h  rh */
 
+#ifndef FORMAT_H
+#define FORMAT_H
+
 typedef struct rtfileheader
 {
   char finfo[12];     // "NuppelVideo" + \0
@@ -91,3 +94,4 @@ typedef struct audbuffertype
     unsigned char *buffer;
 } audbuffertyp;
 
+#endif

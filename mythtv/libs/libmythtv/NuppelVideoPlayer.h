@@ -1,3 +1,6 @@
+#ifndef NUPPELVIDEOPLAYER
+#define NUPPELVIDEOPLAYER
+
 #include <string>
 
 #ifdef MMX
@@ -11,6 +14,7 @@
 
 #include "RTjpegN.h"
 #include "format.h"
+#include "RingBuffer.h"
 
 using namespace std;
 
@@ -26,6 +30,10 @@ class NuppelVideoPlayer
     void SetFileName(char *lfilename) { filename = lfilename; }
 
     void StartPlaying(void);
+
+    bool IsPlaying(void) { return playing; }
+
+    void SetRingBuffer(RingBuffer *rbuf) { ringBuffer = rbuf; }
 
  private:
     void InitSound(void);
@@ -49,7 +57,6 @@ class NuppelVideoPlayer
     string audiodevice;
     
     /* rtjpeg_plugin stuff */
-    int file;
     int eof;
     int video_width;
     int video_height;
@@ -83,4 +90,11 @@ class NuppelVideoPlayer
     uint8_t *planes[3];
 
     int paused;
+
+    bool playing;
+
+    RingBuffer *ringBuffer;
+    bool weMadeBuffer;
 };
+
+#endif

@@ -3,7 +3,7 @@ CXX=g++
 #DEBUG=-O0 -g3 -pg
 OPT=-O6 -march=pentiumpro -fomit-frame-pointer -funroll-loops -fexpensive-optimizations -finline-functions
 
-CXXFLAGS= -Wall -DMMX -D_GNU_SOURCE $(OPT) $(DEBUG)
+CXXFLAGS= -Wall -DMMX -D_GNU_SOURCE -D_REENTRANT $(OPT) $(DEBUG)
 
 CXXCOMPILE = $(CXX) $(CXXFLAGS)
 CXXLINK = $(CXX) $(CXXFLAGS) -o $@
@@ -13,25 +13,24 @@ CXXLINK = $(CXX) $(CXXFLAGS) -o $@
 .cpp.o:
 	$(CXXCOMPILE) -c $< -o $@
 
-all:   nuvplay nuvrec 
+all: libNuppelVideo.a
 
-NUVPLAYOBJ = XJ.o minilzo.o RTjpegN.o linearBlend.o NuppelVideoPlayer.o nuvplay.o
-NUVPLAYLDF = -L/usr/X11R6/lib -lmp3lame -lX11 -lXext -lXv -lm
+NUVOBJ  = XJ.o minilzo.o RTjpegN.o linearBlend.o NuppelVideoPlayer.o 
+NUVOBJ += NuppelVideoRecorder.o RingBuffer.o
+NUVLDF = -L/usr/X11R6/lib -lmp3lame -lX11 -lXext -lXv -lm -lpthread
 
-NUVRECOBJ = NuppelVideoRecorder.o linearBlend.o minilzo.o RTjpegN.o nuvrec.o
-NUVRECLDF = -lmp3lame -lm -lpthread
+libNuppelVideo.a: $(NUVOBJ)
+	@rm -f libNuppelVideo.a
+	ar cru libNuppelVideo.a $(NUVOBJ)
+	ranlib libNuppelVideo.a
 
-nuvplay: $(NUVPLAYOBJ)
-	@rm -f nuvplay
-	$(CXXLINK) $(NUVPLAYOBJ) $(NUVPLAYLDF)
-
-nuvrec: $(NUVRECOBJ)
-	@rm -f nuvrec
-	$(CXXLINK) $(NUVRECOBJ) $(NUVRECLDF)
-
-install: nuvrec nuvplay 
-	 strip nuvrec nuvplay 
-	 install -m 755 nuvrec nuvplay /usr/local/bin
-
+nuppelvideo-config: 
+	echo "#!/bin/sh" > nuppelvideo-config
+	echo " " >> nuppelvideo-config
+	echo "if [ "'$$1'" -a "'$$1'" = \"--libs\" ]" >> nuppelvideo-config
+	echo "then" >> nuppelvideo-config
+	echo "  echo \"$(NUVLDF)\"" >> nuppelvideo-config
+	echo "fi" >> nuppelvideo-config
+	chmod +x nuppelvideo-config
 clean:	
-	rm -f *.o nuvplay nuvrec
+	rm -f *.o libNuppelVideo.a

@@ -4,68 +4,64 @@
 #include <unistd.h>
 #include <pthread.h>
 
-extern int RecordVideo(int argc, char *argv[]);
-extern int PlayVideo(int argc, char *argv[]);
-
-int encoding;
-
-struct args
-{
-    int argc;
-    char **argv;
-};
+#include "NuppelVideoRecorder.h"
+#include "NuppelVideoPlayer.h"
+#include "RingBuffer.h"
 
 void *SpawnEncode(void *param)
 {
-  int i;
-  struct args *TheArgs = (struct args *)param;
+    NuppelVideoRecorder *nvr = (NuppelVideoRecorder *)param;
 
-  for (i = 0; i < TheArgs->argc; i++) printf("enc %d %s\n", i, TheArgs->argv[i]);
-  RecordVideo(TheArgs->argc, TheArgs->argv);
-
-  return NULL;
+    nvr->StartRecording();
+  
+    return NULL;
 }
 
 void *SpawnDecode(void *param)
 {
-  int i;
-  struct args *TheArgs = (struct args *)param;
+    NuppelVideoPlayer *nvp = (NuppelVideoPlayer *)param;
 
-  for (i = 0; i < TheArgs->argc; i++) printf("dec %d %s\n", i, TheArgs->argv[i]);
+    nvp->StartPlaying();
 
-  while (!encoding)
-      usleep(50);
-
-  PlayVideo(TheArgs->argc, TheArgs->argv);
-
-  encoding = 0;
-  return NULL;
+    return NULL;
 }
 
 int main(int argc, char *argv[])
 {
-  struct args EncodeArgs;
-  struct args DecodeArgs;
   pthread_t encode, decode;
 
-  EncodeArgs.argc = argc;
-  EncodeArgs.argv = argv;
-
-  DecodeArgs.argc = 2;
-  DecodeArgs.argv = malloc(sizeof(char *) * 3);
-  DecodeArgs.argv[0] = strdup(argv[0]);
-  DecodeArgs.argv[1] = malloc(strlen(argv[argc - 1]) + 10);
-  strcpy(DecodeArgs.argv[1], argv[argc-1]);
-  strcat(DecodeArgs.argv[1], ".nuv");
-  DecodeArgs.argv[2] = NULL;
- 
-  encoding = 0;
+  RingBuffer *rbuffer = new RingBuffer("ringbuf.nuv", 1024 * 1024 * 5);
   
-  pthread_create(&encode, NULL, SpawnEncode, &EncodeArgs);
-  pthread_create(&decode, NULL, SpawnDecode, &DecodeArgs);
+  NuppelVideoRecorder *nvr = new NuppelVideoRecorder();
+  nvr->SetRingBuffer(rbuffer);
+  nvr->SetMotionLevels(0, 0);
+  nvr->SetQuality(120);
+  nvr->SetResolution(640, 480);
+  nvr->Initialize();
+  
+  NuppelVideoPlayer *nvp = new NuppelVideoPlayer();
+  nvp->SetRingBuffer(rbuffer);
+  
+  pthread_create(&encode, NULL, SpawnEncode, nvr);
 
+  while (!nvr->IsRecording())
+      usleep(50);
+
+  usleep(800000);
+  pthread_create(&decode, NULL, SpawnDecode, nvp);
+
+  while (!nvp->IsPlaying())
+      usleep(50);
+
+  while (nvp->IsPlaying())
+      usleep(50);
+  
+  nvr->StopRecording();
+  
   pthread_join(encode, NULL);
   pthread_join(decode, NULL);
 
+  delete nvr;
+  delete nvp;
   return 0;
 }
