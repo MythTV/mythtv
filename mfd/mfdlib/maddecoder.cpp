@@ -10,6 +10,9 @@
 	Copyright (c) 2000-2001 Brad Hughes <bhughes@trolltech.com>
 
 */
+
+#include "../config.h"
+
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,7 +32,9 @@ using namespace std;
 #include "buffer.h"
 #include "output.h"
 
+#ifdef MYTHLIB_SUPPORT
 #include <mythtv/mythcontext.h>
+#endif
 
 #define XING_MAGIC     (('X' << 24) | ('i' << 16) | ('n' << 8) | 'g')
 
@@ -59,8 +64,10 @@ MadDecoder::MadDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
     output_at = 0;
     output_size = 0;
 
+#ifdef MYTHLIB_SUPPORT
     filename_format = gContext->GetSetting("NonID3FileNameFormat").upper();
     ignore_id3 = gContext->GetNumSetting("Ignore_ID3", 0);
+#endif
 }
 
 MadDecoder::~MadDecoder(void)

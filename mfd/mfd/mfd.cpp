@@ -39,11 +39,6 @@ MFD::MFD(QSqlDatabase *ldb, int port, bool log_stdout, int logging_verbosity)
     {
         db = ldb;
     }
-    if(db == NULL)
-    {
-        cerr << "We'll get nowhere without a database" << endl;
-        exit(0);
-    }
     
     //
     //  Create the uber metadata container

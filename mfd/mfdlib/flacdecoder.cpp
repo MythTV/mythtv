@@ -11,6 +11,8 @@
 
 */
 
+#include "../config.h"
+
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,7 +29,9 @@ using namespace std;
 #include "recycler.h"
 //  #include "metadata.h"
 
+#ifdef MYTHLIB_SUPPORT
 #include <mythtv/mythcontext.h>
+#endif
 
 static FLAC__SeekableStreamDecoderReadStatus flacread(const FLAC__SeekableStreamDecoder *decoder, FLAC__byte bufferp[], unsigned *bytes, void *client_data)
 {
@@ -193,8 +197,10 @@ FlacDecoder::FlacDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
 
     decoder = 0;
 
+#ifdef MYTHLIB_SUPPORT
     filename_format = gContext->GetSetting("NonID3FileNameFormat").upper();
     ignore_id3 = gContext->GetNumSetting("Ignore_ID3", 0);
+#endif
 }
 
 FlacDecoder::~FlacDecoder(void)

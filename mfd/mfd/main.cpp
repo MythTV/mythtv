@@ -8,6 +8,9 @@
 
 */
 
+#include "../config.h"
+
+
 #include <qapplication.h>
 #include <qsqldatabase.h>
 #include <qfile.h>
@@ -17,11 +20,25 @@
 using namespace std;
 #include <unistd.h>
 
+#ifdef MYTHLIB_SUPPORT 
 #include <mythtv/mythcontext.h>
+#endif
 
 #include "mfd.h"
 
+
+//
+//  If configure said to include libmyth support, then we do.
+//
+
+#if MYTHLIB_SUPPORT
 MythContext *gContext;
+#endif
+
+
+//
+//  This is the center of the universe
+//
 
 MFD *the_mfd;
 
@@ -126,28 +143,35 @@ int main(int argc, char **argv)
     }
 
     //
-    //  Get the Myth context and db hooks
+    //  Get the Myth context and db hooks if we were ./configure'd with MYTHLIB support
     //    
-    
+
+
+    QSqlDatabase *db = NULL;
+
+#ifdef MYTHLIB_SUPPORT
     gContext = new MythContext(MYTH_BINARY_VERSION, false, false);
-    QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
+    db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!db)
     {
-        cerr << "mfd: Couldn't connect to database. Giving up. " << endl; 
+        cerr << "mfd: Couldn't connect to database. Giving up." << endl; 
         return -1;
     }
-    
-    if(!gContext->OpenDatabase(db))
+         if(!gContext->OpenDatabase(db))
     {
-        cerr << "mfd: Couldn't open database. I go away now. " << endl;
+        cerr << "mfd: Couldn't open database. I go away now." << endl;
         return -1;
     }
-    
+#endif
+
     //
     //  Figure out port to listen on
     //
 
-    int assigned_port = gContext->GetNumSetting("MFDPort", 2342);
+    int assigned_port = 2342;
+#ifdef MYTHLIB_SUPPORT
+    assigned_port = gContext->GetNumSetting("MFDPort", 2342);
+#endif
     if(special_port > 0)
     {
         assigned_port = special_port;
@@ -160,10 +184,13 @@ int main(int argc, char **argv)
     //
    
     bool log_stdout = false;
+#ifdef MYTHLIB_SUPPORT
     if(gContext->GetNumSetting("MFDLogFlag", 0))
     {
         log_stdout = true;
-    } 
+    }
+#endif
+
     if(!daemon_mode)
     {
         log_stdout = true;
@@ -174,7 +201,13 @@ int main(int argc, char **argv)
     a.exec();
                                 
     delete db;
-    delete gContext;
+
+#ifdef MYTHLIB_SUPPORT
+    if(gContext)
+    {
+        delete gContext;
+    }
+#endif
     return 0;
 }
 

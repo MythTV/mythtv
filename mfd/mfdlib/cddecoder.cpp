@@ -11,6 +11,8 @@
 
 */
 
+#include "../config.h"
+
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,7 +30,10 @@ using namespace std;
 #include "recycler.h"
 //  #include "metadata.h"
 
+
+#ifdef MYTHLIB_SUPPORT
 #include <mythtv/mythcontext.h>
+#endif
 
 CdDecoder::CdDecoder(const QString &file, DecoderFactory *d, QIODevice *i, 
                      Output *o) 
@@ -57,7 +62,11 @@ CdDecoder::CdDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
 
     settracknum = -1;
 
+    devicename = "/dev/cdrom";
+
+#ifdef MYTHLIB_SUPPORT
     devicename = gContext->GetSetting("CDDevice");
+#endif
 }
 
 CdDecoder::~CdDecoder(void)

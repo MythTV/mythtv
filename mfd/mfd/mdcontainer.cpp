@@ -8,13 +8,17 @@
 
 */
 
+#include "../config.h"
+
 #include <iostream>
 using namespace std;
 
 #include <qapplication.h>
 #include <qdir.h>
 
+#ifdef MYTHLIB_SUPPORT
 #include <mythtv/mythcontext.h>
+#endif
 
 
 #include "mdcontainer.h"
@@ -236,7 +240,15 @@ bool MetadataMonitor::checkAudio()
     //
 
     metadata_files.clear();
-    QString startdir = gContext->GetSetting("MusicLocation");
+    
+    //
+    //  Make fallbacks for location much smarter
+    //
+
+    QString startdir = "/mnt/store";
+#ifdef MYTHLIB_SUPPORT
+        startdir = gContext->GetSetting("MusicLocation");
+#endif
     if(startdir.length() > 0)
     {
         buildFileList(startdir);    
@@ -253,6 +265,10 @@ bool MetadataMonitor::checkAudio()
     //  more expensive load if it looks likely to be worth it.
     //
     
+    if(!db)
+    {
+        return true;
+    }
     QString   q_string = "SELECT filename FROM musicmetadata ";
     QSqlQuery query(q_string, db);
     
@@ -284,6 +300,10 @@ bool MetadataMonitor::checkAudio()
 
 bool MetadataMonitor::sweepAudio()
 {
+    if(!db)
+    {
+        return false;
+    }
 
     QString aquery =    "SELECT intid, artist, album, title, genre, "
                         "year, tracknum, length, filename, rating, "
@@ -353,6 +373,8 @@ bool MetadataMonitor::sweepAudio()
         }
     }
 
+
+#ifdef MYTHLIB_SUPPORT
     QString b_query = QString("SELECT name, songlist FROM musicplaylist WHERE "
                              "name != \"backup_playlist_storage\" "
                              "AND hostname = \"%1\" ;")
@@ -375,6 +397,7 @@ bool MetadataMonitor::sweepAudio()
             current_playlists->append(new_playlist);
         }
     }
+#endif
     
     
 
