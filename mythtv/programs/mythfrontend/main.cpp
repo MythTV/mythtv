@@ -229,6 +229,8 @@ bool RunMenu(QString themedir)
     {
         cerr << "Couldn't find theme " << themedir << endl;
     }
+
+    return true;
 }   
     
 int main(int argc, char **argv)

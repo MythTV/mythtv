@@ -28,13 +28,13 @@ DialogBox::DialogBox(const QString &text, const char *checkboxtext,
     setGeometry(0, 0, screenwidth, screenheight);
     setFixedSize(QSize(screenwidth, screenheight));
 
-    setFont(QFont("Arial", 16 * hmult, QFont::Bold));
+    setFont(QFont("Arial", (int)(16 * hmult), QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
     QLabel *maintext = new QLabel(text, this);
     maintext->setAlignment(Qt::WordBreak | Qt::AlignLeft | Qt::AlignTop);
 
-    box = new QVBoxLayout(this, 20 * wmult);
+    box = new QVBoxLayout(this, (int)(20 * wmult));
 
     box->addWidget(maintext, 1);
 

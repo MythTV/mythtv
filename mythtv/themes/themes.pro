@@ -3,7 +3,7 @@
 ######################################################################
 
 TEMPLATE = app
-CONFIG -= moc
+CONFIG -= moc qt
 
 themes.path = /usr/local/share/mythtv/themes/
 themes.files = blue liquid defaultosd

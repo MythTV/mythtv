@@ -52,8 +52,8 @@ GuideGrid::GuideGrid(const QString &channel, QWidget *parent, const char *name)
     }
 
     setPalette(QPalette(bgcolor));
-    m_font = new QFont("Arial", 11 * hmult, QFont::Bold);
-    m_largerFont = new QFont("Arial", 13 * hmult, QFont::Bold);
+    m_font = new QFont("Arial", (int)(11 * hmult), QFont::Bold);
+    m_largerFont = new QFont("Arial", (int)(13 * hmult), QFont::Bold);
 
     m_originalStartTime = QDateTime::currentDateTime();
     m_currentStartTime = m_originalStartTime;
@@ -329,7 +329,7 @@ void GuideGrid::paintChannels(QPainter *p)
 
     QPainter tmp(&pix);
     tmp.setBrush(fgcolor);
-    tmp.setPen(QPen(fgcolor, 2 * wmult));
+    tmp.setPen(QPen(fgcolor, (int)(2 * wmult)));
     tmp.setFont(*m_largerFont);
 
     QString date = m_currentStartTime.toString("ddd");
@@ -337,14 +337,14 @@ void GuideGrid::paintChannels(QPainter *p)
     int datewidth = lfm.width(date);
     int dateheight = lfm.height();
 
-    tmp.drawText((cr.width() - datewidth) / 2, (55 * hmult - dateheight) / 2,
-                 date);
+    tmp.drawText((cr.width() - datewidth) / 2, 
+                 (int)((55 * hmult - dateheight) / 2), date);
 
     date = m_currentStartTime.toString("MMM d");
     datewidth = lfm.width(date);
 
     tmp.drawText((cr.width() - datewidth) / 2, 
-                 (55 * hmult - dateheight) / 2 + dateheight, date);
+                 (int)((55 * hmult - dateheight) / 2 + dateheight), date);
 
     tmp.setFont(*m_font);
 
@@ -406,7 +406,7 @@ void GuideGrid::paintTimes(QPainter *p)
 
     QPainter tmp(&pix);
     tmp.setBrush(fgcolor);
-    tmp.setPen(QPen(fgcolor, 2 * wmult));
+    tmp.setPen(QPen(fgcolor, (int)(2 * wmult)));
     tmp.setFont(*m_largerFont);
 
     int xdifference = (int)(cr.right() / 6);
@@ -461,7 +461,7 @@ void GuideGrid::paintPrograms(QPainter *p)
     pix.fill(this, cr.topLeft());
 
     QPainter tmp(&pix);
-    tmp.setPen(QPen(fgcolor, 2 * wmult));
+    tmp.setPen(QPen(fgcolor, (int)(2 * wmult)));
 
     tmp.setFont(*m_largerFont);
 
@@ -521,10 +521,10 @@ void GuideGrid::paintPrograms(QPainter *p)
 
                 QBrush br = getBGColor(pginfo->category);
 
-                tmp.fillRect(x * xdifference + 1 * wmult, 
-                             ydifference * y + 1 * hmult,
-                             (x + spread) * xdifference - 2 * wmult, 
-                             ydifference - 2 * hmult, br);
+                tmp.fillRect((int)(x * xdifference + 1 * wmult), 
+                             (int)(ydifference * y + 1 * hmult),
+                             (int)((x + spread) * xdifference - 2 * wmult), 
+                             (int)(ydifference - 2 * hmult), br);
 
                 int maxwidth = (int)(spread * xdifference - (15 * wmult));
 
@@ -532,13 +532,13 @@ void GuideGrid::paintPrograms(QPainter *p)
                 if (pginfo->category != "" && usetheme)
                     info += " (" + pginfo->category + ")";
                 
-                tmp.drawText(x * xdifference + 10 * wmult, 
-                             height / 8 + y * ydifference + 1 * hmult, 
+                tmp.drawText((int)(x * xdifference + 10 * wmult), 
+                             (int)(height / 8 + y * ydifference + 1 * hmult), 
                              maxwidth, ydifference,
                              AlignLeft | WordBreak,
                              info);
 
-                tmp.setPen(QPen(fgcolor, 2 * wmult));
+                tmp.setPen(QPen(fgcolor, (int)(2 * wmult)));
 
                 tmp.drawLine((x + spread) * xdifference, ydifference * y, 
                              (x + spread) * xdifference, 
@@ -546,7 +546,7 @@ void GuideGrid::paintPrograms(QPainter *p)
 
                 if (pginfo->recordtype > 0)
                 {
-                    tmp.setPen(QPen(red, 2 * wmult));
+                    tmp.setPen(QPen(red, (int)(2 * wmult)));
                     QString text;
 
                     if (pginfo->recordtype == 1)
@@ -558,18 +558,18 @@ void GuideGrid::paintPrograms(QPainter *p)
 
                     int width = fm.width(text);
 
-                    tmp.drawText((x + spread) * xdifference - width * 1.5, 
-                                 (y + 1) * ydifference - height, width * 1.5, 
-                                 height, AlignLeft, text);
+                    tmp.drawText((int)((x + spread) * xdifference - 
+                                 width * 1.5), (y + 1) * ydifference - height,
+                                 (int)(width * 1.5), height, AlignLeft, text);
              
-                    tmp.setPen(QPen(fgcolor, 2 * wmult));
+                    tmp.setPen(QPen(fgcolor, (int)(2 * wmult)));
                 }
 
                 if (m_currentRow == (int)y)
                 {
                     if ((m_currentCol >= x) && (m_currentCol < (x + spread)))
                     {
-                        tmp.setPen(QPen(red, 3.75 * wmult));
+                        tmp.setPen(QPen(red, (int)(3.75 * wmult)));
                   
                         int rectheight = (int)(ydifference - 4 * hmult);
                         int xstart = 1;
@@ -580,9 +580,9 @@ void GuideGrid::paintPrograms(QPainter *p)
                             xend += (int)(1 * wmult);
 			
                         tmp.drawRect(xstart, 
-                                     ydifference * y + 2 * hmult, 
+                                     (int)(ydifference * y + 2 * hmult), 
                                      xend, rectheight); 
-                        tmp.setPen(QPen(fgcolor, 2 * wmult));
+                        tmp.setPen(QPen(fgcolor, (int)(2 * wmult)));
                     }
                 }
             }
@@ -597,25 +597,26 @@ void GuideGrid::paintPrograms(QPainter *p)
 
 QRect GuideGrid::fullRect() const
 {
-    QRect r(0, 0, 800 * wmult, 600 * hmult);
+    QRect r(0, 0, (int)(800 * wmult), (int)(600 * hmult));
     return r;
 }
 
 QRect GuideGrid::channelRect() const
 {
-    QRect r(0, 0, 74 * wmult, 600 * hmult);
+    QRect r(0, 0, (int)(74 * wmult), (int)(600 * hmult));
     return r;
 }
 
 QRect GuideGrid::timeRect() const
 {
-    QRect r(74 * wmult, 0, 800 * wmult, 49 * hmult + 1);
+    QRect r((int)(74 * wmult), 0, (int)(800 * wmult), (int)(49 * hmult + 1));
     return r;
 }
 
 QRect GuideGrid::programRect() const
 {
-    QRect r(74 * wmult, 49 * hmult, 800 * wmult, 600 * hmult);
+    QRect r((int)(74 * wmult), (int)(49 * hmult), (int)(800 * wmult), 
+            (int)(600 * hmult));
     return r;
 }
 

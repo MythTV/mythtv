@@ -87,8 +87,8 @@ QPixmap *ProgramListItem::getPixmap(void)
 
         if (screenwidth != 800 || screenheight != 600)
         {
-            QImage tmp2 = tmpimage.smoothScale(tmpimage.width() * wmult, 
-                                               tmpimage.height() * hmult);
+            QImage tmp2 = tmpimage.smoothScale((int)(tmpimage.width() * wmult), 
+                                              (int)(tmpimage.height() * hmult));
             pixmap->convertFromImage(tmp2);
         }
         else
@@ -119,8 +119,9 @@ QPixmap *ProgramListItem::getPixmap(void)
 
             if (screenwidth != 800 || screenheight != 600)
             {
-                QImage tmp2 = tmpimage.smoothScale(tmpimage.width() * wmult, 
-                                                   tmpimage.height() * hmult);
+                QImage tmp2;
+                tmp2 = tmpimage.smoothScale((int)(tmpimage.width() * wmult), 
+                                            (int)(tmpimage.height() * hmult));
                 pixmap->convertFromImage(tmp2);
             }
             else

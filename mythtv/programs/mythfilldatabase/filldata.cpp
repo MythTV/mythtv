@@ -69,6 +69,16 @@ bool operator<(const ProgInfo &a, const ProgInfo &b)
     return (a.start < b.start);
 }
 
+bool operator>(const ProgInfo &a, const ProgInfo &b)
+{
+    return (a.start > b.start);
+}
+
+bool operator<=(const ProgInfo &a, const ProgInfo &b)
+{
+    return (a.start <= b.start);
+}
+
 QDateTime fromXMLTVDate(QString &text)
 {
     int year, month, day, hour, min, sec;

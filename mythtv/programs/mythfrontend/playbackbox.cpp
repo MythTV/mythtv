@@ -48,10 +48,10 @@ PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
     setGeometry(0, 0, screenwidth, screenheight);
     setFixedSize(QSize(screenwidth, screenheight));
 
-    setFont(QFont("Arial", 16 * hmult, QFont::Bold));
+    setFont(QFont("Arial", (int)(16 * hmult), QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
-    QVBoxLayout *vbox = new QVBoxLayout(this, 20 * wmult);
+    QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
 
     QLabel *label = new QLabel("Select a recording to view:", this);
     vbox->addWidget(label);
@@ -61,9 +61,9 @@ PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
     listview->addColumn("Date");
     listview->addColumn("Title");
  
-    listview->setColumnWidth(0, 40 * wmult);
-    listview->setColumnWidth(1, 210 * wmult); 
-    listview->setColumnWidth(2, 500 * wmult);
+    listview->setColumnWidth(0, (int)(40 * wmult));
+    listview->setColumnWidth(1, (int)(210 * wmult)); 
+    listview->setColumnWidth(2, (int)(500 * wmult));
     listview->setColumnWidthMode(0, QListView::Manual);
     listview->setColumnWidthMode(1, QListView::Manual);
 
@@ -118,14 +118,14 @@ PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
         // TODO: no recordings
     }
    
-    listview->setFixedHeight(300 * hmult);
+    listview->setFixedHeight((int)(300 * hmult));
 
-    QHBoxLayout *hbox = new QHBoxLayout(vbox, 10 * wmult);
+    QHBoxLayout *hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
 
     QGridLayout *grid = new QGridLayout(hbox, 4, 2, 1);
  
     title = new QLabel(" ", this);
-    title->setFont(QFont("Arial", 25, QFont::Bold));
+    title->setFont(QFont("Arial", (int)(25 * hmult), QFont::Bold));
 
     QLabel *datelabel = new QLabel("Airdate: ", this);
     date = new QLabel(" ", this);
@@ -148,7 +148,7 @@ PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
     grid->setColStretch(1, 1);
     grid->setRowStretch(3, 1);
 
-    QPixmap temp(160 * wmult, 120 * hmult);
+    QPixmap temp((int)(160 * wmult), (int)(120 * hmult));
 
     pixlabel = new QLabel(this);
     pixlabel->setPixmap(temp);
@@ -297,7 +297,7 @@ void PlaybackBox::timeout(void)
     convert(outputbuf, buf, buf + (w * h), buf + (w * h * 5 / 4), w, h);
 
     QImage img(outputbuf, w, h, 32, NULL, 65536 * 65536, QImage::LittleEndian);
-    img = img.scale(160 * wmult, 120 * hmult);
+    img = img.scale((int)(160 * wmult), (int)(120 * hmult));
 
     delete [] outputbuf;
 
@@ -307,6 +307,7 @@ void PlaybackBox::timeout(void)
     p.drawImage(0, 0, img);
     p.end();
 
-    bitBlt(pixlabel, 0, (pixlabel->contentsRect().height() - 120 * hmult) / 2, 
+    bitBlt(pixlabel, 0, 
+           (int)((pixlabel->contentsRect().height() - 120 * hmult) / 2), 
            pmap);
 }

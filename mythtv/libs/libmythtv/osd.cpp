@@ -308,8 +308,8 @@ bool OSD::LoadTheme(void)
         if (coords.length() > 1)
         {
             infoiconpos = parsePoint(coords);
-            infoiconpos.setX(x + infoiconpos.x() * wmult);
-            infoiconpos.setY(y + infoiconpos.y() * hmult);
+            infoiconpos.setX((int)(x + infoiconpos.x() * wmult));
+            infoiconpos.setY((int)(y + infoiconpos.y() * hmult));
             useinfoicon = true;
         }
 
@@ -379,9 +379,10 @@ bool OSD::LoadTheme(void)
 
 void OSD::normalizeRect(QRect *rect)
 {
-    rect->setWidth(rect->width() * 0.91 * wmult);
-    rect->setHeight(rect->height() * hmult);
-    rect->moveTopLeft(QPoint(rect->left() * wmult, rect->top() * hmult));
+    rect->setWidth((int)(rect->width() * 0.91 * wmult));
+    rect->setHeight((int)(rect->height() * hmult));
+    rect->moveTopLeft(QPoint((int)(rect->left() * wmult), 
+                             (int)(rect->top() * hmult)));
 }
 
 QPoint OSD::parsePoint(QString text)

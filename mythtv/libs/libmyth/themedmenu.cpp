@@ -117,10 +117,10 @@ void ThemedMenu::parseBackground(QString dir, QDomElement &element)
             else if (info.tagName() == "buttonarea")
             {
                 buttonArea = parseRect(getFirstText(info));
-                buttonArea.setX(buttonArea.x() * wmult);
-                buttonArea.setY(buttonArea.y() * hmult);
-                buttonArea.setWidth(buttonArea.width() * wmult);
-                buttonArea.setHeight(buttonArea.height() * hmult);
+                buttonArea.setX((int)(buttonArea.x() * wmult));
+                buttonArea.setY((int)(buttonArea.y() * hmult));
+                buttonArea.setWidth((int)(buttonArea.width() * wmult));
+                buttonArea.setHeight((int)(buttonArea.height() * hmult));
                 hasarea = true;
             }
             else
@@ -276,10 +276,10 @@ void ThemedMenu::parseText(QDomElement &element)
             {
                 hasarea = true;
                 textRect = parseRect(getFirstText(info));
-                textRect.setX(textRect.x() * wmult);
-                textRect.setY(textRect.y() * hmult);
-                textRect.setWidth(textRect.width() * wmult);
-                textRect.setHeight(textRect.height() * hmult);
+                textRect.setX((int)(textRect.x() * wmult));
+                textRect.setY((int)(textRect.y() * hmult));
+                textRect.setWidth((int)(textRect.width() * wmult));
+                textRect.setHeight((int)(textRect.height() * hmult));
                 textRect = QRect(textRect.x(), textRect.y(),
                                  buttonnormal->width() - textRect.width() - 
                                  textRect.x(), buttonnormal->height() - 
@@ -328,7 +328,7 @@ void ThemedMenu::parseText(QDomElement &element)
         }
     }
 
-    font = QFont(fontname, fontsize * hmult, weight, italic);
+    font = QFont(fontname, (int)(fontsize * hmult), weight, italic);
     setFont(font);
 
     if (!hasarea)
@@ -438,8 +438,8 @@ void ThemedMenu::parseLogo(QString dir, QDomElement &element)
         exit(0);
     }
 
-    logopos.setX(logopos.x() * wmult);
-    logopos.setY(logopos.y() * hmult);
+    logopos.setX((int)(logopos.x() * wmult));
+    logopos.setY((int)(logopos.y() * hmult));
     logoRect = QRect(logopos.x(), logopos.y(), logo->width(),
                      logo->height());
 }
@@ -473,8 +473,8 @@ void ThemedMenu::parseButton(QString dir, QDomElement &element)
             else if (info.tagName() == "offset")
             {
                 offset = parsePoint(getFirstText(info));
-                offset.setX(offset.x() * wmult);
-                offset.setY(offset.y() * hmult);
+                offset.setX((int)(offset.x() * wmult));
+                offset.setY((int)(offset.y() * hmult));
                 hasoffset = true;
             }
             else
@@ -715,8 +715,8 @@ QPixmap *ThemedMenu::scalePixmap(QString filename)
     if (screenwidth != 800 || screenheight != 600)
     {
         QImage tmpimage(filename);
-        QImage tmp2 = tmpimage.smoothScale(tmpimage.width() * wmult, 
-                                           tmpimage.height() * hmult);
+        QImage tmp2 = tmpimage.smoothScale((int)(tmpimage.width() * wmult), 
+                                           (int)(tmpimage.height() * hmult));
         ret->convertFromImage(tmp2);
     }
     else
@@ -822,9 +822,9 @@ void ThemedMenu::layoutButtons(void)
              j++, iter++)
         {
             if (columns == 3 && j == 1)
-                newrow.buttons.insert(newrow.buttons.begin(), iter);
+                newrow.buttons.insert(newrow.buttons.begin(), &(*iter));
             else
-                newrow.buttons.push_back(iter);
+                newrow.buttons.push_back(&(*iter));
             newrow.numitems++;
         }
 
@@ -838,7 +838,7 @@ void ThemedMenu::layoutButtons(void)
                    (rows + 1);
     int row = 1;
 
-    activebutton = buttonList.begin();
+    activebutton = &(*(buttonList.begin()));
 
     vector<MenuRow>::iterator menuiter = buttonRows.begin();
     for (; menuiter != buttonRows.end(); menuiter++)
@@ -882,7 +882,7 @@ void ThemedMenu::layoutButtons(void)
         row++;
     }
 
-    activebutton = buttonList.begin();
+    activebutton = &(*(buttonList.begin()));
 }
 
 QRect ThemedMenu::menuRect() const

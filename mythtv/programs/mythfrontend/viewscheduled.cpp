@@ -43,10 +43,10 @@ ViewScheduled::ViewScheduled(QString prefix, TV *ltv, QSqlDatabase *ldb,
     setGeometry(0, 0, screenwidth, screenheight);
     setFixedSize(QSize(screenwidth, screenheight));
 
-    setFont(QFont("Arial", 16 * hmult, QFont::Bold));
+    setFont(QFont("Arial", (int)(16 * hmult), QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
-    QVBoxLayout *vbox = new QVBoxLayout(this, 10 * wmult);
+    QVBoxLayout *vbox = new QVBoxLayout(this, (int)(10 * wmult));
 
     desclabel = new QLabel("Select a recording to view:", this);
     vbox->addWidget(desclabel);
@@ -56,9 +56,9 @@ ViewScheduled::ViewScheduled(QString prefix, TV *ltv, QSqlDatabase *ldb,
     listview->addColumn("Date");
     listview->addColumn("Title");
  
-    listview->setColumnWidth(0, 40 * wmult);
-    listview->setColumnWidth(1, 210 * wmult); 
-    listview->setColumnWidth(2, 500 * wmult);
+    listview->setColumnWidth(0, (int)(40 * wmult));
+    listview->setColumnWidth(1, (int)(210 * wmult)); 
+    listview->setColumnWidth(2, (int)(500 * wmult));
     listview->setColumnWidthMode(0, QListView::Manual);
     listview->setColumnWidthMode(1, QListView::Manual);
 
@@ -77,21 +77,21 @@ ViewScheduled::ViewScheduled(QString prefix, TV *ltv, QSqlDatabase *ldb,
 
     sched = new Scheduler(db);
 
-    listview->setFixedHeight(250 * hmult);
+    listview->setFixedHeight((int)(250 * hmult));
 
     QLabel *key = new QLabel("Conflicting recordings are highlighted in <font color=\"red\">red</font>.<br>Deactivated recordings are highlighted in <font color=\"gray\">gray</font>.", this);
-    key->setFont(QFont("Arial", 12 * hmult, QFont::Bold));
+    key->setFont(QFont("Arial", (int)(12 * hmult), QFont::Bold));
     vbox->addWidget(key);
 
     QFrame *f = new QFrame(this);
     f->setFrameStyle(QFrame::HLine | QFrame::Plain);
-    f->setLineWidth(4 * hmult);
+    f->setLineWidth((int)(4 * hmult));
     vbox->addWidget(f);     
 
     QGridLayout *grid = new QGridLayout(vbox, 4, 2, 1);
     
     title = new QLabel(" ", this);
-    title->setFont(QFont("Arial", 20 * hmult, QFont::Bold));
+    title->setFont(QFont("Arial", (int)(20 * hmult), QFont::Bold));
 
     QLabel *datelabel = new QLabel("Airdate: ", this);
     date = new QLabel(" ", this);

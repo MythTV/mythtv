@@ -13,6 +13,8 @@ class ProgramInfo;
 class TimeInfo;
 class ChannelInfo;
 
+using namespace std;
+
 class GuideGrid : public QDialog
 {
     Q_OBJECT

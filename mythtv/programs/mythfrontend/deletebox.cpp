@@ -54,10 +54,10 @@ DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
     setFixedWidth(screenwidth);
     setFixedHeight(screenheight);
 
-    setFont(QFont("Arial", 16 * hmult, QFont::Bold));
+    setFont(QFont("Arial", (int)(16 * hmult), QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
-    QVBoxLayout *vbox = new QVBoxLayout(this, 15 * wmult);
+    QVBoxLayout *vbox = new QVBoxLayout(this, (int)(15 * wmult));
 
     QLabel *label = new QLabel("Select a recording to permanantly delete:", 
                                this);
@@ -69,10 +69,10 @@ DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
     listview->addColumn("Title");
     listview->addColumn("Size");
  
-    listview->setColumnWidth(0, 40 * wmult);
-    listview->setColumnWidth(1, 185 * wmult); 
-    listview->setColumnWidth(2, 435 * wmult);
-    listview->setColumnWidth(3, 90 * wmult);
+    listview->setColumnWidth(0, (int)(40 * wmult));
+    listview->setColumnWidth(1, (int)(185 * wmult)); 
+    listview->setColumnWidth(2, (int)(435 * wmult));
+    listview->setColumnWidth(3, (int)(90 * wmult));
 
     listview->setSorting(-1, false);
     listview->setAllColumnsShowFocus(TRUE);
@@ -126,14 +126,14 @@ DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
         // TODO: no recordings
     }
    
-    listview->setFixedHeight(225 * hmult);
+    listview->setFixedHeight((int)(225 * hmult));
 
-    QHBoxLayout *hbox = new QHBoxLayout(vbox, 10 * wmult);
+    QHBoxLayout *hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
 
     QGridLayout *grid = new QGridLayout(hbox, 4, 2, 1);
     
     title = new QLabel(" ", this);
-    title->setFont(QFont("Arial", 25, QFont::Bold));
+    title->setFont(QFont("Arial", (int)(25 * hmult), QFont::Bold));
 
     QLabel *datelabel = new QLabel("Airdate: ", this);
     date = new QLabel(" ", this);
@@ -156,7 +156,7 @@ DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
     grid->setColStretch(1, 1);
     grid->setRowStretch(3, 1);
 
-    QPixmap temp(160 * wmult, 120 * hmult);
+    QPixmap temp((int)(160 * wmult), (int)(120 * hmult));
     
     pixlabel = new QLabel(this);
     pixlabel->setPixmap(temp);
@@ -417,7 +417,7 @@ void DeleteBox::timeout(void)
     convert(outputbuf, buf, buf + (w * h), buf + (w * h * 5 / 4), w, h);
 
     QImage img(outputbuf, w, h, 32, NULL, 65536 * 65536, QImage::LittleEndian);
-    img = img.scale(160 * wmult, 120 * hmult);
+    img = img.scale((int)(160 * wmult), (int)(120 * hmult));
 
     delete [] outputbuf;
 
@@ -427,7 +427,8 @@ void DeleteBox::timeout(void)
     p.drawImage(0, 0, img);
     p.end();
 
-    bitBlt(pixlabel, 0, (pixlabel->contentsRect().height() - 120 * hmult) / 2, 
+    bitBlt(pixlabel, 0, 
+           (int)((pixlabel->contentsRect().height() - 120 * hmult) / 2), 
            pmap);
 }
 

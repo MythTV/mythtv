@@ -12,13 +12,15 @@
 #ifndef LCDDEVICE_H_
 #define LCDDEVICE_H_
 
-#include <iostream.h>
+#include <iostream>
 #include <qobject.h>
 #include <qstringlist.h>
 #include <qsocket.h>
 #include <qtimer.h>
 #include <qdatetime.h>
 #include <math.h>
+
+using namespace std;
 
 class LCD : public QObject
 {

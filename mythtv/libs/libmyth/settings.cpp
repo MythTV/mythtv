@@ -10,7 +10,7 @@
 
 
 #include "settings.h"
-#include <fstream.h>
+#include <fstream>
 #include <stdlib.h>
 #include <stdio.h>
 #include <qstring.h>
