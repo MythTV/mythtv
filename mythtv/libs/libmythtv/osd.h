@@ -38,7 +38,8 @@ class OSD
     int GetDialogSelection(void) { return currentdialogoption; }
 
     // position is 0 - 1000 
-    void StartPause(int position, QString slidertext);
+    void StartPause(int position, bool fill, QString msgtext,
+                    QString slidertext, int displaytime);
     void UpdatePause(int position, QString slidertext);
     void EndPause(void);
 
@@ -57,6 +58,9 @@ class OSD
     void DarkenBox(QRect &rect, unsigned char *screen);
     void DrawStringIntoBox(QRect rect, const QString &text, 
                            unsigned char *screen);
+
+    void DrawStringCentered(unsigned char *yuvptr, QRect rect,
+                            const QString &text, Efont *font);
 
     void DrawStringWithOutline(unsigned char *yuvptr, QRect rect, 
                                const QString &text, Efont *font,
@@ -129,9 +133,15 @@ class OSD
     OSDImage *pausebackground;
     OSDImage *pausesliderfill;
     OSDImage *pausesliderdelete;
+    OSDImage *pausesliderpos;
     QRect pausestatusRect;
     QRect pausesliderRect;
     QString pausestatus;
+    int pausesliderfontsize;
+    Efont *pausesliderfont;
+    
+    int displaypausetime;
+    bool pausefilltype;
 };
     
 #endif

@@ -25,9 +25,14 @@ str SeekBackground=pause.png
 str SeekPosition=0,-1
 # Location of a place to put a short status message, such as 'Paused'
 # optional
-str SeekStatusRect=10,20,100,45
+str SeekStatusRect=10,20,150,45
 # Location of the slider bar to draw.  If this exists, the next setting must
 # also
 str SeekSliderRect=152,13,470,45
 # Image to use for the fill slider bar.  Only the first column is used.
 str SeekSliderNormal=slider-normal.png
+# Image used to show position on the slider bar.
+str SeekSliderPosition=slider-position.png
+# Size of the font that's displayed over the slider bar for status messages.
+# Not shown if this setting is not present.
+int SeekSliderFontSize=14

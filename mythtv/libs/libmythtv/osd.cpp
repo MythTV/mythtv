@@ -107,9 +107,12 @@ OSD::OSD(int width, int height, const QString &filename, const QString &prefix,
     infotext = channumtext = "";
     infoicon = infobackground = NULL;
 
+    pausesliderfont = NULL;
     usepause = false;
     pausesliderfill = pausesliderdelete = pausebackground = NULL;
-    
+    pausesliderpos = NULL;   
+    pausesliderfontsize = 0;
+ 
     SetNoThemeDefaults();
 
     themepath = FindTheme(osdtheme);
@@ -128,6 +131,7 @@ OSD::OSD(int width, int height, const QString &filename, const QString &prefix,
     {
         infofontsize /= 2;
         channumfontsize /= 2;
+        pausesliderfontsize /= 2;
     }
   
     enableosd = false;
@@ -140,6 +144,9 @@ OSD::OSD(int width, int height, const QString &filename, const QString &prefix,
         printf("Coudln't open the OSD font, disabling the OSD.\n");
         return;
     }
+
+    if (pausesliderfontsize > 0)
+        pausesliderfont = LoadFont(fontname, pausesliderfontsize);
 
     enableosd = true;
 
@@ -157,6 +164,8 @@ OSD::~OSD(void)
         Efont_free(info_font);
     if (channum_font)
         Efont_free(channum_font);
+    if (pausesliderfont)
+        Efont_free(pausesliderfont);
     if (infobackground)
         delete infobackground;
     if (infoicon)
@@ -167,6 +176,8 @@ OSD::~OSD(void)
         delete pausesliderfill;
     if (pausesliderdelete)
         delete pausesliderdelete;
+    if (pausesliderpos)
+        delete pausesliderpos;
 }
 
 void OSD::SetNoThemeDefaults(void)
@@ -347,6 +358,15 @@ bool OSD::LoadTheme(void)
             normalizeRect(&pausesliderRect);
             pausesliderRect.moveBy(x, y);
         }
+
+        bgname = settings->GetSetting("SeekSliderPosition");
+        if (bgname != "")
+        {
+            bgname = themepath + bgname;
+            pausesliderpos = new OSDImage(bgname, hmult, wmult, true);
+        }
+
+        pausesliderfontsize = settings->GetNumSetting("SeekSliderFontSize");
     }
  
     return true;
@@ -414,12 +434,17 @@ void OSD::SetInfoText(const QString &text, const QString &subtitle,
     }
 }
 
-void OSD::StartPause(int position, QString slidertext)
+void OSD::StartPause(int position, bool fill, QString msgtext,
+                     QString slidertext, int displaytime)
 {
-    pausestatus = "Paused";
+    pausestatus = msgtext;
     pauseposition = position;
     pauseslidertext = slidertext;
-
+    pausefilltype = fill; 
+    displaypausetime = -1;
+    if (displaytime > 0)
+        displaypausetime = time(NULL) + displaytime;
+    
     show_pause = true;
 }
 
@@ -488,6 +513,9 @@ void OSD::Display(unsigned char *yuvptr)
 
     if (show_pause)
     {
+        if (displaypausetime > 0 && time(NULL) > displaypausetime)
+            show_pause = false;
+
         DisplayPause(yuvptr);
     }
 
@@ -612,12 +640,44 @@ void OSD::DisplayPause(unsigned char *yuvptr)
 
     if (pausesliderRect.width() > 0)
     {
-        int width = (int)((pausesliderRect.width() / 1000.0) * pauseposition);
-        if (width > pausesliderRect.width())
-            width = pausesliderRect.width();
-	BlendFillSlider(pausesliderfill, pausesliderRect.x(),
-                        pausesliderRect.y(), width, yuvptr);
+        if (pausefilltype || !pausesliderpos)
+        {
+            int width = (int)((pausesliderRect.width() / 1000.0) * 
+                        pauseposition);
+            if (width > pausesliderRect.width())
+                width = pausesliderRect.width();
+	    BlendFillSlider(pausesliderfill, pausesliderRect.x(),
+                            pausesliderRect.y(), width, yuvptr);
+        }
+        else
+        {
+            int xpos = (int)((pausesliderRect.width() / 1000.0) *
+                       pauseposition);
+            xpos += pausesliderRect.left();
+            BlendImage(pausesliderpos, xpos, pausesliderRect.y() - 3, yuvptr);
+        }
     }
+
+    if (pausesliderfont)
+    {
+        DrawStringCentered(yuvptr, pausesliderRect, pauseslidertext,
+                           pausesliderfont);
+    }
+}
+
+void OSD::DrawStringCentered(unsigned char *yuvptr, QRect rect,
+                             const QString &text, Efont *font)
+{
+    int textlength = 0;
+    Efont_extents(info_font, text, NULL, NULL, &textlength, NULL, NULL, NULL,
+                  NULL);
+
+    int xoffset = (rect.width() - textlength) / 2;
+
+    if (xoffset > 0)
+        rect.setLeft(rect.left() + xoffset);
+
+    DrawStringWithOutline(yuvptr, rect, text, font);
 }
 
 void OSD::DrawStringWithOutline(unsigned char *yuvptr, QRect rect, 

@@ -74,7 +74,9 @@ class TV
     void ToggleInputs(void); 
 
     void DoPause(void);
-    int  calcFreeBufferSpace(void);
+    void DoFF(void);
+    void DoRew(void);
+    int  calcSliderPos(int offset, QString &desc);
     
     void UpdateOSD(void); 
     void GetChannelInfo(int lchannel, QString &title, QString &subtitle, 
@@ -141,6 +143,9 @@ class TV
     int tvtorecording;
     
     int playbackLen;
+
+    int fftime;
+    int rewtime;
 
     OSD *osd;
 };

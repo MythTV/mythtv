@@ -50,6 +50,14 @@ TV::TV(const QString &startchannel)
 
     channel->Close();  
 
+    fftime = settings->GetNumSetting("FastForwardAmount");
+    if (fftime <= 0)
+        fftime = 5;
+
+    rewtime = settings->GetNumSetting("RewindAmount");
+    if (rewtime <= 0)
+        rewtime = 5;
+
     nvr = NULL;
     nvp = NULL;
     prbuffer = rbuffer = NULL;
@@ -772,7 +780,9 @@ void TV::RunTV(void)
         {
             if (paused)
             {
-                osd->UpdatePause(calcFreeBufferSpace(), "");
+                QString desc = "";
+                int pos = calcSliderPos(0, desc);
+                osd->UpdatePause(pos, desc);
                 //fprintf(stderr, "\r Paused: %f seconds behind realtime (%f%% buffer left)", (float)(nvr->GetFramesWritten() - nvp->GetFramesPlayed()) / frameRate, (float)rbuffer->GetFreeSpace() / (float)rbuffer->GetFileSize() * 100.0);
             }
             else
@@ -812,9 +822,9 @@ void TV::ProcessKeypress(int keypressed)
         case 's': case 'S':
         case 'p': case 'P': DoPause(); break;
 
-        case wsRight: case 'd': case 'D': nvp->FastForward(5); break;
+        case wsRight: case 'd': case 'D': DoFF(); break;
 
-        case wsLeft: case 'a': case 'A': nvp->Rewind(5); break;
+        case wsLeft: case 'a': case 'A': DoRew(); break;
 
         case wsEscape: exitPlayer = true; break;
 
@@ -850,13 +860,60 @@ void TV::ProcessKeypress(int keypressed)
     }
 }
 
-int TV::calcFreeBufferSpace()
+int TV::calcSliderPos(int offset, QString &desc)
 {
-    float ret = (float)rbuffer->GetFreeSpace() / 
-                ((float)rbuffer->GetFileSize() - rbuffer->GetSmudgeSize());
+    float ret;
+
+    char text[512];
+
+    if (internalState == kState_WatchingLiveTV)
+    {
+        ret = (float)rbuffer->GetFreeSpace() / 
+              ((float)rbuffer->GetFileSize() - rbuffer->GetSmudgeSize());
+        ret *= 1000.0;
+
+        int secsbehind = (int)((float)(nvr->GetFramesWritten() - 
+                                 nvp->GetFramesPlayed()) / frameRate);
+
+        if (secsbehind < 0)
+            secsbehind = 0;
+
+        int hours = (int)secsbehind / 3600;
+        int mins = ((int)secsbehind - hours * 3600) / 60;
+        int secs = ((int)secsbehind - hours * 3600 - mins * 60);
+
+        if (hours > 0)
+            sprintf(text, "%02d:%02d:%02d behind  --  %.2f%% full", hours, mins,
+                    secs, (1000 - ret) / 10);
+        else
+            sprintf(text, "%02d:%02d behind  --  %.2f%% full", mins, secs,
+                    (1000 - ret) / 10);
+
+        desc = text;
+        return (int)(1000 - ret);
+    }
+
+    float secsplayed = ((float)nvp->GetFramesPlayed() / frameRate) + offset;
+    ret = secsplayed / (float)playbackLen;
     ret *= 1000.0;
 
-    return (int)(1000 - ret);
+    int phours = (int)secsplayed / 3600;
+    int pmins = ((int)secsplayed - phours * 3600) / 60;
+    int psecs = ((int)secsplayed - phours * 3600 - pmins * 60);
+
+    int shours = playbackLen / 3600;
+    int smins = (playbackLen - shours * 3600) / 60;
+    int ssecs = (playbackLen - shours * 3600 - smins * 60);
+
+    if (shours > 0)
+        sprintf(text, "%02d:%02d:%02d of %02d:%02d:%02d", phours, pmins, psecs,
+                shours, smins, ssecs);
+    else
+        sprintf(text, "%02d:%02d of %02d:%02d", pmins, psecs, smins, ssecs);
+
+    desc = text;
+
+    return (int)(ret);
 }
 
 void TV::DoPause(void)
@@ -865,10 +922,47 @@ void TV::DoPause(void)
 
     if (paused)
     {
-        osd->StartPause(calcFreeBufferSpace(), ""); 
+        QString desc = "";
+        int pos = calcSliderPos(0, desc);
+        if (internalState == kState_WatchingLiveTV)
+            osd->StartPause(pos, true, "Paused", desc, -1);
+	else
+            osd->StartPause(pos, false, "Paused", desc, -1);
     }
     else
         osd->EndPause();
+}
+
+void TV::DoFF(void)
+{
+    if (paused)
+        return;
+
+    bool slidertype = false;
+    if (internalState == kState_WatchingLiveTV)
+        slidertype = true;
+
+    QString desc = "";
+    int pos = calcSliderPos(fftime, desc);
+    osd->StartPause(pos, slidertype, "Forward", desc, 1);
+
+    nvp->FastForward(fftime);
+}
+
+void TV::DoRew(void)
+{
+    if (paused)
+        return;
+
+    bool slidertype = false;
+    if (internalState == kState_WatchingLiveTV)
+        slidertype = true;
+
+    QString desc = "";
+    int pos = calcSliderPos(0 - rewtime, desc);
+    osd->StartPause(pos, slidertype, "Rewind", desc, 1);
+
+    nvp->Rewind(rewtime);
 }
 
 void TV::ToggleInputs(void)

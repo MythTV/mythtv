@@ -63,6 +63,10 @@ int MP3Quality=7
 #
 # Deinterlace playback (1 for on, 0 for no) -- adds to CPU usage
 int Deinterlace=1
+# How long to skip forward on a fast forward?
+int FastForwardAmount=5
+# How long to skip backwards on a rewind?
+int RewindAmount=5
 # How long should the OSD stay up for in seconds?
 int OSDDisplayTime=3
 # Theme to use for the OSD, if 'none' or otherwise doesn't exist, the normal
