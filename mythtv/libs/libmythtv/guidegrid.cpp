@@ -246,18 +246,11 @@ void GuideGrid::fillTimeInfos()
     {
         TimeInfo *timeinfo = new TimeInfo;
 
-        //int year = t.date().year();
-        //int month = t.date().month();
-        //int day = t.date().day();
-
         int mins = t.time().minute();
         mins = 5 * (mins / 5);
         if (mins % 30 == 0)
         {
             int hour = t.time().hour();
-            //timeinfo->year = year;
-            //timeinfo->month = month;
-            //timeinfo->day = day;
             timeinfo->hour = hour;
             timeinfo->min = mins;
 

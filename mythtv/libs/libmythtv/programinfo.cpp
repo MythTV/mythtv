@@ -1,4 +1,6 @@
 #include "programinfo.h"
+#include <iostream>
+using namespace std;
 
 ProgramInfo::ProgramInfo(void)
 {

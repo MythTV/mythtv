@@ -9,6 +9,9 @@
 #include <qapplication.h>
 #include <qregexp.h>
 
+#include <iostream>
+using namespace std;
+
 #include "viewscheduled.h"
 #include "tv.h"
 #include "programlistitem.h"

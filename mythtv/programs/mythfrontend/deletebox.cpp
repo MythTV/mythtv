@@ -16,6 +16,9 @@
 #include <unistd.h>
 #include <stdio.h>
 
+#include <iostream>
+using namespace std;
+
 #include "deletebox.h"
 #include "tv.h"
 #include "programlistitem.h"
