@@ -358,9 +358,6 @@ void PlaybackBox::killPlayer(void)
             qApp->processEvents();
             qApp->lock();
         }
-        showFullScreen();
-        setActiveWindow();
-
         listview->SetAllowKeypress(true);
         ignoreevents = false;
 
@@ -412,9 +409,6 @@ void PlaybackBox::startPlayer(ProgramInfo *rec)
          qApp->processEvents();
          qApp->lock();
     }
-
-    showFullScreen();
-    setActiveWindow();
 
     listview->SetAllowKeypress(true);
     ignoreevents = false;
@@ -563,6 +557,10 @@ void PlaybackBox::play(QListViewItem *lvitem)
         usleep(50);
         qApp->lock();
     }
+
+    showFullScreen();
+    setActiveWindow();
+
     listview->SetAllowKeypress(true);
     ignoreevents = false;
 
