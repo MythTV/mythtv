@@ -60,5 +60,8 @@ bool DisplayResOSX::switch_res(int width, int height)
         return false;
     
     // switch mode and return success
-    return (CGDisplayNoErr == CGDisplaySwitchToMode(d, dispMode));
+    CGDisplayCapture(d);
+    CGDisplayErr err = CGDisplaySwitchToMode(d, dispMode);
+    CGDisplayRelease(d);
+    return (err == CGDisplayNoErr);
 }
