@@ -203,8 +203,10 @@ public:
             while (query.next())
                 addSelection(query.value(0).toString(),
                              query.value(0).toString());
-        addSelection(QObject::tr("All"),
-                     QObject::tr("All"));
+        addSelection(QObject::tr("All Programs"),
+                     QObject::tr("All Programs"));
+        addSelection(QObject::tr("Default"),
+                     QObject::tr("Default"));
 
         setHelpText(QObject::tr("Default Recording Group to display "
                                 "on the view recordings screen."));
