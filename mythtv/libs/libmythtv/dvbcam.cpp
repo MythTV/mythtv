@@ -64,7 +64,7 @@ DVBCam::DVBCam(int cardNum): cardnum(cardNum)
     pthread_mutex_init(&pmt_lock, NULL);
 
     int cafd;
-    if ((cafd = open(dvbdevice(DVB_DEV_CA, cardnum), O_RDONLY)) >= 0)
+    if ((cafd = open(dvbdevice(DVB_DEV_CA, cardnum), O_RDWR)) >= 0)
     {
         ca_caps_t caps;
         ioctl(cafd, CA_GET_CAP, &caps);
