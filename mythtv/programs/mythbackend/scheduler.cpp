@@ -171,13 +171,6 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
     doRecPriority = (bool)gContext->GetNumSetting("RecPriorityActive");
     doRecPriorityFirst = (bool)gContext->GetNumSetting("RecPriorityOrder");
 
-    if (recpriorityMap.size() > 0)
-        recpriorityMap.clear();
-    if (channelRecPriorityMap.size() > 0)
-        channelRecPriorityMap.clear();
-    if (recTypeRecPriorityMap.size() > 0)
-        recTypeRecPriorityMap.clear();
-
     QMutexLocker lockit(recordingList_lock);
 
     while (recordingList.size() > 0)
@@ -257,13 +250,10 @@ void Scheduler::PrintList(void)
     cout << "--- print list start ---\n";
     list<ProgramInfo *>::iterator i = recordingList.begin();
     cout << "Title                 Chan  ChID  StartTime       S I C "
-            " C R O N Priority Total" << endl;
+            " C R O N Priority" << endl;
     for (; i != recordingList.end(); i++)
     {
         ProgramInfo *first = (*i);
-
-        QString totrecpriority = QString::number(totalRecPriority(first));
-        QString progrecpriority = QString::number(first->recpriority);
 
         cout << first->title.local8Bit().leftJustify(22, ' ', true)
              << first->chanstr.rightJustify(4, ' ') << "  " << first->chanid 
@@ -272,8 +262,7 @@ void Scheduler::PrintList(void)
              << " " << first->inputid << " " << first->cardid << "  "  
              << first->conflicting << " " << first->recording << " "
              << first->override << " " << first->RecStatusChar() << " "
-             << progrecpriority.rightJustify(8, ' ') << " "
-             << totrecpriority.rightJustify(4, ' ')
+             << QString::number(first->recpriority).rightJustify(4, ' ')
              << endl;
     }
 
@@ -666,52 +655,20 @@ list<ProgramInfo *> *Scheduler::getConflicting(ProgramInfo *pginfo,
     return retlist;
 }
 
-int Scheduler::totalRecPriority(ProgramInfo *info)
-{
-    int recpriority = 0;
-    RecordingType rectype;
-
-    if (recpriorityMap.contains(info->schedulerid))
-        return recpriorityMap[info->schedulerid];
-
-    if (!channelRecPriorityMap.contains(info->chanid))
-    {
-        channelRecPriorityMap[info->chanid] = 
-                                 info->GetChannelRecPriority(db, info->chanid);
-    }
-    rectype = info->GetProgramRecordingStatus(db);
-    if (!recTypeRecPriorityMap.contains(rectype))
-    {
-        recTypeRecPriorityMap[rectype] = 
-                                    info->GetRecordingTypeRecPriority(rectype);
-    }
-
-    recpriority = info->recpriority;
-    recpriority += channelRecPriorityMap[info->chanid];
-    recpriority += recTypeRecPriorityMap[rectype];
-    recpriorityMap[info->schedulerid] = recpriority;
-
-    return recpriority;
-}
-
 void Scheduler::CheckRecPriority(ProgramInfo *info,
                           list<ProgramInfo *> *conflictList)
 {
-    int recpriority, srecpriority, resolved = 0;
-
-    recpriority = totalRecPriority(info);
+    int resolved = 0;
 
     list<ProgramInfo *>::iterator i = conflictList->begin();
     for (; i != conflictList->end(); i++)
     {
         ProgramInfo *second = (*i);
 
-        srecpriority = totalRecPriority(second);
-
-        if (recpriority == srecpriority)
+        if (info->recpriority == second->recpriority)
             continue;
 
-        if (recpriority > srecpriority)
+        if (info->recpriority > second->recpriority)
         {
             second->recording = false;
             second->recstatus = rsLowerRecPriority;
@@ -1151,7 +1108,7 @@ void Scheduler::DoMultiCard(void)
                 secondmove = false;
 
             if (doRecPriority && 
-                totalRecPriority(second) > totalRecPriority(first))
+                second->recpriority > first->recpriority)
             {
                 highermove = secondmove;
                 higher = second;
@@ -1718,13 +1675,15 @@ void *Scheduler::SchedulerThread(void *param)
 }
 
 void Scheduler::findAllProgramsToRecord(list<ProgramInfo*>& proglist) {
-     QString query = QString(
+    QMap<RecordingType, int> recTypeRecPriorityMap;
+
+    QString query = QString(
 "SELECT DISTINCT channel.chanid, channel.sourceid, "
 "program.starttime, program.endtime, "
 "program.title, program.subtitle, program.description, "
 "channel.channum, channel.callsign, channel.name, "
 "oldrecorded.starttime IS NOT NULL AS oldrecduplicate, program.category, "
-"record.recpriority, record.recorddups, "
+"record.recpriority + channel.recpriority, record.recorddups, "
 "recorded.starttime IS NOT NULL as recduplicate, record.type, "
 "record.recordid, recordoverride.type, "
 "program.starttime - INTERVAL record.preroll minute, "
@@ -1823,6 +1782,11 @@ void Scheduler::findAllProgramsToRecord(list<ProgramInfo*>& proglist) {
 
              proginfo->recstartts = result.value(18).toDateTime();
              proginfo->recendts = result.value(19).toDateTime();
+
+             if (!recTypeRecPriorityMap.contains(proginfo->rectype))
+                 recTypeRecPriorityMap[proginfo->rectype] = 
+                     proginfo->GetRecordingTypeRecPriority(proginfo->rectype);
+             proginfo->recpriority += recTypeRecPriorityMap[proginfo->rectype];
 
              if (proginfo->recstartts >= proginfo->recendts)
              {

@@ -70,7 +70,6 @@ class Scheduler : public QObject
     void MarkSingleConflict(ProgramInfo *info,
                             list<ProgramInfo *> *conflictList);
 
-    int totalRecPriority(ProgramInfo *info);
     void CheckRecPriority(ProgramInfo *info, list<ProgramInfo *> *conflictList);
     void CheckOverride(ProgramInfo *info, list<ProgramInfo *> *conflictList);
     void RemoveConflicts(void);
@@ -101,10 +100,6 @@ class Scheduler : public QObject
 
     bool doRecPriority;
     bool doRecPriorityFirst;
-
-    QMap<QString, int> recpriorityMap;
-    QMap<QString, int> channelRecPriorityMap;
-    QMap<RecordingType, int> recTypeRecPriorityMap;
 
     bool hasconflicts;
 
