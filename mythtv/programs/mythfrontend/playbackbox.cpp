@@ -1444,7 +1444,8 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, int types)
     QString tmpmessage;
     const char *tmpslot;
 
-    if (types == 1 || types == 2)
+    if ((types == 1 || types == 2) &&
+        (program->subtitle != "" || program->description != ""))
     {
 
         tmpmessage = tr("Yes; allow re-recording"); 
