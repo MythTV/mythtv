@@ -10,6 +10,7 @@
       <text lang="DK">Generelle indstillinger</text>
       <text lang="NL">Algemeen</text>
       <text lang="PT">Configurações Gerais</text>
+      <text lang="SV">Generella inställningar</text>
       <action>GAME_SETTINGS</action>
    </button>
 
@@ -17,6 +18,7 @@
       <type>GAME</type>
       <text>Scan for Games</text>
       <text lang="PT">Procurar Jogos</text>
+      <text lang="SV">Sök efter spel</text>
       <action>SEARCH_FOR_GAMES</action>
    </button>
 

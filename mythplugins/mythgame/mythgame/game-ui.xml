@@ -93,6 +93,7 @@
         <font>infofont</font>
         <value>System:</value>
         <value lang="PT">Sistema:</value>
+        <value lang="SV">System:</value>
       </textarea>
 
       <textarea name="systemname" draworder="6">
@@ -105,6 +106,7 @@
         <font>infofont</font>
         <value>Year:</value>
         <value lang="PT">Ano:</value>
+        <value lang="SV">År:</value>
       </textarea>
 
       <textarea name="yearname" draworder="6">
@@ -117,6 +119,7 @@
         <font>infofont</font>
         <value>Genre:</value>
         <value lang="PT">Género:</value>
+        <value lang="SV">Genre:</value>
       </textarea>
 
       <textarea name="genrename" draworder="6">

@@ -3,388 +3,388 @@
     <name>GameTree</name>
     <message>
         <source>All Games</source>
-        <translation type="unfinished"></translation>
+        <translation>Alla spel</translation>
     </message>
 </context>
 <context>
     <name>NesSettingsDlg</name>
     <message>
         <source>NES Game Settings - </source>
-        <translation type="unfinished"></translation>
+        <translation>Spelinställningar för NES - </translation>
     </message>
     <message>
         <source> - </source>
-        <translation type="unfinished"></translation>
+        <translation>- </translation>
     </message>
 </context>
 <context>
     <name>PCSettingsDlg</name>
     <message>
         <source>PC Game Settings - </source>
-        <translation type="unfinished"></translation>
+        <translation>PC-spelinställningar - </translation>
     </message>
     <message>
         <source> - </source>
-        <translation type="unfinished"></translation>
+        <translation>- </translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
         <source>Game display order</source>
-        <translation type="unfinished"></translation>
+        <translation>Visningsordning för spel</translation>
     </message>
     <message>
         <source>Order in which to sort the games - this is for all systems.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ordningen som spel kommer att sorteras i. Detta gäller alla system.</translation>
     </message>
     <message>
         <source>MAME binary location</source>
-        <translation type="unfinished"></translation>
+        <translation>Sökväg till MAME</translation>
     </message>
     <message>
         <source>Location of the XMAME emulator binary.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sökväg till XMAME emuleringsprogram.</translation>
     </message>
     <message>
         <source>MAME ROM location</source>
-        <translation type="unfinished"></translation>
+        <translation>Sökväg till MAME-spel</translation>
     </message>
     <message>
         <source>Location of the MAME games.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sökväg till MAME-spel (ROM).</translation>
     </message>
     <message>
         <source>catver.ini file</source>
-        <translation type="unfinished"></translation>
+        <translation>catver.ini-filen</translation>
     </message>
     <message>
         <source>Path to the catver.ini file</source>
-        <translation type="unfinished"></translation>
+        <translation>Sökväg till filen catver.ini</translation>
     </message>
     <message>
         <source>Mame screenshots path</source>
-        <translation type="unfinished"></translation>
+        <translation>Sökväg till skärmdumpar för Mame</translation>
     </message>
     <message>
         <source>Directory where MAME screenshots are kept.</source>
-        <translation type="unfinished"></translation>
+        <translation>Det bibliotek där skärmdumpar för MAME lagras.</translation>
     </message>
     <message>
         <source>MAME hiscores path</source>
-        <translation type="unfinished"></translation>
+        <translation>Sökväg till toppnoteringar för MAME</translation>
     </message>
     <message>
         <source>Directory where MAME hiscores are kept.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sökväg till bibliotek där MAME-filer för toppnoteringar av poäng (highscore) lagras.</translation>
     </message>
     <message>
         <source>MAME flyers path</source>
-        <translation type="unfinished"></translation>
+        <translation>Sökväg till MAME-reklamblad</translation>
     </message>
     <message>
         <source>Directory where MAME flyers are kept.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sökväg till biblioteket där reklamblad för MAME lagras.</translation>
     </message>
     <message>
         <source>MAME cabinets path</source>
-        <translation type="unfinished"></translation>
+        <translation>Sökväg till MAME &quot;cabinets&quot;</translation>
     </message>
     <message>
         <source>Directory where MAME cabinets are kept.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sökväg till biblioteket där MAME &quot;cabinets&quot; lagras.</translation>
     </message>
     <message>
         <source>MAME history path</source>
-        <translation type="unfinished"></translation>
+        <translation>Sökväg till MAME-historik</translation>
     </message>
     <message>
         <source>Directory where MAME history files are kept.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sökväg till bibliotek där filer för MAME-historik lagras.</translation>
     </message>
     <message>
         <source>MAME cheat files path</source>
-        <translation type="unfinished"></translation>
+        <translation>Sökväg till fuskfiler för MAME</translation>
     </message>
     <message>
         <source>Directory where MAME cheat files are kept.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sökväg till bibliotek där fuskfiler för MAME lagras.</translation>
     </message>
     <message>
         <source>Show disclaimer</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa avståendeförklaring</translation>
     </message>
     <message>
         <source>Set to show the disclaimer or not</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa/visa inte meddelande om avstående från anspråk (disclaimer)</translation>
     </message>
     <message>
         <source>Show game info</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa spelinformation</translation>
     </message>
     <message>
         <source>Set to show the game info or not</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa/visa inte information om spel</translation>
     </message>
     <message>
         <source>NES binary location</source>
-        <translation type="unfinished"></translation>
+        <translation>Sökväg till NES</translation>
     </message>
     <message>
         <source>Location of the NES emulator binary.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sökväg till NES emuleringsprogram.</translation>
     </message>
     <message>
         <source>NES ROM location</source>
-        <translation type="unfinished"></translation>
+        <translation>Sökväg till NES-spel</translation>
     </message>
     <message>
         <source>Location of the NES games.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sökväg till NES-spel (ROM).</translation>
     </message>
     <message>
         <source>NES CRC file</source>
-        <translation type="unfinished"></translation>
+        <translation>NES CRC-fil</translation>
     </message>
     <message>
         <source>This is the same file that comes with the xmame(xmess) distribution: xmame-0.XX/CRC/nes.crc</source>
-        <translation type="unfinished"></translation>
+        <translation>Detta är samma fil som kommer med xmame(xmess) distribution: xmame-0.XX/CRC/nes.crc</translation>
     </message>
     <message>
         <source>NES screenshots path</source>
-        <translation type="unfinished"></translation>
+        <translation>Sökväg till skärmdumpar för NES</translation>
     </message>
     <message>
         <source>Directory where NES screenshots are kept.</source>
-        <translation type="unfinished"></translation>
+        <translation>Det bibliotek där skärmdumpar för NES lagras.</translation>
     </message>
     <message>
         <source>SNES binary location</source>
-        <translation type="unfinished"></translation>
+        <translation>Sökväg till SNES</translation>
     </message>
     <message>
         <source>Location of the snes9x emulator binary.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sökväg till snes9x emuleringsprogram.</translation>
     </message>
     <message>
         <source>SNES ROM location</source>
-        <translation type="unfinished"></translation>
+        <translation>Sökväg till SNES-spel</translation>
     </message>
     <message>
         <source>Location of the SNES games.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sökväg till SNES-spel (ROM).</translation>
     </message>
     <message>
         <source>SNES screenshots path</source>
-        <translation type="unfinished"></translation>
+        <translation>Sökväg till skärmdumpar för SNES</translation>
     </message>
     <message>
         <source>Directory where SNES screenshots are kept. Looks for screenshots with file names matching the rom file name.</source>
-        <translation type="unfinished"></translation>
+        <translation>Det bibliotek där skärmdumpar för SNES lagras. Letar efter filer som motsvarar namnet på aktuell ROM-fil.</translation>
     </message>
     <message>
         <source>PC Game List xml file</source>
-        <translation type="unfinished"></translation>
+        <translation>Listfil för PC-spel</translation>
     </message>
     <message>
         <source>Path to the Game List xml file. (see README for details)</source>
-        <translation type="unfinished"></translation>
+        <translation>Sökväg till XML-filen som innehåller listan med PC-spel. (Se README-filen för mer detaljer)</translation>
     </message>
     <message>
         <source>PC screenshots path</source>
-        <translation type="unfinished"></translation>
+        <translation>Sökväg till skärmdumpar för PC-spel</translation>
     </message>
     <message>
         <source>Directory where screenshots are kept. Looks for screenshots with file names matching the game name in the Game List xml file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Det bibliotek där skärmdumpar för PC-spel lagras. Letar efter filer som motsvarar namnet på spelet enligt XML-filen som innehåller spellistan.</translation>
     </message>
     <message>
         <source>MythGame Settings -- General</source>
-        <translation type="unfinished"></translation>
+        <translation>Inställningar för MythGame -- Generellt</translation>
     </message>
     <message>
         <source>MythGame Settings -- xmame (page 1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Inställningar för MythGame -- xmame (sida 1)</translation>
     </message>
     <message>
         <source>MythGame Settings -- xmame (page 2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Inställningar för MythGame -- xmame (sida 2)</translation>
     </message>
     <message>
         <source>MythGame Settings -- NES Emulation</source>
-        <translation type="unfinished"></translation>
+        <translation>Inställningar för MythGame -- NES-emulering</translation>
     </message>
     <message>
         <source>MythGame Settings -- SNES Emulation</source>
-        <translation type="unfinished"></translation>
+        <translation>Inställningar för MythGame -- SNES-emulering</translation>
     </message>
     <message>
         <source>MythGame Settings -- PC games</source>
-        <translation type="unfinished"></translation>
+        <translation>Inställningar för MythGame -- PC-spel</translation>
     </message>
     <message>
         <source>Looking for Mame games...</source>
-        <translation type="unfinished"></translation>
+        <translation>Letar efter Mamespel...</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Okänd</translation>
     </message>
     <message>
         <source>Loading game...</source>
-        <translation type="unfinished"></translation>
+        <translation>Laddar spel...</translation>
     </message>
     <message>
         <source>Use defaults</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd standardinställningar</translation>
     </message>
     <message>
         <source>Use the global default MAME settings. All other settings are ignored if this is set.</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd globala standardinställningar för MAME. Alla andra inställningar ignoreras om du aktiverar denna option.</translation>
     </message>
     <message>
         <source>Fullscreen mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Helskärmsläge</translation>
     </message>
     <message>
         <source>Windowed</source>
-        <translation type="unfinished"></translation>
+        <translation>Fönsterbaserad</translation>
     </message>
     <message>
         <source>Fullscreen/DGA</source>
-        <translation type="unfinished"></translation>
+        <translation>Helskärm/DGA</translation>
     </message>
     <message>
         <source>Fullscreen/Xv</source>
-        <translation type="unfinished"></translation>
+        <translation>Helskärm/Xv</translation>
     </message>
     <message>
         <source>Fullscreen</source>
-        <translation type="unfinished"></translation>
+        <translation>Helskärm</translation>
     </message>
     <message>
         <source>Auto frame skip</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatisk bildruteöverhoppning</translation>
     </message>
     <message>
         <source>No Help text</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen hjälptext</translation>
     </message>
     <message>
         <source>Rotate left</source>
-        <translation type="unfinished"></translation>
+        <translation>Rotera åt vänster</translation>
     </message>
     <message>
         <source>Rotate right</source>
-        <translation type="unfinished"></translation>
+        <translation>Rotera år höger</translation>
     </message>
     <message>
         <source>Flip X Axis</source>
-        <translation type="unfinished"></translation>
+        <translation>Vänd runt X-axeln</translation>
     </message>
     <message>
         <source>Flip Y Axis</source>
-        <translation type="unfinished"></translation>
+        <translation>Vänd runt Y-axeln</translation>
     </message>
     <message>
         <source>Extra Artwork</source>
-        <translation type="unfinished"></translation>
+        <translation>Extra grafik</translation>
     </message>
     <message>
         <source>Scanlines</source>
-        <translation type="unfinished"></translation>
+        <translation>Avsökningslinjer</translation>
     </message>
     <message>
         <source>Automatic color depth</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatiskt färgdjup</translation>
     </message>
     <message>
         <source>Scaling</source>
-        <translation type="unfinished"></translation>
+        <translation>Skalning</translation>
     </message>
     <message>
         <source>Antialiasing</source>
-        <translation type="unfinished"></translation>
+        <translation>Antivikning</translation>
     </message>
     <message>
         <source>Translucency</source>
-        <translation type="unfinished"></translation>
+        <translation>Genomskinlighet</translation>
     </message>
     <message>
         <source>Resolution</source>
-        <translation type="unfinished"></translation>
+        <translation>Upplösning</translation>
     </message>
     <message>
         <source>Use Scale</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd skalning</translation>
     </message>
     <message>
         <source>640 x 480</source>
-        <translation type="unfinished"></translation>
+        <translation>640 x 480</translation>
     </message>
     <message>
         <source>800 x 600</source>
-        <translation type="unfinished"></translation>
+        <translation>800 x 600</translation>
     </message>
     <message>
         <source>1024 x 768</source>
-        <translation type="unfinished"></translation>
+        <translation>1024 x 768</translation>
     </message>
     <message>
         <source>1280 x 1024</source>
-        <translation type="unfinished"></translation>
+        <translation>1280 x 1024</translation>
     </message>
     <message>
         <source>1600 x 1200</source>
-        <translation type="unfinished"></translation>
+        <translation>1600 x 1200</translation>
     </message>
     <message>
         <source>Use sound</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd ljud</translation>
     </message>
     <message>
         <source>Use samples</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd samplar</translation>
     </message>
     <message>
         <source>Fake sound</source>
-        <translation type="unfinished"></translation>
+        <translation>Låtsasljud</translation>
     </message>
     <message>
         <source>Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>Volym</translation>
     </message>
     <message>
         <source>Enable cheats</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd fusk</translation>
     </message>
     <message>
         <source>Extra options</source>
-        <translation type="unfinished"></translation>
+        <translation>Extra inställningar</translation>
     </message>
     <message>
         <source>Use Windows Keys</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd windowstangenter</translation>
     </message>
     <message>
         <source>Use Mouse</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd mus</translation>
     </message>
     <message>
         <source>Grab Mouse</source>
-        <translation type="unfinished"></translation>
+        <translation>Fånga muspekaren</translation>
     </message>
     <message>
         <source>Joystick Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Typ av styrpinne</translation>
     </message>
     <message>
         <source>No Joystick</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen styrpinne</translation>
     </message>
     <message>
         <source>i386 Joystick</source>
-        <translation type="unfinished"></translation>
+        <translation>i386-styrpinne</translation>
     </message>
     <message>
         <source>Fm Town Pad</source>
@@ -392,15 +392,15 @@
     </message>
     <message>
         <source>X11 Input Extension Joystick</source>
-        <translation type="unfinished"></translation>
+        <translation>Styrpinne för X11 &quot;Input Extension&quot;</translation>
     </message>
     <message>
         <source>New i386 linux 1.x.x Joystick</source>
-        <translation type="unfinished"></translation>
+        <translation>Ny i386 linux 1.x.x styrpinne</translation>
     </message>
     <message>
         <source>NetBSD USB Joystick</source>
-        <translation type="unfinished"></translation>
+        <translation>NetBSD USB-styrpinne</translation>
     </message>
     <message>
         <source>PS2-Linux native pad</source>
@@ -408,171 +408,171 @@
     </message>
     <message>
         <source>SDL Joystick</source>
-        <translation type="unfinished"></translation>
+        <translation>SDL-styrpinne</translation>
     </message>
     <message>
         <source>Use joystick as analog</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd styrpinne som analog</translation>
     </message>
     <message>
         <source>Mame Game Settings - </source>
-        <translation type="unfinished"></translation>
+        <translation>Spelinställningar för Mame - </translation>
     </message>
     <message>
         <source> - </source>
-        <translation type="unfinished"></translation>
+        <translation>- </translation>
     </message>
     <message>
         <source> - top level</source>
-        <translation type="unfinished"></translation>
+        <translation>- toppnivå</translation>
     </message>
     <message>
         <source>video page 1</source>
-        <translation type="unfinished"></translation>
+        <translation>video sida 1</translation>
     </message>
     <message>
         <source>video page 2</source>
-        <translation type="unfinished"></translation>
+        <translation>video sida 2</translation>
     </message>
     <message>
         <source>vector</source>
-        <translation type="unfinished"></translation>
+        <translation>vektor</translation>
     </message>
     <message>
         <source>sound</source>
-        <translation type="unfinished"></translation>
+        <translation>ljud</translation>
     </message>
     <message>
         <source>input</source>
-        <translation type="unfinished"></translation>
+        <translation>inmatning</translation>
     </message>
     <message>
         <source>misc</source>
-        <translation type="unfinished"></translation>
+        <translation>diverse</translation>
     </message>
     <message>
         <source>Looking for NES games...</source>
-        <translation type="unfinished"></translation>
+        <translation>Letar efter NES-spel...</translation>
     </message>
     <message>
         <source>Looking for SNES games...</source>
-        <translation type="unfinished"></translation>
+        <translation>Letar efter SNES-spel...</translation>
     </message>
     <message>
         <source>   (bad checksum)</source>
-        <translation type="unfinished"></translation>
+        <translation> (felaktig checksumma)</translation>
     </message>
     <message>
         <source>Use the global default SNES settings. All other settings are ignored if this is set.</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd de globala grundinställningarna för SNES. Alla andra inställningar ignoreras om denna är satt.</translation>
     </message>
     <message>
         <source>Use transparency</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd genomskinlighet</translation>
     </message>
     <message>
         <source>No Help Text</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen hjälptext</translation>
     </message>
     <message>
         <source>Use 16-bit mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd 16-bitarsläge</translation>
     </message>
     <message>
         <source>Use Hi-res mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd högupplösningsläge</translation>
     </message>
     <message>
         <source>No modeswitch</source>
-        <translation type="unfinished"></translation>
+        <translation>Inget modbyte</translation>
     </message>
     <message>
         <source>Stretch to fit</source>
-        <translation type="unfinished"></translation>
+        <translation>Sträck för att passa</translation>
     </message>
     <message>
         <source>Interpolation</source>
-        <translation type="unfinished"></translation>
+        <translation>Interpolation</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen</translation>
     </message>
     <message>
         <source>Interpolate 1</source>
-        <translation type="unfinished"></translation>
+        <translation>Interpolera 1</translation>
     </message>
     <message>
         <source>Interpolate 2</source>
-        <translation type="unfinished"></translation>
+        <translation>Interpolera 2</translation>
     </message>
     <message>
         <source>Interpolate 3</source>
-        <translation type="unfinished"></translation>
+        <translation>Interpolera 3</translation>
     </message>
     <message>
         <source>Interpolate 4</source>
-        <translation type="unfinished"></translation>
+        <translation>Interpolera 4</translation>
     </message>
     <message>
         <source>Interpolate 5</source>
-        <translation type="unfinished"></translation>
+        <translation>Interpolera 5</translation>
     </message>
     <message>
         <source>Layering</source>
-        <translation type="unfinished"></translation>
+        <translation>Skiktning</translation>
     </message>
     <message>
         <source>Interleaved</source>
-        <translation type="unfinished"></translation>
+        <translation>Omlott</translation>
     </message>
     <message>
         <source>AltInterleaved</source>
-        <translation type="unfinished"></translation>
+        <translation>Alt omlott</translation>
     </message>
     <message>
         <source>Hi Rom</source>
-        <translation type="unfinished"></translation>
+        <translation>Högt ROM</translation>
     </message>
     <message>
         <source>Low Rom</source>
-        <translation type="unfinished"></translation>
+        <translation>Lågt ROM</translation>
     </message>
     <message>
         <source>Header</source>
-        <translation type="unfinished"></translation>
+        <translation>Huvud</translation>
     </message>
     <message>
         <source>No Header</source>
-        <translation type="unfinished"></translation>
+        <translation>Inget huvud</translation>
     </message>
     <message>
         <source>NTSC</source>
-        <translation type="unfinished"></translation>
+        <translation>NTSC</translation>
     </message>
     <message>
         <source>PAL</source>
-        <translation type="unfinished"></translation>
+        <translation>PAL</translation>
     </message>
     <message>
         <source>No HDMA</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen HDMA</translation>
     </message>
     <message>
         <source>No Windows</source>
-        <translation type="unfinished"></translation>
+        <translation>Inga fönster</translation>
     </message>
     <message>
         <source>No Speed Hacks</source>
-        <translation type="unfinished"></translation>
+        <translation>Inga hastighetsmodifieringar</translation>
     </message>
     <message>
         <source>No Sound</source>
-        <translation type="unfinished"></translation>
+        <translation>Inget ljud</translation>
     </message>
     <message>
         <source>Use stereo audio</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd stereoljud</translation>
     </message>
     <message>
         <source>Envx</source>
@@ -580,67 +580,67 @@
     </message>
     <message>
         <source>No Echo</source>
-        <translation type="unfinished"></translation>
+        <translation>Inget eko</translation>
     </message>
     <message>
         <source>Threaded Sound</source>
-        <translation type="unfinished"></translation>
+        <translation>Trådat ljud</translation>
     </message>
     <message>
         <source>Synced Sound</source>
-        <translation type="unfinished"></translation>
+        <translation>Synkroniserat ljud</translation>
     </message>
     <message>
         <source>Interpolated Sound</source>
-        <translation type="unfinished"></translation>
+        <translation>Interpolerat ljud</translation>
     </message>
     <message>
         <source>No sample caching</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen &quot;caching&quot; av samplar</translation>
     </message>
     <message>
         <source>Alt sample decoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Alt avkodning av samplar</translation>
     </message>
     <message>
         <source>No master volume</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen huvudvolym</translation>
     </message>
     <message>
         <source>Audio buffer size</source>
-        <translation type="unfinished"></translation>
+        <translation>Ljudbuffertstorlek</translation>
     </message>
     <message>
         <source>Sound skip</source>
-        <translation type="unfinished"></translation>
+        <translation>Ljudhopp</translation>
     </message>
     <message>
         <source>Sound quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Ljudkvalitet</translation>
     </message>
     <message>
         <source>SNES Game Settings - </source>
-        <translation type="unfinished"></translation>
+        <translation>Spelinställningar för SNES - </translation>
     </message>
     <message>
         <source>video</source>
-        <translation type="unfinished"></translation>
+        <translation>video</translation>
     </message>
     <message>
         <source>misc page 1</source>
-        <translation type="unfinished"></translation>
+        <translation>diverse sida 1</translation>
     </message>
     <message>
         <source>misc page 2</source>
-        <translation type="unfinished"></translation>
+        <translation>diverse sida 2</translation>
     </message>
     <message>
         <source>sound page 1</source>
-        <translation type="unfinished"></translation>
+        <translation>ljud sida 1</translation>
     </message>
     <message>
         <source>sound page 2</source>
-        <translation type="unfinished"></translation>
+        <translation>ljud sida 2</translation>
     </message>
 </context>
 </TS>
