@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2004-06-17, v0.15.05
+  2004-07-08, v0.15.06
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -15,11 +15,12 @@
 
 
   1. First things first.
-     1.1 How to obtain this document
-     1.2 Document conventions
-     1.3 Mailing lists / getting help
-     1.4 IRC
-     1.5 Contributing to this document
+     1.1 What is MythTV?
+     1.2 How to obtain this document
+     1.3 Document conventions
+     1.4 Mailing lists / getting help
+     1.5 IRC
+     1.6 Contributing to this document
 
   2. Introduction.
   3. Checking prerequisites.
@@ -277,12 +278,73 @@
         22.4.4 JFS
         22.4.5 XFS
 
-
   ______________________________________________________________________
 
   [1m1.  First things first.[0m
 
-  [1m1.1.  How to obtain this document[0m
+  [1m1.1.  What is MythTV?[0m
+
+  MythTV is a suite of programs that allow you to build the mythical
+  home media convergence box on your own using Open Source software and
+  operating systems.
+
+  MythTV has a number of capabilities.  The television portion allows
+  you to do the following:
+
+  +o  You may pause, fast-forward and rewind live Television.
+
+  +o  You may install multiple video capture cards to record more than
+     one program at a time.
+
+  +o  You can have multiple servers, each with multiple capture cards in
+     them.  All servers are centrally managed and all programs are
+     scheduled by the Master backend.
+
+  +o  You can have multiple clients (called "frontends" in MythTV
+     parlance), each with a common view of all available programs.  Any
+     client can watch any program that was recorded by any of the
+     servers.  Clients can be diskless and controlled entirely by a
+     remote control.
+
+  +o  You may use any combination of standard analog capture card,
+     MPEG-2, MJPEG, DVB or HDTV capture devices.  With appropriate
+     hardware, MythTV can control set top boxes, often found in digital
+     cable and satellite TV systems.
+
+  +o  Program Guide Data in North America is downloaded from Zap2It.com,
+     a subsidiary of Tribune Media Services.  This free service is
+     called DataDirect, and provides MythTV almost two weeks of
+     scheduling information.  Program Guide Data in other countries is
+     obtained using XMLTV.  MythTV uses this information to create a
+     schedule that maximizes the number of programs that can be recorded
+     if you don't have enough tuners.
+
+     Other modules in MythTV include:
+
+  +o  MythGallery, a picture-viewing application
+
+  +o  MythVideo, a media-viewer for content not created within MythTV
+
+  +o  MythDVD, a DVD viewer / ripper
+
+  +o  MythMusic, a music playing / ripping application which supports MP3
+     and FLAC
+
+  +o  MythGame
+
+  +o  MythWeather
+
+  +o  MythNews, a RSS news grabber
+
+  +o  MythBrowser, a web browser
+
+  +o  MythWeb, which allows you to control your MythTV system using a web
+     browser.  With MythWeb, you can schedule recordings, delete files,
+     change keybindings and more.  With proper security, you may even
+     schedule a program over the Internet and have it immediately acted
+     on by the scheduler.
+
+  [1m1.2.  How to obtain this document[0m
 
   This HOWTO document is maintained at the primary MythTV website:
   http://www.mythtv.org <http://www.mythtv.org> by Robert Kulagowski
@@ -302,7 +364,7 @@
   This HOWTO is for MythTV v0.15.1.
 
 
-  [1m1.2.  Document conventions[0m
+  [1m1.3.  Document conventions[0m
 
   The following conventions are used throughout this document.
   [1mboldface [22m- used for program names.
@@ -318,7 +380,7 @@
                         Ignore at your own peril.
 
 
-  [1m1.3.  Mailing lists / getting help[0m
+  [1m1.4.  Mailing lists / getting help[0m
 
   It's recommended that you join the user list at
   http://www.mythtv.org/mailman/listinfo/mythtv-users
@@ -332,8 +394,7 @@
   threads.com/lists/mythtv/>.
 
 
-
-  [1m1.4.  IRC[0m
+  [1m1.5.  IRC[0m
 
   There are two IRC channels dedicated to MythTV which can be found on
   irc.freenode.net
@@ -352,7 +413,7 @@
   seems to be ignoring you.
 
 
-  [1m1.5.  Contributing to this document[0m
+  [1m1.6.  Contributing to this document[0m
 
   Contributions to the HOWTO are welcome, especially if you find a
   grammatical or spelling error, or if the wording of something is just
@@ -587,6 +648,7 @@
   a limited subset of the V4L API. The TV Wonder series of cards are
   supported by the Bt8x8 Video4Linux driver.
 
+
   Newer cards may use the CX23881 series of chips; a driver is available
   at http://bytesex.org/cx88/ <http://bytesex.org/cx88/>.
 
@@ -642,7 +704,6 @@
      for information on installing a PVR-250 on Mandrake 9.1.  The
      information contained in the section will also apply to other
      MPEG-2 encoder cards supported by the IVTV driver.
-
 
 
   [1m3.1.5.3.  DVB capture cards.[0m
@@ -711,6 +772,7 @@
   cards and drivers will provide better quality or compatibility than
   others.  In particular, many audio devices included on motherboards
   can be problematic.
+
   The usual practice for capturing the audio associated with the video
   is to run a cable from an audio output on the video capture card to
   the Line input on a sound card. However, some video capture cards
@@ -842,6 +904,7 @@
      XVideo.
 
 
+
   [1m3.1.9.3.  NVIDIA[0m
 
   Some NVIDIA cards with TV-out can be run using the standard nv driver
@@ -903,6 +966,8 @@
   display on a television. The output format varies by region, since
   different countries have different TV standards. People on the mythtv-
   users list have mentioned these adapters:
+
+
   +o  AITech Web Cable Plus, powered by external transformer or takes
      power from PS/2 keyboard connector, support resolutions up to
      1024x768, outputs composite and SVideo, provides position
@@ -963,7 +1028,6 @@
   logical step is ``configuring MySQL'', which you may or may not have
   to perform.  See your package documentation.
 
-
   [1m3.2.1.1.  Red Hat Linux/Fedora Core[0m
 
   Red Hat Linux (9, 8.0 and 7.3) and Fedora Core (2 and 1) packages for
@@ -1021,15 +1085,12 @@
   brought up with the 3rd-parties (maintainer, lists, bugzillas etc.).
 
 
-
   [1m3.2.1.2.  Mandrake[0m
 
   Thac has created RPMs for MythTV for Mandrake 9.0, 9.1 and 9.2 which
   may be obtained from http://rpm.nyvalls.se/ <http://rpm.nyvalls.se/>
   If you have problems with the RPMs, please send him email directly at
   thac@nyvalls.se <thac@nyvalls.se>.
-
-
   [1m3.2.1.3.  Debian[0m
 
   Debian packages for MythTV and most of its add-on modules are
@@ -1072,7 +1133,6 @@
   package in order to compile [1mlircd [22mif your distribution doesn't have a
   pre-packaged [1mlirc[22m.  If you are using [1mXMLTV [22mas a grabber, you will need
   [1mperl[22m.
-
 
 
   ______________________________________________________________________
@@ -1157,7 +1217,6 @@
   This section details the various methods for installing prerequisites
   from the command line.
 
-
   [1m3.2.4.1.  Mandrake[0m
 
   [1murpmi [22mis the simplest tool for installation of packages from the
@@ -1200,6 +1259,7 @@
 
        [root@pvr root]# urpmi mysql gcc gcc-c++ freetype2-devel libqt3-devel alsa-utils XFree86-devel perl
        everything already installed
+
 
 
   In that case, you're ready to move to the next ``section''.  Once you
@@ -1261,25 +1321,24 @@
   and executing:
 
 
-
-  sh-2.05b# apt-get build-dep mythtv
-  Reading Package Lists...
-  Building Dependency Tree...
-  The following NEW packages will be installed:
-    debconf-utils debhelper file fontconfig gettext html2text intltool-debian
-    libaudio2 libexpat1 libfontconfig1 libfontconfig1-dev libfreetype6
-    libfreetype6-dev libglib2.0-0 libjpeg62 libjpeg62-dev liblame-dev liblame0
-    liblcms1 liblcms1-dev libmagic1 libmng-dev libmng1 libmysqlclient-dev
-    libmysqlclient12 libogg-dev libogg0 libpng12-0 libpng12-dev libqt3-headers
-    libqt3-mt-dev libqt3c102-mt libvorbis-dev libvorbis0a libvorbisenc2
-    libvorbisfile3 libxcursor-dev libxcursor1 libxft2 libxft2-dev libxrender-dev
-    libxrender1 mysql-common pkg-config po-debconf qt3-dev-tools xfree86-common
-    xlibmesa-gl-dev xlibmesa-glu-dev xlibmesa3-gl xlibmesa3-glu xlibs xlibs-dev
-    zlib1g-dev
-  0 upgraded, 54 newly installed, 0 to remove and 0 not upgraded.
-  Need to get 0B/24.0MB of archives.
-  After unpacking 78.7MB of additional disk space will be used.
-  Do you want to continue? [Y/n]
+       sh-2.05b# apt-get build-dep mythtv
+       Reading Package Lists...
+       Building Dependency Tree...
+       The following NEW packages will be installed:
+         debconf-utils debhelper file fontconfig gettext html2text intltool-debian
+         libaudio2 libexpat1 libfontconfig1 libfontconfig1-dev libfreetype6
+         libfreetype6-dev libglib2.0-0 libjpeg62 libjpeg62-dev liblame-dev liblame0
+         liblcms1 liblcms1-dev libmagic1 libmng-dev libmng1 libmysqlclient-dev
+         libmysqlclient12 libogg-dev libogg0 libpng12-0 libpng12-dev libqt3-headers
+         libqt3-mt-dev libqt3c102-mt libvorbis-dev libvorbis0a libvorbisenc2
+         libvorbisfile3 libxcursor-dev libxcursor1 libxft2 libxft2-dev libxrender-dev
+         libxrender1 mysql-common pkg-config po-debconf qt3-dev-tools xfree86-common
+         xlibmesa-gl-dev xlibmesa-glu-dev xlibmesa3-gl xlibmesa3-glu xlibs xlibs-dev
+         zlib1g-dev
+       0 upgraded, 54 newly installed, 0 to remove and 0 not upgraded.
+       Need to get 0B/24.0MB of archives.
+       After unpacking 78.7MB of additional disk space will be used.
+       Do you want to continue? [Y/n]
 
 
 
@@ -1327,6 +1386,9 @@
   programs, if it is not already there.  You do this, as root, by
   editing /etc/ld.so.conf, then running [1mldconfig[22m. There are many ways to
   do this; one that works is to enter this series of commands:
+
+
+
        $ su -
        # echo /usr/local/lib >> /etc/ld.so.conf
        # /sbin/ldconfig
@@ -1400,16 +1462,17 @@
             [1mNOTE[22m: ^D means press CTRL and d at the same time.
 
 
-       $ su
-       # cd /etc/profile.d
-       cat > mythtv.sh
-       export QTDIR=/usr/lib/qt3
-       export PATH=$PATH:/usr/lib/qt3/bin
-       ^D
 
-       # chmod a+x mythtv.sh
-       # exit
-       $ exit
+  $ su
+  # cd /etc/profile.d
+  cat > mythtv.sh
+  export QTDIR=/usr/lib/qt3
+  export PATH=$PATH:/usr/lib/qt3/bin
+  ^D
+
+  # chmod a+x mythtv.sh
+  # exit
+  $ exit
 
 
 

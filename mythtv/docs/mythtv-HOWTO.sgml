@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2004-06-17, v0.15.05
+<date>2004-07-08, v0.15.06
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -13,6 +13,51 @@ necessary.
 </abstract>
 <toc>
 <sect>First things first.
+<sect1>What is MythTV?
+<p>MythTV is a suite of programs that allow you to build the mythical home
+media convergence box on your own using Open Source software and operating
+systems.
+
+MythTV has a number of capabilities.  The television portion allows you to
+do the following:
+<itemize>
+<item>You may pause, fast-forward and rewind live Television.
+<item>You may install multiple video capture cards to record more than one
+program at a time.
+<item>You can have multiple servers, each with multiple capture cards in
+them.  All servers are centrally managed and all programs are scheduled by the
+Master backend.
+<item>You can have multiple clients (called "frontends" in MythTV parlance),
+each with a common view of all available programs.  Any client can watch any
+program that was recorded by any of the servers.  Clients can be diskless
+and controlled entirely by a remote control.
+<item>You may use any combination of standard analog capture card, MPEG-2,
+MJPEG, DVB or HDTV capture devices.  With appropriate hardware, MythTV can
+control set top boxes, often found in digital cable and satellite TV
+systems.
+<item>Program Guide Data in North America is downloaded from Zap2It.com, a
+subsidiary of Tribune Media Services.  This free service is called
+DataDirect, and provides MythTV almost two weeks of scheduling information. 
+Program Guide Data in other countries is obtained using XMLTV.  MythTV uses
+this information to create a schedule that maximizes the number of programs
+that can be recorded if you don't have enough tuners.
+</itemize> 
+Other modules in MythTV include:
+<itemize>
+<item>MythGallery, a picture-viewing application
+<item>MythVideo, a media-viewer for content not created within MythTV
+<item>MythDVD, a DVD viewer / ripper
+<item>MythMusic, a music playing / ripping application which supports MP3
+and FLAC
+<item>MythGame
+<item>MythWeather
+<item>MythNews, a RSS news grabber
+<item>MythBrowser, a web browser
+<item>MythWeb, which allows you to control your MythTV system using a web
+browser.  With MythWeb, you can schedule recordings, delete files, change
+keybindings and more.  With proper security, you may even schedule a program
+over the Internet and have it immediately acted on by the scheduler.
+</itemize>
 <sect1>How to obtain this document <label id="how_to_obtain">
 <p>This HOWTO document is maintained at the primary MythTV website: <url
 url="http://www.mythtv.org" name="http://www.mythtv.org"> by Robert
@@ -6466,6 +6511,7 @@ v0.15.04, 2004-06-11.  Fix a broken tag.  Fix Bug 11 (icon grabber for DD in wro
 section)
 v0.15.05, 2004-06-17.  Add "What do those icons mean?".  Update website for
 "lame".
+v0.15.06, 2004-07-08.  Add "What is MythTV"?
 -->
 
 <!--
