@@ -418,13 +418,19 @@ AudioMetadata *FlacDecoder::getMetadata()
     QString artist = "", album = "", title = "", genre = "";
     int year = 0, tracknum = 0, length = 0;
 
-    FILE *input = fopen(filename.ascii(), "r");
+    FILE *input = fopen(filename.local8Bit(), "r");
+    if (!input)
+    {
+        input = fopen(filename.ascii(), "r");
+    }
 
     if (!input)
+    {
         return NULL;
+    }
 
     FLAC__Metadata_Chain *chain = FLAC__metadata_chain_new();
-    if (!FLAC__metadata_chain_read(chain, filename.ascii()))
+    if (!FLAC__metadata_chain_read(chain, filename.local8Bit()))
     {
         FLAC__metadata_chain_delete(chain); 
         return NULL;
@@ -489,82 +495,6 @@ AudioMetadata *FlacDecoder::getMetadata()
 
     return retdata;
 }    
-
-/*
-void FlacDecoder::commitMetadata(Metadata *mdata)
-{
-    FILE *input = fopen(filename.ascii(), "r");
-
-    if (!input)
-        return;
-
-    FLAC__Metadata_Chain *chain = FLAC__metadata_chain_new();
-    if (!FLAC__metadata_chain_read(chain, filename.ascii()))
-    {
-        FLAC__metadata_chain_delete(chain);
-        return;
-    }
-
-    bool found_vc_block = false;
-    FLAC__StreamMetadata *block = 0;
-    FLAC__Metadata_Iterator *iterator = FLAC__metadata_iterator_new();
-
-    FLAC__metadata_iterator_init(iterator, chain);
-
-    do {
-        block = FLAC__metadata_iterator_get_block(iterator);
-        if (block->type == FLAC__METADATA_TYPE_VORBIS_COMMENT)
-            found_vc_block = true;
-    } while (!found_vc_block && FLAC__metadata_iterator_next(iterator));
-
-    if (!found_vc_block)
-    {
-        block = FLAC__metadata_object_new(FLAC__METADATA_TYPE_VORBIS_COMMENT);
-
-        while (FLAC__metadata_iterator_next(iterator))
-            ;
-
-        if (!FLAC__metadata_iterator_insert_block_after(iterator, block))
-        {
-            FLAC__metadata_chain_delete(chain);
-            FLAC__metadata_iterator_delete(iterator);
-            return;
-        }
-
-        FLAC__ASSERT(FLAC__metadata_iterator_get_block(iterator) == block);
-    }
-
-    FLAC__ASSERT(0 != block);
-    FLAC__ASSERT(block->type == FLAC__METADATA_TYPE_VORBIS_COMMENT);
-
-    if (block->data.vorbis_comment.comments > 0)
-        FLAC__metadata_object_vorbiscomment_resize_comments(block, 0);
-
-    setComment(block, "artist", mdata->Artist());
-    setComment(block, "album", mdata->Album());
-    setComment(block, "title", mdata->Title());
-    setComment(block, "genre", mdata->Genre());
-
-    char text[128];
-    if (mdata->Track() != 0)
-    {
-        sprintf(text, "%d", mdata->Track());
-        setComment(block, "tracknumber", text);
-    }
-
-    if (mdata->Year() != 0)
-    {
-        sprintf(text, "%d", mdata->Year());
-        setComment(block, "date", text);
-    }
-
-    FLAC__metadata_chain_write(chain, false, false);
-
-    FLAC__metadata_chain_delete(chain);
-    FLAC__metadata_iterator_delete(iterator);
-}
-*/
-
 
 QString FlacDecoder::getComment(FLAC__StreamMetadata *block, const char *label)
 {

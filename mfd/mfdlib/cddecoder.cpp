@@ -403,8 +403,8 @@ AudioMetadata* CdDecoder::getMetadata(int track)
         return NULL;
     }
 
-    artist = discdata.data_artist;
-    album = discdata.data_title;
+    artist = QString::fromUtf8(discdata.data_artist);
+    album = QString::fromUtf8(discdata.data_title);
     genre = cddb_genre(discdata.data_genre);
  
     if (!genre.isEmpty()) 
@@ -414,8 +414,8 @@ AudioMetadata* CdDecoder::getMetadata(int track)
         genre = flet + rt;
     }
 
-    QString temptitle = discdata.data_track[tracknum - 1].track_name;        
-    QString trackartist = discdata.data_track[tracknum - 1].track_artist;
+    QString temptitle = QString::fromUtf8(discdata.data_track[tracknum - 1].track_name);        
+    QString trackartist = QString::fromUtf8(discdata.data_track[tracknum - 1].track_artist);
 
     if (trackartist.length() > 0)
     {

@@ -198,23 +198,23 @@ void MMusicWatcher::run()
         //  See if any metadata change events have come through
         //
 
-        if(metadata_changed_flag)
-        {
-            //
-            //  The mfd has "pushed" us the information that some collection
-            //  of metadata has changed. Deal with it (default
-            //  implementation is to do nothing)
-            //
+        metadata_changed_mutex.lock();
+            if(metadata_changed_flag)
+            {
+                //
+                //  The mfd has "pushed" us the information that some
+                //  collection of metadata has changed. Deal with it
+                //  (default implementation is to do nothing)
+                //
 
-            int which_collection;
-            bool external_flag;
-            metadata_changed_mutex.lock();
+                int which_collection;
+                bool external_flag;
                 which_collection = metadata_collection_last_changed;
                 external_flag = metadata_change_external_flag;
                 metadata_changed_flag = false;
-            metadata_changed_mutex.unlock();
-            handleMetadataChange(which_collection, external_flag);
-        }
+                handleMetadataChange(which_collection, external_flag);
+            }
+        metadata_changed_mutex.unlock();
 
         //
         //  Check to see if our sweep interval has elapsed (default is 15
@@ -550,14 +550,15 @@ void MMusicWatcher::checkForDeletions(MusicFileMap &music_files, const QString &
         {
             while(query.next() && keep_going)
             {
-                if(music_files.find(startdir + query.value(1).toString()) == music_files.end())
+                QString full_proper_filename = startdir + QString::fromUtf8(query.value(1).toString());
+                     
+                if(music_files.find(full_proper_filename) == music_files.end())
                 {
                     //
                     //  This record should _not_ be in the database
                     //
 
                     ++count;
-                    
                     MSqlQuery delete_query(MSqlQuery::InitCon());
                     delete_query.prepare("DELETE FROM musicmetadata WHERE intid = ?");
                     delete_query.bindValue(0, query.value(0).toUInt());

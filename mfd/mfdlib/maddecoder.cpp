@@ -569,8 +569,14 @@ AudioMetadata *MadDecoder::getMetadata()
 
     // use ID3 header
 
-    id3_file *id3file = id3_file_open(filename.ascii(), 
+    id3_file *id3file = id3_file_open(filename.local8Bit(), 
                                       ID3_FILE_MODE_READONLY);
+
+    if (!id3file)
+    {
+        id3file = id3_file_open(filename.ascii(),
+                                ID3_FILE_MODE_READONLY);
+    }
     if (!id3file)
     {
         return NULL;
@@ -673,7 +679,7 @@ AudioMetadata *MadDecoder::getMetadata()
     timer = mad_timer_zero;
 
 
-    FILE *input = fopen(filename.ascii(), "r");
+    FILE *input = fopen(filename.local8Bit(), "r");
     struct stat s;
     fstat(fileno(input), &s);
     unsigned long old_bitrate = 0;

@@ -353,6 +353,11 @@ AudioMetadata *VorbisDecoder::getMetadata()
     int year = 0, tracknum = 0, length = 0;
 
     FILE *input = fopen(filename.local8Bit(), "r");
+    
+    if (!input)
+    {
+        input = fopen(filename.ascii(), "r");
+    }
 
     if (!input)
     {
