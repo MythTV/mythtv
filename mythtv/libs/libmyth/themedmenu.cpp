@@ -1565,8 +1565,7 @@ void ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
     {
         drawTitle = false;
     }
-    clearToBackground();
-    
+    drawInactiveButtons();
 
     if (LCD::Get())
     {
