@@ -73,6 +73,7 @@ ProgFinder::ProgFinder(MythContext *context, TV *player,
     accel->connectItem(accel->insertItem(Key_Right), this, SLOT(cursorRight()));
     accel->connectItem(accel->insertItem(Key_Enter), this, SLOT(cursorRight()));
     accel->connectItem(accel->insertItem(Key_Return), this, SLOT(cursorRight()));
+    accel->connectItem(accel->insertItem(Key_Space), this, SLOT(cursorRight()));
     accel->connectItem(accel->insertItem(Key_Up), this, SLOT(cursorUp()));
     accel->connectItem(accel->insertItem(Key_Down), this, SLOT(cursorDown()));
     accel->connectItem(accel->insertItem(Key_PageUp), this, SLOT(pageUp()));
