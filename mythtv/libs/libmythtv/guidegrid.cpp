@@ -268,11 +268,9 @@ void GuideGrid::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e, actions);
 
-/*
     if (actions.size() > 0 && keyDown && actions[0] != "ESCAPE")
         return; //check for Escape in case something goes wrong 
                 //with KeyRelease events, shouldn't happen.
-*/
 
     if (e->key() != Key_Control)
         keyDown = true;    

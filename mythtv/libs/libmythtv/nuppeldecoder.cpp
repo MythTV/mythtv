@@ -568,7 +568,7 @@ bool NuppelDecoder::InitAVCodec(int codec)
         return false;
     }
 
-    if (mpa_codec->capabilities & CODEC_CAP_DR1)
+    if (mpa_codec->capabilities & CODEC_CAP_DR1 && codec != CODEC_ID_MJPEG)
         directrendering = true;
 
     if (mpa_ctx)
