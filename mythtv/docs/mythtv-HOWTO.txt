@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2004-02-24, v0.14.04
+  2004-02-26, v0.14.05
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -89,7 +89,7 @@
         6.4.3 Gentoo
         6.4.4 Modifying access to the MySQL database for multiple systems
 
-  7. Setting up ALSA and the mixer.
+  7. Configuring Sound.
      7.1 Graphically setting up the mixer.
         7.1.1 Mandrake 9.0 and Red Hat Linux
            7.1.1.1 Using OSS drivers.
@@ -244,6 +244,7 @@
      21.14 Changing your hostname.
      21.15 Can I run MythTV on my TiVo?
      21.16 Can I run MythTV on my ReplayTV?
+     21.17 Can I use wireless between the frontend and the backend?
 
   22. Example Configurations.
      22.1 Hauppauge PVR-250/350 hardware MPEG-2 encoder.
@@ -252,7 +253,11 @@
         22.3.1 ReiserFS
         22.3.2 ext2 or ext3
      22.4 Advanced Partition Formatting.
-        22.4.1 Ext3
+        22.4.1 Ext2
+        22.4.2 Ext3
+        22.4.3 ReiserFS
+        22.4.4 JFS
+        22.4.5 XFS
 
 
   ______________________________________________________________________
@@ -271,7 +276,6 @@
   <http://www.mythtv.org/docs/mythtv-HOWTO.pdf>.
 
   This HOWTO is for MythTV v0.14.
-
 
   [1m1.1.  Mailing lists / getting help.[0m
 
@@ -340,8 +344,6 @@
   threads.com/archive/MythTV_C2/Users_F11/ <http://www.gossamer-
   threads.com/archive/MythTV_C2/Users_F11/> or post a question to the
   list.
-
-
 
   [1m3.1.1.  CPU Type and Speed[0m
 
@@ -1908,7 +1910,7 @@
 
 
 
-  [1m7.  Setting up ALSA and the mixer.[0m
+  [1m7.  Configuring Sound.[0m
 
   If your video doesn't appear to be in-sync with your audio, it could
   be because you are listening to the real-time audio from your video
@@ -3687,7 +3689,7 @@
                 ?     mark/unmark the current channel as a "favorite"
                 U     increase the play speed
                 J     decrease the play speed
-                W     cycle through 4:3 aspect ratio, 16:9, and 4:3 Zoom (like pan and scan)
+                W     cycle through 4:3 aspect ratio, 16:9, 4:3 Zoom (like Pan and Scan), 16:9 Zoom, and 16:9 Stretch (eliminates black sidebars in TV signal)
              Left     (if a jump amount is entered) to jump back that amount
             Right     (if a jump amount is entered) to jump ahead that amount
 
@@ -6207,9 +6209,24 @@
   The ReplayTV runs VxWorks, a Real Time Operating System from Wind
   River Systems.
 
+  [1m21.17.  Can I use wireless between the frontend and the backend?[0m
+
+  Yes, you may, assuming that your wireless connection has sufficient
+  bandwidth to maintain the datarate between the frontend and the
+  backend.  802.11b should be sufficient if the encoded bitrate of the
+  content is less than the datarate of your wireless connection, which
+  in the case of 802.11b would be approximately 4 Mbps.  (The advertised
+  rate of 11Mbps gives an actual throughput of 4 Mbps.)  802.11a and
+  802.11g, if operating in their high-speed modes, or proprietary
+  802.11b "Turbo" schemes should be adequate.  Multiple wireless
+  frontends, poor signal strength or other factors can severely impact
+  the viewing experience on the frontend.
+
   [1m22.  Example Configurations.[0m
 
   This section contains configurations which you may find useful.
+
+
 
   [1m22.1.  Hauppauge PVR-250/350 hardware MPEG-2 encoder.[0m
 
@@ -6266,7 +6283,6 @@
   The [1mivtvfwextract [22mprogram extracts the firmware required for the card.
   You may want to go to the Hauppauge website and download the latest
   Windows driver if the [1mwget [22mcommand fails.
-
   ivtv also needs to know how your kernel was compiled.  The default
   Makefile is not configured for the way Mandrake "does things".  At the
   top of the Makefile in the driver directory is a line like this:
@@ -6279,8 +6295,7 @@
   edit it so that it looks like:
 
 
-
-  KERNELDIR= /usr/src/linux
+       KERNELDIR= /usr/src/linux
 
 
 
@@ -6330,6 +6345,8 @@
 
         [1mNOTE[22m:  You do not need to add the last line "add above..."
   if you will not be using the IR remote that came with the card.
+
+
        alias char-major-81     videodev
        alias char-major-81-0   ivtv
        alias char-major-61 lirc_i2c
@@ -6373,24 +6390,23 @@
   Finally, load the ivtv driver:
 
 
-       # modprobe ivtv
-       # exit
+  # modprobe ivtv
+  # exit
 
 
 
   Check that the card is being recognized on the PCI bus:
 
 
+       $ lspci -v
+       <snip>
 
-  $ lspci -v
-  <snip>
-
-  00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
-  Encoder (rev 01)
-          Subsystem: Hauppauge computer works Inc.: Unknown device 4801
-          Flags: bus master, medium devsel, latency 32, IRQ 11
-          Memory at d0000000 (32-bit, prefetchable) [size=64M]
-          Capabilities: <available only to root>
+       00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
+       Encoder (rev 01)
+               Subsystem: Hauppauge computer works Inc.: Unknown device 4801
+               Flags: bus master, medium devsel, latency 32, IRQ 11
+               Memory at d0000000 (32-bit, prefetchable) [size=64M]
+               Capabilities: <available only to root>
 
 
 
@@ -6433,7 +6449,8 @@
   command to /etc/rc.d/rc.local:
 
 
-       # echo "/sbin/modprobe ivtv" >> /etc/rc.d/rc.local
+
+  # echo "/sbin/modprobe ivtv" >> /etc/rc.d/rc.local
 
 
 
@@ -6947,20 +6964,115 @@
 
   [1m22.4.  Advanced Partition Formatting.[0m
 
-  MythTV creates large files.  The partitions that your distribution
-  sets up for you may not be optimized for large files.  Using ``LVM''
-  in conjunction with the following techniques can be quite useful.
+  The partitions that your distribution sets up for you may not be
+  optimized for large files. Using LVM in conjunction with the following
+  techniques can be quite useful.
 
-  [1m22.4.1.  Ext3[0m
+  Unlike a typical filesystem, a MythTV video partition is usually a
+  very large filesystem filled with a fairly small number of large
+  files.  Filesystem I/O is usually not an issue, even in multi-tuner
+  and/or multi-frontend setups.
 
-  With Ext3, your biggest gain is that in case of a crash and reboot you
-  don't have to wait very long for your partition to be remounted.  With
-  Ext2, the [1mfsck [22mmay take a long time to run on multi-gigabyte
-  partitions.
+  There is however, one aspect of filesystem performance that can have a
+  bearing on the performance of MythTV.  In Linux, deleting a file will
+  utilize I/O bandwidth until the deletion has been completed.  If
+  deleting the file takes long enough, the video capture buffer may
+  overrun, thereby resulting in dropped frames.  Some filesystems are
+  faster at deleting files than others and, for multi-gigbyte MythTV
+  video files, these differences can be significant.
+
+  Fortunately, there are published tests
+  (http://aurora.zemris.fer.hr/filesystems/big.html
+  <http://aurora.zemris.fer.hr/filesystems/big.html>) that provide
+  insight into filesystem performance under conditions relevant to
+  MythTV usage.  In addition, some limited testing (archived at
+  http://www.gossamer-
+  threads.com/perl/mailarc/gforum.cgi?post=106656;search_string=filesystem;guest=2417820&t=search_engine#106656
+  <http://www.gossamer-
+  threads.com/perl/mailarc/gforum.cgi?post=106656;search_string=filesystem;guest=2417820&t=search_engine#106656>)
+  with very large files (10 gigabytes) was reported in the MythTV Users
+  mailing list.
 
 
-  You can check on your filesystem using the [1mdumpe2fs [22mprogram.  See the
-  [1mman [22mpage for details.
+  [1m22.4.1.  Ext2[0m
+
+  Ext2 was the defacto standard Linux filesystem for many years.  It is
+  stable, provides good I/O performance and can quickly delete large
+  files.  The primary disadvantage of Ext2 is that it is not a
+  journaling filesystem, so a file system consistency check (fsck, which
+  is normally only performed after a system crash) can take many hours
+  on a filesystem the size of a typical MythTV partition.
+
+
+  [1m22.4.2.  Ext3[0m
+
+  Ext3 is Ext2 with a journal, so your biggest gain is that in case of a
+  crash and reboot you won't have to wait very long for your partition
+  to be remounted.
+
+  There are options available when formatting an Ext3 partition, as in:
+
+  # mkfs.ext3 -T largefile4 -m 0 /dev/hdb1
 
 
 
+  This example assumes that /dev/hdb1 has already been created using
+  [1mfdisk[22m. If you're using LVM, /dev/hdb1 may be something like
+  /dev/VGforMyth/video.
+
+  The "-m 0" (zero, not "oh") parameter sets the amount of spaced
+  reserved for root to zero. By default, this is 5%, which on a multi-
+  gigabyte drive is a lot of reserved space.
+
+  The "-T largefile4" option creates one inode per 4 megabytes, which
+  can provide a few percent more storage space.  However, tests indicate
+  that using the "-T largefile4" option can drastically increase the
+  amount of time required to delete a large file and thus it should only
+  be used with encoder settings that produce small video files (YMMV).
+
+  You may also modify some aspects of a filesystem such as the reserved
+  block percentage after it has been created using the [1mtune2fs [22mprogram:
+
+
+       # tune2fs -m 0 /dev/hdb1
+
+
+
+  You can check on your filesystem using the [1mdumpe2fs [22mprogram. See the
+  man page for details.
+
+  [1m22.4.3.  ReiserFS[0m
+
+  The Reiser filesystem is another journaling filesystem commonly
+  distributed with Linux.  It is known to be an extremely efficient
+  filesystem and it especially excels at managing partitions containing
+  a large number of small files.  However, tests indicate it is not the
+  fastest at deleting very large files.  For that reason, it may not be
+  the best choice when using encoder bitrates that produce very large
+  files.
+
+
+  [1m22.4.4.  JFS[0m
+
+  JFS (Journaling File System) is a journaling filesystem originally
+  developed by IBM for AIX which was later released as open source.
+  While not as common as Ext3 or ReiserFS, it is distributed with RedHat
+  9 (RH9) and Fedora Core 1 (RHFC1) and Mandrake as well as other
+  distros.  According to tests, JFS is the file deletion speed king,
+  deleting virtually any file in under one second, even files as large
+  as 10 gigabytes.
+
+
+  [1m22.4.5.  XFS[0m
+
+  XFS is a journaling file system originally developed by SGI for Irix,
+  and later released as open source.  While not a part of the default
+  RedHat Linux 9 or Fedora Core installation (although it is a part of
+  Mandrake), it can be easily installed via ATrpms.  XFS provides
+  deletion speeds for large files only slightly slower than JFS.
+  According to the test results shown at
+  (http://aurora.zemris.fer.hr/filesystems/big.html
+  <http://aurora.zemris.fer.hr/filesystems/big.html>), XFS provide
+  higher I/O rates than JFS, albeit at a higher CPU loading.  This may
+  cause issues if you do not have the spare CPU capacity to handle XFS,
+  potentially leading to dropped frames.
