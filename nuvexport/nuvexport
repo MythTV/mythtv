@@ -1,5 +1,8 @@
 #!/usr/bin/perl -w
-# Last Updated: 2005.01.26 (xris)
+# Last Updated: 2005.02.12 (xris)
+
+# Version
+    $VERSION = '0.2 cvs20050212';
 
 # Autoflush buffers
     $|++;
@@ -96,6 +99,12 @@
 
 # No server stuff enabled yet
     $Args{'noserver'} = 1;
+
+# Show the version?
+    if ($Args{'version'}) {
+        print "nuvexport version:  $VERSION\n";
+        exit;
+    }
 
 # Print the help - for now, this is just perldoc
     if ($Args{'help'}) {

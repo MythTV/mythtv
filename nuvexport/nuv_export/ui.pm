@@ -37,11 +37,14 @@ package nuv_export::ui;
     $cli_args{'chanid|channel=i'}       = 1; # Used to specify a program
     $cli_args{'starttime|start_time=i'} = 1;
 
+    $cli_args{'require_cutlist'}        = 1; # Only show programs that have a cutlist?
+
     $cli_args{'mode|function|export=s'} = 1; # CLI for which export mode to use
 
     $cli_args{'noserver|no-server'}     = 1; # Don't talk to the server -- do all encodes here in this execution
 
-    $cli_args{'nice=i'}              = 1; # Set the value of "nice" for subprocesses
+    $cli_args{'nice=i'}                 = 1; # Set the value of "nice" for subprocesses
+    $cli_args{'version'}                = 1; # Show the version and exit
 
 # Load the commandline options
     $cli_args{'help'}  = 1;

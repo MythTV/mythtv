@@ -89,6 +89,8 @@ package mythtv::recordings;
             $sh->execute($channel, "$syear$smonth$sday$shour$sminute$ssecond", "$eyear$emonth$eday$ehour$eminute$esecond")
                 or die "Could not execute ($q):  $!\n\n";
             my ($show, $episode, $description, $show_hostname, $cutlist) = $sh->fetchrow_array;
+        # Skip shows without cutlists?
+            next if ($Args{'require_cutlist'} && !$cutlist);
         # Unknown file - someday we should report this
             next unless ($show);
             $sh2->execute($channel, "$syear$smonth$sday$shour$sminute$ssecond")
