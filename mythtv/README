@@ -2,8 +2,6 @@
 			         Release 0.7
 
 
-There'll be more information here later, but for now:
-
 BUILD/CONFIGURATION INSTRUCTIONS
 --------------------------------
 
@@ -35,6 +33,10 @@ This is what you need, software wise, to have installed:
            Installing this was rather a pain for me on Debian, but I don't have
            any directions to do so.
 
+See the mythtv-HOWTO.html or mythtv-HOWTO.txt file in the docs/ subdirectory
+for in-depth instructions on installing and compiling mythtv and the
+pre-requisites.
+
 You also need v4l setup and working properly.  If xawtv works, this should, too.
 
 Hardware wise, you need a computer.  Really.  Helps to have a fast one, too.
@@ -42,24 +44,6 @@ You also need a video card with working Xv support (to scale and convert
 colorspaces), and a TV tuner card.  If you're using ALSA for sound support 
 (which _is_ the recommended thing to do), you should be using version 0.9, not
 0.5.
-
-Ok.  Once you've got all the prerequisites installed, on to compiling.
-First of all, do a quick './configure' to configure libavcodec.  Then just type
-'make'.
-
-Compiling note:  If you get an error on building this, that says something
-                 about 'mkspecs', then you don't have the QTDIR environment
-                 variable set.  On debian, this should be set to /usr/share/qt.
-                 I hear on mandrake, it's /usr/lib/qt3.  You'll need to figure
-                 out what it should be on your system, set the variable,
-                 and attempt to compile again.
-
-If you get any errors about missing references, etc, you most likely don't have
-one of the required pieces of software installed.
-
-Follow this by a 'make install'.  It'll put 'mythtv', 'mythdialog', 'mythepg',
-and 'mythfrontend' in your /usr/local/bin directory, and create 
-/usr/local/share/mythtv for you.
 
 IMPORTANT: You _must_ edit the settings.txt file in /usr/local/share/mythtv/
            before running the application.  
