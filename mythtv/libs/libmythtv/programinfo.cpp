@@ -324,11 +324,6 @@ void ProgramInfo::WriteRecordedToDB(QSqlDatabase *db)
 
     QSqlQuery qquery = db->exec(query);
 
-    if (!qquery.isActive())
-    {
-        printf("couldn't insert recording into db\n");
-    }
-
     query = QString("INSERT INTO oldrecorded (channum,starttime,endtime,title,"
                     "subtitle,description) "
                     "VALUES(%1,\"%2\",\"%3\",\"%4\",\"%5\",\"%6\");")
@@ -337,16 +332,11 @@ void ProgramInfo::WriteRecordedToDB(QSqlDatabase *db)
 
     qquery = db->exec(query);
 
-    if (!qquery.isActive())
-    {
-        printf("couldn't insert recording into db\n");
-    }
-
     if (recordtype == 1)
     {
-        query = QString("DELETE FROM singlerecord WHERE channum = %s AND "
-                           "starttime = %s AND endtime = %s;").arg(channum)
-                           .arg(starts).arg(ends);
+        query = QString("DELETE FROM singlerecord WHERE channum = %1 AND "
+                        "starttime = %2 AND endtime = %3;").arg(channum)
+                        .arg(starts).arg(ends);
 
         qquery = db->exec(query);
     }
