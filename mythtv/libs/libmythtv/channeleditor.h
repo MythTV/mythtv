@@ -67,6 +67,7 @@ public slots:
 
     void setHideMode(bool hide) {
         currentHideMode = hide;
+        fillSelections(currentSourceID);
     };
 
 private:

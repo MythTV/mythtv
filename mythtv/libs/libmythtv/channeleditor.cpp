@@ -80,7 +80,7 @@ void ChannelListSetting::fillSelections(const QString& sourceid)
     if (currentSortMode == "Channel Name")
         querystr += " ORDER BY name";
     else if (currentSortMode == "Channel Number")
-        querystr += " ORDER BY channum";
+        querystr += " ORDER BY channum + 0";
 
     QSqlQuery query = db->exec(querystr);
     if (query.isActive() && query.numRowsAffected() > 0)
@@ -99,7 +99,7 @@ void ChannelListSetting::fillSelections(const QString& sourceid)
                 if (channum != "")
                     name = channum + ". " + name;
                 else
-                    name = "??. " + name;
+                    name = "???. " + name;
             }
 
             addSelection(name, chanid);

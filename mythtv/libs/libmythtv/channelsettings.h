@@ -68,7 +68,7 @@ public:
                 if (tmpfloor < query.value(0).toInt())
                     tmpfloor = query.value(0).toInt() + 1;
 
-        return floor<tmpfloor?floor:tmpfloor;
+        return floor<tmpfloor?tmpfloor:floor;
     };
 
     const QString& getField(void) const {

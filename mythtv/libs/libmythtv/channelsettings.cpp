@@ -240,7 +240,7 @@ public:
                 addSelection(query.value(0).toString(),
                              query.value(1).toString());
         } else
-            addSelection("[NO SATELLITES CONFIGURED]", "0");
+            addSelection("[NONE CONFIGURED]", "0");
     };
 };
 
