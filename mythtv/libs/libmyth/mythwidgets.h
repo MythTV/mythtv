@@ -105,11 +105,11 @@ class MythLineEdit : public QLineEdit
     Q_OBJECT
   public:
     MythLineEdit(QWidget *parent=NULL, const char* widgetName=0) :
-      QLineEdit(parent, widgetName) { };
+      QLineEdit(parent, widgetName) { rw = true; };
 
     MythLineEdit(const QString& contents, QWidget *parent=NULL, 
                  const char* widgetName=0) :
-      QLineEdit(contents, parent, widgetName) { };
+      QLineEdit(contents, parent, widgetName) { rw = true; };
 
     void setHelpText(QString help) { helptext = help; };
     void setRW(bool readwrite = true) { rw = readwrite; };

@@ -1400,7 +1400,6 @@ MythPasswordDialog::MythPasswordDialog(QString message,
 
     this->setActiveWindow();
     password_editor->setFocus();
-    
 }
 
 void MythPasswordDialog::keyPressEvent(QKeyEvent *e)
@@ -1414,7 +1413,7 @@ void MythPasswordDialog::keyPressEvent(QKeyEvent *e)
 
 void MythPasswordDialog::checkPassword(const QString &the_text)
 {
-    if(the_text == target_text)
+    if (the_text == target_text)
     {
         *success_flag = true;
         done(0);
@@ -1427,10 +1426,6 @@ void MythPasswordDialog::checkPassword(const QString &the_text)
 
 MythPasswordDialog::~MythPasswordDialog()
 {
-    if(password_editor)
-    {
-        delete password_editor;
-    }
 }
 
 /*

@@ -163,15 +163,15 @@
     <name>MythContext</name>
     <message>
         <source>Connection to the master backend server timed out.  You probably should modify the Mater Server setting in the setup program and set the proper IP address there.</source>
-        <translation type="unfinished"></translation>
+        <translation>Konnte nicht zum Master Backend verbinden. Sie sollten im Setup Programm die IP Adresse des Master Servers kontrollieren.</translation>
     </message>
     <message>
         <source>Could not connect to the master backend server -- is it running?  Is the IP address set for it in the setup program correct?</source>
-        <translation type="unfinished"></translation>
+        <translation>Konnte nicht zum Master Backend Server verbinden -- ist er gestartet? Stimmt seine IP Adresse im Setup?</translation>
     </message>
     <message>
         <source>The connection to the master backend server has gone away for some reason.. Is it running?</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Verbindung zum Master Backend Server wurde unterbrochen. Läuft der Server?</translation>
     </message>
 </context>
 <context>
@@ -562,7 +562,7 @@
     </message>
     <message>
         <source>Maximum number of episodes to keep (set to 0 for ALL)</source>
-        <translation>Wieviele Folgen behalten (0 für Alle)</translation>
+        <translation>Wieviele Folgen behalten (&apos;0&apos; für Alle)</translation>
     </message>
     <message>
         <source>Record new episodes and delete oldest once maximum count is reached</source>
@@ -654,11 +654,11 @@
     </message>
     <message>
         <source>MythTV can control the PCM and master mixer volume.  If you prefer to use an external mixer program, uncheck this box.</source>
-        <translation>MythTV kann die Master/PCM Lautstärke regeln. Abwählen wenn Sie ein externes Regelprogramm nutzen.</translation>
+        <translation type="unfinished">MythTV kann die Master/PCM Lautstärke regeln. Bitte abwählen falls Sie die Lautstärke extern regeln möchten.</translation>
     </message>
     <message>
         <source>Mixer Device</source>
-        <translation>Mixer Gerät</translation>
+        <translation>Mischer Gerät</translation>
     </message>
     <message>
         <source>PCM</source>
@@ -670,11 +670,11 @@
     </message>
     <message>
         <source>Master Mixer Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>Master Lautstärke</translation>
     </message>
     <message>
         <source>Initial volume for the Master Mixer.  This affects all sound created by the soundcard.  Note: Do not set this too low.</source>
-        <translation type="unfinished"></translation>
+        <translation>Anfangslautstärke des Master Mischers. Dies beeinflußt alle Eingänge der Soundkarte und sollte nicht zu leise eingestellt werden.</translation>
     </message>
     <message>
         <source>PCM Mixer Volume</source>
@@ -682,31 +682,31 @@
     </message>
     <message>
         <source>Initial volume for PCM output.  Use of the volume keys in MythTV will adjust this parameter.</source>
-        <translation type="unfinished"></translation>
+        <translation>Anfangslautstärke für den PCM Ausgang. Die Lautstärkeregler in MythTV verändern diese Einstellung.</translation>
     </message>
     <message>
         <source>Deinterlace playback</source>
-        <translation type="unfinished"></translation>
+        <translation>Deinterlace Wiedergabe</translation>
     </message>
     <message>
         <source>Make the video look normal on a progressive display (i.e. monitor).  Deinterlace requires that your CPU supports SSE instructions.  Enabling this without proper CPU support will cause the program to segfault. See the HOWTO document for more information.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bildkorrektur für die Wiedergabe über einen Monitor u.ä. Diese Option nutzt die SSE Funktionen des Prozessors und führt zum Programmabsturz falls diese fehlen sollten. Sehen Sie in der Dokumentation für weitere Informationen nach.</translation>
     </message>
     <message>
         <source>Extra audio buffering</source>
-        <translation type="unfinished"></translation>
+        <translation>Großer Audiopuffer</translation>
     </message>
     <message>
         <source>This attempts to keep extra audio data in the internal buffers.  Try setting this if you&apos;re getting crackly audio. (Not used for software encoded video.)</source>
-        <translation type="unfinished"></translation>
+        <translation>Versucht mehr Audiodaten im internen Puffer zu halten. Testen Sie diese Einstellung bei Audioproblemen. (wird nicht bei Software kodiertem Video verwendet)</translation>
     </message>
     <message>
         <source>Jump amount (in minutes)</source>
-        <translation type="unfinished"></translation>
+        <translation>Sprunglänge (in Min.)</translation>
     </message>
     <message>
         <source>How many minutes to jump forward or backward when the jump keys are pressed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wieviele Minuten überspringen, wenn die Sprung-Tasten gedrückt werden.</translation>
     </message>
     <message>
         <source>Fast forward amount (in seconds)</source>
@@ -714,7 +714,7 @@
     </message>
     <message>
         <source>How many seconds to skip forward on a fast forward.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wieviele Sekunden beim Vorwärts-Springen auslassen.</translation>
     </message>
     <message>
         <source>Rewind amount (in seconds)</source>
@@ -722,127 +722,127 @@
     </message>
     <message>
         <source>How many seconds to skip backward on a rewind.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wieviele Sekunden beim Rückwärts-Springen auslassen.</translation>
     </message>
     <message>
         <source>Seek to exact frame</source>
-        <translation type="unfinished"></translation>
+        <translation>Frame-genau springen</translation>
     </message>
     <message>
         <source>If enabled, seeking is frame exact, but slower.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, sind Sprünge genauer, aber langsamer.</translation>
     </message>
     <message>
         <source>Commercial Skip Method</source>
-        <translation type="unfinished"></translation>
+        <translation>Suchmethode</translation>
     </message>
     <message>
         <source>Blank Frame Detection (default)</source>
-        <translation type="unfinished"></translation>
+        <translation>Dunkle Frames (Standard)</translation>
     </message>
     <message>
         <source>Blank Frame + Scene Change Detection</source>
-        <translation type="unfinished"></translation>
+        <translation>Dunkle Frames und Szenenwechsel</translation>
     </message>
     <message>
         <source>Scene Change Detection</source>
-        <translation type="unfinished"></translation>
+        <translation>Szenenwechsel</translation>
     </message>
     <message>
         <source>This determines the method used by MythTV to detect when commercials start and end.  You must have automatic commercial turned on to use anything other than &apos;Blank Frame&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wählt die Methode aus, nach der Anfang und Ende eines Werbeblocks gesucht wird.</translation>
     </message>
     <message>
         <source>Automatically Skip Commercials</source>
-        <translation type="unfinished"></translation>
+        <translation>Werbung autom. überspringen</translation>
     </message>
     <message>
         <source>Automatically skip commercial breaks that have been flagged during Automatic Commercial Flagging or by the mythcommflag program.</source>
-        <translation type="unfinished"></translation>
+        <translation>Werbeblöcke bei der Wiedergabe automatisch überspringen.</translation>
     </message>
     <message>
         <source>Automatically Flag Commercials</source>
-        <translation type="unfinished"></translation>
+        <translation>Werbung autom. markieren</translation>
     </message>
     <message>
         <source>Automatically flag commercials after a recording completes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Neue Aufnahmen auf Werbung untersuchen.</translation>
     </message>
     <message>
         <source>Strict Commercial Detection</source>
-        <translation type="unfinished"></translation>
+        <translation>Strikte Erkennung</translation>
     </message>
     <message>
         <source>Turn on stricter Commercial Detection code.  If some commercials are not being detected, try turning this setting OFF.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktiviert strikteren Code um Werbung zu finden. Schalten Sie diese Einstellung aus falls manche Werbeblöcke nicht erkannt werden.</translation>
     </message>
     <message>
         <source>Auto Expire Free Disk Space Threshold (in Gigabytes)</source>
-        <translation type="unfinished"></translation>
+        <translation>Freier Speicherplatz für autom. Löschen (in GB)</translation>
     </message>
     <message>
         <source>Trigger AutoExpire when free space in Gigabytes goes below this value.  Turn OFF AutoExpire by setting to 0.</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatisches Löschen startet falls der freie Speicherplatz diesen Wert (in GB) unterschreitet. &apos;0&apos; schaltet autom. Löschen ab.</translation>
     </message>
     <message>
         <source>Auto Expire Frequency (in minutes)</source>
-        <translation type="unfinished"></translation>
+        <translation>Autom. Löschen Interval (in Minuten)</translation>
     </message>
     <message>
         <source>Number of minutes the AutoExpire process will wait between each time that it checks for free disk space.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wieviele Minuten der Autom. Löschen Prozeß zwischen zwei Durchgängen wartet.</translation>
     </message>
     <message>
         <source>Auto Expire Method</source>
-        <translation type="unfinished"></translation>
+        <translation>Autom. Löschen Methode</translation>
     </message>
     <message>
         <source>Oldest Show First</source>
-        <translation type="unfinished"></translation>
+        <translation>älteste Folge zuerst</translation>
     </message>
     <message>
         <source>Method used to determine which recorded shows to AutoExpire first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nach welcher Methode soll Autom. Löschen entscheiden, welche Aufnahme gelöscht wird.</translation>
     </message>
     <message>
         <source>Auto-Expire Default</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatisch Löschen</translation>
     </message>
     <message>
         <source>Turn Auto-Expire ON by default when creating new scheduled recordings.  Existing scheduled recordings will keep their current value.</source>
-        <translation type="unfinished"></translation>
+        <translation>Schaltet Autom. Löschen für neue Aufnahmen ein. Alte Aufnahmen behalten ihre aktuelle Einstellung bei.</translation>
     </message>
     <message>
         <source>New Recording Free Disk Space Threshold (in Megabytes)</source>
-        <translation type="unfinished"></translation>
+        <translation>Freier Speicherplatz für neue Aufnahmen (in MB)</translation>
     </message>
     <message>
         <source>MythTV will stop scheduling new recordings on a backend when its free disk space falls below this value.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV wird für ein Backend keine neuen Aufnahmen planen, falls dessen freier Speicherplatz diesen Wert unterschreitet.</translation>
     </message>
     <message>
         <source>Time to record before start of show (in seconds)</source>
-        <translation type="unfinished"></translation>
+        <translation>Vorz. Aufnahmestart (in Sek.)</translation>
     </message>
     <message>
         <source>Time to record past end of show (in seconds)</source>
-        <translation type="unfinished"></translation>
+        <translation>Versp. Aufnahmeende (in Sek.)</translation>
     </message>
     <message>
         <source>List Newest Recording First</source>
-        <translation type="unfinished"></translation>
+        <translation>Neue Aufnahmen zuerst</translation>
     </message>
     <message>
         <source>If checked (default) the most recent recording will be listed first in the &apos;Watch Recordings&apos; screen. If unchecked the oldest recording will be listed first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, so werden im &apos;Aufnahmen ansehen&apos; Menü neue vor älteren Aufnahmen einsortiert.</translation>
     </message>
     <message>
         <source>Sticky keys</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;Klebrige&apos; Tasten</translation>
     </message>
     <message>
         <source>If this is set, fast forward and rewind continue after the key is released.  Pressing the key again increases the fast forward or rewind speed.  The alternate fast forward and rewind keys always behave in this way.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, läuft der schnelle Vor-/Rücklauf weiter nachdem die Taste gelöst wird. Ein weiterer Tastendruck erhöht die Geschwindigkeit. Bei den alternativen Tasten für schnellen Vor-/Rücklauf ist diese Einstellung immer aktiv.</translation>
     </message>
     <message>
         <source>Language</source>
@@ -891,6 +891,22 @@
     <message>
         <source>Your preferred language.</source>
         <translation>Ihre bevorzugte Sprache.</translation>
+    </message>
+    <message>
+        <source>Setup Pin Code</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This PIN is used to control access to the setup menues. If you want to use this feature, then setting the value to all numbers will make your life much easier.  Set it to blank to disable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Require Setup PIN</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, you will not be able to return to this screen and reset the Setup PIN without first entering the current PIN.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1189,6 +1205,22 @@
     </message>
     <message>
         <source>4:3 Zoom</source>
+        <translation>4:3 Zoom</translation>
+    </message>
+    <message>
+        <source>Brightness (REC) %1 %</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Contrast (REC) %1 %</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Colour (REC) %1 %</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hue (REC) %1 %</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

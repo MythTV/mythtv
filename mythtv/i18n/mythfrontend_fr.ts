@@ -836,6 +836,22 @@
         <source>Your preferred language.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Setup Pin Code</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This PIN is used to control access to the setup menues. If you want to use this feature, then setting the value to all numbers will make your life much easier.  Set it to blank to disable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Require Setup PIN</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, you will not be able to return to this screen and reset the Setup PIN without first entering the current PIN.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RankPrograms</name>
@@ -1125,6 +1141,22 @@
     </message>
     <message>
         <source>4:3 Zoom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Brightness (REC) %1 %</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Contrast (REC) %1 %</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Colour (REC) %1 %</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hue (REC) %1 %</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -147,6 +147,8 @@ class ThemedMenu : public MythDialog
     void clearToBackground(void);
     void drawInactiveButtons(void);
     void drawScrollArrows(QPainter *p);
+    bool checkPinCode(QString timestamp_setting, QString password_setting,
+                      QString text);
 
     QString prefix;
     

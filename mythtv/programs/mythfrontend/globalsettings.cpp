@@ -682,6 +682,30 @@ public:
     };
 };
 
+class SetupPinCode: public LineEditSetting, public GlobalSetting {
+public:
+    SetupPinCode():
+        GlobalSetting("SetupPinCode") {
+        setLabel(QObject::tr("Setup Pin Code"));
+        setHelpText(QObject::tr("This PIN is used to control access to the "
+                    "setup menues. If you want to use this feature, then "
+                    "setting the value to all numbers will make your life "
+                    "much easier.  Set it to blank to disable."));
+    };
+};
+
+class SetupPinCodeRequired: public CheckBoxSetting, public GlobalSetting {
+public:
+    SetupPinCodeRequired():
+        GlobalSetting("SetupPinCodeRequired") {
+        setLabel(QObject::tr("Require Setup PIN"));
+        setValue(false);
+        setHelpText(QObject::tr("If set, you will not be able to return "
+                    "to this screen and reset the Setup PIN without first "
+                    "entering the current PIN."));
+    };
+};
+
 class XineramaScreen: public SpinBoxSetting, public GlobalSetting {
 public:
     XineramaScreen():
@@ -1163,6 +1187,8 @@ MainGeneralSettings::MainGeneralSettings()
     VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
     general->addChild(new AllowQuitShutdown());
     general->addChild(new HaltCommand());
+    general->addChild(new SetupPinCodeRequired());
+    general->addChild(new SetupPinCode());
     general->addChild(new EnableXbox());
     addChild(general);
 }

@@ -1827,6 +1827,13 @@ void ThemedMenu::handleAction(QString &action)
         menufiles.back().row = currentrow;
         menufiles.back().col = currentcolumn;
 
+        if (rest == "main_settings.xml" && 
+            gContext->GetNumSetting("SetupPinCodeRequired", 0) &&
+            !checkPinCode("SetupPinCodeTime", "SetupPinCode", "Setup Pin:"))
+        {
+            return;
+        }
+
         parseMenu(rest);
     }
     else if (action.left(6) == "UPMENU")
@@ -1881,3 +1888,55 @@ bool ThemedMenu::findDepends(QString file)
 
     return false;
 }
+
+bool ThemedMenu::checkPinCode(QString timestamp_setting, 
+                              QString password_setting, QString text)
+{
+    QDateTime curr_time = QDateTime::currentDateTime();
+    QString last_time_stamp = gContext->GetSetting(timestamp_setting);
+    QString password = gContext->GetSetting(password_setting);
+
+    if (password.length() < 1)
+        return true;
+
+    if (last_time_stamp.length() < 1)
+    {
+        cerr << "themedmenu.o: Could not read password/pin time stamp. "
+             << "This is only an issue if it happens repeatedly. " << endl;
+    }
+    else
+    {
+        QDateTime last_time = QDateTime::fromString(last_time_stamp, 
+                                                    Qt::TextDate);
+        if (last_time.secsTo(curr_time) < 120)
+        {
+            last_time_stamp = curr_time.toString(Qt::TextDate);
+            gContext->SetSetting(timestamp_setting, last_time_stamp);
+            gContext->SaveSetting(timestamp_setting, last_time_stamp);
+            return true;
+        }
+    }
+
+    if (password.length() > 0)
+    {
+        bool ok = false;
+        MythPasswordDialog *pwd = new MythPasswordDialog(text, &ok, password,
+                                                     gContext->GetMainWindow());
+        pwd->exec();
+        delete pwd;
+        if (ok)
+        {
+            last_time_stamp = curr_time.toString(Qt::TextDate);
+            gContext->SetSetting(timestamp_setting, last_time_stamp);
+            gContext->SaveSetting(timestamp_setting, last_time_stamp);
+            return true;
+        }
+    }
+    else
+    {
+        return true;
+    }
+
+    return false;
+}
+
