@@ -804,29 +804,18 @@ remounted.</P>
 <P>There are options available when formatting an Ext3 partition, as in:
 <BLOCKQUOTE><CODE>
 <PRE>
-# mkfs.ext3 -T largefile4 -m 0 /dev/hdb1
+# mkfs.ext3 -T largefile4 /dev/hdb1
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
 <P>This example assumes that <CODE>/dev/hdb1</CODE> has already been created using
 <B>fdisk</B>. If you're using LVM, <CODE>/dev/hdb1</CODE> may be something like
 <CODE>/dev/VGforMyth/video</CODE>.</P>
-<P>The "-m 0" (zero, not "oh") parameter sets the amount of spaced reserved for
-root to zero. By default, this is 5%, which on a multi-gigabyte drive is a
-lot of reserved space.</P>
 <P>The "-T largefile4" option creates one inode per 4 megabytes, which can
 provide a few percent more storage space.  However, tests indicate that
 using the "-T largefile4" option can drastically increase the amount of time
 required to delete a large file and thus it should only be used with encoder
 settings that produce small video files (YMMV).</P>
-<P>You may also modify some aspects of a filesystem such as the reserved block
-percentage after it has been created using the <B>tune2fs</B> program:
-<BLOCKQUOTE><CODE>
-<PRE>
-# tune2fs -m 0 /dev/hdb1
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
 <P>You can check on your filesystem using the <B>dumpe2fs</B> program. See
 the man page for details.</P>
 <H3>ReiserFS</H3>

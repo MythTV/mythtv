@@ -56,9 +56,10 @@ join the
 <A HREF="http://www.mythtv.org/mailman/listinfo/mythtv-dev/">http://www.mythtv.org/mailman/listinfo/mythtv-dev/</A> mailing lists.</CAPTION>
 </FIGURE>
 </P>
+<P>If you are in North America you will use the DataDirect grabber which is
+built-in to MythTV.  You <EM>do not</EM> need to install XMLTV.</P>
 <P>Get XMLTV from 
-<A HREF="http://xmltv.sourceforge.net">http://xmltv.sourceforge.net</A>.  Download version 0.5.32 if you're in
-North America.</P>
+<A HREF="http://xmltv.sourceforge.net">http://xmltv.sourceforge.net</A>.  Download the latest version (0.5.32).</P>
 <P>
 <HR>
 <PRE>
@@ -169,14 +170,6 @@ does not have <B>XMLTV</B>, so you may install the XMLTV prerequisites by typing
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>If you are using the Zap2It Data Direct service, you'll need to load the
-SOAP::Lite module
-<BLOCKQUOTE><CODE>
-<PRE>
-# urpmi perl-SOAP-Lite
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
 <P>and skip straight to the XMLTV compilation step.</P>
 
 <H3>Other distributions and manual installation.</H3>
@@ -268,14 +261,13 @@ $ su
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss5.4">5.4</A> <A HREF="mythtv-HOWTO.html#toc5.4">Configuring the Zap2It.com Data Direct service.</A>
+<H2><A NAME="ss5.4">5.4</A> <A HREF="mythtv-HOWTO.html#toc5.4">Configuring the Zap2It.com DataDirect service.</A>
 </H2>
 
-<P><B>NOTE</B>:  Still under development.</P>
-<P>Zap2It Data Direct is a service provided by Zap2It, a subsidiary of
+<P>Zap2It DataDirect is a service provided by Zap2It, a subsidiary of
 Tribune Media Services.  TMS is one of the primary providers for program
 listing data in the United States and Canada.  There are a number of
-advantages to using Data Direct rather than the standard XMLTV
+advantages to using DataDirect rather than the standard XMLTV
 <CODE>tv_grab_na</CODE> grabber.</P>
 <P>
 <UL>
@@ -287,13 +279,20 @@ hundreds of custom HTML pages when you scrape their listings.</LI>
 <LI>As of right now, it's free.</LI>
 </UL>
 </P>
-<P>If you wish to use Zap2It Data Direct, you'll need to establish a user
+<P>If you wish to use Zap2It DataDirect, you'll need to establish a user
 account.  Go to 
 <A HREF="http://labs.zap2it.com">http://labs.zap2it.com</A> and click on the "New User? Sign Up" link. 
 Read the license terms, and if you agree with them click "Accept".  The next
 screen is the subscription registration.  In the "Certificate Code" field,
 enter <B>ZIYN-DQZO-SBUT</B>.</P>
-<P>Fill in the survey.</P>
+<P>Fill in the survey, then proceed to the lineup choices and configure your
+account for your particular location and the channels that you have.  This
+configuration will be imported into MythTV when you first run the
+<B>setup</B> program.</P>
+<P>See the section called 
+<A HREF="mythtv-HOWTO-21.html#MigratingtoDD">Migrating from XMLTV to DataDirect</A> for instructions on moving to to DataDirect if you are
+currently using XMLTV.  If you are starting from a fresh installation, the
+simplest thing is to immediately start using DataDirect.</P>
 <P>
 <A NAME="manually_building_mythtv"></A> </P>
 <H2><A NAME="ss5.5">5.5</A> <A HREF="mythtv-HOWTO.html#toc5.5">Manually building MythTV.</A>

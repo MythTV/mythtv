@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2004-04-15, v0.14.08
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2004-05-05, v0.14.09
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -47,7 +47,7 @@ necessary.</EM>
 <LI><A NAME="toc5.1">5.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss5.1">Notes on compiling on a system with non-Intel processors. </A>
 <LI><A NAME="toc5.2">5.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss5.2">Building LAME.</A>
 <LI><A NAME="toc5.3">5.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss5.3">XMLTV. </A>
-<LI><A NAME="toc5.4">5.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss5.4">Configuring the Zap2It.com Data Direct service.</A>
+<LI><A NAME="toc5.4">5.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss5.4">Configuring the Zap2It.com DataDirect service.</A>
 <LI><A NAME="toc5.5">5.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss5.5">Manually building MythTV.</A>
 <LI><A NAME="toc5.6">5.6</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss5.6">Gentoo. </A>
 </UL>
@@ -189,6 +189,7 @@ necessary.</EM>
 <LI><A NAME="toc20.28">20.28</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.28">My screen goes black when I try to play something.</A>
 <LI><A NAME="toc20.29">20.29</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.29">Poor performance with NVidia cards and XvMC.</A>
 <LI><A NAME="toc20.30">20.30</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.30">My computer is loading a media player application when I insert a CD or DVD.</A>
+<LI><A NAME="toc20.31">20.31</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.31">I can't change channels.</A>
 </UL>
 <P>
 <H2><A NAME="toc21">21.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s21">Miscellaneous. </A></H2>
@@ -198,7 +199,7 @@ necessary.</EM>
 <LI><A NAME="toc21.2">21.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.2">I'd like to use some other window manager.</A>
 <LI><A NAME="toc21.3">21.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.3">What capture resolution should I use?  How does video work?</A>
 <LI><A NAME="toc21.4">21.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.4">MythTV GUI and X Display Sizes.</A>
-<LI><A NAME="toc21.5">21.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.5">I'd like to save or restore my database.</A>
+<LI><A NAME="toc21.5">21.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.5">I'd like to save or restore my database. </A>
 <LI><A NAME="toc21.6">21.6</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.6">I'd like to delete the MySQL database.</A>
 <LI><A NAME="toc21.7">21.7</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.7">btaudio </A>
 <LI><A NAME="toc21.8">21.8</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.8">Removing unwanted channels.</A>
@@ -212,6 +213,7 @@ necessary.</EM>
 <LI><A NAME="toc21.16">21.16</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.16">Can I run MythTV on my ReplayTV?</A>
 <LI><A NAME="toc21.17">21.17</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.17">Can I use wireless between the frontend and the backend?</A>
 <LI><A NAME="toc21.18">21.18</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.18">How can I burn shows that I have recorded to a DVD?</A>
+<LI><A NAME="toc21.19">21.19</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.19">Migrating from XMLTV to DataDirect. </A>
 </UL>
 <P>
 <H2><A NAME="toc22">22.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s22">Example Configurations.</A></H2>
@@ -1268,6 +1270,31 @@ export PATH QTDIR
 </CODE></BLOCKQUOTE>
 </P>
 
+<H3><A NAME="devperms"></A> Device Permissions.</H3>
+
+<P>MythTV will need access to the video4linux devices on your system.  By
+default, your distribution may restrict access to these devices to the
+logged-in user, so if you will be automatically starting
+<B>mythbackend</B> from a script rather than an interactive terminal
+session you will need to make some adjustments.</P>
+<P><B>NOTE</B>: The following instructions are accurate for Mandrake.</P>
+<P>Check for a file called <CODE>/etc/security/console.perms</CODE>.  Open the file
+in your favorite text editor and look for a line that has:
+<BLOCKQUOTE><CODE>
+<PRE>
+&lt;console>  0600 &lt;v4l>        0600 root.video
+</PRE>
+</CODE></BLOCKQUOTE>
+
+and replace it with
+<BLOCKQUOTE><CODE>
+<PRE>
+&lt;console>  0666 &lt;v4l>        0666 root.video
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>What we're doing is allowing read and write access to the files in the
+video4linux directory.</P>
 <H2><A NAME="s5">5.</A> <A HREF="#toc5">Downloading and compiling.</A></H2>
 
 <P>Get MythTV from the 
@@ -1312,9 +1339,10 @@ join the
 <A HREF="http://www.mythtv.org/mailman/listinfo/mythtv-dev/">http://www.mythtv.org/mailman/listinfo/mythtv-dev/</A> mailing lists.</CAPTION>
 </FIGURE>
 </P>
+<P>If you are in North America you will use the DataDirect grabber which is
+built-in to MythTV.  You <EM>do not</EM> need to install XMLTV.</P>
 <P>Get XMLTV from 
-<A HREF="http://xmltv.sourceforge.net">http://xmltv.sourceforge.net</A>.  Download version 0.5.32 if you're in
-North America.</P>
+<A HREF="http://xmltv.sourceforge.net">http://xmltv.sourceforge.net</A>.  Download the latest version (0.5.32).</P>
 <P>
 <HR>
 <PRE>
@@ -1425,14 +1453,6 @@ does not have <B>XMLTV</B>, so you may install the XMLTV prerequisites by typing
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>If you are using the Zap2It Data Direct service, you'll need to load the
-SOAP::Lite module
-<BLOCKQUOTE><CODE>
-<PRE>
-# urpmi perl-SOAP-Lite
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
 <P>and skip straight to the XMLTV compilation step.</P>
 
 <H3>Other distributions and manual installation.</H3>
@@ -1524,14 +1544,13 @@ $ su
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss5.4">5.4</A> <A HREF="#toc5.4">Configuring the Zap2It.com Data Direct service.</A>
+<H2><A NAME="ss5.4">5.4</A> <A HREF="#toc5.4">Configuring the Zap2It.com DataDirect service.</A>
 </H2>
 
-<P><B>NOTE</B>:  Still under development.</P>
-<P>Zap2It Data Direct is a service provided by Zap2It, a subsidiary of
+<P>Zap2It DataDirect is a service provided by Zap2It, a subsidiary of
 Tribune Media Services.  TMS is one of the primary providers for program
 listing data in the United States and Canada.  There are a number of
-advantages to using Data Direct rather than the standard XMLTV
+advantages to using DataDirect rather than the standard XMLTV
 <CODE>tv_grab_na</CODE> grabber.</P>
 <P>
 <UL>
@@ -1543,13 +1562,20 @@ hundreds of custom HTML pages when you scrape their listings.</LI>
 <LI>As of right now, it's free.</LI>
 </UL>
 </P>
-<P>If you wish to use Zap2It Data Direct, you'll need to establish a user
+<P>If you wish to use Zap2It DataDirect, you'll need to establish a user
 account.  Go to 
 <A HREF="http://labs.zap2it.com">http://labs.zap2it.com</A> and click on the "New User? Sign Up" link. 
 Read the license terms, and if you agree with them click "Accept".  The next
 screen is the subscription registration.  In the "Certificate Code" field,
 enter <B>ZIYN-DQZO-SBUT</B>.</P>
-<P>Fill in the survey.</P>
+<P>Fill in the survey, then proceed to the lineup choices and configure your
+account for your particular location and the channels that you have.  This
+configuration will be imported into MythTV when you first run the
+<B>setup</B> program.</P>
+<P>See the section called 
+<A HREF="#MigratingtoDD">Migrating from XMLTV to DataDirect</A> for instructions on moving to to DataDirect if you are
+currently using XMLTV.  If you are starting from a fresh installation, the
+simplest thing is to immediately start using DataDirect.</P>
 <P>
 <A NAME="manually_building_mythtv"></A> </P>
 <H2><A NAME="ss5.5">5.5</A> <A HREF="#toc5.5">Manually building MythTV.</A>
@@ -2851,8 +2877,18 @@ Once you have no additional cards to setup, press ESC.</P>
 space bar to begin.  The first field asks for the name of the video source.
 You may choose something easy to remember, like "Antenna" or "Cable".  Once
 you've chosen a name, press the down arrow to move to the next field.  If
-you're in North America, move to the Zip/postal code field and put in the
-appropriate value.  </P>
+you're in North America, change the grabber to "DataDirect", then continue
+pressing the down arrow to move to the next field.  Fill in the username and
+password that you have established with DataDirect, then move to the
+"Retrieve Listings" button and press the space bar.  The setup program will
+contact the Zap2It servers and get your account information.  Once you're
+done, you may click the Finish button and skip the next few paragraphs,
+since they only apply to users that are using the external XMLTV script to
+get their guide data.</P>
+<P>If you wish to continue using the XMLTV grabber, then move to the Zip/postal
+code field and put in the appropriate value.</P>
+<P><B>NOTE</B>:  As of 2004-05-04, the <B>tv_grab_na</B> grabber still
+works, but you are strongly discouraged from using it.</P>
 <P>If you're outside of North America, then some manual interaction will be
 required with XMLTV.</P>
 <P>Once you have chosen your provider, press RETURN to continue.  XMLTV will
@@ -2998,14 +3034,30 @@ tuning offsets into MythTV.</P>
 today (in case of late-breaking changes to the schedule).</P>
 
 
-<H3>Setting <B>mythfilldatabase</B> to run from <B>cron</B></H3>
+<H3>Periodically running <B>mythfilldatabase</B></H3>
 
 <P>In order to keep your database filled, <B>mythfilldatabase</B> should be
 run once a day.</P>
-<P>There are two ways to accomplish this:  either as a user-based cron job, or
-as a system based cron.  If you use a user-based cron, you can select the
-time that the cron job will be run.  A system-based cron job will run at the
-same time as any other system cron jobs.</P>
+<P>There are three ways to accomplish this:  use the built-in capability of
+MythTV to run the <B>mythfilldatabase</B> program (recommended, but only
+available in CVS), as a user-based cron job, or as a system based cron.  If
+you use a user-based cron, you can select the time that the cron job will be
+run.  A system-based cron job will run at the same time as any other system
+cron jobs.</P>
+
+<H3>Using the built-in method.</H3>
+
+<P>To use MythTV's built-in capability, you'll need to run the
+<B>mythfrontend</B> Setup option.  From the MythFrontend, enter the
+Setup>General screen and advance to "Mythfilldatabase", the fourth screen.
+Select the checkbox, then complete the options as you see fit.  The
+<B>mythbackend</B> program will now run <B>mythfilldatabase</B> at the
+times you specify.</P>
+<P><B>NOTE</B>:  Don't use the built-in and cron methods at the same time. 
+If you switch to the native method, ensure that you've removed any user or
+system cron jobs that you may have been using.</P>
+<H3>Using the cron method.</H3>
+
 <P>If you are a Mandrake 9.0 user and wish to use a system cron job, you can
 perform the following steps:
 <BLOCKQUOTE><CODE>
@@ -5196,6 +5248,12 @@ $ rm ~/.kde/Autostart/Autorun.desktop
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+<H2><A NAME="ss20.31">20.31</A> <A HREF="#toc20.31">I can't change channels.</A>
+</H2>
+
+<P>This may be due to MythTV not having permissions to the appropriate
+video4linux devices.  See the section titled 
+<A HREF="#devperms">Device Permissons</A> for an example.</P>
 <H2><A NAME="s21">21.</A> <A HREF="#toc21">Miscellaneous. </A></H2>
 
 <H2><A NAME="ss21.1">21.1</A> <A HREF="#toc21.1">I'd like to watch the files without using MythTV / I'd like to convert the files to some other format. </A>
@@ -5409,7 +5467,7 @@ purpose of these settings are to cut off rough edges and to expand the image
 so that objects will appear to be the same size as a normal overscanned TV
 picture.</P>
 
-<H2><A NAME="ss21.5">21.5</A> <A HREF="#toc21.5">I'd like to save or restore my database.</A>
+<H2><A NAME="backupdb"></A> <A NAME="ss21.5">21.5</A> <A HREF="#toc21.5">I'd like to save or restore my database. </A>
 </H2>
 
 <P>See the <B>mysqldump</B> manpage for more information.
@@ -6027,6 +6085,47 @@ driveropts=burnfree -dao -v tsize="$TSIZE"s -
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+
+<H2><A NAME="MigratingtoDD"></A> <A NAME="ss21.19">21.19</A> <A HREF="#toc21.19">Migrating from XMLTV to DataDirect. </A>
+</H2>
+
+<P>The first step is to create a backup of your database using the
+instructions found in 
+<A HREF="#backupdb">I'd like to save or restore my database.</A>.</P>
+<P>Next, start <B>mysql</B> and perform the following commands:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mysql -u root mythconverg
+mysql>delete from program;
+mysql>drop table channel;
+mysql>drop table videosource;
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>At this point we need to recreate the two tables that we just deleted.  This
+will ensure that the channel numbers will lineup like they used to.  Open
+the mysqldump file you created in the backup step and search for the
+<CODE>CREATE TABLE channel</CODE> and <CODE>CREATE TABLE videosource</CODE>
+commands.  You should perform a cut-and-paste:
+<BLOCKQUOTE><CODE>
+<PRE>
+mysql>CREATE TABLE videosource (
+  sourceid int(10) unsigned NOT NULL auto_increment,
+  name varchar(128) NOT NULL default '',
+  xmltvgrabber varchar(128) default NULL,
+  userid varchar(128) NOT NULL default '',
+  freqtable varchar(16) NOT NULL default 'default',
+  lineupid varchar(64) default NULL,
+  password varchar(64) default NULL,
+  PRIMARY KEY  (sourceid),
+  UNIQUE KEY name (name)
+) TYPE=MyISAM;
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Do the same for the <CODE>CREATE TABLE channel</CODE> section.  Once that's been
+completed, exit from <B>mysql</B> and run <B>mythfilldatabase</B> to
+populate the database with new data.</P>
 
 <H2><A NAME="s22">22.</A> <A HREF="#toc22">Example Configurations.</A></H2>
 
@@ -6821,29 +6920,18 @@ remounted.</P>
 <P>There are options available when formatting an Ext3 partition, as in:
 <BLOCKQUOTE><CODE>
 <PRE>
-# mkfs.ext3 -T largefile4 -m 0 /dev/hdb1
+# mkfs.ext3 -T largefile4 /dev/hdb1
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
 <P>This example assumes that <CODE>/dev/hdb1</CODE> has already been created using
 <B>fdisk</B>. If you're using LVM, <CODE>/dev/hdb1</CODE> may be something like
 <CODE>/dev/VGforMyth/video</CODE>.</P>
-<P>The "-m 0" (zero, not "oh") parameter sets the amount of spaced reserved for
-root to zero. By default, this is 5%, which on a multi-gigabyte drive is a
-lot of reserved space.</P>
 <P>The "-T largefile4" option creates one inode per 4 megabytes, which can
 provide a few percent more storage space.  However, tests indicate that
 using the "-T largefile4" option can drastically increase the amount of time
 required to delete a large file and thus it should only be used with encoder
 settings that produce small video files (YMMV).</P>
-<P>You may also modify some aspects of a filesystem such as the reserved block
-percentage after it has been created using the <B>tune2fs</B> program:
-<BLOCKQUOTE><CODE>
-<PRE>
-# tune2fs -m 0 /dev/hdb1
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
 <P>You can check on your filesystem using the <B>dumpe2fs</B> program. See
 the man page for details.</P>
 <H3>ReiserFS</H3>

@@ -178,8 +178,18 @@ Once you have no additional cards to setup, press ESC.</P>
 space bar to begin.  The first field asks for the name of the video source.
 You may choose something easy to remember, like "Antenna" or "Cable".  Once
 you've chosen a name, press the down arrow to move to the next field.  If
-you're in North America, move to the Zip/postal code field and put in the
-appropriate value.  </P>
+you're in North America, change the grabber to "DataDirect", then continue
+pressing the down arrow to move to the next field.  Fill in the username and
+password that you have established with DataDirect, then move to the
+"Retrieve Listings" button and press the space bar.  The setup program will
+contact the Zap2It servers and get your account information.  Once you're
+done, you may click the Finish button and skip the next few paragraphs,
+since they only apply to users that are using the external XMLTV script to
+get their guide data.</P>
+<P>If you wish to continue using the XMLTV grabber, then move to the Zip/postal
+code field and put in the appropriate value.</P>
+<P><B>NOTE</B>:  As of 2004-05-04, the <B>tv_grab_na</B> grabber still
+works, but you are strongly discouraged from using it.</P>
 <P>If you're outside of North America, then some manual interaction will be
 required with XMLTV.</P>
 <P>Once you have chosen your provider, press RETURN to continue.  XMLTV will
@@ -325,14 +335,30 @@ tuning offsets into MythTV.</P>
 today (in case of late-breaking changes to the schedule).</P>
 
 
-<H3>Setting <B>mythfilldatabase</B> to run from <B>cron</B></H3>
+<H3>Periodically running <B>mythfilldatabase</B></H3>
 
 <P>In order to keep your database filled, <B>mythfilldatabase</B> should be
 run once a day.</P>
-<P>There are two ways to accomplish this:  either as a user-based cron job, or
-as a system based cron.  If you use a user-based cron, you can select the
-time that the cron job will be run.  A system-based cron job will run at the
-same time as any other system cron jobs.</P>
+<P>There are three ways to accomplish this:  use the built-in capability of
+MythTV to run the <B>mythfilldatabase</B> program (recommended, but only
+available in CVS), as a user-based cron job, or as a system based cron.  If
+you use a user-based cron, you can select the time that the cron job will be
+run.  A system-based cron job will run at the same time as any other system
+cron jobs.</P>
+
+<H3>Using the built-in method.</H3>
+
+<P>To use MythTV's built-in capability, you'll need to run the
+<B>mythfrontend</B> Setup option.  From the MythFrontend, enter the
+Setup>General screen and advance to "Mythfilldatabase", the fourth screen.
+Select the checkbox, then complete the options as you see fit.  The
+<B>mythbackend</B> program will now run <B>mythfilldatabase</B> at the
+times you specify.</P>
+<P><B>NOTE</B>:  Don't use the built-in and cron methods at the same time. 
+If you switch to the native method, ensure that you've removed any user or
+system cron jobs that you may have been using.</P>
+<H3>Using the cron method.</H3>
+
 <P>If you are a Mandrake 9.0 user and wish to use a system cron job, you can
 perform the following steps:
 <BLOCKQUOTE><CODE>

@@ -225,7 +225,7 @@ purpose of these settings are to cut off rough edges and to expand the image
 so that objects will appear to be the same size as a normal overscanned TV
 picture.</P>
 
-<H2><A NAME="ss21.5">21.5</A> <A HREF="mythtv-HOWTO.html#toc21.5">I'd like to save or restore my database.</A>
+<H2><A NAME="backupdb"></A> <A NAME="ss21.5">21.5</A> <A HREF="mythtv-HOWTO.html#toc21.5">I'd like to save or restore my database. </A>
 </H2>
 
 <P>See the <B>mysqldump</B> manpage for more information.
@@ -843,6 +843,47 @@ driveropts=burnfree -dao -v tsize="$TSIZE"s -
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+
+<H2><A NAME="MigratingtoDD"></A> <A NAME="ss21.19">21.19</A> <A HREF="mythtv-HOWTO.html#toc21.19">Migrating from XMLTV to DataDirect. </A>
+</H2>
+
+<P>The first step is to create a backup of your database using the
+instructions found in 
+<A HREF="#backupdb">I'd like to save or restore my database.</A>.</P>
+<P>Next, start <B>mysql</B> and perform the following commands:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mysql -u root mythconverg
+mysql>delete from program;
+mysql>drop table channel;
+mysql>drop table videosource;
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>At this point we need to recreate the two tables that we just deleted.  This
+will ensure that the channel numbers will lineup like they used to.  Open
+the mysqldump file you created in the backup step and search for the
+<CODE>CREATE TABLE channel</CODE> and <CODE>CREATE TABLE videosource</CODE>
+commands.  You should perform a cut-and-paste:
+<BLOCKQUOTE><CODE>
+<PRE>
+mysql>CREATE TABLE videosource (
+  sourceid int(10) unsigned NOT NULL auto_increment,
+  name varchar(128) NOT NULL default '',
+  xmltvgrabber varchar(128) default NULL,
+  userid varchar(128) NOT NULL default '',
+  freqtable varchar(16) NOT NULL default 'default',
+  lineupid varchar(64) default NULL,
+  password varchar(64) default NULL,
+  PRIMARY KEY  (sourceid),
+  UNIQUE KEY name (name)
+) TYPE=MyISAM;
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Do the same for the <CODE>CREATE TABLE channel</CODE> section.  Once that's been
+completed, exit from <B>mysql</B> and run <B>mythfilldatabase</B> to
+populate the database with new data.</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-22.html">Next</A>
