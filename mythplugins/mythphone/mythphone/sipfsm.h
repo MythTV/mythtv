@@ -307,7 +307,7 @@ class SipRegistration : public SipFsmBase
 class SipCall : public SipFsmBase
 {
   public:
-    SipCall(QString localIp, QString natIp, int n, SipFsm *par);
+    SipCall(QString localIp, QString natIp, int localPort, int n, SipFsm *par);
     ~SipCall();
     int  getState() { return State; };
     void setVideoPayload(int p) { videoPayload = p; };
@@ -443,7 +443,7 @@ class SipFsm : public QWidget
     int numCalls();
     int getPrimaryCall() { return primaryCall; };
     int getPrimaryCallState();
-    QString OpenSocket();
+    QString OpenSocket(int Port);
     void CloseSocket();
     void Transmit(QString Msg, QString destIP, int destPort);
     bool Receive(SipMsg &sipMsg);
@@ -465,6 +465,7 @@ class SipFsm : public QWidget
 
     QString localIp;
     QString natIp;
+    int localPort;
     QPtrList<SipFsmBase> FsmList;
     QSocketDevice *sipSocket;
     int callCount;

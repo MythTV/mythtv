@@ -176,6 +176,17 @@ public:
     }
 };
 
+class SipLocalPort: public LineEditSetting, public GlobalSetting {
+public:
+    SipLocalPort():
+        GlobalSetting("SipLocalPort") {
+        setLabel(QObject::tr("SIP Local Port"));
+        setValue(QObject::tr("5060"));
+        setHelpText(QObject::tr("The port on this machine to use. You may need to make these different "
+                                "for each Mythfrontend and setup your firewall to let this port through."));
+    }
+};
+
 class MicrophoneDevice: public ComboBoxSetting, public GlobalSetting {
 public:
     MicrophoneDevice():ComboBoxSetting(true),
@@ -301,9 +312,9 @@ MythPhoneSettings::MythPhoneSettings()
 
     VerticalConfigurationGroup* sipSet = new VerticalConfigurationGroup(false);
     sipSet->setLabel(QObject::tr("SIP Settings"));
-    sipSet->addChild(new MicrophoneDevice());
     sipSet->addChild(new CodecPriorityList());
     sipSet->addChild(new SipBindInterface());
+    sipSet->addChild(new SipLocalPort());
     sipSet->addChild(new NatTraversalMethod());
     sipSet->addChild(new NatIpAddress());
     sipSet->addChild(new AudioLocalPort());
@@ -321,6 +332,7 @@ MythPhoneSettings::MythPhoneSettings()
     VerticalConfigurationGroup* webcamSet = new VerticalConfigurationGroup(false);
     webcamSet->setLabel(QObject::tr("WEBCAM Settings"));
     webcamSet->addChild(new WebcamDevice());
+    webcamSet->addChild(new MicrophoneDevice());
     webcamSet->addChild(new TxResolution());
     webcamSet->addChild(new TransmitFPS());
     webcamSet->addChild(new CaptureResolution());

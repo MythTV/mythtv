@@ -385,17 +385,20 @@ SipFsm::SipFsm(QWidget *parent, const char *name)
     PresenceStatus = "CLOSED";
 
     sipSocket = 0;
-    localIp = OpenSocket();
+    localPort = atoi((const char *)gContext->GetSetting("SipLocalPort"));
+    if (localPort == 0)
+        localPort = 5060;
+    localIp = OpenSocket(localPort);
     natIp = DetermineNatAddress();
     if (natIp.length() == 0)
         natIp = localIp;
-    cout << "SIP listening on IP Address " << localIp << ":5060 NAT address " << natIp << endl;
+    cout << "SIP listening on IP Address " << localIp << ":" << localPort << " NAT address " << natIp << endl;
 
     // Create the timer list
     timerList = new SipTimer;
 
     // Create the Registrar
-    sipRegistrar = new SipRegistrar(this, "volkaerts", localIp, 5060);
+    sipRegistrar = new SipRegistrar(this, "volkaerts", localIp, localPort);
 
     // if Proxy Registration is configured ...
     bool RegisterWithProxy = gContext->GetNumSetting("SipRegisterWithProxy",1);
@@ -407,14 +410,14 @@ SipFsm::SipFsm(QWidget *parent, const char *name)
         QString ProxyPassword = gContext->GetSetting("SipProxyAuthPassword");
         if ((ProxyDNS.length() > 0) && (ProxyUsername.length() > 0) && (ProxyPassword.length() > 0))
         {
-            sipRegistration = new SipRegistration(this, natIp, 5060, ProxyUsername, ProxyPassword, ProxyDNS, 5060);
+            sipRegistration = new SipRegistration(this, natIp, localPort, ProxyUsername, ProxyPassword, ProxyDNS, 5060);
             FsmList.append(sipRegistration);
         }
         else
             cout << "SIP: Cannot register; proxy, username or password not set\n";
 
         // Test -- watch my PC
-        //CreateWatcherFsm("Mythphone@192.168.254.102");//"487658@fwd.pulver.com");//
+        //CreateWatcherFsm("487658@fwd.pulver.com");//"Mythphone@192.168.254.102");//
     }
 
 }
@@ -431,7 +434,7 @@ SipFsm::~SipFsm()
 }
 
 
-QString SipFsm::OpenSocket()
+QString SipFsm::OpenSocket(int Port)
 {
     sipSocket = new QSocketDevice (QSocketDevice::Datagram);
     sipSocket->setBlocking(false);
@@ -450,7 +453,7 @@ QString SipFsm::OpenSocket()
     QHostAddress myIP;
     myIP.setAddress(htonl(sptr->sin_addr.s_addr));
 
-    if (!sipSocket->bind(myIP, 5060))
+    if (!sipSocket->bind(myIP, Port))
     {
         cerr << "Failed to bind for SIP connection " << myIP.toString() << endl;
         delete sipSocket;
@@ -593,7 +596,7 @@ void SipFsm::NewCall(bool audioOnly, QString uri, QString DispName, QString vide
     {
         SipCall *Call;
         primaryCall = cr = callCount++;
-        Call = new SipCall(localIp, natIp, cr, this);
+        Call = new SipCall(localIp, natIp, localPort, cr, this);
         FsmList.append(Call);
 
         // If the dialled number if just a username and we are registered to a proxy, dial
@@ -804,7 +807,7 @@ SipFsmBase *SipFsm::MatchCallId(SipCallId &CallId)
 SipCall *SipFsm::CreateCallFsm()
 {
     int cr = callCount++;
-    SipCall *it = new SipCall(localIp, natIp, cr, this);
+    SipCall *it = new SipCall(localIp, natIp, localPort, cr, this);
     if (primaryCall == -1)
         primaryCall = cr;
     FsmList.append(it);
@@ -813,14 +816,14 @@ SipCall *SipFsm::CreateCallFsm()
 
 SipSubscriber *SipFsm::CreateSubscriberFsm()
 {
-    SipSubscriber *sub = new SipSubscriber(this, natIp, 5060, sipRegistration, PresenceStatus);
+    SipSubscriber *sub = new SipSubscriber(this, natIp, localPort, sipRegistration, PresenceStatus);
     FsmList.append(sub);
     return sub;
 }
 
 SipWatcher *SipFsm::CreateWatcherFsm(QString Url)
 {
-    SipWatcher *watcher = new SipWatcher(this, natIp, 5060, sipRegistration, Url);
+    SipWatcher *watcher = new SipWatcher(this, natIp, localPort, sipRegistration, Url);
     FsmList.append(watcher);
     return watcher;
 }
@@ -1061,11 +1064,12 @@ SipCall
 This class handles a per call instance of the FSM
 **********************************************************************/
 
-SipCall::SipCall(QString localIp, QString natIp, int n, SipFsm *par) : SipFsmBase(par)
+SipCall::SipCall(QString localIp, QString natIp, int localPort, int n, SipFsm *par) : SipFsmBase(par)
 {
     callRef = n;
     sipLocalIP = localIp;
     sipNatIP = natIp;
+    sipLocalPort = localPort;
     initialise();
 }
 
@@ -1087,7 +1091,6 @@ void SipCall::initialise()
     sipAudioRtpPort = atoi((const char *)gContext->GetSetting("AudioLocalPort"));
     sipVideoRtpPort = atoi((const char *)gContext->GetSetting("VideoLocalPort"));
 
-    sipLocalPort = 5060;
     sipRtpPacketisation = 20;
     State = SIP_IDLE;
     remoteAudioPort = 0;
@@ -2024,7 +2027,7 @@ SipSubscriber::SipSubscriber(SipFsm *par, QString localIp, int localPort, SipReg
     if (regProxy)
         MyUrl = new SipUrl("", regProxy->registeredAs(), regProxy->registeredTo(), 5060);
     else
-        MyUrl = new SipUrl("", "MythPhone", sipLocalIp, 5060);
+        MyUrl = new SipUrl("", "MythPhone", sipLocalIp, sipLocalPort);
     MyContactUrl = new SipUrl("", "", sipLocalIp, sipLocalPort);
     cseq = 2;
 
@@ -2059,6 +2062,7 @@ int SipSubscriber::FSM(int Event, SipMsg *sipMsg, void *Value)
         if (expires == -1) // No expires in SUBSCRIBE, choose default value
             expires = 600;
         BuildSendStatus(200, "SUBSCRIBE", sipMsg->getCSeqValue(), SIP_OPT_CONTACT | SIP_OPT_EXPIRES, expires);
+        DebugSent += "  Sent 200 OK for Subscribe\n";
         if (expires > 0)
         {
             (parent->Timer())->Start(this, expires*1000, SIP_SUBSCRIBE_EXPIRE); // Expire subscription
@@ -2185,7 +2189,7 @@ SipWatcher::SipWatcher(SipFsm *par, QString localIp, int localPort, SipRegistrat
     if (regProxy)
         MyUrl = new SipUrl("", regProxy->registeredAs(), regProxy->registeredTo(), 5060);
     else
-        MyUrl = new SipUrl("", "MythPhone", sipLocalIp, 5060);
+        MyUrl = new SipUrl("", "MythPhone", sipLocalIp, sipLocalPort);
     MyContactUrl = new SipUrl("", "", sipLocalIp, sipLocalPort);
 
     FSM(SIP_WATCH, 0);
