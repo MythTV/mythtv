@@ -13,23 +13,27 @@ extern "C" {
 
 #include "common.h"
 
-#define LIBAVCODEC_VERSION_INT 0x000408
-#define LIBAVCODEC_VERSION     "0.4.8"
-#define LIBAVCODEC_BUILD       4677
-#define LIBAVCODEC_BUILD_STR   "4677"
+#define FFMPEG_VERSION_INT     0x000408
+#define FFMPEG_VERSION         "0.4.8"
+#define LIBAVCODEC_BUILD       4679
 
-#define LIBAVCODEC_IDENT	"FFmpeg" LIBAVCODEC_VERSION "b" LIBAVCODEC_BUILD_STR
+#define LIBAVCODEC_VERSION_INT FFMPEG_VERSION_INT
+#define LIBAVCODEC_VERSION     FFMPEG_VERSION
+
+#define AV_STRINGIFY(s)	AV_TOSTRING(s)
+#define AV_TOSTRING(s) #s
+#define LIBAVCODEC_IDENT	"FFmpeg" LIBAVCODEC_VERSION "b" AV_STRINGIFY(LIBAVCODEC_BUILD)
 
 enum CodecID {
     CODEC_ID_NONE, 
     CODEC_ID_MPEG1VIDEO,
-    CODEC_ID_MPEG2VIDEO,
+    CODEC_ID_MPEG2VIDEO, /* prefered ID for MPEG Video 1 or 2 decoding */
     CODEC_ID_MPEG2VIDEO_XVMC,
     CODEC_ID_MPEG2VIDEO_VIA,
     CODEC_ID_H263,
     CODEC_ID_RV10,
     CODEC_ID_MP2,
-    CODEC_ID_MP3LAME,
+    CODEC_ID_MP3, /* prefered ID for MPEG Audio layer 1, 2 or3 decoding */
     CODEC_ID_VORBIS,
     CODEC_ID_AC3,
     CODEC_ID_MJPEG,
@@ -69,6 +73,8 @@ enum CodecID {
     CODEC_ID_MDEC,
     CODEC_ID_ROQ,
     CODEC_ID_INTERPLAY_VIDEO,
+    CODEC_ID_XAN_WC3,
+    CODEC_ID_XAN_WC4,
 
     /* various pcm "codecs" */
     CODEC_ID_PCM_S16LE,
@@ -83,6 +89,8 @@ enum CodecID {
     /* various adpcm codecs */
     CODEC_ID_ADPCM_IMA_QT,
     CODEC_ID_ADPCM_IMA_WAV,
+    CODEC_ID_ADPCM_IMA_DK3,
+    CODEC_ID_ADPCM_IMA_DK4,
     CODEC_ID_ADPCM_MS,
     CODEC_ID_ADPCM_4XM,
 
@@ -95,8 +103,11 @@ enum CodecID {
     /* various DPCM codecs */
     CODEC_ID_ROQ_DPCM,
     CODEC_ID_INTERPLAY_DPCM,
+    CODEC_ID_XAN_DPCM,
 };
-#define CODEC_ID_MPEGVIDEO CODEC_ID_MPEG1VIDEO
+
+/* CODEC_ID_MP3LAME is absolete */
+#define CODEC_ID_MP3LAME CODEC_ID_MP3
 
 enum CodecType {
     CODEC_TYPE_UNKNOWN = -1,
@@ -105,7 +116,19 @@ enum CodecType {
 };
 
 /**
- * Pixel format.
+ * Pixel format. Notes: 
+ *
+ * PIX_FMT_RGBA32 is handled in an endian-specific manner. A RGBA
+ * color is put together as:
+ *  (A << 24) | (R << 16) | (G << 8) | B
+ * This is stored as BGRA on little endian CPU architectures and ARGB on
+ * big endian CPUs.
+ *
+ * When the pixel format is palettized RGB (PIX_FMT_PAL8), the palettized
+ * image data is stored in AVFrame.data[0]. The palette is transported in
+ * AVFrame.data[1] and, is 1024 bytes long (256 4-byte entries) and is
+ * formatted the same as in PIX_FMT_RGBA32 described above (i.e., it is
+ * also endian-specific).
  */
 enum PixelFormat {
     PIX_FMT_YUV420P,   ///< Planar YUV 4:2:0 (1 Cr & Cb sample per 2x2 Y samples)
@@ -114,7 +137,7 @@ enum PixelFormat {
     PIX_FMT_BGR24,     ///< Packed pixel, 3 bytes per pixel, BGRBGR...
     PIX_FMT_YUV422P,   ///< Planar YUV 4:2:2 (1 Cr & Cb sample per 2x1 Y samples)
     PIX_FMT_YUV444P,   ///< Planar YUV 4:4:4 (1 Cr & Cb sample per 1x1 Y samples)
-    PIX_FMT_RGBA32,    ///< Packed pixel, 4 bytes per pixel, BGRABGRA...
+    PIX_FMT_RGBA32,    ///< Packed pixel, 4 bytes per pixel, BGRABGRA..., stored in cpu endianness
     PIX_FMT_YUV410P,   ///< Planar YUV 4:1:0 (1 Cr & Cb sample per 4x4 Y samples)
     PIX_FMT_YUV411P,   ///< Planar YUV 4:1:1 (1 Cr & Cb sample per 4x1 Y samples)
     PIX_FMT_RGB565,    ///< always stored in cpu endianness 
@@ -973,6 +996,7 @@ typedef struct AVCodecContext {
 #define FF_DEBUG_PTS       0x00000200
 #define FF_DEBUG_ER        0x00000400
 #define FF_DEBUG_MMCO      0x00000800
+#define FF_DEBUG_BUGS      0x00001000
     
     /**
      * error.
@@ -1211,6 +1235,14 @@ typedef struct AVCodecContext {
      * - decoding: set by lavc
      */
     uint16_t *inter_matrix;
+    
+    /**
+     * fourcc from the AVI stream header (LSB first, so "ABCD" -> ('D'<<24) + ('C'<<16) + ('B'<<8) + 'A').
+     * this is used to workaround some encoder bugs
+     * - encoding: unused
+     * - decoding: set by user, will be converted to upper case by lavc during init
+     */
+    unsigned int stream_codec_tag;
    
     /**
      * VIA CLE266 Hardware MPEG decoding
@@ -1294,6 +1326,25 @@ typedef struct AVPicture {
     int linesize[4];       ///< number of bytes per line
 } AVPicture;
 
+/**
+ * AVPaletteControl
+ * This structure defines a method for communicating palette changes
+ * between and demuxer and a decoder.
+ */
+typedef struct AVPaletteControl {
+
+    /* demuxer sets this to 1 to indicate the palette has changed;
+     * decoder resets to 0 */
+    int palette_changed;
+
+    /* 256 3-byte RGB palette entries; the components should be
+     * formatted in the buffer as "RGBRGB..." and should be scaled to
+     * 8 bits if they originally represented 6-bit VGA palette
+     * components */
+    unsigned char palette[256 * 3];
+
+} AVPaletteControl;
+
 extern AVCodec ac3_encoder;
 extern AVCodec mp2_encoder;
 extern AVCodec mp3lame_encoder;
@@ -1365,10 +1416,12 @@ extern AVCodec fourxm_decoder;
 extern AVCodec mdec_decoder;
 extern AVCodec roq_decoder;
 extern AVCodec interplay_video_decoder;
+extern AVCodec xan_wc3_decoder;
 extern AVCodec ra_144_decoder;
 extern AVCodec ra_288_decoder;
 extern AVCodec roq_dpcm_decoder;
 extern AVCodec interplay_dpcm_decoder;
+extern AVCodec xan_dpcm_decoder;
 
 /* pcm codecs */
 #define PCM_CODEC(id, name) \
@@ -1388,6 +1441,8 @@ PCM_CODEC(CODEC_ID_PCM_MULAW, pcm_mulaw);
 
 PCM_CODEC(CODEC_ID_ADPCM_IMA_QT, adpcm_ima_qt);
 PCM_CODEC(CODEC_ID_ADPCM_IMA_WAV, adpcm_ima_wav);
+PCM_CODEC(CODEC_ID_ADPCM_IMA_DK3, adpcm_ima_dk3);
+PCM_CODEC(CODEC_ID_ADPCM_IMA_DK4, adpcm_ima_dk4);
 PCM_CODEC(CODEC_ID_ADPCM_MS, adpcm_ms);
 PCM_CODEC(CODEC_ID_ADPCM_4XM, adpcm_4xm);
 

@@ -2481,6 +2481,7 @@ static int decode_frame(AVCodecContext * avctx,
                     avctx->sample_rate = s->sample_rate;
                     avctx->channels = s->nb_channels;
                     avctx->bit_rate = s->bit_rate;
+                    avctx->sub_id = s->layer;
                     switch(s->layer) {
                     case 1:
                         avctx->frame_size = 384;
@@ -2597,7 +2598,7 @@ AVCodec mp3_decoder =
 {
     "mp3",
     CODEC_TYPE_AUDIO,
-    CODEC_ID_MP3LAME,
+    CODEC_ID_MP3,
     sizeof(MPADecodeContext),
     decode_init,
     NULL,

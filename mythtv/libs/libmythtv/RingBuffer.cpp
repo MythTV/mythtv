@@ -813,10 +813,8 @@ void RingBuffer::ReadAheadThread(void)
             readsAllowedWait.wakeAll();
 
         availWaitMutex.lock();
-        if (ateof || stopreads || wanttoread <= used)
-        {
+        if (ateof || stopreads || (wanttoread <= used && wanttoread > 0))
             availWait.wakeAll();
-        }
         availWaitMutex.unlock();
             
         pthread_rwlock_unlock(&rwlock);
@@ -852,15 +850,19 @@ int RingBuffer::ReadFromBuf(void *buf, int count)
 
     int avail = ReadBufAvail();
 
-    if (avail < count && !stopreads)
+    while (avail < count && !stopreads)
     {
         availWaitMutex.lock();
         wanttoread = count;
-        availWait.wait(&availWaitMutex, 1000);
+        if (!availWait.wait(&availWaitMutex, 2000))
+            cerr << "Waited 2 seconds for data to become available, waiting "
+                    "again...\n";
         wanttoread = 0;
         availWaitMutex.unlock();
 
         avail = ReadBufAvail();
+        if (ateof && avail < count)
+            count = avail;
     }
 
     if ((ateof || stopreads) && avail < count)

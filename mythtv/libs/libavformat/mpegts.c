@@ -492,8 +492,8 @@ static void pat_scan_cb(void *opaque, const uint8_t *section, int section_len)
             if (name && provider_name) {
                 new_service(ts, sid, provider_name, name);
             } else {
-                //av_freep(&name);
-                //av_freep(&provider_name);
+                av_freep(&name);
+                av_freep(&provider_name);
             }
         }
     }

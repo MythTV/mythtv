@@ -15,4 +15,4 @@ HEADERS += avformat.h avi.h avio.h
 
 SOURCES += 4xm.c allformats.c asf.c avidec.c avienc.c avio.c aviobuf.c cutils.c
 SOURCES += file.c mov.c mpeg.c mpegts.c mpegtsenc.c mpjpeg.c rm.c utils.c wav.c
-SOURCES += flvenc.c flvdec.c
+SOURCES += flvenc.c flvdec.c os_support.c

@@ -234,7 +234,7 @@ static void mpeg1_encode_sequence_header(MpegEncContext *s)
             
             put_bits(&s->pb, 4, s->aspect_ratio_info);
             put_bits(&s->pb, 4, s->frame_rate_index);
-
+            
             if(s->avctx->rc_max_rate){
                 v = (s->avctx->rc_max_rate + 399) / 400;
                 if (v > 0x3ffff && s->codec_id == CODEC_ID_MPEG1VIDEO)
@@ -252,7 +252,7 @@ static void mpeg1_encode_sequence_header(MpegEncContext *s)
 
             put_bits(&s->pb, 18, v & 0x3FFFF);
             put_bits(&s->pb, 1, 1); /* marker */
-            put_bits(&s->pb, 10, vbv_buffer_size & 0x3FF);
+            put_bits(&s->pb, 10, vbv_buffer_size & 0x3FF); 
             put_bits(&s->pb, 1, 1); /* constrained parameter flag */
             
             ff_write_quant_matrix(&s->pb, s->avctx->intra_matrix);

@@ -222,6 +222,7 @@ void avcodec_default_release_buffer(AVCodecContext *s, AVFrame *pic){
     assert(pic->type==FF_BUFFER_TYPE_INTERNAL);
     assert(s->internal_buffer_count);
 
+    buf = NULL; /* avoids warning */
     for(i=0; i<s->internal_buffer_count; i++){ //just 3-5 checks so is not worth to optimize
         buf= &((InternalBuffer*)s->internal_buffer)[i];
         if(buf->data[0] == pic->data[0])
@@ -303,6 +304,9 @@ AVFrame *avcodec_alloc_frame(void){
 int avcodec_open(AVCodecContext *avctx, AVCodec *codec)
 {
     int ret;
+
+    if(avctx->codec)
+        return -1;
 
     avctx->codec = codec;
     avctx->codec_id = codec->id;
@@ -470,6 +474,12 @@ void avcodec_string(char *buf, int buf_size, AVCodecContext *enc, int encode)
 
     if (p) {
         codec_name = p->name;
+        if (!encode && enc->codec_id == CODEC_ID_MP3) {
+            if (enc->sub_id == 2)
+                codec_name = "mp2";
+            else if (enc->sub_id == 1)
+                codec_name = "mp1";
+        }
     } else if (enc->codec_name[0] != '\0') {
         codec_name = enc->codec_name;
     } else {

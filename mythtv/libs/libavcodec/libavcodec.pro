@@ -27,7 +27,7 @@ SOURCES += ratecontrol.c adpcm.c eval.c jfdctint.c dv.c error_resilience.c
 SOURCES += wmadec.c fft.c mdct.c mace.c huffyuv.c opts.c cyuv.c
 SOURCES += golomb.c h264.c raw.c indeo3.c asv1.c vp3.c 4xm.c cabac.c
 SOURCES += ffv1.c ra144.c ra288.c vcr1.c cljr.c roqvideo.c dpcm.c
-SOURCES += interplayvideo.c
+SOURCES += interplayvideo.c xan.c
 
 contains( CONFIG_AC3, yes ) {
     SOURCES += a52dec.c

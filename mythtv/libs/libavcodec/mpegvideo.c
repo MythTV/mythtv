@@ -24,7 +24,6 @@
  * The simplest mpeg encoder (well, it was the simplest!).
  */ 
  
-#include <ctype.h>
 #include <limits.h>
 #include "avcodec.h"
 #include "dsputil.h"
@@ -371,6 +370,11 @@ int MPV_common_init(MpegEncContext *s)
                         + (toupper((s->avctx->codec_tag>>8 )&0xFF)<<8 )
                         + (toupper((s->avctx->codec_tag>>16)&0xFF)<<16) 
                         + (toupper((s->avctx->codec_tag>>24)&0xFF)<<24);
+
+    s->avctx->stream_codec_tag=   toupper( s->avctx->stream_codec_tag     &0xFF)          
+                               + (toupper((s->avctx->stream_codec_tag>>8 )&0xFF)<<8 )
+                               + (toupper((s->avctx->stream_codec_tag>>16)&0xFF)<<16) 
+                               + (toupper((s->avctx->stream_codec_tag>>24)&0xFF)<<24);
 
     CHECKED_ALLOCZ(s->allocated_edge_emu_buffer, (s->width+64)*2*17*2); //(width + edge + align)*interlaced*MBsize*tolerance
     s->edge_emu_buffer= s->allocated_edge_emu_buffer + (s->width+64)*2*17;
@@ -875,7 +879,7 @@ int MPV_encode_end(AVCodecContext *avctx)
     MPV_common_end(s);
     if (s->out_format == FMT_MJPEG)
         mjpeg_close(s);
-        
+
     av_freep(&avctx->extradata);
       
     return 0;
@@ -3333,7 +3337,6 @@ static void encode_picture(MpegEncContext *s, int picture_number)
 #ifdef CONFIG_RISKY
     /* we need to initialize some time vars before we can encode b-frames */
     // RAL: Condition added for MPEG1VIDEO
-    //FIXME figure out why mpeg1/2 need this !!!
     if (s->codec_id == CODEC_ID_MPEG1VIDEO || s->codec_id == CODEC_ID_MPEG2VIDEO || (s->h263_pred && !s->h263_msmpeg4))
         ff_set_mpeg4_time(s, s->picture_number); 
 #endif
@@ -3514,6 +3517,8 @@ static void encode_picture(MpegEncContext *s, int picture_number)
 #endif
     case FMT_MPEG1:
         mpeg1_encode_picture_header(s, picture_number);
+        break;
+    case FMT_H264:
         break;
     }
     bits= get_bit_count(&s->pb);
@@ -3750,9 +3755,11 @@ static void encode_picture(MpegEncContext *s, int picture_number)
                     s->tex_pb= backup_s.tex_pb;
                 }
                 s->last_bits= get_bit_count(&s->pb);
-                
+               
+#ifdef CONFIG_RISKY
                 if (s->out_format == FMT_H263 && s->pict_type!=B_TYPE)
                     ff_h263_update_motion_val(s);
+#endif
         
                 if(next_block==0){
                     s->dsp.put_pixels_tab[0][0](s->dest[0], s->me.scratchpad     , s->linesize  ,16);
@@ -3916,9 +3923,11 @@ static void encode_picture(MpegEncContext *s, int picture_number)
                 // RAL: Update last macrobloc type
                 s->last_mv_dir = s->mv_dir;
             
+#ifdef CONFIG_RISKY
                 if (s->out_format == FMT_H263 && s->pict_type!=B_TYPE)
                     ff_h263_update_motion_val(s);
-
+#endif
+		
                 MPV_decode_mb(s, s->block);
             }
 

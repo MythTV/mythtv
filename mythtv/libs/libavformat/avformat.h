@@ -5,14 +5,13 @@
 extern "C" {
 #endif
 
-#define LIBAVFORMAT_VERSION_INT 0x000408  
-#define LIBAVFORMAT_VERSION     "0.4.8"
-#define LIBAVFORMAT_BUILD       4606
-#define LIBAVFORMAT_BUILD_STR   "4606"
+#define LIBAVFORMAT_BUILD       4608
 
-#define LIBAVFORMAT_IDENT      "FFmpeg" LIBAVFORMAT_VERSION "b" LIBAVFORMAT_BUILD_STR
+#define LIBAVFORMAT_VERSION_INT FFMPEG_VERSION_INT
+#define LIBAVFORMAT_VERSION     FFMPEG_VERSION
+#define LIBAVFORMAT_IDENT	"FFmpeg" FFMPEG_VERSION "b" AV_STRINGIFY(LIBAVFORMAT_BUILD)
 
-#define CONFIG_RISKY 1
+#include <time.h>
 
 #include "avcodec.h"
 
@@ -126,10 +125,9 @@ typedef struct AVOutputFormat {
     enum CodecID audio_codec; /* default audio codec */
     enum CodecID video_codec; /* default video codec */
     int (*write_header)(struct AVFormatContext *);
-    /* XXX: change prototype for 64 bit pts */
     int (*write_packet)(struct AVFormatContext *, 
                         int stream_index,
-                        unsigned char *buf, int size, int force_pts);
+                        const uint8_t *buf, int size, int64_t pts);
     int (*write_trailer)(struct AVFormatContext *);
     /* can use flags: AVFMT_NOFILE, AVFMT_NEEDNUMBER */
     int flags;
@@ -194,7 +192,7 @@ typedef struct AVStream {
     float quality; 
     /* decoding: position of the first frame of the component, in
        AV_TIME_BASE fractional seconds. */
-    int64_t start_time;
+    int64_t start_time; 
     /* decoding: duration of the stream, in AV_TIME_BASE fractional
        seconds. */
     int64_t duration;
@@ -217,6 +215,11 @@ typedef struct AVFormatContext {
     char author[512];
     char copyright[512];
     char comment[512];
+    char album[512];
+    int year;  /* ID3 year, 0 if none */
+    int track; /* track number, 0 if none */
+    char genre[32]; /* ID3 genre */
+
     int flags; /* format specific flags */
     /* private data for pts handling (do not modify directly) */
     int pts_wrap_bits; /* number of bits in pts (used for wrapping control) */
@@ -338,8 +341,8 @@ int avidec_init(void);
 /* swf.c */
 int swf_init(void);
 
-/* mov.c */
-int mov_init(void);
+/* movenc.c */
+int movenc_init(void);
 
 /* flvenc.c */
 int flvenc_init(void);
@@ -466,6 +469,9 @@ int audio_init(void);
 int dv1394_init(void);
 
 #ifdef HAVE_AV_CONFIG_H
+
+#include "os_support.h"
+
 int strstart(const char *str, const char *val, const char **ptr);
 int stristart(const char *str, const char *val, const char **ptr);
 void pstrcpy(char *buf, int buf_size, const char *str);
@@ -480,6 +486,10 @@ do {\
     (void)sizeof(**_tab == _elem); /* check that types are compatible */\
     __dynarray_add((unsigned long **)_tab, nb_ptr, (unsigned long)_elem);\
 } while(0)
+
+time_t mktimegm(struct tm *tm);
+const char *small_strptime(const char *p, const char *fmt, 
+                           struct tm *dt);
 
 struct in_addr;
 int resolve_host(struct in_addr *sin_addr, const char *hostname);

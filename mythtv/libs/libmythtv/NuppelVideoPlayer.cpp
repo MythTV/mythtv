@@ -410,14 +410,14 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
     if (decoder)
         delete decoder;
 
-    if (!disablevideo && IvtvDecoder::CanHandle(testbuf, 
-                                                ringBuffer->GetFilename()))
+    if (NuppelDecoder::CanHandle(testbuf))
+        decoder = new NuppelDecoder(this, m_db, m_playbackinfo);
+    else if (!disablevideo && IvtvDecoder::CanHandle(testbuf,
+                                                     ringBuffer->GetFilename()))
     {
         decoder = new IvtvDecoder(this, m_db, m_playbackinfo);
         disableaudio = true; // no audio with ivtv.
     }
-    else if (NuppelDecoder::CanHandle(testbuf))
-        decoder = new NuppelDecoder(this, m_db, m_playbackinfo);
     else if (AvFormatDecoder::CanHandle(testbuf, ringBuffer->GetFilename()))
         decoder = new AvFormatDecoder(this, m_db, m_playbackinfo);
 
