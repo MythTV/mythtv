@@ -571,7 +571,7 @@ class UIManagedTreeListType : public UIType
     void    Draw(QPainter *, int drawlayer, int context);
     void    assignTreeData(GenericTree *a_tree);
     void    moveToNode(QValueList<int> route_of_branches);
-    void    moveToNodesFirstChild(QValueList<int> route_of_ranchs);
+    void    moveToNodesFirstChild(QValueList<int> route_of_branchs);
     QValueList <int> * getRouteToActive();
     bool    tryToSetActive(QValueList <int> route);
     void    setHighlightImage(QPixmap an_image){highlight_image = an_image;}
