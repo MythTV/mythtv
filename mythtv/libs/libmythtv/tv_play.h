@@ -191,6 +191,7 @@ class TV : public QObject
     bool paused;
 
     int autoCommercialSkip;
+    bool tryUnflaggedSkip;
 
     float frameRate;
 

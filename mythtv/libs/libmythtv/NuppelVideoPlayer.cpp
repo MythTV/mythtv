@@ -3738,6 +3738,15 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
             hascommbreaktable = true;
     }
 
+    if (!hascommbreaktable && !tryunflaggedskip)
+    {
+        QString desc = "";
+        int pos = calcSliderPos(desc);
+        QString mesg = QObject::tr("Not Flagged");
+        osd->StartPause(pos, false, mesg, desc, 2);
+        return false;
+    }
+
     if (hascommbreaktable)
     {
         SetCommBreakIter();

@@ -678,6 +678,8 @@ void TV::SetupPlayer(void)
     autoCommercialSkip = gContext->GetNumSetting("AutoCommercialSkip");
     nvp->SetAutoCommercialSkip(autoCommercialSkip);
     nvp->SetCommercialSkipMethod(gContext->GetNumSetting("CommercialSkipMethod"));
+    tryUnflaggedSkip = gContext->GetNumSetting("TryUnflaggedSkip");
+    nvp->SetTryUnflaggedSkip(tryUnflaggedSkip);
 
     osd_display_time = gContext->GetNumSetting("OSDDisplayTime");
 

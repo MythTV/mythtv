@@ -268,6 +268,19 @@ public:
     };
 };
 
+class TryUnflaggedSkip: public CheckBoxSetting, public GlobalSetting {
+public:
+    TryUnflaggedSkip():
+        GlobalSetting("TryUnflaggedSkip") {
+        setLabel("Skip Unflagged Commercials");
+        setValue(false);
+        setHelpText("Try to skip commercial breaks even if they have not "
+                    "been flagged.  This does not always work well and can "
+                    "disrupt playback if commercial breaks aren't detected "
+                    "properly.");
+    };
+};
+
 class AutoCommercialFlag: public CheckBoxSetting, public BackendSetting {
 public:
     AutoCommercialFlag():
@@ -1447,6 +1460,7 @@ PlaybackSettings::PlaybackSettings()
     comms->addChild(new AggressiveCommDetect());
     comms->addChild(new CommSkipAllBlanks());
     comms->addChild(new AutoCommercialSkip());
+    comms->addChild(new TryUnflaggedSkip());
     addChild(comms);
 
     VerticalConfigurationGroup* oscan = new VerticalConfigurationGroup(false);

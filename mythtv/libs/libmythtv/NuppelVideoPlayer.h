@@ -58,6 +58,7 @@ class NuppelVideoPlayer
 
     void SetExactSeeks(bool exact) { exactseeks = exact; }
     void SetAutoCommercialSkip(int autoskip);
+    void SetTryUnflaggedSkip(bool tryskip) { tryunflaggedskip = tryskip; };
     void SetCommercialSkipMethod(int method) { commercialskipmethod = method; }
 
     void StartPlaying(void);
@@ -372,6 +373,7 @@ class NuppelVideoPlayer
     int skipcommercials;
     int autocommercialskip;
     int commercialskipmethod;
+    bool tryunflaggedskip;
 
     QString cclines[4];
     int ccindent[4];
