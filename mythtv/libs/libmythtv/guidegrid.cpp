@@ -1548,6 +1548,7 @@ void GuideGrid::quickRecord()
 
     fillProgramInfos();
     update(programRect());
+    update(infoRect());
 }
 
 void GuideGrid::displayInfo()
