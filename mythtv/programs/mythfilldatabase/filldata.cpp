@@ -856,20 +856,26 @@ void fillData(QValueList<Source> &sourcelist)
             {
                 int nextoffset = i + 1;
                 QString querystr;
-                querystr.sprintf("SELECT NULL FROM program WHERE starttime >= "
+                querystr.sprintf("SELECT COUNT(*) FROM program, channel "
+                                 "WHERE program.chanid = channel.chanid "
+                                 "AND channel.sourceid = %d "
+                                 "AND starttime >= "
                                  "DATE_ADD(CURRENT_DATE, INTERVAL %d DAY) AND "
                                  "starttime < DATE_ADD(CURRENT_DATE, INTERVAL %d "
-                                 "DAY);", i, nextoffset);
+                                 "DAY);", (*it).id, i, nextoffset);
                 
                 QSqlQuery query;
                 query.exec(querystr);
                 
-                if (query.isActive() && query.numRowsAffected() > 20)
-                {
-                }
-                else
-                {
-                    grabData(*it, i);
+                if (query.isActive() && query.numRowsAffected() > 0) {
+
+                    query.next();
+                    if (query.value(0).toInt() < 20)
+                        grabData(*it, i);
+
+                } else {
+                    cout << "DB error when checking for existing program data: "
+                         << query.lastError().databaseText() << endl;
                 }
             }
         }
