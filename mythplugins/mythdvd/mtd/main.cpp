@@ -92,6 +92,7 @@ int main(int argc, char **argv)
             cerr << "mtd: Failed to run as a daemon. Bailing out." << endl ;
             return -1;
         }
+        cout << endl;
     }
 
     //

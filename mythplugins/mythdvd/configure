@@ -66,8 +66,8 @@ if test "$transcode" = "yes" ; then
     #
     #   Conditional build and link stuff for mtd
     #
-    echo "HEADERS += logging.h   mtd.h   serversocket.h   jobthread.h   dvdprobe.h"   >> ./mtd/config.pro
-    echo "SOURCES += logging.cpp mtd.cpp serversocket.cpp jobthread.cpp dvdprobe.cpp" >> ./mtd/config.pro
+    echo "HEADERS += logging.h   mtd.h   serversocket.h   jobthread.h   dvdprobe.h   fileobs.h"   >> ./mtd/config.pro
+    echo "SOURCES += logging.cpp mtd.cpp serversocket.cpp jobthread.cpp dvdprobe.cpp fileobs.cpp" >> ./mtd/config.pro
     echo "LIBS    += -ldvdread"                                          >> ./mtd/config.pro
 
     #

@@ -139,6 +139,20 @@ public:
     };
 };
 
+class MTDRipSize: public SpinBoxSetting, public GlobalSetting {
+public:
+    MTDRipSize():
+        SpinBoxSetting(0, 4096, 1),
+        GlobalSetting("MTDRipSize") {
+        setLabel("Ripped video segments");
+        setValue(0);
+        setHelpText("If set to something other than 0, ripped "
+                    "video titles will be broken up into files "
+                    "of this size (in MB). Only applies to Perfect "
+                    "quality recordings, not intermediate files.");
+    };
+};
+
 RipperSettings::RipperSettings()
 {
     VerticalConfigurationGroup* rippersettings = new VerticalConfigurationGroup(false);
@@ -147,6 +161,7 @@ RipperSettings::RipperSettings()
     rippersettings->addChild(new TitlePlayCommand());
     rippersettings->addChild(new MTDPortNumber());
     rippersettings->addChild(new MTDNiceLevel());
+    rippersettings->addChild(new MTDRipSize());
     rippersettings->addChild(new MTDLogFlag());
     addChild(rippersettings);
 }

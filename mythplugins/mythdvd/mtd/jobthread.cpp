@@ -62,7 +62,7 @@ DVDPerfectThread::DVDPerfectThread(MTD *owner,
     job_name = QString("Perfect DVD Rip of %1").arg(name);
     dvd_device_location = dvd_device;
     dvd_title = track - 1;
-    destination = new QFile(dest_file);
+    ripfile = new RipFile(dest_file, ".mpg");
 }
 
 void DVDPerfectThread::run()
@@ -112,9 +112,9 @@ void DVDPerfectThread::run()
     //  Lets open our destination file
     //
     
-    if(!destination->open(IO_WriteOnly | IO_Raw | IO_Truncate))
+    if(!ripfile->open(IO_WriteOnly | IO_Raw | IO_Truncate))
     {
-        problem(QString("DVDPerfectThread could not open output file: %1").arg(destination->name()));
+        problem(QString("DVDPerfectThread could not open output file: %1").arg(ripfile->name()));
         dvd_device_access->unlock();
         return;
     }
@@ -130,7 +130,7 @@ void DVDPerfectThread::run()
     if(!the_dvd)
     {
         problem(QString("DVDPerfectThread could not access this dvd device: %1").arg(dvd_device_location));
-        destination->remove();
+        ripfile->remove();
         dvd_device_access->unlock();
         return;
     }
@@ -140,7 +140,7 @@ void DVDPerfectThread::run()
     if(!vmg_file)
     {
         problem("DVDPerfectThread could not open VMG info.");
-        destination->remove();
+        ripfile->remove();
         DVDClose(the_dvd);
         dvd_device_access->unlock();
         return;
@@ -154,7 +154,7 @@ void DVDPerfectThread::run()
     if(dvd_title < 0 || dvd_title > tt_srpt->nr_of_srpts )
     {
         problem(QString("DVDPerfectThread could not open title number %1").arg(dvd_title + 1));
-        destination->remove();
+        ripfile->remove();
         ifoClose(vmg_file);
         DVDClose(the_dvd);
         dvd_device_access->unlock();
@@ -165,7 +165,7 @@ void DVDPerfectThread::run()
     if(!vts_file)
     {
         problem("DVDPerfectThread could not open the title's info file");
-        destination->remove();
+        ripfile->remove();
         ifoClose(vmg_file);
         DVDClose(the_dvd);
         dvd_device_access->unlock();
@@ -193,7 +193,7 @@ void DVDPerfectThread::run()
     if(!title)
     {
         problem("DVDPerfectThread could not open the title's actual VOB(s)");
-        destination->remove();
+        ripfile->remove();
         ifoClose(vts_file);
         ifoClose(vmg_file);
         DVDClose(the_dvd);
@@ -248,7 +248,7 @@ void DVDPerfectThread::run()
                 DVDCloseFile( title );
                 DVDClose(the_dvd);
                 dvd_device_access->unlock();
-                destination->remove();
+                ripfile->remove();
                 return;
             }
             
@@ -296,7 +296,7 @@ void DVDPerfectThread::run()
                         .arg(cur_output_size)
                         .arg(cur_pack)
                        );
-                destination->remove();
+                ripfile->remove();
                 ifoClose(vts_file);
                 ifoClose(vmg_file);
                 DVDCloseFile( title );
@@ -307,19 +307,13 @@ void DVDPerfectThread::run()
             
             amount_read += len;
 
-            //
-            //  this doesn't work:
-            //
-            //  destination->writeBlock( (char*) video_data, cur_output_size * DVD_VIDEO_LB_LEN);
-            //
-            //
-            // fwrite( video_data, cur_output_size, DVD_VIDEO_LB_LEN, stdout);
-            //
 
             overall_progress = (double) (amount_read) / (double) (overall_size);
             subjob_progress = overall_progress;
             
-            write(destination->handle(), video_data, cur_output_size * DVD_VIDEO_LB_LEN);
+            // write(ripfile->handle(), video_data, cur_output_size * DVD_VIDEO_LB_LEN);
+
+            ripfile->writeBlocks(video_data, cur_output_size * DVD_VIDEO_LB_LEN);
 
             cur_pack = next_vobu;
 
@@ -331,7 +325,7 @@ void DVDPerfectThread::run()
             if(!keepGoing())
             {
                 problem("abandoned job because master control said we need to shut down");
-                destination->remove();
+                ripfile->remove();
                 ifoClose(vts_file);
                 ifoClose(vmg_file);
                 DVDCloseFile( title );
@@ -350,7 +344,15 @@ void DVDPerfectThread::run()
     ifoClose(vmg_file);
     DVDCloseFile( title );
     DVDClose(the_dvd);
-    destination->close();
+    ripfile->close();
     dvd_device_access->unlock();
     return;
+}
+
+DVDPerfectThread::~DVDPerfectThread()
+{
+    if(ripfile);
+    {
+        delete ripfile;
+    }
 }

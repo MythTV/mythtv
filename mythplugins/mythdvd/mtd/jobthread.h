@@ -19,6 +19,7 @@
 #include <dvdread/ifo_read.h>
 #include <dvdread/nav_read.h>
 
+#include "fileobs.h"
 
 class MTD;
 
@@ -74,15 +75,17 @@ class DVDPerfectThread : public JobThread
                      const QString &name,
                      const QString &start_string,
                      int nice_priority);
+
+    ~DVDPerfectThread();
                      
     virtual void run();    
 
   private:
   
+    RipFile      *ripfile;
     QMutex       *dvd_device_access;
     QString      dvd_device_location;
     int          dvd_title;
-    QFile        *destination;
     dvd_reader_t *the_dvd;
     dvd_file_t   *title;
     unsigned char video_data[ 1024 * DVD_VIDEO_LB_LEN ];

@@ -503,7 +503,6 @@ void MTD::startDVD(const QStringList &tokens)
             file_name += " ";
         }        
     }
-    file_name += ".mpg";    //  Should that be VOB ?
 
     QString dvd_device = gContext->GetSetting("DVDDeviceLocation");
     if(dvd_device.length() < 1)
