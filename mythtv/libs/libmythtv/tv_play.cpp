@@ -986,9 +986,9 @@ void TV::ProcessKeypress(QKeyEvent *e)
             action = actions[i];
             handled = true;
 
-            if (action == "UP")
+            if (action == "UP" || action == "CHANNELUP")
                 BrowseDispInfo(BROWSE_UP);
-            else if (action == "DOWN")
+            else if (action == "DOWN" || action == "CHANNELDOWN")
                 BrowseDispInfo(BROWSE_DOWN);
             else if (action == "LEFT")
                 BrowseDispInfo(BROWSE_LEFT);
