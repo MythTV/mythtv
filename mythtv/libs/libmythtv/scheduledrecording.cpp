@@ -178,10 +178,6 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
 "    oldrecorded.description IS NOT NULL AND oldrecorded.description <> '' AND program.description = oldrecorded.description"
 "  ) "
 "WHERE "
-"channel.chanid = program.chanid "
-"AND "
-"record.title = program.title "
-"AND "
 "((record.type = %1) " // allrecord
 " OR "
 " ((record.chanid = program.chanid) " // channel matches
