@@ -488,29 +488,28 @@ int RingBuffer::safe_read(RemoteFile *rf, void *data, unsigned sz)
     bool hiteof = false;
     int reqsize = readblocksize;
 
-
     QSocket *sock = rf->getSocket();
 
+    do 
+    {
+        if (requestedblocks > 3)
+            break;
+
+        if (rf->RequestBlock(reqsize))
+        {
+            hiteof = true;
+            break;
+        }
+        requestedblocks++;
+    }
+    while (requestedblocks < 2);
+ 
     qApp->lock();
     unsigned int available = sock->bytesAvailable();
     qApp->unlock();
 
     while (available < sz) 
     {
-        do
-        {
-            if (requestedblocks > 3)
-                break;
- 
-            if (rf->RequestBlock(reqsize))
-            {
-                hiteof = true;
-                break;
-            }
-            requestedblocks++;
-        }
-        while (requestedblocks < 2);
- 
         if (hiteof)
             break;
 
