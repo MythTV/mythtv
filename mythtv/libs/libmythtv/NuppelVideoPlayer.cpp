@@ -507,7 +507,6 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
                 linearBlendYUV420(vbuffer[wpos], video_width, video_height);
 
             wpos = (wpos+1) % MAXVBUFFER;
-            //printf("wpos now '%d'\n", wpos);
             pthread_mutex_unlock(&video_buflock);
 
             if (vbuffer_numvalid() >= usepre)
