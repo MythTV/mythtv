@@ -1480,6 +1480,15 @@ void Database::warning(const QString &warning_message)
 Database::~Database()
 {
 
+    //
+    //  However I got wiped out, I need to tell the mfd any
+    //  metadata/playlists I own no longer exist
+    //
+            
+    metadata_server->deleteContainer(container_id);    
+    
+/*    
+    
     if(new_metadata)
     {
         delete new_metadata;
@@ -1490,5 +1499,6 @@ Database::~Database()
         delete new_playlists;
         new_playlists = NULL;
     }
+*/
 }
 
