@@ -1,16 +1,6 @@
 #ifndef TV_H
 #define TV_H
 
-#include <qstring.h>
-#include <pthread.h>
-
-#include "NuppelVideoRecorder.h"
-#include "NuppelVideoPlayer.h"
-#include "RingBuffer.h"
-
-#include "channel.h"
-#include "programinfo.h"
-
 typedef enum 
 {
     kState_Error = -1,

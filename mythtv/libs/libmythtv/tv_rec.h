@@ -9,6 +9,7 @@
 #include "RingBuffer.h"
 
 #include "channel.h"
+#include "programinfo.h"
 
 #include "tv.h"
 

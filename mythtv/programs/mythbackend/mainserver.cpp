@@ -147,6 +147,7 @@ void MainServer::customEvent(QCustomEvent *e)
         MythEvent *me = (MythEvent *)e;
 
         broadcast = me->Message();
+        broadcast << me->ExtraData();
         sendstuff = true;
     }
 
@@ -444,7 +445,7 @@ void MainServer::HandleGetPendingRecordings(PlaybackSock *pbs)
 {
     m_context->KickDatabase(QSqlDatabase::database());
 
-    Scheduler *sched = new Scheduler(QSqlDatabase::database());
+    Scheduler *sched = new Scheduler(NULL, NULL, QSqlDatabase::database());
 
     bool conflicts = sched->FillRecordLists(false);
     list<ProgramInfo *> *recordinglist = sched->getAllPending();
@@ -469,7 +470,7 @@ void MainServer::HandleGetConflictingRecordings(QStringList &slist,
 {
     m_context->KickDatabase(QSqlDatabase::database());
 
-    Scheduler *sched = new Scheduler(QSqlDatabase::database());
+    Scheduler *sched = new Scheduler(NULL, NULL, QSqlDatabase::database());
 
     bool removenonplaying = purge.toInt();
 

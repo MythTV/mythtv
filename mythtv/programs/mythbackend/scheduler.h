@@ -3,6 +3,8 @@
 
 class ProgramInfo;
 class QSqlDatabase;
+class EncoderLink;
+class MythContext;
 
 #include <qmap.h> 
 #include <list>
@@ -12,64 +14,69 @@ using namespace std;
 class Scheduler
 {
   public:
-      Scheduler(QSqlDatabase *ldb);
-     ~Scheduler();
+    Scheduler(MythContext *context, QMap<int, EncoderLink *> *tvList,
+              QSqlDatabase *ldb);
+   ~Scheduler();
 
-      bool CheckForChanges(void);
-      bool FillRecordLists(bool doautoconflicts = true);
+    bool CheckForChanges(void);
+    bool FillRecordLists(bool doautoconflicts = true);
 
-      void RemoveFirstRecording(void ); 
-      ProgramInfo *GetNextRecording(void);
+    void RemoveFirstRecording(void ); 
+    ProgramInfo *GetNextRecording(void);
 
-      list<ProgramInfo *> *getAllPending(void) { return &recordingList; }
+    list<ProgramInfo *> *getAllPending(void) { return &recordingList; }
 
-      list<ProgramInfo *> *getConflicting(ProgramInfo *pginfo,
-                                          bool removenonplaying = true,
-                                          list<ProgramInfo *> *uselist = NULL);
+    list<ProgramInfo *> *getConflicting(ProgramInfo *pginfo,
+                                        bool removenonplaying = true,
+                                        list<ProgramInfo *> *uselist = NULL);
 
-      void PrintList(void);
+    void PrintList(void);
+
+  protected:
+    void RunScheduler(void);
+    static void *SchedulerThread(void *param);
 
   private:
-      void setupCards(void);
+    void setupCards(void);
 
-      void MarkKnownInputs(void);
+    void MarkKnownInputs(void);
+    void MarkConflicts(list<ProgramInfo *> *uselist = NULL);
+    void PruneList(void);
 
-      void MarkConflicts(list<ProgramInfo *> *uselist = NULL);
-      void PruneList(void);
+    void MarkConflictsToRemove(void);
+    void MarkSingleConflict(ProgramInfo *info,
+                            list<ProgramInfo *> *conflictList);
+    void CheckOverride(ProgramInfo *info, list<ProgramInfo *> *conflictList);
+    void RemoveConflicts(void);
+    void GuessSingle(ProgramInfo *info, list<ProgramInfo *> *conflictList);
+    void GuessConflicts(void);
 
-      void MarkConflictsToRemove(void);
-      void MarkSingleConflict(ProgramInfo *info,
-                              list<ProgramInfo *> *conflictList);
-      void CheckOverride(ProgramInfo *info, list<ProgramInfo *> *conflictList);
-      void RemoveConflicts(void);
+    bool Conflict(ProgramInfo *a, ProgramInfo *b);
 
-      void GuessSingle(ProgramInfo *info, list<ProgramInfo *> *conflictList);
-      void GuessConflicts(void);
+    bool FindInOldRecordings(ProgramInfo *pginfo);      
 
-      bool Conflict(ProgramInfo *a, ProgramInfo *b);
+    ProgramInfo *GetBest(ProgramInfo *info, 
+                         list<ProgramInfo *> *conflictList);
+    void DoMultiCard();
 
-      bool FindInOldRecordings(ProgramInfo *pginfo);      
+    list<ProgramInfo *> *CopyList(list<ProgramInfo *> *sourcelist);
 
-      ProgramInfo *GetBest(ProgramInfo *info, 
-                           list<ProgramInfo *> *conflictList);
+    QSqlDatabase *db;
 
-      void DoMultiCard();
+    list<ProgramInfo *> recordingList;
 
-      list<ProgramInfo *> *CopyList(list<ProgramInfo *> *sourcelist);
+    bool hasconflicts;
 
-      QSqlDatabase *db;
+    int numcards;
+    int numsources;
+    int numinputs;
 
-      list<ProgramInfo *> recordingList;
+    QMap<int, int> numInputsPerSource;
+    QMap<int, vector<int> > sourceToInput;
+    QMap<int, int> inputToCard;
 
-      bool hasconflicts;
-
-      int numcards;
-      int numsources;
-      int numinputs;
-
-      QMap<int, int> numInputsPerSource;
-      QMap<int, vector<int> > sourceToInput;
-      QMap<int, int> inputToCard;
+    MythContext *m_context;
+    QMap<int, EncoderLink *> *m_tvList;   
 };
 
 #endif

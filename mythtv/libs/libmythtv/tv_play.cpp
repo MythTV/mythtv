@@ -142,20 +142,12 @@ TVState TV::LiveTV(void)
     return retval;
 }
 
-int TV::AllowRecording(ProgramInfo *rcinfo, int timeuntil)
+int TV::AllowRecording(const QString &message, int timeuntil)
 {
     if (internalState != kState_WatchingLiveTV)
     {
         return 1;
     }
-
-    QString message = QString("MythTV wants to record \"") + rcinfo->title;
-    if (m_context->GetNumSetting("DisplayChanNum") == 0)
-        message += QString("\" on ") + rcinfo->channame + " [" +
-                   rcinfo->chansign + "]";
-    else
-        message += "\" on Channel " + rcinfo->chanstr;
-    message += " in %d seconds.  Do you want to:";
 
     QString option1 = "Record and watch while it records";
     QString option2 = "Let it record and go back to the Main Menu";
@@ -1416,6 +1408,25 @@ void TV::customEvent(QCustomEvent *e)
                 nvp->SetLength(filelen);
                 nextState = kState_WatchingPreRecorded;
                 changeState = true;
+            }
+        }
+        else if (internalState == kState_WatchingLiveTV && 
+                 message.left(13) == "ASK_RECORDING")
+        {
+            message = message.simplifyWhiteSpace();
+            QStringList tokens = QStringList::split(" ", message);
+            int cardnum = tokens[1].toInt();
+            int timeuntil = tokens[2].toInt();
+
+            if (cardnum == recorder->GetRecorderNumber())
+            {
+                int retval = AllowRecording(me->ExtraData(), timeuntil);
+
+                QString resp = QString("ASK_RECORDING_RESPONSE %1 %2")
+                                    .arg(cardnum)
+                                    .arg(retval);
+                MythEvent newevent(resp);
+                m_context->dispatch(newevent);
             }
         }
     }

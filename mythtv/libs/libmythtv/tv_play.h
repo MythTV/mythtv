@@ -4,11 +4,14 @@
 #include <qstring.h>
 #include <pthread.h>
 
+#include <qobject.h>
+
 #include "NuppelVideoRecorder.h"
 #include "NuppelVideoPlayer.h"
 #include "RingBuffer.h"
 
 #include "channel.h"
+#include "programinfo.h"
 
 class QSqlDatabase;
 class QDateTime;
@@ -26,7 +29,7 @@ class TV : public QObject
 
     TVState LiveTV(void);
 
-    int AllowRecording(ProgramInfo *rcinfo, int timeuntil);
+    int AllowRecording(const QString &message, int timeuntil);
 
     // next two functions only work on recorded programs.
     void Playback(ProgramInfo *rcinfo);

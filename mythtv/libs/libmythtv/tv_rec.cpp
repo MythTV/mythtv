@@ -107,6 +107,20 @@ int TVRec::AllowRecording(ProgramInfo *rcinfo, int timeuntil)
         return 1;
     }
 
+    QString message = QString("MythTV wants to record \"") + rcinfo->title;
+    if (context->GetNumSetting("DisplayChanNum") == 0)
+        message += QString("\" on ") + rcinfo->channame + " [" +
+                   rcinfo->chansign + "]";
+    else
+        message += "\" on Channel " + rcinfo->chanstr;
+    message += " in %d seconds.  Do you want to:";
+
+    QString query = QString("ASK_RECORDING %1 %2").arg(m_capturecardnum)
+                                                  .arg(timeuntil - 2);
+
+    MythEvent me(query, message);
+    context->dispatch(me);
+
     return -1;
 }
 

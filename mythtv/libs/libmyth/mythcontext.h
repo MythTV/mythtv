@@ -24,13 +24,23 @@ class MythEvent : public QCustomEvent
     MythEvent(const QString &lmessage) : QCustomEvent(MythEventMessage)
     {
         message = lmessage;
+        extradata = "empty";
     }
+    MythEvent(const QString &lmessage, const QString &lextradata)
+           : QCustomEvent(MythEventMessage)
+    {
+        message = lmessage;
+        extradata = lextradata;
+    }
+    
     ~MythEvent() {}
 
     const QString Message() const { return message; }
- 
+    const QString ExtraData() const { return extradata; } 
+
   private:
     QString message;
+    QString extradata;
 };
 
 class MythContext : public QObject

@@ -459,13 +459,14 @@ void MythContext::readSocket(void)
         ReadStringList(serverSock, strlist);
 
         QString message = strlist[0];
+        QString extra = strlist[1];
 
         if (message == "BLAH")
         {
         }
         else
         {
-            MythEvent me(message);
+            MythEvent me(message, extra);
             dispatch(me);
         }
     }

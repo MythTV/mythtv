@@ -16,92 +16,6 @@ using namespace std;
 #include "libmyth/mythcontext.h"
 
 QMap<int, EncoderLink *> tvList;
-void *runScheduler(void *dummy)
-{
-    dummy = dummy;
-    //MythContext *context = (MythContext *)dummy;
-
-    QSqlDatabase *db = QSqlDatabase::database("SUBDB");
-
-    Scheduler *sched = new Scheduler(db);
-
-    bool asked = false;
-    int secsleft;
-    EncoderLink *nexttv = NULL;
-
-    ProgramInfo *nextRecording = NULL;
-    QDateTime nextrectime;
-    QDateTime curtime;
-    QDateTime lastupdate = QDateTime::currentDateTime().addDays(-1);
-
-    while (1)
-    {
-        curtime = QDateTime::currentDateTime();
-
-        if (sched->CheckForChanges() || 
-            (lastupdate.date().day() != curtime.date().day()))
-        {
-            sched->FillRecordLists();
-            //cout << "Found changes in the todo list.\n"; 
-            nextRecording = NULL;
-        }
-
-        if (!nextRecording)
-        {
-            lastupdate = curtime;
-            nextRecording = sched->GetNextRecording();
-            if (nextRecording)
-            {
-                nextrectime = nextRecording->startts;
-                //cout << "Will record " << nextRecording->title
-                //     << " in " << curtime.secsTo(nextrectime) << "secs.\n";
-                asked = false;
-                if (tvList.find(nextRecording->cardid) == tvList.end())
-                {
-                    cerr << "invalid cardid " << nextRecording->cardid << endl;
-                    exit(0);
-                }
-                nexttv = tvList[nextRecording->cardid];
-            }
-        }
-
-        if (nextRecording)
-        {
-            secsleft = curtime.secsTo(nextrectime);
-
-            //cout << secsleft << " seconds until " << nextRecording->title 
-            //     << endl;
-
-            if (nexttv->GetState() == kState_WatchingLiveTV && 
-                secsleft <= 30 && !asked)
-            {
-                asked = true;
-                int result = nexttv->AllowRecording(nextRecording, secsleft);
-
-                if (result == 3)
-                {
-                    //cout << "Skipping " << nextRecording->title << endl;
-                    sched->RemoveFirstRecording();
-                    nextRecording = NULL;
-                    continue;
-                }
-            }
-
-            if (secsleft <= -2)
-            {
-                nexttv->StartRecording(nextRecording);
-                //cout << "Started recording " << nextRecording->title << endl;
-                sched->RemoveFirstRecording();
-                nextRecording = NULL;
-                continue;
-            }
-        }
-       
-        sleep(1);
-    }
-    
-    return NULL;
-}
 
 void setupTVs(MythContext *context)
 {
@@ -161,8 +75,8 @@ int main(int argc, char **argv)
 
     setupTVs(context);
 
-    pthread_t scthread;
-    pthread_create(&scthread, NULL, runScheduler, context);
+    QSqlDatabase *scdb = QSqlDatabase::database("SUBDB");
+    Scheduler *sched = new Scheduler(context, &tvList, scdb);
 
     int port = context->GetNumSetting("ServerPort", 6543);
     int statusport = context->GetNumSetting("StatusPort", 6544);
@@ -173,5 +87,7 @@ int main(int argc, char **argv)
     a.exec();
 
     delete context;
+    delete sched;
+
     return 0;
 }

@@ -16,7 +16,10 @@ protected:
     };
 
     virtual QString setClause(void) {
-        return QString("recordid = %1, %2 = '%3'")
+        QString value = getValue();
+        value.replace(QRegExp("\""), QString("\\\""));
+
+        return QString("recordid = %1, %2 = \"%3\"")
             .arg(parent.getRecordID())
             .arg(getColumn())
             .arg(getValue());

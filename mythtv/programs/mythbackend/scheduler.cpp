@@ -12,13 +12,24 @@ using namespace std;
 
 #include "libmythtv/programinfo.h"
 #include "libmythtv/scheduledrecording.h"
+#include "encoderlink.h"
+#include "libmyth/mythcontext.h"
 
-Scheduler::Scheduler(QSqlDatabase *ldb)
+Scheduler::Scheduler(MythContext *context, QMap<int, EncoderLink *> *tvList,
+                     QSqlDatabase *ldb)
 {
     hasconflicts = false;
     db = ldb;
+    m_context = context;
+    m_tvList = tvList;
 
     setupCards();
+
+    if (tvList)
+    {
+        pthread_t scthread;
+        pthread_create(&scthread, NULL, SchedulerThread, this);
+    }
 }
 
 Scheduler::~Scheduler()
@@ -786,3 +797,90 @@ void Scheduler::DoMultiCard(void)
 
     delete copylist;
 }
+
+void Scheduler::RunScheduler(void)
+{
+    bool asked = false;
+    int secsleft;
+    EncoderLink *nexttv = NULL;
+
+    ProgramInfo *nextRecording = NULL;
+    QDateTime nextrectime;
+
+    QDateTime curtime;
+    QDateTime lastupdate = QDateTime::currentDateTime().addDays(-1);
+
+    while (1)
+    {
+        curtime = QDateTime::currentDateTime();
+
+        if (CheckForChanges() ||
+            (lastupdate.date().day() != curtime.date().day()))
+        {
+            FillRecordLists();
+            //cout << "Found changes in the todo list.\n";
+            nextRecording = NULL;
+        }
+
+        if (!nextRecording)
+        {
+            lastupdate = curtime;
+            nextRecording = GetNextRecording();
+            if (nextRecording)
+            {
+                nextrectime = nextRecording->startts;
+                //cout << "Will record " << nextRecording->title
+                //     << " in " << curtime.secsTo(nextrectime) << "secs.\n";
+                asked = false;
+                if (m_tvList->find(nextRecording->cardid) == m_tvList->end())
+                {
+                    cerr << "invalid cardid " << nextRecording->cardid << endl;
+                    exit(0);
+                }
+                nexttv = (*m_tvList)[nextRecording->cardid];
+            }
+        }
+
+        if (nextRecording)
+        {
+            secsleft = curtime.secsTo(nextrectime);
+
+            //cout << secsleft << " seconds until " << nextRecording->title
+            //     << endl;
+
+            if (nexttv->GetState() == kState_WatchingLiveTV &&
+                secsleft <= 30 && !asked)
+            {
+                asked = true;
+                int result = nexttv->AllowRecording(nextRecording, secsleft);
+
+                if (result == 3)
+                {
+                    //cout << "Skipping " << nextRecording->title << endl;
+                    RemoveFirstRecording();
+                    nextRecording = NULL;
+                    continue;
+                }
+            }
+
+            if (secsleft <= -2)
+            {
+                nexttv->StartRecording(nextRecording);
+                //cout << "Started recording " << nextRecording->title << endl;
+                RemoveFirstRecording();
+                nextRecording = NULL;
+                continue;
+            }
+        }
+
+        sleep(1);
+    }
+} 
+
+void *Scheduler::SchedulerThread(void *param)
+{
+    Scheduler *sched = (Scheduler *)param;
+    sched->RunScheduler();
+ 
+    return NULL;
+} 
