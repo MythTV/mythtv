@@ -32,7 +32,7 @@ void runWeather(void);
 
 void setupKeys(void)
 {
-    REG_JUMP("MythWeather", "Weather forcasts", "", runWeather);
+    REG_JUMP("MythWeather", "Weather forecasts", "", runWeather);
 
     REG_KEY("Weather", "PAUSE", "Pause current page", "P");
 }
