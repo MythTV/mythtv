@@ -105,7 +105,7 @@ bool MythPluginManager::init_plugin(const QString & plugname)
     return true;
 }
 
-void MythPluginManager::run_plugin(const QString & plugname)
+bool MythPluginManager::run_plugin(const QString & plugname)
 {
     QString newname = QString(PREFIX) + "/lib/mythtv/plugins/lib" + plugname +
                       ".so";
@@ -114,13 +114,14 @@ void MythPluginManager::run_plugin(const QString & plugname)
     {
         cerr << "Unable to run plugin '" << plugname 
              << "': not initialized" << endl;
-        return;
+        return false;
     }
 
     m_dict[newname]->run();
+    return true;
 }
 
-void MythPluginManager::config_plugin(const QString & plugname)
+bool MythPluginManager::config_plugin(const QString & plugname)
 {
     QString newname = QString(PREFIX) + "/lib/mythtv/plugins/lib" + plugname +
                       ".so";
@@ -129,10 +130,11 @@ void MythPluginManager::config_plugin(const QString & plugname)
     {
         cerr << "Unable to run plugin '" << plugname
              << "': not initialized" << endl;
-        return;
+        return false;
     }
 
     m_dict[newname]->config();
+    return true;
 }
 
 

@@ -480,7 +480,7 @@ void InitJumpPoints(void)
     REG_JUMP("Manage Recordings / Fix Conflicts", "", "", startManaged);
     REG_JUMP("Program Recording Priorities", "", "", startProgramRecPriorities);
     REG_JUMP("Channel Recording Priorities", "", "", startChannelRecPriorities);
-    REG_JUMP("TV Recording Playback", "", "F12", startPlayback);
+    REG_JUMP("TV Recording Playback", "", "", startPlayback);
     REG_JUMP("TV Recording Deletion", "", "", startDelete);
     REG_JUMP("Live TV", "", "", startTV);
     REG_JUMP("Manual Record Scheduling", "", "", startManual);
@@ -726,19 +726,13 @@ int main(int argc, char **argv)
 
     if (pluginname != "")
     {
-        if (MythPluginManager::init_plugin(pluginname))
-        {
-            MythPluginManager::run_plugin(pluginname);
+        if (MythPluginManager::run_plugin(pluginname))
             return 0;
-        }
         else
         {
             pluginname = "myth" + pluginname;
-            if (MythPluginManager::init_plugin(pluginname))
-            {
-                MythPluginManager::run_plugin(pluginname);
+            if (MythPluginManager::run_plugin(pluginname))
                 return 0;
-            }
         }
     }            
 

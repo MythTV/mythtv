@@ -47,8 +47,8 @@ class MythPluginManager
       
     static void init(void);
     static bool init_plugin(const QString &);
-    static void run_plugin(const QString &);
-    static void config_plugin(const QString &);
+    static bool run_plugin(const QString &);
+    static bool config_plugin(const QString &);
     static void unload_plugin(const QString &);
      
   private:
