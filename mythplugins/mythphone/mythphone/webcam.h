@@ -18,12 +18,17 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/ioctl.h>
 #include <fcntl.h>
 
+#ifndef WIN32
+#include <sys/ioctl.h>
 #include <linux/videodev.h>
 #include <mythtv/mythwidgets.h>
 #include <mythtv/dialogbox.h>
+#else
+#include <windows.h>
+#include <vfw.h>
+#endif
 
 
 #define RGB24_LEN(w,h)      ((w) * (h) * 3)
@@ -36,6 +41,24 @@
 #define _R(y,u,v) (0x2568*(y)  			       + 0x3343*(u)) /0x2000
 #define _G(y,u,v) (0x2568*(y) - 0x0c92*(v) - 0x1a1e*(u)) /0x2000
 #define _B(y,u,v) (0x2568*(y) + 0x40cf*(v))					     /0x2000
+
+#ifdef WIN32
+#define VIDEO_PALETTE_YUV420P   0
+#define VIDEO_PALETTE_YUV422    1 
+#define VIDEO_PALETTE_YUV422P   2 
+#define VIDEO_PALETTE_RGB32     3
+#define VIDEO_PALETTE_RGB24     4
+#define VIDEO_PALETTE_GREY      5
+#endif
+
+
+#ifdef WIN32
+#define WCHEIGHT    bitmapInfo.bmiHeader.biHeight
+#define WCWIDTH     bitmapInfo.bmiHeader.biWidth
+#else
+#define WCWIDTH     vWin.width
+#define WCHEIGHT    vWin.height
+#endif
 
 
 #define WC_CLIENT_BUFFERS   2
@@ -58,67 +81,77 @@ struct wcClient
 class WebcamEvent : public QCustomEvent
 {
 public:
-    enum Type { FrameReady = (QEvent::User + 200)  };
+    enum Type { FrameReady = (QEvent::User + 200), WebcamErrorEv, WebcamDebugEv  };
 
-    WebcamEvent(Type t, wcClient *c)
-        : QCustomEvent(t)
-    { client=c; }
-
-    ~WebcamEvent()
-    {
-    }
+    WebcamEvent(Type t, wcClient *c) : QCustomEvent(t) { client=c; }
+    WebcamEvent(Type t, QString s) : QCustomEvent(t) { text=s; }
+    ~WebcamEvent() {}
 
     wcClient *getClient() { return client; }
+    QString msg() { return text;}
 
 private:
     wcClient *client;
+    QString text;
 };
 
 
-class Webcam : public QObject
-{
 
-  Q_OBJECT
+class Webcam : public QThread
+{
 
   public:
 
-    Webcam(QObject *parent = 0, const char * = 0);
+    Webcam(QWidget *parent=0, QWidget *localVideoWidget=0);
     virtual ~Webcam(void);
+	virtual void run();
+    
     static QString devName(QString WebcamName);
     bool camOpen(QString WebcamName, int width, int height);
     void camClose(void);
-    bool SetPalette(int palette);
-    int  GetPalette(void) { return (vPic.palette); };
+    bool SetPalette(unsigned int palette);
+    unsigned int GetPalette(void);
+#ifndef WIN32
     int  SetBrightness(int v);
     int  SetContrast(int v);
     int  SetColour(int v);
     int  SetHue(int v);
-    int  SetTargetFps(wcClient *client, int fps);
     int  GetBrightness(void) { return (vPic.brightness);};
     int  GetColour(void) { return (vPic.colour);};
     int  GetContrast(void) { return (vPic.contrast);};
     int  GetHue(void) { return (vPic.hue);};
-    int  GetActualFps();
     QString GetName(void) { return vCaps.name; };
-    void GetMaxSize(int *x, int *y) { *y=vCaps.maxheight; *x=vCaps.maxwidth; };
-    void GetMinSize(int *x, int *y) { *y=vCaps.minheight; *x=vCaps.minwidth; };
-    void GetCurSize(int *x, int *y) { *y=vWin.height; *x=vWin.width; };
-    int isGreyscale(void) { return ((vCaps.type & VID_TYPE_MONOCHROME) ? true : false); };
+#endif
+    void SetFlip(bool b) { wcFlip=b; }
+
+
+    int  SetTargetFps(wcClient *client, int fps);
+    int  GetActualFps();
+    void GetMaxSize(int *x, int *y);
+    void GetMinSize(int *x, int *y);
+    void GetCurSize(int *x, int *y);
+    int isGreyscale(void);
 
     wcClient *RegisterClient(int format, int fps, QObject *eventWin);
     void UnregisterClient(wcClient *client);
     unsigned char *GetVideoFrame(wcClient *client);
     void FreeVideoBuffer(wcClient *client, unsigned char *buffer);
+    void ProcessFrame(unsigned char *frame, int fSize);
 
 
   private:
     void StartThread();
     void KillThread();
-    static void *WebcamThread(void *p);
     void WebcamThreadWorker();
 
+#ifdef WIN32
+    HWND hwndCap; 
+    HWND hwndWebcam;
+    static LRESULT CALLBACK frameReadyCallbackProc(HWND hWnd, LPVIDEOHDR lpVHdr);
+    static LRESULT CALLBACK ErrorCallbackProc(HWND hWnd, int nErrID, LPSTR lpErrorText);
+    static LRESULT CALLBACK StatusCallbackProc(HWND hWnd, int nID, LPSTR lpStatusText);
+#endif
 
-    pthread_t webcamthread;
     QPtrList<wcClient> wcClientList;
     QMutex WebcamLock;
 
@@ -134,15 +167,23 @@ class Webcam : public QObject
     int fps;
     int actualFps;
     bool killWebcamThread;
+    int wcFormat;
+    bool wcFlip;
 
-    // Camera-reported capabilities
+    int frameCount;
+    int totalCaptureMs;
+
+    // OS specific data structures
+#ifdef WIN32
+    CAPTUREPARMS capParams;
+    BITMAPINFO bitmapInfo;
+#else
     struct video_capability vCaps;
     struct video_window vWin;
     struct video_picture vPic;
     struct video_clip vClips;
-
+#endif
 
 };
-
 
 #endif

@@ -9,9 +9,16 @@
 #include <qthread.h>
 #include <qdatetime.h>
 
+#ifdef WIN32
+#include <windows.h>
+#include <io.h>
+#include <sstream>
+#include <mmsystem.h>
+#endif
 
 
-#define IP_MTU                    1460     // Standard MTU is 1500, less UDP header size of 40
+#define IP_MAX_MTU                1500     // Max size of rxed RTP packet
+#define IP_MTU                    1290     // Max size of txed RTP packet. Standard MTU is 1500, leave some room for IPSec etc
 #define TX_USER_STREAM_SIZE       4096
 #define MINBYTESIZE               80
 #define RTP_HEADER_SIZE           12
@@ -22,17 +29,26 @@
 #define MAX_DECOMP_AUDIO_SAMPLES  (MAX_COMP_AUDIO_SIZE) // CHANGE FOR HIGHER COMPRESSION CODECS; G.711 has same no. samples after decomp.
 #define PCM_SAMPLES_PER_MS        8
 
+// WIN32 driver constants
+#define NUM_MIC_BUFFERS		16	
+#define MIC_BUFFER_SIZE		MAX_DECOMP_AUDIO_SAMPLES
+#define NUM_SPK_BUFFERS		16	
+#define SPK_BUFFER_SIZE		MIC_BUFFER_SIZE // Need to keep these the same (see RTPPACKET)
+
 
 class RtpEvent : public QCustomEvent
 {
 public:
-    enum Type { RxVideoFrame = (QEvent::User + 300) };
+    enum Type { RxVideoFrame = (QEvent::User + 300), RtpDebugEv };
 
-    RtpEvent(Type t) : QCustomEvent(t) { }
+    RtpEvent(Type t, QString s="") : QCustomEvent(t) { text=s; }
     ~RtpEvent() {  }
+    QString msg() { return text;}
+
+private:
+    QString text;
 
 };
-
 
 
 
@@ -44,7 +60,7 @@ typedef struct RTPPACKET
 	ushort  RtpSequenceNumber;
 	ulong	  RtpTimeStamp;
 	ulong   RtpSourceID;
-	uchar	  RtpData[IP_MTU-RTP_HEADER_SIZE];
+	uchar	  RtpData[IP_MAX_MTU-RTP_HEADER_SIZE-UDP_HEADER_SIZE];
 } RTPPACKET;
 
 typedef struct 
@@ -91,7 +107,7 @@ typedef struct VIDEOBUFFER
 #define RTP_DTMF_VOLUMEMASK     0x3F
 #define JITTERQ_SIZE	          512
 #define PKLATE(c,r)             (((r)<(c)) && (((c)-(r))<32000))    // check if rxed seq-number is less than current but handle wrap
-#define H263SPACE               (IP_MTU-RTP_HEADER_SIZE-sizeof(H263_RFC2190_HDR))
+#define H263SPACE               (IP_MTU-RTP_HEADER_SIZE-UDP_HEADER_SIZE-sizeof(H263_RFC2190_HDR))
 
 #define DTMF_STAR 10
 #define DTMF_HASH 11
@@ -145,12 +161,28 @@ private:
 enum rtpTxMode { RTP_TX_AUDIO_FROM_BUFFER=1, RTP_TX_AUDIO_FROM_MICROPHONE=2, RTP_TX_AUDIO_SILENCE=3, RTP_TX_VIDEO=4 };
 enum rtpRxMode { RTP_RX_AUDIO_TO_BUFFER=1,   RTP_RX_AUDIO_TO_SPEAKER=2,      RTP_RX_AUDIO_DISCARD=3, RTP_RX_VIDEO=4 };
 
-class rtp 
+class rtpListener : public QThread
+{
+public:
+    rtpListener(QSocketDevice *s, QWaitCondition *w) { sock=s; cond=w; killThread=false; start(); }
+    ~rtpListener() { killThread=true; wait(); }
+    virtual void run() { while (!killThread) { if (sock->waitForMore(2000) > 0) cond->wakeAll(); }}
+
+private:
+    QSocketDevice *sock;
+    QWaitCondition *cond;
+    bool killThread;
+};
+
+
+class rtp : public QThread
 {
 
 public:
-    rtp(QObject *callingApp, int localPort, QString remoteIP, int remotePort, int mediaPay, int dtmfPay, QString micDev, QString spkDev, rtpTxMode txm=RTP_TX_AUDIO_FROM_MICROPHONE, rtpRxMode rxm=RTP_RX_AUDIO_TO_SPEAKER);
+    rtp(QWidget *callingApp, int localPort, QString remoteIP, int remotePort, int mediaPay, int dtmfPay, QString micDev, QString spkDev, rtpTxMode txm=RTP_TX_AUDIO_FROM_MICROPHONE, rtpRxMode rxm=RTP_RX_AUDIO_TO_SPEAKER);
     ~rtp();
+	virtual void run();
+
     void Transmit(short *pcmBuffer, int Samples);
     void Transmit(int ms);
     void Record(short *pcmBuffer, int Samples);
@@ -164,7 +196,7 @@ public:
     void getPower(short &m, short &s) { m = micPower; s = spkPower; micPower = 0; spkPower = 0; }
     void getRxStats(int &pIn, int &pMiss, int &pLt, int &bIn, int &bPlayed, int &bOut) { pIn = pkIn; pMiss = pkMissed; pLt = pkLate; bIn = bytesIn; bPlayed = bytesToSpeaker; bOut = bytesOut; }
     void getTxStats(int &pOut) { pOut = pkOut; }
-    bool queueVideo(VIDEOBUFFER *v) { bool res=false; rtpMutex.lock(); if (videoToTx==0) {videoToTx=v; res=true; } rtpMutex.unlock(); return res; }
+    bool queueVideo(VIDEOBUFFER *v) { bool res=false; rtpMutex.lock(); if (videoToTx==0) {videoToTx=v; if (eventCond) eventCond->wakeAll(); res=true; } rtpMutex.unlock(); return res; }
     VIDEOBUFFER *getRxedVideo()     { rtpMutex.lock(); VIDEOBUFFER *b=rxedVideoFrames.take(0); rtpMutex.unlock(); return b; }
     VIDEOBUFFER *getVideoBuffer(int len=0);
     void freeVideoBuffer(VIDEOBUFFER *Buf);
@@ -172,7 +204,6 @@ public:
 
 
 private:
-    static void *rtpThread(void *p);
     void rtpThreadWorker();
     void rtpAudioThreadWorker();
     void rtpVideoThreadWorker();
@@ -194,17 +225,43 @@ private:
     void StreamOut(void* pData, int nLen);
     void StreamOut(RTPPACKET &RTPpacket);
     void fillPacketwithSilence(RTPPACKET &RTPpacket);
-    void fillPacketfromMic(RTPPACKET &RTPpacket);
+    bool fillPacketfromMic(RTPPACKET &RTPpacket);
     void fillPacketfromBuffer(RTPPACKET &RTPpacket);
     void initVideoBuffers(int Num);
     void destroyVideoBuffers();
     void transmitQueuedVideo();
     void AddToneToAudio(short *buffer, int Samples);
+    void Debug(QString dbg);
+
+#ifdef WIN32
+    bool StartTx();
+    bool StartRx();
+    bool StopTx();
+    bool StopRx();
+
+    HWND        hwndLast;
+	int			MicDevice;
+	int			SpeakerDevice;
+
+	// Microphone stuff
+	HWAVEIN		hMicrophone;
+	WAVEHDR		micBufferDescr[NUM_MIC_BUFFERS];
+	short		MicBuffer[NUM_MIC_BUFFERS][MIC_BUFFER_SIZE];
+	int			micCurrBuffer;
+
+	// Speaker stuff
+	HWAVEOUT	hSpeaker;
+	WAVEHDR		spkBufferDescr[NUM_SPK_BUFFERS];
+	short		SpkBuffer[NUM_SPK_BUFFERS][SPK_BUFFER_SIZE];
+#else
+	short		SpkBuffer[1][SPK_BUFFER_SIZE];
+#endif
+	int			spkInBuffer;
 
     QObject *eventWindow;
-    pthread_t rtpthread;
     QMutex rtpMutex;
     QSocketDevice *rtpSocket;
+    QWaitCondition *eventCond;
     codec   *Codec;
     Jitter *pJitter;
     int rxMsPacketSize;
@@ -222,7 +279,6 @@ private:
     int PlayoutDelay;
     int speakerFd;
     int microphoneFd;
-    short PlayBuffer[MAX_DECOMP_AUDIO_SAMPLES];
     short SilenceBuffer[MAX_DECOMP_AUDIO_SAMPLES];
     int PlayLen;
     int SilenceLen;

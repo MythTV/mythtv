@@ -12,14 +12,16 @@
 #include <string.h>
 #include <errno.h>
 #include <iostream>
+
+#ifndef WIN32
 #include <unistd.h>
 #include <fcntl.h>                                     
 #include <sys/ioctl.h>
 
 #include <mythtv/mythcontext.h>
 #include "config.h"
+#endif
 
-#include "rtp.h"
 #include "g711.h"
 #ifdef VA_G729
 #include "g729/va_g729a.h"

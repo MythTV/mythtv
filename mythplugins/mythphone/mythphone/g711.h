@@ -2,7 +2,7 @@
 #define G711_H_
 
 #include <qsocketdevice.h>
-#include <rtp.h>
+#include "rtp.h"
 
 extern "C" {
 #include "gsm/gsm.h"

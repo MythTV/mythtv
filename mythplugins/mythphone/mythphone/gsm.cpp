@@ -15,12 +15,15 @@
 #include <string.h>
 #include <errno.h>
 #include <iostream>
+
+#ifndef WIN32
 #include <unistd.h>
 #include <fcntl.h>                                     
 #include <sys/ioctl.h>
 
 #include <mythtv/mythcontext.h>
 #include "config.h"
+#endif
 
 #include "rtp.h"
 #include "g711.h"
@@ -28,6 +31,9 @@
 extern "C" {
 #include "gsm/gsm.h"
 }
+
+using namespace std;
+
 
 
 gsmCodec::gsmCodec() : codec()

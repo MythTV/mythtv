@@ -9,13 +9,16 @@
     These are non reentrant so need a mutex implemented, if they are to be used elsewhere in the Myth frontend
 */
 #include <qapplication.h>
+#include <qimage.h>
 
 #include <iostream>
 using namespace std;
 
+#ifndef WIN32
 #include <linux/videodev.h>
-
 #include "config.h"
+#endif
+
 #include "h263.h"
 
 
@@ -151,7 +154,7 @@ void H263Container::H263StopEncoder()
     if (h263EncContext)
     {
         avcodec_close(h263EncContext);
-        free(h263EncContext);
+        av_free(h263EncContext);
         h263EncContext = 0;
     }
 }
@@ -166,15 +169,14 @@ void H263Container::H263StopDecoder()
     if (h263DecContext)
     {
         avcodec_close(h263DecContext);
-        free(h263DecContext);
+        av_free(h263DecContext);
         h263DecContext = 0;
     }
 
     if (pictureIn)
-        free(pictureIn);
+        av_free(pictureIn);
     pictureIn = 0;
 }
-
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -375,39 +377,39 @@ void YUV422PtoYUV420P(int width, int height, unsigned char *image)
 
 void cropYuvImage(const uchar *yuvBuffer, int ow, int oh, int cx, int cy, int cw, int ch, uchar *dst)
 {
-  // Only handle even number of cropped lines so we don't have to worry about breaking up 2x2 colour blocks
-  if ((cw%2) || (ch%2) || (cx%2) || (cy%2))
-  {
-    cout << "YUV crop fn does not handle odd sizes; x,y=" << cx << "," << cy << "  w,h=" << cw << "," << ch << endl;
-    return;
-  }
+    // Only handle even number of cropped lines so we don't have to worry about breaking up 2x2 colour blocks
+    if ((cw%2) || (ch%2) || (cx%2) || (cy%2))
+    {
+        cout << "YUV crop fn does not handle odd sizes; x,y=" << cx << "," << cy << "  w,h=" << cw << "," << ch << endl;
+        return;
+    }
 
-	int h;
-	const unsigned char *srcy, *srcu, *srcv;
-	unsigned char *dsty, *dstu, *dstv;
-	srcy = yuvBuffer + (ow*cy) + cx; // Skip all cropped lines at top & cropped line to left
-	srcu = yuvBuffer + (ow*oh) + (ow*cy/4) + (cx/2);
-	srcv = srcu + (ow*oh/4);
-  dsty = dst;
-  dstu = dsty + (cw*ch);
-  dstv = dstu + (cw*ch) / 4;
+    int h;
+    const unsigned char *srcy, *srcu, *srcv;
+    unsigned char *dsty, *dstu, *dstv;
+    srcy = yuvBuffer + (ow*cy) + cx; // Skip all cropped lines at top & cropped line to left
+    srcu = yuvBuffer + (ow*oh) + (ow*cy/4) + (cx/2);
+    srcv = srcu + (ow*oh/4);
+    dsty = dst;
+    dstu = dsty + (cw*ch);
+    dstv = dstu + (cw*ch) / 4;
 
-	for (h=0; h<ch; h++) 
-	{
-    memcpy(dsty, srcy, cw);
-    dsty += cw;
-    srcy += ow;
-  }
+    for (h=0; h<ch; h++) 
+    {
+        memcpy(dsty, srcy, cw);
+        dsty += cw;
+        srcy += ow;
+    }
 
-	for (h=0; h<ch/2; h++) 
-	{
-    memcpy(dstu, srcu, cw/2);
-    dstu += (cw/2);
-    srcu += (ow/2);
-    memcpy(dstv, srcv, cw/2);
-    dstv += (cw/2);
-    srcv += (ow/2);
-  }
+    for (h=0; h<ch/2; h++) 
+    {
+        memcpy(dstu, srcu, cw/2);
+        dstu += (cw/2);
+        srcu += (ow/2);
+        memcpy(dstv, srcv, cw/2);
+        dstv += (cw/2);
+        srcv += (ow/2);
+    }
 }
 
 
@@ -439,6 +441,95 @@ void scaleYuvImage(const uchar *yuvBuffer, int ow, int oh, int dw, int dh, uchar
     dstu += (dw/2);
     dstv += (dw/2);
   }
+}
+
+
+void flipYuv420pImage(const uchar *yuvBuffer, int w, int h, uchar *dst)
+{
+    int h1;
+
+    // Copy Y plane
+    const unsigned char *srcy = yuvBuffer + (w*(h-1)); 
+    for (h1=0; h1<h; h1++) 
+    {
+        memcpy(dst, srcy, w);
+        dst += w;
+        srcy -= w;
+    }
+
+    // Copy U&V planes
+    const unsigned char *srcu = yuvBuffer + (w*h) + (w*(h-2)/4); 
+    const unsigned char *srcv = yuvBuffer + (w*h) + (w*h/4) + (w*(h-2)/4); 
+    uchar *dstu = dst;
+    uchar *dstv = dst+(w*h/4);
+    w /= 2;
+    h /= 2;
+    for (h1=0; h1<h; h1++) 
+    {
+        memcpy(dstu, srcu, w);
+        dstu += w;
+        srcu -= w;
+        memcpy(dstv, srcv, w);
+        dstv += w;
+        srcv -= w;
+    }
+}
+
+
+void flipYuv422pImage(const uchar *yuvBuffer, int w, int h, uchar *dst)
+{
+    int h1;
+
+    // Copy Y plane
+    const unsigned char *srcy = yuvBuffer + (w*(h-1)); 
+    for (h1=0; h1<h; h1++) 
+    {
+        memcpy(dst, srcy, w);
+        dst += w;
+        srcy -= w;
+    }
+
+    // Copy U&V planes
+    const unsigned char *srcu = yuvBuffer + (w*h) + (w*(h-1)/2); 
+    const unsigned char *srcv = yuvBuffer + (w*h) + (w*h/2) + (w*(h-1)/2); 
+    uchar *dstu = dst;
+    uchar *dstv = dst+(w*h/2);
+    w /= 2;
+    for (h1=0; h1<h; h1++) 
+    {
+        memcpy(dstu, srcu, w);
+        dstu += w;
+        srcu -= w;
+        memcpy(dstv, srcv, w);
+        dstv += w;
+        srcv -= w;
+    }
+}
+
+
+void flipRgb32Image(const uchar *rgbBuffer, int w, int h, uchar *dst)
+{
+    w *= 4;
+    const unsigned char *src = rgbBuffer + (w*(h-1)); 
+    for (int h1=0; h1<h; h1++) 
+    {
+        memcpy(dst, src, w);
+        dst += w;
+        src -= w;
+    }
+}
+
+
+void flipRgb24Image(const uchar *rgbBuffer, int w, int h, uchar *dst)
+{
+    w *= 3;
+    const unsigned char *src = rgbBuffer + (w*(h-1)); 
+    for (int h1=0; h1<h; h1++) 
+    {
+        memcpy(dst, src, w);
+        dst += w;
+        src -= w;
+    }
 }
 
 

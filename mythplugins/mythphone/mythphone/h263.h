@@ -10,17 +10,24 @@
 #define H263_CONTAINER_H_
 
 
+#ifndef WIN32
 #include <mythtv/mythwidgets.h>
 #include <mythtv/dialogbox.h>
 #include <mythtv/volumecontrol.h>
 
 #include "directory.h"
+#endif
+
 #include "webcam.h"
 #include "sipfsm.h"
 #include "rtp.h"
 
 extern "C" {
+#ifdef WIN32
+#include "libavcodec/avcodec.h"
+#else
 #include "mythtv/ffmpeg/avcodec.h"
+#endif
 }
 
 
@@ -36,6 +43,10 @@ void YUV420PtoRGB32(const uchar *py, const uchar *pu, const uchar *pv, int width
 void YUV420PtoRGB32(int width, int height, int stride, const unsigned char *src, unsigned char *dst, int dstSize);
 void scaleYuvImage(const uchar *yuvBuffer, int ow, int oh, int dw, int dh, uchar *dst);
 void cropYuvImage(const uchar *yuvBuffer, int ow, int oh, int cx, int cy, int cw, int ch, uchar *dst);
+void flipRgb32Image(const uchar *rgbBuffer, int w, int h, uchar *dst);
+void flipYuv420pImage(const uchar *yuvBuffer, int w, int h, uchar *dst);
+void flipYuv422pImage(const uchar *yuvBuffer, int w, int h, uchar *dst);
+void flipRgb24Image(const uchar *rgbBuffer, int w, int h, uchar *dst);
 
 
 
@@ -60,6 +71,5 @@ class H263Container
     unsigned char *PostEncodeFrame, *PreEncodeFrame;
 
 };
-
 
 #endif

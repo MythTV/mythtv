@@ -7,29 +7,36 @@
 
 */
 #include <qapplication.h>
-#include <netinet/in.h>
 
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
 #include <iostream>
+
+#ifndef WIN32
+#include <netinet/in.h>
 #include <linux/soundcard.h>
 #include <unistd.h>
 #include <fcntl.h>                                     
 #include <sys/ioctl.h>
-#include <netinet/in.h>
 #include <net/if.h>
 #include <linux/sockios.h>
-
 #include <mythtv/mythcontext.h>
 #include "config.h"
+#else
+#include <io.h>
+#include <winsock2.h>
+#include <sstream>
+#include "gcontext.h"
+#endif
+
 #include "rtp.h"
 #include "g711.h"
 
 using namespace std;
 
 
-rtp::rtp(QObject *callingApp, int localPort, QString remoteIP, int remotePort, int mediaPay, int dtmfPay, QString micDev, QString spkDev, rtpTxMode txm, rtpRxMode rxm)
+rtp::rtp(QWidget *callingApp, int localPort, QString remoteIP, int remotePort, int mediaPay, int dtmfPay, QString micDev, QString spkDev, rtpTxMode txm, rtpRxMode rxm)
 {
     eventWindow = callingApp;
     yourIP.setAddress(remoteIP);
@@ -64,9 +71,14 @@ rtp::rtp(QObject *callingApp, int localPort, QString remoteIP, int remotePort, i
     dtmfIn = "";
     dtmfOut = "";
     videoToTx = 0;
+    eventCond = 0;
+
+#ifdef WIN32
+    hwndLast = callingApp->winId();
+#endif
 
     killRtpThread = false;
-    pthread_create(&rtpthread, NULL, rtpThread, this);
+    start();
 }
 
 rtp::~rtp()
@@ -74,15 +86,13 @@ rtp::~rtp()
     killRtpThread = true;
     SpeakerOn = false;
     MicrophoneOn = false;
-    pthread_join(rtpthread, NULL);
+    wait();
     destroyVideoBuffers();
 }
 
-void *rtp::rtpThread(void *p)
+void rtp::run()
 {
-    rtp *me = (rtp *)p;
-    me->rtpThreadWorker();
-    return NULL;
+    rtpThreadWorker();
 }
 
 
@@ -112,7 +122,11 @@ void rtp::rtpAudioThreadWorker()
         // May need to revisit this; as I'd much prefer it to be event driven
         // usleep(10000) seems to cause a 20ms sleep whereas usleep(0)
         // seems to sleep for ~10ms
+#ifdef WIN32
+        usleep(10000);  
+#else
         usleep(0);  
+#endif
 
         if (killRtpThread)
             break;
@@ -121,18 +135,17 @@ void rtp::rtpAudioThreadWorker()
         StreamInAudio();
 
         // Write audio to the speaker, but keep in dejitter buffer as long as possible
-        while (isSpeakerHungry() && pJitter->AnyData())
+        while (isSpeakerHungry() && pJitter->AnyData()  && !killRtpThread)
             PlayOutAudio();
 
         // For mic. data, the microphone determines the transmit rate
         // Mic. needs kicked the first time through
-        if ((txMode == RTP_TX_AUDIO_FROM_MICROPHONE) && 
-            ((isMicrophoneData()) || micFirstTime))
+        while ((txMode == RTP_TX_AUDIO_FROM_MICROPHONE) && 
+            ((isMicrophoneData()) || micFirstTime) && (!killRtpThread))
         {
             micFirstTime = false;
-            fillPacketfromMic(RTPpacket);
-
-            StreamOut(RTPpacket);
+            if (fillPacketfromMic(RTPpacket))
+                StreamOut(RTPpacket);
         }
 
         // For transmitting silence/buffered data we need to use the clock
@@ -167,12 +180,13 @@ void rtp::rtpVideoThreadWorker()
 {
     rtpInitialise();
     OpenSocket();
+    eventCond = new QWaitCondition();
+    rtpListener *videoListener = new rtpListener(rtpSocket, eventCond);
 
     while(!killRtpThread)
     {
-        // Awake every 10ms to see if we need to rx/tx anything
-        // May need to revisit this; as I'd much prefer it to be event driven
-        usleep(10000);  
+        // Suspend for events, waking every 2 secs to see if we need to kill ourselves
+        eventCond->wait(2000);
 
         if (killRtpThread)
             break;
@@ -180,6 +194,10 @@ void rtp::rtpVideoThreadWorker()
         StreamInVideo();
         transmitQueuedVideo();
     }
+
+    delete videoListener;
+    delete eventCond;
+    eventCond = 0;
 
     if (videoToTx)
     {
@@ -241,6 +259,7 @@ void rtp::rtpInitialise()
     bytesToSpeaker = 0;
     micPower = 0;
     spkPower = 0;
+	spkInBuffer = 0;
 
     pJitter = new Jitter();
     //pJitter->Debug();
@@ -273,6 +292,9 @@ void rtp::rtpInitialise()
     }
     rtpMarker = 0;
 }
+
+
+#ifndef WIN32
 
 void rtp::StartTxRx()
 {
@@ -407,11 +429,261 @@ void rtp::StopTxRx()
     microphoneFd = -1;
 }
 
+#else
+
+void rtp::StartTxRx()
+{
+    if (rtpSocket == 0)
+    {
+        cerr << "Cannot start RTP spk/mic, socket not opened\n";
+        return;
+    }
+
+	MicDevice = SpeakerDevice = WAVE_MAPPER;
+    WAVEOUTCAPS AudioCap;
+    int numAudioDevs = waveOutGetNumDevs();
+    for (int i=0; i<=numAudioDevs; i++)
+    {
+        MMRESULT err = waveOutGetDevCaps(i, &AudioCap, sizeof(AudioCap));
+        if (err == MMSYSERR_NOERROR)
+        {
+            if (spkDevice == AudioCap.szPname)
+                SpeakerDevice = i;
+            if (micDevice == AudioCap.szPname)
+                MicDevice = i;
+        }
+    }
+
+
+    StartTx();
+    StartRx();
+}
+
+ 
+bool rtp::StartTx()
+{
+unsigned long dwResult;
+WAVEFORMATEX wfx;
+int b;
+char TextBuffer[100];
+
+
+	micCurrBuffer = 0;
+
+	wfx.cbSize = 0;
+	wfx.nAvgBytesPerSec = 16000;
+	wfx.nBlockAlign = 2;
+	wfx.nChannels = 1;
+	wfx.nSamplesPerSec = 8000;
+	wfx.wBitsPerSample = 16;
+	wfx.wFormatTag = WAVE_FORMAT_PCM;
+
+	// First just query to check there is a compatible Mic.
+	if (dwResult = waveInOpen(0, MicDevice, &wfx, 0, 0, WAVE_FORMAT_QUERY))
+	{
+		//UpdateDebug("Error waveInOpen Query %d\r\n", dwResult);
+		return FALSE;
+	}
+
+	// Now actually open the device
+	dwResult = waveInOpen(&hMicrophone, MicDevice, &wfx, 0, 0, CALLBACK_NULL);
+	if (dwResult)
+	{
+		//UpdateDebug("Error waveInOpen Query %d\r\n", dwResult);
+		return FALSE;
+	}
+
+	// Inform the wave device of where to put the data
+	for (b=0; b<NUM_MIC_BUFFERS; b++)
+	{
+		micBufferDescr[b].lpData = (LPSTR)(MicBuffer[b]);
+		micBufferDescr[b].dwBufferLength = txPCMSamplesPerPacket * sizeof(short); 
+		//micBufferDescr[b].dwBytesRecorded = 0L;
+		micBufferDescr[b].dwFlags = 0L;
+		//micBufferDescr[b].dwUser = 0L;
+		//micBufferDescr[b].lpNext = ((b==(NUM_MIC_BUFFERS-1)) ? (&micBufferDescr[0]) : (&micBufferDescr[b+1]));
+		if (dwResult = waveInPrepareHeader(hMicrophone, &(micBufferDescr[b]), sizeof(WAVEHDR)))
+		{	
+			waveInGetErrorText(dwResult, TextBuffer, sizeof(TextBuffer));
+			//UpdateDebug("Error waveInPrepareHeader %d %d\r\n%s\r\n", b, dwResult, TextBuffer);
+			return FALSE;
+		}
+	}
+
+	// Start recording the data into the buffer
+	if (dwResult = waveInStart(hMicrophone))
+	{
+		//UpdateDebug("Error waveInStart %d\r\n", dwResult);
+		return FALSE;
+	}
+
+	// Send a buffer to fill
+	for (b=0; b<NUM_MIC_BUFFERS; b++)
+	{
+		if (dwResult = waveInAddBuffer(hMicrophone, &(micBufferDescr[b]), sizeof(WAVEHDR)))
+		{
+			//UpdateDebug("Error waveInAddBuffer %d\r\n", dwResult);
+			return FALSE;
+		}
+	}
+
+	MicrophoneOn = TRUE;
+
+	//UpdateDebug("Microphone started\r\n");
+
+	return TRUE;	
+}
+
+bool rtp::StartRx()
+{
+DWORD   dwResult;
+int b;
+
+	spkInBuffer = 0;
+	rxTimestamp = SpkJitter;
+	rxSeqNum = 0;
+	rxFirstFrame = TRUE;
+
+	// Playback the buffer through the speakers
+	WAVEFORMATEX wfx;
+	wfx.cbSize = 0;
+	wfx.nAvgBytesPerSec = 16000;
+	wfx.nBlockAlign = 2;
+	wfx.nChannels = 1;
+	wfx.nSamplesPerSec = 8000;
+	wfx.wBitsPerSample = 16;
+	wfx.wFormatTag = WAVE_FORMAT_PCM;
+
+	if (dwResult = waveOutOpen(&hSpeaker, SpeakerDevice, &wfx, 0, 0L, WAVE_FORMAT_QUERY))
+	{
+		//UpdateDebug("waveOutOpen Query error %d", dwResult);
+		return FALSE;
+	}
+
+	if (dwResult = waveOutOpen(&hSpeaker, SpeakerDevice, &wfx, 0, 0L, CALLBACK_NULL))
+	{
+		//UpdateDebug("waveOutOpen error %d", dwResult);
+		return FALSE;
+	}
+
+	for (b=0; b<NUM_SPK_BUFFERS; b++)
+	{
+		spkBufferDescr[b].lpData = (LPSTR)(SpkBuffer[b]);
+		spkBufferDescr[b].dwBufferLength = rxPCMSamplesPerPacket * sizeof(short);
+		spkBufferDescr[b].dwFlags = 0L;
+		spkBufferDescr[b].dwLoops = 0L;
+		//spkBufferDescr[b].lpNext = ((b==(NUM_SPK_BUFFERS-1)) ? (&spkBufferDescr[0]) : (&spkBufferDescr[b+1]));
+	
+		if (dwResult = waveOutPrepareHeader(hSpeaker, &(spkBufferDescr[b]), sizeof(WAVEHDR)))
+		{
+			//UpdateDebug("waveOutPrepareHeader error %d", dwResult);
+			return FALSE;
+		}
+	}
+
+	//UpdateDebug("Speaker started\r\n");
+	SpeakerOn = TRUE;
+
+    return true;
+}
+
+void rtp::StopTxRx()
+{
+    StopTx();
+    StopRx();
+}
+
+bool rtp::StopTx()
+{
+DWORD   dwResult;
+char TextBuffer[70];
+int b;
+
+	MicrophoneOn = FALSE;
+
+	if (dwResult = waveInReset(hMicrophone))
+	{
+		waveInGetErrorText(dwResult, TextBuffer, sizeof(TextBuffer));
+		//UpdateDebug("Error waveInStop %d\r\n %s\r\n", dwResult, TextBuffer);
+		return FALSE;
+	}
+
+	for (b=0; b<NUM_MIC_BUFFERS; b++)
+	{
+		if (dwResult = waveInUnprepareHeader(hMicrophone, &(micBufferDescr[0]), sizeof(WAVEHDR)))
+		{
+			waveInGetErrorText(dwResult, TextBuffer, sizeof(TextBuffer));
+			//UpdateDebug("Error waveInUnprepareHeader %d %s\r\n", dwResult, TextBuffer);
+			return FALSE;
+		}
+	}
+
+	if (dwResult = waveInClose(hMicrophone))
+	{
+		waveInGetErrorText(dwResult, TextBuffer, sizeof(TextBuffer));
+		//UpdateDebug("Error waveInStop %d\r\n %s\r\n", dwResult, TextBuffer);
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+
+bool rtp::StopRx()
+{
+DWORD   dwResult;
+int b;
+char TextBuffer[100];
+
+	SpeakerOn = FALSE;
+
+	if (dwResult = waveOutReset(hSpeaker))
+	{
+		waveOutGetErrorText(dwResult, TextBuffer, sizeof(TextBuffer));
+		//UpdateDebug("Error waveInStop %d\r\n %s\r\n", dwResult, TextBuffer);
+		return FALSE;
+	}
+
+	for (b=0; b<NUM_SPK_BUFFERS; b++)
+	{
+		if (dwResult = waveOutUnprepareHeader(hSpeaker, &(spkBufferDescr[0]), sizeof(WAVEHDR)))
+		{
+			waveOutGetErrorText(dwResult, TextBuffer, sizeof(TextBuffer));
+			//UpdateDebug("Error waveOutUnprepareHeader %d %s\r\n", dwResult, TextBuffer);
+			return FALSE;
+		}
+	}
+
+	if (dwResult = waveOutClose(hSpeaker))
+	{
+		waveOutGetErrorText(dwResult, TextBuffer, sizeof(TextBuffer));
+		//UpdateDebug("Error waveOutClose %d\r\n %s\r\n", dwResult, TextBuffer);
+		return FALSE;
+	}
+
+	return TRUE;	
+}
+
+#endif
+
+
+void rtp::Debug(QString dbg)
+{
+#ifdef WIN32
+    QString now = (QTime::currentTime()).toString("hh:mm:ss.zzz");
+    if (eventWindow)
+        QApplication::postEvent(eventWindow, new RtpEvent(RtpEvent::RtpDebugEv, now + " " + dbg));
+#else
+    cout << dbg;
+#endif
+}
+
 void rtp::OpenSocket()
 {
     rtpSocket = new QSocketDevice (QSocketDevice::Datagram);
     rtpSocket->setBlocking(false);
 
+#ifndef WIN32
     QString ifName = gContext->GetSetting("SipBindInterface");
     struct ifreq ifreq;
     strcpy(ifreq.ifr_name, ifName);
@@ -425,22 +697,34 @@ void rtp::OpenSocket()
     struct sockaddr_in * sptr = (struct sockaddr_in *)&ifreq.ifr_addr;
     QHostAddress myIP;
     myIP.setAddress(htonl(sptr->sin_addr.s_addr));
+#endif
+
+#ifdef WIN32  // SIOCGIFADDR not supported on Windows
+	char         hostname[100];
+	HOSTENT FAR *hostAddr;
+    int ifNum = atoi(gContext->GetSetting("SipBindInterface"));
+	if ((gethostname(hostname, 100) != 0) || ((hostAddr = gethostbyname(hostname)) == NULL)) 
+    {
+        cerr << "Failed to find network interface " << endl;
+        delete rtpSocket;
+        rtpSocket = 0;
+        return;
+    }
+    QHostAddress myIP; 
+    for (int ifTotal=0; hostAddr->h_addr_list[ifTotal] != 0; ifTotal++)
+        ;
+    if (ifNum >= ifTotal)
+        ifNum = 0;
+    myIP.setAddress(htonl(((struct in_addr *)hostAddr->h_addr_list[ifNum])->S_un.S_addr));
+#endif
 
     if (!rtpSocket->bind(myIP, myPort))
     {
-        cerr << "Failed to bind for RTP connection " << myIP.toString() << ":" << myPort << endl;
+        cerr << "Failed to bind for RTP connection " << myIP.toString() << endl;
         delete rtpSocket;
         rtpSocket = 0;
     }
-
-    // Had to remove this; as sometimes packets were arriving with a different src port because of a NAT somewhere
-    //if (!rtpSocket->connect(yourIP, yourPort))
-    //{
-    //    cerr << "Failed to connect for RTP connection " << myIP.toString() << ":" << myPort << endl;
-    //    delete rtpSocket;
-    //    rtpSocket = 0;
-    //}
-}        
+}
 
 
 void rtp::CloseSocket()
@@ -455,8 +739,12 @@ void rtp::CloseSocket()
 
 bool rtp::isSpeakerHungry()
 {
+    if (!SpeakerOn)
+        return false;    
+
     if (rxMode == RTP_RX_AUDIO_TO_SPEAKER)
     {
+#ifndef WIN32
         int bytesQueued;
         ioctl(speakerFd, SNDCTL_DSP_GETODELAY, &bytesQueued);
     
@@ -487,6 +775,14 @@ bool rtp::isSpeakerHungry()
 //            cout << "Excessive speaker underrun, adjusting spk buffer to " << spkLowThreshold << endl;
             //pJitter->Debug();
         }
+
+#else
+        // Windows -- just check if there is a free buffer    
+        if ((spkBufferDescr[spkInBuffer].dwFlags & WHDR_INQUEUE) != 0)
+            return false;
+
+#endif
+    
     }
 
     // Note - when receiving audio to a buffer; this will effectively
@@ -497,11 +793,15 @@ bool rtp::isSpeakerHungry()
 
 bool rtp::isMicrophoneData()
 {
+#ifndef WIN32
     audio_buf_info info;
     ioctl(microphoneFd, SNDCTL_DSP_GETISPACE, &info);
-
     if (info.bytes > (int)(txPCMSamplesPerPacket*sizeof(short)))
         return true;
+#else
+    if ((micBufferDescr[micCurrBuffer].dwFlags & WHDR_DONE) != 0)
+        return true;
+#endif
     return false;
 }
 
@@ -692,15 +992,25 @@ void rtp::PlayOutAudio()
                 mLen = JBuf->len - RTP_HEADER_SIZE;
                 if ((rxMode == RTP_RX_AUDIO_TO_SPEAKER) && SpeakerOn)
                 {
-                    PlayLen = Codec->Decode(JBuf->RtpData, PlayBuffer, mLen, spkPower);
-                    AddToneToAudio(PlayBuffer, PlayLen/sizeof(short));
-                    m = write(speakerFd, (uchar *)PlayBuffer, PlayLen);
+                    PlayLen = Codec->Decode(JBuf->RtpData, SpkBuffer[spkInBuffer], mLen, spkPower);
+                    AddToneToAudio(SpkBuffer[spkInBuffer], PlayLen/sizeof(short));
+#ifndef WIN32
+                    m = write(speakerFd, (uchar *)SpkBuffer[spkInBuffer], PlayLen);
+#else
+                    if (waveOutWrite(hSpeaker, &(spkBufferDescr[spkInBuffer]), sizeof(WAVEHDR)))
+	    			{
+		    			//UpdateDebug("waveOutWrite error %d", dwResult);
+    					//return;
+				    }
+    				int NextInBuffer = (spkInBuffer+1)%NUM_SPK_BUFFERS;
+	    			spkInBuffer = NextInBuffer;
+#endif
                     bytesToSpeaker += m;
                 }
                 else if (rxMode == RTP_RX_AUDIO_TO_BUFFER)
                 {
-                    PlayLen = Codec->Decode(JBuf->RtpData, PlayBuffer, mLen, spkPower);
-                    recordInPacket(PlayBuffer, PlayLen);
+                    PlayLen = Codec->Decode(JBuf->RtpData, SpkBuffer[spkInBuffer], mLen, spkPower);
+                    recordInPacket(SpkBuffer[spkInBuffer], PlayLen);
                 }
                 rxTimestamp += mLen;
                 pJitter->FreeJBuffer(JBuf);
@@ -748,10 +1058,8 @@ void rtp::PlayOutAudio()
 
 void rtp::StreamInVideo()
 {
-    RTPPACKET rtpDump;
     RTPPACKET *JBuf;
-    int mLen, m, reason;
-    int tryAgain;
+    int mLen, reason;
     bool MarketBitSet = false;
 
     if (rtpSocket)
@@ -1065,6 +1373,7 @@ void rtp::transmitQueuedVideo()
     VIDEOBUFFER *queuedVideo = videoToTx;
     videoToTx = 0;
     rtpMutex.unlock();
+
     if (queuedVideo)
     {
         RTPPACKET videoPacket;
@@ -1108,7 +1417,9 @@ void rtp::transmitQueuedVideo()
             if (rtpSocket)
                 rtpSocket->writeBlock((char *)&videoPacket.RtpVPXCC, RTP_HEADER_SIZE+sizeof(H263_RFC2190_HDR)+pkLen, yourIP, yourPort);
             pkCnt++;
+            pkOut++;
         }
+
         //cout << "Transmitted Video Frame, len " << queuedVideo->len << " as " << pkCnt << " packets\n";
         freeVideoBuffer(queuedVideo);
     }
@@ -1152,25 +1463,39 @@ void rtp::fillPacketwithSilence(RTPPACKET &RTPpacket)
     RTPpacket.len = Codec->Silence(RTPpacket.RtpData, txMsPacketSize);
 }
 
-void rtp::fillPacketfromMic(RTPPACKET &RTPpacket)
+bool rtp::fillPacketfromMic(RTPPACKET &RTPpacket)
 {
     int gain=0;
     if (MicrophoneOn)
     {
-        short micBuffer[MAX_DECOMP_AUDIO_SAMPLES];
-        int len = read(microphoneFd, (char *)micBuffer, txPCMSamplesPerPacket*sizeof(short));
+        short buffer[MAX_DECOMP_AUDIO_SAMPLES];
+#ifndef WIN32
+        int len = read(microphoneFd, (char *)buffer, txPCMSamplesPerPacket*sizeof(short));
+#else
+        int len = txPCMSamplesPerPacket*sizeof(short);
+        if ((micBufferDescr[micCurrBuffer].dwFlags & WHDR_DONE) != 0)
+        {
+            memcpy(buffer, MicBuffer[micCurrBuffer], txPCMSamplesPerPacket*sizeof(short));
+		    int NextBuffer = ((micCurrBuffer+1)%NUM_MIC_BUFFERS);
+		    waveInAddBuffer(hMicrophone, &(micBufferDescr[micCurrBuffer]), sizeof(WAVEHDR));
+		    micCurrBuffer = NextBuffer;
+        }
+        else
+            return false;
+#endif
+
         if (len != (int)(txPCMSamplesPerPacket*sizeof(short)))
         {
-            cout << "Error reading data from Microphone, result " << len << endl;
             fillPacketwithSilence(RTPpacket);
         }
         else if (micMuted)
             fillPacketwithSilence(RTPpacket);
         else
-            RTPpacket.len = Codec->Encode(micBuffer, RTPpacket.RtpData, txPCMSamplesPerPacket, micPower, gain);
+            RTPpacket.len = Codec->Encode(buffer, RTPpacket.RtpData, txPCMSamplesPerPacket, micPower, gain);
     }
     else
         fillPacketwithSilence(RTPpacket);
+    return true;
 }
 
 void rtp::fillPacketfromBuffer(RTPPACKET &RTPpacket)
@@ -1377,12 +1702,15 @@ codec::~codec()
 
 int codec::Encode(short *In, uchar *Out, int Samples, short &maxPower, int gain)
 {
+    (void)maxPower;
+    (void)gain;
     memcpy(Out, (char *)In, Samples);
     return Samples;
 }
 
 int codec::Decode(uchar *In, short *Out, int Len, short &maxPower)
 {
+    (void)maxPower;
     memcpy((char *)Out, In, Len);
     return Len;
 }
