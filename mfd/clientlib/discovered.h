@@ -29,13 +29,17 @@ class DiscoveredMfd
     void    setTimeToLive(int an_int){time_to_live = an_int;}
     int     getTimeToLive(){return time_to_live;}
 
-    bool    isResolved(){return resolved;}
-    void    isResolved(bool y_or_n){resolved = y_or_n;}   
+    bool    isPortResolved(){return port_resolved;}
+    void    isPortResolved(bool y_or_n){port_resolved = y_or_n;}   
+
+    bool    isIpResolved(){return ip_resolved;}
+    void    isIpResolved(bool y_or_n){ip_resolved = y_or_n;}   
 
     QString getHostName(){return hostname;}
     void    setHostName(QString a_host){hostname = a_host;}
     
-    QString getAddress();
+    QString getAddress(){return address;}
+    void    setAddress(QString an_address){ address = an_address;}
 
     int     getPort(){return port;}
     void    setPort(int a_port){port = a_port;}
@@ -45,9 +49,11 @@ class DiscoveredMfd
     
   private:
   
+    QString       address;
     QString       full_service_name;
     QString       hostname;
-    bool          resolved;
+    bool          port_resolved;
+    bool          ip_resolved;
     int           time_to_live;
     int           port;
     QSocketDevice *client_socket_to_mfd;

@@ -20,10 +20,12 @@ DiscoveredMfd::DiscoveredMfd(QString l_full_service_name)
 {
     full_service_name = l_full_service_name;
     hostname = "";
-    resolved = false;
+    port_resolved = false;
+    ip_resolved = false;
     time_to_live = 0;
     client_socket_to_mfd = NULL;
     port = 0;
+    address = "";
 }
 
 int DiscoveredMfd::getSocket()
@@ -33,41 +35,6 @@ int DiscoveredMfd::getSocket()
         return client_socket_to_mfd->socket();
     }
     return -1;   
-}
-
-QString DiscoveredMfd::getAddress()
-{
-
-    if(hostname.length() < 1)
-    {
-        cerr << "discovered.o: can't calculate address with no hostname"
-             << endl;
-        return QString("");
-
-    }
-
-    hostent *host_address = gethostbyname(hostname.ascii());
-
-    if(host_address->h_length == 4)
-    {
-        int ip1 = (int)( (unsigned char) host_address->h_addr[0]);
-        int ip2 = (int)( (unsigned char) host_address->h_addr[1]);
-        int ip3 = (int)( (unsigned char) host_address->h_addr[2]);
-        int ip4 = (int)( (unsigned char) host_address->h_addr[3]);
-        
-        QString ip_address = QString("%1.%2.%3.%4")
-                                    .arg(ip1)
-                                    .arg(ip2)
-                                    .arg(ip3)
-                                    .arg(ip4);
-        return ip_address;
-    }
-    else
-    {
-        cerr << "discovered.o: got weird size for host address"
-             << endl;
-    }
-    return QString("");
 }
 
 bool DiscoveredMfd::connect()

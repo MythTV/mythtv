@@ -154,7 +154,7 @@ void DiscoveryThread::run()
         while ( (an_mfd = it.current()) != 0 )
         {
             ++it;
-            if(an_mfd->isResolved())
+            if(an_mfd->isIpResolved())
             {
                 int mfd_socket = an_mfd->getSocket();
                 if(mfd_socket > 0)
@@ -226,7 +226,7 @@ void DiscoveryThread::run()
         while ( (a_mfd = clean_it.current()) != 0 )
         {
             ++clean_it;
-            if(a_mfd->isResolved())
+            if(a_mfd->isIpResolved())
             {
                 int mfd_socket = a_mfd->getSocket();
                 if(mfd_socket > 0)
@@ -377,6 +377,7 @@ void DiscoveryThread::handleMdnsdCallback(mdnsda answer)
 
     if(answer->type == QTYPE_PTR)
     {
+    
         //
         //  QTYPE_PTR answers tell us about the appearance and disapperance
         //  of basic services without those services being resolved to
@@ -443,7 +444,7 @@ void DiscoveryThread::handleMdnsdCallback(mdnsda answer)
         DiscoveredMfd *dead_mfd = NULL;
         while ( (dead_mfd = dead_it.current()) != 0 )
         {
-            if(dead_mfd->getTimeToLive()  < 1 && dead_mfd->isResolved())
+            if(dead_mfd->getTimeToLive()  < 1 && dead_mfd->isIpResolved())
             {
                 MfdDiscoveryEvent *de = new
                 MfdDiscoveryEvent(
@@ -467,8 +468,8 @@ void DiscoveryThread::handleMdnsdCallback(mdnsda answer)
     else if(answer->type == QTYPE_SRV)
     {
         //
-        //  A QTYPE_SRV answer is giving us resolved ip:port info for a
-        //  service
+        //  A QTYPE_SRV answer is giving us resolved host name and port (but
+        //  not yet an ip address)
         //
 
         //
@@ -489,14 +490,90 @@ void DiscoveryThread::handleMdnsdCallback(mdnsda answer)
         }
         if(which_one)
         {
-            if(!which_one->isResolved())
+            if(!which_one->isPortResolved())
             {
                 which_one->setHostName(QString((char *) answer->rdname).section('.',0,0));
                 which_one->setPort(answer->srv.port);
-                which_one->isResolved(true);
+                which_one->isPortResolved(true);
+                
+                //
+                //  Ask mdsnd for the actual ip address for this hostname
+                //  (no, we can't just ask DNS)
+                //
+
+                QString ip_address_question = QString("%1.local.")
+                                              .arg(which_one->getHostName());
+
+                mdnsd_query(    
+                            mdns_daemon,
+                            (char *) ip_address_question.ascii(), 
+                            QTYPE_A, 
+                            callbackAnswer, 
+                            this
+                           );
+                
+                
+            }                
+        }
+        else
+        {
+            cerr << "discoverythread.o: got an mdns QTYPE_SRV response that I never asked for"
+                 << endl;
+        }
+    }
+    else if(answer->type == QTYPE_A)
+    {
+        in_addr address;
+        address.s_addr = answer->ip;
+        
+        //
+        //  For some obscure "let's not conflict with something" sort of
+        //  reason (I think), ip address comes in backwards.
+        //
+
+        QString backwards_dot_quad = QString(inet_ntoa(address));
+        
+        QString ip1 = backwards_dot_quad.section(".", 3, 3);
+        QString ip2 = backwards_dot_quad.section(".", 2, 2);
+        QString ip3 = backwards_dot_quad.section(".", 1, 1);
+        QString ip4 = backwards_dot_quad.section(".", 0, 0);
+
+        QString dot_quad_address = QString("%1.%2.%3.%4")
+                                           .arg(ip1)
+                                           .arg(ip2)
+                                           .arg(ip3)
+                                           .arg(ip4);
+
+
+        QString hostname = QString((char *)answer->name).section(".", 0, 0);
+
+        //
+        //  See if any of my discovered mfd objects are waiting for an ip
+        //  address
+        //
+
+        QPtrListIterator<DiscoveredMfd> it( *discovered_mfds );
+        DiscoveredMfd *which_one = NULL;
+        DiscoveredMfd *an_mfd;
+        while ( (an_mfd = it.current()) != 0 )
+        {
+            ++it;
+
+            if(an_mfd->getHostName() == QString((char *)answer->name).section(".", 0, 0))
+            {
+                which_one = an_mfd;   
+                break;
+            }
+        }
+        if(which_one)
+        {
+            if(which_one->isPortResolved() && !which_one->isIpResolved())
+            {
+                which_one->setAddress(dot_quad_address);
+                which_one->isIpResolved(true);
 
                 //
-                //  Try and connect. 
+                //  Now we can try to connect
                 //
 
                 if(which_one->connect())
@@ -510,15 +587,27 @@ void DiscoveryThread::handleMdnsdCallback(mdnsda answer)
                                         which_one->getPort()
                                      );
                     QApplication::postEvent(mfd_interface, de);
-                    which_one->isResolved(true);
                 }
                 else
                 {
-                    cerr << "found an mfd but could not connect to it" << endl;
+                    cerr << "discoverythread.o: found an mfd but could "
+                         << "not connect to it" 
+                         << endl;
                     discovered_mfds->remove(which_one);
                 }
-            }
+            }                
         }
+        else
+        {
+            cerr << "discoverythread.cpp: getting mdns host->ip answers that I "
+                 << "never asked for"
+                 << endl;
+        }
+    }
+    else
+    {
+        cerr << "discoverythread.o: gettting mdnsd answer types I don't understand"
+             << endl;
     }
 }
 
@@ -534,7 +623,7 @@ void DiscoveryThread::cleanDeadMfds()
     DiscoveredMfd *an_mfd = NULL;
     while ( (an_mfd = it.current()) != 0 )
     {
-        if(an_mfd->isResolved())
+        if(an_mfd->isIpResolved())
         {
             if(an_mfd->getSocket() < 1)
             {
