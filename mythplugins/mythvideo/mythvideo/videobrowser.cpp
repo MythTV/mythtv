@@ -25,7 +25,7 @@ VideoBrowser::VideoBrowser(QSqlDatabase *ldb,
     db = ldb;
     updateML = false;
     currentParentalLevel = gContext->GetNumSetting("VideoDefaultParentalLevel", 4);
-
+    currentVideoFilter = new VideoFilterSettings(db);
     RefreshMovieList();
 
     noUpdate = false;
@@ -54,6 +54,8 @@ VideoBrowser::VideoBrowser(QSqlDatabase *ldb,
 
 VideoBrowser::~VideoBrowser()
 {
+    if (currentVideoFilter)
+	delete currentVideoFilter;
     delete theme;
     delete bgTransBackup;
     if (curitem)
@@ -189,6 +191,33 @@ void VideoBrowser::keyPressEvent(QKeyEvent *e)
         {
             setParentalLevel(action.toInt());
         }
+	else if (action == "FILTER"){
+		VideoFilterDialog * vfd = new VideoFilterDialog(db,
+			currentVideoFilter,
+			gContext->GetMainWindow(),
+			"filter",
+			"video-",
+			"Video Filter Dialog");
+		vfd->exec();
+		delete vfd;
+		RefreshMovieList();
+		SetCurrentItem();
+		repaint();
+	}else if (action == "INFO"){
+		if (curitem){
+			MythPopupBox * plotbox
+			   = new MythPopupBox(gContext->GetMainWindow());
+			QLabel *plotLabel = plotbox->addLabel(curitem->Plot(),MythPopupBox::Small,true);
+			plotLabel->setAlignment(Qt::AlignJustify | Qt::WordBreak);
+			QButton * okButton = plotbox->addButton(tr("Ok"));
+			okButton->setFocus();
+			plotbox->ExecPopup();
+		//	plotbox->showOkPopup(gContext->GetMainWindow(),
+//				"test",
+//				curitem->Plot());
+			delete plotbox;
+		}
+	}
         else
             handled = false;
     }
@@ -221,7 +250,12 @@ void VideoBrowser::RefreshMovieList()
     updateML = true;
     m_list.clear();
 
-    QSqlQuery query("SELECT intid FROM videometadata WHERE browse = 1 ORDER BY title;", db);
+    QString thequery = QString("SELECT intid FROM %1 %2 %3")
+		.arg(currentVideoFilter->BuildClauseFrom())
+		.arg(currentVideoFilter->BuildClauseWhere())
+		.arg(currentVideoFilter->BuildClauseOrderBy());
+//cout << thequery << endl;
+    QSqlQuery query(thequery,db);
     Metadata *myData;
 
     if (query.isActive() && query.numRowsAffected() > 0)
@@ -672,8 +706,8 @@ void VideoBrowser::selected(Metadata *someItem)
 
     // See if this is being handled by a plugin..
     if (gContext->GetMainWindow()->HandleMedia(handler, filename))
-        return;
-
+	return;
+ 
     QString arg;
     arg.sprintf("\"%s\"",
                 filename.replace(QRegExp("\""), "\\\"").utf8().data());

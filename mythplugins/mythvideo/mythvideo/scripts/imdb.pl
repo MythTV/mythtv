@@ -153,6 +153,57 @@ sub getMovieData {
       }
       $cast = join(',', @actors);
    }
+   
+   
+   # parse genres 
+   my @genres;
+   my $lgenres = "";
+   $count = 0;
+   $data = parseBetween($response, "<b class=\"ch\">Genre:</b>","<a href=\"keywords\">(more)</a>"); 
+   if ($data) {
+      my $beg = "/\">"; 
+      my $end = "</a>";
+      my $start = index($data, $beg);
+      my $finish = index($data, $end, $start);
+      my $genre;
+      while ($start != -1) {
+         $start += length($beg);
+         $genre = substr($data, $start, $finish - $start);
+         # add to array
+         $genres[$count++] = $genre;
+
+         # advance data to next movie
+         $data = substr($data, - (length($data) - $finish));
+         $start = index($data, $beg);
+         $finish = index($data, $end, $start + 1); 
+      }
+      $lgenres = join(',', @genres);
+   }
+   
+   # parse countries 
+   my @countries;
+   my $lcountries = "";
+   $count = 0;
+   $data = parseBetween($response, "<b class=\"ch\">Country:</b>","<br>"); 
+   if ($data) {
+      my $beg = "/\">"; 
+      my $end = "</a>";
+      my $start = index($data, $beg);
+      my $finish = index($data, $end, $start);
+      my $country;
+      while ($start != -1) {
+         $start += length($beg);
+         $country = substr($data, $start, $finish - $start);
+         # add to array
+         $countries[$count++] = $country;
+
+         # advance data to next movie
+         $data = substr($data, - (length($data) - $finish));
+         $start = index($data, $beg);
+         $finish = index($data, $end, $start + 1); 
+      }
+      $lcountries = join(',', @countries);
+   }
 
    # output fields (these field names must match what MythVideo is looking for)
    print "Title:$title\n";
@@ -164,6 +215,8 @@ sub getMovieData {
    print "Runtime:$runtime\n";
    print "Writers: $writer\n";
    print "Cast: $cast\n";
+   print "Genres: $lgenres\n";
+   print "Countries: $lcountries\n";
 }
 
 # dump Movie Poster
@@ -395,33 +448,34 @@ sub getMovieList {
 #
 
 # parse command line arguments 
-getopts('ohrdivD:M:P:');
+getopts('ohrdivDMP');
 
 # print out info 
 if (defined $opt_v) { version(); exit 1; }
 if (defined $opt_i) { info(); exit 1; }
 
 # print out usage if needed
-if (defined $opt_h) { help(); exit 1; }
+if (defined $opt_h || $#ARGV<0) { help(); }
 
 if (defined $opt_D) {
    # take movieid from cmdline arg
-   $movieid = $opt_D || die "Usage : $0 -D <movieid>\n";
+   $movieid = shift || die "Usage : $0 -D <movieid>\n";
    getMovieData($movieid);
 }
 
 elsif (defined $opt_P) {
    # take movieid from cmdline arg
-   $movieid = $opt_P || die "Usage : $0 -P <movieid>\n";
+   $movieid = shift || die "Usage : $0 -P <movieid>\n";
    getMoviePoster($movieid);
 }
 
 elsif (defined $opt_M) {
    # take query from cmdline arg
-   $options = $opt_M || die "Usage : $0 -M [options] <query>\n";
+   $options = shift || die "Usage : $0 -M [options] <query>\n";
    $query = shift;
+   if (!$query) {
+      $query = $options;
+      $options = "";
+   }
    getMovieList($query, $options);
-}
-else {
-    help();
 }

@@ -11,6 +11,7 @@
 #include <qdom.h>
 #include <mythtv/uitypes.h>
 #include <mythtv/xmlparse.h>
+#include "videofilter.h"
 
 class QSqlDatabase;
 typedef QValueList<Metadata>  ValueMetadata;
@@ -42,6 +43,7 @@ class VideoBrowser : public MythDialog
   private:
     bool updateML;
     bool noUpdate;
+    VideoFilterSettings	*currentVideoFilter;
 
     QPixmap getPixmap(QString &level);
     QSqlDatabase *db;

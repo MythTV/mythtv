@@ -47,6 +47,7 @@ class EditMetadataDialog : public MythThemedDialog
     void takeFocusAwayFromEditor(bool up_or_down);
     void saveAndExit();
     void setTitle(QString new_title);
+    void setCategory(int new_category);
     void setPlayer(QString new_player);
     void setLevel(int new_level);
     void setChild(int new_child);
@@ -68,6 +69,7 @@ class EditMetadataDialog : public MythThemedDialog
     MythRemoteLineEdit  *player_editor;
     UIBlackHoleType     *player_hack;
 
+    UISelectorType	*category_select;
     UISelectorType      *level_select;
     UISelectorType      *child_select;
     UICheckBoxType      *browse_check;
@@ -79,3 +81,33 @@ class EditMetadataDialog : public MythThemedDialog
 
 
 #endif
+
+class MythInputDialog: public MythDialog
+{
+  Q_OBJECT
+
+    //
+    //  Very simple class, not themeable
+    //
+
+  public:
+
+    MythInputDialog( QString message,
+                        bool *success,
+                        QString *target,
+                        MythMainWindow *parent, 
+                        const char *name = 0, 
+                        bool setsize = true);
+    ~MythInputDialog();
+
+ protected:
+ 
+    void keyPressEvent(QKeyEvent *e);
+
+  private:
+  
+    MythLineEdit        *text_editor;
+    QString             *target_text;
+    bool                *success_flag;
+};
+

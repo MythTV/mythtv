@@ -12,6 +12,7 @@
 #include <qdom.h>
 #include <mythtv/uitypes.h>
 #include <mythtv/xmlparse.h>
+#include "videofilter.h"
 
 enum
 {
@@ -59,6 +60,7 @@ class VideoManager : public MythDialog
     bool updateML;
     bool noUpdate;
     int debug;
+    VideoFilterSettings *currentVideoFilter;
 
     QPixmap getPixmap(QString &level);
     QSqlDatabase *db;
@@ -70,6 +72,7 @@ class VideoManager : public MythDialog
     QDomElement xmldata;
 
     void ResetCurrentItem();
+    void RemoveCurrentItem();
 
     void RefreshMovieList();
     QString ratingCountry;
@@ -129,6 +132,8 @@ class VideoManager : public MythDialog
     QString movieRating;
     int movieRuntime;
     QString movieNumber;
+    QStringList movieGenres;
+    QStringList movieCountries;
     
     QString theMovieName;
     bool allowselect;

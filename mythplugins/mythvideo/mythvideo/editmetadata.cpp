@@ -54,6 +54,22 @@ void EditMetadataDialog::fillWidgets()
     {
         title_editor->setText(working_metadata->Title());
     }
+    if (category_select)
+    {
+	category_select->addItem(0,"Unknown");
+	QString q_string = QString("SELECT intid, category FROM videocategory"
+				" ORDER BY category");
+	QSqlQuery a_query(q_string,db);
+	if (a_query.isActive())
+	{
+	    while (a_query.next())
+	    {
+		category_select->addItem(a_query.value(0).toInt(),
+					a_query.value(1).toString());
+	    }
+	}
+	category_select->setToItem(working_metadata->getIdCategory(db));
+    }
     if(level_select)
     {
         for(int i = 1; i < 5; i++)
@@ -74,7 +90,8 @@ void EditMetadataDialog::fillWidgets()
         int possible_starting_point = 0;
         child_select->addItem(0, tr("None"));
 
-        QString q_string = QString("SELECT intid, title FROM videometadata ORDER BY title ;");
+        QString q_string = QString("SELECT intid, title FROM videometadata "
+					"ORDER BY title ;");
         QSqlQuery a_query(q_string, db);
         if(a_query.isActive() && a_query.numRowsAffected() > 0)
         {
@@ -170,6 +187,14 @@ void EditMetadataDialog::keyPressEvent(QKeyEvent *e)
         else if (action == "LEFT") 
         {
             something_pushed = false;
+            if (category_select)
+            {
+                if (getCurrentFocusWidget() == category_select)
+                {
+                    category_select->push(false);
+		    something_pushed = true;
+                }
+            }
             if (level_select)
             {
                 if (getCurrentFocusWidget() == level_select)
@@ -194,6 +219,14 @@ void EditMetadataDialog::keyPressEvent(QKeyEvent *e)
         else if (action == "RIGHT")
         {
             something_pushed = false;
+            if (category_select)
+            {
+                if (getCurrentFocusWidget() == category_select)
+                {
+                    category_select->push(true);
+                    something_pushed = true;
+                }
+            }
             if (level_select)
             {
                 if (getCurrentFocusWidget() == level_select)
@@ -216,7 +249,38 @@ void EditMetadataDialog::keyPressEvent(QKeyEvent *e)
             }
         }
         else if (action == "SELECT")
-            activateCurrent();
+	{
+	    something_pushed = false;
+            if (category_select)
+            {
+                if (getCurrentFocusWidget() == category_select)
+                {
+		    QString category = QString("");
+		    bool ok = false;
+		    MythInputDialog	*newcategory = new MythInputDialog(
+				QObject::tr("New category"),
+				&ok,
+				&category,
+				gContext->GetMainWindow());
+		    newcategory->exec();
+		    delete newcategory;	
+
+		    if (ok)
+		    {
+			working_metadata->setCategory(category);
+			int id = working_metadata->getIdCategory(db);
+			category_select->addItem(id, category);
+			category_select->setToItem(id);
+		    }
+                    something_pushed = true;
+                }
+            }
+	
+	    if (!something_pushed)
+	    {
+        	activateCurrent();
+	    }
+	}
         else if (action == "0")
         {    
             if (done_button)
@@ -261,6 +325,11 @@ void EditMetadataDialog::saveAndExit()
 void EditMetadataDialog::setTitle(QString new_title)
 {
     working_metadata->setTitle(new_title);
+}
+
+void EditMetadataDialog::setCategory(int new_category)
+{
+    working_metadata->setIdCategory(db, new_category);
 }
 
 void EditMetadataDialog::setPlayer(QString new_command)
@@ -331,6 +400,13 @@ void EditMetadataDialog::wireUpTheme()
                 this, SLOT(setTitle(QString)));
     }
 
+    category_select = getUISelectorType("category_select");
+    if(level_select)
+    {
+        connect(category_select, SIGNAL(pushed(int)),
+                this, SLOT(setCategory(int)));
+    }
+    
     player_hack = getUIBlackHoleType("player_hack");
     if(player_hack)
     {
@@ -403,3 +479,69 @@ EditMetadataDialog::~EditMetadataDialog()
     }
 }
 
+
+/*
+---------------------------------------------------------------------
+*/
+
+MythInputDialog::MythInputDialog(QString message,
+                                       bool *success,
+                                       QString *target,
+                                       MythMainWindow *parent, 
+                                       const char *name, 
+                                       bool)
+                   :MythDialog(parent, name, false)
+{
+    success_flag = success;
+    target_text = target;
+
+    gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
+    this->setGeometry((screenwidth - 400 ) / 2,
+                      (screenheight - 50 ) / 2,
+                      400,50);
+    QFrame *outside_border = new QFrame(this);
+    outside_border->setGeometry(0,0,400,50);
+    outside_border->setFrameStyle(QFrame::Panel | QFrame::Raised );
+    outside_border->setLineWidth(4);
+    QLabel *message_label = new QLabel(message, this);
+    message_label->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    message_label->setGeometry(15,10,180,30);
+    message_label->setBackgroundOrigin(ParentOrigin);
+    text_editor = new MythLineEdit(this);
+    text_editor->setGeometry(200,10,185,30);
+    text_editor->setBackgroundOrigin(ParentOrigin);
+
+    this->setActiveWindow();
+    text_editor->setFocus();
+}
+
+void MythInputDialog::keyPressEvent(QKeyEvent *e)
+{
+    bool handled = false;
+    QStringList actions;
+    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
+    {
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        {
+            QString action = actions[i];
+            if (action == "ESCAPE")
+            {
+                handled = true;
+                MythDialog::keyPressEvent(e);
+            }
+	    else if (action == "SELECT")
+	    {
+		*success_flag = true;
+		*target_text = QString(text_editor->text());
+		handled = true;
+		MythDialog::keyPressEvent(e);
+		done(0);
+	    }
+        }
+    }
+}
+
+
+MythInputDialog::~MythInputDialog()
+{
+}

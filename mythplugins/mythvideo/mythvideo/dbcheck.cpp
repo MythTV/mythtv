@@ -8,7 +8,7 @@ using namespace std;
 
 #include "mythtv/mythcontext.h"
 
-const QString currentDatabaseVersion = "1002";
+const QString currentDatabaseVersion = "1003";
 
 static void UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -137,4 +137,20 @@ void UpgradeVideoDatabaseSchema(void)
 
         performActualUpdate(updates, "1002", dbver);
     }
+    if (dbver == "1002")
+    {
+        const QString updates[] = {
+"ALTER TABLE videometadata CHANGE plot plot TEXT;",
+"ALTER TABLE videometadata ADD COLUMN category INT UNSIGNED NOT NULL DEFAULT 0;",
+"CREATE TABLE IF NOT EXISTS videocategory ( intid INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY, category VARCHAR(128) NOT NULL );",
+"CREATE TABLE IF NOT EXISTS videocountry ( intid INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY, country VARCHAR(128) NOT NULL ); ",
+"CREATE TABLE IF NOT EXISTS videometadatacountry ( idvideo INT UNSIGNED NOT NULL, idcountry INT UNSIGNED NOT NULL );",
+"CREATE TABLE IF NOT EXISTS videogenre ( intid INT UNSIGNED AUTO_INCREMENT NOT NULL  PRIMARY KEY, genre VARCHAR(128) NOT NULL);",
+"CREATE TABLE IF NOT EXISTS videometadatagenre ( idvideo INT UNSIGNED NOT NULL,	idgenre INT UNSIGNED NOT NULL );",
+""
+};
+
+        performActualUpdate(updates, "1003", dbver);
+    }
 }
+

@@ -12,15 +12,16 @@
 #include <qdir.h>
 #include <qurloperator.h>
 #include <qprocess.h>
+#include <qfiledialog.h>
 
 using namespace std;
 
 #include "metadata.h"
 #include "videomanager.h"
 #include "editmetadata.h"
+#include "videofilter.h"
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdialogs.h>
-
 VideoManager::VideoManager(QSqlDatabase *ldb,
                            MythMainWindow *parent, const char *name)
             : MythDialog(parent, name)
@@ -30,6 +31,7 @@ VideoManager::VideoManager(QSqlDatabase *ldb,
     debug = 0;
     isbusy = false;    // ignores keys when true (set when doing http request)
 
+    currentVideoFilter = new VideoFilterSettings(db,false);
     RefreshMovieList();
 
     fullRect = QRect(0, 0, (int)(800*wmult), (int)(600*hmult));
@@ -115,7 +117,6 @@ void VideoManager::keyPressEvent(QKeyEvent *e)
     {
         QString action = actions[i];
         handled = true;
-
         if (action == "SELECT" && allowselect)
         {
             selected();
@@ -132,8 +133,16 @@ void VideoManager::keyPressEvent(QKeyEvent *e)
                 num(action);
             return;
         }
-
-        if (action == "UP")
+ 	if (action == "DELETE")
+		RemoveCurrentItem();
+	else if (action == "BROWSE"){
+	    if (m_state == SHOWING_MAINWINDOW){ 
+ 		curitem->setBrowse(!curitem->Browse());
+		curitem->updateDatabase(db);
+        	RefreshMovieList();
+        	update(infoRect);
+	    }
+        }else if (action == "UP")
             cursorUp();
         else if (action == "DOWN")
             cursorDown();
@@ -147,9 +156,23 @@ void VideoManager::keyPressEvent(QKeyEvent *e)
             pageDown();
         else if (action == "ESCAPE")
             exitWin();
-        else if (action == "MENU" || action == "INFO")
-            videoMenu();
-        else
+        else if ((action == "MENU") || (action == "INFO"))
+             videoMenu();
+	else if (action == "FILTER")
+		if (m_state == SHOWING_MAINWINDOW){
+			VideoFilterDialog *vfd = new VideoFilterDialog(db,
+					//NULL,
+					currentVideoFilter,
+					gContext->GetMainWindow(),
+					"filter",
+					"video-",
+					"Video Filter Dialog");
+			vfd->exec();
+			delete vfd;
+			RefreshMovieList();
+			update(fullRect);
+		}
+	else
             handled = false;
     }
 
@@ -159,21 +182,10 @@ void VideoManager::keyPressEvent(QKeyEvent *e)
 
 void VideoManager::num(const QString &text)
 {
-    if (m_state == SHOWING_IMDBMANUAL && curIMDBNum.length() != 7)
+    if (m_state == SHOWING_IMDBMANUAL)
     {
         curIMDBNum = curIMDBNum + text;
         update(imdbEnterRect);
-        if (curIMDBNum.length() == 7)
-        {
-            movieNumber = curIMDBNum;
-            GetMovieData(curIMDBNum);
-            backup.begin(this);
-            backup.drawPixmap(0, 0, myBackground);
-            backup.end();
-            m_state = SHOWING_MAINWINDOW;
-            noUpdate = false;
-            update(fullRect);
-        }
     }
 }
 
@@ -184,7 +196,12 @@ void VideoManager::RefreshMovieList()
     updateML = true;
     m_list.clear();
 
-    QSqlQuery query("SELECT intid FROM videometadata ORDER BY title;", db);
+//    QSqlQuery query("SELECT intid FROM videometadata ORDER BY title;", db);
+    QString thequery = QString("SELECT intid FROM %1 %2 %3")
+				.arg(currentVideoFilter->BuildClauseFrom())
+				.arg(currentVideoFilter->BuildClauseWhere())
+				.arg(currentVideoFilter->BuildClauseOrderBy());
+   QSqlQuery query(thequery,db);
     Metadata *myData;
 
     if (query.isActive() && query.numRowsAffected() > 0)
@@ -285,7 +302,9 @@ QString VideoManager::GetMoviePoster(QString movieNum)
           this, SLOT(copyFinished(QNetworkOperation*)) );
     iscopycomplete = false;
     iscopysuccess = false;
+
     op->copy(uri, "file:" + fileprefix);
+
     // wait for completion for up to 5 seconds
     for (int i = 0; i < 500; i++) {
        if (!iscopycomplete) {
@@ -298,8 +317,13 @@ QString VideoManager::GetMoviePoster(QString movieNum)
 
     QString localfile = "";
     if (iscopycomplete) {
-        if (iscopysuccess)
+        if (iscopysuccess){
            localfile = fileprefix + "/" + uri.section('/', -1);
+	   QString extension = uri.right(uri.length()-uri.findRev('.'));
+	   if (dir.rename (localfile, fileprefix +"/" + movieNum + extension)){
+		localfile = fileprefix +"/" + movieNum + extension;
+	   }
+ 	}
     } else {
        op->stop();
        QString err = QString("Copying of '%1' timed out").arg(uri);
@@ -376,6 +400,42 @@ void VideoManager::GetMovieData(QString movieNum)
         curitem->setUserRating(data["UserRating"].toFloat());
         curitem->setRating(data["MovieRating"]);
         curitem->setLength(data["Runtime"].toInt());
+	//movieGenres
+	movieGenres.clear();
+	QString genres = data["Genres"];
+	int indice ;
+	QString genre;
+	while (genres!= ""){
+		indice = genres.find(",");
+		if (indice == -1){
+			genre = genres;
+			genres = "";
+		} else {
+			genre = genres.left(indice);
+			genres = genres.right(genres.length()-indice -1);
+		}
+		movieGenres.append(genre.stripWhiteSpace());
+	}
+	curitem->setGenres(movieGenres);
+	//movieCountries
+	movieCountries.clear();
+	QString countries = data["Countries"];
+	QString country;
+	while (countries!= ""){
+		indice = countries.find(",");
+		if (indice == -1){
+			country = countries;
+			countries = "";
+		} else {
+			country = countries.left(indice);
+			countries = countries.right(countries.length()-indice -1);
+		}
+		country.stripWhiteSpace();
+
+		movieCountries.append(country.stripWhiteSpace());
+	}
+	curitem->setCountries(movieCountries);
+	
         curitem->setInetRef(movieNumber);
         QString movieCoverFile = "";
         movieCoverFile = GetMoviePoster(movieNumber);
@@ -397,24 +457,24 @@ QString VideoManager::executeExternal(QStringList args, QString purpose)
     QString err = "";
 
     VERBOSE(VB_GENERAL, QString("%1: Executing '%2'").arg(purpose).
-                      arg(args.join(" ")) );
+                      arg(args.join(" ")).local8Bit() );
     QProcess proc(args, this);
 
     QString cmd = args[0];
     QFileInfo info(cmd);
     if (!info.exists()) {
-       err.sprintf("\"%s\" failed: does not exist", cmd.latin1());
+       err = QString("\"%1\" failed: does not exist").arg(cmd.local8Bit());
     } else if (!info.isExecutable()) {
-       err.sprintf("\"%s\" failed: not executable", cmd.latin1());
+       err = QString("\"%1\" failed: not executable").arg(cmd.local8Bit());
     } else if (proc.start()) {
         while (true) {
            while (proc.canReadLineStdout() || proc.canReadLineStderr()) {
               if (proc.canReadLineStdout()) {
-                 ret += proc.readLineStdout() + "\n";
+                ret += QString::fromLocal8Bit(proc.readLineStdout(),-1) + "\n";
               } 
               if (proc.canReadLineStderr()) {
                  if (err == "") err = cmd + ": ";
-                 err += proc.readLineStderr() + "\n";
+                 err += QString::fromLocal8Bit(proc.readLineStderr(),-1) + "\n";
               }
            }
            if (proc.isRunning()) {
@@ -422,23 +482,24 @@ QString VideoManager::executeExternal(QStringList args, QString purpose)
               usleep(10000);
            } else {
               if (!proc.normalExit()) {
-                 err.sprintf("\"%s\" failed: Process exited abnormally", 
-                     cmd.latin1());
+                 err = QString("\"%1\" failed: Process exited abnormally")
+                     .arg(cmd.local8Bit());
               } 
               break;
            }
        }
     } else {
-       err.sprintf("\"%s\" failed: Could not start process", cmd.latin1());
+       err = QString("\"%1\" failed: Could not start process")
+		.arg(cmd.local8Bit());
     }
 
     while (proc.canReadLineStdout() || proc.canReadLineStderr()) {
         if (proc.canReadLineStdout()) {
-            ret += proc.readLineStdout() + "\n";
+            ret += QString::fromLocal8Bit(proc.readLineStdout(),-1) + "\n";
         }
         if (proc.canReadLineStderr()) {
            if (err == "") err = cmd + ": ";
-           err += proc.readLineStderr() + "\n";
+           err += QString::fromLocal8Bit(proc.readLineStderr(), -1) + "\n";
         }
     }
 
@@ -1261,6 +1322,7 @@ void VideoManager::videoMenu()
        movieList.push_back("manual:Manually Enter IMDB #");
        movieList.push_back("reset:Reset Entry");
        movieList.push_back("cancel:Cancel");
+       movieList.push_back("remove:Remove Video");
        inListMovie = 0;
        inDataMovie = 0;
        listCountMovie = 0;
@@ -1316,8 +1378,8 @@ void VideoManager::selected()
        }
        backup.flush();
 
-//      int ret = GetMovieListing(movieTitle);
-      int ret = GetMovieListing(curitem->Filename().section('/', -1));
+      int ret = GetMovieListing(curitem->Title());
+//      int ret = GetMovieListing(curitem->Filename().section('/', -1));
       VERBOSE(VB_ALL, 
               QString("GetMovieList returned %1 possible matches").arg(ret));
       if (ret == 1) {
@@ -1419,6 +1481,19 @@ void VideoManager::selected()
            movieNumber = "";
            return;
        }
+       else if (movieNumber == "remove")
+       {
+	   RemoveCurrentItem();
+ 
+           backup.begin(this);
+           backup.drawPixmap(0, 0, myBackground);
+           backup.end();
+ 
+           m_state = SHOWING_MAINWINDOW;
+           update(fullRect);
+           movieNumber = "";
+           return;
+       }
        else if (movieNumber == "") {
            return;
        }
@@ -1445,8 +1520,41 @@ void VideoManager::selected()
            movieNumber = "";
        }
    }
+   else if (m_state == SHOWING_IMDBMANUAL)
+   {
+      movieNumber = curIMDBNum;
+      GetMovieData(curIMDBNum);
+      backup.begin(this);
+      backup.drawPixmap(0, 0, myBackground);
+      backup.end();
+      m_state = SHOWING_MAINWINDOW;
+      noUpdate = false;
+      update(fullRect);
+    }
 }
 
+void VideoManager::RemoveCurrentItem(){
+     if (m_state ==SHOWING_MAINWINDOW){
+	   bool okcancel;
+	   MythPopupBox * ConfirmationDialog = 
+		new MythPopupBox (gContext->GetMainWindow());
+	   okcancel = ConfirmationDialog->showOkCancelPopup(
+				gContext->GetMainWindow(),
+				"",
+				tr("Delete this file ?"),
+				false);
+	   if (okcancel)
+		   if (curitem->Remove(db))
+        	       RefreshMovieList();
+		   else
+		   ConfirmationDialog->showOkPopup(
+				gContext->GetMainWindow(),
+				"",
+				tr("delete failed"));
+	   delete ConfirmationDialog;
+    }
+}
+ 
 void VideoManager::ResetCurrentItem()
 {
     QString coverFile = tr("No Cover");
@@ -1461,7 +1569,10 @@ void VideoManager::ResetCurrentItem()
     curitem->setRating(tr("NR"));
     curitem->setLength(0);
     curitem->setShowLevel(1);
-
+    movieGenres.clear();
+    curitem->setGenres(movieGenres);
+    movieCountries.clear();
+    curitem->setCountries(movieCountries);
     curitem->updateDatabase(db);
     RefreshMovieList();
 }

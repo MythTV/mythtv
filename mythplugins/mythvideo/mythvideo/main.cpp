@@ -20,6 +20,7 @@ using namespace std;
 #include "videomanager.h"
 #include "videobrowser.h"
 #include "videotree.h"
+#include "videofilter.h"
 #include "globalsettings.h"
 #include "fileassoc.h"
 #include "dbcheck.h"
@@ -60,7 +61,14 @@ void setupKeys(void)
              runVideoBrowser);
     REG_JUMP("Video Listings", "The MythVideo video listings", "", 
              runVideoTree);
+
+    REG_KEY("Video","DELETE","Delete video","D");
+    REG_KEY("Video","FILTER","Open video filter dialog","F");
+    REG_KEY("Video","BROWSE","Change browsable in video manager","B");
+
+
 }
+
 
 int mythplugin_init(const char *libversion)
 {

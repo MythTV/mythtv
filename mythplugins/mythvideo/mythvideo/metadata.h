@@ -16,7 +16,10 @@ class Metadata
              QString ldirector = "", QString lplot = "", 
              float luserrating = 0.0, QString lrating = "", int llength = 0, 
              int lid = 0, int lshowlevel = 1, int lchildID = -1,
-             bool lbrowse = true, QString lplaycommand = "")
+             bool lbrowse = true, QString lplaycommand = "",
+	     QString lcategory = "",
+ 	     QStringList lgenres = QStringList(),
+	     QStringList lcountries = QStringList())
     {
         filename = lfilename;
         coverfile = lcoverfile;
@@ -33,6 +36,9 @@ class Metadata
         childID = lchildID;
         browse = lbrowse;
         playcommand = lplaycommand;
+	category = lcategory;
+	genres = lgenres;
+	countries = lcountries;
     }
 
     Metadata(const Metadata &other) 
@@ -52,6 +58,9 @@ class Metadata
         childID = other.childID;
         browse = other.browse;
         playcommand = other.playcommand;
+	category = other.category;
+	genres = other.genres;
+	countries = other.countries;
     }
 
    ~Metadata() {}
@@ -101,14 +110,31 @@ class Metadata
     QString CoverFile() const { return coverfile; }
     void setCoverFile(QString &lcoverfile) { coverfile = lcoverfile; }
 
+    QString Category() const { return category;}
+    void setCategory(QString lcategory){category = lcategory;}
+    QStringList Genres() const { return genres; }
+    void setGenres(QStringList lgenres){genres = lgenres;}
+
+    QStringList Countries() const { return countries;}
+    void setCountries(QStringList lcountries){countries = lcountries;}
+
     void guessTitle();
     void setField(QString field, QString data);
     void dumpToDatabase(QSqlDatabase *db);
     void updateDatabase(QSqlDatabase *db);
     void fillData(QSqlDatabase *db);
     void fillDataFromID(QSqlDatabase *db);
+    int getIdCategory(QSqlDatabase *db);
+    void setIdCategory(QSqlDatabase *db, int id);
+    bool Remove(QSqlDatabase *db);
 
   private:
+    void fillCategory(QSqlDatabase *db);
+    void fillCountries(QSqlDatabase *db);
+    void updateCountries(QSqlDatabase *db);
+    void fillGenres(QSqlDatabase *db);
+    void updateGenres(QSqlDatabase *db);
+ 
     QString title;
     QString inetref;
     QString director;
@@ -121,6 +147,9 @@ class Metadata
     int showlevel;
     bool browse;
     QString playcommand;
+    QString category;
+    QStringList genres;
+    QStringList countries;
 
     unsigned int id;
     
