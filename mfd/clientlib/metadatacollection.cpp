@@ -447,7 +447,6 @@ void MetadataCollection::printMetadata()
     }
 }
 
-
 MetadataCollection::~MetadataCollection()
 {
     metadata.clear();

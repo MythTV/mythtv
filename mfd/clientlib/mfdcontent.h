@@ -39,6 +39,8 @@ class MfdContentCollection
     UIListGenericTree* getAudioCollectionTree(){ return audio_collection_tree;}
     
     AudioMetadata*  getAudioItem(int which_collection, int which_id);
+
+    void sort();
     
   private:
 

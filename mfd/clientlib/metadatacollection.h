@@ -56,7 +56,7 @@ class MetadataCollection
     void          deleteItem(uint which_item);
     void          deleteList(uint which_list);
     void          printMetadata();   // Debugging
-
+    
 
     //
     //  Get at the contents

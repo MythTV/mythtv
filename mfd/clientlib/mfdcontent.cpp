@@ -105,8 +105,9 @@ void MfdContentCollection::addPlaylist(ClientPlaylist *new_playlist, const QStri
     //
 
     UIListGenericTree *playlist_node = new UIListGenericTree(audio_playlist_tree, new_playlist->getName());
-    playlist_node->setAttribute(0, 0);
-    playlist_node->setAttribute(1, 0);
+    playlist_node->setAttribute(0, 0);  //  collection id is 0
+    playlist_node->setAttribute(1, 0); 
+    playlist_node->setAttribute(2, 0); 
 
     //
     //  Find or "create as we go" another node for this playlist in the "By
@@ -160,16 +161,16 @@ void MfdContentCollection::addPlaylist(ClientPlaylist *new_playlist, const QStri
     for(l_it = the_list->begin(); l_it != the_list->end(); ++l_it)
     {
         UIListGenericTree *track_node = new UIListGenericTree(playlist_node, (*l_it).getName());
-        track_node->setInt(counter);
+        track_node->setInt(new_playlist->getId());
         track_node->setAttribute(0, new_playlist->getCollectionId());
         track_node->setAttribute(1, 2);
-        track_node->setAttribute(2, new_playlist->getId());
+        track_node->setAttribute(2, counter);
 
         UIListGenericTree *o_track_node = new UIListGenericTree(collection_playlist_node, (*l_it).getName());
-        o_track_node->setInt(counter);
+        o_track_node->setInt(new_playlist->getId());
         o_track_node->setAttribute(0, new_playlist->getCollectionId());
         o_track_node->setAttribute(1, 2);
-        o_track_node->setAttribute(2, new_playlist->getId());
+        o_track_node->setAttribute(2, counter);
         ++counter;
     }
     
@@ -180,6 +181,7 @@ void MfdContentCollection::addItemToAudioArtistTree(AudioMetadata *item, Generic
     QString album  = item->getAlbum();
     QString artist = item->getArtist();
     QString title  = item->getTitle();
+    int track_no   = item->getTrack();
             
     //
     // The Artist --> Album --> Track   branch
@@ -191,6 +193,7 @@ void MfdContentCollection::addItemToAudioArtistTree(AudioMetadata *item, Generic
         artist_node = new UIListGenericTree((UIListGenericTree *) starting_point, artist);
         artist_node->setAttribute(0, 0);
         artist_node->setAttribute(1, 0);
+        artist_node->setAttribute(2, 0);
     }
 
 
@@ -200,13 +203,15 @@ void MfdContentCollection::addItemToAudioArtistTree(AudioMetadata *item, Generic
         album_node = new UIListGenericTree((UIListGenericTree *) artist_node, album);
         album_node->setAttribute(0, 0);
         album_node->setAttribute(1, 0);
+        album_node->setAttribute(2, 0);
     }
             
-    UIListGenericTree *title_node = new UIListGenericTree((UIListGenericTree *) album_node, title);
+    UIListGenericTree *title_node = new UIListGenericTree((UIListGenericTree *) album_node, 
+                                        QString("%1. %2").arg(track_no).arg(title));
     title_node->setInt(item->getId());
     title_node->setAttribute(0, item->getCollectionId());
     title_node->setAttribute(1, 1);
-
+    title_node->setAttribute(2, track_no);
 }
 
 void MfdContentCollection::addItemToAudioGenreTree(AudioMetadata *item, GenericTree *starting_point)
@@ -215,6 +220,7 @@ void MfdContentCollection::addItemToAudioGenreTree(AudioMetadata *item, GenericT
     QString album  = item->getAlbum();
     QString artist = item->getArtist();
     QString title  = item->getTitle();
+    int track_no   = item->getTrack();
             
     //
     // The Genre --> Artist --> Album --> Track   branch
@@ -226,6 +232,7 @@ void MfdContentCollection::addItemToAudioGenreTree(AudioMetadata *item, GenericT
         genre_node = new UIListGenericTree((UIListGenericTree *)starting_point, genre);
         genre_node->setAttribute(0, 0);
         genre_node->setAttribute(1, 0);
+        genre_node->setAttribute(2, 0);
     }
 
     GenericTree *artist_node = genre_node->getChildByName(artist);
@@ -234,6 +241,7 @@ void MfdContentCollection::addItemToAudioGenreTree(AudioMetadata *item, GenericT
         artist_node = new UIListGenericTree((UIListGenericTree *)genre_node, artist);
         artist_node->setAttribute(0, 0);
         artist_node->setAttribute(1, 0);
+        artist_node->setAttribute(2, 0);
     }
 
     GenericTree *album_node = artist_node->getChildByName(album);
@@ -242,12 +250,15 @@ void MfdContentCollection::addItemToAudioGenreTree(AudioMetadata *item, GenericT
         album_node = new UIListGenericTree((UIListGenericTree *) artist_node, album);
         album_node->setAttribute(0, 0);
         album_node->setAttribute(1, 0);
+        album_node->setAttribute(2, 0);
     }
             
-    UIListGenericTree *title_node = new UIListGenericTree((UIListGenericTree *) album_node, title);
+    UIListGenericTree *title_node = new UIListGenericTree((UIListGenericTree *) album_node, 
+                                        QString("%1. %2").arg(track_no).arg(title));
     title_node->setInt(item->getId());
     title_node->setAttribute(0, item->getCollectionId());
     title_node->setAttribute(1, 1);
+    title_node->setAttribute(2, track_no);
 }
 
 void MfdContentCollection::addItemToAudioCollectionTree(AudioMetadata *item, const QString &collection_name)
@@ -312,6 +323,27 @@ AudioMetadata* MfdContentCollection::getAudioItem(int which_collection, int whic
 
     return audio_item_dictionary[dictionary_key];
     
+}
+
+void MfdContentCollection::sort()
+{
+    //
+    //  we now (presumably) have all our metadata and everything in place.
+    //  Sort it.
+    //
+
+    audio_artist_tree->sortByAttributeThenByString(2);
+    audio_artist_tree->reOrderAsSorted();
+    
+    audio_genre_tree->sortByAttributeThenByString(2);
+    audio_genre_tree->reOrderAsSorted();
+    
+    audio_playlist_tree->sortByAttributeThenByString(2);
+    audio_playlist_tree->reOrderAsSorted();
+    
+    audio_collection_tree->sortByAttributeThenByString(2);
+    audio_collection_tree->reOrderAsSorted();
+
 }
 
 MfdContentCollection::~MfdContentCollection()

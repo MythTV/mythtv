@@ -1432,6 +1432,12 @@ void MetadataClient::buildTree()
         {
             new_collection->addPlaylist(p_it.current(), a_collection->getName());
         }
+        
+        //
+        //  Sort everything
+        //
+        
+        new_collection->sort();
     }        
 
     //
