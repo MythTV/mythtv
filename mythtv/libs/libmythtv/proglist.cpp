@@ -346,8 +346,6 @@ void ProgLister::setViewFromEdit(void)
 
 void ProgLister::chooseView(void)
 {
-    cerr << "choose view: cur = " << curView << ", count = " << viewCount << endl;
-
     if (type == plChannel || type == plCategory)
     {
         if (viewCount < 2)
