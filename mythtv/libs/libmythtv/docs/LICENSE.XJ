@@ -1,0 +1,40 @@
+The XJ module for displaying the images under shared/non-shared X displays
+has been rather crudely hacked from the xqcam.c program by Paul Chinn
+<loomer@svpal.org>, and distributed in the qcam package by Scott Laird
+<scott@laird.com>, under the following license:
+
+Copyright:
+----------
+
+I've placed this program under the same copyright the X Consortium
+uses.  Basically, it's free for any use whatsoever.  If this manages
+to cause great problems for anyone (?) let me know and I suspect we
+can arrange something.
+
+Here's the notice:
+
+
+Copyright (C) 1996 by Scott Laird
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL SCOTT LAIRD BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+Scott Laird
+scott@laird.com
+January 6, 1996.

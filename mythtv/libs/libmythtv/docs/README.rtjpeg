@@ -1,0 +1,172 @@
+RTjpeg
+(C) 1998 Justin Schoeman (justin@suntiger.ee.up.ac.za)
+
+License+Disclaimer
+==================
+This code is distributed under GPLv2 (in other words, do what you like with
+it, but don't sell it, and give credit if you use it).
+THIS SOFTWARE IS IN NO WAY GUARANTEED TO WORK. IF YOU USE IT AND IT DOESN'T
+WORK, OR MESSES UP YOUR COMPUTER, IT'S YOUR OWN PROBLEM.
+
+General:
+========
+This is still a rather developmental real time compressor.  It is based on
+the jpeg compressor by the IJG (see LICENSE.jpeg for license details).  The
+only real difference is the encoder.  This compressor uses a home brew
+redundant data coder (makes use of the fact that some co-efficients have a
+limited range) to very quickly (but not that efficiently) encode the data.
+
+Basic interframe coding (only coefficients that have varied significantly
+are transmitted) is included.
+
+This codec is currently real time at CIF resolutions on anything faster than
+a pentium 200 (on most P133s too now).
+
+Installation:
+=============
+A number of modules are avaliable (in the modules directory).  Some work
+better on different architectures.  Select the module of your choice by
+editing compose.sh .
+
+Please benchmark these routines on various machines and send me your
+compression/decompression rate (and machine type).
+
+Applications:
+=============
+test: *out of date* captures from bttv0 and compresses to out.pgm (1
+	image).
+
+test2 <filename> <Q>: compresses <filename> to stdout with Q factor Q.
+	The input file is a PPM with 2h2v subsapled Cr and Cb attached to
+        the end.
+
+test3 <Q> <M>: capture compressed stream to "ostr" with Q factor Q and
+		motion threshold "M".
+
+test3d: play "ostr" on X display.  Hard coded for 32bpp, change
+	 Rtjpeg_yuvrgb32 to the conversion of your choice.
+
+TC(subdir): experimental constrained rate encoder.
+VS(subdir): experimental compressed Vstream version.
+
+Using the library:
+==================
+(see below for function descriptions)
+
+To compress single images:
+1) RTjpeg_init_compress
+2) (it is a good idea to save the tables with the image)
+3) RTjpeg_compress
+4) save result.
+
+To decompress a single image:
+1) Read saved tables (or call RTjpeg_init_compress with the same Q factor as
+was used to compress the data) 
+2) RTjpeg_init_decompress
+3) store the YUV420 image, or
+3) RTjpeg_yuvrgbXX where XX is the desired RGB depth (8 (grey) 16 (565) 24
+and 32)
+4) (possible) RTjpeg_doubleXX to double the image size.
+
+To compress an image stream (with interframe coding):
+As for single image except:
+1) RTjpeg_init_mcompress AFTER RTjpeg_init compress.
+2) Use RTjpeg_mcompress instead of RTjpeg_compress
+
+To decompress an image stream (with interframe coding):
+As for single frame except:
+1) Initialise output buffer to 0's
+2) do not modify the output buffer except by RTjpeg_decompress.
+
+RTjpeg Functions:
+=================
+(some functions may not yet be implemented for all module types)
+
+extern void RTjpeg_init_Q(__u8 Q);
+----------------------------------
+Change the quality factor for future compressions/decompressions to Q.
+Q=255 ==> IJG jpeg 75% (max)
+Q=128 ==> IJG jpeg 50%
+Q=32 (min usable)
+Q=1 (abstract art)
+
+extern void RTjpeg_init_compress(__u32 *buf, int width, int height, __u8 Q);
+----------------------------------------------------------------------------
+Initialise the compressor.
+  *buf is a pointer to 128 ints.  The de-quantizer values are stored in this
+array.  It is best to save these with the image for reliable decompression
+between versions (although it is probably not necessary).
+  width is the width of the Y component of the image.
+  height is the height of the Y component of the image.
+  Q is the quality factor (see above)
+
+extern void RTjpeg_init_decompress(__u32 *buf, int width, int height);
+----------------------------------------------------------------------
+Initialise decompressor (and color convertor).
+  *buf is a pointer to the 128 ints produced by init_compress.
+  width and height, as before.
+
+extern int RTjpeg_compress(__s8 *sp, unsigned char *bp);
+--------------------------------------------------------
+Compress the image.
+  *sp is a pointer to the output data (for safety, this buffer should be as 
+    large as the uncompressed data).
+  *bp is a pointer to the input data (YUV420P format).
+  RETURN: the number of bytes actually used for the output stream.
+
+extern void RTjpeg_decompress(__s8 *sp, __u8 *bp);
+--------------------------------------------------
+Decompress the image.
+  as before (no RETURN).
+
+extern void RTjpeg_init_mcompress(void);
+----------------------------------------
+Initialise interframe compression.
+
+extern int RTjpeg_mcompress(__s8 *sp, unsigned char *bp, __u16 lmask, __u16 cmask);
+-----------------------------------------------------------------------------------
+Perform interframe compression.
+ *sp, *bp as for compress
+ lmask, cmask threshold value for change in quantized luma and chroma
+   components before transmitting the block. NB works on quantized values,
+   so use lower thresholds for lower Q values.
+
+extern void RTjpeg_set_test(int i);
+-----------------------------------
+Enable test-compressions.
+  i=0: disable test mode
+  i=1: enable test mode
+(In test mode interframe compression is performed WITHOUT updating the local
+copy of the reference image.  This is used for constrained rate encoding to
+test multiple compression factors for compressed block size. Remember to
+call mcompress with test mode = 0 BEFORE transmitting an encoded block.)
+
+extern void RTjpeg_yuvrgb(__u8 *buf, __u8 *rgb);
+------------------------------------------------
+Convert decompressed YUV420P data to RGB data
+  *buf pointer to YUV420P data
+  *rgb pointer to RGB data
+
+extern void RTjpeg_yuvrgb32(__u8 *buf, __u8 *rgb);
+--------------------------------------------------
+convert to RGB32 data (display order)
+
+extern void RTjpeg_yuvrgb24(__u8 *buf, __u8 *rgb);
+--------------------------------------------------
+convert to RGB24 (display order)
+
+extern void RTjpeg_yuvrgb16(__u8 *buf, __u8 *rgb);
+--------------------------------------------------
+convert to RGB 565
+
+extern void RTjpeg_yuvrgb8(__u8 *buf, __u8 *rgb);
+-------------------------------------------------
+convert to grey-scale (grin)
+
+extern void RTjpeg_double32(__u32 *buf);
+extern void RTjpeg_double24(__u8 *buf);
+extern void RTjpeg_double16(__u16 *buf);
+extern void RTjpeg_double8(__u8 *buf);
+--------------------------------------
+convert the image pointed to by *buf to double size (size is determined by
+with and height from init_decompress).

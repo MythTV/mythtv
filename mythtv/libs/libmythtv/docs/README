@@ -1,0 +1,521 @@
+NuppelVideo README for v0.51 (fileformat v0.05)
+
+Table of Contents
+-----------------
+
+    1)  News
+      1a) Whats new in 0.51
+      1b) Whats new in 0.5
+      1c) What was new for 0.4
+
+    2)  Future plans:
+
+    3)  About
+      3a) What is it?
+      3b) Requirements:
+      3c) Why did i write it?
+      3d) My testsystems are:
+      3e) What did i do?
+
+    4)  How can we use it?
+      4a) nuvplay:
+      4b) Examples for nuvplay:
+      4c) nuvrec:
+      4d) Examples for nuvrec:
+      4e) How should we adjust quality parameters?
+
+    5)  And now, what do i do with my *.nuv?
+      5a) nuv -> MPEG:
+      5b) Example nuv -> MPEG:
+        5b1) make a MPEG VBR stream:
+        5b2) make a VCD compliant stream
+
+      5c) nuv2divx:
+
+    6)  If you have problems, or it doesn't work:
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+1)  News
+    ----
+
+ IMPORTANT: if nuvrec falls back to timecode based drop mechanism and you don't
+            want that, you have to load a bttv driver that supports field numbers.
+
+            i use bttv v0.7.69 from http://bytesex.org/bttv/ (seems to work fine)
+            the new 0.8 versions seems not to support field numbers anymore!
+            (0.5.*/0.6.* versions support fieldnr, but are very unstable!)
+
+            you can activate field numbers with:
+
+            modprobe bttv card=YOURCARDTYPE fieldnr=1
+
+ Please send me test reports, containing sync results, compression ratio,
+ cpu load, cpu type/speed and which bttv-card you have. I'll need to know
+ that, because i have no adequate test environment at the moment.
+
+
+------------------------------------------------------------------------
+
+1b) whats new in 0.51
+    -----------------
+
+.) hopefully fixed a nasty bug in dropping algorithm that inserted more
+   frames than were dropped
+.) added a primitive time based drop algorithm (only for test purposes)
+.) raw YUV I420 can be captured too now, if you have a huge hard disk
+.) fallback, if less then 5 buffers are free, nuvrec writes raw frames
+   to the harddisk to save cpu time, this might lead to less frame drops
+   on very slow machines.
+.) audio scaler incorporated.
+.) audio-video sync adjustment (untested, please test and report)
+.) more new bugs (all of them untested ;)
+
+thanks to:             Alexander Oelzant for the audio scaler patch.
+ 
+and thanks to all, who wrote bugreports, free software can't live without that!
+
+
+1b) whats new in 0.5
+    ----------------
+
+.) a very very simple editor for ad elimination, it can also be
+   used as a primitive player (might sound a bit out of sync)
+
+.) better compression :
+   Martin Biely and i wrote new coding/decoding algorithm that are
+   half nibble, nibble and byte oriented and increased the compression
+   ratio by a factor of 1.3 to 1.6 (depends).
+   (therefore lzo now is less effective except for cartoons and stills)
+
+   NOTE: the new RTjpeg is not compatible with original RTjpeg from 
+   Justin Schoeman, so if there are problems with this port don't write
+   mails to him.
+
+.) fixed a bug in RTjpeg, now RTjpeg can be compiled with -O3 -finline ...
+
+.) split file support, every 2Gigs there will be a new .nuv file
+
+.) inserted timecode information into the nuppelvideo file protocol
+.) calculate the effective DSP frequency of the used sound card
+   this is needed for MPEG encoding because some sound cards are
+   so unprecise that movies can be out of sync in a matter of minutes
+   (automatic audio scaling will be inserted soon, in the meantime use sox)
+
+.) some old bug fixed, some new added
+.) more new bugs (most of them untested ;)
+
+thanks to:
+ 
+     Martin Biely    for helping/coding the better coding/decoding algorithms.
+     Andrew Stevens  for writing/supporting an excellent MPEG encoder and
+                     and answering every question immediately.
+     Justin Schoeman for writing/supporting/fixing the very fast RTjpeg codec.
+
+     Benedict Bridgwater for fixing the "Black Hole" bug.
+     Alexander Oelzant   for his support in Exportvideo.
+
+------------------------------------------------------------------------
+1c) what was new for 0.4
+    --------------------
+
+nuvrec and nuvplay has a totally new userinterface, because the old one was a bit
+ugly and not too usable. the bug with audio recording is now fixed. i got many
+mails (don't be angry if i didn't answer all of them, there were too much ;-)
+nuvrec now has an inputselector to capture either from composite or from a source
+with a tuner, that has to be pretuned (i.e. with xawtv).
+
+thanks to Franz Ackermann (aka faz) who found the very nasty bug which caused the
+                                    audio capture process to segfault. many thanks
+      and Karsten Scheibler who sent me a patch to unmute sound on the bttv-card
+                            and an intermediate workaround for the bug faz fixed.
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+2) future plans:
+   -------------
+
+less importance:
+----------------
+include very fast input filters either before RTjpeg or before
+MPEG or AVI. 
+A Gauss filter might help people with little harddisks, bad (not excellent)
+tv reception and not to slow cpu's to record at lower bitrates by filtering
+most of the noise (and by destroing video information too).
+this will also be most usefull with cartoons. it might also help normal
+video material because the differences between two 8x8 blocks in two 
+following pictures might be less which then might be below either the
+luminance or chrominace thresholds, which will decrease the bitrate.
+
+add a lossless/compressing codec codec
+
+middle importance:
+------------------
+fix bugs and add videotext to the nuv files (already in the file protocol)
+to support subtitles. the subtitles will then either be encoded into
+the video stream or exported to a subtitle file (in a common format).
+
+support for .xawtv files for sender information assimilation.
+
+most importance:
+----------------
+write a better timecode based frame drop algorith and get rid of original
+fielnr based algorithm since 2.4 kernels/ bttv 0.8 drivers don't support
+fieldnr's anymore.
+
+write a simple nuv2yuv (only export, no scaling ...) program for people
+who don't want to compile Exportvideo (needs a lot to compile, therefore
+it can deinterlace, cut and scale and insert timestamps or framenumbers)
+
+write better nuv2mpg scripts with command line options
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+3) About
+   -----
+
+------------------------------------------------------------------------
+
+3a) what is it?
+    -----------
+NuppelVideo is a simple low consuming and fast capture program for bttv-cards (BT8x8)
+it is based on the RTjpeg2.0 test3* programs from Justin Schoemann , who wrote the
+very fast and fine RTjpeg2.0 codec (improved by Joerg Walter and Wim Taymans).
+
+------------------------------------------------------------------------
+
+3b) requirements:
+    -------------
+it works only with BTTV-Chipsets, because we need the actual framenumber, which IMHO isn't
+supported by the normal videodev interface, maybe that will be fixed with v4lv2
+you also need an 586 compatible processor with mmx, at least P200MMX with 32MB RAM..
+a P166MMX might also work but with many recogniced frame drops (should not lose sync).
+
+------------------------------------------------------------------------
+
+3c) why did i write it?
+    -------------------
+just for fun? not entirely. i wanted a recording tool that has adjustable quality
+and hopefully doesn't lose audio or videoframes and therefore keeps sync. the latter 
+was the mainreason for writing this tool. i tried FAME, the original RTjpeg2.0 version
+mp1e, vrec, qtvidcap, bttvgrab, and even ffmpeg. they lost frames or did not keep sync,
+or were to slow to be usable on my slow K6-2 350 with a very slow (4MB/s writing) and
+(for capturing purpose much too) small (4GB) scratch disk. it works fine for me and maybe 
+fine for you, too. I would like to know if it does and of course if it doesn't and 
+espacially if you can record with a P166MMX with few or no drops (what material and how).
+
+------------------------------------------------------------------------
+
+3d) my testsystems are:
+    -------------------
+ K6-2-400: 384x288x25 (compr.ratio ca 10:1 with lzo   aktivated) and 40% cpu load
+ K6-2-400: 512x384x25 (compr.ratio ca 10:1 with lzo deaktivated) and 80% cpu load 
+ K7-900:   768x576x25 (compr.ratio ca 8:1  with lzo   aktivated) and 60% cpu load
+
+------------------------------------------------------------------------
+ 
+3e) what did i do?
+    --------------
+i enhanced the original record program with audio recording and use fork with a big
+shared memory to ensure that we lose no (or almost no) frames , if we lose a frame
+because the bttv could not decode one, the last frame will be copied until we have
+the right frame-count to ensure correct audio/video sync.
+
+the player is able to play audio and video, to achive higher speed i took yuv2rgb_mmx.c
+written by Olie Lho <ollie@sis.com.tw> from mpeg2dec (from Aaron Holtzmann).
+your computer should be at least a P200 with MMX to get realtime with 352x240.
+comics and anime can be played with a P166 MMX, if the videos aren't too noisy.
+the player cannot seek and is just for simple playing, quality adjustment and testing.
+anyway i've 'designed' this simple format only for fun
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+4) how can we use it?
+   ------------------
+
+you have to initialize your tv-card with xawtv (Television and channel or Composite[1-3]), 
+set the correct inputchannel and recvolume on your soundcard with aumix or another mixer. 
+test audiorecording with sox, vrec or brec if nuvrec doesn't record audio, if it doesn't 
+work please send me an e-mail and please include the list of hardware you have.
+
+------------------------------------------------------------------------
+
+4a) nuvplay:
+    --------
+
+..........................................................
+bender(yoda) # nuvplay -h
+
+NuppelVideo Player v0.5          (c)Roman HOCHLEITNER
+Usage: nuvplay [options] filename 
+
+options: -w n .......... wait n miliseconds (per frame)
+         -E filename ... export audio to filename
+         -b n .......... videoframes delayed (sync) 0..60 [8]
+         -f ............ play fast (every 7th fr. no audio)
+         -e ............ export audio to stdout
+         -d ............ deinterlace (very slow)
+         -s ............ do not skip frames
+         -c ............ only count video frames
+         -V ............ video only (i.e. no audio)
+         -Z ............ edit mode (for nuvedit)
+         -h ............ this help
+
+Note: this 'player' is far from perfect and if video/audio is not
+      in sync it's rather more a problem of the player and not of the
+      recordtool, in this case try -b 1 to 30 to compensate the delay!
+
+bender(yoda) # _
+..........................................................
+
+------------------------------------------------------------------------
+
+4b) Examples for nuvplay:
+    ---------------------
+	nuvplay newsspeaker.nuv
+	nuvplay -V newsspeaker.nuv    ; # no audio is played
+	nuvplay -V -C newsspeaker.nuv ; # the changes from last frame to this frame is displayed
+                                      ; # thats nice to look, espacially with simpsons,futurama ;-)
+                                        # NOTE: -C is currently not supported
+
+	nuvplay -V -w 300 newsspeaker.nuv ; # wait 300msec after every frame
+	nuvplay -c newsspeaker.nuv        ; # count the video frames 
+
+	nuvplay -e newsspeaker.nuv        ; # write audio to stdout
+
+	nuvplay -e newsspeaker.nuv | toolame -b 192 -m s /dev/stdin newsspeaker.mp2
+        # makes a mpeg layer2 audio file to be multiplexed with the respective videostream
+
+
+------------------------------------------------------------------------
+
+4c) nuvrec:
+    -------
+
+..........................................................
+bender(yoda) # nuvrec -h
+
+NuppelVideo Recording Tool v0.5     (c)Roman HOCHLEITNER
+Usage: nuvrec [options] filename 
+
+options: -q n .......... Quality 3..255  (75%JPEG=)[255]
+         -l n .......... Luminance Threshold   0..20 [1]
+         -c n .......... Chrominance Threshold 0..20 [1]
+         -W n .......... Width       [352 PAL, 352 NTSC]
+         -H n .......... Height      [288 PAL, 240 NTSC]
+         -t min ........ Length (3.5 = 3m 30s) [forever]
+         -S n .......... Source (0 can be Televison) [0]
+         -f n.n ........ Tunerfrequency      [no change]
+         -x n .......... Video buffers in mb  [l.8/b.14]
+         -y n .......... Audio buffers in mb         [2]
+         -V dev ........ Videodevice       [/dev/video0]
+         -A dev ........ Audiodevice          [/dev/dsp]
+         -a n .......... Volume (bttv-volume)    [32768]
+         -p ............ PAL [default] 
+         -n ............ NTSC
+         -s ............ SECAM
+         -Q ............ shut up
+         -N ............ no (lzo) compression
+         -z ............ video only (i.e. no audio)
+         -h ............ this help
+
+bender(yoda) # _
+..........................................................
+
+NOTE: you have to be 'root' if you want to record, or you can make 
+      it a setuid root program with: 
+
+bender(root) # chmod +s /usr/local/bin/nuvrec
+    
+if you change only the permissions of /dev/video it won't be
+enough (!!!) because the player use nice(-5/-10) for its processes.
+if you proceed this way your processes are running at nice
+level 0 and you will experience a great loss of frames!!!!
+
+------------------------------------------------------------------------
+
+4d) Examples for nuvrec: 
+    --------------------
+	nuvrec finefilm          ; # records video+audio with 384x288 PAL and adds '.nuv' to fname 
+	nuvrec -n finefilm       ; # records video+audio with 352x240 NTSC - = -
+	nuvrec -n -N finefilm    ; #  - = - without afterward lzo compression
+	nuvrec -n -N -V finefilm ; #  - = -  but without audio
+
+------------------------------------------------------------------------
+
+4e) How should we adjust quality parameters?
+    ----------------------------------------
+  
+        Quality (-q)
+        luminance (-l) and chroma (-c) thresholds
+
+        Q .. 255 == 75% jpeg Quality : preferred quality setting
+        Q .. 127 == 50% jpeg Quality : use very little lum, chrom threshholds (l2 c1 max)
+        Q ..   3 == ??% jpeg Quality : art of artefacts ;-)
+
+                          Q    lum  chrom  visual qual.   compr. rate (yuv420size:comprsize)
+
+        Normal Movie:   255    0    0      75% jpeg q.    4:1 .. 6:1
+        Normal Movie:   255    1    0      very good      5:1 .. 7:1
+        Normal Movie:   255    1    1      still good     7:1 .. 10:1
+                                           few artefacts
+        Normal Movie:   255    2    1      medium        10:1 .. 16:1
+                                           notable artef.
+        Normal Movie:   255    3    2      news quality  16:1 .. 25:1
+                                           many artef.
+        Normal Movie:   255    5    2      bad news q.   25:1 .. 30:1
+       
+
+
+        Cartoons: Simpsons, Futurama, Southpark, Anime:
+        we can profit very much from higher motion luminance and chrominace values, because
+        if your tv-reception is very little noisy, only the blocks with motion are encoded.
+        if you have more noise you might not get that high compression ratios.
+ 
+        Cartoons, Anime:   255    1    1      75% jpeg q.   10:1 .. 13:1
+        Cartoons, Anime:   255    2    1      very good     16:1 .. 22:1
+        Cartoons, Anime:   255    3    1      still good    20:1 .. 30:1 (e.g. Southpark ..40:1)
+                                              few artefacts
+        Cartoons, Anime:   255    4    2      medium        25:1 .. 35:1
+        Cartoons, Anime:   255    5    3      low           30:1 .. 50:1
+
+        You must have very good tv-reception and you will get that compression results
+        with lower thresholds otherwise increase the tresholds, because much noise will
+        have bad compression afterwards anyway (divx, mpeg)
+        if you have real stills you may achive even higher compression ratios thanks to
+        Markus F.X.J. Oberhumer, who wrote minilzo, because the lzo compression after
+        the RTjpeg compression compresses the "block not changed" bytes which is very
+        effective espacially when compression newsspeaker or comics, but due to the
+        new coding technique the lzo compression is less effective with normal films
+        with more motion (compared to 0.4a)
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+5) And now, what do i do with my *.nuv?
+   ------------------------------------
+
+yes that's a nice question, simple answer: view them, delete them OR
+encode them either to divx-avi or to MPEG1/2 (which i prefer)
+
+------------------------------------------------------------------------
+
+5a) nuv -> MPEG:
+    ------------
+
+from now on i prefer using Andrew Stevens' MPEG encododer mpeg2enc from
+the MJPEG tools project.
+the reason for the change of support is: 
+
+.) impressive speed even with K6 computers
+.) excellent VBR (Variable Bit Rate) code (almost as good as divx quality)
+.) 100% compatible VCD compatible CBR (Constant Bit Rate) code
+   which by the way is light years better than mpeg2movies CBR code
+.) very good communication with the author
+.) a Multiplexer that can make VCD, SVCD, (user rate) VCD and SVCD and
+   VBR code MPEG's. it also supports adjustable audio/video delay
+
+you can find mpeg2enc and mplex as parts from the MJPEG tools at
+<http://mjpeg.sourceforge.net>
+
+to extract the video information from .nuv files you need
+'Exportvideo' from Alexander Oelzant which exports a YUV4MPEG
+stream which mpeg2enc can read.
+(Exportvideo supports .nuv .avi .mpg and .qt files)
+
+<http://131.130.199.155/~aoe/mystuff/mpeg2_movie-avipatch/>, 
+where you can find more avi->mpeg and mpeg related information.
+
+------------------------------------------------------------------------
+
+5b) Example nuv -> MPEG:
+    --------------------
+
+first we export audio and make a MPEG audio layer 2 stream (nuvplay, toolame)
+then we make a VBR MPEG1 video stream (exportvideo, mpeg2enc)
+after that we multiplex it (mplex)
+
+5b1) make a MPEG VBR stream:
+     -----------------------
+
+either you use the simple sample script nuv2mpg to make a VCD compliant
+MPEG stream or you can usr nuv2vbr to make a variable bit rate MPEG stream
+which can be smaller than the CBR stream and might have the same visual
+quality. the resulting files can be almost as little as DivX avi's and have
+the same quality, just play around with -q and -b and try for yourself.
+
+waluliso(sushi) # nuv2vbr movie        ; # no movie.nuv only movie
+
+or
+
+waluliso(sushi) # nuvplay -e movie.nuv | toolame -b 192 -p 2 -m s /dev/stdin movie.mp2
+waluliso(sushi) # exportvideo movie.nuv "|mpeg2enc -b 1200 -q 6 -N -G 21 -g 21 -o movie.m1v"
+waluliso(sushi) # mplex -V -o movie.mpg movie.m1v movie.mp2
+
+and burn it using mkisofs and cdrecord
+
+waluliso(sushi) # mkdir disk1
+waluliso(sushi) # mv movie.mpg disk1/
+waluliso(sushi) # cd disk1/
+waluliso(sushi) # md5sum * >disk.md5
+waluliso(sushi) # cd ..
+waluliso(sushi) # mkisofs -r -J disk1/ | cdrecord dev=0,3,0 -data -
+
+Parameters of mpeg2enc:
+ play around with parameters but let -g -G be the same!!, adjust -b and -q to your
+ desired quality or bitrate -- it depends very much from the quality of the nuv file
+ and be sure you've read the man page of mpeg2enc!!
+
+5b2) make a VCD compliant stream
+     ---------------------------
+
+waluliso(sushi) # nuv2mpg movie        ; # no movie.nuv only movie
+
+waluliso(sushi) # nuvplay -e movie.nuv | toolame -b 224 -p 2 -m s /dev/stdin movie.mp2
+waluliso(sushi) # exportvideo movie.nuv "|mpeg2enc -b 1152 -g 15 -G 15 -o movie.m1v"
+waluliso(sushi) # mplex -f1 -o movie.mpg movie.m1v movie.mp2
+
+and burn it using vcdimager and cdrdao
+
+waluliso(sushi) # vcdimager -c movie.cue -b movie.bin movie.mpg
+waluliso(sushi) # cdrdao write --device 0,3,0 movie.cue 
+#                                       ^ adjust the device to yours ;-)
+
+------------------------------------------------------------------------
+
+5c) nuv2divx:
+    ---------
+
+based on mpeg2divx from the x2divx package written by Ulrich Hecht
+i wrote a nuv2divx program that allows you to make little avi-files
+from your BIG nuv-files. 
+
+you find it at <http://mars.tuwien.ac.at/~roman/nuppelvideo/>
+
+you need to download avifile from <divx.euro.ru> and an appropriate
+divx codec. (i'll support opendivx, if i have time and if the demand
+exists)
+
+both exportvideo and nuv2divx include a deinterlacer for high resolution 
+videos which was based on the Area Based Deinterlacer (a VirtualDub filter) 
+from Gunnar Thalin <guth@home.se>, which i had to change to deinterlace
+YUV420 material.
+
+NOTE: video only .nuv files cannot be converted to divx.avi files. 
+      (BUG FIXME)
+      currently nuv2divx compile/link only with avifile 0.5* (it
+      won't for 0.6)
+
+------------------------------------------------------------------------
+
+6) if you have problems, or it doesn't work:
+   -----------------------------------------
+
+contact me: roman@mars.tuwien.ac.at
+       use: NuppelVideo: ... for Subject
+
+Have Fun,
+
+  Roman
+
+-------------------------------------------------------------
+All trademarks are under copyright of their respecive owners.
