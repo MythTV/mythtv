@@ -18,7 +18,6 @@ using namespace std;
 #include "libmythtv/programinfo.h"
 #include "libmyth/mythcontext.h"
 #include "libmyth/dialogbox.h"
-#include "libmythtv/videosource.h"
 #include "libmythtv/guidegrid.h"
 
 #define QUIT     1

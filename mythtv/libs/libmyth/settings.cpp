@@ -590,11 +590,15 @@ void SimpleDBStorage::save(QSqlDatabase* db) {
         querystr = QString("UPDATE %1 SET %2 WHERE %3;")
             .arg(table).arg(setClause()).arg(whereClause());
         query = db->exec(querystr);
+        if (!query.isActive())
+            MythContext::DBError("simpledbstorage update", querystr);
     } else {
         // Row does not exist yet
         querystr = QString("INSERT INTO %1 SET %2;")
             .arg(table).arg(setClause());
         query = db->exec(querystr);
+        if (!query.isActive())
+            MythContext::DBError("simpledbstorage update", querystr);
     }
 }
 
@@ -604,13 +608,12 @@ void AutoIncrementStorage::save(QSqlDatabase* db) {
         QString query = QString("INSERT INTO %1 (%2) VALUES (0);").arg(table).arg(column);
         QSqlQuery result = db->exec(query);
         if (!result.isActive() || result.numRowsAffected() < 1) {
-            cout << "Failed to insert new entry for ("
-                 << table << "," << column << ")\n";
+            MythContext::DBError("inserting row", result);
             return;
         }
         result = db->exec("SELECT LAST_INSERT_ID();");
         if (!result.isActive() || result.numRowsAffected() < 1) {
-            cout << "Failed to fetch last insert id" << endl;
+            MythContext::DBError("selecting last insert id", result);
             return;
         }
 

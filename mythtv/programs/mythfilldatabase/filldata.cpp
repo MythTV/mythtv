@@ -1099,24 +1099,32 @@ int main(int argc, char *argv[])
                                    "ORDER BY sourceid;");
         sourcequery.exec(querystr);
         
-        if (sourcequery.isActive() && sourcequery.numRowsAffected() > 0)
-        {       
-            while (sourcequery.next())
-            {
-                Source newsource;
+        if (sourcequery.isActive())
+        {
+             if (sourcequery.numRowsAffected() > 0)
+             {
+                  while (sourcequery.next())
+                  {
+                       Source newsource;
             
-                newsource.id = sourcequery.value(0).toInt();
-                newsource.name = sourcequery.value(1).toString();
-                newsource.xmltvgrabber = sourcequery.value(2).toString();
+                       newsource.id = sourcequery.value(0).toInt();
+                       newsource.name = sourcequery.value(1).toString();
+                       newsource.xmltvgrabber = sourcequery.value(2).toString();
             
-                sourcelist.append(newsource);
-            }   
+                       sourcelist.append(newsource);
+                  }
+             }
+             else
+             {
+                  cerr << "There are no channel sources defined, did you run the "
+                       << "setup program?\n";
+                  exit(-1);
+             }
         }
         else
         {
-            cerr << "There are no channel sources defined, did you run the "
-                 << "setup program?\n";
-            exit(-1);
+             MythContext::DBError("loading channel sources", sourcequery);
+             exit(-1);
         }
     
         fillData(sourcelist);
