@@ -1,6 +1,7 @@
 #include <qcombobox.h>
 #include <qspinbox.h>
 #include <qslider.h>
+#include <qlineedit.h>
 
 // These widgets follow these general navigation rules:
 //
@@ -94,9 +95,31 @@ protected:
             setValue(value() + lineStep());
             break;
         default:
-            e->ignore();
-            return;
+            QSlider::keyPressEvent(e);
         }
     }
 };
 
+class MythLineEdit : public QLineEdit {
+  public:
+    MythLineEdit(QWidget *parent=NULL, const char* widgetName=0) :
+      QLineEdit(parent, widgetName) { };
+
+    MythLineEdit(const QString& contents, QWidget *parent=NULL, const char* widgetName=0) :
+      QLineEdit(contents, parent, widgetName) { };
+
+protected:
+  virtual void keyPressEvent(QKeyEvent *e) {
+      switch (e->key())
+          {
+          case Key_Up:
+              focusNextPrevChild(FALSE);
+              break;
+          case Key_Down:
+              focusNextPrevChild(TRUE);
+              break;
+          default:
+              QLineEdit::keyPressEvent(e);
+          }
+  };
+};

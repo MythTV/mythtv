@@ -65,7 +65,7 @@ QWidget* LineEditSetting::configWidget(QWidget* parent,
     QLabel* label = new QLabel(widget, QString(widgetName) + "-label");
     label->setText(getLabel() + ":");
 
-    QLineEdit* edit = new QLineEdit(settingValue, widget,
+    QLineEdit* edit = new MythLineEdit(settingValue, widget,
                                     QString(widgetName) + "-edit");
     edit->setText( getValue() );
 
