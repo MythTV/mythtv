@@ -28,6 +28,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent)
     keyframedist = 30;
 
     exitafterdecoded = false;
+    ateof = false;
 }
 
 AvFormatDecoder::~AvFormatDecoder()
@@ -217,7 +218,8 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     fmt->flags &= ~AVFMT_NOFILE;
 
-    int bitrate = 0;
+    bitrate = 0;
+    double fps = 0;
 
     for (int i = 0; i < ic->nb_streams; i++)
     {
@@ -228,7 +230,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
             {
                 bitrate += enc->bit_rate;
 
-                double fps = (double)enc->frame_rate / enc->frame_rate_base;
+                fps = (double)enc->frame_rate / enc->frame_rate_base;
                 m_parent->SetVideoParams(enc->width, enc->height, fps, 
                                          keyframedist);
              
@@ -290,6 +292,15 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     }
 
     ringBuffer->CalcReadAheadThresh(bitrate);
+
+    if (!haspositionmap)
+    {
+        // the pvr-250 seems to overreport the bitrate by * 2
+        float bytespersec = (float)bitrate / 8 / 2;
+        float secs = ringBuffer->GetRealFileSize() * 1.0 / bytespersec;
+
+        m_parent->SetFileLength((int)(secs), (int)(secs * fps));
+    }
 
     dump_format(ic, 0, filename, 0);
 
@@ -357,6 +368,7 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
     {
         if (av_read_packet(ic, &pkt) < 0)
         {
+            ateof = true;
             m_parent->SetEof();
             return;
         }
@@ -657,6 +669,9 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame)
             exitafterdecoded = true;
             GetFrame(1);
             exitafterdecoded = false;
+
+            if (ateof)
+                return false;
         }
 
         videoenc->hurry_up = 0;
@@ -686,6 +701,8 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame)
     while (normalframes > 0)
     {
         GetFrame(0);
+        if (ateof)
+            break;
         normalframes--;
     }
 

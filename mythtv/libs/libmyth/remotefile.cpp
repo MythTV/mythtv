@@ -133,6 +133,11 @@ QSocket *RemoteFile::openSocket(bool control, bool events)
     return sock;
 }    
 
+long long RemoteFile::GetFileSize(void)
+{
+    return filesize;
+}
+
 bool RemoteFile::isOpen(void)
 {
     return (sock != NULL && controlSock != NULL);

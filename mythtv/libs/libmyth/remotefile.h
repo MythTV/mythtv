@@ -29,6 +29,8 @@ class RemoteFile
 
     bool SaveAs(QByteArray &data, bool events = true);
 
+    long long GetFileSize(void);
+
   private:
     QSocket *openSocket(bool control, bool events = false);
 

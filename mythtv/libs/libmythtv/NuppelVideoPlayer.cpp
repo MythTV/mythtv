@@ -1709,6 +1709,9 @@ void NuppelVideoPlayer::StartPlaying(void)
             if (fftime >= 5)
                 DoFastForward();
 
+            if (eof)
+                continue;
+
             UnpauseVideo();
             while (GetVideoPause())
                 usleep(50);

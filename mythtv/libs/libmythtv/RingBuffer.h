@@ -64,6 +64,8 @@ class RingBuffer
 
     void CalcReadAheadThresh(int estbitrate);
 
+    long long GetRealFileSize(void);
+
   protected:
     static void *startReader(void *type);
     void ReadAheadThread(void);

@@ -1174,4 +1174,18 @@ long long RingBuffer::GetTotalWritePosition(void)
     return totalwritepos; 
 }
 
+long long RingBuffer::GetRealFileSize(void)
+{
+    if (remotefile)
+    {
+        if (normalfile)
+            return remotefile->GetFileSize();
+        else
+            return -1;
+    }
 
+    struct stat st;
+    if (stat(filename.ascii(), &st) == 0)
+        return st.st_size;
+    return -1;
+}

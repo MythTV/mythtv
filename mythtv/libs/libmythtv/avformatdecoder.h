@@ -83,6 +83,9 @@ class AvFormatDecoder : public DecoderBase
     int keyframedist;
 
     bool exitafterdecoded;
+
+    int bitrate;
+    bool ateof;
 };
 
 #endif
