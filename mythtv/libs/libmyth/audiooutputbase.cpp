@@ -48,7 +48,7 @@ AudioOutputBase::~AudioOutputBase()
     pthread_cond_destroy(&audio_bufsig);
 }
 
-void AudioOutputBase::SetStretchFactor(float laudio_stretchfactor)
+void AudioOutputBase::SetStretchFactorLocked(float laudio_stretchfactor)
 {
     effdspstretched = (int)((float)effdsp / laudio_stretchfactor);
     if (audio_stretchfactor != laudio_stretchfactor)
@@ -77,6 +77,13 @@ void AudioOutputBase::SetStretchFactor(float laudio_stretchfactor)
             //pSoundStretch->setSetting(SETTING_USE_AA_FILTER, false);
         }
     }
+}
+
+void AudioOutputBase::SetStretchFactor(float laudio_stretchfactor)
+{
+    pthread_mutex_lock(&audio_buflock);
+    SetStretchFactorLocked(laudio_stretchfactor);
+    pthread_mutex_unlock(&audio_buflock);
 }
 
 void AudioOutputBase::Reconfigure(int laudio_bits, int laudio_channels, 
@@ -158,7 +165,7 @@ void AudioOutputBase::Reconfigure(int laudio_bits, int laudio_channels,
         need_resampler = true;
     }
 
-    SetStretchFactor(audio_stretchfactor);
+    SetStretchFactorLocked(audio_stretchfactor);
     if (pSoundStretch)
     {
         pSoundStretch->setSampleRate(audio_samplerate);

@@ -77,6 +77,8 @@ class AudioOutputBase : public AudioOutput
 
     void UpdateVolume(void);
     
+    void SetStretchFactorLocked(float factor);
+
     int effdsp; // from the recorded stream
     int effdspstretched; // from the recorded stream
 
