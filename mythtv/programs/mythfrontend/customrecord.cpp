@@ -211,20 +211,23 @@ void CustomRecord::testClicked(void)
 				   gContext->GetMainWindow(), "proglist");
     pl->exec();
     delete pl;
-    m_description->setFocus();
+
+    m_testButton->setFocus();
 }
 
 void CustomRecord::recordClicked(void)
 {
     QString desc = m_description->text();
-    // To address possible quoting issues if needed...
-    //desc.replace("\"", "\\\"");
 
     QSqlDatabase *db = QSqlDatabase::database();
     ScheduledRecording record;
     record.loadBySearch(db, kPowerSearch, m_title->text(), desc);
     record.exec(db);
-    accept();
+
+    if (record.getRecordID())
+        accept();
+    else
+	m_recordButton->setFocus();
 }
 
 void CustomRecord::cancelClicked(void)
