@@ -102,7 +102,8 @@ void MFDService::setResolved(uint ip1, uint ip2, uint ip3, uint ip4, uint port_h
     host_information = gethostbyaddr((char*)&(ip_address_number.s_addr), sizeof(ip_address_number), AF_INET);
     if(!host_information)
     {
-        warning("MFDService object could not call gethostbyaddr()");
+        warning(QString("MFDService object could not call gethostbyaddr() using ip address %1")
+                .arg(ip_address_string));
         return;
     }
     QString service_hostname = host_information->h_name;
