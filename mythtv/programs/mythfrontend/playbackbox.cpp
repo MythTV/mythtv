@@ -1623,7 +1623,7 @@ bool PlaybackBox::play(ProgramInfo *rec)
         {
             qApp->unlock();
             qApp->processEvents();
-            usleep(10000);
+            usleep(100000);
             qApp->lock();
         }
     }
