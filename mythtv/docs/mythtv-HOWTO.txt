@@ -3365,13 +3365,6 @@
   but you can also choose encoding format, audio format, and tweak other
   encoder specific properties.
 
-  [1mNOTE[22m: although the width and height can be changed to almost any
-  value, if you start MythTV and don't see video or you get
-  "segmentation fault" errors, it is likely that the video4linux (v4l)
-  subsystem did not like the height and width parameters specified. It's
-  best to leave the default as-is until you're sure that MythTV is
-  operational.
-
   [1mNOTE[22m: although the width and height can be changed to almost anything,
   if you start MythTV and don't see video or you get "segmentation
   fault" errors, it is likely that the video4linux (v4l) subsystem did
@@ -3420,7 +3413,6 @@
   otherwise, [1mblink [22mis used.  Colors should be self explanatory.  The
   update interval determines how often the frontend should poll the
   backend to determine if the status has changed.
-
 
 
   [1m11.  Using MythTV.[0m
@@ -3493,6 +3485,7 @@
   pinouts for RCA DSS receivers.
 
 
+
   [1m12.  MythWeb.[0m
 
   The MythWeb allows you to use a web page to control various aspects of
@@ -3549,13 +3542,11 @@
   have one), you could do something like this:
 
 
-
-  # cd /var/www
-  # htpasswd -c htpasswd mythtv
-  New password:
-  Re-type new password:
-  Adding password for user mythtv
-
+       # cd /var/www
+       # htpasswd -c htpasswd mythtv
+       New password:
+       Re-type new password:
+       Adding password for user mythtv
 
 
   See the man page for [1mhtpasswd [22mfor more examples.
@@ -3610,7 +3601,6 @@
   with the application.
 
 
-
   [1m13.2.  Importing Pictures[0m
 
   The import path in the setup dialog is a colon separated list of
@@ -3623,7 +3613,6 @@
   removable device, it might be a good idea to use autofs.  See the
   automount howto at www.linuxdoc.org <www.linuxdoc.org> for info on how
   to get it working.
-
   If the item in the import path is an executable file, MythGallery will
   attempt to execute it with the destination directory as its sole
   argument.  Be careful when using executable scripts that the script
@@ -3687,6 +3676,7 @@
 
   +o  libcdaudio
 
+
   +o  CDParanoia
 
 
@@ -3732,15 +3722,14 @@
   <http://flac.sourceforge.net> and install:
 
 
-
-  $ tar -xzf flac-1.1.0.tar.gz
-  $ cd flac-1.1.0
-  $ ./configure
-  $ make
-  $ su
-  # make install
-  # exit
-  $
+       $ tar -xzf flac-1.1.0.tar.gz
+       $ cd flac-1.1.0
+       $ ./configure
+       $ make
+       $ su
+       # make install
+       # exit
+       $
 
 
 
@@ -3749,14 +3738,15 @@
   install:
 
 
-       $ tar -xzf libcdaudio-0.99.9.tar.gz
-       $ cd libcdaudio-0.99.9
-       $ ./configure
-       $ make
-       $ su
-       # make install
-       # exit
-       $
+
+  $ tar -xzf libcdaudio-0.99.9.tar.gz
+  $ cd libcdaudio-0.99.9
+  $ ./configure
+  $ make
+  $ su
+  # make install
+  # exit
+  $
 
 
 
@@ -3855,7 +3845,8 @@
   already have installed). To install these all at once, simply type
   (all on the same line):
 
-  $ up2date --solvedeps libvorbis libvorbis-devel vorbis-tools cdparanoia-devel cdparanoia-libs cdparanoia SDL-devel SDL
+
+       $ up2date --solvedeps libvorbis libvorbis-devel vorbis-tools cdparanoia-devel cdparanoia-libs cdparanoia SDL-devel SDL
 
 
 
@@ -3916,7 +3907,6 @@
   Here's some explanation about the Ignore_ID3 and The
   NonID3FileNameFormat:
 
-
   If Ignore_ID3 is set to TRUE, MythMusic will try to determine the
   Genre, Artist, Album, Track Number, and Title from the filename of the
   mp3 file.  The NonID3FileNameFormat variable should be set to the
@@ -3930,6 +3920,7 @@
 
   Genre/Artist/Album/Title Artist/Genre/Album/Title Artist/Album/Title
   (with Genre left as Unknown)
+
 
   The track number is optional but can be specified with the title by
   using the TRACK_TITLE keyword instead of TITLE.  If TRACK_TITLE is
@@ -4048,12 +4039,13 @@
 
   Change into the MythWeather directory, then make and make install:
 
-  $ cd mythweather
-  $ qmake mythweather.pro
-  $ make
-  $ su
-  # make install
-  # exit
+
+       $ cd mythweather
+       $ qmake mythweather.pro
+       $ make
+       $ su
+       # make install
+       # exit
 
 
 
@@ -4112,6 +4104,7 @@
        # exit
 
 
+
   See MythVideo's README file for additional information.
 
 
@@ -4121,6 +4114,7 @@
   use with MythVideo.  You may also transcode the DVD content from
   MPEG-2 to other formats which should greatly reduce the amount of
   space the DVD material takes up on your hard drive.
+
 
   MythDVD has a number of prerequisites to enable transcoding
   functionality.  If you only wish to play DVDs rather than convert them
@@ -4175,12 +4169,15 @@
   +o  You have an AMD K6-2 or VIA C3 processor.  If you have either of
      these, make sure that you you followed the instructions in this
      ``section''.
+
   +o  You have an early production Intel Celeron, Pentium Pro or Pentium
      II.  If you have any of these processors, make sure that your
      ``deinterlace'' variable is set correctly.  Your CPU needs to
      support SSE instructions for deinterlace support.  You may check
      this by doing a $ cat /proc/cpuinfo and looking for "sse" in the
      processor flags section.
+
+
 
   [1m20.2.  mythfilldatabase failing.[0m
 
@@ -4237,7 +4234,6 @@
   various devices, rename and/or copy the file to harddiskhda,
   harddiskhdb, etc.  Edit the file to your liking and on the next reboot
   your setting will be preserved.
-
 
 
   [1m20.4.  I have a MPEG-2 encoder card and my video appears "jittery".[0m
@@ -4311,13 +4307,14 @@
   Also, look for:
 
 
-       Section "Device"
-           Identifier "device1"
-           VendorName "nVidia Corporation"
-           BoardName "NVIDIA GeForce 256 (generic)"
-           Driver "nv"
-           Option "DPMS"
-       EndSection
+
+  Section "Device"
+      Identifier "device1"
+      VendorName "nVidia Corporation"
+      BoardName "NVIDIA GeForce 256 (generic)"
+      Driver "nv"
+      Option "DPMS"
+  EndSection
 
 
 
@@ -4371,7 +4368,6 @@
 
 
        $ xset -dpms s off
-
 
 
   Finally, depending on your distribution, you may be able to turn it
@@ -4430,13 +4426,14 @@
        Signal        Stop      Print   Pass to program Description
        SIGPIPE       No        Yes     Yes             Broken pipe
 
+
+
   [1mgdb [22mhas a number of options, read the man page for more information.
 
   Once at the (gdb) prompt, type run to start program execution.  When
   the program segfaults or appears to lock-up (press CTRL-C), type
 
-
-       (gdb) thread apply all bt full
+  (gdb) thread apply all bt full
 
 
 
@@ -4494,12 +4491,12 @@
   should work correctly because it writes to and read from /dev/dsp in
   the same way that [1maplay [22mdoes.
 
-
   To record audio along with video the audio signal must be digitized by
   a DSP so that the audio data can be stored in a file. On playback, the
   audio data is written to /dev/dsp and converted back to an analog
   signal. This analog signal should then be sent to your speakers. Here
   is what is needed in alsamixer:
+
 
   CAPTUR source - the analog source to be sent to the DSP. This should
   be set to the input source from the tuner card to the sound card. In
@@ -4629,6 +4626,7 @@
   Restart apache for it to take effect.
 
 
+
   [1m20.19.  error: can't find a register in class 'BREG' while reloading[0m
   [1m'asm'[0m
 
@@ -4690,9 +4688,9 @@
   run with no major errors?
 
 
-
   [1m20.25.  When trying to run setup, I get an error like this: "./setup:[0m
   [1merror while loading shared libraries:"[0m
+
 
   You didn't add /usr/local/lib to /etc/ld.so.conf.  See the section on
   modifying ``/etc/ld.so.conf''.
@@ -4817,6 +4815,7 @@
 
        mplayer -audiofile audout -audio-demuxer 20 -rawaudio rate=32000 \
        -rawvideo on:w=640:h=480:fps=29.97 vidout
+
 
 
   If you wanted to write the raw data to separate audio and video files

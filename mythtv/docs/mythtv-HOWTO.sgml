@@ -2652,12 +2652,6 @@ card.  The most significant setting is the recording resolution, but you can
 also choose encoding format, audio format, and tweak other encoder specific
 properties.
 
-<bf>NOTE</bf>: although the width and height can be changed to almost any
-value, if you start MythTV and don't see video or you get "segmentation
-fault" errors, it is likely that the video4linux (v4l) subsystem did not
-like the height and width parameters specified. It's best to leave the
-default as-is until you're sure that MythTV is operational.
-
 <bf>NOTE</bf>: although the width and height can be changed to almost
 anything, if you start MythTV and don't see video or you get "segmentation
 fault" errors, it is likely that the video4linux (v4l) subsystem did not
@@ -5134,7 +5128,7 @@ the <bf>man</bf> page for details.
 <!-- Revision History
 v0.14.00, 2004-01-31.  Initial version for MythTV v0.14.  Rename docs
 version to match.  Standardize spelling of RTjpeg.  Add section on Channel
-Editor in setup.
+Editor in setup.  Remove duplicate note in 10.5.
 -->
 
 <!--
