@@ -17,8 +17,8 @@ using namespace std;
 #include "mythcontext.h"
 #include "audiooutputoss.h"
 
-AudioOutputOSS::AudioOutputOSS(QString audiodevice, int audio_bits, 
-                               int audio_channels, int audio_samplerate)
+AudioOutputOSS::AudioOutputOSS(QString audiodevice, int laudio_bits, 
+                               int laudio_channels, int laudio_samplerate)
 {
     pthread_mutex_init(&audio_buflock, NULL);
     pthread_mutex_init(&avsync_lock, NULL);
@@ -26,8 +26,11 @@ AudioOutputOSS::AudioOutputOSS(QString audiodevice, int audio_bits,
     this->audiodevice = audiodevice;
     audiofd = -1;
     output_audio = 0;
-    
-    Reconfigure(audio_bits, audio_channels, audio_samplerate);
+    audio_bits = -1;
+    audio_channels = -1;
+    audio_samplerate = -1;    
+
+    Reconfigure(laudio_bits, laudio_channels, laudio_samplerate);
 }
 
 AudioOutputOSS::~AudioOutputOSS()
@@ -38,9 +41,13 @@ AudioOutputOSS::~AudioOutputOSS()
     pthread_cond_destroy(&audio_bufsig);
 }
 
-void AudioOutputOSS::Reconfigure(int audio_bits, int audio_channels, 
-                                 int audio_samplerate)
+void AudioOutputOSS::Reconfigure(int laudio_bits, int laudio_channels, 
+                                 int laudio_samplerate)
 {
+    if (laudio_bits == audio_bits && laudio_channels == audio_channels &&
+        laudio_samplerate == audio_samplerate)
+        return;
+
 //  printf("Starting reconfigure\n");
     KillAudio();
     
@@ -52,9 +59,9 @@ void AudioOutputOSS::Reconfigure(int audio_bits, int audio_channels,
     waud = raud = 0;
     audio_actually_paused = false;
     
-    this->audio_channels = audio_channels;
-    this->audio_bits = audio_bits;
-    this->audio_samplerate = audio_samplerate;
+    audio_channels = laudio_channels;
+    audio_bits = laudio_bits;
+    audio_samplerate = laudio_samplerate;
     if(audio_bits != 8 && audio_bits != 16)
     {
         cerr << "AudioOutDSP only supports 8 or 16bit audio ";

@@ -13,14 +13,14 @@ using namespace std;
 class AudioOutputOSS : public AudioOutput
 {
 public:
-    AudioOutputOSS(QString audiodevice, int audio_bits, 
-                   int audio_channels, int audio_samplerate);
+    AudioOutputOSS(QString audiodevice, int laudio_bits, 
+                   int laudio_channels, int laudio_samplerate);
     virtual ~AudioOutputOSS();
     
     virtual void SetBlocking(bool blocking);
     virtual void Reset(void);
-    virtual void Reconfigure(int audio_bits, 
-                             int audio_channels, int audio_samplerate);
+    virtual void Reconfigure(int laudio_bits, 
+                             int laudio_channels, int laudio_samplerate);
 
     virtual void AddSamples(char *buffer, int samples, long long timecode);
     virtual void AddSamples(char *buffers[], int samples, long long timecode);

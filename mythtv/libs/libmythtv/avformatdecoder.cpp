@@ -467,7 +467,8 @@ bool AvFormatDecoder::CheckAudioParams(int freq, int channels)
     {
         audio_check_1st = true;
 
-        if (freq != audio_sampling_rate_2nd && channels != audio_channels_2nd)
+        if ((freq != audio_sampling_rate_2nd && channels != audio_channels_2nd)
+            || (freq == audio_sampling_rate && channels == audio_channels))
         {
             audio_sampling_rate_2nd = -1;
             audio_channels_2nd = -1;

@@ -426,7 +426,9 @@ void TVRec::HandleStateChange(void)
     }
     else
     {
-        printf("Changing from %s to %s\n", origname.ascii(), statename.ascii());
+        QString trans = QString("Changing from %1 to %2\n")
+                               .arg(origname).arg(statename);
+        VERBOSE(VB_GENERAL, trans);
     }
  
     if (startRecorder)
