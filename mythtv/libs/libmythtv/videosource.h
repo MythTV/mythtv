@@ -172,7 +172,7 @@ public:
         addTarget("tv_grab_sn", new XMLTV_generic_config(parent, "tv_grab_sn"));
         grabber->addSelection("Sweden/Norway","tv_grab_sn");
 
-        addTarget("tv_grab_uk", new XMLTV_uk_config(parent));
+        addTarget("tv_grab_uk", new XMLTV_generic_config(parent, "tv_grab_uk"));
         grabber->addSelection("United Kingdom","tv_grab_uk");
 
         addTarget("tv_grab_uk_rt", new XMLTV_generic_config(parent, "tv_grab_uk_rt"));
@@ -276,6 +276,8 @@ public:
         QDir dev("/dev", "video*", QDir::Name, QDir::System);
         fillSelectionsFromDir(dev);
         dev.setPath("/dev/v4l");
+        fillSelectionsFromDir(dev);
+        dev.setPath("/dev/dtv");
         fillSelectionsFromDir(dev);
     };
 
