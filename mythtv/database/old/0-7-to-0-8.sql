@@ -32,11 +32,11 @@ CREATE TABLE IF NOT EXISTS record
 );
 
 INSERT INTO record
-(type,chanid,starttime,startdate,endtime,enddate,title,subtitle,description,profile)
+(type,chanid,starttime,startdate,endtime,enddate,title,subtitle,description)
 SELECT 1, chanid,
 SEC_TO_TIME(TIME_TO_SEC(starttime)), FROM_DAYS(TO_DAYS(starttime)),
 SEC_TO_TIME(TIME_TO_SEC(endtime)), FROM_DAYS(TO_DAYS(endtime)),
-title,subtitle,description,profile
+title,subtitle,description
 FROM singlerecord;
 
 INSERT INTO record
