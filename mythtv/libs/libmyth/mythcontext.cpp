@@ -115,7 +115,7 @@ QString MythContext::FindThemeDir(QString themename)
     return "";
 }
 
-QString MythContext::RunProgramGuide(QString startchannel, bool thread = false)
+QString MythContext::RunProgramGuide(QString startchannel, bool thread)
 {
     if (thread)
         qApp->lock();
@@ -150,14 +150,14 @@ int MythContext::OpenDatabase(QSqlDatabase *db)
     return db->open();
 }
 
-QString MythContext::GetSetting(const QString &key) 
+QString MythContext::GetSetting(const QString &key, const QString &defaultval) 
 {
-    return m_settings->GetSetting(key); 
+    return m_settings->GetSetting(key, defaultval); 
 }
 
-int MythContext::GetNumSetting(const QString &key)
+int MythContext::GetNumSetting(const QString &key, int defaultval)
 { 
-    return m_settings->GetNumSetting(key); 
+    return m_settings->GetNumSetting(key, defaultval); 
 }
 
 void MythContext::SetPalette(QWidget *widget)

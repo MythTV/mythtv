@@ -30,8 +30,8 @@ class MythContext
 
     Settings *settings() { return m_settings; }
 
-    QString GetSetting(const QString &key);
-    int GetNumSetting(const QString &key);
+    QString GetSetting(const QString &key, const QString &defaultval = "");
+    int GetNumSetting(const QString &key, int defaultval = 0);
 
     int GetBigFontSize() { return qtfontbig; }
     int GetMediumFontSize() { return qtfontmed; }

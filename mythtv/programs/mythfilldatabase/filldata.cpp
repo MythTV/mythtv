@@ -928,7 +928,8 @@ int main(int argc, char *argv[])
             cout << "--help\n";
             cout << "   This text\n";
             cout << "\n";
-            cout << "  (Do not use manual or update together\n";
+            cout << "\n";
+            cout << "  --manual and --update can not be used together\n";
             cout << "\n";
             return -1;
         }

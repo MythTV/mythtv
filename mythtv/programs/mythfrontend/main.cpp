@@ -78,7 +78,10 @@ void startTV(void)
                nextstate == kState_WatchingPreRecorded ||
                nextstate == kState_WatchingOtherRecording)
         {
-            usleep(2000);
+            usleep(500);
+            qApp->unlock();
+            qApp->processEvents();
+            qApp->lock();
             nextstate = tv->GetState();
         }
     }

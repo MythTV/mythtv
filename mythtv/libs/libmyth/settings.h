@@ -28,13 +28,11 @@ public:
 	
 	// Setting retrieval functions
 	/** Generic Setting Retrieval functions */
-	QString GetSetting(QString strSetting);
+	QString GetSetting(QString strSetting, QString defaultvalue = "");
 	/** Generic Setting Retrieval function for numeric values */
-	int GetNumSetting(QString strSetting);
+	int GetNumSetting(QString strSetting, int defaultvalue = 0);
 	/** Generic Setting Retrieval function for float values */
-	float GetFloatSetting(QString strSetting);
-	/** Generic Setting Retrieval functions for pointers */
-	void* GetPointer(QString strSetting);
+	float GetFloatSetting(QString strSetting, float defaultvalue = 0);
 	
 	// Setting Setting functions
 	/** Generic Setting Setting function */
@@ -43,21 +41,13 @@ public:
 	void SetSetting(QString strSetting, int nNewVal);
 	/** Generic Setting Setting function for float values */
 	void SetSetting(QString strSetting, float fNewVal);
-	/** Generic Setting Setting function for pointer values */
-	void SetSetting(QString strSetting, void* pNewVal);
 
         void LoadSettingsFiles(QString filename, QString prefix);
         /** parse settings file */
         int ReadSettings(QString pszFile);
 private: // Private attributes
 	/** main property-value mapping for strings */
-	map<QString, QString>* m_pStringSettings;
-	/** main property-value mapping for ints */
-	map<QString, int>* m_pIntSettings;
-	/** main property-value mapping for floats */
-	map<QString, float>* m_pFloatSettings;
-	/** main property-value mapping for pointers */
-	map<QString, void*>* m_pVoidSettings;
+	map<QString, QString> *m_pSettings;
 };
 
 void LoadSettingsFile(Settings *settings, QString filename);

@@ -21,114 +21,89 @@
 #include <string>
 using namespace std;
 
-#include <qpixmap.h>
-#include <qimage.h>
-
 Settings::Settings(QString strSettingsFile)
 {
-	if (strSettingsFile.length() == 0)
-	{
-		strSettingsFile = "settings.txt";
-	}
-	m_pStringSettings = new map<QString, QString>;
-	m_pIntSettings = new map<QString, int>;
-	m_pFloatSettings = new map<QString, float>;
-	m_pVoidSettings = new map<QString, void*>;
+    if (strSettingsFile.length() == 0)
+        strSettingsFile = "settings.txt";
+    m_pSettings = new map<QString, QString>;
 	
-	this->ReadSettings(strSettingsFile);	// load configuration values from settings.txt in this dir	
+    ReadSettings(strSettingsFile);	
 }
 
 Settings::~Settings()
 {
-	if (m_pStringSettings != NULL)
-	{
-		delete m_pStringSettings;
-	}
-	
-	if (m_pIntSettings != NULL)
-	{
-		delete m_pIntSettings;
-	}
-
-	if (m_pFloatSettings != NULL)
-	{
-		delete m_pFloatSettings;
-	}
-
-	if (m_pVoidSettings != NULL)
-	{
-		delete m_pVoidSettings;
-	}
+    if (m_pSettings != NULL)
+        delete m_pSettings;
 }
 		
 // Setting retrieval functions
 /** Generic Setting Retrieval functions */
-QString Settings::GetSetting(QString strSetting)
+QString Settings::GetSetting(QString strSetting, QString defaultvalue)
 {
-	map<QString, QString>::iterator i;
-	if ((!m_pStringSettings->empty()) && ((i = m_pStringSettings->find(strSetting)) != m_pStringSettings->end()))
-	{
-		return (*i).second;
-	}
-	return ""; // property doesn't exist
+    map<QString, QString>::iterator i;
+    if ((!m_pSettings->empty()) && 
+        ((i = m_pSettings->find(strSetting)) != m_pSettings->end()))
+    {
+        return (*i).second;
+    }
+    return defaultvalue; // property doesn't exist
 }
 
 /** Generic Setting Retrieval function for numeric values */
-int Settings::GetNumSetting(QString strSetting)
+int Settings::GetNumSetting(QString strSetting, int defaultvalue)
 {
-	map<QString, int>::iterator i;
-	if ((!m_pIntSettings->empty()) && ((i = m_pIntSettings->find(strSetting)) != m_pIntSettings->end()))
-	{
-		return (*i).second;
-	}
-	return 0; // property doesn't exist
+    int retval = defaultvalue;
+    map<QString, QString>::iterator i;
+    if ((!m_pSettings->empty()) && 
+        ((i = m_pSettings->find(strSetting)) != m_pSettings->end()))
+    {
+        bool ok = false;
+        retval = (*i).second.toInt(&ok);
+        if (!ok)
+            retval = defaultvalue;
+    }
+    return retval; // property doesn't exist
 }
 
 /** Generic Setting Retrieval function for float values */
-float Settings::GetFloatSetting(QString strSetting)
+float Settings::GetFloatSetting(QString strSetting, float defaultvalue)
 {
-	map<QString, float>::iterator i;
-	if ((!m_pFloatSettings->empty()) && ((i = m_pFloatSettings->find(strSetting)) != m_pFloatSettings->end()))
-	{
-		return (*i).second;
-	}
-	return 0; // property doesn't exist
-}
+    float retval = defaultvalue;
 
-/** Generic Setting Retrieval functions for pointers */
-void* Settings::GetPointer(QString strSetting)
-{
-	map<QString, void*>::iterator i;
-	if ((!m_pVoidSettings->empty()) && ((i = m_pVoidSettings->find(strSetting)) != m_pVoidSettings->end()))
-	{
-		return (*i).second;
-	}
-	return NULL; // property doesn't exist
+    map<QString, QString>::iterator i;
+    if ((!m_pSettings->empty()) && 
+        ((i = m_pSettings->find(strSetting)) != m_pSettings->end()))
+    {
+        bool ok = false;
+        retval = ((*i).second).toFloat(&ok);
+        if (!ok)
+            retval = defaultvalue;
+    }
+
+    return defaultvalue; // property doesn't exist
 }
 
 // Setting Setting functions
 /** Generic Setting Setting function */
 void Settings::SetSetting(QString strSetting, QString strNewVal)
 {
-	(*m_pStringSettings)[strSetting] = strNewVal;
+    (*m_pSettings)[strSetting] = strNewVal;
 }
 
 /** Generic Setting Setting function for int values */
 void Settings::SetSetting(QString strSetting, int nNewVal)
 {
-	(*m_pIntSettings)[strSetting] = nNewVal;
+    QString tmp;
+    tmp = tmp.setNum(nNewVal);
+    (*m_pSettings)[strSetting] = tmp;
 }
 
 /** Generic Setting Setting function for float values */
 void Settings::SetSetting(QString strSetting, float fNewVal)
 {
-	(*m_pFloatSettings)[strSetting] = fNewVal;
-}
-
-/** Generic Setting Setting function for pointer values */
-void Settings::SetSetting(QString strSetting, void* pNewVal)
-{
-	(*m_pVoidSettings)[strSetting] = pNewVal;
+    QString tmp;
+    tmp = tmp.setNum(fNewVal);
+    (*m_pSettings)[strSetting] = tmp;
 }
 
 void Settings::LoadSettingsFiles(QString filename, QString prefix)
@@ -147,39 +122,38 @@ void Settings::LoadSettingsFiles(QString filename, QString prefix)
 
 int Settings::ReadSettings(QString pszFile)
 {
-	fstream fin(pszFile.ascii(), ios::in);
-	if (!fin.is_open()) return -1;
+    fstream fin(pszFile.ascii(), ios::in);
+    if (!fin.is_open()) return -1;
 	
-	string strLine;
-	QString strKey;
-	QString strVal;
-	QString strType;
-	int nSplitPoint = 0;
-	while(!fin.eof())
-	{
-		getline(fin,strLine);
-		if ((strLine[0] != '#') && (!strLine.empty()))
-		{
-			nSplitPoint = strLine.find('=');
-			if (nSplitPoint != -1)
-			{
-				strType = strLine.substr(0, 3).c_str();
-				strKey = strLine.substr(4, nSplitPoint  - 4).c_str();
-				strVal = strLine.substr(nSplitPoint + 1, strLine.size()).c_str();
-				if (strType == "flt")
-				{
-					(*m_pFloatSettings)[strKey] = atof(strVal.ascii());
-				}
-				else if (strType == "int")
-				{
-					(*m_pIntSettings)[strKey] = atoi(strVal.ascii());
-				}
-				else if (strType == "str")
-				{
-					(*m_pStringSettings)[strKey] = strVal;				
-				}
-			}		
-		}
-	} // wend
-	return 0;
+    string strLine;
+    QString strKey;
+    QString strVal;
+    QString strType;
+    QString line;
+    int nSplitPoint = 0;
+
+    while(!fin.eof())
+    {
+        getline(fin,strLine);
+        line = strLine.c_str();
+
+        if ((line[0] != '#') && (!line.isEmpty()))
+        {
+            nSplitPoint = strLine.find('=');
+            if (nSplitPoint != -1)
+            {
+                strType = line.mid(0, 3);
+
+                if (strType == "flt" || strType == "int" || strType == "str")
+                    strKey = line.mid(4, nSplitPoint - 4);
+                else
+                    strKey = = line.mid(0, nSplitPoint);
+
+                strVal = line.mid(nSplitPoint + 1, strLine.size());
+
+                (*m_pSettings)[strKey] = strVal;
+            }
+        }
+    } // wend
+    return 0;
 }

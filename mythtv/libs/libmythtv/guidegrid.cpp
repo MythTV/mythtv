@@ -530,7 +530,7 @@ void GuideGrid::paintTimes(QPainter *p)
 
     int xdifference = (int)(tr.width() / DISPLAY_TIMES); 
     QDateTime now = QDateTime::currentDateTime();
-    int nowpos = -1;
+    int nowpos = -9999;
 
     for (int x = 0; x < DISPLAY_TIMES; x++)
     {
@@ -557,20 +557,47 @@ void GuideGrid::paintTimes(QPainter *p)
 
             int t = now.secsTo(QDateTime(m_currentStartTime.date(),
                                          QTime(tinfo->hour, tinfo->min)));
-            if (nowpos < 0 && t < 0)
+            if (nowpos == -9999)
                 nowpos = x + (t / -60 / 5);
         }
     }
 
     tmp.drawLine(0, tr.height() - 1, tr.right(), tr.height() - 1);
 
-    if (nowpos >= 0 && m_settings->GetNumSetting("EPGShowCurrentTime"))
+    if (m_settings->GetNumSetting("EPGShowCurrentTime"))
     {
-        tmp.setPen(QPen(QColor(255, 0, 0), (int)(2 * wmult)));
-        tmp.drawLine((nowpos) * xdifference, 0, (nowpos) * xdifference, 
-                     tr.bottom());
-    }
+        QColor color = QColor(m_settings->GetSetting("EPGCurrentTimeColor"));
+        if (!color.isValid())
+            color.setRgb(255,0,0);
+        
+        QFontMetrics fm(*m_timeFont);
+        int height = fm.height();
+        
+        if (nowpos < 0)
+        {
+            tmp.setPen(QPen(color, (int)(2 * wmult)));
+            tmp.drawText(0, (tr.bottom() - height) / 2 + height, "<<");
+        }
+        else if (nowpos >= 0 && nowpos < DISPLAY_TIMES)
+        {
+            tmp.setPen(QPen(color, (int)(2 * wmult)));
+            tmp.drawLine((nowpos) * xdifference, 0, (nowpos) * xdifference, 
+                         tr.bottom());
 
+            QString nows;
+            QString timeformat = m_settings->GetSetting("TimeFormat", 
+                                                        "h:mm AP");
+            nows.sprintf(now.time().toString(timeformat));
+            tmp.drawText((nowpos) * xdifference + 3, tr.bottom() - 3, nows);
+        }
+        else
+        {
+            tmp.setPen(QPen(color, (int)(2 * wmult)));
+            tmp.drawText(xdifference * (DISPLAY_TIMES - 1), 
+                         (tr.bottom() - height) / 2 + height, ">>");
+        }
+    }
+   
     tmp.end();
 
     p->drawPixmap(tr.topLeft(), pix);
