@@ -39,7 +39,8 @@ class Ripper : public MythDialog
     void fillComboBox (MythComboBox &, const QString &);
 
     int ripTrack(QString &cddevice, Encoder *encoder, int tracknum);
-    void fixFilename(QString &filename, const QString &addition);
+    QString fixFileToken(QString token);
+    void handleFileTokens(QString &filename, Metadata *track);
     void ejectCD(QString &cddev);
 
     QSqlDatabase *db;

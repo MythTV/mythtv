@@ -131,17 +131,6 @@ public:
     };
 };
 
-class FileUnderGenre: public CheckBoxSetting, public GlobalSetting {
-public:
-    FileUnderGenre():
-    GlobalSetting("FileUnderGenre") {
-        setLabel("Genre");
-        setValue(false);
-        setHelpText("If set, ripped music files will be saved under a "
-                    "subdirectory named for the detected music genre.");
-    };
-};
-
 class EncoderType: public ComboBoxSetting, public GlobalSetting {
 public:
     EncoderType():
@@ -154,37 +143,39 @@ public:
     };
 };
 
-class FileUnderArtist: public CheckBoxSetting, public GlobalSetting {
+class FilenameTemplate: public LineEditSetting, public GlobalSetting {
 public:
-    FileUnderArtist():
-        GlobalSetting("FileUnderArtist") {
-        setLabel("Artist");
-        setValue(true);
-        setHelpText("If set, ripped music files will be saved under a "
-                    "subdirectory named for the detected artist.");
+    FilenameTemplate():
+        GlobalSetting("FilenameTemplate") {
+        setLabel("File storage location");
+        setValue("ARTIST/ALBUM/TRACK-TITLE");
+        setHelpText("Defines the location/name for new songs. "
+                    "Valid tokens are: GENRE, ARTIST, ALBUM, "
+                    "TRACK, TITLE, YEAR, / and -. '-' will be replaced "
+                    "by the Token separator");
     };
 };
 
-class FileUnderAlbum: public CheckBoxSetting, public GlobalSetting {
+class TagSeparator: public LineEditSetting, public GlobalSetting {
 public:
-    FileUnderAlbum():
-        GlobalSetting("FileUnderAlbum") {
-        setLabel("Album");
-        setValue(true);
-        setHelpText("If set, ripped music files will be saved under a "
-                    "subdirectory named for the detected album.");
-     };
+    TagSeparator():
+        GlobalSetting("TagSeparator") {
+        setLabel("Token separator");
+        setValue(" - ");
+        setHelpText("Filename tokens will be separated by this string.");
+    };
 };
 
-class CDRipPath: public HorizontalConfigurationGroup {
+class NoWhitespace: public CheckBoxSetting, public GlobalSetting {
 public:
-    CDRipPath() {
-        setLabel("Ripped audio filing scheme");
-        addChild(new FileUnderGenre());
-        addChild(new FileUnderArtist());
-        addChild(new FileUnderAlbum());
+    NoWhitespace():
+    GlobalSetting("NoWhitespace") {
+        setLabel("Replace ' ' with '_'");
+        setValue(false);
+        setHelpText("If set, whitespace characters in filenames will be "
+                    "replaced with underscore characters.");
     };
-}; 
+};
 
 class ParanoiaLevel: public ComboBoxSetting, public GlobalSetting {
 public:
@@ -518,11 +509,13 @@ RipperSettings::RipperSettings()
 {
     VerticalConfigurationGroup* rippersettings = new VerticalConfigurationGroup(false);
     rippersettings->setLabel("CD Ripper Settings");
-    rippersettings->addChild(new CDRipPath());
-    rippersettings->addChild(new PostCDRipScript());
     rippersettings->addChild(new EncoderType());
     rippersettings->addChild(new DefaultRipQuality());
     rippersettings->addChild(new ParanoiaLevel());
+    rippersettings->addChild(new FilenameTemplate());
+    rippersettings->addChild(new TagSeparator());
+    rippersettings->addChild(new NoWhitespace());
+    rippersettings->addChild(new PostCDRipScript());
     rippersettings->addChild(new EjectCD());
     addChild(rippersettings);
 }

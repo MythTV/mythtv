@@ -37,8 +37,8 @@ void LameEncoder::init_id3tags(lame_global_flags *gf, Metadata *metadata)
     tagstr = QString::number(metadata->Year(), 10);
     id3tag_set_year(gf, tagstr);
 
-    // write both v2 and v1 tags.
-    id3tag_add_v2(gf);
+    // write v2 tags.
+    id3tag_v2_only(gf);
 }
 
 int LameEncoder::init_encoder(lame_global_flags *gf, int quality, int vbr)
@@ -112,7 +112,6 @@ LameEncoder::LameEncoder(const QString &outfile, int qualitylevel,
     {
         cout << "Couldn't initialize lame encoder\n";
         return;
-        // FIXME cleanup like in ~Encoder needed?
     }
 }
 

@@ -166,10 +166,10 @@ Ripper::Ripper(QSqlDatabase *ldb, MythMainWindow *parent, const char *name)
     QString label;
     int length, min, sec;
 
-    for(int i = 0; i < decoder->getNumTracks(); i++)
+    for (int trackno = 0; trackno < decoder->getNumTracks(); trackno++)
     {
-        track = decoder->getMetadata(i + 1);
-        if(track)
+        track = decoder->getMetadata(trackno + 1);
+        if (track)
         {
             length = track->Length() / 1000;
             min = length / 60;
@@ -179,7 +179,7 @@ Ripper::Ripper(QSqlDatabase *ldb, MythMainWindow *parent, const char *name)
 
             table->setRowHeight(row, (int)(30 * hmult));
 
-            label.sprintf("%d", i+1);
+            label.sprintf("%d", trackno + 1);
             table->setText(row, 0, label);
 
             table->setText(row, 1, track->Title());
@@ -270,7 +270,7 @@ void Ripper::tableChanged(int row, int col)
     delete decoder;
 }
 
-void Ripper::fillComboBox (MythComboBox & box, const QString & db_column)
+void Ripper::fillComboBox(MythComboBox &box, const QString &db_column)
 {
    QString querystr = QString("SELECT DISTINCT %1 FROM musicmetadata;")
                              .arg(db_column);
@@ -294,18 +294,85 @@ void Ripper::fillComboBox (MythComboBox & box, const QString & db_column)
    box.insertStringList(strlist);
 }
 
-void Ripper::fixFilename(QString &filename, const QString &addition)
+void Ripper::handleFileTokens(QString &filename, Metadata *track)
 {
-    QString tempcopy = addition;
+    QString original = filename;
 
-    tempcopy.replace(QRegExp("/"), QString("_"));
-    tempcopy.replace(QRegExp("\\"), QString("_"));
-    tempcopy.replace(QRegExp(":"), QString("_"));
-    tempcopy.replace(QRegExp("?"), QString("_"));
-    tempcopy.replace(QRegExp("\'"), QString("_"));
-    tempcopy.replace(QRegExp("\""), QString("_"));
+    QString fntempl = gContext->GetSetting("FilenameTemplate");
+    bool no_ws = gContext->GetNumSetting("NoWhitespace", 0);
 
-    filename += "/" + tempcopy;
+    QRegExp rx_ws("\\s{1,}");
+    QRegExp rx("(?:\\s?)(GENRE|ARTIST|ALBUM|TRACK|TITLE|YEAR)(?:\\s?)/");
+
+    int i = 0;
+    while (i >= 0)
+    {
+        i = rx.search(fntempl, i);
+        if (i >= 0)
+        {
+            i += rx.matchedLength();
+            if ((rx.capturedTexts()[1] == "GENRE") && (track->Genre() != ""))
+                filename += fixFileToken(track->Genre()) + "/";
+            if ((rx.capturedTexts()[1] == "ARTIST") && (track->Artist() != ""))
+                filename += fixFileToken(track->Artist()) + "/";
+            if ((rx.capturedTexts()[1] == "ALBUM") && (track->Album() != ""))
+                filename += fixFileToken(track->Album()) + "/";
+            if ((rx.capturedTexts()[1] == "TRACK") && (track->Track() >= 0))
+                filename += fixFileToken(QString::number(track->Track(), 10)) + "/";
+            if ((rx.capturedTexts()[1] == "TITLE") && (track->Title() != ""))
+                filename += fixFileToken(track->Title()) + "/";
+            if ((rx.capturedTexts()[1] == "YEAR") && (track->Year() >= 0))
+                filename += fixFileToken(QString::number(track->Year(), 10)) + "/";
+
+            if (no_ws)
+                filename.replace(rx_ws, "_");
+            mkdir(filename, 0775);
+        }
+    }
+
+    // remove the dir part and other cruft
+    fntempl.replace(QRegExp("(.*/)|\\s*"), "");
+
+    QString tagsep = gContext->GetSetting("TagSeparator");
+    QStringList tokens = QStringList::split("-", fntempl);
+    QStringList fileparts;
+    QString filepart;
+
+    for (unsigned i = 0; i < tokens.size(); i++)
+    {
+        if ((tokens[i] == "GENRE") && (track->Genre() != ""))
+            fileparts += track->Genre();
+        else if ((tokens[i] == "ARTIST") && (track->Artist() != ""))
+            fileparts += track->Artist();
+        else if ((tokens[i] == "ALBUM") && (track->Album() != ""))
+            fileparts += track->Album();
+        else if ((tokens[i] == "TRACK") && (track->Track() >= 0))
+            fileparts += QString::number(track->Track(), 10);
+        else if ((tokens[i] == "TITLE") && (track->Title() != ""))
+            fileparts += track->Title();
+        else if ((tokens[i] == "YEAR") && (track->Year() >= 0))
+            fileparts += QString::number(track->Year(), 10);
+    }
+
+    filepart = fileparts.join( tagsep );
+    filename += fixFileToken(filepart);
+
+    if (filename == original || filename.length() > FILENAME_MAX)
+    {
+        QString tempstr = QString::number(track->Track(), 10);
+        tempstr += " - " + track->Title();
+        filename += fixFileToken(tempstr);
+        cout << "Invalid file storage definition.\n";
+    }
+
+    if (no_ws)
+        filename.replace(rx_ws, "_");
+}
+
+QString Ripper::fixFileToken(QString token)
+{
+    token.replace(QRegExp("(/|\\|:|\'|\")"), QString("_"));
+    return token;
 }
 
 void Ripper::reject() 
@@ -363,29 +430,27 @@ void Ripper::ripthedisc(void)
     QString textstatus;
     QString cddevice = gContext->GetSetting("CDDevice");
     QString encodertype = gContext->GetSetting("EncoderType");
-
-    QString outfile;
-    CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
-
     int encodequal = qualitygroup->id(qualitygroup->selected());
 
-    QString findir = gContext->GetSetting("MusicLocation");
+    CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
 
-    bool fileundergenre = gContext->GetNumSetting("FileUnderGenre", 0);
-    bool fileunderartist = gContext->GetNumSetting("FileUnderArtist", 1);
-    bool fileunderalbum = gContext->GetNumSetting("FileUnderAlbum", 1);
+    QString musicdir = gContext->GetSetting("MusicLocation");
+    if (!musicdir.endsWith("/"))
+        musicdir += "/";
 
-    for (int i = 0; i < decoder->getNumTracks(); i++)
+    for (int trackno = 0; trackno < decoder->getNumTracks(); trackno++)
     {
         Encoder *encoder;
 
         current->setProgress(0);
         current->reset();
 
-        Metadata *track = decoder->getMetadata(db, i + 1);
+        Metadata *track = decoder->getMetadata(db, trackno + 1);
 
         if (track)
         {
+            QString outfile = musicdir;
+
             //
             // cddb_genre from cdda structure is just an enum that
             // gets mapped to a string -- kind of useless for custom
@@ -403,31 +468,7 @@ void Ripper::ripthedisc(void)
 
             qApp->processEvents();
 
-            outfile = findir;
-
-            if (fileundergenre)
-            {
-                fixFilename(outfile, track->Genre());
-                mkdir(outfile, 0777);
-            }
-
-            if (fileunderartist)
-            {
-                fixFilename(outfile, track->Artist());
-                mkdir(outfile, 0777);
-            }
-
-            if (fileunderalbum)
-            {
-                fixFilename(outfile, track->Album());
-                mkdir(outfile, 0777);
-            }
-
-            QString tempstr;
-            tempstr.sprintf("%02d - %s", track->Track(), 
-                            track->Title().latin1());
-
-            fixFilename(outfile, tempstr);
+            handleFileTokens(outfile, track);
 
             if (encodequal < 3)
             {
@@ -448,9 +489,9 @@ void Ripper::ripthedisc(void)
                 encoder = new FlacEncoder(outfile, encodequal, track); 
             }
 
-            ripTrack(cddevice, encoder, i + 1);
+            ripTrack(cddevice, encoder, trackno + 1);
 
-            overall->setProgress(i + 1);
+            overall->setProgress(trackno + 1);
             qApp->processEvents();
 
             delete encoder;
