@@ -2,7 +2,7 @@
 <HTML>
 <HEAD>
  <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.20">
- <TITLE>Installing and using mythtv: Checking prerequisites.</TITLE>
+ <TITLE>Installing and using mythtv: Checking prerequisites. </TITLE>
  <LINK HREF="mythtv-HOWTO-4.html" REL=next>
  <LINK HREF="mythtv-HOWTO-2.html" REL=previous>
  <LINK HREF="mythtv-HOWTO.html#toc3" REL=contents>
@@ -12,22 +12,24 @@
 <A HREF="mythtv-HOWTO-2.html">Previous</A>
 <A HREF="mythtv-HOWTO.html#toc3">Contents</A>
 <HR>
-<H2><A NAME="s3">3.</A> <A HREF="mythtv-HOWTO.html#toc3">Checking prerequisites.</A></H2>
+<H2><A NAME="s3">3.</A> <A HREF="mythtv-HOWTO.html#toc3">Checking prerequisites. </A></H2>
 
-<H2><A NAME="ss3.1">3.1</A> <A HREF="mythtv-HOWTO.html#toc3.1">Hardware.</A>
+<H2><A NAME="ss3.1">3.1</A> <A HREF="mythtv-HOWTO.html#toc3.1">Hardware. </A>
 </H2>
 
 <P>mythtv is a software video encoder, which means that it uses a fairly
-generic "dumb" video capture card, encodes the frames of video using the CPU
-on your motherboard and writes them to disk.  High-end video capture cards
-and devices like the Tivo and RePlay have dedicated encoder chips on them
+generic "dumb" video capture card to get frames of video, encodes them using
+the CPU on your motherboard and writes them to disk.  High-end video capture
+cards and devices like the Tivo and RePlay have dedicated encoder chips
 which use specialized hardware to convert the video stream to the MPEG-2
-format without using the motherboard CPU, which means that the main CPU only
-has to worry about running the Operating System and reading and writing to
-the disk.  These have fairly low CPU requirements compared to encoding
-video.  Currently, there are no known MPEG-2 encoder cards that have
-video4linux drivers which would be suitable for use with mythtv.  Once the
-drivers are written, support for hardware MPEG-2 encoders can be integrated.</P>
+format without using the motherboard CPU.  The main CPU has the
+responsibility of running the Operating System and reading and writing the
+encoded frames to the disk.  These tasks have fairly low CPU requirements
+compared to encoding video, which is why a device like a Series 1 Tivo can
+run with only 16MB of RAM and a 54Mhz CPU.</P>
+<P>Currently, there are no known MPEG-2 encoder cards that have video4linux
+drivers which would be suitable for use with mythtv.  Once the drivers are
+written, support for hardware MPEG-2 encoders can be integrated.</P>
 <P>There are many variables that go into the question: "How fast a CPU do I
 need to run mythtv"?  Obviously, the faster your CPU, the better your
 experience will be with mythtv.  Performing the "Watch TV" function, where
