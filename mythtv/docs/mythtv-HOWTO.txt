@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2004-01-21, v0.13.12
+  2004-01-21, v0.13.13
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -3473,28 +3473,8 @@
   option in mythfrontend.  Make sure you set your pictures directory to
   wherever you're storing your photos.
 
-
-  +o  Use the arrow keys to move around the thumbnails.
-
-  +o  Use SPACE or ENTER to maximize a photo.
-
-  +o  Use p or P to start the slideshow of all the files in the
-     directory.  "Play" or "Pause" on your remote may also work.
-
-  +o  Use SPACE or ENTER to advance to the next photo.
-
-  +o  Use ESC to go up one level, or to exit out of the module if you're
-     at the first level.
-
-  +o  Use the [ and ] keys to rotate the image.
-
-  +o  Use M to bring up the setup dialog.
-
-  +o  Use I to import pictures; when a photo is maximized this will bring
-     up photo information.
-
-  +o  7 and 9 are used to Zoom Out and in, 2, 4, 6 and 8 are used to move
-     around while in zoom mode, 5 centers and 0 exits zoom.
+  The controls for MythGallery can be found in the README that comes
+  with the application.
 
 
   [1m13.2.  Importing Pictures[0m
@@ -3521,32 +3501,33 @@
   Here is an example script that a user may want to run on import:
 
 
-       #!/bin/csh
 
-       if ($#argv == 0) then
-               echo "Usage: $0 dest_dir"
-               exit
-       endif
+  #!/bin/csh
 
-       cd $argv[1]
+  if ($#argv == 0) then
+          echo "Usage: $0 dest_dir"
+          exit
+  endif
 
-       # get stuff over the network
-       wget http://www.somesite.dom/dir/file1.jpg
-       wget http://www.somesite.dom/dir/file2.jpg
-       wget http://www.somesite.dom/dir/file3.jpg
+  cd $argv[1]
 
-       # stuff that requires manual module loading and/or fs mounting
-       modprobe camera_module
-       mount /dev/camera /mnt/camera
-       cp /mnt/camera/* $argv[1]
-       umount /mnt/camera
-       rmmod camera_module
+  # get stuff over the network
+  wget http://www.somesite.dom/dir/file1.jpg
+  wget http://www.somesite.dom/dir/file2.jpg
+  wget http://www.somesite.dom/dir/file3.jpg
 
-       # perform some processing
-       foreach pname (`ls *.jpg`)
-               jpegtran -flip vertical $pname > $pname.new
-               mv $pname.new $pname
-       end
+  # stuff that requires manual module loading and/or fs mounting
+  modprobe camera_module
+  mount /dev/camera /mnt/camera
+  cp /mnt/camera/* $argv[1]
+  umount /mnt/camera
+  rmmod camera_module
+
+  # perform some processing
+  foreach pname (`ls *.jpg`)
+          jpegtran -flip vertical $pname > $pname.new
+          mv $pname.new $pname
+  end
 
 
 
@@ -3564,7 +3545,6 @@
   The prerequisites for MythMusic are:
 
   +o  MAD
-
 
   +o  id3tag
 
@@ -3586,15 +3566,14 @@
   <http://www.mars.org/home/rob/proj/mpeg/>  Save it to a directory you
   can find later.
 
-
-       $ tar -xzf mad-0.14.2b.tar.gz
-       $ cd mad-0.14.2b
-       $ ./configure
-       $ make
-       $ su
-       # make install
-       # exit
-       $
+  $ tar -xzf mad-0.14.2b.tar.gz
+  $ cd mad-0.14.2b
+  $ ./configure
+  $ make
+  $ su
+  # make install
+  # exit
+  $
 
 
 
@@ -3649,8 +3628,6 @@
   Download cdparanoia from http://www.xiph.org/paranoia/down.html
   <http://www.xiph.org/paranoia/download/cdparanoia-III-
   alpha9.8.src.tgz>.
-
-
        $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
        $ cd cdparanoia-III-alpha9.8
        $ ./configure
@@ -3693,6 +3670,7 @@
        # urpmi libcdaudio1-devel libid3tag0 libid3tag0-devel
 
 
+
   [1m15.2.1.  Additional options with MythMusic[0m
 
   Additional visualizations have been added to MythMusic.  If you wish
@@ -3711,8 +3689,6 @@
 
 
        # urpmi libfftw2 libfftw2-devel
-
-
 
   OpenGL should be installed on practically all distributions.  However,
   you will need the devel module.  In Mandrake 9.1 it may be installed
@@ -3766,6 +3742,7 @@
   prerequisites.  Run ./configure --help for help.
 
 
+
   ______________________________________________________________________
   NOTE for Red Hat users: Before compiling, make the following modification
   to settings.pro, otherwise the compile will fail:
@@ -3817,6 +3794,7 @@
 
   Genre/Artist/Album/Title Artist/Genre/Album/Title Artist/Album/Title
   (with Genre left as Unknown)
+
   The track number is optional but can be specified with the title by
   using the TRACK_TITLE keyword instead of TITLE.  If TRACK_TITLE is
   used, then the filename can have a space, hyphen, or underscore
@@ -4006,13 +3984,12 @@
   Change into the MythVideo directory, then make and make install:
 
 
-
-  $ cd mythvideo
-  $ qmake mythvideo.pro
-  $ make
-  $ su
-  # make install
-  # exit
+       $ cd mythvideo
+       $ qmake mythvideo.pro
+       $ make
+       $ su
+       # make install
+       # exit
 
 
 
@@ -4022,7 +3999,6 @@
 
        $ cd videodb
        $ mysql -u mythtv -p < metadata.sql
-
 
 
   See MythVideo's README file for additional information.
@@ -4067,12 +4043,11 @@
   ./configure
 
 
-
-  $ ./configure --enable-transcode
-  $ qmake mythdvd.pro
-  $ make
-  $ su
-  # make install
+       $ ./configure --enable-transcode
+       $ qmake mythdvd.pro
+       $ make
+       $ su
+       # make install
 
 
 
@@ -4129,12 +4104,11 @@
   First, you should check that your kernel has been enabled for DMA:
 
 
-
-  [mythtv@pvr mythtv]$ dmesg |grep DMA
-      ide0: BM-DMA at 0xd800-0xd807, BIOS settings: hda:DMA, hdb:DMA
-      ide1: BM-DMA at 0xd808-0xd80f, BIOS settings: hdc:DMA, hdd:pio
-  hda: 156301488 sectors (80026 MB) w/2048KiB Cache, CHS=9729/255/63, UDMA(33)
-  hdb: 80043264 sectors (40982 MB) w/2048KiB Cache, CHS=4982/255/63, UDMA(33)
+       [mythtv@pvr mythtv]$ dmesg |grep DMA
+           ide0: BM-DMA at 0xd800-0xd807, BIOS settings: hda:DMA, hdb:DMA
+           ide1: BM-DMA at 0xd808-0xd80f, BIOS settings: hdc:DMA, hdd:pio
+       hda: 156301488 sectors (80026 MB) w/2048KiB Cache, CHS=9729/255/63, UDMA(33)
+       hdb: 80043264 sectors (40982 MB) w/2048KiB Cache, CHS=4982/255/63, UDMA(33)
 
 
 
@@ -4149,7 +4123,6 @@
 
 
        # hdparm -d /dev/hd?
-
 
 
   will tell you the DMA status for your hard drives.  If you run [1mhdparm[0m
@@ -4195,6 +4168,8 @@
 
   Some compile errors are worse than others.  If you get an error that
   doesn't abort the compilation, and says something like:
+
+
        cc1plus: warning: changing search order for system directory
        "/usr/local/include"
        cc1plus: warning:   as it has already been specified as a non-system
@@ -4256,24 +4231,23 @@
   Finally, check:
 
 
+       Section "Monitor"
+           Identifier "monitor1"
+           VendorName "Plug'n Play"
+           HorizSync 30-85
+           VertRefresh 50-160
 
-  Section "Monitor"
-      Identifier "monitor1"
-      VendorName "Plug'n Play"
-      HorizSync 30-85
-      VertRefresh 50-160
+           # Sony Vaio C1(X,XS,VE,VN)?
+           # 1024x480 @ 85.6 Hz, 48 kHz hsync
+           ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
 
-      # Sony Vaio C1(X,XS,VE,VN)?
-      # 1024x480 @ 85.6 Hz, 48 kHz hsync
-      ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
+           # TV fullscreen mode or DVD fullscreen output.
+           # 768x576 @ 79 Hz, 50 kHz hsync
+           ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
 
-      # TV fullscreen mode or DVD fullscreen output.
-      # 768x576 @ 79 Hz, 50 kHz hsync
-      ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
-
-      # 768x576 @ 100 Hz, 61.6 kHz hsync
-      ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
-  EndSection
+           # 768x576 @ 100 Hz, 61.6 kHz hsync
+           ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
+       EndSection
 
 
 
@@ -4319,6 +4293,8 @@
 
   Edit the settings.pro file.  Make sure that the top of the file looks
   like this:
+
+
        $ cat settings.pro
        CONFIG += debug
        #CONFIG += release
@@ -4468,7 +4444,6 @@
        # fuser -v /dev/dsp
 
 
-
   To disable aRts in KDE, go to KDE->Control Center->Sound->Sound System
   and uncheck the "Start aRts soundserver on KDE startup" box.  Run #
   killall artsd from the command line to stop the artsd program.
@@ -4530,6 +4505,7 @@
   +o  fvwm
 
   +o  blackbox  (using "Sloppy Focus" and "Focus New Windows")
+
 
 
   [1m20.17.  My PVR-250 card doesn't show inputs in the setup screen.[0m
@@ -4597,7 +4573,6 @@
   the symlink for you when the qt3 package was installed.  The first
   choice is the better solution.
 
-
   [1m20.23.  make: *** No rule to make target /mkspecs/default/qmake.conf',[0m
   [1mneeded by Makefile'.  Stop.[0m
 
@@ -4640,7 +4615,6 @@
   support.'' for examples on finding and removing old versions of lirc.
 
 
-
   [1m20.29.  MySQL not connecting correctly.[0m
 
   Your [1mMySQL [22minstallation may have networking turned off.  Check that
@@ -4661,6 +4635,7 @@
   decoding video.  Users have reported that rather than speeding up
   their video it appears to be doing the opposite.  You may want to
   check that your color depth is set for 24bpp.
+
 
 
   [1m20.32.  My computer is loading a media player application when I[0m
@@ -4706,6 +4681,8 @@
   independently, and there is no rate control between them which means
   that the two programs don't coordinate their efforts to maintain
   synchronization.
+
+
   [1m21.1.1.  mythtranscode example[0m
 
   First, start [1mmythtranscode[22m.  You will need to determine the channel
@@ -4896,7 +4873,6 @@
   image inside the screen. Underscan is useful for computer monitors so
   that toolbars and scrollbars at the edges can be seen.
 
-
   For best results, match the X display area as close as possible to the
   edges of the physical screen. This can only be adjusted by your tv-out
   device or by the settings for the television set. Many sets have these
@@ -4917,7 +4893,6 @@
 
 
        $ mysqldump -u mythtv -pmythtv mythconverg -c > mythtv_backup.sql
-
 
 
   To restore: (assuming that you've dropped the database)
@@ -5024,8 +4999,8 @@
   the channel that has been removed:
 
 
-  $ mysql -u root mythconverg
-  mysql> delete from program where chanid = '1015';
+       $ mysql -u root mythconverg
+       mysql> delete from program where chanid = '1015';
 
 
 
@@ -5045,8 +5020,6 @@
 
   On the "slave" machine, you'll want to edit the /etc/fstab file and
   add something like:
-
-
        masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,soft,nfsvers=3
 
 
@@ -5080,12 +5053,11 @@
   The following also works with blackbox:
 
 
-
-  $ cat > .xinitrc
-  xset -dpms s off &
-  irxevent &
-  mythfrontend &
-  blackbox
+       $ cat > .xinitrc
+       xset -dpms s off &
+       irxevent &
+       mythfrontend &
+       blackbox
 
 
 
@@ -5141,11 +5113,10 @@
   runlevels 3, 4 or 5:
 
 
-
-  $ su
-  # chkconfig --level 345 mythbackend on
-  # exit
-  $
+       $ su
+       # chkconfig --level 345 mythbackend on
+       # exit
+       $
 
 
 
@@ -5174,8 +5145,6 @@
        drwxrwxr-x    2 root     mythtv       4096 Apr 28 21:58 /var/log/mythtv/
        $
 
-
-
   [1m21.11.1.2.  Mandrake 9.x[0m
 
   Mandrake adds one more twist in the form of the msec utility, which
@@ -5200,11 +5169,10 @@
   may add it by typing:
 
 
-
-  $ cd contrib
-  $ su
-  # cat etc.security.msec.perm.local >> /etc/security/msec/perm.local
-  # exit
+       $ cd contrib
+       $ su
+       # cat etc.security.msec.perm.local >> /etc/security/msec/perm.local
+       # exit
 
 
 
@@ -5238,8 +5206,6 @@
 
 
        # /etc/init.d/mythbackend stop
-
-
 
   To obtain a list of options:
 
@@ -5326,7 +5292,6 @@
   program under the host-specific settings: set the Transcoder Auto-run
   checkbox
 
-
   For either manual or automatic transcoding: start mythbackend start
   mythfrontend select setup, and the Transcoding recording profile.  now
   select either RTJPEG or MPEG-4 (selecting any of the hardware encoders
@@ -5370,7 +5335,6 @@
 
        $ su
        # /etc/init.d/mythbackend stop
-
 
 
   2.  Change the hostname.  For most distributions, edit the
@@ -5433,8 +5397,6 @@
 
        # /etc/init.d/mythbackend start
 
-
-
   8.  Quit and restart all frontends.  Delete the mythtv_backup.sql and
   mythtv_restore.sql
 
@@ -5475,7 +5437,7 @@
   Download the latest IVTV driver from Sourceforge.  Check
   http://sourceforge.net/projects/ivtv/
   <http://sourceforge.net/projects/ivtv/> for the current version.
-  Right now, it's 0.1.9.  Untar the file.
+  Right now (2004-01-21), it's 0.1.9.  Untar the file.
 
 
        $ tar -xzf ivtv-0.1.9.tar.gz
@@ -5486,22 +5448,50 @@
   following commands:
 
 
-       $ cd ivtv/ivtv/utils
+       $ cd ivtv/utils
        $ wget http://hauppauge.lightpath.net/software/pvr250/pvr250_17_21288.exe
        $ su
        # ./ivtvfwextract.pl pvr250_17_21288.exe
        # exit
+       $ cd ../driver
 
 
 
   The [1mivtvfwextract [22mprogram extracts the firmware required for the card.
   You may want to go to the Hauppauge website and download the latest
   Windows driver if the [1mwget [22mcommand fails.
+  ivtv also needs to know how your kernel was compiled.  The default
+  Makefile is not configured for the way Mandrake "does things".  At the
+  top of the Makefile in the driver directory is a line like this:
+
+
+       KERNELDIR= /lib/modules/$(KERNVER)/build
+
+
+
+  edit it so that it looks like:
+
+
+       KERNELDIR= /usr/src/linux
+
+
+
+  [1mNOTE[22m:  If you are running a distribution / kernel which is using the
+  new version of i2c (version 2.8.x, found in the latest Mandrake and
+  Cooker) you will need to make the following edit. Look for
+
+
+       # uncomment if you use i2c 2.8.0+
+       #CFLAGS += -DNEW_I2C
+
+
+
+  and remove the "#" from the line containing CFLAGS.
 
   Next, compile the driver:
 
 
-       $ cd ~/ivtv/ivtv/driver
+       $ cd ~/ivtv/driver
        $ make
 
 
@@ -5509,38 +5499,44 @@
   Compile the [1mtest_ioctl [22mprogram:
 
 
-
-  $ cd ../utils
-  $ make
-  $ su
-  # cp test_ioctl /usr/local/bin
-  # exit
-
+       $ cd ../utils
+       $ make
+       $ su
+       # cp test_ioctl /usr/local/bin
+       # exit
 
 
-  [1mNOTE[22m: You may get warnings about i2c during the compile.  Ignore them.
+
+  [1mNOTE[22m: You may get warnings about i2c during the compile.  Ignore them
+  if they look something like this: #warning Using temporary hack for
+  missing I2C driver-ID for saa7114
+
+  However, if you get an actual compile error where the compile doesn't
+  finish and the error looks like: saa7115.c:1117: error: unknown field
+  'inc_use' specified in initializer then you didn't uncomment CFLAGS as
+  specified ``above''.
 
   Add the following to /etc/modules.conf: [1mNOTE[22m:  You do not need to add
   the last line "add above..." if you will not be using the IR remote
   that came with the card.
 
 
-       alias char-major-81     videodev
-       alias char-major-81-0   ivtv
-       alias char-major-61 lirc_i2c
-       options ivtv debug=1
-       options tuner type=2
-       options msp3400 once=1 simple=1
-       add below ivtv msp3400 saa7115 tuner
-       add above ivtv lirc_dev lirc_i2c
+  alias char-major-81     videodev
+  alias char-major-81-0   ivtv
+  alias char-major-61 lirc_i2c
+  options ivtv debug=1
+  options tuner type=2
+  options msp3400 once=1 simple=1
+  add below ivtv msp3400 saa7115 tuner
+  add above ivtv lirc_dev lirc_i2c
 
 
 
   [1mNOTE[22m:  You must specify the tuner type manually.  See
-  ~/ivtv/ivtv/driver/tuner.h for a listing of tuners.  In the above
-  example, tuner type=2 is a Phillips NTSC.  Use an appropriate tuner
-  type for your system and video standard.  The debug=1 parameter on the
-  ivtv line actually means less debugging output will be printed.
+  ~/ivtv/driver/tuner.h for a listing of tuners.  In the above example,
+  tuner type=2 is a Phillips NTSC.  Use an appropriate tuner type for
+  your system and video standard.  The debug=1 parameter on the ivtv
+  line actually means less debugging output will be printed.
 
   Next, copy the files that were compiled in the driver directory into
   the appropriate modules directory:
@@ -5548,7 +5544,7 @@
 
        $ su
        # make install
-       # depmod -a
+       # depmod -ae
 
 
 
@@ -5563,16 +5559,15 @@
   Check that the card is being recognized on the PCI bus:
 
 
+       $ lspci -v
+       <snip>
 
-  $ lspci -v
-  <snip>
-
-  00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
-  Encoder (rev 01)
-          Subsystem: Hauppauge computer works Inc.: Unknown device 4801
-          Flags: bus master, medium devsel, latency 32, IRQ 11
-          Memory at d0000000 (32-bit, prefetchable) [size=64M]
-          Capabilities: <available only to root>
+       00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
+       Encoder (rev 01)
+               Subsystem: Hauppauge computer works Inc.: Unknown device 4801
+               Flags: bus master, medium devsel, latency 32, IRQ 11
+               Memory at d0000000 (32-bit, prefetchable) [size=64M]
+               Capabilities: <available only to root>
 
 
 
@@ -5588,12 +5583,11 @@
        crw-------    1 mythtv   sys       81,   0 Dec 31  1969 video0
        crw-------    1 mythtv   sys       81,  32 Dec 31  1969 video32
 
-
-
   In this case, the ivtv device is video0.
 
-  Go into setup/setup on the machine hosting the hardware MPEG-2 card.
-  When you add a new capture card, ensure that you are using the video0
+  You can now add this card available to MythTV.  Go into your mythtv
+  setup directory on the machine hosting the hardware MPEG-2 card.  When
+  you add a new capture card, ensure that you are using the video0
   device.
 
   [1mNOTE[22m:  As of 2003-04-25 the ivtv driver does not support VBI, so
@@ -5652,6 +5646,7 @@
   right of the image.  If you have this issue, it's fairly obvious.
   This is a firmware issue, apparently.  There are two ways around this:
 
+
   1. Run at 720x480 resolution
 
   2. Turn off DNR
@@ -5690,6 +5685,7 @@
        kernel-source-2.4.22-9mdk
 
 
+
   If you've already installed LIRC from the Mandrake packages, it's
   going to be version 0.6.6, and that won't work.  Uninstall it:
 
@@ -5705,39 +5701,40 @@
   programs on your system:
 
 
-       $ su
-       # updatedb
-       # locate lirc_i2c|grep `uname -r`
-       /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_i2c.c
-       /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_i2c.o.gz
 
-       # locate lirc_dev|grep `uname -r`
-       /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.c
-       /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.h
-       /usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.stamp
-       /usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.ver
-       /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_dev.o.gz
+  $ su
+  # updatedb
+  # locate lirc_i2c|grep `uname -r`
+  /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_i2c.c
+  /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_i2c.o.gz
 
-       # locate irw|grep "/usr"
-       /usr/bin/irw
-       /usr/local/bin/irw
-       /usr/local/man/man1/irw.1
+  # locate lirc_dev|grep `uname -r`
+  /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.c
+  /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.h
+  /usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.stamp
+  /usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.ver
+  /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_dev.o.gz
 
-       # locate lircd|grep "/usr"
-       /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lircd.conf.RM-050
-       /usr/share/man/man8/lircd.8.bz2
-       /usr/share/doc/lirc-0.6.6/html/lircd.html
-       /usr/sbin/lircd
-       /usr/local/sbin/lircd
-       /usr/local/man/man8/lircd.8
+  # locate irw|grep "/usr"
+  /usr/bin/irw
+  /usr/local/bin/irw
+  /usr/local/man/man1/irw.1
 
-       # locate irxevent|grep "/usr"
-       /usr/share/man/man1/irxevent.1.bz2
-       /usr/share/doc/lirc-0.6.6/html/irxevent.html
-       /usr/share/doc/lirc-0.6.6/irxevent.keys
-       /usr/bin/irxevent
-       /usr/local/bin/irxevent
-       /usr/local/man/man1/irxevent.1
+  # locate lircd|grep "/usr"
+  /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lircd.conf.RM-050
+  /usr/share/man/man8/lircd.8.bz2
+  /usr/share/doc/lirc-0.6.6/html/lircd.html
+  /usr/sbin/lircd
+  /usr/local/sbin/lircd
+  /usr/local/man/man8/lircd.8
+
+  # locate irxevent|grep "/usr"
+  /usr/share/man/man1/irxevent.1.bz2
+  /usr/share/doc/lirc-0.6.6/html/irxevent.html
+  /usr/share/doc/lirc-0.6.6/irxevent.keys
+  /usr/bin/irxevent
+  /usr/local/bin/irxevent
+  /usr/local/man/man1/irxevent.1
 
 
 
@@ -5754,6 +5751,7 @@
        # rm -rf /usr/bin/irw /usr/local/bin/irw
 
 
+
   Download the lirc-0.7.0pre2 tarball:
 
 
@@ -5767,9 +5765,9 @@
   work correctly.  Download the patch and install:
 
 
-       $ cd lirc-0.7.0pre2
-       $ wget http://delvare.nerim.net/i2c/other/lirc-CVS-i2c-2.8.0.patch
-       $ patch -p1 < lirc-CVS-i2c-2.8.0.patch
+  $ cd lirc-0.7.0pre2
+  $ wget http://delvare.nerim.net/i2c/other/lirc-CVS-i2c-2.8.0.patch
+  $ patch -p1 < lirc-CVS-i2c-2.8.0.patch
 
 
 
@@ -5818,21 +5816,22 @@
   your /var/log/messages and /var/log/lircd files.
 
 
-       $ su
-       # modprobe lirc_i2c
-       # lsmod
-       Module                  Size  Used by    Not tainted
-       lirc_i2c                5124   0
-       lirc_dev               10096   1  [lirc_i2c]
-       ...
-       # lircd
-       # tail /var/log/messages
-       Sep 18 15:38:26 frontend kernel: lirc_i2c: chip found @ 0x18 (Hauppauge IR)
-       Sep 18 15:38:26 frontend kernel: lirc_dev: lirc_register_plugin:sample_rate:
-       10
-       ...
-       # tail /var/log/lircd
-       Sep 18 15:24:52 frontend lircd 0.7.0pre2: lircd(hauppauge) ready
+
+  $ su
+  # modprobe lirc_i2c
+  # lsmod
+  Module                  Size  Used by    Not tainted
+  lirc_i2c                5124   0
+  lirc_dev               10096   1  [lirc_i2c]
+  ...
+  # lircd
+  # tail /var/log/messages
+  Sep 18 15:38:26 frontend kernel: lirc_i2c: chip found @ 0x18 (Hauppauge IR)
+  Sep 18 15:38:26 frontend kernel: lirc_dev: lirc_register_plugin:sample_rate:
+  10
+  ...
+  # tail /var/log/lircd
+  Sep 18 15:24:52 frontend lircd 0.7.0pre2: lircd(hauppauge) ready
 
 
 
@@ -5879,6 +5878,8 @@
   native LIRC support within MythTV, you will need to modify your
   settings.pro file and recompile.  Your settings.pro should look like
   this:
+
+
 
   # Native lirc support
   CONFIG += using_lirc

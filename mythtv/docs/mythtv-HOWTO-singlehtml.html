@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2004-01-21, v0.13.12
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2004-01-21, v0.13.13
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -3167,21 +3167,8 @@ $
 The configuration for MythGallery is accessed through the main Setup option
 in mythfrontend.  Make sure you set your pictures directory to wherever
 you're storing your photos.</P>
-<P>
-<UL>
-<LI>Use the arrow keys to move around the thumbnails.</LI>
-<LI>Use SPACE or ENTER to maximize a photo.</LI>
-<LI>Use p or P to start the slideshow of all the files in the directory.  "Play" or "Pause" on your remote may also work.</LI>
-<LI>Use SPACE or ENTER to advance to the next photo.</LI>
-<LI>Use ESC to go up one level, or to exit out of the module if you're at the first level.</LI>
-<LI>Use the [ and ] keys to rotate the image.</LI>
-<LI>Use M to bring up the setup dialog.</LI>
-<LI>Use I to import pictures; when a photo is maximized this will bring up
-photo information.</LI>
-<LI>7 and 9 are used to Zoom Out and in, 2, 4, 6 and 8 are used to move
-around while in zoom mode, 5 centers and 0 exits zoom.</LI>
-</UL>
-</P>
+<P>The controls for MythGallery can be found in the README that comes with the
+application.</P>
 
 <H2><A NAME="ss13.2">13.2</A> <A HREF="#toc13.2">Importing Pictures</A>
 </H2>
@@ -5026,7 +5013,7 @@ $ su
 <P><B>NOTE</B>:  You do not need to recompile your kernel.</P>
 <P>Download the latest IVTV driver from Sourceforge.  Check 
 <A HREF="http://sourceforge.net/projects/ivtv/">http://sourceforge.net/projects/ivtv/</A> for the current version. 
-Right now, it's 0.1.9.  Untar the file.
+Right now (2004-01-21), it's 0.1.9.  Untar the file.
 <BLOCKQUOTE><CODE>
 <PRE>
 $ tar -xzf ivtv-0.1.9.tar.gz
@@ -5037,21 +5024,50 @@ $ tar -xzf ivtv-0.1.9.tar.gz
 following commands:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd ivtv/ivtv/utils
+$ cd ivtv/utils
 $ wget http://hauppauge.lightpath.net/software/pvr250/pvr250_17_21288.exe
 $ su
 # ./ivtvfwextract.pl pvr250_17_21288.exe
 # exit
+$ cd ../driver
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
 <P>The <B>ivtvfwextract</B> program extracts the firmware required for the
 card.  You may want to go to the Hauppauge website and download the latest
 Windows driver if the <B>wget</B> command fails.</P>
+<P>ivtv also needs to know how your kernel was compiled.  The default Makefile
+is not configured for the way Mandrake "does things".  At the top of the
+Makefile in the <CODE>driver</CODE> directory is a line like this:
+<BLOCKQUOTE><CODE>
+<PRE>
+KERNELDIR= /lib/modules/$(KERNVER)/build
+</PRE>
+</CODE></BLOCKQUOTE>
+
+edit it so that it looks like:
+<BLOCKQUOTE><CODE>
+<PRE>
+KERNELDIR= /usr/src/linux
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P><B>NOTE</B>:  If you are running a distribution / kernel which is using
+the new version of i2c (version 2.8.x, found in the latest Mandrake and
+Cooker) you will need to make the following edit. Look for
+<A NAME="i2c"></A> 
+<BLOCKQUOTE><CODE>
+<PRE>
+# uncomment if you use i2c 2.8.0+
+#CFLAGS += -DNEW_I2C
+</PRE>
+</CODE></BLOCKQUOTE>
+
+and remove the "#" from the line containing <CODE>CFLAGS</CODE>.</P>
 <P>Next, compile the driver:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd ~/ivtv/ivtv/driver
+$ cd ~/ivtv/driver
 $ make
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -5068,7 +5084,14 @@ $ su
 </CODE></BLOCKQUOTE>
 </P>
 <P><B>NOTE</B>: You may get warnings about i2c during the compile.  Ignore
-them.</P>
+them if they look something like this:
+<CODE>#warning Using temporary hack for missing I2C driver-ID for saa7114</CODE></P>
+<P>However, if you get an actual compile error where the compile doesn't finish
+and the error looks like:
+<CODE>saa7115.c:1117: error: unknown field 'inc_use' specified in
+initializer</CODE>
+then you didn't uncomment CFLAGS as specified 
+<A HREF="#i2c">above</A>.</P>
 <P>Add the following to <CODE>/etc/modules.conf</CODE>:
 <B>NOTE</B>:  You do not need to add the last line "<CODE>add above...</CODE>"
 if you will not be using the IR remote that came with the card.
@@ -5086,7 +5109,7 @@ add above ivtv lirc_dev lirc_i2c
 </CODE></BLOCKQUOTE>
 </P>
 <P><B>NOTE</B>:  You must specify the tuner type manually.  See
-<CODE>~/ivtv/ivtv/driver/tuner.h</CODE> for a listing of tuners.  In the above
+<CODE>~/ivtv/driver/tuner.h</CODE> for a listing of tuners.  In the above
 example, <CODE>tuner type=2</CODE> is a Phillips NTSC.  Use an appropriate tuner
 type for your system and video standard.  The <CODE>debug=1</CODE> parameter on
 the ivtv line actually means less debugging output will be printed.</P>
@@ -5096,7 +5119,7 @@ appropriate modules directory:
 <PRE>
 $ su
 # make install
-# depmod -a
+# depmod -ae
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -5137,7 +5160,8 @@ crw-------    1 mythtv   sys       81,  32 Dec 31  1969 video32
 </CODE></BLOCKQUOTE>
 </P>
 <P>In this case, the ivtv device is <CODE>video0</CODE>.</P>
-<P>Go into <CODE>setup/setup</CODE> on the machine hosting the hardware MPEG-2 card.
+<P>You can now add this card available to MythTV.  Go into your mythtv setup
+directory on the machine hosting the hardware MPEG-2 card.
 When you add a new capture card, ensure that you are using the
 <CODE>video0</CODE> device.  </P>
 <P><B>NOTE</B>:  As of 2003-04-25 the ivtv driver does not support VBI, so

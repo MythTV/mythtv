@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2004-01-21, v0.13.12
+<date>2004-01-21, v0.13.13
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -2727,19 +2727,8 @@ The configuration for MythGallery is accessed through the main Setup option
 in mythfrontend.  Make sure you set your pictures directory to wherever
 you're storing your photos.
 
-<itemize>
-<item>Use the arrow keys to move around the thumbnails.
-<item>Use SPACE or ENTER to maximize a photo.
-<item>Use p or P to start the slideshow of all the files in the directory.  "Play" or "Pause" on your remote may also work.
-<item>Use SPACE or ENTER to advance to the next photo.
-<item>Use ESC to go up one level, or to exit out of the module if you're at the first level.
-<item>Use the &lsqb and &rsqb keys to rotate the image.
-<item>Use M to bring up the setup dialog.
-<item>Use I to import pictures; when a photo is maximized this will bring up
-photo information.
-<item>7 and 9 are used to Zoom Out and in, 2, 4, 6 and 8 are used to move
-around while in zoom mode, 5 centers and 0 exits zoom.
-</itemize>
+The controls for MythGallery can be found in the README that comes with the
+application.
 
 <sect1>Importing Pictures
 <p>The import path in the setup dialog is a colon separated list of
@@ -4408,7 +4397,7 @@ $ su
 Download the latest IVTV driver from Sourceforge.  Check <url
 url="http://sourceforge.net/projects/ivtv/"
 name="http://sourceforge.net/projects/ivtv/"> for the current version. 
-Right now, it's 0.1.9.  Untar the file.
+Right now (2004-01-21), it's 0.1.9.  Untar the file.
 <tscreen><verb>
 $ tar -xzf ivtv-0.1.9.tar.gz
 </verb></tscreen>
@@ -4416,20 +4405,41 @@ $ tar -xzf ivtv-0.1.9.tar.gz
 This should create an ivtv directory.  Switch to it and perform the
 following commands:
 <tscreen><verb>
-$ cd ivtv/ivtv/utils
+$ cd ivtv/utils
 $ wget http://hauppauge.lightpath.net/software/pvr250/pvr250_17_21288.exe
 $ su
 # ./ivtvfwextract.pl pvr250_17_21288.exe
 # exit
+$ cd ../driver
 </verb></tscreen>
 
 The <bf>ivtvfwextract</bf> program extracts the firmware required for the
 card.  You may want to go to the Hauppauge website and download the latest
 Windows driver if the <bf>wget</bf> command fails.
 
+ivtv also needs to know how your kernel was compiled.  The default Makefile
+is not configured for the way Mandrake "does things".  At the top of the
+Makefile in the <tt>driver</tt> directory is a line like this:
+<tscreen><verb>
+KERNELDIR= /lib/modules/$(KERNVER)/build
+</verb></tscreen>
+edit it so that it looks like:
+<tscreen><verb>
+KERNELDIR= /usr/src/linux
+</verb></tscreen>
+
+<bf>NOTE</bf>:  If you are running a distribution / kernel which is using
+the new version of i2c (version 2.8.x, found in the latest Mandrake and
+Cooker) you will need to make the following edit. Look for<label id="i2c">
+<tscreen><verb>
+# uncomment if you use i2c 2.8.0+
+#CFLAGS += -DNEW_I2C
+</verb></tscreen>
+and remove the "#" from the line containing <tt>CFLAGS</tt>.
+
 Next, compile the driver:
 <tscreen><verb>
-$ cd ~/ivtv/ivtv/driver
+$ cd ~/ivtv/driver
 $ make
 </verb></tscreen>
 
@@ -4443,7 +4453,14 @@ $ su
 </verb></tscreen>
 
 <bf>NOTE</bf>: You may get warnings about i2c during the compile.  Ignore
-them.
+them if they look something like this:
+<tt>#warning Using temporary hack for missing I2C driver-ID for saa7114</tt>
+
+However, if you get an actual compile error where the compile doesn't finish
+and the error looks like:
+<tt>saa7115.c:1117: error: unknown field 'inc_use' specified in
+initializer</tt>
+then you didn't uncomment CFLAGS as specified <ref id="i2c" name="above">.
 
 Add the following to <tt>/etc/modules.conf</tt>:
 <bf>NOTE</bf>:  You do not need to add the last line "<tt>add above...</tt>"
@@ -4460,7 +4477,7 @@ add above ivtv lirc_dev lirc_i2c
 </verb></tscreen>
 
 <bf>NOTE</bf>:  You must specify the tuner type manually.  See
-<tt>~/ivtv/ivtv/driver/tuner.h</tt> for a listing of tuners.  In the above
+<tt>~/ivtv/driver/tuner.h</tt> for a listing of tuners.  In the above
 example, <tt>tuner type=2</tt> is a Phillips NTSC.  Use an appropriate tuner
 type for your system and video standard.  The <tt>debug=1</tt> parameter on
 the ivtv line actually means less debugging output will be printed.
@@ -4470,7 +4487,7 @@ appropriate modules directory:
 <tscreen><verb>
 $ su
 # make install
-# depmod -a
+# depmod -ae
 </verb></tscreen>
 
 Finally, load the ivtv driver:
@@ -4506,7 +4523,8 @@ crw-------    1 mythtv   sys       81,  32 Dec 31  1969 video32
 
 In this case, the ivtv device is <tt>video0</tt>.
 
-Go into <tt>setup/setup</tt> on the machine hosting the hardware MPEG-2 card.
+You can now add this card available to MythTV.  Go into your mythtv setup
+directory on the machine hosting the hardware MPEG-2 card.
 When you add a new capture card, ensure that you are using the
 <tt>video0</tt> device.  
 
@@ -5028,6 +5046,10 @@ cardlist.  Fix some wording.
 v0.13.12, 2004-01-21.  Add xmltv-grabbers to Mandrake section.  Add tiff-devel
 for mythgallery.  Add 24bpp for NVidia XvMC.  Add section for auto-running
 media players.  Add note on artsd support in CVS.  Remove Mandrake 8.2.
+v0.13.13, 2004-01-21.  Remove incorrect keybindings from MythGallery; point
+at README instead.  Add pointer to PVR-250 compile about new i2c.  Make some
+path changes since the ivtv tarball doesn't have a double-nested ivtv
+directory like CVS used to.
 -->
 
 <!--
