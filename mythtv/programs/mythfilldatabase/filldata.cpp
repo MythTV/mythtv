@@ -1397,34 +1397,17 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
 
     QDateTime qdtNow = QDateTime::currentDateTime();
     QSqlQuery query;
-    QDateTime GuideDataThroughBefore, GuideDataThroughAfter;
     QString status = "currently running.";
 
     query.exec(QString("UPDATE settings SET data ='%1' "
                        "WHERE value='mythfilldatabaseLastRunStart'")
                        .arg(qdtNow.toString("yyyy-MM-dd hh:mm")));
 
-    query.exec(QString("SELECT MAX(endtime) FROM program;"));
-    if (query.isActive() && query.numRowsAffected())
-    {
-        query.next();
-        GuideDataThroughBefore = QDateTime::fromString(query.value(0).toString(),
-                                                 Qt::ISODate);
-    }
-
     query.exec(QString("UPDATE settings SET data ='%1' "
                        "WHERE value='mythfilldatabaseLastRunStatus'")
                        .arg(status));
 
     int systemcall_status = system(command.ascii());
-
-    query.exec(QString("SELECT MAX(endtime) FROM program;"));
-    if (query.isActive() && query.numRowsAffected())
-    {
-        query.next();
-        GuideDataThroughAfter = QDateTime::fromString(query.value(0).toString(),
-                                                 Qt::ISODate);
-    }
 
     qdtNow = QDateTime::currentDateTime();
     query.exec(QString("UPDATE settings SET data ='%1' "
@@ -1433,19 +1416,15 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
 
     status = "Successful.";
 
-    if (systemcall_status == 0)
+    if (systemcall_status != 0)
     {
-       if (GuideDataThroughAfter == GuideDataThroughBefore)
-           status = "mythfilldatabase ran, but did not insert "
-                    "any new data into the Guide.  This can indicate a "
-                    "potential xmltv failure."; 
-    }
-    else status = QString("FAILED:  xmltv returned error code %1.")
-                          .arg(systemcall_status);
+        status = QString("FAILED:  xmltv returned error code %1.")
+                         .arg(systemcall_status);
 
-    query.exec(QString("UPDATE settings SET data ='%1' "
-                       "WHERE value='mythfilldatabaseLastRunStatus'")
-                       .arg(status));
+        query.exec(QString("UPDATE settings SET data ='%1' "
+                           "WHERE value='mythfilldatabaseLastRunStatus'")
+                           .arg(status));
+    }
  
     if (!quiet)
          cout << "------------------ End of XMLTV output ------------------" << endl;
@@ -1490,6 +1469,18 @@ void clearOldDBEntries(void)
 bool fillData(QValueList<Source> &sourcelist)
 {
     QValueList<Source>::Iterator it;
+
+    QString status;
+    QSqlQuery query;
+    QDateTime GuideDataBefore, GuideDataAfter;
+
+    query.exec(QString("SELECT MAX(endtime) FROM program;"));
+    if (query.isActive() && query.numRowsAffected())
+    {
+        query.next();
+        GuideDataBefore = QDateTime::fromString(query.value(0).toString(),
+                                                Qt::ISODate);
+    }
 
     int failures = 0;
     for (it = sourcelist.begin(); it != sourcelist.end(); ++it) {
@@ -1658,6 +1649,28 @@ bool fillData(QValueList<Source> &sourcelist)
             cerr << "Grabbing XMLTV data using " << xmltv_grabber.ascii() 
                  << " is not verified as working.\n";
         }
+    }
+
+    query.exec(QString("SELECT MAX(endtime) FROM program;"));
+    if (query.isActive() && query.numRowsAffected())
+    {
+        query.next();
+        GuideDataAfter = QDateTime::fromString(query.value(0).toString(),
+                                               Qt::ISODate);
+    }
+
+    if (failures == 0)
+    {
+        if (GuideDataAfter == GuideDataBefore)
+            status = "mythfilldatabase ran, but did not insert "
+                     "any new data into the Guide.  This can indicate a "
+                     "potential xmltv failure."; 
+        else
+            status = "Successful.";
+
+        query.exec(QString("UPDATE settings SET data ='%1' "
+                           "WHERE value='mythfilldatabaseLastRunStatus'")
+                           .arg(status));
     }
 
     clearOldDBEntries();

@@ -758,6 +758,9 @@ void render_slice_via(struct AVCodecContext *s, const AVFrame *src,
     (void)offset;
     (void)type;
 
+    if (!s || !src)
+        return;
+
     AvFormatDecoder *nd = (AvFormatDecoder *)(s->opaque);
 
     int width = s->width;
