@@ -1058,6 +1058,9 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
                         current_height = height;
                         current_aspect = aspect;
 
+                        if (d->mpeg2dec)
+                            d->ResetMPEG2();
+
                         gopset = false;
                         prevgoppos = 0;
                         lastapts = lastvpts = 0;

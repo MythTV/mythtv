@@ -24,6 +24,8 @@ release {
     QMAKE_CFLAGS_RELEASE = $${QMAKE_CXXFLAGS_RELEASE}
 }
 
+QMAKE_LIBDIR_X11 = 
+
 EXTRA_LIBS = -lfreetype -lmp3lame
 
 unix:linux*: {

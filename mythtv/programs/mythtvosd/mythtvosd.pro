@@ -6,5 +6,7 @@ TARGET = mythtvosd
 target.path = $${PREFIX}/bin
 INSTALLS = target
 
+LIBS += $$EXTRA_LIBS 
+
 # Input
 SOURCES += main.cpp
