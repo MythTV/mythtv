@@ -124,6 +124,21 @@ cvs.sql, and if you are moving to a new release version, run the appropriate
 from-x-to-y.sql script (if any).
 
 
+FILESYSTEMS
+-----------
+
+    MythDVD can often generate very large files. If you are doing perfect
+rips, you probably want to make sure that your MythVideo file location
+(where final files end up) is on a filesystem (ext3, etc.) that can handle
+files larger than 2 gigabytes. Alternatively, you can set the MB limit for
+perfect rip sizes in the setup screen.
+
+    For transcoding, the location of the intermediate files (DVD Rip
+Location) **really** needs to be on a large-file capable filesystem.
+This is because the first step in transcoding is to rip the content off the
+DVD in perfect format, which makes for very large (albeit temporary) files. 
+
+
 CONFIGURATION
 -------------
 

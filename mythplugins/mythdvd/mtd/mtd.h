@@ -76,9 +76,11 @@ class MTD : public QObject
     void sendStatusReport(QSocket *socket);
     void sendMediaReport(QSocket *socket);
     void startJob(const QStringList &tokens);
+    void startAbort(const QStringList &tokens);
     void startDVD(const QStringList &tokens);
     void cleanThreads();
     void checkDisc();
+    bool checkFinalFile(QFile *final_file);
     
   private:
   

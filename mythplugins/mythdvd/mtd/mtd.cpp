@@ -331,6 +331,10 @@ void MTD::parseTokens(const QStringList &tokens, QSocket *socket)
     {
         startJob(tokens);
     }
+    else if(tokens[0] == "abort")
+    {
+        startAbort(tokens);
+    }
     else
     {
         QString did_not_parse = tokens.join(" ");
@@ -419,6 +423,8 @@ void MTD::sendStatusReport(QSocket *socket)
                                    .arg(job_threads.at(i)->getSubName());
         sendMessage(socket, a_status_message);
     }
+    
+    sendMessage(socket, "status dvd complete");
 }
 
 void MTD::sendMediaReport(QSocket *socket)
@@ -483,6 +489,51 @@ void MTD::sendMediaReport(QSocket *socket)
         sendMessage(socket, "media dvd summary 0 No Disc");
     }    
     sendMessage(socket, "media dvd complete");
+}
+
+
+void MTD::startAbort(const QStringList &tokens)
+{
+    QString flat = tokens.join(" ");
+
+    //
+    //  Sanity check
+    //
+    
+    if(tokens.count() < 4)
+    {
+        emit writeToLog(QString("bad abort request: %1").arg(flat));
+        return;
+    }
+
+    if(tokens[1] != "dvd" ||
+       tokens[2] != "job")
+    {
+        emit writeToLog(QString("I don't know how to handle this abort request: %1").arg(flat));
+        return;
+    }
+
+    bool ok;
+    int job_to_kill = tokens[3].toInt(&ok);
+    if(!ok || job_to_kill < 0)
+    {
+        emit writeToLog(QString("Could not make out a job number in this abort request: %1").arg(flat));
+        return;
+    }    
+    
+    if(job_to_kill >= (int) job_threads.count())
+    {
+        emit writeToLog(QString("Was asked to kill a job that does not exist: %1").arg(flat));
+        return;
+    }
+
+    //
+    //  OK, we can probably kill this job
+    //
+
+    job_threads.at(job_to_kill)->setSubProgress(0.0, 0);
+    job_threads.at(job_to_kill)->setSubName("Cancelling ...", 0);
+    job_threads.at(job_to_kill)->cancelMe(true);
 }
 
 void MTD::startJob(const QStringList &tokens)
@@ -584,6 +635,12 @@ void MTD::startDVD(const QStringList &tokens)
     }
 
     QFile final_file(dest_dir.filePath(file_name));
+
+    if(!checkFinalFile(&final_file))
+    {
+        emit writeToLog("Final file name is not useable. File exists? Other Pending job?");
+        return;
+    }
     
     //
     //  OK, we are ready to launch this job
@@ -653,4 +710,30 @@ void MTD::startDVD(const QStringList &tokens)
     {
         cerr << "mtd.o: Hmmmmm. Got sent a job with a negative quality parameter. That's just plain weird." << endl;
     }
+}
+
+bool MTD::checkFinalFile(QFile *final_file)
+{
+    //
+    //  Check if file exists
+    //
+    
+    if(final_file->exists())
+    {
+        return false;
+    }
+    
+    //
+    //  Check already active jobs
+    //
+    JobThread *iterator;
+    for(iterator = job_threads.first(); iterator; iterator = job_threads.next() )
+    {
+        if(iterator->getFinalFileName() == final_file->name())
+        {
+            return false;
+        }
+    }
+    
+    return true;
 }

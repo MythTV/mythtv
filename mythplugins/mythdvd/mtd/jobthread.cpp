@@ -29,14 +29,15 @@ JobThread::JobThread(MTD *owner, const QString &start_string, int nice_priority)
           :QThread()
 {
     job_name = "";
-    subjob_name = "";
+    setSubName("", 1);
     overall_progress = 0.0;
-    subjob_progress = 0.0;
+    setSubProgress(0.0, 1);
     parent = owner;
     problem_string = "";
     job_string = start_string;
     nice_level = nice_priority;
     sub_to_overall_multiple = 1.0;
+    cancel_me = false;
 }
 
 void JobThread::run()
@@ -46,7 +47,7 @@ void JobThread::run()
 
 bool JobThread::keepGoing()
 {
-    if(parent->threadsShouldContinue())
+    if(parent->threadsShouldContinue() && ! cancel_me)
     {
         return true;
     }
@@ -56,30 +57,88 @@ bool JobThread::keepGoing()
 void JobThread::updateSubjobString( int seconds_elapsed, 
                                     const QString & pre_string)
 {
-    int estimated_job_time = (int) ( (double) seconds_elapsed / subjob_progress );
-            
+    int estimated_job_time = 0;
+    if(subjob_progress > 0.0)
+    {
+        estimated_job_time = (int) ( (double) seconds_elapsed / subjob_progress );
+    }
+    else
+    {
+        estimated_job_time = (int) ( (double) seconds_elapsed / 0.000001 );
+    }
+        
+    QString new_name = "";    
     if(estimated_job_time >= 3600)
     {
-        subjob_name.sprintf(" %d:%02d:%02d/%d:%02d:%02d",
+        new_name.sprintf(" %d:%02d:%02d/%d:%02d:%02d",
                              seconds_elapsed / 3600,
                              (seconds_elapsed % 3600) / 60,
                              (seconds_elapsed % 3600) % 60,
                              estimated_job_time / 3600,
                              (estimated_job_time % 3600) / 60,
                              (estimated_job_time % 3600) % 60);
-            
     }
     else
     {
-        subjob_name.sprintf(" %02d:%02d/%02d:%02d",
+        new_name.sprintf(" %02d:%02d/%02d:%02d",
                              seconds_elapsed / 60,
                              seconds_elapsed % 60,
                              estimated_job_time / 60,
                              estimated_job_time % 60);
     }        
-    subjob_name.prepend(pre_string);
+    new_name.prepend(pre_string);
+    setSubName(new_name, 1);
 }
 
+void JobThread::setSubProgress(double some_value, uint priority)
+{
+    if(priority > 0)
+    {
+        while(!sub_progress_mutex.tryLock())
+        {
+            sleep(priority);
+        }
+        if(!cancel_me)
+        {
+            subjob_progress = some_value;
+        }
+    }
+    else
+    {
+        sub_progress_mutex.lock();
+        if(!cancel_me)
+        {
+            subjob_progress = some_value;
+        }
+    }
+    sub_progress_mutex.unlock();
+}
+
+void JobThread::setSubName(const QString &new_name, uint priority)
+{
+    if(priority > 0)
+    {
+        while(!sub_name_mutex.tryLock())
+        {
+            sleep(1);
+        }
+        if(!cancel_me)
+        {
+            subjob_name = new_name;
+        }
+    }
+    else
+    {
+        sub_name_mutex.lock();
+        if(!cancel_me)
+        {
+            subjob_name = new_name;
+        }
+    }
+    cout << "SUBJOB name is now: " << subjob_name << endl;
+    sub_name_mutex.unlock();
+    
+}
 
 /*
 ---------------------------------------------------------------------
@@ -121,7 +180,7 @@ bool DVDThread::ripTitle(int title_number,
 
     bool loop = true;
     
-    subjob_name = "Waiting For Access to DVD";
+    setSubName("Waiting For Access to DVD", 1);
 
     while(loop)
     {
@@ -142,6 +201,13 @@ bool DVDThread::ripTitle(int title_number,
             }
         }
     }    
+
+    if(!keepGoing())
+    {
+        problem("abandoned job because master control said we need to shut down");
+        dvd_device_access->unlock();
+        return false;
+    }
 
     //
     //  OK, we got the device. 
@@ -364,10 +430,20 @@ bool DVDThread::ripTitle(int title_number,
                 return false;
             }
             
-            subjob_progress = (double) (sector_counter) / (double) (total_sectors);
+            setSubProgress((double) (sector_counter) / (double) (total_sectors), 1);
             overall_progress = subjob_progress * sub_to_overall_multiple;
             updateSubjobString(job_time.elapsed() / 1000, "Ripping to file ~");
-            ripfile->writeBlocks(video_data, cur_output_size * DVD_VIDEO_LB_LEN);
+            if(!ripfile->writeBlocks(video_data, cur_output_size * DVD_VIDEO_LB_LEN))
+            {
+                problem("Couldn't write blocks during a rip. Filesystem size exceeded? Disc full?");
+                ripfile->remove();
+                ifoClose(vts_file);
+                ifoClose(vmg_file);
+                DVDCloseFile( title );
+                DVDClose(the_dvd);
+                dvd_device_access->unlock();
+                return false;
+            }
 
             sector_counter += next_vobu - cur_pack;
             cur_pack = next_vobu;
@@ -876,8 +952,8 @@ bool DVDTranscodeThread::runTranscode(int which_run)
     //  know what is going on.
     //
 
-    subjob_name = "Transcode is thinking ...";
-    subjob_progress = 0.0;
+    setSubName("Transcode is thinking ...", 1);
+    setSubProgress(0.0, 1);
     uint tick_tock = 3;
     uint seconds_so_far = 0;
     double percent_transcoded = 0.0;
@@ -927,6 +1003,7 @@ bool DVDTranscodeThread::runTranscode(int which_run)
             //  oh darn ... the mtd wants to shut down
             //
 
+            problem("was transcoding, but the mtd shut me down");
             tc_process->tryTerminate();
             sleep(3);
             tc_process->kill();
@@ -969,13 +1046,13 @@ bool DVDTranscodeThread::runTranscode(int which_run)
                 {
                     if(which_run == 1)
                     {
-                        subjob_progress = percent_transcoded;
+                        setSubProgress(percent_transcoded, 1);
                         overall_progress = 0.333333 + (0.333333 * percent_transcoded);
                         updateSubjobString(job_time.elapsed() / 1000, "Transcoding Pass 1 of 2 ~");
                     }
-                    else if(which_run == 2)
+                    else if(which_run == 1)
                     {
-                        subjob_progress = percent_transcoded;
+                        setSubProgress(percent_transcoded, 1);
                         overall_progress = 0.666666 + (0.333333 * percent_transcoded);
                         updateSubjobString(job_time.elapsed() / 1000, "Transcoding Pass 2 of 2 ~");
                     }
@@ -988,7 +1065,7 @@ bool DVDTranscodeThread::runTranscode(int which_run)
                     //
 
                     
-                    subjob_progress = percent_transcoded;
+                    setSubProgress(percent_transcoded, 1);
                     overall_progress = 0.50 + (0.50 * percent_transcoded);
                     updateSubjobString(job_time.elapsed() / 1000, "Transcoding ~");
                 }
@@ -1000,11 +1077,12 @@ bool DVDTranscodeThread::runTranscode(int which_run)
                 {
                     tick_tock = 1;
                 }
-                subjob_name = "Transcode is thinking ";
+                QString a_string = "Transcode is thinking ";
                 for(uint i = 0; i < tick_tock; i++)
                 {
-                    subjob_name += ".";
+                    a_string += ".";
                 }
+                setSubName(a_string, 1);
             }
             sleep(2);
         }

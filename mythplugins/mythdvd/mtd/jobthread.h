@@ -47,7 +47,10 @@ class JobThread : public QThread
     QString getJobString(){return job_string;}
     void    updateSubjobString( int seconds_elapsed, 
                                 const QString &pre_string);
-
+    void    cancelMe(bool yes_or_no){cancel_me = yes_or_no;}
+    void    setSubProgress(double a_value, uint priority);
+    void    setSubName(const QString &new_name, uint priority);
+    virtual QString getFinalFileName(){return "";}
     
   protected:
   
@@ -60,6 +63,10 @@ class JobThread : public QThread
     QString problem_string;
     QString job_string;
     int     nice_level;
+    bool    cancel_me;
+    
+    QMutex  sub_progress_mutex;
+    QMutex  sub_name_mutex;
 };
 
 
@@ -84,7 +91,8 @@ class DVDThread : public JobThread
 
     ~DVDThread();
                      
-    virtual void run();    
+    virtual void run();
+    QString getFinalFileName(){return destination_file_string;}
 
   protected:
 

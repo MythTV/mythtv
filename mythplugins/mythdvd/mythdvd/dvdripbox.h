@@ -41,26 +41,31 @@ class MTDJob
     //  Set
     //
     
-    void setName(const QString &a_name){job_name = a_name;}
-    void setActivity(const QString &an_act){current_activity = an_act;}
+    void setNumber(int a_number){job_number = a_number;}
+    void setName(const QString &a_name);
+    void setActivity(const QString &an_act);
     void setOverall(double a_number){overall_progress = a_number;}
-    void setSubjob(double a_number){subjob_progress = a_number;}
-    
+    void setSubjob(double a_number);
+    void setCancelled(bool yes_or_no){cancelled = yes_or_no;}
+        
     //
     //  Get
     //
     
+    int     getNumber(){return job_number;}
     QString getName(){return job_name;}
     QString getActivity(){return current_activity;}
-    double getOverall(){return overall_progress;}
-    double getSubjob(){return subjob_progress;}
+    double  getOverall(){return overall_progress;}
+    double  getSubjob(){return subjob_progress;}
           
   private:
   
+    int      job_number;
     QString  job_name;
     QString  current_activity;
     double   overall_progress;
     double   subjob_progress;
+    bool     cancelled;
 };
 
 class DVDRipBox : public MythThemedDialog
@@ -103,6 +108,7 @@ class DVDRipBox : public MythThemedDialog
     void showCurrentJob();
     void goRipScreen();
     void checkDisc();
+    void cancelJob();
      
   private:
 
@@ -121,6 +127,7 @@ class DVDRipBox : public MythThemedDialog
     QPtrList<MTDJob> jobs;
     uint             numb_jobs;
     int              current_job;
+    bool             ignore_cancels;
 
     DVDInfo             *dvd_info;
     QTimer              *disc_checking_timer;
@@ -139,6 +146,7 @@ class DVDRipBox : public MythThemedDialog
     UIPushButtonType *nextjob_button;
     UIPushButtonType *prevjob_button;
     UITextButtonType *ripscreen_button;
+    UITextButtonType *cancel_button;
 };
 
 

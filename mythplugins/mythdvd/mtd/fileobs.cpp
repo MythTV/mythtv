@@ -119,7 +119,7 @@ bool RipFile::writeBlocks(unsigned char *the_data, int how_much)
     }
     if(result == 0)
     {
-        cerr << "fileobs.o: Ripfile writing 0 bytes of data. That's probably not a good sign.";
+        cerr << "fileobs.o: Ripfile writing 0 bytes of data. That's probably not a good sign." << endl;
         return false;
     }
     if(result != how_much)

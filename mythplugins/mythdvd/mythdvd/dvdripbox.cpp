@@ -32,10 +32,37 @@ MTDJob::MTDJob(const QString &a_name)
 
 void MTDJob::init()
 {
+    job_number = -1;
     job_name = "";
     current_activity = "";
     overall_progress = 0.0;
     subjob_progress = 0.0;
+    cancelled = false;
+}
+
+void MTDJob::setName(const QString &a_name)
+{
+    if(a_name != job_name && cancelled)
+    {
+        cancelled = false;
+    }
+    job_name = a_name;
+}
+
+void MTDJob::setActivity(const QString &an_act)
+{
+    if(!cancelled)
+    {
+        current_activity = an_act;
+    }
+}
+
+void MTDJob::setSubjob(double a_number)
+{
+    if(!cancelled)
+    {
+        subjob_progress = a_number;
+    }
 }
 
 /*
@@ -79,7 +106,8 @@ DVDRipBox::DVDRipBox(QSqlDatabase *ldb,
     have_disc = false;
     first_disc_found = false;
     block_media_requests = false;
-            
+    ignore_cancels = false;
+                    
     //
     //  Set up the timer which kicks off polling
     //  the mtd for status information
@@ -182,6 +210,7 @@ void DVDRipBox::connectionClosed()
     setContext(0);
     have_disc = false;
     ripscreen_button->SetContext(-2);
+    cancel_button->SetContext(-2);
     QString warning = "Your connection to the Myth "
                       "Transcoding Daemon has gone "
                       "away. This is not a good thing.";
@@ -276,6 +305,14 @@ void DVDRipBox::keyPressEvent(QKeyEvent *e)
                 }
                 break;
                 
+            case Key_9:
+                handled=true;
+                if(cancel_button)
+                {
+                    cancel_button->push();
+                }
+                break;
+                
             case Key_1:
                 handled=true;
                 goToJob(1);
@@ -307,10 +344,6 @@ void DVDRipBox::keyPressEvent(QKeyEvent *e)
             case Key_8:
                 handled=true;
                 goToJob(8);
-                break;
-            case Key_9:
-                handled=true;
-                goToJob(9);
                 break;
         }
     }
@@ -472,11 +505,6 @@ void DVDRipBox::pollStatus()
 
     sendToServer("status");
     
-    //
-    //  update what we know
-    //    
-    
-    showCurrentJob();
 }
 
 void DVDRipBox::showCurrentJob()
@@ -494,12 +522,12 @@ void DVDRipBox::showCurrentJob()
         }
         if(overall_status)
         {
-            int an_int = (int) (a_job->getOverall() * 100);
+            int an_int = (int) (a_job->getOverall() * 1000);
             overall_status->SetUsed(an_int);
         }
         if(job_status)
         {
-            int an_int = (int) (a_job->getSubjob() * 100);
+            int an_int = (int) (a_job->getSubjob() * 1000);
             job_status->SetUsed(an_int);
         }
         if(numb_jobs_text)
@@ -519,7 +547,7 @@ void DVDRipBox::handleStatus(QStringList tokens)
     //  Initial sanity checking
     //
     
-    if(tokens.count() < 4)
+    if(tokens.count() < 3)
     {
         cerr << "dvdripbox.o: I got an mtd status update with a bad number of tokens" << endl;
         return;
@@ -534,6 +562,24 @@ void DVDRipBox::handleStatus(QStringList tokens)
         return;
 
     }
+
+    if(tokens[2] == "complete")
+    {
+        //
+        //  All jobs are updated
+        //
+        ignore_cancels = false;
+        showCurrentJob();
+        return;
+    }
+
+    if(tokens.count() < 4)
+    {
+        cerr << "dvdripbox.o: I got an mtd update I couldn't understand:" << tokens.join(" ") << endl;
+        return;
+    }
+
+    
     
     //
     //  if we got called, and we are still in context 0,
@@ -542,7 +588,7 @@ void DVDRipBox::handleStatus(QStringList tokens)
     //  we're not already in context 2).
     //
     
-
+    
     if(getContext() < 3)
     {
         if((tokens[2] == "summary" &&
@@ -550,6 +596,7 @@ void DVDRipBox::handleStatus(QStringList tokens)
            (tokens[2] == "job"))
         {
             ripscreen_button->SetContext(3);
+            cancel_button->SetContext(3);
             setContext(3);
             update();
             if(warning_text)
@@ -794,6 +841,7 @@ void DVDRipBox::setOverallJobStatus(int job_number, double status, QString title
         MTDJob *which_one = jobs.at(job_number);
         which_one->setName(title);
         which_one->setOverall(status);
+        which_one->setNumber(job_number);
     }    
 }
 
@@ -859,10 +907,31 @@ void DVDRipBox::goRipScreen()
     block_media_requests = false;
     pollStatus();
     showCurrentJob();
+    warning_text->SetText("");
     //setContext(3);
     startStatusPolling();
 }
 
+void DVDRipBox::cancelJob()
+{
+    if( current_job > -1 && 
+        current_job < (int) jobs.count() &&
+        !ignore_cancels)
+    {
+        if(jobs.at(current_job)->getNumber() >= 0)
+        {
+            ignore_cancels = true;
+            stopStatusPolling();
+            sendToServer(QString("abort dvd job %1").arg(jobs.at(current_job)->getNumber()));
+            qApp->processEvents();
+            jobs.at(current_job)->setSubjob(0.0);
+            jobs.at(current_job)->setActivity("Cancelling ...");
+            jobs.at(current_job)->setCancelled(true);
+            showCurrentJob();
+            startStatusPolling();
+        }
+    }
+}
 
 void DVDRipBox::wireUpTheme()
 {
@@ -880,13 +949,13 @@ void DVDRipBox::wireUpTheme()
     overall_status = getUIStatusBarType("overall_status");
     if(overall_status)
     {
-        overall_status->SetTotal(100);
+        overall_status->SetTotal(1000);
         overall_status->SetUsed(0);
     }
     job_status = getUIStatusBarType("job_status");
     if(job_status)
     {
-        job_status->SetTotal(100);
+        job_status->SetTotal(1000);
         job_status->SetUsed(0);
     }
     
@@ -907,6 +976,14 @@ void DVDRipBox::wireUpTheme()
         ripscreen_button->setText("0 New Rip");
         connect(ripscreen_button, SIGNAL(pushed()), this, SLOT(goRipScreen()));
         ripscreen_button->SetContext(-2);
+    }
+
+    cancel_button = getUITextButtonType("cancel_button");
+    if(cancel_button)
+    {
+        cancel_button->setText("9 Cancel Job");
+        connect(cancel_button, SIGNAL(pushed()), this, SLOT(cancelJob()));
+        cancel_button->SetContext(-2);
     }
 }
 
