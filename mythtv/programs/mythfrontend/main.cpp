@@ -239,9 +239,9 @@ void showStatus(void)
     mfdLastRunEnd = gContext->GetSetting("mythfilldatabaseLastRunEnd");
     mfdLastRunStatus = gContext->GetSetting("mythfilldatabaseLastRunStatus");
 
-    Status = QObject::tr("Myth version:") + " " + MYTH_BINARY_VERSION;
+    Status = QObject::tr("Myth version:") + " " + MYTH_BINARY_VERSION + "\n";
 
-    Status = QObject::tr("Last mythfilldatabase guide update:");
+    Status += QObject::tr("Last mythfilldatabase guide update:");
     Status += "\n   ";
     Status += QObject::tr("Started:   ");
     Status += mfdLastRunStart;
