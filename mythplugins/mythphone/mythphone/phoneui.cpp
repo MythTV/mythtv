@@ -2174,8 +2174,11 @@ PhoneUIBox::~PhoneUIBox(void)
         webcam->UnregisterClient(localClient);
     if (txClient != 0)
         webcam->UnregisterClient(txClient);
-
     webcam->camClose();
+    
+    // Flush the events through the event queue now all the event-producing threads are closed
+    QApplication::sendPostedEvents(this, 0);
+    
     if (volume_control)
         delete volume_control;
     delete DirContainer;
