@@ -74,7 +74,7 @@ static unsigned safe_write(int fd, const void *data, unsigned sz)
         ret = write(fd, (char *)data + tot, sz - tot);
         if (ret < 0)
         {
-            perror("ERROR: file I/O problem in 'safe_write()'\n");
+            perror("ERROR: file I/O problem in 'safe_write()'");
             errcnt++;
             if (errcnt == 3) 
                 break;
