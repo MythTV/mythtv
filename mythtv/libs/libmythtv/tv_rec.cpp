@@ -890,13 +890,11 @@ void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
                                "AND starttime < %2 AND endtime > %3 AND "
                                "program.chanid = channel.chanid AND "
                                "channel.sourceid = cardinput.sourceid AND "
-                               "cardinput.inputname = \"%4\" AND "
                                "cardinput.cardid = capturecard.cardid AND "
-                               "capturecard.cardid = \"%5\" AND "
-                               "capturecard.hostname = \"%6\";")
+                               "capturecard.cardid = \"%4\" AND "
+                               "capturecard.hostname = \"%5\";")
                                .arg(channelname).arg(curtimestr).arg(curtimestr)
-                               .arg(channelinput).arg(m_capturecardnum)
-                               .arg(gContext->GetHostName());
+                               .arg(m_capturecardnum).arg(gContext->GetHostName());
 
     QSqlQuery query = db_conn->exec(thequery);
 
@@ -937,12 +935,11 @@ void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
                                    "FROM channel,capturecard,cardinput "
                                    "WHERE channel.channum = \"%1\" AND "
                                    "channel.sourceid = cardinput.sourceid AND "
-                                   "cardinput.inputname = \"%2\" AND "
                                    "cardinput.cardid = capturecard.cardid AND "
-                                   "capturecard.cardid = \"%3\" AND "
-                                   "capturecard.hostname = \"%4\";")
+                                   "capturecard.cardid = \"%2\" AND "
+                                   "capturecard.hostname = \"%3\";")
                                    .arg(channelname)
-                                   .arg(channelinput).arg(m_capturecardnum)
+                                   .arg(m_capturecardnum)
                                    .arg(gContext->GetHostName());
 
         QSqlQuery query = db_conn->exec(thequery);
@@ -1094,15 +1091,18 @@ bool TVRec::CheckChannel(QString name)
 {
     QSqlDatabase* dummy1;
     pthread_mutex_t* dummy2;
-    return CheckChannel(channel, name, dummy1, dummy2);
+    QString dummyID;
+    return CheckChannel(channel, name, dummy1, dummy2, dummyID);
 }
 
 bool TVRec::CheckChannel(ChannelBase *chan, const QString &channum, 
-                         QSqlDatabase *&a_db_conn, pthread_mutex_t *&a_db_lock)
+                         QSqlDatabase *&a_db_conn, pthread_mutex_t *&a_db_lock, QString& inputName)
 {
     if (!db_conn)
         return true;
 
+    inputName = "";
+    
     a_db_conn = db_conn;
     a_db_lock = &db_lock;
 
@@ -1134,7 +1134,46 @@ bool TVRec::CheckChannel(ChannelBase *chan, const QString &channum,
         pthread_mutex_unlock(&db_lock);
         return true;
     }
+    VERBOSE( VB_CHANNEL, QString("Failed to find channel(%1) on current input (%2) of card (%3).")
+                         .arg(channum).arg(channelinput).arg(m_capturecardnum) );
 
+
+    // We didn't find it on the current input let's widen the search
+    thequery = QString("SELECT channel.chanid, cardinput.inputname FROM "
+                       "channel,capturecard,cardinput "
+                       "WHERE channel.channum = \"%1\" AND "
+                       "channel.sourceid = cardinput.sourceid AND "
+                       "cardinput.cardid = capturecard.cardid AND "
+                       "capturecard.cardid = \"%2\" AND "
+                       "capturecard.hostname = \"%3\";")
+                       .arg(channum)
+                       .arg(m_capturecardnum)
+                       .arg(gContext->GetHostName());
+
+    query = db_conn->exec(thequery);
+
+    if (!query.isActive())
+        MythContext::DBError("checkchannel", query);
+    else if (query.numRowsAffected() > 0)
+    {
+        
+        query.next();
+        QString test = query.value(1).toString();
+        if (test != QString::null)
+            inputName = QString::fromUtf8(test);
+
+        VERBOSE( VB_CHANNEL, QString("Found channel(%1) on another input (%2) of card (%3).")
+                             .arg(channum).arg(inputName).arg(m_capturecardnum) );
+
+        pthread_mutex_unlock(&db_lock);
+        return true;
+    }
+
+    VERBOSE( VB_CHANNEL, QString("Failed to find channel(%1) on any input of card (%2).")
+                         .arg(channum).arg(m_capturecardnum) );
+
+                                                                  
+    
     thequery = "SELECT NULL FROM channel;";
     query = db_conn->exec(thequery);
 

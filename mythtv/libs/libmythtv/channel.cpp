@@ -326,6 +326,8 @@ bool Channel::ChannelDown(void)
 
 bool Channel::SetChannelByString(const QString &chan)
 {
+    QString inputName;
+    
     if (!Open())
     {
         cerr << "channel object wasn't open, can't change channels\n";
@@ -335,11 +337,19 @@ bool Channel::SetChannelByString(const QString &chan)
     QSqlDatabase *db_conn;
     pthread_mutex_t *db_lock;
 
-    if (!pParent->CheckChannel(this, chan, db_conn, db_lock))
+    if (!pParent->CheckChannel(this, chan, db_conn, db_lock, inputName))
     {
         VERBOSE(VB_IMPORTANT, QString("CheckChannel failed. Please verify "
                 "channel \"%1\" in the \"setup\" Channel Editor.").arg(chan));
         return false;
+    }
+
+    // If CheckChannel filled in the inputName then we need to change inputs
+    // and return, since the act of changing inputs will change the channel as well.
+    if(!inputName.isEmpty())
+    {
+        ChannelBase::SwitchToInput(inputName, chan);
+        return true;
     }
 
     pthread_mutex_lock(db_lock);
