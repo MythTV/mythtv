@@ -2102,29 +2102,6 @@ public:
     };
 };
 
-#if USING_DVB
-static GlobalSpinBox *DVBMonitorInterval()
-{
-    GlobalSpinBox *bs = new GlobalSpinBox("DVBMonitorInterval", 0, 240, 5);
-    bs->setLabel(QObject::tr("Sample interval for DVB signal statistics "
-                 "(in seconds)"));
-    bs->setValue(0);
-    bs->setHelpText(QObject::tr("MythTV will monitor the DVB signal "
-                    "statistics using the specified interval.  Set to "
-                    "\"0\" to disable."));
-    return bs;
-}
-
-static GlobalSpinBox *DVBMonitorRetention()
-{
-    GlobalSpinBox *bs = new GlobalSpinBox("DVBMonitorRetention", 1, 30, 1);
-    bs->setLabel(QObject::tr("Length of time to retain DVB signal data "
-                             "(in days)"));
-    bs->setValue(1);
-    return bs;
-}
-#endif
-
 static GlobalCheckBox *LogEnabled()
 {
     GlobalCheckBox *bc = new GlobalCheckBox("LogEnabled");
@@ -2890,15 +2867,6 @@ GeneralSettings::GeneralSettings()
     autoexp->addChild(AutoExpireDefault());
     autoexp->addChild(RerecordAutoExpired());
     addChild(autoexp);
-
-#if USING_DVB
-    VerticalConfigurationGroup* dvb = new VerticalConfigurationGroup(false);
-
-    dvb->setLabel(QObject::tr("DVB Global Settings"));
-    dvb->addChild(DVBMonitorInterval());
-    dvb->addChild(DVBMonitorRetention());
-    addChild(dvb);
-#endif
 }
 
 EPGSettings::EPGSettings()

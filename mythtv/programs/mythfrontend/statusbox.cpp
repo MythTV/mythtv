@@ -51,10 +51,6 @@ StatusBox::StatusBox(MythMainWindow *parent, const char *name)
   
     icon_list->SetItemText(item_count++, QObject::tr("Listings Status"));
     icon_list->SetItemText(item_count++, QObject::tr("Tuner Status"));
-#ifdef USING_DVB
-    if (gContext->GetNumSetting("DVBMonitorInterval", 0))
-        icon_list->SetItemText(item_count++, QObject::tr("DVB Status"));
-#endif
     icon_list->SetItemText(item_count++, QObject::tr("Log Entries"));
     icon_list->SetItemText(item_count++, QObject::tr("Job Queue"));
     icon_list->SetItemText(item_count++, QObject::tr("Machine Status"));
@@ -598,8 +594,6 @@ void StatusBox::clicked()
         doListingsStatus();
     else if (currentItem == QObject::tr("Tuner Status"))
         doTunerStatus();
-    else if (currentItem == QObject::tr("DVB Status"))
-        doDVBStatus();
     else if (currentItem == QObject::tr("Log Entries"))
         doLogEntries();
     else if (currentItem == QObject::tr("Job Queue"))
@@ -749,90 +743,6 @@ void StatusBox::doTunerStatus()
             count++;
         }
     }
-    contentTotalLines = count;
-    update(ContentRect);
-}
-
-void StatusBox::doDVBStatus(void)
-{
-    QString querytext;
-    bool doneAnything = false;
-  
-    doScroll = false;
-    int count = 0;
-  
-    contentLines.clear();
-    contentDetail.clear();
-    contentFont.clear();
- 
-    QString Status = QObject::tr("Details of DVB error statistics for last 48 "
-                                 "hours:\n");
-
-
-    MSqlQuery oquery(MSqlQuery::InitCon());
-    oquery.prepare("SELECT starttime,endtime FROM recorded "
-                  "WHERE starttime >= DATE_SUB(NOW(), INTERVAL 48 HOUR) "
-                  "ORDER BY starttime;");
-    oquery.exec();
-
-    if (oquery.isActive() && oquery.numRowsAffected())
-    {
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("SELECT cardid,"
-                      "max(fe_ss),min(fe_ss),avg(fe_ss),"
-                      "max(fe_snr),min(fe_snr),avg(fe_snr),"
-                      "max(fe_ber),min(fe_ber),avg(fe_ber),"
-                      "max(fe_unc),min(fe_unc),avg(fe_unc),"
-                      "max(myth_cont),max(myth_over),max(myth_pkts) "
-                      "FROM dvb_signal_quality "
-                      "WHERE sampletime BETWEEN :STARTTIME AND :ENDTIME "
-                      "GROUP BY cardid");
-        
-        while (oquery.next())
-        {
-            QDateTime t_start = oquery.value(0).toDateTime();
-            QDateTime t_end = oquery.value(1).toDateTime();
-
-            query.bindValue(":STARTTIME", t_start);
-            query.bindValue(":ENDTIME", t_end);
-
-            if (!query.exec())
-                cout << query.lastError().databaseText() << "\r\n" 
-                     << query.lastError().driverText() << "\r\n";
-            
-            if (query.isActive() && query.numRowsAffected())
-            {
-                contentLines[count++] =
-                       QObject::tr("Recording period from %1 to %2")
-                                   .arg(t_start.toString())
-                                   .arg(t_end.toString());
-                
-                while (query.next())
-                {
-                    contentLines[count++] =
-                           QObject::tr("Encoder %1 Min SNR: %2 Avg SNR: %3 Min "
-                                       "BER %4 Avg BER %5 Cont Errs: %6 "
-                                       "Overflows: %7")
-                                       .arg(query.value(0).toInt())
-                                       .arg(query.value(5).toInt())
-                                       .arg(query.value(6).toInt())
-                                       .arg(query.value(8).toInt())
-                                       .arg(query.value(9).toInt())
-                                       .arg(query.value(13).toInt())
-                                       .arg(query.value(14).toInt());
-
-                    doneAnything = true;
-                }
-            }
-        }
-    }
-
-    if (!doneAnything)
-    {
-        contentLines[count++] = QObject::tr("There is no DVB signal quality "
-                                            "data available to display.");
-    }
-
     contentTotalLines = count;
     update(ContentRect);
 }
