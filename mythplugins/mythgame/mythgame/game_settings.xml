@@ -1,7 +1,7 @@
 <mythmenu name="GAME_SETTINGS">
 
    <button>
-      <type>GAME</type>
+      <type>GAME_SETTINGS_GENERAL</type>
       <text>General Settings</text>
       <text lang="IT">Impostazioni generali</text>
       <text lang="ES">Opciones Generales</text>
@@ -15,7 +15,7 @@
    </button>
 
    <button>
-      <type>GAME</type>
+      <type>GAME_SCAN</type>
       <text>Scan for Games</text>
       <text lang="PT">Procurar Jogos</text>
       <text lang="SV">Sök efter spel</text>
