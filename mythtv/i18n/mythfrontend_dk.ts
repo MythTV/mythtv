@@ -133,6 +133,10 @@
         <source>To see a list of all up-coming showings of this program, press &apos;5&apos;</source>
         <translation>For at se en liste over kommende visninger af dette program, tryk &apos;5&apos;</translation>
     </message>
+    <message>
+        <source>Record one showing of this program</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ManualBox</name>
@@ -446,6 +450,10 @@
         <source>       !! No Programs !!</source>
         <translation>!!Ingen udsendelser!!</translation>
     </message>
+    <message>
+        <source>Recording one showing of this program</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ProgLister</name>
@@ -575,6 +583,10 @@
     <message>
         <source>OK</source>
         <translation type="unfinished">Ok</translation>
+    </message>
+    <message>
+        <source>Recording one showing of this program</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3375,6 +3387,70 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>If set, MythTV will warn you whenever you change the channel but are not caught up to live TV.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>F</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Find One Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record one showing of this program</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not adjust BT audio volume.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check this option for budget BT878 based DVB-T cards such as the AverTV DVB-T that require the audio volume left alone.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time offset for thumbnail preview images</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>How many seconds into the show to capture the static preview images from.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Find One Recordings Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Find One Recording types will receive this additional recording priority value.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Interval to sample DVB signal stats at (in seconds, 0 = off)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Length of time to retain DVB signal data (in days)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVB Global Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pre Shutdown check-command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A command executed before the backend would shutdown. The return value of the command determines if the backend is allowed to shutdown. 0 - yes, 1 - reinitializes the idleing, 2 - reset the backend to wait for a frontend again</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Block shutdown before client connected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, the automatic shutdown routine will be disabled until a client connects.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

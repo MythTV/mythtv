@@ -339,7 +339,7 @@ bool IvtvDecoder::ReadWrite(int onlyvideo, int delay)
     {
         if (vidread >= vidwrite)
         {
-            long long startpos = ringBuffer->GetReadPosition();
+            long long startpos = ringBuffer->GetTotalReadPosition();
             count = ringBuffer->Read(&vidbuf[vidread], vidmax - vidread);
             if (count > 0)
             {
@@ -353,7 +353,7 @@ bool IvtvDecoder::ReadWrite(int onlyvideo, int delay)
 
         if (vidread < vidwrite)
         {
-            long long startpos = ringBuffer->GetReadPosition();
+            long long startpos = ringBuffer->GetTotalReadPosition();
             count = ringBuffer->Read(&vidbuf[vidread], vidwrite - vidread);
             if (count > 0)
             {
