@@ -12,7 +12,6 @@
 #include <cerrno>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
-#include <sys/user.h>
 #include <sys/poll.h>
 
 #include <map>
