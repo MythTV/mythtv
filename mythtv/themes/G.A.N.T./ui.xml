@@ -189,6 +189,18 @@
         <catcolor category="Transport" color="#33ff99"></catcolor>
         <catcolor category="Travel" color="#aa00aa"></catcolor>
 
+        <!-- Categories introduced by tv_grab_ja -->
+        <catcolor category="ドラマ" color="rosybrown3"></catcolor>
+        <catcolor category="映画" color="Blue"></catcolor>
+        <catcolor category="スポーツ" color="DarkCyan"></catcolor>
+        <catcolor category="演劇・伝統芸" color="turquoise3"></catcolor>
+        <catcolor category="音楽" color="DarkRed"></catcolor>
+        <catcolor category="バラエティー" color="DarkOrchid"></catcolor>
+        <catcolor category="教養" color="CornflowerBlue"></catcolor>
+        <catcolor category="アニメ・キッズ" color="MediumSlateBlue"></catcolor>
+        <catcolor category="社会・報道" color="DarkOrange3"></catcolor>
+        <catcolor category="趣味・暮らし" color="goldenrod"></catcolor>
+
         <recordstatus type="SingleRecord" image="gg-rs-single.png"></recordstatus>
         <recordstatus type="TimeslotRecord" image="gg-rs-timeslot.png"></recordstatus>
         <recordstatus type="ChannelRecord" image="gg-rs-channel.png"></recordstatus>
@@ -241,10 +253,10 @@
       </textarea>
     </container>
 
-  </window>  
+  </window>
 
    <window name="programguide-video">
-    
+
     <font name="title" face="Arial">
       <color>#ffffff</color>
       <dropcolor>#000000</dropcolor>
@@ -269,7 +281,7 @@
       <size:small>8</size:small>
       <bold>yes</bold>
     </font>
- 
+
     <font name="chaninfo" face="Arial">
       <shadow>1,1</shadow>
       <color>#ffffff</color>
@@ -312,7 +324,7 @@
          <cutdown>no</cutdown>
       </textarea>
     </container>
-   
+
     <container name="chanbar">
       <area>20,325,123,266</area>
       <bar name="chans" draworder="4">
@@ -325,8 +337,8 @@
         <font>chaninfo</font>
         <imagefile>gg-chans.png</imagefile>
       </bar>
-    </container> 
- 
+    </container>
+
     <container name="timebar">
       <area>142,295,640,31</area>
       <bar name="times" draworder="4">
@@ -336,7 +348,7 @@
         <font>descinfo</font>
       </bar>
     </container>
- 
+
     <container name="guide">
       <area>143,326,645,266</area>
       <guidegrid name="guidegrid" draworder="4">
@@ -429,6 +441,18 @@
         <catcolor category="Transport" color="#33ff99"></catcolor>
         <catcolor category="Travel" color="#aa00aa"></catcolor>
 
+        <!-- Categories introduced by tv_grab_ja -->
+        <catcolor category="ドラマ" color="rosybrown3"></catcolor>
+        <catcolor category="映画" color="Blue"></catcolor>
+        <catcolor category="スポーツ" color="DarkCyan"></catcolor>
+        <catcolor category="演劇・伝統芸" color="turquoise3"></catcolor>
+        <catcolor category="音楽" color="DarkRed"></catcolor>
+        <catcolor category="バラエティー" color="DarkOrchid"></catcolor>
+        <catcolor category="教養" color="CornflowerBlue"></catcolor>
+        <catcolor category="アニメ・キッズ" color="MediumSlateBlue"></catcolor>
+        <catcolor category="社会・報道" color="DarkOrange3"></catcolor>
+        <catcolor category="趣味・暮らし" color="goldenrod"></catcolor>
+
         <recordstatus type="SingleRecord" image="gg-rs-single.png"></recordstatus>
         <recordstatus type="TimeslotRecord" image="gg-rs-timeslot.png"></recordstatus>
         <recordstatus type="ChannelRecord" image="gg-rs-channel.png"></recordstatus>
@@ -466,7 +490,7 @@
       </image>
       <textarea name="title" draworder="4" align="vcenter">
         <area>69,1,445,79</area>
-        <font>title</font> 
+        <font>title</font>
       </textarea>
       <textarea name="subtitle" draworder="6">
         <area>4,72,489,30</area>
@@ -486,7 +510,7 @@
         <font>recstatus</font>
       </textarea>
     </container>
- 
+
   </window>
 
   <window name="conflict">
@@ -605,7 +629,7 @@
         <value>Show  (1) All  (2) Important</value>
       </textarea>
     </container>
- 
+
     <container name="conflict_info">
       <area>400,10,380,30</area>
       <textarea name="status" align="right" draworder="4">
@@ -692,14 +716,14 @@
         <multiline>yes</multiline>
       </textarea>
     </container>
- 
+
 
    <container name="norecordings_list">
       <textarea name="msg" align="center" draworder="8">
          <area>0,110,800,70</area>
          <font>info</font>
          <value>You Haven't Scheduled Any Programs To Be Recorded</value>
-         <multiline>yes</multiline> 
+         <multiline>yes</multiline>
       </textarea>
     </container>
 
@@ -1112,7 +1136,7 @@
       <size:small>11</size:small>
       <bold>yes</bold>
     </font>
-  
+
     <font name="record_font" face="Arial">
       <color>#F7862B</color>
       <size>16</size>
@@ -1435,7 +1459,7 @@
       <size:small>14</size:small>
       <bold>yes</bold>
     </font>
-  
+
     <container name="background">
       <image name="filler" draworder="0" fleximage="no">
         <filename>pf-top.png</filename>
@@ -1564,7 +1588,7 @@
         <multiline>yes</multiline>
       </textarea>
     </container>
- 
+
   </window>
 
   <window name="programlist">

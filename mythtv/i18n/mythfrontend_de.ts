@@ -341,7 +341,7 @@
     </message>
     <message>
         <source>, %0.2f GB free</source>
-        <translation>, %0.2f GB frei</translation>
+        <translation type="obsolete">, %0.2f GB frei</translation>
     </message>
     <message>
         <source>Yes, but record this episode again next time</source>
@@ -421,6 +421,10 @@
     </message>
     <message>
         <source>New Password:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>, %1 GB free</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -733,27 +737,27 @@
     </message>
     <message>
         <source>%02d:%02d:%02d behind  --  %.2f%% full</source>
-        <translation>%02d:%02d:%02d zurück  -- %.2f%% voll</translation>
+        <translation type="obsolete">%02d:%02d:%02d zurück  -- %.2f%% voll</translation>
     </message>
     <message>
         <source>%02d:%02d:%02d behind</source>
-        <translation>%02d:%02d:%02d zurück</translation>
+        <translation type="obsolete">%02d:%02d:%02d zurück</translation>
     </message>
     <message>
         <source>%02d:%02d behind  --  %.2f%% full</source>
-        <translation>%02d:%02d zurück  --  %.2f%% voll</translation>
+        <translation type="obsolete">%02d:%02d zurück  --  %.2f%% voll</translation>
     </message>
     <message>
         <source>%02d:%02d behind</source>
-        <translation>%02d:%02d zurück</translation>
+        <translation type="obsolete">%02d:%02d zurück</translation>
     </message>
     <message>
         <source>%02d:%02d:%02d of %02d:%02d:%02d</source>
-        <translation>%02d:%02d:%02d von %02d:%02d:%02d</translation>
+        <translation type="obsolete">%02d:%02d:%02d von %02d:%02d:%02d</translation>
     </message>
     <message>
         <source>%02d:%02d of %02d:%02d</source>
-        <translation>%02d:%02d von %02d:%02d</translation>
+        <translation type="obsolete">%02d:%02d von %02d:%02d</translation>
     </message>
     <message>
         <source>Skip %1 seconds</source>
@@ -3359,10 +3363,6 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Even if Empty</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Description</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3400,7 +3400,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>All</source>
-        <translation type="unfinished">Alle</translation>
+        <translation type="obsolete">Alle</translation>
     </message>
     <message>
         <source>Default Recording Group to display on the view recordings screen.</source>
@@ -3424,6 +3424,30 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>View Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 behind  --  %2 full</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 behind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 of %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All Programs</source>
+        <translation type="unfinished">Alle Sendungen</translation>
+    </message>
+    <message>
+        <source>Commercial Skip Auto-Rewind Amount</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, Myth will automatically rewind this many seconds after performing a commercial skip.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

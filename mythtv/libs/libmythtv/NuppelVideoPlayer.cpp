@@ -3322,6 +3322,8 @@ int NuppelVideoPlayer::calcSliderPos(QString &desc)
 {
     float ret;
 
+    QString text1, text2;
+
     if (livetv)
     {
         ret = ringBuffer->GetFreeSpace() / 
@@ -3347,28 +3349,30 @@ int NuppelVideoPlayer::calcSliderPos(QString &desc)
 
         if (hours > 0)
         {
+            text1.sprintf("%02d:%02d:%02d", hours, mins, secs);
             if (osd->getTimeType() == 0)
             {
-                desc.sprintf(
-                        QObject::tr("%02d:%02d:%02d behind  --  %.2f%% full"), 
-                        hours, mins, secs, (1000 - ret) / 10);
+                text2.sprintf("%.2f%%", (1000 - ret) / 10);
+                desc = QObject::tr("%1 behind  --  %2 full")
+                                   .arg(text1).arg(text2);
             }
             else
             {
-                desc.sprintf(QObject::tr("%02d:%02d:%02d behind"),
-                             hours, mins, secs);
+                desc = QObject::tr("%1 behind").arg(text1);
             }
         }
         else
         {
+            text1.sprintf("%02d:%02d", mins, secs);
             if (osd->getTimeType() == 0)
             {
-                desc.sprintf(QObject::tr("%02d:%02d behind  --  %.2f%% full"), 
-                             mins, secs, (1000 - ret) / 10);
+                text2.sprintf("%.2f%%", (1000 - ret) / 10);
+                desc = QObject::tr("%1 behind  --  %2 full")
+                        .arg(text1).arg(text2);
             }
             else
             {
-                desc.sprintf(QObject::tr("%02d:%02d behind"), mins, secs);
+                desc = QObject::tr("%1 behind").arg(text1);
             }
         }
 
@@ -3400,11 +3404,17 @@ int NuppelVideoPlayer::calcSliderPos(QString &desc)
     int ssecs = (playbackLen - shours * 3600 - smins * 60);
 
     if (shours > 0)
-        desc.sprintf(QObject::tr("%02d:%02d:%02d of %02d:%02d:%02d"), 
-                     phours, pmins, psecs, shours, smins, ssecs);
+    {
+        text1.sprintf("%02d:%02d:%02d", phours, pmins, psecs);
+        text2.sprintf("%02d:%02d:%02d", shours, smins, ssecs);
+    }
     else
-        desc.sprintf(QObject::tr("%02d:%02d of %02d:%02d"),
-                     pmins, psecs, smins, ssecs);
+    {
+        text1.sprintf("%02d:%02d", pmins, psecs);
+        text2.sprintf("%02d:%02d", smins, ssecs);
+    }
+
+    desc = QObject::tr("%1 of %2").arg(text1).arg(text2);
 
     return (int)(ret);
 }

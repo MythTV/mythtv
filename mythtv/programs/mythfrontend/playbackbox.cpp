@@ -620,9 +620,9 @@ void PlaybackBox::updateUsage(QPainter *p)
         usestr.sprintf("%d", (int)perc);
         usestr = usestr + tr("% used");
 
-        QString rep;
-        rep.sprintf(tr(", %0.2f GB free"),
-                    (freeSpaceTotal - freeSpaceUsed) / 1024.0);
+        QString size;
+        size.sprintf("%0.2f", (freeSpaceTotal - freeSpaceUsed) / 1024.0);
+        QString rep = tr(", %1 GB free").arg(size);
         usestr = usestr + rep;
 
         QRect pr = usageRect;
