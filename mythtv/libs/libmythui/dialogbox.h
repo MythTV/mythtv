@@ -7,13 +7,13 @@
 
 class MythListButton;
 
-const int kDialogBoxCompletionEventType = 34111;
+const int kMythDialogBoxCompletionEventType = 34111;
 
 class DialogCompletionEvent : public QCustomEvent
 {
   public: 
     DialogCompletionEvent(const QString &id, int result)
-        : QCustomEvent(kDialogBoxCompletionEventType), 
+        : QCustomEvent(kMythDialogBoxCompletionEventType), 
           m_id(id), m_result(result) { }
 
     QString GetId() { return m_id; }
