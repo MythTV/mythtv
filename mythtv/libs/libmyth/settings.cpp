@@ -193,6 +193,8 @@ QDialog* ConfigurationDialog::dialogWidget(QWidget* parent,
 }
 
 void ConfigurationDialog::exec(QSqlDatabase* db) {
+    load(db);
+
     QDialog* dialog = dialogWidget(NULL);
     dialog->show();
 
