@@ -722,8 +722,21 @@ void DaapServer::addItemToResponse(DaapRequest *daap_request, TagOutput &respons
         
         if(daap_request->getClientType() == DAAP_CLIENT_MFDDAAPCLIENT)
         {
-            QString extension = which_item->getUrl().fileName().section('.', -1,-1);
-            response << Tag('asfm') << extension.utf8() << end;
+            //
+            //  If the file is a wma, stream it as a wav (because the audio
+            //  plugin does not know how to handle non-file based wma
+            //  content)
+            //
+            
+            if(which_item->getUrl().fileName().section('.', -1,-1) == "wma")
+            {
+                response << Tag('asfm') << "wav" << end;
+            }
+            else
+            {
+                QString extension = which_item->getUrl().fileName().section('.', -1,-1);
+                response << Tag('asfm') << extension.utf8() << end;
+            }
         }
         else
         {

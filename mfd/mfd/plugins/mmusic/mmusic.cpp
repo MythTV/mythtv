@@ -165,7 +165,7 @@ void MMusicWatcher::run()
             //  sleep to a time close to our next sweep time
             //
 
-            int seconds_to_sleep = metadata_sweep_time.elapsed() - sweep_wait;
+            int seconds_to_sleep = sweep_wait - metadata_sweep_time.elapsed();
             if(seconds_to_sleep > 0)
             {
                 setTimeout(seconds_to_sleep, 0);

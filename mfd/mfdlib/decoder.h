@@ -106,6 +106,15 @@ public:
     Decoder *create(const QString &, QIODevice *, Output *, bool);
 };
 
+class WavDecoderFactory : public DecoderFactory
+{
+public:
+    bool supports(const QString &) const;
+    const QString &extension() const;
+    const QString &description() const;
+    Decoder *create(const QString &, QIODevice *, Output *, bool);
+};
+
 class MadDecoderFactory : public DecoderFactory
 {
 public:

@@ -110,6 +110,7 @@ static void checkFactories()
         Decoder::registerFactory(new MadDecoderFactory);
         Decoder::registerFactory(new FlacDecoderFactory);
         Decoder::registerFactory(new CdDecoderFactory);
+        Decoder::registerFactory(new WavDecoderFactory);
 #ifdef WMA_AUDIO_SUPPORT
         Decoder::registerFactory(new avfDecoderFactory);
 #endif
