@@ -252,14 +252,11 @@ bool Scheduler::FillRecordList(void)
     VERBOSE(VB_SCHEDULE, "SchedNewRecords...");
     SchedNewRecords();
 
-    if (schedMoveHigher)
-    {
-        VERBOSE(VB_SCHEDULE, "Sort retrylist...");
-        retrylist.sort(comp_retry);
-        VERBOSE(VB_SCHEDULE, "MoveHigherRecords...");
-        MoveHigherRecords();
-        retrylist.clear();
-    }
+    VERBOSE(VB_SCHEDULE, "Sort retrylist...");
+    retrylist.sort(comp_retry);
+    VERBOSE(VB_SCHEDULE, "MoveHigherRecords...");
+    MoveHigherRecords();
+    retrylist.clear();
 
     VERBOSE(VB_SCHEDULE, "ClearListMaps...");
     ClearListMaps();
@@ -619,7 +616,7 @@ void Scheduler::SchedNewRecords(void)
             MarkOtherShowings(titlelist, p);
             PrintRec(p, "  +");
         }
-        else if (schedMoveHigher)
+        else
         {
             for (k++; !FindNextConflict(cardlist, p, k); k++)
                 ;
@@ -651,7 +648,8 @@ void Scheduler::MoveHigherRecords(void)
         for ( ; FindNextConflict(cardlist, p, k); k++)
         {
             RecList &ktitlelist = titlelistmap[(*k)->title];
-            if (!TryAnotherShowing(ktitlelist, *k))
+            if ((p->recpriority < (*k)->recpriority && !schedMoveHigher) ||
+                !TryAnotherShowing(ktitlelist, *k))
             {
                 RestoreRecStatus();
                 break;
