@@ -44,9 +44,9 @@ ProgramInfo::ProgramInfo(void)
     dupin = kDupsInAll;
     dupmethod = kDupCheckSubDesc;
 
-    sourceid = -1;
-    inputid = -1;
-    cardid = -1;
+    sourceid = 0;
+    inputid = 0;
+    cardid = 0;
     schedulerid = "";
     recpriority = 0;
     recgroup = QObject::tr("Default");
@@ -845,7 +845,7 @@ bool ProgramInfo::IsSameProgramTimeslot(const ProgramInfo &other) const
     if (chanid == other.chanid &&
         startts < other.endts &&
         endts > other.startts &&
-        (sourceid == -1 || other.sourceid == -1 ||
+        (sourceid <= 0 || other.sourceid <= 0 ||
          sourceid == other.sourceid))
         return true;
     return false;

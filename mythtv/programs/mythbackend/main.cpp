@@ -388,12 +388,14 @@ int main(int argc, char **argv)
     if (printsched)
     {
         sched = new Scheduler(false, &tvList, db);
+#if 1
         if (gContext->ConnectToMasterServer())
         {
             cout << "Retrieving Schedule from Master backend.\n";
             sched->FillRecordListFromMaster();
         }
         else
+#endif
         {
             cout << "Calculating Schedule from database.\n" <<
                     "Inputs, Card IDs, and Conflict info may be invalid "

@@ -927,7 +927,7 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
             {
                 (*encoderList)[num]->StopRecording();
                 pginfo->recstatus = rsStopped;
-                m_sched->AddToDontRecord(pginfo);
+                m_sched->UpdateRecStatus(pginfo);
             }
 
             if (pbssock)
@@ -963,7 +963,7 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
             if (ismaster)
             {
                 pginfo->recstatus = rsStopped;
-                m_sched->AddToDontRecord(pginfo);
+                m_sched->UpdateRecStatus(pginfo);
             }
         }
     }
@@ -1085,7 +1085,7 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
            {
                (*encoderList)[num]->StopRecording();
                pginfo->recstatus = rsDeleted;
-               m_sched->AddToDontRecord(pginfo);
+               m_sched->UpdateRecStatus(pginfo);
            }
 
            if (pbssock)
@@ -1121,7 +1121,7 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
             if (ismaster)
             {
                 pginfo->recstatus = rsDeleted;
-                m_sched->AddToDontRecord(pginfo);
+                m_sched->UpdateRecStatus(pginfo);
             }
         }
     }

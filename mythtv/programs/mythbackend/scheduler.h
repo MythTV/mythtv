@@ -29,8 +29,7 @@ class Scheduler : public QObject
 
     void FillEncoderFreeSpaceCache();
 
-    void AddToDontRecord(ProgramInfo *pginfo);
-    void RemoveRecording(ProgramInfo *pginfo);
+    void UpdateRecStatus(ProgramInfo *pginfo);
 
     list<ProgramInfo *> *getAllPending(void) { return &recordingList; }
     void getAllPending(list<ProgramInfo *> *retList);
@@ -59,12 +58,12 @@ class Scheduler : public QObject
   private:
     void setupCards(void);
 
-    void findAllProgramsToRecord(list<ProgramInfo*>& proglist);
+    void AddFuturePrograms(const QDateTime &now);
     void findAllScheduledPrograms(list<ProgramInfo*>& proglist);
     void MarkKnownInputs(void);
     void MarkConflicts(list<ProgramInfo *> *uselist = NULL);
     void PruneOverlaps(void);
-    void PruneList(void);
+    void PruneList(const QDateTime &now);
 
     void MarkConflictsToRemove(void);
     void MarkSingleConflict(ProgramInfo *info,
@@ -72,7 +71,6 @@ class Scheduler : public QObject
 
     void CheckRecPriority(ProgramInfo *info, list<ProgramInfo *> *conflictList);
     void CheckOverride(ProgramInfo *info, list<ProgramInfo *> *conflictList);
-    void RemoveConflicts(void);
     void GuessSingle(ProgramInfo *info, list<ProgramInfo *> *conflictList);
     void GuessConflicts(void);
 
@@ -117,9 +115,7 @@ class Scheduler : public QObject
 
     bool threadrunning;
 
-    void PruneDontRecords(void);
-
-    QValueList<ProgramInfo> dontRecordList;
+    void PruneRecordList(const QDateTime &now);
 
     MainServer *m_mainServer;
 };
