@@ -1188,8 +1188,8 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
         len = pkt->size;
         ptr = pkt->data;
         pts = 0;
-        if (pkt->pts != (int64_t)AV_NOPTS_VALUE)
-            pts = pkt->pts / (AV_TIME_BASE / 1000);
+        if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
+            pts = pkt->dts / (AV_TIME_BASE / 1000);
 
         AVStream *curstream = ic->streams[pkt->stream_index];
 
@@ -1354,12 +1354,6 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     }
 
                     long long temppts = pts;
-
-                    if (context->has_b_frames && mpa_pic.pict_type != FF_B_TYPE)
-                    {
-                        temppts = video_last_P_pts;
-                        video_last_P_pts = pts;
-                    }
 
                     if (temppts != 0)
                         lastvpts = temppts;
