@@ -17,7 +17,13 @@ using namespace std;
 
 MdcapInput::MdcapInput(std::vector<char> *raw_data)
 {
-    contents = QValueVector<char>(*raw_data);
+    std::vector<char>::iterator it;
+    for(it = raw_data->begin(); it != raw_data->end(); )
+    {
+        contents.append((*it));
+        ++it;
+    }
+    // contents = QValueVector<char>(*raw_data);
 }
 
 MdcapInput::MdcapInput(QValueVector<char> *raw_data)
