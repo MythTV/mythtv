@@ -667,6 +667,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 
         delay = (nexttrigger.tv_sec - now.tv_sec) * 1000000 +
                 (nexttrigger.tv_usec - now.tv_usec); // uSecs
+
         /* trigger */
         if (delay > 0)
             usleep(delay);
