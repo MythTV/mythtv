@@ -3665,14 +3665,7 @@ int main(int argc, char *argv[])
     }
 
     if (grab_data || mark_repeats)
-    {
-        // sleep a short while before notifying the scheduler to allow
-        // the database to settle.  This probably shouldn't be
-        // necessary, but it might fix an anomaly I saw where the
-        // scheduler missed programs that were just added.
-        sleep(5);
         ScheduledRecording::signalChange(-1);
-    }
 
     delete gContext;
 
