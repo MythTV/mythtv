@@ -19,7 +19,7 @@ OSD::OSD(int width, int height, const string &filename)
 
     channum_y_start = height * 1 / 16;
     channum_y_end = height * 2 / 8;
-    channum_x_start = width * 7 / 8;
+    channum_x_start = width * 6 / 8;
     channum_x_end = width * 15 * 16;
     
     channum_width = channum_x_end - channum_x_start;

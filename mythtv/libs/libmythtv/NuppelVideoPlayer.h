@@ -63,6 +63,8 @@ class NuppelVideoPlayer
     
     void SetInfoText(char *text, int secs);
     void SetChannelText(char *text, int secs);
+   
+    bool OSDVisible(void) { if (osd) return osd->Visible(); else return false; }
     
  private:
     void InitSound(void);

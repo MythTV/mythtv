@@ -106,7 +106,12 @@ void TV::LiveTV(void)
     int keypressed;
     bool paused = false;
     float frameRate = nvp->GetFrameRate();
-  
+ 
+    channelqueued = false;
+    channelKeys[0] = channelKeys[1] = channelKeys[2] = ' ';
+    channelKeys[3] = 0;
+    channelkeysstored = 0;    
+
     cout << endl;
 
     while (nvp->IsPlaying())
@@ -121,17 +126,25 @@ void TV::LiveTV(void)
                case wsEscape: nvp->StopPlaying(); break;
                case wsUp: ChangeChannel(true); break; 
                case wsDown: ChangeChannel(false); break;
+               case wsZero: case wsOne: case wsTwo: case wsThree: case wsFour: 
+               case wsFive: case wsSix: case wsSeven: case wsEight:
+               case wsNine: ChannelKey(keypressed); break;
+               case wsEnter: ChannelCommit(); break;
                default: break;
            }
         }
         if (paused)
         {
-            fprintf(stderr, "\r Paused: %f seconds behind realtime (%f%% buffer left)", (float)(nvr->GetFramesWritten() - nvp->GetFramesPlayed()) / frameRate, (float)rbuffer->GetFreeSpace() / (float)rbuffer->GetFileSize() * 100.0);
+//            fprintf(stderr, "\r Paused: %f seconds behind realtime (%f%% buffer left)", (float)(nvr->GetFramesWritten() - nvp->GetFramesPlayed()) / frameRate, (float)rbuffer->GetFreeSpace() / (float)rbuffer->GetFileSize() * 100.0);
         }
         else
         {
-            fprintf(stderr, "\r                                                                      ");
-            fprintf(stderr, "\r Playing: %f seconds behind realtime (%lld skipped frames)", (float)(nvr->GetFramesWritten() - nvp->GetFramesPlayed()) / frameRate, nvp->GetFramesSkipped());
+//            fprintf(stderr, "\r                                                                      ");
+//            fprintf(stderr, "\r Playing: %f seconds behind realtime (%lld skipped frames)", (float)(nvr->GetFramesWritten() - nvp->GetFramesPlayed()) / frameRate, nvp->GetFramesSkipped());
+        }
+        if (channelqueued && !nvp->OSDVisible())
+        {
+            ChannelCommit();
         }
     }
 
@@ -167,6 +180,72 @@ void TV::ChangeChannel(bool up)
         channel->ChannelUp();
     else
         channel->ChannelDown();
+
+    nvr->Reset();
+    nvr->Unpause();
+
+    usleep(500000);
+    nvp->ResetPlaying();
+    while (!nvp->ResetYet())
+        usleep(5);
+
+    nvp->SetInfoText("Channel Info Placeholder", osd_display_time);
+    nvp->SetChannelText(channel->GetCurrentName(), osd_display_time);
+
+    nvp->Unpause();
+
+    channelqueued = false;
+    channelKeys[0] = channelKeys[1] = channelKeys[2] = ' ';
+    channelkeysstored = 0;
+}
+
+void TV::ChannelKey(int key)
+{
+    char thekey = key - 256 - 0xb0 + '0';
+
+    if (channelkeysstored == 3)
+    {
+        channelKeys[0] = channelKeys[1];
+        channelKeys[1] = channelKeys[2];
+        channelKeys[2] = thekey;
+    }
+    else
+    {
+        channelKeys[channelkeysstored] = thekey; 
+        channelkeysstored++;
+    }
+    channelKeys[3] = 0;
+    nvp->SetChannelText(channelKeys, 2);
+
+    channelqueued = true;
+}
+
+void TV::ChannelCommit(void)
+{
+    if (!channelqueued)
+        return;
+
+    ChangeChannel(channelKeys);
+
+    channelqueued = false;
+    channelKeys[0] = channelKeys[1] = channelKeys[2] = ' ';
+    channelkeysstored = 0;
+}
+
+void TV::ChangeChannel(char *name)
+{
+    nvp->Pause();
+    while (!nvp->GetPause())
+        usleep(5);
+
+    nvr->Pause();
+    while (!nvr->GetPause())
+        usleep(5);
+
+    rbuffer->Reset();
+
+    int channum = atoi(name) - 1;
+    channel->SetChannel(channum);
 
     nvr->Reset();
     nvr->Unpause();

@@ -17,6 +17,8 @@ class OSD
     void SetInfoText(char *text, int length);
     void SetChannumText(char *text, int length);
 
+    bool Visible(void) { return displayframes > 0; }
+    
  private:
     string fontname;
 

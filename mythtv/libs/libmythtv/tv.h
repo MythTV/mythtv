@@ -18,6 +18,10 @@ class TV
 
  private:
     void ChangeChannel(bool up);
+    void ChangeChannel(char *name);
+    
+    void ChannelKey(int key);
+    void ChannelCommit(void);
     
     NuppelVideoRecorder *nvr;
     NuppelVideoPlayer *nvp;
@@ -28,6 +32,10 @@ class TV
     Settings *settings;
 
     int osd_display_time;
+
+    bool channelqueued;
+    char channelKeys[4];
+    int channelkeysstored;
 };
 
 #endif

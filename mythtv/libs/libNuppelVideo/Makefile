@@ -33,4 +33,4 @@ nuppelvideo-config:
 	echo "fi" >> nuppelvideo-config
 	chmod +x nuppelvideo-config
 clean:	
-	rm -f *.o libNuppelVideo.a
+	rm -f *.o libNuppelVideo.a nuppelvideo-config
