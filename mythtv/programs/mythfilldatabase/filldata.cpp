@@ -114,6 +114,7 @@ class ProgInfo
                                       ratings = other.ratings;
                                       repeat = other.repeat;
                                       credits = other.credits;
+				      content = other.content;
                                     }
 
     QString startts;
@@ -127,6 +128,7 @@ class ProgInfo
     QString catType;
     QString airdate;
     QString stars;
+    QString content;
     QValueList<ProgRating> ratings;
 
     QDateTime start;
@@ -1225,7 +1227,8 @@ ProgInfo *parseProgram(QDomElement &element, int localTimezoneOffset)
     pginfo->start = fromXMLTVDate(pginfo->startts);
     pginfo->end = fromXMLTVDate(pginfo->endts);
 
-    pginfo->subtitle = pginfo->title = pginfo->desc = pginfo->category = "";
+    pginfo->subtitle = pginfo->title = pginfo->desc = pginfo->category = pginfo->content = "";
+    
     pginfo->catType = "";
     pginfo->repeat = false;   
  
@@ -1257,6 +1260,11 @@ ProgInfo *parseProgram(QDomElement &element, int localTimezoneOffset)
             {
                 pginfo->subtitle = getFirstText(info);
             }
+	    else if (info.tagName() == "content")
+            {
+                pginfo->content = getFirstText(info);
+            }
+	    
             else if (info.tagName() == "desc" && pginfo->desc == "")
             {
                 pginfo->desc = getFirstText(info);
@@ -1352,7 +1360,25 @@ ProgInfo *parseProgram(QDomElement &element, int localTimezoneOffset)
     if (isNorthAmerica && pginfo->catType == "" &&
         pginfo->stars != "" && pginfo->airdate != "")
         pginfo->catType = "movie";
-
+    
+    /* Hack for teveblad grabber to do something with the content tag*/
+    if (pginfo->content != "")
+    {
+	if (pginfo->category == "film")
+	{
+	    pginfo->subtitle = pginfo->desc;
+	    pginfo->desc = pginfo->content;
+	}
+	else if (pginfo->desc != "") 
+	{
+	    pginfo->desc = pginfo->desc + " - " + pginfo->content;
+	}
+        else if (pginfo->desc == "")
+	{
+	    pginfo->desc = pginfo->content;
+	}
+    }
+    
     if (pginfo->airdate == "")
         pginfo->airdate = QDate::currentDate().toString("yyyy");
 
