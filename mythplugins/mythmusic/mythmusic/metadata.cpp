@@ -329,15 +329,19 @@ void Metadata::updateDatabase(QSqlDatabase *db, QString startdir)
     MSqlQuery query(QString::null, db);
 
     query.prepare("UPDATE musicmetadata SET artist = :ARTIST, album = :ALBUM, "
+                  "compilation_artist = :COMPILATION_ARTIST, "
                   "title = :TITLE, genre = :GENRE, year = :YEAR, "
-                  "tracknum = :TRACKNUM, compilation = :COMPILATION "
+                  "tracknum = :TRACKNUM, rating = :RATING, " 
+                  "compilation = :COMPILATION "
                   "WHERE intid = :ID;");
     query.bindValue(":ARTIST", artist.utf8());
+    query.bindValue(":COMPILATION_ARTIST", compilation_artist.utf8());
     query.bindValue(":ALBUM", album.utf8());
     query.bindValue(":TITLE", title.utf8());
     query.bindValue(":GENRE", genre.utf8());
     query.bindValue(":YEAR", year);
     query.bindValue(":TRACKNUM", tracknum);
+    query.bindValue(":RATING", rating);
     query.bindValue(":COMPILATION", compilation);
     query.bindValue(":ID", id);
 
