@@ -1635,6 +1635,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
 
 void XMLParse::parsePushButton(LayerSet *container, QDomElement &element)
 {
+    int context = -1;
     QPoint pos = QPoint(0, 0);
     QPixmap *image_on = NULL;
     QPixmap *image_off = NULL;
@@ -1660,7 +1661,11 @@ void XMLParse::parsePushButton(LayerSet *container, QDomElement &element)
         QDomElement info = child.toElement();
         if (!info.isNull())
         {
-            if (info.tagName() == "position")
+            if (info.tagName() == "context")
+            {
+                context = getFirstText(info).toInt();
+            }
+            else if (info.tagName() == "position")
             {
                 pos = parsePoint(getFirstText(info));
                 pos.setX((int)(pos.x() * wmult));
@@ -1734,6 +1739,10 @@ void XMLParse::parsePushButton(LayerSet *container, QDomElement &element)
 
     pbt->setPosition(pos);
     pbt->SetOrder(order.toInt());
+    if (context != -1)
+    {
+        pbt->SetContext(context);
+    }
     pbt->SetParent(container);
     pbt->calculateScreenArea();
     container->AddType(pbt);
@@ -1741,6 +1750,7 @@ void XMLParse::parsePushButton(LayerSet *container, QDomElement &element)
 
 void XMLParse::parseTextButton(LayerSet *container, QDomElement &element)
 {
+    int context = -1;
     QString font = "";
     QPoint pos = QPoint(0, 0);
     QPixmap *image_on = NULL;
@@ -1767,7 +1777,11 @@ void XMLParse::parseTextButton(LayerSet *container, QDomElement &element)
         QDomElement info = child.toElement();
         if (!info.isNull())
         {
-            if (info.tagName() == "position")
+            if (info.tagName() == "context")
+            {
+                context = getFirstText(info).toInt();
+            }
+            else if (info.tagName() == "position")
             {
                 pos = parsePoint(getFirstText(info));
                 pos.setX((int)(pos.x() * wmult));
@@ -1854,6 +1868,10 @@ void XMLParse::parseTextButton(LayerSet *container, QDomElement &element)
     tbt->setPosition(pos);
     tbt->setFont(testfont);
     tbt->SetOrder(order.toInt());
+    if (context != -1)
+    {
+        tbt->SetContext(context);
+    }
     tbt->SetParent(container);
     tbt->calculateScreenArea();
     container->AddType(tbt);
