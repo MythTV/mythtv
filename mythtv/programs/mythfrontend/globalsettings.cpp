@@ -223,7 +223,7 @@ public:
         setValue(false);
         setHelpText("If this is set, when you exit playback a menu will be "
                     "displayed with options to save your position, "
-                    "delete the recording, or continue watching");
+                    "delete the recording, or continue watching.");
     };
 };
 

@@ -266,6 +266,7 @@ void TVRec::HandleStateChange(void)
         internalState = nextState;
         changed = true;
 
+        killRecordingFile = true;
         watchingLiveTV = false;
     }
     else if (internalState == kState_None && 
@@ -429,6 +430,7 @@ void TVRec::TeardownRecorder(bool killFile)
             delete curRecording;
             curRecording = NULL;
         }
+        outputFilename = "";
     }
     else if (curRecording)
     {
@@ -951,18 +953,14 @@ long long TVRec::GetFreeSpace(long long totalreadpos)
 void TVRec::SetupRingBuffer(QString &path, long long &filesize, 
                             long long &fillamount, bool pip)
 {
-    if (pip)
-    {
-        filesize = context->GetNumSetting("PIPBufferSize");
-        fillamount = context->GetNumSetting("PIPMaxBufferFill");
-        path = context->GetSetting("PIPBufferName");
-    }
-    else
-    {
-        filesize = context->GetNumSetting("BufferSize");
-        fillamount = context->GetNumSetting("MaxBufferFill");
-        path = context->GetSetting("BufferName");
-    }
+    (void)pip;
+    filesize = context->GetNumSetting("BufferSize");
+    fillamount = context->GetNumSetting("MaxBufferFill");
+
+    path = context->GetSetting("LiveBufferDir") + QString("/ringbuf%1.nuv")
+                                                       .arg(m_capturecardnum);
+
+    outputFilename = path;
 
     filesize = filesize * 1024 * 1024 * 1024;
     fillamount = fillamount * 1024 * 1024;

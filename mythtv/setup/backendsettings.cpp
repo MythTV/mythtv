@@ -25,7 +25,17 @@ public:
         BackendSetting("RecordFilePrefix") {
         setLabel("Directory to hold recordings");
         setValue("/mnt/store/");
-        setHelpText("All recordings get stored in this directory");
+        setHelpText("All recordings get stored in this directory.");
+    };
+};
+
+class LiveBufferPrefix: public LineEditSetting, public BackendSetting {
+public:
+    LiveBufferPrefix():
+        BackendSetting("LiveBufferDir") {
+        setLabel("Directory to hold the live-tv buffers");
+        setValue("/mnt/store/");
+        setHelpText("All live-tv buffers will get stored in this directory.");
     };
 };
 
@@ -69,16 +79,6 @@ public:
     };
 };
 
-class BufferName: public LineEditSetting, public BackendSetting {
-public:
-    BufferName():
-        BackendSetting("BufferName") {
-        setLabel("Live TV buffer");
-        setValue("/mnt/store/ringbuf.nuv");
-        setHelpText("Create the live tv buffer at this pathname");
-    }
-};
-
 class BufferSize: public SliderSetting, public BackendSetting {
 public:
     BufferSize():
@@ -102,54 +102,17 @@ public:
     };
 };
 
-class PIPBufferSize: public SpinBoxSetting, public BackendSetting {
-public:
-    PIPBufferSize():
-        SpinBoxSetting(1, 1024, 1), BackendSetting("PIPBufferSize") {
-        setLabel("Picture-in-picture buffer size");
-        setValue(1);
-    };
-};
-
-class PIPMaxBufferFill: public SpinBoxSetting, public BackendSetting {
-public:
-    PIPMaxBufferFill():
-        SpinBoxSetting(1, 100, 1), BackendSetting("PIPMaxBufferFill") {
-        setLabel("Max buffer fill (%)");
-        setValue(50);
-        setHelpText("How full the picture-in-picture buffer is allowed to grow before "
-                    "forcing an unpause");
-    };
-};
-
-class PIPBufferName: public LineEditSetting, public BackendSetting {
-public:
-    PIPBufferName():
-        BackendSetting("PIPBufferName") {
-        setLabel("Picture-in-picture buffer path");
-        setValue("/mnt/store/ringbuf2.nuv");
-        setHelpText("Create the picture-in-picture buffer at this pathname");
-    };
-};
-
 BackendSettings::BackendSettings(MythContext* context):
     ConfigurationWizard(context) {
 
     VerticalConfigurationGroup* group1 = new VerticalConfigurationGroup(false);
     group1->setLabel("General");
     group1->addChild(new RecordFilePrefix());
-    group1->addChild(new BufferName());
+    group1->addChild(new LiveBufferPrefix());
     group1->addChild(new BufferSize());
     group1->addChild(new MaxBufferFill());
     group1->addChild(new TVFormat());
     group1->addChild(new FreqTable());
     addChild(group1);
-
-    VerticalConfigurationGroup* group2 = new VerticalConfigurationGroup(false);
-    group2->setLabel("Picture-in-picture");
-    group2->addChild(new PIPBufferSize());
-    group2->addChild(new PIPMaxBufferFill());
-    group2->addChild(new PIPBufferName());
-    addChild(group2);
 }
 
