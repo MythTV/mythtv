@@ -27,6 +27,7 @@ class CommDetect
     void SetSceneChangeDetection(bool onOff) { detectSceneChanges = onOff; }
 
     void SetAggressiveDetection(bool onOff)  { aggressiveDetection = onOff; }
+    void SetCommSkipAllBlanks(bool onOff)  { skipAllBlanks = onOff; }
 
     void ClearAllMaps(void);
     void GetCommBreakMap(QMap<long long, int> &marks);
@@ -67,6 +68,8 @@ class CommDetect
 
     bool detectBlankFrames;
     bool detectSceneChanges;
+
+    bool skipAllBlanks;
 
     unsigned char *frame_ptr;
 

@@ -3266,6 +3266,9 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed)
     if (commercialskipmethod & 0x02)
         commDetect->SetSceneChangeDetection(true);
 
+    commDetect->SetCommSkipAllBlanks(
+        gContext->GetNumSetting("CommSkipAllBlanks", 1));
+
     // the meat of the offline commercial detection code, scan through whole
     // file looking for indications of commercial breaks
     GetFrame(1,true);
@@ -3518,7 +3521,8 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
                     JumpToFrame(commBreakIter.key());
             }
 
-            GetFrame(1, true);
+            if (autocommercialskip == 1)
+                GetFrame(1, true);
 
             ++commBreakIter;
         }
@@ -3771,6 +3775,27 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
                     commBreakIter--;
             }
         }
+		else if (commBreakIter.data() == MARK_COMM_START)
+		{
+            int skipped_seconds = (int)((commBreakIter.key() -
+                    framesPlayed) / video_frame_rate);
+
+            // special case when hitting 'skip' < 20 seconds before break
+            if (skipped_seconds < 20)
+            {
+                commBreakIter++;
+
+                if (commBreakIter == commBreakMap.end())
+                {
+                    QString comm_msg =
+                                QString(QObject::tr("At End, can not Skip."));
+                    QString desc;
+                    int spos = calcSliderPos(0,desc);
+                    osd->StartPause(spos, false, comm_msg, desc, 1);
+                    return false;
+                }
+            }
+		}
 
         if (osd)
         {

@@ -3,6 +3,7 @@
 
 #include <qobject.h>
 #include <qstring.h>
+#include <qregexp.h>
 #include <qstringlist.h>
 #include <qrect.h>
 #include <qfile.h>
@@ -56,6 +57,9 @@ class LayerSet
     void    AddType(UIType *);
     UIType  *GetType(const QString &name);
     vector<UIType *> *getAllTypes(){return allTypes;}
+
+    void    ClearAllText(void);
+    void    SetTextByRegexp(QMap<QString, QString> &regexpMap);
 
 
   private:
@@ -400,8 +404,11 @@ class UITextType : public UIType
                 QRect displayrect);
     ~UITextType();
 
+    QString Name() { return m_name; }
+
     void SetText(const QString &text);
     QString GetText() { return m_message; }
+    QString GetDefaultText() { return m_default_msg; }
 
     void SetJustification(int jst) { m_justification = jst; }
     int GetJustification() { return m_justification; }
@@ -417,6 +424,8 @@ class UITextType : public UIType
     int m_justification;
     QRect m_displaysize;
     QString m_message;
+    QString m_default_msg;
+    QString m_name;
 
     fontProp *m_font;
 

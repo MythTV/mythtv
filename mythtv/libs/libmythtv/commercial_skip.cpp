@@ -53,6 +53,8 @@ void CommDetect::Init(int w, int h, double fps)
     frameIsBlank = false;
     sceneHasChanged = false;
 
+    skipAllBlanks = true;
+
     frame_ptr = NULL;
 
     ClearAllMaps();
@@ -530,14 +532,16 @@ void CommDetect::BuildBlankFrameCommList(void)
                 x++;
             }
 
-            while((blankFrameMap.contains(r+1)) &&
-                  (c_start[i+1] != (r+1)))
-                r++;
+            if (skipAllBlanks)
+                while((blankFrameMap.contains(r+1)) &&
+                      (c_start[i+1] != (r+1)))
+                    r++;
         }
         else
         {
-            while(blankFrameMap.contains(r+1))
-                r++;
+            if (skipAllBlanks)
+                while(blankFrameMap.contains(r+1))
+                    r++;
         }
 
         blankCommMap[r] = MARK_COMM_END;

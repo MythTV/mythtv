@@ -638,64 +638,20 @@ void ViewScheduled::updateInfo(QPainter *p)
     QPixmap pix(pr.size());
     pix.fill(this, pr.topLeft());
     QPainter tmp(&pix);
+    QMap<QString, QString> regexpMap;
 
     if (conflictData.count() > 0 && curitem)
-    {  
-
-        QDateTime startts = curitem->recstartts;
-        QDateTime endts = curitem->recendts;
-
-        QString timedate = startts.date().toString(dateformat) + ", " +
-                           startts.time().toString(timeformat) + " - " +
-                           endts.time().toString(timeformat);
-
-        QString subtitle = "";
-        QString chantext = "";
-        QString description = "";
-
-        if (gContext->GetNumSetting("DisplayChanNum") != 0)
-            chantext = curitem->channame + " [" + curitem->chansign + "]";
-        else
-            chantext = curitem->chanstr;
-
-        if (curitem->subtitle != "(null)")
-            subtitle = curitem->subtitle;
-        else
-            subtitle = "";
-
-        if (curitem->description != "(null)")
-            description = curitem->description;
-        else
-            description = "";
+    {
+        QSqlDatabase *m_db = QSqlDatabase::database();
+        curitem->ToMap(m_db, regexpMap);
 
         LayerSet *container = NULL;
         container = theme->GetSet("program_info");
         if (container)
         {
-            UITextType *type = (UITextType *)container->GetType("title");
-            if (type)
-                type->SetText(curitem->title);
- 
-            type = (UITextType *)container->GetType("subtitle");
-            if (type)
-                type->SetText(subtitle);
+            container->ClearAllText();
+            container->SetTextByRegexp(regexpMap);
 
-            type = (UITextType *)container->GetType("timedate");
-            if (type)
-                type->SetText(timedate);
-
-            type = (UITextType *)container->GetType("description");
-            if (type)
-                type->SetText(curitem->description);
-
-            type = (UITextType *)container->GetType("channel");
-            if (type)
-                type->SetText(chantext);
-
-        }
-       
-        if (container)
-        {
             container->Draw(&tmp, 4, 0);
             container->Draw(&tmp, 5, 0);
             container->Draw(&tmp, 6, 0);

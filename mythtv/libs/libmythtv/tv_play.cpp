@@ -2619,16 +2619,6 @@ void TV::DoProgramMenu(void)
 
     NormalSpeed();
 
-    if (paused)
-    {
-        osd->EndPause();
-    }
-    else
-    {
-        activenvp->Pause();
-        paused = true;
-    }
-
     osd->HideAll();
 
     dialogname = "programmenubox";
@@ -2657,9 +2647,6 @@ void TV::DoProgramMenu(void)
 void TV::ProgramMenuAction(int result)
 {
     QString desc = "";
-
-    activenvp->Unpause();
-    paused = false;
 
     while (osd->Visible())
         usleep(50);

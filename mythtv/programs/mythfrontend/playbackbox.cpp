@@ -14,6 +14,7 @@
 #include <qheader.h>
 #include <qfile.h>
 #include <qsqldatabase.h>
+#include <qmap.h>
 
 #include <unistd.h>
 
@@ -317,6 +318,7 @@ void PlaybackBox::updateInfo(QPainter *p)
     if (noUpdate == true)
         return;
 
+    QMap<QString, QString> regexpMap;
     QRect pr = infoRect;
     QPixmap pix(pr.size());
     pix.fill(this, pr.topLeft());
@@ -330,22 +332,7 @@ void PlaybackBox::updateInfo(QPainter *p)
         if (playingVideo == true)
             killPlayer();
 
-        QDateTime startts = curitem->startts;
-        QDateTime endts = curitem->endts;
-
-        QString timedate = startts.date().toString(dateformat) + ", " +
-                           startts.time().toString(timeformat) + " - " +
-                           endts.time().toString(timeformat);
-
-        QString chantext = "";
-        if (displayChanNum)
-            chantext = curitem->channame + " [" + curitem->chansign + "]";
-        else
-            chantext = curitem->chanstr;
-
-        QString subtitle = curitem->subtitle;
-        if (subtitle.length() > 1)
-            subtitle = "\"" + curitem->subtitle + "\"";
+        curitem->ToMap(m_db, regexpMap);
 
         LayerSet *container = NULL;
         if (type != Delete)
@@ -354,25 +341,8 @@ void PlaybackBox::updateInfo(QPainter *p)
             container = theme->GetSet("program_info_del");
         if (container)
         {
-            UITextType *type = (UITextType *)container->GetType("title");
-            if (type)
-                type->SetText(curitem->title);
-
-            type = (UITextType *)container->GetType("subtitle");
-            if (type)
-                type->SetText(subtitle);
-    
-            type = (UITextType *)container->GetType("timedate");
-            if (type)
-                type->SetText(timedate);
-
-            type = (UITextType *)container->GetType("description");
-            if (type)
-                type->SetText(curitem->description);
-
-            type = (UITextType *)container->GetType("channel");
-            if (type)
-                type->SetText(chantext);
+            container->ClearAllText();
+            container->SetTextByRegexp(regexpMap);
 
             UIImageType *itype;
             itype = (UIImageType *)container->GetType("commflagged");

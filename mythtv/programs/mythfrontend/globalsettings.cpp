@@ -265,6 +265,18 @@ public:
     };
 };
 
+class CommSkipAllBlanks: public CheckBoxSetting, public BackendSetting {
+public:
+    CommSkipAllBlanks():
+        BackendSetting("CommSkipAllBlanks") {
+        setLabel(QObject::tr("Skip blank frames after commercials"));
+        setValue(true);
+        setHelpText(QObject::tr("When using Blank Frame Detection and "
+                    "Auto-Flagging, flag blank frames following commercial "
+                    "breaks as part of the the commercial break."));
+    };
+};
+
 class AutoExpireDiskThreshold: public SpinBoxSetting, public BackendSetting {
 public:
     AutoExpireDiskThreshold():
@@ -1380,6 +1392,7 @@ PlaybackSettings::PlaybackSettings()
     comms->addChild(new AutoCommercialFlag());
     comms->addChild(new CommercialSkipMethod());
     comms->addChild(new AggressiveCommDetect());
+    comms->addChild(new CommSkipAllBlanks());
     comms->addChild(new AutoCommercialSkip());
     addChild(comms);
 

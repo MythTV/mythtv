@@ -923,7 +923,7 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
     // If we change the recording times we must also adjust the .nuv file's name
     QString fileprefix = gContext->GetFilePrefix();
     QString oldfilename = pginfo->GetRecordFilename(fileprefix);
-    pginfo->endts = now;
+    pginfo->recendts = now;
     QString newfilename = pginfo->GetRecordFilename(fileprefix);
     QFile checkFile(oldfilename);
 

@@ -191,26 +191,41 @@ void ProgramInfo::FromStringList(QStringList &list, int offset)
 
 void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
 {
-    QString tmFmt = gContext->GetSetting("TimeFormat");
-    QString dtFmt = gContext->GetSetting("ShortDateFormat");
+    QString timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
+    QString dateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d");
+	QString shortDateFormat = gContext->GetSetting("ShortDateFormat", "M/d");
+
     QString length;
     int hours, minutes, seconds;
     RecordingType recordtype;
 
     progMap["title"] = title;
-    progMap["subtitle"] = subtitle;
-    progMap["description"] = description;
+
+    if (subtitle != "(null)")
+        progMap["subtitle"] = subtitle;
+    else
+        progMap["subtitle"] = "";
+
+    if (description != "(null)")
+        progMap["description"] = description;
+    else
+        progMap["description"] = "";
+
     progMap["category"] = category;
     progMap["callsign"] = chansign;
-    progMap["starttime"] = startts.toString(tmFmt);
-    progMap["startdate"] = startts.toString(dtFmt);
-    progMap["endtime"] = endts.toString(tmFmt);
-    progMap["enddate"] = endts.toString(dtFmt);
+    progMap["starttime"] = startts.toString(timeFormat);
+    progMap["startdate"] = startts.toString(shortDateFormat);
+    progMap["endtime"] = endts.toString(timeFormat);
+    progMap["enddate"] = endts.toString(shortDateFormat);
+    progMap["recstarttime"] = recstartts.toString(timeFormat);
+    progMap["recstartdate"] = recstartts.toString(shortDateFormat);
+    progMap["recendtime"] = recendts.toString(timeFormat);
+    progMap["recenddate"] = recendts.toString(shortDateFormat);
     progMap["channum"] = chanstr;
     progMap["chanid"] = chanid;
     progMap["iconpath"] = "";
 
-    seconds = startts.secsTo(endts);
+    seconds = recstartts.secsTo(recendts);
     minutes = seconds / 60;
     progMap["lenmins"] = QString("%1").arg(minutes);
     hours   = minutes / 60;
@@ -248,6 +263,15 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
             break;
     }
     progMap["rank"] = rank;
+
+    progMap["timedate"] = recstartts.date().toString(dateFormat) + ", " +
+                          recstartts.time().toString(timeFormat) + " - " +
+                          recendts.time().toString(timeFormat);
+
+    if (gContext->GetNumSetting("DisplayChanNum") != 0)
+        progMap["channel"] = channame + " [" + chansign + "]";
+    else
+        progMap["channel"] = chanstr;
 
     QString thequery = QString("SELECT icon FROM channel WHERE chanid = %1")
                                .arg(chanid);

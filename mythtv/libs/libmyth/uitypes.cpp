@@ -68,6 +68,53 @@ void LayerSet::Draw(QPainter *dr, int drawlayer, int context)
   }
 }
 
+void LayerSet::ClearAllText(void)
+{
+    vector<UIType *>::iterator i = allTypes->begin();
+    for (; i != allTypes->end(); i++)
+    {
+        UIType *type = (*i);
+        if (UITextType *item = dynamic_cast<UITextType *>(type))
+            if (item->GetDefaultText().contains(QRegExp("%")))
+                item->SetText(QString(""));
+    }
+}
+
+void LayerSet::SetTextByRegexp(QMap<QString, QString> &regexpMap)
+{
+    vector<UIType *>::iterator i = allTypes->begin();
+    for (; i != allTypes->end(); i++)
+    {
+        UIType *type = (*i);
+        if (UITextType *item = dynamic_cast<UITextType *>(type))
+        {
+            QMap<QString, QString>::Iterator riter = regexpMap.begin();
+            QString new_text = item->GetDefaultText();
+            QString full_regex;
+
+            if ((new_text == "") &&
+                (regexpMap.contains(item->Name())))
+            {
+                new_text = regexpMap[item->Name()];
+            }
+            else
+                for (; riter != regexpMap.end(); riter++)
+                {
+                   full_regex = "%" + riter.key().upper() + 
+                     "(\\|([^%|]*))?" + "(\\|([^%|]*))?" + "(\\|([^%]*))?%";
+                   if (riter.data() != "")
+                       new_text.replace(QRegExp(full_regex), 
+                                        "\\2" + riter.data() + "\\4");
+                   else
+                       new_text.replace(QRegExp(full_regex), "\\6");
+                }
+
+            if (new_text != "")
+                item->SetText(new_text);
+        }
+    }
+}
+
 // **************************************************************
 
 UIType::UIType(const QString &name)
@@ -1510,7 +1557,9 @@ UITextType::UITextType(const QString &name, fontProp *font,
                        const QString &text, int dorder, QRect displayrect)
            : UIType(name)
 {
+    m_name = name;
     m_message = text;
+    m_default_msg = text;
     m_font = font;
     m_displaysize = displayrect;
     m_cutdown = true;
