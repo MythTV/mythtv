@@ -481,6 +481,8 @@ void VideoOutputXvMC::PrepareFrame(VideoFrame *buffer)
 
     xvmc_render_state_t *render = (xvmc_render_state_t *)buffer->buf;
 
+    SyncSurface(data->XJ_disp, render->p_surface);
+
     render->state |= MP_XVMC_STATE_DISPLAY_PENDING;
     data->p_render_surface_to_show = render;
 
@@ -496,22 +498,26 @@ void VideoOutputXvMC::Show()
 
     pthread_mutex_lock(&lock);
 
-    SyncSurface(data->XJ_disp, surf);
-
     if (data->p_render_surface_visible != NULL)
         data->p_render_surface_visible->state &= ~MP_XVMC_STATE_DISPLAY_PENDING;
 
     XvMCPutSurface(data->XJ_disp, surf, data->XJ_curwin, imgx, imgy, imgw, 
                    imgh, dispxoff, dispyoff, dispwoff, disphoff, 3);
 
-    if (data->p_render_surface_visible)
+    if (data->p_render_surface_visible && 
+        (data->p_render_surface_visible != data->p_render_surface_to_show))
     {
         surf = data->p_render_surface_visible->p_surface;
 
         int status = XVMC_DISPLAYING;
 
         while (status & XVMC_DISPLAYING)
+        {
             XvMCGetSurfaceStatus(data->XJ_disp, surf, &status);
+            //pthread_mutex_unlock(&lock);
+            //usleep(1000);
+            //pthread_mutex_lock(&lock);
+        }
     }
 
     data->p_render_surface_visible = data->p_render_surface_to_show;
@@ -527,17 +533,9 @@ void VideoOutputXvMC::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
     (void)w;
     (void)h;
 
-    int status = XVMC_DISPLAYING;
-
     xvmc_render_state_t *render = (xvmc_render_state_t *)frame->buf;
 
     pthread_mutex_lock(&lock);
-
-    XvMCGetSurfaceStatus(data->XJ_disp, render->p_surface,
-                         &status);
-
-    if (y == 0 && status & XVMC_DISPLAYING)
-        cerr << "Bad: still displaying frame\n";
 
     if (render->p_past_surface != NULL)
         SyncSurface(data->XJ_disp, render->p_past_surface);

@@ -304,6 +304,7 @@ void NuppelVideoPlayer::InitVideo(void)
     videoOutput = new VideoOutputXv();
 #else
     videoOutput = new VideoOutputXvMC();
+    decoder->setLowBuffers();
 #endif
     videoOutput->Init(video_width, video_height, video_aspect,
                       MAXVBUFFER + 1, vbuffers, widget->winId(), 

@@ -124,6 +124,8 @@ class AvFormatDecoder : public DecoderBase
     int current_width;
     int current_height;
     float current_aspect;
+
+    QPtrList<AVPacket> storedPackets;
 };
 
 #endif

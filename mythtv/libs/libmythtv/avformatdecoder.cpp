@@ -94,6 +94,14 @@ void AvFormatDecoder::SeekReset(void)
     }
 
     inUseBuffers.clear();
+
+    while (storedPackets.count() > 0)
+    {
+        AVPacket *pkt = storedPackets.first();
+        storedPackets.removeFirst();
+        av_free_packet(pkt);
+        delete pkt;
+    }
 }
 
 void AvFormatDecoder::Reset(void)
@@ -603,7 +611,7 @@ float AvFormatDecoder::GetMpegAspect(AVCodecContext *context,
 
 void AvFormatDecoder::GetFrame(int onlyvideo)
 {
-    AVPacket pkt;
+    AVPacket *pkt = NULL;
     int len, ret = 0;
     unsigned char *ptr;
     short samples[AVCODEC_MAX_AUDIO_FRAME_SIZE / 2];
@@ -614,27 +622,64 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
 
     frame_decoded = 0;
 
-    while (!gotvideo)
+    bool allowedquit = false;
+    bool storevideoframes = false;
+
+    while (!allowedquit)
     {
-        if (av_read_packet(ic, &pkt) < 0)
+        if (gotvideo)
         {
-            ateof = true;
-            m_parent->SetEof();
-            return;
+            if (lowbuffers && onlyvideo == 0 && lastapts < lastvpts + 100)
+            {
+                //cout << "behind: " << lastapts << " " << lastvpts << endl;
+                storevideoframes = true;
+            }
+            else
+            {
+                allowedquit = true;
+                continue;
+            }
         }
 
-        len = pkt.size;
-        ptr = pkt.data;
-        bool pts_set = false;
-
-        if (pkt.stream_index > ic->nb_streams)
+        if (!storevideoframes && storedPackets.count() > 0)
         {
-            cout << "bad stream\n";
-            av_free_packet(&pkt);
+            if (pkt)
+                delete pkt;
+            pkt = storedPackets.first();
+            storedPackets.removeFirst();
+        }
+        else
+        {
+            if (!pkt)
+                pkt = new AVPacket;
+
+            if (av_read_packet(ic, pkt) < 0)
+            {
+                ateof = true;
+                m_parent->SetEof();
+                return;
+            }
+        }
+
+        len = pkt->size;
+        ptr = pkt->data;
+
+        if (pkt->stream_index > ic->nb_streams)
+        {
+            cerr << "bad stream\n";
+            av_free_packet(pkt);
             continue;
         }
 
-        AVStream *curstream = ic->streams[pkt.stream_index];
+        AVStream *curstream = ic->streams[pkt->stream_index];
+
+        if (storevideoframes && 
+            curstream->codec.codec_type == CODEC_TYPE_VIDEO)
+        {
+            storedPackets.append(pkt);
+            pkt = NULL;
+            continue;
+        }
 
         if (len > 0 && curstream->codec.codec_type == CODEC_TYPE_VIDEO)
         {
@@ -643,9 +688,9 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                 context->codec_id == CODEC_ID_MPEG2VIDEO_XVMC)
             {
                 int startpos = 0;
-                if ((startpos = PacketHasHeader(pkt.data, pkt.size, SEQ_START)))
+                if ((startpos = PacketHasHeader(ptr, len, SEQ_START)))
                 {
-                    unsigned char *test = pkt.data + startpos;
+                    unsigned char *test = ptr + startpos;
                     int width = (test[0] << 4) | (test[1] >> 4);
                     int height = ((test[1] & 0xff) << 8) | test[2];
 
@@ -666,14 +711,14 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                     }
                 }
                  
-                if (PacketHasHeader(pkt.data, pkt.size, PICTURE_START))
+                if (PacketHasHeader(ptr, len, PICTURE_START))
                 {
                     framesRead++;
                     if (exitafterdecoded)
                         gotvideo = 1;
                 }
 
-                if (PacketHasHeader(pkt.data, pkt.size, GOP_START))
+                if (PacketHasHeader(ptr, len, GOP_START))
                 {
                     int frameNum = framesRead - 1;
  
@@ -686,30 +731,21 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
 
                     lastKey = frameNum;
                     if (!hasFullPositionMap)
-                        positionMap[lastKey / keyframedist] = pkt.startpos;
+                        positionMap[lastKey / keyframedist] = pkt->startpos;
                 }
             }
         }
  
         while (len > 0)
         {
-            long long ipts = AV_NOPTS_VALUE;
-
-            if (frame_decoded && pkt.pts != AV_NOPTS_VALUE && !pts_set)
-            {
-                ipts = pkt.pts;
-                pts_set = 1;
-                frame_decoded = 0;
-            }
-
             switch (curstream->codec.codec_type)
             {
                 case CODEC_TYPE_AUDIO:
                 {
                     if (onlyvideo != 0)
                     {
-                        ptr += pkt.size;
-                        len -= pkt.size;
+                        ptr += pkt->size;
+                        len -= pkt->size;
                         continue;
                     }
 
@@ -722,7 +758,7 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                         continue;
                     }
 
-                    temppts = (long long)((double)pkt.pts * ptsmultiplier); 
+                    temppts = (long long)((double)pkt->pts * ptsmultiplier); 
 
                     if (lastapts != temppts && temppts > 0 && validvpts)
                     {
@@ -741,8 +777,8 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                 {
                     if (onlyvideo < 0)
                     {
-                        ptr += pkt.size;
-                        len -= pkt.size;
+                        ptr += pkt->size;
+                        len -= pkt->size;
                         continue;
                     }
 
@@ -797,10 +833,10 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                         mpa_pic.pict_type == FF_P_TYPE)
                     {
                         long long newvpts = 0;
-                        if (pkt.pts > 0)
+                        if (pkt->pts > 0)
                         {
                             validvpts = true;
-                            newvpts = (long long)((double)pkt.pts * 
+                            newvpts = (long long)((double)pkt->pts * 
                                                   ptsmultiplier); 
                         }
                         else if (context->codec_id == CODEC_ID_MPEG1VIDEO)
@@ -837,8 +873,11 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
             frame_decoded = 1;
         }
         
-        av_free_packet(&pkt);
+        av_free_packet(pkt);
     }                    
+
+    if (pkt)
+        delete pkt;
 
     m_parent->SetFramesPlayed(framesPlayed);
 }

@@ -12,7 +12,8 @@ class DecoderBase
                                              exactseeks = false;
                                              livetv = false;
                                              watchingrecording = false;
-                                             nvr_enc = NULL; }
+                                             nvr_enc = NULL;
+                                             lowbuffers = false; }
     virtual ~DecoderBase() { }
 
     virtual void Reset(void) = 0;
@@ -24,6 +25,8 @@ class DecoderBase
     void setLiveTVMode(bool live) { livetv = live; }
     void setWatchingRecording(bool mode) { watchingrecording = mode; }
     void setRecorder(RemoteEncoder *recorder) { nvr_enc = recorder; }
+
+    void setLowBuffers(void) { lowbuffers = true; }
 
     virtual void GetFrame(int onlyvideo) = 0;
     
@@ -51,6 +54,8 @@ class DecoderBase
     bool livetv;
     bool watchingrecording;
     RemoteEncoder *nvr_enc;
+
+    bool lowbuffers;
 };
 
 #endif
