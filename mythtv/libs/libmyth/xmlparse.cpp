@@ -696,6 +696,7 @@ void XMLParse::parseContainer(QDomElement &element, QString &newname, int &conte
             {
                 area = parseRect(getFirstText(info));
                 normalizeRect(area);
+                container->SetAreaRect(area);
             }
             else if (info.tagName() == "bar")
             {
@@ -715,7 +716,7 @@ void XMLParse::parseContainer(QDomElement &element, QString &newname, int &conte
     if (context != -1)
         container->SetContext(context);
 
-    container->SetAreaRect(area);
+//    container->SetAreaRect(area);
     allTypes->push_back(container);
 }
 
@@ -839,6 +840,7 @@ void XMLParse::parseTextArea(LayerSet *container, QDomElement &element)
     }
     align = "";
     text->SetParent(container);
+    text->calculateScreenArea();
     container->AddType(text);
 }
 
@@ -1438,6 +1440,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
     }
     mtl->setHighlightImage(select_img);
     mtl->makeHighlights();
+    mtl->calculateScreenArea();
     container->AddType(mtl);
 }
 
@@ -1565,6 +1568,7 @@ void XMLParse::parsePushButton(LayerSet *container, QDomElement &element)
     pbt->setPosition(pos);
     pbt->SetOrder(order.toInt());
     pbt->SetParent(container);
+    pbt->calculateScreenArea();
     container->AddType(pbt);
 }
 
@@ -1704,6 +1708,7 @@ void XMLParse::parseTextButton(LayerSet *container, QDomElement &element)
     tbt->setFont(testfont);
     tbt->SetOrder(order.toInt());
     tbt->SetParent(container);
+    tbt->calculateScreenArea();
     container->AddType(tbt);
 }
 

@@ -65,8 +65,9 @@ MythThemedDialog::MythThemedDialog(QString window_name,
                                    QString theme_filename,
                                    QWidget *parent,
                                    const char* name)
-                : MythDialog(parent, name, Qt::WRepaintNoErase)
+                : MythDialog(parent, name)
 {
+    setWFlags(Qt::WRepaintNoErase); //  widgets draw themselves completely
     context = 0;
     my_containers.clear();
     widget_with_current_focus = NULL;
@@ -257,8 +258,6 @@ void MythThemedDialog::updateForeground()
 
 void MythThemedDialog::updateForeground(const QRect &r)
 {
-
-    
     //
     //  Debugging
     //
@@ -280,9 +279,6 @@ void MythThemedDialog::updateForeground(const QRect &r)
     //  and then BitBlt it over
     //
 
-//    my_foreground = my_background;
-//    my_foreground.fill(this, 0, 0);
-//    my_foreground = my_background;
     QPainter whole_dialog_painter(&my_foreground);
     
     QPtrListIterator<LayerSet> an_it(my_containers);
@@ -324,12 +320,9 @@ void MythThemedDialog::updateForeground(const QRect &r)
 
 
             // 
-            //  is 9 layers hardcoded somewhere?
-            //  the container should probably be keeping
-            //  track of how many layers it has on it's own
-            //
+            //  Loop over the draworder layers
             
-            for(int i = 0; i < 9; i++)
+            for(int i = 0; i <= looper->getLayers(); i++)
             {
                 looper->Draw(&offscreen_painter, i, -1);
             }

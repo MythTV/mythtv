@@ -54,7 +54,7 @@ class MythThemedDialog : public MythDialog
     virtual void parseContainer(QDomElement &);
     virtual void parseFont(QDomElement &);
     virtual void parsePopup(QDomElement &);
-    
+
     
     //
     //  Methods to get pointers to dynamically created

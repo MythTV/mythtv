@@ -13,6 +13,7 @@ LayerSet::LayerSet(const QString &name)
     m_name = name;
     m_context = -1;
     m_debug = false;
+    numb_layers = -1;
     allTypes = new vector<UIType *>;
 }
 
@@ -34,6 +35,7 @@ void LayerSet::AddType(UIType *type)
     typeList[type->Name()] = type;
     allTypes->push_back(type);
     type->SetParent(this);
+    bumpUpLayers(type->getOrder());
 }
 
 UIType *LayerSet::GetType(const QString &name)
@@ -43,6 +45,14 @@ UIType *LayerSet::GetType(const QString &name)
         ret = typeList[name];
 
     return ret;
+}
+
+void LayerSet::bumpUpLayers(int a_number)
+{
+    if(a_number > numb_layers)
+    {
+        numb_layers = a_number;
+    }
 }
 
 void LayerSet::Draw(QPainter *dr, int drawlayer, int context)
@@ -72,6 +82,7 @@ UIType::UIType(const QString &name)
     m_order = -1;
     has_focus = false;
     takes_focus = false;
+    screen_area = QRect(0,0,0,0);
 }
 
 UIType::~UIType()
@@ -100,6 +111,7 @@ bool UIType::takeFocus()
     if(takes_focus)
     {
         has_focus = true;
+        refresh();
         return true;
     }
     has_focus = false;
@@ -109,8 +121,18 @@ bool UIType::takeFocus()
 void UIType::looseFocus()
 {
     has_focus = false;
+    refresh();
 }
 
+void UIType::calculateScreenArea()
+{
+    screen_area = QRect(0,0,0,0);
+}
+
+void UIType::refresh()
+{
+    emit requestUpdate(screen_area);
+}
 
 
 // **************************************************************
@@ -1309,17 +1331,7 @@ UITextType::~UITextType()
 void UITextType::SetText(const QString &text)
 {
     m_message = text;
-    if(!m_parent)
-    {
-        cerr << "uitypes.o: Going to be hard to request an update without a parent" << endl;
-        return;
-    }
-
-    QRect redraw_coords = m_displaysize;
-    redraw_coords.moveBy(m_parent->GetAreaRect().left(),
-                         m_parent->GetAreaRect().top());
-
-    emit requestUpdate(redraw_coords);
+    refresh();
 }
 
 void UITextType::Draw(QPainter *dr, int drawlayer, int context)
@@ -1419,6 +1431,15 @@ QString UITextType::cutDown(QString info, QFont *testFont, int maxwidth, int max
 
 }
 
+void UITextType::calculateScreenArea()
+{
+    QRect r = m_displaysize;
+    r.moveBy(m_parent->GetAreaRect().left(),
+             m_parent->GetAreaRect().top());
+    screen_area = r;
+}
+
+
 // ******************************************************************
 
 UIStatusBarType::UIStatusBarType(QString &name, QPoint loc, int dorder)
@@ -1464,25 +1485,17 @@ GenericTree::GenericTree(const QString a_string)
     my_string = a_string;
 }
 
-GenericTree::GenericTree(int an_int)
-{
-    init();
-    my_int = an_int;
-}
-
-GenericTree::GenericTree(QString a_string, QString a_type, int an_int)
+GenericTree::GenericTree(QString a_string, int an_int)
 {
     init();
     my_string = a_string;
-    my_type = a_type;
     my_int = an_int;
 }
 
-GenericTree::GenericTree(QString a_string, QString a_type, int an_int, bool selectable_flag)
+GenericTree::GenericTree(QString a_string, int an_int, bool selectable_flag)
 {
     init();
     my_string = a_string;
-    my_type = a_type;
     my_int = an_int;
     selectable = selectable_flag;
 }
@@ -1491,12 +1504,20 @@ void GenericTree::init()
 {
     my_parent = NULL;
     my_string = "";
-    my_type = "";
     my_stringlist.clear();
     my_int = 0;
     my_subnodes.clear();
+    my_ordered_subnodes.clear();
+    current_ordering_index = -1;
     selectable = false;
     //my_subnodes.setAutoDelete(true);
+    
+    //
+    //  Use 4 here, because we know that's what 
+    //  mythmusic wants (limits resizing)
+    //
+    
+    my_attributes = new IntVector(4);
 }
 
 GenericTree* GenericTree::addNode(QString a_string)
@@ -1504,6 +1525,7 @@ GenericTree* GenericTree::addNode(QString a_string)
     GenericTree *new_node = new GenericTree(a_string);
     new_node->setParent(this);
     my_subnodes.append(new_node);
+    my_ordered_subnodes.append(new_node);
 
     return new_node;
 }
@@ -1514,27 +1536,18 @@ GenericTree* GenericTree::addNode(QString a_string, int an_int)
     new_node->setInt(an_int);
     new_node->setParent(this);
     my_subnodes.append(new_node);
+    my_ordered_subnodes.append(new_node);
     return new_node;
 }
 
-GenericTree* GenericTree::addNode(QString a_string, QString a_type, int an_int)
+GenericTree* GenericTree::addNode(QString a_string, int an_int, bool selectable_flag)
 {
     GenericTree *new_node = new GenericTree(a_string);
     new_node->setInt(an_int);
-    new_node->setType(a_type);
-    new_node->setParent(this);
-    my_subnodes.append(new_node);
-    return new_node;
-}
-
-GenericTree* GenericTree::addNode(QString a_string, QString a_type, int an_int, bool selectable_flag)
-{
-    GenericTree *new_node = new GenericTree(a_string);
-    new_node->setInt(an_int);
-    new_node->setType(a_type);
     new_node->setParent(this);
     new_node->setSelectable(selectable_flag);
     my_subnodes.append(new_node);
+    my_ordered_subnodes.append(new_node);
     return new_node;
 }
 
@@ -1642,11 +1655,35 @@ int GenericTree::getChildPosition(GenericTree *which_child)
     return my_subnodes.findRef(which_child);
 }
 
+int GenericTree::getChildPosition(GenericTree *which_child, int ordering_index)
+{
+    if(current_ordering_index != ordering_index)
+    {
+        reorderSubnodes(ordering_index);
+        current_ordering_index = ordering_index;
+    }
+    return my_ordered_subnodes.findRef(which_child);
+}
+
 int GenericTree::getPosition()
 {
     if(my_parent)
     {
         return my_parent->getChildPosition(this);
+    }
+    return 0;
+}
+
+int GenericTree::getPosition(int ordering_index)
+{
+    if(my_parent)
+    {
+        if(my_parent->getOrderingIndex() != ordering_index)
+        {
+            my_parent->reorderSubnodes(ordering_index);
+            my_parent->setOrderingIndex(ordering_index);
+        }
+        return my_parent->getChildPosition(this, ordering_index);
     }
     return 0;
 }
@@ -1672,7 +1709,7 @@ void GenericTree::printTree(int margin)
     //  recurse through my children
     //
 
-    QPtrListIterator<GenericTree> it( my_subnodes );
+    QPtrListIterator<GenericTree> it( my_ordered_subnodes );
     GenericTree *my_kids;
     while( (my_kids = it.current()) != 0)
     {
@@ -1683,12 +1720,27 @@ void GenericTree::printTree(int margin)
 
 GenericTree* GenericTree::getChildAt(uint reference)
 {
-    if(reference >= my_subnodes.count())
+    if(reference >= my_ordered_subnodes.count())
     {
         cerr << "uitypes.o: out of bounds request to GenericTree::getChildAt()" << endl;
         return NULL;
     }
     return my_subnodes.at(reference);
+}
+
+GenericTree* GenericTree::getChildAt(uint reference, int ordering_index)
+{
+    if(reference >= my_ordered_subnodes.count())
+    {
+        cerr << "uitypes.o: out of bounds request to GenericTree::getChildAt()" << endl;
+        return NULL;
+    }
+    if(ordering_index != current_ordering_index)
+    {
+        reorderSubnodes(ordering_index);
+        current_ordering_index = ordering_index;
+    }
+    return my_ordered_subnodes.at(reference);
 }
 
 GenericTree* GenericTree::prevSibling(int number_up)
@@ -1717,6 +1769,32 @@ GenericTree* GenericTree::prevSibling(int number_up)
     return my_parent->getChildAt(my_position - number_up);
 }
 
+GenericTree* GenericTree::prevSibling(int number_up, int ordering_index)
+{
+
+    if(!my_parent)
+    {
+        //  
+        //  I'm root = no siblings
+        //
+        
+        return NULL;
+    }
+
+    int my_position = my_parent->getChildPosition(this, ordering_index);
+
+    if(my_position < number_up)
+    {
+        //
+        //  not enough siblings "above" me
+        //
+        
+        return NULL;
+    }
+    
+    return my_parent->getChildAt(my_position - number_up, ordering_index);
+}
+
 GenericTree* GenericTree::nextSibling(int number_down)
 {
     if(!my_parent)
@@ -1742,6 +1820,31 @@ GenericTree* GenericTree::nextSibling(int number_down)
     return my_parent->getChildAt(my_position + number_down);
 }
 
+GenericTree* GenericTree::nextSibling(int number_down, int ordering_index)
+{
+    if(!my_parent)
+    {
+        //  
+        //  I'm root = no siblings
+        //
+        
+        return NULL;
+    }
+
+    int my_position = my_parent->getChildPosition(this, ordering_index);
+
+    if(my_position + number_down >= my_parent->childCount())
+    {
+        //
+        //  not enough siblings "below" me
+        //
+        
+        return NULL;
+    }
+    
+    return my_parent->getChildAt(my_position + number_down, ordering_index);
+}
+
 GenericTree* GenericTree::getParent()
 {
     if(my_parent)
@@ -1749,6 +1852,41 @@ GenericTree* GenericTree::getParent()
         return my_parent;
     }
     return NULL;
+}
+
+void GenericTree::setAttribute(uint attribute_position, int value_of_attribute)
+{
+    //
+    //  You can use attibutes for anything you like.
+    //  Mythmusic, for example, stores a value for 
+    //  random ordering in the first "column" (0) and
+    //  a value for "intelligent" (1) ordering in the 
+    //  second column
+    //
+    
+    if(my_attributes->size() < attribute_position + 1)
+    {
+        my_attributes->resize(attribute_position + 1, -1);
+    }
+    my_attributes->at(attribute_position) = value_of_attribute;
+}
+
+void GenericTree::reorderSubnodes(int ordering_index)
+{
+    //
+    //  The nodes are there, we just want to re-order them
+    //  according to attribute column defined by
+    //  ordering_index
+    //
+
+    ordering_index = ordering_index;
+
+    for(uint i = 0; i < my_ordered_subnodes.count() - 1;)
+    {
+        cout << my_ordered_subnodes.at(i)->getString() << endl;
+        ++i;
+    }
+
 }
 
 GenericTree::~GenericTree()
@@ -1762,11 +1900,13 @@ UIManagedTreeListType::UIManagedTreeListType(const QString & name)
 {
     bins = 0;
     bin_corners.clear();
+    screen_corners.clear();
     my_tree_data = NULL;
     current_node = NULL;
     active_node = NULL;
     m_justification = (Qt::AlignLeft | Qt::AlignVCenter);
     active_bin = 0;
+    tree_order = -1;
 }
 
 UIManagedTreeListType::~UIManagedTreeListType()
@@ -1825,7 +1965,7 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
                 {
                     if(hotspot_node->childCount() > 0)
                     {
-                        hotspot_node = hotspot_node->getChildAt(0);
+                        hotspot_node = hotspot_node->getChildAt(0, tree_order);
                     }
                     else
                     {
@@ -1864,7 +2004,7 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
                 //  (beginning of list, end of list, etc.)
                 //
                 
-                int position_in_list = hotspot_node->getPosition();
+                int position_in_list = hotspot_node->getPosition(tree_order);
                 int number_in_list = hotspot_node->siblingCount();
     
                 int number_of_slots = 0;
@@ -1950,7 +2090,7 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
             int still_yet_another_y_location = y_location - QFontMetrics(tmpfont->face).height();
             while (still_yet_another_y_location - QFontMetrics(tmpfont->face).height() > bin_corners[i].top())
             {
-                GenericTree *above = hotspot_node->prevSibling(numb_above);
+                GenericTree *above = hotspot_node->prevSibling(numb_above, tree_order);
                 if(above)
                 {
                     if(i == active_bin)
@@ -1990,7 +2130,7 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
             y_location += QFontMetrics(tmpfont->face).height();
             while (y_location < bin_corners[i].bottom())
             {
-                GenericTree *below = hotspot_node->nextSibling(numb_below);
+                GenericTree *below = hotspot_node->nextSibling(numb_below, tree_order);
                 if(below)
                 {
                     if(i == active_bin)
@@ -2101,7 +2241,7 @@ void UIManagedTreeListType::moveToNode(QValueList<int> route_of_branches)
         current_node = my_tree_data->findLeaf();
     }
     active_node = current_node;
-    emit nodeSelected(current_node->getType(), current_node->getInt());
+    emit nodeSelected(current_node->getInt(), current_node->getAttributes());
 }
 
 void UIManagedTreeListType::assignTreeData(GenericTree *a_tree)
@@ -2134,9 +2274,9 @@ void UIManagedTreeListType::makeHighlights()
 {
     resized_highlight_images.clear();
     highlight_map.clear();
+
     //
-    //  Draw the highlight pixmap
-    //  NB: should be resizing this elsewhere
+    //  (pre-)Draw the highlight pixmaps
     //
 
     for(int i = 1; i <= bins; i++)
@@ -2172,24 +2312,14 @@ bool UIManagedTreeListType::popUp()
     {
         --active_bin;
         current_node = current_node->getParent();
-        emit nodeEntered(current_node->getType(), current_node->getInt());
+        emit nodeEntered(current_node->getInt(), current_node->getAttributes());
     }
     else if(active_bin < bins)
     {
         ++active_bin;
     }
-
-
-    QRect redraw_coords = bin_corners[2];
-    redraw_coords.moveBy(area.left(),area.top());
-    emit requestUpdate(redraw_coords);
-
-    redraw_coords = bin_corners[1];
-    redraw_coords.moveBy(area.left(),area.top());
-    emit requestUpdate(redraw_coords);
-
+    refresh();
     return true;
-
 }
 
 bool UIManagedTreeListType::pushDown()
@@ -2210,21 +2340,14 @@ bool UIManagedTreeListType::pushDown()
     {
         ++active_bin;
         current_node = current_node->getChildAt(0);
-        emit nodeEntered(current_node->getType(), current_node->getInt());
+        emit nodeEntered(current_node->getInt(), current_node->getAttributes());
     }
     else if(active_bin > 1)
     {
         --active_bin;
     }
 
-    QRect redraw_coords = bin_corners[2];
-    redraw_coords.moveBy(area.left(),area.top());
-    emit requestUpdate(redraw_coords);
-
-    redraw_coords = bin_corners[1];
-    redraw_coords.moveBy(area.left(),area.top());
-    emit requestUpdate(redraw_coords);
-    
+    refresh();    
     return true;
 }
 
@@ -2242,12 +2365,9 @@ bool UIManagedTreeListType::moveUp()
         current_node = new_node;
         for(int i = active_bin; i <= bins; i++)
         {
-
-            QRect redraw_coords = bin_corners[i];
-            redraw_coords.moveBy(area.left(),area.top());
-            emit requestUpdate(redraw_coords);
+            emit requestUpdate(screen_corners[i]);
         }
-        emit nodeEntered(current_node->getType(), current_node->getInt());
+        emit nodeEntered(current_node->getInt(), current_node->getAttributes());
         return true;
     }
     return false;
@@ -2267,11 +2387,9 @@ bool UIManagedTreeListType::moveDown()
         current_node = new_node;
         for(int i = active_bin; i <= bins; i++)
         {
-            QRect redraw_coords = bin_corners[i];
-            redraw_coords.moveBy(area.left(),area.top());
-            emit requestUpdate(redraw_coords);
+            emit requestUpdate(screen_corners[i]);
         }
-        emit nodeEntered(current_node->getType(), current_node->getInt());
+        emit nodeEntered(current_node->getInt(), current_node->getAttributes());
         return true;
     }
     return false;
@@ -2284,8 +2402,8 @@ void UIManagedTreeListType::select()
         if(current_node->isSelectable())
         {
             active_node = current_node;
-            emit requestUpdate(area);
-            emit nodeSelected(current_node->getType(), current_node->getInt());
+            emit requestUpdate(screen_corners[active_bin]);
+            emit nodeSelected(current_node->getInt(), current_node->getAttributes());
         }
     }
 }
@@ -2294,8 +2412,8 @@ void UIManagedTreeListType::activate()
 {
     if(active_node)
     {
-        emit requestUpdate(area);
-        emit nodeSelected(active_node->getType(), active_node->getInt());
+        emit requestUpdate(screen_corners[active_bin]);
+        emit nodeSelected(active_node->getInt(), active_node->getAttributes());
     }
 }
 
@@ -2307,7 +2425,7 @@ bool UIManagedTreeListType::nextActive()
         if(test_node)
         {
             active_node = test_node;
-            emit requestUpdate(area);
+            emit requestUpdate(screen_corners[active_bin]);
             return true;
         }
     }
@@ -2322,11 +2440,32 @@ bool UIManagedTreeListType::prevActive()
         if(test_node)
         {
             active_node = test_node;
-            emit requestUpdate(area);
+            emit requestUpdate(screen_corners[active_bin]);
             return true;
         }
     }
     return false;
+}
+
+void UIManagedTreeListType::syncCurrentWithActive()
+{
+    current_node = active_node;
+    requestUpdate();
+}
+
+void UIManagedTreeListType::calculateScreenArea()
+{
+    int i = 0;
+    CornerMap::Iterator it;
+    for ( it = bin_corners.begin(); it != bin_corners.end(); ++it )
+    {
+        QRect r = (*it);
+        r.moveBy(m_parent->GetAreaRect().left(),
+                 m_parent->GetAreaRect().top());
+        ++i;
+        screen_corners[i] = r;
+    }
+    screen_area = area;
 }
 
 
@@ -2374,30 +2513,53 @@ void UIPushButtonType::Draw(QPainter *p, int drawlayer, int context)
 
 void UIPushButtonType::push()
 {
+    if(currently_pushed)
+    {
+        return;
+    }
     currently_pushed = true;
     push_timer.start(300, TRUE);
-    QRect redraw_coords = QRect(    m_displaypos.x(),
-                                    m_displaypos.y(),
-                                    off_pixmap.width(),
-                                    off_pixmap.height());
-    redraw_coords.moveBy(m_parent->GetAreaRect().left(),
-                         m_parent->GetAreaRect().top());
-
-    emit requestUpdate(redraw_coords);
+    refresh();
     emit pushed();
 }
 
 void UIPushButtonType::unPush()
 {
     currently_pushed = false;    
-    QRect redraw_coords = QRect(    m_displaypos.x(),
-                                    m_displaypos.y(),
-                                    off_pixmap.width(),
-                                    off_pixmap.height());
-    redraw_coords.moveBy(m_parent->GetAreaRect().left(),
-                         m_parent->GetAreaRect().top());
+    refresh();
+}
 
-    emit requestUpdate(redraw_coords);
+void UIPushButtonType::calculateScreenArea()
+{
+    int x, y, width, height;
+    
+    x  = m_displaypos.x();
+    x += m_parent->GetAreaRect().left();
+
+    y  = m_displaypos.y();
+    y += m_parent->GetAreaRect().top();
+
+    width = off_pixmap.width();
+    if(on_pixmap.width() > width)
+    {
+        width = on_pixmap.width();
+    }
+    if(pushed_pixmap.width() > width)
+    {
+        width = pushed_pixmap.width();
+    }
+
+    height = off_pixmap.height();
+    if(on_pixmap.height() > height)
+    {
+        height = on_pixmap.height();
+    }
+    if(pushed_pixmap.height() > height)
+    {
+        height = pushed_pixmap.height();
+    }
+    
+    screen_area = QRect(x, y, width, height);
 }
 
 // ********************************************************************
@@ -2453,48 +2615,58 @@ void UITextButtonType::Draw(QPainter *p, int drawlayer, int context)
 
 void UITextButtonType::push()
 {
+    if(currently_pushed)
+    {
+        return;
+    }
     currently_pushed = true;
     push_timer.start(300, TRUE);
-    QRect redraw_coords = QRect(    m_displaypos.x(),
-                                    m_displaypos.y(),
-                                    off_pixmap.width(),
-                                    off_pixmap.height());
-    redraw_coords.moveBy(m_parent->GetAreaRect().left(),
-                         m_parent->GetAreaRect().top());
-
-    emit requestUpdate(redraw_coords);
+    refresh();
     emit pushed();
 }
 
 void UITextButtonType::unPush()
 {
     currently_pushed = false;    
-    QRect redraw_coords = QRect(    m_displaypos.x(),
-                                    m_displaypos.y(),
-                                    off_pixmap.width(),
-                                    off_pixmap.height());
-    redraw_coords.moveBy(m_parent->GetAreaRect().left(),
-                         m_parent->GetAreaRect().top());
-
-    emit requestUpdate(redraw_coords);
+    refresh();
 }
 
 void UITextButtonType::setText(const QString some_text)
 {
     m_text = some_text;
+    refresh();
+}
+
+void UITextButtonType::calculateScreenArea()
+{
+    int x, y, width, height;
     
-    if(!m_parent)
+    x  = m_displaypos.x();
+    x += m_parent->GetAreaRect().left();
+
+    y  = m_displaypos.y();
+    y += m_parent->GetAreaRect().top();
+
+    width = off_pixmap.width();
+    if(on_pixmap.width() > width)
     {
-        cerr << "uitypes.o: Going to be hard to request an update without a parent" << endl;
-        return;
+        width = on_pixmap.width();
+    }
+    if(pushed_pixmap.width() > width)
+    {
+        width = pushed_pixmap.width();
     }
 
-    QRect redraw_coords = QRect(    m_displaypos.x(),
-                                    m_displaypos.y(),
-                                    off_pixmap.width(),
-                                    off_pixmap.height());
-    redraw_coords.moveBy(m_parent->GetAreaRect().left(),
-                         m_parent->GetAreaRect().top());
-
-    emit requestUpdate(redraw_coords);
+    height = off_pixmap.height();
+    if(on_pixmap.height() > height)
+    {
+        height = on_pixmap.height();
+    }
+    if(pushed_pixmap.height() > height)
+    {
+        height = pushed_pixmap.height();
+    }
+    
+    screen_area = QRect(x, y, width, height);
 }
+
