@@ -289,7 +289,11 @@ bool CustomRecord::checkSyntax(void)
     else
     {
         msg = tr("An error was found when checking") + ":\n\n";
+#if QT_VERSION >= 0x030200
         msg += query.executedQuery();
+#else
+        msg += query.lastQuery();
+#endif
         msg += "\n\n" + tr("The database error was") + ":\n";
         msg += query.lastError().databaseText();
 
