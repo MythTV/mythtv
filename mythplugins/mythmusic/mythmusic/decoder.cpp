@@ -218,7 +218,7 @@ void Decoder::getMetadataFromFilename(const QString filename,
             s_tmp.replace(QRegExp(QString(" .*"), FALSE), QString(""));
             tracknum = s_tmp.toInt();
             title = part_str;
-            title.replace(QRegExp(QString("^[0-9][0-9] "), FALSE),
+            title.replace(QRegExp(QString("^[0-9][0-9]? "), FALSE),
                           QString(""));
             title = title.simplifyWhiteSpace();
         }

@@ -349,7 +349,12 @@ void Ripper::handleFileTokens(QString &filename, Metadata *track)
         else if ((tokens[i] == "ALBUM") && (track->Album() != ""))
             fileparts += track->Album();
         else if ((tokens[i] == "TRACK") && (track->Track() >= 0))
-            fileparts += QString::number(track->Track(), 10);
+        {
+            QString tempstr = QString::number(track->Track(), 10);
+            if (track->Track() < 10)
+                tempstr.prepend('0');
+            fileparts += tempstr;
+        }
         else if ((tokens[i] == "TITLE") && (track->Title() != ""))
             fileparts += track->Title();
         else if ((tokens[i] == "YEAR") && (track->Year() >= 0))
