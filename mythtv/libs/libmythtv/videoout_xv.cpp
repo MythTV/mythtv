@@ -210,8 +210,8 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
     // if non-XV mode then run full-screen
     if ( xv_port == -1 )
     {
-        curx = 0;
-        cury = 0;
+        curx = XJ_screenx;
+        cury = XJ_screeny;
         curw = XJ_screenwidth;
         curh = XJ_screenheight;
     }
