@@ -10,7 +10,7 @@
         $SIG{'QUIT'} = sub { print "\n"; exit; };
     # Annoy people running as root
         if ($< < 1) {
-            print "You are running nuvexport as root -- this is not advised.\n";
+            print "You are running nuvexport as root -- this is not advised.\nPress ENTER if you really want to do this.\n";
             <>;
         }
     }
