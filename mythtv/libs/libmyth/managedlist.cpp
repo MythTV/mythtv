@@ -363,6 +363,7 @@ void SelectManagedListItem::cursorRight()
         curItem = 1;
     
     text = getCurItemText();
+    valueText = getCurItemValue();
     
     changed();
 }
@@ -374,6 +375,7 @@ void SelectManagedListItem::cursorLeft()
         curItem =  itemCount - 1;
     
     text = getCurItemText();
+    valueText = getCurItemValue();
     changed();
 }
         
@@ -403,7 +405,7 @@ void SelectManagedListItem::select(const QString& newValue, bool bValue)
     {
         curItem = index;
         text = getCurItemText();
-        setValue(getCurValue());
+        setValue(getCurItemValue());
     }
     else
     {

@@ -235,7 +235,7 @@ class ManagedListGroup : public ManagedListItem
         ManagedListItem* getItem(int index) { return itemList.at(index); }
         ManagedListItem* getCurItem() { return itemList.at(curItem); }
         
-        const QString& getCurValue() { return getItemValue(curItem); }
+        const QString& getCurItemValue() { return getItemValue(curItem); }
         const QString& getItemValue(int which) { return getItem(which)->getValue(); }
         
         const QString& getCurItemText() { return getItemText(curItem); }
@@ -327,66 +327,70 @@ class SelectManagedListItem : public ManagedListGroup
 
 class ManagedListSetting: public SimpleDBStorage
 {
+    Q_OBJECT
+    
     protected:
         ManagedListSetting(QString _table, QString _column, ManagedList* _parentList=NULL):
             SimpleDBStorage(_table, _column ),
             parentList(_parentList) {
             listItem = NULL;
         };
-
+        
+        ManagedList* parentList;
+        ManagedListItem* listItem;
     
-
+    public slots:
+        void itemChanged(ManagedListItem* itm) { syncDBFromItem(); }
     
-    ManagedList* parentList;
-    ManagedListItem* listItem;
     
-public:
-    virtual void load(QSqlDatabase* db) {
-        SimpleDBStorage::load(db);
-        syncItemFromDB();
-    }
     
-    virtual void setValue(int val) {setValue(QString::number(val));} 
-    
-    virtual void setValue(const QString& val) { 
-        if(listItem) 
-        {
-            listItem->setValue(val); 
-            syncDBFromItem();
-        }
-        else
-        {
-            SimpleDBStorage::setValue(val);
-        }
-    }
-    
-    virtual const QString getValue() { 
-        if(listItem) 
-        {
-            syncDBFromItem();
-            return listItem->getValue(); 
-        }
-        else
-        {
-            return SimpleDBStorage::getValue();
+    public:
+        virtual void load(QSqlDatabase* db) {
+            SimpleDBStorage::load(db);
+            syncItemFromDB();
         }
         
-    }
-    
-    virtual void syncDBFromItem() 
-    { 
-        if(listItem) 
-            SimpleDBStorage::setValue(listItem->getValue());
-    }
-    
-    virtual void syncItemFromDB() 
-    { 
-        if(listItem) 
-            listItem->setValue(settingValue);
-    }
-    
-    ManagedListItem* getItem() { return listItem; }
-    operator ManagedListItem*() { return listItem; }
+        virtual void setValue(int val) {setValue(QString::number(val));} 
+        
+        virtual void setValue(const QString& val) { 
+            if(listItem) 
+            {
+                listItem->setValue(val); 
+                syncDBFromItem();
+            }
+            else
+            {
+                SimpleDBStorage::setValue(val);
+            }
+        }
+        
+        virtual const QString getValue() { 
+            if(listItem) 
+            {
+                syncDBFromItem();
+                return listItem->getValue(); 
+            }
+            else
+            {
+                return SimpleDBStorage::getValue();
+            }
+            
+        }
+        
+        virtual void syncDBFromItem() 
+        { 
+            if(listItem) 
+                SimpleDBStorage::setValue(listItem->getValue());
+        }
+        
+        virtual void syncItemFromDB() 
+        { 
+            if(listItem) 
+                listItem->setValue(settingValue);
+        }
+        
+        ManagedListItem* getItem() { return listItem; }
+        operator ManagedListItem*() { return listItem; }
 };
 
 
@@ -399,6 +403,8 @@ class SelectManagedListSetting : public ManagedListSetting
         {
             constructListItem(QObject::tr(listText), _group, _parentList, listName);
             listItem = selectItem;
+            
+            connect(listItem, SIGNAL(changed(ManagedListItem*)), this, SLOT(itemChanged(ManagedListItem*)));
         }
     
         SelectManagedListItem* selectItem;
@@ -451,6 +457,7 @@ class BoolManagedListSetting : public ManagedListSetting
             boolListItem = new BoolManagedListItem(false, _parentList, this, ItemName);
             listItem = boolListItem;
             boolListItem->setLabels(QObject::tr(trueText), QObject::tr(falseText));
+            connect(listItem, SIGNAL(changed(ManagedListItem*)), this, SLOT(itemChanged(ManagedListItem*)));
         }
     
         operator BoolManagedListItem* () { return boolListItem; }
@@ -468,6 +475,7 @@ class IntegerManagedListSetting : public ManagedListSetting
         {
             IntegerListItem = new IntegerManagedListItem(stepAmt, _parentList, this, ItemName);
             listItem = IntegerListItem;
+            connect(listItem, SIGNAL(changed(ManagedListItem*)), this, SLOT(itemChanged(ManagedListItem*)));
         }
     
         operator IntegerManagedListItem* () { return IntegerListItem; }
@@ -496,6 +504,7 @@ class BoundedIntegerManagedListSetting : public ManagedListSetting
         {
             BoundedIntegerListItem = new BoundedIntegerManagedListItem(_min, _max, stepAmt, _parentList, this, ItemName);
             listItem = BoundedIntegerListItem;
+            connect(listItem, SIGNAL(changed(ManagedListItem*)), this, SLOT(itemChanged(ManagedListItem*)));
         }
     
         operator BoundedIntegerManagedListItem* () { return BoundedIntegerListItem; }
