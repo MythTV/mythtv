@@ -34,6 +34,7 @@ gsmCodec::gsmCodec() : codec()
 {
     gsmEncData = gsm_create();
     gsmDecData = gsm_create();
+    gsmMicrosoftCompatability = false;
 }
 
 gsmCodec::~gsmCodec()
@@ -54,6 +55,26 @@ int gsmCodec::Encode(short *In, unsigned char *Out, int Samples, short &maxPower
 
 int gsmCodec::Decode(unsigned char *In, short *Out, int Len, short &maxPower)
 {
+    if (Len == 65)
+    {
+        // Microsoft chose an alternative coding method which creates 40ms samples
+        // of 2x 32.5 bytes each.  We need to configure the codec to handle this then
+        // pass data in as a 33byte then a 32byte sample
+        if (!gsmMicrosoftCompatability)
+        {
+            cout << "SIP: Switching GSM decoder to Microsoft Compatability mode\n";
+            gsmMicrosoftCompatability = true;
+            int opt=1;
+            gsm_option(gsmDecData, GSM_OPT_WAV49, &opt);
+        }
+        gsm_decode(gsmDecData, In, Out);
+        gsm_decode(gsmDecData, In+33, Out+160);
+        for (int i=0;i<320;i++)
+            maxPower = QMAX(maxPower, *Out++);
+        maxPower = 0;
+        return (320*sizeof(short)); 
+    }    
+    
     if (Len != 33)
         cout << "GSM Invalid receive length " << Len << endl;
     gsm_decode(gsmDecData, In, Out);

@@ -18,7 +18,7 @@
 #define UDP_HEADER_SIZE           28
 #define	MESSAGE_SIZE              80       // bytes to send per 10ms
 #define	ULAW_BYTES_PER_MS         8        // bytes to send per 1ms
-#define MAX_COMP_AUDIO_SIZE       256      // This would equate to 30ms sample size
+#define MAX_COMP_AUDIO_SIZE       320      // This would equate to 40ms sample size
 #define MAX_DECOMP_AUDIO_SAMPLES  (MAX_COMP_AUDIO_SIZE) // CHANGE FOR HIGHER COMPRESSION CODECS; G.711 has same no. samples after decomp.
 #define PCM_SAMPLES_PER_MS        8
 

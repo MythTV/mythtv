@@ -49,6 +49,7 @@ public:
 private:
     gsm gsmEncData;
     gsm gsmDecData;
+    bool gsmMicrosoftCompatability;
 };
 
 #ifdef VA_G729
