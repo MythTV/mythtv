@@ -14,6 +14,7 @@
    <button>
       <type>TV_RECPRIORITIES</type>
       <text>Set Channel Recording Priorities</text>
+      <text lang="DE">Sender bewerten</text>
       <action>SETTINGS CHANNELRECPRIORITIES</action>
    </button>
 

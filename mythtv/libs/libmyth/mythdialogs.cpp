@@ -240,8 +240,7 @@ bool MythMainWindow::TranslateKeyPress(const QString &context,
     actions = QStringList();
     int keynum = e->key();
 
-    if (d->jumpMap.count(keynum) > 0 && d->exitmenucallback == NULL &&
-        context != "qtNoJump")
+    if (d->jumpMap.count(keynum) > 0 && d->exitmenucallback == NULL)
     {
         d->exitingtomain = true;
         d->exitmenucallback = d->jumpMap[keynum].callback;

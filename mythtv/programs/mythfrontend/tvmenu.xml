@@ -75,6 +75,7 @@
       <text lang="PT">Modo Directo de TV</text>
       <text lang="ES">TV directo</text>
       <text lang="CA">TV directe</text>
+      <text lang="DE">TV direkt</text>
       <action>EXECTV xawtv -f -device %s -dspdev %s -vbidev %s</action>
    </button>
 -->
@@ -82,6 +83,7 @@
    <button>
       <type>TV_STATUS</type>
       <text>System Status</text>
+      <text lang="DE">Systemstatus</text>
       <action>TV_STATUS</action>
    </button>
 

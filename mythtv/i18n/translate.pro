@@ -20,9 +20,9 @@ SOURCES += ../programs/mythfrontend/main.cpp
 SOURCES += ../programs/mythfrontend/manualbox.cpp
 SOURCES += ../programs/mythfrontend/manualschedule.cpp
 SOURCES += ../programs/mythfrontend/playbackbox.cpp
-SOURCES += ../programs/mythfrontend/rankprograms.cpp
+SOURCES += ../programs/mythfrontend/programrecpriority.cpp
 SOURCES += ../programs/mythfrontend/viewscheduled.cpp
-SOURCES += ../programs/mythfrontend/rankchannels.cpp
+SOURCES += ../programs/mythfrontend/channelrecpriority.cpp
 
 TRANSLATIONS  = mythfrontend_it.ts mythfrontend_es.ts mythfrontend_ca.ts
 TRANSLATIONS += mythfrontend_nl.ts mythfrontend_fr.ts mythfrontend_de.ts

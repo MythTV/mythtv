@@ -97,6 +97,7 @@
    <button>
       <type>TV_RECPRIORITIES</type>
       <text>Recording Priorities</text>
+      <text lang="DE">Sendungen bewerten</text>
       <alttext>Priorities</alttext>
       <action>TV_SET_RECPRIORITIES</action>
    </button>

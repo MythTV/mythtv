@@ -3,27 +3,27 @@
     <name>GuideGrid</name>
     <message>
         <source>Recording Once</source>
-        <translation>Grabar una vez</translation>
+        <translation type="obsolete">Grabar una vez</translation>
     </message>
     <message>
         <source>Timeslot Recording</source>
-        <translation>Grabar en esta franja horaria</translation>
+        <translation type="obsolete">Grabar en esta franja horaria</translation>
     </message>
     <message>
         <source>Channel Recording</source>
-        <translation>Grabar en el canal</translation>
+        <translation type="obsolete">Grabar en el canal</translation>
     </message>
     <message>
         <source>All Recording</source>
-        <translation>Grabar en todas partes</translation>
+        <translation type="obsolete">Grabar en todas partes</translation>
     </message>
     <message>
         <source>Not Recording</source>
-        <translation>No grabar</translation>
+        <translation type="obsolete">No grabar</translation>
     </message>
     <message>
         <source>Weekly Recording</source>
-        <translation>Grabación semanal</translation>
+        <translation type="obsolete">Grabación semanal</translation>
     </message>
 </context>
 <context>
@@ -163,7 +163,7 @@
     <name>MythContext</name>
     <message>
         <source>Connection to the master backend server timed out.  You probably should modify the Master Server setting in the setup program and set the proper IP address there.</source>
-        <translation>Tiempo de espera agotado para conectar con el backend. Probablemente debes de configurar correctamente la dirección IP.</translation>
+        <translation type="obsolete">Tiempo de espera agotado para conectar con el backend. Probablemente debes de configurar correctamente la dirección IP.</translation>
     </message>
     <message>
         <source>Could not connect to the master backend server -- is it running?  Is the IP address set for it in the setup program correct?</source>
@@ -298,6 +298,10 @@
         <source>Cancel</source>
         <translation>Cancelar</translation>
     </message>
+    <message>
+        <source>Yes; allow re-recording</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ProgFinder</name>
@@ -350,31 +354,62 @@
     <name>ProgLister</name>
     <message>
         <source>Recording just this showing</source>
-        <translation>Graba el programa solamente esta vez</translation>
+        <translation type="obsolete">Graba el programa solamente esta vez</translation>
     </message>
     <message>
         <source>Recording every day when shown in this timeslot</source>
-        <translation>Graba el programa cada dia en esta franja</translation>
+        <translation type="obsolete">Graba el programa cada dia en esta franja</translation>
     </message>
     <message>
         <source>Recording every week when shown in this timeslot</source>
-        <translation>Graba el programa cada semana en esta franja</translation>
+        <translation type="obsolete">Graba el programa cada semana en esta franja</translation>
     </message>
     <message>
         <source>Recording when shown on this channel</source>
-        <translation>Grabarlo cuando aparezca en este canal</translation>
+        <translation type="obsolete">Grabarlo cuando aparezca en este canal</translation>
     </message>
     <message>
         <source>Recording all showings</source>
-        <translation>Grabarlo siempre que aparezca</translation>
+        <translation type="obsolete">Grabarlo siempre que aparezca</translation>
     </message>
     <message>
         <source>Not recording this showing</source>
-        <translation>No grabar este programa</translation>
+        <translation type="obsolete">No grabar este programa</translation>
     </message>
     <message>
         <source>Error!</source>
-        <translation>¡ Error !</translation>
+        <translation type="obsolete">¡ Error !</translation>
+    </message>
+</context>
+<context>
+    <name>ProgramRecPriority</name>
+    <message>
+        <source>Recording just this showing</source>
+        <translation type="unfinished">Graba el programa solamente esta vez</translation>
+    </message>
+    <message>
+        <source>Recording every week</source>
+        <translation type="unfinished">Grabar cada semana</translation>
+    </message>
+    <message>
+        <source>Recording when shown in this timeslot</source>
+        <translation type="unfinished">Grabarlo cuando aparezca a esta hora</translation>
+    </message>
+    <message>
+        <source>Recording when shown on this channel</source>
+        <translation type="unfinished">Grabarlo cuando aparezca en este canal</translation>
+    </message>
+    <message>
+        <source>Recording all showings</source>
+        <translation type="unfinished">Grabarlo siempre que aparezca</translation>
+    </message>
+    <message>
+        <source>Not recording this showing</source>
+        <translation type="unfinished">No grabar este programa</translation>
+    </message>
+    <message>
+        <source>Error!</source>
+        <translation type="unfinished">¡ Error !</translation>
     </message>
 </context>
 <context>
@@ -389,7 +424,7 @@
     </message>
     <message>
         <source>Yes, Exit and shutdown the computer</source>
-        <translation>Si, salir ahora y apagar el equipo</translation>
+        <translation type="obsolete">Si, salir ahora y apagar el equipo</translation>
     </message>
     <message>
         <source>Do you really want to exit MythTV?</source>
@@ -569,7 +604,7 @@
     </message>
     <message>
         <source>Rank</source>
-        <translation>Ránking</translation>
+        <translation type="obsolete">Ránking</translation>
     </message>
     <message>
         <source>Record duplicates</source>
@@ -625,15 +660,15 @@
     </message>
     <message>
         <source>Recording Once</source>
-        <translation>Grabar una vez</translation>
+        <translation type="obsolete">Grabar una vez</translation>
     </message>
     <message>
         <source>Timeslot Recording</source>
-        <translation>Grabar en esta franja horaria</translation>
+        <translation type="obsolete">Grabar en esta franja horaria</translation>
     </message>
     <message>
         <source>Weekslot Recording</source>
-        <translation>Grabar semanalmente</translation>
+        <translation type="obsolete">Grabar semanalmente</translation>
     </message>
     <message>
         <source>Channel Recording</source>
@@ -1400,62 +1435,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use Rankings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use program rankings to resolve conflicts.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Rankings First.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use rankings to resolve conflicts before using traditional conflict resolution.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Single Recordings Rank</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Single Recordings will receive this additional ranking value.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Weekslot Recordings Rank</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Weekslot Recordings will receive this additional ranking value.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Timeslot Recordings Rank</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Timeslot Recordings will receive this additional ranking value.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Channel Recordings Rank</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Channel Recordings will receive this additional ranking value.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>All Recordings Rank</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>All Recording types will receive this additional ranking value.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Guide starts at channel</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1569,10 +1548,6 @@
     </message>
     <message>
         <source>Program Guide</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>General Ranking Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1916,36 +1891,268 @@
         <source>OK</source>
         <translation type="unfinished">OK</translation>
     </message>
+    <message>
+        <source>Recording on cardid: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not Recording: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manual Override</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previously Recorded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Currently Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Other Showing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Too Many Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Don&apos;t Record List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lower Rec Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manual Conflict</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto Conflict</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Overlap</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reason Unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Repeat</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>R</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>T</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>W</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>C</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source></source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Single Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Daily Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Weekly Recording</source>
+        <translation type="unfinished">Grabación semanal</translation>
+    </message>
+    <message>
+        <source>Conflicting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Will Record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Won&apos;t Record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Don&apos;t record it</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Never record this episode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record it anyway</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The following scheduled recordings conflict with each other.  Which would you like to record?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remember this choice and use it automatically in the future</source>
+        <translation type="unfinished">Recordar esta opción y usarla automáticamente en el futuro</translation>
+    </message>
+    <message>
+        <source>Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable AC3 to SPDIF passthrough</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable sending AC3 sound directly to your sound card&apos;s SPDIF output, on sources which contain AC3 soundtracks (usually digital TV).  Requires that the audio output device be set to something suitable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PIP Video Location</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Top Left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bottom Left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Top Right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bottom Right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Location of PIP Video window.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reverse direction in fast forward/rewind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, pressing the sticky rewind key in fast forward mode will switch to rewind mode, and vice versa.  If not set, doing so will decrease the speed in the current direction or switch to play mode if the speed can&apos;t be decreased further..</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Recording Priorities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use program recording priorities to resolve conflicts.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Priorities First.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use recording priorities to resolve conflicts before using traditional conflict resolution.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Single Recordings Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Single Recordings will receive this additional recording priority value.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Weekslot Recordings Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Weekslot Recordings will receive this additional recording priority value.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Timeslot Recordings Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Timeslot Recordings will receive this additional recording priority value.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Recordings Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Recordings will receive this additional recording priority value.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All Recordings Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All Recording types will receive this additional recording priority value.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General Recording Priorities Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, Exit and Shutdown</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RankPrograms</name>
     <message>
         <source>Recording just this showing</source>
-        <translation>Graba el programa solamente esta vez</translation>
+        <translation type="obsolete">Graba el programa solamente esta vez</translation>
     </message>
     <message>
         <source>Recording every week</source>
-        <translation>Grabar cada semana</translation>
+        <translation type="obsolete">Grabar cada semana</translation>
     </message>
     <message>
         <source>Recording when shown in this timeslot</source>
-        <translation>Grabarlo cuando aparezca a esta hora</translation>
+        <translation type="obsolete">Grabarlo cuando aparezca a esta hora</translation>
     </message>
     <message>
         <source>Recording when shown on this channel</source>
-        <translation>Grabarlo cuando aparezca en este canal</translation>
+        <translation type="obsolete">Grabarlo cuando aparezca en este canal</translation>
     </message>
     <message>
         <source>Recording all showings</source>
-        <translation>Grabarlo siempre que aparezca</translation>
+        <translation type="obsolete">Grabarlo siempre que aparezca</translation>
     </message>
     <message>
         <source>Not recording this showing</source>
-        <translation>No grabar este programa</translation>
+        <translation type="obsolete">No grabar este programa</translation>
     </message>
     <message>
         <source>Error!</source>
-        <translation>¡ Error !</translation>
+        <translation type="obsolete">¡ Error !</translation>
     </message>
 </context>
 <context>
@@ -2288,15 +2495,15 @@
     </message>
     <message>
         <source>OK</source>
-        <translation>OK</translation>
+        <translation type="obsolete">OK</translation>
     </message>
     <message>
         <source>The follow scheduled recordings conflict with each other.  Which would you like to record?</source>
-        <translation>Estas grabaciones programadas estan en conflicto entre sí. ¿Cuál quiere mantener?</translation>
+        <translation type="obsolete">Estas grabaciones programadas estan en conflicto entre sí. ¿Cuál quiere mantener?</translation>
     </message>
     <message>
         <source>Remember this choice and use it automatically in the future</source>
-        <translation>Recordar esta opción y usarla automáticamente en el futuro</translation>
+        <translation type="obsolete">Recordar esta opción y usarla automáticamente en el futuro</translation>
     </message>
     <message>
         <source>Time Conflict</source>
@@ -2315,23 +2522,11 @@
         <translation type="obsolete">Esta grabación se suspendió por la siguiente causa:</translation>
     </message>
     <message>
-        <source>Record it anyway</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Don&apos;t record it</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Important</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Recording</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
