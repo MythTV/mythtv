@@ -41,6 +41,7 @@ class MythComboBox: public QComboBox
 
   signals:
     void changeHelpText(QString);
+    void accepted(int);
     void gotFocus();
 
   public slots:

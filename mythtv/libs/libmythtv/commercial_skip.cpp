@@ -1291,85 +1291,85 @@ void CommDetect::ConvertShowMapToCommMap(QMap<long long, int>&map)
 void CommDetect::SearchForLogo(NuppelVideoPlayer *nvp, bool fullSpeed,
                                bool verbose)
 {
-	int secs = 10;
-	const int loops = 8;
-	int maxLoops = 12;
-	int loop = 0;
-	int sampleSpacing = 1;
-	int seekIncrement = (int)(sampleSpacing * 60 * fps);
-	long long seekFrame = seekIncrement;
-	long long endFrame = seekFrame + (long long)(secs * fps);
-	int counter = 0;
-	unsigned char *mask[loops];
+    int secs = 10;
+    const int loops = 8;
+    int maxLoops = 12;
+    int loop = 0;
+    int sampleSpacing = 1;
+    int seekIncrement = (int)(sampleSpacing * 60 * fps);
+    long long seekFrame = seekIncrement;
+    long long endFrame = seekFrame + (long long)(secs * fps);
+    int counter = 0;
+    unsigned char *mask[loops];
 
-        for (int i = 0; i < loops; i++)
-            mask[i] = new unsigned char[height * width];
+    for (int i = 0; i < loops; i++)
+        mask[i] = new unsigned char[height * width];
 
-	if (verbose)
-	{
-		printf( "Logo Search" );
-		fflush( stdout );
-	}
+    if (verbose)
+    {
+        printf( "Logo Search" );
+        fflush( stdout );
+    }
 
-	nvp->GetFrame(1,true);
+    nvp->GetFrame(1,true);
 
-	while(counter < loops && loop < maxLoops && !nvp->eof) 
-	{
-		nvp->JumpToFrame(seekFrame);
-		nvp->ClearAfterSeek();
+    while(counter < loops && loop < maxLoops && !nvp->eof) 
+    {
+        nvp->JumpToFrame(seekFrame);
+        nvp->ClearAfterSeek();
 
-		for (int i = 0; i < (int)(secs * fps) && !nvp->eof; i++)
-		{
-			nvp->GetFrame(1,true);
+        for (int i = 0; i < (int)(secs * fps) && !nvp->eof; i++)
+        {
+            nvp->GetFrame(1,true);
 
-			SetMinMaxPixels(nvp->videoOutput->GetLastDecodedFrame());
+            SetMinMaxPixels(nvp->videoOutput->GetLastDecodedFrame());
 
-			// sleep a little so we don't use all cpu even if we're niced
-			if (!fullSpeed)
-				usleep(10000);
-		}
+            // sleep a little so we don't use all cpu even if we're niced
+            if (!fullSpeed)
+                usleep(10000);
+        }
 
-		GetLogoMask(mask[counter]);
+        GetLogoMask(mask[counter]);
 
-		int pixelsInMask = 0;
-		for (int i = 0; i < (width * height); i++)
-			if (mask[counter][i])
-				pixelsInMask++;
+        int pixelsInMask = 0;
+        for (int i = 0; i < (width * height); i++)
+            if (mask[counter][i])
+                pixelsInMask++;
 
-		if (pixelsInMask < (int)(width * height * .10))
-			counter++;
+        if (pixelsInMask < (int)(width * height * .10))
+            counter++;
 
-		seekFrame += seekIncrement;
-		endFrame += seekIncrement;
+        seekFrame += seekIncrement;
+        endFrame += seekIncrement;
 
-		loop++;
-	}
+        loop++;
+    }
 
-	for (int i=0; i < (width * height); i++)
-	{
-		int sum = 0;
-		for (int loop=0; loop < counter; loop++)
-			if (mask[loop][i])
-				sum++;
+    for (int i=0; i < (width * height); i++)
+    {
+        int sum = 0;
+        for (int loop=0; loop < counter; loop++)
+            if (mask[loop][i])
+                sum++;
 
-		if (sum > (int)(counter * .33))
-			mask[0][i] = 1;
-		else
-			mask[0][i] = 0;
-	}
+        if (sum > (int)(counter * .33))
+            mask[0][i] = 1;
+        else
+            mask[0][i] = 0;
+    }
 
-	SetLogoMask(mask[0]);
+    SetLogoMask(mask[0]);
 
-	nvp->JumpToFrame(0);
-	nvp->ClearAfterSeek();
+    nvp->JumpToFrame(0);
+    nvp->ClearAfterSeek();
 
-	if (verbose)
-	{
-		printf( "\b\b\b\b\b\b\b\b\b\b\b" );
-		fflush( stdout );
-	}
+    if (verbose)
+    {
+        printf( "\b\b\b\b\b\b\b\b\b\b\b" );
+        fflush( stdout );
+    }
 
-        for (int i = 0; i < loops; i++)
-            delete [] mask[i];
+    for (int i = 0; i < loops; i++)
+        delete [] mask[i];
 }
 

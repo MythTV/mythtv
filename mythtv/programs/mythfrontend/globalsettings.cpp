@@ -308,8 +308,8 @@ public:
 //        addSelection(QObject::tr("All Detection Methods"), "255");
         setHelpText(QObject::tr("This determines the method used by MythTV to "
                     "detect when commercials start and end.  You must have "
-                    "automatic commercial turned on to use anything "
-                    "other than 'Blank Frame'." ));
+                    "'Automatically Flag Commercials' turned on to use "
+                    "anything other than 'Blank Frame'." ));
     };
 };
 

@@ -2281,7 +2281,8 @@ void PlaybackBox::showRecGroupChooser(void)
                 recGroupType[key] = "recgroup";
             }
 
-    if (gContext->GetNumSetting("UseCategoriesAsRecGroups")) {
+    if (gContext->GetNumSetting("UseCategoriesAsRecGroups"))
+    {
         thequery = QString("SELECT DISTINCT category from recorded");
         query = m_db->exec(thequery);
 
@@ -2304,7 +2305,7 @@ void PlaybackBox::showRecGroupChooser(void)
         recGroupType[tr("All Programs")] = "recgroup";
     }
 
-    QGridLayout *grid = new QGridLayout(2, 2, (int)(10 * wmult));
+    QGridLayout *grid = new QGridLayout(1, 2, (int)(10 * wmult));
 
     label = new QLabel("Group", choosePopup);
     label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
@@ -2316,29 +2317,10 @@ void PlaybackBox::showRecGroupChooser(void)
     chooseComboBox->insertStringList(groups);
     grid->addWidget(chooseComboBox, 0, 1, Qt::AlignLeft);
 
-    label = new QLabel("Password", choosePopup);
-    label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
-    label->setBackgroundOrigin(ParentOrigin);
-    label->setPaletteForegroundColor(popupForeground);
-    grid->addWidget(label, 1, 0, Qt::AlignLeft);
-
-    chooseLineEdit = new MythLineEdit(choosePopup);
-    chooseLineEdit->setText("");
-    chooseLineEdit->selectAll();
-    grid->addWidget(chooseLineEdit, 1, 1, Qt::AlignLeft);
-
     choosePopup->addLayout(grid);
 
-    chooseOkButton = new MythPushButton(choosePopup);
-    chooseOkButton->setText(tr("OK"));
-    chooseOkButton->setEnabled(true);
-    choosePopup->addWidget(chooseOkButton);
-
-    connect(chooseLineEdit, SIGNAL(textChanged(const QString &)), this,
-            SLOT(chooseEditChanged(const QString &)));
-    connect(chooseOkButton, SIGNAL(clicked()), this,
+    connect(chooseComboBox, SIGNAL(accepted(int)), this,
             SLOT(chooseSetViewGroup()));
-    connect(chooseOkButton, SIGNAL(clicked()), choosePopup, SLOT(accept()));
     connect(chooseComboBox, SIGNAL(activated(int)), this,
             SLOT(chooseComboBoxChanged()));
     connect(chooseComboBox, SIGNAL(highlighted(int)), this,
@@ -2346,26 +2328,9 @@ void PlaybackBox::showRecGroupChooser(void)
 
     chooseGroupPassword = getRecGroupPassword(recGroup);
 
-    chooseLineEdit->setEchoMode(QLineEdit::Password);
-    chooseLineEdit->setText(curGroupPassword);
-
-    if (chooseGroupPassword != "")
-        chooseLineEdit->setEnabled(true);
-    else
-        chooseLineEdit->setEnabled(false);
-
-    if (chooseGroupPassword == curGroupPassword)
-        chooseOkButton->setEnabled(true);
-    else
-        chooseOkButton->setEnabled(false);
-
     chooseComboBox->setFocus();
     choosePopup->ExecPopup();
 
-    delete chooseLineEdit;
-    chooseLineEdit = NULL;
-    delete chooseOkButton;
-    chooseOkButton = NULL;
     delete chooseComboBox;
     chooseComboBox = NULL;
 
@@ -2384,17 +2349,29 @@ void PlaybackBox::showRecGroupChooser(void)
 
 void PlaybackBox::chooseSetViewGroup(void)
 {
-    if (!chooseComboBox || !chooseLineEdit)
+    if (!chooseComboBox)
         return;
 
     recGroup = chooseComboBox->currentText();
     recGroupPassword = chooseGroupPassword;
 
-    curGroupPassword = chooseLineEdit->text();
+    if (recGroupPassword != "" )
+    {
 
-    if ((recGroupPassword != "" ) &&
-        (recGroupPassword != curGroupPassword))
-        return;
+        bool ok = false;
+        QString text = "Password:";
+
+        MythPasswordDialog *pwd = new MythPasswordDialog(text, &ok,
+                                                     recGroupPassword,
+                                                     gContext->GetMainWindow());
+        pwd->exec();
+        delete pwd;
+        if (!ok)
+            return;
+
+        curGroupPassword = recGroupPassword;
+    } else
+        curGroupPassword = "";
 
     chooseGroupPassword = "";
 
@@ -2414,54 +2391,17 @@ void PlaybackBox::chooseSetViewGroup(void)
     connected = FillList();
     skipUpdate = false;
     update(fullRect);
+    choosePopup->done(0);
 }
 
 void PlaybackBox::chooseComboBoxChanged(void)
 {
-    if (!chooseComboBox || !chooseLineEdit)
+    if (!chooseComboBox)
         return;
 
     QString newGroup = chooseComboBox->currentText();
 
     chooseGroupPassword = getRecGroupPassword(newGroup);
-    if (chooseGroupPassword != "")
-    {
-        if (chooseGroupPassword != curGroupPassword)
-        {
-            chooseLineEdit->setText("");
-            chooseOkButton->setEnabled(false);
-        }
-        else
-        {
-            chooseLineEdit->setText(curGroupPassword);
-            chooseOkButton->setEnabled(true);
-        }
-
-        chooseLineEdit->setEnabled(true);
-    }
-    else
-    {
-        chooseLineEdit->setText("");
-        chooseLineEdit->setEnabled(false);
-        chooseOkButton->setEnabled(true);
-    }
-}
-
-void PlaybackBox::chooseEditChanged(const QString &newText)
-{
-    if (!chooseOkButton || !chooseLineEdit)
-        return;
-
-    if (newText == chooseGroupPassword)
-    {
-        chooseOkButton->setEnabled(true);
-        if (newText != "")
-            chooseOkButton->setFocus();
-    }
-    else
-    {
-        chooseOkButton->setEnabled(false);
-    }
 }
 
 QString PlaybackBox::getRecGroupPassword(QString group)

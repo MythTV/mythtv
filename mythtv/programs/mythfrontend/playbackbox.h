@@ -75,7 +75,6 @@ class PlaybackBox : public MythDialog
 
     void chooseComboBoxChanged(void);
     void chooseSetViewGroup(void);
-    void chooseEditChanged(const QString &newText);
     void changeComboBoxChanged(void);
     void changeSetRecGroup(void);
     void changeRecGroupPassword();
