@@ -69,6 +69,7 @@ class HDTVRecorder : public RecorderBase
     int keyframedist;
     bool gopset;
     bool m_in_mpg_headers;
+    bool pict_start_is_gop;
     int m_header_sync;
 
     QMap<long long, long long> positionMap;

@@ -7,7 +7,7 @@
 #include <qmap.h>
 #include "scheduledrecording.h"
 
-#define NUMPROGRAMLINES 28
+#define NUMPROGRAMLINES 29
 
 enum MarkTypes {
     MARK_UPDATED_CUT = -3,
@@ -35,6 +35,14 @@ enum TranscoderStatus {
     TRANSCODE_USE_CUTLIST = 0x10,
     TRANSCODE_STOP        = 0x20,
     TRANSCODE_FLAGS       = 0xF0
+};
+
+enum FlagMask {
+    FL_COMMFLAG  = 0x01,
+    FL_CUTLIST   = 0x02,
+    FL_AUTOEXP   = 0x04,
+    FL_EDITING   = 0x08,
+    FL_BOOKMARK  = 0x10,
 };
 
 enum NoRecordType {
@@ -113,6 +121,8 @@ class ProgramInfo
     long long GetBookmark(QSqlDatabase *db);
     bool IsEditing(QSqlDatabase *db);
     void SetEditing(bool edit, QSqlDatabase *db);
+    bool IsCommFlagged(QSqlDatabase *db);
+    void SetCommFlagged(bool edit, QSqlDatabase *db);
     void SetAutoExpire(bool autoExpire, QSqlDatabase *db);
     bool GetAutoExpireFromRecorded(QSqlDatabase *db);
 
@@ -149,6 +159,8 @@ class ProgramInfo
     void FillInRecordInfo(vector<ProgramInfo *> &reclist);
     void EditScheduled(QSqlDatabase *db);
     void EditRecording(QSqlDatabase *db);
+
+    int getProgramFlags(QSqlDatabase *db);
 
     static void GetProgramListByQuery(QSqlDatabase *db,
                                         QPtrList<ProgramInfo> *proglist,
@@ -210,6 +222,8 @@ class ProgramInfo
     bool conflictfixed;
 
     QString schedulerid;
+
+    int programflags;
 
 private:
     void handleRecording(QSqlDatabase *db);

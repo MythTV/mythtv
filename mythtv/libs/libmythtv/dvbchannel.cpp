@@ -457,8 +457,8 @@ void DVBChannel::CheckOptions()
     else
         frequency = t.params.frequency;
 
-    if (frequency < info.frequency_min ||
-        frequency > info.frequency_max)
+    if ((info.frequency_min > 0 && info.frequency_max > 0) &&
+       (frequency < info.frequency_min || frequency > info.frequency_max))
         WARNING(QString("Your frequency setting (%1) is"
                         " out of range. (min/max:%2/%3)")
                         .arg(frequency)

@@ -8,7 +8,7 @@ using namespace std;
 
 #include "mythcontext.h"
 
-const QString currentDatabaseVersion = "1021";
+const QString currentDatabaseVersion = "1022";
 
 void UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -459,6 +459,64 @@ void UpgradeTVDatabaseSchema(void)
 };
 
         performActualUpdate(updates, "1021", dbver);
+    }
+
+    if (dbver == "1021")
+    {
+        const QString updates[] = {
+"ALTER TABLE recorded ADD COLUMN commflagged int(10) unsigned NOT NULL default '0';",
+""
+};
+
+        performActualUpdate(updates, "1022", dbver);
+
+        VERBOSE(VB_ALL, QString("This could take a few minutes."));
+
+        QSqlDatabase *db = QSqlDatabase::database();
+
+        QString thequery, chanid, startts;
+        QSqlQuery query;
+        QDateTime recstartts;
+
+        thequery = QString("SELECT recorded.chanid, recorded.starttime "
+                           "FROM recorded, recordedmarkup "
+                           "WHERE recorded.chanid = recordedmarkup.chanid AND "
+                           "recorded.starttime = recordedmarkup.starttime AND "
+                           "(type = 4 OR type = 5) "
+                           "GROUP BY chanid, starttime");
+        query = db->exec(thequery);
+
+        vector<QString*> cfList;
+
+        if (query.isActive() && query.numRowsAffected() > 0)
+        {
+            while (query.next())
+            {
+                chanid  = query.value(0).toString();
+                recstartts = query.value(1).toDateTime();
+                startts = recstartts.toString("yyyyMMddhhmm");
+                startts += "00";
+
+                QString *tmp = new QString[2];
+                tmp[0] = chanid;
+                tmp[1] = startts;
+                cfList.push_back(tmp);
+            }
+        }
+
+        for (unsigned int i = 0; i < cfList.size(); i++)
+        {
+            chanid = cfList[i][0];
+            startts = cfList[i][1];
+
+            thequery = QString("UPDATE recorded SET commflagged = 1, "
+                               "starttime = %2 WHERE chanid = '%1' AND "
+                               "starttime = '%3';").arg(chanid).arg(startts)
+                                                   .arg(startts);
+
+            db->exec(thequery);
+            delete cfList[i];
+        }
     }
 }
 

@@ -87,6 +87,7 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other)
     cardid = other.cardid;
     schedulerid = other.schedulerid;
     recpriority = other.recpriority;
+    programflags = other.programflags;
 
     repeat = other.repeat;
 
@@ -133,6 +134,7 @@ void ProgramInfo::ToStringList(QStringList &list)
     list << recstartts.toString(Qt::ISODate);
     list << recendts.toString(Qt::ISODate);
     list << QString::number(repeat);
+    list << QString::number(programflags);
 }
 
 void ProgramInfo::FromStringList(QStringList &list, int offset)
@@ -177,6 +179,7 @@ void ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
     recstartts = QDateTime::fromString(*(it++), Qt::ISODate);
     recendts = QDateTime::fromString(*(it++), Qt::ISODate);
     repeat = (*(it++)).toInt();
+    programflags = (*(it++)).toInt();
 
     if (title == " ")
         title = "";
@@ -255,6 +258,7 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
     progMap["type"] = progMap["rec_str"];
 
     progMap["recpriority"] = recpriority;
+    progMap["programflags"] = programflags;
 
     progMap["timedate"] = recstartts.date().toString(dateFormat) + ", " +
                           recstartts.time().toString(timeFormat) + " - " +
@@ -530,6 +534,8 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
             proginfo->chansign = "";
         if (proginfo->channame == QString::null)
             proginfo->channame = "";
+
+        proginfo->programflags = proginfo->getProgramFlags(db);
 
         return proginfo;
     }
@@ -947,6 +953,46 @@ void ProgramInfo::SetEditing(bool edit, QSqlDatabase *db)
     QSqlQuery query = db->exec(querystr);
     if (!query.isActive())
         MythContext::DBError("Edit status update", querystr);
+}
+
+bool ProgramInfo::IsCommFlagged(QSqlDatabase *db)
+{
+    MythContext::KickDatabase(db);
+
+    bool result = false;
+
+    QString starts = recstartts.toString("yyyyMMddhhmm");
+    starts += "00";
+
+    QString querystr = QString("SELECT commflagged FROM recorded WHERE "
+                               "chanid = '%1' AND starttime = '%2';")
+                              .arg(chanid).arg(starts);
+
+    QSqlQuery query = db->exec(querystr);
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        query.next();
+
+        result = query.value(0).toInt();
+    }
+
+    return result;
+}
+
+void ProgramInfo::SetCommFlagged(bool flagged, QSqlDatabase *db)
+{
+    MythContext::KickDatabase(db);
+
+    QString starts = recstartts.toString("yyyyMMddhhmm");
+    starts += "00";
+
+    QString querystr = QString("UPDATE recorded SET commflagged = '%1', "
+                               "starttime = '%2' WHERE chanid = '%3' AND "
+                               "starttime = '%4';").arg(flagged).arg(starts)
+                                                   .arg(chanid).arg(starts);
+    QSqlQuery query = db->exec(querystr);
+    if (!query.isActive())
+        MythContext::DBError("Commercial Flagged status update", querystr);
 }
 
 void ProgramInfo::SetAutoExpire(bool autoExpire, QSqlDatabase *db)
@@ -1702,6 +1748,37 @@ void ProgramInfo::EditScheduled(QSqlDatabase *db)
     }
 
     ScheduledRecording::signalChange(db);
+}
+
+int ProgramInfo::getProgramFlags(QSqlDatabase *db)
+{
+    int flags = 0;
+
+    MythContext::KickDatabase(db);
+        
+    QString starts = recstartts.toString("yyyyMMddhhmm");
+    starts += "00";
+    
+    QString querystr = QString("SELECT commflagged, cutlist, autoexpire, "
+                               "editing, bookmark FROM recorded WHERE "
+                               "chanid = '%1' AND starttime = '%2';")
+                              .arg(chanid).arg(starts);
+    
+    QSqlQuery query = db->exec(querystr);
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        query.next();
+
+        flags |= query.value(0).toInt() ? FL_COMMFLAG : 0;
+        flags |= query.value(1).toString().length() > 1 ? FL_CUTLIST : 0;
+        flags |= query.value(2).toInt() ? FL_AUTOEXP : 0;
+        flags |= query.value(3).toInt() ? (FL_EDITING |
+                                           CheckMarkupFlag(MARK_PROCESSING, 
+                                                           db)) : 0;
+        flags |= query.value(4).toString().length() > 1 ? FL_BOOKMARK : 0;
+    }
+
+    return flags;
 }
 
 void ProgramInfo::handleRecording(QSqlDatabase *db)

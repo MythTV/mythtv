@@ -32,6 +32,7 @@ extern "C" {
 #include <X11/extensions/Xvlib.h>
 #define XMD_H 1
 #include <X11/extensions/xf86vmode.h>
+#include <X11/extensions/Xinerama.h>
 
 extern "C" {
 extern int      XShmQueryExtension(Display*);
@@ -170,6 +171,8 @@ bool VideoOutputXvMC::Init(int width, int height, float aspect,
     unsigned int p_version, p_release, p_request_base, p_event_base, 
                  p_error_base;
     int p_num_adaptors, w_mm, h_mm;
+    bool usingXinerama;
+    int event_base, error_base;
 
     XvAdaptorInfo *ai;
 
@@ -190,7 +193,10 @@ bool VideoOutputXvMC::Init(int width, int height, float aspect,
 
     w_mm = DisplayWidthMM(data->XJ_disp, XJ_screen_num);
     h_mm = DisplayHeightMM(data->XJ_disp, XJ_screen_num);
-    if (w_mm == 0 || h_mm == 0)
+    usingXinerama = 
+        (XineramaQueryExtension(data->XJ_disp, &event_base, &error_base) &&
+         XineramaIsActive(data->XJ_disp));
+    if (w_mm == 0 || h_mm == 0 || usingXinerama)
         data->display_aspect = XJ_aspect;
     else
         data->display_aspect = (float)w_mm/h_mm;

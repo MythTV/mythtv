@@ -3360,6 +3360,7 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed)
         decoder->SetPositionMap();
 
     m_playbackinfo->SetMarkupFlag(MARK_PROCESSING, false, m_db);
+    m_playbackinfo->SetCommFlagged(true, m_db);
     db_lock.unlock();
 
     return(comms_found);

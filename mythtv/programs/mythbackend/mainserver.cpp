@@ -578,7 +578,8 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
     MythContext::KickDatabase(m_db);
 
     thequery = "SELECT recorded.chanid,starttime,endtime,title,subtitle,"
-               "description,hostname,channum,name,callsign FROM recorded "
+               "description,hostname,channum,name,callsign,commflagged,cutlist,"
+               "autoexpire,editing,bookmark FROM recorded "
                "LEFT JOIN channel ON recorded.chanid = channel.chanid "
                "ORDER BY starttime";
 
@@ -635,6 +636,18 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                 proginfo->channame = "#" + proginfo->chanid;
                 proginfo->chansign = "#" + proginfo->chanid;
             }
+
+            // Taken out of programinfo.cpp just to reduce the number of queries
+            int flags = 0;
+            flags |= query.value(10).toInt() ? FL_COMMFLAG : 0;
+            flags |= query.value(11).toString().length() > 1 ? FL_CUTLIST : 0;
+            flags |= query.value(12).toInt() ? FL_AUTOEXP : 0;
+            flags |= query.value(13).toInt() ? (FL_EDITING |
+                                      proginfo->CheckMarkupFlag(MARK_PROCESSING,
+                                                                m_db)) : 0;
+            flags |= query.value(14).toString().length() > 1 ? FL_BOOKMARK : 0;
+
+            proginfo->programflags = flags;
 
             QString lpath = proginfo->GetRecordFilename(fileprefix);
             PlaybackSock *slave = NULL;

@@ -94,6 +94,7 @@ HDTVRecorder::HDTVRecorder()
     keyframedist = 30;
     gopset = false;
     m_in_mpg_headers = false;
+    pict_start_is_gop = false;
     m_header_sync = 0;
 
     firstgoppos = 0;
@@ -307,10 +308,10 @@ void HDTVRecorder::FindKeyframes(const unsigned char *buffer,
         if (payload_unit_start_indicator)
         {
             // packet contains start of PES packet
-	    m_in_mpg_headers = true;
-	    m_header_sync = 0;
-	}
-	if (m_in_mpg_headers) {
+            m_in_mpg_headers = true;
+            m_header_sync = 0;
+        }
+        if (m_in_mpg_headers) {
             // Scan for PES header codes; specifically picture_start
             // and group_start (of_pictures).  These should be within 
             // this first TS packet of the PES packet.
@@ -346,8 +347,18 @@ void HDTVRecorder::FindKeyframes(const unsigned char *buffer,
                             if (gopset || firstgoppos > 0)
                                 framesWritten++;
                             framesSeen++;
+                            if (framesSeen >= 30 && firstgoppos <= 0)
+                            {
+                                // seen 30 frames with no GOP; assume that
+                                // each GOP only contains one I-frame, and
+                                // treat the I-frame as the beginning of the
+                                // GOP.
+                                pict_start_is_gop = true;
+                            }
                         }
-                        if (buffer[i+1] == 0xB8)
+                        if (buffer[i+1] == 0xB8 || 
+                            (pict_start_is_gop && buffer[i+1] == 0x00 &&
+                             (framesSeen) % 15 == 0))
                         {
                             // group_of_pictures
                             int frameNum = framesWritten - 1;
@@ -387,12 +398,12 @@ void HDTVRecorder::FindKeyframes(const unsigned char *buffer,
                             }
                             
                         }
-			if (buffer[i+1] >= 0x01 && buffer[i+1] <= 0xAF)
-			{
-			    // video slice ... end of "interesting"
-			    // headers
-			    m_in_mpg_headers = false;
-			}
+                        if (buffer[i+1] >= 0x01 && buffer[i+1] <= 0xAF)
+                        {
+                            // video slice ... end of "interesting"
+                            // headers
+                            m_in_mpg_headers = false;
+                        }
                         m_header_sync = 0;
                     }
                     break;
