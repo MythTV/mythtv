@@ -108,6 +108,6 @@ str infoForeground=#ffffff
 str infoDropshadow=#000000
 str baseForeground=#ffffff
 str baseDropshadow=#000000
-str popupBackground=#006699
+str popupBackground=background
 str popupHighlight=#ffff33
 
