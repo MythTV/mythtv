@@ -544,8 +544,7 @@ long long MythContext::GetRecorderFramesWritten(int recorder)
     ReadStringList(serverSock, strlist);
     pthread_mutex_unlock(&serverSockLock);
 
-    long long retval = strlist[0].toInt();
-    retval |= ((long long)strlist[1].toInt()) << 32;
+    long long retval = decodeLongLong(strlist, 0);
 
     return retval;
 }
@@ -560,8 +559,7 @@ long long MythContext::GetRecorderFilePosition(int recorder)
     ReadStringList(serverSock, strlist);
     pthread_mutex_unlock(&serverSockLock);
 
-    long long retval = strlist[0].toInt();
-    retval |= ((long long)strlist[1].toInt()) << 32;
+    long long retval = decodeLongLong(strlist, 0);
 
     return retval;
 }
@@ -571,16 +569,14 @@ long long MythContext::GetRecorderFreeSpace(int recorder,
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
     strlist << "GET_FREE_SPACE";
-    strlist << QString::number((int)(totalreadpos & 0xffffffff));
-    strlist << QString::number((int)((totalreadpos >> 32) & 0xffffffff));
+    encodeLongLong(strlist, totalreadpos);
 
     pthread_mutex_lock(&serverSockLock);
     WriteStringList(serverSock, strlist);
     ReadStringList(serverSock, strlist);
     pthread_mutex_unlock(&serverSockLock);
 
-    long long retval = strlist[0].toInt();
-    retval |= ((long long)strlist[1].toInt()) << 32;
+    long long retval = decodeLongLong(strlist, 0);
 
     return retval;
 }
@@ -589,16 +585,14 @@ long long MythContext::GetKeyframePosition(int recorder, long long desired)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
     strlist << "GET_KEYFRAME_POS";
-    strlist << QString::number((int)(desired & 0xffffffff));
-    strlist << QString::number((int)((desired >> 32) & 0xffffffff));
+    encodeLongLong(strlist, desired);
 
     pthread_mutex_lock(&serverSockLock);
     WriteStringList(serverSock, strlist);
     ReadStringList(serverSock, strlist);
     pthread_mutex_unlock(&serverSockLock);
 
-    long long retval = strlist[0].toInt();
-    retval |= ((long long)strlist[1].toInt()) << 32;
+    long long retval = decodeLongLong(strlist, 0);
 
     return retval;
 }
@@ -619,11 +613,8 @@ void MythContext::SetupRecorderRingBuffer(int recorder, QString &path,
 
     path = strlist[0];
 
-    filesize = strlist[1].toInt();
-    filesize |= ((long long)strlist[2].toInt()) << 32;
-
-    fillamount = strlist[3].toInt();
-    fillamount |= ((long long)strlist[4].toInt()) << 32;
+    filesize = decodeLongLong(strlist, 1);
+    fillamount = decodeLongLong(strlist, 3);
 }
 
 void MythContext::SpawnLiveTVRecording(int recorder)
@@ -825,21 +816,18 @@ long long MythContext::SeekRemoteRing(int recorder, QSocket *sock,
 
     strlist = QString("QUERY_RECORDER %1").arg(recorder);
     strlist << "SEEK_RINGBUF";
-    strlist << QString::number((int)(pos & 0xffffffff));
-    strlist << QString::number((int)((pos >> 32) & 0xffffffff));
+    encodeLongLong(strlist, pos);
     strlist << QString::number(whence);
-    strlist << QString::number((int)(curpos & 0xffffffff));
-    strlist << QString::number((int)((curpos >> 32) & 0xffffffff));
+    encodeLongLong(strlist, curpos);
 
     pthread_mutex_lock(&serverSockLock);
     WriteStringList(serverSock, strlist);
     ReadStringList(serverSock, strlist);
     pthread_mutex_unlock(&serverSockLock);
 
-    long long ret = strlist[0].toInt();
-    ret |= ((long long)strlist[1].toInt()) << 32;
+    long long retval = decodeLongLong(strlist, 0);
 
-    return ret;
+    return retval;
 }
 
 QSocket *MythContext::SetupRemoteFile(QString url)

@@ -430,32 +430,26 @@ void MainServer::HandleRecorderQuery(QStringList list, QStringList commands,
     else if (command == "GET_FRAMES_WRITTEN")
     {
         long long value = enc->GetFramesWritten();
-        retlist << QString::number((int)(value & 0xffffffff));
-        retlist << QString::number((int)((value >> 32) & 0xffffffff));
+        encodeLongLong(retlist, value);
     }
     else if (command == "GET_FILE_POSITION")
     {
         long long value = enc->GetFilePosition();
-        retlist << QString::number((int)(value & 0xffffffff));
-        retlist << QString::number((int)((value >> 32) & 0xffffffff));
+        encodeLongLong(retlist, value);
     }
     else if (command == "GET_FREE_SPACE")
     {
-        long long pos = list[2].toInt();
-        pos |= ((long long)list[3].toInt()) << 32;
+        long long pos = decodeLongLong(list, 2);
 
         long long value = enc->GetFreeSpace(pos);
-        retlist << QString::number((int)(value & 0xffffffff));
-        retlist << QString::number((int)((value >> 32) & 0xffffffff));
+        encodeLongLong(retlist, value);
     }
     else if (command == "GET_KEYFRAME_POS")
     {
-        long long desired = list[2].toInt();
-        desired |= ((long long)list[3].toInt()) << 32;
+        long long desired = decodeLongLong(list, 2);
 
         long long value = enc->GetKeyframePosition(desired);
-        retlist << QString::number((int)(value & 0xffffffff));
-        retlist << QString::number((int)((value >> 32) & 0xffffffff));
+        encodeLongLong(retlist, value);
     }
     else if (command == "SETUP_RING_BUFFER")
     {
@@ -473,11 +467,8 @@ void MainServer::HandleRecorderQuery(QStringList list, QStringList commands,
         QString url = QString("rbuf://") + ip + ":" + port + path;
 
         retlist << url;
-        retlist << QString::number((int)(filesize & 0xffffffff));
-        retlist << QString::number((int)((filesize >> 32) & 0xffffffff));
-
-        retlist << QString::number((int)(fillamount & 0xffffffff));
-        retlist << QString::number((int)((fillamount >> 32) & 0xffffffff));
+        encodeLongLong(retlist, filesize);
+        encodeLongLong(retlist, fillamount);
     }
     else if (command == "SPAWN_LIVETV")
     {
@@ -583,18 +574,12 @@ void MainServer::HandleRecorderQuery(QStringList list, QStringList commands,
     }
     else if (command == "SEEK_RINGBUF")
     {
-        long long pos = list[2].toInt();
-        pos |= ((long long)list[3].toInt()) << 32;
-
+        long long pos = decodeLongLong(list, 2);
         int whence = list[4].toInt();
-
-        long long curpos = list[5].toInt();
-        curpos |= ((long long)list[6].toInt()) << 32;
+        long long curpos = decodeLongLong(list, 5);
 
         long long ret = enc->SeekRingBuffer(curpos, pos, whence);
-
-        retlist << QString::number((int)(ret & 0xffffffff));
-        retlist << QString::number((int)((ret >> 32) & 0xffffffff));
+        encodeLongLong(retlist, ret);
     }
     else if (command == "DONE_RINGBUF")
     {

@@ -10,4 +10,7 @@ bool ReadStringList(QSocket *socket, QStringList &list);
 void WriteBlock(QSocket *socket, void *data, int len);
 int ReadBlock(QSocket *socket, void *data, int maxlen);
 
+void encodeLongLong(QStringList &list, long long num);
+long long decodeLongLong(QStringList &list, int offset);
+
 #endif

@@ -100,3 +100,20 @@ int ReadBlock(QSocket *socket, void *data, int maxlen)
     return maxlen;
 }
 
+void encodeLongLong(QStringList &list, long long num)
+{
+    list << QString::number((int)(num >> 32));
+    list << QString::number((int)(num & 0xffffffffLL));
+}
+
+long long decodeLongLong(QStringList &list, int offset)
+{
+    long long retval = 0;
+
+    int l1 = list[offset].toInt();
+    int l2 = list[offset + 1].toInt();
+ 
+    retval = ((long long)(l2) & 0xffffffffLL) | ((long long)(l1) << 32);
+
+    return retval;
+} 

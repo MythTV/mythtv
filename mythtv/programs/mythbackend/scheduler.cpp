@@ -530,7 +530,7 @@ void Scheduler::PruneList(void)
 
         ProgramInfo *first = (*i);
 
-        if (first->recordtype > kSingleRecord && 
+        if (first->recordtype > kSingleRecord &&
             (first->subtitle.length() > 2 && first->description.length() > 2))
         {
             if (FindInOldRecordings(first))

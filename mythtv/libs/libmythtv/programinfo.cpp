@@ -1,4 +1,5 @@
 #include "programinfo.h"
+#include "util.h"
 #include <iostream>
 #include <qsocket.h>
 
@@ -81,8 +82,7 @@ void ProgramInfo::ToStringList(QStringList &list)
     list << chanstr;
     list << chansign;
     list << pathname;
-    list << QString::number((int)(filesize & 0xffffffff));
-    list << QString::number((int)((filesize >> 32) & 0xffffffff));
+    encodeLongLong(list, filesize);
     list << startts.toString();
     list << endts.toString();
     list << QString::number((int)recordtype);
@@ -107,8 +107,7 @@ void ProgramInfo::FromStringList(QStringList &list, int offset)
     chanstr = list[offset + 5];
     chansign = list[offset + 6];
     pathname = list[offset + 7];
-    filesize = list[offset + 8].toInt();
-    filesize |= ((long long)list[offset + 9].toInt()) << 32;
+    filesize = decodeLongLong(list, offset + 8);
     startts = QDateTime::fromString(list[offset + 10]);
     endts = QDateTime::fromString(list[offset + 11]);
     recordtype = (RecordingType)(list[offset + 12].toInt());
