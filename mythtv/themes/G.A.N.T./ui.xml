@@ -691,10 +691,9 @@
         <area>20,40,120,30</area>
         <font>info</font>
       </textarea>
-      <textarea name="time" draworder="6">
+      <textarea name="timedate" draworder="6">
         <area>160,40,420,30</area>
         <font>info</font>
-	<value>%TIMEDATE%</value>
       </textarea>
       <textarea name="subdescr" draworder="6">
         <area>20,70,560,140</area>
@@ -1261,71 +1260,73 @@
 
     <container name="program_info_play">
       <context>0</context>
-      <area>0,360,799,240</area>
+      <area>0,360,800,240</area>
       <textarea name="title" draworder="6">
-        <area>20,0,579,45</area>
+        <area>20,0,580,40</area>
+        <altarea>20,0,760,40</altarea>
         <font>title</font>
       </textarea>
       <textarea name="channel" draworder="6">
         <area>20,40,120,30</area>
         <font>info</font>
       </textarea>
-      <textarea name="time" draworder="6">
-        <area>160,40,420,30</area>
+      <textarea name="timedate" draworder="6">
+        <area>160,40,440,30</area>
+        <altarea>160,40,620,30</altarea>
         <font>info</font>
-	<value>%TIMEDATE%</value>
       </textarea>
       <textarea name="subdescr" draworder="6">
-        <area>20,70,560,180</area>
-        <altarea>20,70,580,150</altarea>
+        <area>20,70,580,125</area>
+        <altarea>20,70,760,125</altarea>
         <font>info</font>
 	<multiline>yes</multiline>
 	<value>%SUBTITLE|"|"
 %%DESCRIPTION%</value>
       </textarea>
 
-      <image name="commflagged" draworder="6">
-        <filename>type/commflagged.png</filename>
-        <position>20,160</position>
-      </image>
-      <image name="cutlist" draworder="6">
-        <filename>type/cutlist.png</filename>
-        <position>55,160</position>
-      </image>
       <image name="autoexpire" draworder="6">
         <filename>type/autoexpire.png</filename>
-        <position>90,160</position>
-      </image>
-      <image name="processing" draworder="6">
-        <filename>type/processing.png</filename>
         <position>20,195</position>
       </image>
       <image name="bookmark" draworder="6">
         <filename>type/bookmark.png</filename>
         <position>55,195</position>
       </image>
+      <image name="commflagged" draworder="6">
+        <filename>type/commflagged.png</filename>
+        <position>90,195</position>
+      </image>
+      <image name="cutlist" draworder="6">
+        <filename>type/cutlist.png</filename>
+        <position>125,195</position>
+      </image>
+      <image name="processing" draworder="6">
+        <filename>type/processing.png</filename>
+        <position>160,195</position>
+      </image>
 
     </container>
 
     <container name="program_info_del">
       <context>1</context>
-      <area>0,360,799,190</area>
+      <area>0,360,800,195</area>
       <textarea name="title" draworder="6">
-        <area>20,0,579,40</area>
+        <area>20,0,580,40</area>
+        <altarea>20,0,760,40</altarea>
         <font>title</font>
       </textarea>
       <textarea name="channel" draworder="6">
         <area>20,40,120,30</area>
         <font>info</font>
       </textarea>
-      <textarea name="time" draworder="6">
-        <area>160,40,420,30</area>
+      <textarea name="timedate" draworder="6">
+        <area>160,40,440,30</area>
+        <altarea>160,40,620,30</altarea>
         <font>info</font>
-	<value>%TIMEDATE%</value>
       </textarea>
       <textarea name="subdescr" draworder="6">
-        <area>20,70,560,180</area>
-        <altarea>20,70,580,150</altarea>
+        <area>20,70,580,125</area>
+        <altarea>20,70,760,125</altarea>
         <font>info</font>
 	<multiline>yes</multiline>
 	<value>%SUBTITLE|"|"
@@ -1334,7 +1335,7 @@
     </container>
 
     <container name="video">
-      <area>610,355,160,120</area>
+      <area>620,360,160,120</area>
     </container>
 
     <!-- Confirm delete and legend help popup -->
@@ -1345,7 +1346,7 @@
 
     <container name="usage">
       <context>1</context>
-      <area>0,550,800,50</area>
+      <area>0,555,800,40</area>
       <statusbar name="usedbar" draworder="5">
         <container fleximage="yes">container.png</container>
 	<fill>filler.png</fill>
@@ -1683,10 +1684,9 @@
         <area>20,40,120,30</area>
         <font>info</font>
       </textarea>
-      <textarea name="time" draworder="6">
+      <textarea name="timedate" draworder="6">
         <area>160,40,420,30</area>
         <font>info</font>
-	<value>%TIMEDATE%</value>
       </textarea>
       <textarea name="subdescr" draworder="6">
         <area>20,70,560,90</area>
