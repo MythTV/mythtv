@@ -776,8 +776,8 @@ bool ProgramInfo::IsSameTimeslot(const ProgramInfo& other) const
 bool ProgramInfo::IsSameProgramTimeslot(const ProgramInfo &other) const
 {
     if (chanid == other.chanid &&
-        startts <= other.endts &&
-        endts >= other.startts &&
+        startts < other.endts &&
+        endts > other.startts &&
         (sourceid == -1 || other.sourceid == -1 ||
          sourceid == other.sourceid))
         return true;
