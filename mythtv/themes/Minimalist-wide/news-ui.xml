@@ -1,0 +1,166 @@
+<mythuitheme>
+
+  <window name="news">
+
+    <font name="active" base="list-active">
+      <color>#ffffff</color>
+    </font>
+
+    <font name="inactive" base="list-inactive">
+      <color>#9999cc</color>-->
+    </font>
+
+    <font name="desc" face="Arial Narrow">
+      <color>#ffffff</color>
+      <size>16</size>
+      <bold>no</bold>
+    </font>
+
+    <font name="updated" face="info">
+      <color>#000000</color>
+      <size>14</size>
+      <bold>no</bold>
+    </font>
+
+    <container name="sites">
+
+      <area>20,20,420,400</area>
+
+      <listbtnarea name="siteslist" draworder="0">
+        <area>0,0,420,400</area>
+        <gradient type="unselected" start="#DDDDFF" end="#505050" alpha="100">
+        </gradient>
+        <gradient type="selected" start="#DDDDFF" end="#909090" alpha="255">
+        </gradient>
+        <fcnfont name="active" function="active"></fcnfont>
+        <fcnfont name="inactive" function="inactive"></fcnfont>
+        <showscrollarrows>yes</showscrollarrows>
+      </listbtnarea>
+
+    </container>
+
+    <container name="articles"> 
+
+      <area>440,20,780,400</area>
+
+      <listbtnarea name="articleslist"  draworder="0">
+        <area>0,0,780,400</area>
+        <gradient type="unselected" start="#DDDDFF" end="#505050" alpha="100">
+        </gradient>
+        <gradient type="selected" start="#DDDDFF" end="#909090" alpha="255">
+        </gradient>
+        <fcnfont name="active" function="active"></fcnfont>
+        <fcnfont name="inactive" function="inactive"></fcnfont>
+        <showscrollarrows>yes</showscrollarrows>
+        <showarrow>no</showarrow>
+      </listbtnarea>
+
+    </container>
+
+    <container name="info"> 
+
+      <area>0,420,1280,300</area>
+
+
+      <textarea name="title" draworder="1">
+        <area>20,10,1240,40</area>
+        <font>subtitle</font>
+        <multiline>no</multiline>
+      </textarea>
+
+      <textarea name="description" draworder="1">
+        <area>20,60,1140,230</area>
+        <font>info</font>
+        <multiline>yes</multiline>
+      </textarea>
+
+      <image name="background" draworder="0" fleximage="no">
+        <filename>music/mm-sel-bg.png</filename>
+        <position>0,0</position>
+      </image>
+
+      <textarea name="updated" align="right" draworder="1">
+        <area>1130,210,120,100</area>
+        <font>updated</font>
+        <multiline>yes</multiline>
+      </textarea>
+
+    </container>
+
+
+    <container name="config-sites">
+
+      <area>20,40,760,560</area>
+
+      <listbtnarea name="category" draworder="0">
+        <area>0,0,300,500</area>
+        <gradient type="unselected" start="#000000" end="#505050" alpha="100">
+        </gradient>
+        <gradient type="selected" start="#52CA38" end="#349838" alpha="255">
+        </gradient>
+        <fcnfont name="active" function="active"></fcnfont>
+        <fcnfont name="inactive" function="inactive"></fcnfont>
+        <showscrollarrows>yes</showscrollarrows>
+      </listbtnarea>
+
+      <listbtnarea name="sites"  draworder="0">
+        <area>320,0,440,500</area>
+        <gradient type="unselected" start="#000000" end="#505050" alpha="100">
+        </gradient>
+        <gradient type="selected" start="#52CA38" end="#349838" alpha="255">
+        </gradient>
+        <fcnfont name="active" function="active"></fcnfont>
+        <fcnfont name="inactive" function="inactive"></fcnfont>
+        <showarrow>no</showarrow>
+        <showscrollarrows>yes</showscrollarrows>
+      </listbtnarea>
+
+	<textarea name="context_switch" draworder="0">
+          <area>0,510,760,50</area>
+          <font>desc</font>
+          <multiline>yes</multiline>
+         </textarea>
+
+    </container>
+
+    <container name="config-freq">
+
+      <area>20,40,760,560</area>
+
+         <textarea name="help" draworder="0">
+          <area>0,50,760,150</area>
+          <font>desc</font>
+          <multiline>yes</multiline>
+         </textarea>
+
+         <blackhole name="spinbox_holder" draworder="0">
+            <area>20,170,70,30</area>
+         </blackhole>
+
+         <textarea name="minutes" draworder="0">
+          <area>90,170,100,30</area>
+          <font>active</font>
+          <value>Minutes</value>
+         </textarea>
+
+	<textarea name="context_switch" draworder="0">
+          <area>0,510,760,50</area>
+          <font>desc</font>
+          <multiline>yes</multiline>
+         </textarea>
+    </container>
+
+    <container name="config-bottom">
+
+      <area>0,400,800,200</area>
+
+      <image name="background" draworder="0" fleximage="no">
+        <filename>news-info-bg.png</filename>
+        <position>0,0</position>
+      </image>
+
+    </container>
+
+  </window>
+ 
+</mythuitheme>

@@ -1,0 +1,101 @@
+# Color of the background
+str BackgroundColor=SteelBlue
+# Color of lines, text, etc
+str ForegroundColor=white
+# Pixmap to use for the background
+str BackgroundPixmap=background.jpg
+
+# Colors for the different program categories
+str Cat_Comedy=DarkOrchid
+str Cat_Animals=ForestGreen
+str Cat_Nature=SprintGreen
+str Cat_SciFi=DarkBlue
+str Cat_Horror=firebrick3
+str Cat_Action=maroon
+str Cat_Game=orchid
+str Cat_Children's=MediumSlateBlue
+str Cat_Edu=CornflowerBlue
+str Cat_Adult=thistle3
+str Cat_Musical=turquoise3
+str Cat_News=DarkOrange3
+str Cat_Reality=sienna
+str Cat_Cooking=tan3
+str Cat_Doc=goldenrod
+str Cat_Sports=DarkCyan
+str Cat_Mystery=SlateGrey
+str Cat_Drama=rosybrown3
+str Cat_Classic=grey62
+str Cat_Crime=MediumVioletRed
+str Cat_Talk=MediumTurquoise
+
+# Forground for dialogs
+str ActiveForeground=#FFFFFF
+
+# This is the background for inactive buttons
+str ActiveButton=#0F00A0
+#str ActiveButton=#FF99c3
+str ActiveLight=#5788c3
+str ActiveMidlight=#4871a2
+str ActiveDark=#162231
+str ActiveMid=#255C72
+str ActiveText=#dcdcdc
+str ActiveBrightText=#5788c3
+str ActiveButtonText=#ffffff
+str ActiveBase=#002a4e
+str ActiveBackground=#426794
+str ActiveShadow=#000000
+str ActiveHighlight=#0099F3
+str ActiveHighlightedText=#000000
+
+str InactiveForeground=#FFFFFF
+str InactiveButton=#426794
+str InactiveLight=#5788c3
+str InactiveMidlight=#4871a2
+str InactiveDark=#162231
+str InactiveMid=#37567b
+str InactiveText=#dcdcdc
+str InactiveBrightText=#5788c3
+str InactiveButtonText=#ffffff
+str InactiveBase=#002a4e
+str InactiveBackground=#426794
+str InactiveShadow=#000000
+str InactiveHighlight=#5cb3ff
+str InactiveHighlightedText=#000000
+
+str DisabledForeground=#555555
+str DisabledButton=#426794
+str DisabledLight=#5788c3
+str DisabledMidlight=#4871a2
+str DisabledDark=#162231
+str DisabledMid=#15475B
+str DisabledText=#15475B
+str DisabledBrightText=#5788c3
+str DisabledButtonText=#ffffff
+str DisabledBase=#002a4e
+str DisabledBackground=#426794
+str DisabledShadow=#000000
+str DisabledHighlight=#000080
+str DisabledHighlightedText=#ffffff
+
+str curTimeChan_bgColor=#8f2813
+str curTimeChan_fgColor=#ffffff
+str date_bgColor=#0f2e8f
+str date_dsColor=#000000
+str date_fgColor=#ffffff
+str chan_bgColor=#0f2f5a
+str chan_dsColor=#000000
+str chan_fgColor=#ffffff
+str time_bgColor=#0f2e8f
+str time_dsColor=#000000
+str time_fgColor=#ffffff
+str prog_bgColor=#2d587b
+str prog_fgColor=#ffffff
+str progLine_Color=#104064
+str progArrow_Color=#ffffff
+int progArrow_Type=0
+str curProg_bgColor=#85a5bc
+str curRecProg_bgColor=#bc4c32
+str curProg_dsColor=#000000
+str curProg_fgColor=#eefb92
+str misChanIcon_bgColor=#000000
+str misChanIcon_fgColor=#ffffff

@@ -1,0 +1,99 @@
+<mythuitheme>
+
+  <window name="gallery">
+
+    <font name="active" base="list-active">
+<!--      <color>#ffffff</color>
+      <size>16</size>
+      <bold>yes</bold>-->
+    </font>
+
+    <font name="inactive" base="list-inactive">
+<!--      <color>#9999cc</color>
+      <size>16</size>
+      <bold>yes</bold>-->
+    </font>
+
+  <font name="menu" face="Arial">
+      <color>#ffffff</color>
+      <size>18</size>
+      <bold>yes</bold>
+      <shadow>2,2</shadow>
+    </font>    
+    
+    <container name="menu">
+      <area>10,20,150,350</area>
+
+      <listbtnarea name="menu" draworder="0">
+        <area>0,77,150,350</area>
+        <gradient type="unselected" start="#DDDDFF" end="#505050" alpha="100">
+        </gradient>
+        <gradient type="selected" start="#DDDDFF" end="#909090" alpha="255">
+        </gradient>
+        <fcnfont name="active" function="active"></fcnfont>
+        <fcnfont name="inactive" function="inactive"></fcnfont>
+        <showarrow>no</showarrow>
+        <showscrollarrows>no</showscrollarrows>
+      </listbtnarea>
+
+    </container>
+
+    <container name="text">
+
+      <area>160,20,1100,45</area>
+      <textarea name="text" draworder="0">
+        <area>0,0,1100,45</area>
+        <font>title</font>
+        <multiline>no</multiline>
+      </textarea>
+
+    </container>
+
+      <container name="view">
+      <area>160,77,1100,630</area>
+
+      <blackhole name="view" draworder="0">
+            <area>0,0,1100,550</area>
+      </blackhole>
+      
+      <textarea name="help1" draworder="1">
+        <area>0,600,175,35</area>
+        <font>help</font>
+        <value>SELECT: View</value>
+      </textarea>
+
+      <textarea name="help2" draworder="1">
+        <area>825,600,325,35</area>
+        <font>help</font>
+        <value>MENU: Activate Menu</value>
+      </textarea>
+
+      <image name="scrollUpReg" draworder="0" fleximage="no">
+        <context>0</context>
+        <filename>lb-uparrow-reg.png</filename>
+        <position>1050,500</position>
+      </image>
+      
+      <image name="scrollUpSel" draworder="0" fleximage="no">
+        <context>1</context>
+        <filename>lb-uparrow-sel.png</filename>
+        <position>1050,500</position>
+      </image>
+
+      <image name="scrollDnReg" draworder="1" fleximage="no">
+        <context>0</context>
+        <filename>lb-dnarrow-reg.png</filename>
+        <position>1050,520</position>
+      </image>
+
+      <image name="scrollDnSel" draworder="1" fleximage="no">
+        <context>1</context>
+        <filename>lb-dnarrow-sel.png</filename>
+        <position>1050,520</position>
+      </image>
+
+    </container>
+
+  </window>
+ 
+</mythuitheme>
