@@ -7,6 +7,7 @@
 #include <qmutex.h>
 #include <qmap.h>
 #include <qptrqueue.h>
+#include <qptrlist.h>
 
 using namespace std;
 
@@ -160,6 +161,7 @@ class VideoOutput
     QMap<VideoFrame *, int> vbufferMap;
     QPtrQueue<VideoFrame> availableVideoBuffers;
     QPtrQueue<VideoFrame> usedVideoBuffers;
+    QPtrList<VideoFrame> busyVideoBuffers;
 
     int rpos;
     int vpos;

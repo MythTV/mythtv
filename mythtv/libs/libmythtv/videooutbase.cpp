@@ -293,6 +293,7 @@ void VideoOutput::InputChanged(int width, int height, float aspect)
     }
 
     usedVideoBuffers.clear();
+    busyVideoBuffers.clear();
 
     video_buflock.unlock();
 }
@@ -571,9 +572,21 @@ VideoFrame *VideoOutput::GetNextFreeFrame(void)
     video_buflock.lock();
     VideoFrame *next = availableVideoBuffers.dequeue();
 
+    while (next && busyVideoBuffers.findRef(next) != -1)
+    {
+        VERBOSE(VB_GENERAL,QString("GetNextFreeFrame() served a busy frame. "
+                                   "Dropping. #Frames=%1/%2.")
+                .arg(availableVideoBuffers.count() + usedVideoBuffers.count())
+                .arg(numbuffers));
+        next = availableVideoBuffers.dequeue();
+    }
+
     // only way this should be triggered if we're in unsafe mode
     if (!next)
+    {
         next = usedVideoBuffers.dequeue();
+        busyVideoBuffers.removeRef(next);
+    }
 
     video_buflock.unlock();
 
@@ -586,6 +599,7 @@ void VideoOutput::ReleaseFrame(VideoFrame *frame)
 
     video_buflock.lock();
     usedVideoBuffers.enqueue(frame);
+    busyVideoBuffers.append(frame);
     video_buflock.unlock();
 }
 
@@ -614,9 +628,14 @@ void VideoOutput::StartDisplayingFrame(void)
 void VideoOutput::DoneDisplayingFrame(void)
 {
     video_buflock.lock();
+
     VideoFrame *buf = usedVideoBuffers.dequeue();
     if (buf)
+    {
         availableVideoBuffers.enqueue(buf);
+        busyVideoBuffers.removeRef(buf);
+    }
+
     video_buflock.unlock();
 }
 
@@ -728,6 +747,8 @@ void VideoOutput::ClearAfterSeek(void)
     {
         vpos = rpos = 0;
     }
+
+    busyVideoBuffers.clear();
 
     video_buflock.unlock();
 }

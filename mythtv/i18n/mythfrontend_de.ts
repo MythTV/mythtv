@@ -297,7 +297,7 @@
     </message>
     <message>
         <source>Yes; allow re-recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja, wieder aufnehmen</translation>
     </message>
 </context>
 <context>
@@ -382,31 +382,31 @@
     <name>ProgramRecPriority</name>
     <message>
         <source>Recording just this showing</source>
-        <translation type="unfinished">Nehme diese Ausstrahlung auf</translation>
+        <translation>Nehme diese Ausstrahlung auf</translation>
     </message>
     <message>
         <source>Recording every week</source>
-        <translation type="unfinished">Nehme wöchentlich auf</translation>
+        <translation>Nehme wöchentlich auf</translation>
     </message>
     <message>
         <source>Recording when shown in this timeslot</source>
-        <translation type="unfinished">Nehme zu dieser Zeit auf</translation>
+        <translation>Nehme zu dieser Zeit auf</translation>
     </message>
     <message>
         <source>Recording when shown on this channel</source>
-        <translation type="unfinished">Nehme auf diesem Sender auf</translation>
+        <translation>Nehme auf diesem Sender auf</translation>
     </message>
     <message>
         <source>Recording all showings</source>
-        <translation type="unfinished">Nehme alle Ausstrahlungen auf</translation>
+        <translation>Nehme alle Ausstrahlungen auf</translation>
     </message>
     <message>
         <source>Not recording this showing</source>
-        <translation type="unfinished">Wird nicht aufgenommen</translation>
+        <translation>Wird nicht aufgenommen</translation>
     </message>
     <message>
         <source>Error!</source>
-        <translation type="unfinished">Fehler!</translation>
+        <translation>Fehler!</translation>
     </message>
 </context>
 <context>
@@ -1894,7 +1894,7 @@
     </message>
     <message>
         <source>Notify, but do not skip</source>
-        <translation type="unfinished"></translation>
+        <translation>Nur Hinweisen</translation>
     </message>
     <message>
         <source>Automatically Skip</source>
@@ -1902,7 +1902,7 @@
     </message>
     <message>
         <source>Automatically skip commercial breaks that have been flagged during Automatic Commercial Flagging or by the mythcommflag program, or just notify that a commercial has been detected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Erkannte Werbung automatisch überspringen, oder nur darauf hinweisen.</translation>
     </message>
     <message>
         <source>UDP Notify Port</source>
@@ -1938,31 +1938,31 @@
     </message>
     <message>
         <source>Recording on cardid: </source>
-        <translation type="unfinished"></translation>
+        <translation>Benutze Tuner (cardid):</translation>
     </message>
     <message>
         <source>Not Recording: </source>
-        <translation type="unfinished"></translation>
+        <translation>Keine Aufnahme:</translation>
     </message>
     <message>
         <source>Manual Override</source>
-        <translation type="unfinished"></translation>
+        <translation>Überstimmt</translation>
     </message>
     <message>
         <source>Previously Recorded</source>
-        <translation type="unfinished"></translation>
+        <translation>Schon aufgenommen</translation>
     </message>
     <message>
         <source>Currently Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Momentan aufnehmen</translation>
     </message>
     <message>
         <source>Other Showing</source>
-        <translation type="unfinished"></translation>
+        <translation>Andere Ausstrahlung</translation>
     </message>
     <message>
         <source>Too Many Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Zu viele Aufnahmen</translation>
     </message>
     <message>
         <source>Don&apos;t Record List</source>
@@ -1982,15 +1982,15 @@
     </message>
     <message>
         <source>Overlap</source>
-        <translation type="unfinished"></translation>
+        <translation>Überschneidung</translation>
     </message>
     <message>
         <source>Reason Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Ursache unbekannt</translation>
     </message>
     <message>
         <source>Repeat</source>
-        <translation type="unfinished"></translation>
+        <translation>Wiederholung</translation>
     </message>
     <message>
         <source>R</source>
@@ -2018,83 +2018,83 @@
     </message>
     <message>
         <source>Single Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Einmalig</translation>
     </message>
     <message>
         <source>Daily Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Täglich</translation>
     </message>
     <message>
         <source>Weekly Recording</source>
-        <translation type="unfinished">Wöchentliche Aufnahme</translation>
+        <translation>Wöchentlich</translation>
     </message>
     <message>
         <source>Conflicting</source>
-        <translation type="unfinished"></translation>
+        <translation>Konflikt</translation>
     </message>
     <message>
         <source>Will Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Aufnehmen</translation>
     </message>
     <message>
         <source>Won&apos;t Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine Aufnahme</translation>
     </message>
     <message>
         <source>Don&apos;t record it</source>
-        <translation type="unfinished">Nicht aufnehmen</translation>
+        <translation>Nicht aufnehmen</translation>
     </message>
     <message>
         <source>Never record this episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Diese Folge niemals aufnehmen</translation>
     </message>
     <message>
         <source>Record it anyway</source>
-        <translation type="unfinished">Dennoch aufnehmen</translation>
+        <translation>Dennoch aufnehmen</translation>
     </message>
     <message>
         <source>The following scheduled recordings conflict with each other.  Which would you like to record?</source>
-        <translation type="unfinished"></translation>
+        <translation>Die folgenden geplanten Aufnahmen überlappen sich. Welche davon möchten Sie aufnehmen?</translation>
     </message>
     <message>
         <source>Remember this choice and use it automatically in the future</source>
-        <translation type="unfinished">Diese Auswahl für die Zukunft merken</translation>
+        <translation>Diese Auswahl für die Zukunft merken</translation>
     </message>
     <message>
         <source>Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Priorität</translation>
     </message>
     <message>
         <source>Enable AC3 to SPDIF passthrough</source>
-        <translation type="unfinished"></translation>
+        <translation>AC3 nach SPDIF durchschleifen</translation>
     </message>
     <message>
         <source>Enable sending AC3 sound directly to your sound card&apos;s SPDIF output, on sources which contain AC3 soundtracks (usually digital TV).  Requires that the audio output device be set to something suitable.</source>
-        <translation type="unfinished"></translation>
+        <translation>AC3 Audio am SPDIF Ausgang der Soundkarte bereitstellen. Dies funktioniert nur falls eine AC3 Tonspur verfügbar ist (wie beim Digitalfernsehen). Ihre Soundkarte muß dafür richtig konfiguriert sein.</translation>
     </message>
     <message>
         <source>PIP Video Location</source>
-        <translation type="unfinished"></translation>
+        <translation>PIP Position</translation>
     </message>
     <message>
         <source>Top Left</source>
-        <translation type="unfinished"></translation>
+        <translation>Oben links</translation>
     </message>
     <message>
         <source>Bottom Left</source>
-        <translation type="unfinished"></translation>
+        <translation>Unten links</translation>
     </message>
     <message>
         <source>Top Right</source>
-        <translation type="unfinished"></translation>
+        <translation>Oben rechts</translation>
     </message>
     <message>
         <source>Bottom Right</source>
-        <translation type="unfinished"></translation>
+        <translation>Unten rechts</translation>
     </message>
     <message>
         <source>Location of PIP Video window.</source>
-        <translation type="unfinished"></translation>
+        <translation>Position für das PIP Fenster (Bild im Bild, verfügbar bei zwei Tunerkarten).</translation>
     </message>
     <message>
         <source>Reverse direction in fast forward/rewind</source>
@@ -2106,7 +2106,7 @@
     </message>
     <message>
         <source>Use Recording Priorities</source>
-        <translation type="unfinished"></translation>
+        <translation>Aufnahmeprioritäten verwenden</translation>
     </message>
     <message>
         <source>Use program recording priorities to resolve conflicts.</source>
@@ -2166,6 +2166,50 @@
     </message>
     <message>
         <source>Yes, Exit and Shutdown</source>
+        <translation>Verlassen und den Rechner anhalten</translation>
+    </message>
+    <message>
+        <source>Myth version:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last mythfilldatabase guide update:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Started:   </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Finished: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Result: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There&apos;s no guide data available! </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Have you run mythfilldatabase?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There is guide data until </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>days</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>WARNING: is mythfilldatabase running?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2530,6 +2574,10 @@
     <message>
         <source>16:9 Zoom</source>
         <translation>16:9 Zoom</translation>
+    </message>
+    <message>
+        <source>Color %1 %</source>
+        <translation>Farbe %1 %</translation>
     </message>
 </context>
 <context>

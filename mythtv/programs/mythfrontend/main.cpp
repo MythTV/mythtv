@@ -228,44 +228,55 @@ void showStatus(void)
     mfdLastRunEnd = gContext->GetSetting("mythfilldatabaseLastRunEnd");
     mfdLastRunStatus = gContext->GetSetting("mythfilldatabaseLastRunStatus");
 
-    Status = QString("Myth version: ") + MYTH_BINARY_VERSION;
+    Status = QObject::tr("Myth version:") + " " + MYTH_BINARY_VERSION;
 
-    Status += "\nLast mythfilldatabase guide update:";
-    Status += "\n   Started:   ";
+    Status = QObject::tr("Last mythfilldatabase guide update:");
+    Status += "\n   ";
+    Status += QObject::tr("Started:   ");
     Status += mfdLastRunStart;
     if (mfdLastRunEnd > mfdLastRunStart)  //if end < start, it's still running.
     {
-       Status += "\n   Finished: ";
-       Status += mfdLastRunEnd;
+        Status += "\n   ";
+        Status += QObject::tr("Finished: ");
+        Status += mfdLastRunEnd;
     }
 
-    Status += "\n   Result: ";
+    Status += "\n   ";
+    Status += QObject::tr("Result: ");
     Status += mfdLastRunStatus;
 
     DaysOfData = qdtNow.daysTo(GuideDataThrough);
 
-    if (!GuideDataThrough.isNull())
+    if (GuideDataThrough.isNull())
     {
-        Status += "\n\nThere's guide data until ";
+        Status += QObject::tr("There's no guide data available! ");
+        Status += QObject::tr("Have you run mythfilldatabase?");
+        Status += "\n";
+    }
+    else
+    {
+        Status += "\n\n";
+        Status += QObject::tr("There is guide data until ");
         Status += QDateTime(GuideDataThrough).toString("yyyy-MM-dd hh:mm");
 
         if (DaysOfData > 0)
         {
-            Status += QString("\n(%1 day").arg(DaysOfData);
-            Status += (DaysOfData == 1 ? "" : "s" );
+            Status += QString("\n(%1 ").arg(DaysOfData);
+            if (DaysOfData >1)
+                Status += QObject::tr("days");
+            else
+                Status += QObject::tr("day");
             Status += ").";
         }
         else
             Status += ".";
     }
-    else
-    {
-        Status += "There's no guide data available! ";
-        Status += "Have you run mythfilldatabase?\n";
-    }
 
     if (DaysOfData <= 3)
-       Status += "\nWARNING: is mythfilldatabase running?";
+    {
+        Status += "\n";
+        Status += QObject::tr("WARNING: is mythfilldatabase running?");
+    }
 
     DialogBox *status_dialog = new DialogBox(gContext->GetMainWindow(), Status);
     status_dialog->AddButton(QObject::tr("OK"));

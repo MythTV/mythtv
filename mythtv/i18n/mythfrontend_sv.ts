@@ -2148,6 +2148,50 @@
         <source>Yes, Exit and Shutdown</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Myth version:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last mythfilldatabase guide update:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Started:   </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Finished: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Result: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There&apos;s no guide data available! </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Have you run mythfilldatabase?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There is guide data until </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>days</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>WARNING: is mythfilldatabase running?</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RankPrograms</name>
@@ -2438,6 +2482,10 @@
     </message>
     <message>
         <source>16:9 Zoom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Color %1 %</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
