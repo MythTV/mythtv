@@ -83,6 +83,45 @@ int main(int argc, char **argv)
             return -1;
         }
 
+    int logfd = -1;
+
+    if (logfile != "") {
+        logfd = open(logfile.ascii(), O_WRONLY|O_CREAT|O_APPEND);
+         
+        if (logfd < 0) {
+            perror("open(logfile)");
+            return -1;
+        }
+    }
+    
+    ofstream pidfs;
+    if (pidfile != "") {
+        pidfs.open(pidfile.ascii());
+        if (!pidfs) {
+            perror("open(pidfile)");
+            return -1;
+        }
+    }
+
+    if (pidfs) {
+        pidfs << getpid() << endl;
+        pidfs.close();
+    }
+
+    close(0);
+
+    if (daemonize)
+        if (daemon(0, 1) < 0) {
+            perror("daemon");
+            return -1;
+        }
+
+    if (logfd != -1) {
+        // Send stdout and stderr to the logfile
+        dup2(logfd, 1);
+        dup2(logfd, 2);
+    }
+
     MythContext *context = new MythContext(false);
     context->LoadSettingsFiles("backend_settings.txt");
 
@@ -115,43 +154,6 @@ int main(int argc, char **argv)
     int statusport = context->GetNumSetting("StatusPort", 6544);
 
     MainServer *ms = new MainServer(context, port, statusport, &tvList);
-
-    int logfd = -1;
-
-    if (logfile != "") {
-        logfd = open(logfile.ascii(), O_WRONLY|O_CREAT|O_APPEND);
-         
-        if (logfd < 0) {
-            perror("open(logfile)");
-            return -1;
-        }
-    }
-    
-    ofstream pidfs;
-    if (pidfile != "") {
-        pidfs.open(pidfile.ascii());
-        if (!pidfs) {
-            perror("open(pidfile)");
-            return -1;
-        }
-    }
-
-    if (daemonize)
-        daemon(0, 1);
-
-    if (pidfs) {
-        pidfs << getpid() << endl;
-        pidfs.close();
-    }
-
-    close(0);
-
-    if (logfd != -1) {
-        // Send stdout and stderr to the logfile
-        dup2(logfd, 1);
-        dup2(logfd, 2);
-    }
-
     a.exec();
 
     delete context;
