@@ -654,9 +654,10 @@ MythDialog* ConfigurationDialog::dialogWidget(MythMainWindow *parent,
     return dialog;
 }
 
-int ConfigurationDialog::exec(QSqlDatabase* db, bool saveOnAccept) 
+int ConfigurationDialog::exec(QSqlDatabase* db, bool saveOnAccept, bool doLoad) 
 {
-    load(db);
+    if (doLoad)
+        load(db);
 
     MythDialog* dialog = dialogWidget(gContext->GetMainWindow());
     dialog->Show();

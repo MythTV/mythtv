@@ -424,7 +424,9 @@ void ProgramRecPriority::edit(void)
             (rec->GetProgramRecordingStatus(db) > kAllRecord))
         {
             ScheduledRecording record;
-            record.loadByProgram(db, rec);
+            record.loadByID(db, rec->recordid);
+            if (record.getSearchType() == kNoSearch)
+                record.loadByProgram(db, rec);
             record.exec(db);
             recid = record.getRecordID();
         }

@@ -184,7 +184,7 @@ public:
                                      const char* widgetName = 0);
 
     // Show a dialogWidget, and save if accepted
-    int exec(QSqlDatabase* db, bool saveOnExec = true);
+    int exec(QSqlDatabase* db, bool saveOnExec = true, bool doLoad = true);
 
 protected:
     MythDialog *dialog;

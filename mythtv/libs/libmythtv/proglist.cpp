@@ -75,6 +75,7 @@ ProgLister::ProgLister(ProgListType pltype, const QString &view,
     chooseLineEdit = NULL;
     chooseOkButton = NULL;
     chooseDeleteButton = NULL;
+    chooseRecordButton = NULL;
 
     curView = -1;
     fillViewList(view);
@@ -211,7 +212,8 @@ void ProgLister::updateBackground(void)
                 case plTitle: value = tr("Program Listings"); break;
                 case plNewListings: value = tr("New Title Search"); break;
                 case plTitleSearch: value = tr("Title Search"); break;
-                case plDescSearch: value = tr("Description Search"); break;
+                case plKeywordSearch: value = tr("Keyword Search"); break;
+                case plPeopleSearch: value = tr("People Search"); break;
                 case plChannel: value = tr("Channel Search"); break;
                 case plCategory: value = tr("Category Search"); break;
                 case plMovies: value = tr("Movie Search"); break;
@@ -303,7 +305,8 @@ void ProgLister::setViewFromList(void)
 
     int view = chooseListBox->currentItem();
 
-    if (type == plTitleSearch || type == plDescSearch)
+    if (type == plTitleSearch || type == plKeywordSearch || 
+        type == plPeopleSearch)
     {
         view--;
         if (view < 0)
@@ -327,11 +330,13 @@ void ProgLister::setViewFromList(void)
 
 void ProgLister::chooseEditChanged(void)
 {
-    if (!chooseOkButton || !chooseLineEdit)
+    if (!chooseOkButton || !chooseRecordButton || !chooseLineEdit)
         return;
 
     chooseOkButton->setEnabled(chooseLineEdit->text().
                                stripWhiteSpace().length() > 0);
+    chooseRecordButton->setEnabled(chooseLineEdit->text().
+                                   stripWhiteSpace().length() > 0);
 }
 
 void ProgLister::chooseListBoxChanged(void)
@@ -387,6 +392,42 @@ void ProgLister::setViewFromEdit(void)
 
     curItem = -1;
     refillAll = true;
+}
+
+void ProgLister::addSearchRecord(void)
+{
+    if (!choosePopup || !chooseListBox || !chooseLineEdit)
+        return;
+
+    QString text = chooseLineEdit->text();
+
+    if (text.stripWhiteSpace().length() == 0)
+        return;
+
+    RecSearchType recsearch;
+
+    switch (type)
+    {
+    case plTitleSearch:
+        recsearch = kTitleSearch;
+        break;
+    case plKeywordSearch:
+        recsearch = kKeywordSearch;
+        break;
+    case plPeopleSearch:
+        recsearch = kPeopleSearch;
+        break;
+    default:
+        cerr << "Unknown search in ProgLister" << endl;
+        return;
+    }
+
+    ScheduledRecording record;
+    record.loadBySearch(db, recsearch, text);
+    record.exec(db);
+    ScheduledRecording::signalChange(db);
+
+    setViewFromEdit();
 }
 
 void ProgLister::deleteKeyword(void)
@@ -459,7 +500,8 @@ void ProgLister::chooseView(void)
         delete choosePopup;
         choosePopup = NULL;
     }
-    else if (type == plTitleSearch || type == plDescSearch)
+    else if (type == plTitleSearch || type == plKeywordSearch ||
+             type == plPeopleSearch)
     {
         int oldView = curView;
 
@@ -492,9 +534,15 @@ void ProgLister::chooseView(void)
         chooseDeleteButton->setText(tr("Delete"));
         choosePopup->addWidget(chooseDeleteButton);
 
+        chooseRecordButton = new MythPushButton(choosePopup);
+        chooseRecordButton->setText(tr("Record"));
+        choosePopup->addWidget(chooseRecordButton);
+
         chooseOkButton->setEnabled(chooseLineEdit->text()
                                    .stripWhiteSpace().length() > 0);
         chooseDeleteButton->setEnabled(curView >= 0);
+        chooseRecordButton->setEnabled(chooseLineEdit->text()
+                                       .stripWhiteSpace().length() > 0);
 
         connect(chooseListBox, SIGNAL(accepted(int)), this, SLOT(setViewFromList()));
         connect(chooseListBox, SIGNAL(menuButtonPressed(int)), chooseLineEdit, SLOT(setFocus()));
@@ -502,6 +550,7 @@ void ProgLister::chooseView(void)
         connect(chooseLineEdit, SIGNAL(textChanged()), this, SLOT(chooseEditChanged()));
         connect(chooseOkButton, SIGNAL(clicked()), this, SLOT(setViewFromEdit()));
         connect(chooseDeleteButton, SIGNAL(clicked()), this, SLOT(deleteKeyword()));
+        connect(chooseRecordButton, SIGNAL(clicked()), this, SLOT(addSearchRecord()));
 
         if (viewCount < 1)
             chooseLineEdit->setFocus();
@@ -515,6 +564,8 @@ void ProgLister::chooseView(void)
         chooseOkButton = NULL;
         delete chooseDeleteButton;
         chooseDeleteButton = NULL;
+        delete chooseRecordButton;
+        chooseRecordButton = NULL;
         delete chooseListBox;
         chooseListBox = NULL;
         delete choosePopup;
@@ -619,7 +670,8 @@ void ProgLister::fillViewList(const QString &view)
         if (view != "")
             curView = viewList.findIndex(view);
     }
-    else if (type == plTitleSearch || type == plDescSearch)
+    else if (type == plTitleSearch || type == plKeywordSearch ||
+             type == plPeopleSearch)
     {
         QString querystr = "SELECT phrase FROM keyword;";
         QSqlQuery query;
@@ -711,7 +763,7 @@ void ProgLister::fillItemList(void)
                         .arg(startTime.toString("yyyyMMddhhmm50"))
                         .arg(channelOrdering);
     }
-    else if (type == plDescSearch) // description search
+    else if (type == plKeywordSearch) // keyword search
     {
         where = QString("WHERE channel.visible = 1 "
                         "AND (program.title LIKE \"\%%1\%\" "
@@ -724,6 +776,23 @@ void ProgLister::fillItemList(void)
                         "LIMIT 500;")
                         .arg(viewList[curView].utf8())
                         .arg(viewList[curView].utf8())
+                        .arg(viewList[curView].utf8())
+                        .arg(startTime.toString("yyyyMMddhhmm50"))
+                        .arg(channelOrdering);
+    }
+    else if (type == plPeopleSearch) // people search
+    {
+        where = QString(", people, credits "
+                        "WHERE channel.visible = 1 "
+                        "AND people.name LIKE \"\%%1\%\" "
+                        "AND credits.person = people.person "
+                        "AND program.chanid = credits.chanid "
+                        "AND program.starttime = credits.starttime "
+                        "AND channel.chanid = program.chanid "
+                        "AND program.endtime > %2 "
+                        "GROUP BY starttime,endtime,channum,callsign "
+                        "ORDER BY program.starttime,%3 "
+                        "LIMIT 500;")
                         .arg(viewList[curView].utf8())
                         .arg(startTime.toString("yyyyMMddhhmm50"))
                         .arg(channelOrdering);

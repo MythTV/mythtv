@@ -12,12 +12,18 @@
 
    <button>
       <type>TV_PROGFIND</type>
-      <text>Descriptions</text>
+      <text>Keywords</text>
       <text lang="DE">Inhalt</text>
       <text lang="SV">Beskrivning</text>
       <text lang="NL">Beschrijving</text>      
       <text lang="JA">内容</text>
-      <action>TV_SEARCH_DESC</action>
+      <action>TV_SEARCH_KEYWORD</action>
+   </button>
+
+   <button>
+      <type>TV_PROGFIND</type>
+      <text>People</text>
+      <action>TV_SEARCH_PEOPLE</action>
    </button>
 
    <button>

@@ -61,6 +61,8 @@ class Scheduler : public QObject
 
     void PruneOldRecords(void);
     void AddNewRecords(void);
+    void BuildNewRecordsQueries(QStringList &from, QStringList &where);
+    void PruneOverlaps(void);
     void BuildListMaps(void);
     void ClearListMaps(void);
     bool FindNextConflict(RecList &cardlist, ProgramInfo *p, RecIter &iter);

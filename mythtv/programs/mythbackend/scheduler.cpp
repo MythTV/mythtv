@@ -124,6 +124,21 @@ static inline bool Recording(ProgramInfo *p)
     return (p->recstatus == rsRecording || p->recstatus == rsWillRecord);
 }
 
+static bool comp_overlap(ProgramInfo *a, ProgramInfo *b)
+{
+    if (a->startts != b->startts)
+        return a->startts < b->startts;
+    if (a->endts != b->endts)
+        return a->endts < b->endts;
+
+    // Note: the PruneOverlaps logic depends on the following
+    if (a->chanid != b->chanid)
+        return a->chanid < b->chanid;
+    if (a->inputid != b->inputid)
+        return a->inputid < b->inputid;
+    return a->recordid < b->recordid;
+}
+
 static bool comp_recstart(ProgramInfo *a, ProgramInfo *b)
 {
     if (a->recstartts != b->recstartts)
@@ -218,9 +233,13 @@ bool Scheduler::FillRecordLists(void)
     VERBOSE(VB_SCHEDULE, "AddNewRecords...");
     AddNewRecords();
 
+    VERBOSE(VB_SCHEDULE, "Sort by time...");
+    reclist.sort(comp_overlap);
+    VERBOSE(VB_SCHEDULE, "PruneOverlaps...");
+    PruneOverlaps();
+
     VERBOSE(VB_SCHEDULE, "Sort by priority...");
     reclist.sort(comp_priority);
-
     VERBOSE(VB_SCHEDULE, "BuildListMaps...");
     BuildListMaps();
 
@@ -241,7 +260,6 @@ bool Scheduler::FillRecordLists(void)
 
     VERBOSE(VB_SCHEDULE, "Sort by time...");
     reclist.sort(comp_recstart);
-
     VERBOSE(VB_SCHEDULE, "PruneRedundants...");
     PruneRedundants();
 
@@ -383,6 +401,32 @@ void Scheduler::PruneOldRecords(void)
             if (p->recstatus == rsRecording && p->recendts < schedTime)
                 p->recstatus = rsRecorded;
             dreciter++;
+        }
+    }
+}
+
+void Scheduler::PruneOverlaps(void)
+{
+    ProgramInfo *lastp = NULL;
+
+    RecIter dreciter = reclist.begin();
+    while (dreciter != reclist.end())
+    {
+        ProgramInfo *p = *dreciter;
+        if (lastp == NULL || lastp->recordid == p->recordid ||
+            !lastp->IsSameTimeslot(*p))
+        {
+            lastp = p;
+            dreciter++;
+        }
+        else
+        {
+            int lpri = RecTypePriority(lastp->rectype);
+            int cpri = RecTypePriority(p->rectype);
+            if (lpri > cpri)
+                *lastp = *p;
+            delete p;
+            dreciter = reclist.erase(dreciter);
         }
     }
 }
@@ -1160,10 +1204,75 @@ void *Scheduler::SchedulerThread(void *param)
     return NULL;
 }
 
+void Scheduler::BuildNewRecordsQueries(QStringList &from, QStringList &where)
+{
+    QString query;
+    QSqlQuery result;
+
+    from << "";
+    where << QString("record.search = %1 AND "
+                     "program.title = record.title").arg(kNoSearch);
+
+    query = QString("SELECT recordid,search,subtitle,description "
+                    "FROM record WHERE search <> %1").arg(kNoSearch);
+
+    result = db->exec(query);
+    if (!result.isActive())
+    {
+        MythContext::DBError("BuildNewRecordsQueries", result);
+        return;
+    }
+
+    while (result.next())
+    {
+        switch (result.value(1).toInt())
+        {
+        case kPowerSearch:
+            from << result.value(2).toString();
+            where << QString("record.recordid = %1 AND %2")
+                .arg(result.value(0).toString())
+                .arg(result.value(2).toString())
+                .arg(result.value(3).toString());
+            break;
+        case kTitleSearch:
+            from << "";
+            where << QString("record.recordid = %1 AND "
+                             "program.title LIKE '\%%2\%'")
+                .arg(result.value(0).toString())
+                .arg(result.value(3).toString());
+            break;
+        case kKeywordSearch:
+            from << "";
+            where << QString("record.recordid = %1 AND "
+                             "(program.title LIKE '\%%2\%' OR "
+                             " program.subtitle LIKE '\%%3\%' OR "
+                             " program.description LIKE '\%%4\%')")
+                .arg(result.value(0).toString())
+                .arg(result.value(3).toString())
+                .arg(result.value(3).toString())
+                .arg(result.value(3).toString());
+            break;
+        case kPeopleSearch:
+            from << ", people, credits";
+            where << QString("record.recordid = %1 AND "
+                             "people.name LIKE '\%%2\%' AND "
+                             "credits.person = people.person AND "
+                             "program.chanid = credits.chanid AND "
+                             "program.starttime = credits.starttime")
+                .arg(result.value(0).toString())
+                .arg(result.value(3).toString());
+            break;
+        default:
+            cerr << "Unknown RecSearchType (" << result.value(1).toInt()
+                 << ") for recordid " << result.value(0).toString() << endl;
+            break;
+        }
+    }
+}
+
 void Scheduler::AddNewRecords(void) {
     QMap<RecordingType, int> recTypeRecPriorityMap;
     RecList tmpList;
-    ProgramInfo *lastp = NULL;
     QMap<int, bool> allowmap;
 
     QMap<int, bool> cardMap;
@@ -1174,6 +1283,21 @@ void Scheduler::AddNewRecords(void) {
         if (enc->isConnected())
             cardMap[enc->getCardId()] = true;
     }
+
+    unsigned clause;
+    QStringList fromclauses, whereclauses;
+
+    BuildNewRecordsQueries(fromclauses, whereclauses);
+
+    if (print_verbose_messages & VB_SCHEDULE)
+    {
+        for (clause = 0; clause < fromclauses.count(); clause++)
+            cout << "Query " << clause << ": " << fromclauses[clause] 
+                 << "/" << whereclauses[clause] << endl;
+    }
+
+    for (clause = 0; clause < fromclauses.count(); clause++)
+    {
 
     QString query = QString(
 "SELECT DISTINCT channel.chanid, channel.sourceid, "
@@ -1192,8 +1316,9 @@ void Scheduler::AddNewRecords(void) {
 "channel.commfree, capturecard.cardid, "
 "cardinput.cardinputid, UPPER(cardinput.shareable) = 'Y' AS shareable, "
 "program.seriesid, program.programid "
-"FROM record "
-" INNER JOIN program ON (program.title = record.title) "
+
+"FROM record, program ") + fromclauses[clause] + QString(
+
 " INNER JOIN channel ON (channel.chanid = program.chanid) "
 " INNER JOIN cardinput ON (channel.sourceid = cardinput.sourceid) "
 " INNER JOIN capturecard ON (capturecard.cardid = cardinput.cardid) "
@@ -1236,9 +1361,10 @@ void Scheduler::AddNewRecords(void) {
 "          AND program.description = recorded.description)) "
 "      ) "
 "     ) "
-"  ) ");
-    query += QString(
-"WHERE "
+"  ) "
+
+"WHERE ") + whereclauses[clause] + QString(" AND "
+
 "((record.type = %1 " // allrecord
 "OR record.type = %2) " // findonerecord
 " OR "
@@ -1267,17 +1393,14 @@ void Scheduler::AddNewRecords(void) {
 "   )"
 "  )"
 " )"
-") "
-// Note: the overlap code below depends on this ordering
-"ORDER BY program.starttime,program.endtime,program.chanid,"
-"cardinput.cardinputid,record.recordid;")
+") ")
         .arg(kAllRecord)
         .arg(kFindOneRecord)
         .arg(kChannelRecord)
         .arg(kTimeslotRecord)
         .arg(kWeekslotRecord);
 
-    VERBOSE(VB_SCHEDULE, " |-- Start DB Query...");
+    VERBOSE(VB_SCHEDULE, QString(" |-- Start DB Query %1...").arg(clause));
     QSqlQuery result = db->exec(query);
 
     if (!result.isActive())
@@ -1394,21 +1517,9 @@ void Scheduler::AddNewRecords(void) {
                 p->recstatus = rsCurrentRecording;
         }
 
-        // Check for overlap against last non-overlap
-        if (lastp == NULL || lastp->recordid == p->recordid ||
-            !lastp->IsSameTimeslot(*p))
-            lastp = p;
-        else
-        {
-            int lpri = RecTypePriority(lastp->rectype);
-            int cpri = RecTypePriority(p->rectype);
-            if (lpri > cpri)
-                *lastp = *p;
-            delete p;
-            continue;
-        }
-
         tmpList.push_back(p);
+    }
+
     }
 
     VERBOSE(VB_SCHEDULE, " +-- Cleanup...");

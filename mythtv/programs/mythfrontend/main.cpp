@@ -67,14 +67,25 @@ void startSearchTitle(void)
     qApp->lock();
 }
 
-void startSearchDesc(void)
+void startSearchKeyword(void)
 {
-  ProgLister searchDesc(plDescSearch, "",
+  ProgLister searchKeyword(plKeywordSearch, "",
                         QSqlDatabase::database(),
                         gContext->GetMainWindow(), "proglist");
 
     qApp->unlock();
-    searchDesc.exec();
+    searchKeyword.exec();
+    qApp->lock();
+}
+
+void startSearchPeople(void)
+{
+  ProgLister searchPeople(plPeopleSearch, "",
+                         QSqlDatabase::database(),
+                         gContext->GetMainWindow(), "proglist");
+
+    qApp->unlock();
+    searchPeople.exec();
     qApp->lock();
 }
 
@@ -394,8 +405,10 @@ void TVMenuCallback(void *data, QString &selection)
         startFinder();
     else if (sel == "tv_search_title")
         startSearchTitle();
-    else if (sel == "tv_search_desc")
-        startSearchDesc();
+    else if (sel == "tv_search_keyword")
+        startSearchKeyword();
+    else if (sel == "tv_search_people")
+        startSearchPeople();
     else if (sel == "tv_search_channel")
         startSearchChannel();
     else if (sel == "tv_search_category")

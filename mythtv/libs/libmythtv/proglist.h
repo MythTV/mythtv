@@ -13,10 +13,11 @@ enum ProgListType {
     plTitle = 1,
     plNewListings = 2,
     plTitleSearch = 3,
-    plDescSearch = 4,
+    plKeywordSearch = 4,
     plChannel = 5,
     plCategory = 6,
-    plMovies = 7
+    plMovies = 7,
+    plPeopleSearch = 8
 };
 
 class QSqlDatabase;
@@ -39,6 +40,7 @@ class ProgLister : public MythDialog
     void chooseEditChanged(void);
     void chooseListBoxChanged(void);
     void setViewFromEdit(void);
+    void addSearchRecord(void);
     void deleteKeyword(void);
     void select(void);
     void edit(void);
@@ -98,6 +100,7 @@ class ProgLister : public MythDialog
     MythRemoteLineEdit *chooseLineEdit;
     MythPushButton *chooseOkButton;
     MythPushButton *chooseDeleteButton;
+    MythPushButton *chooseRecordButton;
 };
 
 #endif

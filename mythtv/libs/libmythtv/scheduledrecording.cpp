@@ -68,19 +68,23 @@ public:
         addSelection(QString::number(kOverrideRecord));
         addSelection(QString::number(kDontRecord));
     };
-    void addNormalSelections(void) {
+    void addNormalSelections(bool haschannel) {
         addSelection(QObject::tr("Do not record this program"),
                      QString::number(kNotRecording));
-        addSelection(QObject::tr("Record only this showing"),
-                     QString::number(kSingleRecord));
+        if (haschannel)
+            addSelection(QObject::tr("Record only this showing"),
+                         QString::number(kSingleRecord));
         addSelection(QObject::tr("Record one showing of this program"),
                      QString::number(kFindOneRecord));
-        addSelection(QObject::tr("Record in this timeslot every week"),
-                     QString::number(kWeekslotRecord));
-        addSelection(QObject::tr("Record in this timeslot every day"),
-                     QString::number(kTimeslotRecord));
-        addSelection(QObject::tr("Record at any time on this channel"),
-                     QString::number(kChannelRecord));
+        if (haschannel)
+        {
+            addSelection(QObject::tr("Record in this timeslot every week"),
+                         QString::number(kWeekslotRecord));
+            addSelection(QObject::tr("Record in this timeslot every day"),
+                         QString::number(kTimeslotRecord));
+            addSelection(QObject::tr("Record at any time on this channel"),
+                         QString::number(kChannelRecord));
+        }
         addSelection(QObject::tr("Record at any time on any channel"),
                      QString::number(kAllRecord));
     };
@@ -92,17 +96,13 @@ public:
         addSelection(QObject::tr("Do not record this showing"),
                      QString::number(kDontRecord));
     };
-    virtual void load(QSqlDatabase* db) {
-        SimpleDBStorage::load(db);
-        QString tempval = getValue();
-        clearSelections();
-        if (tempval.toInt() == kOverrideRecord ||
-            tempval.toInt() == kDontRecord)
-            addOverrideSelections();
-        else
-            addNormalSelections();
-        setValue(getValueIndex(tempval));
-        setUnchanged();
+};
+
+class SRRecSearchType: public IntegerSetting, public SRSetting {
+public:
+    SRRecSearchType(const ScheduledRecording& parent):
+        SRSetting(parent, "search") {
+        setVisible(false);
     };
 };
 
@@ -343,6 +343,7 @@ public:
 ScheduledRecording::ScheduledRecording() {
     addChild(id = new ID());
     addChild(type = new SRRecordingType(*this));
+    addChild(search = new SRRecSearchType(*this));
     addChild(profile = new SRProfileSelector(*this));
     addChild(dupin = new SRDupIn(*this));
     addChild(dupmethod = new SRDupMethod(*this));
@@ -372,31 +373,44 @@ ScheduledRecording::ScheduledRecording() {
 void ScheduledRecording::load(QSqlDatabase *db)
 {
     if (getRecordID())
+    {
         ConfigurationGroup::load(db);
+
+        QString tmpType = type->getValue();
+        type->clearSelections();
+        if (tmpType.toInt() == kOverrideRecord ||
+            tmpType.toInt() == kDontRecord)
+            type->addOverrideSelections();
+        else
+            type->addNormalSelections(!station->getValue().isEmpty());
+        type->setValue(type->getValueIndex(tmpType));
+        type->setUnchanged();
+    }
 }
 
-void ScheduledRecording::fromProgramInfo(ProgramInfo* proginfo, 
-                                         QSqlDatabase *db)
+void ScheduledRecording::setDefault(QSqlDatabase *db, bool haschannel)
 {
     id->setValue(0);
-    id->setUnchanged();
     type->clearSelections();
-    type->addNormalSelections();
-    channel->setValue(proginfo->chanid);
-    station->setValue(proginfo->chansign);
-    title->setValue(proginfo->title);
-    subtitle->setValue(proginfo->subtitle);
-    description->setValue(proginfo->description);
-    startTime->setValue(proginfo->startts.time());
-    startDate->setValue(proginfo->startts.date());
-    endTime->setValue(proginfo->endts.time());
-    endDate->setValue(proginfo->endts.date());
-    category->setValue(proginfo->category);
-    seriesid->setValue(proginfo->seriesid);
-    programid->setValue(proginfo->programid);
+    type->addNormalSelections(haschannel);
+    search->setValue(kNoSearch);
+
+    title->setValue("");
+    subtitle->setValue("");
+    description->setValue("");
+    channel->setValue("");
+    station->setValue("");
+    QDate date = QDate::currentDate();
+    QTime time = QTime::currentTime();
+    startDate->setValue(date);
+    startTime->setValue(time);
+    endDate->setValue(date);
+    endTime->setValue(time);
+    seriesid->setValue("");
+    programid->setValue("");
+    category->setValue("");
 
     profile->fillSelections(db);
-    recgroup->fillSelections(db);
     dupin->setValue(0);
     dupmethod->setValue(0);
     autoexpire->setValue(gContext->GetNumSetting("AutoExpireDefault", 0));
@@ -405,31 +419,38 @@ void ScheduledRecording::fromProgramInfo(ProgramInfo* proginfo,
     startoffset->setValue(0);
     endoffset->setValue(0);
     recpriority->setValue(0);
+    recgroup->fillSelections(db);
     recgroup->setValue("Default");
 }
 
-void ScheduledRecording::makeOverride(ProgramInfo* proginfo)
+void ScheduledRecording::setProgram(ProgramInfo *proginfo)
+{
+    title->setValue(proginfo->title);
+    subtitle->setValue(proginfo->subtitle);
+    description->setValue(proginfo->description);
+    channel->setValue(proginfo->chanid);
+    station->setValue(proginfo->chansign);
+    startDate->setValue(proginfo->startts.date());
+    startTime->setValue(proginfo->startts.time());
+    endDate->setValue(proginfo->endts.date());
+    endTime->setValue(proginfo->endts.time());
+    seriesid->setValue(proginfo->seriesid);
+    programid->setValue(proginfo->programid);
+    category->setValue(proginfo->category);
+}
+
+void ScheduledRecording::makeOverride(void)
 {
     if (type->getValue().toInt() == kOverrideRecord ||
         type->getValue().toInt() == kDontRecord)
         return;
 
     id->setValue(0);
-    id->setUnchanged();
     type->clearSelections();
     type->addOverrideSelections();
-    channel->setValue(proginfo->chanid);
-    station->setValue(proginfo->chansign);
-    title->setValue(proginfo->title);
-    subtitle->setValue(proginfo->subtitle);
-    description->setValue(proginfo->description);
-    startTime->setValue(proginfo->startts.time());
-    startDate->setValue(proginfo->startts.date());
-    endTime->setValue(proginfo->endts.time());
-    endDate->setValue(proginfo->endts.date());
-    category->setValue(proginfo->category);
-    seriesid->setValue(proginfo->seriesid);
-    programid->setValue(proginfo->programid);
+    search->setValue(kNoSearch);
+
+    setProgram(m_pginfo);
 
     profile->setChanged();
     dupin->setChanged();
@@ -443,99 +464,65 @@ void ScheduledRecording::makeOverride(ProgramInfo* proginfo)
     recgroup->setChanged();
 }
 
-bool ScheduledRecording::loadByProgram(QSqlDatabase* db,
+void ScheduledRecording::loadByProgram(QSqlDatabase* db,
                                        ProgramInfo* proginfo) {
     m_pginfo = proginfo;
 
     if (proginfo->recordid)
-    {
         loadByID(db, proginfo->recordid);
-        return true;
+    else {
+        setDefault(db, true);
+        search->setValue(kNoSearch);
     }
 
-    QString sqltitle(proginfo->title);
+    if (search->intValue() == kNoSearch)
+        setProgram(proginfo);
+}
 
-    // this doesn't have to be a QRegexp in qt 3.1+
-    sqltitle.replace(QRegExp("\'"), "\\'");
-    sqltitle.replace(QRegExp("\""), "\\\"");
+void ScheduledRecording::loadBySearch(QSqlDatabase *db,
+                                      RecSearchType lsearch,
+                                      QString forwhat)
+{
+    int rid = 0;
 
-    // prevent the SQL from breaking if chanid is null
-    QString chanid = proginfo->chanid;
-    QString chansign = proginfo->chansign;
-    if (!chanid || chanid == "")
-         chanid = "0";
+    QString thequery = QString("SELECT recordid FROM record WHERE "
+                               "search = %1 AND description LIKE '%2'")
+        .arg(lsearch).arg(forwhat);
+    QSqlQuery query = db->exec(thequery);
 
-    // XXX - this should set proginfo.duplicate as in findAllProgramsToRecord
-    // Have to split up into parts since .arg() only supports %1-%9
-    QString query = QString(
-"SELECT "
-"recordid "
-"FROM record "
-"LEFT JOIN channel ON (record.chanid = channel.chanid) "
-"WHERE "
-"record.title = \"%1\" "
-"AND "
-"((record.type = %2 " // allrecord
-"OR record.type = %3) " // findonerecord
-" OR "
-" ((record.chanid = %4 " // channel matches
-" OR (callsign <> '' AND callsign = '%5')) "
-"  AND "
-"  ((record.type = %6) " // channelrecord
-"   OR"
-"   (((TIME_TO_SEC(record.starttime) = TIME_TO_SEC('%7')) " // timeslot matches
-"      AND "
-"     (TIME_TO_SEC(record.endtime) = TIME_TO_SEC('%8')) "
-"    )"
-"    AND ")
-        .arg(sqltitle.utf8())
-        .arg(kAllRecord)
-        .arg(kFindOneRecord)
-        .arg(chanid)
-        .arg(chansign)
-        .arg(kChannelRecord)
-        .arg(proginfo->startts.time().toString(Qt::ISODate))
-        .arg(proginfo->endts.time().toString(Qt::ISODate));
+    if (query.isActive())
+    {
+        if (query.next())
+            rid = query.value(0).toInt();
+    }
+    else
+        MythContext::DBError("loadBySearch", query);
 
-query += QString(
-"    ((record.type = %1) " // timeslotrecord
-"     OR"
-"     ((DAYOFWEEK(record.startdate) = DAYOFWEEK('%2') "
-"      AND "
-"      ((record.type = %3) " // weekslotrecord
-"       OR "
-"       ((TO_DAYS(record.startdate) = TO_DAYS('%4')) " // date matches
-"        AND "
-"        (TO_DAYS(record.enddate) = TO_DAYS('%5')) "
-"        )"
-"       )"
-"      )"
-"     )"
-"    )"
-"   )"
-"  )"
-" )"
-");")
-        .arg(kTimeslotRecord)
-        .arg(proginfo->startts.date().toString(Qt::ISODate))
-        .arg(kWeekslotRecord)
-        .arg(proginfo->startts.date().toString(Qt::ISODate))
-        .arg(proginfo->endts.date().toString(Qt::ISODate));
-
-    QSqlQuery result = db->exec(query);
-    if (result.isActive()) {
-        if (result.numRowsAffected() > 0) {
-            result.next();
-            loadByID(db, result.value(0).toInt());
-            return true;
-        } else {
-            fromProgramInfo(proginfo, db);
+    if (rid)
+        loadByID(db, rid);
+    else
+    {
+        setDefault(db, false);
+        search->setValue(lsearch);
+        QString ltitle = forwhat;
+        switch (lsearch)
+        {
+        case kTitleSearch:
+            ltitle += " (" +  QObject::tr("Title Search") + ")";
+            break;
+        case kKeywordSearch:
+            ltitle += " (" +  QObject::tr("Keyword Search") + ")";
+            break;
+        case kPeopleSearch:
+            ltitle += " (" +  QObject::tr("People Search") + ")";
+            break;
+        default:
+            ltitle += " (" +  QObject::tr("Unknown Search") + ")";
+            break;
         }
-    } else {
-        MythContext::DBError("loadByProgram", result);
-    }
-
-    return false;
+        title->setValue(ltitle);
+        description->setValue(forwhat);
+    } 
 }
 
 void ScheduledRecording::loadByID(QSqlDatabase* db, int recordID) {
@@ -549,6 +536,10 @@ RecordingType ScheduledRecording::getRecordingType(void) const {
 
 void ScheduledRecording::setRecordingType(RecordingType newType) {
     type->setValue(type->getValueIndex(QString::number(newType)));
+}
+
+RecSearchType ScheduledRecording::getSearchType(void) const {
+    return (RecSearchType)(search->intValue());
 }
 
 bool ScheduledRecording::GetAutoExpire(void) const {
@@ -723,6 +714,16 @@ MythDialog* ScheduledRecording::dialogWidget(MythMainWindow *parent,
     QVBoxLayout* vbox = new QVBoxLayout(dialog, (int)(20 * wmult),
                                                 (int)(10 * wmult));
 
+    if (!m_pginfo || search->intValue() != kNoSearch)
+    {
+        QLabel *searchlabel = new QLabel(title->getValue(), dialog);
+        searchlabel->setBackgroundOrigin(QWidget::WindowOrigin);
+        searchlabel->setFont(gContext->GetBigFont());
+        searchlabel->setMinimumWidth(int(760 * wmult));
+        searchlabel->setMaximumWidth(int(760 * wmult));
+        vbox->addWidget(searchlabel);
+    }
+
     if (m_pginfo)
     {
         QGridLayout *grid = m_pginfo->DisplayWidget(dialog);
@@ -767,6 +768,8 @@ MythDialog* ScheduledRecording::dialogWidget(MythMainWindow *parent,
     hbox = new QHBoxLayout(vbox, (int)(20 * wmult));
     proglistButton = new MythPushButton(tr("List upcoming episodes"),
                                                 dialog);
+    if (!m_pginfo)
+        proglistButton->setEnabled(false);
     hbox->addWidget(proglistButton);
     hbox->addStretch( 42 );
     MythPushButton *cancel = new MythPushButton(tr("&Cancel"), dialog);

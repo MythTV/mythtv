@@ -38,6 +38,15 @@ enum RecordingDupMethodType
     kDupCheckSubDesc  = 0x06
 };
 
+enum RecSearchType
+{
+    kNoSearch = 0,
+    kPowerSearch,
+    kTitleSearch,
+    kKeywordSearch,
+    kPeopleSearch
+};
+
 class ProgramInfo;
 class QSqlDatabase;
 class ScheduledRecording: public ConfigurationGroup, public ConfigurationDialog {
@@ -47,11 +56,11 @@ public:
     //ScheduledRecording(const ScheduledRecording& other);
 
     virtual void load(QSqlDatabase* db);
-    void fromProgramInfo(ProgramInfo* proginfo, QSqlDatabase *db);
-    void makeOverride(ProgramInfo* proginfo);
+    void makeOverride(void);
 
     RecordingType getRecordingType(void) const;
     void setRecordingType(RecordingType);
+    RecSearchType getSearchType(void) const;
 
     bool GetAutoExpire(void) const;
     void SetAutoExpire(bool expire);
@@ -69,7 +78,11 @@ public:
     virtual void save(QSqlDatabase* db);
 
     void loadByID(QSqlDatabase* db, int id);
-    bool loadByProgram(QSqlDatabase* db, ProgramInfo* proginfo);
+    void loadByProgram(QSqlDatabase* db, ProgramInfo* proginfo);
+    void loadBySearch(QSqlDatabase *db, RecSearchType lsearch, QString what);
+
+    int exec(QSqlDatabase* db, bool saveOnExec = true, bool doLoad = false)
+        { return ConfigurationDialog::exec(db, saveOnExec, doLoad); }
 
     void remove(QSqlDatabase* db);
     int getRecordID(void) const { return id->intValue(); };
@@ -104,6 +117,9 @@ protected slots:
     void runProgList();
 
 private:
+    void setDefault(QSqlDatabase *db, bool haschannel);
+    void setProgram(ProgramInfo *proginfo);
+
     class ID: virtual public IntegerSetting,
               public AutoIncrementStorage {
     public:
@@ -116,6 +132,7 @@ private:
 
     ID* id;
     class SRRecordingType* type;
+    class SRRecSearchType* search;
     class SRProfileSelector* profile;
     class SRDupIn* dupin;
     class SRDupMethod* dupmethod;

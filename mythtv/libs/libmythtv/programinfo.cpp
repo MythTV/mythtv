@@ -397,7 +397,7 @@ void ProgramInfo::GetProgramListByQuery(QSqlDatabase *db,
 {
     QString thequery;
      
-    thequery = QString("SELECT channel.chanid,starttime,endtime,title,"
+    thequery = QString("SELECT channel.chanid,program.starttime,endtime,title,"
                        "subtitle,description,category,channel.channum,"
                        "channel.callsign,channel.name,previouslyshown,"
                        "channel.commfree,channel.outputfilters,"
@@ -734,7 +734,7 @@ void ProgramInfo::ApplyRecordStateChange(QSqlDatabase *db,
 {
     GetProgramRecordingStatus(db);
     if (newstate == kOverrideRecord || newstate == kDontRecord)
-        record->makeOverride(this);
+        record->makeOverride();
     record->setRecordingType(newstate);
     record->save(db);
 }
@@ -2028,7 +2028,7 @@ void ProgramInfo::handleRecording(QSqlDatabase *db)
     else if (ret == edcust)
     {
         GetProgramRecordingStatus(db);
-        record->makeOverride(this);
+        record->makeOverride();
         record->exec(db);
     }
 
@@ -2145,7 +2145,7 @@ void ProgramInfo::handleNotRecording(QSqlDatabase *db)
     else if (ret == edcust)
     {
         GetProgramRecordingStatus(db);
-        record->makeOverride(this);
+        record->makeOverride();
         record->exec(db);
     }
 
