@@ -123,6 +123,9 @@ bool DecoderBase::PosMapFromDb(void)
         PosMapEntry e = {it.key(), it.key() * keyframedist, it.data()};
         m_positionMap.push_back(e);
     }
+    VERBOSE(VB_PLAYBACK, QString("Position map filled from DB to: %1")
+            .arg((long int) m_positionMap[m_positionMap.size()-1].index));
+
 
     return true;
 }
@@ -177,7 +180,7 @@ bool DecoderBase::PosMapFromEnc(void)
         PosMapEntry e = {it.key(), it.key() * keyframedist, it.data()};
         m_positionMap.push_back(e);
     }
-    VERBOSE(VB_PLAYBACK, QString("Position map filled to: %1")
+    VERBOSE(VB_PLAYBACK, QString("Position map filled from Encoder to: %1")
             .arg((long int) m_positionMap[m_positionMap.size()-1].index));
 
     return true;
@@ -207,25 +210,32 @@ bool DecoderBase::SyncPositionMap(void)
     if (livetv)
     {
         PosMapFromEnc();
-        //cerr << "Live TV: from encoder: " << m_positionMap.size() 
-        //<< " entries" << endl;
+        VERBOSE(VB_PLAYBACK,
+                QString("SyncPositionMap liveTV, from Encoder: %1 entries")
+                .arg(m_positionMap.size()));
     }
     else if (watchingrecording)
     {
-        //cerr << "Watching & recording..." << endl;
         if (!posmapStarted) 
         {
             // starting up -- try first from database
             PosMapFromDb();
-            //cerr << "from db: " << m_positionMap.size() << " entries" << endl;
+            VERBOSE(VB_PLAYBACK,
+                    QString("SyncPositionMap watchingrecording, from DB: "
+                            "%1 entries")
+                    .arg(m_positionMap.size()));
         }
         // always try to get more from encoder
         if (!PosMapFromEnc()) 
         {
-            //cerr << "...none from encoder" << endl;
+            VERBOSE(VB_PLAYBACK,
+                    QString("SyncPositionMap watchingrecording no entries "
+                            "from encoder, try DB"));
             PosMapFromDb(); // try again from db
         }
-        //cerr << "..." << m_positionMap.size() << " total" << endl;
+        VERBOSE(VB_PLAYBACK,
+                QString("SyncPositionMap watchingrecording total: %1 entries")
+                .arg(m_positionMap.size()));
     }
     else
     {
@@ -233,8 +243,9 @@ bool DecoderBase::SyncPositionMap(void)
         if (!posmapStarted)
         {
             PosMapFromDb();
-            //cerr << "Prerecorded... from db: " << m_positionMap.size() 
-            //<< " (posmapStarted: " << posmapStarted << ")" << endl;
+            VERBOSE(VB_PLAYBACK,
+                    QString("SyncPositionMap prerecorded, from DB: %1 entries")
+                    .arg(m_positionMap.size()));
         }
     }
 
