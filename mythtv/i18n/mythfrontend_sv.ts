@@ -91,7 +91,7 @@
     <name>CustomRecord</name>
     <message>
         <source>Power Search Recording Rule Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Inspelningsregeleditor för avancerad sökning</translation>
     </message>
     <message>
         <source>Rule Name</source>
@@ -115,11 +115,11 @@
     </message>
     <message>
         <source>Exclude unidentified episodes (Data Direct)</source>
-        <translation type="unfinished"></translation>
+        <translation>Uteslut oidentifierade avsnitt (Data Direct)</translation>
     </message>
     <message>
         <source>Exclude unidentified episodes (XMLTV)</source>
-        <translation type="unfinished"></translation>
+        <translation>Uteslut oidentifierade avsnitt (XMLTV)</translation>
     </message>
     <message>
         <source>Category type</source>
@@ -163,15 +163,15 @@
     </message>
     <message>
         <source>Only in primetime</source>
-        <translation type="unfinished"></translation>
+        <translation>Endast under bästa sändningstid</translation>
     </message>
     <message>
         <source>Not in primetime</source>
-        <translation type="unfinished"></translation>
+        <translation>Ej under bästa sändningstid</translation>
     </message>
     <message>
         <source>Multiple sports teams (complete example)</source>
-        <translation type="unfinished">Flera sportlag (komplett exempel)</translation>
+        <translation>Flera sportlag (komplett exempel)</translation>
     </message>
     <message>
         <source>Sci-fi B-movies (complete example)</source>
@@ -240,10 +240,6 @@
         <translation>För att se en lista på alla kommande visningar av detta program, tryck &apos;5&apos;</translation>
     </message>
     <message>
-        <source>Record one showing of this program</source>
-        <translation>Spela in en visning</translation>
-    </message>
-    <message>
         <source>Don&apos;t record this showing</source>
         <translation>Spela inte in denna visning</translation>
     </message>
@@ -254,6 +250,10 @@
     <message>
         <source>Record this showing with normal options</source>
         <translation>Spela in visning med vanliga inställningar</translation>
+    </message>
+    <message>
+        <source>Record one showing of this title</source>
+        <translation>Spela in en visning av denna titel</translation>
     </message>
 </context>
 <context>
@@ -686,6 +686,18 @@
     <message>
         <source>Job Options</source>
         <translation>Jobbinställningar</translation>
+    </message>
+    <message>
+        <source>Playlist Actions</source>
+        <translation>Spellistehandlingar</translation>
+    </message>
+    <message>
+        <source>There are %1 items in the list.</source>
+        <translation>Det finns %1 poster i listan.</translation>
+    </message>
+    <message>
+        <source>Shuffle Play</source>
+        <translation>Blandad spelning</translation>
     </message>
 </context>
 <context>
@@ -4520,10 +4532,6 @@ som du startade detta programmet i.</translation>
         <translation>Spela endast in denna visning</translation>
     </message>
     <message>
-        <source>Record one showing of this program</source>
-        <translation>Spela in en visning av detta program</translation>
-    </message>
-    <message>
         <source>Record in this timeslot every week</source>
         <translation>Spela in denna tid varje vecka</translation>
     </message>
@@ -4792,10 +4800,6 @@ som du startade detta programmet i.</translation>
     <message>
         <source>Use 1-8 to change priority level.</source>
         <translation>1-8 ändrar prioritet.</translation>
-    </message>
-    <message>
-        <source>Delete oldest if this would exceede the max episodes</source>
-        <translation>Radera äldsta om max antal avsnitt överskrids</translation>
     </message>
     <message>
         <source>Show the program guide when starting Live TV</source>
@@ -5090,10 +5094,6 @@ som du startade detta programmet i.</translation>
         <translation>Återköa jobb?</translation>
     </message>
     <message>
-        <source>Follow Symlinks when deleting files</source>
-        <translation>Följ symboliska länkar vid borttagning av filer</translation>
-    </message>
-    <message>
         <source>This will cause Myth to follow symlinks when recordings and related files are deleted, instead of deleting the symlink and leaving the actual file.</source>
         <translation>Detta får Myth att följa symboliska länkar när inspelningar och relaterade filer tas bort, i stället för att ta bort den symboliska länken och lämna kvar den egentliga filen.</translation>
     </message>
@@ -5284,18 +5284,6 @@ som du startade detta programmet i.</translation>
         <translation>Ja, ta bort mina TV-kortsinställningar</translation>
     </message>
     <message>
-        <source>Would you like to clear all program and channel settings before starting configuration?</source>
-        <translation type="obsolete">Vill du rensa alla program och kanalinställningar innan konfigurationen fortsätter?</translation>
-    </message>
-    <message>
-        <source>No, leave my program settings alone</source>
-        <translation type="obsolete">Nej, lämna mina programinställningar som de är</translation>
-    </message>
-    <message>
-        <source>Yes, delete my program settings</source>
-        <translation type="obsolete">Ja, ta bort mina programinställningar</translation>
-    </message>
-    <message>
         <source>%1% Completed @ %2 fps.</source>
         <translation>%1% färdig vid %2 fps.</translation>
     </message>
@@ -5438,6 +5426,26 @@ som du startade detta programmet i.</translation>
     <message>
         <source>Yes, delete my channel settings</source>
         <translation>Ja, ta bort mina kanalinställningar</translation>
+    </message>
+    <message>
+        <source>Record one showing of this title</source>
+        <translation>Spela in en visning av denna titel</translation>
+    </message>
+    <message>
+        <source>Delete oldest if this would exceed the max episodes</source>
+        <translation>Radera äldsta om max antal avsnitt överskrids</translation>
+    </message>
+    <message>
+        <source>Searching for Logo</source>
+        <translation>Letar efter logo</translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation>Alla</translation>
+    </message>
+    <message>
+        <source>Follow symbolic links when deleting files</source>
+        <translation>Följ symboliska länkar vid borttagning av filer</translation>
     </message>
 </context>
 <context>
