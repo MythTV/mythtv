@@ -105,7 +105,7 @@ void XMLTV_na_config::save(QSqlDatabase* db) {
         .arg(filename)
         .arg(2)
         .arg(30)
-        .arg(postalcode->getValue())
+        .arg(postalcode->getValue().replace(QRegExp(" "), ""))
         .arg(provider->getValue());
 
     int ret = system(command);

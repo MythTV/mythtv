@@ -86,8 +86,12 @@ public:
 protected slots:
      void fillProviderSelections(const QString& maybePostalCode) {
          if (QRegExp("\\d{5}").exactMatch(maybePostalCode) ||
-             QRegExp("[a-z]\\d[a-z]\\d[a-z]\\d", false).exactMatch(maybePostalCode))
-                 provider->fillSelections(maybePostalCode);
+             QRegExp("[a-z]\\d[a-z]\\s?\\d[a-z]\\d", false).exactMatch(maybePostalCode))
+         {
+         	 QString mpc = maybePostalCode;
+         	 mpc = mpc.replace(QRegExp(" "), "");
+                 provider->fillSelections(mpc);
+         }
      }
 
 protected:
