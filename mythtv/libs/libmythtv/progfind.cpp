@@ -69,9 +69,9 @@ ProgFinder::ProgFinder(QWidget *parent, const char *name)
     accel = new QAccel(this);
     accel->connectItem(accel->insertItem(Key_Left), this, SLOT(cursorLeft()));
     accel->connectItem(accel->insertItem(Key_Right), this, SLOT(cursorRight()));
-    accel->connectItem(accel->insertItem(Key_Enter), this, SLOT(cursorRight()));
-    accel->connectItem(accel->insertItem(Key_Return), this, SLOT(cursorRight()));
-    accel->connectItem(accel->insertItem(Key_Space), this, SLOT(cursorRight()));
+    accel->connectItem(accel->insertItem(Key_Enter), this, SLOT(select()));
+    accel->connectItem(accel->insertItem(Key_Return), this, SLOT(select()));
+    accel->connectItem(accel->insertItem(Key_Space), this, SLOT(select()));
     accel->connectItem(accel->insertItem(Key_Up), this, SLOT(cursorUp()));
     accel->connectItem(accel->insertItem(Key_Down), this, SLOT(cursorDown()));
     accel->connectItem(accel->insertItem(Key_PageUp), this, SLOT(pageUp()));
@@ -549,12 +549,7 @@ void ProgFinder::cursorLeft()
 
 void ProgFinder::cursorRight()
 {
-    if (inSearch == 2) 
-    {
-    //    getInfo();
-    }
-    else
-    {
+    if (inSearch < 2) {
         inSearch++;
         if (inSearch == 1)
         {
@@ -585,6 +580,14 @@ void ProgFinder::cursorRight()
     }
     update(infoRect);
     update(listRect);
+}
+
+void ProgFinder::select()
+{
+    if (inSearch == 2) 
+        getInfo();
+    else
+        cursorRight();
 }
 
 void ProgFinder::pageUp()
