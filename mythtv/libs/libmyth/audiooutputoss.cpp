@@ -109,7 +109,7 @@ bool AudioOutputOSS::OpenDevice()
     fragment_size = info.fragsize;
 
     audio_buffer_unused = info.bytes - (fragment_size * 4);
-    soundcard_buffer_bytes = info.bytes;
+    soundcard_buffer_size = info.bytes;
 
     int caps;
     
