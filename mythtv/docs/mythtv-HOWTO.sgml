@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-05-02, v2.28
+<date>2003-05-04, v2.29
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -25,10 +25,10 @@ copy of MythTV and the documentation from CVS this way:
 <tscreen><verb>
 $ mkdir mythtv
 $ cd mythtv
-$ cvs -d :pserver:mythtv@cvs.mythtv.org:/var/lib/cvs login
-Logging in to :pserver:mythtv@cvs.mythtv.org:/var/lib/cvs
+$ cvs -d :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs login
+Logging in to :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs
 CVS password: mythtv
-$ cvs -z3 -d :pserver:mythtv@cvs.mythtv.org:/var/lib/cvs checkout MC
+$ cvs -z3 -d :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs checkout mythtv
 </verb></tscreen>
 
 This documentation will be in the <tt>docs/</tt> subdirectory.
@@ -1924,7 +1924,7 @@ $ crontab -l  NOTE: this is a lowercase L.
 # Need to use a shell script because the QTDIR environment variable isn't
 # being honored by crontab?
 # The next text should be all on the same line.
-30 04 * * * /bin/bash $HOME/mythtv-0.8/MC/configfiles/mythfilldatabasecron
+30 04 * * * /bin/bash $HOME/mythtv-0.8/configfiles/mythfilldatabasecron
 $ 
 </verb></tscreen>
 
@@ -3516,6 +3516,7 @@ v2.27, 2003-05-01.  New website for Mark Cooper's pvr hw database.  Better
 debug command for threads.
 v2.28, 2003-05-02.  MythWeb update for Mandrake.  mythweb db_open error. 
 ivtvfwextract is a perl file.  Added "-v" to mythbackend as daemon example.
+v2.29, 2003-05-04.  Updated CVS path.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

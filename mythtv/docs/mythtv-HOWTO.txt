@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-05-02, v2.28
+  2003-05-04, v2.29
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -174,10 +174,10 @@
 
        $ mkdir mythtv
        $ cd mythtv
-       $ cvs -d :pserver:mythtv@cvs.mythtv.org:/var/lib/cvs login
-       Logging in to :pserver:mythtv@cvs.mythtv.org:/var/lib/cvs
+       $ cvs -d :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs login
+       Logging in to :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs
        CVS password: mythtv
-       $ cvs -z3 -d :pserver:mythtv@cvs.mythtv.org:/var/lib/cvs checkout MC
+       $ cvs -z3 -d :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs checkout mythtv
 
   This documentation will be in the docs/ subdirectory.
 
@@ -2106,7 +2106,7 @@
        # Need to use a shell script because the QTDIR environment variable isn't
        # being honored by crontab?
        # The next text should be all on the same line.
-       30 04 * * * /bin/bash $HOME/mythtv-0.8/MC/configfiles/mythfilldatabasecron
+       30 04 * * * /bin/bash $HOME/mythtv-0.8/configfiles/mythfilldatabasecron
        $
 
   As you can see, [1mmythfilldatabase [22mwill now be run at 0430 every day.
