@@ -311,7 +311,7 @@ void NuppelVideoPlayer::InitSound(void)
     while (QTime::currentTime() < curtime && audiofd == -1)
     {
         audiofd = open(audiodevice.ascii(), O_WRONLY | O_NONBLOCK);
-        if (errno != EAGAIN && errno != EINTR)
+        if (audiofd < 0 && errno != EAGAIN && errno != EINTR)
         {
             if (errno == EBUSY)
             {
