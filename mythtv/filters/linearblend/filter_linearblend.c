@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdint.h>
 
 // By default, these routines use MMX instructions.  If your CPU does not
 // support these, uncomment the following line
