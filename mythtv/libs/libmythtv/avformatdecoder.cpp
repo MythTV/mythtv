@@ -742,7 +742,8 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame)
  
         videoenc->hurry_up = 5;
 
-        while (framesRead < desiredKey + 1)
+        while (framesRead < desiredKey + 1 || 
+               !positionMap.contains(desiredKey / keyframedist))
         {
             needflush = true;
 

@@ -2184,7 +2184,7 @@ static int mpeg1_find_frame_end(MpegEncContext *s, uint8_t *buf, int buf_size){
         }
     }        
     pc->state= state;
-    return -1;
+    return END_NOT_FOUND;
 }
 
 /* handle buffering and image synchronisation */
@@ -2212,9 +2212,7 @@ static int mpeg_decode_frame(AVCodecContext *avctx,
     }
 
     if(s2->flags&CODEC_FLAG_TRUNCATED){
-        int next;
-        
-        next= mpeg1_find_frame_end(s2, buf, buf_size);
+        int next= mpeg1_find_frame_end(s2, buf, buf_size);
         
         if( ff_combine_frame(s2, next, &buf, &buf_size) < 0 )
             return buf_size;
@@ -2237,8 +2235,8 @@ static int mpeg_decode_frame(AVCodecContext *avctx,
     for(;;) {
         /* find start next code */
         start_code = find_start_code(&buf_ptr, buf_end);
-        if (start_code < 0){ 
-            //printf("missing end of picture\n");
+        if (start_code < 0){
+//            printf("missing end of picture\n");
             return FFMAX(0, buf_ptr - buf - s2->parse_context.last_index);
         }
 

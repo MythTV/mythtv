@@ -2091,7 +2091,8 @@ void TV::BrowseDispInfo(int direction)
     QDateTime startts = QDateTime::fromString(browsestarttime, Qt::ISODate);
     ProgramInfo *program_info = ProgramInfo::GetProgramAtDateTime(
                                       browsechanid, startts );
-    program_info->ToMap(m_db, regexpMap);
+    if (program_info)
+        program_info->ToMap(m_db, regexpMap);
 
     osd->ClearAllText("browse_info");
     osd->SetTextByRegexp("browse_info", regexpMap, -1);

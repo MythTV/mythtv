@@ -173,7 +173,7 @@ GuideGrid::GuideGrid(const QString &channel, TV *player, QWidget *parent,
     int secsoffset = -((m_originalStartTime.time().minute() % 30) * 60 +
                         m_originalStartTime.time().second());
     m_currentStartTime = m_originalStartTime.addSecs(secsoffset);
-    m_currentStartChannel = 0;
+    m_currentStartChannel = 2;
     m_startChanStr = channel;
     setStartChannel(m_currentStartChannel - 2);
 

@@ -590,10 +590,6 @@ void avcodec_flush_buffers(AVCodecContext *avctx)
     MpegEncContext *s = avctx->priv_data;
     
     switch(avctx->codec_id){
-    case CODEC_ID_MJPEG:
-    case CODEC_ID_MJPEGB:
-        if (avctx->codec->priv_data_size != sizeof(MpegEncContext))
-            break;
     case CODEC_ID_MPEG1VIDEO:
     {
         Mpeg1Context *s1 = avctx->priv_data;
@@ -602,6 +598,8 @@ void avcodec_flush_buffers(AVCodecContext *avctx)
     }
     case CODEC_ID_H263:
     case CODEC_ID_RV10:
+//    case CODEC_ID_MJPEG:
+//    case CODEC_ID_MJPEGB:
     case CODEC_ID_MPEG4:
     case CODEC_ID_MSMPEG4V1:
     case CODEC_ID_MSMPEG4V2:

@@ -1166,5 +1166,6 @@ void MythPopupBox::Show(void)
 
 void MythPopupBox::closeEvent(QCloseEvent *e)
 {
+    (void)e;
 }
 
