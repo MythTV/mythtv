@@ -35,8 +35,7 @@ void SRSchedOptionsGroup::itemChanged(ManagedListItem*)
 
     if (dupMethItem->getItem()->getEnabled())
     {
-        if ((dupMethItem->getItem()->getValue().toInt() != kDupCheckNone) &&
-           (dupMethItem->getItem()->getValue().toInt() != kDupCheckNewEpi) )
+        if (dupMethItem->getItem()->getValue().toInt() != kDupCheckNone)
             dupLocItem->getItem()->setEnabled(true);
         else
             dupLocItem->getItem()->setEnabled(false);

@@ -1470,12 +1470,8 @@ void Scheduler::AddNewRecords(void) {
         if(result.value(30).isNull())
             p->originalAirDate = p->startts.date();
         else
-        {
             p->originalAirDate = QDate::fromString(result.value(30).toString(), Qt::ISODate);
-            
-            if(p->originalAirDate < p->startts.date())
-                p->repeat = true;
-        }
+
 
         if (!recTypeRecPriorityMap.contains(p->rectype))
             recTypeRecPriorityMap[p->rectype] = 
@@ -1534,19 +1530,16 @@ void Scheduler::AddNewRecords(void) {
             p->recstatus = rsDontRecord;
         else if (p->rectype != kSingleRecord &&
                  p->rectype != kOverrideRecord &&
-                 !p->reactivate && (p->dupmethod == kDupCheckNewEpi))
-        {
-            if(p->repeat || result.value(10).toInt() || result.value(14).toInt())
-                p->recstatus = rsRepeat;
-        }
-        else if (p->rectype != kSingleRecord &&
-                 p->rectype != kOverrideRecord &&
                  !p->reactivate &&
                  !(p->dupmethod & kDupCheckNone))
         {
+            if (p->dupmethod == kDupCheckNewEpi && p->repeat)
+                p->recstatus = rsRepeat;
+        
             if (p->dupin & kDupsInOldRecorded &&
                 result.value(10).toInt())
                 p->recstatus = rsPreviousRecording;
+            
             if (p->dupin & kDupsInRecorded &&
                 result.value(14).toInt())
                 p->recstatus = rsCurrentRecording;
