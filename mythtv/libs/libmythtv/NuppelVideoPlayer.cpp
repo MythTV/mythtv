@@ -921,7 +921,8 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
 	    }
         }
 	  
-        if (frameheader.packetlength!=0 && frameheader.packetlength > 0) {
+        if (frameheader.packetlength > 0) 
+        {
             if (ringBuffer->Read(strm, frameheader.packetlength) != 
                 frameheader.packetlength) 
             {
@@ -929,8 +930,10 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
                 return;
             }
         }
+        else
+            continue;
 
-        if (frameheader.frametype=='V') 
+        if (frameheader.frametype == 'V') 
         {
             unsigned char *ret = DecodeFrame(&frameheader, strm);
 
@@ -1833,6 +1836,8 @@ bool NuppelVideoPlayer::DoFastForward(void)
         fileend = (ringBuffer->Read(strm, frameheader.packetlength) !=
                                     frameheader.packetlength);
 
+        if (fileend)
+            continue;
         if (frameheader.frametype == 'V')
         {
             framesPlayed++;
@@ -2523,6 +2528,8 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
         fileend = (ringBuffer->Read(strm, frameheader.packetlength) !=
                                     frameheader.packetlength);
 
+        if (fileend)
+            continue;
         if (frameheader.frametype == 'V')
         {
             framesPlayed++;

@@ -379,10 +379,16 @@ void ViewScheduled::handleConflicting(ProgramInfo *rec)
     {
         for (i = dislike->begin(); i != dislike->end(); i++)
         {
+            QString sqltitle1 = prefer->title;
+            QString sqltitle2 = (*i)->title;
+
+            sqltitle1.replace(QRegExp("\""), QString("\\\""));
+            sqltitle2.replace(QRegExp("\""), QString("\\\""));
+
             thequery = QString("INSERT INTO conflictresolutionany "
                                "(prefertitle, disliketitle) VALUES "
-                               "(\"%1\", \"%2\");").arg(prefer->title)
-                               .arg((*i)->title);
+                               "(\"%1\", \"%2\");").arg(sqltitle1)
+                               .arg(sqltitle2);
             QSqlQuery qquery = db->exec(thequery);
             if (!qquery.isActive())
             {

@@ -3,6 +3,7 @@
 
 #include <qsqldatabase.h>
 #include <qstring.h>
+#include <qregexp.h>
 #include <qdatetime.h>
 
 enum RecordingType

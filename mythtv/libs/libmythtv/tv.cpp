@@ -974,7 +974,8 @@ void TV::RunTV(void)
                     DoFF();
                 else if (doing_rew)
                     DoRew();
-                usleep(50000);
+                if (ff_rew_scaling > 0)
+                    usleep(50000);
             }
         }
 
@@ -1048,6 +1049,8 @@ void TV::RunTV(void)
 
 void TV::ProcessKeypress(int keypressed)
 {
+    bool was_doing_ff_rew = false;
+
     if (editmode)
     {   
         nvp->DoKeypress(keypressed);
@@ -1087,26 +1090,16 @@ void TV::ProcessKeypress(int keypressed)
         }
         case wsRight: case 'd': case 'D': 
         {
-            if (doing_ff && stickykeys)
-                doing_ff = false;
-            else
-            {
-                doing_ff = true;
-                doing_rew = false;
-                DoFF(); 
-            }
+            doing_ff = true;
+            doing_rew = false;
+            DoFF(); 
             break;
         }
         case wsLeft: case 'a': case 'A': 
         {
-            if (doing_rew && stickykeys)
-                doing_rew = false;
-            else
-            {
-                doing_rew = true;
-                doing_ff = false;
-                DoRew(); 
-            }
+            doing_rew = true;
+            doing_ff = false;
+            DoRew(); 
             break;
         }
         case wsEscape: exitPlayer = true; break;
@@ -1117,7 +1110,7 @@ void TV::ProcessKeypress(int keypressed)
             {
                 switch (keypressed)
                 {
-                    case wsZero:   case '0': ff_rew_scaling =  1.00; break;
+                    case wsZero:   case '0': ff_rew_scaling =  0.00; break;
                     case wsOne:    case '1': ff_rew_scaling =  0.25; break;
                     case wsTwo:    case '2': ff_rew_scaling =  0.50; break;
                     case wsThree:  case '3': ff_rew_scaling =  1.00; break;
@@ -1131,6 +1124,7 @@ void TV::ProcessKeypress(int keypressed)
                     default:
                        doing_ff = false;
                        doing_rew = false;
+                       was_doing_ff_rew = true;
                        break;
                 }
             }
@@ -1172,7 +1166,12 @@ void TV::ProcessKeypress(int keypressed)
         switch (keypressed)
         {
             case 'i': case 'I': DoPosition(); break;
-            case ' ': case wsEnter: case wsReturn: nvp->SetBookmark(); break;
+            case ' ': case wsEnter: case wsReturn: 
+            {
+                if (!was_doing_ff_rew)
+                    nvp->SetBookmark(); 
+                break;
+            }
             case 'e': case 'E': editmode = nvp->EnableEdit(); break;
             default: break;
         }
@@ -1384,7 +1383,7 @@ void TV::DoFF(void)
         osd->StartPause(pos, slidertype, "Forward", desc, 2);
     }
 
-    activenvp->FastForward((int)(fftime * ff_rew_scaling));
+    activenvp->FastForward(fftime * ff_rew_scaling);
 }
 
 void TV::DoRew(void)
@@ -1400,7 +1399,7 @@ void TV::DoRew(void)
         osd->StartPause(pos, slidertype, "Rewind", desc, 2);
     }
 
-    activenvp->Rewind((int)(rewtime * ff_rew_scaling));
+    activenvp->Rewind(rewtime * ff_rew_scaling);
 }
 
 void TV::ToggleInputs(void)

@@ -1677,7 +1677,6 @@ eos: //end of slice
 
         MPV_frame_end(s);
 
-        /* XXX: incorrect reported qscale for mpeg2 */
         if (s->pict_type == B_TYPE) {
             picture = s->current_picture;
             avctx->quality = s->qscale;
@@ -1693,6 +1692,8 @@ eos: //end of slice
             s->last_qscale = s->qscale;
             s->picture_number++;
         }
+        if(s->mpeg2)
+            avctx->quality>>=1;
         if (picture) {
             pict->data[0] = picture[0];
             pict->data[1] = picture[1];
@@ -1876,7 +1877,7 @@ static int mpeg_decode_frame(AVCodecContext *avctx,
         } else {
             memcpy(s->buf_ptr, buf_start, len);
             s->buf_ptr += len;
-            if(   (s2->flags&CODEC_FLAG_NOT_TRUNCATED) && (!start_code_found) 
+            if(   (!(s2->flags&CODEC_FLAG_TRUNCATED)) && (!start_code_found) 
                && s->buf_ptr+4<s->buffer+s->buffer_size){
                 start_code_found= 1;
                 code= 0x1FF;
@@ -1971,5 +1972,5 @@ AVCodec mpeg_decoder = {
     NULL,
     mpeg_decode_end,
     mpeg_decode_frame,
-    CODEC_CAP_DRAW_HORIZ_BAND | CODEC_CAP_DR1,
+    CODEC_CAP_DRAW_HORIZ_BAND | CODEC_CAP_DR1 | CODEC_CAP_TRUNCATED,
 };

@@ -206,7 +206,6 @@ bool NuppelVideoRecorder::SetupAVCodec(void)
     mpa_ctx->rc_strategy = 2;
     mpa_ctx->b_frame_strategy = 0;
     mpa_ctx->gop_size = 30;
-    mpa_ctx->flags = CODEC_FLAG_TYPE;
     mpa_ctx->key_frame = -1;
     mpa_ctx->rc_max_rate = 0;
     mpa_ctx->rc_min_rate = 0;
@@ -1367,7 +1366,10 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
         mpa_picture.data[1] = planes[1];
         mpa_picture.data[2] = planes[2];
 
-        mpa_ctx->key_frame = wantkeyframe;
+        if (wantkeyframe)
+            mpa_ctx->force_type = I_TYPE;
+        else
+            mpa_ctx->force_type = 0;
 
 #ifdef EXTRA_LOCKING
         pthread_mutex_lock(&avcodeclock);

@@ -345,13 +345,21 @@ void ProgramInfo::ApplyRecordStateChange(RecordingType newstate)
         }
     }
 
+    QString sqltitle = title;
+    QString sqlsubtitle = subtitle;
+    QString sqldescription = description;
+
+    sqltitle.replace(QRegExp("\""), QString("\\\""));
+    sqlsubtitle.replace(QRegExp("\""), QString("\\\""));
+    sqldescription.replace(QRegExp("\""), QString("\\\""));
+
     if (newstate == kSingleRecord)
     {
         thequery = QString("INSERT INTO singlerecord (chanid,starttime,"
                            "endtime,title,subtitle,description) "
                            "VALUES(%1, %2, %3, \"%4\", \"%5\", \"%6\");")
                            .arg(chanid).arg(sqlstarttime).arg(sqlendtime)
-                           .arg(title).arg(subtitle).arg(description);
+                           .arg(sqltitle).arg(sqlsubtitle).arg(sqldescription);
         if (!query.exec(thequery))
         {
             cerr << "DB Error: record insertion failed, SQL query was:" << endl;
@@ -369,7 +377,7 @@ void ProgramInfo::ApplyRecordStateChange(RecordingType newstate)
         thequery = QString("INSERT INTO timeslotrecord (chanid,starttime,"
                            "endtime,title) VALUES(%1,%2,%3,\"%4\");")
                            .arg(chanid).arg(sqlstarttime).arg(sqlendtime)
-                           .arg(title);
+                           .arg(sqltitle);
         if (!query.exec(thequery))
         {
             cerr << "DB Error: record insertion failed, SQL query was:" << endl;
@@ -379,7 +387,7 @@ void ProgramInfo::ApplyRecordStateChange(RecordingType newstate)
     else if (newstate == kChannelRecord)
     {
         thequery = QString("INSERT INTO allrecord (title,chanid) VALUES("
-                           "\"%1\",%2);").arg(title).arg(chanid);
+                           "\"%1\",%2);").arg(sqltitle).arg(chanid);
         if (!query.exec(thequery))
         {
             cerr << "DB Error: record insertion failed, SQL query was:" << endl;
@@ -389,7 +397,7 @@ void ProgramInfo::ApplyRecordStateChange(RecordingType newstate)
     else if (newstate == kAllRecord)
     {
         thequery = QString("INSERT INTO allrecord (title) VALUES(\"%1\");")
-                           .arg(title);
+                           .arg(sqltitle);
         if (!query.exec(thequery))
         {
             cerr << "DB Error: record insertion failed, SQL query was:" << endl;
@@ -443,12 +451,20 @@ void ProgramInfo::WriteRecordedToDB(QSqlDatabase *db)
     starts += "00";
     ends += "00";
 
+    QString sqltitle = title;
+    QString sqlsubtitle = subtitle;
+    QString sqldescription = description;
+
+    sqltitle.replace(QRegExp("\""), QString("\\\""));
+    sqlsubtitle.replace(QRegExp("\""), QString("\\\""));
+    sqldescription.replace(QRegExp("\""), QString("\\\""));
+
     QString query;
     query = QString("INSERT INTO recorded (chanid,starttime,endtime,title,"
                     "subtitle,description) "
                     "VALUES(%1,\"%2\",\"%3\",\"%4\",\"%5\",\"%6\");")
-                    .arg(chanid).arg(starts).arg(ends).arg(title) 
-                    .arg(subtitle).arg(description);
+                    .arg(chanid).arg(starts).arg(ends).arg(sqltitle) 
+                    .arg(sqlsubtitle).arg(sqldescription);
 
     QSqlQuery qquery = db->exec(query);
     if (!qquery.isActive())
@@ -461,8 +477,8 @@ void ProgramInfo::WriteRecordedToDB(QSqlDatabase *db)
     query = QString("INSERT INTO oldrecorded (chanid,starttime,endtime,title,"
                     "subtitle,description) "
                     "VALUES(%1,\"%2\",\"%3\",\"%4\",\"%5\",\"%6\");")
-                    .arg(chanid).arg(starts).arg(ends).arg(title) 
-                    .arg(subtitle).arg(description);
+                    .arg(chanid).arg(starts).arg(ends).arg(sqltitle) 
+                    .arg(sqlsubtitle).arg(sqldescription);
 
     qquery = db->exec(query);
     if (!qquery.isActive())

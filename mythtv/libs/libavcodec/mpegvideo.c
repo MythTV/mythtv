@@ -410,7 +410,7 @@ int MPV_common_init(MpegEncContext *s)
         
         /* divx501 bitstream reorder buffer */
         CHECKED_ALLOCZ(s->bitstream_buffer, BITSTREAM_BUFFER_SIZE);
-        
+
         /* cbp, ac_pred, pred_dir */
         CHECKED_ALLOCZ(s->cbp_table  , s->mb_num * sizeof(UINT8))
         CHECKED_ALLOCZ(s->pred_dir_table, s->mb_num * sizeof(UINT8))
@@ -444,6 +444,8 @@ int MPV_common_init(MpegEncContext *s)
     //Note the +1 is for a quicker mpeg4 slice_end detection
     
     s->block= s->blocks[0];
+
+    s->parse_context.state= -1;
 
     s->context_initialized = 1;
     return 0;
@@ -994,9 +996,9 @@ int MPV_encode_picture(AVCodecContext *avctx,
 
     init_put_bits(&s->pb, buf, buf_size, NULL, NULL);
 
-    if(avctx->flags&CODEC_FLAG_TYPE){
+    if(avctx->force_type){
         s->input_pict_type=
-        s->force_input_type= avctx->key_frame ? I_TYPE : P_TYPE;
+        s->force_input_type= avctx->force_type;
     }else if(s->flags&CODEC_FLAG_PASS2){
         s->input_pict_type=
         s->force_input_type= s->rc_context.entry[s->input_picture_number].new_pict_type;
@@ -1262,10 +1264,10 @@ static void emulated_edge_mc(MpegEncContext *s, UINT8 *src, int linesize, int bl
         src_x=1-block_w;
     }
 
-    start_y= MAX(0, -src_y);
-    start_x= MAX(0, -src_x);
-    end_y= MIN(block_h, h-src_y);
-    end_x= MIN(block_w, w-src_x);
+    start_y= FFMAX(0, -src_y);
+    start_x= FFMAX(0, -src_x);
+    end_y= FFMIN(block_h, h-src_y);
+    end_x= FFMIN(block_w, w-src_x);
 
     // copy existing part
     for(y=start_y; y<end_y; y++){

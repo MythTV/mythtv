@@ -5,8 +5,8 @@
 
 #define LIBAVCODEC_VERSION_INT 0x000406
 #define LIBAVCODEC_VERSION     "0.4.6"
-#define LIBAVCODEC_BUILD       4634
-#define LIBAVCODEC_BUILD_STR   "4634"
+#define LIBAVCODEC_BUILD       4637
+#define LIBAVCODEC_BUILD_STR   "4637"
 
 enum CodecID {
     CODEC_ID_NONE, 
@@ -50,7 +50,6 @@ enum CodecID {
     CODEC_ID_ADPCM_IMA_WAV,
     CODEC_ID_ADPCM_MS,
 };
-#define CODEC_ID_MSMPEG4 CODEC_ID_MSMPEG4V3
 
 enum CodecType {
     CODEC_TYPE_UNKNOWN = -1,
@@ -79,6 +78,12 @@ enum SampleFormat {
 
 /* in bytes */
 #define AVCODEC_MAX_AUDIO_FRAME_SIZE 131072
+
+/**
+ * Required number of zero bytes at the end of the input bitstream for decoding.
+ * to avoid overreading (and possibly segfaulting)
+ */
+#define FF_INPUT_BUFFER_PADDING_SIZE 8
 
 /* motion estimation type, EPZS by default */
 enum Motion_Est_ID {
@@ -117,7 +122,6 @@ static const int Motion_Est_QTab[] = { ME_ZERO, ME_PHODS, ME_LOG,
 #define CODEC_FLAG_4MV    0x0004  /* 4 MV per MB allowed */
 #define CODEC_FLAG_QPEL   0x0010  /* use qpel MC */
 #define CODEC_FLAG_GMC    0x0020  /* use GMC */
-#define CODEC_FLAG_TYPE   0x0040  /* fixed I/P frame type, from avctx->key_frame */
 #define CODEC_FLAG_PART   0x0080  /* use data partitioning */
 /* parent program gurantees that the input for b-frame containing streams is not written to 
    for at least s->max_b_frames+1 frames, if this is not set than the input will be copied */
@@ -128,8 +132,8 @@ static const int Motion_Est_QTab[] = { ME_ZERO, ME_PHODS, ME_LOG,
 #define CODEC_FLAG_GRAY  0x2000   /* only decode/encode grayscale */
 #define CODEC_FLAG_EMU_EDGE 0x4000/* dont draw edges */
 #define CODEC_FLAG_DR1    0x8000  /* direct renderig type 1 (store internal frames in external buffers) */
-#define CODEC_FLAG_NOT_TRUNCATED  0x00010000 /* input bitstream is not truncated, except before a startcode 
-                                                allows the last part of a frame to be decoded earlier */
+#define CODEC_FLAG_TRUNCATED  0x00010000 /* input bitstream might be truncated at a random location instead 
+                                            of only at frame boundaries */
 #define CODEC_FLAG_NORMALIZE_AQP  0x00020000 /* normalize adaptive quantization */
 #define CODEC_FLAG_INTERLACED_DCT 0x00040000 /* use interlaced dct */
 #define CODEC_FLAG_LOW_DELAY      0x00080000 /* force low delay / will fail on b frames */
@@ -141,6 +145,7 @@ static const int Motion_Est_QTab[] = { ME_ZERO, ME_PHODS, ME_LOG,
 /* if 'parse_only' field is true, then avcodec_parse_frame() can be
    used */
 #define CODEC_CAP_PARSE_ONLY      0x0004
+#define CODEC_CAP_TRUNCATED       0x0008
 
 #define FRAME_RATE_BASE 10000
 
@@ -351,7 +356,7 @@ typedef struct AVCodecContext {
 
     /**
      * encoding: unused
-     * decoding: set by user. 1-> skip b frames, 2-> skip idct/dequant too
+     * decoding: set by user. 1-> skip b frames, 2-> skip idct/dequant too, 5-> skip everything except header
      */
     int hurry_up;
     
@@ -754,6 +759,13 @@ typedef struct AVCodecContext {
      * decoding: set by lavc
      */
      int8_t *display_qscale_table;
+     
+    /**
+     * force specific pict_type.
+     * encoding; set by user (I/P/B_TYPE)
+     * decoding: unused
+     */
+    int force_type;
 } AVCodecContext;
 
 typedef struct AVCodec {
@@ -770,10 +782,13 @@ typedef struct AVCodec {
     struct AVCodec *next;
 } AVCodec;
 
-/* three components are given, that's all */
+/** 
+ * four components are given, that's all.
+ * the last component is alpha
+ */
 typedef struct AVPicture {
-    UINT8 *data[3];
-    int linesize[3];
+    UINT8 *data[4];
+    int linesize[4];
 } AVPicture;
 
 extern AVCodec ac3_encoder;
@@ -816,7 +831,7 @@ extern AVCodec mace6_decoder;
 /* pcm codecs */
 #define PCM_CODEC(id, name) \
 extern AVCodec name ## _decoder; \
-extern AVCodec name ## _encoder;
+extern AVCodec name ## _encoder
 
 PCM_CODEC(CODEC_ID_PCM_S16LE, pcm_s16le);
 PCM_CODEC(CODEC_ID_PCM_S16BE, pcm_s16be);
@@ -924,13 +939,6 @@ int avcodec_close(AVCodecContext *avctx);
 void avcodec_register_all(void);
 
 void avcodec_flush_buffers(AVCodecContext *avctx);
-
-// deprecated / obsolete stuff, WILL be removed
-#ifndef MBC
-#define MBC 128
-#define MBR 96
-#endif
-#define QP_TYPE int
 
 /**
  * Interface for 0.5.0 version

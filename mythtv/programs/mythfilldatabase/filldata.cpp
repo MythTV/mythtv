@@ -670,7 +670,7 @@ void handlePrograms(int id, int offset, QMap<QString,
 
             if (!query.exec(querystr.utf8().data()))
             {
-                cerr << "DB ERror: Program insertion failed, SQL query "
+                cerr << "DB Error: Program insertion failed, SQL query "
                      << "was: " << endl;
                 cerr << querystr.utf8().data() << endl;
             }
