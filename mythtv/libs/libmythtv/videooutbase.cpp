@@ -1088,16 +1088,18 @@ void VideoOutput::CopyFrame(VideoFrame* to, VideoFrame* from)
 
     if (from->qstride > 0 && from->qscale_table != NULL)
     {
+        int tablesize = from->qstride * ((from->height + 15) / 16);
+
         if (to->qstride != from->qstride || to->qscale_table == NULL)
         {
             to->qstride = from->qstride;
             if (to->qscale_table)
                 delete [] to->qscale_table;
 
-            to->qscale_table = new unsigned char[to->qstride * to->height];
+            to->qscale_table = new unsigned char[tablesize];
         }
 
-        memcpy(to->qscale_table, from->qscale_table, to->qstride * to->height);
+        memcpy(to->qscale_table, from->qscale_table, tablesize);
     }
 }
 
