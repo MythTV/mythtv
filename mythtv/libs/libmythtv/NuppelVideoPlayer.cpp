@@ -6,7 +6,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/ioctl.h>
-#include <sys/time.h>
 #include <time.h>
 #include <math.h>
 
@@ -159,7 +158,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
 	    livetv = false;
         }
         else 
-            livetv = true;
+            livetv = ringBuffer->LiveMode();
 
         if (!ringBuffer->IsOpen())
         {
@@ -989,7 +988,7 @@ bool NuppelVideoPlayer::DoRewind(void)
     long long keyPos = (*positionMap)[lastKey / 30];
     long long curPosition = ringBuffer->GetReadPosition();
     long long diff = keyPos - curPosition;
-  
+
     while (ringBuffer->GetFreeSpaceWithReadChange(diff) < 0)
     {
         lastKey += 30;

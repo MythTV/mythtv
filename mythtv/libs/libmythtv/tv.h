@@ -34,7 +34,7 @@ class TV
 
     void LiveTV(void);
     void StartRecording(RecordingInfo *rcinfo);
-    void Playback(const string &inputFileName);
+    void Playback(RecordingInfo *rcinfo);
 
     bool IsRunning(void) { return runMainLoop; }
     void Stop(void) { runMainLoop = false; }

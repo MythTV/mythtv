@@ -8,12 +8,11 @@
 using namespace std;
 
 #include "scheduler.h"
-#include "tv.h"
 #include "infostructs.h"
 
-Scheduler::Scheduler(TV *ltv)
+Scheduler::Scheduler(QSqlDatabase *ldb)
 {
-    tv = ltv;
+    db = ldb;
 }
 
 Scheduler::~Scheduler()
@@ -28,7 +27,6 @@ Scheduler::~Scheduler()
 
 bool Scheduler::CheckForChanges(void)
 {
-    QSqlDatabase *db = QSqlDatabase::database("SUBDB");
     QSqlQuery query;
     char thequery[512];
 
@@ -75,7 +73,6 @@ bool Scheduler::FillRecordLists(void)
     }
 
     char thequery[512];
-    QSqlDatabase *db = QSqlDatabase::database("SUBDB");
     QSqlQuery query;
     QSqlQuery subquery;
 
@@ -241,7 +238,6 @@ void Scheduler::RemoveFirstRecording(void)
         sprintf(startt, "%s00", starts.ascii());
         sprintf(endt, "%s00", ends.ascii());
     
-        QSqlDatabase *db = QSqlDatabase::database("SUBDB");
         QSqlQuery query;                                          
         char thequery[512];
         sprintf(thequery, "DELETE FROM singlerecord WHERE "

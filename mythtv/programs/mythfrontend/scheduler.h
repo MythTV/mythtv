@@ -1,8 +1,8 @@
 #ifndef SCHEDULER_H_
 #define SCHEDULER_H_
 
-class TV;
 class ProgramInfo;
+class QSqlDatabase;
 
 #include <vector>
 using namespace std;
@@ -10,7 +10,7 @@ using namespace std;
 class Scheduler
 {
   public:
-      Scheduler(TV *ltv);
+      Scheduler(QSqlDatabase *ldb);
      ~Scheduler();
 
       bool CheckForChanges(void);
@@ -20,7 +20,7 @@ class Scheduler
       ProgramInfo *GetNextRecording(void);
       
   private:
-      TV *tv;
+      QSqlDatabase *db;
 
       vector<ProgramInfo *> recordingList;
 };

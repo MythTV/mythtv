@@ -118,6 +118,7 @@ int RingBuffer::Read(void *buf, int count)
         {
             ret = read(fd2, buf, count);
 	    totalreadpos += ret;
+            readpos += ret;
         }
         else
         {
@@ -175,6 +176,7 @@ int RingBuffer::Write(const void *buf, int count)
         {
             ret = write(fd, buf, count);
 	    totalwritepos += ret;
+            writepos += ret;
         }
         else
         {
@@ -229,6 +231,7 @@ long long RingBuffer::Seek(long long pos, int whence)
             readpos = ret;
 	else if (whence == SEEK_CUR)
             readpos += pos;
+        totalreadpos = readpos;
     }
     else
     {

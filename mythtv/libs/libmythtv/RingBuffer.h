@@ -37,6 +37,7 @@ class RingBuffer
     void Reset(void);
 
     void StopReads(void) { stopreads = true; }
+    bool LiveMode(void) { return !normalfile; }
 
  private:
     string filename;

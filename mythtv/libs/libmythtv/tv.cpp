@@ -188,11 +188,12 @@ void TV::StartRecording(RecordingInfo *rcinfo)
     }  
 }
 
-void TV::Playback(const string &inputFileName)
+void TV::Playback(RecordingInfo *rcinfo)
 {
     if (internalState == kState_None || internalState == kState_RecordingOnly)
     {
-        inputFilename = inputFileName;
+        string recprefix = settings->GetSetting("RecordFilePrefix");
+        rcinfo->GetRecordFilename(recprefix, inputFilename);
 
         if (internalState == kState_None)
             nextState = kState_WatchingPreRecorded;

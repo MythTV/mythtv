@@ -9,6 +9,7 @@
 #include "scheduler.h"
 #include "infostructs.h"
 #include "recordinginfo.h"
+#include "playbackbox.h"
 
 int startGuide(int startchannel)
 {
@@ -18,6 +19,18 @@ int startGuide(int startchannel)
 
     int chan = gg.getLastChannel();
     return chan;
+}
+
+int startPlayback(TV *tv)
+{
+    QSqlDatabase *db = QSqlDatabase::database();  
+    PlaybackBox pbb(tv, db);
+
+    pbb.Show();
+
+    pbb.exec();
+
+    return 0;
 }
 
 void startTV(TV *tv)
@@ -39,7 +52,7 @@ void startRecording(TV *tv, ProgramInfo *rec)
     QString endts = rec->endts.toString("yyyyMMddhhmm");
 
     sprintf(startt, "%s00", starts.ascii());
-    sprintf(endt, "%s00", starts.ascii());
+    sprintf(endt, "%s00", endts.ascii());
 
     RecordingInfo *tvrec = new RecordingInfo(rec->channum.ascii(),
                                              startt, endt, rec->title.ascii(),
@@ -52,7 +65,9 @@ void startRecording(TV *tv, ProgramInfo *rec)
 void *runScheduler(void *dummy)
 {
     TV *tv = (TV *)dummy;
-    Scheduler *sched = new Scheduler(tv);
+    QSqlDatabase *db = QSqlDatabase::database("SUBDB");
+
+    Scheduler *sched = new Scheduler(db);
 
     if (sched->FillRecordLists())
     {
@@ -163,6 +178,7 @@ int main(int argc, char **argv)
         {
             case 0: startTV(tv); break;
             case 1: startGuide(3); break;
+            case 3: startPlayback(tv); break;
             default: break;
         }
     }

@@ -141,7 +141,7 @@ void NuppelVideoRecorder::Initialize(void)
 	livetv = false;
     }
     else
-        livetv = true;
+        livetv = ringBuffer->LiveMode();
 
     audiobytes = 0;
     InitBuffers();
