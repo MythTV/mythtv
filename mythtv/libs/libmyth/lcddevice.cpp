@@ -80,6 +80,9 @@ LCD::LCD()
     menuPreScrollTimer = new QTimer(this);
     connect(menuPreScrollTimer, SIGNAL(timeout()), this, 
             SLOT(beginScrollingMenuText()));
+
+    retryTimer = new QTimer(this);
+    connect(retryTimer, SIGNAL(timeout()), this, SLOT(restartConnection()));
 }
 
 void LCD::connectToHost(const QString &lhostname, unsigned int lport)
@@ -113,12 +116,31 @@ void LCD::beginScrollingText()
         scrollingText.prepend(" ");
 
     scrollPosition = lcdWidth;
-    scrollTimer->start(400, FALSE);
+    scrollTimer->start(400, false);
 }
 
 void LCD::sendToServer(const QString &someText)
 {
 #ifdef LCD_DEVICE
+    // Check the socket, make sure the connection is still up
+    if (socket->state() == QSocket::Idle)
+    {
+        if(!lcd_ready)
+            return;
+
+        lcd_ready = false;
+
+        //Stop everything
+        stopAll();
+
+        // Ack, connection to server has been severed try to re-establish the 
+        // connection
+        retryTimer->start(10000, false);
+        cerr << "lcddevice: Connection to LCDd died unexpectedly.  Trying to "
+                "reconnect every 10 seconds. . ." << endl;
+        return;
+    }
+
     QTextStream os(socket);
    
     last_command = someText;
@@ -143,6 +165,16 @@ void LCD::sendToServer(const QString &someText)
 #else
     (void)someText;
 #endif
+}
+
+void LCD::restartConnection()
+{
+    // Reset the flag
+    lcd_ready = false;
+    connected = false;
+
+    // Retry to connect. . .  Maybe the user restarted LCDd?
+    connectToHost(hostname, port);
 }
 
 void LCD::serverSendingData()
@@ -258,7 +290,10 @@ void LCD::handleKeyPress(QString key_pressed)
 
 void LCD::init()
 {
-    QString aString, bString;
+    // Stop the timer
+    retryTimer->stop();
+
+    QString aString;
     int i;
     
     connected = TRUE;
@@ -340,7 +375,9 @@ void LCD::init()
     // Turn on the backlight
 
     sendToServer("backlight 255");
-     
+    
+    lcd_ready = true;
+ 
     switchToTime();    // clock is on by default
     
     // send buffer if there's anything in there
@@ -350,8 +387,6 @@ void LCD::init()
         sendToServer(send_buffer);
         send_buffer = "";
     }
-
-    lcd_ready = true; 
 }
 
 void LCD::setWidth(unsigned int x)
@@ -440,11 +475,17 @@ void LCD::scrollText()
 
 void LCD::stopAll()
 {
-    sendToServer("screen_set Music priority 255");
-    sendToServer("screen_set Channel priority 255");
-    sendToServer("screen_set Generic priority 255");
-    sendToServer("screen_set Volume priority 255");
-    sendToServer("screen_set Menu priority 255");
+    // The usual reason things would get this far and then lcd_ready being 
+    // false is the connection died and we're trying to re-establish the 
+    // connection
+    if (lcd_ready)
+    {
+        sendToServer("screen_set Music priority 255");
+        sendToServer("screen_set Channel priority 255");
+        sendToServer("screen_set Generic priority 255");
+        sendToServer("screen_set Volume priority 255");
+        sendToServer("screen_set Menu priority 255");
+    }
 
     preScrollTimer->stop();
     scrollTimer->stop();

@@ -174,10 +174,13 @@ class LCD : public QObject
     void veryBadThings(int);       // Communication Errors
     void serverSendingData();      // Data coming back from LCDd
 
+    void restartConnection();      // Try to re-establish the connection to 
+                                   // LCDd every 10 seconds
+
     void outputTime();             // Fire from a timer
     void outputMusic();            // Short timer (equalizer)
     void outputChannel();          // Longer timer (progress bar)
-    void outputGeneric();          //      Longer timer (progress bar)
+    void outputGeneric();          // Longer timer (progress bar)
     void outputVolume();
 
     void scrollMenuText();         // Scroll the menu items if need be
@@ -211,7 +214,7 @@ class LCD : public QObject
     void handleKeyPress(QString key);
     void startVolume(QString app_name);
 
-    unsigned int        theMode;
+    unsigned int theMode;
 
     QSocket *socket;
     QTimer *timeTimer;
@@ -220,9 +223,10 @@ class LCD : public QObject
     QTimer *genericTimer;
     QTimer *scrollTimer;
     QTimer *preScrollTimer;
-    QTimer  *menuScrollTimer;
-    QTimer  *menuPreScrollTimer;
+    QTimer *menuScrollTimer;
+    QTimer *menuPreScrollTimer;
     QTimer *popMenuTimer;
+    QTimer *retryTimer;
 
     void setWidth(unsigned int);
     void setHeight(unsigned int);
