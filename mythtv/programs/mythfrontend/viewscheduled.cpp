@@ -101,7 +101,7 @@ void ViewScheduled::keyPressEvent(QKeyEvent *e)
                 upcoming();
             else if (action == "DETAILS")
                 details();
-            else if (action == "ESCAPE")
+            else if (action == "ESCAPE" || action == "LEFT")
                 done(MythDialog::Accepted);
             else if (action == "UP")
                 cursorUp();

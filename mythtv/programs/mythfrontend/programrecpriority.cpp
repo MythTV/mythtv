@@ -181,13 +181,13 @@ void ProgramRecPriority::keyPressEvent(QKeyEvent *e)
                 pageUp();
             else if (action == "PAGEDOWN")
                 pageDown();
-            else if (action == "RIGHT")
+            else if (action == "RANKINC")
                 changeRecPriority(1);
-            else if (action == "LEFT")
+            else if (action == "RANKDEC")
                 changeRecPriority(-1);
             else if ((action == "PAUSE") || (action == "PLAYBACK"))
                 deactivate();
-            else if (action == "ESCAPE")
+            else if (action == "ESCAPE" || action == "LEFT")
             {
                 saveRecPriority();
                 gContext->SaveSetting("ProgramRecPrioritySorting",
