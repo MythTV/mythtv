@@ -238,8 +238,15 @@ void MythThemedDialog::updateBackground()
     //
 
     LayerSet *container = theme->GetSet("background");
-    container->Draw(&tmp, 0, context);
-    tmp.end();
+
+    //
+    //  *IFF* there is a background, draw it
+    //
+    if(container)
+    {
+        container->Draw(&tmp, 0, context);
+        tmp.end();
+    }
 
     //
     //  Copy that pixmap to the permanent one
