@@ -20,7 +20,7 @@ installfiles.files = FreeSans.ttf
 INSTALLS = installfiles
  
 # Input
-HEADERS += channel.h filter.h format.h frame.h frequencies.h 
+HEADERS += channel.h commercial_skip.h filter.h format.h frame.h frequencies.h 
 HEADERS += guidegrid.h infodialog.h infostructs.h jitterometer.h lzoconf.h 
 HEADERS += minilzo.h mmx.h NuppelVideoPlayer.h NuppelVideoRecorder.h osd.h 
 HEADERS += osdtypes.h programinfo.h recordingprofile.h remoteencoder.h
@@ -28,7 +28,7 @@ HEADERS += remoteutil.h RingBuffer.h RTjpegN.h scheduledrecording.h
 HEADERS += ttfont.h tv_play.h tv_rec.h videosource.h XJ.h yuv2rgb.h
 HEADERS += progfind.h
 
-SOURCES += channel.cpp filter.c frequencies.c guidegrid.cpp
+SOURCES += channel.cpp commercial_skip.cpp filter.c frequencies.c guidegrid.cpp
 SOURCES += infodialog.cpp infostructs.cpp jitterometer.cpp minilzo.cpp 
 SOURCES += NuppelVideoPlayer.cpp NuppelVideoRecorder.cpp osd.cpp
 SOURCES += osdtypes.cpp programinfo.cpp recordingprofile.cpp remoteencoder.cpp

@@ -6,6 +6,7 @@
 #include "scheduledrecording.h"
 #include "util.h"
 #include "mythcontext.h"
+#include "commercial_skip.h"
 
 using namespace std;
 
@@ -360,7 +361,7 @@ bool ProgramInfo::IsSameTimeslot(const ProgramInfo& other) const
         endts == other.endts &&
         sourceid == other.sourceid &&
         cardid == other.cardid &&
-	inputid == other.inputid)
+        inputid == other.inputid)
         return true;
     else
         return false;
@@ -590,4 +591,123 @@ void ProgramInfo::SetCutList(QMap<long long, int> &delMap, QSqlDatabase *db)
     QSqlQuery query = db->exec(querystr);
     if (!query.isActive())
         MythContext::DBError("cutlist update", querystr);
+}
+
+void ProgramInfo::SetBlankFrameList(QMap<long long, int> &frames,
+        QSqlDatabase *db)
+{
+    QMap<long long, int>::Iterator i;
+
+    QString starts = startts.toString("yyyyMMddhhmm");
+    starts += "00";
+
+    QString querystr = QString("DELETE FROM markup "
+                               "WHERE chanid = '%1' AND starttime = '%2' "
+                               "AND type = %3;"
+                               ).arg(chanid).arg(starts).arg(MARK_BLANK_FRAME);
+    QSqlQuery query = db->exec(querystr);
+    if (!query.isActive())
+        MythContext::DBError("blank frame list clear", querystr);
+
+    for (i = frames.begin(); i != frames.end(); ++i)
+    {
+        long long frame = i.key();
+        QString frame_str;
+        char tempc[128];
+        sprintf(tempc, "%lld", frame );
+        frame_str += tempc;
+        QString querystr = QString("INSERT markup (chanid, starttime, "
+                                   "mark, type) values ( '%1', '%2', %3, "
+                                   "%4);").arg(chanid).arg(starts)
+                                   .arg(frame_str).arg(MARK_BLANK_FRAME);
+        QSqlQuery query = db->exec(querystr);
+        if (!query.isActive())
+            MythContext::DBError("blank frame list insert", querystr);
+    }
+}
+
+void ProgramInfo::GetBlankFrameList(QMap<long long, int> &frames,
+        QSqlDatabase *db)
+{
+    frames.clear();
+
+    MythContext::KickDatabase(db);
+
+    QString starts = startts.toString("yyyyMMddhhmm");
+    starts += "00";
+
+    QString querystr = QString("SELECT mark, type FROM markup WHERE "
+                               "chanid = '%1' AND starttime = '%2' "
+                               "AND type = %3 "
+                               "ORDER BY mark;")
+                               .arg(chanid).arg(starts).arg(MARK_BLANK_FRAME);
+
+    QSqlQuery query = db->exec(querystr);
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        while(query.next())
+            frames[query.value(0).toInt()] = query.value(1).toInt();
+    }
+}
+
+void ProgramInfo::SetCommBreakList(QMap<long long, int> &frames,
+        QSqlDatabase *db)
+{
+    QMap<long long, int>::Iterator i;
+
+    QString starts = startts.toString("yyyyMMddhhmm");
+    starts += "00";
+
+    QString querystr = QString("DELETE FROM markup "
+                               "WHERE chanid = '%1' AND starttime = '%2' "
+                               "AND (type = %3 OR type = %4);"
+                               ).arg(chanid).arg(starts)
+                               .arg(MARK_COMM_START).arg(MARK_COMM_END);
+    QSqlQuery query = db->exec(querystr);
+    if (!query.isActive())
+        MythContext::DBError("blank frame list clear", querystr);
+
+    for (i = frames.begin(); i != frames.end(); ++i)
+    {
+        long long frame = i.key();
+        int mark_type = i.data();
+        QString querystr;
+        QString frame_str;
+        char tempc[128];
+        sprintf(tempc, "%lld", frame );
+        frame_str += tempc;
+        
+        querystr = QString("INSERT markup (chanid, starttime, "
+                               "mark, type) values ( '%1', '%2', %3, "
+                               "%4);").arg(chanid).arg(starts)
+                               .arg(frame_str).arg(mark_type);
+        QSqlQuery query = db->exec(querystr);
+        if (!query.isActive())
+            MythContext::DBError("commercial break list insert", querystr);
+    }
+}
+
+void ProgramInfo::GetCommBreakList(QMap<long long, int> &frames,
+        QSqlDatabase *db)
+{
+    frames.clear();
+
+    MythContext::KickDatabase(db);
+
+    QString starts = startts.toString("yyyyMMddhhmm");
+    starts += "00";
+
+    QString querystr = QString("SELECT mark, type FROM markup WHERE "
+                               "chanid = '%1' AND starttime = '%2' "
+                               "AND (type = %3 OR type = %4) "
+                               "ORDER BY mark;")
+                               .arg(chanid).arg(starts)
+                               .arg(MARK_COMM_START).arg(MARK_COMM_END);
+
+    QSqlQuery query = db->exec(querystr);
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        while(query.next())
+            frames[query.value(0).toInt()] = query.value(1).toInt();
+    }
 }

@@ -87,6 +87,8 @@ class TVRec
     void DoReadThread(void);
     static void *ReadThread(void *param);
 
+    void FlagBlankFrames();
+
  private:
     void SetChannel(bool needopen = false);
 

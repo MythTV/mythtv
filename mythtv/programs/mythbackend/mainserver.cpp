@@ -602,6 +602,19 @@ void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs)
         cerr << thequery << endl;
     }
 
+    // now delete any markups for this program
+    thequery = QString("DELETE FROM markup WHERE chanid = %1 "
+                       "AND starttime = %2;")
+                       .arg(pginfo->chanid).arg(startts);
+
+    query.exec(thequery);
+    if (!query.isActive())
+    {
+        cerr << "DB Error: recorded program deletion failed, SQL query "
+             << "was:" << endl;
+        cerr << thequery << endl;
+    }
+
     DeleteStruct *ds = new DeleteStruct;
     ds->filename = filename;
 

@@ -15,6 +15,7 @@
 using namespace std;
 
 #include "NuppelVideoRecorder.h"
+#include "commercial_skip.h"
 
 extern "C" {
 #include "../libvbitext/vbi.h"
@@ -519,6 +520,9 @@ void NuppelVideoRecorder::StartRecording(void)
         useavcodec = false;
     else
         useavcodec = true;
+
+    if (!hardware_encode)
+        blank_frames.clear();
 
     if (useavcodec)
         useavcodec = SetupAVCodec();
@@ -2162,6 +2166,11 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int len, int fnum,
 
     frameofgop++;
     framesWritten++;
+
+    if (!hardware_encode && CheckFrameIsBlank(buf, w, h))
+    {
+        blank_frames[framesWritten] = 1;
+    }
    
     // now we reset the last frame number so that we can find out
     // how many frames we didn't get next time
@@ -2316,3 +2325,10 @@ void NuppelVideoRecorder::WriteText(unsigned char *buf, int len, int timecode,
     }
 }
 
+void NuppelVideoRecorder::GetBlankFrameMap(QMap<long long, int> &blank_frame_map)
+{
+    QMap<long long, int>::Iterator i;
+
+    for (i = blank_frames.begin(); i != blank_frames.end(); ++i)
+        blank_frame_map[i.key()] = 1;
+}

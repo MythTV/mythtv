@@ -150,6 +150,15 @@ CREATE TABLE IF NOT EXISTS favorites (
     PRIMARY KEY (favid)
 );
 
+CREATE TABLE IF NOT EXISTS markup
+(
+    chanid INT UNSIGNED NOT NULL,
+    starttime TIMESTAMP NOT NULL,
+    mark BIGINT(20) NOT NULL,
+    type INT NOT NULL,
+    primary key (chanid,starttime, mark, type )
+);
+
 INSERT INTO recordingprofiles (name) VALUES ('Default');
 INSERT INTO recordingprofiles (name) VALUES ('Live TV');
 

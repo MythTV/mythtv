@@ -19,6 +19,7 @@ using namespace std;
 #include "NuppelVideoRecorder.h"
 #include "NuppelVideoPlayer.h"
 #include "channel.h"
+#include "commercial_skip.h"
 
 void *SpawnEncode(void *param)
 {
@@ -486,6 +487,10 @@ void TVRec::TeardownRecorder(bool killFile)
         gContext->dispatch(me);
 
         nvr->StopRecording();
+
+        if (curRecording && !killFile)
+            FlagBlankFrames();
+
         pthread_join(encode, NULL);
         delete nvr;
     }
@@ -1482,4 +1487,26 @@ void *TVRec::ReadThread(void *param)
     thetv->DoReadThread();
 
     return NULL;
+}
+
+void TVRec::FlagBlankFrames()
+{
+    QMap<long long, int> blank_frame_map;
+    QMap<long long, int> comm_breaks;
+    int skipMethod = gContext->GetNumSetting("CommercialSkipMethod");
+
+    nvr->GetBlankFrameMap(blank_frame_map);
+    curRecording->SetBlankFrameList(blank_frame_map, db_conn);
+
+    if (!gContext->GetNumSetting("AutoCommercialFlag"))
+        return;
+
+    // this only takes a couple seconds to do so rather than
+    // post-processing if user detects commercials on blanks we do it here.
+    if (skipMethod == COMMERCIAL_SKIP_BLANKS)
+    {
+        BuildCommListFromBlanks(blank_frame_map, nvr->GetFrameRate(),
+            comm_breaks);
+        curRecording->SetCommBreakList(comm_breaks, db_conn);
+    }
 }

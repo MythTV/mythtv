@@ -50,6 +50,10 @@ class ProgramInfo
     void SetEditing(bool edit, QSqlDatabase *db);
     void GetCutList(QMap<long long, int> &delMap, QSqlDatabase *db);
     void SetCutList(QMap<long long, int> &delMap, QSqlDatabase *db);
+    void SetBlankFrameList(QMap<long long, int> &frames, QSqlDatabase *db);
+    void GetBlankFrameList(QMap<long long, int> &frames, QSqlDatabase *db);
+    void SetCommBreakList(QMap<long long, int> &frames, QSqlDatabase *db);
+    void GetCommBreakList(QMap<long long, int> &frames, QSqlDatabase *db);
 
     static void GetProgramRangeDateTime(QPtrList<ProgramInfo> *proglist, QString channel, 
                                         const QString &ltime, const QString &rtime);

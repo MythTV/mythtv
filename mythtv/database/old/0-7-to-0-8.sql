@@ -38,6 +38,15 @@ CREATE TABLE IF NOT EXISTS record
     profile INT UNSIGNED NOT NULL DEFAULT 0
 );
 
+CREATE TABLE IF NOT EXISTS markup
+(
+    chanid INT UNSIGNED NOT NULL,
+    starttime TIMESTAMP NOT NULL,
+    mark BIGINT(20) NOT NULL,
+    type INT NOT NULL,
+    primary key (chanid,starttime, mark, type )
+);  
+
 INSERT INTO record
 (type,chanid,starttime,startdate,endtime,enddate,title,subtitle,description)
 SELECT 1, chanid,

@@ -2,6 +2,7 @@
 #define NUPPELVIDEORECORDER
 
 #include <qstring.h>
+#include <qmap.h>
 #include <vector>
 #include <sys/time.h>
 #include <time.h>
@@ -93,6 +94,8 @@ class NuppelVideoRecorder
 
     long long GetKeyframePosition(long long desired);
 
+    void GetBlankFrameMap(QMap<long long, int> &blank_frame_map);
+
  protected:
     static void *WriteThread(void *param);
     static void *AudioThread(void *param);
@@ -156,6 +159,8 @@ class NuppelVideoRecorder
     char *mp3buf;
     int mp3buf_size;
     lame_global_flags *gf;
+
+    QMap<long long, int> blank_frames;
 
     RTjpeg *rtjc;
 

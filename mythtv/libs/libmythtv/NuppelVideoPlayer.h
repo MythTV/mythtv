@@ -205,8 +205,12 @@ class NuppelVideoPlayer
     bool IsInDelete(long long testframe);
     void SaveCutList(void);
     void LoadCutList(void);
+    void LoadBlankList(void);
+    void LoadCommBreakList(void);
     void DisableEdit(void);
     void SetDeleteIter(void);
+    void SetBlankIter(void);
+    void SetCommBreakIter(void);
 
     int audiofd;
 
@@ -372,10 +376,16 @@ class NuppelVideoPlayer
 
     QMap<long long, int> deleteMap;
     QMap<long long, int>::Iterator deleteIter;
+    QMap<long long, int> blankMap;
+    QMap<long long, int>::Iterator blankIter;
+    QMap<long long, int> commBreakMap;
+    QMap<long long, int>::Iterator commBreakIter;
     QString dialogname;
     int dialogtype;
     long long deleteframe;
     bool hasdeletetable;
+    bool hasblanktable;
+    bool hascommbreaktable;
 
     int ffmpeg_extradatasize;
     char *ffmpeg_extradata;

@@ -181,7 +181,20 @@ public:
         setLabel("Automatically Skip Commercials");
         setValue(false);
         setHelpText("If enabled, MythTV will attempt to automatically skip "
-                    "commercials using the selected Commercial Skip Method.");
+                    "commercials using the selected Commercial Skip Method. "
+                    "If a commercial cutlist exists, it will be used.");
+    };
+};
+
+class AutoCommercialFlag: public CheckBoxSetting, public GlobalSetting {
+public:
+    AutoCommercialFlag():
+        GlobalSetting("AutoCommercialFlag") {
+        setLabel("Automatically Flag Commercials");
+        setValue(false);
+        setHelpText("If enabled, MythTV will attempt to automatically flag "
+                    "commercials during the recording process if you have your "
+                    "'Commercial Skip Method' set to 'Blank Screen Detection'");
     };
 };
 
@@ -820,7 +833,8 @@ PlaybackSettings::PlaybackSettings()
     seek->addChild(new ExactSeeking());
     seek->addChild(new JumpAmount());
     seek->addChild(new CommercialSkipMethod());
-//    seek->addChild(new AutoCommercialSkip());
+    seek->addChild(new AutoCommercialSkip());
+//    seek->addChild(new AutoCommercialFlag());
     addChild(seek);
 
     VerticalConfigurationGroup* oscan = new VerticalConfigurationGroup(false);
