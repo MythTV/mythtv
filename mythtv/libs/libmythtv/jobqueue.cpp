@@ -158,8 +158,6 @@ void JobQueue::ProcessQueue(void)
     QString hostname;
     int sleepTime = gContext->GetNumSetting("JobQueueCheckFrequency", 30);
 
-    QMap<QString, int> job;
-    QMap<QString, int> jobType;
     QMap<QString, int> jobStatus;
     int maxJobs;
     QString message;
@@ -173,8 +171,6 @@ void JobQueue::ProcessQueue(void)
         VERBOSE(VB_JOBQUEUE, QString("JobQueue currently set to run maximum "
                                      "of %1 job(s)").arg(maxJobs));
 
-        job.clear();
-        jobType.clear();
         jobStatus.clear();
 
         GetJobsInQueue(jobs);
@@ -233,7 +229,8 @@ void JobQueue::ProcessQueue(void)
                     (!(jobStatus[key] & JOB_DONE)))
                 {
                     message = QString("JobQueue: Skipping '%1' job for chanid "
-                                      "%2 @ %3, previous job status is '%4'")
+                                      "%2 @ %3, there is another job for "
+                                      "this recording with a status of '%4'")
                                       .arg(JobText(type))
                                       .arg(chanid).arg(startts)
                                       .arg(StatusText(jobStatus[key]));
@@ -241,8 +238,6 @@ void JobQueue::ProcessQueue(void)
                     continue;
                 }
 
-                job[key] = id;
-                jobType[key] = type;
                 jobStatus[key] = status;
                
                 if ((hostname != "") &&
@@ -1665,3 +1660,4 @@ void JobQueue::DoUserJobThread(void)
     controlFlagsLock.unlock();
 }
 
+/* vim: set expandtab tabstop=4 shiftwidth=4: */
