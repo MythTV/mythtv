@@ -83,6 +83,15 @@ void MMTMainWindow::entered(UIListTreeType *treetype, UIListGenericTree *item)
 {
     if (!item || !treetype)
         return;
+        
+    
+    MMTDBItem *pItem = dynamic_cast<MMTDBItem*>(item);
+
+    if (pItem && item->childCount() == 0)
+    {    
+        pItem->populateTree(item);    
+        Tree->Redraw();
+    }        
 }
 
 void MMTMainWindow::selected(UIListGenericTree *item)
@@ -90,7 +99,7 @@ void MMTMainWindow::selected(UIListGenericTree *item)
     if (!item)
         return;
 
-    UIListGenericTree *parent = (UIListGenericTree *)item->getParent(); 
+//    UIListGenericTree *parent = (UIListGenericTree *)item->getParent(); 
 }
 
 void MMTMainWindow::initializeTree()
@@ -98,13 +107,12 @@ void MMTMainWindow::initializeTree()
     // Make the first few nodes in the tree,
     RootNode = new UIListGenericTree(NULL, "Root Node");            
     
-    MoviesRoot = new MMTDBItem(RootNode, tr("Movies"), KEY_MOVIE, 0);
-    TheatersRoot = new MMTDBItem(RootNode, tr("Theaters"), KEY_THEATER, 0);
-    
-    
+    MoviesRoot = new MMTMovieMasterItem(RootNode, tr("Movies"));
+    TheatersRoot = new MMTTheaterMasterItem(RootNode, tr("Theaters"));
     
     Tree->SetTree(RootNode);
 }
+
 
 
 void MMTMainWindow::keyPressEvent(QKeyEvent *e)
