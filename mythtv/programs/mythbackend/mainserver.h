@@ -22,6 +22,8 @@ class MainServer : public QVBox
 
    ~MainServer();
 
+    void customEvent(QCustomEvent *e);
+
   private slots:
     void newConnection(QSocket *);
     void endConnection(QSocket *);

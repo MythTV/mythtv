@@ -6,6 +6,8 @@
 #include <qpalette.h>
 #include <qsocket.h>
 #include <qobject.h>
+#include <qptrlist.h>
+#include <qevent.h>
 
 #include <list>
 #include <vector>
@@ -14,6 +16,24 @@ using namespace std;
 class Settings;
 class QSqlDatabase;
 class ProgramInfo;
+
+
+class MythEvent : public QCustomEvent
+{
+  public:
+    enum Type { MythEventType = (User + 1000) };
+
+    MythEvent(const QString &lmessage) : QCustomEvent(MythEventType)
+    {
+        message = lmessage;
+    }
+    ~MythEvent() {}
+
+    const QString Message() const { return message; }
+ 
+  private:
+    QString message;
+};
 
 class MythContext : public QObject
 {
@@ -93,6 +113,10 @@ class MythContext : public QObject
                                 QString &channelname);
     void GetRecorderInputName(int recorder, QString &inputname);
 
+    void addListener(QObject *obj);
+    void removeListener(QObject *obj);
+    void dispatch(MythEvent &e);
+
   private slots:
     void readSocket();
 
@@ -121,6 +145,8 @@ class MythContext : public QObject
 
     pthread_mutex_t serverSockLock;
     bool expectingReply;
+
+    QPtrList<QObject> listeners;
 };
 
 #endif

@@ -6,6 +6,8 @@
 
 #include "tv.h"
 
+class MainServer;
+
 class EncoderLink
 {
   public:

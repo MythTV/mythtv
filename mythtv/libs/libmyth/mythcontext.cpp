@@ -750,3 +750,24 @@ void MythContext::readSocket(void)
 
 }
 
+void MythContext::addListener(QObject *obj)
+{
+    if (listeners.find(obj) == -1)
+        listeners.append(obj);
+}
+
+void MythContext::removeListener(QObject *obj)
+{
+    listeners.remove(obj);
+}
+
+void MythContext::dispatch(MythEvent &e)
+{
+    QObject *obj = listeners.first();
+    while (obj)
+    {
+        QApplication::postEvent(obj, new MythEvent(e));
+        obj = listeners.next();
+    }
+}
+

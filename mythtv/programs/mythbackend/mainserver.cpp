@@ -28,6 +28,8 @@ MainServer::MainServer(MythContext *context, int port,
             SLOT(newConnection(QSocket *)));
     connect(mythserver, SIGNAL(endConnect(QSocket *)), 
             SLOT(endConnection(QSocket *)));
+
+    m_context->addListener(this);
 }
 
 MainServer::~MainServer()
@@ -122,6 +124,16 @@ void MainServer::readSocket(void)
         {
             cout << "unknown socket\n";
         }
+    }
+}
+
+void MainServer::customEvent(QCustomEvent *e)
+{
+    if (e->type() == MythEvent::MythEventType)
+    {
+        MythEvent *me = (MythEvent *)e;
+ 
+        cout << me->Message() << endl;
     }
 }
 
