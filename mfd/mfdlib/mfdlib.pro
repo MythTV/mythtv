@@ -21,8 +21,11 @@ SOURCES += mfd_events.cpp mfd_plugin.cpp requestthread.cpp clientsocket.cpp
 HEADERS += httpinrequest.h   httpoutrequest.h   httpoutresponse.h   httpinresponse.h
 SOURCES += httpinrequest.cpp httpoutrequest.cpp httpoutresponse.cpp httpinresponse.cpp
 
-HEADERS += httpheader.h   httpgetvar.h   httpserver.h   rtspserver.h
-SOURCES += httpheader.cpp httpgetvar.cpp httpserver.cpp rtspserver.cpp
+HEADERS += httpheader.h   httpgetvar.h   httpserver.h   
+SOURCES += httpheader.cpp httpgetvar.cpp httpserver.cpp
+
+HEADERS += rtspserver.h   rtspinrequest.h   rtspoutresponse.h
+SOURCES += rtspserver.cpp rtspinrequest.cpp rtspoutresponse.cpp
 
 HEADERS += decoder.h   decoder_event.h   visual.h constants.h 
 SOURCES += decoder.cpp decoder_event.cpp 

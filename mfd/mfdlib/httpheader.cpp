@@ -12,6 +12,8 @@
 
 HttpHeader::HttpHeader(const QString &input_line)
 {
+    all_is_well = true;
+
     //
     //  Take a line of text and parse into a matching set of HTTP headers
     //  field: value
@@ -23,6 +25,31 @@ HttpHeader::HttpHeader(const QString &input_line)
     field = field.simplifyWhiteSpace();
     value = value.simplifyWhiteSpace();
 
+    if(field.length() < 1)
+    {
+        all_is_well = false;
+    }
+}
+
+HttpHeader::HttpHeader(const QString &l_field, const QString &l_value)
+{
+    all_is_well = true;
+
+    //
+    //  Take a line of text and parse into a matching set of HTTP headers
+    //  field: value
+    //
+    
+    field = l_field;
+    value = l_value;
+
+    field = field.simplifyWhiteSpace();
+    value = value.simplifyWhiteSpace();
+
+    if(field.length() < 1)
+    {
+        all_is_well = false;
+    }
 }
 
 const QString& HttpHeader::getField()
