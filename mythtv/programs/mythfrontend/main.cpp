@@ -528,11 +528,17 @@ int main(int argc, char **argv)
                 cerr << "Missing argument to -v/--verbose option\n";
                 return -1;
             }
-        } else if ((argpos + 1 == a.argc()) &&
+        }
+        else if (!strcmp(a.argv()[argpos],"--version"))
+        {
+            cout << MYTH_BINARY_VERSION << endl;
+            exit(0);
+        }
+        else if ((argpos + 1 == a.argc()) &&
                     !QString(a.argv()[argpos]).startsWith("-"))
         {
             pluginname = a.argv()[argpos];
-        } 
+        }
         else
         {
             if (!(!strcmp(a.argv()[argpos],"-h") ||
@@ -544,6 +550,7 @@ int main(int argc, char **argv)
                     "                               Accepts any combination (separated by comma)" << endl << 
                     "                               of all,none,quiet,record,playback," << endl <<
                     "                               channel,osd,file,schedule,network" << endl <<
+                    "--version                      Version information" << endl <<
                     "<plugin>                       Initialize and run this plugin" << endl;
             return -1;
         }

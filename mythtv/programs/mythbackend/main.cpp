@@ -242,7 +242,12 @@ int main(int argc, char **argv)
         } else if (!strcmp(a.argv()[argpos],"--printexpire"))
         {
             printexpire = true;
-        } else
+        } else if (!strcmp(a.argv()[argpos],"--version"))
+        {
+            cout << MYTH_BINARY_VERSION << endl;
+            exit(0);
+        }
+        else
         {
             if (!(!strcmp(a.argv()[argpos],"-h") ||
                 !strcmp(a.argv()[argpos],"--help")))
@@ -257,7 +262,8 @@ int main(int argc, char **argv)
                     "                               of all,none,quiet,record,playback," << endl <<
                     "                               channel,osd,file,schedule,network" << endl <<
                     "--printexpire                  List of auto-expire programs" << endl <<
-                    "--printsched                   Upcoming scheduled programs" << endl;
+                    "--printsched                   Upcoming scheduled programs" << endl <<
+                    "--version                      Version information" << endl;
             return -1;
         }
 
