@@ -285,6 +285,8 @@ GuideGrid::~GuideGrid()
 
     m_channelInfos.clear();
 
+    delete theme;
+
 }
 
 

@@ -164,6 +164,7 @@ ProgFinder::~ProgFinder()
 
     delete update_Timer;
 
+    delete theme;
     delete accel;
 
 }
