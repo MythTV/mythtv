@@ -597,7 +597,7 @@ QImage* Metadata::getCoverImage()
     if (!coverImage && (CoverFile() != "No Cover"))
     {
         coverImage = new QImage();
-        if (!coverImage->load(CoverFile()))
+        if (!coverImage->load(coverfile))
         {
             delete coverImage;
             coverImage = NULL;
@@ -605,4 +605,18 @@ QImage* Metadata::getCoverImage()
     }
         
     return coverImage;
+}
+
+
+QPixmap* Metadata::getCoverPixmap()
+{
+    if (coverPixmap)
+        return coverPixmap;
+    
+    if (coverfile)
+    {
+        coverPixmap = new QPixmap();
+        coverPixmap->load(coverfile);
+    }
+    return coverPixmap;
 }

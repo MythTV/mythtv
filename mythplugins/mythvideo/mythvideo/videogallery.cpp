@@ -49,17 +49,7 @@ VideoGallery::VideoGallery(QSqlDatabase *ldb, MythMainWindow *parent, const char
     QStringList an_it(QStringList::split("/", videodir));
 
     
-    if (getContainer("text"))
-        textRect = getContainer("text")->GetAreaRect();
-            
-    if (getContainer("view"))
-        viewRect = getContainer("view")->GetAreaRect();
-    
-    
-    
-    if (getContainer("arrows"))
-        arrowsRect = getContainer("arrows")->GetAreaRect();
-    
+    loadWindow(xmldata);    
     LoadIconWindow(); // load icon settings
 
     if (!an_it.empty())
@@ -283,6 +273,8 @@ void VideoGallery::paintEvent(QPaintEvent *e)
     
     if (r.intersects(arrowsRect))
         updateArrows(&p);
+    
+    MythDialog::paintEvent(e);        
 }
 
 
@@ -297,7 +289,7 @@ void VideoGallery::updateText(QPainter *p)
     pix.fill(this, pr.topLeft());
     QPainter tmp(&pix);
 
-    LayerSet* container = getContainer("text");
+    LayerSet* container = theme->GetSet("text");
     if (container) {
         UITextType *ttype = (UITextType*)container->GetType("text");
         if (ttype) {
@@ -322,7 +314,7 @@ void VideoGallery::updateArrows(QPainter *p)
     pix.fill(this, pr.topLeft());
     QPainter tmp(&pix);
 
-    LayerSet* container = getContainer("arrows");
+    LayerSet* container = theme->GetSet("arrows");
     if (container) {
 
         int upArrow = (topRow == 0) ? 0 : 1;
@@ -422,6 +414,7 @@ void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos, in
     QImage *image = 0;
     int yoffset = 0;
     bool myImage = true;
+    Metadata *meta = NULL;
     
     if (curTreePos->getInt() < 0) // directory
     {     
@@ -460,7 +453,7 @@ void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos, in
             p->drawPixmap(xpos, ypos, backRegPix);
 
         // load video icon
-        Metadata *meta = &metas[curTreePos->getInt()];
+        meta = &metas[curTreePos->getInt()];
         
         image = meta->getCoverImage();
         myImage = false;
@@ -474,9 +467,15 @@ void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos, in
     
     if (image && !image->isNull()) 
     {
-        QPixmap *pixmap = new QPixmap(image->smoothScale((int)(thumbW-2*sw),
-                                                         (int)(thumbH-2*sh-yoffset),
-                           (keepAspectRatio ? QImage::ScaleMin : QImage::ScaleFree) ));
+
+        QPixmap *pixmap = NULL;
+        if (!myImage && meta && meta->haveCoverPixmap())
+            pixmap = meta->getCoverPixmap();
+
+        if (!pixmap)
+            pixmap = new QPixmap(image->smoothScale((int)(thumbW-2*sw),
+                                                    (int)(thumbH-2*sh-yoffset),
+                                               (keepAspectRatio ? QImage::ScaleMin : QImage::ScaleFree) ));
 
         if (!pixmap->isNull())
             p->drawPixmap(xpos + sw, ypos + sh + yoffset,
@@ -485,14 +484,17 @@ void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos, in
                           (pixmap->height()-bh+yoffset)/2+sh,
                           bw-2*sw, bh-2*sh-yoffset);
 
-        delete pixmap;
+        if (myImage)
+            delete pixmap;
+        else
+            meta->setCoverPixmap(pixmap);
     }
     
     
     UITextType *itype = (UITextType*)0;
     UITextType *ttype = (UITextType*)0;
 
-    LayerSet* container = getContainer("view");
+    LayerSet* container = theme->GetSet("view");
     
     if (container) 
     {
@@ -589,7 +591,7 @@ void VideoGallery::LoadIconWindow()
     // parse ui definition in xml file and load the icon settings
     //
 
-    LayerSet *container = getContainer("view");
+    LayerSet *container = theme->GetSet("view");
     if (!container) {
         std::cerr << "MythVideo: Failed to get view container."
                   << std::endl;
@@ -648,6 +650,7 @@ void VideoGallery::LoadIconWindow()
         delete img;
     }
 }
+
  
 void VideoGallery::exitWin()
 {
@@ -748,9 +751,13 @@ void VideoGallery::moveCursor(QString action)
     
         
     if (topRow != oldRow)     // renew the whole screen
+    {
+        cerr << "redraw screen" << endl;
         update(viewRect);
+    }
     else                     // partial update only
     {                    
+        cerr << "redraw singleicon" << endl;
         QPainter p(this);
         updateSingleIcon(&p,prevCol,prevRow);
         updateSingleIcon(&p,currCol,currRow);
@@ -859,4 +866,20 @@ bool VideoGallery::handleSelect()
     }
     
     return handled;
+}
+
+
+void VideoGallery::parseContainer(QDomElement &element)
+{
+    QRect area;
+    QString name;
+    int context;
+    theme->parseContainer(element, name, context, area);
+
+    if (name.lower() == "text")
+        textRect = area;
+    else if (name.lower() == "view")
+        viewRect = area;
+    else if (name.lower() == "arrows")
+        arrowsRect = area;
 }

@@ -30,22 +30,14 @@ VideoBrowser::VideoBrowser(QSqlDatabase *ldb,
     
         
     fetchVideos();
-
-
-    noUpdate = false;
     m_state = 0;
 
     curitem = NULL;
     inData = 0;
-
     
-    if (getContainer("info"))
-        infoRect = getContainer("info")->GetAreaRect();
-        
-    if (getContainer("browsing"))
-        browsingRect = getContainer("browsing")->GetAreaRect();
-        
+    loadWindow(xmldata);        
     bgTransBackup = gContext->LoadScalePixmap("trans-backup.png");
+    
     if (!bgTransBackup)
         bgTransBackup = new QPixmap();
 
@@ -66,7 +58,7 @@ VideoBrowser::~VideoBrowser()
 
 void VideoBrowser::slotParentalLevelChanged()
 {
-    LayerSet *container = getContainer("browsing");
+    LayerSet *container = theme->GetSet("browsing");
     if(container)
     {
         UITextType *pl_value = (UITextType *)container->GetType("pl_value");
@@ -152,7 +144,7 @@ void VideoBrowser::updateBackground(void)
 
     QPainter tmp(&bground);
 
-    LayerSet *container = getContainer("background");
+    LayerSet *container = theme->GetSet("background");
     if (container)
         container->Draw(&tmp, 0, 0);
 
@@ -197,21 +189,20 @@ void VideoBrowser::paintEvent(QPaintEvent *e)
 {
     QRect r = e->rect();
     QPainter p(this);
-
     if (m_state == 0)
     {
-       if (r.intersects(infoRect) && noUpdate == false)
+       if (r.intersects(infoRect) && allowPaint == true)
        {
            updateInfo(&p);
        }
-       if (r.intersects(browsingRect) && noUpdate == false)
+       if (r.intersects(browsingRect) && allowPaint == true)
        {
            updateBrowsing(&p);
        }
     }
     else if (m_state > 0)
     {
-        noUpdate = true;
+        allowPaint = false;
         updatePlayWait(&p);
     }
 }
@@ -227,7 +218,7 @@ void VideoBrowser::updatePlayWait(QPainter *p)
     backup.end();
 
     LayerSet *container = NULL;
-    container = getContainer("playwait");
+    container = theme->GetSet("playwait");
     if (container)
     {
         container->Draw(p, 0, 0);
@@ -243,7 +234,7 @@ void VideoBrowser::updatePlayWait(QPainter *p)
     backup.begin(this);
     backup.drawPixmap(0, 0, myBackground);
     backup.end();
-    noUpdate = false;
+    allowPaint = true;
   }
 }
 
@@ -306,7 +297,7 @@ void VideoBrowser::updateBrowsing(QPainter *p)
     }
 
     LayerSet *container = NULL;
-    container = getContainer("browsing");
+    container = theme->GetSet("browsing");
     if (container)
     {
         UITextType *type = (UITextType *)container->GetType("currentvideo");
@@ -354,12 +345,11 @@ void VideoBrowser::updateInfo(QPainter *p)
        QString rating = curitem->Rating();
        if (rating == "<NULL>")
            rating = tr("No rating available.");
-       QString length = QString("%1").arg(curitem->Length()) + " " +
-	      	      	tr("minutes");
+       QString length = QString("%1").arg(curitem->Length()) + " " + tr("minutes");
        QString level = QString("%1").arg(curitem->ShowLevel());
 
        LayerSet *container = NULL;
-       container = getContainer("info");
+       container = theme->GetSet("info");
        if (container)
        {
            UITextType *type = (UITextType *)container->GetType("title");
@@ -385,8 +375,11 @@ void VideoBrowser::updateInfo(QPainter *p)
            UIImageType *itype = (UIImageType *)container->GetType("coverart");
            if (itype)
            {
-               itype->SetImage(coverfile);
-               itype->LoadImage();
+               //if (itype->GetImage() != coverfile)
+               //{
+                   itype->SetImage(coverfile);
+                   itype->LoadImage();
+               //}
            }
 
            type = (UITextType *)container->GetType("inetref");
@@ -427,7 +420,7 @@ void VideoBrowser::updateInfo(QPainter *p)
     }
     else
     {
-       LayerSet *norec = getContainer("novideos_info");
+       LayerSet *norec = theme->GetSet("novideos_info");
        if (norec)
        {
            norec->Draw(&tmp, 4, 0);
@@ -467,5 +460,18 @@ void VideoBrowser::cursorLeft()
 void VideoBrowser::cursorRight()
 {
     doMenu();
+}
+
+void VideoBrowser::parseContainer(QDomElement &element)
+{
+    
+    QRect area;
+    QString name;
+    int context;
+    theme->parseContainer(element, name, context, area);
+    if (name.lower() == "info")
+        infoRect = area;
+    if (name.lower() == "browsing")
+        browsingRect = area;
 }
 

@@ -24,7 +24,7 @@ class Metadata
              QStringList lcountries = QStringList())
     {
         coverImage = NULL;
-        
+        coverPixmap = NULL;
         filename = lfilename;
         coverfile = lcoverfile;
         title = ltitle;
@@ -48,7 +48,7 @@ class Metadata
     Metadata(const Metadata &other) 
     {
         coverImage = NULL;
-        
+        coverPixmap = NULL;
         filename = other.filename;
         coverfile = other.coverfile;
         title = other.title;
@@ -135,7 +135,9 @@ class Metadata
     bool Remove(QSqlDatabase *db);
     
     QImage* getCoverImage();
-
+    QPixmap* getCoverPixmap();
+    void setCoverPixmap(QPixmap* pix) { coverPixmap = pix; }
+    bool haveCoverPixmap() const { return (coverPixmap != NULL); }
   private:
     void fillCategory(QSqlDatabase *db);
     void fillCountries(QSqlDatabase *db);
@@ -143,7 +145,8 @@ class Metadata
     void fillGenres(QSqlDatabase *db);
     void updateGenres(QSqlDatabase *db);
     QImage* coverImage;
-    
+    QPixmap* coverPixmap;
+        
     QString title;
     QString inetref;
     QString director;

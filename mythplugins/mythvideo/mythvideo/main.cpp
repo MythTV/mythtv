@@ -241,8 +241,10 @@ void runVideoBrowser(void)
 
 void runVideoTree(void)
 {
-    VideoTree *tree = new VideoTree(QSqlDatabase::database(),
-                                    gContext->GetMainWindow(),
+    VideoTree *tree = new VideoTree(gContext->GetMainWindow(),
+                                    QSqlDatabase::database(),
+                                    "videotree",
+                                    "video-",
                                     "video tree");
     tree->exec();
     delete tree;

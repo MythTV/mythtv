@@ -41,7 +41,7 @@ class VideoGallery : public VideoDialog
     
     void VideoGallery::processEvents() { qApp->processEvents(); }
     
-
+    
   protected slots:
     void moveCursor(QString action);
     void exitWin();
@@ -50,6 +50,7 @@ class VideoGallery : public VideoDialog
     void handleVideoSelect();
     
   protected:
+    virtual void parseContainer(QDomElement &element);
     virtual void handleMetaFetch(Metadata*);
     virtual void fetchVideos();
     void doMenu(bool info=false);

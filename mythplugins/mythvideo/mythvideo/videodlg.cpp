@@ -13,18 +13,32 @@ const long WATCHED_WATERMARK = 10000; // Less than this and the chain of videos 
 
 VideoDialog::VideoDialog(DialogType _myType, QSqlDatabase *_db, 
                          MythMainWindow *_parent,  const char* _winName, const char *_name)
-           : MythThemedDialog(_parent, _winName, "video-", _name)
+           : MythDialog(_parent, _name)
 {
     db = _db;
     myType = _myType;
     curitem = NULL;    
     popup = NULL;
+    
+    //
+    //  Load the theme. Crap out if we can't find it.
+    //
+
+    theme = new XMLParse();
+    theme->SetWMult(wmult);
+    theme->SetHMult(hmult);
+    if (!theme->LoadTheme(xmldata, _winName, "video-"))
+    {
+        cerr << "VideoDialog: Couldn't find your theme. I'm outta here" << endl;
+        cerr << _winName << " - " <<  "video-ui" << endl;
+        exit(0);
+    }
+
     expectingPopup = false;
     fullRect = QRect(0, 0, (int)(800*wmult), (int)(600*hmult));
     allowPaint = true;
     currentParentalLevel = gContext->GetNumSetting("VideoDefaultParentalLevel", 1);
     currentVideoFilter = new VideoFilterSettings(db, true);
-    
 }
 
 VideoDialog::~VideoDialog()
@@ -180,7 +194,7 @@ void VideoDialog::playVideo(Metadata *someItem)
     myth_system((QString("%1 ").arg(command)).local8Bit());
 
     // Show a please wait message    
-    LayerSet *container = getTheme()->GetSet("playwait");
+    LayerSet *container = theme->GetSet("playwait");
     
     if (container)
     {
@@ -465,4 +479,35 @@ void VideoDialog::slotDoFilter()
 void VideoDialog::exitWin()
 {
     emit accept();
+}
+
+
+void VideoDialog::loadWindow(QDomElement &element)
+{
+    for (QDomNode child = element.firstChild(); !child.isNull();
+         child = child.nextSibling())
+    {
+        QDomElement e = child.toElement();
+        
+        if (!e.isNull())
+        {
+            if (e.tagName() == "font")
+            {
+                theme->parseFont(e);
+            }
+            else if (e.tagName() == "container")
+            {
+                this->parseContainer(e);
+            }
+            else
+            {
+                MythPopupBox::showOkPopup(gContext->GetMainWindow(), "",
+                                          tr(QString("There is a problem with your"
+                                          "music-ui.xml file... Unknown element: %1").
+                                          arg(e.tagName())));
+                
+                cerr << "Unknown element: " << e.tagName() << endl;
+            }
+        }
+    }
 }

@@ -14,7 +14,7 @@
 class VideoFilterSettings;
 
 
-class VideoDialog : public MythThemedDialog
+class VideoDialog : public MythDialog
 {
     Q_OBJECT
     
@@ -40,10 +40,12 @@ class VideoDialog : public MythThemedDialog
         void slotViewPlot();
         void slotDoFilter();
         void exitWin();
-        virtual void slotParentalLevelChanged() {}
+        virtual void slotParentalLevelChanged() {cerr << "VideoDialog::parseContainer" << endl;}
         virtual void slotWatchVideo();
             
     protected:
+        virtual void parseContainer(QDomElement&) = 0;
+        virtual void loadWindow(QDomElement &element);
         virtual void handleMetaFetch(Metadata*){}
         virtual void fetchVideos();
         virtual void setParentalLevel(int which_level);
@@ -61,6 +63,9 @@ class VideoDialog : public MythThemedDialog
         DialogType myType;
         
         bool allowPaint;
+        
+        XMLParse *theme;
+        QDomElement xmldata;
         
         VideoFilterSettings *currentVideoFilter;
 };

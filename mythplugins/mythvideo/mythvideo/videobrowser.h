@@ -35,12 +35,15 @@ class VideoBrowser : public VideoDialog
     
 
   protected:
+    virtual void parseContainer(QDomElement &element);
     void paintEvent(QPaintEvent *);
     void keyPressEvent(QKeyEvent *e);
     void doMenu(bool info=false);
     virtual void fetchVideos();
     virtual void handleMetaFetch(Metadata* meta);
-  
+    
+    LayerSet* getContainer(const QString &name);
+    
   private:
     QPixmap getPixmap(QString &level);
     void jumpSelection(int amount);
@@ -53,7 +56,6 @@ class VideoBrowser : public VideoDialog
     void grayOut(QPainter *);
 
     bool updateML;
-    bool noUpdate;
     bool allowselect;
            
     ValueMetadata m_list;

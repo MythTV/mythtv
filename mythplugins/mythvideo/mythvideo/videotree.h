@@ -8,13 +8,11 @@
 #include <mythtv/mythdialogs.h>
 #include <mythtv/uitypes.h>
 
-
-#include "videodlg.h"
-
+#include "metadata.h"
 
 class QSqlDatabase;
 
-class VideoTree : public VideoDialog
+class VideoTree : public MythThemedDialog
 {
     Q_OBJECT
 
@@ -22,32 +20,31 @@ class VideoTree : public VideoDialog
 
     typedef QValueVector<int> IntVector;
 
-    VideoTree(QSqlDatabase *ldb, 
-              MythMainWindow *parent, const char *name = 0);
+    VideoTree(MythMainWindow *parent, QSqlDatabase *ldb,
+              QString window_name, QString theme_filename,
+              const char *name = 0);
    ~VideoTree();
 
+    void buildVideoList();
     void buildFileList(QString directory);
     bool ignoreExtension(QString extension);
     
   public slots:
+  
     void handleTreeListSelection(int, IntVector*);
-    void handleTreeListEntry(int, IntVector* = NULL);
-    virtual void slotParentalLevelChanged();
-    virtual void slotWatchVideo();
-    
+    void handleTreeListEntry(int, IntVector*);
+    void playVideo(int node_number);
+    bool checkParentPassword();
+    void setParentalLevel(int which_level);
 
   protected:
     void keyPressEvent(QKeyEvent *e);
-    void doMenu(bool info);
-    virtual void handleMetaFetch(Metadata* meta);
-    virtual void fetchVideos();
-
 
   private:
-    void fillTreeFromFilesystem();
-    void syncMetaToTree(int nodeNumber);
-    void wireUpTheme();
-    
+
+    void         wireUpTheme();
+    int          current_parental_level;
+    QSqlDatabase *db;
     bool         file_browser;
     QStringList  browser_mode_files;
        
