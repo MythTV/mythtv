@@ -562,7 +562,18 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
                 }
                 else
                 {
-                    // TODO: Do an update here of the Name, etc..
+                    query.prepare("UPDATE channel set atscsrcid=:ATSCSRCID "
+                                  "WHERE serviceid=:SERVICEID and mplexid=:MPLEXID");
+                    query.bindValue(":ATSCSRCID",(*s).ATSCSourceID);
+                    query.bindValue(":SERVICEID",(*s).ServiceID);
+                    query.bindValue(":MPLEXID",chan->GetCurrentTransportDBID());
+
+                    if(!query.exec())
+                        MythContext::DBError("Updating ATSC SourceID", query);
+ 
+                    if (!query.isActive())
+                        MythContext::DBError("Updating ATSC SourceID", query);
+
                     SISCAN(QString("Channel %1 already in Database - Skipping").arg((*s).ServiceName));
                     QString status = QString("Updating %1").arg((*s).ServiceName);
                     emit ServiceScanUpdateText(status);
