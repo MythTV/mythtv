@@ -6356,39 +6356,39 @@ Kanalens frekvens i Hz.</translation>
     </message>
     <message>
         <source>(1) Sort by Title    (2) Sort by Priority    (4) Sort by Type</source>
-        <translation type="unfinished"></translation>
+        <translation>(1) Sortera efter titel  (2) Sortera efter prioritet  (4) Sortera efter typ</translation>
     </message>
     <message>
         <source>Select a recording to permanently erase</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj en inspelning att radera</translation>
     </message>
     <message>
         <source>Select a recording to watch</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj en inspelning att visa</translation>
     </message>
     <message>
         <source>Select a recording to permanently erase:</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj en inspelning att radera:</translation>
     </message>
     <message>
         <source>Select a recording to watch:</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj en inspelning att visa:</translation>
     </message>
     <message>
         <source>Select a recording to permanently erase.</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj en inspelning att radera.</translation>
     </message>
     <message>
         <source>Select a recording to watch.</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj en inspelning att visa.</translation>
     </message>
     <message>
         <source>Pick the letter in which the show starts with, then press SELECT or the right arrow</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj den bokstav som programnamnet börjar med och tryck sedan på OK eller högerpil</translation>
     </message>
     <message>
         <source>Select the title of the program you wish to find. When finished return with the left arrow key. Press SELECT to schedule a recording.</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj titeln på det program du vill hitta. När du är klar, återgå med vänsterpil. Tryck OK för att schemalägga en inspelning.</translation>
     </message>
     <message>
         <source>Airdate:</source>
@@ -6400,11 +6400,11 @@ Kanalens frekvens i Hz.</translation>
     </message>
     <message>
         <source>System Status - Select a category to view the status</source>
-        <translation type="unfinished"></translation>
+        <translation>Systemstatus - Välj kategori</translation>
     </message>
     <message>
         <source>This screen displays the status of various system components</source>
-        <translation type="unfinished"></translation>
+        <translation>Denna skärm visar status för olika systemkomponenter</translation>
     </message>
 </context>
 <context>
