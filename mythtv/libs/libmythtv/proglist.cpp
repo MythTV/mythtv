@@ -507,7 +507,7 @@ void ProgLister::setViewFromTime(void)
 
 void ProgLister::chooseView(void)
 {
-    if (type == plChannel || type == plCategory)
+    if (type == plChannel || type == plCategory || type == plNewListings)
     {
         if (viewList.count() < 2)
             return;
@@ -517,6 +517,8 @@ void ProgLister::chooseView(void)
             choosePopup->addLabel(tr("Select Channel"));
         else if (type == plCategory)
             choosePopup->addLabel(tr("Select Category"));
+        else if (type == plNewListings)
+            choosePopup->addLabel(tr("Select List"));
 
         chooseListBox = new MythListBox(choosePopup);
         chooseListBox->setScrollBar(false);
@@ -811,7 +813,22 @@ void ProgLister::fillViewList(const QString &view)
         else
             curView = -1;
     }
-    else if (type == plNewListings || type == plMovies)
+    else if (type == plNewListings)
+    {
+        viewList << "all";
+        viewTextList << tr("All");
+
+        viewList << "movies";
+        viewTextList << tr("Movies");
+
+        viewList << "series";
+        viewTextList << tr("Series");
+
+        viewList << "specials";
+        viewTextList << tr("Specials");
+        curView = 0;
+    }
+    else if (type == plMovies)
     {
         viewList << "";
         viewTextList << "";
@@ -851,12 +868,28 @@ void ProgLister::fillItemList(void)
                         "  oldprogram.oldtitle = program.title "
                         "WHERE channel.visible = 1 "
                         "  AND program.endtime > %1 "
-                        "  AND oldprogram.oldtitle IS NULL "
-                        "  AND (program.category_type <> 'movie' "
-                        "    OR program.airdate >= "
-                        "      YEAR(NOW() - INTERVAL 2 YEAR)) "
-                        "GROUP BY title ")
+                        "  AND oldprogram.oldtitle IS NULL ")
                         .arg(startstr);
+
+        if (qphrase == "movies")
+        {
+            where += "AND (program.category_type = 'movie' ";
+            where += "AND program.airdate >= YEAR(NOW() - INTERVAL 2 YEAR)) ";
+        }
+        else if (qphrase == "series")
+        {
+            where += "AND program.category_type = 'series' ";
+        }
+        else if (qphrase == "specials")
+        {
+            where += "AND program.category_type = 'tvshow' ";
+        }
+        else
+        {
+            where += "AND (program.category_type <> 'movie' ";
+            where += "OR program.airdate >= YEAR(NOW() - INTERVAL 2 YEAR)) ";
+        }
+        where += "GROUP BY title ";
     }
     else if (type == plTitleSearch) // keyword search
     {
