@@ -15,10 +15,6 @@
 #include <qlistbox.h>
 #include <qcheckbox.h>
 
-#include <map>
-
-using namespace std;
-
 class MythContext;
 
 // These widgets follow these general navigation rules:
@@ -41,7 +37,6 @@ public slots:
 protected:
     virtual void keyPressEvent (QKeyEvent* e);
 };
-
 
 class MythSpinBox: public QSpinBox {
 public:
