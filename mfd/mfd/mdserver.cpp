@@ -1214,6 +1214,8 @@ void MetadataServer::sendContainers(HttpInRequest *http_request, MdcapRequest *m
     
 
     bool full_update = true;
+
+    MdcapOutput response;
     
     metadata_mutex.lock();
 
@@ -1240,8 +1242,8 @@ void MetadataServer::sendContainers(HttpInRequest *http_request, MdcapRequest *m
     if(mdcap_request->itemRequest())
     {
         //
-        //  Are we sending everything, or just deltas?
-        //  We send deltas if the client is only off by one.
+        //  Are we sending everything, or just deltas?  We send deltas if
+        //  the client is only off by one generation.
         //
         
         if(full_update)
@@ -1250,161 +1252,13 @@ void MetadataServer::sendContainers(HttpInRequest *http_request, MdcapRequest *m
             //  Send all the metadata items in this container
             //
         
-            QIntDict<Metadata> *metadata = container->getMetadata();
-            
-            MdcapOutput response;
-        
-            response.addItemGroup();
-
-                response.addCollectionId(container->getIdentifier());
-                response.addCollectionGeneration(container->getGeneration());
-                response.addUpdateType(full_update);
-                response.addTotalItems(metadata->count());
-                response.addAddedItems(metadata->count());
-                response.addDeletedItems(0);
-                
-                response.addAddedItemsGroup();
-                    
-                    QIntDictIterator<Metadata> it( *metadata ); 
-                    Metadata *a_metadata;
-                    for ( ; (a_metadata = it.current()); ++it )   
-                    {
-                        if(a_metadata->getType() == MDT_audio)
-                        {
-                            AudioMetadata *audio_metadata = (AudioMetadata *)a_metadata;
-                            response.addAddedItemGroup();
-                                response.addItemType(audio_metadata->getType());
-                                response.addItemId(audio_metadata->getId());
-                                response.addItemUrl(audio_metadata->getUrl().toString());
-                                response.addItemRating(audio_metadata->getRating());
-                                response.addItemLastPlayed(audio_metadata->getLastPlayed().toTime_t());
-                                response.addItemPlayCount(audio_metadata->getPlayCount());
-                                response.addItemArtist(audio_metadata->getArtist());
-                                response.addItemAlbum(audio_metadata->getAlbum());
-                                response.addItemTitle(audio_metadata->getTitle());
-                                response.addItemGenre(audio_metadata->getGenre());
-                                response.addItemYear(audio_metadata->getYear());
-                                response.addItemTrack(audio_metadata->getTrack());
-                                response.addItemLength(audio_metadata->getLength());
-
-                                //
-                                //  If this item is a duplicate of
-                                //  something else that's available
-                                //  locally, let the client know
-                                //
-
-                                if(!container->isLocal() && getLocalEquivalent(a_metadata))
-                                {
-                                    response.addItemDupFlag(true);
-                                }
-                            response.endGroup();
-                        }
-                        else
-                        {
-                            warning("don't know how to handle non audio metadata yet");
-                        }
-                    }
-                
-                response.endGroup();
-
-            response.endGroup();
-            log(QString("built full update (+%1) mdcap payload in %2 second(s)")
-                .arg(metadata->count())
-                .arg(container_timer.elapsed() / 1000.0), 7);
+            sendFullItems(container, &response);
             metadata_mutex.unlock();
             sendResponse(http_request, response);
         }
         else
         {
-            //
-            //  Send the deltas from the last change for items in this
-            //  container
-            //
-        
-            QIntDict<Metadata> *metadata = container->getMetadata();
-            QValueList<int> metadata_additions = container->getMetadataAdditions();
-            QValueList<int> metadata_deletions = container->getMetadataDeletions();
-            
-            MdcapOutput response;
-        
-            response.addItemGroup();
-
-                response.addCollectionId(container->getIdentifier());
-                response.addCollectionGeneration(container->getGeneration());
-                response.addUpdateType(full_update);    // false
-                response.addTotalItems(metadata->count());
-                response.addAddedItems(metadata_additions.count());
-                response.addDeletedItems(metadata_deletions.count());
-                
-                if(metadata_additions.count() > 0)
-                {
-                    response.addAddedItemsGroup();
-                        QValueList<int>::iterator it;
-                        for ( it = metadata_additions.begin(); it != metadata_additions.end(); ++it )
-                        {
-                            Metadata *a_metadata = metadata->find((*it));
-                            if(a_metadata)
-                            {
-                                if(a_metadata->getType() == MDT_audio)
-                                {
-                                    AudioMetadata *audio_metadata = (AudioMetadata *)a_metadata;
-                                    response.addAddedItemGroup();
-                                        response.addItemType(audio_metadata->getType());
-                                        response.addItemId(audio_metadata->getId());
-                                        response.addItemUrl(audio_metadata->getUrl().toString());
-                                        response.addItemRating(audio_metadata->getRating());
-                                        response.addItemLastPlayed(audio_metadata->getLastPlayed().toTime_t());
-                                        response.addItemPlayCount(audio_metadata->getPlayCount());
-                                        response.addItemArtist(audio_metadata->getArtist());
-                                        response.addItemAlbum(audio_metadata->getAlbum());
-                                        response.addItemTitle(audio_metadata->getTitle());
-                                        response.addItemGenre(audio_metadata->getGenre());
-                                        response.addItemYear(audio_metadata->getYear());
-                                        response.addItemTrack(audio_metadata->getTrack());
-                                        response.addItemLength(audio_metadata->getLength());
-
-                                        //
-                                        //  If this item is a duplicate of
-                                        //  something else that's available
-                                        //  locally, let the client know
-                                        //
-
-                                        if(!container->isLocal() && getLocalEquivalent(a_metadata))
-                                        {
-                                            response.addItemDupFlag(true);
-                                        }
-                                    response.endGroup();
-                                }
-                                else
-                                {
-                                    warning("don't know how to handle non audio metadata yet");
-                                }
-                            }
-                            else
-                            {
-                                warning("metadata addition that doesn't point to a metadata!!");
-                            }
-                        }
-                    response.endGroup();
-                }
-                
-                if(metadata_deletions.count() > 0)
-                {
-                    response.addDeletedItemsGroup();
-                        QValueList<int>::iterator it;
-                        for ( it = metadata_deletions.begin(); it != metadata_deletions.end(); ++it )
-                        {
-                            response.addDeletedItem((*it));
-                        }
-                    response.endGroup();
-                }
-                
-
-            response.endGroup();
-            log(QString("built delta update (+%1/-%2) mdcap payload in %3 second(s)")
-                .arg(metadata_additions.count())
-                .arg(metadata_deletions.count())
-                .arg(container_timer.elapsed() / 1000.0), 7);
+            sendDeltaItems(container, &response);
             metadata_mutex.unlock();
             sendResponse(http_request, response);
         }
@@ -1418,70 +1272,10 @@ void MetadataServer::sendContainers(HttpInRequest *http_request, MdcapRequest *m
             //  Send all the lists in this container
             //
         
-            QIntDict<Playlist> *playlists = container->getPlaylists();
-            
-            MdcapOutput response;
-        
-            response.addListGroup();
-
-                response.addCollectionId(container->getIdentifier());
-                response.addCollectionGeneration(container->getGeneration());
-                response.addUpdateType(full_update);
-                response.addTotalItems(playlists->count());
-                response.addAddedItems(playlists->count());
-                response.addDeletedItems(0);
-                
-                response.addAddedListsGroup();
-                    
-                    QIntDictIterator<Playlist> it( *playlists ); 
-                    Playlist *a_playlist;
-                    for ( ; (a_playlist = it.current()); ++it )   
-                    {
-                        response.addAddedListGroup();
-                            response.addListId(a_playlist->getId());
-                            response.addListName(a_playlist->getName());
-                            QValueList<int> *list_items = a_playlist->getListPtr();
-                            QValueList<int>::iterator item_it;
-                            for(item_it = list_items->begin(); item_it != list_items->end(); ++item_it)
-                            {
-                                //
-                                //  Find the Metadata this item_it refers to
-                                //
-
-                                Metadata *a_metadata = getMetadataByContainerAndId(container->getIdentifier(), (*item_it));
-                                if(a_metadata)
-                                {
-                                    AudioMetadata *audio_metadata = (AudioMetadata *)a_metadata;
-                                    if(audio_metadata)
-                                    {
-                                        response.addListItemGroup();
-                                            response.addListItemName(
-                                                                        QString("%1 ~ %2")
-                                                                        .arg(audio_metadata->getArtist())
-                                                                        .arg(audio_metadata->getTitle())
-                                                                    );
-                                            response.addListItem((*item_it));
-                                        response.endGroup();
-                                    }
-                                    else
-                                    {
-                                        warning("me no do non audio yet");
-                                    }
-                                }
-                                else
-                                {
-                                    warning("playlist entry that does not point to metadata");
-                                }
-                                 
-                            }
-                        response.endGroup();
-                    }
-                
-                response.endGroup();
-
-            response.endGroup();
+            sendFullLists(container, &response);
             metadata_mutex.unlock();
             sendResponse(http_request, response);
+
         }
         else
         {
@@ -1490,89 +1284,10 @@ void MetadataServer::sendContainers(HttpInRequest *http_request, MdcapRequest *m
             //  container
             //
 
-            QIntDict<Playlist> *playlists = container->getPlaylists();
-            QValueList<int> playlist_additions = container->getPlaylistAdditions();
-            QValueList<int> playlist_deletions = container->getPlaylistDeletions();
-            
-            MdcapOutput response;
-        
-            response.addListGroup();
-
-                response.addCollectionId(container->getIdentifier());
-                response.addCollectionGeneration(container->getGeneration());
-                response.addUpdateType(full_update);
-                response.addTotalItems(playlists->count());
-                response.addAddedItems(playlist_additions.count());
-                response.addDeletedItems(playlist_deletions.count());
-                
-                if(playlist_additions.count() > 0)
-                {
-                    response.addAddedListsGroup();
-                        QValueList<int>::iterator it;
-                        for ( it = playlist_additions.begin(); it != playlist_additions.end(); ++it )
-                        {
-                            Playlist *a_playlist = playlists->find((*it));
-                            if(a_playlist)
-                            {
-                                response.addAddedListGroup();
-                                    response.addListId(a_playlist->getId());
-                                    response.addListName(a_playlist->getName());
-                                    QValueList<int> *list_items = a_playlist->getListPtr();
-                                    QValueList<int>::iterator item_it;
-                                    for(item_it = list_items->begin(); item_it != list_items->end(); ++item_it)
-                                    {
-                                        //
-                                        //  Find the Metadata this item_it refers to
-                                        //
-
-                                        Metadata *a_metadata = getMetadataByContainerAndId(container->getIdentifier(), (*item_it));
-                                        if(a_metadata)
-                                        {
-                                            AudioMetadata *audio_metadata = (AudioMetadata *)a_metadata;
-                                            if(audio_metadata)
-                                            {
-                                                response.addListItemGroup();
-                                                    response.addListItemName(
-                                                                        QString("%1 ~ %2")
-                                                                        .arg(audio_metadata->getArtist())
-                                                                        .arg(audio_metadata->getTitle())
-                                                                            );
-                                                    response.addListItem((*item_it));
-                                                response.endGroup();
-                                            }
-                                            else
-                                            {
-                                                warning("me no do non audio yet");
-                                            }
-                                        }
-                                        else
-                                        {
-                                            warning("playlist entry that does not point to metadata");
-                                        }
-                                    }
-                                response.endGroup();
-                            }
-                            else
-                            {
-                                warning("playlist addition entry that didn't point to anything");
-                            }
-                        }
-                    response.endGroup();
-                }
-                if(playlist_deletions.count() > 0)
-                {
-                    response.addDeletedListsGroup();
-                        QValueList<int>::iterator it;
-                        for ( it = playlist_deletions.begin(); it != playlist_deletions.end(); ++it )
-                        {
-                            response.addDeletedList((*it));
-                        }
-                    response.endGroup();
-                }
-
-            response.endGroup();
+            sendDeltaLists(container, &response);
             metadata_mutex.unlock();
             sendResponse(http_request, response);
+
         }
         
     }
@@ -1584,6 +1299,286 @@ void MetadataServer::sendContainers(HttpInRequest *http_request, MdcapRequest *m
     }    
 
     
+}
+
+void MetadataServer::sendFullItems(MetadataContainer *container, MdcapOutput *response)
+{
+    QTime container_timer;
+    container_timer.start();
+
+    QIntDict<Metadata> *metadata = container->getMetadata();
+            
+    response->addItemGroup();
+
+        response->addCollectionId(container->getIdentifier());
+        response->addCollectionGeneration(container->getGeneration());
+        response->addUpdateType(true);
+        response->addTotalItems(metadata->count());
+        response->addAddedItems(metadata->count());
+        response->addDeletedItems(0);
+                
+        response->addAddedItemsGroup();
+                    
+            QIntDictIterator<Metadata> it( *metadata ); 
+            Metadata *a_metadata;
+            for ( ; (a_metadata = it.current()); ++it )   
+            {
+                if(a_metadata->getType() == MDT_audio)
+                {
+                    bool local_equivalent_exists = false;
+                    if(!container->isLocal() && getLocalEquivalent(a_metadata))
+                    {
+                            local_equivalent_exists = true;
+                    }
+                    
+                    AudioMetadata *audio_metadata = (AudioMetadata *)a_metadata;
+                    addAudioItem(response, audio_metadata, local_equivalent_exists);
+                }
+                else
+                {
+                    warning("don't know how to handle non audio metadata yet");
+                }
+            }
+                
+        response->endGroup();
+
+    response->endGroup();
+
+    log(QString("built full update (+%1) mdcap payload in %2 second(s)")
+                .arg(metadata->count())
+                .arg(container_timer.elapsed() / 1000.0), 7);
+}
+
+void MetadataServer::sendDeltaItems(MetadataContainer *container, MdcapOutput *response)
+{
+    QTime container_timer;
+    container_timer.start();
+
+
+    //
+    //  Send the deltas from the last change for items in this
+    //  container
+    //
+        
+    QIntDict<Metadata> *metadata = container->getMetadata();
+    QValueList<int> metadata_additions = container->getMetadataAdditions();
+    QValueList<int> metadata_deletions = container->getMetadataDeletions();
+            
+    response->addItemGroup();
+
+        response->addCollectionId(container->getIdentifier());
+        response->addCollectionGeneration(container->getGeneration());
+        response->addUpdateType(false);
+        response->addTotalItems(metadata->count());
+        response->addAddedItems(metadata_additions.count());
+        response->addDeletedItems(metadata_deletions.count());
+                
+        if(metadata_additions.count() > 0)
+        {
+            response->addAddedItemsGroup();
+                QValueList<int>::iterator it;
+                for ( it = metadata_additions.begin(); it != metadata_additions.end(); ++it )
+                {
+                    Metadata *a_metadata = metadata->find((*it));
+                    if(a_metadata)
+                    {
+                        if(a_metadata->getType() == MDT_audio)
+                        {
+                            bool local_equivalent_exists = false;
+                            if(!container->isLocal() && getLocalEquivalent(a_metadata))
+                            {
+                                local_equivalent_exists = true;
+                            }
+                    
+                            AudioMetadata *audio_metadata = (AudioMetadata *)a_metadata;
+                            addAudioItem(response, audio_metadata, local_equivalent_exists);
+                        }
+                        else
+                        {
+                            warning("don't know how to handle non audio metadata yet");
+                        }
+                    }
+                    else
+                    {
+                        warning("metadata addition that doesn't point to a metadata!!");
+                    }
+                }
+            response->endGroup();
+        }
+                
+        if(metadata_deletions.count() > 0)
+        {
+            response->addDeletedItemsGroup();
+                QValueList<int>::iterator it;
+                for ( it = metadata_deletions.begin(); it != metadata_deletions.end(); ++it )
+                {
+                    response->addDeletedItem((*it));
+                }
+            response->endGroup();
+        }
+                
+
+    response->endGroup();
+    log(QString("built delta update (+%1/-%2) mdcap payload in %3 second(s)")
+                .arg(metadata_additions.count())
+                .arg(metadata_deletions.count())
+                .arg(container_timer.elapsed() / 1000.0), 7);
+}
+
+
+
+void MetadataServer::addAudioItem(
+                                    MdcapOutput *response, 
+                                    AudioMetadata *audio_metadata, 
+                                    bool local_equivalent_exists
+                                 )
+{
+    response->addAddedItemGroup();
+        response->addItemType(audio_metadata->getType());
+        response->addItemId(audio_metadata->getId());
+        response->addItemUrl(audio_metadata->getUrl().toString());
+        response->addItemRating(audio_metadata->getRating());
+        response->addItemLastPlayed(audio_metadata->getLastPlayed().toTime_t());
+        response->addItemPlayCount(audio_metadata->getPlayCount());
+        response->addItemArtist(audio_metadata->getArtist());
+        response->addItemAlbum(audio_metadata->getAlbum());
+        response->addItemTitle(audio_metadata->getTitle());
+        response->addItemGenre(audio_metadata->getGenre());
+        response->addItemYear(audio_metadata->getYear());
+        response->addItemTrack(audio_metadata->getTrack());
+        response->addItemLength(audio_metadata->getLength());
+        response->addItemDupFlag(local_equivalent_exists);
+    response->endGroup();
+}
+
+void MetadataServer::sendFullLists(MetadataContainer *container, MdcapOutput *response)
+{
+    QTime container_timer;
+    container_timer.start();
+
+
+    QIntDict<Playlist> *playlists = container->getPlaylists();
+            
+    response->addListGroup();
+
+        response->addCollectionId(container->getIdentifier());
+        response->addCollectionGeneration(container->getGeneration());
+        response->addUpdateType(true);
+        response->addTotalItems(playlists->count());
+        response->addAddedItems(playlists->count());
+        response->addDeletedItems(0);
+                
+        response->addAddedListsGroup();
+                    
+            QIntDictIterator<Playlist> it( *playlists ); 
+            Playlist *a_playlist;
+            for ( ; (a_playlist = it.current()); ++it )   
+            {
+                addAudioList(response, a_playlist, container);
+            }
+                
+        response->endGroup();
+
+    response->endGroup();
+}
+
+void MetadataServer::sendDeltaLists(MetadataContainer *container, MdcapOutput *response)
+{
+    QTime container_timer;
+    container_timer.start();
+
+
+    QIntDict<Playlist> *playlists = container->getPlaylists();
+    QValueList<int> playlist_additions = container->getPlaylistAdditions();
+    QValueList<int> playlist_deletions = container->getPlaylistDeletions();
+            
+    response->addListGroup();
+
+        response->addCollectionId(container->getIdentifier());
+        response->addCollectionGeneration(container->getGeneration());
+        response->addUpdateType(false);
+        response->addTotalItems(playlists->count());
+        response->addAddedItems(playlist_additions.count());
+        response->addDeletedItems(playlist_deletions.count());
+                
+        if(playlist_additions.count() > 0)
+        {
+            response->addAddedListsGroup();
+                QValueList<int>::iterator it;
+                for ( it = playlist_additions.begin(); it != playlist_additions.end(); ++it )
+                {
+                    Playlist *a_playlist = playlists->find((*it));
+                    if(a_playlist)
+                    {
+                        addAudioList(response, a_playlist, container);
+                    }
+                    else
+                    {
+                        warning("playlist addition entry that didn't point to anything");
+                    }
+                }
+            response->endGroup();
+        }
+        if(playlist_deletions.count() > 0)
+        {
+            response->addDeletedListsGroup();
+                QValueList<int>::iterator it;
+                for ( it = playlist_deletions.begin(); it != playlist_deletions.end(); ++it )
+                {
+                    response->addDeletedList((*it));
+                }
+            response->endGroup();
+        }
+
+    response->endGroup();
+}
+
+
+void MetadataServer::addAudioList(
+                                    MdcapOutput *response, 
+                                    Playlist *a_playlist, 
+                                    MetadataContainer *container
+                                 )
+{
+    response->addAddedListGroup();
+        response->addListId(a_playlist->getId());
+        response->addListName(a_playlist->getName());
+        QValueList<int> *list_items = a_playlist->getListPtr();
+        QValueList<int>::iterator item_it;
+        for(item_it = list_items->begin(); item_it != list_items->end(); ++item_it)
+        {
+
+            //
+            //  Find the Metadata this item_it refers to
+            //
+
+            Metadata *a_metadata = getMetadataByContainerAndId(container->getIdentifier(), (*item_it));
+            if(a_metadata)
+            {
+                AudioMetadata *audio_metadata = (AudioMetadata *)a_metadata;
+                if(audio_metadata)
+                {
+                    response->addListItemGroup();
+                        response->addListItemName(
+                                                    QString("%1 ~ %2")
+                                                    .arg(audio_metadata->getArtist())
+                                                    .arg(audio_metadata->getTitle())
+                                                );
+                        response->addListItem((*item_it));
+                    response->endGroup();
+                }
+                else
+                {
+                    warning("me no do non audio yet");
+                }
+            }
+            else
+            {
+                warning("playlist entry that does not point to metadata");
+            }
+                     
+        }
+    response->endGroup();
 }
 
 void MetadataServer::buildUpdateResponse(MdcapOutput *response)

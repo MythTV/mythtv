@@ -105,6 +105,14 @@ class MetadataServer : public MFDHttpPlugin
     void possiblySendUpdate(HttpInRequest *http_request, int client_id);
     void sendContainers(HttpInRequest *http_request, MdcapRequest *mdcap_request);
 
+    void sendFullItems(MetadataContainer *container, MdcapOutput *response);
+    void sendDeltaItems(MetadataContainer *container, MdcapOutput *response);
+    void addAudioItem(MdcapOutput *response, AudioMetadata *audio_metadata, bool local_equivalent_exists);
+    
+    void sendFullLists(MetadataContainer *container, MdcapOutput *response);
+    void sendDeltaLists(MetadataContainer *container, MdcapOutput *response);
+    void addAudioList(MdcapOutput *response, Playlist *a_playlist, MetadataContainer *container);
+        
     void sendResponse(HttpInRequest *http_request, MdcapOutput &response);
 
     void buildUpdateResponse(MdcapOutput *response);
