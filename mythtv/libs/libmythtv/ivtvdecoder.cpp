@@ -230,7 +230,7 @@ void IvtvDecoder::GetFrame(int onlyvideo)
 
     while (!allowedquit)
     {
-        count = ringBuffer->Read(buf, 128000);
+        count = ringBuffer->Read(buf, 131072);
 
         MpegPreProcessPkt(buf, count, startpos);
         if (onlyvideo >= 0)

@@ -1262,7 +1262,8 @@ void NuppelVideoPlayer::IvtvVideoLoop(void)
     {
         if (pausevideo)
         {
-            vidout->Pause();
+            if (!previously_paused)
+                vidout->Pause();
 
             if (!video_actually_paused)
                 videoOutput->UpdatePauseFrame();
@@ -1298,6 +1299,8 @@ void NuppelVideoPlayer::IvtvVideoLoop(void)
         unsigned long frame = vidout->FrameSync();
         decoder->UpdateFrameNumber(frame); 
         SetFramesPlayed(frame);
+
+        usleep(frame_interval / 2);
     }
 
     delete videoOutput;

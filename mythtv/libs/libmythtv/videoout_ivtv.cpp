@@ -88,13 +88,13 @@ void VideoOutputIvtv::Reopen(int skipframes)
         perror("Cannot open ivtv video out device");
     else
     {
-        if (skipframes > 0)
-        {
-            ivtv_cfg_start_decode sd;
-            memset(&sd, 0, sizeof(sd));
+        ivtv_cfg_start_decode sd;
+        memset(&sd, 0, sizeof(sd));
 
-            ioctl(videofd, IVTV_IOC_S_START_DECODE, &sd);
-        }
+        if (skipframes > 0)
+            sd.gop_offset = skipframes;
+
+        ioctl(videofd, IVTV_IOC_S_START_DECODE, &sd);
     }
 }
 
@@ -176,7 +176,10 @@ int VideoOutputIvtv::WriteBuffer(unsigned char *buf, int count)
     {
         n = write(videofd, buf, count);
         if (n < 0)
+        {
+            perror("Writing to videodev");
             return n;
+        }
         count -= n;
         buf += n;
     }

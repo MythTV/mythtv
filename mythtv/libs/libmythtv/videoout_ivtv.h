@@ -2,6 +2,7 @@
 #define VIDEOOUT_IVTV_H_
 
 #include <qstring.h>
+#include <qmutex.h>
 
 #include "videooutbase.h"
 
@@ -43,8 +44,12 @@ class VideoOutputIvtv: public VideoOutput
 
   private:
     int videofd;
+    int writefd;
+
     float fps;
     QString videoDevice;
+
+    QMutex lock;
 };
 
 #endif
