@@ -643,7 +643,7 @@
     </message>
     <message>
         <source>(unspecified)</source>
-        <translation>(não especificado)</translation>
+        <translation type="obsolete">(não especificado)</translation>
     </message>
     <message>
         <source>Rank</source>
@@ -663,7 +663,7 @@
     </message>
     <message>
         <source>Record new episodes and delete oldest once maximum count is reached</source>
-        <translation>Gravar novos episódios e apagar os antigos quando atingir o número máximo de episódios</translation>
+        <translation type="obsolete">Gravar novos episódios e apagar os antigos quando atingir o número máximo de episódios</translation>
     </message>
     <message>
         <source>Audio output device</source>
@@ -963,10 +963,6 @@
     </message>
     <message>
         <source>Air Date:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Record Schedule:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1306,34 +1302,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>ddd MMM d</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>ddd MMMM d</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>MMM d</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>MM/dd</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>MM.dd</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>ddd d MMM</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>dd.MM.yyyy</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Your preferred date format.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1342,55 +1310,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>M/d</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>d/M</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>dd/MM</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>d.M.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>dd.MM.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Your preferred short date format.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Time format</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>h:mm AP</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>h:mm ap</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>hh:mm AP</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>hh:mm ap</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>h:mm</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>hh:mm</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2202,6 +2126,30 @@
         <source>WARNING: is mythfilldatabase running?</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Not Flagged</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record new and delete oldest once maximum count is reached</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use video as timebase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use the video as the timebase and warp the audio to keep it in sync. (Experimental)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use GUI size for TV playback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked, use the above size for TV. If unchecked, use full screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RankPrograms</name>
@@ -2547,7 +2495,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Color %1 %</source>
+        <source>Adjust Recording</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

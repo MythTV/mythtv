@@ -62,6 +62,7 @@
    <button>
       <type>TV_RECPRIORITIES</type>
       <text>Recording Priorities</text>
+      <text lang="DE">Aufnahme- prioritäten</text>
       <action>MENU recpriorities_settings.xml</action>
    </button>
 

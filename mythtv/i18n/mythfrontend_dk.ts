@@ -465,7 +465,7 @@
     </message>
     <message>
         <source>(unspecified)</source>
-        <translation>(uspecificeret)</translation>
+        <translation type="obsolete">(uspecificeret)</translation>
     </message>
     <message>
         <source>cut point</source>
@@ -597,7 +597,7 @@
     </message>
     <message>
         <source>Record new episodes and delete oldest once maximum count is reached</source>
-        <translation>Optag nye episoder og slet de ældste når maksimalt antal er nået</translation>
+        <translation type="obsolete">Optag nye episoder og slet de ældste når maksimalt antal er nået</translation>
     </message>
     <message>
         <source>%02d:%02d:%02d behind  --  %.2f%% full</source>
@@ -661,7 +661,7 @@
     </message>
     <message>
         <source>Record Schedule:</source>
-        <translation>Optagelsestype:</translation>
+        <translation type="obsolete">Optagelsestype:</translation>
     </message>
     <message>
         <source>Episode:</source>
@@ -1248,34 +1248,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>ddd MMM d</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>ddd MMMM d</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>MMM d</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>MM/dd</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>MM.dd</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>ddd d MMM</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>dd.MM.yyyy</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Your preferred date format.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1284,55 +1256,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>M/d</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>d/M</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>dd/MM</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>d.M.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>dd.MM.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Your preferred short date format.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Time format</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>h:mm AP</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>h:mm ap</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>hh:mm AP</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>hh:mm ap</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>h:mm</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>hh:mm</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2144,6 +2072,30 @@
         <source>WARNING: is mythfilldatabase running?</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Not Flagged</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record new and delete oldest once maximum count is reached</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use video as timebase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use the video as the timebase and warp the audio to keep it in sync. (Experimental)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use GUI size for TV playback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked, use the above size for TV. If unchecked, use full screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RankPrograms</name>
@@ -2473,7 +2425,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Color %1 %</source>
+        <source>Adjust Recording</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -465,7 +465,7 @@
     </message>
     <message>
         <source>(unspecified)</source>
-        <translation>(ospecifierad)</translation>
+        <translation type="obsolete">(ospecifierad)</translation>
     </message>
     <message>
         <source>Record duplicates</source>
@@ -481,7 +481,7 @@
     </message>
     <message>
         <source>Record new episodes and delete oldest once maximum count is reached</source>
-        <translation>Spela in nytt avsnitt och radera det äldsta när maximalt antal inspelningar är gjorda</translation>
+        <translation type="obsolete">Spela in nytt avsnitt och radera det äldsta när maximalt antal inspelningar är gjorda</translation>
     </message>
     <message>
         <source>Rank</source>
@@ -649,7 +649,7 @@
     </message>
     <message>
         <source>Record Schedule:</source>
-        <translation>Inspelningsschema:</translation>
+        <translation type="obsolete">Inspelningsschema:</translation>
     </message>
     <message>
         <source>Episode:</source>
@@ -1237,31 +1237,31 @@
     </message>
     <message>
         <source>ddd MMM d</source>
-        <translation>ddd MMM d</translation>
+        <translation type="obsolete">ddd MMM d</translation>
     </message>
     <message>
         <source>ddd MMMM d</source>
-        <translation>ddd MMMM d</translation>
+        <translation type="obsolete">ddd MMMM d</translation>
     </message>
     <message>
         <source>MMM d</source>
-        <translation>MMM d</translation>
+        <translation type="obsolete">MMM d</translation>
     </message>
     <message>
         <source>MM/dd</source>
-        <translation>MM/dd</translation>
+        <translation type="obsolete">MM/dd</translation>
     </message>
     <message>
         <source>MM.dd</source>
-        <translation>MM.dd</translation>
+        <translation type="obsolete">MM.dd</translation>
     </message>
     <message>
         <source>ddd d MMM</source>
-        <translation>ddd d MMM</translation>
+        <translation type="obsolete">ddd d MMM</translation>
     </message>
     <message>
         <source>dd.MM.yyyy</source>
-        <translation>dd.MM.åååå</translation>
+        <translation type="obsolete">dd.MM.åååå</translation>
     </message>
     <message>
         <source>Your preferred date format.</source>
@@ -1273,23 +1273,23 @@
     </message>
     <message>
         <source>M/d</source>
-        <translation>M/d</translation>
+        <translation type="obsolete">M/d</translation>
     </message>
     <message>
         <source>d/M</source>
-        <translation>d/M</translation>
+        <translation type="obsolete">d/M</translation>
     </message>
     <message>
         <source>dd/MM</source>
-        <translation>dd/MM</translation>
+        <translation type="obsolete">dd/MM</translation>
     </message>
     <message>
         <source>d.M.</source>
-        <translation>d.M.</translation>
+        <translation type="obsolete">d.M.</translation>
     </message>
     <message>
         <source>dd.MM.</source>
-        <translation>dd.MM.</translation>
+        <translation type="obsolete">dd.MM.</translation>
     </message>
     <message>
         <source>Your preferred short date format.</source>
@@ -1301,27 +1301,27 @@
     </message>
     <message>
         <source>h:mm AP</source>
-        <translation>t:mm AP</translation>
+        <translation type="obsolete">t:mm AP</translation>
     </message>
     <message>
         <source>h:mm ap</source>
-        <translation>t:mm ap</translation>
+        <translation type="obsolete">t:mm ap</translation>
     </message>
     <message>
         <source>hh:mm AP</source>
-        <translation>tt:mm AP</translation>
+        <translation type="obsolete">tt:mm AP</translation>
     </message>
     <message>
         <source>hh:mm ap</source>
-        <translation>tt:mm ap</translation>
+        <translation type="obsolete">tt:mm ap</translation>
     </message>
     <message>
         <source>h:mm</source>
-        <translation>t:mm</translation>
+        <translation type="obsolete">t:mm</translation>
     </message>
     <message>
         <source>hh:mm</source>
-        <translation>tt:mm</translation>
+        <translation type="obsolete">tt:mm</translation>
     </message>
     <message>
         <source>Your preferred time format.  Choose a format with &quot;AP&quot; in it for an AM/PM display, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
@@ -2192,6 +2192,30 @@
         <source>WARNING: is mythfilldatabase running?</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Not Flagged</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record new and delete oldest once maximum count is reached</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use video as timebase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use the video as the timebase and warp the audio to keep it in sync. (Experimental)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use GUI size for TV playback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked, use the above size for TV. If unchecked, use full screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RankPrograms</name>
@@ -2485,7 +2509,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Color %1 %</source>
+        <source>Adjust Recording</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
