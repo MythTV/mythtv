@@ -1450,6 +1450,12 @@ void MetadataClient::buildTree()
         }
         
         //
+        //  Tally true playlist counts (resolved out to root tracks)
+        //
+        
+        new_collection->tallyPlaylists();
+        
+        //
         //  If this collection is editable, add ability for user to create
         //  new playlist
         //

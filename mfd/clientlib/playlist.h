@@ -37,6 +37,8 @@ class ClientPlaylist
     uint                       getCollectionId(){return collection_id;}    
     QString                    getName(){return name;}
     uint                       getCount(){return entries.count();}
+    void                       setActualTrackCount(int x){ actual_track_count = x;}
+    uint                       getActualTrackCount(){ return actual_track_count; }
     QValueList<PlaylistEntry>* getListPtr(){return &entries;}
 
   private:
@@ -45,6 +47,7 @@ class ClientPlaylist
     PlaylistEntryList entries;
     uint              id;
     uint              collection_id;
+    uint              actual_track_count;
 
 };
 

@@ -11,6 +11,9 @@
 
 */
 
+#include <map>
+using namespace std;
+
 #include <qintdict.h>
 
 class Metadata;
@@ -18,6 +21,7 @@ class AudioMetadata;
 class ClientPlaylist;
 class GenericTree;
 class UIListGenericTree;
+class UIListTreeType;
 class MetadataCollection;
 
 class MfdContentCollection
@@ -41,6 +45,8 @@ class MfdContentCollection
     void addItemToAudioCollectionTree(AudioMetadata *item, const QString &collection_name);
     void addItemToSelectableTrees(AudioMetadata *item);
     void addPlaylistToSelectableTrees(ClientPlaylist *playlist);
+    void tallyPlaylists();
+    uint countPlaylistTracks(ClientPlaylist *playlist, uint counter);
 
     UIListGenericTree* getAudioArtistTree(){     return audio_artist_tree;     }
     UIListGenericTree* getAudioGenreTree(){      return audio_genre_tree;      }
@@ -53,6 +59,13 @@ class MfdContentCollection
     ClientPlaylist*    getAudioPlaylist(int which_collection, int which_id);
     UIListGenericTree* constructPlaylistTree(int which_collection, int which_playlist);
     UIListGenericTree* constructContentTree(int which_collection, int which_playlist);
+    void               turnOffTree(UIListGenericTree *node);
+    void               toggleItem(UIListGenericTree *node, bool turn_on);
+    void               toggleTree(UIListTreeType *menu, UIListGenericTree *playlist_tree, UIListGenericTree *node, bool turn_on);
+    void               alterPlaylist(UIListTreeType *menu, UIListGenericTree *playlist_tree, UIListGenericTree *node, bool turn_on);
+    void               checkParent(UIListGenericTree *node);
+    bool               crossReferenceExists(ClientPlaylist *subject, ClientPlaylist *object, int depth);
+    void               markNodeAsHeld(UIListGenericTree *node, bool held_or_not);
     
     void sort();
     void setupPixmaps();
@@ -70,6 +83,16 @@ class MfdContentCollection
     UIListGenericTree *audio_collection_tree;
     UIListGenericTree *new_playlist_tree;
     UIListGenericTree *editable_playlist_tree;
+
+
+    //
+    //  The following multimap allows a given playlist entry to find
+    //  everything in a content tree that corresponds to that entry
+    //
+
+    typedef multimap<long, UIListGenericTree*> SelectableContentMap;
+    SelectableContentMap selectable_content_map;
+
 
     QIntDict<UIListGenericTree> selectable_content_trees;
 

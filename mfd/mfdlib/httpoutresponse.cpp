@@ -378,8 +378,9 @@ void HttpOutResponse::createHeaderBlock(
     
     /*    Debuggin Output:  */
    
-    /*
     
+    /*
+
     if(my_request)
     {
         my_request->printHeaders();
@@ -390,8 +391,8 @@ void HttpOutResponse::createHeaderBlock(
         cout << header_block->at(i);
     }
     cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& " << endl;
-   
-    */ 
+    
+    */
 }
 
 

@@ -27,6 +27,7 @@ using namespace std;
 
 #include "pixmaps/container_pix.xpm"
 #include "pixmaps/edit_playlist_pix.xpm"
+#include "pixmaps/edit_track_pix.xpm"
 #include "pixmaps/new_playlist_pix.xpm"
 #include "pixmaps/playlist_pix.xpm"
 #include "pixmaps/artist_pix.xpm"
@@ -41,6 +42,7 @@ using namespace std;
 static bool pixmaps_are_setup = false;
 static QPixmap *pixcontainer = NULL;
 static QPixmap *pixeditplaylist = NULL;
+static QPixmap *pixedittrack = NULL;
 static QPixmap *pixnewplaylist = NULL;
 static QPixmap *pixplaylist = NULL;
 static QPixmap *pixartist = NULL;
@@ -126,7 +128,7 @@ void MfdContentCollection::addMetadata(Metadata *new_item, const QString &collec
     //  metadata, complain
     //
     
-    if(new_item->getType() != MDT_audio)
+    if (new_item->getType() != MDT_audio)
     {
         cerr << "mfdcontent.o: no idea what to do with "
              << "non audio content"
@@ -134,7 +136,7 @@ void MfdContentCollection::addMetadata(Metadata *new_item, const QString &collec
         return;
     }
     
-    if(AudioMetadata *copy = dynamic_cast<AudioMetadata*>(new_item) )
+    if (AudioMetadata *copy = dynamic_cast<AudioMetadata*>(new_item) )
     {
         //
         //  Because this object gets constructed and then passed off to the
@@ -162,7 +164,7 @@ void MfdContentCollection::addMetadata(Metadata *new_item, const QString &collec
         //  Now, put it on all the required tree places.
         //
 
-        if(!new_item->isDuplicate())
+        if (!new_item->isDuplicate())
         {
             addItemToAudioArtistTree(copy, audio_artist_tree);
             addItemToAudioGenreTree(copy, audio_genre_tree);
@@ -233,14 +235,14 @@ void MfdContentCollection::addPlaylist(ClientPlaylist *new_playlist, MetadataCol
     //  editing a playlist)
     //
 
-    if(collection->isEditable())
+    if (collection->isEditable())
     {
         //
         //  Make the root editable playlists node (this could be the first
         //  editable playlist)
         //
         
-        if(!editable_playlist_tree)
+        if (!editable_playlist_tree)
         {
             editable_playlist_tree = new UIListGenericTree(NULL, "Edit Playlists");
             editable_playlist_tree->setPixmap(pixeditplaylist);
@@ -275,11 +277,11 @@ void MfdContentCollection::addPlaylist(ClientPlaylist *new_playlist, MetadataCol
 
     UIListGenericTree *collection_node = NULL;
     GenericTree *gt_collection_node = audio_collection_tree->getChildByName(collection_name);
-    if(gt_collection_node)
+    if (gt_collection_node)
     {
         collection_node = (UIListGenericTree *)gt_collection_node;
     }
-    if(!collection_node)
+    if (!collection_node)
     {
         collection_node = new UIListGenericTree(audio_collection_tree, collection_name);
         collection_node->setPixmap(pixcontainer);
@@ -296,7 +298,7 @@ void MfdContentCollection::addPlaylist(ClientPlaylist *new_playlist, MetadataCol
     {
         GenericTree *gt_by_playlist_node = collection_node->getChildByName("Playlist");
         by_playlist_node = (UIListGenericTree *) gt_by_playlist_node;
-        if(!by_playlist_node)
+        if (!by_playlist_node)
         {
             by_playlist_node = new UIListGenericTree((UIListGenericTree *)collection_node, "Playlist");
             by_playlist_node->setPixmap(pixplaylist);
@@ -317,7 +319,7 @@ void MfdContentCollection::addPlaylist(ClientPlaylist *new_playlist, MetadataCol
     QValueList<PlaylistEntry>::iterator l_it;
     for(l_it = the_list->begin(); l_it != the_list->end(); ++l_it)
     {
-        if( (*l_it).isAnotherPlaylist())
+        if ( (*l_it).isAnotherPlaylist())
         {
             recursivelyAddSubPlaylist(  
                                         playlist_node,
@@ -354,7 +356,7 @@ void MfdContentCollection::addPlaylist(ClientPlaylist *new_playlist, MetadataCol
 
 void MfdContentCollection::addNewPlaylistAbility(const QString &collection_name)
 {
-    if(!new_playlist_tree)
+    if (!new_playlist_tree)
     {
         new_playlist_tree = new UIListGenericTree(NULL, "New Playlist");
         new_playlist_tree->setPixmap(pixnewplaylist);
@@ -378,7 +380,7 @@ void MfdContentCollection::recursivelyAddSubPlaylist(
     //
     
     ClientPlaylist *playlist = collection->getPlaylistById(playlist_id);
-    if(!playlist)
+    if (!playlist)
     {
         cerr << "mfdcontent.o: there is no playlist with an id of " <<  playlist_id << endl;
         return;
@@ -398,7 +400,7 @@ void MfdContentCollection::recursivelyAddSubPlaylist(
     QValueList<PlaylistEntry>::iterator l_it;
     for(l_it = the_list->begin(); l_it != the_list->end(); ++l_it)
     {
-        if( (*l_it).isAnotherPlaylist())
+        if ( (*l_it).isAnotherPlaylist())
         {
             recursivelyAddSubPlaylist(
                                         playlist_node, 
@@ -433,33 +435,27 @@ void MfdContentCollection::addItemToAudioArtistTree(AudioMetadata *item, Generic
             
     UIListGenericTree *artist_node = NULL;
     artist_node = (UIListGenericTree *)starting_point->getChildByName(artist);
-    if(!artist_node)
+    if (!artist_node)
     {
         artist_node = new UIListGenericTree((UIListGenericTree *) starting_point, artist);
         artist_node->setPixmap(pixartist);
         artist_node->setAttribute(0, 0);
         artist_node->setAttribute(1, 1);
         artist_node->setAttribute(2, 0);
-        if(do_checks)
-        {
-            artist_node->setCheck(0);
-        }
+        artist_node->setAttribute(3, 2);    // att3 == 2 implies "Artist"
     }
 
 
     UIListGenericTree *album_node = NULL;
     album_node = (UIListGenericTree *)artist_node->getChildByName(album);
-    if(!album_node)
+    if (!album_node)
     {
         album_node = new UIListGenericTree((UIListGenericTree *) artist_node, album);
         album_node->setPixmap(pixalbum);
         album_node->setAttribute(0, 0);
         album_node->setAttribute(1, 1);
         album_node->setAttribute(2, 0);
-        if(do_checks)
-        {
-            album_node->setCheck(0);
-        }
+        album_node->setAttribute(3, 3);    // att3 == 3 implies "Album"
     }
             
     UIListGenericTree *title_node = new UIListGenericTree((UIListGenericTree *) album_node, 
@@ -470,9 +466,14 @@ void MfdContentCollection::addItemToAudioArtistTree(AudioMetadata *item, Generic
     title_node->setAttribute(1, 1);
     title_node->setAttribute(2, track_no);
     
-    if(do_checks)
+    if (do_checks)
     {
-        title_node->setCheck(0);
+        //
+        //  We add this node to our selectable_content_map so that we
+        //  can find it quickly based on the state of a playlist
+        //
+
+        selectable_content_map.insert(make_pair((item->getCollectionId() * METADATA_UNIVERSAL_ID_DIVIDER) + item->getId(), title_node));
     }
 }
 
@@ -490,48 +491,39 @@ void MfdContentCollection::addItemToAudioGenreTree(AudioMetadata *item, GenericT
 
     UIListGenericTree *genre_node = NULL;
     genre_node = (UIListGenericTree *)starting_point->getChildByName(genre);
-    if(!genre_node)
+    if (!genre_node)
     {
         genre_node = new UIListGenericTree((UIListGenericTree *)starting_point, genre);
         genre_node->setPixmap(pixgenre);
         genre_node->setAttribute(0, 0);
         genre_node->setAttribute(1, 1);
         genre_node->setAttribute(2, 0);
-        if(do_checks)
-        {
-            genre_node->setCheck(0);
-        }
+        genre_node->setAttribute(3, 1);    // att3 == 1 implies "Genre"
     }
 
     UIListGenericTree *artist_node = NULL;
     artist_node = (UIListGenericTree *) genre_node->getChildByName(artist);
-    if(!artist_node)
+    if (!artist_node)
     {
         artist_node = new UIListGenericTree((UIListGenericTree *)genre_node, artist);
         artist_node->setPixmap(pixartist);
         artist_node->setAttribute(0, 0);
         artist_node->setAttribute(1, 1);
         artist_node->setAttribute(2, 0);
-        if(do_checks)
-        {
-            artist_node->setCheck(0);
-        }
+        artist_node->setAttribute(3, 2);    // att3 == 1 implies "Artist"
     }
 
     UIListGenericTree *album_node = NULL;
     album_node = (UIListGenericTree *) artist_node->getChildByName(album);
     
-    if(!album_node)
+    if (!album_node)
     {
         album_node = new UIListGenericTree(artist_node, album);
         album_node->setPixmap(pixalbum);
         album_node->setAttribute(0, 0);
         album_node->setAttribute(1, 1);
         album_node->setAttribute(2, 0);
-        if(do_checks)
-        {
-            album_node->setCheck(0);
-        }
+        album_node->setAttribute(3, 3);    // att3 == 3 implies "Album"
     }
             
     UIListGenericTree *title_node = new UIListGenericTree((UIListGenericTree *) album_node, 
@@ -541,9 +533,9 @@ void MfdContentCollection::addItemToAudioGenreTree(AudioMetadata *item, GenericT
     title_node->setAttribute(0, item->getCollectionId());
     title_node->setAttribute(1, 1);
     title_node->setAttribute(2, track_no);
-    if(do_checks)
+    if (do_checks)
     {
-        title_node->setCheck(0);
+        selectable_content_map.insert(make_pair((item->getCollectionId() * METADATA_UNIVERSAL_ID_DIVIDER) + item->getId(), title_node));
     }
 }
 
@@ -564,7 +556,7 @@ void MfdContentCollection::addItemToAudioCollectionTree(AudioMetadata *item, con
     //
     
     UIListGenericTree *collection_node = (UIListGenericTree *)audio_collection_tree->getChildByName(collection_name);
-    if(!collection_node)
+    if (!collection_node)
     {
         collection_node = new UIListGenericTree(audio_collection_tree, collection_name);
         collection_node->setPixmap(pixcontainer);
@@ -588,13 +580,13 @@ void MfdContentCollection::addItemToAudioCollectionTree(AudioMetadata *item, con
 
     //
     //  Ok, the collection node exists, and it now has "By Artist" and "By
-    //  Genre" subnodes. But the new item on the "By Artist" branch.
+    //  Genre" subnodes. Put the new item on the "By Artist" branch.
     //
 
     addItemToAudioArtistTree(item, by_artist_node);        
 
     //
-    //  Now put it on the "By Genre:
+    //  Now put it on the "By Genre" branch
     //    
     
     addItemToAudioGenreTree(item, by_genre_node);
@@ -619,22 +611,18 @@ void MfdContentCollection::addItemToSelectableTrees(AudioMetadata *item)
     
     
     
-    if(!collection_tree)
+    if (!collection_tree)
     {
         collection_tree = new UIListGenericTree(NULL, "user never sees this");
 
         artist_branch = new UIListGenericTree(collection_tree, "Artist");
         artist_branch->setPixmap(pixartist);
-        artist_branch->setCheck(0);
-    
     
         genre_branch = new UIListGenericTree(collection_tree, "Genre");
         genre_branch->setPixmap(pixgenre);
-        genre_branch->setCheck(0);
     
         playlist_branch = new UIListGenericTree(collection_tree, "Playlist");
         playlist_branch->setPixmap(pixplaylist);
-        playlist_branch->setCheck(0);
     
         selectable_content_trees.insert(which_collection, collection_tree);
     }
@@ -646,6 +634,7 @@ void MfdContentCollection::addItemToSelectableTrees(AudioMetadata *item)
     
     addItemToAudioArtistTree(item, artist_branch, true);
     addItemToAudioGenreTree(item, genre_branch, true);
+    
 }
 
 void MfdContentCollection::addPlaylistToSelectableTrees(ClientPlaylist *playlist)
@@ -666,22 +655,18 @@ void MfdContentCollection::addPlaylistToSelectableTrees(ClientPlaylist *playlist
     
     
     
-    if(!collection_tree)
+    if (!collection_tree)
     {
         collection_tree = new UIListGenericTree(NULL, "user never sees this");
 
         artist_branch = new UIListGenericTree(collection_tree, "Artist");
         artist_branch->setPixmap(pixartist);
-        artist_branch->setCheck(0);
-    
     
         genre_branch = new UIListGenericTree(collection_tree, "Genre");
         genre_branch->setPixmap(pixgenre);
-        genre_branch->setCheck(0);
     
         playlist_branch = new UIListGenericTree(collection_tree, "Playlist");
         playlist_branch->setPixmap(pixplaylist);
-        playlist_branch->setCheck(0);
     
         selectable_content_trees.insert(which_collection, collection_tree);
     }
@@ -691,13 +676,59 @@ void MfdContentCollection::addPlaylistToSelectableTrees(ClientPlaylist *playlist
     }
     
     UIListGenericTree *pl_edit_node = new UIListGenericTree(playlist_branch, playlist->getName());
-
+    
+    pl_edit_node->setInt(playlist->getId() * -1);
     pl_edit_node->setPixmap(pixplaylist);   
-    pl_edit_node->setAttribute(0, 0);  //  collection id is 0
+    pl_edit_node->setAttribute(0, playlist->getCollectionId());
     pl_edit_node->setAttribute(1, 2); 
     pl_edit_node->setAttribute(2, 0); 
-    pl_edit_node->setCheck(0);
-    
+
+    long node_key = ((playlist->getCollectionId() * 
+                    METADATA_UNIVERSAL_ID_DIVIDER )
+                    + playlist->getId()) * -1;
+
+    selectable_content_map.insert(make_pair(node_key , pl_edit_node));
+}
+
+void MfdContentCollection::tallyPlaylists()
+{
+    //
+    //  Iterate over each playlist, and find out how many tracks (ie. root
+    //  level nodes after all playlists within playlists are resolved) each
+    //  has.
+    //
+    QIntDictIterator<ClientPlaylist> it( audio_playlist_dictionary ); 
+    for ( ; it.current(); ++it )
+    {
+        int numb_tracks = countPlaylistTracks(it.current(), 0);
+        it.current()->setActualTrackCount(numb_tracks);
+    }
+}
+
+uint MfdContentCollection::countPlaylistTracks(ClientPlaylist *playlist, uint counter)
+{
+
+    QValueList<PlaylistEntry> *the_list = playlist->getListPtr();
+    QValueList<PlaylistEntry>::iterator l_it;
+    for(l_it = the_list->begin(); l_it != the_list->end(); ++l_it)
+    {
+        if ( (*l_it).isAnotherPlaylist())
+        {
+        
+            ClientPlaylist *sub_list = getAudioPlaylist(
+                                                        playlist->getCollectionId(),
+                                                        (*l_it).getId()
+                                                       );
+
+            counter = countPlaylistTracks( sub_list, counter);
+        }
+        else
+        {
+            ++counter;
+        }
+    }  
+
+    return counter;
 }
 
 AudioMetadata* MfdContentCollection::getAudioItem(int which_collection, int which_id)
@@ -740,7 +771,7 @@ UIListGenericTree* MfdContentCollection::constructPlaylistTree(
     
     ClientPlaylist *playlist = getAudioPlaylist(which_collection, which_playlist);
     
-    if(!playlist)
+    if (!playlist)
     {
         cerr << "mfdcontent.o: Asked to constrcut playlist tree, but "
              << "playlist does not exist"
@@ -758,7 +789,7 @@ UIListGenericTree* MfdContentCollection::constructPlaylistTree(
     {
         UIListGenericTree *pl_node = new UIListGenericTree(new_root, (*l_it).getName());
 
-        if( (*l_it).isAnotherPlaylist())
+        if ( (*l_it).isAnotherPlaylist())
         {
             pl_node->setPixmap(pixplaylist);
             pl_node->setAttribute(3, -1);
@@ -784,44 +815,428 @@ UIListGenericTree* MfdContentCollection::constructContentTree(
                                                               )
 {
 
-    return selectable_content_trees[which_collection];
-/*
     //
-    //  This is (only?) called when the user is going to edit a playlist. We
-    //  build a tree that reflects the state of the given playlist so that
-    //  they can change it.
+    //  Given the collection id, find the content tree.
     //
-    //  NB: it is the client's obligation to delete this tree !!
+
+
+    UIListGenericTree *content_tree = selectable_content_trees[which_collection];
+
     //
-    
-    UIListGenericTree *new_root = new UIListGenericTree(NULL, "User should not see this");
-    UIListGenericTree *new_artist = new UIListGenericTree(new_root, "Artist Branch");
-    UIListGenericTree *new_genre = new UIListGenericTree(new_root, "Genre Branch");
-    
-    //
-    //  Traverse the audio_item_dictionary, check if it's part of this
-    //  collection, then see if the item should be checked on, then add it
-    //  to this tree
+    //  By default, everything in the tree should have a check-mark indicating it is off
     //
     
-    QIntDictIterator<AudioMetadata> it( audio_item_dictionary ); 
-    for ( ; it.current(); ++it )
+    turnOffTree (content_tree);
+    
+    //
+    //  We have to iterate over the playlist whole content tree and turn check marks
+    //  on and off to reflect the reality of the playlist in question
+    //
+    
+    ClientPlaylist *playlist = getAudioPlaylist(which_collection, which_playlist);
+
+    QValueList<PlaylistEntry> *the_list = playlist->getListPtr();
+    QValueList<PlaylistEntry>::iterator l_it;
+    for(l_it = the_list->begin(); l_it != the_list->end(); ++l_it)
     {
-        if(it.currentKey() / METADATA_UNIVERSAL_ID_DIVIDER == which_collection)
+        int multiplier = 1;
+        int node_id = (*l_it).getId();
+        if ( (*l_it).isAnotherPlaylist())
         {
-            AudioMetadata *audio_item = new AudioMetadata((*it));
-            addMetadata(audio_item, "A Name", new_artist, new_genre, true);
+            multiplier = -1;
+        }
+
+        SelectableContentMap::iterator it;
+        for (it  = selectable_content_map.lower_bound(((which_collection * METADATA_UNIVERSAL_ID_DIVIDER) + node_id) * multiplier);
+             it != selectable_content_map.upper_bound(((which_collection * METADATA_UNIVERSAL_ID_DIVIDER) + node_id) * multiplier);
+             ++it)
+        {
+            it->second->setCheck(2);
+            checkParent(it->second);
         }
     }
-
-    new_root->sortByAttributeThenByString(2);
-    new_root->reOrderAsSorted();
-
-    return new_root;        
-*/
+    
+    ClientPlaylist *subject = getAudioPlaylist(which_collection, which_playlist);
+    
+    //
+    //  Grey out playlists that would lead to infinite recursion
+    //
+    
+    QIntDictIterator<ClientPlaylist> pl_it( audio_playlist_dictionary ); 
+    for ( ; pl_it.current(); ++pl_it )
+    {
+        if((int) pl_it.current()->getId() == which_playlist || 
+           crossReferenceExists(subject, pl_it.current(), 0))
+        {
+            SelectableContentMap::iterator scm_it;
+            for (scm_it  = selectable_content_map.lower_bound(((which_collection * METADATA_UNIVERSAL_ID_DIVIDER) + pl_it.current()->getId()) * -1);
+                 scm_it != selectable_content_map.upper_bound(((which_collection * METADATA_UNIVERSAL_ID_DIVIDER) + pl_it.current()->getId()) * -1);
+                 ++scm_it)
+            {
+                scm_it->second->setActive(false);
+                checkParent(scm_it->second);
+            }
+        }
+    }
+    
+    //
+    //  Hand it back to the caller
+    //
+    
+    return content_tree;
+    
 
 }
 
+
+void MfdContentCollection::turnOffTree(UIListGenericTree *node)
+{
+    QPtrList<GenericTree> *all_children = node->getAllChildren();
+    QPtrListIterator<GenericTree> it(*all_children);
+    GenericTree *child;
+    while ((child = it.current()) != 0)
+    {
+        UIListGenericTree *ui_child = (UIListGenericTree *) child;
+        ui_child->setItem(NULL);    //  TEMP FIX ME
+        ui_child->setCheck(0);
+        ui_child->setActive(true);
+        turnOffTree(ui_child);
+        ++it;
+    }
+}
+
+void MfdContentCollection::toggleItem(UIListGenericTree *node, bool turn_on)
+{
+    //
+    //  Toggle on or off stuff in the content selection tree
+    //
+
+    SelectableContentMap::iterator it;
+    
+    int node_id = node->getInt();
+    int multiplier = 1;
+    
+    if (node_id < 0)
+    {
+        multiplier = -1;
+        node_id = node_id * -1;
+    }
+    
+    for (it  = selectable_content_map.lower_bound(((node->getAttribute(0) * METADATA_UNIVERSAL_ID_DIVIDER) + node_id) * multiplier);
+         it != selectable_content_map.upper_bound(((node->getAttribute(0) * METADATA_UNIVERSAL_ID_DIVIDER) + node_id) * multiplier);
+         ++it)
+        {
+            if (turn_on)
+            {
+                it->second->setCheck(2);
+            }
+            else
+            {
+                it->second->setCheck(0);
+            }
+            checkParent(it->second);
+        }
+}
+
+void MfdContentCollection::toggleTree(UIListTreeType *menu, UIListGenericTree *playlist_tree, UIListGenericTree *node, bool turn_on)
+{
+
+    //
+    //  Iterate over all the subnodes 
+    //
+
+    QPtrList<GenericTree> *all_children = node->getAllChildren();
+    QPtrListIterator<GenericTree> it(*all_children);
+    GenericTree *child = NULL;
+    while ((child = it.current()) != 0)
+    {
+        ++it;
+        
+        if(UIListGenericTree *ui_child = dynamic_cast<UIListGenericTree*> (child))
+        {
+            if (ui_child->getInt() < 0 && ui_child->getActive())
+            {
+
+                //
+                //  It's a playlist
+                //
+
+                bool at_least_one = true;
+                SelectableContentMap::iterator oit;
+                long node_key = ((ui_child->getAttribute(0) * 
+                                METADATA_UNIVERSAL_ID_DIVIDER )
+                                - ui_child->getInt()) * -1;
+                for (oit  = selectable_content_map.lower_bound(node_key);
+                     oit != selectable_content_map.upper_bound(node_key);
+                     ++oit)
+                {
+                    if (turn_on)
+                    {
+                        if(oit->second->getCheck() == 0)
+                        {
+                            oit->second->setCheck(2);
+                            checkParent(oit->second);
+                            if(at_least_one)
+                            {
+                                alterPlaylist(menu, playlist_tree, oit->second, turn_on);
+                                at_least_one = false;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if(oit->second->getCheck() == 2)
+                        {
+                            oit->second->setCheck(0);
+                            checkParent(oit->second);
+                            if(at_least_one)
+                            {
+                                alterPlaylist(menu, playlist_tree, oit->second, turn_on);
+                                at_least_one = false;
+                            }
+                        }
+                    }
+                }
+            
+            }
+            else if (ui_child->getInt() > 0 && ui_child->getActive())
+            {
+                //
+                //  It's a track
+                //
+
+                bool at_least_one = true;
+                SelectableContentMap::iterator oit;
+                long node_key = (ui_child->getAttribute(0) * 
+                                METADATA_UNIVERSAL_ID_DIVIDER )
+                                + ui_child->getInt();
+                for (oit  = selectable_content_map.lower_bound(node_key);
+                     oit != selectable_content_map.upper_bound(node_key);
+                     ++oit)
+                {
+                    if (turn_on)
+                    {
+                        if(oit->second->getCheck() == 0)
+                        {
+                            oit->second->setCheck(2);
+                            checkParent(oit->second);
+                            if(at_least_one)
+                            {
+                                alterPlaylist(menu, playlist_tree, oit->second, turn_on);
+                                at_least_one = false;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if(oit->second->getCheck() == 2)
+                        {
+                            oit->second->setCheck(0);
+                            checkParent(oit->second);
+                            if(at_least_one)
+                            {
+                                alterPlaylist(menu, playlist_tree, oit->second, turn_on);
+                                at_least_one = false;
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                //
+                //  This is neither a playlist nor a track, but a node with
+                //  stuff below it. We iterate downwards.
+                //
+            
+                toggleTree(menu, playlist_tree, ui_child, turn_on);
+            }
+        }
+    }        
+}
+
+void MfdContentCollection::alterPlaylist(UIListTreeType *menu, UIListGenericTree *playlist_tree, UIListGenericTree *node, bool turn_on)
+{
+    if (turn_on)
+    {
+
+        if (node->getInt() > 0)
+        {
+            AudioMetadata *new_item = getAudioItem(node->getAttribute(0), node->getInt());
+            if(!new_item)
+            {
+                cerr << "mfdcontent.o: alterPlaylist() couldn't find metadata" << endl;
+                return;
+            }
+            
+            QString artist = new_item->getArtist();
+            QString title  = new_item->getTitle();
+            
+            UIListGenericTree *new_pl_node = new UIListGenericTree(playlist_tree, QString("%1 ~ %2").arg(artist).arg(title));
+            new_pl_node->setPixmap(pixtrack);
+            new_pl_node->setInt(node->getInt());
+            new_pl_node->setAttribute(0, node->getAttribute(0));
+            new_pl_node->setAttribute(1, 2);
+            new_pl_node->setAttribute(3, 1);
+        }
+        else if (node->getInt() < 0)
+        {
+            UIListGenericTree *new_pl_node = new UIListGenericTree(playlist_tree, node->getString());
+            new_pl_node->setPixmap(pixplaylist);
+            new_pl_node->setInt(node->getInt() * -1);
+            new_pl_node->setAttribute(0, node->getAttribute(0));
+            new_pl_node->setAttribute(1, 2);
+            new_pl_node->setAttribute(3, -1);
+        }
+    }
+    else
+    {
+        //
+        //  Find the node already on the playlist with node's item id and
+        //  remove it
+        //
+        
+        long target_id = node->getInt();
+        QPtrList<GenericTree> *all_children = playlist_tree->getAllChildren();
+        QPtrListIterator<GenericTree> it(*all_children);
+        GenericTree *child = NULL;
+        while ((child = it.current()) != 0)
+        {
+            ++it;
+            if (target_id > 0)
+            {
+                if (child->getInt() == target_id && child->getAttribute(3) > 0)
+                {
+                    UIListGenericTree *ui_child = (UIListGenericTree *)child;
+                    menu->moveAwayFrom(ui_child);
+                    ui_child->RemoveFromParent();   // sortable removeRef() deletes this
+                }
+           }
+           else if (target_id < 0)
+           {
+                if (child->getInt() == target_id * -1 && child->getAttribute(3) < 0)
+                {
+                    UIListGenericTree *ui_child = (UIListGenericTree *)child;
+                    menu->moveAwayFrom(ui_child);
+                    ui_child->RemoveFromParent();   // sortable removeRef() deletes this
+                }
+           }
+        }
+    }    
+}
+
+void MfdContentCollection::checkParent(UIListGenericTree *node)
+{
+
+    if (!node)
+    {
+        return;
+    }
+
+    if (UIListGenericTree *parent = dynamic_cast<UIListGenericTree*>(node->getParent()))
+    {
+        bool all_on = true;
+        bool one_on = false;
+
+        QPtrList<GenericTree> *all_children = parent->getAllChildren();
+        QPtrListIterator<GenericTree> it(*all_children);
+        GenericTree *child;
+        while ((child = it.current()) != 0)
+        {
+            UIListGenericTree *ui_child = (UIListGenericTree *) child;
+            if (ui_child->getCheck() > 0 && ui_child->getActive())
+            {
+                one_on = true;
+            }
+            if (ui_child->getCheck() == 0 && ui_child->getActive())
+            {
+                all_on = false;
+            }
+            ++it;
+        }
+
+        if (all_on)
+        {
+            parent->setCheck(2);
+        }
+        else if (one_on)
+        {
+            parent->setCheck(1);
+        }
+        else
+        {
+            parent->setCheck(0);
+        }
+
+        if (parent->getParent())
+        {
+            checkParent(parent);
+        }
+    }
+}
+
+bool MfdContentCollection::crossReferenceExists(ClientPlaylist *subject, ClientPlaylist *object, int depth)
+{
+    if(subject == NULL)
+    {
+        cerr << "mfdcontent.o: can't check for cross references to a subject "
+             << "that does not exist" << endl;
+        return false;
+    }
+
+    if(object == NULL)
+    {
+        cerr << "mfdcontent.o: can't check for cross references to an object "
+             << "that does not exist" << endl;
+        return false;
+    }
+
+    if(depth > 10)
+    {
+        cerr << "mfdcontent.o: I'm recursively checking playlists, and have "
+             << "reached a search depth over 10 " << endl ;
+        return false;
+    }
+
+
+    bool ref_exists = false;
+    uint check;
+
+    QValueList<PlaylistEntry> *the_list = object->getListPtr();
+    QValueList<PlaylistEntry>::iterator l_it;
+    for(l_it = the_list->begin(); l_it != the_list->end(); ++l_it)
+    {
+        if ( (*l_it).isAnotherPlaylist())
+        {
+            check = (*l_it).getId();
+            if(check == subject->getId())
+            {
+                ref_exists = true;
+                return ref_exists;
+            }
+            else
+            {
+                //  Recurse down one level
+                int new_depth = depth + 1;
+                ClientPlaylist *new_check = getAudioPlaylist(
+                                                subject->getCollectionId(),
+                                                (*l_it).getId()
+                                                            );
+;
+                if (new_check)
+                {
+                    ref_exists = crossReferenceExists(subject, new_check, new_depth);
+                    if(ref_exists == true)
+                    {
+                        return ref_exists;
+                    }
+                }
+            }
+        }
+    }  
+
+    return ref_exists;
+}
 
 void MfdContentCollection::sort()
 {
@@ -842,22 +1257,22 @@ void MfdContentCollection::sort()
     audio_collection_tree->sortByAttributeThenByString(2);
     audio_collection_tree->reOrderAsSorted();
     
-    if(editable_playlist_tree)
+    if (editable_playlist_tree)
     {
         editable_playlist_tree->sortByString();
         editable_playlist_tree->reOrderAsSorted();
     }
-
 }
 
 void MfdContentCollection::setupPixmaps()
 {
-    if(!pixmaps_are_setup)
+    if (!pixmaps_are_setup)
     {
         if (client_height != 600 || client_width != 800)
         {
             pixcontainer = scalePixmap((const char **)container_pix_xpm, client_wmult, client_hmult);
             pixeditplaylist = scalePixmap((const char **)edit_playlist_pix_xpm, client_wmult, client_hmult);
+            pixedittrack = scalePixmap((const char **)edit_track_pix_xpm, client_wmult, client_hmult);
             pixnewplaylist = scalePixmap((const char **)new_playlist_pix_xpm, client_wmult, client_hmult);
             pixplaylist = scalePixmap((const char **)playlist_pix_xpm, client_wmult, client_hmult);
             pixartist = scalePixmap((const char **)artist_pix_xpm, client_wmult, client_hmult);
@@ -869,6 +1284,7 @@ void MfdContentCollection::setupPixmaps()
         {
             pixcontainer = new QPixmap((const char **)container_pix_xpm);
             pixeditplaylist = new QPixmap((const char **)edit_playlist_pix_xpm);
+            pixedittrack = new QPixmap((const char **)edit_track_pix_xpm);
             pixnewplaylist = new QPixmap((const char **)new_playlist_pix_xpm);
             pixplaylist = new QPixmap((const char **)playlist_pix_xpm);
             pixartist = new QPixmap((const char **)artist_pix_xpm);
@@ -880,43 +1296,85 @@ void MfdContentCollection::setupPixmaps()
     }
 }
 
+void MfdContentCollection::markNodeAsHeld(UIListGenericTree *node, bool held_or_not)
+{
+
+    if (node->getAttribute(3) < 0)
+    {
+        //
+        //  It's a playlist
+        //
+        
+        if(held_or_not)
+        {
+            node->setPixmap(pixeditplaylist);
+        }
+        else
+        {
+            node->setPixmap(pixplaylist);
+        }
+    }
+    else if (node->getAttribute(3) > 0)
+    {
+        //
+        //  It's a track
+        //
+        
+        if(held_or_not)
+        {
+            node->setPixmap(pixedittrack);
+        }
+        else
+        {
+            node->setPixmap(pixtrack);
+        }
+    }
+    else
+    {
+        cerr << "mfdcontent.o: asked to mark a node as held, "
+             << "but it's neither a track nor a playlist"
+             << endl;
+    }
+}
+
+
 MfdContentCollection::~MfdContentCollection()
 {
     audio_item_dictionary.clear();
     audio_playlist_dictionary.clear();
     selectable_content_trees.clear();
     
-    if(audio_artist_tree)
+    if (audio_artist_tree)
     {
         delete audio_artist_tree;
         audio_artist_tree = NULL;
     }
 
-    if(audio_genre_tree)
+    if (audio_genre_tree)
     {
         delete audio_genre_tree;
         audio_genre_tree = NULL;
     }
 
-    if(audio_playlist_tree)
+    if (audio_playlist_tree)
     {
         delete audio_playlist_tree;
         audio_playlist_tree = NULL;
     }
 
-    if(audio_collection_tree)
+    if (audio_collection_tree)
     {
         delete audio_collection_tree;
         audio_collection_tree = NULL;
     }
     
-    if(new_playlist_tree)
+    if (new_playlist_tree)
     {
         delete new_playlist_tree;
         new_playlist_tree = NULL;
     }
 
-    if(editable_playlist_tree)
+    if (editable_playlist_tree)
     {
         delete editable_playlist_tree;
         editable_playlist_tree = NULL;
