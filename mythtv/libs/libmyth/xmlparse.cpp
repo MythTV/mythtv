@@ -1692,6 +1692,7 @@ void XMLParse::parseStatusBar(LayerSet *container, QDomElement &element)
                             fillfile = "trans-" + fillfile;
                         else
                             fillfile = "solid-" + fillfile;
+                        
                         imgFiller = gContext->LoadScalePixmap(fillfile);
                      }
                      else
@@ -1761,6 +1762,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
     QRect binarea;
     int bins = 1;
     int context = -1;
+    int selectPadding = 0;
 
     QPixmap *uparrow_img = NULL;
     QPixmap *downarrow_img = NULL;
@@ -1768,6 +1770,8 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
     QPixmap *rightarrow_img = NULL;
     QPixmap *icon_img = NULL;
     QPixmap *select_img = NULL;
+    QPoint selectPoint(0,0);
+    
 
     //
     //  A Map to store the geometry of
@@ -1848,6 +1852,22 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
 
                 if (imgname.lower() == "selectionbar")
                 {
+                    QString imgpoint = "";
+                    QString imgPad = "";
+                    imgpoint = info.attribute("location", "");
+                    if (!imgpoint.isNull() && !imgpoint.isEmpty())
+                    {
+                        selectPoint = parsePoint(imgpoint);
+                        selectPoint.setX((int)(selectPoint.x() * wmult));
+                        selectPoint.setY((int)(selectPoint.y() * hmult));    
+                    }
+                    
+                    imgPad = info.attribute("padding", "");
+                    if (!imgPad.isNull() && !imgPad.isEmpty())
+                    {
+                        selectPadding = (int)(imgPad.toInt() * hmult);
+                    }
+                    
                     select_img = gContext->LoadScalePixmap(file);
                     if (!select_img)
                     {
@@ -1998,6 +2018,8 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
 
     if (select_img)
     {
+        mtl->setSelectPadding(selectPadding);
+        mtl->setSelectPoint(selectPoint);
         mtl->setHighlightImage(*select_img);
         delete select_img;
     }

@@ -2374,6 +2374,9 @@ UIManagedTreeListType::UIManagedTreeListType(const QString & name)
     show_whole_tree = false;
     scrambled_parents = false;
     color_selectables = false;
+    selectPadding = 0;
+    selectPoint.setX(0);
+    selectPoint.setY(0);
 }
 
 UIManagedTreeListType::~UIManagedTreeListType()
@@ -2633,7 +2636,7 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
                 }
                 else
                 {
-                    p->drawPixmap(x_location, y_location - QFontMetrics(tmpfont->face).height() + QFontMetrics(tmpfont->face).descent(), (*highlight_map[0]));
+                    p->drawPixmap(x_location + selectPoint.x(), y_location - QFontMetrics(tmpfont->face).height() + QFontMetrics(tmpfont->face).descent() + selectPoint.y(), (*highlight_map[0]));
                 }
             }
 
@@ -3007,7 +3010,7 @@ void UIManagedTreeListType::makeHighlights()
     fontProp *tmpfont = NULL;
     QString a_string = QString("bin%1-active").arg(bins);
     tmpfont = &m_fontfcns[m_fonts[a_string]];
-    temp_pixmap->convertFromImage(temp_image.smoothScale(area.width(), QFontMetrics(tmpfont->face).height() ));
+    temp_pixmap->convertFromImage(temp_image.smoothScale(area.width(), QFontMetrics(tmpfont->face).height() + selectPadding ));
     resized_highlight_images.append(temp_pixmap);
     highlight_map[0] = temp_pixmap;
 

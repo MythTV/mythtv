@@ -720,7 +720,8 @@ class UIManagedTreeListType : public UIType
 
     UIManagedTreeListType(const QString &name);
     ~UIManagedTreeListType();
-
+    void    setSelectPoint(QPoint& pt) { selectPoint = pt;}
+    void    setSelectPadding(int pad) {selectPadding = pad;}
     void    setArea(QRect an_area) { area = an_area; }
     void    setBins(int l_bins) { bins = l_bins; }
     void    setBinAreas(CornerMap some_bin_corners) { bin_corners = some_bin_corners; }
@@ -800,7 +801,8 @@ class UIManagedTreeListType : public UIType
     int         tree_order;
     int         visual_order;
     int         iconAttr;
-
+    int         selectPadding;
+    
     QMap<QString, QString>  m_fonts;
     QMap<QString, fontProp> m_fontfcns;
     int                     m_justification;
@@ -816,6 +818,7 @@ class UIManagedTreeListType : public UIType
     bool                    scrambled_parents;
     bool                    color_selectables;
     QMap<int, QPixmap*>     iconMap;
+    QPoint                  selectPoint;
 };
 
 class UIPushButtonType : public UIType
