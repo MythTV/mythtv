@@ -72,8 +72,10 @@ void LCD::connectToHost(QString hostname, unsigned int port)
 	if(!connected)
 	{
 #ifdef LCD_DEVICE	
+	    QTextStream os(socket);
 		socket->connectToHost(hostname, port);
-		this->sendToServer("hello");
+		os << "hello\n";
+		
 #else
 		hostname = hostname;
 		port = port;
@@ -105,7 +107,7 @@ void LCD::sendToServer(QString someText)
 #ifdef LCD_DEVICE
 	QTextStream os(socket);
 	
-	if(connected || someText == "hello")
+	if(connected)
 	{
 #ifdef LCD_DEVICE_DEBUG
     	cout << "lcddevice: Sending to Server: " << someText << endl ;
@@ -378,7 +380,7 @@ void LCD::veryBadThings(int anError)
 	{
 		cerr << "Why? There was an error reading from the socket." << endl ;  
 	}
-	
+	delete socket;
 	
 }
 
