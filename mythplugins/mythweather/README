@@ -1,11 +1,11 @@
                                    MythWeather 
-			           Release 0.8g
+			           Release 0.9
 
 BUILD/CONFIGURATION INSTRUCTIONS
 --------------------------------
 
 Requirements:
-	MythTV (v0.8) installed and working
+	MythTV (v0.9) installed and working
 	Internet Access (to get the weather!)
 
 
@@ -94,7 +94,6 @@ again).
 
  TODO LIST
 ---------
-   - Radar Map Page
    - Finish list of weather types and icons
 
 KNOWN ISSUES
