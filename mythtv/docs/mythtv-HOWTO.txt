@@ -2368,6 +2368,7 @@
 
 
        $ amixer set Master,0 100%,100% unmute
+       $ amixer set PCM,0 100%,100% unmute
        $ amixer set Line,0 75%,75% mute captur
        $ amixer set Capture,0 100%,100% captur
        $ su
@@ -2388,11 +2389,12 @@
   reducing the percentages by 5-10% and checking again.  Once you're
   satisfied, re-run the alsactl store command.
 
-  You may also use the [1malsamixer [22mprogram to set the volume.  First,
-  start [1malsamixer [22mfrom the command line.  You should start out on the
-  "Master" volume control slider.  Use the up and down cursor to set the
-  master volume to around 75%.  Next, use the left and right cursor keys
-  to move around on the screen until you find the "Line" slider.  Press
+  You may also use the [1malsamixer [22mprogram to set the volume. If you are
+  using an ALSA version after 1.0.6, use [1malsamixer -V all [22m. First, start
+  [1malsamixer [22mfrom the command line.  You should start out on the "Master"
+  volume control slider.  Use the up and down cursor to set the master
+  volume to around 75%.  Next, use the left and right cursor keys to
+  move around on the screen until you find the "Line" slider.  Press
   SPACE to set it as the capture source, set the level to around 50-75%
   and press "M" to mute it.  You can now press ESC to exit out of the
   [1malsamixer [22mprogram.  You can also have MythTV manage all volume and
@@ -2416,8 +2418,6 @@
   compilation steps described below by jumping to the ``Completing the
   lirc install'' section. See the contrib/mandrake91.etc.sysconfig.lircd
   file for an example of how to configure lircd.
-
-
      [1mNOTE[22m:  If you wish to use the remote control that comes with the
   Hauppauge PVR-250/350 cards, you will need to run the lirc 0.7.0pre2
   code. See the example installation in the "Hauppauge PVR-250 remote
@@ -3685,9 +3685,12 @@
 
   "Deinterlace Playback" checkbox.
 
-  This implements the linearblend algorithm.  If you don't want
-  linearblend included at the head of your custom filter chain, make
-  sure that this box is unchecked.
+  This implements special behavior needed for the "bobdeint" filter but
+  can also be used to choose any of the deinterlace filters. If you
+  prefer, you may leave this unchecked and include any of the
+  deinterlace filters, other than "bobdeint", in your custom filter
+  chain.
+
 
   o  The "invert" filter
 
@@ -3702,12 +3705,20 @@
   by blending adjacent lines.  It replaces combing in interlaced video
   with a less distracting "ghost" image.
 
+  o The "bobdeint" filter
+
+  This filter splits the interlaced image into two separate fields that
+  can be line doubled then displayed at twice the frame rate. If the
+  display is at the same refresh rate as the recording (59.92Hz NTSC or
+  50Hz PAL) this will cause each refresh to show objects in motion in a
+  new position with no jagged edges. However, if the display is not
+  synchronous, it will cause flickering or the appearance of the picture
+  moving up and down by one line.
 
 
-   [1mNOTE[22m: This filter is appended to the filter chain when "Deinterlace
-  playback" has been checked. If you use "kerneldeint" or "linearblend"
-  for deinterlacing in your filter string, you should not check
-  "Deinterlace playback".
+         [1mNOTE[22m: This filter requires the frame rate to be doubled
+  and therefore can only be used with the "Deinterlace Playback"
+  checkbox.  Do not include this in your filter chain.
 
   o  The "kerneldeint" filter
 
@@ -3778,7 +3789,6 @@
 
   +o  chroma spatial filter strength
 
-
   +o  luma temporal filter strength
 
   Reasonable defaults will be selected for omitted parameters.  The
@@ -3834,9 +3844,11 @@
   as a starting point, here are some filter strings that you may find
   useful:
 
-  For typical broadcast stations: "kerneldeint,denoise3d"
+  For typical broadcast stations: "kerneldeint,quickdnr"
 
-  For stations with poor signal quality: "kerneldeint,denoise3d=12"
+  For stations with poor signal quality: "linearblend,denoise3d=12"
+
+  For synchronous TV-out: check Deinterlace with "Bob (2x framerate)"
 
 
   [1m10.5.  Recording[0m
@@ -3972,6 +3984,8 @@
   otherwise, [1mblink [22mis used.  Colors should be self explanatory.  The
   update interval determines how often the frontend should poll the
   backend to determine if the status has changed.
+
+
   [1m11.  Using MythTV.[0m
 
 
@@ -4018,17 +4032,6 @@
   [1m11.1.4.  LiveTV Browse Mode[0m
 
 
-             Left     browse program prior to current listed program
-            Right     browse program following current listed program
-               Up     browse program on channel above current listed channel/program
-             Down     browse program on channel below current listed channel/program
-                /     browse program on next favorite channel
-              0-9     enter a channel number to browse
-  Space/Enter         change channel to channel of current listed program
-              R/r     Toggle recording of current program (cycles through types)
-            ESC/O     Exit Browse mode
-
-
   [1m11.1.5.  Playback Recording Zoom Mode[0m
 
 
@@ -4057,6 +4060,7 @@
                 W     cycle through 4:3 aspect ratio, 16:9, 4:3 Zoom (like Pan and Scan), 16:9 Zoom, and 16:9 Stretch (eliminates black sidebars in TV signal)
                F8     toggle the sleep timer 30m->1hr->1hr30m->2hr->Off
            CTRL-B     Jump to the beginning of the recording / ringbuffer
+                +     Switch between audio streams
              Left     (if a jump amount is entered) to jump back that amount
             Right     (if a jump amount is entered) to jump ahead that amount
 
@@ -4095,6 +4099,17 @@
   B           toggles the window focus (lets you change channels on the PiP window)
   N           swaps the two channels by changing channels on both cards
 
+
+
+             Left     browse program prior to current listed program
+            Right     browse program following current listed program
+               Up     browse program on channel above current listed channel/program
+             Down     browse program on channel below current listed channel/program
+                /     browse program on next favorite channel
+              0-9     enter a channel number to browse
+  Space/Enter         change channel to channel of current listed program
+              R/r     Toggle recording of current program (cycles through types)
+            ESC/O     Exit Browse mode
 
 
              Left     Move video to Left
@@ -4150,6 +4165,7 @@
   [1m11.1.9.  Setting Program or Channel Recording Priorities[0m
 
 
+
                    Right     increases priority value
                     Left     decreases priority value
                        1     sorts by title
@@ -4157,8 +4173,6 @@
          Home/End            toggle sort priority
                        I     edit recording options
                      ESC     commits changes and exits
-
-
 
   [1m11.1.10.  Viewing Scheduled Recordings/Resolving Conflicts[0m
 
@@ -4219,14 +4233,6 @@
   more keys then you can access all of the features.  With only 16 keys
   most features are usable.
 
-
-  [1m11.2.  Using themes with MythTV[0m
-
-  MythTV is "themeable", meaning that the visual appearance of the
-  program can be modified by the user without re-compiling or altering
-  the program functionality.  The MythTV website has a Themes section;
-  pick a theme you'd like to use and download it to your system.
-
       REMOTE CONTROL     LIRC KEYSTROKE     FUNCTION
                0 - 9     0 - 9              channel selection, EPG navigation, ff/rew speed setting (with stickykeys)
           Left Arrow     Left               scroll left, rewind
@@ -4239,6 +4245,15 @@
                Pause     p                  Pause
          Other key 1     i                  Information
          Other key 2     c                  Change tuner card input
+
+
+
+  [1m11.2.  Using themes with MythTV[0m
+
+  MythTV is "themeable", meaning that the visual appearance of the
+  program can be modified by the user without re-compiling or altering
+  the program functionality.  The MythTV website has a Themes section;
+  pick a theme you'd like to use and download it to your system.
 
   Once it's on your machine, you must move the file and untar it:
 
@@ -4343,6 +4358,7 @@
   WOL and BIOS wakeup. The Master backend will then shut down the Slave
   backends and itself using the "Server halt command".
 
+
   One caveat is that the scheduler tries to guess if the Master backend
   was started by a wakeup call or by the user. If it thinks it was woken
   up by a user, it blocks shutdown until a client connects to the Master
@@ -4354,6 +4370,8 @@
   first and will wakeup the Slave backends using the "Wake command for
   slaves". At this time, there is no support for starting only the
   required Slave backend, so all Slave backends will startup.
+
+
   [1m11.5.2.  Setting up the MythTV side of this extension.[0m
 
   There are a number of options that are used to control the Shutdown /
@@ -4406,6 +4424,7 @@
         program (ie. transcode, automatic updates, etc.) is currently
         running. If you don't need it, leave the field blank.
 
+
   The "WakeOnLan settings": These settings have nothing to do with using
   BIOS or WOL wakeup, they are the same for both.
 
@@ -4420,6 +4439,7 @@
      backend needs for bootup.  Set to "0" to disable. The frontends
      will retry to connect for "Count of reconnect tries" times before
      giving up.
+
   +o  "Wake command for slaves" is the [4mone[24m command executed to wake your
      Slave backends. This should be a script that contains the calls to
      wakeup all Slave backend systems.
@@ -4460,15 +4480,16 @@
   /etc/xinet.d/ directory:
 
 
-       service mythwake
-         {
-               socket_type     = stream
-               wait            = no
-               user            = mythtv
-               protocol        = tcp
-               id              = mythwake
-               server          = /usr/local/bin/mythwake
-         }
+
+  service mythwake
+    {
+          socket_type     = stream
+          wait            = no
+          user            = mythtv
+          protocol        = tcp
+          id              = mythwake
+          server          = /usr/local/bin/mythwake
+    }
 
 
 
@@ -4482,17 +4503,17 @@
   Finally, /usr/local/bin/mythwake looks like:
 
 
-  #! /bin/bash
-  #this should be a command to wake your server
-  WAKECMD="#!/bin/sh\n /usr/local/bin/wakeMBE"
-  #first we need to delete all wake jobs in queue
-  for JOB in atq | cut -f 1 ; do
-      atrm $JOB;
-  done
-  #now we read the date from 'nc'
-  read date;
-  #now set the atjob
-  echo -e "$WAKECMD" | at $date ;
+       #! /bin/bash
+       #this should be a command to wake your server
+       WAKECMD="#!/bin/sh\n /usr/local/bin/wakeMBE"
+       #first we need to delete all wake jobs in queue
+       for JOB in atq | cut -f 1 ; do
+           atrm $JOB;
+       done
+       #now we read the date from 'nc'
+       read date;
+       #now set the atjob
+       echo -e "$WAKECMD" | at $date ;
 
 
 
@@ -4543,7 +4564,6 @@
   would be best if you haven't express your preference. Further, the
   "Upcoming Recordings" page allows you make specific decisions about
   what you really do and don't want to record.
-
 
 
   [1m11.6.1.  Record Types[0m
@@ -4656,7 +4676,6 @@
   or more shows are in conflict. However, priority values let the
   scheduler know what you want so that it can set the schedule based on
   your preferences.
-
   Initially all priority values are set to zero. You may choose to leave
   everything at "0" and let the scheduler follow rules to guess what you
   might prefer when there are conflicts. However, if you have one or two
@@ -4723,7 +4742,6 @@
 
   +o  Currently recording beats not currently recording -- A recording in
      progress can not be moved so it "wins" it's current timeslot.
-
   +o  Higher total priority beats lower total priority -- This is the
      core of the scheduling process. Episodes of the highest priority
      show are placed on the first available card then the next highest
@@ -4742,7 +4760,6 @@
      different types they will be sorted by Single then Find One, Record
      Weekly, Find Weekly, Record Daily, Find Daily, Channel and finally
      All. This only applies if the priorities are the same.
-
 
   +o  If both start times have passed, later start time beats earlier
      start time -- This attempts to miss the least amount of time.
@@ -4791,7 +4808,6 @@
   for the MythTV scheduler. Unlike other DVR systems, this one page
   gives you all of the information and tools you need to see all of your
   alternatives and make whatever adjustments you desire.
-
   The upper half of the screen has a scrollable box listing items that
   match your record rules sorted by time. The lower half shows the
   details for the highlighted item. There are two 'views' available.
@@ -4858,7 +4874,6 @@
   option makes it very easy to try out some "what if" attempts when
   deciding on your best strategy in a difficult situation.
 
-
   [1m12.  MythWeb.[0m
 
   The MythWeb allows you to use a web page to control various aspects of
@@ -4872,7 +4887,6 @@
   and save it to a location where you can find it.  The next step
   depends on whether your distribution has a web server and if you have
   PHP support.
-
 
 
   [1m12.1.1.  Mandrake 9.0[0m
@@ -4918,11 +4932,12 @@
   have one), you could do something like this:
 
 
-       # cd /var/www
-       # htpasswd -c htpasswd mythtv
-       New password:
-       Re-type new password:
-       Adding password for user mythtv
+
+  # cd /var/www
+  # htpasswd -c htpasswd mythtv
+  New password:
+  Re-type new password:
+  Adding password for user mythtv
 
 
 
@@ -4970,15 +4985,16 @@
   load and install the application:
 
 
-       $ tar -xjf mythgallery-0.17.tar.bz2
-       $ cd mythgallery-0.17
-       $ ./configure --enable-opengl
-       $ qmake mythgallery.pro
-       $ make
-       # su
-       # make install
-       # exit
-       $
+
+  $ tar -xjf mythgallery-0.17.tar.bz2
+  $ cd mythgallery-0.17
+  $ ./configure --enable-opengl
+  $ qmake mythgallery.pro
+  $ make
+  # su
+  # make install
+  # exit
+  $
 
 
 
@@ -5043,33 +5059,32 @@
   Here is an example script that a user may want to run on import:
 
 
+       #!/bin/csh
 
-  #!/bin/csh
+       if ($#argv == 0) then
+               echo "Usage: $0 dest_dir"
+               exit
+       endif
 
-  if ($#argv == 0) then
-          echo "Usage: $0 dest_dir"
-          exit
-  endif
+       cd $argv[1]
 
-  cd $argv[1]
+       # get stuff over the network
+       wget http://www.somesite.dom/dir/file1.jpg
+       wget http://www.somesite.dom/dir/file2.jpg
+       wget http://www.somesite.dom/dir/file3.jpg
 
-  # get stuff over the network
-  wget http://www.somesite.dom/dir/file1.jpg
-  wget http://www.somesite.dom/dir/file2.jpg
-  wget http://www.somesite.dom/dir/file3.jpg
+       # stuff that requires manual module loading and/or fs mounting
+       modprobe camera_module
+       mount /dev/camera /mnt/camera
+       cp /mnt/camera/* $argv[1]
+       umount /mnt/camera
+       rmmod camera_module
 
-  # stuff that requires manual module loading and/or fs mounting
-  modprobe camera_module
-  mount /dev/camera /mnt/camera
-  cp /mnt/camera/* $argv[1]
-  umount /mnt/camera
-  rmmod camera_module
-
-  # perform some processing
-  foreach pname (`ls *.jpg`)
-          jpegtran -flip vertical $pname > $pname.new
-          mv $pname.new $pname
-  end
+       # perform some processing
+       foreach pname (`ls *.jpg`)
+               jpegtran -flip vertical $pname > $pname.new
+               mv $pname.new $pname
+       end
 
 
 
@@ -5099,6 +5114,7 @@
   +o  CDParanoia
 
 
+
   [1m15.1.  Manual installation of prerequisites[0m
 
   These instructions are for distributions which don't have pre-compiled
@@ -5108,14 +5124,15 @@
   <http://www.mars.org/home/rob/proj/mpeg/>  Save it to a directory you
   can find later.
 
-  $ tar -xzf mad-0.14.2b.tar.gz
-  $ cd mad-0.14.2b
-  $ ./configure
-  $ make
-  $ su
-  # make install
-  # exit
-  $
+
+       $ tar -xzf mad-0.14.2b.tar.gz
+       $ cd mad-0.14.2b
+       $ ./configure
+       $ make
+       $ su
+       # make install
+       # exit
+       $
 
 
 
@@ -5156,20 +5173,23 @@
   install:
 
 
-       $ tar -xzf libcdaudio-0.99.9.tar.gz
-       $ cd libcdaudio-0.99.9
-       $ ./configure
-       $ make
-       $ su
-       # make install
-       # exit
-       $
+
+  $ tar -xzf libcdaudio-0.99.9.tar.gz
+  $ cd libcdaudio-0.99.9
+  $ ./configure
+  $ make
+  $ su
+  # make install
+  # exit
+  $
 
 
 
   Download cdparanoia from http://www.xiph.org/paranoia/down.html
   <http://www.xiph.org/paranoia/download/cdparanoia-III-
   alpha9.8.src.tgz>.
+
+
        $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
        $ cd cdparanoia-III-alpha9.8
        $ ./configure
@@ -5232,6 +5252,8 @@
 
        # urpmi libfftw2 libfftw2-devel
 
+
+
   OpenGL should be installed on practically all distributions.  However,
   you will need the devel module.  In Mandrake 9.1 it may be installed
   by typing:
@@ -5272,8 +5294,6 @@
   When installing fftw do not use the rpm package offered on the website
   because it will cause an error, so use the source package instead.
 
-
-
   [1mNOTE[22m: you can use the instructions given at the ``automated
         installation section'' to install all of MythMusic in one
   step.
@@ -5284,7 +5304,6 @@
   getting MythMusic going. Make sure that you run ./configure first.  If
   you wish to use the new visualizations, make sure you install the
   prerequisites.  Run ./configure --help for help.
-
 
 
   ______________________________________________________________________
@@ -5347,7 +5366,6 @@
 
   The Ignore_ID3 option does not disable the code that determines the
   track length, just the portion that tries to read ID3 info.
-
 
 
   [1m15.6.  Using MythMusic[0m
@@ -5472,18 +5490,17 @@
   These are the keyboard commands for MythWeather:
 
 
-
-  Left Key             Goes back one page, and extends the time spent
-                       on the page you are on.
-  Right Key            Goes forward one page, see above.
-  Space                Pause, wait on the current page until space is hit
-                       again.
-  Numeric Keys         You can check other weather by keying in other ZIP codes.
-  Enter Key            Switch between Celsius and Fahrenheit. Can also
-                       be used a way to force a data update.
-  "m" Key              Resets the location to the database default, then updates the data.
-  "i"                  Enter / Save settings
-  ESC                  Exit the settings screen without saving / Exit the program
+       Left Key             Goes back one page, and extends the time spent
+                            on the page you are on.
+       Right Key            Goes forward one page, see above.
+       Space                Pause, wait on the current page until space is hit
+                            again.
+       Numeric Keys         You can check other weather by keying in other ZIP codes.
+       Enter Key            Switch between Celsius and Fahrenheit. Can also
+                            be used a way to force a data update.
+       "m" Key              Resets the location to the database default, then updates the data.
+       "i"                  Enter / Save settings
+       ESC                  Exit the settings screen without saving / Exit the program
 
 
 
@@ -5533,10 +5550,13 @@
   MPEG-2 to other formats which should greatly reduce the amount of
   space the DVD material takes up on your hard drive.
 
+
   MythDVD has a number of prerequisites to enable transcoding
   functionality.  If you only wish to play DVDs rather than convert them
   to something like MPEG-4 or xvid you may skip the prerequisite
   installation step.
+
+
   [1m18.1.  Manual Compilation of Prerequisites[0m
 
 
@@ -5592,8 +5612,6 @@
   This indicates that mtd is ready for use.  Once you've successfully
   tested mtd in the foreground, type [1mCTRL-C [22mto stop mtd.  You may then
   start it as a background (daemon) process.
-
-
        $ mtd -d
 
 
@@ -5661,7 +5679,6 @@
 
   or
 
-
   2.  Run [1mqmake mythtv.pro [22min the mythtv directory.  Rerunning [1mqmake[0m
   will create a new Makefile for you, however this still doesn't fix the
   root cause of the issue, which is that your distribution didn't create
@@ -5721,8 +5738,6 @@
 
   At this point, you now have debug-enabled software ready.  Let's
   assume that the problem you're having is in the setup program.
-
-
 
   $ cd setup
   $ gdb ./setup
@@ -6034,16 +6049,17 @@
   A better test to verify that sound will work for MythTV (and recording
   with [1mxawtv [22mfor that matter) is to startup [1mxawtv[22m, mute the line-in then
   run aplay /dev/dsp. You should hear the recorded audio slightly
-  delayed behind the real-time video.  Once this test succeeds, MythTV
-  should work correctly because it writes to and read from /dev/dsp in
-  the same way that [1maplay [22mdoes.
-
-
+  delayed behind the real-time video. You should see messages about
+  "underrun". These can be ignored but they do confirm that the driver
+  is loaded and there is an active device. Once this test succeeds,
+  MythTV should work correctly because it writes to and read from
+  /dev/dsp in the same way that [1maplay [22mdoes.
   To record audio along with video the audio signal must be digitized by
   a DSP so that the audio data can be stored in a file. On playback, the
   audio data is written to /dev/dsp and converted back to an analog
   signal. This analog signal should then be sent to your speakers. Here
-  is what is needed in alsamixer:
+  is what is needed in [1malsamixer[22m. If you are using an ALSA version after
+  1.0.6, use [1malsamixer -V all[22m:
 
   CAPTUR source - the analog source to be sent to the DSP. This should
   be set to the input source from the tuner card to the sound card. In
@@ -6066,9 +6082,9 @@
   Master mixer - sets the level for the analog signal sent to line-out
   or the speakers.
 
-  You may also want to ensure that /dev/dsp hasn't already been grabbed
-  by another process, like [1mesd [22mor [1martsd[22m.  If /dev/dsp isn't available,
-  then MythTV won't work.
+  You may also want to ensure that /dev/dsp , or whatever device file is
+  being used, hasn't already been grabbed by another process, like [1mesd[0m
+  or [1martsd[22m.  If the device file isn't available, then MythTV won't work.
 
 
 
@@ -6166,7 +6182,6 @@
   (https://listman.redhat.com/mailman/listinfo/video4linux-list
   <https://listman.redhat.com/mailman/listinfo/video4linux-list>) for
   more information.
-
   [1m20.5.11.  Mythweb is showing a db_open error when I connect to it[0m
 
   Find your php.ini file. Make sure you've got a line in it like this:
@@ -6341,20 +6356,24 @@
   NTSC, the video standard specifies that there are 525 vertical scan
   lines.  Once the "extra" lines are removed (they're used to
   synchronize the video signal, and encode closed captioning data), you
-  have 480 vertical lines.
+  have 480 horizontal lines stacked vertically.
 
   In PAL, there are 625 "raw" lines of resolution, with a net of 576
-  vertical lines.
+  horizontal lines stacked vertically.
 
-  Horizontally, the maximum you can expect from a Bt8X8 chip is 720.
+  Horizontally, the maximum value allowed for a Bt8X8 chip is 720.
+  However, due to limitations in the chip and other limitations of
+  broadcast television, there may not be a noticeable improvement in
+  image quality beyond 400 or 500 pixels.
 
   With this in mind, there are certain commonly accepted values for
-  resolution.  While other values may be accepted, they will cause scan
-  lines to be repeated or dropped.
+  resolution.  While other values may be accepted for the vertical
+  resolution, they will cause scan lines to be repeated or dropped.
 
   From "best" to "worst", in NTSC:
 
-  +o  720x480 (but more commonly, 704x480.  "DVD" resolution)
+
+  +o  720x480 ("DVD" resolution. Also commonly, 704x480)
 
   +o  640x480 4:3
 
@@ -6419,11 +6438,13 @@
   configuration file to match the display size then restart X.
 
 
+
   [1m21.4.2.  MythTV Dimensions[0m
 
   In 0.10 and later, from "mythfrontend" go to Setup->Appearance.  The
   default for the height and width is "0" - this will cause MythTV to
   automatically size itself to full screen.
+
   If the MythTV GUI width and height are not 0, mythfrontend uses these
   GUI dimensions and is anchored to the upper left corner of the X
   Desktop. If the GUI X and/or Y are not 0, the upper left corner is
@@ -6482,11 +6503,10 @@
   To restore: (assuming that you've dropped the database)
 
 
-
-  $ mysql -u root
-  mysql>create database mythconverg;
-  mysql>exit
-  $ mysql -u mythtv -pmythtv mythconverg < mythtv_backup.sql
+       $ mysql -u root
+       mysql>create database mythconverg;
+       mysql>exit
+       $ mysql -u mythtv -pmythtv mythconverg < mythtv_backup.sql
 
 
 
@@ -6538,6 +6558,7 @@
 
   +o  Pinnacle Studio PCTV Pro - note: this has a MSP34xx, but it's not
      wired correctly to the BT878 chip.
+
 
   +o  ATI TV Wonder VE
 
@@ -6664,9 +6685,10 @@
 
   Make sure that your .blackboxrc file has:
 
+  session.screen0.focusNewWindows:        True
+  session.screen0.focusModel:     SloppyFocus
 
-       session.screen0.focusNewWindows:        True
-       session.screen0.focusModel:     SloppyFocus
+
 
   in it.
 
@@ -6725,11 +6747,11 @@
   /var/tmp/mythbackend.log. This has been tested and is known to work on
   Mandrake and Red Hat, but many people prefer to place logs under
   /var/log/.
-
   To do this, create a group called mythtv (or anything you prefer) and
   add your usual MythTV users to that group. If you changed the user
   that starts mythbackend from the default of root you [4mmust[24m perform this
   step.
+
   Create the directory /var/log/mythtv and set its permissions as
   follows:
 

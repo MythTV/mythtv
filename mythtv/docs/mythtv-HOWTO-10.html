@@ -131,9 +131,11 @@ Enter your filter string in the box titled "Custom Filters".</P>
 <H3>Currently Available Filters</H3>
 
 <P>"Deinterlace Playback" checkbox.</P>
-<P>This implements the linearblend algorithm.  If you don't want linearblend
-included at the head of your custom filter chain, make sure that this box is
-unchecked.</P>
+<P>This implements special behavior needed for the "bobdeint" filter but can
+also be used to choose any of the deinterlace filters. If you prefer, you
+may leave this unchecked and include any of the deinterlace filters, other
+than "bobdeint", in your custom filter chain.</P>
+
 <P>o  The "invert" filter</P>
 <P>Invert ignores any parameters and inverts the pixel values of the video
 frames.  In other words, a negative image. This would rarely be useful but
@@ -142,14 +144,21 @@ may be a good example to verify that your filter strings take effect.</P>
 <P>It is a simple deinterlacing filter that ignores parameters and works by
 blending adjacent lines.  It replaces combing in interlaced video with a
 less distracting "ghost" image.</P>
+<P>o The "bobdeint" filter</P>
+<P>This filter splits the interlaced image into two separate fields that
+can be line doubled then displayed at twice the frame rate. If the
+display is at the same refresh rate as the recording (59.92Hz NTSC or
+50Hz PAL) this will cause each refresh to show objects in motion in
+a new position with no jagged edges. However, if the display is not
+synchronous, it will cause flickering or the appearance of the picture
+moving up and down by one line.</P>
 <P>
 <FIGURE>
 <EPS FILE="stop.eps">
 <IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>: This filter is appended to the filter chain when "Deinterlace
-playback" has been checked. If you use "kerneldeint" or "linearblend" for
-deinterlacing in your filter string, you should not check "Deinterlace
-playback".</CAPTION>
+<CAPTION><B>NOTE</B>: This filter requires the frame rate to be doubled
+and therefore can only be used with the "Deinterlace Playback" checkbox.
+Do not include this in your filter chain.</CAPTION>
 </FIGURE>
 </P>
 <P>o  The "kerneldeint" filter</P>
@@ -246,8 +255,9 @@ type and speed, the resolution of the recording, which filters you are using
 and other factors. You can only determine what is right for you through
 experimentation. However, as a starting point, here are some filter strings
 that you may find useful:</P>
-<P>For typical broadcast stations:      "kerneldeint,denoise3d"</P>
-<P>For stations with poor signal quality: "kerneldeint,denoise3d=12"</P>
+<P>For typical broadcast stations:      "kerneldeint,quickdnr"</P>
+<P>For stations with poor signal quality: "linearblend,denoise3d=12"</P>
+<P>For synchronous TV-out: check Deinterlace with "Bob (2x framerate)"</P>
 
 <H2><A NAME="ss10.5">10.5</A> <A HREF="mythtv-HOWTO.html#toc10.5">Recording </A>
 </H2>

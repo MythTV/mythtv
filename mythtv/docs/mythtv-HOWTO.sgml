@@ -1772,6 +1772,7 @@ Note the spelling in the following commands.
 </code>
 <tscreen><verb>
 $ amixer set Master,0 100%,100% unmute
+$ amixer set PCM,0 100%,100% unmute
 $ amixer set Line,0 75%,75% mute captur
 $ amixer set Capture,0 100%,100% captur
 $ su
@@ -1791,7 +1792,8 @@ for your particular hardware combination.  Try reducing the percentages by
 5-10% and checking again.  Once you're satisfied, re-run the <tt>alsactl
 store</tt> command.
 
-You may also use the <bf>alsamixer</bf> program to set the volume.  First,
+You may also use the <bf>alsamixer</bf> program to set the volume. If you
+are using an ALSA version after 1.0.6, use <bf>alsamixer -V all</bf> . First,
 start <bf>alsamixer</bf> from the command line.  You should start out on the
 "Master" volume control slider.  Use the up and down cursor to set the
 master volume to around 75%.  Next, use the left and right cursor keys to
@@ -2950,9 +2952,11 @@ Enter your filter string in the box titled "Custom Filters".
 <sect2>Currently Available Filters
 <p>"Deinterlace Playback" checkbox.
 
-This implements the linearblend algorithm.  If you don't want linearblend
-included at the head of your custom filter chain, make sure that this box is
-unchecked.
+This implements special behavior needed for the "bobdeint" filter but can
+also be used to choose any of the deinterlace filters. If you prefer, you
+may leave this unchecked and include any of the deinterlace filters, other
+than "bobdeint", in your custom filter chain.
+
 <p>o  The "invert" filter
 
 Invert ignores any parameters and inverts the pixel values of the video
@@ -2965,13 +2969,22 @@ It is a simple deinterlacing filter that ignores parameters and works by
 blending adjacent lines.  It replaces combing in interlaced video with a
 less distracting "ghost" image.
 
+o The "bobdeint" filter
+
+This filter splits the interlaced image into two separate fields that
+can be line doubled then displayed at twice the frame rate. If the
+display is at the same refresh rate as the recording (59.92Hz NTSC or
+50Hz PAL) this will cause each refresh to show objects in motion in
+a new position with no jagged edges. However, if the display is not
+synchronous, it will cause flickering or the appearance of the picture
+moving up and down by one line.
+
 <figure loc="here">
 <eps file="stop.eps" height="1cm">
 <img src="stop.png">
-<caption><bf>NOTE</bf>: This filter is appended to the filter chain when "Deinterlace
-playback" has been checked. If you use "kerneldeint" or "linearblend" for
-deinterlacing in your filter string, you should not check "Deinterlace
-playback".
+<caption><bf>NOTE</bf>: This filter requires the frame rate to be doubled
+and therefore can only be used with the "Deinterlace Playback" checkbox.
+Do not include this in your filter chain.
 </caption>
 </figure>
 
@@ -3094,10 +3107,12 @@ and other factors. You can only determine what is right for you through
 experimentation. However, as a starting point, here are some filter strings
 that you may find useful:
 
-For typical broadcast stations:	"kerneldeint,denoise3d"
+For typical broadcast stations:	"kerneldeint,quickdnr"
 
-For stations with poor signal quality: "kerneldeint,denoise3d=12"
+For stations with poor signal quality: "linearblend,denoise3d=12"
 
+For synchronous TV-out: check Deinterlace with "Bob (2x framerate)"
+ 
 <sect1>Recording 
 <p>Depending on your capture card, MythTV offers different video encoders. 
 The following types of hardware encoding cards are supported:
@@ -3290,6 +3305,7 @@ W       	| cycle through 4:3 aspect ratio, 16:9, 4:3 Zoom (like Pan and Scan),&n
                   16:9 Zoom, and 16:9 Stretch (eliminates black sidebars in TV signal) @
 F8		| toggle the sleep timer 30m->1hr->1hr30m->2hr->Off @
 CTRL-B		| Jump to the beginning of the recording / ringbuffer @
++		| Switch between audio streams @
 Left    	| (if a jump amount is entered) to jump back that amount		     @  
 Right   	| (if a jump amount is entered) to jump ahead that amount		     @  
                 | @
@@ -5081,7 +5097,9 @@ you are using the recording function.
 A better test to verify that sound will work for MythTV (and recording with
 <bf>xawtv</bf> for that matter) is to startup <bf>xawtv</bf>, mute the
 line-in then run <tt>aplay /dev/dsp</tt>. You should hear the recorded audio
-slightly delayed behind the real-time video.  Once this test succeeds, MythTV
+slightly delayed behind the real-time video. You should see messages about
+"underrun". These can be ignored but they do confirm that the driver is
+loaded and there is an active device. Once this test succeeds, MythTV
 should work correctly because it writes to and read from /dev/dsp in
 the same way that <bf>aplay</bf> does.
 
@@ -5089,7 +5107,8 @@ To record audio along with video the audio signal must be digitized by a DSP
 so that the audio data can be stored in a file. On playback, the audio data
 is written to /dev/dsp and converted back to an analog signal. This analog
 signal should then be sent to your speakers. Here is what is needed in
-alsamixer:
+<bf>alsamixer</bf>. If you are using an ALSA version after 1.0.6, use
+<bf>alsamixer -V all</bf>:
 
 CAPTUR source - the analog source to be sent to the DSP. This should be set
 to the input source from the tuner card to the sound card. In most cases
@@ -5110,9 +5129,10 @@ this level to 75% to 85% may result in better audio quality.
 Master mixer - sets the level for the analog signal sent to line-out or the
 speakers.
 
-You may also want to ensure that <tt>/dev/dsp</tt> hasn't already been
-grabbed by another process, like <bf>esd</bf> or <bf>artsd</bf>.  If
-<tt>/dev/dsp</tt> isn't available, then MythTV won't work.  
+You may also want to ensure that <tt>/dev/dsp</tt> , or whatever device
+file is being used, hasn't already been grabbed by another process, like
+<bf>esd</bf> or <bf>artsd</bf>.  If the device file isn't available, then
+MythTV won't work.
 
 <figure loc="here">
 <eps file="stop.eps" height="1cm">
@@ -5341,27 +5361,31 @@ example of a <tt>.twmrc</tt> and <tt>.fvwmrc</tt> file you may use.
 <sect1>What capture resolution should I use?  How does video work?
 <label id="capture_resolution_">
 <!-- Lots of the following is from a Bruce Markey mailto:bjm@lvcm.com post
-to the mailing list, 2003-01-21. -->
+to the mailing list, 2003-01-21. Updated 2005-02-09 bjm  -->
 <p>While MythTV allows you to set various GUI and capture resolutions, not
 all combinations make sense.
 
 First, analog video signals have a defined vertical resolution.  In NTSC,
 the video standard specifies that there are 525 vertical scan lines.  Once
 the "extra" lines are removed (they're used to synchronize the video signal,
-and encode closed captioning data), you have 480 vertical lines.
+and encode closed captioning data), you have 480 horizontal lines stacked
+vertically.
 
-In PAL, there are 625 "raw" lines of resolution, with a net of 576 vertical
-lines.
+In PAL, there are 625 "raw" lines of resolution, with a net of 576
+horizontal lines stacked vertically.
 
-Horizontally, the maximum you can expect from a Bt8X8 chip is 720.
+Horizontally, the maximum value allowed for a Bt8X8 chip is 720. However,
+due to limitations in the chip and other limitations of broadcast
+television, there may not be a noticeable improvement in image quality
+beyond 400 or 500 pixels.
 
 With this in mind, there are certain commonly accepted values for
-resolution.  While other values may be accepted, they will cause scan lines
-to be repeated or dropped.
+resolution.  While other values may be accepted for the vertical
+resolution, they will cause scan lines to be repeated or dropped.
 
 From "best" to "worst", in NTSC:
 <itemize>
-<item>720x480 (but more commonly, 704x480.  "DVD" resolution)
+<item>720x480 ("DVD" resolution. Also commonly, 704x480)
 <item>640x480 4:3
 <item>544x480 (TiVo high resolution)
 <item>480x480 (Video CD resolution)
@@ -7254,7 +7278,7 @@ for Firewire "tuner".  Expand on HDTV - Air2PC can now talk QAM.  Rework
 section 6 slightly (Suggestions from Max Waterman).  Add a little extra hint
 in LVM section about boot-time messages.  (Wendy Seltzer).  Add caveat about
 IP addresses on general setup page. (James Casbon).  Update "mythtv is
-crashing my system".
+crashing my system".  Add + key for audio streams.
 
 
 -->

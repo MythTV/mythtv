@@ -406,14 +406,17 @@ you are using the recording function.</P>
 <P>A better test to verify that sound will work for MythTV (and recording with
 <B>xawtv</B> for that matter) is to startup <B>xawtv</B>, mute the
 line-in then run <CODE>aplay /dev/dsp</CODE>. You should hear the recorded audio
-slightly delayed behind the real-time video.  Once this test succeeds, MythTV
+slightly delayed behind the real-time video. You should see messages about
+"underrun". These can be ignored but they do confirm that the driver is
+loaded and there is an active device. Once this test succeeds, MythTV
 should work correctly because it writes to and read from /dev/dsp in
 the same way that <B>aplay</B> does.</P>
 <P>To record audio along with video the audio signal must be digitized by a DSP
 so that the audio data can be stored in a file. On playback, the audio data
 is written to /dev/dsp and converted back to an analog signal. This analog
 signal should then be sent to your speakers. Here is what is needed in
-alsamixer:</P>
+<B>alsamixer</B>. If you are using an ALSA version after 1.0.6, use
+<B>alsamixer -V all</B>:</P>
 <P>CAPTUR source - the analog source to be sent to the DSP. This should be set
 to the input source from the tuner card to the sound card. In most cases
 this is Line but this could also be Aux, CD, Mic, etc., depending on how you
@@ -429,9 +432,10 @@ volume of 100% is recommended for testing, distortion may occur. Lowering
 this level to 75% to 85% may result in better audio quality.</P>
 <P>Master mixer - sets the level for the analog signal sent to line-out or the
 speakers.</P>
-<P>You may also want to ensure that <CODE>/dev/dsp</CODE> hasn't already been
-grabbed by another process, like <B>esd</B> or <B>artsd</B>.  If
-<CODE>/dev/dsp</CODE> isn't available, then MythTV won't work.  </P>
+<P>You may also want to ensure that <CODE>/dev/dsp</CODE> , or whatever device
+file is being used, hasn't already been grabbed by another process, like
+<B>esd</B> or <B>artsd</B>.  If the device file isn't available, then
+MythTV won't work.</P>
 <P>
 <FIGURE>
 <EPS FILE="stop.eps">

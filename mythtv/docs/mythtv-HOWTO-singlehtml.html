@@ -2142,6 +2142,7 @@ Note the spelling in the following commands.
 <BLOCKQUOTE><CODE>
 <PRE>
 $ amixer set Master,0 100%,100% unmute
+$ amixer set PCM,0 100%,100% unmute
 $ amixer set Line,0 75%,75% mute captur
 $ amixer set Capture,0 100%,100% captur
 $ su
@@ -2160,7 +2161,8 @@ distorted, it's possible that the levels in the above examples are too high
 for your particular hardware combination.  Try reducing the percentages by
 5-10% and checking again.  Once you're satisfied, re-run the <CODE>alsactl
 store</CODE> command.</P>
-<P>You may also use the <B>alsamixer</B> program to set the volume.  First,
+<P>You may also use the <B>alsamixer</B> program to set the volume. If you
+are using an ALSA version after 1.0.6, use <B>alsamixer -V all</B> . First,
 start <B>alsamixer</B> from the command line.  You should start out on the
 "Master" volume control slider.  Use the up and down cursor to set the
 master volume to around 75%.  Next, use the left and right cursor keys to
@@ -3401,9 +3403,11 @@ Enter your filter string in the box titled "Custom Filters".</P>
 <H3>Currently Available Filters</H3>
 
 <P>"Deinterlace Playback" checkbox.</P>
-<P>This implements the linearblend algorithm.  If you don't want linearblend
-included at the head of your custom filter chain, make sure that this box is
-unchecked.</P>
+<P>This implements special behavior needed for the "bobdeint" filter but can
+also be used to choose any of the deinterlace filters. If you prefer, you
+may leave this unchecked and include any of the deinterlace filters, other
+than "bobdeint", in your custom filter chain.</P>
+
 <P>o  The "invert" filter</P>
 <P>Invert ignores any parameters and inverts the pixel values of the video
 frames.  In other words, a negative image. This would rarely be useful but
@@ -3412,14 +3416,21 @@ may be a good example to verify that your filter strings take effect.</P>
 <P>It is a simple deinterlacing filter that ignores parameters and works by
 blending adjacent lines.  It replaces combing in interlaced video with a
 less distracting "ghost" image.</P>
+<P>o The "bobdeint" filter</P>
+<P>This filter splits the interlaced image into two separate fields that
+can be line doubled then displayed at twice the frame rate. If the
+display is at the same refresh rate as the recording (59.92Hz NTSC or
+50Hz PAL) this will cause each refresh to show objects in motion in
+a new position with no jagged edges. However, if the display is not
+synchronous, it will cause flickering or the appearance of the picture
+moving up and down by one line.</P>
 <P>
 <FIGURE>
 <EPS FILE="stop.eps">
 <IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>: This filter is appended to the filter chain when "Deinterlace
-playback" has been checked. If you use "kerneldeint" or "linearblend" for
-deinterlacing in your filter string, you should not check "Deinterlace
-playback".</CAPTION>
+<CAPTION><B>NOTE</B>: This filter requires the frame rate to be doubled
+and therefore can only be used with the "Deinterlace Playback" checkbox.
+Do not include this in your filter chain.</CAPTION>
 </FIGURE>
 </P>
 <P>o  The "kerneldeint" filter</P>
@@ -3516,8 +3527,9 @@ type and speed, the resolution of the recording, which filters you are using
 and other factors. You can only determine what is right for you through
 experimentation. However, as a starting point, here are some filter strings
 that you may find useful:</P>
-<P>For typical broadcast stations:      "kerneldeint,denoise3d"</P>
-<P>For stations with poor signal quality: "kerneldeint,denoise3d=12"</P>
+<P>For typical broadcast stations:      "kerneldeint,quickdnr"</P>
+<P>For stations with poor signal quality: "linearblend,denoise3d=12"</P>
+<P>For synchronous TV-out: check Deinterlace with "Bob (2x framerate)"</P>
 
 <H2><A NAME="ss10.5">10.5</A> <A HREF="#toc10.5">Recording </A>
 </H2>
@@ -3706,6 +3718,7 @@ A </TD><TD> Adjust time stretch (speed up or slow down normal play of audio and 
 W </TD><TD> cycle through 4:3 aspect ratio, 16:9, 4:3 Zoom (like Pan and Scan),&nbsp;16:9 Zoom, and 16:9 Stretch (eliminates black sidebars in TV signal) </TD></TR><TR><TD>
 F8 </TD><TD> toggle the sleep timer 30m->1hr->1hr30m->2hr->Off </TD></TR><TR><TD>
 CTRL-B </TD><TD> Jump to the beginning of the recording / ringbuffer </TD></TR><TR><TD>
++ </TD><TD> Switch between audio streams </TD></TR><TR><TD>
 Left </TD><TD> (if a jump amount is entered) to jump back that amount </TD></TR><TR><TD>
 Right </TD><TD> (if a jump amount is entered) to jump ahead that amount </TD></TR><TR><TD>
 </TD><TD> </TD></TR><TR><TD>
@@ -5626,14 +5639,17 @@ you are using the recording function.</P>
 <P>A better test to verify that sound will work for MythTV (and recording with
 <B>xawtv</B> for that matter) is to startup <B>xawtv</B>, mute the
 line-in then run <CODE>aplay /dev/dsp</CODE>. You should hear the recorded audio
-slightly delayed behind the real-time video.  Once this test succeeds, MythTV
+slightly delayed behind the real-time video. You should see messages about
+"underrun". These can be ignored but they do confirm that the driver is
+loaded and there is an active device. Once this test succeeds, MythTV
 should work correctly because it writes to and read from /dev/dsp in
 the same way that <B>aplay</B> does.</P>
 <P>To record audio along with video the audio signal must be digitized by a DSP
 so that the audio data can be stored in a file. On playback, the audio data
 is written to /dev/dsp and converted back to an analog signal. This analog
 signal should then be sent to your speakers. Here is what is needed in
-alsamixer:</P>
+<B>alsamixer</B>. If you are using an ALSA version after 1.0.6, use
+<B>alsamixer -V all</B>:</P>
 <P>CAPTUR source - the analog source to be sent to the DSP. This should be set
 to the input source from the tuner card to the sound card. In most cases
 this is Line but this could also be Aux, CD, Mic, etc., depending on how you
@@ -5649,9 +5665,10 @@ volume of 100% is recommended for testing, distortion may occur. Lowering
 this level to 75% to 85% may result in better audio quality.</P>
 <P>Master mixer - sets the level for the analog signal sent to line-out or the
 speakers.</P>
-<P>You may also want to ensure that <CODE>/dev/dsp</CODE> hasn't already been
-grabbed by another process, like <B>esd</B> or <B>artsd</B>.  If
-<CODE>/dev/dsp</CODE> isn't available, then MythTV won't work.  </P>
+<P>You may also want to ensure that <CODE>/dev/dsp</CODE> , or whatever device
+file is being used, hasn't already been grabbed by another process, like
+<B>esd</B> or <B>artsd</B>.  If the device file isn't available, then
+MythTV won't work.</P>
 <P>
 <FIGURE>
 <EPS FILE="stop.eps">
@@ -5908,16 +5925,20 @@ all combinations make sense.</P>
 <P>First, analog video signals have a defined vertical resolution.  In NTSC,
 the video standard specifies that there are 525 vertical scan lines.  Once
 the "extra" lines are removed (they're used to synchronize the video signal,
-and encode closed captioning data), you have 480 vertical lines.</P>
-<P>In PAL, there are 625 "raw" lines of resolution, with a net of 576 vertical
-lines.</P>
-<P>Horizontally, the maximum you can expect from a Bt8X8 chip is 720.</P>
+and encode closed captioning data), you have 480 horizontal lines stacked
+vertically.</P>
+<P>In PAL, there are 625 "raw" lines of resolution, with a net of 576
+horizontal lines stacked vertically.</P>
+<P>Horizontally, the maximum value allowed for a Bt8X8 chip is 720. However,
+due to limitations in the chip and other limitations of broadcast
+television, there may not be a noticeable improvement in image quality
+beyond 400 or 500 pixels.</P>
 <P>With this in mind, there are certain commonly accepted values for
-resolution.  While other values may be accepted, they will cause scan lines
-to be repeated or dropped.</P>
+resolution.  While other values may be accepted for the vertical
+resolution, they will cause scan lines to be repeated or dropped.</P>
 <P>From "best" to "worst", in NTSC:
 <UL>
-<LI>720x480 (but more commonly, 704x480.  "DVD" resolution)</LI>
+<LI>720x480 ("DVD" resolution. Also commonly, 704x480)</LI>
 <LI>640x480 4:3</LI>
 <LI>544x480 (TiVo high resolution)</LI>
 <LI>480x480 (Video CD resolution)</LI>

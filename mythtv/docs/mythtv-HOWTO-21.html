@@ -118,16 +118,20 @@ all combinations make sense.</P>
 <P>First, analog video signals have a defined vertical resolution.  In NTSC,
 the video standard specifies that there are 525 vertical scan lines.  Once
 the "extra" lines are removed (they're used to synchronize the video signal,
-and encode closed captioning data), you have 480 vertical lines.</P>
-<P>In PAL, there are 625 "raw" lines of resolution, with a net of 576 vertical
-lines.</P>
-<P>Horizontally, the maximum you can expect from a Bt8X8 chip is 720.</P>
+and encode closed captioning data), you have 480 horizontal lines stacked
+vertically.</P>
+<P>In PAL, there are 625 "raw" lines of resolution, with a net of 576
+horizontal lines stacked vertically.</P>
+<P>Horizontally, the maximum value allowed for a Bt8X8 chip is 720. However,
+due to limitations in the chip and other limitations of broadcast
+television, there may not be a noticeable improvement in image quality
+beyond 400 or 500 pixels.</P>
 <P>With this in mind, there are certain commonly accepted values for
-resolution.  While other values may be accepted, they will cause scan lines
-to be repeated or dropped.</P>
+resolution.  While other values may be accepted for the vertical
+resolution, they will cause scan lines to be repeated or dropped.</P>
 <P>From "best" to "worst", in NTSC:
 <UL>
-<LI>720x480 (but more commonly, 704x480.  "DVD" resolution)</LI>
+<LI>720x480 ("DVD" resolution. Also commonly, 704x480)</LI>
 <LI>640x480 4:3</LI>
 <LI>544x480 (TiVo high resolution)</LI>
 <LI>480x480 (Video CD resolution)</LI>
