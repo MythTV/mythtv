@@ -1441,7 +1441,8 @@ void Weather::cursorRight()
 {
    if (inSetup == false)
    {
-        nextpage_Timer->changeInterval((int)(1000 * nextpageIntArrow));
+        if (nextpage_Timer->isActive())
+            nextpage_Timer->changeInterval((int)(1000 * nextpageIntArrow));
         int tp = currentPage;
         tp++;
 
@@ -1550,7 +1551,8 @@ void Weather::cursorLeft()
 {
    if (inSetup == false)
    {
-   	nextpage_Timer->changeInterval((int)(1000 * nextpageIntArrow));
+        if (nextpage_Timer->isActive())
+   	    nextpage_Timer->changeInterval((int)(1000 * nextpageIntArrow));
    	int tp = currentPage;
    	tp--;
 	
