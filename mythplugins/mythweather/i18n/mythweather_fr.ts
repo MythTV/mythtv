@@ -3,31 +3,31 @@
     <name>String::DayOfWeek</name>
     <message>
         <source>MON</source>
-        <translation>LUNDI</translation>
+        <translation>LUN</translation>
     </message>
     <message>
         <source>TUE</source>
-        <translation>MARDI</translation>
+        <translation>MAR</translation>
     </message>
     <message>
         <source>WED</source>
-        <translation>MERCREDI</translation>
+        <translation>MER</translation>
     </message>
     <message>
         <source>THU</source>
-        <translation>JEUDI</translation>
+        <translation>JEU</translation>
     </message>
     <message>
         <source>FRI</source>
-        <translation>VENDREDI</translation>
+        <translation>VEN</translation>
     </message>
     <message>
         <source>SAT</source>
-        <translation>SAMEDI</translation>
+        <translation>SAM</translation>
     </message>
     <message>
         <source>SUN</source>
-        <translation>DIMANCHE</translation>
+        <translation>DIM</translation>
     </message>
 </context>
 <context>
@@ -66,7 +66,7 @@
     </message>
     <message>
         <source>Few Showers</source>
-        <translation>Averses Eparses</translation>
+        <translation>Averses Éparses</translation>
     </message>
     <message>
         <source>Mostly Sunny</source>
@@ -78,11 +78,11 @@
     </message>
     <message>
         <source>Scattered Flurries</source>
-        <translation>Nuages Eparses</translation>
+        <translation>Fortes rafales</translation>
     </message>
     <message>
         <source>AM Clouds/PM Sun</source>
-        <translation>Nuages Matin/Soleil AM</translation>
+        <translation>Nuages Matin/Soleil A-Midi</translation>
     </message>
     <message>
         <source>Isolated T-Storms</source>
@@ -90,15 +90,15 @@
     </message>
     <message>
         <source>Scattered Thunderstorms</source>
-        <translation>Orages Eparses</translation>
+        <translation>Orages Violents</translation>
     </message>
     <message>
         <source>PM Showers</source>
-        <translation>Averses AM</translation>
+        <translation>Averses A-Midi</translation>
     </message>
     <message>
         <source>PM Showers/Wind</source>
-        <translation>Averses AM/Vent</translation>
+        <translation>Averses A-Midi/Vent</translation>
     </message>
     <message>
         <source>Rain/Snow Showers</source>
@@ -106,7 +106,7 @@
     </message>
     <message>
         <source>Few Snow Showers</source>
-        <translation>Quelques averses de neige</translation>
+        <translation>Faibles averses de neige</translation>
     </message>
     <message>
         <source>Cloudy/Wind</source>
@@ -122,7 +122,7 @@
     </message>
     <message>
         <source>Rain/Thunder</source>
-        <translation>Pluie/Tonnerre</translation>
+        <translation>Pluie/Orage</translation>
     </message>
     <message>
         <source>Partly Cloudy/Windy</source>
@@ -130,7 +130,7 @@
     </message>
     <message>
         <source>AM Rain/Snow Showers</source>
-        <translation>Pluies Matinales/Averses de Neige</translation>
+        <translation>Pluies/neige Matinales</translation>
     </message>
     <message>
         <source>Light Rain/Wind</source>
@@ -154,15 +154,15 @@
     </message>
     <message>
         <source>Sct Flurries/Wind</source>
-        <translation>Bourrasques Eparses/Vent</translation>
+        <translation>fortes rafales/Vent</translation>
     </message>
     <message>
         <source>Sct Strong Storms</source>
-        <translation>Orages Violents Eparses</translation>
+        <translation>Orages Violents</translation>
     </message>
     <message>
         <source>PM T-Storms</source>
-        <translation>Orages Après-Midi</translation>
+        <translation>Orages A-Midi</translation>
     </message>
     <message>
         <source>Thunderstorms</source>
@@ -190,7 +190,7 @@
     </message>
     <message>
         <source>Sct T-Storms/Wind</source>
-        <translation>Orages Eparses/Vent</translation>
+        <translation>Orages Violents/Vent</translation>
     </message>
     <message>
         <source>AM Showers/Wind</source>
@@ -198,7 +198,7 @@
     </message>
     <message>
         <source>Sct Snow Showers</source>
-        <translation>Averses de Neige Eparses</translation>
+        <translation>Fortes averses de neige</translation>
     </message>
     <message>
         <source>Snow to Ice/Wind</source>
@@ -206,7 +206,7 @@
     </message>
     <message>
         <source>Snow to Rain</source>
-        <translation>Neige puis Pluie</translation>
+        <translation>Neige fondue</translation>
     </message>
     <message>
         <source>AM Light Rain</source>
@@ -214,11 +214,11 @@
     </message>
     <message>
         <source>PM Light Rain</source>
-        <translation>Pluie légère l&apos;après-midi</translation>
+        <translation>Pluie légère l&apos;A-Midi</translation>
     </message>
     <message>
         <source>PM Rain</source>
-        <translation>Pluie l&apos;après-midi</translation>
+        <translation>Pluie l&apos;A-Midi</translation>
     </message>
     <message>
         <source>Snow Showers</source>
@@ -230,7 +230,7 @@
     </message>
     <message>
         <source>PM Rain/Snow</source>
-        <translation>Pluie AM/Neige</translation>
+        <translation>Pluie/Neige A-Midi</translation>
     </message>
     <message>
         <source>Few Showers/Wind</source>
@@ -242,15 +242,15 @@
     </message>
     <message>
         <source>PM Rain/Snow Showers</source>
-        <translation>Pluie AM/Averses de Neige</translation>
+        <translation>Averses Neige/pluie A-Midi</translation>
     </message>
     <message>
         <source>PM Rain/Snow/Wind</source>
-        <translation>Pluie AM/Neige/Vent</translation>
+        <translation>Pluie/neige/vent A-Midi</translation>
     </message>
     <message>
         <source>Rain/Snow Showers/Wind</source>
-        <translation>Pluie/Averses de Neige/Vent</translation>
+        <translation>Vent Averses Pluie/neige</translation>
     </message>
     <message>
         <source>Rain/Snow/Wind</source>
@@ -258,11 +258,11 @@
     </message>
     <message>
         <source>Light Snow</source>
-        <translation>Neige légère</translation>
+        <translation>faibles averses neige</translation>
     </message>
     <message>
         <source>PM Snow</source>
-        <translation>Neige l&apos;après-midi</translation>
+        <translation>Neige l&apos;A-Midi</translation>
     </message>
     <message>
         <source>Few Snow Showers/Wind</source>
@@ -270,7 +270,7 @@
     </message>
     <message>
         <source>Light Snow/Wind</source>
-        <translation>Neige légère/Vent</translation>
+        <translation>Quelques flocons/vent</translation>
     </message>
     <message>
         <source>Wintry Mix</source>
@@ -278,7 +278,7 @@
     </message>
     <message>
         <source>AM Wintry Mix</source>
-        <translation>Temps Hivernal AM</translation>
+        <translation>Temps Hivernal le matin</translation>
     </message>
     <message>
         <source>Hvy Rain/Freezing Rain</source>
@@ -290,7 +290,7 @@
     </message>
     <message>
         <source>Rain/Freezing Rain</source>
-        <translation>Pluie/Grésil</translation>
+        <translation>Pluie/Pluie verglassante</translation>
     </message>
     <message>
         <source>T-Storms/Wind</source>
@@ -306,7 +306,7 @@
     </message>
     <message>
         <source>AM Clouds/PM Sun/Wind</source>
-        <translation>Matin Nuageux/Soleil AM/Vent</translation>
+        <translation>Matin Nuageux/Soleil A-Midi/Vent</translation>
     </message>
     <message>
         <source>AM Rain/Snow/Wind</source>
@@ -314,7 +314,7 @@
     </message>
     <message>
         <source>Rain to Snow/Wind</source>
-        <translation>Pluie pui Neige/Vent</translation>
+        <translation>Pluie puis Neige/Vent</translation>
     </message>
     <message>
         <source>Snow to Wintry Mix</source>
@@ -322,7 +322,7 @@
     </message>
     <message>
         <source>PM Snow Showers/Wind</source>
-        <translation>Averses de Neige AM/Vent</translation>
+        <translation>Averses de Neige A-Midi/Vent</translation>
     </message>
     <message>
         <source>Snow and Ice to Rain</source>
@@ -334,7 +334,7 @@
     </message>
     <message>
         <source>AM Rain/Ice</source>
-        <translation>Pluie maitnale/Grêle</translation>
+        <translation>Pluie matinale/Grêle</translation>
     </message>
     <message>
         <source>AM Snow Showers/Wind</source>
@@ -346,7 +346,7 @@
     </message>
     <message>
         <source>PM Light Rain/Wind</source>
-        <translation>Pluie légère AM/Vent</translation>
+        <translation>Pluie légère A-Midi/Vent</translation>
     </message>
     <message>
         <source>AM Light Wintry Mix</source>
@@ -354,7 +354,7 @@
     </message>
     <message>
         <source>PM Light Snow/Wind</source>
-        <translation>Légère Neige AM/Vent</translation>
+        <translation>Légère Neige A-Midi/Vent</translation>
     </message>
     <message>
         <source>Heavy Rain/Wind</source>
@@ -362,7 +362,7 @@
     </message>
     <message>
         <source>PM Snow Shower</source>
-        <translation>Averses de Neige AM</translation>
+        <translation>Averses de Neige A-Midi</translation>
     </message>
     <message>
         <source>Snow to Rain/Wind</source>
@@ -370,7 +370,7 @@
     </message>
     <message>
         <source>PM Light Rain/Ice</source>
-        <translation>Pluie légère AM/Grêle</translation>
+        <translation>Pluie légère A-Midi/Grêle</translation>
     </message>
     <message>
         <source>AM Snow</source>
@@ -386,7 +386,7 @@
     </message>
     <message>
         <source>PM Light Snow</source>
-        <translation>Neige légère l&apos;après-midi</translation>
+        <translation>Neige légère l&apos;A-Midi</translation>
     </message>
     <message>
         <source>AM Drizzle</source>
@@ -394,11 +394,11 @@
     </message>
     <message>
         <source>Strong Storms/Wind</source>
-        <translation>Orages violents/Vent</translation>
+        <translation>Gros orages/Vent</translation>
     </message>
     <message>
         <source>PM Drizzle</source>
-        <translation>Bruine l&apos;après-midi</translation>
+        <translation>Bruine l&apos;A-Midi</translation>
     </message>
     <message>
         <source>Drizzle</source>
@@ -540,7 +540,7 @@
     </message>
     <message>
         <source>[ retrieving weather data ... ]</source>
-        <translation>[ Recherche des données météorologiques... ]</translation>
+        <translation>[ Recherche des données météo... ]</translation>
     </message>
     <message>
         <source>current conditions</source>
@@ -572,7 +572,7 @@
     </message>
     <message>
         <source>extended forecast</source>
-        <translation>Les 3 Jours Prochains</translation>
+        <translation>Les 3 Prochains Jours</translation>
     </message>
     <message>
         <source>LO</source>
@@ -608,7 +608,7 @@
     </message>
     <message>
         <source>MIX/ICE</source>
-        <translation>GRESIL</translation>
+        <translation>GRÉSIL</translation>
     </message>
     <message>
         <source>SNOW</source>
@@ -616,7 +616,7 @@
     </message>
     <message>
         <source>LIGHT</source>
-        <translation>LEGER</translation>
+        <translation>LÉGER</translation>
     </message>
     <message>
         <source>HEAVY</source>
@@ -628,7 +628,7 @@
     </message>
     <message>
         <source>weather setup</source>
-        <translation>Configuration Météorologique</translation>
+        <translation>paramétrage Météo</translation>
     </message>
     <message>
         <source>To save, press &apos;i&apos; - to cancel, hit escape</source>
@@ -671,7 +671,7 @@
     </message>
     <message>
         <source>Retrieving weather data...</source>
-        <translation>Acquisition des données météorologiques...</translation>
+        <translation>Acquisition des données météo...</translation>
     </message>
     <message>
         <source>Use the right arrow key to select your location...</source>
@@ -695,11 +695,11 @@
     </message>
     <message>
         <source>Obtaining initial weather data...</source>
-        <translation>Acquisition des données météorologiques...</translation>
+        <translation>Acquisition des données météo...</translation>
     </message>
     <message>
         <source>Updating weather data...</source>
-        <translation>Mise à jour des données météorologiques...</translation>
+        <translation>Mise à jour des données météo...</translation>
     </message>
     <message>
         <source>Calm</source>
@@ -731,11 +731,11 @@
     </message>
     <message>
         <source>Today a high of </source>
-        <translation>Aujourd&apos;hui, la température maximale sera de </translation>
+        <translation>Aujourd&apos;hui, les maximales seront de </translation>
     </message>
     <message>
         <source> and a low of </source>
-        <translation> °C et la minimale de </translation>
+        <translation> °C et les minimales de </translation>
     </message>
     <message>
         <source>. Currently there is a humidity of </source>
@@ -782,56 +782,28 @@
         <translation> km.</translation>
     </message>
     <message>
-        <source>SUN</source>
-        <translation type="obsolete">DIM</translation>
-    </message>
-    <message>
         <source>Sunday</source>
         <translation>Dimanche</translation>
-    </message>
-    <message>
-        <source>MON</source>
-        <translation type="obsolete">LUN</translation>
     </message>
     <message>
         <source>Monday</source>
         <translation>Lundi</translation>
     </message>
     <message>
-        <source>TUE</source>
-        <translation type="obsolete">MAR</translation>
-    </message>
-    <message>
         <source>Tuesday</source>
         <translation>Mardi</translation>
-    </message>
-    <message>
-        <source>WED</source>
-        <translation type="obsolete">MER</translation>
     </message>
     <message>
         <source>Wednesday</source>
         <translation>Mercredi</translation>
     </message>
     <message>
-        <source>THU</source>
-        <translation type="obsolete">JEU</translation>
-    </message>
-    <message>
         <source>Thursday</source>
         <translation>Jeudi</translation>
     </message>
     <message>
-        <source>FRI</source>
-        <translation type="obsolete">VEN</translation>
-    </message>
-    <message>
         <source>Friday</source>
         <translation>Vendredi</translation>
-    </message>
-    <message>
-        <source>SAT</source>
-        <translation type="obsolete">SAM</translation>
     </message>
     <message>
         <source>Saturday</source>
@@ -851,7 +823,7 @@
     </message>
     <message>
         <source>Weather data from: </source>
-        <translation>Bulletin météorologique du </translation>
+        <translation>Bulletin météo du </translation>
     </message>
     <message>
         <source>Updating...</source>
@@ -860,18 +832,6 @@
     <message>
         <source> (Not All Information Available)</source>
         <translation>(Certaines informations sont indisponibles)</translation>
-    </message>
-    <message>
-        <source>*** Invalid Area ID Entered *** Use a valid area id.</source>
-        <translation type="obsolete">*** ID de lieu incorrect *** Merci de corriger.</translation>
-    </message>
-    <message>
-        <source>Weather Data Not Available</source>
-        <translation type="obsolete">Données météos indisponibles</translation>
-    </message>
-    <message>
-        <source>!!! Timeout Limit !!! Change aggressiveness level.</source>
-        <translation type="obsolete">Temps d&apos;attente dépassé  !!! Changez de type de connexion,</translation>
     </message>
     <message>
         <source>*** Invalid Area ID or Server Error ***</source>
@@ -903,7 +863,15 @@
     </message>
     <message>
         <source> - PAUSED -</source>
-        <translation>- PAUSE -</translation>
+        <translation>- EN PAUSE -</translation>
+    </message>
+    <message>
+        <source>doppler radar</source>
+        <translation>Image Satellite</translation>
+    </message>
+    <message>
+        <source>satellite image</source>
+        <translation>Image Satellite</translation>
     </message>
 </context>
 </TS>
