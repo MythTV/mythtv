@@ -1,0 +1,61 @@
+<myththeme>
+
+  <background style="tiled">
+    <image>background-tile.png</image>
+    <buttonarea>25,150,800,450</buttonarea>
+  </background>
+
+  <genericbutton>
+    <normal>menu-nolight-alpha.png</normal>
+    <active>menu-light-alpha.png</active>
+    <text>
+      <area>40,20,20,20</area>
+      <color>white</color>
+      <fontname>Arial</fontname>
+      <fontsize>14</fontsize>
+      <bold>yes</bold>
+      <italics>yes</italics>
+      <shadow>
+         <color>black</color>
+         <offset>2,2</offset>
+         <alpha>56</alpha>
+      </shadow>
+    </text>
+  </genericbutton>
+  
+  <logo>
+    <image>mythtv-logo2.png</image>
+    <position>240,30</position>
+  </logo>
+
+  <buttondef name="TV">
+    <image>icon-tv.png</image>
+    <offset>-62,-18</offset>
+  </buttondef>
+
+  <buttondef name="TV_SCHEDULE">
+    <image>icon-schedule.png</image>
+    <offset>-70,-12</offset>
+  </buttondef>
+
+  <buttondef name="TV_PLAYBACK">
+    <image>icon-tape.png</image>
+    <offset>-80,-10</offset>
+  </buttondef>
+
+  <buttondef name="TV_CONFLICTS">
+    <image>icon-fixconflict.png</image>
+    <offset>-62,-12</offset>
+  </buttondef>
+  
+  <buttondef name="SETUP">
+    <image>icon-setup.png</image>
+    <offset>-52,-14</offset>
+  </buttondef>
+
+  <buttondef name="TV_DELETE">
+    <image>icon-delete.png</image>
+    <offset>-65,-19</offset>
+  </buttondef>
+
+</myththeme>
