@@ -217,7 +217,7 @@ int main(int argc, char **argv)
         diag->AddButton("Watch TV");
         diag->AddButton("Schedule a Recording");
         diag->AddButton("Fix Recording Conflicts");
-        diag->AddButton("Watch a Previously Recorded Program");  
+        diag->AddButton("Watch a Recording");  
         diag->AddButton("Delete Recordings");
  
         diag->Show();

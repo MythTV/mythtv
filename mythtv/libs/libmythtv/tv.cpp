@@ -578,6 +578,8 @@ void TV::SetupRecorder(void)
                      settings->GetNumSetting("Height"));
     nvr->SetMP3Quality(settings->GetNumSetting("MP3Quality"));
     nvr->SetAudioSampleRate(settings->GetNumSetting("AudioSampleRate"));
+    nvr->SetVideoDevice((char *)settings->GetSetting("V4LDevice").c_str());
+    nvr->SetAudioDevice((char *)settings->GetSetting("AudioDevice").c_str());
     nvr->Initialize();
 }
 
@@ -627,6 +629,7 @@ void TV::SetupPlayer(void)
     nvp->SetOSDFontName((char *)settings->GetSetting("OSDFont").c_str(),
                         theprefix);
     nvp->SetAudioSampleRate(settings->GetNumSetting("AudioSampleRate"));
+    nvp->SetAudioDevice((char *)settings->GetSetting("AudioDevice").c_str());
     osd_display_time = settings->GetNumSetting("OSDDisplayTime");
 }
 

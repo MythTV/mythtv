@@ -24,6 +24,8 @@ int AudioSampleRate=44100
 int MP3Quality=7
 # V4L device
 str V4LDevice=/dev/video
+# dsp device
+str AudioDevice=/dev/dsp
 
 # Playback options
 # Deinterlace playback (1 for on, 0 for no) -- adds to CPU usage

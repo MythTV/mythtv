@@ -4,6 +4,8 @@
 #include <qlabel.h>
 #include <qcursor.h>
 #include <qapplication.h>
+#include <qpixmap.h>
+#include <qbitmap.h>
 
 #include "menubox.h"
 
@@ -27,8 +29,15 @@ MenuBox::MenuBox(const char *text, QWidget *parent = 0,
     setCursor(QCursor(Qt::BlankCursor));
 
     QLabel *maintext = new QLabel(text, this);
+
+    //QPixmap *logo = new QPixmap("mythtv-logo.png");
+    //logo->setMask(logo->createHeuristicMask());
+
+    //maintext->setPixmap(*logo);
     maintext->setAlignment(Qt::AlignHCenter | Qt::AlignTop);
     maintext->setFont(QFont("Arial", 40 * hmult, QFont::Bold));
+
+    //delete logo;
 
     box = new QVBoxLayout(this, 20 * wmult);
 
