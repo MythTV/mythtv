@@ -314,7 +314,7 @@
     </message>
     <message>
         <source>MENU: Options</source>
-        <translation>MENU: Možnosti</translation>
+        <translation type="obsolete">MENU: Možnosti</translation>
     </message>
     <message>
         <source>retrieving data...</source>
@@ -338,11 +338,11 @@
     </message>
     <message>
         <source>Up/Down, Page Up/Down - Browse</source>
-        <translation>Gor/Dol, Stran Gor/Dol - Brskanje</translation>
+        <translation type="obsolete">Gor/Dol, Stran Gor/Dol - Brskanje</translation>
     </message>
     <message>
         <source>Menu - Options</source>
-        <translation>Menu - možnosti</translation>
+        <translation type="obsolete">Menu - možnosti</translation>
     </message>
     <message>
         <source>Parental</source>
@@ -479,6 +479,18 @@
     <message>
         <source>Aucune video</source>
         <translation>Filmi z erotično vsebino</translation>
+    </message>
+    <message>
+        <source>INFO - Action Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Up/Down, Page Up/Down: Browse   MENU: Options   INFO: Action Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play File After This:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

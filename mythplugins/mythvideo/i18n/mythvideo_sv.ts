@@ -453,15 +453,15 @@
     </message>
     <message>
         <source>MENU: Options</source>
-        <translation>MENY: Inställningar</translation>
+        <translation type="obsolete">MENY: Inställningar</translation>
     </message>
     <message>
         <source>Up/Down, Page Up/Down - Browse</source>
-        <translation>Up/Down, Page Up/Down - Bläddra</translation>
+        <translation type="obsolete">Up/Down, Page Up/Down - Bläddra</translation>
     </message>
     <message>
         <source>Menu - Options</source>
-        <translation>Meny - Inställningar</translation>
+        <translation type="obsolete">Meny - Inställningar</translation>
     </message>
     <message>
         <source>Parental</source>
@@ -482,6 +482,18 @@
     <message>
         <source>User Rating</source>
         <translation>Användarbetyg</translation>
+    </message>
+    <message>
+        <source>INFO - Action Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Up/Down, Page Up/Down: Browse   MENU: Options   INFO: Action Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play File After This:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

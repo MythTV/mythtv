@@ -477,15 +477,15 @@
     </message>
     <message>
         <source>MENU: Options</source>
-        <translation>メニュー: オプション</translation>
+        <translation type="obsolete">メニュー: オプション</translation>
     </message>
     <message>
         <source>Up/Down, Page Up/Down - Browse</source>
-        <translation>Up/Down, Page Up/Down - 表示</translation>
+        <translation type="obsolete">Up/Down, Page Up/Down - 表示</translation>
     </message>
     <message>
         <source>Menu - Options</source>
-        <translation>メニュー - オプション</translation>
+        <translation type="obsolete">メニュー - オプション</translation>
     </message>
     <message>
         <source>Parental</source>
@@ -506,6 +506,18 @@
     <message>
         <source>User Rating</source>
         <translation>ユーザー格付け</translation>
+    </message>
+    <message>
+        <source>INFO - Action Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Up/Down, Page Up/Down: Browse   MENU: Options   INFO: Action Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play File After This:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

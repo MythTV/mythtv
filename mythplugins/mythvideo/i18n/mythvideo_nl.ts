@@ -451,15 +451,15 @@
     </message>
     <message>
         <source>MENU: Options</source>
-        <translation>MENU: Opties</translation>
+        <translation type="obsolete">MENU: Opties</translation>
     </message>
     <message>
         <source>Up/Down, Page Up/Down - Browse</source>
-        <translation>Gebruik navigatietoetsen om te bladeren</translation>
+        <translation type="obsolete">Gebruik navigatietoetsen om te bladeren</translation>
     </message>
     <message>
         <source>Menu - Options</source>
-        <translation>Menu - Opties</translation>
+        <translation type="obsolete">Menu - Opties</translation>
     </message>
     <message>
         <source>Parental</source>
@@ -480,6 +480,18 @@
     <message>
         <source>User Rating</source>
         <translation>Gebruikersbeoordeling</translation>
+    </message>
+    <message>
+        <source>INFO - Action Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Up/Down, Page Up/Down: Browse   MENU: Options   INFO: Action Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play File After This:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -472,18 +472,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>MENU: Options</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Up/Down, Page Up/Down - Browse</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Menu - Options</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Parental</source>
         <translation type="unfinished"></translation>
     </message>
@@ -501,6 +489,18 @@
     </message>
     <message>
         <source>User Rating</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>INFO - Action Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Up/Down, Page Up/Down: Browse   MENU: Options   INFO: Action Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play File After This:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
