@@ -449,11 +449,23 @@ void MythRemoteLineEdit::keyPressEvent(QKeyEvent *e)
     
         case Key_Enter:
         case Key_Return:
-        case Key_Space:
             handled = true;
             endCycle();
             e->ignore();
             break;
+
+            //
+            //  Only eat Key_Space if we are in a cycle
+            //
+            
+        case Key_Space:
+            if(active_cycle)
+            {
+                handled = true;
+                endCycle();
+                e->ignore();
+            }
+            break; 
 
             //
             //  If you want to mess arround with other ways to allocate
