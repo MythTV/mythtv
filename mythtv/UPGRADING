@@ -1,6 +1,8 @@
 UPGRADING FROM RELEASE 0.7
 --------------------------
 Insert the 0-7-to-0-8.sql file from the database/ subdir into your database.
+The old settings files (settings.txt, theme.txt) are no longer used and can 
+be deleted from /usr/local/share/mythtv/ and ~/.mythtv/
 Run the setup program included in the setup/ directory, and say yes to both
 questions it asks on the console, before it opens the UI.  Follow the rest of
 the setup instructions from the README, from here on out.
