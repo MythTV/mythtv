@@ -457,13 +457,13 @@
       </textarea>
       <textarea name="tempforecast" draworder="5">
         <context>4</context>
-        <area>260,313,500,90</area>
+        <area>260,313,500,100</area>
         <font>todayfont</font>
         <multiline>yes</multiline>
       </textarea>
       <textarea name="condforecast" draworder="5">
         <context>4</context>
-        <area>260,429,500,90</area>
+        <area>260,429,500,100</area>
         <font>todayfont</font>
         <multiline>yes</multiline>
       </textarea>
@@ -552,6 +552,25 @@
         <area>710,86,80,16</area>
         <font>label2</font>
         <value>HEAVY</value>
+      </textarea>
+
+     <textarea name="maplabel-10" draworder="5" align="left">
+        <context>5</context>
+        <area>153,84,80,16</area>
+        <font>label2</font>
+        <value>COLD</value>
+      </textarea>
+      <textarea name="maplabel-11" draworder="5" align="right">
+        <context>5</context>
+        <area>596,84,80,16</area>
+        <font>label2</font>
+        <value>COLDEST</value>
+      </textarea>
+      <textarea name="maplabel-12" draworder="5" align="center">
+        <context>5</context>
+        <area>0,70,800,15</area>
+        <font>label</font>
+        <value>CLOUD TEMPERATURE</value>
       </textarea>
 
       <image name="radarbk" draworder="4">
