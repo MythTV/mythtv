@@ -618,13 +618,6 @@ PlaybackSettings::PlaybackSettings(MythContext *context)
     oscan->addChild(new XScanDisplacement());
     oscan->addChild(new YScanDisplacement());
     addChild(oscan);
-
-    VerticalConfigurationGroup* osd = new VerticalConfigurationGroup(false);
-    osd->setLabel("On-screen display");
-    osd->addChild(new OSDDisplayTime());
-    osd->addChild(new OSDTheme());
-    osd->addChild(new OSDFont());
-    addChild(osd);
 }
 
 GeneralSettings::GeneralSettings(MythContext *context)
@@ -685,7 +678,7 @@ EPGSettings::EPGSettings(MythContext *context)
     addChild(gen);
 }
 
-ThemeSettings::ThemeSettings(MythContext *context)
+AppearanceSettings::AppearanceSettings(MythContext *context)
              : ConfigurationWizard(context)
 {
     VerticalConfigurationGroup* theme = new VerticalConfigurationGroup(false);
@@ -705,4 +698,11 @@ ThemeSettings::ThemeSettings(MythContext *context)
     qttheme->addChild(new QtFontBig());
     qttheme->addChild(new ThemeQt());
     addChild(qttheme);
+
+    VerticalConfigurationGroup* osd = new VerticalConfigurationGroup(false);
+    osd->setLabel("On-screen display");
+    osd->addChild(new OSDTheme());
+    osd->addChild(new OSDDisplayTime());
+    osd->addChild(new OSDFont());
+    addChild(osd);
 }

@@ -21,9 +21,9 @@ public:
     EPGSettings(MythContext* context);
 };
 
-class ThemeSettings: virtual public ConfigurationWizard {
+class AppearanceSettings: virtual public ConfigurationWizard {
 public:
-    ThemeSettings(MythContext* context);
+    AppearanceSettings(MythContext* context);
 };
 
 #endif

@@ -131,8 +131,8 @@ void TVMenuCallback(void *data, QString &selection)
         startDelete(context);
     else if (sel == "tv_fix_conflicts")
         startManaged(context);
-    else if (sel == "settings theme") {
-        ThemeSettings settings(context);
+    else if (sel == "settings appearance") {
+        AppearanceSettings settings(context);
         settings.exec(QSqlDatabase::database());
     } else if (sel == "settings recording") {
         RecordingProfileEditor editor(context, QSqlDatabase::database());
@@ -224,9 +224,9 @@ void WriteDefaults(MythContext* context, QSqlDatabase* db) {
     EPGSettings es(context);
     es.load(db);
     es.save(db);
-    ThemeSettings ts(context);
-    ts.load(db);
-    ts.save(db);
+    AppearanceSettings as(context);
+    as.load(db);
+    as.save(db);
 }
 
 int main(int argc, char **argv)
