@@ -1,4 +1,4 @@
-package export_VCD;
+package export_DVCD;
 
 # Load the nuv utilities
 	use nuv_utils;
@@ -10,7 +10,7 @@ package export_VCD;
 	sub new {
 		my $class = shift;
 		my $self  = {
-					 'name'            => 'Export to VCD',
+					 'name'            => 'Export to VCD for DVD (48kHz audio)',
 					 'enabled'         => 1,
 					 'started'         => 0,
 					 'fifodir'         => "/tmp/fifodir.$$",
@@ -103,16 +103,16 @@ package export_VCD;
 	# Now we fork off a process to encode the audio
 		if ($Prog{mp2_encoder} =~ /\btoolame$/) {
 			$sample = $nuv_info{audio_sample_rate};
-			if ($sample != 44100) {
-				$command = "nice -n 19 sox -t raw -r $sample -s -w -c 2 $self->(fifodir)/audout -t raw -r 44100 -s -w -c 2 /dev/stdout resample -qs"
-					." | nice -n 19 toolame -s 44.1 -m j -b 224 /dev/stdin $self->(tmp_a)";
+			if ($sample != 48000) {
+				$command = "nice -n 19 sox -t raw -r $sample -s -w -c 2 $self->(fifodir)/audout -t raw -r 48000 -s -w -c 2 /dev/stdout resample -qs"
+					." | nice -n 19 toolame -s 48 -m j -b 224 /dev/stdin $self->(tmp_a)";
 			} else {
 				$command = "nice -n 19 toolame -s $sample -m j -b 224 $self->{fifodir}/audout $self->{tmp_a}";
 			}
 		}
 		else {
 			$command = "nice -n 19 ffmpeg -f s16le -ar $nuv_info{audio_sample_rate} -ac 2 -i $self->{fifodir}/audout -vn -f wav -"
-					  ." | nice -n 19 mp2enc -V -s -o $self->{tmp_a}";
+					  ." | nice -n 19 mp2enc -b 224 -r 48000 -s -o $self->{tmp_a}";
 		}
 		push @{$self->{children}}, fork_command($command);
 	# And lastly, we fork off a process to encode the video

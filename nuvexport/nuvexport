@@ -115,13 +115,16 @@ format and use Microsoft's Windows Media Encoder to encode a WMV file.
     use export_NUV_SQL;
     use export_SVCD;
     use export_VCD;
+    use export_DVCD;
     use export_DVD;
     use export_OGM;
     use export_WMV;
     use export_MP3;
     use export_Trans_XviD;
     use export_Trans_VCD;
+    use export_Trans_DVCD;
     use export_Trans_SVCD;
+    use export_MPEG2_cut;
 
 # Make sure that we have mythtranscode installed
     $Prog{mythtranscode} = find_program('mythtranscode');
@@ -141,12 +144,15 @@ format and use Microsoft's Windows Media Encoder to encode a WMV file.
                      export_DivX->new,
                      export_WMV->new,
                      export_VCD->new,
+                     export_DVCD->new,
                      export_DVD->new,
                      export_OGM->new,
                      export_MP3->new,
                      export_Trans_XviD->new,
                      export_Trans_VCD->new,
-                     export_Trans_SVCD->new;
+                     export_Trans_DVCD->new,
+                     export_Trans_SVCD->new,
+		     export_MPEG2_cut->new;
 
 # Set up the signal handlers
     $SIG{INT}  = \&Quit;

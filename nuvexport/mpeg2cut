@@ -1,0 +1,73 @@
+#! /bin/sh
+#
+# Cut MPEG2 files to remove cutlists...
+# Written by Gavin Hurlbut <gjhurlbu@beirdo.ca>
+#
+# Prerequisites:
+#   avidemux2	- http://fixounet.free.fr/avidemux/
+#   transcode	- http://zebra.fh-weingarten.de/~transcode/
+#   lvemux	- http://lvempeg.sourceforge.net/
+#   gdk2-cursed - http://zemljanka.sourceforge.net/cursed/
+#
+# Usage: mpeg2cut inputfile outputfile segmentList
+#	where segmentList is a space separated list of frame regions to keep
+#		(i.e.  -1999 3000-5000 6000-)
+
+export LD_PRELOAD=libgdk-cursed-2.0.so:libgtk-cursed-2.0.so
+
+FILENAME=$1
+OUTFILE=$2
+BASENAME=`basename ${FILENAME} .nuv`
+
+echo Filename \"${FILENAME}\"
+echo OutFile \"${OUTFILE}\"
+
+shift
+shift
+CUTLIST=$*
+
+echo Cutlist \"${CUTLIST}\"
+
+if [ ! -f ${FILENAME}.idx ]
+then
+	nice -n 19 avidemux2 --index-mpeg ${FILENAME} ${FILENAME}.idx C0 \
+		--audio-codec MP2 --quit 2> /dev/null
+fi
+
+OFFSET=`(tcprobe -i ${FILENAME} 2> /dev/null) | grep av_fine_ms | \
+	sed -e 's/^.*av_fine_ms //' | cut -d " " -f 1`
+
+count=0
+SLICELIST=""
+
+for i in ${CUTLIST}
+do
+	START=`echo $i | cut -d '-' -f 1`
+	END=`echo $i | cut -d '-' -f 2`
+	SLICE=${BASENAME}_${count}
+
+	if [ .${START}. != .. ]
+	then
+		START="--begin ${START}"
+	fi
+
+	if [ .${END}. != .. ]
+	then
+		END="--end ${END}"
+	fi
+
+	nice -n 19 avidemux2 --load ${FILENAME} ${START} ${END} \
+		--audio-codec MP2 --save-raw-video ${SLICE}.m2v \
+		--save-raw-audio ${SLICE}.mp2 --quit 2> /dev/null
+	nice -n 19 lvemux -sh $((-1 * ${OFFSET})) -v ${SLICE}.m2v \
+		-a ${SLICE}.mp2 -o ${SLICE}.mpg
+	rm ${SLICE}.m2v ${SLICE}.m2v.idx ${SLICE}.mp2
+
+	SLICELIST="${SLICELIST} ${SLICE}.mpg"
+	count=$((${count} + 1))
+done
+
+echo Concatenating ${count} segments
+nice -n 19 cat ${SLICELIST} > ${OUTFILE}
+rm ${SLICELIST} ${FILENAME}.idx
+
