@@ -745,8 +745,7 @@ void Database::parseDeletions(TagInput& dmap_data)
         switch(a_tag.type)
         {
             //
-            //  This ain't pretty, and there are a lot of them, but it
-            //  works (and, suprisingly, it's not aching slow)
+            //  Just store a list of deletions
             //
 
             case 'miid':
@@ -851,6 +850,19 @@ void Database::doDatabaseListPlaylistsResponse(TagInput &dmap_data)
                 {
                     TagInput re_rebuilt_internal(a_chunk);
                     parseContainers(re_rebuilt_internal, new_numb_received_playlists);
+                }
+                break;
+            
+            case 'mudl':
+            
+                //
+                //  This is listings tag saying there's a list of deletions to come
+                //
+                
+                dmap_data >> a_chunk;
+                {
+                    TagInput re_rebuilt_internal(a_chunk);
+                    parseDeletedContainers(re_rebuilt_internal);
                 }
                 break;
 
@@ -988,6 +1000,24 @@ void Database::parseContainers(TagInput& dmap_data, int how_many)
                 "containers (playlists) in %2 seconds")
                 .arg(how_many)
                 .arg(elapsed_time), 4);
+
+}
+
+void Database::parseDeletedContainers(TagInput& dmap_data)
+{
+    //
+    //  Because we always rebuild the playlist list from scratch, we just
+    //  throw this info away
+    //
+    
+
+    Tag a_tag;
+    Chunk a_chunk;
+
+    while(!dmap_data.isFinished())
+    {
+        dmap_data >> a_tag >> a_chunk >> end;
+    }
 
 }
 
@@ -1263,6 +1293,7 @@ void Database::doTheMetadataSwap()
         //  find new playlists (additions)
         //
 
+        playlist_additions.clear();
         QIntDictIterator<Playlist> apl_iter(*new_playlists);
         for (; apl_iter.current(); ++apl_iter)
         {
@@ -1277,6 +1308,7 @@ void Database::doTheMetadataSwap()
         //  find old playlists (deletions)
         //
 
+        playlist_deletions.clear();
         QValueList<int>::iterator ysom_iter;
         for ( ysom_iter = previous_playlists.begin(); ysom_iter != previous_playlists.end(); ++ysom_iter )
         {
@@ -1346,6 +1378,7 @@ void Database::doTheMetadataSwap()
         //  find new playlists (additions)
         //
 
+        playlist_additions.clear();
         QIntDictIterator<Playlist> apl_iter(*new_playlists);
         for (; apl_iter.current(); ++apl_iter)
         {
@@ -1360,6 +1393,7 @@ void Database::doTheMetadataSwap()
         //  find old playlists (deletions)
         //
 
+        playlist_deletions.clear();
         QValueList<int>::iterator ysom_iter;
         for ( ysom_iter = previous_playlists.begin(); ysom_iter != previous_playlists.end(); ++ysom_iter )
         {
@@ -1446,13 +1480,6 @@ void Database::warning(const QString &warning_message)
 Database::~Database()
 {
 
-    //  However I got wiped out, I need to tell the mfd any
-    //  metadata/playlists I own no longer exist
-    //
-    
-    metadata_server->deleteContainer(container_id);
-    
-    
     if(new_metadata)
     {
         delete new_metadata;
