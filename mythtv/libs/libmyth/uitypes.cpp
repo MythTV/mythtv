@@ -1288,6 +1288,9 @@ UIImageType::~UIImageType()
 
 void UIImageType::LoadImage()
 {
+    if (m_filename == "none")
+        return;
+
     QString file;
     int transparentFlag = gContext->GetNumSetting("PlayBoxTransparency", 1);
     if (m_flex == true)

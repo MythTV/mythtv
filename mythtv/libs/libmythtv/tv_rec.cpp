@@ -1206,7 +1206,7 @@ bool TVRec::CheckChannel(ChannelBase *chan, const QString &channum,
     query.bindValue(":CARDID", m_capturecardnum);
     query.bindValue(":HOSTNAME", gContext->GetHostName());
 
-    if (!query.isActive())
+    if (!query.exec() || !query.isActive())
     {
         MythContext::DBError("checkchannel", query);
     } 
