@@ -47,27 +47,39 @@ GuideGrid::GuideGrid(const QString &channel, QWidget *parent, const char *name)
         bgcolor = QColor(globalsettings->GetSetting("BackgroundColor"));
         fgcolor = QColor(globalsettings->GetSetting("ForegroundColor"));
 
+        int bgtype = 0;
+
+        QPixmap *bgpixmap = NULL;
+
         if (globalsettings->GetSetting("BackgroundPixmap") != "")
         {
             QString pmapname = globalsettings->GetSetting("ThemePathName") +
                                globalsettings->GetSetting("BackgroundPixmap");
-            setPaletteBackgroundPixmap(QPixmap(pmapname));
+            
+            bgpixmap = loadScalePixmap(pmapname, screenwidth, screenheight,
+                                       wmult, hmult);
+            setPaletteBackgroundPixmap(*bgpixmap);
         }
         else if (globalsettings->GetSetting("TiledBackgroundPixmap") != "")
         {
             QString pmapname = globalsettings->GetSetting("ThemePathName") +
                           globalsettings->GetSetting("TiledBackgroundPixmap");
 
+            bgpixmap = loadScalePixmap(pmapname, screenwidth, screenheight,
+                                       wmult, hmult);
+
             QPixmap background(screenwidth, screenheight);
             QPainter tmp(&background);
 
-            tmp.drawTiledPixmap(0, 0, screenwidth, screenheight, 
-                                QPixmap(pmapname));
+            tmp.drawTiledPixmap(0, 0, screenwidth, screenheight, *bgpixmap);
             tmp.end();
             setPaletteBackgroundPixmap(background);
         }
         else
             setPalette(QPalette(bgcolor));
+
+        if (bgpixmap)
+            delete bgpixmap;
     }
     else
     {

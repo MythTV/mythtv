@@ -21,6 +21,9 @@
 #include <string>
 using namespace std;
 
+#include <qpixmap.h>
+#include <qimage.h>
+
 Settings::Settings(QString strSettingsFile)
 {
 	if (strSettingsFile.length() == 0)
@@ -180,3 +183,22 @@ int Settings::ReadSettings(QString pszFile)
 	} // wend
 	return 0;
 }
+
+QPixmap *loadScalePixmap(QString filename, int screenwidth, int screenheight,
+                         float wmult, float hmult)
+{               
+    QPixmap *ret = new QPixmap();
+            
+    if (screenwidth != 800 || screenheight != 600)
+    {           
+        QImage tmpimage(filename);
+        QImage tmp2 = tmpimage.smoothScale((int)(tmpimage.width() * wmult),
+                                           (int)(tmpimage.height() * hmult));
+        ret->convertFromImage(tmp2);
+    }       
+    else    
+        ret->load(filename);
+
+    return ret;
+}
+
