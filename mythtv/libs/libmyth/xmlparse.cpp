@@ -3,6 +3,7 @@ using namespace std;
 
 #include <cmath>
 
+#include "uilistbtntype.h"
 #include "xmlparse.h"
 
 
@@ -2238,7 +2239,6 @@ void XMLParse::parseListBtnArea(LayerSet *container, QDomElement &element)
     QString fontInactive;
     bool    showArrow = true;
     bool    showScrollArrows = false;
-    bool    showChecked = false;
     int     draworder = 0;
     QColor  grUnselectedBeg(Qt::black);
     QColor  grUnselectedEnd(80,80,80);
@@ -2293,10 +2293,6 @@ void XMLParse::parseListBtnArea(LayerSet *container, QDomElement &element)
                 if (getFirstText(info).lower() == "no")
                     showArrow = false;
             }
-            else if (info.tagName() == "showchecks") {
-                if (getFirstText(info).lower() == "yes")
-                    showChecked = true;
-            }
             else if (info.tagName() == "showscrollarrows") {
                 if (getFirstText(info).lower() == "yes")
                     showScrollArrows = true;
@@ -2340,7 +2336,8 @@ void XMLParse::parseListBtnArea(LayerSet *container, QDomElement &element)
             }
             else
             {
-                std::cerr << "Unknown tag in listbtn area: " << info.tagName() << endl;
+                std::cerr << "Unknown tag in listbtn area: "
+                          << info.tagName() << endl;
                 return;
             }
             
@@ -2350,20 +2347,22 @@ void XMLParse::parseListBtnArea(LayerSet *container, QDomElement &element)
     fontProp *fpActive = GetFont(fontActive);
     if (!fpActive)
     {
-        cerr << "Unknown font: " << fontActive << " in listbtn area: " << name << endl;
+        cerr << "Unknown font: " << fontActive
+             << " in listbtn area: " << name << endl;
         return;
     }
     
     fontProp *fpInactive = GetFont(fontInactive);
     if (!fpInactive)
     {
-        cerr << "Unknown font: " << fontInactive << " in listbtn area: " << name << endl;
+        cerr << "Unknown font: " << fontInactive
+             << " in listbtn area: " << name << endl;
         return;
     }
     
 
     UIListBtnType *l = new UIListBtnType(name, area, draworder, showArrow,
-                                         showScrollArrows, showChecked);
+                                         showScrollArrows);
     l->SetScreen(wmult, hmult);
     l->SetFontActive(fpActive);
     l->SetFontInactive(fpInactive);
@@ -2371,7 +2370,6 @@ void XMLParse::parseListBtnArea(LayerSet *container, QDomElement &element)
     l->SetItemSelColor(grSelectedBeg, grSelectedEnd, grSelectedAlpha);
     l->SetSpacing((int)(spacing*hmult));
     l->SetMargin((int)(margin*wmult));
-    
+
     container->AddType(l);
-    
 }

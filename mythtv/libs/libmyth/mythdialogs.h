@@ -10,6 +10,7 @@
 #include <qpushbutton.h>
 #include <qevent.h>
 #include <qvaluevector.h>
+#include <qscrollview.h>
 
 #include <vector>
 using namespace std;
@@ -358,6 +359,85 @@ class MythImageFileDialog: public MythThemedDialog
     QStringList           image_files;
 };
 
+// ---------------------------------------------------------------------------
+
+class MythScrollDialog : public QScrollView
+{
+    Q_OBJECT
+    
+  public:
+
+    enum DialogCode {
+        Rejected,
+        Accepted
+    };
+
+    enum ScrollMode {
+        HScroll=0,
+        VScroll
+    };
+
+    MythScrollDialog(MythMainWindow *parent, ScrollMode mode=HScroll,
+                     const char *name = 0);
+    ~MythScrollDialog();
+
+    void setArea(int w, int h);
+    void setAreaMultiplied(int areaWTimes, int areaHTimes);
+
+    int  result() const;
+
+  public slots:
+
+    int  exec();
+    virtual void done(int);
+    virtual void show();
+    virtual void hide();
+    virtual void setContentsPos(int x, int y);
+    
+  protected slots:
+
+    virtual void accept();
+    virtual void reject();
+
+  protected:
+
+    void         keyPressEvent(QKeyEvent *e);
+    virtual void paintEvent(QRegion& region, int x, int y, int w, int h);
+
+    void setResult(int r);
+    void viewportPaintEvent(QPaintEvent *pe);
+
+    MythMainWindow *m_parent;
+    int             m_screenWidth, m_screenHeight;
+    int             m_xbase, m_ybase;
+    float           m_wmult, m_hmult;
+
+    ScrollMode      m_scrollMode;
+
+    QFont           m_defaultBigFont;
+    QFont           m_defaultMediumFont;
+    QFont           m_defaultSmallFont;
+
+    int             m_resCode;
+    bool            m_inLoop;
+    
+    QPixmap        *m_bgPixmap;
+    
+    QPixmap        *m_upArrowPix;
+    QPixmap        *m_dnArrowPix;
+    QPixmap        *m_rtArrowPix;
+    QPixmap        *m_ltArrowPix;
+
+    bool            m_showUpArrow;
+    bool            m_showDnArrow;
+    bool            m_showLtArrow;
+    bool            m_showRtArrow;
+
+    QRect           m_upArrowRect;
+    QRect           m_dnArrowRect;
+    QRect           m_rtArrowRect;
+    QRect           m_ltArrowRect;
+};
 
 #endif
 

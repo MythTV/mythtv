@@ -2260,3 +2260,285 @@ MythImageFileDialog::~MythImageFileDialog()
     }
 }
 
+// -----------------------------------------------------------------------------
+
+MythScrollDialog::MythScrollDialog(MythMainWindow *parent,
+                                   MythScrollDialog::ScrollMode mode,
+                                   const char *name)
+    : QScrollView(parent, name)
+{
+    if (!parent) {
+        std::cerr << "MythScrollDialog: Trying to create a dialog without a parent"
+                  << std::endl;
+        exit(-1);
+    }
+
+    m_parent     = parent;
+    m_scrollMode = mode;
+        
+    m_resCode    = 0;
+    m_inLoop     = false;
+    
+    gContext->GetScreenSettings(m_xbase, m_screenWidth, m_wmult,
+                                m_ybase, m_screenHeight, m_hmult);
+
+    m_defaultBigFont = gContext->GetBigFont();
+    m_defaultMediumFont = gContext->GetMediumFont();
+    m_defaultSmallFont = gContext->GetSmallFont();
+
+    setFont(m_defaultMediumFont);
+    setCursor(QCursor(Qt::ArrowCursor));
+    
+    setFrameShape(QFrame::NoFrame);
+    setHScrollBarMode(QScrollView::AlwaysOff);
+    setVScrollBarMode(QScrollView::AlwaysOff);
+    setFixedSize(QSize(m_screenWidth, m_screenHeight));
+
+    gContext->ThemeWidget(viewport());
+    if (viewport()->paletteBackgroundPixmap())
+        m_bgPixmap = new QPixmap(*(viewport()->paletteBackgroundPixmap()));
+    else {
+        m_bgPixmap = new QPixmap(m_screenWidth, m_screenHeight);
+        m_bgPixmap->fill(viewport()->colorGroup().base());
+    }
+    viewport()->setBackgroundMode(Qt::NoBackground);
+
+    m_upArrowPix = gContext->LoadScalePixmap("scrollarrow-up.png");
+    m_dnArrowPix = gContext->LoadScalePixmap("scrollarrow-dn.png");
+    m_ltArrowPix = gContext->LoadScalePixmap("scrollarrow-left.png");
+    m_rtArrowPix = gContext->LoadScalePixmap("scrollarrow-right.png");
+
+    int wmargin = (int)(20*m_wmult);
+    int hmargin = (int)(20*m_hmult);
+    
+    if (m_upArrowPix)
+        m_upArrowRect = QRect(m_screenWidth - m_upArrowPix->width() - wmargin,
+                              hmargin,
+                              m_upArrowPix->width(), m_upArrowPix->height());
+    if (m_dnArrowPix)
+        m_dnArrowRect = QRect(m_screenWidth - m_dnArrowPix->width() - wmargin,
+                              m_screenHeight - m_dnArrowPix->height() - hmargin,
+                              m_dnArrowPix->width(), m_dnArrowPix->height());
+    if (m_rtArrowPix)
+        m_rtArrowRect = QRect(m_screenWidth - m_rtArrowPix->width() - wmargin,
+                              m_screenHeight - m_rtArrowPix->height() - hmargin,
+                              m_rtArrowPix->width(), m_rtArrowPix->height());
+    if (m_ltArrowPix)
+        m_ltArrowRect = QRect(wmargin,
+                              m_screenHeight - m_ltArrowPix->height() - hmargin,
+                              m_ltArrowPix->width(), m_ltArrowPix->height());
+    
+    m_showUpArrow  = true;
+    m_showDnArrow  = true;
+    m_showRtArrow  = false;
+    m_showLtArrow  = false;
+    
+    m_parent->attach(this);
+}
+
+MythScrollDialog::~MythScrollDialog()
+{
+    m_parent->detach(this);
+    delete m_bgPixmap;
+
+    if (m_upArrowPix)
+        delete m_upArrowPix;
+    if (m_dnArrowPix)
+        delete m_dnArrowPix;
+    if (m_ltArrowPix)
+        delete m_ltArrowPix;
+    if (m_rtArrowPix)
+        delete m_rtArrowPix;
+}
+
+void MythScrollDialog::setArea(int w, int h)
+{
+    resizeContents(w, h);
+}
+
+void MythScrollDialog::setAreaMultiplied(int areaWTimes, int areaHTimes)
+{
+    if (areaWTimes < 1 || areaHTimes < 1) {
+        std::cerr << "MythScrollDialog: invalid areaWTimes or areaHTimes"
+                  << std::endl;
+        exit(-1);
+    }
+
+    resizeContents(m_screenWidth*areaWTimes,
+                   m_screenHeight*areaHTimes);
+}
+
+int MythScrollDialog::result() const
+{
+    return m_resCode;    
+}
+
+void MythScrollDialog::show()
+{
+    QScrollView::show();    
+}
+
+void MythScrollDialog::hide()
+{
+    if (isHidden())
+        return;
+
+    // Reimplemented to exit a modal when the dialog is hidden.
+    QWidget::hide();
+    if (m_inLoop)  
+    {
+        m_inLoop = false;
+        qApp->exit_loop();
+    }
+}
+
+int MythScrollDialog::exec()
+{
+    if (m_inLoop) 
+    {
+        std::cerr << "MythScrollDialog::exec: Recursive call detected."
+                  << std::endl;
+        return -1;
+    }
+
+    setResult(0);
+
+    show();
+
+    m_inLoop = true;
+    qApp->enter_loop();
+
+    int res = result();
+
+    return res;
+}
+
+void MythScrollDialog::done(int r)
+{
+    hide();
+    setResult(r);
+    close();
+}
+
+void MythScrollDialog::accept()
+{
+    done(Accepted);
+}
+
+void MythScrollDialog::reject()
+{
+    done(Rejected);
+}
+
+void MythScrollDialog::setResult(int r)
+{
+    m_resCode = r;    
+}
+
+void MythScrollDialog::keyPressEvent(QKeyEvent *e)
+{
+    if (e->state() != 0)
+        return;
+
+    bool handled = false;
+    QStringList actions;
+
+    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
+    {
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        {
+            QString action = actions[i];
+            handled = true;
+
+            if (action == "ESCAPE")
+                reject();
+            else if (action == "UP" || action == "LEFT")
+            {
+                if (focusWidget() &&
+                    (focusWidget()->focusPolicy() == QWidget::StrongFocus ||
+                     focusWidget()->focusPolicy() == QWidget::WheelFocus))
+                {
+                }
+                else
+                    focusNextPrevChild(false);
+            }
+            else if (action == "DOWN" || action == "RIGHT")
+            {
+                if (focusWidget() &&
+                    (focusWidget()->focusPolicy() == QWidget::StrongFocus ||
+                     focusWidget()->focusPolicy() == QWidget::WheelFocus)) 
+                {
+                }
+                else
+                    focusNextPrevChild(true);
+            }
+            else
+                handled = false;
+        }
+    }
+}
+
+void MythScrollDialog::viewportPaintEvent(QPaintEvent *pe)
+{
+    if (!pe)
+        return;
+
+    QRect   er(pe->rect());
+    QRegion reg(er);
+    
+    paintEvent(reg, er.x()+contentsX(), er.y()+contentsY(),
+               er.width(), er.height());
+
+    if (m_scrollMode == HScroll) {
+        if (m_ltArrowPix && m_showLtArrow) {
+            QPixmap pix(m_ltArrowRect.size());
+            bitBlt(&pix, 0, 0, m_bgPixmap, m_ltArrowRect.x(), m_ltArrowRect.y());
+            bitBlt(&pix, 0, 0, m_ltArrowPix);
+            bitBlt(viewport(), m_ltArrowRect.x(), m_ltArrowRect.y(), &pix);
+            reg -= m_ltArrowRect;
+        }
+        if (m_rtArrowPix && m_showRtArrow) {
+            QPixmap pix(m_rtArrowRect.size());
+            bitBlt(&pix, 0, 0, m_bgPixmap, m_rtArrowRect.x(), m_rtArrowRect.y());
+            bitBlt(&pix, 0, 0, m_rtArrowPix);
+            bitBlt(viewport(), m_rtArrowRect.x(), m_rtArrowRect.y(), &pix);
+            reg -= m_rtArrowRect;
+        }
+    }
+    else {
+        if (m_upArrowPix && m_showUpArrow) {
+            QPixmap pix(m_upArrowRect.size());
+            bitBlt(&pix, 0, 0, m_bgPixmap, m_upArrowRect.x(), m_upArrowRect.y());
+            bitBlt(&pix, 0, 0, m_upArrowPix);
+            bitBlt(viewport(), m_upArrowRect.x(), m_upArrowRect.y(), &pix);
+            reg -= m_upArrowRect;
+        }
+        if (m_dnArrowPix && m_showDnArrow) {
+            QPixmap pix(m_dnArrowRect.size());
+            bitBlt(&pix, 0, 0, m_bgPixmap, m_dnArrowRect.x(), m_dnArrowRect.y());
+            bitBlt(&pix, 0, 0, m_dnArrowPix);
+            bitBlt(viewport(), m_dnArrowRect.x(), m_dnArrowRect.y(), &pix);
+            reg -= m_dnArrowRect;
+        }
+    }
+
+    QPainter p(viewport());
+    p.setClipRegion(reg);
+    p.drawPixmap(0, 0, *m_bgPixmap, 0, 0, viewport()->width(),
+                 viewport()->height());
+    p.end();    
+}
+
+void MythScrollDialog::paintEvent(QRegion&, int , int , int , int )
+{
+}
+
+void MythScrollDialog::setContentsPos(int x, int y)
+{
+    viewport()->setUpdatesEnabled(false);
+    QScrollView::setContentsPos(x,y);
+    viewport()->setUpdatesEnabled(true);
+    updateContents();
+}
+    
+      
