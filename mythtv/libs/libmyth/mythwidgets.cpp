@@ -836,8 +836,33 @@ void MythListView::keyPressEvent(QKeyEvent *e)
     {
         switch(e->key())
         {
-            case 'd': case 'D': emit deletePressed(currentItem()); return;
-            case 'p': case 'P': emit playPressed(currentItem()); return;
+            case 'd': 
+            case 'D': 
+            
+                emit deletePressed(currentItem()); 
+                return;
+                
+            case 'p': 
+            case 'P': 
+                emit playPressed(currentItem()); 
+                return;
+                
+        }
+        if(e->key() == Key_Up && currentItem() == firstChild())
+        {
+            //
+            //  Key_Up at top of list allows
+            //  focus to move to other widgets
+            //
+            focusNextPrevChild(false);
+        }
+        if(e->key() == Key_Down && currentItem() == lastItem())
+        {
+            //
+            //  Key_Down at bottom of list allows
+            //  focus to move to other widgets
+            //
+            focusNextPrevChild(true);
         }
         if (e->key() == Key_Space && fixspace)
         {
