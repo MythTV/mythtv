@@ -10,6 +10,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <time.h>
+#include <ctype.h>
 #include <string.h>
 #include <stdio.h>
 #include <sys/timeb.h>
@@ -185,6 +186,8 @@ int issue_modem_cmd(int fd, char *cmd_string)
 
    if (strstr(buffer, "OK") != 0)
      return (0);
+
+   sleep(1);
  }
  
  return (-1);
@@ -350,21 +353,53 @@ char *extract_cid_field(char *buffer, int len, char *field_name, int *field_len)
   }
 }
 
+int getNum(char *dest, int dsize, const char *src, int ssize)
+{
+  int ret = 0;
+
+  if( dest && src )
+  {
+    int i, j;
+    memset(dest, 0, dsize);
+    for(i=0,j=0; i<ssize && i<dsize; i++)
+    {
+      if( isspace(src[i]) )
+      {
+        break;
+      }
+      else if( isdigit(src[i]) )
+      {
+        dest[j++] = src[i];
+      }
+    }
+    ret = j;
+  }
+
+  return ret;
+}
+
 /*
 ** Data comes from modem (when enabled via AT#CID=1) as
 ** DATE = 0915
 ** TIME = 1700
 ** NMBR = 3015551212
 ** NAME = SCHMOE JOE
+**
+** For the ZyXel 1496E+
+** TIME: 09-15 17:00
+** CALLER NAME: SCHMOE JOE
+** CALLER NUMBER: 3015551212
+**
+** init string is: "AT E0 L0 M0 N0 Q0 V1 X7 &C1 &H3 S0=0 S7=45 S13.2=1 S40.2=1 S40.3=1 S40.4=1"
 */
 
 int checkfor_cid_info(char *buffer, int len, CID_Info *cid_info)
 {
-  char *field_ptr;
-  int field_len;
+  char *field_ptr, date[8], time[8];
+  int field_len, time_len = 0;
 
-  field_ptr = extract_cid_field(buffer, len, "NAME = ", &field_len);
-  if (field_ptr)
+  if( (field_ptr = extract_cid_field(buffer, len, "NAME = ", &field_len)) 
+   || (field_ptr = extract_cid_field(buffer, len, "CALLER NAME: ", &field_len)) )
   {
     memset(cid_info->name, 0, sizeof(cid_info->name));
     memcpy(cid_info->name, field_ptr, field_len);
@@ -382,8 +417,8 @@ int checkfor_cid_info(char *buffer, int len, CID_Info *cid_info)
     return 0;
   }
 
-  field_ptr = extract_cid_field(buffer, len, "NMBR = ", &field_len);
-  if (field_ptr)
+  if( (field_ptr = extract_cid_field(buffer, len, "NMBR = ", &field_len))
+   || (field_ptr = extract_cid_field(buffer, len, "CALLER NUMBER: ", &field_len)) )
   {
     memset(cid_info->number, 0, sizeof(cid_info->number));
     memcpy(cid_info->number, field_ptr, field_len);
@@ -401,7 +436,23 @@ int checkfor_cid_info(char *buffer, int len, CID_Info *cid_info)
     return 0;
   }
 
-  field_ptr = extract_cid_field(buffer, len, "DATE = ", &field_len);
+  if( (field_ptr = extract_cid_field(buffer, len, "TIME: ", &field_len)) )
+  {
+    int date_len;
+    date_len = getNum(date, sizeof(date), field_ptr, field_len);
+    time_len = getNum(time, sizeof(time), &field_ptr[date_len+2], field_len-date_len-2);
+    field_ptr = &date[0];
+    field_len = date_len;
+    if( verbose )
+    {
+      printf( "Date(%d): %s\nTime(%d): %s\nField_ptr: %s\n",
+        field_len, date, time_len, time, field_ptr );
+    }
+  }
+  else
+  {
+    field_ptr = extract_cid_field(buffer, len, "DATE = ", &field_len);
+  }
   if (field_ptr)
   {
     memset(cid_info->date, 0, sizeof(cid_info->date));
@@ -420,7 +471,15 @@ int checkfor_cid_info(char *buffer, int len, CID_Info *cid_info)
     return 0;
   }
 
-  field_ptr = extract_cid_field(buffer, len, "TIME = ", &field_len);
+  if (time_len)
+  {
+    field_ptr = &time[0];
+    field_len = time_len;
+  }
+  else
+  {
+    field_ptr = extract_cid_field(buffer, len, "TIME = ", &field_len);
+  }
   if (field_ptr)
   {
     memset(cid_info->time, 0, sizeof(cid_info->time));
@@ -500,6 +559,14 @@ int init_modem(int *fd)
     printf("error open modem\n");
     return -1;
   }
+
+  if (write(*fd, "+++", 3) != 3)
+  {
+    printf("error init modem\n");
+    return -1;
+  }
+
+  sleep(2);
   
   if (issue_modem_cmd(*fd, "AT\r") < 0)
   {
