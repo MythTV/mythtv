@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-11-04, v2.89
+<date>2003-11-09, v2.90
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1024,7 +1024,7 @@ url="http://www.mythtv.org/mailman/listinfo/mythtv-dev/"
 name="http://www.mythtv.org/mailman/listinfo/mythtv-dev/"> mailing lists.
 
 Get XMLTV from <url url="http://xmltv.sourceforge.net"
-name="http://xmltv.sourceforge.net">.  Download version 0.5.19 if you're in
+name="http://xmltv.sourceforge.net">.  Download version 0.5.21 if you're in
 North America.
 
 <code>
@@ -1144,7 +1144,7 @@ Continuing on:
 
 <label id="untarring_xmltv">Untar the xmltv file:
 <tscreen><verb>
-$ tar -xjf xmltv-0.5.19.tar.bz2
+$ tar -xjf xmltv-0.5.21.tar.bz2
 </verb></tscreen>
 Install the xmltv prerequisites:
 
@@ -1161,7 +1161,7 @@ cpan> exit
 
 Change to the XMLTV directory and compile it:
 <tscreen><verb>
-$ cd xmltv-0.5.19
+$ cd xmltv-0.5.21
 $ perl Makefile.PL
 </verb></tscreen>
 You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes" to
@@ -5027,6 +5027,7 @@ v2.88, 2003-11-01.  Fix PVR-250 firmware version.  Geoffrey Hausheer's 10.5
 revision.  Incorporate bstoneaz suggestion on crontab location.
 v2.89, 2003-11-04.  Add note on Debian .debs, remove Cedar from authors
 section, add note on RH8, add note for Qt3.1 minimum.
+v2.90, 2003-11-09.  Update XMLTV version.
 -->
 
 <!--
