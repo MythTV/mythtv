@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-05-06, v2.31
+<date>2003-05-09, v2.32
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1858,7 +1858,7 @@ allow you to fine tune channel frequencies and specify which channels will
 be added to the database.  If you are not using the tv_grab_na grabber, you
 must use the <bf>--manual</bf> option.
 
-<bf>mythfilldatabse --file</bf> is an option if there isn't an XMLTV grabber
+<bf>mythfilldatabase --file</bf> is an option if there isn't an XMLTV grabber
 for your country, but you <bf>do</bf> have an XML formatted listings file
 created by some other program.
 
@@ -3527,6 +3527,7 @@ ivtvfwextract is a perl file.  Added "-v" to mythbackend as daemon example.
 v2.29, 2003-05-04.  Updated CVS path.
 v2.30, 2003-05-05.  Updated PVR-250 instructions.  
 v2.31, 2003-05-06.  Blackbox focus update.
+v2.32, 2003-05-09.  Speeling correction.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
