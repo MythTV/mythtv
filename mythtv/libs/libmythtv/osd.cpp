@@ -876,7 +876,10 @@ void OSD::SetTextByRegexp(const QString &name,
     if (container)
     {
         container->SetTextByRegexp(regexpMap);
-        container->DisplayFor(length * fps);
+        if (length >= 0)
+            container->DisplayFor(length * fps);
+        else
+            container->Display();
         m_setsvisible = true;
     }
     pthread_mutex_unlock(&osdlock);

@@ -2007,6 +2007,11 @@ bool NuppelVideoPlayer::EnableEdit(void)
     seekamountpos = 3;
 
     dialogname = "";
+
+    QMap<QString, QString> regexpMap;
+    m_playbackinfo->ToMap(regexpMap);
+    osd->SetTextByRegexp("editmode", regexpMap, -1);
+
     UpdateEditSlider();
     UpdateTimeDisplay();
     UpdateSeekAmount(true);
@@ -2189,7 +2194,9 @@ void NuppelVideoPlayer::UpdateSeekAmount(bool up)
         default: text = "error"; seekamount = fps; break;
     }
 
-    osd->UpdateEditText(text, QString::null, QString::null, QString::null);
+    QMap<QString, QString> regexpMap;
+    regexpMap["seekamount"] = text;
+    osd->SetTextByRegexp("editmode", regexpMap, -1);
 }
 
 void NuppelVideoPlayer::UpdateTimeDisplay(void)
@@ -2218,7 +2225,11 @@ void NuppelVideoPlayer::UpdateTimeDisplay(void)
     if (IsInDelete(framesPlayed))
         cutmarker = "cut";
 
-    osd->UpdateEditText(QString::null, cutmarker, timestr, framestr);
+    QMap<QString, QString> regexpMap;
+    regexpMap["timedisplay"] = timestr;
+    regexpMap["framedisplay"] = framestr;
+    regexpMap["cutindicator"] = cutmarker;
+    osd->SetTextByRegexp("editmode", regexpMap, -1);
 }
 
 void NuppelVideoPlayer::HandleSelect(void)
