@@ -28,12 +28,14 @@ class ServiceRequestThread : public QThread
   private:
 
     MFDServicePlugin        *parent;
+
     MFDServiceClientSocket  *client_socket;
+    bool                    do_stuff;
+    QMutex                  do_stuff_mutex;
+
     QWaitCondition          wait_condition;
-    //bool                    do_stuff;
     bool                    keep_going;
     QMutex                  keep_going_mutex;
-    QMutex                  prt_mutex;
 };
 
 
