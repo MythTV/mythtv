@@ -71,7 +71,7 @@ class Deinterlace: public CheckBoxSetting, public GlobalSetting {
 public:
     Deinterlace():
         GlobalSetting("Deinterlace") {
-        setLabel("Deinterlace playback?");
+        setLabel("Deinterlace playback");
         setValue(true);
     };
 };
@@ -100,7 +100,7 @@ class ExactSeeking: public CheckBoxSetting, public GlobalSetting {
 public:
     ExactSeeking():
         GlobalSetting("ExactSeeking") {
-        setLabel("Seek to exact frame?");
+        setLabel("Seek to exact frame");
         setValue(false);
     };
 };
@@ -119,7 +119,7 @@ class StickyKeys: public CheckBoxSetting, public GlobalSetting {
 public:
     StickyKeys():
         GlobalSetting("StickyKeys") {
-        setLabel("Sticky keys?");
+        setLabel("Sticky keys");
         setValue(false);
     };
 };
@@ -280,6 +280,25 @@ public:
     };
 };
 
+
+class GeneratePreviewPixmaps: public CheckBoxSetting, public GlobalSetting {
+public:
+    GeneratePreviewPixmaps():
+        GlobalSetting("GeneratePreviewPixmaps") {
+        setLabel("Generate thumbnail preview images for recordings");
+        setValue(false);
+    };
+};
+
+class PlaybackPreview: public CheckBoxSetting, public GlobalSetting {
+public:
+    PlaybackPreview():
+        GlobalSetting("PlaybackPreview") {
+        setLabel("Display live preview of recordings");
+        setValue(true);
+    };
+};
+
 // Theme settings
 
 class ThemeSelector: public PathSetting, public GlobalSetting {
@@ -307,25 +326,7 @@ class ThemeQt: public CheckBoxSetting, public GlobalSetting {
 public:
     ThemeQt():
         GlobalSetting("ThemeQt") {
-        setLabel("Decorate Qt widgets according to theme?");
-        setValue(true);
-    };
-};
-
-class GeneratePreviewPixmaps: public CheckBoxSetting, public GlobalSetting {
-public:
-    GeneratePreviewPixmaps():
-        GlobalSetting("GeneratePreviewPixmaps") {
-        setLabel("Generate static thumbnail pixmaps for recordings?");
-        setValue(false);
-    };
-};
-
-class PlaybackPreview: public CheckBoxSetting, public GlobalSetting {
-public:
-    PlaybackPreview():
-        GlobalSetting("PlaybackPreview") {
-        setLabel("Play the video back in a little preview window?");
+        setLabel("Decorate Qt widgets according to theme");
         setValue(true);
     };
 };
@@ -352,7 +353,7 @@ class DisplayChanNum: public CheckBoxSetting, public GlobalSetting {
 public:
     DisplayChanNum():
         GlobalSetting("DisplayChanNum") {
-        setLabel("Display channel numbers instead of names?");
+        setLabel("Display channel numbers instead of names");
         setValue(true);
     };
 };
@@ -390,7 +391,7 @@ class EPGShowTitle: public CheckBoxSetting, public GlobalSetting {
 public:
     EPGShowTitle():
         GlobalSetting("EPGShowTitle") {
-        setLabel("Display the program title at the bottom?");
+        setLabel("Display the program title at the bottom");
         setValue(true);
     };
 };
@@ -399,7 +400,7 @@ class EPGShowChannelIcon: public CheckBoxSetting, public GlobalSetting {
 public:
     EPGShowChannelIcon():
         GlobalSetting("EPGShowChannelIcon") {
-        setLabel("Display the channel icon?");
+        setLabel("Display the channel icon");
         setValue(true);
     };
 };
@@ -453,7 +454,7 @@ class EPGShowCurrentTime: public CheckBoxSetting, public GlobalSetting {
 public:
     EPGShowCurrentTime():
         GlobalSetting("EPGShowCurrentTime") {
-        setLabel("Display a line indicating the current time?");
+        setLabel("Display a line indicating the current time");
         setValue(false);
     };
 };
@@ -589,6 +590,8 @@ public:
         addChild(new DefaultTVChannel());
         addChild(new UnknownTitle());
         addChild(new UnknownCategory());
+        addChild(new GeneratePreviewPixmaps());
+        addChild(new PlaybackPreview());
     };
 };
 
