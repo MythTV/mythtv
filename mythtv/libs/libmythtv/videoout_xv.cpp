@@ -122,8 +122,6 @@ bool XvVideoOutput::Init(int width, int height, float aspect, int num_buffers,
 
     XJ_aspect = aspect;
 
-    XInitThreads();
-
     data->XJ_disp = XOpenDisplay(NULL);
     if (!data->XJ_disp) 
     {

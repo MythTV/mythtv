@@ -71,10 +71,11 @@ bool ReadStringList(QSocket *socket, QStringList &list)
         qApp->lock();
     }
 
-    qApp->unlock();
-
     QCString sizestr(8 + 1);
     socket->readBlock(sizestr.data(), 8);
+
+    qApp->unlock();
+
     sizestr = sizestr.stripWhiteSpace();
     int size = sizestr.toInt();
 
@@ -100,6 +101,11 @@ bool ReadStringList(QSocket *socket, QStringList &list)
 	    }
 	    usleep(50);
             qApp->processEvents();
+
+            if (zerocnt == 5)
+            {
+                printf("Waiting for data: %u %u\n", read, size);
+            }
         }
     }
 
