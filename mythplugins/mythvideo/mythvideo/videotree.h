@@ -23,6 +23,7 @@ class VideoTree : public MythThemedDialog
     VideoTree(MythMainWindow *parent, QSqlDatabase *ldb,
               QString window_name, QString theme_filename,
               const char *name = 0);
+   ~VideoTree();
 
     void buildVideoList();
 

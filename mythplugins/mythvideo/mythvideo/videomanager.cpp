@@ -111,6 +111,10 @@ VideoManager::~VideoManager(void)
     delete urlTimer;
 
     delete theme;
+    delete bgTransBackup;
+
+    if (curitem)
+        delete curitem;
 }
 
 void VideoManager::keyPressEvent(QKeyEvent *e)
@@ -176,11 +180,12 @@ void VideoManager::RefreshMovieList()
         {
            unsigned int idnum = query.value(0).toUInt();
 
-           //POSSIBLE MEMORY LEAK
            myData = new Metadata();
            myData->setID(idnum);
            myData->fillDataFromID(db);
            m_list.append(*myData);
+
+           delete myData;
         }
     }
     updateML = false;

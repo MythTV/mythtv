@@ -50,6 +50,11 @@ VideoTree::VideoTree(MythMainWindow *parent, QSqlDatabase *ldb,
     updateForeground();
 }
 
+VideoTree::~VideoTree()
+{
+    delete video_tree_data;
+}
+
 void VideoTree::buildVideoList()
 {
     //

@@ -60,6 +60,9 @@ VideoBrowser::VideoBrowser(QSqlDatabase *ldb,
 VideoBrowser::~VideoBrowser()
 {
     delete theme;
+    delete bgTransBackup;
+    if (curitem)
+        delete curitem;
 }
 
 void VideoBrowser::keyPressEvent(QKeyEvent *e)
@@ -116,12 +119,13 @@ void VideoBrowser::RefreshMovieList()
         {
            unsigned int idnum = query.value(0).toUInt();
 
-           //POSSIBLE MEMORY LEAK
            myData = new Metadata();
            myData->setID(idnum);
            myData->fillDataFromID(db);
            if (myData->ShowLevel() <= currentParentalLevel && myData->ShowLevel() != 0)
                m_list.append(*myData);
+
+           delete myData;
         }
     }
     updateML = false;

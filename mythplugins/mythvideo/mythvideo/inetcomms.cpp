@@ -33,6 +33,8 @@ void INETComms::newData(const QByteArray &ba, QNetworkOperation *result)
     tempstore[ba.size()] = 0;
 
     m_data += tempstore;
+
+    delete [] tempstore;
 }
 
 void INETComms::stop()
