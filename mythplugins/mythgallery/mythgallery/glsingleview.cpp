@@ -1160,7 +1160,7 @@ void GLSingleView::createTexInfo()
     if (!t.tex || !t.item)
         return;
     
-    QPixmap pix(512,512);
+    QPixmap pix(512, 512);
 
     QPainter p(&pix, this);
     p.fillRect(0,0,pix.width(),pix.height(),Qt::black);
@@ -1187,7 +1187,10 @@ void GLSingleView::createTexInfo()
                Qt::AlignLeft, info);
     p.end();
 
-    QImage tex = convertToGLFormat(pix.convertToImage());
+    QImage img(pix.convertToImage());
+    img = img.convertDepth(32);
+
+    QImage tex = convertToGLFormat(img);
 
     /* create the texture */
     glGenTextures(1, &m_texInfo);
