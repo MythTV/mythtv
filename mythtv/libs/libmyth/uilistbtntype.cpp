@@ -466,7 +466,7 @@ void UIListTreeType::MoveUp(MovementUnit unit)
     RedrawCurrent();
 }
 
-void UIListTreeType::MoveLeft(void)
+void UIListTreeType::MoveLeft(bool do_refresh)
 {
     if (curlevel > 0)
     {
@@ -479,7 +479,10 @@ void UIListTreeType::MoveLeft(void)
         currentlevel->SetActive(true);
         SetCurrentPosition();
 
-        Redraw();
+        if(do_refresh)
+        {
+            Redraw();
+        }
     }
 }
 
@@ -513,6 +516,88 @@ void UIListTreeType::calculateScreenArea()
     screen_area = r;
 
 }
+
+void UIListTreeType::GoHome()
+{
+
+    while(curlevel > 0)
+    {
+        MoveLeft(false);
+    }
+    MoveUp(MoveMax);
+    Redraw();
+}
+
+void UIListTreeType::select()
+{
+    if(currentpos)
+    {
+        emit selected(currentpos);
+    }
+/*
+        if(current_node->isSelectable())
+        {
+            active_node = current_node;
+            active_parent = active_node->getParent();
+            if(show_whole_tree)
+            {
+                emit requestUpdate(screen_corners[active_bin]);
+            }
+            else
+            {
+                refresh();
+            }
+            emit nodeSelected(current_node->getInt(), current_node->getAttributes());
+        }
+        else
+        {
+            GenericTree *first_leaf = current_node->findLeaf(tree_order);
+            if(first_leaf->isSelectable())
+            {
+                active_node = first_leaf;
+                active_parent = current_node;
+                active_parent->buildFlatListOfSubnodes(tree_order, scrambled_parents);
+                refresh();
+                emit nodeSelected(active_node->getInt(), active_node->getAttributes());
+            }
+        }
+    }
+*/
+}
+
+QStringList UIListTreeType::getRouteToCurrent()
+{
+    //
+    //  Tell whatever is asking a set of strings (node string/title values)
+    //  that make a route to the current node
+    //
+
+    QStringList route_to_current;
+    if(currentpos)
+    {
+        GenericTree *climber = currentpos;
+        route_to_current.push_front(climber->getString());
+        while( (climber = climber->getParent()) )
+        {
+            route_to_current.push_front(climber->getString());
+        }
+    }
+    return route_to_current;
+}
+
+void UIListTreeType::tryToSetCurrent(QStringList route)
+{
+    //
+    //  Given a set of node strings/titles, try and follow them all the way
+    //  into the current tree and then set the current node. If we don't
+    //  make it all the way, go as far as we can, then set the current node.
+    //
+    
+    cout << "you want me to follow this: " 
+         << route.join("/")
+         << endl;
+}
+
 
 //////////////////////////////////////////////////////////////////////////////
 

@@ -54,6 +54,7 @@ class UIListGenericTree : public GenericTree
     bool getActive(void);
 
     bool movePositionUpDown(bool flag);
+    
 
   protected:
     QPixmap *m_image;
@@ -95,11 +96,18 @@ class UIListTreeType : public UIType
     enum MovementUnit { MoveItem, MovePage, MoveMax };
     void MoveDown(MovementUnit unit = MoveItem);
     void MoveUp(MovementUnit unit = MoveItem);
-    void MoveLeft(void);
+    void MoveLeft(bool do_refresh = false);
     void MoveRight(void);
     void calculateScreenArea();
+    void GoHome();
+    void select();
+    QStringList getRouteToCurrent();
+    void tryToSetCurrent(QStringList route);
+
 
   signals:
+    
+    void selected(UIListGenericTree *item);
     void itemSelected(UIListTreeType *parent, UIListGenericTree *item);
     void itemEntered(UIListTreeType *parent, UIListGenericTree *item);
 

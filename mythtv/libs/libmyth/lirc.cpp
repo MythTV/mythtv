@@ -4,6 +4,8 @@
 #include <cstdio>
 #include <cerrno>
 #include <sys/wait.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include "mythcontext.h"
 
