@@ -108,7 +108,7 @@ public:
     SRPreRoll(const ScheduledRecording& parent):
         SpinBoxSetting(-60, 60, 10, true),
         SRSetting(parent, "preroll") {
-        setLabel(QObject::tr("Pre-Roll Minutes"));
+        setLabel(QObject::tr("Start Early (minutes)"));
     };
 };
 
@@ -117,7 +117,7 @@ public:
     SRPostRoll(const ScheduledRecording& parent):
         SpinBoxSetting(-60, 240, 10, true),
         SRSetting(parent, "postroll") {
-        setLabel(QObject::tr("Post-Roll Minutes"));
+        setLabel(QObject::tr("End Late   (minutes)"));
     };
 };
 
