@@ -18,6 +18,12 @@
   V4L driver, and not MythTV.  If you're using ALSA, make sure to have the 
   'Capture' mixer enabled and non-muted and at a decent volume.
 
+) The audio and video are not synchronised by a small but varying amount
+- The way that the audio and video are synchronised relies on the realtime
+  reporting capability of the sound card that you are using.  This requires
+  that the sound driver that you use supports the DSP_CAP_REALTIME capability.
+  Older versions of Alsa (0.5) don't support this, newer ones (0.9) do.
+
 ) I get an error when compiling about 'mkspecs'?
 - You need to set QTDIR.  On Debian, it should be /usr/share/qt
   On Mandrake, it should be /usr/lib/qt3

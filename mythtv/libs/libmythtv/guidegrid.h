@@ -73,8 +73,10 @@ class GuideGrid : public QDialog
 
     QBrush getBGColor(const QString &category);
     
-    QFont *m_font;
-    QFont *m_largerFont;
+    QFont *m_timeFont;
+    QFont *m_chanFont;
+    QFont *m_progFont;
+    QFont *m_titleFont;
 
     vector<ChannelInfo> m_channelInfos;
     TimeInfo *m_timeInfos[DISPLAY_TIMES];

@@ -125,7 +125,7 @@ bool NuppelVideoPlayer::GetPause(void)
  
 void NuppelVideoPlayer::InitSound(void)
 {
-    int bits = 16, stereo = 1, speed = audio_samplerate;
+    int bits = 16, stereo = 1, speed = audio_samplerate, caps;
 
     if (usingextradata)
     {
@@ -170,6 +170,13 @@ void NuppelVideoPlayer::InitSound(void)
         close(audiofd);
         audiofd = -1;
         return;
+    }
+
+    if (ioctl(audiofd, SNDCTL_DSP_GETCAPS, &caps) >= 0 && 
+        !(caps & DSP_CAP_REALTIME))
+    {
+        cerr << "audio device cannot report buffer state accurately,\n"
+             << "audio/video sync will be bad, continuing anyway\n";
     }
 }
 
@@ -667,12 +674,13 @@ int NuppelVideoPlayer::GetAudiotime(void)
        from the audio thread, and then call this from the video thread. */
     int ret;
     struct timeval now;
-    gettimeofday(&now, NULL);
 
     if (audiotime == 0)
         return 0;
 
     pthread_mutex_lock(&avsync_lock);
+
+    gettimeofday(&now, NULL);
 
     ret = audiotime;
  
@@ -1105,7 +1113,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 
         if (delay > 1000000)
         {
-            cout << delay << endl;
+            cout << "Delaying to next trigger: " << delay << endl;
             delay = 100000;
         }
 

@@ -86,8 +86,25 @@ GuideGrid::GuideGrid(const QString &channel, QWidget *parent, const char *name)
         setPalette(QPalette(bgcolor));
     }
 
-    m_font = new QFont("Arial", (int)(11 * hmult), QFont::Bold);
-    m_largerFont = new QFont("Arial", (int)(13 * hmult), QFont::Bold);
+    int timefontsize = globalsettings->GetNumSetting("EPGTimeFontSize");
+    if (timefontsize == 0) 
+        timefontsize = 13;
+    m_timeFont = new QFont("Arial", (int)(timefontsize * hmult), QFont::Bold);
+
+    int chanfontsize = globalsettings->GetNumSetting("EPGChanFontSize");
+    if (chanfontsize == 0) 
+        chanfontsize = 13;
+    m_chanFont = new QFont("Arial", (int)(chanfontsize * hmult), QFont::Bold);
+
+    int progfontsize = globalsettings->GetNumSetting("EPGProgFontSize");
+    if (progfontsize == 0) 
+        progfontsize = 11;
+    m_progFont = new QFont("Arial", (int)(progfontsize * hmult), QFont::Bold);
+
+    int titlefontsize = globalsettings->GetNumSetting("EPGTitleFontSize");
+    if (titlefontsize == 0) 
+        titlefontsize = 19;
+    m_titleFont = new QFont("Arial", (int)(titlefontsize * hmult), QFont::Bold);
 
     m_originalStartTime = QDateTime::currentDateTime();
 
@@ -106,18 +123,18 @@ GuideGrid::GuideGrid(const QString &channel, QWidget *parent, const char *name)
             m_programInfos[y][x] = NULL;
     }
 
-    QTime clock = QTime::currentTime();
-    clock.start();
+    //QTime clock = QTime::currentTime();
+    //clock.start();
     fillTimeInfos();
-    int filltime = clock.elapsed();
-    clock.restart();
+    //int filltime = clock.elapsed();
+    //clock.restart();
     fillChannelInfos();
-    int fillchannels = clock.elapsed();
-    clock.restart();
+    //int fillchannels = clock.elapsed();
+    //clock.restart();
     fillProgramInfos();
-    int fillprogs = clock.elapsed();
+    //int fillprogs = clock.elapsed();
 
-    cout << filltime << " " << fillchannels << " " << fillprogs << endl;
+    //cout << filltime << " " << fillchannels << " " << fillprogs << endl;
 
     QAccel *accel = new QAccel(this);
     accel->connectItem(accel->insertItem(Key_Left), this, SLOT(cursorLeft()));
@@ -404,10 +421,10 @@ void GuideGrid::paintDate(QPainter *p)
     QPainter tmp(&pix);
     tmp.setBrush(fgcolor);
     tmp.setPen(QPen(fgcolor, (int)(2 * wmult)));
-    tmp.setFont(*m_largerFont);
+    tmp.setFont(*m_timeFont);
 
     QString date = m_currentStartTime.toString("ddd");
-    QFontMetrics lfm(*m_largerFont);
+    QFontMetrics lfm(*m_timeFont);
     int datewidth = lfm.width(date);
     int dateheight = lfm.height();
 
@@ -437,7 +454,7 @@ void GuideGrid::paintChannels(QPainter *p)
     QPainter tmp(&pix);
     tmp.setBrush(fgcolor);
     tmp.setPen(QPen(fgcolor, (int)(2 * wmult)));
-    tmp.setFont(*m_font);
+    tmp.setFont(*m_chanFont);
 
     int ydifference = cr.height() / DISPLAY_CHANS;
 
@@ -463,8 +480,8 @@ void GuideGrid::paintChannels(QPainter *p)
             }
         }
 
-        tmp.setFont(*m_largerFont);
-        QFontMetrics lfm(*m_largerFont);
+        tmp.setFont(*m_chanFont);
+        QFontMetrics lfm(*m_chanFont);
         int width = lfm.width(chinfo->chanstr);
         int bheight = lfm.height();
        
@@ -472,8 +489,8 @@ void GuideGrid::paintChannels(QPainter *p)
         tmp.drawText((cr.width() - width) / 2, 
                      ydifference * y + yoffset + bheight, chinfo->chanstr);
 
-        tmp.setFont(*m_font);
-        QFontMetrics fm(*m_font);
+        tmp.setFont(*m_progFont);
+        QFontMetrics fm(*m_progFont);
         width = fm.width(chinfo->callsign);
         int height = fm.height();
         tmp.drawText((cr.width() - width) / 2, 
@@ -500,7 +517,7 @@ void GuideGrid::paintTimes(QPainter *p)
     QPainter tmp(&pix);
     tmp.setBrush(fgcolor);
     tmp.setPen(QPen(fgcolor, (int)(2 * wmult)));
-    tmp.setFont(*m_largerFont);
+    tmp.setFont(*m_timeFont);
 
     int xdifference = (int)(tr.width() / DISPLAY_TIMES); 
 
@@ -519,7 +536,7 @@ void GuideGrid::paintTimes(QPainter *p)
         {
             TimeInfo *tinfo = m_timeInfos[x];
 
-            QFontMetrics fm(*m_largerFont);
+            QFontMetrics fm(*m_timeFont);
             int width = fm.width(tinfo->usertime);
             int height = fm.height();
 
@@ -587,7 +604,7 @@ void GuideGrid::paintPrograms(QPainter *p)
     QPainter tmp(&pix);
     tmp.setPen(QPen(fgcolor, (int)(2 * wmult)));
 
-    tmp.setFont(*m_largerFont);
+    tmp.setFont(*m_progFont);
 
     int ydifference = pr.height() / DISPLAY_CHANS;
     int xdifference = pr.width() / DISPLAY_TIMES;
@@ -618,7 +635,7 @@ void GuideGrid::paintPrograms(QPainter *p)
             int spread = 1;
             if (pginfo->startts != lastprog)
             {
-                QFontMetrics fm(*m_largerFont);
+                QFontMetrics fm(*m_progFont);
                 int height = fm.height();
 
                 if (pginfo->spread != -1)
@@ -762,10 +779,10 @@ void GuideGrid::paintTitle(QPainter *p)
     QPainter tmp(&pix);
     tmp.setBrush(fgcolor);
     tmp.setPen(QPen(fgcolor, (int)(2 * wmult)));
-    tmp.setFont(QFont("Arial", (int)(19 * hmult), QFont::Bold));
+    tmp.setFont(*m_titleFont);
 
     ProgramInfo *pginfo = m_programInfos[m_currentRow][m_currentCol];
-    QFontMetrics lfm(*m_largerFont);
+    QFontMetrics lfm(*m_titleFont);
     int titleheight = lfm.height();
 
     QString info = pginfo->title;

@@ -39,7 +39,9 @@ You also need v4l setup and working properly.  If xawtv works, this should, too.
 
 Hardware wise, you need a computer.  Really.  Helps to have a fast one, too.
 You also need a video card with working Xv support (to scale and convert 
-colorspaces), and a TV tuner card.
+colorspaces), and a TV tuner card.  If you're using ALSA for sound support 
+(which _is_ the recommended thing to do), you should be using version 0.9, not
+0.5.
 
 Ok.  Once you've got all the prerequisites installed, on to compiling.
 First of all, do a quick './configure' to configure libavcodec.  Then just type

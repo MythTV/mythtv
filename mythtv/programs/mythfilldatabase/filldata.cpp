@@ -2,6 +2,7 @@
 #include <qdom.h>
 #include <qfile.h>
 #include <qstring.h>
+#include <qregexp.h>
 #include <qstringlist.h>
 #include <qvaluelist.h>
 #include <qmap.h>
@@ -546,6 +547,13 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
 void clearDBAtOffset(int offset, int chanid)
 {
     int nextoffset = offset + 1;
+
+    if (offset == -1)
+    {
+        offset = 0;
+        nextoffset = 10;
+    }
+
     QString querystr;
     querystr.sprintf("DELETE FROM program WHERE starttime >= "
                      "DATE_ADD(CURRENT_DATE, INTERVAL %d DAY) "
@@ -599,6 +607,10 @@ void handlePrograms(int id, int offset, QMap<QString,
         QValueList<ProgInfo>::iterator i = sortlist->begin();
         for (; i != sortlist->end(); i++)
         {
+            (*i).title.replace(QRegExp("\""), QString("\\\""));
+            (*i).subtitle.replace(QRegExp("\""), QString("\\\""));
+            (*i).desc.replace(QRegExp("\""), QString("\\\""));
+
             querystr.sprintf("INSERT INTO program (chanid,starttime,endtime,"
                              "title,subtitle,description,category) VALUES(%d,"
                              " %s, %s, \"%s\", \"%s\", \"%s\", \"%s\")", 
@@ -607,7 +619,12 @@ void handlePrograms(int id, int offset, QMap<QString,
                              (*i).subtitle.utf8().data(), 
                              (*i).desc.utf8().data(), 
                              (*i).category.utf8().data());
-            query.exec(querystr.utf8().data());
+
+            if (!query.exec(querystr.utf8().data()))
+            {
+                cerr << "Program insertion failed:" << endl;
+                cerr << querystr.utf8().data() << endl;
+            }
         }
     }
 }

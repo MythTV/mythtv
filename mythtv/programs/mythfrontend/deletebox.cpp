@@ -163,7 +163,7 @@ DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
 
     QLabel *sublabel = new QLabel("Episode: ", this);
     subtitle = new QLabel(" ", this);
-    subtitle->setAlignment(Qt::WordBreak | Qt::AlignLeft | Qt::AlignTop);
+    subtitle->setAlignment(Qt::AlignLeft | Qt::AlignTop);
     QLabel *desclabel = new QLabel("Description: ", this);
     description = new QLabel(" ", this);
     description->setAlignment(Qt::WordBreak | Qt::AlignLeft | Qt::AlignTop);

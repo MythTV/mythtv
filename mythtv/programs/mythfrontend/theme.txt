@@ -31,6 +31,13 @@ int DisplayChanNum=1
 # Do we display the program title at the bottom of the EPG or not?
 # (default to yes)
 int EPGShowTitle=1
+#
+# Sizes of the fonts for the EPG
+int EPGTimeFontSize=13
+int EPGChanFontSize=13
+int EPGProgFontSize=11
+int EPGTitleFontSize=19
+#
 # Display order of channels.  Meaningful values are chanid, callsign, and 
 # "channum + 0".
 str ChannelSorting=channum + 0
