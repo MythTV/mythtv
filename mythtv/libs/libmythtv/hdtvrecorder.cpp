@@ -93,7 +93,8 @@ HDTVRecorder::HDTVRecorder()
 
     keyframedist = 30;
     gopset = false;
-    pict_start_is_gop = false;
+    m_in_mpg_headers = false;
+    m_header_sync = 0;
 
     firstgoppos = 0;
 
@@ -306,35 +307,37 @@ void HDTVRecorder::FindKeyframes(const unsigned char *buffer,
         if (payload_unit_start_indicator)
         {
             // packet contains start of PES packet
-
+	    m_in_mpg_headers = true;
+	    m_header_sync = 0;
+	}
+	if (m_in_mpg_headers) {
             // Scan for PES header codes; specifically picture_start
             // and group_start (of_pictures).  These should be within 
             // this first TS packet of the PES packet.
             //   00 00 01 00: picture_start_code
             //   00 00 01 B8: group_start_code
             //   (there are others that we don't care about)
-            int sync = 0;
             payload_size = packet_end_pos - pkt_start;
-            for (int i=pkt_start; i < packet_end_pos; i++)
+            for (int i=pkt_start; i < packet_end_pos && m_in_mpg_headers; i++)
             {
                 char k = buffer[i];
-                switch (sync)
+                switch (m_header_sync)
                 {
                 case 0:
                     if (k == 0x00)
-                        sync = 1;
+                        m_header_sync = 1;
                     break;
                 case 1:
                     if (k == 0x00)
-                        sync = 2;
+                        m_header_sync = 2;
                     else
-                        sync = 0;
+                        m_header_sync = 0;
                     break;
                 case 2:
                     if (k != 0x01)
                     {
                         if (k != 0x00)
-                            sync = 0;
+                            m_header_sync = 0;
                     }
                     else 
                     {
@@ -343,18 +346,8 @@ void HDTVRecorder::FindKeyframes(const unsigned char *buffer,
                             if (gopset || firstgoppos > 0)
                                 framesWritten++;
                             framesSeen++;
-                            if (framesSeen >= 30 && firstgoppos <= 0)
-                            {
-                                // seen 30 frames with no GOP; assume that
-                                // each GOP only contains one I-frame, and
-                                // treat the I-frame as the beginning of the
-                                // GOP.
-                                pict_start_is_gop = true;
-                            }
                         }
-                        if (buffer[i+1] == 0xB8 || 
-                            (pict_start_is_gop && buffer[i+1] == 0x00 &&
-                             (framesSeen) % 15 == 0))
+                        if (buffer[i+1] == 0xB8)
                         {
                             // group_of_pictures
                             int frameNum = framesWritten - 1;
@@ -394,7 +387,13 @@ void HDTVRecorder::FindKeyframes(const unsigned char *buffer,
                             }
                             
                         }
-                        sync = 0;
+			if (buffer[i+1] >= 0x01 && buffer[i+1] <= 0xAF)
+			{
+			    // video slice ... end of "interesting"
+			    // headers
+			    m_in_mpg_headers = false;
+			}
+                        m_header_sync = 0;
                     }
                     break;
                 }
