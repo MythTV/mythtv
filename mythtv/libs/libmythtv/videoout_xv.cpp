@@ -80,6 +80,38 @@ XvVideoOutput::~XvVideoOutput()
     delete data;
 }
 
+void XvVideoOutput::InputChanged(int width, int height, float aspect,
+                                 int num_buffers, unsigned char **out_buffers)
+{
+    if (XJ_started)
+    {
+        XJ_started = false;
+        XJ_width = width;
+        XJ_height = height;
+        XJ_aspect = aspect;
+
+        if (xv_port != -1)
+        {
+            DeleteXvBuffers();
+            CreateXvBuffers(num_buffers, out_buffers);
+            XFlush(data->XJ_disp);
+        }
+        else if (use_shm)
+        {
+            DeleteShmBuffers();
+            CreateShmBuffers(num_buffers, out_buffers);
+        }
+        else
+        {
+            DeleteXBuffers();
+            CreateShmBuffers(num_buffers, out_buffers);
+        }
+
+        MoveResize();
+        XJ_started = true;
+    }
+}
+
 int XvVideoOutput::GetRefreshRate(void)
 {
     if (!XJ_started)
@@ -312,87 +344,18 @@ bool XvVideoOutput::Init(int width, int height, float aspect, int num_buffers,
 
     if (xv_port != -1 )
     {
-        data->XJ_SHMInfo = new XShmSegmentInfo[num_buffers];
-        for (int i = 0; i < num_buffers; i++)
-        {
-            XvImage *image = XvShmCreateImage(data->XJ_disp, xv_port,
-                                              colorid, 0, XJ_width, XJ_height, 
-                                              &(data->XJ_SHMInfo)[i]);
-            (data->XJ_SHMInfo)[i].shmid = shmget(IPC_PRIVATE, image->data_size,
-                                             IPC_CREAT|0777);
-            if ((data->XJ_SHMInfo)[i].shmid < 0)
-            {
-                perror("shmget failed:");
-                return false;
-            }
- 
-            image->data = (data->XJ_SHMInfo)[i].shmaddr = 
-                             (char *)shmat((data->XJ_SHMInfo)[i].shmid, 0, 0);
-            // mark for delete immediately - it won't be removed until detach
-            shmctl((data->XJ_SHMInfo)[i].shmid, IPC_RMID, 0);
-
-            data->buffers[(unsigned char *)image->data] = image;
-            out_buffers[i] = (unsigned char *)image->data;
-
-            (data->XJ_SHMInfo)[i].readOnly = False;
-
-            XShmAttach(data->XJ_disp, &(data->XJ_SHMInfo)[i]);
-            XSync(data->XJ_disp, 0);
-        }
+        if (!CreateXvBuffers(num_buffers, out_buffers))
+            return false;
     }
     else if (use_shm)
     {
-        data->XJ_SHMInfo = new XShmSegmentInfo[num_buffers];
-        for (int i = 0; i < num_buffers; i++)
-        {
-            XImage *image = XShmCreateImage(data->XJ_disp,
-                                    DefaultVisual(data->XJ_disp, XJ_screen_num),
-                                    XJ_depth, ZPixmap, 0,
-                                    &(data->XJ_SHMInfo)[i],
-                                    curw, curh);
-            (data->XJ_SHMInfo)[i].shmid = shmget(IPC_PRIVATE,
-                                    image->bytes_per_line * image->height,
-                                    IPC_CREAT|0777);
-            if ((data->XJ_SHMInfo)[i].shmid < 0)
-            {
-                perror("shmget failed:");
-                return false;
-            }
- 
-            image->data = (data->XJ_SHMInfo)[i].shmaddr = 
-                             (char *)shmat((data->XJ_SHMInfo)[i].shmid, 0, 0);
-            // mark for delete immediately - it won't be removed until detach
-            shmctl((data->XJ_SHMInfo)[i].shmid, IPC_RMID, 0);
-
-            data->xbuffers[(unsigned char *)image->data] = image;
-            out_buffers[i] = (unsigned char *)image->data;
-
-            (data->XJ_SHMInfo)[i].readOnly = False;
-
-            if (!XShmAttach(data->XJ_disp, &(data->XJ_SHMInfo)[i]))
-            {
-                perror("XShmAttach() failed:");
-                return false;
-            }
-            XSync(data->XJ_disp, 0);
-        }
+        if (!CreateShmBuffers(num_buffers, out_buffers))
+            return false;
     }
     else
     {
-        for (int i = 0; i < num_buffers; i++)
-        {
-            char *sbuf = new char[XJ_depth / 8 * XJ_screenwidth * XJ_screenheight];
-            XImage *image = XCreateImage(data->XJ_disp,
-                                        DefaultVisual(data->XJ_disp, 0),
-                                        XJ_depth, ZPixmap, 0, sbuf,
-                                        curw, curh,
-                                        XJ_depth, 0);
-
-            data->xbuffers[(unsigned char *)image->data] = image;
-            out_buffers[i] = (unsigned char *)image->data;
-
-            XSync(data->XJ_disp, 0);
-        }
+        if (!CreateXBuffers(num_buffers, out_buffers))
+            return false;
     }
 
     XSetErrorHandler(old_handler);
@@ -404,14 +367,115 @@ bool XvVideoOutput::Init(int width, int height, float aspect, int num_buffers,
 
     MoveResize();
   
-    XJ_started = 1;
+    XJ_started = true;
 
-    if ((xv_port != -1) &&
-        (colorid != GUID_I420_PLANAR))
+    return true;
+}
+
+bool XvVideoOutput::CreateXvBuffers(int num_buffers, 
+                                    unsigned char **out_buffers)
+{
+    data->XJ_SHMInfo = new XShmSegmentInfo[num_buffers];
+    for (int i = 0; i < num_buffers; i++)
     {
-        scratchspace = new unsigned char[width * height * 3 / 2];
+        XvImage *image = XvShmCreateImage(data->XJ_disp, xv_port,
+                                          colorid, 0, XJ_width, XJ_height,
+                                          &(data->XJ_SHMInfo)[i]);
+
+        (data->XJ_SHMInfo)[i].shmid = shmget(IPC_PRIVATE, image->data_size,
+                                             IPC_CREAT|0777);
+
+        if ((data->XJ_SHMInfo)[i].shmid < 0)
+        {
+            perror("shmget failed:");
+            return false;
+        }
+
+        image->data = (data->XJ_SHMInfo)[i].shmaddr =
+                               (char *)shmat((data->XJ_SHMInfo)[i].shmid, 0, 0);
+
+        // mark for delete immediately - it won't be removed until detach
+        shmctl((data->XJ_SHMInfo)[i].shmid, IPC_RMID, 0);
+
+        data->buffers[(unsigned char *)image->data] = image;
+        out_buffers[i] = (unsigned char *)image->data;
+
+        (data->XJ_SHMInfo)[i].readOnly = False;
+
+        XShmAttach(data->XJ_disp, &(data->XJ_SHMInfo)[i]);
+        XSync(data->XJ_disp, 0);
     }
 
+    if (colorid != GUID_I420_PLANAR)
+    {
+        scratchspace = new unsigned char[XJ_width * XJ_height * 3 / 2];
+    }
+
+    return true;
+}
+
+bool XvVideoOutput::CreateShmBuffers(int num_buffers, 
+                                     unsigned char **out_buffers)
+{
+    data->XJ_SHMInfo = new XShmSegmentInfo[num_buffers];
+
+    for (int i = 0; i < num_buffers; i++)
+    {
+        XImage *image = XShmCreateImage(data->XJ_disp,
+                                        DefaultVisual(data->XJ_disp, 
+                                                      XJ_screen_num),
+                                        XJ_depth, ZPixmap, 0, 
+                                        &(data->XJ_SHMInfo)[i],
+                                        curw, curh);
+
+        (data->XJ_SHMInfo)[i].shmid = shmget(IPC_PRIVATE, image->bytes_per_line
+                                             * image->height, IPC_CREAT|0777);
+
+        if ((data->XJ_SHMInfo)[i].shmid < 0)
+        {
+            perror("shmget failed:");
+            return false;
+        }
+
+        image->data = (data->XJ_SHMInfo)[i].shmaddr =
+                           (char *)shmat((data->XJ_SHMInfo)[i].shmid, 0, 0);
+
+        // mark for delete immediately - it won't be removed until detach
+        shmctl((data->XJ_SHMInfo)[i].shmid, IPC_RMID, 0);
+
+        data->xbuffers[(unsigned char *)image->data] = image;
+        out_buffers[i] = (unsigned char *)image->data;
+
+        (data->XJ_SHMInfo)[i].readOnly = False;
+
+        if (!XShmAttach(data->XJ_disp, &(data->XJ_SHMInfo)[i]))
+        {
+            perror("XShmAttach() failed:");
+            return false;
+        }
+
+        XSync(data->XJ_disp, 0);
+    }
+    return true;
+}
+
+bool XvVideoOutput::CreateXBuffers(int num_buffers, unsigned char **out_buffers)
+{
+    for (int i = 0; i < num_buffers; i++)
+    {
+        char *sbuf = new char[XJ_depth / 8 * XJ_screenwidth * XJ_screenheight];
+
+        XImage *image = XCreateImage(data->XJ_disp,
+                                        DefaultVisual(data->XJ_disp, 0),
+                                        XJ_depth, ZPixmap, 0, sbuf,
+                                        curw, curh,
+                                        XJ_depth, 0);
+
+        data->xbuffers[(unsigned char *)image->data] = image;
+        out_buffers[i] = (unsigned char *)image->data;
+
+        XSync(data->XJ_disp, 0);
+    }
     return true;
 }
 
@@ -421,57 +485,72 @@ void XvVideoOutput::Exit(void)
     {
         XJ_started = false;
 
-        int i = 0;
-
         if ( xv_port != -1 )
         {
-            map<unsigned char *, XvImage *>::iterator iter =
-                data->buffers.begin();
-            for(; iter != data->buffers.end(); ++iter, ++i) 
-            {
-                XShmDetach(data->XJ_disp, &(data->XJ_SHMInfo)[i]);
-                if ((data->XJ_SHMInfo)[i].shmaddr)
-                    shmdt((data->XJ_SHMInfo)[i].shmaddr);
-                XFree(iter->second);
-            }
-
-            delete [] (data->XJ_SHMInfo);
-
-            if (scratchspace)
-                delete [] scratchspace;
-
+            DeleteXvBuffers();
             XvUngrabPort(data->XJ_disp, xv_port, CurrentTime);
         }
         else if (use_shm)
-        {
-            map<unsigned char *, XImage *>::iterator iter =
-                data->xbuffers.begin();
-            for(; iter != data->xbuffers.end(); ++iter, ++i) 
-            {
-                XShmDetach(data->XJ_disp, &(data->XJ_SHMInfo)[i]);
-                if ((data->XJ_SHMInfo)[i].shmaddr)
-                    shmdt((data->XJ_SHMInfo)[i].shmaddr);
-                if ((data->XJ_SHMInfo)[i].shmid > 0)
-                    shmctl((data->XJ_SHMInfo)[i].shmid, IPC_RMID, 0);
-                XFree(iter->second);
-            }
-
-            delete [] (data->XJ_SHMInfo);
-        }
+            DeleteShmBuffers();
         else
-        {
-            // XXX Check this later -- XDestroyImage instead?
-            map<unsigned char *, XImage *>::iterator iter =
-                data->xbuffers.begin();
-            for(; iter != data->xbuffers.end(); ++iter, ++i) 
-            {
-                XFree(iter->second);
-            }
-        }
+            DeleteXBuffers();
 
         XFreeGC(data->XJ_disp, data->XJ_gc);
         XCloseDisplay(data->XJ_disp);
     }
+}
+
+void XvVideoOutput::DeleteXvBuffers()
+{
+    map<unsigned char *, XvImage *>::iterator iter = data->buffers.begin();
+
+    for(int i=0; iter != data->buffers.end(); ++iter, ++i)
+    {
+        XShmDetach(data->XJ_disp, &(data->XJ_SHMInfo)[i]);
+
+        if ((data->XJ_SHMInfo)[i].shmaddr)
+            shmdt((data->XJ_SHMInfo)[i].shmaddr);
+
+        XFree(iter->second);
+    }
+
+    delete [] (data->XJ_SHMInfo);
+
+    if (scratchspace)
+        delete [] scratchspace;
+
+    data->buffers.clear();
+}
+
+void XvVideoOutput::DeleteShmBuffers()
+{
+    map<unsigned char *, XImage *>::iterator iter = data->xbuffers.begin();
+    for(int i=0; iter != data->xbuffers.end(); ++iter, ++i)
+    {
+        XShmDetach(data->XJ_disp, &(data->XJ_SHMInfo)[i]);
+        if ((data->XJ_SHMInfo)[i].shmaddr)
+            shmdt((data->XJ_SHMInfo)[i].shmaddr);
+        if ((data->XJ_SHMInfo)[i].shmid > 0)
+            shmctl((data->XJ_SHMInfo)[i].shmid, IPC_RMID, 0);
+        XFree(iter->second);
+    }
+
+    delete [] (data->XJ_SHMInfo);
+
+    data->xbuffers.clear();
+}
+
+void XvVideoOutput::DeleteXBuffers()
+{
+    // XXX Check this later -- XDestroyImage instead?
+    map<unsigned char *, XImage *>::iterator iter = data->xbuffers.begin();
+
+    for(int i=0; iter != data->xbuffers.end(); ++iter, ++i)
+    {
+        XFree(iter->second);
+    }
+
+    data->xbuffers.clear();
 }
 
 void XvVideoOutput::ToggleFullScreen(void)

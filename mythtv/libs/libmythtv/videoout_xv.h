@@ -15,6 +15,9 @@ class XvVideoOutput
     void PrepareFrame(unsigned char *buffer, int width, int height);
     void Show();
 
+    void InputChanged(int width, int height, float aspect,
+                      int num_buffers, unsigned char **out_buffer);
+
     void ToggleFullScreen();
 
     void EmbedInWidget(unsigned long wid, int x, int y, int w, int h);
@@ -28,6 +31,12 @@ class XvVideoOutput
 
   private:
     void Exit(void);
+    bool CreateXvBuffers(int num_buffers, unsigned char **out_buffers);
+    bool CreateShmBuffers(int num_buffers, unsigned char **out_buffers);
+    bool CreateXBuffers(int num_buffers, unsigned char **out_buffers);
+    void DeleteXvBuffers();
+    void DeleteShmBuffers();
+    void DeleteXBuffers();
 
     XvData *data;
 
