@@ -148,9 +148,18 @@ void MythMainWindow::customEvent(QCustomEvent *ce)
         {
             int mod = keycode & MODIFIER_MASK;
             int k = keycode & ~MODIFIER_MASK; /* trim off the mod */
-            QString text(QChar(k >> 24));
+            int ascii = 0;
+            QString text;
+
+            if (k & UNICODE_ACCEL)
+            {
+                QChar c(k & ~UNICODE_ACCEL);
+                ascii = c.latin1();
+                text = QString(c);
+            }
+
             QKeyEvent key(lke->isKeyDown() ? QEvent::KeyPress :
-                          QEvent::KeyRelease, k, k >> 24, mod, text);
+                          QEvent::KeyRelease, k, ascii, mod, text);
 
             QObject *key_target = getTarget(key);
 
