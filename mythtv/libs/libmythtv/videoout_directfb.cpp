@@ -10,170 +10,212 @@ using namespace std;
 #include <qapplication.h>
 #include <qwidget.h>
 #include <qevent.h>
+#include "mythcontext.h"
 #include "videoout_directfb.h"
 #include "filtermanager.h"
+#include <linux/fb.h>
+#include <sys/ioctl.h>
+#include <fcntl.h>
+#include <unistd.h>
 
-extern "C" {
-#include "../libavcodec/avcodec.h"
+#define DFBCHECKFAIL(dfbcommand, returnstmt...)\
+{\
+    DFBResult err = dfbcommand;\
+\
+	if (err != DFB_OK)\
+	{\
+		fprintf( stderr, "%s <%d>:\n\t", __FILE__, __LINE__ );\
+		DirectFBError( #dfbcommand, err );\
+		return returnstmt;\
+	}\
 }
 
+#define DFBCHECK(x...)\
+{\
+    DFBResult err = x;\
+\
+	if (err != DFB_OK)\
+	{\
+		fprintf( stderr, "%s <%d>:\n\t", __FILE__, __LINE__ );\
+		DirectFBError( #x, err );\
+	}\
+}
 #define DFB_KBID_OFFSET 62976
+
+#define INCREMENT(x, step, min, max)\
+{\
+	int __n;\
+	__n = x + step;\
+	x = ( __n < min )	? min : ( ( __n > max ) ? max : __n );\
+}
+
 static const unsigned int QT_KEYS[DIKI_NUMBER_OF_KEYS][2] =
-{
-	{0xffff,0 }, // unknown key
-	{0x41,	0x61},	// a...z
-	{0x42,	0x62},
-	{0x43,	0x63},
-	{0x44,	0x64},
-	{0x45,	0x65},
-	{0x46,	0x66},
-	{0x47,	0x67},
-	{0x48,	0x68},
-	{0x49,	0x69},
-	{0x4a,	0x6a},
-	{0x4b,	0x8b},
-	{0x4c,	0x6c},
-	{0x4d,	0x6d},
-	{0x4e,	0x6e},
-	{0x4f,	0x6f},
-	{0x50,	0x70},
-	{0x51,	0x71},
-	{0x52,	0x72},
-	{0x53,	0x73},
-	{0x54,	0x74},
-	{0x55,	0x75},
-	{0x56,	0x76},
-	{0x57,	0x77},
-	{0x58,	0x78},
-	{0x59,	0x79},
-	{0x5a,	0x7a},
-	{0x30,	0x30},	// 0-9
-	{0x31,	0x31},
-	{0x32,	0x32},
-	{0x33,	0x33},
-	{0x34,	0x34},
-	{0x35,	0x35},
-	{0x36,	0x36},
-	{0x37,	0x37},
-	{0x38,	0x38},
-	{0x39,	0x39},
-	{0x1030,0x00},	// function keys F1 - F12
-	{0x1031,0x00},
-	{0x1032,0x00},
-	{0x1033,0x00},
-	{0x1034,0x00},
-	{0x1035,0x00},
-	{0x1036,0x00},
-	{0x1037,0x00},
-	{0x1038,0x00},
-	{0x1039,0x00},
-	{0x103a,0x00},
-	{0x103b,0x00},
-	{0x1020,0x00},	// Shift Left
-	{0x1020,0x00},	// Shift Right
-	{0x1021,0x00}, // Control Left
-	{0x1021,0x00},	// Control Right
-	{0x1023,0x00},	// ALT Left
-	{0x1023,0x00},	// ALT Right
-	{0xffff,0x00}, // DIKS_ALTGR  not sure what QT Key is
-	{0x1022,0x00},	// META Left
-	{0x1022,0x00},	// META Right
-	{0x1053,0x00}, // Super Left
-	{0x1054,0x00},	// Super Right
-	{0x1056,0x00},	// Hyper Left
-	{0x1057,0x00},	// Hyper Right
-	{0x1024,0x00},	// CAPS Lock
-	{0x1025,0x00},	// NUM Locka
-	{0x1026,0x00},	// Scroll Lock
-	{0x1000,0x1b},	// Escape
-	{0x1012,0x00},	// Left
-	{0x1014,0x00},	// Right
-	{0x1013,0x00},	// Up
-	{0x1015,0x00},	// Down
-	{0x1001,0x09},	// Tab
-	{0x1004,0x0d},	// Enter
-	{0x20,	0x20},	// 7 bit printable ASCII
-	{0x1003,0x00},	// Backspace
-	{0x1006,0x00},	// Insert
-	{0x1007,0x7f},	// Delete
-	{0x1010,0x00},	// Home
-	{0x1011,0x00},	// End
-	{0x1016,0x00},	// Page Up
-	{0x1017,0x00},	// Page Down
-	{0x1009,0x00},	// Print
-	{0x1008,0x00},	// Pause
-	{0x60,	0x27},	// Quote Left
-	{0x2d,	0x2d},	// Minus
-	{0x3d,	0x3d},	// Equals
-	{0x5b,	0x5b},	// Bracket Left
-	{0x5d,	0x5d},	// Bracket Right
-	{0x5c,	0x5c},	// Back Slash
-	{0x3b,	0x3b},	// Semicolon
-	{0xffff,0x00},  // DIKS_QUOTE_RIGHT not sure what QT Key is...
-	{0x2c,	0x2c},	// Comma
-	{0x2e,	0x2e},	// Period
-	{0x2f,	0x2f},	// Slash
-	{0x3c,	0x3c},	// Less Than
+    {
+        {0xffff,0 }, // unknown key
+        {0x41,	0x61},	// a...z
+        {0x42,	0x62},
+        {0x43,	0x63},
+        {0x44,	0x64},
+        {0x45,	0x65},
+        {0x46,	0x66},
+        {0x47,	0x67},
+        {0x48,	0x68},
+        {0x49,	0x69},
+        {0x4a,	0x6a},
+        {0x4b,	0x8b},
+        {0x4c,	0x6c},
+        {0x4d,	0x6d},
+        {0x4e,	0x6e},
+        {0x4f,	0x6f},
+        {0x50,	0x70},
+        {0x51,	0x71},
+        {0x52,	0x72},
+        {0x53,	0x73},
+        {0x54,	0x74},
+        {0x55,	0x75},
+        {0x56,	0x76},
+        {0x57,	0x77},
+        {0x58,	0x78},
+        {0x59,	0x79},
+        {0x5a,	0x7a},
+        {0x30,	0x30},	// 0-9
+        {0x31,	0x31},
+        {0x32,	0x32},
+        {0x33,	0x33},
+        {0x34,	0x34},
+        {0x35,	0x35},
+        {0x36,	0x36},
+        {0x37,	0x37},
+        {0x38,	0x38},
+        {0x39,	0x39},
+        {0x1030,0x00},	// function keys F1 - F12
+        {0x1031,0x00},
+        {0x1032,0x00},
+        {0x1033,0x00},
+        {0x1034,0x00},
+        {0x1035,0x00},
+        {0x1036,0x00},
+        {0x1037,0x00},
+        {0x1038,0x00},
+        {0x1039,0x00},
+        {0x103a,0x00},
+        {0x103b,0x00},
+        {0x1020,0x00},	// Shift Left
+        {0x1020,0x00},	// Shift Right
+        {0x1021,0x00}, // Control Left
+        {0x1021,0x00},	// Control Right
+        {0x1023,0x00},	// ALT Left
+        {0x1023,0x00},	// ALT Right
+        {0xffff,0x00}, // DIKS_ALTGR  not sure what QT Key is
+        {0x1022,0x00},	// META Left
+        {0x1022,0x00},	// META Right
+        {0x1053,0x00}, // Super Left
+        {0x1054,0x00},	// Super Right
+        {0x1056,0x00},	// Hyper Left
+        {0x1057,0x00},	// Hyper Right
+        {0x1024,0x00},	// CAPS Lock
+        {0x1025,0x00},	// NUM Locka
+        {0x1026,0x00},	// Scroll Lock
+        {0x1000,0x1b},	// Escape
+        {0x1012,0x00},	// Left
+        {0x1014,0x00},	// Right
+        {0x1013,0x00},	// Up
+        {0x1015,0x00},	// Down
+        {0x1001,0x09},	// Tab
+        {0x1004,0x0d},	// Enter
+        {0x20,	0x20},	// 7 bit printable ASCII
+        {0x1003,0x00},	// Backspace
+        {0x1006,0x00},	// Insert
+        {0x1007,0x7f},	// Delete
+        {0x1010,0x00},	// Home
+        {0x1011,0x00},	// End
+        {0x1016,0x00},	// Page Up
+        {0x1017,0x00},	// Page Down
+        {0x1009,0x00},	// Print
+        {0x1008,0x00},	// Pause
+        {0x60,	0x27},	// Quote Left
+        {0x2d,	0x2d},	// Minus
+        {0x3d,	0x3d},	// Equals
+        {0x5b,	0x5b},	// Bracket Left
+        {0x5d,	0x5d},	// Bracket Right
+        {0x5c,	0x5c},	// Back Slash
+        {0x3b,	0x3b},	// Semicolon
+        {0xffff,0x00},  // DIKS_QUOTE_RIGHT not sure what QT Key is...
+        {0x2c,	0x2c},	// Comma
+        {0x2e,	0x2e},	// Period
+        {0x2f,	0x2f},	// Slash
+        {0x3c,	0x3c},	// Less Than
 
-	// keypad keys.
-	// from what i can tell QT doiesnt have a seperate key code for them.
+        // keypad keys.
+        // from what i can tell QT doiesnt have a seperate key code for them.
 
-	{0xffff,0x00},
-	{0xffff,0x00},
-	{0xffff,0x00},
-	{0xffff,0x00},
-	{0xffff,0x00},
-	{0xffff,0x00},
-	{0xffff,0x00},
-	{0xffff,0x00},
-	{0xffff,0x00},
-	{0xffff,0x00},
-	{0xffff,0x00},
-	{0xffff,0x00},
-	{0xffff,0x00},
-	{0xffff,0x00},
-	{0xffff,0x00},
-	{0xffff,0x00},
-	{0xffff,0x00},
-	{0xffff,0x00},
-	{0xffff,0x00},
-	{0xffff,0x00},
-	{0xffff,0x00},
-	{0xffff,0x00},
-	{0xffff,0x00},
-	{0xffff,0x00}
-};
+        {0xffff,0x00},
+        {0xffff,0x00},
+        {0xffff,0x00},
+        {0xffff,0x00},
+        {0xffff,0x00},
+        {0xffff,0x00},
+        {0xffff,0x00},
+        {0xffff,0x00},
+        {0xffff,0x00},
+        {0xffff,0x00},
+        {0xffff,0x00},
+        {0xffff,0x00},
+        {0xffff,0x00},
+        {0xffff,0x00},
+        {0xffff,0x00},
+        {0xffff,0x00},
+        {0xffff,0x00},
+        {0xffff,0x00},
+        {0xffff,0x00},
+        {0xffff,0x00},
+        {0xffff,0x00},
+        {0xffff,0x00},
+        {0xffff,0x00},
+        {0xffff,0x00}
+    };
 
-
-
-//**FIXME - are these values OK?
+//8 1 3 2 works, but not for everyone :-(
 const int kNumBuffers = 31;
 const int kNeedFreeFrames = 1;
 const int kPrebufferFrames = 12;
 const int kKeepPrebuffer = 2;
-
-struct DirectfbParams
-{
-    uint32_t format;
-    int scale;
-    int result;
-    unsigned int id;
-    unsigned int width;
-    unsigned int height;
-    int setsize;
-};
-
+typedef map<unsigned char *, IDirectFBSurface *> BufferMap;
 struct DirectfbData
 {
+    //DirectFB hook
     IDirectFB *dfb;
-    IDirectFBSurface *surface;
-    struct DirectfbParams params;
-    IDirectFBInputDevice *keyboard;
-    IDirectFBEventBuffer *kbbuf;
+    //video output
+    DFBCardCapabilities cardCapabilities;
+    IDirectFBDisplayLayer *primaryLayer;
+    IDirectFBSurface *primarySurface;
+    IDirectFBDisplayLayer *videoLayer;
+    DFBDisplayLayerDescription videoLayerDesc;
+    DFBDisplayLayerConfig videoLayerConfig;
+    IDirectFBSurface *videoSurface;
+    DFBSurfaceCapabilities videoSurfaceCapabilities;
+    //input handling
+    IDirectFBEventBuffer *inputbuf;
+    //buffers
+    BufferMap buffers;
+    //screen
+    int screen_width;
+    int screen_height;
 };
 
+static struct {
+    int flags;
+    unsigned short brightness;
+    unsigned short contrast;
+    unsigned short hue;
+    unsigned short saturation;
+    unsigned short volume;
+} adj = {0, 0x8000, 0x8000, 0x8000, 0x8000, 50};
+
+IDirectFBSurface *tempYV12Surface;
+
 VideoOutputDirectfb::VideoOutputDirectfb(void)
-                   :VideoOutput()
+        :VideoOutput()
 {
     XJ_started = 0;
     data = new DirectfbData();
@@ -182,257 +224,226 @@ VideoOutputDirectfb::VideoOutputDirectfb(void)
 
 VideoOutputDirectfb::~VideoOutputDirectfb()
 {
-	DFBResult ret;
+    DeleteDirectfbBuffers();
 
-	// clear the surface
-    ret = data->surface->Clear(data->surface, 0x00, 0x00, 0x00, 0x00);
-    if (ret)
-    {
-        DirectFBError("Couldn't clear the buffers", ret);
-    }
-
-    ret = data->surface->Flip(data->surface, NULL, DSFLIP_ONSYNC);
-    if (ret)
-    {
-        DirectFBError("Couldn't flip the buffers", ret);
-    }
-
-    ret = data->surface->Clear(data->surface, 0x00, 0x00, 0x00, 0x00);
-    if (ret)
-    {
-        DirectFBError("Couldn't clear the buffers", ret);
-    }
-
-	// cleanup
-    if (data->kbbuf)
-        data->kbbuf->Release(data->kbbuf);
-    if (data->keyboard)
-        data->keyboard->Release(data->keyboard);
-    if (data->surface)
-        data->surface->Release(data->surface);
+    // cleanup
+    if (data->inputbuf)
+        data->inputbuf->Release(data->inputbuf);
+    if (data->videoSurface)
+        data->videoSurface->Release(data->videoSurface);
+    if (tempYV12Surface)
+        tempYV12Surface->Release(tempYV12Surface);
+    if (data->primarySurface)
+        data->primarySurface->Release(data->primarySurface);
+    if(data->primaryLayer)
+        data->primaryLayer->Release(data->primaryLayer);
+    if (data->videoLayer)
+        data->videoLayer->Release(data->videoLayer);
     if (data->dfb)
         data->dfb->Release(data->dfb);
+
     if (pauseFrame.buf)
         delete [] pauseFrame.buf;
 
-    Exit();
-}
-
-void VideoOutputDirectfb::Exit(void)
-{
     if (XJ_started)
     {
         XJ_started = false;
-
-        DeleteDirectfbBuffers();
     }
+    delete data;
 }
 
 int VideoOutputDirectfb::GetRefreshRate(void)
 {
-    return 60;
+    int fh, v;
+    struct fb_var_screeninfo si;
+    double drate;
+    double hrate;
+    double vrate;
+    long htotal;
+    long vtotal;
+    char *fb_dev_name = NULL;
+    if (!fb_dev_name && !(fb_dev_name = getenv("FRAMEBUFFER")))
+        fb_dev_name = strdup("/dev/fb0");
+
+    fh = open(fb_dev_name, O_RDONLY);
+    if (-1 == fh) {
+        return -1;
+    }
+
+    if (ioctl(fh, FBIOGET_VSCREENINFO, &si)) {
+        close(fh);
+        return -1;
+    }
+
+    htotal = si.left_margin + si.xres + si.right_margin + si.hsync_len;
+    vtotal = si.upper_margin + si.yres + si.lower_margin + si.vsync_len;
+
+    switch (si.vmode & FB_VMODE_MASK) {
+    case FB_VMODE_INTERLACED:
+        break;
+    case FB_VMODE_DOUBLE:
+        vtotal <<= 2;
+        break;
+    default:
+        vtotal <<= 1;
+        break;
+    }
+
+    drate = 1E12 / si.pixclock;
+    hrate = drate / htotal;
+    vrate = hrate / vtotal * 2;
+
+    v = (int)(1E3 / vrate + 0.5);
+    /* h = hrate / 1E3; */
+
+    close(fh);
+    return v;
 }
 
 bool VideoOutputDirectfb::Init(int width, int height, float aspect, WId winid,
-              int winx, int winy, int winw, int winh, WId embedid)
+                               int winx, int winy, int winw, int winh, WId embedid)
 {
     DFBResult ret;
     DFBSurfaceDescription desc;
-    DFBDisplayLayerConfig dlc;
-    IDirectFBDisplayLayer *layer;
-    IDirectFBSurface *primary;
+    DFBDisplayLayerConfig conf;
+    DFBDisplayLayerDescription ldesc;
 
-	widget = QWidget::find(winid);
+    widget = QWidget::find(winid);
 
-    VideoOutput::InitBuffers(kNumBuffers, true, kNeedFreeFrames,
-                             kPrebufferFrames, kKeepPrebuffer);
-    VideoOutput::Init(width, height, aspect, winid, winx, winy, winw, winh,
-                      embedid);
-
-    ret = DirectFBInit(NULL,NULL);
-
-    if (ret)
-    {
-        DirectFBError( "Couldn't initialize DirectFB", ret );
-        return false;
-    }
+    //setup DirectFB
+    DFBCHECKFAIL(DirectFBInit(NULL,NULL), false);
 
     DirectFBSetOption("bg-none",NULL);
     DirectFBSetOption("no-cursor",NULL);
 
-    ret = DirectFBCreate( &(data->dfb) );
+    DFBCHECKFAIL(DirectFBCreate( &(data->dfb) ), false);
+    DFBCHECKFAIL(data->dfb->SetCooperativeLevel(data->dfb, DFSCL_FULLSCREEN), false);
 
-    if (ret)
-    {
-        DirectFBError( "Couldn't create DirectFB subsystem", ret );
-        return false;
-    }
+    //setup primary layer
+    //the screen width and height is supposed to correspond to the
+    //dimensions of the primary layer
+    DFBCHECKFAIL(data->dfb->GetDisplayLayer(data->dfb, DLID_PRIMARY, &(data->primaryLayer)), false);
+    DFBCHECKFAIL(data->primaryLayer->GetConfiguration(data->primaryLayer, &conf), false);
+    data->screen_width = conf.width;
+    data->screen_height = conf.height;
 
-    ret = data->dfb->GetDisplayLayer(data->dfb, DLID_PRIMARY, &layer);
+    //determine output card capacities
+    DFBCHECKFAIL(data->dfb->GetCardCapabilities(data->dfb, &(data->cardCapabilities)), false);
+    VERBOSE(VB_GENERAL, QString("DirectFB output : card : %1")
+            .arg((data->cardCapabilities.acceleration_mask & DFXL_BLIT) > 0 ?
+                 "hardware blit support" : "NO hardware blit support"));
 
-    if (ret)
-    {
-        DirectFBError("No primary display layer - WTF?", ret);
-        return false;
-    }
+    //clear primary layer
+    desc.flags = DSDESC_CAPS;
+    desc.caps = DSCAPS_PRIMARY;
+    if(data->cardCapabilities.acceleration_mask & DFXL_BLIT)
+        desc.caps = (DFBSurfaceCapabilities)(desc.caps | DSCAPS_DOUBLE);
+    DFBCHECKFAIL(data->dfb->CreateSurface(data->dfb, &desc, &(data->primarySurface)), false);
+    DFBCHECKFAIL(data->primarySurface->Clear(data->primarySurface, 0, 0, 0, 0xff), false);
+    DFBCHECKFAIL(data->primarySurface->Flip(data->primarySurface, 0, DSFLIP_ONSYNC), false);
 
-    layer->SetOpacity(layer, 0);
-    ret = layer->GetSurface(layer, &primary);
+    //look up an output layer that supports the right format, begin with the video format we have as input, fall back to others
+    data->videoLayerConfig.flags = (DFBDisplayLayerConfigFlags)(DLCONF_WIDTH | DLCONF_HEIGHT | DLCONF_PIXELFORMAT);
+    data->videoLayerConfig.width = width;
+    data->videoLayerConfig.height = height;
+    data->videoLayerConfig.pixelformat = DSPF_I420;
 
-    if (ret)
-    {
-        DirectFBError("Couldn't get primary display surface", ret);
-        return false;
-    }
+    DFBCHECK(data->dfb->EnumDisplayLayers(data->dfb, LayerCallback, data));
 
-    data->params.result = 0;
-
-    ret = data->dfb->EnumDisplayLayers(data->dfb, LayerCallback, data);
-
-    if (ret)
-    {
-        DirectFBError("Couldn't enumerate display layers", ret);
-        return false;
-    }
-
-    ret = data->dfb->GetDisplayLayer(data->dfb, 1, &layer);
-
-    if (ret)
-    {
-        DirectFBError("Couldn't get our display layer - this shouldn't happen", ret);
-        return false;
-    }
-
-    ret = layer->SetCooperativeLevel(layer, DLSCL_EXCLUSIVE);
-
-    if (ret)
-    {
-        DirectFBError("Couldn't get exclusive access", ret);
-        return false;
-    }
-
-    //**FIXME set up size - should be based on width of video
-    dlc.flags = (DFBDisplayLayerConfigFlags)(DLCONF_WIDTH | DLCONF_HEIGHT);
-    dlc.width = width;
-    dlc.height = height;
-
-    ret = layer->SetConfiguration(layer, &dlc);
-
-    if (ret)
-    {
-        DirectFBError("Couldn't set display size", ret);
-        return false;
-    }
-
-    //**FIXME set up pixelformat - should be based on video
-    dlc.flags = DLCONF_PIXELFORMAT;
-    dlc.pixelformat = DSPF_YV12;
-
-    ret = layer->SetConfiguration(layer, &dlc);
-
-    if (ret)
-    {
-        DirectFBError("Couldn't set requested pixelformat", ret);
-        return false;
-    }
-
-    dlc.flags = DLCONF_BUFFERMODE;
-    dlc.buffermode = DLBM_TRIPLE;
-    ret = layer->SetConfiguration(layer, &dlc);
-
-    if (ret)
-    {
-        DirectFBError("Couldn't set up triple buffering, trying double", ret);
-
-        dlc.buffermode = DLBM_BACKVIDEO;
-        ret = layer->SetConfiguration(layer, &dlc);
-
-        if (ret)
-        {
-            dlc.buffermode = DLBM_BACKSYSTEM;
-            ret = layer->SetConfiguration(layer, &dlc);
-
-            if (ret)
-            {
-                DirectFBError("Couldn't set up double buffering, falling back to single buffer", ret);
+    if(data->videoLayer == NULL) {
+        data->videoLayerConfig.pixelformat = DSPF_YV12;
+        DFBCHECK(data->dfb->EnumDisplayLayers(data->dfb, LayerCallback, data));
+        if(data->videoLayer == NULL) {
+            ret = data->primaryLayer->TestConfiguration(data->primaryLayer, &(data->videoLayerConfig), NULL);
+            if (DFB_OK == ret) {
+                data->primaryLayer->AddRef(data->primaryLayer);
+                data->videoLayer = data->primaryLayer;
+            } else {
+                VERBOSE(VB_IMPORTANT, QString("DirectFB could not find appropriate video output layer"));
+                return false;
             }
         }
     }
 
+    //setup video output layer
+    DFBCHECKFAIL(data->videoLayer->SetCooperativeLevel(data->videoLayer, DLSCL_EXCLUSIVE), false);
 
-    ret = layer->GetSurface(layer, &(data->surface));
-
-    if (ret)
+    //determine buffering capacities
+    data->videoLayerConfig.flags = (DFBDisplayLayerConfigFlags)(data->videoLayerConfig.flags | DLCONF_BUFFERMODE);
+    data->videoLayerConfig.buffermode = DLBM_TRIPLE;
+    if (data->videoLayer->TestConfiguration(data->videoLayer, &(data->videoLayerConfig), NULL))
     {
-        DirectFBError( "Couldn't get our layer's surface - this is bad", ret);
-        return false;
+        //try double buffering in video memory
+        data->videoLayerConfig.buffermode = DLBM_BACKVIDEO;
+        if (data->videoLayer->TestConfiguration(data->videoLayer, &(data->videoLayerConfig), NULL))
+        {
+            //fall back to double buffering in system memory
+            data->videoLayerConfig.buffermode = DLBM_BACKSYSTEM;
+        }
     }
 
-    ret = data->surface->SetBlittingFlags(data->surface, DSBLIT_NOFX);
+    DFBCHECKFAIL(data->videoLayer->SetConfiguration(data->videoLayer, &(data->videoLayerConfig)), false);
 
-    if (ret)
-    {
-        DirectFBError("Couldn't set up Blitting flags - continuing anyway", ret);
-    }
+    VERBOSE(VB_GENERAL, QString("DirectFB output : videoLayer : %1 : %2x%3, %4, %5 buffering")
+            .arg(data->videoLayerDesc.name)
+            .arg(data->videoLayerConfig.width)
+            .arg(data->videoLayerConfig.height)
+            .arg(data->videoLayerConfig.pixelformat == DSPF_I420 ? "I420 : Yuv" : "YV12 : Yvu")
+            .arg(
+                data->videoLayerConfig.buffermode == DLBM_TRIPLE ? "triple (video memory)" :
+                data->videoLayerConfig.buffermode == DLBM_BACKVIDEO ? "double (video memory)" :
+                "double (system memory)")
+           );
 
-    //**FIXME set surface properties - should use video
+    //setup video output videoSurface
+    DFBCHECKFAIL(data->videoLayer->GetSurface(data->videoLayer, &(data->videoSurface)), false);
+
+    DFBCHECKFAIL(data->videoSurface->SetBlittingFlags(data->videoSurface, DSBLIT_NOFX), false);
+
+    DFBCHECKFAIL(data->videoSurface->GetCapabilities(data->videoSurface, &data->videoSurfaceCapabilities), false);
+
+    VERBOSE(VB_GENERAL, QString("DirectFB output : videoSurface : %1, %2, %3")
+            .arg((data->videoSurfaceCapabilities & DSCAPS_VIDEOONLY) > 0 ? "in video memory" : "in sytem memory")
+            .arg((data->videoSurfaceCapabilities & DSCAPS_PRIMARY) > 0 ? "primary surface" : "no primary surface")
+            .arg((data->videoSurfaceCapabilities & DSCAPS_INTERLACED) > 0 ? "interlaced" : "not interlaced")
+           );
+
+    //setup video input buffers
+    VideoOutput::InitBuffers(kNumBuffers, true, kNeedFreeFrames,
+                             kPrebufferFrames, kKeepPrebuffer);
     desc.flags = (DFBSurfaceDescriptionFlags)(DSDESC_HEIGHT | DSDESC_WIDTH | DSDESC_PIXELFORMAT);
     desc.width = width;
     desc.height = height;
-    desc.pixelformat = DSPF_YV12;
+    //can this change ?
+    desc.pixelformat = DSPF_I420;
 
-
-	// clear the surface
-    ret = data->surface->Clear(data->surface, 0x00, 0x00, 0x00, 0x00);
-    if (ret)
-    {
-        DirectFBError("Couldn't clear the buffers", ret);
-    }
-
-    ret = data->surface->Flip(data->surface, NULL, DSFLIP_ONSYNC);
-    if (ret)
-    {
-        DirectFBError("Couldn't flip the buffers", ret);
-    }
-
-    ret = data->surface->Clear(data->surface, 0x00, 0x00, 0x00, 0x00);
-    if (ret)
-    {
-        DirectFBError("Couldn't clear the buffers", ret);
-    }
-
-    //show the surface
-    ret = layer->SetOpacity(layer, 255);
-
-    if (ret)
-    {
-        DirectFBError("Couldn't make our layer visible - nothing to see here, go home", ret);
-    }
-
-    ret = data->dfb->GetInputDevice(data->dfb, DIDID_KEYBOARD, &(data->keyboard));
-
-    if (ret)
-    {
-        DirectFBError("Couldn't initialize keyboard", ret);
-    }
-    else
-    {
-        ret = data->keyboard->CreateEventBuffer(data->keyboard, &(data->kbbuf));
-
-        if (ret)
-        {
-            DirectFBError("Couldn't initialize keyboard", ret);
-        }
-        else
-        {
-            data->kbbuf->Reset(data->kbbuf);
-        }
-    }
-
-    if (!CreateDirectfbBuffers())
+    if (!CreateDirectfbBuffers(desc))
         return false;
 
+    VERBOSE(VB_GENERAL, QString("DirectFB input : %1 videoSurface buffers : %1x%2, %3")
+            .arg(kNumBuffers)
+            .arg(desc.width)
+            .arg(desc.height)
+            .arg(desc.pixelformat == DSPF_I420 ? "I420 : Yuv" : "YV12 : Yvu")
+           );
+    //prepare to do a software conversion when the output format is Yvu
+    //(DirectFB does not support software conversion from Yuv -> Yvu yet)
+    if(data->videoLayerConfig.pixelformat == DSPF_YV12)
+    {
+        desc.flags = (DFBSurfaceDescriptionFlags)(DSDESC_HEIGHT | DSDESC_WIDTH | DSDESC_PIXELFORMAT | DSDESC_CAPS);
+        desc.width = width;
+        desc.height = height;
+        desc.pixelformat = DSPF_YV12;
+        //allocate in system memory
+        desc.caps=DSCAPS_SYSTEMONLY;
+        DFBCHECKFAIL(data->dfb->CreateSurface(data->dfb, &desc, &tempYV12Surface), false);
+    }
+
+    //setup input handling
+    DFBCHECK(data->dfb->CreateInputEventBuffer(data->dfb, DICAPS_KEYS, (DFBBoolean)1, &(data->inputbuf)));
+
     //this stuff is right from Xv - look at this sometime
+    //first frame of the buffers
     scratchFrame = &(vbuffers[kNumBuffers]);
 
     pauseFrame.height = scratchFrame->height;
@@ -441,82 +452,127 @@ bool VideoOutputDirectfb::Init(int width, int height, float aspect, WId winid,
     pauseFrame.size = scratchFrame->size;
     pauseFrame.buf = new unsigned char[pauseFrame.size];
 
-    XJ_started = true;
+    VideoOutput::Init(width, height, aspect, winid, winx, winy, data->screen_width, data->screen_height,
+                      embedid);
 
+    VERBOSE(VB_GENERAL, QString("DirectFB output : screen size %1x%2").arg(data->screen_width).arg(data->screen_height));
+    MoveResize();
+
+    if (gContext->GetNumSetting("UseOutputPictureControls", 0))
+    {
+        ChangePictureAttribute(kPictureAttribute_Brightness, brightness);
+        ChangePictureAttribute(kPictureAttribute_Contrast, contrast);
+        ChangePictureAttribute(kPictureAttribute_Colour, colour);
+        ChangePictureAttribute(kPictureAttribute_Hue, hue);
+    }
+
+    //display video output
+    DFBCHECK(data->videoLayer->SetOpacity(data->videoLayer, 0xff));
+
+    w_mm = data->screen_width;
+    h_mm = data->screen_height;
+    //w_mm = DisplayWidthMM(data->XJ_disp, XJ_screen_num);
+    //h_mm = DisplayHeightMM(data->XJ_disp, XJ_screen_num);
+
+    XJ_started = true;
     return true;
+}
+
+float VideoOutputDirectfb::GetDisplayAspect(void)
+{
+    return (float)data->screen_width / (float)data->screen_height;
 }
 
 void VideoOutputDirectfb::PrepareFrame(VideoFrame *buffer)
 {
-    DFBResult ret;
-
-    int width, height, ysize, uvsize;
-    unsigned char *framebuf, *src, *dst;
-    int pitch;
-
     if (!buffer)
         buffer=scratchFrame;
 
-    width = buffer->width;
-    height = buffer->height;
-    ysize = width * height;
-    uvsize = ysize / 4;
+    IDirectFBSurface *bufferSurface = data->buffers[buffer->buf];
 
-    ret = data->surface->Lock(data->surface, DSLF_WRITE, (void**)(&framebuf), &pitch);
-
-    if (ret)
+    if(data->videoLayerConfig.pixelformat == DSPF_YV12)
     {
-        DirectFBError("Couldn't get write access to our surface", ret);
-        return;
+        //do a software conversion in a temporary memory buffer, since DirectFB does not handle this (yet ?)
+        int pitch;
+        int width, height;
+        unsigned char *src, *dst;
+
+        width = buffer->width;
+        height = buffer->height;
+        src = buffer->buf;
+
+        DFBCHECKFAIL(tempYV12Surface->Lock(tempYV12Surface, DSLF_WRITE, (void **)&dst, &pitch));
+        //! pitch is not considered : since the videoSurface is in memory, normally there is no pitch
+        //src Yuv -> dst Yvu
+        //src Y -> dst Y
+        memcpy(dst, src, width * height);
+        //src v -> dst v
+        memcpy(dst + width * height, src + width * height * 5 / 4, width * height / 4);
+        //src u -> dst u
+        memcpy(dst + width * height * 5 / 4, src + width * height, width * height / 4);
+
+        DFBCHECK(tempYV12Surface->Unlock(tempYV12Surface));
+        bufferSurface = tempYV12Surface;
     }
-
-    //memcpy(framebuf, buffer->buf, ysize * 3 / 2);
-    //**FIXME copy the frame's planes onto the surface - should do different
-    //behaviour depending on video?
-    //y-plane
-    memcpy(framebuf, buffer->buf, ysize);
-    //u-plane
-    memcpy(framebuf + width * height, buffer->buf + uvsize * 5, uvsize);
-    //v-plane
-    memcpy(framebuf + uvsize * 5, buffer->buf + ysize, uvsize);
-
-    ret = data->surface->Unlock(data->surface);
-
-    if (ret)
+    if(!bufferSurface)
+        return;
+    if((data->cardCapabilities.acceleration_mask & DFXL_BLIT) > 0)
     {
-      DirectFBError("Unlock() failed", ret);
+        DFBCHECK(data->videoSurface->Blit(data->videoSurface, bufferSurface, NULL, 0, 0));
+    }
+    else
+    {
+        //unaccelerated hardware - probably you do not want this !
+        int pitchsrc;
+        int pitchdst;
+        int width, height;
+        unsigned char *src, *dst;
+
+        width = buffer->width;
+        height = buffer->height;
+        DFBCHECKFAIL(bufferSurface->Lock(bufferSurface, DSLF_READ, (void **)&src, &pitchsrc));
+        DFBCHECKFAIL(data->videoSurface->Lock(data->videoSurface, DSLF_WRITE, (void **)&dst, &pitchdst));
+        //Y
+        memcpy_pic(dst, src, width, height, pitchdst, pitchsrc);
+        dst += pitchdst * height;
+        src += pitchsrc * height;
+        //u (I420) or v (YV12)
+        width /= 2;
+        height /= 2;
+        pitchsrc /= 2;
+        pitchdst /= 2;
+        memcpy_pic(dst, src, width, height, pitchdst, pitchsrc);
+        dst += pitchdst * height;
+        src += pitchsrc * height;
+        //v (I420) or y (YV12)
+        memcpy_pic(dst, src, width, height, pitchdst, pitchsrc);
+        DFBCHECK(bufferSurface->Unlock(bufferSurface));
+        DFBCHECK(data->videoSurface->Unlock(data->videoSurface));
     }
 }
 
-void VideoOutputDirectfb::Show(void)
+void VideoOutputDirectfb::Show(FrameScanType t)
 {
-    DFBResult ret;
 
-    ret = data->surface->Flip(data->surface, NULL, DSFLIP_ONSYNC);
-
-    if (ret)
-    {
-        DirectFBError("Couldn't flip the buffers", ret);
-    }
-
+    DFBCHECK(data->videoSurface->Flip(data->videoSurface, NULL, DSFLIP_ONSYNC));
+/*
     DFBInputEvent event;
-    if (data->kbbuf->GetEvent( data->kbbuf, DFB_EVENT(&event) ) == DFB_OK)
+    if (data->inputbuf->GetEvent( data->inputbuf, DFB_EVENT(&event) ) == DFB_OK)
     {
-	    if (event.type == DIET_KEYPRESS) {
-			QApplication::postEvent(widget, new QKeyEvent(QEvent::KeyPress, QT_KEYS[(event.key_id)-DFB_KBID_OFFSET][0], QT_KEYS[(event.key_id)-DFB_KBID_OFFSET][1], 0));
-		}
-		else if (event.type == DIET_KEYRELEASE)
-		{
-			QApplication::postEvent(widget, new QKeyEvent(QEvent::KeyRelease, QT_KEYS[(event.key_id)-DFB_KBID_OFFSET][0], QT_KEYS[(event.key_id)-DFB_KBID_OFFSET][1], 0));
-		}
-	}
-
+        if (event.type == DIET_KEYPRESS) {
+            QApplication::postEvent(widget, new QKeyEvent(QEvent::KeyPress, QT_KEYS[(event.key_id)-DFB_KBID_OFFSET][0], QT_KEYS[(event.key_id)-DFB_KBID_OFFSET][1], 0));
+        }
+        else if (event.type == DIET_KEYRELEASE)
+        {
+            QApplication::postEvent(widget, new QKeyEvent(QEvent::KeyRelease, QT_KEYS[(event.key_id)-DFB_KBID_OFFSET][0], QT_KEYS[(event.key_id)-DFB_KBID_OFFSET][1], 0));
+        }
+    }
+*/
 }
 
 void VideoOutputDirectfb::DrawUnusedRects(void)
 {
-    //**FIXME - should do something here
-    cerr << "DrawUnusedRects()" << endl;
+    /* DirectFB only draws what is needed :-) */
 }
 
 void VideoOutputDirectfb::UpdatePauseFrame(void)
@@ -549,11 +605,18 @@ void VideoOutputDirectfb::ProcessFrame(VideoFrame *frame, OSD *osd,
 
 void VideoOutputDirectfb::InputChanged(int width, int height, float aspect)
 {
-    //**FIXME - MoveResize()??
     VideoOutput::InputChanged(width, height, aspect);
 
+    DFBSurfaceDescription desc;
+    desc.flags = (DFBSurfaceDescriptionFlags)(DSDESC_HEIGHT | DSDESC_WIDTH | DSDESC_PIXELFORMAT);
+    desc.width = width;
+    desc.height = height;
+    //can this change ?
+    desc.pixelformat = DSPF_I420;
+
     DeleteDirectfbBuffers();
-    CreateDirectfbBuffers();
+    CreateDirectfbBuffers(desc);
+    MoveResize();
 
     scratchFrame = &(vbuffers[kNumBuffers]);
 
@@ -569,26 +632,61 @@ void VideoOutputDirectfb::InputChanged(int width, int height, float aspect)
 
 void VideoOutputDirectfb::AspectChanged(float aspect)
 {
-    //**FIXME - -do something here
-    cerr << "AspectChanged()" << endl;
+    VideoOutput::AspectChanged(aspect);
+    MoveResize();
 }
 
 void VideoOutputDirectfb::Zoom(int direction)
 {
-    //**FIXME - -do something here
-    cerr << "Zoom()" << endl;
+    VideoOutput::Zoom(direction);
+    MoveResize();
 }
 
-bool VideoOutputDirectfb::CreateDirectfbBuffers(void)
+void VideoOutputDirectfb::MoveResize(void)
 {
+    VideoOutput::MoveResize();
+
+    VERBOSE(VB_GENERAL, QString("DirectFB MoveResize : screen size %1x%2, proposed x : %3, y : %4, w : %5, h : %6")
+            .arg(data->screen_width)
+            .arg(data->screen_height)
+            .arg(dispxoff)
+            .arg(dispyoff)
+            .arg(dispwoff)
+            .arg(disphoff));
+    //**FIXME support for zooming when dispwoff > screenwidth || disphoff > screenheight
+    if(data->videoLayerDesc.caps & DLCAPS_SCREEN_LOCATION) {
+        DFBCHECK(data->videoLayer->SetScreenLocation(data->videoLayer,
+                 (float)dispxoff/(float)data->screen_width,
+                 (float)dispyoff/(float)data->screen_height,
+                 (float)dispwoff/(float)data->screen_width,
+                 (float)disphoff/(float)data->screen_height));
+    }
+}
+
+
+
+bool VideoOutputDirectfb::CreateDirectfbBuffers(DFBSurfaceDescription desc)
+{
+    int pitch;
+    //allocate each surface in system memory
+    desc.flags = (DFBSurfaceDescriptionFlags)(desc.flags | DSDESC_CAPS);
+    desc.caps=DSCAPS_SYSTEMONLY;
+
     for (int i = 0; i < numbuffers + 1; i++)
     {
-        vbuffers[i].height = XJ_height;
-        vbuffers[i].width = XJ_width;
+        IDirectFBSurface *bufferSurface;
+        unsigned char *bufferSurfaceData;
+        DFBCHECKFAIL(data->dfb->CreateSurface(data->dfb, &desc, &bufferSurface), false);
+        DFBCHECKFAIL(bufferSurface->Lock(bufferSurface, DSLF_WRITE, (void **)&bufferSurfaceData, &pitch), false);
+        data->buffers[bufferSurfaceData] = bufferSurface;
+        vbuffers[i].height = desc.height;
+        vbuffers[i].width = desc.width;
+        //**FIXME set the three following parameters correctly
         vbuffers[i].bpp = 12;
-        vbuffers[i].size = XJ_height * XJ_width * 3 / 2;
+        vbuffers[i].size = desc.height * desc.width * 3 / 2;
+        //The format FMT_YV12 is a I420 ???? - Can the buffer format change ????
         vbuffers[i].codec = FMT_YV12;
-        vbuffers[i].buf = new unsigned char[vbuffers[i].size];
+        vbuffers[i].buf = bufferSurfaceData;
     }
 
     return true;
@@ -596,72 +694,126 @@ bool VideoOutputDirectfb::CreateDirectfbBuffers(void)
 
 void VideoOutputDirectfb::DeleteDirectfbBuffers(void)
 {
-    for (int i = 0 ; i < numbuffers +1; i++)
+    for (int i = 0; i < numbuffers + 1; i++)
     {
-        delete [] vbuffers[i].buf;
         vbuffers[i].buf = NULL;
-    }
-}
 
-//**FIXME - is there a way to make this part of the class?
-DFBEnumerationResult LayerCallback(unsigned int id,
-  DFBDisplayLayerDescription desc, void *data)
-{
-    struct DirectfbData *vodata = (DirectfbData*)data;
-    struct DirectfbParams *params = &(vodata->params);
-    IDirectFBDisplayLayer *layer;
-    DFBResult ret;
-
-    ret = vodata->dfb->GetDisplayLayer(vodata->dfb, id, &layer);
-
-    if (ret)
-    {
-        DirectFBError("Couldn't open layer", ret);
-        return DFENUM_OK;
-    }
-
-    DFBDisplayLayerConfig dlc;
-
-    if (params->setsize)
-    {
-        dlc.flags = (DFBDisplayLayerConfigFlags)(DLCONF_WIDTH | DLCONF_HEIGHT);
-        dlc.width = params->width;
-        dlc.height = params->height;
-
-        ret = layer->SetConfiguration(layer, &dlc);
-
-        if (ret)
+        if (vbuffers[i].qscale_table)
         {
-            DirectFBError("Couldn't set layer size", ret);
+            delete [] vbuffers[i].qscale_table;
+            vbuffers[i].qscale_table = NULL;
         }
     }
+    BufferMap::iterator iter;
+    for ( iter = data->buffers.begin() ; iter != data->buffers.end() ; iter++ )
+    {
+        if(iter->second) {
+            DFBCHECK(iter->second->Unlock(iter->second));
+            DFBCHECK(iter->second->Release(iter->second));
+        }
+    }
+    data->buffers.clear();
+}
 
-    dlc.flags = DLCONF_PIXELFORMAT;
-    dlc.pixelformat = DSPF_YV12;
+int VideoOutputDirectfb::ChangePictureAttribute(int attributeType, int newValue)
+{
+    data->videoLayer->GetColorAdjustment(data->videoLayer, (DFBColorAdjustment*) &adj);
+    adj.flags = 0;
 
-    layer->SetOpacity(layer, 0);
+    switch (attributeType) {
+    case kPictureAttribute_Brightness:
+        if ( data->videoLayerDesc.caps & DLCAPS_BRIGHTNESS ) {
+            adj.flags = DCAF_BRIGHTNESS;
+            adj.brightness = (unsigned short)(0xffff*newValue/100);
+        }
+        break;
+    case kPictureAttribute_Contrast:
+        if ( data->videoLayerDesc.caps & DLCAPS_CONTRAST ) {
+            adj.flags = DCAF_CONTRAST;
+            adj.contrast = (unsigned short)(0xffff*newValue/100);
+        }
+        break;
+    case kPictureAttribute_Colour:
+        if ( data->videoLayerDesc.caps & DLCAPS_SATURATION ) {
+            adj.flags = DCAF_SATURATION;
+            adj.saturation = (unsigned short)(0xffff*newValue/100);
+        }
+        break;
+    case kPictureAttribute_Hue:
+        if ( data->videoLayerDesc.caps & DLCAPS_HUE ) {
+            adj.flags = DCAF_HUE;
+            adj.hue = (unsigned short)(0xffff*newValue/100);
+        }
+        break;
+    }
 
-    ret = layer->TestConfiguration(layer, &dlc, NULL);
+    if (adj.flags) {
+        if (newValue < 0) newValue = 0;
+        if (newValue >= 100) newValue = 99;
+        data->videoLayer->SetColorAdjustment(data->videoLayer, (DFBColorAdjustment*) &adj);
+        return newValue;
+    }
+    return -1;
+}
 
-    layer->Release(layer);
+DFBEnumerationResult LayerCallback(unsigned int id,
+                                   DFBDisplayLayerDescription desc, void *data)
+{
+    struct DirectfbData *vodata = (DirectfbData*)data;
+    DFBResult ret;
+    IDirectFBSurface *surface;
+
+    if(id == DLID_PRIMARY)
+        return DFENUM_OK;
+
+    DFBCHECKFAIL(vodata->dfb->GetDisplayLayer(vodata->dfb, id, &(vodata->videoLayer)), DFENUM_OK);
+    VERBOSE(VB_GENERAL, QString("DirectFB Layer %1 %2:").arg(id).arg(desc.name));
+
+    if (desc.caps & DLCAPS_SURFACE)
+        VERBOSE(VB_GENERAL, "  - Has a surface.");
+
+    if (desc.caps & DLCAPS_ALPHACHANNEL)
+        VERBOSE(VB_GENERAL, "  - Supports blending based on alpha channel.");
+
+    if (desc.caps & DLCAPS_SRC_COLORKEY)
+        VERBOSE(VB_GENERAL, "  - Supports source color keying.");
+
+    if (desc.caps & DLCAPS_DST_COLORKEY)
+        VERBOSE(VB_GENERAL, "  - Supports destination color keying.");
+
+    if (desc.caps & DLCAPS_FLICKER_FILTERING)
+        VERBOSE(VB_GENERAL, "  - Supports flicker filtering.");
+
+    if (desc.caps & DLCAPS_DEINTERLACING)
+        VERBOSE(VB_GENERAL, "  - Can deinterlace interlaced video for progressive display.  ");
+
+    if (desc.caps & DLCAPS_OPACITY)
+        VERBOSE(VB_GENERAL, "  - Supports blending based on global alpha factor.");
+
+    if (desc.caps & DLCAPS_SCREEN_LOCATION)
+        VERBOSE(VB_GENERAL, "  - Can be positioned on the screen.");
+
+    if (desc.caps & DLCAPS_BRIGHTNESS)
+        VERBOSE(VB_GENERAL, "  - Brightness can be adjusted.");
+
+    if (desc.caps & DLCAPS_CONTRAST)
+        VERBOSE(VB_GENERAL, "  - Contrast can be adjusted.");
+
+    if (desc.caps & DLCAPS_HUE)
+        VERBOSE(VB_GENERAL, "  - Hue can be adjusted.");
+
+    if (desc.caps & DLCAPS_SATURATION)
+        VERBOSE(VB_GENERAL, "  - Saturation can be adjusted.");
+
+    ret = vodata->videoLayer->TestConfiguration(vodata->videoLayer, &(vodata->videoLayerConfig), NULL);
 
     if (DFB_OK == ret)
     {
-        if (params->result)
-        {
-            if (!params->scale && 0)
-            {
-                params->scale = 1;
-                params->id = id;
-            }
-            else
-            {
-                params->result = 1;
-	        params->id = id;
-            }
-        }
-
+        vodata->videoLayerDesc = desc;
+        return DFENUM_CANCEL;
     }
-
+    else {
+        vodata->videoLayer->Release(vodata->videoLayer);
+    }
     return DFENUM_OK;
 }
