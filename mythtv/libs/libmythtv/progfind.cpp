@@ -114,7 +114,6 @@ void ProgFinder::Initialize(void)
 
     inSearch = 0;
     pastInitial = false;
-    searchCount = 37;
     recordingCount = 0;
 
     initData = new QString[(int)(searchCount*showsPerListing)];
@@ -1598,7 +1597,7 @@ JaProgFinder::JaProgFinder(MythMainWindow *parent, const char *name)
          ;
 
     searchCount = numberOfSearchChars;
-    curSearch = 10;
+    curSearch = 0;
 }
 
 void JaProgFinder::fillSearchData()

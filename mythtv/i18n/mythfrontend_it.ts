@@ -701,11 +701,11 @@
     </message>
     <message>
         <source>Skip %1 seconds</source>
-        <translation>Salta %1 secondi</translation>
+        <translation type="obsolete">Salta %1 secondi</translation>
     </message>
     <message>
         <source>Commercial: %1 seconds</source>
-        <translation>Pubblicità: %1 secondi</translation>
+        <translation type="obsolete">Pubblicità: %1 secondi</translation>
     </message>
     <message>
         <source>Found %1 sec. commercial</source>
@@ -3326,10 +3326,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Default</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Duplicate Location</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3439,6 +3435,18 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>If set, Myth will automatically rewind this many seconds after performing a commercial skip.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skip %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commercial: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Logo Detection</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

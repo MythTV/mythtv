@@ -3,15 +3,15 @@
     <name>CaptureCard</name>
     <message>
         <source>You have to save the current card before configuring it, would you like to do this now?</source>
-        <translation type="unfinished"></translation>
+        <translation>これをする前に現在のカードの設定を保存しますか？</translation>
     </message>
     <message>
         <source>Yes, save now</source>
-        <translation type="unfinished"></translation>
+        <translation>はい、保存します</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation type="unfinished">いいえ</translation>
+        <translation>いいえ</translation>
     </message>
 </context>
 <context>
@@ -123,7 +123,7 @@
     </message>
     <message>
         <source>Record one showing of this program</source>
-        <translation type="unfinished">この番組を一回の放送分だけ録画する</translation>
+        <translation>この番組を一回の放送分だけ録画する</translation>
     </message>
 </context>
 <context>
@@ -381,51 +381,51 @@
     </message>
     <message>
         <source>Recording List Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>録画リストメニュー</translation>
     </message>
     <message>
         <source>Change Group View</source>
-        <translation type="unfinished"></translation>
+        <translation>グループビュー変更</translation>
     </message>
     <message>
         <source>Change Group Password</source>
-        <translation type="unfinished"></translation>
+        <translation>グループパスワード変更</translation>
     </message>
     <message>
         <source>Change Recording Group</source>
-        <translation type="unfinished"></translation>
+        <translation>録画グループ変更</translation>
     </message>
     <message>
         <source>Edit Recording Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>録画予約変更</translation>
     </message>
     <message>
         <source>Recording Group View</source>
-        <translation type="unfinished"></translation>
+        <translation>録画グループビュー</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">はい</translation>
+        <translation>はい</translation>
     </message>
     <message>
         <source>Change Recording Group Password</source>
-        <translation type="unfinished"></translation>
+        <translation>録画グループパスワード変更</translation>
     </message>
     <message>
         <source>Recording Group:</source>
-        <translation type="unfinished"></translation>
+        <translation>録画グループ:</translation>
     </message>
     <message>
         <source>Old Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>古いパスワード:</translation>
     </message>
     <message>
         <source>New Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>新しいパスワード</translation>
     </message>
     <message>
         <source>, %1 GB free</source>
-        <translation type="unfinished"></translation>
+        <translation>, %1 GB 空</translation>
     </message>
 </context>
 <context>
@@ -472,7 +472,7 @@
     </message>
     <message>
         <source>Recording one showing of this program</source>
-        <translation type="unfinished">この放送を一回だけ録画する</translation>
+        <translation>この放送を一回だけ録画する</translation>
     </message>
 </context>
 <context>
@@ -578,7 +578,7 @@
     </message>
     <message>
         <source>Recording one showing of this program</source>
-        <translation type="unfinished">この放送を一回だけ録画する</translation>
+        <translation>この放送を一回だけ録画する</translation>
     </message>
 </context>
 <context>
@@ -745,7 +745,7 @@
     </message>
     <message>
         <source>Skip %1 seconds</source>
-        <translation>%1秒間スキップ</translation>
+        <translation type="obsolete">%1秒間スキップ</translation>
     </message>
     <message>
         <source>Not Recording</source>
@@ -1767,7 +1767,7 @@
     </message>
     <message>
         <source>Commercial: %1 seconds</source>
-        <translation>CM: %1 秒</translation>
+        <translation type="obsolete">CM: %1 秒</translation>
     </message>
     <message>
         <source>Notify, but do not skip</source>
@@ -3259,95 +3259,95 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>If set automatic commercial flagging will be skipped for this channel.  Useful for premium channels like HBO.</source>
-        <translation type="unfinished"></translation>
+        <translation>これをセットすると自動コマーシャルマーク付けをこのチャンネルでスキップします。HBO等のプレミアムチャンネルで便利です。</translation>
     </message>
     <message>
         <source>Default</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">既定値</translation>
     </message>
     <message>
         <source>F</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source></source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Find One Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>１回検索録画</translation>
     </message>
     <message>
         <source>Record one showing of this program</source>
-        <translation type="unfinished"></translation>
+        <translation>この番組を一回の放送分だけ録画する</translation>
     </message>
     <message>
         <source>Duplicate Location</source>
-        <translation type="unfinished"></translation>
+        <translation>重複場所</translation>
     </message>
     <message>
         <source>All places</source>
-        <translation type="unfinished"></translation>
+        <translation>全ての場所</translation>
     </message>
     <message>
         <source>Current Recs</source>
-        <translation type="unfinished"></translation>
+        <translation>現在のレコード</translation>
     </message>
     <message>
         <source>Previous Recs</source>
-        <translation type="unfinished"></translation>
+        <translation>前のレコード</translation>
     </message>
     <message>
         <source>Duplicate Check</source>
-        <translation type="unfinished"></translation>
+        <translation>重複チェック</translation>
     </message>
     <message>
         <source>Sub &amp; Desc</source>
-        <translation type="unfinished"></translation>
+        <translation>サブ&amp;内容</translation>
     </message>
     <message>
         <source>Description</source>
-        <translation type="unfinished"></translation>
+        <translation>内容</translation>
     </message>
     <message>
         <source>Max episodes</source>
-        <translation type="unfinished"></translation>
+        <translation>最大番組数</translation>
     </message>
     <message>
         <source>Delete oldest over Max</source>
-        <translation type="unfinished"></translation>
+        <translation>最大を超えた古いものを削除する</translation>
     </message>
     <message>
         <source>Recording Group</source>
-        <translation type="unfinished"></translation>
+        <translation>録画グループ</translation>
     </message>
     <message>
         <source>Do not adjust BT audio volume.</source>
-        <translation type="unfinished"></translation>
+        <translation>BTオーディオボリュームを変更しない。</translation>
     </message>
     <message>
         <source>Check this option for budget BT878 based DVB-T cards such as the AverTV DVB-T that require the audio volume left alone.</source>
-        <translation type="unfinished"></translation>
+        <translation>これをチェックすると</translation>
     </message>
     <message>
         <source>Open DVB card on demand</source>
-        <translation type="unfinished"></translation>
+        <translation>DVBカードをオンデマンドでオープンする</translation>
     </message>
     <message>
         <source>This option makes the backend dvb-recorder only open the card when it is actually in-use leaving it free for other programs at other times.</source>
-        <translation type="unfinished"></translation>
+        <translation>このオプションをセットするとバックエンドdvbレコーダーは本当に使用している時しかオープンしません。その他の時間は他のプログラムで使用できます。</translation>
     </message>
     <message>
         <source>Password required to view all recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>全録画表示にパスワードが必要</translation>
     </message>
     <message>
         <source>If given, a password must be entered to view the complete list of all recordings.</source>
-        <translation type="unfinished"></translation>
+        <translation>これをセットすると完全な全録画一覧を表示するのにパスワードが入力する必要が有ります。</translation>
     </message>
     <message>
         <source>Default Recording Group to display</source>
-        <translation type="unfinished"></translation>
+        <translation>表示する規定の録画グループ</translation>
     </message>
     <message>
         <source>All</source>
@@ -3355,94 +3355,106 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Default Recording Group to display on the view recordings screen.</source>
-        <translation type="unfinished"></translation>
+        <translation>録画画面に表示する規定の録画グループ。</translation>
     </message>
     <message>
         <source>Save current Recording Group view when changed</source>
-        <translation type="unfinished"></translation>
+        <translation>現在の録画ビューを変更した時に保存する</translation>
     </message>
     <message>
         <source>Remember the last selected Recording Group instead of displaying the Default group whenever you enter the playback screen.</source>
-        <translation type="unfinished"></translation>
+        <translation>再生の場合は常に、デフォルト・グループを表示する代わりに最後に選択された録画グループ記憶する。</translation>
     </message>
     <message>
         <source>Use program categories as display groups</source>
-        <translation type="unfinished"></translation>
+        <translation>表示グループで番組カテゴリーを使用する</translation>
     </message>
     <message>
         <source>Add the list of program categories to the list of Recording Groups used for display.  Only programs in non-password protected groups will be listed.</source>
-        <translation type="unfinished"></translation>
+        <translation>画面使用するで録画グループ一覧に番組カテゴリーリストを追加する。パスワードで保護されてないグループのみ有効です。</translation>
     </message>
     <message>
         <source>Time offset for thumbnail preview images</source>
-        <translation type="unfinished"></translation>
+        <translation>サムネイル画像のタイムオフセット</translation>
     </message>
     <message>
         <source>How many seconds into the show to capture the static preview images from.</source>
-        <translation type="unfinished"></translation>
+        <translation>録画の静止画を作成する秒数。</translation>
     </message>
     <message>
         <source>Find One Recordings Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>1回検索録画の優先順位</translation>
     </message>
     <message>
         <source>Find One Recording types will receive this additional recording priority value.</source>
-        <translation type="unfinished"></translation>
+        <translation>1回検索録画にはこの録画優先順位の値が加算されます.</translation>
     </message>
     <message>
         <source>Interval to sample DVB signal stats at (in seconds, 0 = off)</source>
-        <translation type="unfinished"></translation>
+        <translation>DVB信号のサンプリングインターバル(秒, 0 = off)</translation>
     </message>
     <message>
         <source>Length of time to retain DVB signal data (in days)</source>
-        <translation type="unfinished"></translation>
+        <translation>DVB信号データ(数日で)を保持する時間の長さ</translation>
     </message>
     <message>
         <source>View Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>録画ビュー</translation>
     </message>
     <message>
         <source>DVB Global Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>全体的なDVB設定</translation>
     </message>
     <message>
         <source>Pre Shutdown check-command</source>
-        <translation type="unfinished"></translation>
+        <translation>シャットダウン前のチェックコマンド</translation>
     </message>
     <message>
         <source>A command executed before the backend would shutdown. The return value of the command determines if the backend is allowed to shutdown. 0 - yes, 1 - reinitializes the idleing, 2 - reset the backend to wait for a frontend again</source>
-        <translation type="unfinished"></translation>
+        <translation>バックエンドがシャットダウンする前のコマンド。コマンドの戻り値でバックエンドはの動作が決まります。0 - シャットダウン, 1 - 再初期化, 2 - リセットしてフロントエンドを待ちます</translation>
     </message>
     <message>
         <source>Block shutdown before client connected</source>
-        <translation type="unfinished"></translation>
+        <translation>クライアントが接続中はシャットダウンしない</translation>
     </message>
     <message>
         <source>If set, the automatic shutdown routine will be disabled until a client connects.</source>
-        <translation type="unfinished"></translation>
+        <translation>これをセットするとクライアントが接続中は自動シャットダウンは無効になります。</translation>
     </message>
     <message>
         <source>%1 behind  --  %2 full</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 経過  --  %2 全体</translation>
     </message>
     <message>
         <source>%1 behind</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 経過</translation>
     </message>
     <message>
         <source>%1 of %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 / %2</translation>
     </message>
     <message>
         <source>All Programs</source>
-        <translation type="unfinished">全番組</translation>
+        <translation>全番組</translation>
     </message>
     <message>
         <source>Commercial Skip Auto-Rewind Amount</source>
-        <translation type="unfinished"></translation>
+        <translation>コマーシャルスキップ自動巻き戻し量</translation>
     </message>
     <message>
         <source>If set, Myth will automatically rewind this many seconds after performing a commercial skip.</source>
+        <translation>これをセットするとコマーシャルスキップ後に指定した秒数まき戻します｡</translation>
+    </message>
+    <message>
+        <source>Skip %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commercial: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Logo Detection</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3721,23 +3733,23 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Zoom Mode OFF</source>
-        <translation type="unfinished"></translation>
+        <translation>ズームモード OFF</translation>
     </message>
     <message>
         <source>Activate Zoom Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>ズームモード有効</translation>
     </message>
     <message>
         <source>Auto-Expire OFF</source>
-        <translation type="unfinished"></translation>
+        <translation>自動削除 OFF</translation>
     </message>
     <message>
         <source>Auto-Expire ON</source>
-        <translation type="unfinished"></translation>
+        <translation>自動削除 ON</translation>
     </message>
     <message>
         <source>Zoom Mode ON</source>
-        <translation type="unfinished"></translation>
+        <translation>ズームモード ON</translation>
     </message>
 </context>
 <context>

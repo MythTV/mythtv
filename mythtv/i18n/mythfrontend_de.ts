@@ -3,15 +3,15 @@
     <name>CaptureCard</name>
     <message>
         <source>You have to save the current card before configuring it, would you like to do this now?</source>
-        <translation type="unfinished"></translation>
+        <translation>Sie müssen die aktuelle Karte vor dem konfigurieren abspeichern. Möchten Sie dies jetzt tun?</translation>
     </message>
     <message>
         <source>Yes, save now</source>
-        <translation type="unfinished"></translation>
+        <translation>Jetzt speichern</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation type="unfinished">Nicht löschen</translation>
+        <translation>Nicht speichern</translation>
     </message>
 </context>
 <context>
@@ -123,7 +123,7 @@
     </message>
     <message>
         <source>Record one showing of this program</source>
-        <translation type="unfinished"></translation>
+        <translation>Diese Ausstrahlung aufnehmen</translation>
     </message>
 </context>
 <context>
@@ -389,15 +389,15 @@
     </message>
     <message>
         <source>Change Group Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Gruppenpasswort ändern</translation>
     </message>
     <message>
         <source>Change Recording Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Aufnahmegruppe ändern</translation>
     </message>
     <message>
         <source>Edit Recording Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Aufnahmeplan ändern</translation>
     </message>
     <message>
         <source>Recording Group View</source>
@@ -405,27 +405,27 @@
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">Ok</translation>
+        <translation>Ok</translation>
     </message>
     <message>
         <source>Change Recording Group Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Passwort der Aufnahmegruppe ändern</translation>
     </message>
     <message>
         <source>Recording Group:</source>
-        <translation type="unfinished"></translation>
+        <translation>Aufnahmegruppe:</translation>
     </message>
     <message>
         <source>Old Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>Altes Passwort:</translation>
     </message>
     <message>
         <source>New Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>Neues Passwort:</translation>
     </message>
     <message>
         <source>, %1 GB free</source>
-        <translation type="unfinished"></translation>
+        <translation>, %1 GB frei</translation>
     </message>
 </context>
 <context>
@@ -472,7 +472,7 @@
     </message>
     <message>
         <source>Recording one showing of this program</source>
-        <translation type="unfinished"></translation>
+        <translation>Nehme eine Ausstrahlung dieser Sendung auf</translation>
     </message>
 </context>
 <context>
@@ -578,7 +578,7 @@
     </message>
     <message>
         <source>Recording one showing of this program</source>
-        <translation type="unfinished"></translation>
+        <translation>Nehme eine Ausstrahlung dieser Sendung auf</translation>
     </message>
 </context>
 <context>
@@ -761,7 +761,7 @@
     </message>
     <message>
         <source>Skip %1 seconds</source>
-        <translation>Springe %1 Sekunden</translation>
+        <translation type="obsolete">Springe %1 Sekunden</translation>
     </message>
     <message>
         <source>Not Recording</source>
@@ -1782,7 +1782,7 @@
     </message>
     <message>
         <source>Commercial: %1 seconds</source>
-        <translation>Werbung: %1 sekunden</translation>
+        <translation type="obsolete">Werbung: %1 sekunden</translation>
     </message>
     <message>
         <source>Notify, but do not skip</source>
@@ -2318,11 +2318,11 @@
     </message>
     <message>
         <source>QT</source>
-        <translation type="unfinished"></translation>
+        <translation>QT</translation>
     </message>
     <message>
         <source>Xbox</source>
-        <translation type="unfinished"></translation>
+        <translation>XBox</translation>
     </message>
     <message>
         <source>Channel Options</source>
@@ -2330,7 +2330,7 @@
     </message>
     <message>
         <source>Video Source</source>
-        <translation type="unfinished"></translation>
+        <translation>Videoquelle</translation>
     </message>
     <message>
         <source>Sort Mode</source>
@@ -2374,7 +2374,7 @@
     </message>
     <message>
         <source>XMLTV ID</source>
-        <translation type="unfinished"></translation>
+        <translation>XMLTV ID</translation>
     </message>
     <message>
         <source>Frequency ID</source>
@@ -2716,7 +2716,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>(New video source)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Neue Videoquelle)</translation>
     </message>
     <message>
         <source>ERROR, No inputs found</source>
@@ -3264,7 +3264,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Record one showing of this program</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Diese Ausstrahlung aufnehmen</translation>
     </message>
     <message>
         <source>Do not adjust BT audio volume.</source>
@@ -3332,10 +3332,6 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Position Cleared</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Default</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3424,23 +3420,23 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>View Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Aufnahmen ansehen</translation>
     </message>
     <message>
         <source>%1 behind  --  %2 full</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 zurück - %2 voll</translation>
     </message>
     <message>
         <source>%1 behind</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 zurück</translation>
     </message>
     <message>
         <source>%1 of %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 von %2</translation>
     </message>
     <message>
         <source>All Programs</source>
-        <translation type="unfinished">Alle Sendungen</translation>
+        <translation>Alle Sendungen</translation>
     </message>
     <message>
         <source>Commercial Skip Auto-Rewind Amount</source>
@@ -3448,6 +3444,18 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>If set, Myth will automatically rewind this many seconds after performing a commercial skip.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skip %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commercial: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Logo Detection</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3726,11 +3734,11 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Zoom Mode OFF</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoom aus</translation>
     </message>
     <message>
         <source>Activate Zoom Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoom aktivieren</translation>
     </message>
     <message>
         <source>Auto-Expire OFF</source>
@@ -3742,7 +3750,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Zoom Mode ON</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoom ein</translation>
     </message>
 </context>
 <context>
