@@ -31,9 +31,6 @@ using namespace std;
 #include <X11/extensions/xf86vmode.h>
 
 extern "C" {
-#ifdef USING_XVMC_VLD
-#include <X11/extensions/viaXvMC.h>
-#endif
 #include "../libavcodec/avcodec.h"
 #include "../libavcodec/xvmc_render.h"
 }
@@ -949,7 +946,9 @@ void VideoOutputXvMC::Show(FrameScanType scan)
     }
 
     data->p_render_surface_visible = data->p_render_surface_to_show;
-    data->p_render_surface_to_show = NULL;
+
+    if (!m_deinterlacing || (m_deinterlacing && field == 2))
+        data->p_render_surface_to_show = NULL;
 
     if (osdframe)
     {
@@ -1201,6 +1200,8 @@ int VideoOutputXvMC::ChangePictureAttribute(int attributeType, int newValue)
             value = (int) (port_min + (range/100.0) * newValue);
 
             XvSetPortAttribute(data->XJ_disp, xv_port, attribute, value);
+
+            XvMCSetAttribute(data->XJ_disp, &data->ctx, attribute, value);
 
             pthread_mutex_unlock(&lock);
 

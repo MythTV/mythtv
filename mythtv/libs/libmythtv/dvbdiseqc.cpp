@@ -30,6 +30,8 @@
  */
 
 #include <iostream>
+#include <cmath>
+
 #include "pthread.h"
 #include "qsqldatabase.h"
 

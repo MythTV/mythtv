@@ -10,7 +10,7 @@
 
 #ifdef USING_XVMC_VLD
 #include <stdint.h>
-#include <X11/extensions/viaXvMC.h>
+#include <X11/extensions/vldXvMC.h>
 #endif
 
 //the surface should be shown, video driver manipulate this

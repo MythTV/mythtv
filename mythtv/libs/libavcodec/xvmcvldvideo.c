@@ -70,24 +70,46 @@ int XVMC_VLD_field_start(MpegEncContext* s, AVCodecContext* avctx)
         render->p_past_surface = findPastSurface(s, render);
         render->p_future_surface = findFutureSurface(s);
         if (!render->p_past_surface)
-            fprintf(stderr, "error: decoding B frame and past frameis null!");
+            av_log(avctx, AV_LOG_ERROR, "error: decoding B frame and past frameis null!");
         else if (!render->p_future_surface)
-            fprintf(stderr, "error: decoding B frame and future frame is null!");
+            av_log(avctx, AV_LOG_ERROR, "error: decoding B frame and future frame is null!");
         break;
     case  P_TYPE:
         render->p_past_surface = findPastSurface(s, render);
         if (!render->p_past_surface)
-            fprintf(stderr, "error: decoding P frame and past frameis null!");
+            av_log(avctx, AV_LOG_ERROR, "error: decoding P frame and past frameis null!");
         break;
     }
 
     for (i = 0; i < 64; i++)
     {
-        qmatrix.intra_quantiser_matrix[i] = s->intra_matrix[i];
-        qmatrix.non_intra_quantiser_matrix[i] = s->inter_matrix[i];
+        if (s->alternate_scan)
+        {
+            /* Not sure if this is correct. If MPEG video streams have their
+             * QMatrix encoded in the alternative_scan mode rather than zig_zag,
+             * when the IDCT's are sent in alternative_scan mode, then we
+             * should re-zigzag and then de-alternative_scan the QMatrix data
+             * in intra_matrix and inter_matirx. The standard libavcodec always
+             * de-zigzags the incoming MPeg QMatrix.
+             */
+            qmatrix.intra_quantiser_matrix[i] = s->intra_matrix[s->dsp.idct_permutation[i]];
+            qmatrix.non_intra_quantiser_matrix[i] = s->inter_matrix[s->dsp.idct_permutation[i]];
+            qmatrix.chroma_intra_quantiser_matrix[i] = s->chroma_intra_matrix[s->dsp.idct_permutation[i]];
+            qmatrix.chroma_non_intra_quantiser_matrix[i] = s->chroma_inter_matrix[s->dsp.idct_permutation[i]];
+        }
+        else
+        {
+            qmatrix.intra_quantiser_matrix[i] = s->intra_matrix[s->dsp.idct_permutation[i]];
+            qmatrix.non_intra_quantiser_matrix[i] = s->inter_matrix[s->dsp.idct_permutation[i]];
+            qmatrix.chroma_intra_quantiser_matrix[i] = s->chroma_intra_matrix[s->dsp.idct_permutation[i]];
+            qmatrix.chroma_non_intra_quantiser_matrix[i] = s->chroma_inter_matrix[s->dsp.idct_permutation[i]];
+        }
     }
+
     qmatrix.load_intra_quantiser_matrix = 1;
     qmatrix.load_non_intra_quantiser_matrix = 1;
+    qmatrix.load_chroma_intra_quantiser_matrix = 1;
+    qmatrix.load_chroma_non_intra_quantiser_matrix = 1;
 
     binfo.flags = 0;
     if (s->alternate_scan)
@@ -116,7 +138,7 @@ int XVMC_VLD_field_start(MpegEncContext* s, AVCodecContext* avctx)
     case I_TYPE:    binfo.picture_coding_type = XVMC_I_PICTURE;     break;
     case P_TYPE:    binfo.picture_coding_type = XVMC_P_PICTURE;     break;
     case B_TYPE:    binfo.picture_coding_type = XVMC_B_PICTURE;     break;
-    default:    fprintf(stderr, "%s: Unknown picture coding type: %d\n", __FUNCTION__, s->pict_type);
+    default:    av_log(avctx, AV_LOG_ERROR, "%s: Unknown picture coding type: %d\n", __FUNCTION__, s->pict_type);
     }
 
     binfo.intra_dc_precision = s->intra_dc_precision;;
@@ -142,13 +164,16 @@ int XVMC_VLD_field_start(MpegEncContext* s, AVCodecContext* avctx)
 
     status = XvMCLoadQMatrix(render->disp, render->ctx, &qmatrix);
     if (status)
-        fprintf(stderr, "XvMCLoadQMatrix: Error: %d\n", status);
+        av_log(avctx, AV_LOG_ERROR, "XvMCLoadQMatrix: Error: %d\n", status);
 
-    status = XvMCBeginSurface(render->disp, render->ctx, render->p_surface, 
-                              render->p_past_surface, render->p_future_surface,
-                              &binfo);
-    if (status)
-        fprintf(stderr, "XvMCBeginSurface: Error: %d\n", status);
+    do 
+    {
+        status = XvMCBeginSurface(render->disp, render->ctx, render->p_surface, 
+                                  render->p_past_surface, render->p_future_surface,
+                                  &binfo);
+        if (status)
+            av_log(avctx, AV_LOG_ERROR, "XvMCBeginSurface: Error: %d\n", status);
+    } while (status);
 
     return 0;
 }

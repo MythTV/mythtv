@@ -16,6 +16,8 @@ include ( ../../config.mak )
 
 INCLUDEPATH = ../../
 
+# Debug mode on x86 must compile without -fPIC and with -O, otherwise gcc runs 
+# out of registers
 QMAKE_CFLAGS_SHLIB = 
 
 QMAKE_CFLAGS_RELEASE = $$OPTFLAGS -DPIC -fPIC -fomit-frame-pointer -DHAVE_AV_CONFIG_H -I.. -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE

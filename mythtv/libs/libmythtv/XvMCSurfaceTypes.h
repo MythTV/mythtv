@@ -6,9 +6,6 @@
 #include <X11/extensions/XvMC.h>
 
 extern "C" {
-#ifdef USING_XVMC_VLD
-#include <X11/extensions/viaXvMC.h>
-#endif
 #include "../libavcodec/xvmc_render.h"
 }
 
