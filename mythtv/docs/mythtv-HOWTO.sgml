@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-01-16, v1.076
+<date>2003-01-16, v1.077
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -533,6 +533,7 @@ $ ./configure
 $ make
 </verb></tscreen>
 
+<label id="RH80_OSD_Strip">
 <bf>NOTE for Red Hat 8 users only</bf>: You must manually modify a Makefile
 within the themes directory, otherwise your on screen display (OSD) will be
 "generic" rather than themed.  The solution is to edit the Makefile within
@@ -1903,8 +1904,7 @@ Now, you need to clear out the old versions of the software to ensure that
 you're running with the debugging code, then compile and install.
 
 <tscreen><verb>
-$ make clean
-$ make distclean
+$ make clean distclean
 $ ./configure
 $ make
 $ su
@@ -2024,6 +2024,11 @@ second card is #1, etc.
 <sect1>MythWeather is showing me the weather in the Bahamas!
 <p>You didn't read the documentation.  Ensure that you set your locale
 correctly.
+
+<sect1>I can't see parts of the On Screen Display.
+<p>If you're a Red Hat 8.0 user, make sure that you've followed the
+instructions which tell you how to modify the Themes makefile. <ref id="RH80_OSD_Strip"
+name="Link">.
 
 <sect>Miscellaneous.
 <sect1>I'd like to watch the files without using MythTV / I'd like to convert the files to some other format.
@@ -2277,6 +2282,8 @@ developer of MythTV.  Modified version of XMLTV to get; added instruction
 that latest version of XMLTV is usually best because of back-end changes at
 zap2it.
 v1.076, 2003-01-16.  Slight adjustment to Gentoo docs.  Typo in path.
+v1.077, 2003-01-16.  Added "Can't see OSD" to troubleshooting with pointer
+back to RH80 strip instructions.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

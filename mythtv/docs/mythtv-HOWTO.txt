@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-01-16, v1.076
+  2003-01-16, v1.077
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -110,6 +110,7 @@
      17.10 MythTV makes my system crash.
      17.11 Troubleshooting audio
      17.12 MythWeather is showing me the weather in the Bahamas!
+     17.13 I can't see parts of the On Screen Display.
 
   18. Miscellaneous.
      18.1 I'd like to watch the files without using MythTV / I'd like to convert the files to some other format.
@@ -137,7 +138,6 @@
        $ cvs -z3 -d :pserver:mythtv@cvs.mythtv.org:/var/lib/cvs checkout MC
 
   This documentation will be in the docs/ subdirectory.
-
   [1mNOTE[22m: If you are going to use CVS to compile MythTV rather than using
   the distribution tarballs, it is [1mstrongly [22mrecommended that you join
   <http://www.snowman.net/mailman/listinfo/mythtv-commits/> the mythtv-
@@ -2020,8 +2020,7 @@
   Now, you need to clear out the old versions of the software to ensure
   that you're running with the debugging code, then compile and install.
 
-       $ make clean
-       $ make distclean
+       $ make clean distclean
        $ ./configure
        $ make
        $ su
@@ -2122,6 +2121,12 @@
   You didn't read the documentation.  Ensure that you set your locale
   correctly.
 
+  [1m17.13.  I can't see parts of the On Screen Display.[0m
+
+  If you're a Red Hat 8.0 user, make sure that you've followed the
+  instructions which tell you how to modify the Themes makefile.
+  ``Link''.
+
   [1m18.  Miscellaneous.[0m
 
   [1m18.1.  I'd like to watch the files without using MythTV / I'd like to[0m
@@ -2140,11 +2145,11 @@
 
   Download the source to MPlayer and patch:
 
-       $ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90rc1.tar.bz2
-       $ tar -xjf MPlayer-0.90rc1.tar.bz2
-       $ cp mplayer-0.90pre10+mythtv.patch MPlayer-0.90rc1
-       $ cd MPlayer-0.90rc1
-       $ patch -p1 < mplayer-0.90pre10+mythtv.patch
+  $ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90rc1.tar.bz2
+  $ tar -xjf MPlayer-0.90rc1.tar.bz2
+  $ cp mplayer-0.90pre10+mythtv.patch MPlayer-0.90rc1
+  $ cd MPlayer-0.90rc1
+  $ patch -p1 < mplayer-0.90pre10+mythtv.patch
 
   At this point, you can read the MPlayer documentation and start the
   compile process.
@@ -2189,7 +2194,6 @@
 
   [1mTHERE IS NO GUARANTEE THAT THESE INSTRUCTIONS WILL WORK.  USE AT YOUR[0m
   [1mOWN RISK.[0m
-
   Here are some of the features in version 0.8:
 
   +o  A front-end and back-end system.  The back-end is responsible for
