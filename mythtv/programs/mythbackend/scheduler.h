@@ -60,8 +60,8 @@ class Scheduler : public QObject
     void MarkSingleConflict(ProgramInfo *info,
                             list<ProgramInfo *> *conflictList);
 
-    int totalRank(ProgramInfo *info);
-    void CheckRank(ProgramInfo *info, list<ProgramInfo *> *conflictList);
+    int totalRecPriority(ProgramInfo *info);
+    void CheckRecPriority(ProgramInfo *info, list<ProgramInfo *> *conflictList);
     void CheckOverride(ProgramInfo *info, list<ProgramInfo *> *conflictList);
     void RemoveConflicts(void);
     void GuessSingle(ProgramInfo *info, list<ProgramInfo *> *conflictList);
@@ -85,12 +85,12 @@ class Scheduler : public QObject
     QMutex recordingList_lock;
     QMutex scheduledList_lock;
 
-    bool doRank;
-    bool doRankFirst;
+    bool doRecPriority;
+    bool doRecPriorityFirst;
 
-    QMap<QString, int> rankMap;
-    QMap<QString, int> channelRankMap;
-    QMap<RecordingType, int> recTypeRankMap;
+    QMap<QString, int> recpriorityMap;
+    QMap<QString, int> channelRecPriorityMap;
+    QMap<RecordingType, int> recTypeRecPriorityMap;
 
     bool hasconflicts;
 

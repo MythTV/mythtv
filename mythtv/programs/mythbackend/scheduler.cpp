@@ -156,15 +156,15 @@ void Scheduler::FillEncoderFreeSpaceCache()
 
 bool Scheduler::FillRecordLists(bool doautoconflicts)
 {
-    doRank = (bool)gContext->GetNumSetting("RankingActive");
-    doRankFirst = (bool)gContext->GetNumSetting("RankingOrder");
+    doRecPriority = (bool)gContext->GetNumSetting("RecPriorityingActive");
+    doRecPriorityFirst = (bool)gContext->GetNumSetting("RecPriorityingOrder");
 
-    if (rankMap.size() > 0)
-        rankMap.clear();
-    if (channelRankMap.size() > 0)
-        channelRankMap.clear();
-    if (recTypeRankMap.size() > 0)
-        recTypeRankMap.clear();
+    if (recpriorityMap.size() > 0)
+        recpriorityMap.clear();
+    if (channelRecPriorityMap.size() > 0)
+        channelRecPriorityMap.clear();
+    if (recTypeRecPriorityMap.size() > 0)
+        recTypeRecPriorityMap.clear();
 
     QMutexLocker lockit(&recordingList_lock);
 
@@ -242,17 +242,17 @@ void Scheduler::FillRecordListFromMaster(void)
 
 void Scheduler::PrintList(void)
 {
-    QString totrank;
+    QString totrecpriority;
 
     cout << "--- print list start ---\n";
     list<ProgramInfo *>::iterator i = recordingList.begin();
     cout << "Title                 Chan  ChID  StartTime       S I C "
-            " C R O N Rank Total" << endl;
+            " C R O N Priority Total" << endl;
     for (; i != recordingList.end(); i++)
     {
         ProgramInfo *first = (*i);
 
-        totrank = QString::number(totalRank(first));
+        totrecpriority = QString::number(totalRecPriority(first));
 
         cout << first->title.leftJustify(22, ' ', true)
              << first->chanstr.rightJustify(4, ' ') << "  " << first->chanid 
@@ -261,8 +261,8 @@ void Scheduler::PrintList(void)
              << " " << first->inputid << " " << first->cardid << "  "  
              << first->conflicting << " " << first->recording << " "
              << first->override << " " << first->NoRecordChar() << " "
-             << first->rank.rightJustify(4, ' ') << " "
-             << totrank.rightJustify(4, ' ')
+             << first->recpriority.rightJustify(8, ' ') << " "
+             << totrecpriority.rightJustify(4, ' ')
              << endl;
     }
 
@@ -607,50 +607,55 @@ list<ProgramInfo *> *Scheduler::getConflicting(ProgramInfo *pginfo,
     return retlist;
 }
 
-int Scheduler::totalRank(ProgramInfo *info)
+int Scheduler::totalRecPriority(ProgramInfo *info)
 {
-    int rank = 0;
+    int recpriority = 0;
     RecordingType rectype;
 
-    if (rankMap.contains(info->schedulerid))
-        return rankMap[info->schedulerid];
+    if (recpriorityMap.contains(info->schedulerid))
+        return recpriorityMap[info->schedulerid];
 
-    if (!channelRankMap.contains(info->chanid))
-        channelRankMap[info->chanid] = info->GetChannelRank(db, info->chanid);
-
+    if (!channelRecPriorityMap.contains(info->chanid))
+    {
+        channelRecPriorityMap[info->chanid] = 
+                                 info->GetChannelRecPriority(db, info->chanid);
+    }
     rectype = info->GetProgramRecordingStatus(db);
-    if (!recTypeRankMap.contains(rectype))
-        recTypeRankMap[rectype] = info->GetRecordingTypeRank(rectype);
+    if (!recTypeRecPriorityMap.contains(rectype))
+    {
+        recTypeRecPriorityMap[rectype] = 
+                                    info->GetRecordingTypeRecPriority(rectype);
+    }
 
-    rank = info->rank.toInt();
-    rank += channelRankMap[info->chanid];
-    rank += recTypeRankMap[rectype];
-    rankMap[info->schedulerid] = rank;
+    recpriority = info->recpriority.toInt();
+    recpriority += channelRecPriorityMap[info->chanid];
+    recpriority += recTypeRecPriorityMap[rectype];
+    recpriorityMap[info->schedulerid] = recpriority;
 
-    return rank;
+    return recpriority;
 }
 
-void Scheduler::CheckRank(ProgramInfo *info,
+void Scheduler::CheckRecPriority(ProgramInfo *info,
                           list<ProgramInfo *> *conflictList)
 {
-    int rank, srank, resolved = 0;
+    int recpriority, srecpriority, resolved = 0;
 
-    rank = totalRank(info);
+    recpriority = totalRecPriority(info);
 
     list<ProgramInfo *>::iterator i = conflictList->begin();
     for (; i != conflictList->end(); i++)
     {
         ProgramInfo *second = (*i);
 
-        srank = totalRank(second);
+        srecpriority = totalRecPriority(second);
 
-        if (rank == srank)
+        if (recpriority == srecpriority)
             continue;
 
-        if (rank > srank)
+        if (recpriority > srecpriority)
         {
             second->recording = false;
-            second->norecord = nrLowerRanking;
+            second->norecord = nrLowerRecPriority;
             resolved++;
         }
     }
@@ -794,7 +799,7 @@ void Scheduler::MarkConflictsToRemove(void)
 {
     list<ProgramInfo *>::iterator i;
 
-    if (doRank && doRankFirst) 
+    if (doRecPriority && doRecPriorityFirst) 
     {
         i = recordingList.begin();
         for (; i != recordingList.end(); i++)
@@ -804,7 +809,7 @@ void Scheduler::MarkConflictsToRemove(void)
             if (first->conflicting && first->recording)
             {
                 list<ProgramInfo *> *conflictList = getConflicting(first);
-                CheckRank(first, conflictList);
+                CheckRecPriority(first, conflictList);
                 delete conflictList;
             }
         }
@@ -838,7 +843,7 @@ void Scheduler::MarkConflictsToRemove(void)
             first->conflicting = false;
     }
 
-    if (doRank && !doRankFirst) 
+    if (doRecPriority && !doRecPriorityFirst) 
     {
         i = recordingList.begin();
         for (; i != recordingList.end(); i++)
@@ -848,7 +853,7 @@ void Scheduler::MarkConflictsToRemove(void)
             if (first->conflicting && first->recording)
             {
                 list<ProgramInfo *> *conflictList = getConflicting(first);
-                CheckRank(first, conflictList);
+                CheckRecPriority(first, conflictList);
                 delete conflictList;
             }
         }
@@ -1086,7 +1091,8 @@ void Scheduler::DoMultiCard(void)
             if (second->conflictfixed)
                 secondmove = false;
 
-            if (doRank && totalRank(second) > totalRank(first))
+            if (doRecPriority && 
+                totalRecPriority(second) > totalRecPriority(first))
             {
                 highermove = secondmove;
                 higher = second;

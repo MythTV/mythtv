@@ -1,5 +1,5 @@
-#ifndef RANKPROGRAMS_H_
-#define RANKPROGRAMS_H_
+#ifndef PROGRAMRECPROIRITY_H_
+#define PROGRAMRECPROIRITY_H_
 
 #include <qdatetime.h>
 #include <qdom.h>
@@ -12,40 +12,40 @@
 
 class QSqlDatabase;
 
-class ProgramRankInfo : public ProgramInfo
+class ProgramRecPriorityInfo : public ProgramInfo
 {
   public:
-    ProgramRankInfo();
-    ProgramRankInfo(const ProgramRankInfo &other);
-    ProgramRankInfo& operator=(const ProgramInfo&);
+    ProgramRecPriorityInfo();
+    ProgramRecPriorityInfo(const ProgramRecPriorityInfo &other);
+    ProgramRecPriorityInfo& operator=(const ProgramInfo&);
 
 
-    int channelRank;
-    int recTypeRank;
+    int channelRecPriority;
+    int recTypeRecPriority;
     RecordingType recType;
 };
 
-class RankPrograms : public MythDialog
+class ProgramRecPriority : public MythDialog
 {
     Q_OBJECT
   public:
     enum SortType
     {
         byTitle,
-        byRank,
+        byRecPriority,
     };
 
-    RankPrograms(QSqlDatabase *ldb, MythMainWindow *parent, 
+    ProgramRecPriority(QSqlDatabase *ldb, MythMainWindow *parent, 
                  const char *name = 0);
-    ~RankPrograms();
+    ~ProgramRecPriority();
 
   protected slots:
     void cursorDown(bool page = false);
     void cursorUp(bool page = false);
     void pageDown() { cursorDown(true); }
     void pageUp() { cursorUp(true); }
-    void changeRank(int howMuch);
-    void saveRank(void);
+    void changeRecPriority(int howMuch);
+    void saveRecPriority(void);
     void edit();
 
   protected:
@@ -55,8 +55,8 @@ class RankPrograms : public MythDialog
   private:
     void FillList(void);
     void SortList();
-    QMap<QString, ProgramRankInfo> programData;
-    QMap<QString, QString> origRankData;
+    QMap<QString, ProgramRecPriorityInfo> programData;
+    QMap<QString, QString> origRecPriorityData;
 
     void updateBackground(void);
     void updateList(QPainter *);
@@ -67,7 +67,7 @@ class RankPrograms : public MythDialog
     XMLParse *theme;
     QDomElement xmldata;
 
-    ProgramRankInfo *curitem;
+    ProgramRecPriorityInfo *curitem;
 
     QSqlDatabase *db;
 

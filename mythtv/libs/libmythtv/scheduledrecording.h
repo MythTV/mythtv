@@ -47,7 +47,7 @@ public:
 
     void setStart(const QDateTime& start);
     void setEnd(const QDateTime& end);
-    void setRank(const QString& rank);
+    void setRecPriority(const QString& recpriority);
 
     virtual MythDialog* dialogWidget(MythMainWindow *parent, 
                                      const char *name = 0);
@@ -112,7 +112,7 @@ private:
     class SREndTime* endTime;
     class SREndDate* endDate;
     class SRCategory* category;
-    class SRRank* rank;
+    class SRRecPriority* recpriority;
 
     ProgramInfo* m_pginfo;
 };

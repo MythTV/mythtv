@@ -60,16 +60,9 @@
    </button>
 
    <button>
-      <type>TV_RANKINGS</type>
-      <text>Rankings</text>
-      <text lang="ES">Prioridades</text>
-      <text lang="CA">Prioritats</text>
-      <text lang="DE">Bewertungen</text>
-      <text lang="DK">Rangering</text>
-      <text lang="NL">Rangeren</text>
-      <text lang="PT">Configurações de Ordenação</text>
-      <text lang="SV">Rankning</text>
-      <action>MENU rank_settings.xml</action>
+      <type>TV_RECPRIORITIES</type>
+      <text>Recording Priorities</text>
+      <action>MENU recpriorities_settings.xml</action>
    </button>
 
 </mythmenu>

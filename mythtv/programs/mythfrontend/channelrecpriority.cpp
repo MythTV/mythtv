@@ -15,7 +15,7 @@
 #include <algorithm>
 using namespace std;
 
-#include "rankchannels.h"
+#include "channelrecpriority.h"
 #include "infodialog.h"
 #include "tv.h"
 
@@ -23,9 +23,9 @@ using namespace std;
 #include "mythcontext.h"
 #include "infostructs.h"
 
-RankChannels::RankChannels(QSqlDatabase *ldb, MythMainWindow *parent, 
-                           const char *name)
-            : MythDialog(parent, name)
+ChannelRecPriority::ChannelRecPriority(QSqlDatabase *ldb, 
+                                       MythMainWindow *parent, const char *name)
+                  : MythDialog(parent, name)
 {
     db = ldb;
 
@@ -43,11 +43,11 @@ RankChannels::RankChannels(QSqlDatabase *ldb, MythMainWindow *parent,
     theme = new XMLParse();
     theme->SetWMult(wmult);
     theme->SetHMult(hmult);
-    if (!theme->LoadTheme(xmldata, "rankchannels"))
+    if (!theme->LoadTheme(xmldata, "recprioritychannels"))
     {
         DialogBox diag(gContext->GetMainWindow(), "The theme you are using "
-                       "does not contain a 'rankchannels' element.  Please "
-                       "contact the theme creator and ask if they could "
+                       "does not contain a 'recprioritychannels' element.  "
+                       "Please contact the theme creator and ask if they could "
                        "please update it.<br><br>The next screen will be empty."
                        "  Escape out of it to return to the menu.");
         diag.AddButton("OK");
@@ -61,7 +61,7 @@ RankChannels::RankChannels(QSqlDatabase *ldb, MythMainWindow *parent,
     LayerSet *container = theme->GetSet("selector");
     if (container)
     {
-        UIListType *ltype = (UIListType *)container->GetType("ranklist");
+        UIListType *ltype = (UIListType *)container->GetType("recprioritylist");
         if (ltype)
         {
             listsize = ltype->GetItems();
@@ -69,7 +69,7 @@ RankChannels::RankChannels(QSqlDatabase *ldb, MythMainWindow *parent,
     }
     else
     {
-        cerr << "MythFrontEnd: ChannelRank - Failed to get selector object.\n";
+        cerr << "MythFrontEnd: ChannelRecPriority - Failed to get selector.\n";
         exit(0);
     }
 
@@ -80,8 +80,8 @@ RankChannels::RankChannels(QSqlDatabase *ldb, MythMainWindow *parent,
     updateBackground();
 
     FillList();
-    sortType = (SortType)gContext->GetNumSetting("ChannelRankSorting", 
-												 (int)byChannel);
+    sortType = (SortType)gContext->GetNumSetting("ChannelRecPrioritySorting",
+                                                 (int)byChannel);
 
     SortList(); 
     inList = 0;
@@ -91,7 +91,7 @@ RankChannels::RankChannels(QSqlDatabase *ldb, MythMainWindow *parent,
     gContext->addListener(this);
 }
 
-RankChannels::~RankChannels()
+ChannelRecPriority::~ChannelRecPriority()
 {
     gContext->removeListener(this);
     delete theme;
@@ -101,7 +101,7 @@ RankChannels::~RankChannels()
         delete curitem;
 }
 
-void RankChannels::keyPressEvent(QKeyEvent *e)
+void ChannelRecPriority::keyPressEvent(QKeyEvent *e)
 {
     switch (e->key())
     {
@@ -109,10 +109,10 @@ void RankChannels::keyPressEvent(QKeyEvent *e)
         case Key_Down: cursorDown(); break;
         case Key_PageUp: case Key_3: pageUp(); break;
         case Key_PageDown: case Key_9: pageDown(); break;
-        case Key_Right: changeRank(1); break;
-        case Key_Left: changeRank(-1); break;
-        case Key_Escape: saveRank(); 
-                         gContext->SaveSetting("ChannelRankSorting", 
+        case Key_Right: changeRecPriority(1); break;
+        case Key_Left: changeRecPriority(-1); break;
+        case Key_Escape: saveRecPriority(); 
+                         gContext->SaveSetting("ChannelRecPrioritySorting", 
                                                (int)sortType);
                          done(MythDialog::Accepted);
                          break;
@@ -122,9 +122,9 @@ void RankChannels::keyPressEvent(QKeyEvent *e)
                     SortList();     
                     update(fullRect);
                     break;
-        case Key_2: if(sortType == byRank)
+        case Key_2: if(sortType == byRecPriority)
                         break; 
-                    sortType = byRank; 
+                    sortType = byRecPriority; 
                     SortList(); 
                     update(fullRect);
                     break;
@@ -132,7 +132,7 @@ void RankChannels::keyPressEvent(QKeyEvent *e)
     }
 }
 
-void RankChannels::LoadWindow(QDomElement &element)
+void ChannelRecPriority::LoadWindow(QDomElement &element)
 {
     for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling())
@@ -157,7 +157,7 @@ void RankChannels::LoadWindow(QDomElement &element)
     }
 }
 
-void RankChannels::parseContainer(QDomElement &element)
+void ChannelRecPriority::parseContainer(QDomElement &element)
 {
     QRect area;
     QString name;
@@ -170,7 +170,7 @@ void RankChannels::parseContainer(QDomElement &element)
         infoRect = area;
 }
 
-void RankChannels::updateBackground(void)
+void ChannelRecPriority::updateBackground(void)
 {
     QPixmap bground(size());
     bground.fill(this, 0, 0);
@@ -186,7 +186,7 @@ void RankChannels::updateBackground(void)
     setPaletteBackgroundPixmap(myBackground);
 }
 
-void RankChannels::paintEvent(QPaintEvent *e)
+void ChannelRecPriority::paintEvent(QPaintEvent *e)
 {
     QRect r = e->rect();
     QPainter p(this);
@@ -201,7 +201,7 @@ void RankChannels::paintEvent(QPaintEvent *e)
     }
 }
 
-void RankChannels::cursorDown(bool page)
+void ChannelRecPriority::cursorDown(bool page)
 {
     if (page == false)
     {
@@ -253,7 +253,7 @@ void RankChannels::cursorDown(bool page)
     update(fullRect);
 }
 
-void RankChannels::cursorUp(bool page)
+void ChannelRecPriority::cursorUp(bool page)
 {
     if (page == false)
     {
@@ -303,9 +303,9 @@ void RankChannels::cursorUp(bool page)
          inList = 0;
 }
 
-void RankChannels::changeRank(int howMuch) 
+void ChannelRecPriority::changeRecPriority(int howMuch) 
 {
-    int tempRank, cnt;
+    int tempRecPriority, cnt;
     QPainter p(this);
     QMap<QString, ChannelInfo>::Iterator it;
     ChannelInfo *chanInfo;
@@ -316,31 +316,33 @@ void RankChannels::changeRank(int howMuch)
 
     chanInfo = &(it.data());
 
-    // inc/dec rank
-    tempRank = chanInfo->rank.toInt() + howMuch;
-    if(tempRank > -100 && tempRank < 100)
+    // inc/dec recording priority
+    tempRecPriority = chanInfo->recpriority.toInt() + howMuch;
+    if(tempRecPriority > -100 && tempRecPriority < 100)
     {
-        chanInfo->rank = QString::number(tempRank);
+        chanInfo->recpriority = QString::number(tempRecPriority);
 
-        // order may change if sorting by rank, so resort
-        if (sortType == byRank)
+        // order may change if sorting by recoring priority, so resort
+        if (sortType == byRecPriority)
             SortList();
         updateList(&p);
         updateInfo(&p);
     }
 }
 
-void RankChannels::applyChannelRankChange(QSqlDatabase *db, QString chanid, 
-                                          const QString &newrank) 
+void ChannelRecPriority::applyChannelRecPriorityChange(QSqlDatabase *db, 
+                                                       QString chanid, 
+                                                 const QString &newrecpriority) 
 {
-    QString query = QString("UPDATE channel SET rank = '%1' "
-                            "WHERE chanid = '%2';").arg(newrank).arg(chanid);
+    QString query = QString("UPDATE channel SET recpriority = '%1' "
+                            "WHERE chanid = '%2';").arg(newrecpriority)
+                                                   .arg(chanid);
     QSqlQuery result = db->exec(query);
     if (!result.isActive())
-        MythContext::DBError("Save rank update", query);
+        MythContext::DBError("Save recpriority update", query);
 }
 
-void RankChannels::saveRank(void) 
+void ChannelRecPriority::saveRecPriority(void) 
 {
     QMap<QString, ChannelInfo>::Iterator it;
 
@@ -349,23 +351,24 @@ void RankChannels::saveRank(void)
         ChannelInfo *chanInfo = &(it.data());
         QString key = QString::number(chanInfo->chanid);
 
-        // if this channel's rank changed from when we entered
+        // if this channel's recording priority changed from when we entered
         // save new value out to db
-        if (chanInfo->rank != origRankData[key])
-            applyChannelRankChange(db, QString::number(chanInfo->chanid), 
-                                   chanInfo->rank);
+        if (chanInfo->recpriority != origRecPriorityData[key])
+            applyChannelRecPriorityChange(db, 
+                                   QString::number(chanInfo->chanid), 
+                                   chanInfo->recpriority);
     }
     ScheduledRecording::signalChange(db);
 }
 
-void RankChannels::FillList(void)
+void ChannelRecPriority::FillList(void)
 {
     int cnt = 999;
 
     channelData.clear();
 
-    QString query = QString("SELECT chanid, channum, callsign, icon, rank "
-                            "FROM channel;");
+    QString query = QString("SELECT chanid, channum, callsign, icon, "
+                            "recpriority FROM channel;");
 
     QSqlQuery result = db->exec(query);
 
@@ -377,22 +380,23 @@ void RankChannels::FillList(void)
             chaninfo->chanstr = result.value(1).toString();
             chaninfo->callsign = result.value(2).toString();
             chaninfo->iconpath = result.value(3).toString();
-            chaninfo->rank = result.value(4).toString();
+            chaninfo->recpriority = result.value(4).toString();
             channelData[QString::number(cnt)] = *chaninfo;
 
-            // save rank value in map so we don't have to save all channel's
-            // rank values when we exit
-            origRankData[QString::number(chaninfo->chanid)] = chaninfo->rank;
+            // save recording priority value in map so we don't have to save 
+            // all channel's recording priority values when we exit
+            origRecPriorityData[QString::number(chaninfo->chanid)] = 
+                    chaninfo->recpriority;
 
             cnt--;
             dataCount++;
         }
     }
     else if (!result.isActive())
-        MythContext::DBError("Get channel ranks query", query);
+        MythContext::DBError("Get channel recording prioritiess query", query);
 }
 
-typedef struct RankInfo 
+typedef struct RecPriorityInfo 
 {
     ChannelInfo *chan;
     int cnt;
@@ -401,26 +405,26 @@ typedef struct RankInfo
 class channelSort 
 {
     public:
-        bool operator()(const RankInfo a, const RankInfo b) 
+        bool operator()(const RecPriorityInfo a, const RecPriorityInfo b) 
         {
             return(a.chan->chanstr.toInt() > b.chan->chanstr.toInt());
         }
 };
 
-class channelRankSort 
+class channelRecPrioritySort 
 {
     public:
-        bool operator()(const RankInfo a, const RankInfo b) 
+        bool operator()(const RecPriorityInfo a, const RecPriorityInfo b) 
         {
-            if (a.chan->rank.toInt() == b.chan->rank.toInt())
+            if (a.chan->recpriority.toInt() == b.chan->recpriority.toInt())
                 return (a.chan->chanstr.toInt() > b.chan->chanstr.toInt());
-            return (a.chan->rank.toInt() < b.chan->rank.toInt());
+            return (a.chan->recpriority.toInt() < b.chan->recpriority.toInt());
         }
 };
 
-void RankChannels::SortList() 
+void ChannelRecPriority::SortList() 
 {
-    typedef vector<RankInfo> sortList;
+    typedef vector<RecPriorityInfo> sortList;
     typedef QMap<QString, ChannelInfo> chanMap;
     
     int i, j;
@@ -429,7 +433,7 @@ void RankChannels::SortList()
     chanMap::Iterator pit;
     sortList::iterator sit;
     ChannelInfo *chanInfo;
-    RankInfo *rankInfo;
+    RecPriorityInfo *recPriorityInfo;
     chanMap cdCopy;
 
     // copy channelData into sortedList and make a copy
@@ -437,7 +441,7 @@ void RankChannels::SortList()
     for (i = 0, pit = channelData.begin(); pit != channelData.end(); ++pit, i++)
     {
         chanInfo = &(pit.data());
-        RankInfo tmp = {chanInfo, i};
+        RecPriorityInfo tmp = {chanInfo, i};
         sortedList.push_back(tmp);
         cdCopy[pit.key()] = pit.data();
     }
@@ -447,8 +451,8 @@ void RankChannels::SortList()
         case byChannel : sort(sortedList.begin(), sortedList.end(), 
                               channelSort());
                          break;
-        case byRank : sort(sortedList.begin(), sortedList.end(), 
-                           channelRankSort());
+        case byRecPriority : sort(sortedList.begin(), sortedList.end(), 
+                           channelRecPrioritySort());
                       break;
     }
 
@@ -457,20 +461,20 @@ void RankChannels::SortList()
     // rebuild channelData in sortedList order from cdCopy
     for(i = 0, sit = sortedList.begin(); sit != sortedList.end(); i++, ++sit ) 
     {
-        rankInfo = &(*sit);
+        recPriorityInfo = &(*sit);
 
-        // find rankInfo[i] in cdCopy
-        for (j = 0, pit = cdCopy.begin(); j != rankInfo->cnt; j++, ++pit);
+        // find recPriorityInfo[i] in cdCopy
+        for (j = 0, pit = cdCopy.begin(); j !=recPriorityInfo->cnt; j++, ++pit);
 
         chanInfo = &(pit.data());
 
         // put back into channelData
         channelData[QString::number(999-i)] = pit.data();
 
-        // if rankInfo[i] is the channel where the cursor
+        // if recPriorityInfo[i] is the channel where the cursor
         // was pre-sort then we need to update to cursor
         // to the ith position
-        if (!cursorChanged && rankInfo->cnt == inList+inData) 
+        if (!cursorChanged && recPriorityInfo->cnt == inList+inData) 
         {
             inList = dataCount - i - 1;
             if (inList > (int)((int)(listsize / 2) - 1)) 
@@ -491,7 +495,7 @@ void RankChannels::SortList()
     }
 }
 
-void RankChannels::updateList(QPainter *p)
+void ChannelRecPriority::updateList(QPainter *p)
 {
     QRect pr = listRect;
     QPixmap pix(pr.size());
@@ -506,7 +510,7 @@ void RankChannels::updateList(QPainter *p)
     container = theme->GetSet("selector");
     if (container)
     {
-        UIListType *ltype = (UIListType *)container->GetType("ranklist");
+        UIListType *ltype = (UIListType *)container->GetType("recprioritylist");
         if (ltype)
         {
             int cnt = 0;
@@ -521,7 +525,7 @@ void RankChannels::updateList(QPainter *p)
                     if (pastSkip <= 0)
                     {
                         ChannelInfo *chanInfo = &(it.data());
-                        int rank = chanInfo->rank.toInt();
+                        int recPriority = chanInfo->recpriority.toInt();
 
                         if (cnt == inList)
                         {
@@ -533,11 +537,12 @@ void RankChannels::updateList(QPainter *p)
                         
                         ltype->SetItemText(cnt, 1, chanInfo->chanstr);
                         ltype->SetItemText(cnt, 2, chanInfo->callsign);
-                        if (chanInfo->rank.toInt() > 0)
+                        if (chanInfo->recpriority.toInt() > 0)
                             ltype->SetItemText(cnt, 3, "+");
-                        else if (chanInfo->rank.toInt() < 0)
+                        else if (chanInfo->recpriority.toInt() < 0)
                             ltype->SetItemText(cnt, 3, "-");
-                        ltype->SetItemText(cnt, 4, QString::number(abs(rank)));
+                        ltype->SetItemText(cnt, 4, 
+                                           QString::number(abs(recPriority)));
 
                         cnt++;
                         listCount++;
@@ -547,13 +552,13 @@ void RankChannels::updateList(QPainter *p)
                 else
                     pageDowner = true;
             }
-        }
 
-        ltype->SetDownArrow(pageDowner);
-        if (inData > 0)
-            ltype->SetUpArrow(true);
-        else
-            ltype->SetUpArrow(false);
+            ltype->SetDownArrow(pageDowner);
+            if (inData > 0)
+                ltype->SetUpArrow(true);
+            else
+                ltype->SetUpArrow(false);
+        }
     }
 
     if (channelData.count() <= 0)
@@ -576,7 +581,7 @@ void RankChannels::updateList(QPainter *p)
     p->drawPixmap(pr.topLeft(), pix);
 }
 
-void RankChannels::updateInfo(QPainter *p)
+void ChannelRecPriority::updateInfo(QPainter *p)
 {
     QRect pr = infoRect;
     QPixmap pix(pr.size());
@@ -606,12 +611,12 @@ void RankChannels::updateInfo(QPainter *p)
             if (type)
                 type->SetText(curitem->callsign);
  
-            type = (UITextType *)container->GetType("rank");
+            type = (UITextType *)container->GetType("recpriority");
             if (type) {
-                if(curitem->rank.toInt() > 0)
-                    type->SetText("+"+curitem->rank);
+                if(curitem->recpriority.toInt() > 0)
+                    type->SetText("+"+curitem->recpriority);
                 else
-                    type->SetText(curitem->rank);
+                    type->SetText(curitem->recpriority);
             }
         }
        

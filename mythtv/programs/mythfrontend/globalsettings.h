@@ -73,9 +73,9 @@ public:
     MainGeneralSettings();
 };
 
-class GeneralRankingSettings: virtual public ConfigurationWizard {
+class GeneralRecPrioritiesSettings: virtual public ConfigurationWizard {
 public:
-    GeneralRankingSettings();
+    GeneralRecPrioritiesSettings();
 };
 
 class XboxSettings: virtual public ConfigurationWizard {

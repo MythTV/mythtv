@@ -779,7 +779,7 @@
 
   </window>
 
-  <window name="rankchannels">
+  <window name="recprioritychannels">
 
     <font name="active_font" face="Arial">
       <color>#ffffff</color>
@@ -831,13 +831,7 @@
       <textarea name="sched" draworder="0">
         <area>20,10,800,40</area>
         <font>info</font>
-        <value>Channel Rankings</value>
-        <value lang="DE">Sender Bewertungen</value>
-        <value lang="DK">Kanal rangering</value>
-        <value lang="PT">Ordenação de Canais</value>
-        <value lang="SV">Kanalrankning</value>
-        <value lang="CA">Rànquing de canals</value>
-        <value lang="ES">Ranking de canales</value>
+        <value>Channel Recording Priorities</value>
       </textarea>
       <image name="filler" draworder="0" fleximage="yes">
         <filename>rk-background.png</filename>
@@ -846,7 +840,7 @@
       <textarea name="keyinstr" align="center" draworder="0">
         <area>0,570,800,30</area>
         <font>message</font>
-        <value>(1) Sort by Channel    (2) Sort by Rank</value>
+        <value>(1) Sort by Channel    (2) Sort by Priority</value>
         <value lang="DE">(1) Sortiert nach Sender (2) Sortiert nach Rang</value>
         <value lang="DK">(1) Sortér efter Titel  (2) Sortér efter Rang</value>
         <value lang="PT">(1) Ordenar por Canal  (2) Ordenar por Preferência</value>
@@ -858,7 +852,7 @@
 
     <container name="selector">
      <area>0,39,800,375</area>
-      <listarea name="ranklist" draworder="4">
+      <listarea name="recprioritylist" draworder="4">
         <area>20,12,760,330</area>
         <fcnfont name="active_font" function="active"></fcnfont>
         <fcnfont name="inactive_font" function="inactive"></fcnfont>
@@ -890,10 +884,10 @@
         <area>120,12,800,40</area>
         <font>title</font>
       </textarea>
-      <textarea name="inforank" draworder="6">
+      <textarea name="inforecpriority" draworder="6">
         <area>20,90,160,30</area>
         <font>info</font>
-        <value>Rank:</value>
+        <value>Priority:</value>
         <value lang="DE">Rang:</value>
         <value lang="DK">Rang:</value>
         <value lang="PT">Preferência:</value>
@@ -901,7 +895,7 @@
         <value lang="ES">Ranking:</value>
         <value lang="CA">Rànquing:</value>
       </textarea>
-      <textarea name="rank" draworder="6">
+      <textarea name="recpriority" draworder="6">
         <area>200,90,400,30</area>
         <font>info</font>
       </textarea>
@@ -956,7 +950,7 @@
 
   </window>
 
-  <window name="rankprograms">
+  <window name="recpriorityprograms">
 
     <font name="active_font" face="Arial">
       <color>#ffffff</color>
@@ -1032,35 +1026,17 @@
       <textarea name="sched" draworder="0">
         <area>20,10,800,40</area>
         <font>info</font>
-        <value>Program Rankings</value>
-        <value lang="DE">Bewertungen</value>
-        <value lang="DK">Program rangering</value>
-        <value lang="PT">Programas Preferenciais</value>
-        <value lang="SV">Programrankning</value>
-        <value lang="CA">Rànquing per programes</value>
-        <value lang="ES">Ranking por programas</value>
+        <value>Program Recording Priorities</value>
       </textarea>
-      <textarea name="ranklabel" draworder="0">
+      <textarea name="recprioritylabel" draworder="0">
         <area>625,20,800,40</area>
         <font>tinyinfo</font>
-        <value>Rank</value>
-        <value lang="DE">Rang</value>
-        <value lang="DK">Rang</value>
-        <value lang="PT">Preferência</value>
-        <value lang="SV">Rank</value>
-        <value lang="ES">Ranking</value>
-        <value lang="CA">Rànquing</value>
+        <value>Priority</value>
       </textarea>
-      <textarea name="finalranklabel" draworder="0">
+      <textarea name="finalrecprioritylabel" draworder="0">
         <area>690,20,800,40</area>
         <font>tinyinfo</font>
-        <value>Final Rank</value>
-        <value lang="DE">Endbewertung</value>
-        <value lang="DK">Slutrang</value>
-        <value lang="PT">Preferência Final</value>
-        <value lang="SV">Slutrank</value>
-        <value lang="CA">Rànquing final</value>
-        <value lang="ES">Ranking final</value>
+        <value>Final Priority</value>
       </textarea>
       <image name="filler" draworder="0" fleximage="yes">
         <filename>rk-background.png</filename>
@@ -1069,7 +1045,7 @@
       <textarea name="keyinstr" align="center" draworder="0">
         <area>0,570,800,30</area>
         <font>message</font>
-        <value>(1) Sort by Title    (2) Sort by Rank</value>
+        <value>(1) Sort by Title    (2) Sort by Priority</value>
         <value lang="DE">(1) Sortiert nach Sender (2) Sortiert nach Rang</value>
         <value lang="DK">(1) Sortér efter Titel  (2) Sortér efter Rang</value>
         <value lang="PT">(1) Ordenar por Título  (2) Ordenar por Preferência</value>
@@ -1081,7 +1057,7 @@
 
     <container name="selector">
       <area>0,39,800,375</area>
-      <listarea name="ranklist" draworder="4">
+      <listarea name="recprioritylist" draworder="4">
         <area>20,12,760,330</area>
         <fcnfont name="active_font" function="active"></fcnfont>
         <fcnfont name="inactive_font" function="inactive"></fcnfont>
@@ -1137,7 +1113,7 @@
         <area>630,70,100,30</area>
         <font>grayinfo</font>
       </textarea>
-      <textarea name="typerank" draworder="6">
+      <textarea name="typerecpriority" draworder="6">
         <area>643,70,100,30</area>
         <font>grayinfo</font>
       </textarea>
@@ -1170,7 +1146,7 @@
         <area>630,100,100,30</area>
         <font>grayinfo</font>
       </textarea>
-      <textarea name="channelrank" draworder="6">
+      <textarea name="channelrecpriority" draworder="6">
         <area>643,100,100,30</area>
         <font>grayinfo</font>
       </textarea>
@@ -1179,40 +1155,34 @@
         <font>grayinfo</font>
         <value>]</value>
       </textarea>
-      <textarea name="inforank" draworder="6">
+      <textarea name="inforecpriority" draworder="6">
         <area>20,130,160,30</area>
         <font>info</font>
-        <value>Rank:</value>
-        <value lang="DE">Rang:</value>
-        <value lang="DK">Rang:</value>
-        <value lang="PT">Preferência:</value>
-        <value lang="SV">Rank:</value>
-        <value lang="ES">Ranking:</value>
-        <value lang="CA">Rànquing:</value>
+        <value>Priority:</value>
       </textarea>
-      <textarea name="rank" draworder="6">
+      <textarea name="recpriority" draworder="6">
         <area>200,130,400,30</area>
         <font>info</font>
       </textarea>
-      <textarea name="rankbracketA" draworder="6">
+      <textarea name="recprioritybracketA" draworder="6">
         <area>620,130,100,30</area>
         <font>grayinfo</font>
         <value>[</value>
       </textarea>
-      <textarea name="ranksign" draworder="6">
+      <textarea name="recprioritysign" draworder="6">
         <area>630,130,100,30</area>
         <font>grayinfo</font>
       </textarea>
-      <textarea name="rankB" draworder="6">
+      <textarea name="recpriorityB" draworder="6">
         <area>643,130,100,30</area>
         <font>grayinfo</font>
       </textarea>
-      <textarea name="rankbracketB" draworder="6">
+      <textarea name="recprioritybracketB" draworder="6">
         <area>668,130,100,30</area>
         <font>grayinfo</font>
         <value>]  = </value>
       </textarea>
-      <textarea name="finalrank" draworder="6">
+      <textarea name="finalrecpriority" draworder="6">
         <area>709,130,150,30</area>
         <font>yellowinfo</font>
       </textarea>

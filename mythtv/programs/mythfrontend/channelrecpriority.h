@@ -1,5 +1,5 @@
-#ifndef RANKCHANNELS_H_
-#define RANKCHANNELS_H_
+#ifndef CHANNELRECPRIORITY_H_
+#define CHANNELRECPRIORITY_H_
 
 #include <qdatetime.h>
 #include <qdom.h>
@@ -12,29 +12,29 @@
 class QSqlDatabase;
 class ChannelInfo;
 
-class RankChannels : public MythDialog
+class ChannelRecPriority : public MythDialog
 {
     Q_OBJECT
   public:
     enum SortType
     {
         byChannel,
-        byRank,
+        byRecPriority,
     };
 
-    RankChannels(QSqlDatabase *ldb, MythMainWindow *parent, 
+    ChannelRecPriority(QSqlDatabase *ldb, MythMainWindow *parent, 
                   const char *name = 0);
-    ~RankChannels();
+    ~ChannelRecPriority();
 
   protected slots:
     void cursorDown(bool page = false);
     void cursorUp(bool page = false);
     void pageDown() { cursorDown(true); }
     void pageUp() { cursorUp(true); }
-    void changeRank(int howMuch);
-    void applyChannelRankChange(QSqlDatabase*, QString, const QString&);
+    void changeRecPriority(int howMuch);
+    void applyChannelRecPriorityChange(QSqlDatabase*, QString, const QString&);
 
-    void saveRank(void);
+    void saveRecPriority(void);
 
   protected:
     void paintEvent(QPaintEvent *);
@@ -44,7 +44,7 @@ class RankChannels : public MythDialog
     void FillList(void);
     void SortList();
     QMap<QString, ChannelInfo> channelData;
-    QMap<QString, QString> origRankData;
+    QMap<QString, QString> origRecPriorityData;
 
     void updateBackground(void);
     void updateList(QPainter *);

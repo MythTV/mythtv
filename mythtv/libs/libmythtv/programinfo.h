@@ -44,7 +44,7 @@ enum NoRecordType {
     nrOtherShowing = 4,
     nrTooManyRecordings = 5,
     nrDontRecordList = 6,
-    nrLowerRanking = 7,
+    nrLowerRecPriority = 7,
     nrManualConflict = 8,
     nrAutoConflict = 9,
     nrOverlap = 10
@@ -73,15 +73,15 @@ class ProgramInfo
 
     RecordingType GetProgramRecordingStatus(QSqlDatabase *db);
     bool AllowRecordingNewEpisodes(QSqlDatabase *db);
-    int GetChannelRank(QSqlDatabase *db, const QString &chanid);
-    int GetRecordingTypeRank(RecordingType type);
+    int GetChannelRecPriority(QSqlDatabase *db, const QString &chanid);
+    int GetRecordingTypeRecPriority(RecordingType type);
 
     void ApplyRecordStateChange(QSqlDatabase *db, RecordingType newstate);
     void ApplyRecordTimeChange(QSqlDatabase *db, 
                                const QDateTime &newstartts,
                                const QDateTime &newendts);
-    void ApplyRecordRankChange(QSqlDatabase *db,
-                               const QString &newrank);
+    void ApplyRecordRecPriorityChange(QSqlDatabase *db,
+                               const QString &newrecpriority);
     void ToggleRecord(QSqlDatabase *dB);
 
     ScheduledRecording* GetScheduledRecording(QSqlDatabase *db) 
@@ -177,7 +177,7 @@ class ProgramInfo
     QString chanstr;
     QString chansign;
     QString channame;
-    QString rank;
+    QString recpriority;
 
     QString pathname;
     long long filesize;

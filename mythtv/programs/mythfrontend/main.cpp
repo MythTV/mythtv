@@ -17,8 +17,9 @@ using namespace std;
 #include "manualschedule.h"
 #include "playbackbox.h"
 #include "viewscheduled.h"
-#include "rankprograms.h"
-#include "rankchannels.h"
+#include "viewrecommend.h"
+#include "programrecpriority.h"
+#include "channelrecpriority.h"
 #include "globalsettings.h"
 #include "profilegroup.h"
 
@@ -61,10 +62,10 @@ int startManaged(void)
     return 0;
 }
 
-int startProgramRankings(void)
+int startProgramRecPriorities(void)
 {
     QSqlDatabase *db = QSqlDatabase::database();
-    RankPrograms rsb(db, gContext->GetMainWindow(), "rank scheduled");
+    ProgramRecPriority rsb(db, gContext->GetMainWindow(), "recpri scheduled");
 
     qApp->unlock();
     rsb.exec();
@@ -73,10 +74,10 @@ int startProgramRankings(void)
     return 0;
 }
 
-int startChannelRankings(void)
+int startChannelRecPriorities(void)
 {
     QSqlDatabase *db = QSqlDatabase::database();
-    RankChannels rch(db, gContext->GetMainWindow(), "rank channels");
+    ChannelRecPriority rch(db, gContext->GetMainWindow(), "recpri channels");
 
     qApp->unlock();
     rch.exec();
@@ -298,8 +299,8 @@ void TVMenuCallback(void *data, QString &selection)
         startManualSchedule();
     else if (sel == "tv_fix_conflicts")
         startManaged();
-    else if (sel == "tv_set_rankings")
-        startProgramRankings();
+    else if (sel == "tv_set_recpriorities")
+        startProgramRecPriorities();
     else if (sel == "tv_progfind")
         RunProgramFind();
     else if (sel == "settings appearance") 
@@ -337,15 +338,15 @@ void TVMenuCallback(void *data, QString &selection)
         EPGSettings settings;
         settings.exec(QSqlDatabase::database());
     } 
-    else if (sel == "settings generalranking") 
+    else if (sel == "settings generalrecpriorities") 
     {
-        GeneralRankingSettings settings;
+        GeneralRecPrioritiesSettings settings;
         settings.exec(QSqlDatabase::database());
         ScheduledRecording::signalChange(QSqlDatabase::database());
     } 
-    else if (sel == "settings channelranking") 
+    else if (sel == "settings channelrecpriorities") 
     {
-        startChannelRankings();
+        startChannelRecPriorities();
     }
     else if (xbox && sel == "settings xboxsettings")
     {
@@ -437,7 +438,7 @@ void WriteDefaults(QSqlDatabase* db) {
     MainGeneralSettings mgs;
     mgs.load(db);
     mgs.save(db);
-    GeneralRankingSettings grs;
+    GeneralRecPrioritiesSettings grs;
     grs.load(db);
     grs.save(db);
 }

@@ -46,7 +46,7 @@ ProgramInfo::ProgramInfo(void)
     inputid = -1;
     cardid = -1;
     schedulerid = "";
-    rank = "";
+    recpriority = "";
 
     record = NULL;
 }   
@@ -84,7 +84,7 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other)
     inputid = other.inputid;
     cardid = other.cardid;
     schedulerid = other.schedulerid;
-    rank = other.rank;
+    recpriority = other.recpriority;
 
     record = NULL;
 }
@@ -121,7 +121,7 @@ void ProgramInfo::ToStringList(QStringList &list)
     list << QString::number(sourceid);
     list << QString::number(cardid);
     list << QString::number(inputid);
-    list << ((rank != "") ? rank : QString(" "));
+    list << ((recpriority != "") ? recpriority : QString(" "));
     list << QString::number(norecord);
     list << QString::number(recordid);
     list << QString::number(rectype);
@@ -158,7 +158,7 @@ void ProgramInfo::FromStringList(QStringList &list, int offset)
     sourceid = list[offset + 17].toInt();
     cardid = list[offset + 18].toInt();
     inputid = list[offset + 19].toInt();
-    rank = list[offset + 20];
+    recpriority = list[offset + 20];
     norecord = NoRecordType(list[offset + 21].toInt());
     recordid = list[offset + 22].toInt();
     rectype = RecordingType(list[offset + 23].toInt());
@@ -188,8 +188,8 @@ void ProgramInfo::FromStringList(QStringList &list, int offset)
         channame = "";
     if (chansign == " ")
         chansign = "";
-    if (rank == " ")
-        rank = "";
+    if (recpriority == " ")
+        recpriority = "";
 }
 
 void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
@@ -265,7 +265,7 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
             progMap["rec_type"] = "A";
             break;
     }
-    progMap["rank"] = rank;
+    progMap["recpriority"] = recpriority;
 
     progMap["timedate"] = recstartts.date().toString(dateFormat) + ", " +
                           recstartts.time().toString(timeFormat) + " - " +
@@ -312,8 +312,8 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
             case nrDontRecordList:
                     recstatus += QObject::tr("Don't Record List");
                     break;
-            case nrLowerRanking:
-                    recstatus += QObject::tr("Lower Ranking");
+            case nrLowerRecPriority:
+                    recstatus += QObject::tr("Lower Rec Priority");
                     break;
             case nrManualConflict:
                     recstatus += QObject::tr("Manual Conflict");
@@ -615,11 +615,11 @@ bool ProgramInfo::AllowRecordingNewEpisodes(QSqlDatabase *db)
     return true;
 }
 
-int ProgramInfo::GetChannelRank(QSqlDatabase *db, const QString &chanid)
+int ProgramInfo::GetChannelRecPriority(QSqlDatabase *db, const QString &chanid)
 {
     QString thequery;
 
-    thequery = QString("SELECT rank FROM channel WHERE chanid = %1;")
+    thequery = QString("SELECT recpriority FROM channel WHERE chanid = %1;")
                        .arg(chanid);
 
     QSqlQuery query = db->exec(thequery);
@@ -633,20 +633,20 @@ int ProgramInfo::GetChannelRank(QSqlDatabase *db, const QString &chanid)
     return 0;
 }
 
-int ProgramInfo::GetRecordingTypeRank(RecordingType type)
+int ProgramInfo::GetRecordingTypeRecPriority(RecordingType type)
 {
     switch (type)
     {
         case kSingleRecord:
-            return gContext->GetNumSetting("SingleRecordRank", 0);
+            return gContext->GetNumSetting("SingleRecordRecPriority", 0);
         case kTimeslotRecord:
-            return gContext->GetNumSetting("TimeslotRecordRank", 0);
+            return gContext->GetNumSetting("TimeslotRecordRecPriority", 0);
         case kWeekslotRecord:
-            return gContext->GetNumSetting("WeekslotRecordRank", 0);
+            return gContext->GetNumSetting("WeekslotRecordRecPriority", 0);
         case kChannelRecord:
-            return gContext->GetNumSetting("ChannelRecordRank", 0);
+            return gContext->GetNumSetting("ChannelRecordRecPriority", 0);
         case kAllRecord:
-            return gContext->GetNumSetting("AllRecordRank", 0);
+            return gContext->GetNumSetting("AllRecordRecPriority", 0);
         default:
             return 0;
     }
@@ -673,11 +673,11 @@ void ProgramInfo::ApplyRecordTimeChange(QSqlDatabase *db,
     }
 }
 
-void ProgramInfo::ApplyRecordRankChange(QSqlDatabase *db,
-                                        const QString &newrank)
+void ProgramInfo::ApplyRecordRecPriorityChange(QSqlDatabase *db,
+                                        const QString &newrecpriority)
 {
     GetProgramRecordingStatus(db);
-    record->setRank(newrank);
+    record->setRecPriority(newrecpriority);
     record->save(db);
 }
 
@@ -1384,8 +1384,8 @@ QString ProgramInfo::NoRecordText(void)
         return "too many recordings of this program have already been recorded";
     case nrDontRecordList:
         return "it is currently being recorded or was manually canceled";
-    case nrLowerRanking:
-        return "another program with a higher ranking will be recorded instead";
+    case nrLowerRecPriority:
+        return "another prog with a higher rec priority will be recorded";
     case nrManualConflict:
         return "another program was manually chosen to be recorded instead";
     case nrAutoConflict:
@@ -1414,7 +1414,7 @@ QString ProgramInfo::NoRecordChar(void)
         return "T";
     case nrDontRecordList:
         return "D";
-    case nrLowerRanking:
+    case nrLowerRecPriority:
         return "R";
     case nrManualConflict:
         return "M";
@@ -1711,7 +1711,7 @@ void ProgramInfo::handleNotRecording(QSqlDatabase *db)
 
     if (norecord != nrTooManyRecordings &&
         norecord != nrDontRecordList &&
-        norecord != nrLowerRanking &&
+        norecord != nrLowerRecPriority &&
         norecord != nrOverlap)
         diag.AddButton(QObject::tr("Record it anyway"));
 

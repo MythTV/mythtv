@@ -205,12 +205,12 @@ public:
     };
 };
 
-class SRRank: public SpinBoxSetting, public SRSetting {
+class SRRecPriority: public SpinBoxSetting, public SRSetting {
 public:
-    SRRank(const ScheduledRecording& parent): 
+    SRRecPriority(const ScheduledRecording& parent): 
         SpinBoxSetting(-99, 99, 1),
-        SRSetting(parent, "rank") {
-        setLabel(QObject::tr("Rank"));
+        SRSetting(parent, "recpriority") {
+        setLabel(QObject::tr("Priority"));
         setValue(0);
     };
 };
@@ -242,7 +242,7 @@ ScheduledRecording::ScheduledRecording() {
     addChild(startDate = new SRStartDate(*this));
     addChild(endDate = new SREndDate(*this));
     addChild(category = new SRCategory(*this));
-    addChild(rank = new SRRank(*this));
+    addChild(recpriority = new SRRecPriority(*this));
 
     m_pginfo = NULL;
 }
@@ -258,7 +258,7 @@ void ScheduledRecording::fromProgramInfo(ProgramInfo* proginfo)
     endTime->setValue(proginfo->endts.time());
     endDate->setValue(proginfo->endts.date());
     category->setValue(proginfo->category);
-    rank->setValue(proginfo->rank.toInt());
+    recpriority->setValue(proginfo->recpriority.toInt());
     autoexpire->setValue(gContext->GetNumSetting("AutoExpireDefault", 0));
 }
 
@@ -270,7 +270,7 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
 "program.title, program.subtitle, program.description, "
 "channel.channum, channel.callsign, channel.name, "
 "oldrecorded.starttime IS NOT NULL AS oldrecduplicate, program.category, "
-"record.rank, record.recorddups, "
+"record.recpriority, record.recorddups, "
 "recorded.starttime IS NOT NULL as recduplicate, record.type, "
 "record.recordid, recordoverride.type, "
 "program.starttime - INTERVAL record.preroll minute, "
@@ -357,7 +357,7 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
              proginfo->chansign = result.value(8).toString();
              proginfo->channame = result.value(9).toString();
              proginfo->category = QString::fromUtf8(result.value(11).toString());
-             proginfo->rank = result.value(12).toString();
+             proginfo->recpriority = result.value(12).toString();
              proginfo->recdups = RecordingDupsType(result.value(13).toInt());
              proginfo->rectype = RecordingType(result.value(15).toInt());
              proginfo->recordid = result.value(16).toInt();
@@ -430,7 +430,7 @@ void ScheduledRecording::findAllScheduledPrograms(QSqlDatabase* db,
     QString temptime, tempdate;
     QString query = QString("SELECT record.chanid, record.starttime, "
 "record.startdate, record.endtime, record.enddate, record.title, "
-"record.subtitle, record.description, record.rank, record.type, "
+"record.subtitle, record.description, record.recpriority, record.type, "
 "channel.name, record.recordid FROM record "
 "LEFT JOIN channel ON (channel.chanid = record.chanid) "
 "ORDER BY title ASC;");
@@ -472,7 +472,7 @@ void ScheduledRecording::findAllScheduledPrograms(QSqlDatabase* db,
             if (proginfo->rectype == kSingleRecord)
                 proginfo->subtitle = QString::fromUtf8(result.value(6).toString());
             proginfo->description = QString::fromUtf8(result.value(7).toString());
-            proginfo->rank = result.value(8).toString();
+            proginfo->recpriority = result.value(8).toString();
             proginfo->channame = result.value(10).toString();
             proginfo->recstartts = proginfo->startts;
             proginfo->recendts = proginfo->endts;
@@ -751,7 +751,7 @@ MythDialog* ScheduledRecording::dialogWidget(MythMainWindow *parent,
     QVBoxLayout* vbox2 = new QVBoxLayout(hbox, (int)(10 * wmult));
 
     vbox1->addWidget(profile->configWidget(this, dialog));
-    vbox1->addWidget(rank->configWidget(this, dialog));
+    vbox1->addWidget(recpriority->configWidget(this, dialog));
     vbox1->addWidget(autoexpire->configWidget(this, dialog));
 
     vbox2->addWidget(recorddups->configWidget(this, dialog));
@@ -860,8 +860,8 @@ void ScheduledRecording::setEnd(const QDateTime& end) {
     endDate->setValue(end.date());
 }
 
-void ScheduledRecording::setRank(const QString& newrank) {
-    rank->setValue(newrank.toInt());
+void ScheduledRecording::setRecPriority(const QString& newrecpriority) {
+    recpriority->setValue(newrecpriority.toInt());
 }
 
 QString ScheduledRecording::getProfileName(void) const {

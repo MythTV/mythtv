@@ -90,8 +90,10 @@
     <offset>20,10</offset>
   </buttondef>
  
-  <buttondef name="TV_RANKINGS">
-    <image>rank.png</image>
+  <buttondef name="TV_RECPRIORITIES">
+    <image>recpriorities.png</image>
+    <offset>20,10</offset>
+  </buttondef>
     <offset>20,10</offset>
   </buttondef>
 

@@ -440,7 +440,7 @@ void ProgLister::updateList(QPainter *p)
 
 void ProgLister::updateInfo(QPainter *p)
 {
-    int rectyperank, chanrank, progrank, totalrank;
+    int rectyperecpriority, chanrecpriority, progrecpriority, totalrecpriority;
     QRect pr = infoRect;
     QPixmap pix(pr.size());
     pix.fill(this, pr.topLeft());
@@ -449,11 +449,12 @@ void ProgLister::updateInfo(QPainter *p)
 
     if (dataCount > 0)
     {  
-        progrank = 0;
+        progrecpriority = 0;
         rectype = kSingleRecord;
-        rectyperank = 0;
-        chanrank = 0;
-        totalrank = progrank + rectyperank + chanrank;
+        rectyperecpriority = 0;
+        chanrecpriority = 0;
+        totalrecpriority = progrecpriority + rectyperecpriority + 
+                           chanrecpriority;
         LayerSet *container;
 	ProgramInfo *pi = progList.at(curProg);
 

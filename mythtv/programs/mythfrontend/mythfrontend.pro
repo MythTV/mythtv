@@ -15,7 +15,7 @@ INSTALLS = target
 
 setting.path = $${PREFIX}/share/mythtv/
 setting.files += theme.txt mysql.txt mainmenu.xml tvmenu.xml tv_settings.xml
-setting.files += tv_schedule.xml main_settings.xml rank_settings.xml
+setting.files += tv_schedule.xml main_settings.xml recpriorities_settings.xml
 setting.extra = -ldconfig
 
 INSTALLS += setting
@@ -30,11 +30,11 @@ TARGETDEPS += ../../libs/libavformat/libavformat.a
 
 # Input
 HEADERS += manualbox.h playbackbox.h viewscheduled.h globalsettings.h
-HEADERS += manualschedule.h rankprograms.h rankchannels.h
+HEADERS += manualschedule.h programrecpriority.h channelrecpriority.h
 
 SOURCES += main.cpp manualbox.cpp playbackbox.cpp viewscheduled.cpp
-SOURCES += globalsettings.cpp manualschedule.cpp rankprograms.cpp 
-SOURCES += rankchannels.cpp
+SOURCES += globalsettings.cpp manualschedule.cpp programrecpriority.cpp 
+SOURCES += channelrecpriority.cpp
 
 using_dvb {
     LIBS += -ldvbdev

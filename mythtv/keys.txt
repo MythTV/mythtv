@@ -9,7 +9,7 @@ mythfrontend
 - P to play in both "Watch a Recording" and "Delete a Recording".
 - D to delete in both "Watch a Recording" and "Delete a Recording".
 - I to edit recording options from the EPG, "Program Finder",
-    "Program Rankings", or "Fix Scheduling Conflicts" screens.
+    "Program Recording Priorities", or "Fix Scheduling Conflicts" screens.
     From the Playback and Delete screens, 'I' presents options
     for recorded shows such as Auto Expire or Stop Recording.
 
@@ -149,13 +149,13 @@ EPG
 - Pressing 4 will toggle the guide listing between all channels and filtered
   "favorites".
 
-Set Program Rankings and Set Channel Rankings
+Set Program Recording Priorities and Set Channel Recording Priorities
 ---------------------------------------------
 
-- Right increases rank value.
-- Left decreases rank value.
+- Right increases priority value.
+- Left decreases priority value.
 - 1 sorts by title.
-- 2 sorts by rank.
+- 2 sorts by priority.
 - I to edit recording options.
 - ESC commits changes and exits.
 

@@ -8,7 +8,7 @@ using namespace std;
 
 #include "mythcontext.h"
 
-const QString currentDatabaseVersion = "1013";
+const QString currentDatabaseVersion = "1014";
 
 void UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -345,6 +345,25 @@ void UpgradeTVDatabaseSchema(void)
 ""
 };
         performActualUpdate(updates, "1013", dbver);
+    }
+
+    if (dbver == "1013")
+    {
+        const QString updates[] = {
+"ALTER TABLE record CHANGE rank recpriority INT(10) DEFAULT '0' NOT NULL;",
+"ALTER TABLE channel CHANGE rank recpriority INT(10) DEFAULT '0' NOT NULL;",
+"UPDATE settings SET value='RecPriorityingActive' WHERE value='RankingActive';",
+"UPDATE settings SET value='RecPriorityingOrder' WHERE value='RankingOrder';",
+"UPDATE settings SET value='SingleRecordRecPriority' WHERE value='SingleRecordRank';",
+"UPDATE settings SET value='TimeslotRecordRecPriority' WHERE value='TimeslotRecordRank';",
+"UPDATE settings SET value='WeekslotRecordRecPriority' WHERE value='WeekslotRecordRank';",
+"UPDATE settings SET value='ChannelRecordRecPriority' WHERE value='ChannelRecordRank';",
+"UPDATE settings SET value='AllRecordRecPriority' WHERE value='AllRecordRank';",
+"UPDATE settings SET value='ChannelRecPrioritySorting' WHERE value='ChannelRankSorting';",
+"UPDATE settings SET value='ProgramRecPrioritySorting' WHERE value='ProgramRankSorting';",
+""
+};
+        performActualUpdate(updates, "1014", dbver);
     }
 }
 

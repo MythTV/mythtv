@@ -1089,80 +1089,81 @@ public:
     };
 };
 
-// General Ranking settings
+// General RecPriorities settings
 
-class GRUseRanking: public CheckBoxSetting, public BackendSetting {
+class GRUseRecPriorities: public CheckBoxSetting, public BackendSetting {
 public:
-    GRUseRanking():
-        BackendSetting("RankingActive") {
-        setLabel(QObject::tr("Use Rankings"));
-        setHelpText(QObject::tr("Use program rankings to resolve conflicts."));
+    GRUseRecPriorities():
+        BackendSetting("RecPrioritiesActive") {
+        setLabel(QObject::tr("Use Recording Priorities"));
+        setHelpText(QObject::tr("Use program recording priorities to resolve "
+                    "conflicts."));
         setValue(false);
     };
 };
 
-class GRRankingFirst: public CheckBoxSetting, public BackendSetting {
+class GRRecPrioritiesFirst: public CheckBoxSetting, public BackendSetting {
 public:
-    GRRankingFirst():
-        BackendSetting("RankingOrder") {
-        setLabel(QObject::tr("Rankings First."));
-        setHelpText(QObject::tr("Use rankings to resolve conflicts before "
-                    "using traditional conflict resolution."));
+    GRRecPrioritiesFirst():
+        BackendSetting("RecPrioritiesOrder") {
+        setLabel(QObject::tr("Recording Priorities First."));
+        setHelpText(QObject::tr("Use recording priorities to resolve conflicts "
+                    "before using traditional conflict resolution."));
         setValue(true);
     };
 };
 
-class GRSingleRecordRank: public SpinBoxSetting, public BackendSetting {
+class GRSingleRecordRecPriority: public SpinBoxSetting, public BackendSetting {
 public:
-    GRSingleRecordRank():
-        SpinBoxSetting(-99, 99, 1), BackendSetting("SingleRecordRank") {
-        setLabel(QObject::tr("Single Recordings Rank"));
+    GRSingleRecordRecPriority():
+        SpinBoxSetting(-99, 99, 1), BackendSetting("SingleRecordRecPriority") {
+        setLabel(QObject::tr("Single Recordings Priority"));
         setHelpText(QObject::tr("Single Recordings will receive this "
-                    "additional ranking value."));
+                    "additional recording priority value."));
         setValue(0);
     };
 };
 
-class GRWeekslotRecordRank: public SpinBoxSetting, public BackendSetting {
+class GRWeekslotRecordRecPriority: public SpinBoxSetting, public BackendSetting {
 public:
-    GRWeekslotRecordRank():
-        SpinBoxSetting(-99, 99, 1), BackendSetting("WeekslotRecordRank") {
-        setLabel(QObject::tr("Weekslot Recordings Rank"));
+    GRWeekslotRecordRecPriority():
+        SpinBoxSetting(-99, 99, 1), BackendSetting("WeekslotRecordRecPriority") {
+        setLabel(QObject::tr("Weekslot Recordings Priority"));
         setHelpText(QObject::tr("Weekslot Recordings will receive this "
-                    "additional ranking value."));
+                    "additional recording priority value."));
         setValue(0);
     };
 };
 
-class GRTimeslotRecordRank: public SpinBoxSetting, public BackendSetting {
+class GRTimeslotRecordRecPriority: public SpinBoxSetting, public BackendSetting {
 public:
-    GRTimeslotRecordRank():
-        SpinBoxSetting(-99, 99, 1), BackendSetting("TimeslotRecordRank") {
-        setLabel(QObject::tr("Timeslot Recordings Rank"));
+    GRTimeslotRecordRecPriority():
+        SpinBoxSetting(-99, 99, 1), BackendSetting("TimeslotRecordRecPriority") {
+        setLabel(QObject::tr("Timeslot Recordings Priority"));
         setHelpText(QObject::tr("Timeslot Recordings will receive this "
-                    "additional ranking value."));
+                    "additional recording priority value."));
         setValue(0);
     };
 };
 
-class GRChannelRecordRank: public SpinBoxSetting, public BackendSetting {
+class GRChannelRecordRecPriority: public SpinBoxSetting, public BackendSetting {
 public:
-    GRChannelRecordRank():
-        SpinBoxSetting(-99, 99, 1), BackendSetting("ChannelRecordRank") {
-        setLabel(QObject::tr("Channel Recordings Rank"));
+    GRChannelRecordRecPriority():
+        SpinBoxSetting(-99, 99, 1), BackendSetting("ChannelRecordRecPriority") {
+        setLabel(QObject::tr("Channel Recordings Priority"));
         setHelpText(QObject::tr("Channel Recordings will receive this "
-                    "additional ranking value."));
+                    "additional recording priority value."));
         setValue(0);
     };
 };
 
-class GRAllRecordRank: public SpinBoxSetting, public BackendSetting {
+class GRAllRecordRecPriority: public SpinBoxSetting, public BackendSetting {
 public:
-    GRAllRecordRank():
-        SpinBoxSetting(-99, 99, 1), BackendSetting("AllRecordRank") {
-        setLabel(QObject::tr("All Recordings Rank"));
+    GRAllRecordRecPriority():
+        SpinBoxSetting(-99, 99, 1), BackendSetting("AllRecordRecPriority") {
+        setLabel(QObject::tr("All Recordings Priority"));
         setHelpText(QObject::tr("All Recording types will receive this "
-                    "additional ranking value."));
+                    "additional recording priority value."));
         setValue(0);
     };
 };
@@ -1475,18 +1476,18 @@ EPGSettings::EPGSettings()
     addChild(gen);
 }
 
-GeneralRankingSettings::GeneralRankingSettings()
+GeneralRecPrioritiesSettings::GeneralRecPrioritiesSettings()
 {
     VerticalConfigurationGroup* gr = new VerticalConfigurationGroup(false);
-    gr->setLabel(QObject::tr("General Ranking Settings"));
+    gr->setLabel(QObject::tr("General Recording Priorities Settings"));
 
-    gr->addChild(new GRUseRanking());
-    gr->addChild(new GRRankingFirst());
-    gr->addChild(new GRSingleRecordRank());
-    gr->addChild(new GRWeekslotRecordRank());
-    gr->addChild(new GRTimeslotRecordRank());
-    gr->addChild(new GRChannelRecordRank());
-    gr->addChild(new GRAllRecordRank());
+    gr->addChild(new GRUseRecPriorities());
+    gr->addChild(new GRRecPrioritiesFirst());
+    gr->addChild(new GRSingleRecordRecPriority());
+    gr->addChild(new GRWeekslotRecordRecPriority());
+    gr->addChild(new GRTimeslotRecordRecPriority());
+    gr->addChild(new GRChannelRecordRecPriority());
+    gr->addChild(new GRAllRecordRecPriority());
     addChild(gr);
 }
 

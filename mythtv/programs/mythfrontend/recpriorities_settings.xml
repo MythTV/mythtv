@@ -1,27 +1,20 @@
-<mythmenu name="SETUP_TVRANKINGS">
+<mythmenu name="SETUP_TVRECPRIORITIES">
 
    <button>
-      <type>TV_RANKINGS</type>
+      <type>TV_RECPRIORITIES</type>
       <text>General</text>
       <text lang="DE">Allgemeines</text>
       <text lang="DK">Generelt</text>
       <text lang="NL">Algemeen</text>
       <text lang="PT">Configurações Gerais</text>
       <text lang="SV">Generellt</text>
-      <action>SETTINGS GENERALRANKING</action>
+      <action>SETTINGS GENERALRECPRIORITIES</action>
    </button>
 
    <button>
-      <type>TV_RANKINGS</type>
-      <text>Set Channel Rankings</text>
-      <text lang="ES">Ránkings por canales</text>
-      <text lang="CA">Rànquings per canals</text>
-      <text lang="DE">Sender bewerten</text>
-      <text lang="DK">Sæt kanal rangering</text>
-      <text lang="NL">Kanalen Rangeren</text>
-      <text lang="PT">Ordenação de Canais</text>
-      <text lang="SV">Sätt upp kanalrankning</text>
-      <action>SETTINGS CHANNELRANKING</action>
+      <type>TV_RECPRIORITIES</type>
+      <text>Set Channel Recording Priorities</text>
+      <action>SETTINGS CHANNELRECPRIORITIES</action>
    </button>
 
 </mythmenu>
