@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2003-09-11, v2.72
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2003-09-11, v2.73
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1421,7 +1421,7 @@ $ su
 $ tar -xjf mythtv-0.11.tar.bz2
 $ cd mythtv-0.11
 $ ./configure
-$ qmake
+$ qmake mythtv.pro
 $ make
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -2998,7 +2998,7 @@ it.
 <PRE>
 $ tar -xjf mythgallery-0.11.tar.bz2
 $ cd mythgallery-0.11
-$ qmake
+$ qmake mythgallery.pro
 $ make
 # su
 # make install
@@ -3305,7 +3305,7 @@ save and close settings.pro and proceed with compiling MythMusic.
 
 <BLOCKQUOTE><CODE>
 <PRE>
-$ qmake
+$ qmake mythmusic.pro
 $ make
 $ su
 # make install
@@ -3451,7 +3451,7 @@ strip "$(INSTALL_ROOT)/usr/local/share/mythtv/mythweather/images/"
 <BLOCKQUOTE><CODE>
 <PRE>
 $ cd mythweather
-$ qmake
+$ qmake mythweather.pro
 $ make
 $ su
 # make install
@@ -3500,7 +3500,7 @@ watch media files that are not directly supported by MythTV.</P>
 <BLOCKQUOTE><CODE>
 <PRE>
 $ cd mythvideo
-$ qmake
+$ qmake mythvideo.pro
 $ make
 $ su
 # make install
@@ -3558,7 +3558,7 @@ transcode, then the first command in the next example can simply be
 <BLOCKQUOTE><CODE>
 <PRE>
 $ ./configure --enable-transcode
-$ qmake
+$ qmake mythdvd.pro
 $ make
 $ su
 # make install

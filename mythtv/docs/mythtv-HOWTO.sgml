@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-09-11, v2.72
+<date>2003-09-11, v2.73
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1140,7 +1140,7 @@ $ su
 $ tar -xjf mythtv-0.11.tar.bz2
 $ cd mythtv-0.11
 $ ./configure
-$ qmake
+$ qmake mythtv.pro
 $ make
 </verb></tscreen>
 
@@ -2564,7 +2564,7 @@ it.
 <tscreen><verb>
 $ tar -xjf mythgallery-0.11.tar.bz2
 $ cd mythgallery-0.11
-$ qmake
+$ qmake mythgallery.pro
 $ make
 # su
 # make install
@@ -2832,7 +2832,7 @@ INCLUDEPATH *= /usr/include/cdda
 save and close settings.pro and proceed with compiling MythMusic.
 </code>
 <tscreen><verb>
-$ qmake
+$ qmake mythmusic.pro
 $ make
 $ su
 # make install
@@ -2985,7 +2985,7 @@ strip "$(INSTALL_ROOT)/usr/local/share/mythtv/mythweather/images/"
 Change into the MythWeather directory, then make and make install:
 <tscreen><verb>
 $ cd mythweather
-$ qmake
+$ qmake mythweather.pro
 $ make
 $ su
 # make install
@@ -3033,7 +3033,7 @@ watch media files that are not directly supported by MythTV.
 Change into the MythVideo directory, then make and make install:
 <tscreen><verb>
 $ cd mythvideo
-$ qmake
+$ qmake mythvideo.pro
 $ make
 $ su
 # make install
@@ -3078,7 +3078,7 @@ transcode, then the first command in the next example can simply be
 <tt>./configure</tt>
 <tscreen><verb>
 $ ./configure --enable-transcode
-$ qmake
+$ qmake mythdvd.pro
 $ make
 $ su
 # make install
@@ -4557,6 +4557,7 @@ instructions,and an example of how to build from the source package
 v2.71, 2003-09-09.  Get rid of "can't CVS anymore" - it's been switched for
 a while now.
 v2.72, 2003-09-11.  Got to qmake before make now. Add GDB section title.
+v2.73, 2003-09-11.  Make the qmake thing a little more specific.
 -->
 
 <!--

@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-09-11, v2.72
+  2003-09-11, v2.73
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -1567,7 +1567,7 @@
        $ tar -xjf mythtv-0.11.tar.bz2
        $ cd mythtv-0.11
        $ ./configure
-       $ qmake
+       $ qmake mythtv.pro
        $ make
 
 
@@ -3262,7 +3262,7 @@
 
        $ tar -xjf mythgallery-0.11.tar.bz2
        $ cd mythgallery-0.11
-       $ qmake
+       $ qmake mythgallery.pro
        $ make
        # su
        # make install
@@ -3578,7 +3578,7 @@
 
 
 
-       $ qmake
+       $ qmake mythmusic.pro
        $ make
        $ su
        # make install
@@ -3749,7 +3749,7 @@
 
 
        $ cd mythweather
-       $ qmake
+       $ qmake mythweather.pro
        $ make
        $ su
        # make install
@@ -3805,7 +3805,7 @@
 
 
        $ cd mythvideo
-       $ qmake
+       $ qmake mythvideo.pro
        $ make
        $ su
        # make install
@@ -3864,7 +3864,7 @@
 
 
        $ ./configure --enable-transcode
-       $ qmake
+       $ qmake mythdvd.pro
        $ make
        $ su
        # make install
