@@ -2936,10 +2936,19 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
         if (commBreakIter.data() == MARK_COMM_END)
             commBreakIter++;
 
+        if (commBreakIter == commBreakMap.end())
+            return;
+
         if ((commBreakIter.data() == MARK_COMM_START) && 
             (framesPlayed >= commBreakIter.key()))
         {
             ++commBreakIter;
+            if (commBreakIter == commBreakMap.end())
+                return;
+
+            if (commBreakIter.data() == MARK_COMM_START)
+                return;
+
             if (commBreakIter.key() == totalFrames)
                 eof = 1;
             else
@@ -2958,59 +2967,10 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
             }
 
             GetFrame(1, true);
-            while (LastFrameIsBlank())
-                GetFrame(1, true);
 
             ++commBreakIter;
         }
         return;
-    }
-
-    if (autocommercialskip == COMMERCIAL_SKIP_BLANKS)
-    {
-        if (LastFrameIsBlank())
-        {
-            PauseVideo();
-
-            consecutive_blanks++;
-            if (consecutive_blanks >= 3)
-            {
-                int saved_position = framesPlayed;
-                JumpToNetFrame((long long int)(30 * video_frame_rate - 3));
-
-                // search a 10-frame window for another blank
-                int tries = 10;
-
-                GetFrame(1, true);
-                while ((tries > 0) && (!LastFrameIsBlank()))
-                {
-                     GetFrame(1, true);
-                     tries--;
-                }
-
-                if (tries)
-                {
-                    // found another blank
- 
-                    consecutive_blanks = 0;
-                    UnpauseVideo();
-                    return;
-                }
-                else
-                {
-                    // no blank found so exit auto-skip
-                    JumpToFrame(saved_position + 1);
-                    UnpauseVideo();
-                    return;
-                }
-            }
-
-            UnpauseVideo();
-        }
-        else if (consecutive_blanks)
-        {
-            consecutive_blanks = 0;
-        }
     }
 }
 

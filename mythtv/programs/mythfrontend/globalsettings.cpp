@@ -196,9 +196,9 @@ public:
         GlobalSetting("AutoCommercialSkip") {
         setLabel("Automatically Skip Commercials");
         setValue(false);
-        setHelpText("Automatically skip commercial breaks using the selected "
-                    "Commercial Skip Method. If a commercial break cutlist "
-                    "exists, it will be used instead.");
+        setHelpText("Automatically skip commercial breaks that have been "
+                    "flagged during Automatic Commercial Flagging or by "
+                    "the mythcommflag program.");
     };
 };
 
