@@ -703,6 +703,17 @@ public:
     };
 };
 
+class CCWarnSetting: public CheckBoxSetting, public GlobalSetting {
+public:
+    CCWarnSetting():
+       GlobalSetting("CCBufferWarnings") {
+       setLabel(QObject::tr("Enable channel change buffer warnings"));
+       setValue(false);
+       setHelpText(QObject::tr("If set, MythTV will warn you whenever you "
+                   "change the channel but are not caught up to live TV."));
+    };
+};
+
 class UDPNotifyPort: public LineEditSetting, public GlobalSetting {
 public:
     UDPNotifyPort():
@@ -1558,6 +1569,7 @@ PlaybackSettings::PlaybackSettings()
     gen2->addChild(new ClearSavedPosition());
     gen2->addChild(new AltClearSavedPosition());
     gen2->addChild(new UsePicControls());
+    gen2->addChild(new CCWarnSetting());
     gen2->addChild(new UDPNotifyPort());
     addChild(gen2);
 

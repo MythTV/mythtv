@@ -110,8 +110,8 @@ class TV : public QObject
     void SetChannel(bool needopen = false);
 
     void ToggleChannelFavorite(void);
-    void ChangeChannel(int direction);
-    void ChangeChannelByString(QString &name);
+    void ChangeChannel(int direction, bool force = false);
+    void ChangeChannelByString(QString &name, bool force = false);
 
     void ChangeVolume(bool up);
     void ToggleMute(void);
@@ -279,6 +279,11 @@ class TV : public QObject
     bool doSmartForward;
 
     UDPNotify *udpnotify;
+
+    QString lastCC;
+    int lastCCDir;
+    bool showBufferedWarnings;
+    int bufferedChannelThreshold;
 };
 
 #endif

@@ -86,6 +86,7 @@ class NuppelVideoPlayer
     int GetVideoHeight(void) { return video_height; }
     float GetFrameRate(void) { return video_frame_rate; } 
     long long GetFramesPlayed(void) { return framesPlayed; }
+    int GetSecondsBehind(void);
 
     void SetRecorder(RemoteEncoder *recorder);
 

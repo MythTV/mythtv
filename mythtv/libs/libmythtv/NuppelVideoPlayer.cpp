@@ -3284,6 +3284,22 @@ int NuppelVideoPlayer::GetStatusbarPos(void)
     return((int)spos);
 }
 
+int NuppelVideoPlayer::GetSecondsBehind(void)
+{
+    if (!nvr_enc)
+        return 0;
+
+    long long written = nvr_enc->GetFramesWritten();
+    long long played = framesPlayed;
+
+    if (played > written)
+        played = written;
+    if (played < 0)
+        played = 0;
+
+    return (int)((float)(written - played) / video_frame_rate);
+}
+
 int NuppelVideoPlayer::calcSliderPos(QString &desc)
 {
     float ret;
