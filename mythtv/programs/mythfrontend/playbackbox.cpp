@@ -1637,7 +1637,7 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
         case Key_3: case Key_PageUp: pageUp(); break;
         case Key_9: case Key_PageDown: pageDown(); break;
         case Key_Escape: exitWin(); break;
-        default: e->ignore(); break;
+        default: MythDialog::keyPressEvent(e); break;
     }   
 }
 
