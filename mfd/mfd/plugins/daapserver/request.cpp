@@ -41,7 +41,7 @@ void DaapRequest::setFilter(const QString &x)
     //  (for developers) to spit them out if they show up
     //
     
-    cout << "DaapRequest object was aked to set filter to \"" << filter << "\"" << endl;
+    cout << "DaapRequest object was asked to set filter to \"" << filter << "\"" << endl;
 }
 
 void DaapRequest::setQuery(const QString &x)
@@ -53,7 +53,7 @@ void DaapRequest::setQuery(const QString &x)
     //  (for developers) to spit them out if they show up
     //
     
-    cout << "DaapRequest object was aked to set query to \"" << query << "\"" << endl;
+    cout << "DaapRequest object was asked to set query to \"" << query << "\"" << endl;
 }
 
 void DaapRequest::setIndex(const QString &x)
@@ -65,7 +65,7 @@ void DaapRequest::setIndex(const QString &x)
     //  (for developers) to spit them out if they show up
     //
     
-    cout << "DaapRequest object was aked to set index to \"" << index << "\"" << endl;
+    cout << "DaapRequest object was asked to set index to \"" << index << "\"" << endl;
 }
 
 void DaapRequest::parseRawMetaContentCodes()
