@@ -201,6 +201,18 @@ void CaptureCard::loadByID(QSqlDatabase* db, int cardid) {
     load(db);
 }
 
+CardType::CardType(const CaptureCard& parent)
+        : CCSetting(parent, "cardtype") 
+{
+    setLabel("Card type");
+    addSelection("Standard V4L or MJPEG capture card", "V4L");
+#ifdef USING_V4L2
+    addSelection("Hardware MPEG Encoder card", "MPEG");
+#else
+    addSelection("No V4L2 support, Hardware MPEG disabled", "");
+#endif
+};
+
 void CardInput::loadByID(QSqlDatabase* db, int inputid) {
     id->setValue(inputid);
     load(db);
@@ -354,8 +366,7 @@ QStringList VideoDevice::probeInputs(QString device) {
         memset(&vidcap, 0, sizeof(vidcap));
         if (ioctl(videofd, VIDIOCGCAP, &vidcap) != 0) {
             perror("ioctl");
-            close(videofd);
-            return ret;
+            vidcap.channels = 0;
         }
 
         for (int i = 0; i < vidcap.channels; i++) {
@@ -371,6 +382,9 @@ QStringList VideoDevice::probeInputs(QString device) {
             ret += test.name;
         }
     }
+
+    if (ret.size() == 0)
+        ret += "ERROR, No inputs found";
 
     close(videofd);
     return ret;

@@ -299,13 +299,7 @@ public slots:
 
 class CardType: public ComboBoxSetting, public CCSetting {
 public:
-    CardType(const CaptureCard& parent):
-        CCSetting(parent, "cardtype") {
-        setLabel("Card type");
-        addSelection("Standard V4L or MJPEG capture card", "V4L");
-        addSelection("Hardware MPEG Encoder card", "MPEG");
-    };
-
+    CardType(const CaptureCard& parent);
 };
 
 class CaptureCard: public ConfigurationWizard {
