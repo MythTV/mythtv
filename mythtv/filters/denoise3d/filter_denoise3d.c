@@ -157,6 +157,7 @@ mm_support (void)
     }
 }
 #else
+#define emms()
 int mm_support(void) { return 0; }
 #endif // i386
 

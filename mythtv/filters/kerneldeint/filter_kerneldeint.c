@@ -132,6 +132,7 @@ mm_support (void)
     }
 }
 #else // i386
+#define emms()
 int mm_support(void) { return 0; };
 #define mmx_t int
 #endif
