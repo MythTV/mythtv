@@ -466,7 +466,7 @@ int signalStrengthATSC_v4l2(int device, int input)
     int ioctlval = ioctl(device,VIDIOC_G_TUNER, &vsig);
     if (ioctlval == -1)
     {
-        perror("VIDIOC_G_TUNER problem in channel.h's signalStrengthATSC()");
+	perror("VIDIOC_G_TUNER");
         return 0;
     }
     VERBOSE(VB_CHANNEL, QString("signal strength: %1").arg(vsig.signal));
