@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-09-06, v2.70
+<date>2003-09-09, v2.71
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -3252,14 +3252,6 @@ $ xset -dpms s off
 Finally, depending on your distribution, you may be able to turn it off from
 within the control panel.
 
-<sect1>I can't checkout using CVS anymore! 
-<p>Isaac has changed some things around.  The CVS repository is now known as
-<tt>cvs.mythtv.org</tt>, rather than <tt>www.mythtv.org</tt> or
-<tt>mythtv.org</tt> and the path has changed.  Make sure you change your
-<tt>CVSROOT</tt> to point to the new server and path, delete your old tree,
-and re-do the checkout.  See Section 1, <ref id="how_to_obtain" name="How to
-Obtain this document"> for the full name and path.
-
 <sect1>I get segfaults / MythTV isn't doing anything.
 <p>Without details, the developers will not be able to determine if you have
 discovered a genuine code-bug,  or if the problem is with your system.  In
@@ -4556,6 +4548,8 @@ v2.69, 2003-09-06.  Incorporate some suggestions from -users about CVS.  Add
 pointer to custom distributions.
 v2.70, 2003-09-06.  Add a section for Debian-specific build
 instructions,and an example of how to build from the source package
+v2.71, 2003-09-09.  Get rid of "can't CVS anymore" - it's been switched for
+a while now.
 -->
 
 <!--

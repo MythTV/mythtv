@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-09-06, v2.70
+  2003-09-09, v2.71
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -159,25 +159,24 @@
      19.5 I keep losing all of my settings every time I compile!
      19.6 Compile errors.
      19.7 My screen goes blank, but comes back when I wiggle the mouse or use the keyboard.
-     19.8 I can't checkout using CVS anymore!
-     19.9 I get segfaults / MythTV isn't doing anything.
-     19.10 MythTV makes my system crash.
-     19.11 Troubleshooting audio.
-     19.12 I can't see parts of the On Screen Display.
-     19.13 The mythbackend program told me to look at this section.
-     19.14 My remote doesn't work / works sometimes and not others / "ghost" keypresses.
-     19.15 My PVR-250 card doesn't show inputs in the setup screen.
-     19.16 Where's my "canada-cable" entry gone to?
-     19.17 My channels are off by one.
-     19.18 Mythweb is showing a db_open error when I connect to it.
-     19.19 error: can't find a register in class 'BREG' while reloading 'asm'
-     19.20 make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
-     19.21 make: *** No rule to make target /mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
-     19.22 My mouse pointer disappears when placed over the MythTV windows.
-     19.23 What does "strange error flushing buffer" mean on my console?
-     19.24 I can't change the channel when watching Live TV.
-     19.25 Colors are wrong, people have blue faces.
-     19.26 When trying to run setup, I get an error like this: "./setup: error while loading shared libraries:"
+     19.8 I get segfaults / MythTV isn't doing anything.
+     19.9 MythTV makes my system crash.
+     19.10 Troubleshooting audio.
+     19.11 I can't see parts of the On Screen Display.
+     19.12 The mythbackend program told me to look at this section.
+     19.13 My remote doesn't work / works sometimes and not others / "ghost" keypresses.
+     19.14 My PVR-250 card doesn't show inputs in the setup screen.
+     19.15 Where's my "canada-cable" entry gone to?
+     19.16 My channels are off by one.
+     19.17 Mythweb is showing a db_open error when I connect to it.
+     19.18 error: can't find a register in class 'BREG' while reloading 'asm'
+     19.19 make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
+     19.20 make: *** No rule to make target /mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
+     19.21 My mouse pointer disappears when placed over the MythTV windows.
+     19.22 What does "strange error flushing buffer" mean on my console?
+     19.23 I can't change the channel when watching Live TV.
+     19.24 Colors are wrong, people have blue faces.
+     19.25 When trying to run setup, I get an error like this: "./setup: error while loading shared libraries:"
 
   20. Miscellaneous.
      20.1 I'd like to watch the files without using MythTV / I'd like to convert the files to some other format.
@@ -210,6 +209,7 @@
 
 
   ______________________________________________________________________
+
 
   [1m1.  How to obtain this document.[0m
 
@@ -4082,17 +4082,7 @@
   off from within the control panel.
 
 
-  [1m19.8.  I can't checkout using CVS anymore![0m
-
-  Isaac has changed some things around.  The CVS repository is now known
-  as cvs.mythtv.org, rather than www.mythtv.org or mythtv.org and the
-  path has changed.  Make sure you change your CVSROOT to point to the
-  new server and path, delete your old tree, and re-do the checkout.
-  See Section 1, ``How to Obtain this document'' for the full name and
-  path.
-
-
-  [1m19.9.  I get segfaults / MythTV isn't doing anything.[0m
+  [1m19.8.  I get segfaults / MythTV isn't doing anything.[0m
 
   Without details, the developers will not be able to determine if you
   have discovered a genuine code-bug,  or if the problem is with your
@@ -4127,21 +4117,20 @@
   assume that the problem you're having is in the setup program.
 
 
+       $ cd setup
+       $ gdb ./setup
 
-  $ cd setup
-  $ gdb ./setup
-
-  GNU gdb 5.3-1mdk (Mandrake Linux)
-  Copyright 2002 Free Software Foundation, Inc.
-  GDB is free software, covered by the GNU General Public License, and you are
-  welcome to change it and/or distribute copies of it under certain
-  conditions.
-  Type "show copying" to see the conditions.
-  There is absolutely no warranty for GDB.  Type "show warranty" for details.
-  This GDB was configured as "i586-mandrake-linux-gnu"...
-  (gdb) handle SIGPIPE nostop
-  Signal        Stop      Print   Pass to program Description
-  SIGPIPE       No        Yes     Yes             Broken pipe
+       GNU gdb 5.3-1mdk (Mandrake Linux)
+       Copyright 2002 Free Software Foundation, Inc.
+       GDB is free software, covered by the GNU General Public License, and you are
+       welcome to change it and/or distribute copies of it under certain
+       conditions.
+       Type "show copying" to see the conditions.
+       There is absolutely no warranty for GDB.  Type "show warranty" for details.
+       This GDB was configured as "i586-mandrake-linux-gnu"...
+       (gdb) handle SIGPIPE nostop
+       Signal        Stop      Print   Pass to program Description
+       SIGPIPE       No        Yes     Yes             Broken pipe
 
 
 
@@ -4173,7 +4162,7 @@
   instructions.
 
 
-  [1m19.10.  MythTV makes my system crash.[0m
+  [1m19.9.  MythTV makes my system crash.[0m
 
   MythTV [4mcan[24m [4mnot[24m crash your system - it is a user-level program.  If
   your system is crashing when you run MythTV, then you have some issue
@@ -4182,7 +4171,7 @@
   perform a CPU intensive task like encoding video.
 
 
-  [1m19.11.  Troubleshooting audio.[0m
+  [1m19.10.  Troubleshooting audio.[0m
 
   By Bruce Markey, mailto:bjm@lvcm.com <mailto:bjm@lvcm.com> [1mNOTE[22m:  the
   following instructions do not apply to PVR-250/350 encoders; the
@@ -4208,6 +4197,7 @@
   delayed behind the realtime video.  Once this test succeeds, MythTV
   should work correctly because it writes to and read from /dev/dsp in
   the same way that [1maplay [22mdoes.
+
 
   To record audio along with video the audio signal must be digitized by
   a DSP so that the audio data can be stored in a file. On playback, the
@@ -4256,15 +4246,14 @@
   #0, the second card is #1, etc.
 
 
-
-  [1m19.12.  I can't see parts of the On Screen Display.[0m
+  [1m19.11.  I can't see parts of the On Screen Display.[0m
 
   If you're a Red Hat 8.0 user, make sure that you've followed the
   instructions which tell you how to modify the Themes makefile.
   ``Link''.
 
 
-  [1m19.13.  The mythbackend program told me to look at this section.[0m
+  [1m19.12.  The mythbackend program told me to look at this section.[0m
 
   mythbackend does a check to see if your sound device is capable of
   full duplex operation.  If it's not, it's most likely that you're
@@ -4285,7 +4274,7 @@
   will need to get btaudio ``operational''.
 
 
-  [1m19.14.  My remote doesn't work / works sometimes and not others /[0m
+  [1m19.13.  My remote doesn't work / works sometimes and not others /[0m
   [1m"ghost" keypresses.[0m
 
   This can be due to a number of factors.  The simplest case is the
@@ -4311,7 +4300,7 @@
   +o  blackbox  (using "Sloppy Focus" and "Focus New Windows")
 
 
-  [1m19.15.  My PVR-250 card doesn't show inputs in the setup screen.[0m
+  [1m19.14.  My PVR-250 card doesn't show inputs in the setup screen.[0m
 
   See message http://lists.snowman.net/pipermail/mythtv-
   users/2003-April/002527.html
@@ -4319,11 +4308,9 @@
   users/2003-April/002527.html>
 
 
-  [1m19.16.  Where's my "canada-cable" entry gone to?[0m
+  [1m19.15.  Where's my "canada-cable" entry gone to?[0m
 
-
-
-  [1m19.17.  My channels are off by one.[0m
+  [1m19.16.  My channels are off by one.[0m
 
   There is no such thing as "Canada Cable"; Canada uses the same
   frequencies as the United States.  "Canada Cable" was a hack that some
@@ -4337,7 +4324,7 @@
   more information.
 
 
-  [1m19.18.  Mythweb is showing a db_open error when I connect to it.[0m
+  [1m19.17.  Mythweb is showing a db_open error when I connect to it.[0m
 
   Find your php.ini file. Make sure you've got a line in it like this:
 
@@ -4346,7 +4333,7 @@
   Restart apache for it to take effect.
 
 
-  [1m19.19.  error: can't find a register in class 'BREG' while reloading[0m
+  [1m19.18.  error: can't find a register in class 'BREG' while reloading[0m
   [1m'asm'[0m
 
   This is due to the broken Qt that is being distributed by Suse.  To
@@ -4354,7 +4341,7 @@
   you find there and then recompile.
 
 
-  [1m19.20.  make: *** No rule to make target[0m
+  [1m19.19.  make: *** No rule to make target[0m
   [1m/usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.[0m
 
   This error happens when there's a missing link in the
@@ -4380,41 +4367,41 @@
   choice is the better solution.
 
 
-  [1m19.21.  make: *** No rule to make target /mkspecs/default/qmake.conf',[0m
+  [1m19.20.  make: *** No rule to make target /mkspecs/default/qmake.conf',[0m
   [1mneeded by Makefile'.  Stop.[0m
 
   You didn't set your QTDIR.  Re-read the section on ``Setting up
   paths''.
 
 
-
-  [1m19.22.  My mouse pointer disappears when placed over the MythTV win-[0m
+  [1m19.21.  My mouse pointer disappears when placed over the MythTV win-[0m
   [1mdows.[0m
 
   This is the intended behavior.  The MythTV interface is meant for use
   with a remote control or a keyboard.
 
 
-  [1m19.23.  What does "strange error flushing buffer" mean on my console?[0m
+  [1m19.22.  What does "strange error flushing buffer" mean on my console?[0m
 
   Nothing, really.  It's just lame (the mp3 encoder) complaining for
   some obscure reason.  This seems to be fixed in more recent versions
   of the libmp3lame library.
 
 
-  [1m19.24.  I can't change the channel when watching Live TV.[0m
+  [1m19.23.  I can't change the channel when watching Live TV.[0m
 
   Something's wrong with your program database.  Did mythfilldatabase
   run with no major errors?
 
 
-  [1m19.25.  Colors are wrong, people have blue faces.[0m
+
+  [1m19.24.  Colors are wrong, people have blue faces.[0m
 
   If you are using the binary nVidia drivers, make sure you're using at
   least version 1.0-2960.
 
 
-  [1m19.26.  When trying to run setup, I get an error like this: "./setup:[0m
+  [1m19.25.  When trying to run setup, I get an error like this: "./setup:[0m
   [1merror while loading shared libraries:"[0m
 
   You didn't add /usr/local/lib to /etc/ld.so.conf.  See the section on
@@ -4449,12 +4436,11 @@
   Download the source to MPlayer and patch:
 
 
-
-  $ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90.tar.bz2
-  $ tar -xjf MPlayer-0.90.tar.bz2
-  $ cp mplayer-0.90rc5-mythtv-20030407.diff MPlayer-0.90
-  $ cd MPlayer-0.90
-  $ patch -p1 < mplayer-0.90rc5-mythtv-20030407.diff
+       $ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90.tar.bz2
+       $ tar -xjf MPlayer-0.90.tar.bz2
+       $ cp mplayer-0.90rc5-mythtv-20030407.diff MPlayer-0.90
+       $ cd MPlayer-0.90
+       $ patch -p1 < mplayer-0.90rc5-mythtv-20030407.diff
 
 
 
@@ -4473,8 +4459,6 @@
 
   Here's an example submitted to the mythtv-dev list by Pat Pflaum
   mailto:pat@netburp.com <mailto:pat@netburp.com> using fvwm:
-
-
        $ cat > .xinitrc
        fvwm &
        mythfrontend
@@ -4538,6 +4522,7 @@
 
   +o  480x480 (Video CD resolution)
 
+
   +o  352x480 (ReplayTV "Standard" quality)
 
   +o  320x480
@@ -4578,6 +4563,7 @@
 
   There are three sizes that are important for matching the MythTV GUI
   and full screen TV playback to fit the screen:
+
 
   +o  the X display size
 
@@ -4669,8 +4655,7 @@
 
   See the [1mmysqldump [22mmanpage for more information.
 
-
-       $ mysqldump -u mythtv -pmythtv mythconverg > mythtv_backup.sql
+  $ mysqldump -u mythtv -pmythtv mythconverg > mythtv_backup.sql
 
 
 
@@ -4730,6 +4715,7 @@
 
   +o  Pinnacle Studio PCTV Pro - note: this has a MSP34xx, but it's not
      wired correctly to the BT878 chip.
+
 
   +o  ATI TV Wonder VE
 
@@ -4851,12 +4837,13 @@
   Add the following to /etc/modules.conf:
 
 
-       alias char-major-81     videodev
-       alias char-major-81-0   ivtv
-       options ivtv debug=1
-       options tuner type=2
-       options msp3400 once=1 simple=1
-       add above ivtv msp3400 saa7115 tuner
+
+  alias char-major-81     videodev
+  alias char-major-81-0   ivtv
+  options ivtv debug=1
+  options tuner type=2
+  options msp3400 once=1 simple=1
+  add above ivtv msp3400 saa7115 tuner
 
 
 
@@ -4887,16 +4874,15 @@
   Check that the card is being recognized on the PCI bus:
 
 
+       $ lspci -v
+       <snip>
 
-  $ lspci -v
-  <snip>
-
-  00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
-  Encoder (rev 01)
-          Subsystem: Hauppauge computer works Inc.: Unknown device 4801
-          Flags: bus master, medium devsel, latency 32, IRQ 11
-          Memory at d0000000 (32-bit, prefetchable) [size=64M]
-          Capabilities: <available only to root>
+       00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
+       Encoder (rev 01)
+               Subsystem: Hauppauge computer works Inc.: Unknown device 4801
+               Flags: bus master, medium devsel, latency 32, IRQ 11
+               Memory at d0000000 (32-bit, prefetchable) [size=64M]
+               Capabilities: <available only to root>
 
 
 
@@ -4977,7 +4963,8 @@
   To turn off DNR, add the following to your rc.local:
 
 
-       /path/to/ivtv/utils/test_ioctl --set-codec-params=dnr_mode=0,dnr_temporal=0
+
+  /path/to/ivtv/utils/test_ioctl --set-codec-params=dnr_mode=0,dnr_temporal=0
 
 
 
@@ -5010,7 +4997,6 @@
   "/var/video".  The rsize and wsize options are used to increase the
   performance of NFS; soft mean that NFS will eventually timeout on an
   error, and the nfsvers is required for filesizes over 2GB.
-
 
 
   [1m20.12.  I'd like to automatically start mythbackend at system boot[0m
@@ -5074,7 +5060,6 @@
   that starts mythbackend from the default of root you [4mmust[24m perform this
   step.
 
-
   Create the directory /var/log/mythtv and set its permissions as
   follows:
 
@@ -5100,13 +5085,12 @@
   to edit the /etc/security/msec/perm.local file to include the
   following:
 
-
-       # /etc/security/msec/perm.local
-       # Local overrides to the msec program
-       #
-       # Full file path                user.group              permissions
-       /var/log/mythtv/                root.mythtv             775
-       /var/log/mythtv/*               root.mythtv             664
+  # /etc/security/msec/perm.local
+  # Local overrides to the msec program
+  #
+  # Full file path                user.group              permissions
+  /var/log/mythtv/                root.mythtv             775
+  /var/log/mythtv/*               root.mythtv             664
 
 
 
@@ -5134,7 +5118,6 @@
   [1mNOTE[22m: msec can only [4mreduce[24m the permissions of files, so if you don't
   get the results you expect, check that you're not asking msec to add
   missing permissions to the files or directories you created.
-
 
   [1m20.12.2.  Gentoo[0m
 
@@ -5228,7 +5211,7 @@
   already been created using [1mfdisk[22m.
 
 
-       # mkfs.ext3 -T largefile4 -m 0 /dev/hdb1
+  # mkfs.ext3 -T largefile4 -m 0 /dev/hdb1
 
 
 
@@ -5292,7 +5275,6 @@
 
   # fdisk /dev/hda .... create partition 5, save partition table and
   reboot if you have to
-
   Create the LVM physical volume from the partitions (repeat if you have
   multiple partitions to use):
 
@@ -5322,10 +5304,9 @@
   Now create a 5GB volume for mythmusic files if you like:
 
 
-
-  # lvcreate --name music --size 5G VGforMyth
-  # mkreiserfs /dev/VGforMyth/music
-  # mount /dev/VGforMyth/music /var/music
+       # lvcreate --name music --size 5G VGforMyth
+       # mkreiserfs /dev/VGforMyth/music
+       # mount /dev/VGforMyth/music /var/music
 
 
 
@@ -5356,7 +5337,6 @@
   Once you've completed one of the following two procedures, use [1mdf [22mto
   check that you've got more space.
 
-
   [1m20.15.1.  ReiserFS[0m
 
   Make the logical volume used for video bigger:
@@ -5384,6 +5364,7 @@
        # umount /var/video
        # e2fsadm --size +50G /dev/VGforMyth/video
        # mount /dev/VGforMyth/video /var/video
+
 
 
   [1m20.16.  What is this transcoder thing, and how do I use it?[0m
