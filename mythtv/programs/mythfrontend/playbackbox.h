@@ -60,6 +60,7 @@ class PlaybackBox : public MythDialog
 
     void doPlay();
     void doPlayFromBeg();
+    void doPlayListRandom();
 
     void askStop();
     void doStop();
@@ -102,11 +103,15 @@ class PlaybackBox : public MythDialog
     QString cutDown(QString, QFont *, int);
     QPixmap getPixmap(ProgramInfo *);
     QPainter backup;
-    void play(ProgramInfo *);
+    bool play(ProgramInfo *);
     void stop(ProgramInfo *);
     void remove(ProgramInfo *);
     void expire(ProgramInfo *);
     void showActions(ProgramInfo *);
+
+    void togglePlayListItem(void);
+    void togglePlayListItem(ProgramInfo *pginfo);
+    void randomizePlayList(void);
 
     bool haveGroupInfoSet;
     
@@ -130,9 +135,12 @@ class PlaybackBox : public MythDialog
     int titleIndex;
     int progIndex;
     QStringList titleList;
+    QStringList playList;
     QMap<QString, ProgramList> progLists;
 
     ProgramInfo *findMatchingProg(ProgramInfo *);
+    ProgramInfo *findMatchingProg(QString key);
+    ProgramInfo *findMatchingProg(QString chanid, QString startts);
 
     BoxType type;
 

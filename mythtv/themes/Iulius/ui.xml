@@ -1191,6 +1191,13 @@
       <bold>yes</bold>
     </font>
 
+    <font name="tagged_font" face="Arial">
+      <color>#dddd33</color>
+      <size>16</size>
+      <size:small>11</size:small>
+      <bold>yes</bold>
+    </font>
+
     <font name="currenttitle" face="Arial">
       <color>#ffff33</color>
       <size>18</size>
@@ -1269,6 +1276,7 @@
         <fcnfont name="active" function="active"></fcnfont>
         <fcnfont name="active" function="selected"></fcnfont>
         <fcnfont name="inactive" function="inactive"></fcnfont>
+        <fcnfont name="tagged_font" function="tagged"></fcnfont>
         <columnpadding>10</columnpadding>
         <column number="1" width="320" context="-1"></column>
         <column number="2" width="60" context="-1"></column>

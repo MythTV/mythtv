@@ -72,6 +72,10 @@
       <color>#dddd33</color>
     </font>
     
+    <font name="list-tagged"  base="list-active">
+      <color>#dddd33</color>
+    </font>
+    
     <font name="list-selected"  base="list-active">
       <color>#ffffff</color>
     </font>

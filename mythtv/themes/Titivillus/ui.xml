@@ -1094,6 +1094,7 @@
         <fcnfont name="list-active" function="active"></fcnfont>
         <fcnfont name="list-selected" function="selected"></fcnfont>
         <fcnfont name="list-inactive" function="inactive"></fcnfont>
+        <fcnfont name="list-tagged" function="tagged"></fcnfont>
         <columnpadding>5</columnpadding>
         <column number="1" width="340" context="-1"></column>
         <column number="2" width="60" context="-1"></column>

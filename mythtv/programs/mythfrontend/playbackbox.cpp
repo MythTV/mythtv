@@ -55,6 +55,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     titleList << "";
     progIndex = 0;
     titleIndex = 0;
+    playList.clear();
 
     skipUpdate = false;
     skipCnt = 0;
@@ -964,6 +965,13 @@ void PlaybackBox::updateShowTitles(QPainter *p)
                     ltype->EnableForcedFont(cnt, "recording");
                 else if (tempCurrent > 1)
                     ltype->EnableForcedFont(cnt, "recording"); // FIXME: change to overunderrecording, fall back to recording. 
+
+                QString key;
+                key = tempInfo->chanid + "_" +
+                      tempInfo->startts.toString(Qt::ISODate);
+
+                if (playList.grep(key).count())
+                    ltype->EnableForcedFont(cnt, "tagged");
             }
 
         } 
@@ -1313,8 +1321,28 @@ void PlaybackBox::playSelected()
 
     if (!curitem)
         return;
-     
-    play(curitem);
+
+    if (!playList.count())
+    {
+        play(curitem);
+    }
+    else
+    {
+        ProgramInfo *tmpItem;
+        QStringList::Iterator it;
+        bool playNext = true;
+
+        for (it = playList.begin(); it != playList.end() && playNext; ++it )
+        {
+            tmpItem = findMatchingProg(*it);
+            if (tmpItem)
+            {
+                ProgramInfo *rec = new ProgramInfo(*tmpItem);
+                playNext = play(rec);
+                delete rec;
+            }
+        }
+    }
 }
 
 void PlaybackBox::stopSelected()
@@ -1334,7 +1362,22 @@ void PlaybackBox::deleteSelected()
     if (!curitem)
         return;
 
-    remove(curitem);
+    if (!playList.count())
+    {
+        remove(curitem);
+    }
+    else
+    {
+        ProgramInfo *tmpItem;
+        QStringList::Iterator it;
+
+        for (it = playList.begin(); it != playList.end(); ++it )
+        {
+            tmpItem = findMatchingProg(*it);
+            if (tmpItem)
+                remove(tmpItem);
+        }
+    }
 }
 
 void PlaybackBox::expireSelected()
@@ -1386,8 +1429,8 @@ void PlaybackBox::selected()
 
     switch (type) 
     {
-        case Play: play(curitem); break;
-        case Delete: remove(curitem); break;
+        case Play: playSelected(); break;
+        case Delete: deleteSelected(); break;
     }
 }
 
@@ -1438,15 +1481,17 @@ void PlaybackBox::showActionsSelected()
     showActions(curitem);
 }
 
-void PlaybackBox::play(ProgramInfo *rec)
+bool PlaybackBox::play(ProgramInfo *rec)
 {
+    bool playCompleted = false;
+
     if (!rec)
-        return;
+        return false;
 
     if (fileExists(rec) == false)
     {
         cerr << "Error: " << rec->pathname << " file not found\n";
-        return;
+        return false;
     }
 
     ProgramInfo *tvrec = new ProgramInfo(*rec);
@@ -1478,6 +1523,9 @@ void PlaybackBox::play(ProgramInfo *rec)
     bool doremove = false;
     bool doprompt = false;
 
+    if (tv->getEndOfRecording())
+        playCompleted = true;
+
     if (tv->getRequestDelete())
     {
         doremove = true;
@@ -1504,6 +1552,8 @@ void PlaybackBox::play(ProgramInfo *rec)
     connected = FillList();
     skipUpdate = false;
     update(fullRect);
+
+    return playCompleted;
 }
 
 void PlaybackBox::stop(ProgramInfo *rec)
@@ -1786,33 +1836,62 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
                              popupForeground, popupBackground,
                              popupHighlight, "action popup");
 
-    initPopup(popup, program, "", "");
+    if (playList.count())
+    {
+        QLabel *label;
+        label = popup->addLabel(tr("Playlist Actions"), MythPopupBox::Large,
+                               false);
+        label->setAlignment(Qt::AlignCenter | Qt::WordBreak);
+
+        label = popup->addLabel(tr("There are %1 items in the list.")
+                                   .arg(playList.count()));
+        label->setAlignment(Qt::AlignCenter | Qt::WordBreak);
+    }
+    else
+    {
+        initPopup(popup, program, "", "");
+    }
 
     QSqlDatabase *db = QSqlDatabase::database();
     QButton *playButton;
 
-    if (curitem->programflags & FL_BOOKMARK)
-        playButton = popup->addButton(tr("Play from..."), this, SLOT(showPlayFromPopup()));
-    else
-        playButton = popup->addButton(tr("Play"), this, SLOT(doPlay()));
-
-    if (RemoteGetRecordingStatus(program, overrectime, underrectime) > 0)
-        popup->addButton(tr("Stop Recording"), this, SLOT(askStop()));
     
-    // Remove this check and the auto expire buttons if a third button is added to the StoragePopup screen
-    // Otherwise for non-max-episode schedules, the popup will only show one button
-    if (delitem && delitem->UsesMaxEpisodes(db))
+    if (playList.count())
     {
-        popup->addButton(tr("Storage Options"), this, SLOT(showStoragePopup()));
-    } else {
-        if (delitem && delitem->GetAutoExpireFromRecorded(db))
-            popup->addButton(tr("Don't Auto Expire"), this, SLOT(noAutoExpire()));
-        else
-            popup->addButton(tr("Auto Expire"), this, SLOT(doAutoExpire()));
+        playButton = popup->addButton(tr("Play"), this, SLOT(doPlay()));
+        popup->addButton(tr("Shuffle Play"), this, SLOT(doPlayListRandom()));
+        popup->addButton(tr("Change Recording Group"), this,
+                     SLOT(showRecGroupChanger()));
     }
+    else
+    {
+        if ((curitem->programflags & FL_BOOKMARK) || (!playList.count()))
+        {
+            playButton = popup->addButton(tr("Play from..."), this, SLOT(showPlayFromPopup()));
+        }
+        else
+        {
+            playButton = popup->addButton(tr("Play"), this, SLOT(doPlay()));
+        }
 
-    popup->addButton(tr("Recording Options"), this, SLOT(showRecordingPopup()));
-    popup->addButton(tr("Job Options"), this, SLOT(showJobPopup()));
+        if (RemoteGetRecordingStatus(program, overrectime, underrectime) > 0)
+            popup->addButton(tr("Stop Recording"), this, SLOT(askStop()));
+
+        // Remove this check and the auto expire buttons if a third button is added to the StoragePopup screen
+        // Otherwise for non-max-episode schedules, the popup will only show one button
+        if (delitem && delitem->UsesMaxEpisodes(db))
+        {
+            popup->addButton(tr("Storage Options"), this, SLOT(showStoragePopup()));
+        } else {
+            if (delitem && delitem->GetAutoExpireFromRecorded(db))
+                popup->addButton(tr("Don't Auto Expire"), this, SLOT(noAutoExpire()));
+            else
+                popup->addButton(tr("Auto Expire"), this, SLOT(doAutoExpire()));
+        }
+
+        popup->addButton(tr("Recording Options"), this, SLOT(showRecordingPopup()));
+        popup->addButton(tr("Job Options"), this, SLOT(showJobPopup()));
+    }
 
     popup->addButton(tr("Delete"), this, SLOT(askDelete()));
 
@@ -1880,12 +1959,46 @@ void PlaybackBox::doPlay(void)
 
     cancelPopup();
 
-    play(delitem);
+    if (curitem)
+        delete curitem;
+
+    curitem = new ProgramInfo(*delitem);
+
+    playSelected();
 }
 
 void PlaybackBox::doPlayFromBeg(void)
 {
     delitem->setIgnoreBookmark(true);
+    doPlay();
+}
+
+void PlaybackBox::doPlayListRandom(void)
+{
+    if (!expectingPopup)
+        return;
+
+    if (playList.count())
+    {
+        QStringList randomList;
+        QStringList resList;
+        int i;
+        unsigned int items = playList.count();
+
+        while(randomList.count() != items)
+        {
+            i = (int)(1.0 * items * rand() / (RAND_MAX + 1.0));
+
+            resList = randomList.grep(playList[i]);
+            if (resList.count())
+                continue;
+
+            randomList << playList[i];
+        }
+
+        playList = randomList;
+    }
+
     doPlay();
 }
 
@@ -2097,6 +2210,36 @@ ProgramInfo *PlaybackBox::findMatchingProg(ProgramInfo *pginfo)
     return NULL;
 }
 
+ProgramInfo *PlaybackBox::findMatchingProg(QString key)
+{
+    QStringList keyParts;
+
+    if ((key == "") || (key.find('_') < 0))
+        return NULL;
+
+    keyParts = QStringList::split("_", key);
+
+    if (keyParts.count() == 2)
+        return findMatchingProg(keyParts[0], keyParts[1]);
+    else
+        return NULL;
+}
+
+ProgramInfo *PlaybackBox::findMatchingProg(QString chanid, QString startts)
+{
+    ProgramInfo *p;
+    ProgramList *l = &progLists[""];
+
+    for (p = l->first(); p; p = l->next())
+    {
+        if (p->startts.toString(Qt::ISODate) == startts &&
+            p->chanid == chanid)
+            return p;
+    }
+
+    return NULL;
+}
+
 void PlaybackBox::noAutoExpire(void)
 {
     if (!expectingPopup && delitem)
@@ -2173,6 +2316,61 @@ void PlaybackBox::UpdateProgressBar(void)
     update(usageRect);
 }
 
+void PlaybackBox::togglePlayListItem(void)
+{
+    if (!curitem)
+        return;
+
+    if (inTitle)
+    {
+        QString currentTitle = titleList[titleIndex];
+        ProgramInfo *p;
+
+        for( unsigned int i = 0; i < progLists[currentTitle].count(); i++)
+        {
+            p = progLists[currentTitle].at(i);
+            if (p)
+                togglePlayListItem(p);
+        }
+
+        cursorRight();
+    }
+    else
+    {
+        togglePlayListItem(curitem);
+        cursorDown();
+    }
+}
+
+void PlaybackBox::togglePlayListItem(ProgramInfo *pginfo)
+{
+    QString key;
+
+    if (!pginfo)
+        return;
+
+    key  = pginfo->chanid + "_" + pginfo->startts.toString(Qt::ISODate);
+
+    if (playList.grep(key).count())
+    {
+        QStringList tmpList;
+        QStringList::Iterator it;
+
+        tmpList = playList;
+        playList.clear();
+
+        for (it = tmpList.begin(); it != tmpList.end(); ++it )
+        {
+            if (*it != key)
+                playList << *it;
+        }
+    }
+    else
+    {
+        playList << key;
+    }
+}
+
 void PlaybackBox::timeout(void)
 {
     if (titleList.count() <= 1)
@@ -2199,6 +2397,15 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
             showIconHelp();
         else if (action == "MENU")
             showMenu();
+        else if (action == "NEXTFAV")
+            togglePlayListItem();
+        else if (action == "TOGGLEFAV")
+        {
+            playList.clear();
+            connected = FillList();      
+            skipUpdate = false;
+            update(fullRect);
+        }
         else if (titleList.count() > 1)
         {
             if (action == "DELETE")
@@ -2696,6 +2903,7 @@ void PlaybackBox::chooseSetViewGroup(void)
     inTitle = gContext->GetNumSetting("PlaybackBoxStartInTitle", 0);
     titleIndex = 0;
     progIndex = 0;
+    playList.clear();
 
     connected = FillList();
     skipUpdate = false;
@@ -2850,7 +3058,23 @@ void PlaybackBox::changeSetRecGroup(void)
         newRecGroup = "Default";
 
     QSqlDatabase *m_db = QSqlDatabase::database();
-    delitem->ApplyRecordRecGroupChange(m_db, newRecGroup);
+
+    if (!playList.count())
+    {
+        delitem->ApplyRecordRecGroupChange(m_db, newRecGroup);
+    }
+    else
+    {
+        ProgramInfo *tmpItem;
+        QStringList::Iterator it;
+
+        for (it = playList.begin(); it != playList.end(); ++it )
+        {
+            tmpItem = findMatchingProg(*it);
+            if (tmpItem)
+                tmpItem->ApplyRecordRecGroupChange(m_db, newRecGroup);
+        }
+    }
     
     inTitle = gContext->GetNumSetting("PlaybackBoxStartInTitle", 0);
     titleIndex = 0;
