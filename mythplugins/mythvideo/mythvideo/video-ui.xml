@@ -50,6 +50,8 @@
         <font>info</font>
         <value>Select a video to watch...</value>
         <value lang="IT">Seleziona il video da vedere...</value>
+        <value lang="ES">Seleccione el vídeo a ver...</value>
+        <value lang="CA">Esculli el video que vol veure...</value>
       </textarea>
       <image name="filler" draworder="0" fleximage="yes">
         <filename>cr-background.png</filename>
@@ -87,6 +89,8 @@
         <font>bigtitle</font>
         <value>loading...</value>
         <value lang="IT">Lettura...</value>
+        <value lang="ES">Cargando...</value>
+        <value lang="CA">Llegint...</value>
       </textarea>
       <textarea name="title" draworder="0" align="center">
         <area>0,320,800,60</area>
@@ -100,6 +104,8 @@
          <font>info</font>
          <value>No Videos Found In This Directory</value>
          <value lang="IT">Nessun video in questa directory</value>
+         <value lang="ES">No encuentro videos en esta carpeta</value>
+         <value lang="CA">No trovo videos en aquesta carpeta</value>
          <multiline>yes</multiline> 
       </textarea>
     </container>

@@ -3,12 +3,16 @@
    <button>
      <type>TV</type>
      <text>TV Shows</text>
+     <text lang="ES">Programas de TV</text>
+     <text lang="CA">Programes de TV</text>
      <action>EXEC mythvideo /mnt/movies movies</action>
    </button>
 
   <button>
      <type>Videos</type>
      <text>Movies</text>
+     <text lang="ES">Películas</text>
+     <text lang="CA">Pel-lícueas</text>
      <action>EXEC mythvideo /mnt/tvshows movies</action>
    </button>
 
