@@ -1227,7 +1227,7 @@ void LCD::outputTime()
     aString += QTime::currentTime().toString("h:mm ap").left(8) + "\"";
     if (timeFlash)
     {
-        aString = aString.replace(QChar(':'), QChar(' '));
+        aString = aString.replace(QRegExp(":"), " ");
         timeFlash = false;
     }
     else
