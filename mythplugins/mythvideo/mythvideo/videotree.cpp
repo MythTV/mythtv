@@ -29,7 +29,7 @@ VideoTree::VideoTree(MythMainWindow *parent, QSqlDatabase *ldb,
     db = ldb;
     popup = NULL;
     expectingPopup = false;
-    
+    video_tree_data = NULL;
     current_parental_level = gContext->GetNumSetting("VideoDefaultParentalLevel", 1);
 
     file_browser = gContext->GetNumSetting("VideoTreeNoDB", 0);
@@ -402,7 +402,9 @@ void VideoTree::buildVideoList()
         
         QSqlQuery query(thequery,db);
         Metadata *myData;
-    
+        if (!video_tree_data)
+            video_tree_data = video_tree_root->addNode("videos", -2, false);
+        
         if(!query.isActive())
         {
             cerr << "videotree.o: Your database sucks" << endl;
