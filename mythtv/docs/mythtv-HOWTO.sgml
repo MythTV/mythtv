@@ -1,0 +1,557 @@
+<!doctype linuxdoc system>
+<!-- Revision History
+v1.00, 2002-11-05.  Initial.
+v1.01, 2002-11-06.  Added section on lirc, spelling errors.
+v1.02, 2002-11-11.  Converted to docbook, added more to the remote control
+section, compiling on AMD and Via C3 processors, Debian packaging.
+-->
+<!-- 
+To create documentation, execute "% linuxdoc -B html mythtv-HOWTO.sgml" or 
+"% linuxdoc -B txt mythtv-HOWTO.sgml" 
+-->
+
+<article>
+
+<title>Installing mythtv
+<author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
+<date>2002-11-11, v1.02
+<abstract>
+Initially, installation of mythtv seems like a huge task.  There are lots
+of dependencies, and various distributions seem to do the same thing
+different ways.  This document will attempt to give general installation
+instructions, as well as including distribution-specific instructions where
+necessary.
+</abstract>
+
+<toc>
+
+<sect>Introduction. 
+<p>This HOWTO document will focus on mythtv in a North
+America environment using KDE on Mandrake 9.0.  Installation instructions
+for other distributions and regions can be sent to the author for inclusion
+in other versions of this document.
+
+Installation of mythtv on Mandrake 9.0 is made fairly simple since a lot
+of the prerequisites are already packaged.
+
+For users with a Debian system, the mythtv program has been packaged by Matt
+Zimmerman <url url="mailto:mdz@debian.org"> and is available at <url 
+url="http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/"
+name="http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/">  The mailing list
+message for this annoucement can be accessed at <url
+url="http://www.snowman.net/pipermail/mythtv-dev/2002-November/001116.html"
+name="http://www.snowman.net/pipermail/mythtv-dev/2002-November/001116.html">.
+
+<sect>Checking prerequisites.
+
+<p>There are a few ways of installing programs on Linux systems; you can either
+use the graphical tools, or command-line utilities.  Either system will get
+the job done, and it all depends on your comfort level with Linux.
+
+In order to compile mythtv, we need to make sure that the software it
+needs is installed.  As of 2002-11-08, this list includes perl-5.8, mysql,
+gcc, freetype2-devel and qt-devel.  If you're going to use a remote control
+with mythtv, you're going to need the cdialog package in order to compile
+lircd.
+
+<sect1>Graphical installation tools.
+
+<p>On systems running KDE, a tool which will allow you to see what packages
+are available and if they're installed on your system can be accessed by
+clicking K->Configuration->Packaging->KPackage
+
+There are many inter-related modules, so make sure that you've got the
+main package for each one, and not a sub package for an unrelated item.  For
+example, there are many modules that have "perl" in them; some are a part of
+the apache webserver, others are a part of the perl distribution.  In each
+case, we're looking to make sure that the primary module is getting
+installed.
+
+Click the magnifying glass or press <bf>CTRL-F</bf> and enter "perl" as your
+search term.  You should find it under the "Perl" folder.  You need at least
+the perl 5.80 base package installed.  If not, click on the "Mark" button.
+
+Next, search for mysql - it should be under "Databases".  Make sure that
+mysql and mysql-clients are installed.  If not, click on "Mark".
+
+Search for gcc.  You're going to need gcc and gcc-c++ installed.
+
+Search for freetype2.  Make sure that you've got freetype2 and
+freetype2-devel installed.
+
+Finally, check for qt.  You'll need libqt3-devel (under folder "KDE and
+Qt") and libqt3 ("Libraries").
+
+Make sure that cdialog is installed if you want to use mythtv with a remote
+control.
+
+alsa-utils is needed for setting the volume.
+
+If you marked anything to install, click on Install Marked.  Click "Yes" or
+OK if you get a message about satisfying dependencies.
+
+<sect1>Command-line installation.
+<p> This section details the various methods for installing pre-requisites
+from the command line.
+
+<sect2>Mandrake 8.2 and 9.0
+<p>The simplest tool for installing packages from the command line is
+<bf>urpmi</bf>.
+
+Open a shell, and execute the following, all on the same line:
+<tscreen><verb>
+% su -
+# urpmi perl-5.8 mysql gcc gcc-c++ freetype2-devel libqt3-devel cdialog
+alsa-utils
+</verb></tscreen>
+You may get asked a number of questions regarding dependencies.  It's best
+to answer "YES".
+
+However, you might get this when you execute the command above:
+<tscreen><verb>
+[root@pvr root]# urpmi perl-5.8 mysql gcc gcc-c++
+freetype2-devel libqt3-devel cdialog
+everything already installed
+</verb></tscreen>
+
+In that case, you're ready to move onto the next step.
+<sect2>Redhat
+
+<p>[Please submit instructions]
+
+<sect2>Gentoo
+
+<p>[Please submit instructions]
+
+<sect>Setting up paths and ldconfig.
+
+<p>There are some paths that need to be modified before starting the main
+compile of mythtv, otherwise you will get errors.
+
+<sect1>Distribution-specific information.
+<sect2>Mandrake 9.0
+<p>As root, create the following file in <tt>/etc/profile.d</tt>  On my system
+I call it "mythtv.sh".
+
+Open a shell, and switch to superuser mode.
+<bf>NOTE: ^D</bf> means press <bf>CTRL</bf> and <bf>d</bf> at the same time.
+
+<tscreen><verb>
+% su -
+# cd /etc/profile.d
+cat > mythtv.sh
+export QTDIR=/usr/lib/qt3
+export PATH=$PATH:/usr/lib/qt3/bin
+^D
+
+# chmod a+x mythtv.sh
+# exit
+% exit
+</verb></tscreen>
+The last two commands are to exit out of the shell.  This way, when you next
+open a shell your new commands will take effect.
+
+<sect2>Redhat.
+<p>[Please submit instructions]
+
+<sect2>Gentoo.
+
+<p>[Please submit instructions]
+
+<sect1>Checking that it worked.
+<p>Open a shell and switch to superuser mode again.
+<tscreen><verb>
+% su -
+# set
+
+[lots of text]
+QTDIR=/usr/lib/qt3
+PATH=/usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/games:/usr/lib/qt3/bin:/home/mythtv/bin:/usr/lib/qt3/bin
+</verb></tscreen>
+You should see QTDIR and the path changes you made.
+
+Next, we need to make sure that the libraries that we're building will be
+found when we need them.
+
+<sect1>Modifying <tt>/etc/ld.so.conf</tt>.
+<p>Switch to /etc and execute the following:
+<tscreen><verb>
+# cd /etc
+# cat >> ld.so.conf
+/usr/local/lib
+^D
+
+# ldconfig
+# exit
+%
+</verb></tscreen>
+
+<sect>Downloading and compiling.
+
+<p>Get mythtv from the <url url="http://www.mythtv.org" name="mythtv.org">
+website.  Save the tarball to a directory you can find.
+
+Get XMLTV from <url url="http://xmltv.sourceforge.net"
+name="http://xmltv.sourceforge.net">.  Download version 0.5.2
+
+Get lame from <url url="http://www.mp3dev.org/mp3"
+name="http://www.mp3dev.org/mp3">.  Download the sourcecode to v3.92 by
+following the links to sourceforge.net
+
+<sect1>Notes on compiling on a system with non-Intel processors. 
+<p>If
+you've got a system with an AMD K6-2 or a VIA C3 processor, make the
+following change in the <tt>settings.pro</tt> file.
+
+Look for 
+<verb>-march=pentiumpro</verb> 
+and replace it with
+<verb>-march=i586</verb> 
+before you compile.
+
+Recent AMD processors, like the Duron, Thunderbird and Athalon don't need this
+change.
+
+<sect1>Building LAME.
+
+<p>Open a shell and switch to the directory where you saved lame.
+<tscreen><verb>
+% tar -xzf lame-3.92.tar.gz
+% cd lame-3.92
+% ./configure
+% make
+% su
+# make install
+</verb></tscreen>
+Check that it worked:
+<tscreen><verb>
+# ls -l /usr/local/lib
+-rw-r--r--    1 root     root       381706 Nov  4 14:22 libmp3lame.a
+-rwxr-xr-x    1 root     root          674 Nov  4 14:22 libmp3lame.la*
+lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so ->
+libmp3lame.so.0.0.0*
+lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so.0 ->
+libmp3lame.so.0.0.0*
+-rwxr-xr-x    1 root     root       360197 Nov  4 14:22
+libmp3lame.so.0.0.0*
+
+# exit
+%
+</verb></tscreen>
+
+<sect1>Building XMLTV.
+
+<p>Untar the xmltv file:
+<tscreen><verb>
+% tar -xjf xmltv-0.5.2.tar.bz2
+% cd xmltv-0.5.2
+</verb></tscreen>
+Install the xmltv prerequisites:
+<tscreen><verb>
+% su -
+# perl -MCPAN -e shell
+</verb></tscreen>
+Check to see which version of TWIG is being offered by CPAN.  If it's 3.08,
+we need to download it from the author's webiste, because 3.08 has a problem
+with perl 5.8. As of 2002-11-02:
+<tscreen><verb>
+cpan> i /TWIG/
+Author          STWIGGER ("Simon Twigger" <simont@mcw.edu>)
+Distribution    M/MI/MIROD/XML-Twig-3.08.tar.gz
+Module          XML::Twig       (M/MI/MIROD/XML-Twig-3.08.tar.gz)
+3 items found
+
+cpan>
+</verb></tscreen>
+This means that we need to do something a little different later on.  If
+it's 3.09 or better, then execute:
+<tscreen><verb>
+cpan> install XML::Twig
+</verb></tscreen>
+and then the rest of the commands (no matter what the TWIG version was):
+<tscreen><verb>
+cpan> install Date::Manip
+Date::Manip is up to date.
+cpan> install LWP
+cpan> install XML::Writer
+cpan> exit
+</verb></tscreen>
+
+Download the 3.09 version of XMLTWIG from <url
+url="http://www.xmltwig.com/xmltwig/"
+name="http://www.xmltwig.com/xmltwig/">
+<tscreen><verb>
+% tar -xzf XML-Twig-3.09.tar.gz
+% cd XML-Twig-3.09
+% perl Makefile.PL
+% make
+% make test
+% su
+# make install
+# exit
+</verb></tscreen>
+Change to the XMLTV directory and compile it:
+<tscreen><verb>
+% cd xmltv-0.5.2
+% perl Makefile.PL
+</verb></tscreen>
+You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes" to
+the grabber required for your location.
+
+You may get errors about modules not being installed.  They shouldn't matter
+if you're installing North America and have followed the instructions to
+this point.
+<tscreen><verb>
+% make
+% make test
+% su 
+# make install
+# exit
+</verb></tscreen>
+
+<sect1>Building mythtv.
+
+<p>Unpack mythtv
+<tscreen><verb>
+% tar -xjf mythtv-0.7.tar.bz2
+% cd mythtv-0.7
+% ./configure
+% make
+</verb></tscreen>
+Switch to superuser:
+<tscreen><verb>
+% su
+# make install
+# exit
+</verb></tscreen>
+Make sure that mysql is running and started at boot.  Click on Mandrake
+Control Center->System->Services
+
+Setup the initial mysql databases:
+<tscreen><verb>
+% cd database
+% mysql -u root &lt; mc.sql
+</verb></tscreen>
+
+<sect>Setting up alsa and the mixer.
+
+<p>If your video doesn't appear to be in-sync with your audio, it could be
+because you are listening to the real-time audio from your video card rather
+than after it's been processed and synced to the video by mythtv.
+
+What you need to do is to mute the "line-in" of your soundcard and also
+set it as the recording source.
+
+There are two ways to do this.  Graphically, and from the command line.
+
+<sect1>Graphically setting up the mixer.
+
+<p>Open Kmix by K->Multimedia->Sound->Kmix
+
+Click on Settings->Configure  Make sure that "Tick Marks" and "Show
+labels" have "X"'s in them.  This will make it easier to find the correct
+audio source.  Click OK.
+
+On the mixer page, look for Line-In on your soundcard.  You should see
+two LED's - a green one at the top, and a red one at the bottom.  The green
+one at the top is for muting; you want to make sure that the green LED is a
+dark green, meaning that it's "off".  You also want to click on the red LED
+so that it turns bright red, indicating that it's "ON"; this insures that
+the Line-in is used as the source.  Click OK, and make sure that you save
+the settings so that this is your default.
+
+<sect1>Setting the mixer from the command line.
+
+<p>If you're running Mandrake 9.0 and have installed the alsa-utils package,
+then the <bf>amixer</bf> program can be used to setup the mixer.
+
+<tscreen><verb>
+% amixer set Master,0 100%,100% unmute
+% amixer set Line,0 100%,100% mute capture
+% su -
+# alsactl store
+# exit
+% 
+</verb></tscreen>
+That takes care of setting the volume correctly, and the alsa startup script
+will restore the volume after a reboot.
+
+<sect>Setting up a remote control.
+
+<p>mythtv does not have native remote control receiver and decoder software
+built-in.  Instead, remote control functions are implemented by cooperating
+with lirc, the Linux Infra Red Control program.  lirc handles the IR
+hardware and passes keystrokes to mythtv, which then acts as if the user had
+pressed the keys on the keyboard.
+
+lircd has two prerequisites:  dialog, available in Mandrake through the
+"cdialog" RPM, and the kernel source.  Mandrake 9.0 is using the 2.4.19
+kernel, so the easiest thing is to go to <url url="http://www.kernel.org"
+name="http://www.kernel.org"> and download
+the full 2.4.19 tar file from <url
+url="http://www.kernel.org/pub/linux/kernel/v2.4/"
+name="http://www.kernel.org/pub/linux/kernel/v2.4/">.
+
+<sect1>Obtaining the kernel.
+
+<p>An easy way is to use the wget command:
+<tscreen><verb>
+% wget http://www.kernel.org/pub/linux/kernel/v2.4/linux-2.4.19.tar.bz2
+</verb></tscreen>
+Next, open a shell and login as superuser.
+<tscreen><verb>
+% su -
+# cd /home/[yourusername]
+# mkdir /usr/src
+# mv linux-2.4.19.tar.bz2 /usr/src
+# cd /usr/src
+# tar -xjf linux-2.4.19.tar.bz2
+# chown -R root.root linux-2.4.19
+# ln -sf linux-2.4.19 linux
+# exit
+</verb></tscreen>
+
+<sect1>Obtaining and compiling lirc.
+
+<p>You're going to need to download and compile lircd.  Go to <url
+url="http://www.lirc.org" name="http://www.lirc.org"> and download lirc; as
+of 2002-11-07, the version available is 0.6.6.  Grab the remotes.tgz file as
+well. 
+<tscreen><verb>
+% tar -xjf lirc-0.6.6.tar.bz2
+% cd lirc-0.6.6
+% ./setup.sh
+</verb></tscreen>
+You're going to need to know what sort of receiver you have and where
+it's connected.  In my case, I have a Pinnacle Studio TV card, with the IR
+receiver connected to COM1 (/dev/ttys0), so once the configuration menu came
+up I did Driver Configuration->Other Serial Port Devices->Pinnacle Systems
+Receiver->OK and on the next page selected COM1->OK.
+
+Each remote is different; some remote receivers connect directly to your
+capture card and not to a serial port, so make sure that you've got the
+correct one.
+
+<p>You then click "Save Configuration and run configure" to continue.
+
+Once the configuration step is complete:
+<tscreen><verb>
+% make
+% su
+# make install
+# chmod 666 /dev/lircd
+</verb></tscreen>
+Next, we're going to manually start lircd the first time:
+<tscreen><verb>
+# /usr/local/sbin/lircd
+</verb></tscreen>
+Now, we're going to add the commands necessary for lircd to run each time
+we boot:
+<tscreen><verb>
+# cd /etc/rc.d
+# cat >> rc.local
+echo "Starting lircd"
+/usr/local/sbin/lircd
+^D
+# exit
+%
+</verb></tscreen> This takes care of the lircd portion, which "listens" for
+the IR signals. If everything went well, the install script for lircd put an
+appropriate config file for your remote into <tt>/etc/lircd.conf</tt> This
+file maps the buttons on the remote control to the IR pulses coming from the
+receiver.
+
+The next step is to convert those signals into something that can be used
+to control mythtv.
+<tscreen><verb>
+% cd ~/mythtv-0.7/configfiles
+% cp lircrc.example ~/.lircrc
+</verb></tscreen> 
+or
+<tscreen><verb>
+% cp lircrc.example.pinnaclestudiopctv ~/.lircrc
+</verb></tscreen>
+if you've got a Pinnacle Studio PCTV remote.
+<tscreen><verb>
+% irw
+</verb></tscreen>
+Start pressing the keys on your remote; <bf>irw</bf> will
+print the name of the button as it is defined in your
+<tt>/etc/lircd.conf</tt>. If you don't see anything at this point, you need
+to troubleshoot further by going back to the lirc homepage and investigating
+from there.
+
+If it is working, then press <bf>CTRL-C</bf> to abort the program.  Once you
+know that your remote is working, you need to run the <bf>irxevent</bf>
+program, which takes the key presses and sends them to mythtv. 
+<bf>irxevent</bf>
+isn't a daemon, so if you know that your remote is working you need to
+invoke it like this: 
+<tscreen><verb>
+% irxevent &
+</verb></tscreen>
+If <bf>irxevent</bf> isn't running, then mythtv will not respond to your remote
+control.
+
+Currently, mythtv doesn't have native support for controlling the mixer
+volume and mute settings.  A workaround at this time is to invoke the
+<bf>amixer</bf> program.  If you wish to define keys to control the mixer,
+the <bf>irexec</bf> program can accomplish this fairly easily.  The
+configfiles/lircrc.example.pinnaclestudiopctv file has an example of calling
+an external program from a remote control button.
+
+<sect1>Additional information for lirc.
+
+<p>Take a look at the lircrc.example files in the <tt>configfiles/</tt>
+directory.  In my case, (Pinnacle Studio card) the channel up and down functions
+weren't working, due to the fact that the button names were different than
+the <tt>lircrc.example</tt> files that come with mythtv.
+
+The <tt>lircrc.example</tt> file has this:
+<tscreen><verb>
+begin
+    prog = irxevent
+    button = ChannelUp
+    config = Key Up CurrentWindow
+end
+
+begin
+    prog = irxevent
+    button = ChannelDown
+    config = Key Down CurrentWindow
+end
+</verb></tscreen>
+but the <tt>/etc/lircd.conf</tt> that comes in the lircd package 
+defines the buttons for the Pinnacle Studio PCTV as:
+<tscreen><verb>
+          channel+                 0x0000000000000017
+          channel-                 0x000000000000001C
+</verb></tscreen>
+rather than "ChannelUp" and "ChannelDown".  I added the 
+following to my /home/[yourusername]/.lircrc file:
+<tscreen><verb>
+begin
+    prog = irxevent
+    button = channel+
+    config = Key Up CurrentWindow
+end
+
+begin
+    prog = irxevent
+    button = channel-
+    config = Key Down CurrentWindow
+end
+</verb></tscreen>
+which took care of basic functionality.  Because the PCTV Studio remote
+has additional buttons, look at the
+<tt>configfiles/lircrc.example.pinnaclestudiopctv</tt> for an example of how
+to define additional buttons, and how to debug potential button name
+conflicts between the <tt>lircrc.example</tt> file and how <bf>your</bf>
+remote defines the button names.
+
+By examining the button names defined in <tt>/etc/lircd.conf</tt> and using
+the <bf>irw</bf> program to make sure that your remote is working, you can
+create the appropriate mappings in <tt>.lircrc</tt> to get excellent remote
+functionality with mythtv.
+
+</article>
