@@ -1,6 +1,7 @@
 #include <iostream>
 #include <qsocket.h>
 #include <qregexp.h>
+#include <qmap.h>
 
 #include "programinfo.h"
 #include "scheduledrecording.h"
@@ -170,6 +171,34 @@ void ProgramInfo::FromStringList(QStringList &list, int offset)
         chansign = "";
     if (channame == " ")
         channame = "";
+}
+
+void ProgramInfo::ToMap(QMap<QString, QString> &progMap)
+{
+    QString tmFmt = gContext->GetSetting("TimeFormat");
+    QString dtFmt = gContext->GetSetting("ShortDateFormat");
+    QString length;
+    int hours, minutes, seconds;
+
+    progMap["title"] = title;
+    progMap["subtitle"] = subtitle;
+    progMap["description"] = description;
+    progMap["category"] = category;
+    progMap["callsign"] = chansign;
+    progMap["starttime"] = startts.toString(tmFmt);
+    progMap["startdate"] = startts.toString(dtFmt);
+    progMap["endtime"] = endts.toString(tmFmt);
+    progMap["enddate"] = endts.toString(dtFmt);
+    progMap["channum"] = channame;
+    progMap["iconpath"] = "";
+
+    seconds = startts.secsTo(endts);
+    minutes = seconds / 60;
+    progMap["lenmins"] = QString("%1").arg(minutes);
+    hours   = minutes / 60;
+    minutes = minutes % 60;
+    length.sprintf("%d:%02d", hours, minutes);
+    progMap["lentime"] = length;
 }
 
 int ProgramInfo::CalculateLength(void)

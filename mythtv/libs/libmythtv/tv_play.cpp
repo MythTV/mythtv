@@ -1269,16 +1269,9 @@ void TV::DoInfo(void)
     {
         osd->HideSet("status");
 
-        title = playbackinfo->title;
-        subtitle = playbackinfo->subtitle;
-        description = playbackinfo->description;
-        category = playbackinfo->category;
-        starttime = playbackinfo->startts.toString("yyyyMMddhhmm") + "00";
-        endtime = playbackinfo->endts.toString("yyyyMMddhhmm") + "00";
-        callsign = playbackinfo->chansign;
-        iconpath = "";
-        osd->SetInfoText(title, subtitle, description, category, starttime,
-            endtime, callsign, iconpath, osd_display_time);
+        QMap<QString, QString> regexpMap;
+        playbackinfo->ToMap(regexpMap);
+        osd->SetInfoText(regexpMap, osd_display_time);
     }
     else
     {
@@ -1485,7 +1478,13 @@ void TV::ChannelKey(int key)
     channelKeys[4] = 0;
 
     if (activenvp == nvp && osd)
-        osd->SetChannumText(channelKeys, 2);
+    {
+        QMap<QString, QString> regexpMap;
+
+        regexpMap["channum"] = channelKeys;
+        regexpMap["callsign"] = "";
+        osd->SetTextByRegexp("channel_number", regexpMap, 2);
+    }
 
     channelqueued = true;
 }
@@ -1587,7 +1586,12 @@ void TV::PreviousChannel(void)
     if (activenvp == nvp && osd)
     {
         osd->HideSet("program_info");
-        osd->SetChannumText(channame_vector[vector], 1);
+
+        QMap<QString, QString> regexpMap;
+
+        regexpMap["channum"] = channame_vector[vector];
+        regexpMap["callsign"] = "";
+        osd->SetTextByRegexp("channel_number", regexpMap, 1);
     }
 
     // Reset the timer
@@ -1642,15 +1646,12 @@ void TV::ToggleOSD(void)
 
 void TV::UpdateOSD(void)
 {
-    QString title, subtitle, desc, category, starttime, endtime;
-    QString callsign, iconpath, channelname, chanid;
+    QMap<QString, QString> regexpMap;
 
-    GetChannelInfo(activerecorder, title, subtitle, desc, category, 
-                   starttime, endtime, callsign, iconpath, channelname, chanid);
+    GetChannelInfo(activerecorder, regexpMap);
 
-    osd->SetInfoText(title, subtitle, desc, category, starttime, endtime,
-                     callsign, iconpath, osd_display_time);
-    osd->SetChannumText(channelname, osd_display_time);
+    osd->SetInfoText(regexpMap, osd_display_time);
+    osd->SetTextByRegexp("channel_number", regexpMap, osd_display_time);
 }
 
 void TV::UpdateOSDInput(void)
@@ -1665,6 +1666,53 @@ void TV::UpdateOSDInput(void)
 }
 
 void TV::GetNextProgram(RemoteEncoder *enc, int direction,
+                        QMap<QString, QString> &regexpMap)
+{
+    if (!enc)
+        enc = activerecorder;
+
+    QString title, subtitle, description, category, starttime, endtime;
+    QString callsign, iconpath, channum, chanid;
+
+    starttime = regexpMap["dbstarttime"];
+    chanid = regexpMap["chanid"];
+    channum = regexpMap["channum"];
+
+    enc->GetNextProgram(direction,
+                        title, subtitle, description, category, starttime,
+                        endtime, callsign, iconpath, channum, chanid);
+
+    QString tmFmt = gContext->GetSetting("TimeFormat");
+    QString dtFmt = gContext->GetSetting("ShortDateFormat");
+    QDateTime startts = QDateTime::fromString(starttime, Qt::ISODate);
+    QDateTime endts = QDateTime::fromString(endtime, Qt::ISODate);
+    QString length;
+    int hours, minutes, seconds;
+
+    regexpMap["dbstarttime"] = starttime;
+    regexpMap["dbendtime"] = endtime;
+    regexpMap["title"] = title;
+    regexpMap["subtitle"] = subtitle;
+    regexpMap["description"] = description;
+    regexpMap["category"] = category;
+    regexpMap["callsign"] = callsign;
+    regexpMap["starttime"] = startts.toString(tmFmt);
+    regexpMap["startdate"] = startts.toString(dtFmt);
+    regexpMap["endtime"] = endts.toString(tmFmt);
+    regexpMap["enddate"] = endts.toString(dtFmt);
+    regexpMap["channum"] = channum;
+    regexpMap["iconpath"] = iconpath;
+
+    seconds = startts.secsTo(endts);
+    minutes = seconds / 60;
+    regexpMap["lenmins"] = QString("%1").arg(minutes);
+    hours   = minutes / 60;
+    minutes = minutes % 60;
+    length.sprintf("%d:%02d", hours, minutes);
+    regexpMap["lentime"] = length;
+}
+
+void TV::GetNextProgram(RemoteEncoder *enc, int direction,
                         QString &title, QString &subtitle, 
                         QString &desc, QString &category, QString &starttime, 
                         QString &endtime, QString &callsign, QString &iconpath,
@@ -1676,6 +1724,47 @@ void TV::GetNextProgram(RemoteEncoder *enc, int direction,
     enc->GetNextProgram(direction,
                         title, subtitle, desc, category, starttime, endtime, 
                         callsign, iconpath, channelname, chanid);
+}
+
+void TV::GetChannelInfo(RemoteEncoder *enc, QMap<QString, QString> &regexpMap)
+{
+    if (!enc)
+        enc = activerecorder;
+
+    QString title, subtitle, description, category, starttime, endtime;
+    QString callsign, iconpath, channum, chanid;
+
+    enc->GetChannelInfo(title, subtitle, description, category, starttime,
+                        endtime, callsign, iconpath, channum, chanid);
+
+    QString tmFmt = gContext->GetSetting("TimeFormat");
+    QString dtFmt = gContext->GetSetting("ShortDateFormat");
+    QDateTime startts = QDateTime::fromString(starttime, Qt::ISODate);
+    QDateTime endts = QDateTime::fromString(endtime, Qt::ISODate);
+    QString length;
+    int hours, minutes, seconds;
+
+    regexpMap["dbstarttime"] = starttime;
+    regexpMap["dbendtime"] = endtime;
+    regexpMap["title"] = title;
+    regexpMap["subtitle"] = subtitle;
+    regexpMap["description"] = description;
+    regexpMap["category"] = category;
+    regexpMap["callsign"] = callsign;
+    regexpMap["starttime"] = startts.toString(tmFmt);
+    regexpMap["startdate"] = startts.toString(dtFmt);
+    regexpMap["endtime"] = endts.toString(tmFmt);
+    regexpMap["enddate"] = endts.toString(dtFmt);
+    regexpMap["channum"] = channum;
+    regexpMap["iconpath"] = iconpath;
+
+    seconds = startts.secsTo(endts);
+    minutes = seconds / 60;
+    regexpMap["lenmins"] = QString("%1").arg(minutes);
+    hours   = minutes / 60;
+    minutes = minutes % 60;
+    length.sprintf("%d:%02d", hours, minutes);
+    regexpMap["lentime"] = length;
 }
 
 void TV::GetChannelInfo(RemoteEncoder *enc, QString &title, QString &subtitle, 
@@ -1918,12 +2007,12 @@ void TV::BrowseStart(void)
     browsemode = true;
 
     QString title, subtitle, desc, category, starttime, endtime;
-    QString callsign, iconpath, channelname, chanid;
+    QString callsign, iconpath, channum, chanid;
 
     GetChannelInfo(activerecorder, title, subtitle, desc, category, 
-                   starttime, endtime, callsign, iconpath, channelname, chanid);
+                   starttime, endtime, callsign, iconpath, channum, chanid);
 
-    browsechannum = channelname;
+    browsechannum = channum;
     browsechanid = chanid;
     browsestarttime = starttime;
 
@@ -1944,13 +2033,12 @@ void TV::BrowseEnd(bool change)
 
 void TV::BrowseDispInfo(int direction)
 {
-    QString title, subtitle, desc, category, starttime, endtime;
-    QString callsign, iconpath, channelname, chanid;
     QDateTime curtime = QDateTime::currentDateTime();
     QDateTime maxtime = curtime.addSecs(60 * 60 * 4);
     QDateTime lastprogtime =
                   QDateTime::fromString(browsestarttime, Qt::ISODate);
     OSDSet *oset;
+    QMap<QString, QString> regexpMap;
 
     if (paused)
         return;
@@ -1962,26 +2050,20 @@ void TV::BrowseDispInfo(int direction)
         (direction == BROWSE_RIGHT))
         return;
 
-    channelname = browsechannum;
-    starttime = browsestarttime;
-    chanid = browsechanid;
+    regexpMap["channum"] = browsechannum;
+    regexpMap["dbstarttime"] = browsestarttime;
+    regexpMap["chanid"] = browsechanid;
 
     if (direction != BROWSE_SAME)
-        GetNextProgram(activerecorder, direction,
-                       title, subtitle, desc, category,
-                       starttime, endtime, callsign, iconpath,
-                       channelname, chanid);
+        GetNextProgram(activerecorder, direction, regexpMap);
     else
-        GetChannelInfo(activerecorder, title, subtitle, desc, category, 
-                       starttime, endtime, callsign, iconpath,
-                       channelname, chanid);
+        GetChannelInfo(activerecorder, regexpMap);
 
-    browsechannum = channelname;
-    browsechanid = chanid;
-    browsestarttime = starttime;
+    browsechannum = regexpMap["channum"];
+    browsechanid = regexpMap["chanid"];
+    browsestarttime = regexpMap["dbstarttime"];
 
-    osd->SetInfoText(title, subtitle, desc, category, starttime, endtime,
-                     callsign, iconpath, osd_display_time);
+    osd->SetInfoText(regexpMap, osd_display_time);
 
     oset = osd->GetSet("program_info");
     if (oset)

@@ -50,6 +50,8 @@ class OSDSet
     void SetFrameRate(int framerate) { m_framerate = framerate; }
     int GetFrameRate() { return m_framerate; }
 
+    void SetTextByRegexp(QMap<QString, QString> &regexpMap);
+
   private:
     int m_screenwidth;
     int m_screenheight;
@@ -115,6 +117,9 @@ class OSDTypeText : public OSDType
     void SetText(const QString &text);
     QString GetText() { return m_message; }
 
+    void SetDefaultText(const QString &text);
+    QString GetDefaultText() { return m_default_msg; }
+
     void SetMultiLine(bool multi) { m_multiline = multi; }
     bool GetMultiLine() { return m_multiline; }
 
@@ -136,6 +141,7 @@ class OSDTypeText : public OSDType
 
     QRect m_displaysize;
     QString m_message;
+    QString m_default_msg;
 
     TTFFont *m_font;
     TTFFont *m_altfont;

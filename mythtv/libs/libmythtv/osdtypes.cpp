@@ -1,4 +1,6 @@
 #include <qimage.h>
+#include <qmap.h>
+#include <qregexp.h>
 #include <math.h>
 
 #include <iostream>
@@ -134,6 +136,36 @@ OSDType *OSDSet::GetType(const QString &name)
     return ret;
 }
 
+void OSDSet::SetTextByRegexp(QMap<QString, QString> &regexpMap)
+{
+    vector<OSDType *>::iterator iter = allTypes->begin();
+    for (; iter != allTypes->end(); iter++)
+    {
+        OSDType *type = (*iter);
+        if (OSDTypeText *item = dynamic_cast<OSDTypeText *>(type))
+        {
+            QMap<QString, QString>::Iterator riter = regexpMap.begin();
+            QString new_text = item->GetDefaultText();
+            QString full_regex;
+
+            if ((new_text == "") &&
+                (regexpMap.contains(item->Name())))
+            {
+                new_text = regexpMap[item->Name()];
+            }
+            else
+                for (; riter != regexpMap.end(); riter++)
+                {
+                    full_regex = "%" + riter.key().upper() + "%";
+                    new_text.replace(QRegExp(full_regex), riter.data());
+                }
+
+            if (new_text != "")
+                item->SetText(new_text);
+        }
+    }
+}
+
 void OSDSet::Display(bool onoff)
 {
     if (onoff)
@@ -228,6 +260,7 @@ OSDTypeText::OSDTypeText(const QString &name, TTFFont *font,
            : OSDType(name)
 {
     m_message = text;
+    m_default_msg = text;
     m_font = font;
 
     m_altfont = NULL;
@@ -244,6 +277,7 @@ OSDTypeText::OSDTypeText(const OSDTypeText &other)
 {
     m_displaysize = other.m_displaysize;
     m_message = other.m_message;
+    m_default_msg = other.m_default_msg;
     m_font = other.m_font;
     m_altfont = other.m_altfont;
     m_centered = other.m_centered;
@@ -264,6 +298,12 @@ void OSDTypeText::SetAltFont(TTFFont *font)
 void OSDTypeText::SetText(const QString &text)
 {
     m_message = text;
+}
+
+void OSDTypeText::SetDefaultText(const QString &text)
+{
+    m_message = text;
+    m_default_msg = text;
 }
 
 void OSDTypeText::Draw(unsigned char *screenptr, int vid_width, int vid_height,

@@ -27,7 +27,7 @@
   </font>
 
   <container name="channel_number">
-    <textarea name="channel_number">
+    <textarea name="channum">
       <area>460,20,160,90</area>
       <font>channelfont</font>
     </textarea>
@@ -70,7 +70,7 @@
     <textarea name="test" align="right">
        <area>50,50,300,100</area>
        <font>infofontgray</font>
-       <statictext>Blah blah blah</statictext>
+       <value>Blah blah blah</value>
     </textarea>
   -->
   </container>

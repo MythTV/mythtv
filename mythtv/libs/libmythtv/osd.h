@@ -28,7 +28,10 @@ class OSD
    ~OSD(void);
 
     void Display(unsigned char *yuvptr);
-    
+
+    void SetTextByRegexp(const QString &name, QMap<QString, QString> &regexpMap,
+                         int length);
+    void SetInfoText(QMap<QString, QString> regexpMap, int length);
     void SetInfoText(const QString &text, const QString &subtitle, 
                      const QString &desc, const QString &category,
                      const QString &start, const QString &end, 

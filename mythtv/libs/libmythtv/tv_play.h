@@ -2,6 +2,7 @@
 #define TVPLAY_H
 
 #include <qstring.h>
+#include <qmap.h>
 #include <qdatetime.h>
 #include <pthread.h>
 #include <qvaluevector.h>
@@ -46,10 +47,14 @@ class TV : public QObject
     bool IsRecording(void) { return StateIsRecording(internalState); }
 
     void GetNextProgram(RemoteEncoder *enc, int direction,
+                        QMap<QString, QString> &regexpMap);
+    void GetNextProgram(RemoteEncoder *enc, int direction,
                         QString &title, QString &subtitle,
                         QString &desc, QString &category, QString &starttime,
                         QString &endtime, QString &callsign, QString &iconpath,
                         QString &channelname, QString &chanid);
+
+    void GetChannelInfo(RemoteEncoder *enc, QMap<QString, QString> &regexpMap);
     void GetChannelInfo(RemoteEncoder *enc, QString &title, QString &subtitle,
                         QString &desc, QString &category, QString &starttime,
                         QString &endtime, QString &callsign, QString &iconpath,

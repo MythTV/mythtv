@@ -375,6 +375,7 @@ void OSD::parseTextArea(OSDSet *container, QDomElement &element)
     QRect area = QRect(0, 0, 0, 0);
     QString font = "", altfont = "";
     QString statictext = "";
+    QString defaulttext = "";
     bool multiline = false;
 
     QString name = element.attribute("name", "");
@@ -412,6 +413,10 @@ void OSD::parseTextArea(OSDSet *container, QDomElement &element)
             {
                 statictext = getFirstText(info);
             }
+            else if (info.tagName() == "value")
+            {
+                defaulttext = getFirstText(info);
+            }
             else
             {
                 cerr << "Unknown tag in textarea: " << info.tagName() << endl;
@@ -446,6 +451,8 @@ void OSD::parseTextArea(OSDSet *container, QDomElement &element)
 
     if (statictext != "")
         text->SetText(statictext);
+    if (defaulttext != "")
+        text->SetDefaultText(defaulttext);
 
     QString align = element.attribute("align", "");
     if (!align.isNull() && !align.isEmpty())
@@ -858,6 +865,41 @@ QRect OSD::parseRect(QString text)
         retval = QRect(x, y, w, h);
 
     return retval;
+}
+
+
+void OSD::SetTextByRegexp(const QString &name,
+                     QMap<QString, QString> &regexpMap, int length)
+{
+    pthread_mutex_lock(&osdlock);
+    OSDSet *container = GetSet(name);
+    if (container)
+    {
+        container->SetTextByRegexp(regexpMap);
+        container->DisplayFor(length * fps);
+        m_setsvisible = true;
+    }
+    pthread_mutex_unlock(&osdlock);
+}
+
+void OSD::SetInfoText(QMap<QString, QString> regexpMap, int length)
+{
+    pthread_mutex_lock(&osdlock);
+    OSDSet *container = GetSet("program_info");
+    if (container)
+    {
+        container->SetTextByRegexp(regexpMap);
+
+        OSDTypeImage *cs = (OSDTypeImage *)container->GetType("channelicon");
+        if ((cs) &&
+            (regexpMap.contains("iconpath")) &&
+            (regexpMap["iconpath"] != ""))
+            cs->LoadImage(regexpMap["iconpath"], wmult, hmult, 30, 30);
+
+        container->DisplayFor(length * fps);
+        m_setsvisible = true;
+    }
+    pthread_mutex_unlock(&osdlock);
 }
 
 void OSD::SetInfoText(const QString &text, const QString &subtitle,
