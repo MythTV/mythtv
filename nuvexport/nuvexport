@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# Last Updated: 2004.01.07 (xris)
+# Last Updated: 2004.02.04 (xris)
 
 =head1 NAME
 
@@ -183,6 +183,10 @@ format and use Microsoft's Windows Media Encoder to encode a WMV file.
 		exit;
 	}
 
+# Get the hostname of this machine
+	$hostname = `hostname`;
+	chomp($hostname);
+
 # Read the mysql.txt file in use by MythTV.
 # could be in a couple places, so try the usual suspects
 	open(CONF, "/usr/share/mythtv/mysql.txt")
@@ -205,6 +209,9 @@ format and use Microsoft's Windows Media Encoder to encode a WMV file.
 		elsif ($var eq 'DBPassword') {
 			$db_pass = $val;
 		}
+		elsif ($var eq 'LocalHostName') {
+			$hostname = $val;
+		}
 	}
 	close CONF;
 
@@ -212,9 +219,6 @@ format and use Microsoft's Windows Media Encoder to encode a WMV file.
 	$dbh = DBI->connect("dbi:mysql:database=$db_name:host=$db_host", $db_user, $db_pass)
 		or die "Cannot connect to database: $!\n\n";
 
-# Get the hostname of this machine
-	$hostname = `hostname`;
-	chomp($hostname);
 
 # Find the directory where the recordings are located, and grab all of the filenames
 	my $q = "SELECT data FROM settings WHERE value='RecordFilePrefix' AND hostname=?";
