@@ -217,6 +217,10 @@
         <source>No rating available.</source>
         <translation>Não existe classificação disponível.</translation>
     </message>
+    <message>
+        <source>minutes</source>
+        <translation type="unfinished">minutos</translation>
+    </message>
 </context>
 <context>
     <name>VideoManager</name>

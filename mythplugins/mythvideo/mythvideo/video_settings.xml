@@ -7,6 +7,7 @@
       <text lang="CA">Opcions Generals</text>
       <text lang="DK">Generelle indstillinger</text>
       <text lang="PT">Configurações Gerais</text>
+      <text lang="SV">Generella inställningar</text>
       <action>SETTINGS_GENERAL</action>
    </button>
 
@@ -17,14 +18,16 @@
       <text lang="CA">Opcions de reproducció</text>
       <text lang="DK">Afspiller indstillinger</text>
       <text lang="PT">Configurações de Leitura</text>
+      <text lang="SV">Spelarinställningar</text>
       <action>SETTINGS_PLAYER</action>
    </button>
 
    <button>
       <type>VIDEO</type>
       <text>File Types</text>
-      <action>SETTINGS_ASSOCIATIONS</action>
       <text lang="PT">Tipos de Ficheiros</text>
+      <text lang="SV">Filtyper</text>
+      <action>SETTINGS_ASSOCIATIONS</action>
    </button>
 
 </mythmenu>

@@ -185,6 +185,10 @@
         <source>No rating available.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>minutes</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>VideoManager</name>

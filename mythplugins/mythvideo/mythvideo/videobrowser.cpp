@@ -440,7 +440,8 @@ void VideoBrowser::updateInfo(QPainter *p)
        QString rating = curitem->Rating();
        if (rating == "<NULL>")
            rating = tr("No rating available.");
-       QString length = QString("%1").arg(curitem->Length()) + " minutes";
+       QString length = QString("%1").arg(curitem->Length()) + " " +
+	      	      	tr("minutes");
        QString level = QString("%1").arg(curitem->ShowLevel());
 
        LayerSet *container = NULL;
