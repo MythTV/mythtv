@@ -1,7 +1,7 @@
 #CONFIG += debug
 CONFIG += release
 
-PREFIX = /usr/local
+PREFIX = /usr
 
 LIBVERSION = 0.8
 
@@ -15,6 +15,6 @@ DEFINES += EXTRA_LOCKING
 
 release {
         DEFINES += MMX
-        QMAKE_CXXFLAGS_RELEASE = -O6 -march=pentiumpro -fomit-frame-pointer -funroll-loops -fexpensive-optimizations -finline-functions 
+        QMAKE_CXXFLAGS_RELEASE = -O6 -march=pentiumpro -fomit-frame-pointer -funroll-loops -fexpensive-optimizations
 }
 
