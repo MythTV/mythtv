@@ -8,7 +8,7 @@ INSTALLS = target
 
 VERSION = 0.16.0
 
-INCLUDEPATH += ../libmyth ../ dvbdev/ ../libavcodec
+INCLUDEPATH += ../libmyth ../ ./dvbdev/ ./mpeg/ ../libavcodec
 DEPENDPATH += ../libmyth ../libavcodec ../libavformat
 
 LIBS += -L../libmyth -L../libavcodec -L../libavformat
@@ -66,8 +66,16 @@ SOURCES += recordingtypes.cpp jobqueue.cpp
 
 linux {
     HEADERS += channel.h
+    HEADERS += mpeg/tspacket.h mpeg/pespacket.h
+    HEADERS += mpeg/mpegtables.h mpeg/atsctables.h
+    HEADERS += mpeg/mpegstreamdata.h mpeg/atscdescriptors.h mpeg/atscstreamdata.h
+
     SOURCES += channel.cpp NuppelVideoRecorder.cpp tv_rec.cpp channelbase.cpp
     SOURCES += hdtvrecorder.cpp fifowriter.cpp
+    SOURCES += mpeg/tspacket.cpp mpeg/pespacket.cpp
+    SOURCES += mpeg/mpegstreamdata.cpp mpeg/atscstreamdata.cpp
+    SOURCES += mpeg/mpegtables.cpp mpeg/atsctables.cpp
+    SOURCES += mpeg/atscdescriptors.cpp mpeg/atscdescriptorsmap.cpp
 }
 
 macx {

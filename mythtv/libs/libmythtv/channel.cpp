@@ -1,5 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
@@ -48,7 +48,7 @@ bool Channel::Open(void)
     else
     {
          VERBOSE(VB_IMPORTANT, QString("Channel::Open(): Can't open: %1")
-			              .arg(device));
+                                       .arg(device));
          perror(device.ascii());
          return false;
     }
@@ -442,6 +442,7 @@ V clamp(V val, V minv, V maxv) { return std::min(maxv, std::max(minv, val)); }
 int signalStrengthATSC(int device, int input) 
 {
     struct video_signal vsig;
+    memset(&vsig, 0, sizeof(vsig));
 
     int ioctlval = ioctl(device,VIDIOCGSIGNAL,&vsig);
     if (ioctlval == -1) 
@@ -462,12 +463,14 @@ int signalStrengthATSC(int device, int input)
 int signalStrengthATSC_v4l2(int device, int input)
 {
     struct v4l2_tuner vsig;
+    memset(&vsig, 0, sizeof(vsig));
+
     vsig.index = input;
 
     int ioctlval = ioctl(device,VIDIOC_G_TUNER, &vsig);
     if (ioctlval == -1)
     {
-	perror("VIDIOC_G_TUNER");
+        perror("VIDIOC_G_TUNER problem in channel.cpp's signalStrengthATSC_v4l2()");
         return 0;
     }
     VERBOSE(VB_CHANNEL, QString("signal strength: %1").arg(vsig.signal));
@@ -480,6 +483,15 @@ bool Channel::CheckSignal(int msecTotal, int reqSignal, int input)
     int msecSleep = 500, maxSignal = 0, i = 0;
 
     msecTotal = max(msecSleep, msecTotal);
+
+    if (input < 0)
+        input = 0;
+
+    if (videofd <= 0) 
+    {
+        VERBOSE(VB_IMPORTANT, "CheckSignal called with invalid videofd");
+        return false;
+    }
 
     if (usingATSCstrength) 
     {
@@ -527,6 +539,10 @@ bool Channel::TuneTo(const QString &channum, int finetune)
 
 bool Channel::CheckSignalFull(void)
 {
+#if FAKE_VIDEO
+    return true;
+#endif
+
     int signalThresholdWait = 5000;
     int signalThreshold = 65;
     if (usingATSCstrength)
@@ -537,7 +553,11 @@ bool Channel::CheckSignalFull(void)
                                                   65);
     }
 
-    return CheckSignal(signalThresholdWait, signalThreshold, currentcapchannel);
+    int deviceInput = max(currentcapchannel, 0);
+    VERBOSE(VB_CHANNEL, QString("Checking signal on device input: %1").
+            arg(deviceInput));
+
+    return CheckSignal(signalThresholdWait, signalThreshold, deviceInput);
 }
 
 bool Channel::TuneToFrequency(int frequency)

@@ -2,12 +2,16 @@
 #define HDTVRECORDER_H_
 
 #include "recorderbase.h"
+#include "tspacket.h"
 
 struct AVFormatContext;
 struct AVPacket;
+class ATSCStreamData;
 
 class HDTVRecorder : public RecorderBase
 {
+  friend class ATSCStreamData;
+  friend class TSPacketProcessor;
   public:
     HDTVRecorder();
    ~HDTVRecorder();
@@ -49,58 +53,51 @@ class HDTVRecorder : public RecorderBase
     void FinishRecording();
 
     int ProcessData(unsigned char *buffer, int len);
-    void FindKeyframes(const unsigned char *buffer, 
-                       int packet_start_pos,
-                       int pkt_pos,
-                       char adaptation_field_control,
-                       bool payload_unit_start_indicator);
+    bool ProcessTSPacket(const TSPacket& tspacket);
+    void HandleVideo(const TSPacket* tspacket);
+    void HandleAudio(const TSPacket* tspacket);
+    void FindKeyframes(const TSPacket* tspacket);
+    void HandleGOP();
 
     int ResyncStream(unsigned char *buffer, int curr_pos, int len);
-    void RewritePID(unsigned char *buffer, int pid);
-    bool RewritePAT(unsigned char *buffer, int pid, int pkt_len);
-    bool RewritePMT(unsigned char *buffer, int new_pid, int pkt_len);
-    bool recording;
-    bool encoding;
 
-    bool paused;
-    bool mainpaused;
-    bool cleartimeonpause;
+    void WritePAT();
+    void WritePMT();
+
+    ATSCStreamData* StreamData() { return _atsc_stream_data; }
+    const ATSCStreamData* StreamData() const { return _atsc_stream_data; }
+
+    int _atsc_stream_fd;
+    ATSCStreamData* _atsc_stream_data;
+    unsigned char *_buffer;
+    unsigned int _buffer_size;
     bool _error;
 
-    long long framesWritten;
-    long long framesSeen;
+    // Wait for the a GOP before sending data, this prevents resolution changes from crashing ffmpeg
+    bool _wait_for_gop;
 
-    int width, height;
+    // API call is requesting action
+    bool _request_recording;
+    bool _request_pause;
+    // recording or pause is actually being performed
+    bool _recording;
+    bool _paused;
 
-    int chanfd;
+    // statistics
+    long long _tspacket_count;
+    long long _nullpacket_count;
+    long long _resync_count;
+    long long _frames_written_count;
+    long long _frames_seen_count;
 
-    int keyframedist;
-    bool gopset;
-    bool m_in_mpg_headers;
-    bool seq_start_is_gop;
-    int seq_count;
-    int m_header_sync;
+     // used for scanning pes header for group of pictures header
+    int _frame_of_first_gop;
+    int _position_within_gop_header;
+    bool _scanning_pes_header_for_gop;
+    bool _gop_seen;
 
-    QMap<long long, long long> positionMap;
-    QMap<long long, long long> positionMapDelta;
-
-    int firstgoppos;
-    int desired_program;
-
-    int pat_pid;
-    int pmt_pid;
-    int video_pid;
-    int audio_pid;
-    int psip_pid;
-    int output_base_pid;
-
-    int ts_packets;
-
-    int lowest_video_pid;
-    int video_pid_packets;
-
-#define HD_BUFFER_SIZE 255868
-    unsigned char buffer[HD_BUFFER_SIZE];
+    QMap<long long, long long> _position_map;
+    QMap<long long, long long> _position_map_delta;
 };
 
 #endif

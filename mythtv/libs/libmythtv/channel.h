@@ -7,6 +7,8 @@
 
 using namespace std;
 
+#define FAKE_VIDEO 0
+
 class TVRec;
 
 // Implements tuning for analog TV cards (both software and hardware encoding)
