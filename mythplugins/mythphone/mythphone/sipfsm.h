@@ -46,6 +46,15 @@
 #define SIP_REG_FAILED          0x04   // REGISTER failed; will retry after a period of time
 #define SIP_REG_REGISTERED      0x05   // Registration successful
 
+// Presence Subscriber States
+#define SIP_SUB_IDLE            SIP_IDLE
+#define SIP_SUB_SUBSCRIBED      0x02
+
+// Presence Watcher States
+#define SIP_WATCH_IDLE          SIP_IDLE
+#define SIP_WATCH_TRYING        0x02
+#define SIP_WATCH_ACTIVE        0x03
+
 // Events
 #define SIP_OUTCALL             0x100
 #define SIP_INVITE              0x200
@@ -64,9 +73,16 @@
 #define SIP_REGISTRAR_TEXP      0xF00
 #define SIP_REGSTATUS           0x1000
 #define SIP_REG_TREGEXP         0x1100
+#define SIP_SUBSCRIBE           0x1200
+#define SIP_SUBSTATUS           0x1300
+#define SIP_NOTIFY              0x1400
+#define SIP_NOTSTATUS           0x1500
+#define SIP_PRESENCE_CHANGE     0x1600
+#define SIP_SUBSCRIBE_EXPIRE    0x1700
+#define SIP_WATCH               0x1800
 
-#define SIP_CMD(s)              (((s)==SIP_INVITE) || ((s)==SIP_ACK) || ((s)==SIP_BYE) || ((s)==SIP_CANCEL) || ((s)==SIP_REGISTER))
-#define SIP_STATUS(s)           (((s)==SIP_INVITESTATUS_2xx) || ((s)==SIP_INVITESTATUS_1xx) || ((s)==SIP_INVITESTATUS_3456xx) || ((s)==SIP_BYTESTATUS) || ((s)==SIP_CANCELSTATUS))
+#define SIP_CMD(s)              (((s)==SIP_INVITE) || ((s)==SIP_ACK) || ((s)==SIP_BYE) || ((s)==SIP_CANCEL) || ((s)==SIP_REGISTER) || ((s)==SIP_SUBSCRIBE) || ((s)==SIP_NOTIFY) )
+#define SIP_STATUS(s)           (((s)==SIP_INVITESTATUS_2xx) || ((s)==SIP_INVITESTATUS_1xx) || ((s)==SIP_INVITESTATUS_3456xx) || ((s)==SIP_BYTESTATUS) || ((s)==SIP_CANCELSTATUS) || ((s)==SIP_SUBSTATUS) || ((s)==SIP_NOTSTATUS) )
 #define SIP_MSG(s)              (SIP_CMD(s) || SIP_STATUS(s))
 
 // Call FSM Actions - combination of event and state to give a "switch"able value
@@ -109,12 +125,29 @@
 #define SIP_REG_CHALL_RETX                (SIP_REG_CHALLENGED| SIP_RETX)
 #define SIP_REG_FAILED_RETX               (SIP_REG_FAILED    | SIP_RETX)
 
+// Presence Subscriber FSM Actions - combination of event and state to give a "switch"able value
+#define SIP_SUB_IDLE_SUBSCRIBE            (SIP_SUB_IDLE       | SIP_SUBSCRIBE)
+#define SIP_SUB_SUBS_SUBSCRIBE            (SIP_SUB_SUBSCRIBED | SIP_SUBSCRIBE)
+#define SIP_SUB_SUBS_SUBSCRIBE_EXPIRE     (SIP_SUB_SUBSCRIBED | SIP_SUBSCRIBE_EXPIRE)
+#define SIP_SUB_SUBS_RETX                 (SIP_SUB_SUBSCRIBED | SIP_RETX)
+#define SIP_SUB_SUBS_NOTSTATUS            (SIP_SUB_SUBSCRIBED | SIP_NOTSTATUS)
+#define SIP_SUB_SUBS_PRESENCE_CHANGE      (SIP_SUB_SUBSCRIBED | SIP_PRESENCE_CHANGE)
+
+// Presence Watcher FSM Actions - combination of event and state to give a "switch"able value
+#define SIP_WATCH_IDLE_WATCH              (SIP_WATCH_IDLE     | SIP_WATCH)
+#define SIP_WATCH_TRYING_WATCH            (SIP_WATCH_TRYING   | SIP_WATCH)
+#define SIP_WATCH_ACTIVE_SUBSCRIBE_EXPIRE (SIP_WATCH_ACTIVE   | SIP_SUBSCRIBE_EXPIRE)
+#define SIP_WATCH_TRYING_RETX             (SIP_WATCH_TRYING   | SIP_RETX)
+#define SIP_WATCH_TRYING_STATUS           (SIP_WATCH_TRYING   | SIP_SUBSTATUS)
+#define SIP_WATCH_ACTIVE_NOTIFY           (SIP_WATCH_ACTIVE   | SIP_NOTIFY)
+
+
 // Build Options logically OR'ed and sent to build procs
 #define SIP_OPT_SDP		        1
 #define SIP_OPT_CONTACT		    2
 #define SIP_OPT_VIA           4
 #define SIP_OPT_ALLOW         8
-
+#define SIP_OPT_EXPIRES       16
 
 // Timers
 #define REG_RETRY_TIMER       3000 // seconds
@@ -122,6 +155,8 @@
 #define REG_RETRY_MAXCOUNT    5
 
 #define SIP_POLL_PERIOD       2   // Twice per second
+
+
 
 // Forward reference.
 class SipFsm;
@@ -145,6 +180,8 @@ class SipContainer
     void PlaceNewCall(QString Mode, QString uri, QString name, bool disableNat);
     void AnswerRingingCall(QString Mode, bool disableNat);
     void HangupCall();
+    void UiOpened();
+    void UiClosed();
     void GetNotification(int &n, QString &ns);
     void GetRegistrationStatus(bool &Registered, QString &RegisteredTo, QString &RegisteredAs);
     int  CheckforRxEvents(bool &Notify);
@@ -197,11 +234,43 @@ class SipContainer
 class SipFsmBase
 {
   public:
-    SipFsmBase() {};
-    virtual ~SipFsmBase() {};
-    virtual int  FSM(int Event, SipMsg *sipMsg=0, void *Value=0) { return 0; };
+    SipFsmBase(SipFsm *p);
+    virtual ~SipFsmBase();
+    virtual int     FSM(int Event, SipMsg *sipMsg=0, void *Value=0) { return 0; };
+    virtual QString type()       { return "BASE"; };
+    virtual int     getCallRef() { return -1; };
+    QString callId()   { return CallId.string(); };
 
-  private:
+  protected:
+    void BuildSendStatus(int Code, QString Method, int statusCseq, int Option=0, int statusExpires=-1, QString sdp="");
+    void ParseSipMsg(int Event, SipMsg *sipMsg);
+    bool Retransmit(bool force);
+    void DebugFsm(int event, int old_state, int new_state);
+    QString EventtoString(int Event);
+    QString StatetoString(int S);
+
+    QString retx;
+    QString retxIp;
+    int retxPort;
+    int t1;
+    SipFsm   *parent;
+
+    SipCallId CallId;
+    QString viaIp;
+    int viaPort;
+    QString remoteTag;
+    QString remoteEpid;
+    QString rxedTo;
+    QString rxedFrom;
+    QString RecRoute;
+    QString Via;
+    SipUrl *remoteUrl;
+    SipUrl *toUrl;
+    SipUrl *contactUrl;
+    SipUrl *recRouteUrl;
+    SipUrl *MyUrl;
+    SipUrl *MyContactUrl;
+
 };
 
 
@@ -211,6 +280,7 @@ class SipRegistration : public SipFsmBase
     SipRegistration(SipFsm *par, QString localIp, int localPort, QString Username, QString Password, QString ProxyName, int ProxyPort);
     ~SipRegistration();
     virtual int  FSM(int Event, SipMsg *sipMsg=0, void *Value=0);
+    virtual QString type()     { return "REGISTRATION"; };
     bool isRegistered()        { return (State == SIP_REG_REGISTERED); }
     QString registeredTo()     { return ProxyUrl->getHost(); }
     QString registeredAs()     { return MyContactUrl->getUser(); }
@@ -224,15 +294,11 @@ class SipRegistration : public SipFsmBase
     int Expires;
     QString sipLocalIp;
     int sipLocalPort;
-    SipFsm   *parent;
     int regRetryCount;
 
     SipUrl *ProxyUrl;
-    SipUrl *MyUrl;
-    SipUrl *MyContactUrl;
     QString MyPassword;
     int cseq;
-    SipCallId CallId;
 };
 
 
@@ -241,8 +307,6 @@ class SipCall : public SipFsmBase
   public:
     SipCall(QString localIp, QString natIp, int n, SipFsm *par);
     ~SipCall();
-    SipCallId *getCallId() { return &CallId; };
-    int  getCallRef() { return callRef; };
     int  getState() { return State; };
     void setVideoPayload(int p) { videoPayload = p; };
     void setVideoResolution(QString v) { txVideoResolution = v; };
@@ -251,6 +315,8 @@ class SipCall : public SipFsmBase
     void to(QString uri, QString DispName) { DestinationUri = uri; DisplayName = DispName; };
     void dialViaProxy(SipRegistration *s) { viaRegProxy = s; };
     virtual int  FSM(int Event, SipMsg *sipMsg=0, void *Value=0);
+    virtual QString type() { return "CALL"; };
+    virtual int     getCallRef() { return callRef; };
     void GetIncomingCaller(QString &u, QString &d, QString &l, bool &aud)
             { u = CallersUserid; d = CallersDisplayName; l = CallerUrl; aud = (videoPayload == -1); }
     void GetSdpDetails(QString &ip, int &aport, int &audPay, QString &audCodec, int &dtmfPay, int &vport, int &vidPay, QString &vidCodec, QString &vidRes)
@@ -259,55 +325,28 @@ class SipCall : public SipFsmBase
               vidCodec = (vidPay == 34 ? "H263" : ""); vidRes = rxVideoResolution; }
 
   private:
-    SipCallId CallId;
-    SipFsm   *parent;
     int       State;
     int       callRef;
 
     void initialise();
-    void ParseSipMsg(int Event, SipMsg *sipMsg);
     bool UseNat(QString destIPAddress);
     void ForwardMessage(SipMsg *msg);
     void BuildSendInvite(SipMsg *authMsg);
     void BuildSendAck();
     void BuildSendBye(SipMsg *authMsg);
     void BuildSendCancel(SipMsg *authMsg);
-    void BuildSendStatus(int Status, QString Method, int Option=0);
-    bool Retransmit(bool force);
     void AlertUser(SipMsg *rxMsg);
     void GetSDPInfo(SipMsg *sipMsg);
     void addSdpToInvite(SipMsg& msg, bool advertiseVideo);
-    void BuildSdpResponse(SipMsg& msg);
-    void DebugFsm(int event, int old_state, int new_state);
-    QString EventtoString(int Event);
-    QString StatetoString(int S);
+    QString BuildSdpResponse();
 
     QString DestinationUri;
     QString DisplayName;
     CodecNeg CodecList[MAX_AUDIO_CODECS];
     QString txVideoResolution;
     QString rxVideoResolution;
-    QString debugSent;
 
-    QString Via;
-    QString RecRoute;
-    QString viaIp;
-    int viaPort;
-    SipUrl *remoteUrl;
-    SipUrl *toUrl;
-    SipUrl *myFromUrl;
-    SipUrl *myContactUrl;
-    SipUrl *contactUrl;
-    SipUrl *recRouteUrl;
-    QString remoteTag;
-    QString myTag;
-    QString rxedTo;
-    QString rxedFrom;
     int cseq;
-    QString retx;
-    QString retxIp;
-    int retxPort;
-    int t1;
     SipRegistration *viaRegProxy;
 
     // Incoming call information
@@ -335,6 +374,50 @@ class SipCall : public SipFsmBase
 };
 
 
+class SipSubscriber : public SipFsmBase
+{
+  public:
+    SipSubscriber(SipFsm *par, QString localIp, int localPort, SipRegistration *reg, QString status);
+    ~SipSubscriber();
+    virtual int  FSM(int Event, SipMsg *sipMsg=0, void *Value=0);
+    virtual QString type() { return "SUBSCRIBER"; };
+
+  private:
+    void SendNotify(SipMsg *authMsg);
+
+    QString sipLocalIp;
+    int sipLocalPort;
+    SipRegistration *regProxy;
+    QString myStatus;
+
+    int State;
+    SipUrl *watcherUrl;
+    int expires;
+    int cseq;
+};
+
+
+class SipWatcher : public SipFsmBase
+{
+  public:
+    SipWatcher(SipFsm *par, QString localIp, int localPort, SipRegistration *reg, QString destUrl);
+    ~SipWatcher();
+    virtual int  FSM(int Event, SipMsg *sipMsg=0, void *Value=0);
+    virtual QString type() { return "WATCHER"; };
+
+  private:
+    void SendSubscribe(SipMsg *authMsg);
+
+    QString sipLocalIp;
+    int sipLocalPort;
+    SipRegistration *regProxy;
+    SipUrl *watchedUrl;
+    int State;
+    int expires;
+    int cseq;
+};
+
+
 class SipFsm : public QWidget
 {
 
@@ -347,10 +430,14 @@ class SipFsm : public QWidget
     void NewCall(bool audioOnly, QString uri, QString DispName, QString videoMode, bool DisableNat);
     void HangUp(void);
     void Answer(bool audioOnly, QString videoMode, bool DisableNat);
-    void CallCleared(SipCall *Call);
+    void StatusChanged(char *newStatus);
+    void DestroyFsm(SipFsmBase *Fsm);
     void CheckRxEvent(bool &Notify);
     SipCall *MatchCall(int cr);
-    SipCall *MatchCall(SipCallId &CallId);
+    SipFsmBase *MatchCallId(SipCallId &CallId);
+    SipCall *CreateCallFsm();
+    SipSubscriber *CreateSubscriberFsm();
+    SipWatcher *CreateWatcherFsm(QString Url);
     int numCalls();
     int getPrimaryCall() { return primaryCall; };
     int getPrimaryCallState();
@@ -371,11 +458,12 @@ class SipFsm : public QWidget
   
 
   private:
+    int MsgToEvent(SipMsg *sipMsg);
     QString DetermineNatAddress();
 
     QString localIp;
     QString natIp;
-    QPtrList<SipCall> CallList;
+    QPtrList<SipFsmBase> FsmList;
     QSocketDevice *sipSocket;
     int callCount;
     int primaryCall;                   // Currently the frontend is only interested in one call at a time, and others are rejected
@@ -385,6 +473,7 @@ class SipFsm : public QWidget
     SipTimer *timerList;
     SipRegistrar    *sipRegistrar;
     SipRegistration *sipRegistration;
+    QString PresenceStatus;
 };
 
 class SipRegisteredUA
@@ -408,6 +497,7 @@ class SipRegistrar : public SipFsmBase
     SipRegistrar(SipFsm *par, QString domain, QString localIp, int localPort);
     ~SipRegistrar();
     virtual int  FSM(int Event, SipMsg *sipMsg=0, void *Value=0);
+    virtual QString type() { return "REGISTRAR"; };
     bool getRegisteredContact(SipUrl *remoteUrl);
 
   private:
@@ -419,7 +509,6 @@ class SipRegistrar : public SipFsmBase
     QPtrList<SipRegisteredUA> RegisteredList;
     QString sipLocalIp;
     int sipLocalPort;
-    SipFsm   *parent;
     QString  regDomain;
 
 };
@@ -463,6 +552,7 @@ class SipTimer : public QPtrList<aSipTimer>
     ~SipTimer();
     void Start(SipFsmBase *Instance, int ms, int expireEvent, void *Value=0);
     void Stop(SipFsmBase *Instance, int expireEvent, void *Value=0);
+    int msLeft(SipFsmBase *Instance, int expireEvent, void *Value=0);
     virtual int compareItems(QPtrCollection::Item s1, QPtrCollection::Item s2);
     void StopAll(SipFsmBase *Instance);
     SipFsmBase *Expired(int *Event, void **Value);

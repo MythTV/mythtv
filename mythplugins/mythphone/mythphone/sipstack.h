@@ -12,6 +12,7 @@
 
 // Forward declarations
 class SipSdp;
+class SipXpidf;
 class SipUrl;
 class SipCallId;
 class sdpCodec;
@@ -31,8 +32,8 @@ public:
     void addRequestLine(SipUrl &Url);
     void addStatusLine(int Code);
     void addVia(QString Hostname, int Port);
-    void addTo(SipUrl &to, QString tag="");
-    void addFrom(SipUrl &from, QString tag="");
+    void addTo(SipUrl &to, QString tag="", QString epid="");
+    void addFrom(SipUrl &from, QString tag="", QString epid="");
     void addViaCopy(QString Via)    { addGenericLine(Via); }
     void addToCopy(QString To)      { addGenericLine(To); }
     void addFromCopy(QString From)  { addGenericLine(From); }
@@ -40,13 +41,15 @@ public:
     void addCallId(SipCallId id);
     void addCSeq(int c);
     void addContact(SipUrl contact);
-    void addUserAgent();     
+    void addUserAgent(QString ua="MythPhone");     
     void addAllow();
+    void addEvent(QString Event);
+    void addSubState(QString State, int Expires);
     void addAuthorization(QString authMethod, QString Username, QString Password, QString realm, QString nonce, QString uri, bool Proxy=false);
     void addProxyAuthorization(QString authMethod, QString Username, QString Password, QString realm, QString nonce, QString uri);
     void addExpires(int e);
     void addNullContent();
-    void addSDP(SipSdp &sdp);
+    void addContent(QString contentType, QString contentData);
     void insertVia(QString Hostname, int Port);
     void removeVia();
     QString StatusPhrase(int Code);
@@ -66,6 +69,7 @@ public:
     SipUrl *getFromUrl()     { return fromUrl; }
     SipUrl *getToUrl()       { return toUrl; }
     QString getFromTag()     { return fromTag; }
+    QString getFromEpid()    { return fromEpid; }
     QString getToTag()       { return toTag; }
     QString getCompleteTo()  { return completeTo; }
     QString getCompleteFrom(){ return completeFrom; }
@@ -76,10 +80,10 @@ public:
     QString getAuthMethod()  { return authMethod; }
     QString getAuthRealm()   { return authRealm; }
     QString getAuthNonce()   { return authNonce; } 
+    void    addGenericLine(QString Line);
 
 
 private:
-    void addGenericLine(QString Line);
     void decodeLine(QString line);
     void decodeRequestLine(QString line);
     void decodeVia(QString via);
@@ -92,6 +96,8 @@ private:
     void decodeCallid(QString callid);
     void decodeAuthenticate(QString auth);
     void decodeContentType(QString cType);
+    void decodeSdp(QString content);
+    void decodeXpidf(QString content);
     QPtrList<sdpCodec> *decodeSDPLine(QString sdpLine, QPtrList<sdpCodec> *codecList);
     void decodeSDPConnection(QString c);
     QPtrList<sdpCodec> *decodeSDPMedia(QString m);
@@ -108,13 +114,16 @@ private:
     QString cseqMethod;
     int Expires;
     bool msgContainsSDP;
+    bool msgContainsXPIDF;
     SipSdp *sdp;
+    SipXpidf *xpidf;
     SipUrl *contactUrl;
     SipUrl *recRouteUrl;
     SipUrl *fromUrl;
     SipUrl *toUrl;
     QString fromTag;
     QString toTag;
+    QString fromEpid;
     QString completeTo;
     QString completeFrom;
     QString viaIp;
@@ -229,6 +238,26 @@ private:
     QString MediaIp;
 };
 
+
+//////////////////////////////////////////////////////////////////////////////
+//                                    SipXpidf
+//////////////////////////////////////////////////////////////////////////////
+
+class SipXpidf
+{
+public:
+    SipXpidf(SipUrl &Url);
+    SipXpidf();
+    ~SipXpidf() {};
+    void setStatus(QString status, QString substatus) { sipStatus = status; sipSubstatus = substatus; };
+    QString encode();
+
+private:
+    QString user;
+    QString host;
+    QString sipStatus;
+    QString sipSubstatus;
+};
 
 
 #endif

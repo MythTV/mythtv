@@ -58,6 +58,7 @@ PhoneUIBox::PhoneUIBox(QSqlDatabase *db,
     QString regAs;
     QString regTo;
     sipStack->GetRegistrationStatus(reg, regTo, regAs);
+    sipStack->UiOpened();
     if (reg)
         phoneUIStatusBar->DisplayNotification(QString("Registered to " + regTo + " as " + regAs), 5);
     else
@@ -1830,6 +1831,7 @@ void PhoneUIBox::handleTreeListSignals(int , IntVector *attributes)
 
 PhoneUIBox::~PhoneUIBox(void)
 {
+    sipStack->UiClosed();
     webcam->camClose();
     fsmTimer->stop();
     if (volume_control)

@@ -11,6 +11,7 @@
 #include <qapplication.h>
 #include <qdatetime.h>
 #include <qhostaddress.h>
+#include <qdom.h>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -42,8 +43,10 @@ SipMsg::SipMsg(QString Method)
     cseqMethod = "";
     Expires = -1;
     msgContainsSDP = false;
+    msgContainsXPIDF = false;
     callId = 0;
     sdp = 0;
+    xpidf = 0;
     contactUrl = 0;
     recRouteUrl = 0;
     fromUrl = 0;
@@ -66,8 +69,10 @@ SipMsg::SipMsg()
     cseqMethod = "";
     Expires = -1;
     msgContainsSDP = false;
+    msgContainsXPIDF = false;
     callId = 0;
     sdp = 0;
+    xpidf = 0;
     contactUrl = 0;
     recRouteUrl = 0;
     fromUrl = 0;
@@ -86,6 +91,8 @@ SipMsg::~SipMsg()
         delete callId;
     if (sdp)
         delete sdp;
+    if (xpidf)
+        delete xpidf;
     if (contactUrl)
         delete contactUrl;
     if (recRouteUrl)
@@ -110,13 +117,15 @@ SipMsg &SipMsg::operator= (SipMsg &rhs)
     cseqValue = rhs.cseqValue;
     cseqMethod = rhs.cseqMethod;
     msgContainsSDP = rhs.msgContainsSDP;
+    msgContainsXPIDF = rhs.msgContainsXPIDF;
 
     //
     // TODO --- Should this do more???  What is this fn used for; delete if not used
     //
 
-    // Note: SDP not copied
+    // Note: Content not copied
     sdp = 0;
+    xpidf = 0;
 
     return *this;
 }
@@ -148,19 +157,23 @@ void SipMsg::addGenericLine(QString Line)
     Msg += Line;
 }
 
-void SipMsg::addTo(SipUrl &to, QString tag)
+void SipMsg::addTo(SipUrl &to, QString tag, QString epid)
 {
     Msg += "To: " + to.string();
     if (tag.length() > 0)
         Msg += ";tag=" + tag;
+    if (epid.length() > 0)
+        Msg += ";epid=" + epid;
     Msg += "\r\n";
 }
 
-void SipMsg::addFrom(SipUrl &from, QString tag)
+void SipMsg::addFrom(SipUrl &from, QString tag, QString epid)
 {
     Msg += "From: " + from.string();
     if (tag.length() > 0)
         Msg += ";tag=" + tag;
+    if (epid.length() > 0)
+        Msg += ";epid=" + epid;
     Msg += "\r\n";
 }
 
@@ -179,14 +192,27 @@ void SipMsg::addContact(SipUrl contact)
     Msg += "Contact: " + contact.string() + "\r\n";
 }
 
-void SipMsg::addUserAgent()
+void SipMsg::addUserAgent(QString ua)
 {
-    Msg += "User-Agent: MythPhone\r\n";
+    Msg += "User-Agent: " + ua + "\r\n";
 }
 
 void SipMsg::addAllow()
 {
     Msg += "Allow: INVITE, ACK, CANCEL, BYE, INFO, NOTIFY\r\n";
+}
+
+void SipMsg::addEvent(QString Event)
+{
+    Msg += "Event: " + Event + "\r\n";
+}
+
+void SipMsg::addSubState(QString State, int Expires)
+{
+    Msg += "Subscription-State: " + State;
+    if (Expires != -1)
+        Msg += ";expires=" + QString::number(Expires);
+    Msg += "\r\n";
 }
 
 void SipMsg::addAuthorization(QString authMethod, QString Username, QString Password, QString Realm, QString Nonce, QString Uri, bool Proxy)
@@ -225,12 +251,12 @@ void SipMsg::addNullContent()
     Msg += "Content-Length: 0\r\n\r\n";
 }
 
-void SipMsg::addSDP(SipSdp &sdp)
+void SipMsg::addContent(QString contentType, QString contentData)
 {
-    Msg += QString("Content-Type: application/sdp\r\n"
-           "Content-Length: ") + QString::number(sdp.length()) + "\r\n"
+    Msg += QString("Content-Type: ") + contentType + "\r\n"
+           "Content-Length: " + QString::number(contentData.length()) + "\r\n"
            "\r\n"
-           + sdp.string();
+           + contentData;
 }
 
 void SipMsg::insertVia(QString Hostname, int Port)
@@ -322,17 +348,9 @@ void SipMsg::decode(QString sipString)
 
     // Deccode main body of SIP message
     if (msgContainsSDP) 
-    {
-        if (sdp != 0)
-            delete sdp;
-        sdp = new SipSdp("", 0, 0);
-        QPtrList<sdpCodec> *codecList = 0; // Tracks the media block we are parsing
-        while (it != attList.end())
-        {
-            codecList = decodeSDPLine(*it, codecList);
-            it++;
-        }
-    }
+        decodeSdp(sipString.section("\r\n\r\n", 1, 1));
+    if (msgContainsXPIDF) 
+        decodeXpidf(sipString.section("\r\n\r\n", 1, 1));
 }
 
 void SipMsg::decodeLine(QString line)
@@ -364,7 +382,7 @@ void SipMsg::decodeLine(QString line)
 void SipMsg::decodeRequestLine(QString line)
 {
     QString Token = line.section(' ', 0, 0);
-    if ((Token == "INVITE") || (Token == "ACK") || (Token == "BYE") || (Token == "CANCEL") || (Token == "REGISTER"))
+    if ((Token == "INVITE") || (Token == "ACK") || (Token == "BYE") || (Token == "CANCEL") || (Token == "REGISTER") || (Token == "SUBSCRIBE") || (Token == "NOTIFY"))
         thisMethod = Token;
     else if (Token == "SIP/2.0")
     {
@@ -425,8 +443,10 @@ void SipMsg::decodeFrom(QString from)
     if (fromUrl != 0)
         delete fromUrl;
     fromUrl = decodeUrl(from.mid(6)); // Remove "from: " first
-    QString temp = from.section(";tag=", 1, 1);
-    fromTag = temp.section(";", 0, 0);
+    QString temp1 = from.section(";tag=", 1, 1);
+    QString temp2 = from.section(";epid=", 1, 1);
+    fromTag = temp1.section(";", 0, 0);
+    fromEpid = temp2.section(";", 0, 0);
     completeFrom = from + "\r\n";
 }
 
@@ -524,8 +544,49 @@ void SipMsg::decodeCallid(QString callid)
 
 void SipMsg::decodeContentType(QString cType)
 {
-    if (cType.section(' ', 1, 1) == "application/sdp")
+    QString content = cType.section(' ', 1, 1);
+    if (content.startsWith("application/sdp"))
         msgContainsSDP = true;
+    if (content.startsWith("application/xpidf+xml"))
+        msgContainsXPIDF = true;
+}
+
+
+void SipMsg::decodeSdp(QString content)
+{
+    QStringList sdpList = QStringList::split("\r\n", content, true);
+    QStringList::Iterator it;
+    if (sdp != 0)
+        delete sdp;
+    sdp = new SipSdp("", 0, 0);
+    QPtrList<sdpCodec> *codecList = 0; // Tracks the media block we are parsing
+    for (it=sdpList.begin(); (it != sdpList.end()) && (*it != ""); it++)
+    {
+        codecList = decodeSDPLine(*it, codecList);
+        it++;
+    }
+}
+
+void SipMsg::decodeXpidf(QString content)
+{
+    if (xpidf != 0)
+        delete xpidf;
+    xpidf = new SipXpidf();
+
+    QDomDocument xmlContent;
+    xmlContent.setContent(content);
+    QDomElement rootElm = xmlContent.documentElement();
+    cout << "XPIDF Root Tag " << rootElm.tagName() << endl;
+    QDomNode n = rootElm.firstChild();
+    while (!n.isNull())
+    {
+        QDomElement e = n.toElement();
+        if (!e.isNull())
+        {
+            cout << "XPIDF tag " << e.tagName() << endl;
+        }
+        n = n.nextSibling();
+    }
 }
 
 QPtrList<sdpCodec> *SipMsg::decodeSDPLine(QString sdpLine, QPtrList<sdpCodec> *codecList)
@@ -667,11 +728,14 @@ void SipUrl::HostnameToIpAddr()
 void SipUrl::encode()
 {
     QString PortStr = "";
+    thisUrl = "";
     PortStr = QString(":") + QString::number(thisPort); // Note; some proxies demand the port to be present even if it is 5060
     if (thisDisplayName.length() > 0)                            
-        thisUrl = "\"" + thisDisplayName + "\"" + "<sip:" + thisUser + "@" + thisHostname + PortStr + ">";
-    else
-        thisUrl = "<sip:" + thisUser + "@" + thisHostname + PortStr + ">";
+        thisUrl = "\"" + thisDisplayName + "\"";
+    thisUrl += "<sip:";
+    if (thisUser.length() > 0)
+        thisUrl += thisUser + "@";
+    thisUrl += thisHostname + PortStr + ">";
 }
 
 SipUrl::~SipUrl()
@@ -683,6 +747,8 @@ SipUrl::~SipUrl()
 //////////////////////////////////////////////////////////////////////////////
 //                                    SipCallId
 //////////////////////////////////////////////////////////////////////////////
+
+int callIdEnumerator = 0x6243; // Random-ish number
 
 SipCallId::SipCallId(QString ip)
 {
@@ -696,7 +762,7 @@ SipCallId::~SipCallId()
 void SipCallId::Generate(QString ip)
 {
     QString now = (QDateTime::currentDateTime()).toString("hhmmsszzz-ddMMyyyy");
-    thisCallid = now + "@" + ip;
+    thisCallid = QString::number(callIdEnumerator,16) + "-" + now + "@" + ip;
 }
 
 bool SipCallId::operator== (SipCallId &rhs) 
@@ -794,6 +860,44 @@ void SipSdp::encode()
 
 }
 
+
+
+//////////////////////////////////////////////////////////////////////////////
+//                                    SipXpidf
+//////////////////////////////////////////////////////////////////////////////
+
+SipXpidf::SipXpidf()
+{
+    user = "";
+    host = "";
+    sipStatus = "open";
+    sipSubstatus = "online";
+} 
+
+SipXpidf::SipXpidf(SipUrl &Url)
+{
+    user = Url.getUser();
+    host = Url.getHost();
+    sipStatus = "open";
+    sipSubstatus = "online";
+} 
+
+QString SipXpidf::encode()
+{
+    QString xpidf = "<?xml version=\"1.0\"?>\n"
+            "<!DOCTYPE presence\n"
+            "PUBLIC \"-//IETF//DTD RFCxxxx XPIDF 1.0//EN\" \"xpidf.dtd\">\n"
+            "<presence>\n"
+            "<presentity uri=\"sip:" + user + "@" + host + ";method=SUBSCRIBE\" />\n"
+            "<atom id=\"1000\">\n"
+            "<address uri=\"sip:" + user + "@" + host + ";user=ip\" priority=\"0.800000\">\n"
+            "<status status=\"" + sipStatus + "\" />\n"
+            "<msnsubstatus substatus=\"" + sipSubstatus + "\" />\n"
+            "</address>\n"
+            "</atom>\n"
+            "</presence>";
+    return xpidf;
+} 
 
 
 
