@@ -4,6 +4,7 @@
 
 TEMPLATE = app
 CONFIG -= moc
+CONFIG += thread
 
 include ( ../settings.pro )
 

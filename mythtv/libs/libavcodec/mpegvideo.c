@@ -2751,9 +2751,11 @@ static int dct_quantize_c(MpegEncContext *s,
     
     s->fdct (s, block);
 
+#ifndef ARCH_ALPHA		/* Alpha uses unpermuted matrix */
     /* we need this permutation so that we correct the IDCT
        permutation. will be moved into DCT code */
     block_permute(block);
+#endif
 
     if (s->mb_intra) {
         if (!s->h263_aic) {

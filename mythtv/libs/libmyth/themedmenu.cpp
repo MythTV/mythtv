@@ -728,7 +728,6 @@ QPixmap *ThemedMenu::scalePixmap(QString filename)
 void ThemedMenu::Show()
 {
     showFullScreen();
-    setActiveWindow();
 }
 
 QPoint ThemedMenu::parsePoint(QString text)

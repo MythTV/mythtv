@@ -5,7 +5,7 @@ CREATE TABLE channel
 (
     chanid INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
     channum VARCHAR(5) NOT NULL,
-    sourceid INT UNSIGNED;
+    sourceid INT UNSIGNED,
     callsign VARCHAR(20) NULL,
     name VARCHAR(20) NULL,
     icon VARCHAR(255) NULL,
