@@ -567,22 +567,7 @@ bool Channel::TuneToFrequency(int frequency)
             perror("VIDIOC_S_FREQUENCY");
             return false;
         }
-
-        struct v4l2_tuner vsig;
-        memset(&vsig, 0, sizeof(vsig));
-        vsig.index = 0;
-
-        if (ioctl(videofd, VIDIOC_G_TUNER, &vsig) < 0)
-        {
-            perror("VIDIOC_G_TUNER problem in channel::TuneToFrequency");
-            return (false);
-        }
-
-        VERBOSE(VB_CHANNEL, QString("Channel::TuneToFrequency Signal Strength: %1")
-                .arg(vsig.signal));
-
-        if (vsig.signal == 0)
-           return (false);
+        
 
         return CheckSignal(signalThresholdWait, signalThreshold,
                            currentcapchannel);
