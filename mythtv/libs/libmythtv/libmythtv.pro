@@ -71,7 +71,8 @@ SOURCES += sr_dialog.cpp sr_root.cpp sr_items.cpp decoderbase.cpp
 SOURCES += recordingtypes.cpp jobqueue.cpp dtvrecorder.cpp
 
 
-linux {
+unix {
+  !macx {
     HEADERS += channel.h
     HEADERS += mpeg/tsstats.h mpeg/tspacket.h mpeg/pespacket.h
     HEADERS += mpeg/mpegtables.h mpeg/atsctables.h
@@ -83,6 +84,7 @@ linux {
     SOURCES += mpeg/mpegstreamdata.cpp mpeg/atscstreamdata.cpp
     SOURCES += mpeg/mpegtables.cpp mpeg/atsctables.cpp
     SOURCES += mpeg/atscdescriptors.cpp mpeg/atscdescriptorsmap.cpp
+  }
 }
 
 macx {

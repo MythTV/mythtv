@@ -175,6 +175,10 @@ win32 {
     DEFINES    -= USING_OSS
     CONFIG     -= using_joystick_menu
 }
+freebsd {
+    CONFIG     -= using_joystick_menu
+}
+
 ################################################################
 # Please keep these CONFIG blocks as the last part of this file!
 # Add any new features (e.g. CONFIG+=, DEFINES+=) before them.
