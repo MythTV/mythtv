@@ -1182,6 +1182,7 @@ void OSD::normalizeRect(QRect &rect)
     rect.setHeight((int)(rect.height() * hmult));
     rect.moveTopLeft(QPoint((int)(xoffset + rect.x() * wmult),
                             (int)(yoffset + rect.y() * hmult)));
+    rect = rect.normalize();
 }       
 
 QPoint OSD::parsePoint(QString text)

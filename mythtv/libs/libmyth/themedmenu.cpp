@@ -1331,6 +1331,8 @@ QRect ThemedMenuPrivate::parseRect(const QString &text)
     if (sscanf(text.data(), "%d,%d,%d,%d", &x, &y, &w, &h) == 4)
         retval = QRect(x, y, w, h);
 
+    retval = retval.normalize();
+
     return retval;
 }
 

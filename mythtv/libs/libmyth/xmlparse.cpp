@@ -860,6 +860,7 @@ void XMLParse::normalizeRect(QRect &rect)
     rect.setHeight((int)(rect.height() * hmult));
     rect.moveTopLeft(QPoint((int)(rect.x() * wmult),
                              (int)(rect.y() * hmult)));
+    rect = rect.normalize();
 }
 
 QPoint XMLParse::parsePoint(QString text)
