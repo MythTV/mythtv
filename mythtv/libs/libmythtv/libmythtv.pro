@@ -55,15 +55,15 @@ SOURCES += osd.cpp osdtypes.cpp programinfo.cpp recordingprofile.cpp
 SOURCES += remoteencoder.cpp remoteutil.cpp RingBuffer.cpp RTjpegN.cpp 
 SOURCES += scheduledrecording.cpp ttfont.cpp tv_play.cpp videosource.cpp 
 SOURCES += yuv2rgb.cpp progfind.cpp nuppeldecoder.cpp avformatdecoder.cpp 
-SOURCES += recorderbase.cpp filtermanager.cpp proglist.cpp videooutbase.cpp 
+SOURCES += recorderbase.cpp filtermanager.cpp vsync.c proglist.cpp videooutbase.cpp 
 SOURCES += videoout_null.cpp xbox.cpp dbcheck.cpp profilegroup.cpp
 SOURCES += udpnotify.cpp channeleditor.cpp channelsettings.cpp
 SOURCES += osdsurface.cpp osdlistbtntype.cpp blend.c datadirect.cpp
 
-!win32 {
+linux {
     HEADERS += channel.h
     SOURCES += channel.cpp NuppelVideoRecorder.cpp tv_rec.cpp channelbase.cpp
-    SOURCES += vsync.c hdtvrecorder.cpp fifowriter.cpp
+    SOURCES += hdtvrecorder.cpp fifowriter.cpp
 }
 
 using_x11 {

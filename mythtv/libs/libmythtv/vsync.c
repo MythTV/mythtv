@@ -40,6 +40,12 @@
 
 #define BASEPORT 0x3da
 
+#ifndef i386
+void vgasync_cleanup(void)     {}
+int  vgasync_init(int verbose) { return 1; }
+void vgasync_spin_until_end_of_next_refresh(void) {}
+void vgasync_spin_until_out_of_refresh(void)      {}
+#else
 void vgasync_cleanup( void )
 {
     fprintf( stderr, "vgasync: Cleaning up.\n" );
@@ -95,6 +101,7 @@ void vgasync_spin_until_out_of_refresh( void )
 
     if( !i ) fprintf( stderr, "vgasync: Timeout hit.\n" );
 }
+#endif
 
 
 typedef enum {
