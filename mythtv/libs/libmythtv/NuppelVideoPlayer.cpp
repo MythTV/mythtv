@@ -2313,9 +2313,13 @@ bool NuppelVideoPlayer::EnableEdit(void)
 
     // jump to the frame being displayed since framesPlayed is actually ahead
     // of us because of videoOutput's buffering
-    rewindtime = videoOutput->ValidVideoFrames() - 1;
-    while (rewindtime)
-        usleep(50);
+    int bufferedFrames = videoOutput->ValidVideoFrames();
+    if (bufferedFrames);
+    {
+        rewindtime = bufferedFrames - 1;
+        while (rewindtime)
+            usleep(50);
+    }
 
     seekamount = keyframedist;
     seekamountpos = 3;
