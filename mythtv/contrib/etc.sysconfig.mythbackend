@@ -1,0 +1,49 @@
+# /etc/sysconfig/mythbackend
+
+###########################################################################
+#
+# Copyright (c) by Michael Thomson <linux at m-thomson dot net>
+# With thanks to Stu Tomlinson <stu at nosnilmot dot com>
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+#
+###########################################################################
+
+# Config variables for the mythbackend startup script, which is usually
+# located in /etc/rc.d/init.d/mythbackend
+#
+# When the startup script is executed, it sources this file if it exists,
+# otherwise it will fall back on default values.
+#
+# Leave variables commented out to use default values in init script
+# (/etc/rc.d/init.d/mythbackend).
+# 
+# To override defaults, uncomment the relevant variable definition and
+# edit as required.
+
+# User who should start the mythbackend processes (Default: root)
+# MBE_USER="root"
+
+# Directory holding the mythbackend binary (Default: /usr/local/bin/)
+# MBE_LOCATION="/usr/local/bin/"
+
+# Name of mythbackend binary (Default: mythbackend)
+# MBE_PROG="mythbackend"
+
+# Full path to mythbackend log file (Default: /var/tmp/mythbackend.log)
+#
+# NOTE: If you are running as non-root take care to ensure the myth user
+# has permission to write to this log file.
+# MBE_LOGFILE="/var/tmp/mythbackend.log"
