@@ -216,6 +216,7 @@ PlaybackBox::PlaybackBox(MythContext *context, TV *ltv, QSqlDatabase *ldb,
         context->GetNumSetting("PlaybackPreview") == 1)
     {
         QPixmap temp((int)(160 * wmult), (int)(120 * hmult));
+        temp.fill(black);
 
         pixlabel = new QLabel(this);
         pixlabel->setBackgroundOrigin(WindowOrigin);
@@ -233,6 +234,7 @@ PlaybackBox::PlaybackBox(MythContext *context, TV *ltv, QSqlDatabase *ldb,
         vbox->addWidget(freespace);
 
         progressbar = new QProgressBar(this);
+        progressbar->setBackgroundMode(PaletteBase);
         UpdateProgressBar();
         vbox->addWidget(progressbar);
     }

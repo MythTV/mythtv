@@ -139,7 +139,7 @@ InfoDialog::InfoDialog(MythContext *context, ProgramInfo *pginfo,
     QString msg = "Shouldn't show up.";
     if (programtype == 1)
         msg = "Record this program in this timeslot every day";
-    else if (programtype == 2)
+    else if (programtype == 2 || programtype == -1)
         msg = "Record this program in this timeslot every week";
     if (programtype != 0)
     {

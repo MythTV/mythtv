@@ -2290,7 +2290,7 @@ void NuppelVideoPlayer::UpdateSeekAmount(bool up)
     QRect rect;
     rect.setTop(video_height * 3 / 16);
     rect.setBottom(video_height * 6 / 16);
-    rect.setLeft(video_width * 3 / 8);
+    rect.setLeft(video_width * 5 / 16);
     rect.setRight(video_width * 15 / 16);
 
     if (seekamountpos > 0 && !up)

@@ -105,6 +105,17 @@ str TunerCardInput=Television
 str TVFormat=NTSC
 #
 str FreqTable=us-cable
+#
+# Over/underscan options
+# do we over or underscan inside mythtv?  either 'overscan' or 'underscan'
+str VertScanMode=overscan
+str HorizScanMode=overscan
+# How much do we chop (or add)?  %, 0 - 100
+int VertScanPercentage=5
+int HorizScanPercentage=5
+# How much do we offset the picture?
+int xScanDisplacement=0
+int yScanDisplacement=0
 
 # Picture-in-picture options
 int PIPBufferSize=1

@@ -15,6 +15,7 @@
 using namespace std;
 
 #include "XJ.h"
+#include "../libmyth/settings.h"
 
 #include <X11/keysym.h>
 #include <X11/Xatom.h>
@@ -293,29 +294,79 @@ void XvVideoOutput::show_cursor(void)
 
 void XvVideoOutput::ToggleFullScreen(void)
 {
-  if (XJ_fullscreen) {
-    XJ_fullscreen = 0; 
-    curx = oldx; cury = oldy; curw = oldw; curh = oldh;
-    show_cursor();
-    decorate(1);
-  } else {
-    XJ_fullscreen = 1;
-    oldx = curx; oldy = cury; oldw = curw; oldh = curh;
-    curx = 0 - (int)ceil(XJ_screenwidth * .05); 
-    cury = 0 - (int)ceil(XJ_screenheight * 0.05); 
-    curw = (int)ceil(XJ_screenwidth * 1.10); 
-    curh = (int)ceil(XJ_screenheight * 1.12);
-    hide_cursor();
-    decorate(0);
-  }
+    float HorizScanFactor, VertScanFactor;
+    int xScanDisp, yScanDisp;
+    char *prefix = (char *)PREFIX;
 
-  sizehint(curx, cury, curw, curh, 0);
+    Settings *settings = new Settings();
+    settings->LoadSettingsFiles(QString("settings.txt"), QString(prefix));
+
+    QString HorizScanMode = settings->GetSetting("HorizScanMode", "overscan");
+    QString VertScanMode = settings->GetSetting("VertScanMode", "overscan");
+
+    HorizScanFactor = settings->GetNumSetting("HorizScanPercentage", 5) / 100.0;
+    VertScanFactor = settings->GetNumSetting("VertScanPercentage",5) / 100.0;
+    xScanDisp = settings->GetNumSetting("xScanDisplacement", 0);
+    yScanDisp = settings->GetNumSetting("yScanDisplacement",0);
+  
+    if (XJ_fullscreen)
+    {
+        XJ_fullscreen = 0; 
+        curx = oldx; cury = oldy; curw = oldw; curh = oldh;
+        show_cursor();
+        decorate(1);
+    } 
+    else 
+    {
+        XJ_fullscreen = 1;
+        oldx = curx; oldy = cury; oldw = curw; oldh = curh;
+
+        if (VertScanMode == "overscan")
+        {
+            if (HorizScanMode == "overscan")
+            {
+                curx = xScanDisp - (int)ceil(XJ_screenwidth * HorizScanFactor);
+                curw = (int)ceil(XJ_screenwidth * (1 + 2 * HorizScanFactor));
+            }
+            else
+            {
+                curx = xScanDisp + (int)ceil(XJ_screenwidth * HorizScanFactor);
+                curw = (int)ceil(XJ_screenwidth * (1 - 2 * HorizScanFactor));
+            }
+
+            cury = yScanDisp - (int)ceil(XJ_screenheight * VertScanFactor);
+            curh = (int)ceil(XJ_screenheight * (1 + 2 * VertScanFactor));
+        }
+        else
+        {
+            if (HorizScanMode == "overscan")
+            {
+                curx = xScanDisp - (int)ceil(XJ_screenwidth * HorizScanFactor);
+                curw = (int)ceil(XJ_screenwidth * (1 + 2 * HorizScanFactor));
+            }
+            else
+            {
+                curx = xScanDisp + (int)ceil(XJ_screenwidth * HorizScanFactor);
+                curw = (int)ceil(XJ_screenwidth * (1 - 2 * HorizScanFactor));
+            }
+
+            cury = yScanDisp + (int)ceil(XJ_screenheight * VertScanFactor);
+            curh = (int)ceil(XJ_screenheight * (1 - 2 * VertScanFactor));
+        }
+
+        hide_cursor();
+        decorate(0);
+    }
+
+    delete settings;
+
+    sizehint(curx, cury, curw, curh, 0);
  
-  XMoveResizeWindow(XJ_disp, XJ_win, curx, cury, curw, curh);
-  XMapRaised(XJ_disp, XJ_win);
+    XMoveResizeWindow(XJ_disp, XJ_win, curx, cury, curw, curh);
+    XMapRaised(XJ_disp, XJ_win);
 
-  XRaiseWindow(XJ_disp, XJ_win);
-  XFlush(XJ_disp);
+    XRaiseWindow(XJ_disp, XJ_win);
+    XFlush(XJ_disp);
 }
    
 void XvVideoOutput::Show(unsigned char *buffer, int width, int height)

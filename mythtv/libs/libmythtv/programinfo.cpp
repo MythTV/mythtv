@@ -157,7 +157,7 @@ ProgramInfo *GetProgramAtDateTime(QString channel, QDateTime &dtime)
     return GetProgramAtDateTime(channel, sqltime);
 }
 
-// 0 for no, 1 for weekdaily, 2 for weekly.
+// -1 for no data, 0 for no, 1 for weekdaily, 2 for weekly.
 int ProgramInfo::IsProgramRecurring(void)
 {
     QDateTime dtime = startts;
@@ -174,6 +174,9 @@ int ProgramInfo::IsProgramRecurring(void)
 
         ProgramInfo *nextday = GetProgramAtDateTime(chanid, checktime);
 
+        if (NULL == nextday)
+            return -1;
+
         if (nextday && nextday->title == title)
         {
             delete nextday;
@@ -185,6 +188,9 @@ int ProgramInfo::IsProgramRecurring(void)
 
     QDateTime checktime = dtime.addDays(7);
     ProgramInfo *nextweek = GetProgramAtDateTime(chanid, checktime);
+
+    if (NULL == nextweek)
+        return -1;
 
     if (nextweek && nextweek->title == title)
     {
