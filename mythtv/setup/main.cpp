@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    context = new MythContext(false);
+    context = new MythContext(true);
 
     db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!context->OpenDatabase(db))
@@ -104,10 +104,6 @@ int main(int argc, char *argv[])
         printf("couldn't open db\n");
         return -1;
     }
-
-    // XXX something needs to be done to fix this
-//     context->SetNumSetting("GuiWidth", xxx);
-//     context->SetNumSetting("GuiHeight", xxx);
 
     context->LoadQtConfig();
 
