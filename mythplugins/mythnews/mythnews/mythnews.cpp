@@ -133,6 +133,7 @@ MythNews::~MythNews()
 
 void MythNews::LoadWindow(QDomElement &element)
 {
+
     for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling())
     {
