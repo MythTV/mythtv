@@ -202,6 +202,15 @@ Check that <CODE>/etc/mysql/my.cnf</CODE> <EM>does not</EM> contain
 <CODE>127.0.0.1</CODE>.  If you change either of these items, restart 
 <B>MySQL</B>.</P>
 
+<H3>MySQL database is corrupt</H3>
+
+<P>If you have reason to believe that your MySQL database is corrupt,
+execute the following commands to attempt to repair it.</P>
+<P><B>NOTE</B>: Ensure that there are no programs accessing the database
+while you attempt to repair it.  Make sure that all backend and frontend
+programs have exited.</P>
+<P><CODE>mysqlcheck -r -umythtv -p&lt;password&gt; mythconverg</CODE></P>
+
 <H3>Using a MPEG-2 encoder card and the video appears "jittery"</H3>
 
 <H3>Using a MPEG-2 encoder card and the video is jumping up and down</H3>
@@ -362,6 +371,13 @@ the default <CODE>harddisks</CODE> file, your changes will affect all IDE device
 devices, rename and/or copy the file to <CODE>harddiskhda</CODE>,
 <CODE>harddiskhdb</CODE>, etc.  Edit the file to your liking and on the next
 reboot your setting will be preserved.</P>
+
+<H3>Frontend appears to be slow at jumping / seeking.</H3>
+
+<H3>On-screen Display shows incorrect program length.</H3>
+
+<P>This may occur when MythTV doesn't have an accurate seektable.  Run
+<B>mythcommflag --rebuild</B></P>
 
 <H3><A NAME="Troubleshooting_Audio"></A> Troubleshooting audio </H3>
 

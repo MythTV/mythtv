@@ -100,6 +100,17 @@ and replace it with
 before you compile.</P>
 <P>Recent AMD processors, like the Duron, Thunderbird and Athlon don't need this
 change.</P>
+<P>If you have an AMD64, look for 
+<PRE>
+-march=pentiumpro
+</PRE>
+ 
+and replace it with
+<PRE>
+-march=opteron
+</PRE>
+ 
+before you compile.</P>
 
 <H2><A NAME="ss5.2">5.2</A> <A HREF="mythtv-HOWTO.html#toc5.2">Building LAME</A>
 </H2>
@@ -270,8 +281,8 @@ simplest thing is to immediately start using DataDirect.</P>
 <P>Unpack MythTV
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf mythtv-0.15.tar.bz2
-$ cd mythtv-0.15
+$ tar -xjf mythtv-0.16.tar.bz2
+$ cd mythtv-0.16
 $ ./configure
 </PRE>
 </CODE></BLOCKQUOTE>

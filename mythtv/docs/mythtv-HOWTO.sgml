@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2004-09-07, v0.16.00
+<date>2004-09-08, v0.16.00
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1265,7 +1265,7 @@ change.
 If you have an AMD64, look for 
 <verb>-march=pentiumpro</verb> 
 and replace it with
-<verb>-march=m64</verb> 
+<verb>-march=opteron</verb> 
 before you compile.
 
 <sect1>Building LAME
@@ -5718,28 +5718,27 @@ The software packages you will want are:
 
 1. Find the file you want.
 
-2. Run avidemux2 and open the .nuv file that is the program you want to burn 
-to DVD.
+2. Run <bf>avidemux2</bf> and open the .nuv file which corresponds with the
+program you wish to burn to DVD.
 
-3. You will now cut out the segments you want.  Click twice on "A" when you 
-are at the beginning of the segment you want to save.  Then find the end of 
-the segment, and click "B".
+3. Remove the segments you don't need.  Click twice on "A" when you are at
+the beginning of the segment you want to save, find the end of the segment,
+and click "B".
 
-4. Save the raw video stream and audio.  Do that by going to <tt>File->
-Save -> Save Raw Video Stream</tt>.  Save the file as <tt>1.m2v</tt>.  When that's done, go
-to 
+4. Save the raw video stream and audio: <tt>File-> Save -> Save Raw Video
+Stream</tt>.  Save the file as <tt>1.m2v</tt>.  When that's done, go to
 <tt>Audio -> Save Audio</tt>.  Save the file as <tt>1.mp2</tt>
 
-5. Repeat steps 2 & 3 until you have all segments you want saved.
+5. Repeat steps 2 & 3 until you have saved all the segments you wish to keep.
 
-6.  Mplex the video and audio for each segment together in DVD-MPEG2 format.  
+6.  Mplex the video and audio for each segment together in DVD-MPEG2 format.
 Do that by running
 
 <tt>mplex -f 8 -o 1.mpg 1.m2v 1.mp2</tt>
 
 7.  Create a DVD file system by running
 
-<tt>dvdauthor -o DVD 1.mpg 2.mpg ...</tt>
+<tt>dvdauthor -o DVD 1.mpg 2.mpg ... n.mpg</tt>
 
 <tt>dvdauthor -T -o DVD</tt>
 
@@ -5764,20 +5763,22 @@ section.
 This assumes that you have already formatted the videos in a 
 DVD-compliant format that works with <bf>dvdauthor</bf>. 
 
-1. CREATING A MENU
-
+<sect2>CREATING A MENU
+<p>
 This is potentially the most difficult step in creating a DVD with a menu.
 You must capture or create a background image with the appropriate
-resolution and <bf>mplex</bf> it together with an audio file (typically empty
-sound, though you can use sound) and then create overlay images that show
+resolution and <bf>mplex</bf> it together with an audio file (typically
+silence, although though you may use sound) and then create overlay images
+that show
+
 <enum>
 <item>the menu text
 <item>the highlighted buttons
 <item>the selected buttons  
 </enum>
 
-At this point you use <bf>spumux</bf> to combine the background video with
-the overlay menus.
+You would then use <bf>spumux</bf> to combine the background video with the
+overlay menus.
 
 The background image must be saved as a JPG and the overlay images must be
 PNG with a maximum of three colors.  Four colors are allowed, but the
@@ -5786,117 +5787,100 @@ examples, the background file is called <tt>menu.jpg</tt>, the menu text is call
 <tt>menu1.png</tt> and the highlighted and selected buttons are the same and called
 <tt>menu2.png</tt>.
 
-The Steps:
 
-Create a Background 
+<sect3>Create a Background 
+<p>
+To get a background image, use <bf>avidemux2</bf> and find the frame you
+wish to use as a background image.  Save the frame as
+<tt>menu.jpg</tt> by executing <tt>File -> Save -> Save JPG Image</tt>.  
 
-To get a background image, I use avidemux2 and find the frame that I want to
-use as a background image.  I then save the frame as <tt>menu.jpg</tt> by
-executing <tt>File -> Save -> Save JPG Image</tt>.  Or you can create your
-own background image in the GIMP.  Use the following settings:
+You may also create your own background image in the GIMP.  Use the following
+settings:
 
-     For NTSC Video 
+For NTSC Video:
+<tscreen><verb>
+width: 720
+height: 480
+x-axis: 81dpi
+y-axis: 72dpi
+</verb></tscreen>
 
-     width: 720
-     height: 480
-     x-axis: 81dpi
-     y-axis: 72dpi
+<sect3>Convert the background JPG file into a M2V video file
+<p>
+<tt>jpeg2yuv -n 50 -I p -f 29.97 -j menu.jpg | mpeg2enc -n n -f 8 -o menu.m2v</tt>
 
-     Convert the background JPG file into a M2V video file
+For PAL Video 
+<tscreen><verb>
+width: 720
+height: 576
+x-axis: 75dpi
+y-axis: 80dpi
+</verb></tscreen>
 
-<tt>jpeg2yuv -n 50 -I p -f 29.97 -j menu.jpg | mpeg2enc -n n -f 8 -o menu.m2v
-</tt>
-
-
-     For PAL Video 
-
-     width: 720
-     height: 576
-     x-axis: 75dpi
-     y-axis: 80dpi
-
-     Convert the background JPG file into a M2V video file
-
+<sect3>Convert the background JPG file into a M2V video file
+<p>
 <tt>jpeg2yuv -n 50 -I p -f 25 -j menu.jpg | mpeg2enc -n p -f 8 -o 
 menu.m2v</tt>
 
-
-Merge the background you just created with audio 
-
-You will have to have some sort of audio to mplex with the M2V file you just 
-created, so either capture some audio using avidemux2 or another program, or 
-to create empty audio to mplex, use this command
+<sect3>Merge the background you just created with audio 
+<p>
+You will need some sort of audio to <bf>mplex</bf> with the M2V file you
+just created, so either capture some audio using <bf>avidemux2</bf> or
+another program, or to create empty audio to <bf>mplex</bf>, use this
+command
 
 <tt>dd if=/dev/zero bs=4 count=2000 | toolame -b 128 -s 48 /dev/stdin 
 menu.mp2</tt>
 
-This command requires that you have toolame installed, of which I had
-difficulty finding any packages other than source.  It's a hack, but I would
-just try and find a period of silence at least one second long in a PVR-250
-recording and save that using avidemux2.
+<sect3>Merge the M2V video with the MP2 audio
+<p>
+<tt>mplex -f 8 -o menu.mpg menu.m2v menu.mp2</tt>
 
-Merge the M2V video with the MP2 audio
+<sect3>Create the menu buttons
+<p>
 
-     mplex -f 8 -o menu.mpg menu.m2v menu.mp2
+Open the background <tt>menu.jpg</tt> file in the GIMP.  Add a transparent layer
+over the background and mark where you will want the different buttons to be
+located.  This layer will later be deleted, so it doesn't have to be clean. 
+When creating this layer, use all the colors you want to use in your
+buttons.  Remember, no more than three colors.
 
-Create the menu buttons in PNG files
+Delete the Background layer.
 
-This next step is creating the PNG files for the menu text and buttons. 
-This 
-is another 
-step that I find difficult to explain and the steps here are not the
-cleanest 
-way, but they 
-work for me.  If anyone can describe a better way of doing this, please do.
+Change the image to an indexed color mode.  Do this by right-clicking on
+the image and selecting <tt>Image -> Mode -> Indexed</tt>.  Enter "4" in the
+number of colors.
 
-A. Open the background menu.jpg file in the GIMP.  Add a transparent layer 
-over the background and mark where you will want the different buttons to be 
-located.  This layer will later be deleted, so it doesn't have to be clean.  
-When creating this layer, use all the colors you want to use with your
-buttons.  
-Remember, no more than three colors.
+Create two new layers.
 
-B. Delete the Background layer.
-
-C. Change the image to an indexed color mode.  Do this by right-clicking on 
-the image and selecting Image -> Mode -> Indexed.  Enter "4" in the number
-of 
-colors.
-
-D. Create two new layers.
-
-E. In the top layer, you will enter the text for your buttons.  Select the 
+In the top layer, you will enter the text for your buttons.  Select the
 color you want for your text either in the color palette or by using the
-Color 
-Picker Tool.  To use the Color Picker, you must make sure you have that 
-bottom layer selected.  Enter the text for all the buttons on the top layer 
-according to whatever layout you decided on.
+Color Picker Tool.  To use the Color Picker, you must make sure you have
+that bottom layer selected.  Enter the text for all the buttons on the top
+layer according to whatever layout you decided on.
 
-F. Now you will create the actual buttons by drawing boxes around the text 
+Now you will create the actual buttons by drawing boxes around the text
 and filling that area with the Color Fill Tool.  Be sure and select the
-color 
-you want (contrasting to the text) and to create your boxes in the second
-from 
-the top layer.
+color you want (contrasting to the text) and to create your boxes in the
+second from the top layer.
 
-G. Delete that bottom layer that I told you we would eventually delete.
+Delete that bottom layer which we stated earlier would be deleted.
 
-H. Save the current image as menu2.png.  Do that by right-clicking and 
-selecting File -> Save as, and make the name menu.png.  Click "Export" and
-make 
-sure that "Save Background Color" and "Save Resolution" are selected.
+Save the current image as <tt>menu2.png</tt>.  Do that by right-clicking
+and selecting <tt>File -> Save as</tt>, and make the name <tt>menu.png</tt>. 
+Click "Export" and make sure that "Save Background Color" and "Save
+Resolution" are selected.
 
-I. Select the bottom layer and change the Opacity to 0%.  Now save the image 
-as menu1.png.
+Select the bottom layer and change the Opacity to 0%.  Now save the image 
+as <tt>menu1.png</tt>.
 
-Create the final menu video
+<sect3>Create the final menu video 
 
-To create the DVD menu, an XML file is used.  An example menu.xml file is 
-shown below.  The autoorder line is used to decide what takes precident for 
-ordering.  If your buttons are ordered primarily by rows, then select
-"rows".  If 
-your ordering is by column, then choose "columns".  
-
+<p> To create the DVD menu, an XML file is used.  An example
+<tt>menu.xml</tt> file is shown below.  The autoorder line is used to decide
+what takes precident for ordering.  If your buttons are ordered primarily by
+rows, then select "rows".  If your ordering is by column, then choose
+"columns".
 
 <tscreen><verb>
 ###begin menu.xml###
@@ -5930,83 +5914,83 @@ The number of these lines that you see should be the same number of buttons
 you created.  If there are, then good job!
 
 
-2.  Authoring the DVD
-
-To create the dvd structure, an XML file is used.  The below file is an
-example dvd.xml file.  This example file allows for the 4 buttons in the
+<sect2>Authoring the DVD
+<p>
+To create the DVD structure, an XML file is used.  The below file is an
+example <tt>dvd.xml</tt> file.  This example file allows for the 4 buttons in the
 menu created earlier and has three video segments making up each of the 4
 video titles.  Each of the separate video segments will be treated as
 separate chapters of one consistent video title.
 
 <tscreen><verb>
 ### begin dvd.xml ###
-<dvdauthor dest="DVD">
-  <vmgm>
-    <menus>
-      <pgc>
-        <button>jump title 1;</button> 
-        <button>jump title 2;</button> 
-        <button>jump title 3;</button> 
-        <button>jump title 4;</button> 
-        <vob file="menu_final.mpg" pause="inf" /> 
-      </pgc>
-    </menus>
-  </vmgm>
-  <titleset>
-    <titles>
-      <pgc>
-        <post>call vmgm menu 1;</post> 
-        <vob file="1a.mpg" /> 
-        <vob file="1b.mpg" /> 
-        <vob file="1c.mpg" /> 
-      </pgc>
-    </titles>
-  </titleset>
-  <titleset>
-    <titles>
-      <pgc>
-        <post>call vmgm menu 1;</post> 
-        <vob file="2a.mpg" /> 
-        <vob file="2b.mpg" /> 
-        <vob file="2c.mpg" /> 
-      </pgc>
-    </titles>
-  </titleset>
-  <titleset>
-    <titles>
-      <pgc>
-        <post>call vmgm menu 1;</post> 
-        <vob file="3a.mpg" /> 
-        <vob file="3b.mpg" /> 
-        <vob file="3c.mpg" /> 
-      </pgc>
-    </titles>
-  </titleset>
-  <titleset>
-    <titles>
-      <pgc>
-        <post>call vmgm menu 1;</post> 
-        <vob file="4a.mpg" /> 
-        <vob file="4b.mpg" /> 
-        <vob file="4c.mpg" /> 
-      </pgc>
-    </titles>
-  </titleset>
-</dvdauthor>
+&lt;dvdauthor dest="DVD"&gt;
+  &lt;vmgm&gt;
+    &lt;menus&gt;
+      &lt;pgc&gt;
+        &lt;button&gt;jump title 1;&lt;/button&gt; 
+        &lt;button&gt;jump title 2;&lt;/button&gt; 
+        &lt;button&gt;jump title 3;&lt;/button&gt; 
+        &lt;button&gt;jump title 4;&lt;/button&gt; 
+        &lt;vob file="menu_final.mpg" pause="inf" /&gt; 
+      &lt;/pgc&gt;
+    &lt;/menus&gt;
+  &lt;/vmgm&gt;
+  &lt;titleset&gt;
+    &lt;titles&gt;
+      &lt;pgc&gt;
+        &lt;post&gt;call vmgm menu 1;&lt;/post&gt; 
+        &lt;vob file="1a.mpg" /&gt; 
+        &lt;vob file="1b.mpg" /&gt; 
+        &lt;vob file="1c.mpg" /&gt; 
+      &lt;/pgc&gt;
+    &lt;/titles&gt;
+  &lt;/titleset&gt;
+  &lt;titleset&gt;
+    &lt;titles&gt;
+      &lt;pgc&gt;
+        &lt;post&gt;call vmgm menu 1;&lt;/post&gt; 
+        &lt;vob file="2a.mpg" /&gt; 
+        &lt;vob file="2b.mpg" /&gt; 
+        &lt;vob file="2c.mpg" /&gt; 
+      &lt;/pgc&gt;
+    &lt;/titles&gt;
+  &lt;/titleset&gt;
+  &lt;titleset&gt;
+    &lt;titles&gt;
+      &lt;pgc&gt;
+        &lt;post&gt;call vmgm menu 1;&lt;/post&gt; 
+        &lt;vob file="3a.mpg" /&gt; 
+        &lt;vob file="3b.mpg" /&gt; 
+        &lt;vob file="3c.mpg" /&gt; 
+      &lt;/pgc&gt;
+    &lt;/titles&gt;
+  &lt;/titleset&gt;
+  &lt;titleset&gt;
+    &lt;titles&gt;
+      &lt;pgc&gt;
+        &lt;post&gt;call vmgm menu 1;&lt;/post&gt; 
+        &lt;vob file="4a.mpg" /&gt; 
+        &lt;vob file="4b.mpg" /&gt; 
+        &lt;vob file="4c.mpg" /&gt; 
+      &lt;/pgc&gt;
+    &lt;/titles&gt;
+  &lt;/titleset&gt;
+&lt;/dvdauthor&gt;
 ### end dvd.xml ###
 </verb></tscreen>
 
 Create the DVD file structure with
 
-     dvdauthor -x dvd.xml
+<tt>dvdauthor -x dvd.xml</tt>
 
 Test the created DVD file structure with
 
-     xine dvd:/full/path/to/DVD/VIDEO_TS/
+<tt>xine dvd:/full/path/to/DVD/VIDEO_TS/</tt>
 
-Then burn the DVD file structure to a dvd with
+Then burn the DVD file structure to a DVD with
 
-     growisofs -Z /dev/scd0 -dvd-video DVD
+<tt>growisofs -Z /dev/scd0 -dvd-video DVD</tt>
 
 
 <sect1>Migrating from XMLTV to DataDirect <label id="MigratingtoDD">
@@ -6093,29 +6077,52 @@ $
 <sect1>What do the icons on the Watch Recordings screen mean?
 <p>Press "1" or F1 to get a popup.
 <sect1>What is the difference between a PVR-250 and a PVR-350.
-<p>This is covered in the hardware section.  Briefly recapping:
 
-A PVR-250 is primarily a MPEG-2 encoder.  It has a tuner, composite and
-SVideo connection for video, and an 1/8" audio jack for stereo analog audio.
+<p>This is covered in the hardware section, and extensively covered on the
+Hauppauge website.  Briefly recapping:
 
-The PVR-250 MCE (Media Center Edition) contains a FM radio tuner.  This is
-currently not support by MythTV.
+A PVR-250 (model 980) is primarily a MPEG-2 encoder.  It has a tuner,
+composite and SVideo connection for video, and an 1/8" audio jack for stereo
+analog audio.  It also has an IR receiver and comes with a remote control.
+
+The PVR-250 MCE (Media Center Edition, aka model 975)) contains a FM radio
+tuner.  The tuner is currently not support by MythTV.  The PVR-250 MCE does
+not contain a IR receiver or a remote.
 
 The PVR-250 Rev 1 contained an MPEG-2 decoder.  However, this function was
 not connected to any output jacks, and there doesn't appear to be any way to
 pull decoded video from the card, so it's a fairly useless feature.
 
-The PVR-350 has the features of the PVR-250 as well as being able to decode
-MPEG-2.  The encode and decode functions may be used simultaneously.  The
-MPEG-2 decoder function gives superior video quality.  However, the decoder
-function is only available once Linux has started, so you will not see any
-boot-time messages.
+The PVR-350 (model 990) has the features of the PVR-250 as well as being
+able to decode MPEG-2.  The encode and decode functions may be used
+simultaneously.  The MPEG-2 decoder function gives superior video quality. 
+However, the decoder function is only available once Linux has started, so
+you will not see any boot-time messages.
 
 Also, the card does not support any 3D functions, making it a poor gamer
 card.
 
 Non-MPEG-2 content will be displayed on the PVR-350 output using framebuffer
 features, placing a large load on the host CPU.
+
+<sect1>Changing channels on an external Set Top Box
+<p>If you need to use an external Set Top Box (STB), such as for satellite
+TV or for digital cable you will need some way for MythTV to tell the STB to
+switch to a new channel.  There are several methods:
+<enum>
+<item>Use an IR blaster.  An IR blaster is an infrared transmitter connected
+to your computer.  When MythTV needs to change channels it will send IR
+pulses, thereby emulating a remote control.
+<item>Use a direct serial connection.  Some STB's have a serial port on the
+back, although it may not look like a serial port.  It may look like a phone
+jack, or a strange VGA connector.  It may be labeled "Low Speed Data".  A
+direct serial connection is more reliable than an IR blaster.  Not all STB's
+that have a Low Speed Data port have it enabled; you may need to convince
+your service provider to turn it on.  Stating that you have a Tivo may help;
+the Tivo has a direct-connect capability.
+<item>Use a firewire connection.  There is a <tt>6200ch.c</tt> in the MythTV
+contrib directory which may work for you.
+</enum>
 
 
 <sect>Example Configurations.
@@ -6899,9 +6906,10 @@ leading to dropped frames.
 </article>
 <!-- Revision History
 
-v0.16.00, 2004-09-07.  Version bump.  Cedric Teffts' AMD64 settings.pro
-update.  David Greaves' suggestion about mythcommflag and the seektable. Add
-a section on differences between a PVR-250 and a 350. Add bugzilla pointer.
+v0.16.00, 2004-09-08.  Version bump.  Cedric Teffts' AMD64 settings.pro
+update, update by bline.  David Greaves' suggestion about mythcommflag and
+the seektable. Add a section on differences between a PVR-250 and a 350. Add
+bugzilla pointer.  Add a section on changing channels on STBs.
 
 -->
 

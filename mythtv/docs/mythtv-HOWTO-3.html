@@ -203,7 +203,7 @@ encoding. Using either a G200 MJPEG encoder card, or a MPEG-2 encoder card
 supported by the IvyTV project 
 <A HREF="http://ivtv.sourceforge.net/">http://ivtv.sourceforge.net/</A> such as the Hauppauge PVR-250, PVR-350,
 Avermedia M179, Hauppauge "Freestyle" or Yuan M600 cards will allow you to
-use dedicated hardware encoders rather than your CPU. Release 0.15 of MythTV
+use dedicated hardware encoders rather than your CPU. Release 0.16 of MythTV
 is able to use these MPEG-2 encoders as an input device for live TV and for
 scheduled recordings.  (The PVR-350 can simultaneously be used as an output
 device.) Using the on-board MPEG-2 encoder drastically reduces the CPU
@@ -591,6 +591,16 @@ by Matt Zimmerman
 Installation instructions can be found on those pages as well. All of the
 prerequisites for MythTV are available as Debian packages, most of them from
 the official Debian archive.</P>
+<P>If you have followed the instructions on the above page you should have added
+<BLOCKQUOTE><CODE>
+<PRE>
+deb-src http://dijkstra.csh.rit.edu/~mdz/debian unstable mythtv
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>to your <CODE>/etc/apt/sources.list</CODE> file.  Running <B>apt-get update</B> and then
+executing <B>apt-get build-dep mythtv</B> should install all the
+pre-requisites required to compile MythTV.</P>
 <P>
 <FIGURE>
 <EPS FILE="warning.eps">
