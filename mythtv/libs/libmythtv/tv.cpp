@@ -1306,7 +1306,7 @@ void TV::DoFF(void)
     {
         QString desc = "";
         int pos = calcSliderPos(fftime, desc);
-        osd->StartPause(pos, slidertype, "Forward", desc, 1);
+        osd->StartPause(pos, slidertype, "Forward", desc, 2);
     }
 
     activenvp->FastForward(fftime);
@@ -1325,7 +1325,7 @@ void TV::DoRew(void)
     {
         QString desc = "";
         int pos = calcSliderPos(0 - rewtime, desc);
-        osd->StartPause(pos, slidertype, "Rewind", desc, 1);
+        osd->StartPause(pos, slidertype, "Rewind", desc, 2);
     }
 
     activenvp->Rewind(rewtime);

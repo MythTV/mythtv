@@ -84,6 +84,7 @@ class OSD
     int vid_width;
     int vid_height;
 
+    QRect titleRect;
     QRect infoRect;
     bool show_info;
     QString infotext;
@@ -98,6 +99,8 @@ class OSD
     OSDImage *infoicon;
     QString infocallsign;
     QRect callsignRect;
+    QRect timeRect;
+    QString timeFormat;
     
     QRect channumRect; 
     QString channumtext;

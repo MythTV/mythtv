@@ -4,6 +4,7 @@ CONFIG += release
 PREFIX = /usr/local
 
 INCLUDEPATH += $${PREFIX}/include
+INCLUDEPATH *= /usr/local/include
 
 DEFINES += _GNU_SOURCE
 DEFINES += PREFIX=\"$${PREFIX}\"

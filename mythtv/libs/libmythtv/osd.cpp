@@ -188,6 +188,8 @@ OSD::~OSD(void)
 
 void OSD::SetNoThemeDefaults(void)
 {
+    titleRect = QRect(0, 0, 0, 0);
+
     infoRect.setTop(vid_height * 5 / 8);
     infoRect.setBottom(vid_height * 15 / 16);
     infoRect.setLeft(vid_width / 8);
@@ -306,7 +308,16 @@ bool OSD::LoadTheme(void)
         infoRect = parseRect(coords);
         normalizeRect(&infoRect);
         infoRect.moveBy(x, y);
-	
+
+        titleRect = QRect(0, 0, 0, 0);
+        coords = settings->GetSetting("InfoTitleTextBox");
+        if (coords != "")
+        {
+            titleRect = parseRect(coords);
+            normalizeRect(&titleRect);
+            titleRect.moveBy(x, y);
+        }	
+
         int fontsize = settings->GetNumSetting("InfoTextFontSize");
         if (fontsize > 0)
             infofontsize = fontsize;
@@ -329,6 +340,19 @@ bool OSD::LoadTheme(void)
             normalizeRect(&callsignRect);
             callsignRect.moveBy(x, y);
         }
+
+        timeRect = QRect(0, 0, 0, 0);
+        coords = settings->GetSetting("InfoTimeRect");
+        if (coords.length() > 1)
+        {
+            timeRect = parseRect(coords);
+            normalizeRect(&timeRect);
+            timeRect.moveBy(x, y);
+        }
+
+        timeFormat = settings->GetSetting("InfoTimeFormat");
+        if (timeFormat == "")
+            timeFormat = "h:mm ap";
     }
 
     bgname = settings->GetSetting("SeekBackground");
@@ -395,6 +419,20 @@ bool OSD::LoadTheme(void)
 
     if (pausesliderTextRect.width() == 0)
         pausesliderTextRect = pausesliderRect;
+
+    if (settings->GetSetting("ChannelNumberRect") != "")
+    {
+        QString chanrect = settings->GetSetting("ChannelNumberRect");
+
+        channumRect = parseRect(chanrect);
+        normalizeRect(&channumRect);
+        channumRect.moveBy((int)(vid_width * 0.045), 
+                           (int)(vid_height * 0.05));
+
+        channumfontsize = settings->GetNumSetting("ChannelNumberFontSize");
+        if (!channumfontsize)
+            channumfontsize = 40;
+    }
 
     return true;
 }
@@ -698,6 +736,11 @@ void OSD::DisplayInfo(unsigned char *yuvptr)
         if (callsignRect.width() > 0)
             DrawStringWithOutline(yuvptr, callsignRect, infocallsign, 
                                   info_font);
+        if (timeRect.width() > 0)
+        {
+            QString thetime = QTime::currentTime().toString(timeFormat);
+            DrawStringWithOutline(yuvptr, timeRect, thetime, info_font);
+        }
     }
     else
     {
@@ -705,18 +748,41 @@ void OSD::DisplayInfo(unsigned char *yuvptr)
     }
 
     QRect rect = infoRect;
+
+    if (titleRect.width() > 0)
+    {
+        rect = titleRect;
+
+    }
+
     rect.setLeft(rect.left() + 5);
     rect.setRight(rect.right() - 5);
     rect.setTop(rect.top() + 5);
     rect.setBottom(rect.bottom() - 5);
+
     DrawStringWithOutline(yuvptr, rect, infotext, info_font);
- 
-    rect.setTop(rect.top() + infofontsize * 3 / 2);
-    rect.setBottom(rect.bottom() - infofontsize * 3 / 2);
+
+    if (titleRect.width() > 0)
+    {
+        rect = infoRect;
+        rect.setLeft(rect.left() + 5);
+        rect.setRight(rect.right() - 5);
+        rect.setTop(rect.top() + 5);
+        rect.setBottom(rect.bottom() - 5);
+    }
+    else
+    {
+        rect.setTop(rect.top() + infofontsize * 3 / 2);
+        rect.setBottom(rect.bottom() - infofontsize * 3 / 2);
+    }
     DrawStringWithOutline(yuvptr, rect, subtitletext, info_font);
 
     rect = infoRect;
-    rect.setTop(rect.top() + infofontsize * 3);
+
+    if (titleRect.width() > 0)
+        rect.setTop(rect.top() + infofontsize * 3 / 2);
+    else
+        rect.setTop(rect.top() + infofontsize * 3);
     DrawStringIntoBox(rect, desctext, yuvptr);
 }
 

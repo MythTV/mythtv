@@ -375,7 +375,7 @@ void TTFFont::DrawString(unsigned char *yuvptr, int x, int y,
    y += fontsize;
    
    width = maxx;
-   height = maxy - fontsize;
+   height = maxy;
 
    clipx = 0;
    clipy = 0;

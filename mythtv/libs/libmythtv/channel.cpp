@@ -160,7 +160,7 @@ bool Channel::SetChannel(int i)
 
     if (pParent->CheckChannel(channame, finetune))
     {
-        if (currentcapchannel == 0)
+        if (GetCurrentInput() == "Television")
         {
             int frequency = curList[i].freq * 16 / 1000 + finetune;
             if (ioctl(videofd, VIDIOCSFREQ, &frequency) == -1)
