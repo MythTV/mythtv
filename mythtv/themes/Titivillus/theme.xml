@@ -319,7 +319,7 @@
 
   <buttondef name="SHUTDOWN">
     <image>text-blank.png</image>
-    <watermarkimage>watermark/NOTHING.png</watermarkimage>
+    <watermarkimage>text-blank.png</watermarkimage>
     <offset>0,0</offset>
   </buttondef>
 
