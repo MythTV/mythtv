@@ -21,5 +21,5 @@ INSTALLS += installfiles installimages uifiles
 
 # Input
 
-HEADERS += weather.h inetcomms.h
-SOURCES += main.cpp weather.cpp inetcomms.cpp
+HEADERS += weather.h
+SOURCES += main.cpp weather.cpp

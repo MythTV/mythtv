@@ -30,18 +30,16 @@
 #include <qdir.h>
 
 #include "weather.h"
-#include "inetcomms.h"
-
-using namespace std;
 
 #include <mythtv/mythcontext.h>
+#include <mythtv/inetcomms.h>
+
+using namespace std;
 
 Weather::Weather(QSqlDatabase *db, int appCode, MythMainWindow *parent, 
                  const char *name)
        : MythDialog(parent, name)
 {
-    qInitNetworkProtocols();
-
     urlTimer = new QTimer(this);
     connect(urlTimer, SIGNAL(timeout()), SLOT(weatherTimeout()));
 
@@ -2445,9 +2443,9 @@ bool Weather::GetWeatherData()
      }
 
      urlTimer->stop();
+     stopProcessing = false;
      urlTimer->start(10000);
 
-     stopProcessing = false;
      while (!weatherData->isDone())
      {
           qApp->processEvents();
@@ -2498,10 +2496,10 @@ bool Weather::GetWeatherData()
 	 cout << "MythWeather: Grabbing Weather Map Link (part 2) From: " << weatherMapLink2URL.toString() << endl;
 
      urlTimer->stop();
+     stopProcessing = false;
      urlTimer->start(10000);
 
      INETComms *weatherMapLink2 = new INETComms(weatherMapLink2URL);
-     stopProcessing = false;
      while (!weatherMapLink2->isDone())
      {
            qApp->processEvents();
