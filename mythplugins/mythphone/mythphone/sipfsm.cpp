@@ -414,7 +414,7 @@ SipFsm::SipFsm(QWidget *parent, const char *name)
             cout << "SIP: Cannot register; proxy, username or password not set\n";
 
         // Test -- watch my PC
-        //CreateWatcherFsm("454259@fwd.pulver.com");
+        //CreateWatcherFsm("Mythphone@192.168.254.102");
     }
 
 }
@@ -2010,7 +2010,10 @@ SipSubscriber::SipSubscriber(SipFsm *par, QString localIp, int localPort, SipReg
     watcherUrl = 0;
     State = SIP_SUB_IDLE;
 
-    MyUrl = new SipUrl("", regProxy->registeredAs(), regProxy->registeredTo(), 5060);
+    if (regProxy)
+        MyUrl = new SipUrl("", regProxy->registeredAs(), regProxy->registeredTo(), 5060);
+    else
+        MyUrl = new SipUrl("", "MythPhone", sipLocalIp, 5060);
     MyContactUrl = new SipUrl("", "", sipLocalIp, sipLocalPort);
     cseq = 2;
 
@@ -2154,7 +2157,10 @@ SipWatcher::SipWatcher(SipFsm *par, QString localIp, int localPort, SipRegistrat
     cseq = 1;
     expires = -1;
     CallId.Generate(sipLocalIp);
-    MyUrl = new SipUrl("", regProxy->registeredAs(), regProxy->registeredTo(), 5060);
+    if (regProxy)
+        MyUrl = new SipUrl("", regProxy->registeredAs(), regProxy->registeredTo(), 5060);
+    else
+        MyUrl = new SipUrl("", "MythPhone", sipLocalIp, 5060);
     MyContactUrl = new SipUrl("", "", sipLocalIp, sipLocalPort);
 
     FSM(SIP_WATCH, 0);
