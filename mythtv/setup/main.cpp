@@ -140,10 +140,11 @@ int main(int argc, char *argv[])
     mainWindow->Show();
     gContext->SetMainWindow(mainWindow);
 
-    DialogBox dboxCard(mainWindow, "Would you like to clear all capture card "
-                                   "settings before starting configuration?");
-    dboxCard.AddButton("No, leave my card settings alone");
-    dboxCard.AddButton("Yes, delete my card settings");
+    DialogBox dboxCard(mainWindow, QObject::tr("Would you like to clear all "
+                                   "capture card settings before starting "
+                                   "configuration?"));
+    dboxCard.AddButton(QObject::tr("No, leave my card settings alone"));
+    dboxCard.AddButton(QObject::tr("Yes, delete my card settings"));
     if (dboxCard.exec() == 2)
         clearCardDB();
     
@@ -151,11 +152,11 @@ int main(int argc, char *argv[])
     // before we bring up a similar-looking one
     usleep(750000);
     
-    DialogBox dboxProg(mainWindow, "Would you like to clear all program and "
-                                   "channel settings before starting "
-                                   "configuration?");
-    dboxProg.AddButton("No, leave my program settings alone");
-    dboxProg.AddButton("Yes, delete my program settings");
+    DialogBox dboxProg(mainWindow, QObject::tr("Would you like to clear all "
+                                   "program and channel settings before "
+                                   "starting configuration?"));
+    dboxProg.AddButton(QObject::tr("No, leave my program settings alone"));
+    dboxProg.AddButton(QObject::tr("Yes, delete my program settings"));
     if (dboxProg.exec() == 2)
         clearAllDB();
 
