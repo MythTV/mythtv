@@ -12,7 +12,8 @@ class XvVideoOutput
     bool Init(int width, int height, char *window_name, 
               char *icon_name, int num_buffers, 
               unsigned char **out_buffers, unsigned int wid = 0);
-    void Show(unsigned char *buffer, int width, int height);
+    void PrepareFrame(unsigned char *buffer, int width, int height);
+    void Show();
     int CheckEvents(void);
 
     void ToggleFullScreen();

@@ -201,6 +201,8 @@ class NuppelVideoPlayer
 
     void ResetNexttrigger(struct timeval *tv);
 
+    int UpdateDelay(struct timeval *nexttrigger);
+
     void ShowPip(unsigned char *xvidbuf);
     void ShowText();
 

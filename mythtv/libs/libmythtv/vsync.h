@@ -19,6 +19,11 @@
 #ifndef VSYNC_H_INCLUDED
 #define VSYNC_H_INCLUDED
 
+int vgasync_init( int verbose );
+void vgasync_cleanup( void );
+void vgasync_spin_until_end_of_next_refresh( void );
+void vgasync_spin_until_out_of_refresh( void );
+
 int vsync_init( void );
 void vsync_shutdown( void );
 void vsync_wait_for_retrace( void );

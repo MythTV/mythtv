@@ -149,18 +149,11 @@ const char *dri_dev = "/dev/dri/card0";
 static int nvidia_fd = -1;
 const char *nvidia_dev = "/dev/nvidia0";
 
-static int timediff( struct timeval *large, struct timeval *small )
-{
-    return (   ( ( large->tv_sec * 1000 * 1000 ) + large->tv_usec )
-             - ( ( small->tv_sec * 1000 * 1000 ) + small->tv_usec ) );
-}
-
 static struct timeval lastvbi;
 
 int drmWaitVBlank( int fd, drmVBlankPtr vbl )
 {
     struct timeval curvbi;
-    struct timeval curtime;
     int ret;
 
     do {
@@ -170,8 +163,6 @@ int drmWaitVBlank( int fd, drmVBlankPtr vbl )
 
     curvbi.tv_sec = vbl->reply.tval_sec;
     curvbi.tv_usec = vbl->reply.tval_usec;
-    gettimeofday( &curtime, 0 );
-    // fprintf( stderr, "time: %d, late %d\n", timediff( &curvbi, &lastvbi ), timediff( &curtime, &curvbi ) );
     lastvbi = curvbi;
 
     return ret;
@@ -186,19 +177,23 @@ int vsync_init( void )
 
     nvidia_fd = open( nvidia_dev, O_RDONLY );
     if( nvidia_fd < 0 ) {
-        fprintf( stderr, "vsync: Can't open nVidia device %s: %s\n", nvidia_dev, strerror( errno ) );
-        fprintf( stderr, "vsync: Assuming non-nVidia hardware.\n" );
+        /* fprintf( stderr, "vsync: Can't open nVidia device %s: %s\n", nvidia_dev, strerror( errno ) ); */
+        /* fprintf( stderr, "vsync: Assuming non-nVidia hardware.\n" ); */
 
         dri_fd = open( dri_dev, O_RDWR );
         if( dri_fd < 0 ) {
-            fprintf( stderr, "vsync: Can't open device %s: %s\n", dri_dev, strerror( errno ) );
+          /* fprintf( stderr, "vsync: Can't open device %s: %s\n", dri_dev, strerror( errno ) ); */
+            return 0;
         } else {
             blank.request.type = DRM_VBLANK_RELATIVE;
             blank.request.sequence = 1;
             if( (ret = drmWaitVBlank( dri_fd, &blank )) ) {
-                fprintf( stderr, "vsync: Error %d from VBLANK ioctl, not supported by your DRI driver?\n", ret );
+              /* fprintf( stderr, "vsync: Error %d from VBLANK ioctl, not supported by your DRI driver?\n", ret ); */
                 close( dri_fd );
                 dri_fd = -1;
+                return 0;
+            } else {
+                return 2;
             }
         }
     }
@@ -214,10 +209,6 @@ void vsync_shutdown( void )
 
 void vsync_wait_for_retrace( void )
 {
-    struct timeval beforewait;
-    struct timeval afterwait;
-
-    gettimeofday( &beforewait, 0 );
     if( dri_fd >= 0 ) {
         drmVBlank blank;
 
@@ -231,12 +222,7 @@ void vsync_wait_for_retrace( void )
         polldata.revents = 0;
         poll( &polldata, 1, 50 );
     } else {
-        usleep( 20000 );
-    }
-    gettimeofday( &afterwait, 0 );
-    if( timediff( &afterwait, &beforewait ) < 1000 ) {
-        fprintf( stderr, "vsync: Protection hit!  Sleep too short!  vsync unreliable!\n" );
-        usleep( 10000 );
+        usleep( 2000 );
     }
 }
 

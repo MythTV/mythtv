@@ -648,7 +648,7 @@ void XvVideoOutput::StopEmbedding(void)
     pthread_mutex_unlock(&lock);
 }
 
-void XvVideoOutput::Show(unsigned char *buffer, int width, int height)
+void XvVideoOutput::PrepareFrame(unsigned char *buffer, int width, int height)
 {
     if (xv_port != -1)
     {
@@ -755,12 +755,15 @@ void XvVideoOutput::Show(unsigned char *buffer, int width, int height)
             XPutImage(data->XJ_disp, data->XJ_curwin, data->XJ_gc, image, 
                       0, 0, 0, 0, curw, curh );
 
-        XSync(data->XJ_disp, False);
-
         pthread_mutex_unlock(&lock);
 
         delete [] sbuf;
     }
+}
+
+void XvVideoOutput::Show()
+{
+        XSync(data->XJ_disp, False);
 }
 
 int XvVideoOutput::CheckEvents(void)
