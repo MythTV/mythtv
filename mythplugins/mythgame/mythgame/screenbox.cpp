@@ -82,9 +82,15 @@ void ScreenBox::fillList(QListView *listview, QString &paths)
 
     QString first = lines.front();
 
-    char thequery[1024];
-    sprintf(thequery, "SELECT DISTINCT %s FROM gamemetadata ORDER BY %s DESC;",
-                      first.ascii(), first.ascii());
+    QStringList regSystems;
+    if (first == "system")
+    {
+        for (uint i = 0; i < GameHandler::count(); ++i)
+            regSystems.append(GameHandler::getHandler(i)->Systemname());
+    }
+
+    QString thequery = QString("SELECT DISTINCT %1 FROM gamemetadata ORDER "
+                               "BY %2 DESC;").arg(first).arg(first);
 
     QSqlQuery query = db->exec(thequery);
 
@@ -94,74 +100,21 @@ void ScreenBox::fillList(QListView *listview, QString &paths)
         {
             QString current = query.value(0).toString();
 
-            QString querystr = first;
-            QString matchstr = first + " = \"" + current + "\"";           
- 
-            QStringList::Iterator line = lines.begin();
-            ++line;
-            int num = 1;
-
-            QString level = *line;
+            // Don't display non-registered systems, even if they are
+            // in the database.
+            if (first == "system" && 
+                (regSystems.find(current) == regSystems.end()))
+                continue;
 
             RomInfo *rinfo = new RomInfo();
             rinfo->setField(first, current);
 
             TreeItem *item = new TreeItem(allgames, current, first, rinfo);
-            fillNextLevel(level, num, querystr, matchstr, line, lines,
-                          item);
+            item->setExpandable(true);
         }
     }
 
     listview->setOpen(allgames, true);
-}
-
-void ScreenBox::fillNextLevel(QString level, int num, QString querystr, 
-                                QString matchstr, QStringList::Iterator line,
-                                QStringList lines, TreeItem *parent)
-{
-    if (level == "")
-        return;
-
-    QString orderstr = querystr;
- 
-    bool isleaf = false; 
-    if (level == leafLevel)
-    {
-        isleaf = true;
-    }
-    querystr += "," + level;
-    orderstr += "," + level;
-
-    char thequery[1024];
-      sprintf(thequery, "SELECT DISTINCT %s FROM gamemetadata WHERE %s "
-                        "ORDER BY %s DESC;",
-                        querystr.ascii(), matchstr.ascii(), orderstr.ascii());
-                      
-    QSqlQuery query = db->exec(thequery);
-  
-    ++line; 
-    if (query.isActive() && query.numRowsAffected() > 0)
-    {
-        while (query.next())
-        {
-            QString current = query.value(num).toString();
-            QString matchstr2 = matchstr + " AND " + level + " = \"" + 
-                                current + "\"";
-
-            RomInfo *parentinfo = parent->getRomInfo();
-            RomInfo *rinfo;
-            rinfo = new RomInfo(*parentinfo);
-            rinfo->setField(level, current);
-            TreeItem *item = new TreeItem(parent, current, level, rinfo);
-
-            if (line != lines.end() && *line != "gamename")
-                fillNextLevel(*line, num + 1, querystr, matchstr2, line, lines,
-                              item);
-
-            if (!isleaf)
-                checkParent(item);
-        }
-    }
 }
 
 void ScreenBox::checkParent(QListViewItem *item)
@@ -191,7 +144,7 @@ void ScreenBox::setImages(QListViewItem *item)
     {
         PicFrame->setFocusPolicy(QWidget::TabFocus);
         RomInfo *romdata = tcitem->getRomInfo();
-        char thequery[1024];
+        QString thequery;
         QString matchstr = "system = \"" + romdata->System() + "\"";
         if(romdata->Genre() != "")
             matchstr+= " AND genre = \"" + romdata->Genre() + "\"";
@@ -201,9 +154,9 @@ void ScreenBox::setImages(QListViewItem *item)
             year.sprintf("%d",romdata->Year());
             matchstr+= " AND year = \"" + year + "\"";
         }
-        sprintf(thequery, "SELECT DISTINCT gamename FROM gamemetadata WHERE %s "
-                        "ORDER BY gamename DESC;",
-                        matchstr.latin1());
+        thequery = QString("SELECT DISTINCT gamename FROM gamemetadata "
+                           "WHERE %1 ORDER BY gamename ASC;")
+                           .arg(matchstr);
         QSqlQuery query = db->exec(thequery);
         if (query.isActive() && query.numRowsAffected() > 0)
         {

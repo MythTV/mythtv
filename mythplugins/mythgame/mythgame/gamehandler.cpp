@@ -1,11 +1,14 @@
 #include "gamehandler.h"
 #include "mamehandler.h"
+#include "neshandler.h"
 #include "constants.h"
 
 #include <qobject.h>
 #include <qptrlist.h>
 #include <qstringlist.h>
 #include <iostream>
+
+#include <mythtv/mythcontext.h>
 
 using namespace std;
 
@@ -21,8 +24,23 @@ static void checkHandlers(void)
     {
         handlers = new QPtrList<GameHandler>;
 
-        GameHandler::registerHandler(MameHandler::getHandler());
+        if (gContext->GetSetting("XMameBinary") != "")
+            GameHandler::registerHandler(MameHandler::getHandler());
+        if (gContext->GetSetting("NesBinary") != "")
+            GameHandler::registerHandler(NesHandler::getHandler());
     }
+}
+
+GameHandler* GameHandler::getHandler(uint i)
+{
+    checkHandlers();
+    return handlers->at(i);
+}
+
+uint GameHandler::count(void)
+{
+    checkHandlers();
+    return handlers->count();
 }
 
 void GameHandler::processAllGames(void)
@@ -46,6 +64,7 @@ GameHandler* GameHandler::GetHandler(RomInfo *rominfo)
         {
             return handler;
         }
+        handler = handlers->next();
     }
     return handler;
 }

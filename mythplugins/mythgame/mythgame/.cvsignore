@@ -5,4 +5,5 @@ moc_extendedlistview.cpp
 moc_mamesettingsdlg.cpp
 moc_screenbox.cpp
 moc_selectframe.cpp
+moc_nessettingsdlg.cpp
 mythgame

@@ -96,15 +96,35 @@ int main(int argc, char *argv[])
 
     gContext->LoadQtConfig();
 
-    //this should only run the first time.
-    QString thequery = "SELECT gamename FROM gamemetadata;";
+    //look for new systems that haven't been added to the database
+    //yet and tell them to scan their games
+
+    //build a list of all the systems in the database
+    QStringList systems;
+    QString thequery = "SELECT DISTINCT system FROM gamemetadata;";
     QSqlQuery query = db->exec(thequery);
-    if (!query.isActive() || query.numRowsAffected() <= 0)
+    while (query.next())
     {
-        //for each game handler process it's games
-        GameHandler::processAllGames();
+        QString name = query.value(0).toString();
+        systems.append(name);
     }
+
+    cout << "Looking for games..\n";
+    //run through the list of registered systems, and if they're not
+    //in the database, tell them to scan for games
+    for (uint i = 0; i < GameHandler::count(); ++i)
+    {
+        GameHandler* handler = GameHandler::getHandler(i);
+        bool found = systems.find(handler->Systemname()) != systems.end();
+        if (!found)
+        {
+            handler->processGames();
+        }
+    }
+    cout << "done\n";
+
     QString paths = gContext->GetSetting("TreeLevels");
+
     QValueList<RomInfo> Romlist;
 
     QString themename = gContext->GetSetting("Theme");

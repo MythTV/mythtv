@@ -3,6 +3,7 @@
 #include <qsqldatabase.h>
 #include <qpixmap.h>
 #include <qimage.h>
+#include <qbitmap.h>
 #include <iostream>
 #include <qlabel.h>
 #include <qimage.h>
@@ -272,10 +273,13 @@ void SelectFrame::setButtons(RomInfo *first)
                         ButtonImage = ButtonImage.scaleWidth(mImageSize);
                     ButtonMap.convertFromImage(ButtonImage);
                     mButtons[i][j]->setPixmap(ButtonMap);
+                    mButtons[i][j]->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
                 }
                 else
-                    mButtons[i][j]->setText("X");
-                mButtons[i][j]->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+                {
+                    mButtons[i][j]->setText(pCurrent->Gamename());
+                    mButtons[i][j]->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter | Qt::WordBreak);
+                }
                 mButtons[i][j]->show();
                 pCurrent = RomList->next();
             }

@@ -19,8 +19,11 @@ class TreeItem : public QListViewItem
     RomInfo *getRomInfo(void) { return rominfo; }
     QString getLevel(void) { return level; }
 
+    void setOpen(bool o);
+
   private:
     void pickPixmap();
+    QString getClause(QString field);
 
     static void setupPixmaps(void);
     static QPixmap *scalePixmap(const char **xpmdata, float wmult, float hmult);

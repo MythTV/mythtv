@@ -54,7 +54,7 @@ void MameHandler::processGames()
         char *verifyname;
         char *drivername;
 
-        char thequery[4096];
+        QString thequery;
 
         QStringList tmp_array;
 
@@ -65,16 +65,15 @@ void MameHandler::processGames()
         int done_roms = 0;
         float done;
 
-         QSqlDatabase *db = QSqlDatabase::database();
+        QSqlDatabase *db = QSqlDatabase::database();
 
         //remove all metadata entries from the tables, all correct values will be
         //added as they are found.  This is done so that entries that may no longer be
         //available or valid are removed each time the game list is remade.
-        sprintf(thequery,"DELETE FROM mamemetadata;");
+        thequery = "DELETE FROM mamemetadata;";
         db->exec(thequery);
-        sprintf(thequery,"DELETE FROM gamemetadata WHERE system = \"Mame\";");
+        thequery = "DELETE FROM gamemetadata WHERE system = \"Mame\";";
         db->exec(thequery);
-        
 
         for (tmp_counter = 0; tmp_counter < 16; tmp_counter++) {
                 chip[tmp_counter] = "";
@@ -361,14 +360,18 @@ void MameHandler::processGames()
                             {
                                 rom->setGenre("Unknown");
                             }
-                            
-                            sprintf(thequery, "INSERT INTO gamemetadata (system,romname,gamename,genre,"
-                                              "year) VALUES (\"Mame\",\"%s\","
-                                              "\"%s\",\"%s\",%d);", rom->Romname().latin1(),
-                                              rom->Gamename().latin1(), rom->Genre().latin1(), rom->Year());
+                           
+                            thequery = QString("INSERT INTO gamemetadata "
+                                               "(system,romname,gamename,genre,"
+                                               "year) VALUES (\"Mame\",\"%1\","
+                                               "\"%2\",\"%3\",%4);")
+                                               .arg(rom->Romname().latin1())
+                                               .arg(rom->Gamename().latin1())
+                                               .arg(rom->Genre().latin1())
+                                               .arg(rom->Year());
                             db->exec(thequery);
 
-                            sprintf(thequery, "INSERT INTO mamemetadata (romname,manu,cloneof,romof,"
+                            thequery.sprintf("INSERT INTO mamemetadata (romname,manu,cloneof,romof,"
                                               "driver,cpu1,cpu2,cpu3,cpu4,sound1,sound2,sound3,sound4,"
                                               "players,buttons) VALUES (\"%s\",\"%s\",\"%s\",\"%s\","
                                               "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\","
@@ -828,8 +831,9 @@ void MameHandler::SetGameSettings(GameSettings &game_settings, MameRomInfo *romi
     if(rominfo)
     {
         QSqlDatabase *db = QSqlDatabase::database();
-        char thequery[128];
-        sprintf(thequery, "SELECT * FROM mamesettings WHERE romname = \"%s\";",rominfo->Romname().latin1());
+        QString thequery; 
+        thequery = QString("SELECT * FROM mamesettings WHERE romname = \"%1\";")
+                          .arg(rominfo->Romname().latin1());
         QSqlQuery query = db->exec(thequery);
         if (query.isActive() && query.numRowsAffected() > 0)
         {
@@ -871,16 +875,16 @@ void MameHandler::SetGameSettings(GameSettings &game_settings, MameRomInfo *romi
 void MameHandler::SaveGameSettings(GameSettings &game_settings, MameRomInfo *rominfo)
 {
     QSqlDatabase *db = QSqlDatabase::database();
-    char thequery[1024];
+    QString thequery;
     //bool exists = false;
     QString RomName = "default";
     if(rominfo)
         RomName = rominfo->Romname();
-    sprintf(thequery,"SELECT romname FROM mamesettings WHERE romname = \"%s\";", RomName.latin1());
+    thequery = QString("SELECT romname FROM mamesettings WHERE romname = \"%1\";").arg(RomName.latin1());
     QSqlQuery query = db->exec(thequery);
     if (query.isActive() && query.numRowsAffected() > 0)
     {
-        sprintf(thequery, "UPDATE mamesettings SET usedefault = %d, fullscreen = %d, "
+        thequery.sprintf("UPDATE mamesettings SET usedefault = %d, fullscreen = %d, "
                           "scanlines = %d, extra_artwork = %d, autoframeskip = %d, "
                           "autocolordepth = %d, rotleft = %d, rotright = %d, flipx = %d, "
                           "flipy = %d, scale = %d, antialias = %d, translucency = %d, "
@@ -904,7 +908,7 @@ void MameHandler::SaveGameSettings(GameSettings &game_settings, MameRomInfo *rom
     }
     else
     {
-        sprintf(thequery, "INSERT INTO mamesettings (romname,usedefault,fullscreen,scanlines,"
+        thequery.sprintf("INSERT INTO mamesettings (romname,usedefault,fullscreen,scanlines,"
                           "extra_artwork,autoframeskip,autocolordepth,rotleft,rotright,"
                           "flipx,flipy,scale,antialias,translucency,beam,flicker,"
                           "vectorres,analogjoy,mouse,winkeys,grabmouse,joytype,"

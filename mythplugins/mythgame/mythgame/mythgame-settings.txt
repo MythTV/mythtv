@@ -5,6 +5,22 @@ TreeLevels=system year genre gamename
 # default is 0 -- set this to 5 if you want the screenshot selection menu.
 ShotCount=0
 
+### Nes specific settings ###
+
+# Path and name of nes emulator
+str NesBinary=/usr/local/bin/fceu
+
+# Directory where nes roms are located.
+str NesRomLocation=/home/media/games/nes/roms
+
+# Path and name of nes crc file.  This is the same file that comes
+# with the xmame(xmess) distribution: xmame-0.XX/CRC/nes.crc.
+str NesCRCFile=/home/media/games/nes/nes.crc
+
+# Directory where screenshots are kept
+str NesScreensLocation=/home/media/games/nes/screens
+
+
 ### Mame specific settings ###
 
 # Path and name of xmame binary

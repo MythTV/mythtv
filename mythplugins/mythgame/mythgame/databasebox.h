@@ -31,9 +31,6 @@ class DatabaseBox : public MythDialog
     void checkParent(QListViewItem *);
 
     void fillList(QListView *listview, QString &paths);
-    void fillNextLevel(QString level, int num, QString querystr, 
-                       QString matchstr, QStringList::Iterator line,
-                       QStringList lines, TreeItem *parent);
 
     QPixmap getPixmap(QString &level);
 
