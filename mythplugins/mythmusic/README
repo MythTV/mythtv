@@ -14,7 +14,7 @@ with this, as it won't work.
 In addition to MythTV's requirements, you'll need these software packages:
 (note: _all_ of these exist as software packages in Debian).
 
-   MAD - mp3 decoder library, and it's libid3tag library.  
+   MAD - mp3 decoder library, and its libid3tag library.  
          http://www.mars.org/home/rob/proj/mpeg/
 
    Vorbis - I've just used this with version 1.0.  You'll need a full install,
@@ -55,8 +55,8 @@ Now type 'qmake mythmusic.pro' then 'make' in the main distribution directory.
 
 Compiling note:  If you get an error on building this, that says something
                  about 'mkspecs', then you don't have the QTDIR environment
-                 variable set.  On debian, this should be set to /usr/share/qt.
-                 I hear on mandrake, it's /usr/lib/qt3.  You'll need to figure
+                 variable set.  On Debian, this should be set to /usr/share/qt.
+                 On Mandrake, it's /usr/lib/qt3.  You'll need to figure
                  out what it should be on your system, set the variable,
                  and attempt to compile again.
 
@@ -73,7 +73,7 @@ You'll want to go into the Music Settings section of the Setup item from
 mythfrontend and set at least the path where your music is stored.
 
 Once it's done searching for your music, the interface will show up.  It should
-be fairly easy to figure out..   Check out the howto for details.
+be fairly easy to figure out.   Check out the HOWTO for details.
 
 Feel free to subscribe to the development mailing list at:
 http://www.mythtv.org/mailman/listinfo/mythtv-dev
