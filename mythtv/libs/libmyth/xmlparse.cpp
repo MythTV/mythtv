@@ -123,7 +123,21 @@ void XMLParse::parseFont(QDomElement &element)
     QPoint shadowOffset = QPoint(0, 0);
     QString color = "#ffffff";
     QString dropcolor = "#000000";
-
+    
+    bool haveSizeSmall = false;
+    bool haveSizeBig = false;
+    bool haveSize = false;
+    bool haveFace = false;
+    bool haveColor = false;
+    bool haveDropColor = false;
+    bool haveBold = false;
+    bool haveShadow = false;
+    
+    
+    fontProp *baseFont = NULL;
+    
+    
+    
     name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
@@ -131,13 +145,34 @@ void XMLParse::parseFont(QDomElement &element)
         return;
     }
 
+    
+    
+    QString base =  element.attribute("base", "");
+    if (!base.isNull() && !base.isEmpty())
+    {
+        baseFont = GetFont(base);
+        if (!baseFont)
+        {
+            cerr << "Specified base font '" << base << "'  does not exist for font " << face << endl;
+            return;
+        }
+    }
+    
     face = element.attribute("face", "");
     if (face.isNull() || face.isEmpty())
     {
-        cerr << "Font needs a face\n";
-        return;
+        if (!baseFont)
+        {
+            cerr << "Font needs a face\n";
+            return;
+        }
     }
-
+    else
+    {
+        haveFace = true;
+    }
+    
+    
     for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling())
     {
@@ -146,32 +181,39 @@ void XMLParse::parseFont(QDomElement &element)
         {
             if (info.tagName() == "size")
             {
+                haveSize = true;
                 size = getFirstText(info).toInt();
             }
             else if (info.tagName() == "size:small")
             {
+                haveSizeSmall = true;
                 sizeSmall = getFirstText(info).toInt();
             }
             else if (info.tagName() == "size:big")
             {
+                haveSizeBig = true;
                 sizeBig = getFirstText(info).toInt();
             }
             else if (info.tagName() == "color")
             {
+                haveColor = true;
                 color = getFirstText(info);
             }
             else if (info.tagName() == "dropcolor")
             {
+                haveDropColor = true;
                 dropcolor = getFirstText(info);
             }
             else if (info.tagName() == "shadow")
             {
+                haveShadow = true;
                 shadowOffset = parsePoint(getFirstText(info));
                 shadowOffset.setX((int)(shadowOffset.x() * wmult));
                 shadowOffset.setY((int)(shadowOffset.y() * hmult));
             }
             else if (info.tagName() == "bold")
             {
+                haveBold = true;
                 bold = getFirstText(info);
             }
             else
@@ -188,37 +230,63 @@ void XMLParse::parseFont(QDomElement &element)
         cerr << "Error: already have a font called: " << name << endl;
         return;
     }
+    
+    fontProp newFont;
+    
+    if(baseFont)
+        newFont = *baseFont;
 
-    if (fontSizeType == "small")
+    if ( haveSizeSmall && fontSizeType == "small")
     {
         if (sizeSmall > 0)
             size = sizeSmall;
     }
-    else if (fontSizeType == "big")
+    else if( haveSizeBig && fontSizeType == "big")
     {
         if (sizeBig > 0)
             size = sizeBig;
     }
 
-    if (size < 0)
+    if (size < 0 && !baseFont)
     {
         cerr << "Error: font size must be > 0\n";
         return;
     }
 
-    size = (int)ceil(size * hmult);
+    if (baseFont && !haveFace)
+        face = baseFont->face.family();
+    
+    if (baseFont && !haveSize)
+        size = baseFont->face.pointSize();
+    else    
+        size = (int)ceil(size * hmult);
+    
     QFont temp(face, size);
-    if (bold.lower() == "yes")
-        temp.setBold(true);
-
-    QColor foreColor(color);
-    QColor dropColor(dropcolor);
-
-    fontProp newFont;
+    
+    if (baseFont && !haveBold)
+        temp.setBold(baseFont->face.bold());
+    else        
+    {
+        if (bold.lower() == "yes")
+            temp.setBold(true);
+    }
+    
     newFont.face = temp;
-    newFont.color = foreColor;
-    newFont.dropColor = dropColor;
-    newFont.shadowOffset = shadowOffset;
+    
+    if (haveColor)
+    {
+        QColor foreColor(color);
+        newFont.color = foreColor; 
+    }
+    
+    if (haveDropColor)
+    {
+        QColor dropColor(dropcolor);
+        newFont.dropColor = dropColor;
+    }
+    
+    if (haveShadow)
+        newFont.shadowOffset = shadowOffset;
     
     fontMap[name] = newFont;
 }
