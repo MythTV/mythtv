@@ -372,6 +372,19 @@ static void yuv420_argb32_non_mmx(unsigned char *image, unsigned char *py,
     int w, y, cb, cr, r_add, g_add, b_add, width2;
     int dstwidth;
 
+// byte indices
+#ifdef WORDS_BIGENDIAN
+#define R_OI  1
+#define G_OI  2
+#define B_OI  3
+#define A_OI  0
+#else
+#define R_OI  0
+#define G_OI  1
+#define B_OI  2
+#define A_OI  3
+#endif
+
     // squelch a warning
     rgb_stride = y_stride = uv_stride;
     
@@ -394,15 +407,15 @@ static void yuv420_argb32_non_mmx(unsigned char *image, unsigned char *py,
             b_add = C_BU * cb + (1 << (SCALE_BITS - 1));
 
             /* output 4 pixels */
-            RGBOUT(d1[0], d1[1], d1[2], y1_ptr[0]);
-            RGBOUT(d1[4], d1[5], d1[6], y1_ptr[1]);
-            RGBOUT(d2[0], d2[1], d2[2], y2_ptr[0]);
-            RGBOUT(d2[4], d2[5], d2[6], y2_ptr[1]);
+            RGBOUT(d1[R_OI],   d1[G_OI],   d1[B_OI],   y1_ptr[0]);
+            RGBOUT(d1[R_OI+4], d1[G_OI+4], d1[B_OI+4], y1_ptr[1]);
+            RGBOUT(d2[R_OI],   d2[G_OI],   d2[B_OI],   y2_ptr[0]);
+            RGBOUT(d2[R_OI+4], d2[G_OI+4], d2[B_OI+4], y2_ptr[1]);
 
             if (alphaones)
-                d1[3] = d1[7] = d2[3] = d2[7] = 0xff;
+                d1[A_OI] = d1[A_OI+4] = d2[A_OI] = d2[A_OI+4] = 0xff;
             else
-                d1[3] = d1[7] = d2[3] = d2[7] = 0;
+                d1[A_OI] = d1[A_OI+4] = d2[A_OI] = d2[A_OI+4] = 0;
 
             d1 += 8;
             d2 += 8;
@@ -429,55 +442,68 @@ void rgb32_to_yuv420p(unsigned char *lum, unsigned char *cb, unsigned char *cr,
     int r, g, b, r1, g1, b1;
     unsigned char *p;
                       
+// byte indices
+#ifdef WORDS_BIGENDIAN
+#define R_II  3
+#define G_II  2
+#define B_II  1
+#define A_II  0
+#else
+#define R_II  0
+#define G_II  1
+#define B_II  2
+#define A_II  3
+#endif
+
     wrap = width;
     wrap4 = srcwidth * 4;
     p = src;
     for(y=0;y<height;y+=2) {
         for(x=0;x<width;x+=2) {
-            r = p[0];
-            g = p[1];
-            b = p[2];
+            r = p[R_II];
+            g = p[G_II];
+            b = p[B_II];
             r1 = r;
             g1 = g;
             b1 = b;
             lum[0] = (FIX(0.29900) * r + FIX(0.58700) * g +
                       FIX(0.11400) * b + ONE_HALF) >> SCALEBITS;
-            alpha[0] = p[3];
-            
-            r = p[4];
-            g = p[5];
-            b = p[6];
+            alpha[0] = p[A_II];
+
+            r = p[R_II+4];
+            g = p[G_II+4];
+            b = p[B_II+4];
             r1 += r;
             g1 += g;
             b1 += b;
             lum[1] = (FIX(0.29900) * r + FIX(0.58700) * g +
                       FIX(0.11400) * b + ONE_HALF) >> SCALEBITS;
-            alpha[1] = p[7];
-            
+            alpha[1] = p[A_II+4];
+
             p += wrap4;
             lum += wrap;
             alpha += wrap;
-            
-            r = p[0];
-            g = p[1];
-            b = p[2];
+
+            r = p[R_II];
+            g = p[G_II];
+            b = p[B_II];
             r1 += r;
             g1 += g;
             b1 += b;
             lum[0] = (FIX(0.29900) * r + FIX(0.58700) * g +
                       FIX(0.11400) * b + ONE_HALF) >> SCALEBITS;
-            alpha[0] = p[3];
-            
-            r = p[4];
-            g = p[5];
-            b = p[6];
+            alpha[0] = p[A_II];
+
+            r = p[R_II+4];
+            g = p[G_II+4];
+            b = p[B_II+4];
             r1 += r;
             g1 += g;
             b1 += b;
             lum[1] = (FIX(0.29900) * r + FIX(0.58700) * g +
                       FIX(0.11400) * b + ONE_HALF) >> SCALEBITS;
-            alpha[1] = p[7];
-            
+            alpha[1] = p[A_II+4];
+
             cr[0] = ((- FIX(0.16874) * r1 - FIX(0.33126) * g1 +
                     FIX(0.50000) * b1 + 4 * ONE_HALF - 1) >> (SCALEBITS + 2)) +
                     128;
@@ -496,4 +522,3 @@ void rgb32_to_yuv420p(unsigned char *lum, unsigned char *cb, unsigned char *cr,
         alpha += wrap;
     }
 }
-

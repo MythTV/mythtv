@@ -29,6 +29,10 @@ extern "C" {
 
 #include "videodev_myth.h"
 
+#ifdef WORDS_BIGENDIAN
+#include "bswap.h"
+#endif
+
 #ifndef MJPIOC_S_PARAMS
 #include "videodev_mjpeg.h"
 #endif
@@ -1628,6 +1632,15 @@ void NuppelVideoRecorder::BufferIt(unsigned char *buf, int len)
     return;
 }
 
+inline void NuppelVideoRecorder::WriteFrameheader(rtframeheader *fh)
+{
+#ifdef WORDS_BIGENDIAN
+    fh->timecode     = bswap_32(fh->timecode);
+    fh->packetlength = bswap_32(fh->packetlength);
+#endif
+    ringBuffer->Write(fh, FRAMEHEADERSIZE);
+}
+
 void NuppelVideoRecorder::WriteHeader(void)
 {
     struct rtfileheader fileheader;
@@ -1658,6 +1671,18 @@ void NuppelVideoRecorder::WriteHeader(void)
     fileheader.textsblocks = -1; // TODO: make only -1 if VBI support active?
     fileheader.keyframedist = KEYFRAMEDIST;
 
+#ifdef WORDS_BIGENDIAN
+    fileheader.width         = bswap_32(fileheader.width);
+    fileheader.height        = bswap_32(fileheader.height);
+    fileheader.desiredwidth  = bswap_32(fileheader.desiredwidth);
+    fileheader.desiredheight = bswap_32(fileheader.desiredheight);
+    fileheader.aspect        = bswap_dbl(fileheader.aspect);
+    fileheader.fps           = bswap_dbl(fileheader.fps);
+    fileheader.videoblocks   = bswap_32(fileheader.videoblocks);
+    fileheader.audioblocks   = bswap_32(fileheader.audioblocks);
+    fileheader.textsblocks   = bswap_32(fileheader.textsblocks);
+    fileheader.keyframedist  = bswap_32(fileheader.keyframedist);
+#endif
     ringBuffer->Write(&fileheader, FILEHEADERSIZE);
 
     memset(&frameheader, 0, sizeof(frameheader));
@@ -1668,7 +1693,7 @@ void NuppelVideoRecorder::WriteHeader(void)
         frameheader.comptype = 'F';
         frameheader.packetlength = mpa_ctx->extradata_size;
 
-        ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
+        WriteFrameheader(&frameheader);
         ringBuffer->Write(mpa_ctx->extradata, frameheader.packetlength);
     }
     else
@@ -1677,7 +1702,7 @@ void NuppelVideoRecorder::WriteHeader(void)
         frameheader.packetlength = sizeof(tbls);
 
         // compression configuration header
-        ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
+        WriteFrameheader(&frameheader);
 
         memset(tbls, 0, sizeof(tbls));
         ringBuffer->Write(tbls, sizeof(tbls));
@@ -1688,7 +1713,7 @@ void NuppelVideoRecorder::WriteHeader(void)
     frameheader.packetlength = sizeof(extendeddata);
 
     // extended data header
-    ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
+    WriteFrameheader(&frameheader);
     
     struct extendeddata moredata;
     memset(&moredata, 0, sizeof(extendeddata));
@@ -1743,6 +1768,25 @@ void NuppelVideoRecorder::WriteHeader(void)
 
     extendeddataOffset = ringBuffer->GetFileWritePosition();
 
+#ifdef WORDS_BIGENDIAN
+    moredata.version                 = bswap_32(moredata.version);
+    moredata.video_fourcc            = bswap_32(moredata.video_fourcc);
+    moredata.audio_fourcc            = bswap_32(moredata.audio_fourcc);
+    moredata.audio_sample_rate       = bswap_32(moredata.audio_sample_rate);
+    moredata.audio_bits_per_sample   = bswap_32(moredata.audio_bits_per_sample);
+    moredata.audio_channels          = bswap_32(moredata.audio_channels);
+    moredata.audio_compression_ratio = bswap_32(moredata.audio_compression_ratio);
+    moredata.audio_quality           = bswap_32(moredata.audio_quality);
+    moredata.rtjpeg_quality          = bswap_32(moredata.rtjpeg_quality);
+    moredata.rtjpeg_luma_filter      = bswap_32(moredata.rtjpeg_luma_filter);
+    moredata.rtjpeg_chroma_filter    = bswap_32(moredata.rtjpeg_chroma_filter);
+    moredata.lavc_bitrate            = bswap_32(moredata.lavc_bitrate);
+    moredata.lavc_qmin               = bswap_32(moredata.lavc_qmin);
+    moredata.lavc_qmax               = bswap_32(moredata.lavc_qmax);
+    moredata.lavc_maxqdiff           = bswap_32(moredata.lavc_maxqdiff);
+    moredata.seektable_offset        = bswap_64(moredata.seektable_offset);
+    moredata.keyframeadjust_offset   = bswap_64(moredata.keyframeadjust_offset);
+#endif
     ringBuffer->Write(&moredata, sizeof(moredata));
 
     last_block = 0;
@@ -3264,14 +3308,14 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
         frameheader.packetlength = 0;             // no data packet
         frameheader.timecode     = (fnum-startnum)>>1;  
         // write video sync info
-        ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
+        WriteFrameheader(&frameheader);
         frameheader.frametype    = 'S';           // sync frame
         frameheader.comptype     = 'A';           // video sync information
         frameheader.filters      = 0;             // no filters applied
         frameheader.packetlength = 0;             // no data packet
         frameheader.timecode     = effectivedsp;  // effective dsp frequency
         // write audio sync info
-        ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
+        WriteFrameheader(&frameheader);
 
         wantkeyframe = true;
         //ringBuffer->Sync();
@@ -3353,7 +3397,7 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
         frameheader.packetlength =  0;   // no additional data needed
         frameheader.frametype    = 'V';  // last frame (or nullframe if first)
         frameheader.comptype    = 'L';
-        ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
+        WriteFrameheader(&frameheader);
         // we don't calculate sizes for lost frames for compression computation
         dropped--;
         frameofgop++;
@@ -3371,21 +3415,21 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
         {
             frameheader.comptype = '0';
             frameheader.packetlength = len;
-            ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
+            WriteFrameheader(&frameheader);
             ringBuffer->Write(buf, len);
         }
         else if (hardware_encode)
         {
             frameheader.comptype = '4';
             frameheader.packetlength = len;
-            ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
+            WriteFrameheader(&frameheader);
             ringBuffer->Write(buf, len);
         }
         else
         {
             frameheader.comptype = '4';
             frameheader.packetlength = tmp;
-            ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
+            WriteFrameheader(&frameheader);
             ringBuffer->Write(strm, tmp);
         }
     }
@@ -3395,14 +3439,14 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
         {
             frameheader.comptype  = '1'; // video compression: RTjpeg only
             frameheader.packetlength = tmp;
-            ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
+            WriteFrameheader(&frameheader);
             ringBuffer->Write(strm, tmp);
         } 
         else 
         {
             frameheader.comptype  = '0'; // raw YUV420
             frameheader.packetlength = len;
-            ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
+            WriteFrameheader(&frameheader);
             ringBuffer->Write(buf, len); // we write buf directly
         }
     } 
@@ -3413,7 +3457,7 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
         else
             frameheader.comptype  = '3'; // raw YUV420 with lzo
         frameheader.packetlength = out_len;
-        ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
+        WriteFrameheader(&frameheader);
         ringBuffer->Write(out, out_len);
     }
 
@@ -3539,7 +3583,7 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
 
         if (frameheader.packetlength > 0)
         {
-            ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
+            WriteFrameheader(&frameheader);
             ringBuffer->Write(mp3buf, compressedsize);
             ringBuffer->Write(mp3gapless, gaplesssize);
         }
@@ -3550,7 +3594,7 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
         frameheader.comptype = '0'; // uncompressed audio
         frameheader.packetlength = audio_buffer_size;
 
-        ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
+        WriteFrameheader(&frameheader);
         ringBuffer->Write(buf, audio_buffer_size);
         audiobytes += audio_buffer_size; // only audio no header!!
     }
@@ -3563,7 +3607,7 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
         frameheader.frametype = 'A'; // audio frame
         frameheader.comptype  = 'N'; // output a nullframe with
         frameheader.packetlength = 0;
-        ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
+        WriteFrameheader(&frameheader);
         audiobytes += audio_buffer_size;
         audio_behind--;
     }
@@ -3584,7 +3628,7 @@ void NuppelVideoRecorder::WriteText(unsigned char *buf, int len, int timecode,
         frameheader.comptype = 'T'; // european teletext
         frameheader.packetlength = sizeof(int) + len;
 
-        ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
+        WriteFrameheader(&frameheader);
         ringBuffer->Write(&pagenr, sizeof(int));
         ringBuffer->Write(buf, len);
     }
@@ -3593,7 +3637,7 @@ void NuppelVideoRecorder::WriteText(unsigned char *buf, int len, int timecode,
         frameheader.comptype = 'C';      // NTSC CC
         frameheader.packetlength = len;
 
-        ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
+        WriteFrameheader(&frameheader);
         ringBuffer->Write(buf, len);
     }
 }

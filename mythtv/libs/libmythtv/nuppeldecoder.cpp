@@ -15,6 +15,11 @@ using namespace std;
 
 #include "minilzo.h"
 
+#ifdef WORDS_BIGENDIAN
+#include "bswap.h"
+#endif
+
+
 pthread_mutex_t avcodeclock = PTHREAD_MUTEX_INITIALIZER;
 
 NuppelDecoder::NuppelDecoder(NuppelVideoPlayer *parent, MythSqlDatabase *db,
@@ -116,6 +121,40 @@ QString NuppelDecoder::GetEncodingType(void)
     return (value);
 }
 
+inline bool NuppelDecoder::ReadFileheader(rtfileheader *fh)
+{
+    if (ringBuffer->Read(fh, FILEHEADERSIZE) != FILEHEADERSIZE)
+        return false;
+
+#ifdef WORDS_BIGENDIAN
+    fh->width         = bswap_32(fh->width);
+    fh->height        = bswap_32(fh->height);
+    fh->desiredwidth  = bswap_32(fh->desiredwidth);
+    fh->desiredheight = bswap_32(fh->desiredheight);
+    fh->aspect        = bswap_dbl(fh->aspect);
+    fh->fps           = bswap_dbl(fh->fps);
+    fh->videoblocks   = bswap_32(fh->videoblocks);
+    fh->audioblocks   = bswap_32(fh->audioblocks);
+    fh->textsblocks   = bswap_32(fh->textsblocks);
+    fh->keyframedist  = bswap_32(fh->keyframedist);
+#endif
+
+    return true;
+}
+
+inline bool NuppelDecoder::ReadFrameheader(rtframeheader *fh)
+{
+    if (ringBuffer->Read(fh, FRAMEHEADERSIZE) != FRAMEHEADERSIZE)
+        return false;
+
+#ifdef WORDS_BIGENDIAN
+    fh->timecode     = bswap_32(fh->timecode);
+    fh->packetlength = bswap_32(fh->packetlength);
+#endif
+
+    return true;
+}
+
 int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo, 
                             char testbuf[2048])
 {
@@ -130,7 +169,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     char ftype;
     char *space;
 
-    if (ringBuffer->Read(&fileheader, FILEHEADERSIZE) != FILEHEADERSIZE)
+    if (!ReadFileheader(&fileheader))
     {
         cerr << "Error reading file: " << ringBuffer->GetFilename() << endl;
         return -1;
@@ -145,7 +184,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
         startpos = ringBuffer->GetTotalReadPosition();
 
-        if (ringBuffer->Read(&fileheader, FILEHEADERSIZE) != FILEHEADERSIZE)
+        if (!ReadFileheader(&fileheader))
         {
             cerr << "Error reading file: " << ringBuffer->GetFilename() << endl;
             return -1;
@@ -168,7 +207,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     keyframedist = fileheader.keyframedist;
     video_frame_rate = fileheader.fps;
 
-    if (FRAMEHEADERSIZE != ringBuffer->Read(&frameheader, FRAMEHEADERSIZE))
+    if (!ReadFrameheader(&frameheader))
     {
         cerr << "File not big enough for a header\n";
         return -1;
@@ -218,7 +257,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     startpos = ringBuffer->GetTotalReadPosition();
 
-    ringBuffer->Read(&frameheader, FRAMEHEADERSIZE);
+    ReadFrameheader(&frameheader);
 
     if (frameheader.frametype == 'X')
     {
@@ -229,8 +268,28 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         else
         {
             ringBuffer->Read(&extradata, frameheader.packetlength);
+#ifdef WORDS_BIGENDIAN
+            struct extendeddata *ed = &extradata;
+            ed->version                 = bswap_32(ed->version);
+            ed->video_fourcc            = bswap_32(ed->video_fourcc);
+            ed->audio_fourcc            = bswap_32(ed->audio_fourcc);
+            ed->audio_sample_rate       = bswap_32(ed->audio_sample_rate);
+            ed->audio_bits_per_sample   = bswap_32(ed->audio_bits_per_sample);
+            ed->audio_channels          = bswap_32(ed->audio_channels);
+            ed->audio_compression_ratio = bswap_32(ed->audio_compression_ratio);
+            ed->audio_quality           = bswap_32(ed->audio_quality);
+            ed->rtjpeg_quality          = bswap_32(ed->rtjpeg_quality);
+            ed->rtjpeg_luma_filter      = bswap_32(ed->rtjpeg_luma_filter);
+            ed->rtjpeg_chroma_filter    = bswap_32(ed->rtjpeg_chroma_filter);
+            ed->lavc_bitrate            = bswap_32(ed->lavc_bitrate);
+            ed->lavc_qmin               = bswap_32(ed->lavc_qmin);
+            ed->lavc_qmax               = bswap_32(ed->lavc_qmax);
+            ed->lavc_maxqdiff           = bswap_32(ed->lavc_maxqdiff);
+            ed->seektable_offset        = bswap_64(ed->seektable_offset);
+            ed->keyframeadjust_offset   = bswap_64(ed->keyframeadjust_offset);
+#endif
             usingextradata = true;
-            ringBuffer->Read(&frameheader, FRAMEHEADERSIZE);
+            ReadFrameheader(&frameheader);
         }
     }
 
@@ -244,7 +303,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
             perror("seek");
         }
 
-        ringBuffer->Read(&seek_frameheader, FRAMEHEADERSIZE);
+        ReadFrameheader(&seek_frameheader);
 
         if (seek_frameheader.frametype != 'Q')
         {
@@ -270,6 +329,10 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                 {
                     memcpy(&ste, seekbuf + offset,
                            sizeof(struct seektable_entry));
+#ifdef WORDS_BIGENDIAN
+                    ste.file_offset     = bswap_64(ste.file_offset);
+                    ste.keyframe_number = bswap_32(ste.keyframe_number);
+#endif
                     offset += sizeof(struct seektable_entry);
 
                     PosMapEntry e = {ste.keyframe_number,
@@ -329,6 +392,10 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                 {
                     memcpy(&kfate, kfa_buf + offset,
                            sizeof(struct kfatable_entry));
+#ifdef WORDS_BIGENDIAN
+                    kfate.adjust          = bswap_32(kfate.adjust);
+                    kfate.keyframe_number = bswap_32(kfate.keyframe_number);
+#endif
                     offset += sizeof(struct kfatable_entry);
 
                     keyFrameAdjustMap[kfate.keyframe_number] = kfate.adjust;
@@ -369,7 +436,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
         startpos = ringBuffer->GetTotalReadPosition();
 
-        if (ringBuffer->Read(&frameheader, FRAMEHEADERSIZE) != FRAMEHEADERSIZE)
+        if (!ReadFrameheader(&frameheader))
         {
             delete [] space;
             return -1;
@@ -392,6 +459,10 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         effdsp = extradata.audio_sample_rate * 100;
         m_parent->SetEffDsp(effdsp);
         audio_samplerate = extradata.audio_sample_rate;
+#ifdef WORDS_BIGENDIAN
+        // Why only if using extradata?
+        audio_bits_per_sample = extradata.audio_bits_per_sample;
+#endif
         m_parent->SetAudioParams(extradata.audio_bits_per_sample,
                                  extradata.audio_channels, 
                                  extradata.audio_sample_rate);
@@ -426,8 +497,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
         long long startpos2 = ringBuffer->GetTotalReadPosition();
 
-        foundit = (FRAMEHEADERSIZE != ringBuffer->Read(&frameheader,
-                                                       FRAMEHEADERSIZE));
+        foundit = !ReadFrameheader(&frameheader);
 
         bool framesearch = false;
 
@@ -447,8 +517,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
             startpos2 = ringBuffer->GetTotalReadPosition();
 
-            foundit = (FRAMEHEADERSIZE != ringBuffer->Read(&frameheader,
-                                                           FRAMEHEADERSIZE));
+            foundit = !ReadFrameheader(&frameheader);
             if (foundit)
                 break;
         }
@@ -818,7 +887,7 @@ void NuppelDecoder::GetFrame(int avignore)
     {
         long long currentposition = ringBuffer->GetTotalReadPosition();
 
-        if ((ringBuffer->Read(&frameheader, FRAMEHEADERSIZE) != FRAMEHEADERSIZE)
+        if (!ReadFrameheader(&frameheader)
             || (frameheader.frametype == 'Q') || (frameheader.frametype == 'K'))
         {
             ateof = true;
@@ -837,8 +906,7 @@ void NuppelDecoder::GetFrame(int avignore)
 
             ringBuffer->Seek((long long)seeklen-FRAMEHEADERSIZE, SEEK_CUR);
 
-            if (ringBuffer->Read(&frameheader, FRAMEHEADERSIZE)
-                != FRAMEHEADERSIZE)
+            if (!ReadFrameheader(&frameheader))
             {
                 ateof = true;
                 m_parent->SetEof();
@@ -1007,6 +1075,19 @@ void NuppelDecoder::GetFrame(int avignore)
             else
             {
                 getrawframes = 0;
+#ifdef WORDS_BIGENDIAN
+                // Why endian correct the audio buffer here?
+                // Don't big-endian clients have to do it in audiooutBlah.cpp?
+                if (audio_bits_per_sample == 16) {
+                    // swap bytes
+                    for (int i = 0; i < (frameheader.packetlength & ~1); i+=2) {
+                        char tmp;
+                        tmp = strm[i+1];
+                        strm[i+1] = strm[i];
+                        strm[i] = tmp;
+                    }
+                }
+#endif
                 m_parent->AddAudioData((char *)strm, frameheader.packetlength, 
                                        frameheader.timecode);
             }

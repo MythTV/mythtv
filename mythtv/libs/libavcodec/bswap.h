@@ -107,6 +107,18 @@ static inline uint64_t ByteSwap64(uint64_t x)
 
 #endif	/* !HAVE_BYTESWAP_H */
 
+static inline double bswap_dbl(double x)
+{
+    union {
+        uint32_t l[2];
+        double   d;
+    } t;
+    t.d = x;
+    t.l[0] = bswap_32(t.l[1]);
+    t.l[1] = bswap_32(t.l[0]);
+    return t.d;
+}
+
 // be2me ... BigEndian to MachineEndian
 // le2me ... LittleEndian to MachineEndian
 

@@ -96,8 +96,9 @@ CONFIG += using_joystick_menu
 #QMAKE_CXXFLAGS += `directfb-config --cflags`
 
 # Windows support
-#CONFIG += win32
-#DEFINES += _WIN32
+win32 {
+    DEFINES += _WIN32
+}
 
 # Mac OS X support
 macx {
@@ -105,6 +106,15 @@ macx {
     # For source that uses config.h, CONFIG_DARWIN is defined.
     # For other source (e.g. libmythtv), we define this
     DEFINES += CONFIG_DARWIN
+
+    # This .pro file doesn't include config.mak. Force processor architecture:
+    TARGET_ARCH_POWERPC=yes
+}
+
+contains( TARGET_ARCH_POWERPC, yes ) {
+    # Source that has endian-specific code should include config.h,
+    # but until this happens, we define it here:
+    DEFINES += WORDS_BIGENDIAN
 }
 
 # DirectX support
@@ -120,3 +130,19 @@ macx {
 #CONFIG += using_xrandr
 #DEFINES += USING_XRANDR
 
+# Please keep this CONFIG block as the last one
+macx {
+    # Disable the Linux defaults.
+    # Most developers will already know to hand-edit these out,
+    # but for the lazy ones who didn't, we will do it for them :-)
+    CONFIG     -= using_x11
+    CONFIG     -= using_xv
+    EXTRA_LIBS -= -L/usr/X11R6/lib -lXinerama -lXv -lX11 -lXext -lXxf86vm
+    CONFIG     -= using_ivtv
+    DEFINES    -= USING_IVTV
+    CONFIG     -= using_oss
+    DEFINES    -= USING_OSS
+    DEFINES    -= USING_OPENGL_VSYNC
+    EXTRA_LIBS -= -lGL -lGLU
+    CONFIG     -= using_opengl
+}

@@ -55,6 +55,9 @@ class NuppelDecoder : public DecoderBase
     QString GetEncodingType(void);
 
   private:
+    inline bool NuppelDecoder::ReadFileheader(struct rtfileheader *fileheader);
+    inline bool NuppelDecoder::ReadFrameheader(struct rtframeheader *frameheader);
+
     bool DecodeFrame(struct rtframeheader *frameheader,
                      unsigned char *lstrm, VideoFrame *frame);
     bool isValidFrametype(char type);
@@ -78,6 +81,9 @@ class NuppelDecoder : public DecoderBase
     int video_width, video_height, video_size;
     double video_frame_rate;
     int audio_samplerate;
+#ifdef WORDS_BIGENDIAN
+    int audio_bits_per_sample;
+#endif
 
     int ffmpeg_extradatasize;
     char *ffmpeg_extradata;
