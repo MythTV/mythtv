@@ -133,6 +133,11 @@
     <offset>62,30</offset>
   </buttondef>
 
+  <buttondef name="VCD_PLAY">
+    <image>watch_vcd.png</image>
+    <offset>10,25</offset>
+  </buttondef>
+
   <buttondef name="DVD_PLAY">
     <image>watch_dvd.png</image>
     <offset>10,25</offset>
