@@ -146,7 +146,9 @@ void runMenu(QString themedir, const QString &menuname)
     if (diag->foundTheme())
     {
         gContext->GetLCDDevice()->switchToTime();
+        qApp->unlock();
         diag->exec();
+        qApp->lock();
     }
     else
     {
@@ -225,7 +227,9 @@ void runVideoManager(void)
         VideoManager *manage = new VideoManager(QSqlDatabase::database(),
                                                 gContext->GetMainWindow(),
                                                 "video manager");
+        qApp->unlock();
         manage->exec();
+        qApp->lock();
         delete manage;
     }
 }
@@ -235,7 +239,9 @@ void runVideoBrowser(void)
     VideoBrowser *browse = new VideoBrowser(QSqlDatabase::database(),
                                             gContext->GetMainWindow(),
                                             "video browser");
+    qApp->unlock();
     browse->exec();
+    qApp->lock();
     delete browse;
 }
 
@@ -246,7 +252,9 @@ void runVideoTree(void)
                                     "videotree",
                                     "video-",
                                     "video tree");
+    qApp->unlock();
     tree->exec();
+    qApp->lock();
     delete tree;
 }
 
@@ -276,7 +284,9 @@ void runVideoGallery(void)
     VideoGallery *gallery = new VideoGallery(QSqlDatabase::database(),
                                              gContext->GetMainWindow(),
                                              "video gallery");
+    qApp->unlock();
     gallery->exec();
+    qApp->lock();
     delete gallery;
 }
 

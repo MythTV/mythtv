@@ -840,7 +840,9 @@ void VideoGallery::handleVideoSelect()
 
     VideoSelected *selected = new VideoSelected(db, gContext->GetMainWindow(),
                                                 "video selected", where_we_are->getInt());
+    qApp->unlock();
     selected->exec();
+    qApp->lock();
     delete selected;
 }
 
