@@ -1220,7 +1220,7 @@ bool PlaybackBox::FillList()
 
     QString episodeSort = gContext->GetSetting("PlayBoxEpisodeSort", "Date");
 
-    if (episodeSort == "Id")
+    if (episodeSort == "Id" && titleView)
     {
         QMap<QString, ProgramList>::Iterator Iprog;
         for (Iprog = progLists.begin(); Iprog != progLists.end(); ++Iprog)
@@ -1264,9 +1264,9 @@ bool PlaybackBox::FillList()
         {
             p = l->at(i);
 
-            if (episodeSort == "Id")
+            if (episodeSort == "Id" && titleView && titleIndex > 0)
             {
-                if (oldprogramid >= p->programid)
+                if (oldprogramid > p->programid)
                     break;
             }
             else if (listOrder == 0 || type == Delete)
