@@ -125,7 +125,9 @@ struct XvMCData
 
     int colorkey;
     bool needdrawcolor;
+    bool initialdraw;
 };
+
 
 static int XJ_error_catcher(Display * d, XErrorEvent * xeev)
 {
@@ -239,6 +241,7 @@ bool VideoOutputXvMC::Init(int width, int height, float aspect,
     pthread_mutex_init(&lock, NULL);
 
     needrepaint = true;
+    data->initialdraw = true;
 
     int (*old_handler)(Display *, XErrorEvent *);
     int i, ret;
@@ -760,6 +763,10 @@ void VideoOutputXvMC::Exit(void)
 {
     if (XJ_started) 
     {
+        XSetForeground(data->XJ_disp, data->XJ_gc, XJ_black);
+        XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc,
+                       dispx, dispy, dispw, disph);
+
         m_deinterlacing = false;
         InitColorKey(false);
 
@@ -911,6 +918,7 @@ void VideoOutputXvMC::PrepareFrame(VideoFrame *buffer, FrameScanType t)
 
     if (needrepaint)
     {
+        data->initialdraw = false;
         DrawUnusedRects(false);
         needrepaint = false;
     }
@@ -1116,7 +1124,7 @@ void VideoOutputXvMC::DrawUnusedRects(bool sync)
     int boboff = (int) round(((float)disphoff)/480 - 0.001f);
     boboff = (m_deinterlacing && m_deintfiltername == "bobdeint") ? boboff : 0;
 
-    if (data->needdrawcolor)
+    if (data->needdrawcolor && !data->initialdraw)
     {
         XSetForeground(data->XJ_disp, data->XJ_gc, data->colorkey);
         XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc,

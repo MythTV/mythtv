@@ -69,6 +69,7 @@ struct XvData
 
     int colorkey;
     bool needdrawcolor;
+    bool initialdraw;
 };
 
 #define GUID_I420_PLANAR 0x30323449
@@ -228,6 +229,7 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
     pthread_mutex_init(&lock, NULL);
 
     needrepaint = true;
+    data->initialdraw = true;
 
     int (*old_handler)(Display *, XErrorEvent *);
     int i, ret;
@@ -718,6 +720,10 @@ void VideoOutputXv::Exit(void)
 {
     if (XJ_started) 
     {
+        XSetForeground(data->XJ_disp, data->XJ_gc, XJ_black);
+        XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc,
+                       dispx, dispy, dispw, disph);
+
         m_deinterlacing = false;
         InitColorKey(false);
 
@@ -882,6 +888,7 @@ void VideoOutputXv::PrepareFrame(VideoFrame *buffer, FrameScanType t)
 
         if (needrepaint)
         {
+            data->initialdraw = false;
             DrawUnusedRects(false);
             needrepaint = false;
         }
@@ -1055,7 +1062,7 @@ void VideoOutputXv::DrawUnusedRects(bool sync)
     //VERBOSE(VB_PLAYBACK, QString("disphoff(%1) boboff(%2) ndc(%3)")
     //        .arg(disphoff).arg(boboff).arg((data->needdrawcolor?"yes":"no")));
 
-    if (data->needdrawcolor)
+    if (data->needdrawcolor && !data->initialdraw)
     {
         XSetForeground(data->XJ_disp, data->XJ_gc, data->colorkey);
         XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, dispx, 
