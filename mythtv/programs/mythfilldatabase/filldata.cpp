@@ -2410,8 +2410,7 @@ void clearOldDBEntries(void)
     query.exec(querystr);
 
     querystr.sprintf("DELETE FROM record WHERE (type = %d "
-                     "OR type = %d OR type = %d) AND enddate < "
-                     "DATE_SUB(CURRENT_DATE, INTERVAL 1 DAY);",
+                     "OR type = %d OR type = %d) AND enddate < NOW();",
                      kSingleRecord, kOverrideRecord, kDontRecord);
     query.exec(querystr);
 }

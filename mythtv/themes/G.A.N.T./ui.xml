@@ -1674,7 +1674,7 @@
     <container name="program_info">
       <area>20,408,760,240</area>
       <textarea name="title" draworder="6">
-        <area>0,0,800,40</area>
+        <area>0,0,760,40</area>
         <font>title</font>
       </textarea>
       <textarea name="channel" draworder="6">
@@ -1693,11 +1693,11 @@
 %%DESCRIPTION%</value>
       </textarea>
       <textarea name="type" draworder="6">
-        <area>0,160,500,30</area>
+        <area>0,160,540,30</area>
         <font>yellowinfo</font>
       </textarea>
       <textarea name="programid" draworder="6" align="right">
-        <area>520,160,240,30</area>
+        <area>520,160,200,30</area>
         <font>message</font>
       </textarea>
     </container>
