@@ -85,7 +85,12 @@ GuideGrid::GuideGrid(MythContext *context, const QString &channel, TV *player,
     programGuideType = m_context->GetNumSetting("EPGType");
     if (programGuideType == 1)
     {
-        DISPLAY_CHANS = 8;
+	int dNum = m_context->GetNumSetting("chanPerPage");
+	if (dNum != 0)
+		DISPLAY_CHANS = dNum;
+	else
+        	DISPLAY_CHANS = 8;
+
         setupColorScheme();
     }
 
