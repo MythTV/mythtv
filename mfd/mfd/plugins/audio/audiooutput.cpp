@@ -196,15 +196,7 @@ void MMAudioOutput::reset()
         usleep(50);
     }
 
-    close(audio_fd);
-
-    audio_fd = open(audio_device, O_WRONLY, 0);
-
-    if (audio_fd < 0) {
-	error(QString("AudioOutput: failed to open output device '%1'").
-	      arg(audio_device));
-	return;
-    }
+    fcntl(audio_fd, F_SETFL, fcntl(audio_fd, F_GETFL) & ~O_NONBLOCK);
 
     int flags;
     if ((flags = fcntl(audio_fd, F_GETFL, 0)) > 0) {

@@ -11,6 +11,8 @@
 #include <qvaluelist.h>
 
 #include "mfd_events.h"
+#include "httprequest.h"
+#include "httpresponse.h"
 
 #include "daapserver.h"
 #include "mcc_bitfield.h"
@@ -22,31 +24,10 @@ using namespace std;
 #include "daaplib/tagoutput.h"
 #include "daaplib/registry.h"
 
-// #include "./httpd_persistent/httpd.h"
-
 DaapServer *daap_server = NULL;
 
 
 const int   DAAP_OK = 200;
-
-/*
-
-extern "C" void handleSelectCallback(bool *continue_flag)
-{
-    *continue_flag = daap_server->wantsToContinue();
-}
-
-
-extern "C" void parseRequest( httpd *server, void *)
-{
-
-    daap_server->parseIncomingRequest(server);
-}
-
-*/
-/*
----------------------------------------------------------------------
-*/
 
 
 DaapServer::DaapServer(MFD *owner, int identity)
@@ -80,84 +61,8 @@ DaapServer::DaapServer(MFD *owner, int identity)
 }
 
 
-void DaapServer::handleIncoming(HttpRequest *request)
+void DaapServer::handleIncoming(HttpRequest *http_request)
 {
-    cout << "handling request" << endl;
-}
-
-
-/*
-
-void DaapServer::run()
-{
-    //
-    //  Register this (daap) service
-    //
-
-    ServiceEvent *se = new ServiceEvent(QString("services add daap %1 %2")
-                                       .arg(port_number)
-                                       .arg(service_name));
-    QApplication::postEvent(parent, se);
-
-    //
-    //  Create an httpd server (hey .. wadda ya need Apache for?)
-    //
-
-    httpd *server;
-
-    server = httpdCreate(NULL, 3689);
-    if(!server)
-    {
-        fatal("daapserver could not create a persistent http server ... will be unloaded");
-    }
-
-    //
-    //  You can uncomment these to get libhttp to log to the console
-    //
-
-    //httpdSetAccessLog( server, stdout );
-    //httpdSetErrorLog( server, stderr );
-
-    //
-    // Tell libhttp we want to parse all requests ourself
-    //
-    
-    httpdAddCSiteContent( server, parseRequest, (void*)0);
-    httpdSetContentType( server, "application/x-dmap-tagged" );
-
-    //
-    //  Ask the select loop in httpd to call us each time through
-    //  the iterations
-    //
-    
-    httpdAddSelectCallback(server, handleSelectCallback);
-    
-
-    while(keep_going)
-    {
-        timeout.tv_sec  = 2;
-        timeout.tv_usec = 0;
-
-        //
-        //  This SelectLoop will pop a callback to handleSelectCallback()
-        //  every tv_sec's, where we can tell it to stop if needed
-        //
-        
-        httpdSelectLoop( server, timeout);
-        
-    }
-    
-    //
-    //  For plugin reloading to work, we need to clean up after httpd
-    //
-
-    httpdDestroy(server);
-    server = NULL;
-}
-
-void DaapServer::parseIncomingRequest(httpd *server)
-{
-
     metadata_audio_generation = parent->getMetadataAudioGeneration();
 
     //
@@ -171,7 +76,7 @@ void DaapServer::parseIncomingRequest(httpd *server)
     //  Start to build up the request by parsing the path of the request.
     //
     
-    parsePath(server, daap_request);
+    parsePath(http_request, daap_request);
     
     //
     //  Make sure we understand the path
@@ -188,22 +93,25 @@ void DaapServer::parseIncomingRequest(httpd *server)
     
     else if( daap_request->getRequestType() == DAAP_REQUEST_SERVINFO )
     {
-        sendServerInfo(server);
+        sendServerInfo(http_request);
         return;
     }   
+
     else if( daap_request->getRequestType() == DAAP_REQUEST_LOGIN)
     {
         u32 session_id = daap_sessions.getNewId();
-        sendLogin( server, session_id);
+        sendLogin( http_request, session_id);
         return;
     }
+
 
     //
     //  IF we've made it this far, then we have a logged in client, so we
     //  should be able to parse the request to get session ID, etc.
     //
 
-    parseVariables( server, daap_request);
+    parseVariables( http_request, daap_request);
+
 
     if(!daap_sessions.isValid(daap_request->getSessionId()))
     {
@@ -213,7 +121,7 @@ void DaapServer::parseIncomingRequest(httpd *server)
         //  (which it can get by requesting a login).
         //
         
-        httpdSend403( server );
+        http_request->getResponse()->setError(403); // forbidden
         return;
     }
     
@@ -240,11 +148,11 @@ void DaapServer::parseIncomingRequest(httpd *server)
                         .arg(parent->getMetadataAudioGeneration())
                         .arg(daap_request->getDatabaseVersion()), 9);
 
-            sendUpdate(server, parent->getMetadataAudioGeneration());
+            sendUpdate(http_request, parent->getMetadataAudioGeneration());
         }
         else
         {
-            sendMetadata( server, httpdRequestPath(server), daap_request);
+            sendMetadata(http_request, http_request->getUrl(), daap_request);
         }        
         return;        
     }
@@ -263,7 +171,7 @@ void DaapServer::parseIncomingRequest(httpd *server)
                         "(mfd db# = %1, client db# = %2)")
                         .arg(parent->getMetadataAudioGeneration())
                         .arg(daap_request->getDatabaseVersion()), 9);
-            sendUpdate(server, parent->getMetadataAudioGeneration());
+            sendUpdate(http_request, parent->getMetadataAudioGeneration());
         }
         else
         {
@@ -273,17 +181,19 @@ void DaapServer::parseIncomingRequest(httpd *server)
             //
             
             //  FIX            
+            http_request->sendResponse(false);
         }
     }
+
     
     delete daap_request;
     
 }
 
 
-void DaapServer::parsePath(httpd *server, DaapRequest *daap_request)
+void DaapServer::parsePath(HttpRequest *http_request, DaapRequest *daap_request)
 {
-    QString the_path = httpdRequestPath(server);
+    QString the_path = http_request->getUrl();
 
     //
     //  Figure out what kind of request this is
@@ -338,21 +248,27 @@ void DaapServer::parsePath(httpd *server, DaapRequest *daap_request)
         //  Send an httpd 400 error to the client
         //
 
-        httpdSend400( server );
+        http_request->getResponse()->setError(400);
 
     }
 }
 
-void DaapServer::sendServerInfo(httpd *server)
+
+
+
+void DaapServer::sendServerInfo(HttpRequest *http_request)
 {
     Version daapVersion( 2, 0 );
     Version dmapVersion( 1, 0 );
+ 
+/*
     double version = httpdRequestDaapVersion( server );
 
     if( version == 1.0 ) {
         daapVersion.hi = 1;
         daapVersion.lo = 0;
     } 
+*/
     
     TagOutput response;
     
@@ -377,99 +293,122 @@ void DaapServer::sendServerInfo(httpd *server)
              
              << end;
 
-    sendTag( server, response.data() );
+    sendTag( http_request, response.data() );
     
 }
 
-void DaapServer::sendTag( httpd* server, const Chunk& c ) 
+
+
+
+void DaapServer::sendTag( HttpRequest *http_request, const Chunk& c ) 
 {
-    httpdSetContentType( server, "application/x-dmap-tagged" );
-    httpdWrite( server, (char*) c.begin(), c.size() );
+    //
+    //  Set some header stuff 
+    //
+    
+    http_request->getResponse()->addHeader("Content-Type: application/x-dmap-tagged");
+    http_request->getResponse()->addHeader(QString("Content-Length: %1")
+                                           .arg(c.size()));
+    //
+    //  Set the payload
+    //
+    
+    http_request->getResponse()->setPayload((char*) c.begin(), c.size());
+    
+    //
+    //  We are done ... this will exit out and the base class will send it off
+    //
 }
 
-void DaapServer::sendLogin(httpd *server, u32 session_id)
+
+
+void DaapServer::sendLogin(HttpRequest *http_request, u32 session_id)
 {
     TagOutput response;
     response << Tag('mlog') << Tag('mstt') << (u32) DAAP_OK << end 
              << Tag('mlid') << (u32) session_id << end 
              << end;
-    sendTag( server, response.data() );
+    sendTag( http_request, response.data() );
 }
 
-void DaapServer::parseVariables(httpd *server, DaapRequest *daap_request)
-{
-    bool ok;
-    httpVar *varPtr;
 
+
+void DaapServer::parseVariables(HttpRequest *http_request, DaapRequest *daap_request)
+{
     //
     //  Check the user agent header that httpd returns to take note of which
     //  kind of client this is (for iTunes we (will) need to re-encode some
     //  content on the fly.
     //
 
-    QString user_agent = server->request.userAgent;
+    QString user_agent = http_request->getHeader("User-Agent");
+    // QString user_agent = server->request.userAgent;
     if(user_agent.contains("iTunes/4"))
     {
         daap_request->setClientType(DAAP_CLIENT_ITUNES4X);
     }
-    
 
     //
-    //  This goes through the data that came in on the client request,
-    //  breaks it up into useful pieces, and assigns them to our DaapRequest
-    //  object
+    //  This goes through the data that came in on the client request and
+    //  assigns useful data to our DaapRequest object
     //
 
+    bool ok;
+    QString variable;
 
-    if ( ( varPtr = httpdGetVariableByName ( server, "session-id" ) ) != NULL)
+
+    if ( ( variable = http_request->getVariable("session-id") ) != NULL)
     {
-        daap_request->setSessionId(QString(varPtr->value).toULong(&ok));
+        daap_request->setSessionId(variable.toULong(&ok));
         if(!ok)
             warning("daapserver failed to parse session id from client request");
     }
 
-    if ( ( varPtr = httpdGetVariableByName ( server, "revision-number" ) ) != NULL)
+    if ( ( variable = http_request->getVariable("revision-number" ) ) != NULL)
     {
-        daap_request->setDatabaseVersion(QString(varPtr->value).toULong(&ok));
+        daap_request->setDatabaseVersion(variable.toULong(&ok));
         if(!ok)
             warning("daapserver failed to parse database version from client request");
     }
 
-    if ( ( varPtr = httpdGetVariableByName ( server, "delta" ) ) != NULL)
+    if ( ( variable = http_request->getVariable("delta" ) ) != NULL)
     {
-        daap_request->setDatabaseDelta(QString(varPtr->value).toULong(&ok));
+        daap_request->setDatabaseDelta(variable.toULong(&ok));
         if(!ok)
             warning("daapserver failed to parse database delta from client request");
     }
 
-    if ( ( varPtr = httpdGetVariableByName ( server, "type" ) ) != NULL)
+    if ( ( variable = http_request->getVariable("type" ) ) != NULL)
     {
-        daap_request->setContentType(QString(varPtr->value));
+        daap_request->setContentType(variable);
     }
     
-    if ( ( varPtr = httpdGetVariableByName ( server, "meta" ) ) != NULL)
+    if ( ( variable = http_request->getVariable("meta" ) ) != NULL)
     {
-        daap_request->setRawMetaContentCodes(QStringList::split(",",QString(varPtr->value)));
+        daap_request->setRawMetaContentCodes(QStringList::split(",",variable));
         daap_request->parseRawMetaContentCodes();
     }
 
-    if ( ( varPtr = httpdGetVariableByName ( server, "filter" ) ) != NULL)
+    if ( ( variable = http_request->getVariable("filter" ) ) != NULL)
     {
-        daap_request->setFilter(QString(varPtr->value));
+        daap_request->setFilter(variable);
     }
     
-    if ( ( varPtr = httpdGetVariableByName ( server, "query" ) ) != NULL)
+    if ( ( variable = http_request->getVariable("query" ) ) != NULL)
     {
-        daap_request->setQuery(QString(varPtr->value));
+        daap_request->setQuery(variable);
     }
     
-    if ( ( varPtr = httpdGetVariableByName ( server, "index" ) ) != NULL)
+    if ( ( variable = http_request->getVariable("index" ) ) != NULL)
     {
-        daap_request->setIndex(QString(varPtr->value));
+        daap_request->setIndex(variable);
     }
+
 }
 
-void DaapServer::sendUpdate(httpd *server, u32 database_version)
+
+
+void DaapServer::sendUpdate(HttpRequest *http_request, u32 database_version)
 {
 
     TagOutput response;
@@ -478,11 +417,12 @@ void DaapServer::sendUpdate(httpd *server, u32 database_version)
              << Tag('musr') << (u32) database_version << end 
              << end;
 
-    sendTag( server, response.data() );
+    sendTag( http_request, response.data() );
     
 }
 
-void DaapServer::sendMetadata(httpd *server, QString request_path, DaapRequest *daap_request)
+
+void DaapServer::sendMetadata(HttpRequest *http_request, QString request_path, DaapRequest *daap_request)
 {
     //
     //  The request_path is the key here. The client specifies what is
@@ -505,7 +445,7 @@ void DaapServer::sendMetadata(httpd *server, QString request_path, DaapRequest *
         //  It must (*must*) have asked for /databases
         //
         
-        sendDatabaseList( server);
+        sendDatabaseList(http_request);
     } 
     else 
     {
@@ -514,22 +454,24 @@ void DaapServer::sendMetadata(httpd *server, QString request_path, DaapRequest *
         //
 
         
-        if( components[1].toULong() != (ulong) all_the_metadata->getCurrentGeneration() ||
+        /*
+        if( components[1].toULong() != (ulong) parent->getMetadataAudioGeneration() ||
             components.count() < 3)
         {
             //
             //  I don't know what it's asking for ... doesn't make sense ... or db is out of date
             //
             
-            httpdSend403(server);
+            http_request->getResponse()->setError(403);
             return;
         }
+        */
  
         if( components[2] == "items" )
         {
             if( components.count() == 3 )
             {
-                sendDatabase( server, daap_request, components[1].toInt());
+                sendDatabase( http_request, daap_request, components[1].toInt());
             } 
             else if ( components.count() == 4 )
             {
@@ -539,7 +481,7 @@ void DaapServer::sendMetadata(httpd *server, QString request_path, DaapRequest *
                 u32 song_id = cut_down.toULong(&ok);
                 if(ok)
                 {
-                    sendDatabaseItem(server, song_id);
+                    sendDatabaseItem(http_request, song_id);
                 }
                 else
                 {
@@ -551,34 +493,34 @@ void DaapServer::sendMetadata(httpd *server, QString request_path, DaapRequest *
         {
             if( components.count() == 3 )
             {
-                sendContainers( server, daap_request, components[1].toInt());
+                sendContainers( http_request, daap_request, components[1].toInt());
             } 
             else if ( components.count() == 5 && components[4] == "items" )
             {
                 u32 container_id = components[3].toULong();
-                sendContainer(server, container_id, components[1].toInt());
+                sendContainer(http_request, container_id, components[1].toInt());
 
             } 
             else 
             {
-                httpdSend403( server );
+                http_request->getResponse()->setError(403);
                 return;
             }
         } 
         else 
         {
-            httpdSend403( server );
+            http_request->getResponse()->setError(403);
             return;
         }
     }    
 }
 
-void DaapServer::sendDatabaseList( httpd *server)
+void DaapServer::sendDatabaseList(HttpRequest *http_request)
 {
 
     //
     //  Since iTunes (and, therefore, the notion of a "reference" daap
-    //  client) is somewhat brain dead, we have to fold out our *audio*
+    //  client) is somewhat brain dead, we have to fold all our *audio*
     //  collections together to make them look like a single collection
     //
     //  So, as far as iTunes is concerned, there is only 1 database which
@@ -604,11 +546,11 @@ void DaapServer::sendDatabaseList( httpd *server)
                 << end 
              << end;
 
-    sendTag( server, response.data() );
+    sendTag( http_request, response.data() );
 
 }
 
-void DaapServer::sendDatabase(httpd *server, DaapRequest *daap_request, int which_database)
+void DaapServer::sendDatabase(HttpRequest *http_request, DaapRequest *daap_request, int which_database)
 { 
     if(which_database != 1)
     {
@@ -653,7 +595,6 @@ void DaapServer::sendDatabase(httpd *server, DaapRequest *daap_request, int whic
             
                     for( ; iterator.current(); ++iterator)
                     {
-                
                         if(iterator.current()->getType() == MDT_audio)
                         {
                             AudioMetadata *which_item = (AudioMetadata*)iterator.current();
@@ -867,13 +808,12 @@ void DaapServer::sendDatabase(httpd *server, DaapRequest *daap_request, int whic
              }
              response << end 
                       << end;
-
              parent->unlockMetadata();
 
-    sendTag( server, response.data() );
+    sendTag( http_request, response.data() );
 }
 
-void DaapServer::sendDatabaseItem(httpd *server, u32 song_id)
+void DaapServer::sendDatabaseItem(HttpRequest *http_request, u32 song_id)
 {
     
 
@@ -885,7 +825,11 @@ void DaapServer::sendDatabaseItem(httpd *server, u32 song_id)
             AudioMetadata *which_audio = (AudioMetadata*)which_one;
             QUrl file_url = which_audio->getUrl();
             QString file_path = file_url.path();
-            httpdSendFile( server, (char *) file_path.ascii(), httpdRequestContentRange( server ) );
+
+            
+            cout << "setting sendFile() to \"" << file_path << "\"" << endl;
+            http_request->getResponse()->sendFile(file_path);
+
         }
         else
         {
@@ -899,7 +843,7 @@ void DaapServer::sendDatabaseItem(httpd *server, u32 song_id)
 
 }
 
-void DaapServer::sendContainers(httpd *server, DaapRequest *daap_request, int which_database)
+void DaapServer::sendContainers(HttpRequest *http_request, DaapRequest *daap_request, int which_database)
 {
     if(which_database != 1)
     {
@@ -978,11 +922,11 @@ void DaapServer::sendContainers(httpd *server, DaapRequest *daap_request, int wh
             response << end
             << end;
 
-    sendTag( server, response.data() );
+    sendTag( http_request, response.data() );
 
 }
 
-void DaapServer::sendContainer(httpd *server, u32 container_id, int which_database)
+void DaapServer::sendContainer(HttpRequest *http_request, u32 container_id, int which_database)
 {
     if(which_database != 1)
     {
@@ -1091,27 +1035,9 @@ void DaapServer::sendContainer(httpd *server, u32 container_id, int which_databa
              response << end 
              << end;
 
-    sendTag( server, response.data() );
+    sendTag( http_request, response.data() );
 
 }
-
-bool DaapServer::wantsToContinue()
-{
-    //
-    //  polling check for database changes
-    //
-    
-    if(parent->getMetadataAudioGeneration() != metadata_audio_generation)
-    {
-            //
-            //  We want to send an update here, but we need a better http 
-            //  server infrastructure before we can do it.  FIX
-            //
-    }
-    
-    return keep_going;
-}
-*/
 
 DaapServer::~DaapServer()
 {

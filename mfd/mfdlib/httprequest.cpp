@@ -14,6 +14,41 @@ using namespace std;
 #include <qstringlist.h>
 
 #include "httprequest.h"
+#include "httpresponse.h"
+
+HttpGetVariable::HttpGetVariable(const QString &text_segment)
+{
+    //
+    //  Take a line of text and parse into a matching set of HTTP get
+    //  variable field names and values
+    //
+    
+    field = text_segment.section('=', 0, 0);
+    value = text_segment.section('=', 1);
+
+    //
+    //  Do %20 (etc.) changes ?
+    //
+}
+
+
+const QString& HttpGetVariable::getField()
+{
+    return field;
+}
+
+const QString& HttpGetVariable::getValue()
+{
+    return value;
+}
+
+HttpGetVariable::~HttpGetVariable()
+{
+}
+
+/*
+---------------------------------------------------------------------
+*/
 
 HttpHeader::HttpHeader(const QString &input_line)
 {
@@ -35,6 +70,11 @@ const QString& HttpHeader::getField()
     return field;
 }
 
+const QString& HttpHeader::getValue()
+{
+    return value;
+}
+
 HttpHeader::~HttpHeader()
 {
 }
@@ -42,12 +82,21 @@ HttpHeader::~HttpHeader()
 /*
 ---------------------------------------------------------------------
 */
+
+
 HttpRequest::HttpRequest(char *raw_incoming, int incoming_length)
 {
     raw_request = NULL;
     top_line = "";
     all_is_well = true;
+    send_response = true;
     headers.setAutoDelete(true);
+    
+    //
+    //  Every request gets a response
+    //
+    
+    my_response = new HttpResponse();
     
     if(incoming_length > MAX_CLIENT_INCOMING)
     {
@@ -110,7 +159,27 @@ HttpRequest::HttpRequest(char *raw_incoming, int incoming_length)
                     all_is_well = false;
                     return;
                 }
-                url = line_tokens[1];
+                
+                //
+                //  Set the URL 
+                //
+                
+                url = line_tokens[1].section('?', 0, 0);
+                
+                //
+                //  Pull out any http get variables
+                //
+                
+                QString get_variables_string = line_tokens[1].section('?', 1);
+                
+                QStringList get_variables_list = QStringList::split( "&", get_variables_string );
+                
+                for(uint i= 0; i < get_variables_list.count(); i++)
+                {
+                    HttpGetVariable *new_gv = new HttpGetVariable(get_variables_list[i]);
+                    get_variables.insert(new_gv->getField(), new_gv);
+                }
+                
                 
                 //
                 //  Check that we're speaking _http_ and that version is 1.1
@@ -177,15 +246,17 @@ int HttpRequest::readLine(int *parse_point, char *parsing_buffer)
     int  index = *parse_point;
     while(keep_reading)
     {
-        if(index >= raw_length - 1 )
+        
+        if(index >= raw_length )
         {
             //
             //  No data at all.
             //
 
-            parsing_buffer[0] = '\0';
+            parsing_buffer[amount_read] = '\0';
             keep_reading = false;
         }
+         
         else if(raw_request[index] == '\r')
         {
             //
@@ -202,6 +273,7 @@ int HttpRequest::readLine(int *parse_point, char *parsing_buffer)
 
             index++;
             parsing_buffer[amount_read] = '\0';
+            //amount_read++;
             keep_reading = false;
         }
         else
@@ -215,6 +287,26 @@ int HttpRequest::readLine(int *parse_point, char *parsing_buffer)
     return amount_read;
 }
 
+QString HttpRequest::getHeader(const QString& field_label)
+{
+    HttpHeader *which_one = headers.find(field_label);
+    if(which_one)
+    {
+        return which_one->getValue();
+    }
+    return NULL;
+}
+
+QString HttpRequest::getVariable(const QString& variable_name)
+{
+    HttpGetVariable *which_one = get_variables.find(variable_name);
+    if(which_one)
+    {
+        return which_one->getValue();
+    }
+    return NULL;
+}
+
 HttpRequest::~HttpRequest()
 {
     if(raw_request)
@@ -222,6 +314,13 @@ HttpRequest::~HttpRequest()
         delete [] raw_request;
         raw_request = NULL;
     }
+
     headers.clear();
+    get_variables.clear();
+    
+    if(my_response)
+    {
+        delete my_response;
+    }
 }
 

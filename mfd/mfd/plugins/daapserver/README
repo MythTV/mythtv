@@ -14,8 +14,3 @@ library is built and linked staticly. Credits for daaplib are:
     Copyright (c) deleet 2003, Alexander Oberdoerster & Johannes Zander
     http://deleet.de/projekte/daap/daaplib/
 
-It also uses a bunch of routines from libhttpd, a small library for http
-connections (which is how DAAP works). This library is originally Copyright
-(c) 2002 Hughes Technologies Pty Ltd. It was modified by Alexander
-Oberdoerster (for persistence). The httpd library is built and linked staticly.
-

@@ -27,25 +27,20 @@ class DaapServer: public MFDHttpPlugin
     ~DaapServer();
 
     void    handleIncoming(HttpRequest *request);
-/*
-    void    run();
-    void    parseIncomingRequest(httpd *server);
-    void    parsePath(httpd *server, DaapRequest *daap_request);
-    void    sendServerInfo(httpd *server);
-    void    sendTag(httpd *server, const Chunk& c);
-    void    sendLogin(httpd *server, u32 session_id);
-    void    parseVariables(httpd *server, DaapRequest *daap_request);
-    void    sendUpdate(httpd *server, u32 database_version);
-    void    sendMetadata(httpd *server, QString request_path, DaapRequest *daap_request);
-    void    sendDatabaseList(httpd *server);
-    void    sendDatabase(httpd *server, DaapRequest *daap_request, int which_database);
-    void    sendDatabaseItem(httpd *server, u32 song_id);
-    void    sendContainers(httpd *server, DaapRequest *daap_request, int which_database);
-    void    sendContainer(httpd *server, u32 container_id, int which_database);
-    bool    wantsToContinue();
+    void    parsePath(HttpRequest *http_request, DaapRequest *daap_request);
+    void    sendServerInfo(HttpRequest *http_request);
+    void    sendTag(HttpRequest *http_request, const Chunk& c);
+    void    sendLogin(HttpRequest *http_request, u32 session_id);
+    void    parseVariables(HttpRequest *http_request, DaapRequest *daap_request);
+    void    sendUpdate(HttpRequest *http_request, u32 database_version);
+    void    sendMetadata(HttpRequest *http_request, QString request_path, DaapRequest *daap_request);
+    void    sendDatabaseList(HttpRequest *http_request);
+    void    sendDatabase(HttpRequest *http_request, DaapRequest *daap_request, int which_database);
+    void    sendDatabaseItem(HttpRequest *http_request, u32 song_id);
+    void    sendContainers(HttpRequest *http_request, DaapRequest *daap_request, int which_database);
+    void    sendContainer(HttpRequest *http_request, u32 container_id, int which_database);
 
     DaapSessions daap_sessions;
-*/
 
   private:
   

@@ -208,6 +208,7 @@ class MFDHttpPlugin : public MFDServicePlugin
     void            run();
     virtual void    processRequest(MFDServiceClientSocket *a_client);
     virtual void    handleIncoming(HttpRequest *request);
+    virtual void    sendResponse(int client_id, HttpResponse *http_response);
 };
 
 #endif

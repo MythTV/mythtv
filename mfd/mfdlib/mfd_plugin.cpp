@@ -16,7 +16,7 @@ using namespace std;
 
 #include "mfd_plugin.h"
 #include "mfd_events.h"
-
+#include "httpresponse.h"
 
 
 MFDBasePlugin::MFDBasePlugin(MFD *owner, int identifier)
@@ -773,6 +773,7 @@ void MFDHttpPlugin::processRequest(MFDServiceClientSocket *a_client)
 
     char incoming[MAX_CLIENT_INCOMING];    // FIX
     int length = 0;
+    int client_id = a_client->getIdentifier();
 
     //
     //  Copy out the whole block out so we can release the lock straight away.
@@ -804,10 +805,13 @@ void MFDHttpPlugin::processRequest(MFDServiceClientSocket *a_client)
             //
             
             handleIncoming(new_request);
+            if(new_request->sendResponse())
+            {
+                sendResponse(client_id, new_request->getResponse());
+            }
         }
         delete new_request;
     }
-
 }
 
 
@@ -815,4 +819,38 @@ void MFDHttpPlugin::handleIncoming(HttpRequest *)
 {
     warning(QString("%1 plugin called base class handleRequest()")
             .arg(name));
+}
+
+void MFDHttpPlugin::sendResponse(int client_id, HttpResponse *http_response)
+{
+    MFDServiceClientSocket *which_client = NULL;
+
+    client_sockets_mutex.lock();
+        QPtrListIterator<MFDServiceClientSocket> iterator(client_sockets);
+        MFDServiceClientSocket *a_client;
+        while ( (a_client = iterator.current()) != 0 )
+        {
+            ++iterator;
+            if(a_client->getIdentifier() == client_id)
+            {
+                which_client = a_client;
+                break;
+            }
+        }
+    client_sockets_mutex.unlock();
+
+    if(!which_client)
+    {
+        log(QString("%1 plugin wanted to send an http response, but the client socket in question went away")
+            .arg(name), 8);
+    }
+    a_client->lockWriteMutex();
+        
+        //
+        //  Assemble and send the message
+        //
+
+        http_response->send(a_client);
+
+    a_client->unlockWriteMutex();
 }
