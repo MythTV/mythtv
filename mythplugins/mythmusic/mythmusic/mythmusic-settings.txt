@@ -13,3 +13,7 @@ str TemporarySpace=/tmp/
 
 # Order in which to sort the Music Selection Tree.
 str TreeLevels=artist album title
+
+# Automatically lookup an audio CD if it's present and show its information in
+# the Music Selection Tree
+#int AutoLookupCD=1

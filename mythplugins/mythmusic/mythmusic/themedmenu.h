@@ -3,33 +3,61 @@
 
 #include <qwidget.h>
 #include <qdialog.h>
-#include <qvaluevector.h>
 #include <qvaluelist.h>
+#include <qdom.h>
+#include <qmap.h>
+
+#include <vector>
+
+using namespace std;
 
 class QPixmap;
+
+struct ButtonIcon
+{
+    QString name;
+    QPixmap *icon;
+    QPoint offset;
+};
 
 struct ThemedButton
 {
     QPoint pos;
     QRect  posRect;
-    QPixmap *icon; 
+    
+    ButtonIcon *buttonicon;
     QPoint iconPos;
     QRect iconRect;
+
     QString text;
-    QString selectioninfo;
+    QString action;
+
+    int status;
+};
+
+struct MenuRow
+{
+    int numitems;
+    vector<ThemedButton *> buttons;
 };
 
 class ThemedMenu : public QDialog
 {
     Q_OBJECT
   public:
-    ThemedMenu(const char *cdir, const char *menufile, 
+    ThemedMenu(const char *cdir, const char *cprefix, const char *menufile, 
             QWidget *parent = 0, const char *name = 0);
    ~ThemedMenu();
 
     bool foundTheme() { return foundtheme; }
 
     void Show();
+
+    void setCallback(void (*lcallback)(void *, QString &), void *data) 
+                                        { callback = lcallback;
+                                          callbackdata = data;
+                                        }
+    void setKillable(void) { killable = true; }
 
     QString getSelection() { return selection; }
 
@@ -38,16 +66,37 @@ class ThemedMenu : public QDialog
     void keyPressEvent(QKeyEvent *e);
 
   private:
+    void parseMenu(QString menuname);
+
     void parseSettings(QString dir, QString menuname);
 
+    void parseBackground(QString dir, QDomElement &element);
+    void parseLogo(QString dir, QDomElement &element);
+    void parseButtonDefinition(QString dir, QDomElement &element);
+    void parseButton(QString dir, QDomElement &element);
+    void parseThemeButton(QDomElement &element);
+    
+    void parseText(QDomElement &element);
+    void parseOutline(QDomElement &element);
+    void parseShadow(QDomElement &element);
+
+    void setDefaults(void);
+
+    void addButton(QString &type, QString &text, QString &action);
+    void layoutButtons(void);
+   
+    void handleAction(QString &action);
+    bool findDepends(QString file);
+    QString findMenuFile(QString menuname);
+    
+    QString getFirstText(QDomElement &element);
     QPoint parsePoint(QString text);
     QRect parseRect(QString text);
-    QValueList<int> parseOrder(QString text);
 
     QRect menuRect() const;
 
     void paintLogo(QPainter *p);
-    void paintButton(unsigned int button, QPainter *p);
+    void paintButton(unsigned int button, QPainter *p, bool erased);
 
     void drawText(QPainter *p, QRect &rect, int textflags, QString text);
 
@@ -56,17 +105,26 @@ class ThemedMenu : public QDialog
 
     int screenwidth, screenheight;
 
+    QString prefix;
+    
+    QRect buttonArea;    
+    
     QPoint logopos;
     QRect logoRect;
     QPixmap *logo;
 
     QPixmap *buttonnormal;
     QPixmap *buttonactive;
-    QValueVector<ThemedButton> buttonList;
-    QValueList<int> buttonUpDown;
-    QValueList<int> buttonLeftRight;
-    unsigned int activebutton;
 
+    QMap<QString, ButtonIcon> allButtonIcons;
+
+    vector<ThemedButton> buttonList;
+    ThemedButton *activebutton;
+    int currentrow;
+    int currentcolumn;
+
+    vector<MenuRow> buttonRows;
+   
     QRect textRect;
     QColor textColor;
     QFont font;
@@ -83,6 +141,14 @@ class ThemedMenu : public QDialog
 
     QString selection;
     bool foundtheme;
+
+    int menulevel;
+    vector<QString> menufiles;
+
+    void (*callback)(void *, QString &);
+    void *callbackdata;
+
+    bool killable;
 };
 
 QString findThemeDir(QString themename, QString prefix);

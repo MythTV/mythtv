@@ -10,14 +10,15 @@
 #include <qimage.h>
 #include <qdir.h>
 #include <math.h>
+#include <qdom.h>
 
 #include "themedmenu.h"
 #include "settings.h"
 
 extern Settings *globalsettings;
 
-ThemedMenu::ThemedMenu(const char *cdir, const char *menufile, 
-                       QWidget *parent, const char *name)
+ThemedMenu::ThemedMenu(const char *cdir, const char *cprefix, 
+                       const char *menufile, QWidget *parent, const char *name)
           : QDialog(parent, name)
 {
     screenheight = QApplication::desktop()->height();
@@ -36,10 +37,11 @@ ThemedMenu::ThemedMenu(const char *cdir, const char *menufile,
     setFixedHeight(screenheight);
 
     setPalette(QPalette(QColor(250, 250, 250)));
+    setCursor(QCursor(Qt::BlankCursor));
 
     QString dir = QString(cdir) + "/";
 
-    QString filename = dir + menufile;
+    QString filename = dir + "theme.xml";
 
     foundtheme = true;
     QFile filetest(filename);
@@ -49,7 +51,15 @@ ThemedMenu::ThemedMenu(const char *cdir, const char *menufile,
         return;
     }
 
-    parseSettings(dir, menufile);
+    prefix = cprefix;
+    menulevel = 0;
+
+    callback = NULL;
+    killable = false;
+    
+    parseSettings(dir, "theme.xml");
+
+    parseMenu(menufile);
 }
 
 ThemedMenu::~ThemedMenu(void)
@@ -60,46 +70,71 @@ ThemedMenu::~ThemedMenu(void)
         delete buttonnormal;
     if (buttonactive)
         delete buttonactive;
-    for (unsigned int i = 0; i < buttonList.size(); i++)
+
+    QMap<QString, ButtonIcon>::Iterator it;
+    for (it = allButtonIcons.begin(); it != allButtonIcons.end(); ++it)
     {
-        if (buttonList[i].icon)
-            delete buttonList[i].icon;
+        if (it.data().icon)
+            delete it.data().icon;
     }
 }
 
-void ThemedMenu::parseSettings(QString dir, QString menuname)
+QString ThemedMenu::getFirstText(QDomElement &element)
 {
-    QString filename = dir + menuname;
-
-    Settings *settings = new Settings(filename);
-
-    QString setting = settings->GetSetting("Include");
-    if (setting.length() > 1)
+    for (QDomNode dname = element.firstChild(); !dname.isNull();
+         dname = dname.nextSibling())
     {
-        filename = QString(dir) + setting;
-        settings->ReadSettings(filename);
+        QDomText t = dname.toText();
+        if (!t.isNull())
+            return t.data();
     }
-
-    logo = NULL;
-
+    return "";
+}
+	
+void ThemedMenu::parseBackground(QString dir, QDomElement &element)
+{
     bool tiledbackground = false;
-    setting = settings->GetSetting("TiledBackground");
+    QPixmap *bground = NULL;    
+    QString path;
 
-    QPixmap *bground = NULL;
-    if (setting.length() > 1)
-    {
+    bool hasarea = false;
+
+    QString type = element.attribute("style", "");
+    if (type == "tiled")
         tiledbackground = true;
-        setting = dir + setting;
-        bground = scalePixmap(setting);
-    }
-    else
+
+    for (QDomNode child = element.firstChild(); !child.isNull();
+         child = child.nextSibling())
     {
-        setting = settings->GetSetting("Background");
-        if (setting.length() > 1)
+        QDomElement info = child.toElement();
+        if (!info.isNull())
         {
-            setting = dir + setting;
-            bground = scalePixmap(setting);
+            if (info.tagName() == "image")
+            {
+                path = dir + getFirstText(info);
+                bground = scalePixmap(path);
+            }
+            else if (info.tagName() == "buttonarea")
+            {
+                buttonArea = parseRect(getFirstText(info));
+                buttonArea.setX(buttonArea.x() * wmult);
+                buttonArea.setY(buttonArea.y() * hmult);
+                buttonArea.setWidth(buttonArea.width() * wmult);
+                buttonArea.setHeight(buttonArea.height() * hmult);
+                hasarea = true;
+            }
+            else
+            {
+                cerr << "Unknown tag " << info.tagName() << " in background\n";
+                exit(0);
+            }
         }
+    }
+
+    if (!hasarea)
+    {
+        cerr << "Missing buttonaread in background\n";
+        exit(0);
     }
 
     if (bground)
@@ -119,160 +154,558 @@ void ThemedMenu::parseSettings(QString dir, QString menuname)
 
         delete bground;
     }
+}
 
-    setting = settings->GetSetting("Logo");
-    if (setting.length() > 1)
+void ThemedMenu::parseShadow(QDomElement &element)
+{
+    hasshadow = true;
+
+    bool hascolor = false;
+    bool hasoffset = false;
+    bool hasalpha = false;
+
+    for (QDomNode child = element.firstChild(); !child.isNull();
+         child = child.nextSibling())
     {
-        setting = dir + setting;
-        logo = scalePixmap(setting);
-    }
-
-    if (logo)
-    {
-        logopos = parsePoint(settings->GetSetting("LogoPos"));
-        logopos.setX(logopos.x() * wmult);
-        logopos.setY(logopos.y() * hmult);
-        logoRect = QRect(logopos.x(), logopos.y(), logo->width(), 
-                         logo->height());
-    }
-
-    setting = dir + settings->GetSetting("ButtonNormal");
-    buttonnormal = scalePixmap(setting);
-    setting = dir + settings->GetSetting("ButtonActive");
-    buttonactive = scalePixmap(setting);
-
-    textRect = parseRect(settings->GetSetting("ButtonTextArea"));
-    textRect.setX(textRect.x() * wmult);
-    textRect.setY(textRect.y() * hmult);
-    textRect.setWidth(textRect.width() * wmult);
-    textRect.setHeight(textRect.height() * hmult);
-    textRect = QRect(textRect.x(), textRect.y(), 
-                     buttonnormal->width() - textRect.width() - textRect.x(), 
-                     buttonnormal->height() - textRect.height() - textRect.y());
-
-    int buttons = settings->GetNumSetting("NumButtons");
-
-    for (int i = 0; i < buttons; i++)
-    {
-        ThemedButton newbutton;
- 
-        setting = QString("ButtonAction%1").arg(i+1);       
-        newbutton.selectioninfo = settings->GetSetting(setting);
-
-        if (newbutton.selectioninfo == "")
-            cerr << "Button " << i + 1 << " doesn't have a ButtonAction\n"; 
-
-        setting = QString("ButtonPos%1").arg(i+1);
-        
-        newbutton.pos = parsePoint(settings->GetSetting(setting));
-        newbutton.pos.setX(newbutton.pos.x() * wmult);
-        newbutton.pos.setY(newbutton.pos.y() * hmult);
-        newbutton.posRect = QRect(newbutton.pos.x(), newbutton.pos.y(), 
-                                  buttonnormal->width(), 
-                                  buttonnormal->height());
-
-        setting = QString("ButtonText%1").arg(i+1);
-        newbutton.text = settings->GetSetting(setting);
-
-        newbutton.icon = NULL;
-
-        setting = QString("ButtonIcon%1").arg(i+1);
-        setting = settings->GetSetting(setting);
-
-        if (setting.length() > 1)
+        QDomElement info = child.toElement();
+        if (!info.isNull())
         {
-            setting = dir + setting;
-            newbutton.icon = scalePixmap(setting);
-            setting = QString("ButtonIconOffset%1").arg(i+1);
-
-            newbutton.iconPos = parsePoint(settings->GetSetting(setting));
-            newbutton.iconPos.setX(newbutton.iconPos.x() * wmult);
-            newbutton.iconPos.setY(newbutton.iconPos.y() * hmult);
-            newbutton.iconPos += newbutton.pos;
-            newbutton.iconRect = QRect(newbutton.iconPos.x(), 
-                                       newbutton.iconPos.y(),
-                                       newbutton.icon->width(),
-                                       newbutton.icon->height());
+            if (info.tagName() == "color")
+            {
+                shadowColor = QColor(getFirstText(info));
+                hascolor = true;
+            }
+            else if (info.tagName() == "offset")
+            {
+                shadowOffset = parsePoint(getFirstText(info));
+                hasoffset = true;
+            }
+            else if (info.tagName() == "alpha")
+            {
+                shadowalpha = atoi(getFirstText(info).ascii());
+                hasalpha = true;
+            }
+            else
+            {
+                cerr << "Unknown tag " << info.tagName() << " in text/shadow\n";
+                exit(0);
+            }
         }
-        buttonList.push_back(newbutton);
     }
 
-    buttonUpDown = parseOrder(settings->GetSetting("ButtonOrderVertical"));
-    buttonLeftRight = parseOrder(settings->GetSetting("ButtonOrderHorizontal"));
-
-    if (buttonUpDown.size() != buttonList.size())
+    if (!hascolor)
     {
-        cerr << "Invalid ButtonOrderVertical\n";
-        buttonUpDown.clear();
-        for (unsigned int j = 1; j <= buttonList.size(); j++)
-            buttonUpDown.push_back(j);
+        cerr << "Missing color tag in shadow\n";
+        exit(0);
     }
 
-    if (buttonLeftRight.size() != buttonList.size())
+    if (!hasalpha)
     {
-        cerr << "Invalid ButtonOrderHorizontal\n";
-        buttonLeftRight.clear();
-        for (unsigned int j = 1; j <= buttonList.size(); j++)
-            buttonLeftRight.push_back(j);
+        cerr << "Missing alpha tag in shadow\n";
+        exit(0);
     }
 
-    int fontsize = settings->GetNumSetting("ButtonTextSize");
-    bool italic = (bool)settings->GetNumSetting("ButtonTextItalics");
-    QString fontname = settings->GetSetting("ButtonTextName");
-    bool bold = (bool)settings->GetNumSetting("ButtonTextBold");
+    if (!hasoffset)
+    {
+        cerr << "Missing offset tag in shadow\n";
+        exit(0);
+    }
+}
+
+void ThemedMenu::parseOutline(QDomElement &element)
+{
+    hasoutline = true;
+
+    bool hascolor = false;
+    bool hassize = false;
+
+    for (QDomNode child = element.firstChild(); !child.isNull();
+         child = child.nextSibling())
+    {
+        QDomElement info = child.toElement();
+        if (!info.isNull())
+        {
+            if (info.tagName() == "color")
+            {
+                outlineColor = QColor(getFirstText(info));
+                hascolor = true;
+            }
+            else if (info.tagName() == "size")
+            {
+                outlinesize = atoi(getFirstText(info).ascii());
+                outlinesize = (int)(outlinesize * hmult);
+                hassize = true;
+            }
+            else
+            {
+                cerr << "Unknown tag " << info.tagName() << " in text/shadow\n";
+                exit(0);
+            }
+        }
+    }
+
+    if (!hassize)
+    {
+        cerr << "Missing size in outline\n";
+        exit(0);
+    }
+
+    if (!hascolor)
+    {
+        cerr << "Missing color in outline\n";
+        exit(0);
+    }
+}
+
+void ThemedMenu::parseText(QDomElement &element)
+{
+    bool hasarea = false;
 
     int weight = QFont::Normal;
-    if (bold)
-        weight = QFont::Bold;
+    int fontsize = 14;
+    QString fontname = "Arial";
+    bool italic = false;
+
+    for (QDomNode child = element.firstChild(); !child.isNull();
+         child = child.nextSibling())
+    {
+        QDomElement info = child.toElement();
+        if (!info.isNull())
+        {
+            if (info.tagName() == "area") 
+            {
+                hasarea = true;
+                textRect = parseRect(getFirstText(info));
+                textRect.setX(textRect.x() * wmult);
+                textRect.setY(textRect.y() * hmult);
+                textRect.setWidth(textRect.width() * wmult);
+                textRect.setHeight(textRect.height() * hmult);
+                textRect = QRect(textRect.x(), textRect.y(),
+                                 buttonnormal->width() - textRect.width() - 
+                                 textRect.x(), buttonnormal->height() - 
+                                 textRect.height() - textRect.y());
+            }
+            else if (info.tagName() == "fontsize")
+            {
+                fontsize = atoi(getFirstText(info).ascii());
+            }
+            else if (info.tagName() == "fontname")
+            { 
+                fontname = getFirstText(info);
+            }
+            else if (info.tagName() == "bold")
+            {
+                if (getFirstText(info) == "yes")
+                    weight = QFont::Bold;
+            }
+            else if (info.tagName() == "italics")
+            {
+                if (getFirstText(info) == "yes")
+                    italic = true;
+            }
+            else if (info.tagName() == "color")
+            {
+                textColor = QColor(getFirstText(info));
+            }
+            else if (info.tagName() == "centered")
+            {
+                if (getFirstText(info) == "yes")
+                    textflags = Qt::AlignTop | Qt::AlignHCenter | WordBreak;
+            } 
+            else if (info.tagName() == "outline")
+            {
+                parseOutline(info);
+            }
+            else if (info.tagName() == "shadow")
+            {
+                parseShadow(info);
+            }
+            else
+            {
+                cerr << "Unknown tag " << info.tagName() << " in text\n";
+                exit(0);
+            }
+        }
+    }
 
     font = QFont(fontname, fontsize * hmult, weight, italic);
     setFont(font);
 
-    textColor = QColor(settings->GetSetting("ButtonTextColor"));
-
-    setCursor(QCursor(Qt::BlankCursor));
-
-    hasshadow = false;
-    QString shadowcolor = settings->GetSetting("ButtonShadowColor");
-    if (shadowcolor.length() > 1)
+    if (!hasarea)
     {
-        hasshadow = true;
-        shadowColor = QColor(shadowcolor);
-        shadowOffset = parsePoint(settings->GetSetting("ButtonShadowOffset"));
-        shadowalpha = settings->GetNumSetting("ButtonShadowAlpha");
+        cerr << "Missing 'area' tag in 'text' element of 'genericbutton'\n";
+        exit(0);
+    }
+}
+
+void ThemedMenu::parseButtonDefinition(QString dir, QDomElement &element)
+{
+    bool hasnormal = false;
+    bool hasactive = false;
+
+    QString setting;
+
+    textflags = Qt::AlignTop | Qt::AlignLeft | WordBreak;
+
+    for (QDomNode child = element.firstChild(); !child.isNull();
+         child = child.nextSibling())
+    {
+        QDomElement info = child.toElement();
+        if (!info.isNull())
+        {
+            if (info.tagName() == "normal")
+            {
+                setting = dir + getFirstText(info);
+                buttonnormal = scalePixmap(setting);
+                hasnormal = true;
+            }
+            else if (info.tagName() == "active")
+            {
+                setting = dir + getFirstText(info);
+                buttonactive = scalePixmap(setting);
+                hasactive = true;
+            }
+            else if (info.tagName() == "text")
+            {
+                if (!hasnormal)
+                {
+                    cerr << "The 'normal' tag needs to come before the 'text' "
+                         << "tag\n";
+                    exit(0);
+                }
+                parseText(info);
+            }
+            else
+            {
+                cerr << "Unknown tag " << info.tagName() 
+                     << " in genericbutton\n";
+                exit(0);
+            }
+        }
     }
 
+    if (!hasnormal)
+    {
+        cerr << "No normal button image defined\n";
+        exit(0);
+    }
+    if (!hasactive)
+    {
+        cerr << "No active button image defined\n";
+        exit(0);
+    }
+}
+
+void ThemedMenu::parseLogo(QString dir, QDomElement &element)
+{
+    bool hasimage = false;
+    bool hasposition = false;
+
+    for (QDomNode child = element.firstChild(); !child.isNull();
+         child = child.nextSibling())
+    {
+        QDomElement info = child.toElement();
+        if (!info.isNull())
+        {
+            if (info.tagName() == "image")
+            {
+                QString logopath = dir + getFirstText(info);
+                logo = scalePixmap(logopath);
+                hasimage = true;
+            }
+            else if (info.tagName() == "position")
+            {
+                logopos = parsePoint(getFirstText(info));
+		hasposition = true;
+	    }
+            else
+            {
+                cerr << "Unknown tag " << info.tagName() << " in logo\n";
+                exit(0);
+            }
+        }
+    }
+
+    if (!hasimage)
+    {
+        cerr << "Missing image tag in logo\n";
+        exit(0);
+    }
+
+    if (!hasposition)
+    {
+        cerr << "Missing position tag in logo\n";
+        exit(0);
+    }
+
+    logopos.setX(logopos.x() * wmult);
+    logopos.setY(logopos.y() * hmult);
+    logoRect = QRect(logopos.x(), logopos.y(), logo->width(),
+                     logo->height());
+}
+
+void ThemedMenu::parseButton(QString dir, QDomElement &element)
+{
+    bool hasname = false;
+    bool hasoffset = false;
+    bool hasicon = false;
+
+    QString name = "";
+    QPixmap *image = NULL;
+    QPoint offset;
+
+    name = element.attribute("name", "");
+    if (name != "")
+        hasname = true;
+
+    for (QDomNode child = element.firstChild(); !child.isNull();
+         child = child.nextSibling())
+    {    
+        QDomElement info = child.toElement();
+        if (!info.isNull())
+        {
+            if (info.tagName() == "image")
+            {
+                QString imagepath = dir + getFirstText(info); 
+                image = scalePixmap(imagepath);
+                hasicon = true;
+            }
+            else if (info.tagName() == "offset")
+            {
+                offset = parsePoint(getFirstText(info));
+                offset.setX(offset.x() * wmult);
+                offset.setY(offset.y() * hmult);
+                hasoffset = true;
+            }
+            else
+            {
+                cerr << "Unknown tag " << info.tagName() << " in buttondef\n";
+                exit(0);
+            }
+        }
+    }
+
+    if (!hasname)
+    {
+        cerr << "Missing name in button\n";
+        exit(0);
+    }
+
+    if (!hasoffset)
+    {
+        cerr << "Missing offset in buttondef " << name << endl;
+        exit(0);
+    }
+
+    if (!hasicon) 
+    {
+        cerr << "Missing image in buttondef " << name << endl;
+        exit(0);
+    }
+
+    ButtonIcon newbutton;
+
+    newbutton.name = name;
+    newbutton.icon = image;
+    newbutton.offset = offset;
+
+    allButtonIcons[name] = newbutton;
+}
+
+void ThemedMenu::setDefaults(void)
+{
+    logo = NULL;
+    buttonnormal = buttonactive = NULL;
+    textflags = Qt::AlignTop | Qt::AlignLeft | WordBreak;
+    textColor = QColor(white);
     hasoutline = false;
-    int dooutline = settings->GetNumSetting("ButtonTextOutline");
-    if (dooutline)
+    hasshadow = false;
+}
+
+void ThemedMenu::parseSettings(QString dir, QString menuname)
+{
+    QString filename = dir + menuname;
+
+    QDomDocument doc;
+    QFile f(filename);
+
+    if (!f.open(IO_ReadOnly))
+        return;
+    if (!doc.setContent(&f))
     {
-        hasoutline = true;
-        QString outlinecolor = settings->GetSetting("ButtonTextOutlineColor");
-        outlineColor = QColor(outlinecolor);
-        outlinesize = settings->GetNumSetting("ButtonTextOutlineSize");
-        outlinesize = (int)(outlinesize * hmult);
+        f.close();
+        return;
     }
 
-    int centered = settings->GetNumSetting("ButtonTextCentered");
-    
-    if (centered)
-        textflags = Qt::AlignTop | Qt::AlignHCenter | WordBreak;
-    else
-        textflags = Qt::AlignTop | Qt::AlignLeft | WordBreak;
+    f.close();
 
-    int startbutton = settings->GetNumSetting("StartButton") - 1;
-    if (startbutton < 0)
-        startbutton = 0;
-    activebutton = startbutton;
+    bool setbackground = false;
+    bool setbuttondef = false;
+
+    setDefaults();
+
+    QDomElement docElem = doc.documentElement();
+    QDomNode n = docElem.firstChild();
+    while (!n.isNull())
+    {
+        QDomElement e = n.toElement();
+        if (!e.isNull())
+        {
+            if (e.tagName() == "background")
+            {
+                parseBackground(dir, e);
+                setbackground = true;
+            }
+            else if (e.tagName() == "genericbutton")
+            {
+                parseButtonDefinition(dir, e);
+                setbuttondef = true;
+            }
+            else if (e.tagName() == "logo")
+            {
+                parseLogo(dir, e);
+            }
+            else if (e.tagName() == "buttondef")
+            {
+                parseButton(dir, e);
+            }
+            else
+            {
+                cerr << "Unknown element " << e.tagName() << endl;
+                exit(0);
+            }
+        }
+        n = n.nextSibling();
+    }
+
+    if (!setbackground)
+    {
+        cerr << "Missing background element\n";
+        exit(0);
+    }
+
+    if (!setbuttondef)
+    {
+        cerr << "Missing genericbutton definition\n";
+        exit(0);
+    }
+
+    return;
+}
+
+void ThemedMenu::parseThemeButton(QDomElement &element)
+{
+    QString type = "";
+    QString text = "";
+    QString action = "";
+
+    bool addit = true;
+
+    for (QDomNode child = element.firstChild(); !child.isNull();
+         child = child.nextSibling())
+    {
+        QDomElement info = child.toElement();
+        if (!info.isNull())
+        {
+            if (info.tagName() == "type")
+            {
+                type = getFirstText(info);
+            }
+            else if (info.tagName() == "text")
+            {
+                text = getFirstText(info);
+            }
+            else if (info.tagName() == "action")
+            {
+                action = getFirstText(info);
+            }
+            else if (info.tagName() == "depends")
+            {
+                addit = findDepends(getFirstText(info));
+            }
+            else
+            {
+                cerr << "Unknown tag " << info.tagName() << " in button\n";
+                exit(0);
+            }
+        }
+    }
+
+    if (text == "")
+    {
+        cerr << "Missing 'text' in button\n";
+        exit(0);
+    }
+   
+    if (action == "")
+    {
+        cerr << "Missing 'action' in button\n";
+        exit(0);
+    }
+
+    if (addit)
+        addButton(type, text, action);
+}
+
+void ThemedMenu::parseMenu(QString menuname)
+{
+    QString filename = findMenuFile(menuname);
+
+    QDomDocument doc;
+    QFile f(filename);
+
+    if (!f.open(IO_ReadOnly))
+    {
+        cerr << "Couldn't read menu file " << menuname << endl;
+        exit(0);
+    }
+    if (!doc.setContent(&f))
+    {
+        f.close();
+        return;
+    }
+
+    f.close();
+
+    buttonList.clear();
+    buttonRows.clear();
+
+    QDomElement docElem = doc.documentElement();
+    QDomNode n = docElem.firstChild();
+    while (!n.isNull())
+    {
+        QDomElement e = n.toElement();
+        if (!e.isNull())
+        {
+            if (e.tagName() == "button")
+            {
+                parseThemeButton(e);
+            }
+            else
+            {
+                cerr << "Unknown element " << e.tagName() << endl;
+                exit(0);
+            }
+        }
+        n = n.nextSibling();
+    }
+
+    if (buttonList.size() == 0)
+    {
+        cerr << "No buttons for menu " << menuname << endl;
+        exit(0);
+    }
+
+    layoutButtons();
 
     WFlags flags = getWFlags();
     setWFlags(flags | Qt::WRepaintNoErase);
 
+    menulevel++;
+    menufiles.push_back(menuname);
+
     selection = "";
-
     update(menuRect());
-
-    delete settings;
 }
 
 QPixmap *ThemedMenu::scalePixmap(QString filename)
@@ -317,18 +750,139 @@ QRect ThemedMenu::parseRect(QString text)
     return retval;
 }
 
-QValueList<int> ThemedMenu::parseOrder(QString text)
+void ThemedMenu::addButton(QString &type, QString &text, QString &action)
 {
-    QValueList<int> retval;
-    
-    for (unsigned int i = 0; i < buttonList.size(); i++)
+    ThemedButton newbutton;
+
+    newbutton.buttonicon = NULL;
+    if (allButtonIcons.find(type) != allButtonIcons.end())
+        newbutton.buttonicon = &(allButtonIcons[type]);
+
+    newbutton.text = text;
+    newbutton.action = action;
+    newbutton.status = -1;
+
+    buttonList.push_back(newbutton);
+}
+
+void ThemedMenu::layoutButtons(void)
+{
+    int numbuttons = buttonList.size();
+  
+    if (numbuttons > 6)
     {
-        int value = text.section(",", i, i).toInt();
-        if (value != 0)
-            retval.push_back(value);     
+        cerr << "Only displaying 6 buttons\n";
+        numbuttons = 6;
     }
 
-    return retval;
+    int columns = buttonArea.width() / buttonnormal->width();
+    int rows = buttonArea.height() / buttonnormal->height();
+
+    if (rows < 2)
+    {
+        cerr << "Must have room for at least 2 rows of buttons\n";
+        exit(0);
+    }
+    
+    if (columns < 2)
+    {
+        cerr << "Must have room for at least 2 columns of buttons\n";
+        exit(0);
+    }
+
+    if (rows * columns < numbuttons)
+    {
+        cerr << "Not enough room to display " << numbuttons << " buttons\n";
+        numbuttons = rows * columns;
+    }
+
+    // keep the rows balanced
+    if (numbuttons <= 4)
+    {
+        if (columns > 2)
+            columns = 2;
+    }
+    else if (numbuttons <= 6)
+    {
+        if (columns > 3)
+            columns = 3;
+    }    
+
+    vector<ThemedButton>::iterator iter = buttonList.begin();
+
+    rows = numbuttons / columns;
+    rows++;
+
+    for (int i = 0; i < rows; i++)
+    {
+        MenuRow newrow;
+        newrow.numitems = 0;
+
+        for (int j = 0; j < columns && iter != buttonList.end(); 
+             j++, iter++)
+        {
+            if (columns == 3 && j == 1)
+                newrow.buttons.insert(newrow.buttons.begin(), iter);
+            else
+                newrow.buttons.push_back(iter);
+            newrow.numitems++;
+        }
+
+        if (newrow.numitems > 0)
+            buttonRows.push_back(newrow);
+    }            
+
+    rows = buttonRows.size();
+
+    int yspacing = (buttonArea.height() - buttonnormal->height() * rows) /
+                   (rows + 1);
+    int row = 1;
+
+    activebutton = buttonList.begin();
+
+    vector<MenuRow>::iterator menuiter = buttonRows.begin();
+    for (; menuiter != buttonRows.end(); menuiter++)
+    {
+        int ypos = yspacing * row + (buttonnormal->height() * (row - 1));
+        ypos += buttonArea.y();
+
+        int xspacing = (buttonArea.width() - buttonnormal->width() *
+                       (*menuiter).numitems) / ((*menuiter).numitems + 1);
+        int col = 1;
+        vector<ThemedButton *>::iterator biter = (*menuiter).buttons.begin();
+        for (; biter != (*menuiter).buttons.end(); biter++)
+        {
+            int xpos = xspacing * col + (buttonnormal->width() * (col - 1));
+            xpos += buttonArea.x();
+
+            ThemedButton *tbutton = (*biter);
+            if (activebutton == tbutton)
+            {
+                currentrow = row - 1;
+                currentcolumn = col - 1;
+            }
+
+            tbutton->pos = QPoint(xpos, ypos);
+            tbutton->posRect = QRect(tbutton->pos.x(), tbutton->pos.y(),
+                                     buttonnormal->width(),
+                                     buttonnormal->height());
+
+            if (tbutton->buttonicon)
+            {
+                tbutton->iconPos = tbutton->buttonicon->offset + tbutton->pos;
+                tbutton->iconRect = QRect(tbutton->iconPos.x(),
+                                          tbutton->iconPos.y(),
+                                          tbutton->buttonicon->icon->width(),
+                                          tbutton->buttonicon->icon->height());
+            }
+            
+            col++;
+        }
+
+        row++;
+    }
+
+    activebutton = buttonList.begin();
 }
 
 QRect ThemedMenu::menuRect() const
@@ -350,7 +904,7 @@ void ThemedMenu::paintEvent(QPaintEvent *e)
     for (unsigned int i = 0; i < buttonList.size(); i++)
     {
         if (r.intersects(buttonList[i].posRect))
-            paintButton(i, &p);
+            paintButton(i, &p, e->erased());
     }
 }
 
@@ -360,13 +914,23 @@ void ThemedMenu::paintLogo(QPainter *p)
         p->drawPixmap(logoRect, *logo);
 }
 
-void ThemedMenu::paintButton(unsigned int button, QPainter *p)
+void ThemedMenu::paintButton(unsigned int button, QPainter *p, bool erased)
 {
     QRect cr;
-    if (buttonList[button].icon)
+    if (buttonList[button].buttonicon)
         cr = buttonList[button].posRect.unite(buttonList[button].iconRect);
     else
         cr = buttonList[button].posRect;
+
+    if (!erased)
+    {
+        if (buttonList[button].status == 1 && 
+            activebutton == &(buttonList[button]))
+            return;
+        if (buttonList[button].status == 0 && 
+            activebutton != &(buttonList[button]))
+            return;
+    }
 
     QPixmap pix(cr.size());
     pix.fill(this, cr.topLeft());
@@ -379,13 +943,15 @@ void ThemedMenu::paintButton(unsigned int button, QPainter *p)
     newRect.moveBy(buttonList[button].posRect.x() - cr.x(), 
                    buttonList[button].posRect.y() - cr.y());
 
-    if (button == activebutton)
+    if (&(buttonList[button]) == activebutton)
     {
         tmp.drawPixmap(newRect.topLeft(), *buttonactive);
+        buttonList[button].status = 1;
     }
     else
     {
         tmp.drawPixmap(newRect.topLeft(), *buttonnormal);
+        buttonList[button].status = 0;
     }
 
     QRect buttonTextRect = textRect;
@@ -435,14 +1001,15 @@ void ThemedMenu::paintButton(unsigned int button, QPainter *p)
     tmp.setFont(font);
     drawText(&tmp, buttonTextRect, textflags, buttonList[button].text);
 
-    if (buttonList[button].icon)
+    if (buttonList[button].buttonicon)
     {
-        newRect = QRect(0, 0, buttonList[button].iconRect.width(),
+        newRect = QRect(buttonList[button].iconRect.x() - cr.x(), 
+                        buttonList[button].iconRect.y() - cr.y(), 
+                        buttonList[button].iconRect.width(),
                         buttonList[button].iconRect.height());
-        newRect.moveBy(buttonList[button].iconRect.x() - cr.x(),     
-                       buttonList[button].iconRect.y() - cr.y());
 
-        tmp.drawPixmap(newRect.topLeft(), *(buttonList[button].icon));
+        tmp.drawPixmap(newRect.topLeft(), 
+                       *(buttonList[button].buttonicon->icon));
     }
 
 
@@ -499,46 +1066,68 @@ void ThemedMenu::drawText(QPainter *p, QRect &rect, int textflags, QString text)
 void ThemedMenu::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
-
-    unsigned int lastbutton = activebutton;
-    unsigned int lrpos = buttonLeftRight.findIndex(lastbutton + 1);
-    unsigned int udpos = buttonUpDown.findIndex(lastbutton + 1);
+    ThemedButton *lastbutton = activebutton;
 
     switch (e->key())
     {
         case Key_Up:
         {
-            udpos--;
-            if (udpos > buttonList.size())
-                udpos = buttonList.size() - 1;
-            activebutton = buttonUpDown[udpos] - 1;
+            currentrow--;
+            if (currentrow < 0)
+            {
+                currentrow = buttonRows.size() - 1;
+                currentcolumn--;
+                if (currentcolumn < 0)
+                    currentcolumn = buttonRows[currentrow].numitems - 1;
+            }
+
+            if (currentcolumn >= buttonRows[currentrow].numitems)
+                currentcolumn = buttonRows[currentrow].numitems - 1;
+
             handled = true;
             break;
         }
         case Key_Left:
         {
-            lrpos--;
-            if (lrpos > buttonList.size())
-                lrpos = buttonList.size() - 1;
-            activebutton = buttonLeftRight[lrpos] - 1;
+            currentcolumn--;
+            if (currentcolumn < 0)
+            {
+                currentrow--;
+                if (currentrow < 0)
+                    currentrow = buttonRows.size() - 1;
+                currentcolumn = buttonRows[currentrow].numitems - 1;
+            }
+
             handled = true;
             break;
         }
         case Key_Down:
         {
-            udpos++;
-            if (udpos == buttonList.size())
-                udpos = 0;
-            activebutton = buttonUpDown[udpos] - 1;
+            currentrow++;
+            if (currentrow >= (int)buttonRows.size())
+            {
+                currentrow = 0;
+                currentcolumn++;
+                if (currentcolumn >= buttonRows[currentrow].numitems)
+                    currentcolumn = 0;
+            }
+
+            if (currentcolumn >= buttonRows[currentrow].numitems)
+                currentcolumn = buttonRows[currentrow].numitems - 1;
+
             handled = true;
             break;
         }
         case Key_Right:
         {
-            lrpos++;
-            if (lrpos == buttonList.size())
-                lrpos = 0;
-            activebutton = buttonLeftRight[lrpos] - 1;
+            currentcolumn++;
+            if (currentcolumn >= buttonRows[currentrow].numitems)
+            {
+                currentrow++;
+                if (currentrow >= (int)buttonRows.size())
+                    currentrow = 0;
+                currentcolumn = 0;
+            }
             handled = true;
             break;
         }
@@ -546,17 +1135,27 @@ void ThemedMenu::keyPressEvent(QKeyEvent *e)
         case Key_Return:
         case Key_Space:
         {
-            selection = buttonList[activebutton].selectioninfo;
-            done(1);
-            break;
+            handleAction(activebutton->action);
+	    break;
+        }
+        case Key_Escape:
+        {
+            QString action = "UPMENU";
+            if (menulevel > 1)
+                handleAction(action);
+            else if (killable)
+                done(0);
+            handled = true;
         }
         default: break;
     }
 
     if (handled)
     {
-        update(buttonList[lastbutton].posRect);
-        update(buttonList[activebutton].posRect);
+        activebutton = buttonRows[currentrow].buttons[currentcolumn];
+
+        update(lastbutton->posRect);
+        update(activebutton->posRect);
     }
     else
         QDialog::keyPressEvent(e);
@@ -585,3 +1184,67 @@ QString findThemeDir(QString themename, QString prefix)
     return "";
 }
 
+QString ThemedMenu::findMenuFile(QString menuname)
+{
+    char *home = getenv("HOME");
+    QString testdir = QString(home) + "/.mythtv/" + menuname;
+   
+    QFile file(testdir);
+    if (file.exists())
+        return testdir;
+        
+    testdir = prefix + "/share/mythtv/" + menuname;
+    file.setName(testdir);
+    if (file.exists())
+        return testdir;
+        
+    testdir = "../mythfrontend/" + menuname;
+    file.setName(testdir);
+    if (file.exists())
+        return testdir;
+        
+    return "";
+}
+
+void ThemedMenu::handleAction(QString &action)
+{
+    if (action.left(5) == "EXEC ")
+    {
+        QString rest = action.right(action.length() - 5);
+        system(rest);
+    }
+    else if (action.left(5) == "MENU ")
+    {
+        QString rest = action.right(action.length() - 5);
+ 
+        erase(menuRect());
+        parseMenu(rest);
+    }
+    else if (action.left(6) == "UPMENU")
+    {
+        menufiles.pop_back();
+        QString file = menufiles.back();
+        menufiles.pop_back();
+
+        menulevel -= 2;
+ 
+        erase(menuRect());
+        parseMenu(file);
+    }
+    else
+    {
+        selection = action;
+        if (callback != NULL)
+        {
+            callback(callbackdata, selection);
+        }
+    }   
+}
+
+bool ThemedMenu::findDepends(QString file)
+{
+    QString filename = findMenuFile(file);
+    if (filename == "")
+        return false;
+    return true;
+}

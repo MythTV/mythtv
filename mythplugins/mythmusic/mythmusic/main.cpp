@@ -15,7 +15,6 @@ using namespace std;
 #include "databasebox.h"
 #include "playbackbox.h"
 #include "themedmenu.h"
-#include "menubox.h"
 #include "cdrip.h"
 #include "settings.h"
 
@@ -128,66 +127,59 @@ void startRipper(QSqlDatabase *db)
     rip.exec();
 }
 
-bool runMenu(bool usetheme, QString themedir, QSqlDatabase *db, 
+struct MusicData
+{
+    QString paths;
+    QSqlDatabase *db;
+    QString startdir;
+    QValueList<Metadata> *playlist;
+};
+
+void MusicCallback(void *data, QString &selection)
+{
+    MusicData *mdata = (MusicData *)data;
+
+    QString sel = selection.lower();
+
+    if (sel == "music_create_playlist")
+        startDatabaseTree(mdata->db, mdata->paths, mdata->playlist);
+    else if (sel == "music_play")
+        startPlayback(mdata->db, mdata->playlist);
+    else if (sel == "music_rip")
+    {
+        startRipper(mdata->db);
+        SearchDir(mdata->startdir);
+    }
+    else if (sel == "music_setup")
+        ;
+}
+
+void runMenu(QString themedir, QSqlDatabase *db, 
              QString paths, QValueList<Metadata> &playlist, QString startdir)
 {
-    if (usetheme)
-    {
-        ThemedMenu *diag = new ThemedMenu(themedir.ascii(), "music.menu");
-        
-        if (diag->foundTheme())
-        {
-            diag->Show();
-            diag->exec();
-            
-            QString sel = diag->getSelection().lower();
-
-            bool retval = true;
-
-            if (sel == "music_create_playlist")
-                startDatabaseTree(db, paths, &playlist);
-            else if (sel == "music_play")
-                startPlayback(db, &playlist);
-            else if (sel == "music_rip")
-            {
-                startRipper(db);
-                SearchDir(startdir); 
-            }
-            else if (sel == "music_setup")
-                ;
-            else
-                retval = false;
-
-            delete diag;
-
-            return retval;
-        }
-    }
-
-    MenuBox diag("MythMusic");
-
-    diag.AddButton("Make a Playlist");
-    diag.AddButton("Play Music");
-    diag.AddButton("Import a CD");
-
-    diag.Show();
+    ThemedMenu *diag = new ThemedMenu(themedir.ascii(), theprefix,
+                                      "musicmenu.xml");
        
-    int result = diag.exec();
+    MusicData data;
+   
+    data.paths = paths;
+    data.db = db;
+    data.startdir = startdir;
+    data.playlist = &playlist;
 
-    bool retval = true;
-      
-    switch (result)
-    {   
-        case 1: startDatabaseTree(db, paths, &playlist); break;
-        case 2: startPlayback(db, &playlist); break;
-        case 3: { startRipper(db); SearchDir(startdir); } break;
-        default: break;
+    diag->setCallback(MusicCallback, &data);
+    diag->setKillable();
+
+    if (diag->foundTheme())
+    {
+        diag->Show();
+        diag->exec();
     }
-    if (result == 0)
-        retval = false;
-
-    return retval;
-}
+    else
+    {
+        cerr << "Couldn't find theme " << themedir << endl;
+    }
+}            
 
 int main(int argc, char *argv[])
 {
@@ -229,15 +221,13 @@ int main(int argc, char *argv[])
     QString themename = globalsettings->GetSetting("Theme");
 
     QString themedir = findThemeDir(themename, theprefix);
-    bool usetheme = true;
     if (themedir == "")
-        usetheme = false;
-
-    while (1)
     {
-        if (!runMenu(usetheme, themedir, db, paths, playlist, startdir))
-            break;
+        cerr << "Couldn't find theme " << themename << endl;
+        exit(0);
     }
+
+    runMenu(themedir, db, paths, playlist, startdir);
 
     db->close();
 

@@ -1,0 +1,27 @@
+<mythmenu>
+
+   <button>
+      <type>MUSIC_PLAYLIST</type>
+      <text>Select Music</text>
+      <action>MUSIC_CREATE_PLAYLIST</action>
+   </button>
+
+   <button>
+      <type>MUSIC</type>
+      <text>Play Music</text>
+      <action>MUSIC_PLAY</action>
+   </button>
+
+   <button>
+      <type>MUSIC_RIP</type>
+      <text>Import CD</text>
+      <action>MUSIC_RIP</action>
+   </button>
+
+   <button>
+      <type>SETUP</type>
+      <text>Setup</text>
+      <action>MUSIC_SETUP</action>
+   </button>
+
+</mythmenu>
