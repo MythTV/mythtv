@@ -4,7 +4,6 @@
 #include <qlistview.h>
 #include "metadata.h"
 
-class QPixmap;
 class MythContext;
 
 class TreeCheckItem : public QListViewItem
@@ -20,23 +19,12 @@ class TreeCheckItem : public QListViewItem
     Metadata *getMetadata(void) { return metadata; }
     QString getLevel(void) { return level; }
 
-
   private:
-    void pickPixmap();
-
-      virtual void paintCell(QPainter* p, const QColorGroup& cg,int column, int width, int align);
-    static void setupPixmaps(MythContext *context);
-    static QPixmap *scalePixmap(const char **xpmdata, float wmult, float hmult);
+    virtual void paintCell(QPainter* p, const QColorGroup& cg,int column, 
+                           int width, int align);
 
     Metadata *metadata;
     QString level;
-
-    static bool pixmapsSet;
-    static QPixmap *artist;
-    static QPixmap *album;
-    static QPixmap *track;
-    static QPixmap *catalog;
-    static QPixmap *cd;
 
     MythContext *m_context;
 };

@@ -17,79 +17,57 @@ using namespace std;
 
 
 #include "metadata.h"
-
 #include "databasebox.h"
-
-
 
 #include <mythtv/themedmenu.h>
 #include <mythtv/mythcontext.h>
 #include "dirlist.h"
+
 #ifdef ENABLE_LIRC
 #include "lirc_client.h"
 
 int lfd;
-    struct lirc_config *config;
+struct lirc_config *config;
 #endif
 
-void startDatabaseTree(MythContext *context, QSqlDatabase *db, QString &paths, 
+void startDatabaseTree(MythContext *context, QSqlDatabase *db, 
                        QValueList<Metadata> *playlist)
 {
-  int flags;
-    DatabaseBox dbbox(context, db, paths, playlist);
-    QSocketNotifier *sn;
+    DatabaseBox dbbox(context, db, playlist);
 
 #ifdef ENABLE_LIRC
+    int flags;
+    QSocketNotifier *sn;
+
     fcntl(lfd,F_SETOWN,getpid());
     flags=fcntl(lfd,F_GETFL,0);
     if(flags!=-1)
-      {
+    {
 	fcntl(lfd,F_SETFL,flags|O_NONBLOCK);
-      }
+    }
  
     sn = new QSocketNotifier( lfd, QSocketNotifier::Read, NULL);
     QObject::connect( sn, SIGNAL(activated(int)),
 		      &dbbox, SLOT(dataReceived()) );
 
 #endif
-    dbbox.Show();
 
+    dbbox.Show();
     dbbox.exec();
 }
-
-
-struct MusicData
-{
-    MythContext *context;
-    QString paths;
-    QSqlDatabase *db;
-    QString startdir;
-
-    QValueList<Metadata> *playlist;
-};
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-
     
     MythContext *context = new MythContext();
+
 #ifdef ENABLE_LIRC
     lfd=lirc_init("mythvideo",1);
     lirc_readconfig(NULL,&config,NULL);
 #endif
+
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
-
-    context->OpenDatabase(db);
-    context->LoadQtConfig();
-
-    context->LoadSettingsFiles("mythexplorer-settings.txt");
-    if(a.argc() > 1)
-      context->SetSetting("StartDir",a.argv()[1]);
-    if(a.argc() > 2)
-      context->SetSetting("LoadProfile",QString("profile_%1").arg(a.argv()[2]));
-    context->SetSetting("Profile",context->GetSetting(context->GetSetting("LoadProfile")));
-      
     if (!db)
     {
         printf("Couldn't connect to database\n");
@@ -101,32 +79,25 @@ int main(int argc, char *argv[])
         return -1;
     }
 
+    context->LoadQtConfig();
+
+    context->LoadSettingsFiles("mythexplorer-settings.txt");
+
+    if (a.argc() > 1)
+        context->SetSetting("StartDir",a.argv()[1]);
+    if (a.argc() > 2)
+        context->SetSetting("LoadProfile",
+                           QString("profile_%1").arg(a.argv()[2]));
+
+    context->SetSetting("Profile",
+                        context->GetSetting(context->GetSetting("LoadProfile")));
+      
     QString startdir = context->GetSetting("StartDir");
     
-    //    if (startdir != "")
-        Dirlist md = Dirlist(context, startdir);
- 
-   QValueList<Metadata> playlist = md.GetPlaylist();
+    Dirlist md = Dirlist(context, startdir);
+    QValueList<Metadata> playlist = md.GetPlaylist();
 
-
-    QString themename = context->GetSetting("Theme");
-    QString themedir = context->FindThemeDir(themename);
-
-    if (themedir == "")
-    {
-        cerr << "Couldn't find theme " << themename << endl;
-        exit(0);
-    }
- 
-    MusicData data;
-   
-    data.context = context;
-    data.db = db;
-    data.startdir = startdir;
-    data.playlist = &playlist;
-       startDatabaseTree(data.context, data.db, data.paths, 
-                          data.playlist);
-
+    startDatabaseTree(context, db, &playlist);
 
     db->close();
 
