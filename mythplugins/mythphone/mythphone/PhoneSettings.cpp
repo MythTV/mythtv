@@ -199,7 +199,7 @@ public:
     }
 };
 
-class MySipUser: public LineEditSetting, public GlobalSetting {
+/*class MySipUser: public LineEditSetting, public GlobalSetting {
 public:
     MySipUser():
         GlobalSetting("MySipUser") {
@@ -208,7 +208,7 @@ public:
         setHelpText(QObject::tr("The phone number or username that identifies this SIP client. "
                                 "This will be combined with the host address to form the SIP URI user@ip-address."));
     }
-};
+};*/
 
 class CodecPriorityList: public LineEditSetting, public GlobalSetting {
 public:
@@ -239,7 +239,8 @@ public:
         addSelection("None");
         addSelection("Manual");
         addSelection("Web Server");
-        setHelpText(QObject::tr("Method to use for NAT traversal. Choose NONE if you have a public IP address, "
+        setHelpText(QObject::tr("Method to use for NAT traversal; needs a Frontend restart after channging. Choose "
+                                "NONE if you have a public IP address, "
                                 "choose MANUAL if your ISP always gives you the same public address and manually "
                                 "enter this address below. Choose Web Server if you have a dynamic NAT address "
                                 "and enter a web address like http://checkip.dyndns.org below. "));
@@ -295,7 +296,7 @@ MythPhoneSettings::MythPhoneSettings()
     sipProxySet->addChild(new SipProxyAuthName());
     sipProxySet->addChild(new SipProxyAuthPassword());
     sipProxySet->addChild(new MySipName());
-    sipProxySet->addChild(new MySipUser());
+    //sipProxySet->addChild(new MySipUser());
     addChild(sipProxySet);
 
     VerticalConfigurationGroup* sipSet = new VerticalConfigurationGroup(false);
