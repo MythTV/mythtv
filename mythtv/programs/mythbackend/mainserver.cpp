@@ -2332,7 +2332,8 @@ void MainServer::PrintStatus(QSocket *socket)
 
     os << "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" "
        << "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n"
-       << "<html>\r\n"
+       << "<html xmlns=\"http://www.w3.org/1999/xhtml\""
+       << " xml:lang=\"en\" lang=\"en\">\r\n"
        << "<head>\r\n"
        << "  <meta http-equiv=\"Content-Type\""
        << "content=\"text/html; charset=UTF-8\" />\r\n"
@@ -2414,7 +2415,8 @@ void MainServer::PrintStatus(QSocket *socket)
        << "  </style>\r\n"
        << "  <title>MythTV Status - " 
        << qdtNow.toString(shortdateformat) 
-       << " " << qdtNow.toString(timeformat) << "</title>\r\n"
+       << " " << qdtNow.toString(timeformat) << " - "
+       << MYTH_BINARY_VERSION << "</title>\r\n"
        << "</head>\r\n"
        << "<body>\r\n\r\n"
        << "  <h1>MythTV Status</h1>\r\n"
@@ -2475,6 +2477,10 @@ void MainServer::PrintStatus(QSocket *socket)
         else
             os << " and is not recording.";
 
+        if (elink->isLowOnFreeSpace())
+            os << " <strong>WARNING</strong>:"
+               << " This backend is low on free disk space!";
+
         os << "\r\n";
     }
 
@@ -2488,14 +2494,10 @@ void MainServer::PrintStatus(QSocket *socket)
 
     unsigned int iNum = 10;
     if (recordingList.size() < iNum) 
-    {
         iNum = recordingList.size();
-    }
 
     if (iNum == 0)
-    {
         os << "    There are no shows scheduled for recording.\r\n";
-    }
     else
     {
        os << "    The next " << iNum << " show" << (iNum == 1 ? "" : "s" )
@@ -2522,23 +2524,21 @@ void MainServer::PrintStatus(QSocket *socket)
                                                      QRegExp("\""), "&quot;");
                QString timeToRecstart = "in";
                int totalSecsToRecstart = qdtNow.secsTo((*iter)->recstartts);
-               int totalDaysToRecstart = qdtNow.daysTo((*iter)->recstartts);
-               int hoursToRecstart = totalSecsToRecstart / 3600;
+               int preRollSeconds = gContext->GetNumSetting("RecordPreRoll", 0);
+               totalSecsToRecstart -= preRollSeconds; //get preroll per recording as well
+               totalSecsToRecstart -= 60; //since we're not displaying seconds
+               int totalDaysToRecstart = totalSecsToRecstart / 86400;
+               int hoursToRecstart = (totalSecsToRecstart / 3600)
+                                     - (totalDaysToRecstart * 24);
                int minutesToRecstart = (totalSecsToRecstart / 60) % 60;
 
                if (totalDaysToRecstart > 1)
-               {
                    timeToRecstart += QString(" %1 days,")
                                              .arg(totalDaysToRecstart);
-                   hoursToRecstart -= totalDaysToRecstart * 24;
-               }
                else if (totalDaysToRecstart == 1)
-               {
                    timeToRecstart += (" 1 day,");
-                   hoursToRecstart -= 24;
-               }
 
-               if (hoursToRecstart > 1)
+               if (hoursToRecstart != 1)
                    timeToRecstart += QString(" %1 hours and")
                                              .arg(hoursToRecstart);
                else if (hoursToRecstart == 1)
@@ -2550,8 +2550,11 @@ void MainServer::PrintStatus(QSocket *socket)
                else
                    timeToRecstart += " 1 minute";
 
-               if (timeToRecstart == "in 0 minutes")
-                   timeToRecstart = "shortly";
+               if (hoursToRecstart == 0 && minutesToRecstart == 0)
+                   timeToRecstart = "within one minute";
+
+               if (totalSecsToRecstart < 0)
+                   timeToRecstart = "soon";
 
                os << "      <a href=\"#\">"
                   << ((*iter)->recstartts).toString(shortdateformat)
@@ -2620,7 +2623,7 @@ void MainServer::PrintStatus(QSocket *socket)
 
     QSqlQuery query = m_db->exec(querytext);
 
-    if (query.isActive() && query.numRowsAffected())
+    if (query.isActive() && query.numRowsAffected() && query.isValid())
     {
         query.next();
         GuideDataThrough = QDateTime::fromString(query.value(0).toString(),
@@ -2643,19 +2646,25 @@ void MainServer::PrintStatus(QSocket *socket)
     else
        os << "Last run was successful.<br />\r\n";
 
-    DaysOfData = qdtNow.daysTo(GuideDataThrough);
+    if (!GuideDataThrough.isNull())
+    {
+        os << "    There's guide data until "
+           << QDateTime(GuideDataThrough).toString("yyyy-MM-dd hh:mm");
 
-    os << "    There's guide data until "
-       << QDateTime(GuideDataThrough).toString("yyyy-MM-dd hh:mm");
+        DaysOfData = qdtNow.daysTo(GuideDataThrough);
 
-    if (DaysOfData > 0)
-        os << " (" << DaysOfData << " day"
-           << (DaysOfData == 1 ? "" : "s" ) << ").";
+        if (DaysOfData > 0)
+            os << " (" << DaysOfData << " day"
+               << (DaysOfData == 1 ? "" : "s" ) << ").";
+        else
+           os << ".";
+
+        if (DaysOfData <= 3)
+            os << " <strong>WARNING</strong>: is mythfilldatabase running?";
+    }
     else
-       os << ".";
-
-    if (DaysOfData <= 3)
-        os << "<strong>WARNING</strong>: is mythfilldatabase running?";
+        os << "    There's <strong>no guide data</strong> availible! "
+           << "You need to run mythfilldatabase!";
 
     os << "\r\n  </div>\r\n\r\n</body>\r\n</html>\r\n";
 

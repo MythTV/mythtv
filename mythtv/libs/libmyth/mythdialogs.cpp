@@ -293,11 +293,15 @@ void MythMainWindow::RegisterKey(const QString &context, const QString &action,
     }
     else
     {
+        QString inskey = keybind;
+        inskey.replace('\\', "\\\\");
+        inskey.replace('\"', "\\\"");
+
         thequery = QString("INSERT INTO keybindings (context, action, "
                            "description, keylist, hostname) VALUES "
                            "(\"%1\", \"%2\", \"%3\", \"%4\", \"%5\");")
                            .arg(context).arg(action).arg(description)
-                           .arg(keybind).arg(gContext->GetHostName());
+                           .arg(inskey).arg(gContext->GetHostName());
 
         query = db->exec(thequery);
         if (!query.isActive())
@@ -355,10 +359,14 @@ void MythMainWindow::RegisterJump(const QString &destination,
     }
     else
     {
+        QString inskey = keybind;
+        inskey.replace('\\', "\\\\");
+        inskey.replace('\"', "\\\"");
+
         thequery = QString("INSERT INTO jumppoints (destination, description, "
                            "keylist, hostname) VALUES (\"%1\", \"%2\", \"%3\", "
                            "\"%4\");").arg(destination).arg(description)
-                                      .arg(keybind)
+                                      .arg(inskey)
                                       .arg(gContext->GetHostName());
 
         query = db->exec(thequery);

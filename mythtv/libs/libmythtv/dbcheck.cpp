@@ -8,7 +8,7 @@ using namespace std;
 
 #include "mythcontext.h"
 
-const QString currentDatabaseVersion = "1017";
+const QString currentDatabaseVersion = "1018";
 
 void UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -409,6 +409,17 @@ void UpgradeTVDatabaseSchema(void)
 
         performActualUpdate(updates, "1017", dbver);
     }
+
+    if (dbver == "1017")
+    {
+        const QString updates[] = {
+"UPDATE settings SET value='RecPriorityActive' WHERE value='RecPriorityingActive';",
+""
+};
+
+        performActualUpdate(updates, "1018", dbver);
+    }
+
 }
 
 void InitializeDatabase(void)
