@@ -87,6 +87,7 @@ class UIType : public QObject
     virtual void Draw(QPainter *, int, int);
     virtual void calculateScreenArea();
     QRect   getScreenArea(){return screen_area;}
+    QString cutDown(QString, QFont *, bool multiline = false, int ow = -1, int oh = -1);
 
     
   public slots:
@@ -118,6 +119,7 @@ class UIType : public QObject
     bool     takes_focus;
     QRect    screen_area;   //  The area I occupy in
                             //  real screen coordinates
+
 };
 
 class UIBarType : public UIType
@@ -204,7 +206,7 @@ class UIGuideType : public UIType
     void drawText(QPainter *, int);
     void drawRecStatus(QPainter *, int);
     void Blender(QPainter *, QRect, int, QString force = "");
-    QString cutDown(QString, QFont *, int, int);
+    //QString cutDown(QString, QFont *, int, int);
     int m_justification;
     fontProp *m_font;
     QString m_solidcolor;
@@ -271,7 +273,7 @@ class UIListType : public UIType
     void Draw(QPainter *, int drawlayer, int);
 
   private:
-    QString cutDown(QString, QFont *, int);
+    //QString cutDown(QString, QFont *, int);
     int m_selheight;
     int m_justification;
     int m_columns;
@@ -372,7 +374,7 @@ class UITextType : public UIType
     void Draw(QPainter *, int, int);
 
   private:
-    QString cutDown(QString, QFont *, int, int);
+    //QString cutDown(QString, QFont *, int, int);
     int m_justification;
     QRect m_displaysize;
     QString m_message;
@@ -525,7 +527,7 @@ class UIManagedTreeListType : public UIType
                           }
     void    setFonts(QMap<QString, QString> fonts, QMap<QString, fontProp> fontfcn) { 
                           m_fonts = fonts; m_fontfcns = fontfcn; }
-    QString cutDown(QString, QFont *, int, int);
+    //QString cutDown(QString, QFont *, int, int);
     void    drawText(QPainter *p, QString the_text, QString font_name, int x, int y, int bin_number);
     void    setJustification(int jst) { m_justification = jst; }
     int     getJustification() { return m_justification; }

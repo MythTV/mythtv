@@ -134,6 +134,62 @@ void UIType::refresh()
     emit requestUpdate(screen_area);
 }
 
+QString UIType::cutDown(QString info, QFont *testFont, bool multiline, int overload_width, int overload_height)
+{
+    QFontMetrics fm(*testFont);
+    QRect curFontSize;
+    int maxwidth = screen_area.width();
+    if (overload_width != -1)
+        maxwidth = overload_width;
+    int maxheight = screen_area.height();
+    if (overload_height != -1)
+        maxheight = overload_height;
+
+    if (multiline == false)
+    {
+        int curFontWidth = fm.width(info);
+        if (curFontWidth > maxwidth)
+        {
+            QString testInfo = "";
+            curFontWidth = fm.width(testInfo);
+            int tmaxwidth = maxwidth - fm.width("LLL");
+            int count = 0;
+
+            while (curFontWidth < tmaxwidth)
+            {
+                testInfo = info.left(count);
+                curFontWidth = fm.width(testInfo);
+                count = count + 1;
+            }
+            info = testInfo + "...";
+        }
+    }
+    else
+    {
+        bool changed = false;
+        int justification = Qt::AlignLeft | Qt::WordBreak;
+	QRect curFontSize = fm.boundingRect(0, 0, maxwidth, maxheight, justification, info);
+        while (curFontSize.height() > maxheight)
+	{
+            changed = true;
+	    if (info.findRev(" ") == -1)
+            {
+                info = info + "...";
+	        return info;
+	    }
+            info = info.left(info.findRev(" "));
+	    curFontSize = fm.boundingRect(0, 0, maxwidth, maxheight, justification, info);
+	}
+	if (changed == true)
+        {
+            info = info.left(info.length() - 3);
+	    info = info + "...";
+	}
+    }
+
+    return info;
+}
+
 
 // **************************************************************
 
@@ -446,6 +502,7 @@ void UIGuideType::Draw(QPainter *dr, int drawlayer, int context)
   }
 }
 
+/*
 QString UIGuideType::cutDown(QString info, QFont *testFont, int maxwidth, int maxheight)
 {
     QFontMetrics fm(*testFont);
@@ -493,6 +550,7 @@ QString UIGuideType::cutDown(QString info, QFont *testFont, int maxwidth, int ma
     return info;
 
 }
+*/
 
 void UIGuideType::drawCurrent(QPainter *dr)
 {
@@ -753,6 +811,9 @@ void UIGuideType::Blender(QPainter *dr, QRect area, int num, QString force)
 
 void UIGuideType::drawText(QPainter *dr, int num)
 {
+    bool m_multi = false;
+    if ((m_justification & Qt::WordBreak) > 0)
+        m_multi = true;
     QRect area = drawArea[num];
     QString msg;
     if (categoryMap[num].stripWhiteSpace().length() > 0)
@@ -778,7 +839,7 @@ void UIGuideType::drawText(QPainter *dr, int num)
     
 
     if (m_cutdown == true)
-        msg = cutDown(msg, &(m_font->face), area.width(), area.height());
+        msg = cutDown(msg, &(m_font->face), m_multi, area.width(), area.height());
     if (m_cutdown == true && m_debug == true)
         cerr << "    +UIGuideType::CutDown Called.\n";
 
@@ -1022,7 +1083,7 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
                     if (tempWrite != "***FILLER***")
                     {
                         if (columnWidth[j] > 0)
-                            tempWrite = cutDown(tempWrite, &(tmpfont->face), columnWidth[j]);
+                            tempWrite = cutDown(tempWrite, &(tmpfont->face), false, columnWidth[j]);
                     }
                     else
                         tempWrite = "";
@@ -1097,7 +1158,7 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
                  tempWrite = listData[i + (int)(100*j)];
 
                  if (columnWidth[j] > 0)
-                     tempWrite = cutDown(tempWrite, &(tmpfont->face), columnWidth[j]);
+                     tempWrite = cutDown(tempWrite, &(tmpfont->face), false, columnWidth[j]);
         
                  if (fontdrop.x() != 0 || fontdrop.y() != 0)
                  {
@@ -1131,31 +1192,6 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
                  << ", widget layer = " << m_order << "\n";
     }
   }
-}
-
-QString UIListType::cutDown(QString info, QFont *testFont, int maxwidth)
-{
-    QFontMetrics fm(*testFont);
-
-    int curFontWidth = fm.width(info);
-    if (curFontWidth > maxwidth)
-    {
-        QString testInfo = "";
-        curFontWidth = fm.width(testInfo);
-        int tmaxwidth = maxwidth - fm.width("LLL");
-        int count = 0;
-
-        while (curFontWidth < tmaxwidth)
-        {
-            testInfo = info.left(count);
-            curFontWidth = fm.width(testInfo);
-            count = count + 1;
-        }
-        testInfo = testInfo + "...";
-        info = testInfo;
-    }
-    return info;
-
 }
 
 void UIListType::SetItemText(int num, int column, QString data)
@@ -1402,11 +1438,14 @@ void UITextType::Draw(QPainter *dr, int drawlayer, int context)
   if (m_context == context || m_context == -1)
     if (drawlayer == m_order)
     {
+        bool m_multi = false;
+	if ((m_justification & Qt::WordBreak) > 0)
+            m_multi = true;
         QPoint fontdrop = m_font->shadowOffset;
         QString msg = m_message;
         dr->setFont(m_font->face);
         if (m_cutdown == true)
-            msg = cutDown(msg, &(m_font->face), m_displaysize.width(), m_displaysize.height());
+            msg = cutDown(msg, &(m_font->face), m_multi, m_displaysize.width(), m_displaysize.height());
         if (m_cutdown == true && m_debug == true)
             cerr << "    +UITextType::CutDown Called.\n";
 
@@ -1446,6 +1485,7 @@ void UITextType::Draw(QPainter *dr, int drawlayer, int context)
         }
 }
 
+/*
 QString UITextType::cutDown(QString info, QFont *testFont, int maxwidth, int maxheight)
 {
     QFontMetrics fm(*testFont);
@@ -1493,6 +1533,7 @@ QString UITextType::cutDown(QString info, QFont *testFont, int maxwidth, int max
     return info;
 
 }
+*/
 
 void UITextType::calculateScreenArea()
 {
@@ -2052,22 +2093,22 @@ void UIManagedTreeListType::drawText(QPainter *p,
     
     if(!show_whole_tree)
     {
-        the_text = cutDown(the_text, &(temp_font->face), area.width() - 80, area.height());
+        the_text = cutDown(the_text, &(temp_font->face), false, area.width() - 80, area.height());
         p->drawText(x, y, the_text);
     }
     else if(bin_number == bins)
     {
-        the_text = cutDown(the_text, &(temp_font->face), bin_corners[bin_number].width() - right_arrow_image.width(), bin_corners[bin_number].height());
+        the_text = cutDown(the_text, &(temp_font->face), false, bin_corners[bin_number].width() - right_arrow_image.width(), bin_corners[bin_number].height());
         p->drawText(x, y, the_text);
     }
     else if(bin_number == 1)
     {
-        the_text = cutDown(the_text, &(temp_font->face), bin_corners[bin_number].width() - left_arrow_image.width(), bin_corners[bin_number].height());
+        the_text = cutDown(the_text, &(temp_font->face), false, bin_corners[bin_number].width() - left_arrow_image.width(), bin_corners[bin_number].height());
         p->drawText(x + left_arrow_image.width(), y, the_text);
     }
     else
     {
-        the_text = cutDown(the_text, &(temp_font->face), bin_corners[bin_number].width(), bin_corners[bin_number].height());
+        the_text = cutDown(the_text, &(temp_font->face), false, bin_corners[bin_number].width(), bin_corners[bin_number].height());
         p->drawText(x, y, the_text);
     }
 }
@@ -2399,6 +2440,7 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
     */
 }
 
+/*
 QString UIManagedTreeListType::cutDown(QString info, QFont *testFont, int maxwidth, int maxheight)
 {
     QFontMetrics fm(*testFont);
@@ -2446,6 +2488,7 @@ QString UIManagedTreeListType::cutDown(QString info, QFont *testFont, int maxwid
     return info;
 
 }
+*/
 
 void UIManagedTreeListType::moveToNode(QValueList<int> route_of_branches)
 {
