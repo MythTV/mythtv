@@ -841,7 +841,7 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
         {
             long long startpos = pkt->startpos;
             VERBOSE(VB_PLAYBACK, QString("positionMap[ %1 ] == %2.").arg(prevgoppos / keyframedist)
-                                         .arg(startpos));
+                                         .arg((int)startpos));
 
             // Grow positionMap vector several entries at a time
             if (m_positionMap.capacity() == m_positionMap.size())
