@@ -6,7 +6,7 @@ CONFIG += thread dll warn_off
 target.path = $${PREFIX}/lib
 INSTALLS = target
 
-VERSION = 0.15.0 
+VERSION = 0.16.0 
 
 include ( ../../config.mak )
 
