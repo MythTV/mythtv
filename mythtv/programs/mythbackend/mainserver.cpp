@@ -1125,16 +1125,10 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
                                    .arg(logInfo));
     }
 
-    if (pginfo)
-    {
-        ScheduledRecording::signalChange(pginfo->recordid);
+    ScheduledRecording::signalChange(0);
 
+    if (pginfo)
         delete pginfo;
-    }
-    else
-    {
-        ScheduledRecording::signalChange(0);
-    }
 
     if (delete_db)
         delete delete_db;
