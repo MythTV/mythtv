@@ -9,6 +9,7 @@
       <text lang="SV">Spela DVD</text>
       <text lang="ES">Ver DVD</text>
       <text lang="CA">Veure DVD</text>
+      <text lang="FR">Lecture DVD</text>
       <action>DVD_PLAY</action>
    </button>
 

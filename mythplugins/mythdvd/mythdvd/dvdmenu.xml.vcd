@@ -2,6 +2,7 @@
       <type>VCD_PLAY</type>
       <text>Play VCD</text>
       <text lang="DK">Afspil VCD</text>
+      <text lang="FR">Lecture VCD</text>
       <text lang="PT">Tocar VCD</text>
       <text lang="DE">VCD spielen</text>
       <action>VCD_PLAY</action>

@@ -7,4 +7,4 @@ SOURCES += ../mtd/jobthread.cpp
 
 TRANSLATIONS  = mythdvd_it.ts mythdvd_es.ts mythdvd_ca.ts
 TRANSLATIONS += mythdvd_nl.ts mythdvd_de.ts mythdvd_dk.ts
-TRANSLATIONS += mythdvd_pt.ts mythdvd_sv.ts
+TRANSLATIONS += mythdvd_pt.ts mythdvd_sv.ts mythdvd_fr.ts

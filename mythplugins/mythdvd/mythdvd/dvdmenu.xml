@@ -9,20 +9,9 @@
       <text lang="SV">Spela DVD</text>
       <text lang="ES">Ver DVD</text>
       <text lang="CA">Veure DVD</text>
+      <text lang="FR">Lecture DVD</text>
       <action>DVD_PLAY</action>
    </button>
 
-
-   <button>
-      <type>DVD_RIP</type>
-      <text>Rip DVD</text>
-      <text lang="DK">Genkod DVD</text>
-      <text lang="PT">Copiar DVD</text>
-      <text lang="DE">DVD rippen</text>
-      <text lang="SV">Kopiera DVD</text>
-      <text lang="ES">"Ripear" DVD</text>
-      <text lang="CA">Volcar DVD</text>
-      <action>DVD_RIP</action>
-   </button>
 
 </mythmenu>
