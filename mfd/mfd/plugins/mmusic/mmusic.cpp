@@ -45,14 +45,16 @@ MusicFile::MusicFile(const QString &a_file_name, QDateTime last_modified)
     database_id = -1;
 }
 
-void MusicFile::calculateMythDigest()
+bool MusicFile::calculateMythDigest()
 {
     MythDigest a_digest(file_name);
     myth_digest = a_digest.calculate();
     if(myth_digest.length() < 1)
     {
         cerr << "myth digest error on filename of \"" << file_name << "\"" << endl;
+        return false;
     }
+    return true;
 }
 
 /*
@@ -701,8 +703,20 @@ void MMusicWatcher::compareToMasterList(MusicFileMap &music_files, const QString
             counter++;
             
             MusicFile new_master_item(it.key(), it.data().lastModified());
-            new_master_item.calculateMythDigest();
-            master_list[it.key()] = new_master_item;
+            if(new_master_item.calculateMythDigest())
+            {
+                master_list[it.key()] = new_master_item;
+            }
+            else
+            {
+                //
+                //  File is there, but I can't seem to do anything with it
+                //
+
+                files_to_ignore.push_back(it.key());
+                log(QString("could not get digest (permissions problem?) for file: \"%1\"")
+                    .arg(it.key()), 4);
+            }
         }
         else if(master_list.find(it.key()).data().lastModified() != it.data().lastModified())
         {

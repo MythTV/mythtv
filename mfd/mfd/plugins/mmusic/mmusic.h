@@ -27,7 +27,7 @@ class MusicFile
     MusicFile();
     MusicFile(const QString &a_filename, QDateTime last_modified);
 
-    void      calculateMythDigest();    
+    bool      calculateMythDigest();    
     QDateTime lastModified(){ return last_modification; }    
     bool      checkedDatabase(){return checked_database;}
     void      checkedDatabase(bool y_or_n){ checked_database = y_or_n; }
