@@ -165,18 +165,10 @@ bool MetaIOOggVorbisComment::write(Metadata* mdata, bool exclusive)
         fclose(p_input);
         return false; 
     }
-    
-    // Unfortunatly we need a FILE* not a file descriptor....
-    close(fd);
+   
+    // We need a FILE* not a file descriptor....
+    FILE* p_output = fdopen(fd, "wb"); 
     newfilename = tmp;
-    delete[] tmp;
-    
-    
-    // OK, open our temporary file...
-    FILE* p_output = NULL;
-    p_output = fopen(newfilename.local8Bit(), "wb");
-    if (!p_output)
-        p_output = fopen(newfilename.ascii(), "wb");
     
     if (!p_output)
     {

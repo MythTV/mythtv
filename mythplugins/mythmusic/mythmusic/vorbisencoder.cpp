@@ -30,7 +30,8 @@ VorbisEncoder::VorbisEncoder(const QString &outfile, int qualitylevel,
 { 
     int result;
 
-    vorbis_comment* mpVc = MetaIOOggVorbisComment::getRawVorbisComment(metadata);
+    vorbis_comment_init(&vc);
+    MetaIOOggVorbisComment::getRawVorbisComment(metadata, &vc);
 
     packetsdone = 0;
     bytes_written = 0;
@@ -63,7 +64,7 @@ VorbisEncoder::VorbisEncoder(const QString &outfile, int qualitylevel,
     ogg_packet header_comments;
     ogg_packet header_codebooks;
 
-    vorbis_analysis_headerout(&vd, mpVc, &header_main, &header_comments, 
+    vorbis_analysis_headerout(&vd, &vc, &header_main, &header_comments, 
                               &header_codebooks);
 
     ogg_stream_packetin(&os, &header_main);
@@ -89,11 +90,7 @@ VorbisEncoder::~VorbisEncoder()
     ogg_stream_clear(&os);
     vorbis_block_clear(&vb);
     vorbis_dsp_clear(&vd);
-    if (mpVc)
-    {
-        vorbis_comment_clear(mpVc);
-        delete mpVc;
-    }
+    vorbis_comment_clear(&vc);
     vorbis_info_clear(&vi);
 }
 
