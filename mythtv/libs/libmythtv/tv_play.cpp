@@ -538,8 +538,7 @@ void TV::StopPlayerAndRecorder(bool closePlayer, bool closeRecorder)
         {
             prbuffer->StopReads();
             prbuffer->Pause();
-            while (!prbuffer->isPaused())
-                usleep(50);
+            prbuffer->WaitForPause();
         }
 
         if (nvp)
@@ -549,8 +548,7 @@ void TV::StopPlayerAndRecorder(bool closePlayer, bool closeRecorder)
         {
             piprbuffer->StopReads();
             piprbuffer->Pause();
-            while (!piprbuffer->isPaused())
-                usleep(50);
+            piprbuffer->WaitForPause();
         }
 
         if (pipnvp)

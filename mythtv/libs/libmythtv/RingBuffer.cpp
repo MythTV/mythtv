@@ -680,6 +680,9 @@ bool RingBuffer::isPaused(void)
 
 void RingBuffer::WaitForPause(void)
 {
+    if (!readaheadrunning)
+        return;
+
     if  (!readaheadpaused)
     {
         while (!pauseWait.wait(1000))

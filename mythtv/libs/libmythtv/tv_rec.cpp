@@ -1973,7 +1973,7 @@ void TVRec::SetReadThreadSock(QSocket *sock)
 
 void TVRec::RequestRingBufferBlock(int size)
 {
-    if (!readthreadlive)
+    if (!readthreadlive || !rbuffer)
         return;
 
     char buffer[256001];
