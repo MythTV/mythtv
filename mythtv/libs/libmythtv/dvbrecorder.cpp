@@ -21,6 +21,8 @@
  *      Dave Chapman (dave at dchapman.com)
  *          - The dvbstream library, which some code,
  *            in ::StartRecording, is based upon.
+ *      Martin Smith (martin at spamcop.net)
+ *          - The signal quality monitor
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -68,6 +70,13 @@ DVBRecorder::DVBRecorder(DVBChannel* advbchannel): RecorderBase()
     mainpaused = false;
     recording = false;
 
+    cont_errors = 0;
+    stream_overflows = 0;
+    bad_packets = 0;
+
+    signal_monitor_interval = 0;
+    expire_data_days = 3;
+
     wait_for_seqstart = true;
     wait_for_seqstart_enabled = true;
     dmx_buf_size = DEF_DMX_BUF_SIZE;
@@ -111,6 +120,20 @@ void DVBRecorder::SetOption(const QString &name, int value)
             pkt_buf_size = value - (value % MPEG_TS_PKT_SIZE);
             pktbuffer = (unsigned char*)realloc(pktbuffer, pkt_buf_size);
         }
+    }
+    else if (name == "signal_monitor_interval")
+    {
+        signal_monitor_interval = value;
+
+        if (signal_monitor_interval < 0)
+            signal_monitor_interval = 0; 
+    }
+    else if (name == "expire_data_days")
+    {
+        expire_data_days = value;
+
+        if (expire_data_days < 1)
+            expire_data_days = 1;
     }
     else
         RecorderBase::SetOption(name, value);
@@ -336,9 +359,26 @@ void DVBRecorder::StartRecording()
     receiving = false;
     struct pollfd polls;
 
+    pthread_t qualthread;
+    bool qthreadexists = false;
+
     polls.fd = fd_dvr;
     polls.events = POLLIN;
     polls.revents = 0;
+
+    cont_errors = 0;
+    stream_overflows = 0;
+    bad_packets = 0;
+
+    // start the thread that logs signal data to the db
+
+    if (signal_monitor_interval > 0 &&
+        pthread_create(&qualthread, NULL, QualityMonitorHelper, this) == 0)
+    {
+        qthreadexists = true;
+        RECORD("DVB Quality monitor is starting at " << 
+               signal_monitor_interval << "s for card " << cardnum);
+    }
 
     encoding = true;
     recording = true;
@@ -393,6 +433,16 @@ void DVBRecorder::StartRecording()
 
     FinishRecording();
 
+    // stop collecting data if the thread was started successfully
+
+    if (qthreadexists)
+    {
+        pthread_cancel(qualthread);
+        RECORD("DVB Quality monitor thread is stopping for card " << cardnum);
+    }
+
+    ExpireQualityData();
+
     recording = false;
 
     emit Stopped();
@@ -409,6 +459,13 @@ void DVBRecorder::ReadFromDMX()
 
         if (readsz < 0)
         {
+            if (errno == EOVERFLOW)
+            {
+                ++stream_overflows;
+                RECORD("DVB Buffer overflow error detected on read");
+                break;
+            }
+
             if (errno == EAGAIN)
                 break;
             ERRNO("Error reading from DVB device.");
@@ -437,6 +494,7 @@ void DVBRecorder::ReadFromDMX()
             if (pktbuf[1] & 0x80)
             {
                 WARNING("Uncorrectable error in packet, dropped.");
+                ++bad_packets;
                 continue;
             }
 
@@ -465,6 +523,7 @@ void DVBRecorder::ReadFromDMX()
                     RECORD(QString("PID %1 contcounter %2 cc %3")
                            .arg(pid).arg(contcounter[pid]).arg(cc));
                     contcounter[pid] = cc;
+                    ++cont_errors;
                 }            
             }
 
@@ -672,3 +731,105 @@ void DVBRecorder::GetBlankFrameMap(QMap<long long, int> &blank_frame_map)
 {
     (void)blank_frame_map;
 }
+
+// we need the capture card id and I can't see an easy way to get it
+// from this object
+
+int DVBRecorder::GetIDForCardNumber(int cardnum)
+{
+    pthread_mutex_lock(db_lock);
+    int cardid = -1;
+
+    QSqlQuery result = db_conn->exec(QString("SELECT cardid FROM capturecard "
+                                        "WHERE videodevice=\"%1\" AND "
+                                        " cardtype='DVB';").arg(cardnum));
+
+    if (result.isActive() && result.numRowsAffected() > 0)
+    {
+        result.next();
+
+        cardid = result.value(0).toInt();
+    }
+    else
+        RECORD("Could not get cardid for card number " << cardnum);
+
+    pthread_mutex_unlock(db_lock);
+
+    return cardid;
+}
+
+void DVBRecorder::QualityMonitorSample(int cardid,
+                                       dvb_stats_t& sample)
+{
+    QString sql = QString("INSERT INTO dvb_signal_quality("
+                          "sampletime, cardid, fe_snr, fe_ss, fe_ber, "
+                          "fe_unc, myth_cont, myth_over, myth_pkts) "
+                          "VALUES(NOW(), "
+                          "\"%1\",\"%2\",\"%3\",\"%4\","
+                          "\"%5\",\"%6\",\"%7\",\"%8\");")
+        .arg(cardid)
+        .arg(sample.snr & 0xffff)
+        .arg(sample.ss & 0xffff).arg(sample.ber).arg(sample.ub)
+        .arg(cont_errors).arg(stream_overflows).arg(bad_packets);
+
+    QSqlQuery result = db_conn->exec(sql);
+
+    if (!result.isActive())
+        MythContext::DBError("DVB quality sample insert failed", result);
+}
+
+void *DVBRecorder::QualityMonitorThread()
+{
+    dvb_stats_t fe_stats;
+
+    int cardid = GetIDForCardNumber(cardnum);
+
+    // loop until cancelled, wake at intervals and log data
+
+    while (true)
+    {
+        sleep(signal_monitor_interval);
+
+        pthread_testcancel();
+
+        if (cardid >= 0 &&
+            db_conn != NULL && db_lock != NULL && dvbchannel != NULL &&
+            dvbchannel -> FillFrontendStats(fe_stats))
+        {
+            pthread_mutex_lock(db_lock);
+
+            QualityMonitorSample(cardid, fe_stats);
+
+            pthread_mutex_unlock(db_lock);
+        }
+    }
+
+    return NULL;
+}
+
+void DVBRecorder::ExpireQualityData()
+{
+    RECORD("Expiring DVB quality data older than " << expire_data_days <<
+           " day(s)");
+
+    pthread_mutex_lock(db_lock);
+
+    QString sql = QString("DELETE FROM dvb_signal_quality "
+                          "WHERE sampletime < "
+                          "SUBDATE(NOW(), INTERVAL \"%1\" DAY);").
+        arg(expire_data_days);
+
+    QSqlQuery query = db_conn->exec(sql);
+
+    if (!query.isActive())
+        MythContext::DBError("Could not expire DVB signal data",
+                             query);
+
+    pthread_mutex_unlock(db_lock);
+}
+
+void *DVBRecorder::QualityMonitorHelper(void *self)
+{
+    return ((DVBRecorder *)self)->QualityMonitorThread();
+}
+

@@ -268,9 +268,13 @@ void IvtvDecoder::MpegPreProcessPkt(unsigned char *buf, int len,
                 }
                 case PICTURE_START:
                 {
-                    framesRead++;
-                    if (exitafterdecoded)
-                        gotvideo = 1;
+                    int type = (bufptr[1] >> 3) & 7;
+                    if (type >= 1 && type <= 3)
+                    {
+                        framesRead++;
+                        if (exitafterdecoded)
+                            gotvideo = 1;
+                    }
                     break;
                 }
                 default:

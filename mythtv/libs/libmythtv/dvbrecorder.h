@@ -81,6 +81,12 @@ private:
     void SetDemuxFilters(dvb_pids_t& pids);
     void CorrectStreamNumber(ipack* ip, int pid);
 
+    static void* QualityMonitorHelper(void*);
+    int GetIDForCardNumber(int cardnum);
+    void* QualityMonitorThread();
+    void QualityMonitorSample(int cardnum, dvb_stats_t& sample);
+    void ExpireQualityData();
+
     bool recording;
     bool encoding;
 
@@ -109,6 +115,13 @@ private:
     int     dmx_buf_size;
     int     pkt_buf_size;
     unsigned char* pktbuffer;
+
+    unsigned int cont_errors;
+    unsigned int stream_overflows;
+    unsigned int bad_packets;
+
+    int     signal_monitor_interval;
+    int     expire_data_days;
 
     int fd_dvr;
     vector<int> fd_demux;

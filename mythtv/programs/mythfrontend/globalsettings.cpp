@@ -1555,6 +1555,32 @@ public:
     };
 };
 
+#if USING_DVB
+
+class DVBMonitorInterval: public SpinBoxSetting, public BackendSetting {
+public:
+    DVBMonitorInterval():
+        SpinBoxSetting(0, 240, 5),
+        BackendSetting("DVBMonitorInterval") {
+        setLabel(QObject::tr("Interval to sample DVB signal stats at "
+                 "(in seconds, 0 = off)"));
+        setValue(0);
+    };
+};
+
+class DVBMonitorRetention: public SpinBoxSetting, public BackendSetting {
+public:
+    DVBMonitorRetention():
+        SpinBoxSetting(1, 30, 1),
+        BackendSetting("DVBMonitorRetention") {
+        setLabel(QObject::tr("Length of time to retain DVB signal data "
+                             "(in days)"));
+        setValue(1);
+    };
+};
+
+#endif
+
 MainGeneralSettings::MainGeneralSettings()
 {
     AudioSettings *audio = new AudioSettings();
@@ -1667,6 +1693,15 @@ GeneralSettings::GeneralSettings()
     autoexp->addChild(new AutoExpireDefault());
     autoexp->addChild(new MinRecordDiskThreshold());
     addChild(autoexp);
+
+#if USING_DVB
+    VerticalConfigurationGroup* dvb = new VerticalConfigurationGroup(false);
+
+    dvb->setLabel(QObject::tr("DVB Global Settings"));
+    dvb->addChild(new DVBMonitorInterval());
+    dvb->addChild(new DVBMonitorRetention());
+    addChild(dvb);
+#endif
 }
 
 EPGSettings::EPGSettings()

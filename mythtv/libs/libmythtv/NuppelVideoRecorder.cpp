@@ -62,6 +62,8 @@ NuppelVideoRecorder::NuppelVideoRecorder(ChannelBase *channel)
     h = 240;
     pip_mode = 0;
 
+    skip_btaudio = false;
+
     framerate_multiplier = 1.0;
     height_multiplier = 1.0;
 
@@ -266,6 +268,8 @@ void NuppelVideoRecorder::SetOption(const QString &opt, int value)
         pip_mode = value;
     else if (opt == "inpixfmt")
         inpixfmt = (VideoFrameType)value;
+    else if (opt == "skipbtaudio")
+        skip_btaudio = value;
     else
         RecorderBase::SetOption(opt, value);
 }
@@ -987,7 +991,7 @@ void NuppelVideoRecorder::StartRecording(void)
         perror("VIDIOCGCHAN");
 
     // if channel has a audio then activate it
-    if ((vchan.flags & VIDEO_VC_AUDIO) == VIDEO_VC_AUDIO) {
+    if (!skip_btaudio && (vchan.flags & VIDEO_VC_AUDIO) == VIDEO_VC_AUDIO) {
         //if (!quiet) 
         //    fprintf(stderr, "%s\n", "unmuting tv-audio");
         // audio hack, to enable audio from tvcard, in case we use a tuner

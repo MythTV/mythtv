@@ -264,6 +264,8 @@ class NuppelVideoRecorder : public RecorderBase
     ChannelBase *channelObj;
 
     bool setorigaudio;
+
+    bool skip_btaudio;
 };
 
 #endif

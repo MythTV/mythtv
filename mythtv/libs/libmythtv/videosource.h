@@ -387,6 +387,17 @@ public slots:
     void fillSelections(const QString& device);
 };
 
+class SkipBtAudio: public CheckBoxSetting, public CCSetting {
+public:
+    SkipBtAudio(const CaptureCard& parent):
+    CCSetting(parent, "skipbtaudio") {
+        setLabel(QObject::tr("Do not adjust BT audio volume."));
+        setHelpText(QObject::tr("Check this option for budget BT878 based "
+                    "DVB-T cards such as the AverTV DVB-T that require the "
+                    "audio volume left alone."));
+   };
+};
+
 class DVBCardNum: public SpinBoxSetting, public CCSetting {
 public:
     DVBCardNum(const CaptureCard& parent):
@@ -828,6 +839,7 @@ public:
         addChild(new VbiDevice(parent));
         addChild(new AudioDevice(parent));
         addChild(new AudioRateLimit(parent));
+        addChild(new SkipBtAudio(parent));
         addChild(input = new TunerCardInput(parent));
 
         connect(device, SIGNAL(valueChanged(const QString&)),

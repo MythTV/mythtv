@@ -2471,6 +2471,87 @@ void MainServer::ShutSlaveBackendsDown(QString &haltcmd)
     }
 }
 
+#if USING_DVB
+void MainServer::PrintDVBStatus(QTextStream& os)
+{
+    dblock.lock();
+
+    QString querytext;
+
+    bool doneAnything = false;
+    
+    os << "<div class=\"content\">\r\n" <<
+        "<h2>DVB Signal Information</h2>\r\n" <<
+        "Details of DVB error statistics for last 48 hours:<br>\r\n";
+
+    QString outerqry =
+        "SELECT starttime,endtime FROM recorded "
+        "WHERE starttime >= DATE_SUB(NOW(), INTERVAL 48 HOUR) "
+        "ORDER BY starttime;";
+
+    QSqlQuery oquery = m_db->exec(outerqry);
+
+    if (oquery.isActive() && oquery.numRowsAffected())
+    {
+        querytext = QString("SELECT cardid,"
+                            "max(fe_ss),min(fe_ss),avg(fe_ss),"
+                            "max(fe_snr),min(fe_snr),avg(fe_snr),"
+                            "max(fe_ber),min(fe_ber),avg(fe_ber),"
+                            "max(fe_unc),min(fe_unc),avg(fe_unc),"
+                            "max(myth_cont),max(myth_over),max(myth_pkts) "
+                            "FROM dvb_signal_quality "
+                            "WHERE sampletime BETWEEN ? AND ? "
+                            "GROUP BY cardid");
+
+        QSqlQuery query = m_db->exec(NULL);
+        query.prepare(querytext);
+        
+        while (oquery.next())
+        {
+            QDateTime t_start = oquery.value(0).toDateTime();
+            QDateTime t_end = oquery.value(1).toDateTime();
+
+            query.bindValue(0, t_start);
+            query.bindValue(1, t_end);
+
+            if (!query.exec())
+                cout << query.lastError().text() << "\r\n";
+            
+            if (query.isActive())
+            {
+                os << "<br>Recording period from " << t_start.toString() << 
+                    " to " << t_end.toString() <<
+                    "<br>\n";
+                
+                while (query.next())
+                {
+                    os << "Card: " << query.value(0).toInt() <<
+                        " Min SNR: " << query.value(5).toInt() <<
+                        " Avg SNR: " << query.value(6).toInt() <<
+                        " Min BER: " << query.value(8).toInt() <<
+                        " Avg BER: " << query.value(9).toInt() <<
+                        " Cont Errs: " << query.value(13).toInt() <<
+                        " Overflows: " << query.value(14).toInt() <<
+                        "<br>\r\n";
+
+                    doneAnything = true;
+                }
+            }
+        }
+    }
+
+    if (!doneAnything)
+    {
+        os << "<br>There is no DVB signal quality data available to display." 
+           << "<br>\r\n";
+    }
+
+    dblock.unlock();
+
+    os << "</div>\r\n";
+}
+#endif
+
 void MainServer::PrintStatus(QSocket *socket)
 {
     QTextStream os(socket);
@@ -2836,7 +2917,13 @@ void MainServer::PrintStatus(QSocket *socket)
         os << "    There's <strong>no guide data</strong> available! "
            << "Have you run mythfilldatabase?";
 
-    os << "\r\n  </div>\r\n\r\n</body>\r\n</html>\r\n";
+    os << "\r\n  </div>\r\n";
+
+#if USING_DVB
+    PrintDVBStatus(os);
+#endif
+
+    os << "\r\n</body>\r\n</html>\r\n";
 
     while (recordingList.size() > 0)
     {

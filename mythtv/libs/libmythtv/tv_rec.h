@@ -150,7 +150,7 @@ class TVRec
 
     void GetDevices(int cardnum, QString &video, QString &vbi, QString &audio,
                     int &rate, QString &defaultinput, QString &startchannel,
-                    QString &type, dvb_options_t &dvb_opts);
+                    QString &type, dvb_options_t &dvb_opts, bool &skip_bt);
 
     void ConnectDB(int cardnum);
     void DisconnectDB(void);
@@ -202,6 +202,7 @@ class TVRec
  
     QString videodev, vbidev, audiodev, cardtype;
     int audiosamplerate;
+    bool skip_btaudio;
 
     bool inoverrecord;
     int overrecordseconds;

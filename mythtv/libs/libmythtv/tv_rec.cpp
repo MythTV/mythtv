@@ -64,11 +64,12 @@ TVRec::TVRec(int capturecardnum)
     QString chanorder = gContext->GetSetting("ChannelOrdering", "channum + 0");
 
     audiosamplerate = -1;
+    skip_btaudio = false;
 
     QString inputname, startchannel;
 
     GetDevices(capturecardnum, videodev, vbidev, audiodev, audiosamplerate,
-               inputname, startchannel, cardtype, dvb_options);
+               inputname, startchannel, cardtype, dvb_options, skip_btaudio);
 
     if (cardtype == "DVB")
     {
@@ -564,6 +565,10 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
         nvr->SetOption("wait_for_seqstart", dvb_options.wait_for_seqstart);
         nvr->SetOption("dmx_buf_size", dvb_options.dmx_buf_size);
         nvr->SetOption("pkt_buf_size", dvb_options.pkt_buf_size);
+        nvr->SetOption("signal_monitor_interval", 
+                       gContext->GetNumSetting("DVBMonitorInterval", 0));
+        nvr->SetOption("expire_data_days",
+                       gContext->GetNumSetting("DVBMonitorRetention", 3));
         nvr->Initialize();
 #endif
         return;
@@ -575,6 +580,7 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
 
     nvr->SetRingBuffer(rbuffer);
 
+    nvr->SetOption("skipbtaudio", skip_btaudio);
     nvr->SetOptionsFromProfile(&profile, videodev, audiodev, vbidev, ispip);
  
     nvr->Initialize();
@@ -999,7 +1005,7 @@ void TVRec::DisconnectDB(void)
 void TVRec::GetDevices(int cardnum, QString &video, QString &vbi, 
                        QString &audio, int &rate, QString &defaultinput,
                        QString &startchan, QString &type, 
-                       dvb_options_t &dvb_opts)
+                       dvb_options_t &dvb_opts, bool &skip_bt)
 {
     video = "";
     vbi = "";
@@ -1016,7 +1022,7 @@ void TVRec::GetDevices(int cardnum, QString &video, QString &vbi,
                                "audioratelimit,defaultinput,cardtype,"
                                "dvb_swfilter, dvb_recordts,"
                                "dvb_wait_for_seqstart,dvb_dmx_buf_size,"
-                               "dvb_pkt_buf_size "
+                               "dvb_pkt_buf_size, skipbtaudio "
                                "FROM capturecard WHERE cardid = %1;")
                               .arg(cardnum);
 
@@ -1058,6 +1064,8 @@ void TVRec::GetDevices(int cardnum, QString &video, QString &vbi,
         dvb_opts.wait_for_seqstart = query.value(8).toInt();
         dvb_opts.dmx_buf_size = query.value(9).toInt();
         dvb_opts.pkt_buf_size = query.value(10).toInt();
+
+        skip_bt = query.value(11).toInt();
     }
 
     thequery = QString("SELECT if(startchan!='', startchan, '3') "

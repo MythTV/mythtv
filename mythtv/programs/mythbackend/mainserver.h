@@ -90,6 +90,8 @@ class MainServer : public QObject
 
     void getFreeSpace(int &total, int &used);
 
+    void PrintDVBStatus(QTextStream &os);
+
     PlaybackSock *getSlaveByHostname(QString &hostname);
     PlaybackSock *getPlaybackBySock(QSocket *socket);
     FileTransfer *getFileTransferByID(int id);
