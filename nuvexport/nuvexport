@@ -133,7 +133,7 @@ format and use Microsoft's Windows Media Encoder to encode a WMV file.
 
 # Make sure that we have nice installed
 	$Prog{nice} = find_program('nice');
-	die "You need ffmpeg to use this program.\n\n" unless ($Prog{nice});
+	die "You need nice to use this program.\n\n" unless ($Prog{nice});
 
 # Find out which encoders are available to use, and load any extra command line argument variables
 	push @Functions, export_SVCD->new,
