@@ -1121,19 +1121,20 @@ bool PlaybackBox::FillList()
     // titles backwards until we find where we were or go past.  This
     // is somewhat inefficient, but it works.
 
-    oldtitle.remove(prefixes);
+    QString oldsTitle = oldtitle;
+    oldsTitle.remove(prefixes);
     titleIndex = titleList.count() - 1;
     for (int i = titleIndex; i >= 0; i--)
     {
         sTitle = titleList[i];
         sTitle.remove(prefixes);
         
-        if (oldtitle > sTitle)
+        if (oldsTitle > sTitle)
             break;
 
         titleIndex = i;
 
-        if (oldtitle == sTitle)
+        if (oldsTitle == sTitle)
             break;
     }
 
