@@ -33,7 +33,8 @@ Scheduler::Scheduler(MythContext *context, QMap<int, EncoderLink *> *tvList,
         pthread_create(&scthread, NULL, SchedulerThread, this);
     }
 
-    context->addListener(this);
+    if (context)
+        context->addListener(this);
 }
 
 Scheduler::~Scheduler()
@@ -45,7 +46,8 @@ Scheduler::~Scheduler()
         recordingList.pop_back();
     }
 
-    m_context->removeListener(this);
+    if (m_context)
+        m_context->removeListener(this);
 }
 
 void Scheduler::setupCards(void)
@@ -154,8 +156,7 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
         recordingList.pop_back();
     }
 
-    ScheduledRecording::findAllProgramsToRecord(QSqlDatabase::database(),
-                                                recordingList);
+    ScheduledRecording::findAllProgramsToRecord(db, recordingList);
 
     QMap<QString, bool> foundlist;
 
