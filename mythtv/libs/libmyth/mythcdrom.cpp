@@ -3,6 +3,8 @@
 #include <linux/cdrom.h>        // old ioctls for cdrom
 #include <sys/stat.h>
 
+#include "mythcontext.h"
+
 // For testing
 #include <cstdio>
 #include <iostream>
@@ -228,11 +230,17 @@ MediaError MythCDROM::lock()
 
 MediaError MythCDROM::unlock() 
 {
-    if (!isDeviceOpen())
-        openDevice(); // The call to the base unlock will close it if needed.
-
-    if (isDeviceOpen())
+    if (openDevice()) 
+    { 
+        // The call to the base unlock will close it if needed.
+        VERBOSE( VB_ALL, "Unlocking CDROM door");
         ioctl(m_DeviceHandle, CDROM_LOCKDOOR, 0);
+    }
+    else
+    {
+        VERBOSE(VB_GENERAL, "Failed to open device, CDROM try will remain "
+                            "locked.");
+    }
 
     return MythMediaDevice::unlock();
 }
@@ -241,8 +249,19 @@ void MythCDROM::onDeviceMounted()
 {
     QString DetectPath;
     DetectPath.sprintf("%s%s", (const char*)m_MountPath, PATHTO_DVD_DETECT);
+    VERBOSE(VB_ALL, QString("Looking for: '%1'").arg(DetectPath));
+
     struct stat sbuf;
     if (stat(DetectPath, &sbuf) == 0)
+    {
+        VERBOSE(VB_GENERAL, "Probable DVD detected.");
         m_MediaType = MEDIATYPE_VIDEO;
+        // HACK make it possible to eject a DVD by unmounting it
+        performMountCmd(false);
+        m_Status = MEDIASTAT_USEABLE; 
+    }
+    
+    if (m_AllowEject)
+        unlock();
 }
 

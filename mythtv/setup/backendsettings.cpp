@@ -413,6 +413,31 @@ public:
     };
 };
 
+class preSDWUCheckCommand: public LineEditSetting, public BackendSetting {
+public:
+    preSDWUCheckCommand():
+        BackendSetting("preSDWUCheckCommand") {
+        setLabel(QObject::tr("Pre Shutdown check-command"));
+        setValue("");
+        setHelpText(QObject::tr("A command executed before the backend would "
+                    "shutdown. The return value of the command determines if "
+                    "the backend is allowed to shutdown. 0 - yes, "
+                    "1 - reinitializes the idleing, "
+                    "2 - reset the backend to wait for a frontend again"));
+    };
+};
+
+class blockSDWUwithoutClient: public CheckBoxSetting, public BackendSetting {
+public:
+    blockSDWUwithoutClient():
+        BackendSetting("blockSDWUwithoutClient") {
+        setLabel(QObject::tr("Block shutdown before client connected"));
+        setValue(true);
+        setHelpText(QObject::tr("If set, the automatic shutdown routine will "
+                    "be disabled until a client connects."));
+    };
+};
+
 BackendSettings::BackendSettings() {
     VerticalConfigurationGroup* server = new VerticalConfigurationGroup(false);
     server->setLabel(QObject::tr("Host Address Backend Setup"));
@@ -443,12 +468,14 @@ BackendSettings::BackendSettings() {
 
     VerticalConfigurationGroup* group3 = new VerticalConfigurationGroup(false);
     group3->setLabel(QObject::tr("Shutdown/Wakeup Options"));
+    group3->addChild(new blockSDWUwithoutClient());
     group3->addChild(new idleTimeoutSecs());
     group3->addChild(new idleWaitForRecordingTime());
     group3->addChild(new StartupSecsBeforeRecording());
     group3->addChild(new WakeupTimeFormat());
     group3->addChild(new SetWakeuptimeCommand());
     group3->addChild(new ServerHaltCommand());
+    group3->addChild(new preSDWUCheckCommand());
     addChild(group3);    
 
     VerticalConfigurationGroup* group4 = new VerticalConfigurationGroup(false);

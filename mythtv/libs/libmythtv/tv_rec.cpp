@@ -1085,18 +1085,18 @@ void TVRec::GetDevices(int cardnum, QString &video, QString &vbi,
 bool TVRec::CheckChannel(QString name)
 {
     QSqlDatabase* dummy1;
-    pthread_mutex_t dummy2;
+    pthread_mutex_t* dummy2;
     return CheckChannel(channel, name, dummy1, dummy2);
 }
 
 bool TVRec::CheckChannel(ChannelBase *chan, const QString &channum, 
-                         QSqlDatabase *&a_db_conn, pthread_mutex_t &a_db_lock)
+                         QSqlDatabase *&a_db_conn, pthread_mutex_t *&a_db_lock)
 {
     if (!db_conn)
         return true;
 
     a_db_conn = db_conn;
-    a_db_lock = db_lock;
+    a_db_lock = &db_lock;
 
     pthread_mutex_lock(&db_lock);
     MythContext::KickDatabase(db_conn);

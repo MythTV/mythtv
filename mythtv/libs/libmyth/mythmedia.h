@@ -52,7 +52,7 @@ class MythMediaDevice : public QObject
 
     int getDeviceHandle() const { return m_DeviceHandle; }
 
-    bool isDeviceOpen() const { return m_DeviceHandle > 0; }
+    bool isDeviceOpen() const;
     
     MediaType getMediaType() const { return m_MediaType; }
 

@@ -494,7 +494,8 @@ void haltnow()
 {
     QString halt_cmd = gContext->GetSetting("HaltCommand", 
                                             "sudo /sbin/halt -p");
-    system(halt_cmd.ascii());
+    if (!halt_cmd.isEmpty())
+        system(halt_cmd.ascii());
 }
 
 int RunMenu(QString themedir)
@@ -816,7 +817,37 @@ int main(int argc, char **argv)
     if (!gContext->OpenDatabase(db))
     {
         printf("couldn't open db\n");
-        return -1;
+        int pause;
+        if ((pause = gContext->GetNumSetting("WOLsqlReconnectWaitTime", 0)) > 0)
+        {
+            int acttry = 1;
+            int retries = gContext->GetNumSetting("WOLsqlConnectRetry", 5);
+
+            QString WOLsqlCommand = gContext->GetSetting("WOLsqlCommand", 
+                                                   "echo \'WOLsqlServerCommand "
+                                                   "not set\nPlease do so in "
+                                                   "your mysql.txt!\'");
+
+            if (!WOLsqlCommand.isEmpty())
+            {
+                while (acttry <= retries && !gContext->OpenDatabase(db))
+                {
+                    printf("Trying to wakeup SQLserver (Try %d of %d)\n",
+                           acttry, retries);
+                    system(WOLsqlCommand);
+                    sleep(pause);
+                    ++acttry;
+                }
+            }
+            
+            if (WOLsqlCommand.isEmpty() || (acttry > retries))
+            {
+                printf("Sorry, couldn't open db\nExiting.\n");
+                return -1;
+            }
+        }
+        else
+            return -1;
     }
 
     UpgradeTVDatabaseSchema();

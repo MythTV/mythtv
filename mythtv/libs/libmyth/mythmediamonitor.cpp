@@ -183,8 +183,8 @@ bool MediaMonitor::addDevice(const char* devPath )
         if (!is_supermount) 
         {
             if (is_cdrom)
-                pDevice = new MythCDROM(this, QString(mep->mnt_fsname), true, 
-                                        m_AllowEject);
+                pDevice = new MythCDROM(this, QString(mep->mnt_fsname),
+                                        is_supermount, m_AllowEject);
         }
         else 
         {
@@ -201,8 +201,8 @@ bool MediaMonitor::addDevice(const char* devPath )
                 strncpy(devstr, dev, len);
                 devstr[len] = 0;
                 if (is_cdrom)
-                    pDevice = new MythCDROM(this, QString(devstr), true, 
-                                            m_AllowEject);
+                    pDevice = new MythCDROM(this, QString(devstr),
+                                            is_supermount, m_AllowEject);
             }
             else
                 return false;   
@@ -269,7 +269,10 @@ void MediaMonitor::mediaStatusChanged(MediaStatus oldStatus,
     if (!m_Active)
         return;
     
-    VERBOSE(VB_ALL, QString("Media status changed...  New status is:"));
+    VERBOSE(VB_ALL, QString("Media status changed...  New status is: %1 "
+                            "old status was %2")
+                 .arg(MythMediaDevice::MediaStatusStrings[pMedia->getStatus()])
+                 .arg(MythMediaDevice::MediaStatusStrings[oldStatus]));
     // This gets called from outside the main thread so we need to post an event back to the main thread.
     // We're only going to pass up events for useable media...
     if (pMedia->getStatus() == MEDIASTAT_USEABLE || 

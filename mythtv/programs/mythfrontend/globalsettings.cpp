@@ -766,6 +766,17 @@ public:
     };
 };
 
+class PreviewPixmapOffset: public SpinBoxSetting, public BackendSetting {
+public:
+    PreviewPixmapOffset():
+        SpinBoxSetting(0, 600, 1), BackendSetting("PreviewPixmapOffset") {
+        setLabel(QObject::tr("Time offset for thumbnail preview images"));
+        setHelpText(QObject::tr("How many seconds into the show to capture "
+                    "the static preview images from."));
+        setValue(64);
+    };
+};
+
 class PlaybackPreview: public CheckBoxSetting, public GlobalSetting {
 public:
     PlaybackPreview():
@@ -1623,14 +1634,19 @@ GeneralSettings::GeneralSettings()
     general->setLabel(QObject::tr("General"));
     general->addChild(new RecordPreRoll());
     general->addChild(new RecordOverTime());
-    general->addChild(new PlayBoxOrdering());
     general->addChild(new ChannelOrdering());
-    general->addChild(new DisplayChanNum());
     general->addChild(new SmartChannelChange());
-    general->addChild(new GeneratePreviewPixmaps());
-    general->addChild(new PlaybackPreview());
     general->addChild(new AdvancedRecord());
     addChild(general);
+
+    VerticalConfigurationGroup* gen2 = new VerticalConfigurationGroup(false);
+    gen2->setLabel(QObject::tr("General"));
+    gen2->addChild(new PlayBoxOrdering());
+    gen2->addChild(new DisplayChanNum());
+    gen2->addChild(new GeneratePreviewPixmaps());
+    gen2->addChild(new PreviewPixmapOffset());
+    gen2->addChild(new PlaybackPreview());
+    addChild(gen2);
 
     VerticalConfigurationGroup* autoexp = new VerticalConfigurationGroup(false);
     autoexp->setLabel(QObject::tr("Global Auto Expire Settings"));

@@ -69,7 +69,7 @@ class TVRec
     bool IsRecording(void) { return StateIsRecording(internalState); }
 
     bool CheckChannel(ChannelBase *chan, const QString &channum, 
-                      QSqlDatabase *& a_db_conn, pthread_mutex_t &a_db_lock); 
+                      QSqlDatabase *& a_db_conn, pthread_mutex_t *&a_db_lock); 
     void SetChannelValue(QString &field_name,int value, ChannelBase *chan,
                          const QString &channum);
     int GetChannelValue(const QString &channel_field, ChannelBase *chan, 

@@ -20,7 +20,7 @@ class Scheduler : public QObject
 {
   public:
     Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList, 
-              QSqlDatabase *ldb, bool noAutoShutdown = false);
+              QSqlDatabase *ldb);
    ~Scheduler();
 
     bool CheckForChanges(void);
@@ -83,6 +83,8 @@ class Scheduler : public QObject
                          list<ProgramInfo *> *conflictList);
     void DoMultiCard();
 
+    void CheckShutdownServer(int prerollseconds, QDateTime &idleSince,
+                             bool &blockShutdown);
     void ShutdownServer(int prerollseconds);
 
     list<ProgramInfo *> *CopyList(list<ProgramInfo *> *sourcelist);
@@ -123,8 +125,6 @@ class Scheduler : public QObject
     QValueList<ProgramInfo> dontRecordList;
 
     MainServer *m_mainServer;
-    bool m_blockShutdown;
-    bool m_noAutoShutdown;
 };
 
 #endif

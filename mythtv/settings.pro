@@ -24,7 +24,7 @@ EXTRA_LIBS = -lfreetype -lmp3lame
 CONFIG += using_xv
 EXTRA_LIBS += -L/usr/X11R6/lib -lXinerama -lXv -lX11 -lXext -lXxf86vm
 
-# IVTV (PVR-350) support.  Disable if building on Windows.
+# IVTV (PVR-x50) support.  Disable if building on Windows.
 CONFIG += using_ivtv
 DEFINES += USING_IVTV
 

@@ -332,7 +332,7 @@ bool Channel::SetChannelByString(const QString &chan)
     }
 
     QSqlDatabase *db_conn;
-    pthread_mutex_t db_lock;
+    pthread_mutex_t *db_lock;
 
     if (!pParent->CheckChannel(this, chan, db_conn, db_lock))
     {
@@ -341,7 +341,7 @@ bool Channel::SetChannelByString(const QString &chan)
         return false;
     }
 
-    pthread_mutex_lock(&db_lock);
+    pthread_mutex_lock(db_lock);
     QString thequery = QString("SELECT finetune, freqid, tvformat, freqtable "
                                "FROM channel "
                                "LEFT JOIN videosource USING (sourceid) "
@@ -355,7 +355,7 @@ bool Channel::SetChannelByString(const QString &chan)
         MythContext::DBError("fetchtuningparams", query);
     if (query.numRowsAffected() <= 0)
     {
-        pthread_mutex_unlock(&db_lock);
+        pthread_mutex_unlock(db_lock);
         return false;
     }
     query.next();
@@ -373,7 +373,7 @@ bool Channel::SetChannelByString(const QString &chan)
     if (tvformat.isNull() || tvformat.isEmpty())
         tvformat = "Default";
 
-    pthread_mutex_unlock(&db_lock);
+    pthread_mutex_unlock(db_lock);
 
     // Tune
     if (externalChanger[currentcapchannel].isEmpty())

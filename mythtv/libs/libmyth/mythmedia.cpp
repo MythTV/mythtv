@@ -6,6 +6,8 @@
 #include "qfile.h"
 #include "qtextstream.h"
 
+#include "mythcontext.h"
+
 #include <cstdio>
 #include <iostream>
 #include <cstdlib>
@@ -32,7 +34,7 @@ MythMediaDevice::MythMediaDevice(QObject* par, const char* DevicePath,
     m_Locked = false;
     m_DeviceHandle = -1;
     m_SuperMount = SuperMount;
-    m_Status = (isMounted(true)) ? MEDIASTAT_MOUNTED : MEDIASTAT_UNKNOWN;
+    m_Status = (isMounted(true)) ? MEDIASTAT_MOUNTED : MEDIASTAT_NOTMOUNTED;
 }
 
 bool MythMediaDevice::openDevice()
@@ -58,6 +60,11 @@ bool MythMediaDevice::closeDevice()
     return (ret != -1) ? true : false;
 }
 
+bool MythMediaDevice::isDeviceOpen() const 
+{ 
+    return (m_DeviceHandle > 0) ? true : false; 
+}
+
 bool MythMediaDevice::performMountCmd(bool DoMount)
 {
     QString MountCommand;
@@ -75,20 +82,30 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
             MountCommand.sprintf("%s %s", PATHTO_UNMOUNT, 
                                  (const char*)m_DevicePath);
     
-        //cout << "executing '" << MountCommand << "'" << endl;
-        if (0 == system( MountCommand)) 
+        VERBOSE(VB_ALL,  QString("Executing '%1'").arg(MountCommand));
+        if (0 == system(MountCommand)) 
         {
             if(DoMount)
+            {
+                m_Status = MEDIASTAT_MOUNTED;
                 onDeviceMounted();
+            }
             else
                 onDeviceUnmounted();
             return true;
         }
+        else
+        {
+            VERBOSE(VB_GENERAL, QString("Failed to mount %1.")
+                                       .arg(m_DevicePath));
+        }
     } 
     else 
     {
-        // If it's a super mount then the OS will handle mounting /  unmounting..
-        // We just need to give derived classes a chance to perform their mount / unmount logic.
+        VERBOSE( VB_ALL,  "Disk iserted on a supermount device" );
+        // If it's a super mount then the OS will handle mounting /  unmounting.
+        // We just need to give derived classes a chance to perform their 
+        // mount / unmount logic.
         if (DoMount)
             onDeviceMounted();
         else
@@ -175,12 +192,9 @@ MediaStatus MythMediaDevice::setStatus( MediaStatus NewStatus, bool CloseIt )
     if (NewStatus != OldStatus) 
     {
         switch (NewStatus) 
-            {
-            // All of these indicate that disk is not / should not be mounted.
+        {
+            // the disk is not / should not be mounted.
             case MEDIASTAT_ERROR:
-            case MEDIASTAT_UNKNOWN:
-            case MEDIASTAT_OPEN:
-            case MEDIASTAT_USEABLE:
                 if (MEDIASTAT_MOUNTED == OldStatus)
                     unmount();
                 break;
@@ -192,12 +206,17 @@ MediaStatus MythMediaDevice::setStatus( MediaStatus NewStatus, bool CloseIt )
                 // as MEDIASTAT_OPEN, MEDISTAT_ERROR or MEDIASTAT_UNKNOWN.
                 mount();
                 break;
+            case MEDIASTAT_UNKNOWN:
+            case MEDIASTAT_OPEN:
+            case MEDIASTAT_USEABLE:
             case MEDIASTAT_MOUNTED:
                 // get rid of the compiler warning...
                 break;
-            }
+        }
         
-        emit statusChanged(OldStatus, this);
+        // Don't fire off transitions to / from unknown states
+        if (m_Status != MEDIASTAT_UNKNOWN && OldStatus != MEDIASTAT_UNKNOWN)
+            emit statusChanged(OldStatus, this);
     }
 
 

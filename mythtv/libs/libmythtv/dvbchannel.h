@@ -87,7 +87,7 @@ private:
     void StatusMonitorLoop();
 
     bool GetChannelOptions(QString channum);
-    bool GetChannelPids(QSqlDatabase*& db_conn, pthread_mutex_t& db_lock,
+    bool GetChannelPids(QSqlDatabase*& db_conn, pthread_mutex_t*& db_lock,
                         int chanid);
     void PrintChannelOptions();
 

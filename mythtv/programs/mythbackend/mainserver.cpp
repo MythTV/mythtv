@@ -350,9 +350,15 @@ void MainServer::ProcessRequest(QSocket *sock)
             VERBOSE(VB_ALL, "Bad SHUTDOWN_NOW query");
         else if (!ismaster)
         {
-            VERBOSE(VB_ALL, "Going down now as of Mainserver request!");
             QString halt_cmd = listline[1];
-            system(halt_cmd.ascii());
+            if (!halt_cmd.isEmpty())
+            {
+                VERBOSE(VB_ALL, "Going down now as of Mainserver request!");
+                system(halt_cmd.ascii());
+            }
+            else
+                VERBOSE(VB_ALL,
+                        "WARNING: Recieved an empty SHUTDOWN_NOW query!");
         }
     }
     else if (command == "BACKEND_MESSAGE")
@@ -2139,8 +2145,11 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
 
     EncoderLink *elink = encoderList->begin().data();
 
+    int secondsin = gContext->GetNumSetting("PreviewPixmapOffset", 64);
+
     unsigned char *data = (unsigned char *)elink->GetScreenGrab(pginfo, 
-                                                                filename, 64,
+                                                                filename, 
+                                                                secondsin,
                                                                 len, width,
                                                                 height);
 

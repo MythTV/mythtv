@@ -10,3 +10,19 @@ DBName=mythconverg
 # TWO HOSTS MUST NOT USE THE SAME VALUE
 #
 #LocalHostName=my-unique-identifier-goes-here
+
+# If you want your frontend to be able to wake your MySQL server 
+# using WakeOnLan, have a look at the following settings:
+#
+# Set the time the frontend waits (in seconds) beetween reconnect tries. 
+# This should be the rough time your MySQL server needs for startup
+#WOLsqlReconnectWaitTime=0
+#
+#
+# This is the amount of retries to wake the MySQL server until the frontend 
+# gives up
+#WOLsqlConnectRetry=5
+#
+#
+# This is the command executed to wake your MySQL server. 
+#WOLsqlCommand=echo \'WOLsqlServerCommand not set\'

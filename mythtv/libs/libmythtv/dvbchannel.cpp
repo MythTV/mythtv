@@ -189,7 +189,7 @@ bool DVBChannel::GetChannelOptions(QString channum)
     QString         thequery;
     QSqlQuery       query;
     QSqlDatabase    *db_conn;
-    pthread_mutex_t db_lock;
+    pthread_mutex_t *db_lock;
 
     if (!pParent->CheckChannel((ChannelBase*)this, channum,
                                db_conn, db_lock))
@@ -200,7 +200,7 @@ bool DVBChannel::GetChannelOptions(QString channum)
 
     dvbcam->SetDatabase(db_conn, db_lock);
 
-    pthread_mutex_lock(&db_lock);
+    pthread_mutex_lock(db_lock);
     MythContext::KickDatabase(db_conn);
 
     thequery = QString("SELECT chanid FROM channel WHERE channum='%1'")
@@ -213,7 +213,7 @@ bool DVBChannel::GetChannelOptions(QString channum)
     if (query.numRowsAffected() <= 0)
     {
         ERROR("Unable to find channel in database.");
-        pthread_mutex_unlock(&db_lock);
+        pthread_mutex_unlock(db_lock);
         return false;
     }
 
@@ -279,11 +279,11 @@ bool DVBChannel::GetChannelOptions(QString channum)
                               .arg(channum).arg(satid));
         }
 
-        pthread_mutex_unlock(&db_lock);
+        pthread_mutex_unlock(db_lock);
         return false;
     }
 
-    pthread_mutex_unlock(&db_lock);
+    pthread_mutex_unlock(db_lock);
 
     query.next();
     if (!ParseQuery(query))
@@ -295,7 +295,8 @@ bool DVBChannel::GetChannelOptions(QString channum)
     return true;
 }
 
-bool DVBChannel::GetChannelPids(QSqlDatabase*& db_conn, pthread_mutex_t& db_lock,
+bool DVBChannel::GetChannelPids(QSqlDatabase*& db_conn, 
+                                pthread_mutex_t*& db_lock,
                                 int chanid)
 {
     dvb_pids_t& pids = chan_opts.pids;
@@ -308,7 +309,7 @@ bool DVBChannel::GetChannelPids(QSqlDatabase*& db_conn, pthread_mutex_t& db_lock
     pids.other.clear();
 
     // TODO: Also fetch & store language field.
-    pthread_mutex_lock(&db_lock);
+    pthread_mutex_lock(db_lock);
     MythContext::KickDatabase(db_conn);
     QString thequery = QString("SELECT pid, type FROM dvb_pids WHERE chanid=%1")
                                .arg(chanid);
@@ -320,7 +321,7 @@ bool DVBChannel::GetChannelPids(QSqlDatabase*& db_conn, pthread_mutex_t& db_lock
     if (query.numRowsAffected() <= 0)
     {
         ERROR(QString("Unable to find any pids for channel id %1.").arg(chanid));
-        pthread_mutex_unlock(&db_lock);
+        pthread_mutex_unlock(db_lock);
         return false;
     }
 
@@ -342,7 +343,7 @@ bool DVBChannel::GetChannelPids(QSqlDatabase*& db_conn, pthread_mutex_t& db_lock
         }
     }
 
-    pthread_mutex_unlock(&db_lock);
+    pthread_mutex_unlock(db_lock);
     return true;
 }
 

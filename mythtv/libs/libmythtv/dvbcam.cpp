@@ -100,7 +100,7 @@ bool DVBCam::Close()
 
 void DVBCam::ChannelChanged(dvb_channel_t& chan)
 {
-    pthread_mutex_lock(&db_lock);
+    pthread_mutex_lock(db_lock);
 
     MythContext::KickDatabase(db);
     QSqlQuery query = db->exec(QString("SELECT pmtcache FROM dvb_channel"
@@ -131,7 +131,7 @@ void DVBCam::ChannelChanged(dvb_channel_t& chan)
         }
     }
 
-    pthread_mutex_unlock(&db_lock);
+    pthread_mutex_unlock(db_lock);
 }
 
 void DVBCam::ChannelChanged(dvb_channel_t& chan, uint8_t* pmt, int len)
@@ -166,7 +166,7 @@ void DVBCam::ChannelChanged(dvb_channel_t& chan, uint8_t* pmt, int len)
     ba.resize(len);
     memcpy(ba.data(), pmt, len);
 
-    pthread_mutex_lock(&db_lock);
+    pthread_mutex_lock(db_lock);
     QSqlQuery query(QString::null, db);
     query.prepare(QString("UPDATE dvb_channel SET pmtcache=?"
                   " WHERE serviceid=%1").arg(chan.serviceID));
@@ -174,16 +174,18 @@ void DVBCam::ChannelChanged(dvb_channel_t& chan, uint8_t* pmt, int len)
 
     MythContext::KickDatabase(db);
     query.exec();
-    pthread_mutex_unlock(&db_lock);
 
     if (!query.isActive())
     {
         MythContext::DBError("DVBCam PMT Update", query);
+        pthread_mutex_unlock(db_lock);
         return;
     }
 
     if (query.numRowsAffected() == 1)
         GENERAL("CAM - PMT cache updated.");
+
+    pthread_mutex_unlock(db_lock);
 }
 
 void *DVBCam::CiHandlerThreadHelper(void*self)

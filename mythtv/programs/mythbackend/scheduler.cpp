@@ -22,17 +22,13 @@ using namespace std;
 #include "remoteutil.h"
 
 Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList, 
-                     QSqlDatabase *ldb, bool noAutoShutdown)
+                     QSqlDatabase *ldb)
 {
     hasconflicts = false;
     db = ldb;
     m_tvList = tvList;
 
     m_mainServer = NULL;
-    m_noAutoShutdown = noAutoShutdown;
-    // we block the shutdown until a backend connected, if no recording
-    // starts within the next period of time (calculated in the while() loop)
-    m_blockShutdown = true;
 
     setupCards();
 
@@ -1327,10 +1323,11 @@ void Scheduler::RunScheduler(void)
 
     list<ProgramInfo *>::iterator recIter;
 
+    bool blockShutdown = gContext->GetNumSetting("blockSDWUwithoutClient", 1);
     QDateTime idleSince = QDateTime();
     int idleTimeoutSecs = 0;
     int idleWaitForRecordingTime = 0;
-    bool doneWakeupCheck = false;
+    bool firstRun = true;
 
     // wait for slaves to connect
     sleep(2);
@@ -1362,18 +1359,18 @@ void Scheduler::RunScheduler(void)
             // idleWaitForRecordingTime. If no, block the shutdown,
             // because system seems to be waken up by the user and not by a
             // wakeup call
-            if (!doneWakeupCheck)
+            if (firstRun && blockShutdown)
             {
                 if ((recIter = recordingList.begin()) != recordingList.end())
                 {
                     if (curtime.secsTo((*recIter)->startts) - prerollseconds
                         < idleWaitForRecordingTime * 60)
                     {
-                        m_blockShutdown = false;
+                        blockShutdown = false;
                     }
                 }
-                doneWakeupCheck = true;
             }
+            firstRun = false;
         }
 
         recIter = recordingList.begin();
@@ -1543,12 +1540,11 @@ void Scheduler::RunScheduler(void)
         }
 
         // if idletimeout is 0, the user disabled the auto-shutdown feature
-        if ((idleTimeoutSecs > 0) && (m_mainServer != NULL) && 
-            !m_noAutoShutdown)
+        if ((idleTimeoutSecs > 0) && (m_mainServer != NULL)) 
         {
             // we release the block when a client connects
-            if (m_blockShutdown)
-                m_blockShutdown &= !m_mainServer->isClientConnected();
+            if (blockShutdown)
+                blockShutdown &= !m_mainServer->isClientConnected();
             else
             {
                 // find out, if we are currently recording (or LiveTV)
@@ -1582,7 +1578,8 @@ void Scheduler::RunScheduler(void)
                         // is the machine already ideling the timeout time?
                         if (idleSince.addSecs(idleTimeoutSecs) < curtime)
                         {
-                            ShutdownServer(prerollseconds);
+                            CheckShutdownServer(prerollseconds, idleSince,
+                                                blockShutdown);
                         }
                         else
                         {
@@ -1614,6 +1611,53 @@ void Scheduler::RunScheduler(void)
         sleep(1);
     }
 } 
+
+void Scheduler::CheckShutdownServer(int prerollseconds, QDateTime &idleSince, 
+                                    bool &blockShutdown)
+{
+    bool done = false;
+    QString preSDWUCheckCommand = gContext->GetSetting("preSDWUCheckCommand", 
+                                                       "");
+                 
+    int state = 0;
+    if (!preSDWUCheckCommand.isEmpty())
+    {
+        state = system(preSDWUCheckCommand.ascii());
+                      
+        if (WIFEXITED(state) && state != -1)
+        {
+            done = true;
+            switch(WEXITSTATUS(state))
+            {
+                case 0:
+                    ShutdownServer(prerollseconds);
+                    break;
+                case 1:
+                    // just reset idle'ing on retval == 1
+                    idleSince = QDateTime();
+                    break;
+                case 2:
+                    // reset shutdown status on retval = 2
+                    // (needs a clientconnection again,
+                    // before shutdown is executed)
+                    blockShutdown
+                             = gContext->GetNumSetting("blockSDWUwithoutClient",
+                                                       1);
+                    idleSince = QDateTime();
+                    break;
+                // case 3:
+                //    //disable shutdown routine generally
+                //    m_noAutoShutdown = true;
+                //    break;
+                default:
+                    done = false;
+            }
+        }
+    }
+                            
+    if (!done)
+        ShutdownServer(prerollseconds);
+}
 
 void Scheduler::ShutdownServer(int prerollseconds)
 {    
@@ -1648,17 +1692,21 @@ void Scheduler::ShutdownServer(int prerollseconds)
                                   restarttime.toString(wakeup_timeformat));
 
         // now run the command to set the wakeup time
-        system(setwakeup_cmd.ascii());
+        if (!setwakeup_cmd.isEmpty())
+            system(setwakeup_cmd.ascii());
     }
 
     QString halt_cmd = gContext->GetSetting("ServerHaltCommand",
                                             "sudo /sbin/halt -p");
 
-    // now we shut the slave backends down...
-    m_mainServer->ShutSlaveBackendsDown(halt_cmd);
+    if (!halt_cmd.isEmpty())
+    {
+        // now we shut the slave backends down...
+        m_mainServer->ShutSlaveBackendsDown(halt_cmd);
 
-    //and now shutdown myself
-    system(halt_cmd.ascii());
+        // and now shutdown myself
+        system(halt_cmd.ascii());
+    }
 }
 
 void *Scheduler::SchedulerThread(void *param)

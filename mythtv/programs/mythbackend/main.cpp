@@ -121,7 +121,6 @@ int main(int argc, char **argv)
     bool daemonize = false;
     bool printsched = false;
     bool printexpire = false;
-    bool noAutoShutdown = false;
     for (int argpos = 1; argpos < a.argc(); ++argpos)
     {
         if (!strcmp(a.argv()[argpos],"-l") ||
@@ -163,12 +162,6 @@ int main(int argc, char **argv)
         {
             daemonize = true;
 
-        }
-        else if (!strcmp(a.argv()[argpos],"-n") ||
-                 !strcmp(a.argv()[argpos],"--noautoshutdown"))
-        {
-            noAutoShutdown = true;
-            VERBOSE(VB_ALL, "Auto shutdown procedure disabled by commandline"); 
         }
         else if (!strcmp(a.argv()[argpos],"-v") ||
                  !strcmp(a.argv()[argpos],"--verbose"))
@@ -276,8 +269,6 @@ int main(int argc, char **argv)
                     "-p or --pidfile filename       Write PID of mythbackend " <<
                                                     "to filename" << endl <<
                     "-d or --daemon                 Runs mythbackend as a daemon" << endl <<
-                    "-n or --noautoshutdonw         Blocks the auto shutdown routine, so that the" << endl <<
-                    "                               backend will stay alive"<<endl <<
                     "-v or --verbose debug-level    Prints more information" << endl <<
                     "                               Accepts any combination (separated by comma)" << endl << 
                     "                               of all,none,quiet,record,playback," << endl <<
@@ -450,7 +441,7 @@ int main(int argc, char **argv)
     if (ismaster && runsched)
     {
         QSqlDatabase *scdb = QSqlDatabase::database("SUBDB");
-        sched = new Scheduler(true, &tvList, scdb, noAutoShutdown);
+        sched = new Scheduler(true, &tvList, scdb);
     }
 
     QSqlDatabase *expdb = QSqlDatabase::database("EXPDB");

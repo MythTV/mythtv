@@ -53,7 +53,7 @@ public:
     void save(QSqlDatabase* _db) { (void)_db; };
     void load(QSqlDatabase* _db) {
         db = _db;
-        fillSelections();
+        fillSelections(currentSourceID);
     };
 
     QString getSourceID() { return currentSourceID; };
