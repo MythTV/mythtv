@@ -462,7 +462,7 @@
         <value lang="ES">Grabaciones programadas</value>
         <value lang="CA">Gravacions programades</value>
         <value lang="NL">Geplande Opnames</value>
-        <value lang="DE">Geplante Aufnahmen</value>
+        <value lang="DE">Geplante Aufnahmen:</value>
         <value lang="DK">Planlagte optagelser:</value>
       </textarea>
       <image name="filler" draworder="0" fleximage="yes">
@@ -695,6 +695,7 @@
         <area>20,10,800,40</area>
         <font>info</font>
         <value>Channel Rankings</value>
+        <value lang="DE">Sender Bewertungen</value>
         <value lang="DK">Kanal rangering</value>
       </textarea>
       <image name="filler" draworder="0" fleximage="yes">
@@ -705,6 +706,7 @@
         <area>0,570,800,30</area>
         <font>message</font>
         <value>(1) Sort by Channel    (2) Sort by Rank</value>
+        <value lang="DE">(1) Sortiert nach Sender (2) Sortiert nach Rang</value>
         <value lang="DK">(1) Sortér efter Titel  (2) Sortér efter Rang</value>
       </textarea>
     </container>
@@ -747,6 +749,7 @@
         <area>20,90,160,30</area>
         <font>info</font>
         <value>Rank:</value>
+        <value lang="DE">Rang:</value>
         <value lang="DK">Rang:</value>
       </textarea>
       <textarea name="rank" draworder="6">
@@ -1356,7 +1359,7 @@
          <value lang="ES">seleccione 'Programar grabaciones'</value>
          <value lang="CA">esculli 'Programar gravacions'</value>
          <value lang="NL">kies 'Opname plannen'</value>
-         <value lang="DE">'Aufnahme planen' im Hauptmeü</value>
+         <value lang="DE">'Aufnahme planen' im Hauptmenü</value>
          <value lang="DK">vælg 'Optag en udsendelse'</value>
       </textarea>
     </container>
@@ -1510,6 +1513,7 @@
         <value lang="ES">Seleccione una letra...</value>
         <value lang="CA">Esculli una lletra...</value>
         <value lang="NL">Kies een letter...</value>
+        <value lang="DE">Wählen Sie einen Buchstaben...</value>
         <value lang="DK">Vælg et bogstav...</value>
       </textarea>
       <textarea name="pickinfo" draworder="6">
@@ -1547,7 +1551,7 @@
         <value lang="ES">Seleccione el nombre del programa que busca. Cuando lo encuentre vuelva con flecha izquierda. Pulsando 'info' podra determinar las opciones de grabacion.</value>
         <value lang="CA">Cerqui el nom del programa. Quan el trovi retorni amb fletxa esquerra. Prement 'info' podra determinar les opcions de gravacio.</value>
         <value lang="NL">Kies de titel van het programma dat U zoekt. Druk op pijl naar links wanneer U klaar bent. Druk 'info' als U de opname-opties wilt wijzigen.</value>
-        <value lang="DE">Wählen Sie den Titel der gesuchten Sendung. Weiter mit ENTER oder Cursor-Links. Mit 'info' können Sie eine Aufnahme planen.</value>
+        <value lang="DE">Wählen Sie den Titel der gesuchten Sendung. Weiter mit ENTER oder Cursor-Rechts. Mit 'info' können Sie eine Aufnahme planen.</value>
         <value lang="DK">Vælg titlen på det den udsendelse du ønsker at finde og tryk ENTER eller Pil til venstre. Med 'Info' kan du vælge optagelsetype.</value>
         <multiline>yes</multiline>
       </textarea>

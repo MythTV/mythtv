@@ -23,7 +23,7 @@
     </message>
     <message>
         <source>Weekly Recording</source>
-        <translation type="unfinished">Wöchentliche Aufnahme</translation>
+        <translation>Wöchentliche Aufnahme</translation>
     </message>
 </context>
 <context>
@@ -96,19 +96,19 @@
     <name>ManualSchedule</name>
     <message>
         <source>Manual Recording Scheduler</source>
-        <translation type="unfinished"></translation>
+        <translation>Manueller Aufnahmeplaner</translation>
     </message>
     <message>
         <source>Channel:</source>
-        <translation type="unfinished"></translation>
+        <translation>Sender:</translation>
     </message>
     <message>
         <source>Date:</source>
-        <translation type="unfinished"></translation>
+        <translation>Datum:</translation>
     </message>
     <message>
         <source>Time:</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeit:</translation>
     </message>
     <message>
         <source>hr</source>
@@ -120,35 +120,35 @@
     </message>
     <message>
         <source>Duration:</source>
-        <translation type="unfinished">Dauer:</translation>
+        <translation>Dauer:</translation>
     </message>
     <message>
         <source>Title:</source>
-        <translation type="unfinished">Titel:</translation>
+        <translation>Titel:</translation>
     </message>
     <message>
         <source>Subtitle:</source>
-        <translation type="unfinished">Untertitel:</translation>
+        <translation>Untertitel:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation type="unfinished">Beschreibung:</translation>
+        <translation>Beschreibung:</translation>
     </message>
     <message>
         <source>Save this scheduled recording and exit</source>
-        <translation type="unfinished"></translation>
+        <translation>Diese geplante Aufnahme behalten und fertig</translation>
     </message>
     <message>
         <source>Save this scheduled recording and set another</source>
-        <translation type="unfinished"></translation>
+        <translation>Diese Aufnahme speichern und eine neue erstellen</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Abbrechen</translation>
+        <translation>Abbrechen</translation>
     </message>
     <message>
         <source>Manual recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Manuelle Aufnahme</translation>
     </message>
 </context>
 <context>
@@ -195,7 +195,7 @@
     </message>
     <message>
         <source>Delete this recording?</source>
-        <translation type="unfinished">Diese Aufnahme löschen?</translation>
+        <translation>Diese Aufnahme löschen?</translation>
     </message>
 </context>
 <context>
@@ -238,11 +238,11 @@
     </message>
     <message>
         <source>Recording every day when shown in this timeslot</source>
-        <translation type="unfinished">Nehme täglich zu dieser Zeit auf</translation>
+        <translation>Nehme täglich zu dieser Zeit auf</translation>
     </message>
     <message>
         <source>Recording every week when shown in this timeslot</source>
-        <translation type="unfinished">Nehme wöchentlich zu dieser Zeit auf</translation>
+        <translation>Nehme wöchentlich zu dieser Zeit auf</translation>
     </message>
 </context>
 <context>
@@ -269,11 +269,11 @@
     </message>
     <message>
         <source>keyframe</source>
-        <translation type="unfinished">Keyframe</translation>
+        <translation>Keyframe</translation>
     </message>
     <message>
         <source>1 frame</source>
-        <translation type="unfinished">1 Frame</translation>
+        <translation>1 Frame</translation>
     </message>
     <message>
         <source>0.5 seconds</source>
@@ -357,7 +357,7 @@
     </message>
     <message>
         <source>SKIP</source>
-        <translation type="unfinished">Überspringe</translation>
+        <translation>Überspringe</translation>
     </message>
     <message>
         <source>Found %1 sec. commercial</source>
@@ -377,74 +377,74 @@
     </message>
     <message>
         <source>Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Plan</translation>
     </message>
     <message>
         <source>Do not record this program</source>
-        <translation type="unfinished">Diese Sendung nicht aufnehmen</translation>
+        <translation>Diese Sendung nicht aufnehmen</translation>
     </message>
     <message>
         <source>Record only this showing of the program</source>
-        <translation type="unfinished">Diese Sendung nur einmalig aufnehmen</translation>
+        <translation>Diese Sendung nur einmalig aufnehmen</translation>
     </message>
     <message>
         <source>Record this program in this timeslot every day</source>
-        <translation type="unfinished">Diese Sendung täglich zu dieser Zeit aufnehmen</translation>
+        <translation>Diese Sendung täglich zu dieser Zeit aufnehmen</translation>
     </message>
     <message>
         <source>Record this program whenever it&apos;s shown on this channel</source>
-        <translation type="unfinished">Diese Sendung nur auf diesem Sender aufnehmen</translation>
+        <translation>Diese Sendung nur auf diesem Sender aufnehmen</translation>
     </message>
     <message>
         <source>Record this program whenever it&apos;s shown anywhere</source>
-        <translation type="unfinished">Diese Sendung auf jedem Sender aufnehmen</translation>
+        <translation>Diese Sendung auf jedem Sender aufnehmen</translation>
     </message>
     <message>
         <source>Record this program in this timeslot every week</source>
-        <translation type="unfinished">Diese Sendung wöchentlich zu dieser Zeit aufnehmen</translation>
+        <translation>Diese Sendung wöchentlich zu dieser Zeit aufnehmen</translation>
     </message>
     <message>
         <source>Profile</source>
-        <translation type="unfinished">Profil</translation>
+        <translation>Profil</translation>
     </message>
     <message>
         <source>(unspecified)</source>
-        <translation type="unfinished">(unbestimmt)</translation>
+        <translation>(unbestimmt)</translation>
     </message>
     <message>
         <source>Rank</source>
-        <translation type="unfinished"></translation>
+        <translation>Rang</translation>
     </message>
 </context>
 <context>
     <name>RankPrograms</name>
     <message>
         <source>Recording just this showing</source>
-        <translation type="unfinished">Nehme diese Ausstrahlung auf</translation>
+        <translation>Nehme diese Ausstrahlung auf</translation>
     </message>
     <message>
         <source>Recording every week</source>
-        <translation type="unfinished"></translation>
+        <translation>Nehme wöchentlich auf</translation>
     </message>
     <message>
         <source>Recording when shown in this timeslot</source>
-        <translation type="unfinished">Nehme zu dieser Zeit auf</translation>
+        <translation>Nehme zu dieser Zeit auf</translation>
     </message>
     <message>
         <source>Recording when shown on this channel</source>
-        <translation type="unfinished">Nehme auf diesem Sender auf</translation>
+        <translation>Nehme auf diesem Sender auf</translation>
     </message>
     <message>
         <source>Recording all showings</source>
-        <translation type="unfinished">Nehme alle Ausstrahlungen auf</translation>
+        <translation>Nehme alle Ausstrahlungen auf</translation>
     </message>
     <message>
         <source>Not recording this showing</source>
-        <translation type="unfinished">Wird nicht aufgenommen</translation>
+        <translation>Wird nicht aufgenommen</translation>
     </message>
     <message>
         <source>Error!</source>
-        <translation type="unfinished">Fehler!</translation>
+        <translation>Fehler!</translation>
     </message>
 </context>
 <context>
@@ -459,7 +459,7 @@
     </message>
     <message>
         <source>Advanced Recording Options</source>
-        <translation type="unfinished">Erweiterte Aufnahmeoptionen</translation>
+        <translation>Erweiterte Aufnahmeoptionen</translation>
     </message>
 </context>
 <context>
@@ -617,7 +617,11 @@
     </message>
     <message>
         <source>Transcode</source>
-        <translation type="unfinished">Umwandlung</translation>
+        <translation>Umwandlung</translation>
+    </message>
+    <message>
+        <source>Hue %1 %</source>
+        <translation>Farbton %1 %</translation>
     </message>
 </context>
 <context>
@@ -652,7 +656,7 @@
     </message>
     <message>
         <source>Unsuppress recording</source>
-        <translation type="unfinished">Aufnahme wieder aktivieren</translation>
+        <translation>Aufnahme wieder aktivieren</translation>
     </message>
     <message>
         <source>The follow scheduled recordings conflict with each other.  Which would you like to record?</source>

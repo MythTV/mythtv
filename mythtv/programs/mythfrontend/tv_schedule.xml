@@ -50,7 +50,7 @@
       <alttext lang="FR">Enreg. manuel</alttext>
       <alttext lang="ES">Grab. inst.</alttext>
       <alttext lang="CA">Grav. inst.</alttext>
-      <alttext lang="DK">Opt. lige nu</alttext>
+      <alttext lang="DK">Optag nu</alttext>
       <action>TV_MANUAL</action>
    </button>
 
@@ -64,7 +64,7 @@
       <alttext>Man. Sched.</alttext>
       <alttext lang="ES">Programar</alttext>
       <alttext lang="CA">Programar</alttext>
-      <alttext lang="DK">Man. prog.</alttext>
+      <alttext lang="DK">Manuel prog.</alttext>
       <action>TV_MANUALSCHEDULE</action>
    </button>
 

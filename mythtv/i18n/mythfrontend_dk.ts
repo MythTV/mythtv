@@ -104,11 +104,11 @@
     </message>
     <message>
         <source>hr</source>
-        <translation>T</translation>
+        <translation></translation>
     </message>
     <message>
         <source>min</source>
-        <translation>min</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Duration:</source>
@@ -397,7 +397,7 @@
     </message>
     <message>
         <source>Rank</source>
-        <translation type="unfinished"></translation>
+        <translation>Rang</translation>
     </message>
 </context>
 <context>
@@ -571,6 +571,10 @@
     <message>
         <source>Mute Off</source>
         <translation>Lyd slået til</translation>
+    </message>
+    <message>
+        <source>Hue %1 %</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
