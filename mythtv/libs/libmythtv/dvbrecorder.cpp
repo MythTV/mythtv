@@ -658,7 +658,6 @@ void DVBRecorder::ReadFromDMX()
                 continue;
             }
 
-#ifndef USING_SOFTCAM
             if (scrambling)
             {
                 if (!scrambled[pid])
@@ -674,7 +673,6 @@ void DVBRecorder::ReadFromDMX()
                 RECORD(QString("PID %1 is unscrambled").arg(pid));
                 scrambled[pid] = false;
             }
-#endif            
             if (content & 0x1)
             {
                 if (_continuity_count[pid] == 16)
