@@ -145,7 +145,7 @@ contains( TARGET_ALTIVEC, yes ) {
 macx {
     CONFIG     -= using_x11
     CONFIG     -= using_xv
-    EXTRA_LIBS -= -L/usr/X11R6/lib -lXinerama -lXv -lX11 -lXext -lXxf86vm
+    EXTRA_LIBS -= $${LOCAL_LIBDIR_X11} -lXinerama -lXv -lX11 -lXext -lXxf86vm
     CONFIG     -= using_ivtv
     DEFINES    -= USING_IVTV
     CONFIG     -= using_oss
@@ -154,7 +154,7 @@ macx {
 win32 {
     CONFIG     -= using_x11
     CONFIG     -= using_xv
-    EXTRA_LIBS -= -L/usr/X11R6/lib -lXinerama -lXv -lX11 -lXext -lXxf86vm
+    EXTRA_LIBS -= $${LOCAL_LIBDIR_X11} -lXinerama -lXv -lX11 -lXext -lXxf86vm
     CONFIG     -= using_ivtv
     DEFINES    -= USING_IVTV
     CONFIG     -= using_oss
