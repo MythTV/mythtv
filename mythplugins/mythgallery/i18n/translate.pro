@@ -8,5 +8,5 @@ SOURCES += ../mythgallery/singleview.h
 
 TRANSLATIONS  = mythgallery_it.ts mythgallery_es.ts mythgallery_ca.ts
 TRANSLATIONS += mythgallery_nl.ts mythgallery_de.ts mythgallery_dk.ts
-TRANSLATIONS += mythgallery_pt.ts
+TRANSLATIONS += mythgallery_pt.ts mythgallery_sv.ts
 
