@@ -6,6 +6,7 @@
       <text lang="ES">General</text>
       <text lang="CA">General</text>
       <text lang="NL">Algemeen</text>
+      <text lang="FR">Général</text>
       <action>SETTINGS GENERAL</action>
    </button>
 
@@ -16,6 +17,7 @@
       <text lang="ES">Guía de programas</text>
       <text lang="CA">Guia de programes</text>
       <text lang="NL">Programma Gids</text>
+      <text lang="FR">Grille horaire</text>
       <action>SETTINGS EPG</action>
    </button>
 
@@ -26,6 +28,7 @@
       <text lang="ES">Reproducción</text>
       <text lang="CA">Reproducció</text>
       <text lang="NL">Afspelen</text>
+      <text lang="FR">Visionnement</text>
       <action>SETTINGS PLAYBACK</action>
    </button>
 
@@ -36,6 +39,7 @@
       <text lang="ES">Grabación</text>
       <text lang="CA">Gravació</text>
       <text lang="NL">Opnemen</text>
+      <text lang="FR">Enregistrement</text>
       <action>SETTINGS RECORDING</action>
    </button>
 

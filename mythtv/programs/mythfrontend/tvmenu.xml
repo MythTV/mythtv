@@ -7,6 +7,7 @@
       <text lang="ES">Ver la TV</text>
       <text lang="CA">Veure la TV</text>
       <text lang="NL">Kijk TV</text>
+      <text lang="FR">Regarder la TV</text>
       <action>TV_WATCH_LIVE</action>
    </button>
 
@@ -17,7 +18,9 @@
       <text lang="ES">Programar Grabaciones</text>
       <text lang="CA">Programar Gravacions</text>
       <text lang="NL">Opnames Plannen</text>
+      <text lang="FR">Programmer des enregistrements</text>
       <alttext>Schedule</alttext>
+      <alttext lang="FR">Programmer</alttext>
       <action>MENU tv_schedule.xml</action>
    </button>
 
@@ -28,6 +31,7 @@
       <text lang="ES">Ver Grabaciones</text>
       <text lang="CA">Veure Gravacions</text>
       <text lang="NL">Opnames Bekijken</text>
+      <text lang="FR">Visionner</text>
       <action>TV_WATCH_RECORDING</action>
    </button>
 
@@ -38,6 +42,7 @@
       <text lang="ES">Borrar Grabaciones</text>
       <text lang="CA">Esborrar Gravacions</text>
       <text lang="NL">Opnames Verwijderen</text>
+      <text lang="FR">Supprimer</text>
       <action>TV_DELETE</action>
    </button> 
 

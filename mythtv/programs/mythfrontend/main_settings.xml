@@ -5,6 +5,7 @@
       <text lang="IT">Generale</text>
       <text lang="ES">General</text>
       <text lang="CA">General</text>
+      <text lang="FR">Général</text>
       <action>SETTINGS MAINGENERAL</action>
    </button>
 
@@ -14,12 +15,14 @@
       <text lang="IT">Aspetto</text>
       <text lang="ES">Aspecto</text>
       <text lang="CA">Aspecte</text>
+      <text lang="FR">Apparence</text>
       <action>SETTINGS APPEARANCE</action>
    </button>
 
    <button>
      <type>TV</type>
      <text>TV Settings</text>
+     <text lang="FR">Options TV</text>
      <action>MENU tv_settings.xml</action>
    </button>
 

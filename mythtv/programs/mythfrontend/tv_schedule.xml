@@ -7,7 +7,9 @@
       <text lang="ES">Guía de programas</text>
       <text lang="CA">Guia de programes</text>
       <text lang="NL">Programma Gids</text>
+      <text lang="FR">Grille Horaire</text>
       <alttext>Guide</alttext>
+      <alttext lang="FR">Grille</alttext>
       <action>TV_SCHEDULE</action>
    </button>
 
@@ -18,7 +20,9 @@
       <text lang="ES">Buscar programas</text>
       <text lang="CA">Cercar programes</text>
       <text lang="NL">Programma Zoeker</text>
+      <text lang="FR">Recherche de programmes</text>
       <alttext>Finder</alttext>
+      <alttext lang="FR">Recherche</alttext>
       <action>TV_PROGFIND</action>
    </button>
 
@@ -29,7 +33,9 @@
       <text lang="ES">Grabacion manual</text>
       <text lang="CA">Gravar manualment</text>
       <text lang="NL">Manuele opname</text>
+      <text lang="FR">Enregistrement manuel</text>
       <alttext>Manual Record</alttext>
+      <alttext lang="FR">Enreg. manuel</alttext>
       <action>TV_MANUAL</action>
    </button>
 
@@ -40,7 +46,9 @@
       <text lang="ES">Resolver conflictos</text>
       <text lang="CA">Resoldre Conflictes</text>
       <text lang="NL">Conflicten Oplossen</text>
+      <text lang="FR">Gestion des conflits</text>
       <alttext>Fix Conflicts</alttext>
+      <alttext lang="FR">Conflits</alttext>
       <action>TV_FIX_CONFLICTS</action>
    </button>
 

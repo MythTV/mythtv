@@ -817,6 +817,7 @@ public:
         addSelection("Catalan", "CA");
         addSelection("Spanish", "ES");
         addSelection("Dutch", "NL");
+        addSelection("French", "FR");
         setHelpText("Your preferred language.");
     };
 };
