@@ -587,3 +587,8 @@ void MythContext::LCDswitchToNothing()
 	lcd_device->switchToNothing();
 }
 
+void MythContext::LCDpopMenu(QString menu_choice, QString menu_title)
+{
+	lcd_device->popMenu(menu_choice, menu_title);
+}
+

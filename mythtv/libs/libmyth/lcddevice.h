@@ -56,6 +56,12 @@ class LCD : public QObject
 				//	When playing music, switch to this and give
 				//	artist and track name
 				//
+				//
+				//	Note: the use of switchToMusic and setLevels
+				//	is discouraged, because it has become obvious
+				//	that most LCD devices cannot handle 
+				//	communications fast enough to make them useful.
+				//	
 				
 		void	switchToMusic(QString artist, QString track);
 
@@ -98,6 +104,17 @@ class LCD : public QObject
 				
 		void	switchToNothing();
 		
+				//
+				//	This briefly displaces a menu title and
+				//	selection choice on the LCD. After a few 
+				//	seconds, the previous display will reappear.
+				//	This will allow users to navigate menus
+				//	and execute commands without having to turn
+				//	on their TV (when selecting a playlist in
+				//	mythmusic, for example)
+				//
+				
+		void	popMenu(QString menu_item, QString menu_title); 
 
 
 	private slots:
@@ -111,6 +128,7 @@ class LCD : public QObject
 
 		void	scrollText();			//	Scroll the topline text
 		void	beginScrollingText();	//	But only after a bit of time has gone by
+		void	unPopMenu();			//	If no actiivty, remove the Pop Menu display
 		
 	private:
 	
@@ -133,6 +151,7 @@ class LCD : public QObject
 		QTimer	*channelTimer;
 		QTimer	*scrollTimer;
 		QTimer	*preScrollTimer;
+		QTimer	*popMenuTimer;
 
 		void	setWidth(unsigned int);
 		void	setHeight(unsigned int);

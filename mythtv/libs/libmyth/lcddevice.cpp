@@ -58,6 +58,9 @@ LCD::LCD()
 	channelTimer = new QTimer(this);
 	connect(channelTimer, SIGNAL(timeout()), this, SLOT(outputChannel()));
 
+	popMenuTimer = new QTimer(this);
+	connect(popMenuTimer, SIGNAL(timeout()), this, SLOT(unPopMenu()));
+
 }
 
 void LCD::connectToHost(QString hostname, unsigned int port)
@@ -246,6 +249,15 @@ void LCD::init()
 	sendToServer("widget_add Time timeWidget string");
 	sendToServer("widget_add Time topWidget string");
 
+	//
+	//	The Pop Menu Screen	
+	//
+
+	sendToServer("screen_add Menu");
+	sendToServer("widget_del Menu heartbeat");
+	sendToServer("screen_set Menu priority 255");
+	sendToServer("widget_add Menu menuWidget string");
+	sendToServer("widget_add Menu topWidget string");
 
 	//
 	//	The Music Screen
@@ -396,10 +408,13 @@ void LCD::stopAll()
 	sendToServer("screen_set Time priority 255");
 	sendToServer("screen_set Music priority 255");
 	sendToServer("screen_set Channel priority 255");
+	sendToServer("screen_set Menu priority 255");
 	scrollTimer->stop();
 	musicTimer->stop();
 	timeTimer->stop();
 	channelTimer->stop();
+	popMenuTimer->stop();
+	unPopMenu();
 }
 
 void LCD::startTime()
@@ -527,6 +542,24 @@ void LCD::startChannel(QString channum, QString title, QString subtitle)
 	assignScrollingText(aString);
 	progress = 0.0;
 	outputChannel();
+}
+
+void LCD::popMenu(QString menu_item, QString menu_title)
+{
+	QString aString;
+	sendToServer("screen_set Menu priority 16");
+	popMenuTimer->start(5000, TRUE);
+	outputCenteredTopText("Menu", menu_title.left(lcdWidth));
+
+	aString  = "widget_set Menu menuWidget 1 2 \">";
+	aString += menu_item.left(lcdWidth - 1);
+	aString += "\"";
+	sendToServer(aString);
+}
+
+void LCD::unPopMenu()
+{
+	sendToServer("screen_set Menu priority 255");
 }
 
 void LCD::setLevels(int numbLevels, float *values)

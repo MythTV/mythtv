@@ -115,6 +115,7 @@ class MythContext : public QObject
 	void LCDswitchToChannel(QString channum, QString title, QString subtitle);
 	void LCDsetChannelProgress(float percentViewed);
 	void LCDswitchToNothing();
+	void LCDpopMenu(QString menu_choice, QString menu_title);
 	
   private slots:
     void readSocket();
