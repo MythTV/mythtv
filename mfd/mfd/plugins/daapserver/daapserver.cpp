@@ -1317,53 +1317,61 @@ void DaapServer::sendContainers(HttpInRequest *http_request, DaapRequest *daap_r
                 
                 //
                 //  Send any deletions (playlists gone away) if we have any
+                //  and this is a proper partial (delta) update
                 //
 
-                bool do_deletions = false;
 
-                metadata_changed_mutex.lock();
-                    int which_collection_id = metadata_collection_last_changed;
-                metadata_changed_mutex.unlock();
-                MetadataContainer *last_changed_collection = NULL;
-                if(which_collection_id == metadata_server->getLastDestroyedCollection())
-                {
-                    do_deletions = true;
-                }
-                else
-                {
-                    last_changed_collection = metadata_server->getMetadataContainer(which_collection_id);
-                    if(last_changed_collection)
-                    {
-                        if(last_changed_collection->isAudio() && last_changed_collection->isLocal())
-                        {
-                            do_deletions = true;
-                            which_collection_id = last_changed_collection->getIdentifier();
-                        }
-                    }
-                }
+                if(daap_request->getDatabaseDelta() != 0 &&
+                   daap_request->getDatabaseVersion() == daap_request->getDatabaseDelta() + 1 &&
+                   metadata_server->getMetadataLocalAudioGeneration() == daap_request->getDatabaseVersion())
+                { 
+                   
+                    bool do_deletions = false;
 
-                if(do_deletions)
-                {
-                    QValueList<int> deletions;
-                    if(last_changed_collection)
+                    metadata_changed_mutex.lock();
+                        int which_collection_id = metadata_collection_last_changed;
+                    metadata_changed_mutex.unlock();
+                    MetadataContainer *last_changed_collection = NULL;
+                    if(which_collection_id == metadata_server->getLastDestroyedCollection())
                     {
-                        deletions = last_changed_collection->getPlaylistDeletions();
+                        do_deletions = true;
                     }
                     else
                     {
-                        deletions = metadata_server->getLastDestroyedPlaylistList();
-                    }
-                    
-                    if(deletions.count() > 0)
-                    {
-                        response << Tag('mudl');
-                        for(uint i = 0; i < deletions.count(); i++)
+                        last_changed_collection = metadata_server->getMetadataContainer(which_collection_id);
+                        if(last_changed_collection)
                         {
-                            int deletion_value = *deletions.at(i);
-                            deletion_value = (which_collection_id * METADATA_UNIVERSAL_ID_DIVIDER) + deletion_value;
-                            response << Tag('miid') << (u32) deletion_value << end;
+                            if(last_changed_collection->isAudio() && last_changed_collection->isLocal())
+                            {
+                                do_deletions = true;
+                                which_collection_id = last_changed_collection->getIdentifier();
+                            }
                         }
-                        response << end;
+                    }
+                    if(do_deletions)
+                    {
+                
+                        QValueList<int> deletions;
+                        if(last_changed_collection)
+                        {
+                            deletions = last_changed_collection->getPlaylistDeletions();
+                        }
+                        else
+                        {
+                            deletions = metadata_server->getLastDestroyedPlaylistList();
+                        }
+                    
+                        if(deletions.count() > 0)
+                        {
+                            response << Tag('mudl');
+                            for(uint i = 0; i < deletions.count(); i++)
+                            {
+                                int deletion_value = *deletions.at(i);
+                                deletion_value = (which_collection_id * METADATA_UNIVERSAL_ID_DIVIDER) + deletion_value;
+                                response << Tag('miid') << (u32) deletion_value << end;
+                            }
+                            response << end;
+                        }
                     }
                 }
                 
