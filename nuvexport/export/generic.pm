@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.02.17 (xris)
+#Last Updated: 2005.02.21 (xris)
 #
 #  generic.pm
 #
@@ -25,6 +25,7 @@ package export::generic;
 
 # Load the following extra parameters from the commandline
     add_arg('path:s',                        'Save path (only used with the noserver option)');
+    add_arg('underscores!',                  'Convert spaces to underscores for output filename.');
     add_arg('cutlist|use_cutlist!',          'Use the myth cutlist (or not)');
 
 # These aren't used by all modules, but the routine to define them is here, so here they live
@@ -90,6 +91,10 @@ package export::generic;
             }
             $outfile =~ s/(?:[\/\\\:\*\?\<\>\|\-]+\s*)+(?=[^\s\/\\\:\*\?\<\>\|\-])/- /sg;
             $outfile =~ tr/"/'/s;
+        # add underscores?
+            if (arg('underscores')) {
+                $outfile =~ tr/ /_/s;
+            }
         # Make sure we don't have a duplicate filename
             if (-e $self->{'path'}.'/'.$outfile.$suffix) {
                 my $count = 1;
