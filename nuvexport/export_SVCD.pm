@@ -5,7 +5,7 @@ package export_SVCD;
 	push @Arg_str,
 			'a_bitrate|ar:i',
 			'v_bitrate|vr:i',
-			'quantisation:i',
+			'quantisation:f',
 			'use_cutlist',
 			'noise_reduction|denoise';
 
