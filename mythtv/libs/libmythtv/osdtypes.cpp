@@ -1680,6 +1680,7 @@ OSDTypeCC::OSDTypeCC(const QString &name, TTFFont *font, int xoff, int yoff,
 
     QRect rect = QRect(0, 0, 0, 0);
     m_box = new OSDTypeBox("cc_background", rect);
+    m_ccbackground = gContext->GetNumSetting("CCBackground", 0);
 }
 
 OSDTypeCC::~OSDTypeCC()
@@ -1864,7 +1865,7 @@ void OSDTypeCC::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
             if (maxy > surface->height)
                 maxy = surface->height;
 
-            if (0 && !cc->teletextmode)
+            if (m_ccbackground && !cc->teletextmode)
             {
                 QRect rect = QRect(0, 0, textlength + 4, 
                                    (m_font->Size() * 3 / 2) + 3);

@@ -849,6 +849,18 @@ public:
     };
 };
 
+class CCBackground: public CheckBoxSetting, public GlobalSetting {
+public:
+    CCBackground():
+        GlobalSetting("CCBackground") {
+        setLabel(QObject::tr("Black background for Closed Captioning"));
+        setValue(false);
+        setHelpText(QObject::tr("If enabled, captions will be displayed "
+                    "over a black space for maximum contrast. Otherwise, "
+                    "captions will use outlined text over the picture."));
+    };
+};
+
 class DefaultCCMode: public CheckBoxSetting, public GlobalSetting {
 public:
     DefaultCCMode():
@@ -2656,6 +2668,7 @@ PlaybackSettings::PlaybackSettings()
     osd->addChild(new OSDFont());
     osd->addChild(new OSDCCFont());
     osd->addChild(new OSDThemeFontSizeType());
+    osd->addChild(new CCBackground());
     osd->addChild(new DefaultCCMode());
     osd->addChild(new PersistentBrowseMode());
     addChild(osd);

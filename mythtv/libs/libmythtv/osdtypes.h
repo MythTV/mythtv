@@ -449,6 +449,7 @@ class OSDTypeCC : public OSDType
     TTFFont *m_font;
     vector<ccText *> *m_textlist;
     OSDTypeBox *m_box;
+    int m_ccbackground;
 
     int xoffset, yoffset, displaywidth, displayheight;
 };
