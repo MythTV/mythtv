@@ -68,8 +68,8 @@ ProgLister::ProgLister(ProgListType pltype, const QString &view,
     if (ltype)
         listsize = ltype->GetItems();
 
+    choosePopup = NULL;
     chooseListBox = NULL;
-    chooseComboBox = NULL;
     chooseLineEdit = NULL;
     chooseOkButton = NULL;
     chooseDeleteButton = NULL;
@@ -294,13 +294,23 @@ void ProgLister::nextView(void)
 
 void ProgLister::setViewFromList(void)
 {
-    if (!chooseListBox)
+    if (!choosePopup || !chooseListBox)
         return;
 
     int view = chooseListBox->currentItem();
 
-    if (view < 0 || view >= viewCount)
-        return;
+    if (type == plTitleSearch || type == plDescSearch)
+    {
+        view--;
+        if (view < 0)
+        {
+            if (chooseLineEdit)
+                chooseLineEdit->setFocus();
+            return;
+        }
+    }
+
+    choosePopup->done(0);
 
     if (view == curView)
         return;
@@ -316,46 +326,60 @@ void ProgLister::chooseEditChanged(void)
     if (!chooseOkButton || !chooseLineEdit)
         return;
 
-    chooseOkButton->setEnabled(chooseLineEdit->text() != "");
-    chooseDeleteButton->setEnabled(false);
+    chooseOkButton->setEnabled(chooseLineEdit->text().
+                               stripWhiteSpace().length() > 0);
 }
 
-void ProgLister::chooseComboBoxChanged(void)
+void ProgLister::chooseListBoxChanged(void)
 {
-    if (!chooseComboBox || !chooseLineEdit)
+    if (!chooseListBox || !chooseLineEdit)
         return;
 
-    chooseLineEdit->setText(chooseComboBox->currentText());
-    chooseDeleteButton->setEnabled(chooseComboBox->currentText() != "");
+    int view = chooseListBox->currentItem() - 1;
+
+    if (view < 0)
+        chooseLineEdit->setText("");
+    else
+        chooseLineEdit->setText(viewList[view]);
+
+    chooseDeleteButton->setEnabled(view >= 0);
 }
 
 void ProgLister::setViewFromEdit(void)
 {
-    if (!chooseLineEdit)
+    if (!choosePopup || !chooseListBox || !chooseLineEdit)
         return;
 
-    QString view = chooseLineEdit->text();
+    QString text = chooseLineEdit->text();
 
-    if (view <= " ")
+    if (text.stripWhiteSpace().length() == 0)
         return;
 
-    QString querystr = QString("REPLACE INTO keyword VALUES('%1');").arg(view);
-    QSqlQuery query;
-    query.exec(querystr);
+    int oldview = chooseListBox->currentItem() - 1;
+    int newview = viewList.findIndex(text);
 
-    fillViewList(chooseComboBox->currentText());
-
-    chooseComboBox->clear();
-    chooseComboBox->insertStringList(viewTextList);
-
-    curView = viewList.findIndex(view);
-
-    if (curView < 0)
+    if (newview < 0 || newview != oldview)
     {
-        viewList << view;
-        viewTextList << view;
-        curView = viewCount++;
+        if (oldview >= 0)
+        {
+            QString querystr = QString("DELETE FROM keyword "
+                                       "WHERE phrase = '%1';")
+                                       .arg(viewList[oldview]);
+            QSqlQuery query;
+            query.exec(querystr);
+        }
+        if (newview < 0)
+        {
+            QString querystr = QString("REPLACE INTO keyword "
+                                       "VALUES('%1');").arg(text);
+            QSqlQuery query;
+            query.exec(querystr);
+        }
     }
+
+    choosePopup->done(0);
+
+    fillViewList(text);
 
     curItem = -1;
     refillAll = true;
@@ -363,26 +387,39 @@ void ProgLister::setViewFromEdit(void)
 
 void ProgLister::deleteKeyword(void)
 {
-    if (!chooseDeleteButton || !chooseComboBox || !chooseLineEdit)
+    if (!chooseDeleteButton || !chooseListBox)
         return;
 
-    if (viewCount < 1)
+    int view = chooseListBox->currentItem() - 1;
+
+    if (view < 0)
         return;
 
-    QString view = chooseComboBox->currentText();
+    QString text = viewList[view];
 
     QString querystr = QString("DELETE FROM keyword WHERE phrase = '%1';")
-                               .arg(view);
+                               .arg(text);
     QSqlQuery query;
     query.exec(querystr);
 
-    fillViewList(chooseComboBox->currentText());
+    chooseListBox->removeItem(view + 1);
+    viewList.remove(text);
+    viewTextList.remove(text);
+    viewCount--;
 
-    chooseComboBox->clear();
-    chooseComboBox->insertStringList(viewTextList);
+    if (view < curView)
+        curView--;
+    else if (view == curView)
+        curView = -1;
 
-    chooseLineEdit->setText("");
-    chooseDeleteButton->setEnabled(false);
+    if (view >= (int)chooseListBox->count() - 1)
+        view = chooseListBox->count() - 2;
+
+    chooseListBox->setSelected(view + 1, true);
+    if (viewCount < 1)
+        chooseLineEdit->setFocus();
+    else
+        chooseListBox->setFocus();
 }
 
 void ProgLister::chooseView(void)
@@ -392,13 +429,13 @@ void ProgLister::chooseView(void)
         if (viewCount < 2)
             return;
 
-        MythPopupBox choosePopup(gContext->GetMainWindow(), "");
+        choosePopup = new MythPopupBox(gContext->GetMainWindow(), "");
         if (type == plChannel)
-            choosePopup.addLabel(tr("Select Channel"));
+            choosePopup->addLabel(tr("Select Channel"));
         else if (type == plCategory)
-            choosePopup.addLabel(tr("Select Category"));
+            choosePopup->addLabel(tr("Select Category"));
 
-        chooseListBox = new MythListBox(&choosePopup);
+        chooseListBox = new MythListBox(choosePopup);
         chooseListBox->setScrollBar(false);
         chooseListBox->setBottomScrollBar(false);
         chooseListBox->insertStringList(viewTextList);
@@ -406,63 +443,85 @@ void ProgLister::chooseView(void)
             chooseListBox->setCurrentItem(0);
         else
             chooseListBox->setCurrentItem(curView);
-        choosePopup.addWidget(chooseListBox);
+        choosePopup->addWidget(chooseListBox);
 
         connect(chooseListBox, SIGNAL(accepted(int)), this, SLOT(setViewFromList()));
-        connect(chooseListBox, SIGNAL(accepted(int)), &choosePopup, SLOT(accept()));
 
         chooseListBox->setFocus();
-        choosePopup.ExecPopup();
+        choosePopup->ExecPopup();
 
         delete chooseListBox;
         chooseListBox = NULL;
+        delete choosePopup;
+        choosePopup = NULL;
     }
     else if (type == plTitleSearch || type == plDescSearch)
     {
-        MythPopupBox choosePopup(gContext->GetMainWindow(), "");
-        choosePopup.addLabel(tr("Enter Search Phrase"));
+        choosePopup = new MythPopupBox(gContext->GetMainWindow(), "");
+        choosePopup->addLabel(tr("Select Phrase"));
 
-        chooseLineEdit = new MythRemoteLineEdit(&choosePopup);
-        chooseLineEdit->setText("");
-        chooseLineEdit->selectAll();
-        choosePopup.addWidget(chooseLineEdit);
-
-        chooseOkButton = new MythPushButton(&choosePopup);
-        chooseOkButton->setText(tr("OK"));
-        chooseOkButton->setEnabled(false);
-        choosePopup.addWidget(chooseOkButton);
-
-        chooseComboBox = new MythComboBox(false, &choosePopup);
-        chooseComboBox->insertStringList(viewTextList);
+        chooseListBox = new MythListBox(choosePopup);
+        chooseListBox->setScrollBar(false);
+        chooseListBox->setBottomScrollBar(false);
+        chooseListBox->insertItem(tr("<New Phrase>"));
+        chooseListBox->insertStringList(viewTextList);
         if (curView < 0)
-            chooseComboBox->setCurrentItem(0);
+            chooseListBox->setCurrentItem(0);
         else
-            chooseComboBox->setCurrentItem(curView);
-        choosePopup.addWidget(chooseComboBox);
+            chooseListBox->setCurrentItem(curView + 1);
+        choosePopup->addWidget(chooseListBox);
 
-        chooseDeleteButton = new MythPushButton(&choosePopup);
+        chooseLineEdit = new MythRemoteLineEdit(choosePopup);
+        if (curView < 0)
+            chooseLineEdit->setText("");
+        else
+            chooseLineEdit->setText(viewList[curView]);
+        choosePopup->addWidget(chooseLineEdit);
+
+        chooseOkButton = new MythPushButton(choosePopup);
+        chooseOkButton->setText(tr("OK"));
+        choosePopup->addWidget(chooseOkButton);
+
+        chooseDeleteButton = new MythPushButton(choosePopup);
         chooseDeleteButton->setText(tr("Delete"));
-        chooseDeleteButton->setEnabled(chooseComboBox->currentText() != "");
-        choosePopup.addWidget(chooseDeleteButton);
+        choosePopup->addWidget(chooseDeleteButton);
 
+        chooseOkButton->setEnabled(chooseLineEdit->text()
+                                   .stripWhiteSpace().length() > 0);
+        chooseDeleteButton->setEnabled(curView >= 0);
+
+        connect(chooseListBox, SIGNAL(accepted(int)), this, SLOT(setViewFromList()));
+        connect(chooseListBox, SIGNAL(menuButtonPressed(int)), chooseLineEdit, SLOT(setFocus()));
+        connect(chooseListBox, SIGNAL(selectionChanged()), this, SLOT(chooseListBoxChanged()));
         connect(chooseLineEdit, SIGNAL(textChanged()), this, SLOT(chooseEditChanged()));
         connect(chooseOkButton, SIGNAL(clicked()), this, SLOT(setViewFromEdit()));
-        connect(chooseOkButton, SIGNAL(clicked()), &choosePopup, SLOT(accept()));
-        connect(chooseComboBox, SIGNAL(activated(int)), this, SLOT(chooseComboBoxChanged()));
-        connect(chooseComboBox, SIGNAL(highlighted (int)), this, SLOT(chooseComboBoxChanged()));
         connect(chooseDeleteButton, SIGNAL(clicked()), this, SLOT(deleteKeyword()));
 
-        chooseLineEdit->setFocus();
-        choosePopup.ExecPopup();
+        if (viewCount < 1)
+            chooseLineEdit->setFocus();
+        else
+            chooseListBox->setFocus();
+        choosePopup->ExecPopup();
 
         delete chooseLineEdit;
         chooseLineEdit = NULL;
         delete chooseOkButton;
         chooseOkButton = NULL;
-        delete chooseComboBox;
-        chooseComboBox = NULL;
         delete chooseDeleteButton;
         chooseDeleteButton = NULL;
+        delete chooseListBox;
+        chooseListBox = NULL;
+        delete choosePopup;
+        choosePopup = NULL;
+
+        if (viewCount < 1)
+            reject();
+        else if (curView < 0)
+        {
+            curView = 0;
+            curItem = -1;
+            refillAll = true;
+        }
     }
 }
 

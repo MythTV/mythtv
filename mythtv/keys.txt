@@ -179,6 +179,8 @@ Viewing Search Listings
 - Home to change to the previous view if applicable.
 - End to change to the next view if applicable.
 - M to select another view if applicable.
+  - In the title and description search popup, press M again to edit or 
+    delete the selected view.
 
 Recording Profiles Setup Screen
 -------------------------------
