@@ -35,17 +35,22 @@ v1.044, 2002-11-29.  Working on the mythmusic install instructions.  Added
 information about creating your own ~/.mythtv to maintain settings.
 v1.045, 2002-12-02.  Started working on the urpmi instructions for
 mythmusic.  Made changes to Mandrake docs to accomodate MDK 8.2.
+v1.046, 2002-12-02.  Added information on mythfilldatabase and xawtv
+channels.  Added attribution information for Harondel J. Sibble for Mandrake
+8.2.  Modified Gentoo again.  Added text on one system running the master database.  Added
+"Advanced Functionality" section.  Altered text throughout, referencing
+master system needing mysql, remote systems not needing it.
 -->
 <!--
-To create documentation, execute "% linuxdoc -B html mythtv-HOWTO.sgml" or
-"% linuxdoc -B txt -b 1 mythtv-HOWTO.sgml"  
+To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
+"$ linuxdoc -B txt -b 1 mythtv-HOWTO.sgml"  
 -->
 
 <article>
 
 <title>Installing and using mythtv
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2002-12-02, v1.045
+<date>2002-12-02, v1.046
 <abstract>
 Initially, installation of mythtv seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -64,12 +69,12 @@ url="http://www.mythtv.org/cgi-bin/viewcvs.cgi/" name="ViewCVS"> web interface, 
 CVS repository.  You may download the latest copy of mythtv and the 
 documentation from CVS this way:
 <tscreen><verb>
-% mkdir mythtv
-% cd mythtv
-% cvs -d :pserver:mythtv@mythtv.org:/var/lib/cvs login
+$ mkdir mythtv
+$ cd mythtv
+$ cvs -d :pserver:mythtv@mythtv.org:/var/lib/cvs login
 Logging in to :pserver:mythtv@mythtv.org:/var/lib/cvs
 CVS password: mythtv
-% cvs -z3 -d :pserver:mythtv@mythtv.org:/var/lib/cvs checkout MC
+$ cvs -z3 -d :pserver:mythtv@mythtv.org:/var/lib/cvs checkout MC
 </verb></tscreen>
 This documentation will be in the <tt>docs/</tt> subdirectory.
 
@@ -90,6 +95,7 @@ The contributors for this document are:
 <item>Red Hat Linux 8.0: Cedar McKay, <url url="mailto:mythhowto.3.ohthetrees@spamgourmet.com">
 <item>Gentoo: Tony Clark, <url url="mailto:tclark@telia.com">
 <item>Debian: Matthew Zimmerman, <url url="mailto:mdz@debian.org">
+<item>Mandrake 8.2: Harondel J. Sibble, <url url="mailto:help@pdscc.com">
 </itemize>
 
 <sect>Checking prerequisites. 
@@ -136,11 +142,16 @@ use the graphical tools that come with your distribution, or you can use
 command-line utilities.  Either system will get the job done, and it all
 depends on your comfort level with Linux.
 
-In order to compile mythtv, we need to make sure that the software it
-needs is installed.  As of 2002-12-02, this list includes perl, mysql,
-gcc, freetype2-devel and qt-devel.  If you're going to use a remote control
-with mythtv, you're going to need the cdialog package in order to compile
-lircd.
+<bf>NOTE</bf>: If you are using mythtv on multiple systems, at least one of
+them will maintain the master database and will need mysql installed.  
+
+In order to compile mythtv, we need to make sure that the software it needs
+is installed.  As of 2002-12-02, this list includes <bf>perl</bf>,
+<bf>mysql</bf> (only on the master system; remote viewers do not need mysql
+installed and will use the master database), <bf>gcc</bf>, <bf>freetype2-devel</bf> and
+<bf>qt-devel</bf>.  If you're going to use a remote control with mythtv,
+you're going to need the <bf>cdialog</bf> package in order to compile
+<bf>lircd</bf>.
 
 There appears to be issues with ALSA and simultaneously recording and playing 
 sound, which is a core requirement for mythtv.  If you are not running 
@@ -165,8 +176,9 @@ Click the magnifying glass or press <bf>CTRL-F</bf> and enter "perl" as your
 search term.  You should find it under the "Perl" folder.  You need at least
 the perl 5.80 base package installed.  If not, click on the "Mark" button.
 
-Next, search for mysql - it should be under "Databases".  Make sure that
-mysql and mysql-clients are installed.  If not, click on "Mark".
+If you are going to be installing mysql on this system, search for mysql -
+it should be under "Databases".  Make sure that mysql and mysql-clients are
+installed.  If not, click on "Mark".
 
 Search for gcc.  You're going to need gcc and gcc-c++ installed.
 
@@ -196,7 +208,7 @@ have selected:
 <itemize>
 <item>KDE Desktop Environment
 <item>SQL Database Server -  you will have to click on "details" and make 
-sure "mysql-server" is checked.
+sure "mysql-server" is checked.  (only required on the master system)
 <item>Development Tools
 <item>X Software Development
 <item>KDE Software Development
@@ -233,8 +245,8 @@ Open a shell, and execute the following.  You may get asked a number of
 questions regarding dependencies.  It's best to answer "YES".
 
 <tscreen><verb>
-% urpmi mesa-common-devel libmng1-devel mysql-devel libunixodbc2-devel
-% urpmi postgresql-devel xfree86-static-libs
+$ urpmi mesa-common-devel libmng1-devel mysql-devel libunixodbc2-devel
+$ urpmi postgresql-devel xfree86-static-libs
 </verb></tscreen>
 Once all of the pre-requisites have been installed, the next step is to
 obtain and compile the source RPM.
@@ -248,7 +260,7 @@ Cooker</bf> (the beta version of the next release of Mandrake), make sure to
 download the standard "Mandrake" release.  Download the <tt>.src.rpm</tt>
 file to a directory that you can find.  
 <tscreen><verb>
-% su
+$ su
 # cp qt3-3.0.5-7mdk.src.rpm /usr/src/RPMS/SRPMS
 # cd /usr/src/RPMS/SRPMS
 # rpm --rebuild qt3-3.0.5-7mdk.src.rpm
@@ -267,8 +279,13 @@ asked a number of questions regarding dependencies.  It's best to answer
 "YES".
 
 <tscreen><verb>
-% su
-# urpmi perl mysql gcc gcc-c++ freetype2-devel cdialog alsa-utils
+$ su
+# urpmi perl gcc gcc-c++ freetype2-devel cdialog alsa-utils
+</verb></tscreen>
+
+If this is the master system maintaining the database, you will need to install mysql:
+<tscreen><verb>
+# urpmi mysql
 </verb></tscreen>
 
 <bf>NOTE</bf>: Mandrake 8.2 users, <em>do not</em> execute the following
@@ -285,60 +302,39 @@ everything already installed
 </verb></tscreen>
 
 In that case, you're ready to move to the next <ref
-id="Distribution-specific_information" name="section">.
+id="Setting_up_paths" name="section">.
 <sect3>Red Hat Linux 8.0
 
 <p>[Please submit instructions]
 
-<sect3>Gentoo.
-<p>First, edit your <tt>/etc/make.conf</tt> file so that it looks like this:
-<tscreen><verb>
-# Build-time functionality
-# ========================
-#
-# The USE variable is used to enable optional build-time functionality. For
-# example, quite a few packages have optional X, gtk or GNOME functionality
-# that can only be enabled or disabled at compile-time. Gentoo Linux has a
-# very extensive set of USE variables described in our USE variable HOWTO at
-# http://www.gentoo.org/doc/use-howto.html
-#
-# The available list of use flags with descriptions is in your portage tree.
-# Use 'less' to view them:  --> less /usr/portage/profiles/use.desc <--
-#
-# Example:
-#USE="X gtk gnome -alsa"
-USE="mysql qt dvd X -alsa gtk gnome -esd oss"
-</verb></tscreen>
-
-If KDE has not been installed on your system:
-Edit <tt>/etc/make.conf</tt> and locate the "USE" variable.  If the line is commented 
-out, remove the comment.  The line should have at least:
+<sect3>Gentoo. 
+<p>If KDE has not been installed on your system: Edit
+<tt>/etc/make.conf</tt> and locate the "USE" variable. If the line is
+commented out, remove the comment. The line should have at least:
 <tscreen><verb>
 USE="mysql qt alsa"
 </verb></tscreen>
-
-Next you need to build KDE.  If you don't plan on using the ebuilds as
-described in the Gentoo <ref id="Gentoo_build" name="section"> then you also need to install lame.
+Next you need to build KDE. If you don't plan on using the ebuilds as 
+described in the Gentoo section then you also need to install lame.
 <tscreen><verb>
-$emerge kde lame
+$ emerge kde lame mysql
+</verb></tscreen>
+If KDE has already been installed, by default, QT libraries with SQL support 
+are not built. To enable SQL support, add "mysql qt" to your USE variable in 
+<tt>/etc/make.conf</tt> and rebuild QT by running
+<tscreen><verb>
+$ emerge qt
+</verb></tscreen>
+Install MySQL if this is the master system:
+<tscreen><verb>
+$ emerge mysql
 </verb></tscreen>
 
-By default, doesn't build QT libraries with SQL support.  To
-enable SQL support you need to add to your USE variable (USE="mysql") in 
-<tt>/etc/make.conf</tt> and rebuild QT by running 
+All the necessary files will be downloaded and built. This will take a lot
+of time, even on a fast machine if you have to do a full KDE build.
 
-<tscreen><verb>
-% emerge qt
-</verb</tscreen>
-
-<tscreen><verb>
-% emerge mysql
-</verb></tscreen>
-
-All the necessary files will be downloaded and built.  This will take a lot
-of time, even on a fast machine.
-
-<sect>Setting up paths, ldconfig and other shell variables.
+<sect>Setting up paths, ldconfig and other shell variables. <label
+id="Setting_up_paths">
 <p>There are some paths that need to be modified before starting the main
 compile of mythtv, otherwise you will get errors.
 
@@ -352,7 +348,7 @@ Open a shell, and switch to superuser mode.
 <bf>NOTE: ^D</bf> means press <bf>CTRL</bf> and <bf>d</bf> at the same time.
 
 <tscreen><verb>
-% su
+$ su
 # cd /etc/profile.d
 cat > mythtv.sh
 export QTDIR=/usr/lib/qt3
@@ -361,7 +357,7 @@ export PATH=$PATH:/usr/lib/qt3/bin
 
 # chmod a+x mythtv.sh
 # exit
-% exit
+$ exit
 </verb></tscreen>
 The last two commands are to exit out of the shell.  This way, when you next
 open a shell your new commands will take effect.
@@ -380,10 +376,10 @@ You can either modify the <tt>/etc/sysconfig/i18n</tt> file and set
 <tt>LANG="en_US"</tt>, or you can create a file in <tt>~/.i18n</tt>:
 
 <tscreen><verb>
-% cat > ~/.i18n
+$ cat > ~/.i18n
 LANG="en_US"
 ^D
-% exit
+$ exit
 </verb></tscreen>
 
 By making these modifications, you can follow the "other distributions"
@@ -392,7 +388,7 @@ instructions in the <ref id="Configuring_mythtv" name="Configuring mythtv"> sect
 <sect1>Checking that it worked. <label id="Checking_that_it_worked">
 <p>Open a shell and switch to superuser mode again.
 <tscreen><verb>
-% su
+$ su
 # set
 
 [lots of text]
@@ -448,12 +444,12 @@ change.
 
 <p>Open a shell and switch to the directory where you saved lame.
 <tscreen><verb>
-% tar -xzf lame-3.92.tar.gz
-% cd lame-3.92
-% ./configure
-% make
-% make test
-% su
+$ tar -xzf lame-3.92.tar.gz
+$ cd lame-3.92
+$ ./configure
+$ make
+$ make test
+$ su
 # make install
 </verb></tscreen>
 Check that it worked:
@@ -485,11 +481,11 @@ name="http://sourceforge.net/projects/expat/">
 
 Open a shell prompt:
 <tscreen><verb>
-% tar -xzf expat-1.95.5.tar.gz
-% cd expat-1.95.5
-% ./configure
-% make
-% su
+$ tar -xzf expat-1.95.5.tar.gz
+$ cd expat-1.95.5
+$ ./configure
+$ make
+$ su
 # make install
 # exit
 %
@@ -502,12 +498,12 @@ Continuing on:
 
 Untar the xmltv file:
 <tscreen><verb>
-% tar -xjf xmltv-0.5.3.tar.bz2
-% cd xmltv-0.5.3
+$ tar -xjf xmltv-0.5.3.tar.bz2
+$ cd xmltv-0.5.3
 </verb></tscreen>
 Install the xmltv prerequisites:
 <tscreen><verb>
-% su
+$ su
 # perl -MCPAN -e shell
 cpan> install XML::Twig
 cpan> install Date::Manip
@@ -519,8 +515,8 @@ cpan> exit
 
 Change to the XMLTV directory and compile it:
 <tscreen><verb>
-% cd xmltv-0.5.3
-% perl Makefile.PL
+$ cd xmltv-0.5.3
+$ perl Makefile.PL
 </verb></tscreen>
 You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes" to
 the grabber required for your location.
@@ -529,9 +525,9 @@ You may get errors about modules not being installed.  They shouldn't matter
 if you're installing North America and have followed the instructions to
 this point.
 <tscreen><verb>
-% make
-% make test
-% su
+$ make
+$ make test
+$ su
 # make install
 # exit
 </verb></tscreen>
@@ -539,14 +535,14 @@ this point.
 <sect1>Manually building mythtv.
 <p>Unpack mythtv
 <tscreen><verb>
-% tar -xjf mythtv-0.7.tar.bz2
-% cd mythtv-0.7
-% ./configure
-% make
+$ tar -xjf mythtv-0.7.tar.bz2
+$ cd mythtv-0.7
+$ ./configure
+$ make
 </verb></tscreen>
 Switch to superuser:
 <tscreen><verb>
-% su
+$ su
 # make install
 # exit
 </verb></tscreen>
@@ -583,14 +579,14 @@ name="http://bugs.gentoo.org/show_bug.cgi?id=10536">
 
 emerge mythtv:
 <tscreen><verb>
-% emerge /home/[yourusername]/portage/video-media/mythtv/mythtv-0.7.0
+$ emerge /home/[yourusername]/portage/video-media/mythtv/mythtv-0.7.0
 </verb></tscreen>
 
 It should download the source then complain about a missing digest.  To fix
 this,
 
 <tscreen><verb>
-% ebuild /home/[yourusername]/portage/video-media/mythtv/mythtv-0.7.0.ebuild digest
+$ ebuild /home/[yourusername]/portage/video-media/mythtv/mythtv-0.7.0.ebuild digest
 </verb></tscreen>
 
 emerge mythtv again and it should compile and install.
@@ -599,13 +595,13 @@ Do the same for xmltv but an additional step will be required first to fool
 it into thinking XML-Twig is installed.  
 
 <tscreen><verb>
-% su
+$ su
 # emerge inject dev-perl/XML-Twig
 # emerge /home/[yourusername]/portage/dev-perl/xmltv/xmltv-0.5.2
 # ebuild /home/[yourusername]/portage/dev-perl/xmltv/xmltv-0.5.2.ebuild digest
 # emerge /home/[yourusername]/portage/dev-perl/xmltv/xmltv-0.5.2
 # exit
-% 
+$ 
 </verb></tscreen>
 
 <sect1>Debian.
@@ -623,41 +619,45 @@ name="http://www.snowman.net/pipermail/mythtv-dev/2002-November/001116.html">.
 
 <sect>MySQL.
 <sect1>Mandrake 9.0
-<p>Make sure that mysql is running and started at boot.  Click on Mandrake
-Control Center->System->Services, find mysql and click the "On Boot" button and 
-the "Start" button if the mysql status shows that it isn't running yet.
+<p>If this is the master system, make sure that mysql is running and started
+at boot.  Click on Mandrake Control Center->System->Services, find mysql and
+click the "On Boot" button and the "Start" button if the mysql status shows
+that it isn't running yet.
 
 <sect1>Red Hat Linux 8.0
-<p>Make sure that mysql is running and started at boot. Click on GNOME
+<p>If this is the master system, make sure that mysql is running and started at boot. Click on GNOME
 menu>Server Settings>Services and enter the root password when asked.
 Check "mysqld" and then click Start. Click Save, then close the window.
 <sect1>Gentoo.
 
 <sect1>Setting up the initial database.
-<p>Setup the initial mysql databases:
+<p>This step is only required for systems that will be maintaining a
+database of listings.  If you are running multiple mythtv systems you can
+either have one master database read by all the other systems, or you can
+have each system maintaining its own.  To setup the initial mysql databases:
 <tscreen><verb>
-% cd database
+$ cd database
 </verb></tscreen>
 <sect2>Mandrake 9.0
 <p>
 <tscreen><verb>
-% mysql -u root < mc.sql
+$ mysql -u root < mc.sql
 </verb></tscreen>
 <sect2>Debian 3.0
 <p>
 <tscreen><verb>
-% mysql &lt; mc.sql
+$ mysql &lt; mc.sql
 </verb></tscreen>
 <sect2>Red Hat Linux 8.0
 <p>
 <tscreen><verb>
-% mysql < mc.sql
+$ mysql < mc.sql
 </verb></tscreen>
 
 if this returns an error message try switching to root first.
 
 <tscreen><verb>
-% su
+$ su
 # mysql < mc.sql
 # exit
 %
@@ -725,12 +725,12 @@ moving it to "mike in" Then go to the mixer and check "mute" and
 then the <bf>amixer</bf> program can be used to setup the mixer.
 
 <tscreen><verb>
-% amixer set Master,0 100%,100% unmute
-% amixer set Line,0 100%,100% mute capture
-% su
+$ amixer set Master,0 100%,100% unmute
+$ amixer set Line,0 100%,100% mute capture
+$ su
 # alsactl store
 # exit
-% 
+$ 
 </verb></tscreen>
 That takes care of setting the volume correctly, and the ALSA startup script
 will restore the volume after a reboot.
@@ -755,11 +755,11 @@ name="http://www.kernel.org/pub/linux/kernel/v2.4/">.
 
 <p>An easy way is to use the wget command:
 <tscreen><verb>
-% wget http://www.kernel.org/pub/linux/kernel/v2.4/linux-2.4.19.tar.bz2
+$ wget http://www.kernel.org/pub/linux/kernel/v2.4/linux-2.4.19.tar.bz2
 </verb></tscreen>
 Next, open a shell and login as superuser.
 <tscreen><verb>
-% su 
+$ su 
 # mkdir /usr/src
 # mv linux-2.4.19.tar.bz2 /usr/src
 # cd /usr/src
@@ -777,9 +777,9 @@ url="http://www.lirc.org" name="http://www.lirc.org"> and download lirc; as
 of 2002-11-07, the version available is 0.6.6.  Grab the remotes.tgz file as
 well. 
 <tscreen><verb>
-% tar -xjf lirc-0.6.6.tar.bz2
-% cd lirc-0.6.6
-% ./setup.sh
+$ tar -xjf lirc-0.6.6.tar.bz2
+$ cd lirc-0.6.6
+$ ./setup.sh
 </verb></tscreen>
 You're going to need to know what sort of receiver you have and where
 it's connected.  In my case, I have a Pinnacle Studio TV card, with the IR
@@ -795,8 +795,8 @@ correct one.
 
 Once the configuration step is complete:
 <tscreen><verb>
-% make
-% su
+$ make
+$ su
 # make install
 # chmod 666 /dev/lircd
 </verb></tscreen>
@@ -823,16 +823,16 @@ receiver.
 The next step is to convert those signals into something that can be used
 to control mythtv.
 <tscreen><verb>
-% cd ~/mythtv-0.7/configfiles
-% cp lircrc.example ~/.lircrc
+$ cd ~/mythtv-0.7/configfiles
+$ cp lircrc.example ~/.lircrc
 </verb></tscreen> 
 or
 <tscreen><verb>
-% cp lircrc.example.pinnaclestudiopctv ~/.lircrc
+$ cp lircrc.example.pinnaclestudiopctv ~/.lircrc
 </verb></tscreen>
 if you've got a Pinnacle Studio PCTV remote.
 <tscreen><verb>
-% irw
+$ irw
 </verb></tscreen>
 Start pressing the keys on your remote; <bf>irw</bf> will
 print the name of the button as it is defined in your
@@ -847,7 +847,7 @@ program, which takes the key presses and sends them to mythtv.
 isn't a daemon, so if you know that your remote is working you need to
 invoke it like this: 
 <tscreen><verb>
-% irxevent &
+$ irxevent &
 </verb></tscreen>
 If <bf>irxevent</bf> isn't running, then mythtv will not respond to your remote
 control.
@@ -932,7 +932,7 @@ configuration & run configure from the main menu. Once configure is done
 type:
 
 <tscreen><verb>
-% make
+$ make
 </verb></tscreen>
 
 Please note: unlike the Pinnacle receiver above you will be compiling lircd
@@ -960,7 +960,7 @@ If you do receive this statement make sure to run the <bf>setserial</bf> command
 before you load the lirc_sir module. Follow this with the install:
 
 <tscreen><verb>
-% su
+$ su
 # make install
 </verb></tscreen>
  
@@ -994,7 +994,7 @@ received. If everything is configured correctly
 you should see something similar to the following:
 
 <tscreen><verb>
-% irw
+$ irw
 0000000000007ff0 00 1 gi-motorola-dct2000
 000000000000bff8 00 2 gi-motorola-dct2000
 000000000000f7f0 00 ENTER gi-motorola-dct2000
@@ -1019,7 +1019,7 @@ bash, csh scripts automatically close parent file descriptors before they
 start.
  
 <tscreen><verb>
-% cd /usr/local/bin
+$ cd /usr/local/bin
 # su
 # cat > change_channel.csh
 #!/bin/csh
@@ -1028,7 +1028,7 @@ echo "changing to $1"
 ^D
 # chmod a+x change_channel.csh
 # exit
-% exit
+$ exit
 </verb></tscreen>
  
 The following file should be saved as /usr/local/bin/channel.pl
@@ -1078,7 +1078,7 @@ By default, these point to <tt>/mnt/store</tt>.  For example, you may wish to cr
 a <tt>/var/video</tt> subdirectory, so you would change <tt>/mnt/store</tt>
 to <tt>/var/video</tt>
 <tscreen><verb>
-% su
+$ su
 # mkdir /var/video
 # chmod a+rwx /var/video
 # exit
@@ -1116,17 +1116,17 @@ steps, ensure that you follow the Red Hat instructions.
 Open a shell, and switch to the setup directory:
 
 <tscreen><verb>
-% cd setup
+$ cd setup
 </verb></tscreen>
 
 <bf>Red Hat 8.0</bf>
 <tscreen><verb>
-% env LANG=C setup 
+$ env LANG=C setup 
 </verb></tscreen>
 
 <bf>Other distributions</bf>:
 <tscreen><verb>
-% ./setup
+$ ./setup
 </verb></tscreen>
 
 The setup program will ask you a few questions and then proceed to run the
@@ -1138,12 +1138,12 @@ get one week of data inserted into the database.
 
 <bf>Red Hat 8.0</bf>
 <tscreen><verb>
-% env LANG=C mythfilldatabase
+$ env LANG=C mythfilldatabase
 </verb></tscreen>
 
 All other distributions can execute the following:
 <tscreen><verb>
-% mythfilldatabase
+$ mythfilldatabase
 </verb></tscreen>
 
 <bf>NOTE</bf>:  <bf>mythfilldatabase</bf> might take a while to complete,
@@ -1159,6 +1159,10 @@ must use the <bf>--manual</bf> option.
 for your country, but you <bf>do</bf> have an XML formatted listings file
 created by some other program.
 
+<bf>mythfilldatabase --xawchannels</bf> is an option if you have used
+<bf>xawtv</bf> to fine-tune your channels and would like to import the fine
+tuning offsets into mythtv.
+
 <!-- get more information on the manual setting -->
 
 <sect2>Setting <bf>mythfilldatabase</bf> to run from <bf>cron</bf>
@@ -1173,8 +1177,8 @@ same time as any other system cron jobs.
 If you are a Mandrake 9.0 user and wish to use a system cron job, you can
 perform the following steps:
 <tscreen><verb>
-% cd configfiles
-% su
+$ cd configfiles
+$ su
 # cp mythfilldatabasecron /etc/cron.daily
 </verb></tscreen>
 
@@ -1208,9 +1212,9 @@ modify it as you like.  Once you're satisfied with the time that <bf>
 mythfilldatabase</bf> will run, save and exit, and return to the shell prompt.
 
 <tscreen><verb>
-% cd configfiles
-% crontab mythcrontab
-% crontab -l  NOTE: this is a lowercase L.
+$ cd configfiles
+$ crontab mythcrontab
+$ crontab -l  NOTE: this is a lowercase L.
 # The following will run the mythfilldatabase shell script at 0430
 # every day.  Format is
 # minutes hour day_of_month month day_of_week
@@ -1230,7 +1234,7 @@ you can use the crontab command to open your existing job and edit it in
 place.
 
 <tscreen><verb>
-% crontab -e
+$ crontab -e
 </verb></tscreen>
 
 The <bf>crontab -e</bf> command will allow you to edit the existing crontab.
@@ -1239,8 +1243,8 @@ editor.  If you don't like to use <bf>vi</bf>, make sure that you've set
 <tt>VISUAL</tt> to something other than <bf>vi</bf>.
 
 <tscreen><verb>
-% export VISUAL=/usr/bin/joe
-% crontab -e
+$ export VISUAL=/usr/bin/joe
+$ crontab -e
 </verb></tscreen>
 
 This will cause <bf>crontab</bf> to use <bf>joe</bf>, a visual editor that
@@ -1333,9 +1337,9 @@ Mandrake Control Center.
 <sect1>Completing the installation.
 <p>
 <tscreen><verb>
-% tar -xjf mythweb-0.7.tar.bz2
-% cd mythweb-0.7
-% su
+$ tar -xjf mythweb-0.7.tar.bz2
+$ cd mythweb-0.7
+$ su
 # mkdir /var/www/html/mythweb
 # cp -r . /var/www/html/mythweb
 # exit
@@ -1356,9 +1360,9 @@ operational.
 name="http://www.mythtv.org/"> and save it to a location where you can find
 it.
 <tscreen><verb>
-% tar -xjf mythgallery-0.7.tar.bz2
-% cd mythgallery-0.7
-% make
+$ tar -xjf mythgallery-0.7.tar.bz2
+$ cd mythgallery-0.7
+$ make
 # su
 # make install
 # exit
@@ -1408,11 +1412,11 @@ name="http://www.mars.org/home/rob/proj/mpeg/">  Save it to a directory you
 can find later.
 
 <tscreen><verb>
-% tar -xzf mad-0.14.2b.tar.gz
-% cd mad-0.14.2b
-% ./configure
-% make
-% su
+$ tar -xzf mad-0.14.2b.tar.gz
+$ cd mad-0.14.2b
+$ ./configure
+$ make
+$ su
 # make install
 # exit
 %
@@ -1422,11 +1426,11 @@ Download FLAC from <url url="http://flac.sourceforge.net"
 name="http://flac.sourceforge.net"> and install:
 
 <tscreen><verb>
-% tar -xzf flac-1.0.4.tar.gz
-% cd flac-1.0.4
-% ./configure
-% make
-% su
+$ tar -xzf flac-1.0.4.tar.gz
+$ cd flac-1.0.4
+$ ./configure
+$ make
+$ su
 # make install
 # exit
 %
@@ -1436,11 +1440,11 @@ Download libcdaudio from <url name="libcdaudio.sourceforge.net"
 url="http://sourceforge.net/project/showfiles.php?group_id=27134"> and
 install:
 <tscreen><verb>
-% tar -xzf libcdaudio-0.99-6.tar.gz
-% cd libcdaudio-0.99.6
-% ./configure
-% make
-% su
+$ tar -xzf libcdaudio-0.99-6.tar.gz
+$ cd libcdaudio-0.99.6
+$ ./configure
+$ make
+$ su
 # make install
 # exit
 %
@@ -1449,11 +1453,11 @@ install:
 Download cdparanoia from <url name="http://www.xiph.org/paranoia/down.html"
 url="http://www.xiph.org/paranoia/download/cdparanoia-III-alpha9.8.src.tgz">.
 <tscreen><verb>
-% tar -xzf cdparanoia-III-alpha9.8.src.tgz
-% cd cdparanoia-III-alpha9.8
-% ./configure
-% make
-% su
+$ tar -xzf cdparanoia-III-alpha9.8.src.tgz
+$ cd cdparanoia-III-alpha9.8
+$ ./configure
+$ make
+$ su
 # make install
 <!-- see if the next step is a Mandrake only issue -->
 # cp interface/cdda_interface.h /usr/local/include
@@ -1487,13 +1491,13 @@ Install cdparanoia using urpmi or the Mandrake Control Center.
 <p>Once all the pre-requisites have been installed, you can proceed with
 getting mythmusic going.
 <tscreen><verb>
-% ./configure
-% make
-% su
+$ ./configure
+$ make
+$ su
 # make install
 # exit
-% cd musicdb
-% mysql -u root < metadata.sql
+$ cd musicdb
+$ mysql -u root < metadata.sql
 </verb></tscreen>
 
 Edit the <tt>/usr/local/share/mythtv/mythmusic-settings.txt</tt> file for
@@ -1532,12 +1536,73 @@ the <bf>hdparm</bf> program to check and enable DMA.<tscreen><verb>
 If you want to make sure that you don't lose your modifications, make a
 directory <tt>~/.mythtv</tt> and copy your settings.txt file to this
 location.
+<sect>Advanced Functionality.
+<p><bf>NOTE</bf>: The following are not guaranteed to work, and are not
+explicity supported.  If you have issues, please contact the maintainer and
+not Isaac Richards.
+<sect1>Multiple systems accessing a single database.
+<p>If you are going to have multiple systems accessing one database, you
+will need to modify the database to allow remote systems to read it.  By
+default, mythtv only allows access to the database from the localhost.  The
+following works on Mandrake 9.0:
+
+<tscreen><verb>
+$ mysql -u root
+mysql> use mythconverg;
+mysql> grant all on mythconverg.* to mythtv@"%" identified by "mythtv";
+mysql> exit
+$
+</verb></tscreen>
+
+On the remote system, you would modify the
+<tt>/usr/local/share/mythtv/mysql.txt</tt> or <tt>~/.mythtv/mysql.txt</tt>
+file, changing the <tt>str DBHostName=localhost</tt> to <tt>str
+DBHostName=mastersystemname_or_ipaddress</tt>and restart <tt>mythfrontend</tt>.
+
+<sect1>Exporting and mounting filesystems with NFS.
+<p>If you are going to use NFS to share your video directory, the following
+instructions work on Mandrake 9.0.
+
+First, make sure that you installed NFS and that it's running.
+On the master system, edit the <tt>/etc/exports</tt> file and add your video
+directory.  On my system, the video directory is <tt>/var/video</tt>, so
+here is my <tt>/etc/exports</tt> file:
+
+<tscreen><verb>
+$ su
+# cat /etc/exports
+/var/video (rw)
+# 
+</verb></tscreen>
+
+Now, make sure that NFS makes the directory available:
+
+<tscreen><verb>
+$ su
+# exportfs -r
+# 
+</verb></tscreen>
+
+On the remote system, you would execute the following:
+<tscreen><verb>
+$ su
+# mount -t nfs mastersystemname_or_ipaddress:/var/video /mnt/video
+</verb></tscreen>
+
+or modify the <tt>/etc/fstab</tt> file and add:
+<tscreen><verb>
+mastersystemname_or_ipaddress::/var/video /mnt/video nfs soft,rsize=8192,wsize=8192,nosuid 0 0
+</verb></tscreen>
+
+and then mount the filesystem:
+<tscreen><verb>
+# mount -a
+</verb></tscreen>
+
+You can modify the <tt>/usr/local/share/mythtv/settings.txt</tt> or
+<tt>~/.mythtv/settings.txt</tt> file and use <tt>/mnt/video</tt> as the
+video directory.  If you use this in combination with the instructions on
+multiple systems accessing the same database, you can get preliminary
+multiple system support.
+
 </article>
-
-<!-- 
-
-% mysql -u root
-> use mythconverg;
-> grant all on mythconverg.* to mythtv@"%" identified by "mythtv";
-
--->

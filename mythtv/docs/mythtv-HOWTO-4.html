@@ -2,7 +2,7 @@
 <HTML>
 <HEAD>
  <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.20">
- <TITLE>Installing and using mythtv: Setting up paths, ldconfig and other shell variables.</TITLE>
+ <TITLE>Installing and using mythtv: Setting up paths, ldconfig and other shell variables. </TITLE>
  <LINK HREF="mythtv-HOWTO-5.html" REL=next>
  <LINK HREF="mythtv-HOWTO-3.html" REL=previous>
  <LINK HREF="mythtv-HOWTO.html#toc4" REL=contents>
@@ -12,7 +12,7 @@
 <A HREF="mythtv-HOWTO-3.html">Previous</A>
 <A HREF="mythtv-HOWTO.html#toc4">Contents</A>
 <HR>
-<H2><A NAME="s4">4.</A> <A HREF="mythtv-HOWTO.html#toc4">Setting up paths, ldconfig and other shell variables.</A></H2>
+<H2><A NAME="Setting_up_paths"></A> <A NAME="s4">4.</A> <A HREF="mythtv-HOWTO.html#toc4">Setting up paths, ldconfig and other shell variables. </A></H2>
 
 <P>There are some paths that need to be modified before starting the main
 compile of mythtv, otherwise you will get errors.</P>
@@ -29,7 +29,7 @@ I call it "mythtv.sh".</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-% su
+$ su
 # cd /etc/profile.d
 cat > mythtv.sh
 export QTDIR=/usr/lib/qt3
@@ -38,7 +38,7 @@ export PATH=$PATH:/usr/lib/qt3/bin
 
 # chmod a+x mythtv.sh
 # exit
-% exit
+$ exit
 </PRE>
 </CODE></BLOCKQUOTE>
 
@@ -58,10 +58,10 @@ follow the "standard" instructions.</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-% cat > ~/.i18n
+$ cat > ~/.i18n
 LANG="en_US"
 ^D
-% exit
+$ exit
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -75,7 +75,7 @@ instructions in the
 <P>Open a shell and switch to superuser mode again.
 <BLOCKQUOTE><CODE>
 <PRE>
-% su
+$ su
 # set
 
 [lots of text]

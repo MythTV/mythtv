@@ -49,12 +49,12 @@ change.</P>
 <P>Open a shell and switch to the directory where you saved lame.
 <BLOCKQUOTE><CODE>
 <PRE>
-% tar -xzf lame-3.92.tar.gz
-% cd lame-3.92
-% ./configure
-% make
-% make test
-% su
+$ tar -xzf lame-3.92.tar.gz
+$ cd lame-3.92
+$ ./configure
+$ make
+$ make test
+$ su
 # make install
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -91,11 +91,11 @@ xmltv file.</P>
 <P>Open a shell prompt:
 <BLOCKQUOTE><CODE>
 <PRE>
-% tar -xzf expat-1.95.5.tar.gz
-% cd expat-1.95.5
-% ./configure
-% make
-% su
+$ tar -xzf expat-1.95.5.tar.gz
+$ cd expat-1.95.5
+$ ./configure
+$ make
+$ su
 # make install
 # exit
 %
@@ -109,15 +109,15 @@ described in
 <P>Untar the xmltv file:
 <BLOCKQUOTE><CODE>
 <PRE>
-% tar -xjf xmltv-0.5.3.tar.bz2
-% cd xmltv-0.5.3
+$ tar -xjf xmltv-0.5.3.tar.bz2
+$ cd xmltv-0.5.3
 </PRE>
 </CODE></BLOCKQUOTE>
 
 Install the xmltv prerequisites:
 <BLOCKQUOTE><CODE>
 <PRE>
-% su
+$ su
 # perl -MCPAN -e shell
 cpan> install XML::Twig
 cpan> install Date::Manip
@@ -131,8 +131,8 @@ cpan> exit
 <P>Change to the XMLTV directory and compile it:
 <BLOCKQUOTE><CODE>
 <PRE>
-% cd xmltv-0.5.3
-% perl Makefile.PL
+$ cd xmltv-0.5.3
+$ perl Makefile.PL
 </PRE>
 </CODE></BLOCKQUOTE>
 
@@ -143,9 +143,9 @@ if you're installing North America and have followed the instructions to
 this point.
 <BLOCKQUOTE><CODE>
 <PRE>
-% make
-% make test
-% su
+$ make
+$ make test
+$ su
 # make install
 # exit
 </PRE>
@@ -158,17 +158,17 @@ this point.
 <P>Unpack mythtv
 <BLOCKQUOTE><CODE>
 <PRE>
-% tar -xjf mythtv-0.7.tar.bz2
-% cd mythtv-0.7
-% ./configure
-% make
+$ tar -xjf mythtv-0.7.tar.bz2
+$ cd mythtv-0.7
+$ ./configure
+$ make
 </PRE>
 </CODE></BLOCKQUOTE>
 
 Switch to superuser:
 <BLOCKQUOTE><CODE>
 <PRE>
-% su
+$ su
 # make install
 # exit
 </PRE>
@@ -214,7 +214,7 @@ ebuild names are wrong.  The two ebuilds are:</P>
 <P>emerge mythtv:
 <BLOCKQUOTE><CODE>
 <PRE>
-% emerge /home/[yourusername]/portage/video-media/mythtv/mythtv-0.7.0
+$ emerge /home/[yourusername]/portage/video-media/mythtv/mythtv-0.7.0
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -223,7 +223,7 @@ this,</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-% ebuild /home/[yourusername]/portage/video-media/mythtv/mythtv-0.7.0.ebuild digest
+$ ebuild /home/[yourusername]/portage/video-media/mythtv/mythtv-0.7.0.ebuild digest
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -233,13 +233,13 @@ it into thinking XML-Twig is installed.  </P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-% su
+$ su
 # emerge inject dev-perl/XML-Twig
 # emerge /home/[yourusername]/portage/dev-perl/xmltv/xmltv-0.5.2
 # ebuild /home/[yourusername]/portage/dev-perl/xmltv/xmltv-0.5.2.ebuild digest
 # emerge /home/[yourusername]/portage/dev-perl/xmltv/xmltv-0.5.2
 # exit
-% 
+$ 
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>

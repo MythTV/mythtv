@@ -30,7 +30,7 @@ a <CODE>/var/video</CODE> subdirectory, so you would change <CODE>/mnt/store</CO
 to <CODE>/var/video</CODE>
 <BLOCKQUOTE><CODE>
 <PRE>
-% su
+$ su
 # mkdir /var/video
 # chmod a+rwx /var/video
 # exit
@@ -69,21 +69,21 @@ steps, ensure that you follow the Red Hat instructions.</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-% cd setup
+$ cd setup
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
 <P><B>Red Hat 8.0</B>
 <BLOCKQUOTE><CODE>
 <PRE>
-% env LANG=C setup 
+$ env LANG=C setup 
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
 <P><B>Other distributions</B>:
 <BLOCKQUOTE><CODE>
 <PRE>
-% ./setup
+$ ./setup
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -98,14 +98,14 @@ get one week of data inserted into the database.</P>
 <P><B>Red Hat 8.0</B>
 <BLOCKQUOTE><CODE>
 <PRE>
-% env LANG=C mythfilldatabase
+$ env LANG=C mythfilldatabase
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
 <P>All other distributions can execute the following:
 <BLOCKQUOTE><CODE>
 <PRE>
-% mythfilldatabase
+$ mythfilldatabase
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -119,6 +119,9 @@ must use the <B>--manual</B> option.</P>
 <P><B>mythfilldatabse --file</B> is an option if there isn't an XMLTV grabber
 for your country, but you <B>do</B> have an XML formatted listings file
 created by some other program.</P>
+<P><B>mythfilldatabase --xawchannels</B> is an option if you have used
+<B>xawtv</B> to fine-tune your channels and would like to import the fine
+tuning offsets into mythtv.</P>
 
 
 <H3>Setting <B>mythfilldatabase</B> to run from <B>cron</B></H3>
@@ -133,8 +136,8 @@ same time as any other system cron jobs.</P>
 perform the following steps:
 <BLOCKQUOTE><CODE>
 <PRE>
-% cd configfiles
-% su
+$ cd configfiles
+$ su
 # cp mythfilldatabasecron /etc/cron.daily
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -168,9 +171,9 @@ modify it as you like.  Once you're satisfied with the time that <B>mythfilldata
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-% cd configfiles
-% crontab mythcrontab
-% crontab -l  NOTE: this is a lowercase L.
+$ cd configfiles
+$ crontab mythcrontab
+$ crontab -l  NOTE: this is a lowercase L.
 # The following will run the mythfilldatabase shell script at 0430
 # every day.  Format is
 # minutes hour day_of_month month day_of_week
@@ -191,7 +194,7 @@ place.</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-% crontab -e
+$ crontab -e
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -202,8 +205,8 @@ editor.  If you don't like to use <B>vi</B>, make sure that you've set
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-% export VISUAL=/usr/bin/joe
-% crontab -e
+$ export VISUAL=/usr/bin/joe
+$ crontab -e
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>

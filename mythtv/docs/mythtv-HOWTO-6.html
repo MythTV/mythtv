@@ -17,14 +17,15 @@
 <H2><A NAME="ss6.1">6.1</A> <A HREF="mythtv-HOWTO.html#toc6.1">Mandrake 9.0</A>
 </H2>
 
-<P>Make sure that mysql is running and started at boot.  Click on Mandrake
-Control Center->System->Services, find mysql and click the "On Boot" button and 
-the "Start" button if the mysql status shows that it isn't running yet.</P>
+<P>If this is the master system, make sure that mysql is running and started
+at boot.  Click on Mandrake Control Center->System->Services, find mysql and
+click the "On Boot" button and the "Start" button if the mysql status shows
+that it isn't running yet.</P>
 
 <H2><A NAME="ss6.2">6.2</A> <A HREF="mythtv-HOWTO.html#toc6.2">Red Hat Linux 8.0</A>
 </H2>
 
-<P>Make sure that mysql is running and started at boot. Click on GNOME
+<P>If this is the master system, make sure that mysql is running and started at boot. Click on GNOME
 menu>Server Settings>Services and enter the root password when asked.
 Check "mysqld" and then click Start. Click Save, then close the window.</P>
 <H2><A NAME="ss6.3">6.3</A> <A HREF="mythtv-HOWTO.html#toc6.3">Gentoo.</A>
@@ -33,10 +34,13 @@ Check "mysqld" and then click Start. Click Save, then close the window.</P>
 <H2><A NAME="ss6.4">6.4</A> <A HREF="mythtv-HOWTO.html#toc6.4">Setting up the initial database.</A>
 </H2>
 
-<P>Setup the initial mysql databases:
+<P>This step is only required for systems that will be maintaining a
+database of listings.  If you are running multiple mythtv systems you can
+either have one master database read by all the other systems, or you can
+have each system maintaining its own.  To setup the initial mysql databases:
 <BLOCKQUOTE><CODE>
 <PRE>
-% cd database
+$ cd database
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -45,7 +49,7 @@ Check "mysqld" and then click Start. Click Save, then close the window.</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-% mysql -u root &lt; mc.sql
+$ mysql -u root &lt; mc.sql
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -54,7 +58,7 @@ Check "mysqld" and then click Start. Click Save, then close the window.</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-% mysql &lt; mc.sql
+$ mysql &lt; mc.sql
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -63,7 +67,7 @@ Check "mysqld" and then click Start. Click Save, then close the window.</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-% mysql &lt; mc.sql
+$ mysql &lt; mc.sql
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -71,7 +75,7 @@ Check "mysqld" and then click Start. Click Save, then close the window.</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-% su
+$ su
 # mysql &lt; mc.sql
 # exit
 %

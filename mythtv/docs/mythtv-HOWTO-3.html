@@ -58,11 +58,15 @@ simultaneously, thereby allowing live TV watching.</LI>
 use the graphical tools that come with your distribution, or you can use
 command-line utilities.  Either system will get the job done, and it all
 depends on your comfort level with Linux.</P>
-<P>In order to compile mythtv, we need to make sure that the software it
-needs is installed.  As of 2002-12-02, this list includes perl, mysql,
-gcc, freetype2-devel and qt-devel.  If you're going to use a remote control
-with mythtv, you're going to need the cdialog package in order to compile
-lircd.</P>
+<P><B>NOTE</B>: If you are using mythtv on multiple systems, at least one of
+them will maintain the master database and will need mysql installed.  </P>
+<P>In order to compile mythtv, we need to make sure that the software it needs
+is installed.  As of 2002-12-02, this list includes <B>perl</B>,
+<B>mysql</B> (only on the master system; remote viewers do not need mysql
+installed and will use the master database), <B>gcc</B>, <B>freetype2-devel</B> and
+<B>qt-devel</B>.  If you're going to use a remote control with mythtv,
+you're going to need the <B>cdialog</B> package in order to compile
+<B>lircd</B>.</P>
 <P>There appears to be issues with ALSA and simultaneously recording and playing 
 sound, which is a core requirement for mythtv.  If you are not running 
 ALSA 0.9.0rc6 and experience lock-ups of your system when trying to use mythtv, 
@@ -85,8 +89,9 @@ installed.</P>
 <P>Click the magnifying glass or press <B>CTRL-F</B> and enter "perl" as your
 search term.  You should find it under the "Perl" folder.  You need at least
 the perl 5.80 base package installed.  If not, click on the "Mark" button.</P>
-<P>Next, search for mysql - it should be under "Databases".  Make sure that
-mysql and mysql-clients are installed.  If not, click on "Mark".</P>
+<P>If you are going to be installing mysql on this system, search for mysql -
+it should be under "Databases".  Make sure that mysql and mysql-clients are
+installed.  If not, click on "Mark".</P>
 <P>Search for gcc.  You're going to need gcc and gcc-c++ installed.</P>
 <P>Search for freetype2.  Make sure that you've got freetype2 and
 freetype2-devel installed.</P>
@@ -111,7 +116,7 @@ have selected:
 <UL>
 <LI>KDE Desktop Environment</LI>
 <LI>SQL Database Server -  you will have to click on "details" and make 
-sure "mysql-server" is checked.</LI>
+sure "mysql-server" is checked.  (only required on the master system)</LI>
 <LI>Development Tools</LI>
 <LI>X Software Development</LI>
 <LI>KDE Software Development</LI>
@@ -150,8 +155,8 @@ questions regarding dependencies.  It's best to answer "YES".</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-% urpmi mesa-common-devel libmng1-devel mysql-devel libunixodbc2-devel
-% urpmi postgresql-devel xfree86-static-libs
+$ urpmi mesa-common-devel libmng1-devel mysql-devel libunixodbc2-devel
+$ urpmi postgresql-devel xfree86-static-libs
 </PRE>
 </CODE></BLOCKQUOTE>
 
@@ -167,7 +172,7 @@ download the standard "Mandrake" release.  Download the <CODE>.src.rpm</CODE>
 file to a directory that you can find.  
 <BLOCKQUOTE><CODE>
 <PRE>
-% su
+$ su
 # cp qt3-3.0.5-7mdk.src.rpm /usr/src/RPMS/SRPMS
 # cd /usr/src/RPMS/SRPMS
 # rpm --rebuild qt3-3.0.5-7mdk.src.rpm
@@ -189,8 +194,15 @@ asked a number of questions regarding dependencies.  It's best to answer
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-% su
-# urpmi perl mysql gcc gcc-c++ freetype2-devel cdialog alsa-utils
+$ su
+# urpmi perl gcc gcc-c++ freetype2-devel cdialog alsa-utils
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>If this is the master system maintaining the database, you will need to install mysql:
+<BLOCKQUOTE><CODE>
+<PRE>
+# urpmi mysql
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -212,71 +224,48 @@ everything already installed
 </CODE></BLOCKQUOTE>
 </P>
 <P>In that case, you're ready to move to the next 
-<A HREF="mythtv-HOWTO-4.html#Distribution-specific_information">section</A>.</P>
+<A HREF="mythtv-HOWTO-4.html#Setting_up_paths">section</A>.</P>
 <H3>Red Hat Linux 8.0</H3>
 
 <P>[Please submit instructions]</P>
 
-<H3>Gentoo.</H3>
+<H3>Gentoo. </H3>
 
-<P>First, edit your <CODE>/etc/make.conf</CODE> file so that it looks like this:
-<BLOCKQUOTE><CODE>
-<PRE>
-# Build-time functionality
-# ========================
-#
-# The USE variable is used to enable optional build-time functionality. For
-# example, quite a few packages have optional X, gtk or GNOME functionality
-# that can only be enabled or disabled at compile-time. Gentoo Linux has a
-# very extensive set of USE variables described in our USE variable HOWTO at
-# http://www.gentoo.org/doc/use-howto.html
-#
-# The available list of use flags with descriptions is in your portage tree.
-# Use 'less' to view them:  --> less /usr/portage/profiles/use.desc &lt;--
-#
-# Example:
-#USE="X gtk gnome -alsa"
-USE="mysql qt dvd X -alsa gtk gnome -esd oss"
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>If KDE has not been installed on your system:
-Edit <CODE>/etc/make.conf</CODE> and locate the "USE" variable.  If the line is commented 
-out, remove the comment.  The line should have at least:
+<P>If KDE has not been installed on your system: Edit
+<CODE>/etc/make.conf</CODE> and locate the "USE" variable. If the line is
+commented out, remove the comment. The line should have at least:
 <BLOCKQUOTE><CODE>
 <PRE>
 USE="mysql qt alsa"
 </PRE>
 </CODE></BLOCKQUOTE>
-</P>
-<P>Next you need to build KDE.  If you don't plan on using the ebuilds as
-described in the Gentoo 
-<A HREF="mythtv-HOWTO-5.html#Gentoo_build">section</A> then you also need to install lame.
+
+Next you need to build KDE. If you don't plan on using the ebuilds as 
+described in the Gentoo section then you also need to install lame.
 <BLOCKQUOTE><CODE>
 <PRE>
-$emerge kde lame
+$ emerge kde lame mysql
+</PRE>
+</CODE></BLOCKQUOTE>
+
+If KDE has already been installed, by default, QT libraries with SQL support 
+are not built. To enable SQL support, add "mysql qt" to your USE variable in 
+<CODE>/etc/make.conf</CODE> and rebuild QT by running
+<BLOCKQUOTE><CODE>
+<PRE>
+$ emerge qt
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Install MySQL if this is the master system:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ emerge mysql
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>By default, doesn't build QT libraries with SQL support.  To
-enable SQL support you need to add to your USE variable (USE="mysql") in 
-<CODE>/etc/make.conf</CODE> and rebuild QT by running </P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-% emerge qt
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-% emerge mysql
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>All the necessary files will be downloaded and built.  This will take a lot
-of time, even on a fast machine.</P>
+<P>All the necessary files will be downloaded and built. This will take a lot
+of time, even on a fast machine if you have to do a full KDE build.</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-4.html">Next</A>

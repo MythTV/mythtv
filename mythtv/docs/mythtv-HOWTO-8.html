@@ -32,14 +32,14 @@ the full 2.4.19 tar file from
 <P>An easy way is to use the wget command:
 <BLOCKQUOTE><CODE>
 <PRE>
-% wget http://www.kernel.org/pub/linux/kernel/v2.4/linux-2.4.19.tar.bz2
+$ wget http://www.kernel.org/pub/linux/kernel/v2.4/linux-2.4.19.tar.bz2
 </PRE>
 </CODE></BLOCKQUOTE>
 
 Next, open a shell and login as superuser.
 <BLOCKQUOTE><CODE>
 <PRE>
-% su 
+$ su 
 # mkdir /usr/src
 # mv linux-2.4.19.tar.bz2 /usr/src
 # cd /usr/src
@@ -61,9 +61,9 @@ of 2002-11-07, the version available is 0.6.6.  Grab the remotes.tgz file as
 well. 
 <BLOCKQUOTE><CODE>
 <PRE>
-% tar -xjf lirc-0.6.6.tar.bz2
-% cd lirc-0.6.6
-% ./setup.sh
+$ tar -xjf lirc-0.6.6.tar.bz2
+$ cd lirc-0.6.6
+$ ./setup.sh
 </PRE>
 </CODE></BLOCKQUOTE>
 
@@ -80,8 +80,8 @@ correct one.</P>
 <P>Once the configuration step is complete:
 <BLOCKQUOTE><CODE>
 <PRE>
-% make
-% su
+$ make
+$ su
 # make install
 # chmod 666 /dev/lircd
 </PRE>
@@ -116,22 +116,22 @@ receiver.</P>
 to control mythtv.
 <BLOCKQUOTE><CODE>
 <PRE>
-% cd ~/mythtv-0.7/configfiles
-% cp lircrc.example ~/.lircrc
+$ cd ~/mythtv-0.7/configfiles
+$ cp lircrc.example ~/.lircrc
 </PRE>
 </CODE></BLOCKQUOTE>
  
 or
 <BLOCKQUOTE><CODE>
 <PRE>
-% cp lircrc.example.pinnaclestudiopctv ~/.lircrc
+$ cp lircrc.example.pinnaclestudiopctv ~/.lircrc
 </PRE>
 </CODE></BLOCKQUOTE>
 
 if you've got a Pinnacle Studio PCTV remote.
 <BLOCKQUOTE><CODE>
 <PRE>
-% irw
+$ irw
 </PRE>
 </CODE></BLOCKQUOTE>
 
@@ -148,7 +148,7 @@ isn't a daemon, so if you know that your remote is working you need to
 invoke it like this: 
 <BLOCKQUOTE><CODE>
 <PRE>
-% irxevent &amp;
+$ irxevent &amp;
 </PRE>
 </CODE></BLOCKQUOTE>
 
@@ -244,7 +244,7 @@ type:</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-% make
+$ make
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -276,7 +276,7 @@ before you load the lirc_sir module. Follow this with the install:</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-% su
+$ su
 # make install
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -312,7 +312,7 @@ you should see something similar to the following:</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-% irw
+$ irw
 0000000000007ff0 00 1 gi-motorola-dct2000
 000000000000bff8 00 2 gi-motorola-dct2000
 000000000000f7f0 00 ENTER gi-motorola-dct2000
@@ -340,7 +340,7 @@ start.</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-% cd /usr/local/bin
+$ cd /usr/local/bin
 # su
 # cat > change_channel.csh
 #!/bin/csh
@@ -349,7 +349,7 @@ echo "changing to $1"
 ^D
 # chmod a+x change_channel.csh
 # exit
-% exit
+$ exit
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
