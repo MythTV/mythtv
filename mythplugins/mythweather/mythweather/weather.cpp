@@ -48,7 +48,7 @@ Weather::Weather(QSqlDatabase *db, int appCode, MythMainWindow *parent,
 
     allowkeys = true;
    
-    weatherTimeoutInt = gContext->GetNumSetting("WeatherTimeout", 10);
+    weatherTimeoutInt = gContext->GetNumSetting("WeatherTimeout", 20);
     weatherTimeoutInt *= 1000;
     
     config = db;
