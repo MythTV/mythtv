@@ -16,7 +16,7 @@ begin remote
 
   name  Hauppauge
   bits           13
-  flags RC5|CONST_LENGTH
+  flags SHIFT_ENC
   eps            30
   aeps          100
 

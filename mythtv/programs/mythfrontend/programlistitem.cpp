@@ -74,7 +74,9 @@ QPixmap *ProgramListItem::getPixmap(void)
 
     int screenheight = QApplication::desktop()->height();
     int screenwidth = QApplication::desktop()->width();
-    
+ 
+    screenwidth = 800; screenheight = 600;   
+ 
     float wmult = screenwidth / 800.0;
     float hmult = screenheight / 600.0;
 

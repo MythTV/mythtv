@@ -18,6 +18,8 @@ GuideGrid::GuideGrid(int channel, QWidget *parent, const char *name)
     screenheight = QApplication::desktop()->height();
     screenwidth = QApplication::desktop()->width();
 
+    screenwidth = 800; screenheight = 600;
+
     wmult = screenwidth / 800.0;
     hmult = screenheight / 600.0;
 
