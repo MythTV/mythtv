@@ -189,7 +189,7 @@ void SipMsg::addAllow()
     Msg += "Allow: INVITE, ACK, CANCEL, BYE, INFO, NOTIFY\r\n";
 }
 
-void SipMsg::addAuthorization(QString authMethod, QString Username, QString Password, QString Realm, QString Nonce, QString Uri)
+void SipMsg::addAuthorization(QString authMethod, QString Username, QString Password, QString Realm, QString Nonce, QString Uri, bool Proxy)
 {
     // Calculate the Digest key for the response
     HASHHEX HA1;
@@ -198,13 +198,21 @@ void SipMsg::addAuthorization(QString authMethod, QString Username, QString Pass
     DigestCalcHA1("md5", Username, Realm, Password, Nonce, "", HA1);
     DigestCalcResponse(HA1, Nonce, "", "", "", thisMethod, Uri, "", HA2, Response);
 
-    Msg += "Authorization: " + authMethod;
+    if (Proxy)
+        Msg += "Proxy-Authorization: " + authMethod;
+    else
+        Msg += "Authorization: " + authMethod;
     Msg += " username=\"" + Username + "\"";
     Msg += ",realm=\"" + Realm + "\"";
     Msg += ",uri=\"" + Uri + "\"";
     Msg += ",nonce=\"" + Nonce + "\"";
     Msg += QString(",response=\"") + Response + "\"";
     Msg += ",algorithm=md5\r\n";
+}
+
+void SipMsg::addProxyAuthorization(QString authMethod, QString Username, QString Password, QString Realm, QString Nonce, QString Uri)
+{
+    addAuthorization(authMethod, Username, Password, Realm, Nonce, Uri, true);
 }
 
 void SipMsg::addExpires(int e)
@@ -348,7 +356,9 @@ void SipMsg::decodeLine(QString line)
     else if (line.find("Content-Type:", 0, false) == 0)
         decodeContentType(line);
     else if (line.find("WWW-Authenticate:", 0, false) == 0)
-        decodeWWWAuthenticate(line);
+        decodeAuthenticate(line);
+    else if (line.find("Proxy-Authenticate:", 0, false) == 0)
+        decodeAuthenticate(line);
 }
 
 void SipMsg::decodeRequestLine(QString line)
@@ -380,7 +390,7 @@ void SipMsg::decodeVia(QString via)
     completeVia += via + "\r\n";
 }
 
-void SipMsg::decodeWWWAuthenticate(QString auth)
+void SipMsg::decodeAuthenticate(QString auth)
 {
     authMethod = auth.section(' ', 1, 1);
     QString Params = auth.section(' ', 2);
@@ -406,7 +416,7 @@ void SipMsg::decodeWWWAuthenticate(QString auth)
                 cout << "SIP: QOP value not set to AUTH in Challenge\n";
         }
         else
-            cout << "SIP: Unknown parameter in WWW-Authenticate; " << ParamName << endl;
+            cout << "SIP: Unknown parameter in -Authenticate; " << ParamName << endl;
     }
 }
 

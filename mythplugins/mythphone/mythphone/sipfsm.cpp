@@ -574,7 +574,12 @@ void SipFsm::NewCall(bool audioOnly, QString uri, QString DispName, QString vide
         // If the dialled number if just a username and we are registered to a proxy, dial
         // via the proxy
         if ((!uri.contains('@')) && (sipRegistration != 0) && (sipRegistration->isRegistered()))
+        {
             uri.append(QString("@") + gContext->GetSetting("SipProxyName"));
+            Call->dialViaProxy(sipRegistration);
+        }
+        else
+            Call->dialViaProxy(0);
 
         Call->to(uri, DispName);
         Call->setDisableNat(DisableNat);
@@ -778,15 +783,18 @@ SipCall::~SipCall()
         delete remoteUrl;
     if (toUrl != 0)
         delete toUrl;
-    if (myUrl != 0)
-        delete myUrl;
+    if (myFromUrl != 0)
+        delete myFromUrl;
+    if (myContactUrl != 0)
+        delete myContactUrl;
     if (contactUrl != 0)
         delete contactUrl;
     if (recRouteUrl != 0)
         delete recRouteUrl;
     remoteUrl = 0;
     toUrl = 0;
-    myUrl = 0;
+    myFromUrl = 0;
+    myContactUrl = 0;
     contactUrl = 0;
     recRouteUrl = 0;
 }
@@ -799,7 +807,7 @@ void SipCall::initialise()
     // Initialise Local Parameters.  We get info from the database on every new
     // call in case it has been changed
     myDisplayName = gContext->GetSetting("MySipName");
-    sipUsername = gContext->GetSetting("MySipUser");
+    sipUsername = "MythPhone";//gContext->GetSetting("MySipUser");  -- Note; this is really not needed & is too much config
 
     // Get other params - done on a per call basis so config changes take effect immediately
     sipAudioRtpPort = atoi((const char *)gContext->GetSetting("AudioLocalPort"));
@@ -819,10 +827,12 @@ void SipCall::initialise()
     disableNat = false;
     rxVideoResolution = "CIF";
     txVideoResolution = "CIF";
+    viaRegProxy = 0;
 
     remoteUrl = 0;
     toUrl = 0;
-    myUrl = 0;
+    myFromUrl = 0;
+    myContactUrl = 0;
     contactUrl = 0;
     recRouteUrl = 0;
     remoteTag = "";
@@ -922,14 +932,18 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
 #endif
         if (UseNat(remoteUrl->getHostIp()))
             sipLocalIP = sipNatIP;
-        myUrl = new SipUrl(myDisplayName, sipUsername, sipLocalIP, sipLocalPort);
-        BuildSendInvite();
+        myContactUrl = new SipUrl(myDisplayName, sipUsername, sipLocalIP, sipLocalPort);
+        if (viaRegProxy == 0)
+            myFromUrl = new SipUrl(myDisplayName, sipUsername, sipLocalIP, sipLocalPort);
+        else
+            myFromUrl = new SipUrl(myDisplayName, viaRegProxy->registeredAs(), viaRegProxy->registeredTo(), viaRegProxy->registeredPort());
+        BuildSendInvite(0);
         State = SIP_OCONNECTING1;
         break;
     case SIP_IDLE_INVITE:
         if (UseNat(remoteUrl->getHostIp()))
             sipLocalIP = sipNatIP;
-        myUrl = new SipUrl(myDisplayName, sipUsername, sipLocalIP, sipLocalPort);
+        myContactUrl = new SipUrl(myDisplayName, sipUsername, sipLocalIP, sipLocalPort);
 #ifdef SIPREGISTRAR
         if ((toUrl->getUser() == sipUsername)) && (toUrl->getHost() ==  "Volkaerts"))
 #endif
@@ -981,8 +995,16 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
         (parent->Timer())->Stop(this, SIP_RETX);
         // Fall through
     case SIP_OCONNECTING2_INVITESTATUS_3456:
-        BuildSendAck();
-        State = SIP_IDLE;
+        if ((sipMsg->getStatusCode() == 407) && (viaRegProxy != 0) && (viaRegProxy->isRegistered())) // Authentication Required
+        {
+            BuildSendInvite(sipMsg);
+            State = SIP_OCONNECTING1;
+        }
+        else
+        {
+            BuildSendAck();
+            State = SIP_IDLE;
+        }
         break;
     case SIP_OCONNECTING1_INVITESTATUS_2xx:
         (parent->Timer())->Stop(this, SIP_RETX);
@@ -1152,20 +1174,30 @@ bool SipCall::UseNat(QString destIPAddress)
 }
 
 
-void SipCall::BuildSendInvite()
+void SipCall::BuildSendInvite(SipMsg *authMsg)
 {
     CallId.Generate(sipLocalIP);
 
     SipMsg Invite("INVITE");
     Invite.addRequestLine(*remoteUrl);
     Invite.addVia(sipLocalIP, sipLocalPort);
-    Invite.addFrom(*myUrl);
+    Invite.addFrom(*myFromUrl);
     Invite.addTo(*remoteUrl);
     Invite.addCallId(CallId);
     Invite.addCSeq(++cseq);
     Invite.addUserAgent();
+
+    if (authMsg)
+    {
+        if (authMsg->getAuthMethod() == "Digest")
+            Invite.addProxyAuthorization(authMsg->getAuthMethod(), viaRegProxy->registeredAs(), viaRegProxy->registeredPasswd(), authMsg->getAuthRealm(), authMsg->getAuthNonce(), "sip:" + viaRegProxy->registeredTo());
+        else
+            cout << "SIP: Unknown Auth Type: " << authMsg->getAuthMethod() << endl;
+    }
+
+
     //Invite.addAllow();
-    Invite.addContact(*myUrl);
+    Invite.addContact(*myContactUrl);
     addSdpToInvite(Invite, allowVideo);
     
     parent->Transmit(Invite.string(), retxIp = remoteUrl->getHostIp(), retxPort = remoteUrl->getPort());
@@ -1202,7 +1234,7 @@ void SipCall::BuildSendAck()
 {
     debugSent.append("Ack ");
 
-    if ((myUrl == 0) || (remoteUrl == 0))
+    if ((myFromUrl == 0) || (remoteUrl == 0))
     {
         cerr << "URL variables not setup\n";
         return;
@@ -1211,7 +1243,7 @@ void SipCall::BuildSendAck()
     SipMsg Ack("ACK");
     Ack.addRequestLine(*remoteUrl);
     Ack.addVia(sipLocalIP, sipLocalPort);
-    Ack.addFrom(*myUrl);
+    Ack.addFrom(*myFromUrl);
     Ack.addTo(*remoteUrl, remoteTag);
     Ack.addCallId(CallId);
     Ack.addCSeq(cseq);
@@ -1229,7 +1261,7 @@ void SipCall::BuildSendCancel()
 {
     debugSent.append("Cancel ");
 
-    if ((myUrl == 0) || (remoteUrl == 0))
+    if ((myFromUrl == 0) || (remoteUrl == 0))
     {
         cerr << "URL variables not setup\n";
         return;
@@ -1239,7 +1271,7 @@ void SipCall::BuildSendCancel()
     Cancel.addRequestLine(*remoteUrl);
     Cancel.addVia(sipLocalIP, sipLocalPort);
     Cancel.addTo(*remoteUrl, remoteTag);
-    Cancel.addFrom(*myUrl);
+    Cancel.addFrom(*myFromUrl);
     Cancel.addCallId(CallId);
     Cancel.addCSeq(cseq);
     Cancel.addUserAgent();
@@ -1263,7 +1295,7 @@ void SipCall::BuildSendStatus(int Code, QString Method, int Option)
     QString statusStr = QString("%1 ").arg(Code);
     debugSent.append(statusStr);
 
-    if ((myUrl == 0) || (remoteUrl == 0))
+    if ((myFromUrl == 0) || (remoteUrl == 0))
     {
         cerr << "URL variables not setup\n";
         return;
@@ -1277,15 +1309,13 @@ void SipCall::BuildSendStatus(int Code, QString Method, int Option)
         Status.addViaCopy(Via);
     Status.addFromCopy(rxedFrom);
     Status.addToCopy(rxedTo);
-    //Status.addFrom(*remoteUrl, remoteTag);
-    //Status.addTo(*myUrl);
     Status.addCallId(CallId);
     Status.addCSeq(cseq);
 //    Status.addUserAgent();
     //if (Option & SIP_OPT_ALLOW) // Add my Contact URL to the message
     //    Status.addAllow();
     if (Option & SIP_OPT_CONTACT) // Add my Contact URL to the message
-        Status.addContact(*myUrl);
+        Status.addContact(*myContactUrl);
     if (Option & SIP_OPT_SDP) // Add an SDP to the message
         BuildSdpResponse(Status);
     else
@@ -1307,7 +1337,7 @@ void SipCall::BuildSendBye()
 {
     debugSent.append("Bye ");
 
-    if ((myUrl == 0) || (remoteUrl == 0))
+    if (remoteUrl == 0)
     {
         cerr << "URL variables not setup\n";
         return;
@@ -1316,8 +1346,16 @@ void SipCall::BuildSendBye()
     SipMsg Bye("BYE");
     Bye.addRequestLine(*remoteUrl);
     Bye.addVia(sipLocalIP, sipLocalPort);
-    Bye.addFrom(*myUrl);
-    Bye.addTo(*remoteUrl, remoteTag);
+    if (rxedFrom.length() > 0)
+    {
+        Bye.addFromCopy(rxedFrom);
+        Bye.addToCopy(rxedTo);
+    } 
+    else
+    {
+        Bye.addFrom(*myFromUrl);
+        Bye.addTo(*remoteUrl, remoteTag);
+    }
     Bye.addCallId(CallId);
     Bye.addCSeq(++cseq);
     Bye.addUserAgent();

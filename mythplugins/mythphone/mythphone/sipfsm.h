@@ -210,9 +210,11 @@ class SipRegistration : public SipFsmBase
     SipRegistration(SipFsm *par, QString localIp, int localPort, QString Username, QString Password, QString ProxyName, int ProxyPort);
     ~SipRegistration();
     virtual int  FSM(int Event, SipMsg *sipMsg=0, void *Value=0);
-    bool isRegistered() { return (State == SIP_REG_REGISTERED); }
-    QString registeredTo() { return ProxyUrl->getHost(); }
-    QString registeredAs() { return MyContactUrl->getUser(); }
+    bool isRegistered()        { return (State == SIP_REG_REGISTERED); }
+    QString registeredTo()     { return ProxyUrl->getHost(); }
+    QString registeredAs()     { return MyContactUrl->getUser(); }
+    int     registeredPort()   { return ProxyUrl->getPort(); }
+    QString registeredPasswd() { return MyPassword; }
 
   private:
     void SendRegister(SipMsg *authMsg=0);
@@ -246,6 +248,7 @@ class SipCall : public SipFsmBase
     void setAllowVideo(bool a)  { allowVideo = a; };
     void setDisableNat(bool n)  { disableNat = n; };
     void to(QString uri, QString DispName) { DestinationUri = uri; DisplayName = DispName; };
+    void dialViaProxy(SipRegistration *s) { viaRegProxy = s; };
     virtual int  FSM(int Event, SipMsg *sipMsg=0, void *Value=0);
     void GetIncomingCaller(QString &u, QString &d, QString &l, bool &aud)
             { u = CallersUserid; d = CallersDisplayName; l = CallerUrl; aud = (videoPayload == -1); }
@@ -264,7 +267,7 @@ class SipCall : public SipFsmBase
     void ParseSipMsg(int Event, SipMsg *sipMsg);
     bool UseNat(QString destIPAddress);
     void ForwardMessage(SipMsg *msg);
-    void BuildSendInvite();
+    void BuildSendInvite(SipMsg *authMsg);
     void BuildSendAck();
     void BuildSendBye();
     void BuildSendCancel();
@@ -291,7 +294,8 @@ class SipCall : public SipFsmBase
     int viaPort;
     SipUrl *remoteUrl;
     SipUrl *toUrl;
-    SipUrl *myUrl;
+    SipUrl *myFromUrl;
+    SipUrl *myContactUrl;
     SipUrl *contactUrl;
     SipUrl *recRouteUrl;
     QString remoteTag;
@@ -303,6 +307,7 @@ class SipCall : public SipFsmBase
     QString retxIp;
     int retxPort;
     int t1;
+    SipRegistration *viaRegProxy;
 
     // Incoming call information
     QString CallersUserid;

@@ -42,7 +42,8 @@ public:
     void addContact(SipUrl contact);
     void addUserAgent();     
     void addAllow();
-    void addAuthorization(QString authMethod, QString Username, QString Password, QString realm, QString nonce, QString uri);
+    void addAuthorization(QString authMethod, QString Username, QString Password, QString realm, QString nonce, QString uri, bool Proxy=false);
+    void addProxyAuthorization(QString authMethod, QString Username, QString Password, QString realm, QString nonce, QString uri);
     void addExpires(int e);
     void addNullContent();
     void addSDP(SipSdp &sdp);
@@ -89,7 +90,7 @@ private:
     void decodeCseq(QString cseq);
     void decodeExpires(QString Exp);
     void decodeCallid(QString callid);
-    void decodeWWWAuthenticate(QString auth);
+    void decodeAuthenticate(QString auth);
     void decodeContentType(QString cType);
     QPtrList<sdpCodec> *decodeSDPLine(QString sdpLine, QPtrList<sdpCodec> *codecList);
     void decodeSDPConnection(QString c);
