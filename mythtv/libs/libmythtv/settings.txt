@@ -1,7 +1,3 @@
 # set your offset to UTC (only necessary if your xmltv data is given in 
 # another timezone -- should be only european users)
 #str TimeOffset=-0600
-
-# If using Xinerama, what screen to use?
-# Ignored if not using Xinerama
-int XineramaScreen=0

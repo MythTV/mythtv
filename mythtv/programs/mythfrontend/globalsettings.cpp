@@ -347,6 +347,17 @@ public:
     };
 };
 
+class XineramaScreen: public SpinBoxSetting, public GlobalSetting {
+public:
+    XineramaScreen():
+        SpinBoxSetting(0, 8, 1),
+        GlobalSetting("XineramaScreen") {
+        setLabel("Xinerama screen");
+        setValue(0);
+        // ignored if not using xinerama
+    };
+};
+
 // Theme settings
 
 class GuiWidth: public SpinBoxSetting, public GlobalSetting {
@@ -699,6 +710,7 @@ GeneralSettings::GeneralSettings(MythContext *context)
     general3->setLabel("General");
     general3->addChild(new GeneratePreviewPixmaps());
     general3->addChild(new PlaybackPreview());
+    general3->addChild(new XineramaScreen());
     general3->addChild(new AllowQuitShutdown());
     general3->addChild(new HaltCommand());
     addChild(general3);
