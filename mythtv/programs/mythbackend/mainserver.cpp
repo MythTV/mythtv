@@ -254,6 +254,10 @@ void MainServer::ProcessRequest(RefSocket *sock)
     {
         HandleQueryCheckFile(listline, pbs);
     }
+    else if (command == "QUERY_GUIDEDATATHROUGH")
+    {
+        HandleQueryGuideDataThrough(pbs);
+    }
     else if (command == "QUEUE_TRANSCODE")
     {
         HandleQueueTranscode(listline, pbs, TRANSCODE_QUEUED);
@@ -1652,6 +1656,41 @@ void MainServer::HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs)
     SendResponse(pbssock, strlist);
 
     delete pginfo;
+}
+
+void MainServer::getGuideDataThrough(QDateTime &GuideDataThrough)
+{
+    QString querytext;
+
+    querytext = QString("SELECT max(endtime) FROM program;");
+
+    dblock.lock();
+    QSqlQuery query = m_db->exec(querytext);
+
+    if (query.isActive() && query.numRowsAffected())
+    {
+        query.next();
+        if (query.isValid())
+            GuideDataThrough = QDateTime::fromString(query.value(0).toString(),
+                                                     Qt::ISODate);
+    }
+    dblock.unlock();
+}
+
+void MainServer::HandleQueryGuideDataThrough(PlaybackSock *pbs)
+{
+    QDateTime GuideDataThrough;
+    QSocket *pbssock = pbs->getSocket();
+    QStringList strlist;
+
+    getGuideDataThrough(GuideDataThrough);
+
+    if (GuideDataThrough.isNull())
+        strlist << QString("0000-00-00 00:00");
+    else
+        strlist << QDateTime(GuideDataThrough).toString("yyyy-MM-dd hh:mm");
+
+    SendResponse(pbssock, strlist);
 }
 
 void MainServer::HandleGetPendingRecordings(PlaybackSock *pbs)

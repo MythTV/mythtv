@@ -72,6 +72,7 @@ class MainServer : public QObject
     void HandleRescheduleRecordings(int recordid, PlaybackSock *pbs);
     void HandleQueryFreeSpace(PlaybackSock *pbs);
     void HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs);
+    void HandleQueryGuideDataThrough(PlaybackSock *pbs);
     void HandleGetPendingRecordings(PlaybackSock *pbs);
     void HandleGetScheduledRecordings(PlaybackSock *pbs);
     void HandleGetConflictingRecordings(QStringList &slist, PlaybackSock *pbs);
@@ -104,6 +105,7 @@ class MainServer : public QObject
     void SendResponse(QSocket *pbs, QStringList &commands);
 
     void getFreeSpace(int &total, int &used);
+    void getGuideDataThrough(QDateTime &GuideDataThrough);
 
     void PrintDVBStatus(QTextStream &os);
 
