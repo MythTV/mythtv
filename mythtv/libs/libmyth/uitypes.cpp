@@ -3375,7 +3375,13 @@ UIPushButtonType::UIPushButtonType(const QString &name, QPixmap on, QPixmap off,
 
 void UIPushButtonType::Draw(QPainter *p, int drawlayer, int context)
 {
-    context = context;  // Would we ever want to use that?
+    if(context != m_context)
+    {
+        if(m_context != -1)
+        {
+            return;
+        }
+    }
 
     if(drawlayer != m_order)
     {
@@ -3469,7 +3475,13 @@ UITextButtonType::UITextButtonType(const QString &name, QPixmap on, QPixmap off,
 
 void UITextButtonType::Draw(QPainter *p, int drawlayer, int context)
 {
-    context = context;  // Would we ever want to use that?
+    if(context != m_context)
+    {
+        if(m_context != -1)
+        {
+            return;
+        }
+    }
 
     if(drawlayer != m_order)
     {
