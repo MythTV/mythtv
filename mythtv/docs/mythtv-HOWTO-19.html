@@ -70,6 +70,16 @@ $
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+<P>The following also works with blackbox:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cat > .xinitrc
+irxevent &amp;
+mythfrontend &amp;
+blackbox
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 
 <H2><A NAME="capture_resolution_"></A> <A NAME="ss19.4">19.4</A> <A HREF="mythtv-HOWTO.html#toc19.4">What capture resolution should I use?  How does video work?</A>
 </H2>
@@ -357,7 +367,7 @@ $ su
 </CODE></BLOCKQUOTE>
 </P>
 <P>The <B>ivtvfwextract</B> program extracts the firmware required for the
-card.  You may want to go to the website and downloaded the latest Windows
+card.  You may want to go to the website and download the latest Windows
 driver if the <B>wget</B> command fails.</P>
 <P>Place a copy of the <CODE>videodev2.h</CODE> file in the ivtv driver
 subdirectory.  This is the only reason that we installed the kernel-source
@@ -454,6 +464,36 @@ press ENTER.</P>
 <P>The remaining setup is just like a standard V4L card; define a video source
 if you have not already done so, and assign the video source to a video card
 input on the Input Connections screen.</P>
+
+<H2><A NAME="ss19.11">19.11</A> <A HREF="mythtv-HOWTO.html#toc19.11">I'd like to use NFS.</A>
+</H2>
+
+<P>You may want to use a central server to store your files.  </P>
+<P>On the host machine, (in this case, the hostname is "masterbackend") you'll
+want to edit your <CODE>/etc/exports</CODE> file and use something like:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+/var/video (rw)
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>To export the <CODE>/var/video</CODE> directory with read / write privileges.</P>
+<P>On the "slave" machine, you'll want to edit the <CODE>/etc/fstab</CODE> file and
+add something like:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,soft,nfsvers=3
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Then run <CODE># fstab -a</CODE> to re-read the file to mount the file system.</P>
+<P>In this case, the source is a machine called "masterbackend" which is
+exporting the directory "/var/video", which we're mounting locally at
+"/var/video".  The rsize and wsize options are used to increase the
+performance of NFS; soft mean that NFS will eventually timeout on an error,
+and the nfsvers is required for filesizes over 2GB.</P>
 
 <HR>
 Next

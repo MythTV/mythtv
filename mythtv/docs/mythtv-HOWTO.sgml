@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-04-25, v2.20
+<date>2003-04-25, v2.21
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -2559,7 +2559,7 @@ $ su
 </verb></tscreen>
 
 The next step is to edit the
-<tt>/usr/local/share/mythvideo/mythvideo-settings.txt</tt> file.  Change
+<tt>/usr/local/share/mythtv/mythvideo-settings.txt</tt> file.  Change
 the StartDir to a valid mount point on your system.
 
 <sect>Troubleshooting.
@@ -2960,6 +2960,14 @@ Style "myth*"      NoTitle, NoHandles, Sticky, WindowListSkip, BorderWidth 0
 $
 </verb></tscreen>
 
+The following also works with blackbox:
+<tscreen><verb>
+$ cat > .xinitrc
+irxevent &
+mythfrontend &
+blackbox
+</verb></tscreen>
+
 <sect1>What capture resolution should I use?  How does video work?
 <label id="capture_resolution_">
 <!-- Lots of the following is from a Bruce Markey mailto:bjm@lvcm.com post
@@ -3238,7 +3246,7 @@ $ su
 </verb></tscreen>
 
 The <bf>ivtvfwextract</bf> program extracts the firmware required for the
-card.  You may want to go to the website and downloaded the latest Windows
+card.  You may want to go to the website and download the latest Windows
 driver if the <bf>wget</bf> command fails.
 
 Place a copy of the <tt>videodev2.h</tt> file in the ivtv driver
@@ -3332,6 +3340,33 @@ The remaining setup is just like a standard V4L card; define a video source
 if you have not already done so, and assign the video source to a video card
 input on the Input Connections screen.
 
+<sect1>I'd like to use NFS.
+<p>You may want to use a central server to store your files.  
+
+On the host machine, (in this case, the hostname is "masterbackend") you'll
+want to edit your <tt>/etc/exports</tt> file and use something like:
+
+<tscreen><verb>
+/var/video (rw)
+</verb></tscreen>
+
+To export the <tt>/var/video</tt> directory with read / write privileges.
+
+On the "slave" machine, you'll want to edit the <tt>/etc/fstab</tt> file and
+add something like:
+
+<tscreen><verb>
+masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,soft,nfsvers=3
+</verb></tscreen>
+
+Then run <tt># fstab -a</tt> to re-read the file to mount the file system.
+
+In this case, the source is a machine called "masterbackend" which is
+exporting the directory "/var/video", which we're mounting locally at
+"/var/video".  The rsize and wsize options are used to increase the
+performance of NFS; soft mean that NFS will eventually timeout on an error,
+and the nfsvers is required for filesizes over 2GB.
+
 </article>
 <!-- Revision History
 v2.00, 2003-03-14.  Initial release for 0.8.  Added xset command for
@@ -3373,7 +3408,9 @@ PVR-250 not showing inputs.  Updated mythweather debug (runtime option now),
 updated mythvideo settings file.
 v2.19, 2003-04-25.  Mythmusic playlist addition.  Mythmusic adjustments
 since it's now graphically setup.
-v2.20, 2003-04-25.  More CPU stats.
+v2.20, 2003-04-25.  More CPU stats.  Fixed error in mythvideo path.
+v2.21, 2003-04-25.  Grammar error in PVR250 section.  NFS.  Auto-starting
+myth.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

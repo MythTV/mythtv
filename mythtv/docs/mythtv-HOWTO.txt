@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-04-25, v2.20
+  2003-04-25, v2.21
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -152,6 +152,7 @@
      19.8 btaudio
      19.9 Removing unwanted channels.
      19.10 I'd like to use a hardware MPEG-2 encoder.
+     19.11 I'd like to use NFS.
 
   ______________________________________________________________________
 
@@ -2707,7 +2708,7 @@
        # make install
        # exit
 
-  The next step is to edit the /usr/local/share/mythvideo/mythvideo-
+  The next step is to edit the /usr/local/share/mythtv/mythvideo-
   settings.txt file.  Change the StartDir to a valid mount point on your
   system.
 
@@ -3115,6 +3116,13 @@
   ^D
   $
 
+  The following also works with blackbox:
+
+       $ cat > .xinitrc
+       irxevent &
+       mythfrontend &
+       blackbox
+
   [1m19.4.  What capture resolution should I use?  How does video work?[0m
 
   While MythTV allows you to set various GUI and capture resolutions,
@@ -3399,7 +3407,7 @@
        # exit
 
   The [1mivtvfwextract [22mprogram extracts the firmware required for the card.
-  You may want to go to the website and downloaded the latest Windows
+  You may want to go to the website and download the latest Windows
   driver if the [1mwget [22mcommand fails.
 
   Place a copy of the videodev2.h file in the ivtv driver subdirectory.
@@ -3482,4 +3490,28 @@
   The remaining setup is just like a standard V4L card; define a video
   source if you have not already done so, and assign the video source to
   a video card input on the Input Connections screen.
+
+  [1m19.11.  I'd like to use NFS.[0m
+
+  You may want to use a central server to store your files.
+
+  On the host machine, (in this case, the hostname is "masterbackend")
+  you'll want to edit your /etc/exports file and use something like:
+
+       /var/video (rw)
+
+  To export the /var/video directory with read / write privileges.
+
+  On the "slave" machine, you'll want to edit the /etc/fstab file and
+  add something like:
+
+       masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,soft,nfsvers=3
+
+  Then run # fstab -a to re-read the file to mount the file system.
+
+  In this case, the source is a machine called "masterbackend" which is
+  exporting the directory "/var/video", which we're mounting locally at
+  "/var/video".  The rsize and wsize options are used to increase the
+  performance of NFS; soft mean that NFS will eventually timeout on an
+  error, and the nfsvers is required for filesizes over 2GB.
 
