@@ -27,6 +27,8 @@
 #include <qimage.h>
 #include <qlayout.h>
 #include <qsize.h>
+#include <qfileinfo.h>
+#include <qdir.h>
 
 #include "glsingleview.h"
 
@@ -129,6 +131,8 @@ GLSingleView::GLSingleView(QSqlDatabase *db, ThumbList itemList,
     m_tmout         = m_delay * 1000;
     m_effectRunning = false;
     m_running       = false;
+    m_texInfo       = 0;
+    m_showInfo      = false;
 
     // ---------------------------------------------------------------
 
@@ -209,6 +213,9 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
     m_running = false;
     m_effectRunning = false;
     m_tmout = m_delay * 1000;
+
+    bool wasInfo = m_showInfo;
+    m_showInfo = false;
     
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("Gallery", e, actions);
@@ -349,6 +356,10 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
             m_zoom = 1.0;
             m_running = !wasRunning;
         }
+        else if (action == "INFO")
+        {
+            m_showInfo = !wasInfo;
+        }
         else 
             handled = false;
     }
@@ -381,23 +392,53 @@ void GLSingleView::paintTexture()
     glRotatef(t.angle, 0.0, 0.0, 1.0);
 
     glBindTexture(GL_TEXTURE_2D, t.tex);
-    glColor4d(1.0, 1.0, 1.0, 1.0);
-
     glBegin(GL_QUADS);
     {
-        glTexCoord2d(0, 0);
+        glColor4f(1.0, 1.0, 1.0, 1.0);
+        glTexCoord2f(0, 0);
         glVertex3f(-t.cx, -t.cy, 0);
         
-        glTexCoord2d(1, 0);
+        glTexCoord2f(1, 0);
         glVertex3f(t.cx, -t.cy, 0);
         
-        glTexCoord2d(1, 1);
+        glTexCoord2f(1, 1);
         glVertex3f(t.cx, t.cy, 0);
             
-        glTexCoord2d(0, 1);
+        glTexCoord2f(0, 1);
         glVertex3f(-t.cx, t.cy, 0);
     }
     glEnd();
+
+    if (m_showInfo) {
+
+        createTexInfo();
+    
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+        
+        glMatrixMode(GL_TEXTURE);
+        glLoadIdentity();
+        
+        glBindTexture(GL_TEXTURE_2D, m_texInfo);
+        glBegin(GL_QUADS);
+        {
+            glColor4f(1.0, 1.0, 1.0, 0.72);
+            glTexCoord2f(0, 0);
+            glVertex3f(-0.75, -0.75, 0);
+            
+            glTexCoord2f(1, 0);
+            glVertex3f(0.75, -0.75, 0);
+            
+            glTexCoord2f(1, 1);
+            glVertex3f(0.75, 0.75, 0);
+            
+            glTexCoord2f(0, 1);
+            glVertex3f(-0.75, 0.75, 0);
+        }
+        glEnd();
+
+    }
+
 }
 
 void GLSingleView::advanceFrame()
@@ -435,6 +476,7 @@ void GLSingleView::loadImage()
         int a  = m_tex1First ? 0 : 1;
         TexItem& t = m_texItem[a];
 
+        t.item     = item;
         t.angle    = 0;
 
         QString queryStr = "SELECT angle FROM gallerymetadata WHERE "
@@ -1107,4 +1149,53 @@ void GLSingleView::slotTimeOut()
 
     updateGL();
     m_timer->start(m_tmout, true);
+}
+
+void GLSingleView::createTexInfo()
+{
+    if (m_texInfo)
+        glDeleteTextures(1, &m_texInfo);
+
+    TexItem& t = m_texItem[m_curr];
+    if (!t.tex || !t.item)
+        return;
+    
+    QPixmap pix(512,512);
+
+    QPainter p(&pix, this);
+    p.fillRect(0,0,pix.width(),pix.height(),Qt::black);
+    p.setPen(Qt::white);
+
+    QFileInfo fi(t.item->path);
+    QString info(t.item->name);
+
+    info += "\n\n" + tr("Folder: ") + fi.dir().dirName();
+    info += "\n" + tr("Created: ") + fi.created().toString();
+    info += "\n" + tr("Modified: ") + fi.lastModified().toString();
+    info += "\n" + QString(tr("Bytes") + ": %1").arg(fi.size());
+    info += "\n" + QString(tr("Width") + ": %1 " + tr("pixels"))
+             .arg(t.width);
+    info += "\n" + QString(tr("Height") + ": %1 " + tr("pixels"))
+            .arg(t.height);
+    info += "\n" + QString(tr("Pixel Count") + ": %1 " + 
+                           tr("megapixels"))
+            .arg((float) t.width * t.height / 1000000,
+                 0, 'f', 2);
+    info += "\n" + QString(tr("Rotation Angle") + ": %1 " +
+                           tr("degrees")).arg(t.angle);
+    p.drawText(10, 10, pix.width()-20, pix.height()-20,
+               Qt::AlignLeft, info);
+    p.end();
+
+    QImage tex = convertToGLFormat(pix.convertToImage());
+
+    /* create the texture */
+    glGenTextures(1, &m_texInfo);
+    glBindTexture(GL_TEXTURE_2D, m_texInfo);
+    /* actually generate the texture */
+    glTexImage2D( GL_TEXTURE_2D, 0, 3, tex.width(), tex.height(), 0,
+                  GL_RGBA, GL_UNSIGNED_BYTE, tex.bits() );
+    /* enable linear filtering  */
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 }

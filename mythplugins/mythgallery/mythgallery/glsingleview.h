@@ -76,6 +76,7 @@ private:
         float         cx, cy;
         int           width, height;
         int           angle;
+        ThumbItem    *item;
     } TexItem;
 
     QSqlDatabase *m_db;
@@ -99,6 +100,9 @@ private:
     bool          m_effectRunning;
     bool          m_running;
 
+    GLuint        m_texInfo;
+    bool          m_showInfo;
+    
     int           m_i;
     int           m_dir;
     float         m_points[40][40][3];
@@ -116,6 +120,7 @@ private:
     void  loadImage();
     void  paintTexture();
     void  rotate(int angle);
+    void  createTexInfo();
 
     void  registerEffects();
     EffectMethod getRandomEffect();
