@@ -236,6 +236,11 @@ bool ScheduledRecording::loadByProgram(QSqlDatabase* db,
     // this doesn't have to be a QRegexp in qt 3.1+
     sqltitle.replace(QRegExp("\'"), "\\'");
 
+    // prevent the SQL from breaking if chanid is null
+    QString chanid = proginfo.chanid;
+    if (!chanid || chanid == "")
+         chanid = "0";
+
     QString query = QString(
 "SELECT "
 "recordid "
@@ -267,7 +272,7 @@ bool ScheduledRecording::loadByProgram(QSqlDatabase* db,
 ");")
         .arg(sqltitle)
         .arg(AllRecord)
-        .arg(proginfo.chanid)
+        .arg(chanid)
         .arg(ChannelRecord)
         .arg(proginfo.startts.time().toString(Qt::ISODate))
         .arg(proginfo.endts.time().toString(Qt::ISODate))
