@@ -409,6 +409,7 @@ void MythRemoteLineEdit::endCycle()
         current_choice = "";
         current_set = "";
     }
+    emit(textChanged(this->text()));
 }
 
 void MythRemoteLineEdit::setText(const QString& text) 
@@ -530,6 +531,7 @@ void MythRemoteLineEdit::keyPressEvent(QKeyEvent *e)
     {
         endCycle();
         QTextEdit::keyPressEvent(e);
+        emit textChanged(this->text());
     }
 }
 

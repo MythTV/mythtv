@@ -161,6 +161,7 @@ class MythRemoteLineEdit : public QTextEdit
         void    changeHelpText(QString);
         void    gotFocus();
         void    lostFocus();
+        void    textChanged(QString);
 
     public slots:
     
