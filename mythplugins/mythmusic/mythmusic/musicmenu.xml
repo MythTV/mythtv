@@ -8,6 +8,7 @@
       <text lang="CA">Escollir Música</text>
       <text lang="DE">Musik aussuchen</text>
       <text lang="DK">Vælg musik</text>
+      <text lang="NL">Muziek Kiezen</text>
       <action>MUSIC_CREATE_PLAYLIST</action>
    </button>
 
@@ -19,6 +20,7 @@
       <text lang="CA">Escoltar Música</text>
       <text lang="DE">Musik spielen</text>
       <text lang="DK">Afspil musik</text>
+      <text lang="NL">Muziek Afspelen</text>
       <action>MUSIC_PLAY</action>
    </button>
 
@@ -30,6 +32,7 @@
       <text lang="CA">Importar CD</text>
       <text lang="DE">CD importieren</text>
       <text lang="DK">Importér CD</text>
+      <text lang="NL">CD Importeren</text>
       <action>MUSIC_RIP</action>
    </button>
 
@@ -41,6 +44,7 @@
       <text lang="CA">Actualitzar llista</text>
       <text lang="DE">Musikdateien suchen</text>
       <text lang="DK">Søg efter musik</text>
+      <text lang="NL">Muziek Zoeken</text>
       <action>SETTINGS_SCAN</action>
    </button>
 
