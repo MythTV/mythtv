@@ -235,6 +235,7 @@ public:
 
 signals:
     void selectionAdded(const QString& label, QString value);
+    void selectionsCleared(void);
 
 public slots:
 

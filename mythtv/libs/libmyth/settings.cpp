@@ -161,6 +161,7 @@ void StringSelectSetting::clearSelections(void) {
     labels.clear();
     values.clear();
     isSet = false;
+    emit selectionsCleared();
 }
 
 void StringSelectSetting::setValue(const QString& newValue)  {
@@ -310,6 +311,8 @@ QWidget* ComboBoxSetting::configWidget(QWidget* parent,
             this, SLOT(setValue(int)));
     connect(this, SIGNAL(selectionAdded(const QString&,QString)),
             widget, SLOT(insertItem(const QString&)));
+    connect(this, SIGNAL(connectionsCleared(void)),
+            widget, SLOT(clear()));
 
     return box;
 }
