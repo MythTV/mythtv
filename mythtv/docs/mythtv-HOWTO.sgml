@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-08-31, v2.67
+<date>2003-08-31, v2.68
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -49,7 +49,7 @@ using the distribution tarball, it is <bf>strongly</bf> recommended that you
 join the <url url="http://www.snowman.net/mailman/listinfo/mythtv-commits/"
 name="http://www.snowman.net/mailman/listinfo/mythtv-commits/"> and <url
 url="http://www.snowman.net/mailman/listinfo/mythtv-dev/"
-name="http://www.snowman.net/mailman/listinfo/mythtv-dev/"> mailing list.
+name="http://www.snowman.net/mailman/listinfo/mythtv-dev/"> mailing lists.
 
 It's recommended that you join the user list at <url
 url="http://www.snowman.net/mailman/listinfo/mythtv-users"
@@ -509,9 +509,11 @@ name="http://dijkstra.csh.rit.edu/~mdz/debian/dists/woody/mythtv/">
 (for Debian 3.0/woody) and <url
 url="http://dijkstra.csh.rit.edu/~mdz/debian/dists/unstable/mythtv/"
 name="http://dijkstra.csh.rit.edu/~mdz/debian/dists/unstable/mythtv/">
-(for unstable).  Installation instructions can be found on those pages
-as well.  All of the prerequisites for MythTV are available as Debian
-packages, most of them from the official Debian archive.
+(for unstable).  Be sure to use the appropriate packages for your
+system; the woody packages cannot be installed on unstable, nor vice
+versa.  Installation instructions can be found on those pages as well.
+All of the prerequisites for MythTV are available as Debian packages,
+most of them from the official Debian archive.
 
 <p>
 If you are running woody, be sure to follow the instructions on the
@@ -4469,6 +4471,8 @@ libid3tag to MythMusic section.
 v2.66, 2003-08-23.  Move transcoder docs to Misc section.
 v2.67, 2003-08-31.  Update XMLTV version.  Jarod Wilson's update.  New
 Hauppauge firmware version.
+v2.68, 2003-08-31.  Explicit instructions on woody vs. unstable Debian
+packages, minor typo fix
 -->
 
 <!--
