@@ -406,7 +406,7 @@ void Channel::SwitchToInput(int newcapchannel, bool setstarting)
         SetChannelByString(inputChannel[currentcapchannel]);
 }
 
-unsigned short *Channel::GetV4L1Field(int attrib, struct video_picture vid_pic)
+unsigned short *Channel::GetV4L1Field(int attrib, struct video_picture &vid_pic)
 {
     switch (attrib)
     {

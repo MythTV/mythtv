@@ -27,7 +27,8 @@ class Channel : public ChannelBase
     bool ChannelUp(void);
     bool ChannelDown(void);
 
-    unsigned short *Channel::GetV4L1Field(int attrib, struct video_picture vid_pic);
+    unsigned short *Channel::GetV4L1Field(int attrib, 
+                                          struct video_picture &vid_pic);
     int Channel::ChangeColourAttribute(int attrib, const char *name, bool up);
     int ChangeColour(bool up);
     int ChangeBrightness(bool up);
