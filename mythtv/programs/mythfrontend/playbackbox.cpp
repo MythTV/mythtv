@@ -212,6 +212,9 @@ PlaybackBox::PlaybackBox(BoxType ltype, QWidget *parent, const char *name)
         listview->setSelected(item, true);
     }
 
+    showFullScreen();
+    setActiveWindow();
+
     connect(timer, SIGNAL(timeout()), this, SLOT(timeout()));
     timer->start(1000 / 30);
 
@@ -355,6 +358,9 @@ void PlaybackBox::killPlayer(void)
             qApp->processEvents();
             qApp->lock();
         }
+        showFullScreen();
+        setActiveWindow();
+
         listview->SetAllowKeypress(true);
         ignoreevents = false;
 
@@ -366,6 +372,7 @@ void PlaybackBox::killPlayer(void)
 
         nvp = NULL;
         rbuffer = NULL;
+
     }
 }	
 
@@ -405,6 +412,9 @@ void PlaybackBox::startPlayer(ProgramInfo *rec)
          qApp->processEvents();
          qApp->lock();
     }
+
+    showFullScreen();
+    setActiveWindow();
 
     listview->SetAllowKeypress(true);
     ignoreevents = false;
