@@ -552,7 +552,7 @@
     </message>
     <message>
         <source>Pressure</source>
-        <translation>Druck</translation>
+        <translation>Luftdruck</translation>
     </message>
     <message>
         <source>Wind</source>
@@ -695,19 +695,19 @@
     </message>
     <message>
         <source> 1  High Speed Connection</source>
-        <translation> 1  Schnelle Verbindung</translation>
+        <translation> 1  schnelle Verbindung</translation>
     </message>
     <message>
         <source> 8  Medium Speed Connection</source>
-        <translation> 8  Mittlere Verbindung</translation>
+        <translation> 8  mittlere Verbindung</translation>
     </message>
     <message>
         <source> 15 Low Speed Connection</source>
-        <translation> 15 Langsame Verbindung</translation>
+        <translation> 15 langsame Verbindung</translation>
     </message>
     <message>
         <source>Obtaining initial weather data...</source>
-        <translation>Hole initiale Wetterdaten...</translation>
+        <translation>Hole anfängliche Wetterdaten...</translation>
     </message>
     <message>
         <source>Updating weather data...</source>
