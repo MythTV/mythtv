@@ -13,13 +13,24 @@ using namespace std;
 #include <mythtv/mythplugin.h>
 
 extern "C" {
-int mythplugin_init(void);
+int mythplugin_init(const char *libversion);
 int mythplugin_run(void);
 int mythplugin_config(void);
 }
 
-int mythplugin_init(void)
+int mythplugin_init(const char *libversion)
 {
+    QString lib = libversion;
+    if (lib != MYTH_BINARY_VERSION)
+    {
+        cerr << "This plugin was compiled against libmyth version: " 
+             << MYTH_BINARY_VERSION 
+             << "\nbut the library is version: " << libversion << endl;
+        cerr << "You probably want to recompile everything, and do a\n"
+             << "'make distclean' first.\n";
+        return -1; 
+    }
+
     return 0;
 }
 

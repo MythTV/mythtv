@@ -2,6 +2,8 @@
 #include "qdict.h"
 #include <iostream>
 
+#include "mythcontext.h"
+
 using namespace std;
 
 MythPluginManager::MythPlugin::MythPlugin(const QString &libname)
@@ -13,13 +15,13 @@ MythPluginManager::MythPlugin::~MythPlugin()
 {
 }
 
-int MythPluginManager::MythPlugin::init(void)
+int MythPluginManager::MythPlugin::init(const char *libversion)
 {
-    typedef int (*PluginInitFunc)();
+    typedef int (*PluginInitFunc)(const char *);
     PluginInitFunc ifunc = (PluginInitFunc)QLibrary::resolve("mythplugin_init");
 	
     if (ifunc)
-        return ifunc();
+        return ifunc(libversion);
 
     return (-1);
 }
@@ -60,7 +62,7 @@ bool MythPluginManager::init_plugin(const QString & plugname)
         m_dict[newname]->setAutoUnload(true);
     }
    
-    int result = m_dict[newname]->init();
+    int result = m_dict[newname]->init(MYTH_BINARY_VERSION);
    
     if (result == -1)
     {

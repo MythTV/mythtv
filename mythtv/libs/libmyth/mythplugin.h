@@ -24,7 +24,7 @@ class MythPluginManager
          * inside the plugin_init() function so that initialization
          * is only done the first time the library is loaded.
          */
-        int init(void);
+        int init(const char *libversion);
 
         /*
          * This method will call the plugin_run() function
