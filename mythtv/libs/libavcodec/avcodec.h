@@ -28,7 +28,7 @@ enum CodecID {
     CODEC_ID_H263I,
     CODEC_ID_SVQ1,
     CODEC_ID_VORBIS,
-
+    
     /* various pcm "codecs" */
     CODEC_ID_PCM_S16LE,
     CODEC_ID_PCM_S16BE,
@@ -95,7 +95,8 @@ extern int motion_estimation_method;
 
 /* ME algos sorted by quality */
 static const int Motion_Est_QTab[] = { ME_ZERO, ME_PHODS, ME_LOG, 
-				       ME_X1, ME_EPZS, ME_FULL };
+                                       ME_X1, ME_EPZS, ME_FULL };
+
 
 #define FF_MAX_B_FRAMES 4
 
@@ -118,7 +119,7 @@ static const int Motion_Est_QTab[] = { ME_ZERO, ME_PHODS, ME_LOG,
 #define CODEC_FLAG_GRAY  0x2000  /* only decode/encode grayscale */
 #define CODEC_FLAG_EMU_EDGE 0x4000/* dont draw edges */
 #define CODEC_FLAG_DR1    0x8000 /* dr1 */
-#define CODEC_FLAG_NOT_TRUNCATED  0x00010000 /* input bitstream is not truncatedm except before a startcode */
+#define CODEC_FLAG_NOT_TRUNCATED  0x00010000 /* input bitstream is not truncated, except before a startcode */
 /* codec capabilities */
 
 /* decoder can use draw_horiz_band callback */
@@ -135,7 +136,7 @@ typedef struct AVCodecContext {
     int bit_rate_tolerance; /* amount of +- bits (>0)*/
     int flags;
     int sub_id;    /* some codecs needs additionnal format info. It is
-		      stored there */
+                      stored there */
     
     int me_method; /* ME algorithm used for video coding */
     
@@ -158,15 +159,15 @@ typedef struct AVCodecContext {
     int gop_size; /* 0 = intra only */
     enum PixelFormat pix_fmt;  /* pixel format, see PIX_FMT_xxx */
     int repeat_pict; /* when decoding, this signal how much the picture */
-		     /* must be delayed.                                */
-		     /* extra_delay = (repeat_pict / 2) * (1/fps)       */
+                     /* must be delayed.                                */
+                     /* extra_delay = (repeat_pict / 2) * (1/fps)       */
     /* if non NULL, 'draw_horiz_band' is called by the libavcodec
        decoder to draw an horizontal band. It improve cache usage. Not
        all codecs can do that. You must check the codec capabilities
        before */
     void (*draw_horiz_band)(struct AVCodecContext *s,
-			    UINT8 **src_ptr, int linesize,
-			    int y, int width, int height);
+                            UINT8 **src_ptr, int linesize,
+                            int y, int width, int height);
 
     /* audio only */
     int sample_rate; /* samples per sec */
@@ -177,11 +178,11 @@ typedef struct AVCodecContext {
     int frame_size;     /* in samples, initialized when calling 'init' */
     int frame_number;   /* audio or video frame number */
     int real_pict_num;  /* returns the real picture number of
-			   previous encoded frame */
+                           previous encoded frame */
     int key_frame;      /* true if the previous compressed frame was 
-			   a key frame (intra, or seekable) */
+                           a key frame (intra, or seekable) */
     int pict_type;      /* picture type of the previous 
-			   encoded frame */
+                           en/decoded frame */
 /* FIXME: these should have FF_ */
 #define I_TYPE 1 // Intra
 #define P_TYPE 2 // Predicted
@@ -189,15 +190,15 @@ typedef struct AVCodecContext {
 #define S_TYPE 4 // S(GMC)-VOP MPEG4
 
     int delay;          /* number of frames the decoded output 
-			   will be delayed relative to the encoded input */
+                           will be delayed relative to the encoded input */
     uint8_t *mbskip_table; /* =1 if MB didnt change, is only valid for I/P frames 
-			      stride= mb_width = (width+15)>>4 */
+                              stride= mb_width = (width+15)>>4 */
     
     /* encoding parameters */
     int quality;      /* quality of the previous encoded frame 
-			 (between 1 (good) and 31 (bad)) 
-			 this is allso used to set the quality in vbr mode
-			 and the per frame quality in CODEC_FLAG_TYPE (second pass mode) */
+                         (between 1 (good) and 31 (bad)) 
+                         this is allso used to set the quality in vbr mode
+                         and the per frame quality in CODEC_FLAG_TYPE (second pass mode) */
     float qcompress;  /* amount of qscale change between easy & hard scenes (0.0-1.0)*/
     float qblur;      /* amount of qscale smoothing over time (0.0-1.0) */
     int qmin;         /* min qscale */
@@ -209,7 +210,7 @@ typedef struct AVCodecContext {
     int b_frame_strategy;
 
     int hurry_up;     /* when set to 1 during decoding, b frames will be skiped
-			 when set to 2 idct/dequant will be skipped too */
+                         when set to 2 idct/dequant will be skipped too */
     
     struct AVCodec *codec;
     void *priv_data;
@@ -217,15 +218,15 @@ typedef struct AVCodecContext {
     /* The following data is for RTP friendly coding */
     /* By now only H.263/H.263+/MPEG4 coder honours this   */
     int rtp_mode;   /* 1 for activate RTP friendly-mode           */
-		    /* highers numbers represent more error-prone */
-		    /* enviroments, by now just "1" exist         */
+                    /* highers numbers represent more error-prone */
+                    /* enviroments, by now just "1" exist         */
     
     int rtp_payload_size;   /* The size of the RTP payload, the coder will  */
-			    /* do it's best to deliver a chunk with size    */
-			    /* below rtp_payload_size, the chunk will start */
-			    /* with a start code on some codecs like H.263  */
-			    /* This doesn't take account of any particular  */
-			    /* headers inside the transmited RTP payload    */
+                            /* do it's best to deliver a chunk with size    */
+                            /* below rtp_payload_size, the chunk will start */
+                            /* with a start code on some codecs like H.263  */
+                            /* This doesn't take account of any particular  */
+                            /* headers inside the transmited RTP payload    */
 
     
     /* The RTP callcack: This function is called  */
@@ -251,7 +252,7 @@ typedef struct AVCodecContext {
     int skip_count;
     int misc_bits; // cbp, mb_type
     int frame_bits;
-		 
+                 
     /* the following fields are ignored */
     void *opaque;   /* can be used to carry app specific stuff */
     char codec_name[32];
@@ -284,13 +285,13 @@ typedef struct AVCodecContext {
     int dr_uvstride;
     int dr_ip_buffer_count;
     int block_align; /* currently only for adpcm codec in wav/avi */
-
+    
     int parse_only; /* decoding only: if true, only parsing is done
-		       (function avcodec_parse_frame()). The frame
-		       data is returned. Only MPEG codecs support this now. */
-
+                       (function avcodec_parse_frame()). The frame
+                       data is returned. Only MPEG codecs support this now. */
+    
     int mpeg_quant; /* 0-> h263 quant 1-> mpeg quant */
-
+    
     char *stats_out; /* encoding statistics output buffer */
     char *stats_in;  /* encoding statistics input buffer (concatenated stuff from stats_out of pass1 should be placed here)*/
     float rc_qsquish;
@@ -346,8 +347,8 @@ typedef struct AVCodecContext {
 	    uc_res0,uc_res1,uc_res2,uc_res3,uc_res4,uc_res5,
 	    uc_res6,uc_res7,uc_res8,uc_res9,uc_res10,uc_res11,uc_res12;
     unsigned int
-           ui_res0,ui_res1,ui_res2,ui_res3,ui_res4,ui_res5,ui_res6,ui_res7,ui_res8,ui_res9,
-           ui_res10,ui_res11,ui_res12,ui_res13,ui_res14,ui_res15,ui_res16;
+	    ui_res0,ui_res1,ui_res2,ui_res3,ui_res4,ui_res5,ui_res6,ui_res7,ui_res8,ui_res9,
+	    ui_res10,ui_res11,ui_res12,ui_res13,ui_res14,ui_res15,ui_res16;
 } AVCodecContext;
 
 typedef struct AVCodec {
@@ -465,6 +466,7 @@ typedef struct ImgReSampleContext ImgReSampleContext;
 
 ImgReSampleContext *img_resample_init(int output_width, int output_height,
                                       int input_width, int input_height);
+
 ImgReSampleContext *img_resample_full_init(int owidth, int oheight,
                                       int iwidth, int iheight,
                                       int topBand, int bottomBand,

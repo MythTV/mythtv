@@ -60,6 +60,7 @@ extern int (*pix_sum)(UINT8 * pix, int line_size);
 extern int (*pix_norm1)(UINT8 * pix, int line_size);
 
 
+
 void get_pixels_c(DCTELEM *block, const UINT8 *pixels, int line_size);
 void diff_pixels_c(DCTELEM *block, const UINT8 *s1, const UINT8 *s2, int stride);
 void put_pixels_clamped_c(const DCTELEM *block, UINT8 *pixels, int line_size);
@@ -68,14 +69,22 @@ void clear_blocks_c(DCTELEM *blocks);
 
 /* add and put pixel (decoding) */
 typedef void (*op_pixels_func)(UINT8 *block, const UINT8 *pixels, int line_size, int h);
-typedef void (*qpel_mc_func)(UINT8 *dst, UINT8 *src, int dstStride, int srcStride, int mx, int my);
+typedef void (*qpel_mc_func)(UINT8 *dst, UINT8 *src, int stride);
 
-extern op_pixels_func put_pixels_tab[4];
-extern op_pixels_func avg_pixels_tab[4];
-extern op_pixels_func put_no_rnd_pixels_tab[4];
-extern op_pixels_func avg_no_rnd_pixels_tab[4];
-extern qpel_mc_func qpel_mc_rnd_tab[16];
-extern qpel_mc_func qpel_mc_no_rnd_tab[16];
+extern op_pixels_func put_pixels_tab[2][4];
+extern op_pixels_func avg_pixels_tab[2][4];
+extern op_pixels_func put_no_rnd_pixels_tab[2][4];
+extern op_pixels_func avg_no_rnd_pixels_tab[2][4];
+extern qpel_mc_func put_qpel_pixels_tab[2][16];
+extern qpel_mc_func avg_qpel_pixels_tab[2][16];
+extern qpel_mc_func put_no_rnd_qpel_pixels_tab[2][16];
+extern qpel_mc_func avg_no_rnd_qpel_pixels_tab[2][16];
+
+#define CALL_2X_PIXELS(a, b, n)\
+static void a(uint8_t *block, const uint8_t *pixels, int line_size, int h){\
+    b(block  , pixels  , line_size, h);\
+    b(block+n, pixels+n, line_size, h);\
+}
 
 /* motion estimation */
 

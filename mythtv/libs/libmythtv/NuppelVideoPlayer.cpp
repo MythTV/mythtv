@@ -940,6 +940,14 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 
         /* if we get here, we're actually going to do video output */
 
+        if (!disablevideo)
+        {
+            memcpy(X11videobuf, vbuffer[rpos], videosize);
+            if (pipplayer)
+                ShowPip(X11videobuf);
+            osd->Display(X11videobuf);
+        }
+	
         // calculate 'delay', that we need to get from 'now' to 'nexttrigger'
         gettimeofday(&now, NULL);
 
@@ -954,10 +962,6 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 
         if (!disablevideo)
         {
-            memcpy(X11videobuf, vbuffer[rpos], videosize);
-            if (pipplayer)
-                ShowPip(X11videobuf);
-            osd->Display(X11videobuf);
             XJ_show(video_width, video_height);
         }
         /* a/v sync assumes that when 'XJ_show' returns, that is the instant

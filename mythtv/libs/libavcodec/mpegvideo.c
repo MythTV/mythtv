@@ -245,6 +245,9 @@ int MPV_common_init(MpegEncContext *s)
             CHECKED_ALLOCZ(   s->pb2_buffer, PB_BUFFER_SIZE);
         }
         
+        if(s->msmpeg4_version){
+            CHECKED_ALLOCZ(s->ac_stats, 2*2*(MAX_LEVEL+1)*(MAX_RUN+1)*2*sizeof(int));
+        }
         CHECKED_ALLOCZ(s->avctx->stats_out, 256);
     }
     
@@ -349,6 +352,7 @@ void MPV_common_end(MpegEncContext *s)
     av_freep(&s->edge_emu_buffer);
     av_freep(&s->non_b_mv4_table);
     av_freep(&s->avctx->stats_out);
+    av_freep(&s->ac_stats);
     
     for(i=0;i<3;i++) {
         int j;
@@ -716,7 +720,8 @@ void MPV_frame_start(MpegEncContext *s, AVCodecContext *avctx)
 /* generic function for encode/decode called after a frame has been coded/decoded */
 void MPV_frame_end(MpegEncContext *s)
 {
-//    if((s->picture_number%100)==0 && s->encoding) printf("sads:%d //\n", sads);
+    s->avctx->key_frame   = (s->pict_type == I_TYPE);
+    s->avctx->pict_type   = s->pict_type;
 
     /* draw edge for correct motion prediction if outside */
     if (s->pict_type != B_TYPE && !s->intra_only && !(s->flags&CODEC_FLAG_EMU_EDGE)) {
@@ -866,8 +871,7 @@ int MPV_encode_picture(AVCodecContext *avctx,
         MPV_frame_start(s, avctx);
 
         encode_picture(s, s->picture_number);
-        avctx->key_frame   = (s->pict_type == I_TYPE);
-        avctx->pict_type   = s->pict_type;
+
         avctx->real_pict_num  = s->picture_number;
         avctx->header_bits = s->header_bits;
         avctx->mv_bits     = s->mv_bits;
@@ -1059,18 +1063,19 @@ static inline void mpeg_motion(MpegEncContext *s,
                                UINT8 *dest_y, UINT8 *dest_cb, UINT8 *dest_cr,
                                int dest_offset,
                                UINT8 **ref_picture, int src_offset,
-                               int field_based, op_pixels_func *pix_op,
+                               int field_based, op_pixels_func (*pix_op)[4],
                                int motion_x, int motion_y, int h)
 {
     UINT8 *ptr;
     int dxy, offset, mx, my, src_x, src_y, height, v_edge_pos, linesize, uvlinesize;
     int emu=0;
-    
+#if 0    
 if(s->quarter_sample)
 {
     motion_x>>=1;
     motion_y>>=1;
 }
+#endif
     dxy = ((motion_y & 1) << 1) | (motion_x & 1);
     src_x = s->mb_x * 16 + (motion_x >> 1);
     src_y = s->mb_y * (16 >> field_based) + (motion_y >> 1);
@@ -1097,8 +1102,7 @@ if(s->quarter_sample)
             emu=1;
         }
     }
-    pix_op[dxy](dest_y, ptr, linesize, h);
-    pix_op[dxy](dest_y + 8, ptr + 8, linesize, h);
+    pix_op[0][dxy](dest_y, ptr, linesize, h);
 
     if(s->flags&CODEC_FLAG_GRAY) return;
 
@@ -1132,22 +1136,22 @@ if(s->quarter_sample)
         emulated_edge_mc(s, ptr, uvlinesize, 9, (h>>1)+1, src_x, src_y, s->h_edge_pos>>1, v_edge_pos>>1);
         ptr= s->edge_emu_buffer;
     }
-    pix_op[dxy](dest_cb + (dest_offset >> 1), ptr, uvlinesize, h >> 1);
+    pix_op[1][dxy](dest_cb + (dest_offset >> 1), ptr, uvlinesize, h >> 1);
 
     ptr = ref_picture[2] + offset;
     if(emu){
         emulated_edge_mc(s, ptr, uvlinesize, 9, (h>>1)+1, src_x, src_y, s->h_edge_pos>>1, v_edge_pos>>1);
         ptr= s->edge_emu_buffer;
     }
-    pix_op[dxy](dest_cr + (dest_offset >> 1), ptr, uvlinesize, h >> 1);
+    pix_op[1][dxy](dest_cr + (dest_offset >> 1), ptr, uvlinesize, h >> 1);
 }
 
 static inline void qpel_motion(MpegEncContext *s,
                                UINT8 *dest_y, UINT8 *dest_cb, UINT8 *dest_cr,
                                int dest_offset,
                                UINT8 **ref_picture, int src_offset,
-                               int field_based, op_pixels_func *pix_op,
-                               qpel_mc_func *qpix_op,
+                               int field_based, op_pixels_func (*pix_op)[4],
+                               qpel_mc_func (*qpix_op)[16],
                                int motion_x, int motion_y, int h)
 {
     UINT8 *ptr;
@@ -1179,11 +1183,8 @@ static inline void qpel_motion(MpegEncContext *s,
             emu=1;
         }
     }
-    qpix_op[dxy](dest_y                 , ptr                 , linesize, linesize, motion_x&3, motion_y&3);
-    qpix_op[dxy](dest_y              + 8, ptr              + 8, linesize, linesize, motion_x&3, motion_y&3);
-    qpix_op[dxy](dest_y + linesize*8    , ptr + linesize*8    , linesize, linesize, motion_x&3, motion_y&3);
-    qpix_op[dxy](dest_y + linesize*8 + 8, ptr + linesize*8 + 8, linesize, linesize, motion_x&3, motion_y&3);
-    
+    qpix_op[0][dxy](dest_y, ptr, linesize);
+
     if(s->flags&CODEC_FLAG_GRAY) return;
 
     mx= (motion_x>>1) | (motion_x&1);
@@ -1212,21 +1213,21 @@ static inline void qpel_motion(MpegEncContext *s,
         emulated_edge_mc(s, ptr,  s->uvlinesize, 9, (h>>1)+1, src_x, src_y, s->h_edge_pos>>1, v_edge_pos>>1);
         ptr= s->edge_emu_buffer;
     }
-    pix_op[dxy](dest_cb + (dest_offset >> 1), ptr,  s->uvlinesize, h >> 1);
+    pix_op[1][dxy](dest_cb + (dest_offset >> 1), ptr,  s->uvlinesize, h >> 1);
     
     ptr = ref_picture[2] + offset;
     if(emu){
         emulated_edge_mc(s, ptr,  s->uvlinesize, 9, (h>>1)+1, src_x, src_y, s->h_edge_pos>>1, v_edge_pos>>1);
         ptr= s->edge_emu_buffer;
     }
-    pix_op[dxy](dest_cr + (dest_offset >> 1), ptr,  s->uvlinesize, h >> 1);
+    pix_op[1][dxy](dest_cr + (dest_offset >> 1), ptr,  s->uvlinesize, h >> 1);
 }
 
 
 static inline void MPV_motion(MpegEncContext *s, 
                               UINT8 *dest_y, UINT8 *dest_cb, UINT8 *dest_cr,
                               int dir, UINT8 **ref_picture, 
-                              op_pixels_func *pix_op, qpel_mc_func *qpix_op)
+                              op_pixels_func (*pix_op)[4], qpel_mc_func (*qpix_op)[16])
 {
     int dxy, offset, mx, my, src_x, src_y, motion_x, motion_y;
     int mb_x, mb_y, i;
@@ -1239,19 +1240,10 @@ static inline void MPV_motion(MpegEncContext *s,
     switch(s->mv_type) {
     case MV_TYPE_16X16:
         if(s->mcsel){
-#if 0
-            mpeg_motion(s, dest_y, dest_cb, dest_cr, 0,
-                        ref_picture, 0,
-                        0, pix_op,
-                        s->sprite_offset[0][0]>>3,
-                        s->sprite_offset[0][1]>>3,
-                        16);
-#else
             gmc1_motion(s, dest_y, dest_cb, dest_cr, 0,
                         ref_picture, 0,
                         16);
-#endif
-        }else if(s->quarter_sample && dir==0){ //FIXME
+        }else if(s->quarter_sample){
             qpel_motion(s, dest_y, dest_cb, dest_cr, 0,
                         ref_picture, 0,
                         0, pix_op, qpix_op,
@@ -1289,7 +1281,7 @@ static inline void MPV_motion(MpegEncContext *s,
                 }
             }
             dest = dest_y + ((i & 1) * 8) + (i >> 1) * 8 * s->linesize;
-            pix_op[dxy](dest, ptr, s->linesize, 8);
+            pix_op[1][dxy](dest, ptr, s->linesize, 8);
         }
     
         if(s->flags&CODEC_FLAG_GRAY) break;
@@ -1336,14 +1328,14 @@ static inline void MPV_motion(MpegEncContext *s,
                     emu=1;
                 }
             }
-        pix_op[dxy](dest_cb, ptr, s->uvlinesize, 8);
+        pix_op[1][dxy](dest_cb, ptr, s->uvlinesize, 8);
 
         ptr = ref_picture[2] + offset;
         if(emu){
             emulated_edge_mc(s, ptr, s->uvlinesize, 9, 9, src_x, src_y, s->h_edge_pos>>1, s->v_edge_pos>>1);
             ptr= s->edge_emu_buffer;
         }
-        pix_op[dxy](dest_cr, ptr, s->uvlinesize, 8);
+        pix_op[1][dxy](dest_cr, ptr, s->uvlinesize, 8);
         break;
     case MV_TYPE_FIELD:
         if (s->picture_structure == PICT_FRAME) {
@@ -1506,8 +1498,8 @@ void MPV_decode_mb(MpegEncContext *s, DCTELEM block[6][64])
     if (!(s->encoding && (s->intra_only || s->pict_type==B_TYPE))) {
         UINT8 *dest_y, *dest_cb, *dest_cr;
         int dct_linesize, dct_offset;
-        op_pixels_func *op_pix;
-        qpel_mc_func *op_qpix;
+        op_pixels_func (*op_pix)[4];
+        qpel_mc_func (*op_qpix)[16];
 
         /* avoid copy if macroblock skipped in last frame too 
            dont touch it for B-frames as they need the skip info from the next p-frame */
@@ -1546,18 +1538,16 @@ void MPV_decode_mb(MpegEncContext *s, DCTELEM block[6][64])
             if((!s->encoding) || (s->mb_type[mb_xy]&(s->mb_type[mb_xy]-1))){
                 if ((!s->no_rounding) || s->pict_type==B_TYPE){                
                     op_pix = put_pixels_tab;
-                    op_qpix= qpel_mc_rnd_tab;
+                    op_qpix= put_qpel_pixels_tab;
                 }else{
                     op_pix = put_no_rnd_pixels_tab;
-                    op_qpix= qpel_mc_no_rnd_tab;
+                    op_qpix= put_no_rnd_qpel_pixels_tab;
                 }
 
                 if (s->mv_dir & MV_DIR_FORWARD) {
                     MPV_motion(s, dest_y, dest_cb, dest_cr, 0, s->last_picture, op_pix, op_qpix);
-                    if ((!s->no_rounding) || s->pict_type==B_TYPE)
-                        op_pix = avg_pixels_tab;
-                    else
-                        op_pix = avg_no_rnd_pixels_tab;
+                    op_pix = avg_pixels_tab;
+                    op_qpix= avg_qpel_pixels_tab;
                 }
                 if (s->mv_dir & MV_DIR_BACKWARD) {
                     MPV_motion(s, dest_y, dest_cb, dest_cr, 1, s->next_picture, op_pix, op_qpix);
@@ -1725,8 +1715,8 @@ static void encode_mb(MpegEncContext *s, int motion_x, int motion_y)
             get_pixels(s->block[5], ptr, wrap);
         }
     }else{
-        op_pixels_func *op_pix;
-        qpel_mc_func *op_qpix;
+        op_pixels_func (*op_pix)[4];
+        qpel_mc_func (*op_qpix)[16];
         UINT8 *dest_y, *dest_cb, *dest_cr;
         UINT8 *ptr_y, *ptr_cb, *ptr_cr;
         int wrap_y, wrap_c;
@@ -1743,18 +1733,16 @@ static void encode_mb(MpegEncContext *s, int motion_x, int motion_y)
 
         if ((!s->no_rounding) || s->pict_type==B_TYPE){
             op_pix = put_pixels_tab;
-            op_qpix= qpel_mc_rnd_tab;
+            op_qpix= put_qpel_pixels_tab;
         }else{
             op_pix = put_no_rnd_pixels_tab;
-            op_qpix= qpel_mc_no_rnd_tab;
+            op_qpix= put_no_rnd_qpel_pixels_tab;
         }
 
         if (s->mv_dir & MV_DIR_FORWARD) {
             MPV_motion(s, dest_y, dest_cb, dest_cr, 0, s->last_picture, op_pix, op_qpix);
-           if ((!s->no_rounding) || s->pict_type==B_TYPE)
-                op_pix = avg_pixels_tab;
-            else
-                op_pix = avg_no_rnd_pixels_tab;
+            op_pix = avg_pixels_tab;
+            op_qpix= avg_qpel_pixels_tab;
         }
         if (s->mv_dir & MV_DIR_BACKWARD) {
             MPV_motion(s, dest_y, dest_cb, dest_cr, 1, s->next_picture, op_pix, op_qpix);
