@@ -2645,7 +2645,7 @@ AppearanceSettings::AppearanceSettings()
     addChild(screen);
 
 #ifdef USING_XRANDR
-    addChild(VideoModeSettings());
+    addChild(new VideoModeSettings());
 #endif
 
     VerticalConfigurationGroup* dates = new VerticalConfigurationGroup(false);
