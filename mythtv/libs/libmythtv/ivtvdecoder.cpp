@@ -338,8 +338,8 @@ int IvtvDecoder::MpegPreProcessPkt(unsigned char *buf, int start, int len,
                 }
                 case PICTURE_START:
                 {
-                    //int type = (bufptr[1] >> 3) & 7;
-                    //if (type >= 1 && type <= 3)
+                    int type = (bufptr[1] >> 3) & 7;
+                    if (type >= 1 && type <= 3)
                     {
                         framesScanned++;
                         if (exitafterdecoded)
