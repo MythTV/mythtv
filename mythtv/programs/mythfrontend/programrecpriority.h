@@ -62,7 +62,6 @@ class RankPrograms : public MythDialog
     void updateList(QPainter *);
     void updateInfo(QPainter *);
 
-    void resizeImage(QPixmap *, QString);
     void LoadWindow(QDomElement &);
     void parseContainer(QDomElement &);
     XMLParse *theme;

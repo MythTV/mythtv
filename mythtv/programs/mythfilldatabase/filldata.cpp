@@ -1253,7 +1253,7 @@ bool grabData(Source source, int offset)
     else if (xmltv_grabber == "tv_grab_nz")
         command.sprintf("nice -19 %s -n 1 -f %d -o '%s'",
                         xmltv_grabber.ascii(), offset,
-                        configfile.ascii());
+                        filename.ascii());
     else if (xmltv_grabber == "tv_grab_de")
         command.sprintf("nice -19 %s --days 7 --output %s",
                         xmltv_grabber.ascii(),

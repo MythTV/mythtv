@@ -453,7 +453,7 @@ int RingBuffer::safe_read(int fd, void *data, unsigned sz)
         if (ret == 0) // EOF returns 0
         {
             zerocnt++;
-            if (zerocnt >= 20)
+            if (zerocnt >= 10)
             {
                 break;
             }
@@ -760,7 +760,7 @@ void RingBuffer::ReadAheadThread(void)
             rbwpos = (rbwpos + ret) % READ_AHEAD_SIZE;
             pthread_mutex_unlock(&readAheadLock);
 
-            if (ret != totfree && normalfile && !stopreads)
+            if (ret == 0 && normalfile && !stopreads)
             {
                 ateof = true;
             }

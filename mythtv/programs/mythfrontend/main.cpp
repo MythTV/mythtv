@@ -233,6 +233,7 @@ void TVMenuCallback(void *data, QString &selection)
         settings.exec(QSqlDatabase::database());
         gContext->LoadQtConfig();
         gContext->GetMainWindow()->Init();
+        gContext->UpdateImageCache();
         menu->ReloadTheme();
     } 
     else if (sel == "settings recording") 
@@ -444,6 +445,8 @@ int main(int argc, char **argv)
     mainWindow->Show();
     mainWindow->Init();
     gContext->SetMainWindow(mainWindow);
+
+    gContext->UpdateImageCache();
 
     lcd_host = gContext->GetSetting("LCDHost");
     lcd_port = gContext->GetNumSetting("LCDPort");

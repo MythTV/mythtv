@@ -73,8 +73,9 @@ RankChannels::RankChannels(QSqlDatabase *ldb, MythMainWindow *parent,
         exit(0);
     }
 
-    bgTransBackup = new QPixmap();
-    resizeImage(bgTransBackup, "trans-backup.png");
+    bgTransBackup = gContext->LoadScalePixmap("trans-backup.png");
+    if (!bgTransBackup)
+        bgTransBackup = new QPixmap();
 
     updateBackground();
 
@@ -167,38 +168,6 @@ void RankChannels::parseContainer(QDomElement &element)
         listRect = area;
     if (name.lower() == "channel_info")
         infoRect = area;
-}
-
-void RankChannels::resizeImage(QPixmap *dst, QString file)
-{
-    QString baseDir = gContext->GetInstallPrefix();
-    QString themeDir = gContext->FindThemeDir("");
-    themeDir = themeDir + gContext->GetSetting("Theme") + "/";
-    baseDir = baseDir + "/share/mythtv/themes/default/";
-
-    QFile checkFile(themeDir + file);
-
-    if (checkFile.exists())
-        file = themeDir + file;
-    else
-        file = baseDir + file;
-
-    if (hmult == 1 && wmult == 1)
-    {
-        dst->load(file);
-    }
-    else
-    {
-        QImage *sourceImg = new QImage();
-        if (sourceImg->load(file))
-        {
-            QImage scalerImg;
-            scalerImg = sourceImg->smoothScale((int)(sourceImg->width() * wmult),
-                                               (int)(sourceImg->height() * hmult));
-            dst->convertFromImage(scalerImg);
-        }
-        delete sourceImg;
-    }
 }
 
 void RankChannels::updateBackground(void)

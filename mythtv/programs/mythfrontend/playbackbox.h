@@ -99,7 +99,6 @@ class PlaybackBox : public MythDialog
 
     BoxType type;
 
-    void resizeImage(QPixmap *, QString);
     void killPlayer(void);
     void startPlayer(ProgramInfo *rec);
 

@@ -52,7 +52,7 @@ class MythEvent : public QCustomEvent
     QString extradata;
 };
 
-#define MYTH_BINARY_VERSION "0.10.07162003-1"
+#define MYTH_BINARY_VERSION "0.10.07182003-1"
 #define MYTH_SCHEMA_VERSION "1003"
 
 extern bool print_verbose_messages;
@@ -77,7 +77,8 @@ class MythContext : public QObject
     QString GetFilePrefix();
 
     bool LoadSettingsFiles(const QString &filename);
-    void LoadQtConfig();
+    void LoadQtConfig(void);
+    void UpdateImageCache(void);
 
     void GetScreenSettings(int &width, float &wmult, int &height, float &hmult);
    
@@ -114,8 +115,8 @@ class MythContext : public QObject
 
     void ThemeWidget(QWidget *widget);
 
-    QPixmap *LoadScalePixmap(QString filename); 
-    QImage *LoadScaleImage(QString filename);
+    QPixmap *LoadScalePixmap(QString filename, bool fromcache = true); 
+    QImage *LoadScaleImage(QString filename, bool fromcache = true);
 
     void addListener(QObject *obj);
     void removeListener(QObject *obj);
@@ -149,6 +150,11 @@ class MythContext : public QObject
     void SetPalette(QWidget *widget);
     void InitializeScreenSettings(void);
 
+    void ClearOldImageCache(void);
+    void CacheThemeImages(void);
+    void CacheThemeImagesDirectory(const QString &dir);
+    void RemoveCacheDir(const QString &dir);
+
     Settings *m_settings;
     Settings *m_qtThemeSettings;
 
@@ -173,6 +179,7 @@ class MythContext : public QObject
     QMutex dbLock;
 
     QMap<QString, QImage> imageCache;
+    QMap<QString, QPixmap> pixmapCache;
 
     LCD *lcd_device;
 
@@ -182,6 +189,8 @@ class MythContext : public QObject
 
     float m_wmult, m_hmult;
     int m_screenwidth, m_screenheight;
+
+    QString themecachedir;
 };
 
 extern MythContext *gContext;

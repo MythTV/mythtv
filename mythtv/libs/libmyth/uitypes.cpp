@@ -915,108 +915,34 @@ void UIGuideType::SetProgramInfo(unsigned int row, int num, QRect area,
 
 void UIGuideType::LoadImage(int recType, QString file)
 {
-    QString tfile = "";
     QString themeDir = gContext->GetThemeDir();
-    QString baseDir = gContext->GetShareDir() + "themes/default/";
+    QString filename = themeDir + file;
 
-    QFile checkFile(themeDir + file);
-
-    if (checkFile.exists())
-        tfile = themeDir + file;
-    else
-        tfile = baseDir + file;
-    checkFile.setName(tfile);
-    if (!checkFile.exists())
-        tfile = "/tmp/" + file;
-
-    checkFile.setName(tfile);
-    if (!checkFile.exists())
-        tfile = file;
-
-    if (m_debug == true)
-        cerr << "     -Filename: " << file << endl;
-
-    QPixmap img;
-    if (m_hmult == 1 && m_wmult == 1)
+    QPixmap *pix = gContext->LoadScalePixmap(filename);
+    
+    if (pix)
     {
-        img.load(tfile);
+        recImages[recType] = *pix;
+        delete pix;
     }
     else
-    {
-        QImage *sourceImg = new QImage();
-        if (sourceImg->load(tfile))
-        {
-            QImage scalerImg;
-            int doX = sourceImg->width();
-            int doY = sourceImg->height();
-
-            scalerImg = sourceImg->smoothScale((int)(doX * m_wmult),
-                                              (int)(doY * m_hmult));
-            img.convertFromImage(scalerImg);
-            if (m_debug == true)
-                    cerr << "     -Image: " << file << " loaded.\n";
-        }
-        else
-        {
-            if (m_debug == true)
-                cerr << "     -Image: " << file << " failed to load.\n";
-        }
-        delete sourceImg;
-    }
-    recImages[recType] = img;
+        recImages[recType] = QPixmap();
 }
 
 void UIGuideType::SetArrow(int dir, QString file)
 {
-    QString tfile = "";
     QString themeDir = gContext->GetThemeDir();
-    QString baseDir = gContext->GetShareDir() + "themes/default/";
+    QString filename = themeDir + file;
 
-    QFile checkFile(themeDir + file);
+    QPixmap *pix = gContext->LoadScalePixmap(filename);
 
-    if (checkFile.exists())
-        tfile = themeDir + file;
-    else
-        tfile = baseDir + file;
-    checkFile.setName(tfile);
-    if (!checkFile.exists())
-        tfile = "/tmp/" + file;
-
-    checkFile.setName(tfile);
-    if (!checkFile.exists())
-        tfile = file;
-
-    if (m_debug == true)
-        cerr << "     -Filename: " << file << endl;
-
-    QPixmap img;
-    if (m_hmult == 1 && m_wmult == 1)
+    if (pix)
     {
-        img.load(tfile);
+        arrowImages[dir] = *pix;
+        delete pix;
     }
     else
-    {
-        QImage *sourceImg = new QImage();
-        if (sourceImg->load(tfile))
-        {
-            QImage scalerImg;
-            int doX = sourceImg->width();
-            int doY = sourceImg->height();
-
-            scalerImg = sourceImg->smoothScale((int)(doX * m_wmult),
-                                              (int)(doY * m_hmult));
-            img.convertFromImage(scalerImg);
-            if (m_debug == true)
-                    cerr << "     -Image: " << file << " loaded.\n";
-        }
-        else
-        {
-            if (m_debug == true)
-                cerr << "     -Image: " << file << " failed to load.\n";
-        }
-        delete sourceImg;
-    }
-    arrowImages[dir] = img;
+        arrowImages[dir] = QPixmap();
 }
 
 // **************************************************************
@@ -1268,7 +1194,22 @@ void UIImageType::LoadImage()
     QString themeDir = gContext->GetThemeDir();
     QString baseDir = gContext->GetShareDir() + "themes/default/";
 
-    QFile checkFile(themeDir + m_filename);
+    QString filename = themeDir + m_filename;
+
+    if (m_force_x == -1 && m_force_y == -1)
+    {
+        QPixmap *tmppix = gContext->LoadScalePixmap(filename);
+        if (tmppix)
+        {
+            img = *tmppix;
+            m_show = true;
+            
+            delete tmppix;
+            refresh();
+        }
+    }
+
+    QFile checkFile(filename);
 
     if (checkFile.exists())
         file = themeDir + m_filename;

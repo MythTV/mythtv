@@ -39,6 +39,8 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, QSqlDatabase *db,
 
     fps = 29.97;
     validvpts = false;
+
+    lastKey = 0;
 }
 
 AvFormatDecoder::~AvFormatDecoder()
@@ -477,7 +479,11 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
             if (context->codec_id == CODEC_ID_MPEG1VIDEO)
             {
                 if (PacketHasHeader(pkt.data, pkt.size, PICTURE_START))
+                {
                     framesRead++;
+                    if (exitafterdecoded)
+                        gotvideo = 1;
+                }
 
                 if (PacketHasHeader(pkt.data, pkt.size, GOP_START))
                 {
@@ -512,7 +518,7 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
             {
                 case CODEC_TYPE_AUDIO:
                 {
-                    if (onlyvideo)
+                    if (onlyvideo != 0)
                     {
                         ptr += pkt.size;
                         len -= pkt.size;
@@ -545,6 +551,13 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                 }
                 case CODEC_TYPE_VIDEO:
                 {
+                    if (onlyvideo < 0)
+                    {
+                        ptr += pkt.size;
+                        len -= pkt.size;
+                        continue;
+                    }
+
                     AVCodecContext *context = &(curstream->codec);
                     AVFrame mpa_pic;
 
@@ -560,12 +573,6 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                     {
                         cerr << "decoding error\n";
                         exit(0);
-                    }
-
-                    if (ret == 0)
-                    {
-                        if (exitafterdecoded)
-                            gotvideo = 1;
                     }
 
                     if (!gotpicture)
@@ -763,40 +770,18 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame)
     }
     else if (desiredKey != lastKey)
     {
-        AVCodecContext *videoenc = NULL;
-
-        for (int i = 0; i < ic->nb_streams; i++)
-        {
-            AVCodecContext *enc = &ic->streams[i]->codec;
-            if (enc->codec_type == CODEC_TYPE_VIDEO)
-            {
-                videoenc = enc;
-                break;
-            }
-        }            
-
-        if (!videoenc)
-        {
-            cerr << "Couldn't find video decoder\n";
-            return false;
-        }
- 
-        videoenc->hurry_up = 5;
-
         while (framesRead < desiredKey + 1 || 
                !positionMap.contains(desiredKey / keyframedist))
         {
             needflush = true;
 
             exitafterdecoded = true;
-            GetFrame(1);
+            GetFrame(-1);
             exitafterdecoded = false;
 
             if (ateof)
                 return false;
         }
-
-        videoenc->hurry_up = 0;
 
         if (needflush)
         {

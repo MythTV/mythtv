@@ -74,8 +74,9 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     showDateFormat = gContext->GetSetting("ShortDateFormat", "M/d");
     showTimeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
 
-    bgTransBackup = new QPixmap();
-    resizeImage(bgTransBackup, "trans-backup.png");
+    bgTransBackup = gContext->LoadScalePixmap("trans-backup.png");
+    if (!bgTransBackup)
+        bgTransBackup = new QPixmap();
 
     theme = new XMLParse();
     theme->SetWMult(wmult);
@@ -237,38 +238,6 @@ void PlaybackBox::exitWin()
     killPlayer();
 
     emit killTheApp();
-}
-
-void PlaybackBox::resizeImage(QPixmap *dst, QString file)
-{
-    QString baseDir = gContext->GetInstallPrefix();
-    QString themeDir = gContext->FindThemeDir("");
-    themeDir = themeDir + gContext->GetSetting("Theme") + "/";
-    baseDir = baseDir + "/share/mythtv/themes/default/";
-
-    QFile checkFile(themeDir + file);
-
-    if (checkFile.exists())
-        file = themeDir + file;
-    else
-        file = baseDir + file;
-
-    if (hmult == 1 && wmult == 1)
-    {
-        dst->load(file);
-    }
-    else 
-    {
-        QImage *sourceImg = new QImage();
-        if (sourceImg->load(file))
-        {
-            QImage scalerImg;
-            scalerImg = sourceImg->smoothScale((int)(sourceImg->width() * wmult),
-                                               (int)(sourceImg->height() * hmult));
-            dst->convertFromImage(scalerImg);
-        }
-        delete sourceImg;
-    }
 }
 
 void PlaybackBox::updateBackground(void)

@@ -15,6 +15,7 @@
 #include "remotefile.h"
 #include "lcddevice.h"
 #include "dialogbox.h"
+#include "mythdialogs.h"
 
 bool print_verbose_messages = false;    
 
@@ -77,6 +78,7 @@ MythContext::MythContext(const QString &binversion, bool gui)
 MythContext::~MythContext()
 {
     imageCache.clear();
+    pixmapCache.clear();
 
     if (m_settings)
         delete m_settings;
@@ -161,6 +163,7 @@ bool MythContext::LoadSettingsFiles(const QString &filename)
 void MythContext::LoadQtConfig(void)
 {
     language = "";
+    themecachedir = "";
 
     m_height = QApplication::desktop()->height();
     m_width = QApplication::desktop()->width();
@@ -185,6 +188,164 @@ void MythContext::LoadQtConfig(void)
     m_themeloaded = false;
 
     InitializeScreenSettings();
+}
+
+void MythContext::UpdateImageCache(void)
+{
+    imageCache.clear();
+    pixmapCache.clear();
+
+    ClearOldImageCache();
+    CacheThemeImages();
+}
+
+void MythContext::ClearOldImageCache(void)
+{
+    QString cachedirname = QDir::homeDirPath() + "/.mythtv/themecache/";
+
+    themecachedir = cachedirname + GetSetting("Theme") + "." + 
+                    QString::number(m_screenwidth) + "." + 
+                    QString::number(m_screenheight);
+
+    QDir d(cachedirname);
+
+    if (!d.exists())
+        d.mkdir(cachedirname);
+
+    themecachedir += "/";
+
+    d.setPath(themecachedir);
+    if (!d.exists())
+        d.mkdir(themecachedir);
+
+    const QFileInfoList *list = d.entryInfoList();
+    if (!list)
+        return;
+
+    QFileInfoListIterator it(*list);
+    QFileInfo *fi;
+
+    while ((fi = it.current()) != 0)
+    {
+        ++it;
+        if (fi->fileName() == "." || fi->fileName() == "..")
+            continue;
+        if (fi->isDir() && !fi->isSymLink())
+        {
+            if (fi->absFilePath() == themecachedir)
+                continue;
+            RemoveCacheDir(fi->absFilePath());
+        }
+    }
+}
+
+void MythContext::RemoveCacheDir(const QString &dir)
+{
+    QString cachedirname = QDir::homeDirPath() + "/.mythtv/themecache/";
+
+    if (!dir.startsWith(cachedirname))
+        return;
+
+    cout << "removing stale cache dir: " << dir << endl;
+
+    QDir d(dir);
+
+    if (!d.exists())
+        return;
+
+    const QFileInfoList *list = d.entryInfoList();
+    if (!list)
+        return;
+
+    QFileInfoListIterator it(*list);
+    QFileInfo *fi;
+
+    while ((fi = it.current()) != 0)
+    {
+        ++it;
+        if (fi->fileName() == "." || fi->fileName() == "..")
+            continue;
+        if (fi->isFile() && !fi->isSymLink())
+        {
+            QFile file(fi->absFilePath());
+            file.remove();
+        }
+    }
+
+    d.rmdir(dir);
+}
+    
+void MythContext::CacheThemeImages(void)
+{
+    QString baseDir = m_installprefix + "/share/mythtv/themes/default/";
+
+    if (m_screenwidth == 800 && m_screenheight == 600)
+        return;
+
+    CacheThemeImagesDirectory(m_themepathname);
+    CacheThemeImagesDirectory(baseDir);
+}
+
+void MythContext::CacheThemeImagesDirectory(const QString &dir)
+{
+    QDir d(dir);
+    
+    if (!d.exists())
+        return;
+
+    const QFileInfoList *list = d.entryInfoList();
+    if (!list)
+        return;
+
+    QFileInfoListIterator it(*list);
+    QFileInfo *fi;
+
+    MythProgressDialog *caching;
+    caching = new MythProgressDialog(QObject::tr("Pre-scaling theme images"),
+                                     list->count());
+
+    int progress = 0;
+
+    while ((fi = it.current()) != 0)
+    {
+        caching->setProgress(progress);
+        progress++;
+
+        ++it;
+        if (fi->fileName() == "." || fi->fileName() == "..")
+            continue;
+        if (fi->isDir())
+            continue;
+
+        if (fi->extension().lower() != "png" && 
+            fi->extension().lower() != "jpg" &&
+            fi->extension().lower() != "gif")
+            continue;
+
+        QString filename = fi->fileName();
+        QFileInfo cacheinfo(themecachedir + filename);
+
+        if (!cacheinfo.exists() ||
+            (cacheinfo.lastModified() < fi->lastModified()))
+        {
+            cout << "generating cache image for: " << fi->absFilePath() << endl;
+            QImage *tmpimage = LoadScaleImage(fi->absFilePath(), false);
+
+            if (tmpimage)
+            {
+                if (!tmpimage->save(themecachedir + filename, "PNG"))
+                {
+                    cerr << "Couldn't save cache image: " 
+                         << themecachedir + filename << endl;
+                }
+             
+                delete tmpimage;
+            }
+        }
+    }
+
+    caching->Close();
+    delete caching;
 }
 
 void MythContext::GetScreenSettings(int &width, float &wmult, 
@@ -563,7 +724,7 @@ void MythContext::ThemeWidget(QWidget *widget)
         delete bgpixmap;
 }
 
-QImage *MythContext::LoadScaleImage(QString filename)
+QImage *MythContext::LoadScaleImage(QString filename, bool fromcache)
 {
     if (filename.left(5) == "myth:")
         return NULL;
@@ -571,6 +732,21 @@ QImage *MythContext::LoadScaleImage(QString filename)
     QString baseDir = m_installprefix + "/share/mythtv/themes/default/";
 
     QFile checkFile(filename);
+    QFileInfo fi(filename);
+
+    if (themecachedir != "")
+    {
+        QString cachefilepath = themecachedir + fi.fileName();
+        QFile cachecheck(cachefilepath);
+        if (cachecheck.exists() && fromcache)
+        {
+            QImage *ret = new QImage(cachefilepath);
+            if (ret)
+                return ret;
+
+            delete ret;
+        }
+    }
 
     if (!checkFile.exists())
     {
@@ -615,7 +791,7 @@ QImage *MythContext::LoadScaleImage(QString filename)
     return ret;
 }
 
-QPixmap *MythContext::LoadScalePixmap(QString filename) 
+QPixmap *MythContext::LoadScalePixmap(QString filename, bool fromcache) 
 { 
     if (filename.left(5) == "myth:")
         return NULL;
@@ -623,6 +799,29 @@ QPixmap *MythContext::LoadScalePixmap(QString filename)
     QString baseDir = m_installprefix + "/share/mythtv/themes/default/";
 
     QFile checkFile(filename);
+    QFileInfo fi(filename);
+
+    if (themecachedir != "")
+    {
+        QString cachefilepath = themecachedir + fi.fileName();
+        QFile cachecheck(cachefilepath);
+        if (cachecheck.exists() && fromcache)
+        {
+            //if (pixmapCache.contains(cachefilepath))
+            //{
+            //    return new QPixmap(pixmapCache[cachefilepath]);
+            //}
+
+            QPixmap *ret = new QPixmap(cachefilepath);
+            if (ret)
+            {
+                //pixmapCache[cachefilepath] = *ret;
+                return ret;
+            }
+
+            delete ret;
+        }
+    }
 
     if (!checkFile.exists())
     {

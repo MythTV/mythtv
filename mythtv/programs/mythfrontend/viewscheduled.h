@@ -47,7 +47,6 @@ class ViewScheduled : public MythDialog
     void updateConflict(QPainter *);
     void updateInfo(QPainter *);
 
-    void resizeImage(QPixmap *, QString);
     void LoadWindow(QDomElement &);
     void parsePopup(QDomElement &);
     void parseContainer(QDomElement &);
