@@ -10,6 +10,7 @@
       <text lang="ES">Ver DVD</text>
       <text lang="CA">Veure DVD</text>
       <text lang="FR">Lecture DVD</text>
+      <text lang="NL">DVD Afspelen</text>
       <text lang="JA">DVD再生</text>
       <action>DVD_PLAY</action>
    </button>
@@ -25,6 +26,7 @@
       <text lang="ES">"Ripear" DVD</text>
       <text lang="CA">Volcar DVD</text>
       <text lang="FR">Copie DVD</text>
+      <text lang="NL">DVD Rip</text>
       <text lang="JA">DVDリッピング</text>
       <action>DVD_RIP</action>
    </button>

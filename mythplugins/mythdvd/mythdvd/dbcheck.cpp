@@ -8,7 +8,7 @@ using namespace std;
 
 #include "mythtv/mythcontext.h"
 
-const QString currentDatabaseVersion = "1000";
+const QString currentDatabaseVersion = "1001";
 
 static void UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -258,4 +258,15 @@ void UpgradeDVDDatabaseSchema(void)
         InitializeDatabase();
         dbver = "1000";
     }
+
+
+    if (dbver == "1000")
+    {
+      const QString updates[] = {
+"UPDATE dvdtranscode SET use_yv12=1 WHERE (intid=1 OR intid=2 OR intid=12 OR intid=13);",
+""
+};
+      performActualUpdate(updates, "1001", dbver);
+    }
+    
 }

@@ -18,9 +18,11 @@ MythDVD relies heavily on the transcode project:
     Main Author: Thomas Östreich <ostreich@theorie.physik.uni-goettingen.de>
     Current Maintainer: Tilmann Bitterberg <transcode@tibit.org>
 
-and, by the time anyone reads this file, probably a lot of patch
-contributors.
-
 Translations:
     PT: Bruno Rodrigues <bruno.rodrigues at litux dot org>
 
+Fix to always use YV12/I420 codec
+    Dave Alden <alden at math dot ohio-state dot edu>
+
+and, by the time anyone reads this file, probably a lot of patch
+contributors.
