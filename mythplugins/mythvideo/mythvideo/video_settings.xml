@@ -27,6 +27,8 @@
       <text>File Types</text>
       <text lang="PT">Tipos de Ficheiros</text>
       <text lang="SV">Filtyper</text>
+      <text lang="cA">Tipus d'arxius</text>
+      <text lang="ES">Tipos de archivos</text>
       <action>SETTINGS_ASSOCIATIONS</action>
    </button>
 

@@ -60,6 +60,8 @@
                 <value lang="DK">Rip/Genkod</value>
                 <value lang="PT">Cópia/Recodificação</value>
                 <value lang="SV">Kopiering/Omkodning</value>
+                <value lang="ES">Ripear/Trascodificar</value>
+                <value lang="CA">Volcar/Trascodificar</value>
             </textarea>
             <image name="progress_background" draworder="0">
                 <filename>md_progress_background.png</filename>
@@ -108,6 +110,8 @@
                 <value lang="DK">Job 1 af 1</value>
                 <value lang="PT">Processo 1 de 1</value>
                 <value lang="SV">Jobb 1 av 1</value>
+                <value lang="ES">Trabajo 1 de 1</value>
+                <value lang="CA">Tasca 1 de 1</value>
             </textarea>
 
             <statusbar name="overall_status" draworder="1" whitespace="15">
@@ -215,6 +219,8 @@
                 <value lang="DK">Rip/Genkod</value>
                 <value lang="PT">Cópia/Recodificação</value>
                 <value lang="SV">Kopiering/Omkodning</value>
+                <value lang="ES">Ripear/Trascodificar</value>
+                <value lang="CA">Volcar/Trascodificar</value>
             </textarea>
             <image name="progress_background" draworder="0">
                 <filename>md_progress_background.png</filename>
@@ -237,6 +243,8 @@
                 <value lang="DK">Længde:</value>
                 <value lang="PT">Tamanho:</value>
                 <value lang="SV">Längd:</value>
+                <value lang="ES">Duración:</value>
+                <value lang="CA">Duració:</value>
             </textarea>
 
             <textarea name="ripcheck_text" draworder="0" align="right">
@@ -246,6 +254,8 @@
                 <value lang="DK">Vælg:</value>
                 <value lang="PT">Copiar:</value>
                 <value lang="SV">Välj:</value>
+                <value lang="ES">Seleccione:</value>
+                <value lang="CA">Sel·leccionat:</value>
             </textarea>
 
             <textarea name="ripname_text" draworder="0" align="right">
@@ -255,6 +265,8 @@
                 <value lang="DK">Navn:</value>
                 <value lang="PT">Nome:</value>
                 <value lang="SV">Namn:</value>
+                <value lang="ES">Nombre:</value>
+                <value lang="CA">Nom:</value>
             </textarea>
 
             <textarea name="ripquality_text" draworder="0" align="right">
@@ -264,6 +276,8 @@
                 <value lang="DK">Kvalitet:</value>
                 <value lang="PT">Qualidade:</value>
                 <value lang="SV">Kvalitet:</value>
+                <value lang="ES">Calidad:</value>
+                <value lang="CA">Qualitat:</value>
             </textarea>
 
             <textarea name="ripaudio_text" draworder="0" align="right">
@@ -273,6 +287,8 @@
                 <value lang="DK">Lydspor:</value>
                 <value lang="PT">Pista de Áudio:</value>
                 <value lang="SV">Ljudspår:</value>
+                <value lang="ES">Banda de audio:</value>
+                <value lang="CA">Pista d'àudio:</value>
             </textarea>
 
             <textarea name="ripacthree_text" draworder="0" align="right">
@@ -282,6 +298,8 @@
                 <value lang="DK">AC3 lyd:</value>
                 <value lang="PT">Áudio AC3:</value>
                 <value lang="SV">AC3-ljud:</value>
+                <value lang="ES">Audio AC3:</value>
+                <value lang="CA">Àudio AC3:</value>
             </textarea>
 
             <textarea name="subtitle_text" draworder="0" align="right">
@@ -291,6 +309,8 @@
                 <value lang="DK">Undertekster:</value>
                 <value lang="PT">Legendas:</value>
                 <value lang="SV">Textning:</value>
+                <value lang="ES">Subtítulos:</value>
+                <value lang="CA">Subtítols:</value>
             </textarea>
 
             <textarea name="ripview_text" draworder="0" align="right">
@@ -300,6 +320,8 @@
                 <value lang="DK">Se:</value>
                 <value lang="PT">Ângulo:</value>
                 <value lang="SV">Vy:</value>
+                <value lang="ES">Ver:</value>
+                <value lang="CA">Veure:</value>
             </textarea>
 
             <!--
@@ -373,6 +395,8 @@
                 <value lang="DK">Titel 1 af 1</value>
                 <value lang="PT">Título 1 de 1:</value>
                 <value lang="SV">Titel 1 av 1</value>
+                <value lang="ES">Título 1 de 1</value>
+                <value lang="CA">Títol 1 de 1</value>
             </textarea>
 
             <pushbutton name="prev_title_button" draworder="0">

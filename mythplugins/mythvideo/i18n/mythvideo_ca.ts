@@ -3,242 +3,242 @@
     <name>EditMetadataDialog</name>
     <message>
         <source>Level %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Nivell %1</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Cap</translation>
     </message>
     <message>
         <source>No Cover</source>
-        <translation type="unfinished"></translation>
+        <translation>Cap caràtula</translation>
     </message>
     <message>
         <source>Done</source>
-        <translation type="unfinished"></translation>
+        <translation>Fet</translation>
     </message>
 </context>
 <context>
     <name>FileAssocDialog</name>
     <message>
         <source>Please enter the new extension:</source>
-        <translation type="unfinished"></translation>
+        <translation>Introdueixi la nova extensió:</translation>
     </message>
     <message>
         <source>Create new extension</source>
-        <translation type="unfinished"></translation>
+        <translation>Crear una nova extensió</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Cancelar</translation>
     </message>
     <message>
         <source>Done</source>
-        <translation type="unfinished"></translation>
+        <translation>Fet</translation>
     </message>
     <message>
         <source>New</source>
-        <translation type="unfinished"></translation>
+        <translation>Nou</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Esborrar</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
         <source>Directory that holds videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Directori que conté els vídeos</translation>
     </message>
     <message>
         <source>This directory must exist, and the user running MythVideo only needs to have read permission to the directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aquest directori ha d&apos;existir i MythVideo ha de tenir accès de lectura en el directori.</translation>
     </message>
     <message>
         <source>Starting Parental Level</source>
-        <translation type="unfinished"></translation>
+        <translation>Nivell d&apos;accès parental inicial</translation>
     </message>
     <message>
         <source>4 - Highest</source>
-        <translation type="unfinished"></translation>
+        <translation>4 - Superior</translation>
     </message>
     <message>
         <source>1 - Lowest</source>
-        <translation type="unfinished"></translation>
+        <translation>1 - Inferior</translation>
     </message>
     <message>
         <source>2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>3</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>This is the &apos;level&apos; that MythVideo starts at. Any videos with a level at or below this will be shown in the list or while browsing by default. The Parental PIN should be set to limit changing of the default level.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aquest és el &apos;nivell&apos; en el que MythVideo s&apos;inicia. Qualsevol video amb un nivell inferior serà visualitzat a la llista per omisió. El PIN de ontrol d&apos;accès té que ser activat per canviar el aquest nivell per omisió.</translation>
     </message>
     <message>
         <source>Parental Control PIN</source>
-        <translation type="unfinished"></translation>
+        <translation>PIN de control d&apos;accès</translation>
     </message>
     <message>
         <source>This PIN is used to control the current Parental Level. If you want to use this feature, then setting the value to all numbers will make your life much easier. If you don&apos;t want to be bothered by PC dialogs, please set it to be blank.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aquest PIN es fa servir per al control d&apos;accès parental. So vol activar aquesta funció utilitzi números, li resultarà més senzill. Si no vol ser molestat amb diàlegs sol·licitant el PIN, no hi assigni cap valor.</translation>
     </message>
     <message>
         <source>Aggresive Parental Control</source>
-        <translation type="unfinished"></translation>
+        <translation>Control d&apos;accès estricte</translation>
     </message>
     <message>
         <source>If set, you will not be able to return to this screen and reset the Parental PIN without first entering the current PIN. You have been warned.</source>
-        <translation type="unfinished"></translation>
+        <translation>Si està actiu, no podrà retornar a aquesta pantalla i reinicialitzar el PIN de control d&apos;accès sense avans entrar el PIN actual. És un avís.</translation>
     </message>
     <message>
         <source>Show Unknown File Types</source>
-        <translation type="unfinished"></translation>
+        <translation>Visualitza fitxers amb extensió desconeguda</translation>
     </message>
     <message>
         <source>If set, all files below the Myth Video directory will be displayed unless their extension is explicitly set to be ignored. </source>
-        <translation type="unfinished"></translation>
+        <translation>Si està actiu, tots els fitxers del directoris de MythVideo es visualitzen a no ser que la seva extensió estipuli explícitament d&apos;ignorar-los.</translation>
     </message>
     <message>
         <source>Video List browses files</source>
-        <translation type="unfinished"></translation>
+        <translation>La llista de vídeos explora fitxers</translation>
     </message>
     <message>
         <source>If set, this will cause the Video List screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
-        <translation type="unfinished"></translation>
+        <translation>Si està actiu, la pantalla que llista els vídeos visualitzará tots els arxius del directori de MythVideo encara que no hagin estat escanejats.</translation>
     </message>
     <message>
         <source>This is the command used for any file that the extension is not specifically defined.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aquesta és la comanda emprada per a les extensions no definides.</translation>
     </message>
     <message>
         <source>General Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Opcions Generals</translation>
     </message>
     <message>
         <source>Player Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Opcions del reproductor</translation>
     </message>
     <message>
         <source>Parental Pin:</source>
-        <translation type="unfinished"></translation>
+        <translation>Pin d&apos;accés:</translation>
     </message>
     <message>
         <source>Searching for video files</source>
-        <translation type="unfinished"></translation>
+        <translation>Cercant arxius de vídeo</translation>
     </message>
     <message>
         <source>Updating video database</source>
-        <translation type="unfinished"></translation>
+        <translation>Actualitzant base de dades de vídeos</translation>
     </message>
     <message>
         <source>No Cover</source>
-        <translation type="unfinished"></translation>
+        <translation>Cap caràtula</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Desconegut</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Cap</translation>
     </message>
     <message>
         <source>NR</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Unknown Rating</source>
-        <translation type="unfinished"></translation>
+        <translation>No classificat</translation>
     </message>
     <message>
         <source>Default Player</source>
-        <translation type="unfinished"></translation>
+        <translation>Reproductor per omisió</translation>
     </message>
 </context>
 <context>
     <name>VideoBrowser</name>
     <message>
         <source>Parental Pin:</source>
-        <translation type="unfinished"></translation>
+        <translation>PIN de control d&apos;accès:</translation>
     </message>
     <message>
         <source>%1 of %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 de %2</translation>
     </message>
     <message>
         <source>No Videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Sense vídeos</translation>
     </message>
     <message>
         <source>No rating available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sense classificació disponible.</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation type="unfinished"></translation>
+        <translation>minuts</translation>
     </message>
 </context>
 <context>
     <name>VideoManager</name>
     <message>
         <source>Sorry there were no matches for the title</source>
-        <translation type="unfinished"></translation>
+        <translation>Ho sento, no s&apos;han trovat coincidències per a aquest títol</translation>
     </message>
     <message>
         <source>Manually Enter IMDB #</source>
-        <translation type="unfinished"></translation>
+        <translation>Especificar manualment entrada IMDB#</translation>
     </message>
     <message>
         <source>Reset Entry</source>
-        <translation type="unfinished"></translation>
+        <translation>Reiniciar entrada</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Cancelar</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation type="unfinished"></translation>
+        <translation>Minuts</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation type="unfinished"></translation>
+        <translation>Si</translation>
     </message>
     <message>
         <source>No</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>No Cover</source>
-        <translation type="unfinished"></translation>
+        <translation>Cap caràtula</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Desconegut</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Cap</translation>
     </message>
     <message>
         <source>NR</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>VideoTree</name>
     <message>
         <source>Parental Pin:</source>
-        <translation type="unfinished"></translation>
+        <translation>PIN d&apos;accés:</translation>
     </message>
     <message>
         <source>No files found</source>
-        <translation type="unfinished"></translation>
+        <translation>No s&apos;han trovat arxius</translation>
     </message>
 </context>
 </TS>

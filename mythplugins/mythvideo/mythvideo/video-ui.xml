@@ -156,6 +156,7 @@
         <value>Browsable:</value>
         <value lang="PT">Visionável:</value>
         <value lang="SV">Blädderbar:</value>
+        <value lang="CA">Llistable:</value>
       </textarea>
       <textarea name="browseable" draworder="4">
         <area>680,135,100,35</area>
@@ -257,6 +258,8 @@
         <value>0-9: Edit</value>
         <value lang="PT">0-9: Editar</value>
         <value lang="SV">0-9: Redigera</value>
+        <value lang="CA">0-9: Editar</value>
+        <value lang="ES">0-9: Editar</value>
       </textarea>
       <textarea name="keyslbl_two" draworder="4" align="center">
         <area>300,275,200,15</area>
@@ -264,6 +267,8 @@
         <value>Menu/Info: Manual IMDB</value>
         <value lang="PT">Menu/Info: IMDB Manual</value>
         <value lang="SV">Meny/Info: Manuell IMDB</value>
+        <value lang="CA">Menu/Info: IMDB Manual</value>
+        <value lang="ES">Menu/Info: IMDB Manual</value>
       </textarea>
       <textarea name="keyslbl_three" draworder="4" align="right">
         <area>580,275,200,15</area>
@@ -271,6 +276,8 @@
         <value>Enter/OK: Auto IMDB</value>
         <value lang="PT">Enter/OK: IMDB Automático</value>
         <value lang="SV">Enter/OK: Automatisk IMDB</value>
+        <value lang="CA">Enter/OK: IMDB Automàtic</value>
+        <value lang="ES">Enter/OK: IMDB Automático</value>
       </textarea>
     </container>
     
@@ -281,7 +288,7 @@
         <font>titlefnt</font>
         <value>retrieving data...</value>
         <value lang="ES">obteniendo información...</value>
-        <value lang="CA">obtenient informació...</value>
+        <value lang="CA">obtenint informació...</value>
         <value lang="DK">Henter information...</value>
         <value lang="PT">A obter a informação...</value>
         <value lang="SV">hämtar data...</value>
@@ -706,6 +713,8 @@
                 <value lang="DK">Fil:</value>
                 <value lang="PT">Ficheiro:</value>
                 <value lang="SV">Fil:</value>
+                <value lang="CA">Arxiu:</value>
+                <value lang="ES">Archivo:</value>
             </textarea>
             <textarea name="player_label" draworder="0" align="right">
                 <area>30,196,90,40</area>
@@ -714,6 +723,8 @@
                 <value lang="DK">Afspiller:</value>
                 <value lang="PT">Comando:</value>
                 <value lang="SV">Spelare:</value>
+                <value lang="CA">Comanda:</value>
+                <value lang="ES">Comando:</value>
             </textarea>
             <textarea name="video_file" draworder="0">
                 <area>130,155,380,40</area>
@@ -771,6 +782,8 @@
                 <value>MythVideo File Associations</value>
                 <value lang="PT">Associação de Ficheiros do MythVideo</value>
                 <value lang="SV">Filassociationer för videospelaren</value>
+                <value lang="CA">Associació d'arxius a MythVideo</value>
+                <value lang="ES">Asociación de archivos a MythVideo</value>
             </textarea>
  
  
@@ -781,6 +794,8 @@
                 <value>Extension:</value>
                 <value lang="PT">Extensão:</value>
                 <value lang="SV">Filändelse:</value>
+                <value lang="CA">Extensió:</value>
+                <value lang="ES">Extensión:</value>
             </textarea>
 
             <textarea name="command_text" draworder="0" align="right">
@@ -789,6 +804,8 @@
                 <value>Command:</value>
                 <value lang="PT">Comando:</value>
                 <value lang="SV">Kommando:</value>
+                <value lang="CA">Comanda:</value>
+                <value lang="ES">Comando:</value>
             </textarea>
 
             <textarea name="default_text" draworder="0" align="right">
@@ -797,6 +814,8 @@
                 <value>Use default player:</value>
                 <value lang="PT">Usar cliente padrão:</value>
                 <value lang="SV">Använd standardspelare:</value>
+                <value lang="CA">Reproductor:</value>
+                <value lang="ES">Reproductor:</value>
             </textarea>
 
             <textarea name="ignore_text" draworder="0" align="right">
@@ -805,6 +824,8 @@
                 <value>Ignore:</value>
                 <value lang="PT">Ignorar:</value>
                 <value lang="SV">Ignorera:</value>
+                <value lang="CA">Ignorar:</value>
+                <value lang="ES">Ignorar:</value>
             </textarea>
 
 
@@ -896,6 +917,8 @@
                 <value>Edit Video Information</value>
                 <value lang="PT">Editar Informação do Filme</value>
                 <value lang="SV">Redigera filminformation</value>
+                <value lang="CA">Editar Informació del vídeo</value>
+                <value lang="ES">Editar Información del video</value>
             </textarea>
 
             <!--
@@ -908,6 +931,8 @@
                 <value>Name:</value>
                 <value lang="PT">Nome:</value>
                 <value lang="SV">Namn:</value>
+                <value lang="CA">Nom:</value>
+                <value lang="ES">Nombre:</value>
             </textarea>
 
             <textarea name="level_text" draworder="0" align="right">
@@ -916,6 +941,8 @@
                 <value>Parental Control:</value>
                 <value lang="PT">Nível de Acesso:</value>
                 <value lang="SV">Barnlås:</value>
+                <value lang="CA">Nivell d'Accès:</value>
+                <value lang="ES">Nível de Acceso:</value>
             </textarea>
 
             <textarea name="child_text" draworder="0" align="right">
@@ -924,6 +951,8 @@
                 <value>File to Always Play Next:</value>
                 <value lang="PT">Ficheiro para Tocar Depois:</value>
                 <value lang="SV">Fil som alltid spelas efter denna:</value>
+                <value lang="CA">Arxiu a reproduir després:</value>
+                <value lang="ES">Archivo a reproducir después:</value>
             </textarea>
 
             <textarea name="browse_text" draworder="0" align="right">
@@ -932,6 +961,8 @@
                 <value>Include while Browsing:</value>
                 <value lang="PT">Incluir ao Navegar:</value>
                 <value lang="SV">Inkludera vid bläddring:</value>
+                <value lang="CA">Incloure al llistar:</value>
+                <value lang="ES">Incluir al listar:</value>
             </textarea>
 
             <textarea name="coverart_text_label" draworder="0" align="right">
@@ -940,6 +971,8 @@
                 <value>Cover Art:</value>
                 <value lang="PT">Imagem de Capa:</value>
                 <value lang="SV">Omslagsbild:</value>
+                <value lang="CA">Imatge de caràtula:</value>
+                <value lang="ES">Imagen de portada:</value>
             </textarea>
 
             <textarea name="player_text" draworder="0" align="right">
@@ -948,6 +981,8 @@
                 <value>Unique Player Command:</value>
                 <value lang="PT">Comando de Execução Especial:</value>
                 <value lang="SV">Kommando för uppspelning:</value>
+                <value lang="CA">Comanda d'execució específica:</value>
+                <value lang="ES">Comando de ejecución específica:</value>
             </textarea>
 
             <!--
@@ -994,6 +1029,8 @@
                 <value>/path/to/the/thing.jpg</value>
                 <value lang="PT">/directoria/para/a/imagem.jpg</value>
                 <value lang="SV">/sökväg/till/bilden.jpg</value>
+                <value lang="CA">/directori/per/la/imatge.jpg</value>
+                <value lang="ES">/directorio/para/la/imagen.jpg</value>
             </textarea>
 
             <blackhole name="player_hack" draworder="0">

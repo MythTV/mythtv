@@ -3,533 +3,533 @@
     <name>String::DayOfWeek</name>
     <message>
         <source>MON</source>
-        <translation type="unfinished">DIL</translation>
+        <translation>DLL</translation>
     </message>
     <message>
         <source>TUE</source>
-        <translation type="unfinished">DIM</translation>
+        <translation>DIM</translation>
     </message>
     <message>
         <source>WED</source>
-        <translation type="unfinished">DMC</translation>
+        <translation>DMC</translation>
     </message>
     <message>
         <source>THU</source>
-        <translation type="unfinished">DIJ</translation>
+        <translation>DIJ</translation>
     </message>
     <message>
         <source>FRI</source>
-        <translation type="unfinished">DIV</translation>
+        <translation>DIV</translation>
     </message>
     <message>
         <source>SAT</source>
-        <translation type="unfinished">DIS</translation>
+        <translation>DIS</translation>
     </message>
     <message>
         <source>SUN</source>
-        <translation type="unfinished">DIU</translation>
+        <translation>DIU</translation>
     </message>
 </context>
 <context>
     <name>String::WeatherType</name>
     <message>
         <source>Cloudy</source>
-        <translation type="unfinished"></translation>
+        <translation>Tapat</translation>
     </message>
     <message>
         <source>Mostly Cloudy</source>
-        <translation type="unfinished"></translation>
+        <translation>Força tapadot</translation>
     </message>
     <message>
         <source>Partly Cloudy</source>
-        <translation type="unfinished"></translation>
+        <translation>Clarianes</translation>
     </message>
     <message>
         <source>Light Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Ruixats</translation>
     </message>
     <message>
         <source>Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Xàfecs</translation>
     </message>
     <message>
         <source>Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Pluja</translation>
     </message>
     <message>
         <source>AM Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Xàfecs al matí</translation>
     </message>
     <message>
         <source>Fog</source>
-        <translation type="unfinished"></translation>
+        <translation>Boira</translation>
     </message>
     <message>
         <source>Few Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Xàfecs dispersos</translation>
     </message>
     <message>
         <source>Mostly Sunny</source>
-        <translation type="unfinished"></translation>
+        <translation>Força sol</translation>
     </message>
     <message>
         <source>Sunny</source>
-        <translation type="unfinished"></translation>
+        <translation>Sol</translation>
     </message>
     <message>
         <source>Scattered Flurries</source>
-        <translation type="unfinished"></translation>
+        <translation>plujes disperses</translation>
     </message>
     <message>
         <source>AM Clouds/PM Sun</source>
-        <translation type="unfinished"></translation>
+        <translation>Tapat al matí/Sol a la tarda</translation>
     </message>
     <message>
         <source>Isolated T-Storms</source>
-        <translation type="unfinished"></translation>
+        <translation>Tempestes aïllades</translation>
     </message>
     <message>
         <source>Scattered Thunderstorms</source>
-        <translation type="unfinished"></translation>
+        <translation>Tempestes disperses</translation>
     </message>
     <message>
         <source>PM Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Xàfecs de tarda</translation>
     </message>
     <message>
         <source>PM Showers/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Xàfecs de tarda/Vent</translation>
     </message>
     <message>
         <source>Rain/Snow Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Xàfecs de pluja o neu</translation>
     </message>
     <message>
         <source>Few Snow Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Algunes nevades</translation>
     </message>
     <message>
         <source>Cloudy/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Núvol i Vent</translation>
     </message>
     <message>
         <source>Flurries/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Pluja/vent dispers</translation>
     </message>
     <message>
         <source>Mostly Cloudy/Windy</source>
-        <translation type="unfinished"></translation>
+        <translation>Força tapat i vent</translation>
     </message>
     <message>
         <source>Rain/Thunder</source>
-        <translation type="unfinished"></translation>
+        <translation>PLuja i Tempesta</translation>
     </message>
     <message>
         <source>Partly Cloudy/Windy</source>
-        <translation type="unfinished"></translation>
+        <translation>Clarianes i vent</translation>
     </message>
     <message>
         <source>AM Rain/Snow Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Pluja/neu al matí/</translation>
     </message>
     <message>
         <source>Light Rain/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Ruixats i ventet</translation>
     </message>
     <message>
         <source>Showers/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Plujes i vent</translation>
     </message>
     <message>
         <source>Mostly Sunny/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Força sol i vent</translation>
     </message>
     <message>
         <source>Flurries</source>
-        <translation type="unfinished"></translation>
+        <translation>Ventades</translation>
     </message>
     <message>
         <source>Rain/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Vent i pluja</translation>
     </message>
     <message>
         <source>Sct Flurries/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Vent dispers</translation>
     </message>
     <message>
         <source>Sct Strong Storms</source>
-        <translation type="unfinished"></translation>
+        <translation>Tempestes fortes disperses</translation>
     </message>
     <message>
         <source>PM T-Storms</source>
-        <translation type="unfinished"></translation>
+        <translation>Temporal de tardes</translation>
     </message>
     <message>
         <source>Thunderstorms</source>
-        <translation type="unfinished"></translation>
+        <translation>Tempesta de trons</translation>
     </message>
     <message>
         <source>Sunny/Windy</source>
-        <translation type="unfinished"></translation>
+        <translation>Sol/Vent</translation>
     </message>
     <message>
         <source>AM Thunderstorms</source>
-        <translation type="unfinished"></translation>
+        <translation>Tempesta de trons al matí</translation>
     </message>
     <message>
         <source>AM Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Pluja al matí</translation>
     </message>
     <message>
         <source>Iso T-Storms/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Tempestes aïllades/Vent</translation>
     </message>
     <message>
         <source>Rain/Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Pluja/Neu</translation>
     </message>
     <message>
         <source>Sct T-Storms/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Tempestes disperses/Vent</translation>
     </message>
     <message>
         <source>AM Showers/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Xàfecs de matí/Vent</translation>
     </message>
     <message>
         <source>Sct Snow Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Nevades lleus disperses</translation>
     </message>
     <message>
         <source>Snow to Ice/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Neu a glaçada/Vent</translation>
     </message>
     <message>
         <source>Snow to Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Neu a pluja</translation>
     </message>
     <message>
         <source>AM Light Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Ruixats al matí</translation>
     </message>
     <message>
         <source>PM Light Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Ruixats de tarda</translation>
     </message>
     <message>
         <source>PM Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Pluja de tarda</translation>
     </message>
     <message>
         <source>Snow Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Ruixats de neu</translation>
     </message>
     <message>
         <source>Rain to Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Pluja a neu</translation>
     </message>
     <message>
         <source>PM Rain/Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Pluja/Neu a la tarda</translation>
     </message>
     <message>
         <source>Few Showers/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Algun ruixat/vent</translation>
     </message>
     <message>
         <source>Snow/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Neu/Vent</translation>
     </message>
     <message>
         <source>PM Rain/Snow Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Ruixats/neu a la tarda</translation>
     </message>
     <message>
         <source>PM Rain/Snow/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Ruixats/Neu i vent de tarda</translation>
     </message>
     <message>
         <source>Rain/Snow Showers/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Ruixats de Pluja/Neu/Vent</translation>
     </message>
     <message>
         <source>Rain/Snow/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Pluja/Neu/Vent</translation>
     </message>
     <message>
         <source>Light Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Nevadeta</translation>
     </message>
     <message>
         <source>PM Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Neu a la tarda</translation>
     </message>
     <message>
         <source>Few Snow Showers/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Alguns ruixats de neu/Vent</translation>
     </message>
     <message>
         <source>Light Snow/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Lleugera neu/vent</translation>
     </message>
     <message>
         <source>Wintry Mix</source>
-        <translation type="unfinished"></translation>
+        <translation>Ventades</translation>
     </message>
     <message>
         <source>AM Wintry Mix</source>
-        <translation type="unfinished"></translation>
+        <translation>Ventades pel matí</translation>
     </message>
     <message>
         <source>Hvy Rain/Freezing Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Forta pluja/pedregades</translation>
     </message>
     <message>
         <source>AM Light Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Lleugera nevada de matí</translation>
     </message>
     <message>
         <source>Rain/Freezing Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Pluja/pedregades</translation>
     </message>
     <message>
         <source>T-Storms/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Tempesta/Vent</translation>
     </message>
     <message>
         <source>Sprinkles</source>
-        <translation type="unfinished"></translation>
+        <translation>Xim Xim</translation>
     </message>
     <message>
         <source>AM Snow Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Ruixats de neu al matí</translation>
     </message>
     <message>
         <source>AM Clouds/PM Sun/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Nuvol al matí/Tarda sol/vent</translation>
     </message>
     <message>
         <source>AM Rain/Snow/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Matí pluja/neu/vent</translation>
     </message>
     <message>
         <source>Rain to Snow/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Pluja a neu i vent</translation>
     </message>
     <message>
         <source>Snow to Wintry Mix</source>
-        <translation type="unfinished"></translation>
+        <translation>Neu a ventades</translation>
     </message>
     <message>
         <source>PM Snow Showers/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Ruixats de neu de tarda/vent</translation>
     </message>
     <message>
         <source>Snow and Ice to Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Neu i glaçada a pluja</translation>
     </message>
     <message>
         <source>Heavy Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Fortes plujes</translation>
     </message>
     <message>
         <source>AM Rain/Ice</source>
-        <translation type="unfinished"></translation>
+        <translation>Pluja i glaçades al matí</translation>
     </message>
     <message>
         <source>AM Snow Showers/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Ruixats de neu de matí/vent</translation>
     </message>
     <message>
         <source>AM Light Snow/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Nevadetes de matí/vent</translation>
     </message>
     <message>
         <source>PM Light Rain/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Ruixadets i vent de tarda</translation>
     </message>
     <message>
         <source>AM Light Wintry Mix</source>
-        <translation type="unfinished"></translation>
+        <translation>Ventadetes pel matí</translation>
     </message>
     <message>
         <source>PM Light Snow/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Nevadetes/vent de tarda</translation>
     </message>
     <message>
         <source>Heavy Rain/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Fortes plujes i vent</translation>
     </message>
     <message>
         <source>PM Snow Shower</source>
-        <translation type="unfinished"></translation>
+        <translation>Ruixats de neu de tarda</translation>
     </message>
     <message>
         <source>Snow to Rain/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Neu a pluja/Vent</translation>
     </message>
     <message>
         <source>PM Light Rain/Ice</source>
-        <translation type="unfinished"></translation>
+        <translation>Ruixadets i glaçades de tarda</translation>
     </message>
     <message>
         <source>AM Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Neu al matí</translation>
     </message>
     <message>
         <source>Snow to Ice</source>
-        <translation type="unfinished"></translation>
+        <translation>Neu a glaçada</translation>
     </message>
     <message>
         <source>Wintry Mix/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Ventades/Vent</translation>
     </message>
     <message>
         <source>PM Light Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Nevadeta de tarda</translation>
     </message>
     <message>
         <source>AM Drizzle</source>
-        <translation type="unfinished"></translation>
+        <translation>Ruixadets al matí</translation>
     </message>
     <message>
         <source>Strong Storms/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Tempestes fortes/Vent</translation>
     </message>
     <message>
         <source>PM Drizzle</source>
-        <translation type="unfinished"></translation>
+        <translation>Ruixadets de tarda</translation>
     </message>
     <message>
         <source>Drizzle</source>
-        <translation type="unfinished"></translation>
+        <translation>Ruixadets</translation>
     </message>
     <message>
         <source>AM Light Rain/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Ruixats/Vent al matí</translation>
     </message>
     <message>
         <source>AM Rain/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Pluja/Vent pel matí</translation>
     </message>
     <message>
         <source>Wintry Mix to Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Ventades a neu</translation>
     </message>
     <message>
         <source>Snow Showers/Windy</source>
-        <translation type="unfinished"></translation>
+        <translation>Ruixats de neu/Vent</translation>
     </message>
     <message>
         <source>Light Rain Shower</source>
-        <translation type="unfinished"></translation>
+        <translation>Ruixadets de pluja</translation>
     </message>
     <message>
         <source>Light Rain with Thunder</source>
-        <translation type="unfinished"></translation>
+        <translation>Ruixats amb trons</translation>
     </message>
     <message>
         <source>Light Drizzle</source>
-        <translation type="unfinished"></translation>
+        <translation>Lleugers ruixadets</translation>
     </message>
     <message>
         <source>Mist</source>
-        <translation type="unfinished"></translation>
+        <translation>Boireta</translation>
     </message>
     <message>
         <source>Smoke</source>
-        <translation type="unfinished"></translation>
+        <translation>Calitxa</translation>
     </message>
     <message>
         <source>Haze</source>
-        <translation type="unfinished"></translation>
+        <translation>Calina</translation>
     </message>
     <message>
         <source>Light Snow Shower</source>
-        <translation type="unfinished"></translation>
+        <translation>Ruixadet de neu</translation>
     </message>
     <message>
         <source>Light Snow Shower/ Windy</source>
-        <translation type="unfinished"></translation>
+        <translation>Ruixadet de neu i vent</translation>
     </message>
     <message>
         <source>Clear</source>
-        <translation type="unfinished"></translation>
+        <translation>Cel clar</translation>
     </message>
     <message>
         <source>A Few Clouds</source>
-        <translation type="unfinished"></translation>
+        <translation>Alguns núvols</translation>
     </message>
     <message>
         <source>Fair</source>
-        <translation type="unfinished"></translation>
+        <translation>Bé</translation>
     </message>
 </context>
 <context>
     <name>String::WindDirection</name>
     <message>
         <source>N</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>NNE</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>NE</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>E</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>SE</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>SSE</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>S</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>SSW</source>
-        <translation type="unfinished"></translation>
+        <translation>SSO</translation>
     </message>
     <message>
         <source>SW</source>
-        <translation type="unfinished"></translation>
+        <translation>SO</translation>
     </message>
     <message>
         <source>W</source>
-        <translation type="unfinished"></translation>
+        <translation>O</translation>
     </message>
     <message>
         <source>NW</source>
-        <translation type="unfinished"></translation>
+        <translation>NO</translation>
     </message>
     <message>
         <source>NNW</source>
-        <translation type="unfinished"></translation>
+        <translation>NNO</translation>
     </message>
     <message>
         <source>ENE</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>ESE</source>
-        <translation type="unfinished"></translation>
+        <translation>OSO</translation>
     </message>
     <message>
         <source>WSW</source>
-        <translation type="unfinished"></translation>
+        <translation>OSO</translation>
     </message>
     <message>
         <source>WNW</source>
-        <translation type="unfinished"></translation>
+        <translation>ONO</translation>
     </message>
 </context>
 <context>
@@ -772,35 +772,35 @@
     </message>
     <message>
         <source>*** Invalid Area ID or Server Error ***</source>
-        <translation type="unfinished"></translation>
+        <translation>*** Identificació d&apos;àrea desconegut o error del servidor ***</translation>
     </message>
     <message>
         <source>Imperial (Fahrenheit, in, etc)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Metric (Celsius, kPa, etc)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source> F</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source> C</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>.</source>
-        <translation type="unfinished"></translation>
+        <translation>.</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Desconegut</translation>
     </message>
     <message>
         <source> - PAUSED -</source>
-        <translation type="unfinished"></translation>
+        <translation>- PAUSAT -</translation>
     </message>
 </context>
 </TS>

@@ -104,7 +104,7 @@
         <value lang="DE">Lade...</value>
         <value lang="DK">Indlæser...</value>
         <value lang="ES">Cargando...</value>
-        <value lang="CA">Carregant³...</value>
+        <value lang="CA">Carregant...</value>
         <value lang="NL">Bezig laden...</value>
         <value lang="PT">Aguarde um momento...</value>
         <value lang="SV">Laddar...</value>
@@ -646,6 +646,8 @@
         <value>RAIN</value>
         <value lang="PT">CHUVA</value>
         <value lang="SV">REGN</value>
+        <value lang="CA">PLUJA</value>
+        <value lang="ES">LLUVIA</value>
       </textarea>
       <textarea name="maplabel-2" draworder="5" align="center">
         <context>5</context>
@@ -654,6 +656,8 @@
         <value>MIX/ICE</value>
         <value lang="PT">GELO</value>
         <value lang="SV">MIX/IS</value>
+        <value lang="CA">GELADA</value>
+        <value lang="ES">HELADA</value>
       </textarea>
       <textarea name="maplabel-3" draworder="5" align="center">
         <context>5</context>
@@ -662,6 +666,8 @@
         <value>SNOW</value>
         <value lang="PT">NEVE</value>
         <value lang="SV">SNÖ</value>
+        <value lang="CA">NEU</value>
+        <value lang="ES">NIEVE</value>
       </textarea>
 
       <textarea name="maplabel-4" draworder="5" align="right">
@@ -671,6 +677,8 @@
         <value>LIGHT</value>
         <value lang="PT">MENOS</value>
         <value lang="SV">LÄTT</value>
+        <value lang="CA">SUAU</value>
+        <value lang="ES">LIGERA</value>
       </textarea>
       <textarea name="maplabel-5" draworder="5" align="right">
         <context>5</context>
@@ -679,6 +687,8 @@
         <value>LIGHT</value>
         <value lang="PT">MENOS</value>
         <value lang="SV">LÄTT</value>
+        <value lang="CA">SUAU</value>
+        <value lang="ES">LIGERA</value>
       </textarea>
       <textarea name="maplabel-6" draworder="5" align="right">
         <context>5</context>
@@ -687,6 +697,8 @@
         <value>LIGHT</value>
         <value lang="PT">MENOS</value>
         <value lang="SV">LÄTT</value>
+        <value lang="CA">SUAU</value>
+        <value lang="ES">LIGERA</value>
       </textarea>
 
       <textarea name="maplabel-7" draworder="5" align="left">
@@ -696,6 +708,8 @@
         <value>HEAVY</value>
         <value lang="PT">MAIS</value>
         <value lang="SV">KRAFTIGT</value>
+        <value lang="CA">FORTA</value>
+        <value lang="ES">FUERTE</value>
       </textarea>
       <textarea name="maplabel-8" draworder="5" align="left">
         <context>5</context>
@@ -704,6 +718,8 @@
         <value>HEAVY</value>
         <value lang="PT">MAIS</value>
         <value lang="SV">KRAFTIGT</value>
+        <value lang="CA">FORTA</value>
+        <value lang="ES">FUERTE</value>
       </textarea>
       <textarea name="maplabel-9" draworder="5" align="left">
         <context>5</context>
@@ -712,6 +728,8 @@
         <value>HEAVY</value>
         <value lang="PT">MAIS</value>
         <value lang="SV">KRAFTIGT</value>
+        <value lang="CA">FORTA</value>
+        <value lang="ES">FUERTE</value>
       </textarea>
 
       <image name="radarbk" draworder="4">
@@ -745,6 +763,8 @@
         <value lang="DK">Indtast postkode</value>
         <value lang="PT">Código Postal</value>
         <value lang="SV">Mata in postnummer</value>
+        <value lang="ES">Código Postal</value>
+        <value lang="CA">Còdi Postal</value>
         <area>0,215,800,25</area>
       </textarea>
       <textarea name="locationhold" draworder="7" align="center">

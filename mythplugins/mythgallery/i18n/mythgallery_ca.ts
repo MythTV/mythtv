@@ -3,125 +3,125 @@
     <name>IconView</name>
     <message>
         <source>Caching thumbnails...</source>
-        <translation type="unfinished"></translation>
+        <translation>Preparant previsualitzacions...</translation>
     </message>
     <message>
         <source>Import pictures?</source>
-        <translation type="unfinished"></translation>
+        <translation>Importar imatges?</translation>
     </message>
     <message>
         <source>No</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation type="unfinished"></translation>
+        <translation>Si</translation>
     </message>
     <message>
         <source>Nothing found to import</source>
-        <translation type="unfinished"></translation>
+        <translation>No he trovat res per a importar</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
         <source>Directory that holds images</source>
-        <translation type="unfinished"></translation>
+        <translation>Directori que conté les imatges</translation>
     </message>
     <message>
         <source>This directory must exist and MythGallery needs to have read permission.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aquest directori ha d&apos;existir i s&apos;hi ha de tenir accès de lectura.</translation>
     </message>
     <message>
         <source>Paths to import images from</source>
-        <translation type="unfinished"></translation>
+        <translation>Camí per a importar imatges</translation>
     </message>
     <message>
         <source>Type of transition</source>
-        <translation type="unfinished"></translation>
+        <translation>Tipus de transició</translation>
     </message>
     <message>
         <source>Type of background</source>
-        <translation type="unfinished"></translation>
+        <translation>Tipus de fons</translation>
     </message>
     <message>
         <source>This is the number of seconds to display each picture.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aquest és el nombre de segons per visualitzar cada imatge.</translation>
     </message>
     <message>
         <source>MythGallery Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Configuració de MythGallery</translation>
     </message>
     <message>
         <source>This is a colon separated list of paths. If the path in the list is a directory, its contents will be copied. If it is an executable, it will be run.</source>
-        <translation type="unfinished"></translation>
+        <translation>Camins separats per dos punts (&apos;:&apos;). Si el camí és un directori, el contingut serà copiat, si és un programa, serà executat.</translation>
     </message>
     <message>
         <source>This is the type of transition used between pictures in slideshow mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aquest és el tipus de transició entre imatges en el mode de presentació.</translation>
     </message>
     <message>
         <source>This is the type of background for each picture in single view mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>És el tipus de fons per a cada imatge en el mode de una sola imatge.</translation>
     </message>
     <message>
         <source>SlideshowDelay</source>
-        <translation type="unfinished"></translation>
+        <translation>Espera en Presentació</translation>
     </message>
 </context>
 <context>
     <name>SingleView</name>
     <message>
         <source>Bytes</source>
-        <translation type="unfinished"></translation>
+        <translation>Bytes</translation>
     </message>
     <message>
         <source>Width</source>
-        <translation type="unfinished"></translation>
+        <translation>Amplada</translation>
     </message>
     <message>
         <source>Height</source>
-        <translation type="unfinished"></translation>
+        <translation>Alçada</translation>
     </message>
     <message>
         <source>Pixel Count</source>
-        <translation type="unfinished"></translation>
+        <translation>Nombre de Pixels</translation>
     </message>
     <message>
         <source>Rotation Angle</source>
-        <translation type="unfinished"></translation>
+        <translation>Angle de rotació</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>pixels</source>
-        <translation type="unfinished"></translation>
+        <translation>píxels</translation>
     </message>
     <message>
         <source>megapixels</source>
-        <translation type="unfinished"></translation>
+        <translation>megapíxels</translation>
     </message>
     <message>
         <source>degrees</source>
-        <translation type="unfinished"></translation>
+        <translation>graus</translation>
     </message>
     <message>
         <source>Filename: </source>
-        <translation type="unfinished"></translation>
+        <translation>Nom d&apos;arxiu:</translation>
     </message>
     <message>
         <source>Created: </source>
-        <translation type="unfinished"></translation>
+        <translation>Creat:</translation>
     </message>
     <message>
         <source>Modified: </source>
-        <translation type="unfinished"></translation>
+        <translation>Modificat:</translation>
     </message>
 </context>
 </TS>

@@ -3,51 +3,51 @@
     <name>DVDRipBox</name>
     <message>
         <source>Your connection to the Myth Transcoding Daemon has gone away. This is not a good thing.</source>
-        <translation type="unfinished"></translation>
+        <translation>La seva connexió amb el procés de trascodificació s&apos;ha perdut. Això no és bó.</translation>
     </message>
     <message>
         <source>Cannot connect to your Myth Transcoding Daemon. You can try hitting any number key to start it. If you still see this message, then something is really wrong.</source>
-        <translation type="unfinished"></translation>
+        <translation>No puc connectar amb el procés de Trascodificació. Provi de prèmer qualsevol tecla numèrica per iniciar-lo. Si després encara llegeix aquest missatge, alguna cosa va malament.</translation>
     </message>
     <message>
         <source>Attempting to connect to your mtd said host not found. This is unrecoverably bad. </source>
-        <translation type="unfinished"></translation>
+        <translation>Intentant connectar amb el procés de trascodificació no s&apos;ha trovat el nom de màquina, això és un error fatal.</translation>
     </message>
     <message>
         <source>Socket communication errors. This is unrecoverably bad. </source>
-        <translation type="unfinished"></translation>
+        <translation>Error de comunicacions (socket). Aquest és un error fatal.</translation>
     </message>
     <message>
         <source>Something is wrong, but I don&apos;t know what.</source>
-        <translation type="unfinished"></translation>
+        <translation>Alguna cosa no va bé, pero no sé quina.</translation>
     </message>
     <message>
         <source>Job %1 of %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Tasca %1 de %2</translation>
     </message>
     <message>
         <source>No jobs and nothing else to do. You could hit 0 to rip a DVD.</source>
-        <translation type="unfinished"></translation>
+        <translation>No hi han tasques ni res més a fer. Pot prèmer 0 per volcar un DVD.</translation>
     </message>
     <message>
         <source>No Jobs. Checking and/or waiting for DVD.</source>
-        <translation type="unfinished"></translation>
+        <translation>No hi ha tasques. Esperant/comprovant si hi ha un nou DVD.</translation>
     </message>
     <message>
         <source>No jobs and nothing else to do. You could hit 0 to rip a disc if you like.</source>
-        <translation type="unfinished"></translation>
+        <translation>No hi han tasques pendents ni res més a fer. Pot prèmer 0 si vol volcar un disc.</translation>
     </message>
     <message>
         <source>Cancelling ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Cancelant...</translation>
     </message>
     <message>
         <source>0 New Rip</source>
-        <translation type="unfinished"></translation>
+        <translation>0 Nou volcat</translation>
     </message>
     <message>
         <source>9 Cancel Job</source>
-        <translation type="unfinished"></translation>
+        <translation>9 Cancel·lar tasca</translation>
     </message>
 </context>
 <context>
@@ -56,236 +56,244 @@
         <source>
 
 You have no VCD Player command defined.</source>
-        <translation type="unfinished"></translation>
+        <translation>
+
+No hi ha cap comanda definida per als VCD.</translation>
     </message>
     <message>
         <source>OK, I&apos;ll go run Setup</source>
-        <translation type="unfinished"></translation>
+        <translation>D&apos;acord, aniré a la configuració</translation>
     </message>
     <message>
         <source>
 
 You have no VCD Device defined.</source>
-        <translation type="unfinished"></translation>
+        <translation>
+
+No hi ha cap dispositiu VCD definit.</translation>
     </message>
     <message>
         <source>
 
 You have no DVD Player command defined.</source>
-        <translation type="unfinished"></translation>
+        <translation>
+
+No hi ha una comanda assignada per a la reproducció de DVD.</translation>
     </message>
     <message>
         <source>
 
 You have no DVD Device defined.</source>
-        <translation type="unfinished"></translation>
+        <translation>
+
+No hi ha un dispositiu de DVD definit.</translation>
     </message>
     <message>
         <source>Location of VCD device</source>
-        <translation type="unfinished"></translation>
+        <translation>Localització del dispositiu VCD</translation>
     </message>
     <message>
         <source>This device must exist, and the user running MythDVD needs to have read permission on the device.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aquest dispositiu ha d&apos;existir, i l&apos;usuari de MythDVD hi ha de tenir permís de lectura.</translation>
     </message>
     <message>
         <source>Location of DVD device</source>
-        <translation type="unfinished"></translation>
+        <translation>Localització del dispositiu DVD</translation>
     </message>
     <message>
         <source>General Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Configuració General</translation>
     </message>
     <message>
         <source>DVD Player Command</source>
-        <translation type="unfinished"></translation>
+        <translation>Comanda per a la reproducció de DVD</translation>
     </message>
     <message>
         <source>This can be any command to launch a DVD player (e.g. MPlayer, ogle, etc.). If present, %d will be substituted for the DVD device (e.g. /dev/dvd).</source>
-        <translation type="unfinished"></translation>
+        <translation>Pot especificar qualsevol comanda per a reproduir DVDs (p.ex.: mplayer, ogle, xine...). Si s&apos;especifica, %d es substituirà per el dispositiu de DVD (p.ex.: /dev/dvd).</translation>
     </message>
     <message>
         <source>VCD Player Command</source>
-        <translation type="unfinished"></translation>
+        <translation>Comanda per a la reproducció de VCD</translation>
     </message>
     <message>
         <source>This can be any command to launch a VCD player (e.g. MPlayer, xine, etc.). If present, %d will be substituted for the VCD device (e.g. /dev/cdrom).</source>
-        <translation type="unfinished"></translation>
+        <translation>Pot especificar qualsevol comanda per a reproduir VCDs (p.ex.: mplayer, xine...). Si s&apos;especifica, %d es substituirà per el dispositiu de VCD (p.ex.: /dev/cdrom).</translation>
     </message>
     <message>
         <source>DVD Player Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Configuració del reproductor de DVD</translation>
     </message>
     <message>
         <source>VCD Player Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Configuració del reproductor de VCD</translation>
     </message>
     <message>
         <source>Directory to hold temporary files</source>
-        <translation type="unfinished"></translation>
+        <translation>Directori per emmagetzemar arxius temporals</translation>
     </message>
     <message>
         <source>This directory must exist, and the user running MythDVD needs to have write permission to the directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aquest directori ha d&apos;existir i l&apos;usuari que executa MythDVD hi ha de tenir permís en escriptura.</translation>
     </message>
     <message>
         <source>Title Playing Command</source>
-        <translation type="unfinished"></translation>
+        <translation>Comanda de reproducció del títol</translation>
     </message>
     <message>
         <source>This is a command used to preview a given title on a DVD. If present %t will be set to the title, %d for device, %a for audio track, %c for audio channels.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aquesta és una comanda per a la previsualització de un títol del DVD. Si s&apos;especifica %t serà substituit pel títol, %d pel dispositiu, %a per la pista d&apos;àudio, %c per als canals d&apos;àudio.</translation>
     </message>
     <message>
         <source>Subtitle arguments:</source>
-        <translation type="unfinished"></translation>
+        <translation>Paràmetres dels subtítols:</translation>
     </message>
     <message>
         <source>If you choose any subtitles for ripping, this command is added to the end of the Title Play Command to allow previewing of subtitles. If  present %s will be set to the subtitle track. </source>
-        <translation type="unfinished"></translation>
+        <translation>Si escull subtítols en el volcat, aquesta comanda s&apos;afegirà al final de la comanda del reproducció del titol per permetre la previsualitzacioó dels subtítols. Si s&apos;especifica %s es substituirà per la pista de subtítols.</translation>
     </message>
     <message>
         <source>Base transcode command</source>
-        <translation type="unfinished"></translation>
+        <translation>Comanda de trascodificació bàsica</translation>
     </message>
     <message>
         <source>This is the base (without arguments) command to run transcode on your system.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aquesta es la comanda (sense paràmetres) bàsica per a la trasc odificació en el seu sistema.</translation>
     </message>
     <message>
         <source>MTD port number</source>
-        <translation type="unfinished"></translation>
+        <translation>Número de port del MTD</translation>
     </message>
     <message>
         <source>The port number that should be used for communicating with the MTD (Myth Transcoding Daemon)</source>
-        <translation type="unfinished"></translation>
+        <translation>El número de port que es farà servir per a la comunicació amb el MTD (Myth Transcoding Daemon)</translation>
     </message>
     <message>
         <source>MTD logs to terminal window</source>
-        <translation type="unfinished"></translation>
+        <translation>Traçes del MTD a la finestra del terminal</translation>
     </message>
     <message>
         <source>If set, the MTD (Myth Transcoding Daemon) will log to the window it is started from. Otherwise, it will write to a file called  mtd.log in the top level ripping directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>Si s&apos;activa, el MTD (Myth Transcoding Daemon) donarà traces a la finestra des d&apos;on s&apos;ha iniciat, en cas contrari, ho escriurà en un arxiu anomenat mtd.log que es trovarà en el nivell superior del directori de volcat.</translation>
     </message>
     <message>
         <source>Transcode AC3 Audio</source>
-        <translation type="unfinished"></translation>
+        <translation>Trascodificar àudio AC3</translation>
     </message>
     <message>
         <source>If set, the MTD (Myth Transcoding Daemon) will, by default, preserve AC3 (Dolby Digital) audio in transcoded files. </source>
-        <translation type="unfinished"></translation>
+        <translation>Si s&apos;activa, el MTD (Myth Transcoding Daemon), per omisió, conservarà el sò AC3 (Dolby Digital) en la trascodificació.</translation>
     </message>
     <message>
         <source>Use xvid rather than divx</source>
-        <translation type="unfinished"></translation>
+        <translation>Fer servid &apos;xvid&apos; en lloc de &apos;divx&apos;</translation>
     </message>
     <message>
         <source>If set, mythdvd will use the (open, free) xvid codec rather than divx whenever possible.</source>
-        <translation type="unfinished"></translation>
+        <translation>Si s&apos;activa, MythDVD intentarà fer servir el còdec &apos;xvid&apos; (obert, lliure) avans que el &apos;divx&apos; si és que pot fer-ho.</translation>
     </message>
     <message>
         <source>Nice level for MTD</source>
-        <translation type="unfinished"></translation>
+        <translation>Nivell de prioritat (nice) del MTD</translation>
     </message>
     <message>
         <source>This determines the priority of the Myth Transcoding Daemon. Higher numbers mean lower priority (more CPU to other tasks).</source>
-        <translation type="unfinished"></translation>
+        <translation>Determina la prioritat del NTD (Myth Transcoder Daemon). Un valor superior significa menys prioritat (més processador per a altres tasques).</translation>
     </message>
     <message>
         <source>Ripped video segments</source>
-        <translation type="unfinished"></translation>
+        <translation>Segments de vídeo volcats</translation>
     </message>
     <message>
         <source>If set to something other than 0, ripped video titles will be broken up into files of this size (in MB). Applies to both perfect quality recordings and intermediate files used for transcoding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Si s&apos;especifica quelcom diferent de 0, els segments de vídeo seran volcats en fragments d&apos;aquest tamany (en MB). Aplica a tant als arxius temporals com als definitius.</translation>
     </message>
     <message>
         <source>DVD Ripper Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Configuració del volcador de DVD</translation>
     </message>
     <message>
         <source>MTD Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Configuració del MTD</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Desconegut</translation>
     </message>
     <message>
         <source>Waiting For Access to DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Esperant a accedir al DVD</translation>
     </message>
     <message>
         <source>Ripping to file ~</source>
-        <translation type="unfinished"></translation>
+        <translation>Volcant al arxiu ~ </translation>
     </message>
     <message>
         <source>Perfect DVD Rip of %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Volcat perfecte de DVD de %1</translation>
     </message>
     <message>
         <source>Transcode of %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Trascodificació de %1</translation>
     </message>
     <message>
         <source>Waiting for Permission to Start Transcoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Esperant autorització per a iniciar trascodificació</translation>
     </message>
     <message>
         <source>Transcoding Pass 1 of 2 ~</source>
-        <translation type="unfinished"></translation>
+        <translation>Trascodificant, passada 1 de 2 ~ </translation>
     </message>
     <message>
         <source>Transcoding Pass 2 of 2 ~</source>
-        <translation type="unfinished"></translation>
+        <translation>Trascodificant, passada 2 de 2 ~ </translation>
     </message>
     <message>
         <source>Transcoding ~</source>
-        <translation type="unfinished"></translation>
+        <translation>Trascodificant ~ </translation>
     </message>
     <message>
         <source>Transcode is thinking </source>
-        <translation type="unfinished"></translation>
+        <translation>Es trascodificador està pensant</translation>
     </message>
     <message>
         <source>Simultaneous Transcode Jobs</source>
-        <translation type="unfinished"></translation>
+        <translation>Tasques simultànies de trascodificació</translation>
     </message>
     <message>
         <source>This determines the number of simultaneous transcode jobs. If set at 1 (the default), there will only be one active job at a time.</source>
-        <translation type="unfinished"></translation>
+        <translation>Determina el nombre de tasques de trascodificació simultànies. Si es posa a 1 (el valor per omisió) només hi haurà una tasca.</translation>
     </message>
 </context>
 <context>
     <name>TitleDialog</name>
     <message>
         <source>Unkown</source>
-        <translation type="unfinished"></translation>
+        <translation>Desconegut</translation>
     </message>
     <message>
         <source>%1 - Title %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 - Títol %2</translation>
     </message>
     <message>
         <source>Perfect</source>
-        <translation type="unfinished"></translation>
+        <translation>Perfecte</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Cap</translation>
     </message>
     <message>
         <source>Title %1 of %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Títol %1 de %2</translation>
     </message>
     <message>
         <source>0 Process Selected Title</source>
-        <translation type="unfinished"></translation>
+        <translation>0 Processar el títol escollit</translation>
     </message>
     <message>
         <source>0 Process Selected Titles</source>
-        <translation type="unfinished"></translation>
+        <translation>0 Processar els títols escollits</translation>
     </message>
 </context>
 </TS>
