@@ -395,7 +395,7 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
     </message>
     <message>
         <source>Date:</source>
-        <translation>Datum:</translation>
+        <translation type="obsolete">Datum:</translation>
     </message>
     <message>
         <source>Time:</source>
@@ -403,11 +403,11 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
     </message>
     <message>
         <source>hr</source>
-        <translation>uur</translation>
+        <translation type="obsolete">uur</translation>
     </message>
     <message>
         <source>min</source>
-        <translation>min</translation>
+        <translation type="obsolete">min</translation>
     </message>
     <message>
         <source>Duration:</source>
@@ -415,23 +415,23 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
     </message>
     <message>
         <source>Title:</source>
-        <translation>Titel:</translation>
+        <translation type="obsolete">Titel:</translation>
     </message>
     <message>
         <source>Subtitle:</source>
-        <translation>Afleveringstitel:</translation>
+        <translation type="obsolete">Afleveringstitel:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation>Beschrijving:</translation>
+        <translation type="obsolete">Beschrijving:</translation>
     </message>
     <message>
         <source>Save this scheduled recording and exit</source>
-        <translation>Bewaar deze geplande opname en sluit af</translation>
+        <translation type="obsolete">Bewaar deze geplande opname en sluit af</translation>
     </message>
     <message>
         <source>Save this scheduled recording and set another</source>
-        <translation>Bewaar deze geplande opname en plan een volgende opname</translation>
+        <translation type="obsolete">Bewaar deze geplande opname en plan een volgende opname</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -439,7 +439,31 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
     </message>
     <message>
         <source>Manual recording</source>
-        <translation>Manuele opname</translation>
+        <translation type="obsolete">Manuele opname</translation>
+    </message>
+    <message>
+        <source>Date or day of the week</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>minute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation type="unfinished">minuten</translation>
+    </message>
+    <message>
+        <source>Title (optional):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set Recording Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manual Record</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -800,6 +824,18 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
         <source>Add to Playlist</source>
         <translation>Voeg toe aan Afspeellijst</translation>
     </message>
+    <message>
+        <source>User Job</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop</source>
+        <translation type="unfinished">Einde</translation>
+    </message>
+    <message>
+        <source>Begin</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PreviousBox</name>
@@ -1020,6 +1056,18 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
     <message>
         <source>Power Recording Rule</source>
         <translation>Regel voor Geavanceerd Opnemen</translation>
+    </message>
+    <message>
+        <source>(Any Program Type)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(Any Category)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(Any Station)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5692,10 +5740,6 @@ Werkt mogelijk alleen wanneer uitgevoerd in een venster.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Sort shows</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>S</source>
         <comment>RecTypeChar kSingleRecord</comment>
         <translation type="unfinished"></translation>
@@ -5972,6 +6016,10 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>This global setting allows the recorder to record beyond the scheduled end time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resize Video while transcoding</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

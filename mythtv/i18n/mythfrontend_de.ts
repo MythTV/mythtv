@@ -370,7 +370,7 @@
     </message>
     <message>
         <source>Date:</source>
-        <translation>Datum:</translation>
+        <translation type="obsolete">Datum:</translation>
     </message>
     <message>
         <source>Time:</source>
@@ -378,11 +378,11 @@
     </message>
     <message>
         <source>hr</source>
-        <translation>Uhr</translation>
+        <translation type="obsolete">Uhr</translation>
     </message>
     <message>
         <source>min</source>
-        <translation>min</translation>
+        <translation type="obsolete">min</translation>
     </message>
     <message>
         <source>Duration:</source>
@@ -390,23 +390,23 @@
     </message>
     <message>
         <source>Title:</source>
-        <translation>Titel:</translation>
+        <translation type="obsolete">Titel:</translation>
     </message>
     <message>
         <source>Subtitle:</source>
-        <translation>Untertitel:</translation>
+        <translation type="obsolete">Untertitel:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation>Inhalt:</translation>
+        <translation type="obsolete">Inhalt:</translation>
     </message>
     <message>
         <source>Save this scheduled recording and exit</source>
-        <translation>Speichern und zurück ins Menü</translation>
+        <translation type="obsolete">Speichern und zurück ins Menü</translation>
     </message>
     <message>
         <source>Save this scheduled recording and set another</source>
-        <translation>Speichern und eine weitere Aufnahme eingeben</translation>
+        <translation type="obsolete">Speichern und eine weitere Aufnahme eingeben</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -414,7 +414,31 @@
     </message>
     <message>
         <source>Manual recording</source>
-        <translation>Manuelle Aufnahme</translation>
+        <translation type="obsolete">Manuelle Aufnahme</translation>
+    </message>
+    <message>
+        <source>Date or day of the week</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>minute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation type="unfinished">Minuten</translation>
+    </message>
+    <message>
+        <source>Title (optional):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set Recording Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manual Record</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -763,6 +787,18 @@
         <source>Add to Playlist</source>
         <translation>Der Playlist hinzufügen</translation>
     </message>
+    <message>
+        <source>User Job</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop</source>
+        <translation type="unfinished">Stopp</translation>
+    </message>
+    <message>
+        <source>Begin</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PreviousBox</name>
@@ -983,6 +1019,18 @@
     <message>
         <source>Power Recording Rule</source>
         <translation>Flexible Aufnahmeregel</translation>
+    </message>
+    <message>
+        <source>(Any Program Type)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(Any Category)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(Any Station)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5300,7 +5348,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Sort shows</source>
-        <translation>Sendungen sortieren</translation>
+        <translation type="obsolete">Sendungen sortieren</translation>
     </message>
     <message>
         <source>S</source>
@@ -5647,6 +5695,10 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>This global setting allows the recorder to record beyond the scheduled end time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resize Video while transcoding</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

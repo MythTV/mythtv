@@ -374,7 +374,7 @@
     </message>
     <message>
         <source>Date:</source>
-        <translation>Päivämäärä: </translation>
+        <translation type="obsolete">Päivämäärä: </translation>
     </message>
     <message>
         <source>Time:</source>
@@ -382,11 +382,11 @@
     </message>
     <message>
         <source>hr</source>
-        <translation> tuntia</translation>
+        <translation type="obsolete"> tuntia</translation>
     </message>
     <message>
         <source>min</source>
-        <translation> min</translation>
+        <translation type="obsolete"> min</translation>
     </message>
     <message>
         <source>Duration:</source>
@@ -394,23 +394,23 @@
     </message>
     <message>
         <source>Title:</source>
-        <translation>Ohjelman nimi:</translation>
+        <translation type="obsolete">Ohjelman nimi:</translation>
     </message>
     <message>
         <source>Subtitle:</source>
-        <translation>Lisätietoja:</translation>
+        <translation type="obsolete">Lisätietoja:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation>Tiivistelmä:</translation>
+        <translation type="obsolete">Tiivistelmä:</translation>
     </message>
     <message>
         <source>Save this scheduled recording and exit</source>
-        <translation>Tallenna kyseinen ohjelmoitu nauhoitus ja lopeta</translation>
+        <translation type="obsolete">Tallenna kyseinen ohjelmoitu nauhoitus ja lopeta</translation>
     </message>
     <message>
         <source>Save this scheduled recording and set another</source>
-        <translation>Tallenna kyseinen ohjelmoitu nauhoitus ja määritä toinen</translation>
+        <translation type="obsolete">Tallenna kyseinen ohjelmoitu nauhoitus ja määritä toinen</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -418,7 +418,31 @@
     </message>
     <message>
         <source>Manual recording</source>
-        <translation>Manuaalinen nauhoitus</translation>
+        <translation type="obsolete">Manuaalinen nauhoitus</translation>
+    </message>
+    <message>
+        <source>Date or day of the week</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>minute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation type="unfinished">minuuttia</translation>
+    </message>
+    <message>
+        <source>Title (optional):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set Recording Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manual Record</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -771,6 +795,18 @@
         <source>Add to Playlist</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>User Job</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop</source>
+        <translation type="unfinished">Loppuu</translation>
+    </message>
+    <message>
+        <source>Begin</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PreviousBox</name>
@@ -990,6 +1026,18 @@
     </message>
     <message>
         <source>Power Recording Rule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(Any Program Type)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(Any Category)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(Any Station)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5838,10 +5886,6 @@ Myth will now exit.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Sort shows</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>S</source>
         <comment>RecTypeChar kSingleRecord</comment>
         <translation type="unfinished">S</translation>
@@ -6118,6 +6162,10 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>This global setting allows the recorder to record beyond the scheduled end time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resize Video while transcoding</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -915,7 +915,7 @@ void ProgLister::powerEdit()
     powerPopup->addWidget(powerDescEdit);
 
     powerCatType = new MythComboBox(false, powerPopup);
-    powerCatType->insertItem("(Any Program Type)");
+    powerCatType->insertItem(tr("(Any Program Type)"));
     typeList.clear();
     typeList << "";
     powerCatType->insertItem(tr("Movies"));
@@ -930,7 +930,7 @@ void ProgLister::powerEdit()
     powerPopup->addWidget(powerCatType);
 
     powerCategory = new MythComboBox(false, powerPopup);
-    powerCategory->insertItem("(Any Category)");
+    powerCategory->insertItem(tr("(Any Category)"));
     categoryList.clear();
     categoryList << "";
 
@@ -954,7 +954,7 @@ void ProgLister::powerEdit()
     powerPopup->addWidget(powerCategory);
 
     powerStation = new MythComboBox(false, powerPopup);
-    powerStation->insertItem("(Any Station)");
+    powerStation->insertItem(tr("(Any Station)"));
     stationList.clear();
     stationList << "";
 

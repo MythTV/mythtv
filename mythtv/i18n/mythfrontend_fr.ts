@@ -370,7 +370,7 @@
     </message>
     <message>
         <source>Date:</source>
-        <translation>Date:</translation>
+        <translation type="obsolete">Date:</translation>
     </message>
     <message>
         <source>Time:</source>
@@ -378,11 +378,11 @@
     </message>
     <message>
         <source>hr</source>
-        <translation>h</translation>
+        <translation type="obsolete">h</translation>
     </message>
     <message>
         <source>min</source>
-        <translation>min</translation>
+        <translation type="obsolete">min</translation>
     </message>
     <message>
         <source>Duration:</source>
@@ -390,23 +390,23 @@
     </message>
     <message>
         <source>Title:</source>
-        <translation>Titre:</translation>
+        <translation type="obsolete">Titre:</translation>
     </message>
     <message>
         <source>Subtitle:</source>
-        <translation>Sous-titre:</translation>
+        <translation type="obsolete">Sous-titre:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation>Description:</translation>
+        <translation type="obsolete">Description:</translation>
     </message>
     <message>
         <source>Save this scheduled recording and exit</source>
-        <translation>Enregistrer cette programmation et quitter</translation>
+        <translation type="obsolete">Enregistrer cette programmation et quitter</translation>
     </message>
     <message>
         <source>Save this scheduled recording and set another</source>
-        <translation>Enregistrer cette programmation et en entrer une autre</translation>
+        <translation type="obsolete">Enregistrer cette programmation et en entrer une autre</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -414,7 +414,31 @@
     </message>
     <message>
         <source>Manual recording</source>
-        <translation>Enregistrement manuel</translation>
+        <translation type="obsolete">Enregistrement manuel</translation>
+    </message>
+    <message>
+        <source>Date or day of the week</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>minute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation type="unfinished">minutes</translation>
+    </message>
+    <message>
+        <source>Title (optional):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set Recording Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manual Record</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -763,6 +787,18 @@
         <source>Add to Playlist</source>
         <translation>Ajouter à la liste</translation>
     </message>
+    <message>
+        <source>User Job</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop</source>
+        <translation type="unfinished">Interrompre</translation>
+    </message>
+    <message>
+        <source>Begin</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PreviousBox</name>
@@ -983,6 +1019,18 @@
     <message>
         <source>Power Recording Rule</source>
         <translation>Règles d&apos;enregistrement avancé</translation>
+    </message>
+    <message>
+        <source>(Any Program Type)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(Any Category)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(Any Station)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5501,7 +5549,7 @@ La fréquence de cette chaîne en Hz.</translation>
     </message>
     <message>
         <source>Sort shows</source>
-        <translation>Trier les diffusions</translation>
+        <translation type="obsolete">Trier les diffusions</translation>
     </message>
     <message>
         <source>Use libmpeg2 for decoding</source>
@@ -5700,6 +5748,10 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>This global setting allows the recorder to record beyond the scheduled end time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resize Video while transcoding</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

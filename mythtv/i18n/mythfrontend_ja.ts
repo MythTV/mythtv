@@ -404,7 +404,7 @@
     </message>
     <message>
         <source>Date:</source>
-        <translation>日付:</translation>
+        <translation type="obsolete">日付:</translation>
     </message>
     <message>
         <source>Time:</source>
@@ -412,11 +412,11 @@
     </message>
     <message>
         <source>hr</source>
-        <translation>時</translation>
+        <translation type="obsolete">時</translation>
     </message>
     <message>
         <source>min</source>
-        <translation>分</translation>
+        <translation type="obsolete">分</translation>
     </message>
     <message>
         <source>Duration:</source>
@@ -424,23 +424,23 @@
     </message>
     <message>
         <source>Title:</source>
-        <translation>タイトル:</translation>
+        <translation type="obsolete">タイトル:</translation>
     </message>
     <message>
         <source>Subtitle:</source>
-        <translation>サブタイトル:</translation>
+        <translation type="obsolete">サブタイトル:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation>内容:</translation>
+        <translation type="obsolete">内容:</translation>
     </message>
     <message>
         <source>Save this scheduled recording and exit</source>
-        <translation>予約を保存して終了する</translation>
+        <translation type="obsolete">予約を保存して終了する</translation>
     </message>
     <message>
         <source>Save this scheduled recording and set another</source>
-        <translation>予約を保存して別の予約をする</translation>
+        <translation type="obsolete">予約を保存して別の予約をする</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -448,7 +448,31 @@
     </message>
     <message>
         <source>Manual recording</source>
-        <translation>手動録画</translation>
+        <translation type="obsolete">手動録画</translation>
+    </message>
+    <message>
+        <source>Date or day of the week</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>minute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation type="unfinished">分</translation>
+    </message>
+    <message>
+        <source>Title (optional):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set Recording Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manual Record</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -803,6 +827,18 @@
         <source>Add to Playlist</source>
         <translation>プレイリストに追加する</translation>
     </message>
+    <message>
+        <source>User Job</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop</source>
+        <translation type="unfinished">停止</translation>
+    </message>
+    <message>
+        <source>Begin</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PreviousBox</name>
@@ -1023,6 +1059,18 @@
     <message>
         <source>Power Recording Rule</source>
         <translation>パワーレコーディングルール</translation>
+    </message>
+    <message>
+        <source>(Any Program Type)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(Any Category)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(Any Station)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5856,7 +5904,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Sort shows</source>
-        <translation>ファイルを削除するときにシンボリックリンクをたどる</translation>
+        <translation type="obsolete">ファイルを削除するときにシンボリックリンクをたどる</translation>
     </message>
     <message>
         <source>S</source>
@@ -6139,6 +6187,10 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>This global setting allows the recorder to record beyond the scheduled end time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
         <translation>このグローバルな設定は予約録画終了時に有効になります。スケジューラーには影響しません。録画と録画の間に十分な時間がないと時は無視されます。</translation>
+    </message>
+    <message>
+        <source>Resize Video while transcoding</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -370,19 +370,15 @@
     </message>
     <message>
         <source>Date:</source>
-        <translation>Datum:</translation>
-    </message>
-    <message>
-        <source>Time:</source>
-        <translation>Tid:</translation>
+        <translation type="obsolete">Datum:</translation>
     </message>
     <message>
         <source>hr</source>
-        <translation>tim</translation>
+        <translation type="obsolete">tim</translation>
     </message>
     <message>
         <source>min</source>
-        <translation>min</translation>
+        <translation type="obsolete">min</translation>
     </message>
     <message>
         <source>Duration:</source>
@@ -390,23 +386,11 @@
     </message>
     <message>
         <source>Title:</source>
-        <translation>Titel:</translation>
+        <translation type="obsolete">Titel:</translation>
     </message>
     <message>
         <source>Subtitle:</source>
-        <translation>Undertitel:</translation>
-    </message>
-    <message>
-        <source>Description:</source>
-        <translation>Beskrivning:</translation>
-    </message>
-    <message>
-        <source>Save this scheduled recording and exit</source>
-        <translation>Spara denna inspelning och gå tillbaka</translation>
-    </message>
-    <message>
-        <source>Save this scheduled recording and set another</source>
-        <translation>Spara denna inspelning och schemalägg en till</translation>
+        <translation type="obsolete">Undertitel:</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -414,6 +398,42 @@
     </message>
     <message>
         <source>Manual recording</source>
+        <translation type="obsolete">Manuell inspelning</translation>
+    </message>
+    <message>
+        <source>Save and exit</source>
+        <translation type="obsolete">Spara och stäng</translation>
+    </message>
+    <message>
+        <source>Save and set another</source>
+        <translation type="obsolete">Spara och fortsätt</translation>
+    </message>
+    <message>
+        <source>Date or day of the week</source>
+        <translation>Datum eller veckodag</translation>
+    </message>
+    <message>
+        <source>Time:</source>
+        <translation>Tid:</translation>
+    </message>
+    <message>
+        <source>minute</source>
+        <translation>minut</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation>minuter</translation>
+    </message>
+    <message>
+        <source>Title (optional):</source>
+        <translation>Titel (frivillig):</translation>
+    </message>
+    <message>
+        <source>Set Recording Options</source>
+        <translation>Inspelningsinställningar</translation>
+    </message>
+    <message>
+        <source>Manual Record</source>
         <translation>Manuell inspelning</translation>
     </message>
 </context>
@@ -763,6 +783,18 @@
         <source>Add to Playlist</source>
         <translation>Lägg till i spellista</translation>
     </message>
+    <message>
+        <source>User Job</source>
+        <translation>Användarjobb</translation>
+    </message>
+    <message>
+        <source>Stop</source>
+        <translation>Stoppa</translation>
+    </message>
+    <message>
+        <source>Begin</source>
+        <translation>Börja</translation>
+    </message>
 </context>
 <context>
     <name>PreviousBox</name>
@@ -983,6 +1015,18 @@
     <message>
         <source>Power Recording Rule</source>
         <translation>Avancerad inspelningsregel</translation>
+    </message>
+    <message>
+        <source>(Any Program Type)</source>
+        <translation>(Alla programtyper)</translation>
+    </message>
+    <message>
+        <source>(Any Category)</source>
+        <translation>(Alla kategorier)</translation>
+    </message>
+    <message>
+        <source>(Any Station)</source>
+        <translation>(Alla kanaler)</translation>
     </message>
 </context>
 <context>
@@ -1336,7 +1380,7 @@
     </message>
     <message>
         <source>List Newest Recording First</source>
-        <translation>Lista nyaste inspelningar först</translation>
+        <translation>Nyaste inspelningar först</translation>
     </message>
     <message>
         <source>Sticky keys</source>
@@ -2303,10 +2347,6 @@
     <message>
         <source>Try to skip commercial breaks even if they have not been flagged.  This does not always work well and can disrupt playback if commercial breaks aren&apos;t detected properly.</source>
         <translation>Försök att hoppa över reklampauser även fast de inte har identifierats. Detta fungerar inte alltid bra och kan avbryta uppspelningen om reklamen inte identifieras riktigt.</translation>
-    </message>
-    <message>
-        <source>This global setting is ignored in case of conflicts with other scheduled programs.</source>
-        <translation type="obsolete">Denna globala inställning ignoreras vid konflikt med andra inspelningar.</translation>
     </message>
     <message>
         <source>Program Guide Alpha</source>
@@ -5354,10 +5394,6 @@ som du startade detta programmet ifrån.</translation>
         <translation>Välj sorteringsmetod för ett programs avsnitt</translation>
     </message>
     <message>
-        <source>Sort shows</source>
-        <translation>Sortera program</translation>
-    </message>
-    <message>
         <source>S</source>
         <comment>RecTypeChar kSingleRecord</comment>
         <translation>E</translation>
@@ -5637,6 +5673,10 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     <message>
         <source>This global setting allows the recorder to record beyond the scheduled end time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
         <translation>Global inställning som anger hur lång tid efter programmets slut inspelningen slutar. Påverkar inte schemaläggaren. Värdet ignoreras då två program schemalagts utan tillräckligt med tid emellan.</translation>
+    </message>
+    <message>
+        <source>Resize Video while transcoding</source>
+        <translation>Ändra storlek på video under omkodning</translation>
     </message>
 </context>
 <context>
@@ -6166,10 +6206,6 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     <message>
         <source>1.5X</source>
         <translation>1,5X</translation>
-    </message>
-    <message>
-        <source>2.0X</source>
-        <translation type="obsolete">2,0X</translation>
     </message>
     <message>
         <source>Sleep Off</source>
