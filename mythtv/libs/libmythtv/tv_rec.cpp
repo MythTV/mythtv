@@ -369,7 +369,7 @@ void TVRec::SetupRecorder(int profileid)
     nvr->SetRingBuffer(rbuffer);
     nvr->SetVideoDevice(videodev);
 
-    RecordingProfile profile;
+    RecordingProfile profile(context);
     profile.loadByID(db_conn, profileid);
 
     QString setting = profile.byName("videocodec")->getValue();

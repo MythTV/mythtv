@@ -328,7 +328,8 @@ void ViewScheduled::handleConflicting(ProgramInfo *rec)
 
     if (ret == 1)
     {
-        SetRecTimeDialog *srt = new SetRecTimeDialog(m_context,rec,db);
+        SetRecTimeDialog srt(m_context,rec,db);
+        srt.exec();
     }
     else
     {

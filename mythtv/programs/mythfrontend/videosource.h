@@ -275,7 +275,8 @@ private:
 
 class CaptureCardDialog: public ConfigurationWizard {
 public:
-    CaptureCardDialog() {
+    CaptureCardDialog(MythContext *context) : ConfigurationWizard(context),
+                                              ConfigurationDialog(context) {
         CaptureCard* cc = new CaptureCard();
         cc->setLabel("Configure new capture card");
         addChild(cc);
@@ -284,7 +285,8 @@ public:
 
 class VideoSourceDialog: public ConfigurationWizard {
 public:
-    VideoSourceDialog() {
+    VideoSourceDialog(MythContext *context) : ConfigurationWizard(context),
+                                              ConfigurationDialog(context) {
         VideoSource* vs = new VideoSource();
         vs->setLabel("Configure new video source");
         addChild(vs);
@@ -293,7 +295,8 @@ public:
 
 class CardInputDialog: public ConfigurationWizard {
 public:
-    CardInputDialog() {
+    CardInputDialog(MythContext *context) : ConfigurationWizard(context),
+                                            ConfigurationDialog(context) {
         CardInput* ci = new CardInput();
         ci->setLabel("Configure capture card input");
         addChild(ci);

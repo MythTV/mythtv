@@ -21,13 +21,19 @@
 #include <qtabdialog.h>
 #include <qfile.h>
 #include <qlistview.h>
+#include <qcursor.h>
+#include <qapplication.h>
+#include <qwidget.h>
+
+#include "mythcontext.h"
 
 QWidget* VerticalConfigurationGroup::configWidget(QWidget* parent,
                                                   const char* widgetName) {
     
-    //QVGroupBox* widget = new QVGroupBox(parent, widgetName);
     QGroupBox* widget = new QGroupBox(parent, widgetName);
-    QVBoxLayout* layout = new QVBoxLayout(widget, 20);
+    widget->setBackgroundOrigin(QWidget::WindowOrigin);
+
+    QVBoxLayout* layout = new QVBoxLayout(widget, 18);
     widget->setTitle(getLabel());
     for(unsigned i = 0 ; i < children.size() ; ++i)
         if (children[i]->isVisible())
@@ -36,9 +42,25 @@ QWidget* VerticalConfigurationGroup::configWidget(QWidget* parent,
     return widget;
 }
 
+QWidget* HorizontalConfigurationGroup::configWidget(QWidget* parent,
+                                                    const char* widgetName) {
+
+    QGroupBox* widget = new QGroupBox(parent, widgetName);
+    widget->setBackgroundOrigin(QWidget::WindowOrigin);
+
+    QHBoxLayout* layout = new QHBoxLayout(widget, 20);
+    widget->setTitle(getLabel());
+    for(unsigned i = 0 ; i < children.size() ; ++i)
+        if (children[i]->isVisible())
+            layout->add(children[i]->configWidget(widget, NULL));
+
+    return widget;
+}
+
 QWidget* StackedConfigurationGroup::configWidget(QWidget* parent,
                                                  const char* widgetName) {
     QWidgetStack* widget = new QWidgetStack(parent, widgetName);
+    widget->setBackgroundOrigin(QWidget::WindowOrigin);
 
     for(unsigned i = 0 ; i < children.size() ; ++i)
         if (children[i]->isVisible())
@@ -55,6 +77,7 @@ QWidget* StackedConfigurationGroup::configWidget(QWidget* parent,
 QWidget* TabbedConfigurationGroup::configWidget(QWidget* parent,
                                                 const char* widgetName) {
     QTabDialog* widget = new QTabDialog(parent, widgetName);
+    widget->setBackgroundOrigin(QWidget::WindowOrigin);
     
     for(unsigned i = 0 ; i < children.size() ; ++i)
         if (children[i]->isVisible())
@@ -76,12 +99,15 @@ void StackedConfigurationGroup::raise(Configurable* child) {
 QWidget* LineEditSetting::configWidget(QWidget* parent,
                                        const char *widgetName) {
     QWidget* widget = new QHBox(parent, widgetName);
+    widget->setBackgroundOrigin(QWidget::WindowOrigin);
 
     QLabel* label = new QLabel(widget, QString(widgetName) + "-label");
     label->setText(getLabel() + ":");
+    label->setBackgroundOrigin(QWidget::WindowOrigin);
 
     QLineEdit* edit = new MythLineEdit(settingValue, widget,
                                     QString(widgetName) + "-edit");
+    edit->setBackgroundOrigin(QWidget::WindowOrigin);
     edit->setText( getValue() );
 
     connect(this, SIGNAL(valueChanged(const QString&)),
@@ -95,9 +121,11 @@ QWidget* LineEditSetting::configWidget(QWidget* parent,
 QWidget* SliderSetting::configWidget(QWidget* parent,
                                      const char* widgetName) {
     QWidget* widget = new QHBox(parent, widgetName);
+    widget->setBackgroundOrigin(QWidget::WindowOrigin);
 
     QLabel* label = new QLabel(widget, QString(widgetName) + "-label");
     label->setText(getLabel() + ":");
+    label->setBackgroundOrigin(QWidget::WindowOrigin);
 
     QSlider* slider = new MythSlider(widget, QString(widgetName) + "-slider");
     slider->setMinValue(min);
@@ -122,11 +150,14 @@ QWidget* SpinBoxSetting::configWidget(QWidget* parent,
                                       const char* widgetName) {
 
     QWidget* box = new QHBox(parent, widgetName);
+    box->setBackgroundOrigin(QWidget::WindowOrigin);
 
     QLabel* label = new QLabel(box);
+    label->setBackgroundOrigin(QWidget::WindowOrigin);
     label->setText(getLabel() + ":");
 
     QSpinBox* spinbox = new MythSpinBox(box);
+    spinbox->setBackgroundOrigin(QWidget::WindowOrigin);
     spinbox->setMinValue(min);
     spinbox->setMaxValue(max);
     spinbox->setLineStep(step);
@@ -141,10 +172,13 @@ QWidget* SpinBoxSetting::configWidget(QWidget* parent,
 QWidget* ComboBoxSetting::configWidget(QWidget* parent,
                                        const char* widgetName) {
     QWidget* box = new QHBox(parent, widgetName);
+    box->setBackgroundOrigin(QWidget::WindowOrigin);
 
     QLabel* label = new QLabel(box);
     label->setText(getLabel() + ":");
+    label->setBackgroundOrigin(QWidget::WindowOrigin);
     QComboBox* widget = new MythComboBox(rw, box);
+    widget->setBackgroundOrigin(QWidget::WindowOrigin);
 
     for(unsigned int i = 0 ; i < labels.size() ; ++i) {
         widget->insertItem(labels[i]);
@@ -174,10 +208,12 @@ void PathSetting::addSelection(const QString& label,
 QWidget* RadioSetting::configWidget(QWidget* parent,
                                     const char* widgetName) {
     QButtonGroup* widget = new QButtonGroup(parent, widgetName);
+    widget->setBackgroundOrigin(QWidget::WindowOrigin);
     widget->setTitle(getLabel());
 
     for( unsigned i = 0 ; i < labels.size() ; ++i ) {
         QRadioButton* button = new QRadioButton(widget, NULL);
+        button->setBackgroundOrigin(QWidget::WindowOrigin);
         button->setText(labels[i]);
         if (isSet && i == current)
             button->setDown(true);
@@ -190,6 +226,7 @@ QWidget* CheckBoxSetting::configWidget(QWidget* parent,
                                        const char* widgetName) {
     
     QCheckBox* widget = new QCheckBox(parent, widgetName);
+    widget->setBackgroundOrigin(QWidget::WindowOrigin);
     widget->setText(getLabel());
     widget->setChecked(boolValue());
 
@@ -210,16 +247,33 @@ QDialog* ConfigurationDialog::dialogWidget(QWidget* parent,
     return dialog;
 }
 
-void ConfigurationDialog::exec(QSqlDatabase* db) {
+int ConfigurationDialog::exec(QSqlDatabase* db) {
     load(db);
 
     QDialog* dialog = dialogWidget(NULL);
-    dialog->show();
 
-    if (dialog->exec() == QDialog::Accepted)
+    float wmult = 0, hmult = 0;
+    int screenheight = 0, screenwidth = 0;
+    m_context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
+
+    dialog->setGeometry(0, 0, screenwidth, screenheight);
+    dialog->setFixedSize(QSize(screenwidth, screenheight));
+
+    dialog->setFont(QFont("Arial", (int)(m_context->GetSmallFontSize()*hmult),
+                    QFont::Bold));
+
+    m_context->ThemeWidget(dialog);
+
+    dialog->showFullScreen();
+
+    int ret;
+
+    if ((ret = dialog->exec()) == QDialog::Accepted)
         save(db);
 
     delete dialog;
+
+    return ret;
 }
 
 QDialog* ConfigurationWizard::dialogWidget(QWidget* parent,

@@ -1,5 +1,6 @@
 #include "recordingprofile.h"
 #include <qsqldatabase.h>
+#include <qheader.h>
 #include <qcursor.h>
 #include <qlayout.h>
 #include <iostream>
@@ -30,20 +31,34 @@ RecordingProfileBrowser::RecordingProfileBrowser(MythContext* context,
                                                  QSqlDatabase* _db):
     QDialog(parent), db(_db) {
 
+    m_context = context;
+
     int screenwidth, screenheight;
     float wmult, hmult;
     context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
     setGeometry(0, 0, screenwidth, screenheight);
     setFixedSize(QSize(screenwidth, screenheight));
+
+    context->ThemeWidget(this);
+
+    setFont(QFont("Arial", (int)(context->GetMediumFontSize() * hmult),
+            QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
-    QVBoxLayout* vbox = new QVBoxLayout(this);
+
+    QVBoxLayout* vbox = new QVBoxLayout(this, (int)(15 * wmult));
 
     listview = new QListView(this);
     vbox->addWidget(listview);
 
     listview->addColumn("Profile");
     listview->setAllColumnsShowFocus(TRUE);
+
+    listview->viewport()->setPalette(palette());
+    listview->horizontalScrollBar()->setPalette(palette());
+    listview->verticalScrollBar()->setPalette(palette());
+    listview->header()->setPalette(palette());
+    listview->header()->setFont(font());
 
     idMap[new QListViewItem(listview, "(Create new profile)")] = 0;
 
@@ -60,5 +75,7 @@ RecordingProfileBrowser::RecordingProfileBrowser(MythContext* context,
     connect(listview, SIGNAL(clicked(QListViewItem*)),
             this, SLOT(select(QListViewItem*)));
     connect(listview, SIGNAL(returnPressed(QListViewItem*)),
+            this, SLOT(select(QListViewItem*)));
+    connect(listview, SIGNAL(spacePressed(QListViewItem*)),
             this, SLOT(select(QListViewItem*)));
 }

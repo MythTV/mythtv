@@ -3,6 +3,7 @@
 
 #include <qobject.h>
 #include <qwidget.h>
+#include <qdialog.h>
 #include <qstring.h>
 #include <iostream>
 #include <vector>
@@ -11,7 +12,7 @@ using namespace std;
 
 class QSqlDatabase;
 class QWidget;
-class QDialog;
+class MythContext;
 
 class Configurable: virtual public QObject {
     Q_OBJECT
@@ -129,6 +130,12 @@ class VerticalConfigurationGroup: virtual public ConfigurationGroup {
                                   const char* widgetName = 0);
 };
 
+class HorizontalConfigurationGroup: virtual public ConfigurationGroup {
+ public:
+    virtual QWidget* configWidget(QWidget* parent,
+                                  const char* widgetName = 0);
+};
+
 class StackedConfigurationGroup: virtual public ConfigurationGroup {
     Q_OBJECT
 public:
@@ -148,18 +155,26 @@ protected:
 
 class ConfigurationDialog: virtual public Configurable {
 public:
+    ConfigurationDialog(MythContext *context) { m_context = context; }
+
     // Make a modal dialog containing configWidget
     virtual QDialog* dialogWidget(QWidget* parent,
                                   const char* widgetName = 0);
 
     // Show a dialogWidget, and save if accepted
-    virtual void exec(QSqlDatabase* db);
+    int exec(QSqlDatabase* db);
+
+protected:
+    MythContext *m_context;
 };
 
 // A wizard is a group with one child per page
 class ConfigurationWizard: virtual public ConfigurationDialog,
                            virtual public ConfigurationGroup {
 public:
+    ConfigurationWizard(MythContext *context) : ConfigurationDialog(context)
+                                             { }
+
     virtual QDialog* dialogWidget(QWidget* parent,
                                   const char* widgetName=0);
     virtual QWidget* configWidget(QWidget* parent,

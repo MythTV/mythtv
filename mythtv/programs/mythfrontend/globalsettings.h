@@ -274,7 +274,8 @@ public:
 
 class PlaybackSettings: virtual public ConfigurationWizard {
 public:
-    PlaybackSettings() {
+    PlaybackSettings(MythContext *context) : ConfigurationWizard(context),
+                                             ConfigurationDialog(context) {
         VerticalConfigurationGroup* general = new VerticalConfigurationGroup();
         general->setLabel("General playback");
         general->addChild(new AudioOutputDevice());
@@ -311,7 +312,7 @@ public:
 class GeneralSettings: virtual public ConfigurationDialog,
                        virtual public VerticalConfigurationGroup {
 public:
-    GeneralSettings() {
+    GeneralSettings(MythContext *context) : ConfigurationDialog(context) {
         addChild(new XMLTVGrab());
         addChild(new RecordFilePrefix());
         addChild(new ChannelOrdering());

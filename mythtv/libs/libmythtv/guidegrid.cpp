@@ -895,11 +895,9 @@ void GuideGrid::paintTimes(QPainter *p)
             else
             {
                 if (x == 0)
-                    firstTime = m_currentStartTime;
-                if (x == (DISPLAY_TIMES - 6))
                 {
-                    lastTime = QDateTime(m_currentStartTime.date(), 
-                                         QTime(tinfo->hour, tinfo->min, 0));
+                    firstTime = m_currentStartTime;
+                    lastTime = firstTime.addSecs(DISPLAY_TIMES * 60 * 4); 
                 }
 
                 int xpos = (x * xdifference) + (xdifference * 6 - width) / 2;

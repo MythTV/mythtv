@@ -122,13 +122,13 @@ void TVMenuCallback(void *data, QString &selection)
         themesSettings(context);
     else if (sel == "settings recording") {
         RecordingProfileEditor editor(context, NULL, QSqlDatabase::database());
-        editor.show();
+        editor.showFullScreen();
         editor.exec();
     } else if (sel == "settings general") {
-        GeneralSettings settings;
+        GeneralSettings settings(context);
         settings.exec(QSqlDatabase::database());
     } else if (sel == "settings playback") {
-        PlaybackSettings settings;
+        PlaybackSettings settings(context);
         settings.exec(QSqlDatabase::database());
     }
 }

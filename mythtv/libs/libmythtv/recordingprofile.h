@@ -270,7 +270,7 @@ public:
     };
 };
 
-class ImageSize: public VerticalConfigurationGroup {
+class ImageSize: public HorizontalConfigurationGroup {
 public:
     class Width: public SpinBoxSetting, public CodecParam {
     public:
@@ -341,7 +341,8 @@ protected:
         };
     };
 public:
-    RecordingProfile() {
+    RecordingProfile(MythContext *context) : ConfigurationDialog(context),
+                                             ConfigurationWizard(context) {
         // This must be first because it is needed to load/save the other settings
         addChild(id = new ID());
 
@@ -396,6 +397,7 @@ protected:
     QListView* listview;
     map<QListViewItem*,int> idMap;
     QSqlDatabase* db;
+    MythContext *m_context;
 };
 
 class RecordingProfileEditor: public RecordingProfileBrowser {
@@ -410,12 +412,12 @@ public:
 
 protected slots:
     void open(int id) {
-        RecordingProfile* profile = new RecordingProfile();
+        RecordingProfile* profile = new RecordingProfile(m_context);
 
         if (id != 0)
             profile->loadByID(db,id);
 
-        if (profile->dialogWidget(this)->exec() == QDialog::Accepted)
+        if (profile->exec(db) == QDialog::Accepted)
             profile->save(db);
         delete profile;
     };
