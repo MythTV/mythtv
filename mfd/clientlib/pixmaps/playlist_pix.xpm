@@ -1,0 +1,33 @@
+/* XPM */
+static const char * const playlist_pix[] = {
+/* width height num_colors chars_per_pixel */
+"    16    16       10            1",
+/* colors */
+". c #000000",
+"# c #808080",
+"a c #c0dcc0",
+"b c #555f55",
+"c c #aabfaa",
+"d c #d4dfff",
+"e c #fffbf0",
+"f c #a0a0a4",
+"g c None",
+"h c #ffffff",
+/* pixels */
+"ggggggggggg..ggg",
+"ggggg...ggg..ggg",
+"ggg..hhh.gg.gg..",
+"g..hhhff.g..gg..",
+".hhhff..gg..gg.g",
+".h#f..aa.gggg..g",
+".ha.aadea.ggg..g",
+"g.dhdeh###.ggggg",
+"gg.ah##hha.ggggg",
+"ggg.hhhh#b.ggggg",
+"ggg.ch##dc.ggggg",
+"gg..#ddac#.ggggg",
+"g.a#.aafb.gggggg",
+"g.ebcfb..ggggggg",
+"g.bc#..ggggggggg",
+"gg...ggggggggggg"
+};
