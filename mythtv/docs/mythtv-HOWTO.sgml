@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2004-05-05, v0.14.10
+<date>2004-05-06, v0.14.11
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -36,6 +36,33 @@ the developer list strictly for development-related issues.
 Searchable archives for the lists are available at <url
 url="http://www.gossamer-threads.com/archive/MythTV_C2/"
 name="http://www.gossamer-threads.com/archive/MythTV_C2/">.
+
+<sect1>IRC.
+<p>There are two IRC channels dedicated to MythTV which can be found on
+irc.freenode.net
+<itemize>
+<item>mythtv
+<item>mythtv-users
+</itemize>
+
+The <tt>mythtv</tt> channel is where the developers discuss code.  It is not
+a user-support channel.  Please don't ask non-development related questions
+there.
+
+<sect1>Contributing to this document.
+<p>Contributions to the HOWTO are welcome, but as the maintainer I retain
+the right to edit or choose not to use your submission.
+
+If you would like to submit an update or contribution, please send it as
+either SGML or as plain text. <em>NO HTML</em>.  The source used to create
+the HOWTO is in SGML / Linuxdoc.  See the Linuxdoc HOWTO at <url
+url="http://www.tldp.org/HOWTO/Howtos-with-LinuxDoc.html"
+name="http://www.tldp.org/HOWTO/Howtos-with-LinuxDoc.html"> for information
+on the linuxdoc format itself, or look at the <tt>mythtv-HOWTO.sgml</tt>
+file as an example.
+
+SGML patch files are the easiest.  Run a <bf>diff -u origfile newfile >
+doc.patch</bf> and mail it to the address above.
 
 <sect>Introduction.
 <p>This HOWTO document will focus on manually building MythTV in a North
@@ -1080,7 +1107,7 @@ name="http://www.mythtv.org/mailman/listinfo/mythtv-dev/"> mailing lists.
 
 <bf>CVS only</bf>: If you are in North America you will use the DataDirect
 grabber which is built-in to MythTV.  You <em>do not</em> need to install
-XMLTV.
+XMLTV, but you need <bf>wget</bf> version 1.9.1 or higher.
 
 Get XMLTV from <url url="http://xmltv.sourceforge.net"
 name="http://xmltv.sourceforge.net">.  Download the latest version (0.5.32).
@@ -2441,11 +2468,15 @@ you've chosen a name, press the down arrow to move to the next field.
 If you're in North America, change the grabber to "DataDirect", then
 continue pressing the down arrow to move to the next field.  Fill in the
 username and password that you have established with DataDirect, then move
-to the "Retrieve Listings" button and press the space bar.  The setup
-program will contact the Zap2It servers and get your account information. 
-Once you're done, you may click the Finish button and skip the next few
-paragraphs, since they only apply to users that are using the external XMLTV
-script to get their guide data.
+to the "Retrieve Listings" button and press the space bar.  
+
+<bf>NOTE</bf>: You need <bf>wget</bf> version 1.9.1 or higher to use
+DataDirect.
+
+The setup program will contact the Zap2It servers and get your account
+information.  Once you're done, you may click the Finish button and skip the
+next few paragraphs, since they only apply to users that are using the
+external XMLTV script to get their guide data.
 
 If you wish to continue using the XMLTV grabber, then move to the Zip/postal
 code field and put in the appropriate value.
@@ -6287,6 +6318,8 @@ pointer back to it.  Add a section on migrating to DataDirect.  Add section
 on using the native mythfilldatabase scheduler.
 v0.14.10, 2004-05-05.  Update migration instructions for DataDirect.  It's for
 CVS.  Add some forward and backwards pointers in the Migration document.
+v0.14.11, 2004-05-06.  Add section on IRC and how to contribute.  Add wget
+1.9.1 requirement for DataDirect.
 -->
 
 <!--

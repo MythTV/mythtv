@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2004-05-05, v0.14.10
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2004-05-06, v0.14.11
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -21,6 +21,8 @@ necessary.</EM>
 
 <UL>
 <LI><A NAME="toc1.1">1.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.1">Mailing lists / getting help.</A>
+<LI><A NAME="toc1.2">1.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.2">IRC.</A>
+<LI><A NAME="toc1.3">1.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.3">Contributing to this document.</A>
 </UL>
 <P>
 <H2><A NAME="toc2">2.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s2">Introduction.</A></H2>
@@ -249,6 +251,34 @@ list is at
 the developer list strictly for development-related issues.</P>
 <P>Searchable archives for the lists are available at 
 <A HREF="http://www.gossamer-threads.com/archive/MythTV_C2/">http://www.gossamer-threads.com/archive/MythTV_C2/</A>.</P>
+
+<H2><A NAME="ss1.2">1.2</A> <A HREF="#toc1.2">IRC.</A>
+</H2>
+
+<P>There are two IRC channels dedicated to MythTV which can be found on
+irc.freenode.net
+<UL>
+<LI>mythtv</LI>
+<LI>mythtv-users</LI>
+</UL>
+</P>
+<P>The <CODE>mythtv</CODE> channel is where the developers discuss code.  It is not
+a user-support channel.  Please don't ask non-development related questions
+there.</P>
+
+<H2><A NAME="ss1.3">1.3</A> <A HREF="#toc1.3">Contributing to this document.</A>
+</H2>
+
+<P>Contributions to the HOWTO are welcome, but as the maintainer I retain
+the right to edit or choose not to use your submission.</P>
+<P>If you would like to submit an update or contribution, please send it as
+either SGML or as plain text. <EM>NO HTML</EM>.  The source used to create
+the HOWTO is in SGML / Linuxdoc.  See the Linuxdoc HOWTO at 
+<A HREF="http://www.tldp.org/HOWTO/Howtos-with-LinuxDoc.html">http://www.tldp.org/HOWTO/Howtos-with-LinuxDoc.html</A> for information
+on the linuxdoc format itself, or look at the <CODE>mythtv-HOWTO.sgml</CODE>
+file as an example.</P>
+<P>SGML patch files are the easiest.  Run a <B>diff -u origfile newfile >
+doc.patch</B> and mail it to the address above.</P>
 
 <H2><A NAME="s2">2.</A> <A HREF="#toc2">Introduction.</A></H2>
 
@@ -1341,7 +1371,7 @@ join the
 </P>
 <P><B>CVS only</B>: If you are in North America you will use the DataDirect
 grabber which is built-in to MythTV.  You <EM>do not</EM> need to install
-XMLTV.</P>
+XMLTV, but you need <B>wget</B> version 1.9.1 or higher.</P>
 <P>Get XMLTV from 
 <A HREF="http://xmltv.sourceforge.net">http://xmltv.sourceforge.net</A>.  Download the latest version (0.5.32).</P>
 <P>
@@ -2887,11 +2917,13 @@ you've chosen a name, press the down arrow to move to the next field.  </P>
 If you're in North America, change the grabber to "DataDirect", then
 continue pressing the down arrow to move to the next field.  Fill in the
 username and password that you have established with DataDirect, then move
-to the "Retrieve Listings" button and press the space bar.  The setup
-program will contact the Zap2It servers and get your account information. 
-Once you're done, you may click the Finish button and skip the next few
-paragraphs, since they only apply to users that are using the external XMLTV
-script to get their guide data.</P>
+to the "Retrieve Listings" button and press the space bar.  </P>
+<P><B>NOTE</B>: You need <B>wget</B> version 1.9.1 or higher to use
+DataDirect.</P>
+<P>The setup program will contact the Zap2It servers and get your account
+information.  Once you're done, you may click the Finish button and skip the
+next few paragraphs, since they only apply to users that are using the
+external XMLTV script to get their guide data.</P>
 <P>If you wish to continue using the XMLTV grabber, then move to the Zip/postal
 code field and put in the appropriate value.</P>
 <P><B>NOTE</B>:  As of 2004-05-04, the <B>tv_grab_na</B> grabber still
