@@ -3,6 +3,9 @@
 #include <qimage.h>
 #include <qcursor.h>
 #include <qpainter.h>
+#include <qtimer.h>
+
+#include <unistd.h>
 
 #include "singleview.h"
 
@@ -10,7 +13,7 @@
 
 extern Settings *globalsettings;
 
-SingleView::SingleView(const QString &filename, QWidget *parent, 
+SingleView::SingleView(vector<Thumbnail> *imagelist, int pos, QWidget *parent, 
                        const char *name)
 	  : QDialog(parent, name)
 {
@@ -68,11 +71,19 @@ SingleView::SingleView(const QString &filename, QWidget *parent,
 
     m_font = new QFont("Arial", (int)(13 * hmult), QFont::Bold);
 
-    QImage tmpimage(filename);
-    QImage tmp2 = tmpimage.smoothScale((int)(screenwidth * wmult), 
-                                       (int)(screenheight * hmult), 
-                                       QImage::ScaleMin);
-    image = new QImage(tmp2);
+    images = imagelist;
+    imagepos = pos;
+    displaypos = -1;
+
+    image = NULL;
+
+    timerrunning = false;
+    timersecs = globalsettings->GetNumSetting("SlideshowDelay");
+    if (!timersecs)
+        timersecs = 5;
+
+    timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), SLOT(advanceFrame()));    
 
     WFlags flags = getWFlags();
     setWFlags(flags | Qt::WRepaintNoErase);
@@ -82,14 +93,41 @@ SingleView::SingleView(const QString &filename, QWidget *parent,
 
 SingleView::~SingleView()
 {
-     if (image)
-         delete image;
+    if (image)
+        delete image;
+    if (timer)
+    {
+        timer->stop(); 
+        while (timer->isActive())
+            usleep(50);
+        delete timer;
+    }
 }
 
 void SingleView::paintEvent(QPaintEvent *e)
 {
     e = e;
+
+    erase();
+
     QPainter p(this);
+
+    if (displaypos != imagepos)
+    {
+        QString filename = (*images)[imagepos].filename;
+
+        QImage tmpimage(filename);
+        QImage tmp2 = tmpimage.smoothScale((int)(screenwidth * wmult),
+                                           (int)(screenheight * hmult),
+                                           QImage::ScaleMin);
+
+        if (image)
+            delete image;
+
+        image = new QImage(tmp2);
+    
+        displaypos = imagepos;
+    }
 
     p.drawImage((screenwidth - image->width()) / 2, 
                 (screenheight - image->height()) / 2, *image);
@@ -97,5 +135,61 @@ void SingleView::paintEvent(QPaintEvent *e)
 
 void SingleView::keyPressEvent(QKeyEvent *e)
 {
-    QDialog::keyPressEvent(e);
+    bool handled = false;
+
+    int oldpos = imagepos;
+    timer->stop();
+
+    switch (e->key())
+    {
+        case Key_Up:
+        case Key_Left:
+        {
+            imagepos--;
+            if (imagepos < 0)
+                imagepos = images->size() - 1;
+            handled = true;
+            break;
+        }
+        case Key_Right:
+        case Key_Down:
+        case Key_Space:
+        case Key_Enter:
+        case Key_Return:
+        {
+            imagepos++;
+            if (imagepos == (int)images->size())
+                imagepos = 0;
+            handled = true;
+            break;
+        }
+        case 'P':
+        {
+            timerrunning = !timerrunning;
+            handled = true;
+            break;
+        }
+        default: break;
+    }
+
+    if (handled)
+    {
+        update();
+        if (timerrunning)
+            timer->start(timersecs * 1000);
+    }
+    else
+    {
+        imagepos = oldpos;
+        QDialog::keyPressEvent(e);
+    }
+}
+
+void SingleView::advanceFrame(void)
+{
+    imagepos++;
+    if (imagepos == (int)images->size())
+        imagepos = 0;
+
+    update();
 }

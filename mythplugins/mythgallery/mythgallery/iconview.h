@@ -61,6 +61,8 @@ class IconView : public QDialog
     unsigned int screenposition;
 
     int currow, curcol;
+
+    static QPixmap *foldericon;
 };
 
 #endif

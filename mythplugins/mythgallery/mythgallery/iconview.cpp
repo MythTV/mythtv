@@ -13,6 +13,10 @@
 
 extern Settings *globalsettings;
 
+#include "embdata.h"
+
+QPixmap *IconView::foldericon = NULL;
+
 IconView::IconView(const QString &startdir, QWidget *parent, const char *name)
         : QDialog(parent, name)
 {
@@ -85,6 +89,16 @@ IconView::IconView(const QString &startdir, QWidget *parent, const char *name)
     currow = 0;
     curcol = 0;
 
+    if (!foldericon)
+    {
+        QImage tmpimage = qembed_findImage("folder");
+        QImage tmp2 = tmpimage.smoothScale((int)(thumbw * wmult), 
+                                           (int)(thumbh * hmult),
+                                           QImage::ScaleMin);
+        foldericon = new QPixmap();
+        foldericon->convertFromImage(tmp2);
+    }
+
     WFlags flags = getWFlags();
     setWFlags(flags | Qt::WRepaintNoErase);
 
@@ -129,14 +143,23 @@ void IconView::paintEvent(QPaintEvent *e)
 
              Thumbnail *thumb = &(thumbs[curpos]);
 
-             if (!thumb->pixmap)
-                 loadThumbPixmap(thumb);
-
              int xpos = spacew * (x + 1) + thumbw * x;
 
-             if (thumb->pixmap)
-                 tmp.drawPixmap(xpos + (thumbw - thumb->pixmap->width()) / 2, 
-                                ypos, *thumb->pixmap);        
+             if (thumb->isdir)
+             {
+                 tmp.drawPixmap(xpos + (thumbw - foldericon->width()) / 2,
+                                ypos, *foldericon);
+             }
+             else
+             {
+                 if (!thumb->pixmap)
+                     loadThumbPixmap(thumb);
+
+                 if (thumb->pixmap)
+                     tmp.drawPixmap(xpos + 
+                                    (thumbw - thumb->pixmap->width()) / 2, 
+                                    ypos, *thumb->pixmap);        
+             }
 
              tmp.drawText(xpos, ypos + thumbh, thumbw, spaceh, 
                           AlignVCenter | AlignCenter, thumb->name); 
@@ -298,8 +321,17 @@ void IconView::keyPressEvent(QKeyEvent *e)
         case Key_Return:
         {
             int pos = screenposition + currow * THUMBS_W + curcol;
-            SingleView sv(thumbs[pos].filename);
-            sv.exec();
+
+            if (thumbs[pos].isdir)
+            {
+                IconView iv(thumbs[pos].filename); 
+                iv.exec();
+            }
+            else
+            {
+                SingleView sv(&thumbs, pos);
+                sv.exec();
+            }
             handled = true;
             break;
         }

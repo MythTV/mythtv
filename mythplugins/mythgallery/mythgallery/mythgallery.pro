@@ -18,6 +18,5 @@ INSTALLS += installfiles
 LIBS += -L/usr/local/lib -lmyth
 
 # Input
-HEADERS += iconview.h singleview.h
-
+HEADERS += embdata.h iconview.h singleview.h
 SOURCES += iconview.cpp main.cpp singleview.cpp

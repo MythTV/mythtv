@@ -1,2 +1,5 @@
 # Location of where to start looking for pictures
 str GalleryDir=/mnt/store/pictures
+
+# Delay between updates in the slideshow.
+int SlideshowDelay=5
