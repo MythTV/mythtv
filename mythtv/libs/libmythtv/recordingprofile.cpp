@@ -63,7 +63,7 @@ public:
         addSelection("32000");
         addSelection("44100");
         addSelection("48000");
-	setHelpText("Used to set the audio sampling rate from your DSP. "
+	setHelpText("Sets the audio sampling rate for your DSP. "
                     "Ensure that you choose a sampling rate appropriate "
                     "for your device.  btaudio may only allow 32000.");
     };
@@ -153,6 +153,9 @@ public:
         CodecParam(parent, "mpeg4scalebitrate") {
         setLabel("Scale bitrate for frame size");
         setValue(true);
+	setHelpText("If set, the MPEG4 bitrate will be used for "
+                    "640x480.  If other resolutions are used, the "
+                    "bitrate will be scaled appropriately.");
     };
 };
 
@@ -162,8 +165,9 @@ public:
         CodecParam(parent, "mpeg4minquality"),
         SliderSetting(1,31,1) {
 
-        setLabel("Min quality");
+        setLabel("Minimum quality");
         setValue(15);
+	setHelpText("Lower is better.");
     };
 };
 
@@ -173,8 +177,9 @@ public:
         CodecParam(parent, "mpeg4maxquality"),
         SliderSetting(1,31,1) {
 
-        setLabel("Max quality");
+        setLabel("Maximum quality");
         setValue(2);
+	setHelpText("Lower is better.");
     };
 };
 
@@ -184,7 +189,7 @@ public:
         CodecParam(parent, "mpeg4qualdiff"),
         SliderSetting(1,31,1) {
 
-        setLabel("Max quality difference");
+        setLabel("Max quality difference between frames");
         setValue(3);
     };
 };
