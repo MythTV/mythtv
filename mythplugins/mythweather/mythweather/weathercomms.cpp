@@ -8,7 +8,7 @@
 
 using namespace std;
 
-WeatherSock::WeatherSock(Weather *con, bool tDebug)
+WeatherSock::WeatherSock(Weather *con, bool tDebug, int tAgg)
 {
 	debug = tDebug;
 	parent = con;
@@ -16,9 +16,19 @@ WeatherSock::WeatherSock(Weather *con, bool tDebug)
  	gotDataHook = false;
 	timeout_cnt = 0;
 	invalid_cnt = 0;
-	aggressiveness = 1;
+	reset_cnt = 0;
+	if (tAgg < 1)
+		aggressiveness = 1;
+	else
+		aggressiveness = tAgg;
+
+	if (debug == true)
+		cout << "MythWeather: COMMS : Using Aggressiveness value of " << aggressiveness << endl;
+
 	myStatus = false;
 	currentError = 0;
+	error = 0;
+	breakout = false;
 }
 
 QString WeatherSock::getData()
@@ -105,7 +115,7 @@ QString WeatherSock::strStatus()
 
 void WeatherSock::startConnect()
 {
-	bool breakout = false;
+	breakout = false;
 	timeout_cnt = 0;
 	int curState;
 	int tmpState = -99;
@@ -133,6 +143,7 @@ void WeatherSock::startConnect()
 		tmpState = httpSock->state();
 		timeout_cnt++;
 
+
 		if (timeout_cnt > (int)(5*aggressiveness) && getIntStatus() == 1)
 			resetConnection();
 
@@ -152,32 +163,48 @@ void WeatherSock::startConnect()
 				resetConnection();
 			}
 			if (errs >= 0)
+			{
+				if (error != 3)
+					error = errs;
 				breakout = true;
+			}
 		}
 	}
 
-	currentError = (int)(errs * 10);
+	currentError = (int)(error * 10);
 	myStatus = true;
-	
 
         return;
 }
 
 void WeatherSock::resetConnection()
 {
-	if (debug == true)
-		cout << "MythWeather: COMMS : TIMEOUT : " << strStatus() << " --> Resetting" << endl;
-        httpSock->close();
-	parent->processEvents();
-	usleep(100);
-	parent->processEvents();
-        httpData = "";
-	gotDataHook = false;
-        timeout_cnt = 0;
-	disconnect(httpSock, 0, 0, 0);
-	delete httpSock;
-        makeConnection();
-	
+	reset_cnt++;
+	if (reset_cnt > 10)
+	{
+		cout << "MythWeather: COMMS : TIMEOUT : Maximum Timeout - "
+		     << "Try changing your aggressiveness variable.\n";
+		gotDataHook = true;
+		breakout = true;
+		error = 3;
+		myStatus = true;
+	}
+	else
+	{
+		if (debug == true)
+			cout << "MythWeather: COMMS : TIMEOUT : " << strStatus() 
+			     << " --> Resetting (" << reset_cnt << " out of 10)" << endl;
+        	httpSock->close();
+		parent->processEvents();
+		usleep(100);
+		parent->processEvents();
+        	httpData = "";
+		gotDataHook = false;
+        	timeout_cnt = 0;
+		disconnect(httpSock, 0, 0, 0);
+		delete httpSock;
+        	makeConnection();
+	}
 }
 
 void WeatherSock::makeConnection()

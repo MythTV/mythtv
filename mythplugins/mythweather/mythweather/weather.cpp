@@ -1836,11 +1836,13 @@ return ret;
 
 bool Weather::GetWeatherData()
 {
+	int tAgg = (gContext->GetSetting("WeatherAggressiveLvl")).toInt();
+
 	if (debug == true)
 		cout << "MythWeather: Setting status timer and data hook.\n";
 
 	status_Timer->start(100);
-	WeatherSock *internetData = new WeatherSock(this, debug);
+	WeatherSock *internetData = new WeatherSock(this, debug, tAgg);
 	internetData->startConnect();
 	
 	while (internetData->getStatus() == false)
@@ -1866,6 +1868,14 @@ bool Weather::GetWeatherData()
 		lbLocale->setText(locale + " is invalid");
                 update_Timer->stop();
                 cout << "MythWeather: Invalid Area ID.\n";
+                delete internetData;
+                return false;
+	}
+	else if (internetData->checkError() == 30)
+	{
+		lbUpdated->setText("!!! Timeout Limit Reached !!! Change your aggressiveness level.");
+                update_Timer->changeInterval((int)(1000 * 60 * 5));
+                cout << "MythWeather: Timeout error, change agressiveness variable.\n";
                 delete internetData;
                 return false;
 	}

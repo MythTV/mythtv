@@ -10,7 +10,7 @@ class WeatherSock : public QObject
 {
   Q_OBJECT
   public:
-    WeatherSock(Weather *, bool);
+    WeatherSock(Weather *, bool, int);
     QString getData();
     void startConnect();
     int verifyData();
@@ -36,11 +36,14 @@ class WeatherSock : public QObject
     int getIntStatus();
     int timeout_cnt;
     int invalid_cnt;
+    int reset_cnt;
     int currentError;
     int aggressiveness;
+    int error;
     bool myStatus;
     bool debug;
     bool gotDataHook;
+    bool breakout;
 
 };
 
