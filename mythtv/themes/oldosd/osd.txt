@@ -11,10 +11,10 @@ int InfoTextFontSize=18
 # optional settings
 # Position (relative to the info box upper left) where the channel icon is 
 # displayed
-str InfoIconPosition=15,15
+str InfoIconPosition=15,10
 # Position (relative to the info box upper left) where the 5 letter call sign
 # is displayed
-str InfoCallSignRect=55,20,95,45
+str InfoCallSignRect=55,15,95,45
 
 
 # If this next setting exists, display a dialog when the video is paused.
@@ -25,14 +25,14 @@ str SeekBackground=pause.png
 str SeekPosition=0,-1
 # Location of a place to put a short status message, such as 'Paused'
 # optional
-str SeekStatusRect=10,20,150,45
+str SeekStatusRect=10,15,150,45
 # Location of the slider bar to draw.  If this exists, the next setting must
 # also
-str SeekSliderRect=152,13,470,45
+str SeekSliderRect=175,12,450,45
 # Image to use for the fill slider bar.  Only the first column is used.
 str SeekSliderNormal=slider-normal.png
 # Image used to show position on the slider bar.
-str SeekSliderPosition=slider-position.png
+# str SeekSliderPosition=slider-position.png
 # Size of the font that's displayed over the slider bar for status messages.
 # Not shown if this setting is not present.
 int SeekSliderFontSize=14

@@ -872,8 +872,16 @@ int TV::calcSliderPos(int offset, QString &desc)
               ((float)rbuffer->GetFileSize() - rbuffer->GetSmudgeSize());
         ret *= 1000.0;
 
-        int secsbehind = (int)((float)(nvr->GetFramesWritten() - 
-                                 nvp->GetFramesPlayed()) / frameRate);
+        long long written = nvr->GetFramesWritten();
+        long long played = nvp->GetFramesPlayed();
+
+        played += (int)(offset * frameRate);
+        if (played > written)
+            played = written;
+        if (played < 0)
+            played = 0;
+	
+        int secsbehind = (int)((float)(written - played) / frameRate);
 
         if (secsbehind < 0)
             secsbehind = 0;
