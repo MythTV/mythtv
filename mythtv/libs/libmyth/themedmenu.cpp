@@ -2144,19 +2144,24 @@ bool ThemedMenuPrivate::handleAction(const QString &action)
     return true;
 }
 
-bool ThemedMenuPrivate::findDepends(const QString &file)
+bool ThemedMenuPrivate::findDepends(const QString &fileList)
 {
-    QString filename = findMenuFile(file);
-    if (filename != "")
-        return true;
-
-    QString newname = QString(PREFIX) + "/lib/mythtv/plugins/lib" + file +
-                      ".so";
-
-    QFile checkFile(newname);
-    if (checkFile.exists())
-        return true;
-
+    QStringList files = QStringList::split(" ", fileList);
+    QString filename;
+    
+    for ( QStringList::Iterator it = files.begin(); it != files.end(); ++it ) {
+        filename = findMenuFile(*it);
+        if (filename != "")
+            return true;
+    
+        QString newname = QString(PREFIX) + "/lib/mythtv/plugins/lib" + *it +
+                          ".so";
+    
+        QFile checkFile(newname);
+        if (checkFile.exists())
+            return true;
+    }
+    
     return false;
 }
 
