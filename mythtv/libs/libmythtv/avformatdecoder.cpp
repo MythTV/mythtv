@@ -1232,7 +1232,7 @@ void AvFormatDecoder::SetupAudioStream(void)
     if (curstream == NULL)
         return;
 
-    VERBOSE(VB_ALL, QString("Initializing audio parms from stream #%1.")
+    VERBOSE(VB_AUDIO, QString("Initializing audio parms from stream #%1.")
             .arg(currentAudioTrack));
 
     m_parent->SetEffDsp(curstream->codec.sample_rate * 100);

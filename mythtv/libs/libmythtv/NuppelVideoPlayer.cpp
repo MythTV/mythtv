@@ -3452,7 +3452,18 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
             m_db->unlock();
         }
 
+        if (showPercentage)
+        {
+            printf( "Finding Logo" );
+            fflush( stdout );
+        }
         commDetect->SearchForLogo(this, fullSpeed);
+        if (showPercentage)
+        {
+            printf( "\b\b\b\b\b\b\b\b\b\b\b\b            "
+                    "\b\b\b\b\b\b\b\b\b\b\b\b" );
+            fflush( stdout );
+        }
     }
 
 
@@ -3572,9 +3583,17 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
 
     if (showPercentage)
     {
+        elapsed = flagTime.elapsed() / 1000.0;
+
+        if (elapsed)
+            flagFPS = (int)(currentFrame->frameNumber / elapsed);
+        else
+            flagFPS = 0;
+
         if (totalFrames)
-            printf( "\b\b" );
-        printf( "\b\b\b\b        \b\b\b\b\b\b" );
+            printf( "\b\b\b\b\b\b      \b\b\b\b\b\b" );
+        else
+            printf( "\b\b\b\b\b\b\b\b\b\b\b           \b\b\b\b\b\b\b\b\b\b\b" );
     }
 
     if (commercialskipmethod & COMM_DETECT_BLANKS)

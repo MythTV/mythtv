@@ -317,6 +317,7 @@ int main(int argc, char *argv[])
     QString binname = finfo.baseName();
 
     print_verbose_messages = VB_IMPORTANT;
+    verboseString = "important";
 
     while (argpos < a.argc())
     {
