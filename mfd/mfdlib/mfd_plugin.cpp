@@ -16,7 +16,7 @@ using namespace std;
 
 #include "mfd_plugin.h"
 #include "mfd_events.h"
-#include "httpresponse.h"
+#include "httpoutresponse.h"
 
 
 MFDBasePlugin::MFDBasePlugin(MFD *owner, int identifier, const QString &a_name)

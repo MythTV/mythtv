@@ -95,6 +95,7 @@ DaapInstance::DaapInstance(
 
 void DaapInstance::run()
 {
+
     //
     //  So, first thing we need to do is try and open a client socket to the
     //  daap server

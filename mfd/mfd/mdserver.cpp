@@ -82,7 +82,7 @@ void MetadataServer::run()
 }
 
 
-void MetadataServer::handleIncoming(HttpInRequest *request, int client_id)
+void MetadataServer::handleIncoming(HttpInRequest *request, int /* client_id */ )
 {
     //
     //  The MfdHttpPlugin class ensures that this function gets called in
@@ -93,6 +93,8 @@ void MetadataServer::handleIncoming(HttpInRequest *request, int client_id)
     //  MdcapRequest *mdcap_request = new MdcapRequest();
     
     cout << " we are in handleIncoming with an httpRequest " << endl;
+    request->printRequest();
+    request->printHeaders();
     
     
 }

@@ -12,6 +12,7 @@
 
 #include "serviceclient.h"
 
+class MdcapResponse;
 
 class MetadataClient : public ServiceClient
 {
@@ -27,6 +28,7 @@ class MetadataClient : public ServiceClient
     ~MetadataClient();
 
     void handleIncoming();
+    void processResponse(MdcapResponse *mdcap_response);
     void sendFirstRequest();
 
 };

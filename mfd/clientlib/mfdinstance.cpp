@@ -351,7 +351,7 @@ void MfdInstance::parseFromMfd(QStringList &tokens)
                          << endl;
                 }
             }
-            else if(tokens[3] == "mmdp")
+            else if(tokens[3] == "mdcap")
             {
                 if(tokens[1] == "found")
                 {
@@ -407,6 +407,7 @@ void MfdInstance::addMetadataClient(const QString &address, uint a_port)
     if(new_metadata->connect())
     {
         my_service_clients->append(new_metadata);
+        new_metadata->sendFirstRequest();
     }
     else
     {

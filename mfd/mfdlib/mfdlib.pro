@@ -18,8 +18,8 @@ INSTALLS += target
 HEADERS += mfd_events.h   mfd_plugin.h   requestthread.h   clientsocket.h  
 SOURCES += mfd_events.cpp mfd_plugin.cpp requestthread.cpp clientsocket.cpp
 
-HEADERS += httpinrequest.h   httpoutrequest.h   httpresponse.h   
-SOURCES += httpinrequest.cpp httpoutrequest.cpp httpresponse.cpp 
+HEADERS += httpinrequest.h   httpoutrequest.h   httpoutresponse.h   httpinresponse.h
+SOURCES += httpinrequest.cpp httpoutrequest.cpp httpoutresponse.cpp httpinresponse.cpp
 
 HEADERS += httpheader.h   httpgetvar.h
 SOURCES += httpheader.cpp httpgetvar.cpp

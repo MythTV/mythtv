@@ -14,7 +14,7 @@ using namespace std;
 #include <qstringlist.h>
 
 #include "httpinrequest.h"
-#include "httpresponse.h"
+#include "httpoutresponse.h"
 #include "mfd_plugin.h"
 
 HttpInRequest::HttpInRequest(MFDHttpPlugin *owner, char *raw_incoming, int incoming_length)

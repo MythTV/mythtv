@@ -12,7 +12,7 @@
 
 #include "mfd_events.h"
 #include "httpinrequest.h"
-#include "httpresponse.h"
+#include "httpoutresponse.h"
 
 #include "daapserver.h"
 #include "mcc_bitfield.h"

@@ -1,7 +1,7 @@
-#ifndef HTTPRESPONSE_H_
-#define HTTPRESPONSE_H_
+#ifndef HTTPOUTRESPONSE_H_
+#define HTTPOUTRESPONSE_H_
 /*
-	httpresponse.h
+	httpoutresponse.h
 
 	(c) 2003 Thor Sigvaldason and Isaac Richards
 	Part of the mythTV project

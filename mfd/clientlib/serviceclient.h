@@ -50,11 +50,8 @@ class ServiceClient
     QSocketDevice  *client_socket_to_service;
     int            mfd_id;
     MfdInterface   *mfd_interface;
-
-  private:
-  
-    MfdServiceType service_type;
     QString        ip_address;
+    MfdServiceType service_type;
     uint           port;  
 };
 

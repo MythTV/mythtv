@@ -1,5 +1,5 @@
 /*
-    httpresponse.h
+    httpoutresponse.cpp
 
     (c) 2003 Thor Sigvaldason and Isaac Richards
     Part of the mythTV project
@@ -33,7 +33,7 @@ extern "C" {
 
 
 
-#include "httpresponse.h"
+#include "httpoutresponse.h"
 #include "mfd_plugin.h"
 
 

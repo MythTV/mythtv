@@ -10,16 +10,11 @@
 
 */
 
-#include <vector>
-using namespace std;
-
-#include <qdict.h>
-
-#include "httpheader.h"
+#include "httpinresponse.h"
 
 class DaapInstance;
 
-class DaapResponse
+class DaapResponse : public HttpInResponse
 {
 
   public:
@@ -31,26 +26,11 @@ class DaapResponse
                 );
     ~DaapResponse();
 
-    int                 readLine(int *parse_point, char *parsing_buffer, char *raw_incoming);
-    bool                complete();
-    void                appendToPayload(char *raw_incoming, int length);
-    void                printHeaders();    // Debugging
-    std::vector<char>*  getPayload(){return &payload;}
-    QString             getHeader(const QString &field_label);
-    bool                allIsWell(){return all_is_well;}
-    void                allIsWell(bool yes_or_no){all_is_well = yes_or_no;}
-    
+    void         warning(const QString &warn_text);
+
   private:
 
     DaapInstance *parent;
-    int          raw_length;
-    bool         all_is_well;
-    int          status_code;
-    int          expected_payload_size;
-        
-    QDict<HttpHeader>   headers;
-    QString             preserved_top_line;
-    std::vector<char>   payload;
 };
 
 #endif  // daapresponse_h_
