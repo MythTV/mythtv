@@ -146,7 +146,7 @@ package mythtv::nuvinfo;
             die "Unrecognized mpeg stream type.  Please execute the following and see if you\n"
                ."notice errors (make sure that you don't have the \"really quiet\" option set\n"
                ."in your mplayer config).  If not, email the output to the nuvexport author.\n\n"
-               ."    $program -vo null -ao null -frames 0 -identify '$file'\n\n";
+               ."    $program -v -v -v -v -nolirc -nojoystick -vo null -ao null -frames 0 -identify '$file'\n\n";
         }
 # ID_VIDEO_BITRATE=6500000
 # ID_AUDIO_FORMAT=80
