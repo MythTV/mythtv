@@ -75,7 +75,7 @@ VideoOutput *VideoOutput::InitVideoOut(VideoOutputType type)
 
 VideoOutput::VideoOutput()
 {
-    letterbox = -1;
+    letterbox = kLetterbox_Off;
     rpos = 0;
     vpos = 0;
 
@@ -139,8 +139,8 @@ bool VideoOutput::Init(int width, int height, float aspect, WId winid,
 
     XJ_width = width;
     XJ_height = height;
-    XJ_aspect = aspect;
-
+    AspectSet(aspect);
+    
     QString HorizScanMode = gContext->GetSetting("HorizScanMode", "overscan");
     QString VertScanMode = gContext->GetSetting("VertScanMode", "overscan");
 
@@ -184,10 +184,8 @@ bool VideoOutput::Init(int width, int height, float aspect, WId winid,
     hue = gContext->GetNumSettingOnHost("PlaybackHue", 
                                         gContext->GetHostName(), 0);
 
-    int asp_override = gContext->GetNumSetting("AspectOverride", 0);
-
-    if (asp_override > 0) 
-        AspectOverride(asp_override);
+    letterbox = gContext->GetNumSetting("AspectOverride", 0);
+    AspectSet(aspect);
 
     embedding = false;
 
@@ -268,43 +266,40 @@ bool VideoOutput::ApproveDeintFilter(const QString& filtername) const
     return (filtername != "bobdeint");
 }
 
-void VideoOutput::AspectOverride(int override)
+void VideoOutput::AspectSet(float aspect)
 {
-    switch(override)
+    videoAspect = aspect;
+    XJ_aspect = aspect;
+    
+    // Override video's aspect if configured to do so
+    switch (letterbox) 
     {
         default:
-        case 0:
-           break;
-        case 1:
-           XJ_aspect = (16.0 / 9);
-           letterbox = 0;
-           break;
-        case 2:
-           XJ_aspect = (4.0 / 3);
-           letterbox = 1;
-           break;
-        case 3:
-           XJ_aspect = (16.0 / 9);
-           letterbox = 2;
-           break;
-        case 4:
-           XJ_aspect = (4.0 / 3);
-           letterbox = 3;
-           break;
+        case kLetterbox_Off:
+        case kLetterbox_Fill:           XJ_aspect = videoAspect;
+                                        break;
+
+        case kLetterbox_4_3:
+        case kLetterbox_4_3_Zoom:       XJ_aspect = (4.0 / 3);
+                                        break;
+        case kLetterbox_16_9:
+        case kLetterbox_16_9_Zoom:
+        case kLetterbox_16_9_Stretch:   XJ_aspect = (16.0 / 9);
+                                        break;
     }
 }
 
 void VideoOutput::AspectChanged(float aspect)
 {
-    XJ_aspect = aspect;
+    AspectSet(aspect);
 }
 
 void VideoOutput::InputChanged(int width, int height, float aspect)
 {
     XJ_width = width;
     XJ_height = height;
-    XJ_aspect = aspect;
-
+    AspectSet(aspect);
+    
     video_buflock.lock();
 
     availableVideoBuffers.clear();
@@ -392,6 +387,22 @@ void VideoOutput::GetVisibleSize(int &xoff, int &yoff, int &width, int &height)
             width = (imgw*3)/4;
             xoff = imgw/8;
             break;
+        case kLetterbox_Fill:
+            if (GetDisplayAspect() > XJ_aspect)
+            {
+                int pixDisplayed = int(((XJ_aspect / GetDisplayAspect()) * imgh) + 0.5);
+
+                height = pixDisplayed;
+                yoff = (imgh - pixDisplayed) / 2;
+            }
+            else
+            {
+                int pixDisplayed = int(((GetDisplayAspect() / XJ_aspect) * imgw) + 0.5);
+
+                width = pixDisplayed;
+                xoff = (imgw - pixDisplayed) / 2;
+            }
+            break;
         default:
             break;
     }
@@ -400,6 +411,7 @@ void VideoOutput::GetVisibleSize(int &xoff, int &yoff, int &width, int &height)
 void VideoOutput::MoveResize(void)
 {
     int yoff, xoff;
+    float displayAspect;
 
     // Preset all image placement and sizing variables.
     imgx = 0; imgy = 0;
@@ -409,6 +421,17 @@ void VideoOutput::MoveResize(void)
     dispwoff = dispw; disphoff = disph;
     if (imgw == 1920 && imgh == 1088)
         imgh = 1080; // ATSC 1920x1080
+
+    // Get display aspect and correct for rounding errors
+    displayAspect = GetDisplayAspect();
+
+    // Check if close to 4:3
+    if(fabs(displayAspect - 1.333333) < 0.1)
+        displayAspect = 1.333333;
+
+    // Check if close to 16:9
+    if(fabs(displayAspect - 1.777777) < 0.1)
+        displayAspect = 1.777777;
 
 /*
     Here we apply playback over/underscanning and offsetting (if any apply).
@@ -521,33 +544,41 @@ void VideoOutput::MoveResize(void)
     //printf("Before: %dx%d%+d%+d\n", dispwoff, disphoff, dispxoff, 
     //    dispyoff);
     
-    if (XJ_aspect <= 1.4) 
-    {
-        // Video is 4:3
-        if (letterbox == -1)
-            letterbox = kLetterbox_4_3;
-    }
-    else
-    {
-        // Video is 16:9
-        if (letterbox == -1)
-            letterbox = kLetterbox_16_9;
+    if ((fabs(displayAspect - XJ_aspect) / displayAspect) > 0.1){
+        if(letterbox == kLetterbox_Fill){
+            if (displayAspect > XJ_aspect)
+            {
+                float pixNeeded = ((displayAspect / XJ_aspect) * (float)disphoff) + 0.5;
+
+                dispyoff += (disphoff - (int)pixNeeded) / 2;
+                disphoff = (int)pixNeeded;
+            }
+            else
+            {
+                float pixNeeded = ((XJ_aspect / displayAspect) * (float)dispwoff) + 0.5;
+
+                dispxoff += (dispwoff - (int)pixNeeded) / 2;
+                dispwoff = (int)pixNeeded;
+            }
+        }
+        else {
+            if (displayAspect > XJ_aspect)
+            {
+                float pixNeeded = ((XJ_aspect / displayAspect) * (float)dispwoff) + 0.5;
+
+                dispxoff += (dispwoff - (int)pixNeeded) / 2;
+                dispwoff = (int)pixNeeded;
+            }
+            else
+            {
+                float pixNeeded = ((displayAspect / XJ_aspect) * (float)disphoff) + 0.5;
+
+                dispyoff += (disphoff - (int)pixNeeded) / 2;
+                disphoff = (int)pixNeeded;
+            }
+        }
     }
 
-    if (GetDisplayAspect() > XJ_aspect)
-    {
-        float pixNeeded = (h_mm * XJ_aspect) * ((float)dispwoff / w_mm);
-
-        dispxoff += (dispwoff - (int)pixNeeded) / 2;
-        dispwoff = (int)pixNeeded;
-    }
-    else
-    {
-        float pixNeeded = (w_mm / XJ_aspect) * ((float)disphoff / h_mm);
-
-        dispyoff += (disphoff - (int)pixNeeded) / 2;
-        disphoff = (int)pixNeeded;
-    }
 
     if ((letterbox == kLetterbox_4_3_Zoom) ||
         (letterbox == kLetterbox_16_9_Zoom))
@@ -571,6 +602,30 @@ void VideoOutput::MoveResize(void)
         //dispxoff, dispyoff);
         dispxoff -= (dispwoff/6); // 1/6 of original is 1/8 of new
         dispwoff = dispwoff*4/3;
+    }
+
+    if ((double(abs(disphoff - imgh)) / disphoff) < 0.05){
+      /* Calculated height is within 5% of the source height. Accept
+        slight distortion/overscan/underscan to avoid scaling */
+
+      dispyoff += (disphoff - imgh) / 2;
+      disphoff = imgh;
+
+      VERBOSE(VB_PLAYBACK,
+             QString("Snapping height to avoid scaling: disphoff %1, dispyoff: %2")
+             .arg(disphoff).arg(dispyoff));
+    }
+
+    if ((double(abs(dispwoff - imgw)) / dispwoff) < 0.05){
+      /* Calculated width is within 5% of the source width. Accept
+        slight distortion/overscan/underscan to avoid scaling */
+
+      dispxoff += (dispwoff - imgw) / 2;
+      dispwoff = imgw;
+
+      VERBOSE(VB_PLAYBACK,
+             QString("Snapping width to avoid scaling: dispwoff %1, dispxoff: %2")
+             .arg(dispwoff).arg(dispxoff));
     }
 
     if (ZoomedIn)
@@ -597,6 +652,18 @@ void VideoOutput::MoveResize(void)
     //printf("After: %dx%d%+d%+d\n", dispwoff, disphoff, dispxoff, 
     //dispyoff);
 
+#if 0
+    printf("VideoOutput::MoveResize:\n");
+    printf("Img(%d,%d %d,%d)\n", imgx, imgy, imgw, imgh);
+    printf("Disp(%d,%d %d,%d)\n", dispxoff, dispyoff, dispwoff, disphoff);
+    printf("Offset(%d,%d)\n", xoff, yoff);
+    printf("Vscan(%f, %f)\n", img_vscanf, img_vscanf);
+    printf("DisplayAspect: %f\n", GetDisplayAspect());
+    printf("VideoAspect(%f)\n", videoAspect);
+    printf("XJ_aspect(%f)\n", XJ_aspect);
+    printf("CDisplayAspect: %f\n", displayAspect);
+    printf("Letterbox: %d\n", letterbox);
+#endif
  
     VERBOSE(VB_PLAYBACK,
             QString("Image size. dispxoff %1, dispyoff: %2, dispwoff: %3, "
@@ -655,24 +722,14 @@ void VideoOutput::ToggleLetterbox(int letterboxMode)
     if (letterboxMode == kLetterbox_Toggle)
     {
         if (++letterbox >= kLetterbox_END)
-            letterbox = 0;
+            letterbox = kLetterbox_Off;
     }
     else
     {
         letterbox = letterboxMode;
     }
 
-    switch (letterbox) 
-    {
-        default:
-        case kLetterbox_4_3:
-        case kLetterbox_4_3_Zoom:      AspectChanged(4.0 / 3);
-                                       break;
-        case kLetterbox_16_9:
-        case kLetterbox_16_9_Zoom:
-        case kLetterbox_16_9_Stretch:  AspectChanged(16.0 / 9);
-                                       break;
-    }
+    AspectChanged(videoAspect);
 }
 
 int VideoOutput::ValidVideoFrames(void)

@@ -68,11 +68,13 @@ enum ZoomDirections
 enum letterboxModes
 {
     kLetterbox_Toggle = -1,
-    kLetterbox_4_3 = 0,
+    kLetterbox_Off = 0,
+    kLetterbox_4_3,
     kLetterbox_16_9,
     kLetterbox_4_3_Zoom,
     kLetterbox_16_9_Zoom,
     kLetterbox_16_9_Stretch,
+    kLetterbox_Fill,
     kLetterbox_END
 };
 
@@ -200,10 +202,11 @@ class VideoOutput
     void DoPipResize(int pipwidth, int pipheight);
     void ShutdownPipResize(void);
 
-    void AspectOverride(int override);
+    void AspectSet(float aspect);
 
     int XJ_width, XJ_height;
     float XJ_aspect;
+    float videoAspect;
 
     int w_mm;
     int h_mm;

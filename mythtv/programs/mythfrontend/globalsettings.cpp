@@ -1097,13 +1097,18 @@ static GenericComboBox *AspectOverride()
     GenericComboBox *gc = new GenericComboBox("AspectOverride");
     gc->setLabel(QObject::tr("Aspect Override"));
     gc->addSelection(QObject::tr("Off"), "0");
-    gc->addSelection(QObject::tr("16/9 Anamorphic"), "1");
-    gc->addSelection(QObject::tr("4/3 Normal"), "2");
-    gc->addSelection(QObject::tr("16/9 Zoom"), "3");
+    gc->addSelection(QObject::tr("4/3"), "1");
+    gc->addSelection(QObject::tr("16/9"), "2");
     gc->addSelection(QObject::tr("4/3 Zoom"), "3");
+    gc->addSelection(QObject::tr("16/9 Zoom"), "4");
+    gc->addSelection(QObject::tr("16/9 Stretch"), "5");
+    gc->addSelection(QObject::tr("Fill"), "6");
     gc->setHelpText(QObject::tr("This will override any aspect ratio in the "
                     "recorded stream, the same as pressing the W Key "
-                    "during playback."));
+                    "during playback. "
+		    "Fill will \"fill\" the screen with the image clipping as required. "
+		    "Fill is useful when using 4:3 interlaced TV's for display."
+		    ));
     return gc;
 }
 

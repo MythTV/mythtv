@@ -1764,7 +1764,7 @@ void NuppelVideoPlayer::StartPlaying(void)
     if (!disablevideo)
     {
         int dispx = 0, dispy = 0, dispw = video_width, disph = video_height;
-        videoOutput->GetDrawSize(dispx, dispy, dispw, disph);
+        videoOutput->GetVisibleSize(dispx, dispy, dispw, disph);
         osd = new OSD(video_width, video_height, frame_interval,
                       osdfontname, osdccfontname, osdprefix, osdtheme,
                       dispx, dispy, dispw, disph);

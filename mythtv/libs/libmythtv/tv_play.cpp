@@ -3390,11 +3390,13 @@ void TV::ToggleLetterbox(int letterboxMode)
 
     switch (letterbox)
     {
-        case kLetterbox_4_3: default: text = tr("4:3"); break;
+        case kLetterbox_4_3:          text = tr("4:3"); break;
         case kLetterbox_16_9:         text = tr("16:9"); break;
         case kLetterbox_4_3_Zoom:     text = tr("4:3 Zoom"); break;
         case kLetterbox_16_9_Zoom:    text = tr("16:9 Zoom"); break;
         case kLetterbox_16_9_Stretch: text = tr("16:9 Stretch"); break;
+        case kLetterbox_Fill:         text = tr("Fill"); break;
+        default:                      text = tr("Off"); break;
     }
 
     if (osd && !browsemode && !osd->IsRunningTreeMenu())
