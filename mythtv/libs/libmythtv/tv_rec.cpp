@@ -119,7 +119,7 @@ TVRec::TVRec(int capturecardnum)
         exit(-20);
 #endif
     }
-    if (cardtype == "FIREWIRE")
+    else if (cardtype == "FIREWIRE")
     {
 #ifdef USING_FIREWIRE
         channel = new FirewireChannel(this);
