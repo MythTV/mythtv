@@ -616,6 +616,13 @@
       <bold>yes</bold>
     </font>
 
+    <font name="recording_font" face="Arial">
+      <color>#FF33FF</color>
+      <size>16</size>
+      <size:small>11</size:small>
+      <bold>yes</bold>
+    </font>
+
     <font name="norecordfnt" face="Arial">
       <color>#999999</color>
       <size>16</size>
@@ -724,7 +731,8 @@
         <fcnfont name="norecordfnt" function="disabledrecording"></fcnfont>
         <fcnfont name="active_font" function="active"></fcnfont>
         <fcnfont name="inactive_font" function="inactive"></fcnfont>
-        <fcnfont name="record_font" function="recording"></fcnfont>
+        <fcnfont name="record_font" function="record"></fcnfont>
+        <fcnfont name="recording_font" function="recording"></fcnfont>
         <fcnfont name="active_font" function="selected"></fcnfont>
         <columnpadding>10</columnpadding>
         <column number="1" width="160" context="-1"></column>
@@ -1205,8 +1213,8 @@
       <bold>yes</bold>
     </font>
 
-    <font name="record_font" face="Arial">
-      <color>#F7862B</color>
+    <font name="recording_font" face="Arial">
+      <color>#FF33FF</color>
       <size>16</size>
       <size:small>11</size:small>
       <bold>yes</bold>
@@ -1299,7 +1307,7 @@
       </listarea>
       <listarea name="showing" draworder="4">
         <area>240,18,600,265</area>
-        <fcnfont name="record_font" function="recording"></fcnfont>
+        <fcnfont name="recording_font" function="recording"></fcnfont>
         <fcnfont name="overunderrecfont" function="overunderrecording"></fcnfont>
         <fcnfont name="active" function="active"></fcnfont>
         <fcnfont name="active" function="selected"></fcnfont>
@@ -1486,6 +1494,13 @@
       <bold>yes</bold>
     </font>
 
+    <font name="recording_font" face="Arial">
+      <color>#FF33FF</color>
+      <size>16</size>
+      <size:small>11</size:small>
+      <bold>yes</bold>
+    </font>
+
     <font name="titleinfo" face="Arial">
       <color>#ffffff</color>
       <dropcolor>#000000</dropcolor>
@@ -1559,7 +1574,8 @@
         <fcnfont name="active" function="active"></fcnfont>
         <fcnfont name="active" function="selected"></fcnfont>
         <fcnfont name="inactive" function="inactive"></fcnfont>
-        <fcnfont name="record_font" function="recording"></fcnfont>
+        <fcnfont name="record_font" function="record"></fcnfont>
+        <fcnfont name="recording_font" function="recording"></fcnfont>
         <items>9</items>
         <image function="selectionbar" filename="pf-sel3.png" location="-8,-7"></image>
       </listarea>
@@ -1668,6 +1684,13 @@
       <bold>yes</bold>
     </font>
 
+    <font name="recording_font" face="Arial">
+      <color>#FF33FF</color>
+      <size>16</size>
+      <size:small>11</size:small>
+      <bold>yes</bold>
+    </font>
+
     <font name="conflict_font" face="Arial">
       <color>#ffff33</color>
       <size>16</size>
@@ -1735,7 +1758,8 @@
         <fcnfont name="active_font" function="active"></fcnfont>
         <fcnfont name="inactive_font" function="inactive"></fcnfont>
         <fcnfont name="active_font" function="selected"></fcnfont>
-        <fcnfont name="record_font" function="recording"></fcnfont>
+        <fcnfont name="record_font" function="record"></fcnfont>
+        <fcnfont name="recording_font" function="recording"></fcnfont>
         <fcnfont name="conflict_font" function="conflicting"></fcnfont>
         <columnpadding>10</columnpadding>
         <column number="1" width="160" context="-1"></column>

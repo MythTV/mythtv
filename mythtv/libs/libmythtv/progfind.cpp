@@ -922,8 +922,10 @@ void ProgFinder::showShowingList()
                             + showData[t]->startts.toString(dateFormat)
                             + " " + showData[t]->startts.toString(timeFormat));
 
-                        if (showData[t]->recstatus <= rsWillRecord)
+                        if (showData[t]->recstatus == rsRecording)
                             ltype->EnableForcedFont(curLabel, "recording");
+                        else if (showData[t]->recstatus == rsWillRecord)
+                            ltype->EnableForcedFont(curLabel, "record");
 
                     }
                     else

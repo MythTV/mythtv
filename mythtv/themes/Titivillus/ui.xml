@@ -698,7 +698,8 @@
         <fcnfont name="norecordfnt" function="disabledrecording"></fcnfont>
         <fcnfont name="list-active" function="active"></fcnfont>
         <fcnfont name="list-inactive" function="inactive"></fcnfont>
-        <fcnfont name="list-record" function="recording"></fcnfont>
+        <fcnfont name="list-record" function="record"></fcnfont>
+        <fcnfont name="list-recording" function="recording"></fcnfont>
         <fcnfont name="list-selected" function="selected"></fcnfont>
         <columnpadding>10</columnpadding>
         <column number="1" width="160" context="-1"></column>
@@ -936,7 +937,8 @@
         <fcnfont name="list-active" function="active"></fcnfont>
         <fcnfont name="list-inactive" function="inactive"></fcnfont>
         <fcnfont name="list-selected" function="selected"></fcnfont>
-        <fcnfont name="list-record" function="recording"></fcnfont>
+        <fcnfont name="list-record" function="record"></fcnfont>
+        <fcnfont name="list-recording" function="recording"></fcnfont>
         <columnpadding>1</columnpadding>
         <column number="1" width="35" context="-1"></column>
         <column number="2" width="570" context="-1"></column>
@@ -1130,7 +1132,8 @@
       </listarea>
       <listarea name="showing" draworder="4">
         <area>240,18,600,265</area>
-        <fcnfont name="list-record" function="recording"></fcnfont>
+        <fcnfont name="list-record" function="record"></fcnfont>
+        <fcnfont name="list-recording" function="recording"></fcnfont>
         <fcnfont name="overunderrecfont" function="overunderrecording"></fcnfont>
         <fcnfont name="list-active" function="active"></fcnfont>
         <fcnfont name="list-selected" function="selected"></fcnfont>
@@ -1355,7 +1358,8 @@
         <fcnfont name="list-active" function="active"></fcnfont>
         <fcnfont name="list-selected" function="selected"></fcnfont>
         <fcnfont name="list-inactive" function="inactive"></fcnfont>
-        <fcnfont name="list-record" function="recording"></fcnfont>
+        <fcnfont name="list-record" function="record"></fcnfont>
+        <fcnfont name="list-recording" function="recording"></fcnfont>
         <items>9</items>
         <image function="selectionbar" filename="progfind/progfind_sel3.png" location="-8,-5"></image>
       </listarea>
@@ -1474,7 +1478,8 @@
         <fcnfont name="list-active" function="active"></fcnfont>
         <fcnfont name="list-inactive" function="inactive"></fcnfont>
         <fcnfont name="list-selected" function="selected"></fcnfont>
-        <fcnfont name="list-record" function="recording"></fcnfont>
+        <fcnfont name="list-record" function="record"></fcnfont>
+        <fcnfont name="list-recording" function="recording"></fcnfont>
         <fcnfont name="list-conflict" function="conflicting"></fcnfont>
         <columnpadding>5</columnpadding>
         <column number="1" width="155" context="-1"></column>

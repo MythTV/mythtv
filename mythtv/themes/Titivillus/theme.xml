@@ -63,7 +63,11 @@
     <font name="list-record" base="list-active">
       <color>#33ff33</color>
     </font>
-    
+
+    <font name="list-recording" base="list-active">
+      <color>#ff5544</color>
+    </font>
+
     <font name="list-norecord" base="list-active">
       <color>#999999</color>
     </font>

@@ -1486,8 +1486,10 @@ void ProgLister::updateList(QPainter *p)
 
                 if (pi->recstatus == rsConflict)
                     ltype->EnableForcedFont(i, "conflicting");
-                else if (pi->recstatus <= rsWillRecord)
+                else if (pi->recstatus == rsRecording)
                     ltype->EnableForcedFont(i, "recording");
+                else if (pi->recstatus == rsWillRecord)
+                    ltype->EnableForcedFont(i, "record");
 
                 if (i + skip == curItem)
                     ltype->SetItemCurrent(i);
