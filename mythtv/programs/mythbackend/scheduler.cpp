@@ -31,6 +31,9 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
 
     threadrunning = runthread;
 
+    recordingList_lock = new QMutex(true);
+    scheduledList_lock = new QMutex(true);
+
     if (runthread)
     {
         pthread_t scthread;
@@ -166,7 +169,7 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
     if (recTypeRecPriorityMap.size() > 0)
         recTypeRecPriorityMap.clear();
 
-    QMutexLocker lockit(&recordingList_lock);
+    QMutexLocker lockit(recordingList_lock);
 
     while (recordingList.size() > 0)
     {
@@ -229,7 +232,7 @@ void Scheduler::FillRecordListFromMaster(void)
 
     vector<ProgramInfo *>::iterator pgiter = reclist.begin();
 
-    QMutexLocker lockit(&recordingList_lock);
+    QMutexLocker lockit(recordingList_lock);
 
     for (; pgiter != reclist.end(); pgiter++)
     {
@@ -305,7 +308,7 @@ void Scheduler::RemoveRecording(ProgramInfo *pginfo)
 {
     recPendingList.remove(pginfo->schedulerid);
 
-    QMutexLocker lockit(&recordingList_lock);
+    QMutexLocker lockit(recordingList_lock);
 
     list<ProgramInfo *>::iterator i = recordingList.begin();
     for (; i != recordingList.end(); i++)
@@ -523,7 +526,7 @@ void Scheduler::PruneList(void)
 
 void Scheduler::getAllPending(list<ProgramInfo *> *retList)
 {
-    QMutexLocker lockit(&recordingList_lock);
+    QMutexLocker lockit(recordingList_lock);
 
     while (retList->size() > 0)
     {
@@ -556,7 +559,7 @@ list<ProgramInfo *> *Scheduler::getAllScheduled(void)
 
 void Scheduler::getAllScheduled(list<ProgramInfo *> *retList)
 {
-    QMutexLocker lockit(&scheduledList_lock);
+    QMutexLocker lockit(scheduledList_lock);
 
     while (retList->size() > 0)
     {
@@ -579,6 +582,8 @@ list<ProgramInfo *> *Scheduler::getConflicting(ProgramInfo *pginfo,
                                                bool removenonplaying,
                                                list<ProgramInfo *> *uselist)
 {
+    QMutexLocker lockit(recordingList_lock);
+
     if (!pginfo->conflicting && removenonplaying)
         return NULL;
 

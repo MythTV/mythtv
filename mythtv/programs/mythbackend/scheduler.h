@@ -82,8 +82,8 @@ class Scheduler : public QObject
     list<ProgramInfo *> recordingList;
     list<ProgramInfo *> scheduledList;
 
-    QMutex recordingList_lock;
-    QMutex scheduledList_lock;
+    QMutex *recordingList_lock;
+    QMutex *scheduledList_lock;
 
     bool doRecPriority;
     bool doRecPriorityFirst;
