@@ -1570,7 +1570,7 @@ void UIAnimatedImageType::Draw(QPainter *dr, int drawlayer, int context)
 
             if (!((*imageList)[m_currentimage-1])->isNull())
             {
-                dr->drawPixmap(m_displaypos.x(), m_displaypos.y(), *imageList->at(m_currentimage-1), m_drop_x, m_drop_y);
+                dr->drawPixmap(m_displaypos.x(), m_displaypos.y(), *(*imageList)[m_currentimage-1], m_drop_x, m_drop_y);
             }
         }
     }
