@@ -1,6 +1,6 @@
 #include "volumecontrol.h"
 
-#ifndef _WIN32
+#ifdef USING_OSS
 #include <sys/soundcard.h>
 #endif
 
@@ -19,7 +19,7 @@ VolumeControl::VolumeControl(bool setstartingvolume)
     mixerfd = 0;
     volume = 0;
 
-#ifndef _WIN32
+#ifdef USING_OSS
     mute = false;
     current_mute_state = MUTE_OFF;
   
@@ -72,7 +72,7 @@ VolumeControl::~VolumeControl()
 
 int VolumeControl::GetCurrentVolume(void)
 {
-#ifndef _WIN32
+#ifdef USING_OSS
     int realvol;
     
     if(mute)
@@ -96,7 +96,7 @@ int VolumeControl::GetCurrentVolume(void)
 
 void VolumeControl::SetCurrentVolume(int value)
 {
-#ifndef _WIN32
+#ifdef USING_OSS
     volume = value;
 
     if (volume > 100)
@@ -133,7 +133,7 @@ void VolumeControl::AdjustCurrentVolume(int change)
 
 void VolumeControl::SetMute(bool on)
 {
-#ifndef _WIN32
+#ifdef USING_OSS
     int realvol;
 
     if (on)
@@ -165,7 +165,7 @@ kMuteState VolumeControl::IterateMutedChannels(void)
 // current_mute_state is initialized to "MUTE_OFF".  If individual muting
 // is enabled, each call to SetMute will advance to the next state:
 // MUTE_OFF -> MUTE_LEFT -> MUTE_RIGHT -> MUTE_BOTH -> MUTE_OFF
-#ifndef _WIN32
+#ifdef USING_OSS
     int realvol;
 
     switch (current_mute_state)
