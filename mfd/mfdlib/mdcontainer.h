@@ -72,6 +72,9 @@ class MetadataContainer
     Playlist*           getPlaylist(int pl_id);
     QIntDict<Playlist>* getPlaylists(){return current_playlists;}
 
+    QValueList<int>*    getMetadataAdditions(){return &metadata_additions;}
+    QValueList<int>*    getMetadataDeletions(){return &metadata_deletions;}
+
     void                dataSwap(   
                                     QIntDict<Metadata>* new_metadata, 
                                     QValueList<int> metadata_in,

@@ -20,6 +20,7 @@ using namespace std;
 struct httpd;
 
 #include "daaplib/basic.h"
+#include "daaplib/tagoutput.h"
 
 #include "request.h"
 #include "session.h"
@@ -41,6 +42,7 @@ class DaapServer: public MFDHttpPlugin
     void    sendUpdate(HttpRequest *http_request, u32 database_version);
     void    sendMetadata(HttpRequest *http_request, QString request_path, DaapRequest *daap_request);
     void    sendDatabaseList(HttpRequest *http_request);
+    void    addItemToResponse(TagOutput &response, AudioMetadata *which_item, u64 meta_codes);
     void    sendDatabase(HttpRequest *http_request, DaapRequest *daap_request, int which_database);
     void    sendDatabaseItem(HttpRequest *http_request, u32 song_id, DaapRequest *daap_request);
     void    sendContainers(HttpRequest *http_request, DaapRequest *daap_request, int which_database);
@@ -55,6 +57,7 @@ class DaapServer: public MFDHttpPlugin
     QPtrList<MetadataContainer> *metadata_containers;
     QString                     service_name;
     QValueList<int>             hanging_updates;
+    QMutex                      hanging_updates_mutex;
     bool                        first_update;
 };
 

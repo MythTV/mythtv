@@ -42,6 +42,7 @@ class MetadataServer : public MFDServicePlugin
     void                         unlockPlaylists();
 
     QPtrList<MetadataContainer>* getMetadataContainers(){return metadata_containers;}
+    MetadataContainer*           getMetadataContainer(int which_one);
     uint                         getMetadataAudioGeneration();
     uint                         getAllAudioMetadataCount();
     uint                         getAllAudioPlaylistCount();

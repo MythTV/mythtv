@@ -334,6 +334,30 @@ void MetadataServer::doAtomicDataSwap(
     unlockMetadata();
 }
 
+MetadataContainer* MetadataServer::getMetadataContainer(int which_one)
+{
+    //
+    //  Hope and pray that whoever called this locked the metadata first!
+    //
+    
+    MetadataContainer *target = NULL;
+    MetadataContainer *a_container;
+    for (
+            a_container = metadata_containers->first(); 
+            a_container; 
+            a_container = metadata_containers->next()
+        )
+    {
+        if(a_container->getIdentifier() == which_one)
+        {
+            target = a_container;
+            break; 
+        }
+    }
+    return target;        
+}
+
+
 
 MetadataServer::~MetadataServer()
 {
