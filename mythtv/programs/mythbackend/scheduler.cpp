@@ -270,8 +270,8 @@ void Scheduler::PrintList(bool onlyFutureRecordings)
     QDateTime now = QDateTime::currentDateTime();
 
     cout << "--- print list start ---\n";
-    cout << "Title - Subtitle                  Chan ChID Day Start  End   "
-        "S C I  T O N Pri" << endl;
+    cout << "Title - Subtitle                    Chan ChID Day Start  End   "
+        "S C I  T N Pri" << endl;
 
     RecIter i = reclist.begin();
     for ( ; i != reclist.end(); i++)
@@ -305,13 +305,13 @@ void Scheduler::PrintRec(ProgramInfo *p, const char *prefix)
     else
         episode = p->title.local8Bit();
 
-    cout << episode.leftJustify(33, ' ', true) << " "
+    cout << episode.leftJustify(35, ' ', true) << " "
          << p->chanstr.rightJustify(4, ' ') << " " << p->chanid 
          << p->recstartts.toString("  dd hh:mm-").local8Bit()
          << p->recendts.toString("hh:mm  ").local8Bit()
          << p->sourceid << " " << p->cardid << " "
          << p->inputid << "  " << p->RecTypeChar() << " "
-         << p->override << " " << p->RecStatusChar() << " "
+         << p->RecStatusChar() << " "
          << QString::number(p->recpriority).rightJustify(3, ' ')
          << endl;
 }
@@ -450,7 +450,8 @@ void Scheduler::MarkOtherShowings(RecList &titlelist, ProgramInfo *p)
             continue;
         if (q->IsSameTimeslot(*p))
             q->recstatus = rsLaterShowing;
-        else if (q->rectype != kSingleRecord && q->override != 1 && 
+        else if (q->rectype != kSingleRecord && 
+                 q->rectype != kOverrideRecord && 
                  q->IsSameProgram(*p))
         {
             if (q->recstartts < p->recstartts)
@@ -504,7 +505,8 @@ bool Scheduler::TryAnotherShowing(RecList &titlelist, ProgramInfo *p)
             continue;
         if (!p->IsSameProgram(*q))
             continue;
-        if ((p->rectype == kSingleRecord || p->override == 1) && 
+        if ((p->rectype == kSingleRecord || 
+             p->rectype == kOverrideRecord) && 
             !p->IsSameTimeslot(*q))
             continue;
         if (q->recstartts < schedTime && p->recstartts >= schedTime)
@@ -1183,7 +1185,7 @@ void Scheduler::AddNewRecords(void) {
 "IF(cardinput.preference IS NOT NULL,cardinput.preference,0), "
 "record.dupin, "
 "recorded.endtime IS NOT NULL AND recorded.endtime < NOW() AS recduplicate, "
-"record.type, record.recordid, recordoverride.type, "
+"record.type, record.recordid, 0, "
 "program.starttime - INTERVAL record.startoffset minute AS recstartts, "
 "program.endtime + INTERVAL record.endoffset minute AS recendts, "
 "program.previouslyshown, record.recgroup, record.dupmethod, "
@@ -1211,16 +1213,6 @@ void Scheduler::AddNewRecords(void) {
 "    (((record.dupmethod & 0x02) = 0) OR (recorded.subtitle IS NOT NULL AND recorded.subtitle <> '' AND program.subtitle = recorded.subtitle)) "
 "     AND "
 "    (((record.dupmethod & 0x04) = 0) OR (recorded.description IS NOT NULL AND recorded.description <> '' AND program.description = recorded.description)) "
-"  ) "
-" LEFT JOIN recordoverride ON "
-"  ( "
-"    record.recordid = recordoverride.recordid "
-"    AND channel.callsign = recordoverride.station "
-"    AND program.starttime = recordoverride.starttime "
-"    AND program.endtime = recordoverride.endtime "
-"    AND program.title = recordoverride.title "
-"    AND program.subtitle = recordoverride.subtitle "
-"    AND program.description = recordoverride.description "
 "  ) "
 "WHERE "
 "((record.type = %1 " // allrecord
@@ -1252,7 +1244,7 @@ void Scheduler::AddNewRecords(void) {
 "  )"
 " )"
 ") "
-// Note: the rsOverlap code below depends on this ordering
+// Note: the overlap code below depends on this ordering
 "ORDER BY program.starttime,program.endtime,program.chanid,"
 "cardinput.cardinputid,record.recordid;")
         .arg(kAllRecord)
@@ -1300,7 +1292,6 @@ void Scheduler::AddNewRecords(void) {
         p->dupmethod = RecordingDupMethodType(result.value(22).toInt());
         p->rectype = RecordingType(result.value(15).toInt());
         p->recordid = result.value(16).toInt();
-        p->override = result.value(17).toInt();
 
         p->recstartts = result.value(18).toDateTime();
         p->recendts = recendts;
@@ -1313,9 +1304,6 @@ void Scheduler::AddNewRecords(void) {
             recTypeRecPriorityMap[p->rectype] = 
                 p->GetRecordingTypeRecPriority(p->rectype);
         p->recpriority += recTypeRecPriorityMap[p->rectype];
-
-        if (p->override == 1)
-            p->recpriority += 50;
 
         if (p->recstartts >= p->recendts)
         {
@@ -1351,8 +1339,7 @@ void Scheduler::AddNewRecords(void) {
         for ( ; rec != reclist.end(); rec++)
         {
             ProgramInfo *r = *rec;
-            if (p->recordid == r->recordid &&
-                p->IsSameProgramTimeslot(*r))
+            if (p->IsSameTimeslot(*r))
             {
                 if (r->reactivate > 0)
                 {
@@ -1377,10 +1364,11 @@ void Scheduler::AddNewRecords(void) {
             p->recstatus = rsTooManyRecordings;
 
         // Check for rsCurrentRecording and rsPreviousRecording
-        if (p->override == 2)
-            p->recstatus = rsManualOverride;
+        if (p->rectype == kDontRecord)
+            p->recstatus = rsDontRecord;
         else if (p->rectype != kSingleRecord &&
-                 p->override != 1 && !p->reactivate &&
+                 p->rectype != kOverrideRecord &&
+                 !p->reactivate &&
                  !(p->dupmethod & kDupCheckNone))
         {
             if (p->dupin & kDupsInOldRecorded &&
@@ -1391,7 +1379,7 @@ void Scheduler::AddNewRecords(void) {
                 p->recstatus = rsCurrentRecording;
         }
 
-        // Check for rsOverlap against last non-rsOverlap
+        // Check for overlap against last non-overlap
         if (lastp == NULL || lastp->recordid == p->recordid ||
             !lastp->IsSameTimeslot(*p))
             lastp = p;
@@ -1399,13 +1387,10 @@ void Scheduler::AddNewRecords(void) {
         {
             int lpri = RecTypePriority(lastp->rectype);
             int cpri = RecTypePriority(p->rectype);
-            if (lpri <= cpri)
-                p->recstatus = rsOverlap;
-            else
-            {
-                lastp->recstatus = rsOverlap;
-                lastp = p;
-            }
+            if (lpri > cpri)
+                *lastp = *p;
+            delete p;
+            continue;
         }
 
         tmpList.push_back(p);
@@ -1454,6 +1439,7 @@ void Scheduler::findAllScheduledPrograms(list<ProgramInfo *> &proglist)
             proginfo->recordid = result.value(11).toInt();
 
             if (proginfo->rectype == kSingleRecord || 
+                proginfo->rectype == kOverrideRecord ||
                 proginfo->rectype == kTimeslotRecord ||
                 proginfo->rectype == kWeekslotRecord) 
             {
@@ -1473,13 +1459,11 @@ void Scheduler::findAllScheduledPrograms(list<ProgramInfo *> &proglist)
             }
 
             proginfo->title = QString::fromUtf8(result.value(5).toString());
-
-            if (proginfo->rectype == kSingleRecord)
-                proginfo->subtitle =
+            proginfo->subtitle =
                     QString::fromUtf8(result.value(6).toString());
-
             proginfo->description =
                 QString::fromUtf8(result.value(7).toString());
+
             proginfo->recpriority = result.value(8).toInt();
             proginfo->channame = QString::fromUtf8(result.value(10).toString());
             proginfo->recgroup = result.value(12).toString();

@@ -1554,6 +1554,17 @@ public:
     };
 };
 
+class GROverrideRecordRecPriority: public SpinBoxSetting, public BackendSetting {
+public:
+    GROverrideRecordRecPriority():
+        SpinBoxSetting(-99, 99, 1), BackendSetting("OverrideRecordRecPriority") {
+        setLabel(QObject::tr("Override Recordings Priority"));
+        setHelpText(QObject::tr("Override Recordings will receive this "
+                    "additional recording priority value."));
+        setValue(0);
+    };
+};
+
 class DefaultTVChannel: public LineEditSetting, public GlobalSetting {
 public:
     DefaultTVChannel():
@@ -2329,6 +2340,7 @@ GeneralRecPrioritiesSettings::GeneralRecPrioritiesSettings()
 
     gr->addChild(new GRSchedMoveHigher());
     gr->addChild(new GRSingleRecordRecPriority());
+    gr->addChild(new GROverrideRecordRecPriority());
     gr->addChild(new GRFindOneRecordRecPriority());
     gr->addChild(new GRWeekslotRecordRecPriority());
     gr->addChild(new GRTimeslotRecordRecPriority());

@@ -78,56 +78,80 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, MythMainWindow *parent,
 
     lview->installEventFilter(this);
 
-    RecListItem *item = new RecListItem(lview, tr("Record this program whenever"
-                                        " it's shown anywhere"), kAllRecord);
-    if (recordstatus == kAllRecord)
-        selectItem = item;
+    RecListItem *item;
 
-    item = new RecListItem(lview, tr("Record this program whenever it's shown "
-                           "on this channel"), kChannelRecord);
-    if (recordstatus == kChannelRecord)
-        selectItem = item;
+    if (recordstatus != kOverrideRecord && recordstatus != kDontRecord)
+    {
 
-    QString msg = "Shouldn't show up.";
-    RecordingType rt = kNotRecording;
-    if (programtype == 2 ||
-        programtype == -1 ||
-        recordstatus == kWeekslotRecord)
-    {
-        msg = tr("Record this program in this timeslot every week");
-        rt = kTimeslotRecord;
-    }
-    else if (programtype == 1)
-    {
-        msg = tr("Record this program in this timeslot every day");
-        rt = kTimeslotRecord;
-    }
+        item = new RecListItem(lview, tr("Record this program whenever "
+                                         "it's shown anywhere"), kAllRecord);
+        if (recordstatus == kAllRecord)
+            selectItem = item;
 
-    if (programtype != 0)
-    {
-        item = new RecListItem(lview, msg, rt);
-        if ((recordstatus == kTimeslotRecord) ||
-            (recordstatus == kWeekslotRecord))
+        item = new RecListItem(lview, tr("Record this program whenever it's "
+                                         "shown on this channel"), 
+                               kChannelRecord);
+        if (recordstatus == kChannelRecord)
+            selectItem = item;
+
+        QString msg = "Shouldn't show up.";
+        RecordingType rt = kNotRecording;
+        if (programtype == 2 ||
+            programtype == -1 ||
+            recordstatus == kWeekslotRecord)
+        {
+            msg = tr("Record this program in this timeslot every week");
+            rt = kTimeslotRecord;
+        }
+        else if (programtype == 1)
+        {
+            msg = tr("Record this program in this timeslot every day");
+            rt = kTimeslotRecord;
+        }
+
+        if (programtype != 0)
+        {
+            item = new RecListItem(lview, msg, rt);
+            if ((recordstatus == kTimeslotRecord) ||
+                (recordstatus == kWeekslotRecord))
+                selectItem = item;
+        }
+
+        if (recordstatus == kFindOneRecord)
+        {
+            msg = tr("Record one showing of this program");
+            rt = kFindOneRecord;
+            item = new RecListItem(lview, msg, kFindOneRecord);
+            selectItem = item;
+        }
+
+        item = new RecListItem(lview, tr("Record only this showing of the "
+                                         "program"), kSingleRecord);
+        if (recordstatus == kSingleRecord)
+            selectItem = item;
+
+        item = new RecListItem(lview, tr("Don't record this program"), 
+                               kNotRecording);
+        if (selectItem == NULL)
             selectItem = item;
     }
-
-    if (recordstatus == kFindOneRecord)
+    else
     {
-        msg = tr("Record one showing of this program");
-        rt = kFindOneRecord;
-        item = new RecListItem(lview, msg, kFindOneRecord);
-        selectItem = item;
+        item = new RecListItem(lview, tr("Don't record this showing"), 
+                               kDontRecord);
+        if (recordstatus == kDontRecord)
+            selectItem = item;
+
+        item = new RecListItem(lview, tr("Record this showing with override "
+                                         "options"), kOverrideRecord);
+        if (recordstatus == kOverrideRecord)
+            selectItem = item;
+
+        item = new RecListItem(lview, tr("Record this showing with normal "
+                                         "options"), kNotRecording);
+        if (selectItem == NULL)
+            selectItem = item;
     }
-
-    item = new RecListItem(lview, tr("Record only this showing of the program"),
-                           kSingleRecord);
-    if (recordstatus == kSingleRecord)
-        selectItem = item;
-
-    item = new RecListItem(lview, tr("Don't record this program"), 
-                           kNotRecording);
-    if (selectItem == NULL)
-        selectItem = item;
 
     vbox->addWidget(lview, 0);
 

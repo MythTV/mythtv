@@ -52,7 +52,7 @@ enum RecStatusType {
     rsRecording = -2,
     rsWillRecord = -1,
     rsUnknown = 0,
-    rsManualOverride = 1,
+    rsDontRecord = 1,
     rsPreviousRecording = 2,
     rsCurrentRecording = 3,
     rsEarlierShowing = 4,
@@ -61,7 +61,7 @@ enum RecStatusType {
     rsConflict = 7,
     rsLaterShowing = 8,
     //rsUnused = 9,
-    rsOverlap = 10,
+    //rsUnused = 10,
     rsLowDiskSpace = 11,
     rsTunerBusy = 12
 };
@@ -234,7 +234,6 @@ class ProgramInfo
     int spread;
     int startCol;
 
-    int override;
     RecStatusType recstatus;
     RecStatusType savedrecstatus;
     int numconflicts;

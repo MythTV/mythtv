@@ -61,7 +61,6 @@ ProgramRecPriorityInfo& ProgramRecPriorityInfo::operator=(const ProgramInfo &oth
     spread = other.spread;
     startCol = other.startCol;
 
-    override = other.override;
     recstatus = other.recstatus;
     recordid = other.recordid;
     rectype = other.rectype;
@@ -463,13 +462,15 @@ void ProgramRecPriority::edit(void)
                      cnt++, ++it);
                 progInfo = &(it.data());
            
-                int rtRecPriors[6];
+                int rtRecPriors[8];
                 rtRecPriors[0] = gContext->GetNumSetting("SingleRecordRecPrior", 0);
                 rtRecPriors[1] = gContext->GetNumSetting("TimeslotRecordRecPrior", 0);
                 rtRecPriors[2] = gContext->GetNumSetting("ChannelRecordRecPrior", 0);
                 rtRecPriors[3] = gContext->GetNumSetting("AllRecordRecPrior", 0);
                 rtRecPriors[4] = gContext->GetNumSetting("WeekslotRecordRecPrior", 0);
                 rtRecPriors[5] = gContext->GetNumSetting("FindOneRecordRecPrior", 0);
+                rtRecPriors[6] = gContext->GetNumSetting("OverrideRecordRecPrior", 0);
+                rtRecPriors[7] = gContext->GetNumSetting("OverrideRecordRecPrior", 0);
 
                 // set the recording priorities of that program 
                 progInfo->recpriority = recPriority;
@@ -548,7 +549,7 @@ void ProgramRecPriority::saveRecPriority(void)
 
 void ProgramRecPriority::FillList(void)
 {
-    int cnt = 999, rtRecPriors[5];
+    int cnt = 999, rtRecPriors[8];
     vector<ProgramInfo *> recordinglist;
 
     programData.clear();
@@ -581,6 +582,8 @@ void ProgramRecPriority::FillList(void)
     rtRecPriors[3] = gContext->GetNumSetting("AllRecordRecPriority", 0);
     rtRecPriors[4] = gContext->GetNumSetting("WeekslotRecordRecPriority", 0);
     rtRecPriors[5] = gContext->GetNumSetting("FindOneRecordRecPriority", 0);
+    rtRecPriors[6] = gContext->GetNumSetting("OverrideRecordRecPriority", 0);
+    rtRecPriors[7] = gContext->GetNumSetting("OverrideRecordRecPriority", 0);
     
     // get channel recording priorities and recording types associated with each
     // program from db
@@ -617,7 +620,8 @@ void ProgramRecPriority::FillList(void)
             // does so the keys will match 
             QDateTime startts; 
             if (recType == kSingleRecord || recType == kTimeslotRecord ||
-                recType == kWeekslotRecord)
+                recType == kWeekslotRecord || recType == kOverrideRecord ||
+                recType == kDontRecord)
                 startts = QDateTime::fromString(tempDate + ":" + tempTime,
                                                 Qt::ISODate);
             else
@@ -794,7 +798,10 @@ void ProgramRecPriority::updateList(QPainter *p)
                                         progInfo->recTypeRecPriority;
         
                         QString tempSubTitle = progInfo->title;
-                        if ((progInfo->subtitle).stripWhiteSpace().length() > 0)
+                        if ((progInfo->rectype == kSingleRecord ||
+                             progInfo->rectype == kOverrideRecord ||
+                             progInfo->rectype == kDontRecord) &&
+                            (progInfo->subtitle).stripWhiteSpace().length() > 0)
                             tempSubTitle = tempSubTitle + " - \"" + 
                                            progInfo->subtitle + "\"";
 
@@ -905,6 +912,9 @@ void ProgramRecPriority::updateInfo(QPainter *p)
                     case kSingleRecord:
                         text = tr("Recording just this showing");
                         break;
+                    case kOverrideRecord:
+                        text = tr("Recording this showing with override options");
+                        break;
                     case kWeekslotRecord:
                         text = tr("Recording every week");
                         break;
@@ -919,6 +929,9 @@ void ProgramRecPriority::updateInfo(QPainter *p)
                         break;
                     case kFindOneRecord:
                         text = tr("Recording one showing of this program");
+                        break;
+                    case kDontRecord:
+                        text = tr("Manually not recording this showing");
                         break;
                     case kNotRecording:
                         text = tr("Not recording this showing");

@@ -11,18 +11,19 @@
 
 // Convert a RecordingType to a simple integer so it's specificity can
 // be compared to another.  Lower number means more specific.
-// NOTE: This _MUST_ match the order in the SRRecordingType class.
 int RecTypePriority(RecordingType rectype)
 {
     switch (rectype) {
     case kNotRecording:   return 0; break;
-    case kSingleRecord:   return 1; break;
-    case kFindOneRecord:  return 2; break;
-    case kWeekslotRecord: return 3; break;
-    case kTimeslotRecord: return 4; break;
-    case kChannelRecord:  return 5; break;
-    case kAllRecord:      return 6; break;
-    default: return 7;
+    case kDontRecord:     return 1; break;
+    case kOverrideRecord: return 2; break;
+    case kSingleRecord:   return 3; break;
+    case kFindOneRecord:  return 4; break;
+    case kWeekslotRecord: return 5; break;
+    case kTimeslotRecord: return 6; break;
+    case kChannelRecord:  return 7; break;
+    case kAllRecord:      return 9; break;
+    default: return 9;
     }
 }
 
@@ -57,6 +58,17 @@ public:
     SRRecordingType(const ScheduledRecording& parent):
         SRSetting(parent, "type") {
         setLabel(QObject::tr("Schedule"));
+        addSelection(QString::number(kNotRecording));
+        addSelection(QString::number(kSingleRecord));
+        addSelection(QString::number(kFindOneRecord));
+        addSelection(QString::number(kWeekslotRecord));
+        addSelection(QString::number(kTimeslotRecord));
+        addSelection(QString::number(kChannelRecord));
+        addSelection(QString::number(kAllRecord));
+        addSelection(QString::number(kOverrideRecord));
+        addSelection(QString::number(kDontRecord));
+    };
+    void addNormalSelections(void) {
         addSelection(QObject::tr("Do not record this program"),
                      QString::number(kNotRecording));
         addSelection(QObject::tr("Record only this showing"),
@@ -71,6 +83,26 @@ public:
                      QString::number(kChannelRecord));
         addSelection(QObject::tr("Record at any time on any channel"),
                      QString::number(kAllRecord));
+    };
+    void addOverrideSelections(void) {
+        addSelection(QObject::tr("Record this showing with normal options"),
+                     QString::number(kNotRecording));
+        addSelection(QObject::tr("Record this showing with override options"),
+                     QString::number(kOverrideRecord));
+        addSelection(QObject::tr("Do not record this showing"),
+                     QString::number(kDontRecord));
+    };
+    virtual void load(QSqlDatabase* db) {
+        SimpleDBStorage::load(db);
+        QString tempval = getValue();
+        clearSelections();
+        if (tempval.toInt() == kOverrideRecord ||
+            tempval.toInt() == kDontRecord)
+            addOverrideSelections();
+        else
+            addNormalSelections();
+        setValue(getValueIndex(tempval));
+        setUnchanged();
     };
 };
 
@@ -312,8 +344,19 @@ ScheduledRecording::ScheduledRecording() {
     m_pginfo = NULL;
 }
 
-void ScheduledRecording::fromProgramInfo(ProgramInfo* proginfo)
+void ScheduledRecording::load(QSqlDatabase *db)
 {
+    if (getRecordID())
+        ConfigurationGroup::load(db);
+}
+
+void ScheduledRecording::fromProgramInfo(ProgramInfo* proginfo, 
+                                         QSqlDatabase *db)
+{
+    id->setValue(0);
+    id->setUnchanged();
+    type->clearSelections();
+    type->addNormalSelections();
     channel->setValue(proginfo->chanid);
     station->setValue(proginfo->chansign);
     title->setValue(proginfo->title);
@@ -324,9 +367,50 @@ void ScheduledRecording::fromProgramInfo(ProgramInfo* proginfo)
     endTime->setValue(proginfo->endts.time());
     endDate->setValue(proginfo->endts.date());
     category->setValue(proginfo->category);
-    recpriority->setValue(proginfo->recpriority);
-    recgroup->setValue(proginfo->recgroup);
+
+    profile->fillSelections(db);
+    dupin->setValue(0);
+    dupmethod->setValue(0);
     autoexpire->setValue(gContext->GetNumSetting("AutoExpireDefault", 0));
+    maxepisodes->setValue(0);
+    maxnewest->setValue(0);
+    startoffset->setValue(0);
+    endoffset->setValue(0);
+    recpriority->setValue(0);
+    recgroup->setValue("Default");
+}
+
+void ScheduledRecording::makeOverride(ProgramInfo* proginfo)
+{
+    if (type->getValue().toInt() == kOverrideRecord ||
+        type->getValue().toInt() == kDontRecord)
+        return;
+
+    id->setValue(0);
+    id->setUnchanged();
+    type->clearSelections();
+    type->addOverrideSelections();
+    channel->setValue(proginfo->chanid);
+    station->setValue(proginfo->chansign);
+    title->setValue(proginfo->title);
+    subtitle->setValue(proginfo->subtitle);
+    description->setValue(proginfo->description);
+    startTime->setValue(proginfo->startts.time());
+    startDate->setValue(proginfo->startts.date());
+    endTime->setValue(proginfo->endts.time());
+    endDate->setValue(proginfo->endts.date());
+    category->setValue(proginfo->category);
+
+    profile->setChanged();
+    dupin->setChanged();
+    dupmethod->setChanged();
+    autoexpire->setChanged();
+    maxepisodes->setChanged();
+    maxnewest->setChanged();
+    startoffset->setChanged();
+    endoffset->setChanged();
+    recpriority->setChanged();
+    recgroup->setChanged();
 }
 
 bool ScheduledRecording::loadByProgram(QSqlDatabase* db,
@@ -415,7 +499,7 @@ query += QString(
             loadByID(db, result.value(0).toInt());
             return true;
         } else {
-            fromProgramInfo(proginfo);
+            fromProgramInfo(proginfo, db);
         }
     } else {
         MythContext::DBError("loadByProgram", result);
@@ -434,7 +518,7 @@ RecordingType ScheduledRecording::getRecordingType(void) const {
 }
 
 void ScheduledRecording::setRecordingType(RecordingType newType) {
-    type->setValue(RecTypePriority(newType));
+    type->setValue(type->getValueIndex(QString::number(newType)));
 }
 
 bool ScheduledRecording::GetAutoExpire(void) const {
@@ -462,6 +546,9 @@ void ScheduledRecording::save(QSqlDatabase* db) {
 }
 
 void ScheduledRecording::remove(QSqlDatabase* db) {
+    if (!getRecordID())
+        return;
+
     QString query = QString("DELETE FROM record WHERE recordid = %1")
                             .arg(getRecordID());
     db->exec(query);
@@ -522,8 +609,7 @@ bool ScheduledRecording::hasChanged(QSqlDatabase* db) {
 void ScheduledRecording::doneRecording(QSqlDatabase* db, 
                                        const ProgramInfo& proginfo) 
 {
-    if (getRecordingType() == kSingleRecord ||
-        getRecordingType() == kFindOneRecord)
+    if (getRecordingType() == kFindOneRecord)
         remove(db);
 
     addHistory(db, proginfo);
@@ -679,11 +765,13 @@ void ScheduledRecording::setAvailableOptions(void)
     switch(type->getValue().toInt())
     {
         case kNotRecording:
+        case kDontRecord:
                 isScheduled = false;
                 break;
 
         case kSingleRecord:
         case kFindOneRecord:
+        case kOverrideRecord:
                 multiEpisode = false;
                 break;
     }
@@ -749,6 +837,8 @@ void ScheduledRecording::fillSelections(QSqlDatabase* db, SelectSetting* setting
                     .arg(sr.endTime->timeValue().toString());
                 break;
             case kSingleRecord:
+            case kOverrideRecord:
+            case kDontRecord:
                 label = QString("%1 on channel %2 (%3 %4 - %5)")
                     .arg(sr.title->getValue())
                     .arg(sr.channel->getSelectionLabel())

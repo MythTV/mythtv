@@ -36,7 +36,6 @@ ProgramInfo::ProgramInfo(void)
     recstartts = startts;
     recendts = startts;
 
-    override = 0;
     recstatus = rsUnknown;
     savedrecstatus = rsUnknown;
     numconflicts = 0;
@@ -84,7 +83,6 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other)
     spread = other.spread;
     startCol = other.startCol;
  
-    override = other.override;
     recstatus = other.recstatus;
     savedrecstatus = other.savedrecstatus;
     numconflicts = other.numconflicts;
@@ -136,7 +134,6 @@ ProgramInfo &ProgramInfo::operator=(const ProgramInfo &other)
     spread = other.spread;
     startCol = other.startCol;
 
-    override = other.override;
     recstatus = other.recstatus;
     savedrecstatus = other.savedrecstatus;
     numconflicts = other.numconflicts;
@@ -190,7 +187,7 @@ void ProgramInfo::ToStringList(QStringList &list)
     list << endts.toString(Qt::ISODate);
     list << QString(" "); // dummy place holder
     list << QString::number(shareable);
-    list << QString::number(override);
+    list << QString("0"); // dummy place holder
     list << ((hostname != "") ? hostname : QString(" "));
     list << QString::number(sourceid);
     list << QString::number(cardid);
@@ -240,7 +237,7 @@ void ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
     endts = QDateTime::fromString(*(it++), Qt::ISODate);
     it++; // dummy place holder
     shareable = (*(it++)).toInt();
-    override = (*(it++)).toInt();
+    it++; // dummy place holder
     hostname = *(it++);
     sourceid = (*(it++)).toInt();
     cardid = (*(it++)).toInt();
@@ -748,6 +745,9 @@ int ProgramInfo::GetRecordingTypeRecPriority(RecordingType type)
             return gContext->GetNumSetting("AllRecordRecPriority", 0);
         case kFindOneRecord:
             return gContext->GetNumSetting("FindOneRecordRecPriority", 0);
+        case kOverrideRecord:
+        case kDontRecord:
+            return gContext->GetNumSetting("OverrideRecordRecPriority", 0);
         default:
             return 0;
     }
@@ -758,6 +758,8 @@ void ProgramInfo::ApplyRecordStateChange(QSqlDatabase *db,
                                          RecordingType newstate)
 {
     GetProgramRecordingStatus(db);
+    if (newstate == kOverrideRecord || newstate == kDontRecord)
+        record->makeOverride(this);
     record->setRecordingType(newstate);
     record->save(db);
 }
@@ -828,6 +830,12 @@ void ProgramInfo::ToggleRecord(QSqlDatabase *db)
         case kAllRecord:
         default:
             ApplyRecordStateChange(db, kNotRecording);
+            break;
+        case kOverrideRecord:
+            ApplyRecordStateChange(db, kDontRecord);
+            break;
+        case kDontRecord:
+            ApplyRecordStateChange(db, kOverrideRecord);
             break;
     }
 }
@@ -1596,6 +1604,10 @@ QString ProgramInfo::RecTypeChar(void)
     case kFindOneRecord:
         recstring = QObject::tr("F");
         break;
+    case kOverrideRecord:
+    case kDontRecord:
+        recstring = QObject::tr("O");
+        break;
     case kNotRecording:
     default:
         recstring = QObject::tr("");
@@ -1629,6 +1641,10 @@ QString ProgramInfo::RecTypeText(void)
     case kFindOneRecord:
         recstring = QObject::tr("Find One Recording");
         break;
+    case kOverrideRecord:
+    case kDontRecord:
+        recstring = QObject::tr("Override Recording");
+        break;
     default:
         recstring = QObject::tr("Not Recording");
         break;
@@ -1651,7 +1667,7 @@ QString ProgramInfo::RecStatusChar(void)
         return QString::number(cardid);
     case rsWillRecord:
         return QString::number(cardid);
-    case rsManualOverride:
+    case rsDontRecord:
         return "X";
     case rsPreviousRecording:
         return "P";
@@ -1667,8 +1683,6 @@ QString ProgramInfo::RecStatusChar(void)
         return "C";
     case rsLaterShowing:
         return "L";
-    case rsOverlap:
-        return "V";
     case rsLowDiskSpace:
         return "K";
     case rsTunerBusy:
@@ -1696,8 +1710,8 @@ QString ProgramInfo::RecStatusText(void)
             return QObject::tr("Recording");
         case rsWillRecord:
             return QObject::tr("Will Record");
-        case rsManualOverride:
-            return QObject::tr("Manual Override");
+        case rsDontRecord:
+            return QObject::tr("Don't Record");
         case rsPreviousRecording:
             return QObject::tr("Previous Recording");
         case rsCurrentRecording:
@@ -1712,8 +1726,6 @@ QString ProgramInfo::RecStatusText(void)
             return QObject::tr("Conflicting");
         case rsLaterShowing:
             return QObject::tr("Later Showing");
-        case rsOverlap:
-            return QObject::tr("Overlap");
         case rsLowDiskSpace:
             return QObject::tr("Low Disk Space");
         case rsTunerBusy:
@@ -1766,7 +1778,7 @@ QString ProgramInfo::RecStatusDesc(void)
 
         switch (recstatus)
         {
-        case rsManualOverride:
+        case rsDontRecord:
             message += QObject::tr("it was manually set to not record.");
             break;
         case rsPreviousRecording:
@@ -1797,10 +1809,6 @@ QString ProgramInfo::RecStatusDesc(void)
         case rsLaterShowing:
             message += QObject::tr("this episode will be recorded at a "
                                    "later time instead.");
-            break;
-        case rsOverlap:
-            message += QObject::tr("it is covered by another scheduled "
-                                   "recording for the same program.");
             break;
         case rsLowDiskSpace:
             message += QObject::tr("there wasn't enough disk space available.");
@@ -1849,7 +1857,6 @@ void ProgramInfo::FillInRecordInfo(vector<ProgramInfo *> &reclist)
                 
     if (found)
     {
-        override = found->override;
         recstatus = found->recstatus;
         recordid = found->recordid;
         rectype = found->rectype;
@@ -2026,7 +2033,8 @@ void ProgramInfo::handleRecording(QSqlDatabase *db)
     message += RecStatusDesc();
 
     DialogBox diag(gContext->GetMainWindow(), message);
-    int button = 1, ok = -1, react = -1, addov = -1, forget = -1, clearov = -1;
+    int button = 1, ok = -1, react = -1, addov = -1, forget = -1, clearov = -1,
+        ednorm = -1, edcust = -1;
 
     diag.AddButton(QObject::tr("OK"));
     ok = button++;
@@ -2035,29 +2043,49 @@ void ProgramInfo::handleRecording(QSqlDatabase *db)
         (recstatus == rsStopped ||
          recstatus == rsDeleted))
     {
-        diag.AddButton(QObject::tr("Reactivate it"));
+        diag.AddButton(QObject::tr("Reactivate"));
         react = button++;
     }
 
-    if (recstartts > now && recstatus == rsWillRecord)
+    if (recendts > now)
     {
-        diag.AddButton(QObject::tr("Don't record it"));
-        addov = button++;
-        if ((dupmethod & kDupCheckNone) ||
-            ((dupmethod & kDupCheckSub) &&
-             (subtitle != "")) ||
-            ((dupmethod & kDupCheckDesc) &&
-             (description != "")))
+        if (rectype != kSingleRecord &&
+            rectype != kFindOneRecord &&
+            recstatus == rsWillRecord)
         {
-            diag.AddButton(QObject::tr("Never record this episode"));
-            forget = button++;
+            diag.AddButton(QObject::tr("Don't record"));
+            addov = button++;
+            if ((dupmethod & kDupCheckNone) ||
+                ((dupmethod & kDupCheckSub) &&
+                 (subtitle != "")) ||
+                ((dupmethod & kDupCheckDesc) &&
+                 (description != "")))
+            {
+                diag.AddButton(QObject::tr("Never record"));
+                forget = button++;
+            }
         }
-    }
 
-    if (recendts > now && override != 0)
-    {
-        diag.AddButton(QObject::tr("Clear Override"));
-        clearov = button++;
+        if (rectype != kOverrideRecord && rectype != kDontRecord)
+        {
+            diag.AddButton(QObject::tr("Edit Options"));
+            ednorm = button++;
+
+            if (rectype != kSingleRecord && rectype != kFindOneRecord)
+            {
+                diag.AddButton(QObject::tr("Add Override"));
+                edcust = button++;
+            }
+        }
+
+        if (rectype == kOverrideRecord || rectype == kDontRecord)
+        {
+            diag.AddButton(QObject::tr("Edit Override"));
+            ednorm = button++;
+
+            diag.AddButton(QObject::tr("Clear Override"));
+            clearov = button++;
+        }
     }
 
     int ret = diag.exec();
@@ -2065,19 +2093,25 @@ void ProgramInfo::handleRecording(QSqlDatabase *db)
     if (ret == react)
         RemoteReactivateRecording(this);
     else if (ret == addov)
-        setOverride(db, 2);
+        ApplyRecordStateChange(db, kDontRecord);
     else if (ret == forget)
     {
-        setOverride(db, 2);
-        if (record == NULL) 
-        {
-            record = new ScheduledRecording();
-            record->loadByProgram(db, this);
-        }
+        ApplyRecordStateChange(db, kDontRecord);
         record->addHistory(db, *this);
     }
-    if (ret == clearov)
-        setOverride(db, 0);
+    else if (ret == clearov)
+        ApplyRecordStateChange(db, kNotRecording);
+    else if (ret == ednorm)
+    {
+        GetProgramRecordingStatus(db);
+        record->exec(db);
+    }
+    else if (ret == edcust)
+    {
+        GetProgramRecordingStatus(db);
+        record->makeOverride(this);
+        record->exec(db);
+    }
 
     return;
 }
@@ -2120,7 +2154,8 @@ void ProgramInfo::handleNotRecording(QSqlDatabase *db)
     }
 
     DialogBox diag(gContext->GetMainWindow(), message);
-    int button = 1, ok = -1, react = -1, addov = -1, clearov = -1;
+    int button = 1, ok = -1, react = -1, addov = -1, clearov = -1,
+        ednorm = -1, edcust = -1;
 
     diag.AddButton(QObject::tr("OK"));
     ok = button++;
@@ -2128,29 +2163,47 @@ void ProgramInfo::handleNotRecording(QSqlDatabase *db)
     QDateTime now = QDateTime::currentDateTime();
 
     if (recstartts < now && recendts > now &&
-        recstatus != rsManualOverride)
+        recstatus != rsDontRecord)
     {
-        diag.AddButton(QObject::tr("Reactivate it"));
+        diag.AddButton(QObject::tr("Reactivate"));
         react = button++;
     }
 
-    if (recendts > now &&
-        override != 1 &&
-        (recstatus == rsManualOverride ||
-         recstatus == rsPreviousRecording ||
-         recstatus == rsCurrentRecording ||
-         recstatus == rsEarlierShowing ||
-         recstatus == rsConflict ||
-         recstatus == rsLaterShowing))
+    if (recendts > now)
     {
-        diag.AddButton(QObject::tr("Record it anyway"));
-        addov = button++;
-    }
+        if ((rectype != kSingleRecord && 
+             rectype != kFindOneRecord &&
+             rectype != kOverrideRecord) &&
+            (recstatus == rsDontRecord ||
+             recstatus == rsPreviousRecording ||
+             recstatus == rsCurrentRecording ||
+             recstatus == rsEarlierShowing ||
+             recstatus == rsLaterShowing))
+        {
+            diag.AddButton(QObject::tr("Record anyway"));
+            addov = button++;
+        }
 
-    if (recendts > now && override != 0)
-    {
-        diag.AddButton(QObject::tr("Clear Override"));
-        clearov = button++;
+        if (rectype != kOverrideRecord && rectype != kDontRecord)
+        {
+            diag.AddButton(QObject::tr("Edit Options"));
+            ednorm = button++;
+
+            if (rectype != kSingleRecord && rectype != kFindOneRecord)
+            {
+                diag.AddButton(QObject::tr("Add Override"));
+                edcust = button++;
+            }
+        }
+
+        if (rectype == kOverrideRecord || rectype == kDontRecord)
+        {
+            diag.AddButton(QObject::tr("Edit Override"));
+            ednorm = button++;
+
+            diag.AddButton(QObject::tr("Clear Override"));
+            clearov = button++;
+        }
     }
 
     int ret = diag.exec();
@@ -2159,12 +2212,23 @@ void ProgramInfo::handleNotRecording(QSqlDatabase *db)
         RemoteReactivateRecording(this);
     else if (ret == addov)
     {
-        setOverride(db, 1);
+        ApplyRecordStateChange(db, kOverrideRecord);
         if (recstartts < now)
             RemoteReactivateRecording(this);
     }
     else if (ret == clearov)
-        setOverride(db, 0);
+        ApplyRecordStateChange(db, kNotRecording);
+    else if (ret == ednorm)
+    {
+        GetProgramRecordingStatus(db);
+        record->exec(db);
+    }
+    else if (ret == edcust)
+    {
+        GetProgramRecordingStatus(db);
+        record->makeOverride(this);
+        record->exec(db);
+    }
 
     return;
 }

@@ -15,7 +15,9 @@ enum RecordingType
     kChannelRecord,
     kAllRecord,
     kWeekslotRecord,
-    kFindOneRecord
+    kFindOneRecord,
+    kOverrideRecord,
+    kDontRecord
 };
 
 int RecTypePriority(RecordingType rectype);
@@ -44,7 +46,9 @@ public:
     ScheduledRecording();
     //ScheduledRecording(const ScheduledRecording& other);
 
-    void fromProgramInfo(ProgramInfo* proginfo);
+    virtual void load(QSqlDatabase* db);
+    void fromProgramInfo(ProgramInfo* proginfo, QSqlDatabase *db);
+    void makeOverride(ProgramInfo* proginfo);
 
     RecordingType getRecordingType(void) const;
     void setRecordingType(RecordingType);

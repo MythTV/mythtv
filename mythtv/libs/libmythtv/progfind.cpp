@@ -505,6 +505,9 @@ void ProgFinder::getInfo(bool toggle)
                 case kSingleRecord:
                     data = tr("Recording just this showing");
                     break;
+                case kOverrideRecord:
+                    data = tr("Recording this showing with override options");
+                    break;
                 case kFindOneRecord:
                     data = tr("Recording one showing of this program");
                     break;
@@ -519,6 +522,9 @@ void ProgFinder::getInfo(bool toggle)
                     break;
                 case kAllRecord:
                     data = tr("Recording all showings");
+                    break;
+                case kDontRecord:
+                    data = tr("Manually not recording this showing");
                     break;
                 case kNotRecording:
                     data = tr("Not recording this showing");
@@ -1123,7 +1129,9 @@ int ProgFinder::checkRecordingStatus(int showNum)
             if (showData[showNum].subtitle == curRecordings[j].subtitle &&
                 showData[showNum].description == curRecordings[j].description)
             {
-                if (curRecordings[j].type == kSingleRecord)
+                if (curRecordings[j].type == kSingleRecord ||
+                    curRecordings[j].type == kOverrideRecord ||
+                    curRecordings[j].type == kDontRecord)
                 {
                     if (showData[showNum].startdatetime ==
                         curRecordings[j].startdatetime)
@@ -1334,6 +1342,9 @@ void ProgFinder::selectShowData(QString progTitle)
                 case kSingleRecord:
                     data = tr("Recording just this showing");
                     break;
+                case kOverrideRecord:
+                    data = tr("Recording this showing with override options");
+                    break;
                 case kFindOneRecord:
                     data = tr("Recording one showing of this program");
                     break;
@@ -1348,6 +1359,9 @@ void ProgFinder::selectShowData(QString progTitle)
                     break;
                 case kAllRecord:
                     data = tr("Recording all showings");
+                    break;
+                case kDontRecord:
+                    data = tr("Manually not recording this showing");
                     break;
                 case kNotRecording:
                     data = tr("Not recording this showing");

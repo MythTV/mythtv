@@ -1900,8 +1900,10 @@ void clearOldDBEntries(void)
                      "DATE_SUB(CURRENT_DATE, INTERVAL %d DAY);", offset);
     query.exec(querystr);
 
-    querystr.sprintf("DELETE FROM record WHERE type = 1 AND enddate < "
-                     "DATE_SUB(CURRENT_DATE, INTERVAL 1 DAY);");
+    querystr.sprintf("DELETE FROM record WHERE (type = %d "
+                     "OR type = %d OR type = %d) AND enddate < "
+                     "DATE_SUB(CURRENT_DATE, INTERVAL 1 DAY);",
+                     kSingleRecord, kOverrideRecord, kDontRecord);
     query.exec(querystr);
 
     querystr.sprintf("DELETE FROM recordoverride WHERE endtime < "

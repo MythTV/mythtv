@@ -865,6 +865,10 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
                 case kFindOneRecord:
                     recFlag = 6;
                     break;
+                case kOverrideRecord:
+                case kDontRecord:
+                    recFlag = 7;
+                    break;
                 case kNotRecording:
                 default:
                     recFlag = 0;

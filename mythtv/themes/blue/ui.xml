@@ -234,6 +234,7 @@
         <recordstatus type="AllRecord" image="gg-rs-all.png"></recordstatus>
         <recordstatus type="WeekslotRecord" image="gg-rs-weekslot.png"></recordstatus>
         <recordstatus type="FindOneRecord" image="gg-rs-findone.png"></recordstatus>
+        <recordstatus type="OverrideRecord" image="gg-rs-override.png"></recordstatus>
         <arrow direction="left" image="gg-arrow-left.png"></arrow>
         <arrow direction="right" image="gg-arrow-right.png"></arrow>
         <font>descinfo</font>
