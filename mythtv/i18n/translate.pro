@@ -1,3 +1,4 @@
+SOURCES += ../libs/libmyth/managedlist.cpp
 SOURCES += ../libs/libmyth/mythcontext.cpp
 SOURCES += ../libs/libmyth/mythdialogs.cpp
 SOURCES += ../libs/libmyth/mythwizard.cpp
@@ -32,6 +33,7 @@ SOURCES += ../programs/mythfrontend/manualbox.cpp
 SOURCES += ../programs/mythfrontend/manualschedule.cpp
 SOURCES += ../programs/mythfrontend/playbackbox.cpp
 SOURCES += ../programs/mythfrontend/programrecpriority.cpp
+SOURCES += ../programs/mythfrontend/statusbox.cpp
 SOURCES += ../programs/mythfrontend/viewscheduled.cpp
 SOURCES += ../programs/mythfrontend/channelrecpriority.cpp
 SOURCES += ../setup/backendsettings.cpp
