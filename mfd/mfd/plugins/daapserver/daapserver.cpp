@@ -375,8 +375,6 @@ void DaapServer::parseVariables(httpd *server, DaapRequest *daap_request)
     //  content on the fly.
     //
 
-    cout << "The user agent is " << server->request.userAgent << endl;
-
     QString user_agent = server->request.userAgent;
     if(user_agent.contains("iTunes/4"))
     {
