@@ -109,6 +109,22 @@ void VideoBrowser::keyPressEvent(QKeyEvent *e)
     }
 
     if (!handled)
+    {
+        gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e, actions);
+
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        {
+            QString action = actions[i];
+            if (action == "PLAYBACK")
+            {
+                handled = true;
+                slotWatchVideo();
+            }
+        }            
+    }
+
+    
+    if (!handled)
         MythDialog::keyPressEvent(e);
 }
 

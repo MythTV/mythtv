@@ -110,6 +110,23 @@ void VideoTree::keyPressEvent(QKeyEvent *e)
             handled = false;
     }
 
+        if (!handled)
+    {
+    
+    gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e, actions);
+
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        {
+            QString action = actions[i];
+            if (action == "PLAYBACK")
+            {
+                handled = true;
+                playVideo(-1);
+            }
+        }            
+    }
+
+    
     if (!handled) 
         MythThemedDialog::keyPressEvent(e);
 }

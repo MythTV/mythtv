@@ -86,25 +86,25 @@ void VideoSelected::keyPressEvent(QKeyEvent *e)
         {
             selected(curitem);
             return;
-	}else if (action == "INFO"){
-		if (curitem){
-			MythPopupBox * plotbox
-			   = new MythPopupBox(gContext->GetMainWindow());
-			QLabel *plotLabel = plotbox->addLabel(curitem->Plot(),MythPopupBox::Small,true);
-			plotLabel->setAlignment(Qt::AlignJustify | Qt::WordBreak);
-			QButton * okButton = plotbox->addButton(tr("Ok"));
-			okButton->setFocus();
-			plotbox->ExecPopup();
-		//	plotbox->showOkPopup(gContext->GetMainWindow(),
-//				"test",
-//				curitem->Plot());
-			delete plotbox;
-		}
-	}
-        else
-            handled = false;
-    }
 
+        }
+
+        if (!handled)
+        {
+            gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e, actions);
+
+            for (unsigned int i = 0; i < actions.size() && !handled; i++)
+            {
+                QString action = actions[i];
+                if (action == "PLAYBACK")
+                {
+                    handled = true;
+                    selected(curitem);
+                }
+            }            
+        }
+    }
+    
     if (!handled)
         MythDialog::keyPressEvent(e);
 }
