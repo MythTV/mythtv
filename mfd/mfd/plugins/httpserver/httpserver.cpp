@@ -453,13 +453,15 @@ void ClientHttpServer::handleIncoming(HttpRequest *http_request, int)
     QTime page_build_time;
     page_build_time.start();
     
-    addTopHTML(http_request);
-    startCoreTable(http_request);
-    listMFDs(http_request);
-    listSections(http_request, branch_one);
-    showCurrentSection(http_request, branch_one, branch_two);
-    endCoreTable(http_request);
-    addBottomHTML(http_request);
+    HttpResponse *response = http_request->getResponse();
+    
+    addTopHTML(response);
+    startCoreTable(response);
+    listMFDs(response);
+    listSections(response, branch_one);
+    showCurrentSection(response, branch_one, branch_two);
+    endCoreTable(response);
+    addBottomHTML(response);
 
     log(QString("built HTML response for client in %1 second(s)")
         .arg(page_build_time.elapsed() / 1000.0), 9);    
@@ -468,62 +470,62 @@ void ClientHttpServer::handleIncoming(HttpRequest *http_request, int)
     //
 }
 
-void ClientHttpServer::addTopHTML(HttpRequest *http_request)
+void ClientHttpServer::addTopHTML(HttpResponse *response)
 {
-    http_request->getResponse()->addHeader("Content-Type: text/html");
-    http_request->getResponse()->clearPayload();
+    response->addHeader("Content-Type: text/html");
+    response->clearPayload();
     
     //
     //  Just building up the HTML as we go here ... pretty hacky
     //
 
-    http_request->getResponse()->addToPayload("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
-    http_request->getResponse()->addToPayload("<head>");
-    http_request->getResponse()->addToPayload(QString("<title>MFD on %1</title>").arg(my_hostname));
-    http_request->getResponse()->addToPayload("</head>");
-    http_request->getResponse()->addToPayload("<body bgcolor=\"#FFFFFF\" text=\"#000000\" link=\"#0000FF\" vlink=\"#000080\" alink=\"#FF0000\">");
-    http_request->getResponse()->addToPayload("<center>");
-    http_request->getResponse()->addToPayload("<p>MFD Ultra Fancy Pants Interface</p>");
-    http_request->getResponse()->addToPayload("</center>");
-    http_request->getResponse()->addToPayload("<hr><br><br>");
+    response->addToPayload("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+    response->addToPayload("<head>");
+    response->addToPayload(QString("<title>MFD on %1</title>").arg(my_hostname));
+    response->addToPayload("</head>");
+    response->addToPayload("<body bgcolor=\"#FFFFFF\" text=\"#000000\" link=\"#0000FF\" vlink=\"#000080\" alink=\"#FF0000\">");
+    response->addToPayload("<center>");
+    response->addToPayload("<p>MFD Ultra Fancy Pants Interface</p>");
+    response->addToPayload("</center>");
+    response->addToPayload("<hr><br><br>");
 }
 
-void ClientHttpServer::startCoreTable(HttpRequest *http_request)
+void ClientHttpServer::startCoreTable(HttpResponse *response)
 {
-    http_request->getResponse()->addToPayload("<center>");
-    http_request->getResponse()->addToPayload("<table>");
+    response->addToPayload("<center>");
+    response->addToPayload("<table>");
 }
 
-void ClientHttpServer::listMFDs(HttpRequest *http_request)
+void ClientHttpServer::listMFDs(HttpResponse *response)
 {
-    http_request->getResponse()->addToPayload("<tr>");
-    http_request->getResponse()->addToPayload(QString("<td colspan=\"%1\" align=\"left\">").arg(core_table_columns));
-    http_request->getResponse()->addToPayload(QString("UFPI on %1").arg(mfdContext->getHostName()));
+    response->addToPayload("<tr>");
+    response->addToPayload(QString("<td colspan=\"%1\" align=\"left\">").arg(core_table_columns));
+    response->addToPayload(QString("UFPI on %1").arg(mfdContext->getHostName()));
 
     other_ufpi_mutex.lock();
         for(uint i = 0; i < other_ufpi.count(); i++)
         {
-            http_request->getResponse()->addToPayload(QString(" | <a href=\"%1\">%2</a>")
+            response->addToPayload(QString(" | <a href=\"%1\">%2</a>")
             .arg(other_ufpi.at(i)->getUrl())
             .arg(other_ufpi.at(i)->getName())
             );
         }
     other_ufpi_mutex.unlock();
 
-    http_request->getResponse()->addToPayload("</td>");
-    http_request->getResponse()->addToPayload("</tr>");
+    response->addToPayload("</td>");
+    response->addToPayload("</tr>");
 
-    http_request->getResponse()->addToPayload("<tr>");
-    http_request->getResponse()->addToPayload(QString("<td colspan=\"%1\" align=\"left\">").arg(core_table_columns));
-    http_request->getResponse()->addToPayload("<hr>");
-    http_request->getResponse()->addToPayload("</td>");
-    http_request->getResponse()->addToPayload("</tr>");
+    response->addToPayload("<tr>");
+    response->addToPayload(QString("<td colspan=\"%1\" align=\"left\">").arg(core_table_columns));
+    response->addToPayload("<hr>");
+    response->addToPayload("</td>");
+    response->addToPayload("</tr>");
 }
 
-void ClientHttpServer::listSections(HttpRequest *http_request, const QString &branch_one)
+void ClientHttpServer::listSections(HttpResponse *response, const QString &branch_one)
 {
-    http_request->getResponse()->addToPayload("<tr>");
-    http_request->getResponse()->addToPayload(QString("<td colspan=\"%1\" align=\"left\">").arg(core_table_columns));
+    response->addToPayload("<tr>");
+    response->addToPayload(QString("<td colspan=\"%1\" align=\"left\">").arg(core_table_columns));
 
     //
     //  Add the various "sections", with an HREF iff it's not the section we're currently in
@@ -531,52 +533,52 @@ void ClientHttpServer::listSections(HttpRequest *http_request, const QString &br
     
     if(branch_one == "status")
     {
-        http_request->getResponse()->addToPayload("Status ");
+        response->addToPayload("Status ");
     }
     else
     {
-        http_request->getResponse()->addToPayload("<a href=\"/status\">Status</a> ");
+        response->addToPayload("<a href=\"/status\">Status</a> ");
     }
 
     if(branch_one == "audio")
     {
-        http_request->getResponse()->addToPayload("| Audio ");
+        response->addToPayload("| Audio ");
     }
     else
     {
-        http_request->getResponse()->addToPayload("| <a href=\"/audio/playlists\">Audio</a> ");
+        response->addToPayload("| <a href=\"/audio/playlists\">Audio</a> ");
     }
 
     if(branch_one == "video")
     {
-        http_request->getResponse()->addToPayload("| Video ");
+        response->addToPayload("| Video ");
     }
     else
     {
-        http_request->getResponse()->addToPayload("| <a href=\"/video\">Video</a> ");
+        response->addToPayload("| <a href=\"/video\">Video</a> ");
     }
 
     if(branch_one == "images")
     {
-        http_request->getResponse()->addToPayload("| Images ");
+        response->addToPayload("| Images ");
     }
     else
     {
-        http_request->getResponse()->addToPayload("| <a href=\"/images\">Images</a> ");
+        response->addToPayload("| <a href=\"/images\">Images</a> ");
     }
 
-    http_request->getResponse()->addToPayload("</td>");
-    http_request->getResponse()->addToPayload("</tr>");
+    response->addToPayload("</td>");
+    response->addToPayload("</tr>");
 
-    http_request->getResponse()->addToPayload("<tr>");
-    http_request->getResponse()->addToPayload(QString("<td colspan=\"%1\" align=\"left\">").arg(core_table_columns));
-    http_request->getResponse()->addToPayload("<hr>");
-    http_request->getResponse()->addToPayload("</td>");
-    http_request->getResponse()->addToPayload("</tr>");
+    response->addToPayload("<tr>");
+    response->addToPayload(QString("<td colspan=\"%1\" align=\"left\">").arg(core_table_columns));
+    response->addToPayload("<hr>");
+    response->addToPayload("</td>");
+    response->addToPayload("</tr>");
 
 }
 
-void ClientHttpServer::showCurrentSection(HttpRequest *http_request, const QString &branch_one, const QString &branch_two)
+void ClientHttpServer::showCurrentSection(HttpResponse *response, const QString &branch_one, const QString &branch_two)
 {
 
     //
@@ -585,90 +587,90 @@ void ClientHttpServer::showCurrentSection(HttpRequest *http_request, const QStri
 
     if(branch_one == "status" || branch_one == "video" || branch_one == "images")
     {
-        http_request->getResponse()->addToPayload("<tr>");
-        http_request->getResponse()->addToPayload(QString("<td colspan=\"%1\" align=\"left\">").arg(core_table_columns));
-        http_request->getResponse()->addToPayload("Doesn't | Do | Anything | Yet");
-        http_request->getResponse()->addToPayload("</td>");
-        http_request->getResponse()->addToPayload("</tr>");
+        response->addToPayload("<tr>");
+        response->addToPayload(QString("<td colspan=\"%1\" align=\"left\">").arg(core_table_columns));
+        response->addToPayload("Doesn't | Do | Anything | Yet");
+        response->addToPayload("</td>");
+        response->addToPayload("</tr>");
 
-        http_request->getResponse()->addToPayload("<tr>");
-        http_request->getResponse()->addToPayload(QString("<td colspan=\"%1\" align=\"left\">").arg(core_table_columns));
-        http_request->getResponse()->addToPayload("<hr>");
-        http_request->getResponse()->addToPayload("</td>");
-        http_request->getResponse()->addToPayload("</tr>");
+        response->addToPayload("<tr>");
+        response->addToPayload(QString("<td colspan=\"%1\" align=\"left\">").arg(core_table_columns));
+        response->addToPayload("<hr>");
+        response->addToPayload("</td>");
+        response->addToPayload("</tr>");
         
-        http_request->getResponse()->addToPayload("<tr><td>&nbsp</td><td>&nbsp</td><td>&nbsp</td></tr>");
-        http_request->getResponse()->addToPayload("<tr><td>&nbsp</td><td align=\"center\">Not Yet</td><td>&nbsp</td></tr>");
-        http_request->getResponse()->addToPayload("<tr><td>&nbsp</td><td>&nbsp</td><td>&nbsp</td></tr>");
+        response->addToPayload("<tr><td>&nbsp</td><td>&nbsp</td><td>&nbsp</td></tr>");
+        response->addToPayload("<tr><td>&nbsp</td><td align=\"center\">Not Yet</td><td>&nbsp</td></tr>");
+        response->addToPayload("<tr><td>&nbsp</td><td>&nbsp</td><td>&nbsp</td></tr>");
         
     }
     else if(branch_one == "audio")
     {
         if(branch_two == "playlists")
         {
-            http_request->getResponse()->addToPayload("<tr>");
-            http_request->getResponse()->addToPayload(QString("<td colspan=\"%1\" align=\"left\">").arg(core_table_columns));
-            http_request->getResponse()->addToPayload("Playlists | <a href=\"/audio/tracks\">Tracks</a> ");
-            http_request->getResponse()->addToPayload("</td>");
-            http_request->getResponse()->addToPayload("</tr>");
+            response->addToPayload("<tr>");
+            response->addToPayload(QString("<td colspan=\"%1\" align=\"left\">").arg(core_table_columns));
+            response->addToPayload("Playlists | <a href=\"/audio/tracks\">Tracks</a> ");
+            response->addToPayload("</td>");
+            response->addToPayload("</tr>");
 
-            http_request->getResponse()->addToPayload("<tr>");
-            http_request->getResponse()->addToPayload(QString("<td colspan=\"%1\" align=\"left\">").arg(core_table_columns));
-            http_request->getResponse()->addToPayload("<hr>");
-            http_request->getResponse()->addToPayload("</td>");
-            http_request->getResponse()->addToPayload("</tr>");
+            response->addToPayload("<tr>");
+            response->addToPayload(QString("<td colspan=\"%1\" align=\"left\">").arg(core_table_columns));
+            response->addToPayload("<hr>");
+            response->addToPayload("</td>");
+            response->addToPayload("</tr>");
             
-            http_request->getResponse()->addToPayload("<tr>");
+            response->addToPayload("<tr>");
 
-            http_request->getResponse()->addToPayload("<td colspan=\"3\" align=\"center\">");
+            response->addToPayload("<td colspan=\"3\" align=\"center\">");
 
-            http_request->getResponse()->addToPayload(" <a href=\"/audio/playlists?stopcommand=prev\">PREV</a> ");
-            http_request->getResponse()->addToPayload(" &nbsp; &nbsp; <a href=\"/audio/playlists?stopcommand=stop\">STOP</a> ");
-            http_request->getResponse()->addToPayload(" &nbsp; &nbsp; <a href=\"/audio/playlists?stopcommand=next\">NEXT</a> ");
+            response->addToPayload(" <a href=\"/audio/playlists?stopcommand=prev\">PREV</a> ");
+            response->addToPayload(" &nbsp; &nbsp; <a href=\"/audio/playlists?stopcommand=stop\">STOP</a> ");
+            response->addToPayload(" &nbsp; &nbsp; <a href=\"/audio/playlists?stopcommand=next\">NEXT</a> ");
 
-            http_request->getResponse()->addToPayload("</td>");
+            response->addToPayload("</td>");
 
-            http_request->getResponse()->addToPayload("</tr>");
+            response->addToPayload("</tr>");
 
-            showPlaylists(http_request);
+            showPlaylists(response);
         }
         else if(branch_two == "tracks")
         {
-            http_request->getResponse()->addToPayload("<tr>");
-            http_request->getResponse()->addToPayload(QString("<td colspan=\"%1\" align=\"left\">").arg(core_table_columns));
-            http_request->getResponse()->addToPayload("<a href=\"/audio/playlists\">Playlists</a> | Tracks ");
-            http_request->getResponse()->addToPayload("</td>");
-            http_request->getResponse()->addToPayload("</tr>");
+            response->addToPayload("<tr>");
+            response->addToPayload(QString("<td colspan=\"%1\" align=\"left\">").arg(core_table_columns));
+            response->addToPayload("<a href=\"/audio/playlists\">Playlists</a> | Tracks ");
+            response->addToPayload("</td>");
+            response->addToPayload("</tr>");
 
-            http_request->getResponse()->addToPayload("<tr>");
-            http_request->getResponse()->addToPayload(QString("<td colspan=\"%1\" align=\"left\">").arg(core_table_columns));
-            http_request->getResponse()->addToPayload("<hr>");
-            http_request->getResponse()->addToPayload("</td>");
-            http_request->getResponse()->addToPayload("</tr>");
+            response->addToPayload("<tr>");
+            response->addToPayload(QString("<td colspan=\"%1\" align=\"left\">").arg(core_table_columns));
+            response->addToPayload("<hr>");
+            response->addToPayload("</td>");
+            response->addToPayload("</tr>");
 
-            http_request->getResponse()->addToPayload("<tr>");
-            http_request->getResponse()->addToPayload("<td colspan=\"3\" align=\"center\"><a href=\"/audio/tracks?stopcommand=stop\">STOP</a></td>");
-            http_request->getResponse()->addToPayload("</td>");
-            http_request->getResponse()->addToPayload("</tr>");
+            response->addToPayload("<tr>");
+            response->addToPayload("<td colspan=\"3\" align=\"center\"><a href=\"/audio/tracks?stopcommand=stop\">STOP</a></td>");
+            response->addToPayload("</td>");
+            response->addToPayload("</tr>");
 
 
 
-            showTracks(http_request);
+            showTracks(response);
 
         }
         else
         {
-            http_request->getResponse()->setError(404);
+            response->setError(404);
         }
     }
     else
     {
-        http_request->getResponse()->setError(404);
+        response->setError(404);
     }
 
 }
 
-void ClientHttpServer::showPlaylists(HttpRequest *http_request)
+void ClientHttpServer::showPlaylists(HttpResponse *response)
 {
     //
     //  Lock the metadata
@@ -708,29 +710,29 @@ void ClientHttpServer::showPlaylists(HttpRequest *http_request)
                     ++it;
                     if(counter % 2 == 0)
                     {
-                        http_request->getResponse()->addToPayload("<tr bgcolor=\"ccccee\">");
+                        response->addToPayload("<tr bgcolor=\"ccccee\">");
                     }
                     else
                     {
-                        http_request->getResponse()->addToPayload("<tr>");
+                        response->addToPayload("<tr>");
                     }
                     ++counter;
 
-                    http_request->getResponse()->addToPayload("<td>");
-                    http_request->getResponse()->addToPayload(a_playlist->getName());
-                    http_request->getResponse()->addToPayload("</td>");
+                    response->addToPayload("<td>");
+                    response->addToPayload(a_playlist->getName());
+                    response->addToPayload("</td>");
 
-                    http_request->getResponse()->addToPayload("<td>");
-                    http_request->getResponse()->addToPayload("</td>");
+                    response->addToPayload("<td>");
+                    response->addToPayload("</td>");
 
-                    http_request->getResponse()->addToPayload("<td>");
-                    http_request->getResponse()->addToPayload(
+                    response->addToPayload("<td>");
+                    response->addToPayload(
                         QString("<a href=\"/audio/playlists?playplaylist=%1&container=%2\">play</a>")
                         .arg(a_playlist->getId())
                         .arg(a_container->getIdentifier()));
-                    http_request->getResponse()->addToPayload("</td>");
+                    response->addToPayload("</td>");
 
-                    http_request->getResponse()->addToPayload("</tr>");
+                    response->addToPayload("</tr>");
                 }
             }
         }
@@ -744,7 +746,7 @@ void ClientHttpServer::showPlaylists(HttpRequest *http_request)
 
 }
 
-void ClientHttpServer::showTracks(HttpRequest *http_request)
+void ClientHttpServer::showTracks(HttpResponse *response)
 {
     //
     //  Lock the metadata
@@ -782,7 +784,6 @@ void ClientHttpServer::showTracks(HttpRequest *http_request)
                 {
                     if(iterator.current()->getType() == MDT_audio)
                     {
-                        AudioMetadata *which_item = (AudioMetadata*)iterator.current();
                         if(AudioMetadata *which_item = dynamic_cast<AudioMetadata*>(iterator.current()) )
                         {
                             if(!a_container->isLocal() && metadata_server->getLocalEquivalent(which_item))
@@ -795,30 +796,30 @@ void ClientHttpServer::showTracks(HttpRequest *http_request)
                             {
                                 if(counter % 2 == 0)
                                 {
-                                    http_request->getResponse()->addToPayload("<tr bgcolor=\"ccccee\">");
+                                    response->addToPayload("<tr bgcolor=\"ccccee\">");
                                 }
                                 else
                                 {
-                                    http_request->getResponse()->addToPayload("<tr>");
+                                    response->addToPayload("<tr>");
                                 }
                                 ++counter;
 
-                                http_request->getResponse()->addToPayload("<td>");
-                                http_request->getResponse()->addToPayload(which_item->getArtist());
-                                http_request->getResponse()->addToPayload("</td>");
+                                response->addToPayload("<td>");
+                                response->addToPayload(which_item->getArtist());
+                                response->addToPayload("</td>");
 
-                                http_request->getResponse()->addToPayload("<td>");
-                                http_request->getResponse()->addToPayload(which_item->getTitle());
-                                http_request->getResponse()->addToPayload("</td>");
+                                response->addToPayload("<td>");
+                                response->addToPayload(which_item->getTitle());
+                                response->addToPayload("</td>");
 
-                                http_request->getResponse()->addToPayload("<td>");
-                                http_request->getResponse()->addToPayload(
+                                response->addToPayload("<td>");
+                                response->addToPayload(
                                     QString("<a href=\"/audio/tracks?playtrack=%1&container=%2\">play</a>")
                                     .arg(which_item->getId())
                                     .arg(a_container->getIdentifier()));
-                                http_request->getResponse()->addToPayload("</td>");
+                                response->addToPayload("</td>");
 
-                                http_request->getResponse()->addToPayload("</tr>");
+                                response->addToPayload("</tr>");
                             }
                         }
                         else
@@ -839,20 +840,20 @@ void ClientHttpServer::showTracks(HttpRequest *http_request)
 
 }
 
-void ClientHttpServer::endCoreTable(HttpRequest *http_request)
+void ClientHttpServer::endCoreTable(HttpResponse *response)
 {
-    http_request->getResponse()->addToPayload("</table>");
-    http_request->getResponse()->addToPayload("</center>");
+    response->addToPayload("</table>");
+    response->addToPayload("</center>");
 }
 
-void ClientHttpServer::addBottomHTML(HttpRequest *http_request)
+void ClientHttpServer::addBottomHTML(HttpResponse *response)
 {
-    http_request->getResponse()->addToPayload("<br><br><hr>");
-    http_request->getResponse()->addToPayload("<font size=\"-2\">");
-    http_request->getResponse()->addToPayload("<center>");
-    http_request->getResponse()->addToPayload("<p>&copy 2002, 2003, 2004 &nbsp by Isaac Richards, Thor Sigvaldason, and all the <a href=\"http://www.mythtv.org/\">MythTV</a> contributors.</p>");
-    http_request->getResponse()->addToPayload("</center>");
-    http_request->getResponse()->addToPayload("</font>");
+    response->addToPayload("<br><br><hr>");
+    response->addToPayload("<font size=\"-2\">");
+    response->addToPayload("<center>");
+    response->addToPayload("<p>&copy 2002, 2003, 2004 &nbsp by Isaac Richards, Thor Sigvaldason, and all the <a href=\"http://www.mythtv.org/\">MythTV</a> contributors.</p>");
+    response->addToPayload("</center>");
+    response->addToPayload("</font>");
 }
 
 

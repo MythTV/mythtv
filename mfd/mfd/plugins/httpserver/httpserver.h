@@ -59,15 +59,15 @@ class ClientHttpServer: public MFDHttpPlugin
     //  Stuff that builds the HTML
     //
 
-    void    addTopHTML(HttpRequest *http_request);
-    void    startCoreTable(HttpRequest *http_request);
-    void    listMFDs(HttpRequest *http_request);
-    void    listSections(HttpRequest *http_request, const QString &branch_one);
-    void    showCurrentSection(HttpRequest *http_request, const QString &branch_one, const QString &branch_two);
-    void    showPlaylists(HttpRequest *http_request);
-    void    showTracks(HttpRequest *http_request);
-    void    endCoreTable(HttpRequest *http_request);
-    void    addBottomHTML(HttpRequest *http_request);     
+    void    addTopHTML(HttpResponse *response);
+    void    startCoreTable(HttpResponse *response);
+    void    listMFDs(HttpResponse *response);
+    void    listSections(HttpResponse *response, const QString &branch_one);
+    void    showCurrentSection(HttpResponse *response, const QString &branch_one, const QString &branch_two);
+    void    showPlaylists(HttpResponse *response);
+    void    showTracks(HttpResponse *response);
+    void    endCoreTable(HttpResponse *response);
+    void    addBottomHTML(HttpResponse *response);     
 
     //
     //  Stuff to do stuff (well that's helpful)
