@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2004-05-30, v0.15.01
+<date>2004-06-03, v0.15.02
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -23,7 +23,7 @@ name="http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html"> or as a PDF
 at <url url="http://www.mythtv.org/docs/mythtv-HOWTO.pdf"
 name="http://www.mythtv.org/docs/mythtv-HOWTO.pdf">.
 
-This HOWTO is for MythTV v0.15.
+This HOWTO is for MythTV v0.15.1.
 
 <sect1>Mailing lists / getting help.
 <p>It's recommended that you join the user list at <url
@@ -2580,6 +2580,33 @@ database.
 <p>Run the <tt>mythfilldatabase</tt> program as directed.  The master
 backend will obtain guide data for all the video sources you defined during
 setup.
+
+<bf>NOTE</bf>: If you are using DataDirect and watching the output messages
+on the console or the log file it is normal to see a "401 Unauthorized"
+error followed by a "200 OK" when the connection to Zap2It is being
+established.
+<tscreen><verb>
+From : Sun Jun 13 05:00:00 2004 To : Mon Jun 14 05:00:00 2004 (UTC)
+--02:58:01--
+http://datadirect.webservices.zap2it.com/tvlistings/xtvdService
+           => -'
+Resolving datadirect.webservices.zap2it.com... 206.18.98.160
+Connecting to datadirect.webservices.zap2it.com[206.18.98.160]:80...
+connected.
+HTTP request sent, awaiting response... 401 Unauthorized
+Connecting to datadirect.webservices.zap2it.com[206.18.98.160]:80...
+connected.
+HTTP request sent, awaiting response... 200 OK
+Length: unspecified [text/xml]
+
+    [    <=>                              ] 114,125       63.57K/s
+
+02:58:03 (63.53 KB/s) - -' saved [114125]
+
+Your subscription expires on 08/20/2004 12:00:00 AM
+Grab complete.  Actual data from Sun Jun 13 05:00:00 2004 to Mon Jun 14
+00:00:00 2004 (UTC)
+</verb></tscreen>
 
 Once <tt>mythfilldatabase</tt> has finished, start the master server before
 continuing.
@@ -6384,6 +6411,7 @@ Adjust the MySQL v3 instructions since I wasn't paying attention the first
 time.  Instructions for grabbing icons for DataDirect.
 v0.15.01, 2004-05-30  Get rid of a "CVS only" holdover.  Ramon Redondo's
 patch for Gentoo.  Get rid of some doubled doubled words. (Ian Forde)
+v0.15.02, 2004-06-03  Patch by Bill Chmura about 401/200 error with DataDirect.
 -->
 
 <!--
