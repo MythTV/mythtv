@@ -770,9 +770,12 @@ void ProgramInfo::ApplyRecordRecGroupChange(QSqlDatabase *db,
     QString starts = recstartts.toString("yyyyMMddhhmm");
     starts += "00";
 
+    QString myRecGroup = newrecgroup;
+    myRecGroup.replace(QRegExp("'"), QString("\'"));
+
     QString querystr = QString("UPDATE recorded SET recgroup = '%1', "
                                "starttime = '%2' WHERE chanid = '%3' AND "
-                               "starttime = '%4';").arg(newrecgroup).arg(starts)
+                               "starttime = '%4';").arg(myRecGroup).arg(starts)
                                                    .arg(chanid).arg(starts);
     QSqlQuery query = db->exec(querystr);
     if (!query.isActive())

@@ -378,12 +378,12 @@ public:
         BackendSetting("CommercialSkipCPU") {
 
         setLabel(QObject::tr("CPU Usage"));
-        addSelection(QObject::tr("Low (run 'niced' and give up CPU time every frame)"), "0");
-        addSelection(QObject::tr("Medium (run 'niced')"), "1");
-        addSelection(QObject::tr("High (run full-speed)"), "2");
+        addSelection(QObject::tr("Low"), "0");
+        addSelection(QObject::tr("Medium"), "1");
+        addSelection(QObject::tr("High"), "2");
         setHelpText(QObject::tr("This setting determines approximately how "
                     "much CPU Commercial Detection threads will consume. "
-                    "At full speed, all available CPU time will be used "
+                    "On 'High', all available CPU time will be used "
                     "which may cause problems on slow systems." ));
     };
 };
