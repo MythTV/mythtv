@@ -1057,7 +1057,7 @@
         <area>20,12,760,330</area>
         <fcnfont name="active_font" function="active"></fcnfont>
         <fcnfont name="inactive_font" function="inactive"></fcnfont>
-        <fcnfont name="record_font" function="recording"></fcnfont>
+        <fcnfont name="record_font" function="record"></fcnfont>
         <fcnfont name="active_font" function="selected"></fcnfont>
         <columnpadding>1</columnpadding>
         <column number="1" width="35" context="-1"></column>

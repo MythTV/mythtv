@@ -1031,7 +1031,7 @@ void ProgramRecPriority::updateList(QPainter *p)
                             progInfo->recstatus == rsInactive)
                             ltype->EnableForcedFont(cnt, "inactive");
                         else if (recMatch[progInfo->recordid] > 0)
-                            ltype->EnableForcedFont(cnt, "recording");
+                            ltype->EnableForcedFont(cnt, "record");
                         // else if (listMatch[progInfo->recordid] < 1)
                         //    ltype->EnableForcedFont(cnt, "dormant");
 
