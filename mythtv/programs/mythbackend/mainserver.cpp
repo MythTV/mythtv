@@ -993,6 +993,8 @@ void *MainServer::SpawnDeleteThread(void *param)
 
 void MainServer::DoDeleteThread(DeleteStruct *ds)
 {
+    deletelock.lock();
+
     QString logInfo = QString("chanid %1 at %2")
                               .arg(ds->chanid).arg(ds->recstartts.toString());
                              
@@ -1009,6 +1011,7 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
                            QString("File %1 does not exist for %2 when trying "
                                    "to delete recording.")
                                    .arg(ds->filename).arg(logInfo));
+        deletelock.unlock();
         return;
     }
 
@@ -1028,6 +1031,7 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
         if (delete_db)
             delete delete_db;
 
+        deletelock.unlock();
         return;
     }
 
@@ -1059,6 +1063,7 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
         if (delete_db)
             delete delete_db;
 
+        deletelock.unlock();
         return;
     }
 
@@ -1110,8 +1115,12 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
                                    .arg(logInfo));
     }
 
+    ScheduledRecording::signalChange(0);
+
     if (delete_db)
         delete delete_db;
+
+    deletelock.unlock();
 }
 
 void MainServer::HandleCheckRecordingActive(QStringList &slist, 

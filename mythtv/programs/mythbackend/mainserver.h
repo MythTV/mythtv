@@ -141,6 +141,7 @@ class MainServer : public QObject
     bool ismaster;
 
     QMutex dblock;
+    QMutex deletelock;
     QMutex threadPoolLock;
     vector<ProcessRequestThread *> threadPool;
 
