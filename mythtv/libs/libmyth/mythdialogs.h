@@ -99,6 +99,7 @@ class MythMainWindow : public QDialog
     void JumpTo(const QString &destination);
     bool DestinationExists(const QString &destination) const;
 
+
   protected:
     void keyPressEvent(QKeyEvent *e);
     void customEvent(QCustomEvent *ce);
@@ -363,6 +364,7 @@ class MythImageFileDialog: public MythThemedDialog
     GenericTree           *initial_node;
     UIImageType           *image_box;
     QStringList           image_files;
+    QString               initialDir;
 };
 
 // ---------------------------------------------------------------------------

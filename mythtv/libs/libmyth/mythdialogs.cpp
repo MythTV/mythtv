@@ -2220,7 +2220,8 @@ MythImageFileDialog::MythImageFileDialog(QString *result,
     {
         image_box->calculateScreenArea();
     }
-    
+    initialDir = top_directory;
+        
     image_files.clear();
     buildTree(top_directory);
 
@@ -2286,7 +2287,8 @@ void MythImageFileDialog::buildTree(QString starting_where)
         {
             make_active = true;
         }
-        QString prefix = gContext->GetSetting("VideoStartupDir");
+        QString prefix = initialDir;
+
         if(prefix.length() < 1)
         {
             cerr << "mythdialogs.o: Seems unlikely that this is going to work" << endl;
