@@ -1333,30 +1333,21 @@ void TV::NormalSpeed(void)
 void TV::ChangeSpeed(int direction)
 {
     speed_index += direction;
-    if (speed_index > 4 || speed_index < -4)
-    {
-        speed_index -= direction;
-        return;
-    }
 
     float time = StopFFRew();
     float speed;
     QString mesg;
 
-    if (speed_index > 0)
+    switch (speed_index)
     {
-        speed = speed_index+1;
-        mesg = QString(tr("Speed %1X")).arg(speed_index+1);
-    }
-    else if (speed_index < 0)
-    {
-        speed = 1.0 / (-speed_index+1);
-        mesg = QString(tr("Speed 1/%1X")).arg(-speed_index+1);
-    }
-    else
-    {
-        speed = 1.0;
-        mesg = tr("Play");
+        case  3: speed = 5.0;      mesg = QString(tr("Speed 5X"));    break;
+        case  2: speed = 3.0;      mesg = QString(tr("Speed 3X"));    break;
+        case  1: speed = 2.0;      mesg = QString(tr("Speed 2X"));    break;
+        case  0: speed = 1.0;      mesg = QString(tr("Play"));        break;
+        case -1: speed = 1.0 / 3;  mesg = QString(tr("Speed 1/3X"));  break;
+        case -2: speed = 1.0 / 8;  mesg = QString(tr("Speed 1/8X"));  break;
+        case -3: speed = 1.0 / 16; mesg = QString(tr("Speed 1/16X")); break;
+        default: speed_index -= direction; return; break;
     }
 
     activenvp->SetPlaySpeed(speed);
