@@ -250,7 +250,7 @@ void DVBRecorder::OpenFilters(dvb_pid_t& pids, dmx_pes_type_t type)
     {
         int this_pid = pids[i];
 
-        RECORD(QString("Adding pid %1, type %1").arg(this_pid).arg((int)type));
+        RECORD(QString("Adding pid %1, type %2").arg(this_pid).arg((int)type));
 
         if (this_pid < 0x10 || this_pid > 0x1fff)
             WARNING(QString("PID value (%1) is outside dvb specification.")

@@ -861,7 +861,7 @@ void NuppelVideoRecorder::StartRecording(void)
     if (!pip_mode)
     {
         int commDetectMethod = gContext->GetNumSetting("CommercialSkipMethod",
-                                                       COMMERCIAL_SKIP_BLANKS);
+                                                       COMM_DETECT_BLANKS);
         
         if (commDetect)
             commDetect->Init(w_out, h_out, video_frame_rate, commDetectMethod);

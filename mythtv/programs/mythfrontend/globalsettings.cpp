@@ -205,8 +205,7 @@ public:
                              query.value(0).toString());
         addSelection(QObject::tr("All Programs"),
                      QObject::tr("All Programs"));
-        addSelection(QObject::tr("Default"),
-                     QObject::tr("Default"));
+        addSelection(QString("Default"), QString("Default"));
 
         setHelpText(QObject::tr("Default Recording Group to display "
                                 "on the view recordings screen."));
@@ -305,6 +304,8 @@ public:
         addSelection(QObject::tr("Blank Frame Detection (default)"), "1");
         addSelection(QObject::tr("Blank Frame + Scene Change Detection"), "3");
         addSelection(QObject::tr("Scene Change Detection"), "2");
+        addSelection(QObject::tr("Logo Detection"), "4");
+//        addSelection(QObject::tr("All Detection Methods"), "255");
         setHelpText(QObject::tr("This determines the method used by MythTV to "
                     "detect when commercials start and end.  You must have "
                     "automatic commercial turned on to use anything "

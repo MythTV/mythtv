@@ -584,7 +584,7 @@ void DVBChannel::CheckOptions()
        (symbol_rate < info.symbol_rate_min ||
         symbol_rate > info.symbol_rate_max))
         WARNING(QString("Symbol Rate setting (%1) is "
-                        "out of range (min/max:%1/%1)")
+                        "out of range (min/max:%2/%3)")
                         .arg(symbol_rate)
                         .arg(info.symbol_rate_min)
                         .arg(info.symbol_rate_max));

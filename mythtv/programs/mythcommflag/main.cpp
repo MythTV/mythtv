@@ -36,7 +36,7 @@ double fps = 29.97;
 void FlagCommercials(QSqlDatabase *db, QString chanid, QString starttime)
 {
     int commDetectMethod = gContext->GetNumSetting("CommercialSkipMethod",
-                                                   COMMERCIAL_SKIP_BLANKS);
+                                                   COMM_DETECT_BLANKS);
     QMap<long long, int> blanks;
     ProgramInfo *program_info =
         ProgramInfo::GetProgramFromRecorded(db, chanid, starttime);

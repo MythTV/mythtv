@@ -15,6 +15,12 @@ CommDetect::CommDetect(int w, int h, double fps, int method)
     comm_debug_init(w, h);
 #endif
 
+    logoFrame = NULL;
+    logoMask = NULL;
+    logoCheckMask = NULL;
+    logoMaxValues = NULL;
+    logoMinValues = NULL;
+
     Init(w, h, fps, method);
 }
 
@@ -22,26 +28,38 @@ CommDetect::~CommDetect(void)
 {
     frame_ptr = NULL;
 
+    if (logoFrame)
+        delete [] logoFrame;
+
+    if (logoMask)
+        delete [] logoMask;
+
+    if (logoCheckMask)
+        delete [] logoCheckMask;
+
+    if (logoMaxValues)
+        delete [] logoMaxValues;
+
+    if (logoMinValues)
+        delete [] logoMinValues;
+
 #ifdef SHOW_DEBUG_WIN
     comm_debug_destroy();
 #endif
 }
 
-void CommDetect::Init(int w, int h, double fps, int method)
+void CommDetect::Init(int w, int h, double frame_rate, int method)
 {
     commDetectMethod = method;
 
     width = w;
     height = h;
-    frame_rate = fps;
+    fps = frame_rate;
     fpm = fps * 60;
 
     framesProcessed = 0;
 
     border = gContext->GetNumSetting("CommBorder", 10);
-
-    detectBlankFrames = true;
-    detectSceneChanges = false;
 
     aggressiveDetection = true;
 
@@ -53,15 +71,35 @@ void CommDetect::Init(int w, int h, double fps, int method)
     lastHistogram[0] = -1;
     histogram[0] = -1;
 
-    SetBlankFrameDetection(commDetectMethod & COMMERCIAL_SKIP_BLANKS);
-    SetSceneChangeDetection(commDetectMethod & COMMERCIAL_SKIP_SCENE);
-
     frameIsBlank = false;
     sceneHasChanged = false;
+    stationLogoPresent = false;
 
     skipAllBlanks = true;
 
     frame_ptr = NULL;
+
+    if (logoFrame)
+        delete [] logoFrame;
+    logoFrame = new unsigned char[width * height];
+
+    if (logoMask)
+        delete [] logoMask;
+    logoMask = new unsigned char[width * height];
+
+    if (logoCheckMask)
+        delete [] logoCheckMask;
+    logoCheckMask = new unsigned char[width * height];
+
+    if (logoMaxValues)
+        delete [] logoMaxValues;
+    logoMaxValues = new unsigned char[width * height];
+
+    if (logoMinValues)
+        delete [] logoMinValues;
+    logoMinValues = new unsigned char[width * height];
+
+    logoFrameCount = 0;
 
     ClearAllMaps();
 }
@@ -73,14 +111,30 @@ void CommDetect::ProcessNextFrame(VideoFrame *frame, long long frame_number)
 
     frame_ptr = frame->buf;
 
+#ifdef SHOW_DEBUG_WIN
+    comm_debug_show(frame->buf);
+#endif
+
     lastFrameWasBlank = frameIsBlank;
     lastFrameWasSceneChange = sceneHasChanged;
 
-    if (detectBlankFrames)
+    if (commDetectMethod & COMM_DETECT_BLANKS)
         frameIsBlank = CheckFrameIsBlank();
 
-    if (detectSceneChanges)
+    if (commDetectMethod & COMM_DETECT_SCENE)
         sceneHasChanged = CheckSceneHasChanged();
+
+    if (commDetectMethod & COMM_DETECT_LOGO)
+    {
+        bool nowPresent = CheckStationLogo();
+
+        if (!stationLogoPresent && nowPresent)
+            logoCommBreakMap[frame_number] = MARK_START;
+        else if (stationLogoPresent && !nowPresent)
+            logoCommBreakMap[frame_number] = MARK_END;
+
+        stationLogoPresent = nowPresent;
+    }
 
     if (frame_number != -1)
     {
@@ -88,14 +142,10 @@ void CommDetect::ProcessNextFrame(VideoFrame *frame, long long frame_number)
             blankFrameMap[frame_number] = MARK_BLANK_FRAME;
 
         if (sceneHasChanged)
-            sceneChangeMap[frame_number] = MARK_SCENE_CHANGE;
+            sceneMap[frame_number] = MARK_SCENE_CHANGE;
     }
 
     framesProcessed++;
-
-#ifdef SHOW_DEBUG_WIN
-    comm_debug_show(frame_ptr);
-#endif
 }
 
 bool CommDetect::CheckFrameIsBlank(void)
@@ -192,13 +242,135 @@ bool CommDetect::CheckSceneHasChanged(void)
             similar += lastHistogram[i];
     }
 
-    if (similar < ((width - (border * 2)) * (height - (border * 2)) / 4 * .91))
+    sceneChangePercent = (int)(100.0 * similar /
+                               ((width - (border * 2)) *
+                                (height - (border * 2)) / 4));
+    if (sceneChangePercent < 91)
     {
         memcpy(lastHistogram, histogram, sizeof(histogram));
         return(true);
     }
 
     return(false);
+}
+
+bool CommDetect::CheckStationLogo(void)
+{
+    long in_sum = 0;
+    int in_pixels = 0;
+    long out_sum = 0;
+    int out_pixels = 0;
+
+    for (int y = logoMinY - 2; y <= (logoMaxY + 2); y += 5)
+    {
+        for (int x = logoMinX - 2; x <= (logoMaxX + 2); x += 5)
+        {
+            int index = (y + 2) * width + x + 2;
+
+            if (logoCheckMask[index] == 0)
+                continue;
+
+            in_sum = in_pixels = 0;
+            out_sum = out_pixels = 0;
+
+            for (int y2 = 0; y2 < 5; y2++)
+            {
+                index = (y + y2) * width + x;
+                unsigned char *maskPtr = &logoMask[index];
+                unsigned char *fPtr = &frame_ptr[index];
+                for (int x2 = 0; x2 < 5; x2++)
+                {
+                    if (*maskPtr == 1)
+                    {
+                        in_sum += *fPtr;
+                        in_pixels++;
+                    }
+                    else if (*maskPtr == 3)
+                    {
+                        out_sum += *fPtr;
+                        out_pixels++;
+                    }
+                    index++;
+                    maskPtr++;
+                    fPtr++;
+                }
+            }
+
+            if ((in_pixels >= 5) && (out_pixels >= 5))
+            {
+                int in_avg = in_sum / in_pixels;
+                int out_avg = out_sum / out_pixels;
+
+                if (in_avg < (out_avg - 10))
+                {
+                    return(false);
+                }
+            }
+        }
+    }
+
+    in_sum = in_pixels = 0;
+    out_sum = out_pixels = 0;
+
+    for (int y = logoMinY - 2; y <= (logoMaxY + 2); y++)
+    {
+        int index = y * width + logoMinX - 2;
+        unsigned char *maskPtr = &logoMask[index];
+        unsigned char *fPtr = &frame_ptr[index];
+        for (int x = logoMinX - 2; x <= (logoMaxX + 2); x++)
+        {
+            if (*maskPtr == 1)
+            {
+                in_sum += *fPtr;
+                in_pixels++;
+            }
+            else if (*maskPtr == 3)
+            {
+                out_sum += *fPtr;
+                out_pixels++;
+            }
+            index++;
+            maskPtr++;
+            fPtr++;
+        }
+    }
+
+    if (!in_pixels || !out_pixels)
+        return(false);
+
+    int in_avg = in_sum / in_pixels;
+    int out_avg = out_sum / out_pixels;
+
+    if (in_avg > (out_avg + 10))
+        return(true);
+
+    return(false);
+}
+
+void CommDetect::SetMinMaxPixels(VideoFrame *frame)
+{
+    if (!logoFrameCount)
+    {
+        memset(logoMaxValues, 0, width * height);
+        memset(logoMinValues, 255, width * height);
+        memset(logoFrame, 0, width * height);
+        memset(logoMask, 0, width * height);
+        memset(logoCheckMask, 0, width * height);
+    }
+
+    logoFrameCount++;
+
+    for (int y = 0; y < height; y++)
+    {
+        for (int x = 0; x < width; x++)
+        {
+            unsigned char pixel = frame->buf[y * width + x];
+            if (logoMaxValues[y * width + x] < pixel)
+                logoMaxValues[y * width + x] = pixel;
+            if (logoMinValues[y * width + x] > pixel)
+                logoMinValues[y * width + x] = pixel;
+        }
+    }
 }
 
 bool CommDetect::FrameIsBlank(void)
@@ -216,51 +388,49 @@ void CommDetect::ClearAllMaps(void)
     blankFrameMap.clear();
     blankCommMap.clear();
     blankCommBreakMap.clear();
-    sceneChangeMap.clear();
-    sceneChangeCommMap.clear();
+    sceneMap.clear();
+    sceneCommBreakMap.clear();
     commBreakMap.clear();
 }
 
 void CommDetect::GetCommBreakMap(QMap<long long, int> &marks)
 {
-    QMap<long long, int>::Iterator it;
-
     marks.clear();
 
-    if (detectBlankFrames)
-        BuildBlankFrameCommList();
-    else
-        blankCommBreakMap.clear();
+    switch (commDetectMethod)
+    {
+        case COMM_DETECT_OFF:         return;
 
-    if (detectSceneChanges)
-        BuildSceneChangeCommList();
-    else
-        sceneChangeCommMap.clear();
+        case COMM_DETECT_BLANKS:      BuildBlankFrameCommList();
+                                      marks = blankCommBreakMap;
+                                      break;
 
-    BuildMasterCommList();
+        case COMM_DETECT_SCENE:       BuildSceneChangeCommList();
+                                      marks = sceneCommBreakMap;
+                                      break;
 
-    if (commBreakMap.isEmpty())
-        for (it = blankCommBreakMap.begin(); it != blankCommBreakMap.end();
-                ++it)
-            commBreakMap[it.key()] = it.data();
+        case COMM_DETECT_BLANK_SCENE: BuildBlankFrameCommList();
+                                      BuildSceneChangeCommList();
+                                      BuildMasterCommList();
+                                      marks = commBreakMap;
+                                      break;
 
-    if (commBreakMap.isEmpty())
-        for (it = sceneChangeCommMap.begin(); it != sceneChangeCommMap.end();
-                ++it)
-            commBreakMap[it.key()] = it.data();
+        case COMM_DETECT_LOGO:        BuildLogoCommList();
+                                      marks = logoCommBreakMap;
+                                      break;
 
-    for (it = commBreakMap.begin(); it != commBreakMap.end(); ++it)
-        marks[it.key()] = it.data();
+        case COMM_DETECT_ALL:         BuildBlankFrameCommList();
+                                      BuildSceneChangeCommList();
+                                      BuildLogoCommList();
+                                      BuildAllMethodsCommList();
+                                      marks = commBreakMap;
+                                      break;
+    }
 }
 
 void CommDetect::SetBlankFrameMap(QMap<long long, int> &blanks)
 {
-    QMap<long long, int>::Iterator it;
-
-    blankFrameMap.clear();
-
-    for (it = blanks.begin(); it != blanks.end(); ++it)
-        blankFrameMap[it.key()] = it.data();
+    blankFrameMap = blanks;
 }
 
 void CommDetect::GetBlankFrameMap(QMap<long long, int> &blanks,
@@ -278,28 +448,18 @@ void CommDetect::GetBlankFrameMap(QMap<long long, int> &blanks,
 
 void CommDetect::GetBlankCommMap(QMap<long long, int> &comms)
 {
-    QMap<long long, int>::Iterator it;
-
     if (blankCommMap.isEmpty())
         BuildBlankFrameCommList();
 
-    comms.clear();
-
-    for (it = blankCommMap.begin(); it != blankCommMap.end(); ++it)
-        comms[it.key()] = it.data();
+    comms = blankCommMap;
 }
 
 void CommDetect::GetBlankCommBreakMap(QMap<long long, int> &comms)
 {
-    QMap<long long, int>::Iterator it;
-
     if (blankCommBreakMap.isEmpty())
         BuildBlankFrameCommList();
 
-    comms.clear();
-
-    for (it = blankCommBreakMap.begin(); it != blankCommBreakMap.end(); ++it)
-        comms[it.key()] = it.data();
+    comms = blankCommBreakMap;
 }
 
 void CommDetect::GetSceneChangeMap(QMap<long long, int> &scenes,
@@ -310,7 +470,7 @@ void CommDetect::GetSceneChangeMap(QMap<long long, int> &scenes,
     if (start_frame == -1)
         scenes.clear();
 
-    for (it = sceneChangeMap.begin(); it != sceneChangeMap.end(); ++it)
+    for (it = sceneMap.begin(); it != sceneMap.end(); ++it)
         if ((start_frame == -1) || (it.key() >= start_frame))
             scenes[it.key()] = it.data();
 }
@@ -341,14 +501,14 @@ void CommDetect::BuildMasterCommList(void)
     }
 
     if ((blankCommBreakMap.size() > 1) &&
-        (sceneChangeCommMap.size() > 1))
+        (sceneCommBreakMap.size() > 1))
     {
         // see if beginning of the recording looks like a commercial
         QMap<long long, int>::Iterator it_a;
         QMap<long long, int>::Iterator it_b;
 
         it_a = blankCommBreakMap.begin();
-        it_b = sceneChangeCommMap.begin();
+        it_b = sceneCommBreakMap.begin();
 
         if ((it_b.key() < 2) &&
             (it_a.key() > 2))
@@ -369,8 +529,8 @@ void CommDetect::BuildMasterCommList(void)
                 (it.key() > max_blank))
                     max_blank = it.key();
 
-        it = sceneChangeCommMap.begin();
-        for(unsigned int i = 0; i < sceneChangeCommMap.size(); i++)
+        it = sceneCommBreakMap.begin();
+        for(unsigned int i = 0; i < sceneCommBreakMap.size(); i++)
             if ((it.data() == MARK_COMM_END) &&
                 (it.key() > max_scene))
                 max_scene = it.key();
@@ -384,7 +544,7 @@ void CommDetect::BuildMasterCommList(void)
     }
 
     if ((blankCommBreakMap.size() > 3) &&
-        (sceneChangeCommMap.size() > 1))
+        (sceneCommBreakMap.size() > 1))
     {
         QMap<long long, int>::Iterator it_a;
         QMap<long long, int>::Iterator it_b;
@@ -403,14 +563,14 @@ void CommDetect::BuildMasterCommList(void)
             long long fdiff = it_b.key() - it_a.key();
             bool allTrue = false;
 
-            if (fdiff < (62 * frame_rate))
+            if (fdiff < (62 * fps))
             {
                 long long f = it_a.key() + 1;
 
                 allTrue = true;
 
                 while ((f < framesProcessed) && (f < it_b.key()) && (allTrue))
-                    allTrue = FrameIsInCommBreak(f++, sceneChangeCommMap);
+                    allTrue = FrameIsInCommBreak(f++, sceneCommBreakMap);
             }
 
             if (allTrue)
@@ -424,6 +584,48 @@ void CommDetect::BuildMasterCommList(void)
             if (it_b != blankCommBreakMap.end())
                 it_b++;
         }
+    }
+}
+
+void CommDetect::BuildAllMethodsCommList(void)
+{
+    bool includeBlankFrameMethod  = (blankCommBreakMap.size() > 2);
+    bool includeSceneChangeMethod = (sceneCommBreakMap.size() > 2);
+    bool includeLogoMethod        = (logoCommBreakMap.size() > 2);
+
+    QMap<long long, int> frameMap;
+    QMap<long long, int>::Iterator it;
+
+    commBreakMap.clear();
+
+    for (int i = 0; i <= framesProcessed; i++)
+    {
+        int value = 0;
+
+        if (blankFrameMap.contains(i))
+            value += 0x01;
+
+        if ((includeBlankFrameMethod) &&
+            (blankCommBreakMap.contains(i)))
+            value += 0x02;
+
+        if ((includeSceneChangeMethod) &&
+            (sceneCommBreakMap.contains(i)))
+            value += 0x04;
+
+        if ((includeLogoMethod) &&
+            (logoCommBreakMap.contains(i)))
+            value += 0x08;
+
+        frameMap[i] = value;
+    }
+
+
+    for (int i = 0; i <= framesProcessed; i++)
+    {
+        int value = frameMap[i];
+
+        
     }
 }
 
@@ -457,21 +659,21 @@ void CommDetect::BuildBlankFrameCommList(void)
             // end of breaks
             int gap_length = bframes[x] - bframes[i];
             if (((aggressiveDetection) &&
-                 ((abs((int)(gap_length - (15 * frame_rate))) < 10 ) ||
-                  (abs((int)(gap_length - (20 * frame_rate))) < 11 ) ||
-                  (abs((int)(gap_length - (30 * frame_rate))) < 12 ) ||
-                  (abs((int)(gap_length - (45 * frame_rate))) < 13 ) ||
-                  (abs((int)(gap_length - (60 * frame_rate))) < 15 ) ||
-                  (abs((int)(gap_length - (90 * frame_rate))) < 10 ) ||
-                  (abs((int)(gap_length - (120 * frame_rate))) < 10 ))) ||
+                 ((abs((int)(gap_length - (15 * fps))) < 10 ) ||
+                  (abs((int)(gap_length - (20 * fps))) < 11 ) ||
+                  (abs((int)(gap_length - (30 * fps))) < 12 ) ||
+                  (abs((int)(gap_length - (45 * fps))) < 13 ) ||
+                  (abs((int)(gap_length - (60 * fps))) < 15 ) ||
+                  (abs((int)(gap_length - (90 * fps))) < 10 ) ||
+                  (abs((int)(gap_length - (120 * fps))) < 10 ))) ||
                 ((!aggressiveDetection) &&
-                 ((abs((int)(gap_length - (15 * frame_rate))) < 13 ) ||
-                  (abs((int)(gap_length - (20 * frame_rate))) < 15 ) ||
-                  (abs((int)(gap_length - (30 * frame_rate))) < 17 ) ||
-                  (abs((int)(gap_length - (45 * frame_rate))) < 19 ) ||
-                  (abs((int)(gap_length - (60 * frame_rate))) < 20 ) ||
-                  (abs((int)(gap_length - (90 * frame_rate))) < 20 ) ||
-                  (abs((int)(gap_length - (120 * frame_rate))) < 20 ))))
+                 ((abs((int)(gap_length - (15 * fps))) < 13 ) ||
+                  (abs((int)(gap_length - (20 * fps))) < 15 ) ||
+                  (abs((int)(gap_length - (30 * fps))) < 17 ) ||
+                  (abs((int)(gap_length - (45 * fps))) < 19 ) ||
+                  (abs((int)(gap_length - (60 * fps))) < 20 ) ||
+                  (abs((int)(gap_length - (90 * fps))) < 20 ) ||
+                  (abs((int)(gap_length - (120 * fps))) < 20 ))))
             {
                 c_start[commercials] = bframes[i];
                 c_end[commercials] = bframes[x] - 1;
@@ -481,14 +683,10 @@ void CommDetect::BuildBlankFrameCommList(void)
             }
 
             if ((!aggressiveDetection) &&
-                ((abs((int)(gap_length - (30 * frame_rate)))
-                                            < (int)(frame_rate * 0.85)) ||
-                 (abs((int)(gap_length - (60 * frame_rate)))
-                                            < (int)(frame_rate * 0.95)) ||
-                 (abs((int)(gap_length - (90 * frame_rate)))
-                                            < (int)(frame_rate * 1.05)) ||
-                 (abs((int)(gap_length - (120 * frame_rate)))
-                                            < (int)(frame_rate * 1.15))) &&
+                ((abs((int)(gap_length - (30 * fps))) < (int)(fps * 0.85)) ||
+                 (abs((int)(gap_length - (60 * fps))) < (int)(fps * 0.95)) ||
+                 (abs((int)(gap_length - (90 * fps))) < (int)(fps * 1.05)) ||
+                 (abs((int)(gap_length - (120 * fps))) < (int)(fps * 1.15))) &&
                 ((x + 2) < frames) &&
                 ((i + 2) < frames) &&
                 ((bframes[i] + 1) == bframes[i+1]) &&
@@ -508,8 +706,8 @@ void CommDetect::BuildBlankFrameCommList(void)
     // don't allow single commercial at head
     // of show unless followed by another
     if ((commercials > 1) &&
-        (c_end[0] < (33 * frame_rate)) &&
-        (c_start[1] > (c_end[0] + 40 * frame_rate)))
+        (c_end[0] < (33 * fps)) &&
+        (c_start[1] > (c_end[0] + 40 * fps)))
         i = 1;
 
     // eliminate any blank frames at end of commercials
@@ -518,7 +716,7 @@ void CommDetect::BuildBlankFrameCommList(void)
     {
         long long r = c_start[i];
 
-        if ((r < (30 * frame_rate)) &&
+        if ((r < (30 * fps)) &&
             (first_comm))
             r = 1;
 
@@ -563,14 +761,16 @@ void CommDetect::BuildBlankFrameCommList(void)
 void CommDetect::BuildSceneChangeCommList(void)
 {
     int section_start = -1;
-    int seconds = (int)(framesProcessed / frame_rate);
+    int seconds = (int)(framesProcessed / fps);
     int sc_histogram[seconds+1];
+
+    sceneCommBreakMap.clear();
 
     memset(sc_histogram, 0, sizeof(sc_histogram));
     for(long long f = 0; f < framesProcessed; f++)
     {
-        if (sceneChangeMap.contains(f))
-            sc_histogram[(int)(f / frame_rate)]++;
+        if (sceneMap.contains(f))
+            sc_histogram[(int)(f / fps)]++;
     }
 
     for(long long s = 0; s < (seconds + 1); s++)
@@ -579,13 +779,13 @@ void CommDetect::BuildSceneChangeCommList(void)
         {
             if (section_start == -1)
             {
-                long long f = (long long)(s * frame_rate);
-                for(int i = 0; i < frame_rate; i++, f++)
+                long long f = (long long)(s * fps);
+                for(int i = 0; i < fps; i++, f++)
                 {
-                    if (sceneChangeMap.contains(f))
+                    if (sceneMap.contains(f))
                     {
-                        sceneChangeCommMap[f] = MARK_COMM_START;
-                        i = (int)(frame_rate) + 1;
+                        sceneCommBreakMap[f] = MARK_COMM_START;
+                        i = (int)(fps) + 1;
                     }
                 }
             }
@@ -596,18 +796,18 @@ void CommDetect::BuildSceneChangeCommList(void)
         if ((section_start >= 0) &&
             (s > (section_start + 32)))
         {
-            long long f = (long long)(section_start * frame_rate);
+            long long f = (long long)(section_start * fps);
             bool found_end = false;
 
-            for(int i = 0; i < frame_rate; i++, f++)
+            for(int i = 0; i < fps; i++, f++)
             {
-                if (sceneChangeMap.contains(f))
+                if (sceneMap.contains(f))
                 {
-                    if (sceneChangeCommMap.contains(f))
-                        sceneChangeCommMap.erase(f);
+                    if (sceneCommBreakMap.contains(f))
+                        sceneCommBreakMap.erase(f);
                     else
-                        sceneChangeCommMap[f] = MARK_COMM_END;
-                    i = (int)(frame_rate) + 1;
+                        sceneCommBreakMap[f] = MARK_COMM_END;
+                    i = (int)(fps) + 1;
                     found_end = true;
                 }
             }
@@ -615,40 +815,46 @@ void CommDetect::BuildSceneChangeCommList(void)
 
             if (!found_end)
             {
-                f = (long long)(section_start * frame_rate);
-                sceneChangeCommMap[f] = MARK_COMM_END;
+                f = (long long)(section_start * fps);
+                sceneCommBreakMap[f] = MARK_COMM_END;
             }
         }
     }
 
     if (section_start >= 0)
-        sceneChangeCommMap[framesProcessed] = MARK_COMM_END;
+        sceneCommBreakMap[framesProcessed] = MARK_COMM_END;
 
     QMap<long long, int>::Iterator it;
     QMap<long long, int>::Iterator prev;
     QMap<long long, int> deleteMap;
 
-    it = sceneChangeCommMap.begin();
+    it = sceneCommBreakMap.begin();
     prev = it;
-    if (it != sceneChangeCommMap.end())
+    if (it != sceneCommBreakMap.end())
     {
         it++;
-        while (it != sceneChangeCommMap.end())
+        while (it != sceneCommBreakMap.end())
         {
             if ((it.data() == MARK_COMM_END) &&
-                (it.key() - prev.key()) < (30 * frame_rate))
+                (it.key() - prev.key()) < (30 * fps))
             {
                 deleteMap[it.key()] = 1;
                 deleteMap[prev.key()] = 1;
             }
             prev++;
-            if (it != sceneChangeCommMap.end())
+            if (it != sceneCommBreakMap.end())
                 it++;
         }
 
         for (it = deleteMap.begin(); it != deleteMap.end(); ++it)
-            sceneChangeCommMap.erase(it.key());
+            sceneCommBreakMap.erase(it.key());
     }
+}
+
+void CommDetect::BuildLogoCommList()
+{
+    CondenseMarkMap(logoCommBreakMap, (int)(25 * fps), (int)(30 * fps));
+    ConvertShowMapToCommMap(logoCommBreakMap);
 }
 
 void CommDetect::MergeBlankCommList(void)
@@ -677,7 +883,7 @@ void CommDetect::MergeBlankCommList(void)
     {
         // if next commercial starts less than 15*fps frames away then merge
         if ((((prev.key() + 1) == it.key()) ||
-             ((prev.key() + (15 * frame_rate)) > it.key())) &&
+             ((prev.key() + (15 * fps)) > it.key())) &&
             (prev.data() == MARK_COMM_END) &&
             (it.data() == MARK_COMM_START))
         {
@@ -706,9 +912,9 @@ void CommDetect::MergeBlankCommList(void)
     {
         // if we find any segments less than 35 seconds between commercial
         // breaks include those segments in the commercial break.
-        if (((tmpMap_prev.data() + (35 * frame_rate)) > tmpMap_it.key()) &&
-            ((tmpMap_prev.data() - tmpMap_prev.key()) > (35 * frame_rate)) &&
-            ((tmpMap_it.data() - tmpMap_it.key()) > (35 * frame_rate)))
+        if (((tmpMap_prev.data() + (35 * fps)) > tmpMap_it.key()) &&
+            ((tmpMap_prev.data() - tmpMap_prev.key()) > (35 * fps)) &&
+            ((tmpMap_it.data() - tmpMap_it.key()) > (35 * fps)))
         {
             blankCommBreakMap.erase(tmpMap_prev.data());
             blankCommBreakMap.erase(tmpMap_it.key());
@@ -778,10 +984,13 @@ void CommDetect::DumpMap(QMap<long long, int> &map)
 {
     QMap<long long, int>::Iterator it;
 
+    cerr << "DumpMap()" << endl;
+    cerr << "---------------------" << endl;
+    cerr << endl;
     for (it = map.begin(); it != map.end(); ++it)
     {
         long long frame = it.key();
-        int my_fps = (int)ceil(frame_rate);
+        int my_fps = (int)ceil(fps);
         int hour = (frame / my_fps) / 60 / 60;
         int min = (frame / my_fps) / 60 - (hour * 60);
         int sec = (frame / my_fps) - (min * 60) - (hour * 60 * 60);
@@ -790,5 +999,290 @@ void CommDetect::DumpMap(QMap<long long, int> &map)
         printf( "%7lld : %d (%02d:%02d:%02d.%02d) (%d)\n",
             it.key(), it.data(), hour, min, sec, frm,
             (int)(frame / my_fps));
+    }
+    cerr << "---------------------" << endl;
+}
+
+void CommDetect::DumpLogo(bool fromCurrentFrame)
+{
+    char scrPixels[] = " .oxX";
+
+    printf( "\nLogo Data " );
+    if (fromCurrentFrame)
+        printf( "from current frame\n" );
+
+    printf( "\n     " );
+
+    for(int x = logoMinX - 2; x <= (logoMaxX + 2); x++)
+        printf( "%d", x % 10);
+    printf( "\n" );
+    for(int y = logoMinY - 2; y <= (logoMaxY + 2); y++)
+    {
+        printf( "%3d: ", y );
+        for(int x = logoMinX - 2; x <= (logoMaxX + 2); x++)
+        {
+            if (fromCurrentFrame)
+            {
+                printf( "%c", scrPixels[frame_ptr[y * width + x] / 50]);
+            }
+            else
+            {
+                switch (logoMask[y * width + x])
+                {
+                    case 0:
+                    case 2: printf(" ");
+                            break;
+                    case 1: printf("*");
+                            break;
+                    case 3: printf(".");
+                            break;
+                }
+            }
+        }
+        printf( "\n" );
+    }
+}
+
+void CommDetect::GetLogoMask(unsigned char *mask)
+{
+    logoFrameCount = 0;
+    memset(mask, 0, width * height);
+    memcpy(logoFrame, logoMinValues, width * height);
+
+    int maxValue = 0;
+    for(int i = 0; i < (width * height); i++)
+        if (logoFrame[i] > maxValue)
+            maxValue = logoFrame[i];
+
+    for(int i = 0; i < (width * height); i++)
+    {
+        if (logoFrame[i] > (maxValue - 70))
+            logoMask[i] = 255;
+        else
+            logoMask[i] = 0;
+    }
+
+    int exclMinX = (int)(width * .45);
+    int exclMaxX = (int)(width * .55);
+    int exclMinY = (int)(height * .35);
+    int exclMaxY = (int)(height * .65);
+
+    for (int y = 0; y < height; y++)
+    {
+        if ((y > exclMinY) && (y < exclMaxY))
+            continue;
+
+        for (int x = 0; x < width; x++)
+        {
+            if ((x > exclMinX) && (x < exclMaxX))
+                continue;
+
+            // need to add some detection for non-opaque logos here
+            if (logoMask[y * width + x] > 80)
+                mask[y * width + x] = 1;
+            else
+                mask[y * width + x] = 0;
+        }
+    }
+}
+
+void CommDetect::SetLogoMaskArea()
+{
+    logoMinX = width - 1;
+    logoMaxX = 0;
+    logoMinY = height - 1;
+    logoMaxY = 0;
+
+    for (int y = 0; y < height; y++)
+    {
+        for (int x = 0; x < width; x++)
+        {
+            if (logoMask[y * width + x] == 1)
+            {
+                if (x < logoMinX)
+                    logoMinX = x;
+                if (y < logoMinY)
+                    logoMinY = y;
+                if (x > logoMaxX)
+                    logoMaxX = x;
+                if (y > logoMaxY)
+                    logoMaxY = y;
+            }
+        }
+    }
+
+    if (logoMinX < 2)
+        logoMinX = 2;
+    if (logoMaxX > (width-3))
+        logoMaxX = (width-3);
+    if (logoMinY < 2)
+        logoMinY = 2;
+    if (logoMaxY > (height-3))
+        logoMaxY = (height-3);
+}
+
+void CommDetect::SetLogoMask(unsigned char *mask)
+{
+    int pixels = 0;
+
+    memcpy(logoMask, mask, width * height);
+
+    SetLogoMaskArea();
+
+    for(int y = logoMinY; y <= logoMaxY; y++)
+        for(int x = logoMinX; x <= logoMaxX; x++)
+            if (!logoMask[y * width + x] == 1)
+                pixels++;
+
+    if (pixels < 30)
+    {
+        detectStationLogo = false;
+        return;
+    }
+
+    // set the pixels around our logo
+    for(int y = (logoMinY - 1); y <= (logoMaxY + 1); y++)
+    {
+        for(int x = (logoMinX - 1); x <= (logoMaxX + 1); x++)
+        {
+            if (!logoMask[y * width + x])
+            {
+                for (int y2 = y - 1; y2 <= (y + 1); y2++)
+                {
+                    for (int x2 = x - 1; x2 <= (x + 1); x2++)
+                    {
+                        if ((logoMask[y2 * width + x2] == 1) &&
+                            (!logoMask[y * width + x]))
+                        {
+                            logoMask[y * width + x] = 2;
+                            x2 = x + 2;
+                            y2 = y + 2;
+
+                            logoCheckMask[y2 * width + x2] = 1;
+                            logoCheckMask[y * width + x] = 1;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    for(int y = (logoMinY - 2); y <= (logoMaxY + 2); y++)
+    {
+        for(int x = (logoMinX - 2); x <= (logoMaxX + 2); x++)
+        {
+            if (!logoMask[y * width + x])
+            {
+                for (int y2 = y - 1; y2 <= (y + 1); y2++)
+                {
+                    for (int x2 = x - 1; x2 <= (x + 1); x2++)
+                    {
+                        if ((logoMask[y2 * width + x2] == 2) &&
+                            (!logoMask[y * width + x]))
+                        {
+                            logoMask[y * width + x] = 3;
+                            x2 = x + 2;
+                            y2 = y + 2;
+
+                            logoCheckMask[y * width + x] = 1;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+//    DumpLogo();
+
+    logoFrameCount = 0;
+}
+
+void CommDetect::CondenseMarkMap(QMap<long long, int>&map, int spacing,
+                                 int length)
+{
+    QMap<long long, int>::Iterator it;
+    QMap<long long, int>::Iterator prev;
+    QMap<long long, int>tmpMap;
+
+    if (map.size() <= 2)
+        return;
+
+    // merge any segments less than 'spacing' frames apart from each other
+    for (it = map.begin(); it != map.end(); it++)
+        tmpMap[it.key()] = it.data();
+
+    prev = tmpMap.begin();
+    it = prev;
+    it++;
+    while(it != tmpMap.end())
+    {
+        if ((it.data() == MARK_START) &&
+            (prev.data() == MARK_END) &&
+            ((it.key() - prev.key()) < spacing))
+        {
+            map.erase(prev.key());
+            map.erase(it.key());
+        }
+        prev++;
+        it++;
+    }
+
+    if (map.size() == 0)
+        return;
+
+    // delete any segments less than 'length' frames in length
+    tmpMap.clear();
+    for (it = map.begin(); it != map.end(); it++)
+        tmpMap[it.key()] = it.data();
+
+    prev = tmpMap.begin();
+    it = prev;
+    it++;
+    while(it != tmpMap.end())
+    {
+        if ((prev.data() == MARK_START) &&
+            (it.data() == MARK_END) &&
+            ((it.key() - prev.key()) < length))
+        {
+            map.erase(prev.key());
+            map.erase(it.key());
+        }
+        prev++;
+        it++;
+    }
+}
+
+void CommDetect::ConvertShowMapToCommMap(QMap<long long, int>&map)
+{
+    QMap<long long, int>::Iterator it;
+
+    if (map.size() == 0)
+        return;
+
+    for (it = map.begin(); it != map.end(); it++)
+    {
+        if (it.data() == MARK_START)
+            map[it.key()] = MARK_COMM_END;
+        else
+            map[it.key()] = MARK_COMM_START;
+    }
+
+    it = map.begin();
+    if (it != map.end()) 
+    {
+        switch (map[it.key()])
+        {
+            case MARK_COMM_END:
+                    if (it.key() == 0)
+                        map.erase(0);
+                    else
+                        map[0] = MARK_COMM_START;
+                    break;
+            case MARK_COMM_START:
+                    break;
+            default:
+                    map.erase(0);
+                    break;
+        }
     }
 }

@@ -49,7 +49,7 @@ ProgramInfo::ProgramInfo(void)
     cardid = 0;
     schedulerid = "";
     recpriority = 0;
-    recgroup = QObject::tr("Default");
+    recgroup = QString("Default");
 
     repeat = false;
 
@@ -191,7 +191,7 @@ void ProgramInfo::ToStringList(QStringList &list)
     list << recendts.toString(Qt::ISODate);
     list << QString::number(repeat);
     list << QString::number(programflags);
-    list << ((recgroup != "") ? recgroup : QObject::tr("Default"));
+    list << ((recgroup != "") ? recgroup : QString("Default"));
     list << QString::number(chancommfree);
 }
 
@@ -266,7 +266,7 @@ void ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
     if (chansign == " ")
         chansign = "";
     if (recgroup == " ")
-        recgroup = QObject::tr("Default");
+        recgroup = QString("Default");
 }
 
 void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
@@ -427,7 +427,7 @@ void ProgramInfo::GetProgramRangeDateTime(QSqlDatabase *db,
 {
     QString where;
 
-    where = QString("WHERE program.chanid = %1 AND endtime >= %1 AND "
+    where = QString("WHERE program.chanid = %1 AND endtime >= %2 AND "
                     "starttime <= %3 AND program.chanid = channel.chanid "
                     "ORDER BY starttime;")
                     .arg(channel).arg(ltime).arg(rtime);

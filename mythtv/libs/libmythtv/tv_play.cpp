@@ -24,6 +24,7 @@ using namespace std;
 #include "NuppelVideoPlayer.h"
 #include "programinfo.h"
 #include "udpnotify.h"
+#include "commercial_skip.h"
 
 struct SeekSpeedInfo {
     QString   dispString;
@@ -709,10 +710,12 @@ void TV::SetupPlayer(void)
     nvp->SetLength(playbackLen);
     nvp->SetExactSeeks(gContext->GetNumSetting("ExactSeeking"));
 
-    autoCommercialSkip = gContext->GetNumSetting("AutoCommercialSkip");
+    autoCommercialSkip = gContext->GetNumSetting("AutoCommercialSkip", 0);
     nvp->SetAutoCommercialSkip(autoCommercialSkip);
-    nvp->SetCommercialSkipMethod(gContext->GetNumSetting("CommercialSkipMethod"));
-    tryUnflaggedSkip = gContext->GetNumSetting("TryUnflaggedSkip");
+    nvp->SetCommercialSkipMethod(gContext->GetNumSetting("CommercialSkipMethod",
+                                                         COMM_DETECT_BLANKS));
+
+    tryUnflaggedSkip = gContext->GetNumSetting("TryUnflaggedSkip", 0);
     nvp->SetTryUnflaggedSkip(tryUnflaggedSkip);
 
     osd_display_time = gContext->GetNumSetting("OSDDisplayTime");

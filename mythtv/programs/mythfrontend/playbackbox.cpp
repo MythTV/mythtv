@@ -78,7 +78,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     recGroupType.clear();
 
     curGroupPassword = QString("");
-    recGroup = gContext->GetSetting("DisplayRecGroup", QObject::tr("Default"));
+    recGroup = gContext->GetSetting("DisplayRecGroup", QString("Default"));
 
     groupDisplayName = tr("All Programs");
 
