@@ -305,7 +305,7 @@ bool DVDProbe::probe()
     //  this, but it seems to work.
     //
 
-    int drive_handle = open(device, O_RDONLY);
+    int drive_handle = open(device, O_RDONLY | O_NONBLOCK);
     int status = ioctl(drive_handle, CDROM_DRIVE_STATUS, NULL);
     if(status < 4)
     {
