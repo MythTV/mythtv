@@ -525,11 +525,13 @@ int Channel::ChangeColourAttribute(int attrib, const char *name, bool up)
         ctrl.id = qctrl.id = attrib;
         if (ioctl(videofd, VIDIOC_QUERYCTRL, &qctrl) < 0)
         {
+            perror("VIDIOC_QUERYCTRL");
             return -1;
         }
 
         if (ioctl(videofd, VIDIOC_G_CTRL, &ctrl) < 0)
         {
+            perror("VIDIOC_G_CTRL");
             return -1;
         }
         card_value = (int)(65535.0 / (qctrl.maximum - qctrl.minimum) * 
@@ -543,6 +545,7 @@ int Channel::ChangeColourAttribute(int attrib, const char *name, bool up)
 
         if (ioctl(videofd, VIDIOCGPICT, &vid_pic) < 0)
         {
+            perror("VIDIOCGPICT");
             return -1;
         }
 
@@ -594,6 +597,7 @@ int Channel::ChangeColourAttribute(int attrib, const char *name, bool up)
         ctrl.id = qctrl.id = attrib;
         if (ioctl(videofd, VIDIOC_QUERYCTRL, &qctrl) < 0)
         {
+            perror("VIDIOC_QUERYCTRL");
             return -1;
         }
         ctrl.value = (int)((qctrl.maximum - qctrl.minimum) / 65535.0 * 
@@ -605,6 +609,7 @@ int Channel::ChangeColourAttribute(int attrib, const char *name, bool up)
                                     : ctrl.value;
         if (ioctl(videofd, VIDIOC_S_CTRL, &ctrl) < 0)
         {
+            perror("VIDIOC_S_CTRL");
             return -1;
         }
     }
@@ -616,6 +621,7 @@ int Channel::ChangeColourAttribute(int attrib, const char *name, bool up)
 
         if (ioctl(videofd, VIDIOCGPICT, &vid_pic) < 0)
         {
+            perror("VIDIOCGPICT");
             return -1;
         }
         setfield = GetV4L1Field(attrib, vid_pic);
@@ -624,11 +630,13 @@ int Channel::ChangeColourAttribute(int attrib, const char *name, bool up)
             *setfield = newvalue;
             if (ioctl(videofd, VIDIOCSPICT, &vid_pic) < 0)
             {
+                perror("VIDIOCSPICT");
                 return -1;
             }
         }
         else
         {
+            // ???
             return -1;
         }
     }
