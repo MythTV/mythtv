@@ -2929,7 +2929,7 @@ void NuppelVideoRecorder::WriteVideo(Frame *frame, bool skipsync, bool forcekey)
     frameofgop++;
     framesWritten++;
 
-    if (!hardware_encode)
+    if ((!hardware_encode) && (commDetect))
     {
         commDetect->ProcessNextFrame(buf, (fnum-startnum)>>1 );
         if (commDetect->FrameIsBlank())
@@ -3106,5 +3106,6 @@ void NuppelVideoRecorder::WriteText(unsigned char *buf, int len, int timecode,
 
 void NuppelVideoRecorder::GetBlankFrameMap(QMap<long long, int> &blank_frame_map)
 {
-    commDetect->GetBlankFrameMap(blank_frame_map);
+    if (commDetect)
+        commDetect->GetBlankFrameMap(blank_frame_map);
 }
