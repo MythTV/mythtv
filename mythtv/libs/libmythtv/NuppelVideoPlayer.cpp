@@ -387,7 +387,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
     }
 
     ringBuffer->Start();
-    startpos = ringBuffer->GetReadPosition();
+    startpos = ringBuffer->GetTotalReadPosition();
     
     if (ringBuffer->Read(&fileheader, FILEHEADERSIZE) != FILEHEADERSIZE)
     {
@@ -402,7 +402,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
         char dummychar;
         ringBuffer->Read(&dummychar, 1);
 
-        startpos = ringBuffer->GetReadPosition();
+        startpos = ringBuffer->GetTotalReadPosition();
  
         if (ringBuffer->Read(&fileheader, FILEHEADERSIZE) != FILEHEADERSIZE)
         {
@@ -479,7 +479,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
         return 0;
     }
 
-    startpos = ringBuffer->GetReadPosition();
+    startpos = ringBuffer->GetTotalReadPosition();
 
     ringBuffer->Read(&frameheader, FRAMEHEADERSIZE);
     
@@ -499,7 +499,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
 
     if (usingextradata && extradata.seektable_offset > 0 && !disablevideo)
     {
-        long long currentpos = ringBuffer->GetReadPosition();
+        long long currentpos = ringBuffer->GetTotalReadPosition();
         struct rtframeheader seek_frameheader;
 
         int seekret = ringBuffer->Seek(extradata.seektable_offset, SEEK_SET);
@@ -556,7 +556,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
         char dummychar;
         ringBuffer->Read(&dummychar, 1);
 
-        startpos = ringBuffer->GetReadPosition();
+        startpos = ringBuffer->GetTotalReadPosition();
 
         if (ringBuffer->Read(&frameheader, FRAMEHEADERSIZE) != FRAMEHEADERSIZE)
         {
@@ -607,7 +607,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
             }
         }
 
-        long long startpos2 = ringBuffer->GetReadPosition();
+        long long startpos2 = ringBuffer->GetTotalReadPosition();
 
         foundit = (FRAMEHEADERSIZE != ringBuffer->Read(&frameheader, 
                                                        FRAMEHEADERSIZE));
@@ -621,7 +621,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
             char dummychar;
             ringBuffer->Read(&dummychar, 1);
         
-            startpos2 = ringBuffer->GetReadPosition();
+            startpos2 = ringBuffer->GetTotalReadPosition();
         
             foundit = (FRAMEHEADERSIZE != ringBuffer->Read(&frameheader, 
                                                            FRAMEHEADERSIZE));
@@ -1058,7 +1058,8 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
 
     while (!gotvideo)
     {
-	long long currentposition = ringBuffer->GetReadPosition();
+	long long currentposition = ringBuffer->GetTotalReadPosition();
+
         if ((ringBuffer->Read(&frameheader, FRAMEHEADERSIZE) != FRAMEHEADERSIZE)
             || (frameheader.frametype == 'Q'))
         {
@@ -1945,7 +1946,7 @@ bool NuppelVideoPlayer::DoRewind(void)
 
     int normalframes = desiredFrame - lastKey;
     long long keyPos = (*positionMap)[lastKey / keyframedist];
-    long long curPosition = ringBuffer->GetReadPosition();
+    long long curPosition = ringBuffer->GetTotalReadPosition();
     long long diff = keyPos - curPosition;
 
     while (ringBuffer->GetFreeSpaceWithReadChange(diff) < 0)
@@ -2106,7 +2107,7 @@ bool NuppelVideoPlayer::DoFastForward(void)
     if (keyPos != -1)
     {
         lastKey = desiredKey;
-        long long diff = keyPos - ringBuffer->GetReadPosition();
+        long long diff = keyPos - ringBuffer->GetTotalReadPosition();
 
         ringBuffer->Seek(diff, SEEK_CUR);
         framesPlayed = lastKey;
@@ -2124,7 +2125,7 @@ bool NuppelVideoPlayer::DoFastForward(void)
                 {
                     if (!haspositionmap)
                         (*positionMap)[framesPlayed / keyframedist] = 
-                                                 ringBuffer->GetReadPosition();
+                                             ringBuffer->GetTotalReadPosition();
                     lastKey = framesPlayed;
                 }
                 if (frameheader.comptype == 'A')
@@ -2846,7 +2847,7 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
             if (frameheader.comptype == 'V')
             {
                 (*positionMap)[framesPlayed / keyframedist] =
-                                             ringBuffer->GetReadPosition();
+                                             ringBuffer->GetTotalReadPosition();
                 lastKey = framesPlayed;
             }
             if (frameheader.comptype == 'A')
@@ -2866,7 +2867,7 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
                        frameheader.packetlength);
         }
 
-        if (ringBuffer->GetReadPosition() > maxRead)
+        if (ringBuffer->GetTotalReadPosition() > maxRead)
             break;
     }
 
@@ -2902,7 +2903,8 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
             decodedframes++;
             frame = DecodeFrame(&frameheader, strm, buf);
 
-            if (ringBuffer->GetReadPosition() > maxRead && decodedframes > 2)
+            if (ringBuffer->GetTotalReadPosition() > maxRead && 
+                decodedframes > 2)
                 break;
         }
     }

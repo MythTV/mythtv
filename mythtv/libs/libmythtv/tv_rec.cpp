@@ -1197,10 +1197,9 @@ long long TVRec::SeekRingBuffer(long long curpos, long long pos, int whence)
 
     if (whence == SEEK_CUR)
     {
-        long long desired = curpos + pos;
-        long long realpos = rbuffer->GetReadPosition();
+        long long realpos = rbuffer->GetTotalReadPosition();
 
-        pos = desired - realpos;
+        pos = pos + curpos - realpos;
     }
 
     long long ret = rbuffer->Seek(pos, whence);

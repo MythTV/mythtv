@@ -146,7 +146,7 @@ long long ThreadedFileWriter::Seek(long long pos, int whence)
     /* Assumes that we don't seek very often. This is not a high
        performance approach... we just block until the write thread
        empties the buffer. */
-    while(BufUsed()>0)
+    while(BufUsed() > 0)
 	usleep(5000);
 
     return lseek64(fd, pos, whence);
@@ -156,7 +156,7 @@ void ThreadedFileWriter::DiskLoop()
 {
     int size;
 
-    while( !in_dtor || BufUsed()>0 )
+    while(!in_dtor || BufUsed() > 0)
     {
 	size = BufUsed();
 	
@@ -482,10 +482,20 @@ int RingBuffer::Read(void *buf, int count)
     }
     else
     {
+//cout << "reading: " << totalreadpos << " " << readpos << " " << count << " " << filesize << endl;
         if (remotefile)
         {
             ret = safe_read(remotefile, buf, count);
-            readpos += ret;
+
+            if (readpos + count > filesize)
+            {
+                int toread = filesize - readpos;
+                int left = count - toread;
+
+                readpos = left;
+            }
+            else
+                readpos += ret;
             totalreadpos += ret;
         } 
         else if (readpos + count > filesize)
@@ -561,6 +571,7 @@ int RingBuffer::Write(const void *buf, int count)
     }
     else
     {
+//cout << "write: " << totalwritepos << " " << writepos << " " << count << " " << filesize << endl;
         if (writepos + count > filesize)
         {
 	    int towrite = filesize - writepos;
@@ -627,20 +638,37 @@ long long RingBuffer::Seek(long long pos, int whence)
     else
     {
         if (remotefile)
-            ret = remotefile->Seek(pos, whence, readpos);
+            ret = remotefile->Seek(pos, whence, totalreadpos);
         else
-            ret = lseek64(fd2, pos, whence);
-
-	if (whence == SEEK_SET)
         {
-	    totalreadpos = pos; // only used for file open
-	    readpos = ret;
+            if (whence == SEEK_SET)
+            {
+                ret = lseek64(fd2, pos, whence);
+            }
+            else if (whence == SEEK_CUR)
+            {
+                long long realseek = totalreadpos + pos;
+                while (realseek > filesize)
+                    realseek -= filesize;
+
+                ret = lseek64(fd2, realseek, SEEK_SET);
+            }
+	}
+
+        if (whence == SEEK_SET)
+        {
+            totalreadpos = pos; // only used for file open
+            readpos = ret;
         }
-	else if (whence == SEEK_CUR)
+        else if (whence == SEEK_CUR)
         {
             readpos += pos;
-	    totalreadpos += pos;
-	}
+            totalreadpos += pos;
+            while (readpos > filesize)
+                readpos -= filesize;
+            while (readpos < 0)
+                readpos += filesize;
+        }
     }
     pthread_rwlock_unlock(&rwlock);
 
