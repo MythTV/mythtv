@@ -2489,6 +2489,7 @@ bool fillData(QValueList<Source> &sourcelist)
 
     int failures = 0;
     for (it = sourcelist.begin(); it != sourcelist.end(); ++it) {
+        int chancnt = 0;
         QString xmltv_grabber = (*it).xmltvgrabber;
         if (xmltv_grabber == "tv_grab_uk" || xmltv_grabber == "tv_grab_de" ||
             xmltv_grabber == "tv_grab_fi" || xmltv_grabber == "tv_grab_es" ||
@@ -2513,15 +2514,14 @@ bool fillData(QValueList<Source> &sourcelist)
             for (int i = 0; i < 7; i++)
             {
                 QString querystr;
-                querystr.sprintf("SELECT COUNT(*) as 'hits' "
-                                 "FROM channel LEFT JOIN program USING (chanid) "
-                                 "WHERE sourceid = %d AND starttime >= "
-                                 "DATE_ADD(CURRENT_DATE(), INTERVAL %d DAY) "
+                querystr.sprintf("SELECT COUNT(*) FROM program "
+                                 "LEFT JOIN channel USING (chanid) "
+                                 "WHERE sourceid = %d "
+                                 "AND starttime >= DATE_ADD(CURRENT_DATE(), "
+                                 "    INTERVAL %d DAY) "
                                  "AND starttime < DATE_ADD(CURRENT_DATE(), "
-                                 "INTERVAL 1+%d DAY) "
-                                 "GROUP BY channel.chanid "
-                                 "ORDER BY hits DESC LIMIT 1",
-                                 (*it).id, i, i);               
+                                 "    INTERVAL %d DAY)",
+                                 (*it).id, i, i+1);
  
                 QSqlQuery query;
                 query.exec(querystr);
@@ -2613,18 +2613,33 @@ bool fillData(QValueList<Source> &sourcelist)
                 // Check to see if we already downloaded data for this date
                 bool download_needed = false;
                 QString date(qCurrentDate.addDays(i).toString());
+
+                if (!chancnt)
+                {
+                    QString qstr = QString("SELECT COUNT(*) FROM channel "
+                                           "WHERE sourceid = %1")
+                                           .arg((*it).id);
+                    QSqlQuery qchan;
+                    qchan.exec(qstr);
+                    if (qchan.isActive() && qchan.numRowsAffected() > 0) 
+                    {
+                        qchan.next();
+                        chancnt = qchan.value(0).toInt();
+                    }
+                    else
+                        MythContext::DBError("counting channels per source", 
+                                             qchan);
+                }
                 QString querystr;
 
-                querystr.sprintf("SELECT COUNT(*) as 'hits' "
-                                 "FROM channel LEFT JOIN program USING (chanid) "
-                                 "WHERE sourceid = %d AND starttime >= "
-                                 "DATE_ADD(CURRENT_DATE(), INTERVAL '%d 18' "
-                                 "DAY_HOUR) AND "
-                                 "starttime < DATE_ADD(CURRENT_DATE(), "
-                                 "INTERVAL 1+%d DAY) "
-                                 "GROUP BY channel.chanid "
-                                 "ORDER BY hits DESC LIMIT 1",
-                                 (*it).id, i, i); 
+                querystr.sprintf("SELECT COUNT(*) FROM program "
+                                 "LEFT JOIN channel USING (chanid) "
+                                 "WHERE sourceid = %d "
+                                 "AND starttime >= DATE_ADD(CURRENT_DATE(), "
+                                 "    INTERVAL '%d 18' DAY_HOUR) "
+                                 "AND starttime < DATE_ADD(CURRENT_DATE(), "
+                                 "    INTERVAL %d DAY)",
+                                 (*it).id, i, i+1);
                 QSqlQuery query;
                 query.exec(querystr);
                
@@ -2633,7 +2648,7 @@ bool fillData(QValueList<Source> &sourcelist)
                     // We also need to get this day's data if there's only a 
                     // suspiciously small amount in the DB.
                     if (!query.numRowsAffected() ||
-                        (query.next() && query.value(0).toInt() <= 10))
+                        (query.next() && query.value(0).toInt() < chancnt * 4))
                     {
                         download_needed = true;
                     }
@@ -2642,20 +2657,19 @@ bool fillData(QValueList<Source> &sourcelist)
                     MythContext::DBError("checking existing program data", 
                                          query);
 
-                // Now look for programs marked as "To Be Announced"
-                if (refresh_tba && !download_needed && 
-                    xmltv_grabber == "tv_grab_uk_rt") 
+                // Now look for programs marked as "To Be Announced" after noon
+                if (xmltv_grabber == "tv_grab_uk_rt" && 
+                    !download_needed && refresh_tba)
                 {
-                    querystr.sprintf("SELECT COUNT(*) as 'hits' "
-                                     "FROM channel LEFT JOIN program USING (chanid) "
-                                     "WHERE sourceid = %d AND starttime >= "
-                                     "DATE_ADD(CURRENT_DATE(), INTERVAL '%d 12' DAY_HOUR) "
-                                     "AND starttime < DATE_ADD(CURRENT_DATE(), "
-                                     "INTERVAL 1+%d DAY) "
-                                     "AND category = 'TBA' "
-                                     "GROUP BY channel.chanid "
-                                     "ORDER BY hits DESC LIMIT 1",
-                                      (*it).id, i, i);
+                    querystr.sprintf("SELECT COUNT(*) FROM program "
+                                 "LEFT JOIN channel USING (chanid) "
+                                 "WHERE sourceid = %d "
+                                 "AND starttime >= DATE_ADD(CURRENT_DATE(), "
+                                 "    INTERVAL '%d 12' DAY_HOUR) "
+                                 "AND starttime < DATE_ADD(CURRENT_DATE(), "
+                                 "    INTERVAL %d DAY) "
+                                 "AND category = 'TBA'",
+                                 (*it).id, i, i+1);
                     QSqlQuery query;
                     query.exec(querystr);
 
