@@ -13,7 +13,7 @@ CXXLINK = $(CXX) $(CXXFLAGS) -o $@
 .cpp.o:
 	$(CXXCOMPILE) -c $< -o $@
 
-all: libNuppelVideo.a
+all: libNuppelVideo.a nuppelvideo-config
 
 NUVOBJ  = XJ.o minilzo.o RTjpegN.o linearBlend.o NuppelVideoPlayer.o 
 NUVOBJ += NuppelVideoRecorder.o RingBuffer.o
