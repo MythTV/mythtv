@@ -55,6 +55,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     leftRight = false;   // If change is left or right, don't restart video
     playingVideo = false;
     graphicPopup = true;
+    expectingPopup = false;
 
     titleData = NULL;
     popup = NULL;
@@ -1568,11 +1569,17 @@ void PlaybackBox::showDeletePopup(int types)
     QAccel *popaccel = new QAccel(popup);
     popaccel->connectItem(popaccel->insertItem(Key_Escape), this, 
                           SLOT(noDelete()));
+
+    expectingPopup = true;
 }
 
 void PlaybackBox::noDelete()
 {
+    if (!expectingPopup)
+        return;
+
     popup->hide();
+    expectingPopup = false;
 
     noUpdate = false;
     backup.begin(this);
@@ -1596,11 +1603,15 @@ void PlaybackBox::noDelete()
 
 void PlaybackBox::doDelete()
 {
-    doRemove(delitem);
+    if (!expectingPopup)
+        return;
 
     popup->hide();
-
+    expectingPopup = false;
     noUpdate = false;
+
+    doRemove(delitem);
+
     backup.begin(this);
     backup.drawPixmap(0, 0, myBackground);
     backup.end();
@@ -1622,10 +1633,14 @@ void PlaybackBox::doDelete()
 
 void PlaybackBox::noAutoExpire()
 {
-    QSqlDatabase *db = QSqlDatabase::database();
-    delitem->SetAutoExpire(false, db);
+    if (!expectingPopup)
+        return;
 
     popup->hide();
+    expectingPopup = false;
+
+    QSqlDatabase *db = QSqlDatabase::database();
+    delitem->SetAutoExpire(false, db);
 
     noUpdate = false;
     backup.begin(this);
@@ -1649,10 +1664,14 @@ void PlaybackBox::noAutoExpire()
 
 void PlaybackBox::doAutoExpire()
 {
-    QSqlDatabase *db = QSqlDatabase::database();
-    delitem->SetAutoExpire(true, db);
+    if (!expectingPopup)
+        return;
 
     popup->hide();
+    expectingPopup = false;
+
+    QSqlDatabase *db = QSqlDatabase::database();
+    delitem->SetAutoExpire(true, db);
 
     noUpdate = false;
     backup.begin(this);
