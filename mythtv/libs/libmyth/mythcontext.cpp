@@ -1272,12 +1272,12 @@ bool MythContext::CheckProtoVersion(QSocketDevice* socket)
             MythPopupBox::showOkPopup(d->mainWindow, 
                                       "Connection failure",
                                       tr(QString("The server uses network "
-                                                 "protocol version %1,"
+                                                 "protocol version %1, "
                                                  "but this client only "
                                                  "understands version %2.  "
                                                  "Make sure you are running "
-                                                 "compatible versions of"
-                                                 "the backend and frontend"))
+                                                 "compatible versions of "
+                                                 "the backend and frontend."))
                                                  .arg(strlist[1])
                                                  .arg(MYTH_PROTO_VERSION));
             qApp->unlock();
