@@ -32,7 +32,7 @@ private:
     int repeat;
 
     bool ToneVoltageLnb(dvb_tuning_t& tuning, bool reset, bool& havetuned);
-    bool ToneBurstSwitch(dvb_tuning_t& tuning, bool reset, bool& havetuned);
+    bool ToneSwitch(dvb_tuning_t& tuning, bool reset, bool& havetuned);
     bool PreDiseqcCmd();
     bool OneWayProtocol(dvb_tuning_t& tuning, bool reset, bool& havetuned);
     bool WritePortGroup(dvb_tuning_t& tuning);

@@ -51,7 +51,7 @@ bool DVBDiSEqC::Set(dvb_tuning_t& tuning, bool reset, bool& havetuned)
     switch(tuning.diseqc_type)
     {
         case 1:
-            if (!ToneBurstSwitch(tuning, reset, havetuned))
+            if (!ToneSwitch(tuning, reset, havetuned))
                 return false;
             // fall through
         case 0:
@@ -107,19 +107,19 @@ bool DVBDiSEqC::ToneVoltageLnb(dvb_tuning_t& tuning, bool reset, bool& havetuned
     return true;
 }
 
-bool DVBDiSEqC::ToneBurstSwitch(dvb_tuning_t& tuning, bool reset, bool& havetuned)
+bool DVBDiSEqC::ToneSwitch(dvb_tuning_t& tuning, bool reset, bool& havetuned)
 {
-    CHANNEL(QString("Tone Burst Switch - Port %1/2").arg(tuning.diseqc_port));
+    CHANNEL(QString("Tone Switch - Port %1/2").arg(tuning.diseqc_port));
 
     if (prev_tuning.diseqc_port != tuning.diseqc_port || reset)
     {
         if (tuning.diseqc_port > 2)
-            ERROR("Tone-Burst Switches only supports two ports.");
+            ERROR("Tone Switches only supports two ports.");
 
         if (ioctl(fd_frontend, FE_DISEQC_SEND_BURST,
             (tuning.diseqc_port == 1 ? SEC_MINI_A : SEC_MINI_B )) < 0)
         {
-            ERRNO("Setting Tone-Burst Switch failed.");
+            ERRNO("Setting Tone Switch failed.");
             return false;
         }
 

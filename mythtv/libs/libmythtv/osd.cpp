@@ -1005,12 +1005,13 @@ void OSD::SetTextByRegexp(const QString &name,
         else
             container->Display();
 
-        if ((regexpMap.contains("iconpath")) &&
-            (regexpMap["iconpath"] != ""))
+        OSDTypeImage *cs = (OSDTypeImage *)container->GetType("channelicon");
+        if (cs)
         {
-            OSDTypeImage *cs = (OSDTypeImage *)container->GetType("channelicon");
-            if (cs)
+            if (regexpMap.contains("iconpath") && regexpMap["iconpath"] != "")
                 cs->LoadImage(regexpMap["iconpath"], wmult, hmult, 30, 30);
+            else
+                cs->LoadImage(" ", wmult, hmult, 30, 30);
         }
 
         m_setsvisible = true;
@@ -1028,10 +1029,13 @@ void OSD::SetInfoText(QMap<QString, QString> regexpMap, int length)
         container->SetTextByRegexp(regexpMap);
 
         OSDTypeImage *cs = (OSDTypeImage *)container->GetType("channelicon");
-        if ((cs) &&
-            (regexpMap.contains("iconpath")) &&
-            (regexpMap["iconpath"] != ""))
-            cs->LoadImage(regexpMap["iconpath"], wmult, hmult, 30, 30);
+        if (cs)
+        {
+            if (regexpMap.contains("iconpath") && regexpMap["iconpath"] != "")
+                cs->LoadImage(regexpMap["iconpath"], wmult, hmult, 30, 30);
+            else
+                cs->LoadImage(" ", wmult, hmult, 30, 30);
+        }
 
         container->DisplayFor(length * 1000000);
         m_setsvisible = true;
