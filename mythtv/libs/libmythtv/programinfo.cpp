@@ -288,6 +288,8 @@ bool ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
     FLOAT_FROM_LIST(stars)
     DATE_FROM_LIST(originalAirDate);
 
+    seriesid += "";
+    programid += "";
 
     return true;
 }
@@ -955,7 +957,6 @@ void ProgramInfo::StartedRecording(QSqlDatabase *db)
 
     starts += "00";
     ends += "00";
-    seriesid += "";
 
     QSqlQuery query(QString::null, db);
 
@@ -977,8 +978,8 @@ void ProgramInfo::StartedRecording(QSqlDatabase *db)
     query.bindValue(":RECGROUP", recgroup.utf8());
     query.bindValue(":AUTOEXP", record->GetAutoExpire());
     query.bindValue(":RECORDID", recordid);
-    query.bindValue(":SERIESID", seriesid);
-    query.bindValue(":PROGRAMID", programid);
+    query.bindValue(":SERIESID", seriesid.utf8());
+    query.bindValue(":PROGRAMID", programid.utf8());
     query.bindValue(":STARS", stars);
     query.bindValue(":REPEAT", repeat);
     query.bindValue(":ORIGAIRDATE", originalAirDate.toString());

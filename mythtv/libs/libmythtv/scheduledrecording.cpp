@@ -438,8 +438,8 @@ void ScheduledRecording::addHistory(QSqlDatabase* db,
     result.bindValue(":SUBTITLE", proginfo.subtitle.utf8());
     result.bindValue(":DESC", proginfo.description.utf8());
     result.bindValue(":CATEGORY", proginfo.category.utf8());
-    result.bindValue(":SERIESID", proginfo.seriesid);
-    result.bindValue(":PROGRAMID", proginfo.programid);
+    result.bindValue(":SERIESID", proginfo.seriesid.utf8());
+    result.bindValue(":PROGRAMID", proginfo.programid.utf8());
 
     result.exec();
 
