@@ -359,7 +359,7 @@ void ChannelRecPriority::changeRecPriority(int howMuch)
 
     // inc/dec recording priority
     tempRecPriority = chanInfo->recpriority.toInt() + howMuch;
-    if(tempRecPriority > -100 && tempRecPriority < 100)
+    if (tempRecPriority > -100 && tempRecPriority < 100)
     {
         chanInfo->recpriority = QString::number(tempRecPriority);
 
@@ -642,7 +642,7 @@ void ChannelRecPriority::updateInfo(QPainter *p)
             itype = (UIImageType *)container->GetType("icon");
             if (itype) {
                 int iconsize = itype->GetSize();
-                if(curitem->iconpath == "none" || curitem->iconpath == "")
+                if (curitem->iconpath == "none" || curitem->iconpath == "")
                     curitem->iconpath = "blankicon.jpg";
                 if (!curitem->icon)
                     curitem->LoadIcon(iconsize);
@@ -656,7 +656,7 @@ void ChannelRecPriority::updateInfo(QPainter *p)
  
             type = (UITextType *)container->GetType("recpriority");
             if (type) {
-                if(curitem->recpriority.toInt() > 0)
+                if (curitem->recpriority.toInt() > 0)
                     type->SetText("+"+curitem->recpriority);
                 else
                     type->SetText(curitem->recpriority);

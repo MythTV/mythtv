@@ -1560,11 +1560,11 @@ void fixProgramList(QValueList<ProgInfo> *fixlist)
                 tokeep = cur, todelete = i;
             else if ((*cur).subtitle != "" && (*i).subtitle == "")
                 tokeep = cur, todelete = i;
-            else if((*i).subtitle != "" && (*cur).subtitle == "")
+            else if ((*i).subtitle != "" && (*cur).subtitle == "")
                 tokeep = i, todelete = cur;
-            else if((*cur).desc != "" && (*i).desc == "")
+            else if ((*cur).desc != "" && (*i).desc == "")
                 tokeep = cur, todelete = i;
-            else if((*i).desc != "" && (*cur).desc == "")
+            else if ((*i).desc != "" && (*cur).desc == "")
                 tokeep = i, todelete = cur;
             else
                 tokeep = i, todelete = cur;
@@ -3260,7 +3260,7 @@ int main(int argc, char *argv[])
     if (query.isActive() && query.numRowsAffected() > 0)
     {
         query.next();
-        if(query.value(0).toInt() != 0)
+        if (query.value(0).toInt() != 0)
             query.exec("UPDATE settings SET data = '1' WHERE value = 'HaveRepeats';");
         else
             query.exec("UPDATE settings SET data = '0' WHERE value = 'HaveRepeats';");

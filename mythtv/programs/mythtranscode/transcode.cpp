@@ -101,7 +101,7 @@ class AudioReencodeBuffer : public AudioOutput
             for(int chan = 0; chan < channels; chan++)
             {
                 audiobuffer[audiobuffer_len++] = buffers[chan][itemp];
-                if(bits == 16)
+                if (bits == 16)
                     audiobuffer[audiobuffer_len++] = buffers[chan][itemp+1];
             }
         }

@@ -64,7 +64,7 @@ void DPRINTF(int level, const char *format, ...)
 
 void FrameBuffer::setPkt(AVPacket *newpkt, int64_t del)
 {
-    if(newpkt->size + pkt.size > size)
+    if (newpkt->size + pkt.size > size)
     {
         pkt.data = (uint8_t *)realloc(pkt.data, pkt.size + newpkt->size);
         size = pkt.size + newpkt->size;
@@ -371,7 +371,7 @@ uint32_t MPEG2trans::process_mp2_audio(AVPacket *pkt)
     if (check_mp2_header(buf))
     {
         uint8_t pad;
-        if(buf[1] != 0xfd)
+        if (buf[1] != 0xfd)
         {
             cerr << "Only MP2 audio is currently supported\n";
             assert(0);
@@ -524,7 +524,7 @@ bool MPEG2trans::process_video(AVPacket *pkt, bool gopsearch)
             }
             else
                 frame_len = 4 + parse_seq_header(vidblkptr + 4, false);
-            if(! chopping && cutlistIter != cutlistMap.end() && 
+            if (! chopping && cutlistIter != cutlistMap.end() && 
                last_frame_number >= cutlistIter.key())
             {
                 chopping = 1;
@@ -549,17 +549,17 @@ bool MPEG2trans::process_video(AVPacket *pkt, bool gopsearch)
             found_gop = true;
             last_gop_pts = thispkt->pts;
             frame_start = vidblkptr;
-            if(chop_end)
+            if (chop_end)
                 chop_end = false;
             last_frame_number += pic_frame_count;
-            if(! chopping && cutlistIter != cutlistMap.end() && 
+            if (! chopping && cutlistIter != cutlistMap.end() && 
                last_frame_number >= cutlistIter.key() && 
                last_frame_number < cutlistIter.data())
             {
                 chopping = 1;
                 chop_start_pts = thispkt->pts;
             }
-            else if(chopping && cutlistIter != cutlistMap.end() && 
+            else if (chopping && cutlistIter != cutlistMap.end() && 
                last_frame_number >= cutlistIter.data())
             {
                 chopping = 0;
@@ -587,7 +587,7 @@ bool MPEG2trans::process_video(AVPacket *pkt, bool gopsearch)
                             gop_ts.sec ) * AV_TIME_BASE +
                            gop_ts.pic * AV_TIME_BASE / video_frame_rate - 
                            goppts;
-            if(chop_end)
+            if (chop_end)
             {
                 closed = 0;
                 broken = 1;
@@ -623,11 +623,11 @@ bool MPEG2trans::process_video(AVPacket *pkt, bool gopsearch)
                 default: pictype = 'X'; break;
             }
             if (0 && chop_end) {
-                if(pic_frame_count < 2 && pictype == 'B') {
+                if (pic_frame_count < 2 && pictype == 'B') {
                     skip_pic_frame = 1;
                     skipped_frames++;
                 } else {
-                    if(pic_frame_count == 0)
+                    if (pic_frame_count == 0)
                         num = 0;
                     else
                         num -= skipped_frames;
@@ -654,9 +654,9 @@ bool MPEG2trans::process_video(AVPacket *pkt, bool gopsearch)
         return false;
     if ((uint32_t)(vidblkptr - thispkt->data) == videoFrame.getSize())
     {
-        if(! chopping && !skip_pic_frame && frame_start)
+        if (! chopping && !skip_pic_frame && frame_start)
         {
-            if(found_gop)
+            if (found_gop)
                 write_muxed_frame(videoout_st, seqFrame.getPkt(), false);
             AVPacket picpkt;
             picpkt.pts = thispkt->pts;
@@ -805,12 +805,12 @@ uint32_t MPEG2trans::parse_seq_header(uint8_t *PES_data, bool store)
         gb->SkipNext(50);
     }
     gb->SkipNext(12);
-    if(gb->GetNext(1))
+    if (gb->GetNext(1))
     {
         gb->SkipNext(8*64);
         len += 64;
     }
-    if(gb->GetNext(1))
+    if (gb->GetNext(1))
     {
         gb->SkipNext(8*64);
         len += 64;

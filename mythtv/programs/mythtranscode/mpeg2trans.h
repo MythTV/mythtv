@@ -19,7 +19,7 @@ class FrameBuffer
 {
   public:
     FrameBuffer(void) { size = 0; pkt.size = 0; pkt.data = NULL; delta = 0;}
-    ~FrameBuffer(void) { if(pkt.data) free (pkt.data); }
+    ~FrameBuffer(void) { if (pkt.data) free (pkt.data); }
     void setPkt(AVPacket *newpkt, int64_t del = 0);
     void setPkt(uint8_t *data, uint32_t newsize, int64_t newpts, int64_t del=0);
     AVPacket *getPkt(void) { return &pkt; }

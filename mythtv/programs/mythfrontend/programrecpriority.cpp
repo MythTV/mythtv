@@ -553,7 +553,7 @@ void ProgramRecPriority::changeRecPriority(int howMuch)
 
     // inc/dec recording priority
     tempRecPriority = progInfo->recpriority + howMuch;
-    if(tempRecPriority > -100 && tempRecPriority < 100) 
+    if (tempRecPriority > -100 && tempRecPriority < 100) 
     {
         progInfo->recpriority = tempRecPriority;
 
@@ -675,7 +675,7 @@ void ProgramRecPriority::FillList(void)
             {
                 ProgramRecPriorityInfo *progInfo = &(it.data());
                 QString keyB = progInfo->MakeUniqueKey();
-                if(keyA == keyB)
+                if (keyA == keyB)
                 {
                     progInfo->channelRecPriority = channelRecPriority;
                     progInfo->recTypeRecPriority = recTypeRecPriority;
@@ -986,7 +986,7 @@ void ProgramRecPriority::updateInfo(QPainter *p)
             }
             type = (UITextType *)container->GetType("typesign");
             if (type) {
-                if(rectyperecpriority >= 0)
+                if (rectyperecpriority >= 0)
                     type->SetText("+");
                 else
                     type->SetText("-");
@@ -994,7 +994,7 @@ void ProgramRecPriority::updateInfo(QPainter *p)
 
             type = (UITextType *)container->GetType("channel");
             if (type) {
-                if(rectype != kAllRecord && rectype != kFindOneRecord)
+                if (rectype != kAllRecord && rectype != kFindOneRecord)
                     type->SetText(curitem->ChannelText(channelFormat));
                 else
                     type->SetText(tr("Any"));
@@ -1002,7 +1002,7 @@ void ProgramRecPriority::updateInfo(QPainter *p)
 
             type = (UITextType *)container->GetType("longchannel");
             if (type) {
-                if(rectype != kAllRecord && rectype != kFindOneRecord)
+                if (rectype != kAllRecord && rectype != kFindOneRecord)
                     type->SetText(curitem->ChannelText(longChannelFormat));
                 else
                     type->SetText(tr("Any"));
@@ -1015,7 +1015,7 @@ void ProgramRecPriority::updateInfo(QPainter *p)
 
             type = (UITextType *)container->GetType("channelsign");
             if (type) {
-                if(chanrecpriority >= 0)
+                if (chanrecpriority >= 0)
                     type->SetText("+");
                 else
                     type->SetText("-");
@@ -1023,7 +1023,7 @@ void ProgramRecPriority::updateInfo(QPainter *p)
 
             type = (UITextType *)container->GetType("recpriority");
             if (type) {
-                if(curitem->recpriority >= 0)
+                if (curitem->recpriority >= 0)
                     type->SetText("+"+QString::number(curitem->recpriority));
                 else
                     type->SetText(QString::number(curitem->recpriority));

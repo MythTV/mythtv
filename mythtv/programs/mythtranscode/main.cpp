@@ -276,7 +276,7 @@ int main(int argc, char *argv[])
     VERBOSE(VB_GENERAL, QString("Transcoding from %1 to %2")
                         .arg(infile).arg(tmpfile));
 
-    if(showprogress)
+    if (showprogress)
         transcode->ShowProgress(true);
     int result = 0;
     result = transcode->TranscodeFile((char *)infile.ascii(),

@@ -86,7 +86,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     curGroupPassword = QString("");
     recGroup = gContext->GetSetting("DisplayRecGroup", QString("All Programs"));
     VERBOSE( VB_GENERAL, recGroup);
-    if(groupnameAsAllProg)
+    if (groupnameAsAllProg)
     {
         if ((recGroup == "Default") || (recGroup == "All Programs"))
             groupDisplayName = tr(recGroup);
@@ -213,7 +213,7 @@ void PlaybackBox::killPlayerSafe(void)
         while (state != kKilled)
         {
             /* ensure that key events don't mess up our states */
-            if((state != kKilling) && (state != kKilled))
+            if ((state != kKilling) && (state != kKilled))
                 state = kKilling;
 
             /* NOTE: need unlock/process/lock here because we need
@@ -404,7 +404,7 @@ void PlaybackBox::updateGroupInfo(QPainter *p, QRect& pr, QPixmap& pix)
         int countInGroup; // = progLists[""].count();
         
        
-        if(titleList[titleIndex] == "")
+        if (titleList[titleIndex] == "")
         {
            countInGroup = progLists[""].count(); 
            infoMap["title"] = groupDisplayName;
@@ -959,9 +959,9 @@ void PlaybackBox::updateShowTitles(QPainter *p)
 
 void PlaybackBox::cursorLeft()
 {
-    if(!inTitle)
+    if (!inTitle)
     {
-        if(haveGroupInfoSet)
+        if (haveGroupInfoSet)
             killPlayerSafe();
         
         inTitle = true;
@@ -977,7 +977,7 @@ void PlaybackBox::cursorLeft()
 
 void PlaybackBox::cursorRight()
 {
-    if(inTitle)
+    if (inTitle)
     {
         leftRight = true;
         inTitle = false;
@@ -1291,7 +1291,7 @@ void PlaybackBox::selected()
 {
     state = kStopping;
 
-    if(inTitle && haveGroupInfoSet)
+    if (inTitle && haveGroupInfoSet)
     {
         cursorRight();
         return;
@@ -1348,7 +1348,7 @@ void PlaybackBox::showActionsSelected()
     if (!curitem)
         return;
 
-    if(inTitle && haveGroupInfoSet)
+    if (inTitle && haveGroupInfoSet)
         return;
 
     showActions(curitem);
@@ -1441,7 +1441,7 @@ void PlaybackBox::remove(ProgramInfo *toDel)
 {
     state = kStopping;
 
-    if(delitem)
+    if (delitem)
         delete delitem;
 
     delitem = new ProgramInfo(*toDel);
@@ -1452,7 +1452,7 @@ void PlaybackBox::expire(ProgramInfo *toExp)
 {
     state = kStopping;
 
-    if(delitem)
+    if (delitem)
         delete delitem;
     delitem = new ProgramInfo(*toExp);
 
@@ -1463,7 +1463,7 @@ void PlaybackBox::showActions(ProgramInfo *toExp)
 {
     killPlayer();
 
-    if(delitem)
+    if (delitem)
         delete delitem;
 
     delitem = new ProgramInfo(*toExp);
@@ -1764,7 +1764,7 @@ void PlaybackBox::doBeginTranscoding()
 
     QSqlQuery result = db->exec(query);
 
-    if(result.isActive() && result.numRowsAffected() > 0)
+    if (result.isActive() && result.numRowsAffected() > 0)
         RemoteQueueTranscode(curitem, TRANSCODE_STOP);
     else
         RemoteQueueTranscode(curitem, TRANSCODE_QUEUED |
@@ -1948,7 +1948,7 @@ void PlaybackBox::promptEndOfRecording(ProgramInfo *rec)
     if (!rec)
         return;
 
-    if(delitem)
+    if (delitem)
         delete delitem;
         
     delitem = new ProgramInfo(*rec);
@@ -2438,7 +2438,7 @@ void PlaybackBox::chooseSetViewGroup(void)
     recGroup = chooseComboBox->currentText();
     recGroupPassword = chooseGroupPassword;
 
-    if(groupnameAsAllProg)
+    if (groupnameAsAllProg)
         groupDisplayName = recGroup;
 
     if (recGroup == tr("Default"))
@@ -2612,7 +2612,7 @@ void PlaybackBox::showRecGroupChanger(void)
     delete chooseComboBox;
     chooseComboBox = NULL;
 
-    if(delitem)
+    if (delitem)
         delete delitem;
     delitem = NULL;
 }
