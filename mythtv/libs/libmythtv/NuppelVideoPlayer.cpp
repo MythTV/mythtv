@@ -1456,7 +1456,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 
     videosync->Start();
 
-    while (!eof && !killvideo)
+    while (!killvideo)
     {
         if (needsetpipplayer)
         {
@@ -1549,7 +1549,7 @@ void NuppelVideoPlayer::IvtvVideoLoop(void)
     VideoOutputIvtv *vidout = (VideoOutputIvtv *)videoOutput;
     vidout->SetFPS(GetFrameRate());
 
-    while (!eof && !killvideo)
+    while (!killvideo)
     {
         if (needsetpipplayer)
         {
