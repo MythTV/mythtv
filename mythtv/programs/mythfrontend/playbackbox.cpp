@@ -1413,7 +1413,7 @@ void PlaybackBox::remove(ProgramInfo *toDel)
     state = kStopping;
 
     delitem = new ProgramInfo(*toDel);
-    showDeletePopup(delitem, 2);
+    showDeletePopup(delitem, DeleteRecording);
 }
 
 void PlaybackBox::expire(ProgramInfo *toExp)
@@ -1421,7 +1421,7 @@ void PlaybackBox::expire(ProgramInfo *toExp)
     state = kStopping;
 
     delitem = new ProgramInfo(*toExp);
-    showDeletePopup(delitem, 3);
+    showDeletePopup(delitem, AutoExpireRecording);
 }
 
 void PlaybackBox::showActions(ProgramInfo *toExp)
@@ -1432,7 +1432,7 @@ void PlaybackBox::showActions(ProgramInfo *toExp)
     showActionPopup(delitem);
 }
 
-void PlaybackBox::showDeletePopup(ProgramInfo *program, int types)
+void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
 {
     timer->stop();
     playingVideo = false;
@@ -1449,11 +1449,14 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, int types)
     QString message1;
     switch (types)
     {
-        case 1: message1 = tr("You have finished watching:"); break;
-        case 2: message1 = tr("Are you sure you want to delete:"); break;
-        case 3: message1 = tr("Allow this program to AutoExpire?"); break;
-        case 4: message1 = tr("Are you sure you want to stop:"); break;
-        default: message1 = "ERROR ERROR ERROR"; break;
+        case EndOfRecording:
+             message1 = tr("You have finished watching:"); break;
+        case DeleteRecording:
+             message1 = tr("Are you sure you want to delete:"); break;
+        case AutoExpireRecording:
+             message1 = tr("Allow this program to AutoExpire?"); break;
+        case StopRecording:
+             message1 = tr("Are you sure you want to stop:"); break;
     }
     
     QString message2 = " ";
@@ -1465,49 +1468,55 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, int types)
     QString tmpmessage;
     const char *tmpslot;
 
-    if ((types == 1 || types == 2) &&
+    if ((types == EndOfRecording || types == DeleteRecording) &&
         (program->subtitle != "" && program->description != ""))
     {
 
-        tmpmessage = tr("Yes; allow re-recording"); 
+        tmpmessage = tr("Yes, but record this episode again next time"); 
         tmpslot = SLOT(doDeleteForgetHistory());
         popup->addButton(tmpmessage, this, tmpslot);
     }
 
     switch (types)
     {
-        case 1: case 2: tmpmessage = tr("Yes, get rid of it"); 
-                        tmpslot = SLOT(doDelete());
-                        break;
-        case 3: tmpmessage = tr("Yes, AutoExpire"); 
-                tmpslot = SLOT(doAutoExpire());
-                break;
-        case 4: tmpmessage = tr("Yes, stop recording it"); 
-                tmpslot = SLOT(doStop());
-                break;
-        default: tmpmessage = "ERROR ERROR ERROR"; tmpslot = NULL; break;
+        case EndOfRecording:
+        case DeleteRecording:
+             tmpmessage = tr("Yes, delete it"); 
+             tmpslot = SLOT(doDelete());
+             break;
+        case AutoExpireRecording:
+             tmpmessage = tr("Yes, AutoExpire"); 
+             tmpslot = SLOT(doAutoExpire());
+             break;
+        case StopRecording:
+             tmpmessage = tr("Yes, stop recording it"); 
+             tmpslot = SLOT(doStop());
+             break;
     }
     QButton *yesButton = popup->addButton(tmpmessage, this, tmpslot);
 
     switch (types)
     {
-        case 1: tmpmessage = tr("No, I might want to watch it again."); 
-                tmpslot = SLOT(noDelete());
-                break;
-        case 2: tmpmessage = tr("No, keep it, I changed my mind"); 
-                tmpslot = SLOT(noDelete());
-                break;
-        case 3: tmpmessage = tr("No, do not AutoExpire"); 
-                tmpslot = SLOT(noAutoExpire());
-                break;
-        case 4: tmpmessage = tr("No, continue recording it"); 
-                tmpslot = SLOT(noStop());
-                break;
-        default: tmpmessage = "ERROR ERROR ERROR"; tmpslot = NULL; break;
+        case EndOfRecording:
+             tmpmessage = tr("No, I might want to watch it again."); 
+             tmpslot = SLOT(noDelete());
+             break;
+        case DeleteRecording:
+             tmpmessage = tr("No, keep it, I changed my mind"); 
+             tmpslot = SLOT(noDelete());
+             break;
+        case AutoExpireRecording:
+             tmpmessage = tr("No, do not AutoExpire"); 
+             tmpslot = SLOT(noAutoExpire());
+             break;
+        case StopRecording:
+             tmpmessage = tr("No, continue recording it"); 
+             tmpslot = SLOT(noStop());
+             break;
     }
     QButton *noButton = popup->addButton(tmpmessage, this, tmpslot);
 
-    if (types == 1 || types == 2)
+    if (types == EndOfRecording || types == DeleteRecording)
         noButton->setFocus();
     else
     {
@@ -1637,7 +1646,7 @@ void PlaybackBox::askStop(void)
 
     cancelPopup();
 
-    showDeletePopup(delitem, 4);
+    showDeletePopup(delitem, StopRecording);
 }
 
 void PlaybackBox::noStop(void)
@@ -1675,7 +1684,7 @@ void PlaybackBox::askDelete(void)
 
     cancelPopup();
 
-    showDeletePopup(delitem, 2);
+    showDeletePopup(delitem, DeleteRecording);
 }
 
 void PlaybackBox::noDelete(void)
@@ -1771,7 +1780,7 @@ void PlaybackBox::promptEndOfRecording(ProgramInfo *rec)
         return;
 
     delitem = new ProgramInfo(*rec);
-    showDeletePopup(delitem, 1);
+    showDeletePopup(delitem, EndOfRecording);
 }
 
 void PlaybackBox::UpdateProgressBar(void)
