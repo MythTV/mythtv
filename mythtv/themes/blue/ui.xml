@@ -1278,14 +1278,14 @@
         <fcnfont name="active" function="selected"></fcnfont>
         <fcnfont name="inactive" function="inactive"></fcnfont>
         <columnpadding>10</columnpadding>
-        <column number="1" width="320" context="-1"></column>
-        <column number="2" width="60" context="-1"></column>
+        <column number="1" width="353" context="-1"></column>
+        <column number="2" width="55" context="-1"></column>
         <column number="3" width="110" context="0"></column>
         <column number="4" width="110" context="1"></column>
         <items>7</items>
         <image function="selectionbar" filename="bar.png" location="-13,-2"></image>
-        <image function="uparrow" filename="uparrow.png" location="755,22"></image>
-        <image function="downarrow" filename="downarrow.png" location="755,230"></image>
+        <image function="uparrow" filename="uparrow.png" location="743,12"></image>
+        <image function="downarrow" filename="downarrow.png" location="743,255"></image>
       </listarea>
       <image name="showinglines" draworder="5" fleximage="yes">
         <filename>showings.png</filename>
@@ -1330,7 +1330,7 @@
         <font>info</font>
       </textarea>
       <textarea name="subdescr" draworder="6">
-        <area>20,93,750,125</area>
+        <area>20,97,750,125</area>
         <altarea>20,70,760,125</altarea>
         <font>info</font>
         <multiline>yes</multiline>
@@ -1351,23 +1351,23 @@
 
       <image name="autoexpire" draworder="6">
         <filename>autoexpire.png</filename>
-        <position>20,60</position>
+        <position>20,62</position>
       </image>
       <image name="bookmark" draworder="6">
         <filename>bookmark.png</filename>
-        <position>55,60</position>
+        <position>55,62</position>
       </image>
       <image name="commflagged" draworder="6">
         <filename>commflagged.png</filename>
-        <position>90,60</position>
+        <position>90,62</position>
       </image>
       <image name="cutlist" draworder="6">
         <filename>cutlist.png</filename>
-        <position>125,60</position>
+        <position>125,62</position>
       </image>
       <image name="processing" draworder="6">
         <filename>processing.png</filename>
-        <position>160,60</position>
+        <position>160,62</position>
       </image>
 
     </container>
