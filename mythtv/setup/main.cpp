@@ -16,6 +16,7 @@
 #include <iostream>
 
 #include "libmyth/mythcontext.h"
+#include "libmyth/langsettings.h"
 #include "libmyth/dialogbox.h"
 #include "libmythtv/videosource.h"
 #include "libmythtv/channeleditor.h"
@@ -26,7 +27,6 @@
 
 using namespace std;
 
-QTranslator *translator;
 QSqlDatabase* db;
 
 void clearCardDB(void)
@@ -106,7 +106,6 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     gContext = new MythContext(MYTH_BINARY_VERSION, true);
-    translator = new QTranslator(0);
 
     db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!gContext->OpenDatabase(db))
@@ -122,10 +121,7 @@ int main(int argc, char *argv[])
 
     UpgradeTVDatabaseSchema();
 
-    translator->load(
-        gContext->FindTranslation(gContext->GetSetting("Language")),
-        ".");
-    a.installTranslator(translator);
+    LanguageSettings::load("mythfrontend");
 
     gContext->SetSetting("Theme", "blue");
     gContext->LoadQtConfig();
@@ -139,6 +135,7 @@ int main(int argc, char *argv[])
     MythMainWindow *mainWindow = new MythMainWindow();
     mainWindow->Show();
     gContext->SetMainWindow(mainWindow);
+    LanguageSettings::prompt();
 
     DialogBox dboxCard(mainWindow, QObject::tr("Would you like to clear all "
                                    "capture card settings before starting "

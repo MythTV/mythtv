@@ -39,12 +39,12 @@ using namespace std;
 #include "mythmediamonitor.h"
 #include "statusbox.h"
 #include "lcddevice.h"
+#include "langsettings.h"
 
 #define QUIT     1
 #define HALT     2
 
 ThemedMenu *menu;
-QTranslator *translator;
 XBox *xbox = NULL;
 
 void startGuide(void)
@@ -395,11 +395,7 @@ void TVMenuCallback(void *data, QString &selection)
         AppearanceSettings settings;
         settings.exec(QSqlDatabase::database());
 
-        qApp->removeTranslator(translator);
-        translator->load(
-            gContext->FindTranslation(gContext->GetSetting("Language")),
-            ".");
-        qApp->installTranslator(translator);
+        LanguageSettings::reload();
 
         gContext->LoadQtConfig();
         gContext->GetMainWindow()->Init();
@@ -721,7 +717,6 @@ int main(int argc, char **argv)
     QApplication::setDesktopSettingsAware(FALSE);
 #endif
     QApplication a(argc, argv);
-    translator = new QTranslator(0);
 
     QString logfile = "";
     QString verboseString = QString(" important general");
@@ -958,10 +953,7 @@ int main(int argc, char **argv)
             lcd->setupLEDs(RemoteGetRecordingMask);
     }
 
-    translator->load(
-        gContext->FindTranslation(gContext->GetSetting("Language")),
-        ".");
-    a.installTranslator(translator);
+    LanguageSettings::load("mythfrontend");
 
     WriteDefaults(db);
 
@@ -982,6 +974,7 @@ int main(int argc, char **argv)
 
     MythMainWindow *mainWindow = new MythMainWindow();
     gContext->SetMainWindow(mainWindow);
+    LanguageSettings::prompt();
 
     InitJumpPoints();
 

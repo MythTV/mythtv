@@ -1,6 +1,7 @@
 #include "config.h"
 #include "mythcontext.h"
 #include "dbsettings.h"
+#include "langsettings.h"
 
 #include "globalsettings.h"
 #include "scheduledrecording.h"
@@ -1900,21 +1901,7 @@ static HostComboBox *MythLanguage()
 {
     HostComboBox *gc = new HostComboBox("Language");
     gc->setLabel(QObject::tr("Language"));
-    gc->addSelection(QString::fromUtf8("English"), "EN");     // English
-    gc->addSelection(QString::fromUtf8("Italiano"), "IT");    // Italian
-    gc->addSelection(QString::fromUtf8("Català"), "CA");      // Catalan
-    gc->addSelection(QString::fromUtf8("Español"), "ES");     // Spanish
-    gc->addSelection(QString::fromUtf8("Nederlands"), "NL");  // Dutch
-    gc->addSelection(QString::fromUtf8("Français"), "FR");    // French
-    gc->addSelection(QString::fromUtf8("Deutsch"), "DE");     // German
-    gc->addSelection(QString::fromUtf8("Dansk"), "DK");       // Danish
-    gc->addSelection(QString::fromUtf8("Svenska"), "SV");     // Swedish
-    gc->addSelection(QString::fromUtf8("Português"), "PT");   // Portuguese
-    //gc->addSelection(QString::fromUtf8("日本語"), "JA");    // Japanese
-    gc->addSelection(QString::fromUtf8("Nihongo"), "JA");     // Japanese
-    gc->addSelection(QString::fromUtf8("Slovenski"), "SI");   // Slovenian
-    gc->addSelection(QString::fromUtf8("Suomi"), "FI");   // Finnish
-    gc->addSelection(QString::fromUtf8("Hanzi (Traditional)"), "ZH_TW"); // Traditional Chinese
+    LanguageSettings::fillSelections(gc);
     gc->setHelpText(QObject::tr("Your preferred language.") );
     return gc;
 }

@@ -28,6 +28,7 @@
 #include "screensaver.h"
 #include "DisplayRes.h"
 #include "dbsettings.h"
+#include "langsettings.h"
 
 // These defines provide portability for different
 // plugin file names.
@@ -480,6 +481,9 @@ bool MythContextPrivate::PromptForDatabaseParams(void)
         MythMainWindow *mainWindow = new MythMainWindow();
         parent->SetMainWindow(mainWindow);
     
+        // ask user for language settings
+        LanguageSettings::prompt();
+        
         // ask user for database parameters
         DatabaseSettings settings;
         accepted = (settings.exec(NULL) == QDialog::Accepted);
