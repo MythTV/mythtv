@@ -425,22 +425,12 @@ void ProgramRecPriority::edit(void)
     if (rec)
     {
         int recid = 0;
-
-        if ((gContext->GetNumSetting("AdvancedRecord", 0)) ||
-            (rec->GetProgramRecordingStatus(db) > kAllRecord))
-        {
-            ScheduledRecording record;
-            record.loadByID(db, rec->recordid);
-            if (record.getSearchType() == kNoSearch)
-                record.loadByProgram(db, rec);
-            record.exec(db);
-            recid = record.getRecordID();
-        }
-        else
-        {
-            InfoDialog diag(rec, gContext->GetMainWindow(), "Program Info");
-            diag.exec();
-        }
+        ScheduledRecording record;
+        record.loadByID(db, rec->recordid);
+        if (record.getSearchType() == kNoSearch)
+            record.loadByProgram(db, rec);
+        record.exec(db);
+        recid = record.getRecordID();
 
         // We need to refetch the recording priority values since the Advanced
         // Recording Options page could've been used to change them 

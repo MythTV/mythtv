@@ -2081,18 +2081,8 @@ void ProgramInfo::EditRecording(QSqlDatabase *db)
 
 void ProgramInfo::EditScheduled(QSqlDatabase *db)
 {
-    MythContext::KickDatabase(db);
-
-    if (gContext->GetNumSetting("AdvancedRecord", 0))
-    {
-        GetProgramRecordingStatus(db);
-        record->exec(db);
-    }
-    else
-    {
-        InfoDialog diag(this, gContext->GetMainWindow(), "Program Info");
-        diag.exec();
-    }
+    GetProgramRecordingStatus(db);
+    record->exec(db);
 }
 
 void ProgramInfo::showDetails(QSqlDatabase *db)

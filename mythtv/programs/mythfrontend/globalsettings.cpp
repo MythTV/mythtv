@@ -1044,16 +1044,6 @@ public:
     };
 };
 
-class AdvancedRecord: public CheckBoxSetting, public GlobalSetting {
-public:
-    AdvancedRecord():
-        GlobalSetting("AdvancedRecord") {
-        setLabel(QObject::tr("Always use Advanced Recording Options screen"));
-        setValue(false);
-        setHelpText(QObject::tr("Always use the Advanced Recording Options "
-                    "screen when editing a scheduled recording."));
-    };
-};
 
 class AllowQuitShutdown: public ComboBoxSetting, public GlobalSetting {
 public:
@@ -2681,7 +2671,6 @@ GeneralSettings::GeneralSettings()
 
     VerticalConfigurationGroup* gen2 = new VerticalConfigurationGroup(false);
     gen2->setLabel(QObject::tr("General (page 2)"));
-    gen2->addChild(new AdvancedRecord());
     gen2->addChild(new ChannelFormat());
     gen2->addChild(new LongChannelFormat());
     gen2->addChild(new ATSCCheckSignalWait());

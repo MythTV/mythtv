@@ -1739,17 +1739,9 @@ void PlaybackBox::doEditScheduled()
 
     QSqlDatabase *db = QSqlDatabase::database();
 
-    if (gContext->GetNumSetting("AdvancedRecord", 0))
-    {
-        ScheduledRecording record;
-        record.loadByProgram(db, curitem);
-        record.exec(db);
-    }
-    else
-    {
-        InfoDialog diag(curitem, gContext->GetMainWindow(), "Program Info");
-        diag.exec();
-    }
+    ScheduledRecording record;
+    record.loadByProgram(db, curitem);
+    record.exec(db);
     
     connected = FillList();
     update(fullRect);
