@@ -18,9 +18,9 @@
 #endif
 
 #include "RTjpegN.h"
-#include "frame.h"
 
 extern "C" {
+#include "frame.h"
 #include "libavcodec/avcodec.h"
 }
 

@@ -8,7 +8,9 @@
 #define COMMERCIAL_SKIP_SCENE   0x2
 #define COMMERCIAL_SKIP_RATING  0x4
 
+extern "C" {
 #include "frame.h"
+}
 
 class CommDetect
 {

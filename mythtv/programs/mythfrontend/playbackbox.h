@@ -112,7 +112,7 @@ class PlaybackBox : public MythDialog
 
     BoxType type;
 
-    void killPlayer(void);
+    bool killPlayer(void);
     void killPlayerSafe(void);
     void startPlayer(ProgramInfo *rec);
 
@@ -132,11 +132,20 @@ class PlaybackBox : public MythDialog
     pthread_t decoder;
 
     typedef enum 
-    { kStarting, kPlaying, kStopping, kStopped, kChanging } playerStateType;
+    { kStarting, kPlaying, kKilling, kKilled, kStopping, kStopped, 
+      kChanging } playerStateType;
 
     playerStateType state;
 
+    typedef enum
+    { kNvpToPlay, kNvpToStop, kDone } killStateType;
+     
+    killStateType killState;
+    QTime killTimeout;
+
     QTime nvpTimeout;    
+    QTime waitToStartPreviewTimer;
+    bool waitToStart;
  
     QDateTime lastUpdateTime;
     bool graphicPopup;

@@ -133,12 +133,15 @@ void DVBCam::CiHandlerLoop()
         usleep(250);
         if (!ciHandler->Process())
             continue;
+
         for (int s=0; s<ciHandler->NumSlots(); s++)
         {
             const unsigned short *caids = ciHandler->GetCaSystemIds(s);
             // TODO: Only set cam with correct id.
-            if (caids != NULL)
+            if (caids != NULL && setCamProgramMapTable)
             {
+                GENERAL(QString("Sending PMT to CAM in slot %1.").arg(s));
+
                 cCiCaPmt capmt(chan_opts.serviceID);
 
                 capmt.AddCaDescriptor(pmtlen, pmtbuf);
@@ -146,6 +149,8 @@ void DVBCam::CiHandlerLoop()
                 SetPids(capmt, chan_opts.pids);
 
                 ciHandler->SetCaPmt(capmt,s);
+
+                setCamProgramMapTable = false;
             }
         }
     }

@@ -401,6 +401,9 @@ class NuppelVideoPlayer
     float warpfactor_avg;
     int rtcfd;
     int vsynctol;
+    short int *warplbuff;
+    short int *warprbuff;
+    int warpbuffsize;
  
     bool delay_clipping;
     struct timeval nexttrigger, now;

@@ -8,9 +8,9 @@
 #include "programinfo.h"
 #include "format.h"
 #include "decoderbase.h"
-#include "frame.h"
 
 extern "C" {
+#include "frame.h"
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
 }

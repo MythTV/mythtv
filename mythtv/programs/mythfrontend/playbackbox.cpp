@@ -38,6 +38,8 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     type = ltype;
 
     state = kStopped;
+    killState = kDone;
+    waitToStart = false;
 
     rbuffer = NULL;
     nvp = NULL;
@@ -151,13 +153,16 @@ void PlaybackBox::killPlayerSafe(void)
     /* if the user keeps selecting new recordings we will never stop playing */
     setEnabled(false);
 
-    if (state != kStopped)
+    if (state != kKilled)
     {
-        state = kStopping;
-        while (state != kStopped)
+        while (state != kKilled)
         {
+            /* ensure that key events don't mess up our states */
+            if((state != kKilling) && (state != kKilled))
+                state = kKilling;
+
             /* NOTE: need unlock/process/lock here because we need
-	       to allow updateVideo() to run to handle changes in states */
+               to allow updateVideo() to run to handle changes in states */
             qApp->unlock();
             qApp->processEvents();
             usleep(500);
@@ -424,7 +429,8 @@ void PlaybackBox::updateInfo(QPainter *p)
         tmp.end();
         p->drawPixmap(pr.topLeft(), pix);
 
-        timer->start(500);
+        waitToStartPreviewTimer.start();
+        waitToStart = true;
     }
     else
     {
@@ -453,9 +459,25 @@ void PlaybackBox::updateVideo(QPainter *p)
         }
     }
 
+    /* keep calling killPlayer() to handle nvp cleanup */
+    /* until killPlayer() is done */
+    if (killState != kDone)
+    {
+        if (!killPlayer())
+            return;
+    }
+
+    /* if we aren't supposed to have a preview playing then always go */
+    /* to the stopping state */
+    if (!playbackPreview && (state != kKilling) && (state != kKilled))
+    {
+        state = kStopping;
+    }
+
     /* if we have no nvp and aren't playing yet */
     /* if we have an item we should start playing */
-    if (!nvp && playingVideo == false && curitem)
+    if (!nvp && playbackPreview && (playingVideo == false) && curitem && 
+        (state != kKilling) && (state != kKilled) && (state != kStarting))
     {
         ProgramInfo *rec = curitem;
 
@@ -471,15 +493,20 @@ void PlaybackBox::updateVideo(QPainter *p)
 
     if (state == kChanging)
     {
-        state = kStarting;
         if (nvp)
-            killPlayer();
+        {
+            killPlayer(); /* start killing the player */
+            return;
+        }
 
-        startPlayer(curitem);
+        state = kStarting;
     }
 
-    if (state == kStarting)
+    if ((state == kStarting) && 
+        (!waitToStart || (waitToStartPreviewTimer.elapsed() > 500)))
     {
+        waitToStart = false;
+
         if (!nvp)
             startPlayer(curitem);
 
@@ -487,12 +514,18 @@ void PlaybackBox::updateVideo(QPainter *p)
             state = kPlaying;
     }
 
-    if (state == kStopping)
+    if ((state == kStopping) || (state == kKilling))
     {
         if (nvp)
-            killPlayer();
+        {
+            killPlayer(); /* start killing the player and exit */
+            return;
+        }
 
-        state = kStopped;
+        if (state == kKilling)
+            state = kKilled;
+        else
+            state = kStopped;
     }
 
     /* if we are playing and nvp is running, then grab a new video frame */
@@ -526,9 +559,9 @@ void PlaybackBox::updateVideo(QPainter *p)
     {
         if (nvpTimeout.elapsed() > 2000)
         {
-            killPlayer();
-            startPlayer(curitem);
             state = kStarting;
+            killPlayer();
+            return;
         }
     }
 }
@@ -1098,51 +1131,53 @@ static void *SpawnDecoder(void *param)
     return NULL;
 }
 
-void PlaybackBox::killPlayer(void)
+bool PlaybackBox::killPlayer(void)
 {
-    timer->stop();
-    while (timer->isActive())
-        usleep(50);
-
     playingVideo = false;
 
-    if (nvp)
+    /* if we don't have nvp to deal with then we are done */
+    if (!nvp)
     {
-        QTime timeout;
-        timeout.start();
-
-        while (!nvp->IsPlaying())
-        {
-            if (timeout.elapsed() > 2000)
-            {
-                cerr << "Took too long to start playing\n";
-                break;
-            }
-            usleep(50);
-        }
-        timeout.restart();
-
-        rbuffer->Pause();
-
-        nvp->StopPlaying();
-
-        while (nvp->IsPlaying())
-        {
-            if (timeout.elapsed() > 2000)
-            {
-                cerr << "Took too long to stop playing\n";
-                break;
-            }
-            usleep(50);
-        }
-
-        pthread_join(decoder, NULL);
-        delete nvp;
-        delete rbuffer;
-
-        nvp = NULL;
-        rbuffer = NULL;
+        killState = kDone;
+        return true;
     }
+
+    if (killState == kDone)
+    {
+        killState = kNvpToPlay;
+        killTimeout.start();
+    }
+ 
+    if (killState == kNvpToPlay)
+    {
+        if (nvp->IsPlaying() || (killTimeout.elapsed() > 2000))
+        {
+	    killState = kNvpToStop;
+
+            rbuffer->Pause();
+            nvp->StopPlaying();
+        }
+        else /* return false status since we aren't done yet */
+            return false;
+    }
+
+    if (killState == kNvpToStop)
+    {
+        if (!nvp->IsPlaying() || (killTimeout.elapsed() > 2000))
+        {
+            pthread_join(decoder, NULL);
+            delete nvp;
+            delete rbuffer;
+
+            nvp = NULL;
+            rbuffer = NULL;
+            killState = kDone;
+        }
+        else /* return false status since we aren't done yet */
+            return false;
+    }
+
+    return true;
 }        
 
 void PlaybackBox::startPlayer(ProgramInfo *rec)

@@ -1,8 +1,10 @@
 #ifndef VIDEOOUTBASE_H_
 #define VIDEOOUTBASE_H_
 
+extern "C" {
 #include "frame.h"
 #include "filter.h"
+}
 
 #include <qmutex.h>
 #include <qmap.h>

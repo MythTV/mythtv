@@ -687,7 +687,6 @@ DVBCardVerificationWizard::DVBCardVerificationWizard(int cardNum) {
     testGroup->addChild(ss);
 
     HorizontalConfigurationGroup* lblGroup = new HorizontalConfigurationGroup(false,true);
-#warning FIXME: BER & UB Do not work without reading TS?
     DVBInfoLabel* ber = new DVBInfoLabel("Bit Error Rate");
     DVBInfoLabel* un  = new DVBInfoLabel("Uncorrected Blocks");
     lblGroup->addChild(ber);
@@ -718,7 +717,6 @@ DVBCardVerificationWizard::DVBCardVerificationWizard(int cardNum) {
     connect(chan, SIGNAL(StatusSignalStrength(int)), ss, SLOT(setValue(int)));
     connect(chan, SIGNAL(StatusBitErrorRate(int)), ber, SLOT(set(int)));
     connect(chan, SIGNAL(StatusUncorrectedBlocks(int)), un, SLOT(set(int)));
-#warning FIXME: Protect DVB driver access.
     connect(chan, SIGNAL(Status(QString)), sl, SLOT(set(QString)));
 
     connect(loadtune, SIGNAL(pressed()), this, SLOT(tunePredefined()));
@@ -742,15 +740,14 @@ void DVBCardVerificationWizard::tuneConfigscreen() {
     bool parseOK = true;
     switch (chan->GetCardType())
     {
-#warning FIXME: Protect DVB driver access.
         case FE_QPSK:
             parseOK = chan->ParseQPSK(
                 dvbopts->getFrequency(), dvbopts->getInversion(),
                 dvbopts->getSymbolrate(), dvbopts->getFec(),
                 dvbopts->getPolarity(),
-#warning FIXME: Static Diseqc options.
+                //TODO: Static Diseqc options.
                 QString("0"), QString("0"),
-#warning FIXME: Static LNB options.
+                //TODO: Static LNB options.
                 QString("11700000"), QString("10600000"),
                 QString("9750000"), chan_opts.tuning);
             break;

@@ -1,8 +1,11 @@
 #ifndef FILTERMANAGER
 #define FILTERMANAGER
 
+extern "C" {
 #include "filter.h"
 #include "frame.h"
+}
+
 #include <qdict.h>
 #include <qptrlist.h>
 #include <qstring.h>

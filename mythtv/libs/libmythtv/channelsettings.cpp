@@ -216,7 +216,6 @@ public:
     DvbSatellite(const ChannelID& id):
         ComboBoxSetting(), DvbSetting(id, "satid") {
         setLabel("Satellite");
-        setValue("0");
     };
 
     void load(QSqlDatabase* db) {

@@ -73,7 +73,11 @@ signals:
     void StatusBitErrorRate(int val);
     void StatusUncorrectedBlocks(int val);
     void Status(fe_status_t status);
-    void StatusString(QString val);
+    void Status(QString val);
+
+protected:
+    void connectNotify(const char* signal);
+    void disconnectNotify(const char* signal);
 
 private:
     static void* StatusMonitorHelper(void*);
@@ -107,7 +111,8 @@ private:
     bool isOpen;
 
     pthread_t statusMonitorThread;
-    bool pauseStatusMonitor;
+    bool monitorRunning;
+    int monitorClients;
 
     DVBDiSEqC* diseqc;
 

@@ -62,7 +62,8 @@ DVBChannel::DVBChannel(int aCardNum, TVRec *parent)
     first_tune = true;
     isOpen = false;
     diseqc = NULL;
-    pauseStatusMonitor = false;
+    monitorRunning = false;
+    monitorClients = 0;
 
     dvbcam = NULL;
     dvbsct = NULL;
@@ -125,8 +126,6 @@ bool DVBChannel::Open()
 
     GENERAL(QString("Using DVB card %1, with frontend %2.")
             .arg(cardnum).arg(info.name));
-
-    pthread_create(&statusMonitorThread, NULL, StatusMonitorHelper, this);
 
     return isOpen = true;
 }
@@ -585,10 +584,15 @@ void DVBChannel::StatusMonitorLoop()
     unsigned int snr=1, ss=1, ber=1, ub=1;
     fe_status_t status;
 
-    while (true)
+    monitorRunning = true;
+        
+    while (monitorClients > 0)
     {
-        while (pauseStatusMonitor)
-            usleep(500*1000);
+        if (!isOpen)
+        {
+            usleep(250*1000);
+            continue;
+        }
         
         ioctl(fd_frontend, FE_READ_SNR, &snr);
         emit StatusSignalToNoise(snr);
@@ -615,9 +619,35 @@ void DVBChannel::StatusMonitorLoop()
             if (status & FE_HAS_SYNC) str += "SYNC ";
             if (status & FE_HAS_LOCK) str += "LOCK ";
         }
-        emit StatusString(str);
+        emit Status(str);
 
         usleep(250*1000);
+    }
+
+    monitorRunning = false;
+}
+
+void DVBChannel::connectNotify(const char* signal)
+{
+    QString sig = signal;
+    if (sig != SIGNAL(ChannelChanged()))
+    {
+        monitorClients++;
+        if (!monitorRunning)
+            pthread_create(&statusMonitorThread, NULL,
+                           StatusMonitorHelper, this);
+    }
+}
+
+void DVBChannel::disconnectNotify(const char* signal)
+{
+    QString sig = signal;
+    if (sig != SIGNAL(ChannelChanged()))
+    {
+        monitorClients--;
+        if (monitorClients < 1)
+            while(monitorRunning)
+                usleep(1000);
     }
 }
 

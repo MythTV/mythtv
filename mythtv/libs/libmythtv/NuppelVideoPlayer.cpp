@@ -162,6 +162,9 @@ NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
 
     limitKeyRepeat = false;
 
+    warplbuff = NULL;
+    warprbuff = NULL;
+    warpbuffsize = 0;
 }
 
 NuppelVideoPlayer::~NuppelVideoPlayer(void)
@@ -896,7 +899,12 @@ void NuppelVideoPlayer::ShowText(void)
                                   //storing it in an integer
 #define WARPAVLEN (video_frame_rate * 600) // How long to average the warp over
 #define RTCRATE 1024 // RTC frequency if we have no vsync
-
+#define WARPCLIP    0.1 // How much we allow the warp to deviate from 1 
+                        // (normal speed)
+#define MAXDIVERGE  20  // Maximum number of frames of A/V divergence allowed
+                        // before dropping or extending video frames to 
+                        // compensate
+ 
 float NuppelVideoPlayer::WarpFactor(void) 
 {
     // Calculate a new warp factor
@@ -915,25 +923,17 @@ float NuppelVideoPlayer::WarpFactor(void)
     // Clip the amount changed so we don't get big frequency variations
     warpdiff = newwarp / warpfactor;
     if (warpdiff > (1 + MAXWARPDIFF)) 
-    {
-//        cerr << "Clipped.  Warpdiff: " << warpdiff << "  warp: " << newwarp;
         newwarp = warpfactor * (1 + MAXWARPDIFF);
-//        cerr << "  clipped to: " << newwarp << endl;
-    } 
     else if (warpdiff < (1 - MAXWARPDIFF)) 
-    {
-//        cerr << "Clipped.  Warpdiff: " << warpdiff << "  warp: " << newwarp;
         newwarp = warpfactor * (1 - MAXWARPDIFF);
-//        cerr << "  clipped to: " << newwarp << endl;
-    }
     
     warpfactor = newwarp;
 
     // Clip final warp factor
-    if (warpfactor < 0.5) 
-        warpfactor = 0.5;
-    else if (warpfactor > 2) 
-        warpfactor = 2;
+    if (warpfactor < (1 - WARPCLIP)) 
+        warpfactor = 1 - WARPCLIP;
+    else if (warpfactor > (1 + (WARPCLIP * 2))) 
+        warpfactor = 1 + (WARPCLIP * 2);
 
     // Keep a 10 minute average
     warpfactor_avg = (warpfactor + (warpfactor_avg * (WARPAVLEN - 1))) / 
@@ -956,9 +956,9 @@ void NuppelVideoPlayer::InitVTAVSync(void)
     else 
         warpfactor_avg = 1;
     // Reset the warpfactor if it's obviously bogus
-    if (warpfactor_avg < 0.5) 
+    if (warpfactor_avg < (1 - WARPCLIP)) 
         warpfactor_avg = 1;
-    if (warpfactor_avg > 2) 
+    if (warpfactor_avg > (1 + (WARPCLIP * 2)) )
         warpfactor_avg = 1;
 
     warpfactor = warpfactor_avg;
@@ -977,7 +977,7 @@ void NuppelVideoPlayer::InitVTAVSync(void)
             hasvsync = true;
 
             if ( ret == 1 ) timing_type = "nVidia polling";
-            vsynctol = refreshrate / 2; 
+            vsynctol = refreshrate / 4; 
             // How far out can the vsync be for us to use it?
         } 
         else 
@@ -1022,10 +1022,19 @@ void NuppelVideoPlayer::VTAVSync(void)
         return;
     }
 
-    diverge = WarpFactor();
-    /*if (diverge < -5) cerr << "Dropping frame to keep audio in sync :(" << endl;
-    else*/ 
-    if (disablevideo) 
+    if (normal_speed)
+        diverge = WarpFactor();
+    else
+        diverge = 0;
+
+    delay = UpdateDelay(&nexttrigger);
+    // If video is way ahead of audio, drop some frames until we're close again.
+    // If we're close to a vsync then we'll display a frame to keep the 
+    // picture updated.
+    if ((diverge < -MAXDIVERGE) && (delay < vsynctol)) 
+        cerr << "A/V diverged by " << diverge 
+             << " frames, dropping frame to keep audio in sync" << endl;
+    else if (disablevideo) 
     {
         delay = UpdateDelay(&nexttrigger);
         if (delay > 0) 
@@ -1056,10 +1065,6 @@ void NuppelVideoPlayer::VTAVSync(void)
                 delay = UpdateDelay(&nexttrigger);
             }
         } 
-        else if (rtcfd >= 0) 
-        {
-            // No vsync - use the RTC instead
-        } 
         else 
         {    
             // No vsync _or_ RTC, fall back to usleep() (yuck)
@@ -1077,12 +1082,20 @@ void NuppelVideoPlayer::VTAVSync(void)
     
     if (output_jmeter && output_jmeter->RecordCycleTime()) 
         cout << "avsync_avg: " << avsync_avg / 1000 
-             << ", avsync_oldavg: " << avsync_oldavg / 1000 
              << ", warpfactor: " << warpfactor 
              << ", warpfactor_avg: " << warpfactor_avg << endl;
 
     // Schedule next frame
     nexttrigger.tv_usec += frame_interval;
+    if (diverge > MAXDIVERGE) 
+    {
+        // Audio is way ahead of the video - cut the frame rate
+        // until it's almost in sync
+        cerr << "A/V diverged by " << diverge 
+             << " frames, extending frame to keep audio in sync" << endl;
+        nexttrigger.tv_usec += (frame_interval * ((int)diverge / MAXDIVERGE));
+    }
+
     NormalizeTimeval(&nexttrigger);
     
     if (audioOutput && normal_speed) 
@@ -1110,6 +1123,19 @@ void NuppelVideoPlayer::ShutdownVTAVSync(void)
     if (hasvgasync) 
         vgasync_cleanup();
     gContext->SaveSetting("WarpFactor", (int)(warpfactor_avg * WARPMULTIPLIER));
+
+    if (warplbuff) 
+    {
+        free(warplbuff);
+        warplbuff = NULL;
+    }
+
+    if (warprbuff) 
+    {
+        free(warprbuff);
+        warprbuff = NULL;
+    }
+    warpbuffsize = 0;
 
     if (rtcfd >= 0)
     {
@@ -1866,25 +1892,52 @@ void NuppelVideoPlayer::AddAudioData(char *buffer, int len, long long timecode)
         if (usevideotimebase)
         {
             int samples;
-            char * newbuffer;
+            short int * newbuffer;
             float incount = 0;
             int outcount;
             int samplesize;
+            int newsamples;
+            int newlen;
 
             samplesize = audio_channels * audio_bits / 8;
             samples = len / samplesize;
-            newbuffer = (char *)malloc(len * 2);
+            newsamples = (int)(samples / warpfactor);
+            newlen = newsamples * samplesize;
+
+            // We use the left warp buffer to store the new data.
+            // If it isn't big enough it is resized.
+            if ((warpbuffsize < newlen) || (! warplbuff))
+            {
+                if (warprbuff) 
+                {
+                    // Make sure this isn't allocated since we're only
+                    // resizing 1 buffer.
+                    free(warprbuff);
+                    warprbuff = NULL;
+                }
+
+                newbuffer = (short int *)realloc(warplbuff, newlen);
+                if (!newbuffer) 
+                {
+                    cerr << "Couldn't allocate warped audio buffer!" << endl;
+                    return;
+                }
+                warplbuff = newbuffer;
+                warpbuffsize = newlen;
+            } 
+            else 
+                newbuffer = warplbuff;
+
             for (incount = 0, outcount = 0; 
-                 (incount < samples) && (outcount < (samples * 2)); 
+                 (incount < samples) && (outcount < newsamples); 
                  outcount++, incount += warpfactor) 
             {
-                memcpy(newbuffer + (outcount * samplesize), 
-                       buffer + ((int)incount * samplesize), samplesize);
+                memcpy(((char *)newbuffer) + (outcount * samplesize), 
+                       buffer + (((int)incount) * samplesize), samplesize);
             }
 
             samples = outcount;
-            audioOutput->AddSamples(buffer, samples, timecode);
-            free(newbuffer);
+            audioOutput->AddSamples((char *)newbuffer, samples, timecode);
         }
         else
             audioOutput->AddSamples(buffer, len / 
@@ -1905,14 +1958,44 @@ void NuppelVideoPlayer::AddAudioData(short int *lbuffer, short int *rbuffer,
             short int *newrbuffer;
             float incount = 0;
             int outcount;
+            int newlen;
+            int newsamples;
 
-            newlbuffer = (short int *)malloc(sizeof(short int) * samples * 2);
-            newrbuffer = (short int *)malloc(sizeof(short int) * samples * 2);
+            newsamples = (int)(samples / warpfactor);
+            newlen = newsamples * sizeof(short int);
+
+            // We resize the buffers if they aren't big enough
+            if ((warpbuffsize < newlen) || (!warplbuff) || (!warprbuff))
+            {
+                newlbuffer = (short int *)realloc(warplbuff, newlen);
+                if (!newlbuffer) 
+                {
+                    cerr << "Couldn't allocate left warped audio buffer!\n";
+                    return;
+                }
+                warplbuff = newlbuffer;
+
+                newrbuffer = (short int *)realloc(warprbuff, newlen);
+                if (!newrbuffer) 
+                {
+                    cerr << "Couldn't allocate right warped audio buffer!\n";
+                    return;
+                }
+                warprbuff = newrbuffer;
+
+                warpbuffsize = newlen;
+            } 
+            else 
+            {
+                newlbuffer = warplbuff;
+                newrbuffer = warprbuff;
+            }
+
             buffers[0] = (char *)newlbuffer;
             buffers[1] = (char *)newlbuffer;
 
             for (incount = 0, outcount = 0; 
-                 (incount < samples) && (outcount < (samples * 2)); 
+                 (incount < samples) && (outcount < newsamples); 
                  outcount++, incount += warpfactor) 
             {
                 newlbuffer[outcount] = lbuffer[(int)incount];
@@ -1920,12 +2003,9 @@ void NuppelVideoPlayer::AddAudioData(short int *lbuffer, short int *rbuffer,
             }
 
             samples = outcount;
-            audioOutput->AddSamples(buffers, samples, timecode);
-            free(newlbuffer);
-            free(newrbuffer);
         }
-        else
-            audioOutput->AddSamples(buffers, samples, timecode);
+
+        audioOutput->AddSamples(buffers, samples, timecode);
     }
 }
 

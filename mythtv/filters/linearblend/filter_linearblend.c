@@ -10,7 +10,7 @@
 #include "filter.h"
 #include "frame.h"
 
-typedef struct ThisFilter
+typedef struct LBFilter
 {
     int (*filter)(VideoFilter *, VideoFrame *);
     void (*cleanup)(VideoFilter *);
@@ -24,7 +24,7 @@ typedef struct ThisFilter
     /* functions and variables below here considered "private" */
     int mm_flags;
     void (*subfilter)(unsigned char *, int);
-} ThisFilter;
+} LBFilter;
 
 #define cpuid(index,eax,ebx,ecx,edx)\
     __asm __volatile\
@@ -148,7 +148,7 @@ int mm_support(void)
     }
 }
 
-static void linearBlend(unsigned char *src, int stride)
+void linearBlend(unsigned char *src, int stride)
 {
     int a, b, c, x;
 
@@ -192,7 +192,7 @@ static void linearBlend(unsigned char *src, int stride)
     }
 }
 
-static void linearBlendMMX(unsigned char *src, int stride)
+void linearBlendMMX(unsigned char *src, int stride)
 {
 //  src += 4 * stride;
     asm volatile(
@@ -239,7 +239,7 @@ static void linearBlendMMX(unsigned char *src, int stride)
     );
 }
 
-static void linearBlend3DNow(unsigned char *src, int stride)
+void linearBlend3DNow(unsigned char *src, int stride)
 {
 //  src += 4 * stride;
     asm volatile(
@@ -297,7 +297,7 @@ int linearBlendFilter(VideoFilter *f, VideoFrame *frame)
     unsigned char *src;
     unsigned char *uoff;
     unsigned char *voff;
-    ThisFilter *vf = (ThisFilter *)f;
+    LBFilter *vf = (LBFilter *)f;
 
     for (y = 0; y < ymax; y+=8)
     {  
@@ -335,7 +335,7 @@ int linearBlendFilter(VideoFilter *f, VideoFrame *frame)
 VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt, 
                         int *width, int *height, char *options)
 {
-    ThisFilter *filter;
+    LBFilter *filter;
     (void)width;
     (void)height;
     (void)options;
@@ -343,7 +343,7 @@ VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt,
     if (inpixfmt != FMT_YV12 || outpixfmt != FMT_YV12)
         return NULL;
 
-    filter = malloc(sizeof(ThisFilter));
+    filter = malloc(sizeof(LBFilter));
 
     if (filter == NULL)
     {

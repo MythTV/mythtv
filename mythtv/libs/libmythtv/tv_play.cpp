@@ -2296,6 +2296,19 @@ void TV::doLoadMenu(void)
     QString dummy;
     QString channame = "3";
 
+    bool fullscreen = !gContext->GetNumSetting("GuiSizeForTV", 0);
+    MythMainWindow* mwnd = gContext->GetMainWindow();
+    
+    if (fullscreen)
+    {
+        int xbase, ybase, screenwidth, screenheight;
+        float wmult, hmult;
+        gContext->GetScreenSettings(xbase, screenwidth, wmult,
+                                    ybase, screenheight, hmult);
+        mwnd->setGeometry(xbase, ybase, screenwidth, screenheight);
+        mwnd->setFixedSize(QSize(screenwidth, screenheight));
+    }
+
     if (activerecorder)
        channame = activerecorder->GetCurrentChannel();
 
@@ -2309,6 +2322,14 @@ void TV::doLoadMenu(void)
     }
 
     StopEmbeddingOutput();
+
+    if (fullscreen) 
+    {
+        mwnd->setGeometry(0, 0, QApplication::desktop()->width(),
+                          QApplication::desktop()->height());
+        mwnd->setFixedSize(QSize(QApplication::desktop()->width(),
+                                 QApplication::desktop()->height()));
+    }
 
     menurunning = false;
 }

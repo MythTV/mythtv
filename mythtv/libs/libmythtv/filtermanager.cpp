@@ -6,6 +6,26 @@
 
 using namespace std;
 #include "filtermanager.h"
+#include "mythcontext.h"
+
+static const char *FmtToString(VideoFrameType ft)
+{
+    switch(ft)
+    {
+        case FMT_NONE:
+            return "NONE";
+        case FMT_RGB24:
+            return "RGB24";
+        case FMT_YV12:
+            return "YV12";
+        case FMT_ARGB32:
+            return "ARGB32";
+        case FMT_YUV422P:
+            return "YUV422P";
+        default:
+            return "INVALID";
+    }
+}
 
 FilterChain::FilterChain(void)
 {
@@ -151,6 +171,8 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
         }
         else
         {
+            VERBOSE(VB_IMPORTANT,QString("FilterManager: failed to load "
+                    "filter '%1'").arg(FiltName));
             FiltInfoChain.clear();
             break;
         }
@@ -190,7 +212,7 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
             FI2 = FiltInfoChain.at(i-1);
             for (FC = FI->formats; FC->in != -1; FC++)
             {
-                for (FC2 = FI2->formats; FC2->in != -1; FC++)
+                for (FC2 = FI2->formats; FC2->in != -1; FC2++)
                     if (FC2->out == FC->in)
                         break;
                 if (FC2->out == FC->in)
@@ -209,6 +231,8 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
         {
             if (!Convert)
             {
+                VERBOSE(VB_IMPORTANT,"FilterManager: format conversion needed "
+                        "but convert filter not found");
                 FiltInfoChain.clear();
                 break;
             }
@@ -244,7 +268,11 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
     if (ofmt != inpixfmt)
     {
         if (!Convert)
+        {
+            VERBOSE(VB_IMPORTANT,"FilterManager: format conversion needed but "
+                    "convert filter not found");
             FiltInfoChain.clear();
+        }
         else
         {
             FiltInfoChain.insert(0, Convert);
@@ -291,6 +319,32 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
                              FmtList.at(i)->out, postfilt_width, 
                              postfilt_height, OptsList.at(i));
 
+        if (!NewFilt)
+        {
+            delete FiltChain;
+            VERBOSE(VB_IMPORTANT,QString("FilterManager: failed to load "
+                        "filter %1 %2->%3 with args %4")
+                    .arg(FiltInfoChain.at(i)->name)
+                    .arg(FmtToString(FmtList.at(i)->in))
+                    .arg(FmtToString(FmtList.at(i)->out))
+                    .arg(OptsList.at(i)?OptsList.at(i):"NULL")
+                   );
+            FiltChain = NULL;
+            break;
+        }
+
+        if (NewFilt->filter)
+            FiltChain->append(NewFilt);
+        else
+        {
+            if (NewFilt->opts)
+                free(NewFilt->opts);
+            if (NewFilt->cleanup)
+                NewFilt->cleanup(NewFilt);
+            dlclose(NewFilt->handle);
+            free(NewFilt);
+        }
+
         switch (inpixfmt)
         {
             case FMT_YV12:
@@ -311,31 +365,15 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
 
         if (cbufsize > nbufsize)
             nbufsize = cbufsize;
-
-        if (!NewFilt)
-        {
-            delete FiltChain;
-            FiltChain = NULL;
-            break;
-        }
-        if (NewFilt->filter)
-            FiltChain->append(NewFilt);
-        else
-        {
-            if (NewFilt->opts)
-                free (NewFilt->opts);
-            if (NewFilt->cleanup)
-                NewFilt->cleanup(NewFilt);
-            dlclose (NewFilt->handle);
-            free (NewFilt);
-        }
     }
 
-    if(!FiltChain)
-        return NULL;
-    nbufsize = cbufsize;
-    width = postfilt_width;
-    height = postfilt_height;
+    if (FiltChain)
+    {
+        nbufsize = cbufsize;
+        width = postfilt_width;
+        height = postfilt_height;
+    }
+
     return FiltChain;
 }
 
