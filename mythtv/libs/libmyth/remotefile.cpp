@@ -172,8 +172,6 @@ void RemoteFile::Reset(void)
     int avail;
     char *trash;
 
-    usleep(50000);
-
     while (sock->bytesAvailable() > 0)
     {
         pthread_mutex_lock(&lock);
@@ -186,7 +184,7 @@ void RemoteFile::Reset(void)
         pthread_mutex_unlock(&lock);
 
         // cerr << avail << " bytes available during reset.\n";
-        usleep(50000);
+        usleep(20000);
     }
 }
     
@@ -216,8 +214,6 @@ long long RemoteFile::Seek(long long pos, int whence, long long curpos)
 
     strlist.clear();
 
-    Reset();
-
     strlist = QString(query).arg(recordernum);
     strlist << "SEEK" + append;
     encodeLongLong(strlist, pos);
@@ -234,6 +230,10 @@ long long RemoteFile::Seek(long long pos, int whence, long long curpos)
 
     long long retval = decodeLongLong(strlist, 0);
     readposition = retval;
+
+    Reset();
+
+    RequestBlock(2048);
 
     return retval;
 }
