@@ -1,6 +1,8 @@
 #include <iostream>
 using namespace std;
 
+#include <assert.h>
+
 #include "avformatdecoder.h"
 #include "RingBuffer.h"
 #include "NuppelVideoPlayer.h"
