@@ -15,8 +15,8 @@ extern "C" {
 
 #define LIBAVCODEC_VERSION_INT 0x000406
 #define LIBAVCODEC_VERSION     "0.4.6"
-#define LIBAVCODEC_BUILD       4668
-#define LIBAVCODEC_BUILD_STR   "4668"
+#define LIBAVCODEC_BUILD       4669
+#define LIBAVCODEC_BUILD_STR   "4669"
 
 #define LIBAVCODEC_IDENT	"FFmpeg" LIBAVCODEC_VERSION "b" LIBAVCODEC_BUILD_STR
 
@@ -31,6 +31,7 @@ enum CodecID {
     CODEC_ID_AC3,
     CODEC_ID_MJPEG,
     CODEC_ID_MJPEGB,
+    CODEC_ID_LJPEG,
     CODEC_ID_MPEG4,
     CODEC_ID_RAWVIDEO,
     CODEC_ID_MSMPEG4V1,
@@ -56,6 +57,7 @@ enum CodecID {
     CODEC_ID_AAC,
     CODEC_ID_MPEG4AAC,
     CODEC_ID_ASV1,
+    CODEC_ID_FFV1,
     CODEC_ID_4XM,
 
     /* various pcm "codecs" */
@@ -76,6 +78,9 @@ enum CodecID {
 
 	/* AMR */
     CODEC_ID_AMR_NB,
+    /* RealAudio codecs*/
+    CODEC_ID_RA_144,
+    CODEC_ID_RA_288,
 };
 
 enum CodecType {
@@ -88,24 +93,24 @@ enum CodecType {
  * Pixel format.
  */
 enum PixelFormat {
-    PIX_FMT_YUV420P,
-    PIX_FMT_YUV422,
-    PIX_FMT_RGB24,     ///< 3 bytes, R is first 
-    PIX_FMT_BGR24,     ///< 3 bytes, B is first 
-    PIX_FMT_YUV422P,
-    PIX_FMT_YUV444P,
-    PIX_FMT_RGBA32,    ///< always stored in cpu endianness 
-    PIX_FMT_YUV410P,
-    PIX_FMT_YUV411P,
+    PIX_FMT_YUV420P,   ///< Planar YUV 4:2:0 (1 Cr & Cb sample per 2x2 Y samples)
+    PIX_FMT_YUV422,    
+    PIX_FMT_RGB24,     ///< Packed pixel, 3 bytes per pixel, RGBRGB...
+    PIX_FMT_BGR24,     ///< Packed pixel, 3 bytes per pixel, BGRBGR...
+    PIX_FMT_YUV422P,   ///< Planar YUV 4:2:2 (1 Cr & Cb sample per 2x1 Y samples)
+    PIX_FMT_YUV444P,   ///< Planar YUV 4:4:4 (1 Cr & Cb sample per 1x1 Y samples)
+    PIX_FMT_RGBA32,    ///< Packed pixel, 4 bytes per pixel, BGRABGRA...
+    PIX_FMT_YUV410P,   ///< Planar YUV 4:1:0 (1 Cr & Cb sample per 4x4 Y samples)
+    PIX_FMT_YUV411P,   ///< Planar YUV 4:1:1 (1 Cr & Cb sample per 4x1 Y samples)
     PIX_FMT_RGB565,    ///< always stored in cpu endianness 
     PIX_FMT_RGB555,    ///< always stored in cpu endianness, most significant bit to 1 
     PIX_FMT_GRAY8,
     PIX_FMT_MONOWHITE, ///< 0 is white 
     PIX_FMT_MONOBLACK, ///< 0 is black 
     PIX_FMT_PAL8,      ///< 8 bit with RGBA palette 
-    PIX_FMT_YUVJ420P,  ///< YUV full scale (jpeg)
-    PIX_FMT_YUVJ422P,  ///< YUV full scale (jpeg)
-    PIX_FMT_YUVJ444P,  ///< YUV full scale (jpeg)
+    PIX_FMT_YUVJ420P,  ///< Planar YUV 4:2:0 full scale (jpeg)
+    PIX_FMT_YUVJ422P,  ///< Planar YUV 4:2:2 full scale (jpeg)
+    PIX_FMT_YUVJ444P,  ///< Planar YUV 4:4:4 full scale (jpeg)
     PIX_FMT_NB,
 };
 
@@ -1123,6 +1128,22 @@ typedef struct AVCodecContext {
      * - decoding: unused
      */
     int global_quality;
+    
+#define FF_CODER_TYPE_VLC   0
+#define FF_CODER_TYPE_AC    1
+    /**
+     * coder type
+     * - encoding: set by user.
+     * - decoding: unused
+     */
+    int coder_type;
+
+    /**
+     * context model
+     * - encoding: set by user.
+     * - decoding: unused
+     */
+    int context_model;
 } AVCodecContext;
 
 
@@ -1194,7 +1215,7 @@ typedef struct AVCodec {
  */
 typedef struct AVPicture {
     uint8_t *data[4];
-    int linesize[4];
+    int linesize[4];       ///< number of bytes per line
 } AVPicture;
 
 extern AVCodec ac3_encoder;
@@ -1206,6 +1227,7 @@ extern AVCodec h263_encoder;
 extern AVCodec h263p_encoder;
 extern AVCodec rv10_encoder;
 extern AVCodec mjpeg_encoder;
+extern AVCodec ljpeg_encoder;
 extern AVCodec mpeg4_encoder;
 extern AVCodec msmpeg4v1_encoder;
 extern AVCodec msmpeg4v2_encoder;
@@ -1215,6 +1237,7 @@ extern AVCodec wmv2_encoder;
 extern AVCodec huffyuv_encoder;
 extern AVCodec h264_encoder;
 extern AVCodec asv1_encoder;
+extern AVCodec ffv1_encoder;
 
 extern AVCodec h263_decoder;
 extern AVCodec mpeg4_decoder;
@@ -1245,9 +1268,14 @@ extern AVCodec h264_decoder;
 extern AVCodec indeo3_decoder;
 extern AVCodec vp3_decoder;
 extern AVCodec amr_nb_decoder;
+extern AVCodec amr_nb_encoder;
 extern AVCodec aac_decoder;
 extern AVCodec mpeg4aac_decoder;
 extern AVCodec asv1_decoder;
+extern AVCodec ffv1_decoder;
+extern AVCodec fourxm_decoder;
+extern AVCodec ra_144_decoder;
+extern AVCodec ra_288_decoder;
 
 /* pcm codecs */
 #define PCM_CODEC(id, name) \
@@ -1268,6 +1296,7 @@ PCM_CODEC(CODEC_ID_PCM_MULAW, pcm_mulaw);
 PCM_CODEC(CODEC_ID_ADPCM_IMA_QT, adpcm_ima_qt);
 PCM_CODEC(CODEC_ID_ADPCM_IMA_WAV, adpcm_ima_wav);
 PCM_CODEC(CODEC_ID_ADPCM_MS, adpcm_ms);
+PCM_CODEC(CODEC_ID_ADPCM_4XM, adpcm_4xm);
 
 #undef PCM_CODEC
 

@@ -84,6 +84,7 @@ SHFLAGS=-shared
 netserver="no"
 need_inet_aton="no"
 ffserver="no"
+ffplay="no"
 LDFLAGS=-Wl,--warn-common
 FFSLDFLAGS=-Wl,-E
 LIBPREF="lib"
@@ -93,6 +94,7 @@ SLIBSUF=".so"
 risky="yes"
 small="no"
 amr_nb="no"
+amr_nb_fixed="no"
 
 # OS specific
 targetos=`uname -s`
@@ -321,11 +323,15 @@ for opt do
   ;;
   --disable-ffserver) ffserver="no"
   ;;
+  --disable-ffplay) ffplay="no"
+  ;;
   --disable-risky) risky="no"
   ;;
   --enable-small) small="yes"
   ;;
   --enable-amr_nb) amr_nb="yes"
+  ;;
+  --enable-amr_nb-fixed) amr_nb_fixed="yes"
   ;;
   esac
 done
@@ -590,6 +596,9 @@ if test "$vhook" = "default" ; then
   vhook="$dlopen"
 fi
 
+##########################################
+# imlib probe
+
 cat > $TMPC << EOF
 #include <X11/Xlib.h>
 #include <Imlib2.h>
@@ -600,6 +609,9 @@ imlib2=no
 if $cc -o $TMPE $TMPC -lImlib2 2> /dev/null  ; then
 imlib2=yes
 fi
+
+##########################################
+# freetype probe
 
 cat > $TMPC << EOF
 #include <ft2build.h>
@@ -613,6 +625,31 @@ if test "x$targetos" != "xBeOS" && test "$os2" != "yes"; then
       freetype2=yes
     fi
   fi
+fi
+
+##########################################
+# SDL probe
+
+cat > $TMPC << EOF
+#include <SDL.h>
+#undef main /* We don't want SDL to override our main() */
+int main( void ) { return SDL_Init (SDL_INIT_VIDEO); }
+EOF
+
+sdl_too_old=no
+sdl=no
+if $cc -o $TMPE `sdl-config --cflags` $TMPC `sdl-config --libs`  2> /dev/null  ; then
+_sdlversion=`sdl-config --version | sed 's/[^0-9]//g'`
+if test "$_sdlversion" -lt 121 ; then
+sdl_too_old=yes
+else
+sdl=yes
+fi
+fi
+
+
+if test "$sdl" = "no" ; then
+   ffplay=no
 fi
 
 if test "$small" = "yes"; then
@@ -642,6 +679,7 @@ echo "  --help                   print this message"
 #echo "  --enable-shared-pp       use libpostproc.so [default=no]"
 #echo "  --enable-shared          build shared libraries [default=no]"
 #echo "  --enable-amr_nb          enable amr_nb audio codec"
+#echo "  --enable-amr_nb-fixed    use fixed point for amr-nb codec"
 #echo ""
 echo "Advanced options (experts only):"
 #echo "  --source-path=PATH       path of source code [$source_path]"
@@ -666,6 +704,7 @@ echo "  --disable-simple_idct    disable simple IDCT routines [default=no]"
 echo "  --disable-mpegaudio-hp   faster (but less accurate)"
 echo "                           mpegaudio decoding [default=no]"
 #echo "  --disable-ffserver       disable ffserver build"
+#echo "  --disable-ffplay         disable ffplay build"
 #echo "  --disable-risky          disables patent encumbered codecs"
 #echo "  --enable-small           optimize for size instead of speed"
 #echo ""
@@ -702,6 +741,10 @@ echo "lcdproc support   $lcdproc"
 #echo "pp support       $pp"
 #echo "shared pp        $shared_pp"
 #echo "Video hooking    $vhook"
+#echo "SDL support      $sdl"
+#if test $sdl_too_old = "yes"; then
+#echo "-> Your SDL version is too old - please upgrade to have FFplay/SDL support"
+#fi
 #echo "risky / patent encumbered codecs $risky"
 #echo "optimize for size $small"
 
@@ -709,7 +752,8 @@ echo "lcdproc support   $lcdproc"
 #echo "Imlib2 support   $imlib2"
 #echo "freetype support $freetype2"
 #fi
-#echo "AMR-NB support"  $amr_nb
+#echo "AMR-NB float support"  $amr_nb
+#echo "AMR-NB fixed support"  $amr_nb_fixed
 
 echo "Creating config.mak and config.h"
 
@@ -761,6 +805,7 @@ fi
 if test "$mmx" = "yes" ; then
   echo "TARGET_MMX=yes" >> config.mak
   echo "#define HAVE_MMX 1" >> $TMPH
+  echo "#define __CPU__ 586" >> $TMPH
 fi
 #if test "$builtin_vector" = "yes" ; then
 #  echo "TARGET_BUILTIN_VECTOR=yes" >> config.mak
@@ -795,6 +840,11 @@ if test "$imlib2" = "yes" ; then
 fi
 if test "$freetype2" = "yes" ; then
   echo "HAVE_FREETYPE2=yes" >> config.mak
+fi
+if test "$sdl" = "yes" ; then
+  echo "CONFIG_SDL=yes" >> config.mak
+  echo "SDL_LIBS=`sdl-config --libs`" >> config.mak
+  echo "SDL_CFLAGS=`sdl-config --cflags`" >> config.mak
 fi
 if test "$have_lrintf" = "yes" ; then
   echo "#define HAVE_LRINTF 1" >> $TMPH
@@ -970,6 +1020,10 @@ if test "$ffserver" = "yes" ; then
   echo "CONFIG_FFSERVER=yes" >> config.mak
 fi
 
+if test "$ffplay" = "yes" ; then
+  echo "CONFIG_FFPLAY=yes" >> config.mak
+fi
+
 if test "$risky" = "yes" ; then
   echo "#define CONFIG_RISKY 1" >> $TMPH
   echo "CONFIG_RISKY=yes" >> config.mak
@@ -995,11 +1049,24 @@ if test "$amr_nb" = "yes" ; then
   echo "#define AMR_NB 1" >> $TMPH
   echo "AMR_NB=yes" >> config.mak
   echo
-  echo "AMR NB NOTICE! Make sure you have downloaded TS26.073 from "
+if test "$amr_nb_fixed" = "yes" ; then
+  echo "AMR_NB_FIXED=yes" >> config.mak
+  echo "#define AMR_NB_FIXED 1" >> $TMPH
+  echo "AMR NB FIXED POINT NOTICE! Make sure you have downloaded TS26.073 "
+  echo "REL-5 version 5.1.0 from "
   echo "http://www.3gpp.org/ftp/Specs/latest/Rel-5/26_series/26073-510.zip"
   echo "and extracted src to libavcodec/amr"
-  echo "You must also add -DMMS_IO to CFLAGS in libavcodec/amr/makefile."
+  echo "You must also add -DMMS_IO and remove -pedantic-errors to/from CFLAGS in libavcodec/amr/makefile."
+  echo "i.e. CFLAGS = -Wall -I. \$(CFLAGS_\$(MODE)) -D\$(VAD) -DMMS_IO"
   echo
+else
+  echo "AMR NB FLOAT NOTICE ! Make sure you have downloaded TS26.104"
+  echo "REL-5 V5.1.0 from "
+  echo "http://www.3gpp.org/ftp/Specs/latest/Rel-5/26_series/26104-510.zip"
+  echo "and extracted the source to libavcodec/amr_float"
+  echo
+fi
+
 fi
 
 diff $TMPH config.h >/dev/null 2>&1

@@ -37,14 +37,15 @@ typedef struct CABACContext{
     uint8_t lps_range[2*64][4];   ///< rangeTabLPS
     uint8_t lps_state[2*64];      ///< transIdxLPS
     uint8_t mps_state[2*64];      ///< transIdxMPS
+    uint8_t *bytestream_start;
     uint8_t *bytestream;
     int bits_left;                ///<
     PutBitContext pb;
 }CABACContext;
 
-const uint8_t ff_h264_lps_range[64][4];
-const uint8_t ff_h264_mps_state[64];
-const uint8_t ff_h264_lps_state[64];
+extern const uint8_t ff_h264_lps_range[64][4];
+extern const uint8_t ff_h264_mps_state[64];
+extern const uint8_t ff_h264_lps_state[64];
 
 void ff_init_cabac_encoder(CABACContext *c, uint8_t *buf, int buf_size);
 void ff_init_cabac_decoder(CABACContext *c, uint8_t *buf, int buf_size);
@@ -138,7 +139,11 @@ static inline void put_cabac_bypass(CABACContext *c, int bit){
 #endif
 }
 
-static inline void put_cabac_terminate(CABACContext *c, int bit){
+/**
+ *
+ * @return the number of bytes written
+ */
+static inline int put_cabac_terminate(CABACContext *c, int bit){
     c->range -= 2;
 
     if(!bit){
@@ -159,6 +164,8 @@ static inline void put_cabac_terminate(CABACContext *c, int bit){
 #ifdef STRICT_LIMITS
     c->symCount++;
 #endif
+
+    return (get_bit_count(&c->pb)+7)>>3;
 }
 
 /**
@@ -199,12 +206,16 @@ static inline void put_cabac_u(CABACContext *c, uint8_t * state, int v, int max,
 /**
  * put unary exp golomb k-th order binarization.
  */
-static inline void put_cabac_ueg(CABACContext *c, uint8_t * state, int v, int sign, int max, int is_signed, int k, int max_index){
+static inline void put_cabac_ueg(CABACContext *c, uint8_t * state, int v, int max, int is_signed, int k, int max_index){
     int i;
     
     if(v==0)
         put_cabac(c, state, 0);
     else{
+        const int sign= v < 0;
+        
+        if(is_signed) v= ABS(v);
+        
         if(v<max){
             for(i=0; i<v; i++){
                 put_cabac(c, state, 1);
@@ -299,13 +310,17 @@ static inline int get_cabac_bypass(CABACContext *c){
     }
 }
 
+/**
+ *
+ * @return the number of bytes read or 0 if no end
+ */
 static inline int get_cabac_terminate(CABACContext *c){
     c->range -= 2<<8;
     if(c->low < c->range){
         renorm_cabac_decoder(c);    
         return 0;
     }else{
-        return 1;
+        return c->bytestream - c->bytestream_start;
     }    
 }
 

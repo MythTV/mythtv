@@ -59,6 +59,10 @@
 /* in case you can't read a file, try commenting */
 #define MOV_SPLIT_CHUNKS
 
+/* Special handling for movies created with Minolta Dimaxe Xi*/
+/* this fix should not interfere with other .mov files, but just in case*/
+#define MOV_MINOLTA_FIX
+
 /* some streams in QT (and in MP4 mostly) aren't either video nor audio */
 /* so we first list them as this, then clean up the list of streams we give back, */
 /* getting rid of these */
@@ -651,7 +655,6 @@ static int mov_read_smi(MOVContext *c, ByteIOContext *pb, MOV_atom_t atom)
     st->codec.extradata = (uint8_t*) av_mallocz(st->codec.extradata_size);
 
     if (st->codec.extradata) {
-        int i;
 	strcpy(st->codec.extradata, "SVQ3"); // fake
 	get_buffer(pb, st->codec.extradata + 0x5a, atom.size);
 	//printf("Reading SMI %Ld  %s\n", atom.size, (char*)st->codec.extradata + 0x5a);
@@ -768,9 +771,10 @@ static int mov_read_stsd(MOVContext *c, ByteIOContext *pb, MOV_atom_t atom)
 	    st->codec.bits_per_sample = get_be16(pb); /* depth */
             st->codec.color_table_id = get_be16(pb); /* colortable id */
 
+/*          These are set in mov_read_stts and might already be set!
             st->codec.frame_rate      = 25;
             st->codec.frame_rate_base = 1;
-
+*/
 	    size -= (16+8*4+2+32+2*2);
 #if 0
 	    while (size >= 8) {
@@ -878,7 +882,7 @@ static int mov_read_stsd(MOVContext *c, ByteIOContext *pb, MOV_atom_t atom)
                get_byte(pb); //frames_per_sample
 
 #ifdef DEBUG
-               printf("Audio: damr_type=%c%c%c%c damr_size=%Ld damr_vendor=%c%c%c%c\n",
+               printf("Audio: damr_type=%c%c%c%c damr_size=%d damr_vendor=%c%c%c%c\n",
                        (damr_type >> 24) & 0xff,
                        (damr_type >> 16) & 0xff,
                        (damr_type >> 8) & 0xff,
@@ -890,7 +894,7 @@ static int mov_read_stsd(MOVContext *c, ByteIOContext *pb, MOV_atom_t atom)
                        (damr_vendor >> 0) & 0xff
 		       );
 #endif
-                
+
                st->time_length=0;//Not possible to get from this info, must count number of AMR frames
                st->codec.sample_rate=8000;
                st->codec.channels=1;
@@ -898,9 +902,20 @@ static int mov_read_stsd(MOVContext *c, ByteIOContext *pb, MOV_atom_t atom)
                st->codec.bit_rate=0; /*It is not possible to tell this before we have 
                                        an audio frame and even then every frame can be different*/
 	    }
-	    else
-	    {
-                get_be16(pb); /* version */
+            else if( st->codec.codec_tag == MKTAG( 'm', 'p', '4', 's' ))
+            {
+                //This is some stuff for the hint track, lets ignore it!
+                //Do some mp4 auto detect.
+                c->mp4=1;
+                size-=(16);
+                url_fskip(pb, size); /* The mp4s atom also contians a esds atom that we can skip*/
+            }
+	    else if(size>=(16+20))
+	    {//16 bytes read, reading atleast 20 more
+#ifdef DEBUG
+                printf("audio size=0x%X\n",size);
+#endif
+                uint16_t version = get_be16(pb); /* version */
                 get_be16(pb); /* revision level */
                 get_be32(pb); /* vendor */
 
@@ -925,14 +940,51 @@ static int mov_read_stsd(MOVContext *c, ByteIOContext *pb, MOV_atom_t atom)
 	        default:
                     ;
 	        }
-	        get_be32(pb); /* samples per packet */
-	        get_be32(pb); /* bytes per packet */
-                get_be32(pb); /* bytes per frame */
-                get_be32(pb); /* bytes per sample */
-	        {
-		    MOV_atom_t a = { format, url_ftell(pb), size - (16 + 20 + 16 + 8) };
-		    mov_read_default(c, pb, a);
-	        }
+
+                //Read QT version 1 fields. In version 0 theese dont exist
+#ifdef DEBUG
+                printf("version =%d mp4=%d\n",version,c->mp4);
+                printf("size-(16+20+16)=%d\n",size-(16+20+16));
+#endif
+                if((version==1) && size>=(16+20+16))
+                {
+                    get_be32(pb); /* samples per packet */
+                    get_be32(pb); /* bytes per packet */
+                    get_be32(pb); /* bytes per frame */
+                    get_be32(pb); /* bytes per sample */
+                    if(size>(16+20+16))
+                    {
+                        //Optional, additional atom-based fields
+#ifdef DEBUG
+                        printf("offest=0x%X, sizeleft=%d=0x%x,format=%c%c%c%c\n",(int)url_ftell(pb),size - (16 + 20 + 16 ),size - (16 + 20 + 16 ),
+                            (format >> 0) & 0xff,
+                            (format >> 8) & 0xff,
+                            (format >> 16) & 0xff,
+                            (format >> 24) & 0xff);
+#endif
+                        MOV_atom_t a = { format, url_ftell(pb), size - (16 + 20 + 16 + 8) };
+                        mov_read_default(c, pb, a);
+                    }
+                }
+                else
+                {
+                    //We should be down to 0 bytes here, but lets make sure.
+                    size-=(16+20);
+#ifdef DEBUG
+                    if(size>0)
+                        printf("skipping 0x%X bytes\n",size-(16+20));
+#endif
+                    url_fskip(pb, size);
+                }
+            }
+            else
+            {
+                size-=16;
+                //Unknown size, but lets do our best and skip the rest.
+#ifdef DEBUG
+                printf("Strange size, skipping 0x%X bytes\n",size);
+#endif
+                url_fskip(pb, size);
             }
         }
     }
@@ -1043,16 +1095,43 @@ printf("track[%i].stts.entries = %i\n", c->fc->nb_streams-1, entries);
 #endif
     }
 
-    if(st->codec.codec_type==CODEC_TYPE_VIDEO)
+#define MAX(a,b) a>b?a:b
+#define MIN(a,b) a>b?b:a
+    /*The stsd atom which contain codec type sometimes comes after the stts so we cannot check for codec_type*/
+    if(duration>0)
     {
+        //Find greatest common divisor to avoid overflow using the Euclidean Algorithm...
+        uint32_t max=MAX(duration,total_sample_count);
+        uint32_t min=MIN(duration,total_sample_count);
+        uint32_t spare=max%min;
+
+        while(spare!=0)
+        {
+            max=min;
+            min=spare;
+            spare=max%min;
+        }
+        
+        duration/=min;
+        total_sample_count/=min;
+
         //Only support constant frame rate. But lets calculate the average. Needed by .mp4-files created with nec e606 3g phone.
-        //Hmm, lets set base to 1
-        st->codec.frame_rate_base=1;
-        st->codec.frame_rate = st->codec.frame_rate_base * c->streams[c->total_streams]->time_scale * total_sample_count / duration;
+        //To get better precision, we use the duration as frame_rate_base
+
+        st->codec.frame_rate_base=duration;
+        st->codec.frame_rate = c->streams[c->total_streams]->time_scale * total_sample_count;
+
 #ifdef DEBUG
-        printf("VIDEO FRAME RATE average= %i (tot sample count= %i ,tot dur= %i)\n", st->codec.frame_rate,total_sample_count,duration);
+        printf("FRAME RATE average (video or audio)= %f (tot sample count= %i ,tot dur= %i timescale=%d)\n", (float)st->codec.frame_rate/st->codec.frame_rate_base,total_sample_count,duration,c->streams[c->total_streams]->time_scale);
 #endif
     }
+    else
+    {
+        st->codec.frame_rate_base = 1;
+        st->codec.frame_rate = c->streams[c->total_streams]->time_scale;
+    }
+#undef MAX
+#undef MIN
     return 0;
 }
 
@@ -1330,10 +1409,11 @@ static int mov_probe(AVProbeData *p)
         case MKTAG( 'f', 'r', 'e', 'e' ):
         case MKTAG( 'm', 'd', 'a', 't' ):
         case MKTAG( 'p', 'n', 'o', 't' ): /* detect movs with preview pics like ew.mov and april.mov */
+        case MKTAG( 'u', 'd', 't', 'a' ): /* Packet Video PVAuthor adds this and a lot of more junk */
             return AVPROBE_SCORE_MAX;
         case MKTAG( 'f', 't', 'y', 'p' ):
         case MKTAG( 's', 'k', 'i', 'p' ):
-            offset = to_be32(p->buf) + offset;
+            offset = to_be32(p->buf+offset) + offset;
             break;
         default:
             /* unrecognized tag */
@@ -1362,8 +1442,6 @@ static int mov_read_header(AVFormatContext *s, AVFormatParameters *ap)
     else
 	atom.size = 0x7FFFFFFFFFFFFFFFLL;
 
-    if (atom.size == 0)
-        atom.size = 0x7FFFFFFFFFFFFFFFLL;
 #ifdef DEBUG
     printf("filesz=%Ld\n", atom.size);
 #endif
@@ -1488,6 +1566,33 @@ again:
 	    && ((msc->chunk_offsets[msc->next_chunk] - offset) < size))
 	    size = msc->chunk_offsets[msc->next_chunk] - offset;
     }
+
+#ifdef MOV_MINOLTA_FIX
+    //Make sure that size is according to sample_size (Needed by .mov files 
+    //created on a Minolta Dimage Xi where audio chunks contains waste data in the end)
+    //Maybe we should really not only check sc->sample_size, but also sc->sample_sizes
+    //but I have no such movies
+    if (sc->sample_size > 0) { 
+        int foundsize=0;
+        for(i=0; i<(sc->sample_to_chunk_sz); i++) {
+            if( (sc->sample_to_chunk[i].first)<=(sc->next_chunk) && (sc->sample_size>0) )
+            {
+                foundsize=sc->sample_to_chunk[i].count*sc->sample_size;
+            }
+#ifdef DEBUG
+            /*printf("sample_to_chunk first=%ld count=%ld, id=%ld\n", sc->sample_to_chunk[i].first, sc->sample_to_chunk[i].count, sc->sample_to_chunk[i].id);*/
+#endif
+        }
+        if( (foundsize>0) && (foundsize<size) )
+        {
+#ifdef DEBUG
+            /*printf("this size should actually be %d\n",foundsize);*/
+#endif
+            size=foundsize;
+        }
+    }
+#endif //MOV_MINOLTA_FIX
+
 #ifdef MOV_SPLIT_CHUNKS
     /* split chunks into samples */
     if (sc->sample_size == 0) {
@@ -1519,7 +1624,6 @@ readchunk:
 
     //printf("READCHUNK hlen: %d  %d off: %Ld   pos:%Ld\n", size, sc->header_len, offset, url_ftell(&s->pb));
     if (sc->header_len > 0) {
-        // XXX
         av_new_packet(pkt, size + sc->header_len, 0);
         memcpy(pkt->data, sc->header_data, sc->header_len);
         get_buffer(&s->pb, pkt->data + sc->header_len, size);
@@ -1527,7 +1631,6 @@ readchunk:
         av_freep(&sc->header_data);
         sc->header_len = 0;
     } else {
-        // XXX
         av_new_packet(pkt, size, 0);
         get_buffer(&s->pb, pkt->data, pkt->size);
     }

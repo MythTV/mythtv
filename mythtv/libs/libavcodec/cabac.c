@@ -91,6 +91,7 @@ void ff_init_cabac_encoder(CABACContext *c, uint8_t *buf, int buf_size){
  * @param buf_size size of buf in bits
  */
 void ff_init_cabac_decoder(CABACContext *c, uint8_t *buf, int buf_size){
+    c->bytestream_start= 
     c->bytestream= buf;
 
     c->low= *c->bytestream++;
@@ -158,7 +159,7 @@ STOP_TIMER("put_cabac_u")
 
     for(i=0; i<SIZE; i++){
 START_TIMER
-        put_cabac_ueg(&c, state, r[i], 0, 3, 0, 1, 2);
+        put_cabac_ueg(&c, state, r[i], 3, 0, 1, 2);
 STOP_TIMER("put_cabac_ueg")
     }    
    

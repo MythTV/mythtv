@@ -314,6 +314,9 @@ int gif_init(void);
 /* au.c */
 int au_init(void);
 
+/* amr.c */
+int amr_init(void);
+
 /* wav.c */
 int wav_init(void);
 
@@ -329,12 +332,12 @@ int dv_init(void);
 /* ffm.c */
 int ffm_init(void);
 
-/* 4xm.c */
-int fourxm_init(void);
-
 /* rtsp.c */
 extern AVInputFormat redir_demux;
 int redir_open(AVFormatContext **ic_ptr, ByteIOContext *f);
+
+/* 4xm.c */
+int fourxm_init(void);
 
 /* yuv4mpeg.c */
 extern AVOutputFormat yuv4mpegpipe_oformat;
@@ -424,6 +427,16 @@ int strstart(const char *str, const char *val, const char **ptr);
 int stristart(const char *str, const char *val, const char **ptr);
 void pstrcpy(char *buf, int buf_size, const char *str);
 char *pstrcat(char *buf, int buf_size, const char *s);
+
+void __dynarray_add(unsigned long **tab_ptr, int *nb_ptr, unsigned long elem);
+
+#define dynarray_add(tab, nb_ptr, elem)\
+do {\
+    typeof(tab) _tab = (tab);\
+    typeof(elem) _elem = (elem);\
+    (void)sizeof(**_tab == _elem); /* check that types are compatible */\
+    __dynarray_add((unsigned long **)_tab, nb_ptr, (unsigned long)_elem);\
+} while(0)
 
 struct in_addr;
 int resolve_host(struct in_addr *sin_addr, const char *hostname);

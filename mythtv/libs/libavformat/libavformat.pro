@@ -14,4 +14,4 @@ QMAKE_CFLAGS_DEBUG = -g -DHAVE_AV_CONFIG_H -I.. -D_FILE_OFFSET_BITS=64 -D_LARGEF
 HEADERS += avformat.h avi.h avio.h
 
 SOURCES += 4xm.c allformats.c asf.c avidec.c avienc.c avio.c aviobuf.c cutils.c
-SOURCES += file.c mov.c mpeg.c mpegts.c mpjpeg.c rm.c utils.c wav.c
+SOURCES += file.c mov.c mpeg.c mpegts.c mpegtsenc.c mpjpeg.c rm.c utils.c wav.c
