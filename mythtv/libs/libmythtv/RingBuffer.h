@@ -19,6 +19,9 @@ class RingBuffer
     int Read(void *buf, int count);
     int Write(const void *buf, int count);
 
+    // this should _only_ be used when transitioning from livetv->recording
+    int WriteToDumpFile(const void *buf, int count);
+
     void TransitionToFile(const string &lfilename);
     void TransitionToRing(void);
 

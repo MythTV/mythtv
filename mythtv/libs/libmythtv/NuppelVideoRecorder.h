@@ -64,7 +64,7 @@ class NuppelVideoRecorder
 
     float GetFrameRate(void) { return video_frame_rate; }
   
-    void WriteHeader(void);
+    void WriteHeader(bool todumpfile = false);
  
  protected:
     static void *WriteThread(void *param);

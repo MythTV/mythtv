@@ -660,8 +660,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 
     videosize = video_width * video_height * 3 / 2;
  
-    X11videobuf = XJ_init(video_width, video_height, "Mythical Convergence",
-                          "MythTV");
+    X11videobuf = XJ_init(video_width, video_height, "MythTV", "MythTV");
 
     int pause_rpos = 0;
     while (!eof && !killplayer)
@@ -710,6 +709,8 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         delay = (nexttrigger.tv_sec - now.tv_sec) * 1000000 +
                 (nexttrigger.tv_usec - now.tv_usec); // uSecs
 
+        if (delay > 1000000)
+            printf("%d\n", delay);
         /* trigger */
         if (delay > 0)
             usleep(delay);

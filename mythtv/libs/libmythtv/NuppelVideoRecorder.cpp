@@ -668,7 +668,7 @@ void NuppelVideoRecorder::BufferIt(unsigned char *buf)
     return;
 }
 
-void NuppelVideoRecorder::WriteHeader(void)
+void NuppelVideoRecorder::WriteHeader(bool todumpfile)
 {
     struct rtfileheader fileheader;
     struct rtframeheader frameheader;
@@ -695,7 +695,10 @@ void NuppelVideoRecorder::WriteHeader(void)
     fileheader.textsblocks = 0;
     fileheader.keyframedist = KEYFRAMEDISTEND;
 
-    ringBuffer->Write(&fileheader, FILEHEADERSIZE);
+    if (todumpfile)
+        ringBuffer->WriteToDumpFile(&fileheader, FILEHEADERSIZE);
+    else
+        ringBuffer->Write(&fileheader, FILEHEADERSIZE);
 
     memset(&frameheader, 0, sizeof(frameheader));
     frameheader.frametype = 'D'; // compressor data
@@ -703,10 +706,16 @@ void NuppelVideoRecorder::WriteHeader(void)
     frameheader.packetlength = sizeof(tbls);
 
     // compression configuration header
-    ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
+    if (todumpfile)
+        ringBuffer->WriteToDumpFile(&frameheader, FRAMEHEADERSIZE);
+    else
+        ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
 
     // compression configuration data
-    ringBuffer->Write(tbls, sizeof(tbls));
+    if (todumpfile)
+        ringBuffer->WriteToDumpFile(tbls, sizeof(tbls));
+    else
+        ringBuffer->Write(tbls, sizeof(tbls));
 
     last_block = 0;
     lf = 0; // that resets framenumber so that seeking in the

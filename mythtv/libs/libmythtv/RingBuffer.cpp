@@ -71,7 +71,8 @@ void RingBuffer::TransitionToFile(const string &lfilename)
 {
     pthread_rwlock_wrlock(&rwlock);
 
-    dumpfd = open(filename.c_str(), O_WRONLY|O_TRUNC|O_CREAT|O_LARGEFILE, 0644);
+    dumpfd = open(lfilename.c_str(), 
+                  O_WRONLY|O_TRUNC|O_CREAT|O_LARGEFILE, 0644);
 
     pthread_rwlock_unlock(&rwlock);
 }
@@ -164,6 +165,12 @@ int RingBuffer::Read(void *buf, int count)
     return ret;
 }
 
+int RingBuffer::WriteToDumpFile(const void *buf, int count)
+{
+    int ret = write(dumpfd, buf, count);
+    return ret;
+}
+
 int RingBuffer::Write(const void *buf, int count)
 {
     int ret = -1;
@@ -212,6 +219,7 @@ int RingBuffer::Write(const void *buf, int count)
         {
             write(dumpfd, buf, count);
         }
+        sync();
     }
 
     pthread_rwlock_unlock(&rwlock);
@@ -247,9 +255,9 @@ long long RingBuffer::Seek(long long pos, int whence)
 	    totalreadpos += pos;
 	}
     }
-    return ret;
-
     pthread_rwlock_unlock(&rwlock);
+
+    return ret;
 }
 
 long long RingBuffer::GetFreeSpace(void)

@@ -39,7 +39,6 @@ time_t RecordingInfo::GetEndTime(void)
 {
     struct tm *convtime = GetStructTM(endtime);
     time_t ret = mktime(convtime);
-
     free(convtime);
     return ret;
 }

@@ -107,7 +107,7 @@ void TV::LiveTV(void)
         int result = system(cmdline);
 
         if (result > 0)
-            result -= 255;
+            result = WEXITSTATUS(result);
 
         if (result == 1)
         {
@@ -131,7 +131,9 @@ void TV::LiveTV(void)
 int TV::AllowRecording(RecordingInfo *rcinfo, int timeuntil)
 {
     if (internalState != kState_WatchingLiveTV)
+    {
         return 1;
+    }
 
     string channame;
     rcinfo->GetChannel(channame);
@@ -463,9 +465,15 @@ void TV::HandleStateChange(void)
     else if (internalState == kState_WatchingLiveTV &&  
              nextState == kState_WatchingRecording)
     {
+        nvp->Pause();
+        while (!nvp->GetPause())
+            usleep(5);
+
         nvr->Pause();
         while (!nvr->GetPause())
             usleep(5);
+
+        rbuffer->Reset();
 
         string channame;
         curRecording->GetChannel(channame);
@@ -473,10 +481,17 @@ void TV::HandleStateChange(void)
         channel->SetChannelByString(channame);
 
         rbuffer->TransitionToFile(outputFilename);
-        nvr->WriteHeader();
-
+        nvr->WriteHeader(true);
+        nvr->Reset();
         nvr->Unpause();
 
+        nvp->ResetPlaying();
+        while (!nvp->ResetYet())
+            usleep(5);
+
+        usleep(300000);
+
+        nvp->Unpause();
         internalState = nextState;
         changed = true;
 
@@ -487,7 +502,14 @@ void TV::HandleStateChange(void)
              (internalState == kState_WatchingPreRecorded &&
               nextState == kState_WatchingLiveTV))
     {
+        nvp->Pause();
+        while (!nvp->GetPause())
+            usleep(50);
+
         rbuffer->TransitionToRing();
+
+        nvp->Unpause();
+ 
         WriteRecordedRecord();
  
         internalState = nextState;
@@ -523,7 +545,7 @@ void TV::HandleStateChange(void)
     }
 
     if (sleepBetween) 
-        usleep(200000);
+        usleep(300000);
 
     if (startPlayer)
     {
@@ -841,9 +863,9 @@ void TV::ChangeChannel(bool up)
     while (!nvp->ResetYet())
         usleep(5);
 
-    UpdateOSD();
+    usleep(300000);
 
-    usleep(200000);
+    UpdateOSD();
 
     nvp->Unpause();
 
@@ -916,9 +938,9 @@ void TV::ChangeChannel(char *name)
     while (!nvp->ResetYet())
         usleep(5);
 
-    UpdateOSD();
+    usleep(300000);
 
-    usleep(200000);
+    UpdateOSD();
 
     nvp->Unpause();
 }
