@@ -100,12 +100,11 @@ GuideGrid::GuideGrid(const QString &channel, TV *player, QWidget *parent,
 
     // The 'Current Listings' and 'Future Programs' bar at the bottom of the screen.
     showProgramBar = gContext->GetNumSetting("EPGProgramBar", 1);
+    altTransparent = gContext->GetNumSetting("EPGTransparency");
 
     programGuideType = gContext->GetNumSetting("EPGType");
     if (programGuideType == 1)
     {
-	altTransparent = gContext->GetNumSetting("AltEPGTransparent");
-
 	int dNum = gContext->GetNumSetting("chanPerPage", 8);
 	desiredDisplayChans = DISPLAY_CHANS = dNum;
 
@@ -1284,7 +1283,7 @@ void GuideGrid::paintPrograms(QPainter *p)
                     if (endy > pr.bottom())
                         endy = pr.bottom();
 
-		    if (altTransparent == 0 || programGuideType != 1)
+		    if (altTransparent == 0)
 		    {
                        unsigned int *data = NULL;
 
@@ -1328,6 +1327,16 @@ void GuideGrid::paintPrograms(QPainter *p)
                 
                 int startx = (int)(x * xdifference + 7 * wmult);
                 int kstartx = startx;
+		int ystart = 1;
+                int rectheight = (int)(ydifference - 3 * tmphmult);
+		int xstart = 1;
+		if (x != 0)
+                    xstart = (int)(x * xdifference + 2 * tmpwmult);
+		int xend = (int)(xdifference * spread - 4 * tmpwmult);
+                if (x == 0)
+                    xend += (int)(1 * tmpwmult);
+		int rrOffset = 5;
+                int rRound = 12;
 
                 if (programGuideType != 1)
                 {
@@ -1342,20 +1351,11 @@ void GuideGrid::paintPrograms(QPainter *p)
 
                 startx = (int)((x + spread) * xdifference); 
 
-                int ystart = 1;
-                int rectheight = (int)(ydifference - 3 * tmphmult);
                 if (y != 0)
                 {
                     ystart = (int)(ydifference * y + 2 * tmphmult);
                     rectheight = (int)(ydifference - 4 * tmphmult);
                 }
-
-                int xstart = 1;
-                if (x != 0)
-                    xstart = (int)(x * xdifference + 2 * tmpwmult);
-                int xend = (int)(xdifference * spread - 4 * tmpwmult);
-                if (x == 0)
-                    xend += (int)(1 * tmpwmult);
 
                 if (programGuideType != 1)
                 {
@@ -1427,8 +1427,6 @@ void GuideGrid::paintPrograms(QPainter *p)
                 }
                 else
                 {
-                    int rrOffset = 5;
-                    int rRound = 12;
 
                     // PROGRAM BACKGROUND COLOR
 		    if (altTransparent != 0)
