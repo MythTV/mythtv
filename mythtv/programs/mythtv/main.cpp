@@ -16,7 +16,6 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     gContext = new MythContext();
-    gContext->ConnectServer("localhost", 6543);
 
     QString themename = gContext->GetSetting("Theme");
     QString themedir = gContext->FindThemeDir(themename);
@@ -39,6 +38,10 @@ int main(int argc, char *argv[])
         printf("couldn't open db\n");
         return -1;
     }
+
+    QString server = gContext->GetSetting("MasterServerIP", "localhost");
+    int port = gContext->GetNumSetting("MasterServerPort", 6543);
+    gContext->ConnectServer(server, port);
 
     TV *tv = new TV(db);
     tv->Init();

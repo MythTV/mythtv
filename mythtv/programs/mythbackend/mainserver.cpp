@@ -355,8 +355,8 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             }
 
             QString lpath = proginfo->GetRecordFilename(fileprefix);
-            QString ip = gContext->GetSetting("ServerIP");
-            QString port = gContext->GetSetting("ServerPort");
+            QString ip = gContext->GetSetting("BackendServerIP");
+            QString port = gContext->GetSetting("BackendServerPort");
 
             if (pbs->isLocal())
                 proginfo->pathname = lpath;
@@ -581,8 +581,8 @@ void MainServer::HandleGetFreeRecorder(PlaybackSock *pbs)
     }
 
     strlist << QString::number(retval);
-    strlist << gContext->GetSetting("ServerIP");
-    strlist << gContext->GetSetting("ServerPort");
+    strlist << gContext->GetSetting("BackendServerIP");
+    strlist << gContext->GetSetting("BackendServerPort");
 
     WriteStringList(pbs->getSocket(), strlist);
 }
@@ -647,8 +647,8 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
 
         enc->SetupRingBuffer(path, filesize, fillamount, pip);
 
-        QString ip = gContext->GetSetting("ServerIP");
-        QString port = gContext->GetSetting("ServerPort");
+        QString ip = gContext->GetSetting("BackendServerIP");
+        QString port = gContext->GetSetting("BackendServerPort");
         QString url = QString("rbuf://") + ip + ":" + port + path;
 
         retlist << url;
@@ -895,8 +895,8 @@ void MainServer::HandleGetRecorderNum(QStringList &slist, PlaybackSock *pbs)
     }
     
     QStringList retlist = QString::number(retval);
-    retlist << gContext->GetSetting("ServerIP");
-    retlist << gContext->GetSetting("ServerPort");
+    retlist << gContext->GetSetting("BackendServerIP");
+    retlist << gContext->GetSetting("BackendServerPort");
 
     WriteStringList(pbs->getSocket(), retlist);    
 }

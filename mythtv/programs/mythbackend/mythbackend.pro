@@ -10,11 +10,6 @@ TARGET = mythbackend
 target.path = $${PREFIX}/bin
 INSTALLS = target
 
-setting.path = $${PREFIX}/share/mythtv/
-setting.files += backend_settings.txt
-
-INSTALLS += setting
-
 INCLUDEPATH += ../../libs/libmythtv ../../libs
 DEPENDPATH += ../../libs/libmythtv ../../libs/libmyth ../../libs/libavcodec
 DEPENDPATH += ../../libs/libvbitext

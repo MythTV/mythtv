@@ -126,7 +126,6 @@ int main(int argc, char **argv)
     }
 
     gContext = new MythContext(false);
-    gContext->LoadSettingsFiles("backend_settings.txt");
 
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!db)
@@ -153,8 +152,8 @@ int main(int argc, char **argv)
     QSqlDatabase *scdb = QSqlDatabase::database("SUBDB");
     Scheduler *sched = new Scheduler(&tvList, scdb);
 
-    int port = gContext->GetNumSetting("ServerPort", 6543);
-    int statusport = gContext->GetNumSetting("StatusPort", 6544);
+    int port = gContext->GetNumSetting("BackendServerPort", 6543);
+    int statusport = gContext->GetNumSetting("BackendStatusPort", 6544);
 
     new MainServer(port, statusport, &tvList);
 

@@ -92,8 +92,8 @@ bool MythContext::ConnectServer(const QString &hostname, int port)
         if (num > 100)
         {
             cerr << "Connection timed out.\n";
-            cerr << "You probably should edit backend_settings.txt and\n";
-            cerr << "set the proper IP address in there.\n";
+            cerr << "You probably should modify the Master Server settings\n";
+            cerr << "in the setup program and set the proper IP address.\n";
             exit(0);
         }
     }

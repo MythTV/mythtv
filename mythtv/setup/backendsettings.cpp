@@ -39,6 +39,66 @@ protected:
     };
 };
 
+class LocalServerIP: public LineEditSetting, public BackendHostSetting {
+public:
+    LocalServerIP():
+        BackendHostSetting("BackendServerIP") {
+            QString hostname = gContext->GetHostName();
+            QString label = "IP address for " + gContext->GetHostName();
+            setLabel(label);
+            setValue("127.0.0.1");
+            setHelpText("Enter the IP address of this machine.  Use an "
+                        "externally accessible address (ie, not 127.0.0.1) "
+                        "if you are going to be running a frontend on a "
+                        "different machine than this one.");
+    };
+};
+
+class LocalServerPort: public LineEditSetting, public BackendHostSetting {
+public:
+    LocalServerPort():
+        BackendHostSetting("BackendServerPort") {
+            setLabel("Port the server runs on");
+            setValue("6543");
+            setHelpText("Unless you've got good reason to, don't change this.");
+    };
+};
+
+class LocalStatusPort: public LineEditSetting, public BackendHostSetting {
+public:
+    LocalStatusPort():
+        BackendHostSetting("BackendStatusPort") {
+            setLabel("Port the server ");
+            setValue("6544");
+            setHelpText("Port which the server will listen to for HTTP "
+                        "requests.  Currently, it shows a little status "
+                        "information.");
+    };
+};
+
+class MasterServerIP: public LineEditSetting, public BackendSetting {
+public:
+    MasterServerIP():
+        BackendSetting("MasterServerIP") {
+            setLabel("Master Server IP address");
+            setValue("127.0.0.1");
+            setHelpText("The IP address of the master backend server. All "
+                        "frontend and non-master backend machines will connect "
+                        "to this server.  If you only have one backend, this "
+                        "should be the same IP address as above.");
+    };
+};
+
+class MasterServerPort: public LineEditSetting, public BackendSetting {
+public:
+    MasterServerPort():
+        BackendSetting("BackendServerPort") {
+            setLabel("Port the master server runs on");
+            setValue("6543");
+            setHelpText("Unless you've got good reason to, don't change this.");
+    };
+};
+
 class RecordFilePrefix: public LineEditSetting, public BackendHostSetting {
 public:
     RecordFilePrefix():
@@ -177,6 +237,15 @@ public:
 };
 
 BackendSettings::BackendSettings() {
+    VerticalConfigurationGroup* server = new VerticalConfigurationGroup(false);
+    server->setLabel("Host Address Backend Setup");
+    server->addChild(new LocalServerIP());
+    server->addChild(new LocalServerPort());
+    server->addChild(new LocalStatusPort());
+    server->addChild(new MasterServerIP());
+    server->addChild(new MasterServerPort());
+    addChild(server);
+
     VerticalConfigurationGroup* group1 = new VerticalConfigurationGroup(false);
     group1->setLabel("Host-specific Backend Setup");
     group1->addChild(new RecordFilePrefix());

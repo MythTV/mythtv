@@ -230,7 +230,6 @@ int main(int argc, char **argv)
     QApplication a(argc, argv);
 
     gContext = new MythContext;
-    gContext->ConnectServer("localhost", 6543);
 
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!db)
@@ -244,6 +243,10 @@ int main(int argc, char **argv)
         printf("couldn't open db\n");
         return -1;
     }
+
+    QString server = gContext->GetSetting("MasterServerIP", "localhost");
+    int port = gContext->GetNumSetting("MasterServerPort", 6543);
+    gContext->ConnectServer(server, port);
 
     WriteDefaults(db);
 
