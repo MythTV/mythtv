@@ -103,7 +103,10 @@ void DatabaseBox::fillCD(void)
 
         QString level = "title";
 
-        new TreeCheckItem(cditem, title, level, track);
+        TreeCheckItem *item = new TreeCheckItem(cditem, title, level, track);
+
+        if (plist->find(*track) != plist->end())
+            item->setOn(true);
 
         tracknum--;
     }

@@ -287,6 +287,9 @@ void PlaybackBox::setupListView(void)
    
     QValueList<Metadata>::iterator it = plist->end();
     int count = plist->size();
+    if (count == 0)
+        return;
+
     it--;
     while (it != plist->end())
     {
