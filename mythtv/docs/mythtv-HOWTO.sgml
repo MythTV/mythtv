@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-11-01, v2.88
+<date>2003-11-04, v2.89
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -67,7 +67,6 @@ The contributors to MythTV are:<label id="contributors">
 <item>Developer:  John Danner, <url url="mailto:jdanner@untzuntz.com">
 <item>Developer:  Chris Pinkham, <url url="mailto:cpinkham@bc2va.org">
 <item>Overall structure of HOWTO and Mandrake 9.x documentation: Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<item>Red Hat Linux 8.0 documentation: Cedar McKay, <url url="mailto:mythhowto.3.ohthetrees@spamgourmet.com">
 <item>Gentoo documentation and package: Tony Clark, <url url="mailto:tclark@telia.com">
 <item>Gentoo documentation and package: Max Kalika, <url url="mailto:max@gentoo.org">
 <item>Debian package: Matt Zimmerman, <url url="mailto:mdz@debian.org">
@@ -150,9 +149,9 @@ simultaneously serve content to a remote frontend.
 
 The second mode of operation is where MythTV is paired with a hardware-based
 video encoder, such as a Matrox G200 or a Hauppauge WinTV-PVR-250/350.  In
-this mode, because the video encoding is being done externally, the CPU
-requirements are quite low.  See the <ref id="video_capture_device"
-name="Video Capture Device"> section for details.
+this mode, because the video encoding is being done by a dedicated video
+processor, the host CPU requirements are quite low.  See the <ref
+id="video_capture_device" name="Video Capture Device"> section for details.
 
 If you have a Via M10000 series or a Hauppauge PVR-350, MythTV can use the
 hardware-based video decoder for playback, which further reduces CPU
@@ -459,6 +458,13 @@ satisfying any prerequisites.
 system to store the master database.  This does not necessarily mean that
 MySQL must run on one of the MythTV boxes.
 
+<bf>NOTE</bf>:  The following distributions have issues which may prevent a
+successful MythTV installation:
+<itemize>
+<item>Suse 8.2 - Broken Qt package
+<item>Red Hat 8 - does not meet minimum version requirement for Qt (3.1)
+</itemize>
+
 <sect2>Pre-compiled packages. <label id="precompiled">
 <p>A number of people have created pre-compiled packages for MythTV that may
 make your installation easier.
@@ -475,7 +481,7 @@ additional configuration steps in this HOWTO.  The next logical step is
 <ref id="mysql" name="configuring MySQL">, which you may or may not have to
 perform.  See your package documentation.
 
-<sect3>Red Hat Linux 9
+<sect3>Red Hat Linux
 <label id="atrpms">
 <p>Red Hat Linux 9 packages for MythTV and most of its add-on modules and
 some themes have been packaged by <url
@@ -545,6 +551,9 @@ versa.  Installation instructions can be found on those pages as well.
 All of the prerequisites for MythTV are available as Debian packages,
 most of them from the official Debian archive.
 
+<bf>NOTE</bf>:  As of 2003-11-03, the .debs are still for MythTV 0.11.  New
+.debs will be created some time in December 2003.
+
 <p>
 If you are running woody, be sure to follow the instructions on the
 above page to ensure that the MySQL server starts up immediately after
@@ -579,7 +588,7 @@ pre-packaged <bf>lirc</bf>.  If you are using <bf>XMLTV</bf> as a grabber,
 you will need <bf>perl</bf>.
 
 <code>
-NOTE:  Qt v3.1 is recommended, but not required.
+NOTE:  Qt v3.1 is required.
 
 NOTE:  If you are going to be using RPMs to install various
 components, you should be aware that not all packages include the necessary
@@ -5016,6 +5025,8 @@ v2.87, 2003-10-25.  Add link to nuvexport website.  Fix broken section header fo
 mythtranscode.
 v2.88, 2003-11-01.  Fix PVR-250 firmware version.  Geoffrey Hausheer's 10.5
 revision.  Incorporate bstoneaz suggestion on crontab location.
+v2.89, 2003-11-04.  Add note on Debian .debs, remove Cedar from authors
+section, add note on RH8, add note for Qt3.1 minimum.
 -->
 
 <!--

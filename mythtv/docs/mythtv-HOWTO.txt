@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-11-01, v2.88
+  2003-11-04, v2.89
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -34,7 +34,7 @@
         3.1.9 External Adapters
      3.2 Software.
         3.2.1 Pre-compiled packages.
-           3.2.1.1 Red Hat Linux 9
+           3.2.1.1 Red Hat Linux
            3.2.1.2 Mandrake
            3.2.1.3 Debian
         3.2.2 Manual installation
@@ -282,9 +282,6 @@
   +o  Overall structure of HOWTO and Mandrake 9.x documentation: Robert
      Kulagowski,  <mailto:rkulagow@rocketmail.com>
 
-  +o  Red Hat Linux 8.0 documentation: Cedar McKay,
-     <mailto:mythhowto.3.ohthetrees@spamgourmet.com>
-
   +o  Gentoo documentation and package: Tony Clark,
      <mailto:tclark@telia.com>
 
@@ -345,6 +342,7 @@
   can be made.  For example, if you have plenty of CPU, you can use
   higher bitrates or capture sizes, etc.
 
+
   MythTV has two modes of operation.  First, it can function as a
   software video encoder, which means that it uses a fairly generic
   "dumb" video capture card to get frames of video, encodes them using
@@ -392,8 +390,8 @@
   The second mode of operation is where MythTV is paired with a
   hardware-based video encoder, such as a Matrox G200 or a Hauppauge
   WinTV-PVR-250/350.  In this mode, because the video encoding is being
-  done externally, the CPU requirements are quite low.  See the ``Video
-  Capture Device'' section for details.
+  done by a dedicated video processor, the host CPU requirements are
+  quite low.  See the ``Video Capture Device'' section for details.
 
   If you have a Via M10000 series or a Hauppauge PVR-350, MythTV can use
   the hardware-based video decoder for playback, which further reduces
@@ -756,6 +754,13 @@
   to store the master database.  This does not necessarily mean that
   MySQL must run on one of the MythTV boxes.
 
+  [1mNOTE[22m:  The following distributions have issues which may prevent a
+  successful MythTV installation:
+
+  +o  Suse 8.2 - Broken Qt package
+
+  +o  Red Hat 8 - does not meet minimum version requirement for Qt (3.1)
+
 
   [1m3.2.1.  Pre-compiled packages.[0m
 
@@ -775,7 +780,7 @@
   to perform.  See your package documentation.
 
 
-  [1m3.2.1.1.  Red Hat Linux 9[0m
+  [1m3.2.1.1.  Red Hat Linux[0m
 
   Red Hat Linux 9 packages for MythTV and most of its add-on modules and
   some themes have been packaged by mailto:Axel.Thimm@physik.fu-
@@ -797,12 +802,13 @@
   atrpms-kickstart package <http://atrpms.physik.fu-
   berlin.de/dist/rh9/atrpms-kickstart/>.  Install the package with:
 
-
-       # rpm -Uvh atrpms-kickstart*
+  # rpm -Uvh atrpms-kickstart*
 
 
 
   Then update your [1mapt [22mpackage listings:
+
+
        # apt-get update
 
 
@@ -852,6 +858,9 @@
   the prerequisites for MythTV are available as Debian packages, most of
   them from the official Debian archive.
 
+  [1mNOTE[22m:  As of 2003-11-03, the .debs are still for MythTV 0.11.  New
+  .debs will be created some time in December 2003.
+
 
   If you are running woody, be sure to follow the instructions on the
   above page to ensure that the MySQL server starts up immediately after
@@ -864,7 +873,6 @@
   installation.  This user has access to write new recordings to disk in
   the default directory, read and write the database, access the audio
   and video devices, and everything else that MythTV needs to do.
-
 
 
   See /usr/share/doc/[4mpackagename[24m/README.Debian for more information,
@@ -888,7 +896,7 @@
 
 
   ______________________________________________________________________
-  NOTE:  Qt v3.1 is recommended, but not required.
+  NOTE:  Qt v3.1 is required.
 
   NOTE:  If you are going to be using RPMs to install various
   components, you should be aware that not all packages include the necessary
@@ -989,7 +997,6 @@
   +o  SQL Database Server -  you will have to click on "details" and make
      sure "mysql-server" is checked.  (only required on the master
      system)
-
   +o  Development Tools
 
   +o  X Software Development
@@ -997,7 +1004,6 @@
   +o  KDE Software Development
 
   +o  Kernel Development
-
 
   Click Install to continue.
 
@@ -1051,14 +1057,13 @@
 
 
 
-       $ urpmi mesa-common-devel libmng1-devel mysql-devel libunixodbc2-devel
-       $ urpmi postgresql-devel xfree86-static-libs
+  $ urpmi mesa-common-devel libmng1-devel mysql-devel libunixodbc2-devel
+  $ urpmi postgresql-devel xfree86-static-libs
 
 
 
   Once all of the prerequisites have been installed, the next step is to
   obtain and compile the source RPM.
-
 
   Go to http://www.rpmfind.net <http://www.rpmfind.net> and search for
   qt3.  There will be a number of different versions available.  As of
@@ -1168,7 +1173,8 @@
   /etc/make.conf and rebuild Qt by running
 
 
-       # emerge qt
+
+  # emerge qt
 
 
 
@@ -1233,8 +1239,6 @@
        # exit
        $
 
-
-
   [1m4.2.2.  Distribution-Specific Notes[0m
 
   [1m4.2.2.1.  Red Hat[0m
@@ -1244,8 +1248,6 @@
   It's recommended to run [1m/sbin/ldconfig [22mafter installing every package.
   Failing that, always run it if you get an unexpected error about not
   finding libraries.
-
-
 
   [1m4.3.  Environment variable Requirements for MythTV[0m
 
@@ -1297,16 +1299,17 @@
   and d at the same time.
 
 
-       $ su
-       # cd /etc/profile.d
-       cat > mythtv.sh
-       export QTDIR=/usr/lib/qt3
-       export PATH=$PATH:/usr/lib/qt3/bin
-       ^D
 
-       # chmod a+x mythtv.sh
-       # exit
-       $ exit
+  $ su
+  # cd /etc/profile.d
+  cat > mythtv.sh
+  export QTDIR=/usr/lib/qt3
+  export PATH=$PATH:/usr/lib/qt3/bin
+  ^D
+
+  # chmod a+x mythtv.sh
+  # exit
+  $ exit
 
 
 

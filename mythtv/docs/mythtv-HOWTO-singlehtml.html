@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2003-11-01, v2.88
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2003-11-04, v2.89
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -263,8 +263,6 @@ like to install a custom version of Knoppix optimized for MythTV.</P>
 <A HREF="mailto:cpinkham@bc2va.org">mailto:cpinkham@bc2va.org</A></LI>
 <LI>Overall structure of HOWTO and Mandrake 9.x documentation: Robert Kulagowski, 
 <A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></LI>
-<LI>Red Hat Linux 8.0 documentation: Cedar McKay, 
-<A HREF="mailto:mythhowto.3.ohthetrees@spamgourmet.com">mailto:mythhowto.3.ohthetrees@spamgourmet.com</A></LI>
 <LI>Gentoo documentation and package: Tony Clark, 
 <A HREF="mailto:tclark@telia.com">mailto:tclark@telia.com</A></LI>
 <LI>Gentoo documentation and package: Max Kalika, 
@@ -351,8 +349,8 @@ simultaneously serve content to a remote frontend.</LI>
 </P>
 <P>The second mode of operation is where MythTV is paired with a hardware-based
 video encoder, such as a Matrox G200 or a Hauppauge WinTV-PVR-250/350.  In
-this mode, because the video encoding is being done externally, the CPU
-requirements are quite low.  See the 
+this mode, because the video encoding is being done by a dedicated video
+processor, the host CPU requirements are quite low.  See the 
 <A HREF="#video_capture_device">Video Capture Device</A> section for details.</P>
 <P>If you have a Via M10000 series or a Hauppauge PVR-350, MythTV can use the
 hardware-based video decoder for playback, which further reduces CPU
@@ -655,6 +653,13 @@ satisfying any prerequisites.</P>
 <P><B>NOTE</B>: you must have the MySQL database software installed on a
 system to store the master database.  This does not necessarily mean that
 MySQL must run on one of the MythTV boxes.</P>
+<P><B>NOTE</B>:  The following distributions have issues which may prevent a
+successful MythTV installation:
+<UL>
+<LI>Suse 8.2 - Broken Qt package</LI>
+<LI>Red Hat 8 - does not meet minimum version requirement for Qt (3.1)</LI>
+</UL>
+</P>
 
 <H3><A NAME="precompiled"></A> Pre-compiled packages. </H3>
 
@@ -671,7 +676,7 @@ additional configuration steps in this HOWTO.  The next logical step is
 <A HREF="#mysql">configuring MySQL</A>, which you may or may not have to
 perform.  See your package documentation.</P>
 
-<H3><A NAME="atrpms"></A> Red Hat Linux 9</H3>
+<H3><A NAME="atrpms"></A> Red Hat Linux</H3>
 
 <P>Red Hat Linux 9 packages for MythTV and most of its add-on modules and
 some themes have been packaged by 
@@ -743,6 +748,8 @@ system; the woody packages cannot be installed on unstable, nor vice
 versa.  Installation instructions can be found on those pages as well.
 All of the prerequisites for MythTV are available as Debian packages,
 most of them from the official Debian archive.</P>
+<P><B>NOTE</B>:  As of 2003-11-03, the .debs are still for MythTV 0.11.  New
+.debs will be created some time in December 2003.</P>
 
 <P>If you are running woody, be sure to follow the instructions on the
 above page to ensure that the MySQL server starts up immediately after
@@ -776,7 +783,7 @@ you will need <B>perl</B>.</P>
 <P>
 <HR>
 <PRE>
-NOTE:  Qt v3.1 is recommended, but not required.
+NOTE:  Qt v3.1 is required.
 
 NOTE:  If you are going to be using RPMs to install various
 components, you should be aware that not all packages include the necessary
