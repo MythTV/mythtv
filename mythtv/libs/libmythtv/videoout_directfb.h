@@ -69,7 +69,7 @@ static inline void * memcpy_pic(unsigned char * dst, unsigned char * src, int by
         int i;
         void *retval=dst;
 
-        if(dstStride == srcStride) memcpy(dst, src, srcStride*height);
+        if (dstStride == srcStride) memcpy(dst, src, srcStride*height);
         else
         {
                 for(i=0; i<height; i++)

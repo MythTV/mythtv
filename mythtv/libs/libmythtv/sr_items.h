@@ -251,7 +251,7 @@ class SRDupMethod: public SRSelectSetting
             : SRSelectSetting(_parent, "dupMethodList", "[ Match duplicates with ]", _group, 
                               "dupmethod", _list) 
         {
-            if(gContext->GetNumSetting("HaveRepeats", 0))
+            if (gContext->GetNumSetting("HaveRepeats", 0))
                 addSelection("Record new episodes only", kDupCheckNewEpi);
                 
             addSelection("Match duplicates using subtitle & description", kDupCheckSubDesc);
@@ -608,7 +608,7 @@ class SRRecGroup: public SRSelectSetting
         }
         
         virtual QString getValue(void) const {
-            if(settingValue == "__NEW_GROUP__")
+            if (settingValue == "__NEW_GROUP__")
                 return QString("Default");
             else
                 return settingValue;

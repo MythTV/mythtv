@@ -234,9 +234,9 @@ public:
 
     void selectCodecs(QString groupType)
     {
-        if(!groupType.isNull())
+        if (!groupType.isNull())
         {
-            if(groupType == "MPEG")
+            if (groupType == "MPEG")
                codecName->addSelection("MPEG-2 Hardware Encoder");
             else
             {
@@ -588,11 +588,11 @@ public:
 
     void selectCodecs(QString groupType)
     {
-        if(!groupType.isNull())
+        if (!groupType.isNull())
         {
-            if(groupType == "MPEG")
+            if (groupType == "MPEG")
                codecName->addSelection("MPEG-2 Hardware Encoder");
-            else if(groupType == "MJPEG")
+            else if (groupType == "MJPEG")
                 codecName->addSelection("Hardware MJPEG");
             else
             {
@@ -720,12 +720,12 @@ bool RecordingProfile::loadByCard(QSqlDatabase* db, QString name, int cardid) {
     if (result.isActive() && result.numRowsAffected() > 0) {
         while (result.next())
         {
-            if(result.value(1).toString() == hostname)
+            if (result.value(1).toString() == hostname)
             {
                 id = result.value(0).toInt();
                 break;
             }
-            else if(result.value(2).toInt() == 1)
+            else if (result.value(2).toInt() == 1)
                 id = result.value(0).toInt();
         }
     }
@@ -782,7 +782,7 @@ RecordingProfileEditor::RecordingProfileEditor(QSqlDatabase* _db,
     labelName = profName;
     db = _db;
     group = id;
-    if(! labelName.isNull())
+    if (! labelName.isNull())
         this->setLabel(labelName);
 }
 
@@ -817,7 +817,7 @@ void RecordingProfile::fillSelections(QSqlDatabase* db, SelectSetting* setting, 
         {
             while (result.next())
             {
-                if(group == TRANSCODER_GROUP)
+                if (group == TRANSCODER_GROUP)
                 {
                     setting->addSelection(QString( "From %1").arg(result.value(0).toString()),
                                           result.value(1).toString());
@@ -853,7 +853,7 @@ void RecordingProfile::fillSelections(QSqlDatabase* db, SelectManagedListItem* s
         {
             while (result.next())
             {
-                if(group == TRANSCODER_GROUP)
+                if (group == TRANSCODER_GROUP)
                 {
                     setting->addSelection(QString( "From %1").arg(result.value(0).toString()),
                                           result.value(1).toString());

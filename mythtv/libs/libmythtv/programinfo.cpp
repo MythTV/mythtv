@@ -270,7 +270,7 @@ bool ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
         chansign = "";
     if (recgroup == " ")
         recgroup = QString("Default");
-    if(chanOutputFilters == " ")
+    if (chanOutputFilters == " ")
         chanOutputFilters = "";
     if (seriesid == " ")
         seriesid = "";
@@ -364,7 +364,7 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
 
     progMap["time"] = timeNow.time().toString(timeFormat);
 
-    if(db)
+    if (db)
     {
         QString thequery = QString("SELECT icon FROM channel WHERE chanid = %1")
                                    .arg(chanid);
@@ -392,7 +392,7 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
     progMap["seriesid"] = seriesid;
     progMap["programid"] = programid;
     
-    if(stars)
+    if (stars)
         progMap["stars"] = QString("(%1 %2) ").arg(4.0 * stars).arg(QObject::tr("stars"));
     else
         progMap["stars"] = "";
@@ -493,7 +493,7 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
         proginfo->stars = query.value(15).toString().toFloat();
         proginfo->repeat = query.value(16).toInt();
         
-        if(query.value(17).isNull() || query.value(17).toString().isEmpty())
+        if (query.value(17).isNull() || query.value(17).toString().isEmpty())
         {
             proginfo->originalAirDate = proginfo->startts.date();
             proginfo->hasAirDate = false;
@@ -2023,7 +2023,7 @@ void ProgramInfo::showDetails(QSqlDatabase *db)
 
     QString attr = "";
 
-    if(partnumber > 0)
+    if (partnumber > 0)
         attr = QString("Part %1 of %2, ").arg(partnumber).arg(parttotal);
 
     if (rating != "" && rating != "NR")
@@ -2056,7 +2056,7 @@ void ProgramInfo::showDetails(QSqlDatabase *db)
     }
     msg += "\n";
 
-    if(category != "")
+    if (category != "")
         msg += QObject::tr("Category:  ") + category + "\n";
 
     if (category_type  != "")
@@ -2067,7 +2067,7 @@ void ProgramInfo::showDetails(QSqlDatabase *db)
         msg += "\n";
     }
 
-    if(epinum != "")
+    if (epinum != "")
         msg += QObject::tr("Episode Number:  ") + epinum + "\n";
 
     if (hasAirDate && category_type != "movie")
@@ -2075,7 +2075,7 @@ void ProgramInfo::showDetails(QSqlDatabase *db)
         msg += QObject::tr("Original Airdate:  ");
         msg += originalAirDate.toString(oldDateFormat) + "\n";
     }
-    if(programid  != "")
+    if (programid  != "")
         msg += QObject::tr("Program ID:  ") + programid + "\n";
 
     QString role = "", pname = "";
@@ -2131,7 +2131,7 @@ void ProgramInfo::showDetails(QSqlDatabase *db)
                 msg += "Director:  " + plist + "\n";
         }
     }
-    if(filesize > 0)
+    if (filesize > 0)
     {
         msg += QObject::tr("Filesize:  ") + longLongToString(filesize) + "\n";
         msg += QObject::tr("Recording Group:  ") + recgroup + "\n";
@@ -2495,7 +2495,7 @@ bool ProgramList::FromProgram(QSqlDatabase *db, const QString sql,
         
         
         
-        if(query.value(16).isNull() || query.value(16).toString().isEmpty())
+        if (query.value(16).isNull() || query.value(16).toString().isEmpty())
         {
             p->originalAirDate = p->startts.date();
             p->hasAirDate = false;

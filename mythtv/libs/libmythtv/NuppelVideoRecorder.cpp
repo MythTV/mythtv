@@ -650,7 +650,7 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
         lame_set_mode(gf, audio_channels == 2 ? STEREO : MONO);
         lame_set_num_channels(gf, audio_channels);
         lame_set_in_samplerate(gf, audio_samplerate);
-        if((tmp = lame_init_params(gf)) != 0)
+        if ((tmp = lame_init_params(gf)) != 0)
         {
             cerr << "lame_init_params error " << tmp << "\n";
             compressaudio = false; 
@@ -3212,9 +3212,9 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
     if (freecount < 5 || rawmode)
         raw = 1; // speed up the encode process
     
-    if(raw==1 || compressthis==0) 
+    if (raw==1 || compressthis==0) 
     {
-        if(ringBuffer->IsIOBound())
+        if (ringBuffer->IsIOBound())
         {
             /* need to compress, the disk can't handle any more bandwidth*/
             raw=0;
@@ -3477,7 +3477,7 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
         int gaplesssize = 0;
         int lameret = 0;
 
-        if(audio_channels == 2)
+        if (audio_channels == 2)
         {
             lameret = lame_encode_buffer_interleaved(gf, (short int *)buf,
                                                      audio_buffer_size / 

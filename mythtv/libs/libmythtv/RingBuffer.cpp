@@ -558,7 +558,7 @@ int RingBuffer::safe_read(RemoteFile *rf, void *data, unsigned sz)
     int ret = 0;
 
     ret = rf->Read(data, sz);
-    if(ret < 0)
+    if (ret < 0)
     {
         VERBOSE(VB_IMPORTANT, "RemoteFile::Read() failed in RingBuffer::safe_read().");
         rf->Seek(internalreadpos, SEEK_SET);

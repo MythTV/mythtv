@@ -168,7 +168,7 @@ void ScheduledRecording::loadBySearch(QSqlDatabase *db,
 
 void ScheduledRecording::fetchChannelInfo(QSqlDatabase *db)
 {
-    if(channel->getValue().toInt() > 0)
+    if (channel->getValue().toInt() > 0)
     {
         QString queryStr(QString("SELECT channum, callsign, name FROM channel WHERE chanid = '%1';").arg(channel->getValue()));
         
@@ -226,7 +226,7 @@ void ScheduledRecording::ToMap(QMap<QString, QString>& progMap)
         progMap["enddate"] = endTime->getValue();
         
         
-        if(chanstr.isEmpty())
+        if (chanstr.isEmpty())
         {
             progMap["channum"] = QObject::tr("Any");
             progMap["longchannel"] = QObject::tr("Any");
@@ -640,7 +640,7 @@ void ScheduledRecording::setDefault(QSqlDatabase *db, bool haschannel)
 
      
     
-    if(!type)   
+    if (!type)   
     {
         cerr << "No type object" << endl;
         return;

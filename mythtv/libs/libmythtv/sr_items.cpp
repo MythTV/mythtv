@@ -44,13 +44,13 @@ void SRDupSettingsGroup::syncText()
 
     text = dupMethItem->getItem()->getText();
         
-    if((meth != kDupCheckNone) && (meth != kDupCheckNewEpi))
+    if ((meth != kDupCheckNone) && (meth != kDupCheckNewEpi))
     {
-        if(loc == kDupsInAll)
+        if (loc == kDupsInAll)
             text += ", in current and previous recordings";
-        else if(kDupsInRecorded)
+        else if (kDupsInRecorded)
             text += ", in current recordings only";
-        else if(kDupsInOldRecorded)
+        else if (kDupsInOldRecorded)
             text += ", in previous recordings only";
     }    
 }
@@ -110,7 +110,7 @@ void SREpisodesGroup::syncText()
     
     text = maxEpisodes->getItem()->getText();
     
-    if(maxEpi != 0)
+    if (maxEpi != 0)
         text += QString(", %1").arg(maxNewest->getItem()->getText());
     
 }
@@ -144,9 +144,9 @@ SRSchedOptionsGroup::SRSchedOptionsGroup(ScheduledRecording& _rec, ManagedList* 
 void SRSchedOptionsGroup::itemChanged(ManagedListItem*)
 {
     
-    if(dupMethItem->getItem()->getEnabled())
+    if (dupMethItem->getItem()->getEnabled())
     {
-        if((dupMethItem->getItem()->getValue().toInt() != kDupCheckNone) && 
+        if ((dupMethItem->getItem()->getValue().toInt() != kDupCheckNone) && 
            (dupMethItem->getItem()->getValue().toInt() != kDupCheckNewEpi) )
             dupLocItem->getItem()->setEnabled(true);
         else
@@ -160,9 +160,9 @@ void SRSchedOptionsGroup::setEnabled(bool isScheduled, bool multiEpisode)
     
     dupMethItem->getItem()->setEnabled(isScheduled & multiEpisode);
     
-    if(dupMethItem->getItem()->getEnabled())
+    if (dupMethItem->getItem()->getEnabled())
     {
-        if(dupMethItem->getItem()->getValue().toInt() != kDupCheckNone)
+        if (dupMethItem->getItem()->getValue().toInt() != kDupCheckNone)
             dupLocItem->getItem()->setEnabled(true);
         else
             dupLocItem->getItem()->setEnabled(false);
@@ -218,7 +218,7 @@ void SRRecGroup::showNewRecGroup()
     bool ok = MythPopupBox::showGetTextPopup(gContext->GetMainWindow(), QObject::tr("Create New Recording Group"),
                                        QObject::tr("Using your keyboard or the numbers keys on your remote enter the group name"),
                                        newGroup);
-    if(ok)
+    if (ok)
     {
         addSelection(QString(QObject::tr("Store in the \"%1\" recording group")).arg(newGroup), newGroup, true);
         selectItem->selectValue(newGroup);

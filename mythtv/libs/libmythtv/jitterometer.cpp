@@ -37,7 +37,7 @@ bool Jitterometer::RecordEndTime()
 
   gettimeofday(&timenow, NULL);
 
-  if(starttime_valid)
+  if (starttime_valid)
     {
       times[count] =
         (timenow.tv_sec  - starttime.tv_sec ) * 1000000 +
@@ -50,7 +50,7 @@ bool Jitterometer::RecordEndTime()
 
   starttime_valid = 0;
 
-  if(count==num_cycles)
+  if (count==num_cycles)
     {
       /* compute and display stuff, reset count to -1  */
 

@@ -389,7 +389,7 @@ void ProgFinder::escape()
 
 void ProgFinder::showGuide()
 {
-    if(!ggActive)
+    if (!ggActive)
     {
         QString startchannel = gContext->GetSetting("DefaultTVChannel");
         if (startchannel == "")

@@ -94,7 +94,7 @@ void RecOptDialog::paintEvent(QPaintEvent *e)
     QRect r = e->rect();
     QPainter p(this);
     
-    if( updateAll || r.intersects(infoRect))
+    if ( updateAll || r.intersects(infoRect))
         updateInfo(&p);
     
     listMenu.paintEvent(r, &p, updateAll);
@@ -120,10 +120,10 @@ void RecOptDialog::keyPressEvent(QKeyEvent *e)
         handled = true;
         if (action == "ESCAPE")
         {
-            if(!listMenu.goBack())
+            if (!listMenu.goBack())
                 done(MythDialog::Rejected);
         }
-        else if(!listMenu.getLocked())
+        else if (!listMenu.getLocked())
         {
             if (action == "UP")
                 listMenu.cursorUp(false);
@@ -162,9 +162,9 @@ void RecOptDialog::updateInfo(QPainter *p)
     if (container)
     {  
         
-        if(infoMap.isEmpty())
+        if (infoMap.isEmpty())
         {
-            if(schedRec)
+            if (schedRec)
                 schedRec->ToMap(infoMap);
             else
                 // this should NEVER happen

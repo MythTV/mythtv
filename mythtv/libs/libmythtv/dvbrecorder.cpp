@@ -185,7 +185,7 @@ bool DVBRecorder::Open()
     }
 
     fd_dvr = open(dvbdevice(DVB_DEV_DVR,cardnum), O_RDONLY | O_NONBLOCK);
-    if(fd_dvr < 0)
+    if (fd_dvr < 0)
     {
         ERRNO("Recorder: Failed to open dvb device");
         return false;

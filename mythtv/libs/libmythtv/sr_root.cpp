@@ -88,7 +88,7 @@ void RootSRGroup::itemChanged(ManagedListItem*)
                 break;
     }
     
-    if(isScheduled)
+    if (isScheduled)
     {
         recordAsShownItem->setText(QString("[ %1 ]").arg(QObject::tr("Record this program as shown")));
         recordAsShownItem->setState(MLS_BOLD);
@@ -96,7 +96,7 @@ void RootSRGroup::itemChanged(ManagedListItem*)
     }
     else
     {
-        if(schedRec.getRecordID() > 0)
+        if (schedRec.getRecordID() > 0)
         {
             recordAsShownItem->setText(QString("[ %1 ]").arg(QObject::tr("Cancel this recording")));
             recordAsShownItem->setState(MLS_BOLD);

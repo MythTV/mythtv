@@ -731,7 +731,7 @@ void CommDetect::BuildBlankFrameCommList(void)
         blankCommMap[r] = MARK_COMM_START;
 
         r = c_end[i];
-        if( i < (commercials-1))
+        if ( i < (commercials-1))
         {
             for(x = 0; x < (frames-1); x++)
                 if (bframes[x] == r)

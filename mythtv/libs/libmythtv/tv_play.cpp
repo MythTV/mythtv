@@ -877,15 +877,15 @@ QString TV::getFiltersForChannel()
     
     QString chan_name;
     
-    if(playbackinfo) // Recordings have this info already.
+    if (playbackinfo) // Recordings have this info already.
         chanFilters = playbackinfo->chanOutputFilters;
-    else if(activerecorder)
+    else if (activerecorder)
     {
         // Live TV requires a lookup
         activerecorder->GetOutputFilters(chanFilters);
     }
     
-    if((chanFilters.length() > 1) && (chanFilters[0] != '+'))
+    if ((chanFilters.length() > 1) && (chanFilters[0] != '+'))
     {
         filters = chanFilters;
     }
@@ -1857,7 +1857,7 @@ void TV::DoPause(void)
     speed_index = 0;
     float time = 0.0;
 
-    if(doing_ff_rew)
+    if (doing_ff_rew)
     {
         time = StopFFRew();
         activenvp->Play(1.0, true);

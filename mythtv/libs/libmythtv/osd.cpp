@@ -403,12 +403,12 @@ void OSD::parseFont(QDomElement &element)
 
     if (fontSizeType == "small")
     {
-        if(sizeSmall > 0)
+        if (sizeSmall > 0)
             size = sizeSmall;
     }
     else if (fontSizeType == "big")
     {
-        if(sizeBig > 0)
+        if (sizeBig > 0)
             size = sizeBig;
     }
     

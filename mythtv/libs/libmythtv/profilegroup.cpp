@@ -170,7 +170,7 @@ void ProfileGroupEditor::open(int id) {
                 bool skip = false;
                 for (QValueList <int>::Iterator j = found.begin();
                        j != found.end(); j++)
-                    if(i == *j)
+                    if (i == *j)
                         skip = true;
                 if (! skip)
                 {

@@ -240,7 +240,7 @@ VideoOutputDirectfb::~VideoOutputDirectfb()
         tempYV12Surface->Release(tempYV12Surface);
     if (data->primarySurface)
         data->primarySurface->Release(data->primarySurface);
-    if(data->primaryLayer)
+    if (data->primaryLayer)
         data->primaryLayer->Release(data->primaryLayer);
     if (data->videoLayer)
         data->videoLayer->Release(data->videoLayer);
@@ -341,7 +341,7 @@ bool VideoOutputDirectfb::Init(int width, int height, float aspect, WId winid,
     //clear primary layer
     desc.flags = DSDESC_CAPS;
     desc.caps = DSCAPS_PRIMARY;
-    if(data->cardCapabilities.acceleration_mask & DFXL_BLIT)
+    if (data->cardCapabilities.acceleration_mask & DFXL_BLIT)
         desc.caps = (DFBSurfaceCapabilities)(desc.caps | DSCAPS_DOUBLE);
     DFBCHECKFAIL(data->dfb->CreateSurface(data->dfb, &desc, &(data->primarySurface)), false);
     DFBCHECKFAIL(data->primarySurface->Clear(data->primarySurface, 0, 0, 0, 0xff), false);
@@ -355,10 +355,10 @@ bool VideoOutputDirectfb::Init(int width, int height, float aspect, WId winid,
 
     DFBCHECK(data->dfb->EnumDisplayLayers(data->dfb, LayerCallback, data));
 
-    if(data->videoLayer == NULL) {
+    if (data->videoLayer == NULL) {
         data->videoLayerConfig.pixelformat = DSPF_YV12;
         DFBCHECK(data->dfb->EnumDisplayLayers(data->dfb, LayerCallback, data));
-        if(data->videoLayer == NULL) {
+        if (data->videoLayer == NULL) {
             ret = data->primaryLayer->TestConfiguration(data->primaryLayer, &(data->videoLayerConfig), NULL);
             if (DFB_OK == ret) {
                 data->primaryLayer->AddRef(data->primaryLayer);
@@ -433,7 +433,7 @@ bool VideoOutputDirectfb::Init(int width, int height, float aspect, WId winid,
            );
     //prepare to do a software conversion when the output format is Yvu
     //(DirectFB does not support software conversion from Yuv -> Yvu yet)
-    if(data->videoLayerConfig.pixelformat == DSPF_YV12)
+    if (data->videoLayerConfig.pixelformat == DSPF_YV12)
     {
         desc.flags = (DFBSurfaceDescriptionFlags)(DSDESC_HEIGHT | DSDESC_WIDTH | DSDESC_PIXELFORMAT | DSDESC_CAPS);
         desc.width = width;
@@ -500,7 +500,7 @@ void VideoOutputDirectfb::PrepareFrame(VideoFrame *buffer, FrameScanType t)
 
     IDirectFBSurface *bufferSurface = data->buffers[buffer->buf];
 
-    if(data->videoLayerConfig.pixelformat == DSPF_YV12)
+    if (data->videoLayerConfig.pixelformat == DSPF_YV12)
     {
         //do a software conversion in a temporary memory buffer, since DirectFB does not handle this (yet ?)
         int pitch;
@@ -524,9 +524,9 @@ void VideoOutputDirectfb::PrepareFrame(VideoFrame *buffer, FrameScanType t)
         DFBCHECK(tempYV12Surface->Unlock(tempYV12Surface));
         bufferSurface = tempYV12Surface;
     }
-    if(!bufferSurface)
+    if (!bufferSurface)
         return;
-    if((data->cardCapabilities.acceleration_mask & DFXL_BLIT) > 0)
+    if ((data->cardCapabilities.acceleration_mask & DFXL_BLIT) > 0)
     {
         DFBCHECK(data->videoSurface->Blit(data->videoSurface, bufferSurface, NULL, 0, 0));
     }
@@ -666,7 +666,7 @@ void VideoOutputDirectfb::MoveResize(void)
             .arg(dispwoff)
             .arg(disphoff));
     //**FIXME support for zooming when dispwoff > screenwidth || disphoff > screenheight
-    if(data->videoLayerDesc.caps & DLCAPS_SCREEN_LOCATION) {
+    if (data->videoLayerDesc.caps & DLCAPS_SCREEN_LOCATION) {
         DFBCHECK(data->videoLayer->SetScreenLocation(data->videoLayer,
                  (float)dispxoff/(float)data->screen_width,
                  (float)dispyoff/(float)data->screen_height,
@@ -719,7 +719,7 @@ void VideoOutputDirectfb::DeleteDirectfbBuffers(void)
     BufferMap::iterator iter;
     for ( iter = data->buffers.begin() ; iter != data->buffers.end() ; iter++ )
     {
-        if(iter->second) {
+        if (iter->second) {
             DFBCHECK(iter->second->Unlock(iter->second));
             DFBCHECK(iter->second->Release(iter->second));
         }
@@ -775,7 +775,7 @@ DFBEnumerationResult LayerCallback(unsigned int id,
     DFBResult ret;
     IDirectFBSurface *surface;
 
-    if(id == DLID_PRIMARY)
+    if (id == DLID_PRIMARY)
         return DFENUM_OK;
 
     DFBCHECKFAIL(vodata->dfb->GetDisplayLayer(vodata->dfb, id, &(vodata->videoLayer)), DFENUM_OK);

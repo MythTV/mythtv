@@ -351,7 +351,7 @@ void GuideGrid::keyPressEvent(QKeyEvent *e)
                 escape();
             else if (action == "SELECT")
             {                         
-                if(m_player && selectChangesChannel)
+                if (m_player && selectChangesChannel)
                 {
                     // See if this show is far enough into the future that it's probable
                     // that the user wanted to schedule it to record instead of changing the channel.

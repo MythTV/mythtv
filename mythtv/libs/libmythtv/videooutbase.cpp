@@ -408,7 +408,7 @@ void VideoOutput::MoveResize(void)
                 xoff = imgx;
             imgx -= xoff;
         }
-        if(xoff < 0) 
+        if (xoff < 0) 
         {
             if (abs(xoff) > imgx) 
                 xoff = 0 - imgx;
@@ -455,7 +455,7 @@ void VideoOutput::MoveResize(void)
             dispxoff += xoff;
         }
 
-        if(xoff < 0) 
+        if (xoff < 0) 
         {
             if (abs(xoff) > dispxoff) 
                 xoff = 0 - dispxoff;

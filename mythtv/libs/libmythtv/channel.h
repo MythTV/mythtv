@@ -74,7 +74,7 @@ class Channel : public ChannelBase
 
     bool commfree;
 
-    bool usingstrength;
+    bool usingATSCstrength;
 };
 
 #endif

@@ -29,7 +29,7 @@ Channel::Channel(TVRec *parent, const QString &videodevice, bool strength)
     usingv4l2 = false;
     videomode = VIDEO_MODE_NTSC;
     currentFormat = "";
-    usingstrength = strength;
+    usingATSCstrength = strength;
 }
 
 Channel::~Channel(void)
@@ -482,7 +482,7 @@ bool Channel::CheckSignal(int msecTotal, int reqSignal, int input)
 
     msecTotal = max(msecSleep, msecTotal);
 
-    if (usingstrength) 
+    if (usingATSCstrength) 
     {
         VERBOSE(VB_CHANNEL, QString("CheckSignal(%1, %2, %3) usingv4l2(%4)")
                 .arg(msecTotal).arg(reqSignal).arg(input).arg(usingv4l2));
@@ -530,7 +530,7 @@ bool Channel::CheckSignalFull(void)
 {
     int signalThresholdWait = 5000;
     int signalThreshold = 65;
-    if (usingstrength)
+    if (usingATSCstrength)
     {
         signalThresholdWait = gContext->GetNumSetting("ATSCCheckSignalWait",
                                                       5000);
@@ -547,7 +547,7 @@ bool Channel::TuneToFrequency(int frequency)
 
     int signalThresholdWait = 5000;
     int signalThreshold = 65;
-    if (usingstrength) 
+    if (usingATSCstrength) 
     {
         signalThresholdWait = gContext->GetNumSetting("ATSCCheckSignalWait", 
                                                       5000);
@@ -567,6 +567,23 @@ bool Channel::TuneToFrequency(int frequency)
             perror("VIDIOC_S_FREQUENCY");
             return false;
         }
+
+        struct v4l2_tuner vsig;
+        memset(&vsig, 0, sizeof(vsig));
+        vsig.index = 0;
+
+        if (ioctl(videofd, VIDIOC_G_TUNER, &vsig) < 0)
+        {
+            perror("VIDIOC_G_TUNER problem in channel::TuneToFrequency");
+            return (false);
+        }
+
+        VERBOSE(VB_CHANNEL, QString("Channel::TuneToFrequency Signal Strength: %1")
+                .arg(vsig.signal));
+
+        if (vsig.signal == 0)
+           return (false);
+
         return CheckSignal(signalThresholdWait, signalThreshold,
                            currentcapchannel);
     }

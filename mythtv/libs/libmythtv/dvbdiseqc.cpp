@@ -333,7 +333,7 @@ bool DVBDiSEqC::Diseqc1xSwitch(dvb_tuning_t& tuning, bool reset,
                           | ((tuning.voltage == SEC_VOLTAGE_18) ? 2 : 0) 
                           | ((tuning.tone == SEC_TONE_ON) ? 1 : 0);
 
-        if(!SendDiSEqCMessage(tuning,cmd)) 
+        if (!SendDiSEqCMessage(tuning,cmd)) 
         {
             ERRNO("Setting DiSEqC failed.\n");
             return false;

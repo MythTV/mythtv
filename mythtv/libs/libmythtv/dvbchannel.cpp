@@ -105,7 +105,7 @@ bool DVBChannel::Open()
 
     fd_frontend = open(dvbdevice(DVB_DEV_FRONTEND, cardnum),
                        O_RDWR | O_NONBLOCK);
-    if(fd_frontend < 0)
+    if (fd_frontend < 0)
     {
         ERRNO("Opening DVB frontend device failed.");
         return false;
@@ -761,7 +761,7 @@ bool DVBChannel::ParseQuery(QSqlQuery& query)
             }
             break;
         case FE_QAM:
-            if(!ParseQAM(query.value(4).toString(), query.value(5).toString(),
+            if (!ParseQAM(query.value(4).toString(), query.value(5).toString(),
                          query.value(6).toString(), query.value(7).toString(),
                          query.value(8).toString(), chan_opts.tuning))
             {
