@@ -12,7 +12,6 @@
 #include <qvbox.h>
 #include <qprogressbar.h>
 #include <qradiobutton.h>
-#include <qsqldatabase.h>
 #include <iostream>
 
 #include <unistd.h>
@@ -34,14 +33,14 @@ extern "C" {
 #include "flacencoder.h"
 
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythdbcon.h>
 #include <mythtv/mythwidgets.h>
 
 using namespace std;
 
-Ripper::Ripper(QSqlDatabase *ldb, MythMainWindow *parent, const char *name)
+Ripper::Ripper(MythMainWindow *parent, const char *name)
       : MythDialog(parent, name)
 {
-    db = ldb;
 
     // Set this to false so we can tell if the ripper has done anything
     // (i.e. we can tell if the user quit prior to ripping)
@@ -289,7 +288,7 @@ bool Ripper::somethingWasRipped()
 void Ripper::artistChanged(const QString &newartist)
 {
     CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
-    Metadata *data = decoder->getMetadata(db, 1);
+    Metadata *data = decoder->getMetadata(1);
     
     if (!decoder || !data)
         return;
@@ -315,7 +314,7 @@ void Ripper::artistChanged(const QString &newartist)
 void Ripper::albumChanged(const QString &newalbum)
 {
     CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
-    Metadata *data = decoder->getMetadata(db, 1);
+    Metadata *data = decoder->getMetadata(1);
 
     if (!decoder || !data)
         return;
@@ -332,7 +331,7 @@ void Ripper::albumChanged(const QString &newalbum)
 void Ripper::genreChanged(const QString &newgenre)
 {
     CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
-    Metadata *data = decoder->getMetadata(db, 1);
+    Metadata *data = decoder->getMetadata(1);
 
     if (!decoder || !data)
         return;
@@ -359,7 +358,7 @@ void Ripper::compilationChanged(bool state)
         // Update artist MetaData of each track on the ablum...
         for (int trackno = 1; trackno <= totaltracks; ++trackno)
         {
-            data = decoder->getMetadata(db, trackno);
+            data = decoder->getMetadata(trackno);
 
             // Make metadata appear to be just a normal track.
             data->setCompilationArtist("");
@@ -378,7 +377,7 @@ void Ripper::compilationChanged(bool state)
         // Update artist MetaData of each track on the ablum...
         for (int trackno = 1; trackno <= totaltracks; ++trackno)
         {
-            data = decoder->getMetadata(db, trackno);
+            data = decoder->getMetadata(trackno);
 
             // Make metadata appear to be just a normal track.
             data->setCompilationArtist(artistname);
@@ -400,7 +399,7 @@ void Ripper::compilationChanged(bool state)
 void Ripper::tableChanged(int row, int col)
 {
     CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
-    Metadata *data = decoder->getMetadata(db, row + 1 );
+    Metadata *data = decoder->getMetadata(row + 1 );
 
     if (!decoder || !data)
         return;
@@ -447,7 +446,7 @@ void Ripper::switchTitlesAndArtists()
     QString tmp;
     for (int row = 0; row < totaltracks; ++row)
     {
-        data = decoder->getMetadata(db, row + 1);
+        data = decoder->getMetadata(row + 1);
       
         if (data)
         {
@@ -484,11 +483,12 @@ void Ripper::fillComboBox(MythComboBox &box, const QString &db_column)
     QString querystr = QString("SELECT DISTINCT %1 FROM musicmetadata;")
                                .arg(db_column);
       
-    QSqlQuery query(querystr, db);
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.exec(querystr);
    
     QValueList<QString> list;
    
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.isActive() && query.size() > 0)
     { 
         while (query.next())
         {
@@ -661,7 +661,7 @@ void Ripper::ripthedisc(void)
         current->setProgress(0);
         current->reset();
 
-        Metadata *track = decoder->getMetadata(db, trackno + 1);
+        Metadata *track = decoder->getMetadata(trackno + 1);
 
         if (track)
         {

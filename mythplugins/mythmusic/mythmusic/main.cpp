@@ -69,9 +69,7 @@ void CheckFile(const QString &filename)
 
     if (decoder)
     {
-        QSqlDatabase *db = QSqlDatabase::database();
-
-        Metadata *data = decoder->getMetadata(db);
+        Metadata *data = decoder->getMetadata();
         if (data)
             delete data;
 
@@ -115,12 +113,12 @@ void BuildFileList(QString &directory, MusicLoadedMap &music_files)
     }
 }
 
-void SavePending(QSqlDatabase *db, int pending)
+void SavePending(int pending)
 {
     //  Temporary Hack until mythmusic
     //  has a proper settings/setup
 
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT * FROM settings "
                   "WHERE value = :LASTPUSH "
                   "AND hostname = :HOST ;");
@@ -130,48 +128,45 @@ void SavePending(QSqlDatabase *db, int pending)
     if (query.exec() && query.size() == 0)
     {
         //  first run from this host / recent version
-        MSqlQuery subquery(QString::null, db);
-        subquery.prepare("INSERT INTO settings (value,data,hostname) VALUES "
+        query.prepare("INSERT INTO settings (value,data,hostname) VALUES "
                          "(:LASTPUSH, :DATA, :HOST );");
-        subquery.bindValue(":LASTPUSH", "LastMusicPlaylistPush");
-        subquery.bindValue(":DATA", pending);
-        subquery.bindValue(":HOST", gContext->GetHostName());
+        query.bindValue(":LASTPUSH", "LastMusicPlaylistPush");
+        query.bindValue(":DATA", pending);
+        query.bindValue(":HOST", gContext->GetHostName());
        
-        subquery.exec(); 
+        query.exec(); 
     }
     else if (query.size() == 1)
     {
         //  ah, just right
-        MSqlQuery subquery(QString::null, db);
-        subquery.prepare("UPDATE settings SET data = :DATA WHERE "
+        query.prepare("UPDATE settings SET data = :DATA WHERE "
                          "WHERE value = :LASTPUSH "
                          "AND hostname = :HOST ;");
-        subquery.bindValue(":DATA", pending);
-        subquery.bindValue(":LASTPUSH", "LastMusicPlaylistPush");
-        subquery.bindValue(":HOST", gContext->GetHostName());
+        query.bindValue(":DATA", pending);
+        query.bindValue(":LASTPUSH", "LastMusicPlaylistPush");
+        query.bindValue(":HOST", gContext->GetHostName());
 
-        subquery.exec();
+        query.exec();
     }                       
     else
     {
         //  correct thor's diabolical plot to 
         //  consume all table space
 
-        MSqlQuery subquery(QString::null, db);
-        subquery.prepare("DELETE FROM settings WHERE "
+        query.prepare("DELETE FROM settings WHERE "
                          "WHERE value = :LASTPUSH "
                          "AND hostname = :HOST ;");
-        subquery.bindValue(":LASTPUSH", "LastMusicPlaylistPush");
-        subquery.bindValue(":HOST", gContext->GetHostName());
-        subquery.exec(); 
+        query.bindValue(":LASTPUSH", "LastMusicPlaylistPush");
+        query.bindValue(":HOST", gContext->GetHostName());
+        query.exec(); 
         
-        subquery.prepare("INSERT INTO settings (value,data,hostname) VALUES "
+        query.prepare("INSERT INTO settings (value,data,hostname) VALUES "
                          "(:LASTPUSH, :DATA, :HOST );");
-        subquery.bindValue(":LASTPUSH", "LastMusicPlaylistPush");
-        subquery.bindValue(":DATA", pending);
-        subquery.bindValue(":HOST", gContext->GetHostName());
+        query.bindValue(":LASTPUSH", "LastMusicPlaylistPush");
+        query.bindValue(":DATA", pending);
+        query.bindValue(":HOST", gContext->GetHostName());
 
-        subquery.exec();
+        query.exec();
     }
 }
 
@@ -182,9 +177,9 @@ void SearchDir(QString &directory)
 
     BuildFileList(directory, music_files);
 
-    MSqlQuery query("SELECT filename FROM musicmetadata "
-                    "WHERE filename NOT LIKE ('%://%');",
-                     QSqlDatabase::database());
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.exec("SELECT filename FROM musicmetadata "
+                    "WHERE filename NOT LIKE ('%://%');");
 
     int counter = 0;
 
@@ -266,8 +261,7 @@ void startDatabaseTree(PlaylistsContainer *all_playlists, AllMusic *all_music)
 
 bool startRipper(void)
 {
-    Ripper rip(QSqlDatabase::database(), gContext->GetMainWindow(), 
-               "cd ripper");
+    Ripper rip(gContext->GetMainWindow(), "cd ripper");
 
     qApp->unlock();
     rip.exec();
@@ -322,17 +316,17 @@ void MusicCallback(void *data, QString &selection)
     else if (sel == "music_set_general")
     {
         MusicGeneralSettings settings;
-        settings.exec(QSqlDatabase::database());
+        settings.exec();
     }
     else if (sel == "music_set_player")
     {
         MusicPlayerSettings settings;
-        settings.exec(QSqlDatabase::database());
+        settings.exec();
     }
     else if (sel == "music_set_ripper")
     {
         MusicRipperSettings settings;
-        settings.exec(QSqlDatabase::database());
+        settings.exec();
     }
 }
 
@@ -410,14 +404,14 @@ int mythplugin_init(const char *libversion)
     UpgradeMusicDatabaseSchema();
 
     MusicGeneralSettings general;
-    general.load(QSqlDatabase::database());
-    general.save(QSqlDatabase::database());
+    general.load();
+    general.save();
     MusicPlayerSettings settings;
-    settings.load(QSqlDatabase::database());
-    settings.save(QSqlDatabase::database());
+    settings.load();
+    settings.save();
     MusicRipperSettings ripper;
-    ripper.load(QSqlDatabase::database());
-    ripper.save(QSqlDatabase::database());
+    ripper.load();
+    ripper.save();
 
     setupKeys();
 
@@ -432,9 +426,9 @@ static void preMusic(MusicData *mdata)
 
     CheckFreeDBServerFile();
 
-    QSqlDatabase *db = QSqlDatabase::database();
 
-    MSqlQuery count_query("SELECT COUNT(*) FROM musicmetadata;", db);
+    MSqlQuery count_query(MSqlQuery::InitCon());
+    count_query.exec("SELECT COUNT(*) FROM musicmetadata;");
 
     bool musicdata_exists = false;
     if (count_query.isActive())
@@ -467,10 +461,10 @@ static void preMusic(MusicData *mdata)
     // Set the various track formatting modes
     Metadata::setArtistAndTrackFormats();
     
-    AllMusic *all_music = new AllMusic(db, paths, startdir);
+    AllMusic *all_music = new AllMusic(paths, startdir);
 
     //  Load all playlists into RAM (once!)
-    PlaylistsContainer *all_playlists = new PlaylistsContainer(db, all_music, gContext->GetHostName());
+    PlaylistsContainer *all_playlists = new PlaylistsContainer(all_music, gContext->GetHostName());
 
     mdata->paths = paths;
     mdata->startdir = startdir;
@@ -491,7 +485,7 @@ static void postMusic(MusicData *mdata)
     {
         mdata->all_playlists->save();
         int x = mdata->all_playlists->getPending();
-        SavePending(QSqlDatabase::database(), x);
+        SavePending(x);
     }
 
     delete mdata->all_music;

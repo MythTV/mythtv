@@ -1,6 +1,5 @@
 #include <qlayout.h>
 #include <qapplication.h>
-#include <qsqldatabase.h>
 #include <qcursor.h>
 #include <qstringlist.h>
 #include <qpixmap.h>
@@ -22,9 +21,8 @@ using namespace std;
 
 
 
-VideoBrowser::VideoBrowser(QSqlDatabase *ldb,
-                           MythMainWindow *parent, const char *name)
-            : VideoDialog(DLG_BROWSER, ldb, parent, "browser", name)
+VideoBrowser::VideoBrowser(MythMainWindow *parent, const char *name)
+            : VideoDialog(DLG_BROWSER, parent, "browser", name)
 {
     updateML = false;
     

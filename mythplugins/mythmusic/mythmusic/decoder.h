@@ -11,7 +11,6 @@ class Metadata;
 class Decoder;
 class DecoderFactory;
 
-class QSqlDatabase;
 class QObject;
 class QIODevice;
 class QThread;
@@ -80,7 +79,7 @@ class Decoder : public QThread
     static Decoder *create(const QString &, QIODevice *, AudioOutput *, 
                            bool = FALSE);
 
-    virtual Metadata *getMetadata(QSqlDatabase *db) = 0;
+    virtual Metadata *getMetadata() = 0;
     virtual void commitMetadata(Metadata *mdata) = 0;
 
     static void SetLocationFormatUseTags(void);

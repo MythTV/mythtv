@@ -4,6 +4,7 @@
 #include <qdatetime.h>
 #include <qlayout.h>
 #include <qhbox.h>
+#include <qvariant.h>
 
 #include <mythtv/mythwidgets.h>
 #include <mythtv/mythdialogs.h>

@@ -310,20 +310,7 @@ int CdDecoder::getNumCDAudioTracks(void)
     return retval;
 }
 
-Metadata* CdDecoder::getMetadata(QSqlDatabase *x, int track)
-{
-    x = x;
-    settracknum = track;
-    return getMetadata();
-}
-
-Metadata* CdDecoder::getMetadata(QSqlDatabase *x)
-{
-    x = x ;
-    return getMetadata();
-}
-
-Metadata *CdDecoder::getMetadata(int track)
+Metadata* CdDecoder::getMetadata(int track)
 {
     settracknum = track;
     return getMetadata();

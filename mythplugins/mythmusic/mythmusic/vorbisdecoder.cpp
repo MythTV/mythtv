@@ -293,10 +293,10 @@ void VorbisDecoder::run()
     deinit();
 }
 
-Metadata *VorbisDecoder::getMetadata(QSqlDatabase *db)
+Metadata *VorbisDecoder::getMetadata()
 {
     Metadata *mdata = new Metadata(filename);
-    if (mdata->isInDatabase(db, musiclocation))
+    if (mdata->isInDatabase(musiclocation))
     {
         return mdata;
     }
@@ -313,7 +313,7 @@ Metadata *VorbisDecoder::getMetadata(QSqlDatabase *db)
     delete p_tagger;
 
     if (mdata)
-        mdata->dumpToDatabase(db, musiclocation);
+        mdata->dumpToDatabase(musiclocation);
     else
         cerr << "vorbisdecoder.o: Could not read metadata from " << filename.local8Bit() << endl;    
 

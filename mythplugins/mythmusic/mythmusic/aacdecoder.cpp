@@ -614,11 +614,11 @@ void aacDecoder::run()
     deinit();
 }
 
-Metadata* aacDecoder::getMetadata(QSqlDatabase *db)
+Metadata* aacDecoder::getMetadata()
 {
 
     Metadata *mdata = new Metadata(filename);
-    if (mdata->isInDatabase(db, musiclocation))
+    if (mdata->isInDatabase(musiclocation))
     {
       return mdata;
     }
@@ -635,7 +635,7 @@ Metadata* aacDecoder::getMetadata(QSqlDatabase *db)
     delete p_tagger;
 
     if (mdata)
-        mdata->dumpToDatabase(db, musiclocation);
+        mdata->dumpToDatabase(musiclocation);
     else
       error(QString("aacdecoder.o: Could not read metadata from \"%1\"").arg(filename.local8Bit()));
 

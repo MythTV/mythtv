@@ -4,7 +4,6 @@
 #include <qwidget.h>
 #include <qdialog.h>
 #include <qapplication.h>
-#include <qsqldatabase.h>
 
 #include <mythtv/mythwidgets.h>
 #include <mythtv/uitypes.h>
@@ -21,8 +20,8 @@ class VideoDialog : public MythDialog
     public:
         enum DialogType { DLG_BROWSER, DLG_GALLERY, DLG_TREE };
         
-        VideoDialog(DialogType _myType, QSqlDatabase *_db, 
-                    MythMainWindow *_parent, const char* _winName, const char *_name = 0);
+        VideoDialog(DialogType _myType, MythMainWindow *_parent, 
+                    const char* _winName, const char *_name = 0);
         
         virtual ~VideoDialog();
         
@@ -58,7 +57,6 @@ class VideoDialog : public MythDialog
         
         QPixmap myBackground;
         int currentParentalLevel;        
-        QSqlDatabase *db;
         Metadata* curitem;
         MythPopupBox* popup;
         bool expectingPopup;

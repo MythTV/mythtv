@@ -1,6 +1,5 @@
 #include <qlayout.h>
 #include <qapplication.h>
-#include <qsqldatabase.h>
 #include <qcursor.h>
 #include <qstringlist.h>
 #include <qpixmap.h>
@@ -21,14 +20,13 @@ using namespace std;
 #include "editmetadata.h"
 #include "videofilter.h"
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythdbcon.h>
 #include <mythtv/mythdialogs.h>
 
 
-VideoManager::VideoManager(QSqlDatabase *ldb,
-                           MythMainWindow *parent, const char *name)
+VideoManager::VideoManager(MythMainWindow *parent, const char *name)
             : MythDialog(parent, name)
 {
-    db = ldb;
     updateML = false;
     debug = 0;
     isbusy = false;    // ignores keys when true (set when doing http request)
@@ -37,7 +35,7 @@ VideoManager::VideoManager(QSqlDatabase *ldb,
     popup = NULL;
     videoDir = gContext->GetSetting("VideoStartupDir");    
     artDir = gContext->GetSetting("VideoArtworkDir");
-    currentVideoFilter = new VideoFilterSettings(db, true, "VideoManager");
+    currentVideoFilter = new VideoFilterSettings(true, "VideoManager");
     RefreshMovieList();
     
     fullRect = QRect(0, 0, size().width(), size().height());
@@ -196,7 +194,9 @@ void VideoManager::RefreshMovieList()
                                .arg(currentVideoFilter->BuildClauseFrom())
                                .arg(currentVideoFilter->BuildClauseWhere())
                                .arg(currentVideoFilter->BuildClauseOrderBy());
-    QSqlQuery query(thequery,db);
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.exec(thequery);
+
     Metadata *myData;
 
     if (query.isActive() && query.size() > 0)
@@ -207,7 +207,7 @@ void VideoManager::RefreshMovieList()
 
            myData = new Metadata();
            myData->setID(idnum);
-           myData->fillDataFromID(db);
+           myData->fillDataFromID();
            m_list.append(*myData);
 
            delete myData;
@@ -458,7 +458,7 @@ void VideoManager::GetMovieData(QString movieNum)
         ResetCurrentItem();
     }
 
-    curitem->updateDatabase(db);
+    curitem->updateDatabase();
     RefreshMovieList();
 }
 
@@ -1013,7 +1013,7 @@ void VideoManager::doParental(int amount)
     if ( (curshowlevel > -1) && (curshowlevel < 5))
     {
         curitem->setShowLevel(curshowlevel);
-        curitem->updateDatabase(db);
+        curitem->updateDatabase();
         RefreshMovieList();
         update(infoRect);
     }
@@ -1426,7 +1426,7 @@ void VideoManager::ResetCurrentItem()
     curitem->setGenres(movieGenres);
     movieCountries.clear();
     curitem->setCountries(movieCountries);
-    curitem->updateDatabase(db);
+    curitem->updateDatabase();
     RefreshMovieList();
 
 }
@@ -1494,7 +1494,7 @@ void VideoManager::handleIMDBList()
         if (movieCoverFile != "<NULL>")
         {
             curitem->setCoverFile(movieCoverFile);
-            curitem->updateDatabase(db);
+            curitem->updateDatabase();
             RefreshMovieList();
         }
 
@@ -1620,7 +1620,7 @@ void VideoManager::slotEditMeta()
     if (!curitem)
         return;
         
-    EditMetadataDialog* md_editor = new EditMetadataDialog(db, curitem, gContext->GetMainWindow(),
+    EditMetadataDialog* md_editor = new EditMetadataDialog(curitem, gContext->GetMainWindow(),
                                                            "edit_metadata", "video-",
                                                            "edit metadata dialog");
     
@@ -1628,7 +1628,7 @@ void VideoManager::slotEditMeta()
     md_editor->exec();
     delete md_editor;
     cancelPopup();
-    curitem->fillDataFromID(db);
+    curitem->fillDataFromID();
 
     RefreshMovieList();
     update(infoRect);
@@ -1646,7 +1646,7 @@ void VideoManager::slotRemoveVideo()
 
         if (okcancel)
         {
-            if (curitem->Remove(db))
+            if (curitem->Remove())
                 RefreshMovieList();
             else
                 ConfirmationDialog->showOkPopup(gContext->GetMainWindow(), "", tr("delete failed"));
@@ -1693,7 +1693,7 @@ void VideoManager::slotResetMeta()
     if (movieCoverFile != "<NULL>")
     {
         curitem->setCoverFile(movieCoverFile);
-        curitem->updateDatabase(db);
+        curitem->updateDatabase();
         RefreshMovieList();
     }
 
@@ -1712,7 +1712,7 @@ void VideoManager::slotDoFilter()
 {
     cancelPopup();
     
-    VideoFilterDialog *vfd = new VideoFilterDialog(db, currentVideoFilter,
+    VideoFilterDialog *vfd = new VideoFilterDialog(currentVideoFilter,
                                                    gContext->GetMainWindow(),
                                                    "filter", "video-", "Video Filter Dialog");
     vfd->exec();
@@ -1732,7 +1732,7 @@ void VideoManager::slotToggleBrowseable()
     if (curitem)
     { 
         curitem->setBrowse(!curitem->Browse());
-        curitem->updateDatabase(db);
+        curitem->updateDatabase();
     }
 
     RefreshMovieList();

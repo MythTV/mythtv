@@ -357,10 +357,10 @@ void avfDecoder::run()
     deinit();
 }
 
-Metadata* avfDecoder::getMetadata(QSqlDatabase *db)
+Metadata* avfDecoder::getMetadata()
 {
     Metadata *mdata = new Metadata(filename);
-    if (mdata->isInDatabase(db, musiclocation))
+    if (mdata->isInDatabase(musiclocation))
     {
         return mdata;
     }
@@ -377,7 +377,7 @@ Metadata* avfDecoder::getMetadata(QSqlDatabase *db)
     delete p_tagger;
 
     if (mdata)
-        mdata->dumpToDatabase(db, musiclocation);
+        mdata->dumpToDatabase(musiclocation);
     else
         cerr << "avfdecoder.o: Could not read metadata from " << filename << endl;
 

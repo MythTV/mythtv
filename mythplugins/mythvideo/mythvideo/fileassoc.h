@@ -16,7 +16,6 @@
 using namespace std;
 
 #include <qptrlist.h>
-#include <qsqldatabase.h>
 
 #include <mythtv/mythdialogs.h>
 #include <mythtv/mythcontext.h>
@@ -30,11 +29,9 @@ class FileAssociation
     
   public:
   
-    FileAssociation(QSqlDatabase *ldb,
-                    const QString &new_extension);
+    FileAssociation(const QString &new_extension);
     
-    FileAssociation(QSqlDatabase *ldb,
-                    int   i,
+    FileAssociation(int   i,
                     const QString &e,
                     const QString &p,
                     bool  g,
@@ -63,7 +60,6 @@ class FileAssociation
     bool         ignore;
     bool         use_default;
     bool         changed;
-    QSqlDatabase *db;
     bool         loaded_from_db;
     
 };
@@ -79,8 +75,7 @@ class FileAssocDialog : public MythThemedDialog
     
   public:
   
-    FileAssocDialog(QSqlDatabase *ldb,
-                    MythMainWindow *parent, 
+    FileAssocDialog(MythMainWindow *parent, 
                     QString window_name,
                     QString theme_filename,
                     const char* name = 0);
@@ -109,7 +104,6 @@ class FileAssocDialog : public MythThemedDialog
   
     QPtrList<FileAssociation>   file_associations;
     FileAssociation             *current_fa;
-    QSqlDatabase                *db;    
 
     //
     //  GUI stuff

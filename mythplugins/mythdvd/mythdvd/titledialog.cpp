@@ -19,8 +19,7 @@ using namespace std;
 
 #include "titledialog.h"
 
-TitleDialog::TitleDialog(QSqlDatabase *ldb,
-                         QSocket *a_socket, 
+TitleDialog::TitleDialog(QSocket *a_socket, 
                          QString d_name, 
                          QPtrList<DVDTitleInfo> *titles, 
                          MythMainWindow *parent,
@@ -29,11 +28,6 @@ TitleDialog::TitleDialog(QSqlDatabase *ldb,
                          const char* name)
             :MythThemedDialog(parent, window_name, theme_filename, name)
 {
-    //
-    //  Assign pointer to database
-    //
-    
-    db = ldb;
 
     name_editor = NULL;
     socket_to_mtd = a_socket;
@@ -124,8 +118,10 @@ void TitleDialog::showCurrentTitle()
                                        "WHERE input = %1 ;")
                                        .arg(current_title->getInputID());
        
-            QSqlQuery a_query(q_string, db);
-            if(a_query.isActive() && a_query.numRowsAffected() > 0)
+            MSqlQuery a_query(MSqlQuery::InitCon());
+            a_query.exec(q_string);  
+
+            if(a_query.isActive() && a_query.size() > 0)
             {
                 while(a_query.next())
                 {

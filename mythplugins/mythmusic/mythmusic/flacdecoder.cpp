@@ -385,10 +385,10 @@ E=VALUE" */
         char *field_value;
 } Argument_VcField;
 
-Metadata *FlacDecoder::getMetadata(QSqlDatabase *db)
+Metadata *FlacDecoder::getMetadata()
 {
     Metadata *mdata = new Metadata(filename);
-    if (mdata->isInDatabase(db, musiclocation))
+    if (mdata->isInDatabase(musiclocation))
     {
         return mdata;
     }
@@ -404,7 +404,7 @@ Metadata *FlacDecoder::getMetadata(QSqlDatabase *db)
     delete p_tagger;
 
     if (mdata)
-        mdata->dumpToDatabase(db, musiclocation);
+        mdata->dumpToDatabase(musiclocation);
     else
         cerr << "flacdecoder.o: Could not read metadata from " << filename.local8Bit() << endl;
 

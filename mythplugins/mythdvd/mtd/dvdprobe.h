@@ -12,7 +12,6 @@
 
 #include <qstring.h>
 #include <qptrlist.h>
-#include <qsqldatabase.h>
 
 #include <dvdread/dvd_reader.h>
 #include <dvdread/ifo_read.h>
@@ -98,7 +97,7 @@ class DVDTitle
     void    setSize(uint h, uint v){hsize = h; vsize = v;}
     void    setLBox(bool yes_or_no){letterbox = yes_or_no;}
     void    setVFormat(const QString &a_string){video_format = a_string;}    
-    void    determineInputID(QSqlDatabase *db);
+    void    determineInputID();
 
     //
     //  Get
@@ -155,7 +154,7 @@ class DVDProbe
 
   public:
   
-    DVDProbe(const QString &dvd_device, QSqlDatabase *ldb);
+    DVDProbe(const QString &dvd_device);
     ~DVDProbe();
 
     bool                probe();
@@ -172,7 +171,6 @@ class DVDProbe
 
     QPtrList<DVDTitle>  titles;
     QString             volume_name;
-    QSqlDatabase        *db;
 };
 
 #endif  // dvdprobe_h_

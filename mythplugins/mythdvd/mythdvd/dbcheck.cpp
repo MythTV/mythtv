@@ -7,15 +7,16 @@ using namespace std;
 #include "dbcheck.h"
 
 #include "mythtv/mythcontext.h"
+#include "mythtv/mythdbcon.h"
 
 const QString currentDatabaseVersion = "1001";
 
 static void UpdateDBVersionNumber(const QString &newnumber)
 {
-    QSqlDatabase *db_conn = QSqlDatabase::database();
+    MSqlQuery query(MSqlQuery::InitCon());
 
-    db_conn->exec("DELETE FROM settings WHERE value='DVDDBSchemaVer';");
-    db_conn->exec(QString("INSERT INTO settings (value, data, hostname) "
+    query.exec("DELETE FROM settings WHERE value='DVDDBSchemaVer';");
+    query.exec(QString("INSERT INTO settings (value, data, hostname) "
                           "VALUES ('DVDDBSchemaVer', %1, NULL);")
                          .arg(newnumber));
 }
@@ -23,7 +24,7 @@ static void UpdateDBVersionNumber(const QString &newnumber)
 static void performActualUpdate(const QString updates[], QString version,
                                 QString &dbver)
 {
-    QSqlDatabase *db_conn = QSqlDatabase::database();
+    MSqlQuery query(MSqlQuery::InitCon());
 
     VERBOSE(VB_ALL, QString("Upgrading to MythDVD schema version ") + 
             version);
@@ -33,7 +34,7 @@ static void performActualUpdate(const QString updates[], QString version,
 
     while (thequery != "")
     {
-        db_conn->exec(thequery);
+        query.exec(thequery);
         counter++;
         thequery = updates[counter];
     }
@@ -46,9 +47,10 @@ static void InitializeDatabase(void)
 {
     VERBOSE(VB_ALL, "Inserting MythDVD initial database information.");
 
-    QSqlDatabase *db_conn = QSqlDatabase::database();
-    QSqlQuery qQuery = db_conn->exec("SELECT * FROM dvdinput;");
-    if (!qQuery.isActive() || qQuery.numRowsAffected() <= 0)
+    MSqlQuery qQuery(MSqlQuery::InitCon());
+    qQuery.exec("SELECT * FROM dvdinput;");
+
+    if (!qQuery.isActive() || qQuery.size() <= 0)
     {
         const QString updates[] = {
 "CREATE TABLE IF NOT EXISTS dvdinput ("
@@ -107,8 +109,8 @@ static void InitializeDatabase(void)
         performActualUpdate(updates, "1000", dbver);
     }
 
-    qQuery = db_conn->exec("SELECT * FROM dvdtranscode;");
-    if (!qQuery.isActive() || qQuery.numRowsAffected() <= 0)
+    qQuery.exec("SELECT * FROM dvdtranscode;");
+    if (!qQuery.isActive() || qQuery.size() <= 0)
     {
         const QString updates[] = {
 "CREATE TABLE IF NOT EXISTS dvdtranscode ("

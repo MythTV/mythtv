@@ -5,10 +5,11 @@
 */
 
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythdbcon.h>
 
 #include "videofilter.h"
 
-VideoFilterSettings::VideoFilterSettings(QSqlDatabase * ldb, bool loaddefaultsettings, const QString& _prefix)
+VideoFilterSettings::VideoFilterSettings(bool loaddefaultsettings, const QString& _prefix)
 {
     if ( !_prefix )
         prefix = "VideoDefault";
@@ -16,7 +17,6 @@ VideoFilterSettings::VideoFilterSettings(QSqlDatabase * ldb, bool loaddefaultset
         prefix = _prefix + "Default";
     
     // do nothing yet
-    db = ldb;
     if (loaddefaultsettings)
     {
         category = gContext->GetNumSetting( QString("%1Category").arg(prefix),-1);
@@ -44,7 +44,6 @@ VideoFilterSettings::VideoFilterSettings(QSqlDatabase * ldb, bool loaddefaultset
 
 VideoFilterSettings::VideoFilterSettings(VideoFilterSettings *other)
 {
-    db = other->db;
     category = other->category;
     genre = other->genre;
     country = other->country;
@@ -73,8 +72,7 @@ void VideoFilterSettings::saveAsDefault()
     gContext->SaveSetting(QString("%1Orderby").arg(prefix), orderby);
 }
 
-VideoFilterDialog::VideoFilterDialog(QSqlDatabase *ldb,
-                                 VideoFilterSettings * settings,
+VideoFilterDialog::VideoFilterDialog(VideoFilterSettings * settings,
                                  MythMainWindow *parent, 
                                  QString window_name,
                                  QString theme_filename,
@@ -87,20 +85,12 @@ VideoFilterDialog::VideoFilterDialog(QSqlDatabase *ldb,
     //  works on a single metadata entry.
     //
     
-    if(!ldb)
-    {
-        cerr << "videofilter.o: Where I am supposed to load stuff from if you don't give me a db pointer?"
-             << endl;
-        exit(0);
-    }
-    db = ldb;
-
     originalSettings = settings;
     if (originalSettings){
         //Save data settings before changing them
         currentSettings = new VideoFilterSettings (settings);
     }else{
-        currentSettings = new VideoFilterSettings (db);
+        currentSettings = new VideoFilterSettings ();
     }
 
     // Widgets
@@ -240,7 +230,9 @@ void VideoFilterDialog::update_numvideo()
         QString q_string = QString("%1 %2 %3")
                            .arg(select).arg(from).arg(where);
         
-        QSqlQuery a_query(q_string,db);
+
+        MSqlQuery a_query(MSqlQuery::InitCon());
+        a_query.exec(q_string);
         
         if((a_query.isActive()) && (a_query.size()>0))
         {
@@ -263,7 +255,9 @@ void VideoFilterDialog::fillWidgets()
         category_select->addItem(-1, "All");
         QString q_string = QString("SELECT intid, category FROM videocategory "
                                    "ORDER BY category");
-        QSqlQuery a_query(q_string,db);
+        MSqlQuery a_query(MSqlQuery::InitCon());
+        a_query.exec(q_string);
+
         if (a_query.isActive() && a_query.size()>0)
         {
             while (a_query.next())
@@ -284,7 +278,9 @@ void VideoFilterDialog::fillWidgets()
                                    "ON intid = idgenre "
                                    "GROUP BY intid , genre "
                                    "ORDER BY genre;");
-        QSqlQuery a_query(q_string,db);
+        MSqlQuery a_query(MSqlQuery::InitCon());
+        a_query.exec(q_string);
+
         if (a_query.isActive() && a_query.size()>0)
         {
             while (a_query.next())
@@ -305,7 +301,8 @@ void VideoFilterDialog::fillWidgets()
                                    "ON intid = idcountry "
                                    "GROUP BY intid, country "
                                    "ORDER BY country;");
-        QSqlQuery a_query(q_string,db);
+        MSqlQuery a_query(MSqlQuery::InitCon());
+        a_query.exec(q_string);
         if (a_query.isActive() && a_query.size()>0)
         {
             while(a_query.next())
@@ -323,7 +320,9 @@ void VideoFilterDialog::fillWidgets()
         year_select->addItem(-1,"All");
         QString q_string = QString("SELECT year FROM videometadata "
                                    "GROUP BY year ORDER BY year DESC;");
-        QSqlQuery a_query(q_string, db);
+        MSqlQuery a_query(MSqlQuery::InitCon());
+        a_query.exec(q_string);
+
         if(a_query.isActive() && a_query.size()>0)
         {
             while(a_query.next())
@@ -349,7 +348,9 @@ void VideoFilterDialog::fillWidgets()
         QString q_string = QString("SELECT FLOOR((length-1)/30) "
                                    "FROM videometadata "
                                    "GROUP BY FLOOR((length-1)/30);");
-        QSqlQuery a_query(q_string,db);
+        MSqlQuery a_query(MSqlQuery::InitCon());
+        a_query.exec(q_string);
+
         if (a_query.isActive() && a_query.size()>0)
         {
            while (a_query.next())
@@ -377,7 +378,9 @@ void VideoFilterDialog::fillWidgets()
         QString q_string = QString("SELECT FLOOR(userrating) "
                                    "FROM videometadata "
                                    "GROUP BY FLOOR(userrating) DESC;");
-        QSqlQuery a_query(q_string, db);
+        MSqlQuery a_query(MSqlQuery::InitCon());
+        a_query.exec(q_string);
+
         if(a_query.isActive()&&a_query.size()>0)
         {
             while(a_query.next())

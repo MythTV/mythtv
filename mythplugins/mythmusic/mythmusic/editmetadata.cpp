@@ -1,6 +1,6 @@
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythdbcon.h>
 #include <qdir.h>
-#include <qsqldatabase.h>
 #include "editmetadata.h"
 #include "decoder.h"
 #include "genres.c"
@@ -368,12 +368,13 @@ void EditMetadataDialog::fillSearchList(QString field)
 {
     searchList.clear();
     
-    QSqlQuery query;
     QString querystr;
     querystr = QString("SELECT DISTINCT %1 FROM musicmetadata ORDER BY %2").arg(field).arg(field);
          
+    MSqlQuery query(MSqlQuery::InitCon());
     query.exec(querystr);
-    if (query.isActive() && query.numRowsAffected())
+
+    if (query.isActive() && query.size())
     {
         while (query.next())
         {
@@ -487,9 +488,7 @@ void EditMetadataDialog::saveToDatabase()
 {
     cancelPopup();
 
-    QSqlDatabase *db = QSqlDatabase::database();
-
-    m_metadata->updateDatabase(db, QString::null);
+    m_metadata->updateDatabase(QString::null);
     *m_sourceMetadata = m_metadata;
     done(1);
 }

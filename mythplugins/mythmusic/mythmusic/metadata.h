@@ -10,7 +10,6 @@
 #include "treecheckitem.h"
 #include <mythtv/uitypes.h>
 
-class QSqlDatabase;
 class AllMusic;
 
 class Metadata
@@ -116,16 +115,16 @@ class Metadata
     void setCompilation(bool state) { compilation = state; formattedartist = formattedtitle = ""; }
     bool determineIfCompilation(bool cd = false);
     
-    bool isInDatabase(QSqlDatabase *db, QString startdir);
-    void dumpToDatabase(QSqlDatabase *db, QString startdir);
-    void updateDatabase(QSqlDatabase *db, QString startdir);
+    bool isInDatabase(QString startdir);
+    void dumpToDatabase(QString startdir);
+    void updateDatabase(QString startdir);
     void setField(const QString &field, const QString &data);
     void getField(const QString &field, QString *data);
     void getField(const QStringList& tree_levels, QString *data, const QString &paths, const QString &startdir, uint depth);
     bool areYouFinished(uint depth, uint treedepth, const QString& paths, const QString& startdir);
-    void fillData(QSqlDatabase *db);
-    void fillDataFromID(QSqlDatabase *db);
-    void persist(QSqlDatabase *db);
+    void fillData();
+    void fillDataFromID();
+    void persist();
     bool hasChanged(){return changed;}
     static void setArtistAndTrackFormats();
 
@@ -238,7 +237,7 @@ class AllMusic
 
   public:
   
-    AllMusic(QSqlDatabase *ldb, QString path_assignment, QString a_startdir);
+    AllMusic(QString path_assignment, QString a_startdir);
     ~AllMusic();
 
     QString     getLabel(int an_id, bool *error_flag);
@@ -273,8 +272,6 @@ class AllMusic
     MusicNode           *root_node;
     
     
-    QSqlDatabase       *db;
-
 
     //  NB: While a QMap is VALUE BASED the
     //  values we are copying here are pointers,

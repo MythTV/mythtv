@@ -1,11 +1,9 @@
 #include <qlayout.h>
 #include <qpushbutton.h>
 #include <qlabel.h>
-#include <qsqldatabase.h>
 #include <qsqlrecord.h>
 #include <qsqlfield.h> 
 #include <qsqldriver.h>
-#include <qsqlquery.h>
 #include <qsqlcursor.h>
 #include <qhbox.h>
 
@@ -92,14 +90,14 @@ static SmartPLField *lookupField(QString name)
 
 QString formattedFieldValue(const QVariant &value)
 {
-    QSqlDatabase *db = QSqlDatabase::database();
     QSqlField field("", value.type());
     if (value.isNull())
         field.setNull();
     else
         field.setValue(value);
 
-    QString result = db->driver()->formatValue(&field);    
+    MSqlQuery query(MSqlQuery::InitCon());
+    QString result = query.driver()->formatValue(&field);
     return result;
 }
 
@@ -495,10 +493,10 @@ void SmartPLCriteriaRow::fillSearchList(QString field)
 {
     searchList.clear();
     
-    MSqlQuery query;
+    MSqlQuery query(MSqlQuery::InitCon());
     QString querystr;
     querystr = QString("SELECT DISTINCT %1 FROM musicmetadata ORDER BY %2").arg(field).arg(field);
-         
+        
     query.exec(querystr);
     if (query.isActive() && query.numRowsAffected())
     {
@@ -625,7 +623,7 @@ bool SmartPLCriteriaRow::saveToDatabase(int smartPlaylistID)
         Value2 = value2Edit->text();
     }
     
-    MSqlQuery query;
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("INSERT INTO smartplaylistitem (smartplaylistid, field, operator,"
                   " value1, value2)"
                   "VALUES (:SMARTPLAYLISTID, :FIELD, :OPERATOR, :VALUE1, :VALUE2);");
@@ -928,8 +926,8 @@ void SmartPlaylistEditor::updateMatches(void)
     QString sql = "select count(*) from musicmetadata ";
     sql += getWhereClause();
     
-    MSqlQuery query(sql);
-    query.exec();
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.exec(sql);
     
     if (query.isActive() && query.numRowsAffected() > 0)
     {
@@ -964,7 +962,7 @@ void SmartPlaylistEditor::saveClicked(void)
     else
         SmartPlaylistEditor::deleteSmartPlaylist(category, name);
     
-    MSqlQuery query;
+    MSqlQuery query(MSqlQuery::InitCon());
     // insert new smartplaylist
     query.prepare("INSERT INTO smartplaylist (name, categoryid, matchtype, orderby, limitto) "
                 "VALUES (:NAME, :CATEGORYID, :MATCHTYPE, :ORDERBY, :LIMIT);");
@@ -1038,7 +1036,7 @@ void SmartPlaylistEditor::loadFromDatabase(QString category, QString name)
     // load smartplaylist from database
     int categoryid = SmartPlaylistEditor::lookupCategoryID(category);
     
-    MSqlQuery query;
+    MSqlQuery query(MSqlQuery::InitCon());
     int ID;
     
     query.prepare("SELECT smartplaylistid, name, categoryid, matchtype, orderby, limitto " 
@@ -1180,7 +1178,7 @@ void SmartPlaylistEditor::newCategory(void)
 {
     // insert new smartplaylistcategory
 
-    MSqlQuery query;
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("INSERT INTO smartplaylistcategory (name) "
                 "VALUES (:NAME);");
     query.bindValue(":NAME", categoryEdit->text().utf8());
@@ -1226,7 +1224,7 @@ void SmartPlaylistEditor::renameCategory(void)
         return;
         
     // change the category     
-    MSqlQuery query;
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("UPDATE smartplaylistcategory SET name = :NEW_CATEGORY "
                   "WHERE name = :OLD_CATEGORY;");
     query.bindValue(":OLD_CATEGORY", categoryCombo->currentText().utf8());
@@ -1322,9 +1320,9 @@ void SmartPlaylistEditor::orderByClicked(void)
 void SmartPlaylistEditor::getSmartPlaylistCategories(void)
 {
     categoryCombo->clear();
-    MSqlQuery query("SELECT name FROM smartplaylistcategory ORDER BY name;");
+    MSqlQuery query(MSqlQuery::InitCon());
 
-    if (query.exec())
+    if (query.exec("SELECT name FROM smartplaylistcategory ORDER BY name;"))
     {
         if (query.isActive() && query.numRowsAffected() > 0)
         {
@@ -1348,7 +1346,7 @@ bool SmartPlaylistEditor::deleteSmartPlaylist(QString category, QString name)
     // get categoryid
     int categoryid = SmartPlaylistEditor::lookupCategoryID(category);
     
-    MSqlQuery query;
+    MSqlQuery query(MSqlQuery::InitCon());
     
     // get playlist ID
     int ID;
@@ -1396,7 +1394,7 @@ bool SmartPlaylistEditor::deleteSmartPlaylist(QString category, QString name)
 bool SmartPlaylistEditor::deleteCategory(QString category)
 {
     int categoryid = SmartPlaylistEditor::lookupCategoryID(category);
-    MSqlQuery query;
+    MSqlQuery query(MSqlQuery::InitCon());
     
     //delete all smartplaylists with the selected category
     query.prepare("SELECT name FROM smartplaylist "
@@ -1430,10 +1428,11 @@ bool SmartPlaylistEditor::deleteCategory(QString category)
 int SmartPlaylistEditor::lookupCategoryID(QString category)
 {    
     int ID;
-    MSqlQuery query;
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT categoryid FROM smartplaylistcategory "
                   "WHERE name = :CATEGORY;");
     query.bindValue(":CATEGORY", category.utf8());
+
     if (query.exec())
     {    
         if (query.isActive() && query.numRowsAffected() > 0)
@@ -1518,7 +1517,7 @@ void SmartPLResultViewer::setSQL(QString sql)
 {
     listView->clear();
 
-    MSqlQuery query(sql);
+    MSqlQuery query(MSqlQuery::InitCon());
     query.exec();
     
     QListViewItem *item;
@@ -1809,9 +1808,9 @@ void SmartPlaylistDialog::categoryChanged(void)
 void SmartPlaylistDialog::getSmartPlaylistCategories(void)
 {
     categoryCombo->clear();
-    MSqlQuery query("SELECT name FROM smartplaylistcategory ORDER BY name;");
+    MSqlQuery query(MSqlQuery::InitCon());
 
-    if (query.exec())
+    if (query.exec("SELECT name FROM smartplaylistcategory ORDER BY name;"))
     {
         if (query.isActive() && query.numRowsAffected() > 0)
         {
@@ -1831,8 +1830,8 @@ void SmartPlaylistDialog::getSmartPlaylists(QString category)
     int categoryid = SmartPlaylistEditor::lookupCategoryID(category);
 
     listbox->clear();
-    
-    MSqlQuery query;
+
+    MSqlQuery query(MSqlQuery::InitCon());    
     query.prepare("SELECT name FROM smartplaylist WHERE categoryid = :CATEGORYID "
                   "ORDER BY name;");
     query.bindValue(":CATEGORYID", categoryid);

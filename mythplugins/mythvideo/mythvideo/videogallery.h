@@ -28,15 +28,13 @@ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include "videodlg.h"
 
 
-class QSqlDatabase;
 typedef QValueList<Metadata>  ValueMetadata;
 
 class VideoGallery : public VideoDialog
 {
     Q_OBJECT
   public:
-    VideoGallery(QSqlDatabase *ldb, 
-                 MythMainWindow *parent, const char *name = 0);
+    VideoGallery(MythMainWindow *parent, const char *name = 0);
     ~VideoGallery();
     
     void VideoGallery::processEvents() { qApp->processEvents(); }

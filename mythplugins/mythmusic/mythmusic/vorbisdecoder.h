@@ -18,7 +18,7 @@ class VorbisDecoder : public Decoder
     void seek(double);
     void stop();
 
-    Metadata *getMetadata(QSqlDatabase *db);
+    Metadata *getMetadata();
     void commitMetadata(Metadata *mdata);
 
   private:

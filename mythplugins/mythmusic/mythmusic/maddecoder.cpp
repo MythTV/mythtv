@@ -512,10 +512,10 @@ enum mad_flow MadDecoder::madError(struct mad_stream *stream,
     return MAD_FLOW_STOP;
 }
 
-Metadata *MadDecoder::getMetadata(QSqlDatabase *db)
+Metadata *MadDecoder::getMetadata()
 {
     Metadata *mdata = new Metadata(filename);
-    if (mdata->isInDatabase(db, musiclocation))
+    if (mdata->isInDatabase(musiclocation))
     {
         return mdata;
     }
@@ -532,7 +532,7 @@ Metadata *MadDecoder::getMetadata(QSqlDatabase *db)
     delete p_tagger;
 
     if (mdata)
-        mdata->dumpToDatabase(db, musiclocation);
+        mdata->dumpToDatabase(musiclocation);
     else
         cerr << "maddecoder.o: Could not read metadata from " << filename.local8Bit() << endl;
 

@@ -1,5 +1,4 @@
 #include <iostream> 
-#include <qsqldatabase.h> 
 #include <qregexp.h> 
 #include <qdatetime.h>
 #include <qdir.h>
@@ -72,9 +71,9 @@ void Metadata::SetStartdir(const QString &dir)
     Metadata::m_startdir = dir;
 }
 
-void Metadata::persist(QSqlDatabase *db)
+void Metadata::persist()
 {
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("UPDATE musicmetadata set rating = :RATING , "
                   "playcount = :PLAYCOUNT , lastplay = :LASTPLAY "
                   "where intid = :ID ;");
@@ -87,14 +86,14 @@ void Metadata::persist(QSqlDatabase *db)
         MythContext::DBError("music persist", query);
 }
 
-bool Metadata::isInDatabase(QSqlDatabase *db, QString startdir)
+bool Metadata::isInDatabase(QString startdir)
 {
     bool retval = false;
 
     QString sqlfilename = filename;
     sqlfilename = filename.remove(0, startdir.length());
 
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT artist,compilation_artist,album,title,genre,year,tracknum,"
                   "length,intid,rating,playcount,lastplay,compilation FROM "
                   "musicmetadata WHERE filename = :FILENAME ;");
@@ -124,7 +123,7 @@ bool Metadata::isInDatabase(QSqlDatabase *db, QString startdir)
     return retval;
 }
 
-void Metadata::dumpToDatabase(QSqlDatabase *db, QString startdir)
+void Metadata::dumpToDatabase(QString startdir)
 {
     if (artist == "")
         artist = QObject::tr("Unknown Artist");
@@ -142,7 +141,7 @@ void Metadata::dumpToDatabase(QSqlDatabase *db, QString startdir)
 
     // Don't update the database if a song with the exact same
     // metadata is already there
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT filename FROM musicmetadata WHERE "
                   "( ( artist = :ARTIST ) AND "
                   "( compilation_artist = :COMPILATION_ARTIST ) "
@@ -180,7 +179,7 @@ void Metadata::dumpToDatabase(QSqlDatabase *db, QString startdir)
     query.exec();
 
     // easiest way to ensure we've got 'id' filled.
-    fillData(db);
+    fillData();
 }
 
 // Default values for formats
@@ -310,7 +309,7 @@ QString Metadata::FormatTitle()
 }
 
 
-void Metadata::updateDatabase(QSqlDatabase *db, QString startdir)
+void Metadata::updateDatabase(QString startdir)
 {
     startdir = startdir; 
     // only save to DB if something changed
@@ -326,7 +325,7 @@ void Metadata::updateDatabase(QSqlDatabase *db, QString startdir)
     if (genre == "")
         genre = QObject::tr("Unknown Genre");
 
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("UPDATE musicmetadata SET artist = :ARTIST, album = :ALBUM, "
                   "compilation_artist = :COMPILATION_ARTIST, "
@@ -461,7 +460,7 @@ void Metadata::getField(const QString &field, QString *data)
     }
 }
 
-void Metadata::fillData(QSqlDatabase *db)
+void Metadata::fillData()
 {
     if (title == "")
         return;
@@ -479,7 +478,7 @@ void Metadata::fillData(QSqlDatabase *db)
 
     thequery += ";";
 
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(thequery);
     query.bindValue(":TITLE", title.utf8());
     query.bindValue(":ALBUM", album.utf8());
@@ -510,12 +509,12 @@ void Metadata::fillData(QSqlDatabase *db)
     }
 }
 
-void Metadata::fillDataFromID(QSqlDatabase *db)
+void Metadata::fillDataFromID()
 {       
     if (id == 0)
         return; 
         
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT title,artist,compilation_artist,album,title,genre,year,tracknum,"
                   "length,filename,rating,playcount,lastplay,compilation FROM "
                   "musicmetadata WHERE intid = :ID ;");
@@ -606,9 +605,8 @@ void MetadataLoadingThread::run()
     parent->resync();
 }
 
-AllMusic::AllMusic(QSqlDatabase *ldb, QString path_assignment, QString a_startdir)
+AllMusic::AllMusic(QString path_assignment, QString a_startdir)
 {
-    db = ldb;
     startdir = a_startdir;
     done_loading = false;
     
@@ -675,7 +673,8 @@ void AllMusic::resync()
     if (!startdir.endsWith("/"));
         startdir += "/";
 
-    MSqlQuery query = db->exec(aquery);
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.exec(aquery);
 
     all_music.clear();
     
@@ -1063,7 +1062,7 @@ void AllMusic::save()
     {
         if(searcher->hasChanged())
         {
-            searcher->persist(db);
+            searcher->persist();
         }
         ++an_iterator;
     }

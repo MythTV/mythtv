@@ -4,7 +4,6 @@
 #include <qvaluelist.h>
 #include <qlistview.h>
 #include <qptrlist.h>
-#include <qsqldatabase.h>
 #include <qthread.h>
 
 #include "metadata.h"
@@ -64,11 +63,11 @@ class Playlist
 
     void postLoad(void);
 
-    void loadPlaylist(QString a_name, QSqlDatabase *a_db, QString a_host);
-    void loadPlaylistByID(int id, QSqlDatabase *a_db, QString a_host);
+    void loadPlaylist(QString a_name, QString a_host);
+    void loadPlaylistByID(int id, QString a_host);
 
-    void savePlaylist(QString a_name, QSqlDatabase *a_db);
-    void saveNewPlaylist(QSqlDatabase *a_db, QString a_host);
+    void savePlaylist(QString a_name);
+    void saveNewPlaylist(QString a_host);
 
     void putYourselfOnTheListView(UIListGenericTree *a_parent);
 
@@ -135,8 +134,7 @@ class PlaylistLoadingThread : public QThread
 class PlaylistsContainer
 {
   public:
-    PlaylistsContainer(QSqlDatabase *db_ptr, AllMusic *all_music, 
-                       QString host_name);
+    PlaylistsContainer(AllMusic *all_music, QString host_name);
    ~PlaylistsContainer();
 
     void            load();
@@ -189,7 +187,6 @@ class PlaylistsContainer
     Playlist            *backup_playlist;
     QValueList<int>     cd_playlist;
     QPtrList<Playlist>  *all_other_playlists;
-    QSqlDatabase        *db;   
     AllMusic            *all_available_music;
     PlaylistTitle       *active_widget;
     int                 pending_writeback_index;

@@ -25,15 +25,13 @@ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include <mythtv/uitypes.h>
 #include <mythtv/xmlparse.h>
 
-class QSqlDatabase;
 typedef QValueList<Metadata>  ValueMetadata;
 
 class VideoSelected : public MythDialog
 {
     Q_OBJECT
   public:
-    VideoSelected(QSqlDatabase *ldb, 
-                 MythMainWindow *parent, const char *name = 0, int idnum = 0);
+    VideoSelected(MythMainWindow *parent, const char *name = 0, int idnum = 0);
     ~VideoSelected();
     void VideoSelected::processEvents() { qApp->processEvents(); }
     
@@ -50,7 +48,6 @@ class VideoSelected : public MythDialog
     bool noUpdate;
 
     QPixmap getPixmap(QString &level);
-    QSqlDatabase *db;
 
     void LoadWindow(QDomElement &);
     void parseContainer(QDomElement &);

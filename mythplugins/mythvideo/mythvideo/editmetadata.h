@@ -14,7 +14,6 @@
 
 #include <iostream>
 using namespace std;
-#include <qsqldatabase.h>
 #include <mythtv/mythdialogs.h>
 
 #include "metadata.h"
@@ -30,8 +29,7 @@ class EditMetadataDialog : public MythThemedDialog
     
   public:
   
-    EditMetadataDialog(QSqlDatabase *ldb,
-                       Metadata *source_metadata,
+    EditMetadataDialog(Metadata *source_metadata,
                        MythMainWindow *parent, 
                        QString window_name,
                        QString theme_filename,
@@ -57,7 +55,6 @@ class EditMetadataDialog : public MythThemedDialog
 
   private:
   
-    QSqlDatabase        *db;    
     Metadata            *working_metadata;
 
     //

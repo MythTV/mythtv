@@ -22,15 +22,13 @@ enum
     SHOWING_IMDBMANUAL
 };
 
-class QSqlDatabase;
 typedef QValueList<Metadata>  ValueMetadata;
 
 class VideoManager : public MythDialog
 {
     Q_OBJECT
   public:
-    VideoManager(QSqlDatabase *ldb, 
-                 MythMainWindow *parent, const char *name = 0);
+    VideoManager(MythMainWindow *parent, const char *name = 0);
     ~VideoManager(void);
     void VideoManager::processEvents() { qApp->processEvents(); }
     
@@ -79,7 +77,6 @@ class VideoManager : public MythDialog
     VideoFilterSettings *currentVideoFilter;
 
     QPixmap getPixmap(QString &level);
-    QSqlDatabase *db;
     ValueMetadata m_list;
 
     void LoadWindow(QDomElement &);

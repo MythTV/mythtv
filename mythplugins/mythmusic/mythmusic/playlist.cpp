@@ -260,17 +260,8 @@ bool PlaylistsContainer::checkCDTrack(int track)
     return false;
 }
 
-PlaylistsContainer::PlaylistsContainer(QSqlDatabase *db_ptr, 
-                                       AllMusic *all_music, QString host_name)
+PlaylistsContainer::PlaylistsContainer(AllMusic *all_music, QString host_name)
 {
-    if (!db_ptr)
-    { 
-        cerr << "playlist.o: Tried to initialize a PlaylistsContainer with "
-                "no database pointer\n";
-        return;
-    }
-
-    db = db_ptr;
     active_widget = NULL;
     my_host = host_name;
  
@@ -327,15 +318,15 @@ void PlaylistsContainer::load()
     
     cd_playlist.clear();
 
-    active_playlist->loadPlaylist("default_playlist_storage", db, my_host);
+    active_playlist->loadPlaylist("default_playlist_storage", my_host);
     active_playlist->fillSongsFromSonglist();
     
-    backup_playlist->loadPlaylist("backup_playlist_storage", db, my_host);
+    backup_playlist->loadPlaylist("backup_playlist_storage", my_host);
     backup_playlist->fillSongsFromSonglist();
 
     all_other_playlists->clear();
 
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT playlistid FROM musicplaylist "
                   "WHERE name != :DEFAULT  "
                   "AND name != :BACKUP  "
@@ -350,7 +341,7 @@ void PlaylistsContainer::load()
         {
             Playlist *temp_playlist = new Playlist(all_available_music);   //  No, we don't destruct this ...
             temp_playlist->setParent(this);
-            temp_playlist->loadPlaylistByID(query.value(0).toInt(), db, my_host);
+            temp_playlist->loadPlaylistByID(query.value(0).toInt(), my_host);
             temp_playlist->fillSongsFromSonglist();
             all_other_playlists->append(temp_playlist); //  ... cause it's sitting on this PtrList
         }
@@ -467,7 +458,7 @@ void Playlist::describeYourself()
 }
 
 
-void Playlist::loadPlaylist(QString a_name, QSqlDatabase *a_db, QString a_host)
+void Playlist::loadPlaylist(QString a_name, QString a_host)
 {
     QString thequery;
     if (a_host.length() < 1)
@@ -477,7 +468,7 @@ void Playlist::loadPlaylist(QString a_name, QSqlDatabase *a_db, QString a_host)
         return;
     }
    
-    MSqlQuery query(QString::null, a_db);
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT playlistid, name, songlist FROM "
                   "musicplaylist WHERE name = :NAME AND "
                   "hostname = :HOST ;");
@@ -500,14 +491,14 @@ void Playlist::loadPlaylist(QString a_name, QSqlDatabase *a_db, QString a_host)
     else
     {
         name = a_name;
-        saveNewPlaylist(a_db, a_host);
+        saveNewPlaylist(a_host);
         changed = true;
     }
 }
 
-void Playlist::loadPlaylistByID(int id, QSqlDatabase *a_db, QString a_host)
+void Playlist::loadPlaylistByID(int id, QString a_host)
 {
-    MSqlQuery query(QString::null, a_db);
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT playlistid, name, songlist FROM "
                   "musicplaylist WHERE playlistid = :ID AND "
                   "hostname = :HOST ;");
@@ -576,8 +567,7 @@ void Playlist::fillSonglistFromSongs()
 
 void Playlist::fillSonglistFromQuery(QString whereClause)
 {
-    QSqlDatabase *db_conn = QSqlDatabase::database();
-    MSqlQuery query(QString::null, db_conn);
+    MSqlQuery query(MSqlQuery::InitCon());
 
     QString theQuery;
 
@@ -603,8 +593,7 @@ void Playlist::fillSonglistFromQuery(QString whereClause)
 
 void Playlist::fillSonglistFromSmartPlaylist(QString category, QString name)
 {
-    QSqlDatabase *db_conn = QSqlDatabase::database();
-    MSqlQuery query(QString::null, db_conn);
+    MSqlQuery query(MSqlQuery::InitCon());
 
     // find the correct categoryid
     int categoryID = SmartPlaylistEditor::lookupCategoryID(category);
@@ -683,22 +672,15 @@ void Playlist::fillSonglistFromSmartPlaylist(QString category, QString name)
     fillSonglistFromQuery(whereClause); 
 }
     
-void Playlist::savePlaylist(QString a_name, QSqlDatabase *a_db)
+void Playlist::savePlaylist(QString a_name)
 {
-    if (!a_db)
-    {
-        cerr << "playlist.o: I can't save a playlist by name without a "
-                "pointer to a database" << endl ;
-        return;
-    }
-
     name = name.simplifyWhiteSpace();
     if (name.length() < 1)
         return;
 
     fillSonglistFromSongs();
 
-    MSqlQuery query(QString::null, a_db);        
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT NULL FROM musicplaylist WHERE playlistid = :ID ;");
     query.bindValue(":ID", playlistid);
 
@@ -721,13 +703,8 @@ void Playlist::savePlaylist(QString a_name, QSqlDatabase *a_db)
     query.exec();
 }
 
-void Playlist::saveNewPlaylist(QSqlDatabase *a_db, QString a_host)
+void Playlist::saveNewPlaylist(QString a_host)
 {
-    if(!a_db)
-    {
-        cerr << "playlist.o: I can't save a playlist by name without a pointer to a database" << endl ;
-        return;
-    }
     name = name.simplifyWhiteSpace();
     if(name.length() < 1)
     {
@@ -743,7 +720,7 @@ void Playlist::saveNewPlaylist(QSqlDatabase *a_db, QString a_host)
 
     fillSonglistFromSongs();
     
-    MSqlQuery query(QString::null, a_db);
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("INSERT musicplaylist (name, hostname) "
                   "VALUES(:NAME, :HOST);");
     query.bindValue(":NAME", name.utf8());
@@ -965,12 +942,12 @@ void PlaylistsContainer::save()
         if(a_list->hasChanged())
         {
             a_list->fillSonglistFromSongs();
-            a_list->savePlaylist(a_list->getName(), db);
+            a_list->savePlaylist(a_list->getName());
         }
     }
     
-    active_playlist->savePlaylist("default_playlist_storage", db);
-    backup_playlist->savePlaylist("backup_playlist_storage", db);
+    active_playlist->savePlaylist("default_playlist_storage");
+    backup_playlist->savePlaylist("backup_playlist_storage");
 }
 
 void PlaylistsContainer::createNewPlaylist(QString name)
@@ -980,7 +957,7 @@ void PlaylistsContainer::createNewPlaylist(QString name)
     new_list->setName(name);
     
     //  Need to touch the database to get persistent ID
-    new_list->saveNewPlaylist(db, my_host);
+    new_list->saveNewPlaylist(my_host);
     new_list->Changed();
     all_other_playlists->append(new_list);
     //if(my_widget)
@@ -995,7 +972,7 @@ void PlaylistsContainer::copyNewPlaylist(QString name)
     new_list->setParent(this);
     new_list->setName(name);
     //  Need to touch the database to get persistent ID
-    new_list->saveNewPlaylist(db, my_host);
+    new_list->saveNewPlaylist(my_host);
     new_list->Changed();
     all_other_playlists->append(new_list);
     active_playlist->copyTracks(new_list, false);
@@ -1106,7 +1083,7 @@ void PlaylistsContainer::deletePlaylist(int kill_me)
         }
     }
 
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM musicplaylist WHERE playlistid = :ID ;");
     query.bindValue(":ID", kill_me);
 

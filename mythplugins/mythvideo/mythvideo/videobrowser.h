@@ -14,7 +14,6 @@
 
 #include "videodlg.h"
 
-class QSqlDatabase;
 typedef QValueList<Metadata>  ValueMetadata;
 
 class VideoBrowser : public VideoDialog
@@ -22,8 +21,7 @@ class VideoBrowser : public VideoDialog
     Q_OBJECT
   
   public:
-    VideoBrowser(QSqlDatabase *ldb, 
-                 MythMainWindow *parent, const char *name = 0);
+    VideoBrowser(MythMainWindow *parent, const char *name = 0);
     virtual ~VideoBrowser();
    
   protected slots:

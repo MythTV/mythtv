@@ -14,7 +14,6 @@
 #include <mythtv/lcddevice.h>
 #include <mythtv/uilistbtntype.h>
 
-class QSqlDatabase;
 class TreeCheckItem;
 
 class ReadCDThread : public QThread

@@ -18,6 +18,10 @@ using namespace std;
 #include <unistd.h>
 #include "dvdprobe.h"
 
+#include <mythtv/mythcontext.h>
+#include <mythtv/mythdbcon.h>
+
+
 DVDSubTitle::DVDSubTitle(int subtitle_id, const QString &a_language)
 {
     id = subtitle_id; 
@@ -372,14 +376,8 @@ void DVDTitle::addSubTitle(DVDSubTitle *new_subtitle)
     subtitles.append(new_subtitle);
 }
 
-void DVDTitle::determineInputID(QSqlDatabase *db)
+void DVDTitle::determineInputID()
 {
-    if(!db)
-    {
-        cerr << "dvdprobe.o: Yeah, right, whatever. I'll look stuff up with nowhere to look. Duh ..." << endl;
-        return;
-    }
-    
     QString q_string = QString("SELECT intid FROM dvdinput WHERE "
                               "hsize = %1 and "
                               "vsize = %2 and "
@@ -396,7 +394,8 @@ void DVDTitle::determineInputID(QSqlDatabase *db)
                               .arg(letterbox)
                               .arg(video_format);
 
-    QSqlQuery a_query (q_string, db);
+    MSqlQuery a_query;
+    q_query.exec(q_string);
     
     if(a_query.isActive() && a_query.numRowsAffected() > 0)
     {
@@ -436,21 +435,13 @@ DVDTitle::~DVDTitle()
 */
 
 
-DVDProbe::DVDProbe(const QString &dvd_device, QSqlDatabase *ldb)
+DVDProbe::DVDProbe(const QString &dvd_device)
 {
     //
     //  This object just figures out what's on a disc
     //  and tells whomever asks about it.
     //
-    
-    if(!ldb)
-    {
-        cerr << "dvdprobe.o: Hey! You tried to construct me with a null database pointer" << endl;
-        exit(0);
-    }
-    
-    db = ldb;
-    
+   
     device = dvd_device;
     dvd = NULL;
     titles.setAutoDelete(true);
@@ -762,7 +753,7 @@ bool DVDProbe::probe()
                 //  dvdinput table
                 //
                 
-                new_title->determineInputID(db);
+                new_title->determineInputID();
         
                 //
                 //  Add this new title to the container

@@ -5,11 +5,9 @@
 #include <qstring.h>
 
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythdbcon.h>
 #include <qpixmap.h>
 #include <qimage.h>
-#include <mythtv/mythdbcon.h>
-
-class QSqlDatabase;
 
 class Metadata
 {
@@ -159,24 +157,24 @@ class Metadata
     void guessTitle();
     void eatBraces(const QString &left_brace, const QString &right_brace);
     void setField(QString field, QString data);
-    void dumpToDatabase(QSqlDatabase *db);
-    void updateDatabase(QSqlDatabase *db);
-    bool fillDataFromID(QSqlDatabase *db);
-    bool fillDataFromFilename(QSqlDatabase *db);
-    int getIdCategory(QSqlDatabase *db);
-    void setIdCategory(QSqlDatabase *db, int id);
-    bool Remove(QSqlDatabase *db);
+    void dumpToDatabase();
+    void updateDatabase();
+    bool fillDataFromID();
+    bool fillDataFromFilename();
+    int getIdCategory();
+    void setIdCategory(int id);
+    bool Remove();
     
     QImage* getCoverImage();
     QPixmap* getCoverPixmap();
     void setCoverPixmap(QPixmap* pix) { coverPixmap = pix; }
     bool haveCoverPixmap() const { return (coverPixmap != NULL); }
   private:
-    void fillCategory(QSqlDatabase *db);
-    void fillCountries(QSqlDatabase *db);
-    void updateCountries(QSqlDatabase *db);
-    void fillGenres(QSqlDatabase *db);
-    void updateGenres(QSqlDatabase *db);
+    void fillCategory();
+    void fillCountries();
+    void updateCountries();
+    void fillGenres();
+    void updateGenres();
     QImage* coverImage;
     QPixmap* coverPixmap;
         

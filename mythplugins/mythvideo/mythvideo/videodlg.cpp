@@ -12,11 +12,10 @@
 const long WATCHED_WATERMARK = 10000; // Less than this and the chain of videos will 
                                       // not be followed when playing.
 
-VideoDialog::VideoDialog(DialogType _myType, QSqlDatabase *_db, 
-                         MythMainWindow *_parent,  const char* _winName, const char *_name)
+VideoDialog::VideoDialog(DialogType _myType, MythMainWindow *_parent,  
+                         const char* _winName, const char *_name)
            : MythDialog(_parent, _name)
 {
-    db = _db;
     myType = _myType;
     curitem = NULL;    
     popup = NULL;
@@ -39,7 +38,7 @@ VideoDialog::VideoDialog(DialogType _myType, QSqlDatabase *_db,
     fullRect = QRect(0, 0, size().width(), size().height());
     allowPaint = true;
     currentParentalLevel = gContext->GetNumSetting("VideoDefaultParentalLevel", 1);
-    currentVideoFilter = new VideoFilterSettings(db, true, _winName);
+    currentVideoFilter = new VideoFilterSettings(true, _winName);
 }
 
 VideoDialog::~VideoDialog()
@@ -217,7 +216,7 @@ void VideoDialog::playVideo(Metadata *someItem)
     while (parentItem->ChildID() > 0 && playing_time.elapsed() > WATCHED_WATERMARK)
     {
         childItem->setID(parentItem->ChildID());
-        childItem->fillDataFromID(db);
+        childItem->fillDataFromID();
 
         if (parentItem->ChildID() > 0)
         {
@@ -274,7 +273,7 @@ QString VideoDialog::getHandler(Metadata *someItem)
         
         QString extension = filename.section(".", -1, -1);
 
-        MSqlQuery query(QString::null, db);
+        MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT playcommand, use_default FROM "
                       "videotypes WHERE extension = :EXT ;");
         query.bindValue(":EXT", extension);
@@ -447,8 +446,9 @@ void VideoDialog::fetchVideos()
                         .arg(currentVideoFilter->BuildClauseWhere())
                         .arg(currentVideoFilter->BuildClauseOrderBy());
 
-    MSqlQuery query(thequery,db);
-    
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.exec(thequery);
+
     Metadata *myData;
 
     if (query.isActive() && query.size() > 0)
@@ -458,7 +458,7 @@ void VideoDialog::fetchVideos()
             myData = new Metadata();
             
             myData->setID(query.value(0).toUInt());
-            myData->fillDataFromID(db);
+            myData->fillDataFromID();
             if (myData->ShowLevel() <= currentParentalLevel && myData->ShowLevel() != 0)
             {
                 handleMetaFetch(myData);
@@ -473,7 +473,7 @@ void VideoDialog::fetchVideos()
 void VideoDialog::slotDoFilter()
 {
     cancelPopup();
-    VideoFilterDialog * vfd = new VideoFilterDialog(db, currentVideoFilter,
+    VideoFilterDialog * vfd = new VideoFilterDialog(currentVideoFilter,
                                                     gContext->GetMainWindow(),
                                                     "filter", "video-",
                                                     "Video Filter Dialog");

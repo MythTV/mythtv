@@ -13,14 +13,13 @@
 
 #include <iostream>
 using namespace std;
-#include <qsqldatabase.h>
 #include <mythtv/mythdialogs.h>
 
 #include "metadata.h"
 class VideoFilterSettings
 {
     public :
-        VideoFilterSettings(QSqlDatabase *db, bool loaddefaultsettings = true, 
+        VideoFilterSettings(bool loaddefaultsettings = true,  
                             const QString& _prefix = "");
         VideoFilterSettings(VideoFilterSettings *other);
         ~VideoFilterSettings();
@@ -59,7 +58,6 @@ class VideoFilterSettings
         int browse;
         int orderby;
         QString prefix;
-        QSqlDatabase    *db;
 };
 
 class VideoFilterDialog : public MythThemedDialog
@@ -73,8 +71,7 @@ class VideoFilterDialog : public MythThemedDialog
     
   public:
   
-    VideoFilterDialog(QSqlDatabase *ldb,
-                       VideoFilterSettings *settings,
+    VideoFilterDialog(VideoFilterSettings *settings,
                        MythMainWindow *parent, 
                        QString window_name,
                        QString theme_filename,
@@ -103,7 +100,6 @@ class VideoFilterDialog : public MythThemedDialog
     void setOrderby(int new_orderby);
  private:
     void update_numvideo();
-    QSqlDatabase        *db;    
     VideoFilterSettings *originalSettings;
     VideoFilterSettings *currentSettings;
     //  

@@ -17,7 +17,6 @@
 using namespace std;
 
 #include <qapplication.h>
-#include <qsqldatabase.h>
 #include <qmutex.h>
 #include <qregexp.h>
 #include <mythtv/themedmenu.h>
@@ -41,8 +40,7 @@ using namespace std;
 #ifdef TRANSCODE_SUPPORT
 void startDVDRipper(void)
 {
-    DVDRipBox *drb = new DVDRipBox(QSqlDatabase::database(), 
-                                   gContext->GetMainWindow(),
+    DVDRipBox *drb = new DVDRipBox(gContext->GetMainWindow(),
                                    "dvd_rip", "dvd-"); 
     qApp->unlock();
     drb->exec();
@@ -193,17 +191,17 @@ void DVDCallback(void *data, QString &selection)
     else if (sel == "dvd_settings_general")
     {
         DVDGeneralSettings settings;
-        settings.exec(QSqlDatabase::database());
+        settings.exec();
     }
     else if (sel == "dvd_settings_play")
     {
         DVDPlayerSettings settings;
-        settings.exec(QSqlDatabase::database());
+        settings.exec();
     }
     else if (sel == "dvd_settings_rip")
     {
         DVDRipperSettings settings;
-        settings.exec(QSqlDatabase::database());
+        settings.exec();
     }
 }
 
@@ -304,15 +302,15 @@ int mythplugin_init(const char *libversion)
     UpgradeDVDDatabaseSchema();
 
     DVDGeneralSettings gsettings;
-    gsettings.load(QSqlDatabase::database());
-    gsettings.save(QSqlDatabase::database());
+    gsettings.load();
+    gsettings.save();
     DVDPlayerSettings psettings;
-    psettings.load(QSqlDatabase::database());
-    psettings.save(QSqlDatabase::database());
+    psettings.load();
+    psettings.save();
 #ifdef TRANSCODE_SUPPORT
     DVDRipperSettings rsettings;
-    rsettings.load(QSqlDatabase::database());
-    rsettings.save(QSqlDatabase::database());
+    rsettings.load();
+    rsettings.save();
 #endif
 
     initKeys();

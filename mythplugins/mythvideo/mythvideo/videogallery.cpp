@@ -13,7 +13,6 @@ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 #include <qlayout.h>
 #include <qapplication.h>
-#include <qsqldatabase.h>
 #include <qstringlist.h>
 #include <qpixmap.h>
 #include <unistd.h>
@@ -32,8 +31,8 @@ const int UP_FOLDER = -2;
 
 
 
-VideoGallery::VideoGallery(QSqlDatabase *ldb, MythMainWindow *parent, const char *name)
-            : VideoDialog(DLG_GALLERY, ldb, parent, "gallery", name)
+VideoGallery::VideoGallery(MythMainWindow *parent, const char *name)
+            : VideoDialog(DLG_GALLERY, parent, "gallery", name)
 {
     updateML = false;
 
@@ -873,7 +872,7 @@ void VideoGallery::handleVideoSelect()
 {
     cancelPopup();
 
-    VideoSelected *selected = new VideoSelected(db, gContext->GetMainWindow(),
+    VideoSelected *selected = new VideoSelected(gContext->GetMainWindow(),
                                                 "video selected", where_we_are->getInt());
     qApp->unlock();
     selected->exec();

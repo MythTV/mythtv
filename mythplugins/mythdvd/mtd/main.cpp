@@ -18,6 +18,7 @@ using namespace std;
 #include <unistd.h>
 
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythdbcon.h>
 #include <mythtv/langsettings.h>
 
 #include "../mythdvd/config.h"
@@ -99,15 +100,11 @@ int main(int argc, char **argv)
     //  Get the Myth context and db hooks
     //    
     
-    gContext = new MythContext(MYTH_BINARY_VERSION, false);
-    QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
-    if (!db)
-    {
-        cerr << "mtd: Couldn't connect to database. Giving up. " << endl; 
-        return -1;
-    }
-    
-    if(!gContext->OpenDatabase(db))
+    gContext = NULL;
+    gContext = new MythContext(MYTH_BINARY_VERSION);
+    gContext->Init(false);
+
+    if (!MSqlQuery::testDBConnection())
     {
         cerr << "mtd: Couldn't open database. I go away now. " << endl;
         return -1;

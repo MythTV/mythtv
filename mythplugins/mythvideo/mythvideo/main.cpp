@@ -3,7 +3,6 @@
 using namespace std;
 
 #include <qapplication.h>
-#include <qsqldatabase.h>
 #include <unistd.h>
 #include <qsocketnotifier.h>
 #include <qtextcodec.h>
@@ -43,8 +42,8 @@ typedef QMap <QString, VideoFileLocation> VideoLoadedMap;
 
 void runMenu(QString, const QString &);
 void VideoCallback(void *, QString &);
-void SearchDir(QSqlDatabase *, QString &);
-void BuildFileList(QSqlDatabase *, QString &, VideoLoadedMap &, QStringList &);
+void SearchDir(QString &);
+void BuildFileList(QString &, VideoLoadedMap &, QStringList &);
 
 extern "C" {
 int mythplugin_init(const char *libversion);
@@ -92,11 +91,11 @@ int mythplugin_init(const char *libversion)
     UpgradeVideoDatabaseSchema();
 
     VideoGeneralSettings general;
-    general.load(QSqlDatabase::database());
-    general.save(QSqlDatabase::database());
+    general.load();
+    general.save();
     VideoPlayerSettings settings;
-    settings.load(QSqlDatabase::database());
-    settings.save(QSqlDatabase::database());
+    settings.load();
+    settings.save();
 
     setupKeys();
 
@@ -208,10 +207,9 @@ void runVideoManager(void)
     {
         QString startdir = gContext->GetSetting("VideoStartupDir",
                                                 "/share/Movies/dvd");
-        SearchDir(QSqlDatabase::database(), startdir);
+        SearchDir(startdir);
 
-        VideoManager *manage = new VideoManager(QSqlDatabase::database(),
-                                                gContext->GetMainWindow(),
+        VideoManager *manage = new VideoManager(gContext->GetMainWindow(),
                                                 "video manager");
         qApp->unlock();
         manage->exec();
@@ -222,8 +220,7 @@ void runVideoManager(void)
 
 void runVideoBrowser(void)
 {
-    VideoBrowser *browse = new VideoBrowser(QSqlDatabase::database(),
-                                            gContext->GetMainWindow(),
+    VideoBrowser *browse = new VideoBrowser(gContext->GetMainWindow(),
                                             "video browser");
     qApp->unlock();
     browse->exec();
@@ -234,7 +231,6 @@ void runVideoBrowser(void)
 void runVideoTree(void)
 {
     VideoTree *tree = new VideoTree(gContext->GetMainWindow(),
-                                    QSqlDatabase::database(),
                                     "videotree",
                                     "video-",
                                     "video tree"); 
@@ -269,8 +265,7 @@ void runDefaultView(void)
 
 void runVideoGallery(void)
 {
-    VideoGallery *gallery = new VideoGallery(QSqlDatabase::database(),
-                                             gContext->GetMainWindow(),
+    VideoGallery *gallery = new VideoGallery(gContext->GetMainWindow(),
                                              "video gallery");
     qApp->unlock();
     gallery->exec();
@@ -306,24 +301,23 @@ void VideoCallback(void *data, QString &selection)
             if (checkParentPassword())
             {
                 VideoGeneralSettings settings;
-                settings.exec(QSqlDatabase::database());
+                settings.exec();
             }
         }
         else
         {
             VideoGeneralSettings settings;
-            settings.exec(QSqlDatabase::database());
+            settings.exec();
         }
     }
     else if (sel == "settings_player")
     {
         VideoPlayerSettings settings;
-        settings.exec(QSqlDatabase::database());
+        settings.exec();
     }
     else if (sel == "settings_associations")
     {
-        FileAssocDialog fa(QSqlDatabase::database(),
-                           gContext->GetMainWindow(),
+        FileAssocDialog fa(gContext->GetMainWindow(),
                            "file_associations",
                            "video-",
                            "fa dialog");
@@ -332,15 +326,16 @@ void VideoCallback(void *data, QString &selection)
     }
 }
 
-void SearchDir(QSqlDatabase *db, QString &directory)
+void SearchDir(QString &directory)
 {
     VideoLoadedMap video_files;
     VideoLoadedMap::Iterator iter;
 
     QStringList imageExtensions = QImage::inputFormatList();
-    BuildFileList(db, directory, video_files, imageExtensions);
+    BuildFileList(directory, video_files, imageExtensions);
 
-    MSqlQuery query("SELECT filename FROM videometadata;", db);
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.exec("SELECT filename FROM videometadata;");
 
     int counter = 0;
 
@@ -385,7 +380,7 @@ void SearchDir(QSqlDatabase *db, QString &directory)
                                      QObject::tr("None"), 0.0, 
                                      QObject::tr("NR"), 0, 0, 1);
             myNewFile->guessTitle();
-            myNewFile->dumpToDatabase(db);
+            myNewFile->dumpToDatabase();
             if (myNewFile)
                 delete myNewFile;
         }
@@ -405,12 +400,14 @@ void SearchDir(QSqlDatabase *db, QString &directory)
     delete file_checking;
 }
 
-bool IgnoreExtension(QSqlDatabase *db, QString extension)
+bool IgnoreExtension(QString extension)
 {
     
     QString q_string = QString("SELECT f_ignore FROM videotypes WHERE extension = \"%1\" ;")
                               .arg(extension);
-    MSqlQuery a_query(q_string, db);
+    MSqlQuery a_query(MSqlQuery::InitCon());
+    a_query.exec(q_string);
+
     if(a_query.isActive() && a_query.size() > 0)
     {
         //
@@ -432,8 +429,7 @@ bool IgnoreExtension(QSqlDatabase *db, QString extension)
     return !gContext->GetNumSetting("VideoListUnknownFileTypes", 1);
 }
 
-void BuildFileList(QSqlDatabase *db,
-                   QString &directory, 
+void BuildFileList(QString &directory, 
                    VideoLoadedMap &video_files,
                    QStringList &imageExtensions)
 {
@@ -464,7 +460,7 @@ void BuildFileList(QSqlDatabase *db,
         
         if(!fi->isDir())
         {
-            if(IgnoreExtension(db, fi->extension(false)))
+            if(IgnoreExtension(fi->extension(false)))
             {
                 continue;
             }
@@ -472,7 +468,7 @@ void BuildFileList(QSqlDatabase *db,
         
         QString filename = fi->absFilePath();
         if (fi->isDir())
-            BuildFileList(db, filename, video_files, imageExtensions);
+            BuildFileList(filename, video_files, imageExtensions);
         else
         {
             r.setPattern("^" + fi->extension() + "$");

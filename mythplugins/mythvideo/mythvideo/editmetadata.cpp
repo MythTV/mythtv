@@ -8,12 +8,12 @@
 */
 
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythdbcon.h>
 
 #include "editmetadata.h"
 
 
-EditMetadataDialog::EditMetadataDialog(QSqlDatabase *ldb,
-                                       Metadata *source_metadata,
+EditMetadataDialog::EditMetadataDialog(Metadata *source_metadata,
                                        MythMainWindow *parent, 
                                        QString window_name,
                                        QString theme_filename,
@@ -26,12 +26,6 @@ EditMetadataDialog::EditMetadataDialog(QSqlDatabase *ldb,
     //  works on a single metadata entry.
     //
     
-    if(!ldb)
-    {
-        cerr << "editmetadata.o: Where I am supposed to load stuff from if you don't give me a db pointer?" << endl;
-        exit(0);
-    }
-    db = ldb;
     
     //
     //  Make a copy, so we can abandon changes if desired
@@ -39,7 +33,7 @@ EditMetadataDialog::EditMetadataDialog(QSqlDatabase *ldb,
 
     working_metadata = new Metadata();
     working_metadata->setID(source_metadata->ID());
-    working_metadata->fillDataFromID(db);
+    working_metadata->fillDataFromID();
     
     title_editor = NULL; 
     player_editor = NULL; 
@@ -59,7 +53,9 @@ void EditMetadataDialog::fillWidgets()
         category_select->addItem(0,"Unknown");
         QString q_string = QString("SELECT intid, category FROM videocategory"
                                    " ORDER BY category");
-        QSqlQuery a_query(q_string,db);
+        MSqlQuery a_query(MSqlQuery::InitCon());
+        a_query.exec(q_string);
+
         if (a_query.isActive())
         {
             while (a_query.next())
@@ -68,7 +64,7 @@ void EditMetadataDialog::fillWidgets()
                 category_select->addItem(a_query.value(0).toInt(), cat);
             }
         }
-        category_select->setToItem(working_metadata->getIdCategory(db));
+        category_select->setToItem(working_metadata->getIdCategory());
     }
     if(level_select)
     {
@@ -92,7 +88,9 @@ void EditMetadataDialog::fillWidgets()
 
         QString q_string = QString("SELECT intid, title FROM videometadata "
                                    "ORDER BY title ;");
-        QSqlQuery a_query(q_string, db);
+        MSqlQuery a_query(MSqlQuery::InitCon());
+        a_query.exec(q_string);
+
         if(a_query.isActive() && a_query.size() > 0)
         {
             while(a_query.next())
@@ -295,7 +293,7 @@ void EditMetadataDialog::keyPressEvent(QKeyEvent *e)
                     if (ok)
                     {
                         working_metadata->setCategory(category);
-                        int id = working_metadata->getIdCategory(db);
+                        int id = working_metadata->getIdCategory();
                         category_select->addItem(id, category);
                         category_select->setToItem(id);
                     }
@@ -340,7 +338,7 @@ void EditMetadataDialog::saveAndExit()
     //  Persist to database
     //
     
-    working_metadata->updateDatabase(db);
+    working_metadata->updateDatabase();
     
     //
     //  All done
@@ -356,7 +354,7 @@ void EditMetadataDialog::setTitle(QString new_title)
 
 void EditMetadataDialog::setCategory(int new_category)
 {
-    working_metadata->setIdCategory(db, new_category);
+    working_metadata->setIdCategory(new_category);
 }
 
 void EditMetadataDialog::setPlayer(QString new_command)

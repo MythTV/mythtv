@@ -13,19 +13,13 @@
 
 #include "fileassoc.h"
 
-FileAssociation::FileAssociation(QSqlDatabase *ldb, const QString &new_extension)
+FileAssociation::FileAssociation(const QString &new_extension)
 {
     //
     //  Create a new file association
     //  (empty)
     //
 
-    if(!ldb)
-    {
-        cerr << "fileassoc.o: Not going to get very vary without a db pointer!" << endl;
-        exit(0);
-    }
-    db = ldb;
     loaded_from_db = false;
     changed = true;
     id = -1;
@@ -35,8 +29,7 @@ FileAssociation::FileAssociation(QSqlDatabase *ldb, const QString &new_extension
     use_default = true;
 }
 
-FileAssociation::FileAssociation(QSqlDatabase *ldb,
-                                 int   i,
+FileAssociation::FileAssociation(int   i,
                                  const QString &e,
                                  const QString &p,
                                  bool  g,
@@ -48,12 +41,6 @@ FileAssociation::FileAssociation(QSqlDatabase *ldb,
     //  already exists in the db
     //
 
-    if(!ldb)
-    {
-        cerr << "fileassoc.o: Not going to get very vary without a db pointer!" << endl;
-        exit(0);
-    }
-    db = ldb;
     loaded_from_db = true;
     changed = false;
 
@@ -76,7 +63,7 @@ void FileAssociation::saveYourself()
             //  save its changes.
             //
 
-            MSqlQuery query(QString::null, db);
+            MSqlQuery query(MSqlQuery::InitCon());
             query.prepare("UPDATE videotypes SET playcommand = :COMMAND, "
                           "f_ignore = :IGNORE, use_default = :DEFAULT "
                           "WHERE intid = :ID ;");
@@ -89,7 +76,7 @@ void FileAssociation::saveYourself()
         }
         else
         {
-            MSqlQuery query(QString::null, db);
+            MSqlQuery query(MSqlQuery::InitCon());
             query.prepare("INSERT INTO videotypes "
                           "(extension, playcommand, f_ignore, use_default) "
                           "VALUES (:EXT, :COMMAND, :IGNORE, :DEFAULT) ;");
@@ -108,7 +95,7 @@ void FileAssociation::deleteYourselfFromDB()
 {
     if(loaded_from_db)
     {
-        MSqlQuery query(QString::null, db);
+        MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("DELETE FROM videotypes WHERE intid = :ID ;");
         query.bindValue(":ID", id);
         if(!query.exec())
@@ -120,19 +107,12 @@ void FileAssociation::deleteYourselfFromDB()
 ---------------------------------------------------------------------
 */
 
-FileAssocDialog::FileAssocDialog(QSqlDatabase *ldb,
-                                 MythMainWindow *parent, 
+FileAssocDialog::FileAssocDialog(MythMainWindow *parent, 
                                  QString window_name,
                                  QString theme_filename,
                                  const char* name)
                 :MythThemedDialog(parent, window_name, theme_filename, name)
 {
-    if(!ldb)
-    {
-        cerr << "fileassoc.o: Where I am supposed to load stuff from if you don't give me a db pointer?" << endl;
-        exit(0);
-    }
-    db = ldb;
     command_editor = NULL;
     file_associations.clear();
     file_associations.setAutoDelete(true);
@@ -226,23 +206,18 @@ void FileAssocDialog::takeFocusAwayFromEditor(bool up_or_down)
 
 void FileAssocDialog::loadFileAssociations()
 {
-    if(!db)
-    {
-        cerr << "fileassoc.o: Ha Ha Ha. Very funny" << endl;
-        return;
-    }
-    
     QString q_string = QString("SELECT intid, extension, playcommand, "
                                "f_ignore, use_default "
                                "FROM videotypes ;");
     
-    MSqlQuery a_query(q_string, db);
+    MSqlQuery a_query(MSqlQuery::InitCon());
+    a_query.exec(q_string);
+
     if(a_query.isActive() && a_query.size() > 0)
     {
         while(a_query.next())
         {
-            FileAssociation *new_fa = new FileAssociation(db,
-                                                          a_query.value(0).toInt(),
+            FileAssociation *new_fa = new FileAssociation(a_query.value(0).toInt(),
                                                           a_query.value(1).toString(),
                                                           a_query.value(2).toString(),
                                                           a_query.value(3).toBool(),
@@ -448,7 +423,7 @@ void FileAssocDialog::createExtension()
     QString new_extension = new_extension_editor->text();
     if(new_extension.length() > 0)
     {
-        FileAssociation *new_fa = new FileAssociation(db, new_extension);
+        FileAssociation *new_fa = new FileAssociation(new_extension);
         file_associations.append(new_fa);
         current_fa = new_fa;
     }

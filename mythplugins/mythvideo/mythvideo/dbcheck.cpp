@@ -1,4 +1,3 @@
-#include <qsqldatabase.h>
 #include <qstring.h>
 
 #include <iostream>
@@ -7,15 +6,16 @@ using namespace std;
 #include "dbcheck.h"
 
 #include "mythtv/mythcontext.h"
+#include "mythtv/mythdbcon.h"
 
 const QString currentDatabaseVersion = "1005";
 
 static void UpdateDBVersionNumber(const QString &newnumber)
 {
-    QSqlDatabase *db_conn = QSqlDatabase::database();
+    MSqlQuery query(MSqlQuery::InitCon());
 
-    db_conn->exec("DELETE FROM settings WHERE value='VideoDBSchemaVer';");
-    db_conn->exec(QString("INSERT INTO settings (value, data, hostname) "
+    query.exec("DELETE FROM settings WHERE value='VideoDBSchemaVer';");
+    query.exec(QString("INSERT INTO settings (value, data, hostname) "
                           "VALUES ('VideoDBSchemaVer', %1, NULL);")
                          .arg(newnumber));
 }
@@ -23,7 +23,7 @@ static void UpdateDBVersionNumber(const QString &newnumber)
 static void performActualUpdate(const QString updates[], QString version,
                                 QString &dbver)
 {
-    QSqlDatabase *db_conn = QSqlDatabase::database();
+    MSqlQuery query(MSqlQuery::InitCon());
 
     VERBOSE(VB_ALL, QString("Upgrading to MythVideo schema version ") + 
             version);
@@ -33,7 +33,7 @@ static void performActualUpdate(const QString updates[], QString version,
 
     while (thequery != "")
     {
-        db_conn->exec(thequery);
+        query.exec(thequery);
         counter++;
         thequery = updates[counter];
     }
@@ -45,8 +45,6 @@ static void performActualUpdate(const QString updates[], QString version,
 static void InitializeDatabase(void)
 {
     VERBOSE(VB_ALL, "Inserting MythVideo initial database information.");
-
-    QSqlDatabase *db_conn = QSqlDatabase::database();
 
     const QString updates[] = {
 "CREATE TABLE IF NOT EXISTS videometadata ("
@@ -80,8 +78,10 @@ static void InitializeDatabase(void)
     QString dbver = "";
     performActualUpdate(updates, "1000", dbver);
 
-    QSqlQuery qQuery = db_conn->exec("SELECT * FROM videotypes;");
-    if (!qQuery.isActive() || qQuery.numRowsAffected() <= 0)
+    MSqlQuery qQuery(MSqlQuery::InitCon());
+    qQuery.exec("SELECT * FROM videotypes;");
+
+    if (!qQuery.isActive() || qQuery.size() <= 0)
     {
         const QString updates2[] = {
 "INSERT INTO videotypes (extension, playcommand, f_ignore, use_default)"

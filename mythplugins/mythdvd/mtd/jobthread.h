@@ -13,7 +13,6 @@
 #include <qthread.h>
 #include <qstringlist.h>
 #include <qfile.h>
-#include <qsqldatabase.h>
 #include <qprocess.h>
 #include <dvdread/dvd_reader.h>
 #include <dvdread/ifo_types.h>
@@ -159,7 +158,6 @@ class DVDTranscodeThread : public DVDThread
                        int nice_priority,
                        int quality_level,
                        bool do_ac3,
-                       QSqlDatabase *ldb,
                        int which_audio,
                        int numb_seconds,
                        int subtitle_track_numb);
@@ -184,7 +182,6 @@ class DVDTranscodeThread : public DVDThread
     QStringList  tc_arguments;
     QProcess     *tc_process;
     bool         two_pass;
-    QSqlDatabase *db;
     int          audio_track;
     int          length_in_seconds;
     bool         ac3_flag;

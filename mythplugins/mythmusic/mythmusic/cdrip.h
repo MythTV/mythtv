@@ -10,7 +10,6 @@
 #include <mythtv/mythwidgets.h>
 #include <mythtv/mythdialogs.h>
 
-class QSqlDatabase;
 class QFrame;
 class QVBoxLayout;
 class QPushButton;
@@ -22,7 +21,7 @@ class Ripper : public MythDialog
 {
     Q_OBJECT
   public:
-    Ripper(QSqlDatabase *ldb, MythMainWindow *parent, const char *name = 0);
+    Ripper(MythMainWindow *parent, const char *name = 0);
    ~Ripper(void);
   
     QSizePolicy sizePolicy(void);
@@ -46,7 +45,6 @@ class Ripper : public MythDialog
     void handleFileTokens(QString &filename, Metadata *track);
     void ejectCD(QString &cddev);
 
-    QSqlDatabase *db;
     QVBoxLayout *bigvb;
     QFrame *firstdiag;
 

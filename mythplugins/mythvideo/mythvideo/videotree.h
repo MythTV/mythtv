@@ -10,7 +10,6 @@
 
 #include "metadata.h"
 
-class QSqlDatabase;
 class VideoFilterSettings;
 
 class VideoTree : public MythThemedDialog
@@ -21,9 +20,8 @@ class VideoTree : public MythThemedDialog
 
     typedef QValueVector<int> IntVector;
 
-    VideoTree(MythMainWindow *parent, QSqlDatabase *ldb,
-              QString window_name, QString theme_filename,
-              const char *name = 0);
+    VideoTree(MythMainWindow *parent, QString window_name, 
+              QString theme_filename, const char *name = 0);
    ~VideoTree();
 
     void buildVideoList();
@@ -61,7 +59,6 @@ class VideoTree : public MythThemedDialog
     Metadata* curitem;    
     void         wireUpTheme();
     int          current_parental_level;
-    QSqlDatabase *db;
     bool         file_browser;
     QStringList  browser_mode_files;
        

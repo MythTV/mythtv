@@ -1,5 +1,4 @@
 #include <qapplication.h>
-#include <qsqldatabase.h>
 #include <stdlib.h>
 #include <iostream>
 using namespace std;
@@ -21,13 +20,11 @@ const long WATCHED_WATERMARK = 10000; // Less than this and the chain of videos 
                                       // not be followed when playing.
 
 
-VideoTree::VideoTree(MythMainWindow *parent, QSqlDatabase *ldb,
-                     QString window_name, QString theme_filename,
-                     const char *name)
+VideoTree::VideoTree(MythMainWindow *parent, QString window_name, 
+                     QString theme_filename, const char *name)
          : MythThemedDialog(parent, window_name, theme_filename, name)
 {
     curitem = NULL;
-    db = ldb;
     popup = NULL;
     expectingPopup = false;
     video_tree_data = NULL;
@@ -43,7 +40,7 @@ VideoTree::VideoTree(MythMainWindow *parent, QSqlDatabase *ldb,
     wireUpTheme();
     video_tree_root = new GenericTree("video root", -2, false);
     
-    currentVideoFilter = new VideoFilterSettings(db, true, "VideoTree");
+    currentVideoFilter = new VideoFilterSettings(true, "VideoTree");
     
     buildVideoList();
     
@@ -237,7 +234,7 @@ void VideoTree::setParentalLevel(int which_level)
 
 bool VideoTree::ignoreExtension(QString extension)
 {
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT f_ignore FROM videotypes WHERE extension = :EXT ;");
     query.bindValue(":EXT", extension);
     if(query.exec() && query.isActive() && query.size() > 0)
@@ -417,7 +414,9 @@ void VideoTree::buildVideoList()
                     .arg(currentVideoFilter->BuildClauseWhere())
                     .arg(currentVideoFilter->BuildClauseOrderBy());
         
-        MSqlQuery query(thequery,db);
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.exec(thequery);
+
         Metadata *myData;
         if (!video_tree_data)
             video_tree_data = video_tree_root->addNode("videos", -2, false);
@@ -443,7 +442,7 @@ void VideoTree::buildVideoList()
             
                 myData = new Metadata();
                 myData->setID(idnum);
-                myData->fillDataFromID(db);
+                myData->fillDataFromID();
                 if (myData->ShowLevel() <= current_parental_level && myData->ShowLevel() != 0)
                 {
                     QString file_string = myData->Filename();
@@ -527,7 +526,7 @@ void VideoTree::handleTreeListEntry(int node_int, IntVector*)
                 /* See if we can find this filename in DB */
                 curitem->setFilename(the_file);
                 
-                if(curitem->fillDataFromFilename(db)) 
+                if(curitem->fillDataFromFilename()) 
                 {
                     video_title->SetText(curitem->Title());
                     video_file->SetText(curitem->Filename().section("/", -1));
@@ -559,7 +558,7 @@ void VideoTree::handleTreeListEntry(int node_int, IntVector*)
                 curitem = new Metadata();
                             
             curitem->setID(node_int);
-            curitem->fillDataFromID(db);
+            curitem->fillDataFromID();
             video_title->SetText(curitem->Title());
             video_file->SetText(curitem->Filename().section("/", -1));
             video_poster->SetImage(curitem->CoverFile());
@@ -586,7 +585,7 @@ void VideoTree::handleTreeListEntry(int node_int, IntVector*)
         //
         
 
-        MSqlQuery query(QString::null, db);
+        MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT playcommand, use_default FROM "
                       "videotypes WHERE extension = :EXT ;");
         query.bindValue(":EXT", extension);
@@ -658,7 +657,7 @@ void VideoTree::handleTreeListSelection(int node_int, IntVector *)
 
                     Metadata *node_data = new Metadata();
                     node_data->setID(which_file);
-                    node_data->fillDataFromID(db);
+                    node_data->fillDataFromID();
                     which_file = node_data->ChildID();
                     //cout << "Just set which file to " << which_file << endl;
                     delete node_data;
@@ -914,7 +913,7 @@ void VideoTree::playVideo(Metadata *someItem)
     while (parentItem->ChildID() > 0 && playing_time.elapsed() > WATCHED_WATERMARK)
     {
         childItem->setID(parentItem->ChildID());
-        childItem->fillDataFromID(db);
+        childItem->fillDataFromID();
 
         if (parentItem->ChildID() > 0)
         {
@@ -971,7 +970,7 @@ QString VideoTree::getHandler(Metadata *someItem)
         
         QString extension = filename.section(".", -1, -1);
 
-        MSqlQuery query(QString::null, db);
+        MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT playcommand, use_default FROM "
                       "videotypes WHERE extension = :EXT ;");
         query.bindValue(":EXT", extension);
@@ -1041,7 +1040,7 @@ QString VideoTree::getCommand(Metadata *someItem)
 void VideoTree::slotDoFilter()
 {
     cancelPopup();
-    VideoFilterDialog * vfd = new VideoFilterDialog(db, currentVideoFilter,
+    VideoFilterDialog * vfd = new VideoFilterDialog(currentVideoFilter,
                                                     gContext->GetMainWindow(),
                                                     "filter", "video-",
                                                     "Video Filter Dialog");

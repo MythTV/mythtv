@@ -21,6 +21,7 @@ using namespace std;
 #include <qapplication.h>
 
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythdbcon.h>
 
 #include "jobthread.h"
 #include "mtd.h"
@@ -595,7 +596,6 @@ DVDTranscodeThread::DVDTranscodeThread(MTD *owner,
                                        int nice_priority,
                                        int quality_level,
                                        bool do_ac3,
-                                       QSqlDatabase *ldb,
                                        int which_audio,
                                        int numb_seconds,
                                        int subtitle_track_numb)
@@ -609,7 +609,6 @@ DVDTranscodeThread::DVDTranscodeThread(MTD *owner,
                             nice_priority)
 
 {
-    db = ldb;
     quality = quality_level;
     ac3_flag = do_ac3;
     working_directory = NULL;
@@ -835,8 +834,10 @@ bool DVDTranscodeThread::buildTranscodeCommandLine(int which_run)
                                      " FROM dvdtranscode WHERE intid = %1 ;")
                                      .arg(quality);
                                      
-    QSqlQuery a_query(q_string, db);
-    if(a_query.isActive() && a_query.numRowsAffected() > 0)
+    MSqlQuery a_query(MSqlQuery::InitCon());
+    a_query.exec(q_string);
+
+    if(a_query.isActive() && a_query.size() > 0)
     {
         a_query.next();
     }
@@ -881,10 +882,11 @@ bool DVDTranscodeThread::buildTranscodeCommandLine(int which_run)
     //
     
     q_string = QString("SELECT hsize, vsize, fr_code FROM dvdinput WHERE intid = %1 ;").arg(input_setting);
-    QSqlQuery second_query(q_string, db);
-    if(second_query.isActive() && second_query.numRowsAffected() > 0)
+    a_query.exec(q_string);
+
+    if(a_query.isActive() && a_query.size() > 0)
     {
-        second_query.next();
+        a_query.next();
     }
     else
     {
@@ -892,9 +894,9 @@ bool DVDTranscodeThread::buildTranscodeCommandLine(int which_run)
         return false;
     }
 
-    int input_hsize = second_query.value(0).toInt();
-    int input_vsize = second_query.value(1).toInt();
-    int fr_code = second_query.value(2).toInt();
+    int input_hsize = a_query.value(0).toInt();
+    int input_vsize = a_query.value(1).toInt();
+    int fr_code = a_query.value(2).toInt();
     
     //
     //  Check if we are doing subtitles

@@ -10,7 +10,6 @@
 	
 */
 
-#include <qsqldatabase.h>
 
 #include "decoder.h"
 
@@ -30,7 +29,7 @@ class aacDecoder : public Decoder
     void seek(double);
     void stop();
 
-    Metadata *getMetadata(QSqlDatabase *db);
+    Metadata *getMetadata();
     void commitMetadata(Metadata *mdata);
 
     bool     initializeMP4();

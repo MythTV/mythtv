@@ -13,7 +13,6 @@ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 #include <qlayout.h>
 #include <qapplication.h>
-#include <qsqldatabase.h>
 #include <qcursor.h>
 #include <qstringlist.h>
 #include <qpixmap.h>
@@ -33,16 +32,14 @@ using namespace std;
 #include <mythtv/mythdbcon.h>
 
 
-VideoSelected::VideoSelected(QSqlDatabase *ldb,
-                             MythMainWindow *parent, const char *name, 
+VideoSelected::VideoSelected(MythMainWindow *parent, const char *name, 
                              int idnum)
             : MythDialog(parent, name)
 {
-    db = ldb;
 
     curitem = new Metadata();
     curitem->setID(idnum);
-    curitem->fillDataFromID(db);
+    curitem->fillDataFromID();
 
     noUpdate = false;
     m_state = 0;
@@ -193,7 +190,7 @@ void VideoSelected::updatePlayWait(QPainter *p)
     while (parentItem->ChildID() > 0 && playing_time.elapsed() > 10000)
     {
         childItem->setID(parentItem->ChildID());
-        childItem->fillDataFromID(db);
+        childItem->fillDataFromID();
 
         if (parentItem->ChildID() > 0)
         {
@@ -404,7 +401,7 @@ void VideoSelected::selected(Metadata *someItem)
         
         QString extension = filename.section(".", -1, -1);
 
-        MSqlQuery query(QString::null, db);
+        MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT playcommand, use_default FROM "
                       "videotypes WHERE extension = :EXT ;");
         query.bindValue(":EXT", extension);

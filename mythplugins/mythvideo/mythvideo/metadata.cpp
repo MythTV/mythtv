@@ -1,4 +1,3 @@
-#include <qsqldatabase.h>
 #include <qfile.h>
 #include <cmath>
 #include <iostream>
@@ -75,17 +74,19 @@ void Metadata::setField(QString field, QString data)
     }
 }
 
-bool Metadata::Remove(QSqlDatabase *db)
+bool Metadata::Remove()
 {
     QFile videofile;
     videofile.setName(filename);
     bool isremoved = videofile.remove();
     if (isremoved)
     {
+        MSqlQuery query(MSqlQuery::InitCon());
         QString thequery;
+
         thequery.sprintf("DELETE FROM videometadatagenre "
                         " WHERE idvideo = %d",id);
-        MSqlQuery query(thequery,db);
+        query.exec(thequery);
         if (!query.isActive()){
             MythContext::DBError("delete from videometadatagenre", query);
         }
@@ -116,9 +117,9 @@ bool Metadata::Remove(QSqlDatabase *db)
     return isremoved;
 }
 
-void Metadata::fillCategory(QSqlDatabase *db)
+void Metadata::fillCategory()
 {
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT videocategory.category"
                   " FROM videometadata INNER JOIN videocategory"
                   " ON videometadata.category = videocategory.intid"
@@ -132,9 +133,9 @@ void Metadata::fillCategory(QSqlDatabase *db)
     }
 }
 
-void Metadata::fillGenres(QSqlDatabase *db)
+void Metadata::fillGenres()
 {
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT genre"
                   " FROM videometadatagenre INNER JOIN videogenre"
                   " ON videometadatagenre.idgenre = videogenre.intid"
@@ -150,9 +151,9 @@ void Metadata::fillGenres(QSqlDatabase *db)
     }
 }
 
-void Metadata::fillCountries(QSqlDatabase *db)
+void Metadata::fillCountries()
 {
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT country" 
                   " FROM videometadatacountry INNER JOIN videocountry"
                   " ON videometadatacountry.idcountry = videocountry.intid"
@@ -169,12 +170,12 @@ void Metadata::fillCountries(QSqlDatabase *db)
 
 }
 
-bool Metadata::fillDataFromFilename(QSqlDatabase *db)
+bool Metadata::fillDataFromFilename()
 {
     if (filename == "")
         return false;
 
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT intid FROM videometadata WHERE filename = :FILE ;");
     query.bindValue(":FILE", filename.utf8());
 
@@ -184,7 +185,7 @@ bool Metadata::fillDataFromFilename(QSqlDatabase *db)
 
         id = query.value(0).toInt();
 
-        return fillDataFromID(db);
+        return fillDataFromID();
     }
 
     MythContext::DBError("fillfromfilename", query);
@@ -192,12 +193,12 @@ bool Metadata::fillDataFromFilename(QSqlDatabase *db)
     return false;
 }
 
-bool Metadata::fillDataFromID(QSqlDatabase *db)
+bool Metadata::fillDataFromID()
 {       
     if (id == 0)
         return false; 
         
-    MSqlQuery query(QString::null, db); 
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT title,director,plot,rating,year,userrating,"
                   "length,filename,showlevel,coverfile,inetref,childid,"
                   "browse,playcommand, videocategory.category "
@@ -230,10 +231,10 @@ bool Metadata::fillDataFromID(QSqlDatabase *db)
         category = query.value(14).toString();
 
     // Genres
-        fillGenres(db);
+        fillGenres();
     
         //Countries
-        fillCountries(db);
+        fillCountries();
 
         return true;
     }
@@ -242,7 +243,7 @@ bool Metadata::fillDataFromID(QSqlDatabase *db)
     return false;
 }
 
-void Metadata::dumpToDatabase(QSqlDatabase *db)
+void Metadata::dumpToDatabase()
 {
     if (title == "")
         title = filename;
@@ -271,7 +272,7 @@ void Metadata::dumpToDatabase(QSqlDatabase *db)
     if (userrating < -10.0 || userrating >= 10.0)
         userrating = 0.0;
 
-    MSqlQuery a_query(QString::null, db);
+    MSqlQuery a_query(MSqlQuery::InitCon());
     a_query.prepare("INSERT INTO videometadata (title,director,plot,"
                     "rating,year,userrating,length,filename,showlevel,"
                     "coverfile,inetref,browse) VALUES (:TITLE, :DIRECTOR, "
@@ -316,8 +317,8 @@ void Metadata::dumpToDatabase(QSqlDatabase *db)
         return;
     }
 
-    updateGenres(db);
-    updateCountries(db);
+    updateGenres();
+    updateCountries();
 }
 
 void Metadata::guessTitle()
@@ -375,7 +376,7 @@ void Metadata::eatBraces(const QString &left_brace, const QString &right_brace)
     }
 }
 
-void Metadata::updateDatabase(QSqlDatabase *db)
+void Metadata::updateDatabase()
 {
     if (title == "")
         guessTitle();
@@ -390,9 +391,9 @@ void Metadata::updateDatabase(QSqlDatabase *db)
     if (inetref == "")
         inetref = "00000000";
 
-    int idCategory = getIdCategory(db);
+    int idCategory = getIdCategory();
 
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("UPDATE videometadata SET title = :TITLE, "
                   "director = :DIRECTOR, plot = :PLOT, rating= :RATING, "
                   "year = :YEAR, userrating = :USERRATING, length = :LENGTH, "
@@ -422,16 +423,16 @@ void Metadata::updateDatabase(QSqlDatabase *db)
     {
         MythContext::DBError("video metadata update", query);
     }
-    updateGenres(db);
-    updateCountries(db);
+    updateGenres();
+    updateCountries();
 }
 
-int Metadata::getIdCategory(QSqlDatabase *db)
+int Metadata::getIdCategory()
 {
     int idcategory = 0;
     if (category != "")
     {
-        MSqlQuery query(QString::null, db);
+        MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT intid FROM videocategory"
                       " WHERE category like :CATEGORY ;");
         query.bindValue(":CATEGORY" ,category.utf8());
@@ -466,13 +467,13 @@ int Metadata::getIdCategory(QSqlDatabase *db)
     
 }
 
-void Metadata::setIdCategory(QSqlDatabase *db, int id)
+void Metadata::setIdCategory(int id)
 {
     if (id==0)
         category = "";
     else 
     {
-        MSqlQuery query(QString::null, db);
+        MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT category FROM videocategory"
                       " WHERE intid = :ID;");
         query.bindValue(":ID", id);
@@ -485,9 +486,9 @@ void Metadata::setIdCategory(QSqlDatabase *db, int id)
     }
 }
 
-void Metadata::updateGenres(QSqlDatabase *db)
+void Metadata::updateGenres()
 {
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM videometadatagenre where idvideo = :ID;");
     query.bindValue(":ID", id);
     if (!query.exec() || !query.isActive())
@@ -547,11 +548,11 @@ void Metadata::updateGenres(QSqlDatabase *db)
     }
 }
 
-void Metadata::updateCountries(QSqlDatabase *db)
+void Metadata::updateCountries()
 {
     //remove countries for this video
 
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM videometadatacountry where idvideo = :ID;");
     query.bindValue(":ID", id);
     if (!query.exec() || !query.isActive())
