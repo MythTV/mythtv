@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-01-24, v1.082
+<date>2003-01-26, v1.083
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -18,7 +18,7 @@ necessary.
 <p>This HOWTO document is maintained at the primary MythTV website:  <url url="
 http://www.mythtv.org" name="http://www.mythtv.org">.  The latest version of
 this document can be found in CVS, accessible either through the <url
-url="http://www.mythtv.org/cgi-bin/viewcvs.cgi/" name="ViewCVS"> web interface, or directly from the
+url="http://cvs.mythtv.org/cgi-bin/viewcvs.cgi/" name="ViewCVS"> web interface, or directly from the
 CVS repository.  You may download the latest copy of MythTV and the 
 documentation from CVS this way:
 <tscreen><verb>
@@ -2361,6 +2361,7 @@ v1.080, 2003-01-17.  Adjustment to RH80 docs by Cedar.  Added recommendation
 to use KDE vs. Gnome for RH8.
 v1.081, 2003-01-20.  Fixed XMLTV version error (Darren Mak)
 v1.082, 2003-01-24.  Added help for MDK 9.0 mysql startup.
+v1.083, 2003-01-26.  Fixed link to webcvs in section 1.  (Cedar McKay)
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

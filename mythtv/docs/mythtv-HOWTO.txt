@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-01-24, v1.082
+  2003-01-26, v1.083
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -126,7 +126,7 @@
   This HOWTO document is maintained at the primary MythTV website:
   http://www.mythtv.org < http://www.mythtv.org>.  The latest version of
   this document can be found in CVS, accessible either through the
-  ViewCVS <http://www.mythtv.org/cgi-bin/viewcvs.cgi/> web interface, or
+  ViewCVS <http://cvs.mythtv.org/cgi-bin/viewcvs.cgi/> web interface, or
   directly from the CVS repository.  You may download the latest copy of
   MythTV and the documentation from CVS this way:
 
