@@ -711,8 +711,8 @@ void PlaylistsContainer::writeTree(GenericTree *tree_to_write_to)
     GenericTree *subsub_node = sub_node->addNode("Active Play Queue", 0);
     subsub_node->setAttribute(0, 0);
     subsub_node->setAttribute(1, 0);
-    subsub_node->setAttribute(2, 0);
-    subsub_node->setAttribute(3, 0);
+    subsub_node->setAttribute(2, rand());
+    subsub_node->setAttribute(3, rand());
 
     active_playlist->writeTree(subsub_node, 0);
 
@@ -723,10 +723,10 @@ void PlaylistsContainer::writeTree(GenericTree *tree_to_write_to)
     {
         ++a_counter;
         GenericTree *new_node = sub_node->addNode(a_list->getName(), a_counter);
-        sub_node->setAttribute(0, 0);
-        sub_node->setAttribute(1, a_counter);
-        sub_node->setAttribute(2, a_counter);
-        sub_node->setAttribute(3, a_counter);
+        new_node->setAttribute(0, 0);
+        new_node->setAttribute(1, a_counter);
+        new_node->setAttribute(2, rand());
+        new_node->setAttribute(3, rand());
         a_list->writeTree(new_node, 0);
         ++iterator;
     }

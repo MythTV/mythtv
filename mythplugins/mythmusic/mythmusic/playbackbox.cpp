@@ -56,6 +56,11 @@ PlaybackBox::PlaybackBox(QString window_name,
     //
 
     show_whole_tree = gContext->GetNumSetting("ShowWholeTree", 1);
+    keyboard_accelerators = gContext->GetNumSetting("KeyboardAccelerators", 1);
+    if(!keyboard_accelerators)
+    {
+        show_whole_tree = false;
+    }
     showrating = gContext->GetNumSetting("MusicShowRatings", 0);
     listAsShuffled = gContext->GetNumSetting("ListAsShuffled", 0);
     cycle_visualizer = gContext->GetNumSetting("VisualCycleOnSongChange", 0);
@@ -90,7 +95,7 @@ PlaybackBox::PlaybackBox(QString window_name,
     //  Set some button values
     //
     
-    if (!show_whole_tree) 
+    if (!keyboard_accelerators) 
     {
         pledit_button->setText("Edit Playlist");
         vis_button->setText("Visualize");
@@ -145,12 +150,22 @@ PlaybackBox::PlaybackBox(QString window_name,
         visual_mode_timer->start(visual_mode_delay * 1000);
     }
     visualizer_status = 1;
-    mainvisual->setVisual(visual_mode);
-    //connect(visual_mode_timer, SIGNAL(timeout()), this, SLOT(expandVisualizer()));
-    //shrinkVisualizer();
 
     //
-    //  Ready to go. Let's update the foregroung just to
+    //  Temporary workaround for visualizer Bad X Requests
+    //
+    //  start on Blank, and then set the "real" mode after
+    //  the playlist timer fires. Seems to work.
+    //
+    //  Suspicion: in most modes, SDL is not happy if the
+    //  window doesn't fully exist yet  (????)
+    //
+    
+    mainvisual->setVisual("Blank");
+//    mainvisual->setVisual(visual_mode);
+
+    //
+    //  Ready to go. Let's update the foreground just to
     //  be safe.
     //
 
@@ -232,7 +247,7 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
     }
     else
     {
-        if (show_whole_tree)
+        if (keyboard_accelerators)
         {
             switch (e->key())
             {
@@ -300,15 +315,7 @@ void PlaybackBox::checkForPlaylists()
     if(all_playlists->doneLoading() &&
        all_music->doneLoading())
     {
-        if(show_whole_tree)
-        {
-            setContext(1);
-        }
-        else
-        {
-            setContext(2);
-            
-        }
+        mainvisual->setVisual(visual_mode);
         music_tree_list->showWholeTree(show_whole_tree);
         waiting_for_playlists_timer->stop();
         constructPlaylistTree();
@@ -318,6 +325,15 @@ void PlaybackBox::checkForPlaylists()
         branches_to_current_node.append(0);                  //  Active play Queue
         music_tree_list->moveToNodesFirstChild(branches_to_current_node);
         music_tree_list->refresh();
+        if(show_whole_tree)
+        {
+            setContext(1);
+        }
+        else
+        {
+            setContext(2);
+        }
+        updateForeground();
     }
     else
     {
@@ -325,6 +341,8 @@ void PlaybackBox::checkForPlaylists()
         //  Visual Feedback ...
         //
     }
+
+
 }
 
 PlaybackBox::~PlaybackBox(void)
@@ -651,14 +669,14 @@ void PlaybackBox::previous()
 {
     if(repeatmode == REPEAT_ALL)
     {
-        if(music_tree_list->prevActive(true))
+        if(music_tree_list->prevActive(true, show_whole_tree))
         {
             music_tree_list->activate();
         }
     }
     else
     {
-        if(music_tree_list->prevActive(false))
+        if(music_tree_list->prevActive(false, show_whole_tree))
         {
             music_tree_list->activate();
         }
@@ -672,14 +690,21 @@ void PlaybackBox::next()
 {
     if(repeatmode == REPEAT_ALL)
     {
-        if(music_tree_list->nextActive(true))
+        //
+        //  Grap the next track after this
+        //  one. First flag is to wrap around
+        //  to the beginning of the list. Second
+        //  decides if we will traverse up and down
+        //  tree.
+        //
+        if(music_tree_list->nextActive(true, show_whole_tree))
         {
             music_tree_list->activate();
         }
     }
     else
     {
-        if(music_tree_list->nextActive(false))
+        if(music_tree_list->nextActive(false, show_whole_tree))
         {
             music_tree_list->activate();
         }
@@ -750,22 +775,25 @@ void PlaybackBox::setShuffleMode(unsigned int mode)
     switch (shufflemode)
     {
         case SHUFFLE_INTELLIGENT:
-            if (show_whole_tree)
-                shuffle_button->setText("1 Shuffle: Intelligent");
+            if (keyboard_accelerators)
+                shuffle_button->setText("1 Shuffle: Smart");
             else
-                shuffle_button->setText("Shuffle: Intelligent");
+                shuffle_button->setText("Shuffle: Smart");
+            music_tree_list->scrambleParents(true);
             break;
         case SHUFFLE_RANDOM:
-            if (show_whole_tree)
-                shuffle_button->setText("1 Shuffle: Random");
+            if (keyboard_accelerators)
+                shuffle_button->setText("1 Shuffle: Rand");
             else
-                shuffle_button->setText("Shuffle: Random");
+                shuffle_button->setText("Shuffle: Rand");
+            music_tree_list->scrambleParents(true);
             break;
         default:
-            if (show_whole_tree)
+            if (keyboard_accelerators)
                 shuffle_button->setText("1 Shuffle: None");
             else
                 shuffle_button->setText("Shuffle: None");
+            music_tree_list->scrambleParents(false);
             break;
     }
     music_tree_list->setTreeOrdering(shufflemode + 1);
@@ -825,19 +853,19 @@ void PlaybackBox::setRepeatMode(unsigned int mode)
     switch (repeatmode)
     {
         case REPEAT_ALL:
-            if (show_whole_tree)
+            if (keyboard_accelerators)
                 repeat_button->setText("2 Repeat: All");
             else
                 repeat_button->setText("Repeat: All");
             break;
         case REPEAT_TRACK:
-            if (show_whole_tree)
+            if (keyboard_accelerators)
                 repeat_button->setText("2 Repeat: Track");
             else
                 repeat_button->setText("Repeat: Track");
             break;
         default:
-            if (show_whole_tree)
+            if (keyboard_accelerators)
                 repeat_button->setText("2 Repeat: None");
             else
                 repeat_button->setText("Repeat: None");

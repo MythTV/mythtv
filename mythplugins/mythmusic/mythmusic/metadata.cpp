@@ -883,8 +883,8 @@ void MusicNode::writeTree(GenericTree *tree_to_write_to, int a_counter)
     GenericTree *sub_node = tree_to_write_to->addNode(my_title);
     sub_node->setAttribute(0, 0);
     sub_node->setAttribute(1, a_counter);
-    sub_node->setAttribute(2, a_counter);
-    sub_node->setAttribute(3, a_counter);
+    sub_node->setAttribute(2, rand());
+    sub_node->setAttribute(3, rand());
     
     QPtrListIterator<Metadata>  anit(my_tracks);
     Metadata *a_track;

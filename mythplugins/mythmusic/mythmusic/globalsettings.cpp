@@ -106,6 +106,18 @@ public:
     };
 };
 
+class KeyboardAccelerators: public CheckBoxSetting, public GlobalSetting {
+public:
+    KeyboardAccelerators():
+        GlobalSetting("KeyboardAccelerators") {
+        setLabel("Use Keyboard/Remote Accelerated Buttons");
+        setValue(true);
+        setHelpText("If this is not set, you will need "
+                    "to use arrow keys to select and activate "
+                    "various functions.");
+    };
+};
+
 class ParanoiaLevel: public ComboBoxSetting, public GlobalSetting {
 public:
     ParanoiaLevel():
@@ -336,6 +348,7 @@ GeneralSettings::GeneralSettings()
     general->addChild(new NonID3FileNameFormat());
     general->addChild(new IgnoreID3Tags());
     general->addChild(new AutoLookupCD());
+    general->addChild(new KeyboardAccelerators());
     addChild(general);
 
     VerticalConfigurationGroup *general2 = new VerticalConfigurationGroup(false);

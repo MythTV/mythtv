@@ -128,6 +128,7 @@ class PlaybackBox : public MythThemedDialog
 
     bool cycle_visualizer;
     bool show_whole_tree;
+    bool keyboard_accelerators;
 
     //
     //  Theme-related "widgets"
