@@ -69,6 +69,15 @@ linux {
     SOURCES += hdtvrecorder.cpp fifowriter.cpp
 }
 
+macx {
+    SOURCES += videoout_quartz.cpp
+    HEADERS += videoout_quartz.h
+
+    # videoout_quartz.cpp uses CoreGraphics from ApplicationServices
+    QMAKE_CXXFLAGS += -F/System/Library/Frameworks/ApplicationServices.framework/Frameworks
+    LIBS           += -framework ApplicationServices
+}
+
 using_x11 {
     using_xv {
         SOURCES += videoout_xv.cpp

@@ -31,6 +31,10 @@
 #include "videoout_dx.h"
 #endif
 
+#ifdef Q_OS_MACX
+#include "videoout_quartz.h"
+#endif
+
 #include "dithertable.h"
 
 #include "../libavcodec/avcodec.h"
@@ -66,6 +70,10 @@ VideoOutput *VideoOutput::InitVideoOut(VideoOutputType type)
 
 #ifdef USING_XV
     return new VideoOutputXv();
+#endif
+
+#ifdef Q_OS_MACX
+    return new VideoOutputQuartz();
 #endif
 
     VERBOSE(VB_IMPORTANT, "Not compiled with any useable video output method.");
