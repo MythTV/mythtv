@@ -59,6 +59,25 @@ keybindings and more.  With proper security, you may even schedule a program
 over the Internet and have it immediately acted on by the scheduler.
 <item>MythPhone, phone and videophone using SIP.
 </itemize>
+<sect1>QuickStart
+<p>Custom mini-distributions are available to make it easier to install
+MythTV.  A mini-distribution removes many of the "general purpose"
+workstation / server software packages that may be installed by default if
+you use one of the big-name OS packages.
+
+See <url url="http://mysettopbox.tv" name="http://mysettopbox.tv"> if you'd
+like to install a custom version of Knoppix optimized for MythTV.
+
+See <url url="http://linpvr.org/" name="http://linpvr.org/"> if you'd like
+to install MythTV onto a VIA Epia M machine.
+
+<!-- See <url url="http://bit.blkbk.com/" name="http://bit.blkbk.com/"> if you'd
+like to install MythTV on an XBox. -->
+
+See <url url="http://wilsonet.com/mythtv/"
+name="http://wilsonet.com/mythtv/"> for instructions tailored to RedHat's
+Fedora Core distribution.
+
 <sect1>How to obtain this document <label id="how_to_obtain">
 <p>This HOWTO document is maintained at the primary MythTV website: <url
 url="http://www.mythtv.org" name="http://www.mythtv.org"> by Robert
@@ -81,7 +100,7 @@ name="http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html"> or as a PDF
 at <url url="http://www.mythtv.org/docs/mythtv-HOWTO.pdf"
 name="http://www.mythtv.org/docs/mythtv-HOWTO.pdf">.
 
-This HOWTO is for MythTV v0.16.
+This HOWTO is for MythTV v0.17.
 
 <sect1>Document conventions
 <p>The following conventions are used throughout this document.<newline>
@@ -170,24 +189,6 @@ doc.patch</bf> and mail it to the address above.
 American environment. If you have installation instructions for a different
 region or Linux distribution, please send them to the author so that it can
 be included in other versions of this document.
-
-Pre-compiled binaries are available for a number of distributions.  See
-section <ref id="precompiled" name="Software::Pre-compiled packages"> for
-more information.
-
-Custom mini-distributions are also available to make it easier to install
-MythTV.  A mini-distribution removes many of the "general purpose"
-workstation / server software packages that may be installed by default if
-you use one of the big-name OS packages.
-
-See <url url="http://linpvr.org/" name="http://linpvr.org/"> if you'd like
-to install MythTV onto a VIA Epia M machine.
-
-See <url url="http://mysettopbox.tv" name="http://mysettopbox.tv"> if you'd
-like to install a custom version of Knoppix optimized for MythTV.
-
-See <url url="http://bit.blkbk.com/" name="http://bit.blkbk.com/"> if you'd
-like to install MythTV on an XBox.
 
 <sect>Checking prerequisites. 
 <p>You must ensure that any firewalls (either hardware, or a software
@@ -424,11 +425,13 @@ unencrypted Free-To-Air satellite channels.
 <p>Currently there are two HDTV card with Linux drivers which are known to
 operate in the United States - the HD-2000 and HD-3000 cards available from
 <url url="http://www.pchdtv.com/" name="http://www.pchdtv.com/"> and the
-Air2PC-ATSC-PCI available from <url url="http://www.cyberestore.com/product_info.php?cPath=28&amp;products_id=103"
+Air2PC-ATSC-PCI available from <url
+url="http://www.cyberestore.com/product_info.php?cPath=28&amp;products_id=103"
 name="http://www.cyberestore.com/product_info.php?cPath=28&amp;products_id=103">
-These cards can only be used to capture over-the-air HDTV.  There are no known
-capture devices which will allow you to capture the HDTV output from a
-set-top box commonly found with digital cable systems or satellite systems.
+or <url url="http://mythic.tv/" name="http://mythic.tv/">. The Air2PC card
+can be configured to capture unencrypted QAM and 8VSB.  8VSB is the standard
+used for over-the-air ATSC signals, QAM is used on cable TV systems.  The
+Air2PC is supported using the linux-dvb drivers.
 
 To playback HDTV content, plan on a powerful CPU.  "How powerful?" depends
 on a number of factors, such as the capture resolution, whether the video is
@@ -442,21 +445,25 @@ Weave" deinterlacing, or if you have an NVIDIA card with MPEG-2 hardware
 accelleration.  If you enable the hardware accelleration, you may be able to
 use a 1.8GHz processor.
 
+<sect3>Firewire.
+<p>You may use the Firewire output of the DCT6200 or the SA3250.
+
 <sect2>Hardware known NOT to work and other issues
 <p><itemize>
 <item>Hauppauge WinTV-D or -HD (no driver)
 <item>Hauppauge WinTV-USB series
-<item>Hauppauge WinTV-PVR-usb, usb2 or PCI cards (no driver - this is not the PVR-250/350
+<item>Hauppauge WinTV-PVR-usb, or PCI cards (no driver - this is not the PVR-250/350
 series of cards supported by the IvyTV driver)
+<item>Hauppauge WinTV-PVR-USB2 (driver available at http://justiceforall.free.fr/pvrusb2.html, no MythTV support)
 <item>ATI All-in-Wonder series
 </itemize>
-<p>There are no known capture cards for digital cable.  You must use the
-set-top box provided by your digital cable provider and capture the analog
-video output using either composite or S-Video.
 
-There are no known capture cards for HDTV content.
+There are no known consumer-level capture devices which will allow you to
+capture the HDTV output (either DVI or HDMI) from a set-top box commonly
+found with digital cable systems or satellite systems.
 
-There are no known capture cards for component (RGB or YPbPr) video.
+There are no known consumer-level capture devices which will allow you to
+capture component output from a set-top box.
 <sect2>Sound card
 <p>The system needs a sound card or an on-board equivalent on the motherboard
 to play back and in most cases, to record sound. Any sound card that can be
@@ -7209,7 +7216,10 @@ leading to dropped frames.
 
 v0.17.00, 2005-01-  Version bump. Update LAME information.  Change case on
 march= line. Spelling error.  DTK's update to setup keys.  Update make -j
-stuff.  Add update to ALSA.  Remove all the stuff about compiling ALSA.
+stuff.  Add update to ALSA sound output.  Remove all the stuff about
+compiling ALSA.  Add another source for the Air2PC-ATSC card.  Add a section
+for Firewire "tuner".  Expand on HDTV - Air2PC can now talk QAM.  Comment
+out the xbox linux site; it appears to be dead?
 
 
 -->
