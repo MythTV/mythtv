@@ -22,7 +22,6 @@
       <alttext lang="DE">EPG</alttext>
       <alttext lang="DK">Guide</alttext>
       <alttext lang="NL">Gids</alttext>
-      <alttext lang="NL">Guia</alttext>
       <alttext lang="SV">Guide</alttext>
       <alttext lang="JA">ガイド</alttext>
       <alttext lang="ZH_TW">節目</alttext>
@@ -50,9 +49,9 @@
       <alttext lang="CA">Cercar</alttext>
       <alttext lang="DE">ABC Suche</alttext>
       <alttext lang="DK">Finder</alttext>
-      <alttext lang="NL">Zoeker</alttext>
+      <alttext lang="NL">Zoek A-Z</alttext>
       <alttext lang="PT">Procurar</alttext>
-      <alttext lang="SV">Sökaren</alttext>
+      <alttext lang="SV">Letaren</alttext>
       <alttext lang="JA">検索</alttext>
       <alttext lang="ZH_TW">搜尋</alttext>
       <action>TV_PROGFIND</action>
@@ -70,7 +69,8 @@
       <text lang="ZH_TW">關鍵字</text>
       <alttext>Search</alttext>
       <alttext lang="FR">Texte</alttext>
-      <alttext lang="SV">Sök</alttext>
+      <alttext lang="NL">Zoek</alttext>      
+      <alttext lang="SV">Ord</alttext>
       <alttext lang="DE">Wörter</alttext>
       <action>MENU tv_search.xml</action>
    </button>
@@ -88,6 +88,7 @@
       <alttext lang="DE">Listen</alttext>
       <alttext lang="SV">Listor</alttext>
       <alttext lang="FR">Listes</alttext>
+      <alttext lang="NL">Lijsten</alttext>      
       <action>MENU tv_lists.xml</action>
    </button>
 
@@ -125,6 +126,7 @@
       <text lang="NL">Geavanceerd Opnameschema</text>
       <text lang="JA">カスタム録画</text>
       <text lang="FR">Enregistrement avancé</text>
+      <text lang="NL">Opname op maat</text>      
       <action>TV_CUSTOM_RECORD</action>
    </button>
 
