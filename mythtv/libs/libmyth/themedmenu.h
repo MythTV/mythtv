@@ -17,6 +17,7 @@ struct ButtonIcon
 {
     QString name;
     QPixmap *icon;
+    QPixmap *activeicon;
     QPoint offset;
 };
 

@@ -389,7 +389,7 @@ void LCD::stopAll()
 
 void LCD::startTime()
 {
-	sendToServer("screen_set Time priority 16");
+	sendToServer("screen_set Time priority 64");
 	timeTimer->start(500, FALSE);
 	outputTime();
 	theMode = 0;	
@@ -485,7 +485,7 @@ void LCD::assignScrollingText(QString theText)
 void LCD::startMusic(QString artist, QString track)
 {
 	QString aString;
-	sendToServer("screen_set Music priority 16");
+	sendToServer("screen_set Music priority 64");
 	musicTimer->start(100, FALSE);
 	aString = artist;
 	aString += " - ";
@@ -497,7 +497,7 @@ void LCD::startMusic(QString artist, QString track)
 void LCD::startChannel(QString channum, QString title, QString subtitle)
 {
 	QString aString;
-	sendToServer("screen_set Channel priority 16");
+	sendToServer("screen_set Channel priority 64");
 	channelTimer->start(500, FALSE);
 	aString = channum;
 	aString += ": ";

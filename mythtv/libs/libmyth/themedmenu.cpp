@@ -71,6 +71,8 @@ ThemedMenu::~ThemedMenu(void)
     {
         if (it.data().icon)
             delete it.data().icon;
+        if (it.data().activeicon)
+            delete it.data().activeicon;
     }
 }
 
@@ -448,6 +450,7 @@ void ThemedMenu::parseButton(QString dir, QDomElement &element)
 
     QString name = "";
     QPixmap *image = NULL;
+    QPixmap *activeimage = NULL;
     QPoint offset;
 
     name = element.attribute("name", "");
@@ -465,6 +468,11 @@ void ThemedMenu::parseButton(QString dir, QDomElement &element)
                 QString imagepath = dir + getFirstText(info); 
                 image = m_context->LoadScalePixmap(imagepath);
                 hasicon = true;
+            }
+            else if (info.tagName() == "activeimage")
+            {
+                QString imagepath = dir + getFirstText(info);
+                activeimage = m_context->LoadScalePixmap(imagepath);
             }
             else if (info.tagName() == "offset")
             {
@@ -504,6 +512,7 @@ void ThemedMenu::parseButton(QString dir, QDomElement &element)
     newbutton.name = name;
     newbutton.icon = image;
     newbutton.offset = offset;
+    newbutton.activeicon = activeimage;
 
     allButtonIcons[name] = newbutton;
 }
@@ -998,8 +1007,13 @@ void ThemedMenu::paintButton(unsigned int button, QPainter *p, bool erased)
                         buttonList[button].iconRect.width(),
                         buttonList[button].iconRect.height());
 
-        tmp.drawPixmap(newRect.topLeft(), 
-                       *(buttonList[button].buttonicon->icon));
+        if ((&(buttonList[button]) == activebutton) && 
+            (buttonList[button].buttonicon->activeicon))
+            tmp.drawPixmap(newRect.topLeft(),
+                           *(buttonList[button].buttonicon->activeicon));
+        else
+            tmp.drawPixmap(newRect.topLeft(), 
+                           *(buttonList[button].buttonicon->icon));
     }
 
 
@@ -1063,6 +1077,8 @@ void ThemedMenu::ReloadTheme(void)
     {
         if (it.data().icon)
             delete it.data().icon;
+        if (it.data().activeicon)
+            delete it.data().activeicon;
     }
     allButtonIcons.clear();
 
