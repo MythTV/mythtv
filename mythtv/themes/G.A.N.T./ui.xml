@@ -1816,10 +1816,10 @@
     </font>
 
     <container name="background">
-     <!-- <image name="backgroundimg" draworder="0" fleximage="no">
-        <filename>trans-rk-background.png</filename>
-        <position>0,0</position>
-      </image> -->
+      <image name="filler" draworder="0" fleximage="yes">
+        <filename>sr-background.png</filename>
+        <position>0,305</position>
+      </image>
     </container>
 
     <container name="selector">

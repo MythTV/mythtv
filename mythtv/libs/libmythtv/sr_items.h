@@ -191,7 +191,7 @@ class SRRecordingType : public SRSelectSetting
         {
             addSelection("Record this showing with normal options", kNotRecording);
             addSelection("Record this showing with override options", kOverrideRecord);
-            addSelection("Do not record this showing", kDontRecord);
+            addSelection("Do not allow this showing to be recorded", kDontRecord);
         }
         
         

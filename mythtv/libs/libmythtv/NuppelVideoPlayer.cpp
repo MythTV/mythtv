@@ -624,9 +624,8 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
             hasdeletetable = true;
             deleteIter = deleteMap.begin();
         }
-
-        bookmarkseek = GetBookmark();
     }
+    bookmarkseek = GetBookmark();
 
     commDetect = new CommDetect(video_width, video_height, video_frame_rate,
                                 commercialskipmethod);
