@@ -201,6 +201,33 @@
         <catcolor category="社会・報道" color="DarkOrange3"></catcolor>
         <catcolor category="趣味・暮らし" color="goldenrod"></catcolor>
 
+
+	<!-- Categories introduced by italian program guide www.latele.it -->
+        <catcolor category="Altri" color="SlateGray"></catcolor>
+        <catcolor category="Corto" color="SlateGray"></catcolor>
+        <catcolor category="Speciale" color="SlateGray"></catcolor>
+        <catcolor category="Quiz" color="turquoise"></catcolor>
+        <catcolor category="Spettacolo" color="turquoise"></catcolor>
+        <catcolor category="Serial" color="brown"></catcolor>
+        <catcolor category="Telefilm" color="brown"></catcolor>
+        <catcolor category="Musicale" color="Red"></catcolor>
+        <catcolor category="Musica" color="Red"></catcolor>
+        <catcolor category="Variet�| " color="sienna"></catcolor>
+        <catcolor category="Magazine" color="sienna"></catcolor>
+        <catcolor category="Rubrica" color="sienna"></catcolor>
+        <catcolor category="Notizie" color="Orange"></catcolor>
+        <catcolor category="Informazione" color="Orange"></catcolor>
+        <catcolor category="Film" color="Blue"></catcolor>
+        <catcolor category="Sport" color="Cyan"></catcolor>
+        <catcolor category="Calcio" color="Cyan"></catcolor>
+        <catcolor category="Motori" color="Cyan"></catcolor>
+        <catcolor category="Bambini" color="Green"></catcolor>
+        <catcolor category="Ragazzi" color="Green"></catcolor>
+        <catcolor category="TV Movies" color="DarkOrchid"></catcolor>
+        <catcolor category="TV-Movie" color="DarkOrchid"></catcolor>
+        <catcolor category="Attualit�| " color="tan3"></catcolor>
+        <catcolor category="Documentario" color="tan3"></catcolor>
+
         <recordstatus type="SingleRecord" image="gg-rs-single.png"></recordstatus>
         <recordstatus type="TimeslotRecord" image="gg-rs-timeslot.png"></recordstatus>
         <recordstatus type="ChannelRecord" image="gg-rs-channel.png"></recordstatus>
