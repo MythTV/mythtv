@@ -48,6 +48,10 @@ public:
     // recorded
     void doneRecording(QSqlDatabase* db, const ProgramInfo& proginfo);
 
+    // Forget whether a program has been recorded before (allows it to
+    // be recorded again)
+    void forgetHistory(QSqlDatabase* db, const ProgramInfo& proginfo);
+
     static bool hasChanged(QSqlDatabase* db);
 
     static void ScheduledRecording::fillSelections(QSqlDatabase* db, SelectSetting* setting);

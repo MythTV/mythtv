@@ -258,6 +258,7 @@ bool ScheduledRecording::loadByProgram(QSqlDatabase* db,
     if (!chanid || chanid == "")
          chanid = "0";
 
+    // XXX - this should set proginfo.duplicate as in findAllProgramsToRecord
     QString query = QString(
 "SELECT "
 "recordid "
@@ -386,8 +387,6 @@ bool ScheduledRecording::hasChanged(QSqlDatabase* db) {
 }
 
 void ScheduledRecording::doneRecording(QSqlDatabase* db, const ProgramInfo& proginfo) {
-    (void)proginfo;
-
     if (getRecordingType() == SingleRecord)
         remove(db);
 
@@ -416,6 +415,26 @@ void ScheduledRecording::doneRecording(QSqlDatabase* db, const ProgramInfo& prog
     // The addition of an entry to oldrecorded may affect near-future
     // scheduling decisions, so recalculate
     signalChange(db);
+}
+
+void ScheduledRecording::forgetHistory(QSqlDatabase* db,
+                                       const ProgramInfo& proginfo) {
+    QString sqltitle = proginfo.title;
+    QString sqlsubtitle = proginfo.subtitle;
+    QString sqldescription = proginfo.description;
+
+    sqltitle.replace(QRegExp("'"), QString("\\'"));
+    sqlsubtitle.replace(QRegExp("'"), QString("\\'"));
+    sqldescription.replace(QRegExp("'"), QString("\\'"));
+
+    QString query = QString("DELETE FROM oldrecorded WHERE chanid='%1' AND title = '%2' AND subtitle = '%3' AND description = '%4'")
+        .arg(proginfo.chanid)
+        .arg(sqltitle.utf8()) 
+        .arg(sqlsubtitle.utf8())
+        .arg(sqldescription.utf8());
+    QSqlQuery result = db->exec(query);
+    if (!result.isActive())
+        MythContext::DBError("forgetHistory", result);
 }
 
 MythDialog* ScheduledRecording::dialogWidget(QWidget* parent, const char* name)
