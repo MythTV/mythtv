@@ -701,11 +701,11 @@
     </message>
     <message>
         <source>Playlist Actions</source>
-        <translation>Spellistehandlingar</translation>
+        <translation type="obsolete">Spellistehandlingar</translation>
     </message>
     <message>
         <source>There are %1 items in the list.</source>
-        <translation>Det finns %1 poster i listan.</translation>
+        <translation type="obsolete">Det finns %1 poster i listan.</translation>
     </message>
     <message>
         <source>Shuffle Play</source>
@@ -718,6 +718,58 @@
     <message>
         <source>Show group list as titles</source>
         <translation>Visa grupplista som titlar</translation>
+    </message>
+    <message>
+        <source>Playlist options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add this Category/Title Group to Playlist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add this Recording Group to Playlist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add this recording to Playlist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There are %1 items in the playlist.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There is %1 item in the playlist.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear Playlist</source>
+        <translation>Rensa spellista</translation>
+    </message>
+    <message>
+        <source>Toggle playlist for this Category/Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle playlist for this Recording Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle playlist for this recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>These actions affect all items in the playlist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove from Playlist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add to Playlist</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
