@@ -595,13 +595,12 @@ void TVRec::HandleStateChange(void)
                 channel->SetFd(nvr->GetVideoFd());
             frameRate = nvr->GetFrameRate();
 
-            int jobTypes = curRecording->GetAutoRunJobs();
             int transcodeFirst =
                   gContext->GetNumSetting("AutoTranscodeBeforeAutoCommflag", 0);
 
             if ((tmpInternalState != kState_WatchingLiveTV) &&
                 (!curRecording->chancommfree) &&
-                (jobTypes & JOB_COMMFLAG) &&
+                (curRecording->GetAutoRunJobs() & JOB_COMMFLAG) &&
                 (gContext->GetNumSetting("AutoCommflagWhileRecording", 0)) &&
                 ((autoTranscode && !transcodeFirst) || (!autoTranscode)))
             {
