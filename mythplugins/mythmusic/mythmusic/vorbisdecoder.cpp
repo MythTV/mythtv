@@ -345,7 +345,7 @@ Metadata *VorbisDecoder::getMetadata(QSqlDatabase *db)
     comment = ov_comment(&vf, -1);
     length = (int)ov_time_total(&vf, -1) * 1000;
 
-    if (ignore_id3)
+    if (ignore_id3 || title.isEmpty())
     {
         getMetadataFromFilename(filename, QString(".ogg$"), artist, album, 
                                 title, genre, tracknum);

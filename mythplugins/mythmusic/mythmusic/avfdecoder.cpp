@@ -406,7 +406,7 @@ Metadata* avfDecoder::getMetadata(QSqlDatabase *x)
     tracknum = ic->track;
     length = (ic->duration / AV_TIME_BASE) * 1000;
 
-    if (ignore_id3)
+    if (ignore_id3 || title.isEmpty())
     {
         getMetadataFromFilename(filename, QString(".wma$"), artist, album,
                                 title, genre, tracknum);
