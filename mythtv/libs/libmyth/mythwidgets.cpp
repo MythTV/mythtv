@@ -339,8 +339,8 @@ void MythDialog::Show(void)
 }
 
 MythProgressDialog::MythProgressDialog(const QString& labelText, int totalSteps,
-                                       QWidget* parent=NULL, const char* name=0,
-                                       bool modal=FALSE):
+                                       QWidget* parent, const char* name,
+                                       bool modal):
      QProgressDialog(labelText, "Cancel", totalSteps, parent, name, modal) {
      QPushButton* mcancelButton = new MythPushButton("Cancel", this);
      this->setCancelButton(mcancelButton);

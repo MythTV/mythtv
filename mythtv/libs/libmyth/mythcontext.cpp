@@ -13,7 +13,6 @@
 #include "oldsettings.h"
 #include "themedmenu.h"
 #include "util.h"
-#include "remoteencoder.h"
 
 MythContext::MythContext(bool gui)
            : QObject()
