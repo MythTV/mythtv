@@ -46,7 +46,7 @@ x11="yes"
 xrandr="yes"
 xv="yes"
 xvmc="no"
-xvmc_vld="yes"
+xvmc_vld="no"
 opengl_vsync="no"
 direct_fb="no"
 direct_x="no"
@@ -915,7 +915,7 @@ if test x"$tune" = x"generic" -a x"$cpu_overide" != x"yes"; then
    elif expr "$processor" : ".*Intel(R) Pentium(R) M" > /dev/null ; then
        ARCHFLAGS="-march=pentium4"
    elif expr "$processor" : ".*Intel(R) Xeon(TM) CPU" > /dev/null ; then
-       ARCHFLAGS="-march=pentium4"   
+       ARCHFLAGS="-march=pentium4"
    elif expr "$processor" : ".*Pentium(R) III Xeon processor" > /dev/null ; then
        ARCHFLAGS="-march=pentium3"
    elif expr "$processor" : ".*Pentium III" > /dev/null ; then
@@ -1628,21 +1628,16 @@ if test x"$xvmc" = x"yes"; then
     fi
 fi
 
-if test x"$xvmc_vld" = x"yes" ; then
+if test x`ls /usr/X11R6/lib/libviaXvMC.* 2> /dev/null | head -n 1` = x"" ; then
     xvmc_vld="no"
-    if test x`ls /usr/X11R6/lib/libviaXvMC.* 2> /dev/null | head -n 1` != x"" ; then
-        if test x"$cpu_raw" = x"c3" -o x"$cpu_raw" = x"c3-2" ; then
-            xvmc_vld="yes"
-        fi
+fi
+if test x"$xvmc_vld" = x"yes" ; then
+    if test x`ls /usr/X11R6/lib/libXvMCW.* 2> /dev/null | head -n 1` != x"" ; then
+        VENDOR_XVMC_LIBS="-lXvMCW"
+    else
+        VENDOR_XVMC_LIBS="-lviaXvMC"
     fi
-    if test x"$xvmc_vld" = x"yes" ; then
-        if test x`ls /usr/X11R6/lib/libXvMCW.* 2> /dev/null | head -n 1` != x"" ; then
-            VENDOR_XVMC_LIBS="-lXvMCW"
-        else
-            VENDOR_XVMC_LIBS="-lviaXvMC"
-        fi
-        xvmc="yes"
-    fi
+    xvmc="yes"
 fi
 
 if test x"$opengl_vsync" = x"yes" ; then
