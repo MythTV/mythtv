@@ -51,7 +51,11 @@ public:
         GlobalSetting("Deinterlace") {
         setLabel("Deinterlace playback");
         setValue(true);
-        setHelpText("Make the video look normal on a progressive display (ie, a monitor)");
+        setHelpText("Make the video look normal on a progressive display "
+                    "(i.e. monitor).  Deinterlace requires that your CPU "
+                    "supports SSE instructions.  Enabling this without "
+                    "proper CPU support will cause the program to segfault. "
+                    "See the HOWTO document for more information.");
     };
 };
 
@@ -63,7 +67,7 @@ public:
         setLabel("Jump amount (minutes)");
         setValue(10);
         setHelpText("How many minutes to jump forward or backward "
-                   "when the jump keys are pressed");
+                   "when the jump keys are pressed.");
     };
 };
 
@@ -72,9 +76,9 @@ public:
     FastForwardAmount():
         SpinBoxSetting(1, 600, 1),
         GlobalSetting("FastForwardAmount") {
-        setLabel("Fast forward amount (seconds)");
+        setLabel("Fast forward amount (in seconds)");
         setValue(30);
-        setHelpText("How many seconds to skip forward on a fast forward");
+        setHelpText("How many seconds to skip forward on a fast forward.");
     };
 };
 
@@ -83,9 +87,9 @@ public:
     RewindAmount():
         SpinBoxSetting(1, 600, 1),
         GlobalSetting("RewindAmount") {
-        setLabel("Rewind amount (seconds)");
+        setLabel("Rewind amount (in seconds)");
         setValue(5);
-        setHelpText("How many seconds to skip backward on a rewind");
+        setHelpText("How many seconds to skip backward on a rewind.");
     };
 };
 
@@ -95,7 +99,7 @@ public:
         GlobalSetting("ExactSeeking") {
         setLabel("Seek to exact frame");
         setValue(false);
-        setHelpText("If this is set, seeking is frame exact (slower)");
+        setHelpText("If enabled, seeking is frame exact, but slower.");
     };
 };
 
@@ -104,7 +108,7 @@ public:
     RecordOverTime():
         SpinBoxSetting(0, 600, 1),
         GlobalSetting("RecordOverTime") {
-        setLabel("Time to record past end of show (seconds)");
+        setLabel("Time to record past end of show (in seconds)");
         setValue(0);
     };
 };
@@ -116,7 +120,8 @@ public:
         setLabel("Sticky keys");
         setValue(false);
         setHelpText("If this is set, fast forward and rewind continue after the key is released, until "
-                    "it is pressed again");
+                    "the key is pressed again.  If enabled, set FastForwardAmount "
+                    and RewindAmount to one second.");
     };
 };
 
@@ -127,6 +132,8 @@ public:
         GlobalSetting("OSDDisplayTime") {
         setLabel("Number of seconds for which OSD should be displayed");
         setValue(3);
+        setHelpText("How long it takes the On Screen Display to fade "
+                    "away.");
     };
 };
 
@@ -277,11 +284,15 @@ public:
     AllowQuitShutdown():
         GlobalSetting("AllowQuitShutdown") {
         setLabel("System shutdown");
-        addSelection("No", "0");
-        addSelection("Control", "1");
-        addSelection("Meta", "2");
-        addSelection("Alt", "3");
-        addSelection("No modifier", "4");
+        addSelection("No exit key", "0");
+	addSelection("ESC", "4");
+        addSelection("Control-ESC", "1");
+        addSelection("Meta-ESC", "2");
+        addSelection("Alt-ESC", "3");
+        setHelpText("MythTV is designed to run continuously.  If you wish, "
+                    "you may use the ESC key or the ESC key + a modifier to exit "
+                    "MythTV.  Do not choose a key combination that will be "
+                    "intercepted by your window manager.");
     };
 };
 
