@@ -1164,6 +1164,9 @@ void Scheduler::RunScheduler(void)
             lastupdate = curtime;
             VERBOSE(VB_GENERAL, "Found changes in the todo list.");
 
+            MythEvent me("SCHEDULE_CHANGE");
+            gContext->dispatch(me);
+
             // Determine if the user wants us to start recording early
             // and by how many seconds
             prerollseconds = gContext->GetNumSetting("RecordPreRoll");

@@ -71,6 +71,8 @@ class GuideGrid : public MythDialog
     void quickRecord();
     void displayInfo();
 
+    void customEvent(QCustomEvent *e);
+
   protected:
     void paintEvent(QPaintEvent *);
 
@@ -159,6 +161,8 @@ class GuideGrid : public MythDialog
     QTimer *timeCheck;
 
     QSqlDatabase *m_db;
+
+    bool ignoreevents;
 };
 
 #endif

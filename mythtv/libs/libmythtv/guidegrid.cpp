@@ -77,6 +77,7 @@ GuideGrid::GuideGrid(MythMainWindow *parent, const QString &channel, TV *player,
     DISPLAY_TIMES = 30;
     int maxchannel = 0;
     m_currentStartChannel = 0;
+    ignoreevents = false;
 
     m_player = player;
     m_db = QSqlDatabase::database();
@@ -211,10 +212,12 @@ GuideGrid::GuideGrid(MythMainWindow *parent, const QString &channel, TV *player,
     updateBackground();
 
     setNoErase();
+    gContext->addListener(this);
 }
 
 GuideGrid::~GuideGrid()
 {
+    gContext->removeListener(this);
     for (int x = 0; x < DISPLAY_TIMES; x++)
     {
         if (m_timeInfos[x])
@@ -748,6 +751,24 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
     } 
 }
 
+void GuideGrid::customEvent(QCustomEvent *e)
+{
+    if (ignoreevents)
+        return;
+
+    if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
+    {
+        MythEvent *me = (MythEvent *)e;
+        QString message = me->Message();
+
+        if (message == "SCHEDULE_CHANGE")
+        {
+            fillProgramInfos();
+            update(fullRect);
+        }
+    }
+}
+
 void GuideGrid::paintEvent(QPaintEvent *e)
 {
     QRect r = e->rect();
@@ -755,6 +776,7 @@ void GuideGrid::paintEvent(QPaintEvent *e)
 
     if (!showInfo)
     {
+        ignoreevents = true;
         if (r.intersects(infoRect))
             paintInfo(&p);
         if (r.intersects(dateRect))
@@ -767,6 +789,7 @@ void GuideGrid::paintEvent(QPaintEvent *e)
             paintPrograms(&p);
         if (r.intersects(curInfoRect))
             paintCurrentInfo(&p);
+        ignoreevents = false;
     }
 }
 
