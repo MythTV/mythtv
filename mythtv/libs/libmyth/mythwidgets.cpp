@@ -412,13 +412,17 @@ void MythRemoteLineEdit::keyPressEvent(QKeyEvent *e)
         case Key_Up:
             handled = true;
             endCycle();
-            focusNextPrevChild(FALSE);
+            // Need to call very base one because
+            // QTextEdit reimplements it to tab
+            // through links (even if you're in
+            // PlainText Mode !!)
+            QWidget::focusNextPrevChild(false);
             break;
    
         case Key_Down:
             handled = true;
             endCycle();
-            focusNextPrevChild(TRUE);
+            QWidget::focusNextPrevChild(true);
             break;
     
         case Key_Enter:
