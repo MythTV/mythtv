@@ -157,6 +157,23 @@ static void write_section_data(AVFormatContext *s, MpegTSFilter *tss1,
     }
 }
 
+void mpegts_close_filter(MpegTSContext *ts, MpegTSFilter *filter)
+{
+    int pid;
+
+    if (!ts || !filter)
+        return;
+    pid = filter->pid;
+    if (filter->type == MPEGTS_SECTION)
+        av_freep(&filter->u.section_filter.section_buf);
+    else if (filter->type == MPEGTS_PES)
+        av_freep(&filter->u.pes_filter.opaque);
+
+    av_free(filter);
+    ts->pids[pid] = NULL;
+}
+
+
 MpegTSFilter *mpegts_open_section_filter(MpegTSContext *ts, unsigned int pid, 
                                          SectionCallback *section_cb, void *opaque,
                                          int check_crc)
@@ -219,21 +236,6 @@ MpegTSFilter *mpegts_open_pes_filter(MpegTSContext *ts, unsigned int pid,
     return filter;
 }
 
-void mpegts_close_filter(MpegTSContext *ts, MpegTSFilter *filter)
-{
-    int pid;
-
-    if (!ts || !filter)
-        return;
-    pid = filter->pid;
-    if (filter->type == MPEGTS_SECTION)
-        av_freep(&filter->u.section_filter.section_buf);
-    else if (filter->type == MPEGTS_PES)
-        av_freep(&filter->u.pes_filter.opaque);
-
-    av_free(filter);
-    ts->pids[pid] = NULL;
-}
 
 static int analyze(const uint8_t *buf, int size, int packet_size, int *index){
     int stat[packet_size];
@@ -736,15 +738,6 @@ static int64_t get_pts(const uint8_t *p)
     return pts;
 }
 
-static void create_stream(PESContext *pes, int code)
-{
-    pes->st = av_new_stream(pes->stream, pes->pid);
-    if (pes->st) {
-        init_stream(pes->st, pes->stream_type, code);
-        pes->st->priv_data = pes;
-        pes->st->need_parsing = 1;
-    }
-}
 
 static void init_stream(AVStream *st, int stream_type, int code)
 {
@@ -797,6 +790,17 @@ static void init_stream(AVStream *st, int stream_type, int code)
     st->codec.codec_id = codec_id;
     av_set_pts_info(st, 60, 1, 90000);
 }
+
+static void create_stream(PESContext *pes, int code)
+{
+    pes->st = av_new_stream(pes->stream, pes->pid);
+    if (pes->st) {
+        init_stream(pes->st, pes->stream_type, code);
+        pes->st->priv_data = pes;
+        pes->st->need_parsing = 1;
+    }
+}
+
 
 /* return non zero if a packet could be constructed */
 static void mpegts_push_data(void *opaque,
