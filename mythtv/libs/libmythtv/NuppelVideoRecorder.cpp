@@ -1245,6 +1245,8 @@ void NuppelVideoRecorder::Reset(void)
 
     audiobytes = 0;
     effectivedsp = 0;
+
+    seektable->clear();
 }
 
 void *NuppelVideoRecorder::WriteThread(void *param)
