@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-04-12, v2.12
+<date>2003-04-15, v2.13
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -75,35 +75,47 @@ The contributors to MythTV are:
 
 <sect>Checking prerequisites. 
 <sect1>Hardware. 
-<p>MythTV is a software video encoder, which means that it uses a fairly
-generic "dumb" video capture card to get frames of video, encodes them using
-the CPU on your motherboard and writes them to disk.  High-end video capture
-cards and devices like the Tivo and RePlay have dedicated encoder chips
-which use specialized hardware to convert the video stream to the MPEG-2
-format without using the motherboard CPU.  The main CPU has the
-responsibility of running the Operating System and reading and writing the
-encoded frames to the disk.  These tasks have fairly low CPU requirements
-compared to encoding video, which is why a device like a Series 1 Tivo can
-run with only 16MB of RAM and a 54Mhz CPU.
+<p>MythTV has two modes of operation.  It can function as a software video
+encoder, which means that it uses a fairly generic "dumb" video capture card
+to get frames of video, encodes them using the CPU on your motherboard and
+writes them to disk.  High-end video capture cards and devices like the Tivo
+and RePlay have dedicated encoder chips which use specialized hardware to
+convert the video stream to the MPEG-2 format without using the motherboard
+CPU.  The main CPU has the responsibility of running the Operating System
+and reading and writing the encoded frames to the disk.  These tasks have
+fairly low CPU requirements compared to encoding video, which is why a
+device like a Series 1 Tivo can run with only 16MB of RAM and a 54Mhz CPU.
 
-<code>
-The IvyTV project <url url="http://ivtv.sourceforge.net/"
-name="http://ivtv.sourceforge.net/"> has an alpha-quality driver for MPEG-2
-encoder cards which use the iTVC15 chip or Conexant CX23415/CX23416 MPEG
-Codec, such as the Hauppauge WinTV-PVR250/350.  As of 2003-03-24, MythTV can
-not use these cards as an input device.  If support is integrated into
-MythTV, this will substantially reduce the CPU requirements for the capture
-system.
-</code>
+Using either a G200 MJPEG encoder card, or a WinTV PVR-250 or 350 from
+Hauppauge and the driver from the IvyTV project <url
+url="http://ivtv.sourceforge.net/" name="http://ivtv.sourceforge.net/"> will
+allow you to use dedicated hardware encoders rather than your CPU. As of
+2003-04-15, the CVS version MythTV is now able to use the PVR-250/350 cards
+as an input device for live TV and for scheduled recordings.  Seek support
+is still being written.  Using the onboard MPEG-2 encoder drastically
+reduces the CPU requirements for encoding.  Here are some data points:
+
+<itemize>
+<item>An Athlon 1800XP can decode a 720x480 8Mbps MPEG-2 file using 10% CPU
+<item>An Athlon 1Ghz can decode a 720x480 16Mbps MPEG-2 file using 30-50%
+CPU, can decode a 480x480 16Mbps MPEG-2 using 30% CPU and approximately 30%
+for Live TV at 416x480.
+</itemize>
 
 There are many variables that go into the question: "How fast a CPU do I
 need to run MythTV"?  Obviously, the faster your CPU, the better your
-experience will be with MythTV.  Performing the "Watch TV" function, where
-the CPU is both encoding and decoding video simultaneously to allow Pause,
-Fast Forward and Rewind functions for live TV requires more CPU then just
-encoding or decoding.  MythTV also supports multiple encoder cards in a
-single PC, thereby increasing the CPU requirements if you plan on
-simultaneously encoding multiple programs.
+experience will be with MythTV.  If you are using the software MPEG-4
+encoder and performing the "Watch TV" function, where the CPU is both
+encoding and decoding video simultaneously to allow Pause, Fast Forward and
+Rewind functions for live TV requires more CPU then just encoding or
+decoding.  MythTV also supports multiple encoder cards in a single PC,
+thereby increasing the CPU requirements if you plan on simultaneously
+encoding multiple programs.
+
+<code>
+NOTE:  As of 2003-04-15 the current IVTV driver does not support multiple
+hardware encoder cards in the same chassis.
+</code>
 
 Here are a few data points:
 <itemize>
@@ -2921,6 +2933,7 @@ v2.09, 2003-04-11.  Add spec for P4 2.4Ghz machine.  Added comment on repeat
 v2.10, 2003-04-11.  Fixed typo.  AMD SSE info.  Channel removal information.
 v2.11, 2003-04-11.  Updated channel removal.
 v2.12, 2003-04-12.  keys.txt.  troubleshooting the remote.
+v2.13, 2003-04-15.  Update on PVR-250.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

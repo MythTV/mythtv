@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-04-12, v2.12
+  2003-04-15, v2.13
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -219,37 +219,49 @@
 
   [1m3.1.  Hardware.[0m
 
-  MythTV is a software video encoder, which means that it uses a fairly
-  generic "dumb" video capture card to get frames of video, encodes them
-  using the CPU on your motherboard and writes them to disk.  High-end
-  video capture cards and devices like the Tivo and RePlay have
-  dedicated encoder chips which use specialized hardware to convert the
-  video stream to the MPEG-2 format without using the motherboard CPU.
-  The main CPU has the responsibility of running the Operating System
-  and reading and writing the encoded frames to the disk.  These tasks
-  have fairly low CPU requirements compared to encoding video, which is
-  why a device like a Series 1 Tivo can run with only 16MB of RAM and a
-  54Mhz CPU.
+  MythTV has two modes of operation.  It can function as a software
+  video encoder, which means that it uses a fairly generic "dumb" video
+  capture card to get frames of video, encodes them using the CPU on
+  your motherboard and writes them to disk.  High-end video capture
+  cards and devices like the Tivo and RePlay have dedicated encoder
+  chips which use specialized hardware to convert the video stream to
+  the MPEG-2 format without using the motherboard CPU.  The main CPU has
+  the responsibility of running the Operating System and reading and
+  writing the encoded frames to the disk.  These tasks have fairly low
+  CPU requirements compared to encoding video, which is why a device
+  like a Series 1 Tivo can run with only 16MB of RAM and a 54Mhz CPU.
 
-  ______________________________________________________________________
-  The IvyTV project <url url="http://ivtv.sourceforge.net/"
-  name="http://ivtv.sourceforge.net/"> has an alpha-quality driver for MPEG-2
-  encoder cards which use the iTVC15 chip or Conexant CX23415/CX23416 MPEG
-  Codec, such as the Hauppauge WinTV-PVR250/350.  As of 2003-03-24, MythTV can
-  not use these cards as an input device.  If support is integrated into
-  MythTV, this will substantially reduce the CPU requirements for the capture
-  system.
-  ______________________________________________________________________
+  Using either a G200 MJPEG encoder card, or a WinTV PVR-250 or 350 from
+  Hauppauge and the driver from the IvyTV project
+  http://ivtv.sourceforge.net/ <http://ivtv.sourceforge.net/> will allow
+  you to use dedicated hardware encoders rather than your CPU. As of
+  2003-04-15, the CVS version MythTV is now able to use the PVR-250/350
+  cards as an input device for live TV and for scheduled recordings.
+  Seek support is still being written.  Using the onboard MPEG-2 encoder
+  drastically reduces the CPU requirements for encoding.  Here are some
+  data points:
+
+  +o  An Athlon 1800XP can decode a 720x480 8Mbps MPEG-2 file using 10%
+     CPU
+
+  +o  An Athlon 1Ghz can decode a 720x480 16Mbps MPEG-2 file using 30-50%
+     CPU, can decode a 480x480 16Mbps MPEG-2 using 30% CPU and
+     approximately 30% for Live TV at 416x480.
 
   There are many variables that go into the question: "How fast a CPU do
   I need to run MythTV"?  Obviously, the faster your CPU, the better
-  your experience will be with MythTV.  Performing the "Watch TV"
-  function, where the CPU is both encoding and decoding video
-  simultaneously to allow Pause, Fast Forward and Rewind functions for
-  live TV requires more CPU then just encoding or decoding.  MythTV also
-  supports multiple encoder cards in a single PC, thereby increasing the
-  CPU requirements if you plan on simultaneously encoding multiple
-  programs.
+  your experience will be with MythTV.  If you are using the software
+  MPEG-4 encoder and performing the "Watch TV" function, where the CPU
+  is both encoding and decoding video simultaneously to allow Pause,
+  Fast Forward and Rewind functions for live TV requires more CPU then
+  just encoding or decoding.  MythTV also supports multiple encoder
+  cards in a single PC, thereby increasing the CPU requirements if you
+  plan on simultaneously encoding multiple programs.
+
+  ______________________________________________________________________
+  NOTE:  As of 2003-04-15 the current IVTV driver does not support multiple
+  hardware encoder cards in the same chassis.
+  ______________________________________________________________________
 
   Here are a few data points:
 
@@ -473,8 +485,8 @@
   "qt3-devel".  The full filenames will vary, so one you know the file-
   name, you can install them with
 
-       # rpm -Uvh [filename1]
-       # rpm -Uvh [filename2]
+  # rpm -Uvh [filename1]
+  # rpm -Uvh [filename2]
 
   Once this has completed (it can take a while, so please be patient),
   continue by following the Mandrake 9.0 instructions.
@@ -560,7 +572,6 @@
   The following instructions work for Mandrake 9.0 and 9.1 using bash as
   the shell, and may be applicable for a distribution which uses
   /etc/profile.d.
-
   As root, create the following file in /etc/profile.d  The example
   filename is "mythtv.sh".  Use what you feel is appropriate.
 
@@ -666,7 +677,6 @@
 
   If you've got a system with an AMD K6-2 or a VIA C3 processor, make
   the following change in the settings.pro file.
-
   Look for
 
   -march=pentiumpro
@@ -684,13 +694,13 @@
 
   Open a shell and switch to the directory where you saved lame.
 
-  $ tar -xzf lame-3.93.1.tar.gz
-  $ cd lame-3.93.1
-  $ ./configure
-  $ make
-  $ make test
-  $ su
-  # make install
+       $ tar -xzf lame-3.93.1.tar.gz
+       $ cd lame-3.93.1
+       $ ./configure
+       $ make
+       $ make test
+       $ su
+       # make install
 
   Check that it worked:
 
@@ -718,10 +728,10 @@
   If you get errors installing XML::Twig or other XMLTV prerequisites,
   try deleting the old versions of libexpat
 
-       $ su
-       # rm -f /usr/lib/libexpat*
-       # /sbin/ldconfig
-       # exit
+  $ su
+  # rm -f /usr/lib/libexpat*
+  # /sbin/ldconfig
+  # exit
 
   Download version 1.95.5 from sourceforge.net:
   http://sourceforge.net/projects/expat/
@@ -729,15 +739,15 @@
 
   Open a shell prompt:
 
-  $ tar -xzf expat-1.95.5.tar.gz
-  $ cd expat-1.95.5
-  $ ./configure
-  $ make
-  $ su
-  # make install
-  # /sbin/ldconfig
-  # exit
-  $
+       $ tar -xzf expat-1.95.5.tar.gz
+       $ cd expat-1.95.5
+       $ ./configure
+       $ make
+       $ su
+       # make install
+       # /sbin/ldconfig
+       # exit
+       $
 
   [1mNOTE[22m:  Red Hat Linux 8.0 users, make sure that you set your LANG as
   described in ``Section 4''.
@@ -812,11 +822,11 @@
 
   Once you have downloaded the portage file, installation is simple.
 
-       $ su -
-       # emerge rsync # make sure portage is up to date.
-       # cd /usr/local
-       # tar xvfjp Path_To/mythtv-gentoo-portage.tar.bz2
-       # vi /etc/make.conf
+  $ su -
+  # emerge rsync # make sure portage is up to date.
+  # cd /usr/local
+  # tar xvfjp Path_To/mythtv-gentoo-portage.tar.bz2
+  # vi /etc/make.conf
 
   Add mysql to your USE variable.  ie USE="mysql ...."
 
@@ -878,7 +888,7 @@
 
   To setup the initial mysql databases:
 
-  $ cd database
+       $ cd database
 
   [1m6.4.1.  Mandrake 9.0[0m
 
@@ -902,7 +912,6 @@
   update the schema, use the -f flag to force [1mmysql [22mto continue setting
   up the tables even if they already exist.  By default, [1mmysql [22mwill stop
   at the first error.
-
   [1m6.4.5.  Modifying access to the MySQL database for multiple systems[0m
 
   If you're going to have multiple systems accessing a master database,
@@ -918,8 +927,8 @@
 
   This example has no security at all, and allows access from any host.
 
-  $ mysql -u root mythconverg
-  mysql> grant all on mythconverg.* to mythtv@"%" identified by "mythtv";
+       $ mysql -u root mythconverg
+       mysql> grant all on mythconverg.* to mythtv@"%" identified by "mythtv";
 
   For a more secure setup, you can restrict which machines or subnets
   have access. If you have a complete DNS system operational, you could
@@ -1020,15 +1029,15 @@
 
   Start with the alsa-driver package:
 
-  $ tar -xjf alsa-driver-0.9.x.tar.bz2
-  $ cd alsa-driver-0.9.x
-  $ ./configure --with-cards=XXX --with-sequencer=yes
-  $ make
-  $ su
-  # make install
-  # ./snddevices
-  # exit
-  $
+       $ tar -xjf alsa-driver-0.9.x.tar.bz2
+       $ cd alsa-driver-0.9.x
+       $ ./configure --with-cards=XXX --with-sequencer=yes
+       $ make
+       $ su
+       # make install
+       # ./snddevices
+       # exit
+       $
 
   This will compile and install the kernel modules and initialization
   scripts, as well as create device nodes in /dev.
@@ -1118,13 +1127,13 @@
   Note the spelling in the following commands.
   ______________________________________________________________________
 
-  $ amixer set Master,0 100%,100% unmute
-  $ amixer set Line,0 75%,75% mute captur
-  $ amixer set Capture,0 100%,100% mute captur
-  $ su
-  # alsactl store
-  # exit
-  $
+       $ amixer set Master,0 100%,100% unmute
+       $ amixer set Line,0 75%,75% mute captur
+       $ amixer set Capture,0 100%,100% mute captur
+       $ su
+       # alsactl store
+       # exit
+       $
 
   If you have multiple sound cards, then use the -c parameter to specify
   which card to adjust.  Note that the first card will be "0", the
