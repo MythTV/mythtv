@@ -413,7 +413,7 @@ VideoFilter * FilterManager::LoadFilter(FilterInfo *FiltInfo,
                                         int &height, char *opts)
 {
     void *handle;
-    char *error;
+    const char *error;
     VideoFilter *Filter;
     VideoFilter *(*InitFilter)(int, int, int *, int *, char *);
 
