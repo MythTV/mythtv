@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
 
     gContext->LoadQtConfig();
 
-    gContext->LoadSettingsFiles("mythexplorer-settings.txt");
+    gContext->LoadSettingsFiles("mythvideo-settings.txt");
 
     if (a.argc() > 1)
         gContext->SetSetting("StartDir",a.argv()[1]);

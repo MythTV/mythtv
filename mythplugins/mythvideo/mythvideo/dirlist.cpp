@@ -46,11 +46,22 @@ Dirlist::Dirlist(QString &directory)
 
         if (fi->fileName() == "..")
         {
-	    Metadata retdata(fi->absFilePath(), fi->absFilePath(), "album", 
-                             "title", "dir",1900, 3, 40);
-            playlist.append(retdata);
-	    ++it;
-            continue;
+            // Don't add parent directory if we're already at the top of
+            // the current tree -- don't want MythVideo users randomly
+            // browsing the host file system!
+            if (0 == directory.compare(gContext->GetSetting("StartDir")))
+            {
+                ++it;
+                continue;
+            }
+            else
+            {
+                Metadata retdata(fi->absFilePath(), fi->absFilePath(), "album",
+                                 "(Up one level)", "dir",1900, 3, 40);
+                playlist.append(retdata);
+                ++it;
+                continue;
+            }
         }
 	
         QString filename = fi->absFilePath();
@@ -65,8 +76,7 @@ Dirlist::Dirlist(QString &directory)
             QString ext = filename.section('.',-1);
 	    //printf("profile:%s\n",gContext->GetSetting("Profile").ascii());
 	    QString prof = gContext->GetSetting("Profile");
-	    QString prof_name = "profile_" + prof;
-	    if (gContext->GetSetting(prof_name).contains(ext, FALSE))
+	    if (prof.contains(ext, FALSE))
             {
                 data = CheckFile(filename);
                 playlist.append(*data);

@@ -105,8 +105,11 @@ void DatabaseBox::fillList(MythListView *listview,
         QString filename =(*it).Filename();
         mdata->setFilename(filename);
         mdata->setGenre((*it).Genre());
-        mdata->setField("title",(*it).Filename());
-        title=(*it).Filename().section('/',-1);
+        if (0 == (*it).Title().compare("title"))
+            title = filename.section('/',-1).section('.',0,-2);
+        else
+            title = (*it).Title();
+        mdata->setTitle(title);
         new TreeCheckItem(listview, title, NULL, mdata);
     }
 }

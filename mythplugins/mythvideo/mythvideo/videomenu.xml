@@ -3,13 +3,13 @@
    <button>
      <type>TV</type>
      <text>TV Shows</text>
-     <action>EXEC mythexplorer /mnt/movies movies</action>
+     <action>EXEC mythvideo /mnt/movies movies</action>
    </button>
 
   <button>
      <type>Videos</type>
      <text>Movies</text>
-     <action>EXEC mythexplorer /mnt/tvshows movies</action>
+     <action>EXEC mythvideo /mnt/tvshows movies</action>
    </button>
 
 

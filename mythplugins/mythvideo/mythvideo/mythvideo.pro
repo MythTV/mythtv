@@ -11,7 +11,7 @@ target.path = $${PREFIX}/bin
 INSTALLS += target
 
 installfiles.path = $${PREFIX}/share/mythtv
-installfiles.files = mythexplorer-settings.txt videomenu.xml
+installfiles.files = mythvideo-settings.txt videomenu.xml
 
 INSTALLS += installfiles
 
