@@ -230,13 +230,13 @@ class MythPushButton : public QPushButton
 {
     Q_OBJECT
   public:
-    MythPushButton(QWidget *parent, const char *name = 0)
+    MythPushButton(QWidget *parent, const char *name = 0, bool aa = false)
                  : QPushButton(parent, name)
-                  { setBackgroundOrigin(WindowOrigin); }
+                  { setBackgroundOrigin(WindowOrigin); arrowAccel = aa;}
 
-    MythPushButton(const QString &text, QWidget *parent)
+    MythPushButton(const QString &text, QWidget *parent, bool aa = false)
                  : QPushButton(text, parent)
-                  { setBackgroundOrigin(WindowOrigin); }
+                  { setBackgroundOrigin(WindowOrigin); arrowAccel = aa;}
 
     void setHelpText(const QString &help) { helptext = help; }
 
@@ -253,6 +253,7 @@ class MythPushButton : public QPushButton
   private:
     QColor origcolor;
     QString helptext;
+    bool arrowAccel;
 };
 
 class MythCheckBox: public QCheckBox

@@ -207,6 +207,7 @@ class MythPopupBox : public MythDialog
     QVBoxLayout *vbox;
     QColor popupForegroundColor;
     int hpadding, wpadding;
+    bool arrowAccel;
 };
 
 class MythProgressDialog: public MythDialog

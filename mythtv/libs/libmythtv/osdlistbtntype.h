@@ -117,6 +117,7 @@ class OSDListTreeType : public OSDType
     float m_hmult;
 
     bool m_visible;
+    bool m_arrowAccel;
 };
  
 class OSDListBtnType : public OSDType

@@ -854,7 +854,7 @@ MythPopupBox::MythPopupBox(MythMainWindow *parent, const char *name)
             : MythDialog(parent, name, false)
 {
     float wmult, hmult;
-
+    arrowAccel = true;
     gContext->GetScreenSettings(wmult, hmult);
 
     setLineWidth(3);
@@ -877,7 +877,7 @@ MythPopupBox::MythPopupBox(MythMainWindow *parent, bool graphicPopup,
             : MythDialog(parent, name, false)
 {
     float wmult, hmult;
-
+    arrowAccel = true;
     gContext->GetScreenSettings(wmult, hmult);
 
     setLineWidth(3);
@@ -979,7 +979,7 @@ QButton *MythPopupBox::addButton(QString caption, QObject *target,
         slot = SLOT(defaultButtonPressedHandler());
     }
 
-    MythPushButton *button = new MythPushButton(caption, this);
+    MythPushButton *button = new MythPushButton(caption, this, arrowAccel);
     m_parent->connect(button, SIGNAL(pressed()), target, slot);
     addWidget(button, false);
     return button;
@@ -1082,7 +1082,7 @@ void MythPopupBox::keyPressEvent(QKeyEvent *e)
     {
         QString action = actions[i];
 
-        if (action == "ESCAPE")
+        if((action == "ESCAPE") || (arrowAccel && action == "LEFT"))
         {
             emit popupDone();
             handled = true;

@@ -875,6 +875,20 @@ void MythPushButton::keyPressEvent(QKeyEvent *e)
                 emit pressed();
                 handled = true;
             }
+            else if(arrowAccel)
+            {
+                if(action == "LEFT") 
+                {
+                    parent()->event(e);
+                    handled = true;
+                }
+                else if (action == "RIGHT")
+                {
+                    setDown(true);
+                    emit pressed();
+                    handled = true;
+                }
+            }
         }
     }
 

@@ -62,6 +62,8 @@ OSDListTreeType::OSDListTreeType(const QString &name, const QRect &area,
     m_levelsize = levelsize;
     m_levelspacing = levelspacing;
 
+    m_arrowAccel = true;
+    
     levels = 0;
     curlevel = -1;
 
@@ -234,7 +236,11 @@ bool OSDListTreeType::HandleKeypress(QKeyEvent *e)
                     currentlevel = GetLevel(curlevel);
                     currentlevel->SetActive(true);
                     SetCurrentPosition();
-                }   
+                }
+                else if (m_arrowAccel)
+                {
+                    m_visible = false;
+                }
             }
             else if (action == "RIGHT")
             {
@@ -252,6 +258,10 @@ bool OSDListTreeType::HandleKeypress(QKeyEvent *e)
                     currentlevel->SetVisible(true);
                     currentlevel->SetActive(true);
                     SetCurrentPosition();
+                }
+                else if (m_arrowAccel)
+                {
+                    emit itemSelected(this, currentpos);
                 }
             }
             else if (action == "ESCAPE")

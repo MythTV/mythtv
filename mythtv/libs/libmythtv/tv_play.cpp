@@ -1261,9 +1261,10 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 osd->DialogUp(dialogname); 
             else if (action == "DOWN")
                 osd->DialogDown(dialogname);
-            else if (action == "SELECT" || action == "ESCAPE")
+            else if (action == "SELECT" || action == "ESCAPE"||
+                     action == "LEFT" || action == "RIGHT")
             {
-                if (action == "ESCAPE")
+                if (action == "ESCAPE" || action == "LEFT")
                     osd->DialogAbort(dialogname);
                 osd->TurnDialogOff(dialogname);
                 if (dialogname == "alreadybeingedited")
