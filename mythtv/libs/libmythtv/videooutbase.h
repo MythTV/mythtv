@@ -87,7 +87,7 @@ class VideoOutput
 
   protected:
     void ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer);
-    bool DisplayOSD(VideoFrame *frame, OSD *osd, int stride = -1);
+    int DisplayOSD(VideoFrame *frame, OSD *osd, int stride = -1);
 
     void BlendSurfaceToYV12(OSDSurface *surface, unsigned char *yuvptr,
                             int stride = -1);

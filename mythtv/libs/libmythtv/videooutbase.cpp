@@ -475,9 +475,9 @@ void VideoOutput::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
     }
 }
 
-bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd, int stride)
+int VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd, int stride)
 {
-    bool retval = false;
+    int retval = -1;
 
     if (osd)
     {
@@ -490,26 +490,26 @@ bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd, int stride)
                 {
                     unsigned char *yuvptr = frame->buf;
                     BlendSurfaceToYV12(surface, yuvptr, stride);
-                    retval = surface->Changed();
                     break;
                 }
                 case FMT_AI44:
                 {
                     unsigned char *ai44ptr = frame->buf;
-                    BlendSurfaceToI44(surface, ai44ptr, true, stride);
-                    retval = true;
+                    if (surface->Changed())
+                        BlendSurfaceToI44(surface, ai44ptr, true, stride);
                     break;
                 }
                 case FMT_IA44:
                 {
                     unsigned char *ia44ptr = frame->buf;
-                    BlendSurfaceToI44(surface, ia44ptr, false, stride);
-                    retval = true;
+                    if (surface->Changed())
+                        BlendSurfaceToI44(surface, ia44ptr, false, stride);
                     break;
                 }
                 default:
                     break;
             }
+            retval = surface->Changed() ? 1 : 0;
         }
     }
 

@@ -450,19 +450,24 @@ void VideoOutputVIA::ProcessFrame(VideoFrame *frame, OSD *osd,
         tmpframe.codec = FMT_IA44;
         tmpframe.buf = (unsigned char *)data->lpSubSurface;
 
-        if (!DisplayOSD(&tmpframe, osd, data->ddLock.SubDev.dwPitch))
+        int ret = DisplayOSD(&tmpframe, osd, data->ddLock.SubDev.dwPitch);
+
+        if (ret < 0)
         {
             data->VIASubPict.dwTaskType = VIA_TASK_SP_DISPLAY_DISABLE;
             VIASUBPicture(&data->VIASubPict);
             return;
         }
 
-        data->VIASubPict.dwSPLeft = 0;
-        data->VIASubPict.dwSPTop = 0;
-        data->VIASubPict.dwSPWidth = XJ_width;
-        data->VIASubPict.dwSPHeight = XJ_height;
-        data->VIASubPict.dwDisplayBuffIndex = 0;
-        data->VIASubPict.dwTaskType = VIA_TASK_SP_DISPLAY;
-        VIASUBPicture(&data->VIASubPict);
+        if (ret > 0)
+        {
+            data->VIASubPict.dwSPLeft = 0;
+            data->VIASubPict.dwSPTop = 0;
+            data->VIASubPict.dwSPWidth = XJ_width;
+            data->VIASubPict.dwSPHeight = XJ_height;
+            data->VIASubPict.dwDisplayBuffIndex = 0;
+            data->VIASubPict.dwTaskType = VIA_TASK_SP_DISPLAY;
+            VIASUBPicture(&data->VIASubPict);
+        }
     } 
 }

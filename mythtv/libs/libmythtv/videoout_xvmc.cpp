@@ -777,15 +777,19 @@ void VideoOutputXvMC::ProcessFrame(VideoFrame *frame, OSD *osd,
                 tmpframe.codec = FMT_AI44;
             tmpframe.buf = (unsigned char *)(data->xvimage->data);
 
-            if (!DisplayOSD(&tmpframe, osd))
+            int ret = DisplayOSD(&tmpframe, osd);
+            if (ret < 0)
                 return;                
 
             pthread_mutex_lock(&lock);
 
-            XvMCCompositeSubpicture(data->XJ_disp, &data->subpicture, 
-                                    data->xvimage, 0, 0, XJ_width, XJ_height, 
-                                    0, 0);
-            XvMCSyncSubpicture(data->XJ_disp, &data->subpicture);
+            if (ret > 0)
+            {
+                XvMCCompositeSubpicture(data->XJ_disp, &data->subpicture, 
+                                        data->xvimage, 0, 0, XJ_width, 
+                                        XJ_height, 0, 0);
+                XvMCSyncSubpicture(data->XJ_disp, &data->subpicture);
+            }
 
             if (data->subpicture_mode == BLEND_SUBPICTURE)
             {
