@@ -43,7 +43,7 @@ CONFIG += using_x11
 CONFIG += using_xv
 EXTRA_LIBS += -L/usr/X11R6/lib -lXinerama -lXv -lX11 -lXext -lXxf86vm
 
-# IVTV (PVR-x50) support.  Disable if building on Windows.
+# IVTV (PVR-x50) support
 CONFIG += using_ivtv
 DEFINES += USING_IVTV
 
@@ -152,11 +152,14 @@ contains( TARGET_ALTIVEC, yes ) {
 #CONFIG += using_xrandr
 #DEFINES += USING_XRANDR
 
-# Please keep this CONFIG block as the last one
+################################################################
+# Please keep these CONFIG blocks as the last part of this file!
+# Add any new features (e.g. CONFIG+=, DEFINES+=) before them.
+################################################################
+# Disable the Linux defaults.
+# Most developers will already know to hand-edit these out,
+# but for the lazy ones who haven't, we will do it for them :-)
 macx {
-    # Disable the Linux defaults.
-    # Most developers will already know to hand-edit these out,
-    # but for the lazy ones who didn't, we will do it for them :-)
     CONFIG     -= using_x11
     CONFIG     -= using_xv
     EXTRA_LIBS -= -L/usr/X11R6/lib -lXinerama -lXv -lX11 -lXext -lXxf86vm
@@ -166,3 +169,17 @@ macx {
     DEFINES    -= USING_OSS
     CONFIG     -= using_joystick_menu
 }
+win32 {
+    CONFIG     -= using_x11
+    CONFIG     -= using_xv
+    EXTRA_LIBS -= -L/usr/X11R6/lib -lXinerama -lXv -lX11 -lXext -lXxf86vm
+    CONFIG     -= using_ivtv
+    DEFINES    -= USING_IVTV
+    CONFIG     -= using_oss
+    DEFINES    -= USING_OSS
+    CONFIG     -= using_joystick_menu
+}
+################################################################
+# Please keep these CONFIG blocks as the last part of this file!
+# Add any new features (e.g. CONFIG+=, DEFINES+=) before them.
+################################################################
