@@ -1395,6 +1395,7 @@ void PlaybackBox::playSelectedPlaylist(bool random)
     bool playNext = true;
     int i = 0;
    
+    onPlaylist = true;
     while (randomList.count() && playNext)
     {
         if (random)
@@ -1410,6 +1411,7 @@ void PlaybackBox::playSelectedPlaylist(bool random)
         }
         randomList.remove(it);
     }
+    onPlaylist = false;
 }
 
 void PlaybackBox::playSelected()
@@ -1643,6 +1645,7 @@ bool PlaybackBox::play(ProgramInfo *rec)
         doremove = true;
     }
     else if (tv->getEndOfRecording() &&
+             !onPlaylist &&
              gContext->GetNumSetting("EndOfRecordingExitPrompt"))
     {
         doprompt = true;
