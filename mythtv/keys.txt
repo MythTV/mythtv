@@ -18,7 +18,7 @@ Watching TV or a recording
 - P to pause / play.
 - C to change inputs on TV Tuner card
 - ESC quits
-- I puts the Onscreen Display up again.  Also allows you to "Instant Record"
+- I puts the Onscreen Display up again.
 - M brings up the electronic program guide (Grid) -- see the EPG section.
 
 Without the stickykeys option selected
@@ -69,6 +69,8 @@ EPG
   PageDown, Home and End.
 - I or Space or Enter will bring up more information about a show, and allow
   you to schedule a recording.
+  -  If you select "Record this showing" while watching Live TV you can
+     "Instant Record" a program.
 - Pressing M when on a channel will change to that channel.
 - Pressing ESC or C exits without changing the channel.
 
