@@ -1,3 +1,7 @@
+INCLUDEPATH += ../mfdlib
+DEPENDPATH += ../mfdlib
+LIBS += -Wl,--export-dynamic $$EXTRA_LIBS -L../mfdlib/ -lmfdlib -Wl,-rpath,${PREFIX}/lib
+
 include ( ../settings.pro )
 
 !exists(../config.pro ) {
@@ -10,8 +14,6 @@ include ( ../settings.pro )
 
 include (../options.pro)
 
-INCLUDEPATH += ../mfdlib
-DEPENDPATH += ../mfdlib
 
 TEMPLATE = app
 CONFIG += thread
@@ -19,7 +21,6 @@ target.path = $${PREFIX}/bin
 INSTALLS += target
 
 TARGET = mfd
-LIBS += -Wl,--export-dynamic $$EXTRA_LIBS -L../mfdlib/ -lmfdlib -Wl,-rpath,/usr/local/lib
 
 !isEmpty(USE_MYTH_LIB) {
 LIBS += -lmyth-$$LIBVERSION 

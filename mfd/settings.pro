@@ -8,6 +8,10 @@ LIBVERSION = 0.14
 INCLUDEPATH += $${PREFIX}/include
 INCLUDEPATH *= /usr/local/include
 
+INCLUDEPATH *= /usr/include/cdda
+
+LIB *= -L$${PREFIX}/lib
+
 DEFINES += _GNU_SOURCE
 DEFINES += PREFIX=\"$${PREFIX}\"
 release {
