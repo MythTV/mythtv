@@ -224,7 +224,7 @@
         <catcolor category="Transport" color="#33ff99"></catcolor>
         <catcolor category="Travel" color="#aa00aa"></catcolor>
 
- <!-- Categories introduced by belgian and dutch grabbers teveblad.be -->
+        <!-- Categories used by teveblad.be (grabbed with pytvgrab) -->
         <catcolor category="nieuws" color="DarkOrange3"></catcolor>
         <catcolor category="actua" color="sienna"></catcolor>
         <catcolor category="documentaire" color="goldenrod"></catcolor>
@@ -241,6 +241,26 @@
         <catcolor category="kinderprogramma" color="MediumSlateBlue"></catcolor>
         <catcolor category="tekenfilm" color="MediumSlateBlue"></catcolor>
         <catcolor category="tekenfilm kind" color="MediumSlateBlue"></catcolor>
+
+        <!-- Categories used by tvgids.nl (grabbed with tv_grab_nl) -->
+        <catcolor category="Amusement" color="orchid"></catcolor>
+        <catcolor category="Animatie" color="#3333aa"></catcolor>
+        <catcolor category="Comedy" color="#8800aa"></catcolor>
+        <catcolor category="Documentaire" color="goldenrod"></catcolor>
+        <catcolor category="Erotiek" color="thistle3"></catcolor>
+        <catcolor category="Film" color="Blue"></catcolor>
+        <catcolor category="Informatief" color="DarkOrange3"></catcolor>
+        <catcolor category="Jeugd" color="MediumSlateBlue"></catcolor>
+        <catcolor category="Kunst/cultuur" color="grey62"></catcolor>
+        <catcolor category="Misdaad" color="MediumVioletRed"></catcolor>
+        <catcolor category="Muziek" color="DarkRed"></catcolor>
+        <catcolor category="Natuur" color="#00ff44"></catcolor>
+        <catcolor category="Nieuws/actualiteiten" color="DarkOrange3"></catcolor>
+        <catcolor category="Overige" color="#222200"></catcolor>
+        <catcolor category="Religieus" color="CornflowerBlue"></catcolor>
+        <catcolor category="Serie/soap" color="SlateGrey"></catcolor>
+        <catcolor category="Sport" color="DarkCyan"></catcolor>
+        <catcolor category="Wetenschap" color="#33ff99"></catcolor>
 
 
         <!-- Categories introduced by tv_grab_jp -->
