@@ -25,6 +25,8 @@ using namespace std;
 MainServer::MainServer(int port, int statusport, 
                        QMap<int, EncoderLink *> *tvList)
 {
+    masterServerSock = NULL;
+
     encoderList = tvList;
 
     recordfileprefix = gContext->GetFilePrefix();
@@ -145,6 +147,14 @@ void MainServer::readSocket(void)
             {
                 HandleMessage(listline, pbs);
             }
+            else if (command == "BACKEND_MESSAGE")
+            {
+                QString message = listline[1];
+                QString extra = listline[2];
+
+                MythEvent me(message, extra);
+                gContext->dispatch(me);
+            }
             else
             {
                cout << "unknown command: " << command << endl;
@@ -157,7 +167,6 @@ void MainServer::readSocket(void)
     }
 }
 
-// XXX: Send to master backend
 void MainServer::customEvent(QCustomEvent *e)
 {
     QStringList broadcast;
@@ -184,6 +193,11 @@ void MainServer::customEvent(QCustomEvent *e)
                 WriteStringList(pbs->getSocket(), broadcast);
             }
         }
+
+        if (masterServerSock)
+        {
+            WriteStringList(masterServerSock, broadcast);
+        }
     }
 }
 
@@ -199,6 +213,15 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         cout << "adding: " << commands[2] << " as a player " << wantevents
              << "\n";
         PlaybackSock *pbs = new PlaybackSock(socket, commands[2], wantevents);
+        playbackList.push_back(pbs);
+    }
+    else if (commands[1] == "SlaveBackend")
+    {
+        cout << "adding: " << commands[2] << " as a slave backend server\n";
+        PlaybackSock *pbs = new PlaybackSock(socket, commands[2], false);
+        pbs->setAsSlaveBackend();
+
+        // XXX mark all encoders with this sock.
         playbackList.push_back(pbs);
     }
     else if (commands[1] == "RingBuffer")
@@ -982,6 +1005,12 @@ void MainServer::endConnection(QSocket *socket)
         QSocket *sock = (*it)->getSocket();
         if (sock == socket)
         {
+            if ((*it)->isSlaveBackend())
+            {
+                cout << "Slave backend: " << (*it)->getHostname() 
+                     << " has left the building\n";
+                // XXX mark all encoders using this hostname as not connected
+            }
             delete (*it);
             playbackList.erase(it);
             return;
@@ -1111,8 +1140,27 @@ void MainServer::PrintStatus(QSocket *socket)
        << "</HEAD>\r\n"
        << "<BODY>\r\n";
 
-    os << "Status information will eventually go here.\r\n";
- 
+    QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
+    for (; iter != encoderList->end(); ++iter)
+    {
+        EncoderLink *elink = iter.data();
+
+        if (elink->isLocal())
+        {
+            os << "Encoder: " << elink->getCardId() << " is local.\r\n";
+        }
+        else
+        {
+            os << "Encoder: " << elink->getCardId() << " is remote and ";
+            if (elink->isConnected())
+                os << "is connected\r\n";
+            else
+                os << "is not connected\r\n";
+        }
+
+        os << "<br>\r\n";
+    }
+
     os << "</BODY>\r\n"
        << "</HTTP>\r\n";
 }

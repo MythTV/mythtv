@@ -14,6 +14,7 @@ PlaybackSock::PlaybackSock(QSocket *lsock, QString lhostname, bool wantevents)
     sock = lsock;
     hostname = lhostname;
     events = wantevents;
+    backend = false;
 
     if (hostname == localhostname)
         local = true;

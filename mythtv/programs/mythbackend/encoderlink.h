@@ -16,6 +16,8 @@ class EncoderLink
 
    ~EncoderLink();
 
+    void setSocket(QSocket *lsock) { sock = lsock; }
+
     QSocket *getSocket() { return sock; }
     QString getHostname() { return hostname; }
 
@@ -24,6 +26,7 @@ class EncoderLink
     bool isLocal() { return local; }
 
     bool isConnected();
+    int getCardId() { return m_capturecardnum; }
 
     bool isBusy();
     TVState GetState();

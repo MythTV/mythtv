@@ -16,11 +16,16 @@ class PlaybackSock
     bool isLocal() { return local; }
     bool wantsEvents() { return events; }
 
+    bool isSlaveBackend() { return backend; }
+    void setAsSlaveBackend() { backend = true; }
+
   private:
     QSocket *sock;
     QString hostname;
     bool local;
     bool events;
+
+    bool backend;
 };
 
 #endif

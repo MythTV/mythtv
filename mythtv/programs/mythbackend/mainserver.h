@@ -69,6 +69,8 @@ class MainServer : public QObject
     QString recordfileprefix;
 
     HttpStatus *statusserver;
+
+    QSocket *masterServerSock;
 };
 
 #endif

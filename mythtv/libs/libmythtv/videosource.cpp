@@ -1,5 +1,6 @@
 #include "videosource.h"
 #include "libmyth/mythwidgets.h"
+#include "libmyth/mythcontext.h"
 
 #include <qapplication.h>
 #include <qsqldatabase.h>
@@ -175,7 +176,9 @@ void VideoSource::loadByID(QSqlDatabase* db, int sourceid) {
 
 void CaptureCard::fillSelections(QSqlDatabase* db,
                                  SelectSetting* setting) {
-    QString query = QString("SELECT videodevice, cardid FROM capturecard;");
+    QString query = QString("SELECT videodevice, cardid FROM capturecard "
+                            "WHERE hostname = \"%1\";")
+                            .arg(gContext->GetHostName());
     QSqlQuery result = db->exec(query);
 
     if (result.isActive() && result.numRowsAffected() > 0)
@@ -265,7 +268,11 @@ void CardInputEditor::load(QSqlDatabase* db) {
     // SelectSetting provided a facility to edit the labels, we
     // could use CaptureCard::fillSelections
 
-    QSqlQuery capturecards = db->exec("SELECT cardid,videodevice FROM capturecard;");
+    QString thequery = QString("SELECT cardid, videodevice FROM capturecard "
+                               "WHERE hostname = \"%1\";")
+                              .arg(gContext->GetHostName());
+
+    QSqlQuery capturecards = db->exec(thequery);
     if (capturecards.isActive() && capturecards.numRowsAffected() > 0)
         while (capturecards.next()) {
             int cardid = capturecards.value(0).toInt();
