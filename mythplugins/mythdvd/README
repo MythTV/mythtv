@@ -112,7 +112,7 @@ For just DVD playback, you can do:
 
 Next:
 
-                qmake
+                qmake mythdvd.pro
                 make
                 make install
 
