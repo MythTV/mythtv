@@ -327,7 +327,7 @@ void DeleteBox::selected(QListViewItem *lvitem)
         thequery = QString("DELETE FROM recorded WHERE channum = %1 AND title "
                            "= \"%2\" AND starttime = %3 AND endtime = %4;")
                            .arg(rec->channum).arg(rec->title).arg(startts)
-                           .arg(startts).arg(endts);
+                           .arg(endts);
 
         query = db->exec(thequery);
 
