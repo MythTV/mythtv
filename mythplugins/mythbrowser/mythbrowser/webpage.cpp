@@ -79,24 +79,49 @@ WebPage::WebPage (const char *location, int zoom, int width, int height, WFlags 
         qApp->installEventFilter(this);
 }
 
-void WebPage::openURLRequest(const KURL &url, const KParts::URLArgs &args)
+WebPage::WebPage (const char *location, const KParts::URLArgs &args, int zoom, int width, int height, WFlags flags) : QWidget(NULL,NULL,flags)
 {
-    urlHistory.push(browser->url().url());
-//    argHistory.push();
+//    progressBar=NULL;
+    browser=new KHTMLPart(this);
 
+    // connect signal for link clicks
+    connect( browser->browserExtension(),
+         SIGNAL( openURLRequest( const KURL &, const KParts::URLArgs & ) ), 
+         this, SLOT( openURLRequest(const KURL &, const KParts::URLArgs & ) ) );
+
+    // connect signals for the progress bar...
+//    connect( browser,SIGNAL(started(KIO::Job*)),
+//         this,SLOT(started(KIO::Job*)));
+//    connect( browser,SIGNAL(completed()),
+//         this,SLOT(completed()));
+
+    // ...and enable the progress bar
+    browser->setProgressInfoEnabled(true);
+    browser->showProgressInfo(true);
+
+    browser->setStandardFont("Arial");
     browser->browserExtension()->setURLArgs(args);
-    browser->openURL(url.url());
-    emit changeTitle(url.url());
+    browser->openURL(location);
+
+    browser->view()->resize(width,height);
+
+    zoom = zoom<20 ? 20:zoom;
+    zoom = zoom>300 ? 300:zoom;
+    browser->setZoomFactor(zoom);
+    zoomFactor=zoom;
+
+    browser->setPluginsEnabled(false);
+    browser->enableMetaRefresh(true);
+    browser->setJavaEnabled(true);
+    browser->enableJScript(true);
+
+    if(DEBUG)
+        qApp->installEventFilter(this);
 }
 
-void WebPage::back()
+void WebPage::openURLRequest(const KURL &url, const KParts::URLArgs &args)
 {
-    if(urlHistory.count()>0) {
-//    browser->browserExtension()->setURLArgs(args);
-        QString url=urlHistory.pop();
-        browser->openURL(url);
-        emit changeTitle(url);
-    }
+     emit newUrlRequested(url,args);
 }
 
 void WebPage::zoomOut()

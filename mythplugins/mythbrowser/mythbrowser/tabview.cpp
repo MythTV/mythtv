@@ -55,8 +55,14 @@ TabView::TabView(QSqlDatabase *db, QStringList urls,
     for(QStringList::Iterator it = urls.begin(); it != urls.end(); ++it) {
         // is rect.height() really the height of the tab in pixels???
         WebPage *page = new WebPage(*it,z,w,h,f);
+	connect(page,SIGNAL( newUrlRequested(const KURL &,const KParts::URLArgs&)),
+           this, SLOT( newUrlRequested(const KURL &,const KParts::URLArgs &)));
         mytab->addTab(page,*it);
-        connect(page,SIGNAL(changeTitle(QString)),this,SLOT(changeTitle(QString)));
+
+	QPtrStack<QWidget> *currWidgetHistory = new QPtrStack<QWidget>;
+	widgetHistory.append(currWidgetHistory);
+	QValueStack<QString> *currUrlHistory = new QValueStack<QString>;
+	urlHistory.append(currUrlHistory);
     }
 
     // Connect the context-menu
@@ -124,13 +130,6 @@ void TabView::actionMouseEmulation()
     }
 }
 
-void TabView::actionBack()
-{
-    cancelMenu();
-
-    ((WebPage*)mytab->currentPage())->back();
-}
-
 void TabView::actionNextTab()
 {
     cancelMenu();
@@ -182,7 +181,7 @@ void TabView::actionAddBookmark()
 {
     cancelMenu();
     PopupBox *popupBox = new PopupBox(this,
-            ((WebPage*)mytab->currentPage())->browser->baseURL().htmlURL());
+	    ((WebPage*)mytab->currentPage())->browser->baseURL().htmlURL());
     connect(popupBox, SIGNAL(finished(const char*,const char*,const char*)),
             this, SLOT(finishAddBookmark(const char*,const char*,const char*)));
     qApp->removeEventFilter(this);
@@ -195,29 +194,59 @@ void TabView::finishAddBookmark(const char* group, const char* desc, const char*
     QString groupStr = QString(group);
     QString descStr = QString(desc);
     QString urlStr = QString(url);
-
-    printf("finish bookmark menu\n");
+    urlStr.stripWhiteSpace();
+    if( urlStr.find("http://")==-1 )
+        urlStr.prepend("http://");
 
     if(groupStr.isEmpty() || urlStr.isEmpty())
         return;
 
-    // Check if already in DB
-    QSqlQuery query( "SELECT url FROM websites WHERE url='" + urlStr + "'", myDb);
-    if (!query.isActive()) {
-        cerr << "MythBookmarksConfig: Error in finding in DB" << endl;
-        return;
-    } else if( query.numRowsAffected() == 0 ) { // Insert if not yet in DB
-        QSqlQuery query( "INSERT INTO websites (grp,dsc,url) VALUES( '" + groupStr + "', '" +
-             descStr + "', '" + urlStr + "' );",myDb);
-        if (!query.isActive()) {
-            cerr << "MythBookmarksConfig: Error in inserting in DB" << endl;
-        }
+    QSqlQuery query(myDb);
+    query.prepare("INSERT INTO websites (grp, dsc, url) VALUES(:GROUP, :DESC, :URL);");
+    query.bindValue(":GROUP",groupStr.utf8());
+    query.bindValue(":DESC",descStr.utf8());
+    query.bindValue(":URL",urlStr.utf8());
+    if (!query.exec()) {
+        cerr << "MythBookmarksConfig: Error in inserting in DB" << endl;
     }
 }
 
-void TabView::changeTitle(QString title)
+void TabView::actionBack()
 {
-    mytab->setTabLabel(mytab->currentPage(),title);
+    cancelMenu();
+
+    int index = mytab->currentPageIndex();
+    QPtrStack<QWidget> *curWidgetHistory = widgetHistory.at(index);
+    if (!curWidgetHistory->isEmpty()) {
+        QValueStack<QString> *curUrlHistory = urlHistory.at(index);
+
+        QWidget *curr = mytab->currentPage();
+        mytab->insertTab(curWidgetHistory->pop(),curUrlHistory->pop(),index);
+	mytab->removePage(curr);
+	mytab->setCurrentPage(index);
+
+	// disconnect(curr,...);
+	delete curr;
+    }
+}
+
+void TabView::newUrlRequested(const KURL &url, const KParts::URLArgs &args)
+{
+    int index = mytab->currentPageIndex();
+    QPtrStack<QWidget> *curWidgetHistory = widgetHistory.at(index);
+    QValueStack<QString> *curUrlHistory = urlHistory.at(index);
+
+    QWidget *curr = mytab->currentPage();
+    curWidgetHistory->push(curr);
+    curUrlHistory->push(mytab->label(index));
+
+    WebPage *page = new WebPage(url.url(),args,((WebPage*)curr)->zoomFactor,w,h,f);
+    mytab->insertTab(page,url.url(),index);
+    mytab->removePage(curr);
+    mytab->setCurrentPage(index);
+
+    connect(page,SIGNAL( newUrlRequested(const KURL &,const KParts::URLArgs&)),
+	    this, SLOT( newUrlRequested(const KURL &,const KParts::URLArgs &)));
 }
 
 bool TabView::eventFilter(QObject* object, QEvent* event)

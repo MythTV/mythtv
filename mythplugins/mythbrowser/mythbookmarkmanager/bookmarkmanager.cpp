@@ -9,6 +9,7 @@
  * - Philippe Cattin <cattin@vision.ee.ethz.ch>
  *
  * Bugfixes from:
+ * - Jim Radford
  *
  * Translations by:
  *
@@ -31,14 +32,14 @@ using namespace std;
 
 // ---------------------------------------------------
 
- class BookmarkItem
+class BookmarkItem
 {
- public:
-     typedef QPtrList<BookmarkItem> List;
+public:
+    typedef QPtrList<BookmarkItem> List;
 
-     QString group;
-     QString desc;
-     QString url;
+    QString group;
+    QString desc;
+    QString url;
 };
 
 // ---------------------------------------------------
@@ -49,20 +50,20 @@ public:
 
     typedef QPtrList<BookmarkGroup> List;
 
-     QString name;
-     BookmarkItem::List  siteList;
+    QString name;
+    BookmarkItem::List  siteList;
 
-     BookmarkGroup() {
-         siteList.setAutoDelete(true);
-     }
+    BookmarkGroup() {
+        siteList.setAutoDelete(true);
+    }
 
-     ~BookmarkGroup() {
-         siteList.clear();
-     }
+    ~BookmarkGroup() {
+        siteList.clear();
+    }
 
-     void clear() {
-         siteList.clear();
-     };
+    void clear() {
+        siteList.clear();
+    };
 };
 
 // ---------------------------------------------------
@@ -139,16 +140,16 @@ void PopupBox::slotOkClicked()
 {
 public:
 
-     BookmarkGroup::List groupList;
-     QStringList selectedSitesList;
+    BookmarkGroup::List groupList;
+    QStringList selectedSitesList;
 
-     BookmarkConfigPriv() {
-         groupList.setAutoDelete(true);
-     }
+    BookmarkConfigPriv() {
+        groupList.setAutoDelete(true);
+    }
 
-     ~BookmarkConfigPriv() {
-         groupList.clear();
-     }
+    ~BookmarkConfigPriv() {
+        groupList.clear();
+    }
 };
 
 // ---------------------------------------------------
@@ -202,22 +203,22 @@ void BookmarksConfig::populateListView()
     myTree->groupList.clear();
     QSqlQuery query("SELECT grp, dsc, url FROM websites ORDER BY grp", myDb);
     if (!query.isActive()) {
-    cerr << "MythBrowserConfig: Error in loading from DB" << endl;
+        cerr << "MythBrowserConfig: Error in loading from DB" << endl;
     } else {
-    BookmarkGroup *group = new BookmarkGroup();
-    group->name="Empty";
-    while( query.next() ) {
-        if( QString::compare(group->name,query.value(0).toString())!=0 ) {
-        group = new BookmarkGroup();
-        group->name = query.value(0).toString();
-        myTree->groupList.append(group);
+        BookmarkGroup *group = new BookmarkGroup();
+        group->name="Empty";
+        while( query.next() ) {
+            if( QString::compare(group->name,query.value(0).toString())!=0 ) {
+                group = new BookmarkGroup();
+                group->name = query.value(0).toString();
+                myTree->groupList.append(group);
+            }
+            BookmarkItem *site = new BookmarkItem();
+            site->group = query.value(0).toString();
+            site->desc = query.value(1).toString();
+            site->url = query.value(2).toString();
+            group->siteList.append(site);
         }
-        BookmarkItem *site = new BookmarkItem();
-        site->group = query.value(0).toString();
-        site->desc = query.value(1).toString();
-        site->url = query.value(2).toString();
-        group->siteList.append(site);
-    }
     }
 
     // Build the ListView
@@ -292,7 +293,8 @@ void BookmarksConfig::setupView()
     browser->setRW(true);
     browser->setHelpText("this is the help line");
     hbox2->addWidget(browser);
-    browser->setText(gContext->GetSetting("WebBrowserCommand", "/usr/local/bin/mythbrowser"));
+    //    browser->setText(gContext->GetSetting("WebBrowserCommand", "/usr/local/bin/mythbrowser"));
+    browser->setText(gContext->GetSetting("WebBrowserCommand", PREFIX "/bin/mythbrowser"));
 
     // Add new bookmark ------------------------------------
     QHBoxLayout *hbox = new QHBoxLayout(vbox);
@@ -326,21 +328,22 @@ void BookmarksConfig::slotFinish()
 void BookmarksConfig::slotBookmarksViewExecuted(QListViewItem *item)
 {
     if(!item)
-    return;
+        return;
 
     BookmarkViewItem* viewItem = dynamic_cast<BookmarkViewItem*>(item);
     if (!viewItem) { // This is a upper level item, i.e. a "group name"
-//  item->setOpen(!(item->isOpen()));
+        // item->setOpen(!(item->isOpen()));
     } else {
-    QSqlQuery query("DELETE FROM websites WHERE url='"+viewItem->myBookmarkSite->url+"'",myDb);
-    if (!query.isActive()) {
-        cerr << "MythBookmarksConfig: Error in deleting in DB" << endl;
-        return;
-    }
-    populateListView();
+        QSqlQuery query(myDb);
+        query.prepare("DELETE FROM websites WHERE url=:URL");
+        query.bindValue(":URL",viewItem->myBookmarkSite->url);
+        if (!query.exec()) {
+           cerr << "MythBookmarksConfig: Error in deleting in DB" << endl;
+           return;
+        }
+        populateListView();
     }
 }
-
 
 void BookmarksConfig::slotAddBookmark()
 {
@@ -350,28 +353,26 @@ void BookmarksConfig::slotAddBookmark()
      popupBox->show();
 }
 
-
 void BookmarksConfig::slotWebSiteAdded(const char* group, const char* desc, const char* url)
 {
     QString *groupStr = new QString(group);
     QString *descStr = new QString(desc);
     QString *urlStr = new QString(url);
+    urlStr->stripWhiteSpace();
+    if( urlStr->find("http://")==-1 )
+        urlStr->prepend("http://");
 
     if(groupStr->isEmpty() || urlStr->isEmpty())
-    return;
+        return;
 
-    // Check if already in DB
-    QSqlQuery query( "SELECT url FROM websites WHERE url='" + *urlStr + "'", myDb);
-    if (!query.isActive()) {
-    cerr << "MythBookmarksConfig: Error in finding in DB" << endl;
-    return;
-    } else if( query.numRowsAffected() == 0 ) { // Insert if not yet in DB
-    QSqlQuery query( "INSERT INTO websites (grp,dsc,url) VALUES( '" + *groupStr + "', '" +
-             *descStr + "', '" + *urlStr + "' );",myDb);
-     if (!query.isActive()) {
-         cerr << "MythBookmarksConfig: Error in inserting in DB" << endl;
-     }
-     }
+    QSqlQuery query(myDb);
+    query.prepare("INSERT INTO websites (grp, dsc, url) VALUES(:GROUP, :DESC, :URL);");
+    query.bindValue(":GROUP",groupStr->utf8());
+    query.bindValue(":DESC",descStr->utf8());
+    query.bindValue(":URL",urlStr->utf8());
+    if (!query.exec()) {
+        cerr << "MythBookmarksConfig: Error in inserting in DB" << endl;
+    }
     populateListView();
 }
 
@@ -424,31 +425,31 @@ void Bookmarks::populateListView()
     myTree->groupList.clear();
     QSqlQuery query("SELECT grp, dsc, url FROM websites ORDER BY grp", myDb);
     if (!query.isActive()) {
-    cerr << "MythBrowserConfig: Error in loading from DB" << endl;
+        cerr << "MythBrowserConfig: Error in loading from DB" << endl;
     } else {
-    BookmarkGroup *group = new BookmarkGroup();
-    group->name="Empty";
-    while( query.next() ) {
-        if( QString::compare(group->name,query.value(0).toString())!=0 ) {
-        group = new BookmarkGroup();
-        group->name = query.value(0).toString();
-        myTree->groupList.append(group);
-        }
-        BookmarkItem *site = new BookmarkItem();
-        site->group = query.value(0).toString();
-        site->desc = query.value(1).toString();
-        site->url = query.value(2).toString();
-        group->siteList.append(site);
+        BookmarkGroup *group = new BookmarkGroup();
+        group->name="Empty";
+        while( query.next() ) {
+            if( QString::compare(group->name,query.value(0).toString())!=0 ) {
+                group = new BookmarkGroup();
+                group->name = query.value(0).toString();
+                myTree->groupList.append(group);
+            }
+            BookmarkItem *site = new BookmarkItem();
+            site->group = query.value(0).toString();
+            site->desc = query.value(1).toString();
+            site->url = query.value(2).toString();
+            group->siteList.append(site);
         }
     }
 
     // Build the ListView
     myBookmarksView->clear();
     for (BookmarkGroup* cat = myTree->groupList.first(); cat; cat = myTree->groupList.next() ) {
-    QListViewItem *catItem = new QListViewItem(myBookmarksView, cat->name,"");
-    catItem->setOpen(false);
-    for(BookmarkItem* site = cat->siteList.first(); site; site = cat->siteList.next() ) {
-        new BookmarkViewItem(catItem, site);
+        QListViewItem *catItem = new QListViewItem(myBookmarksView, cat->name,"");
+        catItem->setOpen(false);
+        for(BookmarkItem* site = cat->siteList.first(); site; site = cat->siteList.next() ) {
+            new BookmarkViewItem(catItem, site);
         }
     }
 
@@ -487,7 +488,8 @@ void Bookmarks::setupView()
 
 void Bookmarks::slotBookmarksViewExecuted(QListViewItem *item)
 {
-    QString cmd = gContext->GetSetting("WebBrowserCommand","/usr/local/bin/mythbrowser");
+  //    QString cmd = gContext->GetSetting("WebBrowserCommand","/usr/local/bin/mythbrowser");
+    QString cmd = gContext->GetSetting("WebBrowserCommand", PREFIX "/bin/mythbrowser");
     QString zoom = QString(" -z %1 ").arg(gContext->GetNumSetting("WebBrowserZoomLevel",200));
 
     if(!item)
@@ -495,19 +497,19 @@ void Bookmarks::slotBookmarksViewExecuted(QListViewItem *item)
 
     BookmarkViewItem* viewItem = dynamic_cast<BookmarkViewItem*>(item);
     if (!viewItem) { // This is a upper level item, i.e. a "group name"
-    QListViewItemIterator it(item);
-    ++it;
-    while ( it.current() ) {
-        BookmarkViewItem* leafItem = dynamic_cast<BookmarkViewItem*>(it.current());
-        if(leafItem)
-        cmd += zoom+leafItem->myBookmarkSite->url;
-        else
-        break;
+        QListViewItemIterator it(item);
         ++it;
-    }
-    system(cmd);
+        while ( it.current() ) {
+            BookmarkViewItem* leafItem = dynamic_cast<BookmarkViewItem*>(it.current());
+            if(leafItem)
+                cmd += zoom+leafItem->myBookmarkSite->url;
+            else
+                break;
+            ++it;
+        }
+        system(cmd);
     } else {
-    cmd += zoom+viewItem->myBookmarkSite->url;
-    system(cmd);
+        cmd += zoom+viewItem->myBookmarkSite->url;
+        system(cmd);
     }
 }

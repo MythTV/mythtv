@@ -24,3 +24,9 @@ V0.31   - tab-label now reflects the current URL
 
 V0.32   - Zoom In and Zoom Out added to the Popup Menu
 
+2003.12.22
+        - Change DB code as suggested by A. Withers (bug reported by D. Berger)
+        - Improved BACK functionality (no reloading)
+        - Add 'http://' to a link if missing
+        - PREFIX patch from Jim Radford
+

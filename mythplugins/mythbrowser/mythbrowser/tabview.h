@@ -7,8 +7,14 @@
 #include <kmainwindow.h>
 #include <qtabwidget.h>
 #include <qsqldatabase.h>
+#include <qptrstack.h>
+#include <qptrlist.h>
+#include <qvaluestack.h>
 
 #include "mythtv/mythdialogs.h"
+
+typedef QPtrStack<QWidget> WIDGET_HISTORY;
+typedef QValueStack<QString> URL_HISTORY;
 
 class MyMythPopupBox : public MythPopupBox
 {
@@ -21,53 +27,57 @@ public:
 
 class TabView : public MythMainWindow
 {
-  Q_OBJECT
+    Q_OBJECT
 
 protected:
-  virtual bool eventFilter(QObject* object, QEvent* event);
+    virtual bool eventFilter(QObject* object, QEvent* event);
 
 public:
-  TabView(QSqlDatabase *db, QStringList urls,
+    TabView(QSqlDatabase *db, QStringList urls,
           int zoom, int width, int height, WFlags flags);
-  ~TabView();
+    ~TabView();
 
 signals:
-  void menuPressed();
-  void closeMenu();
+    void menuPressed();
+    void closeMenu();
 
 public slots:
-  void changeTitle(QString title);
+//  void openURLRequested(KURL url,KParts::URLArgs args);
+    void newUrlRequested(const KURL &url, const KParts::URLArgs &args);
 
 private slots:
-  void openMenu();
-  void actionBack();
-  void actionNextTab();
-  void actionPrevTab();
-  void actionMouseEmulation();
+    void openMenu();
+    void actionBack();
+    void actionNextTab();
+    void actionPrevTab();
+    void actionMouseEmulation();
 //  void actionDoLeftClick();
-  void actionSTOP();
-  void actionZoomOut();
-  void actionZoomIn();
-  void cancelMenu();
-  void actionAddBookmark();
-  void finishAddBookmark(const char* group, const char* desc, const char* url);
+    void actionSTOP();
+    void actionZoomOut();
+    void actionZoomIn();
+    void cancelMenu();
+    void actionAddBookmark();
+    void finishAddBookmark(const char* group, const char* desc, const char* url);
 
 private:
-  int z,w,h;
-  WFlags f;
-  QSqlDatabase       *myDb;
+    int z,w,h;
+    WFlags f;
+    QSqlDatabase       *myDb;
 
-  int mouseEmulation, saveMouseEmulation;
+    int mouseEmulation, saveMouseEmulation;
 
-  QStringList urls;
-  QTabWidget *mytab;
+    QStringList urls;
+    QTabWidget *mytab;
 
-  QCursor *mouse;
+    QCursor *mouse;
 
-  bool menuIsOpen;
-  MyMythPopupBox *menu;
+    bool menuIsOpen;
+    MyMythPopupBox *menu;
 
-  QWidget *hadFocus;
+    QWidget *hadFocus;
+
+    QPtrList<WIDGET_HISTORY> widgetHistory;
+    QPtrList<URL_HISTORY> urlHistory;
 };
 
 class PopupBox : public QDialog

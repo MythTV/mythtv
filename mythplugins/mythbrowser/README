@@ -1,8 +1,7 @@
 This is the README file for the MythBrowser.
 
-October 26, 2003
+December 27, 2003
 
-Version: 0.31
 (c) 2003 Philippe C. Cattin (cattin * vision.ee.ethz.ch)
 
 MythBrowser is distributed under the GNU GENERAL PUBLIC LICENSE version 2
@@ -50,41 +49,6 @@ qmake
 make
 make install
 
-Since MythBrowser is a new myth plugin you have to add it by hand to the myth
-interface. First you have to add it to the mainmenu.xml (usually in
-/usr/local/share/mythtv):
-
-   <button>
-      <type>WEBPAGE</type>
-      <text>WebBrowser</text>
-      <action>PLUGIN mythbookmarkmanager</action>
-      <depends>mythbookmarkmanager</depends>
-   </button>
-
-Then you need to add WebBrowser to the Settings Menu main_settings.xml (usually
-in /usr/local/share/mythtv):
-
-   <button>
-     <type>WEBPAGE</type>
-     <text>WebBrowser Settings</text>
-      <action>CONFIGPLUGIN mythbookmarkmanager</action>
-    <depends>mythbookmarkmanager</depends>
-   </button>
-
-If you want to assign a pic to this button you have to add the following lines
-to your favorite theme (e.g. /usr/local/share/mythtv/themes/blue/theme.xml) 
-
-  <buttondef name="WEBPAGE">
-    <image>webpage.png</image>
-    <offset>55,30</offset>
-  </buttondef>
-
-and lastly you have to copy the file mythbrowser/images/webpage.png in the
-directory /usr/local/share/mythtv/themes/default.
-
-After restarting mythfrontend everything should be up and running.
-
-
 
 3. Usage
 ========
@@ -92,7 +56,7 @@ After restarting mythfrontend everything should be up and running.
   First you have to enter the MythBrowser Settings to define your favorite
 webpages and groups. This is also where you can adjust the zoom level of the
 fonts on the webpages as well as define the command to execute mythbrowser
-(default: /usr/local/bin/mythbrowser). Then exit setup.
+(default: PREFIX+/bin/mythbrowser). Then exit setup.
 
   In the MythBrowser screen you can then select a webpage to display. If
 you select (SPACE/Enter) on a group the browser will be startet with all
