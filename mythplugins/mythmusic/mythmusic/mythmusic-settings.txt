@@ -1,0 +1,12 @@
+# Directory to store music in.  MUST EXIST.  And the user running mythmusic
+# needs to have write permission to here, if you want to rip CDs.
+str MusicLocation=/mnt/store/music/
+
+# Where's your CD ROM?  Gotta be able to read from here.
+str CDDevice=/dev/cdrom
+
+# Place to store the temporary output from the CD.  Gotta be able to write.
+str TemporarySpace=/tmp/
+
+# Order in which to sort the Music Selection Tree.
+str TreeLevels=artist album title

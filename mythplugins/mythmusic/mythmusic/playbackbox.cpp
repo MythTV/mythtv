@@ -1,0 +1,590 @@
+#include <qlayout.h>
+#include <qapplication.h>
+#include <qcursor.h>
+#include <qpixmap.h>
+#include <qstringlist.h>
+#include <qfile.h>
+#include <qsettings.h>
+#include <qlabel.h>
+#include <qgroupbox.h>
+#include <qlistview.h>
+#include <qtoolbutton.h>
+#include <qslider.h>
+#include <qstyle.h>
+
+#include "scrolllabel.h"
+#include "metadata.h"
+#include "audiooutput.h"
+#include "constants.h"
+#include "streaminput.h"
+#include "output.h"
+#include "decoder.h"
+#include "playbackbox.h"
+
+#include "res/nextfile.xpm"
+#include "res/next.xpm"
+#include "res/pause.xpm"
+#include "res/play.xpm"
+#include "res/prevfile.xpm"
+#include "res/prev.xpm"
+#include "res/stop.xpm"
+
+class MyButton : public QToolButton
+{   
+  public:
+    MyButton(QWidget *parent) : QToolButton(parent) 
+                { setFocusPolicy(StrongFocus); } 
+    
+    void drawButton(QPainter *p);
+};  
+
+
+void MyButton::drawButton( QPainter * p )
+{
+    QStyle::SCFlags controls = QStyle::SC_ToolButton;
+    QStyle::SCFlags active = QStyle::SC_None;
+
+//    Qt::ArrowType arrowtype = d->arrow;
+
+    if (isDown())
+        active |= QStyle::SC_ToolButton;
+
+    QStyle::SFlags flags = QStyle::Style_Default;
+    if (isEnabled())
+        flags |= QStyle::Style_Enabled;
+    if (hasFocus())
+        flags |= QStyle::Style_MouseOver;
+    if (isDown())
+        flags |= QStyle::Style_Down;
+    if (isOn())
+        flags |= QStyle::Style_On;
+    if (!autoRaise()) {
+        flags |= QStyle::Style_AutoRaise;
+        if (uses3D()) {
+            flags |= QStyle::Style_MouseOver;
+            if (! isOn() && ! isDown())
+                flags |= QStyle::Style_Raised;
+        }
+    } else if (! isOn() && ! isDown())
+        flags |= QStyle::Style_Raised;
+
+    style().drawComplexControl(QStyle::CC_ToolButton, p, this, rect(), 
+                               colorGroup(), flags, controls, active,
+                               //hasArrow ? QStyleOption(arrowtype) :
+                               QStyleOption());
+    drawButtonLabel(p);
+}
+
+PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
+                         QWidget *parent, const char *name)
+           : QDialog(parent, name)
+{
+    db = ldb;
+
+    int screenheight = QApplication::desktop()->height();
+    int screenwidth = QApplication::desktop()->width();
+
+    screenwidth = 800; screenheight = 600;
+
+    float wmult = screenwidth / 800.0;
+    float hmult = screenheight / 600.0;
+
+    setGeometry(0, 0, screenwidth, screenheight);
+    setFixedSize(QSize(screenwidth, screenheight));
+
+    setFont(QFont("Arial", 18 * hmult, QFont::Bold));
+    setCursor(QCursor(Qt::BlankCursor));
+
+    QVBoxLayout *vbox = new QVBoxLayout(this, 20 * wmult);
+
+    QVBoxLayout *vbox2 = new QVBoxLayout(vbox, 2);
+
+    QGroupBox *topdisplay = new QGroupBox(this);
+    vbox2->addWidget(topdisplay);
+
+    topdisplay->setLineWidth(4);
+    topdisplay->setMidLineWidth(3);
+    topdisplay->setFrameShape(QFrame::Panel);
+    topdisplay->setFrameShadow(QFrame::Sunken);
+    topdisplay->setPaletteBackgroundColor(QColor("grey"));
+
+    QVBoxLayout *framebox = new QVBoxLayout(topdisplay, 10);
+
+    titlelabel = new ScrollLabel(topdisplay);
+    titlelabel->setText("  ");
+    titlelabel->setPaletteBackgroundColor(QColor("grey"));
+
+    framebox->addWidget(titlelabel);   
+
+    timelabel = new QLabel(topdisplay);
+    timelabel->setText("  ");
+    timelabel->setPaletteBackgroundColor(QColor("grey"));
+    timelabel->setAlignment(AlignRight);
+
+    framebox->addWidget(timelabel);
+
+    seekbar = new QSlider(Qt::Horizontal, this);
+    seekbar->setFocusPolicy(NoFocus);
+    seekbar->setTracking(false);   
+    seekbar->blockSignals(true); 
+
+    vbox2->addWidget(seekbar);
+
+    QHBoxLayout *controlbox = new QHBoxLayout(vbox2, 2);
+
+    MyButton *prevfileb = new MyButton(this);
+    prevfileb->setAutoRaise(true);
+    prevfileb->setIconSet(QPixmap((const char **)prevfile_pix));  
+    connect(prevfileb, SIGNAL(clicked()), this, SLOT(previous()));
+ 
+    MyButton *prevb = new MyButton(this);
+    prevb->setAutoRaise(true);
+    prevb->setIconSet(QPixmap((const char **)prev_pix));
+    connect(prevb, SIGNAL(clicked()), this, SLOT(seekback()));
+
+    MyButton *pauseb = new MyButton(this);
+    pauseb->setAutoRaise(true);
+    pauseb->setIconSet(QPixmap((const char **)pause_pix));
+    connect(pauseb, SIGNAL(clicked()), this, SLOT(pause()));
+
+    MyButton *playb = new MyButton(this);
+    playb->setAutoRaise(true);
+    playb->setIconSet(QPixmap((const char **)play_pix));
+    connect(playb, SIGNAL(clicked()), this, SLOT(play()));
+
+    MyButton *stopb = new MyButton(this);
+    stopb->setAutoRaise(true);
+    stopb->setIconSet(QPixmap((const char **)stop_pix));
+    connect(stopb, SIGNAL(clicked()), this, SLOT(stop()));
+    
+    MyButton *nextb = new MyButton(this);
+    nextb->setAutoRaise(true);
+    nextb->setIconSet(QPixmap((const char **)next_pix));
+    connect(nextb, SIGNAL(clicked()), this, SLOT(seekforward()));
+
+    MyButton *nextfileb = new MyButton(this);
+    nextfileb->setAutoRaise(true);
+    nextfileb->setIconSet(QPixmap((const char **)nextfile_pix));
+    connect(nextfileb, SIGNAL(clicked()), this, SLOT(next()));    
+
+    controlbox->addWidget(prevfileb);
+    controlbox->addWidget(prevb);
+    controlbox->addWidget(pauseb);
+    controlbox->addWidget(playb);
+    controlbox->addWidget(stopb);
+    controlbox->addWidget(nextb);
+    controlbox->addWidget(nextfileb);
+
+    playview = new QListView(this);
+    playview->addColumn("#");
+    playview->addColumn("Artist");  
+    playview->addColumn("Title");
+    playview->addColumn("Length");
+    playview->setFont(QFont("Arial", 14 * hmult, QFont::Bold));
+
+    playview->setFocusPolicy(NoFocus);
+
+    playview->setColumnWidth(0, 50 * wmult);
+    playview->setColumnWidth(1, 210 * wmult);
+    playview->setColumnWidth(2, 400 * wmult);
+    playview->setColumnWidth(3, 80 * wmult);
+    playview->setColumnWidthMode(0, QListView::Manual);
+    playview->setColumnWidthMode(1, QListView::Manual);
+    playview->setColumnWidthMode(2, QListView::Manual);
+    playview->setColumnWidthMode(3, QListView::Manual);
+
+    playview->setColumnAlignment(3, Qt::AlignRight);
+
+    playview->setSorting(-1);
+    playview->setAllColumnsShowFocus(true);
+
+    QListViewItem *litem;
+
+    QValueList<Metadata>::iterator it = playlist->end();
+    int count = playlist->size();
+    it--;
+    while (it != playlist->end())
+    {
+        QString position = QString("%1").arg(count);
+        int secs = (*it).Length() / 1000;
+        int min = secs / 60;
+        secs -= min * 60;
+    
+        char timestr[64];
+        sprintf(timestr, "%2d:%02d", min, secs);
+       
+        litem = new QListViewItem(playview, position, (*it).Artist(), 
+                                  (*it).Title(), timestr);
+        listlist.prepend(litem);
+        it--; count--;
+    }
+
+    vbox->addWidget(playview, 1);
+
+    playb->setFocus();
+
+    input = 0; decoder = 0; seeking = false; remainingTime = false;
+    output = 0; outputBufferSize = 0;
+
+    plist = playlist; 
+    playlistindex = 0;
+   
+    if (plist->size() > 0)
+    { 
+        curMeta = ((*plist)[playlistindex]);
+
+        playfile = curMeta.Filename();
+        emit play();
+    }
+}
+
+PlaybackBox::~PlaybackBox(void)
+{
+    stopAll();
+}
+
+void PlaybackBox::Show(void)
+{
+    showFullScreen();
+    setActiveWindow();
+}
+
+void PlaybackBox::play()
+{
+    stop();
+
+    QUrl sourceurl(playfile);
+    QString sourcename(playfile);
+
+    if (output)
+        fprintf(stderr, "output not deleted!\n");
+
+    QString cdext = ".cda";
+    if (playfile.right(cdext.length()).lower() == cdext)
+    {
+        output = NULL;
+    }
+    else
+    {
+        output = new AudioOutput(outputBufferSize * 1024, "/dev/dsp");
+        output->setBufferSize(outputBufferSize * 1024);
+        output->addListener(this);
+
+        if (! output->initialize())
+            return;
+    }
+
+    if (! sourceurl.isLocalFile()) {
+        StreamInput streaminput(sourceurl);
+        streaminput.setup();
+        input = streaminput.socket();
+    } else
+        input = new QFile(sourceurl.toString(FALSE, FALSE));
+
+    if (decoder && ! decoder->factory()->supports(sourcename))
+        decoder = 0;
+
+    if (! decoder) {
+        decoder = Decoder::create(sourcename, input, output);
+
+        if (! decoder) {
+            printf("mythmusic: unsupported fileformat\n");
+            stopAll();
+            return;
+        }
+
+        decoder->setBlockSize(globalBlockSize);
+        decoder->addListener(this);
+    } else {
+        decoder->setInput(input);
+        decoder->setOutput(output);
+    }
+
+    QString disp = curMeta.Artist() + "  ~  " + curMeta.Album() + 
+                   "  ~   " + curMeta.Title();
+    titlelabel->setText(disp);
+
+    QListViewItem *curItem = listlist.at(playlistindex);
+    playview->setCurrentItem(curItem);
+    playview->ensureItemVisible(curItem);
+    playview->setSelected(curItem, true);
+
+    currentTime = 0;
+    maxTime = curMeta.Length() / 1000;
+
+    if (decoder->initialize()) {
+        seekbar->setMinValue(0);
+        seekbar->setValue(0);
+        seekbar->setMaxValue(maxTime);
+        if (seekbar->maxValue() == 0) {
+            seekbar->setEnabled(false);
+        } else {
+            seekbar->setEnabled(true);
+        }
+ 
+        if (output)
+            output->start();
+        decoder->start();
+    }
+}
+
+void PlaybackBox::pause(void)
+{
+    if (output) {
+        output->mutex()->lock();
+        output->pause();
+        output->mutex()->unlock();
+    }
+
+    // wake up threads
+    if (decoder) {
+        decoder->mutex()->lock();
+        decoder->cond()->wakeAll();
+        decoder->mutex()->unlock();
+    }
+
+    if (output) {
+        output->recycler()->mutex()->lock();
+        output->recycler()->cond()->wakeAll();
+        output->recycler()->mutex()->unlock();
+    }
+}
+
+void PlaybackBox::stop(void)
+{
+    if (decoder && decoder->running()) {
+        decoder->mutex()->lock();
+        decoder->stop();
+        decoder->mutex()->unlock();
+    }
+
+    if (output && output->running()) {
+        output->mutex()->lock();
+        output->stop();
+        output->mutex()->unlock();
+    }
+
+    // wake up threads
+    if (decoder) {
+        decoder->mutex()->lock();
+        decoder->cond()->wakeAll();
+        decoder->mutex()->unlock();
+    }
+
+    if (output) {
+        output->recycler()->mutex()->lock();
+        output->recycler()->cond()->wakeAll();
+        output->recycler()->mutex()->unlock();
+    }
+
+    if (decoder)
+        decoder->wait();
+
+    if (output)
+        output->wait();
+
+    if (output)
+    {
+        delete output;
+        output = 0;
+    }
+
+    delete input;
+    input = 0;
+}
+
+void PlaybackBox::stopAll()
+{
+    stop();
+
+    if (decoder) {
+        decoder->removeListener(this);
+        decoder = 0;
+    }
+}
+
+void PlaybackBox::previous()
+{
+    stop();
+
+    playlistindex--;
+    if (playlistindex < 0)
+        playlistindex = plist->size() - 1;
+
+    curMeta = ((*plist)[playlistindex]);
+    playfile = curMeta.Filename();
+
+    play();
+}
+
+void PlaybackBox::next()
+{
+    stop();
+
+    playlistindex++;
+    if (playlistindex >= (int)plist->size())
+        playlistindex = 0;
+
+    curMeta = ((*plist)[playlistindex]);
+    playfile = curMeta.Filename();
+
+    play();
+}
+
+void PlaybackBox::seekforward()
+{
+    int nextTime = currentTime + 5;
+    if (nextTime > maxTime)
+        nextTime = maxTime;
+    seek(nextTime);
+}
+
+void PlaybackBox::seekback()
+{
+    int nextTime = currentTime - 5;
+    if (nextTime < 0)
+        nextTime = 0;
+    seek(nextTime);
+}
+
+void PlaybackBox::startseek()
+{
+    seeking = true;
+}
+
+void PlaybackBox::doneseek()
+{
+    seeking = false;
+}
+
+void PlaybackBox::seek(int pos)
+{
+    if (output && output->running()) {
+        output->mutex()->lock();
+        output->seek(pos);
+
+        if (decoder && decoder->running()) {
+            decoder->mutex()->lock();
+            decoder->seek(pos);
+
+            decoder->mutex()->unlock();
+        }
+
+        output->mutex()->unlock();
+    }
+}
+
+void PlaybackBox::changeSong()
+{
+    stop();
+    play();
+}
+
+void PlaybackBox::closeEvent(QCloseEvent *event)
+{
+    stopAll();
+
+    hide();
+
+    event->accept();
+}
+
+void PlaybackBox::showEvent(QShowEvent *event)
+{
+    QWidget::showEvent(event);
+}
+
+void PlaybackBox::customEvent(QCustomEvent *event)
+{
+    switch ((int) event->type()) {
+    case OutputEvent::Playing:
+        {
+            statusString = tr("Playing stream.");
+
+            break;
+        }
+
+    case OutputEvent::Buffering:
+        {
+            statusString = tr("Buffering stream.");
+
+            break;
+        }
+
+    case OutputEvent::Paused:
+        {
+            statusString = tr("Stream paused.");
+
+            break;
+        }
+
+    case OutputEvent::Info:
+        {
+            OutputEvent *oe = (OutputEvent *) event;
+
+            int em, es, rs;
+
+            currentTime = rs = oe->elapsedSeconds();
+
+            em = rs / 60;
+            es = rs % 60;
+
+            timeString.sprintf("%02d:%02d", em, es);
+
+            if (! seeking) 
+                seekbar->setValue(oe->elapsedSeconds());
+
+            infoString.sprintf("%d kbps, %.1f kHz %s.",
+                               oe->bitrate(), float(oe->frequency()) / 1000.0,
+                               oe->channels() > 1 ? "stereo" : "mono");
+
+            timelabel->setText(timeString);
+
+            break;
+        }
+    case OutputEvent::Error:
+        {
+            statusString = tr("Output error.");
+            timeString = "--m --s";
+
+            //OutputEvent *aoe = (OutputEvent *) event;
+            //QMessageBox::critical(qApp->activeWindow(),
+            //                      statusString,
+            //                      *aoe->errorMessage());
+
+            stopAll();
+
+            break;
+        }
+    case DecoderEvent::Stopped:
+        {
+            statusString = tr("Stream stopped.");
+            timeString = "--m --s";
+
+            break;
+        }
+    case DecoderEvent::Finished:
+        {
+            statusString = tr("Finished playing stream.");
+            next();
+            break;
+        }
+
+    case DecoderEvent::Error:
+        {
+            stopAll();
+            QApplication::sendPostedEvents();
+
+            statusString = tr("Decoder error.");
+
+            //DecoderEvent *dxe = (DecoderEvent *) event;
+            //QMessageBox::critical(qApp->activeWindow(),
+            //                      statusString,
+            //                      *dxe->errorMessage());
+            break;
+        }
+    }
+
+    QWidget::customEvent(event);
+}
+
