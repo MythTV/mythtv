@@ -136,7 +136,7 @@ AVCodec *avcodec_find_encoder(enum CodecID id)
     AVCodec *p;
     p = first_avcodec;
     while (p) {
-        if (p->encode != NULL && (enum CodecID)p->id == id)
+        if (p->encode != NULL && p->id == id)
             return p;
         p = p->next;
     }
@@ -160,7 +160,7 @@ AVCodec *avcodec_find_decoder(enum CodecID id)
     AVCodec *p;
     p = first_avcodec;
     while (p) {
-        if (p->decode != NULL && (enum CodecID)p->id == id)
+        if (p->decode != NULL && p->id == id)
             return p;
         p = p->next;
     }
@@ -184,7 +184,7 @@ AVCodec *avcodec_find(enum CodecID id)
     AVCodec *p;
     p = first_avcodec;
     while (p) {
-        if ((enum CodecID)p->id == id)
+        if (p->id == id)
             return p;
         p = p->next;
     }
@@ -434,7 +434,6 @@ void avcodec_flush_buffers(AVCodecContext *avctx)
 
 static int raw_encode_init(AVCodecContext *s)
 {
-    s = s;
     return 0;
 }
 
@@ -442,21 +441,12 @@ static int raw_decode_frame(AVCodecContext *avctx,
 			    void *data, int *data_size,
 			    UINT8 *buf, int buf_size)
 {
-    avctx = avctx;
-    data = data;
-    data_size = data_size;
-    buf = buf;
-    buf_size = buf_size;
     return -1;
 }
 
 static int raw_encode_frame(AVCodecContext *avctx,
 			    unsigned char *frame, int buf_size, void *data)
 {
-    avctx = avctx;
-    frame = frame;
-    buf_size = buf_size;
-    data = data;
     return -1;
 }
 

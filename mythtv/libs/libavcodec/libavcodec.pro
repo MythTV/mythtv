@@ -4,7 +4,7 @@
 
 TEMPLATE = lib
 TARGET = avcodec
-CONFIG += thread staticlib
+CONFIG += thread staticlib warn_off
 
 include ( ../settings.pro )
 include ( ../config.mak )
@@ -13,8 +13,8 @@ include ( ../config.mak )
     error(Please run the configure script first)
 }
 
-QMAKE_CFLAGS_RELEASE = $$OPTFLAGS -Wall -Wno-missing-prototypes -Wno-unused -Wno-sign-compare -DHAVE_AV_CONFIG_H -I.. -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE
-QMAKE_CFLAGS_DEBUG = -g -Wall -Wno-missing-prototypes -Wno-unused -Wno-sign-compare -DHAVE_AV_CONFIG_H -I.. -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE
+QMAKE_CFLAGS_RELEASE = $$OPTFLAGS -DHAVE_AV_CONFIG_H -I.. -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE
+QMAKE_CFLAGS_DEBUG = -g -DHAVE_AV_CONFIG_H -I.. -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE
 
 # Input
 SOURCES += common.c utils.c mem.c allcodecs.c mpegvideo.c h263.c jrevdct.c
@@ -63,6 +63,10 @@ contains( TARGET_ARCH_ALPHA, yes ) {
 }
 
 contains( TARGET_ARCH_POWERPC, yes ) {
+    OBJS += ppc/dsputil_ppc.c
+}
+
+contains( TARGET_ARCH_ALTIVEC, yes ) {
     OBJS += ppc/dsputil_altivec.c
     QMAKE_CFLAGS_RELEASE += -faltivec
 }

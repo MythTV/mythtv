@@ -102,7 +102,7 @@ static void convert_matrix(MpegEncContext *s, int (*qmat)[64], uint16_t (*qmat16
                 /* 3444240       >= (1<<36)/(aanscales[i] * qscale * quant_matrix[i]) >= 275 */
                 
                 qmat[qscale][j] = (int)((UINT64_C(1) << (QMAT_SHIFT + 14)) / 
-                                 (aanscales[i] * qscale * quant_matrix[j]));
+                                (aanscales[i] * qscale * quant_matrix[j]));
             }
         } else {
             for(i=0;i<64;i++) {
@@ -145,7 +145,7 @@ int MPV_common_init(MpegEncContext *s)
         s->fdct = fdct_ifast;
     else
         s->fdct = ff_jpeg_fdct_islow;
-    
+        
 #ifdef HAVE_MMX
     MPV_common_init_mmx(s);
 #endif
@@ -244,7 +244,7 @@ int MPV_common_init(MpegEncContext *s)
             CHECKED_ALLOCZ(s->tex_pb_buffer, PB_BUFFER_SIZE);
             CHECKED_ALLOCZ(   s->pb2_buffer, PB_BUFFER_SIZE);
         }
-
+        
         CHECKED_ALLOCZ(s->avctx->stats_out, 256);
     }
     
@@ -282,7 +282,7 @@ int MPV_common_init(MpegEncContext *s)
         
         /* cbp values */
         CHECKED_ALLOCZ(s->coded_block, y_size);
-
+        
         /* divx501 bitstream reorder buffer */
         CHECKED_ALLOCZ(s->bitstream_buffer, BITSTREAM_BUFFER_SIZE);
         
@@ -291,11 +291,11 @@ int MPV_common_init(MpegEncContext *s)
         CHECKED_ALLOCZ(s->pred_dir_table, s->mb_num * sizeof(UINT8))
     }
     CHECKED_ALLOCZ(s->qscale_table  , s->mb_num * sizeof(UINT8))
-   
+    
     /* which mb is a intra block */
     CHECKED_ALLOCZ(s->mbintra_table, s->mb_num);
     memset(s->mbintra_table, 1, s->mb_num);
- 
+    
     /* default structure is frame */
     s->picture_structure = PICT_FRAME;
     
@@ -349,7 +349,7 @@ void MPV_common_end(MpegEncContext *s)
     av_freep(&s->edge_emu_buffer);
     av_freep(&s->non_b_mv4_table);
     av_freep(&s->avctx->stats_out);
-
+    
     for(i=0;i<3;i++) {
         int j;
         if(!(s->flags&CODEC_FLAG_DR1)){
@@ -402,8 +402,8 @@ int MPV_encode_init(AVCodecContext *avctx)
     s->aspect_ratio_info= avctx->aspect_ratio_info;
     if (avctx->aspect_ratio_info == FF_ASPECT_EXTENDED)
     {
-       s->aspected_width = avctx->aspected_width;
-       s->aspected_height = avctx->aspected_height;
+	s->aspected_width = avctx->aspected_width;
+	s->aspected_height = avctx->aspected_height;
     }
     s->flags= avctx->flags;
     s->max_b_frames= avctx->max_b_frames;
@@ -725,8 +725,8 @@ void MPV_frame_end(MpegEncContext *s)
         draw_edges(s->current_picture[2], s->uvlinesize, s->h_edge_pos>>1, s->v_edge_pos>>1, EDGE_WIDTH/2);
     }
     emms_c();
-   
-    s->last_pict_type    = s->pict_type; 
+    
+    s->last_pict_type    = s->pict_type;
     if(s->pict_type!=B_TYPE){
         s->last_non_b_pict_type= s->pict_type;
         s->num_available_buffers++;
@@ -887,7 +887,7 @@ int MPV_encode_picture(AVCodecContext *avctx,
         
         if(s->flags&CODEC_FLAG_PASS1)
             ff_write_pass1_stats(s);
-
+    
     }
 
     s->input_picture_number++;
@@ -895,7 +895,7 @@ int MPV_encode_picture(AVCodecContext *avctx,
 
     flush_put_bits(&s->pb);
     s->frame_bits  = (pbBufPtr(&s->pb) - s->pb.buf) * 8;
-
+    
     s->total_bits += s->frame_bits;
     avctx->frame_bits  = s->frame_bits;
 //printf("fcode: %d, type: %d, head: %d, mv: %d, misc: %d, frame: %d, itex: %d, ptex: %d\n", 
@@ -1812,7 +1812,7 @@ static void encode_mb(MpegEncContext *s, int motion_x, int motion_y)
         }
 
     }
-
+            
 #if 0
             {
                 float adap_parm;
@@ -2074,7 +2074,7 @@ static void encode_picture(MpegEncContext *s, int picture_number)
         }
 //printf("Scene change detected, encoding as I Frame %d %d\n", s->mb_var_sum, s->mc_mb_var_sum);
     }
-   
+    
     if(s->pict_type==P_TYPE || s->pict_type==S_TYPE) 
     {
         s->f_code= ff_get_best_fcode(s, s->p_mv_table, MB_TYPE_INTER);
@@ -2089,7 +2089,7 @@ static void encode_picture(MpegEncContext *s, int picture_number)
         ff_fix_long_b_mvs(s, s->b_bidir_forw_mv_table, s->f_code, MB_TYPE_BIDIR);
         ff_fix_long_b_mvs(s, s->b_bidir_back_mv_table, s->b_code, MB_TYPE_BIDIR);
     }
-   
+    
 //printf("f_code %d ///\n", s->f_code);
 
 //    printf("%d %d\n", s->avg_mb_var, s->mc_mb_var);
@@ -2204,7 +2204,7 @@ static void encode_picture(MpegEncContext *s, int picture_number)
             s->block_index[3]+=2;
             s->block_index[4]++;
             s->block_index[5]++;
-           
+            
             /* write gob / video packet header for formats which support it at any MB (MPEG4) */
             if(s->rtp_mode && s->mb_y>0 && s->codec_id==CODEC_ID_MPEG4){
                 int pdif= pbBufPtr(&s->pb) - s->ptr_lastgob;
@@ -2415,6 +2415,7 @@ static void encode_picture(MpegEncContext *s, int picture_number)
             MPV_decode_mb(s, s->block);
 //printf("MB %d %d bits\n", s->mb_x+s->mb_y*s->mb_width, get_bit_count(&s->pb));
         }
+
 
         /* Obtain average GOB size for RTP */
         if (s->rtp_mode) {
@@ -2728,7 +2729,7 @@ void ff_conceal_past_errors(MpegEncContext *s, int unknown_pos)
     int i, intra_count=0, inter_count=0;
     int intra_conceal= s->msmpeg4_version ? 50 : 50; //FIXME finetune
     int inter_conceal= s->msmpeg4_version ? 50 : 50;
-    
+
     // for last block
     if(mb_x>=s->mb_width)  mb_x= s->mb_width -1;
     if(mb_y>=s->mb_height) mb_y= s->mb_height-1;

@@ -52,15 +52,15 @@ INT64 gettime(void)
 static short idct_mmx_perm[64];
 
 static short idct_simple_mmx_perm[64]={
-       0x00, 0x08, 0x04, 0x09, 0x01, 0x0C, 0x05, 0x0D, 
-       0x10, 0x18, 0x14, 0x19, 0x11, 0x1C, 0x15, 0x1D, 
-       0x20, 0x28, 0x24, 0x29, 0x21, 0x2C, 0x25, 0x2D, 
-       0x12, 0x1A, 0x16, 0x1B, 0x13, 0x1E, 0x17, 0x1F, 
-       0x02, 0x0A, 0x06, 0x0B, 0x03, 0x0E, 0x07, 0x0F, 
-       0x30, 0x38, 0x34, 0x39, 0x31, 0x3C, 0x35, 0x3D, 
-       0x22, 0x2A, 0x26, 0x2B, 0x23, 0x2E, 0x27, 0x2F, 
-       0x32, 0x3A, 0x36, 0x3B, 0x33, 0x3E, 0x37, 0x3F,
-};  
+	0x00, 0x08, 0x04, 0x09, 0x01, 0x0C, 0x05, 0x0D, 
+	0x10, 0x18, 0x14, 0x19, 0x11, 0x1C, 0x15, 0x1D, 
+	0x20, 0x28, 0x24, 0x29, 0x21, 0x2C, 0x25, 0x2D, 
+	0x12, 0x1A, 0x16, 0x1B, 0x13, 0x1E, 0x17, 0x1F, 
+	0x02, 0x0A, 0x06, 0x0B, 0x03, 0x0E, 0x07, 0x0F, 
+	0x30, 0x38, 0x34, 0x39, 0x31, 0x3C, 0x35, 0x3D, 
+	0x22, 0x2A, 0x26, 0x2B, 0x23, 0x2E, 0x27, 0x2F, 
+	0x32, 0x3A, 0x36, 0x3B, 0x33, 0x3E, 0x37, 0x3F,
+};
 
 void idct_mmx_init(void)
 {
@@ -84,7 +84,7 @@ void dct_error(const char *name, int is_idct,
     int it, i, scale;
     int err_inf, v;
     INT64 err2, ti, ti1, it1;
-    INT64 sysErr[64]. sysErrMax=0;
+    INT64 sysErr[64], sysErrMax=0;
     int maxout=0;
     int max_sum=0;
     int blockSumErrMax=0, blockSumErr;
@@ -95,10 +95,10 @@ void dct_error(const char *name, int is_idct,
     err2 = 0;
     for(i=0; i<64; i++) sysErr[i]=0;
     for(it=0;it<NB_ITS;it++) {
-        for(i=0;i<64;i++) 
+        for(i=0;i<64;i++)
             block1[i] = 0;
         switch(test){
-        case 0:
+        case 0: 
             for(i=0;i<64;i++)
                 block1[i] = (random() % 512) -256;
             if (is_idct){
@@ -133,13 +133,14 @@ void dct_error(const char *name, int is_idct,
 
         if (fdct_func == ff_mmx_idct ||
             fdct_func == j_rev_dct || fdct_func == ff_mmxext_idct) {
-            for(i=0;i<64;i++) 
+            for(i=0;i<64;i++)
                 block[idct_mmx_perm[i]] = block1[i];
         } else if(fdct_func == simple_idct_mmx ) {
             for(i=0;i<64;i++)
                 block[idct_simple_mmx_perm[i]] = block1[i];
-        } else {
-            for(i=0;i<64;i++)
+
+	} else {
+            for(i=0; i<64; i++)
                 block[i]= block1[i];
         }
 #if 0 // simulate mismatch control for tested IDCT but not the ref
@@ -192,7 +193,7 @@ void dct_error(const char *name, int is_idct,
     
 #if 1 // dump systematic errors
     for(i=0; i<64; i++){
-       if(i%8==0) printf("\n");
+	if(i%8==0) printf("\n");
         printf("%5d ", (int)sysErr[i]);
     }
     printf("\n");
@@ -271,7 +272,7 @@ void help(void)
 int main(int argc, char **argv)
 {
     int test_idct = 0;
-    int c, i;
+    int c,i;
     int test=1;
 
     init_fdct();
@@ -282,7 +283,7 @@ int main(int argc, char **argv)
         cropTbl[i] = 0;
         cropTbl[i + MAX_NEG_CROP + 256] = 255;
     }
-
+    
     for(;;) {
         c = getopt(argc, argv, "ih");
         if (c == -1)
@@ -297,9 +298,9 @@ int main(int argc, char **argv)
             break;
         }
     }
-               
+    
     if(optind <argc) test= atoi(argv[optind]);
-
+               
     printf("ffmpeg DCT/IDCT test\n");
 
     if (!test_idct) {
@@ -316,7 +317,7 @@ int main(int argc, char **argv)
         dct_error("SIMPLE-MMX", 1, simple_idct_mmx, idct, test);
 //        dct_error("ODIVX-C", 1, odivx_idct_c, idct);
 //printf(" test against odivx idct\n");
-//     dct_error("REF", 1, idct, odivx_idct_c);
+//	dct_error("REF", 1, idct, odivx_idct_c);
 //        dct_error("INT", 1, j_rev_dct, odivx_idct_c);
 //        dct_error("MMX", 1, ff_mmx_idct, odivx_idct_c);
 //        dct_error("MMXEXT", 1, ff_mmxext_idct, odivx_idct_c);

@@ -2541,7 +2541,7 @@ int h263_decode_mb(MpegEncContext *s,
         }
         if((!s->progressive_sequence) && (cbp || s->workaround_bugs==2))
             s->interlaced_dct= get_bits1(&s->gb);
-
+        
         s->mv_dir = MV_DIR_FORWARD;
         if ((cbpc & 16) == 0) {
             if(s->mcsel){
@@ -2606,8 +2606,7 @@ int h263_decode_mb(MpegEncContext *s,
                 s->mv[0][0][1] = my;
 
                 if (s->umvplus_dec && (mx - pred_x) == 1 && (my - pred_y) == 1)
-                   skip_bits1(&s->gb); /* Bit stuffing to prevent PSC */  
-
+                   skip_bits1(&s->gb); /* Bit stuffing to prevent PSC */                   
             }
         } else {
             PRINT_MB_TYPE("4");
@@ -3659,8 +3658,8 @@ int mpeg4_decode_picture_header(MpegEncContext * s)
 //                    printf("width/height: %d %d\n", width, height);
                 }
             }
-           
-            s->progressive_sequence= get_bits1(&s->gb)^1; 
+            
+            s->progressive_sequence= get_bits1(&s->gb)^1;
             if(!get_bits1(&s->gb)) printf("OBMC not supported (very likely buggy encoder)\n");   /* OBMC Disable */
             if (vo_ver_id == 1) {
                 s->vol_sprite_usage = get_bits1(&s->gb); /* vol_sprite_usage */
