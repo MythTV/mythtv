@@ -200,7 +200,7 @@ Recording Groups
 
 Recording Groups allow you to separate programs into user-defined
 categories, such as "Kids", "Alice", "Bob", etc.  This can be used to reduce
-clutter in the Default Watch Recordings screen.
+clutter, or to segregate content if you use the PIN function.
 
 In the Watch Recordings Screen
 - M to change the view or to set a group password
