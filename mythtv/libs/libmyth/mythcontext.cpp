@@ -494,8 +494,3 @@ void MythContext::dispatch(MythEvent &e)
         obj = listeners.next();
     }
 }
-
-
-QString MythContext::DBQuote(const QString& str) {
-     
-}
