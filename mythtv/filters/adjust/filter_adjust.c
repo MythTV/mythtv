@@ -347,8 +347,8 @@ newAdjustFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
         ymin = 16;
         ymax = 253;
         ygamma = 1.0;
-        cmin = 2;
-        cmax = 253;
+        cmin = 16;
+        cmax = 240;
         cgamma = 1.0;
     }
 
