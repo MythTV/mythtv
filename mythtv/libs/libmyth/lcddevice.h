@@ -9,8 +9,6 @@
 
 */
 
-#ifdef LCD_DEVICE
-
 #ifndef LCDDEVICE_H_
 #define LCDDEVICE_H_
 
@@ -136,5 +134,4 @@ class LCD : public QObject
 
 };
 
-#endif
 #endif

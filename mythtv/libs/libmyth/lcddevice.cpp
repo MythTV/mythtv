@@ -9,8 +9,6 @@
 
 */
 
-#ifdef LCD_DEVICE   // only compile if the compiler line defines LCD_DEVICE
-
 #include "lcddevice.h"
 
 LCD::LCD(QString hostname, unsigned int port)
@@ -58,9 +56,11 @@ LCD::LCD(QString hostname, unsigned int port)
 	
 	channelTimer = new QTimer(this);
 	connect(channelTimer, SIGNAL(timeout()), this, SLOT(outputChannel()));
-	
+
+#ifdef LCD_DEVICE	
 	socket->connectToHost(hostname, port);
 	this->sendToServer("hello");
+#endif
 }
 
 void LCD::beginScrollingText()
@@ -84,6 +84,7 @@ void LCD::beginScrollingText()
 
 void LCD::sendToServer(QString someText)
 {
+#ifdef LCD_DEVICE
 	QTextStream os(socket);
 
 #ifdef LCD_DEVICE_DEBUG
@@ -95,6 +96,7 @@ void LCD::sendToServer(QString someText)
 	//
 
 	os << someText << "\n";
+#endif
 }
 
 void LCD::serverSendingData()
@@ -196,11 +198,10 @@ void LCD::serverSendingData()
 			cerr << "lcddevice: WARNING: Something is getting passed to LCDd that it doesn't understand" << endl;
 		}
 	}
-	
 }
 
 void LCD::init()
-{	
+{
 	QString aString, bString;
 	int i;
 	
@@ -471,7 +472,6 @@ void LCD::assignScrollingText(QString theText)
 		scrollTimer->stop();
 		preScrollTimer->start(2000, TRUE);
 		
-		
 	}
 }
 
@@ -641,8 +641,8 @@ LCD::~LCD()
     cout << "lcddevice: An LCD device is being snuffed out of existence (~LCD() was called)" << endl ;
 #endif
 	stopAll();
+#ifdef LCD_DEVICE
 	socket->close();
+#endif
 	delete socket;
 }
-
-#endif

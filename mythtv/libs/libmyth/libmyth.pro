@@ -13,5 +13,6 @@ VERSION = 0.6.0
 include ( ../settings.pro )
 
 # Input
-HEADERS += dialogbox.h programinfo.h settings.h themedmenu.h 
-SOURCES += dialogbox.cpp programinfo.cpp settings.cpp themedmenu.cpp
+HEADERS += dialogbox.h lcddevice.h programinfo.h settings.h themedmenu.h 
+SOURCES += dialogbox.cpp lcddevice.cpp programinfo.cpp settings.cpp 
+SOURCES += themedmenu.cpp
