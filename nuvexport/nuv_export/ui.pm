@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.02.23 (xris)
+#Last Updated: 2005.04.02 (xris)
 #
 #   nuvexport::ui
 #
@@ -260,6 +260,9 @@ package nuv_export::ui;
     }
 
     sub confirm_shows {
+    # cli-only?  Skip the confirmation
+        return ('x', @_) if ($is_cli);
+    # Load the arguments
         my @episodes = @_;
         my $num_episodes = @episodes;
     # Define a newline + whitespace so we can tab out extra lines of episode description
@@ -425,6 +428,14 @@ package nuv_export::ui;
             else {
                 $default = 'Yes';
             }
+        }
+    # cli mode?  Return the default
+        if ($is_cli) {
+        # Looking for a boolean/yesno response?
+            if ($type eq 'yesno') {
+                return $default =~ /^\W*[nf0]/i ? 0 : 1;
+            }
+            return $default;
         }
     # Loop until we get a valid response
         while (1) {
