@@ -1403,7 +1403,6 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                         inUseBuffers.removeRef(picframe);
                     gotvideo = 1;
                     framesPlayed++;
-                    cout << "queue: " << framesPlayed << endl;
 
                     break;
                 }
