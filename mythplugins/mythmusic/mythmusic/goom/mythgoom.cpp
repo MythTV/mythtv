@@ -24,7 +24,7 @@ Goom::Goom(long int winid)
     surface = NULL;
     buffer = NULL;
 
-    static char SDL_windowhack[32];
+    char SDL_windowhack[32];
     sprintf(SDL_windowhack, "%ld", winid);
     setenv("SDL_WINDOWID", SDL_windowhack, 1);
 
