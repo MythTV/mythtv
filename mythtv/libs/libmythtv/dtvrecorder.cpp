@@ -8,6 +8,7 @@
 
 #include <cassert>
 #include <cerrno>
+#include <unistd.h>
 
 using namespace std;
 
