@@ -375,6 +375,9 @@ void TV::DisconnectDB(void)
 
 bool TV::CheckChannel(int channum)
 {
+    if (!db_conn)
+        return true;
+
     bool ret = false;
     char query[1024];
     sprintf(query, "SELECT * FROM channel WHERE channum = %d", channum);
