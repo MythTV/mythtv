@@ -172,7 +172,7 @@ void EncoderLink::cacheFreeSpace()
         struct statfs statbuf;
         if (statfs(recordfileprefix.ascii(), &statbuf) == 0)
         {
-            freeSpace = statbuf.f_bfree / (1024*1024/statbuf.f_bsize);
+            freeSpace = statbuf.f_bavail / (1024*1024/statbuf.f_bsize);
         }
     }
     else if (sock)
@@ -191,7 +191,7 @@ void EncoderLink::cacheFreeSpace()
             struct statfs statbuf;
             if (statfs(recordfileprefix.ascii(), &statbuf) == 0)
             {
-                freeSpace = statbuf.f_bfree / (1024*1024/statbuf.f_bsize);
+                freeSpace = statbuf.f_bavail / (1024*1024/statbuf.f_bsize);
             }
         }
     }

@@ -912,9 +912,11 @@ void MainServer::HandleQueryFreeSpace(PlaybackSock *pbs)
     int totalspace = -1, usedspace = -1;
     if (statfs(recordfileprefix.ascii(), &statbuf) == 0) 
     {
-        totalspace = statbuf.f_blocks / (1024*1024/statbuf.f_bsize);
-        usedspace = (statbuf.f_blocks - statbuf.f_bfree) / 
-                    (1024*1024/statbuf.f_bsize);
+        // total space available to user is total blocks - reserved blocks
+        totalspace = (statbuf.f_blocks - (statbuf.f_bfree - statbuf.f_bavail)) /
+                      (1024*1024/statbuf.f_bsize);
+        usedspace = (statbuf.f_blocks - statbuf.f_bavail) /
+                     (1024*1024/statbuf.f_bsize);
     }
 
     if (ismaster)

@@ -57,7 +57,7 @@ void AutoExpire::RunExpirer(void)
         struct statfs statbuf;
         int freespace = -1;
         if (statfs(recordfileprefix.ascii(), &statbuf) == 0) {
-            freespace = statbuf.f_bfree / (1024*1024*1024/statbuf.f_bsize);
+            freespace = statbuf.f_bavail / (1024*1024*1024/statbuf.f_bsize);
         }
 
         int minFree = gContext->GetNumSetting("AutoExpireDiskThreshold", 0);
@@ -95,7 +95,7 @@ void AutoExpire::RunExpirer(void)
                 if (statfs(recordfileprefix.ascii(), &statbuf) == 0)
                 {
                     freespace =
-                        statbuf.f_bfree / (1024*1024*1024/statbuf.f_bsize);
+                        statbuf.f_bavail / (1024*1024*1024/statbuf.f_bsize);
                 }
             }
 
