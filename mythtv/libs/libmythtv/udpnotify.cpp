@@ -34,6 +34,7 @@ match they will be ignored.
 #include <sys/types.h>
 #include <sys/socket.h>
 
+#include <qapplication.h>
 #include <qsocketdevice.h>
 #include <qsocketnotifier.h>
 #include <qhostaddress.h>
@@ -133,6 +134,9 @@ UDPNotify::UDPNotify(TV *tv, int udp_port)
     // Setup UDP receive socket and install notifier
     m_udp_port = udp_port;
 
+    // need to lock because of the socket notifier.
+    qApp->lock();
+
     qsd = new QSocketDevice(QSocketDevice::Datagram);
     if (!qsd->bind(bcastaddr, udp_port))
     {
@@ -147,10 +151,14 @@ UDPNotify::UDPNotify(TV *tv, int udp_port)
         // Connect the Notifier to the incming data slot
         connect(qsn, SIGNAL(activated(int)), this, SLOT(incomingData(int)));
     }
+
+    qApp->unlock();
 }
 
 UDPNotify::~UDPNotify(void)
 {
+    qApp->lock();
+
     disconnect(qsn, SIGNAL(activated(int)), this, SLOT(incomingData(int)));
 
     qsd->close();
@@ -159,6 +167,8 @@ UDPNotify::~UDPNotify(void)
 
     if (qsn)
         delete qsn;
+
+    qApp->unlock();
 
     vector<UDPNotifyOSDSet *>::iterator i = setList->begin();
     for (; i != setList->end(); i++)
