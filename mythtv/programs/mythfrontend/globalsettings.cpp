@@ -273,6 +273,8 @@ public:
         GlobalSetting("GeneratePreviewPixmaps") {
         setLabel("Generate thumbnail preview images for recordings");
         setValue(false);
+	setHelpText("CURRENTLY DISABLED: If set, a static image of the saved file will be "
+                    "displayed on the \"Watch a Recording\" menu.");
     };
 };
 
@@ -282,6 +284,9 @@ public:
         GlobalSetting("PlaybackPreview") {
         setLabel("Display live preview of recordings");
         setValue(true);
+        setHelpText("If set, a preview of the saved file will play in a "
+                    "small window on the \"Watch a Recording\" menu.");
+
     };
 };
 
@@ -308,6 +313,11 @@ public:
         GlobalSetting("HaltCommand") {
         setLabel("Halt command");
         setValue("halt");
+	setHelpText("If you have configured an exit key on the System "
+                    "Shutdown menu, you will be given the opportunity "
+                    "to exit MythTV or halt the system completely. "
+                    "Another possibility for this field is "
+                    "poweroff");
     };
 };
 
@@ -366,6 +376,8 @@ public:
         SpinBoxSetting(160, 1600, 8), GlobalSetting("GuiWidth") {
         setLabel("GUI width");
         setValue(800);
+	setHelpText("The width of the GUI.  Do not make the GUI "
+                    "wider than your actual screen resolution.");
     };
 };
 
@@ -375,6 +387,9 @@ public:
         SpinBoxSetting(160, 1600, 8), GlobalSetting("GuiHeight") {
         setLabel("GUI height");
         setValue(600);
+	setHelpText("The height of the GUI.  Do not make the GUI "
+                    "taller than your actual screen resolution.");
+
     };
 };
 
