@@ -434,9 +434,7 @@ bool MetadataMythMusicMonitor::sweepMetadata()
             //  from database
             //
             
-            cout << "thinking about deleting " << mf_iterator.key() << endl;
-
-            /*
+            
             QString name(mf_iterator.key());
             name.replace(quote_regex, "\"\"");
             QString querystr = QString("DELETE FROM musicmetadata WHERE "
@@ -444,7 +442,6 @@ bool MetadataMythMusicMonitor::sweepMetadata()
             query.exec(querystr);
             music_files.remove(mf_iterator);
             something_changed = true;
-            */
             
         }
         else if(*mf_iterator == MFL_on_file_system)
