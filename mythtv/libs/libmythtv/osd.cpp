@@ -120,7 +120,6 @@ void OSD::SetDefaults(void)
     {
         QString name = "cc_font";
         int fontsize = 480 / 27;
-        fontsize = (int)(fontsize * hmult);
 
         ccfont = LoadFont(ccfontname, fontsize);
 
@@ -166,7 +165,7 @@ void OSD::Reinit(int width, int height, int frint, int dispx, int dispy,
     {
         TTFFont *font = (*fonts);
         if (font)
-            font->Reinit(vid_width, vid_height);
+            font->Reinit(vid_width, vid_height, hmult);
     }
 
     QMap<QString, OSDSet *>::iterator sets = setMap.begin();
@@ -179,7 +178,7 @@ void OSD::Reinit(int width, int height, int frint, int dispx, int dispy,
     }
 
     delete drawSurface;
-    drawSurface = new OSDSurface(displaywidth, displayheight);
+    drawSurface = new OSDSurface(width, height);
 }
 
 QString OSD::FindTheme(QString name)
@@ -207,7 +206,7 @@ TTFFont *OSD::LoadFont(QString name, int size)
 {
     QString fullname = QDir::homeDirPath() + "/.mythtv/" + name;
     TTFFont *font = new TTFFont((char *)fullname.ascii(), size, vid_width,
-                                vid_height);
+                                vid_height, hmult);
 
     if (font->isValid())
         return font;
@@ -216,7 +215,7 @@ TTFFont *OSD::LoadFont(QString name, int size)
     fullname = fontprefix + "/share/mythtv/" + name;
 
     font = new TTFFont((char *)fullname.ascii(), size, vid_width,
-                       vid_height);
+                       vid_height, hmult);
 
     if (font->isValid())
         return font;
@@ -226,7 +225,7 @@ TTFFont *OSD::LoadFont(QString name, int size)
     {
         fullname = themepath + "/" + name;
         font = new TTFFont((char *)fullname.ascii(), size, vid_width,
-                           vid_height);
+                           vid_height, hmult);
         if (font->isValid())
             return font;
     }
@@ -234,7 +233,8 @@ TTFFont *OSD::LoadFont(QString name, int size)
     delete font;
 
     fullname = name;
-    font = new TTFFont((char *)fullname.ascii(), size, vid_width, vid_height);
+    font = new TTFFont((char *)fullname.ascii(), size, vid_width, vid_height,
+                       hmult);
 
     if (font->isValid())
         return font;
@@ -323,8 +323,6 @@ void OSD::parseFont(QDomElement &element)
         cerr << "Error: font size must be > 0\n";
         exit(0); 
     }
-
-    size = (int)(size * hmult);
 
     font = LoadFont(fontfile, size);
     if (!font)

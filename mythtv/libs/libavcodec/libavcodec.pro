@@ -29,6 +29,7 @@ SOURCES += golomb.c h264.c raw.c indeo3.c asv1.c vp3.c 4xm.c cabac.c
 SOURCES += ffv1.c ra144.c ra288.c vcr1.c cljr.c roqvideo.c dpcm.c
 SOURCES += interplayvideo.c xan.c rpza.c cinepak.c msrle.c msvideo1.c
 SOURCES += vqavideo.c idcinvideo.c adx.c rational.c faandct.c
+SOURCES += libpostproc/postprocess.c
 
 contains( CONFIG_AC3, yes ) {
     SOURCES += a52dec.c
@@ -84,10 +85,6 @@ contains( TARGET_MMX, yes ) {
 #        QMAKE_CFLAGS_DEBUG += -msse
 #    }
 }
-
-#contains( CONFIG_PP, yes ) {
-#    SOURCES += libpostproc/postprocess.c
-#}
 
 contains( TARGET_ARCH_ARMV4L, yes ) {
     SOURCES += armv4l/jrevdct_arm.S armv4l/dsputil_arm.c

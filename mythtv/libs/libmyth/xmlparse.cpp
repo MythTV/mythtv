@@ -25,6 +25,8 @@ bool XMLParse::LoadTheme(QDomElement &ele, QString winName, QString specialfile)
 {
     usetrans = gContext->GetNumSetting("PlayBoxTransparency", 1);
 
+    fontSizeType = gContext->GetSetting("ThemeFontSizeType", "default");
+    
     QString themepath = gContext->GetThemeDir();
     QString themefile = themepath + specialfile + "ui.xml";
 
@@ -110,6 +112,8 @@ void XMLParse::parseFont(QDomElement &element)
     QString face;
     QString bold;
     int size = -1;
+    int sizeSmall = -1;
+    int sizeBig = -1;
     QPoint shadowOffset = QPoint(0, 0);
     QString color = "#ffffff";
     QString dropcolor = "#000000";
@@ -137,6 +141,14 @@ void XMLParse::parseFont(QDomElement &element)
             if (info.tagName() == "size")
             {
                 size = getFirstText(info).toInt();
+            }
+            else if (info.tagName() == "size:small")
+            {
+                sizeSmall = getFirstText(info).toInt();
+            }
+            else if (info.tagName() == "size:big")
+            {
+                sizeBig = getFirstText(info).toInt();
             }
             else if (info.tagName() == "color")
             {
@@ -171,13 +183,24 @@ void XMLParse::parseFont(QDomElement &element)
         exit(0);
     }
 
+    if (fontSizeType == "small")
+    {
+        if(sizeSmall > 0)
+            size = sizeSmall;
+    }
+    else if (fontSizeType == "big")
+    {
+        if(sizeBig > 0)
+            size = sizeBig;
+    }
+    
     if (size < 0)
     {
         cerr << "Error: font size must be > 0\n";
         exit(0);
     }
 
-    size = (int)(size * hmult);
+    size = (int)ceil(size * hmult);
     QFont temp(face, size);
     if (bold.lower() == "yes")
         temp.setBold(true);

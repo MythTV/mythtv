@@ -1096,20 +1096,18 @@ void MythContext::dispatchNow(MythEvent &e)
 
 QFont MythContext::GetBigFont(void)
 {
-    return QFont("Arial", (int)(gContext->GetBigFontSize() * m_hmult),
-                 QFont::Bold);
+    return QFont("Arial", (int)ceil(GetBigFontSize() * m_hmult), QFont::Bold);
 }
 
 QFont MythContext::GetMediumFont(void)
 {
-    return QFont("Arial", (int)(gContext->GetMediumFontSize() * m_hmult),
+    return QFont("Arial", (int)ceil(GetMediumFontSize() * m_hmult), 
                  QFont::Bold);
 }
 
 QFont MythContext::GetSmallFont(void)
 {
-    return QFont("Arial", (int)(gContext->GetSmallFontSize() * m_hmult),
-                 QFont::Bold);
+    return QFont("Arial", (int)ceil(GetSmallFontSize() * m_hmult), QFont::Bold);
 }
 
 QString MythContext::GetLanguage(void)

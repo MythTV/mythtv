@@ -1272,13 +1272,11 @@ QGridLayout* ProgramInfo::DisplayWidget(ScheduledRecording* rec,
     int screenwidth, screenheight;
     gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
-    int bigfont = gContext->GetBigFontSize();
-
     QGridLayout *grid = new QGridLayout(4, 2, (int)(10*wmult));
     
     QLabel *titlefield = new QLabel(title, parent);
     titlefield->setBackgroundOrigin(QWidget::WindowOrigin);
-    titlefield->setFont(QFont("Arial", (int)(bigfont * hmult), QFont::Bold));
+    titlefield->setFont(gContext->GetBigFont());
 
     QString dateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d");
     QString timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");

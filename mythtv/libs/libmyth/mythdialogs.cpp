@@ -60,8 +60,7 @@ void MythMainWindow::Init(void)
     setGeometry(xbase, ybase, screenwidth, screenheight);
     setFixedSize(QSize(screenwidth, screenheight));
 
-    setFont(QFont("Arial", (int)(gContext->GetMediumFontSize() * hmult),
-            QFont::Bold));
+    setFont(gContext->GetMediumFont());
     setCursor(QCursor(Qt::BlankCursor));
 
     gContext->ThemeWidget(this);
@@ -600,8 +599,7 @@ MythProgressDialog::MythProgressDialog(const QString &message, int totalSteps)
 
     gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
-    setFont(QFont("Arial", (int)(gContext->GetMediumFontSize() * hmult),
-            QFont::Bold));
+    setFont(gContext->GetMediumFont());
     setCursor(QCursor(Qt::BlankCursor));
 
     gContext->ThemeWidget(this);
@@ -1438,10 +1436,8 @@ Myth2ButtonDialog::Myth2ButtonDialog(MythMainWindow *parent, QString title1,
                  : MythDialog(parent, title1, false)
 {
     gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
-    QFont bigFont("Arial", (int)(gContext->GetBigFontSize() * hmult),
-                  QFont::Bold);
-    QFont medFont("Arial", (int)(gContext->GetMediumFontSize() * hmult),
-                  QFont::Bold);
+    QFont bigFont = gContext->GetBigFont();
+    QFont medFont = gContext->GetMediumFont();
 
     popup = new MythPopupBox(gContext->GetMainWindow(), "2 button dialog");
     popup->setFrameStyle( QFrame::Box | QFrame::Plain );

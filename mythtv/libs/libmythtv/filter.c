@@ -16,7 +16,7 @@ VideoFilter *load_videoFilter(char *filter_name, char *options)
     void *handle;
     char *error;
 
-    VideoFilter *filter;
+    VideoFilter *filter = NULL;
     VideoFilter * (*initFilter)(char *options);
     snprintf(module, sizeof(module),"%s/lib%s.so", MYTHTV_FILTER_PATH, 
              filter_name);
@@ -47,7 +47,8 @@ VideoFilter *load_videoFilter(char *filter_name, char *options)
     }
   
     filter = (*initFilter)(options);
-    filter->handle = handle;
+    if (filter)
+        filter->handle = handle;
   
     return filter;
 }

@@ -13,7 +13,6 @@
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <sys/user.h>
-#include <linux/fb.h>
 
 #include <map>
 #include <iostream>

@@ -129,6 +129,17 @@ public:
     };
 };
 
+class CustomFilters: public LineEditSetting, public GlobalSetting {
+public:
+    CustomFilters():
+        GlobalSetting("CustomFilters") {
+        setLabel(QObject::tr("Custom Filters"));
+        setValue("");
+        setHelpText(QObject::tr("Advanced Filter configuration, format:\n"
+                                "[[<filter>=<options>,]...]"));
+    };
+};
+
 class DecodeExtraAudio: public CheckBoxSetting, public GlobalSetting {
 public:
     DecodeExtraAudio():
@@ -873,6 +884,19 @@ public:
     };
 };
 
+class ThemeFontSizeType: public ComboBoxSetting, public GlobalSetting {
+public:
+    ThemeFontSizeType():
+        GlobalSetting("ThemeFontSizeType") {
+        setLabel(QObject::tr("Font size"));
+        addSelection(QObject::tr("default"), "default");
+        addSelection(QObject::tr("small"), "small");
+        addSelection(QObject::tr("big"), "big");
+        setHelpText(QObject::tr("default: TV, small: monitor, big:"));
+    };
+};
+
+
 ThemeSelector::ThemeSelector():
     GlobalSetting("Theme") {
 
@@ -1294,15 +1318,20 @@ PlaybackSettings::PlaybackSettings()
     VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
     general->setLabel(QObject::tr("General playback"));
     general->addChild(new Deinterlace());
+    general->addChild(new CustomFilters());
     general->addChild(new ReduceJitter());
     general->addChild(new ExperimentalSync());
     general->addChild(new DecodeExtraAudio());
-    general->addChild(new PlaybackExitPrompt());
-    general->addChild(new EndOfRecordingExitPrompt());
-    general->addChild(new ClearSavedPosition());
-    general->addChild(new AltClearSavedPosition());
-    general->addChild(new UsePicControls());
     addChild(general);
+
+    VerticalConfigurationGroup* gen2 = new VerticalConfigurationGroup(false);
+    gen2->setLabel(QObject::tr("General playback (part 2)"));
+    gen2->addChild(new PlaybackExitPrompt());
+    gen2->addChild(new EndOfRecordingExitPrompt());
+    gen2->addChild(new ClearSavedPosition());
+    gen2->addChild(new AltClearSavedPosition());
+    gen2->addChild(new UsePicControls());
+    addChild(gen2);
 
     addChild(new PVR350Settings());
 
@@ -1410,6 +1439,7 @@ AppearanceSettings::AppearanceSettings()
     theme->setLabel(QObject::tr("Theme"));
 
     theme->addChild(new ThemeSelector());
+    theme->addChild(new ThemeFontSizeType());
     theme->addChild(new RandomTheme());
     addChild(theme);
 

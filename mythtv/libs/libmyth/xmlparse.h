@@ -19,6 +19,7 @@ class XMLParse
 
     void SetWMult(double wm) { wmult = wm; }
     void SetHMult(double hm) { hmult = hm; }
+    void SetFontSizeType(QString s) { fontSizeType = s; }
 
     bool LoadTheme(QDomElement &, QString, QString sf = "");
     QString getFirstText(QDomElement &);
@@ -51,6 +52,8 @@ class XMLParse
     double hmult;
 
     int usetrans;
+    
+    QString fontSizeType;
 };
 
 #endif

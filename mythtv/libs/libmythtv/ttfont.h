@@ -13,7 +13,8 @@ class OSDSurface;
 class TTFFont
 {
   public:
-     TTFFont(char *file, int size, int video_width, int video_height);
+     TTFFont(char *file, int size, int video_width, int video_height,
+             float hmult);
     ~TTFFont();
 
      // 0-255
@@ -31,7 +32,7 @@ class TTFFont
      int SpaceWidth() { return spacewidth; }
      int Size() { return m_size; }
 
-     void Reinit(int width, int height);
+     void Reinit(int width, int height, float hmult);
 
   private:
      void KillFace(void);
@@ -70,6 +71,9 @@ class TTFFont
      int m_color;
 
      QString m_file;
+
+     int loadedfontsize;
+     float m_hmult;
 };
 
 #endif

@@ -420,6 +420,27 @@ void RemoteEncoder::GetNextProgram(int direction,
     iconpath = strlist[7];
     channelname = strlist[8];
     chanid = strlist[9];
+
+    if (title == " ")
+        title = "";
+    if (subtitle == " ")
+        subtitle = "";
+    if (desc == " ")
+        desc = "";
+    if (category == " ")
+        category = "";
+    if (starttime == " ")
+        starttime = "";
+    if (endtime == " ")
+        endtime = "";
+    if (callsign == " ")
+        callsign = "";
+    if (iconpath == " ")
+        iconpath = "";
+    if (channelname == " ")
+        channelname = "";
+    if (chanid == " ")
+        chanid = "";
 }
 
 void RemoteEncoder::GetChannelInfo(QString &title, QString &subtitle,
@@ -443,6 +464,27 @@ void RemoteEncoder::GetChannelInfo(QString &title, QString &subtitle,
     iconpath = strlist[7];
     channelname = strlist[8];
     chanid = strlist[9];
+
+    if (title == " ")
+        title = "";
+    if (subtitle == " ")
+        subtitle = "";
+    if (desc == " ")
+        desc = "";
+    if (category == " ")
+        category = "";
+    if (starttime == " ")
+        starttime = "";
+    if (endtime == " ")
+        endtime = "";
+    if (callsign == " ")
+        callsign = "";
+    if (iconpath == " ")
+        iconpath = "";
+    if (channelname == " ")
+        channelname = "";
+    if (chanid == " ")
+        chanid = "";
 
     lastchannel = channelname;
 }

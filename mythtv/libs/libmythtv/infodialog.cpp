@@ -38,13 +38,15 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, MythMainWindow *parent,
                        const char *name)
           : MythDialog(parent, name)
 {
+    myinfo = new ProgramInfo(*pginfo);
+
     int mediumfont = gContext->GetMediumFontSize();
 
     QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
 
-    if (pginfo)
+    if (myinfo)
     {
-        QGridLayout *grid = pginfo->DisplayWidget(NULL, this);
+        QGridLayout *grid = myinfo->DisplayWidget(NULL, this);
         vbox->addLayout(grid);
     }
 
@@ -53,8 +55,8 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, MythMainWindow *parent,
     f->setLineWidth((int)(4 * hmult));
     vbox->addWidget(f);    
 
-    programtype = pginfo->IsProgramRecurring();
-    recordstatus = pginfo->GetProgramRecordingStatus(QSqlDatabase::database());
+    programtype = myinfo->IsProgramRecurring();
+    recordstatus = myinfo->GetProgramRecordingStatus(QSqlDatabase::database());
 
     if (recordstatus == kTimeslotRecord && programtype == 0)
     {
@@ -148,8 +150,12 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, MythMainWindow *parent,
 
     lview->setFocus();
  
-    myinfo = pginfo;
 }
+
+InfoDialog::~InfoDialog()
+{
+    delete myinfo;
+} 
 
 QLabel *InfoDialog::getDateLabel(ProgramInfo *pginfo)
 {

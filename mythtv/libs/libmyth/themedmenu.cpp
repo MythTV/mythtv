@@ -369,7 +369,8 @@ void ThemedMenu::parseText(TextAttributes &attributes, QDomElement &element)
         }
     }
 
-    attributes.font = QFont(fontname, (int)(fontsize * hmult), weight, italic);
+    attributes.font = QFont(fontname, (int)ceil(fontsize * hmult), weight, 
+                            italic);
 
     if (!hasarea)
     {
@@ -1624,8 +1625,7 @@ void ThemedMenu::ReloadTheme(void)
     gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
     setFixedSize(QSize(screenwidth, screenheight));
 
-    setFont(QFont("Arial", (int)(gContext->GetMediumFontSize() * hmult),
-            QFont::Bold));
+    setFont(gContext->GetMediumFont());
     setCursor(QCursor(Qt::BlankCursor));
 
     gContext->ThemeWidget(this);

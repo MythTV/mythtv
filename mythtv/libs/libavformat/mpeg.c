@@ -226,7 +226,11 @@ static int mpeg_mux_init(AVFormatContext *ctx)
     else
         /* every 2 seconds */
         s->pack_header_freq = 2 * bitrate / s->packet_size / 8;
-    
+   
+    /* the above seems to make pack_header_freq zero sometimes */
+    if (s->pack_header_freq == 0)
+       s->pack_header_freq = 1;
+ 
     if (s->is_mpeg2)
         /* every 200 packets. Need to look at the spec.  */
         s->system_header_freq = s->pack_header_freq * 40;

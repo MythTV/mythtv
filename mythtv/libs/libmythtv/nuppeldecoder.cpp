@@ -240,7 +240,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         }
     }
 
-    if (usingextradata && extradata.seektable_offset > 0 && !disablevideo)
+    if (usingextradata && extradata.seektable_offset > 0)
     {
         long long currentpos = ringBuffer->GetTotalReadPosition();
         struct rtframeheader seek_frameheader;

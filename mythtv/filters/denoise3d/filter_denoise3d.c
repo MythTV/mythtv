@@ -507,7 +507,7 @@ denoiseMMX (uint8_t * Frame,    // mpi->planes[x]
             cbuf[0].ub[5] = Vertical[cbuf[1].w[1]];
             cbuf[0].ub[6] = Vertical[cbuf[1].w[2]];
             cbuf[0].ub[7] = Vertical[cbuf[1].w[3]];
-            paddd_m2r (cbuf[0], mm2);
+            paddb_m2r (cbuf[0], mm2);
             movq_r2m (mm2, BlockUp[0]);
             movq_r2r (mm2, mm3);
             movq_m2r (BlockPrev[0], mm0);

@@ -17,6 +17,7 @@ class InfoDialog : public MythDialog
   public:
     InfoDialog(ProgramInfo *pginfo, MythMainWindow *parent, 
                const char *name = 0);
+   ~InfoDialog();           
 
   protected slots:
     void selected(QListViewItem *);

@@ -601,6 +601,10 @@ void TV::SetupPlayer(void)
         filters += "linearblend";
     }
 
+    if (filters.length() > 1)
+        filters += ",";
+    filters += gContext->GetSetting("CustomFilters");
+
     nvp->SetVideoFilters(filters);
 
     if (embedid > 0)

@@ -144,13 +144,13 @@ struct rectangle {
   int y1;
 };
 
-#define IVTVFB_IOCTL_GET_STATE          _IOR('@', 1, sizeof(struct ivtvfb_ioctl_state_info))
-#define IVTVFB_IOCTL_SET_STATE          _IOW('@', 2, sizeof(struct ivtvfb_ioctl_state_info))
-#define IVTVFB_IOCTL_PREP_FRAME         _IOW('@', 3, 2*4)
-#define IVTVFB_IOCTL_BLT_COPY           _IOW('@', 4, sizeof(struct ivtvfb_ioctl_blt_copy_args))
-#define IVTVFB_IOCTL_GET_ACTIVE_BUFFER  _IOR('@', 5, sizeof(struct ivtv_osd_coords))
-#define IVTVFB_IOCTL_SET_ACTIVE_BUFFER  _IOW('@', 6, sizeof(struct ivtv_osd_coords))
-#define IVTVFB_IOCTL_GET_FRAME_BUFFER   _IOR('@', 7, sizeof(struct ivtvfb_ioctl_get_frame_buffer))
+#define IVTVFB_IOCTL_GET_STATE          _IOR('@', 1, struct ivtvfb_ioctl_state_info)
+#define IVTVFB_IOCTL_SET_STATE          _IOW('@', 2, struct ivtvfb_ioctl_state_info)
+#define IVTVFB_IOCTL_PREP_FRAME         _IOW('@', 3, struct ivtvfb_ioctl_dma_host_to_ivtv_args)
+#define IVTVFB_IOCTL_BLT_COPY           _IOW('@', 4, struct ivtvfb_ioctl_blt_copy_args)
+#define IVTVFB_IOCTL_GET_ACTIVE_BUFFER  _IOR('@', 5, struct ivtv_osd_coords)
+#define IVTVFB_IOCTL_SET_ACTIVE_BUFFER  _IOW('@', 6, struct ivtv_osd_coords)
+#define IVTVFB_IOCTL_GET_FRAME_BUFFER   _IOR('@', 7, struct ivtvfb_ioctl_get_frame_buffer)
 
 #define IVTVFB_STATUS_ENABLED           (1 << 0)
 #define IVTVFB_STATUS_GLOBAL_ALPHA      (1 << 1)

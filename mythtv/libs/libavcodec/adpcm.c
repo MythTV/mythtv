@@ -524,12 +524,9 @@ static int adpcm_decode_frame(AVCodecContext *avctx,
         }
         break;
     case CODEC_ID_ADPCM_IMA_WAV:
-        if (buf_size > BLKSIZE) {
-            if (avctx->block_align != 0)
-                buf_size = avctx->block_align;
-            else
-                buf_size = BLKSIZE;
-        }
+        if (avctx->block_align != 0 && buf_size > avctx->block_align)
+            buf_size = avctx->block_align;
+
 	// XXX: do as per-channel loop
         cs = &(c->status[0]);
         cs->predictor = (*src++) & 0x0FF;
@@ -605,13 +602,8 @@ static int adpcm_decode_frame(AVCodecContext *avctx,
 
         break;
     case CODEC_ID_ADPCM_MS:
-
-        if (buf_size > BLKSIZE) {
-            if (avctx->block_align != 0)
-                buf_size = avctx->block_align;
-            else
-                buf_size = BLKSIZE;
-        }
+        if (avctx->block_align != 0 && buf_size > avctx->block_align)
+            buf_size = avctx->block_align;
         n = buf_size - 7 * avctx->channels;
         if (n < 0)
             return -1;
@@ -656,12 +648,9 @@ static int adpcm_decode_frame(AVCodecContext *avctx,
         }
         break;
     case CODEC_ID_ADPCM_IMA_DK4:
-        if (buf_size > BLKSIZE) {
-            if (avctx->block_align != 0)
-                buf_size = avctx->block_align;
-            else
-                buf_size = BLKSIZE;
-        }
+        if (avctx->block_align != 0 && buf_size > avctx->block_align)
+            buf_size = avctx->block_align;
+
         c->status[0].predictor = (src[0] | (src[1] << 8));
         c->status[0].step_index = src[2];
         src += 4;
@@ -695,12 +684,9 @@ static int adpcm_decode_frame(AVCodecContext *avctx,
         }
         break;
     case CODEC_ID_ADPCM_IMA_DK3:
-        if (buf_size > BLKSIZE) {
-            if (avctx->block_align != 0)
-                buf_size = avctx->block_align;
-            else
-                buf_size = BLKSIZE;
-        }
+        if (avctx->block_align != 0 && buf_size > avctx->block_align)
+            buf_size = avctx->block_align;
+
         c->status[0].predictor = (src[10] | (src[11] << 8));
         c->status[1].predictor = (src[12] | (src[13] << 8));
         c->status[0].step_index = src[14];

@@ -6,6 +6,7 @@
       <color>#ffffff</color>
       <dropcolor>#000000</dropcolor>
       <size>25</size>
+      <size:small>15</size:small>
       <shadow>3,3</shadow>
       <bold>yes</bold>
     </font>
@@ -13,6 +14,7 @@
     <font name="info" face="Arial">
       <color>#ffffff</color>
       <size>17</size>
+      <size:small>15</size:small>
       <shadow>2,2</shadow>
       <bold>yes</bold>
     </font>
@@ -21,6 +23,7 @@
       <shadow>2,2</shadow>
       <color>#ffffff</color>
       <size>16</size>
+      <size:small>11</size:small>
       <bold>yes</bold>
     </font>
 
@@ -28,12 +31,14 @@
       <shadow>1,1</shadow>
       <color>#ffffff</color>
       <size>15</size>
+      <size:small>12</size:small>
       <bold>yes</bold>
     </font>
 
     <font name="recstatus" face="Arial">
       <color>#ffff33</color>
       <size>17</size>
+      <size:small>12</size:small>
       <shadow>2,2</shadow>
       <bold>yes</bold>
     </font>
@@ -41,6 +46,7 @@
     <font name="small" face="Arial">
       <color>#ffff33</color>
       <size>16</size>
+      <size:small>12</size:small>
     </font>
 
     <container name="background">

@@ -919,16 +919,16 @@ void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
                            QString &callsign, QString &iconpath, 
                            QString &channelname, QString &chanid)
 {
-    title = " ";
-    subtitle = " ";
-    desc = " ";
-    category = " ";
-    starttime = " ";
-    endtime = " ";
-    callsign = " ";
-    iconpath = " ";
-    channelname = " ";
-    chanid = " ";
+    title = "";
+    subtitle = "";
+    desc = "";
+    category = "";
+    starttime = "";
+    endtime = "";
+    callsign = "";
+    iconpath = "";
+    channelname = "";
+    chanid = "";
 
     if (!db_conn)
         return;
