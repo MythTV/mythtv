@@ -28,6 +28,7 @@ using namespace std;
 #include "guidegrid.h"
 #include "mythplugin.h"
 #include "remoteutil.h"
+#include "xbox.h"
 
 #define QUIT     1
 #define HALTWKUP 2
@@ -35,6 +36,7 @@ using namespace std;
 
 ThemedMenu *menu;
 MythContext *gContext;
+XBox *xbox = NULL;
 
 QString startGuide(void)
 {
@@ -273,6 +275,13 @@ void TVMenuCallback(void *data, QString &selection)
     {
         startChannelRankings();
     }
+    else if (xbox && sel == "settings xboxsettings")
+    {
+        XboxSettings settings;
+        settings.exec(QSqlDatabase::database());
+
+        xbox->GetSettings();
+    }
 }
 
 int handleExit(void)
@@ -463,6 +472,14 @@ int main(int argc, char **argv)
         gContext->GetLCDDevice()->connectToHost(lcd_host, lcd_port);
         gContext->GetLCDDevice()->setupLEDs(RemoteGetRecordingMask);
     }
+
+    if (gContext->GetNumSetting("EnableXbox") == 1)
+    {
+        xbox = new XBox();
+        xbox->GetSettings();
+    }
+    else
+        xbox = NULL;
 
     if (a.argc() == 2)
     {

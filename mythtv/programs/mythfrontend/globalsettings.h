@@ -78,4 +78,9 @@ public:
     GeneralRankingSettings();
 };
 
+class XboxSettings: virtual public ConfigurationWizard {
+public:
+    XboxSettings();
+};
+
 #endif

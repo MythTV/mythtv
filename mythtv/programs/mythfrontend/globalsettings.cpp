@@ -1072,6 +1072,69 @@ public:
     };
 };
 
+class EnableXbox: public CheckBoxSetting, public GlobalSetting {
+public:
+    EnableXbox():
+        GlobalSetting("EnableXbox") {
+        setLabel("Enable Xbox Hardware");
+        setHelpText("This enables support for Xbox Specific hardware.  "
+                    "Requires a frontend restart for changes to take effect.");
+        setValue(false);
+    };
+};
+
+class XboxBlinkBIN: public ComboBoxSetting, public GlobalSetting {
+public:
+    XboxBlinkBIN():
+        GlobalSetting("XboxBlinkBIN") {
+        setLabel("Xbox Linux Distribution");
+        addSelection("GentooX","led");
+        addSelection("Other","blink");
+        setHelpText("This is used to determine the name of the blink binary "
+                    "led will be used on GentooX, blink otherwise.");
+    };
+};
+
+class XboxLEDDefault: public ComboBoxSetting, public GlobalSetting {
+public:
+    XboxLEDDefault():
+        GlobalSetting("XboxLEDDefault") {
+        setLabel("Default LED mode");
+        addSelection("Off", "nnnn");
+        addSelection("Green","gggg");
+        addSelection("Orange","oooo");
+        addSelection("Red","rrrr");
+        setHelpText("The sets the LED mode when there is nothing else "
+                    "to display");
+    };
+};
+
+class XboxLEDRecording: public ComboBoxSetting, public GlobalSetting {
+public:
+    XboxLEDRecording():
+        GlobalSetting("XboxLEDRecording") {
+        setLabel("Recording LED mode");
+        addSelection("Off", "nnnn");
+        addSelection("Green","gggg");
+        addSelection("Orange","oooo");
+        addSelection("Red","rrrr");
+        setHelpText("The sets the LED mode when a backend is recording");
+    };
+};
+
+class XboxCheckRec: public SpinBoxSetting, public GlobalSetting {
+public:
+    XboxCheckRec():
+        SpinBoxSetting(1, 600, 2),
+        GlobalSetting("XboxCheckRec") {
+        setLabel("Recording Check Frequency");
+        setValue(5);
+        setHelpText("This specifies how often to check if a recording "
+                    "is in progress and update the Xbox LED.");
+
+    };
+};
+
 MainGeneralSettings::MainGeneralSettings()
 {
     AudioSettings *audio = new AudioSettings();
@@ -1080,6 +1143,7 @@ MainGeneralSettings::MainGeneralSettings()
     VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
     general->addChild(new AllowQuitShutdown());
     general->addChild(new HaltCommand());
+    general->addChild(new EnableXbox());
     addChild(general);
 }
 
@@ -1228,5 +1292,17 @@ AppearanceSettings::AppearanceSettings()
     qttheme->addChild(new PlayBoxTransparency());
     qttheme->addChild(new PlayBoxShading());
     addChild(qttheme);
+}
+
+XboxSettings::XboxSettings()
+{
+    VerticalConfigurationGroup* xboxset = new VerticalConfigurationGroup(false);
+
+    xboxset->setLabel("Xbox");
+    xboxset->addChild(new XboxBlinkBIN());
+    xboxset->addChild(new XboxLEDDefault());
+    xboxset->addChild(new XboxLEDRecording());
+    xboxset->addChild(new XboxCheckRec());
+    addChild(xboxset);
 }
 

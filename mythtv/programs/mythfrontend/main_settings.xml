@@ -104,4 +104,11 @@
      <depends>mythdvd</depends>
    </button>
 
+   <button>
+     <type>SETUP</type>
+     <text>Xbox</text>
+     <action>SETTINGS XBOXSETTINGS</action>
+     <dependssetting>EnableXbox</dependssetting>
+   </button>
+
 </mythmenu>
