@@ -2757,16 +2757,17 @@ void MainServer::PrintStatus(QSocket *socket)
 
     mfdLastRunStart = gContext->GetSetting("mythfilldatabaseLastRunStart");
     mfdLastRunEnd = gContext->GetSetting("mythfilldatabaseLastRunEnd");
-    mfdLastRunStatus = gContext->GetNumSetting("mythfilldatabaseLastRunStatus");
+    mfdLastRunStatus = gContext->GetSetting("mythfilldatabaseLastRunStatus");
 
     os << "    Last mythfilldatabase run started on " << mfdLastRunStart
-       << " and ended on " << mfdLastRunEnd << ". ";
+       << " and ";
 
-    if(!mfdLastRunStatus)
-       os << "<br /><strong>WARNING</strong>: "
-          << "There was an error during the last run.<br />\r\n";
-    else
-       os << "Last run was successful.<br />\r\n";
+    if (mfdLastRunEnd < mfdLastRunStart) 
+        os << "is ";
+    else 
+        os << "ended on " << mfdLastRunEnd << ". ";
+
+    os << mfdLastRunStatus << "<br />\r\n";    
 
     if (!GuideDataThrough.isNull())
     {

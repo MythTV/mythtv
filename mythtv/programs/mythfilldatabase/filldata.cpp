@@ -1397,20 +1397,55 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
 
     QDateTime qdtNow = QDateTime::currentDateTime();
     QSqlQuery query;
+    QDateTime GuideDataThroughBefore, GuideDataThroughAfter;
+    QString status = "currently running.";
+
     query.exec(QString("UPDATE settings SET data ='%1' "
                        "WHERE value='mythfilldatabaseLastRunStart'")
                        .arg(qdtNow.toString("yyyy-MM-dd hh:mm")));
 
-    int status = system(command.ascii());
+    query.exec(QString("SELECT MAX(endtime) FROM program;"));
+    if (query.isActive() && query.numRowsAffected())
+    {
+        query.next();
+        GuideDataThroughBefore = QDateTime::fromString(query.value(0).toString(),
+                                                 Qt::ISODate);
+    }
 
     query.exec(QString("UPDATE settings SET data ='%1' "
                        "WHERE value='mythfilldatabaseLastRunStatus'")
                        .arg(status));
 
+    int systemcall_status = system(command.ascii());
+
+    query.exec(QString("SELECT MAX(endtime) FROM program;"));
+    if (query.isActive() && query.numRowsAffected())
+    {
+        query.next();
+        GuideDataThroughAfter = QDateTime::fromString(query.value(0).toString(),
+                                                 Qt::ISODate);
+    }
+
     qdtNow = QDateTime::currentDateTime();
     query.exec(QString("UPDATE settings SET data ='%1' "
                        "WHERE value='mythfilldatabaseLastRunEnd'")
                        .arg(qdtNow.toString("yyyy-MM-dd hh:mm")));
+
+    status = "Successful.";
+
+    if (systemcall_status == 0)
+    {
+       if (GuideDataThroughAfter == GuideDataThroughBefore)
+           status = "mythfilldatabase ran, but did not insert "
+                    "any new data into the Guide.  This can indicate a "
+                    "potential xmltv failure."; 
+    }
+    else status = QString("FAILED:  xmltv returned error code %1.")
+                          .arg(systemcall_status);
+
+    query.exec(QString("UPDATE settings SET data ='%1' "
+                       "WHERE value='mythfilldatabaseLastRunStatus'")
+                       .arg(status));
  
     if (!quiet)
          cout << "------------------ End of XMLTV output ------------------" << endl;
@@ -1420,7 +1455,7 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
     QFile thefile(filename);
     thefile.remove();
 
-    return (status == 0);
+    return (systemcall_status == 0);
 }
 
 void clearOldDBEntries(void)

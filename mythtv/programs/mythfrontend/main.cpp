@@ -225,20 +225,19 @@ void showStatus(void)
 
     mfdLastRunStart = gContext->GetSetting("mythfilldatabaseLastRunStart");
     mfdLastRunEnd = gContext->GetSetting("mythfilldatabaseLastRunEnd");
-    mfdLastRunStatus = gContext->GetNumSetting("mythfilldatabaseLastRunStatus");
+    mfdLastRunStatus = gContext->GetSetting("mythfilldatabaseLastRunStatus");
 
     Status = "Last mythfilldatabase guide update:";
     Status += "\n   Started:   ";
     Status += mfdLastRunStart;
-    Status += "\n   Finished: ";
-    Status += mfdLastRunEnd;
+    if (mfdLastRunEnd > mfdLastRunStart)  //if end < start, it's still running.
+    {
+       Status += "\n   Finished: ";
+       Status += mfdLastRunEnd;
+    }
 
     Status += "\n   Result: ";
-
-    if(!mfdLastRunStatus)
-       Status += "FAILED";
-    else
-       Status += "Successful";
+    Status += mfdLastRunStatus;
 
     DaysOfData = qdtNow.daysTo(GuideDataThrough);
 
