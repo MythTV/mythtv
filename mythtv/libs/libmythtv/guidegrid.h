@@ -107,6 +107,8 @@ class GuideGrid : public QDialog
     QColor fgcolor;
     QColor bgcolor;
 
+    ProgramInfo *lastLookup;
+
     MythContext *m_context;
     Settings *m_settings;
 };

@@ -86,6 +86,8 @@ GuideGrid::GuideGrid(MythContext *context, const QString &channel,
             m_programInfos[y][x] = NULL;
     }
 
+    lastLookup = NULL;
+
     //QTime clock = QTime::currentTime();
     //clock.start();
     fillTimeInfos();
@@ -264,6 +266,9 @@ void GuideGrid::fillTimeInfos()
         sprintf(temp, "%4d%02d%02d%02d%02d50", year, month, day, hour, sqlmins);
         timeinfo->sqltime = temp;
 
+        timeinfo->sqlts = QDateTime(QDate(year, month, day), 
+                                    QTime(hour, sqlmins));
+
         m_timeInfos[x] = timeinfo;
 
         t = t.addSecs(5 * 60);
@@ -288,11 +293,28 @@ ProgramInfo *GuideGrid::getProgramInfo(unsigned int row, unsigned int col)
 
     QString chanid = QString("%1").arg(m_channelInfos[chanNum].chanid);
 
+    if (lastLookup)
+    {
+        if (lastLookup->chanid == chanid)
+        {
+            if (m_timeInfos[col]->sqlts < lastLookup->endts &&
+                m_timeInfos[col]->sqlts > lastLookup->startts)
+            {
+                ProgramInfo *pginfo = new ProgramInfo(*lastLookup);
+                pginfo->startCol = col;
+                return pginfo;
+            }
+        }
+        delete lastLookup;
+        lastLookup = NULL;
+    }
+
     ProgramInfo *pginfo = GetProgramAtDateTime(chanid,
                                              m_timeInfos[col]->sqltime.ascii());
     if (pginfo)
     {
         pginfo->startCol = col;
+        lastLookup = new ProgramInfo(*pginfo);
         return pginfo;
     }
   

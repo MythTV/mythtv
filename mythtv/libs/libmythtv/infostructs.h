@@ -29,6 +29,8 @@ class TimeInfo
     QString usertime;
     QString sqltime;
 
+    QDateTime sqlts;
+
     int year;
     int month;
     int day;
