@@ -754,7 +754,7 @@ void DVDRipBox::handleMedia(QStringList tokens)
         }
         
         QString audio_string = "";
-        for(uint i = 5; i < tokens.count(); i++)
+        for(uint i = 6; i < tokens.count(); i++)
         {
             audio_string += tokens[i];
             if(i < tokens.count() - 1)
@@ -763,7 +763,8 @@ void DVDRipBox::handleMedia(QStringList tokens)
             }
         }
         
-        DVDAudioInfo *new_audio = new DVDAudioInfo(tokens[4].toUInt(), audio_string);
+        DVDAudioInfo *new_audio = new DVDAudioInfo(tokens[4].toUInt() + 1, audio_string);
+        new_audio->setChannels(tokens[5].toInt());
         which_title->addAudio(new_audio);
     }
     

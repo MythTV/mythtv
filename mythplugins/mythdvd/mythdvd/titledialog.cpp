@@ -140,7 +140,7 @@ void TitleDialog::setAudio(int audio_index)
 {
     MythComboBox *which_box = (MythComboBox *)sender();
     int which_title = atoi(which_box->name());
-    dvd_titles->at(which_title)->setAudio(audio_index);
+    dvd_titles->at(which_title)->setAudio(audio_index + 1);
 }
 
 void TitleDialog::toggleTitle(bool on_or_off)
@@ -181,14 +181,30 @@ void TitleDialog::viewTitle()
     DVDTitleInfo *title_in_question = dvd_titles->at(which_title);
     
     int audio_track = 1;
+    int channels = 2;
     if(title_in_question)
     {
         audio_track = title_in_question->getAudio();
+        DVDAudioInfo *audio_in_question = title_in_question->getAudioTrack(audio_track - 1);
+        if(audio_in_question)
+        {
+            channels = audio_in_question->getChannels();
+        }
     }
-    
+
+    if(player_string.contains("mplayer"))
+    {
+        //
+        //  Way to save a few bits mplayer
+        //
+        audio_track += 127;
+    }
+        
     player_string = player_string.replace(QRegExp("%d"), dvd_device);
     player_string = player_string.replace(QRegExp("%t"), which_button->name());
     player_string = player_string.replace(QRegExp("%a"), QString("%1").arg(audio_track));
+    player_string = player_string.replace(QRegExp("%c"), QString("%1").arg(channels));
+
     system(player_string);
 }
 

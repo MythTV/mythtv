@@ -414,9 +414,10 @@ void MTD::sendMediaReport(QSocket *socket)
                 //  Send title/track #, audio track #, descriptive string
                 //
                 
-                sendMessage(socket, QString("media dvd title-audio %1 %2 %3")
+                sendMessage(socket, QString("media dvd title-audio %1 %2 %3 %4")
                             .arg(dvd_titles->at(i)->getTrack())
                             .arg(j+1)
+                            .arg(audio_tracks->at(j)->getChannels())
                             .arg(audio_tracks->at(j)->getAudioString())
                            );
             }

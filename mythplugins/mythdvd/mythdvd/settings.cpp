@@ -92,11 +92,11 @@ public:
     TitlePlayCommand():
         GlobalSetting("TitlePlayCommand"){
         setLabel("Title Playing Command");
-        setValue("mplayer -dvd-device %d -fs -vo xv -dvd %t -aid %a");
+        setValue("mplayer -dvd-device %d -fs -vo xv -dvd %t -aid %a -channels %c");
         setHelpText("This is a command used to preview a given "
                     "title on a DVD. If present %t will be set "
                     "to the title, %d for device, %a for audio "
-                    "track. ");
+                    "track, %c for audio channels.");
     };
 };
 

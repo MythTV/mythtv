@@ -30,12 +30,15 @@ class DVDAudioInfo
     ~DVDAudioInfo();
     
     QString getAudioString(){return description;}
+    void    setChannels(int a_number){channels = a_number;}
+    int     getChannels(){return channels;}
+    int     getTrack(){return track;}
 
   private:
   
     QString description;
     int     track;
-
+    int     channels;
 };
 
 class DVDTitleInfo
@@ -81,6 +84,7 @@ class DVDTitleInfo
 
     void                    addAudio(DVDAudioInfo *new_audio_track);
     QPtrList<DVDAudioInfo>* getAudioTracks(){return &audio_tracks;}
+    DVDAudioInfo*           getAudioTrack(int which_one){return audio_tracks.at(which_one);}
         
   private:
   

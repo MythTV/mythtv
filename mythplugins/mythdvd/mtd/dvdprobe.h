@@ -31,6 +31,7 @@ class DVDAudio
     
     void    printYourself();
     void    fill(audio_attr_t *audio_attributes);
+    int     getChannels(){return channels;}
     QString getAudioString();    
 
   private:
