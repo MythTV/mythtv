@@ -83,6 +83,9 @@ void SearchDir(QString &directory)
         return;
 
     const QFileInfoList *list = d.entryInfoList();
+    if (!list)
+        return;
+
     QFileInfoListIterator it(*list);
     QFileInfo *fi;
 
