@@ -13,7 +13,6 @@ INCLUDEPATH += $${PREFIX}/include
 LIBPATH += $${PREFIX}/lib
 
 DEFINES += _GNU_SOURCE
-DEFINES += PREFIX=\"$${PREFIX}\"
 release {
 	QMAKE_CXXFLAGS_RELEASE = -O2 -fomit-frame-pointer
 }	

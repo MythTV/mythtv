@@ -66,7 +66,7 @@ int mythplugin_init(const char *libversion)
 void runNews(void)
 {
     QTranslator translator(0);
-    translator.load(PREFIX + QString("/share/mythtv/i18n/mythnews_") +
+    translator.load(gContext->GetTranslationsDir() + QString("mythnews_") +
                     QString(gContext->GetSetting("Language").lower()) +
                     QString(".qm"), ".");
     qApp->installTranslator(&translator);
@@ -87,7 +87,7 @@ int mythplugin_run(void)
 int mythplugin_config(void)
 {
     QTranslator translator(0);
-    translator.load(PREFIX + QString("/share/mythtv/i18n/mythnews_") +
+    translator.load(gContext->GetTranslationsDir() + QString("mythnews_") +
                     QString(gContext->GetSetting("Language").lower()) +
                     QString(".qm"), ".");
     qApp->installTranslator(&translator);

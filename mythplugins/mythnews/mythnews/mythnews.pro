@@ -18,3 +18,7 @@ INSTALLS += installfiles installimages uifiles
 # Input
 HEADERS += mythnews.h mythnewsconfig.h newsengine.h
 SOURCES += main.cpp mythnews.cpp mythnewsconfig.cpp newsengine.cpp
+
+macx {
+    QMAKE_LFLAGS += -flat_namespace -undefined suppress
+}

@@ -51,7 +51,9 @@ MythNews::MythNews(QSqlDatabase *db, MythMainWindow *parent,
         dir.mkdir(fileprefix);
     
     zoom = QString("-z %1").arg(gContext->GetNumSetting("WebBrowserZoomLevel",200));
-    browser = gContext->GetSetting("WebBrowserCommand", PREFIX "/bin/mythbrowser");
+    browser = gContext->GetSetting("WebBrowserCommand",
+                                   gContext->GetInstallPrefix() +
+                                      "/bin/mythbrowser");
     
     // Initialize variables
 
