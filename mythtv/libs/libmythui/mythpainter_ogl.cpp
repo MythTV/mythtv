@@ -7,6 +7,11 @@
 #include <qcache.h>
 #include <qintcache.h>
 
+#include "config.h"
+#ifdef CONFIG_DARWIN
+#include <OpenGL/glext.h>
+#endif
+
 #include "mythpainter_ogl.h"
 #include "mythfontproperties.h"
 

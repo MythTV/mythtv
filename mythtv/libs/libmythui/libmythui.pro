@@ -7,6 +7,7 @@ CONFIG += debug thread dll
 target.path = $${PREFIX}/lib
 INSTALLS = target
 INCLUDEPATH += ../../libs/libmyth
+INCLUDEPATH += ../..
 LIBS += -L../libmyth -lmyth-$$LIBVERSION
 VERSION = 0.17.0
 
