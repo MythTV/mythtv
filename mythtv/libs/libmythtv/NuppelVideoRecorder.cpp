@@ -234,7 +234,7 @@ void NuppelVideoRecorder::StartRecording(void)
     rtjc->SetFormat(&i);
     rtjc->SetSize(&w, &h);
     rtjc->SetQuality(&Q);
-    i = 0;
+    i = 1;
     rtjc->SetIntra(&i, &M1, &M2);
 
     if (childrenLive)

@@ -12,7 +12,7 @@
 static inline void linearBlend(unsigned char *src, int stride)
 {
 #ifdef MMX
-  src += 4 * stride;
+//  src += 4 * stride;
   asm volatile(
        "leal (%0, %1), %%eax                           \n\t"
        "leal (%%eax, %1, 4), %%ebx                     \n\t"
@@ -57,7 +57,7 @@ static inline void linearBlend(unsigned char *src, int stride)
   );
 #else
   int x;
-  src += 4 * stride;
+//  src += 4 * stride;
   for (x=0; x<8; x++)
   {
      src[0       ] = (src[0       ] + 2*src[stride  ] + src[stride*2])>>2;
@@ -78,12 +78,13 @@ static inline void linearBlend(unsigned char *src, int stride)
 void linearBlendYUV420(unsigned char *yuvptr, int width, int height)
 {
   int stride = width;
+  int ymax = height - 8;
   int x,y;
   unsigned char *src;
 
-  for (y = 0; y < height-8; y+=8)
+  for (y = 0; y < ymax; y+=8)
   {
-    for (x = 0; x < width; x+=8)
+    for (x = 0; x < stride; x+=8)
     {
        src = yuvptr + x + y * stride;  
        linearBlend(src, stride);  
@@ -91,18 +92,22 @@ void linearBlendYUV420(unsigned char *yuvptr, int width, int height)
   }
 
   stride = width / 2;
+  ymax = height / 2 - 8;
+
+  unsigned char *uoff = yuvptr + width * height;
+  unsigned char *voff = yuvptr + width * height * 5 / 4;
  
-  for (y = 0; y < height / 2 - 8; y += 8)
+  for (y = 0; y < ymax; y += 8)
   {
-    for (x = 0; x < width / 2; x += 8)
+    for (x = 0; x < stride; x += 8)
     {
-       src = (yuvptr + width * height) + x + y * stride;
+       src = uoff + x + y * stride;
        linearBlend(src, stride);
 
-       src = (yuvptr + width * height * 5/4) + x + y * stride;
+       src = voff + x + y * stride;
        linearBlend(src, stride);
      }
   }
- 
+
   emms();
 }
