@@ -9,6 +9,9 @@
 #include <vorbis/vorbisfile.h>
 #include <vorbis/vorbisenc.h>
 
+#include <iostream>
+using namespace std;
+
 int write_page(ogg_page *page, FILE *fp)
 {
     int written = fwrite(page->header, 1, page->header_len, fp);

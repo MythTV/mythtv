@@ -64,6 +64,7 @@ void CheckFile(QString &filename)
 
     if (decoder)
     {
+        cout << "Checking: " << filename << endl;
         QSqlDatabase *db = QSqlDatabase::database();
 
         Metadata *data = decoder->getMetadata(db);

@@ -79,5 +79,6 @@ class Metadata
 };
 
 bool operator==(const Metadata& a, const Metadata& b);
+bool operator!=(const Metadata& a, const Metadata& b);
 
 #endif

@@ -8,6 +8,13 @@ bool operator==(const Metadata& a, const Metadata& b)
     return false;
 }
 
+bool operator!=(const Metadata& a, const Metadata& b)
+{
+    if (a.Filename() != b.Filename())
+        return true;
+    return false;
+}
+
 bool Metadata::isInDatabase(QSqlDatabase *db)
 {
     bool retval = false;

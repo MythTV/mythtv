@@ -1,1 +1,10 @@
 .qmake.internal.cache
+Makefile
+moc_cdrip.cpp
+moc_databasebox.cpp
+moc_menubox.cpp
+moc_playbackbox.cpp
+moc_scrolllabel.cpp
+moc_streaminput.cpp
+moc_themedmenu.cpp
+mythmusic
