@@ -11,8 +11,8 @@
 class XMLParse
 {
   public:
-    XMLParse(MythContext *);
-    ~XMLParse();
+    XMLParse();
+   ~XMLParse();
 
     fontProp *GetFont(const QString &);
     LayerSet *GetSet(const QString &text);
@@ -35,9 +35,6 @@ class XMLParse
     void resizeImage(QPixmap *, QString);
   
   private:
-
-    MythContext *gContext;
-
     QMap<QString, fontProp> fontMap;
     QMap<QString, LayerSet*> layerMap;
     vector<LayerSet *> *allTypes;

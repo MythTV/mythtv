@@ -120,6 +120,8 @@ UIListType::UIListType(const QString &name, QRect area, int dorder, UIFontPairTy
 
 UIListType::~UIListType()
 {
+    if (m_text)
+        delete m_text;
 }
 
 void UIListType::Draw(QPainter *dr, int drawlayer, int context)

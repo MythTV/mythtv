@@ -4,10 +4,9 @@ using namespace std;
 #include "xmlparse.h"
 
 
-XMLParse::XMLParse(MythContext *cont)
+XMLParse::XMLParse(void)
 {
     allTypes = new vector<LayerSet *>;
-    gContext = cont;
 } 
 
 XMLParse::~XMLParse()
