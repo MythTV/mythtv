@@ -131,7 +131,6 @@ class PlaybackBox : public MythDialog
     bool killPlayer(void);
     void killPlayerSafe(void);
     void startPlayer(ProgramInfo *rec);
-    void stopPreview();
 
     void doRemove(ProgramInfo *, bool forgetHistory);
     void promptEndOfRecording(ProgramInfo *);
@@ -180,8 +179,6 @@ class PlaybackBox : public MythDialog
     QString timeformat;
 
     void grayOut(QPainter *);
-    bool enableGrayOut;
-    int transparentFlag;
     void updateBackground(void);
     void updateVideo(QPainter *);
     void updateShowTitles(QPainter *);

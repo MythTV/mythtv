@@ -41,7 +41,6 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     state = kStopped;
     killState = kDone;
     waitToStart = false;
-    enableGrayOut = false;
 
     rbuffer = NULL;
     nvp = NULL;
@@ -55,8 +54,6 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     listCount = 0;          
 
     inTitle = gContext->GetNumSetting("PlaybackBoxStartInTitle", 0);
-
-    transparentFlag = gContext->GetNumSetting("PlayBoxShading", 0);
 
  
     skipNum = 0;            // Amount of records to skip (for scrolling)
@@ -376,15 +373,6 @@ void PlaybackBox::paintEvent(QPaintEvent *e)
         updateVideo(&p);
     }
 
-
-    // the grayouting needs to be cleared when exiting the popup...
-    if (popup != NULL || enableGrayOut)
-    {
-        backup.begin(this);
-        grayOut(&backup);
-        backup.end();
-    }
-
     skipCnt--;
     if (skipCnt < 0)
     {
@@ -395,7 +383,7 @@ void PlaybackBox::paintEvent(QPaintEvent *e)
 
 void PlaybackBox::grayOut(QPainter *tmp)
 {
-    //int transparentFlag = gContext->GetNumSetting("PlayBoxShading", 0);
+    int transparentFlag = gContext->GetNumSetting("PlayBoxShading", 0);
     if (transparentFlag == 0)
         tmp->fillRect(QRect(QPoint(0, 0), size()), 
                       QBrush(QColor(10, 10, 10), Dense4Pattern));
@@ -1234,8 +1222,7 @@ bool PlaybackBox::FillList()
     if (infoList)
     {
         QString temp;
-        
-        
+
         vector<ProgramInfo *>::iterator i = infoList->begin();
         for (; i != infoList->end(); i++)
         {
@@ -1442,12 +1429,15 @@ void PlaybackBox::selected()
 
 void PlaybackBox::showMenu()
 {
-    //state = kStopping;
-    //killPlayer();
+    state = kStopping;
+    killPlayer();
 
-    //timer->stop();
-    //playingVideo = false;
-    stopPreview();
+    timer->stop();
+    playingVideo = false;
+
+    backup.begin(this);
+    grayOut(&backup);
+    backup.end();
 
     popup = new MythPopupBox(gContext->GetMainWindow(), graphicPopup,
                              popupForeground, popupBackground,
@@ -1638,7 +1628,7 @@ void PlaybackBox::expire(ProgramInfo *toExp)
 
 void PlaybackBox::showActions(ProgramInfo *toExp)
 {
-    //killPlayer();
+    killPlayer();
 
     if(delitem)
         delete delitem;
@@ -1652,9 +1642,9 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
 {
     updateFreeSpace = true;
 
-    //enableGrayOut = true;
-
-    stopPreview();
+    backup.begin(this);
+    grayOut(&backup);
+    backup.end();
 
     popup = new MythPopupBox(gContext->GetMainWindow(), graphicPopup,
                              popupForeground, popupBackground,
@@ -1742,12 +1732,9 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
 
 void PlaybackBox::showActionPopup(ProgramInfo *program)
 {
-/*    backup.begin(this);
+    backup.begin(this);
     grayOut(&backup);
-    backup.end();*/
-    //enableGrayOut = true;
-
-stopPreview();
+    backup.end();
 
     popup = new MythPopupBox(gContext->GetMainWindow(), graphicPopup,
                              popupForeground, popupBackground,
@@ -1802,9 +1789,7 @@ stopPreview();
 void PlaybackBox::initPopup(MythPopupBox *popup, ProgramInfo *program,
                             QString message, QString message2)
 {
-    //killPlayerSafe();
-    //stopPreview();
-    //enableGrayOut = true;
+    killPlayerSafe();
 
     QDateTime startts = program->startts;
     QDateTime endts = program->endts;
@@ -1832,38 +1817,24 @@ void PlaybackBox::initPopup(MythPopupBox *popup, ProgramInfo *program,
         popup->addLabel(message2);
 }
 
-//do we need a closePopup that doesn't restart the preview and stuff like that?
 void PlaybackBox::cancelPopup(void)
 {
     popup->hide();
     expectingPopup = false;
-    enableGrayOut = false;
 
-    //backup.begin(this);
-    //backup.drawPixmap(0, 0, myBackground);
-    //backup.end();
+    backup.begin(this);
+    backup.drawPixmap(0, 0, myBackground);
+    backup.end();
 
     delete popup;
     popup = NULL;
 
-    timer->start(500);
-    playingVideo = true;
-
     skipUpdate = false;
     skipCnt = 2;
-    updateBackground();
     update(fullRect);
+
     setActiveWindow();
 }
-
-//stop? pause?
-void PlaybackBox::stopPreview(void)
-{
-    //killPlayerSafe();
-    timer->stop();
-    playingVideo = false;
-}
-
 
 void PlaybackBox::doPlay(void)
 {
@@ -2390,15 +2361,11 @@ void PlaybackBox::showIconHelp(void)
         return;
     }
 
-    //killPlayerSafe();
+    killPlayerSafe();
 
-    //backup.begin(this);
-    //grayOut(&backup);
-    //backup.end();
-
-    stopPreview();
-
-    enableGrayOut = true;
+    backup.begin(this);
+    grayOut(&backup);
+    backup.end();
 
     iconhelp->addLayout(grid);
 
@@ -2409,10 +2376,9 @@ void PlaybackBox::showIconHelp(void)
 
     delete iconhelp;
 
-    //backup.begin(this);
-    //backup.drawPixmap(0, 0, myBackground);
-    //backup.end();
-    enableGrayOut = false;
+    backup.begin(this);
+    backup.drawPixmap(0, 0, myBackground);
+    backup.end();
 
     state = kChanging;
 
@@ -2434,15 +2400,12 @@ void PlaybackBox::showRecGroupChooser(void)
                                               "choose recgroup view");
     choosePopup = &tmpPopup;
 
-    //timer->stop();
-    //playingVideo = false;
+    timer->stop();
+    playingVideo = false;
 
-    stopPreview();
-    enableGrayOut = true;
-
-    //backup.begin(this);
-    //grayOut(&backup);
-    //backup.end();
+    backup.begin(this);
+    grayOut(&backup);
+    backup.end();
 
     QLabel *label = choosePopup->addLabel(tr("Recording Group View"),
                                   MythPopupBox::Large, false);
@@ -2520,11 +2483,9 @@ void PlaybackBox::showRecGroupChooser(void)
     delete chooseComboBox;
     chooseComboBox = NULL;
 
-    //backup.begin(this);
-    //backup.drawPixmap(0, 0, myBackground);
-    //backup.end();
-
-    enableGrayOut = false;
+    backup.begin(this);
+    backup.drawPixmap(0, 0, myBackground);
+    backup.end();
 
     skipUpdate = false;
     skipCnt = 2;
@@ -2548,6 +2509,7 @@ void PlaybackBox::chooseSetViewGroup(void)
 
     if (recGroupPassword != "" )
     {
+
         bool ok = false;
         QString text = "Password:";
 
@@ -2643,8 +2605,6 @@ void PlaybackBox::showRecGroupChanger(void)
         return;
 
     cancelPopup();
-
-    enableGrayOut = true;
 
     MythPopupBox tmpPopup(gContext->GetMainWindow(),
                                               true, popupForeground,
@@ -2753,15 +2713,12 @@ void PlaybackBox::showRecGroupPasswordChanger(void)
                                               "change recgroup password");
     choosePopup = &tmpPopup;
 
-    stopPreview();
-    enableGrayOut = true;
+    timer->stop();
+    playingVideo = false;
 
-    //timer->stop();
-    //playingVideo = false;
-
-    //backup.begin(this);
-    //grayOut(&backup);
-    //backup.end();
+    backup.begin(this);
+    grayOut(&backup);
+    backup.end();
 
     QLabel *label = choosePopup->addLabel(tr("Change Recording Group Password"),
                                   MythPopupBox::Large, false);
@@ -2835,10 +2792,9 @@ void PlaybackBox::showRecGroupPasswordChanger(void)
     delete chooseOkButton;
     chooseOkButton = NULL;
 
-    //backup.begin(this);
-    //backup.drawPixmap(0, 0, myBackground);
-    //backup.end();
-    enableGrayOut = false;
+    backup.begin(this);
+    backup.drawPixmap(0, 0, myBackground);
+    backup.end();
 
     skipUpdate = false;
     skipCnt = 2;
