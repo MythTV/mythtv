@@ -347,8 +347,14 @@ bool Transcoder::isFileInUse(ProgramInfo *pginfo)
             continue;
         if (elink->GetState() == kState_WatchingPreRecorded)
             return true;
-        if (elink->isParsingCommercials(pginfo))
+
+        dblock->lock();
+        if (pginfo->IsCommProcessing(db_conn))
+        {
+            dblock->unlock();
             return true;
+        }
+        dblock->unlock();
     }
     return false;
 }

@@ -28,6 +28,7 @@ using namespace std;
 
 #include "libmyth/mythcontext.h"
 #include "libmyth/util.h"
+#include "libmyth/mythdbcon.h"
 
 #include "mainserver.h"
 #include "scheduler.h"
@@ -437,11 +438,27 @@ void MainServer::customEvent(QCustomEvent *e)
 
     if (sendstuff)
     {
+        bool sendGlobal = false;
+        if (ismaster && broadcast[1].left(7) == "GLOBAL_")
+        {
+            broadcast[1].replace(QRegExp("GLOBAL_"), "LOCAL_");
+            MythEvent me(broadcast[1], broadcast[2]);
+            gContext->dispatch(me);
+
+            sendGlobal = true;
+        }
+
         vector<PlaybackSock *>::iterator iter = playbackList.begin();
         for (; iter != playbackList.end(); iter++)
         {
             PlaybackSock *pbs = (*iter);
-            if (pbs->wantsEvents())
+
+            if (sendGlobal)
+            {
+                if (pbs->isSlaveBackend())
+                    WriteStringList(pbs->getSocket(), broadcast);
+            }
+            else if (pbs->wantsEvents())
             {
                 WriteStringList(pbs->getSocket(), broadcast);
             }
@@ -869,6 +886,53 @@ static void *SpawnDelete(void *param)
     return NULL;
 }
 
+struct DeleteRecordedMarkupStruct
+{
+    MainServer *ms;
+    QString chanid;
+    QString startts;
+};
+
+void *MainServer::SpawnDeleteRecordedMarkup(void *param)
+{
+    DeleteRecordedMarkupStruct *ds = (DeleteRecordedMarkupStruct *)param;
+    MainServer *ms = ds->ms;
+    ms->DoSpawnDeleteRecordedMarkup(ds->chanid, ds->startts);
+
+    delete ds;
+
+    return NULL;
+}
+
+void MainServer::DoSpawnDeleteRecordedMarkup(QString chanid, QString startts)
+{
+    QString name = QString("recmarkup%1%2").arg(getpid()).arg(rand());
+
+    MythSqlDatabase *recmarkup_db = new MythSqlDatabase(name);
+
+    QString thequery = QString("DELETE FROM recordedmarkup WHERE chanid = %1 "
+                               "AND starttime = %2;")
+                              .arg(chanid).arg(startts);
+
+    if (!recmarkup_db || !recmarkup_db->isOpen())
+    {
+        QString msg = QString("ERROR deleting recordedmarkup for chanid "
+                              "%1 recorded at %2, unable to open DB "
+                              "connection.")
+                              .arg(chanid).arg(startts);
+        VERBOSE(VB_GENERAL, msg);
+        return;
+    }
+
+    QSqlDatabase *db = recmarkup_db->db();
+
+    QSqlQuery query = db->exec(thequery);
+    if (!query.isActive())
+        MythContext::DBError("Recorded program deletion (2)", query);
+
+    delete recmarkup_db;
+}
+
 void MainServer::HandleCheckRecordingActive(QStringList &slist, 
                                             PlaybackSock *pbs)
 {
@@ -1065,6 +1129,13 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
         SendResponse(pbssock, outputlist);
     }
 
+    QString message = QString("GLOBAL_COMMFLAG START %1 %2 %3")
+                              .arg(pginfo->chanid)
+                              .arg(pginfo->startts.toString(Qt::ISODate))
+                              .arg(gContext->GetHostName());
+    MythEvent me(message);
+    gContext->dispatch(me);
+
     delete pginfo;
 }
 
@@ -1148,6 +1219,22 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
 
     MythContext::KickDatabase(m_db);
 
+    if (pginfo->IsCommProcessing(m_db))
+    {
+        QString message = QString("GLOBAL_COMMFLAG STOP %1 %2 master")
+                                 .arg(pginfo->chanid)
+                                 .arg(pginfo->recstartts.toString(Qt::ISODate));
+        MythEvent me(message);
+        gContext->dispatch(me);
+
+        int loop = 0;
+        while ((pginfo->IsCommProcessing(m_db)) && loop < 20)
+        {
+            usleep(100000);
+            loop++;
+        }
+    }
+
     QSqlQuery query(QString::null, m_db);
     query.prepare("DELETE FROM recorded WHERE chanid = :CHANID AND "
                   "title = :TITLE AND starttime = :STARTTIME AND "
@@ -1162,16 +1249,20 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
     if (!query.isActive())
         MythContext::DBError("Recorded program deletion", query);
 
-    // now delete any markups for this program
-    QString thequery = QString("DELETE FROM recordedmarkup WHERE chanid = %1 "
-                               "AND starttime = %2;")
-                              .arg(pginfo->chanid).arg(startts);
-
-    query = m_db->exec(thequery);
-    if (!query.isActive())
-        MythContext::DBError("Recorded program deletion (2)", query);
-
     dblock.unlock();
+
+    DeleteRecordedMarkupStruct *ds = new DeleteRecordedMarkupStruct;
+    ds->chanid = pginfo->chanid;
+    ds->startts = startts;
+    ds->ms = this;
+
+    pthread_t deleterecordedmarkupthread;
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+
+    pthread_create(&deleterecordedmarkupthread, &attr,
+                   SpawnDeleteRecordedMarkup, ds);
 
     QString fileprefix = gContext->GetFilePrefix();
     QString filename = pginfo->GetRecordFilename(fileprefix);

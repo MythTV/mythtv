@@ -3369,7 +3369,8 @@ bool NuppelVideoPlayer::LastFrameIsBlank(void)
     return FrameIsBlank(videoOutput->GetLastDecodedFrame());
 }
 
-int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed)
+int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
+                                       bool *abortFlag)
 {
     int comms_found = 0;
     int percentage = 0;
@@ -3386,9 +3387,7 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed)
         return(0);
 
     m_db->lock();
-    // set to processing
-    m_playbackinfo->SetCommFlagged(2, m_db->db());
-    m_playbackinfo->SetMarkupFlag(MARK_PROCESSING, true, m_db->db());
+    m_playbackinfo->SetCommFlagged(COMM_FLAG_PROCESSING, m_db->db());
     m_db->unlock();
 
     playing = true;
@@ -3422,6 +3421,18 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed)
 
     while (!eof)
     {
+        if (abortFlag && *abortFlag)
+        {
+            playing = false;
+            killplayer = true;
+
+            m_db->lock();
+            m_playbackinfo->SetCommFlagged(COMM_FLAG_NOT_FLAGGED, m_db->db());
+            m_db->unlock();
+
+            return(0);
+        }
+
         // sleep a little so we don't use all cpu even if we're niced
         if (!fullSpeed)
             usleep(10000);
@@ -3495,9 +3506,7 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed)
     if (!hasFullPositionMap)
         decoder->SetPositionMap();
 
-    m_playbackinfo->SetMarkupFlag(MARK_PROCESSING, false, m_db->db());
-    // also clears processing status
-    m_playbackinfo->SetCommFlagged(1, m_db->db());
+    m_playbackinfo->SetCommFlagged(COMM_FLAG_DONE, m_db->db());
     m_db->unlock();
 
     return(comms_found);

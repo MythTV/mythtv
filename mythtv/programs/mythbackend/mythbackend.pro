@@ -20,7 +20,8 @@ LIBS += -lmythavcodec-$$LIBVERSION -lmyth-$$LIBVERSION $$EXTRA_LIBS
 # Input
 HEADERS += autoexpire.h encoderlink.h filetransfer.h httpstatus.h mainserver.h
 HEADERS += playbacksock.h scheduler.h server.h transcoder.h housekeeper.h
+HEADERS += commercialflag.h
 
 SOURCES += autoexpire.cpp encoderlink.cpp filetransfer.cpp httpstatus.cpp
 SOURCES += main.cpp mainserver.cpp playbacksock.cpp scheduler.cpp server.cpp
-SOURCES += transcoder.cpp housekeeper.cpp
+SOURCES += transcoder.cpp housekeeper.cpp commercialflag.cpp

@@ -366,6 +366,50 @@ public:
     };
 };
 
+class CommercialSkipCPU: public ComboBoxSetting, public BackendSetting {
+public:
+    CommercialSkipCPU():
+        BackendSetting("CommercialSkipCPU") {
+
+        setLabel(QObject::tr("CPU Usage"));
+        addSelection(QObject::tr("Low (run 'niced' and give up cpu time every frame)"), "0");
+        addSelection(QObject::tr("Medium (run 'niced')"), "1");
+        addSelection(QObject::tr("High (run full-speed)"), "2");
+        setHelpText(QObject::tr("This setting determines approximately how "
+                    "much CPU Commercial Detection threads will consume. "
+                    "At full speed, all available CPU time will be used "
+                    "which may cause problems on slow systems." ));
+    };
+};
+
+class CommercialSkipHost: public ComboBoxSetting, public BackendSetting {
+public:
+    CommercialSkipHost():
+        BackendSetting("CommercialSkipHost") {
+        setLabel(QObject::tr("Commercial Detection Processing Host"));
+
+        addSelection(QObject::tr("Default"), "Default");
+        
+        QSqlDatabase *db = QSqlDatabase::database();
+        QString thequery = QString("SELECT DISTINCT hostname from settings");
+        QSqlQuery query = db->exec(thequery);
+
+        if (query.isActive() && query.numRowsAffected() > 0)
+            while (query.next())
+            {
+                if ((query.value(0).toString() != "") &&
+                    (query.value(0).toString() != QString::null))
+                    addSelection(query.value(0).toString(),
+                                 query.value(0).toString());
+            }
+
+        setHelpText(QObject::tr("Select 'Default' to run Commercial "
+                                "Detection on the same backend a show was "
+                                "recorded on.  Select a hostname to run all "
+                                "detection jobs on a specific host."));
+    };
+};
+
 class AutoCommercialSkip: public ComboBoxSetting, public GlobalSetting {
 public:
     AutoCommercialSkip():
@@ -2367,6 +2411,8 @@ PlaybackSettings::PlaybackSettings()
     comms->setLabel(QObject::tr("Commercial Detection"));
     comms->addChild(new AutoCommercialFlag());
     comms->addChild(new CommercialSkipMethod());
+    comms->addChild(new CommercialSkipCPU());
+    comms->addChild(new CommercialSkipHost());
     comms->addChild(new AggressiveCommDetect());
     comms->addChild(new CommSkipAllBlanks());
     comms->addChild(new CommRewindAmount());

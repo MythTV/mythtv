@@ -1778,11 +1778,18 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
     QSqlQuery result = db->exec(query);
 
     if (result.isActive() && result.numRowsAffected() > 0)
-	popup->addButton(tr("Stop Transcoding"), this,
-		     SLOT(doBeginTranscoding()));
+        popup->addButton(tr("Stop Transcoding"), this,
+                         SLOT(doBeginTranscoding()));
     else
-	popup->addButton(tr("Begin Transcoding"), this,
-		     SLOT(doBeginTranscoding()));
+        popup->addButton(tr("Begin Transcoding"), this,
+                         SLOT(doBeginTranscoding()));
+
+    if (curitem->IsCommProcessing(db))
+        popup->addButton(tr("Stop Commercial Flagging"), this,
+                         SLOT(doBeginFlagging()));
+    else
+        popup->addButton(tr("Begin Commercial Flagging"), this,
+                         SLOT(doBeginFlagging()));
 
     popup->addButton(tr("Delete"), this, SLOT(askDelete()));
     popup->addButton(tr("Cancel"), this, SLOT(doCancel()));
@@ -1943,6 +1950,53 @@ void PlaybackBox::doBeginTranscoding()
 
 }
 
+void PlaybackBox::doBeginFlagging()
+{
+    if (!expectingPopup)
+        return;
+
+    cancelPopup();
+
+    QString message;
+
+    QSqlDatabase *db = QSqlDatabase::database();
+
+    ProgramInfo *tmpItem = findMatchingProgInShowDateData(curitem);
+    QString detectionHost = gContext->GetSetting("CommercialSkipHost");
+
+    if (detectionHost == "Default")
+        detectionHost = "master";
+
+    if (curitem->IsCommProcessing(db))
+    {
+        message = QString("GLOBAL_COMMFLAG STOP %1 %2 %3")
+                          .arg(curitem->chanid)
+                          .arg(curitem->startts.toString(Qt::ISODate))
+                          .arg(detectionHost);
+        if (tmpItem)
+        {
+            tmpItem->programflags &= ~FL_EDITING;
+            tmpItem->programflags &= ~FL_COMMFLAG;
+        }
+    }
+    else
+    {
+        message = QString("GLOBAL_COMMFLAG START %1 %2 %3")
+                          .arg(curitem->chanid)
+                          .arg(curitem->startts.toString(Qt::ISODate))
+                          .arg(detectionHost);
+        if (tmpItem)
+        {
+            tmpItem->programflags |= FL_EDITING;
+            tmpItem->programflags &= ~FL_COMMFLAG;
+        }
+    }
+
+    RemoteSendMessage(message);
+
+    update(listRect);
+}
+
 void PlaybackBox::askDelete(void)
 {
     if (!expectingPopup)
@@ -1993,6 +2047,20 @@ void PlaybackBox::doDeleteForgetHistory(void)
     timer->start(500);
 }
 
+ProgramInfo *PlaybackBox::findMatchingProgInShowDateData(ProgramInfo *pginfo)
+{
+    QMap<QString, ProgramInfo>::Iterator it;
+
+    for (it = showDateData.begin(); it != showDateData.end(); it++)
+    {
+        if (((*it).startts == pginfo->startts) &&
+            ((*it).chanid == pginfo->chanid))
+            return(&(*it));
+    }
+
+    return(NULL);
+}
+
 void PlaybackBox::noAutoExpire(void)
 {
     if (!expectingPopup && delitem)
@@ -2003,7 +2071,16 @@ void PlaybackBox::noAutoExpire(void)
     QSqlDatabase *db = QSqlDatabase::database();
     delitem->SetAutoExpire(false, db);
 
+    ProgramInfo *tmpItem = findMatchingProgInShowDateData(delitem);
+    if (tmpItem)
+        tmpItem->programflags &= ~FL_AUTOEXP;
+
+    delete delitem;
+    delitem = NULL;
+
     state = kChanging;
+
+    update(listRect);
 }
 
 void PlaybackBox::doAutoExpire(void)
@@ -2016,7 +2093,16 @@ void PlaybackBox::doAutoExpire(void)
     QSqlDatabase *db = QSqlDatabase::database();
     delitem->SetAutoExpire(true, db);
 
+    ProgramInfo *tmpItem = findMatchingProgInShowDateData(delitem);
+    if (tmpItem)
+        tmpItem->programflags |= FL_AUTOEXP;
+
+    delete delitem;
+    delitem = NULL;
+
     state = kChanging;
+
+    update(listRect);
 }
 
 void PlaybackBox::doCancel(void)

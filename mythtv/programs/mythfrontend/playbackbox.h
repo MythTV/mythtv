@@ -80,6 +80,7 @@ class PlaybackBox : public MythDialog
     void changeRecGroupPassword();
     void changeOldPasswordChanged(const QString &newText);
     void doBeginTranscoding();
+    void doBeginFlagging();
   protected:
     void paintEvent(QPaintEvent *);
     void keyPressEvent(QKeyEvent *e);
@@ -125,6 +126,8 @@ class PlaybackBox : public MythDialog
     QMap<QString, QString> showList;
     QMap<QString, ProgramInfo> showData;
     QMap<QString, ProgramInfo> showDateData;
+
+    ProgramInfo *findMatchingProgInShowDateData(ProgramInfo *);
 
     BoxType type;
 

@@ -103,6 +103,9 @@ class MainServer : public QObject
 
     bool isRingBufSock(QSocket *sock);
 
+    static void *SpawnDeleteRecordedMarkup(void *param);
+    void DoSpawnDeleteRecordedMarkup(QString chanid, QString startts);
+
     QMap<int, EncoderLink *> *encoderList;
 
     MythServer *mythserver;

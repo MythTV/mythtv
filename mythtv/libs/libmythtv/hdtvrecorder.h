@@ -80,8 +80,8 @@ class HDTVRecorder : public RecorderBase
     int m_header_sync;
 
     QMap<long long, long long> positionMap;
+    QMap<long long, long long> positionMapDelta;
 
-    long long prev_gop_save_pos;
     int firstgoppos;
     int desired_program;
 

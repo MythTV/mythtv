@@ -141,10 +141,6 @@ class TVRec
     void RunTV(void);
     static void *EventThread(void *param);
 
-    void DoFlagCommercialsThread(void);
-    static void *FlagCommercialsThread(void *param);
-    void FlagCommercials(void);
-
  private:
     void SetChannel(bool needopen = false);
 
@@ -217,14 +213,9 @@ class TVRec
     bool readthreadlive;
     QMutex readthreadLock;
 
-    bool flagthreadstarted;
-
     int m_capturecardnum;
 
     bool ispip;
-
-    QPtrList <ProgramInfo> commercialFlag;
-    pthread_mutex_t commLock;
 
     bool askAllowRecording;
     bool recordPending;

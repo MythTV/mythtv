@@ -437,19 +437,19 @@ bool MpegRecorder::SetupRecording(void)
 
     ic->build_index = 0;
 
-    prev_gop_save_pos = -1;
-
     return true;
 }
 
 void MpegRecorder::FinishRecording(void)
 {
-    if (curRecording && db_lock && db_conn)
+    if (curRecording && positionMapDelta.size() && db_lock && db_conn)
     {
         pthread_mutex_lock(db_lock);
         MythContext::KickDatabase(db_conn);
-        curRecording->SetPositionMap(positionMap, MARK_GOP_START, db_conn);
+        curRecording->SetPositionMapDelta(positionMapDelta, MARK_GOP_START,
+                                          db_conn);
         pthread_mutex_unlock(db_lock);
+        positionMapDelta.clear();
     }
 }
 
@@ -536,16 +536,17 @@ void MpegRecorder::ProcessData(unsigned char *buffer, int len)
                 long long keyCount = frameNum / keyframedist;
 
                 positionMap[keyCount] = startpos;
+                positionMapDelta[keyCount] = startpos;
 
                 if (curRecording && db_lock && db_conn &&
-                    ((positionMap.size() % 30) == 0))
+                    ((positionMapDelta.size() % 30) == 0))
                 {
                     pthread_mutex_lock(db_lock);
                     MythContext::KickDatabase(db_conn);
-                    curRecording->SetPositionMap(positionMap, MARK_GOP_START,
-                            db_conn, prev_gop_save_pos, keyCount);
+                    curRecording->SetPositionMapDelta(positionMapDelta,
+                            MARK_GOP_START, db_conn);
                     pthread_mutex_unlock(db_lock);
-                    prev_gop_save_pos = keyCount + 1;
+                    positionMapDelta.clear();
                 }
             }
         }
@@ -578,6 +579,15 @@ void MpegRecorder::Reset(void)
     framesWritten = 0;
 
     positionMap.clear();
+    positionMapDelta.clear();
+
+    if (curRecording && db_lock && db_conn)
+    {
+        pthread_mutex_lock(db_lock);
+        MythContext::KickDatabase(db_conn);
+        curRecording->ClearPositionMap(MARK_GOP_START, db_conn);
+        pthread_mutex_unlock(db_lock);
+    }
 }
 
 void MpegRecorder::Pause(bool clear)

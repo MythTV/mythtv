@@ -644,11 +644,3 @@ char *EncoderLink::GetScreenGrab(ProgramInfo *pginfo, const QString &filename,
     return NULL;
 }
 
-bool EncoderLink::isParsingCommercials(ProgramInfo *pginfo)
-{
-    if (local)
-        return tv->isParsingCommercials(pginfo);
-
-    return false;
-}
-

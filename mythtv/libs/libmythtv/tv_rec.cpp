@@ -58,7 +58,6 @@ TVRec::TVRec(int capturecardnum)
     autoTranscode = 0;
 
     pthread_mutex_init(&db_lock, NULL);
-    pthread_mutex_init(&commLock, NULL);
 
     ConnectDB(capturecardnum);
 
@@ -534,7 +533,7 @@ void TVRec::HandleStateChange(void)
             VERBOSE(VB_IMPORTANT, "Tuning Error -- aborting recording");
 
         if (nvr->IsRecording())
-	{
+        {
             // evil.
             channel->SetFd(nvr->GetVideoFd());
             frameRate = nvr->GetFrameRate();
@@ -703,7 +702,27 @@ void TVRec::TeardownRecorder(bool killFile)
         {
             if ((gContext->GetNumSetting("AutoCommercialFlag", 1)) &&
                 (prevRecording->chancommfree == 0))
-                FlagCommercials();
+            {
+                QString detectionHost =
+                            gContext->GetSetting("CommercialSkipHost");
+
+                if (detectionHost == "Default")
+                    detectionHost = gContext->GetHostName();
+
+                QString message = QString("GLOBAL_COMMFLAG START %1 %2 %3")
+                           .arg(prevRecording->chanid)
+                           .arg(prevRecording->recstartts.toString(Qt::ISODate))
+                           .arg(detectionHost);
+                MythEvent me(message);
+                gContext->dispatch(me);
+            }
+
+            if (prevRecording->chancommfree != 0)
+            {
+                pthread_mutex_lock(&db_lock);
+                prevRecording->SetCommFlagged(COMM_FLAG_COMMFREE, db_conn);
+                pthread_mutex_unlock(&db_lock);
+            }
 
             if (autoTranscode)
             {
@@ -2110,66 +2129,6 @@ int TVRec::RequestRingBufferBlock(int size)
     return tot;
 }
 
-void TVRec::DoFlagCommercialsThread(void)
-{
-    ProgramInfo *program_info = new ProgramInfo(*prevRecording);
-
-    flagthreadstarted = true;
-
-    QString name = QString("commercial%1%2").arg(getpid()).arg(rand());
-
-    MythSqlDatabase *commthread_db = new MythSqlDatabase(name);
-
-    if (!commthread_db || !commthread_db->isOpen())
-        return;
-
-    nice(19);
-
-    pthread_mutex_lock(&commLock);
-    commercialFlag.append(program_info);
-    pthread_mutex_unlock(&commLock);
-
-    QString filename = program_info->GetRecordFilename(
-                                gContext->GetSetting("RecordFilePrefix"));
-
-    RingBuffer *tmprbuf = new RingBuffer(filename, false);
-
-    NuppelVideoPlayer *nvp = new NuppelVideoPlayer(commthread_db, program_info);
-    nvp->SetRingBuffer(tmprbuf);
-
-    nvp->FlagCommercials();
-
-    pthread_mutex_lock(&commLock);
-    commercialFlag.removeRef(program_info);
-    pthread_mutex_unlock(&commLock);
-
-    delete nvp;
-    delete tmprbuf;
-    delete program_info;
-    delete commthread_db;
-}
-
-void *TVRec::FlagCommercialsThread(void *param)
-{
-    TVRec *thetv = (TVRec *)param;
-    thetv->DoFlagCommercialsThread();
-
-    return NULL;
-}
-
-void TVRec::FlagCommercials(void)
-{
-    flagthreadstarted = false;
-
-    pthread_attr_t attr;
-    pthread_attr_init(&attr);
-    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-    pthread_create(&commercials, &attr, FlagCommercialsThread, this);
-
-    while (!flagthreadstarted)
-        usleep(50);
-}
-
 void TVRec::RetrieveInputChannels(map<int, QString> &inputChannel,
                                   map<int, QString> &inputTuneTo,
                                   map<int, QString> &externalChanger,
@@ -2236,21 +2195,5 @@ void TVRec::StoreInputChannels(map<int, QString> &inputChannel)
     }
 
     pthread_mutex_unlock(&db_lock);
-}
-
-bool TVRec::isParsingCommercials(ProgramInfo *pginfo)
-{
-    ProgramInfo *pinfo;
-    pthread_mutex_lock(&commLock);
-    for (pinfo = commercialFlag.first(); pinfo; pinfo = commercialFlag.next())
-    {
-        if(pginfo->chanid == pinfo->chanid || pginfo->recstartts == pinfo->recstartts)
-        {
-            pthread_mutex_unlock(&commLock);
-            return true;
-        }
-    }
-    pthread_mutex_unlock(&commLock);
-    return false;
 }
 

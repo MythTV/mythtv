@@ -170,7 +170,6 @@ void DVBRecorder::ChannelChanged(dvb_channel_t& chan)
     channel_changed = true;
 
     framesWritten = 0;
-    prev_gop_save_pos = -1;
     memset(prvpkt, 0, 3);
 }
 
@@ -597,12 +596,14 @@ int DVBRecorder::GetVideoFd(void)
 
 void DVBRecorder::FinishRecording()
 {
-    if (curRecording && db_lock && db_conn)
+    if (curRecording && positionMapDelta.size() && db_lock && db_conn)
     {
         pthread_mutex_lock(db_lock);
         MythContext::KickDatabase(db_conn);
-        curRecording->SetPositionMap(positionMap, MARK_GOP_BYFRAME, db_conn);
+        curRecording->SetPositionMapDelta(positionMapDelta, MARK_GOP_BYFRAME,
+                                          db_conn);
         pthread_mutex_unlock(db_lock);
+        positionMapDelta.clear();
     }
 }
 
@@ -669,18 +670,18 @@ void DVBRecorder::LocalProcessData(unsigned char *buffer, int len)
                         long long startpos = ringBuffer->GetFileWritePosition();
 
                         positionMap[framesWritten] = startpos;
+                        positionMapDelta[framesWritten] = startpos;
 
                         if (curRecording && db_lock && db_conn &&
-                            ((positionMap.size() % 30) == 0))
+                            ((positionMapDelta.size() % 30) == 0))
                         {
                             pthread_mutex_lock(db_lock);
                             MythContext::KickDatabase(db_conn);
-                            curRecording->SetPositionMap(
-                                            positionMap, MARK_GOP_BYFRAME,
-                                            db_conn, prev_gop_save_pos,
-                                            framesWritten);
+                            curRecording->SetPositionMapDelta(
+                                            positionMapDelta, MARK_GOP_BYFRAME,
+                                            db_conn);
                             pthread_mutex_unlock(db_lock);
-                            prev_gop_save_pos = framesWritten + 1;
+                            positionMapDelta.clear();
                         }
                     }
                     break;
@@ -711,6 +712,15 @@ void DVBRecorder::Reset(void)
     framesWritten = 0;
 
     positionMap.clear();
+    positionMapDelta.clear();
+
+    if (curRecording && db_lock && db_conn)
+    {
+        pthread_mutex_lock(db_lock);
+        MythContext::KickDatabase(db_conn);
+        curRecording->ClearPositionMap(MARK_GOP_BYFRAME, db_conn);
+        pthread_mutex_unlock(db_lock);
+    }
 }
 
 void DVBRecorder::Pause(bool clear)

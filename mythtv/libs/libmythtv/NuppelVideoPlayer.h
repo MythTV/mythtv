@@ -114,7 +114,8 @@ class NuppelVideoPlayer
                                int *did_ff, bool *is_key, bool honorCutList);
     void TranscodeWriteText(void (*func)(void *, unsigned char *, int, int, int), void *ptr);
 
-    int FlagCommercials(bool showPercentage = false, bool fullSpeed = false);
+    int FlagCommercials(bool showPercentage = false, bool fullSpeed = false,
+                        bool *abortFlag = NULL);
 
     VideoFrame *GetCurrentFrame(int &w, int &h);
     void ReleaseCurrentFrame(VideoFrame *frame);

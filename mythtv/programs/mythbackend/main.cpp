@@ -17,6 +17,7 @@ using namespace std;
 #include "autoexpire.h"
 #include "scheduler.h"
 #include "transcoder.h"
+#include "commercialflag.h"
 #include "mainserver.h"
 #include "encoderlink.h"
 #include "remoteutil.h"
@@ -30,6 +31,7 @@ QMap<int, EncoderLink *> tvList;
 AutoExpire *expirer = NULL;
 Scheduler *sched = NULL;
 Transcoder *trans = NULL;
+CommercialFlagger *commflag = NULL;
 QString pidfile;
 QString lockfile_location;
 HouseKeeper *housekeeping = NULL;
@@ -470,6 +472,13 @@ int main(int argc, char **argv)
         return -1;
     }
 
+    QSqlDatabase *flagthread = QSqlDatabase::addDatabase("QMYSQL3", "FLAGDB");
+    if (!flagthread)
+    {
+        cerr << "Couldn't connect to database\n";
+        return -1;
+    }
+
     QSqlDatabase *msdb = QSqlDatabase::addDatabase("QMYSQL3", "MSDB");
     if (!msdb)
     {
@@ -481,6 +490,7 @@ int main(int argc, char **argv)
         !gContext->OpenDatabase(expthread) ||
         !gContext->OpenDatabase(hkthread) ||
         !gContext->OpenDatabase(transthread) ||
+        !gContext->OpenDatabase(flagthread) ||
         !gContext->OpenDatabase(msdb))
     {
         cerr << "Couldn't open database\n";
@@ -570,6 +580,9 @@ int main(int argc, char **argv)
 
     QSqlDatabase *trandb = QSqlDatabase::database("TRANSDB");
     trans = new Transcoder(&tvList, trandb);
+
+    QSqlDatabase *flagdb = QSqlDatabase::database("FLAGDB");
+    commflag = new CommercialFlagger(ismaster, flagdb);
 
     VERBOSE(VB_ALL, QString("%1 version: %2 www.mythtv.org")
                             .arg(binname).arg(MYTH_BINARY_VERSION));

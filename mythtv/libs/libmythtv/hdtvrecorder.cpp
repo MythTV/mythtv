@@ -268,19 +268,19 @@ int HDTVRecorder::GetVideoFd(void)
 
 bool HDTVRecorder::SetupRecording(void)
 {
-    prev_gop_save_pos = -1;
-
     return true;
 }
 
 void HDTVRecorder::FinishRecording(void)
 {
-    if (curRecording && db_lock && db_conn)
+    if (curRecording && positionMapDelta.size() && db_lock && db_conn)
     {
         pthread_mutex_lock(db_lock);
         MythContext::KickDatabase(db_conn);
-        curRecording->SetPositionMap(positionMap, MARK_GOP_BYFRAME, db_conn);
+        curRecording->SetPositionMapDelta(positionMapDelta, MARK_GOP_BYFRAME,
+                                          db_conn);
         pthread_mutex_unlock(db_lock);
+        positionMapDelta.clear();
     }
 }
 
@@ -399,18 +399,18 @@ void HDTVRecorder::FindKeyframes(const unsigned char *buffer,
                                 ringBuffer->GetFileWritePosition();
 
                             positionMap[frameNum] = startpos;
+                            positionMapDelta[frameNum] = startpos;
                             
                             if (curRecording && db_lock && db_conn &&
-                                ((positionMap.size() % 30) == 0))
+                                ((positionMapDelta.size() % 30) == 0))
                             {
                                 pthread_mutex_lock(db_lock);
                                 MythContext::KickDatabase(db_conn);
-                                curRecording->SetPositionMap(
-                                    positionMap, MARK_GOP_BYFRAME,
-                                    db_conn, prev_gop_save_pos, 
-                                    frameNum);
+                                curRecording->SetPositionMapDelta(
+                                    positionMapDelta, MARK_GOP_BYFRAME,
+                                    db_conn);
                                 pthread_mutex_unlock(db_lock);
-                                prev_gop_save_pos = frameNum + 1;
+                                positionMapDelta.clear();
                             }
                             
                         }
@@ -825,9 +825,16 @@ void HDTVRecorder::Reset(void)
     lowest_video_pid = 0x1fff;
     video_pid_packets = 0;
     
-    prev_gop_save_pos = -1;
-
     positionMap.clear();
+    positionMapDelta.clear();
+
+    if (curRecording && db_lock && db_conn)
+    {
+        pthread_mutex_lock(db_lock);
+        MythContext::KickDatabase(db_conn);
+        curRecording->ClearPositionMap(MARK_GOP_BYFRAME, db_conn);
+        pthread_mutex_unlock(db_lock);
+    }
 
     if (chanfd > 0) 
     {

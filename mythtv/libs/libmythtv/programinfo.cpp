@@ -1075,7 +1075,7 @@ bool ProgramInfo::IsCommFlagged(QSqlDatabase *db)
     {
         query.next();
 
-        result = (query.value(0).toInt() == 1);
+        result = (query.value(0).toInt() == COMM_FLAG_DONE);
     }
 
     return result;
@@ -1115,7 +1115,7 @@ bool ProgramInfo::IsCommProcessing(QSqlDatabase *db)
     {
         query.next();
 
-        result = (query.value(0).toInt() == 2);
+        result = (query.value(0).toInt() == COMM_FLAG_PROCESSING);
     }
 
     return result;
@@ -1450,6 +1450,20 @@ void ProgramInfo::GetPositionMap(QMap<long long, long long> &posMap, int type,
     }
 }
 
+void ProgramInfo::ClearPositionMap(int type, QSqlDatabase *db)
+{
+    QString starts = recstartts.toString("yyyyMMddhhmm");
+    starts += "00";
+
+    QString querystr = QString("DELETE FROM recordedmarkup "
+                               "WHERE chanid = '%1' AND starttime = '%2' "
+                               "AND type = %3;")
+                               .arg(chanid).arg(starts).arg(type);
+    QSqlQuery query = db->exec(querystr);
+    if (!query.isActive())
+        MythContext::DBError("clear position map", querystr);
+}
+
 void ProgramInfo::SetPositionMap(QMap<long long, long long> &posMap, int type,
                                  QSqlDatabase *db, long long min_frame,
                                  long long max_frame)
@@ -1514,6 +1528,41 @@ void ProgramInfo::SetPositionMap(QMap<long long, long long> &posMap, int type,
         QSqlQuery subquery = db->exec(querystr);
         if (!subquery.isActive())
             MythContext::DBError("position map insert", querystr);
+    }
+}
+
+void ProgramInfo::SetPositionMapDelta(QMap<long long, long long> &posMap, int type,
+                                      QSqlDatabase *db)
+{
+    QMap<long long, long long>::Iterator i;
+
+cerr << "SetPositionMapDelta: size: " << posMap.size() << endl;
+    QString starts = recstartts.toString("yyyyMMddhhmm");
+    starts += "00";
+
+    for (i = posMap.begin(); i != posMap.end(); ++i)
+    {
+        long long frame = i.key();
+        char tempc[128];
+        sprintf(tempc, "%lld", frame);
+
+        QString frame_str = tempc;
+
+        long long offset = i.data();
+        sprintf(tempc, "%lld", offset);
+       
+        QString offset_str = tempc;
+
+        QString querystr = QString("INSERT INTO recordedmarkup (chanid, starttime, "
+                           "mark, type, offset) values "
+                           "( '%1', '%2', %3, %4, \"%5\");")
+                           .arg(chanid).arg(starts)
+                           .arg(frame_str).arg(type)
+                           .arg(offset_str);
+
+        QSqlQuery subquery = db->exec(querystr);
+        if (!subquery.isActive())
+            MythContext::DBError("delta position map insert", querystr);
     }
 }
 
@@ -1928,10 +1977,11 @@ int ProgramInfo::getProgramFlags(QSqlDatabase *db)
     {
         query.next();
 
-        flags |= (query.value(0).toInt() == 1) ? FL_COMMFLAG : 0;
+        flags |= (query.value(0).toInt() == COMM_FLAG_DONE) ? FL_COMMFLAG : 0;
         flags |= query.value(1).toString().length() > 1 ? FL_CUTLIST : 0;
         flags |= query.value(2).toInt() ? FL_AUTOEXP : 0;
-        if (query.value(3).toInt() || (query.value(0).toInt() == 2))
+        if ((query.value(3).toInt()) ||
+            (query.value(0).toInt() == COMM_FLAG_PROCESSING))
             flags |= FL_EDITING;
         flags |= query.value(4).toString().length() > 1 ? FL_BOOKMARK : 0;
     }

@@ -70,8 +70,8 @@ class MpegRecorder : public RecorderBase
     bool gopset;
 
     QMap<long long, long long> positionMap;
+    QMap<long long, long long> positionMapDelta;
 
-    long long prev_gop_save_pos;
     static const int audRateL1[];
     static const int audRateL2[];
     static const char* streamType[];

@@ -99,8 +99,6 @@ class EncoderLink
                         int secondsin, int &bufferlen,
                         int &video_width, int &video_height);
 
-    bool isParsingCommercials(ProgramInfo *pginfo);
-
   private:
     int m_capturecardnum;
 

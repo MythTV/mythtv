@@ -104,7 +104,7 @@ private:
     bool signal_monitor_quit;
 
     QMap<long long, long long> positionMap;
-    long long prev_gop_save_pos;
+    QMap<long long, long long> positionMapDelta;
 
     bool    dvb_on_demand;
     bool    isopen;

@@ -12,7 +12,6 @@
 enum MarkTypes {
     MARK_UPDATED_CUT = -3,
     MARK_EDIT_MODE = -2,
-    MARK_PROCESSING = -1,
     MARK_CUT_END = 0,
     MARK_CUT_START = 1,
     MARK_BOOKMARK = 2,
@@ -23,6 +22,13 @@ enum MarkTypes {
     MARK_KEYFRAME = 7,
     MARK_SCENE_CHANGE = 8,
     MARK_GOP_BYFRAME = 9
+};
+
+enum CommFlagStatuses {
+    COMM_FLAG_NOT_FLAGGED = 0,
+    COMM_FLAG_DONE = 1,
+    COMM_FLAG_PROCESSING = 2,
+    COMM_FLAG_COMMFREE = 3
 };
 
 enum TranscoderStatus {
@@ -166,9 +172,12 @@ class ProgramInfo
     void SetMarkupFlag(int type, bool processing, QSqlDatabase *db);
     void GetPositionMap(QMap<long long, long long> &posMap, int type,
                         QSqlDatabase *db);
+    void ClearPositionMap(int type, QSqlDatabase *db);
     void SetPositionMap(QMap<long long, long long> &posMap, int type,
                         QSqlDatabase *db,
                         long long min_frame = -1, long long max_frame = -1);
+    void SetPositionMapDelta(QMap<long long, long long> &posMap, int type,
+                             QSqlDatabase *db);
 
     void DeleteHistory(QSqlDatabase *db);
     QString RecTypeChar(void);
