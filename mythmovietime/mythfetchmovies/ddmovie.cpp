@@ -21,10 +21,43 @@
  *
  * ============================================================ */
 
-#include <qfile.h>
+
 #include "mythtv/mythcontext.h"
 #include <mythtv/mythdbcon.h>
 #include "ddmovie.h"
+ 
+
+FILE* TMSMovieDirect::fetchData(const QString& user, const QString& pass, 
+                                const QString& postalCode, double radius, int days)
+{
+    FILE* ret = NULL;
+    
+    QString ddMoviesURL = gContext->GetSetting("movietime-ddurl",
+                                               "http://webservices.stage.tms.tribune.com/moviedata/xmd");
+    QString ddCustID = gContext->GetSetting("movietime-ddcustomer", "TNV01");
+                    
+    QString url = QString("%1?customer=%2\\&postalCode=%3\\&radius=%4\\&numberOfDays=%5")
+                          .arg(ddMoviesURL)
+                          .arg(ddCustID)
+                          .arg(postalCode)
+                          .arg(radius)
+                          .arg(days);
+    
+
+    QString command = QString("wget --http-user='%1' --http-passwd='%2' "
+                              "--header='Accept-Encoding:gzip'"
+                              " %3 --output-document=- | gzip -df")
+                             .arg(user)
+                             .arg(pass)
+                             .arg(url);
+
+
+
+    
+    
+    ret = popen(command.ascii(), "r");
+    return ret;
+}
 
 
 
@@ -57,10 +90,10 @@ bool TMSMovieDirect::store()
     return true;
 }
 
-bool TMSMovieDirect::importFile(const char* filename)
+bool TMSMovieDirect::importFile(const QString& filename)
 {
     QFile f(filename);
-    QDomDocument doc;
+    
     
     if (!filename || !f.open(IO_ReadOnly))
     {
@@ -69,6 +102,30 @@ bool TMSMovieDirect::importFile(const char* filename)
         return false;
     }
     
+    return importFile(f);
+}
+
+
+bool TMSMovieDirect::importData(const QString& user, const QString& pass, const QString& postalCode, double radius, int days)
+{
+    FILE* fp = fetchData(user, pass, postalCode, radius, days);
+    if (!fp)
+        return false;
+   
+    QFile f;
+
+    if (!f.open(IO_ReadOnly, fp)) 
+    {
+       VERBOSE(VB_GENERAL,"Error opening DataDirect file");
+       return false;
+    }
+    
+    return importFile(f);
+}
+
+bool TMSMovieDirect::importFile(QFile& f)
+{   
+    QDomDocument doc;     
     QString errorMsg;
     int errorLine = 0;
     int errorColumn = 0;
@@ -77,7 +134,7 @@ bool TMSMovieDirect::importFile(const char* filename)
     {
         VERBOSE(VB_IMPORTANT, QString("TMSMovieDirect::importFile: Error, parsing %1\n"
                                        "at line: %2  column: %3 msg: %4").
-                                       arg(filename).arg(errorLine).arg(errorColumn).arg(errorMsg));
+                                       arg(f.name()).arg(errorLine).arg(errorColumn).arg(errorMsg));
         f.close();
         return false;        
     }

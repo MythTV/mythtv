@@ -31,6 +31,10 @@ void showUsage()
     cout << "Usage:" << endl;
     cout << "   --file <filename>" << endl;
     cout << "       Import data from the given file." << endl << endl;
+    cout << "   --user <username>" << endl;
+    cout << "       The user ID to authenticate on the web server with." << endl << endl;
+    cout << "   --pass <password>" << endl;
+    cout << "       The password to authenticate on the web server with." << endl << endl;
     cout << "   --help" << endl;
     cout << "       This text." << endl << endl;
 }
@@ -38,7 +42,7 @@ void showUsage()
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv, false);
-    QString filename;
+    QString filename, user, passwd;
     int argpos = 1;
     
     while (argpos < a.argc())
@@ -46,6 +50,14 @@ int main(int argc, char *argv[])
         if (!strcmp(a.argv()[argpos], "--file"))
         {
             filename = a.argv()[++argpos];
+        }
+        else if (!strcmp(a.argv()[argpos], "--user"))
+        {
+            user = a.argv()[++argpos];
+        }
+        else if (!strcmp(a.argv()[argpos], "--pass"))
+        {
+            passwd = a.argv()[++argpos];
         }
         else if (!strcmp(a.argv()[argpos], "-h") ||
                  !strcmp(a.argv()[argpos], "--help"))
@@ -75,17 +87,21 @@ int main(int argc, char *argv[])
         return -1;
     }
     
+    TMSMovieDirect dd;
     if (!filename.isEmpty() )
     {
-        TMSMovieDirect dd;
         dd.importFile(filename);
-        dd.store();
+    }
+    else if (!user.isEmpty() && !passwd.isEmpty() )
+    {
+        dd.importData( user, passwd, "43319", 25 );
     }
     else
     {
         showUsage();
     }
     
+    dd.store();
     return 0;
 }
 

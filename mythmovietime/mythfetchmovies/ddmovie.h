@@ -29,6 +29,7 @@
 #include <qdom.h>
 #include <qsqldatabase.h>
 #include <qsqlquery.h>
+#include <qfile.h>
 
 class TMSCrewmember
 {
@@ -225,7 +226,13 @@ class TMSMovieDirect
 {
     public:
         TMSMovieDirect() { clearValues(); }
-        bool importFile( const char* filename);
+        
+        bool importFile(const QString& filename);
+        bool importFile(QFile& f);
+        bool importData(const QString& user, const QString& pass, 
+                        const QString& postalCode, 
+                        double radius, int days = 7);
+            
         bool store();
         
         bool parseTheaters(const QDomElement& elem);
@@ -258,6 +265,11 @@ class TMSMovieDirect
         
         typedef  QValueList<TMSFilm> FilmList;
         FilmList Films;
+    
+    protected:
+        FILE* fetchData(const QString& user, const QString& pass, 
+                        const QString& postalCode, double radius, int days = 7);
+
 };
 
 #endif
