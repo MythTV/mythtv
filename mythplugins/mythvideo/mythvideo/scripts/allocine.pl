@@ -264,17 +264,45 @@ sub getMoviePoster {
    my $page=parseBetween($response,"page=",".html\" class=\"link1\"><span class=\"text2\">Dernière photo");
    my @pages = split ("page=",$page);
    $request = "";
+
+   my $uri = "";
    for $page (@pages ) { 
-	        $request = $page;
-	      }
-	 if (!($request eq "")) {
-	    $request = "http://www.allocine.fr/film/galerie_gen_cfilm=" . $movieid . "&page=" . $request . ".html";
-	    $response = get $request;
-	 }
+        $request = $page;
+  	
+	#
+	# get only the page number
+	# 
+	$request = substr($request, 0, index($request, '.'));
+  
+        if (!($request eq "")) {
+	     $request = "http://www.allocine.fr/film/galerie_gen_cfilm=" . $movieid . "&page=" . $request . ".html";
+	     $response = get $request;
+        
+             $uri = parseBetween($response,"<table style=\"padding:0 0 0 0\" border=\"0\" >","Ko\" />");
+             $uri = parseBetween($uri ,"<img src=\"","\" border=\"0\" class=\"galerie\" ");
+        }
+	#
+	# stop when we have an poster...
+	#
+	last if ($uri =~ /affiche/)
+   }
 
-
-   my $uri = parseBetween($response,"<table style=\"padding:0 0 0 0\" border=\"0\" >","Ko\" />");
-   $uri = parseBetween($uri ,"<img src=\"","\" border=\"0\" class=\"galerie\" ");
+   #
+   # in case nothing was found fall back to the little poster...
+   #
+   if ($uri eq "" || $uri !~ /affiche/)
+   {
+	$request = "http://www.allocine.fr/film/fichefilm_gen_cfilm=" . $movieid .".html";
+	$response = get $request;
+	$response = parseBetween($response, "sousnav_separe_droite2.gif","sortie");
+	$uri = parseBetween($response, "<img src=\"","\"");
+   
+        #
+        # filter default Allocine background...
+        #
+        return if ($uri =~ /AffichetteAllocine/)
+   }
+ 
    print "$uri\n";
 }
 
@@ -301,6 +329,10 @@ sub getMovieList {
    if (rindex($query, '[') != -1) {
       $query = substr($query, 0, rindex($query, '[')); 
    }
+   # Strip off anything following '-' - people use this for general comments
+   if (index($query, '-') != -1) {
+      $query = substr($query, 0, index($query, '-')); 
+   }
 
    # IMDB searches do better if any trailing ,The is left off
    $query =~ /(.*), The$/i;
@@ -314,13 +346,17 @@ sub getMovieList {
    }
    my $count = 0;
    my $typerecherche = 3;
-   
+  
    while (($typerecherche <=5) && ($count ==0)){
 	   # get the search results  page
 	   my $request = "http://www.allocine.fr/recherche/?rub=1&motcle=$query";
 	   if (defined $opt_d) { printf("# request: '%s'\n", $request); }
 	   my $response = get $request;
-	
+
+	   #
+	   # don't try to invent if it doesn't exist
+	   #
+	   return if $response =~ /Pas de résultats/;
 	
 	   # extract possible matches
 	   #    possible matches are grouped in several catagories:  
@@ -332,7 +368,6 @@ sub getMovieList {
 	   
 	   my @movies;
 	
-	
 	   my $data = $exact_matches;
 	   if ($data eq "") {
 	      if (defined $opt_d) { printf("# no results\n"); }
@@ -340,7 +375,7 @@ sub getMovieList {
 	   }else{
 	      my $start = index($data, $beg);
 	      my $finish = index($data, $end, $start);
-	      
+	   
 	      my $title;
 	      while ($start != -1) {
 	         $start += length($beg);
@@ -412,11 +447,11 @@ elsif (defined $opt_P) {
 
 elsif (defined $opt_M) {
    # take query from cmdline arg
-   $options = shift || die "Usage : $0 -M [options] <query>\n";
-   $query = shift;
-   if (!$query) {
-      $query = $options;
-      $options = "";
+   #$options = shift || die "Usage : $0 -M <query>\n";
+   my $query;
+   my $options = '';
+   foreach $key (0 .. $#ARGV) {
+   	$query .= $ARGV[$key]. ' ';
    }
    getMovieList($query, $options);
 }
