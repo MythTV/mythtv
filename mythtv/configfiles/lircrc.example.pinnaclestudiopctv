@@ -116,6 +116,7 @@ begin
     prog = irexec
     button = Mute
     config = /usr/bin/amixer -q set Master,0 mute
+    config = /usr/bin/amixer -q set Master,0 unmute
 end
 
 begin
