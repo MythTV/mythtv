@@ -8,6 +8,7 @@
 ## 15 Apr 03	1.0	Hacked
 ## 16 Apr 03	1.0.1	Remove .log file when we start (may not be needed)
 ## 16 Apr 03	1.1	Added nice support and autoscale/fps support
+## 18 Jun 03	1.1.1	Added patch by Andrew Albinger to fix ' in string
 ##
 ## TODO:
 ## 1) Fine tune the --autoscale function
@@ -106,6 +107,7 @@ if ($getname) {
 		  print "string to execute=$getnamestr\n";
 		  $outname=`$getnamestr`;
 		  chomp $outname;
+                  $outname=~ s/'/\\'/;
 }
 print "outname=$outname\n";
 
