@@ -3,7 +3,7 @@
     <name>GameTree</name>
     <message>
         <source>All Games</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle Games</translation>
     </message>
 </context>
 <context>
@@ -840,19 +840,19 @@ Please enter the correct path and try again.</source>
     <name>ThemeUI</name>
     <message>
         <source>System:</source>
-        <translation type="unfinished"></translation>
+        <translation>Console:</translation>
     </message>
     <message>
         <source>Year:</source>
-        <translation type="unfinished"></translation>
+        <translation>Jaar:</translation>
     </message>
     <message>
         <source>Genre:</source>
-        <translation type="unfinished"></translation>
+        <translation>Genre:</translation>
     </message>
     <message>
         <source>Favorite:</source>
-        <translation type="unfinished"></translation>
+        <translation>Favoriet:</translation>
     </message>
 </context>
 </TS>
