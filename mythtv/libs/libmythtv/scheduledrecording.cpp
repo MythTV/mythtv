@@ -68,6 +68,7 @@ public:
 
     virtual void fillSelections(QSqlDatabase* db) {
         clearSelections();
+        addSelection(QObject::tr("(unspecified)"), "0");
         RecordingProfile::fillSelections(db, this, 0);
     };
 };

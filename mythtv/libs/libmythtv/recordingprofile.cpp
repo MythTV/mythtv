@@ -332,6 +332,15 @@ private:
     VideoCodecName* codecName;
 };
 
+class AutoTranscode: public CodecParam, public CheckBoxSetting {
+public:
+    AutoTranscode(const RecordingProfile& parent):
+        CodecParam(parent, "autotranscode") {
+        setLabel("Automatically transcode after recording");
+        setValue(false);
+    };
+};
+
 class ImageSize: public HorizontalConfigurationGroup {
 public:
     class Width: public SpinBoxSetting, public CodecParam {
@@ -396,6 +405,7 @@ RecordingProfile::RecordingProfile(QString profName)
         labelName = profName + "->Profile";
     profile->setLabel(labelName);
     profile->addChild(name = new Name(*this));
+    profile->addChild(new AutoTranscode(*this));
     addChild(profile);
 
     QString tvFormat = gContext->GetSetting("TVFormat");
@@ -516,7 +526,7 @@ void RecordingProfile::fillSelections(QSqlDatabase* db, SelectSetting* setting,
     if (group == 0)
     {
        for(int i = 0; availProfiles[i][0] != 0; i++)
-           setting->addSelection(availProfiles[i],QString::number(i));
+           setting->addSelection(availProfiles[i],availProfiles[i]);
     }
     else
     {

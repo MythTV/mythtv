@@ -8,7 +8,7 @@ using namespace std;
 
 #include "mythcontext.h"
 
-const QString currentDatabaseVersion = "1005";
+const QString currentDatabaseVersion = "1006";
 
 void UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -119,6 +119,28 @@ void UpgradeTVDatabaseSchema(void)
 
         UpdateDBVersionNumber("1005");
         dbver = "1005";
+    }
+
+    if (dbver == "1005")
+    {
+        VERBOSE(VB_ALL, "Upgrading to schema version 1006");
+
+        const QString updates[] = {
+"DELETE FROM settings where value = 'TranscoderAutoRun';",
+"ALTER TABLE record CHANGE profile profile VARCHAR(128);",
+"",
+};
+        int counter = 0;
+        QString thequery = updates[counter];
+        while (thequery != "")
+        {
+            db_conn->exec(thequery);
+            counter++;
+            thequery = updates[counter];
+        }
+
+        UpdateDBVersionNumber("1006");
+        dbver = "1006";
     }
 }
 

@@ -200,18 +200,6 @@ public:
     };
 };
 
-class TranscoderAutoRun: public CheckBoxSetting, public BackendSetting {
-public:
-    TranscoderAutoRun():
-        BackendSetting("TranscoderAutoRun") {
-        setLabel("Auto-run the transcoder after each recording");
-        setValue(0);
-        setHelpText("When set and the transcoder is active, the transcoder "
-                    "will run automatically after each recording finishes."
-                );
-        };
-};
-
 class TimeOffset: public ComboBoxSetting, public BackendSetting {
 public:
     TimeOffset():
@@ -302,7 +290,6 @@ BackendSettings::BackendSettings() {
     group1->addChild(new LiveBufferPrefix());
     group1->addChild(new BufferSize());
     group1->addChild(new MaxBufferFill());
-    group1->addChild(new TranscoderAutoRun());
     addChild(group1);
 
     VerticalConfigurationGroup* group2 = new VerticalConfigurationGroup(false);

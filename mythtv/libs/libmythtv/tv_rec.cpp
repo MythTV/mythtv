@@ -48,6 +48,7 @@ TVRec::TVRec(int capturecardnum)
     curRecording = NULL;
     pendingRecording = NULL;
     profileName = "";
+    autoTranscode = 0;
 
     pthread_mutex_init(&db_lock, NULL);
     pthread_mutex_init(&commLock, NULL);
@@ -456,6 +457,9 @@ void TVRec::HandleStateChange(void)
 
         pthread_mutex_unlock(&db_lock);
 
+        // Determine whether to automatically run the transcoder or not
+        autoTranscode = profile.byName("autotranscode")->getValue().toInt();
+
         SetupRecorder(profile);
         nvr->SetRecording(curRecording);
         nvr->SetDB(db_conn, &db_lock);
@@ -686,7 +690,7 @@ void TVRec::TeardownRecorder(bool killFile)
             if (gContext->GetNumSetting("AutoCommercialFlag", 1))
                 FlagCommercials();
 
-            if (gContext->GetNumSetting("TranscoderAutoRun", 0))
+            if (autoTranscode)
             {
                 QString message = QString("LOCAL_TRANSCODE %1 %2 %3")
                            .arg(prevRecording->chanid)

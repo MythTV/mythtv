@@ -218,6 +218,7 @@ class TVRec
     QDateTime recordPendingStart;
 
     QString profileName;
+    int autoTranscode;
 };
 
 #endif
