@@ -3,7 +3,7 @@
 
 <title>Installing and using mythtv
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-01-11, v1.071
+<date>2003-01-13, v1.073
 <abstract>
 Initially, installation of mythtv seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -922,9 +922,8 @@ configuration files that make it so you can recompile your kernel with
 Red Hat defaults. And as a side benefit, your kernel will be compiled  
 specifically for your architecture. For a more detailed description (or  
 if you run into trouble) of how to do this go to  
-<url url="http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/ 
-ch-custom-kernel.html" name="http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/ 
-ch-custom-kernel.html">
+<url url="http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/ch-custom-kernel.html" 
+name="http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/ch-custom-kernel.html">
 
 For the impatient:
 Make sure you have an emergency floppy boot disk available!
@@ -2013,6 +2012,10 @@ grabbed by another process, like <bf>esd</bf> or <bf>artsd</bf>.  If
 <tt>/dev/dsp</tt> isn't available, then mythtv won't work.  Check your
 windowmanager documentation for instructions on disabling the sound manager.
 
+If you're using multiple sound cards and multiple tuners, use <tt>alsamixer
+-c 1</tt> to work with the second sound card.  The first card is #0, the
+second card is #1, etc.
+
 <sect>Miscellaneous.
 <sect1>I'd like to watch the files without using mythtv / I'd like to convert the files to some other format.
 <p>Matthew Zimmerman has created a patch for MPlayer / Mencoder
@@ -2147,6 +2150,16 @@ You should see the connection established between the front-end and back-end
 systems by examining the mythbackend window; it will display the client
 connection attempts.
 
+The cvs version of mythtv now supports pressing the ESC key to exit the
+application.  If you wish to configure mythtv to exit on ESC, go to
+the mythfrontend setup screen (not the setup program used to initially
+configure mythtv) and enter the General configuration screen.  Move through
+the setup until you get to the System Shutdown parameter.  By default, this
+is set to "No", which means there is no defined exit key for mythtv.  If you
+set it to "No Modifier", this will mean that the ESC key is used to exit
+mythtv.  Control, Meta and ALT modifiers mean that the Modifier + ESC key
+must be pressed to activate the exit from mythtv.
+
 </article>
 <!-- Revision History
 v1.00, 2002-11-05.  Initial.
@@ -2245,6 +2258,9 @@ and artsd.  Added mythweather international example.
 v1.069, 2003-01-11.  Fixed keyboard commands for mythweather.
 v1.070, 2003-01-11.  Remove Mark Cooper's email address, per request.
 v1.071, 2003-01-11.  Added Gentoo lirc instructions.  Fixed xset command.
+v1.072, 2003-01-12.  Added alsamixer commands for multiple sound cards.
+v1.073, 2003-01-13.  Added text on configuring ESC to exit in CVS version of
+myth.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

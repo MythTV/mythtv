@@ -1,6 +1,6 @@
   Installing and using mythtv
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-01-11, v1.071
+  2003-01-13, v1.073
 
   Initially, installation of mythtv seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -1056,10 +1056,10 @@
   Red Hat defaults. And as a side benefit, your kernel will be compiled
   specifically for your architecture. For a more detailed description
   (or if you run into trouble) of how to do this go to
-  http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/
-  ch-custom-kernel.html
-  <http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/
-  ch-custom-kernel.html>
+  http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-
+  guide/ch-custom-kernel.html
+  <http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-
+  guide/ch-custom-kernel.html>
 
   For the impatient: Make sure you have an emergency floppy boot disk
   available!
@@ -2106,6 +2106,10 @@
   then mythtv won't work.  Check your windowmanager documentation for
   instructions on disabling the sound manager.
 
+  If you're using multiple sound cards and multiple tuners, use
+  alsamixer -c 1 to work with the second sound card.  The first card is
+  #0, the second card is #1, etc.
+
   [1m18.  Miscellaneous.[0m
 
   [1m18.1.  I'd like to watch the files without using mythtv / I'd like to[0m
@@ -2159,9 +2163,9 @@
   lose all of your settings and will need to re-run the mc.sql script to
   setup the database structure before running the setup program.
 
-       $ mysql -u root
-       mysql> drop database mythconverg;
-       mysql> quit
+  $ mysql -u root
+  mysql> drop database mythconverg;
+  mysql> quit
 
   [1m18.5.  I'd like to start using the development version of mythtv.[0m
 
@@ -2221,8 +2225,8 @@
 
   Once you're done editing the file, start the setup program:
 
-       $ cd setup
-       $ ./setup
+  $ cd setup
+  $ ./setup
 
   This will open the setup wizard which will allow you to graphically
   configure your system.
@@ -2239,4 +2243,15 @@
   You should see the connection established between the front-end and
   back-end systems by examining the mythbackend window; it will display
   the client connection attempts.
+
+  The cvs version of mythtv now supports pressing the ESC key to exit
+  the application.  If you wish to configure mythtv to exit on ESC, go
+  to the mythfrontend setup screen (not the setup program used to
+  initially configure mythtv) and enter the General configuration
+  screen.  Move through the setup until you get to the System Shutdown
+  parameter.  By default, this is set to "No", which means there is no
+  defined exit key for mythtv.  If you set it to "No Modifier", this
+  will mean that the ESC key is used to exit mythtv.  Control, Meta and
+  ALT modifiers mean that the Modifier + ESC key must be pressed to
+  activate the exit from mythtv.
 

@@ -238,6 +238,9 @@ speakers.</P>
 grabbed by another process, like <B>esd</B> or <B>artsd</B>.  If
 <CODE>/dev/dsp</CODE> isn't available, then mythtv won't work.  Check your
 windowmanager documentation for instructions on disabling the sound manager.</P>
+<P>If you're using multiple sound cards and multiple tuners, use <CODE>alsamixer
+-c 1</CODE> to work with the second sound card.  The first card is #0, the
+second card is #1, etc.</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-18.html">Next</A>
