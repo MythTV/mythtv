@@ -220,33 +220,25 @@ bool Scheduler::FillRecordLists(void)
 
     PruneOldRecords();
     AddNewRecords();
-    //cout << "after add records:" << endl;
-    //PrintList();
 
     reclist.sort(comp_priority);
-    //cout << "after priority sort:" << endl;;
-    //PrintList();
+
+    BuildListMaps();
 
     SchedNewRecords();
-    //cout << "after sched records:" << endl;
-    //PrintList();
 
     if (schedMoveHigher)
     {
         retrylist.sort(comp_retry);
         MoveHigherRecords();
         retrylist.clear();
-        //cout << "after move records:" << endl;
-        //PrintList();
     }
 
+    ClearListMaps();
+
     reclist.sort(comp_recstart);
-    //cout << "after recstart sort:" << endl;
-    //PrintList();
 
     PruneRedundants();
-    //cout << "after prune redundants:" << endl;
-    //PrintList();
 
     return hasconflicts;
 }
@@ -359,9 +351,28 @@ void Scheduler::PruneOldRecords(void)
     }
 }
 
-bool Scheduler::FindNextConflict(ProgramInfo *p, RecIter &j)
+void Scheduler::BuildListMaps(void)
 {
-    for ( ; j != reclist.end(); j++)
+    RecIter i = reclist.begin();
+    for ( ; i != reclist.end(); i++)
+    {
+        ProgramInfo *p = *i;
+        if (p->recstatus == rsRecording || p->recstatus == rsUnknown)
+            cardlistmap[p->cardid].push_back(p);
+        if (p->recstatus == rsUnknown)
+            titlelistmap[p->title].push_back(p);
+    }
+}
+
+void Scheduler::ClearListMaps(void)
+{
+    cardlistmap.clear();
+    titlelistmap.clear();
+}
+
+bool Scheduler::FindNextConflict(RecList &cardlist, ProgramInfo *p, RecIter &j)
+{
+    for ( ; j != cardlist.end(); j++)
     {
         ProgramInfo *q = *j;
 
@@ -385,10 +396,10 @@ bool Scheduler::FindNextConflict(ProgramInfo *p, RecIter &j)
     return false;
 }
 
-void Scheduler::MarkOtherShowings(ProgramInfo *p)
+void Scheduler::MarkOtherShowings(RecList &titlelist, ProgramInfo *p)
 {
-    RecIter i = reclist.begin();
-    for ( ; i != reclist.end(); i++)
+    RecIter i = titlelist.begin();
+    for ( ; i != titlelist.end(); i++)
     {
         ProgramInfo *q = *i;
         if (q->recstatus != rsUnknown && q->recstatus != rsEarlierShowing &&
@@ -427,17 +438,22 @@ void Scheduler::RestoreRecStatus(void)
     }
 }
 
-bool Scheduler::TryAnotherShowing(RecIter i)
+bool Scheduler::TryAnotherShowing(RecList &titlelist, ProgramInfo *p)
 {
-    ProgramInfo *p = *i;
-
     if (p->recstatus == rsRecording)
         return false;
 
+    RecIter j = titlelist.begin();
+    for ( ; j != titlelist.end(); j++)
+    {
+        ProgramInfo *q = *j;
+        if (q == p)
+            break;
+    }
+
     p->recstatus = rsLaterShowing;
 
-    RecIter j = i;
-    for (j++; j != reclist.end(); j++)
+    for (j++; j != titlelist.end(); j++)
     {
         ProgramInfo *q = *j;
         if (q->recstatus != rsEarlierShowing &&
@@ -450,11 +466,14 @@ bool Scheduler::TryAnotherShowing(RecIter i)
             continue;
         if (q->recstartts < schedTime && p->recstartts >= schedTime)
             continue;
-        RecIter k = reclist.begin();
-        if (FindNextConflict(q, k))
+
+        RecList &cardlist = cardlistmap[q->cardid];
+        RecIter k = cardlist.begin();
+        if (FindNextConflict(cardlist, q, k))
             continue;
+
         q->recstatus = rsWillRecord;
-        MarkOtherShowings(q);
+        MarkOtherShowings(titlelist, q);
         PrintRec(p, "     -");
         PrintRec(q, "     +");
         return true;
@@ -473,19 +492,25 @@ void Scheduler::SchedNewRecords(void)
     {
         ProgramInfo *p = *i;
         if (p->recstatus == rsRecording)
-            MarkOtherShowings(p);
+        {
+            RecList &titlelist = titlelistmap[p->title];
+            MarkOtherShowings(titlelist, p);
+        }
         if (p->recstatus != rsUnknown)
             continue;
-        RecIter k = reclist.begin();
-        if (!FindNextConflict(p, k))
+
+        RecList &cardlist = cardlistmap[p->cardid];
+        RecIter k = cardlist.begin();
+        if (!FindNextConflict(cardlist, p, k))
         {
+            RecList &titlelist = titlelistmap[p->title];
             p->recstatus = rsWillRecord;
-            MarkOtherShowings(p);
+            MarkOtherShowings(titlelist, p);
             PrintRec(p, "  +");
         }
         else if (schedMoveHigher)
         {
-            for (k++; !FindNextConflict(p, k); k++)
+            for (k++; !FindNextConflict(cardlist, p, k); k++)
                 ;
             retrylist.push_back(p);
         }
@@ -507,12 +532,15 @@ void Scheduler::MoveHigherRecords(void)
 
         BackupRecStatus();
         p->recstatus = rsWillRecord;
-        MarkOtherShowings(p);
+        RecList &titlelist = titlelistmap[p->title];
+        MarkOtherShowings(titlelist, p);
 
-        RecIter k = reclist.begin();
-        for ( ; FindNextConflict(p, k); k++)
+        RecList &cardlist = cardlistmap[p->cardid];
+        RecIter k = cardlist.begin();
+        for ( ; FindNextConflict(cardlist, p, k); k++)
         {
-            if (!TryAnotherShowing(k))
+            RecList &ktitlelist = titlelistmap[(*k)->title];
+            if (!TryAnotherShowing(ktitlelist, *k))
             {
                 RestoreRecStatus();
                 break;
@@ -583,7 +611,7 @@ RecList *Scheduler::getConflicting(ProgramInfo *pginfo)
     RecList *retlist = new RecList;
 
     RecIter i = reclist.begin();
-    for (; FindNextConflict(pginfo, i); i++)
+    for (; FindNextConflict(reclist, pginfo, i); i++)
     {
         ProgramInfo *p = *i;
         retlist->push_back(p);
@@ -698,6 +726,7 @@ void Scheduler::RunScheduler(void)
             VERBOSE(VB_GENERAL, "Found changes in the todo list.");
             FillEncoderFreeSpaceCache();
             FillRecordLists();
+            PrintList();
             lastupdate = curtime;
             startIter = reclist.begin();
             statuschanged = true;

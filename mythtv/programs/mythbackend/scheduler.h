@@ -60,11 +60,13 @@ class Scheduler : public QObject
 
     void PruneOldRecords(void);
     void AddNewRecords(void);
-    bool FindNextConflict(ProgramInfo *p, RecIter &iter);
-    void MarkOtherShowings(ProgramInfo *p);
+    void BuildListMaps(void);
+    void ClearListMaps(void);
+    bool FindNextConflict(RecList &cardlist, ProgramInfo *p, RecIter &iter);
+    void MarkOtherShowings(RecList &titlelist, ProgramInfo *p);
     void BackupRecStatus(void);
     void RestoreRecStatus(void);
-    bool TryAnotherShowing(RecIter iter);
+    bool TryAnotherShowing(RecList &titlelist, ProgramInfo *p);
     void SchedNewRecords(void);
     void MoveHigherRecords(void);
     void PruneRedundants(void);
@@ -79,6 +81,8 @@ class Scheduler : public QObject
     RecList reclist;
     RecList retrylist;
     RecList schedlist;
+    QMap<int, RecList> cardlistmap;
+    QMap<QString, RecList> titlelistmap;
 
     QMutex *reclist_lock;
     QMutex *schedlist_lock;
