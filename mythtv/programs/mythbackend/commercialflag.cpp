@@ -64,6 +64,9 @@ void CommercialFlagger::customEvent(QCustomEvent *e)
                                       chanid, startts);
             dblock.unlock();
 
+            if (!pginfo)
+                return;
+
             if ((action == "START") &&
                 (!flaggingList.contains(key)) &&
                 ((detectionHost == gContext->GetHostName()) ||
@@ -111,6 +114,9 @@ void CommercialFlagger::customEvent(QCustomEvent *e)
 
 void CommercialFlagger::FlagCommercials(ProgramInfo *tmpInfo)
 {
+    if (!tmpInfo)
+        return;
+
     flagThreadStarted = false;
 
     flagInfo = tmpInfo;

@@ -628,7 +628,6 @@ static void *run_priv_thread(void *data)
         for (MythPrivRequest req = gContext->popPrivRequest(); 
              true; req = gContext->popPrivRequest()) 
         {
-            MythPrivRequest req = gContext->popPrivRequest();
             bool done = false;
             switch (req.getType()) 
             {

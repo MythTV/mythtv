@@ -25,7 +25,6 @@ static void *run_priv_thread(void *data)
         {
             bool done = false;
 
-            MythPrivRequest req = gContext->popPrivRequest();
             switch (req.getType()) 
             {
             case MythPrivRequest::MythRealtime:
