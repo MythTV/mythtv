@@ -1,5 +1,52 @@
 <!DOCTYPE TS><TS>
 <context>
+    <name>GLSingleView</name>
+    <message>
+        <source>Folder: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Created: </source>
+        <translation type="unfinished">Criado em: </translation>
+    </message>
+    <message>
+        <source>Modified: </source>
+        <translation type="unfinished">Modificado em: </translation>
+    </message>
+    <message>
+        <source>Bytes</source>
+        <translation type="unfinished">Bytes</translation>
+    </message>
+    <message>
+        <source>Width</source>
+        <translation type="unfinished">Largura</translation>
+    </message>
+    <message>
+        <source>pixels</source>
+        <translation type="unfinished">pontos</translation>
+    </message>
+    <message>
+        <source>Height</source>
+        <translation type="unfinished">Altura</translation>
+    </message>
+    <message>
+        <source>Pixel Count</source>
+        <translation type="unfinished">Número de Pontos</translation>
+    </message>
+    <message>
+        <source>megapixels</source>
+        <translation type="unfinished">milhões de pontos</translation>
+    </message>
+    <message>
+        <source>Rotation Angle</source>
+        <translation type="unfinished">Angulo de Rotação</translation>
+    </message>
+    <message>
+        <source>degrees</source>
+        <translation type="unfinished">graus</translation>
+    </message>
+</context>
+<context>
     <name>IconView</name>
     <message>
         <source>Import pictures?</source>

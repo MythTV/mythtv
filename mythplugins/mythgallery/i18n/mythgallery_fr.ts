@@ -1,5 +1,52 @@
 <!DOCTYPE TS><TS>
 <context>
+    <name>GLSingleView</name>
+    <message>
+        <source>Folder: </source>
+        <translation type="unfinished">répertoire: </translation>
+    </message>
+    <message>
+        <source>Created: </source>
+        <translation type="unfinished">Créé le:</translation>
+    </message>
+    <message>
+        <source>Modified: </source>
+        <translation type="unfinished">Modifié le:</translation>
+    </message>
+    <message>
+        <source>Bytes</source>
+        <translation type="unfinished">Octets</translation>
+    </message>
+    <message>
+        <source>Width</source>
+        <translation type="unfinished">Largeur</translation>
+    </message>
+    <message>
+        <source>pixels</source>
+        <translation type="unfinished">Pixels</translation>
+    </message>
+    <message>
+        <source>Height</source>
+        <translation type="unfinished">Hauteur</translation>
+    </message>
+    <message>
+        <source>Pixel Count</source>
+        <translation type="unfinished">Nombre de pixels</translation>
+    </message>
+    <message>
+        <source>megapixels</source>
+        <translation type="unfinished">MegaPixels</translation>
+    </message>
+    <message>
+        <source>Rotation Angle</source>
+        <translation type="unfinished">Angle de rotation</translation>
+    </message>
+    <message>
+        <source>degrees</source>
+        <translation type="unfinished">degrées</translation>
+    </message>
+</context>
+<context>
     <name>IconView</name>
     <message>
         <source>Import pictures?</source>
@@ -23,31 +70,31 @@
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur</translation>
     </message>
     <message>
         <source>Sorry: OpenGL support not available</source>
-        <translation type="unfinished"></translation>
+        <translation>Désolé le support d&apos;OpenGL n&apos;est pas disponible</translation>
     </message>
     <message>
         <source>SlideShow</source>
-        <translation type="unfinished"></translation>
+        <translation>Diaporama</translation>
     </message>
     <message>
         <source>Rotate CW</source>
-        <translation type="unfinished"></translation>
+        <translation>Tourner sens horaire</translation>
     </message>
     <message>
         <source>Rotate CCW</source>
-        <translation type="unfinished"></translation>
+        <translation>Tourner sens anti-horaire</translation>
     </message>
     <message>
         <source>Import</source>
-        <translation type="unfinished"></translation>
+        <translation>Importer</translation>
     </message>
     <message>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres</translation>
     </message>
 </context>
 <context>
@@ -82,7 +129,7 @@
     </message>
     <message>
         <source>This is a colon separated list of paths. If the path in the list is a directory, its contents will be copied. If it is an executable, it will be run.</source>
-        <translation>Liste des chemins séparés par &apos;:&apos;. Si l&apos;élément de la liste est un chemin, son contenu sera copié. Si c&apos;est un executable. il sera executé.</translation>
+        <translation>Liste des chemins séparés par &apos;:&apos;. Si le chemin de la liste est un répertoire, son contenu sera copié. Si c&apos;est un exécutable. il sera exécuté.</translation>
     </message>
     <message>
         <source>This is the type of transition used between pictures in slideshow mode.</source>
@@ -90,7 +137,7 @@
     </message>
     <message>
         <source>This is the type of background for each picture in single view mode.</source>
-        <translation>C&apos;est le type de fond d&apos;ecran en mode &apos;une seule image&apos;.</translation>
+        <translation>C&apos;est le type de fond d&apos;écran en mode &apos;une seule image&apos;.</translation>
     </message>
     <message>
         <source>Slideshow Delay</source>
@@ -98,27 +145,27 @@
     </message>
     <message>
         <source>Use OpenGL transitions</source>
-        <translation type="unfinished"></translation>
+        <translation>Utiliser les transitions OpenGL</translation>
     </message>
     <message>
         <source>Check this to enable OpenGL based slideshow transitions</source>
-        <translation type="unfinished"></translation>
+        <translation>Cocher ici pour autoriser les diaporamas avec des transitions OpenGL</translation>
     </message>
     <message>
         <source>Type of OpenGL transition</source>
-        <translation type="unfinished"></translation>
+        <translation>Type de transition OpenGL</translation>
     </message>
     <message>
         <source>This is the type of OpenGL transition used between pictures in slideshow mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ceci est le type de transition OpenGL utilisé entre chaque image en mode diaporama</translation>
     </message>
     <message>
         <source>Gallery Directory does not exist or is unreadable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le répertoire des photos n&apos;existe pas ou est illisible</translation>
     </message>
     <message>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>Ok</translation>
     </message>
 </context>
 <context>
@@ -145,11 +192,11 @@
     </message>
     <message>
         <source>pixels</source>
-        <translation type="unfinished"></translation>
+        <translation>Pixels</translation>
     </message>
     <message>
         <source>megapixels</source>
-        <translation type="unfinished"></translation>
+        <translation>MegaPixels</translation>
     </message>
     <message>
         <source>degrees</source>
@@ -165,7 +212,7 @@
     </message>
     <message>
         <source>Folder: </source>
-        <translation type="unfinished"></translation>
+        <translation>répertoire: </translation>
     </message>
 </context>
 </TS>
