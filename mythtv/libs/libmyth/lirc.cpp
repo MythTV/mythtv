@@ -58,6 +58,13 @@ void LircClient::Process(void)
                code != NULL)
         {
             QKeySequence a(code);
+
+            if (!a.count()) 
+            {
+                cerr << "LircClient warning: attempt to convert '" << code 
+                     << "' to a key sequence failed. Fix your key mappings.\n";
+            }
+
             for (unsigned int i = 0; i < a.count(); i++)
             {
                 int mod = a[i] & MODIFIER_MASK;

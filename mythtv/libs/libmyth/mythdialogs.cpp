@@ -1,5 +1,6 @@
 #include <qcursor.h>
 #include <qdialog.h>
+#include <qdir.h>
 #include <qvbox.h>
 #include <qapplication.h>
 #include <qlayout.h>
