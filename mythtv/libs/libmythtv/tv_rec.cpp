@@ -317,6 +317,7 @@ void TVRec::HandleStateChange(void)
             usleep(5);
 
         nvr->TransitionToRing();
+        nvr->Reset();
 
         nvr->Unpause();
 

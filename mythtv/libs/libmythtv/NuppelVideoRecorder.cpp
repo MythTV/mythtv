@@ -997,28 +997,18 @@ void NuppelVideoRecorder::DoMJPEG(void)
     close(fd);
 }
 
+// Must be called while paused.
 void NuppelVideoRecorder::TransitionToFile(const QString &lfilename)
 {
-    pausewritethread = true;
-    while (!actuallypaused)
-	usleep(50);
-
     ringBuffer->TransitionToFile(lfilename);
     WriteHeader(true);
-
-    pausewritethread = false;
 }
 
+// Must be called while paused.
 void NuppelVideoRecorder::TransitionToRing(void)
 {
-    pausewritethread = true;
-    while (!actuallypaused)
-        usleep(50);
-
     WriteSeekTable(true);
     ringBuffer->TransitionToRing();
-
-    pausewritethread = false;
 }
 
 int NuppelVideoRecorder::SpawnChildren(void)
