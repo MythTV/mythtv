@@ -1732,4 +1732,142 @@
 
   </window>
 
+
+
+  <window name="recording_options">
+
+    <font name="active" face="Arial">
+      <color>#ffffff</color>
+      <size>18</size>
+      <size:small>11</size:small>
+    </font>
+
+    <font name="inactive" face="Arial">
+      <color>#9999cc</color>
+      <size>18</size>
+      <size:small>11</size:small>
+    </font>
+
+
+    <font name="enabled_state_0_font" face="Arial">
+      <color>#ffffff</color>
+      <size>18</size>
+      <size:small>11</size:small>
+      <bold>yes</bold>
+    </font>
+
+
+    <font name="title" face="Arial">
+      <color>#ffffff</color>
+      <dropcolor>#000000</dropcolor>
+      <size>27</size>
+      <size:small>14</size:small>
+      <shadow>3,3</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="subtitle" face="Arial">
+      <color>#ffffff</color>
+      <dropcolor>#000000</dropcolor>
+      <size>24</size>
+      <size:small>14</size:small>
+      <shadow>3,3</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="info" face="Arial">
+      <color>#ffffff</color>
+      <size>17</size>
+      <size:small>10</size:small>
+      <shadow>1,1</shadow>
+    </font>
+
+    <font name="infob" face="Arial">
+      <color>#ffffff</color>
+      <size>17</size>
+      <size:small>10</size:small>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="message" face="Arial">
+      <color>#ffffff</color>
+      <size>17</size>
+      <size:small>12</size:small>
+      <shadow>3,3</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <container name="background">
+     <!-- <image name="backgroundimg" draworder="0" fleximage="no">
+        <filename>trans-rk-background.png</filename>
+        <position>0,0</position>
+      </image> -->
+    </container>
+
+    <container name="selector">
+      <area>0,300,800,300</area>
+      <listarea name="menu_list" draworder="4">
+        <area>20,10,760,274</area>
+        <fcnfont name="active" function="active"></fcnfont>
+        <fcnfont name="inactive" function="inactive"></fcnfont>
+	<fcnfont name="inactive" function="disabled"></fcnfont>
+        <fcnfont name="active" function="selected"></fcnfont>
+	<fcnfont name="enabled_state_0_font" function="enabled_state_0"></fcnfont>
+        <columnpadding>1</columnpadding>
+        <column number="1" width="745" context="-1"></column>
+        <items>10</items>
+        <image function="selectionbar" filename="rk-selectbar.png" location="-6,-2"></image>
+        <image function="uparrow" filename="uparrow.png" location="755,15"></image>
+        <image function="downarrow" filename="downarrow.png" location="755,235"></image>
+      </listarea>
+      <image name="showinglines" draworder="5" fleximage="no">
+        <filename>def-ro-lines.png</filename>
+        <position>0,0</position>
+      </image>
+    </container>
+
+    <container name="program_info">
+      <area>0,20,800,210</area>
+      <textarea name="title" draworder="6">
+        <area>20,0,800,40</area>
+        <font>title</font>
+      </textarea>
+      <textarea name="subtitle" draworder="6">
+        <area>20,38,579,30</area>
+        <font>subtitle</font>
+      </textarea>
+      <textarea name="infotime" draworder="6" align="right">
+        <area>20,66,150,30</area>
+        <font>infob</font>
+        <value>Airdate:</value>
+      </textarea>
+      <textarea name="timedate" draworder="6">
+        <area>180,66,600,30</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="infochan" draworder="6" align="right">
+        <area>20,95,150,30</area>
+        <font>infob</font>
+        <value>Channel:</value>
+      </textarea>
+      <textarea name="channel" draworder="6">
+        <area>180,95,400,30</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="infodesc" draworder="6" align="right">
+        <area>20,125,150,30</area>
+        <font>infob</font>
+        <value>Description:</value>
+      </textarea>
+      <textarea name="description" draworder="6">
+        <area>180,125,600,120</area>
+        <font>info</font>
+        <multiline>yes</multiline>
+      </textarea>
+    </container>
+
+
+  </window>
+
 </mythuitheme>
