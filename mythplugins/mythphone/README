@@ -5,11 +5,10 @@ Paul Volkaerts
 August 28th 2004
 
 
-Mythphone has, at the time of writing, just been checked into the main MYTH 
-CVS repository. Mythphone is a phone and videophone capability on MYTH using
-the standard SIP protocol.  It is compatible with Microsoft XP Messenger (see
-caveat below) and with SIP Service Providers such as Free World Dialup (
-fwd.pulver.com).
+Mythphone is a phone and videophone capability on MYTH using the standard
+SIP protocol.  It is compatible with Microsoft XP Messenger (see caveat
+below) and with SIP Service Providers such as Free World Dialup 
+(fwd.pulver.com).
 
 
 
@@ -252,8 +251,3 @@ securemenu.vxml -- If during the initial menu the user enters a correct pin
 it jumps to this file which then prompt with a second-level menu such as 
 "read the TV guide". Edit this file and make sure it points to your 
 "program_listing.php" file within mythweb.
-
-
-
-
-
