@@ -1051,6 +1051,8 @@ void TV::ProcessKeypress(int keypressed)
     if (editmode)
     {   
         nvp->DoKeypress(keypressed);
+        if (keypressed == wsEscape || keypressed == 'e' || keypressed == 'E')
+            editmode = nvp->GetEditMode();
         return;
     }
 

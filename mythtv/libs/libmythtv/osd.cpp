@@ -910,6 +910,7 @@ void OSD::ShowEditArrow(long long number, long long totalframes, int type)
     pthread_mutex_lock(&osdlock);
 
     OSDSet *set = new OSDSet(name, false, vid_width, vid_height, wmult, hmult);
+    set->SetAllowFade(false);
     AddSet(set, name, false);
 
     OSDTypeImage *image;

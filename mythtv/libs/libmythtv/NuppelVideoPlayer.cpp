@@ -112,7 +112,9 @@ NuppelVideoPlayer::NuppelVideoPlayer(void)
 
     timedisplay = NULL;
     seekamount = 30;
-    seekamountpos = 2;
+    seekamountpos = 4;
+    deleteframe = 0;
+    hasdeletetable = false;
 
     dialogname = "";
 
@@ -527,6 +529,14 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
             fftime = 0;
 
             exactseeks = seeks;
+        }
+
+        LoadCutList();
+
+        if (!deleteMap.isEmpty())
+        {
+            hasdeletetable = true;
+            deleteIter = deleteMap.begin();
         }
     }
 
@@ -1557,6 +1567,14 @@ void NuppelVideoPlayer::StartPlaying(void)
                                 // ringbuffer, decompresses it, and stores it
                                 // in our local buffer. Also reads and
                                 // decompresses any audio frames it encounters
+
+        if (hasdeletetable && deleteIter.data() == 1 && 
+            framesPlayed >= deleteIter.key())
+        {
+            ++deleteIter;
+            fftime = deleteIter.key() - framesPlayed;
+            ++deleteIter;
+        }
     }
 
     // these threads will also exit when killplayer or eof is true
@@ -1856,13 +1874,31 @@ bool NuppelVideoPlayer::EnableEdit(void)
         while (!GetPause())
             usleep(50);
         seekamount = keyframedist;
-        seekamountpos = 2;
+        seekamountpos = 4;
 
         dialogname = "";
-        deleteMap.clear();
         UpdateEditSlider();
     }
     return editmode;   
+}
+
+void NuppelVideoPlayer::DisableEdit(void)
+{
+    editmode = false;
+
+    QMap<long long, int>::Iterator i = deleteMap.begin();
+    for (; i != deleteMap.end(); ++i)
+        osd->HideEditArrow(i.key());
+    osd->HideText("seek_desc");
+    osd->HideText("deletemarker");
+    osd->HideText("edittime_display");
+    osd->HideText("editslider");
+
+    timedisplay = NULL;
+
+    SaveCutList();
+
+    Unpause();
 }
 
 void NuppelVideoPlayer::DoKeypress(int keypress)
@@ -1929,6 +1965,12 @@ void NuppelVideoPlayer::DoKeypress(int keypress)
             UpdateSeekAmount(false);
             break; 
         }
+        case wsEscape: case 'e': case 'E':
+        {
+            DisableEdit();
+            break;
+        }
+        default: break;
     }
     exactseeks = exactstore;
 }
@@ -1973,7 +2015,7 @@ void NuppelVideoPlayer::UpdateTimeDisplay(void)
 {
     if (!timedisplay)
     {
-        timedisplay = new OSDSet("edittime_display", true, video_width, 
+        timedisplay = new OSDSet("edittime_display", false, video_width, 
                                  video_height, video_width / 640.0, 
                                  video_height / 480.0);
 
@@ -1987,6 +2029,8 @@ void NuppelVideoPlayer::UpdateTimeDisplay(void)
         OSDTypeText *text = new OSDTypeText("timedisp", font, "", rect);
         timedisplay->AddType(text);
 
+        timedisplay->SetAllowFade(false);
+        osd->SetVisible(timedisplay, -1);
         osd->AddSet(timedisplay, "edittime_display");
     }
 
@@ -2225,7 +2269,122 @@ bool NuppelVideoPlayer::IsInDelete(void)
         }
     }
 
+    if (indelete) 
+        ret = true;
+
     return ret;
+}
+
+void NuppelVideoPlayer::SaveCutList(void)
+{
+    long long startpos = 0;
+    long long endpos = 0;
+    bool first = true;
+    bool indelete = false;
+
+    long long lastpos = -1;
+    int lasttype = -1;
+
+    QMap<long long, int>::Iterator i;
+
+    for (i = deleteMap.begin(); i != deleteMap.end();)
+    {
+        long long frame = i.key();
+        int direction = i.data();
+
+        if (direction == 0 && !indelete && first)
+        {
+            deleteMap[0] = 1;
+            startpos = 0;
+            endpos = frame;
+        }
+        else if (direction == 0)
+        {
+            endpos = frame;
+            indelete = false;
+            first = false;
+        }
+        else if (direction == 1 && !indelete)
+        {
+            startpos = frame;
+            indelete = true;
+            first = false;
+        }
+
+        if (direction == lasttype)
+        {
+            if (direction == 0)
+            {
+                deleteMap.remove(lastpos);
+                ++i;
+            }
+            else
+            {
+                ++i;
+                deleteMap.remove(frame);
+            }
+        }
+        else
+            ++i;
+
+        lastpos = frame;
+        lasttype = direction;
+    }
+    
+    if (indelete)
+        deleteMap[totalFrames] = 0;
+
+    QString filename = ringBuffer->GetFilename();
+    filename += ".cutlist";
+
+    FILE *cutfile = fopen(filename.ascii(), "w");
+    
+    for (i = deleteMap.begin(); i != deleteMap.end(); ++i)
+    {
+        long long frame = i.key();
+        int direction = i.data();
+
+        if (direction == 1)
+            fprintf(cutfile, "%lld - ", frame);
+        else if (direction == 0)
+            fprintf(cutfile, "%lld\n", frame);
+    }
+
+    fclose(cutfile);
+
+    if (deleteMap.isEmpty())
+        unlink(filename.ascii());
+}
+
+void NuppelVideoPlayer::LoadCutList(void)
+{
+    QString filename = ringBuffer->GetFilename();
+    filename += ".cutlist";
+
+    deleteMap.clear();
+
+    FILE *cutfile = fopen(filename.ascii(), "r");
+
+    if (cutfile)
+    {
+        char buffer[1024];
+        long long start = 0, end = 0;
+
+        while (!feof(cutfile))
+        {
+            fgets(buffer, 1024, cutfile);
+            if (sscanf(buffer, "%lld - %lld\n", &start, &end) != 2)
+            {
+                cerr << "Malformed cutlist line: " << buffer << endl;
+            }
+            else
+            {
+                deleteMap[start] = 1;
+                deleteMap[end] = 0;
+            }
+        }
+        fclose(cutfile);
+    }
 }
 
 char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,

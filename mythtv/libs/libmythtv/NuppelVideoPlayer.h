@@ -114,6 +114,8 @@ class NuppelVideoPlayer
     bool EnableEdit(void);
     void DoKeypress(int keypress);
 
+    bool GetEditMode(void) { return editmode; }
+
  protected:
     void OutputAudioLoop(void);
     void OutputVideoLoop(void);
@@ -162,6 +164,9 @@ class NuppelVideoPlayer
     void HandleResponse(void);
     void HandleArbSeek(bool right);
     bool IsInDelete(void);
+    void SaveCutList(void);
+    void LoadCutList(void);
+    void DisableEdit(void);
 
     int audiofd;
 
@@ -300,9 +305,11 @@ class NuppelVideoPlayer
     OSDSet *timedisplay;
 
     QMap<long long, int> deleteMap;
+    QMap<long long, int>::Iterator deleteIter;
     QString dialogname;
     int dialogtype;
     long long deleteframe;
+    bool hasdeletetable;
 };
 
 #endif
