@@ -7,6 +7,7 @@
 opengl="no"
 fftw_lib="no"
 sdl="no"
+aac="no"
 
 for opt do
   case "$opt" in
@@ -16,7 +17,9 @@ for opt do
   ;;
   --enable-sdl) sdl="yes"
   ;;
-  --enable-all) sdl="yes"; opengl="yes"; fftw_lib="yes";
+  --enable-aac) aac="yes"
+  ;;
+  --enable-all) sdl="yes"; opengl="yes"; fftw_lib="yes"; aac="yes";
   ;;
   esac
 done
@@ -32,6 +35,7 @@ Standard options:
   --enable-fftw            enable fftw visualizers [default=no]
   --enable-opengl          enable OpenGL visualizers [default=no]
   --enable-sdl             use SDL for the synaesthesia output [default=no]
+  --enable-aac             enable AAC/MP4 audio file decompression [default=no]
   --enable-all             Enable all of the above.
 EOF
 exit 1
@@ -78,9 +82,19 @@ if test "$sdl" = "yes" ; then
   echo "QMAKE_CXXFLAGS_RELEASE += `sdl-config --cflags`" >> ./mythmusic/config.pro
   echo "QMAKE_CXXFLAGS_DEBUG += `sdl-config --cflags`" >> ./mythmusic/config.pro
 fi
-
 if test "$sdl" = "no" ; then
   echo "        SDL    support will not be included"
+fi
+
+if test "$aac" = "yes" ; then
+  echo "        AAC    support will be included"
+  echo "#define AAC_SUPPORT 1" >> ./mythmusic/config.h
+  echo "LIBS += -lfaad -lmp4ff" >> ./mythmusic/config.pro
+  echo "HEADERS += aacdecoder.h" >> ./mythmusic/config.pro
+  echo "SOURCES += aacdecoder.cpp" >> ./mythmusic/config.pro
+fi
+if test "$aac" = "no" ; then
+  echo "        AAC    support will not be included"
 fi
 echo ""
 

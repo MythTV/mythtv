@@ -118,6 +118,9 @@ static void checkFactories()
         Decoder::registerFactory(new FlacDecoderFactory);
         Decoder::registerFactory(new CdDecoderFactory);
         Decoder::registerFactory(new avfDecoderFactory);
+#ifdef AAC_SUPPORT
+        Decoder::registerFactory(new aacDecoderFactory);
+#endif
     }
 }
 

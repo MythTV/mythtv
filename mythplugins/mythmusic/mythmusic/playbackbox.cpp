@@ -511,7 +511,7 @@ void PlaybackBoxMusic::toggleMute()
 void PlaybackBoxMusic::showVolume(bool on_or_off)
 {
     float volume_level;
-    if (volume_control)
+    if (volume_control && output)
     {
         if (volume_status)
         {

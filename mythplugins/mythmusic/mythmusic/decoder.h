@@ -1,6 +1,7 @@
 #ifndef DECODER_H_
 #define DECODER_H_
 
+#include "config.h"
 #include <qstring.h>
 #include <qevent.h>
 #include <qthread.h>
@@ -165,5 +166,16 @@ public:
     const QString &description() const;
     Decoder *create(const QString &, QIODevice *, AudioOutput *, bool);
 };
+
+#ifdef AAC_SUPPORT
+class aacDecoderFactory : public DecoderFactory
+{
+public:
+    bool supports(const QString &) const;
+    const QString &extension() const;
+    const QString &description() const;
+    Decoder *create(const QString &, QIODevice *, AudioOutput *, bool);
+};
+#endif
 
 #endif
