@@ -721,6 +721,9 @@ void RingBuffer::ReadAheadThread(void)
     }
 
     delete [] readAheadBuffer;
+    readAheadBuffer = NULL;
+    rbrpos = 0;
+    rbwpos = 0;
 }
 
 int RingBuffer::ReadFromBuf(void *buf, int count)

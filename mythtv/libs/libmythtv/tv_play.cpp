@@ -543,6 +543,25 @@ void TV::HandleStateChange(void)
 	osd = nvp->GetOSD();
     }
 
+    if (closePlayer)
+    {
+        if (prbuffer)
+        {
+            prbuffer->StopReads();
+            prbuffer->Pause();
+            while (!prbuffer->isPaused())
+                usleep(50);
+        }
+
+        if (piprbuffer)
+        {
+            piprbuffer->StopReads();
+            piprbuffer->Pause();
+            while (!piprbuffer->isPaused())
+                usleep(50);
+        }
+    }
+
     if (closeRecorder)
     {
         recorder->StopLiveTV();
@@ -630,11 +649,6 @@ void TV::TeardownPlayer(void)
 {
     if (nvp)
     {
-        prbuffer->Pause();
-        while (!prbuffer->isPaused())
-            usleep(50);
-
-        prbuffer->StopReads();
         nvp->StopPlaying();
         pthread_join(decode, NULL);
         delete nvp;
@@ -664,11 +678,6 @@ void TV::TeardownPipPlayer(void)
 {
     if (pipnvp)
     {
-        piprbuffer->Pause();
-        while (!piprbuffer->isPaused())
-            usleep(50);
-
-        piprbuffer->StopReads();
         pipnvp->StopPlaying();
         pthread_join(pipdecode, NULL);
         delete pipnvp;
