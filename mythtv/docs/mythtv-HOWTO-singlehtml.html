@@ -1121,7 +1121,75 @@ Date::Manip, a perl module used by XMLTV, is not UTF-8 safe. As a result,
 whenever you run setup or mythfilldatabase you will get a lot of UTF-8
 warnings. There is an 
 <A HREF="http://membled.com/work/patches/DateManip/">http://membled.com/work/patches/DateManip/</A> updated version of
-Date::Manip at the XMLTV site fixing this and other XMLTV related bugs.</P>
+Date::Manip at the XMLTV site fixing this and other XMLTV related
+# bugs.</P>
+
+<H3>Debian</H3>
+
+<P>Debian source packages are available from the same place as the
+binary packages.  These can be used to build customized packages, and
+to automatically satisfy MythTV's build-time dependencies.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+sh-2.05b# apt-get build-dep mythtv
+Reading Package Lists...
+Building Dependency Tree...
+The following NEW packages will be installed:
+  debconf-utils debhelper file fontconfig gettext html2text intltool-debian
+  libaudio2 libexpat1 libfontconfig1 libfontconfig1-dev libfreetype6
+  libfreetype6-dev libglib2.0-0 libjpeg62 libjpeg62-dev liblame-dev liblame0
+  liblcms1 liblcms1-dev libmagic1 libmng-dev libmng1 libmysqlclient-dev
+  libmysqlclient12 libogg-dev libogg0 libpng12-0 libpng12-dev libqt3-headers
+  libqt3-mt-dev libqt3c102-mt libvorbis-dev libvorbis0a libvorbisenc2
+  libvorbisfile3 libxcursor-dev libxcursor1 libxft2 libxft2-dev libxrender-dev
+  libxrender1 mysql-common pkg-config po-debconf qt3-dev-tools xfree86-common
+  xlibmesa-gl-dev xlibmesa-glu-dev xlibmesa3-gl xlibmesa3-glu xlibs xlibs-dev
+  zlib1g-dev
+0 upgraded, 54 newly installed, 0 to remove and 0 not upgraded.
+Need to get 0B/24.0MB of archives.
+After unpacking 78.7MB of additional disk space will be used.
+Do you want to continue? [Y/n] 
+[...]
+sh-2.05b# cd /tmp
+sh-2.05b# apt-get source mythtv
+Reading Package Lists...
+Building Dependency Tree...
+Need to get 3085kB of source archives.
+Get:1 http://dijkstra.csh.rit.edu unstable/mythtv mythtv 0.11-4 (dsc) [507B]
+Get:2 http://dijkstra.csh.rit.edu unstable/mythtv mythtv 0.11-4 (tar) [3071kB]
+Get:3 http://dijkstra.csh.rit.edu unstable/mythtv mythtv 0.11-4 (diff) [13.9kB]
+Fetched 3085kB in 0s (8120kB/s)
+dpkg-source: extracting mythtv in mythtv-0.11
+sh-2.05b# cd mythtv-0.11
+[customize settings.pro, etc.]
+[edit debian/changelog and increment the version number]
+sh-2.05b# dpkg-buildpackage -rfakeroot -us -uc -b
+[...]
+dpkg-deb: building package `mythtv-backend' in `../mythtv-backend_0.11-4_i386.deb'.
+dpkg-deb: building package `mythtv-frontend' in `../mythtv-frontend_0.11-4_i386.deb'.
+dpkg-deb: building package `libmyth-0.11' in `../libmyth-0.11_0.11-4_i386.deb'.
+dpkg-deb: building package `libmyth-0.11-dev' in `../libmyth-0.11-dev_0.11-4_i386.deb'.
+ dpkg-genchanges -b
+dpkg-genchanges: binary-only upload - not including any source code
+dpkg-buildpackage: binary only upload (no source included)
+sh-2.05b# ls -l ../*.deb
+-rw-r--r--    1 root     root        31734 Sep  6 19:07 ../libmyth-0.11-dev_0.11-4_i386.deb
+-rw-r--r--    1 root     root       408444 Sep  6 19:07 ../libmyth-0.11_0.11-4_i386.deb
+-rw-r--r--    1 root     root      3324966 Sep  6 19:07 ../mythtv-backend_0.11-4_i386.deb
+-rw-r--r--    1 root     root        15350 Sep  6 19:07 ../mythtv-common_0.11-4_all.deb
+-rw-r--r--    1 root     root        17978 Sep  6 19:07 ../mythtv-database_0.11-4_all.deb
+-rw-r--r--    1 root     root       422232 Sep  6 19:07 ../mythtv-doc_0.11-4_all.deb
+-rw-r--r--    1 root     root      4900474 Sep  6 19:07 ../mythtv-frontend_0.11-4_i386.deb
+-rw-r--r--    1 root     root        12372 Sep  6 19:07 ../mythtv_0.11-4_all.deb
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<P>If building from CVS instead of the source package, then the QTDIR
+environment variable must be set when building.  On Debian woody,
+QTDIR should be set to <CODE>/usr/share/qt</CODE>.  On Debian unstable,
+QTDIR should be set to <CODE>/usr/share/qt3</CODE>.</P>
 
 <H2><A NAME="s5">5.</A> <A HREF="#toc5">Downloading and compiling.</A></H2>
 

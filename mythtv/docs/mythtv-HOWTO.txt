@@ -61,6 +61,7 @@
         4.3.2 Distribution-Specific Notes
            4.3.2.1 Mandrake
            4.3.2.2 Red Hat Linux 9/8.0
+           4.3.2.3 Debian
 
   5. Downloading and compiling.
      5.1 Notes on compiling on a system with non-Intel processors.
@@ -144,7 +145,6 @@
      15.6 Using MythMusic.
      15.7 Troubleshooting MythMusic.
         15.7.1 When I run MythMusic and try and look up a CD, I get an error message
-
   16. MythWeather.
   17. MythVideo.
   18. MythDVD.
@@ -1260,8 +1260,75 @@
   of UTF-8 warnings. There is an
   http://membled.com/work/patches/DateManip/
   <http://membled.com/work/patches/DateManip/> updated version of
-  Date::Manip at the XMLTV site fixing this and other XMLTV related
+  Date::Manip at the XMLTV site fixing this and other XMLTV related #
   bugs.
+
+
+  [1m4.3.2.3.  Debian[0m
+
+  Debian source packages are available from the same place as the binary
+  packages.  These can be used to build customized packages, and to
+  automatically satisfy MythTV's build-time dependencies.
+
+
+
+  sh-2.05b# apt-get build-dep mythtv
+  Reading Package Lists...
+  Building Dependency Tree...
+  The following NEW packages will be installed:
+    debconf-utils debhelper file fontconfig gettext html2text intltool-debian
+    libaudio2 libexpat1 libfontconfig1 libfontconfig1-dev libfreetype6
+    libfreetype6-dev libglib2.0-0 libjpeg62 libjpeg62-dev liblame-dev liblame0
+    liblcms1 liblcms1-dev libmagic1 libmng-dev libmng1 libmysqlclient-dev
+    libmysqlclient12 libogg-dev libogg0 libpng12-0 libpng12-dev libqt3-headers
+    libqt3-mt-dev libqt3c102-mt libvorbis-dev libvorbis0a libvorbisenc2
+    libvorbisfile3 libxcursor-dev libxcursor1 libxft2 libxft2-dev libxrender-dev
+    libxrender1 mysql-common pkg-config po-debconf qt3-dev-tools xfree86-common
+    xlibmesa-gl-dev xlibmesa-glu-dev xlibmesa3-gl xlibmesa3-glu xlibs xlibs-dev
+    zlib1g-dev
+  0 upgraded, 54 newly installed, 0 to remove and 0 not upgraded.
+  Need to get 0B/24.0MB of archives.
+  After unpacking 78.7MB of additional disk space will be used.
+  Do you want to continue? [Y/n]
+  [...]
+  sh-2.05b# cd /tmp
+  sh-2.05b# apt-get source mythtv
+  Reading Package Lists...
+  Building Dependency Tree...
+  Need to get 3085kB of source archives.
+  Get:1 http://dijkstra.csh.rit.edu unstable/mythtv mythtv 0.11-4 (dsc) [507B]
+  Get:2 http://dijkstra.csh.rit.edu unstable/mythtv mythtv 0.11-4 (tar) [3071kB]
+  Get:3 http://dijkstra.csh.rit.edu unstable/mythtv mythtv 0.11-4 (diff) [13.9kB]
+  Fetched 3085kB in 0s (8120kB/s)
+  dpkg-source: extracting mythtv in mythtv-0.11
+  sh-2.05b# cd mythtv-0.11
+  [customize settings.pro, etc.]
+  [edit debian/changelog and increment the version number]
+  sh-2.05b# dpkg-buildpackage -rfakeroot -us -uc -b
+  [...]
+  dpkg-deb: building package `mythtv-backend' in `../mythtv-backend_0.11-4_i386.deb'.
+  dpkg-deb: building package `mythtv-frontend' in `../mythtv-frontend_0.11-4_i386.deb'.
+  dpkg-deb: building package `libmyth-0.11' in `../libmyth-0.11_0.11-4_i386.deb'.
+  dpkg-deb: building package `libmyth-0.11-dev' in `../libmyth-0.11-dev_0.11-4_i386.deb'.
+   dpkg-genchanges -b
+  dpkg-genchanges: binary-only upload - not including any source code
+  dpkg-buildpackage: binary only upload (no source included)
+  sh-2.05b# ls -l ../*.deb
+  -rw-r--r--    1 root     root        31734 Sep  6 19:07 ../libmyth-0.11-dev_0.11-4_i386.deb
+  -rw-r--r--    1 root     root       408444 Sep  6 19:07 ../libmyth-0.11_0.11-4_i386.deb
+  -rw-r--r--    1 root     root      3324966 Sep  6 19:07 ../mythtv-backend_0.11-4_i386.deb
+  -rw-r--r--    1 root     root        15350 Sep  6 19:07 ../mythtv-common_0.11-4_all.deb
+  -rw-r--r--    1 root     root        17978 Sep  6 19:07 ../mythtv-database_0.11-4_all.deb
+  -rw-r--r--    1 root     root       422232 Sep  6 19:07 ../mythtv-doc_0.11-4_all.deb
+  -rw-r--r--    1 root     root      4900474 Sep  6 19:07 ../mythtv-frontend_0.11-4_i386.deb
+  -rw-r--r--    1 root     root        12372 Sep  6 19:07 ../mythtv_0.11-4_all.deb
+
+
+
+  If building from CVS instead of the source package, then the QTDIR
+  environment variable must be set when building.  On Debian woody,
+  QTDIR should be set to /usr/share/qt.  On Debian unstable, QTDIR
+  should be set to /usr/share/qt3.
 
 
   [1m5.  Downloading and compiling.[0m
@@ -1300,6 +1367,8 @@
   Get XMLTV from http://xmltv.sourceforge.net
   <http://xmltv.sourceforge.net>.  Download version 0.5.17 if you're in
   North America.
+
+
   ______________________________________________________________________
   NOTE for Mandrake users:  If you have added a "PLF" mirror, you may skip the
   next step and type:
@@ -1359,19 +1428,18 @@
   Check that it worked:
 
 
+       # ls -l /usr/local/lib
+       -rw-r--r--    1 root     root       381706 Nov  4 14:22 libmp3lame.a
+       -rwxr-xr-x    1 root     root          674 Nov  4 14:22 libmp3lame.la*
+       lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so ->
+       libmp3lame.so.0.0.0*
+       lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so.0 ->
+       libmp3lame.so.0.0.0*
+       -rwxr-xr-x    1 root     root       360197 Nov  4 14:22
+       libmp3lame.so.0.0.0*
 
-  # ls -l /usr/local/lib
-  -rw-r--r--    1 root     root       381706 Nov  4 14:22 libmp3lame.a
-  -rwxr-xr-x    1 root     root          674 Nov  4 14:22 libmp3lame.la*
-  lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so ->
-  libmp3lame.so.0.0.0*
-  lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so.0 ->
-  libmp3lame.so.0.0.0*
-  -rwxr-xr-x    1 root     root       360197 Nov  4 14:22
-  libmp3lame.so.0.0.0*
-
-  # exit
-  $
+       # exit
+       $
 
 
 
@@ -1391,6 +1459,8 @@
 
   If you install from this location you may skip to ``Manually building
   MythTV''.
+
+
 
   [1m5.3.2.  Mandrake[0m
 
@@ -1422,6 +1492,8 @@
        # /sbin/ldconfig
        # exit
 
+
+
   Download version 1.95.5 from sourceforge.net:
   http://sourceforge.net/projects/expat/
   <http://sourceforge.net/projects/expat/>
@@ -1452,9 +1524,6 @@
 
 
   Install the xmltv prerequisites:
-
-
-
        $ su
        # perl -MCPAN -e shell
        cpan> install XML::Twig
@@ -1482,12 +1551,11 @@
   instructions to this point.
 
 
-
-  $ make
-  $ make test
-  $ su
-  # make install
-  # exit
+       $ make
+       $ make test
+       $ su
+       # make install
+       # exit
 
 
 
@@ -1600,8 +1668,7 @@
   To setup the initial mysql databases:
 
 
-
-  $ cd database
+       $ cd database
 
 
 
@@ -1721,7 +1788,6 @@
   line.
 
 
-
   [1m7.1.  Graphically setting up the mixer.[0m
 
   [1m7.1.1.  Mandrake 9.0 and Red Hat Linux[0m
@@ -1762,6 +1828,7 @@
 
   To configure sound to work with MythTV, select
 
+
   RedHat Menu>Sound & Video>Volume Control
 
 
@@ -1788,6 +1855,7 @@
   "details". Near the top it will say something like "The module options
   for snd-XXX", where XXX is the name of your driver. In the
   instructions below, replace "XXX" with the name of your driver.
+
   Download the development release (0.9.x) from the ALSA web site
   http://www.alsa-project.org <http://www.alsa-project.org>.  You need
   at least three files:
@@ -1819,21 +1887,22 @@
   Install the rest of the packages:
 
 
-       $ cd ~
-       $ tar -xjf alsa-lib-0.9.x.tar.bz2
-       $ cd alsa-lib-0.9.x
-       $ ./configure
-       $ make
-       $ su
-       # make install
-       # exit
-       $ cd ..
-       $ tar -xjf alsa-utils-0.9.x.tar.bz2
-       $ cd alsa-utils-0.9.x
-       $ ./configure
-       $ make
-       $ su
-       # make install
+
+  $ cd ~
+  $ tar -xjf alsa-lib-0.9.x.tar.bz2
+  $ cd alsa-lib-0.9.x
+  $ ./configure
+  $ make
+  $ su
+  # make install
+  # exit
+  $ cd ..
+  $ tar -xjf alsa-utils-0.9.x.tar.bz2
+  $ cd alsa-utils-0.9.x
+  $ ./configure
+  $ make
+  $ su
+  # make install
 
 
 
@@ -1844,19 +1913,18 @@
   file that has this configuration:
 
 
-
-  alias char-major-116 snd
-  alias snd-card-0 snd-XXX
-  # module options should go here
-  # OSS/Free portion
-  alias char-major-14 soundcore
-  alias sound-slot-0 snd-card-0
-  # card #1
-  alias sound-service-0-0 snd-mixer-oss
-  alias sound-service-0-1 snd-seq-oss
-  alias sound-service-0-3 snd-pcm-oss
-  alias sound-service-0-8 snd-seq-oss
-  alias sound-service-0-12 snd-pcm-oss
+       alias char-major-116 snd
+       alias snd-card-0 snd-XXX
+       # module options should go here
+       # OSS/Free portion
+       alias char-major-14 soundcore
+       alias sound-slot-0 snd-card-0
+       # card #1
+       alias sound-service-0-0 snd-mixer-oss
+       alias sound-service-0-1 snd-seq-oss
+       alias sound-service-0-3 snd-pcm-oss
+       alias sound-service-0-8 snd-seq-oss
+       alias sound-service-0-12 snd-pcm-oss
 
 
 
@@ -1883,7 +1951,7 @@
   you can do as root with:
 
 
-       # alsactl -f /etc/asound.state store
+  # alsactl -f /etc/asound.state store
 
 
 
@@ -1904,7 +1972,6 @@
 
 
   If it works, you're done installing ALSA!
-
 
 
   [1m7.2.  Setting the mixer from the command line.[0m
@@ -2030,10 +2097,9 @@
   as well.
 
 
-
-  $ tar -xjf lirc-0.6.6.tar.bz2
-  $ cd lirc-0.6.6
-  $ ./setup.sh
+       $ tar -xjf lirc-0.6.6.tar.bz2
+       $ cd lirc-0.6.6
+       $ ./setup.sh
 
 
 
@@ -2071,11 +2137,10 @@
   At this point, if you're using a serial receiver, check that there's a
   lirc device in /dev:
 
-
-       $ ls -l /dev/li*
-       lr-xr-xr-x    1 root     root            5 Jan 27 09:00 /dev/lirc -> ttyS0
-       srw-rw-rw-    1 root     root            0 Jan 27 15:01 /dev/lircd=
-       prw-r--r--    1 root     root            0 Jan 27 09:00 /dev/lircm|
+  $ ls -l /dev/li*
+  lr-xr-xr-x    1 root     root            5 Jan 27 09:00 /dev/lirc -> ttyS0
+  srw-rw-rw-    1 root     root            0 Jan 27 15:01 /dev/lircd=
+  prw-r--r--    1 root     root            0 Jan 27 09:00 /dev/lircm|
 
 
 
@@ -2157,6 +2222,7 @@
   <http://atrpms.physik.fu-berlin.de/name/kernel/>. You will also find
   suitable kernel modules for ALSA, lirc, bttv, ivtv, saa7134 etc.
   there. See also the ``main Red Hat section''.
+
   For the impatient: Make sure you have an emergency floppy boot disk
   available!
 
@@ -2197,8 +2263,6 @@
        # make modules_install
        # make install
 
-
-
   if you are using [1mgrub[22m, that should be it, reboot and select your
   custom kernel upon boot. If you are using [1mlilo[22m, change your lilo
   configuration according to
@@ -2219,8 +2283,7 @@
   first thing in the file.  It must come first, or it may not work.
 
 
-
-  alias char-major-61 XXX
+       alias char-major-61 XXX
 
 
 
@@ -2262,9 +2325,8 @@
   If your remote ends up working well, you should consider submitting
   your lircd.conf file back to the lirc developers. Once finished:
 
-
-       $ su
-       # cp myremote /etc/lircd.conf
+  $ su
+  # cp myremote /etc/lircd.conf
 
 
 
@@ -2279,10 +2341,9 @@
   time we boot. Mandrake 9.1 users, you can execute:
 
 
-
-  $ su
-  # chkconfig --level 35 lircd on
-  # exit
+       $ su
+       # chkconfig --level 35 lircd on
+       # exit
 
 
 
@@ -2323,8 +2384,7 @@
 
   if you've got a Pinnacle Studio PCTV remote.
 
-
-       $ irw
+  $ irw
 
 
 
@@ -2340,7 +2400,7 @@
   you need to invoke it like this:
 
 
-  $ irxevent &
+       $ irxevent &
 
 
 
@@ -2385,19 +2445,20 @@
   my /home/[yourusername]/.lircrc file:
 
 
-       begin
-           prog = irxevent
-           button = channel+
-           repeat = 3
-           config = Key Up CurrentWindow
-       end
 
-       begin
-           prog = irxevent
-           button = channel-
-           repeat = 3
-           config = Key Down CurrentWindow
-       end
+  begin
+      prog = irxevent
+      button = channel+
+      repeat = 3
+      config = Key Up CurrentWindow
+  end
+
+  begin
+      prog = irxevent
+      button = channel-
+      repeat = 3
+      config = Key Down CurrentWindow
+  end
 
 
 
@@ -2449,19 +2510,19 @@
   kernel module you might see the following message during make:
 
 
-       lirc_sir.c:56:2: warning: #warning
-       "******************************************"
+  lirc_sir.c:56:2: warning: #warning
+  "******************************************"
 
-       lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
+  lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
 
-       lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
+  lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
 
-       lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
+  lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
 
-       lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
+  lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
 
-       lirc_sir.c:61:2: warning: #warning
-       "******************************************"
+  lirc_sir.c:61:2: warning: #warning
+  "******************************************"
 
 
 
@@ -2512,8 +2573,6 @@
        000000000000bff8 00 2 gi-motorola-dct2000
        000000000000f7f0 00 ENTER gi-motorola-dct2000
 
-
-
   Once you've verified lirc is working you can press [1mCTRL-C [22mto exit [1mirw[0m
   and configure the channel changing script.
 
@@ -2528,16 +2587,17 @@
   /dev/device. Unlike Bourne or bash, csh scripts automatically close
   parent file descriptors before they start.
 
-  $ cd /usr/local/bin
-  # su
-  # cat > change_channel.csh
-  #!/bin/csh
-  echo "changing to $1"
-  /usr/local/bin/channel.pl $1 &
-  ^D
-  # chmod a+x change_channel.csh
-  # exit
-  $ exit
+
+       $ cd /usr/local/bin
+       # su
+       # cat > change_channel.csh
+       #!/bin/csh
+       echo "changing to $1"
+       /usr/local/bin/channel.pl $1 &
+       ^D
+       # chmod a+x change_channel.csh
+       # exit
+       $ exit
 
 
 
@@ -2578,7 +2638,6 @@
        # exit
 
 
-
   The first thing to configure is the master backend system.  If you are
   running multiple backend systems, the master backend will make all
   decisions about which programs will be recorded on which tuners.  If
@@ -2592,6 +2651,7 @@
   tuner on the master will always be the first choice. You will then
   want to add your ``other backends'' in the order of your preference
   for recording.
+
   See ``Advanced Backend Configurations'' for information on configuring
   multiple backend systems in various ways.
 
@@ -2721,7 +2781,6 @@
   the load of the listings provider and the speed of your connection to
   the Internet.  Be patient!
 
-
   You will then be returned to the Video Sources screen.  If you have
   multiple video sources available, such as Antenna, Cable, etc, go
   ahead and define them all, even if they're not all going to be
@@ -2775,8 +2834,6 @@
 
        $ mythbackend
 
-
-
   mythbackend will print information about connections and what it's
   doing to the console.  If you'd like to see the options that are
   available for mythbackend, type mythbackend -h for help.
@@ -2784,16 +2841,15 @@
   As of 2003-03-27, the available options are:
 
 
-
-  $ mythbackend -h
-  Invalid argument: -h
-  Valid options are:
-  -l or --logfile filename       Writes STDERR and STDOUT messages to filename
-  -p or --pidfile filename       Write PID of mythbackend to filename
-  -d or --daemon                 Runs mythbackend as a daemon
-  -v or --verbose                Prints more information
-  --printexpire                  List of auto-expire programs
-  --printsched                   Upcoming scheduled programs
+       $ mythbackend -h
+       Invalid argument: -h
+       Valid options are:
+       -l or --logfile filename       Writes STDERR and STDOUT messages to filename
+       -p or --pidfile filename       Write PID of mythbackend to filename
+       -d or --daemon                 Runs mythbackend as a daemon
+       -v or --verbose                Prints more information
+       --printexpire                  List of auto-expire programs
+       --printsched                   Upcoming scheduled programs
 
 
 
@@ -2841,6 +2897,7 @@
   [1mmythfilldatabase --file [22mis an option if there isn't an XMLTV grabber
   for your country, but you [1mdo [22mhave an XML formatted listings file
   created by some other program.
+
 
   [1mmythfilldatabase --xawchannels [22mis an option if you have used [1mxawtv [22mto
   fine-tune your channels and would like to import the fine tuning
