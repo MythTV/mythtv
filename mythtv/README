@@ -1,11 +1,10 @@
                                    MythTV
-			        Release 0.14
-
+			        Release 0.15
 
 BUILD/CONFIGURATION INSTRUCTIONS
 --------------------------------
 
-This is what you need, software wise, to have installed:
+The following is a list of some of the prerequisites you will need installed:
 
    libttf - Freetype 2 is now required (it used to only be able to use 
             freetype 1).  I _think_ any release will work, but I'm using 2.1.2.
@@ -30,25 +29,33 @@ This is what you need, software wise, to have installed:
            be best.  I don't know, though, I'm utterly new to it.  Get it from
            your distro, or from http://www.mysql.com
 
-   XMLTV - If you are in North America, you need at least the latest version
-           (0.5.32 as of 2004-04-12).  This will do the work of actually 
-           grabbing the program information. Get it from http://xmltv.sf.net
-           If you're not, then you need some sort of listings grabber and
-           will need to run the mythfilldatabase program in --manual mode.
+   XMLTV - If you are outside of North America, you will need to install the
+           latest version (0.5.34 as of 2004-05-22).  This will do the work
+           of actually grabbing the program information. Get it from
+           http://xmltv.sf.net
+
+           If XMLTV does not have a grabber for your country, then you need
+           some sort of listings grabber and will need to run the
+           mythfilldatabase program in --manual mode.
+
+           If you are in North America, you do not need XMLTV.  MythTV has
+           a built-in grabber which uses Zap2It as a data source.  See the
+           HOWTO for complete instructions on configuring an account.
           
 See the mythtv-HOWTO.html or mythtv-HOWTO.txt file in the docs/ subdirectory
 or on http://www.mythtv.org/docs/ for in-depth instructions on installing and 
-compiling mythtv and all of the pre-requisites.  It has instructions for various
-linux distributions.
+compiling MythTV and all of the pre-requisites.  It has instructions for various
+Linux distributions.
 
-You also need v4l setup and working properly.  If xawtv works (in grabdisplay
-mode and with xv), this should, too.
+If you are using a framegrabber card (as opposed to a hardware MPEG-2
+capture card) You also need v4l setup and working properly.  If xawtv works
+(in grabdisplay mode and with xv), this should, too.
 
 Hardware wise, you need a computer.  Really.  Helps to have a fast one, too.
 You also need a video card with working Xv support (to scale and convert
 colorspaces), and a capture card.  If you're using ALSA for sound support
 (which _is_ the recommended thing to do), you should be using at least
-version 0.9, not 0.5.
+version 0.9.
 
 See the UPGRADING file for information on upgrading between releases.
 
