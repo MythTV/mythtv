@@ -1321,7 +1321,8 @@ void Scheduler::AddNewRecords(void) {
 "program.previouslyshown, record.recgroup, record.dupmethod, "
 "channel.commfree, capturecard.cardid, "
 "cardinput.cardinputid, UPPER(cardinput.shareable) = 'Y' AS shareable, "
-"program.seriesid, program.programid "
+"program.seriesid, program.programid, "
+"program.stars, program.originalairdate "
 
 "FROM record, program ") + fromclauses[clause] + QString(
 
@@ -1454,6 +1455,19 @@ void Scheduler::AddNewRecords(void) {
         p->shareable = result.value(26).toInt();
         p->seriesid = result.value(27).toString();
         p->programid = result.value(28).toString();
+        p->stars =  result.value(29).toString().toFloat();
+        
+        p->repeat = result.value(20).toInt();
+        
+        if(result.value(30).isNull())
+            p->originalAirDate = p->startts.date();
+        else
+        {
+            p->originalAirDate = QDate::fromString(result.value(30).toString(), Qt::ISODate);
+            
+            if(p->originalAirDate < p->startts.date())
+                p->repeat = true;
+        }
 
         if (!recTypeRecPriorityMap.contains(p->rectype))
             recTypeRecPriorityMap[p->rectype] = 
@@ -1467,7 +1481,7 @@ void Scheduler::AddNewRecords(void) {
             p->recendts = p->endts;
         }
 
-        p->repeat = result.value(20).toInt();
+        
         p->recgroup = result.value(21).toString();
 
         p->schedulerid = 
@@ -1510,6 +1524,13 @@ void Scheduler::AddNewRecords(void) {
         // Check for rsCurrentRecording and rsPreviousRecording
         if (p->rectype == kDontRecord)
             p->recstatus = rsDontRecord;
+        else if (p->rectype != kSingleRecord &&
+                 p->rectype != kOverrideRecord &&
+                 !p->reactivate && (p->dupmethod == kDupCheckNewEpi))
+        {
+            if(p->repeat || result.value(10).toInt() || result.value(14).toInt())
+                p->recstatus = rsRepeat;
+        }
         else if (p->rectype != kSingleRecord &&
                  p->rectype != kOverrideRecord &&
                  !p->reactivate &&

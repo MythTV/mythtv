@@ -105,6 +105,9 @@ void ScheduledRecording::loadByProgram(QSqlDatabase* db, ProgramInfo* proginfo)
 {
     m_pginfo = proginfo;
     
+    //query.exec( "SELECT count(previouslyshown) FROM program WHERE previouslyshown = 1;");
+    //if (query.isActive() && query.numRowsAffected() > 0)
+    
     if (proginfo->recordid)
         loadByID(db, proginfo->recordid);
     else

@@ -248,8 +248,12 @@ class SRDupMethod: public SRSelectSetting
 {
     public:
         SRDupMethod(ScheduledRecording& _parent, ManagedList* _list, ManagedListGroup* _group)
-            : SRSelectSetting(_parent, "dupMethodList", "[ Match duplicates with ]", _group, "dupmethod", _list) 
+            : SRSelectSetting(_parent, "dupMethodList", "[ Match duplicates with ]", _group, 
+                              "dupmethod", _list) 
         {
+            if(gContext->GetNumSetting("HaveRepeats", 0))
+                addSelection("Record new episodes only", kDupCheckNewEpi);
+                
             addSelection("Match duplicates using subtitle & description", kDupCheckSubDesc);
             addSelection("Match duplicates using subtitle", kDupCheckSub);
             addSelection("Match duplicates using description", kDupCheckDesc);

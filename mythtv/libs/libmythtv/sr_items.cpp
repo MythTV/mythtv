@@ -44,7 +44,7 @@ void SRDupSettingsGroup::syncText()
 
     text = dupMethItem->getItem()->getText();
         
-    if(meth != kDupCheckNone)
+    if((meth != kDupCheckNone) && (meth != kDupCheckNewEpi))
     {
         if(loc == kDupsInAll)
             text += ", in current and previous recordings";
@@ -146,7 +146,8 @@ void SRSchedOptionsGroup::itemChanged(ManagedListItem*)
     
     if(dupMethItem->getItem()->getEnabled())
     {
-        if(dupMethItem->getItem()->getValue().toInt() != kDupCheckNone)
+        if((dupMethItem->getItem()->getValue().toInt() != kDupCheckNone) && 
+           (dupMethItem->getItem()->getValue().toInt() != kDupCheckNewEpi) )
             dupLocItem->getItem()->setEnabled(true);
         else
             dupLocItem->getItem()->setEnabled(false);

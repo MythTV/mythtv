@@ -38,7 +38,8 @@ enum RecordingDupMethodType
     kDupCheckNone     = 0x01,
     kDupCheckSub      = 0x02,
     kDupCheckDesc     = 0x04,
-    kDupCheckSubDesc  = 0x06
+    kDupCheckSubDesc  = 0x06,
+    kDupCheckNewEpi   = 0x08,
 };
 
 enum RecSearchType
@@ -240,7 +241,6 @@ protected:
     QString timeFormat;
     QString dateFormat;
     QString shortDateFormat;
-    
 };
 
 

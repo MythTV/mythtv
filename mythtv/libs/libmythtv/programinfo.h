@@ -7,7 +7,8 @@
 #include <qmap.h>
 #include "scheduledrecording.h"
 
-#define NUMPROGRAMLINES 36
+
+#define NUMPROGRAMLINES 38
 
 enum MarkTypes {
     MARK_UPDATED_CUT = -3,
@@ -66,7 +67,7 @@ enum RecStatusType {
     rsCancelled = 6,
     rsConflict = 7,
     rsLaterShowing = 8,
-    //rsUnused = 9,
+    rsRepeat = 9,
     //rsUnused = 10,
     rsLowDiskSpace = 11,
     rsTunerBusy = 12
@@ -79,10 +80,12 @@ class ProgramInfo
   public:
     ProgramInfo();
     ProgramInfo(const ProgramInfo &other);
+    
     ~ProgramInfo();
 
     ProgramInfo& operator=(const ProgramInfo &other);
-
+    ProgramInfo& clone(const ProgramInfo &other);
+    
     // returns 0 for one-time, 1 for weekdaily, 2 for weekly
     int IsProgramRecurring(void);
 
@@ -229,8 +232,15 @@ class ProgramInfo
     QDateTime endts;
     QDateTime recstartts;
     QDateTime recendts;
+
+    
+
+    float stars;
+    QDate originalAirDate;
     QDateTime lastmodified;
 
+
+    
     bool repeat;
 
     int spread;

@@ -26,6 +26,8 @@ ProgramInfo::ProgramInfo(void)
     channame = "";
     chancommfree = 0;
     chanOutputFilters = "";
+    stars = 0;
+    
 
     pathname = "";
     filesize = 0;
@@ -35,7 +37,9 @@ ProgramInfo::ProgramInfo(void)
     endts = startts;
     recstartts = startts;
     recendts = startts;
+    originalAirDate = startts.date();
     lastmodified = startts;
+
 
     recstatus = rsUnknown;
     savedrecstatus = rsUnknown;
@@ -62,57 +66,18 @@ ProgramInfo::ProgramInfo(void)
         
 ProgramInfo::ProgramInfo(const ProgramInfo &other)
 {           
-    title = other.title;
-    subtitle = other.subtitle;
-    description = other.description;
-    category = other.category;
-    chanid = other.chanid;
-    chanstr = other.chanstr;
-    chansign = other.chansign;
-    channame = other.channame;
-    chancommfree = other.chancommfree;
-    chanOutputFilters = other.chanOutputFilters;
-    
-    pathname = other.pathname;
-    filesize = other.filesize;
-    hostname = other.hostname;
-
-    startts = other.startts;
-    endts = other.endts;
-    recstartts = other.recstartts;
-    recendts = other.recendts;
-    lastmodified = other.lastmodified;
-    spread = other.spread;
-    startCol = other.startCol;
- 
-    recstatus = other.recstatus;
-    savedrecstatus = other.savedrecstatus;
-    numconflicts = other.numconflicts;
-    conflictpriority = other.conflictpriority;
-    reactivate = other.reactivate;
-    recordid = other.recordid;
-    rectype = other.rectype;
-    dupin = other.dupin;
-    dupmethod = other.dupmethod;
-
-    sourceid = other.sourceid;
-    inputid = other.inputid;
-    cardid = other.cardid;
-    shareable = other.shareable;
-    schedulerid = other.schedulerid;
-    recpriority = other.recpriority;
-    recgroup = other.recgroup;
-    programflags = other.programflags;
-
-    repeat = other.repeat;
-
-    seriesid = other.seriesid;
-    programid = other.programid;
-
     record = NULL;
+    
+    clone(other);
 }
 
-ProgramInfo &ProgramInfo::operator=(const ProgramInfo &other)
+
+ProgramInfo &ProgramInfo::operator=(const ProgramInfo &other) 
+{ 
+    return clone(other); 
+}
+
+ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
 {
     if (record)
         delete record;
@@ -164,6 +129,9 @@ ProgramInfo &ProgramInfo::operator=(const ProgramInfo &other)
     seriesid = other.seriesid;
     programid = other.programid;
 
+    originalAirDate = other.originalAirDate;
+    stars = other.stars;
+    
     record = NULL;
 
     return *this;
@@ -217,6 +185,8 @@ void ProgramInfo::ToStringList(QStringList &list)
     list << ((seriesid != "") ? seriesid : QString(" "));
     list << ((programid != "") ? programid : QString(" "));
     list << lastmodified.toString(Qt::ISODate);
+    list << QString::number(stars);
+    list << originalAirDate.toString(Qt::ISODate);
 }
 
 bool ProgramInfo::FromStringList(QStringList &list, int offset)
@@ -270,6 +240,8 @@ bool ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
     seriesid = *(it++);
     programid = *(it++);
     lastmodified = QDateTime::fromString(*(it++), Qt::ISODate);
+    stars = (*(it++)).toFloat();
+    originalAirDate = QDate::fromString(*(it++), Qt::ISODate);
 
     if (title == " ")
         title = "";
@@ -309,6 +281,7 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
 {
     QString timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
     QString dateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d");
+    QString oldDateFormat = gContext->GetSetting("OldDateFormat", "M/d/yyyy");
     QString shortDateFormat = gContext->GetSetting("ShortDateFormat", "M/d");
     QString channelFormat = 
         gContext->GetSetting("ChannelFormat", "<num> <sign>");
@@ -401,12 +374,29 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
     progMap["RECSTATUS"] = RecStatusText();
 
     if (repeat)
-        progMap["REPEAT"] = QObject::tr("Repeat");
+    {
+        progMap["REPEAT"] = QString("(%1) ").arg(QObject::tr("Repeat"));
+        progMap["LONGREPEAT"] = QString("(%1 %2) ")
+                                .arg(QObject::tr("Repeat"))
+                                .arg(originalAirDate.toString(oldDateFormat));
+    }
     else
+    {
         progMap["REPEAT"] = "";
-
+        progMap["LONGREPEAT"] = "";
+    }
+   
     progMap["seriesid"] = seriesid;
     progMap["programid"] = programid;
+    
+    if(stars)
+        progMap["stars"] = QString("(%1 %2) ").arg(4.0 * stars).arg(QObject::tr("stars"));
+    else
+        progMap["stars"] = "";
+        
+    progMap["originalairdate"]= originalAirDate.toString(dateFormat);
+    progMap["shortoriginalairdate"]= originalAirDate.toString(shortDateFormat);
+    
 }
 
 int ProgramInfo::CalculateLength(void)
@@ -454,7 +444,7 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
                        "subtitle,description,channel.channum, "
                        "channel.callsign,channel.name,channel.commfree, "
                        "channel.outputfilters,seriesid,programid,filesize, "
-                       "lastmodified "
+                       "lastmodified,stars,previouslyshown,originalairdate "
                        "FROM recorded "
                        "LEFT JOIN channel "
                        "ON recorded.chanid = channel.chanid "
@@ -491,9 +481,20 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
         proginfo->seriesid = query.value(11).toString();
         proginfo->programid = query.value(12).toString();
         proginfo->filesize = stringToLongLong(query.value(13).toString());
+
         proginfo->lastmodified =
                   QDateTime::fromString(query.value(14).toString(),
                                         Qt::ISODate);
+        
+        proginfo->stars = query.value(15).toString().toFloat();
+        proginfo->repeat = query.value(16).toInt();
+        
+        if(query.value(17).isNull() || query.value(17).toString().isEmpty())
+            proginfo->originalAirDate = proginfo->startts.date();
+        else
+            proginfo->originalAirDate = QDate::fromString(query.value(17).toString(),
+                                                          Qt::ISODate);
+
 
         proginfo->spread = -1;
 
@@ -856,16 +857,19 @@ void ProgramInfo::StartedRecording(QSqlDatabase *db)
     QString query;
     query = QString("INSERT INTO recorded (chanid,starttime,endtime,title,"
                     "subtitle,description,hostname,category,recgroup,"
-                    "autoexpire,recordid,seriesid,programid) "
+                    "autoexpire,recordid,seriesid,programid,stars,"
+                    "previouslyshown,originalairdate) "
                     "VALUES(%1,\"%2\",\"%3\",\"%4\",\"%5\",\"%6\",\"%7\","
                         "\"%8\",\"%9\"")
                     .arg(chanid).arg(starts).arg(ends).arg(sqltitle.utf8()) 
                     .arg(sqlsubtitle.utf8()).arg(sqldescription.utf8())
                     .arg(gContext->GetHostName()).arg(sqlcategory.utf8())
                     .arg(sqlrecgroup.utf8());
-    query += QString(",%1,%2,\"%3\",\"%4\");")
+                    
+    query += QString(",%1,%2,\"%3\",\"%4\", %5, %6, \"%7\");")
                     .arg(record->GetAutoExpire()).arg(recordid)
-                    .arg(seriesid).arg(programid);
+                    .arg(seriesid).arg(programid).arg(stars)
+                    .arg(repeat).arg(originalAirDate.toString());
 
     QSqlQuery qquery = db->exec(query);
     if (!qquery.isActive())
@@ -1614,6 +1618,8 @@ QString ProgramInfo::RecStatusChar(void)
         return QObject::tr("P", "RecStatusChar");
     case rsCurrentRecording:
         return QObject::tr("R", "RecStatusChar");
+    case rsRepeat:
+        return QObject::tr("r", "RecStatusChar");    
     case rsEarlierShowing:
         return QObject::tr("E", "RecStatusChar");
     case rsTooManyRecordings:
@@ -1671,6 +1677,8 @@ QString ProgramInfo::RecStatusText(void)
             return QObject::tr("Low Disk Space");
         case rsTunerBusy:
             return QObject::tr("Tuner Busy");
+        case rsRepeat:
+            return QObject::tr("Repeat");            
         default:
             return QObject::tr("Unknown");
         }
@@ -1736,6 +1744,9 @@ QString ProgramInfo::RecStatusDesc(void)
             message += QObject::tr("this episode will be recorded at an "
                                    "earlier time instead.");
             break;
+        case rsRepeat:
+            message += QObject::tr("this episode is a repeat.");
+            break;            
         case rsTooManyRecordings:
             message += QObject::tr("too many recordings of this program have "
                                    "already been recorded.");
@@ -2129,6 +2140,7 @@ void ProgramInfo::handleNotRecording(QSqlDatabase *db)
              recstatus == rsPreviousRecording ||
              recstatus == rsCurrentRecording ||
              recstatus == rsEarlierShowing ||
+             recstatus == rsRepeat ||
              recstatus == rsLaterShowing))
         {
             diag.AddButton(QObject::tr("Record anyway"));
@@ -2230,10 +2242,15 @@ bool ProgramList::FromProgram(QSqlDatabase *db, const QString sql,
         "    program.title, program.subtitle, program.description, "
         "    program.category, channel.channum, channel.callsign, "
         "    channel.name, program.previouslyshown, channel.commfree, "
-        "    channel.outputfilters, program.seriesid, program.programid "
+        "    channel.outputfilters, program.seriesid, program.programid, "
+        "    program.stars, program.originalairdate "
         "FROM program "
         "LEFT JOIN channel ON program.chanid = channel.chanid "
         "%1 ").arg(sql);
+
+            
+
+                
     if (!sql.contains(" GROUP BY "))
         querystr += "GROUP BY program.starttime, channel.channum, "
             "  channel.callsign ";
@@ -2274,6 +2291,16 @@ bool ProgramList::FromProgram(QSqlDatabase *db, const QString sql,
         p->seriesid = query.value(13).toString();
         p->programid = query.value(14).toString();
 
+        p->stars = query.value(15).toString().toFloat();
+        
+        
+        
+        if(query.value(16).isNull() || query.value(16).toString().isEmpty())
+            p->originalAirDate = p->startts.date();
+        else
+            p->originalAirDate = QDate::fromString(query.value(16).toString(),
+                                                   Qt::ISODate);
+                                           
         ProgramInfo *s;
         for (s = schedList.first(); s; s = schedList.next())
         {
