@@ -43,6 +43,7 @@ MythMainWindow::MythMainWindow(QWidget *parent, const char *name, bool modal)
 {
     Init();
     ignore_lirc_keys = false;
+    exitingtomain = false;
 #ifdef USE_LIRC
     pthread_t lirc_tid;
     pthread_attr_t attr;
@@ -97,6 +98,9 @@ void MythMainWindow::detach(QWidget *child)
 
     if (current)
         current->setFocus();
+
+    if (exitingtomain)
+        QApplication::postEvent(this, new ExitToMainMenuEvent());
 }
 
 QWidget *MythMainWindow::currentWidget(void)
@@ -104,6 +108,41 @@ QWidget *MythMainWindow::currentWidget(void)
     if (widgetList.size() > 0)
         return widgetList.back();
     return NULL;
+}
+
+void MythMainWindow::ExitToMainMenu(void)
+{
+    QWidget *current = currentWidget();
+
+    if (current)
+    {
+        if (current->name() != QString("mainmenu"))
+        {
+            if (MythDialog *dial = dynamic_cast<MythDialog*>(current))
+            {
+                QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, Key_Escape, 
+                                               0, Qt::NoButton);
+                QObject *key_target = getTarget(*key);
+                QApplication::postEvent(key_target, key);
+                exitingtomain = true;
+            }
+        }
+        else
+        {
+            exitingtomain = false;
+        }
+    }
+}
+
+int MythMainWindow::TranslateKeyPress(const QString &context,
+                                      int key, QValueVector<int> *retvec)
+{
+/*
+    if (key == Key_T)
+        QApplication::postEvent(this, new ExitToMainMenuEvent());
+*/
+
+    return false;
 }
 
 void MythMainWindow::keyPressEvent(QKeyEvent *e)
@@ -117,7 +156,11 @@ void MythMainWindow::keyPressEvent(QKeyEvent *e)
 
 void MythMainWindow::customEvent(QCustomEvent *ce)
 {
-    if (ce->type() == kExternalKeycodeEventType)
+    if (ce->type() == kExitToMainMenuEventType)
+    {
+        ExitToMainMenu();
+    }
+    else if (ce->type() == kExternalKeycodeEventType)
     {
         ExternalKeycodeEvent *eke = (ExternalKeycodeEvent *)ce;
         int keycode = eke->getKeycode();
@@ -285,7 +328,7 @@ int MythDialog::exec()
     return res;
 }
 
-void MythDialog::hide()
+void MythDialog::hide(void)
 {
     if (isHidden())
         return;

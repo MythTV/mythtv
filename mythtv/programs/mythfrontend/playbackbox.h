@@ -31,9 +31,6 @@ class PlaybackBox : public MythDialog
    
     void customEvent(QCustomEvent *e);
   
-  signals:
-    void killTheApp();
- 
   protected slots:
     void timeout(void);
 

@@ -69,8 +69,6 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     usageRect = QRect(0, 0, 0, 0);
     videoRect = QRect(0, 0, 0, 0);
 
-    connect(this, SIGNAL(killTheApp()), this, SLOT(accept()));
-
     noUpdate = false;
 
     showDateFormat = gContext->GetSetting("ShortDateFormat", "M/d");
@@ -239,7 +237,7 @@ void PlaybackBox::exitWin()
     timer->stop();
     killPlayer();
 
-    emit killTheApp();
+    accept();
 }
 
 void PlaybackBox::updateBackground(void)

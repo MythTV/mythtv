@@ -9,6 +9,7 @@
 #include <qpixmap.h>
 #include <qpushbutton.h>
 #include <qevent.h>
+#include <qvaluevector.h>
 
 #include <vector>
 using namespace std;
@@ -32,6 +33,7 @@ class LayerSet;
 class GenericTree;
 
 const int kExternalKeycodeEventType = 33213;
+const int kExitToMainMenuEventType = 33214;
 
 class ExternalKeycodeEvent : public QCustomEvent
 {
@@ -43,6 +45,12 @@ class ExternalKeycodeEvent : public QCustomEvent
 
   private:
     int keycode;
+};
+
+class ExitToMainMenuEvent : public QCustomEvent
+{
+  public:
+    ExitToMainMenuEvent(void) : QCustomEvent(kExitToMainMenuEventType) {}
 };
 
 class MythMainWindow : public QDialog
@@ -59,9 +67,14 @@ class MythMainWindow : public QDialog
 
     QWidget *currentWidget(void);
 
-   protected:
+    int TranslateKeyPress(const QString &context, int key, 
+                          QValueVector<int> *retvec = NULL);
+
+  protected:
     void keyPressEvent(QKeyEvent *e);
     void customEvent(QCustomEvent *ce);
+
+    void ExitToMainMenu();
 
     QObject *getTarget(QKeyEvent &key);
 
@@ -72,6 +85,8 @@ class MythMainWindow : public QDialog
     vector<QWidget *> widgetList;
 
     bool ignore_lirc_keys;
+
+    bool exitingtomain;
 };
 
 class MythDialog : public QFrame
@@ -86,9 +101,9 @@ class MythDialog : public QFrame
 
     int result(void) const { return rescode; }
 
-    virtual void Show();
+    virtual void Show(void);
 
-    void hide();
+    void hide(void);
 
     void setNoErase(void);
 

@@ -87,7 +87,8 @@ int startChannelRecPriorities(void)
 
 int startPlayback(void)
 {
-    PlaybackBox pbb(PlaybackBox::Play, gContext->GetMainWindow(), "play");
+    PlaybackBox pbb(PlaybackBox::Play, gContext->GetMainWindow(), 
+                    "tvplayselect");
 
     qApp->unlock();
     pbb.exec();
@@ -99,7 +100,7 @@ int startPlayback(void)
 int startDelete(void)
 {
     PlaybackBox delbox(PlaybackBox::Delete, gContext->GetMainWindow(), 
-                       "delete");
+                       "tvplayselect");
    
     qApp->unlock();
     delbox.exec();

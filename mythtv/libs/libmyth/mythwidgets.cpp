@@ -12,6 +12,7 @@ using namespace std;
 #include "mythwidgets.h"
 #include "mythcontext.h"
 #include "util.h"
+#include "mythdialogs.h"
 
 void MythComboBox::keyPressEvent(QKeyEvent *e)
 {
