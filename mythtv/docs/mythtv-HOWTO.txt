@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-04-29, v2.25
+  2003-04-30, v2.26
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -505,7 +505,8 @@
   [1mfreetype2-devel[22m, [1mXFree86-devel[22m, [1mqt-devel [22mand [1mlame[22m.  If you're going to
   use a remote control with MythTV, you're going to need the [1mcdialog[0m
   package in order to compile [1mlircd [22mif your distribution doesn't have a
-  pre-packaged [1mlirc[22m.
+  pre-packaged [1mlirc[22m.  If you are using [1mXMLTV [22mas a grabber, you will need
+  [1mperl[22m.
 
   ______________________________________________________________________
   NOTE:  QT v3.1 is recommended, but not required.
@@ -517,10 +518,6 @@
 
   NOTE:  Other than where noted, Mandrake 9.1 users may follow the
   Mandrake 9.0 instructions.
-
-  NOTE:  Perl is required for XMLTV.  MythTV supports directly obtaining
-  program data from gist.com, so if you use gist.com as a data source you do
-  not need to install Perl or XMLTV but you will need wget.
   ______________________________________________________________________
 
   There appears to be issues with ALSA and simultaneously recording and
@@ -549,12 +546,10 @@
   perl distribution.  In each case, we're looking to make sure that the
   primary module is getting installed.
 
-  If you're going to be using XMLTV rather than obtaining program
-  listings directly from gist.com, you'll need to install perl.  Click
-  the magnifying glass or press [1mCTRL-F [22mand enter "perl" as your search
-  term.  You should find it under the "Perl" folder.  You need at least
-  the perl 5.80 base package installed.  If not, click on the "Mark"
-  button.
+  Click the magnifying glass or press [1mCTRL-F [22mand enter "perl" as your
+  search term.  You should find it under the "Perl" folder.  You need at
+  least the perl 5.80 base package installed.  If not, click on the
+  "Mark" button.
 
   If you are going to be installing mysql on this system, search for
   mysql - it should be under "Databases".  Make sure that mysql and
@@ -680,8 +675,8 @@
   "qt3-devel".  The full filenames will vary, so one you know the file-
   name, you can install them with
 
-       # rpm -Uvh [filename1]
-       # rpm -Uvh [filename2]
+  # rpm -Uvh [filename1]
+  # rpm -Uvh [filename2]
 
   Once this has completed (it can take a while, so please be patient),
   continue by following the Mandrake 9.0 instructions.
@@ -697,7 +692,7 @@
 
        $ su
        # urpmi mysql gcc gcc-c++ freetype2-devel cdialog alsa-utils
-       # urpmi XFree86-devel
+       # urpmi XFree86-devel perl
 
   ______________________________________________________________________
   NOTE for Mandrake 8.2 users: do not execute the following
@@ -713,14 +708,9 @@
   # urpmi libqt3-mysql
   ______________________________________________________________________
 
-  If you are going to be using XMLTV rather than directly obtaining
-  program listings from gist.com, you must install [1mperl[22m:
-
-       # urpmi perl
-
   However, you might get this when you execute the command above:
 
-       [root@pvr root]# urpmi mysql gcc gcc-c++ freetype2-devel libqt3-devel alsa-utils XFree86-devel
+       [root@pvr root]# urpmi mysql gcc gcc-c++ freetype2-devel libqt3-devel alsa-utils XFree86-devel perl
        everything already installed
 
   In that case, you're ready to move to the next ``section''.
@@ -772,7 +762,6 @@
   The following instructions work for Mandrake 9.0 and 9.1 using bash as
   the shell, and may be applicable for a distribution which uses
   /etc/profile.d.
-
   As root, create the following file in /etc/profile.d  The example
   filename is "mythtv.sh".  Use what you feel is appropriate.
 
@@ -815,12 +804,12 @@
 
   Open a new shell and switch to superuser mode.
 
-  $ su
-  # set
+       $ su
+       # set
 
-  [lots of text]
-  QTDIR=/usr/lib/qt3
-  PATH=/usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/games:/usr/lib/qt3/bin:/home/mythtv/bin:/usr/lib/qt3/bin
+       [lots of text]
+       QTDIR=/usr/lib/qt3
+       PATH=/usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/games:/usr/lib/qt3/bin:/home/mythtv/bin:/usr/lib/qt3/bin
 
   You should see QTDIR and /usr/lib/qt3/bin in your path.
 
@@ -853,15 +842,6 @@
 
   Get MythTV from the mythtv.org <http://www.mythtv.org> web site.  Save
   the tarball to a directory you can find.
-
-  [1mNOTE[22m: If you are in North America, you should decide whether you will
-  be using XMLTV for your guide data or whether you will subscribe to
-  www.gist.com <www.gist.com>.  gist.com listings require a subscription
-  fee; see the website for details.  The gist.com listings appear to be
-  more complete than those obtained using XMLTV from the zap2it website.
-  If you subscribe to gist.com, you will not need to install XMLTV and
-  can ``skip'' the installation procedure - mythfilldatabase can obtain
-  the guide data directly from the gist.com website.
 
   Get XMLTV from http://xmltv.sourceforge.net
   <http://xmltv.sourceforge.net>.  Download version 0.5.10
@@ -909,18 +889,18 @@
 
   Check that it worked:
 
-  # ls -l /usr/local/lib
-  -rw-r--r--    1 root     root       381706 Nov  4 14:22 libmp3lame.a
-  -rwxr-xr-x    1 root     root          674 Nov  4 14:22 libmp3lame.la*
-  lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so ->
-  libmp3lame.so.0.0.0*
-  lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so.0 ->
-  libmp3lame.so.0.0.0*
-  -rwxr-xr-x    1 root     root       360197 Nov  4 14:22
-  libmp3lame.so.0.0.0*
+       # ls -l /usr/local/lib
+       -rw-r--r--    1 root     root       381706 Nov  4 14:22 libmp3lame.a
+       -rwxr-xr-x    1 root     root          674 Nov  4 14:22 libmp3lame.la*
+       lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so ->
+       libmp3lame.so.0.0.0*
+       lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so.0 ->
+       libmp3lame.so.0.0.0*
+       -rwxr-xr-x    1 root     root       360197 Nov  4 14:22
+       libmp3lame.so.0.0.0*
 
-  # exit
-  $
+       # exit
+       $
 
   [1m5.3.  Building XMLTV.[0m
 
@@ -961,8 +941,8 @@
 
   Untar the xmltv file:
 
-  $ tar -xjf xmltv-0.5.10.tar.bz2
-  $ cd xmltv-0.5.10
+       $ tar -xjf xmltv-0.5.10.tar.bz2
+       $ cd xmltv-0.5.10
 
   Install the xmltv prerequisites:
 
@@ -986,8 +966,8 @@
 
   Change to the XMLTV directory and compile it:
 
-       $ cd xmltv-0.5.10
-       $ perl Makefile.PL
+  $ cd xmltv-0.5.10
+  $ perl Makefile.PL
 
   You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes"
   to the grabber required for your location.
@@ -1006,10 +986,10 @@
 
   Unpack MythTV
 
-  $ tar -xjf mythtv-0.8.tar.bz2
-  $ cd mythtv-0.8
-  $ ./configure
-  $ make
+       $ tar -xjf mythtv-0.8.tar.bz2
+       $ cd mythtv-0.8
+       $ ./configure
+       $ make
 
   ______________________________________________________________________
   NOTE for Red Hat 8 users: You must manually modify a Makefile
@@ -1081,10 +1061,10 @@
 
   [1mNOTE[22m:  There have been reports that mysql isn't starting at boot.
 
-       $ su
-       # chkconfig --level 35 mysql on
-       # /etc/rc.d/init.d/mysql start
-       # exit
+  $ su
+  # chkconfig --level 35 mysql on
+  # /etc/rc.d/init.d/mysql start
+  # exit
 
   [1m6.2.  Red Hat Linux 8.0[0m
 
@@ -1264,6 +1244,7 @@
 
   This will compile and install the kernel modules and initialization
   scripts, as well as create device nodes in /dev.
+
   Install the rest of the packages:
 
        $ cd ~
@@ -1287,7 +1268,6 @@
   configuration to ensure that you don't end up with mysterious
   conflicts in the future.  You should end up with a /etc/modules.conf
   file that has this configuration:
-
        alias char-major-116 snd
        alias snd-card-0 snd-XXX
        # module options should go here
@@ -1471,10 +1451,10 @@
   At this point, if you're using a serial receiver, check that the link
   has been correctly made in /dev:
 
-  $ ls -l /dev/li*
-  lr-xr-xr-x    1 root     root            5 Jan 27 09:00 /dev/lirc -> ttyS0
-  srw-rw-rw-    1 root     root            0 Jan 27 15:01 /dev/lircd=
-  prw-r--r--    1 root     root            0 Jan 27 09:00 /dev/lircm|
+       $ ls -l /dev/li*
+       lr-xr-xr-x    1 root     root            5 Jan 27 09:00 /dev/lirc -> ttyS0
+       srw-rw-rw-    1 root     root            0 Jan 27 15:01 /dev/lircd=
+       prw-r--r--    1 root     root            0 Jan 27 09:00 /dev/lircm|
 
   As you can see, there's a link from /dev/lirc to ttyS0, aka "COM1".
 
@@ -1615,6 +1595,7 @@
 
   The next step is to convert those signals into something that can be
   used to control MythTV.
+
        $ cd ~/mythtv-0.8/configfiles
        $ cp lircrc.example ~/.lircrc
 
@@ -1796,16 +1777,16 @@
   /dev/device. Unlike bourne or bash, csh scripts automatically close
   parent file descriptors before they start.
 
-       $ cd /usr/local/bin
-       # su
-       # cat > change_channel.csh
-       #!/bin/csh
-       echo "changing to $1"
-       /usr/local/bin/channel.pl $1 &
-       ^D
-       # chmod a+x change_channel.csh
-       # exit
-       $ exit
+  $ cd /usr/local/bin
+  # su
+  # cat > change_channel.csh
+  #!/bin/csh
+  echo "changing to $1"
+  /usr/local/bin/channel.pl $1 &
+  ^D
+  # chmod a+x change_channel.csh
+  # exit
+  $ exit
 
   See contrib/channel.pl for the actual file.  Copy it to
   /usr/local/bin/
@@ -1879,6 +1860,7 @@
 
   The next question will ask you if you wish to clear out your video
   source information.  You should answer "YES" to this as well.
+
   Once the graphical setup starts, you'll see that there are four
   choices.
 
@@ -2111,18 +2093,18 @@
   you like.  Once you're satisfied with the time that [1mmythfilldatabase[0m
   will run, save and exit, and return to the shell prompt.
 
-  $ cd configfiles
-  $ crontab mythcrontab
-  $ crontab -l  NOTE: this is a lowercase L.
-  # The following will run the mythfilldatabase shell script at 0430
-  # every day.  Format is
-  # minutes hour day_of_month month day_of_week
-  # man 5 crontab for more information
-  # Need to use a shell script because the QTDIR environment variable isn't
-  # being honored by crontab?
-  # The next text should be all on the same line.
-  30 04 * * * /bin/bash $HOME/mythtv-0.8/MC/configfiles/mythfilldatabasecron
-  $
+       $ cd configfiles
+       $ crontab mythcrontab
+       $ crontab -l  NOTE: this is a lowercase L.
+       # The following will run the mythfilldatabase shell script at 0430
+       # every day.  Format is
+       # minutes hour day_of_month month day_of_week
+       # man 5 crontab for more information
+       # Need to use a shell script because the QTDIR environment variable isn't
+       # being honored by crontab?
+       # The next text should be all on the same line.
+       30 04 * * * /bin/bash $HOME/mythtv-0.8/MC/configfiles/mythfilldatabasecron
+       $
 
   As you can see, [1mmythfilldatabase [22mwill now be run at 0430 every day.
 
@@ -2136,7 +2118,6 @@
   [1mNOTE[22m:  By default, the crontab will use [1mvi [22mas your editor.  If you
   don't like to use [1mvi[22m, make sure that you've set VISUAL to something
   other than [1mvi[22m.
-
        $ export VISUAL=/usr/bin/joe
        $ crontab -e
 
@@ -2251,11 +2232,11 @@
 
   Once it's on your machine, you must move the file and untar it:
 
-       $ su
-       # cp funhouse.tar.gz /usr/local/share/mythtv/themes
-       # cd /usr/local/share/mythtv/themes
-       # tar -xjf funhouse.tar.gz
-       # exit
+  $ su
+  # cp funhouse.tar.gz /usr/local/share/mythtv/themes
+  # cd /usr/local/share/mythtv/themes
+  # tar -xjf funhouse.tar.gz
+  # exit
 
   The theme will now be available in the mythfrontend Appearance
   section.
@@ -2435,17 +2416,17 @@
   <http://www.xiph.org/paranoia/download/cdparanoia-III-
   alpha9.8.src.tgz>.
 
-  $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
-  $ cd cdparanoia-III-alpha9.8
-  $ ./configure
-  $ make
-  $ su
-  # make install
-  # cd /usr/lib
-  # ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
-  # ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
-  # exit
-  $
+       $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
+       $ cd cdparanoia-III-alpha9.8
+       $ ./configure
+       $ make
+       $ su
+       # make install
+       # cd /usr/lib
+       # ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
+       # ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
+       # exit
+       $
 
   [1m15.2.  Mandrake 9.0[0m
 
@@ -2575,7 +2556,6 @@
 
   The Ignore_ID3 option does not disable the code that determines the
   track length, just the portion that tries to read ID3 info.
-
   [1m15.6.  Using MythMusic.[0m
 
   MythMusic is fairly simple to use.  It is recommended that you insert
@@ -2641,7 +2621,6 @@
   The MythWeather module will obtain the weather information for the
   location that you specify.  You must be running MythTV v0.8 in order
   to use MythWeather.
-
   ______________________________________________________________________
   NOTE for Red Hat Linux 8.0 users: Red Hat 8 users must make the following
   modification, or several weather icons will fail to be installed.
@@ -2656,11 +2635,11 @@
 
   Change into the MythWeather directory, then make and make install:
 
-  $ cd mythweather
-  $ make
-  $ su
-  # make install
-  # exit
+       $ cd mythweather
+       $ make
+       $ su
+       # make install
+       # exit
 
   MythWeather uses MSNBC.com as its source for weather data and
   weather.com for its radar image.
@@ -2753,11 +2732,11 @@
 
   First, you should check that your kernel has been enabled for DMA:
 
-       [mythtv@pvr mythtv]$ dmesg |grep DMA
-           ide0: BM-DMA at 0xd800-0xd807, BIOS settings: hda:DMA, hdb:DMA
-           ide1: BM-DMA at 0xd808-0xd80f, BIOS settings: hdc:DMA, hdd:pio
-       hda: 156301488 sectors (80026 MB) w/2048KiB Cache, CHS=9729/255/63, UDMA(33)
-       hdb: 80043264 sectors (40982 MB) w/2048KiB Cache, CHS=4982/255/63, UDMA(33)
+  [mythtv@pvr mythtv]$ dmesg |grep DMA
+      ide0: BM-DMA at 0xd800-0xd807, BIOS settings: hda:DMA, hdb:DMA
+      ide1: BM-DMA at 0xd808-0xd80f, BIOS settings: hdc:DMA, hdd:pio
+  hda: 156301488 sectors (80026 MB) w/2048KiB Cache, CHS=9729/255/63, UDMA(33)
+  hdb: 80043264 sectors (40982 MB) w/2048KiB Cache, CHS=4982/255/63, UDMA(33)
 
   From the listing above, you can see that hda, hdb and hdc are set for
   DMA, and hdd is set for pio.  If your kernel is not reporting DMA
@@ -2823,11 +2802,11 @@
 
   Edit your /etc/X11/XF86Config-4 file, and look for:
 
-  Section "ServerFlags"
-      #DontZap # disable <Crtl><Alt><BS> (server abort)
-      #DontZoom # disable <Crtl><Alt><KP_+>/<KP_-> (resolution switching)
-      AllowMouseOpenFail # allows the server to start up even if the mouse doesn't work
-  EndSection
+       Section "ServerFlags"
+           #DontZap # disable <Crtl><Alt><BS> (server abort)
+           #DontZoom # disable <Crtl><Alt><KP_+>/<KP_-> (resolution switching)
+           AllowMouseOpenFail # allows the server to start up even if the mouse doesn't work
+       EndSection
 
   Add Option "NoPM" "true" and Option "BlankTime" "0"to the ServerFlags
   section.
@@ -2848,23 +2827,23 @@
 
   Finally, check:
 
-       Section "Monitor"
-           Identifier "monitor1"
-           VendorName "Plug'n Play"
-           HorizSync 30-85
-           VertRefresh 50-160
+  Section "Monitor"
+      Identifier "monitor1"
+      VendorName "Plug'n Play"
+      HorizSync 30-85
+      VertRefresh 50-160
 
-           # Sony Vaio C1(X,XS,VE,VN)?
-           # 1024x480 @ 85.6 Hz, 48 kHz hsync
-           ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
+      # Sony Vaio C1(X,XS,VE,VN)?
+      # 1024x480 @ 85.6 Hz, 48 kHz hsync
+      ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
 
-           # TV fullscreen mode or DVD fullscreen output.
-           # 768x576 @ 79 Hz, 50 kHz hsync
-           ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
+      # TV fullscreen mode or DVD fullscreen output.
+      # 768x576 @ 79 Hz, 50 kHz hsync
+      ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
 
-           # 768x576 @ 100 Hz, 61.6 kHz hsync
-           ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
-       EndSection
+      # 768x576 @ 100 Hz, 61.6 kHz hsync
+      ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
+  EndSection
 
   Ensure that there isn't an Option "DPMS" in the Monitor configuration.
 
@@ -2921,25 +2900,30 @@
   At this point, you now have debug-enabled software ready.  Let's
   assume that the problem you're having is in the setup program.
 
-  $ cd setup
-  $ gdb ./setup
+       $ cd setup
+       $ gdb ./setup
 
-  GNU gdb 5.3-1mdk (Mandrake Linux)
-  Copyright 2002 Free Software Foundation, Inc.
-  GDB is free software, covered by the GNU General Public License, and you are
-  welcome to change it and/or distribute copies of it under certain
-  conditions.
-  Type "show copying" to see the conditions.
-  There is absolutely no warranty for GDB.  Type "show warranty" for details.
-  This GDB was configured as "i586-mandrake-linux-gnu"...
-  (gdb)
+       GNU gdb 5.3-1mdk (Mandrake Linux)
+       Copyright 2002 Free Software Foundation, Inc.
+       GDB is free software, covered by the GNU General Public License, and you are
+       welcome to change it and/or distribute copies of it under certain
+       conditions.
+       Type "show copying" to see the conditions.
+       There is absolutely no warranty for GDB.  Type "show warranty" for details.
+       This GDB was configured as "i586-mandrake-linux-gnu"...
+       (gdb)
 
   [1mgdb [22mhas a number of options, read the man page for more information.
 
   Once at the (gdb) prompt, type run to start program execution.  When
-  the program segfaults, type bt to get the backtrace.  The backtrace
-  should be posted to the mythtv-dev mailing list, along with the steps
-  you followed to get the program to crash.
+  the program segfaults or appears to lock-up, type info threads to get
+  the listing of all running threads.  For each thread, type thread 1,
+  press enter, then type bt full, thread 2, bt full, etc.  There may be
+  a lot of threads, but you must iterate through all of them.
+
+  The backtrace information for all the threads should be posted to the
+  mythtv-dev mailing list, along with the steps you followed to get the
+  program to crash.
 
   [1m18.10.  MythTV makes my system crash.[0m
 
@@ -3152,6 +3136,7 @@
 
   In PAL, there are 625 "raw" lines of resolution, with a net of 576
   vertical lines.
+
   Horizontally, the maximum you can expect from a Bt8X8 chip is 720.
 
   With this in mind, there are certain commonly accepted values for
@@ -3216,6 +3201,7 @@
 
   The MythTV GUI uses its GUI dimensions regardless of the other two and
   is anchored to the upper left corner of the X Desktop.
+
   The MythTV full screen mode uses the X display size dimensions
   regardless of the other two and is anchored to the upper left corner
   of the X display.
@@ -3403,12 +3389,12 @@
   Mandrake kernel level (ie, not 2.4.21-0.16mdk as in the example below,
   then alter the [1murpmi [22mcommand appropriately.)
 
-       $ uname -a
-       Linux pvr 2.4.21-0.16mdk #1 Fri Apr 11 06:51:54 CEST 2003 i686 unknown
-       unknown GNU/Linux
+  $ uname -a
+  Linux pvr 2.4.21-0.16mdk #1 Fri Apr 11 06:51:54 CEST 2003 i686 unknown
+  unknown GNU/Linux
 
-       $ su
-       # urpmi kernel-source
+  $ su
+  # urpmi kernel-source
 
   [1mNOTE[22m:  You do not need to recompile your kernel.
 
@@ -3431,12 +3417,6 @@
   You may want to go to the website and download the latest Windows
   driver if the [1mwget [22mcommand fails.
 
-  Place a copy of the videodev2.h file in the ivtv driver subdirectory.
-  This is the only reason that we installed the kernel-source above.  In
-  the future, the ivtv driver may include the videodev2.h file in the
-  distribution.
-
-       $ cp /usr/src/linux/include/linux/videodev2.h ~/ivtv/ivtv/driver/
        $ cd ~/ivtv/ivtv/driver
        $ make
 
@@ -3456,7 +3436,6 @@
 
   Next, copy the files that were compiled in the driver directory into
   the appropriate modules directory:
-
        $ su
        # cd /lib/modules/2.4.21-0.16mdk/kernel/drivers/media/video
        # cp ~/ivtv/ivtv/driver/msp3400.o .
@@ -3490,9 +3469,9 @@
 
   Check that the ivtv driver has created a new video device:
 
-  $ ls -l /dev/v4l/vi*
-  crw-------    1 mythtv   sys       81,   0 Dec 31  1969 /dev/v4l/video0
-  crw-------    1 mythtv   root      81,  32 Dec 31  1969 /dev/v4l/video32
+       $ ls -l /dev/v4l/vi*
+       crw-------    1 mythtv   sys       81,   0 Dec 31  1969 /dev/v4l/video0
+       crw-------    1 mythtv   root      81,  32 Dec 31  1969 /dev/v4l/video32
 
   In this case, the ivtv device is video0.
 
@@ -3540,7 +3519,7 @@
   On the "slave" machine, you'll want to edit the /etc/fstab file and
   add something like:
 
-  masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,soft,nfsvers=3
+       masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,soft,nfsvers=3
 
   Then run # fstab -a to re-read the file to mount the file system.
 
@@ -3605,14 +3584,14 @@
   Create the directory /var/log/mythtv and set its permissions as
   follows:
 
-       $ su
-       # mkdir /var/log/mythtv
-       # chown root:mythtv /var/log/mythtv
-       # chmod 0775 /var/log/mythtv
-       # exit
-       $ ls -ld /var/log/mythtv
-       drwxrwxr-x    2 root     mythtv       4096 Apr 28 21:58 /var/log/mythtv/
-       $
+  $ su
+  # mkdir /var/log/mythtv
+  # chown root:mythtv /var/log/mythtv
+  # chmod 0775 /var/log/mythtv
+  # exit
+  $ ls -ld /var/log/mythtv
+  drwxrwxr-x    2 root     mythtv       4096 Apr 28 21:58 /var/log/mythtv/
+  $
 
   [1m19.12.1.2.  Mandrake 9.x[0m
 
@@ -3641,10 +3620,10 @@
 
   Finally run the msec tool to check and implement your changes.
 
-  $ su
-  # msec
-  # exit
-  $
+       $ su
+       # msec
+       # exit
+       $
 
   [1mNOTE[22m: msec can only [4mreduce[24m the permissions of files, so if you don't
   get the results you expect, check that you're not asking msec to add

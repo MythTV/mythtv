@@ -264,9 +264,14 @@ This GDB was configured as "i586-mandrake-linux-gnu"...
 <P><B>gdb</B> has a number of options, read the <CODE>man</CODE> page for more
 information.</P>
 <P>Once at the <CODE>(gdb)</CODE> prompt, type <CODE>run</CODE> to start program
-execution.  When the program segfaults, type <CODE>bt</CODE> to get the
-backtrace.  The backtrace should be posted to the mythtv-dev mailing list,
-along with the steps you followed to get the program to crash.</P>
+execution.  When the program segfaults or appears to lock-up, type <CODE>info
+threads</CODE> to get the listing of all running threads.  For each thread,
+type <CODE>thread 1</CODE>, press enter, then type <CODE>bt full</CODE>, <CODE>thread 2</CODE>,
+<CODE>bt full</CODE>, etc.  There may be a lot of threads, but you must iterate
+through all of them.</P>
+<P>The backtrace information for all the threads should be posted to the
+mythtv-dev mailing list, along with the steps you followed to get the
+program to crash.</P>
 
 <H2><A NAME="ss18.10">18.10</A> <A HREF="mythtv-HOWTO.html#toc18.10">MythTV makes my system crash. </A>
 </H2>

@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-04-29, v2.25
+<date>2003-04-30, v2.26
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -335,7 +335,8 @@ is installed.  As of 2003-03-15, this list includes <bf>mysql</bf>,
 <bf>qt-devel</bf> and <bf>lame</bf>.  If you're going to use a remote
 control with MythTV, you're going to need the <bf>cdialog</bf> package in
 order to compile <bf>lircd</bf> if your distribution doesn't have a
-pre-packaged <bf>lirc</bf>.
+pre-packaged <bf>lirc</bf>.  If you are using <bf>XMLTV</bf> as a grabber,
+you will need <bf>perl</bf>.
 
 <code>
 NOTE:  QT v3.1 is recommended, but not required.
@@ -347,10 +348,6 @@ that you've installed the -devel version of a pre-requisite.
 
 NOTE:  Other than where noted, Mandrake 9.1 users may follow the
 Mandrake 9.0 instructions.
-
-NOTE:  Perl is required for XMLTV.  MythTV supports directly obtaining
-program data from gist.com, so if you use gist.com as a data source you do
-not need to install Perl or XMLTV but you will need wget.
 </code>
 
 There appears to be issues with ALSA and simultaneously recording and
@@ -376,11 +373,9 @@ the apache web server, others are a part of the perl distribution.  In each
 case, we're looking to make sure that the primary module is getting
 installed.
 
-If you're going to be using XMLTV rather than obtaining program listings
-directly from gist.com, you'll need to install perl.  Click the magnifying
-glass or press <bf>CTRL-F</bf> and enter "perl" as your search term.  You
-should find it under the "Perl" folder.  You need at least the perl 5.80
-base package installed.  If not, click on the "Mark" button.
+Click the magnifying glass or press <bf>CTRL-F</bf> and enter "perl" as your
+search term.  You should find it under the "Perl" folder.  You need at least
+the perl 5.80 base package installed.  If not, click on the "Mark" button.
 
 If you are going to be installing mysql on this system, search for mysql -
 it should be under "Databases".  Make sure that mysql and mysql-clients are
@@ -518,7 +513,7 @@ asked a number of questions regarding dependencies.  It's best to answer
 <tscreen><verb>
 $ su
 # urpmi mysql gcc gcc-c++ freetype2-devel cdialog alsa-utils
-# urpmi XFree86-devel
+# urpmi XFree86-devel perl
 </verb></tscreen>
 
 <code>
@@ -537,16 +532,9 @@ NOTE for Mandrake 9.1 users: execute the following command.
 # urpmi libqt3-mysql
 </code>
 
-If you are going to be using XMLTV rather than directly obtaining program
-listings from gist.com, you must install <bf>perl</bf>:
-
-<tscreen><verb>
-# urpmi perl
-</verb></tscreen>
-
 However, you might get this when you execute the command above:
 <tscreen><verb>
-[root@pvr root]# urpmi mysql gcc gcc-c++ freetype2-devel libqt3-devel alsa-utils XFree86-devel
+[root@pvr root]# urpmi mysql gcc gcc-c++ freetype2-devel libqt3-devel alsa-utils XFree86-devel perl
 everything already installed
 </verb></tscreen>
 
@@ -678,16 +666,6 @@ run it if you get an unexpected error about not finding libraries.
 <p>Get MythTV from the <url url="http://www.mythtv.org" name="mythtv.org">
 web site.  Save the tarball to a directory you can find.
 
-<bf>NOTE</bf>: If you are in North America, you should decide whether you
-will be using XMLTV for your guide data or whether you will subscribe to
-<url url="www.gist.com" name="www.gist.com">.  gist.com listings require a
-subscription fee; see the website for details.  The gist.com listings appear
-to be more complete than those obtained using XMLTV from the zap2it website. 
-If you subscribe to gist.com, you will not need to install XMLTV and can
-<ref id="manually_building_mythtv" name="skip"> the installation procedure -
-mythfilldatabase can obtain the guide data directly from the gist.com
-website.
-
 Get XMLTV from <url url="http://xmltv.sourceforge.net"
 name="http://xmltv.sourceforge.net">.  Download version 0.5.10
 
@@ -704,8 +682,7 @@ following the links to sourceforge.net
 
 <sect1>Notes on compiling on a system with non-Intel processors. <label
 id="nonintelcpu_">
-<p>If
-you've got a system with an AMD K6-2 or a VIA C3 processor, make the
+<p>If you've got a system with an AMD K6-2 or a VIA C3 processor, make the
 following change in the <tt>settings.pro</tt> file.
 
 Look for 
@@ -718,7 +695,6 @@ Recent AMD processors, like the Duron, Thunderbird and Athlon don't need this
 change.
 
 <sect1>Building LAME.
-
 <p>Open a shell and switch to the directory where you saved lame.
 <tscreen><verb>
 $ tar -xzf lame-3.93.1.tar.gz
@@ -2743,9 +2719,15 @@ This GDB was configured as "i586-mandrake-linux-gnu"...
 information.
 
 Once at the <tt>(gdb)</tt> prompt, type <tt>run</tt> to start program
-execution.  When the program segfaults, type <tt>bt</tt> to get the
-backtrace.  The backtrace should be posted to the mythtv-dev mailing list,
-along with the steps you followed to get the program to crash.
+execution.  When the program segfaults or appears to lock-up, type <tt>info
+threads</tt> to get the listing of all running threads.  For each thread,
+type <tt/thread 1/, press enter, then type <tt/bt full/, <tt/thread 2/,
+<tt/bt full/, etc.  There may be a lot of threads, but you must iterate
+through all of them.
+
+The backtrace information for all the threads should be posted to the
+mythtv-dev mailing list, along with the steps you followed to get the
+program to crash.
 
 <sect1>MythTV makes my system crash. 
 <p>MythTV <em>can not</em> crash your system - it is a user-level program. 
@@ -3219,13 +3201,7 @@ $ su
 The <bf>ivtvfwextract</bf> program extracts the firmware required for the
 card.  You may want to go to the website and download the latest Windows
 driver if the <bf>wget</bf> command fails.
-
-Place a copy of the <tt>videodev2.h</tt> file in the ivtv driver
-subdirectory.  This is the only reason that we installed the kernel-source
-above.  In the future, the ivtv driver may include the <tt>videodev2.h</tt>
-file in the distribution.
 <tscreen><verb>
-$ cp /usr/src/linux/include/linux/videodev2.h ~/ivtv/ivtv/driver/
 $ cd ~/ivtv/ivtv/driver
 $ make
 </verb></tscreen>
@@ -3522,6 +3498,8 @@ Normalized spacing between tscreen tag and text.
 v2.24, 2003-04-28.  canada-cable.
 v2.25, 2003-04-29.  Additional btaudio card.  Added instructions for gentoo
 mythbackend auto-start.
+v2.26, 2003-04-29.  Debugging info for threads.  Get rid of videodev2.h
+instructions; it's now in the Myth CVS.  Remove gist.com; they've shutdown. 
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

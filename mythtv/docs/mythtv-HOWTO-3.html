@@ -260,7 +260,8 @@ is installed.  As of 2003-03-15, this list includes <B>mysql</B>,
 <B>qt-devel</B> and <B>lame</B>.  If you're going to use a remote
 control with MythTV, you're going to need the <B>cdialog</B> package in
 order to compile <B>lircd</B> if your distribution doesn't have a
-pre-packaged <B>lirc</B>.</P>
+pre-packaged <B>lirc</B>.  If you are using <B>XMLTV</B> as a grabber,
+you will need <B>perl</B>.</P>
 <P>
 <HR>
 <PRE>
@@ -273,10 +274,6 @@ that you've installed the -devel version of a pre-requisite.
 
 NOTE:  Other than where noted, Mandrake 9.1 users may follow the
 Mandrake 9.0 instructions.
-
-NOTE:  Perl is required for XMLTV.  MythTV supports directly obtaining
-program data from gist.com, so if you use gist.com as a data source you do
-not need to install Perl or XMLTV but you will need wget.
 </PRE>
 <HR>
 </P>
@@ -302,11 +299,9 @@ example, there are many modules that have "perl" in them; some are a part of
 the apache web server, others are a part of the perl distribution.  In each
 case, we're looking to make sure that the primary module is getting
 installed.</P>
-<P>If you're going to be using XMLTV rather than obtaining program listings
-directly from gist.com, you'll need to install perl.  Click the magnifying
-glass or press <B>CTRL-F</B> and enter "perl" as your search term.  You
-should find it under the "Perl" folder.  You need at least the perl 5.80
-base package installed.  If not, click on the "Mark" button.</P>
+<P>Click the magnifying glass or press <B>CTRL-F</B> and enter "perl" as your
+search term.  You should find it under the "Perl" folder.  You need at least
+the perl 5.80 base package installed.  If not, click on the "Mark" button.</P>
 <P>If you are going to be installing mysql on this system, search for mysql -
 it should be under "Databases".  Make sure that mysql and mysql-clients are
 installed.  If not, click on "Mark".</P>
@@ -459,7 +454,7 @@ asked a number of questions regarding dependencies.  It's best to answer
 <PRE>
 $ su
 # urpmi mysql gcc gcc-c++ freetype2-devel cdialog alsa-utils
-# urpmi XFree86-devel
+# urpmi XFree86-devel perl
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -488,19 +483,10 @@ NOTE for Mandrake 9.1 users: execute the following command.
 </PRE>
 <HR>
 </P>
-<P>If you are going to be using XMLTV rather than directly obtaining program
-listings from gist.com, you must install <B>perl</B>:</P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-# urpmi perl
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
 <P>However, you might get this when you execute the command above:
 <BLOCKQUOTE><CODE>
 <PRE>
-[root@pvr root]# urpmi mysql gcc gcc-c++ freetype2-devel libqt3-devel alsa-utils XFree86-devel
+[root@pvr root]# urpmi mysql gcc gcc-c++ freetype2-devel libqt3-devel alsa-utils XFree86-devel perl
 everything already installed
 </PRE>
 </CODE></BLOCKQUOTE>

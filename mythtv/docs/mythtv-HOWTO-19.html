@@ -367,14 +367,9 @@ $ su
 </P>
 <P>The <B>ivtvfwextract</B> program extracts the firmware required for the
 card.  You may want to go to the website and download the latest Windows
-driver if the <B>wget</B> command fails.</P>
-<P>Place a copy of the <CODE>videodev2.h</CODE> file in the ivtv driver
-subdirectory.  This is the only reason that we installed the kernel-source
-above.  In the future, the ivtv driver may include the <CODE>videodev2.h</CODE>
-file in the distribution.
+driver if the <B>wget</B> command fails.
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cp /usr/src/linux/include/linux/videodev2.h ~/ivtv/ivtv/driver/
 $ cd ~/ivtv/ivtv/driver
 $ make
 </PRE>
