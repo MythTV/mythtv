@@ -428,8 +428,12 @@ QWidget* ComboBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     if (isSet)
         widget->setCurrentItem(current);
 
-    connect(widget, SIGNAL(highlighted(int)),
-            this, SLOT(setValue(int)));
+    if (rw)
+        connect(widget, SIGNAL(highlighted(const QString &)),
+                this, SLOT(setValue(const QString &)));
+    else
+        connect(widget, SIGNAL(highlighted(int)),
+                this, SLOT(setValue(int)));
     connect(this, SIGNAL(selectionAdded(const QString&,QString)),
             widget, SLOT(insertItem(const QString&)));
     connect(this, SIGNAL(selectionsCleared()),

@@ -773,7 +773,7 @@ void VideoOutputXvMC::UpdatePauseFrame(void)
 }
 
 void VideoOutputXvMC::ProcessFrame(VideoFrame *frame, OSD *osd,
-                                   vector<VideoFilter *> &filterList,
+                                   FilterChain *filterList,
                                    NuppelVideoPlayer *pipPlayer)
 {
     (void)filterList;

@@ -47,6 +47,9 @@ class RecorderBase
     virtual long long GetKeyframePosition(long long desired) = 0;
     virtual void GetBlankFrameMap(QMap<long long, int> &blank_frame_map) = 0;
 
+    virtual void ChannelNameChanged(const QString& new_name);
+    QString GetCurChannelName() const;
+
   protected:
     RingBuffer *ringBuffer;
     bool weMadeBuffer;
@@ -61,6 +64,7 @@ class RecorderBase
     double video_frame_rate;
 
     ProgramInfo *curRecording;
+    QString curChannelName;
 
     QSqlDatabase *db_conn;
     pthread_mutex_t *db_lock;

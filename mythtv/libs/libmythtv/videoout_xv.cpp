@@ -20,6 +20,7 @@ using namespace std;
 #include "osdsurface.h"
 #include "../libmyth/util.h"
 #include "mythcontext.h"
+#include "filtermanager.h"
 
 extern "C" {
 #include "../libavcodec/avcodec.h"
@@ -789,7 +790,7 @@ void VideoOutputXv::UpdatePauseFrame(void)
 }
 
 void VideoOutputXv::ProcessFrame(VideoFrame *frame, OSD *osd,
-                                 vector<VideoFilter *> &filterList,
+                                 FilterChain *filterList,
                                  NuppelVideoPlayer *pipPlayer)
 {
     pthread_mutex_lock(&lock);
@@ -800,7 +801,8 @@ void VideoOutputXv::ProcessFrame(VideoFrame *frame, OSD *osd,
         CopyFrame(scratchFrame, &pauseFrame);
     }
 
-    process_video_filters(frame, &filterList[0], filterList.size());
+    if (filterList)
+        filterList->ProcessFrame(frame);
 
     ShowPip(frame, pipPlayer);
     DisplayOSD(frame, osd);

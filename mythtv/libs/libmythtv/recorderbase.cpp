@@ -21,6 +21,7 @@ RecorderBase::RecorderBase(void)
     vbimode = 0;
 
     curRecording = NULL;
+    curChannelName = "";
 
     db_conn = NULL;
     db_lock = NULL;
@@ -99,3 +100,12 @@ void RecorderBase::SetOption(const QString &name, int value)
     cerr << "Unknown int option: " << name << ": " << value << endl;
 }
 
+void RecorderBase::ChannelNameChanged(const QString& new_name)
+{
+    curChannelName = new_name;
+}
+
+QString RecorderBase::GetCurChannelName() const
+{
+    return curChannelName;
+}

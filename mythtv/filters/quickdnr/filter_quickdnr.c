@@ -30,6 +30,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "filter.h"
 #include "frame.h"
@@ -38,16 +39,11 @@ static const char FILTER_NAME[] = "quickdnr";
 
 typedef struct ThisFilter
 {
-  int (*filter)(VideoFilter *, VideoFrame *);
-  void (*cleanup)(VideoFilter *);
+  VideoFilter vf;
 
-  char *name;
-  void *handle; // Library handle;
-
-  /* functions and variables below here considered "private" */
   int Luma_size;
   int UV_size;
-  int sized;
+  int first;
   uint64_t Luma_threshold_mask;
   uint64_t Chroma_threshold_mask;
   uint8_t Luma_threshold;
@@ -165,22 +161,11 @@ int quickdnr(VideoFilter *f, VideoFrame *frame)
   ThisFilter *tf = (ThisFilter *)f; 
   int y; 
 
-  if (!tf->sized) {
-    tf->sized = 1;
-    if (frame->codec == FMT_YV12) { // Only support YV12 for now
-      tf->average=malloc(sizeof(uint8_t) * frame->width * 3 / 2 * frame->height);
-      if (tf->average == NULL)
-	{
-	  fprintf(stderr,"Couldn't allocate memory for QuickDNR buffer\n");
-	  return -1;
-	}
-      tf->Luma_size = frame->width * frame->height;
-      tf->UV_size = frame->width * frame->height / 2 + tf->Luma_size;
-    }
-    else
-      return -1;
+  if (tf->first)
+  {
+    memcpy (tf->average, frame->buf, frame->size);
+    tf->first = 0;
   }
-
   for(y = 0;y < tf->Luma_size;y++) {
     if(abs(tf->average[y] - frame->buf[y]) < tf->Luma_threshold) {
       tf->average[y] = (tf->average[y] + frame->buf[y]) >> 1;
@@ -207,22 +192,12 @@ int quickdnrMMX(VideoFilter *f, VideoFrame *frame)
   uint64_t *av_p;
   const uint64_t sign_convert = 0x8080808080808080LL;
 
-  if (!tf->sized) {
-    tf->sized = 1;
-    if (frame->codec == FMT_YV12) { // Only support YV12 for now
-      tf->average=malloc(sizeof(uint8_t) * frame->width * 3 / 2 * frame->height);
-      if (tf->average == NULL)
-	{
-	  fprintf(stderr,"Couldn't allocate memory for DNR buffer\n");
-	  return -1;
-	}
-      tf->Luma_size = frame->width * frame->height;
-      tf->UV_size = frame->width * frame->height / 2 + tf->Luma_size;
-    }
-    else
-      return -1;
-  }
  
+  if (tf->first)
+  {
+    memcpy (tf->average, frame->buf, frame->size);
+    tf->first = 0;
+  }
   av_p = (uint64_t *)tf->average;
 
   asm volatile("prefetch 64(%0)     \n\t" //Experimental values from athlon
@@ -304,16 +279,25 @@ int quickdnrMMX(VideoFilter *f, VideoFrame *frame)
 
 void cleanup(VideoFilter *vf)
 {
-  ThisFilter *tf = (ThisFilter *)vf;
+  ThisFilter *tf;
+  tf = (ThisFilter *)vf;
   free(tf->average);
-  free((ThisFilter *)vf);
 }
 
-VideoFilter *new_filter(char *options)
+VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt, 
+                        int *width, int *height, char *options)
 {
   unsigned int Param1, Param2;
   int i;
-  ThisFilter *filter = malloc(sizeof(ThisFilter));
+  ThisFilter *filter;
+
+  if (inpixfmt != FMT_YV12 || outpixfmt != FMT_YV12)
+    {
+      fprintf(stderr,"QuickDNR: attempt to initialize with unsupported format\n");
+      return NULL;
+    }
+
+  filter = malloc(sizeof(ThisFilter));
 
   if (filter == NULL)
     {
@@ -321,6 +305,17 @@ VideoFilter *new_filter(char *options)
       return NULL;
     }
 
+  fprintf(stderr,"%d\n",sizeof(uint8_t) * (*width) * 3 / 2 * (*height));
+  filter->average=malloc(sizeof(uint8_t) * (*width) * 3 / 2 * (*height));
+  if (filter->average == NULL)
+    {
+      fprintf(stderr,"Couldn't allocate memory for DNR buffer\n");
+      free(filter);
+      return NULL;
+    }
+  filter->Luma_size = *width * *height;
+  filter->UV_size = *width * *height / 2 + filter->Luma_size;
+  
   if (options && (sscanf(options, "%u:%u", &Param1, &Param2) == 2)) { 
     filter->Luma_threshold = (uint8_t) Param1;
     filter->Chroma_threshold = (uint8_t) Param2;
@@ -331,7 +326,7 @@ VideoFilter *new_filter(char *options)
   }
   
   if(mm_support() > MM_MMXEXT) {
-    filter->filter = &quickdnrMMX;
+    filter->vf.filter = &quickdnrMMX;
     
     filter->Luma_threshold_mask = 0;
     filter->Chroma_threshold_mask = 0;
@@ -343,17 +338,31 @@ VideoFilter *new_filter(char *options)
 	+ ((filter->Chroma_threshold > 0x80) ? (filter->Chroma_threshold - 0x80) :  (filter->Chroma_threshold + 0x80));
     }
   }
-  else filter->filter = &quickdnr;
+  else filter->vf.filter = &quickdnr;
+  filter->first = 1;
   
 #ifdef QUICKDNR_DEBUG
   fprintf(stderr,"DNR Loaded:%X Params: %u %u Luma: %d %X%X Chroma: %d %X%X\n",mm_support(), Param1, Param2, filter->Luma_threshold, ((int*)&filter->Luma_threshold_mask)[1], ((int*)&filter->Luma_threshold_mask)[0], filter->Chroma_threshold, ((int*)&filter->Chroma_threshold_mask)[1], ((int*)&filter->Chroma_threshold_mask)[0]);
 #endif
 
-  filter->cleanup = &cleanup;
-  filter->name = (char *)FILTER_NAME;
-  filter->sized = 0;
-  filter->average = NULL;
+  filter->vf.cleanup = &cleanup;
   return (VideoFilter *)filter;
 }
 
+static FmtConv FmtList[] = 
+{
+  { FMT_YV12, FMT_YV12 },
+  FMT_NULL
+};
 
+FilterInfo filter_table[] = 
+{
+  {
+    symbol:     "new_filter",
+    name:       "quickdnr",
+    descript:   "removes noise with a fast thresholded average filter",
+    formats:    FmtList,
+    libname:    NULL
+  },
+  FILT_NULL
+};

@@ -2,20 +2,18 @@
 #define VIDEOOUTBASE_H_
 
 #include "frame.h"
-extern "C" {
 #include "filter.h"
-}
 
 #include <qmutex.h>
 #include <qmap.h>
 #include <qptrqueue.h>
 
-#include <vector>
 using namespace std;
 
 class NuppelVideoPlayer;
 class OSD;
 class OSDSurface;
+class FilterChain;
 
 enum VideoOutputType
 {
@@ -90,7 +88,7 @@ class VideoOutput
     virtual void UpdatePauseFrame(void) = 0;
     // pass in null to use the pause frame, if it exists.
     virtual void ProcessFrame(VideoFrame *frame, OSD *osd,
-                              vector<VideoFilter *> &filterList,
+                              FilterChain *filterList,
                               NuppelVideoPlayer *pipPlayer) = 0;
 
     void ClearAfterSeek(void);

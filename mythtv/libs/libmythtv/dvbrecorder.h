@@ -70,6 +70,7 @@ private:
     void CloseFilters();
     void OpenFilters(dvb_pid_t& pid, dmx_pes_type_t type);
     void SetDemuxFilters(dvb_pids_t& pids);
+    void CorrectStreamNumber(ipack* ip, int pid);
 
     bool recording;
     bool encoding;

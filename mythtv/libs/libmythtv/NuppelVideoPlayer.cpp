@@ -23,6 +23,7 @@ using namespace std;
 #include "programinfo.h"
 #include "mythcontext.h"
 #include "fifowriter.h"
+#include "filtermanager.h"
 
 #include "decoderbase.h"
 #include "nuppeldecoder.h"
@@ -116,6 +117,8 @@ NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
     needsetpipplayer = false;
 
     videoFilterList = "";
+    videoFilters = NULL;
+    FiltMan = new FilterManager;
 
     videoOutput = NULL;
     watchingrecording = false;
@@ -151,6 +154,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
     lastccrow = 0;
 
     limitKeyRepeat = false;
+
 }
 
 NuppelVideoPlayer::~NuppelVideoPlayer(void)
@@ -176,11 +180,11 @@ NuppelVideoPlayer::~NuppelVideoPlayer(void)
     if (decoder)
         delete decoder;
 
-    if (videoFilters.size() > 0)
-    {
-        filters_cleanup(&videoFilters[0], videoFilters.size());
-        videoFilters.clear();
-    }
+    if (FiltMan)
+        delete FiltMan;
+
+    if (videoFilters)
+        delete videoFilters;
 
     if (videoOutput)
         delete videoOutput;
@@ -288,10 +292,11 @@ void NuppelVideoPlayer::ForceVideoOutputType(VideoOutputType type)
 
 void NuppelVideoPlayer::InitVideo(void)
 {
+    InitFilters();
     if (disablevideo)
     {
         videoOutput = new VideoOutputNull();
-        videoOutput->Init(video_width, video_height, video_aspect,
+        videoOutput->Init(postfilt_width, postfilt_height, video_aspect,
                           0, 0, 0, 0, 0, 0);
     }
     else
@@ -328,7 +333,7 @@ void NuppelVideoPlayer::InitVideo(void)
         if (gContext->GetNumSetting("DecodeExtraAudio", 0))
             decoder->setLowBuffers();
 
-        videoOutput->Init(video_width, video_height, video_aspect,
+        videoOutput->Init(postfilt_width, postfilt_height, video_aspect,
                           widget->winId(), 0, 0, widget->width(), 
                           widget->height(), 0);
     }
@@ -341,7 +346,8 @@ void NuppelVideoPlayer::InitVideo(void)
 
 void NuppelVideoPlayer::ReinitVideo(void)
 {
-    videoOutput->InputChanged(video_width, video_height, video_aspect);
+    InitFilters();
+    videoOutput->InputChanged(postfilt_width, postfilt_height, video_aspect);
 
     if (osd)
     {
@@ -489,17 +495,15 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
 
 void NuppelVideoPlayer::InitFilters(void)
 {
-    QStringList filters = QStringList::split(",", videoFilterList);
-    for (QStringList::Iterator i = filters.begin(); i != filters.end(); i++)
-    {
-        QString filtname = (*i).section('=', 0, 0);
-        QString filtopts = (*i).section('=', 1, 0xffffffff,
-                                        QString::SectionIncludeTrailingSep);
-        VideoFilter *filter = load_videoFilter((char *)(filtname.ascii()),
-                                               (char *)(filtopts.ascii()));
-        if (filter != NULL)
-            videoFilters.push_back(filter);
-    }   
+    VideoFrameType tmp = FMT_YV12;
+
+    if (videoFilters)
+        delete videoFilters;
+
+    postfilt_width = video_width;
+    postfilt_height = video_height;
+    videoFilters = FiltMan->LoadFilters(videoFilterList, tmp, tmp, 
+                                        postfilt_width, postfilt_height);
 }
 
 int NuppelVideoPlayer::tbuffer_numvalid(void)
@@ -1389,8 +1393,6 @@ void NuppelVideoPlayer::StartPlaying(void)
         audioOutput = AudioOutput::OpenAudio(audiodevice, audio_bits,
                                              audio_channels, audio_samplerate);
     }
-
-    InitFilters();
 
     InitVideo();
 
@@ -2805,6 +2807,7 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
         nvr->SetFrameRate(video_frame_rate);
 
         // this is ripped from tv_rec SetupRecording. It'd be nice to merge
+        nvr->SetOption("inpixfmt", FMT_YV12);
         nvr->SetOption("width", video_width);
         nvr->SetOption("height", video_height);
 

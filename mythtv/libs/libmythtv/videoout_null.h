@@ -26,7 +26,7 @@ class VideoOutputNull : public VideoOutput
 
     void UpdatePauseFrame(void);
     void ProcessFrame(VideoFrame *frame, OSD *osd,
-                      vector<VideoFilter *> &filterList,
+                      FilterChain *filterList,
                       NuppelVideoPlayer *pipPlayer);
 
   private:

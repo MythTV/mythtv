@@ -145,7 +145,7 @@ bool MythContext::ConnectServer(const QString &hostname, int port)
                 MythPopupBox::showOkPopup(mainWindow, "connection failure",
                                           tr("Connection to the master backend "
                                              "server timed out.  You probably "
-                                             "should modify the Mater Server "
+                                             "should modify the Master Server "
                                              "setting in the setup program and "
                                              "set the proper IP address "
                                              "there."));

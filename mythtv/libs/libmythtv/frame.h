@@ -11,7 +11,8 @@ typedef enum FrameType_
     FMT_VIA_HWSLICE,
     FMT_IA44,
     FMT_AI44,
-    FMT_ARGB32
+    FMT_ARGB32,
+    FMT_YUV422P
 } VideoFrameType;
 
 typedef struct VideoFrame_

@@ -482,7 +482,10 @@ void TVRec::HandleStateChange(void)
         SetupRecorder(profile);
         nvr->SetRecording(curRecording);
         nvr->SetDB(db_conn, &db_lock);
+        if (channel != NULL)
+            nvr->ChannelNameChanged(channel->GetCurrentName());
 
+        SetVideoFiltersForChannel(channel, channel->GetCurrentName());
         pthread_create(&encode, NULL, SpawnEncode, nvr);
 
         while (!nvr->IsRecording())
@@ -490,7 +493,6 @@ void TVRec::HandleStateChange(void)
 
         // evil.
         channel->SetFd(nvr->GetVideoFd());
-        SetVideoFiltersForChannel(channel, channel->GetCurrentName());
 
         frameRate = nvr->GetFrameRate();
     }
@@ -1743,6 +1745,7 @@ void TVRec::ChangeChannel(int channeldirection)
     else
         channel->ChannelDown();
 
+    nvr->ChannelNameChanged(channel->GetCurrentName());
     nvr->Reset();
     nvr->Unpause();
 
@@ -1862,6 +1865,7 @@ void TVRec::SetChannel(QString name)
     if (!channel->SetChannelByString(chan))
         channel->SetChannelByString(prevchan);
 
+    nvr->ChannelNameChanged(channel->GetCurrentName());
     nvr->Reset();
     nvr->Unpause();
 

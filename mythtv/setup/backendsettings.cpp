@@ -217,7 +217,7 @@ public:
     TimeOffset():
         BackendSetting("TimeOffset") {
         setLabel("Time offset for XMLTV listings");
-        addSelection("None", "");
+        addSelection("None");
         addSelection("Auto");
         addSelection("+0030");
         addSelection("+0100");

@@ -216,9 +216,15 @@ void Channel::SetFreqTable(const QString &name)
 
 int Channel::GetCurrentChannelNum(const QString &channame)
 {
+    // remove part after '-' for (HDTV subchannels)
+    QString real_channame = channame;
+    int pos = channame.find('-');
+    if (pos != -1)
+        real_channame.truncate(pos);
+
     for (int i = 0; i < totalChannels; i++)
     {
-        if (channame == curList[i].name)
+        if (real_channame == curList[i].name)
             return i;
     }
 

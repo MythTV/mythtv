@@ -16,11 +16,7 @@ static const char FILTER_NAME[] = "PostProcess";
 
 typedef struct ThisFilter
 {
-    int (*filter)(VideoFilter *, VideoFrame *);
-    void (*cleanup)(VideoFilter *);
-
-    char *name;
-    void *handle; // Library handle;
+    VideoFilter vf;
 
     pp_mode_t* mode;
     pp_context_t* context;
@@ -40,41 +36,6 @@ int pp(VideoFilter *vf, VideoFrame *frame)
 {
     ThisFilter* tf = (ThisFilter*)vf;
 
-    if (frame->codec != FMT_YV12)
-    {
-        if (tf->eprint)
-            return 0;
-        printf("ERROR: PostProcess filter only works on YV12 for now!\n");
-        tf->eprint = 1;
-    }
-
-    if (tf->width != frame->width || tf->height != frame->height)
-    {
-        printf("Reinitializing filter (%ux%u -> %ux%u)\n",
-            tf->width, tf->height, frame->width, frame->height);
-
-        if (tf->context)
-            pp_free_context(tf->context);
-        tf->context = NULL;
-
-        tf->context = pp_get_context(frame->width, frame->height,
-                            PP_CPU_CAPS_MMX|PP_CPU_CAPS_MMX2|PP_CPU_CAPS_3DNOW);
-
-        tf->ysize = frame->size/3*2;
-        tf->csize = (frame->size - tf->ysize) / 2;
-
-        tf->width = frame->width;
-        tf->height = frame->height;
-
-        tf->srcStride[0] = tf->ysize / frame->height;
-        tf->srcStride[1] = tf->csize / frame->height * 2;
-        tf->srcStride[2] = tf->csize / frame->height * 2;
-
-        tf->dstStride[0] = tf->ysize / frame->height;
-        tf->dstStride[1] = tf->csize / frame->height * 2;
-        tf->dstStride[2] = tf->csize / frame->height * 2;
-    }
-
     tf->src[0] = tf->dst[0] = frame->buf;
     tf->src[1] = tf->dst[1] = frame->buf + tf->ysize;
     tf->src[2] = tf->dst[2] = frame->buf + tf->ysize + tf->csize;
@@ -93,20 +54,48 @@ int pp(VideoFilter *vf, VideoFrame *frame)
 
 void cleanup(VideoFilter *filter)
 {
+    pp_free_context(((ThisFilter*)filter)->context);
     pp_free_mode(((ThisFilter*)filter)->mode);
-    free(filter);
 }
 
-VideoFilter *new_filter(char *options)
+VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt, 
+                        int *width, int *height, char *options)
 {
-    ThisFilter *filter = malloc(sizeof(ThisFilter));
+    ThisFilter *filter;
 
+    if ( inpixfmt != FMT_YV12 || outpixfmt != FMT_YV12 )
+        return NULL;
+
+    filter = malloc(sizeof(ThisFilter));
     if (filter == NULL)
     {
         fprintf(stderr,"Couldn't allocate memory for filter\n");
         return NULL;
     }
 
+    filter->context = pp_get_context(*width, *height,
+                            PP_CPU_CAPS_MMX|PP_CPU_CAPS_MMX2|PP_CPU_CAPS_3DNOW);
+    if (filter->context == NULL)
+    {
+        fprintf(stderr,"PostProc: failed to get PP context\n");
+        free(filter);
+        return NULL;
+    }
+
+    filter->ysize = (*width) * (*height);
+    filter->csize = filter->ysize / 4;
+
+    filter->width = *width;
+    filter->height = *height;
+
+    filter->srcStride[0] = filter->ysize / (*height);
+    filter->srcStride[1] = filter->csize / (*height) * 2;
+    filter->srcStride[2] = filter->csize / (*height) * 2;
+
+    filter->dstStride[0] = filter->ysize / (*height);
+    filter->dstStride[1] = filter->csize / (*height) * 2;
+    filter->dstStride[2] = filter->csize / (*height) * 2;
+    
     printf("Filteroptions: %s\n", options);
     filter->mode = pp_get_mode_by_name_and_quality(options, PP_QUALITY_MAX);
     if (filter->mode == NULL)
@@ -116,13 +105,26 @@ VideoFilter *new_filter(char *options)
     }
 
     filter->eprint = 0;
-    filter->context = NULL;
-    filter->height = 0;
-    filter->width = 0;
 
-    filter->filter = &pp;
-    filter->cleanup = &cleanup;
-    filter->name = (char *)FILTER_NAME;
+    filter->vf.filter = &pp;
+    filter->vf.cleanup = &cleanup;
     return (VideoFilter *)filter;
 }
 
+FmtConv FmtList[] = 
+{
+    { FMT_YV12, FMT_YV12 },
+    FMT_NULL
+};
+
+FilterInfo filter_table[] = 
+{
+    {
+        symbol:     "new_filter",
+        name:       "postprocess",
+        descript:   "FFMPEG's postprocessing filters",
+        formats:    FmtList,
+        libname:    NULL
+    },
+    FILT_NULL
+};

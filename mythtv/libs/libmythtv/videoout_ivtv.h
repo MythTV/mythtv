@@ -30,7 +30,7 @@ class VideoOutputIvtv: public VideoOutput
 
     void UpdatePauseFrame(void);
     void ProcessFrame(VideoFrame *frame, OSD *osd,
-                      vector<VideoFilter *> &filterList,
+                      FilterChain *filterList,
                       NuppelVideoPlayer *pipPlayer);
 
     int WriteBuffer(unsigned char *buf, int count);

@@ -9,19 +9,35 @@
 
 #define MYTHTV_FILTER_PATH PREFIX"/lib/mythtv/filters"
 
+typedef struct FmtConv_
+{
+    VideoFrameType in;
+    VideoFrameType out;
+} FmtConv;
+
+#define FMT_NULL {FMT_NONE,FMT_NONE}
+
+typedef struct FilterInfo_
+{
+    char *symbol;
+    char *name;
+    char *descript;
+    FmtConv *formats;
+    char *libname;
+} FilterInfo;
+
 typedef struct  VideoFilter_
 {
-    int (*filter)(void *, VideoFrame *);
+    int (*filter)(struct VideoFilter_ *, VideoFrame *);
     void (*cleanup)(struct VideoFilter_ *);
 
-    char *name;
     void *handle; // Library handle;
+    VideoFrameType inpixfmt;
+    VideoFrameType outpixfmt;
+    char *opts;
+    FilterInfo *info;
 } VideoFilter;
 
-
-VideoFilter *load_videoFilter(char *filter_name, char *options);
-int process_video_filters(VideoFrame *frame, VideoFilter **filters, 
-                          int numberFilters);
-void filters_cleanup(VideoFilter **filters, int numberFilters);
+#define FILT_NULL {NULL,NULL,NULL,NULL,NULL}
 
 #endif // #ifndef _FILTER_H

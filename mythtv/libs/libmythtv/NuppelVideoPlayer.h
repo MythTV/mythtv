@@ -1,7 +1,6 @@
 #ifndef NUPPELVIDEOPLAYER
 #define NUPPELVIDEOPLAYER
 
-#include <vector>
 #include <qstring.h>
 #include <qmutex.h>
 #include <qwaitcondition.h>
@@ -32,6 +31,8 @@ class QSqlDatabase;
 class ProgramInfo;
 class DecoderBase;
 class AudioOutput;
+class FilterManager;
+class FilterChain;
 
 struct TextContainer
 {
@@ -256,6 +257,8 @@ class NuppelVideoPlayer
     int eof;
     int video_width;
     int video_height;
+    int postfilt_width;
+    int postfilt_height;
     int video_size;
     double video_frame_rate;
     float video_aspect;
@@ -330,7 +333,8 @@ class NuppelVideoPlayer
     bool needsetpipplayer;
 
     QString videoFilterList;
-    vector<VideoFilter *> videoFilters;
+    FilterChain *videoFilters;
+    FilterManager *FiltMan;
 
     int keyframedist;
 

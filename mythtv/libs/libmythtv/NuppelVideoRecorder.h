@@ -36,6 +36,8 @@ struct cc;
 class RTjpeg;
 class RingBuffer;
 class ChannelBase;
+class FilterManager;
+class FilterChain;
 
 class NuppelVideoRecorder : public RecorderBase
 {
@@ -227,9 +229,13 @@ class NuppelVideoRecorder : public RecorderBase
     int mb_decision;
 
     QString videoFilterList;
-    vector<VideoFilter *> videoFilters;
+    FilterChain *videoFilters;
+    FilterManager *FiltMan;
 
+    VideoFrameType inpixfmt;
     PixelFormat picture_format;
+    int w_out;
+    int h_out;
 
     bool hardware_encode;
     int hmjpg_quality;

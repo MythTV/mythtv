@@ -192,6 +192,9 @@ void DVBRecorder::OpenFilters(dvb_pid_t& pids, dmx_pes_type_t type)
                 swfilter_open = true;
             }
 
+            if (i)
+                params.pes_type = DMX_PES_OTHER;
+
             if (ioctl(fd_tmp, DMX_SET_PES_FILTER, &params) < 0)
             {
                 close(fd_tmp);
@@ -251,6 +254,17 @@ void DVBRecorder::SetDemuxFilters(dvb_pids_t& pids)
     OpenFilters(pids.other,       DMX_PES_OTHER);
 }
 
+void DVBRecorder::CorrectStreamNumber(ipack* ip, int pid)
+{
+    for (unsigned int i=0; i<chan_opts.pids.audio.size(); i++)
+        if (chan_opts.pids.audio[i] == pid)
+            ip->cid = 0xC0 + i;
+
+    for (unsigned int i=0; i<chan_opts.pids.video.size(); i++)
+        if (chan_opts.pids.video[i] == pid)
+            ip->cid = 0xE0 + i;
+}
+
 void DVBRecorder::StartRecording()
 {
     if (!Open())
@@ -282,7 +296,7 @@ void DVBRecorder::StartRecording()
 
         if (paused)
         {
-            for (int i=0; i<fd_demux.size(); i++)
+            for (unsigned int i=0; i<fd_demux.size(); i++)
                 if (ioctl(fd_demux[i], DMX_STOP) < 0)
                     ERRNO(QString("Pausing DVB filter #%1 failed.").arg(i));
             receiving = false;
@@ -295,7 +309,7 @@ void DVBRecorder::StartRecording()
         }
         else if (was_paused)
         {
-            for (int i=0; i<fd_demux.size(); i++)
+            for (unsigned int i=0; i<fd_demux.size(); i++)
                 if (ioctl(fd_demux[i], DMX_START) < 0)
                     ERRNO(QString("Unpausing DVB filter #%1 failed.").arg(i));
 
@@ -356,6 +370,9 @@ void DVBRecorder::StartRecording()
                 if (ip == NULL)
                     continue;
             
+                CorrectStreamNumber(ip,pid);
+                ip->ps = 1;
+                
                 if ( (pktbuf[1] & 0x40) && (ip->plength == MMAX_PLENGTH-6) )
                 {
                     ip->plength = ip->found-6;

@@ -162,7 +162,7 @@
 <context>
     <name>MythContext</name>
     <message>
-        <source>Connection to the master backend server timed out.  You probably should modify the Mater Server setting in the setup program and set the proper IP address there.</source>
+        <source>Connection to the master backend server timed out.  You probably should modify the Master Server setting in the setup program and set the proper IP address there.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1753,6 +1753,47 @@
     </message>
     <message>
         <source>PVR-350 Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom Filters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Advanced Filter configuration, format:
+[[&lt;filter&gt;=&lt;options&gt;,]...]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Font size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>small</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>big</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>default: TV, small: monitor, big:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change channels immediately without select</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When a complete channel number is entered MythTV will switch to that channel immediately without requiring you to hit the select button.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General playback (part 2)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -29,6 +29,14 @@
      (ffmpeg was looking for program 5, but only program 2 was left in 
      the stream, so it choked).
 
+   Nov. 3, 2003 by Doug Larrick:
+   * code to enable selecting a program number for stations with
+     multiple programs
+   * always renumber PIDs to match outgoing program number (#1:
+     0x10 (base), 0x11 (video), 0x14 (audio))
+   * change expected keyframe distance to 30 frames to see if this
+     lets people seek past halfway in recordings
+
    References / example code: 
      ATSC standards a.54, a.69 (www.atsc.org)
      ts2pes from mpegutils from dvb (www.linuxtv.org)
@@ -61,10 +69,7 @@ extern "C" {
 #include "../libavformat/mpegts.h"
 }
 
-//#define BUFFER_SIZE 4096
-//#define BUFFER_SIZE 256001
-#define BUFFER_SIZE 255868
-#define PACKETS (BUFFER_SIZE / 188)
+#define PACKETS (HD_BUFFER_SIZE / 188)
 
 #define SYNC_BYTE 0x47
 
@@ -84,16 +89,17 @@ HDTVRecorder::HDTVRecorder()
 
     chanfd = -1; 
 
-    keyframedist = 15;
+    keyframedist = 30;
     gopset = false;
     pict_start_is_gop = false;
 
     firstgoppos = 0;
 
+    desired_program = 0;
     pat_pid = 0;
     psip_pid = 0x1ffb;
     base_pid = 0; // will be filled in when we find it
-    first_base_pid = 0;
+    output_base_pid = 0;
     ts_packets = 0; // cumulative packet count
 
     // temporary to find lowest PID in first 500 packets
@@ -131,8 +137,6 @@ void HDTVRecorder::StartRecording(void)
         perror("open video:");
         return;
     }
-
-    static uint8_t buffer[BUFFER_SIZE];
 
     if (!SetupRecording())
     {
@@ -240,29 +244,6 @@ int HDTVRecorder::GetVideoFd(void)
 }
 
 // start common code to the dvbrecorder class.
-
-static void mpg_write_packet(void *opaque, uint8_t *buf, int buf_size)
-{
-    (void)opaque;
-    (void)buf;
-    (void)buf_size;
-}
-
-static int mpg_read_packet(void *opaque, uint8_t *buf, int buf_size)
-{
-    (void)opaque;
-    (void)buf;
-    (void)buf_size;
-    return 0;
-}
-
-static int mpg_seek_packet(void *opaque, int64_t offset, int whence)
-{
-    (void)opaque;
-    (void)offset;
-    (void)whence;
-    return 0;
-}
 
 bool HDTVRecorder::SetupRecording(void)
 {
@@ -525,7 +506,7 @@ bool HDTVRecorder::RewritePMT(unsigned char *buffer, int old_pid, int new_pid)
 
     // skip program info
     if (buffer[pos] == 0xff)
-	return false;  // premature end of packet
+        return false;  // premature end of packet
     pos += 2 + (((buffer[pos] << 8) | buffer[pos+1]) & 0x0fff);
 
     // rewrite other pids
@@ -548,7 +529,7 @@ bool HDTVRecorder::RewritePMT(unsigned char *buffer, int old_pid, int new_pid)
 
         if (buffer[pos] == 0xff)
             return false;  // premature end of packet
-	// bounds checked at top of while loop
+        // bounds checked at top of while loop
         pos += 2 + (((buffer[pos] << 8) | buffer[pos+1]) & 0x0fff);
     }
 
@@ -694,7 +675,7 @@ int HDTVRecorder::ProcessData(unsigned char *buffer, int len)
                 int sec_start = pos + buffer[pos] + 1;
 
                 // write to ringbuffer if pids gets rewritten successfully.
-                if (RewritePAT(&buffer[sec_start], first_base_pid))
+                if (RewritePAT(&buffer[sec_start], output_base_pid))
                     ringBuffer->Write(&buffer[packet_start_pos], 188);
             }
         }
@@ -719,7 +700,7 @@ int HDTVRecorder::ProcessData(unsigned char *buffer, int len)
             {
                  // delay until first GOP to avoid decoder crash on res change
                 RewritePID(&(buffer[packet_start_pos]), 
-                           VIDEO_PID(first_base_pid));
+                           VIDEO_PID(output_base_pid));
                 ringBuffer->Write(&buffer[packet_start_pos], 188);
             }
         }
@@ -729,7 +710,7 @@ int HDTVRecorder::ProcessData(unsigned char *buffer, int len)
             if (gopset || firstgoppos) 
             {
                 RewritePID(&(buffer[packet_start_pos]), 
-                           AUDIO_PID(first_base_pid));
+                           AUDIO_PID(output_base_pid));
                 ringBuffer->Write(&buffer[packet_start_pos], 188);
             }
         }
@@ -737,11 +718,11 @@ int HDTVRecorder::ProcessData(unsigned char *buffer, int len)
         {
             // decoder needs base PID
             int sec_start = pos + buffer[pos] + 1;
-            RewritePID(&(buffer[packet_start_pos]), first_base_pid);
+            RewritePID(&(buffer[packet_start_pos]), output_base_pid);
 
             // if it's a PMT table, rewrite the PIDs contained in it too
             if (buffer[sec_start] == 0x02) {
-                if (RewritePMT(&(buffer[sec_start]), base_pid, first_base_pid))
+                if (RewritePMT(&(buffer[sec_start]), base_pid, output_base_pid))
                 {
                     ringBuffer->Write(&buffer[packet_start_pos], 188);
                 }
@@ -760,14 +741,27 @@ int HDTVRecorder::ProcessData(unsigned char *buffer, int len)
             // stream
             if ((pid & 0xff0f) == 0x0001 && !base_pid) 
             {
-                if (pid < lowest_video_pid)
-                    lowest_video_pid = pid;
-                video_pid_packets++;
-                if (video_pid_packets >= 50) 
+                // Look for our desired subprogram here to ensure we're
+                // actually seeing packets from it... if not, we'll
+                // fall back on the 1st one.
+                int program_num = (pid & 0x00f0) >> 4;
+                if (program_num == desired_program && desired_program != 0) 
                 {
-                    base_pid = lowest_video_pid - 1;
-                    if (first_base_pid == 0)
-                        first_base_pid = base_pid;
+                    base_pid = pid - 1;
+                    if (output_base_pid == 0)
+                        output_base_pid = 16;
+                }
+                else 
+                {
+                    if (pid < lowest_video_pid)
+                        lowest_video_pid = pid;
+                    video_pid_packets++;
+                    if (video_pid_packets >= 50) 
+                    {
+                        base_pid = lowest_video_pid - 1;
+                        if (output_base_pid == 0)
+                            output_base_pid = 0x10;
+                    }
                 }
             }
         }
@@ -863,4 +857,32 @@ long long HDTVRecorder::GetKeyframePosition(long long desired)
 void HDTVRecorder::GetBlankFrameMap(QMap<long long, int> &blank_frame_map)
 {
     (void)blank_frame_map;
+}
+
+void HDTVRecorder::ChannelNameChanged(const QString& new_chan)
+{
+    RecorderBase::ChannelNameChanged(new_chan);
+
+    desired_program = 0;
+    // look up freqid
+    pthread_mutex_lock(db_lock);
+    QString thequery = QString("SELECT freqid "
+                               "FROM channel WHERE channum = \"%1\";")
+        .arg(curChannelName);
+    QSqlQuery query = db_conn->exec(thequery);
+    if (!query.isActive())
+        MythContext::DBError("fetchtuningparamschanid", query);
+    if (query.numRowsAffected() <= 0)
+    {
+        pthread_mutex_unlock(db_lock);
+        return;
+    }
+    query.next();
+    QString freqid(query.value(0).toString());
+    pthread_mutex_unlock(db_lock);
+    int pos = freqid.find('-');
+    if (pos != -1) 
+    {
+        desired_program = atoi(freqid.mid(pos+1).ascii());
+    }
 }

@@ -30,7 +30,7 @@ class VideoOutputXv : public VideoOutput
 
     void UpdatePauseFrame(void);
     void ProcessFrame(VideoFrame *frame, OSD *osd,
-                      vector<VideoFilter *> &filterList,
+                      FilterChain *filterList,
                       NuppelVideoPlayer *pipPlayer);
 
     int ChangePictureAttribute(int attributeType, int newValue);

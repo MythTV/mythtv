@@ -20,6 +20,7 @@ using namespace std;
 #include "commercial_skip.h"
 #include "../libvbitext/cc.h"
 #include "channelbase.h"
+#include "filtermanager.h"
 
 extern "C" {
 #include "../libvbitext/vbi.h"
@@ -135,6 +136,9 @@ NuppelVideoRecorder::NuppelVideoRecorder(ChannelBase *channel)
     hmjpg_maxw = 640;
     
     videoFilterList = "";
+    videoFilters = NULL;
+    FiltMan = new FilterManager;
+    inpixfmt = FMT_YV12;
 
     setorigaudio = false;
     origaudio = new struct video_audio;
@@ -200,11 +204,10 @@ NuppelVideoRecorder::~NuppelVideoRecorder(void)
         free(mpa_ctx);
     mpa_ctx = NULL;
 
-    if (videoFilters.size() > 0)
-    {
-        filters_cleanup(&videoFilters[0], videoFilters.size());
-        videoFilters.clear();
-    }
+    if (videoFilters)
+        delete videoFilters;
+    if (FiltMan)
+        delete FiltMan;
 }
 
 void NuppelVideoRecorder::SetOption(const QString &opt, int value)
@@ -336,21 +339,21 @@ bool NuppelVideoRecorder::SetupAVCodec(void)
         case PIX_FMT_YUV420P:
         case PIX_FMT_YUV422P:
             mpa_ctx->pix_fmt = picture_format; 
-            mpa_picture.linesize[0] = w;
-            mpa_picture.linesize[1] = w / 2;
-            mpa_picture.linesize[2] = w / 2;
+            mpa_picture.linesize[0] = w_out;
+            mpa_picture.linesize[1] = w_out / 2;
+            mpa_picture.linesize[2] = w_out / 2;
             break;
         default:
             cerr << "Unknown picture format: " << picture_format << endl;
     }
  
-    mpa_ctx->width = w;
+    mpa_ctx->width = w_out;
     mpa_ctx->height = (int)(h * height_multiplier);
 
     int usebitrate = targetbitrate * 1000;
     if (scalebitrate)
     {
-        float diff = (w * h) / (640.0 * 480.0);
+        float diff = (w_out * h_out) / (640.0 * 480.0);
         usebitrate = (int)(diff * usebitrate);
     }
 
@@ -408,8 +411,8 @@ void NuppelVideoRecorder::SetupRTjpeg(void)
     rtjc = new RTjpeg();
     setval = RTJ_YUV420;
     rtjc->SetFormat(&setval);
-    setval = (int)(h * height_multiplier);
-    rtjc->SetSize(&w, &setval);
+    setval = (int)(h_out * height_multiplier);
+    rtjc->SetSize(&w_out, &setval);
     rtjc->SetQuality(&Q);
     setval = 2;
     rtjc->SetIntra(&setval, &M1, &M2);
@@ -488,8 +491,8 @@ void NuppelVideoRecorder::Initialize(void)
 
     audiobytes = 0;
 
-    InitBuffers();
     InitFilters();
+    InitBuffers();
 }
 
 int NuppelVideoRecorder::AudioInit(bool skipdevice)
@@ -619,23 +622,14 @@ int NuppelVideoRecorder::MJPEGInit(void)
 
 void NuppelVideoRecorder::InitFilters(void)
 {
-    if (videoFilters.size() > 0)
-    {
-        filters_cleanup(&videoFilters[0], videoFilters.size());
-        videoFilters.clear();
-    }
+    if (videoFilters)
+        delete videoFilters;
 
-    QStringList filters = QStringList::split(",", videoFilterList);
-    for (QStringList::Iterator i = filters.begin(); i != filters.end(); i++)
-    {
-        QString filtname = (*i).section('=', 0, 0);
-        QString filtopts = (*i).section('=', 1, 0xffffffff,
-                                        QString::SectionIncludeTrailingSep);
-        VideoFilter *filter = load_videoFilter((char *)(filtname.ascii()), 
-                                               (char *)(filtopts.ascii()));
-        if (filter != NULL)
-            videoFilters.push_back(filter);
-    }
+    w_out = w;
+    h_out = h;
+    VideoFrameType tmp = FMT_YV12;
+    videoFilters = FiltMan->LoadFilters(videoFilterList, inpixfmt, tmp, 
+                                        w_out, h_out);
 }
 
 void NuppelVideoRecorder::InitBuffers(void)
@@ -692,6 +686,8 @@ void NuppelVideoRecorder::StartRecording(void)
         return;
     }
 
+    inpixfmt = FMT_NONE;
+    InitFilters();
     StreamAllocate();
     positionMap.clear();
 
@@ -731,9 +727,9 @@ void NuppelVideoRecorder::StartRecording(void)
     if (!pip_mode)
     {
         if (commDetect)
-            commDetect->Init(w, h, video_frame_rate);
+            commDetect->Init(w_out, h_out, video_frame_rate);
         else
-            commDetect = new CommDetect(w, h, video_frame_rate);
+            commDetect = new CommDetect(w_out, h_out, video_frame_rate);
 
         commDetect->SetAggressiveDetection(
                         gContext->GetNumSetting("AggressiveCommDetect", 1));
@@ -894,7 +890,7 @@ void NuppelVideoRecorder::StartRecording(void)
 
     mm.height = h;
     mm.width  = w;
-    if (picture_format == PIX_FMT_YUV422P)
+    if (inpixfmt == FMT_YUV422P)
         mm.format = VIDEO_PALETTE_YUV422P;
     else
         mm.format = VIDEO_PALETTE_YUV420P;  
@@ -980,10 +976,13 @@ void NuppelVideoRecorder::DoV4L2(void)
     memset(&vbuf, 0, sizeof(vbuf));
     memset(&vrbuf, 0, sizeof(vrbuf));
 
-    vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    if (inpixfmt == FMT_YUV422P)
+        vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUV422P;
+    else
+        vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUV420;
+
     vfmt.fmt.pix.width = w;
     vfmt.fmt.pix.height = h;
-    vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUV420;
     vfmt.fmt.pix.field = V4L2_FIELD_INTERLACED;
 
     if (ioctl(fd, VIDIOC_S_FMT, &vfmt) < 0)
@@ -1379,11 +1378,13 @@ void NuppelVideoRecorder::WriteHeader(void)
     static const char finfo[12] = "MythTVVideo";
     static const char vers[5]   = "0.07";
     
+    if (!videoFilters)
+        InitFilters();
     memset(&fileheader, 0, sizeof(fileheader));
     memcpy(fileheader.finfo, finfo, sizeof(fileheader.finfo));
     memcpy(fileheader.version, vers, sizeof(fileheader.version));
-    fileheader.width  = w;
-    fileheader.height = (int)(h * height_multiplier);
+    fileheader.width  = w_out;
+    fileheader.height = (int)(h_out * height_multiplier);
     fileheader.desiredwidth  = 0;
     fileheader.desiredheight = 0;
     fileheader.pimode = 'P';
@@ -2495,8 +2496,8 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
         //ringBuffer->Sync();
     }
 
-    if (videoFilters.size() > 0)
-        process_video_filters(frame, &videoFilters[0], videoFilters.size());
+    if (videoFilters)
+        videoFilters->ProcessFrame(frame);
 
     if (useavcodec)
     {

@@ -10,15 +10,16 @@
 #include "filter.h"
 #include "frame.h"
 
-static const char FILTER_NAME[] = "linearblend";
-
 typedef struct ThisFilter
 {
     int (*filter)(VideoFilter *, VideoFrame *);
     void (*cleanup)(VideoFilter *);
 
-    char *name;
     void *handle; // Library handle;
+    VideoFrameType inpixfmt;
+    VideoFrameType outpixfmt;
+    char *opts;
+    FilterInfo *info;
 
     /* functions and variables below here considered "private" */
     int mm_flags;
@@ -298,9 +299,6 @@ int linearBlendFilter(VideoFilter *f, VideoFrame *frame)
     unsigned char *voff;
     ThisFilter *vf = (ThisFilter *)f;
 
-    if (frame->codec != FMT_YV12)
-        return 1;
-
     for (y = 0; y < ymax; y+=8)
     {  
         for (x = 0; x < stride; x+=8)
@@ -334,16 +332,18 @@ int linearBlendFilter(VideoFilter *f, VideoFrame *frame)
     return 0;
 }
 
-void cleanup(VideoFilter *filter)
+VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt, 
+                        int *width, int *height, char *options)
 {
-    free((ThisFilter *)filter);
-}
+    ThisFilter *filter;
+    (void)width;
+    (void)height;
+    (void)options;
 
-VideoFilter *new_filter(char *options)
-{
-    ThisFilter *filter = malloc(sizeof(ThisFilter));
+    if (inpixfmt != FMT_YV12 || outpixfmt != FMT_YV12)
+        return NULL;
 
-    options = options;
+    filter = malloc(sizeof(ThisFilter));
 
     if (filter == NULL)
     {
@@ -352,9 +352,7 @@ VideoFilter *new_filter(char *options)
     }
 
     filter->filter = &linearBlendFilter;
-
     filter->mm_flags = mm_support();
-
     if (filter->mm_flags & MM_MMXEXT)
         filter->subfilter = &linearBlendMMX;
     else if (filter->mm_flags & MM_3DNOW)
@@ -362,8 +360,24 @@ VideoFilter *new_filter(char *options)
     else
         filter->subfilter = &linearBlend;
 
-    filter->cleanup = &cleanup;
-    filter->name = (char *)FILTER_NAME;
+    filter->cleanup = NULL;
     return (VideoFilter *)filter;
 }
 
+static FmtConv FmtList[] = 
+{
+    { FMT_YV12, FMT_YV12 },
+    FMT_NULL
+};
+
+FilterInfo filter_table[] = 
+{
+    {
+        symbol:     "new_filter",
+        name:       "linearblend",
+        descript:   "fast blending deinterlace filter",
+        formats:    FmtList,
+        libname:    NULL
+    },
+    FILT_NULL
+};

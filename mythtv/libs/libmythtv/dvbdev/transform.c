@@ -1950,11 +1950,6 @@ void ps_pes(ipack *p)
 	if (p->mpeg == 2){
 		switch(p->buf[3]){
 		case VIDEO_STREAM_S ... VIDEO_STREAM_E:
-			/* FIXME: this is a workaround so that libavformat does
-			 * not create multiple video streams during decoding 
-			 */
-			p->buf[3] = VIDEO_STREAM_S;
-
 			if (!p->has_vi){
 				if(get_vinfo(p->buf, p->count, &p->vi,1) >=0) {
 					p->has_vi = 1;

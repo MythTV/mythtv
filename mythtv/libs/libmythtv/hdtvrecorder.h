@@ -35,16 +35,18 @@ class HDTVRecorder : public RecorderBase
     long long GetKeyframePosition(long long desired);
     void GetBlankFrameMap(QMap<long long, int> &blank_frame_map);
 
+    void ChannelNameChanged(const QString& new_freqid);
+
   private:
     bool SetupRecording();
     void FinishRecording();
 
     int ProcessData(unsigned char *buffer, int len);
     void FindKeyframes(const unsigned char *buffer, 
-		       int packet_start_pos,
-		       int pkt_pos,
-		       char adaptation_field_control,
-		       bool payload_unit_start_indicator);
+                       int packet_start_pos,
+                       int pkt_pos,
+                       char adaptation_field_control,
+                       bool payload_unit_start_indicator);
 
     int ResyncStream(unsigned char *buffer, int curr_pos, int len);
     void RewritePID(unsigned char *buffer, int pid);
@@ -71,16 +73,20 @@ class HDTVRecorder : public RecorderBase
 
     long long prev_gop_save_pos;
     int firstgoppos;
+    int desired_program;
 
     int pat_pid;
     int psip_pid;
     int base_pid;
-    int first_base_pid;
+    int output_base_pid;
 
     int ts_packets;
 
     int lowest_video_pid;
     int video_pid_packets;
+
+#define HD_BUFFER_SIZE 255868
+    unsigned char buffer[HD_BUFFER_SIZE];
 };
 
 #endif

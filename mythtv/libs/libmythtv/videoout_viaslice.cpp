@@ -451,7 +451,7 @@ void VideoOutputVIA::UpdatePauseFrame(void)
 }
 
 void VideoOutputVIA::ProcessFrame(VideoFrame *frame, OSD *osd,
-                                  vector<VideoFilter *> &filterList,
+                                  FilterChain *filterList,
                                   NuppelVideoPlayer *pipPlayer)
 {
     (void)filterList;
