@@ -4,8 +4,9 @@ package export_SVCD;
 	use nuv_utils;
 
 # Make sure we have pointers to the main:: namespace for certain variables
-	*Prog = *main::Prog;
-	*gui  = *main::gui;
+	*Prog  = *main::Prog;
+	*gui   = *main::gui;
+	*DEBUG = *main::DEBUG;
 
 	sub new {
 		my $class = shift;
