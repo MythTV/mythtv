@@ -202,12 +202,12 @@ void addTimeOffset(QString &timestr, int config_off, QString offset )
         }
         else if (timestr.length() == 12)
         {
-            year  = timestr.left(2).toInt(&ok, 10);
-            month = timestr.mid(2,2).toInt(&ok, 10);
-            day   = timestr.mid(4,2).toInt(&ok, 10);
-            hour  = timestr.mid(6,2).toInt(&ok, 10);
-            min   = timestr.mid(8,2).toInt(&ok, 10);
-            sec   = timestr.mid(10,2).toInt(&ok, 10);
+            year  = timestr.left(4).toInt(&ok, 10);
+            month = timestr.mid(4,2).toInt(&ok, 10);
+            day   = timestr.mid(6,2).toInt(&ok, 10);
+            hour  = timestr.mid(8,2).toInt(&ok, 10);
+            min   = timestr.mid(10,2).toInt(&ok, 10);
+            sec   = 0;
         }
         else
         {
@@ -762,8 +762,9 @@ void handlePrograms(int id, int offset, QMap<QString,
             querystr.sprintf("INSERT INTO program (chanid,starttime,endtime,"
                              "title,subtitle,description,category) VALUES(%d,"
                              " %s, %s, \"%s\", \"%s\", \"%s\", \"%s\");", 
-                             chanid, (*i).startts.ascii(), 
-                             (*i).endts.ascii(), (*i).title.utf8().data(), 
+                             chanid, (*i).start.toString().ascii(), 
+                             (*i).end.toString().ascii(), 
+                             (*i).title.utf8().data(), 
                              (*i).subtitle.utf8().data(), 
                              (*i).desc.utf8().data(), 
                              (*i).category.utf8().data());
