@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.02.13 (xris)
+#Last Updated: 2005.02.16 (xris)
 #
 #  nuv_export::shared_utils
 #
@@ -14,24 +14,27 @@ package nuv_export::shared_utils;
         use Exporter;
         our @ISA = qw/ Exporter /;
 
-        our @EXPORT = qw/ &clear &find_program &shell_escape &wrap &system &mkdir &wipe_tmpfiles
-                          @Exporters %Prog %Args $DEBUG
-                          $num_cpus $is_child
-                          @tmpfiles %children
+        our @EXPORT = qw/ &clear        &find_program       &shell_escape
+                          &wrap         &wipe_tmpfiles
+                          &system       &mkdir
+                          @Exporters
+                          $DEBUG        $NICE
+                          $num_cpus     $is_child
+                          @tmpfiles     %children
                         /;
     }
 
 # Variables that we export so all other modules can share them
     our @Exporters;     # A list of the various exporters
-    our %Prog;          # Locations of preferred programs for various tasks (mplex, etc) -- DEPRECATED
-    our %Args;          # Edit this to store command line arguments in individual variables
     our $is_child = 0;  # This is set to 1 after forking to a new process
     our @tmpfiles;      # Keep track of temporary files, so we can clean them up upon quit
     our %children;      # Keep track of child pid's so we can kill them off if we quit unexpectedly
     our $num_cpus = 0;  # How many cpu's on this machine?
 
+
+# These are defined here to avoid some nasty use-loops with nuv_export::ui
     our $DEBUG;
-    $Args{'debug'} = \$DEBUG;
+    our $NICE;
 
 # Remove any temporary files, and make sure child processes are cleaned up.
     END {
@@ -69,6 +72,10 @@ package nuv_export::shared_utils;
     else {
         $num_cpus = 1;
     }
+
+# Make sure that we have nice installed
+    $NICE = find_program('nice');
+    die "You need nice in order to use nuvexport.\n\n" unless ($NICE);
 
 # Clear the screen
     sub clear {

@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.02.14 (xris)
+#Last Updated: 2005.02.17 (xris)
 #
 #  export::transcode::XviD
 #  Maintained by Chris Petersen <mythtv@forevermore.net>
@@ -10,6 +10,7 @@ package export::transcode::XviD;
 
 # Load the myth and nuv utilities, and make sure we're connected to the database
     use nuv_export::shared_utils;
+    use nuv_export::cli;
     use nuv_export::ui;
     use mythtv::db;
     use mythtv::recordings;
@@ -28,7 +29,7 @@ package export::transcode::XviD;
                      'enabled'         => 1,
                      'errors'          => [],
                     # Transcode-related settings
-                     'denoise'         => 1,
+                     'noise_reduction' => 1,
                      'deinterlace'     => 1,
                      'crop'            => 1,
                     # VBR-specific settings
@@ -56,9 +57,9 @@ package export::transcode::XviD;
     # Load the parent module's settings
         $self->SUPER::gather_settings();
     # Audio Bitrate
-        if ($Args{'a_bitrate'}) {
-            $self->{'a_bitrate'} = $Args{'a_bitrate'};
-            die "Audio bitrate must be > 0\n" unless ($Args{'a_bitrate'} > 0);
+        if (arg('a_bitrate')) {
+            $self->{'a_bitrate'} = arg('a_bitrate');
+            die "Audio bitrate must be > 0\n" unless (arg('a_bitrate') > 0);
         }
         else {
             $self->{'a_bitrate'} = query_text('Audio bitrate?',
@@ -66,13 +67,13 @@ package export::transcode::XviD;
                                               $self->{'a_bitrate'});
         }
     # VBR options
-        if ($Args{'multipass'}) {
+        if (arg('multipass')) {
             $self->{'multipass'} = 1;
             $self->{'vbr'}       = 1;
         }
-        elsif ($Args{'quantisation'}) {
-            die "Quantisation must be a number between 1 and 31 (lower means better quality).\n" if ($Args{'quantisation'} < 1 || $Args{'quantisation'} > 31);
-            $self->{'quantisation'} = $Args{'quantisation'};
+        elsif (arg('quantisation')) {
+            die "Quantisation must be a number between 1 and 31 (lower means better quality).\n" if (arg('quantisation') < 1 || arg('quantisation') > 31);
+            $self->{'quantisation'} = arg('quantisation');
             $self->{'vbr'}          = 1;
         }
         elsif (!$is_cli) {
@@ -101,9 +102,9 @@ package export::transcode::XviD;
             }
         }
     # Ask the user what audio and video bitrates he/she wants
-        if ($Args{'v_bitrate'}) {
-            die "Video bitrate must be > 0\n" unless ($Args{'v_bitrate'} > 0);
-            $self->{'v_bitrate'} = $Args{'v_bitrate'};
+        if (arg('v_bitrate')) {
+            die "Video bitrate must be > 0\n" unless (arg('v_bitrate') > 0);
+            $self->{'v_bitrate'} = arg('v_bitrate');
         }
         elsif ($self->{'multipass'} || !$self->{'vbr'}) {
             # make sure we have v_bitrate on the commandline

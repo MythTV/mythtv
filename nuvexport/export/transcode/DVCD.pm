@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.01.26 (xris)
+#Last Updated: 2005.02.17 (xris)
 #
 #  export::transcode::DVCD
 #  Maintained by Gavin Hurlbut <gjhurlbu@gmail.com>
@@ -10,6 +10,7 @@ package export::transcode::DVCD;
 
 # Load the myth and nuv utilities, and make sure we're connected to the database
     use nuv_export::shared_utils;
+    use nuv_export::cli;
     use nuv_export::ui;
     use mythtv::db;
     use mythtv::recordings;
@@ -24,7 +25,7 @@ package export::transcode::DVCD;
                      'enabled'         => 1,
                      'errors'          => [],
                     # Transcode-related settings
-                     'denoise'         => 1,
+                     'noise_reduction' => 1,
                      'deinterlace'     => 1,
                      'crop'            => 1,
                     };
@@ -33,8 +34,8 @@ package export::transcode::DVCD;
     # Initialize and check for transcode
         $self->init_transcode();
     # Make sure that we have an mplexer
-        $Prog{'mplexer'} = find_program('tcmplex', 'mplex');
-        push @{$self->{'errors'}}, 'You need tcmplex or mplex to export a dvcd.' unless ($Prog{'mplexer'});
+        find_program('tcmplex')
+            or push @{$self->{'errors'}}, 'You need tcmplex to export a dvcd.';
 
     # Any errors?  disable this function
         $self->{'enabled'} = 0 if ($self->{'errors'} && @{$self->{'errors'}} > 0);
@@ -65,7 +66,7 @@ package export::transcode::DVCD;
     # Execute the parent method
         $self->SUPER::export($episode, ".$$");
     # Multiplex the streams
-        my $command = "nice -n $Args{'nice'} tcmplex -m v $ntsc"
+        my $command = "$NICE tcmplex -m v $ntsc"
                       .' -i '.shell_escape($self->get_outfile($episode, ".$$.m1v"))
                       .' -p '.shell_escape($self->get_outfile($episode, ".$$.mpa"))
                       .' -o '.shell_escape($self->get_outfile($episode, '.mpg'));

@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.12.26 (xris)
+#Last Updated: 2005.02.16 (xris)
 #
 #   nuvexport::ui
 #
@@ -9,103 +9,36 @@
 package nuv_export::ui;
 
     use File::Path;
-    use Getopt::Long;
 
 # Load the myth and nuv utilities, and make sure we're connected to the database
     use nuv_export::shared_utils;
-    use mythtv::db;
+    use nuv_export::cli;
     use mythtv::recordings;
 
     BEGIN {
         use Exporter;
         our @ISA = qw/ Exporter /;
 
-        our @EXPORT = qw/ &add_arg        &load_cli_args      &arg
-                          &load_episodes  &load_cli_episodes
+        our @EXPORT = qw/ &load_episodes  &load_cli_episodes
                           &query_savepath &query_exporters    &query_text
-                          $is_cli
                         /;
-    }
-
-# Only need to keep track of cli args here
-    my %cli_args;
-
-# Load the following extra parameters from the commandline
-    add_arg('search-only',            'Search only, do not do anything with the found recordings');
-    add_arg('confirm',                'Confirm commandline-entered choices');
-
-    add_arg('title=s',                'Find programs to convert based on their title.');
-    add_arg('subtitle|episode=s',     'Find programs to convert based on their subtitle (episode name).');
-    add_arg('description=s',          'Find programs to convert based on their description.');
-    add_arg('infile|input|i=s',       'Input filename');
-    add_arg('chanid|channel=i',       'Find programs to convert based on their chanid');
-    add_arg('starttime|start_time=i', 'Find programs to convert based on their starttime.');
-
-    add_arg('require_cutlist',        'Only show programs that have a cutlist?');
-
-    add_arg('mode|export=s',          'Specify which export mode to use');
-
-    add_arg('noserver|no-server',     "Don't talk to the server -- do all encodes here in this execution");
-
-    add_arg('nice=i',                 'Set the value of "nice" for subprocesses');
-    add_arg('version',                'Show the version and exit');
-
-# Load the commandline options
-    add_arg('help',  'Show nuvexport help');
-    add_arg('debug', 'Enable debug mode');
-
-# Look for certain commandline options to determine if this is cli-mode
-    our $is_cli = 0;
-
-# Load the commandline arguments
-    sub load_cli_args {
-    # Build an array of the requested commandline arguments
-        my @args;
-        foreach my $key (keys %cli_args) {
-            push @args, $cli_args{$key}[0];
-        }
-    # Get the options
-        GetOptions(\%Args, keys %cli_args)
-            or die "Invalid commandline parameter(s).\n";
-    # Make sure nice is defined
-        if (defined($Args{'nice'})) {
-            die "--nice must be between -20 (highest priority) and 19 (lowest)\n" if (int($Args{'nice'}) != $Args{'nice'} || $Args{'nice'} > 19 || $Args{'nice'} < -20);
-            $Args{'nice'} = int($Args{'nice'});
-        }
-        else {
-            $Args{'nice'} = 19;
-        }
-    # Is this a commandline-only request?
-        if (!$Args{'confirm'} && ($Args{'title'} || $Args{'subtitle'} || $Args{'description'} || $Args{'infile'} || $Args{'starttime'} || $Args{'chanid'})) {
-            $is_cli = 1;
-        }
-    }
-
-# Add an argument to check for on the commandline
-    sub add_arg {
-        my ($arg, $description) = @_;
-        my ($name) = $arg =~ /^([^!=:\|]+)/;
-        $cli_args{$name} = [$arg, $description];
-    }
-
-# Retrieve the value of a commandline argument
-    sub arg {
-        my ($arg, $default) = @_;
-        return defined($Args{$arg}) ? $Args{$arg} : $default;
     }
 
 # Load episodes from the commandline
     sub load_cli_episodes {
         my @matches;
     # Performing a search
-        if ($Args{'title'} || $Args{'subtitle'} || $Args{'description'}) {
+        if (arg('title') || arg('subtitle') || arg('description')) {
             foreach my $show (sort keys %Shows) {
             # Title search?
-                next unless (!$Args{'title'} || $show =~ /$Args{'title'}/si);
+                my $title = arg('title');
+                next unless (!$title || $show =~ /$title/si);
             # Search episodes
                 foreach my $episode (@{$Shows{$show}}) {
-                    next unless (!$Args{'subtitle'}    || $episode->{'title'}       =~ /$Args{'subtitle'}/si);
-                    next unless (!$Args{'description'} || $episode->{'description'} =~ /$Args{'description'}/si);
+                    my $subtitle    = arg('subtitle');
+                    my $description = arg('description');
+                    next unless (!$subtitle    || $episode->{'title'}       =~ /$subtitle/si);
+                    next unless (!$description || $episode->{'description'} =~ /$description/si);
                     push @matches, $episode;
                 }
             }
@@ -114,11 +47,13 @@ package nuv_export::ui;
         }
     # Look for a filename or channel/starttime
         else {
+            my $chanid    = arg('chanid');
+            my $starttimg = arg('starttime');
         # Filename specified on the command line -- extract the chanid and starttime
-            if ($Args{'infile'}) {
-                if ($Args{'infile'} =~ /\b(\d+)_(\d+)_\d+\.nuv$/) {
-                    $Args{'chanid'}    = $1;
-                    $Args{'starttime'} = $2;
+            if (arg('infile')) {
+                if (arg('infile') =~ /\b(\d+)_(\d+)_\d+\.nuv$/) {
+                    $chanid    = $1;
+                    $starttime = $2;
                 }
                 else {
                     die "Input filename does not match the MythTV recording name format.\n"
@@ -126,24 +61,24 @@ package nuv_export::ui;
                 }
             }
         # Find the show
-            if ($Args{'starttime'} || $Args{'chanid'}) {
+            if ($starttime || $chanid) {
             # We need both arguments
-                die "Please specify both a starttime and chanid.\n" unless ($Args{'starttime'} && $Args{'chanid'});
+                die "Please specify both a starttime and chanid.\n" unless ($starttime && $chanid);
             # Make sure the requested show exists
                 foreach my $show (sort keys %Shows) {
                     foreach my $episode (@{$Shows{$show}}) {
-                        next unless ($Args{'chanid'} == $episode->{'channel'} && $Args{'starttime'} == $episode->{'start_time'});
+                        next unless ($chanid == $episode->{'channel'} && $starttime == $episode->{'start_time'});
                         push @matches, $episode;
                         last;
                     }
                     last if (@matches);
                 }
             # Not found?
-                die "Couldn't find a show on chanid $Args{'chanid'} at the specified time.\n" unless (@matches);
+                die "Couldn't find a show on chanid $chanid at the specified time.\n" unless (@matches);
             }
         }
     # Only searching, not processing
-        if ($Args{'search-only'}) {
+        if (arg('search-only')) {
             if (@matches) {
                 print "\nMatching Shows:\n\n";
                 foreach my $episode (@matches) {
@@ -376,12 +311,13 @@ package nuv_export::ui;
 
         die "No export modules were found!\n" unless (@Exporters);
     # Load the mode from the commandline?
-        if ($Args{'mode'}) {
+        if (my $mode = arg('mode', ($PROGRAM_NAME =~ /^.*?nuvexport-([\w\-]+)$/) ? $1 : undef)) {
             foreach my $exporter (@Exporters) {
-                next unless ($Args{'mode'} =~ /$exporter->{'cli'}/);
+                next unless ($mode =~ /$exporter->{'cli'}/);
                 return $exporter;
             }
-            die "Unknown exporter mode:  $Args{'mode'}\n";
+            print "Unknown exporter mode:  $mode\n";
+            exit -1;
         }
     # Build the query
         my $query = "Using $export_prog for exporting.\n"
@@ -428,9 +364,9 @@ package nuv_export::ui;
 #            die "here, we should be loading the savepath from the mythvideo info in the database\n";
 #        }
     # No need?
-        return undef unless ($Args{'noserver'} || $Args{'path'});
+        return undef unless (arg('noserver') || arg('path'));
     # Grab a path from the commandline?
-        my $path = ($Args{'path'} or '');
+        my $path = (arg('path') or '');
         $path =~ s/\/+$//s;
         if ($is_cli) {
         # Need a pathname

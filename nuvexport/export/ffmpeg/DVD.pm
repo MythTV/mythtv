@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.02.15 (xris)
+#Last Updated: 2005.02.16 (xris)
 #
 #  export::ffmpeg::DVD
 #  Maintained by Gavin Hurlbut <gjhurlbu@gmail.com>
@@ -10,6 +10,7 @@ package export::ffmpeg::DVD;
 
 # Load the myth and nuv utilities, and make sure we're connected to the database
     use nuv_export::shared_utils;
+    use nuv_export::cli;
     use nuv_export::ui;
     use mythtv::db;
     use mythtv::recordings;
@@ -57,8 +58,8 @@ package export::ffmpeg::DVD;
     # Load the parent module's settings
         $self->SUPER::gather_settings();
     # Ask the user what audio bitrate he/she wants
-        $self->{'a_bitrate'} = $Args{'a_bitrate'} if ($Args{'a_bitrate'});
-        if (!$Args{'a_bitrate'} || $Args{'confirm'}) {
+        $self->{'a_bitrate'} = arg('a_bitrate') if (arg('a_bitrate'));
+        if (!arg('a_bitrate') || arg('confirm')) {
             while (1) {
                 my $a_bitrate = query_text('Audio bitrate?',
                                            'int',
@@ -77,8 +78,8 @@ package export::ffmpeg::DVD;
         }
     # Ask the user what video bitrate he/she wants, or calculate the max bitrate
         my $max_v_bitrate = 9500 - $self->{'a_bitrate'};
-        $self->{'v_bitrate'} = $Args{'v_bitrate'} if ($Args{'v_bitrate'});
-        if (!$Args{'v_bitrate'} || $Args{'confirm'}) {
+        $self->{'v_bitrate'} = arg('v_bitrate') if (arg('v_bitrate'));
+        if (!arg('v_bitrate') || arg('confirm')) {
             while (1) {
                 my $v_bitrate = query_text('Maximum video bitrate for VBR?',
                                            'int',
@@ -96,8 +97,8 @@ package export::ffmpeg::DVD;
             }
         }
     # Ask the user what vbr quality (quantisation) he/she wants - 2..31
-        $self->{'quantisation'} = $Args{'quantisation'} if ($Args{'quantisation'});
-        if (!$Args{'quantisation'} || $Args{'confirm'}) {
+        $self->{'quantisation'} = arg('quantisation') if (arg('quantisation'));
+        if (!arg('quantisation') || arg('confirm')) {
             while (1) {
                 my $quantisation = query_text('VBR quality/quantisation (2-31)?', 'float', $self->{'quantisation'});
                 if ($quantisation < 2) {

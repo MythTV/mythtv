@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.01.26 (xris)
+#Last Updated: 2005.02.17 (xris)
 #
 #  export::transcode::VCD
 #  Maintained by Gavin Hurlbut <gjhurlbu@gmail.com>
@@ -10,6 +10,7 @@ package export::transcode::VCD;
 
 # Load the myth and nuv utilities, and make sure we're connected to the database
     use nuv_export::shared_utils;
+    use nuv_export::cli;
     use nuv_export::ui;
     use mythtv::db;
     use mythtv::recordings;
@@ -24,7 +25,7 @@ package export::transcode::VCD;
                      'enabled'         => 1,
                      'errors'          => [],
                     # Transcode-related settings
-                     'denoise'         => 1,
+                     'noise_reduction' => 1,
                      'deinterlace'     => 1,
                      'crop'            => 1,
                     # VCD-specific settings
@@ -35,8 +36,8 @@ package export::transcode::VCD;
     # Initialize and check for transcode
         $self->init_transcode();
     # Make sure that we have an mplexer
-        $Prog{'mplexer'} = find_program('tcmplex', 'mplex');
-        push @{$self->{'errors'}}, 'You need tcmplex or mplex to export a vcd.' unless ($Prog{'mplexer'});
+        find_program('tcmplex', 'mplex')
+            or push @{$self->{'errors'}}, 'You need tcmplex or mplex to export a vcd.';
 
     # Any errors?  disable this function
         $self->{'enabled'} = 0 if ($self->{'errors'} && @{$self->{'errors'}} > 0);
@@ -87,7 +88,7 @@ package export::transcode::VCD;
             print "Not splitting because combined file size of chunks is < ".(0.97 * $self->{'split_every'} * 1024 * 1024).", which is the requested split size.\n";
         }
     # Multiplex the streams
-        my $command = "nice -n $Args{'nice'} tcmplex -m v $ntsc"
+        my $command = "$NICE tcmplex -m v $ntsc"
                       .($split_file ? ' -F '.shell_escape($split_file) : '')
                       .' -i '.shell_escape($self->get_outfile($episode, ".$$.m1v"))
                       .' -p '.shell_escape($self->get_outfile($episode, ".$$.mpa"))

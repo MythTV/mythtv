@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.02.13 (xris)
+#Last Updated: 2005.02.17 (xris)
 #
 #  generic.pm
 #
@@ -12,6 +12,7 @@ package export::generic;
     use POSIX;
 
     use nuv_export::shared_utils;
+    use nuv_export::cli;
     use nuv_export::ui;
 
     BEGIN {
@@ -29,8 +30,8 @@ package export::generic;
 # These aren't used by all modules, but the routine to define them is here, so here they live
     add_arg('height|v_res|h=i',              'Output height.');
     add_arg('width|h_res|w=i',               'Output width.');
-    add_arg('deinterlace:s!',                'Deinterlace video.');
-    add_arg('noise_reduction|denoise|nr:s!', 'Enable noise reduction.');
+    add_arg('deinterlace!',                  'Deinterlace video.');
+    add_arg('noise_reduction|denoise|nr!',   'Enable noise reduction.');
     add_arg('crop!',                         'Crop out broadcast overscan.');
 
 # Gather generic export settings
@@ -41,22 +42,19 @@ package export::generic;
     # Ask the user if he/she wants to use the cutlist
         $self->{'use_cutlist'} = query_text('Enable Myth cutlist?',
                                             'yesno',
-                                            (defined($Args{'cutlist'}) && $Args{'cutlist'} == 0) ? 'No' : 'Yes');
+                                            arg('cutlist', 1) ? 'No' : 'Yes');
     # Video settings
         if (!$self->{'audioonly'}) {
-        # Defaults?
-            $Args{'denoise'}     = '' if (defined $Args{'denoise'} && $Args{'denoise'} eq '');
-            $Args{'deinterlace'} = 1  if (defined $Args{'deinterlace'} && $Args{'deinterlace'} eq '');
         # Noise reduction?
-            $self->{'denoise'} = query_text('Enable noise reduction (slower, but better results)?',
+            $self->{'noise_reduction'} = query_text('Enable noise reduction (slower, but better results)?',
                                                     'yesno',
-                                                    $self->{'denoise'} ? 'Yes' : 'No');
+                                                    arg('noise_reduction', $self->{'noise_reduction'}) ? 'Yes' : 'No');
         # Deinterlace video?
             $self->{'deinterlace'} = query_text('Enable deinterlacing?',
                                                 'yesno',
-                                                $self->{'deinterlace'} ? 'Yes' : 'No');
+                                                arg('deinterlace', $self->{'deinterlace'}) ? 'Yes' : 'No');
         # Crop video to get rid of broadcast padding
-            if ($Args{'crop'}) {
+            if (arg('crop')) {
                 $self->{'crop'} = 1;
             }
             else {
@@ -113,9 +111,9 @@ package export::generic;
     sub query_resolution {
         my $self = shift;
     # Ask the user what resolution he/she wants
-        if ($Args{'width'}) {
-            die "Width must be > 0\n" unless ($Args{'width'} > 0);
-            $self->{'width'} = $Args{'width'};
+        if (arg('width')) {
+            die "Width must be > 0\n" unless (arg('width') > 0);
+            $self->{'width'} = arg('width');
         }
         else {
             while (1) {
@@ -145,9 +143,9 @@ package export::generic;
             }
         }
     # Ask about the height
-        if ($Args{'height'}) {
-            die "Height must be > 0\n" unless ($Args{'height'} > 0);
-            $self->{'height'} = $Args{'height'};
+        if (arg('height')) {
+            die "Height must be > 0\n" unless (arg('height') > 0);
+            $self->{'height'} = arg('height');
         }
         else {
             while (1) {

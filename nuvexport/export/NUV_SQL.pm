@@ -15,6 +15,7 @@ package export::NUV_SQL;
 
 # Load the myth and nuv utilities, and make sure we're connected to the database
     use nuv_export::shared_utils;
+    use nuv_export::cli;
     use nuv_export::ui;
     use mythtv::db;
     use mythtv::recordings;

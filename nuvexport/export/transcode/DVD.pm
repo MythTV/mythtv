@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.02.14 (xris)
+#Last Updated: 2005.02.17 (xris)
 #
 #  export::transcode::DVD
 #  Maintained by Gavin Hurlbut <gjhurlbu@gmail.com>
@@ -10,6 +10,7 @@ package export::transcode::DVD;
 
 # Load the myth and nuv utilities, and make sure we're connected to the database
     use nuv_export::shared_utils;
+    use nuv_export::cli;
     use nuv_export::ui;
     use mythtv::db;
     use mythtv::recordings;
@@ -27,7 +28,7 @@ package export::transcode::DVD;
                      'enabled'         => 1,
                      'errors'          => [],
                     # Transcode-related settings
-                     'denoise'         => 1,
+                     'noise_reduction' => 1,
                      'deinterlace'     => 1,
                      'crop'            => 1,
                     # DVD-specific settings
@@ -40,8 +41,8 @@ package export::transcode::DVD;
     # Initialize and check for transcode
         $self->init_transcode();
     # Make sure that we have an mplexer
-        $Prog{'mplexer'} = find_program('tcmplex', 'mplex');
-        push @{$self->{'errors'}}, 'You need tcmplex or mplex to export a dvd.' unless ($Prog{'mplexer'});
+        find_program('tcmplex')
+            or push @{$self->{'errors'}}, 'You need tcmplex to export a dvd.';
 
     # Any errors?  disable this function
         $self->{'enabled'} = 0 if ($self->{'errors'} && @{$self->{'errors'}} > 0);
@@ -54,8 +55,8 @@ package export::transcode::DVD;
     # Load the parent module's settings
         $self->SUPER::gather_settings();
     # Ask the user what audio bitrate he/she wants
-        $self->{'a_bitrate'} = $Args{'a_bitrate'} if ($Args{'a_bitrate'});
-        if (!$Args{'a_bitrate'} || $Args{'confirm'}) {
+        $self->{'a_bitrate'} = arg('a_bitrate') if (arg('a_bitrate'));
+        if (!arg('a_bitrate') || arg('confirm')) {
             while (1) {
                 my $a_bitrate = query_text('Audio bitrate?',
                                            'int',
@@ -74,8 +75,8 @@ package export::transcode::DVD;
         }
     # Ask the user what video bitrate he/she wants, or calculate the max bitrate
         my $max_v_bitrate = 9500 - $self->{'a_bitrate'};
-        $self->{'v_bitrate'} = $Args{'v_bitrate'} if ($Args{'v_bitrate'});
-        if (!$Args{'v_bitrate'} || $Args{'confirm'}) {
+        $self->{'v_bitrate'} = arg('v_bitrate') if (arg('v_bitrate'));
+        if (!arg('v_bitrate') || arg('confirm')) {
             while (1) {
                 my $v_bitrate = query_text('Maximum video bitrate for VBR?',
                                            'int',
@@ -93,8 +94,8 @@ package export::transcode::DVD;
             }
         }
     # Ask the user what vbr quality (quantisation) he/she wants - 2..31
-        $self->{'quantisation'} = $Args{'quantisation'} if ($Args{'quantisation'});
-        if (!$Args{'quantisation'} || $Args{'confirm'}) {
+        $self->{'quantisation'} = arg('quantisation') if (arg('quantisation'));
+        if (!arg('quantisation') || arg('confirm')) {
             while (1) {
                 my $quantisation = query_text('VBR quality/quantisation (2-31)?', 'float', $self->{'quantisation'});
                 if ($quantisation < 2) {
@@ -131,7 +132,7 @@ package export::transcode::DVD;
     # Execute the parent method
         $self->SUPER::export($episode, ".$$");
     # Multiplex the streams
-        my $command = "nice -n $Args{'nice'} tcmplex -m d $ntsc"
+        my $command = "$NICE tcmplex -m d $ntsc"
                       .' -i '.shell_escape($self->get_outfile($episode, ".$$.m2v"))
                       .' -p '.shell_escape($self->get_outfile($episode, ".$$.mpa"))
                       .' -o '.shell_escape($self->get_outfile($episode, '.mpg'));

@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.02.15 (xris)
+#Last Updated: 2005.02.17 (xris)
 #
 #  ffmpeg.pm
 #
@@ -16,6 +16,7 @@ package export::ffmpeg;
     use POSIX;
 
     use nuv_export::shared_utils;
+    use nuv_export::cli;
     use nuv_export::ui;
     use mythtv::recordings;
 
@@ -23,7 +24,7 @@ package export::ffmpeg;
 #
 #   path        (defined by generic)
 #   use_cutlist (defined by generic)
-#   denoise
+#   noise_reduction
 #   deinterlace
 #   crop
 #
@@ -33,12 +34,12 @@ package export::ffmpeg;
         my $self      = shift;
         my $audioonly = (shift or 0);
     # Make sure we have ffmpeg
-        $Prog{'ffmpeg'} = find_program('ffmpeg');
-        push @{$self->{'errors'}}, 'You need ffmpeg to use this exporter.' unless ($Prog{'ffmpeg'});
+        my $ffmpeg = find_program('ffmpeg')
+            or push @{$self->{'errors'}}, 'You need ffmpeg to use this exporter.';
     # Audio only?
         $self->{'audioonly'} = $audioonly;
     # Gather the supported codecs
-        my $formats = `$Prog{'ffmpeg'} -formats`;
+        my $formats = `$ffmpeg -formats 2>/dev/null`;
         $formats =~ s/^.+?\n\s*Codecs:\s*\n(.+?\n)\s*\n.*?$/$1/s;
         while ($formats =~ /^\s(.{6})\s(\S+)\s*$/mg) {
             $self->{'codecs'}{$2} = $1;
@@ -82,7 +83,7 @@ package export::ffmpeg;
         }
 
     # Here, we have to fork off a copy of mythtranscode (no need to use --fifosync with transcode -- it seems to do this on its own)
-        $mythtranscode = "nice -n $Args{'nice'} mythtranscode --showprogress -p autodetect -c $episode->{channel} -s $episode->{start_time_sep} -f \"/tmp/fifodir_$$/\"";
+        $mythtranscode = "$NICE mythtranscode --showprogress -p autodetect -c $episode->{channel} -s $episode->{start_time_sep} -f \"/tmp/fifodir_$$/\"";
         $mythtranscode .= ' --honorcutlist' if ($self->{use_cutlist});
 
         my $videofifo = "/tmp/fifodir_$$/vidout";
@@ -104,12 +105,12 @@ package export::ffmpeg;
         else {
         # Do noise reduction
             if ($self->{'noise_reduction'}) {
-                $ffmpeg .= "nice -n $Args{'nice'} ffmpeg -f rawvideo";
+                $ffmpeg .= "$NICE ffmpeg -f rawvideo";
                 $ffmpeg .= " -s " . $episode->{'finfo'}{'width'} . "x" . $episode->{'finfo'}{'height'};
                 $ffmpeg .= " -r " . $episode->{'finfo'}{'fps'};
                 $ffmpeg .= " -i /tmp/fifodir_$$/vidout -f yuv4mpegpipe -";
                 $ffmpeg .= " 2> /dev/null | ";
-                $ffmpeg .= "nice -n $Args{'nice'} yuvdenoise -F -r 16";
+                $ffmpeg .= "$NICE yuvdenoise -F -r 16";
                 if ($self->{'crop'}) {
                     $ffmpeg .= " -b $crop_w,$crop_h,-$crop_w,-$crop_h";
                 }
@@ -120,7 +121,7 @@ package export::ffmpeg;
         }
 
     # Start the ffmpeg command
-        $ffmpeg .= "nice -n $Args{'nice'} ffmpeg";
+        $ffmpeg .= "$NICE ffmpeg";
         if ($num_cpus > 1) {
             $transcode .= ' -threads '.($num_cpus);
         }

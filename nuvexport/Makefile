@@ -34,6 +34,7 @@ MYTHTV_MODULES	  = mythtv/nuvinfo.pm \
 NUVEXPORT_MODULES = nuv_export/help.pm         \
 		    nuv_export/shared_utils.pm \
 		    nuv_export/task.pm         \
+		    nuv_export/cli.pm          \
 		    nuv_export/ui.pm
 MODULES		  = ${EXPORT_MODULES} ${MYTHTV_MODULES} ${NUVEXPORT_MODULES}
 

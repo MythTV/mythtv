@@ -10,6 +10,7 @@ package mythtv::recordings;
 
     use DBI;
     use nuv_export::shared_utils;
+    use nuv_export::cli;
     use mythtv::db;
     use mythtv::nuvinfo;
 
@@ -22,7 +23,6 @@ package mythtv::recordings;
     # These are available for export, but for the most part should only be needed here
         our @EXPORT_OK = qw/ &generate_showtime $num_shows /;
     }
-    our @EXPORT_OK;
 
 # Variables we intend to export
     our ($video_dir, @Files, %Shows, $num_shows);
@@ -90,7 +90,7 @@ package mythtv::recordings;
                 or die "Could not execute ($q):  $!\n\n";
             my ($show, $episode, $description, $show_hostname, $cutlist) = $sh->fetchrow_array;
         # Skip shows without cutlists?
-            next if ($Args{'require_cutlist'} && !$cutlist);
+            next if (arg('require_cutlist') && !$cutlist);
         # Unknown file - someday we should report this
             next unless ($show);
             $sh2->execute($channel, "$syear$smonth$sday$shour$sminute$ssecond")

@@ -1,8 +1,8 @@
 #!/usr/bin/perl -w
-# Last Updated: 2005.02.12 (xris)
+# Last Updated: 2005.02.16 (xris)
 
 # Version
-    $VERSION = '0.2 cvs20050215';
+    $VERSION = '0.2 cvs20050221';
 
 # Autoflush buffers
     $|++;
@@ -22,31 +22,15 @@
     use File::Basename;
     use lib dirname($ENV{'_'}), '/usr/share/nuvexport', '/usr/local/share/nuvexport';
 
-# How was nuvexport called?
-    my $callname = $0;
-
 # Load the myth and nuv utilities, and connect to the database
     use nuv_export::shared_utils;
+    use nuv_export::cli;
+    use nuv_export::ui;
+    use mythtv::recordings;
 
 # Make sure that we have mythtranscode installed
-    $Prog{'mythtranscode'} = find_program('mythtranscode');
-    die "You need mythtranscode in order to use nuvexport.\n\n" unless ($Prog{'mythtranscode'});
-
-# Make sure that we have nice installed
-    $Prog{'nice'} = find_program('nice');
-    die "You need nice in order to use nuvexport.\n\n" unless ($Prog{'nice'});
-
-# Load some options early, before anything else:
-# --help, --ffmpeg, --transcode.  Default is --ffmpeg
-    BEGIN {
-
-        our $export_prog = 'ffmpeg';
-
-        use Getopt::Long qw(:config pass_through);
-        GetOptions('ffmpeg'    => sub { $export_prog = 'ffmpeg';    },
-                   'transcode' => sub { $export_prog = 'transcode'; },
-                  );
-    }
+    find_program('mythtranscode')
+        or die "You need mythtranscode in order to use nuvexport.\n\n";
 
 # Load the exporters based on which suite was selected above
     if ($export_prog eq 'transcode') {
@@ -89,30 +73,20 @@
         push @Exporters, export::NUV_SQL->new;
 
 # Load the ui
-    use nuv_export::ui;
     load_cli_args();
 
-# Import a callname?
-    if (!$Args{'mode'} && $callname =~ /^.*?nuvexport-(\S+)$/) {
-        $Args{'mode'} = $1;
-    }
-
-# No server stuff enabled yet
-    $Args{'noserver'} = 1;
-
 # Show the version?
-    if ($Args{'version'}) {
+    if (arg('version')) {
         print "nuvexport version:  $VERSION\n";
         exit;
     }
 
 # Print the help - for now, this is just perldoc
-    if ($Args{'help'}) {
+    if (arg('help')) {
         require nuv_export::help;
     }
 
 # Load the recordings, and the $video_dir variable
-    use mythtv::recordings;
     load_recordings();
 
 # Load episodes from the commandline (and display/quit if this is search-only)
@@ -128,7 +102,7 @@
     $exporter->gather_settings();
 
 # Encode right here?
-    if ($Args{'noserver'}) {
+    if (arg('noserver')) {
         foreach my $episode (@episodes) {
         # Keep track of when we started
             if ($DEBUG) {

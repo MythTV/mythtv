@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.02.14 (xris)
+#Last Updated: 2005.02.17 (xris)
 #
 #  transcode.pm
 #
@@ -15,6 +15,7 @@ package export::transcode;
     use POSIX;
 
     use nuv_export::shared_utils;
+    use nuv_export::cli;
     use nuv_export::ui;
     use mythtv::recordings;
 
@@ -25,7 +26,7 @@ package export::transcode;
 #
 #   path        (defined by generic)
 #   use_cutlist (defined by generic)
-#   denoise
+#   noise_reduction
 #   deinterlace
 #   crop
 #   zoom_filter
@@ -35,8 +36,8 @@ package export::transcode;
     sub init_transcode {
         my $self = shift;
     # Make sure we have transcode
-        $Prog{'transcode'} = find_program('transcode');
-        push @{$self->{'errors'}}, 'You need transcode to use this exporter.' unless ($Prog{'transcode'});
+        find_program('transcode')
+            or push @{$self->{'errors'}}, 'You need transcode to use this exporter.';
     }
 
 # Gather data for transcode
@@ -47,15 +48,15 @@ package export::transcode;
         $self->SUPER::gather_settings($skip ? $skip - 1 : 0);
         return if ($skip);
     # Zoom Filter
-        if (defined $Args{'zoom_filter'}) {
-            if (!$Args{'zoom_filter'}) {
+        if (defined arg('zoom_filter')) {
+            if (!arg('zoom_filter')) {
                 $self->{'zoom_filter'} = 'B_spline';
             }
-            elsif ($Args{'zoom_filter'} =~ /^(?:Lanczos3|Bell|Box|Mitchell|Hermite|B_spline|Triangle)$/) {
-                $self->{'zoom_filter'} = $Args{'zoom_filter'};
+            elsif (arg('zoom_filter') =~ /^(?:Lanczos3|Bell|Box|Mitchell|Hermite|B_spline|Triangle)$/) {
+                $self->{'zoom_filter'} = arg('zoom_filter');
             }
             else {
-                die "Unknown zoom_filter:  $Args{'zoom_filter'}\n";
+                die "Unknown zoom_filter:  ".arg('zoom_filter')."\n";
             }
         }
     }
@@ -71,7 +72,7 @@ package export::transcode;
     # Load nuv info
         load_finfo($episode);
     # Start the transcode command
-        $transcode = "nice -n $Args{'nice'} transcode"
+        $transcode = "$NICE transcode"
                    # -V is now the default, but need to keep using it because people are still using an older version of transcode
                     .' -V'                     # use YV12/I420 instead of RGB, for faster processing
                     .' --print_status 16'      # Only print status every 16 frames -- prevents buffer-related slowdowns
@@ -105,7 +106,7 @@ package export::transcode;
                 die "Possibly stale mythtranscode fifo's in /tmp/fifodir_$$/.\nPlease remove them before running nuvexport.\n\n";
             }
         # Here, we have to fork off a copy of mythtranscode (no need to use --fifosync with transcode -- it seems to do this on its own)
-            $mythtranscode = "nice -n $Args{'nice'} mythtranscode --showprogress -p autodetect -c $episode->{'channel'} -s $episode->{'start_time_sep'} -f \"/tmp/fifodir_$$/\"";
+            $mythtranscode = "$NICE mythtranscode --showprogress -p autodetect -c $episode->{'channel'} -s $episode->{'start_time_sep'} -f \"/tmp/fifodir_$$/\"";
         # On no-audio encodes, we need to do something to keep mythtranscode's audio buffers from filling up available RAM
         #    $mythtranscode .= ' --fifosync' if ($skip_audio);
         # let transcode handle the cutlist -- got too annoyed with the first/last frame(s) showing up no matter what I told mythtranscode
@@ -113,8 +114,8 @@ package export::transcode;
         }
     # Figure out the input files
         if ($episode->{'finfo'}{'is_mpeg'}) {
-    		$transcode .= " -i $episode->{'filename'} -x ";
-            if ($episode->{'finfo'}{'mpeg_stream_type'} == 'pes') {
+            $transcode .= " -i $episode->{'filename'} -x ";
+            if ($episode->{'finfo'}{'mpeg_stream_type'} eq 'pes') {
                 $transcode .= 'vob';
             }
             else {
@@ -155,7 +156,7 @@ package export::transcode;
             $transcode .= " -J smartyuv";
             #smartyuv|smartdeinter|dilyuvmmx
         }
-        if ($self->{'denoise'}) {
+        if ($self->{'noise_reduction'}) {
             $transcode .= " -J yuvdenoise=mode=2";
         }
     # Add any additional settings from the child module

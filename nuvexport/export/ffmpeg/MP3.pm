@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.02.15 (xris)
+#Last Updated: 2005.02.16 (xris)
 #
 #  export::ffmpeg::MP3
 #  Maintained by Chris Petersen <mythtv@forevermore.net>
@@ -10,6 +10,7 @@ package export::ffmpeg::MP3;
 
 # Load the myth and nuv utilities, and make sure we're connected to the database
     use nuv_export::shared_utils;
+    use nuv_export::cli;
     use nuv_export::ui;
     use mythtv::db;
     use mythtv::recordings;
@@ -25,15 +26,15 @@ package export::ffmpeg::MP3;
                      'enabled'         => 1,
                      'errors'          => [],
                     # Options
-                     'bitrate'       => 128,
+                     'bitrate'         => 128,
                     };
         bless($self, $class);
 
     # Initialize and check for transcode
         $self->init_ffmpeg(1);
     # Make sure that we have an mplexer
-        $Prog{'id3tag'} = find_program('id3tag');
-        push @{$self->{'errors'}}, 'You need id3tag to export an mp3.' unless ($Prog{'id3tag'});
+        find_program('id3tag')
+            or push @{$self->{'errors'}}, 'You need id3tag to export an mp3.';
     # Can we even encode vcd?
         if (!$self->can_encode('mp3')) {
             push @{$self->{'errors'}}, "Your ffmpeg installation doesn't support encoding to mp3 audio.";
@@ -48,12 +49,10 @@ package export::ffmpeg::MP3;
         my $self = shift;
     # Load the parent module's settings (skipping one parent, since we don't need the ffmpeg-specific options)
         $self->SUPER::gather_settings(1);
-    # Just in case someone used the wrong commandline parameter
-        $Args{'bitrate'} ||= $Args{'a_bitrate'};
     # Audio Bitrate
-        if ($Args{'bitrate'}) {
-            $self->{'bitrate'} = $Args{'bitrate'};
-            die "Audio bitrate must be > 0\n" unless ($Args{'bitrate'} > 0);
+        if (arg('bitrate')) {
+            $self->{'bitrate'} = (arg('bitrate') or arg('a_bitrate'));
+            die "Audio bitrate must be > 0\n" unless ($self->{'bitrate'} > 0);
         }
         else {
             $self->{'bitrate'} = query_text('Audio bitrate?',

@@ -10,6 +10,7 @@ package export::MPEG2_cut;
 
 # Load the myth and nuv utilities, and make sure we're connected to the database
     use nuv_export::shared_utils;
+    use nuv_export::cli;
     use nuv_export::ui;
     use mythtv::db;
     use mythtv::recordings;
@@ -27,17 +28,17 @@ package export::MPEG2_cut;
                 };
         bless($self, $class);
     # Make sure we have tcprobe
-        $Prog{'tcprobe'} = find_program('tcprobe');
-        push @{$self->{'errors'}}, 'You need tcprobe to use this.' unless ($Prog{'tcprobe'});
+        find_program('tcprobe')
+            or push @{$self->{'errors'}}, 'You need tcprobe to use this.';
     # Make sure we have lvemux
-        $Prog{'mplexer'} = find_program('lvemux');
-        push @{$self->{'errors'}}, 'You need lvemux to use this.' unless ($Prog{'mplexer'});
+        find_program('lvemux')
+            or push @{$self->{'errors'}}, 'You need lvemux to use this.';
     # Make sure we have avidemux2
-        $Prog{'avidemux'} = find_program('avidemux2');
-        push @{$self->{'errors'}}, 'You need avidemux2 to use this.' unless ($Prog{'avidemux'});
+        find_program('avidemux2')
+            or push @{$self->{'errors'}}, 'You need avidemux2 to use this.';
     # Make sure we have mpeg2cut
-        $Prog{'mpeg2cut'} = find_program('mpeg2cut');
-        push @{$self->{'errors'}}, 'You need mpeg2cut to use this.' unless ($Prog{'mpeg2cut'});
+        find_program('mpeg2cut')
+            or push @{$self->{'errors'}}, 'You need mpeg2cut to use this.';
 
     # Any errors?  disable this function
         $self->{'enabled'} = 0 if ($self->{'errors'} && @{$self->{'errors'}} > 0);
@@ -71,12 +72,12 @@ package export::MPEG2_cut;
         my $safe_outfile = shell_escape($self->get_outfile($episode, '.mpg'));
         my $standard = ($episode->{'finfo'}{'fps'} =~ /^2(?:5|4\.9)/) ? 'PAL' : 'NTSC';
         my $gopsize = ($standard eq 'PAL') ? 12 : 15;
-        my $lastgop = ($episode->{'goptype'} == 6) ? 
+        my $lastgop = ($episode->{'goptype'} == 6) ?
                       ($gopsize * $episode->{'lastgop'}) :
                       $episode->{'lastgop'};
 
         my $command = "mpeg2cut $episode->{'filename'} $safe_outfile $lastgop ";
-        
+
         @cuts = split("\n",$episode->{'cutlist'});
         my @skiplist;
         foreach my $cut (@cuts) {

@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.02.14 (xris)
+#Last Updated: 2005.02.17 (xris)
 #
 #  export::transcode::SVCD
 #  Maintained by Chris Petersen <mythtv@forevermore.net>
@@ -10,6 +10,7 @@ package export::transcode::SVCD;
 
 # Load the myth and nuv utilities, and make sure we're connected to the database
     use nuv_export::shared_utils;
+    use nuv_export::cli;
     use nuv_export::ui;
     use mythtv::db;
     use mythtv::recordings;
@@ -27,7 +28,7 @@ package export::transcode::SVCD;
                      'enabled'         => 1,
                      'errors'          => [],
                     # Transcode-related settings
-                     'denoise'         => 1,
+                     'noise_reduction' => 1,
                      'deinterlace'     => 1,
                      'crop'            => 1,
                     # SVCD-specific settings
@@ -52,8 +53,8 @@ package export::transcode::SVCD;
     # Load the parent module's settings
         $self->SUPER::gather_settings();
     # Ask the user what audio bitrate he/she wants
-        $self->{'a_bitrate'} = $Args{'a_bitrate'} if ($Args{'a_bitrate'});
-        if (!$Args{'a_bitrate'} || $Args{'confirm'}) {
+        $self->{'a_bitrate'} = arg('a_bitrate') if (arg('a_bitrate'));
+        if (!arg('a_bitrate') || arg('confirm')) {
             while (1) {
                 my $a_bitrate = query_text('Audio bitrate?',
                                            'int',
@@ -73,8 +74,8 @@ package export::transcode::SVCD;
     # Ask the user what video bitrate he/she wants, or calculate the max bitrate (2756 max, though we round down a bit since some dvd players can't handle the max)
     # Then again, mpeg2enc seems to have trouble with bitrates > 2500
         my $max_v_bitrate = 2742 - $self->{'a_bitrate'};
-        $self->{'v_bitrate'} = $Args{'v_bitrate'} if ($Args{'v_bitrate'});
-        if (!$Args{'v_bitrate'} || $Args{'confirm'}) {
+        $self->{'v_bitrate'} = arg('v_bitrate') if (arg('v_bitrate'));
+        if (!arg('v_bitrate') || arg('confirm')) {
             $self->{'v_bitrate'} = ($max_v_bitrate < 2500) ? 2742 - $self->{'a_bitrate'} : 2500;
             while (1) {
                 my $v_bitrate = query_text('Maximum video bitrate for VBR?',
@@ -93,8 +94,8 @@ package export::transcode::SVCD;
             }
         }
     # Ask the user what vbr quality (quantisation) he/she wants - 2..31
-        $self->{'quantisation'} = $Args{'quantisation'} if ($Args{'quantisation'});
-        if (!$Args{'quantisation'} || $Args{'confirm'}) {
+        $self->{'quantisation'} = arg('quantisation') if (arg('quantisation'));
+        if (!arg('quantisation') || arg('confirm')) {
             while (1) {
                 my $quantisation = query_text('VBR quality/quantisation (2-31)?', 'float', $self->{'quantisation'});
                 if ($quantisation < 2) {
@@ -150,7 +151,7 @@ package export::transcode::SVCD;
             print "Not splitting because combined file size of chunks is < ".(0.97 * $self->{'split_every'} * 1024 * 1024).", which is the requested split size.\n";
         }
     # Multiplex the streams
-        my $command = "nice -n $Args{'nice'} tcmplex -m s $ntsc"
+        my $command = "$NICE tcmplex -m s $ntsc"
                       .($split_file ? ' -F '.shell_escape($split_file) : '')
                       .' -i '.shell_escape($self->get_outfile($episode, ".$$.m2v"))
                       .' -p '.shell_escape($self->get_outfile($episode, ".$$.mpa"))

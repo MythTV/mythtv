@@ -1,4 +1,4 @@
-#Last Updated: 2005.02.15 (xris)
+#Last Updated: 2005.02.16 (xris)
 #
 #  export::ffmpeg::ASF
 #  Maintained by Gavin Hurlbut <gjhurlbu@gmail.com>
@@ -9,6 +9,7 @@ package export::ffmpeg::ASF;
 
 # Load the myth and nuv utilities, and make sure we're connected to the database
     use nuv_export::shared_utils;
+    use nuv_export::cli;
     use nuv_export::ui;
     use mythtv::db;
     use mythtv::recordings;
@@ -57,9 +58,9 @@ package export::ffmpeg::ASF;
         $self->SUPER::gather_settings();
 
     # Audio Bitrate
-        if ($Args{'a_bitrate'}) {
-            $self->{'a_bitrate'} = $Args{'a_bitrate'};
-            die "Audio bitrate must be > 0\n" unless ($Args{'a_bitrate'} > 0);
+        if (arg('a_bitrate')) {
+            $self->{'a_bitrate'} = arg('a_bitrate');
+            die "Audio bitrate must be > 0\n" unless (arg('a_bitrate') > 0);
         }
         else {
             $self->{'a_bitrate'} = query_text('Audio bitrate?',
@@ -67,9 +68,9 @@ package export::ffmpeg::ASF;
                                               $self->{'a_bitrate'});
         }
     # Ask the user what video bitrate he/she wants
-        if ($Args{'v_bitrate'}) {
-            die "Video bitrate must be > 0\n" unless ($Args{'v_bitrate'} > 0);
-            $self->{'v_bitrate'} = $Args{'v_bitrate'};
+        if (arg('v_bitrate')) {
+            die "Video bitrate must be > 0\n" unless (arg('v_bitrate') > 0);
+            $self->{'v_bitrate'} = arg('v_bitrate');
         }
         elsif ($self->{'multipass'} || !$self->{'vbr'}) {
             # make sure we have v_bitrate on the commandline

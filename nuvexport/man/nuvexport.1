@@ -1,6 +1,6 @@
 .\" Comments
 .\" $Id$
-.Dd Sept 26, 2004 
+.Dd Sept 26, 2004
 .ds volume-operating-system NuvExport
 .Os NUVEXPORT
 .Dt NUVEXPORT 1 1
@@ -27,12 +27,12 @@
 
 .Op Fl Fl ffmpeg
 .Op Fl Fl deinterlace
-.Op Fl Fl denoise
+.Op Fl Fl noise_reduction
 .Op Fl Fl crop
 
 .Op Fl Fl transcode
 .Op Fl Fl deinterlace
-.Op Fl Fl denoise
+.Op Fl Fl noise_reduction
 .Op Fl Fl crop
 .Op Fl Fl zoom_filter=\fRfiltername\fR
 
@@ -79,7 +79,7 @@ Uses ffmpeg as the re-encoder process
 .Bl -tag -width indent
 .It Fl Fl deinterlace
 deinterlaces the output file
-.It Fl Fl denoise
+.It Fl Fl noise_reduction
 uses noise reduction filters to clean up the output
 .It Fl Fl crop
 crops the broadcast overscan
@@ -89,7 +89,7 @@ Uses transcode as the re-encoder process
 .Bl -tag -width indent
 .It Fl Fl deinterlace
 deinterlaces the output file
-.It Fl Fl denoise
+.It Fl Fl noise_reduction
 uses noise reduction filters to clean up the output
 .It Fl Fl crop
 crops the broadcast overscan
@@ -101,15 +101,15 @@ uses a zoom filter as specified
 .Sh USAGE
 As mentioned, the program is interactive, and is fairly self explanitory.  The following are the basic steps to export a file from mythtv.
 .Bd -literal
-1) Choose export type from the prompts, details of the choices are below 
+1) Choose export type from the prompts, details of the choices are below
     in EXPORT TYPES section
 2) Choose from the show titles.
-3) Choose a specific show from the titles, you may select a number of 
+3) Choose a specific show from the titles, you may select a number of
     different shows, and batch them for re-encode
 4) hit "c" to continue and begin the reencode process
-5) the following questions are usually ok to leave with defaults, 
+5) the following questions are usually ok to leave with defaults,
     especially if you are unsure as to their function
-.Ed 
+.Ed
 .Sh DIAGNOSTICS
 .Ex -std
 .Sh DEPENDANCIES
@@ -136,10 +136,10 @@ DVCD - export to VCD format, but using 48kHz audio, useful for DVDs
 DVD - export to DVD
 WMV - Windows Media Player files, exports ASF files with the mpeg4 codec
 MP3 - Export audio track to a Mp3
-MPEG2->MPEG2 cut - cuts commercials tagged by mythtv and gives 
+MPEG2->MPEG2 cut - cuts commercials tagged by mythtv and gives
     you a mpeg file. This only works for Mpeg-2 recorded media,
     like that recorded with a PVR-x25 card
-nuv and sql - dumps mysql database so it can be moved to another 
+nuv and sql - dumps mysql database so it can be moved to another
     mythtv backend
 .Ed
 .Sh SEE ALSO
