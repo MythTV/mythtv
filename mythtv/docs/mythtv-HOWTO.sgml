@@ -3,7 +3,7 @@
 
 <title>Installing and using mythtv
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-01-09, v1.066
+<date>2003-01-09, v1.067
 <abstract>
 Initially, installation of mythtv seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1704,32 +1704,32 @@ Edit the <tt>/usr/local/share/mythtv/mythmusic-settings.txt</tt> file for
 your particular system.
 
 <sect>mythweather
-<p>The mythweather module will obtain the weather information for the zipcode
-that you specify.
+<p>The mythweather module will obtain the weather information for the
+location that you specify.
 
 Change into the mythweather directory, then make and make install:
 <tscreen><verb>
-$ cd mythvideo
+$ cd mythweather
 $ make
 $ su
 # make install
 # exit
 </verb></tscreen>
 
-Mythweather uses msnbc as its source for weather data.  You may specify a
+mythweather uses MSNBC.com as its source for weather data.  You may specify a
 number of identifiers in order to obtain your local weather.
 <itemize>
 <item>Your zip code.
 <item>An airport code.
-<item>The "accid"
+<item>The "accid".
 </itemize>
 
-In order to determine your accid, you would access the msnbc.com weather
+In order to determine your accid, access the msnbc.com weather
 site at the following URL: <url
 url="http://www.msnbc.com/news/wea_front.asp?0wl=w3&amp;tab=oth&amp;ta=y"
 name="http://www.msnbc.com/news/wea_front.asp?0wl=w3&amp;tab=oth&amp;ta=y">  Once
-there, fill in your location.  Once the msnbc server completes your request,
-look at the URL in your address bar for "accid=XXXXX".  The "XXXXX" portion
+there, fill in your location.  After the MSNBC server completes your request,
+check the URL in the address bar for "accid=XXXXX".  The "XXXXX" portion
 is the area id you will need for the next configuration step.
 
 For now, you must manually configure mythweather:
@@ -1751,7 +1751,7 @@ mysql> exit
 $
 </verb></tscreen>
 
-If you wish to use Celsius:
+If you wish to use Celsius as the default:
 <tscreen><verb>
 mysql> insert into settings (value, data) VALUES ('SIUnits', 'Yes');
 mysql>
@@ -1759,16 +1759,15 @@ mysql>
 
 These are the keyboard commands for mythweather:
 
-MYTHWEATHER KEYBOARD COMMANDS
------------------------------
-   Left Key             Goes back one page, this also extends the time spent
-                        on the page you are at.
-   Right Key            Goes forward one page, see above.
-   Space                Pause, wait on the current page until space is hit
-                        again.
-   Numeric Keys         You can check other weather by keying in other ZIP codes.
-   Enter Key            Switch between celsius and fahrenheit. Can also
-                        be used a way to force a data update.
+Left Key             Goes back one page, and extends the time spent
+                     on the page you are on.
+Right Key            Goes forward one page, see above.
+Space                Pause, wait on the current page until space is hit
+                     again.
+Numeric Keys         You can check other weather by keying in other ZIP codes.
+Enter Key            Switch between celsius and fahrenheit. Can also
+                     be used a way to force a data update.
+"m" Key              Resets the location to the database default, then updates the data.
 
 <sect>mythvideo
 
@@ -2216,6 +2215,7 @@ going on.
 v1.066, 2003-01-09.  Modified gentoo instructions, now that there's a
 download site for the portage file.  Added section identifiers for
 mythweather and mythvideo.  Added content for mythweather.
+v1.067, 2003-01-09.  Updated mythweather keys.  Fix mythweather example.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
