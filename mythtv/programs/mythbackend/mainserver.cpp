@@ -84,6 +84,7 @@ void MainServer::readSocket(void)
         line = line.simplifyWhiteSpace();
         QStringList tokens = QStringList::split(" ", line);
         QString command = tokens[0];
+cout << command << endl;
         if (command == "ANN")
         {
             if (tokens.size() < 3 || tokens.size() > 4)
@@ -377,10 +378,10 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             proginfo->title = QString::fromUtf8(query.value(3).toString());
             proginfo->subtitle = QString::fromUtf8(query.value(4).toString());
             proginfo->description = QString::fromUtf8(query.value(5).toString());
-            QString hostname = query.value(6).toString();
+            proginfo->hostname = query.value(6).toString();
 
-            if (hostname.isEmpty() || hostname.isNull())
-                hostname = gContext->GetHostName();
+            if (proginfo->hostname.isEmpty() || proginfo->hostname.isNull())
+                proginfo->hostname = gContext->GetHostName();
 
             proginfo->conflicting = false;
 
@@ -417,7 +418,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             QString ip = gContext->GetSetting("BackendServerIP");
             QString port = gContext->GetSetting("BackendServerPort");
 
-            if (hostname == gContext->GetHostName())
+            if (proginfo->hostname == gContext->GetHostName())
             {
                 if (pbs->isLocal())
                     proginfo->pathname = lpath;
@@ -435,7 +436,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             }
             else
             {
-                PlaybackSock *slave = getSlaveByHostname(hostname);
+                PlaybackSock *slave = getSlaveByHostname(proginfo->hostname);
  
                 if (!slave)
                 {
