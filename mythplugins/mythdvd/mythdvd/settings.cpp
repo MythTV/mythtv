@@ -81,13 +81,12 @@ public:
 };
 
 #ifdef VCD_SUPPORT
-class VCDPlayerCommand: public ComboBoxSetting, public GlobalSetting {
+class VCDPlayerCommand: public LineEditSetting, public GlobalSetting {
 public:
     VCDPlayerCommand():
-        ComboBoxSetting(true), GlobalSetting("VCDPlayerCommand") {
+        GlobalSetting("VCDPlayerCommand") {
         setLabel(QObject::tr("VCD Player Command"));
-        addSelection("xine -f -g vcdx://");
-        addSelection("mplayer -vcd 1 -cdrom-device %d -fs -zoom -vo xv");
+        addValue("mplayer vcd:// -cdrom-device %d -fs -zoom -vo xv");
         setHelpText(QObject::tr("This can be any command to launch a VCD player "
                     "(e.g. MPlayer, xine, etc.). If present, %d will "
                     "be substituted for the VCD device (e.g. /dev/cdrom)."));
