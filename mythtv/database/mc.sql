@@ -226,9 +226,10 @@ CREATE TABLE IF NOT EXISTS credits
 
 
 CREATE TABLE IF NOT EXISTS transcoding (
-    chanid INT NOT NULL,
+    chanid INT UNSIGNED,
     starttime TIMESTAMP,
-    isdone INT UNSIGNED NOT NULL DEFAULT 0
+    status INT,
+    hostname VARCHAR(255)
 );
 
 INSERT INTO settings VALUES ('DBSchemaVer', 900, NULL);

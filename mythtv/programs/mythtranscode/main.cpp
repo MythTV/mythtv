@@ -25,7 +25,7 @@ void usage(char *progname)
 {
     cerr << "Usage: " << progname << " <--chanid <channelid>>\n";
     cerr << "\t<--starttime <starttime>> <--profile <profile>>\n";
-    cerr << "\t<honorcutlist> <--allkeys> <--help>\n\n";
+    cerr << "\t<--honorcutlist> <--allkeys> <--database> <--help>\n\n";
     cerr << "\t--chanid       or -c: Takes a channel id. REQUIRED\n";
     cerr << "\t--starttime    or -s: Takes a starttime for the\n";
     cerr << "\t\trecording. REQUIRED\n";
@@ -34,13 +34,14 @@ void usage(char *progname)
     cerr << "\t--honorcutlist or -l: Specifies whether to use the cutlist.\n";
     cerr << "\t--allkeys      or -k: Specifies that the output file\n";
     cerr << "\t\tshould be made entirely of keyframes.\n";
+    cerr << "\t--database     or -d: Store status in the db\n";
     cerr << "\t--help         or -h: Prints this help statement.\n";
 }
 
 int main(int argc, char *argv[])
 {
     QString chanid, starttime, profilename;
-    bool honorcutlist = false, keyframesonly = false;
+    bool honorcutlist = false, keyframesonly = false, use_db = false;
     srand(time(NULL));
 
     QApplication a(argc, argv, false);
@@ -112,6 +113,11 @@ int main(int argc, char *argv[])
         {
             keyframesonly = true;
         }
+        else if (!strcmp(a.argv()[argpos],"-d") ||
+                 !strcmp(a.argv()[argpos],"--database"))
+        {
+            use_db = true;
+        }
         else if (!strcmp(a.argv()[argpos],"-h") ||
                  !strcmp(a.argv()[argpos],"--help")) 
         {
@@ -164,70 +170,83 @@ int main(int argc, char *argv[])
     QString infile = pginfo->GetRecordFilename(fileprefix);
     QString tmpfile = infile + ".tmp";
 
-    StoreTranscodeState(pginfo, 1);
+    if (use_db) 
+        StoreTranscodeState(pginfo, 1);
     NuppelVideoPlayer *nvp = new NuppelVideoPlayer(db, pginfo);
 
     cout << "Transcoding from " << infile << " to " << tmpfile << "\n";
 
-    if (nvp->ReencodeFile((char *)infile.ascii(), (char *)tmpfile.ascii(), 
-                          profile, honorcutlist, keyframesonly)) 
+    int result = nvp->ReencodeFile((char *)infile.ascii(),
+                          (char *)tmpfile.ascii(),
+                          profile, honorcutlist, keyframesonly);
+    int retval;
+    if (result == REENCODE_OK)
     {
-        StoreTranscodeState(pginfo, 0);
+        if (use_db)
+            StoreTranscodeState(pginfo, 0);
         cout << "Transcoding " << infile << " done\n";
+        retval = 0;
     } 
-    else 
+    else if (result == REENCODE_CUTLIST_CHANGE)
     {
-        StoreTranscodeState(pginfo, -1);
+        if (use_db)
+            StoreTranscodeState(pginfo, -2);
+        cout << "Transcoding " << infile 
+             << " aborted because of cutlist update\n";
+        retval = 1;
+    }
+    else
+    {
+        if (use_db)
+            StoreTranscodeState(pginfo, -1);
         cout << "Transcoding " << infile << " failed\n";
+        retval = -1;
     }
 
     delete nvp;
-    return 0;
+    return retval;
 }
 
-void StoreTranscodeState(ProgramInfo *pginfo, int createdelete)
+void StoreTranscodeState(ProgramInfo *pginfo, int status)
 {
+    // status can have values:
+    // -2 : Transcode failed because cutlist changed
+    // -1 : Transcode failed for some othr reason
+    //  0 : Transcoder was launched
+    //  1 : Transcode started
+    //  2 : Transcode completed successfully
     bool exists = false;
     QString query = QString("SELECT * FROM transcoding WHERE "
-                            "chanid = '%1' AND starttime = '%2';")
+                            "chanid = '%1' AND starttime = '%2' "
+                            "AND hostname = '%3';")
                            .arg(pginfo->chanid)
-                           .arg(pginfo->startts.toString("yyyyMMddhhmmss"));
+                           .arg(pginfo->startts.toString("yyyyMMddhhmmss"))
+                           .arg(gContext->GetHostName());
     QSqlQuery result = db->exec(query);
     if (result.isActive() && result.numRowsAffected() > 0)
         exists = true;
 
-    if (createdelete == 1) 
+    if (! exists)
     {
-        if (exists)
-            return;
-        query = QString("INSERT INTO transcoding (chanid,starttime,isdone) "
-                        "VALUES ('%1','%2',0);")
-                        .arg(pginfo->chanid) 
-                        .arg(pginfo->startts.toString("yyyyMMddhhmmss"));
-    } 
-    else if (createdelete == -1) 
-    {
-        if (!exists)
-            return;
-        query = QString("DELETE FROM transcoding "
-                        "WHERE chanid = '%1' AND starttime = '%2';")
+        query = QString("INSERT INTO transcoding "
+                        "(chanid,starttime,status,hostname) "
+                        "VALUES ('%1','%2','%3','%4');")
                         .arg(pginfo->chanid)
-                        .arg(pginfo->startts.toString("yyyyMMddhhmmss"));
+                        .arg(pginfo->startts.toString("yyyyMMddhhmmss"))
+                        .arg(status).arg(gContext->GetHostName());
     } 
     else 
     {
-        if (!exists) 
-        {
-            cerr << "Error updating transcoding table. Row is non-existant\n";
-            return;
-        }
-        query = QString("UPDATE transcoding SET isdone = 1, "
+        query = QString("UPDATE transcoding SET status = '%1', "
                         "starttime = starttime "
-                        "WHERE chanid = '%1' AND starttime = '%2';")
-                        .arg(pginfo->chanid)
-                        .arg(pginfo->startts.toString("yyyyMMddhhmmss"));
+                        "WHERE chanid = '%2' AND starttime = '%3' "
+                        "AND hostname = '%3';")
+                        .arg(status).arg(pginfo->chanid)
+                        .arg(pginfo->startts.toString("yyyyMMddhhmmss"))
+                        .arg(gContext->GetHostName());
     }
 
     MythContext::KickDatabase(db);
     db->exec(query);
 }
+

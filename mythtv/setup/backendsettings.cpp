@@ -212,6 +212,20 @@ public:
         };
 };
 
+class TranscoderUseCutlist: public CheckBoxSetting, public BackendSetting {
+public:
+    TranscoderUseCutlist():
+        BackendSetting("TranscoderUseCutlist") {
+        setLabel("Use cutlist during transcoding");
+        setValue(0);
+        setHelpText("When set and the transcoder is active, the transcoded "
+                    "files will not contain anything marked in the cutlist "
+                    "(i.e. commercials).  NOTE:  When enabled, automatic "
+                    "transcoding will be disabled."
+                );
+        };
+};
+
 class TimeOffset: public ComboBoxSetting, public BackendSetting {
 public:
     TimeOffset():
@@ -278,6 +292,7 @@ BackendSettings::BackendSettings() {
     group1->addChild(new BufferSize());
     group1->addChild(new MaxBufferFill());
     group1->addChild(new MaxTranscoders());
+    group1->addChild(new TranscoderUseCutlist());
     addChild(group1);
 
     VerticalConfigurationGroup* group2 = new VerticalConfigurationGroup(false);

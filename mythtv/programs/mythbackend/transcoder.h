@@ -35,6 +35,8 @@ class Transcoder : public QObject
     pthread_mutex_t transqlock;
 
     bool transcodePoll;
+    int maxTranscoders;
+    int useCutlist;
 
     QMap<int, EncoderLink *> *m_tvList;
     QSqlDatabase *db_conn;

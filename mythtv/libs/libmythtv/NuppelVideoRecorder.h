@@ -85,6 +85,8 @@ class NuppelVideoRecorder : public RecorderBase
     void StreamAllocate(void);
     void WriteHeader(bool todumpfile = false);
     void WriteSeekTable(bool todumpfile);
+    void UpdateSeekTable(int frame_num, bool update_db);
+
     bool SetupAVCodec(void);
     int AudioInit(bool skipdevice = false);
     void WriteVideo(Frame *frame, bool skipsync = false, bool forcekey = false);

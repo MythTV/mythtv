@@ -1498,6 +1498,29 @@ void NuppelVideoRecorder::WriteSeekTable(bool todumpfile)
     }
 }
 
+void NuppelVideoRecorder::UpdateSeekTable(int frame_num, bool use_db)
+{
+    long long position = ringBuffer->GetFileWritePosition();
+    struct seektable_entry ste;
+    ste.file_offset = position;
+    ste.keyframe_number = frame_num;
+    positionMap[ste.keyframe_number] = position;
+
+    seektable->push_back(ste);
+
+    if (use_db && curRecording && db_lock && db_conn &&
+        (positionMap.size() % 15) == 0)
+    {
+        pthread_mutex_lock(db_lock);
+        MythContext::KickDatabase(db_conn);
+        curRecording->SetPositionMap(positionMap, MARK_KEYFRAME, db_conn,
+                                     prev_keyframe_save_pos, 
+                                     (long long)ste.keyframe_number);
+        pthread_mutex_unlock(db_lock);
+        prev_keyframe_save_pos = ste.keyframe_number + 1;
+    }
+}
+
 int NuppelVideoRecorder::CreateNuppelFile(void)
 {
     framesWritten = 0;
@@ -2770,13 +2793,7 @@ void NuppelVideoRecorder::WriteVideo(Frame *frame, bool skipsync, bool forcekey)
         frameofgop=0;
         ringBuffer->Write("RTjjjjjjjjjjjjjjjjjjjjjjjj", FRAMEHEADERSIZE);
 
-        long long position = ringBuffer->GetFileWritePosition();
-        struct seektable_entry ste;
-        ste.file_offset = position;
-        ste.keyframe_number = ((fnum - startnum) >> 1) / keyframedist;
-        positionMap[ste.keyframe_number] = position;
-
-        seektable->push_back(ste);
+        UpdateSeekTable(((fnum - startnum) >> 1) / keyframedist, true);
 
         frameheader.frametype    = 'S';           // sync frame
         frameheader.comptype     = 'V';           // video sync information
@@ -2795,18 +2812,6 @@ void NuppelVideoRecorder::WriteVideo(Frame *frame, bool skipsync, bool forcekey)
 
         wantkeyframe = true;
         ringBuffer->Sync();
-
-        if (curRecording && db_lock && db_conn && 
-            (positionMap.size() % 15) == 0)
-        {
-            pthread_mutex_lock(db_lock);
-            MythContext::KickDatabase(db_conn);
-            curRecording->SetPositionMap(positionMap, MARK_KEYFRAME, db_conn,
-                       prev_keyframe_save_pos, (long long)ste.keyframe_number);
-            pthread_mutex_unlock(db_lock);
-
-            prev_keyframe_save_pos = ste.keyframe_number + 1;
-        }
     }
 
     if (videoFilters.size() > 0)

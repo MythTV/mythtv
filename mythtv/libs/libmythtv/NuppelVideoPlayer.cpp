@@ -2336,6 +2336,7 @@ void NuppelVideoPlayer::SaveCutList(void)
         deleteMap[totalFrames] = 0;
 
     QMutexLocker lockit(&db_lock);
+    m_playbackinfo->SetMarkupFlag(MARK_UPDATED_CUT, true, m_db);
     m_playbackinfo->SetCutList(deleteMap, m_db);
 }
 
@@ -2532,9 +2533,18 @@ class AudioReencodeBuffer : public AudioOutput
     long long last_audiotime;
 };
 
-bool NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
-                                     RecordingProfile &profile,
-                                     bool honorCutList, bool forceKeyFrames)
+void NuppelVideoPlayer::QueueTranscode(void)
+{
+    QString message = QString("LOCAL_READY_TO_TRANSCODE %1 %2")
+                            .arg(m_playbackinfo->chanid)
+                            .arg(m_playbackinfo->startts.toString(Qt::ISODate));
+    MythEvent me(message);
+    gContext->dispatch(me);
+}
+
+int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
+                                    RecordingProfile &profile,
+                                    bool honorCutList, bool forceKeyFrames)
 { 
     NuppelVideoRecorder *nvr;
 
@@ -2545,6 +2555,20 @@ bool NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
      
     int audioframesize;
     int audioFrame = 0;
+
+    QTime curtime = QTime::currentTime();
+    if (honorCutList && m_playbackinfo)
+    {
+        if (m_playbackinfo->IsEditing(m_db) ||
+                m_playbackinfo->CheckMarkupFlag(MARK_PROCESSING, m_db)) {
+            return REENCODE_CUTLIST_CHANGE;
+        }
+        db_lock.lock();
+        m_playbackinfo->SetMarkupFlag(MARK_UPDATED_CUT, false, m_db);
+        db_lock.unlock();
+        curtime = curtime.addSecs(60);
+    }
+
     // Input setup
     nvr = new NuppelVideoRecorder;
     ringBuffer = new RingBuffer(filename, false, false);
@@ -2552,7 +2576,7 @@ bool NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
     if (OpenFile(false) < 0)
     {
         delete nvr;
-        return false;
+        return REENCODE_ERROR;
     }
 
     // Recorder setup
@@ -2648,7 +2672,9 @@ bool NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
     QMap<long long, int>::Iterator i;
     QMap<long long, int>::Iterator last = deleteMap.end();
     bool writekeyframe = true;
-    
+   
+    int num_keyframes = 0;
+ 
     if (honorCutList && !deleteMap.isEmpty())
     {
         i = deleteMap.begin();
@@ -2697,7 +2723,7 @@ bool NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
                 delete outRingBuffer;
                 delete nvr;
                 unlink(outputname);
-                return false;
+                return REENCODE_ERROR;
             }
 
             decoder->WriteStoredData(outRingBuffer);
@@ -2705,6 +2731,9 @@ bool NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
                 writekeyframe = true;
             else
                 writekeyframe = decoder->isLastFrameKey();
+
+            if (decoder->isLastFrameKey())
+                nvr->UpdateSeekTable(num_keyframes++, false);
  
             nvr->WriteVideo(&frame, true, writekeyframe);
             rtxt = wtxt;
@@ -2744,16 +2773,27 @@ bool NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
 
             nvr->WriteVideo(&frame, true, writekeyframe);
         }
+
+        if (honorCutList && QTime::currentTime() > curtime) 
+        {
+            if (m_playbackinfo->CheckMarkupFlag(MARK_UPDATED_CUT, m_db)) 
+            {
+                delete outRingBuffer;
+                delete nvr;
+                unlink(outputname);
+                return REENCODE_CUTLIST_CHANGE;
+            }
+            curtime = QTime::currentTime();
+            curtime = curtime.addSecs(60);
+        }
     
         decoder->GetFrame(0);
     }
 
-    if (!tryraw)
-        nvr->WriteSeekTable(false);
+    nvr->WriteSeekTable(false);
     delete outRingBuffer;
     delete nvr;
-
-    return true;
+    return REENCODE_OK;
 }
 
 int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed)
@@ -2853,6 +2893,7 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed)
     if (commBreakMap.size())
     {
         db_lock.lock();
+        m_playbackinfo->SetMarkupFlag(MARK_UPDATED_CUT, true, m_db);
         m_playbackinfo->SetCommBreakList(commBreakMap, m_db);
         db_lock.unlock();
     }

@@ -892,6 +892,11 @@ void TV::ProcessKeypress(int keypressed)
             DoSkipCommercials(1);
             break;
         }
+        case Key_X:
+        {
+            DoQueueTranscode();
+            break;
+        }
         case Key_Q:
         {
             doing_ff = false;
@@ -1388,6 +1393,15 @@ void TV::DoJumpBack(void)
     }
 
     activenvp->Rewind(jumptime * 60);
+}
+
+void TV::DoQueueTranscode(void)
+{
+     if (internalState == kState_WatchingPreRecorded &&
+         gContext->GetNumSetting("MaxTranscoders", 0) > 0)
+     {
+         activenvp->QueueTranscode();
+     }
 }
 
 void TV::DoSkipCommercials(int direction)

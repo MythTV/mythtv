@@ -9,6 +9,7 @@
 
 #define NUMPROGRAMLINES 20
 
+#define MARK_UPDATED_CUT  -3
 #define MARK_EDIT_MODE    -2
 #define MARK_PROCESSING   -1
 #define MARK_CUT_END       0

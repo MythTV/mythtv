@@ -707,11 +707,14 @@ void TVRec::TeardownRecorder(bool killFile)
             if (gContext->GetNumSetting("AutoCommercialFlag", 0))
                 FlagCommercials();
 
-            QString message = QString("LOCAL_READY_TO_TRANSCODE %1 %2")
-                       .arg(prevRecording->chanid)
-                       .arg(prevRecording->startts.toString(Qt::ISODate));
-            MythEvent me(message);
-            gContext->dispatch(me);
+            if (!gContext->GetNumSetting("TranscoderUseCutlist", 0))
+            {
+                QString message = QString("LOCAL_READY_TO_TRANSCODE %1 %2")
+                           .arg(prevRecording->chanid)
+                           .arg(prevRecording->startts.toString(Qt::ISODate));
+                MythEvent me(message);
+                gContext->dispatch(me);
+            }
         }
     }
 

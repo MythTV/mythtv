@@ -26,11 +26,13 @@ Transcoder::Transcoder(QMap<int, EncoderLink *> *tvList,
     m_tvList = tvList;
     db_conn = ldb;
 
-    if (gContext->GetNumSetting("MaxTranscoders", 0)) 
-    {
-        ClearTranscodeTable(false);
-//        RestartTranscoding();
-    }
+    maxTranscoders = gContext->GetNumSetting("MaxTranscoders", 0);
+    if (!maxTranscoders)
+        return;
+
+    useCutlist = gContext->GetNumSetting("TranscoderUseCutlist", 0);
+    ClearTranscodeTable(false);
+//    RestartTranscoding();
 
     transcodePoll = false;
 
@@ -67,6 +69,7 @@ void Transcoder::customEvent(QCustomEvent *e)
                         "transcoding\n";
                 return;
             }
+            // cout << "DEBUG: Received transcode message\n";
             EnqueueTranscode(pinfo);
         }
     }
@@ -82,10 +85,12 @@ pid_t Transcoder::Transcode(ProgramInfo *pginfo)
 
     InitTranscoder(pginfo);
     QString path = "mythtranscode";
-    QString command = QString("%1 -c %2 -s %3 -p %4").arg(path.ascii())
+    QString command = QString("%1 -c %2 -s %3 -p %4 -d %5").arg(path.ascii())
                       .arg(pginfo->chanid)
                       .arg(pginfo->startts.toString(Qt::ISODate))
-                      .arg("Transcode");
+                      .arg("Transcode")
+                      .arg(useCutlist ? "-l" : "");
+    // cout << "DEBUG: " << command.ascii() << endl;
     //Transcode may use the avencoder which is not thread-safe
     child = fork();
     if (child < 0) {
@@ -105,10 +110,12 @@ pid_t Transcoder::Transcode(ProgramInfo *pginfo)
 void Transcoder::InitTranscoder(ProgramInfo *pginfo)
 {
      QString query;
-     query = QString("INSERT into transcoding (chanid,starttime,isdone) "
-                     "VALUES ('%1','%2',0);")
+     query = QString("INSERT into transcoding "
+                     "(chanid,starttime,status,hostname) "
+                     "VALUES ('%1','%2',0,'%3');")
                      .arg(pginfo->chanid)
-                     .arg(pginfo->startts.toString("yyyyMMddhhmmss"));
+                     .arg(pginfo->startts.toString("yyyyMMddhhmmss"))
+                     .arg(gContext->GetHostName());
      MythContext::KickDatabase(db_conn);
      db_conn->exec(query);
 }
@@ -118,34 +125,40 @@ void Transcoder::ClearTranscodeTable(bool skipPartial)
      QString query;
      QString fileprefix = gContext->GetFilePrefix();
      MythContext::KickDatabase(db_conn);
-     query = QString("SELECT transcoding.chanid,starttime,isdone FROM transcoding;");
+     query = QString("SELECT chanid,starttime,status FROM transcoding "
+                     "WHERE hostname = '%1';").arg(gContext->GetHostName());
      QSqlQuery result = db_conn->exec(query);
      if (result.isActive() && result.numRowsAffected() > 0)
      {
         while (result.next())
         {
-            if (!result.value(2).toInt())
+            int status = result.value(2).toInt();
+            if ((!skipPartial && status != 2) || status == -2)
             {
-                if (!skipPartial)
+                // transcode didn't finish delete partial transcode
+                QDateTime dtstart = result.value(1).toDateTime();
+                ProgramInfo *pinfo = ProgramInfo::GetProgramFromRecorded(
+                                              result.value(0).toString(),
+                                              dtstart);
+                if (!pinfo)
                 {
-                     // transcode didn't finish delete partial transcode
-                     QDateTime dtstart = result.value(1).toDateTime();
-                     ProgramInfo *pinfo = ProgramInfo::GetProgramFromRecorded(
-                                                   result.value(0).toString(), 
-                                                   dtstart);
-                     if (!pinfo) 
-                     {
-                         cerr << "Bad transcoding info\n";
-                         continue;
-                     }
-                     QString filename = pinfo->GetRecordFilename(fileprefix);
-                     filename += ".tmp";
-                     cout << "Deleting " << filename << endl;
-                     unlink(filename);
-                     EnqueueTranscode(pinfo);
+                    cerr << "Bad transcoding info\n";
+                    continue;
                 }
+                QString filename = pinfo->GetRecordFilename(fileprefix);
+                filename += ".tmp";
+                cout << "Deleting " << filename << endl;
+                unlink(filename);
+                query = QString("DELETE FROM transcoding WHERE "
+                                "chanid = '%1' AND starttime = '%2' "
+                                "AND hostname = '%3';")
+                                .arg(result.value(0).toString())
+                                .arg(dtstart.toString("yyyyMMddhhmmss"))
+                                .arg(gContext->GetHostName());
+                db_conn->exec(query);
+                EnqueueTranscode(pinfo);
             }
-            else
+            else if (status == 2)
             {
                 QDateTime dtstart = result.value(1).toDateTime();
                 ProgramInfo *pinfo = ProgramInfo::GetProgramFromRecorded(
@@ -168,18 +181,26 @@ void Transcoder::ClearTranscodeTable(bool skipPartial)
                     // unlink(filename);
                     rename (tmpfile, filename);
                     query = QString("DELETE FROM transcoding WHERE "
-                                    "chanid = '%1' AND starttime = '%2'")
+                                    "chanid = '%1' AND starttime = '%2' "
+                                    "AND hostname = '%3';")
+                                    .arg(result.value(0).toString())
+                                    .arg(dtstart.toString("yyyyMMddhhmmss"))
+                                    .arg(gContext->GetHostName());
+                    db_conn->exec(query);
+                    query = QString("DELETE FROM recordedmarkup WHERE "
+                                    "chanid = '%1' AND starttime = '%2';")
                                     .arg(result.value(0).toString())
                                     .arg(dtstart.toString("yyyyMMddhhmmss"));
                     db_conn->exec(query);
                 }
             }
+            else if (status == -1)
+            {
+                 // transcoding failed for an unknown reason,
+                 // it is likely that this cannot be recoverable.
+                 // Do nothing for now.
+            }
         }
-     }
-     if (!skipPartial) 
-     {
-         query = QString("DELETE from transcoding WHERE isdone = '0';");
-         db_conn->exec(query);
      }
 }
 
@@ -212,7 +233,6 @@ void Transcoder::TranscodePoll()
     transcodePoll = true;
     while (transcodePoll) 
     {
-        int maxTranscoders = gContext->GetNumSetting("MaxTranscoders", 0);
         if (maxTranscoders) 
         {
             ClearTranscodeTable(true);
@@ -232,10 +252,17 @@ void Transcoder::TranscodePoll()
 
             if (pinfo) 
             {
-                pid_t pid = Transcode(pinfo);
-                delete pinfo;
-                if (pid > 0) 
-                    Transcoders.append(pid);
+                if (!useCutlist || !isFileInUse(pinfo))
+                {
+                    pid_t pid = Transcode(pinfo);
+                    delete pinfo;
+                    if (pid > 0)
+                        Transcoders.append(pid);
+                }
+                else
+                {
+                    EnqueueTranscode(pinfo);
+                }
             }
         }
 
