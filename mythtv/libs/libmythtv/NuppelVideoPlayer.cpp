@@ -1102,11 +1102,11 @@ void NuppelVideoPlayer::UpdateCC(unsigned char *inpos)
 #define WARPAVLEN (video_frame_rate * 600) // How long to average the warp over
 #define WARPCLIP    0.1 // How much we allow the warp to deviate from 1 
                         // (normal speed)
-#define MAXDIVERGE  20  // Maximum number of frames of A/V divergence allowed
+#define MAXDIVERGE  3   // Maximum number of frames of A/V divergence allowed
                         // before dropping or extending video frames to 
                         // compensate
-#define DIVERGELIMIT 200 // A/V divergence above this amount is clipped
-                         // to avoid bad stream data causing huge pauses
+#define DIVERGELIMIT 30 // A/V divergence above this amount is clipped
+                        // to avoid bad stream data causing huge pauses
  
 float NuppelVideoPlayer::WarpFactor(void) 
 {
@@ -1270,11 +1270,11 @@ void NuppelVideoPlayer::AVSync(void)
         if (diverge > DIVERGELIMIT)
             diverge = DIVERGELIMIT;
 
-        // Audio is way ahead of the video - cut the frame rate
-        // until it's almost in sync
+        // Audio is way ahead of the video - cut the frame rate to
+        // half speed until it is within normal range
         VERBOSE(VB_PLAYBACK, QString("A/V diverged by %1 frames, extending "
             "frame to keep audio in sync").arg(diverge));
-        avsync_adjustment = (frame_interval * ((int)diverge / MAXDIVERGE));
+        avsync_adjustment = frame_interval;
         lastsync = true;
     }
 
