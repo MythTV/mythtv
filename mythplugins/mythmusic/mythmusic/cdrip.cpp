@@ -57,6 +57,7 @@ void MyLineEdit::keyPressEvent(QKeyEvent *e)
             handled = true;
             break;
         }
+        default: break;
     }
 
     if (!handled)

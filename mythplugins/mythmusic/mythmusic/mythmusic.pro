@@ -3,10 +3,17 @@
 ######################################################################
 
 TEMPLATE = app
-CONFIG += thread debug
+CONFIG += thread
 TARGET = mythmusic
 target.path = /usr/local/bin
-INSTALLS = target
+INSTALLS += target
+
+installfiles.path = /usr/local/share/mythtv
+installfiles.files = mythmusic-settings.txt
+
+INSTALLS += installfiles
+
+include ( ../settings.pro )
 
 LIBS += -lmad -lid3tag -logg -lvorbisfile -lvorbis -lvorbisenc -lcdaudio -lFLAC
 LIBS += -lcdda_paranoia -lcdda_interface
@@ -15,11 +22,11 @@ LIBS += -lcdda_paranoia -lcdda_interface
 HEADERS += audiooutput.h buffer.h cddecoder.h cdrip.h constants.h databasebox.h 
 HEADERS += decoder.h flacdecoder.h flacencoder.h maddecoder.h menubox.h 
 HEADERS += metadata.h playbackbox.h output.h recycler.h settings.h 
-HEADERS += scrolllabel.h streaminput.h treecheckitem.h vorbisdecoder.h 
-HEADERS += vorbisencoder.h
+HEADERS += scrolllabel.h streaminput.h themedmenu.h treecheckitem.h 
+HEADERS += vorbisdecoder.h vorbisencoder.h
 
 SOURCES += audiooutput.cpp cddecoder.cpp cdrip.cpp databasebox.cpp decoder.cpp 
 SOURCES += flacdecoder.cpp flacencoder.cpp maddecoder.cpp main.cpp menubox.cpp 
 SOURCES += metadata.cpp playbackbox.cpp output.cpp recycler.cpp settings.cpp 
-SOURCES += scrolllabel.cpp streaminput.cpp treecheckitem.cpp vorbisdecoder.cpp 
-SOURCES += vorbisencoder.cpp
+SOURCES += scrolllabel.cpp streaminput.cpp themedmenu.cpp treecheckitem.cpp 
+SOURCES += vorbisdecoder.cpp vorbisencoder.cpp

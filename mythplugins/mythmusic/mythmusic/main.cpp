@@ -14,11 +14,14 @@ using namespace std;
 #include "vorbisdecoder.h"
 #include "databasebox.h"
 #include "playbackbox.h"
+#include "themedmenu.h"
 #include "menubox.h"
 #include "cdrip.h"
 #include "settings.h"
 
 Settings *settings;
+
+char theprefix[] = "/usr/local";
 
 void CheckFreeDBServerFile(void)
 {
@@ -124,9 +127,76 @@ void startRipper(QSqlDatabase *db)
     rip.exec();
 }
 
+bool runMenu(bool usetheme, QString themedir, QSqlDatabase *db, 
+             QString paths, QValueList<Metadata> &playlist, QString startdir)
+{
+    if (usetheme)
+    {
+        ThemedMenu *diag = new ThemedMenu(themedir.ascii(), "music.menu");
+        
+        if (diag->foundTheme())
+        {
+            diag->Show();
+            diag->exec();
+            
+            QString sel = diag->getSelection().lower();
+
+            bool retval = true;
+
+            if (sel == "music_create_playlist")
+                startDatabaseTree(db, paths, &playlist);
+            else if (sel == "music_play")
+                startPlayback(db, &playlist);
+            else if (sel == "music_rip")
+            {
+                startRipper(db);
+                SearchDir(startdir); 
+            }
+            else if (sel == "music_setup")
+                ;
+            else
+                retval = false;
+
+            delete diag;
+
+            return retval;
+        }
+    }
+
+    MenuBox diag("MythMusic");
+
+    diag.AddButton("Make a Playlist");
+    diag.AddButton("Play Music");
+    diag.AddButton("Import a CD");
+
+    diag.Show();
+       
+    int result = diag.exec();
+
+    bool retval = true;
+      
+    switch (result)
+    {   
+        case 1: startDatabaseTree(db, paths, &playlist); break;
+        case 2: startPlayback(db, &playlist); break;
+        case 3: { startRipper(db); SearchDir(startdir); } break;
+        default: break;
+    }
+    if (result == 0)
+        retval = false;
+
+    return retval;
+}
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
+    settings = new Settings();
+
+    settings->LoadSettingsFiles("mythmusic-settings.txt", theprefix);
+    settings->LoadSettingsFiles("theme.txt", theprefix);
+    settings->LoadSettingsFiles("mysql.txt", theprefix);
 
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!db)
@@ -145,40 +215,32 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    settings = new Settings("mythmusic-settings.txt");
-
     CheckFreeDBServerFile();
 
     QString startdir = settings->GetSetting("MusicLocation");
-    SearchDir(startdir);
+
+    if (startdir != "")
+        SearchDir(startdir);
 
     QString paths = settings->GetSetting("TreeLevels");
     QValueList<Metadata> playlist;
 
+    QString themename = settings->GetSetting("Theme");
+
+    QString themedir = findThemeDir(themename, theprefix);
+    bool usetheme = true;
+    if (themedir == "")
+        usetheme = false;
+
     while (1)
     {
-        MenuBox diag("MythMusic");
-     
-        diag.AddButton("Make a Playlist");
-        diag.AddButton("Play Music");
-        diag.AddButton("Import a CD");
-
-        diag.Show();
-
-        int result = diag.exec();
-
-        switch (result)
-        {
-            case 1: startDatabaseTree(db, paths, &playlist); break;
-            case 2: startPlayback(db, &playlist); break;
-            case 3: { startRipper(db); SearchDir(startdir); } break;
-            default: break;
-        }
-        if (result == 0) 
+        if (!runMenu(usetheme, themedir, db, paths, playlist, startdir))
             break;
     }
 
     db->close();
+
+    delete settings;
 
     return 0;
 }

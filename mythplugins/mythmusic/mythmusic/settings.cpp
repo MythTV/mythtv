@@ -128,6 +128,20 @@ void Settings::SetSetting(QString strSetting, void* pNewVal)
 	(*m_pVoidSettings)[strSetting] = pNewVal;
 }
 
+void Settings::LoadSettingsFiles(QString filename, QString prefix)
+{
+    QString setname = prefix + "/share/mythtv/" + filename;
+    ReadSettings(setname);
+
+    char *home = getenv("HOME");
+    setname = QString(home) + "/.mythtv/" + filename;
+
+    ReadSettings(setname);
+
+    setname = "./" + filename;
+    ReadSettings(setname);
+}
+
 int Settings::ReadSettings(QString pszFile)
 {
 	fstream fin(pszFile.ascii(), ios::in);

@@ -45,6 +45,7 @@ public:
 	/** Generic Setting Setting function for pointer values */
 	void SetSetting(QString strSetting, void* pNewVal);
 
+        void LoadSettingsFiles(QString filename, QString prefix);
         /** parse settings file */
         int ReadSettings(QString pszFile);
 private: // Private attributes
@@ -57,5 +58,7 @@ private: // Private attributes
 	/** main property-value mapping for pointers */
 	map<QString, void*>* m_pVoidSettings;
 };
+
+void LoadSettingsFile(Settings *settings, QString filename);
 
 #endif
