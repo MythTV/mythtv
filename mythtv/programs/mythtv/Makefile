@@ -23,7 +23,7 @@ NUVLIBS = `libNuppelVideo/nuppelvideo-config --libs` `mysql_config --libs`
 
 all: libNuppelVideo.a examples libmythtv.a mythtv
 
-LIBTVOBJ = tv.o settings.o channel.o frequencies.o
+LIBTVOBJ = tv.o settings.o channel.o frequencies.o recordinginfo.o
 TVOBJ = main.o
 TVLDF = -L. -lmythtv -LlibNuppelVideo/ -lNuppelVideo $(NUVLIBS)
 

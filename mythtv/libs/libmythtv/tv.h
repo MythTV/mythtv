@@ -13,6 +13,7 @@ using namespace std;
 #include "settings.h"
 
 #include "channel.h"
+#include "recordinginfo.h"
 
 typedef enum 
 {
@@ -32,8 +33,7 @@ class TV
    ~TV(void);
 
     void LiveTV(void);
-    void StartRecording(const string &channelName, int duration, 
-                        const string &outputFileName);
+    void StartRecording(RecordingInfo *rcinfo);
     void Playback(const string &inputFileName);
 
     bool IsRunning(void) { return runMainLoop; }
@@ -107,8 +107,7 @@ class TV
     bool runMainLoop;
     bool exitPlayer;
     bool paused;
-    int secsToRecord;
-    time_t recordStartTime;
+    time_t recordEndTime;
 
     float frameRate;
 
@@ -116,9 +115,10 @@ class TV
     bool changeState;
     TVState nextState;
     string inputFilename, outputFilename;
-    string recordChannel;
 
     bool watchingLiveTV;
+
+    RecordingInfo *curRecording;
 };
 
 #endif
