@@ -1507,10 +1507,8 @@ void ThemedMenu::ReloadTheme(void)
 
     showFullScreen();
 
-    QString theme = gContext->GetSetting("Theme");
-    QString themedir = gContext->FindThemeDir(theme);
-
-    parseSettings(themedir + "/", "theme.xml");
+    QString themedir = gContext->GetThemeDir();
+    parseSettings(themedir, "theme.xml");
 
     QString file = menufiles.back().name;
     int row = menufiles.back().row;

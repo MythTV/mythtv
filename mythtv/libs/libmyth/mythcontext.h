@@ -50,7 +50,7 @@ class MythEvent : public QCustomEvent
     QString extradata;
 };
 
-#define MYTH_BINARY_VERSION "0.9.05312003-1"
+#define MYTH_BINARY_VERSION "0.9.05312003-2"
 
 extern bool print_verbose_messages;
 
@@ -68,6 +68,8 @@ class MythContext : public QObject
     bool ConnectServer(const QString &hostname, int port);
 
     QString GetInstallPrefix() { return m_installprefix; }
+    QString GetShareDir() { return m_installprefix + "/share/mythtv/"; }
+
     QString GetFilePrefix();
 
     void LoadSettingsFiles(const QString &filename);
@@ -76,6 +78,7 @@ class MythContext : public QObject
     void GetScreenSettings(int &width, float &wmult, int &height, float &hmult);
    
     QString FindThemeDir(QString themename);
+    QString GetThemeDir(void) { return m_themepathname; }
 
     int OpenDatabase(QSqlDatabase *db);
     static void KickDatabase(QSqlDatabase *db);

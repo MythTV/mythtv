@@ -23,15 +23,17 @@ XMLParse::~XMLParse()
 
 bool XMLParse::LoadTheme(QDomElement &ele, QString winName, QString specialfile)
 {
-    QString themepath = gContext->FindThemeDir("") + gContext->GetSetting("Theme");
-    QString themefile = themepath + "/" + specialfile + "ui.xml";
+    usetrans = gContext->GetNumSetting("PlayBoxTransparency", 1);
+
+    QString themepath = gContext->GetThemeDir();
+    QString themefile = themepath + specialfile + "ui.xml";
 
     QDomDocument doc;
     QFile f(themefile);
 
     if (!f.open(IO_ReadOnly))
     {
-        themepath = gContext->FindThemeDir("") + "default/";
+        themepath = gContext->GetShareDir() + "themes/default/";
         themefile = themepath + "/" + specialfile + "ui.xml";
         f.setName(themefile);
         if (!f.open(IO_ReadOnly))
@@ -960,9 +962,9 @@ void XMLParse::parseListArea(LayerSet *container, QDomElement &element)
     QPoint uparrow_loc;
     QPoint dnarrow_loc;
     QPoint select_loc;
-    QPixmap uparrow_img;
-    QPixmap dnarrow_img;
-    QPixmap select_img;
+    QPixmap *uparrow_img = NULL;
+    QPixmap *dnarrow_img = NULL;
+    QPixmap *select_img = NULL;
 
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
@@ -1099,21 +1101,21 @@ void XMLParse::parseListArea(LayerSet *container, QDomElement &element)
 
                 if (imgname.lower() == "selectionbar")
                 {
-                    resizeImage(&select_img, imgfile);
+                    select_img = gContext->LoadScalePixmap(imgfile);
                     select_loc = parsePoint(imgpoint);
                     select_loc.setX((int)(select_loc.x() * wmult));
                     select_loc.setY((int)(select_loc.y() * hmult));
                 }
                 if (imgname.lower() == "uparrow")
                 {
-                    resizeImage(&uparrow_img, imgfile);
+                    uparrow_img = gContext->LoadScalePixmap(imgfile);
                     uparrow_loc = parsePoint(imgpoint);
                     uparrow_loc.setX((int)(uparrow_loc.x() * wmult));
                     uparrow_loc.setY((int)(uparrow_loc.y() * hmult));
                 }
                 if (imgname.lower() == "downarrow")
                 {
-                    resizeImage(&dnarrow_img, imgfile);
+                    dnarrow_img = gContext->LoadScalePixmap(imgfile);
                     dnarrow_loc = parsePoint(imgpoint);
                     dnarrow_loc.setX((int)(dnarrow_loc.x() * wmult));
                     dnarrow_loc.setY((int)(dnarrow_loc.y() * hmult));
@@ -1162,9 +1164,22 @@ void XMLParse::parseListArea(LayerSet *container, QDomElement &element)
     list->SetCount(item_cnt);
     list->SetScreen(wmult, hmult);
     list->SetColumnPad(padding);
-    list->SetImageSelection(select_img, select_loc);
-    list->SetImageUpArrow(uparrow_img, uparrow_loc);
-    list->SetImageDownArrow(dnarrow_img, dnarrow_loc);
+    if (select_img)
+    {
+        list->SetImageSelection(*select_img, select_loc);
+        delete select_img;
+    }
+    if (uparrow_img)
+    {
+        list->SetImageUpArrow(*uparrow_img, uparrow_loc);
+        delete uparrow_img;
+    }
+    if (dnarrow_img)
+    {
+        list->SetImageDownArrow(*dnarrow_img, dnarrow_loc);
+        delete dnarrow_img;
+    }
+
     typedef QMap<QString,QString> fontdata;
     fontdata::Iterator it;
     for ( it = fontFunctions.begin(); it != fontFunctions.end(); ++it )
@@ -1208,43 +1223,12 @@ LayerSet *XMLParse::GetSet(const QString &text)
     return ret;
 }
 
-void XMLParse::resizeImage(QPixmap *dst, QString file)
-{
-    QString baseDir = gContext->GetInstallPrefix();
-    QString themeDir = gContext->FindThemeDir("");
-    themeDir = themeDir + gContext->GetSetting("Theme") + "/";
-    baseDir = baseDir + "/share/mythtv/themes/default/";
-
-    QFile checkFile(themeDir + file);
-
-    if (checkFile.exists())
-         file = themeDir + file;
-    else
-         file = baseDir + file;
-
-    if (hmult == 1 && wmult == 1)
-    {
-         dst->load(file);
-    }
-    else
-    {
-        QImage *sourceImg = new QImage();
-        if (sourceImg->load(file))
-        {
-            QImage scalerImg;
-            scalerImg = sourceImg->smoothScale((int)(sourceImg->width() * wmult),
-                                               (int)(sourceImg->height() * hmult));
-            dst->convertFromImage(scalerImg);
-        }
-        delete sourceImg;
-    }
-}
-
 void XMLParse::parseStatusBar(LayerSet *container, QDomElement &element)
 {
     int imgFillSpace = 0;
-    QPixmap imgFiller;
-    QPixmap imgContainer;
+    QPixmap *imgFiller = NULL;
+    QPixmap *imgContainer = NULL;
+ 
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
@@ -1275,20 +1259,19 @@ void XMLParse::parseStatusBar(LayerSet *container, QDomElement &element)
                 {
                     if (flex.lower() == "yes")
                     {
-                        int trans = gContext->GetNumSetting("PlayBoxTransparency", 1);
-                        if (trans == 1)
+                        if (usetrans == 1)
                             confile = "trans-" + confile;
                         else
                             confile = "solid-" + confile;
 
-                        resizeImage(&imgContainer, confile);
+                        imgContainer = gContext->LoadScalePixmap(confile);
                     }
                     else
-                        resizeImage(&imgContainer, confile);
+                        imgContainer = gContext->LoadScalePixmap(confile);
                 }
                 else
                 {
-                    resizeImage(&imgContainer, confile);
+                    imgContainer = gContext->LoadScalePixmap(confile);
                 }
             }
             else if (info.tagName() == "position")
@@ -1307,19 +1290,18 @@ void XMLParse::parseStatusBar(LayerSet *container, QDomElement &element)
                 {
                     if (flex.lower() == "yes")
                     {
-                        int trans = gContext->GetNumSetting("PlayBoxTransparency", 1);
-                        if (trans == 1)
+                        if (usetrans == 1)
                             fillfile = "trans-" + fillfile;
                         else
                             fillfile = "solid-" + fillfile;
-                        resizeImage(&imgFiller, fillfile);
+                        imgFiller = gContext->LoadScalePixmap(fillfile);
                      }
                      else
-                        resizeImage(&imgFiller, fillfile);
+                        imgFiller = gContext->LoadScalePixmap(fillfile);
                 }
                 else
                 {
-                    resizeImage(&imgFiller, fillfile);
+                    imgFiller = gContext->LoadScalePixmap(fillfile);
                 }
             }
             else
@@ -1332,8 +1314,16 @@ void XMLParse::parseStatusBar(LayerSet *container, QDomElement &element)
 
     UIStatusBarType *sb = new UIStatusBarType(name, pos, order.toInt());
     sb->SetFiller(imgFillSpace);
-    sb->SetContainerImage(imgContainer);
-    sb->SetFillerImage(imgFiller);
+    if (imgContainer)
+    {
+        sb->SetContainerImage(*imgContainer);
+        delete imgContainer; 
+    }
+    if (imgFiller)
+    {
+        sb->SetFillerImage(*imgFiller);
+        delete imgFiller;
+    }
     container->AddType(sb);
 }
 
@@ -1344,12 +1334,11 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
     int bins = 1;
     int context = -1;
 
-    QPixmap uparrow_img;
-    QPixmap downarrow_img;
-    QPixmap leftarrow_img;
-    QPixmap rightarrow_img;
-
-    QPixmap select_img;
+    QPixmap *uparrow_img = NULL;
+    QPixmap *downarrow_img = NULL;
+    QPixmap *leftarrow_img = NULL;
+    QPixmap *rightarrow_img = NULL;
+    QPixmap *select_img = NULL;
 
     //
     //  A Map to store the geometry of
@@ -1424,100 +1413,40 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
 
                 if (imgname.lower() == "selectionbar")
                 {
-                    QString baseDir = gContext->GetInstallPrefix();
-                    QString themeDir = gContext->FindThemeDir("");
-                    themeDir = themeDir + gContext->GetSetting("Theme") + "/";
-                    baseDir = baseDir + "/share/mythtv/themes/default/";
-                    QFile checkFile(themeDir + file);
-                    if (checkFile.exists())
-                    {
-                        file = themeDir + file;
-                    }
-                    else
-                    {
-                        file = baseDir + file;
-                    }
-                    if(!select_img.load(file))
+                    select_img = gContext->LoadScalePixmap(file);
+                    if(!select_img)
                     {
                         cerr << "xmparse.o: I can't find a file called " << file << endl ;
                     }
                 }
                 else if (imgname.lower() == "uparrow")
                 {
-                    QString baseDir = gContext->GetInstallPrefix();
-                    QString themeDir = gContext->FindThemeDir("");
-                    themeDir = themeDir + gContext->GetSetting("Theme") + "/";
-                    baseDir = baseDir + "/share/mythtv/themes/default/";
-                    QFile checkFile(themeDir + file);
-                    if (checkFile.exists())
-                    {
-                        file = themeDir + file;
-                    }
-                    else
-                    {
-                        file = baseDir + file;
-                    }
-                    if(!uparrow_img.load(file))
+                    uparrow_img = gContext->LoadScalePixmap(file);
+                    if(!uparrow_img)
                     {
                         cerr << "xmparse.o: I can't find a file called " << file << endl ;
                     }
                 }
                 else if (imgname.lower() == "downarrow")
                 {
-                    QString baseDir = gContext->GetInstallPrefix();
-                    QString themeDir = gContext->FindThemeDir("");
-                    themeDir = themeDir + gContext->GetSetting("Theme") + "/";
-                    baseDir = baseDir + "/share/mythtv/themes/default/";
-                    QFile checkFile(themeDir + file);
-                    if (checkFile.exists())
-                    {
-                        file = themeDir + file;
-                    }
-                    else
-                    {
-                        file = baseDir + file;
-                    }
-                    if(!downarrow_img.load(file))
+                    downarrow_img = gContext->LoadScalePixmap(file);
+                    if(!downarrow_img)
                     {
                         cerr << "xmparse.o: I can't find a file called " << file << endl ;
                     }
                 }
                 else if (imgname.lower() == "leftarrow")
                 {
-                    QString baseDir = gContext->GetInstallPrefix();
-                    QString themeDir = gContext->FindThemeDir("");
-                    themeDir = themeDir + gContext->GetSetting("Theme") + "/";
-                    baseDir = baseDir + "/share/mythtv/themes/default/";
-                    QFile checkFile(themeDir + file);
-                    if (checkFile.exists())
-                    {
-                        file = themeDir + file;
-                    }
-                    else
-                    {
-                        file = baseDir + file;
-                    }
-                    if(!leftarrow_img.load(file))
+                    leftarrow_img = gContext->LoadScalePixmap(file);
+                    if(!leftarrow_img)
                     {
                         cerr << "xmparse.o: I can't find a file called " << file << endl ;
                     }
                 }
                 else if (imgname.lower() == "rightarrow")
                 {
-                    QString baseDir = gContext->GetInstallPrefix();
-                    QString themeDir = gContext->FindThemeDir("");
-                    themeDir = themeDir + gContext->GetSetting("Theme") + "/";
-                    baseDir = baseDir + "/share/mythtv/themes/default/";
-                    QFile checkFile(themeDir + file);
-                    if (checkFile.exists())
-                    {
-                        file = themeDir + file;
-                    }
-                    else
-                    {
-                        file = baseDir + file;
-                    }
-                    if(!rightarrow_img.load(file))
+                    rightarrow_img = gContext->LoadScalePixmap(file);
+                    if(!rightarrow_img)
                     {
                         cerr << "xmparse.o: I can't find a file called " << file << endl ;
                     }
@@ -1614,11 +1543,31 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
     }
 
     if (theFonts.size() > 0)
-    {
         mtl->setFonts(fontFunctions, theFonts);
+
+    if (select_img)
+    {
+        mtl->setHighlightImage(*select_img);
+        delete select_img;
     }
-    mtl->setHighlightImage(select_img);
-    mtl->setArrowImages(uparrow_img, downarrow_img, leftarrow_img, rightarrow_img);
+
+    if (!uparrow_img)
+        uparrow_img = new QPixmap();
+    if (!downarrow_img)
+        downarrow_img = new QPixmap();
+    if (!leftarrow_img)
+        leftarrow_img = new QPixmap();
+    if (!rightarrow_img)
+        rightarrow_img = new QPixmap();
+
+    mtl->setArrowImages(*uparrow_img, *downarrow_img, *leftarrow_img, 
+                        *rightarrow_img);
+
+    delete uparrow_img;
+    delete downarrow_img;
+    delete leftarrow_img;
+    delete rightarrow_img;
+
     mtl->makeHighlights();
     mtl->calculateScreenArea();
     container->AddType(mtl);
@@ -1627,9 +1576,9 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
 void XMLParse::parsePushButton(LayerSet *container, QDomElement &element)
 {
     QPoint pos = QPoint(0, 0);
-    QPixmap image_on, image_off, image_pushed;
-
-    QPixmap *tmppix = NULL;
+    QPixmap *image_on = NULL;
+    QPixmap *image_off = NULL;
+    QPixmap *image_pushed = NULL;
 
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
@@ -1678,56 +1627,26 @@ void XMLParse::parsePushButton(LayerSet *container, QDomElement &element)
 
                 if (imgname.lower() == "on")
                 {
-                    QString themeDir = gContext->FindThemeDir("");
-                    themeDir = themeDir + gContext->GetSetting("Theme") + "/";
-
-                    tmppix = gContext->LoadScalePixmap(themeDir + file);
-
-                    if (!tmppix)
+                    image_on = gContext->LoadScalePixmap(file);
+                    if (!image_on)
                     {
                         cerr << "xmparse.o: I can't find a file called " << file << endl ;
-                    }
-                    else
-                    {
-                        image_on = *tmppix;
-                        delete tmppix;
-                        tmppix = NULL;
                     }
                 }
                 if (imgname.lower() == "off")
                 {
-                    QString themeDir = gContext->FindThemeDir("");
-                    themeDir = themeDir + gContext->GetSetting("Theme") + "/";
-
-                    tmppix = gContext->LoadScalePixmap(themeDir + file);
-
-                    if(!tmppix)
+                    image_off = gContext->LoadScalePixmap(file);
+                    if(!image_off)
                     {
                         cerr << "xmparse.o: I can't find a file called " << file << endl ;
-                    }
-                    else
-                    {
-                        image_off = *tmppix;
-                        delete tmppix;
-                        tmppix = NULL;
                     }
                 }
                 if (imgname.lower() == "pushed")
                 {
-                    QString themeDir = gContext->FindThemeDir("");
-                    themeDir = themeDir + gContext->GetSetting("Theme") + "/";
-
-                    tmppix = gContext->LoadScalePixmap(themeDir + file);
-
-                    if(!tmppix)
+                    image_pushed = gContext->LoadScalePixmap(file);
+                    if(!image_pushed)
                     {
                         cerr << "xmparse.o: I can't find a file called " << file << endl ;
-                    }
-                    else
-                    {
-                        image_pushed = *tmppix;
-                        delete tmppix;
-                        tmppix = NULL;
                     }
                 }
             }
@@ -1739,8 +1658,20 @@ void XMLParse::parsePushButton(LayerSet *container, QDomElement &element)
         }
     }
 
+    if (!image_on)
+        image_on = new QPixmap();
+    if (!image_off)
+        image_off = new QPixmap();
+    if (!image_pushed)
+        image_pushed = new QPixmap();
 
-    UIPushButtonType *pbt = new UIPushButtonType(name, image_on, image_off, image_pushed);
+    UIPushButtonType *pbt = new UIPushButtonType(name, *image_on, *image_off, 
+                                                 *image_pushed);
+
+    delete image_on;
+    delete image_off;
+    delete image_pushed;
+
     pbt->setPosition(pos);
     pbt->SetOrder(order.toInt());
     pbt->SetParent(container);
@@ -1752,8 +1683,9 @@ void XMLParse::parseTextButton(LayerSet *container, QDomElement &element)
 {
     QString font = "";
     QPoint pos = QPoint(0, 0);
-    QPixmap image_on, image_off, image_pushed;
-    QPixmap *tmppix;
+    QPixmap *image_on = NULL;
+    QPixmap *image_off = NULL;
+    QPixmap *image_pushed = NULL;
 
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
@@ -1806,56 +1738,27 @@ void XMLParse::parseTextButton(LayerSet *container, QDomElement &element)
 
                 if (imgname.lower() == "on")
                 {
-                    QString themeDir = gContext->FindThemeDir("");
-                    themeDir = themeDir + gContext->GetSetting("Theme") + "/";
-
-                    tmppix = gContext->LoadScalePixmap(themeDir + file);
-
-                    if(!tmppix)
+                    image_on = gContext->LoadScalePixmap(file);
+                    if(!image_on)
                     {
                         cerr << "xmparse.o: I can't find a file called " << file << endl ;
-                    }
-                    else
-                    {
-                        image_on = *tmppix;
-                        delete tmppix;
-                        tmppix = NULL;
                     }
                 }
                 if (imgname.lower() == "off")
                 {
-                    QString themeDir = gContext->FindThemeDir("");
-                    themeDir = themeDir + gContext->GetSetting("Theme") + "/";
-
-                    tmppix = gContext->LoadScalePixmap(themeDir + file);
-
-                    if(!tmppix)
+                    image_off = gContext->LoadScalePixmap(file);
+                    if(!image_off)
                     {
                         cerr << "xmparse.o: I can't find a file called " << file << endl ;
-                    }
-                    else
-                    {
-                        image_off = *tmppix;
-                        delete tmppix;
-                        tmppix = NULL;
                     }
                 }
                 if (imgname.lower() == "pushed")
                 {
-                    QString themeDir = gContext->FindThemeDir("");
-                    themeDir = themeDir + gContext->GetSetting("Theme") + "/";
+                    image_pushed = gContext->LoadScalePixmap(file);
 
-                    tmppix = gContext->LoadScalePixmap(themeDir + file);
-
-                    if(!tmppix)
+                    if(!image_pushed)
                     {
                         cerr << "xmparse.o: I can't find a file called " << file << endl ;
-                    }
-                    else
-                    {
-                        image_pushed = *tmppix;
-                        delete tmppix;
-                        tmppix = NULL;
                     }
                 }
             }
@@ -1874,7 +1777,20 @@ void XMLParse::parseTextButton(LayerSet *container, QDomElement &element)
         exit(0);
     }
 
-    UITextButtonType *tbt = new UITextButtonType(name, image_on, image_off, image_pushed);
+    if (!image_on)
+        image_on = new QPixmap();
+    if (!image_off)
+        image_off = new QPixmap();
+    if (!image_pushed)
+        image_pushed = new QPixmap();
+
+    UITextButtonType *tbt = new UITextButtonType(name, *image_on, *image_off, 
+                                                 *image_pushed);
+
+    delete image_on;
+    delete image_off;
+    delete image_pushed;
+
     tbt->setPosition(pos);
     tbt->setFont(testfont);
     tbt->SetOrder(order.toInt());

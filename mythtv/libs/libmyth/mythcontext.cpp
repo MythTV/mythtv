@@ -532,7 +532,10 @@ QImage *MythContext::LoadScaleImage(QString filename)
     if (!checkFile.exists())
     {
         QFileInfo fi(filename);
-        filename = baseDir + fi.fileName();
+        filename = m_themepathname + fi.fileName();
+        checkFile.setName(filename);
+        if (!checkFile.exists())
+            filename = baseDir + fi.fileName();
     }
 
     QImage *ret = NULL;
@@ -581,7 +584,10 @@ QPixmap *MythContext::LoadScalePixmap(QString filename)
     if (!checkFile.exists())
     {
         QFileInfo fi(filename);
-        filename = baseDir + fi.fileName();
+        filename = m_themepathname + fi.fileName();
+        checkFile.setName(filename);
+        if (!checkFile.exists())
+            filename = baseDir + fi.fileName();
     }
               
     QPixmap *ret = new QPixmap();

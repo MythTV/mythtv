@@ -36,7 +36,6 @@ class XMLParse
     void parseStatusBar(LayerSet *, QDomElement &);
     void parseImage(LayerSet *, QDomElement &);
     void parseRepeatedImage(LayerSet *, QDomElement &);
-    void resizeImage(QPixmap *, QString);
     void parsePushButton(LayerSet *, QDomElement &);
     void parseTextButton(LayerSet *, QDomElement &);
     void parseBlackHole(LayerSet *, QDomElement &);
@@ -48,6 +47,8 @@ class XMLParse
 
     double wmult;
     double hmult;
+
+    int usetrans;
 };
 
 #endif

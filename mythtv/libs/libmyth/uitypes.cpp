@@ -196,10 +196,8 @@ void UIBarType::LoadImage(int loc, QString myFile)
 
     QString file;
 
-    QString baseDir = gContext->GetInstallPrefix();
-    QString themeDir = gContext->FindThemeDir("");
-    themeDir = themeDir + gContext->GetSetting("Theme") + "/";
-    baseDir = baseDir + "/share/mythtv/themes/default/";
+    QString themeDir = gContext->GetThemeDir();
+    QString baseDir = gContext->GetShareDir() + "themes/default/";
 
     QFile checkFile(themeDir + filename);
 
@@ -850,10 +848,8 @@ void UIGuideType::SetProgramInfo(unsigned int row, int num, QRect area,
 void UIGuideType::LoadImage(int recType, QString file)
 {
     QString tfile = "";
-    QString baseDir = gContext->GetInstallPrefix();
-    QString themeDir = gContext->FindThemeDir("");
-    themeDir = themeDir + gContext->GetSetting("Theme") + "/";
-    baseDir = baseDir + "/share/mythtv/themes/default/";
+    QString themeDir = gContext->GetThemeDir();
+    QString baseDir = gContext->GetShareDir() + "themes/default/";
 
     QFile checkFile(themeDir + file);
 
@@ -905,10 +901,8 @@ void UIGuideType::LoadImage(int recType, QString file)
 void UIGuideType::SetArrow(int dir, QString file)
 {
     QString tfile = "";
-    QString baseDir = gContext->GetInstallPrefix();
-    QString themeDir = gContext->FindThemeDir("");
-    themeDir = themeDir + gContext->GetSetting("Theme") + "/";
-    baseDir = baseDir + "/share/mythtv/themes/default/";
+    QString themeDir = gContext->GetThemeDir();
+    QString baseDir = gContext->GetShareDir() + "themes/default/";
 
     QFile checkFile(themeDir + file);
 
@@ -1219,10 +1213,8 @@ void UIImageType::LoadImage()
             m_filename = "solid-" + m_filename;
     }
 
-    QString baseDir = gContext->GetInstallPrefix();
-    QString themeDir = gContext->FindThemeDir("");
-    themeDir = themeDir + gContext->GetSetting("Theme") + "/";
-    baseDir = baseDir + "/share/mythtv/themes/default/";
+    QString themeDir = gContext->GetThemeDir();
+    QString baseDir = gContext->GetShareDir() + "themes/default/";
 
     QFile checkFile(themeDir + m_filename);
 
