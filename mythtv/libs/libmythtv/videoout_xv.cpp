@@ -743,6 +743,8 @@ void VideoOutputXv::PrepareFrame(VideoFrame *buffer)
                            width, height);
             scontext = img_resample_init(dispw, disph, width, height);
             img_resample(scontext, &image_out, &image_in);
+
+            img_resample_close(scontext);
         }
 
         switch (data->fallbackImage->bits_per_pixel)

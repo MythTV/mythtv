@@ -17,6 +17,10 @@ class OSD;
 class OSDSurface;
 class FilterChain;
 
+extern "C" {
+struct ImgReSampleContext;
+}
+
 enum VideoOutputType
 {
     kVideoOutput_Default = 0,
@@ -138,6 +142,9 @@ class VideoOutput
 
     void CopyFrame(VideoFrame* to, VideoFrame* from);
 
+    void DoPipResize(int pipwidth, int pipheight);
+    void ShutdownPipResize(void);
+
     int XJ_width, XJ_height;
     float XJ_aspect;
 
@@ -178,6 +185,19 @@ class VideoOutput
     bool needrepaint;
 
     QWaitCondition availableVideoBuffers_wait;
+
+#define MAX_NEG_CROP 384
+    unsigned char cropTbl[256 + 2 * MAX_NEG_CROP];
+    unsigned char *cm;
+
+    int desired_piph;
+    int desired_pipw;
+
+    int piph_in, piph_out;
+    int pipw_in, pipw_out;
+    unsigned char *piptmpbuf;
+
+    ImgReSampleContext *pipscontext;
 };
 
 #endif
