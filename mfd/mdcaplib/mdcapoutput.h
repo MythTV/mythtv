@@ -39,16 +39,27 @@ class MdcapOutput
 
     void addServerInfoGroup();
     void addLoginGroup();
+    void addUpdateGroup();
+    void addCollectionGroup();
     void endGroup();
     
+    //
+    //  Simple type, but imply groups (eg. strings)
+    //
+
+    void addServiceName(const QString &service_name);
+    void addCollectionName(const QString &collection_name);
+
     //
     //  "element" functions
     //
 
     void addStatus(uint16_t the_status);
-    void addServiceName(const QString &service_name);
     void addProtocolVersion();
     void addSessionId(uint32_t session_id);
+    void addCollectionCount(int collection_count);
+    void addCollectionId(int collection_id);
+    void addCollectionGeneration(int collection_generation);    
 
 
   private:

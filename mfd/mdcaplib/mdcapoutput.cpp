@@ -75,6 +75,20 @@ void MdcapOutput::addLoginGroup()
     
 }
 
+void MdcapOutput::addUpdateGroup()
+{
+    append(MarkupCodes::update_group);
+    open_groups.push(contents.size());
+    append((uint32_t) 0);
+}
+
+void MdcapOutput::addCollectionGroup()
+{
+    append(MarkupCodes::collection_group);
+    open_groups.push(contents.size());
+    append((uint32_t) 0);
+}
+
 void MdcapOutput::endGroup()
 {
     //
@@ -142,6 +156,43 @@ void MdcapOutput::addServiceName(const QString &service_name)
     
 }
 
+void MdcapOutput::addCollectionName(const QString &collection_name)
+{
+
+    //
+    //  Get the name of the service in utf8
+    //
+
+    QCString utf8_string = collection_name.utf8();
+    
+    //
+    //  Put in a content code for a name
+    //
+
+    append(MarkupCodes::name);
+    
+    //
+    //  This content is a string, it obviously requires a length specification
+    //
+    
+    open_groups.push(contents.size());
+    append((uint32_t) 0);
+    
+    //
+    //  Add the name in utf8 format
+    //
+    
+    append(utf8_string, utf8_string.length());
+
+    //
+    //  Now that the name has been inserted, close out this group
+    //  
+    
+    endGroup();
+
+    
+}
+
 void MdcapOutput::addProtocolVersion()
 {
     //
@@ -161,6 +212,36 @@ void MdcapOutput::addSessionId(uint32_t session_id)
     
     append(MarkupCodes::session_id);
     append((uint32_t) session_id);
+}
+
+void MdcapOutput::addCollectionCount(int collection_count)
+{
+    //
+    //  collection count is always 4 bytes long
+    //
+    
+    append(MarkupCodes::collection_count);
+    append((uint32_t) collection_count);
+}
+
+void MdcapOutput::addCollectionId(int collection_id)
+{
+    //
+    //  collection id is always 4 bytes long
+    //
+    
+    append(MarkupCodes::collection_id);
+    append((uint32_t) collection_id);
+}
+
+void MdcapOutput::addCollectionGeneration(int collection_generation)
+{
+    //
+    //  collection generation is always 4 bytes long
+    //
+    
+    append(MarkupCodes::collection_generation);
+    append((uint32_t) collection_generation);
 }
 
 void MdcapOutput::append(char a_char)

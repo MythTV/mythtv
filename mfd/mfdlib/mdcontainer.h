@@ -67,6 +67,7 @@ class MetadataContainer
     uint                getPlaylistCount();
     void                setName(const QString &a_name){my_name = a_name;}
     QString             getName(){return my_name;}
+    int                 getGeneration(){ return generation;}
 
     Metadata*           getMetadata(int item_id);
     QIntDict<Metadata>* getMetadata(){return current_metadata;}
@@ -130,7 +131,8 @@ class MetadataContainer
     
     QString my_name;
     
-    int                         current_playlist_id;
+    int current_playlist_id;
+    int generation;                        
 };
 
 #endif

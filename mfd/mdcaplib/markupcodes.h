@@ -30,24 +30,29 @@ class MarkupCodes
     //  Codes for containers that hold groups of items
     //
 
-    static const char server_info_group = 1;
-    static const char login_group = 2;
-    
+    static const char server_info_group     = 1;
+    static const char login_group           = 2;
+    static const char update_group          = 3;
+    static const char collection_group      = 4;
     
     //
     //  Smaller items that implicitly imply groups (by virtue of being of
     //  variable length)
     //
     
-    static const char name = 16;
+    static const char name                  = 16;
     
     //
     //  Simple types of fixed lengths
     //
 
-    static const char status_code = 32;
-    static const char protocol_version = 33;
-    static const char session_id = 34;
+    static const char status_code           = 32;
+    static const char protocol_version      = 33;
+    static const char session_id            = 34;
+    static const char collection_count      = 35;
+    static const char collection_id         = 36;
+    static const char collection_generation = 37;
+    
     
 
   private:

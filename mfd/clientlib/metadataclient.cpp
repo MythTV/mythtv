@@ -236,6 +236,10 @@ void MetadataClient::processResponse(MdcapResponse *mdcap_response)
     {
         parseLogin(mdcap_input);
     }
+    else if(first_tag == MarkupCodes::update_group)
+    {
+        parseUpdate(mdcap_input);
+    }
     else
     {
         cerr << "metadataclient.o: did not understand first markup code "
@@ -398,7 +402,17 @@ void MetadataClient::parseLogin(MdcapInput &mdcap_input)
             //  Ok, I can set my session id for all future communications
             //  with this server
             //
+
             session_id = new_session_id;
+
+            //
+            //  Execellent, we have a session number. Time for our first update
+            //            
+            
+            MdcapRequest update_request("/update", ip_address);   
+            update_request.addGetVariable("session-id", session_id);
+            update_request.send(client_socket_to_service);
+            
 
         }
         else
@@ -409,6 +423,68 @@ void MetadataClient::parseLogin(MdcapInput &mdcap_input)
         }
     }
     
+    delete group_contents;
+}
+
+void MetadataClient::parseUpdate(MdcapInput &mdcap_input)
+{
+    //
+    //  /update request returns information about how many containers there
+    //  are, then what each container's id, name, and current generation is
+    //
+
+    QValueVector<char> *group_contents = new QValueVector<char>;
+    
+    char group_code = mdcap_input.popGroup(group_contents);
+    
+    if(group_code != MarkupCodes::update_group)
+    {
+        cerr << "metadataclient.o: asked to parseUpdate(), but "
+             << "group code was not update_group "
+             << endl;
+        delete group_contents;
+        return;
+    }
+    
+
+    MdcapInput rebuilt_internals(group_contents);
+
+    int collection_count = rebuilt_internals.popCollectionCount();
+
+
+    //
+    //  Make a list of all our current collections ('cause we're going to go
+    //  through the whole list from the server in a sec, and if we have
+    //  something here at the client end that does not appear in that list,
+    //  we'll need to delete it.
+    //
+
+    // FIX
+
+
+    //
+    //  For each, collection, parse out the details
+    //
+
+
+    for(int i = 0; i < collection_count; i++)
+    {
+        QValueVector<char> *collection_contents = new QValueVector<char>;
+        char collection_code = rebuilt_internals.popGroup(collection_contents);
+        if(collection_code != MarkupCodes::collection_group)
+        {
+            cerr << "metadataclient.o: trying to parse a collection group "
+                 << "inside an update group, but not getting collection_"
+                 << "group as the content code. Buggered!"
+                 << endl;
+
+            delete collection_contents;
+            return;   
+        }
+        
+        //int collection_id = parseCollection(collection_contents)
+    }
+
     delete group_contents;
 }
 

@@ -12,9 +12,14 @@
 
 const char MarkupCodes::server_info_group;
 const char MarkupCodes::login_group;
+const char MarkupCodes::update_group;
+const char MarkupCodes::collection_group;
 
 const char MarkupCodes::name;
 
 const char MarkupCodes::status_code;
 const char MarkupCodes::protocol_version;
 const char MarkupCodes::session_id;
+const char MarkupCodes::collection_count;
+const char MarkupCodes::collection_id;
+const char MarkupCodes::collection_generation;

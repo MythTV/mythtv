@@ -58,6 +58,8 @@ char MdcapInput::popGroup(QValueVector<char> *group_contents)
     if(
         return_value != MarkupCodes::server_info_group &&
         return_value != MarkupCodes::login_group &&
+        return_value != MarkupCodes::update_group &&
+        return_value != MarkupCodes::collection_group &&
         return_value != MarkupCodes::name
       )
     {
@@ -292,6 +294,35 @@ uint32_t MdcapInput::popSessionId()
     {
         cerr << "mdcapinput.o: asked to popSessionId(), but content code is "
              << "not session_id "
+             << endl;
+        return 0;       
+    }
+
+    return popU32();    
+}
+
+
+uint32_t MdcapInput::popCollectionCount()
+{
+    //
+    //  Session id is always 5 bytes
+    //  1st byte - session id markup code
+    //    next 4 - 32 bit integer = number of collections
+    //
+    
+    if(contents.size() < 5)
+    {
+        cerr << "mdcapinput.o: asked to popCollectionCount(), but "
+             << "there are not enough bytes left in the stream "
+             << endl;
+        return 0;
+    }
+
+    char content_code = popByte();
+    if(content_code != MarkupCodes::collection_count)
+    {
+        cerr << "mdcapinput.o: asked to popCollectionCount(), but "
+             << "content code is not collection_count "
              << endl;
         return 0;       
     }

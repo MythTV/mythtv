@@ -84,7 +84,7 @@ void MetadataServer::run()
 }
 
 
-void MetadataServer::handleIncoming(HttpInRequest *http_request, int /* client_id */ )
+void MetadataServer::handleIncoming(HttpInRequest *http_request, int client_id)
 {
     //
     //  The MfdHttpPlugin class ensures that this function gets called in
@@ -139,33 +139,33 @@ void MetadataServer::handleIncoming(HttpInRequest *http_request, int /* client_i
         return;
     }
 
-
-
-/*
-
-
     //
     //  If we've made it this far, then we have a logged in client, so we
-    //  should be able to parse the request to get session ID, etc.
+    //  should be able to parse the request to get the session ID
     //
 
-    parseVariables( http_request, daap_request);
-
-    if(!daap_sessions.isValid(daap_request->getSessionId()))
+    bool ok = false;
+    uint32_t session_id = http_request->getVariable("session-id").toULong(&ok);
+    if(!ok || !mdcap_sessions.isValid(session_id))
     {
-        //
-        //  Hmmm ... this isn't right. The DAAP client did not ask for
-        //  server info or a login, but it does not have a valid session id
-        //  (which it can get by requesting a login).
-        //
-        
-        http_request->getResponse()->setError(403); // forbidden
-        delete daap_request;
-        daap_request = NULL;
+        warning("mdcap request did not contain a valid session id");
+        delete mdcap_request;
+        mdcap_request = NULL;
         return;
+        
+    }
+
+    //
+    //  Ok, client is valid login (good session id), so they probably want some metadata, etc.
+    //
+    
+    if(mdcap_request->getRequestType() == MDCAP_REQUEST_UPDATE)
+    {
+        possiblySendUpdate(http_request, client_id);
     }
     
-    */
+    delete mdcap_request;
+    mdcap_request = NULL;
 }
 
 void MetadataServer::lockMetadata()
@@ -1047,6 +1047,56 @@ void MetadataServer::sendLogin(HttpInRequest *http_request, uint32_t session_id)
         response.addStatus(200);
         response.addSessionId(session_id);
     response.endGroup();
+
+    sendResponse(http_request, response);
+}
+
+void MetadataServer::possiblySendUpdate(HttpInRequest *http_request, int /* client_id */)
+{
+    //
+    //  If the client is not up to date with version numbers, send an update
+    //
+    
+    QString version_string = http_request->getHeader("MDCAP-Container-Versions");
+    if(version_string.length() > 0)
+    {
+        //
+        //  Client sent container versions
+        //
+    }
+    
+    //
+    //  We do need to send an update. Send a list of metadata collections with their current version numbers
+    //
+    
+    MdcapOutput response;
+    
+    lockMetadata();
+        response.addUpdateGroup();
+
+            //
+            //  How many collections in total
+            //
+
+            response.addCollectionCount(metadata_containers->count());
+
+            //
+            //  For each, add information about metadata containers
+            //
+
+            QPtrListIterator<MetadataContainer> it( *metadata_containers );
+            MetadataContainer *container;
+            while ( (container = it.current()) != 0 ) 
+            {
+                ++it;
+                response.addCollectionGroup();
+                    response.addCollectionId(container->getIdentifier());
+                    response.addCollectionName(container->getName());
+                    response.addCollectionGeneration(container->getGeneration());
+                response.endGroup();
+            }
+        response.endGroup();
+    unlockMetadata();
 
     sendResponse(http_request, response);
 }

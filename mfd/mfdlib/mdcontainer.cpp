@@ -34,6 +34,7 @@ MetadataContainer::MetadataContainer(
     current_metadata = NULL;
     current_playlists = NULL;
     current_playlist_id = 2;
+    generation = 1;
 }
 
 void MetadataContainer::log(const QString &log_message, int verbosity)
@@ -179,6 +180,7 @@ void MetadataContainer::dataSwap(
         playlist_deletions = playlist_out;
     }
 
+    ++generation;
 }
 
 void MetadataContainer::dataDelta(
@@ -255,6 +257,8 @@ void MetadataContainer::dataDelta(
         playlist_additions = playlist_in;
         playlist_deletions = playlist_out;
     }
+    
+    ++generation;
 }
 
 void MetadataContainer::mapPlaylists(

@@ -100,6 +100,7 @@ class MetadataServer : public MFDHttpPlugin
     
     void sendServerInfo(HttpInRequest *http_request);
     void sendLogin(HttpInRequest *http_request, uint32_t session_id);
+    void possiblySendUpdate(HttpInRequest *http_request, int client_id);
 
     void sendResponse(HttpInRequest *http_request, MdcapOutput &response);
 

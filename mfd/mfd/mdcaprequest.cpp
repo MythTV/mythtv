@@ -40,13 +40,11 @@ void MdcapRequest::parsePath(HttpInRequest *http_request)
     {
         setRequestType(MDCAP_REQUEST_LOGOUT);
     }
-
-/*
     else if(the_path.startsWith("/update"))
     {
-        daap_request->setRequestType(DAAP_REQUEST_UPDATE);
-        log(": a client asked for /update", 9);
+        setRequestType(MDCAP_REQUEST_UPDATE);
     }
+/*
     else if(the_path.startsWith("/databases"))
     {
         daap_request->setRequestType(DAAP_REQUEST_DATABASES);

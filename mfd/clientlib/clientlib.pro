@@ -32,7 +32,7 @@ SOURCES += mfdinterface.cpp discoverythread.cpp mfdinstance.cpp \
            mdcaprequest.cpp mdcapresponse.cpp
 
 inc.path = $${PREFIX}/include/mfdclient/
-inc.files  = mfdinterface.h mfdinstance.h
+inc.files  = mfdinterface.h
 
 LIBS += -L../mdcaplib -lmdcap -Wl,--export-dynamic
 

@@ -38,6 +38,7 @@ class MetadataClient : public ServiceClient
     
     void parseServerInfo(MdcapInput &mdcap_input);
     void parseLogin(MdcapInput &mdcap_input);
+    void parseUpdate(MdcapInput &mdcap_input);
 
   private:
   

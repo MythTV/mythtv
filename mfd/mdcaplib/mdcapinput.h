@@ -38,6 +38,7 @@ class MdcapInput
     int         popStatus();
     void        popProtocol(int *major, int *minor);   
     uint32_t    popSessionId();
+    uint32_t    popCollectionCount();
 
   private:
 
