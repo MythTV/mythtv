@@ -2333,6 +2333,8 @@ void NuppelVideoPlayer::DoPlay(void)
         osd->SetFrameInterval(frame_interval);
     if (videoOutput && videosync != NULL)
     {
+        videosync->SetFrameInterval(frame_interval, m_double_framerate);
+
         // If using bob deinterlace, turn on or off if we
         // changed to or from synchronous playback speed.
 

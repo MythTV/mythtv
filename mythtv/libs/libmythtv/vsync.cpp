@@ -115,7 +115,9 @@ void VideoSync::SetFrameInterval(int fr, bool intr)
     m_interlaced = intr;
     if (m_interlaced && m_refresh_interval > m_frame_interval/2)
         m_interlaced = false; // can't display both fields at 2x rate
-    
+
+    VERBOSE(VB_PLAYBACK, QString("Set video sync frame interval to %1")
+                                 .arg(m_frame_interval));
 }
 
 void VideoSync::OffsetTimeval(struct timeval& tv, int offset)
