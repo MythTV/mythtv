@@ -2616,7 +2616,8 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
 
                 if (show_whole_tree)
                 {
-                    p->drawPixmap(x_location, y_location - QFontMetrics(tmpfont->face).height() + QFontMetrics(tmpfont->face).descent(), (*highlight_map[i]));
+                    p->drawPixmap(x_location + selectPoint.x(), y_location - QFontMetrics(tmpfont->face).height() + QFontMetrics(tmpfont->face).descent() + selectPoint.y(), (*highlight_map[i]));
+                    //p->drawPixmap(x_location, y_location - QFontMetrics(tmpfont->face).height() + QFontMetrics(tmpfont->face).descent(), (*highlight_map[i]));
 
                     //
                     //  Left or right arrows
@@ -2996,7 +2997,7 @@ void UIManagedTreeListType::makeHighlights()
         fontProp *tmpfont = NULL;
         QString a_string = QString("bin%1-active").arg(i);
         tmpfont = &m_fontfcns[m_fonts[a_string]];
-        temp_pixmap->convertFromImage(temp_image.smoothScale(bin_corners[i].width(), QFontMetrics(tmpfont->face).height() ));
+        temp_pixmap->convertFromImage(temp_image.smoothScale(bin_corners[i].width(), QFontMetrics(tmpfont->face).height() + selectPadding));
         resized_highlight_images.append(temp_pixmap);
         highlight_map[i] = temp_pixmap;
     }
