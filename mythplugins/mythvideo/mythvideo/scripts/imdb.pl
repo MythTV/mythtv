@@ -8,18 +8,23 @@
 # the README file in this directory.
 #
 # Author: Tim Harvey (tharvey AT alumni.calpoly DOT edu)
+# Modified: Andrei Rjeousski
+# - Added amazon.com covers and improved handling for imdb posters
 #
+
 
 use LWP::Simple;      # libwww-perl providing simple HTML get actions
 use HTML::Entities;
 use URI::Escape;
+use XML::Simple;
+
 
 use vars qw($opt_h $opt_r $opt_d $opt_i $opt_v $opt_D $opt_M $opt_P);
 use Getopt::Std; 
 
 $title = "IMDB Query"; 
-$version = "v1.00";
-$author = "Tim Harvey";
+$version = "v1.1";
+$author = "Tim Harvey, Andrei Rjeousski";
 
 # display usage
 sub usage {
@@ -235,12 +240,28 @@ sub getMoviePoster {
    # look for references to impawards.com posters - they are high quality
    my $site = "http://www.impawards.com";
    my $impsite = parseBetween($response, "<a href=\"".$site, "\">".$site);
+
+   # jersey girl fix
+   $impsite = parseBetween($response, "<a href=\"http://impawards.com","\">http://impawards.com") if ($impsite eq "");
+
    if ($impsite) {
       $impsite = $site . $impsite;
+
       if (defined $opt_d) { print "# Searching for poster at: ".$impsite."\n"; }
       my $impres = get $impsite;
       if (defined $opt_d) { printf("# got %i bytes\n", length($impres)); }
-      if (defined $opt_r) { printf("%s", $impres); }
+      if (defined $opt_r) { printf("%s", $impres); }      
+
+	# making sure it isnt redirect
+	$uri = parseBetween($impres, "0;URL=..", "\">");
+	if ($uri ne "") {
+		if (defined $opt_d) { printf("# processing redirect to %s\n",$uri); }
+		# this was redirect
+		$impres = get $site . $uri;
+	}
+
+      
+      # do stuff normally	
       $uri = parseBetween($impres, "<img SRC=\"posters/", "\" ALT");
       # uri here is relative... patch it up to make a valid uri
       if (!($uri =~ /http:(.*)/ )) {
@@ -261,6 +282,77 @@ sub getMoviePoster {
        } else {
           if (defined $opt_d) { print "# no poster found\n"; }
        }
+   }
+   
+   # now we couldnt even find lowres poster from IMDB, lets try looking for dvd
+   # cover on amazon.com   
+
+   my $movie_title;
+   my $found_low_res = 0;
+   
+   # no poster found, take lowres image from imdb
+   if ($uri eq "") {
+       if (defined $opt_d) { print "# looking for lowres imdb posters\n"; }
+       my $host = "http://www.imdb.com/title/tt" . $movieid . "/";
+       $response = get $host;
+
+       $uri = parseBetween($response, "alt=\"cover\" src=\"http://ia.imdb.com/media/imdb/", "\"");
+       
+       # get the title
+       $movie_title = parseBetween($response, "<title>", "<\/title>");
+       
+       if ($uri ne "" ) {
+           $uri = "http://ia.imdb.com/media/imdb/".$uri;
+           $found_low_res = 1;
+       } else {
+          if (defined $opt_d) { print "# no poster found\n"; }
+       }
+   }
+   
+   # now we couldnt even find lowres poster from IMDB, lets try looking for dvd
+   # cover on amazon.com
+   if ($uri eq "" or $found_low_res) {
+      if (defined $opt_d) { print "# starting to look for poster on Amazon.com\n"; }
+      if (defined $opt_d) { print "# starting to look for movie title\n"; }
+      
+         
+      # get rid of the year
+      $movie_title =~ /(.*) \([^\)]+\)/i;
+      if ($1) { $movie_title = $1; }
+      $movie_title =~ /(.*), The$/i;
+      if ($1) { $movie_title = $1; }
+      
+      if (defined $opt_d) { print "# Movie title is: $movie_title\n"; }
+      
+      # request XML info from amazon
+      my $xml_uri = "http://xml.amazon.com/onca/xml3?t=000&dev-t=000&KeywordSearch=".$movie_title."&mode=dvd&type=lite&page=1&f=xml";
+      
+      $response = get $xml_uri;
+      if (defined $opt_r) { printf("%s", $response); }
+      
+      my $xml_parser = XML::Simple->new();
+      my $xml_doc = $xml_parser->XMLin($response);
+      my $ama_uri = "";
+
+      if (ref($xml_doc->{Details}) eq 'ARRAY') {
+         $ama_uri = $xml_doc->{Details}->[0]->{ImageUrlLarge};
+      } else {
+         $ama_uri = $xml_doc->{Details}->{ImageUrlLarge};
+      }
+      
+      my $image = get $ama_uri if (defined($ama_uri) && $ama_uri ne "");
+      if (defined($ama_uri) && length($image) eq "807") {
+         if (defined $opt_d) { printf("# this image is blank\n"); }
+         $ama_uri = "";
+      }
+      
+      if (!defined($ama_uri)) {
+         $ama_uri = "";
+      }
+	
+      if ($ama_uri ne "") {
+	$uri = $ama_uri;
+      }
    }
 
    print "$uri\n";
