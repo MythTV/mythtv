@@ -181,11 +181,14 @@ int mythplugin_init(const char *libversion)
         return -1;
 
     GeneralSettings gsettings;
-    gsettings.exec(QSqlDatabase::database());
+    gsettings.load(QSqlDatabase::database());
+    gsettings.save(QSqlDatabase::database());
     PlayerSettings psettings;
-    psettings.exec(QSqlDatabase::database());
+    psettings.load(QSqlDatabase::database());
+    psettings.save(QSqlDatabase::database());
     RipperSettings rsettings;
-    rsettings.exec(QSqlDatabase::database());
+    rsettings.load(QSqlDatabase::database());
+    rsettings.save(QSqlDatabase::database());
 
     return 0;
 }
