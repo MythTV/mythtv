@@ -1188,7 +1188,7 @@ static HostSpinBox *GuiVidModeWidth()
 
 static HostSpinBox *GuiVidModeHeight()
 {
-    HostSpinBox *gs = new HostSpinBox("GuiVidModeHeight", 0, 1200, 4, true);
+    HostSpinBox *gs = new HostSpinBox("GuiVidModeHeight", 0, 1440, 4, true);
     gs->setLabelAboveWidget(true);
     gs->setLabel(QObject::tr("Height"));
     gs->setValue(0);
@@ -1212,7 +1212,7 @@ static HostSpinBox *VidModeWidth(int idx)
 static HostSpinBox *VidModeHeight(int idx)
 {
     HostSpinBox *gs = new HostSpinBox(QString("VidModeHeight%1").arg(idx),
-                                            0, 1200, 4, true);
+                                            0, 1440, 4, true);
     gs->setLabel(QObject::tr("Y"));
     gs->setValue(0);
     gs->setHelpText(QObject::tr("Vertical resolution of video mode "
@@ -1249,7 +1249,7 @@ static HostSpinBox *TVVidModeWidth(int idx)
 
 static HostSpinBox *TVVidModeHeight()
 {
-    HostSpinBox *gs = new HostSpinBox("TVVidModeHeight", 0, 1200, 4, true);
+    HostSpinBox *gs = new HostSpinBox("TVVidModeHeight", 0, 1440, 4, true);
     gs->setLabelAboveWidget(true);
     gs->setLabel(QObject::tr("Height"));
     gs->setValue(0);
@@ -1262,7 +1262,7 @@ static HostSpinBox *TVVidModeHeight()
 static HostSpinBox *TVVidModeHeight(int idx)
 {
     HostSpinBox *gs = new HostSpinBox(QString("TVVidModeHeight%1").arg(idx),
-                                            0, 1200, 4, true);
+                                            0, 1440, 4, true);
     gs->setLabel(QObject::tr("Y"));
     gs->setValue(0);
     gs->setHelpText(QObject::tr("Vertical resolution for playback video mode. "
