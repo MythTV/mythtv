@@ -839,34 +839,37 @@ void MameHandler::makecmd_line(const char * game, QString *exec, MameRomInfo * r
         else
           *exec+= game_settings.fullscreen ? fullscreen : windowed;
 
-        *exec+= game_settings.scanlines ? " -scanlines" : " -noscanlines";
-        *exec+= game_settings.extra_artwork ? " -artwork" : " -noartwork";
-        *exec+= game_settings.autoframeskip ? " -autoframeskip" : " -noautoframeskip";
-        *exec+= game_settings.auto_colordepth ? " -bpp 0" : " ";
-        *exec+= game_settings.rot_left ? " -rol" : "";
-        *exec+= game_settings.rot_right ? " -ror" : "";
-        *exec+= game_settings.flipx ? " -flipx" : "";
-        *exec+= game_settings.flipy ? " -flipy" : "";
-        *exec+= " -scale ";
-        *exec+= scale;
-        *exec+= game_settings.antialias ? " -antialias" : " -noantialias";
-        *exec+= game_settings.translucency ? " -translucency" : " -notranslucency";
-        *exec+= vectoropts;
-        *exec+= vectorres;
-        *exec+= game_settings.analog_joy ? " -analogstick" : " -noanalogstick";
-        *exec+= game_settings.mouse ? " -mouse" : " -nomouse";
-        *exec+= game_settings.winkeys ? winkeys : nowinkeys;
-        *exec+= game_settings.grab_mouse ? grabmouse : nograbmouse;
-        *exec+= " -joytype ";
-        *exec+= joytype;
-        *exec+= game_settings.sound ? " -sound" : " -nosound";
-        *exec+= game_settings.samples ? " -samples" : " -nosamples";
-        *exec+= game_settings.fake_sound ? " -fakesound" : "";
-        *exec+= " -volume ";
-        *exec+= volume;
-        *exec+=  " ";
-        *exec+= game_settings.cheat ? " -cheat " : " -nocheat ";
-        //*exec+= game_settings.extra_options ? game_settings.extra_options : " ";
+        if(!game_settings.default_options)
+        {
+            *exec+= game_settings.scanlines ? " -scanlines" : " -noscanlines";
+            *exec+= game_settings.extra_artwork ? " -artwork" : " -noartwork";
+            *exec+= game_settings.autoframeskip ? " -autoframeskip" : " -noautoframeskip";
+            *exec+= game_settings.auto_colordepth ? " -bpp 0" : " ";
+            *exec+= game_settings.rot_left ? " -rol" : "";
+            *exec+= game_settings.rot_right ? " -ror" : "";
+            *exec+= game_settings.flipx ? " -flipx" : "";
+            *exec+= game_settings.flipy ? " -flipy" : "";
+            *exec+= " -scale ";
+            *exec+= scale;
+            *exec+= game_settings.antialias ? " -antialias" : " -noantialias";
+            *exec+= game_settings.translucency ? " -translucency" : " -notranslucency";
+            *exec+= vectoropts;
+            *exec+= vectorres;
+            *exec+= game_settings.analog_joy ? " -analogstick" : " -noanalogstick";
+            *exec+= game_settings.mouse ? " -mouse" : " -nomouse";
+            *exec+= game_settings.winkeys ? winkeys : nowinkeys;
+            *exec+= game_settings.grab_mouse ? grabmouse : nograbmouse;
+            *exec+= " -joytype ";
+            *exec+= joytype;
+            *exec+= game_settings.sound ? " -sound" : " -nosound";
+            *exec+= game_settings.samples ? " -samples" : " -nosamples";
+            *exec+= game_settings.fake_sound ? " -fakesound" : "";
+            *exec+= " -volume ";
+            *exec+= volume;
+            *exec+=  " ";
+            *exec+= game_settings.cheat ? " -cheat " : " -nocheat ";
+            //*exec+= game_settings.extra_options ? game_settings.extra_options : " ";
+        }
         *exec+= " ";
         *exec+= game;
 }
@@ -928,6 +931,8 @@ void MameHandler::SetGameSettings(GameSettings &game_settings, MameRomInfo *romi
                 game_settings.cheat = query.value(26).toBool();
                 game_settings.extra_options = query.value(27).toString();
             }
+            else
+                game_settings.default_options = true;
         }
     }
 }
