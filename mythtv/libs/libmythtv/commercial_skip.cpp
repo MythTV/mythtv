@@ -27,7 +27,10 @@ CommDetect::CommDetect(int w, int h, double fps, int method)
     logoGoodEdgeThreshold = 0.75;
     logoBadEdgeThreshold = 0.85;
 
-    verboseDebugging = false;
+    if (getenv("DEBUGCOMMFLAG"))
+        verboseDebugging = true;
+    else
+        verboseDebugging = false;
 
     Init(w, h, fps, method);
 }
@@ -234,9 +237,9 @@ void CommDetect::ProcessNextFrame(VideoFrame *frame, long long frame_number)
 bool CommDetect::CheckFrameIsBlank(void)
 {
     int MaxDiff = 25;
-    int DarkBrightness = 50;
-    int DimBrightness = 80;
-    int DimAVG = 20;
+    int DarkBrightness = 80;
+    int DimBrightness = 120;
+    int DimAVG = 35;
     bool abort = false;
     int max = 0;
     int min = 255;
