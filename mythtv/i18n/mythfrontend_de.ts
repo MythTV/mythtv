@@ -201,7 +201,7 @@
     </message>
     <message>
         <source>, %d,%03d MB free</source>
-        <translation>, %d,%03d MB frei</translation>
+        <translation type="obsolete">, %d,%03d MB frei</translation>
     </message>
     <message>
         <source>All Programs</source>
@@ -225,7 +225,7 @@
     </message>
     <message>
         <source>Yes, get rid of it</source>
-        <translation>Ja, weg damit!</translation>
+        <translation type="obsolete">Ja, weg damit!</translation>
     </message>
     <message>
         <source>No, I might want to watch it again.</source>
@@ -297,7 +297,19 @@
     </message>
     <message>
         <source>Yes; allow re-recording</source>
-        <translation>Ja, und wieder aufnehmen</translation>
+        <translation type="obsolete">Ja, und wieder aufnehmen</translation>
+    </message>
+    <message>
+        <source>, %0.2f GB free</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, but record this episode again next time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, delete it</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -376,6 +388,58 @@
     <message>
         <source>Error!</source>
         <translation type="obsolete">Fehler!</translation>
+    </message>
+    <message>
+        <source>Program Listings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Title Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Description Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Category Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Movie Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Category</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter Phrase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">Ok</translation>
+    </message>
+    <message>
+        <source>Movie</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1069,7 +1133,7 @@
     </message>
     <message>
         <source>If this is set, captions will be on by default when playing back recordings or watching live TV.</source>
-        <translation>Falls gesetzt, werden Untertitel beim Fernsehen oder der Wiedergabe von Aufnahmen eingeblendet.</translation>
+        <translation type="obsolete">Falls gesetzt, werden Untertitel beim Fernsehen oder der Wiedergabe von Aufnahmen eingeblendet.</translation>
     </message>
     <message>
         <source>Always use Browse mode when changing channels in LiveTV</source>
@@ -1333,30 +1397,6 @@
     </message>
     <message>
         <source>Guide Shading Method</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Colorized (alpha)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Colorized (shaded)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Embossed (shaded)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Embossed (solid)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Rounded (shaded)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Rounded (solid)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1765,7 +1805,7 @@
     </message>
     <message>
         <source>PVR-350 Settings</source>
-        <translation>PVR-350 Einstellungen</translation>
+        <translation type="obsolete">PVR-350 Einstellungen</translation>
     </message>
     <message>
         <source>Custom Filters</source>
@@ -2164,6 +2204,70 @@
         <source>If checked, use the above size for TV. If unchecked, use full screen.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>If this is set, captions will be on by default when playing back recordings or watching live TV.  Closed Captioning can be turned on or off by pressing &apos;T&apos; during playback.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Prompt on Exit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, you will not be prompted when pressing the exit key.  Instead, MythTV will immediately exit.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alpha - Transparent (CPU Usage - High)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Blender - Transparent (CPU Usage - Middle)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Eco - Transparent (CPU Usage - Low)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Solid (CPU Usage - Middle)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display Genre Colors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Colorize program guide using  genre colors. (Not available for all grabbers.)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display Genre Text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(Not available for all grabbers.)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monitor CD/DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This enables support for monitoring your CD/DVD drives for new disks and launchingthe proper plugin to handle them.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use HW XVMC MPEG Decoding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use VIA HW MPEG Decoding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hardware Decoding Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RankPrograms</name>
@@ -2533,6 +2637,10 @@
     </message>
     <message>
         <source>Adjust Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
