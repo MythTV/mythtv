@@ -154,7 +154,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
     for (int i = 0; i <= MAXVBUFFER; i++)
         vbuffer[i] = NULL;
 
-    for (int i = 0; i < MAXTBUFFER; i++)
+    for (int i = 0; i <= MAXTBUFFER; i++)
         tbuffer[i] = NULL;
 
     own_vidbufs = false;
@@ -195,14 +195,14 @@ NuppelVideoPlayer::~NuppelVideoPlayer(void)
 
     if (own_vidbufs)
     {
-        for (int i = 0; i <= MAXVBUFFER; i++)
+        for (int i = 0; i < MAXVBUFFER; i++)
         {
             if (vbuffer[i])
                 delete [] vbuffer[i];
         }
     }
 
-    for (int i = 0; i <= MAXTBUFFER; i++)
+    for (int i = 0; i < MAXTBUFFER; i++)
     {
         if (tbuffer[i])
             delete [] tbuffer[i];

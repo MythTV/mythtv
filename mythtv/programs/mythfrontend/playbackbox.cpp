@@ -289,6 +289,7 @@ void PlaybackBox::killPlayer(void)
 
         nvp->StopPlaying();
         pthread_join(decoder, NULL);
+
         delete nvp;
         delete rbuffer;
 
