@@ -479,6 +479,7 @@ static void pmt_cb(void *opaque, const uint8_t *section, int section_len)
     }
 
     /* clear existing streams and filters not in new pmt */
+
     for (i=0; i<PMT_PIDS_MAX; i++) 
         if (ts->pmt_pids_old[i] && !pmtInList(ts->pmt_pids, ts->pmt_pids_old[i])) {
             printf("closing filter for pid 0x%x\n", ts->pmt_pids_old[i]);
@@ -486,6 +487,7 @@ static void pmt_cb(void *opaque, const uint8_t *section, int section_len)
             mpegts_close_filter(ts, ts->pids[ts->pmt_pids_old[i]]);
             changes = 1;
         }
+
     memcpy(ts->pmt_pids_old, ts->pmt_pids, PMT_PIDS_MAX*sizeof(int));
 
     /* all parameters are there */
@@ -1223,26 +1225,12 @@ static int mpegts_read_header(AVFormatContext *s,
         if (!ts->auto_guess) {
             ts->set_service_ret = -1;
 
-            /* first do a scaning to get all the services */
-            url_fseek(pb, pos, SEEK_SET);
-            mpegts_scan_sdt(ts);
-            
+            /* SDT Scan Removed here. It caused startup delays in TS files
+               SDT will not exist in a stripped TS file created by myth. */
+
+            mpegts_scan_pat(ts);
+                
             handle_packets(ts, MAX_SCAN_PACKETS);
-            
-            if (ts->nb_services <= 0) {
-                /* no SDT found, we try to look at the PAT */
-                
-                /* First remove the SDT filters from each PID */
-                int i;
-                for (i=0; i < NB_PID_MAX; i++) {
-                    if (ts->pids[i])
-                        mpegts_close_filter(ts, ts->pids[i]);
-                }
-                url_fseek(pb, pos, SEEK_SET);
-                mpegts_scan_pat(ts);
-                
-                handle_packets(ts, MAX_SCAN_PACKETS);
-            }
             
             if (ts->nb_services <= 0) {
                /* raw transport stream */
