@@ -930,7 +930,7 @@ void Scheduler::RunScheduler(void)
         {
             FillRecordLists();
             lastupdate = curtime;
-            //cout << "Found changes in the todo list.\n";
+            VERBOSE("Found changes in the todo list.");
         }
 
         recIter = recordingList.begin();
@@ -941,8 +941,7 @@ void Scheduler::RunScheduler(void)
             nextrectime = nextRecording->startts;
             secsleft = curtime.secsTo(nextrectime);
 
-            //cout << secsleft << " seconds until " << nextRecording->title
-            //     << endl;
+//            VERBOSE(secsleft << " seconds until " << nextRecording->title);
 
             if (secsleft > 35)
                 break;
@@ -973,14 +972,16 @@ void Scheduler::RunScheduler(void)
                 if (responseList.contains(nextRecording->schedulerid) &&
                     responseList[nextRecording->schedulerid] == false)
                 {
-                    //cout << "Waiting for \"" << nextRecording->title 
-                    //     << "\" to be approved\n";
+                    VERBOSE("Waiting for \"" << nextRecording->title 
+                    << "\" to be approved.");
                 }
                 else
                 {
                     nexttv->StartRecording(nextRecording);
-                    //cout << "Started recording " << nextRecording->title 
-                    //     << endl;
+                    VERBOSE("Started recording \"" << nextRecording->title 
+                    << "\" on channel: " << nextRecording->chanid.toInt()-1000
+                    << " on cardid: " << nextRecording->cardid << ", sourceid: "
+                    << nextRecording->sourceid);
                     RemoveRecording(nextRecording);
                     nextRecording = NULL;
                     recIter = recordingList.begin();

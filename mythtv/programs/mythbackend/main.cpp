@@ -234,6 +234,8 @@ int main(int argc, char **argv)
     QSqlDatabase *trandb = QSqlDatabase::database("TRANSDB");
 //    Transcoder *trans = new Transcoder(&tvList, trandb);
 
+    VERBOSE("Verbose mode activated.");
+
     new MainServer(ismaster, port, statusport, &tvList);
 
     a.exec();
