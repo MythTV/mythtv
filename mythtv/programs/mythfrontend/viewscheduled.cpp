@@ -132,7 +132,7 @@ void ViewScheduled::FillList(void)
     bool conflicts = false;
     vector<ProgramInfo *> recordinglist;
 
-    m_context->GetAllPendingRecordings(recordinglist);
+    conflicts = m_context->GetAllPendingRecordings(recordinglist);
 
     vector<ProgramInfo *>::reverse_iterator pgiter = recordinglist.rbegin();
 
@@ -176,7 +176,7 @@ void ViewScheduled::changed(QListViewItem *lvitem)
     date->setText(timedate);
 
     QString chantext;
-    if (m_context->GetNumSetting("DisplayChanNum") == 0)
+    if (m_context->GetNumSetting("DisplayChanNum") != 0)
         chantext = rec->channame + " [" + rec->chansign + "]";
     else
         chantext = rec->chanstr;

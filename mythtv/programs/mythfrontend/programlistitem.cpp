@@ -48,7 +48,7 @@ ProgramListItem::ProgramListItem(MythContext *context, QListView *parent,
     }
     else
     {
-        if (context->GetNumSetting("DisplayChanNum") == 0)
+        if (context->GetNumSetting("DisplayChanNum") != 0)
             setText(0, pginfo->chansign);
         else
             setText(0, pginfo->chanstr);
