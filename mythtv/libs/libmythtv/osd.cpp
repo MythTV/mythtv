@@ -59,14 +59,14 @@ OSD::OSD(int width, int height, int frint, const QString &font,
 
     if (themepath == "")
     {
-        cerr << "Couldn't find osdtheme: " << osdtheme << endl;
+        cerr << "Couldn't find OSD theme: " << osdtheme << endl;
     }
     else
     {
         themepath += "/";
         if (!LoadTheme())
         {
-            cerr << "Couldn't load osdtheme: " << osdtheme << " at " 
+            cerr << "Couldn't load OSD theme: " << osdtheme << " at " 
                  << themepath << endl;
         }
     }
