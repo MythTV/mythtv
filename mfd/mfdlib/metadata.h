@@ -262,6 +262,8 @@ class Playlist
     uint             getCollectionId(){return collection_id;}    
     bool             internalChange(){ return internal_change; }
     void             internalChange(bool uh_huh_or_nope_not_me){internal_change = uh_huh_or_nope_not_me;}
+    bool             waitingForList(){ return waiting_for_list; }
+    void             waitingForList(bool uh_huh_or_nope_not_me){waiting_for_list = uh_huh_or_nope_not_me;}
     
   private:
   
@@ -271,6 +273,7 @@ class Playlist
     uint             id;
     uint             collection_id;
     bool             internal_change;
+    bool             waiting_for_list;
 };
 
 #endif
