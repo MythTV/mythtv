@@ -37,36 +37,19 @@ void RecordingProfile::loadByName(QSqlDatabase* db, QString name) {
     }
 }
 
-RecordingProfileBrowser::RecordingProfileBrowser(MythContext* context,
-                                                 QWidget* parent,
-                                                 QSqlDatabase* _db)
-                       : MythDialog(context, parent), db(_db) 
-{
-
-    QVBoxLayout* vbox = new QVBoxLayout(this, (int)(15 * wmult));
-
-    listview = new MythListView(this);
-    vbox->addWidget(listview);
-
-    listview->addColumn("Profile");
-    listview->setAllColumnsShowFocus(TRUE);
-
-    idMap[new QListViewItem(listview, "(Create new profile)")] = 0;
-
+void RecordingProfileEditor::load(QSqlDatabase* db) {
+    addSelection("(Create new profile)", "0");
     QSqlQuery query = db->exec("SELECT id, name FROM recordingprofiles");
-
     if (query.isActive() && query.numRowsAffected() > 0)
-        while (query.next()) {
-            QListViewItem* item = new QListViewItem(listview,
-                                                    query.value(1).toString());
-            idMap[item] = query.value(0).toInt();
-            listview->insertItem(item);
-        }
+        while (query.next())
+            addSelection(query.value(1).toString(), query.value(0).toString());
+}
 
-    connect(listview, SIGNAL(clicked(QListViewItem*)),
-            this, SLOT(select(QListViewItem*)));
-    connect(listview, SIGNAL(returnPressed(QListViewItem*)),
-            this, SLOT(select(QListViewItem*)));
-    connect(listview, SIGNAL(spacePressed(QListViewItem*)),
-            this, SLOT(select(QListViewItem*)));
+int RecordingProfileEditor::exec(QSqlDatabase* db) {
+    if (ConfigurationDialog::exec(db) == QDialog::Accepted) {
+        open(getValue().toInt());
+        return QDialog::Accepted;
+    }
+
+    return QDialog::Rejected;
 }

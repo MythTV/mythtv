@@ -343,3 +343,23 @@ void MythListView::keyPressEvent(QKeyEvent *e)
     QListView::keyPressEvent(e);
 }
 
+void MythListBox::setCurrentItem(const QString& matchText) {
+    for(unsigned i = 0 ; i < count() ; ++i)
+        if (text(i) == matchText)
+            setCurrentItem(i);
+}
+
+void MythListBox::keyPressEvent(QKeyEvent* e) {
+    switch (e->key()) {
+    case Key_Up:
+    case Key_Down:
+    case Key_Next:
+    case Key_Prior:
+    case Key_Home:
+    case Key_End:
+        QListBox::keyPressEvent(e);
+        break;
+    default:
+        e->ignore();
+    }
+}

@@ -12,6 +12,11 @@
 #include <qheader.h>
 #include <qtable.h>
 #include <qbuttongroup.h>
+#include <qlistbox.h>
+
+#include <map>
+
+using namespace std;
 
 class MythContext;
 
@@ -138,6 +143,18 @@ class MythListView : public QListView
   private:
     bool allowkeypress;
     bool fixspace;
+};
+
+class MythListBox: public QListBox {
+    Q_OBJECT
+public:
+    MythListBox(QWidget* parent): QListBox(parent) {};
+
+    virtual void keyPressEvent(QKeyEvent* e);
+
+public slots:
+    void setCurrentItem(const QString& text);
+    void setCurrentItem(int index) { QListBox::setCurrentItem(index); };
 };
 
 #endif

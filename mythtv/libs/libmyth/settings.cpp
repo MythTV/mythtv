@@ -239,10 +239,18 @@ QWidget* CheckBoxSetting::configWidget(QWidget* parent,
 }
 
 void ConfigurationDialogWidget::keyPressEvent(QKeyEvent* e) {
-    if (e->key() == Key_Escape)
+    switch (e->key()) {
+    case Key_Enter:
+    case Key_Return:
+    case Key_Space:
         accept();
-    else
+        break;
+    case Key_Escape:
+        reject();
+        break;
+    default:
         e->ignore();
+    }
 }
 
 QDialog* ConfigurationDialog::dialogWidget(QWidget* parent,
@@ -359,34 +367,38 @@ void AutoIncrementStorage::save(QSqlDatabase* db) {
     }
 }
 
-// QDialog* Browsable::browseDialog(QSqlDatabase* db,
-//                                  QWidget* parent, const char* widgetName) {
-//     QString query = QString("SELECT %1, %2 FROM %3")
-//         .arg(valueColumn).arg(labelColumn).arg(table);
-//     QSqlQuery result = db->exec(query);
+QWidget* ListBoxSetting::configWidget(QWidget* parent, const char* widgetName) {
+    QWidget* box = new QHBox(parent, widgetName);
+    box->setBackgroundOrigin(QWidget::WindowOrigin);
 
-//     QDialog* dialog = new QDialog(parent, widgetName);
-//     QVBoxLayout* vbox = new QVBoxLayout(dialog);
+    QLabel* label = new QLabel(box);
+    label->setText(getLabel() + ":");
+    label->setBackgroundOrigin(QWidget::WindowOrigin);
+    MythListBox* widget = new MythListBox(box);
+    widget->setBackgroundOrigin(QWidget::WindowOrigin);
 
-//     QListView* listview = new QListView(dialog);
-//     vbox->addWidget(listview);
+    for(unsigned int i = 0 ; i < labels.size() ; ++i) {
+        widget->insertItem(labels[i]);
+        if (isSet && current == i)
+            widget->setCurrentItem(i);
+    }
 
-//     listview->setAllColumnsShowFocus(TRUE);
+    // xxx, needs to update the listbox when a selection is added
+//     connect(this, SIGNAL(selectionAdded(const QString&, QString)),
+//             widget, SLOT(insertItem(QString)));
+    connect(this, SIGNAL(valueChanged(const QString&)),
+            widget, SLOT(setCurrentItem(const QString&)));
+    connect(widget, SIGNAL(highlighted(const QString&)),
+            this, SLOT(setValueByLabel(const QString&)));
 
-//     if (result.isActive() && result.numRowsAffected() > 0)
-//         while (result.next()) {
-//             QString value = result.value(0).toString();
-//             QString label = result.value(1).toString();
-//             QListViewItem* item = new QListViewItem(listview,
-//                                                     result.value(1).toString());
-//             itemToValue[item] = value;
-//             listview->insertItem(item);
-//         }
+    return box;
+}
 
-//     connect(listview, SIGNAL(clicked(QListViewItem*)),
-//             this, SLOT(select(QListViewItem*)));
-//     connect(listview, SIGNAL(returnPressed(QListViewItem*)),
-//             this, SLOT(select(QListViewItem*)));
-
-//     return dialog;
-// }
+void ListBoxSetting::setValueByLabel(const QString& label) {
+    for(unsigned i = 0 ; i < labels.size() ; ++i)
+        if (labels[i] == label) {
+            setValue(values[i]);
+            return;
+        }
+    cerr << "BUG: ListBoxSetting::setValueByLabel called for unknown label " << label << endl;
+}

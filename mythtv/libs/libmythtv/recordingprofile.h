@@ -344,8 +344,7 @@ protected:
         };
     };
 public:
-    RecordingProfile(MythContext *context) : ConfigurationDialog(context),
-                                             ConfigurationWizard(context) {
+    RecordingProfile(MythContext *context) : ConfigurationWizard(context) {
         // This must be first because it is needed to load/save the other settings
         addChild(id = new ID());
 
@@ -384,34 +383,15 @@ private:
     ImageSize* imageSize;
 };
 
-class RecordingProfileBrowser: public MythDialog {
+class RecordingProfileEditor: public ListBoxSetting, public ConfigurationDialog {
     Q_OBJECT
 public:
-    RecordingProfileBrowser(MythContext* context, QWidget* parent, QSqlDatabase* db);
+    RecordingProfileEditor(MythContext* context, QSqlDatabase* _db):
+        ConfigurationDialog(context), db(_db) {};
 
-signals:
-    void selected(int id);
-
-protected slots:
-    void select(QListViewItem* item) {
-        emit selected(idMap[item]);
-    };
-
-protected:
-    MythListView* listview;
-    map<QListViewItem*,int> idMap;
-    QSqlDatabase* db;
-};
-
-class RecordingProfileEditor: public RecordingProfileBrowser {
-    Q_OBJECT
-public:
-    RecordingProfileEditor(MythContext* context, QWidget* parent, QSqlDatabase* db):
-        RecordingProfileBrowser(context, parent, db) {
-
-            connect(this, SIGNAL(selected(int)),
-                    this, SLOT(open(int)));
-    };
+    virtual int exec(QSqlDatabase* db);
+    virtual void load(QSqlDatabase* db);
+    virtual void save(QSqlDatabase* db) { (void)db; };
 
 protected slots:
     void open(int id) {
@@ -424,6 +404,9 @@ protected slots:
             profile->save(db);
         delete profile;
     };
+
+protected:
+    QSqlDatabase* db;
 };
 
 #endif

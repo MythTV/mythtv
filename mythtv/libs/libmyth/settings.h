@@ -151,7 +151,6 @@ protected:
     unsigned top;
 };
 
-// A dialog which always accepts
 class ConfigurationDialogWidget: public QDialog {
 public:
     ConfigurationDialogWidget(QWidget* parent = NULL, const char* widgetName = 0):
@@ -176,8 +175,8 @@ protected:
 };
 
 // A wizard is a group with one child per page
-class ConfigurationWizard: virtual public ConfigurationDialog,
-                           virtual public ConfigurationGroup {
+class ConfigurationWizard: public ConfigurationDialog,
+                           public ConfigurationGroup {
 public:
     ConfigurationWizard(MythContext *context) : ConfigurationDialog(context)
                                              { }
@@ -255,6 +254,7 @@ public:
 
         labels.push_back(label);
         values.push_back(value);
+
         emit selectionAdded(label, value);
 
         if (select || !isSet)
@@ -314,6 +314,23 @@ public:
     virtual QWidget* configWidget(QWidget* parent, const char* widgetName = 0);
 private:
     bool rw;
+};
+
+class ListBoxSetting: public StringSelectSetting {
+    Q_OBJECT
+public:
+    virtual QWidget* configWidget(QWidget* parent, const char* widgetName = 0);
+
+signals:
+    void itemAdded(QString);
+
+protected slots:
+    void addItem(const QString& label, QString value) {
+        (void)value;
+        emit itemAdded(label);
+    };
+
+    void setValueByLabel(const QString& label);
 };
 
 class RadioSetting: public StringSelectSetting {
@@ -441,32 +458,5 @@ public:
     virtual void load(QSqlDatabase* db) { (void)db; };
     virtual void save(QSqlDatabase* db);
 };
-
-// class Browsable: public QObject {
-//     Q_OBJECT
-// public:
-//     Browsable(QString _title,
-//               QString _table, QString _valueColumn, QString _labelColumn):
-//         title(_title),
-//         table(_table), valueColumn(_valueColumn), labelColumn(_labelColumn) {};
-
-//     QDialog* browseDialog(QSqlDatabase* db,
-//                           QWidget* parent = NULL, const char* widgetName = 0);
-
-// signals:
-//     void selected(QString value);
-
-// protected slots:
-//     void select(class QListViewItem* item) {
-//         emit selected(itemToValue[item]);
-//     };
-
-// private:
-//     QString title;
-//     QString table;
-//     QString valueColumn;
-//     QString labelColumn;
-//     map<class QListViewItem*,QString> itemToValue;
-// };
 
 #endif
