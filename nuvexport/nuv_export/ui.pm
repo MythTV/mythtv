@@ -62,7 +62,7 @@ package nuv_export::ui;
             $Args{'nice'} = 19;
         }
     # Is this a commandline-only request?
-        if (!$Args{'confirm'} and ($Args{'title'} or $Args{'subtitle'} or $Args{'description'} or $Args{'infile'} or $Args{'starttime'} or $Args{'chanid'})) {
+        if (!$Args{'confirm'} && ($Args{'title'} || $Args{'subtitle'} || $Args{'description'} || $Args{'infile'} || $Args{'starttime'} || $Args{'chanid'})) {
             $is_cli = 1;
         }
     }
