@@ -869,7 +869,8 @@ void DatabaseBox::keyPressEvent(QKeyEvent *e)
 {
     //
     //  This is a bit wonky, but it works
-    // 
+    //  (more or less)
+    //
 
     if(holding_track)
     {
