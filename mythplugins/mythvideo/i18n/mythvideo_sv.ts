@@ -49,11 +49,11 @@
     <name>QObject</name>
     <message>
         <source>Directory that holds videos</source>
-        <translation>Biliotek som innehåller filmer</translation>
+        <translation>Katalog som innehåller videofiler</translation>
     </message>
     <message>
         <source>This directory must exist, and the user running MythVideo only needs to have read permission to the directory.</source>
-        <translation>Detta bibliotek måste finnas och användaren som kör MythVideo måste åtminstone ha läsrättigheter i det.</translation>
+        <translation>Denna katalog måste finnas och användaren som kör MythVideo måste åtminstone ha läsrättigheter i det.</translation>
     </message>
     <message>
         <source>Starting Parental Level</source>
@@ -84,14 +84,6 @@
         <translation>PIN-kod för barnlås</translation>
     </message>
     <message>
-        <source>This PIN is used to control the current Parental Level. If you want to use this feature, then setting the value to all numbers will make your life much easier. If you don&apos;t want to be bothered by PC dialogs, please set it to be blank.</source>
-        <translation type="obsolete">Denna PIN-kod används för att låsa upp barnlåset för filmer. Om ingen kod anges kommer barnlåset att vara avslaget. Om du slår på barnlåset är det lättast om bara siffror används.</translation>
-    </message>
-    <message>
-        <source>Aggresive Parental Control</source>
-        <translation>Lås även vy för barnlåskonfigurationen</translation>
-    </message>
-    <message>
         <source>If set, you will not be able to return to this screen and reset the Parental PIN without first entering the current PIN. You have been warned.</source>
         <translation>Om denna funktion är aktiverad måste PIN-koden matas in för att kunna återvända till denna vy. Du har härmed blivit varnad.</translation>
     </message>
@@ -101,7 +93,7 @@
     </message>
     <message>
         <source>If set, all files below the Myth Video directory will be displayed unless their extension is explicitly set to be ignored. </source>
-        <translation>Om funktionen är aktiverad, kommer alla filer som ligger under det tidigare specifierade filmbiblioteket att visas, såvida inte deras filändelse har satts upp för att ignoreras.</translation>
+        <translation>Om funktionen är aktiverad, kommer alla filer som ligger under den tidigare specifierade katalogen att visas, såvida inte deras filändelse har satts upp för att ignoreras.</translation>
     </message>
     <message>
         <source>Video List browses files</source>
@@ -109,15 +101,11 @@
     </message>
     <message>
         <source>If set, this will cause the Video List screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
-        <translation>Om denna funktion är aktiverad kommer videolistvyn att visa alla relevanta filer som ligger under det tidigare specifierade filmbiblioteket och inte bara de filmer som har sökts upp under Filmhanteraren.</translation>
+        <translation>Om denna funktion är aktiverad kommer videolistvyn att visa alla relevanta filer som ligger under den tidigare specifierade katalogen och inte bara de filmer som har sökts upp under Filmhanteraren.</translation>
     </message>
     <message>
         <source>Default Player</source>
         <translation>Standardspelare</translation>
-    </message>
-    <message>
-        <source>This is the command used for any file that the extension is not specifically defined.</source>
-        <translation type="obsolete">Detta är kommandot som används för att spela upp filer som har en filändelse som inte specifikt har associerats med en spelare.</translation>
     </message>
     <message>
         <source>General Settings</source>
@@ -133,7 +121,7 @@
     </message>
     <message>
         <source>Searching for video files</source>
-        <translation>Söker efter filmer</translation>
+        <translation>Söker efter videofiler</translation>
     </message>
     <message>
         <source>Updating video database</source>
@@ -161,60 +149,64 @@
     </message>
     <message>
         <source>Newly scanned files are browsable by default</source>
-        <translation type="unfinished"></translation>
+        <translation>Nyscannade filer är bläddringsbara som standard</translation>
     </message>
     <message>
         <source>If set, newly scanned files in the Video Manager will be marked as browsable and will appear in the &apos;Browse&apos; menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nyscannade filer i Video Manager kommer att markeras som bläddringsbara och kommer att synas i bläddra-menyn.</translation>
     </message>
     <message>
         <source>This is the command used for any file that the extension is not specifically defined. You may also enter the name of one of the playback plugins such as &apos;Internal&apos; or &apos;MythXine&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Detta är kommandot som används för att spela upp filer som har en filändelse som inte specifikt har associerats med en spelare. Du kan även skriva in namnet på en av avspelningspluginerna, exempelvis &apos;Internal&apos; eller &apos;MythXine&apos;.</translation>
     </message>
     <message>
         <source>New category</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This PIN is used to control the current Parental Level. If you want to use this feature, then setting the value to all numbers will make your life much easier.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ny kategori</translation>
     </message>
     <message>
         <source>Command to search for movie listings</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando för att söka efter filmlistor</translation>
     </message>
     <message>
         <source>This command must be executable by the user running MythVideo.</source>
-        <translation type="unfinished"></translation>
+        <translation>Detta kommando måste kunna exekveras av användaren som kör MythVideo.</translation>
     </message>
     <message>
         <source>Command to search for movie posters</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando för att söka efter filmposters</translation>
     </message>
     <message>
         <source>Command to extract data for movies</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando för att hämta filminformation</translation>
     </message>
     <message>
         <source>Directory that holds movie posters</source>
-        <translation type="unfinished"></translation>
+        <translation>Katalog innehållande filmposters</translation>
     </message>
     <message>
         <source>This directory must exist, and the user running MythVideo needs to have read/write permission to the directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>Katalogen måste existers och användaren som kör MythVideo måste ha skriv/läs-rättigheter till den.</translation>
     </message>
     <message>
         <source>Video Manager</source>
-        <translation type="unfinished"></translation>
+        <translation>Videohanterare</translation>
     </message>
     <message>
         <source>Could not retrieve poster</source>
-        <translation type="unfinished"></translation>
+        <translation>Kunde inte hämta poster</translation>
     </message>
     <message>
         <source>A movie poster exists for this movie but Myth could not retrieve it within a reasonable amount of time.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>En filmposter finns för denna filmen men MythTVideo kunde inte hämta den inom rimlig tid.</translation>
+    </message>
+    <message>
+        <source>This PIN is used to control the current Parental Level. If you want to use this feature, then setting the value to all numbers will make your life much easier.</source>
+        <translation>Denna PIN-kod används för att låsa upp barnlåset för filmer. Om ingen kod anges kommer barnlåset att vara avslaget. Om du slår på barnlåset är det lättast om bara siffror används.</translation>
+    </message>
+    <message>
+        <source>Aggressive Parental Control</source>
+        <translation>Lås även vy för barnlåskonfigurationen</translation>
     </message>
 </context>
 <context>
@@ -260,18 +252,6 @@
         <translation>IMDB-nummer:</translation>
     </message>
     <message>
-        <source>0-9: Edit</source>
-        <translation type="obsolete">0-9: Redigera</translation>
-    </message>
-    <message>
-        <source>Menu/Info: Manual IMDB</source>
-        <translation type="obsolete">Meny/Info: Manuell IMDB</translation>
-    </message>
-    <message>
-        <source>Enter/OK: Auto IMDB</source>
-        <translation type="obsolete">Enter/OK: Automatisk IMDB</translation>
-    </message>
-    <message>
         <source>retrieving data...</source>
         <translation>hämtar data...</translation>
     </message>
@@ -285,23 +265,15 @@
     </message>
     <message>
         <source>loading...</source>
-        <translation>Laddar...</translation>
+        <translation>laddar...</translation>
     </message>
     <message>
         <source>No Videos Found</source>
-        <translation>Inga filmer funna</translation>
-    </message>
-    <message>
-        <source>Use the left and right arrows</source>
-        <translation type="obsolete">Använd vänster och höger piltangent</translation>
-    </message>
-    <message>
-        <source>PL</source>
-        <translation type="obsolete">Nivå</translation>
+        <translation>Inga filmer hittades</translation>
     </message>
     <message>
         <source>Directed by</source>
-        <translation>Regisserad av:</translation>
+        <translation>Regi:</translation>
     </message>
     <message>
         <source>File:</source>
@@ -313,7 +285,7 @@
     </message>
     <message>
         <source>PL </source>
-        <translation></translation>
+        <translation>Nivå </translation>
     </message>
     <message>
         <source>MythVideo File Associations</source>
@@ -369,91 +341,91 @@
     </message>
     <message>
         <source>1</source>
-        <translation type="unfinished">1</translation>
+        <translation>1</translation>
     </message>
     <message>
         <source>Category:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategori:</translation>
     </message>
     <message>
         <source>Filters video list</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtrerar videolistan</translation>
     </message>
     <message>
         <source>Category :</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategori:</translation>
     </message>
     <message>
         <source>Genre :</source>
-        <translation type="unfinished"></translation>
+        <translation>Genre:</translation>
     </message>
     <message>
         <source>Country :</source>
-        <translation type="unfinished"></translation>
+        <translation>Land:</translation>
     </message>
     <message>
         <source>Year :</source>
-        <translation type="unfinished"></translation>
+        <translation>År:</translation>
     </message>
     <message>
         <source>Runtime :</source>
-        <translation type="unfinished"></translation>
+        <translation>Speltid:</translation>
     </message>
     <message>
         <source>User Rating :</source>
-        <translation type="unfinished"></translation>
+        <translation>Användarbetyg:</translation>
     </message>
     <message>
         <source>Browse :</source>
-        <translation type="unfinished"></translation>
+        <translation>Bläddra:</translation>
     </message>
     <message>
         <source>Sort by :</source>
-        <translation type="unfinished"></translation>
+        <translation>Sortera efter:</translation>
     </message>
     <message>
         <source>Aucune video</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen video</translation>
     </message>
     <message>
         <source>SELECT: Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>VÄLJ: Ändra</translation>
     </message>
     <message>
         <source></source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>MENU: Options</source>
-        <translation type="unfinished"></translation>
+        <translation>MENY: Inställningar</translation>
     </message>
     <message>
         <source>Up/Down, Page Up/Down - Browse</source>
-        <translation type="unfinished"></translation>
+        <translation>Up/Down, Page Up/Down - Bläddra</translation>
     </message>
     <message>
         <source>Menu - Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Meny - Inställningar</translation>
     </message>
     <message>
         <source>Parental</source>
-        <translation type="unfinished"></translation>
+        <translation>Barnlås</translation>
     </message>
     <message>
         <source>Level</source>
-        <translation type="unfinished"></translation>
+        <translation>Nivå</translation>
     </message>
     <message>
         <source>Year</source>
-        <translation type="unfinished"></translation>
+        <translation>År</translation>
     </message>
     <message>
         <source>Runtime</source>
-        <translation type="unfinished"></translation>
+        <translation>Speltid</translation>
     </message>
     <message>
         <source>User Rating</source>
-        <translation type="unfinished"></translation>
+        <translation>Användarbetyg</translation>
     </message>
 </context>
 <context>
@@ -480,46 +452,42 @@
     </message>
     <message>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Select action</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj åtgärd</translation>
     </message>
     <message>
         <source>Watch This Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Spela upp denna film</translation>
     </message>
     <message>
         <source>View Full Plot</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa full beskrivning</translation>
     </message>
     <message>
         <source>Filter Display</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtervisning</translation>
     </message>
     <message>
         <source>Switch to Video Listings</source>
-        <translation type="unfinished"></translation>
+        <translation>Växla till filmlista</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Avbryt</translation>
     </message>
 </context>
 <context>
     <name>VideoManager</name>
     <message>
-        <source>Sorry there were no matches for the title</source>
-        <translation type="obsolete">Inga matchande titlar hittades</translation>
-    </message>
-    <message>
         <source>Manually Enter IMDB #</source>
-        <translation type="unfinished">Skriv in IMDB-numret manuellt</translation>
-    </message>
-    <message>
-        <source>Reset Entry</source>
-        <translation type="obsolete">Rensa information</translation>
+        <translation>Skriv in IMDB-numret manuellt</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Avbryt</translation>
+        <translation>Avbryt</translation>
     </message>
     <message>
         <source>minutes</source>
@@ -543,7 +511,7 @@
     </message>
     <message>
         <source>None</source>
-        <translation>Okänd</translation>
+        <translation>Ingen</translation>
     </message>
     <message>
         <source>NR</source>
@@ -551,39 +519,39 @@
     </message>
     <message>
         <source>delete failed</source>
-        <translation type="unfinished"></translation>
+        <translation>borttagning misslyckades</translation>
     </message>
     <message>
         <source>Select action:</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj åtgärd:</translation>
     </message>
     <message>
         <source>Edit Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Ändra metadata</translation>
     </message>
     <message>
         <source>Search IMDB</source>
-        <translation type="unfinished"></translation>
+        <translation>Sök IMDB</translation>
     </message>
     <message>
         <source>Reset Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Återställ metadata</translation>
     </message>
     <message>
         <source>Toggle Browseable</source>
-        <translation type="unfinished"></translation>
+        <translation>Växla bläddringsbar</translation>
     </message>
     <message>
         <source>Remove Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta bort film</translation>
     </message>
     <message>
         <source>Filter Display</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtervisning</translation>
     </message>
     <message>
         <source>Delete this file?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta bort denna fil?</translation>
     </message>
 </context>
 <context>
