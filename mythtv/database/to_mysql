@@ -44,7 +44,10 @@ elsif (@ARGV >= 2) {
 }
 else { die }
 
-my $sharepath = "/usr/local/share/mythtv/";
+my $homedirpath = $ENV{"HOME"} . "/.mythtv/";
+mkdir $homedirpath;
+my $sharepath = $homedirpath . "channels/";
+mkdir $sharepath;
 chdir $sharepath;
 
 my ($encoding, $credits, $channels, $progs) = @{XMLTV::parsefile($filename)};
@@ -86,6 +89,11 @@ foreach my $id (keys %channels) {
         $dbh->do("INSERT INTO channel (channum,callsign,icon) VALUES($channum, \"$callsign\",\"$src\")")
           or die $dbh->errstr;
         print "ADDED channel: $id , $callsign, $src\n";
+    }
+    else
+    {
+        $dbh->do("UPDATE channel SET icon = \"$src\" WHERE channum = $channum AND callsign = \"$callsign\";")
+          or die $dbh->errstr;
     }
 }
 my $nextoffset = $offset + 1;
