@@ -26,8 +26,8 @@ Compiling note:  If you get an error on building this, that says something
 If you get any errors about missing references, etc, you most likely don't have
 one of the required pieces of software installed.
 
-Follow this by a 'make install'.  It'll put a 'mythgame' binary in your
-/usr/local/bin directory.
+Follow this by a 'make install'.  It'll put a 'libmythgame.so' plugin in your
+/usr/local/lib/mythtv/plugins directory.
 
 Finally, insert gamedb/metadata.sql, gamedb/nesdb.sql, and gamedb/snesdata.sql 
 into your existing MythTV database (in that order).
