@@ -1,0 +1,21 @@
+str Include=global.menu
+
+str Logo=myth_tv_logo.png
+str LogoPos=270,40
+
+int NumButtons=2
+str ButtonOrderVertical=1,2
+str ButtonOrderHorizontal=1,2
+int StartButton=1
+
+str ButtonPos1=170,250
+str ButtonIcon1=watch_tv.png
+str ButtonIconOffset1=20,10
+str ButtonText1=TV
+str ButtonAction1=MODE_TV
+
+str ButtonPos2=430,250
+str ButtonIcon2=play_cd.png
+str ButtonIconOffset2=15,10
+str ButtonText2=Music
+str ButtonAction2=MODE_MUSIC

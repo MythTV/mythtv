@@ -1,0 +1,64 @@
+str Include=global.menu
+
+# Logo image
+str Logo=myth_tv_logo.png
+# X, Y coordinates of the upper left corner of the logo pixmap.
+str LogoPos=270,40
+
+# How many buttons are there?
+int NumButtons=6
+
+# The order buttons are visited with the up and down arrows
+str ButtonOrderVertical=1,4,2,5,3,6
+# The order buttons are visited with the left and right arrows
+str ButtonOrderHorizontal=1,2,3,4,5,6
+
+# Which button to start out on?
+int StartButton=2
+
+# Button 1
+# X,Y coords of the button
+str ButtonPos1=50,180
+# Optional icon picture to overlay
+str ButtonIcon1=record.png
+# X,Y offset of the icon picture, relative to the button position
+str ButtonIconOffset1=20,10
+# Text to display
+str ButtonText1=Schedule a Recording
+# Action of the button
+str ButtonAction1=TV_SCHEDULE
+
+# Button 2
+str ButtonPos2=300,180
+str ButtonIcon2=watch_tv.png
+str ButtonIconOffset2=20,10
+str ButtonText2=Watch TV
+str ButtonAction2=TV_WATCH_LIVE
+
+# Button 3
+str ButtonPos3=550,180
+str ButtonIcon3=play.png
+str ButtonIconOffset3=20,10
+str ButtonText3=Watch a Recording
+str ButtonAction3=TV_WATCH_RECORDING
+
+# Button 4
+str ButtonPos4=50,400
+str ButtonIcon4=conflict.png
+str ButtonIconOffset4=20,10
+str ButtonText4=Fix Scheduling Conflicts
+str ButtonAction4=TV_FIX_CONFLICTS
+
+# Button 5
+str ButtonPos5=300,400
+str ButtonIcon5=setup.png
+str ButtonIconOffset5=20,10
+str ButtonText5=Setup
+str ButtonAction5=TV_SETUP
+
+# Button 6
+str ButtonPos6=550,400
+str ButtonIcon6=delete.png
+str ButtonIconOffset6=20,10
+str ButtonText6=Delete Recordings
+str ButtonAction6=TV_DELETE

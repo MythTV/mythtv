@@ -730,7 +730,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         }
 
         /* if we get here, we're actually going to do video output */
-  
+
         // calculate 'delay', that we need to get from 'now' to 'nexttrigger'
         gettimeofday(&now, NULL);
 

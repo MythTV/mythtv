@@ -30,10 +30,10 @@ void *SpawnDecode(void *param)
 
 TV::TV(const QString &startchannel)
 {
-    QString settingsfile = QString(theprefix) + "/share/mythtv/settings.txt";
-    settings = new Settings(settingsfile);
+    settings = new Settings();
 
-    settings->ReadSettings("settings.txt");
+    settings->LoadSettingsFiles("settings.txt", theprefix);
+    settings->LoadSettingsFiles("mysql.txt", theprefix);
 
     db_conn = NULL;
     ConnectDB();
@@ -91,6 +91,11 @@ TV::~TV(void)
         delete nvr;
     if (db_conn)
         DisconnectDB();
+}
+
+QString TV::GetInstallPrefix(void)
+{
+    return QString(theprefix); 
 }
 
 void TV::LiveTV(void)

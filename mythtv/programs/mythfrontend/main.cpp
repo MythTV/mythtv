@@ -1,17 +1,21 @@
 #include <qapplication.h>
 #include <qsqldatabase.h>
+#include <qfile.h>
 #include <unistd.h>
 
 #include "guidegrid.h"
 #include "tv.h"
 #include "settings.h"
-#include "menubox.h"
+#include "themedmenu.h"
 #include "scheduler.h"
 #include "infostructs.h"
 #include "programinfo.h"
 #include "playbackbox.h"
 #include "deletebox.h"
 #include "viewscheduled.h"
+#include "menubox.h"
+
+char installprefix[] = "/usr/local";
 
 int startGuide(int startchannel)
 {
@@ -170,9 +174,117 @@ void *runScheduler(void *dummy)
     return NULL;
 }
 
+bool RunTVMenu(bool usetheme, QString themedir, TV *tv, QString prefix)
+{
+    if (usetheme)
+    {
+        ThemedMenu *diag = new ThemedMenu(themedir.ascii(), "tv.menu");
+
+        if (diag->foundTheme())
+        {
+            diag->Show();
+            diag->exec();
+
+            QString sel = diag->getSelection().lower();
+
+            bool retval = true;
+
+            if (sel == "tv_watch_live")
+                startTV(tv);
+            else if (sel == "tv_watch_recording")
+                startPlayback(tv, prefix);
+            else if (sel == "tv_schedule")
+                startGuide(3);
+            else if (sel == "tv_delete")
+                startDelete(tv, prefix);
+            else if (sel == "tv_fix_conflicts")
+                startManaged(tv, prefix);
+            else if (sel == "tv_setup")
+                ;
+            else 
+                retval = false;
+
+            delete diag;
+
+            return retval;
+        }
+    }
+
+    MenuBox *diag = new MenuBox("MythTV");
+
+    diag->AddButton("Watch TV");
+    diag->AddButton("Schedule a Recording");
+    diag->AddButton("Fix Recording Conflicts");
+    diag->AddButton("Watch a Previously Recorded Program");
+    diag->AddButton("Delete Recordings");
+    diag->AddButton("Setup");
+
+    diag->Show();
+    int ret = diag->exec();
+
+    bool handled = true;
+    switch (ret)
+    {
+        case 1: startTV(tv); break;
+        case 2: startGuide(3); break;
+        case 3: startManaged(tv, prefix); break;
+        case 4: startPlayback(tv, prefix); break;
+        case 5: startDelete(tv, prefix); break;
+        case 6: break;
+        default: handled = false; break;
+    }
+
+    delete diag;
+
+    return handled;
+}
+
+QString RunMainMenu(bool usetheme, QString themedir)
+{
+    if (usetheme)
+    {
+        ThemedMenu *diag = new ThemedMenu(themedir.ascii(), "main.menu");
+
+        if (diag->foundTheme())
+        {
+            diag->Show();
+            diag->exec();
+
+            QString sel = diag->getSelection().lower();
+
+            delete diag;
+
+            return sel;
+        }
+    }
+
+    MenuBox *diag = new MenuBox("MythTV");
+
+    diag->AddButton("TV");
+    diag->AddButton("Music");
+
+    diag->Show();
+    int ret = diag->exec();
+
+    QString returnval = "";
+    if (ret == 1)
+        returnval = "mode_tv";
+    else if (ret == 2)
+        returnval = "mode_music";
+
+    delete diag;
+
+    return returnval;
+}
+
 int main(int argc, char **argv)
 {
     QApplication a(argc, argv);
+
+    Settings *mysettings = new Settings;
+
+    mysettings->LoadSettingsFiles("theme.txt", installprefix);
+    mysettings->LoadSettingsFiles("mysql.txt", installprefix);
 
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!db)
@@ -205,59 +317,43 @@ int main(int argc, char **argv)
     TV *tv = new TV("3");
 
     QString prefix = tv->GetFilePrefix();
+    QString theprefix = tv->GetInstallPrefix();
+
+    QString themename = mysettings->GetSetting("Theme");
+
+    QString themedir = findThemeDir(themename, theprefix);
+    bool usetheme = true;
+    if (themedir == "")
+        usetheme = false;
  
     pthread_t scthread;
     pthread_create(&scthread, NULL, runScheduler, tv);
 
+    bool displaymain = false;
+    QString musiclocation = theprefix + "/bin/mythmusic";
+    QFile testfile(musiclocation);
+    if (testfile.exists())
+        displaymain = true;
+
     while (1)
     {
-//        MenuBox *maindiag = new MenuBox("");
-//
-//        maindiag->AddButton("TV");
-//        maindiag->AddButton("Music");
-
-//        maindiag->Show();
-//        int result = maindiag->exec();
-
-//        if (result == 1)
-//        {
-//    while (1)
-//    {
-        MenuBox *diag = new MenuBox("MythTV");
-
-        diag->AddButton("Watch TV");
-        diag->AddButton("Schedule a Recording");
-        diag->AddButton("Fix Recording Conflicts");
-        diag->AddButton("Watch a Recording");  
-        diag->AddButton("Delete Recordings");
- 
-        diag->Show();
-        int result = diag->exec();
-
-        switch (result)
+        if (displaymain)
         {
-            case 1: startTV(tv); break;
-            case 2: startGuide(3); break;
-            case 3: startManaged(tv, prefix); break;
-            case 4: startPlayback(tv, prefix); break;
-            case 5: startDelete(tv, prefix); break;
-            default: break;
+            QString sel = RunMainMenu(usetheme, themedir);
+            if (sel == "mode_tv")
+            {
+                while (RunTVMenu(usetheme, themedir, tv, prefix))
+                    ;
+            }
+            else if (sel == "mode_music")
+                system(musiclocation);
         }
-
-        delete diag;
-//        if (result == 0)
-//            break;
-//    }
-//        }
-//        else if (result == 2)
-//        {
-//            system("mythmusic /root/music/");
-//        }
-//    
-//        delete maindiag;
+        else
+            RunTVMenu(usetheme, themedir, tv, prefix);
     }
 
     delete tv;
+    delete mysettings;
 
     return 0;
 }

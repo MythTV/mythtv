@@ -53,6 +53,8 @@ class TV
     bool ChangeExternalChannel(char *channum);
 
     QString GetFilePrefix() { return settings->GetSetting("RecordFilePrefix"); }
+    QString GetInstallPrefix();
+
  protected:
     void doLoadMenu(void);
     static void *MenuHandler(void *param);

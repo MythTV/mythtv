@@ -10,6 +10,14 @@ INSTALLS = target
 
 include ( ../settings.pro )
 
+setting.path = /usr/local/share/mythtv/
+
+!exists( /usr/local/share/mythtv/theme.txt ) {
+    setting.files += theme.txt
+}
+
+INSTALLS += setting
+
 INCLUDEPATH += ../mythepg ../mythdialog ../libNuppelVideo ../libmythtv
 LIBS += -L../libmythtv -L../libNuppelVideo -lmythtv -lNuppelVideo -lXv
 LIBS += -lttf -lmp3lame
@@ -20,9 +28,9 @@ TARGETDEPS = ../libNuppelVideo/libNuppelVideo.a ../libmythtv/libmythtv.a
 HEADERS += ../mythepg/guidegrid.h ../mythepg/infodialog.h 
 HEADERS += ../mythepg/infostructs.h ../mythdialog/dialogbox.h menubox.h 
 HEADERS += scheduler.h playbackbox.h deletebox.h programlistitem.h 
-HEADERS += viewscheduled.h
+HEADERS += viewscheduled.h themedmenu.h
 
 SOURCES += ../mythepg/guidegrid.cpp ../mythepg/infodialog.cpp 
 SOURCES += ../mythepg/infostructs.cpp ../mythdialog/dialogbox.cpp main.cpp 
 SOURCES += menubox.cpp scheduler.cpp playbackbox.cpp deletebox.cpp 
-SOURCES += programlistitem.cpp viewscheduled.cpp
+SOURCES += programlistitem.cpp viewscheduled.cpp themedmenu.cpp

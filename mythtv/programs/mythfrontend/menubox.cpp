@@ -9,8 +9,8 @@
 
 #include "menubox.h"
 
-MenuBox::MenuBox(const char *text, QWidget *parent = 0, 
-                 const char *name = 0)
+MenuBox::MenuBox(const char *text, QWidget *parent, 
+                 const char *name)
        : QDialog(parent, name)
 {
     int screenheight = QApplication::desktop()->height();

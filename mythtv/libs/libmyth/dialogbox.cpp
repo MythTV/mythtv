@@ -7,8 +7,8 @@
 
 #include "dialogbox.h"
 
-DialogBox::DialogBox(const QString &text, const char *checkboxtext = 0,
-                     QWidget *parent = 0, const char *name = 0)
+DialogBox::DialogBox(const QString &text, const char *checkboxtext,
+                     QWidget *parent, const char *name)
          : QDialog(parent, name)
 {
     int screenheight = QApplication::desktop()->height();
