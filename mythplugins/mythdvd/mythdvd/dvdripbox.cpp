@@ -437,11 +437,11 @@ void DVDRipBox::readFromServer()
 {
     while(client_socket->canReadLine())
     {
-        QString line_from_server = client_socket->readLine();
+        QString line_from_server = QString::fromUtf8(client_socket->readLine());
         line_from_server = line_from_server.replace( QRegExp("\n"), "" );
         line_from_server = line_from_server.replace( QRegExp("\r"), "" );
         line_from_server.simplifyWhiteSpace();
-        //cout << "Getting \"" << line_from_server << "\"" << endl ;
+        // cout << "Getting \"" << line_from_server.local8Bit() << "\"" << endl ;
         QStringList tokens = QStringList::split(" ", line_from_server);
         if(tokens.count() > 0)
         {

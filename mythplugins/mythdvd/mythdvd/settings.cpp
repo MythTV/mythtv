@@ -120,7 +120,7 @@ public:
     SetRipDirectory():
         GlobalSetting("DVDRipLocation") {
         setLabel(QObject::tr("Directory to hold temporary files"));
-        setValue("/mnt/store/dvdrip/");
+        setValue("/var/lib/mythdvd/temp");
         setHelpText(QObject::tr("This directory must exist, and the user "
                     "running MythDVD needs to have write permission "
                     "to the directory."));

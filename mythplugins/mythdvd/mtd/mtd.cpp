@@ -419,8 +419,8 @@ void MTD::sendMessage(QSocket *where, const QString &what)
 {
     QString message = what;
     message.append("\n");
-    //cout << "Sending : " << message;
-    where->writeBlock(message.latin1(), message.length());
+    // cout << "Sending : " << message.local8Bit();
+    where->writeBlock(message.utf8(), message.utf8().length());
 }
 
 void MTD::sayHi(QSocket *socket)
