@@ -88,6 +88,10 @@ VideoOutputXv::VideoOutputXv(void)
     pauseFrame.qscale_table = NULL;
 
     data = new XvData();
+
+    framesShown = 0;
+    showFrame = 1;
+    fps = 0;
 }
 
 VideoOutputXv::~VideoOutputXv()
@@ -727,11 +731,6 @@ void VideoOutputXv::PrepareFrame(VideoFrame *buffer)
     }
     else
     {
-        static long long framesShown = 0;
-        static int showFrame = 1;
-        static int fps = 0;
-        static time_t stop_time;
-
         // bad way to throttle frame display for non-Xv mode.
         // calculate fps we can do and skip enough frames so we don't exceed.
         if (framesShown == 0)

@@ -398,8 +398,9 @@ void HDTVRecorder::FindKeyframes(const unsigned char *buffer,
                             long long startpos = 
                                 ringBuffer->GetFileWritePosition();
 
+                            if (!positionMap.contains(frameNum))
+                                positionMapDelta[frameNum] = startpos;
                             positionMap[frameNum] = startpos;
-                            positionMapDelta[frameNum] = startpos;
                             
                             if (curRecording && db_lock && db_conn &&
                                 ((positionMapDelta.size() % 30) == 0))

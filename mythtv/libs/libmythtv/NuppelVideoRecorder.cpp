@@ -1809,8 +1809,10 @@ void NuppelVideoRecorder::UpdateSeekTable(int frame_num, bool use_db, long offse
     struct seektable_entry ste;
     ste.file_offset = position;
     ste.keyframe_number = frame_num;
+
+    if (!positionMap.contains(ste.keyframe_number))
+        positionMapDelta[ste.keyframe_number] = position;
     positionMap[ste.keyframe_number] = position;
-    positionMapDelta[ste.keyframe_number] = position;
 
     seektable->push_back(ste);
 

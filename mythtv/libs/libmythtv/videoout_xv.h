@@ -62,6 +62,11 @@ class VideoOutputXv : public VideoOutput
 
     int use_shm;
 
+    long long framesShown;
+    int showFrame;
+    int fps;
+    time_t stop_time;
+
     unsigned char *scratchspace;
 
     pthread_mutex_t lock;

@@ -605,8 +605,9 @@ void MpegRecorder::ProcessData(unsigned char *buffer, int len)
 
                 long long keyCount = frameNum / keyframedist;
 
+                if (!positionMap.contains(keyCount))
+                    positionMapDelta[keyCount] = startpos;
                 positionMap[keyCount] = startpos;
-                positionMapDelta[keyCount] = startpos;
 
                 if (curRecording && db_lock && db_conn &&
                     ((positionMapDelta.size() % 30) == 0))
