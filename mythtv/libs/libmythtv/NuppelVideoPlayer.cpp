@@ -634,8 +634,6 @@ void NuppelVideoPlayer::StartPlaying(void)
 	}
 	if (rewindtime > 0)
 	{
-	    CalcMaxRWTime();
-
 	    rewindtime *= video_frame_rate;
 	    DoRewind();
 
@@ -757,16 +755,6 @@ void NuppelVideoPlayer::Rewind(float seconds)
     rewindtime = seconds;
 }
 
-void NuppelVideoPlayer::CalcMaxRWTime(void)
-{
-    if (livetv)
-    {
-    }
-    else
-    {
-    }
-}
-
 void NuppelVideoPlayer::DoRewind(void)
 {
     if (rewindtime < 5)
@@ -779,12 +767,22 @@ void NuppelVideoPlayer::DoRewind(void)
     {
         lastKey -= 30;
     }
+    if (lastKey < 1)
+        lastKey = 1;
 
     int normalframes = desiredFrame - lastKey;
-
     long long keyPos = positionList[lastKey / 30];
-    long long diff = keyPos - ringBuffer->GetReadPosition();
-    
+    long long curPosition = ringBuffer->GetReadPosition();
+    long long diff = keyPos - curPosition;
+  
+    while (ringBuffer->GetFreeSpaceWithReadChange(diff) < 0)
+    {
+        lastKey += 30;
+        keyPos = positionList[lastKey / 30];
+        diff = keyPos - curPosition;
+        normalframes = 0;
+    }
+
     ringBuffer->Seek(diff, SEEK_CUR);
     framesPlayed = lastKey;
 

@@ -47,9 +47,7 @@ int main(int argc, char *argv[])
   else filename=argv[optind];
 
   NuppelVideoPlayer *nvp = new NuppelVideoPlayer();
-
   nvp->SetFileName(filename);
-
   nvp->StartPlaying(); 
  
   delete nvp;

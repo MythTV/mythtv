@@ -164,6 +164,7 @@ long long RingBuffer::Seek(long long pos, int whence)
         ret = lseek(fd2, pos, whence);
 	if (whence == SEEK_SET)
         {
+            // FIXME: set totalreadpos too
 	    readpos = ret;
         }
 	else if (whence == SEEK_CUR)
@@ -178,7 +179,24 @@ long long RingBuffer::Seek(long long pos, int whence)
 long long RingBuffer::GetFreeSpace(void)
 {
     if (!normalfile)
-        return (totalreadpos + filesize - totalwritepos);
+        return (totalreadpos + filesize - totalwritepos - smudgeamount);
     else
         return -1;
 }
+
+long long RingBuffer::GetFreeSpaceWithReadChange(long long readchange)
+{
+    if (!normalfile)
+    {
+        if (readchange > 0)
+            readchange = 0 - (filesize - readchange);
+
+	return (totalreadpos + readchange + filesize - totalwritepos - 
+                smudgeamount);
+    }
+    else
+    {
+        return readpos + readchange;
+    }
+}
+

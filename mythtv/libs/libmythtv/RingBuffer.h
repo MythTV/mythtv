@@ -28,6 +28,8 @@ class RingBuffer
 
     long long GetFreeSpace(void);
 
+    long long GetFreeSpaceWithReadChange(long long readchange);
+
  private:
     string filename;
     

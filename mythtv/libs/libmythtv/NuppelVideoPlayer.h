@@ -67,7 +67,6 @@ class NuppelVideoPlayer
                             unsigned char **audiodata, int *alen);
     
     long long CalcMaxPausePosition(void);
-    void CalcMaxRWTime();
     void CalcMaxFFTime();
    
     void DoFastForward();
