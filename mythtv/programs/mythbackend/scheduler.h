@@ -7,6 +7,7 @@ class EncoderLink;
 class MainServer;
 
 #include <qmutex.h>
+#include <qwaitcondition.h>
 #include <qmap.h> 
 #include <list>
 #include <vector>
@@ -26,7 +27,7 @@ class Scheduler : public QObject
               QSqlDatabase *ldb);
     ~Scheduler();
 
-    void Reschedule(int recordid) { reschedQueue.append(recordid); }
+    void Reschedule(int recordid);
     void FillRecordListFromDB(void);
     void FillRecordListFromMaster(void);
 
@@ -85,6 +86,8 @@ class Scheduler : public QObject
     QSqlDatabase *db;
 
     QValueList<int> reschedQueue;
+    QMutex reschedLock;
+    QWaitCondition reschedWait;
     RecList reclist;
     RecList retrylist;
     RecList schedlist;

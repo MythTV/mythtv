@@ -797,6 +797,13 @@ void Scheduler::getAllScheduled(QStringList &strList)
         (*i)->ToStringList(strList);
 }
 
+void Scheduler::Reschedule(int recordid) { 
+    reschedLock.lock(); 
+    reschedQueue.append(recordid); 
+    reschedWait.wakeOne();
+    reschedLock.unlock();
+}
+
 void Scheduler::RunScheduler(void)
 {
     int prerollseconds = 0;
@@ -830,15 +837,20 @@ void Scheduler::RunScheduler(void)
 
     while (1)
     {
-        if (ScheduledRecording::hasChanged(db))
-            Reschedule(-1);
-
         curtime = QDateTime::currentDateTime();
         bool statuschanged = false;
 
-        if ((startIter == reclist.end() ||
-             curtime.secsTo((*startIter)->recstartts) > 30) &&
-            reschedQueue.count())
+      if ((startIter != reclist.end() &&
+           curtime.secsTo((*startIter)->recstartts) < 30))
+          sleep(1);
+      else
+      {
+        reschedLock.lock();
+        if (!reschedQueue.count())
+            reschedWait.wait(&reschedLock, 1000);
+        reschedLock.unlock();
+            
+        if (reschedQueue.count())
         {
             gettimeofday(&fillstart, NULL);
             QString msg;
@@ -923,10 +935,13 @@ void Scheduler::RunScheduler(void)
                 firstRun = false;
             }
         }
+      }
 
         for ( ; startIter != reclist.end(); startIter++)
             if ((*startIter)->recstatus == rsWillRecord)
                 break;
+
+        curtime = QDateTime::currentDateTime();
 
         RecIter recIter = startIter;
         for ( ; recIter != reclist.end(); recIter++)
@@ -1139,8 +1154,6 @@ void Scheduler::RunScheduler(void)
                     idleSince = QDateTime();
             }
         }
-
-        sleep(1);
     }
 } 
 
