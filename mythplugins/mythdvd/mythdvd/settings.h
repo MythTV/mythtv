@@ -40,19 +40,19 @@ class GlobalSetting: public SimpleDBStorage, virtual public Configurable
 // The real work.
 
 // Temporary dumping ground for things that have not been properly categorized yet
-class GeneralSettings: virtual public ConfigurationWizard {
+class DVDGeneralSettings: virtual public ConfigurationWizard {
 public:
-    GeneralSettings();
+    DVDGeneralSettings();
 };
 
-class PlayerSettings: virtual public ConfigurationWizard {
+class DVDPlayerSettings: virtual public ConfigurationWizard {
 public:
-    PlayerSettings();
+    DVDPlayerSettings();
 };
 
-class RipperSettings: virtual public ConfigurationWizard {
+class DVDRipperSettings: virtual public ConfigurationWizard {
 public:
-    RipperSettings();
+    DVDRipperSettings();
 };
 
 #endif

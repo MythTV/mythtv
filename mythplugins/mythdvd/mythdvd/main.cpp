@@ -186,17 +186,17 @@ void DVDCallback(void *data, QString &selection)
     }
     else if (sel == "dvd_settings_general")
     {
-        GeneralSettings settings;
+        DVDGeneralSettings settings;
         settings.exec(QSqlDatabase::database());
     }
     else if (sel == "dvd_settings_play")
     {
-        PlayerSettings settings;
+        DVDPlayerSettings settings;
         settings.exec(QSqlDatabase::database());
     }
     else if (sel == "dvd_settings_rip")
     {
-        RipperSettings settings;
+        DVDRipperSettings settings;
         settings.exec(QSqlDatabase::database());
     }
 }
@@ -250,14 +250,14 @@ int mythplugin_init(const char *libversion)
 
     UpgradeDVDDatabaseSchema();
 
-    GeneralSettings gsettings;
+    DVDGeneralSettings gsettings;
     gsettings.load(QSqlDatabase::database());
     gsettings.save(QSqlDatabase::database());
-    PlayerSettings psettings;
+    DVDPlayerSettings psettings;
     psettings.load(QSqlDatabase::database());
     psettings.save(QSqlDatabase::database());
 #ifdef TRANSCODE_SUPPORT
-    RipperSettings rsettings;
+    DVDRipperSettings rsettings;
     rsettings.load(QSqlDatabase::database());
     rsettings.save(QSqlDatabase::database());
 #endif

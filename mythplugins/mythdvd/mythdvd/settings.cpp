@@ -50,7 +50,7 @@ public:
     };
 };
 
-GeneralSettings::GeneralSettings()
+DVDGeneralSettings::DVDGeneralSettings()
 {
     VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
     general->setLabel(QObject::tr("General Settings"));
@@ -95,7 +95,7 @@ public:
 #endif
 
 
-PlayerSettings::PlayerSettings()
+DVDPlayerSettings::DVDPlayerSettings()
 {
     VerticalConfigurationGroup* playersettings = new VerticalConfigurationGroup(false);
     playersettings->setLabel(QObject::tr("DVD Player Settings"));
@@ -258,7 +258,7 @@ public:
     };
 };
 
-RipperSettings::RipperSettings()
+DVDRipperSettings::DVDRipperSettings()
 {
     VerticalConfigurationGroup* rippersettings = new VerticalConfigurationGroup(false);
     rippersettings->setLabel(QObject::tr("DVD Ripper Settings"));
