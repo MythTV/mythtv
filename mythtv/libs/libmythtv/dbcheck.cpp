@@ -1560,7 +1560,7 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
             return false;
     }
 
-    if (dbver = "1076")
+    if (dbver == "1076")
     {
         const QString updates[] = {
 "ALTER TABLE channel MODIFY COLUMN serviceid mediumint unsigned;",
@@ -1570,7 +1570,7 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
             return false;
     }
 
-    if (dbver = "1077")
+    if (dbver == "1077")
     {
         const QString updates[] = {
 "INSERT INTO `dtv_privatetypes` "
