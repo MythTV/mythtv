@@ -640,7 +640,8 @@ void Weather::loadCityData(int dat)
 
         char temporary[1024];
         char *hold;
-        accidFile.seekg(startData + accidBreaks[curLetter + 26], ios::beg);
+        accidFile.seekg((streamoff)startData + 
+                        accidBreaks[curLetter + 26], ios::beg);
 
         if (dat > 4) 
         {
