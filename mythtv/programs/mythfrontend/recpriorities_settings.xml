@@ -5,6 +5,7 @@
       <text>General</text>
       <text lang="DE">Allgemeines</text>
       <text lang="DK">Generelt</text>
+      <text lang="NL">Algemeen</text>
       <action>SETTINGS GENERALRANKING</action>
    </button>
 
@@ -15,6 +16,7 @@
       <text lang="CA">Prioritats de Canals</text>
       <text lang="DE">Sender bewerten</text>
       <text lang="DK">Sæt kanal rangering</text>
+      <text lang="NL">Kanalen Rangeren</text>
       <action>SETTINGS CHANNELRANKING</action>
    </button>
 

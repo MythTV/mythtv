@@ -3,15 +3,15 @@
     <name>GuideGrid</name>
     <message>
         <source>Recording Once</source>
-        <translation>Eenmalige Opname</translation>
+        <translation>Eenmalig Opnemen</translation>
     </message>
     <message>
         <source>Timeslot Recording</source>
-        <translation>Opname per Tijdsblok</translation>
+        <translation>Opnemen per Tijdsblok</translation>
     </message>
     <message>
         <source>Channel Recording</source>
-        <translation>Opname per Kanaal</translation>
+        <translation>Opnemen per Kanaal</translation>
     </message>
     <message>
         <source>All Recording</source>
@@ -23,7 +23,7 @@
     </message>
     <message>
         <source>Weekly Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Wekelijks Opnemen</translation>
     </message>
 </context>
 <context>
@@ -77,7 +77,7 @@
     </message>
     <message>
         <source>Duration:</source>
-        <translation>Tijdsduur:</translation>
+        <translation>Speelduur:</translation>
     </message>
     <message>
         <source>minutes</source>
@@ -96,59 +96,59 @@
     <name>ManualSchedule</name>
     <message>
         <source>Manual Recording Scheduler</source>
-        <translation type="unfinished"></translation>
+        <translation>Manuele Opname Planner</translation>
     </message>
     <message>
         <source>Channel:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanaal:</translation>
     </message>
     <message>
         <source>Date:</source>
-        <translation type="unfinished"></translation>
+        <translation>Datum:</translation>
     </message>
     <message>
         <source>Time:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tijd:</translation>
     </message>
     <message>
         <source>hr</source>
-        <translation type="unfinished"></translation>
+        <translation>uur</translation>
     </message>
     <message>
         <source>min</source>
-        <translation type="unfinished"></translation>
+        <translation>min</translation>
     </message>
     <message>
         <source>Duration:</source>
-        <translation type="unfinished">Tijdsduur:</translation>
+        <translation>Speelduur:</translation>
     </message>
     <message>
         <source>Title:</source>
-        <translation type="unfinished">Titel:</translation>
+        <translation>Titel:</translation>
     </message>
     <message>
         <source>Subtitle:</source>
-        <translation type="unfinished">Afleveringstitel:</translation>
+        <translation>Afleveringstitel:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation type="unfinished"></translation>
+        <translation>Beschrijving:</translation>
     </message>
     <message>
         <source>Save this scheduled recording and exit</source>
-        <translation type="unfinished"></translation>
+        <translation>Bewaar deze geplande opname en sluit af</translation>
     </message>
     <message>
         <source>Save this scheduled recording and set another</source>
-        <translation type="unfinished"></translation>
+        <translation>Bewaar deze geplande opname en plan een nieuwe opname</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuleer</translation>
     </message>
     <message>
         <source>Manual recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Manuele opname</translation>
     </message>
 </context>
 <context>
@@ -190,11 +190,11 @@
     </message>
     <message>
         <source>Yes, get rid of it</source>
-        <translation>Ja, verwijder ze</translation>
+        <translation>Ja, verwijder deze opname</translation>
     </message>
     <message>
         <source>No, I might want to watch it again.</source>
-        <translation>Nee, ik wil ze later nog eens bekijken.</translation>
+        <translation>Nee, bewaar deze opname.</translation>
     </message>
     <message>
         <source>No, keep it, I changed my mind</source>
@@ -202,6 +202,18 @@
     </message>
     <message>
         <source>Delete this recording?</source>
+        <translation>Deze opname verwijderen?</translation>
+    </message>
+    <message>
+        <source>Allow this program to AutoExpire?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, AutoExpire</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No, Do Not AutoExpire</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -245,11 +257,11 @@
     </message>
     <message>
         <source>Recording every day when shown in this timeslot</source>
-        <translation type="unfinished"></translation>
+        <translation>Dagelijkse vertoningen opnemen in dit tijdsblok</translation>
     </message>
     <message>
         <source>Recording every week when shown in this timeslot</source>
-        <translation type="unfinished"></translation>
+        <translation>Wekelijkse vertoningen opnemen in dit tijdsblok</translation>
     </message>
 </context>
 <context>
@@ -272,154 +284,162 @@
     </message>
     <message>
         <source>cut point</source>
-        <translation type="unfinished"></translation>
+        <translation>knippunt</translation>
     </message>
     <message>
         <source>keyframe</source>
-        <translation type="unfinished"></translation>
+        <translation>sleutelframe</translation>
     </message>
     <message>
         <source>1 frame</source>
-        <translation type="unfinished"></translation>
+        <translation>1 frame</translation>
     </message>
     <message>
         <source>0.5 seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>0,5 seconden</translation>
     </message>
     <message>
         <source>1 second</source>
-        <translation type="unfinished"></translation>
+        <translation>1 seconde</translation>
     </message>
     <message>
         <source>5 seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>5 seconden</translation>
     </message>
     <message>
         <source>20 seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>20 seconden</translation>
     </message>
     <message>
         <source>1 minute</source>
-        <translation type="unfinished"></translation>
+        <translation>1 minuut</translation>
     </message>
     <message>
         <source>5 minutes</source>
-        <translation type="unfinished"></translation>
+        <translation>5 minuten</translation>
     </message>
     <message>
         <source>10 minutes</source>
-        <translation type="unfinished"></translation>
+        <translation>10 minuten</translation>
     </message>
     <message>
         <source>error</source>
-        <translation type="unfinished"></translation>
+        <translation>fout</translation>
     </message>
     <message>
         <source>You are close to an existing cut point.  Would you like to:</source>
-        <translation type="unfinished"></translation>
+        <translation>Een bestaande knippunt is dichtbij. Wenst U:</translation>
     </message>
     <message>
         <source>Delete this cut point</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit knippunt te verwijderen</translation>
     </message>
     <message>
         <source>Move this cut point to the current position</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit knippunt naar hier te verplaatsen</translation>
     </message>
     <message>
         <source>Flip directions - delete to the </source>
-        <translation type="unfinished"></translation>
+        <translation>De richting om te draaien - verwijder naar </translation>
     </message>
     <message>
         <source>right</source>
-        <translation type="unfinished"></translation>
+        <translation>rechts</translation>
     </message>
     <message>
         <source>left</source>
-        <translation type="unfinished"></translation>
+        <translation>links</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuleer</translation>
     </message>
     <message>
         <source>Insert a new cut point?</source>
-        <translation type="unfinished"></translation>
+        <translation>Een nieuw knippunt toevoegen?</translation>
     </message>
     <message>
         <source>Delete before this frame</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwijder voor dit frame</translation>
     </message>
     <message>
         <source>Delete after this frame</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwijder na dit frame</translation>
     </message>
     <message>
         <source>Auto-Skip %1 seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatisch %1 seconden overslaan</translation>
     </message>
     <message>
         <source>SKIP</source>
-        <translation type="unfinished">Overslaan</translation>
+        <translation>Overslaan</translation>
     </message>
     <message>
         <source>Found %1 sec. commercial</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 seconden reclame gevonden</translation>
     </message>
     <message>
         <source>At Start of program.</source>
-        <translation type="unfinished"></translation>
+        <translation>In het begin.</translation>
     </message>
     <message>
         <source>At End, can not Skip.</source>
-        <translation type="unfinished"></translation>
+        <translation>Op het einde, kan niet Overslaan.</translation>
     </message>
     <message>
         <source>Start of program.</source>
-        <translation type="unfinished"></translation>
+        <translation>Begin van programma.</translation>
     </message>
     <message>
         <source>cut</source>
-        <translation type="unfinished"></translation>
+        <translation>knip</translation>
     </message>
     <message>
         <source>Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Plannen</translation>
     </message>
     <message>
         <source>Do not record this program</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit programma niet opnemen</translation>
     </message>
     <message>
         <source>Record only this showing of the program</source>
-        <translation type="unfinished">Enkel deze vertoning van het programma opnemen</translation>
+        <translation>Enkel deze vertoning van het programma opnemen</translation>
     </message>
     <message>
         <source>Record this program in this timeslot every day</source>
-        <translation type="unfinished">Dit programma dagelijks in dit tijdsblok opnemen</translation>
+        <translation>Dit programma dagelijks in dit tijdsblok opnemen</translation>
     </message>
     <message>
         <source>Record this program whenever it&apos;s shown on this channel</source>
-        <translation type="unfinished">Dit programma altijd op dit kanaal opnemen</translation>
+        <translation>Dit programma altijd op dit kanaal opnemen</translation>
     </message>
     <message>
         <source>Record this program whenever it&apos;s shown anywhere</source>
-        <translation type="unfinished">Dit programma altijd en op alle kanalen opnemen</translation>
+        <translation>Dit programma altijd en op alle kanalen opnemen</translation>
     </message>
     <message>
         <source>Record this program in this timeslot every week</source>
-        <translation type="unfinished">Dit programma wekelijks in dit tijdsblok opnemen</translation>
+        <translation>Dit programma wekelijks in dit tijdsblok opnemen</translation>
     </message>
     <message>
         <source>Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Profiel</translation>
     </message>
     <message>
         <source>(unspecified)</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatisch %1 seconden overslaan</translation>
     </message>
     <message>
         <source>Rank</source>
+        <translation>Rang</translation>
+    </message>
+    <message>
+        <source>Auto-Expire recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Number of most recent episodes to keep (set to 0 for ALL)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -427,31 +447,31 @@
     <name>RankPrograms</name>
     <message>
         <source>Recording just this showing</source>
-        <translation type="unfinished">Neem enkel deze vertoning op</translation>
+        <translation>Neem enkel deze vertoning op</translation>
     </message>
     <message>
         <source>Recording every week</source>
-        <translation type="unfinished"></translation>
+        <translation>Neem wekelijks op</translation>
     </message>
     <message>
         <source>Recording when shown in this timeslot</source>
-        <translation type="unfinished">Neem enkel vertoningen op in dit tijdsblok</translation>
+        <translation>Neem enkel vertoningen op in dit tijdsblok</translation>
     </message>
     <message>
         <source>Recording when shown on this channel</source>
-        <translation type="unfinished">Neem enkel vertoningen op dit kanaal op</translation>
+        <translation>Neem enkel vertoningen op dit kanaal op</translation>
     </message>
     <message>
         <source>Recording all showings</source>
-        <translation type="unfinished">Neem alle vertoningen op</translation>
+        <translation>Neem alle vertoningen op</translation>
     </message>
     <message>
         <source>Not recording this showing</source>
-        <translation type="unfinished">Neem deze vertoning niet op</translation>
+        <translation>Neem deze vertoning niet op</translation>
     </message>
     <message>
         <source>Error!</source>
-        <translation type="unfinished">Fout!</translation>
+        <translation>Fout!</translation>
     </message>
 </context>
 <context>
@@ -466,7 +486,7 @@
     </message>
     <message>
         <source>Advanced Recording Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Geavanceerde Opname Opties</translation>
     </message>
 </context>
 <context>
@@ -624,11 +644,11 @@
     </message>
     <message>
         <source>Transcode</source>
-        <translation type="unfinished"></translation>
+        <translation>Omzetten</translation>
     </message>
     <message>
         <source>Hue %1 %</source>
-        <translation type="unfinished"></translation>
+        <translation>Hue %1 %</translation>
     </message>
 </context>
 <context>
@@ -671,7 +691,7 @@
     </message>
     <message>
         <source>Unsuppress recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Heractiveer opname</translation>
     </message>
 </context>
 </TS>

@@ -216,6 +216,7 @@
         <value lang="ES">Visibilidat</value>
         <value lang="CA">Visibilitat</value>
         <value lang="DK">Sigtbarhed</value>
+        <value lang="NL">Zichtbaarheid</value>
       </textarea>
       <textarea name="visibility" draworder="5" align="right">
         <context>1</context>

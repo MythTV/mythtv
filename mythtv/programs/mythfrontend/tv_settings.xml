@@ -58,6 +58,7 @@
       <text lang="CA">Prioritats</text>
       <text lang="DE">Bewertungen</text>
       <text lang="DK">Rangering</text>
+      <text lang="NL">Rangeren</text>
       <action>MENU rank_settings.xml</action>
    </button>
 

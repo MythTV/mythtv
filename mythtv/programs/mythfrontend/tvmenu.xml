@@ -28,6 +28,7 @@
       <alttext lang="ES">Temporizadores</alttext>
       <alttext lang="CA">Temporitzadors</alttext>
       <alttext lang="DK">Optagelser</alttext>
+      <alttext lang="NL">Planning</alttext>
       <action>MENU tv_schedule.xml</action>
    </button>
 

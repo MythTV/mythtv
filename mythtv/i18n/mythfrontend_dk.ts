@@ -185,6 +185,18 @@
         <source>No, keep it, I changed my mind</source>
         <translation>Nej, behold den, jeg har ombestemt mig</translation>
     </message>
+    <message>
+        <source>Allow this program to AutoExpire?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, AutoExpire</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No, Do Not AutoExpire</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ProgFinder</name>
@@ -398,6 +410,14 @@
     <message>
         <source>Rank</source>
         <translation>Rang</translation>
+    </message>
+    <message>
+        <source>Auto-Expire recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Number of most recent episodes to keep (set to 0 for ALL)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

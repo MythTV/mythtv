@@ -8,6 +8,7 @@
       <text lang="FR">Général</text>
       <text lang="DE">Allgemeines</text>
       <text lang="DK">Generelt</text>
+      <text lang="NL">Algemeen</text>
       <action>SETTINGS MAINGENERAL</action>
    </button>
 
@@ -20,6 +21,7 @@
       <text lang="FR">Apparence</text>
       <text lang="DE">Aussehen</text>
       <text lang="DK">Udseende</text>
+      <text lang="NL">Uiterlijk</text>
       <action>SETTINGS APPEARANCE</action>
    </button>
 
@@ -31,6 +33,7 @@
      <text lang="FR">Options TV</text>
      <text lang="DE">TV Einstellungen</text>
      <text lang="DK">TV indstillinger</text>
+     <text lang="NL">TV Instellingen</text>
      <action>MENU tv_settings.xml</action>
    </button>
 
@@ -41,6 +44,7 @@
      <text lang="CA">Configurar Música</text>
      <text lang="DE">Musik Einstellungen</text>
      <text lang="DK">Musik indstillinger</text>
+     <text lang="NL">Muziek Instellingen</text>
      <action>CONFIGPLUGIN mythmusic</action>
      <depends>mythmusic</depends>
    </button>
@@ -52,6 +56,7 @@
      <text lang="CA">Configurar Jocs</text>
      <text lang="DE">Spiele Einstellungen</text>
      <text lang="DK">Spil indstillinger</text>
+     <text lang="NL">Spelen Instellingen</text>
      <action>CONFIGPLUGIN mythgame</action>
      <depends>mythgame</depends>
    </button>
@@ -63,6 +68,7 @@
       <text lang="CA">Configurar Imatges</text>
       <text lang="DE">Bilder Einstellungen</text>
       <text lang="DK">Billed indstillinger</text>
+      <text lang="NL">Beelden Instellingen</text>
       <action>CONFIGPLUGIN mythgallery</action>
       <depends>mythgallery</depends>
    </button>
@@ -74,6 +80,7 @@
        <text lang="CA">Configurar Videos</text>
        <text lang="DE">Videos Einstellungen</text>
        <text lang="DK">Video indstillinger</text>
+       <text lang="NL">Films Instellingen</text>
        <action>CONFIGPLUGIN mythvideo</action>
        <depends>mythvideo</depends>
    </button>
@@ -85,6 +92,7 @@
      <text lang="CA">Configurar El Temps</text>
      <text lang="DE">Wetter Einstellungen</text>
      <text lang="DK">Vejr indstililnger</text>
+     <text lang="NL">"Het Weer" Instellingen</text>
      <action>CONFIGPLUGIN mythweather</action>
      <depends>mythweather</depends>
    </button>

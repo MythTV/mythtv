@@ -15,6 +15,7 @@
       <alttext lang="ES">Parilla</alttext>
       <alttext lang="CA">Guia</alttext>
       <alttext lang="DK">Guide</alttext>
+      <alttext lang="NL">Gids</alttext>
       <action>TV_SCHEDULE</action>
    </button>
 
@@ -33,6 +34,7 @@
       <alttext lang="ES">Buscar</alttext>
       <alttext lang="CA">Cercar</alttext>
       <alttext lang="DK">Finder</alttext>
+      <alttext lang="NL">Zoeker</alttext>
       <action>TV_PROGFIND</action>
    </button>
 
@@ -42,7 +44,7 @@
       <text lang="IT">Registrazione manuale</text>
       <text lang="ES">Grabación Instanánea</text>
       <text lang="CA">Gravar ara</text>
-      <text lang="NL">Manuele opname</text>
+      <text lang="NL">Instant Opname</text>
       <text lang="FR">Enregistrement manuel</text>
       <text lang="DE">Sofortige Aufnahme</text>
       <text lang="DK">Optag lige nu</text>
@@ -51,6 +53,7 @@
       <alttext lang="ES">Grab. inst.</alttext>
       <alttext lang="CA">Grav. inst.</alttext>
       <alttext lang="DK">Optag nu</alttext>
+      <alttext lang="NL">Instant</alttext>
       <action>TV_MANUAL</action>
    </button>
 
@@ -61,10 +64,12 @@
       <text lang="CA">Programar Gravacions</text>
       <text lang="DE">Manuelle Planung</text>
       <text lang="DK">Manuel programmering</text>
+      <text lang="NL">Manuele Opname</text>
       <alttext>Man. Sched.</alttext>
       <alttext lang="ES">Programar</alttext>
       <alttext lang="CA">Programar</alttext>
       <alttext lang="DK">Manuel prog.</alttext>
+      <alttext lang="NL">Manueel</alttext>
       <action>TV_MANUALSCHEDULE</action>
    </button>
 
@@ -75,10 +80,12 @@
       <text lang="CA">Prioritats de programes</text>
       <text lang="DE">Sendungen bewerten</text>
       <text lang="DK">Sæt program rangering</text>
+      <text lang="NL">Programma's Rangeren</text>
       <alttext>Set Rankings</alttext>
       <alttext lang="ES">Por programas</alttext>
       <alttext lang="CA">Per programes</alttext>
       <alttext lang="DK">Sæt rangering</alttext>
+      <alttext lang="NL">Rangeren</alttext>
       <action>TV_SET_RANKINGS</action>
    </button>
 
@@ -97,6 +104,7 @@
       <alttext lang="ES">Conflictos</alttext>
       <alttext lang="FR">Conflictes</alttext>
       <alttext lang="DK">Løs konflikter</alttext>
+      <alttext lang="NL">Conflicten</alttext>
       <action>TV_FIX_CONFLICTS</action>
    </button>
 

@@ -85,6 +85,7 @@
       <text lang="FR">Configuration</text>
       <text lang="DE">Konfiguration</text>
       <text lang="DK">Konfiguration</text>
+      <text lang="NL">Configuratie</text>
       <action>MENU main_settings.xml</action>
    </button>
 
