@@ -244,11 +244,6 @@ private:
 
     TableSourcePIDObject TableSourcePIDs;
 
-    bool verifyPAT(tablehead_t *head,uint8_t *data, int len);
-    bool verifySDT(uint8_t *buf, int len);
-    bool verifyNIT(uint8_t *buf, int len);
-    bool verifyPMT(uint8_t *data, int len);
-
     /* Huffman Text Decompression Routines */
     int HuffmanGetRootNode(uint8_t Input, uint8_t Table[]);
     bool HuffmanGetBit(uint8_t test[], uint16_t bit);
