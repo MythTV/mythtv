@@ -25,6 +25,8 @@ class AutoExpire : public QObject
     static void *ExpirerThread(void *param);
 
   private:
+    vector<ProgramInfo *>::iterator SelectFile(const QString &recordfileprefix);
+
     void ClearExpireList(void);
 
     void ExpireEpisodesOverMax(void);

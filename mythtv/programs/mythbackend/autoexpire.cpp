@@ -4,6 +4,7 @@
 #include <qregexp.h>
 #include <qstring.h>
 #include <qdatetime.h>
+#include <qfile.h>
 
 #include <iostream>
 #include <algorithm>
@@ -72,49 +73,78 @@ void AutoExpire::RunExpirer(void)
 
             FillExpireList();
 
-            if ((freespace < minFree) &&
-                (expireList.size() > 0))
+            if (expireList.size() > 0)
             {
-                // delete the "first" item on our list (really off the end)
-                ProgramInfo *pginfo = expireList.back();
+                vector<ProgramInfo *>::iterator i;
+                ProgramInfo *pginfo;
 
-                QString msg = QString("AutoExpiring: %1 %2 %3 MBytes")
-                                      .arg(pginfo->title)
-                                      .arg(pginfo->startts.toString())
-                                      .arg((int)(pginfo->filesize/1024/1024));
-                VERBOSE(VB_FILE, msg.local8Bit());
-                gContext->LogEntry("autoexpire", LP_NOTICE, "Expired Program", msg);
+                i = SelectFile(recordfileprefix);
 
-                QString message =
-                           QString("AUTO_EXPIRE %1 %2")
-                                   .arg(pginfo->chanid)
-                                   .arg(pginfo->startts.toString(Qt::ISODate));
-                MythEvent me(message);
-                gContext->dispatch(me);
-
-                delete pginfo;
-                expireList.erase(expireList.end() - 1);
-
-                if (statfs(recordfileprefix.ascii(), &statbuf) == 0)
+                if (i != expireList.end())
                 {
-                    freespace =
-                        statbuf.f_bavail / (1024*1024*1024/statbuf.f_bsize);
-                }
-            }
+                    pginfo = *i;
+                    msg = QString("AutoExpiring: %1 %2 %3 MBytes")
+                                  .arg(pginfo->title)
+                                  .arg(pginfo->startts.toString())
+                                  .arg((int)(pginfo->filesize/1024/1024));
+                    VERBOSE(VB_FILE, msg.local8Bit());
+                    gContext->LogEntry("autoexpire", LP_NOTICE,
+                                       "Expired Program", msg);
 
-            if (freespace < minFree)
-            {
-                msg = QString("WARNING: Not enough space freed, only %1 "
-                              "Gigs free but need %2.")
-                              .arg(freespace).arg(minFree);
+                    msg = QString("AUTO_EXPIRE %1 %2")
+                                  .arg(pginfo->chanid)
+                                  .arg(pginfo->startts.toString(Qt::ISODate));
+                    MythEvent me(msg);
+                    gContext->dispatch(me);
+
+                    delete pginfo;
+                    expireList.erase(i);
+
+                    if (statfs(recordfileprefix.ascii(), &statbuf) == 0)
+                    {
+                        freespace =
+                            statbuf.f_bavail / (1024*1024*1024/statbuf.f_bsize);
+                        if (freespace < minFree)
+                        {
+                            msg = QString("WARNING: Not enough space freed, "
+                                          "only %1 Gigs free but need %2.")
+                                          .arg(freespace).arg(minFree);
+                        }
+                        else
+                        {
+                            msg = QString("AutoExpire successful, %1 Gigs "
+                                          "now free.").arg(freespace);
+                        }
+                    }
+                    else
+                    {
+                        msg = QString("WARNING: Expired recording, but "
+                                      "unable to calculate new free space.");
+                    }
+
+                    VERBOSE(VB_FILE, msg);
+                }
+                else
+                {
+                    // Couldn't find any autoexpire files.
+                    msg = QString("ERROR when trying to autoexpire files.  "
+                                  "Could not find any files to expire.");
+                    gContext->LogEntry("mythbackend", LP_WARNING,
+                                       "Autoexpire Recording", QString("Could "
+                                       "not find any files to expire."));
+                    VERBOSE(VB_IMPORTANT, msg);
+                }
+
             }
             else
             {
-                msg = QString("AutoExpire successful, %1 Gigs now free.")
-                              .arg(freespace);
+                msg = QString("ERROR when trying to autoexpire files.  "
+                              "No recordings allowed to expire.");
+                gContext->LogEntry("mythbackend", LP_WARNING,
+                                   "Autoexpire Recording", QString("No "
+                                   "recordings allowed to expire."));
+                VERBOSE(VB_IMPORTANT, msg);
             }
-
-            VERBOSE(VB_FILE, msg);
         }
         else if ((minFree) && (freespace == -1))
         {
@@ -127,6 +157,41 @@ void AutoExpire::RunExpirer(void)
         sleep(gContext->GetNumSetting("AutoExpireFrequency", 10) * 60);
     }
 } 
+
+vector<ProgramInfo *>::iterator
+    AutoExpire::SelectFile(const QString &recordfileprefix)
+{
+    vector<ProgramInfo *>::iterator i;
+
+    i = expireList.begin();
+    while (i != expireList.end())
+    {
+        QString filename = (*i)->GetRecordFilename(recordfileprefix);
+        QFile checkFile(filename);
+
+        if (checkFile.exists())
+        {
+            // This file should work.  No need to look further.
+            return(i);
+        }
+        else
+        {
+            // Couldn't find the file.  Delete would probally fail so find
+            // another file.
+            VERBOSE(VB_IMPORTANT,
+                QString("ERROR when trying to autoexpire file: %1. File "
+                        "doesn't exist.  Database metadata will not be "
+                        "removed.").arg(filename));
+            gContext->LogEntry("mythbackend", LP_WARNING,
+                               "Autoexpire Recording",
+                               QString("File %1 does not exist when trying to "
+                                       "autoexpire recording.").arg(filename));
+        }
+        i++;
+    }
+
+    return i;
+}
 
 void *AutoExpire::ExpirerThread(void *param)
 {
@@ -151,8 +216,9 @@ void AutoExpire::ExpireEpisodesOverMax(void)
 
     if (query.exec() && query.isActive() && query.size() > 0)
     {
-        VERBOSE(VB_FILE, QString("Found %1 record profiles using max episode expiration")
-                                    .arg(query.numRowsAffected()));
+        VERBOSE(VB_FILE, QString("Found %1 record profiles using max episode "
+                                 "expiration")
+                                 .arg(query.numRowsAffected()));
         while (query.next()) {
             VERBOSE(VB_FILE, QString(" - %1").arg(query.value(2).toString()));
             maxEpisodes[query.value(0).toString()] = query.value(1).toInt();
@@ -168,9 +234,10 @@ void AutoExpire::ExpireEpisodesOverMax(void)
 
         query.prepare(querystr);
 
-        VERBOSE(VB_FILE, QString("Found %1 episodes in recording profile %2 using max expiration")
-                                    .arg(query.numRowsAffected())
-                                    .arg(maxIter.key()));
+        VERBOSE(VB_FILE, QString("Found %1 episodes in recording profile %2 "
+                                 "using max expiration")
+                                 .arg(query.numRowsAffected())
+                                 .arg(maxIter.key()));
         if (query.exec() && query.isActive() && query.size() > 0)
         {
             int found = 0;
@@ -184,14 +251,15 @@ void AutoExpire::ExpireEpisodesOverMax(void)
                                           .arg(query.value(2).toString())
                                           .arg(query.value(1).toString());
                     VERBOSE(VB_FILE, msg);
-                    gContext->LogEntry("autoexpire", LP_NOTICE, "Expired program", msg);
+                    gContext->LogEntry("autoexpire", LP_NOTICE,
+                                       "Expired program", msg);
 
-                    QString message = QString("AUTO_EXPIRE %1 %2")
-                                              .arg(query.value(0).toString())
-                                              .arg(query.value(1).toDateTime()
-                                                   .toString(Qt::ISODate));
+                    msg = QString("AUTO_EXPIRE %1 %2")
+                                  .arg(query.value(0).toString())
+                                  .arg(query.value(1).toDateTime()
+                                       .toString(Qt::ISODate));
 
-                    MythEvent me(message);
+                    MythEvent me(msg);
                     gContext->dispatchNow(me);
                 }
             }
@@ -215,7 +283,7 @@ void AutoExpire::FillExpireList(void)
 
 void AutoExpire::PrintExpireList(void)
 {
-    cout << "MythTV AutoExpire List (programs listed last will expire first)\n";
+    cout << "MythTV AutoExpire List (programs listed in order of expiration)\n";
 
     vector<ProgramInfo *>::iterator i = expireList.begin();
     for(; i != expireList.end(); i++)
@@ -256,7 +324,7 @@ void AutoExpire::FillOldestFirst(void)
                "LEFT JOIN channel ON recorded.chanid = channel.chanid "
                "WHERE recorded.hostname = '%1' "
                "AND autoexpire > 0 "
-               "ORDER BY autoexpire ASC, starttime DESC")
+               "ORDER BY autoexpire DESC, starttime ASC")
                .arg(gContext->GetHostName());
 
     query.prepare(querystr);
@@ -309,3 +377,4 @@ void AutoExpire::FillOldestFirst(void)
         }
 }
 
+/* vim: set expandtab tabstop=4 shiftwidth=4: */
