@@ -682,16 +682,16 @@ void ProgramInfo::SetBlankFrameList(QMap<long long, int> &frames,
     for (i = frames.begin(); i != frames.end(); ++i)
     {
         long long frame = i.key();
-        QString frame_str;
         char tempc[128];
-        sprintf(tempc, "%lld", frame );
-        frame_str += tempc;
-        QString querystr = QString("INSERT recordedmarkup (chanid, starttime, "
-                                   "mark, type) values ( '%1', '%2', %3, "
-                                   "%4);").arg(chanid).arg(starts)
-                                   .arg(frame_str).arg(MARK_BLANK_FRAME);
-        QSqlQuery query = db->exec(querystr);
-        if (!query.isActive())
+        sprintf(tempc, "%lld", frame);
+        QString frame_str = tempc;
+
+        querystr = QString("INSERT recordedmarkup (chanid, starttime, "
+                           "mark, type) values ( '%1', '%2', %3, "
+                           "%4);").arg(chanid).arg(starts)
+                           .arg(frame_str).arg(MARK_BLANK_FRAME);
+        QSqlQuery subquery = db->exec(querystr);
+        if (!subquery.isActive())
             MythContext::DBError("blank frame list insert", querystr);
     }
 }
