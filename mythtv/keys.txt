@@ -96,7 +96,7 @@ LiveTV Browse Mode:
 If you have two or more tuner cards:
 
 - V toggle Picture-in-picture on or off
-- B toggles the active window (lets you change channels on the PiP window.
+- B toggles the window focus (lets you change channels on the PiP window).
 - N swaps the two channels by changing channels on both cards.
 
 While watching a recording:
