@@ -16,7 +16,7 @@ using namespace std;
 
 VolumeControl::VolumeControl(bool setstartingvolume)
 {
-    mixerfd = 0;
+    mixerfd = -1;
     volume = 0;
 
 #ifdef USING_OSS
@@ -66,7 +66,7 @@ VolumeControl::VolumeControl(bool setstartingvolume)
 
 VolumeControl::~VolumeControl()
 {
-    if (mixerfd > 0)
+    if (mixerfd >= 0)
         close(mixerfd);
 }
 
@@ -105,7 +105,7 @@ void VolumeControl::SetCurrentVolume(int value)
         volume = 0;
 
     internal_volume = volume;
-    if (mixerfd > 0)
+    if (mixerfd >= 0)
     {
         if (!mute)
         {
@@ -144,7 +144,7 @@ void VolumeControl::SetMute(bool on)
     {
         realvol = (internal_volume << 8) + internal_volume;
     }
-    if (mixerfd > 0)
+    if (mixerfd >= 0)
     {
         int ret = ioctl(mixerfd, MIXER_WRITE(control), &realvol);
         if (ret < 0)
@@ -188,7 +188,7 @@ kMuteState VolumeControl::IterateMutedChannels(void)
            break;
     }
 
-    if (mixerfd > 0)
+    if (mixerfd >= 0)
     {
         int ret = ioctl(mixerfd, MIXER_WRITE(control), &realvol);
         if (ret < 0)

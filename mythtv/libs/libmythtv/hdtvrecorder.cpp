@@ -115,7 +115,7 @@ HDTVRecorder::HDTVRecorder()
 
 HDTVRecorder::~HDTVRecorder()
 {
-    if (chanfd > 0)
+    if (chanfd >= 0)
         close(chanfd);
 }
 
@@ -151,7 +151,7 @@ void HDTVRecorder::StartRecording(void)
     int ret;
 
     chanfd = open(videodevice.ascii(), O_RDWR);
-    if (chanfd <= 0)
+    if (chanfd < 0)
     {
         cerr << "HD1 Can't open video device: " << videodevice 
              << " chanfd = "<< chanfd << endl;
@@ -846,7 +846,7 @@ void HDTVRecorder::Reset(void)
         pthread_mutex_unlock(db_lock);
     }
 
-    if (chanfd > 0) 
+    if (chanfd >= 0) 
     {
         int ret = close(chanfd);
         if (ret < 0) 
@@ -855,7 +855,7 @@ void HDTVRecorder::Reset(void)
             return;
         }
         chanfd = open(videodevice.ascii(), O_RDWR);
-        if (chanfd <= 0)
+        if (chanfd < 0)
         {
             cerr << "HD1 Can't open video device: " << videodevice 
                  << " chanfd = "<< chanfd << endl;

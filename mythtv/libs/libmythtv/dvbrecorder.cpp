@@ -211,7 +211,7 @@ void DVBRecorder::Close()
 
     CloseFilters();
 
-    if (fd_dvr > 0)
+    if (fd_dvr >= 0)
         close(fd_dvr);
 
     if (dvb_on_demand && dvbchannel)
@@ -223,7 +223,7 @@ void DVBRecorder::Close()
 void DVBRecorder::CloseFilters()
 {
     for(unsigned int i=0; i<fd_demux.size(); i++)
-        if (fd_demux[i] > 0)
+        if (fd_demux[i] >= 0)
             close(fd_demux[i]);
     fd_demux.clear();
 

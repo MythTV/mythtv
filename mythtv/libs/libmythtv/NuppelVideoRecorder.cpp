@@ -48,8 +48,8 @@ NuppelVideoRecorder::NuppelVideoRecorder(ChannelBase *channel)
     channelObj = channel;
 
     encoding = false;
-    fd = 0;
-    channelfd = 0;
+    fd = -1;
+    channelfd = -1;
     lf = tf = 0;
     M1 = 0, M2 = 0, Q = 255;
     pid = pid2 = 0;
@@ -166,7 +166,7 @@ NuppelVideoRecorder::~NuppelVideoRecorder(void)
         delete [] strm;
     if (commDetect)
         delete commDetect;
-    if (fd > 0)
+    if (fd >= 0)
         close(fd);
     if (seektable)
     {
@@ -611,6 +611,7 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
         ioctl(afd, SNDCTL_DSP_SETFMT, &afmt);
         if (afmt != AFMT_S16_LE) 
         {
+            close(afd);
             cerr << "Can't get 16 bit DSP, exiting\n";
             return 1;
         }
@@ -619,6 +620,7 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
             ioctl(afd, SNDCTL_DSP_CHANNELS, &audio_channels) < 0 ||
             ioctl(afd, SNDCTL_DSP_SPEED, &audio_samplerate) < 0)
         {
+            close(afd);
             cerr << "recorder: " << audiodevice 
                  << ": error setting audio input device to "
                  << audio_samplerate << "kHz/" 
@@ -629,6 +631,7 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
 
         if (-1 == ioctl(afd, SNDCTL_DSP_GETBLKSIZE, &blocksize)) 
         {
+            close(afd);
             cerr << "Can't get DSP blocksize, exiting\n";
             return(1);
         }
@@ -671,7 +674,7 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
 int NuppelVideoRecorder::MJPEGInit(void)
 {
     fd = open(videodevice.ascii(), O_RDWR);
-    if (fd <= 0)
+    if (fd < 0)
     {
         cerr << "Can't open video device: " << videodevice << endl;
         perror("open video:");
@@ -900,11 +903,11 @@ void NuppelVideoRecorder::StartRecording(void)
 
     int retries = 0;
     fd = open(videodevice.ascii(), O_RDWR);
-    while (fd <= 0)
+    while (fd < 0)
     {
         usleep(30000);
         fd = open(videodevice.ascii(), O_RDWR);
-        if (retries++ > 5)
+        if (fd < 0 && retries++ > 5)
         { 
             cerr << "Can't open video device: " << videodevice << endl;
             perror("open video:");

@@ -105,29 +105,15 @@ void LircClient::SpawnApp(void)
 {
     // Spawn app to thwap led (or what ever the user has picked if
     // anything) to give positive feedback that a key was received
-    if (external_app != " &")
+    if (external_app == " &")
+	    return;
+
+    int status = myth_system(external_app);
+
+    if (status > 0)
     {
-        pid_t child = fork();
-        if (child < 0)
-            perror("fork");
-        else if (child == 0)
-        {
-            for (int i = 3; i < sysconf(_SC_OPEN_MAX) - 1; ++i)
-                close(i);
-            execl("/bin/sh", "sh", "-c", external_app.ascii(), NULL);
-            _exit(1);
-        }
-        else
-        {
-            int status;
-            if (waitpid(child, &status, 0) < 0)
-                perror("waitpid");
-            else if (status != 0)
-            {
-                cerr << "External key pressed command exited with status "
-                     << status << endl;
-            }
-        }
+        cerr << "External key pressed command exited with status "
+             << status << endl;
     }
 }
 

@@ -134,7 +134,7 @@ ThreadedFileWriter::ThreadedFileWriter(const char *filename,
 
     fd = open(filename, flags, mode);
 
-    if (fd <= 0)
+    if (fd < 0)
     {
         /* oops! */
         VERBOSE(VB_IMPORTANT,"ERROR opening file in ThreadedFileWriter.");
@@ -159,7 +159,8 @@ ThreadedFileWriter::~ThreadedFileWriter()
 
     pthread_join(writer, NULL);
 
-    close(fd);
+    if (fd >= 0)
+        close(fd);
     fd = -1;
 
     if (buf)
@@ -394,7 +395,7 @@ RingBuffer::RingBuffer(const QString &lfilename, bool write, bool usereadahead)
                 
                 fd2 = open(filename.ascii(), O_RDONLY|O_LARGEFILE|O_STREAMING);
                 
-                if (!fd2)
+                if (fd2 < 0)
                 {
                     VERBOSE( VB_IMPORTANT, QString("Could not open %1.  %2 retries remaining.")
                                            .arg(filename).arg(openAttempts));
@@ -408,8 +409,8 @@ RingBuffer::RingBuffer(const QString &lfilename, bool write, bool usereadahead)
                                                        "%2 retries remaining.")
                                                        .arg(filename).arg(openAttempts));
                         close(fd2);
+                        fd2 = -1;
                         usleep(500000);
-                        fd2 = 0;
                     }
                     else
                     {
@@ -503,7 +504,7 @@ RingBuffer::~RingBuffer(void)
         delete tfw;
         tfw = NULL;
     }
-    if (fd2 > 0)
+    if (fd2 >= 0)
     {
         close(fd2);
     }

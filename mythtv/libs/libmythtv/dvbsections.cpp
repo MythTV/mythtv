@@ -135,7 +135,7 @@ void DVBSections::Stop()
 
     for (int i=0; i<pollLength; i++)
     {
-        if (pollArray[i].fd > 0)
+        if (pollArray[i].fd >= 0)
             close(pollArray[i].fd);
     }
 

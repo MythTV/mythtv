@@ -301,7 +301,7 @@ void startTV(void)
         {
             qApp->unlock();
             qApp->processEvents();
-            usleep(100);
+            usleep(10000);
             qApp->lock();
         }
 
@@ -879,6 +879,10 @@ int main(int argc, char **argv)
         // Send stdout and stderr to the logfile
         dup2(logfd, 1);
         dup2(logfd, 2);
+
+        // Close the unduplicated logfd
+        if (logfd != 1 && logfd != 2)
+            close(logfd);
     }
 
     if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)

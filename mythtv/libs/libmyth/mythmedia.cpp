@@ -62,7 +62,7 @@ bool MythMediaDevice::closeDevice()
 
 bool MythMediaDevice::isDeviceOpen() const 
 { 
-    return (m_DeviceHandle > 0) ? true : false; 
+    return (m_DeviceHandle >= 0) ? true : false; 
 }
 
 bool MythMediaDevice::performMountCmd(bool DoMount)

@@ -414,6 +414,10 @@ int main(int argc, char **argv)
         // Send stdout and stderr to the logfile
         dup2(logfd, 1);
         dup2(logfd, 2);
+
+        // Close the unduplicated logfd
+        if (logfd != 1 && logfd != 2)
+            close(logfd);
     }
 
     gContext = new MythContext(MYTH_BINARY_VERSION, false, false);

@@ -1,6 +1,9 @@
 #include <qapplication.h>
 
+#include <sys/types.h>
+#include <sys/wait.h>
 #include <unistd.h>
+#include <fcntl.h>
 
 #include <iostream>
 using namespace std;
@@ -656,7 +659,46 @@ int myth_system(const QString &command, int flags)
     (void)flags;
 #endif
 
-    return system(command);
+    pid_t child = fork();
+
+    if (child < 0)
+    {
+        /* Fork failed */
+        perror("fork");
+        return -1;
+    }
+    else if (child == 0)
+    {
+        /* Child */
+        /* Close all open file descriptors except stdout/stderr */
+        for (int i = sysconf(_SC_OPEN_MAX) - 1; i > 2; i--)
+            close(i);
+
+        /* Attach stdin to /dev/null */
+        close(0);
+        int fd = open("/dev/null", O_RDONLY);
+        dup2(fd, 0);
+        if (fd != 0)
+            close(fd);
+
+        /* Run command */
+        execl("/bin/sh", "sh", "-c", command.ascii(), NULL);
+        perror("execl");
+
+        /* Failed to exec */
+        _exit(127);
+    }
+    else
+    {
+        /* Parent */
+        int status;
+
+        if (waitpid(child, &status, 0) < 0) {
+            perror("waitpid");
+            return -1;
+        }
+        return WEXITSTATUS(status);
+    }
 }
 
 QString cutDownString(QString text, QFont *testFont, int maxwidth)

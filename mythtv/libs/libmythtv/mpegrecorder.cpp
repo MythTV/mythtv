@@ -76,9 +76,9 @@ MpegRecorder::MpegRecorder()
 
 MpegRecorder::~MpegRecorder()
 {
-    if (chanfd > 0)
+    if (chanfd >= 0)
         close(chanfd);
-    if (readfd > 0)
+    if (readfd >= 0)
         close(readfd);
 }
 
@@ -227,7 +227,7 @@ void MpegRecorder::openMpegFileAsInput(void)
 {
     chanfd = readfd = open(videodevice.ascii(), O_RDONLY);
 
-    if (readfd <= 0)
+    if (readfd < 0)
     {
         cerr << "Can't open MPEG File: " << videodevice << endl;
         perror("open mpeg file:");
@@ -238,7 +238,7 @@ void MpegRecorder::openMpegFileAsInput(void)
 void MpegRecorder::openV4L2DeviceAsInput(void)
 {
     chanfd = open(videodevice.ascii(), O_RDWR);
-    if (chanfd <= 0)
+    if (chanfd < 0)
     {
         cerr << "Can't open video device: " << videodevice << endl;
         perror("open video:");
@@ -342,7 +342,7 @@ void MpegRecorder::openV4L2DeviceAsInput(void)
     }
 
     readfd = open(videodevice.ascii(), O_RDWR);
-    if (readfd <= 0)
+    if (readfd < 0)
     {
         cerr << "Can't open video device: " << videodevice << endl;
         perror("open video:");
@@ -357,7 +357,7 @@ void MpegRecorder::StartRecording(void)
     else
         openV4L2DeviceAsInput();
 
-    if ((chanfd <= 0) || (readfd <= 0))
+    if ((chanfd < 0) || (readfd < 0))
         return;
 
     if (!SetupRecording())
@@ -385,7 +385,7 @@ void MpegRecorder::StartRecording(void)
             pauseWait.wakeAll();
 
             if ((!deviceIsMpegFile) &&
-                (readfd > 0))
+                (readfd >= 0))
             {
                 close(readfd);
                 readfd = -1;
@@ -415,7 +415,7 @@ void MpegRecorder::StartRecording(void)
             close(readfd);
             readfd = open(videodevice.ascii(), O_RDONLY);
 
-            if (readfd > 0)
+            if (readfd >= 0)
                 ret = read(readfd, buffer, bufferSize);
             if (ret <= 0)
             {
