@@ -1062,8 +1062,8 @@ void ScanWizardScanner::scan()
     pthread_create(&tuner_thread, NULL, SpawnTune, this);
 }
 
-ScanWizard::ScanWizard() : nCaptureCard(-1), nVideoDev(-1),
-    nCardType(CardUtil::ERROR_PROBE) 
+ScanWizard::ScanWizard() : nVideoDev(-1), nCardType(CardUtil::ERROR_PROBE), 
+    nCaptureCard(-1)
 {
     paneQPSK =  new QPSKPane();
     paneQAM = new QAMPane();
