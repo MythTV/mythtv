@@ -129,7 +129,8 @@ void MythContextPrivate::Init(bool gui, bool lcd)
         if (gethostname(localhostname, 1024))
         {
             perror("gethostname");
-            exit(1);
+            VERBOSE(VB_IMPORTANT, "MCP: Could not determine host name, exiting");
+            exit(-29);
         }
         m_localhostname = localhostname;
     }
@@ -201,12 +202,12 @@ MythContext::MythContext(const QString &binversion, bool gui, bool lcd)
 
     if (binversion != MYTH_BINARY_VERSION)
     {
-        cerr << "This app was compiled against libmyth version: " << binversion
-             << "\nbut the library is version: " << MYTH_BINARY_VERSION << endl;
-        cerr << "You probably want to recompile everything, and do a\n"
-             << "'make distclean' first.\n";
-        cerr << "exiting\n";
-        exit(1);
+        VERBOSE(VB_IMPORTANT, QString("This app was compiled against libmyth version: %1")
+                .arg(binversion));
+        VERBOSE(VB_IMPORTANT, QString("but the library is version: %1").arg(MYTH_BINARY_VERSION));
+        VERBOSE(VB_IMPORTANT, "You probably want to recompile everything, and do a");
+        VERBOSE(VB_IMPORTANT, "'make distclean' first. exiting.");
+        exit(-30);
     }
 
     d = new MythContextPrivate(this);

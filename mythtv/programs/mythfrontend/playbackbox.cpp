@@ -142,7 +142,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
                                   "theme.\nPlease make that your ui.xml is valid.\n\nMyth will now exit."));
                                   
         cerr << "Failed to get selector object.\n";
-        exit(0);
+        exit(22);
         return;
     }
 
@@ -251,7 +251,7 @@ void PlaybackBox::LoadWindow(QDomElement &element)
             else
             {
                 cerr << "Unknown element: " << e.tagName() << endl;
-                exit(0);
+                exit(23);
             }
         }
     }
@@ -282,13 +282,13 @@ void PlaybackBox::parsePopup(QDomElement &element)
     if (name.isNull() || name.isEmpty())
     {
         cerr << "Popup needs a name\n";
-        exit(0);
+        exit(24);
     }
 
     if (name != "confirmdelete")
     {
         cerr << "Unknown popup name! (try using 'confirmdelete')\n";
-        exit(0);
+        exit(25);
     }
 
     for (QDomNode child = element.firstChild(); !child.isNull();
@@ -316,7 +316,7 @@ void PlaybackBox::parsePopup(QDomElement &element)
             else
             {
                 cerr << "Unknown popup child: " << info.tagName() << endl;
-                exit(0);
+                exit(26);
             }
         }
     }

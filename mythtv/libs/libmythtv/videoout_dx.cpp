@@ -308,9 +308,9 @@ void VideoOutputDX::PrepareFrame(VideoFrame *buffer, FrameScanType t)
                 case MAKEFOURCC('R','V','1','6'): av_format = PIX_FMT_RGB565; break;
                 case MAKEFOURCC('R','V','2','4'): av_format = PIX_FMT_RGB24;  break;
                 case MAKEFOURCC('R','V','3','2'): av_format = PIX_FMT_RGBA32; break;
-                default: cerr << "Non Xv mode only supports 16, 24, and 32 bpp "
-                             "displays\n";
-                         exit(0);
+                default: 
+                    VERBOSE(VB_IMPORTANT, "VODX: Non Xv mode only supports 16, 24, and 32 bpp displays");
+                    exit(-22);
             }
             
             avpicture_fill(&image_out, picbuf, av_format, XJ_width, XJ_height);

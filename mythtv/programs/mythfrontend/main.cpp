@@ -857,7 +857,7 @@ int main(int argc, char **argv)
     if (themedir == "")
     {
         cerr << "Couldn't find theme " << themename << endl;
-        exit(0);
+        exit(21);
     }
 
     gContext->LoadQtConfig();

@@ -197,8 +197,8 @@ void ProgLister::LoadWindow(QDomElement &element)
             }
             else
             {
-                cerr << "Unknown element: " << e.tagName() << endl;
-                exit(0);
+                VERBOSE(VB_IMPORTANT, QString("Unknown element: %1, exiting").arg(e.tagName()));
+                exit(-17);
             }
         }
     }

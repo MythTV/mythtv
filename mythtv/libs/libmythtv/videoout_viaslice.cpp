@@ -241,9 +241,9 @@ bool VideoOutputVIA::Init(int width, int height, float aspect,
 
     if (VIADriverProc(CREATEDRIVER, NULL))
     {
-        cerr << "Unable to initialize VIA CLE266 HW Driver, "
-                "please check your installation.\n";
-        exit(1);
+        VERBOSE(VB_IMPORTANT, "Unable to initialize VIA CLE266 HW Driver, ");
+        VERBOSE(VB_IMPORTANT, "please check your installation, exiting");
+        exit(-23);
     }
 
     if (!CreateViaBuffers())
@@ -289,9 +289,9 @@ bool VideoOutputVIA::CreateViaBuffers(void)
         if (data->lpSubSurface == MAP_FAILED)
         {
             perror("MMAP ViaSlice Surface failed");
-            cerr << "Couldn't map overlay surface\n";
-            cerr << "You should run MythTV as root when using ViaSlice\n";
-            exit(1);
+            VERBOSE(VB_IMPORTANT, "Couldn't map overlay surface");
+            VERBOSE(VB_IMPORTANT, "You should run MythTV as root when using ViaSlice");
+            exit(-24);
         }
 
         data->lpSubSurface += data->ddLock.SubDev.dwSUBPhysicalAddr[0];
@@ -314,9 +314,9 @@ bool VideoOutputVIA::CreateViaBuffers(void)
     else
     {
         perror("Open /dev/mem failed");
-        cerr << "Couldn't open /dev/mem to map overlay surface\n";
-        cerr << "You should run MythTV as root when using ViaSlice\n";
-        exit(1);
+        VERBOSE(VB_IMPORTANT, "Couldn't open /dev/mem to map overlay surface");
+        VERBOSE(VB_IMPORTANT, "You should run MythTV as root when using ViaSlice");
+        exit(-25);
     }
      
     for (int i = 0; i < kNumBuffers; i++)

@@ -1156,19 +1156,19 @@ void NuppelVideoRecorder::DoV4L2(void)
 
         if (ioctl(fd, VIDIOC_S_FMT, &vfmt) < 0)
         {
-            VERBOSE(VB_ALL, "Unable to set desired format");
-            exit(0);
+            VERBOSE(VB_IMPORTANT, "NVR: v4l2: Unable to set desired format");
+            exit(-2);
         }
         else
         {
             // we need to convert the buffer - we can't deal with yuyv directly.
             if (inpixfmt == FMT_YUV422P)
             {
-                cerr << "v4l2: yuyv format supported, but yuv422 requested." << endl;
-                cerr << "v4l2: unfortunately, this converter hasn't been written yet." << endl;
-                exit(0);
+                VERBOSE(VB_IMPORTANT, "NVR: v4l2: yuyv format supported, but yuv422 requested.");
+                VERBOSE(VB_IMPORTANT, "NVR: v4l2: unfortunately, this converter hasn't been written yet, exiting");
+                exit(-3);
             }
-            cerr << "v4l2: format set, getting yuyv from v4l, converting" << endl;
+            cerr << "NVR: v4l2: format set, getting yuyv from v4l, converting" << endl;
         }
     }
     else
@@ -1185,14 +1185,14 @@ void NuppelVideoRecorder::DoV4L2(void)
 
     if (ioctl(fd, VIDIOC_REQBUFS, &vrbuf) < 0)
     {
-        cerr << "Not able to get any capture buffers\n";
-        exit(-1);
+        VERBOSE(VB_IMPORTANT, "NVR: Not able to get any capture buffers, exiting");
+        exit(-4);
     }
 
     if (vrbuf.count < 5)
     {
-        cerr << "Not enough buffer memory\n";
-        exit(-1);
+        VERBOSE(VB_IMPORTANT, "NVR: Not enough buffer memory, exiting");
+        exit(-5);
     }
 
     numbuffers = vrbuf.count;
@@ -1207,8 +1207,8 @@ void NuppelVideoRecorder::DoV4L2(void)
 
         if (ioctl(fd, VIDIOC_QUERYBUF, &vbuf) < 0)
         {
-            printf("unable to query capture buffer %d\n", i);
-            exit(0);
+            VERBOSE(VB_IMPORTANT, QString("NVR: unable to query capture buffer %1").arg(i));
+            exit(-6);
         }
 
         buffers[i] = (unsigned char *)mmap(NULL, vbuf.length,
@@ -1218,7 +1218,8 @@ void NuppelVideoRecorder::DoV4L2(void)
         if (buffers[i] == MAP_FAILED)
         {
             perror("mmap");
-            exit(-1);
+            VERBOSE(VB_IMPORTANT, QString("NVR: memory map error"));
+            exit(-7);
         }
         bufferlen[i] = vbuf.length;
     }
@@ -3497,7 +3498,7 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
         if (lameret < 0)
         {
             cerr << "lame error '" << lameret << "', exiting\n";
-            exit(-1); 
+            exit(-8); 
         }
         compressedsize = lameret;
 
@@ -3506,7 +3507,7 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
         if (lameret < 0)
         {
             cerr << "lame error - " << lameret << " - exiting\n";
-            exit(-1);
+            exit(-9);
         }
         gaplesssize = lameret;
 

@@ -106,7 +106,7 @@ bool setupTVs(bool ismaster)
                 cerr << msg;
                 gContext->LogEntry("mythbackend", LP_CRITICAL,
                                    "Problem with capture cards", msg);
-                exit(-1);
+                exit(2);
             }
 
             if (!ismaster)
@@ -523,7 +523,7 @@ int main(int argc, char **argv)
         cerr << "No setting found for this machine's BackendServerIP.\n"
              << "Please run setup on this machine and modify the first page\n"
              << "of the general settings.\n";
-        exit(-1);
+        exit(3);
     }
 
     if (masterip == myip)

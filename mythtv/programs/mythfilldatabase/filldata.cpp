@@ -1414,7 +1414,7 @@ void parseFile(QString filename, QValueList<ChanInfo> *chanlist,
     {
         cerr << "Don't use tv_grab_na_dd, use the internal datadirect grabber."
              << endl;
-        exit(-1);
+        exit(14);
     }
 
     QString aggregatedTitle;
@@ -2258,7 +2258,7 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
     char tempfilename[] = "/tmp/mythXXXXXX";
     if (mkstemp(tempfilename) == -1) {
          perror("mkstemp");
-         exit(1);
+         exit(15);
     }
 
     QString filename = QString(tempfilename);
@@ -3220,13 +3220,13 @@ int main(int argc, char *argv[])
                                      "Could not find any defined channel "
                                      "sources - did you run the setup "
                                      "program?");
-                  exit(-1);
+                  exit(16);
              }
         }
         else
         {
              MythContext::DBError("loading channel sources", sourcequery);
-             exit(-1);
+             exit(17);
         }
     
         bool ret = fillData(sourcelist);
@@ -3236,7 +3236,7 @@ int main(int argc, char *argv[])
              cerr << "Failed to fetch some program info\n";
              gContext->LogEntry("mythfilldatabase", LP_WARNING,
                                 "Failed to fetch some program info", "");
-             exit(1);
+             exit(18);
         }
     }
 

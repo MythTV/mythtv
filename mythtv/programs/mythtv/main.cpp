@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
     if (themedir == "")
     {   
         cerr << "Couldn't find theme " << themename << endl;
-        exit(0);
+        return 44; // exit(44)
     }
     
     gContext->LoadQtConfig();
@@ -32,12 +32,12 @@ int main(int argc, char *argv[])
     if (!db)
     {
         printf("Couldn't connect to database\n");
-        return -1; 
+        return 45; // exit(45)
     }       
     if (!gContext->OpenDatabase(db))
     {
         printf("couldn't open db\n");
-        return -1;
+        return 46; // exit(46)
     }
 
     gContext->LoadQtConfig();
@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
     if (auddevice == "" || auddevice == QString::null)
     {
         cerr << "You need to run 'mythfrontend', not 'mythtv'.\n";
-        exit(-1);
+        return 47; // exit(47)
     }
 
     MythMainWindow *mainWindow = new MythMainWindow();
@@ -82,5 +82,5 @@ int main(int argc, char *argv[])
     delete tv;
     delete gContext;
 
-    exit(0);
+    return 0; // exit(0)
 }

@@ -269,7 +269,7 @@ int main(int argc, char *argv[])
                 !strncmp(a.argv()[argpos + 1], "--", 2))
             {
                 printf("missing or invalid parameters for --chanid option\n");
-                exit(-1);
+                exit(7);
             }
             
             chanid += a.argv()[++argpos];
@@ -281,7 +281,7 @@ int main(int argc, char *argv[])
                 !strncmp(a.argv()[argpos + 1], "--", 2))
             {
                 printf("missing or invalid parameters for --starttime option\n");
-                exit(-1);
+                exit(8);
             }
             
             starttime += a.argv()[++argpos];
@@ -459,12 +459,12 @@ int main(int argc, char *argv[])
                     "      if either is used." << endl << endl <<
                     "If no command line arguments are specified, all" << endl <<
                     "unflagged videos will be flagged." << endl << endl;
-            exit(-1);
+            exit(9);
         }
         else
         {
             printf("illegal option: '%s' (use --help)\n", a.argv()[argpos]);
-            exit(-1);
+            exit(10);
         }
 
         ++argpos;
@@ -476,14 +476,14 @@ int main(int argc, char *argv[])
     if (!gContext->OpenDatabase(db))
     {
         printf("couldn't open db\n");
-        exit(-1);
+        exit(11);
     }
 
     if ((chanid.isEmpty() && !starttime.isEmpty()) ||
         (!chanid.isEmpty() && starttime.isEmpty()))
     {
         printf( "You must specify both the Channel ID and the Start Time\n");
-        exit(-1);
+        exit(12);
     }
 
     // be nice to other programs since FlagCommercials() can consume 100% cpu
@@ -568,7 +568,7 @@ int main(int argc, char *argv[])
         else
         {
              MythContext::DBError("Querying recorded programs", recordedquery);
-             exit(-1);
+             exit(13);
         }
     }
 

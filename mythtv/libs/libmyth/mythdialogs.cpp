@@ -1383,7 +1383,7 @@ MythThemedDialog::MythThemedDialog(MythMainWindow *parent, QString window_name,
     {
         cerr << "dialogbox.o: Couldn't find your theme. I'm outta here" << endl;
         cerr << window_name << " - " <<  theme_filename << endl;
-        exit(0);
+        exit(-31);
     }
 
     loadWindow(xmldata);
@@ -1486,7 +1486,7 @@ void MythThemedDialog::loadWindow(QDomElement &element)
             {
                 cerr << "dialogbox.o: I don't understand this DOM Element:" 
                      << e.tagName() << endl;
-                exit(0);
+                exit(-32);
             }
         }
     }
@@ -1508,7 +1508,7 @@ void MythThemedDialog::parseContainer(QDomElement &element)
     {
         cerr << "dialogbox.o: I told an object to parse a container and it "
                 "didn't give me a name back\n";
-        exit(0);
+        exit(-33);
     }
 
     LayerSet *container_reference = theme->GetSet(name);
@@ -2302,7 +2302,7 @@ MythImageFileDialog::MythImageFileDialog(QString *result,
     else
     {
         cerr << "myhdialogs.o: Could not find a UIImageType called file_browser_background in your theme." << endl;
-        exit(0);
+        exit(-34);
     }
 
     //
@@ -2331,7 +2331,7 @@ MythImageFileDialog::MythImageFileDialog(QString *result,
     else
     {
         cerr << "mythdialogs.o: Could not find a UIManagedTreeListType called file_browser in your theme." << endl;
-        exit(0);
+        exit(-35);
     }    
     
     //
@@ -2561,7 +2561,7 @@ MythScrollDialog::MythScrollDialog(MythMainWindow *parent,
     if (!parent) {
         std::cerr << "MythScrollDialog: Trying to create a dialog without a parent"
                   << std::endl;
-        exit(-1);
+        exit(-36);
     }
 
     m_parent     = parent;
@@ -2652,7 +2652,7 @@ void MythScrollDialog::setAreaMultiplied(int areaWTimes, int areaHTimes)
     if (areaWTimes < 1 || areaHTimes < 1) {
         std::cerr << "MythScrollDialog: invalid areaWTimes or areaHTimes"
                   << std::endl;
-        exit(-1);
+        exit(-37);
     }
 
     resizeContents(m_screenWidth*areaWTimes,

@@ -443,8 +443,8 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
 
         if (!foundimageformat)
         {
-            printf("Couldn't find the proper Xv image format\n");
-            exit(0);
+            VERBOSE(VB_IMPORTANT, "Couldn't find the proper Xv image format, exiting");
+            exit(-26);
         }
 
         if (fo)
@@ -932,9 +932,9 @@ void VideoOutputXv::PrepareFrame(VideoFrame *buffer, FrameScanType t)
             case 16: av_format = PIX_FMT_RGB565; break;
             case 24: av_format = PIX_FMT_RGB24;  break;
             case 32: av_format = PIX_FMT_RGBA32; break;
-            default: cerr << "Non Xv mode only supports 16, 24, and 32 bpp "
-                         "displays\n";
-                     exit(0);
+            default: 
+                VERBOSE(VB_IMPORTANT, "Non Xv mode only supports 16, 24, and 32 bpp displays");
+                exit(-27);
         }
 
         avpicture_fill(&image_in, (uint8_t *)image->data, 

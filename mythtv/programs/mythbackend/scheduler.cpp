@@ -86,7 +86,7 @@ void Scheduler::verifyCards(void)
     {
         cerr << "ERROR: no capture cards are defined in the database.\n";
         cerr << "Perhaps you should read the installation instructions?\n";
-        exit(1);
+        exit(5);
     }
 
     thequery = "SELECT sourceid,name FROM videosource ORDER BY sourceid;";

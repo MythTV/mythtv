@@ -1150,7 +1150,7 @@ void ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
         cerr << "Couldn't read menu file " << menuname << endl;
         if (menuname == "mainmenu.xml" )
         {
-            exit(0);
+            exit(-38);
         }
         else
         {
@@ -1178,7 +1178,7 @@ void ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
 
         if (menuname == "mainmenu.xml" )
         {
-            exit(0);
+            exit(-39);
         }
 
         MythPopupBox::showOkPopup(gContext->GetMainWindow(), 
@@ -1214,7 +1214,7 @@ void ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
             else
             {
                 cerr << "Unknown element " << e.tagName() << endl;
-                exit(1);
+                exit(-40);
             }
         }
         n = n.nextSibling();
@@ -1223,7 +1223,7 @@ void ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
     if (buttonList.size() == 0)
     {
         cerr << "No buttons for menu " << menuname << endl;
-        exit(1);
+        exit(-41);
     }
 
     layoutButtons();
@@ -1350,13 +1350,13 @@ void ThemedMenuPrivate::layoutButtons(void)
     if (maxrows < 2)
     {
         cerr << "Must have room for at least 2 rows of buttons\n";
-        exit(1);
+        exit(-43);
     }
     
     if (columns < 1)
     {
         cerr << "Must have room for at least 1 column of buttons\n";
-        exit(1);
+        exit(-44);
     }
 
     // keep the rows balanced

@@ -209,8 +209,8 @@ TV::TV(void)
 
     if (!m_db || !m_db->isOpen())
     {
-        VERBOSE(VB_ALL, "Couldn't open DB connection in player, exiting");
-        exit(-1);
+        VERBOSE(VB_IMPORTANT, "TV: Couldn't open DB connection in player, exiting");
+        exit(-18);
     }
     
     repoLevel = gContext->GetNumSetting("TVRepositionLevel", 2);
@@ -627,8 +627,8 @@ void TV::HandleStateChange(void)
 
     if (nextState == kState_Error)
     {
-        printf("ERROR: Attempting to set to an error state.\n");
-        exit(-1);
+        VERBOSE(VB_IMPORTANT, "TV: Attempting to set to an error state, exiting");
+        exit(-19);
     }
 
     if (internalState == kState_None && nextState == kState_WatchingLiveTV)

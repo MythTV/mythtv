@@ -1001,9 +1001,8 @@ void NuppelDecoder::GetFrame(int avignore)
                     }
                     else if (lameret < 0)
                     {
-                        cerr << "lame decode error: " << lameret 
-                             << ", exiting\n";
-                        exit(-1);
+                        VERBOSE(VB_IMPORTANT, QString("lame decode error: %1, exiting").arg(lameret));
+                        exit(-15);
                     }
                     packetlen = 0;
                 } while (lameret > 0);

@@ -859,8 +859,8 @@ OSDListBtnTypeItem::OSDListBtnTypeItem(OSDListBtnType* lbtype,
                                        bool showArrow, CheckState state)
 {
     if (!lbtype) {
-        cerr << "OSDListBtnTypeItem: trying to creating item without parent\n";
-        exit(-1);
+        VERBOSE(VB_IMPORTANT, "OSDListBtnTypeItem: trying to creating item without parent");
+        exit(-16);
     }
     
     m_parent    = lbtype;

@@ -312,14 +312,14 @@ void XMLParse::parseAnimatedImage(LayerSet *container, QDomElement &element)
     if (name.isNull() || name.isEmpty())
     {
         cerr << "Animated Image needs a name\n";
-        exit(0);
+        exit(-46);
     }
 
     QString order = element.attribute("draworder", "");
     if (order.isNull() || order.isEmpty())
     {
         cerr << "Animated Image needs an order\n";
-        exit(0);
+        exit(-47);
     }
 
     QString filename = "";
@@ -374,7 +374,7 @@ void XMLParse::parseAnimatedImage(LayerSet *container, QDomElement &element)
             else
             {
                 cerr << "Unknown: " << info.tagName() << " in image\n";
-                exit(0);
+                exit(-49);
             }
         }
     }

@@ -445,7 +445,8 @@ void DataDirectProcessor::grabData(bool plineupsOnly, QDateTime pstartDate,
     if (mkstemp(ctempfilename) == -1) 
     {
          perror("mkstemp");
-         exit(1);
+         VERBOSE(VB_IMPORTANT, "DDP: error creating temp files");
+         exit(-12);
     }
 
     QString tmpfilename = QString(ctempfilename);

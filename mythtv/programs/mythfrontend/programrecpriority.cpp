@@ -132,7 +132,7 @@ ProgramRecPriority::ProgramRecPriority(QSqlDatabase *ldb, MythMainWindow *parent
     else
     {
         cerr << "MythFrontEnd: ProgramRecPriority - Failed to get selector object.\n";
-        exit(0);
+        exit(27);
     }
 
     bgTransBackup = gContext->LoadScalePixmap("trans-backup.png");
@@ -258,7 +258,7 @@ void ProgramRecPriority::LoadWindow(QDomElement &element)
             else
             {
                 cerr << "Unknown element: " << e.tagName() << endl;
-                exit(0);
+                exit(28);
             }
         }
     }

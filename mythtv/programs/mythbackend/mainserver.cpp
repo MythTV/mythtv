@@ -549,7 +549,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         if (iter == encoderList->end())
         {
             VERBOSE(VB_ALL, "Unknown encoder.");
-            exit(1);
+            exit(4);
         }
 
         EncoderLink *enc = iter.data();

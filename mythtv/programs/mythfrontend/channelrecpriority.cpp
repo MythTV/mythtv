@@ -70,7 +70,7 @@ ChannelRecPriority::ChannelRecPriority(QSqlDatabase *ldb,
     else
     {
         cerr << "MythFrontEnd: ChannelRecPriority - Failed to get selector.\n";
-        exit(0);
+        exit(19);
     }
 
     bgTransBackup = gContext->LoadScalePixmap("trans-backup.png");
@@ -189,7 +189,7 @@ void ChannelRecPriority::LoadWindow(QDomElement &element)
             else
             {
                 cerr << "Unknown element: " << e.tagName() << endl;
-                exit(0);
+                exit(20);
             }
         }
     }

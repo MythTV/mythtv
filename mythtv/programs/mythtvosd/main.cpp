@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
     if (a.argc() == 0)
     {
         printHelp();
-        exit(0);
+        return 0; // exit(0)
     }
 
     for (int argpos = 1; argpos < a.argc(); ++argpos)
@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
         if (arg.startsWith("-h") || arg.startsWith("--help"))
         {
             printHelp();
-            exit(0);
+            return 0; // exit(0)
         }
 
         if (arg.startsWith("--template="))
@@ -113,7 +113,7 @@ int main(int argc, char *argv[])
         cerr << "--template=<value> argument is required\n"
              << "  <value> can be 'alert', 'cid', 'scroller', or a "
              << "filename of a template\n";
-        exit(-1);
+        return 48; // exit(48)
     }
 
     if (templatearg == "cid")
@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
         if (!mfile.open(IO_ReadOnly))
         {
             cerr << "Unable to open template file '" << templatearg << "'\n";
-            exit(-2);
+            return 49; // exit(49)
         }
 
         QByteArray mdata = mfile.readAll();
@@ -190,7 +190,7 @@ int main(int argc, char *argv[])
         < 0)
     {
         perror("Set broadcast");
-        exit(-3);
+        return 50; // exit(50)
     }
 
     QCString utf8 = message.utf8();
@@ -206,6 +206,6 @@ int main(int argc, char *argv[])
              << " and port: " << port << endl;
     }
    
-    return 0;
+    return 0; // exit(0)
 }
 

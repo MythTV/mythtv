@@ -1485,7 +1485,7 @@ UIListBtnTypeItem::UIListBtnTypeItem(UIListBtnType* lbtype, const QString& text,
     if (!lbtype) {
         std::cerr << "UIListBtnTypeItem: trying to creating item without parent"
                   << std::endl;
-        exit(-1);
+        exit(-45);
     }
     
     m_parent    = lbtype;

@@ -41,7 +41,7 @@ void performActualUpdate(const QString updates[], QString version,
                  << thequery << endl
                  << MythContext::DBErrorMessage(db_conn->lastError()) << endl;
 
-            exit(-1);
+            exit(-13);
         }
 
         counter++;
@@ -988,7 +988,7 @@ void InitializeDatabase(void)
              << "\r\nhas " << qQuery.numRowsAffected() << " tables.\r\n";
         cerr << "If you are sure this is a good mythtv database, verify\r\n"
              << "that the settings table has the DBSchemaVer variable.\r\n";
-        exit(1);
+        exit(-14);
     }
 
     VERBOSE(VB_ALL, "Inserting MythTV initial database information.");

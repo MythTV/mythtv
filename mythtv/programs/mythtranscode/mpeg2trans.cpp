@@ -105,7 +105,7 @@ void GetBits::MarkerBit(void)
     if (! GetNext(1))
     {
         cerr <<  "Marker bit was not valid!\n";
-        exit(1);
+        exit(31);
     }
 }
 
@@ -203,7 +203,7 @@ void MPEG2trans::write_muxed_frame(AVStream *stream, AVPacket *pkt, int advance,
         if (audioPool.isEmpty() )
         {
             cerr << "Ran out of audio buffers!\n";
-            exit(1);
+            exit(32);
         }
         DPRINTF(1, "AUDMUX : %d buffers left\n", audioPool.count());
     }
@@ -222,7 +222,7 @@ void MPEG2trans::write_muxed_frame(AVStream *stream, AVPacket *pkt, int advance,
         if (videoPool.isEmpty())
         {
             cerr << "Ran out of video buffers!\n";
-            exit(1);
+            exit(33);
         }
         DPRINTF(1, "VIDMUX : %d buffers left\n", videoPool.count());
     }
@@ -249,7 +249,7 @@ void MPEG2trans::write_muxed_frame(AVStream *stream, AVPacket *pkt, int advance,
         if (av_set_parameters(outputContext, NULL) < 0)
         {
             cerr << "Invalid output format parameters\n";
-            exit(1);
+            exit(34);
         }
         /* write the stream header, if any */
         av_write_header(outputContext);
@@ -273,7 +273,7 @@ void MPEG2trans::write_muxed_frame(AVStream *stream, AVPacket *pkt, int advance,
                                buf->getData(), buf->getSize()) != 0)
             {
                 cerr << "Error while writing audio frame\n";
-                exit(1);
+                exit(35);
             }
             DPRINTF(1, "AUDIO PTS (initial): %lld (stored): %lld\n", buf->getPTS(), PTS2INT(audioout_st->pts));
 //            DPRINTF(1, "AUDIO PTS (initial): %lld (stored): %lld %d\n", orig, PTS2INT(audioout_st->pts), outputContext->pts_den);
@@ -291,7 +291,7 @@ void MPEG2trans::write_muxed_frame(AVStream *stream, AVPacket *pkt, int advance,
             if (av_write_frame(outputContext, videoout_st->index, buf->getData(), buf->getSize()) != 0)
             {
                 cerr << "Error while writing audio frame\n";
-                exit(1);
+                exit(36);
             }
             DPRINTF(1, "VIDEO PTS (initial): %lld (stored): %lld\n", buf->getPTS(), PTS2INT(videoout_st->pts));
             vidpts += PTS2INT(videoout_st->pts) - bufpts;
@@ -684,11 +684,11 @@ int MPEG2trans::DoTranscode(QString inputFilename, QString outputFilename)
        < 0) {
      cerr << "failed to open file '" << inputFilename 
           << "' errcode: " << err << "\n";
-     exit(1);
+     exit(37);
    }
    if (av_find_stream_info(inputContext) < 0) {
      cerr << "Couldn't find stream paramters for ' " << inputFilename << "'\n";
-     exit(1);
+     exit(38);
    }
    for(i = 0; i < inputContext->nb_streams; i++) {
      AVCodecContext *enc = &inputContext->streams[i]->codec;
@@ -720,14 +720,14 @@ int MPEG2trans::DoTranscode(QString inputFilename, QString outputFilename)
     fmt = guess_format("vob", NULL, NULL);
     if (!fmt) {
         cerr << "Could not find suitable output format\n";
-        exit(1);
+        exit(39);
     }
    
     /* allocate the output media context */
     outputContext = (AVFormatContext *)av_mallocz(sizeof(AVFormatContext));
     if (!outputContext) {
         cerr << "Memory error\n";
-        exit(1);
+        exit(40);
     }
     outputContext->oformat = fmt;
     snprintf(outputContext->filename,
@@ -747,7 +747,7 @@ int MPEG2trans::DoTranscode(QString inputFilename, QString outputFilename)
     /* open the output file, if needed */
     if (url_fopen(&outputContext->pb, outputFilename, URL_WRONLY) < 0) {
             cerr << "Could not open '" << outputFilename << "'\n";
-            exit(1);
+            exit(41);
     }
     
    }
@@ -969,11 +969,11 @@ void MPEG2trans::BuildKeyframeIndex(QString filename, QMap <long long, long long
     if ((err = av_open_input_file(&inputContext, filename, NULL, 0, ap)) < 0) {
         cerr << "failed to open file '" << filename 
              << "' errcode: " << err << "\n";
-        exit(1);
+        exit(42);
     }
     if (av_find_stream_info(inputContext) < 0) {
         cerr << "Couldn't find stream paramters for ' " << filename << "'\n";
-        exit(1);
+        exit(43);
     }
     for(i = 0; i < inputContext->nb_streams; i++) {
         AVCodecContext *enc = &inputContext->streams[i]->codec;

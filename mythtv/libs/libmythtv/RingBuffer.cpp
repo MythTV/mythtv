@@ -135,7 +135,7 @@ ThreadedFileWriter::ThreadedFileWriter(const char *filename,
         /* oops! */
         VERBOSE(VB_IMPORTANT,"ERROR opening file in ThreadedFileWriter.");
         perror(filename);
-        exit(1);
+        exit(-10);
     }
     else
     {

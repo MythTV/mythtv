@@ -89,7 +89,7 @@ TVRec::TVRec(int capturecardnum)
                               "but no DVB support compiled in!");
         VERBOSE(VB_IMPORTANT, "Remove the card from configuration, "
                               "or recompile MythTV.");
-        exit(-1);
+        exit(-20);
 #endif
     }
     else if ((cardtype == "MPEG") && (videodev.lower().left(5) == "file:"))
@@ -391,8 +391,8 @@ void TVRec::HandleStateChange(void)
 
     if (nextState == kState_Error)
     {
-        printf("ERROR: Attempting to set to an error state.\n");
-        exit(-1);
+        VERBOSE(VB_IMPORTANT, "TVRec: Attempting to set to an error state, exiting");
+        exit(-21);
     }
 
     if (tmpInternalState == kState_None && nextState == kState_WatchingLiveTV)

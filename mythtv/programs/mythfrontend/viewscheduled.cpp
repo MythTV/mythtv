@@ -56,7 +56,7 @@ ViewScheduled::ViewScheduled(QSqlDatabase *ldb, MythMainWindow *parent,
     else
     {
         cerr << "MythFrontEnd: ViewSchedule - Failed to get selector object.\n";
-        exit(0);
+        exit(29);
     }
 
     updateBackground();
@@ -157,7 +157,7 @@ void ViewScheduled::LoadWindow(QDomElement &element)
             else
             {
                 cerr << "Unknown element: " << e.tagName() << endl;
-                exit(0);
+                exit(30);
             }
         }
     }

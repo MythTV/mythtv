@@ -68,8 +68,8 @@ VideoOutput *VideoOutput::InitVideoOut(VideoOutputType type)
     return new VideoOutputXv();
 #endif
 
-    VERBOSE(VB_ALL, "Not compiled with any useable video output method.");
-    exit(-1);
+    VERBOSE(VB_IMPORTANT, "Not compiled with any useable video output method.");
+    exit(-28);
 }
 
 VideoOutput::VideoOutput()
