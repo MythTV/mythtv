@@ -48,7 +48,13 @@ void MFDBasePlugin::warning(const QString &warning_message)
         QString warn_string = QString("WARNING: %1 plugin %2")
                               .arg(name)
                               .arg(warning_message);
-        log(warn_string, 1);
+        log_mutex.lock();
+            if(parent)
+            {
+                LoggingEvent *le = new LoggingEvent(warn_string, 1);
+                QApplication::postEvent(parent, le);    
+            }
+        log_mutex.unlock();
     warning_mutex.unlock();
 }
 
@@ -146,7 +152,7 @@ MFDCapabilityPlugin::MFDCapabilityPlugin(MFD* owner, int identifier, const QStri
 
 void MFDCapabilityPlugin::doSomething(const QStringList &, int)
 {
-    cerr << "Base mfdplugin's class doSomething() method was called. " << endl;
+    warning("Base mfdplugin's class doSomething() method was called.");
 }
 
 
@@ -476,7 +482,7 @@ void MFDServicePlugin::readClients()
                             thread_pool_mutex.unlock();
                             ++thread_pool_size;
                             log(QString("added another request thread on demand (there are now %1 of them)")
-                                .arg(thread_pool_size), 2);
+                                .arg(thread_pool_size), 1);
                         
                         }
                         else
@@ -612,7 +618,7 @@ void MFDServicePlugin::waitForSomethingToHappen()
                     delete srt;
                     srt = NULL;
                     log(QString("thread pool reduced by one due to lack of demand (size is now %1)")
-                        .arg(thread_pool_size), 2);
+                        .arg(thread_pool_size), 1);
                 }
             thread_pool_mutex.unlock();
         }

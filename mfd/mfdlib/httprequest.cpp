@@ -102,7 +102,7 @@ HttpRequest::HttpRequest(MFDHttpPlugin *owner, char *raw_incoming, int incoming_
     
     if(incoming_length > MAX_CLIENT_INCOMING)
     {
-        cerr << "httprequest.o: http request too big .. this should not happen" << endl;
+        parent->warning("http request too big .. this should not happen");
         all_is_well = false;
         return;
     }
@@ -142,10 +142,8 @@ HttpRequest::HttpRequest(MFDHttpPlugin *owner, char *raw_incoming, int incoming_
 
             if(line_tokens.count() < 3)
             {
-                cerr << "httprequest.o: got a malformed first line: \"" 
-                     << top_line 
-                     << "\"" 
-                     << endl;
+                parent->warning(QString("httprequest got a malformed first line: \"%1\"")
+                        .arg(top_line));
                 all_is_well = false;
                 return;
             }
@@ -153,11 +151,9 @@ HttpRequest::HttpRequest(MFDHttpPlugin *owner, char *raw_incoming, int incoming_
             {
                 if(line_tokens[0] != "GET")
                 {
-                    cerr << "httprequest.o: only know how to do \"GET\" "
-                         << "requests, but got a \"" 
-                         << line_tokens[0] 
-                         << "\" request" 
-                         << endl;
+                    parent->warning(QString("httprequest only knows how to do \"GET\" "
+                                    "requests, but got a \"%1\" request")
+                                    .arg(line_tokens[0])); 
                     all_is_well = false;
                     return;
                 }
@@ -190,11 +186,9 @@ HttpRequest::HttpRequest(MFDHttpPlugin *owner, char *raw_incoming, int incoming_
                 QStringList protocol_and_version = QStringList::split( "/", line_tokens[2]);
                 if(protocol_and_version.count() != 2)
                 {
-                    cerr << "httprequest.o: bad protocol and version in request ... "
-                         << "should be \"HTTP/1.1\" but got \""
-                         <<  line_tokens[2]
-                         << "\""
-                         << endl; 
+                    parent->warning(QString("httprequest got bad protocol and version in request ... "
+                                    "should be \"HTTP/1.1\" but got \"%1\"")
+                                    .arg(line_tokens[2]));
                     all_is_well = false;
                     return;
                 }
@@ -202,21 +196,17 @@ HttpRequest::HttpRequest(MFDHttpPlugin *owner, char *raw_incoming, int incoming_
                 {
                     if(protocol_and_version[0] != "HTTP")
                     {
-                        cerr << "httprequest.o: bad protocol "
-                             << "should be \"HTTP\" but got \""
-                             <<  protocol_and_version[0]
-                             << "\""
-                             << endl; 
+                        parent->warning(QString("httprequest got bad protocol "
+                                                "should be \"HTTP\" but got \"%1\"")
+                                                .arg(protocol_and_version[0]));
                         all_is_well = false;
                         return;
                     }
                     if(protocol_and_version[1] != "1.1")
                     {
-                        cerr << "httprequest.o: bad http version "
-                             << "should be \"1.1\" but got \""
-                             <<  protocol_and_version[1]
-                             << "\""
-                             << endl; 
+                        parent->warning(QString("httprequest got bad http version "
+                                                "should be \"1.1\" but got \"%1\"")
+                                                .arg(protocol_and_version[1]));
                         all_is_well = false;
                         return;
                     }
