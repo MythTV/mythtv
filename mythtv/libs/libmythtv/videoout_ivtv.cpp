@@ -318,6 +318,9 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
 
             usleep(20000);
 
+            osdcoords.lines = 480;
+            osdcoords.pixel_stride = 720 * 2;
+
             ioctl(fbfd, IVTVFB_IOCTL_SET_ACTIVE_BUFFER, &osdcoords);
 
             bufferuse = !bufferuse;
