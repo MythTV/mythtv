@@ -1773,24 +1773,24 @@
 
     <font name="info" face="Arial">
       <color>#ffffff</color>
-      <size>17</size>
+      <size>22</size>
       <size:small>10</size:small>
-      <shadow>1,1</shadow>
+      <shadow>2,2</shadow>
     </font>
 
     <font name="infob" face="Arial">
       <color>#ffffff</color>
-      <size>17</size>
+      <size>20</size>
       <size:small>10</size:small>
-      <shadow>1,1</shadow>
+	<shadow>2,2</shadow>
       <bold>yes</bold>
     </font>
 
     <font name="message" face="Arial">
       <color>#ffffff</color>
-      <size>17</size>
+      <size>22</size>
       <size:small>12</size:small>
-      <shadow>3,3</shadow>
+      <shadow>2,2</shadow>
       <bold>yes</bold>
     </font>
 
@@ -1812,7 +1812,7 @@
 	<fcnfont name="enabled_state_0_font" function="enabled_state_0"></fcnfont>
         <columnpadding>1</columnpadding>
         <column number="1" width="745" context="-1"></column>
-        <items>10</items>
+        <items>8</items>
         <image function="selectionbar" filename="rk-selectbar.png" location="-6,-2"></image>
         <image function="uparrow" filename="uparrow.png" location="755,15"></image>
         <image function="downarrow" filename="downarrow.png" location="755,235"></image>
@@ -1830,7 +1830,7 @@
         <font>title</font>
       </textarea>
       <textarea name="subtitle" draworder="6">
-        <area>20,38,579,30</area>
+        <area>20,34,579,30</area>
         <font>subtitle</font>
       </textarea>
       <textarea name="infotime" draworder="6" align="right">
@@ -1865,5 +1865,7 @@
 
 
   </window>
+
+
 
 </mythuitheme>

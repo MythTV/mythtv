@@ -184,7 +184,7 @@ ManagedListGroup::ManagedListGroup(const QString& txt, ManagedListGroup* pGroup,
     parentGroup = pGroup;
     if(pGroup)
     {
-        goBack = new ManagedListItem(tr("Go Back..."), parentList, this, "goBack");
+        goBack = new ManagedListItem(QString("[ %1 ]").arg(QObject::tr("Go Back")), parentList, this, "goBack");
         goBack->setValue("__NO_VALUE__");
         goBack->setState(MLS_BOLD);
         goBack->setEnabled(true);
@@ -224,9 +224,13 @@ bool ManagedListGroup::addItem(ManagedListItem* item, int where)
         
     if(!child(item->name()) && !item->parent())
         insertChild(item);
-                   
-    if(where < 0)
+    
+    int listSize = itemList.count();
+                       
+    if((where == -2) || (listSize ==0))
         itemList.append(item);
+    else if(where == -1)
+        itemList.insert(itemList.count() - 1, item);
     else 
         itemList.insert(where, item);
     
@@ -264,7 +268,7 @@ void ManagedListGroup::clear()
     
     if(parentGroup)
     {
-        goBack = new ManagedListItem(tr("Go Back..."), parentList, this, "goBack");
+        goBack = new ManagedListItem(QString("[ %1 ]").arg(QObject::tr("Go Back")), parentList, this, "goBack");
         goBack->setValue("__NO_VALUE__");
         addItem(goBack);
         connect(goBack, SIGNAL(selected(ManagedListItem*)), this, SLOT(doGoBack()));
@@ -294,6 +298,7 @@ SelectManagedListItem::SelectManagedListItem(const QString& baseTxt, ManagedList
                      : ManagedListGroup(baseTxt, pGroup, pList, _parent, _name)
 {
     baseText = baseTxt;
+    goBack->setText(QString("[ %1 ]").arg(QObject::tr("No Change")));
 }
         
 void SelectManagedListItem::addSelection(const QString& label, QString value, bool select)
@@ -365,8 +370,8 @@ void SelectManagedListItem::cursorRight(bool page)
         return;
 
     ++curItem;
-    if(curItem >= itemCount)
-        curItem = 1;
+    if(curItem >= (itemCount-1))
+        curItem = 0;
     
     text = getCurItemText();
     valueText = getCurItemValue();
@@ -380,8 +385,8 @@ void SelectManagedListItem::cursorLeft(bool page)
         return;
 
     --curItem;
-    if(curItem < 1)
-        curItem =  itemCount - 1;
+    if(curItem < 0)
+        curItem =  itemCount - 2;
     
     text = getCurItemText();
     valueText = getCurItemValue();
@@ -436,7 +441,7 @@ void SelectManagedListItem::itemSelected(ManagedListItem* itm)
     if(curItem == 0)
         curItem = lastItem;
     else
-        text = itm->getText() + "...";
+        text = QString( "[ %1 ]").arg(itm->getText());
     
     changed();    
     doGoBack();

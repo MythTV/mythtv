@@ -10,18 +10,29 @@ class RootSRGroup : public ManagedListGroup
 {
     Q_OBJECT
     public:
-        RootSRGroup(ScheduledRecording& _rec,ManagedList* _parentList=NULL, QObject* _parent=NULL);
+        RootSRGroup(ScheduledRecording& _rec, ManagedList* _parentList=NULL, QObject* _parent=NULL);
         void setDialog(MythDialog* dlg);
+        
+        class SRSchedOptionsGroup* getSchedOptions() {return schedOptions;}
+        class SRStorageOptionsGroup* getStorageOptions() {return storageOptions;}
+        
      
      public slots:
         void itemChanged(ManagedListItem*);
         
      protected:
+         
          ScheduledRecording& schedRec;
+         
          DialogDoneListItem* cancelItem;
          DialogDoneListItem* recordAsShownItem;
          ManagedListItem* upcomingButton;         
+         
+         class SRSchedOptionsGroup* schedOptions;
+         class SRStorageOptionsGroup* storageOptions;
+         
          class SRRecordingType* recType;
+#if 0         
          class SRProfileSelector* profile;
          class SRDupSettingsGroup* dupSettings;
          class SROffsetGroup* offsetGroup;
@@ -29,5 +40,6 @@ class RootSRGroup : public ManagedListGroup
          class SRRecPriority* recPriority;
          class SREpisodesGroup* episodes;
          class SRRecGroup* recGroup;
+#endif
 };
 #endif

@@ -3,8 +3,10 @@
 
 #include "settings.h"
 #include <qdatetime.h>
-
+#include "managedlist.h"
 #include <list>
+
+
 using namespace std;
 
 enum RecordingType
@@ -49,14 +51,55 @@ enum RecSearchType
 
 class ProgramInfo;
 class QSqlDatabase;
+
+class RootSRGroup;
+class RecOptDialog;
+
+
+class SRRecordingType;
+class SRRecSearchType;
+class SRProfileSelector;
+class SRDupIn;
+class SRDupMethod;
+class SRAutoExpire;
+class SRStartOffset;
+class SREndOffset;
+class SRMaxEpisodes;
+class SRMaxNewest;
+class SRChannel;
+class SRStation;
+class SRTitle;
+class SRSubtitle;
+class SRDescription;
+class SRStartTime;
+class SRStartDate;
+class SREndTime;
+class SREndDate;
+class SRCategory;
+class SRRecPriority;
+class SRRecGroup;
+class SRSeriesid;
+class SRProgramid;
+
+
+
+
+
+
 class ScheduledRecording: public ConfigurationGroup, public ConfigurationDialog {
     Q_OBJECT
 public:
     ScheduledRecording();
-    //ScheduledRecording(const ScheduledRecording& other);
+    ScheduledRecording(const ScheduledRecording& other);
 
     virtual void load(QSqlDatabase* db);
+    
+    virtual MythDialog* dialogWidget(MythMainWindow* parent,
+                                     const char* widgetName=0);    
+    
     void makeOverride(void);
+    ProgramInfo* getProgramInfo() { return m_pginfo; }
+    RootSRGroup* getRootGroup() { return rootGroup; }
 
     RecordingType getRecordingType(void) const;
     void setRecordingType(RecordingType);
@@ -73,16 +116,14 @@ public:
     void setRecPriority(int recpriority);
     void setRecGroup(const QString& recgroup);
 
-    virtual MythDialog* dialogWidget(MythMainWindow *parent, 
-                                     const char *name = 0);
+    
     virtual void save(QSqlDatabase* db);
 
-    void loadByID(QSqlDatabase* db, int id);
-    void loadByProgram(QSqlDatabase* db, ProgramInfo* proginfo);
-    void loadBySearch(QSqlDatabase *db, RecSearchType lsearch, QString what);
+    virtual void loadByID(QSqlDatabase* db, int id);
+    virtual void loadByProgram(QSqlDatabase* db, ProgramInfo* proginfo);
+    virtual void loadBySearch(QSqlDatabase *db, RecSearchType lsearch, QString what);
 
-    int exec(QSqlDatabase* db, bool saveOnExec = true, bool doLoad = false)
-        { return ConfigurationDialog::exec(db, saveOnExec, doLoad); }
+    //virtual int exec(QSqlDatabase* db, bool saveOnExec = true, bool doLoad = false);
 
     void remove(QSqlDatabase* db);
     int getRecordID(void) const { return id->intValue(); };
@@ -104,30 +145,57 @@ public:
 
     static bool hasChanged(QSqlDatabase* db);
 
-    static void ScheduledRecording::fillSelections(QSqlDatabase* db, SelectSetting* setting);
+    static void fillSelections(QSqlDatabase* db, SelectSetting* setting);
 
     static void signalChange(QSqlDatabase* db);
+    
+    void setRecTypeObj(SRRecordingType* val) {type = val;}
+    void setSearchTypeObj(SRRecSearchType* val) {search = val;}
+    void setProfileObj( SRProfileSelector* val) {profile = val;}
+    void setDupInObj(SRDupIn* val) {dupin = val;}
+    void setDupMethodObj(SRDupMethod* val) {dupmethod = val;}
+    void setAutoExpireObj(SRAutoExpire* val) {autoexpire = val;}
+    void setStartOffsetObj(SRStartOffset* val) {startoffset = val;}
+    void setEndOffsetObj(SREndOffset* val) {endoffset = val;}
+    void setMaxEpisodesObj(SRMaxEpisodes* val) {maxepisodes = val;}
+    void setMaxNewestObj(SRMaxNewest* val) {maxnewest = val;}
+    void setChannelObj(SRChannel* val) {channel = val;}
+    void setStationObj(SRStation* val) {station = val;}
+    void setTitleObj(SRTitle* val) {title = val;}
+    void setSubTitleObj(SRSubtitle* val) {subtitle = val;}
+    void setDescriptionObj(SRDescription* val) {description = val;}
+    void setStartTimeObj(SRStartTime* val) {startTime = val;}
+    void setStartDateObj(SRStartDate* val) {startDate = val;}
+    void setEndTimeObj(SREndTime* val) {endTime = val;}
+    void setEndDateObj(SREndDate* val) {endDate = val;}
+    void setCategoryObj(SRCategory* val) {category = val;}
+    void setRecPriorityObj(SRRecPriority* val) {recpriority = val;}
+    void setRecGroupObj(SRRecGroup* val) {recgroup = val;}
+    void setSeriesIDObj(SRSeriesid* val) {seriesid = val;}
+    void setProgramIDObj(SRProgramid* val) {programid = val;}
+    
+    void ToMap(QMap<QString, QString>& infoMap);
+    
+    QString ChannelText(QString format);
 
 protected slots:
-    void setAvailableOptions(const QString& newValue)
-                             { setAvailableOptions(); };
-    void setAvailableOptions(int newValue)
-                             { setAvailableOptions(); };
-    void setAvailableOptions(void);
     void runProgList();
 
-private:
-    void setDefault(QSqlDatabase *db, bool haschannel);
-    void setProgram(ProgramInfo *proginfo);
-
+protected:
+    virtual void setDefault(QSqlDatabase *db, bool haschannel);
+    virtual void setProgram(ProgramInfo *proginfo);
+    void fetchChannelInfo(QSqlDatabase *db);
+    
     class ID: virtual public IntegerSetting,
-              public AutoIncrementStorage {
-    public:
-        ID():
-            AutoIncrementStorage("record", "recordid") {
-            setName("RecordID");
-            setVisible(false);
-        };
+              public AutoIncrementStorage 
+    {
+        public:
+            ID()
+               : AutoIncrementStorage("record", "recordid") 
+            {
+                setName("RecordID");
+                setVisible(false);
+            }
     };
 
     ID* id;
@@ -155,22 +223,22 @@ private:
     class SRRecGroup* recgroup;
     class SRSeriesid* seriesid;
     class SRProgramid* programid;
-
-    QWidget *typeWidget;
-    QWidget *profileWidget;
-    QWidget *recpriorityWidget;
-    QWidget *autoexpireWidget;
-    QWidget *recgroupWidget;
-    QWidget *startoffsetWidget;
-    QWidget *endoffsetWidget;
-    QWidget *maxepisodesWidget;
-    QWidget *maxnewestWidget;
-    QWidget *dupinWidget;
-    QWidget *dupmethodWidget;
-    MythPushButton *proglistButton;
-
+    
     ProgramInfo* m_pginfo;
+    RootSRGroup* rootGroup;
+    RecOptDialog* m_dialog;
+    QString chanstr;
+    QString chansign;
+    QString channame;
+    QString channelFormat;
+    QString longChannelFormat;
 };
+
+
+
+
+
+
 
 class ScheduledRecordingEditor: public ListBoxSetting, public ConfigurationDialog {
     Q_OBJECT
@@ -189,5 +257,6 @@ protected slots:
 protected:
     QSqlDatabase* db;
 };
+
 
 #endif

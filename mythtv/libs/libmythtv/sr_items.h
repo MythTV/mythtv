@@ -161,7 +161,8 @@ class SRRecordingType : public SRSelectSetting
 {
     public:
         SRRecordingType(ScheduledRecording& _parent, ManagedList* _list, ManagedListGroup* _group)
-            : SRSelectSetting(_parent, "typeList", "Select recording schedule...", _group, "type", _list) 
+            : SRSelectSetting(_parent, "typeList", QString("[ %1 ]").arg(QObject::tr("Select Recording Schedule")), 
+                              _group, "type", _list) 
         {
             _parent.setRecTypeObj(this);
         }
@@ -206,6 +207,8 @@ class SRStartOffset : public SRBoundedIntegerSetting
             setTemplates("Start recording %1 minutes late", "Start recording %1 minute late", "Start recording on time", 
                          "Start recording %1 minute early", "Start recording %1 minutes early");
             setShortTemplates(" %1 minutes late", " %1 minute late", "on time", " %1 minute early", " %1 minutes early");
+            
+            _parent.setStartOffsetObj(this);
         }
 };
 
@@ -220,6 +223,8 @@ class SREndOffset : public SRBoundedIntegerSetting
             setTemplates("End recording %1 minutes early", "End recording %1 minute early", "End recording on time", 
                          "End recording %1 minute late", "End recording %1 minutes late");
             setShortTemplates("%1 minutes early", "%1 minute early", "on time", "%1 minute late", "%1 minutes late");
+            
+            _parent.setEndOffsetObj(this);
         }
 };
 
@@ -228,12 +233,13 @@ class SRDupIn : public SRSelectSetting
 {
     public:
         SRDupIn(ScheduledRecording& _parent, ManagedList* _list, ManagedListGroup* _group)
-            : SRSelectSetting(_parent, "dupInList", "Check for duplicates in...", _group, "dupin", _list ) 
+            : SRSelectSetting(_parent, "dupInList", "[ Check for duplicates in ]", _group, "dupin", _list ) 
         {
             addSelection("Look for duplicates in current and previous recordings", kDupsInAll);
             addSelection("Look for duplicates in current recordings only", kDupsInRecorded);
             addSelection("Look for duplicates in previous recordings only", kDupsInOldRecorded);
             setValue(kDupsInAll);
+            _parent.setDupInObj(this);
         }
 };
 
@@ -242,13 +248,14 @@ class SRDupMethod: public SRSelectSetting
 {
     public:
         SRDupMethod(ScheduledRecording& _parent, ManagedList* _list, ManagedListGroup* _group)
-            : SRSelectSetting(_parent, "dupMethodList", "Match duplicates with...", _group, "dupmethod", _list) 
+            : SRSelectSetting(_parent, "dupMethodList", "[ Match duplicates with ]", _group, "dupmethod", _list) 
         {
             addSelection("Match duplicates using subtitle & description", kDupCheckSubDesc);
             addSelection("Match duplicates using subtitle", kDupCheckSub);
             addSelection("Match duplicates using description", kDupCheckDesc);
             addSelection("Don't match duplicates", kDupCheckNone);
             setValue(kDupCheckSubDesc);
+            _parent.setDupMethodObj(this);
         }
 };
 
@@ -266,7 +273,7 @@ class SRRecSearchType: public IntegerSetting, public SimpleSRSetting
 class SRProfileSelector: public SRSelectSetting {
     public:
         SRProfileSelector(ScheduledRecording& _parent, ManagedList* _list, ManagedListGroup* _group)
-            : SRSelectSetting(_parent, "profileList", "Select recording Profile...", _group, "profile", _list ) 
+            : SRSelectSetting(_parent, "profileList", "[ Select recording Profile ]", _group, "profile", _list ) 
         {
             _parent.setProfileObj(this);
         }
@@ -283,6 +290,51 @@ class SRProfileSelector: public SRSelectSetting {
         }
 };
 
+class SRSchedOptionsGroup : public ManagedListGroup
+{
+    Q_OBJECT
+    
+    public:
+        SRSchedOptionsGroup(ScheduledRecording& _rec, ManagedList* _list, ManagedListGroup* _group, QObject* _parent);
+        
+        void setEnabled(bool isScheduled, bool multiEpisode);
+    
+    public slots:
+        void itemChanged(ManagedListItem*);
+            
+    protected:
+        class SRProfileSelector* profile;
+        class SRStartOffset* startOffset;
+        class SREndOffset* endOffset;
+        class SRRecPriority* recPriority;
+        class SRDupMethod* dupMethItem;
+        class SRDupIn* dupLocItem;
+        
+        ScheduledRecording& schedRec;
+};
+
+
+class SRStorageOptionsGroup : public ManagedListGroup
+{
+    Q_OBJECT
+    
+    public:
+        SRStorageOptionsGroup(ScheduledRecording& _rec, ManagedList* _list, ManagedListGroup* _group, QObject* _parent);
+        
+        void setEnabled(bool isScheduled, bool multiEpisode);
+    
+    public slots:
+        void itemChanged(ManagedListItem*);
+        
+    protected:
+        class SRRecGroup* recGroup;
+        class SRAutoExpire* autoExpire;
+        class SRMaxEpisodes* maxEpisodes;
+        class SRMaxNewest* maxNewest;
+        
+        ScheduledRecording& schedRec;
+};
+
 
 class SRDupSettingsGroup : public ManagedListGroup
 {
@@ -291,7 +343,7 @@ class SRDupSettingsGroup : public ManagedListGroup
         SRDupSettingsGroup(ScheduledRecording& _rec, ManagedList* _list, ManagedListGroup* _group, QObject* _parent);
         virtual void doGoBack();    
         void syncText();
-    
+        
     public slots:
         void itemChanged(ManagedListItem*);
         
@@ -530,7 +582,8 @@ class SRRecPriority: public SRBoundedIntegerSetting
 class SRRecGroup: public SRSelectSetting {
 public:
     SRRecGroup(ScheduledRecording& _parent, ManagedList* _list, ManagedListGroup* _group)
-        : SRSelectSetting(_parent, "recgroupList", "Select recording group...", _group, "recgroup", _list ) 
+        : SRSelectSetting(_parent, "recgroupList", QString("[ %1 ]").arg(QObject::tr("Select Recording Group")), 
+                          _group, "recgroup", _list ) 
     {
         setValue(QObject::tr("Default"));
         _parent.setRecGroupObj(this);

@@ -34,7 +34,7 @@ class ManagedListItem : public QObject
         void setState(int val) { curState = val; emit changed(this); }
         
         const bool getEnabled() const { return enabled; }
-        void setEnabled(bool val) { enabled = val; }
+        virtual void setEnabled(bool val) { enabled = val; }
                 
         ManagedList* getParentList() { return parentList; }
         virtual void setParentList(ManagedList* _parent);
