@@ -857,6 +857,7 @@ void PhoneUIBox::ProcessSipNotification()
         else if (NotifyType == "IM")
         {
             cout << "Got IM from " << NotifyUrl << endl << NotifyParam1 << endl;
+            MythPopupBox::showOkPopup(gContext->GetMainWindow(), "IM:"+NotifyUrl, NotifyParam1);
         }
 
         else 
@@ -867,17 +868,20 @@ void PhoneUIBox::ProcessSipNotification()
 
 void PhoneUIBox::OnScreenClockTick()
 {
-    ConnectTime++; 
-    phoneUIStatusBar->updateMidCallTime(ConnectTime);
-
     int pIn=0, pMiss=0, pLate=0, bIn=0, bOut=0, bPlayed=0, pOut = 0;        
-    rtpAudio->getRxStats(pIn, pMiss, pLate, bIn, bPlayed, bOut);
-    rtpAudio->getTxStats(pOut);
-    phoneUIStatusBar->updateMidCallAudioStats(pIn, pMiss, pLate, pOut);
+    int bvIn=0, bvOut=0;
+    if (rtpAudio)
+    {
+        ConnectTime++; 
+        phoneUIStatusBar->updateMidCallTime(ConnectTime);
+    
+        rtpAudio->getRxStats(pIn, pMiss, pLate, bIn, bPlayed, bOut);
+        rtpAudio->getTxStats(pOut);
+        phoneUIStatusBar->updateMidCallAudioStats(pIn, pMiss, pLate, pOut);
+    }
 
     if (rtpVideo)
     {
-        int bvIn=0, bvOut=0;
         pIn=0, pMiss=0, pLate=0, bPlayed=0, pOut = 0;        
         rtpVideo->getRxStats(pIn, pMiss, pLate, bvIn, bPlayed, bvOut);
         rtpVideo->getTxStats(pOut);
