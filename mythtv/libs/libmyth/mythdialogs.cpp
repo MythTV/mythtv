@@ -766,6 +766,7 @@ MythDialog::MythDialog(MythMainWindow *parent, const char *name, bool setsize)
 
     if (setsize)
     {
+        move(0, 0);
         setFixedSize(QSize(screenwidth, screenheight));
         gContext->ThemeWidget(this);
     }

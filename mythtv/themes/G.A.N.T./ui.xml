@@ -1840,7 +1840,7 @@
         <image function="selectionbar" filename="rk-selectbar.png" location="-8,3"></image>
         <image function="uparrow" filename="uparrow.png" location="755,15"></image>
         <image function="downarrow" filename="downarrow.png" location="755,235"></image>
-        <image function="rightarrow" filename="rightarrow.png" location="-30,5"></image>
+        <image function="rightarrow" filename="rightarrow.png" location="-10,5"></image>
         <image function="leftarrow" filename="leftarrow.png" location="-5,5"></image>
       </listarea>
       <image name="showinglines" draworder="5" fleximage="no">
