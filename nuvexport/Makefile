@@ -8,6 +8,8 @@ MANS	          = man/nuvexport.1 \
                     man/nuvexport-vcd.1 \
                     man/nuvexport-xvid.1
 
+CONF              = nuvexportrc
+
 EXPORT_MODULES	  = export/generic.pm         \
 		    export/ffmpeg.pm          \
 		    export/transcode.pm       \
@@ -51,6 +53,7 @@ prefix=/usr/local
 bindir=${prefix}/bin
 datadir=${prefix}/share
 mandir=${prefix}/man
+sysconfdir=/etc
 
 MODDIR=${datadir}/nuvexport
 MAN1DIR=${mandir}/man1
@@ -58,11 +61,18 @@ MAN1DIR=${mandir}/man1
 default:
 	@echo "Use \"make install\" to install the new version"
 
-
 install:
 	# First the binaries
 	@for i in ${BINS} ; do \
 	   ${INSTALL} -Dv ${OWNER} -m 0755 $$i ${bindir}/$$i; \
+	done
+	# Then the config file(s)
+	@for i in ${CONF} ; do \
+	   if [ -e "${sysconfdir}"/"$$i" ]; then \
+	      ${INSTALL} -Dv ${OWNER} -m 0755 $$i ${sysconfdir}/$$i.dist; \
+	   else \
+	      ${INSTALL} -Dv ${OWNER} -m 0755 $$i ${sysconfdir}/$$i; \
+	   fi \
 	done
 	# Install the mode symlinks
 	@for i in ${NUVEXPORT_LINKS} ; do \

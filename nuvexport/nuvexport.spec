@@ -4,7 +4,7 @@
 
 Name:       nuvexport
 Version:    0.2
-Release:    cvs20050307
+Release:    cvs20050308
 License:    GPL
 Summary:    mythtv nuv video file conversion script
 URL:        http://forevermore.net/nuvexport/
@@ -56,7 +56,7 @@ rm -f $RPM_BUILD_DIR/file.list.%{name}
 %{_bindir}/*
 %{_datadir}/nuvexport/
 %{_mandir}/man1/*
-
+%config %{_sysconfdir}/*
 %doc COPYING
 
 %changelog

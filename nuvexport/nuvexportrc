@@ -2,11 +2,14 @@
 # nuvexportrc:
 #
 #  This file contains the configuration for nuvexport, and should be installed
-#    as /etc/nuvexportrc or ~/.nuvexportrc (if you use both, the one in your
-#    home directory will take precedence).
+#    as /etc/nuvexportrc.  You can also copy this file to ~/.nuvexportrc, where
+#    nuvexport will look first, if you wish to create settings local to a
+#    specific user.
 #
-#  The config in this file likely will NOT work, which is why this file has
-#    been left out of the makefile and rpm for the time being.
+#  support for nuvexportrc is still new, so expect that more default options
+#    will be added as time goes on (so you'll know what you can edit).  In the
+#    meantime, you can poke around in the code for add_arg() calls to see which
+#    options are available.
 #
 
 #
@@ -16,30 +19,30 @@
 #
 <nuvexport>
 
-#
-#  Set export_prog to ffmpeg, transcode or mencoder, depending on your
-#    preference of program for exports.  This is equivalent to --ffmpeg,
-#    --transcode or --mencoder
-#
+    #
+    #  Set export_prog to ffmpeg, transcode or mencoder, depending on your
+    #    preference of program for exports.  This is equivalent to --ffmpeg,
+    #    --transcode or --mencoder
+    #
     export_prog=ffmpeg
 
-#
-#  Any other parameters set in this file are equivalent to using the equivalent
-#    setting as a commandline option.  For boolean options like --deinterlace
-#    (--nodeinterlace), use deinterlace=yes (or no, true or false) instead.
-#    Actual commandline options will override anything in this file.
-#
+    #
+    #  Any other parameters set in this file are equivalent to using the equivalent
+    #    setting as a commandline option.  For boolean options like --deinterlace
+    #    (--nodeinterlace), use deinterlace=yes (or no, true or false) instead.
+    #    Actual commandline options will override anything in this file.
+    #
 
-#
-#  Preferred mode -- if you don't set this, nuvexport will ask you what you
-#    would like to do.  Use --mode or any of the mode symlinks (like
-#    nuvexport-xvid) to override.
-#
-#    mode=xvid
+    #
+    #  Preferred mode -- if you don't set this, nuvexport will ask you what you
+    #    would like to do.  Use --mode or any of the mode symlinks (like
+    #    nuvexport-xvid) to override.
+    #
+    #mode=xvid
 
-#
-#  Setting underscores to yes will convert whitespace in filenames to an
-#    underscore character (which some people seem to prefer)
+    #
+    #  Setting underscores to yes will convert whitespace in filenames to an
+    #    underscore character (which some people seem to prefer)
     underscores=no
 
 </nuvexport>
@@ -97,6 +100,13 @@
     height       = auto
 
 </XviD>
+
+#
+#  Default mp3 bitrate is 128
+#
+<MP3>
+    bitrate = 128
+</MP3>
 
 #
 #  If you want to provide settings for a very specific export module, you can
