@@ -96,6 +96,10 @@
         <source>Settings</source>
         <translation>Instellingen</translation>
     </message>
+    <message>
+        <source>Random</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>

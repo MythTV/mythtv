@@ -94,6 +94,7 @@ private:
     void actionRotateCW();
     void actionRotateCCW();
     void actionSlideShow();
+    void actionRandomShow();
     void actionSettings();
     void actionImport();
 

@@ -32,14 +32,15 @@
 #include "galleryutil.h"
 
 SingleView::SingleView(QSqlDatabase *db, ThumbList itemList,
-                       int pos, bool slideShow,
+                       int pos, int slideShow,
                        MythMainWindow *parent, const char *name )
     : MythDialog(parent, name)
 {
     m_db        = db;
     m_itemList  = itemList;
     m_pos       = pos;
-    
+    m_slideShow = slideShow;
+
     // --------------------------------------------------------------------
 
     // remove all dirs from m_itemList;
@@ -115,10 +116,13 @@ SingleView::SingleView(QSqlDatabase *db, ThumbList itemList,
 
     // --------------------------------------------------------------------
 
+    if(slideShow > 1)
+        randomFrame();
     loadImage();
     if (slideShow) {
         m_running = true;
         m_timer->start(m_tmout, true);
+        gContext->DisableScreensaver();
     }
 }
 
@@ -235,6 +239,7 @@ void SingleView::keyPressEvent(QKeyEvent *e)
     bool wasRunning = m_running;
     m_timer->stop();
     m_running = false;
+    gContext->RestoreScreensaver();
     m_effectRunning = false;
     m_tmout = m_delay * 1000;
     if (m_painter && m_painter->isActive())
@@ -399,6 +404,7 @@ void SingleView::keyPressEvent(QKeyEvent *e)
 
     if (m_running) {
         m_timer->start(m_tmout, true);
+        gContext->DisableScreensaver();
     }
 
     if (handled) {
@@ -414,6 +420,15 @@ void SingleView::advanceFrame()
     m_pos++;
     if (m_pos >= (int)m_itemList.count())
         m_pos = 0;
+}
+
+void SingleView::randomFrame()
+{
+    int newframe;
+    if(m_itemList.count() > 1){
+        while((newframe = (int)(rand()/(RAND_MAX+1.0) * m_itemList.count())) == m_pos);
+        m_pos = newframe;
+    }
 }
 
 void SingleView::retreatFrame()
@@ -1168,7 +1183,11 @@ void SingleView::slotTimeOut()
             if (m_effectRandom)
                 m_effectMethod = getRandomEffect();
 
-            advanceFrame();
+             if (m_slideShow > 1)
+                 randomFrame();
+             else
+                 advanceFrame();
+
             bool wasMovie = m_movieState > 0;
             loadImage();
             bool isMovie = m_movieState > 0;

@@ -346,7 +346,7 @@ void IconView::keyPressEvent(QKeyEvent *e)
           
                     handled = true;
                     
-                    bool slideShow = (action == "PLAY");
+                    int slideShow = (action == "PLAY")?1:0;
 #ifdef OPENGL_SUPPORT
                     int useOpenGL = gContext->GetNumSetting("SlideshowUseOpenGL");
                     if (useOpenGL) {
@@ -507,6 +507,8 @@ void IconView::loadTheme()
     UIListBtnTypeItem* item;
     item = new UIListBtnTypeItem(m_menuType, tr("SlideShow"));
     item->setData(new Action(&IconView::actionSlideShow));
+    item = new UIListBtnTypeItem(m_menuType, tr("Random"));
+    item->setData(new Action(&IconView::actionRandomShow));
     item = new UIListBtnTypeItem(m_menuType, tr("Rotate CW"));
     item->setData(new Action(&IconView::actionRotateCW));
     item = new UIListBtnTypeItem(m_menuType, tr("Rotate CCW"));
@@ -837,7 +839,7 @@ void IconView::actionSlideShow()
     int useOpenGL = gContext->GetNumSetting("SlideshowUseOpenGL");
     if (useOpenGL) {
         if (QGLFormat::hasOpenGL()) {
-            GLSDialog gv(m_db, m_itemList, pos, true,
+            GLSDialog gv(m_db, m_itemList, pos, 1,
                          gContext->GetMainWindow());
             gv.exec();
         }
@@ -850,7 +852,39 @@ void IconView::actionSlideShow()
     else 
 #endif
     {
-        SingleView sv(m_db, m_itemList, pos, true,
+        SingleView sv(m_db, m_itemList, pos, 1,
+                      gContext->GetMainWindow());
+        sv.exec();
+    }                         
+}
+
+void IconView::actionRandomShow()
+{
+    ThumbItem* item = m_itemList.at(m_currRow * m_nCols +
+                                    m_currCol);
+    if (!item || item->isDir)
+        return;
+
+    int pos = m_currRow * m_nCols + m_currCol;
+
+#ifdef OPENGL_SUPPORT
+    int useOpenGL = gContext->GetNumSetting("SlideshowUseOpenGL");
+    if (useOpenGL) {
+        if (QGLFormat::hasOpenGL()) {
+            GLSDialog gv(m_db, m_itemList, pos, 2,
+                         gContext->GetMainWindow());
+            gv.exec();
+        }
+        else {
+            MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+                                      tr("Error"),
+                                      tr("Sorry: OpenGL support not available"));
+        }
+    }
+    else 
+#endif
+    {
+        SingleView sv(m_db, m_itemList, pos, 2,
                       gContext->GetMainWindow());
         sv.exec();
     }                         

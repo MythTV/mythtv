@@ -32,7 +32,7 @@ class SingleView : public MythDialog
 public:
 
     SingleView(QSqlDatabase *db, ThumbList itemList,
-               int pos, bool slideShow,
+               int pos, int slideShow,
                MythMainWindow *parent, const char *name=0);
     ~SingleView();
 
@@ -63,6 +63,7 @@ private:
     int           m_delay;
     bool          m_effectRunning;
     bool          m_running;
+    int           m_slideShow;
     QTimer       *m_timer;
     QPixmap      *m_effectPix;
     QPainter     *m_painter;
@@ -82,6 +83,7 @@ private:
 private:
 
     void  advanceFrame();
+    void  randomFrame();
     void  retreatFrame();
     void  loadImage();
     void  rotate(int angle);

@@ -37,7 +37,7 @@ class GLSDialog : public MythDialog
 public:
     
     GLSDialog(QSqlDatabase *db, const ThumbList& itemList,
-              int pos, bool slideShow, MythMainWindow *parent,
+              int pos, int slideShow, MythMainWindow *parent,
               const char *name=0);
 
 protected:
@@ -56,7 +56,7 @@ class GLSingleView : public QGLWidget
 public:
 
     GLSingleView(QSqlDatabase *db, ThumbList itemList,
-                 int pos, bool slideShow, QWidget *parent);
+                 int pos, int slideShow, QWidget *parent);
     ~GLSingleView();
 
     void cleanUp();
@@ -100,6 +100,7 @@ private:
     int           m_delay;
     bool          m_effectRunning;
     bool          m_running;
+    int           m_slideShow;
 
     GLuint        m_texInfo;
     bool          m_showInfo;
@@ -116,6 +117,7 @@ private:
 private:
     
     void  advanceFrame();
+    void  randomFrame();
     void  retreatFrame();
     void  loadImage();
     void  paintTexture();
