@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <math.h>
 
 #include <qstringlist.h>
 
@@ -6,14 +7,24 @@
 #include "programinfo.h"
 #include "util.h"
 
+//#include "commercial_debug.h"
+
 CommDetect::CommDetect(int w, int h, double fps)
 {
+#ifdef SHOW_DEBUG_WIN
+    comm_debug_init(w, h);
+#endif
+
     Init(w, h, fps);
 }
 
 CommDetect::~CommDetect(void)
 {
     frame_ptr = NULL;
+
+#ifdef SHOW_DEBUG_WIN
+    comm_debug_destroy();
+#endif
 }
 
 void CommDetect::Init(int w, int h, double fps)
@@ -31,7 +42,9 @@ void CommDetect::Init(int w, int h, double fps)
     lastFrameWasSceneChange = false;
 
     memset(lastHistogram, 0, sizeof(lastHistogram));
+    memset(histogram, 0, sizeof(histogram));
     lastHistogram[0] = -1;
+    histogram[0] = -1;
 
     frameIsBlank = false;
     sceneHasChanged = false;
@@ -69,6 +82,10 @@ void CommDetect::ProcessNextFrame(unsigned char *buf, long long frame_number)
     }
 
     framesProcessed++;
+
+#ifdef SHOW_DEBUG_WIN
+    comm_debug_show(buf);
+#endif
 }
 
 bool CommDetect::CheckFrameIsBlank(void)
@@ -121,8 +138,6 @@ bool CommDetect::CheckFrameIsBlank(void)
 // analyzes every 1 out of 4 pixels (every other column in every other row)
 bool CommDetect::CheckSceneHasChanged(void)
 {
-    int histogram[256];
-
     if (!width || !height)
         return(false);
 
@@ -136,6 +151,8 @@ bool CommDetect::CheckSceneHasChanged(void)
         return(false);
     }
 
+    memcpy(lastHistogram, histogram, sizeof(histogram));
+
     // compare current frame with last frame here
     memset(histogram, 0, sizeof(histogram));
     for(int y = 0; y < height; y += 2)
@@ -144,7 +161,6 @@ bool CommDetect::CheckSceneHasChanged(void)
 
     if (lastFrameWasSceneChange)
     {
-        lastFrameWasSceneChange = false;
         memcpy(lastHistogram, histogram, sizeof(histogram));
         return(false);
     }
@@ -161,13 +177,10 @@ bool CommDetect::CheckSceneHasChanged(void)
 
     if (similar < (width * height / 4 * .91))
     {
-        lastFrameWasSceneChange = true;
         memcpy(lastHistogram, histogram, sizeof(histogram));
         return(true);
     }
 
-    lastFrameWasSceneChange = false;
-    memcpy(lastHistogram, histogram, sizeof(histogram));
     return(false);
 }
 
@@ -333,20 +346,17 @@ void CommDetect::BuildMasterCommList(void)
         long long max_blank = 0;
         long long max_scene = 0;
 
-        for(it = blankCommBreakMap.begin(); it != blankCommBreakMap.end(); ++it)
-        {
-            it++;
-            if (it.key() > max_blank)
-                max_blank = it.key();
-        }
+        it = blankCommBreakMap.begin();
+        for(int i = 0; i < blankCommBreakMap.size(); i++)
+            if ((it.data() == MARK_COMM_END) &&
+                (it.key() > max_blank))
+                    max_blank = it.key();
 
-        for(it = sceneChangeCommMap.begin(); it != sceneChangeCommMap.end();
-            ++it)
-        {
-            it++;
-            if (it.key() > max_scene)
+        it = sceneChangeCommMap.begin();
+        for(int i = 0; i < sceneChangeCommMap.size(); i++)
+            if ((it.data() == MARK_COMM_END) &&
+                (it.key() > max_scene))
                 max_scene = it.key();
-        }
 
         if ((max_blank < (framesProcessed - 2)) &&
             (max_scene > (framesProcessed - 2)))
@@ -393,7 +403,9 @@ void CommDetect::BuildMasterCommList(void)
             }
 
             it_a++; it_a++;
-            it_b++; it_b++;
+            it_b++;
+            if (it_b != blankCommBreakMap.end())
+                it_b++;
         }
     }
 }
@@ -532,30 +544,29 @@ void CommDetect::BuildSceneChangeCommList(void)
             (s > (section_start + 32)))
         {
             long long f = (long long)(section_start * frame_rate);
+            bool found_end = false;
+
             for(int i = 0; i < frame_rate; i++, f++)
             {
                 if (sceneChangeMap.contains(f))
                 {
                     sceneChangeCommMap[f] = MARK_COMM_END;
                     i = (int)(frame_rate) + 1;
+                    found_end = true;
                 }
             }
             section_start = -1;
+
+            if (!found_end)
+            {
+                f = (long long)(section_start * frame_rate);
+                sceneChangeCommMap[f] = MARK_COMM_END;
+            }
         }
     }
 
     if (section_start >= 0)
-    {
-        long long f = framesProcessed;
-        for(int i = 0; i < frame_rate; i++, f--)
-        {
-            if (sceneChangeMap.contains(f))
-            {
-                sceneChangeCommMap[f] = MARK_COMM_END;
-                i = (int)(frame_rate) + 1;
-            }
-        }
-    }
+        sceneChangeCommMap[framesProcessed] = MARK_COMM_END;
 }
 
 void CommDetect::MergeBlankCommList(void)
@@ -677,3 +688,21 @@ bool CommDetect::FrameIsInCommBreak(long long f, QMap<long long, int> &breakMap)
     return(false);
 }
 
+void CommDetect::DumpMap(QMap<long long, int> &map)
+{
+    QMap<long long, int>::Iterator it;
+
+    for (it = map.begin(); it != map.end(); ++it)
+    {
+        long long frame = it.key();
+        int my_fps = (int)ceil(frame_rate);
+        int hour = (frame / my_fps) / 60 / 60;
+        int min = (frame / my_fps) / 60 - (hour * 60);
+        int sec = (frame / my_fps) - (min * 60) - (hour * 60 * 60);
+        int frm = frame - ((sec * my_fps) + (min * 60 * my_fps) +
+                    (hour * 60 * 60 * my_fps));
+        printf( "%7lld : %d (%02d:%02d:%02d.%02d) (%d)\n",
+            it.key(), it.data(), hour, min, sec, frm,
+            (int)(frame / my_fps));
+    }
+}

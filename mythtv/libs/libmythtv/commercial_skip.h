@@ -42,6 +42,8 @@ class CommDetect
 
     bool FrameIsInCommBreak(long long f, QMap<long long, int> &breakMap);
 
+    void DumpMap(QMap<long long, int> &map);
+
   private:
     bool CheckFrameIsBlank(void);
     bool CheckSceneHasChanged(void);
@@ -73,6 +75,7 @@ class CommDetect
     bool lastFrameWasBlank;
     bool lastFrameWasSceneChange;
 
+    int histogram[256];
     int lastHistogram[256];
 };
 
