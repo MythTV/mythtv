@@ -375,7 +375,7 @@ class UIListType : public UIType
                        m_current = -1; m_columns = 0; }
  
     void Draw(QPainter *, int drawlayer, int);
-
+    bool ShowSelAlways() const { return m_showSelAlways; }
   private:
     //QString cutDown(QString, QFont *, int);
     int m_selheight;
@@ -387,6 +387,7 @@ class UIListType : public UIType
     int m_count;
     bool m_darrow;
     bool m_uarrow;
+    bool m_showSelAlways;
     QRect m_fill_area;
     QColor m_fill_color;
     int m_fill_type;
