@@ -132,8 +132,8 @@ public:
         GlobalSetting("OSDDisplayTime") {
         setLabel("Number of seconds for which OSD should be displayed");
         setValue(3);
-        setHelpText("How long it takes the On Screen Display to fade "
-                    "away.");
+        setHelpText("How long the program information remains on the On "
+                    "Screen Display after a channel change.");
     };
 };
 
