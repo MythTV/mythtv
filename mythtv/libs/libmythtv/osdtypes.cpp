@@ -319,7 +319,11 @@ void OSDTypeText::Draw(unsigned char *screenptr, int vid_width, int vid_height,
 
     if (m_multiline && textlength > maxlength)
     {
-        char *orig = strdup((char *)m_message.ascii());
+        QString tmp_msg = m_message;
+        tmp_msg.replace(QRegExp("%BR%"), "\n");
+        tmp_msg.replace(QRegExp("\n")," \n ");
+
+        char *orig = strdup((char *)tmp_msg.ascii());
         int length = 0;
         int lines = 0;
         char line[512];
@@ -343,7 +347,8 @@ void OSDTypeText::Draw(unsigned char *screenptr, int vid_width, int vid_height,
                 }
             }
             m_font->CalcWidth(word, &textlength);
-            if (textlength + m_font->SpaceWidth() + length > maxlength)
+            if ((textlength + m_font->SpaceWidth() + length > maxlength) ||
+                (!strcmp(word, "\n")))
             {
                 QRect drawrect = m_displaysize;
                 drawrect.setTop(m_displaysize.top() + 
@@ -353,6 +358,12 @@ void OSDTypeText::Draw(unsigned char *screenptr, int vid_width, int vid_height,
                 length = 0;
                 memset(line, '\0', 512);
                 lines++;
+
+                if (!strcmp(word, "\n"))
+                {
+                    word[0] = '\0';
+                    textlength = 0;
+                }
             }
             if (length == 0)
             {
@@ -361,8 +372,9 @@ void OSDTypeText::Draw(unsigned char *screenptr, int vid_width, int vid_height,
             }
             else
             {
+                if (length)
+                    strcat(line, " ");
                 length += textlength + m_font->SpaceWidth();
-                strcat(line, " ");
                 strcat(line, word);
             }
             word = strtok(NULL, " ");
