@@ -163,7 +163,7 @@ void VideoManager::keyPressEvent(QKeyEvent *e)
             pageDown();
         else if (action == "ESCAPE")
             exitWin();
-        else if ((action == "INFO"))
+        else if ((action == "INFO") || action == "MENU")
              videoMenu();
         else if (action == "FILTER" && (m_state == SHOWING_MAINWINDOW))
             slotDoFilter();

@@ -56,19 +56,19 @@ void EditMetadataDialog::fillWidgets()
     }
     if (category_select)
     {
-	category_select->addItem(0,"Unknown");
-	QString q_string = QString("SELECT intid, category FROM videocategory"
-				" ORDER BY category");
-	QSqlQuery a_query(q_string,db);
-	if (a_query.isActive())
-	{
-	    while (a_query.next())
-	    {
-		category_select->addItem(a_query.value(0).toInt(),
-					a_query.value(1).toString());
+        category_select->addItem(0,"Unknown");
+	    QString q_string = QString("SELECT intid, category FROM videocategory"
+                                   " ORDER BY category");
+        QSqlQuery a_query(q_string,db);
+        if (a_query.isActive())
+        {
+            while (a_query.next())
+	        {
+		        category_select->addItem(a_query.value(0).toInt(),
+					                     a_query.value(1).toString());
+	        }
 	    }
-	}
-	category_select->setToItem(working_metadata->getIdCategory(db));
+	    category_select->setToItem(working_metadata->getIdCategory(db));
     }
     if(level_select)
     {
@@ -146,11 +146,18 @@ void EditMetadataDialog::fillWidgets()
         if(working_metadata->ChildID() > 0)
         {
             child_select->setToItem(working_metadata->ChildID());
+            cachedChildSelection = working_metadata->ChildID();
         }
         else
         {
             child_select->setToItem(possible_starting_point);
+            cachedChildSelection = possible_starting_point;
         }
+    }
+    if(child_select && child_check)
+    {
+        child_check->setState(cachedChildSelection > 0);
+        child_select->allowFocus(cachedChildSelection > 0);
     }
     if(browse_check)
     {
@@ -166,6 +173,25 @@ void EditMetadataDialog::fillWidgets()
     }
     
 }
+
+void EditMetadataDialog::toggleChild(bool yes_or_no)
+{
+    if(child_select)
+    {
+        if(yes_or_no)
+        {
+            child_select->setToItem(cachedChildSelection);
+            working_metadata->setChildID(cachedChildSelection);
+        }
+        else
+        {
+            child_select->setToItem(0);
+            working_metadata->setChildID(0);
+        }
+        child_select->allowFocus(yes_or_no);
+    }
+}
+
 
 void EditMetadataDialog::keyPressEvent(QKeyEvent *e)
 {
@@ -345,6 +371,11 @@ void EditMetadataDialog::setLevel(int new_level)
 void EditMetadataDialog::setChild(int new_child)
 {
     working_metadata->setChildID(new_child);
+    if(child_check)
+    {
+        child_check->setState(new_child > 0);
+        cachedChildSelection = new_child;
+    }
 }
 
 void EditMetadataDialog::toggleBrowse(bool yes_or_no)
@@ -438,6 +469,13 @@ void EditMetadataDialog::wireUpTheme()
     {
         connect(level_select, SIGNAL(pushed(int)),
                 this, SLOT(setLevel(int)));
+    }
+
+    child_check = getUICheckBoxType("child_check");
+    if(child_check)
+    {
+        connect(child_check, SIGNAL(pushed(bool)),
+                this, SLOT(toggleChild(bool)));
     }
     
     child_select = getUISelectorType("child_select");

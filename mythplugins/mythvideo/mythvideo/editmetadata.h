@@ -4,7 +4,7 @@
 /*
 	editmetadata.h
 
-	(c) 2003 Thor Sigvaldason, Isaac Richards, and ?? ??
+	(c) 2003, 2004 Thor Sigvaldason, Isaac Richards, and ?? ??
 	Part of the mythTV project
 	
     Class to let user edit the metadata associated with
@@ -50,6 +50,7 @@ class EditMetadataDialog : public MythThemedDialog
     void setCategory(int new_category);
     void setPlayer(QString new_player);
     void setLevel(int new_level);
+    void toggleChild(bool yes_or_no);
     void setChild(int new_child);
     void toggleBrowse(bool yes_or_no);
     void findCoverArt();
@@ -71,11 +72,19 @@ class EditMetadataDialog : public MythThemedDialog
 
     UISelectorType	*category_select;
     UISelectorType      *level_select;
+    UICheckBoxType      *child_check;
     UISelectorType      *child_select;
     UICheckBoxType      *browse_check;
     UIPushButtonType    *coverart_button;
     UITextType          *coverart_text;
     UITextButtonType    *done_button;
+
+    //
+    //  Remember video-to-play-next index number when the user is toggling
+    //  child videos on and off
+    //
+    
+    int cachedChildSelection;
  
 };
 
