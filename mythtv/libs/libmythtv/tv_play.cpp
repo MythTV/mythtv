@@ -787,7 +787,7 @@ void TV::RunTV(void)
             if (paused && !(pausecheck % 20))
             {
                 QString desc = "";
-                int pos = calcSliderPos(0, desc);
+                int pos = nvp->calcSliderPos(0, desc);
                 osd->UpdatePause(pos, desc);
                 pausecheck = 0;
             }
@@ -1224,98 +1224,6 @@ void TV::SwapPIP(void)
     ToggleActiveWindow();
 }
 
-int TV::calcSliderPos(int offset, QString &desc)
-{
-    float ret;
-
-    char text[512];
-
-    if (internalState == kState_WatchingLiveTV)
-    {
-        ret = prbuffer->GetFreeSpace() / 
-              ((float)prbuffer->GetFileSize() - prbuffer->GetSmudgeSize());
-        ret *= 1000.0;
-
-        long long written = recorder->GetFramesWritten();
-        long long played = nvp->GetFramesPlayed();
-
-        played += (int)(offset * frameRate);
-        if (played > written)
-            played = written;
-        if (played < 0)
-            played = 0;
-	
-        int secsbehind = (int)((float)(written - played) / frameRate);
-
-        if (secsbehind < 0)
-            secsbehind = 0;
-
-        int hours = (int)secsbehind / 3600;
-        int mins = ((int)secsbehind - hours * 3600) / 60;
-        int secs = ((int)secsbehind - hours * 3600 - mins * 60);
-
-        if (hours > 0)
-        {
-            if (osd->getTimeType() == 0)
-            {
-                sprintf(text, tr("%02d:%02d:%02d behind  --  %.2f%% full"), 
-                        hours, mins, secs, (1000 - ret) / 10);
-            }
-            else
-            {
-                sprintf(text, tr("%02d:%02d:%02d behind"), hours, mins, secs);
-            }
-        }
-        else
-        {
-            if (osd->getTimeType() == 0)
-            {
-                sprintf(text, tr("%02d:%02d behind  --  %.2f%% full"), 
-                        mins, secs, (1000 - ret) / 10);
-            }
-            else
-            {
-                sprintf(text, tr("%02d:%02d behind"), mins, secs);
-            }
-        }
-
-        desc = text;
-        return (int)(1000 - ret);
-    }
-
-    if (internalState == kState_WatchingRecording)
-        playbackLen = (int)(((float)recorder->GetFramesWritten() / frameRate));
-    else
-        playbackLen = nvp->GetLength();
-
-    float secsplayed = ((float)nvp->GetFramesPlayed() / frameRate) + offset;
-    if (secsplayed < 0)
-        secsplayed = 0;
-    if (secsplayed > playbackLen)
-        secsplayed = playbackLen;
-
-    ret = secsplayed / (float)playbackLen;
-    ret *= 1000.0;
-
-    int phours = (int)secsplayed / 3600;
-    int pmins = ((int)secsplayed - phours * 3600) / 60;
-    int psecs = ((int)secsplayed - phours * 3600 - pmins * 60);
-
-    int shours = playbackLen / 3600;
-    int smins = (playbackLen - shours * 3600) / 60;
-    int ssecs = (playbackLen - shours * 3600 - smins * 60);
-
-    if (shours > 0)
-        sprintf(text, tr("%02d:%02d:%02d of %02d:%02d:%02d"), 
-                phours, pmins, psecs, shours, smins, ssecs);
-    else
-        sprintf(text, tr("%02d:%02d of %02d:%02d"), pmins, psecs, smins, ssecs);
-
-    desc = text;
-
-    return (int)(ret);
-}
-
 void TV::DoPause(void)
 {
     paused = activenvp->TogglePause();
@@ -1326,7 +1234,7 @@ void TV::DoPause(void)
     if (paused)
     {
         QString desc = "";
-        int pos = calcSliderPos(0, desc);
+        int pos = nvp->calcSliderPos(0, desc);
         if (internalState == kState_WatchingLiveTV)
             osd->StartPause(pos, true, tr("Paused"), desc, -1);
 	else
@@ -1362,7 +1270,7 @@ void TV::DoInfo(void)
             oset->Display(false);
 
         QString desc = "";
-        int pos = calcSliderPos(0, desc);
+        int pos = nvp->calcSliderPos(0, desc);
         osd->StartPause(pos, false, tr("Position"), desc, osd_display_time);
     }
 }
@@ -1391,7 +1299,7 @@ void TV::DoFF(int time)
     if (activenvp == nvp)
     {
         QString desc = "";
-        int pos = calcSliderPos((int)(time * ff_rew_scaling), desc);
+        int pos = nvp->calcSliderPos((int)(time * ff_rew_scaling), desc);
         osd->StartPause(pos, slidertype, scaleString, desc, 2);
     }
 
@@ -1432,7 +1340,7 @@ void TV::DoRew(int time)
     if (activenvp == nvp)
     {
         QString desc = "";
-        int pos = calcSliderPos(0 - (int)(time * ff_rew_scaling), desc);
+        int pos = nvp->calcSliderPos(0 - (int)(time * ff_rew_scaling), desc);
         osd->StartPause(pos, slidertype, scaleString, desc, 2);
     }
 
@@ -1487,7 +1395,7 @@ void TV::DoJumpAhead(void)
     if (activenvp == nvp)
     {
         QString desc = "";
-        int pos = calcSliderPos((int)(jumptime * 60), desc);
+        int pos = nvp->calcSliderPos((int)(jumptime * 60), desc);
         osd->StartPause(pos, slidertype, tr("Jump Ahead"), desc, 2);
     }
 
@@ -1523,7 +1431,7 @@ void TV::DoJumpBack(void)
     if (activenvp == nvp)
     {
         QString desc = "";
-        int pos = calcSliderPos(0 - (int)(jumptime * 60), desc);
+        int pos = nvp->calcSliderPos(0 - (int)(jumptime * 60), desc);
         osd->StartPause(pos, slidertype, tr("Jump Back"), desc, 2);
     }
 
@@ -1596,8 +1504,8 @@ void TV::DoSkipCommercials(int direction)
     {
         QString dummy = "";
         QString desc = tr("Searching...");
-        int pos = calcSliderPos(0, dummy);
-        osd->StartPause(pos, slidertype, tr("SKIP"), desc, 6);
+        int pos = nvp->calcSliderPos(0, dummy);
+        osd->StartPause(pos, slidertype, tr("Skip"), desc, 6);
     }
 
     activenvp->SkipCommercials(direction);

@@ -157,6 +157,8 @@ class NuppelVideoPlayer
     int GetEof(void) { return eof; }
     void SetFramesPlayed(long long played) { framesPlayed = played; }
 
+    int calcSliderPos(int offset, QString &desc);
+
     bool GetLimitKeyRepeat(void) { return limitKeyRepeat; }
 
     void Reinit(void);

@@ -125,7 +125,6 @@ class TV : public QObject
     void DoJumpAhead(void);
     void DoJumpBack(void);
     void DoSkipCommercials(int direction);
-    int  calcSliderPos(int offset, QString &desc);
 
     void DoQueueTranscode(void);  
  

@@ -3281,6 +3281,103 @@ int NuppelVideoPlayer::GetStatusbarPos(void)
     return((int)spos);
 }
 
+int NuppelVideoPlayer::calcSliderPos(int offset, QString &desc)
+{
+    float ret;
+
+    char text[512];
+
+    if (livetv)
+    {
+        ret = ringBuffer->GetFreeSpace() / 
+              ((float)ringBuffer->GetFileSize() - ringBuffer->GetSmudgeSize());
+        ret *= 1000.0;
+
+        long long written = nvr_enc->GetFramesWritten();
+        long long played = framesPlayed;
+
+        played += (int)(offset * video_frame_rate);
+        if (played > written)
+            played = written;
+        if (played < 0)
+            played = 0;
+
+        int secsbehind = (int)((float)(written - played) / video_frame_rate);
+
+        if (secsbehind < 0)
+            secsbehind = 0;
+
+        int hours = (int)secsbehind / 3600;
+        int mins = ((int)secsbehind - hours * 3600) / 60;
+        int secs = ((int)secsbehind - hours * 3600 - mins * 60);
+
+        if (hours > 0)
+        {
+            if (osd->getTimeType() == 0)
+            {
+                sprintf(text,
+                        QObject::tr("%02d:%02d:%02d behind  --  %.2f%% full"), 
+                        hours, mins, secs, (1000 - ret) / 10);
+            }
+            else
+            {
+                sprintf(text, QObject::tr("%02d:%02d:%02d behind"),
+                        hours, mins, secs);
+            }
+        }
+        else
+        {
+            if (osd->getTimeType() == 0)
+            {
+                sprintf(text, QObject::tr("%02d:%02d behind  --  %.2f%% full"), 
+                        mins, secs, (1000 - ret) / 10);
+            }
+            else
+            {
+                sprintf(text, QObject::tr("%02d:%02d behind"), mins, secs);
+            }
+        }
+
+        desc = text;
+        return (int)(1000 - ret);
+    }
+
+    int playbackLen;
+    if (watchingrecording && nvr_enc && nvr_enc->IsValidRecorder())
+        playbackLen =
+            (int)(((float)nvr_enc->GetFramesWritten() / video_frame_rate));
+    else
+        playbackLen = totalLength;
+
+    float secsplayed = ((float)framesPlayed / video_frame_rate) + offset;
+    if (secsplayed < 0)
+        secsplayed = 0;
+    if (secsplayed > playbackLen)
+        secsplayed = playbackLen;
+
+    ret = secsplayed / (float)playbackLen;
+    ret *= 1000.0;
+
+    int phours = (int)secsplayed / 3600;
+    int pmins = ((int)secsplayed - phours * 3600) / 60;
+    int psecs = ((int)secsplayed - phours * 3600 - pmins * 60);
+
+    int shours = playbackLen / 3600;
+    int smins = (playbackLen - shours * 3600) / 60;
+    int ssecs = (playbackLen - shours * 3600 - smins * 60);
+
+    if (shours > 0)
+        sprintf(text, QObject::tr("%02d:%02d:%02d of %02d:%02d:%02d"), 
+                phours, pmins, psecs, shours, smins, ssecs);
+    else
+        sprintf(text, QObject::tr("%02d:%02d of %02d:%02d"),
+                pmins, psecs, smins, ssecs);
+
+    desc = text;
+
+    return (int)(ret);
+}
+
 bool NuppelVideoPlayer::FrameIsBlank(int vposition)
 {
     commDetect->ProcessNextFrame(&(vbuffers[vposition]));
@@ -3316,10 +3413,11 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
                 {
                     int skipped_seconds = (int)((commBreakIter.key() -
                             framesPlayed) / video_frame_rate);
-                    QString comm_msg = QString(QObject::tr("Auto-Skip %1 seconds"))
+                    QString comm_msg = QString(QObject::tr("Skip %1 seconds"))
                                       .arg(skipped_seconds);
-                    int spos = GetStatusbarPos();
-                    osd->StartPause(spos, false, QObject::tr("SKIP"), comm_msg, 1);
+                    QString desc;
+                    int spos = calcSliderPos(skipped_seconds, desc);
+                    osd->StartPause(spos, false, comm_msg, desc, 1);
                 }
 
                 JumpToFrame(commBreakIter.key());
@@ -3464,7 +3562,8 @@ void NuppelVideoPlayer::SkipCommercialsByBlanks(void)
                 if (osd)
                 {
                     QString comm_msg;
-                    int spos = GetStatusbarPos();
+                    QString desc;
+                    int spos = calcSliderPos(0, desc);
 
                     blank_seq_found = 1;
 
@@ -3472,7 +3571,7 @@ void NuppelVideoPlayer::SkipCommercialsByBlanks(void)
                     comm_msg = QString(QObject::tr("Found %1 sec. commercial"))
                                       .arg(*comm_length);
        
-                    osd->StartPause(spos, false, QObject::tr("SKIP"), comm_msg, 5);
+                    osd->StartPause(spos, false, comm_msg, desc, 5);
                 }
                 break;
             }
@@ -3530,9 +3629,12 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
         if ((commBreakIter == commBreakMap.begin()) &&
             (direction < 0))
         {
-            QString comm_msg = QString(QObject::tr("At Start of program."));
-            int spos = GetStatusbarPos();
-            osd->StartPause(spos, false, QObject::tr("SKIP"), comm_msg, 1);
+            int skipped_seconds = (int)((0 - framesPlayed) / video_frame_rate);
+
+            QString comm_msg = QString(QObject::tr("Start of program."));
+            QString desc;
+            int spos = calcSliderPos(skipped_seconds, desc);
+            osd->StartPause(spos, false, comm_msg, desc, 1);
 
             JumpToFrame(0);
             return true;
@@ -3542,8 +3644,9 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
             (direction > 0))
         {
             QString comm_msg = QString(QObject::tr("At End, can not Skip."));
-            int spos = GetStatusbarPos();
-            osd->StartPause(spos, false, QObject::tr("SKIP"), comm_msg, 1);
+            QString desc;
+            int spos = calcSliderPos(0,desc);
+            osd->StartPause(spos, false, comm_msg, desc, 1);
             return false;
         }
 
@@ -3554,13 +3657,17 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
             int skipped_seconds = (int)((commBreakIter.key() -
                     framesPlayed) / video_frame_rate);
 
+            // special case when hitting 'skip backwards' <3 seconds after break
             if (skipped_seconds > -3)
             {
                 if (commBreakIter == commBreakMap.begin())
                 {
                     QString comm_msg = QString(QObject::tr("Start of program."));
-                    int spos = GetStatusbarPos();
-                    osd->StartPause(spos, false, QObject::tr("SKIP"), comm_msg, 1);
+                    QString desc;
+                    skipped_seconds = (int)((0 -
+                                             framesPlayed) / video_frame_rate);
+                    int spos = calcSliderPos(skipped_seconds, desc);
+                    osd->StartPause(spos, false, comm_msg, desc, 1);
 
                     JumpToFrame(0);
                     return true;
@@ -3574,10 +3681,11 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
         {
             int skipped_seconds = (int)((commBreakIter.key() -
                     framesPlayed) / video_frame_rate);
-            QString comm_msg = QString(QObject::tr("Auto-Skip %1 seconds"))
+            QString comm_msg = QString(QObject::tr("Skip %1 seconds"))
                                   .arg(skipped_seconds);
-            int spos = GetStatusbarPos();
-            osd->StartPause(spos, false, QObject::tr("SKIP"), comm_msg, 1);
+            QString desc;
+            int spos = calcSliderPos(skipped_seconds, desc);
+            osd->StartPause(spos, false, comm_msg, desc, 1);
         }
         JumpToFrame(commBreakIter.key());
         commBreakIter++;
