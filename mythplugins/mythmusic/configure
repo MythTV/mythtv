@@ -4,12 +4,12 @@
 #
 
 # default parameters
-opengl="yes"
+opengl="no"
 fftw_lib="no"
 
 for opt do
   case "$opt" in
-  --disable-opengl) opengl="no"
+  --enable-opengl) opengl="yes"
   ;;
   --enable-fftw) fftw_lib="yes"
   ;;
@@ -25,7 +25,7 @@ Options: [defaults in brackets after descriptions]
 echo "Standard options:"
 echo "  --help                   print this message"
 echo "  --enable-fftw            enable fftw visualizers [default=no]"
-echo "  --disable-opengl         disable OpenGL visualizers [default=yes]"
+echo "  --enable-opengl         disable OpenGL visualizers [default=yes]"
 
 EOF
 exit 1

@@ -26,7 +26,9 @@
 #include <fftw.h>
 #endif		
 
+#ifdef OPENGL_SUPPORT
 #include <qgl.h>
+#endif
 
 class Spectrum : public VisualBase
 {
@@ -89,15 +91,18 @@ class Blank : public VisualBase
 };
 
 
+#ifndef OPENGL_SUPPORT
+#else
+
 class Gears : public QGLWidget, public VisualBase
 {
+
 
 	//
 	//	Draws some OpenGL gears and manipulates
 	//	them based on audio data
 	//
 	
-	Q_OBJECT
 	
 	public:
 		Gears(QWidget *parent = 0, const char * = 0);
@@ -132,5 +137,5 @@ class Gears : public QGLWidget, public VisualBase
 };
 
 
-
+#endif // opengl_support	
 #endif // __visualize_h

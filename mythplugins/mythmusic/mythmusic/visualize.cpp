@@ -290,6 +290,9 @@ bool Blank::draw(QPainter *p, const QColor &back)
 }
 
 
+#ifdef OPENGL_SUPPORT
+
+
 //
 //	Need this for the Gears Object (below)
 //
@@ -422,9 +425,6 @@ static GLfloat view_rotx=20.0, view_rotz=0.0;
 static GLint gear1, gear2, gear3;
 
 
-GLfloat angle = 0.0;
-
-
 Gears::Gears(QWidget *parent, const char *name)
 	: QGLWidget(parent, name), falloff( 4.0 ), analyzerBarWidth( 10 ), fps( 20 )
 {
@@ -434,13 +434,13 @@ Gears::Gears(QWidget *parent, const char *name)
 	//	the Qt GL class.
 	//
 
-#ifdef OPENGL_SUPPORT
     int screenwidth = 0, screenheight = 0;
     float wmult = 0.0, hmult = 0.0;
     gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
     this->setGeometry(0, 0, screenwidth, screenheight);
     this->setFixedSize(QSize(screenwidth, screenheight));
-#endif
+	angle = 0.0;
+	view_roty = 30.0;
 
 #ifdef FFTW_SUPPORT
     plan =  rfftw_create_plan(512, FFTW_REAL_TO_COMPLEX, FFTW_ESTIMATE);
@@ -448,8 +448,6 @@ Gears::Gears(QWidget *parent, const char *name)
 	startColor 	= QColor(0,0,255);
 	targetColor = QColor(255,0,0); 
 	
-	angle = 0.0;
-	view_roty = 30.0;
 	
 }
 
@@ -578,18 +576,15 @@ bool Gears::process(VisualNode *node)
 bool Gears::draw(QPainter *p, const QColor &back)
 {
 
-#ifdef OPENGL_SUPPORT
 	updateGL();
 	p->fillRect(0, 0, 1, 1, back);	// argh   -Wall
     return false;
-#else
     p->fillRect(0, 0, size.width(), size.height(), back);
 	p->setPen(Qt::white);
 	p->setFont(QFont("Helvetica", 20));
     p->drawText(size.width() / 2 - 200, size.height() / 2 - 20, 400, 20, Qt::AlignCenter, "Visualization requires FFT and OpenGL libraries");
     p->drawText(size.width() / 2 - 200, size.height() / 2, 400, 20, Qt::AlignCenter, "Did you run configure?");
 	return true;
-#endif
 }
 
 void Gears::drawTheGears()
@@ -689,9 +684,8 @@ void Gears::resizeGL( int width, int height )
 
 void Gears::paintGL()
 {
-#ifdef OPENGL_SUPPORT
     drawTheGears();
-#endif
 }
 
 
+#endif

@@ -69,24 +69,33 @@ void MainVisual::setVisual( const QString &visualname )
 	//
 	if(visualname == "Random")
 	{
+
+#ifdef OPENGL_SUPPORT
 		int i = rand() % 3;
+#else
+		int i = rand() % 2;
+#endif
 		if(i == 0)
-		{
-			newvis = new Gears(this);
-		}
-		else if(i == 1)
 		{
 			newvis = new Spectrum;
 		}
-		else if(i == 2)
+#ifdef OPENGL_SUPPORT
+		else if(i == 1)
+		{
+			newvis = new Gears(this);
+		}
+#endif
+		else
 		{
 			newvis = new Synaesthesia;
 		}
 	}
+#ifdef OPENGL_SUPPORT
 	else if(visualname == "Gears")
 	{
 		newvis = new Gears(this);
 	}
+#endif
     else if (visualname == "Spectrum")
     {
         newvis = new Spectrum;
