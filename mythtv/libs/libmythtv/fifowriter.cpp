@@ -74,7 +74,6 @@ int FIFOWriter::FIFOInit(int id, QString desc, QString name, long size,
     fbdesc[id] = desc;
     killwr[id] = 0;
     fbcount[id] = (usesync) ? 2 : num_bufs;
-
     fifo_buf[id] = new struct fifo_buf;
     struct fifo_buf *fifoptr = fifo_buf[id];
     for (int i = 0; i < fbcount[id]; i++)
@@ -182,6 +181,11 @@ void FIFOWriter::FIFOWrite(int id, void *buffer, long blksize)
             timeout.tv_nsec = now.tv_usec * 1000;
             pthread_cond_timedwait(&full_cond[id], &fifo_lock[id], &timeout);
         }
+    }
+    if (blksize > maxblksize[id])
+    {
+        delete [] fb_inptr[id]->data;
+        fb_inptr[id]->data = new unsigned char[blksize];
     }
     memcpy(fb_inptr[id]->data,buffer,blksize);
     fb_inptr[id]->blksize = blksize;

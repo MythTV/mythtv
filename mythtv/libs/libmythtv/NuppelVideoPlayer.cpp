@@ -2679,6 +2679,13 @@ class AudioReencodeBuffer : public AudioOutput
     {
         Reset();
         Reconfigure(audio_bits, audio_channels, 0);
+        bufsize = 512000;
+        audiobuffer = new unsigned char[bufsize];
+    }
+
+   ~AudioReencodeBuffer()
+    {
+        delete [] audiobuffer;
     }
 
     // reconfigure sound out for new params
@@ -2694,8 +2701,9 @@ class AudioReencodeBuffer : public AudioOutput
     // dsprate is in 100 * samples/second
     virtual void SetEffDsp(int dsprate)
     {
-        (void)dsprate;
+        eff_audiorate = (dsprate / 100);
     }
+
     virtual void SetBlocking(bool block) { (void)block; }
     virtual void Reset(void)
     {
@@ -2705,26 +2713,36 @@ class AudioReencodeBuffer : public AudioOutput
     // timecode is in milliseconds.
     virtual void AddSamples(char *buffer, int samples, long long timecode)
     {
-        int freebuf = BUFSIZE - audiobuffer_len;
+        int freebuf = bufsize - audiobuffer_len;
 
         if (samples * bytes_per_sample > freebuf)
         {
-            cout << "Audio buffer overflow, audio data lost!\n";
-            samples = freebuf / bytes_per_sample;
+            bufsize += samples * bytes_per_sample - freebuf;
+            unsigned char *tmpbuf = new unsigned char[bufsize];
+            memcpy(tmpbuf, audiobuffer, audiobuffer_len);
+            delete [] audiobuffer;
+            audiobuffer = tmpbuf;
         }
 
-        memcpy(audiobuffer + audiobuffer_len, buffer, samples * bytes_per_sample);
-        last_audiotime = timecode;
+        memcpy(audiobuffer + audiobuffer_len, buffer, 
+               samples * bytes_per_sample);
+        audiobuffer_len += samples * bytes_per_sample;
+        // last_audiotime is at the end of the sample
+        last_audiotime = timecode + samples * 1000 / eff_audiorate;
     }
+
     virtual void AddSamples(char *buffers[], int samples, long long timecode)
     {
         int audio_bytes = bits / 8;
-        int freebuf = BUFSIZE - audiobuffer_len;
+        int freebuf = bufsize - audiobuffer_len;
 
         if (samples * bytes_per_sample > freebuf)
         {
-            cout << "Audio buffer overflow, audio data lost!\n";
-            samples = freebuf / bytes_per_sample;
+            bufsize += samples * bytes_per_sample - freebuf;
+            unsigned char *tmpbuf = new unsigned char[bufsize];
+            memcpy(tmpbuf, audiobuffer, audiobuffer_len);
+            delete [] audiobuffer;
+            audiobuffer = tmpbuf;
         }
 
         for (int itemp = 0; itemp < samples*audio_bytes; itemp+=audio_bytes)
@@ -2737,7 +2755,8 @@ class AudioReencodeBuffer : public AudioOutput
             }
         }
 
-        last_audiotime = timecode;
+        // last_audiotime is at the end of the sample
+        last_audiotime = timecode + samples * 1000 / eff_audiorate;
     }
 
     virtual void SetTimecode(long long timecode)
@@ -2758,9 +2777,9 @@ class AudioReencodeBuffer : public AudioOutput
         return last_audiotime;
     }
 
-    static const int BUFSIZE = 512000;
-    unsigned char audiobuffer[BUFSIZE];
-    int audiobuffer_len, channels, bits, bytes_per_sample;
+    int bufsize;
+    unsigned char *audiobuffer;
+    int audiobuffer_len, channels, bits, bytes_per_sample, eff_audiorate;
     long long last_audiotime;
 };
 
@@ -2812,11 +2831,17 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
     nvr = new NuppelVideoRecorder(NULL);
     ringBuffer = new RingBuffer(filename, false, false);
 
+    audioOutput = new AudioReencodeBuffer(audio_bits, audio_channels);
+    AudioReencodeBuffer *arb = ((AudioReencodeBuffer*)audioOutput);
+
     if (OpenFile(false) < 0)
     {
         delete nvr;
         return REENCODE_ERROR;
     }
+
+    if (arb->eff_audiorate > 0)
+        audio_samplerate = arb->eff_audiorate;
 
     // Recorder setup
     nvr->SetFrameRate(video_frame_rate);
@@ -2904,6 +2929,7 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
         availableVideoBuffers.enqueue(&(vbuffers[i]));
         vbufferMap[&(vbuffers[i])] = i;
     }
+    usedVideoBuffers.clear();
 
     ClearAfterSeek();
 
@@ -2919,11 +2945,14 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
     {
         QString audfifo = fifodir + QString("/audout");
         QString vidfifo = fifodir + QString("/vidout");
-        //framecontrol is true if we want to enforce fifo sync.
+        int audio_size = audio_samplerate * audio_bits * audio_channels / 8;
+        // framecontrol is true if we want to enforce fifo sync.
+        if (framecontrol)
+            cout << "Enforcing sync on fifos\n";
         fifow = new FIFOWriter::FIFOWriter(2, framecontrol);
 
         if (!fifow->FIFOInit(0, QString("video"), vidfifo, frame.size, 50) ||
-            !fifow->FIFOInit(1, QString("audio"), audfifo, 128000, 25))
+            !fifow->FIFOInit(1, QString("audio"), audfifo, audio_size, 25))
         {
            cerr << "Error initializing fifo writer.  Aborting" << endl;
            delete fifow;
@@ -2947,7 +2976,6 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
     decoder->setExactSeeks(true);
     decoder->GetFrame(0);
     int rawaudio = decoder->GetRawAudioState();
-    audioOutput = new AudioReencodeBuffer(audio_bits, audio_channels);
 
     QMap<long long, int>::Iterator i;
     QMap<long long, int>::Iterator last = deleteMap.end();
@@ -2971,6 +2999,12 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
 
     frame.frameNumber = 0;
     long lastKeyFrame = 0;
+    long totalAudio = 0;
+    int dropvideo = 0;
+    int rateTimeConv = audio_samplerate * audio_bits * audio_channels / 8000;
+    float vidFrameTime = 1000.0 / video_frame_rate;
+    int wait_recover = 0;
+
     while (!eof)
     {
         frame.buf = vbuffers[vpos].buf;
@@ -2999,7 +3033,77 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
         if (eof)
             break;
 
-        if (rawaudio)
+        if (fifow)
+        {
+            int audbufTime = arb->audiobuffer_len / rateTimeConv;
+            totalAudio += audbufTime;
+            int auddelta = arb->last_audiotime - totalAudio;
+            int vidTime = (int) (frame.frameNumber * vidFrameTime + 0.5);
+            rpos = vbufferMap[usedVideoBuffers.head()];
+            int viddelta = timecodes[rpos] - vidTime;
+            int delta = viddelta - auddelta;
+            if (abs(delta) < 500 && abs(delta) >= vidFrameTime)
+            {
+                cout << "Audio is " << abs(delta) << " ms "
+                     << ((delta > 0) ? "ahead of" : "behind")
+                     << " video at # " << frame.frameNumber << endl;
+                dropvideo = (delta > 0) ? 1 : -1;
+                wait_recover = 0;
+            }
+            else if (delta >= 500 && delta < 10000)
+            {
+                if (wait_recover == 0)
+                {
+                    dropvideo = 5;
+                    wait_recover = 6;
+                }
+                else if (wait_recover == 1)
+                {
+                    // Video is badly lagging.  Try to catch up.
+                    int count = 0;
+                    while (delta > vidFrameTime)
+                    {
+                        fifow->FIFOWrite(0, usedVideoBuffers.head()->buf,
+                                         frame.size);
+                        count++;
+                        delta -= (int)vidFrameTime;
+                    }
+                    cout << "Added " << count << " blank video frames" << endl;
+                    frame.frameNumber += count;
+                    dropvideo = 0;
+                    wait_recover = 0;
+                }
+                else
+                    wait_recover--;
+            }
+            else
+                dropvideo = 0;
+            // cout << frame.frameNumber << ": video time: " << frame.timecode
+            //      << " audio time: " << arb->last_audiotime << " buf: "
+            //      << audbufTime << " exp: "
+            //      << totalAudio << endl;
+            fifow->FIFOWrite(1, arb->audiobuffer, arb->audiobuffer_len);
+            if (dropvideo < 0)
+            {
+                dropvideo++;
+                frame.frameNumber--;
+            }
+            else
+            {
+                fifow->FIFOWrite(0, usedVideoBuffers.head()->buf, frame.size);
+                if (dropvideo)
+                {
+                    fifow->FIFOWrite(0, usedVideoBuffers.head()->buf,
+                                     frame.size);
+                    frame.frameNumber++;
+                    dropvideo--;
+                }
+            }
+            availableVideoBuffers.enqueue(usedVideoBuffers.dequeue());
+            audioOutput->Reset();
+            rtxt = wtxt;
+        }
+        else if (rawaudio)
         {
             // Encoding from NuppelVideo to NuppelVideo with MP3 audio
             // So let's not decode/reencode audio
@@ -3050,25 +3154,14 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
                 decoder->WriteStoredData(outRingBuffer, true);
             else
             {
-                if (fifow) 
-                { 
-                   AudioReencodeBuffer *arb = ((AudioReencodeBuffer*)audioOutput);
-                    fifow->FIFOWrite(1, arb->audiobuffer, arb->audiobuffer_len);
-                    fifow->FIFOWrite(0, frame.buf,frame.size);
-                    arb->audiobuffer_len = 0;
-                } 
-                else 
-                {
-                    decoder->WriteStoredData(outRingBuffer, false);
-                    nvr->WriteVideo(&frame, true, writekeyframe);
-                }
+                decoder->WriteStoredData(outRingBuffer, false);
+                nvr->WriteVideo(&frame, true, writekeyframe);
             }
             audioOutput->Reset();
             rtxt = wtxt;
         } 
         else 
         {
-            AudioReencodeBuffer *arb = ((AudioReencodeBuffer*)audioOutput);
             // audio is fully decoded, so we need to reencode it
             audioframesize = arb->audiobuffer_len;
             if (audioframesize > 0)
