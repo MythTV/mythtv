@@ -1869,6 +1869,18 @@
         <source>Always</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Skip blank frames after commercials</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When using Blank Frame Detection and Auto-Flagging, flag blank frames following commercial breaks as part of the the commercial break.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
+    </message>
 </context>
 <context>
     <name>RankPrograms</name>
@@ -2099,7 +2111,7 @@
     </message>
     <message>
         <source>4:3 Zoom</source>
-        <translation type="obsolete">4:3 Zoom</translation>
+        <translation type="unfinished">4:3 Zoom</translation>
     </message>
     <message>
         <source>Brightness (REC) %1 %</source>
@@ -2158,7 +2170,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Zoom</source>
+        <source>16:9 Zoom</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2214,6 +2226,18 @@
     </message>
     <message>
         <source>Don&apos;t record it</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Important</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

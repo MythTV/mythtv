@@ -183,7 +183,7 @@ VideoOutput *VideoOutput::InitVideoOut(VideoOutputType type)
 
 VideoOutput::VideoOutput()
 {
-    letterbox = 0;
+    letterbox = -1;
     rpos = 0;
     vpos = 0;
 
@@ -464,72 +464,74 @@ void VideoOutput::MoveResize(void)
     // necessarily square.
     // n.b. assumes aspect < 1.4 is 4:3 and > 1.4 is 16:9; other
     // aspect ratios wil cause incorrect results
-
-    if (letterbox == 2) 
+    
+    //cout << "XJ aspect " << XJ_aspect << endl;
+    //cout << "Display aspect " << GetDisplayAspect() << endl;
+    //printf("Before: %dx%d%+d%+d\n", dispwoff, disphoff, dispxoff, 
+    //    dispyoff);
+    
+    if (XJ_aspect <= 1.4) 
     {
-        // Zoom mode 
-        // expressly for 4:3 program inside 16:9 frames displayed on 4:3 set 
-        // or 16:9 program inside 4:3 frames displayed on 16:9 set
-        // Math works out that zoom is the same for both
+        // Video is 4:3
+        if (letterbox == -1)
+            letterbox = 0;
+        if (GetDisplayAspect() <= 1.4)
+        {
+            // Display is 4:3 - do nothing
+        }
+        else 
+        {
+            // Display is 16:9 - pillarbox it
+            // image in center, 3/4 of the overall width
+            dispxoff += (dispwoff/8);
+            dispwoff = dispwoff*3/4;
+        }
+    }
+    else 
+    {
+        // Video is 16:9
+        if (letterbox == -1)
+            letterbox = 1;
+        if (GetDisplayAspect() <= 1.4)
+        {
+            // Display is 4:3 -- letterbox it
+            // image in center, 3/4 of the overall height
+            dispyoff += (disphoff/8);
+            disphoff = disphoff*3/4;
+        }
+        else
+        {
+            // Display is 16:9 - do nothing
+        }
+    }
+
+    if (letterbox > 1) 
+    {
+        // Zoom mode
+        //printf("Before zoom: %dx%d%+d%+d\n", dispwoff, disphoff,
+        //dispxoff, dispyoff);
         // Expand by 4/3 and overscan
         dispxoff -= (dispwoff/6); // 1/6 of original is 1/8 of new
         dispwoff = dispwoff*4/3;
         dispyoff -= (disphoff/6);
         disphoff = disphoff*4/3;
     }
-    else 
-    {
-        if (XJ_aspect <= 1.4) 
-        {
-            // Video is 4:3
-            if (GetDisplayAspect() <= 1.4)
-            {
-                // Display is 4:3 - do nothing
-            }
-            else 
-            {
-                // Display is 16:9 - pillarbox it
-                // image in center, 3/4 of the overall width
-                dispxoff += (dispwoff/8);
-                dispwoff = dispwoff*3/4;
-            }
-        }
-        else
-        {
-            // Video is 16:9
-            if (GetDisplayAspect() <= 1.4)
-            {
-                // Display is 4:3 -- letterbox it
-                // image in center, 3/4 of the overall height
-                dispyoff += (disphoff/8);
-                disphoff = disphoff*3/4;
-            }
-            else 
-            {
-                // Display is 16:9 - do nothing
-            }
-        }
-    }
+
+    //printf("After: %dx%d%+d%+d\n", dispwoff, disphoff, dispxoff, 
+    //dispyoff);
 
     DrawUnusedRects();
 }
 
 void VideoOutput::ToggleLetterbox(void)
 {
-    if (++letterbox > 2)
+    if (++letterbox > 3)
         letterbox = 0;
 
     switch (letterbox) 
     {
-    case 0:
-        AspectChanged(4.0 / 3);
-        break;
-    case 1:
-        AspectChanged(16.0 / 9);
-        break;
-    case 2:
-        AspectChanged(GetDisplayAspect());
-        break;
+        default: case 0: case 2: AspectChanged(4.0 / 3); break;
+        case 1: case 3: AspectChanged(16.0 / 9); break;
     }
 }
 

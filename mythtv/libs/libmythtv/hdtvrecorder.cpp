@@ -431,11 +431,9 @@ void HDTVRecorder::RewritePID(unsigned char *buffer, int pid)
     buffer[2] = b2;
 }
 
-bool HDTVRecorder::RewritePAT(unsigned char *buffer, int pid)
+bool HDTVRecorder::RewritePAT(unsigned char *buffer, int pid, int pkt_len)
 {
     int pos = 0;
-    int sec_len = ((buffer[1] << 8) | buffer[2]) & 0x0fff;
-    sec_len += 3;  // adjust for 3 header bytes
 
     // Rewrite the PAT table, eliminating any other streams that the old
     // one may have described so that ffmpeg can only find ours (useful since
@@ -447,8 +445,17 @@ bool HDTVRecorder::RewritePAT(unsigned char *buffer, int pid)
     // TODO: typically PIDs seem to be padded with 1-bits.  Someone 
     // with better knowledge of PAT table formats should confirm this.
     // If it is wrong, fix the '0xe0' values in RewritePMT too.
-    
-    pos = 8;
+  
+    // new_len is the length of the new PAT we're creating, including the
+    // 3 bytes of the header that occur before the length word.  We'll 
+    // account for those 3 bytes later.  If the contents of the new PAT
+    // ever change, be sure to update this!
+    int new_len = 16;
+
+    if (new_len > pkt_len)
+        return false;  // new packet would exceed boundary, skip it
+
+    pos = 8;  // section header is 8 bytes, skip it
 
     buffer[pos] = 0x00;
     buffer[pos+1] = 0x01;
@@ -456,8 +463,8 @@ bool HDTVRecorder::RewritePAT(unsigned char *buffer, int pid)
     buffer[pos+3] = pid & 0xff;
     pos += 4;
 
-    // rewrite section length, add 4 for checksum bytes
-    int new_len = (pos + 4) - 3;
+    // rewrite section length
+    new_len -= 3; // account for 3 bytes before length word in header
     buffer[1] = (buffer[1] & 0xf0) | ((new_len & 0x0f00) >> 8);
     buffer[2] = new_len & 0xff;
 
@@ -469,12 +476,13 @@ bool HDTVRecorder::RewritePAT(unsigned char *buffer, int pid)
     buffer[pos++] = (crc & 0x000000ff);
 
     // pad the rest of the packet with 0xff
-    memset(buffer + pos, 0xff, sec_len - pos);
+    memset(buffer + pos, 0xff, pkt_len - pos);
 
     return true;
 }
 
-bool HDTVRecorder::RewritePMT(unsigned char *buffer, int old_pid, int new_pid)
+bool HDTVRecorder::RewritePMT(unsigned char *buffer, int old_pid, int new_pid,
+                              int pkt_len)
 {
     // TODO: if it's possible for a PMT to span packets, then this function
     // doesn't know how to deal with anything after the first packet.  On the
@@ -484,6 +492,10 @@ bool HDTVRecorder::RewritePMT(unsigned char *buffer, int old_pid, int new_pid)
     int pid;
     int sec_len = ((buffer[1] & 0x0f) << 8) + buffer[2];
     sec_len += 3;  // adjust for 3 header bytes
+
+    // make sure section doesn't span packet bounds
+    if (sec_len > pkt_len)
+        sec_len = pkt_len;
 
     // rewrite program number to 1
     buffer[3] = 0x00;
@@ -675,7 +687,8 @@ int HDTVRecorder::ProcessData(unsigned char *buffer, int len)
                 int sec_start = pos + buffer[pos] + 1;
 
                 // write to ringbuffer if pids gets rewritten successfully.
-                if (RewritePAT(&buffer[sec_start], output_base_pid))
+                if (RewritePAT(&buffer[sec_start], output_base_pid,
+                               packet_end_pos - sec_start))
                     ringBuffer->Write(&buffer[packet_start_pos], 188);
             }
         }
@@ -722,7 +735,8 @@ int HDTVRecorder::ProcessData(unsigned char *buffer, int len)
 
             // if it's a PMT table, rewrite the PIDs contained in it too
             if (buffer[sec_start] == 0x02) {
-                if (RewritePMT(&(buffer[sec_start]), base_pid, output_base_pid))
+                if (RewritePMT(&(buffer[sec_start]), base_pid, output_base_pid,
+                               packet_end_pos - sec_start))
                 {
                     ringBuffer->Write(&buffer[packet_start_pos], 188);
                 }

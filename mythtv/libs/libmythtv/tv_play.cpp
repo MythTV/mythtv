@@ -2316,7 +2316,8 @@ void TV::ToggleLetterbox(void)
 
     switch (letterbox)
     {
-        case 2: text = tr("Zoom"); break;
+        case 3: text = tr("16:9 Zoom"); break;
+        case 2: text = tr("4:3 Zoom"); break;
         case 1: text = tr("16:9"); break;
         default: text = tr("4:3"); break;
     }

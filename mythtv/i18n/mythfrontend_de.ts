@@ -578,7 +578,7 @@
     </message>
     <message>
         <source>Record duplicates</source>
-        <translation>Auch Serienwdh. aufnehmen</translation>
+        <translation>Wdh. aufnehmen</translation>
     </message>
     <message>
         <source>Auto Expire</source>
@@ -678,7 +678,7 @@
     </message>
     <message>
         <source>MythTV can control the PCM and master mixer volume.  If you prefer to use an external mixer program, uncheck this box.</source>
-        <translation type="unfinished">MythTV kann die Master/PCM Lautstärke regeln. Bitte abwählen falls Sie die Lautstärke extern regeln möchten.</translation>
+        <translation>MythTV kann die Master/PCM Lautstärke regeln. Bitte abwählen falls Sie die Lautstärke extern regeln möchten.</translation>
     </message>
     <message>
         <source>Mixer Device</source>
@@ -862,7 +862,7 @@
     </message>
     <message>
         <source>Sticky keys</source>
-        <translation>&apos;Klebrige&apos; Tasten</translation>
+        <translation>&quot;Klebrige&quot; Tasten</translation>
     </message>
     <message>
         <source>If this is set, fast forward and rewind continue after the key is released.  Pressing the key again increases the fast forward or rewind speed.  The alternate fast forward and rewind keys always behave in this way.</source>
@@ -918,19 +918,19 @@
     </message>
     <message>
         <source>Setup Pin Code</source>
-        <translation type="unfinished"></translation>
+        <translation>Setup Pin Code</translation>
     </message>
     <message>
         <source>This PIN is used to control access to the setup menues. If you want to use this feature, then setting the value to all numbers will make your life much easier.  Set it to blank to disable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Diese PIN sichert den Zugang zu den Konfigurationsmenüs und sollte für eine einfache Nutzung nur aus Ziffern bestehen. Ein leerer Eintrag schaltet die PIN Kontrolle ab.</translation>
     </message>
     <message>
         <source>Require Setup PIN</source>
-        <translation type="unfinished"></translation>
+        <translation>PIN Code abfragen</translation>
     </message>
     <message>
         <source>If set, you will not be able to return to this screen and reset the Setup PIN without first entering the current PIN.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, muß zum Ändern der PIN zuerst die aktuelle PIN eingegeben werden.</translation>
     </message>
     <message>
         <source>Reposition after fast forward/rewind</source>
@@ -938,87 +938,87 @@
     </message>
     <message>
         <source>When exiting sticky keys fast forward/rewind mode, reposition before resuming normal playback.  This is to compensate for the reaction time between seeing where to resume playback and actually exiting fast forward/rewind mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nach dem Verlassen der &quot;klebrigen Tasten&quot; Funktion vor der Wiedergabe neu positionieren. Dies gleicht die Reaktionszeit zwischen gewünschter und tatsächlicher Wiedergabeposition aus.</translation>
     </message>
     <message>
         <source>Number of seconds for OSD information</source>
-        <translation type="unfinished"></translation>
+        <translation>Verweildauer des OSD (in Sek.)</translation>
     </message>
     <message>
         <source>How long the program information remains on the On Screen Display after a channel change.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bestimmt wie lange das OSD (on screen display) nach dem Umschalten angezeigt wird.</translation>
     </message>
     <message>
         <source>OSD theme</source>
-        <translation type="unfinished"></translation>
+        <translation>OSD Thema</translation>
     </message>
     <message>
         <source>OSD font</source>
-        <translation type="unfinished"></translation>
+        <translation>OSD Zeichensatz</translation>
     </message>
     <message>
         <source>Closed Caption font</source>
-        <translation type="unfinished"></translation>
+        <translation>Teletext Zeichensatz</translation>
     </message>
     <message>
         <source>Channel ordering</source>
-        <translation type="unfinished"></translation>
+        <translation>Sendersortierung</translation>
     </message>
     <message>
         <source>channel number (numeric)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanal (numerisch)</translation>
     </message>
     <message>
         <source>channel number (alpha)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanal (alphabetisch)</translation>
     </message>
     <message>
         <source>database order</source>
-        <translation type="unfinished"></translation>
+        <translation>Datenbank</translation>
     </message>
     <message>
         <source>channel name</source>
-        <translation type="unfinished"></translation>
+        <translation>Sendername</translation>
     </message>
     <message>
         <source>Vertical over/underscan percentage</source>
-        <translation type="unfinished"></translation>
+        <translation>Bildvergrößerung (vert. in %)</translation>
     </message>
     <message>
         <source>Adjust this if the image does not fill your screen vertically.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hier können Sie die vertikale Bildgröße einstellen.</translation>
     </message>
     <message>
         <source>Horizontal over/underscan percentage</source>
-        <translation type="unfinished"></translation>
+        <translation>Bildvergrößerung (horiz. in %)</translation>
     </message>
     <message>
         <source>Adjust this if the image does not fill your screen horizontally.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hier können Sie die horizontale Bildgröße einstellen.</translation>
     </message>
     <message>
         <source>Scan displacement (X)</source>
-        <translation type="unfinished"></translation>
+        <translation>Bildposition (horiz.)</translation>
     </message>
     <message>
         <source>Adjust this to move the image horizontally.</source>
-        <translation type="unfinished"></translation>
+        <translation>Verschiebt das Bild horizontal.</translation>
     </message>
     <message>
         <source>Scan displacement (Y)</source>
-        <translation type="unfinished"></translation>
+        <translation>Bildposition (vert.)</translation>
     </message>
     <message>
         <source>Adjust this to move the image vertically.</source>
-        <translation type="unfinished"></translation>
+        <translation>Verschiebt das Bild vertikal.</translation>
     </message>
     <message>
         <source>Jitter reduction</source>
-        <translation type="unfinished"></translation>
+        <translation>Bildstabilisator</translation>
     </message>
     <message>
         <source>If this is set, frame timing will be adjusted for smoother motion.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, wird das Frame Timing für eine gleichmäßigere Bewegung angepasst.</translation>
     </message>
     <message>
         <source>Experimental A/V Sync</source>
@@ -1274,11 +1274,11 @@
     </message>
     <message>
         <source>Your preferred date format.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ihr bevorzugtes Datumsformat.</translation>
     </message>
     <message>
         <source>Short Date format</source>
-        <translation type="unfinished"></translation>
+        <translation>Kurzes Datumsformat</translation>
     </message>
     <message>
         <source>M/d</source>
@@ -1302,11 +1302,11 @@
     </message>
     <message>
         <source>Your preferred short date format.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ihr bevorzugtes kurzes Datumsformat.</translation>
     </message>
     <message>
         <source>Time format</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeitformat</translation>
     </message>
     <message>
         <source>h:mm AP</source>
@@ -1338,7 +1338,7 @@
     </message>
     <message>
         <source>Theme</source>
-        <translation type="unfinished"></translation>
+        <translation>Thema</translation>
     </message>
     <message>
         <source>Problem reading theme preview image </source>
@@ -1346,19 +1346,19 @@
     </message>
     <message>
         <source>Display channel names instead of numbers</source>
-        <translation type="unfinished"></translation>
+        <translation>Sendernamen statt Nummern anzeigen</translation>
     </message>
     <message>
         <source>&quot;Big&quot; font</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;Großer&quot; Zeichensatz</translation>
     </message>
     <message>
         <source>&quot;Medium&quot; font</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;Mitllerer&quot; Zeichensatz</translation>
     </message>
     <message>
         <source>&quot;Small&quot; font</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;Kleiner&quot; Zeichensatz</translation>
     </message>
     <message>
         <source>Program Guide Selection Placement</source>
@@ -1650,11 +1650,11 @@
     </message>
     <message>
         <source>Audio Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Audio Qualität</translation>
     </message>
     <message>
         <source>RTjpeg Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>RTjpeg Qualität</translation>
     </message>
     <message>
         <source>Higher is better quality.</source>
@@ -1762,35 +1762,35 @@
     </message>
     <message>
         <source>RTjpeg Parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>RTjpeg Parameter</translation>
     </message>
     <message>
         <source>MPEG-4 Parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>MPEGß4 Parameter</translation>
     </message>
     <message>
         <source>Hardware MJPEG Parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>Hardware MJPEG Parameter</translation>
     </message>
     <message>
         <source>MPEG-2 Hardware Encoder</source>
-        <translation type="unfinished"></translation>
+        <translation>MPEG-2 Hardware Kodierer</translation>
     </message>
     <message>
         <source>Automatically transcode after recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Aufnahmen autom. umwandeln</translation>
     </message>
     <message>
         <source>Width</source>
-        <translation type="unfinished"></translation>
+        <translation>Breite</translation>
     </message>
     <message>
         <source>Height</source>
-        <translation type="unfinished"></translation>
+        <translation>Höhe</translation>
     </message>
     <message>
         <source>Image size</source>
-        <translation type="unfinished"></translation>
+        <translation>Bildgröße</translation>
     </message>
     <message>
         <source>Mixer Controls</source>
@@ -1806,31 +1806,31 @@
     </message>
     <message>
         <source>Use Xv picture controls</source>
-        <translation type="unfinished"></translation>
+        <translation>Nutze Xv Bildregler</translation>
     </message>
     <message>
         <source>If set, Xv picture controls (brightness, contrast, etc.) are used during playback. These are independent of the v4l controls used for recording. The Xv controls may not work properly on some systems.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, können während der Wiedergabe die Xv Bildregler genutzt werden. Diese sind unabhängig von den für die Aufnahme verwendeten V4L Reglern. In manchen Rechnern könnten die Xv Regler nicht funktionieren.</translation>
     </message>
     <message>
         <source>Use the PVR-350&apos;s TV out / MPEG decoder</source>
-        <translation type="unfinished"></translation>
+        <translation>Nutze den PVR-350 MPEG Dekoder (TV out)</translation>
     </message>
     <message>
         <source>MythTV can use the PVR-350&apos;s TV out and MPEG decoder for high quality playback.  This requires that the ivtv-fb kernel module is also loaded and set up properly.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV kann den TV-Ausgang und MPEG-Dekoder auf Hauppage PVR-350 Karten für die Wiedergabe nutzen. Dazu muß das ivtv-fb Kernelmodul richtig eingerichtet und geladen sein.</translation>
     </message>
     <message>
         <source>Video device for the PVR-350 MPEG decoder</source>
-        <translation type="unfinished"></translation>
+        <translation>Videogerät für den PVR-350 MPEG Dekoder</translation>
     </message>
     <message>
         <source>PVR-350 Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>PVR-350 Einstellungen</translation>
     </message>
     <message>
         <source>Custom Filters</source>
-        <translation type="unfinished"></translation>
+        <translation>Spezielle Filter</translation>
     </message>
     <message>
         <source>Advanced Filter configuration, format:
@@ -1839,27 +1839,27 @@
     </message>
     <message>
         <source>Font size</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeichensatzgröße</translation>
     </message>
     <message>
         <source>default</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard</translation>
     </message>
     <message>
         <source>small</source>
-        <translation type="unfinished"></translation>
+        <translation>Klein</translation>
     </message>
     <message>
         <source>big</source>
-        <translation type="unfinished"></translation>
+        <translation>Groß</translation>
     </message>
     <message>
         <source>default: TV, small: monitor, big:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Standard: TV klein; Monitor groß</translation>
     </message>
     <message>
         <source>Change channels immediately without select</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>When a complete channel number is entered MythTV will switch to that channel immediately without requiring you to hit the select button.</source>
@@ -1903,15 +1903,27 @@
     </message>
     <message>
         <source>Never</source>
-        <translation type="unfinished"></translation>
+        <translation>Niemals</translation>
     </message>
     <message>
         <source>If deleted</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gelöscht</translation>
     </message>
     <message>
         <source>Always</source>
+        <translation>Immer</translation>
+    </message>
+    <message>
+        <source>Skip blank frames after commercials</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When using Blank Frame Detection and Auto-Flagging, flag blank frames following commercial breaks as part of the the commercial break.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">Ok</translation>
     </message>
 </context>
 <context>
@@ -2210,27 +2222,27 @@
     </message>
     <message>
         <source>4:3 Zoom</source>
-        <translation type="obsolete">4:3 Zoom</translation>
+        <translation type="unfinished">4:3 Zoom</translation>
     </message>
     <message>
         <source>Brightness (REC) %1 %</source>
-        <translation type="unfinished"></translation>
+        <translation>Helligkeit (REC) %1 %</translation>
     </message>
     <message>
         <source>Contrast (REC) %1 %</source>
-        <translation type="unfinished"></translation>
+        <translation>Kontrast (REC) %1 %</translation>
     </message>
     <message>
         <source>Colour (REC) %1 %</source>
-        <translation type="unfinished"></translation>
+        <translation>Farbe (REC) %1 %</translation>
     </message>
     <message>
         <source>Hue (REC) %1 %</source>
-        <translation type="unfinished"></translation>
+        <translation>Farbton (REC) %1 %</translation>
     </message>
     <message>
         <source>Program Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Programmenü</translation>
     </message>
     <message>
         <source>Set Commercial Auto-Skip OFF</source>
@@ -2270,6 +2282,10 @@
     </message>
     <message>
         <source>Zoom</source>
+        <translation type="obsolete">Zoom</translation>
+    </message>
+    <message>
+        <source>16:9 Zoom</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2321,10 +2337,22 @@
     </message>
     <message>
         <source>Record it anyway</source>
-        <translation type="unfinished"></translation>
+        <translation>Dennoch aufnehmen</translation>
     </message>
     <message>
         <source>Don&apos;t record it</source>
+        <translation>Nicht aufnehmen</translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Important</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -50,8 +50,9 @@ class HDTVRecorder : public RecorderBase
 
     int ResyncStream(unsigned char *buffer, int curr_pos, int len);
     void RewritePID(unsigned char *buffer, int pid);
-    bool RewritePAT(unsigned char *buffer, int pid);
-    bool RewritePMT(unsigned char *buffer, int old_pid, int new_pid);
+    bool RewritePAT(unsigned char *buffer, int pid, int pkt_len);
+    bool RewritePMT(unsigned char *buffer, int old_pid, int new_pid, 
+                    int pkt_len);
     bool recording;
     bool encoding;
 

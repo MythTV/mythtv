@@ -169,7 +169,7 @@ bool VideoOutputXvMC::Init(int width, int height, float aspect,
   
     unsigned int p_version, p_release, p_request_base, p_event_base, 
                  p_error_base;
-    int p_num_adaptors;
+    int p_num_adaptors, w_mm, h_mm;
 
     XvAdaptorInfo *ai;
 
@@ -785,7 +785,7 @@ void VideoOutputXvMC::DrawUnusedRects(void)
     XSync(data->XJ_disp, false);
 }
 
-float VideoOutputXvMV::GetDisplayAspect(void)
+float VideoOutputXvMC::GetDisplayAspect(void)
 {
     return data->display_aspect;
 }

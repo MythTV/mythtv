@@ -213,9 +213,9 @@ NuppelVideoRecorder::~NuppelVideoRecorder(void)
 void NuppelVideoRecorder::SetOption(const QString &opt, int value)
 {
     if (opt == "width")
-        w = value;
+        w_out = w = value;
     else if (opt == "height")
-        h = value;
+        h_out = h = value;
     else if (opt == "rtjpegchromafilter")
         M1 = value;
     else if (opt == "rtjpeglumafilter")
