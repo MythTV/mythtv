@@ -15,8 +15,8 @@ class AudioOutputARTS : public AudioOutputBase
 {
   public:
      AudioOutputARTS(QString audiodevice, int audio_bits, 
-                   int audio_channels, int audio_samplerate,
-		   AudioOutputSource source, bool set_initial_vol);
+                     int audio_channels, int audio_samplerate,
+                     AudioOutputSource source, bool set_initial_vol);
      virtual ~AudioOutputARTS();
 
     // Volume control

@@ -578,8 +578,7 @@ inline void AudioOutputALSA::GetVolumeRange(void)
     snd_mixer_selem_get_playback_volume_range(elem, &playback_vol_min,
                                               &playback_vol_max);
     volume_range_multiplier = (100.0 / (float)(playback_vol_max -
-                                                   playback_vol_min));
-						   
+                                               playback_vol_min));
 
     VERBOSE(VB_AUDIO, QString("Volume range is %1 to %2, mult=%3")
             .arg(playback_vol_min).arg(playback_vol_max)

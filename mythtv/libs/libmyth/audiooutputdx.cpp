@@ -96,8 +96,8 @@ DEFINE_GUID( _KSDATAFORMAT_SUBTYPE_DOLBY_AC3_SPDIF, WAVE_FORMAT_DOLBY_AC3_SPDIF,
 
 
 AudioOutputDX::AudioOutputDX(QString audiodevice, int audio_bits, 
-                                 int audio_channels, int audio_samplerate,
-				 AudioOutputSource source, bool set_initial_vol)
+                             int audio_channels, int audio_samplerate,
+                             AudioOutputSource source, bool set_initial_vol)
 {
     this->audiodevice = audiodevice;
     

@@ -20,10 +20,10 @@ extern "C"
 }
 
 AudioOutputJACK::AudioOutputJACK(QString audiodevice, int laudio_bits, 
-                               int laudio_channels, int laudio_samplerate,
-			       AudioOutputSource source, bool set_initial_vol)
-              : AudioOutputBase(audiodevice, laudio_bits, 
-	                      laudio_channels, laudio_samplerate, source, set_initial_vol)
+                                 int laudio_channels, int laudio_samplerate,
+                                 AudioOutputSource source, bool set_initial_vol)
+               : AudioOutputBase(audiodevice, laudio_bits, laudio_channels,
+                                 laudio_samplerate, source, set_initial_vol)
 {
     // Initialise the Jack output layer
     JACK_Init();
@@ -53,24 +53,28 @@ bool AudioOutputJACK::OpenDevice()
     if(!audiodevice.isEmpty()) {
         jack_port_flags = 0;
         jack_port_name_count = 1;
-	jack_port_name = audiodevice.ascii();
+        jack_port_name = audiodevice.ascii();
     }
-	
+
     int err = -1;
     audioid = -1;
     while (timer.elapsed() < 2000 && audioid == -1)
     {
-        err = JACK_OpenEx(&audioid, 16, (unsigned long *) &audio_samplerate, audio_channels, audio_channels,
-	                &jack_port_name, jack_port_name_count, jack_port_flags);
-	if (err == 1) {
-	    Error(QString("Error connecting to jackd:%1.  Is it running?").arg(audiodevice));
-	    return false;
+        err = JACK_OpenEx(&audioid, 16, (unsigned long *) &audio_samplerate,
+                          audio_channels, audio_channels, &jack_port_name,
+                          jack_port_name_count, jack_port_flags);
+        if (err == 1) {
+            Error(QString("Error connecting to jackd:%1.  Is it running?")
+                  .arg(audiodevice));
+            return false;
         } else if (err == 2) {
-	  // need to resample
-	  VERBOSE(VB_AUDIO, QString("Failed to open device at requested samplerate.  Retrying"));
-          err = JACK_OpenEx(&audioid, 16, (unsigned long *) &audio_samplerate, audio_channels, audio_channels,
-                        &jack_port_name, jack_port_name_count, jack_port_flags);
-	}
+            // need to resample
+            VERBOSE(VB_AUDIO, QString("Failed to open device at"
+                                      " requested samplerate.  Retrying"));
+            err = JACK_OpenEx(&audioid, 16, (unsigned long *) &audio_samplerate,
+                              audio_channels, audio_channels, &jack_port_name,
+                              jack_port_name_count, jack_port_flags);
+        }
 
         if (err != 0)
         {
@@ -103,7 +107,7 @@ bool AudioOutputJACK::OpenDevice()
     // Setup volume control
     if (internal_vol)
         VolumeInit();
-	
+
     // Device opened successfully
     return true; 
 }
@@ -114,8 +118,8 @@ void AudioOutputJACK::CloseDevice()
     if (audioid != -1) 
     {
         err = JACK_Close(audioid);
-	if (err != 0)
-	    Error(QString("Error closing Jack output device"));
+        if (err != 0)
+            Error(QString("Error closing Jack output device"));
     }
 
     audioid = -1;
@@ -174,7 +178,7 @@ int AudioOutputJACK::GetVolumeChannel(int channel)
     
     if (!internal_vol)
         return 100;
-	
+
     JACK_GetVolumeForChannel(audioid, channel, &vol);
     return vol;
 }

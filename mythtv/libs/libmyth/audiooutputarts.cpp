@@ -9,9 +9,9 @@ using namespace std;
 
 AudioOutputARTS::AudioOutputARTS(QString audiodevice, int audio_bits, 
                                  int audio_channels, int audio_samplerate,
-				 AudioOutputSource source, bool set_initial_vol)
-              : AudioOutputBase(audiodevice, audio_bits,
-                              audio_channels, audio_samplerate, source, set_initial_vol)
+                                 AudioOutputSource source, bool set_initial_vol)
+              : AudioOutputBase(audiodevice, audio_bits, audio_channels,
+                                audio_samplerate, source, set_initial_vol)
 {
     // our initalisation
     pcm_handle = NULL;
@@ -59,8 +59,8 @@ bool AudioOutputARTS::OpenDevice()
                               "mythtv");
 
     buff_size = arts_stream_get(stream, ARTS_P_BUFFER_SIZE) + 
-		(arts_stream_get(stream, ARTS_P_SERVER_LATENCY) * 
-			audio_bits * audio_channels * audio_samplerate / 8);
+                (arts_stream_get(stream, ARTS_P_SERVER_LATENCY) * 
+                 audio_bits * audio_channels * audio_samplerate / 8);
 
     pcm_handle = stream;
 

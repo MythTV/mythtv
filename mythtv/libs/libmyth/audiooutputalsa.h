@@ -62,7 +62,7 @@ class AudioOutputALSA : public AudioOutputBase
     QString mixer_control;  // e.g. "PCM"
 
     float volume_range_multiplier;
-    long playback_vol_min, playback_vol_max;	
+    long playback_vol_min, playback_vol_max;
 };
 
 #endif
