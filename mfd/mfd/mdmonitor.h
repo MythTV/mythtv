@@ -16,6 +16,7 @@
 #include <qthread.h>
 #include <qmutex.h>
 #include <qwaitcondition.h>
+#include <qsqldatabase.h>
 
 #include "metadata.h"
 

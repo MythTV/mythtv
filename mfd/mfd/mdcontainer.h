@@ -58,6 +58,7 @@ class MetadataContainer
     virtual bool        tryToUpdate();
     int                 getIdentifier(){return unique_identifier;}
     bool                isAudio();
+    bool                isVideo();
     bool                isLocal();
     uint                getMetadataCount();
     uint                getPlaylistCount();

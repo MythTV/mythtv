@@ -22,13 +22,14 @@ using namespace std;
 #include "daaplib/tagoutput.h"
 #include "daaplib/registry.h"
 
-#include "./httpd_persistent/httpd.h"
+// #include "./httpd_persistent/httpd.h"
 
 DaapServer *daap_server = NULL;
 
 
 const int   DAAP_OK = 200;
 
+/*
 
 extern "C" void handleSelectCallback(bool *continue_flag)
 {
@@ -42,14 +43,16 @@ extern "C" void parseRequest( httpd *server, void *)
     daap_server->parseIncomingRequest(server);
 }
 
+*/
 /*
 ---------------------------------------------------------------------
 */
 
 
 DaapServer::DaapServer(MFD *owner, int identity)
-      :MFDServicePlugin(owner, identity, 3689)
+      :MFDHttpPlugin(owner, identity, 3689)
 {
+
     metadata_containers = owner->getMetadataContainers();    
     QString local_hostname = "unknown";
     char my_hostname[2049];
@@ -63,7 +66,20 @@ DaapServer::DaapServer(MFD *owner, int identity)
         local_hostname = my_hostname;
     }
     service_name = QString("MythMusic (DAAP) on %1").arg(local_hostname); 
+
+    //
+    //  Register this (daap) service
+    //
+
+    ServiceEvent *se = new ServiceEvent(QString("services add daap %1 %2")
+                                       .arg(port_number)
+                                       .arg(service_name));
+    QApplication::postEvent(parent, se);
+
+
 }
+
+/*
 
 void DaapServer::run()
 {
@@ -110,8 +126,6 @@ void DaapServer::run()
     httpdAddSelectCallback(server, handleSelectCallback);
     
 
-    struct timeval timeout;
-
     while(keep_going)
     {
         timeout.tv_sec  = 2;
@@ -123,6 +137,7 @@ void DaapServer::run()
         //
         
         httpdSelectLoop( server, timeout);
+        
     }
     
     //
@@ -135,6 +150,9 @@ void DaapServer::run()
 
 void DaapServer::parseIncomingRequest(httpd *server)
 {
+
+    metadata_audio_generation = parent->getMetadataAudioGeneration();
+
     //
     //  Create a DaapRequest object that will be built up to understand the
     //  request that has just come in from a client
@@ -206,16 +224,16 @@ void DaapServer::parseIncomingRequest(httpd *server)
         //
 
         
-        if(daap_request->getDatabaseVersion() != parent->getMetadataGeneration() &&
+        if(daap_request->getDatabaseVersion() != parent->getMetadataAudioGeneration() &&
            daap_request->getDatabaseVersion() != 0)
         {
             log(QString("daap client asked for a database request, "
                         "but has stale db reference "
                         "(mfd db# = %1, client db# = %2)")
-                        .arg(parent->getMetadataGeneration())
+                        .arg(parent->getMetadataAudioGeneration())
                         .arg(daap_request->getDatabaseVersion()), 9);
 
-            sendUpdate(server, parent->getMetadataGeneration());
+            sendUpdate(server, parent->getMetadataAudioGeneration());
         }
         else
         {
@@ -226,19 +244,28 @@ void DaapServer::parseIncomingRequest(httpd *server)
     else if (daap_request->getRequestType() == DAAP_REQUEST_UPDATE)
     {
         //
-        //  iTunes has an annoying habit of just sending these requests. We
+        //  
         //  should only respond if the database version numbers are out of
         //  whack.
         //
 
 
-        if(daap_request->getDatabaseVersion() != parent->getMetadataGeneration())
+        if(daap_request->getDatabaseVersion() != parent->getMetadataAudioGeneration())
         {
             log(QString("daap client asked for and will get an update "
                         "(mfd db# = %1, client db# = %2)")
-                        .arg(parent->getMetadataGeneration())
+                        .arg(parent->getMetadataAudioGeneration())
                         .arg(daap_request->getDatabaseVersion()), 9);
-            sendUpdate(server, parent->getMetadataGeneration());
+            sendUpdate(server, parent->getMetadataAudioGeneration());
+        }
+        else
+        {
+            //
+            //  We can hold this request, so that when (if?) the database of
+            //  music does change, we have some way to push back the update
+            //
+            
+            //  FIX            
         }
     }
     
@@ -479,18 +506,18 @@ void DaapServer::sendMetadata(httpd *server, QString request_path, DaapRequest *
         //  Ok, it's asking for something below /databases/...
         //
 
-        /*
+        
         if( components[1].toULong() != (ulong) all_the_metadata->getCurrentGeneration() ||
             components.count() < 3)
         {
             //
-            //  I don't know what it's asking for ... doesn't make sense
+            //  I don't know what it's asking for ... doesn't make sense ... or db is out of date
             //
             
             httpdSend403(server);
             return;
         }
-        */ 
+ 
         if( components[2] == "items" )
         {
             if( components.count() == 3 )
@@ -1061,7 +1088,23 @@ void DaapServer::sendContainer(httpd *server, u32 container_id, int which_databa
 
 }
 
-
+bool DaapServer::wantsToContinue()
+{
+    //
+    //  polling check for database changes
+    //
+    
+    if(parent->getMetadataAudioGeneration() != metadata_audio_generation)
+    {
+            //
+            //  We want to send an update here, but we need a better http 
+            //  server infrastructure before we can do it.  FIX
+            //
+    }
+    
+    return keep_going;
+}
+*/
 
 DaapServer::~DaapServer()
 {

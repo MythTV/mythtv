@@ -32,7 +32,8 @@ MFD::MFD(QSqlDatabase *ldb, int port, bool log_stdout, int logging_verbosity)
     watchdog_flag = false;
     port_number = port;
     metadata_container_identifier = 0;
-    metadata_generation = 4;    // 4? Why 4? ... arbitrary starting point, higher than 3 for obscure iTunes reasons
+    metadata_video_generation = 0;
+    metadata_audio_generation = 4;    // 4? Why 4? ... arbitrary starting point, higher than 3 for obscure iTunes reasons
     metadata_containers = new QPtrList<MetadataContainer>;
     metadata_containers->setAutoDelete(true);
     metadata_id = 1;
@@ -76,6 +77,14 @@ MFD::MFD(QSqlDatabase *ldb, int port, bool log_stdout, int logging_verbosity)
             this, SLOT(endConnection(MFDClientSocket *)));
 
     //
+    //  Create the metadata server object (separate thread object that has
+    //  it's own server port for serving metadata)
+    //
+    
+    metadata_server = new MetadataServer(this, 2344);
+    metadata_server->start();
+
+    //
     //  Create the plugin manager, which will
     //  automatically load the plugins
     //
@@ -85,13 +94,6 @@ MFD::MFD(QSqlDatabase *ldb, int port, bool log_stdout, int logging_verbosity)
             this, SLOT(registerMFDService(void)));
     registerMFDService();
     
-    //
-    //  Create the metadata server object (separate thread object that has
-    //  it's own server port for serving metadata)
-    //
-    
-    metadata_server = new MetadataServer(this, 2344);
-    metadata_server->start();
 }
 
 
@@ -287,9 +289,20 @@ void MFD::customEvent(QCustomEvent *ce)
             {
                 if(a_container->tryToUpdate())
                 {
-                    bumpMetadataGeneration();
-                    log(QString("mfd metadata generation counter is now at %1")
-                        .arg(metadata_generation), 2);
+                    if(a_container->isAudio())
+                    {
+                        bumpMetadataAudioGeneration();
+                        log(QString("mfd metadata audio generation counter is now at %1")
+                            .arg(metadata_audio_generation), 2);
+                    }
+                    else if (a_container->isVideo())
+                    {
+                        bumpMetadataAudioGeneration();
+                        log(QString("mfd metadata video generation counter is now at %1")
+                            .arg(metadata_video_generation), 2);
+                    }
+                    
+                    //  metadata_server->addToDo("check", -1);
                 }
                 break;
             }
@@ -624,16 +637,22 @@ int MFD::bumpMetadataContainerIdentifier()
     return metadata_container_identifier;
 }
 
-int MFD::bumpMetadataGeneration()
+int MFD::bumpMetadataAudioGeneration()
 {
     //
-    //  Any time anything changes in any metadata collection, we need to
-    //  keep track of the fact that something has changed by augmenting the
-    //  value of metadata_generation
+    //  Any time anything changes in any audio metadata collection, we need
+    //  to keep track of the fact that something has changed by augmenting
+    //  the value of metadata_audio_generation
     //
     
-    ++metadata_generation;
-    return metadata_generation;
+    ++metadata_audio_generation;
+    return metadata_audio_generation;
+}
+
+int MFD::bumpMetadataVideoGeneration()
+{
+    ++metadata_video_generation;
+    return metadata_video_generation;
 }
 
 int MFD::bumpMetadataId()

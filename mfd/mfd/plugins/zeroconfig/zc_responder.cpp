@@ -432,8 +432,10 @@ void ZeroConfigResponder::run()
 
             if(FD_ISSET(u_shaped_pipe[0], &readfds))
             {
-                char read_back[10];
-                read(u_shaped_pipe[0], read_back, 9);
+                u_shaped_pipe_mutex.lock();
+                    char read_back[10];
+                    read(u_shaped_pipe[0], read_back, 9);
+                u_shaped_pipe_mutex.unlock();
             }
 
 

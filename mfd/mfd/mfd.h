@@ -37,7 +37,8 @@ class MFD : public QObject
     ~MFD();
     
     QPtrList<MetadataContainer>* getMetadataContainers(){return metadata_containers;}
-    uint                         getMetadataGeneration(){return metadata_generation;}
+    uint                         getMetadataAudioGeneration(){return metadata_audio_generation;}
+    uint                         getMetadataVideoGeneration(){return metadata_video_generation;}
     int                          bumpMetadataId();
     int                          bumpPlaylistId();
     uint                         getAllAudioMetadataCount();
@@ -81,7 +82,8 @@ class MFD : public QObject
     void makeMetadataContainers();
 
     int  bumpMetadataContainerIdentifier();
-    int  bumpMetadataGeneration();
+    int  bumpMetadataAudioGeneration();
+    int  bumpMetadataVideoGeneration();
     
 
     QSqlDatabase                *db;
@@ -95,7 +97,9 @@ class MFD : public QObject
 
     QPtrList<MetadataContainer> *metadata_containers;
     int                         metadata_container_identifier;
-    uint                        metadata_generation;
+
+    uint                        metadata_audio_generation;
+    uint                        metadata_video_generation;
     
     int                         metadata_id;
     int                         playlist_id;

@@ -18,6 +18,7 @@
 AudioPlugin::AudioPlugin(MFD *owner, int identity)
       :MFDServicePlugin(owner, identity, 2343)
 {
+    setName("audio");
     input = NULL;
     output = NULL;
     decoder = NULL;
@@ -43,17 +44,15 @@ void AudioPlugin::swallowOutputUpdate(int numb_seconds, int channels, int bitrat
     play_data_mutex.unlock();
 
     //
-    //  Put an internal request on the list of things to do
+    //  Tell the clients
     //
     
-    addToDo("playupdate", -1);
-    
-    //
-    //  wake up the running thread so it can send this new data to connected
-    //  clients
-    //    
-    
-    wakeUp();
+    sendMessage(QString("playing %1 %2 %3 %4")
+                        .arg(elapsed_time)
+                        .arg(current_channels)
+                        .arg(current_bitrate)
+                        .arg(current_frequency));
+
 }
 
 void AudioPlugin::run()
@@ -95,32 +94,8 @@ void AudioPlugin::run()
         //
         
         updateSockets();
-        
-        
-        QStringList pending_tokens;
-        int         pending_socket = 0;
+        waitForSomethingToHappen();
 
-        //
-        //  Pull off the first pending command request
-        //
-
-        things_to_do_mutex.lock();
-            if(things_to_do.count() > 0)
-            {
-                pending_tokens = things_to_do.getFirst()->getTokens();
-                pending_socket = things_to_do.getFirst()->getSocketIdentifier();
-                things_to_do.removeFirst();
-            }
-        things_to_do_mutex.unlock();
-            
-        if(pending_tokens.count() > 0)
-        {
-            doSomething(pending_tokens, pending_socket);
-        }
-        else
-        {
-            waitForSomethingToHappen();
-        }
     }
 
     stopAudio();
@@ -193,14 +168,6 @@ void AudioPlugin::doSomething(const QStringList &tokens, int socket_identifier)
         else if(tokens[0] == "stop")
         {
             stopAudio();
-        }
-        else if(tokens[0] == "playupdate")
-        {
-            sendMessage(QString("playing %1 %2 %3 %4")
-                        .arg(elapsed_time)
-                        .arg(current_channels)
-                        .arg(current_bitrate)
-                        .arg(current_frequency));
         }
         else
         {

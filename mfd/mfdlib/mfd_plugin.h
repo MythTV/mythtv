@@ -6,7 +6,7 @@
 	(c) 2003 Thor Sigvaldason and Isaac Richards
 	Part of the mythTV project
 	
-	Headers for the plugin skeleton.
+	Headers for the plugin(s) skeleton(s).
 
 */
 
@@ -16,8 +16,12 @@
 #include <qmutex.h>
 #include <qstringlist.h>
 #include <qsocketdevice.h>
+#include <vector>
+using namespace std;
 
 #include "../mfd/mfd.h"
+#include "requestthread.h"
+#include "clientsocket.h"
  
 class SocketBuffer
 {
@@ -68,7 +72,7 @@ class MFDBasePlugin : public QThread
     virtual void sendMessage(const QString &message, int socket_identifier);
     virtual void sendMessage(const QString &message);
     virtual void huh(const QStringList &tokens, int socket_identifier);
-
+    void         setName(const QString &a_name);
     
 
   protected:
@@ -87,6 +91,9 @@ class MFDBasePlugin : public QThread
 
     QWaitCondition          main_wait_condition;
     QMutex                  main_wait_mutex;
+    
+    QString                 name;
+    
 };
 
 class MFDCapabilityPlugin : public MFDBasePlugin
@@ -114,18 +121,6 @@ class MFDCapabilityPlugin : public MFDBasePlugin
 
 };
 
-class MFDServiceClientSocket : public QSocketDevice
-{
-  public:
-  
-    MFDServiceClientSocket(int identifier, int socket_id, Type type);
-    int getIdentifier(){return unique_identifier;}
-    
-  private:
-  
-    int unique_identifier;
-};
-
 class MFDServicePlugin : public MFDBasePlugin
 {
   public:
@@ -133,25 +128,22 @@ class MFDServicePlugin : public MFDBasePlugin
     MFDServicePlugin(MFD *owner, int identifier, int port);
     ~MFDServicePlugin();
     
-    bool    initServerSocket();
-    void    updateSockets();
-    void    findNewClients();
-    void    dropDeadClients();
-    void    readClients();
-    void    addToDo(QString new_stuff_todo, int client_id);
-    void    wakeUp();
-    void    addFileDescriptor(int fd);
-    void    removeFileDescriptor(int fd);
-    void    clearFileDescriptors();
-    void    waitForSomethingToHappen();
-    void    setTimeout(int numb_seconds, int numb_useconds);
+    bool            initServerSocket();
+    void            updateSockets();
+    void            findNewClients();
+    void            dropDeadClients();
+    void            readClients();
+    virtual void    doSomething(const QStringList &tokens, int socket_identifier);
+    void            wakeUp();
+    void            waitForSomethingToHappen();
+    void            setTimeout(int numb_seconds, int numb_useconds);
+    int             bumpClient();
+    void            sendMessage(const QString &message, int socket_identifier);
+    void            sendMessage(const QString &message);
 
-    int     bumpClient(){
-                            ++client_socket_identifier;
-                            return client_socket_identifier;
-                        }
-    void    sendMessage(const QString &message, int socket_identifier);
-    void    sendMessage(const QString &message);
+
+    virtual void    processRequest(MFDServiceClientSocket *a_client);
+    void            markUnused(ServiceRequestThread *which_one);
 
   protected:
 
@@ -171,11 +163,20 @@ class MFDServicePlugin : public MFDBasePlugin
     QMutex  u_shaped_pipe_mutex;
     int     u_shaped_pipe[2];
 
-    QMutex          file_descriptors_mutex;
-    QValueList<int> internal_file_descriptors;
-    QValueList<int> extra_file_descriptors;
+    vector<ServiceRequestThread *> thread_pool;
+    QMutex                         thread_pool_mutex;
 
+};
 
+class MFDHttpPlugin : public MFDServicePlugin
+{
+
+  public:
+  
+    MFDHttpPlugin(MFD *owner, int identifier, int port);
+    ~MFDHttpPlugin();
+
+    void    run();
 };
 
 #endif

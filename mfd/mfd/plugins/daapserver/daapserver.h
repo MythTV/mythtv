@@ -18,7 +18,7 @@ struct httpd;
 #include "request.h"
 #include "session.h"
 
-class DaapServer: public MFDServicePlugin
+class DaapServer: public MFDHttpPlugin
 {
 
   public:
@@ -26,6 +26,7 @@ class DaapServer: public MFDServicePlugin
     DaapServer(MFD *owner, int identity);
     ~DaapServer();
     
+/*
     void    run();
     void    parseIncomingRequest(httpd *server);
     void    parsePath(httpd *server, DaapRequest *daap_request);
@@ -40,16 +41,18 @@ class DaapServer: public MFDServicePlugin
     void    sendDatabaseItem(httpd *server, u32 song_id);
     void    sendContainers(httpd *server, DaapRequest *daap_request, int which_database);
     void    sendContainer(httpd *server, u32 container_id, int which_database);
-    bool    wantsToContinue(){return keep_going;}
+    bool    wantsToContinue();
 
     DaapSessions daap_sessions;
+*/
 
   private:
   
     QPtrList<MetadataContainer> *metadata_containers;
-
     QString service_name;
 
+    uint metadata_audio_generation;
+    
 };
 
 #endif  // daapserver_h_

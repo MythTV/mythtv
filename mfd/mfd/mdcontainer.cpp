@@ -70,6 +70,16 @@ bool MetadataContainer::isAudio()
 }
 
 
+bool MetadataContainer::isVideo()
+{
+    if(content_type == MCCT_video)
+    {
+        return true;
+    }
+    return false;
+}
+
+
 bool MetadataContainer::isLocal()
 {
     if(location_type == MCLT_host)
