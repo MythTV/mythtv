@@ -1236,7 +1236,7 @@ QString TVRec::GetNextChannel(Channel *chan, int channeldirection)
     thequery = QString("SELECT channel.channum FROM channel,capturecard,"
                        "cardinput%1 WHERE "
                        "channel.%2 %3 \"%4\" %5 AND %6 "
-                       "ORDER BY %7 %8 LIMIT 1;")
+                       "ORDER BY channel.%7 %8 LIMIT 1;")
                        .arg(fromfavorites).arg(channelorder)
                        .arg(comp).arg(id).arg(wherefavorites)
                        .arg(wherepart).arg(channelorder).arg(ordering);
@@ -1263,7 +1263,7 @@ QString TVRec::GetNextChannel(Channel *chan, int channeldirection)
         thequery = QString("SELECT channel.channum FROM channel,capturecard,"
                            "cardinput%1 WHERE "
                            "channel.%2 %3 \"%4\" %5 AND %6 "
-                           "ORDER BY %7 %8 LIMIT 1;")
+                           "ORDER BY channel.%7 %8 LIMIT 1;")
                            .arg(fromfavorites).arg(channelorder)
                            .arg(comp).arg(id).arg(wherefavorites)
                            .arg(wherepart).arg(channelorder).arg(ordering);
