@@ -563,18 +563,6 @@ static HostComboBox *PlayBoxEpisodeSort()
     return gc;
 }
 
-class PlayBoxSettings: public HorizontalConfigurationGroup
-{
-  public:
-    PlayBoxSettings(void) : HorizontalConfigurationGroup(false, false)
-    {
-        setLabel(QObject::tr("Sort shows"));
-        setUseLabel(false);
-        addChild(PlayBoxOrdering());
-        addChild(PlayBoxEpisodeSort());
-    }
-};
-
 static HostCheckBox *StickyKeys()
 {
     HostCheckBox *gc = new HostCheckBox("StickyKeys");
@@ -1899,15 +1887,17 @@ public:
          setTrigger(volumeControl);
 
          ConfigurationGroup* settings = new VerticalConfigurationGroup(false);
-         settings->addChild(MixerDevice());
-         settings->addChild(MixerControl());
+         HorizontalConfigurationGroup *lr = new HorizontalConfigurationGroup(false, false);
+         lr->addChild(MixerDevice());
+         lr->addChild(MixerControl());
+         settings->addChild(lr);
          settings->addChild(MixerVolume());
          settings->addChild(PCMVolume());
          settings->addChild(IndividualMuteControl());
          addTarget("1", settings);
 
          // show nothing if volumeControl is off
-         addTarget("0", new VerticalConfigurationGroup(true));
+         addTarget("0", new VerticalConfigurationGroup(false, false));
      };
 };
 
@@ -2717,6 +2707,10 @@ MainGeneralSettings::MainGeneralSettings()
     general->addChild(HaltCommand());
     general->addChild(LircKeyPressedApp());
     general->addChild(UseArrowAccels());
+    addChild(general);
+
+    general = new VerticalConfigurationGroup(false);
+    general->setLabel(QObject::tr("General"));
     general->addChild(SetupPinCodeRequired());
     general->addChild(SetupPinCode());
     general->addChild(EnableMediaMon());
@@ -2757,7 +2751,8 @@ PlaybackSettings::PlaybackSettings()
 
     VerticalConfigurationGroup* pbox = new VerticalConfigurationGroup(false);
     pbox->setLabel(QObject::tr("View Recordings"));
-    pbox->addChild(new PlayBoxSettings());
+    pbox->addChild(PlayBoxOrdering());
+    pbox->addChild(PlayBoxEpisodeSort());
     pbox->addChild(GeneratePreviewPixmaps());
     pbox->addChild(PreviewPixmapOffset());
     pbox->addChild(PlaybackPreview());
