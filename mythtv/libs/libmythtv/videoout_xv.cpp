@@ -20,12 +20,7 @@ using namespace std;
 #include "../libmyth/util.h"
 
 extern "C" {
-#define HAVE_LRINTF
-#ifdef MMX
-#define HAVE_MMX
-#endif
-#include "../libavcodec/dsputil.h"
-//extern int mm_flags;
+#include "../libavcodec/avcodec.h"
 }
 
 #include <X11/keysym.h>
@@ -631,7 +626,7 @@ void XvVideoOutput::StopEmbedding(void)
 
 void XvVideoOutput::Show(unsigned char *buffer, int width, int height)
 {
-    if ( xv_port != -1 )
+    if (xv_port != -1)
     {
         XvImage *image = data->buffers[buffer];
         if (colorid == GUID_YV12_PLANAR)
@@ -656,15 +651,12 @@ void XvVideoOutput::Show(unsigned char *buffer, int width, int height)
     }
     else
     {
-        unsigned char *sbuf = new unsigned char[curw * curh * XJ_depth / 8];
+        unsigned char *sbuf = new unsigned char[curw * curh * 4];
         XImage *image = data->xbuffers[buffer];
         AVPicture image_in, image_out;
         ImgReSampleContext *scontext;
         int av_format;
 
-#ifdef MMX
-        mm_flags = 1;
-#endif
         avpicture_fill(&image_out, (uint8_t *)sbuf, PIX_FMT_YUV420P,
             curw, curh );
 
@@ -681,7 +673,7 @@ void XvVideoOutput::Show(unsigned char *buffer, int width, int height)
             img_resample( scontext, &image_out, &image_in );
         }
 
-        switch (XJ_depth)
+        switch (image->bits_per_pixel)
         {
             case 16: av_format = PIX_FMT_RGB565; break;
             case 24: av_format = PIX_FMT_RGB24;  break;
@@ -710,7 +702,7 @@ void XvVideoOutput::Show(unsigned char *buffer, int width, int height)
 
         pthread_mutex_unlock(&lock);
 
-        delete sbuf;
+        delete [] sbuf;
     }
 }
 
