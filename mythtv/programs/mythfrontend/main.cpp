@@ -856,7 +856,7 @@ int main(int argc, char **argv)
         dir.mkdir(fileprefix);
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
-    
+   
     // Create priveleged thread, then drop privs
     pthread_t priv_thread;
 
@@ -867,7 +867,6 @@ int main(int argc, char **argv)
         priv_thread = 0;
     }
     setuid(getuid());
-
 
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!db)
