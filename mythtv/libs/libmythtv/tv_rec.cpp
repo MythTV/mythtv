@@ -160,7 +160,22 @@ void TVRec::StartRecording(ProgramInfo *rcinfo)
         MythEvent me(message);
 
         gContext->dispatch(me);
-    }  
+    }
+    else
+    {
+        cerr << QDateTime::currentDateTime().toString() 
+             << ":  wanted to record: " << endl;
+        cerr << rcinfo->title << " " << rcinfo->chanid << " " 
+             << rcinfo->startts.toString() << endl;
+        cerr << "But current state is: " << internalState << endl;
+        if (curRecording)
+        {
+            cerr << "currently: " << curRecording->title << " " 
+                 << curRecording->chanid << " " 
+                 << curRecording->startts.toString() << " " 
+                 << curRecording->endts.toString() << endl;
+        }
+    }
 }
 
 void TVRec::StopRecording(void)
