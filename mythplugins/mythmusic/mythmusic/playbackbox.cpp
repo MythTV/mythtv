@@ -881,7 +881,6 @@ void PlaybackBox::customEvent(QCustomEvent *event)
             timeString.sprintf("%02d:%02d", em, es);
 			
 			percent_heard = (  (float) rs /  (float) curMeta.Length() ) * 1000.0 ;
-        	cout << "Hurray an ouput event with percent_heard = " << percent_heard << endl << flush ;
 
 			gContext->LCDsetChannelProgress(percent_heard);
             if (! seeking)
