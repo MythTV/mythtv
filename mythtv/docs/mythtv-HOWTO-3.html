@@ -137,11 +137,10 @@ encoding to software, some higher-end cards incorporate hardware-level
 encoding. Using either a G200 MJPEG encoder card, or a WinTV-PVR-250 or 350
 from Hauppauge and the driver from the IvyTV project 
 <A HREF="http://ivtv.sourceforge.net/">http://ivtv.sourceforge.net/</A> will
-allow you to use dedicated hardware encoders rather than your CPU. As of
-2003-04-15, the CVS version MythTV is now able to use the PVR-250/350 cards
-as an input device for live TV and for scheduled recordings.  Using the
-onboard MPEG-2 encoder drastically reduces the CPU requirements for
-encoding.</P>
+allow you to use dedicated hardware encoders rather than your CPU. Release
+0.9 of MythTV is able to use the PVR-250/350 cards as an input device for
+live TV and for scheduled recordings.  Using the onboard MPEG-2 encoder
+drastically reduces the CPU requirements for encoding.</P>
 <P>Here are some data points for encoding:
 <UL>
 <LI>A Celeron 450 uses 2% CPU for encoding a 480x480 16Mbps MPEG-2 stream.</LI>
@@ -190,32 +189,131 @@ performed by your CPU rather than the video card.  This is very CPU
 intensive.  Check the XFree86 documentation for details if you are uncertain
 about your preferred card.  You may also run <CODE>xvinfo</CODE>; look for your
 video card to be listed as one of the adapters.</P>
-<P>Most people, though, want to view television on a television set. For this, 
-you need either (a) one of the relatively small number of cards with TV out 
-outputs that are supported by Linux and XFree86, or (b) an external 
-VGA-to-TV converter.</P>
-<P>For (a), all nVidia cards with TV out that are supported by the current drivers
-from nVidia should be able to display on a television. Some cards with
-certain chip sets support overscan adjustment. See 
-<A HREF="http://www.nvidia.com/content/drivers/drivers.asp">http://www.nvidia.com/content/drivers/drivers.asp</A> for nVidia driver
-information.</P>
-<P>Many older nVidia cards (such as GeForce2 cards with TV out) can use
-<B>nvtv</B> 
-<A HREF="http://sourceforge.net/projects/nv-tv-out/">http://sourceforge.net/projects/nv-tv-out/</A>, a utility which provides
-controls for overscan, x,y position and several other useful controls to
-fine tune output.</P>
-<P>See the forums at 
-<A HREF="http://sourceforge.net/forum/forum.php?forum_id=105850">http://sourceforge.net/forum/forum.php?forum_id=105850</A> for more
-infomation on which cards work with <B>nvtv</B>. </P>
-<P>Recent Matrox cards (the G450 and G550) are reported to work with kernel
-patches (for Linux 2.4.19) available at 
-<A HREF="http://www.bglug.ca/matrox_tvout/">http://www.bglug.ca/matrox_tvout/</A>.</P>
-<P>Cards made by ATI have no official support for TV out under Linux and
-XFree86, though some people report making them work with the experimental
-devel branch of the GATOS drivers, available at 
-<A HREF="http://gatos.sourceforge.net/watching_tv.php">http://gatos.sourceforge.net/watching_tv.php</A>. </P>
-<P>For choice (b), VGA-to-TV converters work well; many people have stated they
-are satisfied with the output of the following devices:</P>
+
+<P>If you want to use MythTV with a standard television, there are two things
+that you're going to need:</P>
+<P>1. A physical connection from your video card to your TV set, which can
+either be a TV-out port on the card itself, or an external adapter that
+converts the VGA signal to an appropriate video signal. "Appropriate"
+depends on a number of factors, such as video standard (NTSC vs PAL) type of
+input connection (Composite vs SVideo), etc.</P>
+<P>2. An X driver for your video card that supports the XVideo extensions. 
+These extensions transfer some of the processing needed to display
+full-motion video from the CPU to the card's own hardware. While it is
+<EM>possible</EM> to run MythTV on a card that does not have XVideo
+extentions it will require massive amounts of CPU and will most likely
+result in frame drops.</P>
+<P>Both these requirements must be met.  There are X drivers that support
+XVideo on their VGA outputs, but not on their TV outputs.</P>
+
+<H3>Cards with TV out</H3>
+
+<P>The next section deals with a number of cards that are known to have
+TV-out ports.  The list is unlikely to be complete, so if you know of
+others, please post a message to the mythtv-users mailing list so the
+information can be included in future versions of the HOWTO. The list is
+organized by manufacturer.</P>
+<P>Reports here are based on what users of the cards have posted on the
+mythtv-users mailing list, so if you need configuration details, please
+search the archives at 
+<A HREF="http://www.gossamer-threads.com/archive/MythTV_C2/Users_F11/">http://www.gossamer-threads.com/archive/MythTV_C2/Users_F11/</A> using
+the card name in your search string.</P>
+
+<H3>ATI</H3>
+
+<P>ATI makes many cards with TV-out capability, but ATI offers no official
+support for their use with Linux. The standard XFree86 ati driver does not
+support TV-out.</P>
+<P>The enhanced ati.2 X driver created by the GATOS 
+<A HREF="http://gatos.sourceforge.net">http://gatos.sourceforge.net</A>
+project offers some support for TV-out, but only in its "experimental"
+version, available through CVS. There have been reports from people who say
+they have made this driver work with one or another ATI card. For example,
+Bruce Markey 
+<A HREF="mailto:bjm@lvcm.com">mailto:bjm@lvcm.com</A> writes (on the mythtv-users
+mailing list): "I got this to work. You can quote me on that. I've used
+TV-out on several models of ATI cards both All-In-Wonder and regular cards
+with TV-out." See the "Adventurous Setup" section of 
+<A HREF="http://gatos.sourceforge.net/watching_tv.php">http://gatos.sourceforge.net/watching_tv.php</A> for details. Also see
+<A HREF="http://www.retinalburn.net/linux/tvout.html">http://www.retinalburn.net/linux/tvout.html</A> for more information.</P>
+<P>Specific cards:
+<UL>
+<LI>ATI Rage II+DVD (Mach 64). Ports not described. Reported to work, but no details reported.</LI>
+<LI>Rage 128 VIVO. Ports not described. Reported to work, but no details reported.</LI>
+<LI>Radeon 7500. Ports not described. Reported to work, but no details reported.</LI>
+</UL>
+</P>
+
+<H3>Matrox</H3>
+
+<P>The standard Matrox driver included with XFree86 does not support TV-out.</P>
+<P>Older Matrox cards can be used with a proprietary X driver provided by 
+Matrox, and it does simultaneously support TV out and XVideo on some cards. 
+See 
+<A HREF="http://www.matrox.com/mga/support/drivers/files/lnx_21.cfm">http://www.matrox.com/mga/support/drivers/files/lnx_21.cfm</A> for details.</P>
+<P>Newer Matrox cards can be run with a set of kernel patches (for kernel 
+2.4.19) and a customized X driver, but this arrangement does not support 
+XVideo on TV-out. See 
+<A HREF="http://www.bglug.ca/matrox_tvout/g450_tvout_howto.html">http://www.bglug.ca/matrox_tvout/g450_tvout_howto.html</A> for details.</P>
+<P>Specific cards:
+<UL>
+<LI>Matrox G400 AGP. Uses external adapter to provide Composite and
+SVideo ports. Reported to work with the proprietary Matrox X driver.</LI>
+<LI>Matrox Millennium 450GX AGP. Uses external adapter to provide
+Composite and SVideo ports. TV-out implementation does <EM>NOT</EM> support XVideo.</LI>
+<LI>Matrox Millennium 550GX AGP. Uses external adapter to provide
+Composite and sVideo ports. TV-out implementation does <EM>NOT</EM> support XVideo.</LI>
+</UL>
+</P>
+
+<H3>nVidia</H3>
+
+<P>Some nVidia cards with TV-out can be run using the standard nv driver in 
+XFree86, combined with the userspace application <B>nvtv</B> to control the TV-out 
+port. See 
+<A HREF="http://sourceforge.net/projects/nv-tv-out/">http://sourceforge.net/projects/nv-tv-out/</A> for details.  Recent
+versions of the nVidia driver have better support for overscan and other
+features useful with TV-Out, so the <B>nvtv</B> application may not be
+required.</P>
+<P>Some nVidia cards can be run with a proprietary nVidia X driver made
+available by nVidia. See 
+<A HREF="http://www.nvidia.com/view.asp?IO=linux">http://www.nvidia.com/view.asp?IO=linux</A> for more information.</P>
+<P>Specific cards:
+<UL>
+<LI>GeForce4 MX440-SE AGP. Has Composite and SVideo ports. Works using the
+nVidia X driver.</LI>
+<LI>GeForce2 GTS 64 MB DDR 4x AGP. Has SVideo port. Works using the nVidia X 
+driver. Reportedly works using the nv driver plus nvtv.</LI>
+<LI>GeForce4 MX420 PCI (BFG Asylum). Has SVideo port. No tests reported.</LI>
+</UL>
+</P>
+
+<H3>Savage</H3>
+
+<P>The standard savage X driver supports TV out on some Savage cards. 
+Unfortunately, XVideo support for the Savage 2000 card (a very common and 
+inexpensive Savage card with TV out) is broken. See 
+<A HREF="http://www.probo.com/timr/savage40.html">http://www.probo.com/timr/savage40.html</A> for details.</P>
+<P>Specific cards:
+<UL>
+<LI>Savage 2000 AGP. Has Composite and SVideo ports. Does not support XVideo.</LI>
+<LI>S3 Savage IX 8MB AGP. Has SVideo output. Reported to work.</LI>
+</UL>
+</P>
+
+<H3>Other Options</H3>
+
+<P>Some devices with onboard TV-out capability, such as XBoxes converted to 
+Linux and some laptops, can be used as MythTV frontends to display on a 
+television screen. Please consult the mythtv-users mailing list for messages 
+that report the details of these special arrangements.</P>
+
+<H3>External Adapters</H3>
+
+<P>External adapters convert standard VGA output to a form suitable for 
+display on a television. The output format varies by region, since 
+different countries have different TV standards. People on the mythtv-users 
+list have mentioned these adapters:</P>
 <P>
 <UL>
 <LI>AITech Web Cable Plus, powered by external transformer or takes power
@@ -225,6 +323,10 @@ composite and SVideo, provides position adjustment.</LI>
 outputs; pan, brightness, overscan/underscan controls; supports up to
 1024x768 outputs; and supports PAL and NTSC.</LI>
 <LI>ADS TV Elite XGA</LI>
+<LI>AverKey iMicro (comments are generally favorable)</LI>
+<LI>AITech Web Cable (comments are generally unfavorable, different than
+the "Plus" version above)</LI>
+<LI>TVIEW Gold (mentioned once, favorably)</LI>
 </UL>
 </P>
 
