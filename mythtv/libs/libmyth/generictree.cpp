@@ -44,7 +44,7 @@ class SortableGenericTreeList : public QPtrList<GenericTree>
             else
                 return -1;
         }
-        if(sort_type == 3)
+        if (sort_type == 3)
         {
             //
             //  Sort by attribute (ordering index), but, it if those are
@@ -577,7 +577,7 @@ void GenericTree::reOrderAsSorted()
     //  subnodes
     //
     
-    if(m_subnodes->count() != m_ordered_subnodes->count())
+    if (m_subnodes->count() != m_ordered_subnodes->count())
     {
         cerr << "generictree.o: Can't reOrderAsSorted(), because the number "
              << "of subnodes is different than the number of ordered subnodes"

@@ -85,7 +85,7 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
         VERBOSE(VB_ALL,  QString("Executing '%1'").arg(MountCommand));
         if (0 == system(MountCommand)) 
         {
-            if(DoMount)
+            if (DoMount)
             {
                 m_Status = MEDIASTAT_MOUNTED;
                 onDeviceMounted();

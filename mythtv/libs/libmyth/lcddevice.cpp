@@ -134,7 +134,7 @@ void LCD::sendToServer(const QString &someText)
     // Check the socket, make sure the connection is still up
     if (socket->state() == QSocket::Idle)
     {
-        if(!lcd_ready)
+        if (!lcd_ready)
             return;
 
         lcd_ready = false;
@@ -154,7 +154,7 @@ void LCD::sendToServer(const QString &someText)
    
     last_command = someText;
  
-    if(connected)
+    if (connected)
     {
 #ifdef LCD_DEVICE_DEBUG
         cout << "lcddevice: Sending to Server: " << someText << endl ;
@@ -401,7 +401,7 @@ void LCD::init()
     
     // send buffer if there's anything in there
     
-    if(send_buffer.length() > 0)
+    if (send_buffer.length() > 0)
     {
         sendToServer(send_buffer);
         send_buffer = "";
@@ -692,7 +692,7 @@ void LCD::startChannel(QString channum, QString title, QString subtitle)
     theMode = 2;
     assignScrollingText(aString, "topWidget", 1);
     aString = title;
-    if(subtitle.length() > 0)
+    if (subtitle.length() > 0)
     {
         aString += " - '";
         aString += subtitle;
@@ -1439,7 +1439,7 @@ LCD::~LCD()
     cout << "lcddevice: An LCD device is being snuffed out of existence "
             "(~LCD() was called)" << endl ;
 #endif
-    if(socket)
+    if (socket)
     {
         delete socket;
         lcd_ready = false;

@@ -422,7 +422,7 @@ void UIPhoneEntry::keyClicked(QString action)
 
 void UIPhoneEntry::keyBlink(const QPoint &pos)
 {
-    if(m_drawBlink)
+    if (m_drawBlink)
         return;
 
     m_buttonOffset = QPoint(pos.x(), pos.y());
@@ -447,7 +447,7 @@ void UIPhoneEntry::switchCaps()
 
         if (!(text.isNull() || text.isEmpty()))
         {
-            if(m_capsLock)
+            if (m_capsLock)
                 subtitle->SetText(text.upper());
             else
                 subtitle->SetText(text.lower());

@@ -63,8 +63,8 @@ class ManagedListItem : public QObject
         
     protected:
         virtual void syncTextToValue() { changed(); }
-        virtual void selected() { if(enabled) emit selected(this); }
-        virtual void canceled() { if(enabled) emit canceled(this); }
+        virtual void selected() { if (enabled) emit selected(this); }
+        virtual void canceled() { if (enabled) emit canceled(this); }
         virtual void changed() { emit(changed(this)); }
         int curState;
         int listIndex;
@@ -88,7 +88,7 @@ class DialogDoneListItem : public ManagedListItem
             resultValue = _result;
         }
         
-        virtual void selected() { if(enabled && dialog) dialog->done(resultValue); }
+        virtual void selected() { if (enabled && dialog) dialog->done(resultValue); }
         
         void setDialog(MythDialog* dlg) { dialog = dlg;}
         
@@ -128,8 +128,8 @@ class IntegerManagedListItem : public ManagedListItem
         const QString& getShortText() const { return shortText; }
         
     public slots:
-        virtual void cursorLeft(bool page = false) { if(enabled) changeValue(page ? (0 - bigStep) : (0 - step)); }
-        virtual void cursorRight(bool page = false) { if(enabled) changeValue(page ? bigStep : step); }
+        virtual void cursorLeft(bool page = false) { if (enabled) changeValue(page ? (0 - bigStep) : (0 - step)); }
+        virtual void cursorRight(bool page = false) { if (enabled) changeValue(page ? bigStep : step); }
         
     protected:
         virtual void syncTextToValue();
@@ -161,7 +161,7 @@ class BoolManagedListItem : public ManagedListItem
         virtual void setValue(bool val) 
         { 
             // DS note: using QString::number(val) blows up...
-            if(val)
+            if (val)
                 ManagedListItem::setValue("1");
             else
                 ManagedListItem::setValue("0");
@@ -175,8 +175,8 @@ class BoolManagedListItem : public ManagedListItem
         
     
     public slots:        
-        virtual void cursorLeft(bool) { if(enabled) setValue(!boolValue()); }
-        virtual void cursorRight(bool) { if(enabled) setValue(!boolValue()); }
+        virtual void cursorLeft(bool) { if (enabled) setValue(!boolValue()); }
+        virtual void cursorRight(bool) { if (enabled) setValue(!boolValue()); }
     
     protected:
         virtual void syncTextToValue();
@@ -297,7 +297,7 @@ class SelectManagedListItem : public ManagedListGroup
            for(ManagedListItem* tempItem = itemList.first(); tempItem; tempItem = itemList.next() )
             {
                 i++;
-                if(tempItem->getValue() == value)
+                if (tempItem->getValue() == value)
                     return i;
             }
             return -1;
@@ -308,7 +308,7 @@ class SelectManagedListItem : public ManagedListGroup
            for(ManagedListItem* tempItem = itemList.first(); tempItem; tempItem = itemList.next() )
             {
                 i++;
-                if(tempItem->getText() == txt)
+                if (tempItem->getText() == txt)
                     return i;
             }
             
@@ -361,7 +361,7 @@ class ManagedListSetting: public SimpleDBStorage
         virtual void setValue(int val) {setValue(QString::number(val));} 
         
         virtual void setValue(const QString& val) { 
-            if(listItem) 
+            if (listItem) 
             {
                 listItem->setValue(val); 
                 syncDBFromItem();
@@ -373,7 +373,7 @@ class ManagedListSetting: public SimpleDBStorage
         }
         
         virtual const QString getValue() { 
-            if(listItem) 
+            if (listItem) 
             {
                 syncDBFromItem();
                 return listItem->getValue(); 
@@ -387,13 +387,13 @@ class ManagedListSetting: public SimpleDBStorage
         
         virtual void syncDBFromItem() 
         { 
-            if(listItem) 
+            if (listItem) 
                 SimpleDBStorage::setValue(listItem->getValue());
         }
         
         virtual void syncItemFromDB() 
         { 
-            if(listItem) 
+            if (listItem) 
                 listItem->setValue(settingValue);
         }
         
@@ -426,9 +426,9 @@ class SelectManagedListSetting : public ManagedListSetting
     public:    
         ManagedListItem* addSelection(const QString& label, const QString& value, bool trans = true ) 
         {
-            if(selectItem)
+            if (selectItem)
             {
-                if(trans)
+                if (trans)
                     return selectItem->addSelection(QObject::tr(label), value);
                 else
                     return selectItem->addSelection(label, value);
@@ -439,9 +439,9 @@ class SelectManagedListSetting : public ManagedListSetting
 
         ManagedListItem* addButton(const QString& label, const QString& value, bool trans = true ) 
         {
-            if(selectItem)
+            if (selectItem)
             {
-                if(trans)
+                if (trans)
                     return selectItem->addButton(QObject::tr(label), value);
                 else
                     return selectItem->addButton(label, value);
@@ -452,9 +452,9 @@ class SelectManagedListSetting : public ManagedListSetting
         
         ManagedListItem* addSelection(const QString& label, int value, bool trans = true ) 
         {
-            if(selectItem)
+            if (selectItem)
             {
-                if(trans)
+                if (trans)
                     return selectItem->addSelection(QObject::tr(label), QString::number(value));
                 else
                     return selectItem->addSelection(label, QString::number(value));
@@ -463,7 +463,7 @@ class SelectManagedListSetting : public ManagedListSetting
         }        
     
         void clearSelections() {
-            if(selectItem)
+            if (selectItem)
                 selectItem->clearSelections();
         }
         

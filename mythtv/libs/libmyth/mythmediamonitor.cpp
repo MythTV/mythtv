@@ -46,9 +46,9 @@ MediaMonitor *theMonitor = NULL;
 
 MediaMonitor* MediaMonitor::getMediaMonitor()
 {
-    if(!theMonitor)
+    if (!theMonitor)
     {
-        if(gContext->GetNumSetting("MonitorDrives") == 1)
+        if (gContext->GetNumSetting("MonitorDrives") == 1)
         {
             theMonitor = new MediaMonitor(NULL, 500, true);
             theMonitor->addFSTab();

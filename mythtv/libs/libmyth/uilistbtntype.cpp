@@ -284,7 +284,7 @@ UIListGenericTree *UIListTreeType::GetCurrentPosition(void)
 
 void UIListTreeType::Draw(QPainter *p, int order, int blah)
 {
-    if(hidden)
+    if (hidden)
     {
         return;
     }
@@ -381,7 +381,7 @@ void UIListTreeType::ClearLevel(UIListBtnType *list)
 
 void UIListTreeType::RefreshCurrentLevel(void)
 {
-    if(currentlevel)
+    if (currentlevel)
     {
         QPtrListIterator<UIListBtnTypeItem> it = currentlevel->GetIterator();
 
@@ -457,7 +457,7 @@ void UIListTreeType::SetCurrentPosition(void)
 
 void UIListTreeType::Redraw(void)
 {
-    if(!currentlevel)
+    if (!currentlevel)
     {
         return;
     }
@@ -469,7 +469,7 @@ void UIListTreeType::Redraw(void)
 
 void UIListTreeType::RedrawCurrent(void)
 {
-    if(!currentlevel)
+    if (!currentlevel)
     {
         return;
     }
@@ -482,7 +482,7 @@ void UIListTreeType::RedrawCurrent(void)
 
 void UIListTreeType::MoveDown(MovementUnit unit)
 {
-    if(!currentlevel)
+    if (!currentlevel)
     {
         return;
     }
@@ -493,7 +493,7 @@ void UIListTreeType::MoveDown(MovementUnit unit)
 
 void UIListTreeType::MoveUp(MovementUnit unit)
 {
-    if(!currentlevel)
+    if (!currentlevel)
     {
         return;
     }
@@ -504,7 +504,7 @@ void UIListTreeType::MoveUp(MovementUnit unit)
 
 void UIListTreeType::MoveLeft(bool do_refresh)
 {
-    if(!currentlevel)
+    if (!currentlevel)
     {
         return;
     }
@@ -519,7 +519,7 @@ void UIListTreeType::MoveLeft(bool do_refresh)
         currentlevel->SetActive(true);
         SetCurrentPosition();
 
-        if(do_refresh)
+        if (do_refresh)
         {
             Redraw();
         }
@@ -528,7 +528,7 @@ void UIListTreeType::MoveLeft(bool do_refresh)
 
 bool UIListTreeType::MoveRight(bool do_refresh)
 {
-    if(!currentpos || !currentlevel)
+    if (!currentpos || !currentlevel)
     {
         return true;
     }
@@ -548,7 +548,7 @@ bool UIListTreeType::MoveRight(bool do_refresh)
         currentlevel->SetActive(true);
         SetCurrentPosition();
 
-        if(do_refresh)
+        if (do_refresh)
         {
             Redraw();
         }
@@ -581,7 +581,7 @@ void UIListTreeType::GoHome()
 
 void UIListTreeType::select()
 {
-    if(currentpos)
+    if (currentpos)
     {
         emit selected(currentpos);
         emit itemSelected(this, currentpos);
@@ -596,7 +596,7 @@ QStringList UIListTreeType::getRouteToCurrent()
     //
 
     QStringList route_to_current;
-    if(currentpos)
+    if (currentpos)
     {
         GenericTree *climber = currentpos;
         route_to_current.push_front(climber->getString());
@@ -633,7 +633,7 @@ void UIListTreeType::tryToSetCurrent(QStringList route)
     //  If the route is empty, we are done
     //
 
-    if(route.count() < 2)
+    if (route.count() < 2)
     {
         return;
     }
@@ -642,7 +642,7 @@ void UIListTreeType::tryToSetCurrent(QStringList route)
     //  If we have no currentpos (no active node), we are done
     //
     
-    if(!currentpos || !currentlevel)
+    if (!currentpos || !currentlevel)
     {
         return;
     }
@@ -651,7 +651,7 @@ void UIListTreeType::tryToSetCurrent(QStringList route)
     //  Make sure the absolute root node name/string matches
     //
     
-    if(currentpos->getParent()->getString() != route[0])
+    if (currentpos->getParent()->getString() != route[0])
     {
         return;
     }
@@ -661,7 +661,7 @@ void UIListTreeType::tryToSetCurrent(QStringList route)
     //
     
     GenericTree *first_child = currentpos->getParent()->getChildByName(route[1]);
-    if(!first_child)
+    if (!first_child)
     {
         return;
     } 
@@ -682,11 +682,11 @@ void UIListTreeType::tryToSetCurrent(QStringList route)
     while(keep_going &&  it != route.end())
     {
         GenericTree *next_child = currentpos->getChildByName(*it);
-        if(next_child)
+        if (next_child)
         {
             MoveRight(false);      
             currentpos = (UIListGenericTree *)next_child;
-            if(!currentlevel->MoveToNamedPosition(currentpos->getString()))
+            if (!currentlevel->MoveToNamedPosition(currentpos->getString()))
             {
                 cerr << "uilistbtntype.o: had problem finding "
                      << "something it knows is there"
@@ -715,7 +715,7 @@ void UIListTreeType::setActive(bool x)
 
 void UIListTreeType::enter()
 {
-    if(currentpos)
+    if (currentpos)
     {
         emit itemEntered(this, currentpos);
     }
@@ -1130,12 +1130,12 @@ void UIListBtnType::MoveDown(MovementUnit unit)
 
 bool UIListBtnType::MoveToNamedPosition(const QString &position_name)
 {
-    if(m_selPosition < 0)
+    if (m_selPosition < 0)
     {
         return false;
     }
 
-    if(!m_selIterator->toFirst())
+    if (!m_selIterator->toFirst())
     {
         return false;
     }
@@ -1144,7 +1144,7 @@ bool UIListBtnType::MoveToNamedPosition(const QString &position_name)
     bool found_it = false;
     while(m_selIterator->current())
     {
-        if(m_selIterator->current()->text() == position_name)
+        if (m_selIterator->current()->text() == position_name)
         {
             found_it = true;
             break;
@@ -1153,7 +1153,7 @@ bool UIListBtnType::MoveToNamedPosition(const QString &position_name)
         ++m_selPosition;
     }
 
-    if(!found_it)
+    if (!found_it)
     {
         m_selPosition = -1;
         return false;
@@ -1260,7 +1260,7 @@ void UIListBtnType::Draw(QPainter *p, int order, int, bool active_on)
 
     fontProp* font = m_active ? m_fontActive : m_fontInactive;
     
-    if(!active_on)
+    if (!active_on)
     {
         font = m_fontInactive;
     }
@@ -1275,7 +1275,7 @@ void UIListBtnType::Draw(QPainter *p, int order, int, bool active_on)
     while (it.current() && 
            (y - m_rect.y()) <= (m_contentsRect.height() - m_itemHeight)) 
     {
-        if(active_on && it.current()->getOverrideInactive())
+        if (active_on && it.current()->getOverrideInactive())
         {
             font = m_fontInactive;
             p->setFont(font->face);
@@ -1653,7 +1653,7 @@ void UIListBtnTypeItem::paint(QPainter *p, fontProp *font, int x, int y, bool ac
         }
         else
         {
-            if(active_on)
+            if (active_on)
             {
                 p->drawPixmap(x, y, m_parent->m_itemSelInactPix);
             }

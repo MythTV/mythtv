@@ -47,7 +47,7 @@ UIType *LayerSet::GetType(const QString &name)
 
 void LayerSet::bumpUpLayers(int a_number)
 {
-    if(a_number > numb_layers)
+    if (a_number > numb_layers)
     {
         numb_layers = a_number;
     }
@@ -175,7 +175,7 @@ UIType::UIType(const QString &name)
 void UIType::SetOrder(int order)
 {
     m_order = order;
-    if(m_parent)
+    if (m_parent)
     {
         m_parent->bumpUpLayers(order);
     }
@@ -212,7 +212,7 @@ QString UIType::Name()
 
 bool UIType::takeFocus()
 {
-    if(takes_focus)
+    if (takes_focus)
     {
         has_focus = true;
         refresh();
@@ -260,7 +260,7 @@ void UIType::hide()
 
 bool UIType::toggleShow()
 {
-    if(hidden)
+    if (hidden)
     {
         show();
     }
@@ -1306,7 +1306,7 @@ void UIImageType::LoadImage()
 
 void UIImageType::Draw(QPainter *dr, int drawlayer, int context)
 {
-    if(hidden)
+    if (hidden)
     {
         return;
     }
@@ -1350,7 +1350,7 @@ void UIImageType::refresh()
                     img.width(),
                     img.height());
     
-    if(m_parent)
+    if (m_parent)
     {
         r.moveBy(m_parent->GetAreaRect().left(),
                  m_parent->GetAreaRect().top());
@@ -1588,7 +1588,7 @@ void UIAnimatedImageType::Draw(QPainter *dr, int drawlayer, int context)
 
 void UIAnimatedImageType::refresh()
 {
-    if(m_parent && imageList->at(0) != NULL)
+    if (m_parent && imageList->at(0) != NULL)
     {
         QRect r = QRect(m_displaypos.x(),  m_displaypos.y(),
                     imageList->at(0)->width(), imageList->at(0)->height());
@@ -1691,7 +1691,7 @@ void UIRepeatedImageType::Draw(QPainter *p, int drawlayer, int context)
                     cerr << "       -Drawing @ (" << m_displaypos.x() << ", " << m_displaypos.y() << ")" << endl;
                     cerr << "       -Skip Section: (" << m_drop_x << ", " << m_drop_y << ")\n";
                 }
-                if(m_orientation == 0)
+                if (m_orientation == 0)
                 {
                     for(int i = 0; i < m_repeat; i++)
                     {
@@ -1739,10 +1739,10 @@ void UIRepeatedImageType::Draw(QPainter *p, int drawlayer, int context)
 
 void UIRepeatedImageType::setRepeat(int how_many)
 {
-    if(how_many >= 0)
+    if (how_many >= 0)
     {
         m_repeat = how_many;
-        if(how_many > m_highest_repeat)
+        if (how_many > m_highest_repeat)
         {
             m_highest_repeat = how_many;
         }
@@ -1752,7 +1752,7 @@ void UIRepeatedImageType::setRepeat(int how_many)
 
 void UIRepeatedImageType::setOrientation(int x)
 {
-    if(x < 0 || x > 3)
+    if (x < 0 || x > 3)
     {
         cerr << "uitypes.o: UIRepeatedImageType received an invalid request to set orientation to " << x << endl;
         return;
@@ -1770,21 +1770,21 @@ void UIRepeatedImageType::refresh()
     
     QRect r = QRect(0,0,0,0);
     
-    if(m_orientation == 0)
+    if (m_orientation == 0)
     {
         r = QRect(m_displaypos.x(),
                   m_displaypos.y(),
                   img.width() * m_highest_repeat,
                   img.height());
     }
-    else if(m_orientation == 1)
+    else if (m_orientation == 1)
     {
         r = QRect(m_displaypos.x() - (m_highest_repeat * img.width()),
                   m_displaypos.y(),
                   img.width() * (m_highest_repeat + 1),
                   img.height());
     }    
-    else if(m_orientation == 2)
+    else if (m_orientation == 2)
     {
         r = QRect(m_displaypos.x(),
                   m_displaypos.y() - (m_highest_repeat * img.height()),
@@ -1798,7 +1798,7 @@ void UIRepeatedImageType::refresh()
                   img.width(),
                   img.height() * m_highest_repeat);
     }    
-    if(m_parent)
+    if (m_parent)
     {
         r.moveBy(m_parent->GetAreaRect().left(),
                  m_parent->GetAreaRect().top());
@@ -1861,7 +1861,7 @@ void UITextType::SetText(const QString &text)
 
 void UITextType::Draw(QPainter *dr, int drawlayer, int context)
 {
-    if(hidden)
+    if (hidden)
     {
         return;
     }
@@ -1964,11 +1964,11 @@ void UIMultiTextType::setTexts(QStringList new_messages)
             messages[i].append(" ");
         }
     }
-    if(messages.count() > 0)
+    if (messages.count() > 0)
     {
         m_message = messages[0];
         current_text_index = 0;
-        if(drop_timing_length > 0)
+        if (drop_timing_length > 0)
         {
             transition_timer.start(drop_timing_length);
             animation_stage = Animation_Drop;
@@ -1984,7 +1984,7 @@ void UIMultiTextType::setTexts(QStringList new_messages)
         horizontal_transform = 0;
         QFontMetrics fm(m_font->face);
         max_horizontal_transform = fm.width(m_message) - m_displaysize.width();
-        if(max_horizontal_transform < 0)
+        if (max_horizontal_transform < 0)
         {
             max_horizontal_transform = 0;
             m_justification = (Qt::AlignCenter | Qt::AlignBottom);
@@ -2089,9 +2089,9 @@ void UIMultiTextType::animate()
     //  Check which animation stage we're in and move things along appropriately
     //
     
-    if(animation_stage == Animation_Drop)
+    if (animation_stage == Animation_Drop)
     {
-        if(vertical_transform > 0)
+        if (vertical_transform > 0)
         {
             vertical_transform--;
             refresh();
@@ -2108,7 +2108,7 @@ void UIMultiTextType::animate()
         }
         return;
     }
-    else if(animation_stage == Animation_DropPause)
+    else if (animation_stage == Animation_DropPause)
     {
         //
         //  Done pausing after drop
@@ -2118,9 +2118,9 @@ void UIMultiTextType::animate()
         transition_timer.changeInterval(scroll_timing_length);
         return;
     }
-    else if(animation_stage == Animation_Scroll)
+    else if (animation_stage == Animation_Scroll)
     {
-        if(horizontal_transform < max_horizontal_transform)
+        if (horizontal_transform < max_horizontal_transform)
         {
             horizontal_transform++;
             refresh();
@@ -2132,17 +2132,17 @@ void UIMultiTextType::animate()
         }
         return;
     }
-    else if(animation_stage == Animation_ScrollPause)
+    else if (animation_stage == Animation_ScrollPause)
     {
-        if(messages.count() > 1)
+        if (messages.count() > 1)
         {
             current_text_index++;
-            if(current_text_index >= (int) messages.count())
+            if (current_text_index >= (int) messages.count())
             {
                 current_text_index = 0;
             }
             m_message = messages[current_text_index];
-            if(drop_timing_length > 0)
+            if (drop_timing_length > 0)
             {
                 transition_timer.start(drop_timing_length);
                 animation_stage = Animation_Drop;
@@ -2158,7 +2158,7 @@ void UIMultiTextType::animate()
             horizontal_transform = 0;
             QFontMetrics fm(m_font->face);
             max_horizontal_transform = fm.width(m_message) - m_displaysize.width();
-            if(max_horizontal_transform < 0)
+            if (max_horizontal_transform < 0)
             {
                 max_horizontal_transform = 0;
                 m_justification = (Qt::AlignCenter | Qt::AlignBottom);
@@ -2220,17 +2220,17 @@ void UIStatusBarType::Draw(QPainter *dr, int drawlayer, int context)
                 cerr << "       -Height = " << height << endl;
             }
 
-            if(m_orientation == 0)
+            if (m_orientation == 0)
             {
                 dr->drawPixmap(m_location.x(), m_location.y(), m_container);
                 dr->drawPixmap(m_location.x(), m_location.y(), m_filler, 0, 0, width + m_fillerSpace);
             }
-            else if(m_orientation == 1)
+            else if (m_orientation == 1)
             {
                 dr->drawPixmap(m_location.x(), m_location.y(), m_container);
                 dr->drawPixmap(m_location.x() + width, m_location.y(), m_filler, width - m_fillerSpace, 0);
             }
-            else if(m_orientation == 2)
+            else if (m_orientation == 2)
             {
                 dr->drawPixmap(m_location.x(), m_location.y(), m_container);
                 dr->drawPixmap( m_location.x(), 
@@ -2239,7 +2239,7 @@ void UIStatusBarType::Draw(QPainter *dr, int drawlayer, int context)
                                 0, 
                                 (m_filler.height() - height) - m_fillerSpace);
             }
-            else if(m_orientation == 3)
+            else if (m_orientation == 3)
             {
                 dr->drawPixmap(m_location.x(), m_location.y(), m_container);
                 dr->drawPixmap(m_location.x(), m_location.y(), m_filler, 0, 0, -1, height + m_fillerSpace);
@@ -2261,7 +2261,7 @@ void UIStatusBarType::calculateScreenArea()
 
 void UIStatusBarType::setOrientation(int x)
 {
-    if(x < 0 || x > 3)
+    if (x < 0 || x > 3)
     {
         cerr << "uitypes.o: UIStatusBarType received an invalid request to set orientation to " << x << endl;
         return;
@@ -2308,17 +2308,17 @@ void UIManagedTreeListType::drawText(QPainter *p,
     p->setFont(temp_font->face);
     p->setPen(QPen(temp_font->color, (int)(2 * m_wmult)));
     
-    if(!show_whole_tree)
+    if (!show_whole_tree)
     {
         the_text = cutDown(the_text, &(temp_font->face), false, area.width() - 80, area.height());
         p->drawText(x, y, the_text);
     }
-    else if(bin_number == bins)
+    else if (bin_number == bins)
     {
         the_text = cutDown(the_text, &(temp_font->face), false, bin_corners[bin_number].width() - right_arrow_image.width(), bin_corners[bin_number].height());
         p->drawText(x, y, the_text);
     }
-    else if(bin_number == 1)
+    else if (bin_number == 1)
     {
         the_text = cutDown(the_text, &(temp_font->face), false, bin_corners[bin_number].width() - left_arrow_image.width(), bin_corners[bin_number].height());
         p->drawText(x + left_arrow_image.width(), y, the_text);
@@ -2334,21 +2334,21 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
 {
     //  Do nothing if context is wrong;
 
-    if(m_context != context)
+    if (m_context != context)
     {
-        if(m_context != -1)
+        if (m_context != -1)
         {
             return;
         }
     }
 
-    if(drawlayer != m_order)
+    if (drawlayer != m_order)
     {
         // not my turn
         return;
     }
 
-    if(!current_node)
+    if (!current_node)
     {
         // no data (yet?)
         return;
@@ -2365,7 +2365,7 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
     int starting_bin = 0;
     int ending_bin = 0;
     
-    if(show_whole_tree)
+    if (show_whole_tree)
     {
         starting_bin = bins;
         ending_bin = 0;
@@ -2380,26 +2380,26 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
     {
         GenericTree *hotspot_node = current_node;
 
-        if(i < active_bin)
+        if (i < active_bin)
         {
             for(int j = 0; j < bins - i; j++)
             {
-                if(hotspot_node)
+                if (hotspot_node)
                 {
-                    if(hotspot_node->getParent())
+                    if (hotspot_node->getParent())
                     {
                         hotspot_node = hotspot_node->getParent();
                     }
                 }
             }
         }
-        if(i > active_bin)
+        if (i > active_bin)
         {
             for(int j = 0; j < i - active_bin; j++)
             {
-                if(hotspot_node)
+                if (hotspot_node)
                 {
-                    if(hotspot_node->childCount() > 0)
+                    if (hotspot_node->childCount() > 0)
                     {
                         hotspot_node = hotspot_node->getSelectedChild(visual_order);
                     }
@@ -2415,7 +2415,7 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
         //  OK, we have the starting node for this bin (if it exists)
         //
         
-        if(hotspot_node)
+        if (hotspot_node)
         {
             QString a_string = QString("bin%1-active").arg(i);
             fontProp *tmpfont = &m_fontfcns[m_fonts[a_string]];
@@ -2423,13 +2423,13 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
             int y_location = bin_corners[i].top() + (bin_corners[i].height() / 2)
                              + (QFontMetrics(tmpfont->face).height() / 2);
                              
-            if(!show_whole_tree)
+            if (!show_whole_tree)
             {
                 x_location = area.left();
                 y_location = area.top() + (area.height() / 2) + (QFontMetrics(tmpfont->face).height() / 2);
             }
 
-            if(i == bins)
+            if (i == bins)
             {
                 draw_up_arrow = true;
                 draw_down_arrow = true;
@@ -2445,7 +2445,7 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
                 int number_of_slots = 0;
                 int another_y_location = y_location - QFontMetrics(tmpfont->face).height();
                 int a_limit = bin_corners[i].top();
-                if(!show_whole_tree)
+                if (!show_whole_tree)
                 {
                     a_limit = area.top();
                 }
@@ -2455,22 +2455,22 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
                     ++number_of_slots;
                 }
                 
-                if(position_in_list <= number_of_slots)
+                if (position_in_list <= number_of_slots)
                 {
                     draw_up_arrow = false;
                 }
-                if(position_in_list < number_of_slots)
+                if (position_in_list < number_of_slots)
                 {
                     for(int j = 0; j < number_of_slots - position_in_list; j++)
                     {
                         y_location -= QFontMetrics(tmpfont->face).height();
                     }
                 }
-                if((number_in_list - position_in_list) <= number_of_slots &&
+                if ((number_in_list - position_in_list) <= number_of_slots &&
                    position_in_list > number_of_slots)
                 {
                     draw_down_arrow = false;
-                    if(number_in_list >= number_of_slots * 2 + 1)
+                    if (number_in_list >= number_of_slots * 2 + 1)
                     { 
                         for(int j = 0; j <= number_of_slots - (number_in_list - position_in_list); j++)
                         {
@@ -2485,11 +2485,11 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
                         }
                     }
                 }
-                if((number_in_list - position_in_list) == number_of_slots + 1)
+                if ((number_in_list - position_in_list) == number_of_slots + 1)
                 {
                     draw_down_arrow = false;
                 }
-                if(number_in_list <  (number_of_slots * 2) + 2)
+                if (number_in_list <  (number_of_slots * 2) + 2)
                 {
                     draw_down_arrow = false;
                     draw_up_arrow = false;
@@ -2497,41 +2497,41 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
             }
             
             QString font_name = "active";
-            if(i > active_bin)
+            if (i > active_bin)
             {
                 font_name = "inactive";
             }
-            if(hotspot_node == active_node)
+            if (hotspot_node == active_node)
             {
                 font_name = "selected";
             }
-            if(i == active_bin && color_selectables && hotspot_node->isSelectable())
+            if (i == active_bin && color_selectables && hotspot_node->isSelectable())
             {
                 font_name = "selectable";
             }
 
             
 
-            if(i == active_bin)
+            if (i == active_bin)
             {
                 //
                 //  Draw the highlight pixmap for this bin
                 //
                 
-                if(show_whole_tree)
+                if (show_whole_tree)
                 {
                     p->drawPixmap(x_location, y_location - QFontMetrics(tmpfont->face).height() + QFontMetrics(tmpfont->face).descent(), (*highlight_map[i]));
 
                     //
                     //  Left or right arrows
                     //
-                    if(i == bins && hotspot_node->childCount() > 0)
+                    if (i == bins && hotspot_node->childCount() > 0)
                     {
                         p->drawPixmap(x_location + (*highlight_map[i]).width() - right_arrow_image.width(),
                                       y_location - QFontMetrics(tmpfont->face).height() + right_arrow_image.height() / 2,
                                       right_arrow_image);
                     }
-                    if(i == 1 && hotspot_node->getParent()->getParent())
+                    if (i == 1 && hotspot_node->getParent()->getParent())
                     {
                         p->drawPixmap(x_location,
                                       y_location - QFontMetrics(tmpfont->face).height() + left_arrow_image.height() / 2,
@@ -2551,15 +2551,15 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
             QString msg = hotspot_node->getString();
             drawText(p, msg, font_name, x_location, y_location, i);
 
-            if(i == bins)
+            if (i == bins)
             {
                 //
                 //  Draw up/down arrows
                 //
                 
-                if(draw_up_arrow)
+                if (draw_up_arrow)
                 {
-                    if(show_whole_tree)
+                    if (show_whole_tree)
                     {
                         p->drawPixmap(bin_corners[i].right() - up_arrow_image.width(), 
                                       bin_corners[i].top(), 
@@ -2572,9 +2572,9 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
                                       up_arrow_image);
                     }
                 }
-                if(draw_down_arrow)
+                if (draw_down_arrow)
                 {
-                    if(show_whole_tree)
+                    if (show_whole_tree)
                     {
                         p->drawPixmap(bin_corners[i].right() - down_arrow_image.width(),
                                       bin_corners[i].bottom() - down_arrow_image.height(),
@@ -2596,24 +2596,24 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
             int numb_above = 1;
             int still_yet_another_y_location = y_location - QFontMetrics(tmpfont->face).height();
             int a_limit = bin_corners[i].top();
-            if(!show_whole_tree)
+            if (!show_whole_tree)
             {
                 a_limit = area.top();
             }
             while (still_yet_another_y_location - QFontMetrics(tmpfont->face).height() > a_limit)
             {
                 GenericTree *above = hotspot_node->prevSibling(numb_above, visual_order);
-                if(above)
+                if (above)
                 {
-                    if(i == active_bin && color_selectables && above->isSelectable())
+                    if (i == active_bin && color_selectables && above->isSelectable())
                     {
                         font_name = "selectable";
                     }
-                    else if(above == active_node)
+                    else if (above == active_node)
                     {
                         font_name = "selected";
                     }
-                    else if(i == active_bin)
+                    else if (i == active_bin)
                     {
                         font_name = "active";
                     }
@@ -2636,24 +2636,24 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
             int numb_below = 1;
             y_location += QFontMetrics(tmpfont->face).height();
             a_limit = bin_corners[i].bottom();
-            if(!show_whole_tree)
+            if (!show_whole_tree)
             {
                 a_limit = area.bottom();
             }
             while (y_location < a_limit)
             {
                 GenericTree *below = hotspot_node->nextSibling(numb_below, visual_order);
-                if(below)
+                if (below)
                 {
-                    if(i == active_bin && color_selectables && below->isSelectable())
+                    if (i == active_bin && color_selectables && below->isSelectable())
                     {
                         font_name = "selectable";
                     }
-                    else if(below == active_node)
+                    else if (below == active_node)
                     {
                         font_name = "selected";
                     }
-                    else if(i == active_bin)
+                    else if (i == active_bin)
                     {
                         font_name = "active";
                     }
@@ -2697,7 +2697,7 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
 void UIManagedTreeListType::moveToNode(QValueList<int> route_of_branches)
 {
     current_node = my_tree_data->findNode(route_of_branches);
-    if(!current_node)
+    if (!current_node)
     {
         current_node = my_tree_data->findLeaf();
     }
@@ -2710,9 +2710,9 @@ void UIManagedTreeListType::moveToNodesFirstChild(QValueList<int> route_of_branc
 {
     GenericTree *finder = my_tree_data->findNode(route_of_branches);
 
-    if(finder)
+    if (finder)
     {
-        if(finder->childCount() > 0)
+        if (finder->childCount() > 0)
         {
             current_node = finder->getChildAt(0, tree_order);
             active_node = current_node;
@@ -2736,7 +2736,7 @@ void UIManagedTreeListType::moveToNodesFirstChild(QValueList<int> route_of_branc
 
 QValueList <int> * UIManagedTreeListType::getRouteToActive()
 {
-    if(active_node)
+    if (active_node)
     {
         route_to_active.clear();
         GenericTree *climber = active_node;
@@ -2754,7 +2754,7 @@ QValueList <int> * UIManagedTreeListType::getRouteToActive()
 QStringList UIManagedTreeListType::getRouteToCurrent()
 {
     QStringList route_to_current;
-    if(current_node)
+    if (current_node)
     {
         GenericTree *climber = current_node;
         route_to_current.push_front(climber->getString());
@@ -2769,10 +2769,10 @@ QStringList UIManagedTreeListType::getRouteToCurrent()
 
 bool UIManagedTreeListType::tryToSetActive(QValueList <int> route)
 {
-    if(&route)
+    if (&route)
     {
         GenericTree *a_node = my_tree_data->findNode(route);
-        if(a_node && a_node->isSelectable())
+        if (a_node && a_node->isSelectable())
         {
             active_node = a_node;
             current_node = a_node;
@@ -2785,7 +2785,7 @@ bool UIManagedTreeListType::tryToSetActive(QValueList <int> route)
 
 bool UIManagedTreeListType::tryToSetCurrent(QStringList route)
 {
-    if(!my_tree_data)
+    if (!my_tree_data)
     {
         current_node = NULL;
         return false;
@@ -2797,14 +2797,14 @@ bool UIManagedTreeListType::tryToSetCurrent(QStringList route)
     //  
     //
     
-    if(route.count() > 0)
+    if (route.count() > 0)
     {
-        if(route[0] == my_tree_data->getString())
+        if (route[0] == my_tree_data->getString())
         {
             for(uint i = 1; i < route.count(); i ++)
             {
                 GenericTree *descender = current_node->getChildByName(route[i]);
-                if(descender)
+                if (descender)
                 {
                     current_node = descender;
                 }
@@ -2826,7 +2826,7 @@ bool UIManagedTreeListType::tryToSetCurrent(QStringList route)
 
 void UIManagedTreeListType::assignTreeData(GenericTree *a_tree)
 {
-    if(a_tree)
+    if (a_tree)
     {
         my_tree_data = a_tree;
 
@@ -2852,7 +2852,7 @@ void UIManagedTreeListType::setCurrentNode(GenericTree *a_node)
     //  to see if this node exists somewhere...
     //
     
-    if(a_node)
+    if (a_node)
     {
         current_node = a_node;
     }
@@ -2865,7 +2865,7 @@ int UIManagedTreeListType::getActiveBin()
 
 void UIManagedTreeListType::setActiveBin(int a_bin)
 {
-    if(a_bin > bins)
+    if (a_bin > bins)
     {
         active_bin = bins;
     }
@@ -2919,17 +2919,17 @@ bool UIManagedTreeListType::popUp()
     //  current active node's parent  
     //
     
-    if(!current_node)
+    if (!current_node)
     {
         return false;
     }
     
-    if(!current_node->getParent())
+    if (!current_node->getParent())
     {
         return false;
     }
     
-    if(!current_node->getParent()->getParent())
+    if (!current_node->getParent()->getParent())
     {
         //
         //  I be ultimate root
@@ -2939,7 +2939,7 @@ bool UIManagedTreeListType::popUp()
         
     }
     
-    if(!show_whole_tree)
+    if (!show_whole_tree)
     {
         //
         //  Oh no you don't
@@ -2948,13 +2948,13 @@ bool UIManagedTreeListType::popUp()
         return false;
     }
     
-    if(active_bin > 1)
+    if (active_bin > 1)
     {
         --active_bin;
         current_node = current_node->getParent();
         emit nodeEntered(current_node->getInt(), current_node->getAttributes());
     }
-    else if(active_bin < bins)
+    else if (active_bin < bins)
     {
         ++active_bin;
     }
@@ -2969,19 +2969,19 @@ bool UIManagedTreeListType::pushDown()
     //  current active node's first child
     //
 
-    if(!current_node)
+    if (!current_node)
     {
         return false;
     }
 
-    if(current_node->childCount() < 1)
+    if (current_node->childCount() < 1)
     {
         //
         //  I be leaf
         return false;
     }
     
-    if(!show_whole_tree)
+    if (!show_whole_tree)
     {
         //
         //  Bad tree, bad!
@@ -2989,13 +2989,13 @@ bool UIManagedTreeListType::pushDown()
         return false;
     }
 
-    if(active_bin < bins)
+    if (active_bin < bins)
     {
         ++active_bin;
         current_node = current_node->getSelectedChild(visual_order);
         emit nodeEntered(current_node->getInt(), current_node->getAttributes());
     }
-    else if(active_bin > 1)
+    else if (active_bin > 1)
     {
         --active_bin;
     }
@@ -3006,7 +3006,7 @@ bool UIManagedTreeListType::pushDown()
 
 bool UIManagedTreeListType::moveUp(bool do_refresh)
 {
-    if(!current_node)
+    if (!current_node)
     {
         return false;
     }
@@ -3017,12 +3017,12 @@ bool UIManagedTreeListType::moveUp(bool do_refresh)
     //
 
     GenericTree *new_node = current_node->prevSibling(1, visual_order);
-    if(new_node)
+    if (new_node)
     {
         current_node = new_node;
-        if(do_refresh)
+        if (do_refresh)
         {
-            if(show_whole_tree)
+            if (show_whole_tree)
             {
                 for(int i = active_bin; i <= bins; i++)
                 {
@@ -3043,7 +3043,7 @@ bool UIManagedTreeListType::moveUp(bool do_refresh)
 
 bool UIManagedTreeListType::moveDown(bool do_refresh)
 {
-    if(!current_node)
+    if (!current_node)
     {
         return false;
     }
@@ -3055,12 +3055,12 @@ bool UIManagedTreeListType::moveDown(bool do_refresh)
     //
 
     GenericTree *new_node = current_node->nextSibling(1, visual_order);
-    if(new_node)
+    if (new_node)
     {
         current_node = new_node;
-        if(do_refresh)
+        if (do_refresh)
         {
-            if(show_whole_tree)
+            if (show_whole_tree)
             {
                 for(int i = active_bin; i <= bins; i++)
                 {
@@ -3088,7 +3088,7 @@ int UIManagedTreeListType::calculateEntriesInBin(int bin_number)
     //  entries can appear in a given bin
     //
     
-    if(bin_number < 1 || bin_number > bins)
+    if (bin_number < 1 || bin_number > bins)
     {
         return 0;
     }
@@ -3100,13 +3100,13 @@ int UIManagedTreeListType::calculateEntriesInBin(int bin_number)
     int y_location =    bin_corners[bin_number].top() 
                         + (bin_corners[bin_number].height() / 2) 
                         + (QFontMetrics(tmpfont->face).height() / 2);
-    if(!show_whole_tree)
+    if (!show_whole_tree)
     {
         y_location = area.top() + (area.height() / 2) + (QFontMetrics(tmpfont->face).height() / 2);
     }
     int another_y_location = y_location - QFontMetrics(tmpfont->face).height();
     int a_limit = bin_corners[bin_number].top();
-    if(!show_whole_tree)
+    if (!show_whole_tree)
     {
         a_limit = area.top();
     }
@@ -3117,7 +3117,7 @@ int UIManagedTreeListType::calculateEntriesInBin(int bin_number)
     }
     y_location += QFontMetrics(tmpfont->face).height();
     a_limit = bin_corners[bin_number].bottom();
-    if(!show_whole_tree)
+    if (!show_whole_tree)
     {
         a_limit = area.bottom();
     }
@@ -3131,20 +3131,20 @@ int UIManagedTreeListType::calculateEntriesInBin(int bin_number)
 
 bool UIManagedTreeListType::pageUp()
 {
-    if(!current_node)
+    if (!current_node)
     {
         return false;
     }
     int entries_to_jump = calculateEntriesInBin(active_bin);
     for(int i = 0; i < entries_to_jump; i++)
     {
-        if(!moveUp(false))
+        if (!moveUp(false))
         {
             i = entries_to_jump;
         }
         
     }
-    if(show_whole_tree)
+    if (show_whole_tree)
     {
         for(int i = active_bin; i <= bins; i++)
         {
@@ -3160,24 +3160,24 @@ bool UIManagedTreeListType::pageUp()
 
 bool UIManagedTreeListType::pageDown()
 {
-    if(!current_node)
+    if (!current_node)
     {
         return false;
     }
-    if(!current_node)
+    if (!current_node)
     {
         return false;
     }
     int entries_to_jump = calculateEntriesInBin(active_bin);
     for(int i = 0; i < entries_to_jump; i++)
     {
-        if(!moveDown(false))
+        if (!moveDown(false))
         {
             i = entries_to_jump;
         }
         
     }
-    if(show_whole_tree)
+    if (show_whole_tree)
     {
         for(int i = active_bin; i <= bins; i++)
         {
@@ -3193,13 +3193,13 @@ bool UIManagedTreeListType::pageDown()
 
 void UIManagedTreeListType::select()
 {
-    if(current_node)
+    if (current_node)
     {
-        if(current_node->isSelectable())
+        if (current_node->isSelectable())
         {
             active_node = current_node;
             active_parent = active_node->getParent();
-            if(show_whole_tree)
+            if (show_whole_tree)
             {
                 emit requestUpdate(screen_corners[active_bin]);
             }
@@ -3212,7 +3212,7 @@ void UIManagedTreeListType::select()
         else
         {
             GenericTree *first_leaf = current_node->findLeaf(tree_order);
-            if(first_leaf->isSelectable())
+            if (first_leaf->isSelectable())
             {
                 active_node = first_leaf;
                 active_parent = current_node;
@@ -3226,7 +3226,7 @@ void UIManagedTreeListType::select()
 
 void UIManagedTreeListType::activate()
 {
-    if(active_node)
+    if (active_node)
     {
         emit requestUpdate(screen_corners[active_bin]);
         emit nodeSelected(active_node->getInt(), active_node->getAttributes());
@@ -3235,7 +3235,7 @@ void UIManagedTreeListType::activate()
 
 void UIManagedTreeListType::enter()
 {
-    if(current_node)
+    if (current_node)
     {
         emit nodeEntered(current_node->getInt(), current_node->getAttributes());
     }
@@ -3243,11 +3243,11 @@ void UIManagedTreeListType::enter()
 
 bool UIManagedTreeListType::nextActive(bool wrap_around, bool traverse_up_down)
 {
-    if(!active_node)
+    if (!active_node)
     {
         return false;
     }
-    if(traverse_up_down && active_parent != active_node->getParent())
+    if (traverse_up_down && active_parent != active_node->getParent())
     {
         return complexInternalNextPrevActive(true, wrap_around);
     }
@@ -3258,22 +3258,22 @@ bool UIManagedTreeListType::nextActive(bool wrap_around, bool traverse_up_down)
     
     bool in_sync = false;
     
-    if(current_node == active_node)
+    if (current_node == active_node)
     {
         in_sync = true;
     }
     
-    if(active_node)
+    if (active_node)
     {
         GenericTree *test_node = active_node->nextSibling(1, tree_order);
-        if(test_node)
+        if (test_node)
         {
             active_node = test_node;
-            if(in_sync)
+            if (in_sync)
             {
                 current_node = active_node;
             }
-            if(show_whole_tree)
+            if (show_whole_tree)
             {
                 emit requestUpdate(screen_corners[active_bin]);
             }
@@ -3283,20 +3283,20 @@ bool UIManagedTreeListType::nextActive(bool wrap_around, bool traverse_up_down)
             }
             return true;
         }
-        else if(wrap_around)
+        else if (wrap_around)
         {
             test_node = active_node->getParent();
-            if(test_node)
+            if (test_node)
             {
                 test_node = test_node->getChildAt(0, tree_order);
-                if(test_node)
+                if (test_node)
                 {
                     active_node = test_node;
-                    if(in_sync)
+                    if (in_sync)
                     {
                         current_node = active_node;
                     }
-                    if(show_whole_tree)
+                    if (show_whole_tree)
                     {
                         emit requestUpdate(screen_corners[active_bin]);
                     }
@@ -3314,32 +3314,32 @@ bool UIManagedTreeListType::nextActive(bool wrap_around, bool traverse_up_down)
 
 bool UIManagedTreeListType::prevActive(bool wrap_around, bool traverse_up_down)
 {
-    if(!active_node)
+    if (!active_node)
     {
         return false;
     }
-    if(traverse_up_down && active_parent != active_node->getParent())
+    if (traverse_up_down && active_parent != active_node->getParent())
     {
         return complexInternalNextPrevActive(false, wrap_around);
     }
     bool in_sync = false;
     
-    if(current_node == active_node)
+    if (current_node == active_node)
     {
         in_sync = true;
     }
     
-    if(active_node)
+    if (active_node)
     {
         GenericTree *test_node = active_node->prevSibling(1, tree_order);
-        if(test_node)
+        if (test_node)
         {
             active_node = test_node;
-            if(in_sync)
+            if (in_sync)
             {
                 current_node = active_node;
             }
-            if(show_whole_tree)
+            if (show_whole_tree)
             {
                 emit requestUpdate(screen_corners[active_bin]);
             }
@@ -3349,23 +3349,23 @@ bool UIManagedTreeListType::prevActive(bool wrap_around, bool traverse_up_down)
             }
             return true;
         }
-        else if(wrap_around)
+        else if (wrap_around)
         {
             test_node = active_node->getParent();
-            if(test_node)
+            if (test_node)
             {
                 int numb_children = test_node->childCount();
-                if(numb_children > 0)
+                if (numb_children > 0)
                 {
                     test_node = test_node->getChildAt(numb_children - 1, tree_order);
-                    if(test_node)
+                    if (test_node)
                     {
                         active_node = test_node;
-                        if(in_sync)
+                        if (in_sync)
                         {
                             current_node = active_node;
                         }
-                        if(show_whole_tree)
+                        if (show_whole_tree)
                         {
                             emit requestUpdate(screen_corners[active_bin]);
                         }
@@ -3384,19 +3384,19 @@ bool UIManagedTreeListType::prevActive(bool wrap_around, bool traverse_up_down)
 
 bool UIManagedTreeListType::complexInternalNextPrevActive(bool forward_or_back, bool wrap_around)
 {
-    if(active_parent)
+    if (active_parent)
     {
         bool in_sync = false;
-        if(current_node == active_node)
+        if (current_node == active_node)
         {
             in_sync = true;
         }
         GenericTree *next;
         next = active_parent->nextPrevFromFlatList(forward_or_back, wrap_around, active_node);
-        if(next)
+        if (next)
         {
             active_node = next;
-            if(in_sync)
+            if (in_sync)
             {
                 current_node = active_node;
             }
@@ -3445,27 +3445,27 @@ UIPushButtonType::UIPushButtonType(const QString &name, QPixmap on, QPixmap off,
 
 void UIPushButtonType::Draw(QPainter *p, int drawlayer, int context)
 {
-    if(context != m_context)
+    if (context != m_context)
     {
-        if(m_context != -1)
+        if (m_context != -1)
         {
             return;
         }
     }
 
-    if(drawlayer != m_order)
+    if (drawlayer != m_order)
     {
         // not my turn
         return;
     }
 
-    if(currently_pushed)
+    if (currently_pushed)
     {
         p->drawPixmap(m_displaypos.x(), m_displaypos.y(), pushed_pixmap);
     }
     else
     {
-        if(has_focus)
+        if (has_focus)
         {
             p->drawPixmap(m_displaypos.x(), m_displaypos.y(), on_pixmap);
         }
@@ -3479,7 +3479,7 @@ void UIPushButtonType::Draw(QPainter *p, int drawlayer, int context)
 
 void UIPushButtonType::push()
 {
-    if(currently_pushed)
+    if (currently_pushed)
     {
         return;
     }
@@ -3506,21 +3506,21 @@ void UIPushButtonType::calculateScreenArea()
     y += m_parent->GetAreaRect().top();
 
     width = off_pixmap.width();
-    if(on_pixmap.width() > width)
+    if (on_pixmap.width() > width)
     {
         width = on_pixmap.width();
     }
-    if(pushed_pixmap.width() > width)
+    if (pushed_pixmap.width() > width)
     {
         width = pushed_pixmap.width();
     }
 
     height = off_pixmap.height();
-    if(on_pixmap.height() > height)
+    if (on_pixmap.height() > height)
     {
         height = on_pixmap.height();
     }
-    if(pushed_pixmap.height() > height)
+    if (pushed_pixmap.height() > height)
     {
         height = pushed_pixmap.height();
     }
@@ -3545,27 +3545,27 @@ UITextButtonType::UITextButtonType(const QString &name, QPixmap on, QPixmap off,
 
 void UITextButtonType::Draw(QPainter *p, int drawlayer, int context)
 {
-    if(context != m_context)
+    if (context != m_context)
     {
-        if(m_context != -1)
+        if (m_context != -1)
         {
             return;
         }
     }
 
-    if(drawlayer != m_order)
+    if (drawlayer != m_order)
     {
         // not my turn
         return;
     }
 
-    if(currently_pushed)
+    if (currently_pushed)
     {
         p->drawPixmap(m_displaypos.x(), m_displaypos.y(), pushed_pixmap);
     }
     else
     {
-        if(has_focus)
+        if (has_focus)
         {
             p->drawPixmap(m_displaypos.x(), m_displaypos.y(), on_pixmap);
         }
@@ -3587,7 +3587,7 @@ void UITextButtonType::Draw(QPainter *p, int drawlayer, int context)
 
 void UITextButtonType::push()
 {
-    if(currently_pushed)
+    if (currently_pushed)
     {
         return;
     }
@@ -3620,21 +3620,21 @@ void UITextButtonType::calculateScreenArea()
     y += m_parent->GetAreaRect().top();
 
     width = off_pixmap.width();
-    if(on_pixmap.width() > width)
+    if (on_pixmap.width() > width)
     {
         width = on_pixmap.width();
     }
-    if(pushed_pixmap.width() > width)
+    if (pushed_pixmap.width() > width)
     {
         width = pushed_pixmap.width();
     }
 
     height = off_pixmap.height();
-    if(on_pixmap.height() > height)
+    if (on_pixmap.height() > height)
     {
         height = on_pixmap.height();
     }
-    if(pushed_pixmap.height() > height)
+    if (pushed_pixmap.height() > height)
     {
         height = pushed_pixmap.height();
     }
@@ -3660,19 +3660,19 @@ UICheckBoxType::UICheckBoxType(const QString &name,
 
 void UICheckBoxType::Draw(QPainter *p, int drawlayer, int context)
 {
-    if(context != m_context)
+    if (context != m_context)
     {
-        if(m_context != -1)
+        if (m_context != -1)
         {
             return;
         }
     }
-    if(drawlayer != m_order)
+    if (drawlayer != m_order)
     {   
     }
-    if(has_focus)
+    if (has_focus)
     {
-        if(checked)
+        if (checked)
         {
             p->drawPixmap(m_displaypos.x(), m_displaypos.y(), checked_pixmap_high);
         }
@@ -3683,7 +3683,7 @@ void UICheckBoxType::Draw(QPainter *p, int drawlayer, int context)
     }
     else
     {
-        if(checked)
+        if (checked)
         {
             p->drawPixmap(m_displaypos.x(), m_displaypos.y(), checked_pixmap);
         }
@@ -3705,29 +3705,29 @@ void UICheckBoxType::calculateScreenArea()
     y += m_parent->GetAreaRect().top();
 
     width = checked_pixmap.width();
-    if(unchecked_pixmap.width() > width)
+    if (unchecked_pixmap.width() > width)
     {
         width = unchecked_pixmap.width();
     }
-    if(checked_pixmap_high.width() > width)
+    if (checked_pixmap_high.width() > width)
     {
         width = checked_pixmap_high.width();
     }
-    if(unchecked_pixmap_high.width() > width)
+    if (unchecked_pixmap_high.width() > width)
     {
         width = unchecked_pixmap_high.width();
     }
 
     height = checked_pixmap.height();
-    if(unchecked_pixmap.height() > height)
+    if (unchecked_pixmap.height() > height)
     {
         height = unchecked_pixmap.height();
     }
-    if(checked_pixmap_high.height() > height)
+    if (checked_pixmap_high.height() > height)
     {
         height = checked_pixmap_high.height();
     }
-    if(unchecked_pixmap_high.height() > height)
+    if (unchecked_pixmap_high.height() > height)
     {
         height = unchecked_pixmap_high.height();
     }
@@ -3766,27 +3766,27 @@ UISelectorType::UISelectorType(const QString &name,
 
 void UISelectorType::Draw(QPainter *p, int drawlayer, int context)
 {
-    if(context != m_context)
+    if (context != m_context)
     {
-        if(m_context != -1)
+        if (m_context != -1)
         {
             return;
         }
     }
 
-    if(drawlayer != m_order)
+    if (drawlayer != m_order)
     {
         // not my turn
         return;
     }
 
-    if(currently_pushed)
+    if (currently_pushed)
     {
         p->drawPixmap(m_displaypos.x(), m_displaypos.y(), pushed_pixmap);
     }
     else
     {
-        if(has_focus)
+        if (has_focus)
         {
             p->drawPixmap(m_displaypos.x(), m_displaypos.y(), on_pixmap);
         }
@@ -3795,7 +3795,7 @@ void UISelectorType::Draw(QPainter *p, int drawlayer, int context)
             p->drawPixmap(m_displaypos.x(), m_displaypos.y(), off_pixmap);
         }
     }
-    if(current_data)
+    if (current_data)
     {
         p->setFont(m_font->face);
         p->setBrush(m_font->color);
@@ -3821,7 +3821,7 @@ void UISelectorType::addItem(int an_int, const QString &a_string)
 {
     IntStringPair *new_data = new IntStringPair(an_int, a_string);
     my_data.append(new_data);
-    if(!current_data)
+    if (!current_data)
     {
         current_data = new_data;
     }
@@ -3831,7 +3831,7 @@ void UISelectorType::setToItem(int which_item)
 {
     for(uint i = 0; i < my_data.count(); i++)
     {
-        if(my_data.at(i)->getInt() == which_item)
+        if (my_data.at(i)->getInt() == which_item)
         {
             current_data = my_data.at(i);
             refresh();
@@ -3841,19 +3841,19 @@ void UISelectorType::setToItem(int which_item)
 
 void UISelectorType::push(bool up_or_down)
 {
-    if(currently_pushed)
+    if (currently_pushed)
     {
         return;
     }
     currently_pushed = true;
     push_timer.start(300, TRUE);
 
-    if(current_data)
+    if (current_data)
     {
         my_data.find(current_data);
-        if(up_or_down)
+        if (up_or_down)
         {
-            if(!(current_data = my_data.next()))
+            if (!(current_data = my_data.next()))
             {
                 current_data = my_data.first();
             }
@@ -3861,7 +3861,7 @@ void UISelectorType::push(bool up_or_down)
         }
         else
         {
-            if(!(current_data = my_data.prev()))
+            if (!(current_data = my_data.prev()))
             {
                 current_data = my_data.last();
             }

@@ -169,12 +169,12 @@ void AudioOutputDX::AddSamples(char *buffer, int frames, long long timecode)
     if (awaiting_data) 
     {
 //        dsresult = IDirectSoundBuffer_Play(dsbuffer, 0, 0, DSBPLAY_LOOPING);
-//        if(dsresult == DSERR_BUFFERLOST)
+//        if (dsresult == DSERR_BUFFERLOST)
 //        {
 //            IDirectSoundBuffer_Restore(dsbuffer);
 //            dsresult = IDirectSoundBuffer_Play(dsbuffer, 0, 0, DSBPLAY_LOOPING );
 //        }
-//        if(dsresult != DS_OK)
+//        if (dsresult != DS_OK)
 //        {
 //            VERBOSE(VB_ALL, "cannot start playing buffer" );
 //        }
@@ -211,7 +211,7 @@ void AudioOutputDX::AddSamples(char *buffers[], int frames, long long timecode)
     return;
     }
 
-    if(pcm_handle == NULL)
+    if (pcm_handle == NULL)
     {
         free(audiobuffer);
         return;
@@ -222,7 +222,7 @@ void AudioOutputDX::AddSamples(char *buffers[], int frames, long long timecode)
         for(int chan = 0; chan < audio_channels; chan++)
         {
             audiobuffer[waud++] = buffers[chan][itemp];
-            if(audio_bits == 16)
+            if (audio_bits == 16)
                 audiobuffer[waud++] = buffers[chan][itemp+1];
             if (waud >= audbufsize)
                 waud -= audbufsize;
@@ -232,13 +232,13 @@ void AudioOutputDX::AddSamples(char *buffers[], int frames, long long timecode)
     err = arts_write(pcm_handle, audiobuffer, frames*4);
     free(audiobuffer);
 
-    if(err < 0)
+    if (err < 0)
     {
         fprintf(stderr, "arts_write error: %s\n", arts_error_text(err));
         return;
     }
 
-    if(timecode < 0) 
+    if (timecode < 0) 
         timecode = audbuf_timecode; // add to current timecode*/
     
     /* we want the time at the end -- but the file format stores
@@ -286,12 +286,12 @@ void AudioOutputDX::Pause(bool pause)
         VERBOSE(VB_ALL, "unpausing");
     
         dsresult = IDirectSoundBuffer_Play(dsbuffer, 0, 0, DSBPLAY_LOOPING);
-        if(dsresult == DSERR_BUFFERLOST)
+        if (dsresult == DSERR_BUFFERLOST)
         {
             IDirectSoundBuffer_Restore(dsbuffer);
             dsresult = IDirectSoundBuffer_Play(dsbuffer, 0, 0, DSBPLAY_LOOPING );
         }
-        if(dsresult != DS_OK)
+        if (dsresult != DS_OK)
         {
             VERBOSE(VB_ALL, "cannot start playing buffer" );
         }
@@ -313,7 +313,7 @@ int AudioOutputDX::GetAudiotime(void)
 
     dsresult = IDirectSoundBuffer_GetCurrentPosition(dsbuffer, &play_pos, NULL);
 
-    if(dsresult != DS_OK)
+    if (dsresult != DS_OK)
     {
         VERBOSE(VB_ALL, "cannot get current buffer positions");
         return -1;
@@ -427,7 +427,7 @@ int AudioOutputDX::CreateDSBuffer(int audio_bits, int audio_channels, int audio_
 /*    waveformat.dwChannelMask = 0;
     for( i = 0; i < sizeof(pi_channels_in)/sizeof(uint32_t); i++ )
     {
-        if( i_channels & pi_channels_in[i] )
+        if ( i_channels & pi_channels_in[i] )
             waveformat.dwChannelMask |= pi_channels_out[i];
     }*/
 
@@ -503,14 +503,14 @@ int AudioOutputDX::CreateDSBuffer(int audio_bits, int audio_channels, int audio_
         {
             return -1;
         }
-        if( !b_probe ) VERBOSE(VB_ALL, "couldn't use hardware sound buffer" );
+        if ( !b_probe ) VERBOSE(VB_ALL, "couldn't use hardware sound buffer" );
     }
 
     write_cursor = 0;
     buffer_size = FRAMES_NUM * audio_bits/8 * audio_channels;
 
     /* Stop here if we were just probing */
-    if( b_probe )
+    if ( b_probe )
     {
         IDirectSoundBuffer_Release(dsbuffer);
         dsbuffer = NULL;
@@ -592,7 +592,7 @@ int AudioOutputDX::FillBuffer(int frames, char *buffer)
     
         dsresult = IDirectSoundBuffer_GetCurrentPosition(dsbuffer, &play_pos, &write_pos);
 
-        if(dsresult != DS_OK)
+        if (dsresult != DS_OK)
         {
             VERBOSE(VB_ALL, "cannot get current buffer positions");
             return -1;
@@ -618,7 +618,7 @@ int AudioOutputDX::FillBuffer(int frames, char *buffer)
                 
             dsresult = IDirectSoundBuffer_GetCurrentPosition(dsbuffer, &play_pos, &write_pos);
 
-            if(dsresult != DS_OK)
+            if (dsresult != DS_OK)
             {
                 VERBOSE(VB_ALL, "cannot get current buffer positions");
                 return -1;
@@ -641,7 +641,7 @@ int AudioOutputDX::FillBuffer(int frames, char *buffer)
                 &p_wrap_around,            /* Buffer adress (if wrap around) */
                 &l_bytes2,               /* Count of bytes after wrap around */
                 0);                                                   /* Flags */
-    if(dsresult == DSERR_BUFFERLOST)
+    if (dsresult == DSERR_BUFFERLOST)
     {
         IDirectSoundBuffer_Restore(dsbuffer);
         dsresult = IDirectSoundBuffer_Lock(
@@ -654,13 +654,13 @@ int AudioOutputDX::FillBuffer(int frames, char *buffer)
                                &l_bytes2,
                                0);
     }
-    if(dsresult != DS_OK)
+    if (dsresult != DS_OK)
     {
         VERBOSE(VB_ALL, "cannot lock buffer");
         return -1;
     }
 
-    if(buffer == NULL)
+    if (buffer == NULL)
     {
         VERBOSE(VB_ALL, "Writing null bytes");
     
@@ -673,11 +673,11 @@ int AudioOutputDX::FillBuffer(int frames, char *buffer)
            while (write_cursor >= buffer_size)
                write_cursor -= buffer_size;
     }
-/*    else if( p_aout->output.p_sys->b_chan_reorder )
+/*    else if ( p_aout->output.p_sys->b_chan_reorder )
     {
         /* Do the channel reordering here * /
 
-        if( p_aout->output.output.i_format ==  VLC_FOURCC('s','1','6','l') )
+        if ( p_aout->output.output.i_format ==  VLC_FOURCC('s','1','6','l') )
           InterleaveS16( (int16_t *)p_buffer->p_buffer,
                          (int16_t *)p_write_position,
                          p_aout->output.p_sys->pi_chan_table,

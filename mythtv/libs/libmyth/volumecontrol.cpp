@@ -75,7 +75,7 @@ int VolumeControl::GetCurrentVolume(void)
 #ifdef USING_OSS
     int realvol;
     
-    if(mute)
+    if (mute)
     {
         return internal_volume;
     }
@@ -107,7 +107,7 @@ void VolumeControl::SetCurrentVolume(int value)
     internal_volume = volume;
     if (mixerfd > 0)
     {
-        if(!mute)
+        if (!mute)
         {
             int realvol = (volume << 8) + volume;
             int ret = ioctl(mixerfd, MIXER_WRITE(control), &realvol);

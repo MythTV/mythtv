@@ -57,13 +57,13 @@ void AudioOutputARTS::Reconfigure(int audio_bits,
 
 AudioOutputARTS::~AudioOutputARTS()
 {
-    if(pcm_handle != NULL)
+    if (pcm_handle != NULL)
         arts_close_stream(pcm_handle);
 }
 
 void AudioOutputARTS::Reset(void)
 {
-    if(pcm_handle == NULL)
+    if (pcm_handle == NULL)
         return;
     audbuf_timecode = 0;
     // FIXME: kedl: not sure what else could be required here?
@@ -73,12 +73,12 @@ void AudioOutputARTS::AddSamples(char *buffer, int frames, long long timecode)
 {
     int err;
     
-    if(pcm_handle == NULL)
+    if (pcm_handle == NULL)
         return;
 
     err = arts_write(pcm_handle, buffer, 
                      frames * audio_bits / 8 * audio_channels);
-    if(err < 0)
+    if (err < 0)
     {
         // FIXME: Fatal?
         VERBOSE(VB_IMPORTANT, QString("Write error: %1")
@@ -86,7 +86,7 @@ void AudioOutputARTS::AddSamples(char *buffer, int frames, long long timecode)
         return;
     }
 
-    if(timecode < 0) 
+    if (timecode < 0) 
         timecode = audbuf_timecode; // add to current timecode
     
     /* we want the time at the end -- but the file format stores
@@ -110,7 +110,7 @@ void AudioOutputARTS::AddSamples(char *buffers[], int frames, long long timecode
         return;
     }
 
-    if(pcm_handle == NULL)
+    if (pcm_handle == NULL)
     {
     	free(audiobuffer);
         return;
@@ -121,7 +121,7 @@ void AudioOutputARTS::AddSamples(char *buffers[], int frames, long long timecode
         for(int chan = 0; chan < audio_channels; chan++)
         {
             audiobuffer[waud++] = buffers[chan][itemp];
-            if(audio_bits == 16)
+            if (audio_bits == 16)
                 audiobuffer[waud++] = buffers[chan][itemp+1];
             if (waud >= audbufsize)
                 waud -= audbufsize;
@@ -131,14 +131,14 @@ void AudioOutputARTS::AddSamples(char *buffers[], int frames, long long timecode
     err = arts_write(pcm_handle, audiobuffer, frames*4);
     free(audiobuffer);
 
-    if(err < 0)
+    if (err < 0)
     {
         // FIXME: Fatal?
         VERBOSE(VB_IMPORTANT, QString("Write error: %1").arg(arts_error_text(err)));
         return;
     }
 
-    if(timecode < 0) 
+    if (timecode < 0) 
         timecode = audbuf_timecode; // add to current timecode
     
     /* we want the time at the end -- but the file format stores

@@ -560,7 +560,7 @@ void GetMythTVGeometry(Display *dpy, int screen_num, int *x, int *y,
 
         printf("Found %d Xinerama Screens.\n", nr_xinerama_screens);
 
-        if(screen_nr > 0 && screen_nr < nr_xinerama_screens)
+        if (screen_nr > 0 && screen_nr < nr_xinerama_screens)
         {
             screen = &xinerama_screens[screen_nr];
             printf("Using screen %d, %dx%d+%d+%d\n",

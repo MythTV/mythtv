@@ -1128,7 +1128,7 @@ void MythPopupBox::keyPressEvent(QKeyEvent *e)
     {
         QString action = actions[i];
 
-        if((action == "ESCAPE") || (arrowAccel && action == "LEFT"))
+        if ((action == "ESCAPE") || (arrowAccel && action == "LEFT"))
         {
             emit popupDone();
             handled = true;
@@ -1217,7 +1217,7 @@ bool MythPopupBox::showGetTextPopup(MythMainWindow *parent, QString title,
     
     textEdit->setFocus();
     
-    if(popup.ExecPopup() == 0)
+    if (popup.ExecPopup() == 0)
     {
         text = textEdit->text();
         return true;
@@ -1369,7 +1369,7 @@ MythThemedDialog::MythThemedDialog(MythMainWindow *parent, QString window_name,
     theme = new XMLParse();
     theme->SetWMult(wmult);
     theme->SetHMult(hmult);
-    if(!theme->LoadTheme(xmldata, window_name, theme_filename))
+    if (!theme->LoadTheme(xmldata, window_name, theme_filename))
     {
         cerr << "dialogbox.o: Couldn't find your theme. I'm outta here" << endl;
         cerr << window_name << " - " <<  theme_filename << endl;
@@ -1436,7 +1436,7 @@ bool MythThemedDialog::buildFocusList()
         }
         ++another_it;
     }
-    if(focus_taking_widgets.count() > 0)
+    if (focus_taking_widgets.count() > 0)
     {
         return true;
     }
@@ -1577,7 +1577,7 @@ void MythThemedDialog::updateForeground()
 void MythThemedDialog::updateForeground(const QRect &r)
 {
     QRect rect_to_update = r;
-    if(r.width() == 0 || r.height() == 0)
+    if (r.width() == 0 || r.height() == 0)
     {
         cerr << "MythThemedDialog.o: something is requesting a screen update of zero size. "
              << "A widget probably has not done a calculateScreeArea(). Will redraw "
@@ -1595,7 +1595,7 @@ void MythThemedDialog::updateForeground(const QRect &r)
 void MythThemedDialog::ReallyUpdateForeground(const QRect &r)
 {
     QRect rect_to_update = r;
-    if(r.width() == 0 || r.height() == 0)
+    if (r.width() == 0 || r.height() == 0)
     {
         cerr << "MythThemedDialog.o: something is requesting a screen update of zero size. "
              << "A widget probably has not done a calculateScreeArea(). Will redraw "
@@ -1749,7 +1749,7 @@ bool MythThemedDialog::assignFirstFocus()
 
     while ((looper = an_it.current()) != 0)
     {
-        if(looper->canTakeFocus())
+        if (looper->canTakeFocus())
         {
             widget_with_current_focus = looper;
             widget_with_current_focus->takeFocus();
@@ -1820,7 +1820,7 @@ bool MythThemedDialog::nextPrevWidgetFocus(bool up_or_down)
             an_it.toLast();
             while ((looper = an_it.current()) != 0)
             {
-                if(looper->canTakeFocus())
+                if (looper->canTakeFocus())
                 {
                     widget_with_current_focus->looseFocus();
                     widget_with_current_focus = looper;
@@ -1875,7 +1875,7 @@ UIType* MythThemedDialog::getUIObject(const QString &name)
 
 UIType* MythThemedDialog::getCurrentFocusWidget()
 {
-    if(widget_with_current_focus)
+    if (widget_with_current_focus)
     {
         return widget_with_current_focus;
     }
@@ -1890,10 +1890,10 @@ UIManagedTreeListType* MythThemedDialog::getUIManagedTreeListType(const QString 
     while( (looper = an_it.current()) != 0)
     {
         UIType *hunter = looper->GetType(name);
-        if(hunter)
+        if (hunter)
         {
             UIManagedTreeListType *hunted;
-            if( (hunted = dynamic_cast<UIManagedTreeListType*>(hunter)) )
+            if ( (hunted = dynamic_cast<UIManagedTreeListType*>(hunter)) )
             {
                 return hunted;
             }
@@ -1911,10 +1911,10 @@ UITextType* MythThemedDialog::getUITextType(const QString &name)
     while( (looper = an_it.current()) != 0)
     {
         UIType *hunter = looper->GetType(name);
-        if(hunter)
+        if (hunter)
         {
             UITextType *hunted;
-            if( (hunted = dynamic_cast<UITextType*>(hunter)) )
+            if ( (hunted = dynamic_cast<UITextType*>(hunter)) )
             {
                 return hunted;
             }
@@ -1932,10 +1932,10 @@ UIMultiTextType* MythThemedDialog::getUIMultiTextType(const QString &name)
     while( (looper = an_it.current()) != 0)
     {
         UIType *hunter = looper->GetType(name);
-        if(hunter)
+        if (hunter)
         {
             UIMultiTextType *hunted;
-            if( (hunted = dynamic_cast<UIMultiTextType*>(hunter)) )
+            if ( (hunted = dynamic_cast<UIMultiTextType*>(hunter)) )
             {
                 return hunted;
             }
@@ -1953,10 +1953,10 @@ UIPushButtonType* MythThemedDialog::getUIPushButtonType(const QString &name)
     while( (looper = an_it.current()) != 0)
     {
         UIType *hunter = looper->GetType(name);
-        if(hunter)
+        if (hunter)
         {
             UIPushButtonType *hunted;
-            if( (hunted = dynamic_cast<UIPushButtonType*>(hunter)) )
+            if ( (hunted = dynamic_cast<UIPushButtonType*>(hunter)) )
             {
                 return hunted;
             }
@@ -1974,10 +1974,10 @@ UITextButtonType* MythThemedDialog::getUITextButtonType(const QString &name)
     while( (looper = an_it.current()) != 0)
     {
         UIType *hunter = looper->GetType(name);
-        if(hunter)
+        if (hunter)
         {
             UITextButtonType *hunted;
-            if( (hunted = dynamic_cast<UITextButtonType*>(hunter)) )
+            if ( (hunted = dynamic_cast<UITextButtonType*>(hunter)) )
             {
                 return hunted;
             }
@@ -1995,10 +1995,10 @@ UIRepeatedImageType* MythThemedDialog::getUIRepeatedImageType(const QString &nam
     while( (looper = an_it.current()) != 0)
     {
         UIType *hunter = looper->GetType(name);
-        if(hunter)
+        if (hunter)
         {
             UIRepeatedImageType *hunted;
-            if( (hunted = dynamic_cast<UIRepeatedImageType*>(hunter)) )
+            if ( (hunted = dynamic_cast<UIRepeatedImageType*>(hunter)) )
             {
                 return hunted;
             }
@@ -2016,10 +2016,10 @@ UICheckBoxType* MythThemedDialog::getUICheckBoxType(const QString &name)
     while( (looper = an_it.current()) != 0)
     {
         UIType *hunter = looper->GetType(name);
-        if(hunter)
+        if (hunter)
         {
             UICheckBoxType *hunted;
-            if( (hunted = dynamic_cast<UICheckBoxType*>(hunter)) )
+            if ( (hunted = dynamic_cast<UICheckBoxType*>(hunter)) )
             {
                 return hunted;
             }
@@ -2037,10 +2037,10 @@ UISelectorType* MythThemedDialog::getUISelectorType(const QString &name)
     while( (looper = an_it.current()) != 0)
     {
         UIType *hunter = looper->GetType(name);
-        if(hunter)
+        if (hunter)
         {
             UISelectorType *hunted;
-            if( (hunted = dynamic_cast<UISelectorType*>(hunter)) )
+            if ( (hunted = dynamic_cast<UISelectorType*>(hunter)) )
             {
                 return hunted;
             }
@@ -2058,10 +2058,10 @@ UIBlackHoleType* MythThemedDialog::getUIBlackHoleType(const QString &name)
     while( (looper = an_it.current()) != 0)
     {
         UIType *hunter = looper->GetType(name);
-        if(hunter)
+        if (hunter)
         {
             UIBlackHoleType *hunted;
-            if( (hunted = dynamic_cast<UIBlackHoleType*>(hunter)) )
+            if ( (hunted = dynamic_cast<UIBlackHoleType*>(hunter)) )
             {
                 return hunted;
             }
@@ -2079,10 +2079,10 @@ UIImageType* MythThemedDialog::getUIImageType(const QString &name)
     while( (looper = an_it.current()) != 0)
     {
         UIType *hunter = looper->GetType(name);
-        if(hunter)
+        if (hunter)
         {
             UIImageType *hunted;
-            if( (hunted = dynamic_cast<UIImageType*>(hunter)) )
+            if ( (hunted = dynamic_cast<UIImageType*>(hunter)) )
             {
                 return hunted;
             }
@@ -2100,10 +2100,10 @@ UIStatusBarType* MythThemedDialog::getUIStatusBarType(const QString &name)
     while( (looper = an_it.current()) != 0)
     {
         UIType *hunter = looper->GetType(name);
-        if(hunter)
+        if (hunter)
         {
             UIStatusBarType *hunted;
-            if( (hunted = dynamic_cast<UIStatusBarType*>(hunter)) )
+            if ( (hunted = dynamic_cast<UIStatusBarType*>(hunter)) )
             {
                 return hunted;
             }
@@ -2265,7 +2265,7 @@ MythImageFileDialog::MythImageFileDialog(QString *result,
     
 
     UIImageType *file_browser_background = getUIImageType("file_browser_background");
-    if(file_browser_background)
+    if (file_browser_background)
     {
         QPixmap background = file_browser_background->GetImage();
         
@@ -2293,7 +2293,7 @@ MythImageFileDialog::MythImageFileDialog(QString *result,
     //
 
     file_browser = getUIManagedTreeListType("file_browser");
-    if(file_browser)
+    if (file_browser)
     {
         file_browser->calculateScreenArea();
         file_browser->showWholeTree(true);
@@ -2314,7 +2314,7 @@ MythImageFileDialog::MythImageFileDialog(QString *result,
     //
     
     image_box = getUIImageType("image_box");
-    if(image_box)
+    if (image_box)
     {
         image_box->calculateScreenArea();
     }
@@ -2324,7 +2324,7 @@ MythImageFileDialog::MythImageFileDialog(QString *result,
     buildTree(top_directory);
 
     file_browser->assignTreeData(root_parent);
-    if(initial_node)
+    if (initial_node)
     {
         file_browser->setCurrentNode(initial_node);
     }
@@ -2381,13 +2381,13 @@ void MythImageFileDialog::buildTree(QString starting_where)
     {
         bool make_active = false;
         QString file_string = *(image_files.at(i));
-        if(file_string == *selected_file)
+        if (file_string == *selected_file)
         {
             make_active = true;
         }
         QString prefix = initialDir;
 
-        if(prefix.length() < 1)
+        if (prefix.length() < 1)
         {
             cerr << "mythdialogs.o: Seems unlikely that this is going to work" << endl;
         }
@@ -2399,11 +2399,11 @@ void MythImageFileDialog::buildTree(QString starting_where)
         QStringList::Iterator an_it = list.begin();
         for( ; an_it != list.end(); ++an_it)
         {
-            if(a_counter + 1 >= (int) list.count())
+            if (a_counter + 1 >= (int) list.count())
             {
                 QString title = (*an_it);
                 GenericTree *added_node = where_to_add->addNode(title.section(".",0,0), i, true);
-                if(make_active)
+                if (make_active)
                 {
                     initial_node = added_node;
                 }
@@ -2413,7 +2413,7 @@ void MythImageFileDialog::buildTree(QString starting_where)
                 QString dirname = *an_it + "/";
                 GenericTree *sub_node;
                 sub_node = where_to_add->getChildByName(dirname);
-                if(!sub_node)
+                if (!sub_node)
                 {
                     sub_node = where_to_add->addNode(dirname, -1, false);
                 }
@@ -2422,7 +2422,7 @@ void MythImageFileDialog::buildTree(QString starting_where)
             ++a_counter;
         }
     }
-    if(file_root->childCount() < 1)
+    if (file_root->childCount() < 1)
     {
         //
         //  Nothing survived the requirements
@@ -2463,7 +2463,7 @@ void MythImageFileDialog::buildFileList(QString directory)
             continue;
         }
             
-        if(fi->isDir())
+        if (fi->isDir())
         {
             buildFileList(fi->absFilePath());
         }
@@ -2472,7 +2472,7 @@ void MythImageFileDialog::buildFileList(QString directory)
             r.setPattern("^" + fi->extension() + "$");
             r.setCaseSensitive(false);
             QStringList result = imageExtensions.grep(r);
-            if(!result.isEmpty())
+            if (!result.isEmpty())
             {
                 image_files.append(fi->absFilePath());
             }
@@ -2481,7 +2481,7 @@ void MythImageFileDialog::buildFileList(QString directory)
                 r.setPattern("^" + fi->extension());
                 r.setCaseSensitive(false);
                 QStringList other_result = imageExtensions.grep(r);
-                if(!result.isEmpty())
+                if (!result.isEmpty())
                 {
                     image_files.append(fi->absFilePath());
                 }
@@ -2492,9 +2492,9 @@ void MythImageFileDialog::buildFileList(QString directory)
 
 void MythImageFileDialog::handleTreeListEntered(int type, IntVector*)
 {
-    if(image_box)
+    if (image_box)
     {
-        if(type > -1)
+        if (type > -1)
         {
             image_box->SetImage(image_files[type]);
         }
@@ -2508,7 +2508,7 @@ void MythImageFileDialog::handleTreeListEntered(int type, IntVector*)
 
 void MythImageFileDialog::handleTreeListSelection(int type, IntVector*)
 {
-    if(type > -1)
+    if (type > -1)
     {
         *selected_file = image_files[type];
         done(0);
@@ -2517,7 +2517,7 @@ void MythImageFileDialog::handleTreeListSelection(int type, IntVector*)
 
 MythImageFileDialog::~MythImageFileDialog()
 {
-    if(root_parent)
+    if (root_parent)
     {
         root_parent->deleteAllChildren();
         delete root_parent;

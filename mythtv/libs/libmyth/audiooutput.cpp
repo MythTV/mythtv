@@ -20,7 +20,7 @@ using namespace std;
 AudioOutput *AudioOutput::OpenAudio(QString audiodevice, int audio_bits, 
                                     int audio_channels, int audio_samplerate)
 {
-    if(audiodevice.startsWith("ALSA:"))
+    if (audiodevice.startsWith("ALSA:"))
     {
 #ifdef USE_ALSA
         return new AudioOutputALSA(audiodevice.remove(0, 5), audio_bits,

@@ -1148,7 +1148,7 @@ void ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
     {
         
         cerr << "Couldn't read menu file " << menuname << endl;
-        if(menuname == "mainmenu.xml" )
+        if (menuname == "mainmenu.xml" )
         {
             exit(0);
         }

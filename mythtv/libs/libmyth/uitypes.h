@@ -752,8 +752,8 @@ class UIManagedTreeListType : public UIType
     void    showWholeTree(bool yes_or_no){ show_whole_tree = yes_or_no; }
     void    scrambleParents(bool yes_or_no){ scrambled_parents = yes_or_no; }
     void    colorSelectables(bool yes_or_no){color_selectables = yes_or_no; }
-    void    sortTreeByString(){if(my_tree_data) my_tree_data->sortByString(); }
-    void    sortTreeBySelectable(){if(my_tree_data) my_tree_data->sortBySelectable();}
+    void    sortTreeByString(){if (my_tree_data) my_tree_data->sortByString(); }
+    void    sortTreeBySelectable(){if (my_tree_data) my_tree_data->sortBySelectable();}
     GenericTree *getCurrentNode() { return current_node; }
     void    setCurrentNode(GenericTree *a_node);
     int     getActiveBin();

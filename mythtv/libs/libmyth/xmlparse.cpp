@@ -188,12 +188,12 @@ void XMLParse::parseFont(QDomElement &element)
 
     if (fontSizeType == "small")
     {
-        if(sizeSmall > 0)
+        if (sizeSmall > 0)
             size = sizeSmall;
     }
     else if (fontSizeType == "big")
     {
-        if(sizeBig > 0)
+        if (sizeBig > 0)
             size = sizeBig;
     }
     
@@ -461,19 +461,19 @@ void XMLParse::parseRepeatedImage(LayerSet *container, QDomElement &element)
             else if (info.tagName() == "orientation")
             {
                 QString orient_string = getFirstText(info).lower();
-                if(orient_string == "lefttoright")
+                if (orient_string == "lefttoright")
                 {
                     orientation = 0;
                 }
-                if(orient_string == "righttoleft")
+                if (orient_string == "righttoleft")
                 {
                     orientation = 1;
                 }
-                if(orient_string == "bottomtotop")
+                if (orient_string == "bottomtotop")
                 {
                     orientation = 2;
                 }
-                if(orient_string == "toptobottom")
+                if (orient_string == "toptobottom")
                 {
                     orientation = 3;
                 }
@@ -1187,23 +1187,23 @@ void XMLParse::parseMultiTextArea(LayerSet *container, QDomElement &element)
             {
                 context = getFirstText(info).toInt();
             }
-            else if(info.tagName() == "padding")
+            else if (info.tagName() == "padding")
             {
                 padding = getFirstText(info).toInt();
             }
-            else if(info.tagName() == "dropdelay")
+            else if (info.tagName() == "dropdelay")
             {
                 drop_delay = getFirstText(info).toInt();
             }
-            else if(info.tagName() == "droppause")
+            else if (info.tagName() == "droppause")
             {
                 drop_pause = getFirstText(info).toInt();
             }
-            else if(info.tagName() == "scrolldelay")
+            else if (info.tagName() == "scrolldelay")
             {
                 scroll_delay = getFirstText(info).toInt();
             }
-            else if(info.tagName() == "scrollpause")
+            else if (info.tagName() == "scrollpause")
             {
                 scroll_pause = getFirstText(info).toInt();
             }
@@ -1256,23 +1256,23 @@ void XMLParse::parseMultiTextArea(LayerSet *container, QDomElement &element)
         multitext->SetContext(context);
     }
 
-    if(padding > -1)
+    if (padding > -1)
     {
         multitext->setMessageSpacePadding(padding);
     }
-    if(drop_delay > -1)
+    if (drop_delay > -1)
     {
         multitext->setDropTimingLength(drop_delay);
     }
-    if(drop_pause > -1)
+    if (drop_pause > -1)
     {
         multitext->setDropTimingPause(drop_pause);
     }
-    if(scroll_delay > -1)
+    if (scroll_delay > -1)
     {
         multitext->setScrollTimingLength(scroll_delay);
     }
-    if(scroll_pause > -1)
+    if (scroll_pause > -1)
     {
         multitext->setScrollTimingPause(scroll_pause);
     }
@@ -1656,19 +1656,19 @@ void XMLParse::parseStatusBar(LayerSet *container, QDomElement &element)
             else if (info.tagName() == "orientation")
             {
                 QString orient_string = getFirstText(info).lower();
-                if(orient_string == "lefttoright")
+                if (orient_string == "lefttoright")
                 {
                     orientation = 0;
                 }
-                if(orient_string == "righttoleft")
+                if (orient_string == "righttoleft")
                 {
                     orientation = 1;
                 }
-                if(orient_string == "bottomtotop")
+                if (orient_string == "bottomtotop")
                 {
                     orientation = 2;
                 }
-                if(orient_string == "toptobottom")
+                if (orient_string == "toptobottom")
                 {
                     orientation = 3;
                 }
@@ -1765,7 +1765,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                 area = parseRect(getFirstText(info));
                 normalizeRect(area);
             }
-            else if(info.tagName() == "image")
+            else if (info.tagName() == "image")
             {
                 QString imgname = "";
                 QString file = "";
@@ -1784,7 +1784,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                     return;
                 }
     
-                if(info.tagName() == "context")
+                if (info.tagName() == "context")
                 {
                     context = getFirstText(info).toInt();
                 }
@@ -1792,7 +1792,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                 if (imgname.lower() == "selectionbar")
                 {
                     select_img = gContext->LoadScalePixmap(file);
-                    if(!select_img)
+                    if (!select_img)
                     {
                         cerr << "xmparse.o: I can't find a file called " << file << endl ;
                     }
@@ -1800,7 +1800,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                 else if (imgname.lower() == "uparrow")
                 {
                     uparrow_img = gContext->LoadScalePixmap(file);
-                    if(!uparrow_img)
+                    if (!uparrow_img)
                     {
                         cerr << "xmparse.o: I can't find a file called " << file << endl ;
                     }
@@ -1808,7 +1808,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                 else if (imgname.lower() == "downarrow")
                 {
                     downarrow_img = gContext->LoadScalePixmap(file);
-                    if(!downarrow_img)
+                    if (!downarrow_img)
                     {
                         cerr << "xmparse.o: I can't find a file called " << file << endl ;
                     }
@@ -1816,7 +1816,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                 else if (imgname.lower() == "leftarrow")
                 {
                     leftarrow_img = gContext->LoadScalePixmap(file);
-                    if(!leftarrow_img)
+                    if (!leftarrow_img)
                     {
                         cerr << "xmparse.o: I can't find a file called " << file << endl ;
                     }
@@ -1824,7 +1824,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                 else if (imgname.lower() == "rightarrow")
                 {
                     rightarrow_img = gContext->LoadScalePixmap(file);
-                    if(!rightarrow_img)
+                    if (!rightarrow_img)
                     {
                         cerr << "xmparse.o: I can't find a file called " << file << endl ;
                     }
@@ -1834,16 +1834,16 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                     cerr << "xmlparse.o: I don't know what to do with an image tag who's function is " << imgname << endl;
                 }
             }
-            else if(info.tagName() == "bin")
+            else if (info.tagName() == "bin")
             {
                 QString whichbin_string = info.attribute("number", "");
                 int whichbin = whichbin_string.toInt();
-                if(whichbin < 1)
+                if (whichbin < 1)
                 {
                     cerr << "xmlparse.o: Bad setting for bin number in bin tag" << endl;
                     return;
                 }
-                if(whichbin > bins + 1)
+                if (whichbin > bins + 1)
                 {
                     cerr << "xmlparse.o: Attempt to set bin with a reference larger than number of bins" << endl;
                     return;
@@ -1990,7 +1990,7 @@ void XMLParse::parsePushButton(LayerSet *container, QDomElement &element)
                 pos.setX((int)(pos.x() * wmult));
                 pos.setY((int)(pos.y() * hmult));
             }
-            else if(info.tagName() == "image")
+            else if (info.tagName() == "image")
             {
                 QString imgname = "";
                 QString file = "";
@@ -2020,7 +2020,7 @@ void XMLParse::parsePushButton(LayerSet *container, QDomElement &element)
                 if (imgname.lower() == "off")
                 {
                     image_off = gContext->LoadScalePixmap(file);
-                    if(!image_off)
+                    if (!image_off)
                     {
                         cerr << "xmparse.o: I can't find a file called " << file << endl ;
                     }
@@ -2028,7 +2028,7 @@ void XMLParse::parsePushButton(LayerSet *container, QDomElement &element)
                 if (imgname.lower() == "pushed")
                 {
                     image_pushed = gContext->LoadScalePixmap(file);
-                    if(!image_pushed)
+                    if (!image_pushed)
                     {
                         cerr << "xmparse.o: I can't find a file called " << file << endl ;
                     }
@@ -2111,7 +2111,7 @@ void XMLParse::parseTextButton(LayerSet *container, QDomElement &element)
             {
                 font = getFirstText(info);
             }
-            else if(info.tagName() == "image")
+            else if (info.tagName() == "image")
             {
                 QString imgname = "";
                 QString file = "";
@@ -2133,7 +2133,7 @@ void XMLParse::parseTextButton(LayerSet *container, QDomElement &element)
                 if (imgname.lower() == "on")
                 {
                     image_on = gContext->LoadScalePixmap(file);
-                    if(!image_on)
+                    if (!image_on)
                     {
                         cerr << "xmparse.o: I can't find a file called " << file << endl ;
                     }
@@ -2141,7 +2141,7 @@ void XMLParse::parseTextButton(LayerSet *container, QDomElement &element)
                 if (imgname.lower() == "off")
                 {
                     image_off = gContext->LoadScalePixmap(file);
-                    if(!image_off)
+                    if (!image_off)
                     {
                         cerr << "xmparse.o: I can't find a file called " << file << endl ;
                     }
@@ -2150,7 +2150,7 @@ void XMLParse::parseTextButton(LayerSet *container, QDomElement &element)
                 {
                     image_pushed = gContext->LoadScalePixmap(file);
 
-                    if(!image_pushed)
+                    if (!image_pushed)
                     {
                         cerr << "xmparse.o: I can't find a file called " << file << endl ;
                     }
@@ -2237,7 +2237,7 @@ void XMLParse::parseCheckBox(LayerSet *container, QDomElement &element)
                 pos.setX((int)(pos.x() * wmult));
                 pos.setY((int)(pos.y() * hmult));
             }
-            else if(info.tagName() == "image")
+            else if (info.tagName() == "image")
             {
                 QString imgname = "";
                 QString file = "";
@@ -2259,7 +2259,7 @@ void XMLParse::parseCheckBox(LayerSet *container, QDomElement &element)
                 if (imgname.lower() == "checked")
                 {
                     image_checked = gContext->LoadScalePixmap(file);
-                    if(!image_checked)
+                    if (!image_checked)
                     {
                         cerr << "xmparse.o: I can't find a file called " << file << endl ;
                     }
@@ -2267,7 +2267,7 @@ void XMLParse::parseCheckBox(LayerSet *container, QDomElement &element)
                 if (imgname.lower() == "unchecked")
                 {
                     image_unchecked = gContext->LoadScalePixmap(file);
-                    if(!image_unchecked)
+                    if (!image_unchecked)
                     {
                         cerr << "xmparse.o: I can't find a file called " << file << endl ;
                     }
@@ -2275,7 +2275,7 @@ void XMLParse::parseCheckBox(LayerSet *container, QDomElement &element)
                 if (imgname.lower() == "checked_high")
                 {
                     image_checked_high = gContext->LoadScalePixmap(file);
-                    if(!image_checked_high)
+                    if (!image_checked_high)
                     {
                         cerr << "xmparse.o: I can't find a file called " << file << endl ;
                     }
@@ -2283,7 +2283,7 @@ void XMLParse::parseCheckBox(LayerSet *container, QDomElement &element)
                 if (imgname.lower() == "unchecked_high")
                 {
                     image_unchecked_high = gContext->LoadScalePixmap(file);
-                    if(!image_unchecked_high)
+                    if (!image_unchecked_high)
                     {
                         cerr << "xmparse.o: I can't find a file called " << file << endl ;
                     }
@@ -2369,7 +2369,7 @@ void XMLParse::parseSelector(LayerSet *container, QDomElement &element)
             {
                 font = getFirstText(info);
             }
-            else if(info.tagName() == "image")
+            else if (info.tagName() == "image")
             {
                 QString imgname = "";
                 QString file = "";
@@ -2391,7 +2391,7 @@ void XMLParse::parseSelector(LayerSet *container, QDomElement &element)
                 if (imgname.lower() == "on")
                 {
                     image_on = gContext->LoadScalePixmap(file);
-                    if(!image_on)
+                    if (!image_on)
                     {
                         cerr << "xmparse.o: I can't find a file called " << file << endl ;
                     }
@@ -2399,7 +2399,7 @@ void XMLParse::parseSelector(LayerSet *container, QDomElement &element)
                 if (imgname.lower() == "off")
                 {
                     image_off = gContext->LoadScalePixmap(file);
-                    if(!image_off)
+                    if (!image_off)
                     {
                         cerr << "xmparse.o: I can't find a file called " << file << endl ;
                     }
@@ -2408,7 +2408,7 @@ void XMLParse::parseSelector(LayerSet *container, QDomElement &element)
                 {
                     image_pushed = gContext->LoadScalePixmap(file);
 
-                    if(!image_pushed)
+                    if (!image_pushed)
                     {
                         cerr << "xmparse.o: I can't find a file called " << file << endl ;
                     }

@@ -63,7 +63,7 @@ void AudioOutputOSS::Reconfigure(int laudio_bits, int laudio_channels,
     audio_channels = laudio_channels;
     audio_bits = laudio_bits;
     audio_samplerate = laudio_samplerate;
-    if(audio_bits != 8 && audio_bits != 16)
+    if (audio_bits != 8 && audio_bits != 16)
     {
         Error("AudioOutputOSS only supports 8 or 16bit audio.");
         return;
@@ -150,7 +150,7 @@ void AudioOutputOSS::Reconfigure(int laudio_bits, int laudio_channels,
                                  .arg(fragment_size));
 
     audio_buffer_unused = info.bytes - (fragment_size * 4);
-    if(audio_buffer_unused < 0)
+    if (audio_buffer_unused < 0)
        audio_buffer_unused = 0;
 
     if (!gContext->GetNumSetting("AggressiveSoundcardBuffer", 0))
@@ -432,7 +432,7 @@ void AudioOutputOSS::AddSamples(char *buffers[], int samples,
         for(int chan = 0; chan < audio_channels; chan++)
         {
             audiobuffer[waud++] = buffers[chan][itemp];
-            if(audio_bits == 16)
+            if (audio_bits == 16)
                 audiobuffer[waud++] = buffers[chan][itemp+1];
             
             if (waud >= AUDBUFSIZE)

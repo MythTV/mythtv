@@ -395,7 +395,7 @@ void MythRemoteLineEdit::startCycle(QString current_choice, QString set)
     int dummy;
     int dummy_two;
     
-    if(active_cycle)
+    if (active_cycle)
     {
         cerr << "libmyth: MythRemoteLineEdit was asked to start a cycle when a cycle was already active." << endl;
     }
@@ -495,7 +495,7 @@ void MythRemoteLineEdit::updateCycle(QString current_choice, QString set)
     //  select the character that may well
     //  get deleted
     
-    if(current_choice == "X" && pre_cycle_pos > 0)
+    if (current_choice == "X" && pre_cycle_pos > 0)
     {
         setSelection(pre_cycle_para, pre_cycle_pos - 1, pre_cycle_para, pre_cycle_pos, 0);
     }
@@ -722,7 +722,7 @@ void MythRemoteLineEdit::cycleKeys(QString cycle_list)
             cycle_timer->changeInterval(cycle_time);
             index = current_set.find(current_choice);
             int length = current_set.length();
-            if(index + 1 >= length)
+            if (index + 1 >= length)
             {
                 index = -1;
             }
@@ -795,7 +795,7 @@ void MythRemoteLineEdit::focusOutEvent(QFocusEvent *e)
 
 MythRemoteLineEdit::~MythRemoteLineEdit()
 {
-    if(cycle_timer)
+    if (cycle_timer)
     {
         delete cycle_timer;
     }
@@ -875,9 +875,9 @@ void MythPushButton::keyPressEvent(QKeyEvent *e)
                 emit pressed();
                 handled = true;
             }
-            else if(arrowAccel)
+            else if (arrowAccel)
             {
-                if(action == "LEFT") 
+                if (action == "LEFT") 
                 {
                     parent()->event(e);
                     handled = true;

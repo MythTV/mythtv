@@ -122,7 +122,7 @@ void MythContextPrivate::Init(bool gui, bool lcd)
         cerr << "Unable to read configuration file mysql.txt" << endl;
 
     m_localhostname = m_settings->GetSetting("LocalHostName", NULL);
-    if(m_localhostname == NULL)
+    if (m_localhostname == NULL)
     {
         char localhostname[1024];
         if (gethostname(localhostname, 1024))
@@ -725,7 +725,7 @@ QString MythContext::FindThemeDir(const QString &themename)
 
 
     // Don't complain about the "default" theme being missing
-    if(themename == QObject::tr("Default"))
+    if (themename == QObject::tr("Default"))
     {
         testdir = d->m_installprefix + "/share/mythtv/";
         dir.setPath(testdir);
@@ -796,7 +796,7 @@ void MythContext::KickDatabase(QSqlDatabase *db)
 
 void MythContext::DBError(const QString &where, const QSqlQuery& query) 
 {
-    if(query.lastError().type())
+    if (query.lastError().type())
     {
         cerr << "DB Error (" << where << "):" << endl;
     }
