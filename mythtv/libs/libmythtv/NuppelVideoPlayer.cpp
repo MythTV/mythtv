@@ -1974,6 +1974,7 @@ void NuppelVideoPlayer::StartPlaying(void)
  
         pthread_mutex_init(&audio_buflock, NULL);
         pthread_mutex_init(&video_buflock, NULL);
+        pthread_mutex_init(&text_buflock, NULL);
         pthread_mutex_init(&avsync_lock, NULL);
 
         if (own_vidbufs)
@@ -3137,6 +3138,7 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
 
     pthread_mutex_init(&audio_buflock, NULL);
     pthread_mutex_init(&video_buflock, NULL);
+    pthread_mutex_init(&text_buflock, NULL);
     pthread_mutex_init(&avsync_lock, NULL);
 
     own_vidbufs = true;
