@@ -33,3 +33,5 @@ EXTRA_LIBS = -L/usr/X11R6/lib -lXinerama -lXv -lX11 -lXext -lXxf86vm
 #CONFIG += using_lirc
 #EXTRA_LIBS += -llirc_client
 
+# XvMC support, modify as necessary
+#EXTRA_LIBS += -lXvMC -lXvMCNVIDIA

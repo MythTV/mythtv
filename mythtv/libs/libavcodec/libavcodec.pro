@@ -36,7 +36,7 @@ contains( CONFIG_AC3, yes ) {
     }
 }
 
-contains( HAVE_XVMC_ACCEL, yes ) {
+contains( CONFIG_XVMC, yes ) {
     SOURCES += xvmcvideo.c
 }
 
