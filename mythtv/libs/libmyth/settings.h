@@ -356,10 +356,12 @@ class ComboBoxSetting: public SelectSetting {
     Q_OBJECT;
 
 protected:
-    ComboBoxSetting(bool _rw = false) {
+    ComboBoxSetting(bool _rw = false, int _step = 1) {
         rw = _rw;
+        step = _step;
         widget = NULL;
     };
+
 public:
     virtual void setValue(QString newValue) {
         if (!rw)
@@ -394,6 +396,9 @@ protected slots:
 private:
     bool rw;
     MythComboBox *widget;
+
+protected:
+    int step;
 };
 
 class ListBoxSetting: public SelectSetting {
@@ -755,8 +760,9 @@ class HostComboBox: public ComboBoxSetting, public HostSetting {
 
 class HostTimeBox: public ComboBoxSetting, public HostSetting {
   public:
-    HostTimeBox(const QString &name, const QString &defaultTime = "00:00") :
-        ComboBoxSetting(),
+    HostTimeBox(const QString &name, const QString &defaultTime = "00:00",
+                const int interval = 1) :
+        ComboBoxSetting(false, 30 / interval),
         HostSetting(name)
     {
         int hour;
@@ -765,7 +771,7 @@ class HostTimeBox: public ComboBoxSetting, public HostSetting {
 
         for (hour = 0; hour < 24; hour++)
         {
-            for (minute = 0; minute < 60; minute++)
+            for (minute = 0; minute < 60; minute += interval)
             {
                 timeStr = timeStr.sprintf("%02d:%02d", hour, minute);
                 addSelection(timeStr, timeStr, timeStr == defaultTime);

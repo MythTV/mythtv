@@ -539,6 +539,9 @@ QWidget* ComboBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     if (isSet)
         widget->setCurrentItem(current);
 
+    if (1 < step)
+        widget->setStep(step);
+
     if (rw)
         connect(widget, SIGNAL(highlighted(const QString &)),
                 this, SLOT(setValue(const QString &)));

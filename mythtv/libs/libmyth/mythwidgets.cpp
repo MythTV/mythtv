@@ -41,6 +41,20 @@ void MythComboBox::keyPressEvent(QKeyEvent *e)
                 if (count() > 0)
                     setCurrentItem((currentItem() + 1) % count());
             }
+            else if (action == "PAGEDOWN")
+            {
+                if (currentItem() == 0)
+                    setCurrentItem(count() - (step % count()));
+                else if (count() > 0)
+                    setCurrentItem(
+                        (currentItem() + count() - (step % count())) % count());
+            }
+            else if (action == "PAGEUP")
+            {
+                if (count() > 0)
+                    setCurrentItem(
+                        (currentItem() + (step % count())) % count());
+            }
             else if (action == "SELECT" && AcceptOnSelect)
                 emit accepted(currentItem());
             else
