@@ -497,7 +497,10 @@ bool Scheduler::FindInOldRecordings(ProgramInfo *pginfo)
 {
     QSqlQuery query;
     QString thequery;
-    
+   
+    if (pginfo->subtitle == "" || pginfo->description == "")
+        return false;
+
     thequery = QString("SELECT NULL FROM oldrecorded WHERE "
                        "title = \"%1\" AND subtitle = \"%2\" AND "
                        "description = \"%3\";").arg(pginfo->title)
