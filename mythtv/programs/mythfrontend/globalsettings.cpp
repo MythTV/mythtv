@@ -157,7 +157,7 @@ public:
 class TunerCardInput: public ComboBoxSetting, public GlobalSetting {
 public:
     TunerCardInput():
-        GlobalSetting("TunerCardInput") {
+        ComboBoxSetting(true), GlobalSetting("TunerCardInput") {
         setLabel("Default input");
         addSelection("Television");
         addSelection("Composite1");
