@@ -799,6 +799,17 @@ static GenericSpinBox *YScanDisplacement()
     return gs;
 };
 
+static GenericCheckBox *UseMPEG2Dec()
+{
+    GenericCheckBox *gc = new GenericCheckBox("UseMPEG2Dec");
+    gc->setLabel(QObject::tr("Use libmpeg2 for decoding"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("If enabled, libmpeg2 will be used instead "
+                    "of ffmpeg for decoding MPEG-1 and MPEG-2 video frames. "
+                    "This can be faster. Not available when XvMC is used."));
+    return gc;
+}
+
 static GenericCheckBox *UseVideoTimebase()
 {
     GenericCheckBox *gc = new GenericCheckBox("UseVideoTimebase");
@@ -2701,6 +2712,7 @@ PlaybackSettings::PlaybackSettings()
     general->setLabel(QObject::tr("General playback"));
     general->addChild(new DeinterlaceSettings());
     general->addChild(CustomFilters());
+    general->addChild(UseMPEG2Dec());
     general->addChild(UseVideoTimebase());
     general->addChild(DecodeExtraAudio());
     general->addChild(AspectOverride());

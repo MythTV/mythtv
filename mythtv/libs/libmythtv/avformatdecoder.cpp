@@ -17,16 +17,128 @@ extern "C" {
 #include "libavcodec/xvmc_render.h"
 #endif
 #include "libavcodec/liba52/a52.h"
+#include "../libmythmpeg2/mpeg2.h"
 }
 
 #define MAX_AC3_FRAME_SIZE 6144
 
 extern pthread_mutex_t avcodeclock;
 
+class AvFormatDecoderPrivate
+{
+  public:
+    AvFormatDecoderPrivate(AvFormatDecoder *lparent);
+   ~AvFormatDecoderPrivate();
+    
+    bool InitMPEG2();
+    void DestroyMPEG2();
+    void ResetMPEG2();
+    int DecodeMPEG2Video(AVCodecContext *avctx, AVFrame *picture,
+                         int *got_picture_ptr, uint8_t *buf, int buf_size);
+    
+    AvFormatDecoder *parent;
+    mpeg2dec_t *mpeg2dec;
+};
+
+AvFormatDecoderPrivate::AvFormatDecoderPrivate(AvFormatDecoder *lparent)
+{
+    parent = lparent;
+    mpeg2dec = NULL;
+}
+
+AvFormatDecoderPrivate::~AvFormatDecoderPrivate()
+{
+    DestroyMPEG2();
+}
+
+bool AvFormatDecoderPrivate::InitMPEG2()
+{
+    DestroyMPEG2();
+    if (gContext->GetNumSetting("UseMPEG2Dec", 0))
+    {
+        mpeg2dec = mpeg2_init();
+        if (mpeg2dec)
+          VERBOSE(VB_PLAYBACK, "Using libmpeg2 for video decoding");
+    }
+    return (mpeg2dec != NULL);
+}
+
+void AvFormatDecoderPrivate::DestroyMPEG2()
+{
+    if (mpeg2dec)
+        mpeg2_close(mpeg2dec);
+    mpeg2dec = NULL;
+}
+
+void AvFormatDecoderPrivate::ResetMPEG2()
+{
+    if (mpeg2dec)
+        mpeg2_reset(mpeg2dec, 0);
+}
+
+int AvFormatDecoderPrivate::DecodeMPEG2Video(AVCodecContext *avctx,
+                                             AVFrame *picture,
+                                             int *got_picture_ptr,
+                                             uint8_t *buf, int buf_size)
+{
+    *got_picture_ptr = 0;
+    const mpeg2_info_t *info = mpeg2_info(mpeg2dec);
+    mpeg2_buffer(mpeg2dec, buf, buf + buf_size);
+    while (1)
+    {
+        switch (mpeg2_parse(mpeg2dec))
+        {
+            case STATE_SEQUENCE:
+                // libmpeg2 needs three buffers to do its work.
+                // We set up two prediction buffers here, from
+                // the set of available video frames.
+                mpeg2_custom_fbuf(mpeg2dec, 1);
+                for (int i = 0; i < 2; i++)
+                {
+                    avctx->get_buffer(avctx, picture);
+                    mpeg2_set_buf(mpeg2dec, picture->data, picture->opaque);
+                }
+                break;
+            case STATE_PICTURE:
+                // This sets up the third buffer for libmpeg2.
+                // We use up one of the three buffers for each
+                // frame shown. The frames get released once
+                // they are drawn (outside this routine).
+                avctx->get_buffer(avctx, picture);
+                mpeg2_set_buf(mpeg2dec, picture->data, picture->opaque);
+                break;
+            case STATE_BUFFER:
+                // We're supposed to wait for STATE_SLICE, but
+                // STATE_BUFFER is returned first. Since we handed
+                // libmpeg2 a full frame, we know it should be
+                // done once it's finished with the data.
+                if (info->display_fbuf)
+                {
+                    picture->data[0] = info->display_fbuf->buf[0];
+                    picture->data[1] = info->display_fbuf->buf[1];
+                    picture->data[2] = info->display_fbuf->buf[2];
+                    picture->opaque  = info->display_fbuf->id;
+                    *got_picture_ptr = 1;
+                }
+                return buf_size;
+            case STATE_INVALID:
+                // This is the error state. The decoder must be
+                // reset on an error.
+                mpeg2_reset(mpeg2dec, 0);
+                return -1;
+            default:
+                break;
+        }
+    }
+}
+
+
 AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, MythSqlDatabase *db,
                                  ProgramInfo *pginfo)
                : DecoderBase(parent, db, pginfo)
 {
+    d = new AvFormatDecoderPrivate(this);
+    
     ic = NULL;
     directrendering = false;
     lastapts = lastvpts = 0;
@@ -82,6 +194,7 @@ AvFormatDecoder::~AvFormatDecoder()
         av_close_input_file(ic);
         ic = NULL;
     }
+    delete d;
 }
 
 void AvFormatDecoder::SeekReset(long long, int skipFrames, bool doflush)
@@ -90,6 +203,8 @@ void AvFormatDecoder::SeekReset(long long, int skipFrames, bool doflush)
     lastvpts = 0;
 
     av_read_frame_flush(ic);
+    
+    d->ResetMPEG2();
 
     ic->pb.pos = ringBuffer->GetTotalReadPosition();
     ic->pb.buf_ptr = ic->pb.buffer;
@@ -434,6 +549,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 enc->rate_emu = 0;
                 enc->error_rate = 0;
 
+                d->DestroyMPEG2();
                 if (!novideo && (enc->codec_id == CODEC_ID_MPEG1VIDEO ||
                     enc->codec_id == CODEC_ID_MPEG2VIDEO))
                 {
@@ -448,6 +564,10 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     if (gContext->GetNumSetting("UseXvMcVld", 1))
                         enc->codec_id = CODEC_ID_MPEG2VIDEO_XVMC_VLD;
 #endif
+                    // Only use libmpeg2 when not using XvMC
+                    if (enc->codec_id == CODEC_ID_MPEG1VIDEO ||
+                        enc->codec_id == CODEC_ID_MPEG2VIDEO)
+                        d->InitMPEG2();
                 }
 
                 AVCodec *codec = avcodec_find_decoder(enc->codec_id);
@@ -1332,8 +1452,12 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     int gotpicture = 0;
 
                     pthread_mutex_lock(&avcodeclock);
-                    ret = avcodec_decode_video(context, &mpa_pic,
-                                               &gotpicture, ptr, len);
+                    if (d->mpeg2dec)
+                        ret = d->DecodeMPEG2Video(context, &mpa_pic,
+                                                  &gotpicture, ptr, len);
+                    else
+                        ret = avcodec_decode_video(context, &mpa_pic,
+                                                   &gotpicture, ptr, len);
                     pthread_mutex_unlock(&avcodeclock);
 
                     if (ret < 0)

@@ -8,18 +8,24 @@ INSTALLS = target
 
 VERSION = 0.16.0
 
-INCLUDEPATH += ../libmyth ../ ./dvbdev/ ./mpeg/ ../libavcodec
-DEPENDPATH += ../libmyth ../libavcodec ../libavformat
+INCLUDEPATH += ../libmyth ../ ./dvbdev/ ./mpeg/ ../libavcodec ../libmythmpeg2
+DEPENDPATH += ../libmyth ../libavcodec ../libavformat ../libmythmpeg2
 
-LIBS += -L../libmyth -L../libavcodec -L../libavformat
-LIBS += -lmyth-$${LIBVERSION} -lmythavcodec-$${LIBVERSION} -lmythavformat-$${LIBVERSION} $$EXTRA_LIBS
+LIBS += -L../libmyth -L../libavcodec -L../libavformat -L../libmythmpeg2
+LIBS += -lmyth-$${LIBVERSION} -lmythavcodec-$${LIBVERSION} \
+        -lmythavformat-$${LIBVERSION} -lmythmpeg2-$${LIBVERSION} \
+        $$EXTRA_LIBS
 
 isEmpty(QMAKE_EXTENSION_SHLIB) {
   QMAKE_EXTENSION_SHLIB=so
 }
+isEmpty(QMAKE_EXTENSION_LIB) {
+  QMAKE_EXTENSION_LIB=a
+}
 TARGETDEPS += ../libmyth/libmyth-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 TARGETDEPS += ../libavcodec/libmythavcodec-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 TARGETDEPS += ../libavformat/libmythavformat-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
+TARGETDEPS += ../libmythmpeg2/libmythmpeg2-$${LIBVERSION}.$${QMAKE_EXTENSION_LIB}
 
 QMAKE_CFLAGS_RELEASE = $$OPTFLAGS -DHAVE_AV_CONFIG_H -I.. -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE
 QMAKE_CFLAGS_DEBUG = -g -DHAVE_AV_CONFIG_H -I.. -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE

@@ -120,6 +120,8 @@ class AvFormatDecoder : public DecoderBase
 
     // Update our position map, keyframe distance, and the like.  Called for key frame packets.
     void HandleGopStart(AVPacket *pkt);
+    
+    class AvFormatDecoderPrivate *d;
 
     AVFormatContext *ic;
     AVFormatParameters params;
