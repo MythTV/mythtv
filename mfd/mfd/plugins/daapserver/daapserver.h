@@ -25,7 +25,8 @@ class DaapServer: public MFDHttpPlugin
 
     DaapServer(MFD *owner, int identity);
     ~DaapServer();
-    
+
+    void    handleIncoming(HttpRequest *request);
 /*
     void    run();
     void    parseIncomingRequest(httpd *server);

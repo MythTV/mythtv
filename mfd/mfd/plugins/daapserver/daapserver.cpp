@@ -79,6 +79,13 @@ DaapServer::DaapServer(MFD *owner, int identity)
 
 }
 
+
+void DaapServer::handleIncoming(HttpRequest *request)
+{
+    cout << "handling request" << endl;
+}
+
+
 /*
 
 void DaapServer::run()

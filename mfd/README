@@ -7,7 +7,7 @@ GENERAL INFO
 
 INSTALL:
 
-	./configure
+    ./configure
     qmake
     make
     make install
@@ -25,7 +25,7 @@ will not know that it has gone away.
 INFORMATION FOR DEVELOPERS
 --------------------------
 
-	The mfd is not terribly complicated. There is a core little object
+    The mfd is not terribly complicated. There is a core little object
 (called MFD) that main() creates and hands over control to. It handles
 metadata (a collection of MetadataContainers) and loads in plugins. Plugins
 can either present their own (socket-based) interface to the world, or get

@@ -11,8 +11,8 @@ TARGET = mfdlib
 target.path = $${PREFIX}/lib
 INSTALLS += target
 
-HEADERS += mfd_events.h   mfd_plugin.h   requestthread.h   clientsocket.h
-SOURCES += mfd_events.cpp mfd_plugin.cpp requestthread.cpp clientsocket.cpp
+HEADERS += mfd_events.h   mfd_plugin.h   requestthread.h   clientsocket.h   httprequest.h
+SOURCES += mfd_events.cpp mfd_plugin.cpp requestthread.cpp clientsocket.cpp httprequest.cpp
 
 HEADERS += decoder.h   decoder_event.h   visual.h constants.h 
 SOURCES += decoder.cpp decoder_event.cpp 

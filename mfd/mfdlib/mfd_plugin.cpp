@@ -1,4 +1,4 @@
-/*
+    /*
 	mfd_plugin.cpp
 
 	(c) 2003 Thor Sigvaldason and Isaac Richards
@@ -16,6 +16,7 @@ using namespace std;
 
 #include "mfd_plugin.h"
 #include "mfd_events.h"
+
 
 
 MFDBasePlugin::MFDBasePlugin(MFD *owner, int identifier)
@@ -247,6 +248,24 @@ MFDServicePlugin::MFDServicePlugin(MFD *owner, int identifier, int port, bool l_
 
     
 }
+
+void MFDServicePlugin::run()
+{
+    initServerSocket();
+
+    while(keep_going)
+    {
+
+        //
+        //  Update the status of our sockets.
+        //
+        
+        updateSockets();
+        waitForSomethingToHappen();
+    }
+}
+
+
 
 bool MFDServicePlugin::initServerSocket()
 {
@@ -603,16 +622,6 @@ int MFDServicePlugin::bumpClient()
 void MFDServicePlugin::processRequest(MFDServiceClientSocket *a_client)
 {
 
-    //
-    //  The thread pool stuff means that this gets called in its own thread.
-    //
-    //  We just pull out what's in there and fire off to doSomething()
-    //
-
-    char incoming[2049];    // FIX
-
-    int length = 0;
-    
     if(!a_client)
     {
         warning(QString("%1 plugin tried to run a processRequest() on a client that does not exist")
@@ -620,19 +629,28 @@ void MFDServicePlugin::processRequest(MFDServiceClientSocket *a_client)
         return;
     }
 
+    //
+    //  The thread pool stuff means that this gets called in its own thread.
+    //
+    //  We just pull out what's in there and fire off to doSomething()
+    //
+
+    char incoming[MAX_CLIENT_INCOMING];    // FIX
+    int length = 0;
+    
     a_client->lockReadMutex();
-        length = a_client->readBlock(incoming, 2048);
+        length = a_client->readBlock(incoming, MAX_CLIENT_INCOMING - 1);
     a_client->unlockReadMutex();
     a_client->setReading(false);
 
     if(length > 0)
     {
-        if(length >= 2048)
+        if(length >= MAX_CLIENT_INCOMING)
         {
             // oh crap
             warning(QString("%1 plugin client socket is getting too much data")
                     .arg(name));
-            length = 2048;
+            length = MAX_CLIENT_INCOMING;
         }
     
         incoming[length] = '\0';
@@ -743,4 +761,58 @@ void MFDHttpPlugin::run()
     }
 }
 
+void MFDHttpPlugin::processRequest(MFDServiceClientSocket *a_client)
+{
 
+    if(!a_client)
+    {
+        warning(QString("%1 httpd plugin tried to run a processRequest() on a client that does not exist")
+                .arg(name));
+        return;
+    }
+
+    char incoming[MAX_CLIENT_INCOMING];    // FIX
+    int length = 0;
+
+    //
+    //  Copy out the whole block out so we can release the lock straight away.
+    //
+
+
+    a_client->lockReadMutex();
+        length = a_client->readBlock(incoming, MAX_CLIENT_INCOMING - 1);
+    a_client->unlockReadMutex();
+    a_client->setReading(false);
+    
+    
+    if(length > 0)
+    {
+        if(length >= MAX_CLIENT_INCOMING)
+        {
+            // oh crap
+            warning(QString("%1 plugin client http socket is getting too much data")
+                    .arg(name));
+            length = MAX_CLIENT_INCOMING;
+        }
+
+        HttpRequest *new_request = new HttpRequest(incoming, length);
+        if(new_request->allIsWell())
+        {
+            //
+            //  Pass it to handleIncoming() which should be re-implemented
+            //  in any actual plugin
+            //
+            
+            handleIncoming(new_request);
+        }
+        delete new_request;
+    }
+
+}
+
+
+void MFDHttpPlugin::handleIncoming(HttpRequest *)
+{
+    warning(QString("%1 plugin called base class handleRequest()")
+            .arg(name));
+}

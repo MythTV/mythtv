@@ -179,7 +179,6 @@ if test "$daapserver" = "yes" ; then
     #
 
     echo "SUBDIRS += ./mfd/plugins/daapserver/daaplib "   >> ./config.pro
-    echo "SUBDIRS += ./mfd/plugins/daapserver/httpd_persistent "   >> ./config.pro
     echo "SUBDIRS += ./mfd/plugins/daapserver "   >> ./config.pro
 
 fi

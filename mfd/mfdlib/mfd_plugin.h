@@ -22,6 +22,7 @@ using namespace std;
 #include "../mfd/mfd.h"
 #include "requestthread.h"
 #include "clientsocket.h"
+#include "httprequest.h"
  
 class SocketBuffer
 {
@@ -128,6 +129,7 @@ class MFDServicePlugin : public MFDBasePlugin
     MFDServicePlugin(MFD *owner, int identifier, int port, bool l_use_thread_pool = true, uint l_thread_pool_size = 5);
     ~MFDServicePlugin();
     
+    virtual void    run();
     bool            initServerSocket();
     void            updateSockets();
     void            findNewClients();
@@ -203,7 +205,9 @@ class MFDHttpPlugin : public MFDServicePlugin
     MFDHttpPlugin(MFD *owner, int identifier, int port);
     ~MFDHttpPlugin();
 
-    void    run();
+    void            run();
+    virtual void    processRequest(MFDServiceClientSocket *a_client);
+    virtual void    handleIncoming(HttpRequest *request);
 };
 
 #endif
