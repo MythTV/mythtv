@@ -20,6 +20,9 @@ release {
 
 EXTRA_LIBS = -lfreetype -lmp3lame
 
+# X11 support
+CONFIG += using_x11
+
 # Default Xv support
 CONFIG += using_xv
 EXTRA_LIBS += -L/usr/X11R6/lib -lXinerama -lXv -lX11 -lXext -lXxf86vm

@@ -63,20 +63,22 @@ SOURCES += osdsurface.cpp osdlistbtntype.cpp blend.c
     SOURCES += vsync.c hdtvrecorder.cpp fifowriter.cpp
 }
 
-using_xv {
-    SOURCES += videoout_xv.cpp
-    HEADERS += videoout_xv.h
-    DEFINES += USING_XV
+using_x11 {
+    using_xv {
+        SOURCES += videoout_xv.cpp
+        HEADERS += videoout_xv.h
+        DEFINES += USING_XV
+    }
+
+    using_xvmc {
+        SOURCES += videoout_xvmc.cpp
+        HEADERS += videoout_xvmc.h
+    }
 }
 
 using_ivtv {
     SOURCES += mpegrecorder.cpp ivtvdecoder.cpp videoout_ivtv.cpp
     HEADERS += mpegrecorder.h ivtvdecoder.h videoout_ivtv.h
-}
-
-using_xvmc {
-    SOURCES += videoout_xvmc.cpp
-    HEADERS += videoout_xvmc.h
 }
 
 using_viahwslice {

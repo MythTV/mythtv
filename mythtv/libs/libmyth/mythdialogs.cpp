@@ -26,6 +26,7 @@ using namespace std;
 #include "mythdialogs.h"
 #include "lcddevice.h"
 #include "mythmediamonitor.h"
+#include "screensaver.h"
 
 #ifdef USE_LIRC
 static void *SpawnLirc(void *param)
@@ -614,6 +615,33 @@ void MythMainWindow::customEvent(QCustomEvent *ce)
         d->ignore_lirc_keys = lme->eventsMuted();
     }
 #endif
+    else if (ce->type() == ScreenSaverEvent::kScreenSaverEventType)
+    {
+        ScreenSaverEvent *sse = (ScreenSaverEvent *)ce;
+        switch (sse->getSSEventType())
+        {
+            case ScreenSaverEvent::ssetDisable:
+            {
+                gContext->DoDisableScreensaver();
+                break;
+            }
+            case ScreenSaverEvent::ssetRestore:
+            {
+                gContext->DoRestoreScreensaver();
+                break;
+            }
+            case ScreenSaverEvent::ssetReset:
+            {
+                gContext->DoResetScreensaver();
+                break;
+            }
+            default:
+            {
+                cerr << "Unknown ScreenSaverEvent type: " <<
+                        sse->getSSEventType() << std::endl;
+            }
+        }
+    }
 }
 
 QObject *MythMainWindow::getTarget(QKeyEvent &key)

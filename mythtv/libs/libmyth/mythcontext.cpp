@@ -23,10 +23,7 @@
 #include "dialogbox.h"
 #include "mythdialogs.h"
 #include "mythplugin.h"
-
-#ifndef QWS
-#include <X11/Xlib.h>
-#endif
+#include "screensaver.h"
 
 MythContext *gContext = NULL;
 
@@ -88,13 +85,7 @@ class MythContextPrivate
 
     MythPluginManager *pluginmanager;
 
-    struct {
-        bool saved;
-        int timeout;
-        int interval;
-        int preferblank;
-        int allowexposure;
-    } m_screensaver;
+    ScreenSaverControl *screensaver;
 
     int m_logenable, m_logmaxcount, m_logprintlevel;
     QMap<QString,int> lastLogCounts;
@@ -121,7 +112,7 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
     m_backgroundimage = NULL;
 
     m_db = QSqlDatabase::addDatabase("QMYSQL3", "MythContext");
-    m_screensaver.saved = false;
+    screensaver = new ScreenSaverControl();
 }
 
 void MythContextPrivate::Init(bool gui, bool lcd)
@@ -1466,44 +1457,35 @@ MythPluginManager *MythContext::getPluginManager(void)
 
 void MythContext::DisableScreensaver(void)
 {
-#if 0
-#ifndef QWS
-    if (!d->m_screensaver.saved)
-    {
-        XGetScreenSaver(qt_xdisplay(),
-                        &d->m_screensaver.timeout, &d->m_screensaver.interval,
-                        &d->m_screensaver.preferblank, 
-                        &d->m_screensaver.allowexposure);
-        d->m_screensaver.saved = true;
-    }
-
-    XResetScreenSaver(qt_xdisplay());
-    XSetScreenSaver(qt_xdisplay(), 0, 0, 0, 0);
-#endif
-#endif
+    QApplication::postEvent(GetMainWindow(),
+            new ScreenSaverEvent(ScreenSaverEvent::ssetDisable));
 }
 
 void MythContext::RestoreScreensaver(void)
 {
-#if 0
-#ifndef QWS
-    XResetScreenSaver(qt_xdisplay());
-    XSetScreenSaver(qt_xdisplay(),
-                    d->m_screensaver.timeout, d->m_screensaver.interval,
-                    d->m_screensaver.preferblank, 
-                    d->m_screensaver.allowexposure);
-    d->m_screensaver.saved = false;
-#endif
-#endif
+    QApplication::postEvent(GetMainWindow(),
+            new ScreenSaverEvent(ScreenSaverEvent::ssetRestore));
 }
 
 void MythContext::ResetScreensaver(void)
 {
-#if 0
-#ifndef QWS
-    XResetScreenSaver(qt_xdisplay());
-#endif
-#endif
+    QApplication::postEvent(GetMainWindow(),
+            new ScreenSaverEvent(ScreenSaverEvent::ssetReset));
+}
+
+void MythContext::DoDisableScreensaver(void)
+{
+    d->screensaver->Disable();
+}
+
+void MythContext::DoRestoreScreensaver(void)
+{
+    d->screensaver->Restore();
+}
+
+void MythContext::DoResetScreensaver(void)
+{
+    d->screensaver->Reset();
 }
 
 void MythContext::LogEntry(const QString &module, int priority,

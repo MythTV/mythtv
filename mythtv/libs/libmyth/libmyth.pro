@@ -13,7 +13,7 @@ HEADERS += dialogbox.h lcddevice.h mythcontext.h mythwidgets.h oldsettings.h
 HEADERS += remotefile.h settings.h themedmenu.h util.h mythwizard.h
 HEADERS += volumecontrol.h uitypes.h xmlparse.h mythplugin.h mythdbcon.h
 HEADERS += mythdialogs.h audiooutput.h inetcomms.h httpcomms.h mythmedia.h 
-HEADERS += uilistbtntype.h uiphoneentry.h generictree.h
+HEADERS += uilistbtntype.h uiphoneentry.h generictree.h screensaver.h
 
 SOURCES += dialogbox.cpp lcddevice.cpp mythcontext.cpp mythwidgets.cpp 
 SOURCES += oldsettings.cpp remotefile.cpp settings.cpp themedmenu.cpp
@@ -63,3 +63,10 @@ using_directx {
     SOURCES += audiooutputdx.cpp
 }
 
+using_x11 {
+    SOURCES += screensaver-x11.cpp
+}
+
+!using_x11 {
+    SOURCES += screensaver-null.cpp
+}
