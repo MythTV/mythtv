@@ -716,6 +716,7 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
                                         "this file is an ogg: %1 ")
                                         .arg(file_to_send->name().ascii()));
             }
+            fclose(input_file);
             streamEmptyWav(which_client);
             return;
         }
@@ -776,7 +777,6 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
                                 "an http header for an ogg stream");
             }
             ov_clear(&ov_file);
-            fclose(input_file);
             return;
         }
 
@@ -820,7 +820,6 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
                                     "a wav header");
                 }
                 ov_clear(&ov_file);
-                fclose(input_file);
                 return;
             }
         }
@@ -854,7 +853,6 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
                                         "in an ogg file");
                     }
                     ov_clear(&ov_file);
-                    fclose(input_file);
                     return;
             }
         }
@@ -932,7 +930,6 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
         }
         
         ov_clear(&ov_file);
-        fclose(input_file);
     }
     else
     {

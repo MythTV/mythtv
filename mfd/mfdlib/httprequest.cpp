@@ -93,7 +93,8 @@ HttpRequest::HttpRequest(MFDHttpPlugin *owner, char *raw_incoming, int incoming_
     all_is_well = true;
     send_response = true;
     headers.setAutoDelete(true);
-    
+    get_variables.setAutoDelete(true); 
+       
     //
     //  Every request gets a response
     //
@@ -176,6 +177,7 @@ HttpRequest::HttpRequest(MFDHttpPlugin *owner, char *raw_incoming, int incoming_
                 {
                     HttpGetVariable *new_gv = new HttpGetVariable(get_variables_list[i]);
                     get_variables.insert(new_gv->getField(), new_gv);
+                    
                 }
                 
                 
