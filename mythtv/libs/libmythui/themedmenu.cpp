@@ -2278,7 +2278,9 @@ bool ThemedMenu::keyPressEvent(QKeyEvent *e)
 
     bool ret = true;
     if (!d->keyPressHandler(e))
+    {
         ret = MythScreenType::keyPressEvent(e);
+    }
 
     d->ignorekeys = false;
 

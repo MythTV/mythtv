@@ -39,6 +39,7 @@ MythDialogBox::MythDialogBox(const QString &text,
     buttonList->SetTextFlags(Qt::AlignCenter);
 
     buttonList->SetActive(true);
+    m_retScreen = NULL;
 }
 
 void MythDialogBox::SetReturnEvent(MythScreenType *retscreen, 
