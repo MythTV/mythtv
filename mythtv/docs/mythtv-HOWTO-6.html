@@ -129,6 +129,7 @@ This example has no security at all, and allows access from any host.
 <PRE>
 $ mysql -u root mythconverg
 mysql> grant all on mythconverg.* to mythtv@"%" identified by "mythtv";
+mysql> flush privileges;
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -139,6 +140,7 @@ following:
 <PRE>
 $ mysql -u root mythconverg
 mysql> grant all on mythconverg.* to mythtv@"%.mydomain.com" identified by "mythtv";
+mysql> flush privileges;
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -147,6 +149,7 @@ mysql> grant all on mythconverg.* to mythtv@"%.mydomain.com" identified by "myth
 <PRE>
 $ mysql -u root mythconverg
 mysql> grant all on mythconverg.* to mythtv@"192.168.1.%" identified by "mythtv";
+mysql> flush privileges;
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>

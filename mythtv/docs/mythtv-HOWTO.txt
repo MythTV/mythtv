@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2004-02-26, v0.14.05
+  2004-03-14, v0.14.06
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -245,6 +245,7 @@
      21.15 Can I run MythTV on my TiVo?
      21.16 Can I run MythTV on my ReplayTV?
      21.17 Can I use wireless between the frontend and the backend?
+     21.18 How can I burn shows that I have recorded to a DVD?
 
   22. Example Configurations.
      22.1 Hauppauge PVR-250/350 hardware MPEG-2 encoder.
@@ -275,7 +276,9 @@
   at http://www.mythtv.org/docs/mythtv-HOWTO.pdf
   <http://www.mythtv.org/docs/mythtv-HOWTO.pdf>.
 
+
   This HOWTO is for MythTV v0.14.
+
 
   [1m1.1.  Mailing lists / getting help.[0m
 
@@ -406,9 +409,6 @@
   If you have a Via M10000 series or a Hauppauge PVR-350, MythTV can use
   the hardware-based video decoder for playback, which further reduces
   CPU requirements.
-
-
-
   [1m3.1.2.  Memory[0m
 
   A MythTV host that is both a backend and a frontend and using software
@@ -488,9 +488,9 @@
 
 
 
-   [1mNOTE[22m: The ATI All-in-Wonder cards (which are not the same as the ATI
-  TV Wonder, TV Wonder VE or TV Wonder Pro) [4mwill[24m [4mnot[24m work as a MythTV
-  capture device because the GATOS http://gatos.sourceforge.net
+        [1mNOTE[22m: The ATI All-in-Wonder cards (which are not the same
+  as the ATI TV Wonder, TV Wonder VE or TV Wonder Pro) [4mwill[24m [4mnot[24m work as
+  a MythTV capture device because the GATOS http://gatos.sourceforge.net
   <http://gatos.sourceforge.net> drivers that are available provide only
   a limited subset of the V4L API. The TV Wonder series of cards are
   supported by the Bt8x8 Video4Linux driver.
@@ -547,10 +547,11 @@
   +o  A Celeron 450 (no SSE) can decode a 480x480 16Mbps MPEG-2 file with
      80% CPU.
 
-  See the ``Hauppauge PVR-250/350 hardware MPEG-2 encoder.''  section
-  for information on installing a PVR-250 on Mandrake 9.1.  The
-  information contained in the section will also apply to other MPEG-2
-  encoder cards supported by the IVTV driver.
+     See the ``Hauppauge PVR-250/350 hardware MPEG-2 encoder.'' section
+     for information on installing a PVR-250 on Mandrake 9.1.  The
+     information contained in the section will also apply to other
+     MPEG-2 encoder cards supported by the IVTV driver.
+
 
   [1m3.1.5.3.  DVB capture cards.[0m
 
@@ -589,8 +590,8 @@
   may be able to use a 1.8GHz processor.
 
 
-  [1m3.1.6.  Hardware known NOT to work and other issues.[0m
 
+  [1m3.1.6.  Hardware known NOT to work and other issues.[0m
 
 
   +o  Hauppauge WinTV-D or -HD (no driver)
@@ -638,14 +639,15 @@
 
 
 
-      [1mNOTE[22m:  Plugging a Line-level device into the Mic input is not
-  recommended.  Line-level devices have higher voltages and can damage
-  the sound card.  In addition, even if it doesn't break your card, you
-  will be getting Mono sound.  See the Linux MP3 HOWTO at
+        [1mNOTE[22m:  Plugging a Line-level device into the Mic input is
+  not recommended.  Line-level devices have higher voltages and can
+  damage the sound card.  In addition, even if it doesn't break your
+  card, you will be getting Mono sound.  See the Linux MP3 HOWTO at
   http://www.ibiblio.org/pub/Linux/docs/HOWTO/other-
   formats/html_single/MP3-HOWTO.html#toc8
   <http://www.ibiblio.org/pub/Linux/docs/HOWTO/other-
   formats/html_single/MP3-HOWTO.html#toc8> for additional information.
+
 
 
   [1m3.1.8.  Video Display Card[0m
@@ -713,11 +715,13 @@
   +o  ATI Rage II+DVD (Mach 64). Ports not described. Reported to work,
      but no details reported.
 
+
   +o  Rage 128 VIVO. Ports not described. Reported to work, but no
      details reported.
 
   +o  Radeon 7500. Ports not described. Reported to work, but no details
      reported.
+
 
   [1m3.1.9.2.  Matrox[0m
 
@@ -776,6 +780,7 @@
   +o  GeForce4 MX420 PCI (BFG Asylum). Has SVideo port.
 
 
+
   [1m3.1.9.4.  Savage[0m
 
   The standard savage X driver supports TV out on some Savage cards.
@@ -783,7 +788,6 @@
   and inexpensive Savage card with TV out) is broken. See
   http://www.probo.com/timr/savage40.html
   <http://www.probo.com/timr/savage40.html> for details.
-
 
   Specific cards:
 
@@ -904,15 +908,14 @@
   Then update your [1mapt [22mpackage listings:
 
 
-       # apt-get update
+  # apt-get update
 
 
 
   And finally:
 
 
-
-  # apt-get install mythtv-suite
+       # apt-get install mythtv-suite
 
 
 
@@ -966,8 +969,6 @@
   See /usr/share/doc/[4mpackagename[24m/README.Debian for more information,
   including copies of the MythTV documentation.  The mythtv-doc package
   contains a copy of this HOWTO in /usr/share/doc/mythtv-doc.
-
-
   [1m3.2.2.  Manual installation[0m
 
   You may use the graphical tools that come with your distribution, or
@@ -1032,6 +1033,7 @@
   If you are going to be installing MySQL on this system, search for
   mysql - it should be under "Databases".  Make sure that mysql and
   mysql-clients are installed.  If not, click on "Mark".
+
 
   Search for gcc.  You're going to need gcc and gcc-c++ installed.
 
@@ -1439,7 +1441,7 @@
   <http://www.mythtv.org/mailman/listinfo/mythtv-dev/> mailing lists.
 
   Get XMLTV from http://xmltv.sourceforge.net
-  <http://xmltv.sourceforge.net>.  Download version 0.5.29 if you're in
+  <http://xmltv.sourceforge.net>.  Download version 0.5.30 if you're in
   North America.
 
 
@@ -1449,8 +1451,9 @@
 
   # urpmi libmp3lame0 libmp3lame0-devel
 
-  NOTE for Red Hat users: If you are installing with apt or yum, you may skip this step, it will be taken care
-  of. Otherwise get lame and lame-devel from FreshRPMS: http://freshrpms.net/rpm/lame/
+  NOTE for Red Hat users: If you are installing with apt or yum, you may skip
+  this step, it will be taken care of. Otherwise get lame and lame-devel from
+  FreshRPMS: http://freshrpms.net/rpm/lame/
 
   After downloading, be sure to install both:
   # rpm -Uvh lame*
@@ -1461,7 +1464,6 @@
   Get lame from http://www.mp3dev.org/mp3 <http://www.mp3dev.org/mp3>.
   Download the source code to v3.93.1 by following the links to
   sourceforge.net
-
 
   [1m5.1.  Notes on compiling on a system with non-Intel processors.[0m
 
@@ -1599,7 +1601,7 @@
   Untar the xmltv file:
 
 
-       $ tar -xjf xmltv-0.5.29.tar.bz2
+       $ tar -xjf xmltv-0.5.30.tar.bz2
 
 
 
@@ -1621,7 +1623,7 @@
   Change to the XMLTV directory and compile it:
 
 
-       $ cd xmltv-0.5.29
+       $ cd xmltv-0.5.30
        $ perl Makefile.PL
 
 
@@ -1889,6 +1891,7 @@
 
        $ mysql -u root mythconverg
        mysql> grant all on mythconverg.* to mythtv@"%" identified by "mythtv";
+       mysql> flush privileges;
 
 
 
@@ -1899,6 +1902,7 @@
 
        $ mysql -u root mythconverg
        mysql> grant all on mythconverg.* to mythtv@"%.mydomain.com" identified by "mythtv";
+       mysql> flush privileges;
 
 
 
@@ -1907,6 +1911,7 @@
 
        $ mysql -u root mythconverg
        mysql> grant all on mythconverg.* to mythtv@"192.168.1.%" identified by "mythtv";
+       mysql> flush privileges;
 
 
 
@@ -1933,8 +1938,6 @@
 
   There are two ways to do this.  Graphically, and from the command
   line.
-
-
 
   [1m7.1.  Graphically setting up the mixer.[0m
 
@@ -3003,9 +3006,11 @@
      [1mNOTE[22m:  Don't add a video source to a hardware input if you don't
   actually have anything connected there.  For example, adding "Cable"
   to the Tuner and to the Composite inputs without having something
-  connected to Composite will lead to blank recordings.  Press ESC to
-  return to the main menu, and press ESC again if you have no further
-  items to configure, thereby returning you to the command line.
+  connected to Composite will lead to blank recordings.
+
+  Press ESC to return to the main menu, and press ESC again if you have
+  no further items to configure, thereby returning you to the command
+  line.
 
 
   [1m9.1.5.  Channel Editor[0m
@@ -4853,11 +4858,10 @@
   [1m20.2.  mythfilldatabase failing.[0m
 
   If mythfilldatabase suddenly appears to be failing, check to see what
-  version of XMLTV you're running.  Versions prior to 0.5.4 need to have
-  the following change made: edit the
-  /usr/lib/perl5/site_perl/5.8.0/XMLTV/ZapListings.pm file and perform a
-  global search and replace, searching for "tvlistings2" and replacing
-  it with "tvlistings".
+  version of XMLTV you're running.
+
+
+
     [1mNOTE[22m:  It is highly recommended to run the latest version of XMLTV
   available.  In North America, zap2it, the listings provider, has been
   making numerous changes to their website which negatively impact
@@ -5381,7 +5385,9 @@
 
   Your [1mMySQL [22minstallation may have networking turned off.  Check that
   /etc/mysql/my.cnf [4mdoes[24m [4mnot[24m contain skip-networking.  If it does,
-  remove it, and restart [1mMySQL[22m.
+  remove it.  Also verify that bind-address is set to your IP address
+  instead of 127.0.0.1.  If you change either of these items, restart
+  [1mMySQL[22m.
 
   [1m20.28.  My screen goes black when I try to play something.[0m
 
@@ -5426,6 +5432,7 @@
   (http://forevermore.net/myth/ <http://forevermore.net/myth/>) are
   better suited for the end user.  However, since [1mmythtranscode [22mcan be a
   useful tool, directions on using it follow.
+
 
   [1mmythtranscode [22mcreates raw streams, which means that they do not
   contain any container information such as resolution, frame-rate, or
@@ -5484,8 +5491,10 @@
   Or to play directly using mplayer (again 1.0PRE1 or later is needed):
 
 
-       mplayer -audiofile audout -audio-demuxer 20 -rawaudio rate=32000 \
-       -rawvideo on:w=640:h=480:fps=29.97 vidout
+
+  mplayer -audiofile audout -audio-demuxer 20 -rawaudio rate=32000 \
+  -rawvideo on:w=640:h=480:fps=29.97 vidout
+
 
 
   If you wanted to write the raw data to separate audio and video files
@@ -5544,6 +5553,7 @@
   +o  544x240
 
   +o  480x240
+
 
   +o  352x240
 
@@ -5670,6 +5680,7 @@
   database for multiple systems'' section for more information.
 
 
+
   [1m21.6.  I'd like to delete the MySQL database.[0m
 
 
@@ -5725,11 +5736,9 @@
   +o  Avermedia AVerTV Studio (no digital DSP output, "whiney noise" on
      analog)
 
-  See contrib/example.modules.conf.for.btaudio for an example file on
-  how to configure btaudio on your system.
-
   Once btaudio loads, it should register additional /dev/dsp and
   /dev/mixer devices.  Typing $ dmesg will let you know what's going on.
+
 
 
   [1m21.8.  Removing unwanted channels.[0m
@@ -5740,6 +5749,7 @@
   channels; for example, HBO or Showtime may be available on your cable
   TV system, but is scrambled because you're not a subscriber to that
   channel.  Since you can never watch it, you want to get rid of it.
+
   First, comment out the channel from the  /.mythtv/<sourcename>.xmltv
   file by inserting the word "not " (including the space) in front of
   the unwanted entry. This will prevent [1mxmltv [22mfrom grabbing future
@@ -5792,7 +5802,8 @@
   add something like:
 
 
-       masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,soft,nfsvers=3
+
+  masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,soft,nfsvers=3
 
 
 
@@ -5861,11 +5872,10 @@
   /etc/rc.d/init.d/:
 
 
-
-  $ cd contrib
-  $ su
-  # chmod a+x etc.rc.d.init.d.mythbackend
-  # cp etc.rc.d.init.d.mythbackend /etc/rc.d/init.d/mythbackend
+       $ cd contrib
+       $ su
+       # chmod a+x etc.rc.d.init.d.mythbackend
+       # cp etc.rc.d.init.d.mythbackend /etc/rc.d/init.d/mythbackend
 
 
 
@@ -5917,8 +5927,6 @@
        $ ls -ld /var/log/mythtv
        drwxrwxr-x    2 root     mythtv       4096 Apr 28 21:58 /var/log/mythtv/
        $
-
-
 
   [1m21.11.1.2.  Mandrake 9.x[0m
 
@@ -6222,11 +6230,61 @@
   frontends, poor signal strength or other factors can severely impact
   the viewing experience on the frontend.
 
+  [1m21.18.  How can I burn shows that I have recorded to a DVD?[0m
+
+  There are two answers to this question.  The easiest thing to do is to
+  simply burn the MythTV files onto the DVD and treat the DVD as if it
+  were a hard drive.  This will allow you to save the programs, but it's
+  likely that they will [4mnot[24m be playable in a DVD player because the disc
+  will simply contain files and not any DVD structure.  If you'd like to
+  create a DVD that will play in a standard DVD player and your files
+  have been recorded as MPEG-2 from a device supported by the IVTV
+  driver, the first step you'll need to perform is to remux the file to
+  make it DVD compliant.  Next, you'll use [1mdvdauthor[22m, [1mmkisofs [22mto create
+  the ISO image, and finally [1mdvdrecord [22mto burn that to a blank DVD-R.
+
+  The requirements for this procedure are [1mmjpegtools [22m(provides [1mmplex[22m)
+  and [1mdvdauthor [22m(provides [1mmpeg2desc [22mand [1mdvdauthor[22m).
+
+  This script will perform the necessary steps. You'll need to pass it
+  the .nuv file and a name for the new DVD project.  You should end up
+  with a directory which you can [1mmkisofs [22minto a ISO file then burn it.
+
+
+
+       #!/bin/sh
+
+       mkfifo aud0
+       mkfifo vid0
+       mkfifo dvdmpg
+
+       mpeg2desc -a0 < $1 > aud0 &
+       mpeg2desc -v0 < $1 > vid0 &
+       mplex -f 8 -V -o dvdmpg aud0 vid0 &
+       dvdauthor -o $2 -f dvdmpg
+       dvdauthor -o $2 -T
+
+       rm aud0
+       rm vid0
+       rm dvdmpg
+
+
+
+  It's also possible to pipe the output of [1mmkisofs [22mdirectly to [1mcdrecord[0m
+  without any intermediate files being written to your hard drive.  For
+  example:
+
+
+       #!/bin/sh
+       TSIZE=`mkisofs -dvd-video -udf -q -print-size .`
+       mkisofs -dvd-video -udf -V "$1" . | nice -10 cdrecord speed=1 dev=1,1,0 \
+       driveropts=burnfree -dao -v tsize="$TSIZE"s -
+
+
+
   [1m22.  Example Configurations.[0m
 
   This section contains configurations which you may find useful.
-
-
 
   [1m22.1.  Hauppauge PVR-250/350 hardware MPEG-2 encoder.[0m
 
@@ -6283,6 +6341,7 @@
   The [1mivtvfwextract [22mprogram extracts the firmware required for the card.
   You may want to go to the Hauppauge website and download the latest
   Windows driver if the [1mwget [22mcommand fails.
+
   ivtv also needs to know how your kernel was compiled.  The default
   Makefile is not configured for the way Mandrake "does things".  At the
   top of the Makefile in the driver directory is a line like this:
@@ -6294,8 +6353,7 @@
 
   edit it so that it looks like:
 
-
-       KERNELDIR= /usr/src/linux
+  KERNELDIR= /usr/src/linux
 
 
 
@@ -6390,23 +6448,24 @@
   Finally, load the ivtv driver:
 
 
-  # modprobe ivtv
-  # exit
+       # modprobe ivtv
+       # exit
 
 
 
   Check that the card is being recognized on the PCI bus:
 
 
-       $ lspci -v
-       <snip>
 
-       00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
-       Encoder (rev 01)
-               Subsystem: Hauppauge computer works Inc.: Unknown device 4801
-               Flags: bus master, medium devsel, latency 32, IRQ 11
-               Memory at d0000000 (32-bit, prefetchable) [size=64M]
-               Capabilities: <available only to root>
+  $ lspci -v
+  <snip>
+
+  00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
+  Encoder (rev 01)
+          Subsystem: Hauppauge computer works Inc.: Unknown device 4801
+          Flags: bus master, medium devsel, latency 32, IRQ 11
+          Memory at d0000000 (32-bit, prefetchable) [size=64M]
+          Capabilities: <available only to root>
 
 
 
@@ -6449,8 +6508,7 @@
   command to /etc/rc.d/rc.local:
 
 
-
-  # echo "/sbin/modprobe ivtv" >> /etc/rc.d/rc.local
+       # echo "/sbin/modprobe ivtv" >> /etc/rc.d/rc.local
 
 
 

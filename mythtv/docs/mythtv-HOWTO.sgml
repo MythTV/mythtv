@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2004-02-26, v0.14.05
+<date>2004-03-14, v0.14.06
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -196,14 +196,14 @@ on-board encoding of the analog video; hardware known as a Digital-Analog
 Converter (DAC) takes the video and presents it to the computer in an
 essentially raw digital form.
 
-For a list of video capture cards known to work
-with Linux, please see
+For a list of video capture cards known to work with Linux, please see
 <tt>/usr/src/linux/Documentation/video4linux/bttv</tt> for a partial
 listing; even if your specific card is not listed, it may be that the vendor
 is actually using a standard reference design and placing their own name on
-it.  See the video4linux mailing list (<url url="https://listman.redhat.com/mailman/listinfo/video4linux-list"
+it.  See the video4linux mailing list (<url
+url="https://listman.redhat.com/mailman/listinfo/video4linux-list"
 name="https://listman.redhat.com/mailman/listinfo/video4linux-list">) for
-more information and for specific hardware questions.  
+more information and for specific hardware questions.
 
 The most common inexpensive cards available use the Bt848 or Bt878 video
 capture chip; examples are the "Hauppauge WinTV Go" card and the "AverTV
@@ -221,10 +221,10 @@ are not the same.  The All-in-Wonder cards will not work with MythTV.
 <figure loc="here">
 <eps file="stop.eps" height="4cm">
 <img src="stop.png">
-<caption><bf>NOTE</bf>: The ATI All-in-Wonder cards (which are not the same as the ATI
-TV Wonder, TV Wonder VE or TV Wonder Pro) <em>will not</em> work as a MythTV
-capture device because the GATOS <url url="http://gatos.sourceforge.net"
-name="http://gatos.sourceforge.net">
+<caption><bf>NOTE</bf>: The ATI All-in-Wonder cards (which are not the same
+as the ATI TV Wonder, TV Wonder VE or TV Wonder Pro) <em>will not</em> work
+as a MythTV capture device because the GATOS <url
+url="http://gatos.sourceforge.net" name="http://gatos.sourceforge.net">
 drivers that are available provide only a limited subset of the V4L API. 
 The TV Wonder series of cards are supported by the Bt8x8 Video4Linux driver.
 </caption>
@@ -272,16 +272,16 @@ for Live TV at 416x480.
 <item>A Celeron 450 (no SSE) can decode a 480x480 16Mbps MPEG-2 file with
 80% CPU.
 </itemize>
+See the <ref id="pvr250" name="Hauppauge PVR-250/350 hardware MPEG-2
+encoder."> section for information on installing a PVR-250 on Mandrake 9.1. 
+The information contained in the section will also apply to other MPEG-2
+encoder cards supported by the IVTV driver.
 
-See the <ref id="pvr250" name="Hauppauge PVR-250/350 hardware MPEG-2 encoder.">
-section for information on installing a PVR-250 on Mandrake 9.1.  The
-information contained in the section will also apply to other MPEG-2 encoder cards
-supported by the IVTV driver.
 <sect3>DVB capture cards.
 <p>DVB is a video standard primarily found in Europe.  MythTV supports DVB;
 see the pages maintained by Martin Smith <url
-url="mailto:martin@ethics-gradient.net" name="martin@ethics-gradient.net"> at <url
-url="http://www.ethics-gradient.net/myth/mythdvb.html"
+url="mailto:martin@ethics-gradient.net" name="martin@ethics-gradient.net">
+at <url url="http://www.ethics-gradient.net/myth/mythdvb.html"
 name="http://www.ethics-gradient.net/myth/mythdvb.html"> for more
 information.  To see if your DVB card is supported, see the list of cards at
 <url url="http://www.linuxtv.org/download/dvb/CARDS"
@@ -357,8 +357,8 @@ a sound card for audio capture.
 <figure loc="here">
 <eps file="stop.eps" height="1cm">
 <img src="stop.png">
-<caption><bf>NOTE</bf>:  Plugging a Line-level device into the Mic input is not
-recommended.  Line-level devices have higher voltages and can damage the
+<caption><bf>NOTE</bf>:  Plugging a Line-level device into the Mic input is
+not recommended.  Line-level devices have higher voltages and can damage the
 sound card.  In addition, even if it doesn't break your card, you will be
 getting Mono sound.  See the Linux MP3 HOWTO at <url
 url="http://www.ibiblio.org/pub/Linux/docs/HOWTO/other-formats/html_single/MP3-HOWTO.html#toc8"
@@ -425,7 +425,8 @@ name="http://www.retinalburn.net/linux/tvout.html"> for more information.
 
 Specific cards:
 <itemize>
-<item>ATI Rage II+DVD (Mach 64). Ports not described. Reported to work, but no details reported.
+<item>ATI Rage II+DVD (Mach 64). Ports not described. Reported to work, but
+no details reported.
 <item>Rage 128 VIVO. Ports not described. Reported to work, but no details reported.
 <item>Radeon 7500. Ports not described. Reported to work, but no details reported.
 </itemize>
@@ -1057,7 +1058,7 @@ name="http://www.mythtv.org/mailman/listinfo/mythtv-dev/"> mailing lists.
 </figure>
 
 Get XMLTV from <url url="http://xmltv.sourceforge.net"
-name="http://xmltv.sourceforge.net">.  Download version 0.5.29 if you're in
+name="http://xmltv.sourceforge.net">.  Download version 0.5.30 if you're in
 North America.
 
 <code>
@@ -1066,8 +1067,9 @@ next step and type:
 
 # urpmi libmp3lame0 libmp3lame0-devel
 
-NOTE for Red Hat users: If you are installing with apt or yum, you may skip this step, it will be taken care
-of. Otherwise get lame and lame-devel from FreshRPMS: http://freshrpms.net/rpm/lame/
+NOTE for Red Hat users: If you are installing with apt or yum, you may skip
+this step, it will be taken care of. Otherwise get lame and lame-devel from
+FreshRPMS: http://freshrpms.net/rpm/lame/
 
 After downloading, be sure to install both:
 # rpm -Uvh lame*
@@ -1187,7 +1189,7 @@ Continuing on:
 
 <label id="untarring_xmltv">Untar the xmltv file:
 <tscreen><verb>
-$ tar -xjf xmltv-0.5.29.tar.bz2
+$ tar -xjf xmltv-0.5.30.tar.bz2
 </verb></tscreen>
 Install the xmltv prerequisites:
 
@@ -1204,7 +1206,7 @@ cpan> exit
 
 Change to the XMLTV directory and compile it:
 <tscreen><verb>
-$ cd xmltv-0.5.29
+$ cd xmltv-0.5.30
 $ perl Makefile.PL
 </verb></tscreen>
 You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes" to
@@ -1432,6 +1434,7 @@ This example has no security at all, and allows access from any host.
 <tscreen><verb>
 $ mysql -u root mythconverg
 mysql> grant all on mythconverg.* to mythtv@"%" identified by "mythtv";
+mysql> flush privileges;
 </verb></tscreen>
 
 For a more secure setup, you can restrict which machines or subnets have
@@ -1440,12 +1443,14 @@ following:
 <tscreen><verb>
 $ mysql -u root mythconverg
 mysql> grant all on mythconverg.* to mythtv@"%.mydomain.com" identified by "mythtv";
+mysql> flush privileges;
 </verb></tscreen>
 
 Finally, if you just want to restrict by IP subnet:
 <tscreen><verb>
 $ mysql -u root mythconverg
 mysql> grant all on mythconverg.* to mythtv@"192.168.1.%" identified by "mythtv";
+mysql> flush privileges;
 </verb></tscreen>
 
 <sect>Configuring Sound.
@@ -2417,6 +2422,7 @@ Tuner and to the Composite inputs without having something connected to
 Composite will lead to blank recordings.
 </caption>
 </figure>
+
 Press ESC to return to the main menu, and press ESC again if you have no
 further items to configure, thereby returning you to the command line.
 
@@ -2487,8 +2493,8 @@ the correct IP address for the database server.
 </figure>
 <sect1>Configuring and running mythfilldatabase.
 <p><figure loc="here">
-<eps file="stop.eps" height="1cm">
-<img src="stop.png">
+<eps file="warning.eps" height="1cm">
+<img src="warning.png">
 <caption><bf>NOTE</bf>:  <bf>mythfilldatabase</bf> might take a while to complete,
 depending on any number of factors, most of which you can't control.  It's
 best to just let the program run to completion.
@@ -2586,6 +2592,7 @@ $ crontab -e
 </verb></tscreen>
 
 The <bf>crontab -e</bf> command will allow you to edit the existing crontab.
+
 <figure loc="here">
 <eps file="stop.eps" height="1cm">
 <img src="stop.png">
@@ -4088,11 +4095,8 @@ deinterlace support.  You may check this by doing a <tt>$ cat
 </itemize>
 <sect1>mythfilldatabase failing.
 <p>If mythfilldatabase suddenly appears to be failing, check to see what version of
-XMLTV you're running.  Versions prior to 0.5.4 need to have the following
-change made: edit the
-<tt>/usr/lib/perl5/site_perl/5.8.0/XMLTV/ZapListings.pm</tt> file and
-perform a global search and replace, searching for "tvlistings2" and
-replacing it with "tvlistings".
+XMLTV you're running.
+
 <figure loc="here">
 <eps file="stop.eps" height="1cm">
 <img src="stop.png">
@@ -4332,6 +4336,7 @@ perform a CPU intensive task like encoding video.
 <sect1>Troubleshooting audio. <label id="Troubleshooting_Audio">
 <p>By Bruce Markey, <url url="mailto:bjm@lvcm.com"
 name="mailto:bjm@lvcm.com">
+
 <figure loc="here">
 <eps file="stop.eps" height="1cm">
 <img src="stop.png">
@@ -4541,7 +4546,9 @@ examples on finding and removing old versions of lirc.
 <sect1>MySQL not connecting correctly.
 <p>Your <bf>MySQL</bf> installation may have networking turned off. 
 Check that <tt>/etc/mysql/my.cnf</tt> <em>does not</em> contain
-<tt>skip-networking</tt>.  If it does, remove it, and restart
+<tt>skip-networking</tt>.  If it does, remove it.  Also verify that 
+<tt>bind-address</tt> is set to your IP address instead of 
+<tt>127.0.0.1</tt>.  If you change either of these items, restart 
 <bf>MySQL</bf>.
 <sect1>My screen goes black when I try to play something.
 <p>MythTV prints error and status messages to the shell that was used to
@@ -4841,9 +4848,6 @@ The following cards have been reported to work, but have issues:
 <item>Avermedia AVerTV Studio (no digital DSP output, "whiney noise" on
 analog)
 </itemize>
-
-See <tt>contrib/example.modules.conf.for.btaudio</tt> for an example file on
-how to configure btaudio on your system.
 
 Once btaudio loads, it should register additional <tt>/dev/dsp</tt> and
 <tt>/dev/mixer</tt> devices.  Typing <tt>$ dmesg</tt> will let you know
@@ -5271,6 +5275,54 @@ actual throughput of 4 Mbps.)  802.11a and 802.11g, if operating in their
 high-speed modes, or proprietary 802.11b "Turbo" schemes should be
 adequate.  Multiple wireless frontends, poor signal strength or other
 factors can severely impact the viewing experience on the frontend.
+<sect1>How can I burn shows that I have recorded to a DVD?
+<p>There are two answers to this question.  The easiest thing to do is to
+simply burn the MythTV files onto the DVD and treat the DVD as if it were a
+hard drive.  This will allow you to save the programs, but it's likely that
+they will <em>not</em> be playable in a DVD player because the disc will
+simply contain files and not any DVD structure.  If you'd like to create a
+DVD that will play in a standard DVD player and your files have been
+recorded as MPEG-2 from a device supported by the IVTV driver, the first
+step you'll need to perform is to remux the file to make it DVD compliant. 
+Next, you'll use <bf>dvdauthor</bf>, <bf>mkisofs</bf> to create the ISO
+image, and finally <bf>dvdrecord</bf> to burn that to a blank DVD-R.
+
+The requirements for this procedure are <bf>mjpegtools</bf> (provides
+<bf>mplex</bf>) and <bf>dvdauthor</bf> (provides <bf>mpeg2desc</bf> and
+<bf>dvdauthor</bf>).
+
+This script will perform the necessary steps. You'll need to pass it the
+.nuv file and a name for the new DVD project.  You should end up with a
+directory which you can <bf>mkisofs</bf> into a ISO file then burn it.
+
+<tscreen><verb>
+#!/bin/sh
+
+mkfifo aud0
+mkfifo vid0
+mkfifo dvdmpg
+
+mpeg2desc -a0 < $1 > aud0 &
+mpeg2desc -v0 < $1 > vid0 &
+mplex -f 8 -V -o dvdmpg aud0 vid0 &
+dvdauthor -o $2 -f dvdmpg
+dvdauthor -o $2 -T
+
+rm aud0
+rm vid0
+rm dvdmpg
+</verb></tscreen>
+
+It's also possible to pipe the output of <bf>mkisofs</bf> directly to
+<bf>cdrecord</bf> without any intermediate files being written to your hard
+drive.  For example:
+<tscreen><verb>
+#!/bin/sh
+TSIZE=`mkisofs -dvd-video -udf -q -print-size .`
+mkisofs -dvd-video -udf -V "$1" . | nice -10 cdrecord speed=1 dev=1,1,0 \
+driveropts=burnfree -dao -v tsize="$TSIZE"s -
+</verb></tscreen>
+
 <sect>Example Configurations.
 <p>This section contains configurations which you may find useful.
 <sect1>Hauppauge PVR-250/350 hardware MPEG-2 encoder. <label id="pvr250">
@@ -5387,6 +5439,7 @@ initializer</tt>
 then you didn't uncomment CFLAGS as specified <ref id="i2c" name="above">.
 
 Add the following to <tt>/etc/modules.conf</tt>:
+
 <figure loc="here">
 <eps file="stop.eps" height="1cm">
 <img src="stop.png">
@@ -5497,7 +5550,9 @@ command to <tt>/etc/rc.d/rc.local</tt>:
 # echo "/sbin/modprobe ivtv" >> /etc/rc.d/rc.local
 </verb></tscreen>
 
-<label id="troubleshooting_pvraudio"><figure loc="here">
+<label id="troubleshooting_pvraudio">
+
+<figure loc="here">
 <eps file="stop.eps" height="1cm">
 <img src="stop.png">
 <caption><bf>NOTE</bf>:  some people complain
@@ -6078,6 +6133,8 @@ v0.14.05, 2004-02-26.  Convert some "stop"s to "warnings".  Add additional
 stuff for the various zoom modes.  Add wireless (might work, YMMV).  Change
 the section title for 7 to "Configuring Sound."  William Powers' Advanced
 Partitioning contribution.
+v0.14.06, 2004-03-14.  Fix things.  Ramon Redondo's mysql priv contribution. 
+Bump XMLTV version.  David Blevins' DVD burning contribution.
 -->
 
 <!--

@@ -143,14 +143,13 @@ available for capturing video.  </P>
 on-board encoding of the analog video; hardware known as a Digital-Analog
 Converter (DAC) takes the video and presents it to the computer in an
 essentially raw digital form.</P>
-<P>For a list of video capture cards known to work
-with Linux, please see
+<P>For a list of video capture cards known to work with Linux, please see
 <CODE>/usr/src/linux/Documentation/video4linux/bttv</CODE> for a partial
 listing; even if your specific card is not listed, it may be that the vendor
 is actually using a standard reference design and placing their own name on
 it.  See the video4linux mailing list (
 <A HREF="https://listman.redhat.com/mailman/listinfo/video4linux-list">https://listman.redhat.com/mailman/listinfo/video4linux-list</A>) for
-more information and for specific hardware questions.  </P>
+more information and for specific hardware questions.</P>
 <P>The most common inexpensive cards available use the Bt848 or Bt878 video
 capture chip; examples are the "Hauppauge WinTV Go" card and the "AverTV
 Desktop PVR" card, both of which use the bttv kernel module.</P>
@@ -171,9 +170,9 @@ are not the same.  The All-in-Wonder cards will not work with MythTV.
 <FIGURE>
 <EPS FILE="stop.eps">
 <IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>: The ATI All-in-Wonder cards (which are not the same as the ATI
-TV Wonder, TV Wonder VE or TV Wonder Pro) <EM>will not</EM> work as a MythTV
-capture device because the GATOS 
+<CAPTION><B>NOTE</B>: The ATI All-in-Wonder cards (which are not the same
+as the ATI TV Wonder, TV Wonder VE or TV Wonder Pro) <EM>will not</EM> work
+as a MythTV capture device because the GATOS 
 <A HREF="http://gatos.sourceforge.net">http://gatos.sourceforge.net</A>
 drivers that are available provide only a limited subset of the V4L API. The TV Wonder series of cards are supported by the Bt8x8 Video4Linux driver.</CAPTION>
 </FIGURE>
@@ -221,17 +220,18 @@ for Live TV at 416x480.</LI>
 <LI>A Celeron 450 (no SSE) can decode a 480x480 16Mbps MPEG-2 file with
 80% CPU.</LI>
 </UL>
-</P>
-<P>See the 
-<A HREF="mythtv-HOWTO-22.html#pvr250">Hauppauge PVR-250/350 hardware MPEG-2 encoder.</A>
-section for information on installing a PVR-250 on Mandrake 9.1.  The
-information contained in the section will also apply to other MPEG-2 encoder cards
-supported by the IVTV driver.</P>
+
+See the 
+<A HREF="mythtv-HOWTO-22.html#pvr250">Hauppauge PVR-250/350 hardware MPEG-2 encoder.</A> section for information on installing a PVR-250 on Mandrake 9.1. 
+The information contained in the section will also apply to other MPEG-2
+encoder cards supported by the IVTV driver.</P>
+
 <H3>DVB capture cards.</H3>
 
 <P>DVB is a video standard primarily found in Europe.  MythTV supports DVB;
 see the pages maintained by Martin Smith 
-<A HREF="mailto:martin@ethics-gradient.net">martin@ethics-gradient.net</A> at 
+<A HREF="mailto:martin@ethics-gradient.net">martin@ethics-gradient.net</A>
+at 
 <A HREF="http://www.ethics-gradient.net/myth/mythdvb.html">http://www.ethics-gradient.net/myth/mythdvb.html</A> for more
 information.  To see if your DVB card is supported, see the list of cards at
 <A HREF="http://www.linuxtv.org/download/dvb/CARDS">http://www.linuxtv.org/download/dvb/CARDS</A> for more information.</P>
@@ -306,8 +306,8 @@ a sound card for audio capture.</CAPTION>
 <FIGURE>
 <EPS FILE="stop.eps">
 <IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>:  Plugging a Line-level device into the Mic input is not
-recommended.  Line-level devices have higher voltages and can damage the
+<CAPTION><B>NOTE</B>:  Plugging a Line-level device into the Mic input is
+not recommended.  Line-level devices have higher voltages and can damage the
 sound card.  In addition, even if it doesn't break your card, you will be
 getting Mono sound.  See the Linux MP3 HOWTO at 
 <A HREF="http://www.ibiblio.org/pub/Linux/docs/HOWTO/other-formats/html_single/MP3-HOWTO.html#toc8">http://www.ibiblio.org/pub/Linux/docs/HOWTO/other-formats/html_single/MP3-HOWTO.html#toc8</A>
@@ -368,7 +368,8 @@ with TV-out." See the "Adventurous Setup" section of
 <A HREF="http://www.retinalburn.net/linux/tvout.html">http://www.retinalburn.net/linux/tvout.html</A> for more information.</P>
 <P>Specific cards:
 <UL>
-<LI>ATI Rage II+DVD (Mach 64). Ports not described. Reported to work, but no details reported.</LI>
+<LI>ATI Rage II+DVD (Mach 64). Ports not described. Reported to work, but
+no details reported.</LI>
 <LI>Rage 128 VIVO. Ports not described. Reported to work, but no details reported.</LI>
 <LI>Radeon 7500. Ports not described. Reported to work, but no details reported.</LI>
 </UL>

@@ -306,8 +306,6 @@ wired correctly to the BT878 chip.</LI>
 analog)</LI>
 </UL>
 </P>
-<P>See <CODE>contrib/example.modules.conf.for.btaudio</CODE> for an example file on
-how to configure btaudio on your system.</P>
 <P>Once btaudio loads, it should register additional <CODE>/dev/dsp</CODE> and
 <CODE>/dev/mixer</CODE> devices.  Typing <CODE>$ dmesg</CODE> will let you know
 what's going on.</P>
@@ -793,6 +791,59 @@ actual throughput of 4 Mbps.)  802.11a and 802.11g, if operating in their
 high-speed modes, or proprietary 802.11b "Turbo" schemes should be
 adequate.  Multiple wireless frontends, poor signal strength or other
 factors can severely impact the viewing experience on the frontend.</P>
+<H2><A NAME="ss21.18">21.18</A> <A HREF="mythtv-HOWTO.html#toc21.18">How can I burn shows that I have recorded to a DVD?</A>
+</H2>
+
+<P>There are two answers to this question.  The easiest thing to do is to
+simply burn the MythTV files onto the DVD and treat the DVD as if it were a
+hard drive.  This will allow you to save the programs, but it's likely that
+they will <EM>not</EM> be playable in a DVD player because the disc will
+simply contain files and not any DVD structure.  If you'd like to create a
+DVD that will play in a standard DVD player and your files have been
+recorded as MPEG-2 from a device supported by the IVTV driver, the first
+step you'll need to perform is to remux the file to make it DVD compliant. 
+Next, you'll use <B>dvdauthor</B>, <B>mkisofs</B> to create the ISO
+image, and finally <B>dvdrecord</B> to burn that to a blank DVD-R.</P>
+<P>The requirements for this procedure are <B>mjpegtools</B> (provides
+<B>mplex</B>) and <B>dvdauthor</B> (provides <B>mpeg2desc</B> and
+<B>dvdauthor</B>).</P>
+<P>This script will perform the necessary steps. You'll need to pass it the
+.nuv file and a name for the new DVD project.  You should end up with a
+directory which you can <B>mkisofs</B> into a ISO file then burn it.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+#!/bin/sh
+
+mkfifo aud0
+mkfifo vid0
+mkfifo dvdmpg
+
+mpeg2desc -a0 &lt; $1 > aud0 &amp;
+mpeg2desc -v0 &lt; $1 > vid0 &amp;
+mplex -f 8 -V -o dvdmpg aud0 vid0 &amp;
+dvdauthor -o $2 -f dvdmpg
+dvdauthor -o $2 -T
+
+rm aud0
+rm vid0
+rm dvdmpg
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>It's also possible to pipe the output of <B>mkisofs</B> directly to
+<B>cdrecord</B> without any intermediate files being written to your hard
+drive.  For example:
+<BLOCKQUOTE><CODE>
+<PRE>
+#!/bin/sh
+TSIZE=`mkisofs -dvd-video -udf -q -print-size .`
+mkisofs -dvd-video -udf -V "$1" . | nice -10 cdrecord speed=1 dev=1,1,0 \
+driveropts=burnfree -dao -v tsize="$TSIZE"s -
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
 <HR>
 <A HREF="mythtv-HOWTO-22.html">Next</A>
 <A HREF="mythtv-HOWTO-20.html">Previous</A>

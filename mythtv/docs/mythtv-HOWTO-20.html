@@ -34,11 +34,8 @@ deinterlace support.  You may check this by doing a <CODE>$ cat
 </H2>
 
 <P>If mythfilldatabase suddenly appears to be failing, check to see what version of
-XMLTV you're running.  Versions prior to 0.5.4 need to have the following
-change made: edit the
-<CODE>/usr/lib/perl5/site_perl/5.8.0/XMLTV/ZapListings.pm</CODE> file and
-perform a global search and replace, searching for "tvlistings2" and
-replacing it with "tvlistings".
+XMLTV you're running.</P>
+<P>
 <FIGURE>
 <EPS FILE="stop.eps">
 <IMG SRC="stop.png">
@@ -311,7 +308,8 @@ perform a CPU intensive task like encoding video.</P>
 </H2>
 
 <P>By Bruce Markey, 
-<A HREF="mailto:bjm@lvcm.com">mailto:bjm@lvcm.com</A>
+<A HREF="mailto:bjm@lvcm.com">mailto:bjm@lvcm.com</A></P>
+<P>
 <FIGURE>
 <EPS FILE="stop.eps">
 <IMG SRC="stop.png">
@@ -537,7 +535,9 @@ examples on finding and removing old versions of lirc.</P>
 
 <P>Your <B>MySQL</B> installation may have networking turned off. 
 Check that <CODE>/etc/mysql/my.cnf</CODE> <EM>does not</EM> contain
-<CODE>skip-networking</CODE>.  If it does, remove it, and restart
+<CODE>skip-networking</CODE>.  If it does, remove it.  Also verify that 
+<CODE>bind-address</CODE> is set to your IP address instead of 
+<CODE>127.0.0.1</CODE>.  If you change either of these items, restart 
 <B>MySQL</B>.</P>
 <H2><A NAME="ss20.28">20.28</A> <A HREF="mythtv-HOWTO.html#toc20.28">My screen goes black when I try to play something.</A>
 </H2>
