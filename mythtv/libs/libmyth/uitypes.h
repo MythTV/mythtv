@@ -125,6 +125,10 @@ class UIListType : public UIType
     void SetUpArrow(bool arrow) { m_uarrow = arrow; }
     void SetDownArrow(bool arrow) { m_darrow = arrow; }
  
+    void SetFill(QRect area, QColor color, int type) {
+                          m_fill_area = area; m_fill_color = color; 
+                          m_fill_type = type; }
+
     void SetForceColor(QString color) { m_forcecolor = color; }
     void EnableForcedColor(int num) { forceColors[num] = m_forcecolor; }
     void EnableForcedColor(int num, QString color) { forceColors[num] = color; }
@@ -147,6 +151,9 @@ class UIListType : public UIType
     int m_count;
     bool m_darrow;
     bool m_uarrow;
+    QRect m_fill_area;
+    QColor m_fill_color;
+    int m_fill_type;
     QPixmap m_selection;
     QPixmap m_downarrow;
     QPixmap m_uparrow;

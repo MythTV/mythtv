@@ -133,6 +133,9 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
   {
     if (drawlayer == m_order)
     {
+        if (m_fill_type == 1 && m_active == true)
+            dr->fillRect(m_fill_area, QBrush(m_fill_color, Qt::Dense4Pattern));
+
         QString tempWrite;
             int left = 0;
         fontProp *tmpfont = NULL;

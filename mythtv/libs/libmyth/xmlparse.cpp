@@ -512,6 +512,10 @@ void XMLParse::parseListArea(LayerSet *container, QDomElement &element)
     QMap<int, int> columnContexts;
     int colCnt = -1;
 
+    QRect fill_select_area = QRect(0, 0, 0, 0);
+    QColor fill_select_color = QColor(255, 255, 255);
+    int fill_type = -1;
+
     QPoint uparrow_loc;
     QPoint dnarrow_loc;
     QPoint select_loc;
@@ -568,6 +572,45 @@ void XMLParse::parseListArea(LayerSet *container, QDomElement &element)
             else if (info.tagName() == "columnpadding")
             {
                 padding = getFirstText(info).toInt();
+            }
+            else if (info.tagName() == "fill")
+            {
+                QString fillfcn = "";
+                QString fillcolor = "";
+                QString fillarea = "";
+                QString filltype = "";
+ 
+                fillfcn = info.attribute("function", "");
+                fillcolor = info.attribute("color", "#ffffff"); 
+                fillarea = info.attribute("area", "");
+                filltype = info.attribute("type", "");
+
+                if (fillfcn.isNull() || fillfcn.isEmpty())
+                {
+                    cerr << "Fill needs a function\n";
+                    exit(0);
+                }
+                if (fillcolor.isNull() || fillcolor.isEmpty())
+                {
+                    cerr << "Fill needs a color\n";
+                    exit(0);
+                }
+                if (filltype == "5050")
+                    fill_type = 1;
+                if (fill_type == -1)
+                    fill_type = 1;
+
+                if (fillarea.isNull() || fillarea.isEmpty())
+                {
+                    fill_select_area = area; 
+                }
+                else
+                {
+                    fill_select_area = parseRect(fillarea);
+                    normalizeRect(fill_select_area);
+                }
+                fill_select_color = QColor(fillcolor);
+ 
             }
             else if (info.tagName() == "image")
             {
@@ -681,6 +724,8 @@ void XMLParse::parseListArea(LayerSet *container, QDomElement &element)
     list->SetImageSelection(select_img, select_loc);
     list->SetImageUpArrow(uparrow_img, uparrow_loc);
     list->SetImageDownArrow(dnarrow_img, dnarrow_loc);
+    if (fill_type != -1)
+        list->SetFill(fill_select_area, fill_select_color, fill_type);
     if (context != -1)
     {
         list->SetContext(context);
