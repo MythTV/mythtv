@@ -139,7 +139,12 @@ class OSD
     QString pausestatus;
     int pausesliderfontsize;
     Efont *pausesliderfont;
-    
+    int pauseyoffset;
+    int pausemovementperframe;
+    bool hidingpause;
+   
+    int CalcNewOffset(OSDImage *image, int curoffset);
+
     int displaypausetime;
     bool pausefilltype;
 };

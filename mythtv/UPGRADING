@@ -18,3 +18,8 @@ They'll be updated the next time you run the filldata script.  You can remove
 all the .jpg and .gif files from the /usr/local/share/mythtv/ directory, if
 you want.
 
+UPGRADING FROM RELEASE 0.4
+--------------------------
+You don't need to do anything other than re-edit the settings.txt file.
+Just remember to run the ./configure script to setup libavcodec before
+making MythTV.

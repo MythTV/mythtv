@@ -100,8 +100,11 @@ OSD::OSD(int width, int height, const QString &filename, const QString &prefix,
     show_info = false;
     show_channum = false;
     show_dialog = false;
-    show_pause = false;
+    show_pause = hidingpause = false;
+    pauseyoffset = 0;
 
+    pausemovementperframe = (int)(6 * hmult);
+    
     currentdialogoption = 1;
 
     infotext = channumtext = "";
@@ -442,6 +445,9 @@ void OSD::StartPause(int position, bool fill, QString msgtext,
     pauseslidertext = slidertext;
     pausefilltype = fill; 
     displaypausetime = -1;
+    pauseyoffset = 0;
+    hidingpause = false;
+    
     if (displaytime > 0)
         displaypausetime = time(NULL) + displaytime;
     
@@ -452,12 +458,15 @@ void OSD::UpdatePause(int position, QString slidertext)
 {
     pauseposition = position;
     pauseslidertext = slidertext;
+    hidingpause = false;
+    pauseyoffset = 0;
 }
 
 void OSD::EndPause(void)
 {
+    hidingpause = true;
     show_pause = false;
-    displayframes = 0;
+    displaypausetime = 0;
 }
 
 void OSD::SetChannumText(const QString &text, int length)
@@ -514,11 +523,27 @@ void OSD::Display(unsigned char *yuvptr)
     if (show_pause)
     {
         if (displaypausetime > 0 && time(NULL) > displaypausetime)
+        {
             show_pause = false;
-
+            hidingpause = true;
+        }
+	    
         DisplayPause(yuvptr);
     }
 
+    if (hidingpause)
+    {
+        if (pausemovementperframe == 0)
+            hidingpause = false;
+
+        pauseyoffset = CalcNewOffset(pausebackground, pauseyoffset);
+        if (pauseyoffset < 0)
+            hidingpause = false;
+
+        if (hidingpause)
+            DisplayPause(yuvptr);
+    }   
+ 
     if (time(NULL) > displayframes)
     {
         show_info = false; 
@@ -542,6 +567,17 @@ void OSD::Display(unsigned char *yuvptr)
     {
         DisplayChannumNoTheme(yuvptr);
     }
+}
+
+int OSD::CalcNewOffset(OSDImage *image, int curoffset)
+{
+    if (!image)
+        return -1;
+
+    curoffset += pausemovementperframe;
+    if (curoffset >= image->height)
+        return -1;
+    return curoffset;
 }
 
 void OSD::DisplayDialogNoTheme(unsigned char *yuvptr)
@@ -629,13 +665,14 @@ void OSD::DisplayPause(unsigned char *yuvptr)
     if (pausebackground)
     {
         BlendImage(pausebackground, pausebackground->position.x(),
-                   pausebackground->position.y(), yuvptr);
+                   pausebackground->position.y() + pauseyoffset, yuvptr);
     }
  
     if (pausestatusRect.width() > 0)
     {
-        DrawStringWithOutline(yuvptr, pausestatusRect, pausestatus,
-                              info_font);
+        QRect temp = pausestatusRect;
+        temp.moveTopLeft(QPoint(temp.left(), temp.top() + pauseyoffset));
+        DrawStringWithOutline(yuvptr, temp, pausestatus, info_font);
     }
 
     if (pausesliderRect.width() > 0)
@@ -647,21 +684,23 @@ void OSD::DisplayPause(unsigned char *yuvptr)
             if (width > pausesliderRect.width())
                 width = pausesliderRect.width();
 	    BlendFillSlider(pausesliderfill, pausesliderRect.x(),
-                            pausesliderRect.y(), width, yuvptr);
+                            pausesliderRect.y() + pauseyoffset, width, yuvptr);
         }
         else
         {
             int xpos = (int)((pausesliderRect.width() / 1000.0) *
                        pauseposition);
             xpos += pausesliderRect.left();
-            BlendImage(pausesliderpos, xpos, pausesliderRect.y() - 3, yuvptr);
+            BlendImage(pausesliderpos, xpos, pausesliderRect.y() - 3 + 
+                       pauseyoffset, yuvptr);
         }
     }
 
     if (pausesliderfont)
     {
-        DrawStringCentered(yuvptr, pausesliderRect, pauseslidertext,
-                           pausesliderfont);
+        QRect temp = pausesliderRect;
+        temp.moveTopLeft(QPoint(temp.left(), temp.top() + pauseyoffset));
+        DrawStringCentered(yuvptr, temp, pauseslidertext, pausesliderfont);
     }
 }
 

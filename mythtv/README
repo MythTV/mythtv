@@ -45,7 +45,8 @@ You also need a video card with working Xv support (to scale and convert
 colorspaces), and a TV tuner card.
 
 Ok.  Once you've got all the prerequisites installed, on to compiling.
-Just type 'make' in the main distribution directory.
+First of all, do a quick './configure' to configure libavcodec.  Then just type
+'make'.
 
 Compiling note:  If you get an error on building this, that says something
                  about 'mkspecs', then you don't have the QTDIR environment
@@ -109,6 +110,10 @@ The channel icons were moved from /usr/local/share/mythtv/ to ~/.mythtv/channels
 They'll be updated the next time you run the filldata script.  You can remove
 all the .jpg and .gif files from the /usr/local/share/mythtv/ directory, if
 you want.
+
+UPGRADING FROM RELEASE 0.4
+--------------------------
+You don't need to do anything other than re-edit the settings.txt file.
 
 Once the database is setup, run the filldata script also in the same directory.
 This'll take awhile, as it's populating the database with the next week's worth
