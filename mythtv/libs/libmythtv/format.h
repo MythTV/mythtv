@@ -160,4 +160,14 @@ typedef struct teletextsubtitle
     unsigned char len;
 } teletextsubtitle;
 
+typedef struct ccsubtitle
+{
+    unsigned char row;
+    unsigned char rowcount;
+    unsigned char resumedirect;
+    unsigned char resumetext;
+    unsigned char clr; // clear the display
+    unsigned char len; //length of string to follow
+} ccsubtitle;
+
 #endif

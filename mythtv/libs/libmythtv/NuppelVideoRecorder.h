@@ -29,6 +29,7 @@ using namespace std;
 
 struct video_audio;
 struct VBIData;
+struct cc;
 class RTjpeg;
 class RingBuffer;
 
@@ -133,6 +134,7 @@ class NuppelVideoRecorder
     void DoMJPEG();
 
     void FormatTeletextSubtitles(struct VBIData *vbidata);
+    void FormatCC(struct ccsubtitle *subtitle, struct cc *cc, int data);
     
     QString sfilename;
     bool encoding;
@@ -280,6 +282,8 @@ class NuppelVideoRecorder
     int hmjpg_maxw;
 
     bool cleartimeonpause;
+
+    struct ccsubtitle subtitle;
 };
 
 #endif

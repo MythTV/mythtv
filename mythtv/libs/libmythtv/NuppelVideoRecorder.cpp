@@ -20,6 +20,7 @@ using namespace std;
 
 extern "C" {
 #include "../libvbitext/vbi.h"
+#include "../libvbitext/cc.h"
 }
 
 #include <linux/videodev.h>
@@ -135,6 +136,8 @@ NuppelVideoRecorder::NuppelVideoRecorder(void)
     videoFilterList = "";
 
     origaudio = new struct video_audio;
+
+    memset(&subtitle, 0, sizeof(subtitle));
 }
 
 NuppelVideoRecorder::~NuppelVideoRecorder(void)
@@ -1706,6 +1709,176 @@ void NuppelVideoRecorder::FormatTeletextSubtitles(struct VBIData *vbidata)
     textbuffer[act]->freeToEncode = 1;
 }
 
+void NuppelVideoRecorder::FormatCC(struct ccsubtitle *subtitle, 
+                                   struct cc *cc, int data)
+{
+    struct timeval tnow;
+    gettimeofday (&tnow, &tzone);
+
+    int act = act_text_buffer;
+    if (!textbuffer[act]->freeToBuffer)
+    {
+        cerr << act << " ran out of free TEXT buffers :-(\n";
+        return;
+    }
+
+    // calculate timecode:
+    // compute the difference  between now and stm (start time)
+    textbuffer[act]->timecode = (tnow.tv_sec - stm.tv_sec) * 1000 +
+                                 tnow.tv_usec / 1000 - stm.tv_usec / 1000;
+
+    const int rowdata[] = { 11, -1, 1, 2, 3, 4, 12, 13,
+                            14, 15, 5, 6, 7, 8, 9, 10 };
+    const char *specialchar[] =
+    { "~A®", "~A°", "~A½", "~A¿", "(TM)", "~A¢", "~A£", "o/~ ",
+      "~Aà", " ", "~Aè", "~Aâ", "~Aê", "~Aî", "~Aô", "~Aû"
+    };
+
+    int b1, b2, row, len, x;
+
+    if (data == -1)              // invalid data. flush buffers to be safe.
+    {
+        // TODO: write textbuffer[act]
+        //printf (" TODO: write textbuffer[act]\n");
+        memset(subtitle, 0, sizeof(subtitle));
+        memset(cc->ccbuf, 0, 2 * CC_BUFSIZE);
+        return;
+    }
+
+    b1 = data & 0x7f;
+    b2 = (data >> 8) & 0x7f;
+    len = strlen (cc->ccbuf[cc->ccmode]);
+
+    if (b1 & 0x60 && data != cc->lastcode)       // text
+    {
+        cc->ccbuf[cc->ccmode][len++] = b1;
+        if (b2 & 0x60)
+            cc->ccbuf[cc->ccmode][len++] = b2;
+        /* TODO: I don't think we need this for just showing CC?
+        if (b1 == ']' || b2 == ']')
+            webtv_check(cc->ccbuf[cc->ccmode], len);
+        */
+    }
+    else if ((b1 & 0x10) && (b2 > 0x1F) && (data != cc->lastcode))
+        // codes are always transmitted twice (apparently not,
+        // ignore the second occurance)
+    {
+        cc->ccmode = (b1 >> 3) & 1;
+        len = strlen(cc->ccbuf[cc->ccmode]);
+
+        if (b2 & 0x40)           //preamble address code (row & indent)
+        {
+            row = rowdata[((b1 << 1) & 14) | ((b2 >> 5) & 1)];
+            subtitle->row = row;
+            if (len != 0)
+                cc->ccbuf[cc->ccmode][len++] = '\n';
+
+            if (b2 & 0x10)        //row contains indent flag
+                for (x = 0; x < (b2 & 0x0F) << 1; x++)
+                    cc->ccbuf[cc->ccmode][len++] = ' ';
+        }
+        else
+        {
+            switch (b1 & 0x07)
+            {
+               case 0x00:          //attribute
+                  /*
+                   printf ("<ATTRIBUTE %d %d>\n", b1, b2);
+                   fflush (stdout);
+                   */
+                   break;
+               case 0x01:          //midrow or char
+                   switch (b2 & 0x70)
+                   {
+                       case 0x20:      //midrow attribute change
+                           // TODO: we _do_ want colors, is that an attribute?
+                           break;
+                       case 0x30:      //special character..
+                           strcat(cc->ccbuf[cc->ccmode], 
+                                  specialchar[b2 & 0x0f]);
+                           break;
+                   }
+                   break;
+               case 0x04:          //misc
+               case 0x05:          //misc + F
+//                 printf("ccmode %d cmd %02x\n",ccmode,b2);
+                   switch (b2)
+                   {
+                       case 0x21:      //backspace
+                           cc->ccbuf[cc->ccmode][len--] = 0;
+                           break;
+                       case 0x25:      //2 row caption
+                           subtitle->rowcount = 1;
+                           break;
+                       case 0x26:      //3 row caption
+                           subtitle->rowcount = 2;
+                           break;
+                       case 0x27:      //4 row caption
+                           subtitle->rowcount = 3;
+                           break;
+                       case 0x29:      //resume direct caption
+                           printf ("\nresume direct caption\n");
+                           subtitle->resumedirect = 1;
+                           break;
+                       case 0x2B:      //resume text display
+                           subtitle->resumetext = 1;
+                           break;
+                       case 0x2C:      //erase displayed memory
+                           subtitle->clr = 1;
+                           memcpy(textbuffer[act]->buffer, subtitle,
+                                  sizeof(ccsubtitle));
+                           textbuffer[act]->bufferlen = sizeof(ccsubtitle);
+                           textbuffer[act]->freeToBuffer = 0;
+                           act_text_buffer++;
+                           if (act_text_buffer >= text_buffer_count)
+                               act_text_buffer = 0;
+                           textbuffer[act]->freeToEncode = 1;
+                           break;
+                       case 0x2D:      //carriage return
+                           if (cc->ccmode == 1)
+                               break;
+                       case 0x2F:      //end caption + swap memory
+                       case 0x20:      //resume caption (new caption)
+                           subtitle->len = len;
+                           if (!len)
+                               break;
+                           memcpy(textbuffer[act]->buffer, subtitle,
+                                  sizeof(ccsubtitle));
+                           memcpy((char *)textbuffer[act]->buffer +
+                                  sizeof(ccsubtitle), cc->ccbuf[cc->ccmode],
+                                  subtitle->len);
+                           textbuffer[act]->bufferlen = subtitle->len + 
+                                                        sizeof(ccsubtitle);
+                           textbuffer[act]->freeToBuffer = 0;
+                           act_text_buffer++;
+                           if (act_text_buffer >= text_buffer_count)
+                               act_text_buffer = 0;
+                           textbuffer[act]->freeToEncode = 1;
+
+                           /*
+                           if (subtitle->len)
+                           printf("CC text channel %i: %s\n", cc->ccmode + 1,
+                                  cc->ccbuf[cc->ccmode]);
+                           fflush (stdout);
+                           */
+                       /* fallthrough */
+                       case 0x2A:      //text restart
+                       case 0x2E:      //erase non-displayed memory
+                           memset(subtitle, 0, sizeof(ccsubtitle));
+                           memset(cc->ccbuf[cc->ccmode], 0, CC_BUFSIZE);
+                       break;
+                   }
+                   break;
+               case 0x07:          //misc (TAB)
+                   for (x = 0; x < (b2 & 0x03); x++)
+                       cc->ccbuf[cc->ccmode][len++] = ' ';
+                   break;
+           }
+        }
+    }
+    cc->lastcode = data;
+}
+
 static void vbi_event(struct VBIData *data, struct vt_event *ev)
 {
     switch (ev->type)
@@ -1731,20 +1904,43 @@ static void vbi_event(struct VBIData *data, struct vt_event *ev)
 // should be easy to add US closed captioning
 void NuppelVideoRecorder::doVbiThread(void)
 {
-    struct vbi *vbi;
+    struct vbi *vbi = NULL;
+    struct cc *cc = NULL;
+    int vbifd;
 
-    if ((vbi = vbi_open(vbidevice.ascii(), 0, 99, -1)) <= 0)
+    switch (vbimode)
     {
-        cerr << "Can't open vbi device: " << vbidevice << "\n";
-        return;
+        case 1:
+            vbi = vbi_open(vbidevice.ascii(), NULL, 99, -1);
+            if (!vbi)
+            {
+                cerr << "Can't open vbi device: " << vbidevice << endl;
+                return;
+            }
+            vbifd = vbi->fd;
+            break;
+        case 2:
+            cc = cc_open(vbidevice.ascii());
+            if (!cc)
+            {
+                cerr << "Can't open vbi device: " << vbidevice << endl;
+                return; 
+            }
+            vbifd = cc->fd;
+            break;
+        case 3:
+        default:
+            return;
     }
-    cout << "opened vbi device\n";
+
+    struct ccsubtitle subtitle;
+    memset(&subtitle, 0, sizeof(subtitle));
 
     struct VBIData vbicallbackdata;
-
     vbicallbackdata.nvr = this;
 
-    vbi_add_handler(vbi, (void*) vbi_event, &vbicallbackdata);
+    if (vbimode == 1)
+        vbi_add_handler(vbi, (void*) vbi_event, &vbicallbackdata);
 
     while (childrenLive) 
     {
@@ -1760,9 +1956,9 @@ void NuppelVideoRecorder::doVbiThread(void)
         tv.tv_sec = 5;
         tv.tv_usec = 0;
         FD_ZERO(&rdset);
-        FD_SET(vbi->fd, &rdset);
+        FD_SET(vbifd, &rdset);
 
-        switch (select(vbi->fd+1, &rdset, 0, 0, &tv))
+        switch (select(vbifd + 1, &rdset, 0, 0, &tv))
         {
             case -1:
                   perror("vbi select");
@@ -1772,31 +1968,35 @@ void NuppelVideoRecorder::doVbiThread(void)
                   continue;
         }
 
-        if (vbimode == 1)
+        switch (vbimode)
         {
-            vbicallbackdata.foundteletextpage = false;
-            vbi_handler(vbi, vbi->fd);
-            if (vbicallbackdata.foundteletextpage)
-            {
-                // decode VBI as teletext subtitles
-                FormatTeletextSubtitles(&vbicallbackdata);
-            }
-        }
-        else if (vbimode == 2)
-        {
-            char buffer[65536];
-            if (read(vbi->fd, buffer, 65536) < 65536) 
-            {
-                cerr << "Can't read vbi data\n";
-            }
-            // TODO: decode VBI as US close caption
+            case 1:
+                vbicallbackdata.foundteletextpage = false;
+                vbi_handler(vbi, vbi->fd);
+                if (vbicallbackdata.foundteletextpage)
+                {
+                    // decode VBI as teletext subtitles
+                    FormatTeletextSubtitles(&vbicallbackdata);
+                }
+                break;
+            case 2:
+                FormatCC(&subtitle, cc, cc_handler(cc));
+                break;
         }
     }
 
-    vbi_del_handler(vbi, (void*) vbi_event, &vbicallbackdata);
-
-    vbi_close(vbi);
-    cout << "closed vbi device\n";
+    switch (vbimode)
+    {
+        case 1:
+            vbi_del_handler(vbi, (void*) vbi_event, &vbicallbackdata);
+            vbi_close(vbi);
+            break;
+        case 2:
+             cc_close(cc);
+             break;
+        default:
+             return;
+    }
 }
 
 
@@ -2504,8 +2704,12 @@ void NuppelVideoRecorder::WriteText(unsigned char *buf, int len, int timecode,
     }
     else if (vbimode == 2)
     {
-        // TODO: maybe CC can be stored in the same way,
-        // perhaps the pagenr can be used to store the streamnumber
+        frameheader.comptype = 'C';      // NTSC CC
+        frameheader.packetlength = len;
+
+        ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
+        ringBuffer->Write(buf, len);
+        printf((char *)buf);
     }
 }
 

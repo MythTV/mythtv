@@ -1327,7 +1327,7 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo, bool unsafe)
             {
                 cerr << "text buffer overflow\n";
             }
-            else
+            else if (cc)
             {
                 memcpy(tbuffer[wtxt], strm, frameheader.packetlength);
                 txttimecodes[wtxt] = frameheader.timecode;
@@ -1498,12 +1498,11 @@ void NuppelVideoPlayer::ToggleCC(void)
 {
     if (cc)
     {
-        printf("turn tt off\n");
+        osd->ClearAllCCText();
         cc = false;
     }
     else
     {
-        printf("turn tt on\n");
         cc = true;
     }
 }
@@ -1546,12 +1545,58 @@ void NuppelVideoPlayer::ShowText(void)
         }
         else if (txttype[rtxt] == 'C')
         {
-            // TODO: show US close caption
-            //
-            // as far as I understand this is a stream of characters,
-            // which upon display is broken into words and lines and scrolled,
-            // vbipagenr could be used to select the streamnr like
-            // the pagenr for teletext
+            int j;
+            unsigned char *inpos = tbuffer[rtxt];
+            struct ccsubtitle subtitle;
+
+            memcpy(&subtitle, inpos, sizeof(subtitle));
+            inpos += sizeof(subtitle);
+
+            if (subtitle.clr)
+            {
+                //printf ("erase displayed memory\n");
+                for (j = 0; j < 3; j++)
+                {
+                    cclines[j] = "";
+                }
+                osd->ClearAllCCText();
+            }
+
+            if (subtitle.len)
+            {
+                unsigned char *end = inpos + subtitle.len;
+                int row = 0;
+                while (inpos < end)
+                {
+                    unsigned char *cur = inpos;
+
+                    //null terminate at EOL
+                    while (cur < end && *cur != '\n' && *cur != 0)
+                        cur++;
+                    *cur = 0;
+
+                    if (row < 3)
+                    {
+                        cclines[row++] = QString((const char *)inpos);
+                        //printf ("CC text: %s\n", inpos);
+                    }
+
+                    inpos = cur + 1;
+                }
+
+                if (subtitle.rowcount != row)
+                    subtitle.rowcount = row;
+
+            }
+
+            //redraw
+            osd->ClearAllCCText ();
+            for (j = 0; j < subtitle.rowcount && j < 3; j++)
+            {
+                if (cclines[j].isNull() || cclines[j].isEmpty())
+                    continue;
+                osd->AddCCText(cclines[j], 5, subtitle.row + j, 1, false);
+            }
         }
 
         /* update rtxt */

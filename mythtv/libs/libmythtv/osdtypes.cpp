@@ -1045,7 +1045,7 @@ void OSDTypePositionRectangle::Draw(unsigned char *screenptr, int vid_width,
 }
 
 OSDTypeCC::OSDTypeCC(const QString &name, TTFFont *font)
-          : OSDType(name)
+         : OSDType(name)
 {
     m_font = font;
     m_textlist = NULL;
@@ -1053,6 +1053,7 @@ OSDTypeCC::OSDTypeCC(const QString &name, TTFFont *font)
 
 OSDTypeCC::~OSDTypeCC()
 {
+    ClearAllCCText();
 }
 
 void OSDTypeCC::AddCCText(const QString &text, int x, int y, int color, 
@@ -1116,12 +1117,12 @@ void OSDTypeCC::Draw(unsigned char *screenptr, int vid_width, int vid_height,
             }
             else
             {
-                x = cc->x;
-                y = cc->y;
+                x = cc->x * vid_width / 40;
+                y = cc->y * vid_height / 18;
             }
 
             int maxx = x + textlength;
-            int maxy = y + m_font->Size();
+            int maxy = y + m_font->Size() * 3 / 2;
 
             if (maxx > vid_width)
                 maxx = vid_width;
@@ -1130,7 +1131,7 @@ void OSDTypeCC::Draw(unsigned char *screenptr, int vid_width, int vid_height,
                 maxy = vid_height;
 
             m_font->DrawString(screenptr, x, y, cc->text, maxx, maxy, 255, 
-                               cc->color, false);
+                               cc->color, false, true);
         }
     }
 }

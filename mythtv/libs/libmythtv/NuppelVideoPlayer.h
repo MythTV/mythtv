@@ -410,6 +410,8 @@ class NuppelVideoPlayer
     int autocommercialskip;
     int commercialskipmethod;
     int commercialskipeverywhere;
+
+    QString cclines[4];
 };
 
 #endif

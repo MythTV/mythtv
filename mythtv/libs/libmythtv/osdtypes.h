@@ -321,7 +321,6 @@ class OSDTypeCC : public OSDType
   private:
     TTFFont *m_font;
     vector<ccText *> *m_textlist;
-
 };
 
 #endif
