@@ -67,6 +67,8 @@ class DecoderBase
     virtual void incCurrentAudioTrack(){}
     virtual void decCurrentAudioTrack(){}
     virtual bool setCurrentAudioTrack(int){ return false;}
+
+    void setTranscoding(bool value) { transcoding = value; };
                                                           
     bool IsErrored() { return errored; }
   protected:
@@ -92,6 +94,7 @@ class DecoderBase
 
     bool ateof;
     bool exitafterdecoded;
+    bool transcoding;
 
     bool hasFullPositionMap;
     bool recordingHasPositionMap;

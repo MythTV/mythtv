@@ -1327,6 +1327,7 @@ void AvFormatDecoder::SetupAudioStream(void)
     m_parent->SetEffDsp(curstream->codec.sample_rate * 100);
 
     do_ac3_passthru = curstream->codec.codec_id == CODEC_ID_AC3 &&
+                      !transcoding &&
                       gContext->GetNumSetting("AC3PassThru", false);
 }
 

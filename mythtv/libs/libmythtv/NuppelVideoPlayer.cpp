@@ -105,6 +105,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(ProgramInfo *info)
 
     forceVideoOutput = kVideoOutput_Default;
     decoder = NULL;
+    transcoding = false;
 
     bookmarkseek = 0;
 
@@ -679,6 +680,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
     decoder->setLiveTVMode(livetv);
     decoder->setWatchingRecording(watchingrecording);
     decoder->setRecorder(nvr_enc);
+    decoder->setTranscoding(transcoding);
 
     eof = 0;
     text_size = 8 * (sizeof(teletextsubtitle) + VT_WIDTH);
@@ -2095,6 +2097,14 @@ void NuppelVideoPlayer::SetEffDsp(int dsprate)
     if (audioOutput)
         audioOutput->SetEffDsp(dsprate);
 }
+
+void NuppelVideoPlayer::SetTranscoding(bool value)
+{
+    transcoding = value;
+
+    if (decoder)
+        decoder->setTranscoding(value);
+};
 
 void NuppelVideoPlayer::AddAudioData(char *buffer, int len, long long timecode)
 {

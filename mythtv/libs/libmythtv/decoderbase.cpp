@@ -39,6 +39,7 @@ DecoderBase::DecoderBase(NuppelVideoPlayer *parent, ProgramInfo *pginfo)
     getrawframes = false;
     getrawvideo = false; 
     errored = false;
+    transcoding = false;
 }
 
 void DecoderBase::Reset(void)

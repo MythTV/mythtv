@@ -132,6 +132,7 @@ class NuppelVideoPlayer
     bool PipPlayerSet(void) { return !needsetpipplayer; }
 
     void SetVideoFilters(QString &filters) { videoFilterList = filters; }
+    void SetTranscoding(bool value);
 
     void SetWatchingRecording(bool mode);
     void SetBookmark(void);
@@ -376,6 +377,8 @@ class NuppelVideoPlayer
     int seekamount;
     int seekamountpos;
     OSDSet *timedisplay;
+
+    bool transcoding;
 
     QMap<long long, int> deleteMap;
     QMap<long long, int>::Iterator deleteIter;

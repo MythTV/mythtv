@@ -340,6 +340,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
     AudioOutput *audioOutput = new AudioReencodeBuffer(0, 0);
     AudioReencodeBuffer *arb = ((AudioReencodeBuffer*)audioOutput);
     nvp->SetAudioOutput(audioOutput);
+    nvp->SetTranscoding(true);
 
     if (nvp->OpenFile(false) < 0)
     {
