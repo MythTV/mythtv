@@ -96,6 +96,9 @@ void MythSlider::keyPressEvent(QKeyEvent* e)
     case Key_Right:
         setValue(value() + lineStep());
         break;
+    case Key_Enter:
+    case Key_Return:
+        e->ignore();
     default:
         QSlider::keyPressEvent(e);
     }
@@ -110,6 +113,9 @@ void MythLineEdit::keyPressEvent(QKeyEvent *e)
     case Key_Down:
         focusNextPrevChild(TRUE);
         break;
+    case Key_Enter:
+    case Key_Return:
+        e->ignore();
     default:
         QLineEdit::keyPressEvent(e);
     }
