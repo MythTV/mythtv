@@ -61,7 +61,9 @@ class NuppelVideoRecorder
     void SetHMJPGQuality(int quality) { hmjpg_quality = quality; }
     void SetHMJPGHDecimation(int deci) { hmjpg_hdecimation = deci; }
     void SetHMJPGVDecimation(int deci) { hmjpg_vdecimation = deci; }
-    
+
+    void ChangeDeinterlacer(int deint_mode);   
+ 
     void Initialize(void);
     void StartRecording(void);
     void StopRecording(void) { encoding = false; } 
@@ -118,10 +120,12 @@ class NuppelVideoRecorder
     
     int CreateNuppelFile(void);
 
-    void WriteVideo(unsigned char *buf, int len, int fnum, int timecode);
+    void WriteVideo(Frame *frame);
     void WriteAudio(unsigned char *buf, int fnum, int timecode);
     void WriteText(unsigned char *buf, int len, int timecode, int pagenr);
 
+    Frame * GetField(struct vidbuffertype *vidbuf, bool top_field, 
+                     bool interpolate);
     bool SetupAVCodec(void);
 
     void WriteSeekTable(bool todumpfile);
@@ -226,6 +230,20 @@ class NuppelVideoRecorder
     bool actuallypaused;
     bool audiopaused;
     bool mainpaused;
+
+    enum DeinterlaceMode {
+        DEINTERLACE_NONE =0,
+        DEINTERLACE_BOB,
+        DEINTERLACE_BOB_FULLHEIGHT_COPY,
+        DEINTERLACE_BOB_FULLHEIGHT_LINEAR_INTERPOLATION,
+        DEINTERLACE_DISCARD_TOP,
+        DEINTERLACE_DISCARD_BOTTOM,
+        DEINTERLACE_LAST
+    };
+
+    DeinterlaceMode deinterlace_mode;
+    double framerate_multiplier;
+    double height_multiplier;
     
     int last_block;
     int firsttc;

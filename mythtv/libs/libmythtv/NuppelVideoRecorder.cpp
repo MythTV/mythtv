@@ -53,6 +53,10 @@ NuppelVideoRecorder::NuppelVideoRecorder(void)
     w = 352;
     h = 240;
 
+    deinterlace_mode = DEINTERLACE_NONE;
+    framerate_multiplier = 1.0;
+    height_multiplier = 1.0;
+
     mp3quality = 3;
     gf = NULL;
     rtjc = NULL;
@@ -127,7 +131,7 @@ NuppelVideoRecorder::NuppelVideoRecorder(void)
     hmjpg_hdecimation = 2;
     hmjpg_vdecimation = 2;
     hmjpg_maxw = 640;
-	
+    
     videoFilterList = "";
 
     origaudio = new struct video_audio;
@@ -227,28 +231,22 @@ bool NuppelVideoRecorder::SetupAVCodec(void)
     }
 
     mpa_ctx = avcodec_alloc_context();
-   
-    if (picture_format == PIX_FMT_YUV420P)
-    { 
-        mpa_ctx->pix_fmt = PIX_FMT_YUV420P;
-    
-        mpa_picture.linesize[0] = w;
-        mpa_picture.linesize[1] = w / 2;
-        mpa_picture.linesize[2] = w / 2;
-    }
-    else if (picture_format == PIX_FMT_YUV422P)
+  
+    switch (picture_format)
     {
-        mpa_ctx->pix_fmt = PIX_FMT_YUV422P;
-
-        mpa_picture.linesize[0] = w;
-        mpa_picture.linesize[1] = w / 2;
-        mpa_picture.linesize[2] = w / 2;
-    }   
-    else
-        cerr << "Unknown picture format: " << picture_format << endl;
-
+        case PIX_FMT_YUV420P:
+        case PIX_FMT_YUV422P:
+            mpa_ctx->pix_fmt = picture_format; 
+            mpa_picture.linesize[0] = w;
+            mpa_picture.linesize[1] = w / 2;
+            mpa_picture.linesize[2] = w / 2;
+            break;
+        default:
+            cerr << "Unknown picture format: " << picture_format << endl;
+    }
+ 
     mpa_ctx->width = w;
-    mpa_ctx->height = h;
+    mpa_ctx->height = (int)(h * height_multiplier);
 
     int usebitrate = targetbitrate * 1000;
     if (scalebitrate)
@@ -260,7 +258,8 @@ bool NuppelVideoRecorder::SetupAVCodec(void)
     if (targetbitrate == -1)
         usebitrate = -1;
 
-    mpa_ctx->frame_rate = (int)ceil(video_frame_rate * FRAME_RATE_BASE);
+    mpa_ctx->frame_rate = (int)ceil(video_frame_rate * FRAME_RATE_BASE *
+                                    framerate_multiplier);
     mpa_ctx->bit_rate = usebitrate;
     mpa_ctx->bit_rate_tolerance = usebitrate * 100;
     mpa_ctx->qmin = maxquality;
@@ -309,14 +308,14 @@ void NuppelVideoRecorder::Initialize(void)
     if (compressaudio)
     {
         gf = lame_init();
-	lame_set_bWriteVbrTag(gf, 0);
-	lame_set_quality(gf, mp3quality);
-	lame_set_compression_ratio(gf, 11);
+        lame_set_bWriteVbrTag(gf, 0);
+        lame_set_quality(gf, mp3quality);
+        lame_set_compression_ratio(gf, 11);
         lame_set_mode(gf, audio_channels == 2 ? STEREO : MONO);
         lame_set_num_channels(gf, audio_channels);
         lame_set_out_samplerate(gf, audio_samplerate);
         lame_set_in_samplerate(gf, audio_samplerate);
-	lame_init_params(gf);
+        lame_init_params(gf);
 
         if (audio_bits != 16) 
         {
@@ -384,8 +383,8 @@ void NuppelVideoRecorder::Initialize(void)
     {
         cerr << "Warning: Old ringbuf creation\n";
         ringBuffer = new RingBuffer(NULL, sfilename, true);
-	weMadeBuffer = true;
-	livetv = false;
+        weMadeBuffer = true;
+        livetv = false;
     }
     else
         livetv = ringBuffer->LiveMode();
@@ -536,7 +535,8 @@ void NuppelVideoRecorder::StartRecording(void)
         rtjc = new RTjpeg();
         setval = RTJ_YUV420;
         rtjc->SetFormat(&setval);
-        rtjc->SetSize(&w, &h);
+        setval = (int)(h * height_multiplier);
+        rtjc->SetSize(&w, &setval);
         rtjc->SetQuality(&Q);
         setval = 2;
         rtjc->SetIntra(&setval, &M1, &M2);
@@ -652,7 +652,7 @@ void NuppelVideoRecorder::StartRecording(void)
 
     for (int i = 0; i < numbuffers; i++)
     {
-	memset(buffers[i], 0, bufferlen[i]);
+        memset(buffers[i], 0, bufferlen[i]);
         vbuf.type = V4L2_BUF_TYPE_CAPTURE;
         vbuf.index = i;
         ioctl(fd, VIDIOC_QBUF, &vbuf);
@@ -703,7 +703,7 @@ again:
 
         frame = vbuf.index;
         BufferIt(buffers[frame], video_buffer_size);
-	
+    
         vbuf.type = V4L2_BUF_TYPE_CAPTURE;
         ioctl(fd, VIDIOC_QBUF, &vbuf);
     }
@@ -993,10 +993,10 @@ void NuppelVideoRecorder::DoMJPEG(void)
 
     munmap(MJPG_buff, breq.count * breq.size);
     KillChildren();
-	        
+            
     if (!livetv)
         WriteSeekTable(false);
-		    
+            
     recording = false;
     close(fd);
 }
@@ -1023,12 +1023,12 @@ int NuppelVideoRecorder::SpawnChildren(void)
     childrenLive = true;
     
     result = pthread_create(&write_tid, NULL, 
-		            NuppelVideoRecorder::WriteThread, this);
+                            NuppelVideoRecorder::WriteThread, this);
 
     if (result)
     {
         cerr << "Couldn't spawn writer thread, exiting\n";
-	return -1;
+        return -1;
     }
 
     result = pthread_create(&audio_tid, NULL,
@@ -1037,7 +1037,7 @@ int NuppelVideoRecorder::SpawnChildren(void)
     if (result)
     {
         cerr << "Couldn't spawn audio thread, exiting\n";
-	return -1;
+        return -1;
     }
 
     if (vbimode)
@@ -1114,10 +1114,10 @@ void NuppelVideoRecorder::BufferIt(unsigned char *buf, int len)
 
     if (!videobuffer[act]->freeToBuffer) 
     {
-	printf("DROPPED frame due to full buffer in the recorder.\n");
+        printf("DROPPED frame due to full buffer in the recorder.\n");
         return; // we can't buffer the current frame
     }
-	
+    
     videobuffer[act]->sample = tf;
 
     // record the time at the start of this frame.
@@ -1147,7 +1147,7 @@ void NuppelVideoRecorder::WriteHeader(bool todumpfile)
     memcpy(fileheader.finfo, finfo, sizeof(fileheader.finfo));
     memcpy(fileheader.version, vers, sizeof(fileheader.version));
     fileheader.width  = w;
-    fileheader.height = h;
+    fileheader.height = (int)(h * height_multiplier);
     fileheader.desiredwidth  = 0;
     fileheader.desiredheight = 0;
     fileheader.pimode = 'P';
@@ -1157,6 +1157,7 @@ void NuppelVideoRecorder::WriteHeader(bool todumpfile)
     else
         fileheader.fps = 25.0;
     video_frame_rate = fileheader.fps;
+    fileheader.fps *= framerate_multiplier;
     fileheader.videoblocks = -1;
     fileheader.audioblocks = -1;
     fileheader.textsblocks = -1; // TODO: make only -1 if VBI support active?
@@ -1350,7 +1351,7 @@ void NuppelVideoRecorder::Reset(void)
     {
         vidbuffertype *vidbuf = videobuffer[i];
         vidbuf->sample = 0;
-	vidbuf->timecode = 0;
+        vidbuf->timecode = 0;
         vidbuf->freeToEncode = 0;
         vidbuf->freeToBuffer = 1;
     }
@@ -1359,7 +1360,7 @@ void NuppelVideoRecorder::Reset(void)
     {
         audbuffertype *audbuf = audiobuffer[i];
         audbuf->sample = 0;
-	audbuf->timecode = 0;
+        audbuf->timecode = 0;
         audbuf->freeToEncode = 0;
         audbuf->freeToBuffer = 1;
     }
@@ -1479,12 +1480,13 @@ void NuppelVideoRecorder::doAudioThread(void)
     ioctl(afd,SNDCTL_DSP_SETTRIGGER,&trigger);
 
     audiopaused = false;
-    while (childrenLive) {
-	if (paused)
-	{
+    while (childrenLive) 
+    {
+        if (paused)
+        {
             audiopaused = true;
             usleep(50);
-	    act = act_audio_buffer;
+            act = act_audio_buffer;
             continue;
         }
 
@@ -1496,12 +1498,12 @@ void NuppelVideoRecorder::doAudioThread(void)
             perror("read audio");
         }
 
-	/* record the current time */
-	/* Don't assume that the sound device's record buffer is empty
-	   (like we used to.) Measure to see how much stuff is in there,
-	   and correct for it when calculating the timestamp */
+        /* record the current time */
+        /* Don't assume that the sound device's record buffer is empty
+           (like we used to.) Measure to see how much stuff is in there,
+           and correct for it when calculating the timestamp */
         gettimeofday(&anow, &tzone);
-	ioctl( afd, SNDCTL_DSP_GETISPACE, &ispace );
+        ioctl( afd, SNDCTL_DSP_GETISPACE, &ispace );
 
         act = act_audio_buffer;
 
@@ -1514,17 +1516,16 @@ void NuppelVideoRecorder::doAudioThread(void)
 
         audiobuffer[act]->sample = act_audio_sample;
 
-	/* calculate timecode. First compute the difference
-	   between now and stm (start time) */
-        audiobuffer[act]->timecode = 
-	    (anow.tv_sec-stm.tv_sec)*1000 + 
-	    anow.tv_usec/1000 - stm.tv_usec/1000;
-	/* We want the timestamp to point to the start of this
-	   audio chunk. So, subtract off the length of the chunk
-	   and the length of audio still in the capture buffer. */
-	audiobuffer[act]->timecode -= (int)( 
-		( ispace.fragments * ispace.fragsize + audio_buffer_size )
-		* 1000.0 / ( audio_samplerate * audio_bytes_per_sample )  );
+        /* calculate timecode. First compute the difference
+           between now and stm (start time) */
+        audiobuffer[act]->timecode = (anow.tv_sec - stm.tv_sec) * 1000 + 
+                                     anow.tv_usec / 1000 - stm.tv_usec / 1000;
+        /* We want the timestamp to point to the start of this
+           audio chunk. So, subtract off the length of the chunk
+           and the length of audio still in the capture buffer. */
+        audiobuffer[act]->timecode -= (int)( 
+                (ispace.fragments * ispace.fragsize + audio_buffer_size)
+                 * 1000.0 / (audio_samplerate * audio_bytes_per_sample));
 
         memcpy(audiobuffer[act]->buffer, buffer, audio_buffer_size);
 
@@ -1804,13 +1805,13 @@ void NuppelVideoRecorder::doWriteThread(void)
     actuallypaused = false;
     while (childrenLive)
     {
-	if (pausewritethread)
-	{
+        if (pausewritethread)
+        {
             actuallypaused = true;
             usleep(50);
             continue;
-	}
-	
+        }
+    
         enum 
         { ACTION_NONE, 
           ACTION_VIDEO, 
@@ -1847,10 +1848,65 @@ void NuppelVideoRecorder::doWriteThread(void)
         {
             case ACTION_VIDEO:
             {
-                WriteVideo(videobuffer[act_video_encode]->buffer,
-                           videobuffer[act_video_encode]->bufferlen,
-                           videobuffer[act_video_encode]->sample,
-                           videobuffer[act_video_encode]->timecode);
+                switch (deinterlace_mode)
+                {
+                    case DEINTERLACE_BOB:
+                    case DEINTERLACE_BOB_FULLHEIGHT_COPY:
+                    case DEINTERLACE_BOB_FULLHEIGHT_LINEAR_INTERPOLATION:
+                    {
+                        Frame *top_frame = 
+                                  GetField(videobuffer[act_video_encode], true,
+                                           (deinterlace_mode != DEINTERLACE_BOB)
+                                            ? true : false);
+
+                        Frame *bottom_frame =
+                                  GetField(videobuffer[act_video_encode], false,
+                                           (deinterlace_mode != DEINTERLACE_BOB)
+                                            ? true : false);
+
+                        WriteVideo(top_frame);
+                        WriteVideo(bottom_frame);
+                        delete [] top_frame->buf;
+                        delete [] bottom_frame->buf;
+                        delete top_frame;
+                        delete bottom_frame;
+                    }
+                    break;
+                    case DEINTERLACE_DISCARD_TOP:
+                    {
+                        Frame *top_frame =
+                             GetField(videobuffer[act_video_encode],true,false);
+                        WriteVideo(top_frame);
+                        delete [] top_frame->buf;
+                        delete top_frame;
+                    }
+                    break;
+                    case DEINTERLACE_DISCARD_BOTTOM:
+                    {
+                        Frame *bottom_frame =
+                            GetField(videobuffer[act_video_encode],false,false);
+                        WriteVideo(bottom_frame);
+                        delete [] bottom_frame->buf;
+                        delete bottom_frame;
+                    }
+                    break;
+                    case DEINTERLACE_NONE:
+                    case DEINTERLACE_LAST:
+                    {
+                        Frame frame;
+                        frame.codec = CODEC_YUV;
+                        frame.width = w;
+                        frame.height = h;
+                        frame.buf = videobuffer[act_video_encode]->buffer;
+                        frame.len = videobuffer[act_video_encode]->bufferlen;
+                        frame.frameNumber = videobuffer[act_video_encode]->sample;
+                        frame.timecode = videobuffer[act_video_encode]->timecode;
+                        frame.is_field = FALSE;
+    
+                        WriteVideo(&frame);
+                    }
+                }
+
                 videobuffer[act_video_encode]->sample = 0;
                 videobuffer[act_video_encode]->freeToEncode = 0;
                 videobuffer[act_video_encode]->freeToBuffer = 1;
@@ -1911,8 +1967,158 @@ long long NuppelVideoRecorder::GetKeyframePosition(long long desired)
     return ret;
 }
 
-void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int len, int fnum, 
-                                     int timecode)
+void NuppelVideoRecorder::ChangeDeinterlacer(int deint_mode)
+{
+    switch (deint_mode)
+    {
+        case DEINTERLACE_NONE:
+            height_multiplier = 1;
+            framerate_multiplier = 1;
+            break;
+        case DEINTERLACE_BOB:
+            height_multiplier = 0.5;
+            framerate_multiplier = 2;
+            break;
+        case DEINTERLACE_BOB_FULLHEIGHT_COPY:
+        case DEINTERLACE_BOB_FULLHEIGHT_LINEAR_INTERPOLATION:
+            height_multiplier = 1;
+            framerate_multiplier = 2;
+            break;
+        case DEINTERLACE_DISCARD_TOP:
+        case DEINTERLACE_DISCARD_BOTTOM:
+            height_multiplier = 0.5;
+            framerate_multiplier = 1;
+            break;
+        case DEINTERLACE_LAST:
+        default:
+            cerr << "Unknown deinterlace mode: " << deint_mode << endl;
+            return;
+    }
+    deinterlace_mode = (DeinterlaceMode)deint_mode;
+}
+
+Frame *NuppelVideoRecorder::GetField(struct vidbuffertype *vidbuf,
+                                     bool top_field, bool interpolate)
+{
+
+    unsigned char *buf = vidbuf->buffer;
+
+    Frame *frame = new Frame();
+    frame->codec = CODEC_YUV;
+    frame->width = w;
+    frame->height = (int) (h * height_multiplier);
+    frame->len = (frame->width * frame->height) +
+                 (frame->width * frame->height)/2;
+    frame->bpp = -1;
+    frame->is_field = interpolate ? FALSE : TRUE;
+
+    if (top_field)
+    {
+        frame->frameNumber = (int)(vidbuf->sample *  framerate_multiplier);
+        frame->timecode =  vidbuf->timecode;
+    }
+    else
+    {
+        frame->frameNumber = (int)(vidbuf->sample * framerate_multiplier) + 1;
+        /* Note we need to add the time between fields to timecode
+           to adjust for two field situation */
+        int field_delay = (ntsc) ? (int)(33 / framerate_multiplier) :
+                                   (int)(40 / framerate_multiplier);
+        frame->timecode =  vidbuf->timecode + field_delay;
+    }
+
+    unsigned char *planes[3];
+    unsigned int planes_height[3];
+    unsigned int planes_width[3];
+
+    unsigned char *buf_out;
+    unsigned char *plane_out;
+    unsigned char *plane_out_end;
+
+    planes_height[0] = h;
+    planes_width[0] = w;
+    planes[0] = buf;
+    planes[1] = planes[0] + w * h;
+
+    switch (picture_format)
+    {
+        case PIX_FMT_YUV420P:
+            planes[2] = planes[1] + (w * h) / 4;
+            planes_height[1] = planes_height[2] = h/2;
+            planes_width[1] = planes_width[2] = w/2;
+            break;
+        case PIX_FMT_YUV422P:
+            planes[2] = planes[1] + (w * h) / 2;
+            planes_height[1] = planes_height[2] = h;
+            planes_width[1] = planes_width[2] = w/2;
+            break;
+        default:
+            cerr << "Unknown picture format: " << picture_format << endl;
+    }
+
+    buf_out = new unsigned char[(int)(vidbuf->bufferlen * height_multiplier)];
+
+    plane_out = buf_out;
+    frame->buf = buf_out;
+
+    for (int i = 0; i < 3; i++)
+    {
+        unsigned char *plane_in = planes[i];
+        plane_out_end = plane_out + (int) (planes_width[i] * planes_height[i] *
+                        height_multiplier);
+
+        /* Always do first field */
+        memcpy(plane_out, plane_in, planes_width[i]);
+        plane_out += planes_width[i];
+        plane_in += planes_width[i];
+
+        if (!top_field)
+        {
+            memcpy(plane_out, plane_in, planes_width[i]);
+            plane_out += planes_width[i];
+            plane_in += planes_width[i];
+        }
+
+        plane_in += planes_width[i];
+
+        while (plane_out < plane_out_end)
+        {
+            // Replace with optimised memcpy later FIX
+            memcpy(plane_out, plane_in, planes_width[i]);
+            plane_out += planes_width[i];
+            if (interpolate)
+            {
+                if (deinterlace_mode == 
+                                DEINTERLACE_BOB_FULLHEIGHT_LINEAR_INTERPOLATION)
+                {
+                    unsigned char *top = plane_in - 2 * planes_width[i];
+                    unsigned char *bottom = plane_in;
+
+                    // Take average of this field line and the next
+                    // to fill in this field, probably only slightly
+                    // better than copying the line. Also 
+                    // slow for situations where memcpy is optimised
+                    // with asm.
+
+                    for (unsigned int j = 0; j < planes_width[i]; j++)
+                    {
+                        *plane_out++ = ((int)(*top++) + (int)(*bottom++)) >> 1;
+                    }
+                }
+                else // just line double
+                {
+                    memcpy(plane_out, plane_in, planes_width[i]);
+                    plane_out += planes_width[i];
+                }
+            }
+            plane_in += planes_width[i] * 2;
+        }
+    }
+    
+    return frame;
+}
+
+void NuppelVideoRecorder::WriteVideo(Frame *frame)
 {
     int tmp = 0, r = 0, out_len = OUT_LEN;
     struct rtframeheader frameheader;
@@ -1920,31 +2126,27 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int len, int fnum,
     int raw = 0;
     int timeperframe = 40;
     uint8_t *planes[3];
-    Frame frame;
+    int len = frame->len;
+    int fnum = frame->frameNumber;
+    int timecode = frame->timecode;
+    unsigned char *buf = frame->buf;
 
     memset(&frameheader, 0, sizeof(frameheader));
 
     planes[0] = buf;
-    planes[1] = planes[0] + w * h;
+    planes[1] = planes[0] + frame->width * frame->height;
     if (picture_format == PIX_FMT_YUV422P)
-        planes[2] = planes[1] + (w * h) / 2;
+        planes[2] = planes[1] + (frame->width * frame->height) / 2;
     else
-        planes[2] = planes[1] + (w * h) / 4;
+        planes[2] = planes[1] + (frame->width * frame->height) / 4;
     compressthis = compression;
 
-    frame.codec = CODEC_YUV;
-    frame.width = w;
-    frame.height = h;
-    frame.bpp = -1;
-    frame.frameNumber = fnum;
-    frame.buf = buf;
-
     if (lf == 0) 
-    { // this will be triggered every new file
+    {   // this will be triggered every new file
         lf = fnum;
         startnum = fnum;
-	lasttimecode = 0;
-	frameofgop = 0;
+        lasttimecode = 0;
+        frameofgop = 0;
     }
 
     // count free buffers -- FIXME this can be done with less CPU time!!
@@ -1954,19 +2156,20 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int len, int fnum,
             freecount++;
     }
 
-    if ( freecount < (video_buffer_count / 3) ) 
-	compressthis = 0; // speed up the encode process
+    if (freecount < (video_buffer_count / 3)) 
+        compressthis = 0; // speed up the encode process
     
     if (freecount < 5 || rawmode)
-	raw = 1; // speed up the encode process
+        raw = 1; // speed up the encode process
     
-    if(raw==1 || compressthis==0) {
-	if(ringBuffer->IsIOBound())
-	{
-	    /* need to compress, the disk can't handle any more bandwidth*/
-	    raw=0;
-	    compressthis=1;
-	}
+    if(raw==1 || compressthis==0) 
+    {
+        if(ringBuffer->IsIOBound())
+        {
+            /* need to compress, the disk can't handle any more bandwidth*/
+            raw=0;
+            compressthis=1;
+        }
     }
 
     // see if it's time for a seeker header, sync information and a keyframe
@@ -2006,16 +2209,16 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int len, int fnum,
     }
 
     if (videoFilters.size() > 0)
-        process_video_filters(&frame, &videoFilters[0], videoFilters.size());
+        process_video_filters(frame, &videoFilters[0], videoFilters.size());
 
     if (useavcodec)
     {
         mpa_picture.data[0] = planes[0];
         mpa_picture.data[1] = planes[1];
         mpa_picture.data[2] = planes[2];
-        mpa_picture.linesize[0] = w;
-        mpa_picture.linesize[1] = w / 2;
-        mpa_picture.linesize[2] = w / 2;
+        mpa_picture.linesize[0] = frame->width;
+        mpa_picture.linesize[1] = frame->width / 2;
+        mpa_picture.linesize[2] = frame->width / 2;
         mpa_picture.pts = timecode;
         mpa_picture.type = FF_BUFFER_TYPE_SHARED;
 
@@ -2024,13 +2227,13 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int len, int fnum,
         else
             mpa_picture.pict_type = 0;
 
-	if (!hardware_encode)
-	{
+        if (!hardware_encode)
+        {
             pthread_mutex_lock(&avcodeclock);
             tmp = avcodec_encode_video(mpa_ctx, (unsigned char *)strm, 
-                                       video_buffer_size, &mpa_picture); 
+                                       len, &mpa_picture); 
             pthread_mutex_unlock(&avcodeclock);
-	}
+        }
     }
     else
     {
@@ -2041,12 +2244,12 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int len, int fnum,
             tmp = rtjc->Compress(strm, planes);
         }
         else 
-            tmp = video_buffer_size;
+            tmp = len;
 
         // here is lzo compression afterwards
         if (compressthis) {
             if (raw) 
-                r = lzo1x_1_compress((unsigned char*)buf, video_buffer_size, 
+                r = lzo1x_1_compress((unsigned char*)buf, len, 
                                      out, (lzo_uint *)&out_len, wrkmem);
             else
                 r = lzo1x_1_compress((unsigned char *)strm, tmp, out,
@@ -2063,11 +2266,10 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int len, int fnum,
     
     if (dropped>0)
     {
-//	printf("recorder dropped = '%ld' fnum = '%d' lf = '%d'\n", dropped, fnum, lf);
-	if (ntsc)
-	    timeperframe = 1000/30;
-	else
-	    timeperframe = 1000/25;
+        if (ntsc)
+            timeperframe = (int)(1000 / (30 * framerate_multiplier));
+        else
+            timeperframe = (int)(1000 / (25 * framerate_multiplier));
     }
    
     // if we have lost frames we insert "copied" frames until we have the
@@ -2077,11 +2279,6 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int len, int fnum,
     while (0 && dropped > 0) 
     {
         frameheader.timecode = lasttimecode + timeperframe;
-	/*
-	  if(frameheader.timecode - lasttimecode > 49 ||
-	  frameheader.timecode - lasttimecode < 16)
-	  printf("Recorder timecode irregularity 2, last = '%d' cur = '%d'\n", lasttimecode, frameheader.timecode); */
-
         lasttimecode = frameheader.timecode;
         frameheader.keyframe  = frameofgop;             // no keyframe defaulted
         frameheader.packetlength =  0;   // no additional data needed
@@ -2095,10 +2292,6 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int len, int fnum,
 
     frameheader.frametype = 'V'; // video frame
     frameheader.timecode  = timecode;
-    /*
-      if(frameheader.timecode - lasttimecode > 49 ||
-      frameheader.timecode - lasttimecode < 16)
-      printf("Recorder timecode irregularity 1, last = '%d' cur = '%d' fnum = '%d' lf = '%d'\n", lasttimecode, frameheader.timecode, fnum, lf); */
     lasttimecode = frameheader.timecode;
     frameheader.filters   = 0;             // no filters applied
 
@@ -2108,9 +2301,9 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int len, int fnum,
         if (mpa_codec->id == CODEC_ID_RAWVIDEO)
         {
             frameheader.comptype = '0';
-            frameheader.packetlength = video_buffer_size;
+            frameheader.packetlength = len;
             ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
-            ringBuffer->Write(buf, video_buffer_size);
+            ringBuffer->Write(buf, len);
         }
         else if (hardware_encode)
         {
@@ -2139,9 +2332,9 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int len, int fnum,
         else 
         {
             frameheader.comptype  = '0'; // raw YUV420
-            frameheader.packetlength = video_buffer_size;
+            frameheader.packetlength = len;
             ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
-            ringBuffer->Write(buf, video_buffer_size); // we write buf directly
+            ringBuffer->Write(buf, len); // we write buf directly
         }
     } 
     else 
@@ -2158,7 +2351,7 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int len, int fnum,
     frameofgop++;
     framesWritten++;
 
-    if (!hardware_encode && CheckFrameIsBlank(buf, w, h))
+    if (!hardware_encode && CheckFrameIsBlank(buf, frame->width, frame->height))
     {
         blank_frames[framesWritten] = 1;
     }

@@ -42,6 +42,8 @@ TVRec::TVRec(int capturecardnum)
     m_capturecardnum = capturecardnum;
     ispip = false;
 
+    deinterlace_mode = 0;
+
     pthread_mutex_init(&db_lock, NULL);
 
     ConnectDB(capturecardnum);
@@ -423,6 +425,7 @@ void TVRec::HandleStateChange(void)
 void TVRec::SetupRecorder(RecordingProfile& profile) 
 {
     nvr = new NuppelVideoRecorder();
+    nvr->ChangeDeinterlacer(deinterlace_mode);
     nvr->SetRingBuffer(rbuffer);
     nvr->SetVideoDevice(videodev);
     nvr->SetVbiDevice(vbidev);

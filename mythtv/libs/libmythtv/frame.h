@@ -19,6 +19,9 @@ typedef struct Frame_
     int bpp;
     int frameNumber;
     unsigned char *buf;
+    int len;
+    int timecode;
+    int is_field;
 } Frame;
 
 #endif // #ifndef _FRAME_H

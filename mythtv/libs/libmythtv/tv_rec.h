@@ -131,6 +131,8 @@ class TVRec
     RingBuffer *rbuffer;
     Channel *channel;
 
+    int deinterlace_mode;
+
     QSqlDatabase *db_conn;
     pthread_mutex_t db_lock;
 

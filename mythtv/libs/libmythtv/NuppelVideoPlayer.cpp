@@ -1580,6 +1580,8 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         eventvalid = true;
     }
 
+    int frame_time = (int)(1000000/video_frame_rate);
+
     Frame frame;
     
     frame.codec = CODEC_YUV;
@@ -1679,10 +1681,10 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         {
             /* If delay is sometwhat more than a frame or < 0ms, 
                we clip it to these amounts and reset nexttrigger */
-            if ( delay > 40000 )
+            if ( delay > frame_time )
             {
                 // cerr << "Delaying to next trigger: " << delay << endl;
-                delay = 40000;
+                delay = frame_time;
                 usleep(delay);
 
                 gettimeofday(&nexttrigger, NULL);
