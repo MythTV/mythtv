@@ -281,7 +281,7 @@
     <container name="program_info">
       <area>20,12,760,151</area>
       <textarea name="title" draworder="4" align="left">
-        <area>10,10,590,60</area>
+        <area>10,5,590,60</area>
         <font>title</font>
       </textarea>
       <textarea name="subtitle" draworder="6">
@@ -600,30 +600,16 @@
   <window name="conflict">
 
 
-    <font name="norecordfnt" face="Trebuchet Ms">
+    <font name="norecordfnt" base="list-active">
       <color>#9999cc</color>
-      <size>15</size>
-      <size:small>11</size:small>
-      <size:big>17</size:big>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
     </font>
 
-    <font name="conflictfnt" face="Trebuchet Ms">
+    <font name="conflictfnt" base="list-active">
       <color>#ffff33</color>
-      <size>15</size>
-      <size:small>11</size:small>
-      <size:big>17</size:big>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
     </font>
 
-    <font name="currenttitle" face="Trebuchet Ms">
+    <font name="currenttitle" base="list-active">
       <color>#ffff33</color>
-      <size>18</size>
-      <size:small>12</size:small>
-      <size:big>20</size:big>
-      <bold>yes</bold>
     </font>
 
 
@@ -675,8 +661,8 @@
         <fcnfont name="list-record" function="recording"></fcnfont>
         <fcnfont name="list-selected" function="selected"></fcnfont>
         <columnpadding>10</columnpadding>
-        <column number="1" width="145" context="-1"></column>
-        <column number="2" width="137" context="-1"></column>
+        <column number="1" width="160" context="-1"></column>
+        <column number="2" width="134" context="-1"></column>
         <column number="3" width="395" context="-1"></column>
         <column number="4" width="30" context="-1"></column>
         <items>8</items>
@@ -1056,13 +1042,8 @@
       <color>#ffffAA</color>
     </font>
 
-    <font name="currenttitle" face="Trebuchet Ms">
+    <font name="currenttitle" base="list-active">
       <color>#ffff33</color>
-      <size>16</size>
-      <size:big>22</size:big>
-      <size:small>14</size:small>
-      <shadow>2,2</shadow>
-      <bold>yes</bold>
     </font>
 
 
@@ -1113,19 +1094,20 @@
         <fcnfont name="list-active" function="active"></fcnfont>
         <fcnfont name="list-selected" function="selected"></fcnfont>
         <fcnfont name="list-inactive" function="inactive"></fcnfont>
-        <columnpadding>10</columnpadding>
-        <column number="1" width="350" context="-1"></column>
-        <column number="2" width="50" context="-1"></column>
-        <column number="3" width="110" context="0"></column>
+        <columnpadding>5</columnpadding>
+        <column number="1" width="340" context="-1"></column>
+        <column number="2" width="60" context="-1"></column>
+        <column number="3" width="134" context="0"></column>
         <column number="4" width="110" context="1"></column>
+
         <items>7</items>
-        <image function="selectionbar" filename="shared/long_bar.png" location="-20,-12"></image>
+        <image function="selectionbar" filename="shared/long_bar.png" location="-20,-2"></image>
         <image function="uparrow" draworder="6" filename="shared/up_arrow.png" location="750,15"></image>
-        <image function="downarrow" draworder="6" filename="shared/down_arrow.png" location="750,252"></image>
+        <image function="downarrow" draworder="6" filename="shared/down_arrow.png" location="750,258"></image>
       </listarea>
       <image name="showinglines" draworder="5" fleximage="yes">
         <filename>playback_box/showings.png</filename>
-        <position>0,0</position>
+        <position>0,3</position>
       </image>
       <textarea name="current" draworder="6">
         <area>34,131,185,40</area>
@@ -1153,13 +1135,13 @@
       <context>0</context>
       <area>0,340,800,300</area>
       <textarea name="title" draworder="6">
-        <area>25,9,580,40</area>
-        <altarea>20,5,580,40</altarea>
+        <area>25,0,580,44</area>
+        <altarea>20,0,580,44</altarea>
         <font>title</font>
       </textarea>
 
       <textarea name="subtitle" draworder="6">
-        <area>25,44,600,40</area>
+        <area>25,42,600,40</area>
         <font>subtitle</font>
         <multiline>yes</multiline>
       </textarea>
@@ -1170,12 +1152,12 @@
       </textarea>
 
       <textarea name="timedate" draworder="6">
-        <area>170,74,440,30</area>
+        <area>180,74,440,30</area>
         <font>info</font>
       </textarea>
 
       <textarea name="description" draworder="6">
-        <area>25,140,755,125</area>
+        <area>25,130,755,125</area>
         <altarea>20,140,760,125</altarea>
         <font>metadata</font>
         <multiline>yes</multiline>
@@ -1184,24 +1166,24 @@
 
       <image name="commflagged" draworder="6">
         <filename>type/commflagged.png</filename>
-        <position>84,106</position>
+        <position>84,104</position>
       </image>
       <image name="autoexpire" draworder="6">
         <filename>type/autoexpire.png</filename>
-        <position>52,106</position>
+        <position>52,104</position>
       </image>
       <image name="bookmark" draworder="6">
         <filename>type/bookmark.png</filename>
-        <position>116,106</position>
+        <position>116,104</position>
       </image>
       <image name="cutlist" draworder="6">
         <filename>type/cutlist.png</filename>
-        <position>148,106</position>
+        <position>148,104</position>
       </image>
 
       <image name="processing" draworder="6">
         <filename>type/processing.png</filename>
-        <position>20,106</position>
+        <position>20,104</position>
       </image>
 
     </container>
@@ -1308,14 +1290,14 @@
     </container>
 
     <container name="selector">
-      <area>25,260,770,310</area>
+      <area>25,240,770,320</area>
       <listarea name="alphabet" draworder="2">
         <area>23,8,65,295</area>
         <fcnfont name="list-active" function="active"></fcnfont>
         <fcnfont name="list-selected" function="selected"></fcnfont>
         <fcnfont name="list-inactive" function="inactive"></fcnfont>
         <items>9</items>
-        <image function="selectionbar" filename="progfind/progfind_sel1.png" location="-14,-7"></image>
+        <image function="selectionbar" filename="progfind/progfind_sel1.png" location="-14,0"></image>
       </listarea>
       <listarea name="shows" draworder="2">
         <area>88,8,380,295</area>
@@ -1324,7 +1306,7 @@
         <fcnfont name="list-inactive" function="inactive"></fcnfont>
         <column number="1" width="380" context="-1"></column>
         <items>9</items>
-        <image function="selectionbar" filename="progfind/progfind_sel2.png" location="-14,-7"></image>
+        <image function="selectionbar" filename="progfind/progfind_sel2.png" location="-14,0"></image>
       </listarea>
       <listarea name="times" draworder="2">
         <area>470,8,280,295</area>
@@ -1333,26 +1315,26 @@
         <fcnfont name="list-inactive" function="inactive"></fcnfont>
         <fcnfont name="list-record" function="recording"></fcnfont>
         <items>9</items>
-        <image function="selectionbar" filename="progfind/progfind_sel3.png" location="-8,-7"></image>
+        <image function="selectionbar" filename="progfind/progfind_sel3.png" location="-8,0"></image>
       </listarea>
       <image name="lines" draworder="5" fleximage="no">
         <filename>progfind/progfind_lines.png</filename>
-        <position>0,0</position>
+        <position>0,10</position>
       </image>
     </container>
 
     <container name="program_info">
       <area>25,25,750,220</area>
       <textarea name="title" draworder="6">
-        <area>25,15,515,45</area>
+        <area>25,5,515,45</area>
         <font>title</font>
       </textarea>
       <textarea name="subtitle" draworder="6">
-        <area>25,50,700,35</area>
+        <area>25,45,700,35</area>
         <font>subtitle</font>
       </textarea>
       <textarea name="timedate" draworder="6" align="right">
-        <area>290,160,440,27</area>
+        <area>290,156,440,27</area>
        <font>info</font>
       </textarea>
       <textarea name="channel" draworder="6" align="right">
@@ -1366,7 +1348,7 @@
         <value>%LONGREPEAT%%STARS%%DESCRIPTION%</value>
       </textarea>
       <textarea name="recordingstatus" draworder="6">
-        <area>25,180,500,35</area>
+        <area>25,176,500,35</area>
         <font>recstatus</font>
       </textarea>
     </container>

@@ -48,7 +48,10 @@
       <size:big>17</size:big>
     </font>
 
-    <font name="list-active" base="basefont">
+    <font name="list-active" base="basefont" face="Freesans">
+      <size>15</size>
+      <size:small>14</size:small>
+      <size:big>18</size:big>
       <shadow>2,2</shadow>
       <color>#ddddff</color>
     </font>
