@@ -197,6 +197,7 @@ void Channel::SetFormat(const QString &format)
 
     struct video_channel vc;
     memset(&vc, 0, sizeof(vc));
+    vc.channel = currentcapchannel;
     ioctl(videofd, VIDIOCGCHAN, &vc);
     vc.norm = mode;
     ioctl(videofd, VIDIOCSCHAN, &vc);
