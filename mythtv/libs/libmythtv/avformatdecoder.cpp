@@ -452,6 +452,8 @@ bool AvFormatDecoder::CheckVideoParams(int width, int height)
 
 bool AvFormatDecoder::CheckAudioParams(int freq, int channels)
 {
+    return false;
+
     if (freq == audio_sampling_rate && channels == audio_channels)
         return false;
 
