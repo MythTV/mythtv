@@ -2655,7 +2655,7 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
     uint8_t *planes[3];
     int len = frame->size;
     int fnum = frame->frameNumber;
-    int timecode = frame->timecode;
+    long long timecode = frame->timecode;
     unsigned char *buf = frame->buf;
 
     memset(&frameheader, 0, sizeof(frameheader));
