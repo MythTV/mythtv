@@ -11,6 +11,7 @@
 #include "mythcontext.h"
 #include "mythdialogs.h"
 
+#include <unistd.h>
 #include <cmath>
 
 #include <qapplication.h>
