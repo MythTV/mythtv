@@ -853,8 +853,9 @@ public:
         setLabel(QObject::tr("External channel change command"));
         setValue("");
         setHelpText(QObject::tr("If specified, this command will be run to "
-                    "change the channel for inputs which do not have a tuner. "
-                    "The first argument will be the channel number."));
+                    "change the channel for inputs which have an external "
+                    "tuner device such as a cable box. The first argument "
+                    "will be the channel number."));
     };
 };
 
@@ -864,10 +865,10 @@ public:
         CISetting(parent, "tunechan") {
         setLabel(QObject::tr("Preset tuner to channel"));
         setValue("");
-        setHelpText(QObject::tr("If specified, the tuner will change to this "
-                    "channel when the input is selected.  This is only "
-                    "useful if you use your tuner input with an external "
-                    "channel changer."));
+        setHelpText(QObject::tr("Leave this blank unless you have an external "
+                    "tuner that is connected to the tuner input of your card. "
+                    "If so, you will need to specify the preset channel for "
+                    "the signal (normally 3 or 4)."));
     };
 };
 
