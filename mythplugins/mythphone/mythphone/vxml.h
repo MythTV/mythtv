@@ -55,8 +55,9 @@ class vxmlParser
     QString callerName;
     QString vxmlUrl;
     QString httpMethod;
+    QString postNamelist;
     void vxmlThreadWorker();
-    bool loadVxmlPage(QString Url, QString Method, QDomDocument &script);
+    bool loadVxmlPage(QString Url, QString Method, QString Namelist, QDomDocument &script);
     void Parse(QDomDocument &vxmlPage);
     void parseForm(QDomElement &formElm);
     bool parseField(QDomElement &field);

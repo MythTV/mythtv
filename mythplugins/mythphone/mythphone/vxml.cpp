@@ -166,6 +166,7 @@ void vxmlParser::vxmlThreadWorker()
 
     vxmlUrl = gContext->GetSetting("DefaultVxmlUrl");
     httpMethod = "get";
+    postNamelist = "";
     lastUrl = vxmlUrl;
 
     if (vxmlUrl == "")
@@ -173,9 +174,10 @@ void vxmlParser::vxmlThreadWorker()
 
     while ((!killVxmlThread) && (vxmlUrl != ""))
     {
-        loadVxmlPage(vxmlUrl, httpMethod, vxmlDoc);
+        loadVxmlPage(vxmlUrl, httpMethod, postNamelist, vxmlDoc);
         vxmlUrl = "";
         httpMethod = "";
+        postNamelist = "";
 
         Parse(vxmlDoc);
         killVxmlPage = false;
@@ -185,9 +187,10 @@ void vxmlParser::vxmlThreadWorker()
 } 
 
 
-bool vxmlParser::loadVxmlPage(QString strUrl, QString Method, QDomDocument &script)
+bool vxmlParser::loadVxmlPage(QString strUrl, QString Method, QString Namelist, QDomDocument &script)
 {
     QString Content = "";
+    QString httpRequest;
 
     if (strUrl == "Default")
     {
@@ -215,6 +218,7 @@ bool vxmlParser::loadVxmlPage(QString strUrl, QString Method, QDomDocument &scri
 
     QUrl Url(lastUrl, strUrl, TRUE);
     lastUrl = Url;
+    lastUrl.setQuery("");
     QString Query = Url.query();
     if (Query != "")
     {
@@ -229,9 +233,19 @@ bool vxmlParser::loadVxmlPage(QString strUrl, QString Method, QDomDocument &scri
         //
         Query.replace('+', '&'); 
     }
-    QString httpGet = QString("GET %1%2 HTTP/1.0\r\n"
+    if (Method == "get")
+        httpRequest = QString("GET %1%2 HTTP/1.0\r\n"
                               "User-Agent: MythPhone/1.0\r\n"
                               "\r\n").arg(Url.path()).arg(Query);
+    else
+    {
+        Namelist.replace('+', '&'); // As above
+        httpRequest = QString("POST %1%2 HTTP/1.0\r\n"
+                              "User-Agent: MythPhone/1.0\r\n"
+                              "Content-Type: application/x-www-form-urlencoded\r\n"
+                              "Content-Length: %3\r\n"
+                              "\r\n%4").arg(Url.path()).arg(Query).arg(Namelist.length()).arg(Namelist);
+    }
     QSocketDevice *httpSock = new QSocketDevice(QSocketDevice::Stream);
     QHostAddress hostIp;
     int port = Url.port();
@@ -239,12 +253,12 @@ bool vxmlParser::loadVxmlPage(QString strUrl, QString Method, QDomDocument &scri
         port = 80;
     if (hostIp.setAddress(Url.host()))
         hostIp.setAddress("127.0.0.1");
-    cout << "Requesting page from host " << hostIp.toString() << ":" << port << " path " << Url.path() << Query << endl;
+    cout << "Requesting page from host " << hostIp.toString() << ":" << port << " Method: " << Method << " path " << Url.path() << Query << endl;
 
     if (httpSock->connect(hostIp, port))
     {
         int bytesAvail;
-        if ((httpSock->writeBlock(httpGet, httpGet.length()) != -1) &&
+        if ((httpSock->writeBlock(httpRequest, httpRequest.length()) != -1) &&
             ((bytesAvail = httpSock->waitForMore(3000)) != -1))
         {
             char *httpResponse = new char[bytesAvail+1];
@@ -316,6 +330,13 @@ void vxmlParser::Parse(QDomDocument &vxmlPage)
             else if (e.tagName() == "prompt")
             {
                 parsePrompt(e, false);
+            }
+            else if (e.tagName() == "submit")
+            {
+                vxmlUrl = e.attribute("next");
+                postNamelist = e.attribute("namelist");
+                httpMethod = e.attribute("method");
+                killVxmlPage = true;
             }
             else
                 cerr << "Unsupported VXML tag \"" << e.tagName() << "\"\n";
@@ -423,15 +444,19 @@ bool vxmlParser::parseField(QDomElement &field)
         n = n.nextSibling();
     }
 
-    // We've played the prompt, now capture the digits
-    QString inDigits = "";
-    QString newDigits;
-    do
+    // If the prompt got to its natural end then we just quit now; but if it got
+    // stopped by a digit then we carry on waiting for max-digits
+    QString inDigits = Rtp->getDtmf();
+    if ((inDigits.length() > 0) && (inDigits.length() < maxDigits))
     {
-        PlaySilence(4000, true); // Default to waiting 4 seconds for digits
-        newDigits = Rtp->getDtmf();
-        inDigits += newDigits;
-    } while ((inDigits.length() < maxDigits) && (newDigits.length() > 0));
+        QString newDigits;
+        do
+        {
+            PlaySilence(4000, true); // Default to waiting 4 seconds for more digits
+            newDigits = Rtp->getDtmf();
+            inDigits += newDigits;
+        } while ((inDigits.length() < maxDigits) && (newDigits.length() > 0));
+    }
 
     // If we got the right number of digits create the variable
     if (inDigits.length() >= minDigits)
@@ -525,6 +550,7 @@ void vxmlParser::parseNoInput(QDomElement &noInput, bool &reprompt)
             if (e.tagName() == "submit")
             {
                 vxmlUrl = e.attribute("next");
+                postNamelist = e.attribute("namelist");
                 httpMethod = e.attribute("method");
                 killVxmlPage = true;
             }
@@ -621,6 +647,7 @@ bool vxmlParser::parseIfBlock(QDomElement &ifBlock, QString Cond, bool &reprompt
                 if (e.tagName() == "submit")
                 {
                     vxmlUrl = e.attribute("next");
+                    postNamelist = e.attribute("namelist");
                     httpMethod = e.attribute("method");
                     killVxmlPage = true;
                 }
