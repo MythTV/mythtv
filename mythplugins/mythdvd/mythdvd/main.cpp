@@ -158,7 +158,7 @@ void runMenu(QString which_menu)
 
     if (diag->foundTheme())
     {
-        gContext->LCDswitchToTime();
+        gContext->GetLCDDevice()->switchToTime();
         diag->exec();
     }
     else

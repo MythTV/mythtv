@@ -99,7 +99,7 @@ int main(int argc, char **argv)
     //  Get the Myth context and db hooks
     //    
     
-    gContext = new MythContext(MYTH_BINARY_VERSION, false);
+    gContext = new MythContext(MYTH_BINARY_VERSION, false, false);
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!db)
     {
