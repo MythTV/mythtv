@@ -1701,10 +1701,10 @@
         <fcnfont name="active_font" function="selected"></fcnfont>
         <fcnfont name="record_font" function="recording"></fcnfont>
         <fcnfont name="conflict_font" function="conflicting"></fcnfont>
-        <columnpadding>5</columnpadding>
+        <columnpadding>10</columnpadding>
         <column number="1" width="160" context="-1"></column>
         <column number="2" width="120" context="-1"></column>
-        <column number="3" width="440" context="-1"></column>
+        <column number="3" width="420" context="-1"></column>
         <items>11</items>
         <image function="selectionbar" filename="rk-selectbar.png" location="-6,-2"></image>
         <image function="uparrow" filename="uparrow.png" location="755,22"></image>
@@ -1723,11 +1723,11 @@
         <font>title</font>
       </textarea>
       <textarea name="channel" draworder="6">
-        <area>0,40,160,30</area>
+        <area>0,40,190,30</area>
         <font>info</font>
       </textarea>
       <textarea name="timedate" draworder="6">
-        <area>180,40,420,30</area>
+        <area>200,40,420,30</area>
         <font>info</font>
       </textarea>
       <textarea name="subdescr" draworder="6">

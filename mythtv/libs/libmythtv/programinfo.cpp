@@ -1425,7 +1425,7 @@ void ProgramInfo::SetMarkupMap(QMap<long long, int> &marks, QSqlDatabase *db,
         // check to make sure the show still exists before saving markups
         query.prepare("SELECT starttime FROM recorded"
                       " WHERE chanid = :CHANID"
-                      " AND starttime : STARTTIME ;");
+                      " AND starttime :STARTTIME ;");
         query.bindValue(":CHANID", chanid);
         query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
 
