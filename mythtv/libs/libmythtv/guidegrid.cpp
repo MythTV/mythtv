@@ -101,6 +101,8 @@ GuideGrid::GuideGrid(const QString &channel, TV *player, QWidget *parent,
     programGuideType = gContext->GetNumSetting("EPGType");
     if (programGuideType == 1)
     {
+	altTransparent = gContext->GetNumSetting("AltEPGTransparent");
+
 	int dNum = gContext->GetNumSetting("chanPerPage", 8);
 	desiredDisplayChans = DISPLAY_CHANS = dNum;
 
@@ -1300,21 +1302,24 @@ void GuideGrid::paintPrograms(QPainter *p)
                     if (endy > pr.bottom())
                         endy = pr.bottom();
 
-                    unsigned int *data = NULL;
+		    if (altTransparent == 0 || programGuideType != 1)
+		    {
+                       unsigned int *data = NULL;
                    
-                    for (int tmpy = starty; tmpy <= endy; tmpy++)
-                    {
-                        data = (unsigned int *)bgimage.scanLine(tmpy);
-                        for (int tmpx = startx; tmpx <= endx; tmpx++)
-                        {
-                            QRgb pixelcolor = data[tmpx];
-                            data[tmpx] = blendColors(pixelcolor, blendcolor, 
+                       for (int tmpy = starty; tmpy <= endy; tmpy++)
+                       {
+                          data = (unsigned int *)bgimage.scanLine(tmpy);
+                          for (int tmpx = startx; tmpx <= endx; tmpx++)
+                          {
+                              QRgb pixelcolor = data[tmpx];
+                              data[tmpx] = blendColors(pixelcolor, blendcolor, 
                                                      96);
-                        }
-                    }
-                    tmp.drawImage(startx, starty, bgimage, startx, starty, 
+                          }
+                       }
+                       tmp.drawImage(startx, starty, bgimage, startx, starty, 
                                   endx - startx + 1, 
                                   endy - starty + 1);
+		    }
                 }
 
                 int maxwidth = (int)(spread * xdifference - (10 * wmult));
@@ -1440,17 +1445,23 @@ void GuideGrid::paintPrograms(QPainter *p)
                     int rRound = 12;
 
                     // PROGRAM BACKGROUND COLOR
-                    tmp.fillRect(xstart - (rrOffset / 2), 
+		    if (altTransparent != 0)
+		    {
+                           tmp.fillRect(xstart - (rrOffset / 2), 
                                  ystart - (rrOffset / 2),
                                  xend + (rrOffset / 2), 
                                  rectheight + (rrOffset / 2),
                                  QBrush(prog_bgColor, SolidPattern));
+		    }
 
-                    // PROGRAM LINE COLOR
-                    tmp.setPen(QPen(progLine_Color, (int)(.5 * wmult)));
-                    tmp.drawRoundRect(xstart - rrOffset, ystart - rrOffset,
+		    if (altTransparent != 0)
+		    {
+                        // PROGRAM LINE COLOR
+                        tmp.setPen(QPen(progLine_Color, (int)(.5 * wmult)));
+                        tmp.drawRoundRect(xstart - rrOffset, ystart - rrOffset,
                                       xend + rrOffset, rectheight + rrOffset, 
                                       rRound, rRound);
+		    }
 
                     bool isCurrent = false;
 
@@ -1482,12 +1493,23 @@ void GuideGrid::paintPrograms(QPainter *p)
                                 ScheduledRecording::NotRecording)
                             {
                                 // CURRENT PROGRAM HIGHLIGHT COLOR
-                                tmp.fillRect(xstart - (rrOffset / 2), 
+				if (altTransparent != 0)
+                    		{
+                                      tmp.fillRect(xstart - (rrOffset / 2), 
                                              ystart - (rrOffset / 2),
                                              xend + (rrOffset / 2), 
                                              rectheight + (rrOffset / 2),
                                              QBrush(curProg_bgColor, 
-                                             SolidPattern));
+                                             SolidPattern ));
+				}
+				else
+				{
+				      tmp.setPen(QPen(curProg_fgColor, (int)(4 * wmult)));
+				      tmp.drawRect(xstart - (rrOffset / 2), 
+						   ystart - (rrOffset / 2), 
+						   xend + (rrOffset / 2), 
+						   rectheight + (rrOffset / 2));
+				}
                             }
                             else
                             {
@@ -1499,14 +1521,18 @@ void GuideGrid::paintPrograms(QPainter *p)
                                              QBrush(curRecProg_bgColor, 
                                              SolidPattern));
                             }
-                            // PROGRAM LINE COLOR
-                            tmp.setPen(QPen(progLine_Color, 
+
+			    if (altTransparent != 0)
+			    {
+                                // PROGRAM LINE COLOR
+                                tmp.setPen(QPen(progLine_Color, 
                                             (int)(1.5 * wmult)));
-                            tmp.drawRoundRect(xstart - rrOffset, 
+                                tmp.drawRoundRect(xstart - rrOffset, 
                                               ystart - rrOffset,
                                               xend + rrOffset, 
                                               rectheight + rrOffset, rRound, 
                                               rRound);
+			    }
                         }
                     }
 

@@ -157,6 +157,7 @@ class GuideGrid : public MythDialog
 
     int startChannel;
     int programGuideType;
+    int altTransparent;
     int desiredDisplayChans;
     int DISPLAY_CHANS;
     int DISPLAY_TIMES;
