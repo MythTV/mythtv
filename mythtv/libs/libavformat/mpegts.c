@@ -387,7 +387,7 @@ static void pmt_cb(void *opaque, const uint8_t *section, int section_len)
         case STREAM_TYPE_AUDIO_MPEG2:
         case STREAM_TYPE_VIDEO_MPEG1:
         case STREAM_TYPE_VIDEO_MPEG2:
-        case STREAM_TYPE_AUDIO_A52:
+        case STREAM_TYPE_AUDIO_AC3:
             add_pes_stream(ts->stream, pid);
             break;
         default:
@@ -624,7 +624,7 @@ static void mpegts_push_data(void *opaque,
                         if (code >= 0x1c0 && code <= 0x1df) {
                             codec_type = CODEC_TYPE_AUDIO;
                             codec_id = CODEC_ID_MP2;
-                        } else if (code >= 0x1b0 && code <= 0x1bf) {
+                        } else if (code == 0x1bd) {
                             codec_type = CODEC_TYPE_AUDIO;
                             codec_id = CODEC_ID_AC3;
                         } else {
