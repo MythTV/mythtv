@@ -6,6 +6,9 @@
 	
 */
 
+#include <iostream>
+using namespace std;
+
 #include "netflasher.h"
 
 NetFlasher::NetFlasher(UIImageType *icon)
