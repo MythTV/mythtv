@@ -172,6 +172,8 @@ void RemoteFile::Reset(void)
     int avail;
     char *trash;
 
+    usleep(10000);
+
     while (sock->bytesAvailable() > 0)
     {
         pthread_mutex_lock(&lock);
@@ -184,7 +186,7 @@ void RemoteFile::Reset(void)
         pthread_mutex_unlock(&lock);
 
         // cerr << avail << " bytes available during reset.\n";
-        usleep(20000);
+        usleep(30000);
     }
 }
     
@@ -232,8 +234,6 @@ long long RemoteFile::Seek(long long pos, int whence, long long curpos)
     readposition = retval;
 
     Reset();
-
-    RequestBlock(2048);
 
     return retval;
 }
