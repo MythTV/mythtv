@@ -144,6 +144,7 @@ void DaapClient::run()
     for ( an_instance = daap_instances.first(); an_instance; an_instance = daap_instances.next() )
     {
         an_instance->stop();
+        an_instance->wakeUp();
         an_instance->wait();
     }
     

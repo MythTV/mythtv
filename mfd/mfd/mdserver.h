@@ -41,7 +41,7 @@ class MetadataServer : public MFDServicePlugin
     QPtrList<MetadataContainer>* getMetadataContainers(){return metadata_containers;}
     QPtrList<MetadataContainer>* getLocalAudioMetadataContainers(){return local_audio_metadata_containers;}
     MetadataContainer*           getMetadataContainer(int which_one);
-    uint                         getMetadataAudioGeneration();
+    uint                         getMetadataLocalAudioGeneration();
     uint                         getMetadataContainerCount();
     uint                         getAllLocalAudioMetadataCount();
     uint                         getAllLocalAudioPlaylistCount();
@@ -69,6 +69,18 @@ class MetadataServer : public MFDServicePlugin
                                                  );
 
 
+    void                         doAtomicDataDelta(
+                                                    MetadataContainer *which_one,
+                                                    QIntDict<Metadata>* new_metadata,
+                                                    QValueList<int> metadata_additions,
+                                                    QValueList<int> metadata_deletions,
+                                                    QIntDict<Playlist>* new_playlists,
+                                                    QValueList<int> playlist_additions,
+                                                    QValueList<int> playlist_deletions
+                                                 );
+
+
+
   private:
 
     int                          bumpContainerId();
@@ -81,8 +93,8 @@ class MetadataServer : public MFDServicePlugin
     int                         metadata_container_count;
     QMutex                      metadata_container_count_mutex;
 
-    QMutex                      metadata_audio_generation_mutex;
-    uint                        metadata_audio_generation;
+    QMutex                      metadata_local_audio_generation_mutex;
+    uint                        metadata_local_audio_generation;
 
     int                         container_identifier;
     QMutex                      container_identifier_mutex;

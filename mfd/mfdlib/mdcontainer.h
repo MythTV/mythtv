@@ -86,6 +86,15 @@ class MetadataContainer
                                     QValueList<int> playlist_out
                                 );
 
+    void                dataDelta(   
+                                    QIntDict<Metadata>* new_metadata, 
+                                    QValueList<int> metadata_in,
+                                    QValueList<int> metadata_out,
+                                    QIntDict<Playlist>* new_playlists,
+                                    QValueList<int> playlist_in,
+                                    QValueList<int> playlist_out
+                                );
+
     MetadataCollectionContentType  getContentType(){ return content_type;}
     MetadataCollectionLocationType getLocationType(){ return location_type;}
 

@@ -146,6 +146,9 @@ void DaapInstance::run()
     
     DaapRequest first_request(this, "/server-info", server_address);
     first_request.send(client_socket_to_daap_server);
+
+    log(QString("sent daap request: \"%1\"")
+        .arg(first_request.getRequestString()), 9);
     
     while(keep_going)
     {
@@ -186,7 +189,7 @@ void DaapInstance::run()
     
 
         
-        timeout.tv_sec = 200;
+        timeout.tv_sec = 10;
         timeout.tv_usec = 0;
         int result = select(nfds, &readfds, NULL, NULL, &timeout);
         if(result < 0)
@@ -212,7 +215,7 @@ void DaapInstance::run()
                 u_shaped_pipe_mutex.lock();
                     char read_back[2049];
                     read(u_shaped_pipe[0], read_back, 2048);
-                    u_shaped_pipe_mutex.unlock();
+                u_shaped_pipe_mutex.unlock();
             }
         }
     }
@@ -227,6 +230,8 @@ void DaapInstance::run()
         DaapRequest logout_request(this, "/logout", server_address);
         logout_request.addGetVariable("session-id", session_id);
         logout_request.send(client_socket_to_daap_server, true);
+        log(QString("sent daap request: \"%1\"")
+            .arg(first_request.getRequestString()), 9);
     }
     
     //
@@ -486,6 +491,7 @@ bool DaapInstance::checkServerType(const QString &server_description)
 
 void DaapInstance::processResponse(DaapResponse *daap_response)
 {
+
     //
     //  Check the type of server
     //
@@ -562,14 +568,17 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
     if(top_level_tag.type == 'msrv')
     {
         doServerInfoResponse(rebuilt_internal);
+        return;
     }
     else if(top_level_tag.type == 'mlog')
     {
         doLoginResponse(rebuilt_internal);
+        return;
     }
     else if(top_level_tag.type == 'mupd')
     {
         doUpdateResponse(rebuilt_internal);
+        return;
     }
     else if(top_level_tag.type == 'avdb')
     {
@@ -639,12 +648,16 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
             QString request_string = QString("/databases/%1/items").arg(which_database);
             DaapRequest update_request(this, request_string, server_address);
             update_request.addGetVariable("session-id", session_id);
-            update_request.addGetVariable("revision-number", metadata_generation);
             
             int generation_delta = a_database->getKnownGeneration();
             if(generation_delta > 0)
             {
                 update_request.addGetVariable("delta", generation_delta);
+                update_request.addGetVariable("revision-number", metadata_generation);
+            }
+            else
+            {
+                update_request.addGetVariable("revision-number", metadata_generation);
             }
             
             //
@@ -689,6 +702,8 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
 
             current_request_db = a_database;            
             update_request.send(client_socket_to_daap_server);
+            log(QString("sent daap request: \"%1\"")
+                .arg(update_request.getRequestString()), 9);
             
             //
             //  We've already sent a request, don't send another one
@@ -703,17 +718,23 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
             DaapRequest update_request(this, request_string, server_address);
             update_request.addGetVariable("session-id", session_id);
 
-            update_request.addGetVariable("revision-number", metadata_generation);
-
             int generation_delta = a_database->getKnownGeneration();
             if(generation_delta > 0)
             {
                 update_request.addGetVariable("delta", generation_delta);
+                update_request.addGetVariable("revision-number", metadata_generation);
+            }
+            else
+            {
+                update_request.addGetVariable("revision-number", metadata_generation);
             }
             
+
             
             current_request_db = a_database;            
             update_request.send(client_socket_to_daap_server);
+            log(QString("sent daap request: \"%1\"")
+                .arg(update_request.getRequestString()), 9);
             
             //
             //  We've already sent a request, don't send another one
@@ -733,17 +754,22 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
             DaapRequest update_request(this, request_string, server_address);
             update_request.addGetVariable("session-id", session_id);
 
-            update_request.addGetVariable("revision-number", metadata_generation);
-            
             int generation_delta = a_database->getKnownGeneration();
             if(generation_delta > 0)
             {
                 update_request.addGetVariable("delta", generation_delta);
+                update_request.addGetVariable("revision-number", metadata_generation);
+            }
+            else
+            {
+                update_request.addGetVariable("revision-number", metadata_generation);
             }
             
             
             current_request_db = a_database;            
             update_request.send(client_socket_to_daap_server);
+            log(QString("sent daap request: \"%1\"")
+                .arg(update_request.getRequestString()), 9);
             
             //
             //  We've already sent a request, don't send another one
@@ -757,16 +783,19 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
         {
             current_request_db = NULL;
             current_request_playlist = -1;
+            
+            //
+            //  If there's nothing to send, do a hanging update request
+            //
+
+            DaapRequest update_request(this, "/update", server_address);
+            update_request.addGetVariable("session-id", session_id);
+            update_request.addGetVariable("revision-number", metadata_generation);
+            update_request.send(client_socket_to_daap_server);
+            log(QString("sent daap request: \"%1\"")
+                .arg(update_request.getRequestString()), 9);
         }
     }
-
-    //
-    //  If there's nothing to send, do a hanging update request
-    //
-
-    DaapRequest update_request(this, "/update", server_address);
-    update_request.addGetVariable("session-id", session_id);
-    update_request.addGetVariable("revision-number", metadata_generation);
 }
 
 
@@ -979,6 +1008,8 @@ void DaapInstance::doServerInfoResponse(TagInput& dmap_data)
 
     DaapRequest login_request(this, "/login", server_address);
     login_request.send(client_socket_to_daap_server);
+    log(QString("sent daap request: \"%1\"")
+        .arg(login_request.getRequestString()), 9);
     
 }
 
@@ -1050,6 +1081,8 @@ void DaapInstance::doLoginResponse(TagInput& dmap_data)
         update_request.addGetVariable("session-id", session_id);
         update_request.addGetVariable("revision-number", metadata_generation);
         update_request.send(client_socket_to_daap_server);
+        log(QString("sent daap request: \"%1\"")
+            .arg(update_request.getRequestString()), 9);
                 
         
     }
@@ -1122,7 +1155,6 @@ void DaapInstance::doUpdateResponse(TagInput& dmap_data)
     
     if(update_status)
     {
-        metadata_generation = new_metadata_generation;
         
         //
         //  Tell our databases to be ignorant 
@@ -1144,13 +1176,23 @@ void DaapInstance::doUpdateResponse(TagInput& dmap_data)
                     .arg(service_name)
                     .arg(server_address)
                     .arg(server_port)
-                    .arg(metadata_generation), 4);
+                    .arg(new_metadata_generation), 4);
         
         DaapRequest database_request(this, "/databases", server_address);
         database_request.addGetVariable("session-id", session_id);
-        database_request.addGetVariable("revision-number", metadata_generation);
+        database_request.addGetVariable("revision-number", new_metadata_generation);
+
+        if(metadata_generation > 1)
+        {
+            database_request.addGetVariable("delta", metadata_generation);
+        }
+
+
         database_request.send(client_socket_to_daap_server);
+        log(QString("sent daap request: \"%1\"")
+            .arg(database_request.getRequestString()), 9);
         
+        metadata_generation = new_metadata_generation;
         
     }
     else
@@ -1158,6 +1200,7 @@ void DaapInstance::doUpdateResponse(TagInput& dmap_data)
         //
         //  Crap ... 
         //
+        warning("doUpdateResponse() got a bad update status");
     }
 }
 
@@ -1349,23 +1392,37 @@ void DaapInstance::parseDatabaseListings(TagInput& dmap_data, int how_many)
         }    
 
         //
-        //  Create a new database for this ...
+        //  Create a new database for this ... if we don't have one for this already
         //
             
-        Database *new_database = new Database(
-                                                new_database_id,
-                                                new_database_name,
-                                                new_database_expected_item_count,
-                                                new_database_expected_container_count,
-                                                the_mfd,
-                                                parent,
-                                                session_id,
-                                                server_address,
-                                                server_port
+        Database *a_database = NULL;
+        bool need_new_database = true;
+        for ( a_database = databases.first(); a_database; a_database = databases.next() )
+        {
+            if(a_database->getDaapId() == new_database_id)
+            {
+                need_new_database = false;
+                break;
+            }
+        }
+
+        if(need_new_database)
+        {
+            Database *new_database = new Database(
+                                                    new_database_id,
+                                                    new_database_name,
+                                                    new_database_expected_item_count,
+                                                    new_database_expected_container_count,
+                                                    the_mfd,
+                                                    parent,
+                                                    session_id,
+                                                    server_address,
+                                                    server_port
                                              );
-        log(QString("creating new database with daap server id of %1")
-            .arg(new_database_id), 9);
-        databases.append(new_database);
+            log(QString("creating new database with daap server id of %1")
+                .arg(new_database_id), 9);
+            databases.append(new_database);
+        }
     }
 }
 

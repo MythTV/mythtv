@@ -69,13 +69,15 @@ Database::Database(
     new_metadata->setAutoDelete(true);
     new_playlists = new QIntDict<Playlist>;
     new_metadata->setAutoDelete(true);
-
-    /*
+    full_data_update = true;
+    
+    
     metadata_additions.clear();
     metadata_deletions.clear();
     playlist_additions.clear();
     playlist_deletions.clear();
-    */
+    previous_metadata.clear();
+    previous_playlists.clear();
 
 }
 
@@ -152,6 +154,7 @@ void Database::doDatabaseItemsResponse(TagInput& dmap_data)
                 
                 dmap_data >> a_u32_variable;
                 new_numb_items = a_u32_variable;
+                checkUpdateType(new_numb_items, new_received_numb_items);
                 break;
                 
             case 'mrco':
@@ -162,6 +165,7 @@ void Database::doDatabaseItemsResponse(TagInput& dmap_data)
                 
                 dmap_data >> a_u32_variable;
                 new_received_numb_items = a_u32_variable;
+                checkUpdateType(new_numb_items, new_received_numb_items);
                 break;
                 
             case 'mlcl':
@@ -177,6 +181,19 @@ void Database::doDatabaseItemsResponse(TagInput& dmap_data)
                 }
                 break;
 
+            case 'mudl':
+
+                //
+                //  This is "listing" tag, with a list of things to delete since the previous 
+                //
+                
+                dmap_data >> a_chunk;
+                {
+                    TagInput re_rebuilt_internal(a_chunk);
+                    parseDeletions(re_rebuilt_internal);
+                }
+                break;
+
             default:
                 warning("got an unknown tag type "
                         "while doing doDatabaseItemsResponse()");
@@ -188,9 +205,37 @@ void Database::doDatabaseItemsResponse(TagInput& dmap_data)
     }
 
     have_items = true;    
+}
+
+
+void Database::checkUpdateType(int new_numb_items, int new_received_numb_items)
+{
+    if(new_numb_items == -1 || new_received_numb_items == -1)
+    {
+        return;
+    }
+
+    if(new_numb_items == new_received_numb_items)
+    {
+        //
+        //  We're getting all data from the daap server, not a partial
+        //  update
+        //
+        log("receiving a complete data update from daap server", 9);
+        full_data_update = true;
+    }
+    else
+    {
+        log("receiving a partial (delta) update from daap server", 9);
+        full_data_update = false;
+        metadata_additions.clear();
+        metadata_deletions.clear();
+    }
+    
+
 }    
 
-void Database::parseItems(TagInput& dmap_data, int how_many)
+void Database::parseItems(TagInput& dmap_data, int how_many_now)
 {
 
     Tag a_tag;
@@ -206,7 +251,7 @@ void Database::parseItems(TagInput& dmap_data, int how_many)
     QTime loading_time;
     loading_time.start();    
     
-    for(int i = 0; i < how_many; i++)
+    for(int i = 0; i < how_many_now; i++)
     {
         Chunk emergency_throwaway_chunk;
 
@@ -634,6 +679,7 @@ void Database::parseItems(TagInput& dmap_data, int how_many)
             //            
             
             new_item->setCollectionId(container_id);
+            new_item->setId(new_item_id);
 
             QDateTime when;
             when.setTime_t(new_item_date_added);
@@ -662,8 +708,6 @@ void Database::parseItems(TagInput& dmap_data, int how_many)
             
             new_metadata->insert(new_item->getId(), new_item);
 
-                                
-            
         }
         else
         {
@@ -676,8 +720,52 @@ void Database::parseItems(TagInput& dmap_data, int how_many)
     double elapsed_time = loading_time.elapsed() / 1000.0;
     log(QString("parsed and loaded metadata for %1 "
                 "items in %2 seconds")
-                .arg(how_many)
+                .arg(how_many_now)
                 .arg(elapsed_time), 4);
+}
+
+
+void Database::parseDeletions(TagInput& dmap_data)
+{
+    if(full_data_update)
+    {
+        warning("Got deltas (deletions), but "
+                "am in full data mode (?)");
+    }
+
+    while(!dmap_data.isFinished())
+    {
+    
+        u32 a_u32_variable;
+
+        Tag a_tag;
+        Chunk emergency_throwaway_chunk;
+        dmap_data >> a_tag;
+        
+        switch(a_tag.type)
+        {
+            //
+            //  This ain't pretty, and there are a lot of them, but it
+            //  works (and, suprisingly, it's not aching slow)
+            //
+
+            case 'miid':
+                
+                    //
+                    //  item id, the thing that has been deleted
+                    //
+
+                    dmap_data >> a_u32_variable;
+                    metadata_deletions.push_back(a_u32_variable);
+                    break;
+
+            default:
+                    
+                warning("unknown tag while parsing database item");
+                dmap_data >> emergency_throwaway_chunk;
+        }
+        dmap_data >> end;
+    }
 }
 
 void Database::doDatabaseListPlaylistsResponse(TagInput &dmap_data)
@@ -777,6 +865,14 @@ void Database::doDatabaseListPlaylistsResponse(TagInput &dmap_data)
     }
 
     have_playlist_list = true;
+    if(new_numb_playlists == 0)
+    {
+        //
+        //  There are no containers (playlists) to get
+        //
+        
+        have_playlists = true;
+    }
 }
 
 void Database::parseContainers(TagInput& dmap_data, int how_many)
@@ -864,10 +960,11 @@ void Database::parseContainers(TagInput& dmap_data, int how_many)
 
         if(new_playlist_id > -1 && new_playlist_name.length() > 0)
         {
+
             //
             //  Make a playlist
             //
-            
+        
             Playlist *new_playlist = new Playlist(
                                                     container_id,
                                                     new_playlist_name,
@@ -1123,102 +1220,187 @@ void Database::parsePlaylist(TagInput &dmap_data, int how_many, Playlist *which_
 void Database::doTheMetadataSwap()
 {
     //
-    //  This gets called when everything is up to date.
+    //  This gets called when everything is up to date.  (ie. we've made all
+    //  the /database/whatever calls, and have got all the way to sitting in
+    //  a hanging update)
     //
 
 
-    //
-    //  Make a reference to what we had, so we can tell next time what changed
-    //    
-    
-    //
-    //  find new metadata (additions)
-    //
-
-    QIntDictIterator<Metadata> iter(*new_metadata);
-    for (; iter.current(); ++iter)
+    if(full_data_update)
     {
-        int an_integer = iter.currentKey();
-        if(previous_metadata.find(an_integer) == previous_metadata.end())
+
+        //
+        //  find new metadata (additions)
+        //
+
+        QIntDictIterator<Metadata> iter(*new_metadata);
+        for (; iter.current(); ++iter)
         {
+            int an_integer = iter.currentKey();
+            if(previous_metadata.find(an_integer) == previous_metadata.end())
+            {
+                metadata_additions.push_back(an_integer);
+            }
+        }
+
+        //
+        //  find old metadata (deletions)
+        //
+
+        QValueList<int>::iterator other_iter;
+        for ( other_iter = previous_metadata.begin(); other_iter != previous_metadata.end(); ++other_iter )
+        {
+            int an_integer = (*other_iter);
+            if(!new_metadata->find(an_integer))
+            {
+                metadata_deletions.push_back(an_integer);
+            }
+        }
+
+
+        //
+        //  find new playlists (additions)
+        //
+
+        QIntDictIterator<Playlist> apl_iter(*new_playlists);
+        for (; apl_iter.current(); ++apl_iter)
+        {
+            int an_integer = apl_iter.currentKey();
+            if(previous_playlists.find(an_integer) == previous_playlists.end())
+            {
+                playlist_additions.push_back(an_integer);
+            }
+        }
+
+        //
+        //  find old playlists (deletions)
+        //
+
+        QValueList<int>::iterator ysom_iter;
+        for ( ysom_iter = previous_playlists.begin(); ysom_iter != previous_playlists.end(); ++ysom_iter )
+        {
+            int an_integer = (*ysom_iter);
+            if(!new_playlists->find(an_integer))
+            {
+                playlist_deletions.push_back(an_integer);
+            }
+        }
+
+        //
+        //  Make copies for next time through
+        //    
+    
+        previous_metadata.clear();
+        QIntDictIterator<Metadata> yano_iter(*new_metadata);
+        for (; yano_iter.current(); ++yano_iter)
+        {
+            int an_integer = yano_iter.currentKey();
+            previous_metadata.push_back(an_integer);
+        }
+            
+    
+        previous_playlists.clear();
+        QIntDictIterator<Playlist> syano_iter(*new_playlists);
+        for (; syano_iter.current(); ++syano_iter)
+        {
+            int an_integer = syano_iter.currentKey();
+            previous_playlists.push_back(an_integer);
+        }
+
+        metadata_server->doAtomicDataSwap(
+                                            metadata_container, 
+                                                  new_metadata, 
+                                            metadata_additions,
+                                            metadata_deletions,
+                                                 new_playlists,
+                                            playlist_additions,
+                                            playlist_deletions
+                                         );
+
+
+    }
+    else    //  this was a partial update from the daap server
+    {
+
+        //
+        //  Additions _are_ the metadata
+        //
+
+        QIntDictIterator<Metadata> iter(*new_metadata);
+        for (; iter.current(); ++iter)
+        {
+            int an_integer = iter.currentKey();
             metadata_additions.push_back(an_integer);
         }
-    }
-            
-    //
-    //  find old metadata (deletions)
-    //
-            
-    QValueList<int>::iterator other_iter;
-    for ( other_iter = previous_metadata.begin(); other_iter != previous_metadata.end(); ++other_iter )
-    {
-        int an_integer = (*other_iter);
-        if(!new_metadata->find(an_integer))
+
+        //
+        //  Deletions are already set
+        //
+
+        
+
+        //
+        //  find new playlists (additions)
+        //
+
+        QIntDictIterator<Playlist> apl_iter(*new_playlists);
+        for (; apl_iter.current(); ++apl_iter)
         {
-            metadata_deletions.push_back(an_integer);
+            int an_integer = apl_iter.currentKey();
+            if(previous_playlists.find(an_integer) == previous_playlists.end())
+            {
+                playlist_additions.push_back(an_integer);
+            }
         }
-    }
 
+        //
+        //  find old playlists (deletions)
+        //
 
-    //
-    //  find new playlists (additions)
-    //
-
-    QIntDictIterator<Playlist> apl_iter(*new_playlists);
-    for (; apl_iter.current(); ++apl_iter)
-    {
-        int an_integer = apl_iter.currentKey();
-        if(previous_playlists.find(an_integer) == previous_playlists.end())
+        QValueList<int>::iterator ysom_iter;
+        for ( ysom_iter = previous_playlists.begin(); ysom_iter != previous_playlists.end(); ++ysom_iter )
         {
-            playlist_additions.push_back(an_integer);
+            int an_integer = (*ysom_iter);
+            if(!new_playlists->find(an_integer))
+            {
+                playlist_deletions.push_back(an_integer);
+            }
         }
-    }
-            
-    //
-    //  find old playlists (deletions)
-    //
-            
-    QValueList<int>::iterator ysom_iter;
-    for ( ysom_iter = previous_playlists.begin(); ysom_iter != previous_playlists.end(); ++ysom_iter )
-    {
-        int an_integer = (*ysom_iter);
-        if(!new_playlists->find(an_integer))
-        {
-            playlist_deletions.push_back(an_integer);
-        }
-    }
 
-    //
-    //  Make copies for next time through
-    //    
+        //
+        //  Try and keep the previous stuff up to date (add new metadata,
+        //  and all playlists, since pl don't delta)
+        //    
     
-    previous_metadata.clear();
-    QIntDictIterator<Metadata> yano_iter(*new_metadata);
-    for (; yano_iter.current(); ++yano_iter)
-    {
-        int an_integer = yano_iter.currentKey();
-        previous_metadata.push_back(an_integer);
-    }
+        QIntDictIterator<Metadata> yano_iter(*new_metadata);
+        for (; yano_iter.current(); ++yano_iter)
+        {
+            int an_integer = yano_iter.currentKey();
+            previous_metadata.push_back(an_integer);
+        }
             
     
-    previous_playlists.clear();
-    QIntDictIterator<Playlist> syano_iter(*new_playlists);
-    for (; syano_iter.current(); ++syano_iter)
-    {
-        int an_integer = syano_iter.currentKey();
-        previous_playlists.push_back(an_integer);
-    }
-            
-    metadata_server->doAtomicDataSwap(
-                                        metadata_container, 
-                                              new_metadata, 
-                                        metadata_additions,
-                                        metadata_deletions,
-                                             new_playlists,
-                                        playlist_additions,
-                                        playlist_deletions
-                                     );
+        previous_playlists.clear();
+        QIntDictIterator<Playlist> syano_iter(*new_playlists);
+        for (; syano_iter.current(); ++syano_iter)
+        {
+            int an_integer = syano_iter.currentKey();
+            previous_playlists.push_back(an_integer);
+        }
 
+        metadata_server->doAtomicDataDelta(
+                                            metadata_container, 
+                                                  new_metadata, 
+                                            metadata_additions,
+                                            metadata_deletions,
+                                                 new_playlists,
+                                            playlist_additions,
+                                            playlist_deletions
+                                         );
+
+
+    }
+    
 
     //
     //  The container now owns the metadata and playlists. We need some new
@@ -1229,7 +1411,6 @@ void Database::doTheMetadataSwap()
     new_metadata->setAutoDelete(true);
     new_playlists = new QIntDict<Playlist>;
     new_metadata->setAutoDelete(true);
-    
     
     
 }

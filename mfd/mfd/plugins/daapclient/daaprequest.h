@@ -34,7 +34,8 @@ class DaapRequest
     bool send(QSocketDevice *where_to_send, bool ignore_shutdown=false);
     void addGetVariable(const QString &label, int value);
     void addGetVariable(const QString &label, const QString &value);
-    
+    QString getRequestString();
+        
   private:
 
     DaapInstance *parent;
@@ -43,6 +44,7 @@ class DaapRequest
     
     QString base_url;
     QString host_address;
+    QString stored_request;
 
     QDict<HttpGetVariable>   get_variables;
     

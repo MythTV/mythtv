@@ -338,7 +338,6 @@ void avfDecoder::run()
         len = pkt->size;
         mutex()->unlock();
 
-        cout << "Pulled " << len << " bytes from input file " << endl;
 
         while (len > 0 && !done && !finish && !user_stop && seekTime <= 0.0)  
         {
@@ -351,7 +350,6 @@ void avfDecoder::run()
             dec_len = avcodec_decode_audio(audio_dec, samples, &data_size, 
                                            ptr, len);    
                                            
-            cout << "decoder processed " << dec_len << " bytes " << endl;
             if (dec_len < 0) 
             {
                 mutex()->unlock();

@@ -26,7 +26,7 @@ MetadataServer::MetadataServer(MFD* owner, int port)
     metadata_containers->setAutoDelete(true);
     local_audio_metadata_containers = new QPtrList<MetadataContainer>;
     local_audio_metadata_containers->setAutoDelete(false);
-    metadata_audio_generation = 4;  //  don't ask
+    metadata_local_audio_generation = 4;  //  don't ask
     container_identifier = 0;
     
     local_audio_metadata_count = 0;
@@ -102,12 +102,12 @@ void MetadataServer::unlockMetadata()
     metadata_mutex.unlock();
 }
 
-uint MetadataServer::getMetadataAudioGeneration()
+uint MetadataServer::getMetadataLocalAudioGeneration()
 {
     uint return_value;
-    metadata_audio_generation_mutex.lock();
-        return_value = metadata_audio_generation;
-    metadata_audio_generation_mutex.unlock();
+    metadata_local_audio_generation_mutex.lock();
+        return_value = metadata_local_audio_generation;
+    metadata_local_audio_generation_mutex.unlock();
     return return_value;
 }
 
@@ -328,12 +328,12 @@ void MetadataServer::deleteContainer(int container_id)
         //  generation)
         //
         
-        if(ex_type == MCCT_audio)
+        if(ex_type == MCCT_audio && ex_location == MCLT_host)
         {
-            metadata_audio_generation_mutex.lock();
-                ++metadata_audio_generation;
-                ++metadata_audio_generation;
-            metadata_audio_generation_mutex.unlock();
+            metadata_local_audio_generation_mutex.lock();
+                ++metadata_local_audio_generation;
+                ++metadata_local_audio_generation;
+            metadata_local_audio_generation_mutex.unlock();
         }
 
         MetadataChangeEvent *mce = new MetadataChangeEvent(-1);
@@ -432,12 +432,6 @@ void MetadataServer::doAtomicDataSwap(
                                 .arg(playlist_deletions.count())
                                 ,4);
 
-                    if(target->isAudio())
-                    {
-                        metadata_audio_generation_mutex.lock();
-                            ++metadata_audio_generation;
-                        metadata_audio_generation_mutex.unlock();
-                    }
                     if(target->isLocal() && target->isAudio())
                     {
                         local_audio_metadata_count = 
@@ -446,16 +440,117 @@ void MetadataServer::doAtomicDataSwap(
                         local_audio_playlist_count = 
                                 local_audio_playlist_count 
                                 + target->getPlaylistCount();
+                        metadata_local_audio_generation_mutex.lock();
+                            ++metadata_local_audio_generation;
+                        metadata_local_audio_generation_mutex.unlock();
                     }
                 local_audio_playlist_count_mutex.unlock();
             local_audio_metadata_count_mutex.unlock();
         }
         else
         {
-            //  Crap!
+            warning("can not do a an AtomicDataSwap()"
+                    " on a Container I don't own");
         }
         
     unlockMetadata();
+}
+
+void MetadataServer::doAtomicDataDelta(
+                                        MetadataContainer *which_one,
+                                        QIntDict<Metadata>* new_metadata,
+                                        QValueList<int> metadata_additions,
+                                        QValueList<int> metadata_deletions,
+                                        QIntDict<Playlist>* new_playlists,
+                                        QValueList<int> playlist_additions,
+                                        QValueList<int> playlist_deletions
+                                     )
+{
+
+
+    //
+    //  Lock the metadata, find the right container, and _delta_ its data. 
+    //
+    //  The "atomic" idea is the same as above, but here we're adding to
+    //  whats already there (for metadata, playlists are still a swap out)
+    //
+
+    lockMetadata();
+
+        MetadataContainer *target = NULL;
+        MetadataContainer *a_container;
+        for (
+                a_container = metadata_containers->first(); 
+                a_container; 
+                a_container = metadata_containers->next()
+            )
+        {
+            if(a_container == which_one)
+            {
+                target = a_container;
+                break; 
+            }
+        }
+        
+        if(target)
+        {
+            local_audio_metadata_count_mutex.lock();
+                local_audio_playlist_count_mutex.lock();
+            
+                    if(target->isLocal() && target->isAudio())
+                    {
+                        local_audio_playlist_count = 
+                                local_audio_playlist_count 
+                                - target->getPlaylistCount();
+                    }
+
+                    target->dataDelta(
+                                    new_metadata, 
+                                    metadata_additions,
+                                    metadata_deletions,
+                                    new_playlists,
+                                    playlist_additions,
+                                    playlist_deletions
+                                    );
+
+                    log(QString("container %1 did delta of new data: "
+                                "%2 items (+%3/-%4) and "
+                                "%5 containers/playlists (+%6/-%7)")
+                                .arg(target->getIdentifier())
+
+                                .arg(target->getMetadataCount())
+                                .arg(metadata_additions.count())
+                                .arg(metadata_deletions.count())
+                                
+                                .arg(new_playlists->count())
+                                .arg(playlist_additions.count())
+                                .arg(playlist_deletions.count())
+                                ,4);
+
+                    if(target->isLocal() && target->isAudio())
+                    {
+                        local_audio_metadata_count = 
+                                local_audio_metadata_count 
+                                + target->getMetadataCount();
+                        local_audio_playlist_count = 
+                                local_audio_playlist_count 
+                                + target->getPlaylistCount();
+                        metadata_local_audio_generation_mutex.lock();
+                            ++metadata_local_audio_generation;
+                        metadata_local_audio_generation_mutex.unlock();
+                    }
+                local_audio_playlist_count_mutex.unlock();
+            local_audio_metadata_count_mutex.unlock();
+        }
+        else
+        {
+            warning("can not do a an AtomicDataSwap()"
+                    " on a Container I don't own");
+        }
+        
+    unlockMetadata();
+
+
 }
 
 MetadataContainer* MetadataServer::getMetadataContainer(int which_one)

@@ -152,6 +152,64 @@ void MetadataContainer::dataSwap(
     playlist_deletions = playlist_out;
 }
 
+void MetadataContainer::dataDelta(
+                                    QIntDict<Metadata>* new_metadata, 
+                                    QValueList<int> metadata_in,
+                                    QValueList<int> metadata_out,
+                                    QIntDict<Playlist>* new_playlists,
+                                    QValueList<int> playlist_in,
+                                    QValueList<int> playlist_out
+                                )
+{
+    //
+    //  Add the new metadata
+    //
+
+    QIntDictIterator<Metadata> it( *new_metadata ); 
+    for ( ; it.current(); ++it )
+    {
+        current_metadata->insert(it.currentKey(), it.current());
+    }
+
+    //
+    //  Delete the -deltas
+    //
+    
+    current_metadata->setAutoDelete(false);    
+    QValueList<int>::iterator iter;
+    for ( iter = metadata_out.begin(); iter != metadata_out.end(); ++iter )
+    {
+        if(!current_metadata->remove((*iter)))
+        {
+            warning(QString("while doing a neg delta, asked "
+                    "to remove something that wasn't there: %1")
+                    .arg((*iter)));
+        }
+    }
+
+    delete new_metadata;
+
+    if(current_playlists)
+    {
+        delete current_playlists;
+    }
+
+    current_playlists = new_playlists;
+
+    //
+    //  NB: these are QDeepCopy variables, so this object now has its own
+    //  private copy of the deltas (additions, deletions). That means the
+    //  thread that assigned them can keep looking at (iterating over) it's
+    //  copy without screwing up _this_ copy (I think).
+    //
+
+    metadata_additions = metadata_in;
+    metadata_deletions = metadata_out;
+
+    playlist_additions = playlist_in;
+    playlist_deletions = playlist_out;
+}
+
 MetadataContainer::~MetadataContainer()
 {
     if(current_metadata)

@@ -25,6 +25,7 @@ DaapRequest::DaapRequest(
     base_url = l_base_url;
     host_address = l_host_address;
     get_variables.setAutoDelete(true);
+    stored_request = "";
 }
 
 void DaapRequest::addGetVariable(const QString& label, int value)
@@ -79,6 +80,13 @@ bool DaapRequest::send(QSocketDevice *where_to_send, bool ignore_shutdown)
 
     QString top_line = QString("GET %1 HTTP/1.1\r\n").arg(extended_url);
     addText(&the_request, top_line);
+
+    //
+    //  You can change this to stored_request = extended URL if you want
+    //  to get debugging output that includes the GET variables
+    //
+    
+    stored_request = base_url;
     
     //
     //  Add a few more "standard" daap headers (ie. things that iTunes sends
@@ -256,6 +264,20 @@ bool DaapRequest::sendBlock(std::vector<char> block_to_send, QSocketDevice *wher
     }
     
     return true;
+}
+
+QString DaapRequest::getRequestString()
+{
+    QString return_value;
+    if(stored_request.length() < 1)
+    {
+        return_value = "ERROR request not yet sent ERROR";
+    }
+    else
+    {
+        return_value = stored_request;
+    }
+    return return_value;
 }
 
 DaapRequest::~DaapRequest()

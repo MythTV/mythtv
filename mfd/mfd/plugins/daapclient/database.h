@@ -49,7 +49,8 @@ class Database
     int     getFirstPlaylistWithoutList();
 
     void    doDatabaseItemsResponse(TagInput &dmap_data);
-    void    parseItems(TagInput &dmap_data, int how_many);
+    void    parseItems(TagInput &dmap_data, int how_many_now);
+    void    parseDeletions(TagInput &dmap_data);    
 
     void    doDatabaseListPlaylistsResponse(TagInput &dmap_data);    
     void    parseContainers(TagInput &dmap_data, int how_many);
@@ -61,6 +62,7 @@ class Database
     
     int     getKnownGeneration(){return generation_delta;}
     void    beIgnorant();
+    void    checkUpdateType(int new_numb_items, int new_received_numb_items);
          
   private:   
 
@@ -97,7 +99,7 @@ class Database
     QValueList<int>     previous_metadata;
     QValueList<int>     previous_playlists;
 
-    int generation_delta;
-
+    int     generation_delta;
+    bool    full_data_update;
 };
 #endif  // database_h_

@@ -143,7 +143,7 @@ void DaapServer::handleIncoming(HttpRequest *http_request, int client_id)
 
         metadata_server->lockMetadata();
 
-            uint audio_generation = metadata_server->getMetadataAudioGeneration();
+            uint audio_generation = metadata_server->getMetadataLocalAudioGeneration();
 
             if(daap_request->getDatabaseVersion() != audio_generation &&
                daap_request->getDatabaseVersion() != 0)
@@ -198,7 +198,7 @@ void DaapServer::handleIncoming(HttpRequest *http_request, int client_id)
         //
 
 
-        uint audio_generation = metadata_server->getMetadataAudioGeneration();
+        uint audio_generation = metadata_server->getMetadataLocalAudioGeneration();
         if(daap_request->getDatabaseVersion() != audio_generation)
         {
             log(QString(": a client asked for and will get an update "
@@ -223,7 +223,7 @@ void DaapServer::handleIncoming(HttpRequest *http_request, int client_id)
             {
                 hanging_updates_mutex.lock();
                     hanging_updates.append(client_id);
-                    log(QString("now have %1 clients sitting in hanging updates")
+                    log(QString("now has %1 client(s) sitting in a hanging update")
                         .arg(hanging_updates.count()), 8);
                 hanging_updates_mutex.unlock();
             }
@@ -855,7 +855,7 @@ void DaapServer::sendDatabase(HttpRequest *http_request, DaapRequest *daap_reque
     //  send deltas (+/-) additions if it makes sense, otherwise send everything
     //
 
-    uint audio_generation = metadata_server->getMetadataAudioGeneration();
+    uint audio_generation = metadata_server->getMetadataLocalAudioGeneration();
     uint client_db_generation = daap_request->getDatabaseVersion();
     uint client_db_delta = daap_request->getDatabaseDelta();
 
@@ -948,7 +948,7 @@ void DaapServer::sendDatabase(HttpRequest *http_request, DaapRequest *daap_reque
                     << Tag('mlcl') ;
              
         //
-        // Iterate over all the containers, and then over every item in
+        // Iterate over all the _local_ _audio_ containers, and then over every item in
         // each container
         //
              
@@ -960,7 +960,7 @@ void DaapServer::sendDatabase(HttpRequest *http_request, DaapRequest *daap_reque
             a_container = metadata_containers->next() 
            )
         {
-            if(a_container->isAudio())
+            if(a_container->isAudio() && a_container->isLocal() )
             {
                 QIntDict<Metadata>     *which_metadata;
                 which_metadata = a_container->getMetadata();
@@ -1136,7 +1136,7 @@ void DaapServer::sendContainers(HttpRequest *http_request, DaapRequest *daap_req
                     a_container = metadata_containers->next() 
                    )
                 {
-                    if(a_container->isAudio())
+                    if(a_container->isAudio() && a_container->isLocal() )
                     {
                         QIntDict<Playlist> *which_playlists = a_container->getPlaylists();
                         if(which_playlists)
@@ -1239,7 +1239,7 @@ void DaapServer::sendContainer(HttpRequest *http_request, u32 container_id, int 
                             a_container = metadata_containers->next() 
                            )
                         {
-                            if(a_container->isAudio())
+                            if(a_container->isAudio() && a_container->isLocal() )
                             {
                                 QIntDict<Metadata>     *which_metadata;
                                 which_metadata = a_container->getMetadata();
@@ -1287,7 +1287,7 @@ void DaapServer::handleMetadataChange(int which_collection)
             {
                 take_action = true;
             }
-            audio_generation = metadata_server->getMetadataAudioGeneration();
+            audio_generation = metadata_server->getMetadataLocalAudioGeneration();
         metadata_server->unlockMetadata();
     }
     else
