@@ -769,8 +769,8 @@ void MythXMLParser::parseTextArea(MythUIContainer *container, QDomElement &eleme
         }
     }
 
-    area.moveTopLeft(container->getPosition());
-    alt_area.moveTopLeft(container->getPosition());
+    area.moveBy(container->getPosition().x(), container->getPosition().y());
+    alt_area.moveBy(container->getPosition().x(), container->getPosition().y());
 
     MythUIText *new_text = new MythUIText(value, *font, area, 
                                         alt_area, owner, name);
