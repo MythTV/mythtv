@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <qapplication.h>
+#include <qdir.h>
 #include <qdialog.h>
 #include <qlayout.h>
 #include <qlabel.h>
@@ -435,6 +436,7 @@ void Ripper::ripthedisc(void)
     CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
 
     QString musicdir = gContext->GetSetting("MusicLocation");
+    musicdir = QDir::cleanDirPath(musicdir);
     if (!musicdir.endsWith("/"))
         musicdir += "/";
 

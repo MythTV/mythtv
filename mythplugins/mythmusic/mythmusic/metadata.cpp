@@ -2,7 +2,7 @@
 #include <qsqldatabase.h> 
 #include <qregexp.h> 
 #include <qdatetime.h>
-
+#include <qdir.h>
 
 using namespace std;
 
@@ -426,6 +426,7 @@ void AllMusic::resync()
 
     QString filename;
     QString startdir = gContext->GetSetting("MusicLocation");
+    startdir = QDir::cleanDirPath(startdir);
     if (!startdir.endsWith("/"));
         startdir += "/";
 

@@ -12,6 +12,7 @@
 
 #include <qobject.h>
 #include <qptrlist.h>
+#include <qdir.h>
 #include <qstringlist.h>
 #include <qregexp.h>
 
@@ -97,6 +98,7 @@ QString Decoder::musiclocation = "";
 void Decoder::SetLocationFormatUseTags(void)
 {
     QString startdir = gContext->GetSetting("MusicLocation");
+    startdir = QDir::cleanDirPath(startdir);
     if (!startdir.endsWith("/"))
         startdir += "/";
 

@@ -1,5 +1,6 @@
 #include <qsqldatabase.h>
 #include <qstring.h>
+#include <qdir.h>
 
 #include <iostream>
 using namespace std;
@@ -86,6 +87,7 @@ void UpgradeMusicDatabaseSchema(void)
     if (dbver == "1000")
     {
         QString startdir = gContext->GetSetting("MusicLocation");
+        startdir = QDir::cleanDirPath(startdir);
         if (!startdir.endsWith("/"))
             startdir += "/";
 

@@ -126,7 +126,7 @@ void SavePending(QSqlDatabase *db, int pending)
 
     QSqlQuery some_query(some_query_string, db);
     
-    if(some_query.numRowsAffected() == 0)
+    if (some_query.numRowsAffected() == 0)
     {
         //  first run from this host / recent version
         QString a_query_string = QString("INSERT INTO settings (value,data,"
@@ -138,7 +138,7 @@ void SavePending(QSqlDatabase *db, int pending)
         QSqlQuery another_query(a_query_string, db);
 
     }
-    else if(some_query.numRowsAffected() == 1)
+    else if (some_query.numRowsAffected() == 1)
     {
         //  ah, just right
         
@@ -179,8 +179,9 @@ void SearchDir(QString &directory)
 
     BuildFileList(directory, music_files);
 
-    QSqlQuery query("SELECT filename FROM musicmetadata WHERE filename NOT LIKE ('%://%');",
-        QSqlDatabase::database());
+    QSqlQuery query("SELECT filename FROM musicmetadata "
+                    "WHERE filename NOT LIKE ('%://%');",
+                     QSqlDatabase::database());
 
     int counter = 0;
 
@@ -439,6 +440,7 @@ static void preMusic(MusicData *mdata)
 
     //  Load all available info about songs (once!)
     QString startdir = gContext->GetSetting("MusicLocation");
+    startdir = QDir::cleanDirPath(startdir);
     if (!startdir.endsWith("/"));
         startdir += "/";
 
@@ -507,6 +509,7 @@ int mythplugin_config(void)
     MusicData mdata;
     mdata.paths = gContext->GetSetting("TreeLevels");
     mdata.startdir = gContext->GetSetting("MusicLocation");
+    mdata.startdir = QDir::cleanDirPath(mdata.startdir);
     if (!mdata.startdir.endsWith("/"));
         mdata.startdir += "/";
 
