@@ -280,6 +280,7 @@ void XMLParse::parseImage(LayerSet *container, QDomElement &element)
 
 void XMLParse::parseRepeatedImage(LayerSet *container, QDomElement &element)
 {
+    int orientation = 0;
     int context = -1;
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
@@ -331,6 +332,26 @@ void XMLParse::parseRepeatedImage(LayerSet *container, QDomElement &element)
                 skipin.setX((int)(skipin.x() * wmult));
                 skipin.setY((int)(skipin.y() * hmult));
             }
+            else if (info.tagName() == "orientation")
+            {
+                QString orient_string = getFirstText(info).lower();
+                if(orient_string == "lefttoright")
+                {
+                    orientation = 0;
+                }
+                if(orient_string == "righttoleft")
+                {
+                    orientation = 1;
+                }
+                if(orient_string == "bottomtotop")
+                {
+                    orientation = 2;
+                }
+                if(orient_string == "toptobottom")
+                {
+                    orientation = 3;
+                }
+            }
             else
             {
                 cerr << "Unknown: " << info.tagName() << " in repeated image\n";
@@ -358,6 +379,7 @@ void XMLParse::parseRepeatedImage(LayerSet *container, QDomElement &element)
     {
         image->SetContext(context);
     }
+    image->setOrientation(orientation);
     image->SetParent(container);
     container->AddType(image);
 }

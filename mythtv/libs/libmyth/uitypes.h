@@ -359,6 +359,7 @@ class UIRepeatedImageType : public UIImageType
     UIRepeatedImageType(const QString &, const QString &, int, QPoint);
     void setRepeat(int how_many);
     void Draw(QPainter *, int, int);
+    void setOrientation(int x);
 
   public slots:
   
@@ -368,6 +369,16 @@ class UIRepeatedImageType : public UIImageType
   
     int m_repeat;
     int m_highest_repeat;
+    
+  private:
+  
+    //  0 = left to right
+    //  1 = right to left
+    //  2 = bottom to top
+    //  3 = top to bottom
+    
+    int m_orientation;
+    
 };
 
 

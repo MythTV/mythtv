@@ -1389,6 +1389,7 @@ UIRepeatedImageType::UIRepeatedImageType(const QString &name, const QString &fil
 {
     m_repeat = 0;
     m_highest_repeat = 0;
+    m_orientation = 0;
 }
 
 void UIRepeatedImageType::Draw(QPainter *p, int drawlayer, int context)
@@ -1405,9 +1406,33 @@ void UIRepeatedImageType::Draw(QPainter *p, int drawlayer, int context)
                     cerr << "       -Drawing @ (" << m_displaypos.x() << ", " << m_displaypos.y() << ")" << endl;
                     cerr << "       -Skip Section: (" << m_drop_x << ", " << m_drop_y << ")\n";
                 }
-                for(int i = 0; i < m_repeat; i++)
+                if(m_orientation == 0)
                 {
-                    p->drawPixmap(m_displaypos.x() + (i * img.width()), m_displaypos.y(), img, m_drop_x, m_drop_y);
+                    for(int i = 0; i < m_repeat; i++)
+                    {
+                        p->drawPixmap(m_displaypos.x() + (i * img.width()), m_displaypos.y(), img, m_drop_x, m_drop_y);
+                    }
+                }
+                else if (m_orientation == 1)
+                {
+                    for(int i = 0; i < m_repeat; i++)
+                    {
+                        p->drawPixmap(m_displaypos.x() - (i * img.width()), m_displaypos.y(), img, m_drop_x, m_drop_y);
+                    }
+                }
+                else if (m_orientation == 2)
+                {
+                    for(int i = 0; i < m_repeat; i++)
+                    {
+                        p->drawPixmap(m_displaypos.x(),  m_displaypos.y() - (i * img.height()), img, m_drop_x, m_drop_y);
+                    }
+                }
+                else if (m_orientation == 3)
+                {
+                    for(int i = 0; i < m_repeat; i++)
+                    {
+                        p->drawPixmap(m_displaypos.x(),  m_displaypos.y() + (i * img.height()), img, m_drop_x, m_drop_y);
+                    }
                 }
             } 
             else if (m_debug == true)
@@ -1440,6 +1465,16 @@ void UIRepeatedImageType::setRepeat(int how_many)
     }
 }
 
+void UIRepeatedImageType::setOrientation(int x)
+{
+    if(x < 0 || x > 3)
+    {
+        cerr << "uitypes.o: UIRepeatedImageType received an invalid request to set orientation to " << x << endl;
+        return;
+    }
+    m_orientation = x ;
+}
+
 void UIRepeatedImageType::refresh()
 {
     //
@@ -1448,11 +1483,36 @@ void UIRepeatedImageType::refresh()
     //  coordinates
     //
     
-    QRect r = QRect(m_displaypos.x(),
-                    m_displaypos.y(),
-                    img.width() * m_highest_repeat,
-                    img.height());
+    QRect r = QRect(0,0,0,0);
     
+    if(m_orientation == 0)
+    {
+        r = QRect(m_displaypos.x(),
+                  m_displaypos.y(),
+                  img.width() * m_highest_repeat,
+                  img.height());
+    }
+    else if(m_orientation == 1)
+    {
+        r = QRect(m_displaypos.x() - (m_highest_repeat * img.width()),
+                  m_displaypos.y(),
+                  img.width() * (m_highest_repeat + 1),
+                  img.height());
+    }    
+    else if(m_orientation == 2)
+    {
+        r = QRect(m_displaypos.x(),
+                  m_displaypos.y() - (m_highest_repeat * img.height()),
+                  img.width(),
+                  img.height() * (m_highest_repeat + 1));
+    }    
+    else if (m_orientation == 3)
+    {
+        r = QRect(m_displaypos.x(),
+                  m_displaypos.y(),
+                  img.width(),
+                  img.height() * m_highest_repeat);
+    }    
     if(m_parent)
     {
         r.moveBy(m_parent->GetAreaRect().left(),
