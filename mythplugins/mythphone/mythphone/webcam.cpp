@@ -493,7 +493,6 @@ void Webcam::WebcamThreadWorker()
         else
             cerr << "Error reading from webcam; got " << len << " bytes; expected " << frameSize << endl;
     }
-    cout << "Webcam done; fps=" << actualFps << endl;
 }
 
 Webcam::~Webcam()
