@@ -37,14 +37,7 @@ enum VideoFileLocation
 
 typedef QMap <QString, VideoFileLocation> VideoLoadedMap;
 
-struct GenericData
-{
-    QString paths;
-    QSqlDatabase *db;
-    QString startdir;
-};
-
-void runMenu(QString, const QString &, QSqlDatabase *, QString);
+void runMenu(QString, const QString &);
 void VideoCallback(void *, QString &);
 void SearchDir(QSqlDatabase *, QString &);
 void BuildFileList(QSqlDatabase *, QString &, VideoLoadedMap &, QStringList &);
@@ -53,6 +46,20 @@ extern "C" {
 int mythplugin_init(const char *libversion);
 int mythplugin_run(void);
 int mythplugin_config(void);
+}
+
+void runVideoManager(void);
+void runVideoBrowser(void);
+void runVideoTree(void);
+
+void setupKeys(void)
+{
+    REG_JUMP("Video Manager", "The MythVideo video manager", "", 
+             runVideoManager);
+    REG_JUMP("Video Browser", "The MythVideo video browser", "", 
+             runVideoBrowser);
+    REG_JUMP("Video Listings", "The MythVideo video listings", "", 
+             runVideoTree);
 }
 
 int mythplugin_init(const char *libversion)
@@ -70,6 +77,8 @@ int mythplugin_init(const char *libversion)
     settings.load(QSqlDatabase::database());
     settings.save(QSqlDatabase::database());
 
+    setupKeys();
+
     return 0;
 }
 
@@ -81,11 +90,8 @@ int mythplugin_run(void)
                     QString(".qm"), ".");
     qApp->installTranslator(&translator);
 
-    QString startdir = gContext->GetSetting("VideoStartupDir", 
-                                            "/share/Movies/dvd");
-
     QString themedir = gContext->GetThemeDir();
-    runMenu(themedir, "videomenu.xml", QSqlDatabase::database(), startdir);
+    runMenu(themedir, "videomenu.xml");
 
     qApp->removeTranslator(&translator);
 
@@ -100,29 +106,20 @@ int mythplugin_config(void)
                     QString(".qm"), ".");
     qApp->installTranslator(&translator);
 
-    QString startdir = gContext->GetSetting("VideoStartupDir",
-                                            "/share/Movies/dvd");
-
     QString themedir = gContext->GetThemeDir();
-    runMenu(themedir, "video_settings.xml", QSqlDatabase::database(), startdir);
+    runMenu(themedir, "video_settings.xml");
 
     qApp->removeTranslator(&translator);
 
     return 0;
 }
 
-void runMenu(QString themedir, const QString &menuname, 
-             QSqlDatabase *db, QString startdir)
+void runMenu(QString themedir, const QString &menuname)
 {
     ThemedMenu *diag = new ThemedMenu(themedir.ascii(), menuname,
                                       gContext->GetMainWindow(), "videomenu");
 
-    GenericData data;
-
-    data.db = db;
-    data.startdir = startdir;
-
-    diag->setCallback(VideoCallback, &data);
+    diag->setCallback(VideoCallback, NULL);
     diag->setKillable();
 
     if (diag->foundTheme())
@@ -143,33 +140,26 @@ bool checkParentPassword()
     QDateTime curr_time = QDateTime::currentDateTime();
     QString last_time_stamp = gContext->GetSetting("VideoPasswordTime");
     QString password = gContext->GetSetting("VideoAdminPassword");
-    if(password.length() < 1)
-    {
-        return true;
-    }
 
-    //
-    //  See if we recently (and succesfully)
-    //  asked for a password
-    //
+    if (password.length() < 1)
+        return true;
+
+    // See if we recently (and succesfully) asked for a password
     
-    if(last_time_stamp.length() < 1)
+    if (last_time_stamp.length() < 1)
     {
-        //
-        //  Probably first time used
-        //
+        // Probably first time used
 
         cerr << "main.o: Could not read password/pin time stamp. "
              << "This is only an issue if it happens repeatedly. " << endl;
     }
     else
     {
-        QDateTime last_time = QDateTime::fromString(last_time_stamp, Qt::TextDate);
-        if(last_time.secsTo(curr_time) < 120)
+        QDateTime last_time = QDateTime::fromString(last_time_stamp, 
+                                                    Qt::TextDate);
+        if (last_time.secsTo(curr_time) < 120)
         {
-            //
-            //  Two minute window
-            //
+            // Two minute window
             last_time_stamp = curr_time.toString(Qt::TextDate);
             gContext->SetSetting("VideoPasswordTime", last_time_stamp);
             gContext->SaveSetting("VideoPasswordTime", last_time_stamp);
@@ -177,11 +167,9 @@ bool checkParentPassword()
         }
     }
     
-    //
-    //  See if there is a password set
-    //
+    // See if there is a password set
     
-    if(password.length() > 0)
+    if (password.length() > 0)
     {
         bool ok = false;
         MythPasswordDialog *pwd = new MythPasswordDialog(QObject::tr("Parental Pin:"),
@@ -190,12 +178,10 @@ bool checkParentPassword()
                                                          gContext->GetMainWindow());
         pwd->exec();
         delete pwd;
-        if(ok)
-        {
-            //
-            //  All is good
-            //
 
+        if (ok)
+        {
+            // All is good
             last_time_stamp = curr_time.toString(Qt::TextDate);
             gContext->SetSetting("VideoPasswordTime", last_time_stamp);
             gContext->SaveSetting("VideoPasswordTime", last_time_stamp);
@@ -203,46 +189,56 @@ bool checkParentPassword()
         }
     }
     else
-    {
         return true;
-    }
     return false;
+}
+
+void runVideoManager(void)
+{
+    if (checkParentPassword())
+    {
+        QString startdir = gContext->GetSetting("VideoStartupDir",
+                                                "/share/Movies/dvd");
+        SearchDir(QSqlDatabase::database(), startdir);
+
+        VideoManager *manage = new VideoManager(QSqlDatabase::database(),
+                                                gContext->GetMainWindow(),
+                                                "video manager");
+        manage->exec();
+        delete manage;
+    }
+}
+
+void runVideoBrowser(void)
+{
+    VideoBrowser *browse = new VideoBrowser(QSqlDatabase::database(),
+                                            gContext->GetMainWindow(),
+                                            "video browser");
+    browse->exec();
+    delete browse;
+}
+
+void runVideoTree(void)
+{
+    VideoTree *tree = new VideoTree(gContext->GetMainWindow(),
+                                    QSqlDatabase::database(), "videotree", 
+                                    "video-");
+    tree->exec();
+    delete tree;
 }
 
 void VideoCallback(void *data, QString &selection)
 {
-    GenericData *mdata = (GenericData *)data;
+    (void)data;
 
     QString sel = selection.lower();
 
     if (sel == "manager")
-    {
-        if(checkParentPassword())
-        {
-            SearchDir(mdata->db, mdata->startdir);
-
-            VideoManager *manage = new VideoManager(mdata->db, 
-                                                    gContext->GetMainWindow(),
-                                                    "video manager");
-            manage->exec();
-            delete manage;
-        }
-    }
+        runVideoManager();
     else if (sel == "browser")
-    {
-        VideoBrowser *browse = new VideoBrowser(mdata->db,
-                                                gContext->GetMainWindow(),
-                                                "video browser");
-        browse->exec();
-        delete browse;
-    }
+        runVideoBrowser();
     else if (sel == "listing")
-    {
-        VideoTree *tree = new VideoTree(gContext->GetMainWindow(),
-                                        mdata->db, "videotree", "video-");
-        tree->exec();
-        delete tree;
-    }
+        runVideoTree();
     else if (sel == "settings_general")
     {
         //
@@ -252,9 +248,9 @@ void VideoCallback(void *data, QString &selection)
         //  than that!
         //
         
-        if(gContext->GetNumSetting("VideoAggressivePC", 0))
+        if (gContext->GetNumSetting("VideoAggressivePC", 0))
         {
-            if(checkParentPassword())
+            if (checkParentPassword())
             {
                 GeneralSettings settings;
                 settings.exec(QSqlDatabase::database());
@@ -273,7 +269,7 @@ void VideoCallback(void *data, QString &selection)
     }
     else if (sel == "settings_associations")
     {
-        FileAssocDialog fa(mdata->db,
+        FileAssocDialog fa(QSqlDatabase::database(),
                            gContext->GetMainWindow(),
                            "file_associations",
                            "video-",

@@ -116,73 +116,82 @@ VideoManager::~VideoManager(void)
 
 void VideoManager::keyPressEvent(QKeyEvent *e)
 {
-    if (allowselect)
-    {
-        switch (e->key())
-        {
-            case Key_Space: 
-            case Key_Enter: 
-            case Key_Return: 
-                selected(); 
-                return;
-                break;
+    bool handled = false;
+    QStringList actions;
+    gContext->GetMainWindow()->TranslateKeyPress("Gallery", e, actions);
 
-            case Key_0:
-            case Key_1:
-            case Key_2:
-            case Key_3:
-            case Key_4:
-            case Key_5:
-            case Key_6:
-            case Key_7:
-            case Key_8:
-            case Key_9:
-                if(m_state == SHOWING_MAINWINDOW)
-                {
-                    editMetadata();
-                }
-                break;
-            default: break;
+    for (unsigned int i = 0; i < actions.size(); i++)
+    {
+        QString action = actions[i];
+
+        if (action == "SELECT" && allowselect)
+        {
+            selected();
+            return;
+        }
+        else if (action == "0" || action == "1" || action == "2" ||
+                 action == "3" || action == "4" || action == "5" ||
+                 action == "6" || action == "7" || action == "8" ||
+                 action == "9")
+        {
+            if (allowselect && m_state == SHOWING_MAINWINDOW)
+                editMetadata();
+            else if (m_state != SHOWING_MAINWINDOW)
+                num(action);
+            return;
+        }
+
+        if (action == "UP")
+        {
+            cursorUp();
+            handled = true;
+        }
+        else if (action == "DOWN")
+        {
+            cursorDown();
+            handled = true;
+        }
+        else if (action == "LEFT")
+        {
+            cursorLeft();
+            handled = true;
+        }
+        else if (action == "RIGHT")
+        {
+            cursorRight();
+            handled = true;
+        }
+        else if (action == "PAGEUP")
+        {
+            pageUp();
+            handled = true;
+        }
+        else if (action == "PAGEDOWN")
+        {
+            pageDown();
+            handled = true;
+        }
+        else if (action == "ESCAPE")
+        {
+            exitWin();
+            handled = true;
+        }
+        else if (action == "MENU" || action == "INFO")
+        {
+            videoMenu();
+            handled = true;
         }
     }
 
-    switch (e->key())
-    {
-        case Key_Down: cursorDown(); break;
-        case Key_Up: cursorUp(); break;
-        case Key_Left: cursorLeft(); break;
-        case Key_Right: cursorRight(); break;
-        case Key_PageUp: pageUp(); break;
-        case Key_PageDown: pageDown(); break;
-        case Key_Escape: exitWin(); break;
-        case Key_M: case Key_I: videoMenu(); break;
-
-        case Key_0: 
-        case Key_1: 
-        case Key_2: 
-        case Key_3: 
-        case Key_4: 
-        case Key_5: 
-        case Key_6: 
-        case Key_7: 
-        case Key_8: 
-        case Key_9: 
-        
-            if(m_state != SHOWING_MAINWINDOW)
-            {
-                num(e); 
-            }
-            break;
-
-        default: MythDialog::keyPressEvent(e);
-    }
+    if (!handled)
+        MythDialog::keyPressEvent(e);
 }
 
-void VideoManager::num(QKeyEvent *e)
+void VideoManager::num(const QString &text)
 {
     if (m_state == SHOWING_IMDBMANUAL && curIMDBNum.length() != 7)
     {
-        curIMDBNum = curIMDBNum + e->text();
+        curIMDBNum = curIMDBNum + text;
         update(imdbEnterRect);
         if (curIMDBNum.length() == 7)
         {

@@ -161,31 +161,51 @@ void VideoBrowser::setParentalLevel(int which_level)
 }
 
 void VideoBrowser::keyPressEvent(QKeyEvent *e)
-{ 
-    if (allowselect)
+{
+    bool handled = false;
+    QStringList actions;
+    gContext->GetMainWindow()->TranslateKeyPress("Gallery", e, actions);
+
+    for (unsigned int i = 0; i < actions.size(); i++)
     {
-        switch (e->key())
+        QString action = actions[i];
+
+        if (action == "SELECT" && allowselect)
         {
-            case Key_Space: case Key_Enter: case Key_Return: 
-                selected(curitem); return;
-            default: break;
+            selected(curitem);
+            return;
+        }
+
+        if (action == "UP")
+        {
+            cursorUp();
+            handled = true;
+        }
+        else if (action == "DOWN")
+        {
+            cursorDown();
+            handled = true;
+        }
+        else if (action == "LEFT")
+        {
+            cursorLeft();
+            handled = true;
+        }
+        else if (action == "RIGHT")
+        {
+            cursorRight();
+            handled = true;
+        }
+        else if (action == "1" || action == "2" || action == "3" ||
+                 action == "4")
+        {
+            setParentalLevel(action.toInt());
+            handled = true;
         }
     }
 
-    switch (e->key())
-    {
-        case Key_Down: cursorDown(); break;
-        case Key_Up: cursorUp(); break;
-        case Key_Left: cursorLeft(); break;
-        case Key_Right: cursorRight(); break;
-
-        case Key_1: setParentalLevel(1); break;
-        case Key_2: setParentalLevel(2); break;
-        case Key_3: setParentalLevel(3); break;
-        case Key_4: setParentalLevel(4); break;
-
-        default: MythDialog::keyPressEvent(e);
-    }
+    if (!handled)
+        MythDialog::keyPressEvent(e);
 }
 
 void VideoBrowser::updateBackground(void)

@@ -154,97 +154,90 @@ void EditMetadataDialog::keyPressEvent(QKeyEvent *e)
     bool handled = false;
     bool something_pushed = false;
 
-    switch (e->key())
-    {
+    QStringList actions;
+    gContext->GetMainWindow()->TranslateKeyPress("Gallery", e, actions);
 
-        //
-        //  Widget Navigation
-        //
-        
-        case Key_Up:
+    for (unsigned int i = 0; i < actions.size(); i++)
+    {
+        QString action = actions[i];
+
+        if (action == "UP")
+        {
             nextPrevWidgetFocus(false);
             handled = true;
-            break;
-        case Key_Down:
+        }
+        else if (action == "DOWN")
+        { 
             nextPrevWidgetFocus(true);
             handled = true;
-            break;
-        case Key_Left:
+        }
+        else if (action == "LEFT") 
+        {
             something_pushed = false;
-            if(level_select)
+            if (level_select)
             {
-                if(getCurrentFocusWidget() == level_select)
+                if (getCurrentFocusWidget() == level_select)
                 {
                     level_select->push(false);
                     something_pushed = true;
                 }
             }
-            if(child_select)
+            if (child_select)
             {
-                if(getCurrentFocusWidget() == child_select)
+                if (getCurrentFocusWidget() == child_select)
                 {
                     child_select->push(false);
                     something_pushed = true;
                 }
             }
-            if(!something_pushed)
+            if (!something_pushed)
             {
                 activateCurrent();
             }
             handled = true;
-            break;
-        case Key_Right:
+        }
+        else if (action == "RIGHT")
+        {
             something_pushed = false;
-            if(level_select)
+            if (level_select)
             {
-                if(getCurrentFocusWidget() == level_select)
+                if (getCurrentFocusWidget() == level_select)
                 {
                     level_select->push(true);
                     something_pushed = true;
                 }
             }
-            if(child_select)
+            if (child_select)
             {
-                if(getCurrentFocusWidget() == child_select)
+                if (getCurrentFocusWidget() == child_select)
                 {
                     child_select->push(true);
                     something_pushed = true;
                 }
             }
-            if(!something_pushed)
+            if (!something_pushed)
             {
                 activateCurrent();
             }
             handled = true;
-            break;
-            handled = true;
-            break;
-
-        //
-        //  Widget Activation
-        //
-        
-        case Key_Space:
-        case Key_Enter:
-        case Key_Return:
+        }
+        else if (action == "SELECT")
+        {
             activateCurrent();
             handled = true;
-            break;
-            
-        case Key_0:
+        }
+        else if (action == "0")
+        {    
             if(done_button)
             {
                 done_button->push();
             }
             handled = true;
-            break;
+        }
     }
     
-    
-    if(!handled)
-    {
+    if (!handled)
         MythThemedDialog::keyPressEvent(e);
-    }
 }
 
 

@@ -51,26 +51,59 @@ VideoTree::~VideoTree()
 
 void VideoTree::keyPressEvent(QKeyEvent *e)
 {
-    switch (e->key())
+    bool handled = false;
+    QStringList actions;
+    gContext->GetMainWindow()->TranslateKeyPress("Gallery", e, actions);
+
+    for (unsigned int i = 0; i < actions.size(); i++)
     {
-        case Key_Space: case Key_Enter: case Key_Return:
-            video_tree_list->select(); break;
-        
-        case Key_Up: video_tree_list->moveUp(); break;
-        case Key_Down: video_tree_list->moveDown(); break;
-        case Key_Left: video_tree_list->popUp(); break;
-        case Key_Right: video_tree_list->pushDown(); break;
-       
-        case Key_PageUp: video_tree_list->pageUp(); break;
-        case Key_PageDown: video_tree_list->pageDown(); break;
-       
-        case Key_1: setParentalLevel(1); break;
-        case Key_2: setParentalLevel(2); break;
-        case Key_3: setParentalLevel(3); break;
-        case Key_4: setParentalLevel(4); break;
-       
-        default: MythThemedDialog::keyPressEvent(e); break;
+        QString action = actions[i];
+
+        if (action == "SELECT")
+        {
+            video_tree_list->select();
+            handled = true;
+        }
+        else if (action == "UP")
+        {
+            video_tree_list->moveUp();
+            handled = true;
+        }
+        else if (action == "DOWN")
+        {
+            video_tree_list->moveDown();
+            handled = true;
+        }
+        else if (action == "LEFT")
+        {
+            video_tree_list->popUp();
+            handled = true;
+        }
+        else if (action == "RIGHT")
+        {
+            video_tree_list->pushDown();
+            handled = true;
+        }
+        else if (action == "PAGEUP")
+        {
+            video_tree_list->pageUp();
+            handled = true;
+        }
+        else if (action == "PAGEDOWN")
+        {
+            video_tree_list->pageDown();
+            handled = true;
+        }
+        else if (action == "1" || action == "2" || action == "3" ||
+                 action == "4")
+        {
+            setParentalLevel(action.toInt());
+            handled = true;
+        }
     }
+
+    if (!handled) 
+        MythThemedDialog::keyPressEvent(e);
 }
 
 bool VideoTree::checkParentPassword()

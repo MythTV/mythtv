@@ -161,94 +161,74 @@ FileAssocDialog::FileAssocDialog(QSqlDatabase *ldb,
 void FileAssocDialog::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
-    
-    switch (e->key())
+    QStringList actions;
+    gContext->GetMainWindow()->TranslateKeyPress("Gallery", e, actions);
+
+    for (unsigned int i = 0; i < actions.size(); i++)
     {
+        QString action = actions[i];
 
-        //
-        //  Widget Navigation
-        //
-        
-        case Key_Up:
+        if (action == "UP")    
+        {
             nextPrevWidgetFocus(false);
-            while(getCurrentFocusWidget()->GetContext() < -1)
-            {
+            while (getCurrentFocusWidget()->GetContext() < -1)
                 nextPrevWidgetFocus(false);
-            }
             handled = true;
-            break;
-        case Key_Down:
+        }
+        else if (action == "DOWN")
+        {
             nextPrevWidgetFocus(true);
-            while(getCurrentFocusWidget()->GetContext() < -1)
-            {
+            while (getCurrentFocusWidget()->GetContext() < -1)
                 nextPrevWidgetFocus(true);
-            }
             handled = true;
-            break;
-        case Key_Left:
-            if(extension_select)
+        }
+        else if (action == "LEFT")
+        {
+            if (extension_select)
             {
-                if(extension_select == getCurrentFocusWidget())
-                {
+                if (extension_select == getCurrentFocusWidget())
                     extension_select->push(false);
-                }
             }
-            if(default_check)
+            if (default_check)
             {
-                if(default_check == getCurrentFocusWidget())
-                {
+                if (default_check == getCurrentFocusWidget())
                     activateCurrent();
-                }
             }
-            if(ignore_check)
+            if (ignore_check)
             {
-                if(ignore_check == getCurrentFocusWidget())
-                {
+                if (ignore_check == getCurrentFocusWidget())
                     activateCurrent();
-                }
             }
             handled = true;
-            break;
-        case Key_Right:
-            if(extension_select)
+        }
+        else if (action == "RIGHT")
+        {
+            if (extension_select)
             {
-                if(extension_select == getCurrentFocusWidget())
-                {
+                if (extension_select == getCurrentFocusWidget())
                     extension_select->push(true);
-                }
             }
-            if(default_check)
+            if (default_check)
             {
-                if(default_check == getCurrentFocusWidget())
-                {
+                if (default_check == getCurrentFocusWidget())
                     activateCurrent();
-                }
             }
-            if(ignore_check)
+            if (ignore_check)
             {
-                if(ignore_check == getCurrentFocusWidget())
-                {
+                if (ignore_check == getCurrentFocusWidget())
                     activateCurrent();
-                }
             }
             handled = true;
-            break;
-
-        //
-        //  Widget Activation
-        //
-        
-        case Key_Space:
-        case Key_Enter:
-        case Key_Return:
+        }
+        else if (action == "SELECT")
+        {
             activateCurrent();
             handled = true;
-            break;
+        }
     }
-    if(!handled)
-    {
+
+    if (!handled)
         MythThemedDialog::keyPressEvent(e);
-    }
 }
 
 void FileAssocDialog::takeFocusAwayFromEditor(bool up_or_down)
@@ -455,93 +435,28 @@ void FileAssocDialog::deleteCurrent()
 
 void FileAssocDialog::makeNewExtension()
 {
-    //
-    //  Create the popup window for new extension
-    //  dialog/widgets
-    //
+    // Create the popup window for new extension dialog/widgets
 
     new_extension_popup = new MythPopupBox(gContext->GetMainWindow(), 
                                            "new extension popup");
     gContext->ThemeWidget(new_extension_popup);
-    //new_extension_popup->setPaletteForegroundColor(popupHighlight);
 
-    QLabel *above_filler = new QLabel("", new_extension_popup);
-    QLabel *message = new QLabel(tr("Please enter the new extension:"), 
-                                 new_extension_popup);
-    QLabel *below_filler = new QLabel("", new_extension_popup);
+    new_extension_popup->addLabel("");
+    new_extension_popup->addLabel(tr("Please enter the new extension:"));
+    new_extension_popup->addLabel("");
 
-    above_filler->setBackgroundOrigin(ParentOrigin);
-    message->setBackgroundOrigin(ParentOrigin);
-    below_filler->setBackgroundOrigin(ParentOrigin);
-        
     
     new_extension_editor = new MythRemoteLineEdit(new_extension_popup);
+    new_extension_popup->addWidget(new_extension_editor);
 
-    MythPushButton *create_button = new MythPushButton(tr("Create new extension"), 
-                                                       new_extension_popup);
-    MythPushButton *nevermind_button = new MythPushButton(tr("Cancel"), 
-                                                          new_extension_popup); 
-    
-    
-    new_extension_popup->addWidget(above_filler, false);
-    new_extension_popup->addWidget(message, false);
-    new_extension_popup->addWidget(below_filler, false);
-    new_extension_popup->addWidget(new_extension_editor, false);
-    new_extension_popup->addWidget(create_button, false);
-    new_extension_popup->addWidget(nevermind_button, false);
-    
+    new_extension_popup->addButton(tr("Create new extension"), this,
+                                   SLOT(createExtension()));
+    new_extension_popup->addButton(tr("Cancel"), this, 
+                                   SLOT(removeExtensionPopup()));
+
     new_extension_editor->setFocus();
     
-    above_filler->adjustSize();
-    message->adjustSize();
-    below_filler->adjustSize();
-    new_extension_editor->adjustSize();
-    create_button->adjustSize();
-    nevermind_button->adjustSize();
-    
-    new_extension_popup->polish();
-    
-    int pop_h = above_filler->height() + 
-                message->height() + 
-                below_filler->height() + 
-                new_extension_editor->height() +
-                create_button->height() + 
-                nevermind_button->height() +
-                (int)(110 * hmult);
-
-    new_extension_popup->setMinimumHeight(pop_h);
-
-    int max_w = message->width();
-    if(new_extension_editor->width() > max_w)
-    {
-        max_w = new_extension_editor->width();
-    }
-    if(create_button->width() > max_w)
-    {
-        max_w = create_button->width();
-    }
-    if(nevermind_button->width() > max_w)
-    {
-        max_w = nevermind_button->width();
-    }
-    
-    max_w += (int)(80 * wmult);
-
-    int x = (int)(width() / 2) - (int)(max_w / 2);
-    int y = (int)(height() / 2) - (int)(pop_h / 2);
-    
-    new_extension_popup->setFixedSize(max_w, pop_h);
-    new_extension_popup->setGeometry(x, y, max_w, pop_h);
-
-    QAccel *popaccel = new QAccel(new_extension_popup);
-    popaccel->connectItem(popaccel->insertItem(Key_Escape), this,
-                              SLOT(removeExtensionPopup()));
-    connect(create_button, SIGNAL(pressed()), this, SLOT(createExtension()));
-    connect(nevermind_button, SIGNAL(pressed()), this, SLOT(removeExtensionPopup()));
-    
-    new_extension_popup->Show();
-    
-    
+    new_extension_popup->ShowPopup(this, SLOT(removeExtensionPopup()));
 }
 
 void FileAssocDialog::createExtension()

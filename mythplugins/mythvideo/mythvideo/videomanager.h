@@ -53,7 +53,7 @@ class VideoManager : public MythDialog
     void validateUp();
 
   private slots:
-    void num(QKeyEvent *e);
+    void num(const QString &text);
 
   private:
     bool updateML;
