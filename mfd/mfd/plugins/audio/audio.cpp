@@ -464,6 +464,7 @@ bool AudioPlugin::playMetadata(int collection_id, int metadata_id)
                         "item %2, but it does not exist")
                         .arg(collection_id)
                         .arg(metadata_id));
+        metadata_server->unlockMetadata();
         return false;
     }
 
