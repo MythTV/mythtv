@@ -338,8 +338,9 @@ void Scheduler::PruneOldRecords(void)
     {
         ProgramInfo *p = *dreciter;
         if (p->recendts < deltime ||
-            (p->recstatus >= rsWillRecord && p->recstatus != rsCancelled &&
-             p->recstatus != rsLowDiskSpace && p->recstatus != rsTunerBusy))
+            (p->recstartts > schedTime && p->recstatus >= rsWillRecord && 
+             p->recstatus != rsCancelled && p->recstatus != rsLowDiskSpace && 
+             p->recstatus != rsTunerBusy))
         {
             delete p;
             dreciter = reclist.erase(dreciter);
