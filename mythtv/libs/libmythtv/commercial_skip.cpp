@@ -105,6 +105,10 @@ bool CommDetect::CheckFrameIsBlank(void)
     {
         int y_mult = (int)(height / divisor);
         int x_mult = (int)(width / divisor);
+
+        if (x_mult < 1 || y_mult < 1)
+            continue;
+
         for(int y = y_mult; y < height; y += y_mult)
         {
             if (line_checked[y])
