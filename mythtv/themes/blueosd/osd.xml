@@ -261,8 +261,8 @@
   <container name="menu">
     <listtreemenu name="menu">
       <area>20,40,620,300</area>
-      <listsize>20,40,180,300</listsize>
-      <leveloffset>25</leveloffset>
+      <listsize>20,40,294,300</listsize>
+      <leveloffset>10</leveloffset>
       <gradient type="unselected" start="#505050" end="#000000" alpha="100">
       </gradient>
       <gradient type="selected" start="#52CA38" end="#349838" alpha="255">

@@ -149,7 +149,7 @@ void OSDListTreeType::SetAsTree(OSDGenericTree *toplevel)
     treetop = toplevel;
 
     // just for now, remove later
-    if (levels > 3)
+    if (levels > 2)
         levels = 3;
 
     for (int i = 0; i < levels; i++)
@@ -642,6 +642,8 @@ void OSDListBtnType::Init()
     int sz2 = m_fontInactive->Size() * 3 / 2;
     m_itemHeight = QMAX(sz1, sz2) + (int)(2 * m_itemMargin);
 
+    m_itemHeight = (m_itemHeight / 2) * 2;
+
     if (m_showScrollArrows) 
     {
         LoadPixmap(m_upArrowRegPix, "uparrow-reg");
@@ -671,7 +673,9 @@ void OSDListBtnType::Init()
     LoadPixmap(m_checkFullPix, "check-full");
     LoadPixmap(m_arrowPix, "arrow");
 
-    QImage img(m_rect.width(), m_itemHeight, 32);
+    int itemWidth = (m_rect.width() / 2) * 2;
+
+    QImage img(itemWidth, m_itemHeight, 32);
     img.setAlphaBuffer(true);
 
     for (int y = 0; y < img.height(); y++) 
