@@ -115,7 +115,7 @@ class ThemedMenuPrivate
     void positionButtons(bool resetpos);
     bool makeRowVisible(int newrow, int oldrow, bool forcedraw = true);
 
-    void handleAction(const QString &action);
+    bool handleAction(const QString &action);
     bool findDepends(const QString &file);
     QString findMenuFile(const QString &menuname);
 
@@ -1943,10 +1943,12 @@ bool ThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
             lastbutton = activebutton;
             activebutton = NULL;
             parent->repaint(lastbutton->posRect);
-            for (unsigned int pos = 0; pos < lastbutton->action.count();
-                 pos++)
+
+            QStringList::Iterator it = lastbutton->action.begin();
+            for (; it != lastbutton->action.end(); it++)
             {
-                handleAction(lastbutton->action[pos]);
+                if (handleAction(*it))
+                    break;
             }
 
             lastbutton = NULL;
@@ -2035,12 +2037,14 @@ QString ThemedMenuPrivate::findMenuFile(const QString &menuname)
     return "";
 }
 
-void ThemedMenuPrivate::handleAction(const QString &action)
+bool ThemedMenuPrivate::handleAction(const QString &action)
 {
     if (action.left(5) == "EXEC ")
     {
         QString rest = action.right(action.length() - 5);
         myth_system(rest);
+
+        return false;
     }
     else if (action.left(7) == "EXECTV ")
     {
@@ -2087,7 +2091,7 @@ void ThemedMenuPrivate::handleAction(const QString &action)
             gContext->GetNumSetting("SetupPinCodeRequired", 0) &&
             !checkPinCode("SetupPinCodeTime", "SetupPinCode", "Setup Pin:"))
         {
-            return;
+            return true;
         }
 
         parseMenu(rest);
@@ -2135,7 +2139,9 @@ void ThemedMenuPrivate::handleAction(const QString &action)
         {
             callback(callbackdata, selection);
         }
-    }   
+    }
+
+    return true;
 }
 
 bool ThemedMenuPrivate::findDepends(const QString &file)
