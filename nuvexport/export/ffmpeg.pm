@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.03.31 (xris)
+#Last Updated: 2005.04.02 (xris)
 #
 #  ffmpeg.pm
 #
@@ -145,7 +145,7 @@ package export::ffmpeg;
             $ffmpeg .= " -i $videofifo";
 
         # Deinterlace in ffmpeg only if the user wants to
-            if ($self->val('deinterlace') && !$self->val('noise_reduction') && !$self->val('deint_in_yuvdenoise')) {
+            if ($self->val('deinterlace') && !($self->val('noise_reduction') && $self->val('deint_in_yuvdenoise'))) {
                 $ffmpeg .= " -deinterlace";
             }
         # Crop
