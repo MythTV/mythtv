@@ -6,13 +6,16 @@ mythfrontend
 - Arrow keys are used to move the highlight point around.
 - ALT-F4 to exit out of the application.
 - Space or Enter to take action on the item under the highlight point.
+- P to play in both "Watch a Recording" and "Delete a Recording".
+- D to delete in both "Watch a Recording" and "Delete a Recording".
+
 
 Watching TV or a recording
 --------------------------
 
 - Up and down arrow keys change the channel.
 - Type the channel number to go directly to the channel.
-- P to pause / unpause.
+- P to pause / play.
 - Left arrow to rewind the configured number of seconds.  (default is 5)
 - Right arrow to fast forward the configured number of seconds. (default is 30)
 - C to change inputs on TV Tuner card

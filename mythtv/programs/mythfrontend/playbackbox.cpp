@@ -6,6 +6,7 @@
 #include <qsqldatabase.h>
 #include <qlistview.h>
 #include <qdatetime.h>
+#include <qprogressbar.h>
 #include <qapplication.h>
 #include <qtimer.h>
 #include <qimage.h>
@@ -19,12 +20,15 @@
 #include "yuv2rgb.h"
 
 #include "libmyth/mythcontext.h"
+#include "libmyth/dialogbox.h"
 #include "libmyth/programinfo.h"
 
 PlaybackBox::PlaybackBox(MythContext *context, TV *ltv, QSqlDatabase *ldb, 
-                         QWidget *parent, const char *name)
+                         PlaybackBox::BoxType ltype, QWidget *parent, 
+                         const char *name)
            : QDialog(parent, name)
 {
+    type = ltype;
     tv = ltv;
     db = ldb;
     fileprefix = context->GetFilePrefix();
@@ -42,20 +46,37 @@ PlaybackBox::PlaybackBox(MythContext *context, TV *ltv, QSqlDatabase *ldb,
             QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
-    QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
+    context->ThemeWidget(this, screenwidth, screenheight, wmult, hmult);
+    
+    QVBoxLayout *vbox = new QVBoxLayout(this, (int)(15 * wmult));
 
-    QLabel *label = new QLabel("Select a recording to view:", this);
+    QString message = "Select a recording to ";
+    if (type == Delete)
+        message += "permanantly delete:";
+    else
+        message += "view:";
+    QLabel *label = new QLabel(message, this);
+    label->setBackgroundOrigin(WindowOrigin);
     vbox->addWidget(label);
 
-    QListView *listview = new QListView(this);
+    listview = new MyListView(this);
 
     listview->addColumn("Date");
     listview->addColumn("Title");
- 
-    listview->setColumnWidth(0, (int)(220 * wmult)); 
-    listview->setColumnWidth(1, (int)(520 * wmult));
-    listview->setColumnWidthMode(0, QListView::Manual);
-    listview->setColumnWidthMode(1, QListView::Manual);
+    if (type == Delete)
+        listview->addColumn("Size");
+
+    if (type == Delete)
+    {
+        listview->setColumnWidth(0, (int)(200 * wmult)); 
+        listview->setColumnWidth(1, (int)(455 * wmult));
+        listview->setColumnWidth(2, (int)(90 * wmult));
+    }
+    else
+    {
+        listview->setColumnWidth(0, (int)(220 * wmult)); 
+        listview->setColumnWidth(1, (int)(520 * wmult));
+    }
 
     listview->setSorting(-1, false);
     listview->setAllColumnsShowFocus(TRUE);
@@ -66,6 +87,10 @@ PlaybackBox::PlaybackBox(MythContext *context, TV *ltv, QSqlDatabase *ldb,
             SLOT(selected(QListViewItem *))); 
     connect(listview, SIGNAL(selectionChanged(QListViewItem *)), this,
             SLOT(changed(QListViewItem *)));
+    connect(listview, SIGNAL(deletePressed(QListViewItem *)), this,
+            SLOT(remove(QListViewItem *)));
+    connect(listview, SIGNAL(playPressed(QListViewItem *)), this,
+            SLOT(play(QListViewItem *))); 
 
     vbox->addWidget(listview, 1);
 
@@ -74,8 +99,12 @@ PlaybackBox::PlaybackBox(MythContext *context, TV *ltv, QSqlDatabase *ldb,
     ProgramListItem *item = NULL;
    
     thequery = "SELECT chanid,starttime,endtime,title,subtitle,description "
-               "FROM recorded ORDER BY starttime;";
- 
+               "FROM recorded ORDER BY starttime";
+
+    if (type == Delete)
+        thequery += " DESC";
+    thequery += ";";
+
     query = db->exec(thequery);
 
     if (query.isActive() && query.numRowsAffected() > 0)
@@ -123,36 +152,48 @@ PlaybackBox::PlaybackBox(MythContext *context, TV *ltv, QSqlDatabase *ldb,
                 proginfo->chansign = "#" + proginfo->chanid;
             }
 
-            item = new ProgramListItem(context, listview, proginfo, 0, tv, 
-                                       fileprefix);
+            item = new ProgramListItem(context, listview, proginfo, 
+                                       type == Delete, tv, fileprefix);
         }
     }
     else
     {
         // TODO: no recordings
     }
-   
-    listview->setFixedHeight((int)(300 * hmult));
+  
+    if (type == Delete)
+        listview->setFixedHeight((int)(225 * hmult));
+    else 
+        listview->setFixedHeight((int)(300 * hmult));
 
     QHBoxLayout *hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
 
     QGridLayout *grid = new QGridLayout(hbox, 5, 2, 1);
  
     title = new QLabel(" ", this);
+    title->setBackgroundOrigin(WindowOrigin);
     title->setFont(QFont("Arial", (int)(context->GetBigFontSize() * hmult), 
                    QFont::Bold));
 
     QLabel *datelabel = new QLabel("Airdate: ", this);
+    datelabel->setBackgroundOrigin(WindowOrigin);
     date = new QLabel(" ", this);
+    date->setBackgroundOrigin(WindowOrigin);
 
     QLabel *chanlabel = new QLabel("Channel: ", this);
+    chanlabel->setBackgroundOrigin(WindowOrigin);
     chan = new QLabel(" ", this);
+    chan->setBackgroundOrigin(WindowOrigin);
 
     QLabel *sublabel = new QLabel("Episode: ", this);
+    sublabel->setBackgroundOrigin(WindowOrigin);
     subtitle = new QLabel(" ", this);
+    subtitle->setBackgroundOrigin(WindowOrigin);
     subtitle->setAlignment(Qt::AlignLeft | Qt::AlignTop);
     QLabel *desclabel = new QLabel("Description: ", this);
+    desclabel->setBackgroundOrigin(WindowOrigin);
     description = new QLabel(" ", this);
+    description->setBackgroundOrigin(WindowOrigin);
     description->setAlignment(Qt::WordBreak | Qt::AlignLeft | Qt::AlignTop);
  
     grid->addMultiCellWidget(title, 0, 0, 0, 1, Qt::AlignLeft);
@@ -168,18 +209,35 @@ PlaybackBox::PlaybackBox(MythContext *context, TV *ltv, QSqlDatabase *ldb,
     grid->setColStretch(1, 1);
     grid->setRowStretch(4, 1);
 
-    if (m_context->GetNumSetting("GeneratePreviewPixmap") == 1 ||
-        m_context->GetNumSetting("PlaybackPreview") == 1)
+    if (context->GetNumSetting("GeneratePreviewPixmap") == 1 ||
+        context->GetNumSetting("PlaybackPreview") == 1)
     {
         QPixmap temp((int)(160 * wmult), (int)(120 * hmult));
 
         pixlabel = new QLabel(this);
+        pixlabel->setBackgroundOrigin(WindowOrigin);
         pixlabel->setPixmap(temp);
 
         hbox->addWidget(pixlabel);
     }
     else
         pixlabel = NULL;
+
+    if (type == Delete) 
+    {
+        freespace = new QLabel(" ", this);
+        freespace->setBackgroundOrigin(WindowOrigin);
+        vbox->addWidget(freespace);
+
+        progressbar = new QProgressBar(this);
+        UpdateProgressBar();
+        vbox->addWidget(progressbar);
+    }
+    else
+    {
+        freespace = NULL;
+        progressbar = NULL;
+    }
 
     nvp = NULL;
     timer = new QTimer(this);
@@ -264,13 +322,22 @@ void PlaybackBox::changed(QListViewItem *lvitem)
 {
     killPlayer();
 
-    ProgramListItem *pgitem = (ProgramListItem *)lvitem;
-    if (!pgitem)
-        return;
-   
     if (!title)
         return;
 
+    ProgramListItem *pgitem = (ProgramListItem *)lvitem;
+    if (!pgitem)
+    {
+        title->setText("");
+        date->setText("");
+        chan->setText("");
+        subtitle->setText("");
+        description->setText("");
+        if (pixlabel)
+            pixlabel->setPixmap(QPixmap(0, 0));
+        return;
+    }
+   
     ProgramInfo *rec = pgitem->getProgramInfo();
 
     if (m_context->GetNumSetting("PlaybackPreview") == 1)
@@ -321,7 +388,39 @@ void PlaybackBox::changed(QListViewItem *lvitem)
     timer->start(1000 / 30);
 }
 
+static void *SpawnDelete(void *param)
+{
+    QString *filenameptr = (QString *)param;
+    QString filename = *filenameptr;
+
+    unlink(filename.ascii());
+
+    filename += ".png";
+    unlink(filename.ascii());
+
+    filename = *filenameptr;
+    filename += ".bookmark";
+    unlink(filename.ascii());
+
+    filename = *filenameptr;
+    filename += ".cutlist";
+    unlink(filename.ascii());
+
+    delete filenameptr;
+
+    return NULL;
+}
+
 void PlaybackBox::selected(QListViewItem *lvitem)
+{
+    switch (type) 
+    {
+        case Play: play(lvitem); break;
+        case Delete: remove(lvitem); break;
+    }
+}
+
+void PlaybackBox::play(QListViewItem *lvitem)
 {
     killPlayer();
 
@@ -336,6 +435,156 @@ void PlaybackBox::selected(QListViewItem *lvitem)
 
     startPlayer(rec);
     timer->start(1000 / 30);
+}
+
+void PlaybackBox::remove(QListViewItem *lvitem)
+{
+    killPlayer();
+       
+    ProgramListItem *pgitem = (ProgramListItem *)lvitem;
+    ProgramInfo *rec = pgitem->getProgramInfo();
+
+    QString message = "Are you sure you want to delete:<br><br>";
+    message += rec->title;
+    message += "<br>";
+    
+    QDateTime startts = rec->startts;
+    QDateTime endts = rec->endts;
+
+    QString dateformat = m_context->GetSetting("DateFormat");
+    if (dateformat == "")
+        dateformat = "ddd MMMM d";
+    QString timeformat = m_context->GetSetting("TimeFormat");
+    if (timeformat == "")
+        timeformat = "h:mm AP";
+
+    QString timedate = endts.date().toString(dateformat) + QString(", ") +
+                       startts.time().toString(timeformat) + QString(" - ") +
+                       endts.time().toString(timeformat);
+
+    message += timedate;
+    message += "<br>";
+    if (rec->subtitle != "(null)")
+        message += rec->subtitle;
+    message += "<br>";
+    if (rec->description != "(null)")
+        message += rec->description;
+
+    message += "<br><br>It will be gone forever.";
+
+    DialogBox diag(m_context, message);
+
+    diag.AddButton("Yes, get rid of it");
+    diag.AddButton("No, keep it, I changed my mind");
+
+    diag.Show();
+
+    int result = diag.exec();
+
+    if (result == 1)
+    {
+        QString filename = rec->GetRecordFilename(fileprefix);
+
+        QSqlQuery query;
+        QString thequery;
+
+        QString startts = rec->startts.toString("yyyyMMddhhmm");
+        startts += "00";
+        QString endts = rec->endts.toString("yyyyMMddhhmm");
+        endts += "00";
+
+        thequery = QString("DELETE FROM recorded WHERE chanid = %1 AND title "
+                           "= \"%2\" AND starttime = %3 AND endtime = %4;")
+                           .arg(rec->chanid).arg(rec->title).arg(startts)
+                           .arg(endts);
+
+        query = db->exec(thequery);
+        if (!query.isActive())
+        {
+            cerr << "DB Error: recorded program deletion failed, SQL query "
+                 << "was:" << endl;
+            cerr << thequery << endl;
+        }
+
+        QString *fileptr = new QString(filename);
+
+        pthread_t deletethread;
+        pthread_attr_t attr;
+        pthread_attr_init(&attr);
+        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+
+        pthread_create(&deletethread, &attr, SpawnDelete, fileptr);
+
+        if (lvitem->itemBelow())
+        {
+            listview->setCurrentItem(lvitem->itemBelow());
+            listview->setSelected(lvitem->itemBelow(), true);
+        }
+        else if (lvitem->itemAbove())
+        {
+            listview->setCurrentItem(lvitem->itemAbove());
+            listview->setSelected(lvitem->itemAbove(), true);
+        }
+        else
+            changed(NULL);
+
+        delete lvitem;
+        UpdateProgressBar();
+    }    
+    else if (m_context->GetNumSetting("PlaybackPreview") == 1)
+        startPlayer(rec);
+
+    setActiveWindow();
+    raise();
+
+    timer->start(1000 / 30);
+}
+
+void PlaybackBox::GetFreeSpaceStats(int &totalspace, int &usedspace)
+{
+    QString command;
+    command.sprintf("df -k -P %s", fileprefix.ascii());
+
+    FILE *file = popen(command.ascii(), "r");
+
+    if (!file)
+    {
+        totalspace = -1;
+        usedspace = -1;
+    }
+    else
+    {
+        char buffer[1024];
+        fgets(buffer, 1024, file);
+        fgets(buffer, 1024, file);
+
+        char dummy[1024];
+        int dummyi;
+        sscanf(buffer, "%s %d %d %d %s %s\n", dummy, &totalspace, &usedspace,
+               &dummyi, dummy, dummy);
+
+        totalspace /= 1000;
+        usedspace /= 1000; 
+        pclose(file);
+    }
+}
+ 
+void PlaybackBox::UpdateProgressBar(void)
+{
+    int total, used;
+    GetFreeSpaceStats(total, used);
+
+    QString usestr;
+    char text[128];
+    sprintf(text, "Storage: %d,%03d MB used out of %d,%03d MB total", 
+            used / 1000, used % 1000, 
+            total / 1000, total % 1000);
+
+    usestr = text;
+
+    freespace->setText(usestr);
+    progressbar->setTotalSteps(total);
+    progressbar->setProgress(used);
 }
 
 void PlaybackBox::timeout(void)

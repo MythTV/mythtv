@@ -8,7 +8,9 @@
 
 class QSqlDatabase;
 class QListViewItem;
+class MyListView;
 class QLabel;
+class QProgressBar;
 class TV;
 class NuppelVideoPlayer;
 class RingBuffer;
@@ -20,18 +22,26 @@ class PlaybackBox : public QDialog
 {
     Q_OBJECT
   public:
+    typedef enum { Play, Delete } BoxType;
+
     PlaybackBox(MythContext *context, TV *ltv, QSqlDatabase *ldb, 
-                QWidget *parent = 0, const char *name = 0);
+                BoxType ltype, QWidget *parent = 0, const char *name = 0);
    ~PlaybackBox(void);
     
     void Show();
   
   protected slots:
     void selected(QListViewItem *);
+    void remove(QListViewItem *);
+    void play(QListViewItem *);
     void changed(QListViewItem *);
     void timeout(void);
 
   private:
+    void GetFreeSpaceStats(int &totalspace, int &usedspace); 
+    void UpdateProgressBar(void);
+
+    BoxType type;
     QSqlDatabase *db;
     TV *tv;
 
@@ -43,6 +53,11 @@ class PlaybackBox : public QDialog
     QLabel *date;
     QLabel *chan;
     QLabel *pixlabel;
+
+    MyListView *listview;
+
+    QLabel *freespace;
+    QProgressBar *progressbar;
 
     float wmult, hmult;
     int descwidth;

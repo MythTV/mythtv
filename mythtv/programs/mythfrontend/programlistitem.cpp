@@ -14,15 +14,16 @@
 
 void MyListView::keyPressEvent(QKeyEvent *e)
 {
-    if (e->key() == Key_Space) 
+    if (currentItem() && !currentItem()->isEnabled())
     {
-        if ( currentItem() && !currentItem()->isEnabled() )
+    }
+    else
+    {
+        switch(e->key())
         {
-        }
-        else
-        {   
-            emit spacePressed( currentItem() );
-            return;
+            case 'd': case 'D': emit deletePressed(currentItem()); return;
+            case 'p': case 'P': emit playPressed(currentItem()); return;
+            case Key_Space: emit spacePressed(currentItem()); return;
         }
     }
 

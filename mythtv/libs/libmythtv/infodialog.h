@@ -26,9 +26,12 @@ class InfoDialog : public QDialog
     void rectimeslotPressed(void);
     void recchannelPressed(void);
     void receveryPressed(void);
-    void okPressed(void);
+
+  protected:
+    void hideEvent(QHideEvent *e);
 
   private:
+    void okPressed(void);
     QLabel *getDateLabel(ProgramInfo *pginfo);
   
     QCheckBox *norec;

@@ -25,7 +25,10 @@ DialogBox::DialogBox(MythContext *context, const QString &text,
             QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
+    //context->ThemeWidget(this, screenwidth, screenheight, wmult, hmult);
+
     QLabel *maintext = new QLabel(text, this);
+    maintext->setBackgroundOrigin(WindowOrigin);
     maintext->setAlignment(Qt::WordBreak | Qt::AlignLeft | Qt::AlignTop);
 
     box = new QVBoxLayout(this, (int)(20 * wmult));

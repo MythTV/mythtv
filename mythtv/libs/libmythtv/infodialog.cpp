@@ -35,15 +35,6 @@ InfoDialog::InfoDialog(MythContext *context, ProgramInfo *pginfo,
     setFont(QFont("Arial", (int)(mediumfont * hmult), QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
-    QPushButton *ok = new QPushButton("OK", this, "close");
-    ok->setFont(QFont("Arial", (int)(bigfont * hmult), QFont::Bold));
-
-    QPushButton *cancel = new QPushButton("Cancel", this, "cancel");
-    cancel->setFont(QFont("Arial", (int)(bigfont * hmult), QFont::Bold));
-
-    connect(ok, SIGNAL(clicked()), this, SLOT(okPressed()));
-    connect(cancel, SIGNAL(clicked()), this, SLOT(reject()));
-
     QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
 
     QGridLayout *grid = new QGridLayout(vbox, 4, 2, (int)(10 * wmult));
@@ -114,16 +105,6 @@ InfoDialog::InfoDialog(MythContext *context, ProgramInfo *pginfo,
     recevery = new QCheckBox("Record this program whenever it's shown anywhere", this);
     middleBox->addWidget(recevery);
     connect(recevery, SIGNAL(clicked()), this, SLOT(receveryPressed()));
-
-    f = new QFrame(this);
-    f->setFrameStyle(QFrame::HLine | QFrame::Plain);
-    f->setLineWidth((int)(4 * hmult));
-    vbox->addWidget(f);   
-
-    QHBoxLayout *bottomBox = new QHBoxLayout(vbox);
-
-    bottomBox->addWidget(ok, 1, Qt::AlignCenter);
-    bottomBox->addWidget(cancel, 1, Qt::AlignCenter);
 
     vbox->activate();
 
@@ -264,6 +245,12 @@ void InfoDialog::receveryPressed(void)
     }
 }
 
+void InfoDialog::hideEvent(QHideEvent *e)
+{
+    okPressed();
+    QDialog::hideEvent(e);
+}
+
 void InfoDialog::okPressed(void)
 {
     RecordingType currentSelected = kNotRecording;
@@ -278,6 +265,4 @@ void InfoDialog::okPressed(void)
 
     if (currentSelected != recordstatus)
         myinfo->ApplyRecordStateChange(currentSelected);   
-
-    accept();
 }

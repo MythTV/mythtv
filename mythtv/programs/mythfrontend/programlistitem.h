@@ -2,17 +2,25 @@
 #define PROGRAMLISTITEM_H_
 
 #include <qlistview.h>
+#include <qpixmap.h>
 
-class ProgramInfo;
-class QPixmap;
+#include "libmyth/programinfo.h"
+
+class MythContext;
+class TV;
 
 class MyListView : public QListView
 {
+    Q_OBJECT
   public:
     MyListView(QWidget *parent) : QListView(parent) {}
 
   protected:
     void keyPressEvent( QKeyEvent *e );
+
+  signals:
+    void playPressed(QListViewItem *);
+    void deletePressed(QListViewItem *);
 };
 
 class ProgramListItem : public QListViewItem

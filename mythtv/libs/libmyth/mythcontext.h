@@ -42,6 +42,8 @@ class MythContext
                              int screenheight, float wmult, float hmult);
 
   private:
+    void SetPalette(QWidget *widget);
+
     // font sizes
     int qtfontbig, qtfontmed, qtfontsmall;
 

@@ -127,6 +127,55 @@ int MythContext::GetNumSetting(const QString &key)
     return m_settings->GetNumSetting(key); 
 }
 
+void MythContext::SetPalette(QWidget *widget)
+{
+    QColor bgcolor = QColor(m_settings->GetSetting("BackgroundColor"));
+    QColor fgcolor = QColor(m_settings->GetSetting("ForegroundColor"));
+
+    //widget->setPaletteBackgroundColor(bgcolor);
+    //widget->setPaletteForegroundColor(fgcolor);
+
+    QPalette pal = widget->palette();
+
+    QColorGroup active = pal.active();
+    QColorGroup disabled = pal.disabled();
+    QColorGroup inactive = pal.inactive();
+
+    const QString names[] = { "Foreground", "Button", "Light", "Midlight",  
+                              "Dark", "Mid", "Text", "BrightText", "ButtonText",
+                              "Base", "Background", "Shadow", "Highlight",
+                              "HighlightedText" };
+
+    QString type = "Active";
+    for (int i = 0; i < 13; i++)
+    {
+        QString color = m_settings->GetSetting(type + names[i]);
+        if (color != "")
+            pal.setColor(QPalette::Active, (QColorGroup::ColorRole) i,
+                         QColor(color));
+    }
+
+    type = "Disabled";
+    for (int i = 0; i < 13; i++)
+    {
+        QString color = m_settings->GetSetting(type + names[i]);
+        if (color != "")
+            pal.setColor(QPalette::Disabled, (QColorGroup::ColorRole) i,
+                         QColor(color));
+    }
+
+    type = "Inactive";
+    for (int i = 0; i < 13; i++)
+    {
+        QString color = m_settings->GetSetting(type + names[i]);
+        if (color != "")
+            pal.setColor(QPalette::Inactive, (QColorGroup::ColorRole) i,
+                         QColor(color));
+    }
+
+    widget->setPalette(pal);
+}
+
 void MythContext::ThemeWidget(QWidget *widget, int screenwidth, 
                               int screenheight, float wmult, float hmult)
 {
@@ -135,11 +184,7 @@ void MythContext::ThemeWidget(QWidget *widget, int screenwidth,
 
     if (usetheme)
     {
-        bgcolor = QColor(m_settings->GetSetting("BackgroundColor"));
-        fgcolor = QColor(m_settings->GetSetting("ForegroundColor"));
-
-        widget->setPaletteBackgroundColor(bgcolor);
-        widget->setPaletteForegroundColor(fgcolor);
+        SetPalette(widget);
 
         QPixmap *bgpixmap = NULL;
 

@@ -43,9 +43,12 @@ ViewScheduled::ViewScheduled(MythContext *context, TV *ltv, QSqlDatabase *ldb,
             QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
+    context->ThemeWidget(this, screenwidth, screenheight, wmult, hmult);
+           
     QVBoxLayout *vbox = new QVBoxLayout(this, (int)(10 * wmult));
 
     desclabel = new QLabel("Select a recording to view:", this);
+    desclabel->setBackgroundOrigin(WindowOrigin);
     vbox->addWidget(desclabel);
 
     listview = new MyListView(this);
@@ -82,6 +85,7 @@ ViewScheduled::ViewScheduled(MythContext *context, TV *ltv, QSqlDatabase *ldb,
                              "color=\"gray\">gray</font>.", this);
     key->setFont(QFont("Arial", (int)(m_context->GetSmallFontSize() * hmult), 
                  QFont::Bold));
+    key->setBackgroundOrigin(WindowOrigin);
     vbox->addWidget(key);
 
     QFrame *f = new QFrame(this);
@@ -92,21 +96,30 @@ ViewScheduled::ViewScheduled(MythContext *context, TV *ltv, QSqlDatabase *ldb,
     QGridLayout *grid = new QGridLayout(vbox, 5, 2, 1);
     
     title = new QLabel(" ", this);
+    title->setBackgroundOrigin(WindowOrigin);
     title->setFont(QFont("Arial", (int)(m_context->GetBigFontSize() * hmult), 
                    QFont::Bold));
 
     QLabel *datelabel = new QLabel("Airdate: ", this);
+    datelabel->setBackgroundOrigin(WindowOrigin);
     date = new QLabel(" ", this);
+    date->setBackgroundOrigin(WindowOrigin);
 
     QLabel *chanlabel = new QLabel("Channel: ", this);
+    chanlabel->setBackgroundOrigin(WindowOrigin);
     chan = new QLabel(" ", this);
+    chan->setBackgroundOrigin(WindowOrigin);
 
     QLabel *sublabel = new QLabel("Episode: ", this);
+    sublabel->setBackgroundOrigin(WindowOrigin);
     subtitle = new QLabel(" ", this);
+    subtitle->setBackgroundOrigin(WindowOrigin);
     subtitle->setAlignment(Qt::AlignLeft | Qt::AlignTop);
 
     QLabel *desclabel = new QLabel("Description: ", this);
+    desclabel->setBackgroundOrigin(WindowOrigin);
     description = new QLabel(" ", this);
+    description->setBackgroundOrigin(WindowOrigin);
     description->setAlignment(Qt::WordBreak | Qt::AlignLeft | Qt::AlignTop);
  
     grid->addMultiCellWidget(title, 0, 0, 0, 1, Qt::AlignLeft);
@@ -150,6 +163,7 @@ void ViewScheduled::FillList(void)
         desclabel->setText("You have no recording conflicts.");
 
     listview->setCurrentItem(listview->firstChild());
+    listview->setSelected(listview->firstChild(), true);
 }
 
 void ViewScheduled::Show()

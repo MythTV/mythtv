@@ -28,8 +28,7 @@ TARGETDEPS += ../../libs/libmythtv/libmythtv.a
 TARGETDEPS += ../../libs/libavcodec/libavcodec.a
 
 # Input
-HEADERS += scheduler.h playbackbox.h deletebox.h programlistitem.h 
-HEADERS += viewscheduled.h
+HEADERS += scheduler.h playbackbox.h programlistitem.h viewscheduled.h
 
-SOURCES += main.cpp scheduler.cpp playbackbox.cpp deletebox.cpp 
-SOURCES += programlistitem.cpp viewscheduled.cpp
+SOURCES += main.cpp scheduler.cpp playbackbox.cpp programlistitem.cpp
+SOURCES += viewscheduled.cpp

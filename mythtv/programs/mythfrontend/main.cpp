@@ -10,7 +10,6 @@ using namespace std;
 #include "tv.h"
 #include "scheduler.h"
 #include "playbackbox.h"
-#include "deletebox.h"
 #include "viewscheduled.h"
 
 #include "libmyth/themedmenu.h"
@@ -42,7 +41,7 @@ int startManaged(MythContext *context)
 int startPlayback(MythContext *context)
 {
     QSqlDatabase *db = QSqlDatabase::database();  
-    PlaybackBox pbb(context, tvList.begin().data(), db);
+    PlaybackBox pbb(context, tvList.begin().data(), db, PlaybackBox::Play);
 
     pbb.Show();
 
@@ -54,7 +53,7 @@ int startPlayback(MythContext *context)
 int startDelete(MythContext *context)
 {
     QSqlDatabase *db = QSqlDatabase::database();
-    DeleteBox delbox(context, tvList.begin().data(), db);
+    PlaybackBox delbox(context, tvList.begin().data(), db, PlaybackBox::Delete);
    
     delbox.Show();
     
