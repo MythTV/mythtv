@@ -163,7 +163,6 @@ class NuppelVideoPlayer
     void UnpauseAudio(void);
  
     int OpenFile(bool skipDsp = false);
-    int CloseFile(void);
 
     int GetAudiotime(void);
     void SetAudiotime(void);
