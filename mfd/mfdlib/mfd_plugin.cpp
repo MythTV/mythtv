@@ -359,9 +359,22 @@ void MFDServicePlugin::dropDeadClients()
                 if(!still_there)
                 {
                     //
-                    //  No bytes to read, and we didn't even make it through the
-                    //  30 msec's .... client gone away. Remove it from the list.
+                    //  No bytes to read, and we didn't even make it through
+                    //  the 30 msec's .... client gone away. We want to
+                    //  remove it from the list ... BUT, if the writeLock is
+                    //  on, some other thread has not yet realized this
+                    //  client has gone away ..
                     //
+                    //  ... so, sit here and block (bah!) till that other
+                    //  ... thread realizes what's going on
+                    
+                    a_client->lockWriteMutex();
+                    
+                    //
+                    //  ah, all ours
+                    //
+                    
+                    a_client->unlockWriteMutex();
 
                     client_sockets.remove(a_client);
 

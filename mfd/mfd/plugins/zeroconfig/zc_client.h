@@ -21,7 +21,7 @@
 #include "../../mfd.h"
 
 
-
+class ZeroConfigClient;
 
 class MFDService
 {
@@ -33,7 +33,7 @@ class MFDService
   
   public:
    
-    MFDService(QString name, QString type, QString domain);
+    MFDService(ZeroConfigClient *owner, QString name, QString type, QString domain);
     ~MFDService();
     
     const QString & getName(){return service_name;}
@@ -78,7 +78,8 @@ class MFDService
         MAX_SLOCATION
     };
 
-    int     service_location;    
+    int     service_location;
+    ZeroConfigClient *parent;
 };
 
 

@@ -10,6 +10,10 @@
 
 */
 
+#include <vector>
+#include <iostream>
+using namespace std;
+
 #include <qstring.h>
 #include <qdict.h>
 
@@ -21,15 +25,16 @@ class HttpResponse
 
   public:
 
-    HttpResponse();
+    HttpResponse(HttpRequest *requestor);
     ~HttpResponse();
     
     void setError(int error_number);
-    void addText(int* index, char* block, QString new_text);
+    void addText(std::vector<char> *buffer, QString text_to_add);
     void send(MFDServiceClientSocket *which_client);
+    bool sendBlock(MFDServiceClientSocket *which_client, std::vector<char> block_to_send);
     void addHeader(const QString &new_header);
     void setPayload(char *new_payload, int new_payload_size);
-    void sendFile(QString file_path){file_to_serve = file_path;}
+    void sendFile(QString file_path);
     
   private:
     
@@ -37,11 +42,11 @@ class HttpResponse
     QString status_string;
     bool    all_is_well;
 
-    char    *payload;
-    int     payload_size;
-    QString file_to_serve;
+
+    std::vector<char> payload;
 
     QDict<HttpHeader> headers;
+    HttpRequest *my_request;
 };
 
 #endif

@@ -24,7 +24,8 @@ class MFD;
 
 enum MetadataCollectionContentType
 {
-    MCCT_audio = 0,
+    MCCT_unknown = 0,
+    MCCT_audio,
     MCCT_video
 };
 

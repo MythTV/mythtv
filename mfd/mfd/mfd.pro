@@ -19,7 +19,7 @@ target.path = $${PREFIX}/bin
 INSTALLS += target
 
 TARGET = mfd
-LIBS += -Wl,--export-dynamic $$EXTRA_LIBS -L../mfdlib/ -l mfdlib -Wl,-rpath,/usr/local/lib
+LIBS += -Wl,--export-dynamic $$EXTRA_LIBS -L../mfdlib/ -lmfdlib -Wl,-rpath,/usr/local/lib
 
 !isEmpty(USE_MYTH_LIB) {
 LIBS += -lmyth-$$LIBVERSION 

@@ -32,8 +32,9 @@ ZeroConfigClient     *zero_config_client = NULL;
 ---------------------------------------------------------------------
 */
 
-MFDService::MFDService(QString name, QString type, QString domain)
+MFDService::MFDService(ZeroConfigClient *owner, QString name, QString type, QString domain)
 {
+    parent = owner;
     service_name = name;
     service_type = type;
     service_domain = domain;
@@ -87,7 +88,7 @@ void MFDService::setResolved(uint ip1, uint ip2, uint ip3, uint ip4, uint port_h
     char my_hostname[2049];
     if(gethostname(my_hostname, 2048) < 0)
     {
-        warning("MFDService object could not call gethostname()");
+        parent->warning("MFDService object could not call gethostname()");
         return;
     }
 
@@ -99,16 +100,26 @@ void MFDService::setResolved(uint ip1, uint ip2, uint ip3, uint ip4, uint port_h
     struct in_addr  ip_address_number;
     ip_address_number.s_addr = inet_addr(ip_address_string.ascii());
     host_information = gethostbyaddr((char*)&(ip_address_number.s_addr), sizeof(ip_address_number), AF_INET);
+    QString service_hostname = "";
     if(!host_information)
     {
-        warning(QString("MFDService object could not call gethostbyaddr() using ip address %1")
+        parent->warning(QString("MFDService object could not call gethostbyaddr() using ip address %1 (will assume local)")
                 .arg(ip_address_string));
-        return;
     }
-    QString service_hostname = host_information->h_name;
-    service_hostname = service_hostname.section('.',0,0);
+    else
+    {
+        service_hostname = host_information->h_name;
+        service_hostname = service_hostname.section('.',0,0);
+    }
 
-    if(service_hostname == local_hostname)
+    //
+    //  Determine service location: local if hostname's are the same (i.e. 
+    //  even if different network interfaces) or no IP hostname lookup (i.e.
+    //  probably no functioning network), lan otherwise, but at somepoint
+    //  we'll want to add net (on the network, beyond the local lan).
+    //
+
+    if(service_hostname == local_hostname || service_hostname.length() == 0)
     {
         service_location = SLOCATION_HOST;
     }
@@ -410,7 +421,7 @@ void ZeroConfigClient::handleBrowseCallback(mDNS *const m, DNSQuestion *question
     {
         if(checkServiceName(nameC))
         {
-            MFDService *new_service = new MFDService(nameC, typeC, domainC);
+            MFDService *new_service = new MFDService(this, nameC, typeC, domainC);
             available_services.append(new_service);
 
             //

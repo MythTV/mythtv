@@ -10,6 +10,7 @@
 
 #include <iostream>
 using namespace std;
+#include <fcntl.h>
 #include <unistd.h>
 
 #include <qdatetime.h>
@@ -18,21 +19,24 @@ using namespace std;
 #include "httpresponse.h"
 
 
-HttpResponse::HttpResponse()
+HttpResponse::HttpResponse(HttpRequest *requestor)
 {
+    my_request = requestor;
     headers.setAutoDelete(true);
     all_is_well = true;
     status_code = 200;
     status_string = "OK";
-    payload = NULL;
-    payload_size = 0;
-    file_to_serve = "";
+    payload.clear();
 }
 
 void HttpResponse::setError(int error_number)
 {
     all_is_well = false;
     
+    //
+    //  These are all HTTP 1.1 status responses
+    //
+
     if(error_number == 400)
     {
         status_code = error_number;
@@ -159,38 +163,32 @@ void HttpResponse::setError(int error_number)
     }
 }
 
-void HttpResponse::addText(int *index, char* block, QString new_text)
+void HttpResponse::addText(std::vector<char> *buffer, QString text_to_add)
 {
-    int position = *index;
-    for(uint i = 0; i < new_text.length(); i++)
-    {
-        block[position] = new_text[i].latin1();
-        position++;
-    }
-    *index = position;
+    buffer->insert(buffer->end(), text_to_add.ascii(), text_to_add.ascii() + text_to_add.length()); 
 }
 
 void HttpResponse::send(MFDServiceClientSocket *which_client)
 {
-    char outgoing_block[MAX_CLIENT_OUTGOING];
-    int  current_point = 0;
+    std::vector<char> header_block;
 
     //
-    //  Build the first line
+    //  Build the first line. Note that the status code and status string
+    //  are already set (by default 200, "OK").
     //
     
     QString first_line = QString("HTTP/1.1 %1 %2\r\n")
                          .arg(status_code)
                          .arg(status_string);
-
-    addText(&current_point, outgoing_block, first_line);
-
+    
+    addText(&header_block, first_line);
+    
     //
     //  Always add the server header
     //
     
     QString server_header = QString("Server: MythTV Embedded Server\r\n");
-    addText(&current_point, outgoing_block, server_header); 
+    addText(&header_block, server_header);
 
     //
     //  Always do the date
@@ -198,163 +196,156 @@ void HttpResponse::send(MFDServiceClientSocket *which_client)
 
     QDateTime current_time = QDateTime::currentDateTime (Qt::UTC);
     QString date_header = QString("Date: %1 GMT\r\n").arg(current_time.toString("ddd, dd MMM yyyy hh:mm:ss"));
-    addText(&current_point, outgoing_block, date_header);
+    addText(&header_block, date_header);
 
 
     if(all_is_well)
     {
-        if(file_to_serve.length() > 0)
-        {
-            QFile the_file(file_to_serve);
-            if(the_file.exists())
-            {
-                QString file_size_header = QString("Content-Length: %1\r\n").arg(the_file.size());
-                addText(&current_point, outgoing_block, file_size_header);
-                payload = NULL;
-                payload_size = 0;
-                
-                //
-                //  Add an end of headers blank line
-                //    
-    
-                outgoing_block[current_point] = '\r';
-                current_point++;
-                outgoing_block[current_point] = '\n';
-                current_point++;
 
-            }
-            else
-            {
-                cout << "crappity crap crap" << endl;
-            }
-    
-        }
-        else
+
+        //
+        //  No errors, set the Content-Length Header
+        //
+        
+        QString content_length_header = QString("Content-Length: %1\r\n").arg(payload.size());
+        addText(&header_block, content_length_header);
+        
+        //
+        //  Explain that we are happy to accept content ranges (which we'll figure out real soon now)
+        //
+        
+        QString content_ranges_header = QString("Accept-Ranges: bytes\r\n");
+        addText(&header_block, content_ranges_header);
+
+        //
+        //  Set any other headers that were assigned
+        //
+        
+        QDictIterator<HttpHeader> it( headers );
+        for( ; it.current(); ++it )
         {
-            //
-            //  No errors, send all headers
-            //
-        
-            QDictIterator<HttpHeader> it( headers );
-            for( ; it.current(); ++it )
-            {
-                QString a_header = QString("%1: %2\r\n")
-                                   .arg(it.current()->getField())
-                                   .arg(it.current()->getValue());
-                addText(&current_point, outgoing_block, a_header);
-            }
-        
-            //
-            //  Add an end of headers blank line
-            //    
-    
-            outgoing_block[current_point] = '\r';
-            current_point++;
-            outgoing_block[current_point] = '\n';
-            current_point++;
-        
-            //
-            //  the payload
-            //
-        
-            if(payload)
-            {
-                for(int i = 0; i < payload_size; i++)
-                {
-                    outgoing_block[current_point] = payload[i];
-                    current_point++;
-                }
-            }
+            QString a_header = QString("%1: %2\r\n")
+                               .arg(it.current()->getField())
+                               .arg(it.current()->getValue());
+            addText(&header_block, a_header);
         }
+        
+               
     }
     else
     {
+
         //
         //  Errors, just send an empty payload with minimal headers
         //
-        
+
+        payload.clear();
+
         QString content_type_header = QString("Content-Type: text/html\r\n");
-        addText(&current_point, outgoing_block, content_type_header);
+        addText(&header_block, content_type_header);
 
         QString content_length_header = QString("Content-Length: 0\r\n");
-        addText(&current_point, outgoing_block, content_length_header);
+        addText(&header_block, content_length_header);
 
-        //
-        //  Add a final blank line
-        //    
-    
-        outgoing_block[current_point] = '\r';
-        current_point++;
-        outgoing_block[current_point] = '\n';
-        current_point++;
-    
     }
+
+    //
+    //
+    //  Add an end of headers blank line
+    //
+           
+    QString blank_line = QString("\r\n");
+    addText(&header_block, blank_line);
+    
+
     
     //
     //  All done, send it
     //
-    //  We may need to do multiple writes ...
+    //  (if the header goes through, try and send the payload)
+    //
     
-    bool keep_writing = true;
-    while(keep_writing)
+    if(sendBlock(which_client, header_block))
     {
-        int result = which_client->writeBlock(outgoing_block, current_point);
-        cout << "sent " << result << " bytes" << endl;
+        sendBlock(which_client, payload);    
+    }
+}
+
+
+bool HttpResponse::sendBlock(MFDServiceClientSocket *which_client, std::vector<char> block_to_send)
+{
+    int nfds = 0;
+    fd_set writefds;
+    struct  timeval timeout;
+    int amount_written = 0;
+    bool keep_going = true;
+
+    //
+    //  Could be that our payload (for example) is empty.
+    //
+
+    if(block_to_send.size() < 1)
+    {
+        keep_going = false;
+    }
+
+
+    while(keep_going)
+    {
+        FD_ZERO(&writefds);
+        FD_SET(which_client->socket(), &writefds);
+        if(nfds <= which_client->socket())
+        {
+            nfds = which_client->socket() + 1;
+        }
+        
+        timeout.tv_sec = 5;
+        timeout.tv_usec = 0;
+        int result = select(nfds, NULL, &writefds, NULL, &timeout);
         if(result < 0)
         {
-            //
-            //  Socket is full, wait a bit
-            //
+            cerr << "Crappity crap crap" << endl;
+        }
 
-            usleep(100);
+        if(FD_ISSET(which_client->socket(), &writefds))
+        {
+            //
+            //  Socket is available for writing
+            //
+            
+            int bytes_sent = which_client->writeBlock( &(block_to_send[amount_written]), block_to_send.size() - amount_written);
+            if(bytes_sent < 0)
+            {
+                //
+                //  Hmm, select() said we were ready, but now we're getting
+                //  an error ... client has gone away?
+                //
+                
+                return false;
+                
+            }
+            else if(bytes_sent >= (int) (block_to_send.size() - amount_written))
+            {
+                //
+                //  All done
+                //
+
+                keep_going = false;
+            }
+            else
+            {
+                amount_written += bytes_sent;
+            }
         }
         else
         {
-            if(result == 0 || result == current_point)
-            {
-                keep_writing = false;
-            }
-            else if(result < current_point)
-            {
-                for(int i = 0; i < current_point - result; i++)
-                {
-                    ++*outgoing_block;
-                }
-                current_point = current_point - result;
-            }
+            //
+            //  We just time'd out
+            //
         }
-    }
 
-    if(file_to_serve.length() > 0)
-    {
-        QFile the_file(file_to_serve);
-        if(the_file.open(IO_Raw | IO_ReadOnly))
-        {
-            char in_and_out[10000];
-            int how_much;
-            bool keep_going = true;
-            while( keep_going)
-            {
-                how_much = the_file.readLine(in_and_out, 1024);
-                if(which_client->writeBlock(in_and_out, how_much) < 0)
-                {
-                    keep_going = false;
-                }
-            }
-            the_file.close();
-        }
-        
-    }    
-    
-        
-    outgoing_block[current_point] = '\0';
-    cout << "######################################"
-         << endl
-         << "Sending:"
-         << endl
-         << outgoing_block
-         << endl;
-    
+    }
+    return true;
 }
 
 void HttpResponse::addHeader(const QString &new_header)
@@ -371,28 +362,41 @@ void HttpResponse::setPayload(char *new_payload, int new_payload_size)
         new_payload_size = MAX_CLIENT_OUTGOING;
     }
 
-    if(payload)
-    {
-        delete payload;
-        payload = NULL;
+
+    payload.clear();
+
+    payload.insert(payload.end(), new_payload, new_payload + new_payload_size);
+}
+
+void HttpResponse::sendFile(QString file_path)
+{
+
+    int	 fd;
+    int  len;
+	char buf[10000];
+
+    fd = open(file_path.ascii(),O_RDONLY);
+    if (fd < 0)
+	{
+	    //  my_request-> do a real warning()
+	    cout << "Crappity crap crap" << endl;
+	    setError(404);
+        return;
     }
-    
-    payload = new char[new_payload_size];
-    
-    for(int i = 0; i < new_payload_size; i++)
+
+    //  lseek(fd, 0, SEEK_SET);
+    len = read(fd, buf, 10000);
+    while(len > 0)
     {
-        payload[i] = new_payload[i];
+        payload.insert(payload.end(), buf, buf + len);
+		len = read(fd, buf, 10000);
     }
-    payload_size = new_payload_size;
+	close(fd);
 }
     
 HttpResponse::~HttpResponse()
 {
     headers.clear();
-    if(payload)
-    {
-        delete payload;
-        payload = NULL;
-    }
+    payload.clear();
 }
 

@@ -96,7 +96,7 @@ HttpRequest::HttpRequest(char *raw_incoming, int incoming_length)
     //  Every request gets a response
     //
     
-    my_response = new HttpResponse();
+    my_response = new HttpResponse(this);
     
     if(incoming_length > MAX_CLIENT_INCOMING)
     {

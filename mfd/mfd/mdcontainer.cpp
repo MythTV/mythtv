@@ -36,6 +36,8 @@ MetadataContainer::MetadataContainer(
     unique_identifier = l_unique_identifier;
     content_type = l_content_type;
     location_type = l_location_type;
+    current_metadata = NULL;
+    current_playlists = NULL;
 }
 
 void MetadataContainer::log(const QString &log_message, int verbosity)
