@@ -9,6 +9,105 @@
 /* needed for kenneths verification functions that need to be re-written*/
 #define WORD(i,j)   ((i << 8) | j)
 
+// Set EIT_DEBUG_SID to a valid serviceid to enable EIT debugging
+// #define EIT_DEBUG_SID 1602
+
+SIParser::description_table_rec SIParser::description_table[] = 
+{ 
+    { 0x10, "Movies" },
+    { 0x11, "Movie - detective/thriller" },
+    { 0x12, "Movie - adventure/western/war" },
+    { 0x13, "Movie - science fiction/fantasy/horror" },
+    { 0x14, "Movie - comedy" },
+    { 0x15, "Movie - soap/melodrama/folkloric" },
+    { 0x16, "Movie - romance" },
+    { 0x17, "Movie - serious/classical/religious/historical movie/drama" },
+    { 0x18, "Movie - adult movie/drama" },
+    
+    { 0x20, "News" },
+    { 0x21, "news/weather report" },
+    { 0x22, "news magazine" },
+    { 0x23, "documentary" },
+    { 0x24, "discussion/interview/debate" },
+    
+    { 0x30, "show/game Show" },
+    { 0x31, "game show/quiz/contest" },
+    { 0x32, "variety show" },
+    { 0x33, "talk show" },
+    
+    { 0x40, "Sports" },
+    { 0x41, "special events (Olympic Games, World Cup etc.)" },
+    { 0x42, "sports magazines" },
+    { 0x43, "football/soccer" },
+    { 0x44, "tennis/squash" },
+    { 0x45, "team sports (excluding football)" },
+    { 0x46, "athletics" },
+    { 0x47, "motor sport" },
+    { 0x48, "water sport" },
+    { 0x49, "winter sports" },
+    { 0x4A, "equestrian" },
+    { 0x4B, "martial sports" },
+    
+    { 0x50, "Kids" },
+    { 0x51, "pre-school children's programmes" },
+    { 0x52, "entertainment programmes for 6 to14" },
+    { 0x53, "entertainment programmes for 10 to 16" },
+    { 0x54, "informational/educational/school programmes" },
+    { 0x55, "cartoons/puppets" },
+    
+    { 0x60, "music/ballet/dance" },
+    { 0x61, "rock/pop" },
+    { 0x62, "serious music/classical music" },
+    { 0x63, "folk/traditional music" },
+    { 0x64, "jazz" },
+    { 0x65, "musical/opera" },
+    { 0x66, "ballet" },
+
+    { 0x70, "arts/culture" },
+    { 0x71, "performing arts" },
+    { 0x72, "fine arts" },
+    { 0x73, "religion" },
+    { 0x74, "popular culture/traditional arts" },
+    { 0x75, "literature" },
+    { 0x76, "film/cinema" },
+    { 0x77, "experimental film/video" },
+    { 0x78, "broadcasting/press" },
+    { 0x79, "new media" },
+    { 0x7A, "arts/culture magazines" },
+    { 0x7B, "fashion" },
+    
+    { 0x80, "social/policical/economics" },
+    { 0x81, "magazines/reports/documentary" },
+    { 0x82, "economics/social advisory" },
+    { 0x83, "remarkable people" },
+    
+    { 0x90, "Education/Science/Factual" },
+    { 0x91, "nature/animals/environment" },
+    { 0x92, "technology/natural sciences" },
+    { 0x93, "medicine/physiology/psychology" },
+    { 0x94, "foreign countries/expeditions" },
+    { 0x95, "social/spiritual sciences" },
+    { 0x96, "further education" },
+    { 0x97, "languages" },
+    
+    { 0xA0, "leisure/hobbies" },
+    { 0xA1, "tourism/travel" },
+    { 0xA2, "handicraft" },
+    { 0xA3, "motoring" },
+    { 0xA4, "fitness & health" },
+    { 0xA5, "cooking" },
+    { 0xA6, "advertizement/shopping" },
+    { 0xA7, "gardening" },
+    // Special
+    { 0xB0, "Original Language" },
+    { 0xB1, "black & white" },
+    { 0xB2, "unpublished" },
+    { 0xB3, "live broadcast" },
+    // UK Freeview custom id
+    { 0xF0, "Drama" },
+    { 0, NULL }    
+};
+
 SIParser::SIParser()
 {
     ThreadRunning = false;
@@ -29,12 +128,35 @@ SIParser::SIParser()
     Table[SERVICES] = new ServiceHandler();
     Table[NETWORK] = new NetworkHandler();
 
+    initialiseCategories();
+
     Reset();
+
+    // Get a list of wanted languages and set up their priorities
+    // (Lowest number wins)
+    QStringList PreferredLanguages = QStringList::split(",", gContext->GetSetting("PreferredLanguages", ""));
+    QStringList::Iterator plit;
+    int prio = 1;
+    for (plit = PreferredLanguages.begin(); plit != PreferredLanguages.end(); ++plit)
+    {
+        SIPARSER(QString("Added preferred language %1 with priority %2").arg(*plit).arg(prio));
+        LanguagePriority[*plit] = prio++;
+    }
 }
 
 SIParser::~SIParser()
 {
     pthread_mutex_destroy(&pmap_lock);
+}
+
+void SIParser::initialiseCategories()
+{
+    description_table_rec *p=description_table;
+    while (p->id!= 0)
+    { 
+        m_mapCategories[p->id] = QObject::tr(p->desc);
+        p++;
+    }
 }
 
 /* Resets all trackers, and closes all section filters */
@@ -95,8 +217,8 @@ void SIParser::CheckTrackers()
             SIPARSER(QString("Table[%1]->RequirePIDs() == true").arg((tabletypes) x));
             while (Table[x]->GetPIDs(pid,filter,mask))
             {
-                AddPid(pid,mask,filter,true);
-                SIPARSER(QString("Adding PID %1 Filter %2 Mask %3").arg(pid,4,16).arg(filter,2,16).arg(mask,2,16));
+                AddPid(pid, mask, filter, true, 
+                        ((SIStandard == SI_STANDARD_DVB) && (x == EVENTS)) ? 1000 : 10);
             }
         }
     }
@@ -154,8 +276,6 @@ void SIParser::LoadPrivateTypes(uint16_t NetworkID)
                        .arg(NetworkID)
                        .arg(STD);
 
-printf("%s\n",theQuery.ascii());
-
     pthread_mutex_lock(db_lock);
     QSqlQuery query = db_conn->exec(theQuery);
 
@@ -186,6 +306,14 @@ printf("%s\n",theQuery.ascii());
                 SIPARSER(QString("ChannelNumbers Present using Descriptor %d")
                          .arg(PrivateTypes.ChannelNumbers));
             }
+            if (QString(query.value(0).toString()) == "force_guide_present")
+            {
+                if (query.value(1).toString() == "yes")
+                {
+                    PrivateTypes.ForceGuidePresent = true;
+                    SIPARSER(QString("Forcing Guide Present"));
+                }
+            }
             if (QString(query.value(0).toString()) == "guide_fixup")
             {
                 PrivateTypes.EITFixUp = query.value(1).toInt();
@@ -195,12 +323,16 @@ printf("%s\n",theQuery.ascii());
             {
                 PrivateTypes.CustomGuideRanges = true;
                 QStringList temp  = QStringList::split(",",query.value(1).toString());
-                QStringList::Iterator i;
-                PrivateTypes.GuideTableMin = temp[0].toInt();
-                PrivateTypes.GuideTableMax = temp[1].toInt();
-                SIPARSER(QString("Using Guide Custom Range %1 - %2")
-                         .arg(PrivateTypes.GuideTableMin,2,16)
-                         .arg(PrivateTypes.GuideTableMax,2,16));
+                PrivateTypes.CurrentTransportTableMin = temp[0].toInt();
+                PrivateTypes.CurrentTransportTableMax = temp[1].toInt();
+                PrivateTypes.OtherTransportTableMin = temp[2].toInt();
+                PrivateTypes.OtherTransportTableMax = temp[3].toInt();
+                
+                SIPARSER(QString("Using Guide Custom Range; CurrentTransport: %1-%2, OtherTransport: %3-%4")
+                         .arg(PrivateTypes.CurrentTransportTableMin,2,16)
+                         .arg(PrivateTypes.CurrentTransportTableMax,2,16)
+                         .arg(PrivateTypes.OtherTransportTableMin,2,16)
+                         .arg(PrivateTypes.OtherTransportTableMax,2,16));
             }
             if (QString(query.value(0).toString()) == "tv_types")
             {
@@ -241,12 +373,13 @@ bool SIParser::GetServiceObject(QMap_SDTObject& SDT)
     return true;
 }
 
-void SIParser::AddPid(uint16_t pid,uint8_t mask,uint8_t filter, bool CheckCRC)
+void SIParser::AddPid(uint16_t pid,uint8_t mask,uint8_t filter, bool CheckCRC, int bufferFactor)
 {
     (void) pid;
     (void) mask;
     (void) filter;
     (void) CheckCRC;
+    (void) bufferFactor;
     SIPARSER("Using AddPid from SIParser which does nothing");
 }
 
@@ -278,8 +411,6 @@ bool SIParser::FillPMap(SISTANDARD _SIStandard)
         Table[x]->SetSIStandard(_SIStandard);
 
     SIStandard = _SIStandard;
-
-printf("SI Standard = %d\n",SIStandard);
 
     pthread_mutex_unlock(&pmap_lock);
 
@@ -386,9 +517,8 @@ void SIParser::ParseTable(uint8_t* buffer, int size, uint16_t pid)
         {
               case 0xC7:  ParseMGT(&head, &buffer[8], size-8);
                           break;
-              case 0xC8:  ParseTVCT(&head, &buffer[8], size-8);
-                          break;
-              case 0xC9:  ParseCVCT(&head, &buffer[8], size-8);
+              case 0xC8:  
+              case 0xC9:  ParseVCT(&head, &buffer[8], size-8);
                           break;
               case 0xCA:  ParseRRT(&head, &buffer[8], size-8);
                           break;
@@ -705,37 +835,13 @@ void SIParser::ParsePMT(tablehead_t* head, uint8_t* buffer, int size)
 void SIParser::ProcessUnknownDescriptor(uint8_t* buf, int len)
 {
 
-    (void) buf;
-    (void) len;
-
-// TODO: Add to SIDEBUG level
-
-/*    fprintf(stderr,"Unknown Descriptor: ");
+    QString temp = "Unknown Descriptor: ";
+   
     for (int x=0;x<len;x++)
-       fprintf(stderr,"%02X ",buf[x]);
-    fprintf(stderr,"\n");
-*/
-}
+       temp += QString("%1 ").arg(buf[x],2,16);
 
-/*------------------------------------------------------------------------
- *   CRC CHECKERS
- *------------------------------------------------------------------------*/
+    SIPARSER(temp);
 
- bool SIParser::ATSC_CRC32(uint8_t* buffer, int size)
-{
-   //TODO: Cut and paste from PSIP PCHDTV Code
-   (void) buffer;
-   (void) size;
-   return true;
-}
-
- bool SIParser::DVB_CRC32(uint8_t* buffer, int size)
-{
-   // This doesnt need to be implimented right now since the DVB drivers
-   // already do the CRC checking.
-   (void) buffer;
-   (void) size;
-   return true;
 }
 
 /*------------------------------------------------------------------------
@@ -951,13 +1057,9 @@ void SIParser::ParseNIT(tablehead_t* head, uint8_t* buffer, int size)
     
         if (PrivateTypes.ChannelNumbers && !(ChannelNumbers.empty()))
         {
-            printf("I got some ChannelNumbers this time around!\n");
             QMap_uint16_t::Iterator c;
             for (c = ChannelNumbers.begin() ; c != ChannelNumbers.end() ; ++c)
-            {
-                printf("ServiceID %d = Channelnumber %d\n",c.key(),c.data());
                 ((ServiceHandler*) Table[SERVICES])->Services[t.TransportID][c.key()].ChanNum = c.data();
-            }
         }
 
         ((NetworkHandler*) Table[NETWORK])->NITList.Transport += t;
@@ -1009,15 +1111,14 @@ void SIParser::ParseSDT(tablehead_t* head, uint8_t* buffer, int size)
     uint16_t descriptors_loop_length = 0;
     SDTObject s;
 
-    s.TransportID = head->table_id_ext;
-    s.NetworkID = network_id;
+    SIPARSER(QString("SDT: NetworkID=%1 TransportID=%2").arg(network_id).arg(head->table_id_ext));
 
     while (pos < (size-4))
     {
         s.ServiceID = buffer[pos] << 8 | buffer[pos+1];
         s.TransportID = head->table_id_ext;
         s.NetworkID = network_id;
-        s.EITPresent = (buffer[pos+2] & 0x02) >> 1;
+        s.EITPresent = PrivateTypes.ForceGuidePresent ? 1 : (buffer[pos+2] & 0x02) >> 1;
         s.RunningStatus = (buffer[pos+3] & 0xE0) >> 5;
         s.CAStatus = (buffer[pos+3] & 0x10) >> 4;
         s.Version = head->version;
@@ -1044,16 +1145,23 @@ void SIParser::ParseSDT(tablehead_t* head, uint8_t* buffer, int size)
             len = buffer[pos + 6 + lentotal];
             lentotal += (len + 2);
         }
-        SIPARSER(QString("SDT: sid=%1 type=%2 name=%3").arg(s.ServiceID).arg(s.ServiceType).arg(s.ServiceName.ascii()));
 
+        bool eit_requested = false;
 #ifdef USING_DVB_EIT
 
         if ((s.EITPresent) && (s.ServiceType == 1) && ((!PrivateTypes.GuideOnSingleTransport) ||
             ((PrivateTypes.GuideOnSingleTransport) && 
             (PrivateTypes.GuideTransportID == PrivateTypes.CurrentTransportID)))) 
-
+        {
             Table[EVENTS]->RequestEmit(s.ServiceID);
+            eit_requested = true;
+        }
 #endif
+
+        SIPARSER(QString("SDT: sid=%1 type=%2 eit_present=%3 eit_requested=%4 name=%5")
+                 .arg(s.ServiceID).arg(s.ServiceType)
+                 .arg(s.EITPresent).arg(eit_requested)
+                 .arg(s.ServiceName.ascii()));
 
         if (CurrentTransport)
             ((ServiceHandler*) Table[SERVICES])->Services[0][s.ServiceID] = s;
@@ -1068,7 +1176,7 @@ void SIParser::ParseSDT(tablehead_t* head, uint8_t* buffer, int size)
 
     // TODO: This is temp
     Table[EVENTS]->DependencyMet(SERVICES);
-    Table[EVENTS]->AddPid(0x12,0x00,0x00);
+    Table[EVENTS]->AddPid(0x12,0x00,0x00,true);
 }
 
 void SIParser::ParseDVBEIT(tablehead_t* head, uint8_t* buffer ,int size)
@@ -1081,8 +1189,19 @@ void SIParser::ParseDVBEIT(tablehead_t* head, uint8_t* buffer ,int size)
     {
         if (PrivateTypes.CustomGuideRanges)
         {
-            for (int x = PrivateTypes.GuideTableMin ; x < last_table_id ; x++)
-              ((EventHandler*) Table[EVENTS])->Tracker[head->table_id_ext][x].Reset();
+            if ((head->table_id >= PrivateTypes.CurrentTransportTableMin)
+                && (head->table_id <= PrivateTypes.CurrentTransportTableMax))
+            {
+                for (int x = PrivateTypes.CurrentTransportTableMin; x <= PrivateTypes.CurrentTransportTableMax; x++)
+                    ((EventHandler*) Table[EVENTS])->Tracker[head->table_id_ext][x].Reset();
+            }
+            else if ((head->table_id >= PrivateTypes.OtherTransportTableMin)
+                && (head->table_id <= PrivateTypes.OtherTransportTableMax))
+            {
+                for (int x = PrivateTypes.OtherTransportTableMin; x <= PrivateTypes.OtherTransportTableMax; x++)
+                    ((EventHandler*) Table[EVENTS])->Tracker[head->table_id_ext][x].Reset();
+            }
+            
         }
         else
         {
@@ -1104,7 +1223,7 @@ void SIParser::ParseDVBEIT(tablehead_t* head, uint8_t* buffer ,int size)
     if (Table[EVENTS]->AddSection(head,head->table_id_ext,head->table_id))
         return;
 
-    if (last_segment_number != last_table_id)
+    if (last_segment_number != head->section_last)
     {
         for (int x=(last_segment_number+1);x<((head->section_number&0xF8)+8);x++)
             ((EventHandler*) Table[EVENTS])->Tracker[head->table_id_ext][head->table_id].MarkUnused(x);
@@ -1123,7 +1242,9 @@ void SIParser::ParseDVBEIT(tablehead_t* head, uint8_t* buffer ,int size)
     e.TransportID                = buffer[0] << 8 | buffer[1];
     e.NetworkID                  = buffer[2]  << 8 | buffer[3];
 
-    printf("EIT_DEBUG: sid:%d nid:%04X tid:%04X lseg:%02X ltab:%02X tab:%02X sec:%02X lsec: %02X size:%d\n",
+#ifdef EIT_DEBUG_SID
+if (e.ServiceID == EIT_DEBUG_SID) {
+    fprintf(sdtout,"EIT_DEBUG: sid:%d nid:%04X tid:%04X lseg:%02X ltab:%02X tab:%02X sec:%02X lsec: %02X size:%d\n",
            e.ServiceID,
            e.NetworkID,
            e.TransportID,
@@ -1133,6 +1254,8 @@ void SIParser::ParseDVBEIT(tablehead_t* head, uint8_t* buffer ,int size)
            head->section_number,
            head->section_last,
            size);
+}
+#endif
 
    // Loop through table (last 4 bytes are CRC)
    while (pos < (size-4))
@@ -1144,49 +1267,129 @@ void SIParser::ParseDVBEIT(tablehead_t* head, uint8_t* buffer ,int size)
                        (bcdtoint(buffer[pos+7] & 0xFF) * 3600) +
                        (bcdtoint(buffer[pos+8] & 0xFF) * 60) +
                        (bcdtoint(buffer[pos+9] & 0xFF)) ) ;
-       descriptor_length = ((buffer[pos+10] & 0x0F) << 8) | buffer[pos+11];
-       des_pos = pos + 12;
 
-  /*     fprintf(stderr,"DVBDate: %02X %02X %02X %02X %02X\n",
-                       buffer[pos+2],
-                       buffer[pos+3],
-                       buffer[pos+4],
-                       buffer[pos+5],
-                       buffer[pos+6]);
-*/
-//       fprintf(stdout,"EIT: %d EventID: %d   Time: %s\n",e.ServiceID,e.EventID,e.StartTime.toString(QString("yyyyMMddhhmm")).ascii());
+#ifdef EIT_DEBUG_SID
+if (e.ServiceID == EIT_DEBUG_SID) {
+       fprintf(stdout,"EIT_EVENT: %d EventID: %d   Time: %s - %s\n",e.ServiceID,e.EventID,e.StartTime.toString(QString("yyyyMMddhhmm")).ascii(),e.EndTime.toString(QString("yyyyMMddhhmm")).ascii());
+}
+#endif
 
-       // Parse descriptors for length
-        while(des_pos < (pos + descriptor_length)) 
+        // variables to store info about "best descriptor" 4D & 4E
+        // (used to pick out the one with the preferred language 
+        // in case there are more than one)
+        int bd4D_prio = -1;
+        uint8_t *bd4D_data = NULL;
+        QString bd4D_lang;
+        int bd4E_prio = -1;
+        uint8_t *bd4E_data = NULL;
+        QString bd4E_lang;
+
+        // Parse descriptors
+        descriptor_length = ((buffer[pos+10] & 0x0F) << 8) | buffer[pos+11];
+        pos+=12;
+        des_pos = pos;
+        while (des_pos < (pos + descriptor_length)) 
         { 
             switch (buffer[des_pos]) 
             {
                 case 0x4D:
-                           ProcessShortEventDescriptor(&buffer[des_pos],
-                               buffer[des_pos+1]+2,e);
-                           break;
-                case 0x4E:
-                           ProcessExtendedEventDescriptor(&buffer[des_pos],
-                               buffer[des_pos+1]+2,e);
-                           break;
-                case 0x54:
-                           e.ContentDescription = ProcessContentDescriptor(
-                                &buffer[des_pos],buffer[des_pos+1]+2);
-                           break;
-                default:            
-                           ProcessUnknownDescriptor(&buffer[des_pos],buffer[des_pos+1]+2);
-             }
-             des_pos += (buffer[des_pos+1] + 2);
+                    {
+                        QString lang = QString::fromLatin1((const char*) &buffer[des_pos + 2], 3);
+                        int prio = LanguagePriority[lang];
 
-             if (des_pos > size)
-                 return;
+#ifdef EIT_DEBUG_SID
+if (e.ServiceID == EIT_DEBUG_SID) {
+       fprintf(stdout,"EIT_EVENT: 4D descriptor, lang %s, prio %i\n", lang.ascii(), prio);
+}
+#endif
+
+                        if ((prio > 0 && prio < bd4D_prio) || bd4D_prio == -1)
+                        {
+                            // this descriptor is better than what we have
+                            // => store a reference to this one
+                            bd4D_lang = lang;
+                            bd4D_prio = prio;
+                            bd4D_data = &buffer[des_pos];
+                        }
+                    }
+                    break;
+
+                case 0x4E:
+                    {
+                        QString lang = QString::fromLatin1((const char*) &buffer[des_pos + 3], 3);
+                        int prio = LanguagePriority[lang];
+
+#ifdef EIT_DEBUG_SID
+if (e.ServiceID == EIT_DEBUG_SID) {
+       fprintf(stdout,"EIT_EVENT: 4E descriptor, lang %s, prio %i\n", lang.ascii(), prio);
+}
+#endif
+
+                        if ((prio > 0 && prio < bd4E_prio) || bd4E_prio == -1)
+                        {
+                            // this descriptor is better than what we have
+                            // => store a reference to this one
+                            bd4E_lang = lang;
+                            bd4E_prio = prio;
+                            bd4E_data = &buffer[des_pos];
+                        }
+                    }
+                    break;
+
+                case 0x50:
+                    ProcessComponentDescriptor(&buffer[des_pos], buffer[des_pos+1]+2,e);
+                    break;
+
+                case 0x54:
+                    e.ContentDescription =
+                            ProcessContentDescriptor(&buffer[des_pos],buffer[des_pos+1]+2);
+                    break;
+
+                default:            
+                    ProcessUnknownDescriptor(&buffer[des_pos],buffer[des_pos+1]+2);
+                    break;
+            }
+            des_pos += (buffer[des_pos+1]+2);
+
+            if (des_pos > size)
+                return;
         }
+
+
+        // Resolve data for "best" 4D & 4E descriptors
+        if (bd4D_data != NULL)
+        {
+#ifdef EIT_DEBUG_SID
+if (e.ServiceID == EIT_DEBUG_SID) {
+        fprintf(stdout, "EIT_EVENT: using 4D data for language='%s'\n", bd4D_lang.ascii());
+}
+#endif
+            e.LanguageCode = bd4D_lang;
+            ProcessShortEventDescriptor(bd4D_data, bd4D_data[1] + 2, e);
+        }
+        if (bd4E_data != NULL)
+        {
+#ifdef EIT_DEBUG_SID
+if (e.ServiceID == EIT_DEBUG_SID) {
+        fprintf(stdout, "EIT_EVENT: using 4E data for language='%s'\n", bd4E_lang.ascii());
+}
+#endif
+            e.LanguageCode = bd4E_lang;
+            ProcessExtendedEventDescriptor(bd4E_data, bd4E_data[1] + 2, e);
+        }
+
 
         EITFixUp(e);
 
+#ifdef EIT_DEBUG_SID
+if (e.ServiceID == EIT_DEBUG_SID) {
+        fprintf(stdout, "EIT_EVENT: LanguageCode='%s' Event_Name='%s' Description='%s'\n", e.LanguageCode.ascii(), e.Event_Name.ascii(), e.Description.ascii());
+}
+#endif
+
         ((EventHandler*) Table[EVENTS])->Events[head->table_id_ext][e.EventID] = e;
         e.clearEventValues();
-        pos += (descriptor_length + 12);
+        pos += descriptor_length;
     }
 }
 
@@ -1232,6 +1435,8 @@ void SIParser::ParseDescriptorLinkage(uint8_t* buffer,int size,NetworkObject &n)
     n.LinkageType = buffer[8];
     n.LinkagePresent = 1;
 
+    //The following was found to break EIT guide for 
+    // Kristian Kalweit <kalweit@exorpro.de>
     if (n.LinkageType == 4)
     {
         PrivateTypes.GuideOnSingleTransport = true;
@@ -1282,8 +1487,6 @@ void SIParser::ParseDescriptorUKChannelList(uint8_t* buffer,int size, QMap_uint1
         uint16_t channel_num = (buffer[i+2]&0x03<<8)|(buffer[i+3]&0xff);
 
         numbers[service_id] = channel_num;
-
-        cerr << "UK service "<<service_id<<" on channel "<<channel_num<<"\n";
     }
 }
 
@@ -1650,84 +1853,32 @@ TransportObject SIParser::ParseDescriptorCableDeliverySystem(uint8_t* buffer, in
 QString SIParser::ProcessContentDescriptor(uint8_t *buf,int size)
 {
 // TODO: Add all types, possibly just lookup from a big array that is an include file?
-
     (void) size;
-
-    QString retval;
-
-    switch ((buf[2] & 0xF0) >> 4) 
-    {
-    case 0:
-        retval = "Undefined Content";
-        break;
-    case 1:
-        retval = "Movies / Drama";
-        break;
-    case 2:
-        retval = "News / Current Affairs";
-        break;
-    case 3:
-        retval = "Show / Game Show";
-        break;
-    case 4:
-        retval = "Sports";
-        break;
-    case 5:
-        retval = "Childrens";
-        break;
-    case 6:
-        retval = "Music / Ballet / Dance";
-        break;
-    case 7:
-        retval = "Arts / Culture";
-        break;
-    case 8:
-        retval = "Social/Political Issues/Economics";
-        break;
-    case 9:
-        retval = "Educational";
-        break;
-    case 0x0A:
-        retval = "Leisure Hobbies";
-        break;
-    case 0x0B:
-        retval = "Special Characteristics";
-        break;
-    case 0x0C:
-    case 0x0D:
-    case 0x0E:
-        retval = "Reserved for Future Use";
-        break;
-    case 0x0F:
-        retval = "User Defined";
-        break;
-    }
-    return retval;
+    uint8_t content = buf[2];
+    if (content)
+        return m_mapCategories[content];
+    else
+        return QString();
 }
 
 /*
- *  DVB Descriptor 0x40 - Short Event Descriptor - EIT
+ *  DVB Descriptor 0x4D - Short Event Descriptor - EIT
  */
 
 void SIParser::ProcessShortEventDescriptor(uint8_t *buf,int size,Event& e)
 {
 // TODO: Test lower loop
 
-   (void) size;
+    (void) size;
 
-   int event_name_len = buf[5] & 0xFF;
-   int text_char_len = buf[event_name_len + 6];;
+    int event_name_len = buf[5] & 0xFF;
+    int text_char_len = buf[event_name_len + 6];;
 
-// TODO: Use common Language extractor for ATSC/DVB since its the same
-// Might also use the lookuptable that Daniel has
-   e.LanguageCode = QString::fromLatin1((const char*) buf + 2, 3);
+    e.Event_Name = DecodeText(buf + 6, event_name_len);
+    e.Event_Subtitle = DecodeText(buf + event_name_len + 7, text_char_len);
 
-   e.Event_Name = DecodeText(buf + 6, event_name_len);
-   e.Description = DecodeText(buf + event_name_len + 7, text_char_len);
-
-  if(e.Event_Name == e.Description)
-      e.Description="";
-
+    if(e.Event_Subtitle == e.Event_Name)
+        e.Event_Subtitle= "";
 }
 
 
@@ -1741,8 +1892,6 @@ void SIParser::ProcessExtendedEventDescriptor(uint8_t *buf,int size,Event &e)
 
 // TODO: Nothing, Complete
 
-    e.LanguageCode = QString::fromLatin1((const char*) buf + 3, 3);
-
     if (buf[6] != 0)
       return;
 
@@ -1755,6 +1904,32 @@ QString SIParser::ParseDescriptorLanguage(uint8_t* buffer, int size)
 {
     (void) size;
     return QString::fromLatin1((const char*) buffer + 2, 3);
+}
+
+void SIParser::ProcessComponentDescriptor(uint8_t *buf,int size,Event& e)
+{
+   (void)size;
+   switch (buf[2] & 0x0f)
+   {
+   case 0x1: //Video
+       if ((buf[3]>=0x9) && (buf[3]<=0x10))
+           e.HDTV = true;
+       break;
+   case 0x2: //Audio
+       if ((buf[3]=0x3) || (buf[3]=0x5))
+           e.Stereo = true;
+       break;
+   case 0x3: //Teletext/Subtitles
+       switch (buf[3])
+       {
+       case 0x1:
+       case 0x3:
+       case 0x10 ... 0x13:
+       case 0x20 ... 0x23:
+            e.SubTitled = true;
+       }
+       break;
+   }
 }
 
 void SIParser::ParseDescriptorTeletext(uint8_t* buffer, int size)
@@ -1944,9 +2119,9 @@ void SIParser::ParseMGT(tablehead_t* head, uint8_t* buffer, int size)
 }
 
 /*
- *  ATSC Table 0xC8 - Terrestrial Virtual Channel Table - PID 0x1FFB
+ *  ATSC Table 0xC8/0xC9 - Terrestrial/Cable Virtual Channel Table - PID 0x1FFB
  */
-void SIParser::ParseTVCT(tablehead_t* head, uint8_t* buffer, int size)
+void SIParser::ParseVCT(tablehead_t* head, uint8_t* buffer, int size)
 {
 
 // Prerequisites: MGT, and CHANNEL_ETT
@@ -1979,6 +2154,7 @@ void SIParser::ParseTVCT(tablehead_t* head, uint8_t* buffer, int size)
             LoadPrivateTypes(s.TransportID);
 
 //        uint8_t ETM_Location = (buffer[pos+26] & 0xC0) >> 6;
+        s.CAStatus = (buffer[pos+26] & 0x20) >> 5;
         s.ServiceID = buffer[pos+24] << 8 | buffer[pos+25];
 
         s.ATSCSourceID = buffer[pos+28] << 8 | buffer[pos+29];
@@ -1989,6 +2165,9 @@ void SIParser::ParseTVCT(tablehead_t* head, uint8_t* buffer, int size)
         s.Version = head->version;
         s.ServiceType = 1;
         s.EITPresent = 1;
+
+        SIPARSER(QString("Found Channel %1-%2 - %3 CAStatus=%4").arg(major_channel_number)
+                 .arg(minor_channel_number).arg(s.ServiceName).arg(s.CAStatus));
 
         uint16_t descriptors_length = (buffer[pos+30] & 0x02) << 8 | buffer[pos+31];
 
@@ -2030,16 +2209,6 @@ void SIParser::ParseTVCT(tablehead_t* head, uint8_t* buffer, int size)
 }
 
 /*
- *  ATSC Table 0xC9 - Cable Virtual Channel Table - PID 0x1FFB
- */
-void SIParser::ParseCVCT(tablehead_t* head, uint8_t* buffer, int size)
-{
-    (void)head;
-    (void)buffer;
-    (void)size;
-}
-
-/*
  *  ATSC Table 0xCA - Rating Region Table - PID 0x1FFB
  */
 void SIParser::ParseRRT(tablehead_t* head, uint8_t* buffer, int size)
@@ -2056,26 +2225,17 @@ void SIParser::ParseRRT(tablehead_t* head, uint8_t* buffer, int size)
 
     QString temp = ParseMSS(&buffer[2],buffer[1]);
 
-    printf("RRT: %02X %s\n",head->table_id_ext & 0xFF,temp.ascii());
-
     pos += buffer[1] + 2;
     uint8_t dimensions = buffer[pos++];
-
-    printf("RRT: %d dimensions\n",dimensions);
 
     for (int x = 0 ; x < dimensions ; x++)
     {
         QString Name = ParseMSS(&buffer[pos + 1],buffer[pos]);
-        printf("RRT: %s\n",Name.ascii());
-
         /* Skip past Dimesion Name */
         pos += buffer[pos] + 1;
 
         /* Skip past Values Defined */
-        if ((buffer[pos] & 0xE0) != 0xE0)
-            printf("RRT: Lost Here\n");
         uint8_t values = buffer[pos] & 0x0F;
-        printf("RRT: %d values\n",values);
         pos++;
 
         for (int y = 0 ; y < values ; y++)
@@ -2085,8 +2245,6 @@ void SIParser::ParseRRT(tablehead_t* head, uint8_t* buffer, int size)
 
             QString Rating_Value_Text = ParseMSS(&buffer[pos + 1],buffer[pos]);
             pos += buffer[pos] + 1;
-
-            printf("RRT: [%d][%d] %s %s\n",x,y,Value_Text.ascii(),Rating_Value_Text.ascii());
 
         }
 
@@ -2131,8 +2289,10 @@ void SIParser::ParseATSCEIT(tablehead_t* head, uint8_t* buffer, int size, uint16
         uint8_t title_length = buffer[pos+9];
         e.Event_Name = ParseMSS(&buffer[pos+10],title_length);
 
-        printf("Title [%02X][%04X] = %s  %s - %s\n",head->table_id_ext,event_id,e.Event_Name.ascii(),e.StartTime.toString(Qt::TextDate).ascii(),
+#ifdef EIT_DEBUG_SID
+        fprintf(stdout,"Title [%02X][%04X] = %s  %s - %s\n",head->table_id_ext,event_id,e.Event_Name.ascii(),e.StartTime.toString(Qt::TextDate).ascii(),
                                            e.EndTime.toString(Qt::TextDate).ascii());
+#endif
 
         pos += (title_length + 10);
 
@@ -2263,13 +2423,9 @@ void SIParser::ParseDescriptorATSCContentAdvisory(uint8_t* buffer, int size)
         uint8_t dimensions = buffer[pos+1];
         pos += 2;
         for (int y = 0 ; y < dimensions ; y++)
-        {
-            printf("Dim: %02X %02X ",buffer[pos],buffer[pos+1]);
             pos += 2;
-        }
         if (buffer[pos] > 0)
             temp = ParseMSS(&buffer[pos+1],buffer[pos]);
-        printf("Rating Region: %s\n",temp.ascii());
         pos += buffer[pos] + 1;
     }
 
@@ -2642,7 +2798,12 @@ QString SIParser::ProcessDescriptorHuffmanTextLarge(unsigned char *buf,unsigned 
 
 void SIParser::EITFixUp(Event& event)
 {
-        
+    if (event.Description == "" && event.Event_Subtitle != "") 
+    {
+         event.Description = event.Event_Subtitle;        
+         event.Event_Subtitle="";        
+    }
+
     switch (PrivateTypes.EITFixUp)
     {   
         case 1:    EITFixUpStyle1(event);
@@ -2721,7 +2882,7 @@ void SIParser::EITFixUpStyle1(Event& event)
     position = event.Description.find("(CC)");
     if (position != -1)
     {
-       event.SubTitles = QString("teletext");
+       event.SubTitled = true;
        event.Description = event.Description.replace("(CC)","");
     }
 
@@ -2729,7 +2890,7 @@ void SIParser::EITFixUpStyle1(Event& event)
     position = event.Description.find("(Stereo)");
     if (position != -1)
     {
-       event.Audio = QString("stereo");
+       event.Stereo = true;
        event.Description = event.Description.replace("(Stereo)","");
     }
 
@@ -2742,17 +2903,18 @@ void SIParser::EITFixUpStyle2(Event& event)
     {
         //Do something here
     }
+    //BBC three case (could add another record here ?)
+    event.Description = event.Description.replace(" Then 60 Seconds.","");
+    event.Description = event.Description.replace(" Followed by 60 Seconds.","");
+    event.Description = event.Description.replace("Brand New Series - ","");
+    event.Description = event.Description.replace("Brand New Series","");
+    event.Description = event.Description.replace("New Series","");
 
     position = event.Description.find(':');
     if (position != -1)
     {
         event.Event_Subtitle = event.Description.left(position);
         event.Description = event.Description.right(event.Description.length()-position-2);
-        //BBC three case (could add another record here ?)
-        event.Description = event.Description.replace(" Then 60 Seconds.","");
-        event.Event_Subtitle = event.Event_Subtitle.replace("Brand New Series - ","");
-        event.Event_Subtitle = event.Event_Subtitle.replace("Brand New Series","");
-        event.Event_Subtitle = event.Event_Subtitle.replace("New Series","");
         if ((event.Event_Subtitle.length() > 0) &&
             (event.Description.length() > 0) &&
             (event.Event_Subtitle.length() > event.Description.length()))

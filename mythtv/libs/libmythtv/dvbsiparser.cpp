@@ -68,11 +68,15 @@ DVBSIParser::~DVBSIParser()
     pthread_mutex_destroy(&poll_lock);
 }
 
-void DVBSIParser::AddPid(uint16_t pid,uint8_t mask,uint8_t filter, bool CheckCRC)
+void DVBSIParser::AddPid(uint16_t pid,uint8_t mask,uint8_t filter, bool CheckCRC, int bufferFactor)
 {
 
     struct dmx_sct_filter_params params;
     int fd;
+
+    int sect_buf_size = MAX_SECTION_SIZE * bufferFactor;
+
+    SIPARSER(QString("Adding PID %1 Filter %2 Mask %3 Buffer %4").arg(pid,4,16).arg(filter,2,16).arg(mask,2,16).arg(sect_buf_size));
 
     /* Set flag so other processes can get past poll_lock */
     filterChange = true;
@@ -108,6 +112,12 @@ void DVBSIParser::AddPid(uint16_t pid,uint8_t mask,uint8_t filter, bool CheckCRC
         return;
     }
 
+    if (ioctl(fd, DMX_SET_BUFFER_SIZE, sect_buf_size) < 0) {
+        ERRNO(QString("Failed to set demux buffer size (pid %1)").arg(pid));
+        pthread_mutex_unlock(&poll_lock);
+        return;
+    }
+
     if (ioctl(fd, DMX_SET_FILTER, &params) < 0)
     {
         ERRNO(QString("Failed to set section filter (pid %1)").arg(pid));
@@ -133,6 +143,8 @@ void DVBSIParser::DelPid(int pid)
 {
     PIDFDMap::Iterator it;
     int x = 0;
+
+    SIPARSER(QString("Deleting PID %1").arg(pid,4,16));
 
     filterChange = true;
 

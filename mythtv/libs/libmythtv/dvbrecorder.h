@@ -70,6 +70,10 @@ private:
     bool            _software_filter_open;
     bool            _reset_pid_filters; // set when we want to generate a new filter set
 
+    // Stream IDs for the PS recorder
+    uint8_t audioid;
+    uint8_t videoid;
+
     uint8_t *pat_pkt;
     uint8_t *pmt_pkt;
     static const int PMT_PID;

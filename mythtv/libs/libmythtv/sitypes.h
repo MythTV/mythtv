@@ -104,9 +104,12 @@ public:
     uint8_t       ChannelNumbers;
     /* Use Custom Guide Ranges other than 0x50-0x5F & 0x60-0x6F in DVB */
     bool          CustomGuideRanges;
-    uint8_t       GuideTableMin;
-    uint8_t       GuideTableMax;
+    uint8_t       CurrentTransportTableMin;
+    uint8_t       CurrentTransportTableMax;
+    uint8_t       OtherTransportTableMin;
+    uint8_t       OtherTransportTableMax;
     /* Custom Guide Parameters */
+    bool          ForceGuidePresent;
     bool          CustomGuidePID;
     uint16_t      GuidePID;
     bool          GuideOnSingleTransport;
@@ -190,6 +193,7 @@ public:
     virtual void DependencyChanged(tabletypes /*t*/) {}
 
     SISTANDARD SIStandard;
+
 };
 
 /* Object best to be removed and not used anymore */
@@ -320,8 +324,9 @@ public:
     QString ContentDescription;
     QString Year;
     QStringList Actors;
-    QString SubTitles;
-    QString Audio;
+    bool Stereo;
+    bool HDTV;
+    bool SubTitled;
     int ETM_Location;    /* Used to flag still waiting ETTs for ATSC */
     bool ATSC;
 };
@@ -404,10 +409,6 @@ public:
     bool TelevisionService() { return hasVideo && hasAudio; }
     bool OnAir() { return TelevisionService(); }
     bool FTA() { return !hasCA; }
-
-    ElementaryPIDObject *PreferredAudioStream();
-    ElementaryPIDObject *PreferredVideoStream();
-    ElementaryPIDObject *PreferredSubtitleStream();
 
     uint16_t PCRPID;
     uint16_t ServiceID;
@@ -529,6 +530,7 @@ public:
     EventHandler() : TableHandler() { Reset(); }
     ~EventHandler() {}
     void Reset();
+    void SetSIStandard(SISTANDARD _SIStandard) { SIStandard = _SIStandard; }
     bool Complete();
     void SetupTrackers();
     bool RequirePIDs();
@@ -558,6 +560,7 @@ class ServiceHandler : public TableHandler
 public:
     ServiceHandler() : TableHandler() { Reset(); }
     ~ServiceHandler() {}
+    void SetSIStandard(SISTANDARD _SIStandard) { SIStandard = _SIStandard; }
     void Reset();
     bool Complete();
     bool RequirePIDs();
@@ -582,6 +585,7 @@ class NetworkHandler : public TableHandler
 public:
     NetworkHandler() : TableHandler() { Reset(); }
     ~NetworkHandler() {}
+    void SetSIStandard(SISTANDARD _SIStandard) { SIStandard = _SIStandard; }
     void Reset();
     bool Complete();
     bool RequirePIDs();
@@ -593,6 +597,7 @@ public:
     bool AddSection(tablehead_t *head, uint16_t key0, uint16_t key1);
     void DependencyMet(tabletypes t) { (void) t;}
 
+    SISTANDARD           SIStandard;
     SectionTracker         Tracker;
     pullStatus             status;
     bool                 mgtloaded;

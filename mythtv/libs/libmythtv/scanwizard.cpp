@@ -657,10 +657,7 @@ void ScanWizardScanner::customEvent( QCustomEvent * e )
                 // Wait for dvbsections to start this is silly,
                 // but does the trick
                 while (dvbchannel->siparser == NULL)
-                {
                    usleep(250);
-                   printf("Waiting for dvb sections to start..\n");
-                }
                 popupProgress->status(tr("Scanning"));
                 connect(dvbchannel->siparser, SIGNAL(TableLoaded()),
                            this,SLOT(TableLoaded()));

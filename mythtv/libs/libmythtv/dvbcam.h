@@ -27,6 +27,7 @@ private:
     void SendPMT(PMTObject &pmt, uint8_t cplm);
 
     int             cardnum;
+    int             numslots;
     cCiHandler      *ciHandler;
 
     bool            exitCiThread;

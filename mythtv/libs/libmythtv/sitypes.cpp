@@ -32,6 +32,9 @@
 #include <stdint.h>
 #include "sitypes.h"
 
+// Set EIT_DEBUG_SID to a valid serviceid to enable EIT debugging
+// #define EIT_DEBUG_SID 1602
+
 void pidHandler::reset()
 {
     pid = 0;
@@ -48,9 +51,12 @@ void privateTypes::reset()
     EITFixUp = 0;
     SDTMapping = false;
     CurrentTransportID = 0;
+    ForceGuidePresent = false;
     CustomGuideRanges = false;
-    GuideTableMin = 0;
-    GuideTableMax = 0;
+    CurrentTransportTableMin = 0;
+    CurrentTransportTableMax = 0;
+    OtherTransportTableMin = 0;
+    OtherTransportTableMax = 0;
     GuidePID = 0;
     GuideTransportID = 0;
     CustomGuidePID = false;
@@ -93,15 +99,14 @@ void SectionTracker::MarkUnused(int Section)
 
 int SectionTracker::Complete()
 {
-    int done = 1;
     if (MaxSections == -1)
         return 0;
-    for (int x=0;x<MaxSections+1;x++)
+    for (int x = 0; x <= MaxSections; x++)
     {
         if (Filled[x] == 0)
-            done = 0;
+            return 0;
     }
-    return done;
+    return 1;
 }
 
 QString SectionTracker::loadStatus()
@@ -134,7 +139,6 @@ int SectionTracker::AddSection(tablehead *head)
     }
     else if (Version != head->version)
     {
-         printf("Version Change: Old: %d  New: %d\n",Version,head->version);
          Reset();
          MaxSections = head->section_last;
          Version = head->version;
@@ -238,8 +242,9 @@ void Event::clearEventValues()
     Event_Subtitle = "";
     ContentDescription = "";
     Year = "";
-    SubTitles = "";
-    Audio = "";
+    SubTitled = false;
+    Stereo = false;
+    HDTV = false;
     ATSC = false;
 }
 
@@ -287,58 +292,6 @@ void PMTObject::Reset()
     hasCA = false;
     hasAudio = false;
     hasVideo = false;
-}
-
-// Try to auto detect which audio stream to use
-// NOTE!!! This is only used for PS recording via transform.c!
-ElementaryPIDObject *PMTObject::PreferredAudioStream()
-{
-    QValueList<ElementaryPIDObject>::Iterator pit;
-
-    // Change this if you prefer AC3
-    bool prefer_ac3 = false;
-    if (prefer_ac3)
-    {
-        for (pit = Components.begin(); pit != Components.end(); ++pit)
-            if ((*pit).Record && ((*pit).Type == ES_TYPE_AUDIO_AC3))
-                return &(*pit);
-    }
-
-    // Use first MPEG audio stream
-    for (pit = Components.begin(); pit != Components.end(); ++pit)
-        if ((*pit).Record && (((*pit).Type == ES_TYPE_AUDIO_MPEG1) || ((*pit).Type == ES_TYPE_AUDIO_MPEG2)))
-            return &(*pit);
-
-    // No MPEG audio found - look for AC3
-    for (pit = Components.begin(); pit != Components.end(); ++pit)
-        if ((*pit).Record && ((*pit).Type == ES_TYPE_AUDIO_AC3))
-            return &(*pit);
-
-    return NULL;
-}
-
-// Try to auto detect which video stream to use
-// NOTE!!! This is only used for PS recording via transform.c!
-ElementaryPIDObject *PMTObject::PreferredVideoStream()
-{
-    // Use first video stream
-    QValueList<ElementaryPIDObject>::Iterator pit;
-    for (pit = Components.begin(); pit != Components.end(); ++pit)
-        if ((*pit).Record && (((*pit).Type == ES_TYPE_VIDEO_MPEG1) || ((*pit).Type == ES_TYPE_VIDEO_MPEG2)))
-            return &(*pit);
-
-    return NULL;
-}
-
-ElementaryPIDObject *PMTObject::PreferredSubtitleStream()
-{
-    // Use first subtitle stream
-    QValueList<ElementaryPIDObject>::Iterator pit;
-    for (pit = Components.begin(); pit != Components.end(); ++pit)
-        if ((*pit).Record && ((*pit).Type == ES_TYPE_SUBTITLE))
-            return &(*pit);
-
-    return NULL;
 }
 
 void PATHandler::Reset()
@@ -528,10 +481,7 @@ bool MGTHandler::AddSection(tablehead_t *head, uint16_t key0, uint16_t key1)
     int retval = Tracker.AddSection(head);
 
     if (retval == -1)
-    {
-        printf("MGT Changed!\n");
         return false;
-    }
     return retval;
 }
 
@@ -712,6 +662,9 @@ bool EventHandler::GetPIDs(uint16_t& pid, uint8_t& filter, uint8_t& mask)
 
 void EventHandler::RequestEmit(uint16_t key)
 {
+#ifdef EIT_DEBUG_SID
+    fprintf(stdout,"EventHandler::RequestEmit for serviceid=%i\n", key);
+#endif
     status[key].requested = true;
     status[key].requestedEmit = true;
     status[key].emitted = false;
@@ -737,17 +690,25 @@ bool EventHandler::EmitRequired()
 
     for (s = status.begin() ; s != status.end() ; ++s)
     {
-        if ((s.data().emitted == false) && (s.data().pulling == true))
+        if (s.data().emitted || !s.data().pulling)
         {
-            AllComplete = true;
-            /* Make sure all sections are being pulled otherwise your not done */
-            if (TrackerSetup[s.key()] == false)
-                AllComplete = false;
-            for (i = Tracker[s.key()].begin() ; i != Tracker[s.key()].end() ; ++i)
+            continue;
+        }
+
+        AllComplete = true;
+        /* Make sure all sections are being pulled otherwise your not done */
+        if (TrackerSetup[s.key()] == false)
+            AllComplete = false;
+        for (i = Tracker[s.key()].begin() ; i != Tracker[s.key()].end() ; ++i)
+        {
+            if (!i.data().Complete())
             {
-                if (i.data().Complete() == false)
-                    AllComplete = false;
+                AllComplete = false;
+                break;
             }
+        }
+        if (SIStandard == SI_STANDARD_ATSC)
+        {
             for (e = Events[s.key()].begin() ; e != Events[s.key()].end() ; ++e)
             {
                 if (e.data().ETM_Location != 0)
@@ -766,9 +727,9 @@ bool EventHandler::EmitRequired()
                     }
                 }
             }
-            if (AllComplete)
-                return true;
         }
+        if (AllComplete)
+            return true;
     }
     return false;
 }
@@ -794,20 +755,23 @@ bool EventHandler::GetEmitID(uint16_t& key0, uint16_t& key1)
                 if (!(i.data().Complete()))
                     AllComplete = false;
             }
-            for (e = Events[s.key()].begin() ; e != Events[s.key()].end() ; ++e)
+            if (SIStandard == SI_STANDARD_ATSC)
             {
-                if (e.data().ETM_Location != 0)
+                for (e = Events[s.key()].begin() ; e != Events[s.key()].end() ; ++e)
                 {
-                    for (p = EITpid.begin() ; p != EITpid.end() ; ++p)
+                    if (e.data().ETM_Location != 0)
                     {
-                        if (e.data().SourcePID == p.data().pid)
+                        for (p = EITpid.begin() ; p != EITpid.end() ; ++p)
                         {
-                            /* Delete events that need ETTs that aren't filtered */
-                            if (ETTpid.contains(p.key()))
-                                AllComplete = false;
-// Don't remove it because it screwed up the list.. This is temporary..
-//                                    else
-//                                        Events[s.key()].remove(e);
+                            if (e.data().SourcePID == p.data().pid)
+                            {
+                                /* Delete events that need ETTs that aren't filtered */
+                                if (ETTpid.contains(p.key()))
+                                    AllComplete = false;
+    // Don't remove it because it screwed up the list.. This is temporary..
+    //                                    else
+    //                                        Events[s.key()].remove(e);
+                            }
                         }
                     }
                 }
@@ -868,6 +832,12 @@ bool EventHandler::AddSection(tablehead_t *head, uint16_t key0, uint16_t key1)
 {
     int retval = false;
 
+#ifdef EIT_DEBUG_SID
+    if (key0 == EIT_DEBUG_SID) {
+        printf("EventHandler::AddSection sid=%i eid=%i version=%i section %02x of %02x\n", key0, key1, head->version, head->section_number, head->section_last);
+    }
+#endif
+
     if (SIStandard == SI_STANDARD_ATSC)
     {
         QMap_pidHandler::Iterator p;
@@ -882,6 +852,12 @@ bool EventHandler::AddSection(tablehead_t *head, uint16_t key0, uint16_t key1)
 
     if (SIStandard == SI_STANDARD_DVB)
     {
+#ifdef EIT_DEBUG_SID
+        if (key0 == EIT_DEBUG_SID) {
+            QString foo = Tracker[key0][key1].loadStatus();
+            printf("%s\n", foo.ascii());
+        }
+#endif
         return Tracker[key0][key1].AddSection(head);
     }
 

@@ -96,7 +96,7 @@ public:
     // Stops all collection of data and clears all values (on a channel change for example)
     void Reset();
 
-    virtual void AddPid(uint16_t pid,uint8_t mask,uint8_t filter,bool CheckCRC);
+    virtual void AddPid(uint16_t pid,uint8_t mask,uint8_t filter,bool CheckCRC,int bufferFactor);
     virtual void DelPid(int pid);
     virtual void DelAllPids();
 
@@ -113,7 +113,7 @@ public:
     void CheckTrackers();
 
     void SetDB(QSqlDatabase* _db_conn, pthread_mutex_t* _db_lock)
-        { db_conn = _db_conn; db_lock = _db_lock; printf("Setting DB in siparser\n"); };
+        { db_conn = _db_conn; db_lock = _db_lock; };
 
 signals:
 
@@ -158,10 +158,6 @@ private:
 
     void ProcessUnknownDescriptor(uint8_t *buffer, int size);
 
-    // CRC Functions to verify table is OK.
-    bool ATSC_CRC32(uint8_t* buffer, int size);
-    bool DVB_CRC32(uint8_t* buffer, int size);
-
     // Common Helper Functions
     QString DecodeText(uint8_t *s, int length);
 
@@ -195,7 +191,8 @@ private:
     // DVB EIT Table Descriptors
     QString ProcessContentDescriptor       (uint8_t *buf,int size);
     void ProcessShortEventDescriptor       (uint8_t *buf,int size,Event& e);
-    void ProcessExtendedEventDescriptor    (uint8_t *buf,int size,Event &e);
+    void ProcessExtendedEventDescriptor    (uint8_t *buf,int size,Event& e);
+    void ProcessComponentDescriptor        (uint8_t *buf,int size,Event& e);
 
     // ATSC Helper Parsers
     QDateTime ConvertATSCDate(uint32_t offset);
@@ -203,8 +200,7 @@ private:
 
     // ATSC Table Parsers
     void ParseMGT       (tablehead_t* head, uint8_t* buffer, int size);
-    void ParseTVCT      (tablehead_t* head, uint8_t* buffer, int size);
-    void ParseCVCT      (tablehead_t* head, uint8_t* buffer, int size);
+    void ParseVCT      (tablehead_t* head, uint8_t* buffer, int size);
     void ParseRRT       (tablehead_t* head, uint8_t* buffer, int size);
     void ParseATSCEIT   (tablehead_t* head, uint8_t* buffer, int size, uint16_t pid);
     void ParseETT       (tablehead_t* head, uint8_t* buffer, int size, uint16_t pid);
@@ -222,6 +218,9 @@ private:
     uint16_t CurrentTransport;
     uint16_t RequestedServiceID;
     uint16_t RequestedTransportID;
+    
+    // Preferred languages and their priority
+    QMap<QString, int>  LanguagePriority;
 
     // DVB Variables
     uint16_t NITPID;
@@ -281,6 +280,15 @@ private:
     void EITFixUpStyle2(Event& event);
     void EITFixUpStyle3(Event& event);
 
+    //DVB category descriptions
+    typedef struct 
+    {         
+        uint8_t id;
+        char *desc;
+    } description_table_rec;
+    static description_table_rec description_table[];
+    QMap<uint8_t,QString>  m_mapCategories;
+    void initialiseCategories();
 };
 
 #define SIPARSER(args...) \

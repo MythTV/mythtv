@@ -919,8 +919,9 @@ void SIScan::AddEvents()
                  counter++;
 
                  query.prepare("INSERT INTO program (chanid,starttime,endtime,"
-                          "title,description,subtitle,category,programid) "
-                          "VALUES (:CHANID,:STARTTIME,:ENDTIME,:TITLE,:DESCRIPTION,:SUBTITLE,:CATEGORY,:PROGRAMID);");
+                          "title,description,subtitle,category,programid,"
+                          "stereo,closecaptioned,hdtv)"
+                          "VALUES (:CHANID,:STARTTIME,:ENDTIME,:TITLE,:DESCRIPTION,:SUBTITLE,:CATEGORY,:PROGRAMID,:STEREO,:CLOSECAPTIONED,:HDTV);");
                 query.bindValue(":CHANID",ChanID);
                 query.bindValue(":STARTTIME",(*e).StartTime.toString(QString("yyyy-MM-dd hh:mm:00")));
                 query.bindValue(":ENDTIME",(*e).EndTime.toString(QString("yyyy-MM-dd hh:mm:00")));
@@ -929,6 +930,9 @@ void SIScan::AddEvents()
                 query.bindValue(":SUBTITLE",(*e).Event_Subtitle.utf8());
                 query.bindValue(":CATEGORY",(*e).ContentDescription.utf8());
                 query.bindValue(":PROGRAMID",(*e).EventID);
+                query.bindValue(":STEREO",(*e).Stereo);
+                query.bindValue(":CLOSECAPTIONED",(*e).SubTitled);
+                query.bindValue(":HDTV",(*e).HDTV);
 
                 if(!query.exec())
                     MythContext::DBError("Adding Event", query);

@@ -176,11 +176,12 @@ bool DVBRecorder::Open()
         return false;
     }
 
-    VERBOSE(VB_GENERAL, QString("DVB#%1 ").arg(_card_number_option)
-            << "Recorder: Card opened successfully.");
-
     connect(dvbchannel, SIGNAL(ChannelChanged(dvb_channel_t&)),
             this, SLOT(ChannelChanged(dvb_channel_t&)));
+
+    VERBOSE(VB_GENERAL, QString("DVB#%1 Recorder: Card opened successfully (using %2 mode).")
+                        .arg(_card_number_option)
+                        .arg(_record_transport_stream_option ? "TS" : "PS"));
 
     dvbchannel->RecorderStarted();
 
@@ -287,13 +288,13 @@ void DVBRecorder::OpenFilters(uint16_t pid, ES_Type type)
             case ES_TYPE_VIDEO_MPEG1:
             case ES_TYPE_VIDEO_MPEG2:
                 init_ipack(ip, 2048, ProcessDataPS);
-                ip->replaceid=0xe0;
+                ip->replaceid = videoid++;
                 break;
 
             case ES_TYPE_AUDIO_MPEG1:
             case ES_TYPE_AUDIO_MPEG2:
                 init_ipack(ip, 65535, ProcessDataPS); /* don't repack PES */
-                ip->replaceid=0xc0;
+                ip->replaceid = audioid++;
                 break;
 
             case ES_TYPE_AUDIO_AC3:
@@ -331,40 +332,27 @@ void DVBRecorder::SetDemuxFilters()
     _wait_for_keyframe = _wait_for_keyframe_option;
     keyframe_found = false;
 
-    if (_record_transport_stream_option)
-    {
-        bool need_pcr_pid = true;
+    audioid = 0xC0;
+    videoid = 0xE0;
 
-        // Record all streams flagged for recording
-        QValueList<ElementaryPIDObject>::Iterator es;
-        for (es = m_pmt.Components.begin(); es != m_pmt.Components.end(); ++es)
+
+    // Record all streams flagged for recording
+    bool need_pcr_pid = true;
+    QValueList<ElementaryPIDObject>::Iterator es;
+    for (es = m_pmt.Components.begin(); es != m_pmt.Components.end(); ++es)
+    {
+        if ((*es).Record)
         {
-            if ((*es).Record)
-            {
-                OpenFilters((*es).PID, (*es).Type);
+            OpenFilters((*es).PID, (*es).Type);
 
-                if ((*es).PID == m_pmt.PCRPID)
-                    need_pcr_pid = false;
-            }
+            if ((*es).PID == m_pmt.PCRPID)
+                need_pcr_pid = false;
         }
-
-        if (need_pcr_pid)
-            OpenFilters(m_pmt.PCRPID, ES_TYPE_UNKNOWN);
     }
-    else
-    {
-        // PES recording currently only supports one video and one audio PID (I think???)
-        ElementaryPIDObject *as = m_pmt.PreferredAudioStream();
-        ElementaryPIDObject *vs = m_pmt.PreferredVideoStream();
-//        ElementaryPIDObject *sub = m_pmt.PreferredSubtitleStream();
 
-        if (as)
-            OpenFilters(as->PID, as->Type);
-        if (vs)
-            OpenFilters(vs->PID, vs->Type);
-        //if (sub)
-        //    OpenFilters(sub->PID, sub->Type);
-    }
+    if (_record_transport_stream_option && need_pcr_pid)
+        OpenFilters(m_pmt.PCRPID, ES_TYPE_UNKNOWN);
+
 
     if (_pid_filters.size() == 0 && pid_ipack.size() == 0)
     {
@@ -393,9 +381,13 @@ void DVBRecorder::AutoPID()
     StreamTypes += ES_TYPE_AUDIO_MPEG1;
     StreamTypes += ES_TYPE_AUDIO_MPEG2;
     StreamTypes += ES_TYPE_AUDIO_AC3;
-    StreamTypes += ES_TYPE_AUDIO_AAC;
-    StreamTypes += ES_TYPE_TELETEXT;
-    StreamTypes += ES_TYPE_SUBTITLE;
+    if (_record_transport_stream_option)
+    {
+        // PS recorder can't handle these
+        StreamTypes += ES_TYPE_AUDIO_AAC;
+        StreamTypes += ES_TYPE_TELETEXT;
+        StreamTypes += ES_TYPE_SUBTITLE;
+    }
 
     QMap<ES_Type, bool> flagged;
     QValueList<ElementaryPIDObject>::Iterator es;
@@ -428,6 +420,35 @@ void DVBRecorder::AutoPID()
             if (ignore)
                 continue; // Ignore this stream
         }
+
+        if (!_record_transport_stream_option)
+        {
+            // The MPEG PS decoder in Myth currently only handles one stream
+            // of each type, so make sure we don't already have one
+            switch ((*es).Type)
+            {
+                case ES_TYPE_VIDEO_MPEG1:
+                case ES_TYPE_VIDEO_MPEG2:
+                    if (flagged.contains(ES_TYPE_VIDEO_MPEG1) || flagged.contains(ES_TYPE_VIDEO_MPEG2))
+                        continue; // Ignore this stream
+                    break;
+
+                case ES_TYPE_AUDIO_MPEG1:
+                case ES_TYPE_AUDIO_MPEG2:
+                    if (flagged.contains(ES_TYPE_AUDIO_MPEG1) || flagged.contains(ES_TYPE_AUDIO_MPEG2))
+                        continue; // Ignore this stream
+                    break;
+
+                case ES_TYPE_AUDIO_AC3:
+                    if (flagged.contains(ES_TYPE_AUDIO_AC3))
+                        continue; // Ignore this stream
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
 
         if (Languages.isEmpty() // No specific language wanted
             || (*es).Language.isEmpty() // Component has no language
@@ -670,7 +691,7 @@ void DVBRecorder::ReadFromDMX()
                     if ((pktbuf[1] & 0x40) == 0)
                         continue; // No PUSI - drop packet
 
-                    RECORD(QString("Found payload_unit_start_indicator for PID%1").arg(pid));
+                    RECORD(QString("Found PUSI for PID %1").arg(pid));
                     pusi_seen[pid] = true;
                 }
 

@@ -46,6 +46,7 @@ using namespace std;
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <sys/poll.h>
+#include <linux/dvb/ca.h>
 
 #include "recorderbase.h"
 
@@ -61,6 +62,17 @@ DVBCam::DVBCam(int cardNum): cardnum(cardNum)
     ciHandler = NULL;
 
     pthread_mutex_init(&pmt_lock, NULL);
+
+    int cafd;
+    if ((cafd = open(dvbdevice(DVB_DEV_CA, cardnum), O_RDONLY)) >= 0)
+    {
+        ca_caps_t caps;
+        ioctl(cafd, CA_GET_CAP, &caps);
+        numslots = caps.slot_num;
+        close(cafd);
+    }
+    else
+        numslots = 0;
 }
 
 DVBCam::~DVBCam()
@@ -72,6 +84,9 @@ DVBCam::~DVBCam()
 
 bool DVBCam::Start()
 {
+    if (numslots == 0)
+        return false;
+
     exitCiThread = false;
     have_pmt = false;
     pmt_sent = false;
