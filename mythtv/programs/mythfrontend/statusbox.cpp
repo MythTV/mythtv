@@ -164,7 +164,7 @@ void StatusBox::updateContent()
         }
     }
 
-    list_area->SetUpArrow(startPos > 0);
+    list_area->SetUpArrow((startPos > 0) && (contentSize < contentTotalLines));
     list_area->SetDownArrow((startPos + contentSize) < contentTotalLines);
 
     container->Draw(&tmp, 0, 0);

@@ -472,10 +472,10 @@ bool JobQueue::QueueJobs(QSqlDatabase* db, int jobTypes,
                          QString chanid, QDateTime starttime, QString args,
                          QString comment, QString host)
 {
-    if (jobTypes & JOB_TRANSCODE)
-        QueueJob(db, JOB_TRANSCODE, chanid, starttime, args, comment, host);
     if (jobTypes & JOB_COMMFLAG)
         QueueJob(db, JOB_COMMFLAG, chanid, starttime, args, comment, host);
+    if (jobTypes & JOB_TRANSCODE)
+        QueueJob(db, JOB_TRANSCODE, chanid, starttime, args, comment, host);
     if (jobTypes & JOB_USERJOB1)
         QueueJob(db, JOB_USERJOB1, chanid, starttime, args, comment, host);
     if (jobTypes & JOB_USERJOB2)
@@ -1189,7 +1189,7 @@ void JobQueue::RecoverQueue(QSqlDatabase *db, bool justOld)
 void JobQueue::CleanupOldJobsInQueue(QSqlDatabase* db)
 {
     QSqlQuery delquery(QString::null, db);
-    QDateTime donePurgeDate = QDateTime::currentDateTime().addDays(-2);
+    QDateTime donePurgeDate = QDateTime::currentDateTime().addDays(-3);
     QDateTime errorsPurgeDate = QDateTime::currentDateTime().addDays(-7);
 
     delquery.prepare("DELETE FROM jobqueue "
@@ -1597,10 +1597,46 @@ void JobQueue::DoFlagCommercialsThread(void)
     gContext->LogEntry("commflag", LP_NOTICE, "Commercial Flagging Started",
                        msg);
 
-    int breaksFound = nvp->FlagCommercials(false, dontSleep, &controlFlagging);
+    int breaksFound = 0;
+#ifdef CALL_COMMFLAG_THE_OLD_WAY
+    breaksFound = nvp->FlagCommercials(false, dontSleep,
+                                       &controlFlagging, true);
+#else
+    QString cmd = QString("mythcommflag -j --chanid %1 --starttime %2 --force")
+                         .arg(program_info->chanid)
+                         .arg(program_info->startts.toString("yyyyMMddhhmm00"));
+
+    if (print_verbose_messages & (VB_COMMFLAG|VB_JOBQUEUE))
+    {
+        cmd += " -v ";
+        if (print_verbose_messages & VB_COMMFLAG)
+        {
+            cmd += "commflag";
+            if (print_verbose_messages & VB_JOBQUEUE)
+                cmd += ",jobqueue";
+        }
+        else
+        {
+            cmd += "jobqueue";
+        }
+    }
+
+    breaksFound = myth_system(cmd.ascii());
+#endif
 
     controlFlagsLock.lock();
-    if (*(jobControlFlags[key]) == JOB_STOP)
+    if (breaksFound == -1)
+    {
+        msg = QString("Commercial Flagging ERRORED for %1.")
+                      .arg(logDesc);
+
+        gContext->LogEntry("commflag", LP_WARNING,
+                           "Commercial Flagging Errored", msg);
+
+        ChangeJobStatus(commthread_db->db(), jobID, JOB_ERRORED,
+                        "Job aborted with Error.");
+    }
+    else if (*(jobControlFlags[key]) == JOB_STOP)
     {
         msg = QString("ABORTED Commercial Flagging for %1.")
                       .arg(logDesc);

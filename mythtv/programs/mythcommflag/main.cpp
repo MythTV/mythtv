@@ -22,16 +22,17 @@
 
 using namespace std;
 
-int testmode = 0;
-int show_blanks = 0;
-int just_blanks = 0;
-int quiet = 0;
-int force = 0;
+bool testMode = false;
+bool showBlanks = false;
+bool justBlanks = false;
+bool quiet = false;
+bool force = false;
 
-bool show_percentage = true;
-bool full_speed = true;
-bool rebuild_seektable = false;
-bool be_nice = true;
+bool showPercentage = true;
+bool fullSpeed = true;
+bool rebuildSeekTable = false;
+bool beNice = true;
+bool inJobQueue = false;
 
 double fps = 29.97; 
 
@@ -72,8 +73,9 @@ void BuildVideoMarkup(QString& filename)
 
 }
 
-void FlagCommercials(QSqlDatabase *db, QString chanid, QString starttime)
+int FlagCommercials(QSqlDatabase *db, QString chanid, QString starttime)
 {
+    int breaksFound = 0;
     int commDetectMethod = gContext->GetNumSetting("CommercialSkipMethod",
                                                    COMM_DETECT_BLANKS);
     QMap<long long, int> blanks;
@@ -84,7 +86,7 @@ void FlagCommercials(QSqlDatabase *db, QString chanid, QString starttime)
     {
         printf( "No program data exists for channel %s at %s\n",
             chanid.ascii(), starttime.ascii());
-        return;
+        return(0);
     }
 
     QString filename = program_info->GetRecordFilename("...");
@@ -100,26 +102,26 @@ void FlagCommercials(QSqlDatabase *db, QString chanid, QString starttime)
             printf( "IN USE\n" );
             printf( "                        "
                         "(the program is already being flagged elsewhere)\n" );
-            return;
+            return(0);
         }
     }
     else
     {
         if ((!force) && (program_info->IsCommProcessing(db)))
-            return;
+            return(0);
     }
 
     filename = program_info->GetPlaybackURL();
 
-    if (testmode)
+    if (testMode)
     {
         if (!quiet)
             printf( "0 (test)\n" );
-        return;
+        return(0);
     }
 
     blanks.clear();
-    if (show_blanks)
+    if (showBlanks)
     {
         program_info->GetBlankFrameList(blanks, db);
         if (!blanks.empty())
@@ -208,7 +210,7 @@ void FlagCommercials(QSqlDatabase *db, QString chanid, QString starttime)
                     (int)(frame / my_fps));
             }
 
-            if (just_blanks)
+            if (justBlanks)
             {
                 printf( "Saving new commercial break list to database.\n" );
                 program_info->SetCommBreakList(breaks, db);
@@ -217,9 +219,9 @@ void FlagCommercials(QSqlDatabase *db, QString chanid, QString starttime)
             delete commDetect;
         }
         delete program_info;
-        return;
+        return(0);
     }
-    else if (just_blanks)
+    else if (justBlanks)
     {
         program_info->GetBlankFrameList(blanks, db);
         if (!blanks.empty())
@@ -252,7 +254,7 @@ void FlagCommercials(QSqlDatabase *db, QString chanid, QString starttime)
                 printf( "no blanks\n" );
         }
         delete program_info;
-        return;
+        return(0);
     }
 
     RingBuffer *tmprbuf = new RingBuffer(filename, false);
@@ -266,13 +268,13 @@ void FlagCommercials(QSqlDatabase *db, QString chanid, QString starttime)
         cerr << "Unable to open commflag db connection\n";
         delete tmprbuf;
         delete program_info;
-        return;
+        return(0);
     }
     
     NuppelVideoPlayer *nvp = new NuppelVideoPlayer(mdb, program_info);
     nvp->SetRingBuffer(tmprbuf);
 
-    if (rebuild_seektable)
+    if (rebuildSeekTable)
     {
         nvp->RebuildSeekTable();
 
@@ -281,16 +283,19 @@ void FlagCommercials(QSqlDatabase *db, QString chanid, QString starttime)
     }
     else
     {
-        int comms_found = nvp->FlagCommercials(show_percentage, full_speed);
+        breaksFound = nvp->FlagCommercials(showPercentage, fullSpeed,
+                                               NULL, inJobQueue);
 
         if (!quiet)
-            printf( "%d\n", comms_found );
+            printf( "%d\n", breaksFound );
     }
 
     delete nvp;
     delete tmprbuf;
     delete program_info;
     delete mdb;
+
+    return breaksFound;
 }
 
 int main(int argc, char *argv[])
@@ -304,12 +309,14 @@ int main(int argc, char *argv[])
     QString chanid;
     QString starttime;
     time_t time_now;
-    int all_recorded = 0;
-    QString verboseString = QString(" important general");
+    bool allRecorded = false;
+    QString verboseString = QString("");
 
     QFileInfo finfo(a.argv()[0]);
 
     QString binname = finfo.baseName();
+
+    print_verbose_messages = VB_NONE;
 
     while (argpos < a.argc())
     {
@@ -355,21 +362,25 @@ int main(int argc, char *argv[])
             filename = (a.argv()[++argpos]);
             cerr << filename << endl;
             isVideo = true;
-            rebuild_seektable = true;
-            be_nice = false;
+            rebuildSeekTable = true;
+            beNice = false;
         }
         else if (!strcmp(a.argv()[argpos], "--blanks"))
         {
             if (!quiet)
-                show_blanks = 1;
+                showBlanks = true;
         }
         else if (!strcmp(a.argv()[argpos], "--justblanks"))
         {
-            just_blanks = 1;
+            justBlanks = true;
+        }
+        else if (!strcmp(a.argv()[argpos], "-j"))
+        {
+            inJobQueue = true;
         }
         else if (!strcmp(a.argv()[argpos], "--all"))
         {
-            all_recorded = 1;
+            allRecorded = true;
         }
         else if (!strcmp(a.argv()[argpos], "--fps"))
         {
@@ -377,32 +388,32 @@ int main(int argc, char *argv[])
         }
         else if (!strcmp(a.argv()[argpos], "--test"))
         {
-            testmode = 1;
+            testMode = true;
         }
         else if (!strcmp(a.argv()[argpos], "--quiet"))
         {
-            if (!show_blanks)
+            if (!showBlanks)
             {
-                quiet = 1;
-                show_percentage = false;
+                quiet = true;
+                showPercentage = false;
             }
         }
         else if (!strcmp(a.argv()[argpos], "--sleep"))
         {
-            full_speed = false;
+            fullSpeed = false;
         }
         else if (!strcmp(a.argv()[argpos], "--rebuild"))
         {
-            rebuild_seektable = true;
-            be_nice = false;
+            rebuildSeekTable = true;
+            beNice = false;
         }
         else if (!strcmp(a.argv()[argpos], "--force"))
         {
-            force = 1;
+            force = true;
         }
         else if (!strcmp(a.argv()[argpos], "--hogcpu"))
         {
-            be_nice = false;
+            beNice = false;
         }
         else if (!strcmp(a.argv()[argpos],"-v") ||
                  !strcmp(a.argv()[argpos],"--verbose"))
@@ -414,7 +425,8 @@ int main(int argc, char *argv[])
                 {
                     cerr << "Invalid or missing argument to -v/--verbose option\n";
                     return -1;
-                } else
+                }
+                else
                 {
                     QStringList verboseOpts;
                     verboseOpts = QStringList::split(',',a.argv()[argpos+1]);
@@ -470,6 +482,11 @@ int main(int argc, char *argv[])
                         else if (!strcmp(*it,"network"))
                         {
                             print_verbose_messages |= VB_NETWORK;
+                            verboseString += " " + *it;
+                        }
+                        else if (!strcmp(*it,"jobqueue"))
+                        {
+                            print_verbose_messages |= VB_JOBQUEUE;
                             verboseString += " " + *it;
                         }
                         else if (!strcmp(*it,"commflag"))
@@ -552,8 +569,33 @@ int main(int argc, char *argv[])
         exit(12);
     }
 
+    if (inJobQueue) {
+        int jobQueueCPU = gContext->GetNumSetting("JobQueueCPU", 0);
+
+        if (beNice || jobQueueCPU < 2)
+            nice(19);
+
+        if (jobQueueCPU)
+            fullSpeed = true;
+        else
+            fullSpeed = false;
+
+        quiet = true;
+        isVideo = false;
+        showBlanks = false;
+        justBlanks = false;
+        testMode = false;
+        showPercentage = false;
+
+        int breaksFound = FlagCommercials(db, chanid, starttime);
+
+        delete gContext;
+
+        exit(breaksFound);
+    }
+
     // be nice to other programs since FlagCommercials() can consume 100% CPU
-    if (be_nice)
+    if (beNice)
         nice(19);
 
     time_now = time(NULL);
@@ -575,7 +617,7 @@ int main(int argc, char *argv[])
                 printf( "ALL Un-flagged programs\n" );
             printf( "ChanID  Start Time      "
                     "Title                                      " );
-            if (rebuild_seektable)
+            if (rebuildSeekTable)
                 printf("Status\n");
             else
                 printf("Breaks\n");
@@ -618,7 +660,7 @@ int main(int argc, char *argv[])
 
                 chanid = recordedquery.value(0).toString();
 
-                if ( all_recorded )
+                if ( allRecorded )
                 {
                     FlagCommercials(db, chanid, starttime);
                 }

@@ -606,19 +606,19 @@ void VideoOutput::Zoom(int direction)
                     ZoomedIn = 0;
                 break;
         case kZoomUp:
-                if (ZoomedUp < 90)
+                if (ZoomedUp < 100)
                     ZoomedUp += 10;
                 break;
         case kZoomDown:
-                if (ZoomedUp > -90)
+                if (ZoomedUp > -100)
                     ZoomedUp -= 10;
                 break;
         case kZoomLeft:
-                if (ZoomedRight < 90)
+                if (ZoomedRight < 100)
                     ZoomedRight += 10;
                 break;
         case kZoomRight:
-                if (ZoomedRight > -90)
+                if (ZoomedRight > -100)
                     ZoomedRight -= 10;
                 break;
     }
