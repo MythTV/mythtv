@@ -269,42 +269,45 @@ void SipThread::SipThreadWorker()
 
     SipFsm *sipFsm = new SipFsm();
 
-    while(!sipContainer->killThread())
+    if (sipFsm->SocketOpenedOk())
     {
-        int OldCallState = CallState;
+        while(!sipContainer->killThread())
+        {
+            int OldCallState = CallState;
 
 #ifdef WIN32
-        wait(1000); // In Windows, cannot get the socket-blocking to work properly, so use poll-mode
+            wait(1000); // In Windows, cannot get the socket-blocking to work properly, so use poll-mode
 #endif
 
-        // This blocks for timeout or data in Linux
-        CheckNetworkEvents(sipFsm);
-        CheckUIEvents(sipFsm);
-        CheckRegistrationStatus(sipFsm); // Probably don't need to do this every 1/2 sec but this is a fallout of a non event-driven arch.
-        sipFsm->HandleTimerExpiries();
-        ChangePrimaryCallState(sipFsm, sipFsm->getPrimaryCallState());
-
-        // A Ring No Answer timer runs to send calls to voicemail after x seconds
+            // This blocks for timeout or data in Linux
+            CheckNetworkEvents(sipFsm);
+            CheckUIEvents(sipFsm);
+            CheckRegistrationStatus(sipFsm); // Probably don't need to do this every 1/2 sec but this is a fallout of a non event-driven arch.
+            sipFsm->HandleTimerExpiries();
+            ChangePrimaryCallState(sipFsm, sipFsm->getPrimaryCallState());
+    
+            // A Ring No Answer timer runs to send calls to voicemail after x seconds
 #ifndef WIN32
-        if ((CallState == SIP_ICONNECTING) && (rnaTimer != -1))
-        {
-            if (--rnaTimer < 0)
+            if ((CallState == SIP_ICONNECTING) && (rnaTimer != -1))
             {
-                rnaTimer = -1;
-                vxmlCallActive = true;
-                sipFsm->Answer(true, "", false);
+                if (--rnaTimer < 0)
+                {
+                    rnaTimer = -1;
+                    vxmlCallActive = true;
+                    sipFsm->Answer(true, "", false);
+                }
             }
-        }
 #endif
 
-        ChangePrimaryCallState(sipFsm, sipFsm->getPrimaryCallState());
-
-        EventQLock.lock();
-        if ((OldCallState != CallState) && (eventWindow))
-            QApplication::postEvent(eventWindow, new SipEvent(SipEvent::SipStateChange));
-        EventQLock.unlock();
+            ChangePrimaryCallState(sipFsm, sipFsm->getPrimaryCallState());
+    
+            EventQLock.lock();
+            if ((OldCallState != CallState) && (eventWindow))
+                QApplication::postEvent(eventWindow, new SipEvent(SipEvent::SipStateChange));
+            EventQLock.unlock();
+        }
     }
-
+        
     delete sipFsm;
     if (debugStream)
         delete debugStream;

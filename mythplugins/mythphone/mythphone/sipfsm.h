@@ -541,6 +541,7 @@ class SipFsm : public QWidget
 
     SipFsm(QWidget *parent = 0, const char * = 0);
     ~SipFsm(void);
+    bool SocketOpenedOk() { return sipSocket != 0 ? true : false; }
     static void Debug(SipDebugEvent::Type t, QString dbg);
     void NewCall(bool audioOnly, QString uri, QString DispName, QString videoMode, bool DisableNat);
     void HangUp(void);
