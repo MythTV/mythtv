@@ -39,7 +39,7 @@ typedef struct rtframeheader
     			// A: 0 .. Uncompressed (44100/sec 16bit 2ch)
     			//    1 .. lzo compression [NI]
     			//    2 .. layer2 (packet) [NI]
-    			//    3 .. layer3 (packet) [NI]
+    			//    3 .. layer3 (packet)
     			//    F .. flac (lossless) [NI]
     			//    S .. shorten (lossless) [NI]
 			//    N .. null frame loudless

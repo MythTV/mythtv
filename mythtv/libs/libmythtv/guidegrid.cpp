@@ -123,6 +123,10 @@ GuideGrid::GuideGrid(MythContext *context, const QString &channel,
                        SLOT(pageRight()));
     accel->connectItem(accel->insertItem(Key_PageUp), this, SLOT(pageUp()));
     accel->connectItem(accel->insertItem(Key_PageDown), this, SLOT(pageDown()));
+    accel->connectItem(accel->insertItem(CTRL + Key_Up), this,
+                       SLOT(pageUp()));
+    accel->connectItem(accel->insertItem(CTRL + Key_Down), this,
+                       SLOT(pageDown()));
 
     accel->connectItem(accel->insertItem(Key_7), this, SLOT(dayLeft()));
     accel->connectItem(accel->insertItem(Key_1), this, SLOT(dayRight()));

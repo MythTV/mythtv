@@ -810,7 +810,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    context = new MythContext;
+    context = new MythContext(false);
 
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!context->OpenDatabase(db))

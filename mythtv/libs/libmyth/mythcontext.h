@@ -11,7 +11,7 @@ class QSqlDatabase;
 class MythContext
 {
   public:
-    MythContext();
+    MythContext(bool gui = true);
    ~MythContext();
 
     QString GetInstallPrefix() { return m_installprefix; }

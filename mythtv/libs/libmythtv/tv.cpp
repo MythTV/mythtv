@@ -1063,7 +1063,9 @@ void TV::ProcessKeypress(int keypressed)
     if (editmode)
     {   
         nvp->DoKeypress(keypressed);
-        if (keypressed == wsEscape || keypressed == 'e' || keypressed == 'E')
+        if (keypressed == wsEscape || 
+            keypressed == 'e' || keypressed == 'E' ||
+            keypressed == 'm' || keypressed == 'M')
             editmode = nvp->GetEditMode();
         return;
     }
@@ -1181,7 +1183,8 @@ void TV::ProcessKeypress(int keypressed)
                     nvp->SetBookmark(); 
                 break;
             }
-            case 'e': case 'E': editmode = nvp->EnableEdit(); break;
+            case 'e': case 'E': 
+            case 'm': case 'M': editmode = nvp->EnableEdit(); break;
             default: break;
         }
     }

@@ -12,7 +12,7 @@
 
 using namespace libmyth;
 
-MythContext::MythContext(void)
+MythContext::MythContext(bool gui)
 {
     m_installprefix = PREFIX;
     m_settings = new Settings;
@@ -35,8 +35,15 @@ MythContext::MythContext(void)
     if (qtfontsmall <= 0)
         qtfontsmall = 25;
 
-    m_height = QApplication::desktop()->height();
-    m_width = QApplication::desktop()->width();
+    if (gui)
+    {
+        m_height = QApplication::desktop()->height();
+        m_width = QApplication::desktop()->width();
+    }
+    else 
+    {
+        m_height = m_width = 0;
+    }
 
     if (m_settings->GetNumSetting("GuiWidth") > 0)
         m_width = m_settings->GetNumSetting("GuiWidth");
