@@ -47,7 +47,7 @@ ThemeSelector::ThemeSelector():
         QFileInfo xml(theme->absFilePath() + "/theme.xml");
 
         if (!preview.exists() || !xml.exists()) {
-            cout << theme->absFilePath() << " doesn't look like a theme\n";
+            //cout << theme->absFilePath() << " doesn't look like a theme\n";
             continue;
         }
 
