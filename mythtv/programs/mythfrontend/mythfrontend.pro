@@ -19,7 +19,7 @@ setting.files += info_menu.xml mainmenu.xml media_settings.xml tv_schedule.xml
 setting.files += util_menu.xml info_settings.xml main_settings.xml
 setting.files += recpriorities_settings.xml tv_search.xml tv_lists.xml
 setting.files += library.xml manage_recordings.xml optical_menu.xml tvmenu.xml
-setting.files += tv_settings.xml
+setting.files += tv_settings.xml tv_lists.xml
 setting.extra = -ldconfig
 
 INSTALLS += setting
