@@ -658,7 +658,18 @@ void TV::HandleStateChange(void)
         recorder->SpawnLiveTV();
 
         gContext->DisableScreensaver();
-        StartPlayerAndRecorder(true, true);
+        StartPlayerAndRecorder(true, false);
+        if (recorder->IsRecording())
+            StartPlayerAndRecorder(false, true);
+        else
+        {
+            VERBOSE(VB_IMPORTANT, "LiveTV not successfully started");
+            tmpInternalState = internalState;
+            nextState = internalState;
+            StopPlayerAndRecorder(true, false);
+            gContext->RestoreScreensaver();
+            recorder = NULL;
+        }
     }
     else if (internalState == kState_WatchingLiveTV && 
              nextState == kState_None)
@@ -788,9 +799,10 @@ void TV::StartPlayerAndRecorder(bool startPlayer, bool startRecorder)
 { 
     if (startRecorder)
     {
-        while (!recorder->IsRecording())
+        while (!recorder->IsRecording() && !exitPlayer)
             usleep(50);
-
+        if (exitPlayer)
+            return;
         frameRate = recorder->GetFrameRate();
     }
 
@@ -3349,8 +3361,7 @@ void TV::customEvent(QCustomEvent *e)
                 AskAllowRecording(me->ExtraDataList(), timeuntil);
             }
         }
-        else if (GetState() == kState_WatchingLiveTV &&
-                 message.left(11) == "QUIT_LIVETV")
+        else if (message.left(11) == "QUIT_LIVETV")
         {
             message = message.simplifyWhiteSpace();
             QStringList tokens = QStringList::split(" ", message);

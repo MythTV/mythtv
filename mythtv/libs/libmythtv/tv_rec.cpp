@@ -554,8 +554,15 @@ void TVRec::HandleStateChange(void)
         }
         else
         {
-            if (nvr->IsErrored())
+            if (error || nvr->IsErrored()) {
+                VERBOSE(VB_IMPORTANT, "TVRec: Recording Prematurely Stopped");
+
+                QString message = QString("QUIT_LIVETV %1").arg(m_capturecardnum);
+                MythEvent me(message);
+                gContext->dispatch(me);
+
                 prematurelystopped = true;
+            }
             FinishedRecording();
             killRecordingFile = true;
             closeRecorder = true;
