@@ -11,11 +11,11 @@
     </message>
     <message>
         <source>Edit..</source>
-        <translation type="unfinished"></translation>
+        <translation>Bewerk..</translation>
     </message>
     <message>
         <source>Delete..</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwijder..</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this capture card?</source>
@@ -27,7 +27,7 @@
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation type="unfinished"></translation>
+        <translation>Neen, niet doen.</translation>
     </message>
 </context>
 <context>
@@ -103,11 +103,11 @@
     <name>InfoDialog</name>
     <message>
         <source>Episode:</source>
-        <translation type="obsolete">Aflevering</translation>
+        <translation>Aflevering:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation type="obsolete">Beschrijving</translation>
+        <translation>Beschrijving:</translation>
     </message>
     <message>
         <source>Record this program whenever it&apos;s shown anywhere</source>
@@ -135,11 +135,11 @@
     </message>
     <message>
         <source>To go to the advanced recordings screen, press &apos;i&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Om naar het geavanceer opnamemenu te gaan, druk &apos;i&apos;</translation>
     </message>
     <message>
         <source>To see a list of all up-coming showings of this program, press &apos;5&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Voor een overzicht van alle uitzendingen van dit programma, duk &apos;5&apos;</translation>
     </message>
     <message>
         <source>Record one showing of this program</source>
@@ -240,41 +240,41 @@
     <name>MythContext</name>
     <message>
         <source>Could not connect to the master backend server -- is it running?  Is the IP address set for it in the setup program correct?</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan geen verbinding met de backend server -- staat die aan? Staat hiervoor het juiste ip adres ingesteld?</translation>
     </message>
     <message>
         <source>The connection to the master backend server has gone away for some reason.. Is it running?</source>
-        <translation type="unfinished"></translation>
+        <translation>Verbinding met de backend server is weg... Staat die aan?</translation>
     </message>
 </context>
 <context>
     <name>MythPopupBox</name>
     <message>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Annuleer</translation>
+        <translation>Annuleer</translation>
     </message>
 </context>
 <context>
     <name>MythWizard</name>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Anuleer</translation>
     </message>
     <message>
         <source>&lt; &amp;Back</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt; &amp;Terug</translation>
     </message>
     <message>
         <source>&amp;Next &gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Volgende &gt;</translation>
     </message>
     <message>
         <source>&amp;Finish</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Beeindig</translation>
     </message>
 </context>
 <context>
@@ -332,91 +332,91 @@
     </message>
     <message>
         <source>Allow this program to AutoExpire?</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit programma automatisch laten vervallen?</translation>
     </message>
     <message>
         <source>Yes, AutoExpire</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja, laten vervallen</translation>
     </message>
     <message>
         <source>Are you sure you want to stop:</source>
-        <translation type="unfinished"></translation>
+        <translation>Bent u zeker dat u wil stoppen:</translation>
     </message>
     <message>
         <source>Yes, stop recording it</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja, stop met opname</translation>
     </message>
     <message>
         <source>No, do not AutoExpire</source>
-        <translation type="unfinished"></translation>
+        <translation>Neen, niet automatisch laten vervallen</translation>
     </message>
     <message>
         <source>No, continue recording it</source>
-        <translation type="unfinished"></translation>
+        <translation>Blijf opnemen</translation>
     </message>
     <message>
         <source>Select action:</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecteer:</translation>
     </message>
     <message>
         <source>Play</source>
-        <translation type="unfinished"></translation>
+        <translation>Afspelen</translation>
     </message>
     <message>
         <source>Stop Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Stop Opname</translation>
     </message>
     <message>
         <source>Don&apos;t Auto Expire</source>
-        <translation type="unfinished"></translation>
+        <translation>Niet automatisch laten vervallen</translation>
     </message>
     <message>
         <source>Auto Expire</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatisch laten vervallen</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwijderen</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Annuleer</translation>
+        <translation>Annuleer</translation>
     </message>
     <message>
         <source>, %0.2f GB free</source>
-        <translation type="unfinished"></translation>
+        <translation>, %0.2f GB vrij</translation>
     </message>
     <message>
         <source>Yes, but record this episode again next time</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja, maar neem deze aflevering opnieuw op.</translation>
     </message>
     <message>
         <source>Yes, delete it</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja, verwijder</translation>
     </message>
     <message>
         <source>Status Icons</source>
-        <translation type="unfinished"></translation>
+        <translation>Status Iconen</translation>
     </message>
     <message>
         <source>Commercials are flagged</source>
-        <translation type="unfinished"></translation>
+        <translation>Reclameblokken zijn gemarkeerd</translation>
     </message>
     <message>
         <source>An editing cutlist is present</source>
-        <translation type="unfinished"></translation>
+        <translation>Er zijn knippunten aanwezig</translation>
     </message>
     <message>
         <source>The program is able to auto-expire</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit programma vervalt automatisch</translation>
     </message>
     <message>
         <source>Commercials are being flagged</source>
-        <translation type="unfinished"></translation>
+        <translation>Reclameblokken worden gemarkeerd</translation>
     </message>
     <message>
         <source>A bookmark is set</source>
-        <translation type="unfinished"></translation>
+        <translation>Bladwijzer aanwezig</translation>
     </message>
     <message>
         <source>Ok</source>
@@ -506,43 +506,43 @@
     </message>
     <message>
         <source>Program Listings</source>
-        <translation type="unfinished"></translation>
+        <translation>Programmaoverzicht</translation>
     </message>
     <message>
         <source>New Title Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieuwe programma&apos;s zoeken</translation>
     </message>
     <message>
         <source>Title Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoek programma&apos;s</translation>
     </message>
     <message>
         <source>Description Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoeken op omschrijving</translation>
     </message>
     <message>
         <source>Channel Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoeken per zender</translation>
     </message>
     <message>
         <source>Category Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoeken om categorie</translation>
     </message>
     <message>
         <source>Movie Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Films zoeken</translation>
     </message>
     <message>
         <source>Unknown Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Onbekende zoekopdracht</translation>
     </message>
     <message>
         <source>Select Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Kies Kanaal</translation>
     </message>
     <message>
         <source>Select Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Kies Categorie</translation>
     </message>
     <message>
         <source>OK</source>
@@ -550,50 +550,50 @@
     </message>
     <message>
         <source>Movie</source>
-        <translation type="unfinished"></translation>
+        <translation>Film</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwijder</translation>
     </message>
     <message>
         <source>Select Phrase</source>
-        <translation type="unfinished"></translation>
+        <translation>Kies zoekstring</translation>
     </message>
     <message>
         <source>&lt;New Phrase&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Nieuwe Zoekstring&gt;</translation>
     </message>
 </context>
 <context>
     <name>ProgramRecPriority</name>
     <message>
         <source>Recording just this showing</source>
-        <translation type="unfinished">Neem enkel deze vertoning op</translation>
+        <translation>Neem enkel deze vertoning op</translation>
     </message>
     <message>
         <source>Recording every week</source>
-        <translation type="unfinished">Neem wekelijks op</translation>
+        <translation>Neem wekelijks op</translation>
     </message>
     <message>
         <source>Recording when shown in this timeslot</source>
-        <translation type="unfinished">Neem enkel vertoningen op in dit tijdsblok</translation>
+        <translation>Neem enkel vertoningen op in dit tijdsblok</translation>
     </message>
     <message>
         <source>Recording when shown on this channel</source>
-        <translation type="unfinished">Neem enkel vertoningen op dit kanaal op</translation>
+        <translation>Neem enkel vertoningen op dit kanaal op</translation>
     </message>
     <message>
         <source>Recording all showings</source>
-        <translation type="unfinished">Neem alle vertoningen op</translation>
+        <translation>Neem alle vertoningen op</translation>
     </message>
     <message>
         <source>Not recording this showing</source>
-        <translation type="unfinished">Neem deze vertoning niet op</translation>
+        <translation>Neem deze vertoning niet op</translation>
     </message>
     <message>
         <source>Error!</source>
-        <translation type="unfinished">Fout!</translation>
+        <translation>Fout!</translation>
     </message>
     <message>
         <source>The theme you are using does not contain a &apos;recpriorityprograms&apos; element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Escape out of it to return to the menu.</source>
@@ -624,7 +624,7 @@
     </message>
     <message>
         <source>Yes, Exit and shutdown the computer</source>
-        <translation type="obsolete">Ja, sluit nu af en zet de computer uit</translation>
+        <translation>Ja, sluit nu af en zet de computer uit</translation>
     </message>
     <message>
         <source>cut point</source>
@@ -800,83 +800,83 @@
     </message>
     <message>
         <source>Rank</source>
-        <translation type="unfinished">Rang</translation>
+        <translation>Rang</translation>
     </message>
     <message>
         <source>Record duplicates</source>
-        <translation type="unfinished"></translation>
+        <translation>Copies opnemen</translation>
     </message>
     <message>
         <source>Auto Expire</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatisch vervallen</translation>
     </message>
     <message>
         <source>Maximum number of episodes to keep (set to 0 for ALL)</source>
-        <translation type="unfinished"></translation>
+        <translation>Aantal afleveringen om te bewaren (kies 0 voor alle)</translation>
     </message>
     <message>
         <source>%02d:%02d:%02d behind  --  %.2f%% full</source>
-        <translation type="unfinished">%02d:%02d:%02d achter  --  %.2f%% vol</translation>
+        <translation>%02d:%02d:%02d achter  --  %.2f%% vol</translation>
     </message>
     <message>
         <source>%02d:%02d:%02d behind</source>
-        <translation type="unfinished">%02d:%02d:%02d achter</translation>
+        <translation>%02d:%02d:%02d achter</translation>
     </message>
     <message>
         <source>%02d:%02d behind  --  %.2f%% full</source>
-        <translation type="unfinished">%02d:%02d achter  --  %.2f%% vol</translation>
+        <translation>%02d:%02d achter  --  %.2f%% vol</translation>
     </message>
     <message>
         <source>%02d:%02d behind</source>
-        <translation type="unfinished">%02d:%02d achter</translation>
+        <translation>%02d:%02d achter</translation>
     </message>
     <message>
         <source>%02d:%02d:%02d of %02d:%02d:%02d</source>
-        <translation type="unfinished">%02d:%02d:%02d van %02d:%02d:%02d</translation>
+        <translation>%02d:%02d:%02d van %02d:%02d:%02d</translation>
     </message>
     <message>
         <source>%02d:%02d of %02d:%02d</source>
-        <translation type="unfinished">%02d:%02d van %02d:%02d</translation>
+        <translation>%02d:%02d van %02d:%02d</translation>
     </message>
     <message>
         <source>Skip %1 seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>Sla %1 seconden over</translation>
     </message>
     <message>
         <source>Not Recording</source>
-        <translation type="unfinished">Niet Opnemen</translation>
+        <translation>Wordt niet Opgenomen</translation>
     </message>
     <message>
         <source>Recording Once</source>
-        <translation type="obsolete">Eenmalig Opnemen</translation>
+        <translation>Eenmalige Opname</translation>
     </message>
     <message>
         <source>Timeslot Recording</source>
-        <translation type="obsolete">Opnemen per Tijdsblok</translation>
+        <translation>Opname per Tijdsblok</translation>
     </message>
     <message>
         <source>Channel Recording</source>
-        <translation type="unfinished">Opnemen per Kanaal</translation>
+        <translation>Opname per Kanaal</translation>
     </message>
     <message>
         <source>All Recording</source>
-        <translation type="unfinished">Alles Opnemen</translation>
+        <translation>Alles Opnemen</translation>
     </message>
     <message>
         <source>Air Date:</source>
-        <translation type="unfinished"></translation>
+        <translation>Uitzenduur:</translation>
     </message>
     <message>
         <source>Episode:</source>
-        <translation type="unfinished"></translation>
+        <translation>Aflevering:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation type="unfinished"></translation>
+        <translation>Beschrijving:</translation>
     </message>
     <message>
         <source>Pre-scaling theme images</source>
-        <translation type="unfinished"></translation>
+        <translation>Afbeeldingen worden geschaald.</translation>
     </message>
     <message>
         <source>Audio output device</source>
@@ -2117,43 +2117,43 @@
     </message>
     <message>
         <source>Last mythfilldatabase guide update:</source>
-        <translation type="unfinished"></translation>
+        <translation>Laatste programmagids update: </translation>
     </message>
     <message>
         <source>Started:   </source>
-        <translation type="unfinished"></translation>
+        <translation>Begonnen: </translation>
     </message>
     <message>
         <source>Finished: </source>
-        <translation type="unfinished"></translation>
+        <translation>Einde: </translation>
     </message>
     <message>
         <source>Result: </source>
-        <translation type="unfinished"></translation>
+        <translation>Resultaat</translation>
     </message>
     <message>
         <source>There&apos;s no guide data available! </source>
-        <translation type="unfinished"></translation>
+        <translation>De programmagids is leeg!</translation>
     </message>
     <message>
         <source>Have you run mythfilldatabase?</source>
-        <translation type="unfinished"></translation>
+        <translation>Probleem met je internetconnectie?</translation>
     </message>
     <message>
         <source>There is guide data until </source>
-        <translation type="unfinished"></translation>
+        <translation>Er is programmadata tot</translation>
     </message>
     <message>
         <source>days</source>
-        <translation type="unfinished"></translation>
+        <translation>dagen</translation>
     </message>
     <message>
         <source>day</source>
-        <translation type="unfinished"></translation>
+        <translation>dag</translation>
     </message>
     <message>
         <source>WARNING: is mythfilldatabase running?</source>
-        <translation type="unfinished"></translation>
+        <translation>Probleem met de programmadata?</translation>
     </message>
     <message>
         <source>Not Flagged</source>
@@ -4011,11 +4011,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>All</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle</translation>
     </message>
     <message>
         <source>Important</source>
-        <translation type="unfinished"></translation>
+        <translation>Belangrijk</translation>
     </message>
 </context>
 </TS>
