@@ -1291,7 +1291,7 @@
         <column number="3" width="110" context="0"></column>
         <column number="4" width="110" context="1"></column>
         <items>7</items>
-        <image function="selectionbar" filename="bar.png" location="-13,-2"></image>
+        <image function="selectionbar" filename="bar.png" location="-13,-7"></image>
         <image function="uparrow" filename="uparrow.png" location="743,12"></image>
         <image function="downarrow" filename="downarrow.png" location="743,251"></image>
       </listarea>
@@ -1334,9 +1334,9 @@
       </textarea>
 
       <textarea name="subtitle" draworder="6">
-        <area>25,47,600,40</area>
+        <area>25,47,605,40</area>
         <font>subtitle</font>
-        <multiline>yes</multiline>
+        <multiline>no</multiline>
       </textarea>
 
       <textarea name="channel" draworder="6">
@@ -1409,7 +1409,7 @@
     </container>
 
     <container name="video">
-      <area>616,351,160,120</area>
+      <area>613,351,160,120</area>
     </container>
 
     <popup name="confirmdelete">
