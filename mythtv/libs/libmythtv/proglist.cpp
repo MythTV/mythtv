@@ -105,7 +105,8 @@ void ProgLister::keyPressEvent(QKeyEvent *e)
         case Key_Down: cursorDown(false); break;
         case Key_PageUp: case Key_9: cursorUp(true); break;
         case Key_PageDown: case Key_3: cursorDown(true); break;
-	case Key_Enter: case Key_Return: select(); break;
+	case Key_Space: case Key_Enter: case Key_Return: case Key_I:
+                select(); break;
         default: MythDialog::keyPressEvent(e); break;
     }
 }
