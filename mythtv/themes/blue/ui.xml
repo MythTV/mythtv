@@ -1691,29 +1691,33 @@
     </container>
 
     <container name="program_info">
-      <area>0,410,800,240</area>
+      <area>20,408,800,240</area>
       <textarea name="title" draworder="6">
-        <area>20,0,800,50</area>
+        <area>0,0,800,50</area>
         <font>title</font>
       </textarea>
       <textarea name="channel" draworder="6">
-        <area>20,40,120,30</area>
+        <area>0,40,120,30</area>
         <font>info</font>
       </textarea>
       <textarea name="timedate" draworder="6">
-        <area>160,40,420,30</area>
+        <area>140,40,420,30</area>
         <font>info</font>
       </textarea>
       <textarea name="subdescr" draworder="6">
-        <area>20,70,720,90</area>
+        <area>0,70,720,90</area>
         <font>info</font>
 	<multiline>yes</multiline>
 	<value>%SUBTITLE|"|"
 %%DESCRIPTION%</value>
       </textarea>
       <textarea name="type" draworder="6">
-        <area>20,160,430,30</area>
+        <area>0,160,500,30</area>
         <font>yellowinfo</font>
+      </textarea>
+      <textarea name="programid" draworder="6" align="right">
+        <area>520,160,240,30</area>
+        <font>message</font>
       </textarea>
     </container>
 
