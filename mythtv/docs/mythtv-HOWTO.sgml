@@ -121,7 +121,7 @@ watching, but does allow for encoding video and then watching it later.
 <item>The developer states that his AMD1800+ system can <bf>almost</bf>
 encode two MPEG-4 video streams and watch one program simultaneously.
 <item>A PIII/800MHz system with 512MB RAM can encode one video
-stream using the RTJPEG codec with 480x480 capture resolution and play it back
+stream using the RTjpeg codec with 480x480 capture resolution and play it back
 simultaneously, thereby allowing live TV watching.
 <item>A dual Celeron/450MHz is able to view a 480x480 MPEG-4/3300kbps file
 created on a different system with 30% CPU usage.
@@ -149,14 +149,14 @@ may be useful if you are running multiple encoders.
 <p>Encoded video takes up a lot of hard disk space. The exact amount depends
 on the encoding scheme, the size of the raw images, and the frames per
 second, but typical values for MythTV range from 700 megabytes/hour to 2
-gigabyte/hour for MPEG-4 and larger for MPEG-2 and RTJPEG.
+gigabyte/hour for MPEG-4 and larger for MPEG-2 and RTjpeg.
 
 <bf>NOTE</bf>:  You <em>must</em> use DMA for hard drive access to prevent
 choppy or jittery video.  Not all distributions enable DMA at boot time. 
 See the Troubleshooting Section for <ref id="Setting_DMA"
 name="instructions"> on how to do this.
 
-Writing video to disk is sensitive to timing issues; RTJPEG requires less
+Writing video to disk is sensitive to timing issues; RTjpeg requires less
 CPU with the tradeoff being larger files and needing to write to the disk
 faster.  MPEG-4 requires more CPU, but the files are smaller.  At the
 default resolution, MPEG-2 creates the largest files of all with almost no
@@ -2208,6 +2208,13 @@ Composite will lead to blank recordings.
 Press ESC to return to the main menu, and press ESC again if you have no
 further items to configure, thereby returning you to the command line.
 
+<sect2>Channel Editor
+<p>The channel editor is used to globally alter channel information,
+including items like hue, contrast, finetuning and others.  Users in North
+America shouldn't run the channel editor until after completing initial
+setup and running <bf>mythfilldatabase</bf> at least once to populate the
+database.
+
 <sect1>Post-configuration.
 <p>Run the <tt>mythfilldatabase</tt> program as directed.  The master
 backend will obtain guide data for all the video sources you defined during
@@ -2458,7 +2465,7 @@ With parameters: <tt>kerneldeint=10:1,denoise3d=12</tt>
 Without: <tt>kerneldeint,denoise3d</tt>
 
 Recording filters are set for each individual channel. These may be used
-when encoding in software (MPEG-4, RTJPEG) but do not apply when using a
+when encoding in software (MPEG-4, RTjpeg) but do not apply when using a
 capture card with hardware encoding such as those supported by the ivtv
 driver, DVB, HDTV or MJPEG cards. You can run MythTV's "setup" program and
 select the "Channel Editor". On the first page for each channel, you can
@@ -3788,8 +3795,8 @@ start the application.  If nothing seems to be happening when you try to
 view a program, try switching back to the shell and look for error messages
 there.
 
-<sect1>Poor performance with NVidia cards and XVMC.
-<p>XVMC is a NVidia driver feature which is supposed to help with decoding
+<sect1>Poor performance with NVidia cards and XvMC.
+<p>XvMC is a NVidia driver feature which is supposed to help with decoding
 video.  Users have reported that rather than speeding up their video it
 appears to be doing the opposite.  You may want to check that your color
 depth is set for 24bpp.
@@ -4354,7 +4361,7 @@ For either manual or automatic transcoding:
    start mythbackend
    start mythfrontend
    select setup, and the Transcoding recording profile.
-      now select either RTJPEG or MPEG-4 (selecting any of the hardware
+      now select either RTjpeg or MPEG-4 (selecting any of the hardware
       encoders will result in the transcoder not working).
       set the other parameters as you'd like.  For best performance, you
       should match the audio to the 'Default' profile.  If you plan to
@@ -5126,7 +5133,8 @@ the <bf>man</bf> page for details.
 </article>
 <!-- Revision History
 v0.14.00, 2004-01-31.  Initial version for MythTV v0.14.  Rename docs
-version to match.
+version to match.  Standardize spelling of RTjpeg.  Add section on Channel
+Editor in setup.
 -->
 
 <!--

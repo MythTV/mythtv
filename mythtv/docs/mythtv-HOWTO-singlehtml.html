@@ -180,7 +180,7 @@ necessary.</EM>
 <LI><A NAME="toc20.26">20.26</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.26">Troubleshooting the Hauppauge PVR-250 IR remote</A>
 <LI><A NAME="toc20.27">20.27</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.27">MySQL not connecting correctly.</A>
 <LI><A NAME="toc20.28">20.28</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.28">My screen goes black when I try to play something.</A>
-<LI><A NAME="toc20.29">20.29</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.29">Poor performance with NVidia cards and XVMC.</A>
+<LI><A NAME="toc20.29">20.29</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.29">Poor performance with NVidia cards and XvMC.</A>
 <LI><A NAME="toc20.30">20.30</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.30">My computer is loading a media player application when I insert a CD or DVD.</A>
 </UL>
 <P>
@@ -313,7 +313,7 @@ watching, but does allow for encoding video and then watching it later.</LI>
 <LI>The developer states that his AMD1800+ system can <B>almost</B>
 encode two MPEG-4 video streams and watch one program simultaneously.</LI>
 <LI>A PIII/800MHz system with 512MB RAM can encode one video
-stream using the RTJPEG codec with 480x480 capture resolution and play it back
+stream using the RTjpeg codec with 480x480 capture resolution and play it back
 simultaneously, thereby allowing live TV watching.</LI>
 <LI>A dual Celeron/450MHz is able to view a 480x480 MPEG-4/3300kbps file
 created on a different system with 30% CPU usage.</LI>
@@ -342,12 +342,12 @@ may be useful if you are running multiple encoders.</P>
 <P>Encoded video takes up a lot of hard disk space. The exact amount depends
 on the encoding scheme, the size of the raw images, and the frames per
 second, but typical values for MythTV range from 700 megabytes/hour to 2
-gigabyte/hour for MPEG-4 and larger for MPEG-2 and RTJPEG.</P>
+gigabyte/hour for MPEG-4 and larger for MPEG-2 and RTjpeg.</P>
 <P><B>NOTE</B>:  You <EM>must</EM> use DMA for hard drive access to prevent
 choppy or jittery video.  Not all distributions enable DMA at boot time. 
 See the Troubleshooting Section for 
 <A HREF="#Setting_DMA">instructions</A> on how to do this.</P>
-<P>Writing video to disk is sensitive to timing issues; RTJPEG requires less
+<P>Writing video to disk is sensitive to timing issues; RTjpeg requires less
 CPU with the tradeoff being larger files and needing to write to the disk
 faster.  MPEG-4 requires more CPU, but the files are smaller.  At the
 default resolution, MPEG-2 creates the largest files of all with almost no
@@ -2599,6 +2599,14 @@ Composite will lead to blank recordings.</P>
 <P>Press ESC to return to the main menu, and press ESC again if you have no
 further items to configure, thereby returning you to the command line.</P>
 
+<H3>Channel Editor</H3>
+
+<P>The channel editor is used to globally alter channel information,
+including items like hue, contrast, finetuning and others.  Users in North
+America shouldn't run the channel editor until after completing initial
+setup and running <B>mythfilldatabase</B> at least once to populate the
+database.</P>
+
 <H2><A NAME="ss9.2">9.2</A> <A HREF="#toc9.2">Post-configuration.</A>
 </H2>
 
@@ -2861,7 +2869,7 @@ be no spaces in the filter string. Here is an example filter string:</P>
 <P>With parameters: <CODE>kerneldeint=10:1,denoise3d=12</CODE></P>
 <P>Without: <CODE>kerneldeint,denoise3d</CODE></P>
 <P>Recording filters are set for each individual channel. These may be used
-when encoding in software (MPEG-4, RTJPEG) but do not apply when using a
+when encoding in software (MPEG-4, RTjpeg) but do not apply when using a
 capture card with hardware encoding such as those supported by the ivtv
 driver, DVB, HDTV or MJPEG cards. You can run MythTV's "setup" program and
 select the "Channel Editor". On the first page for each channel, you can
@@ -4291,10 +4299,10 @@ start the application.  If nothing seems to be happening when you try to
 view a program, try switching back to the shell and look for error messages
 there.</P>
 
-<H2><A NAME="ss20.29">20.29</A> <A HREF="#toc20.29">Poor performance with NVidia cards and XVMC.</A>
+<H2><A NAME="ss20.29">20.29</A> <A HREF="#toc20.29">Poor performance with NVidia cards and XvMC.</A>
 </H2>
 
-<P>XVMC is a NVidia driver feature which is supposed to help with decoding
+<P>XvMC is a NVidia driver feature which is supposed to help with decoding
 video.  Users have reported that rather than speeding up their video it
 appears to be doing the opposite.  You may want to check that your color
 depth is set for 24bpp.</P>
@@ -4913,7 +4921,7 @@ set the Transcoder Auto-run checkbox</P>
 start mythbackend
 start mythfrontend
 select setup, and the Transcoding recording profile.
-now select either RTJPEG or MPEG-4 (selecting any of the hardware
+now select either RTjpeg or MPEG-4 (selecting any of the hardware
 encoders will result in the transcoder not working).
 set the other parameters as you'd like.  For best performance, you
 should match the audio to the 'Default' profile.  If you plan to

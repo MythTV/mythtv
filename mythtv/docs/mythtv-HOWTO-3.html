@@ -71,7 +71,7 @@ watching, but does allow for encoding video and then watching it later.</LI>
 <LI>The developer states that his AMD1800+ system can <B>almost</B>
 encode two MPEG-4 video streams and watch one program simultaneously.</LI>
 <LI>A PIII/800MHz system with 512MB RAM can encode one video
-stream using the RTJPEG codec with 480x480 capture resolution and play it back
+stream using the RTjpeg codec with 480x480 capture resolution and play it back
 simultaneously, thereby allowing live TV watching.</LI>
 <LI>A dual Celeron/450MHz is able to view a 480x480 MPEG-4/3300kbps file
 created on a different system with 30% CPU usage.</LI>
@@ -100,12 +100,12 @@ may be useful if you are running multiple encoders.</P>
 <P>Encoded video takes up a lot of hard disk space. The exact amount depends
 on the encoding scheme, the size of the raw images, and the frames per
 second, but typical values for MythTV range from 700 megabytes/hour to 2
-gigabyte/hour for MPEG-4 and larger for MPEG-2 and RTJPEG.</P>
+gigabyte/hour for MPEG-4 and larger for MPEG-2 and RTjpeg.</P>
 <P><B>NOTE</B>:  You <EM>must</EM> use DMA for hard drive access to prevent
 choppy or jittery video.  Not all distributions enable DMA at boot time. 
 See the Troubleshooting Section for 
 <A HREF="mythtv-HOWTO-20.html#Setting_DMA">instructions</A> on how to do this.</P>
-<P>Writing video to disk is sensitive to timing issues; RTJPEG requires less
+<P>Writing video to disk is sensitive to timing issues; RTjpeg requires less
 CPU with the tradeoff being larger files and needing to write to the disk
 faster.  MPEG-4 requires more CPU, but the files are smaller.  At the
 default resolution, MPEG-2 creates the largest files of all with almost no
