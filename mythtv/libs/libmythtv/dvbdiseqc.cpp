@@ -315,10 +315,9 @@ bool DVBDiSEqC::Diseqc1xSwitch(dvb_tuning_t& tuning, bool reset,
 
     GENERAL(QString("DiSEqC 1.0 Switch - Port %1").arg(tuning.diseqc_port));
 
-    if (tuning.diseqc_port != 0 &&
-        ((prev_tuning.diseqc_port != tuning.diseqc_port ||
-          prev_tuning.tone != tuning.tone ||
-          prev_tuning.voltage != tuning.voltage) || reset))
+    if ((prev_tuning.diseqc_port != tuning.diseqc_port ||
+        prev_tuning.tone != tuning.tone ||
+        prev_tuning.voltage != tuning.voltage) || reset)
     {
         if (tuning.diseqc_port > 3)
         {
