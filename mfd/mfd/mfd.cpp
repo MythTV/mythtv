@@ -31,13 +31,12 @@ MFD::MFD(QSqlDatabase *ldb, int port, bool log_stdout, int logging_verbosity)
     shutting_down = false;
     watchdog_flag = false;
     port_number = port;
-    metadata_container_identifier = 0;
-    metadata_video_generation = 0;
-    metadata_audio_generation = 4;    // 4? Why 4? ... arbitrary starting point, higher than 3 for obscure iTunes reasons
-    metadata_containers = new QPtrList<MetadataContainer>;
-    metadata_containers->setAutoDelete(true);
-    metadata_id = 1;
-    playlist_id = 1;
+    //metadata_container_identifier = 0;
+    //metadata_video_generation = 0;
+    //metadata_audio_generation = 4;    // 4? Why 4? ... arbitrary starting point, higher than 3 for obscure iTunes reasons
+    //metadata_containers = new QPtrList<MetadataContainer>;
+    //metadata_id = 1;
+    //playlist_id = 1;
 
     //
     //  Assign the database if one exists
@@ -48,12 +47,6 @@ MFD::MFD(QSqlDatabase *ldb, int port, bool log_stdout, int logging_verbosity)
     {
         db = ldb;
     }
-    
-    //
-    //  Build collections of metadata
-    //
-    
-    makeMetadataContainers();
     
     //
     //  Create the log (possibly to stdout)
@@ -78,7 +71,8 @@ MFD::MFD(QSqlDatabase *ldb, int port, bool log_stdout, int logging_verbosity)
 
     //
     //  Create the metadata server object (separate thread object that has
-    //  it's own server port for serving metadata)
+    //  it's own server port for serving metadata and owns all the
+    //  containers)
     //
     
     metadata_server = new MetadataServer(this, 2344);
@@ -97,6 +91,7 @@ MFD::MFD(QSqlDatabase *ldb, int port, bool log_stdout, int logging_verbosity)
 }
 
 
+/*
 void MFD::makeMetadataContainers()
 {
     //
@@ -133,7 +128,7 @@ void MFD::makeMetadataContainers()
         
 
 
-/*
+
         MetadataContainer *another_new_collection = new MetadataMythDBContainer(
                                                                         this,
                                                                         bumpMetadataContainerIdentifier(),
@@ -144,7 +139,7 @@ void MFD::makeMetadataContainers()
 
                                                                        
         metadata_containers->append(another_new_collection);
-*/
+
         
 #else
 
@@ -165,6 +160,8 @@ void MFD::makeMetadataContainers()
 #endif
     
 }
+
+*/
 
 void MFD::customEvent(QCustomEvent *ce)
 {
@@ -279,6 +276,7 @@ void MFD::customEvent(QCustomEvent *ce)
         //  iterate over the containers and tell the relevant one to update
         //  
         
+        /*
         MetadataChangeEvent *mce = (MetadataChangeEvent*)ce;
         QPtrListIterator<MetadataContainer> iterator( *metadata_containers );
         MetadataContainer *a_container;
@@ -307,6 +305,7 @@ void MFD::customEvent(QCustomEvent *ce)
                 break;
             }
          }
+         */
     }
     else
     {
@@ -547,7 +546,8 @@ void MFD::shutDown()
     //  Turn off the metadata
     //
     
-    //metadata_container->shutDown();
+    metadata_server->stop();
+    metadata_server->wait();
     
     
     //
@@ -627,6 +627,7 @@ void MFD::registerMFDService()
     
 }
 
+/*
 int MFD::bumpMetadataContainerIdentifier()
 {
     //
@@ -822,8 +823,18 @@ Playlist* MFD::getPlaylist(int id)
     
 }
 
+*/
+
+
 MFD::~MFD()
 {
+
+    if(metadata_server)
+    {
+        delete metadata_server;
+        metadata_server = NULL;
+    }    
+
     if(plugin_manager)
     {
         delete plugin_manager;
@@ -842,11 +853,6 @@ MFD::~MFD()
         mfd_log = NULL;
     }
     
-    if(metadata_server)
-    {
-        delete metadata_server;
-        metadata_server = NULL;
-    }    
 }
 
 

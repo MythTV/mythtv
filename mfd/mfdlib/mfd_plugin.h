@@ -137,6 +137,7 @@ class MFDServicePlugin : public MFDBasePlugin
     ~MFDServicePlugin();
     
     virtual void    run();
+    virtual void    stop();
     bool            initServerSocket();
     void            updateSockets();
     void            findNewClients();

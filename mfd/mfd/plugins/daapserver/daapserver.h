@@ -15,6 +15,7 @@ using namespace std;
 #include <qvaluelist.h>
 
 #include "mfd_plugin.h"
+#include "../../mdserver.h"
 
 struct httpd;
 
@@ -49,14 +50,11 @@ class DaapServer: public MFDHttpPlugin
 
   private:
   
+    MetadataServer              *metadata_server;
     QPtrList<MetadataContainer> *metadata_containers;
-    QString service_name;
-
-    uint metadata_audio_generation;
-
-    QValueList<int> hanging_updates;
-
-    bool first_update;
+    QString                     service_name;
+    QValueList<int>             hanging_updates;
+    bool                        first_update;
 };
 
 #endif  // daapserver_h_

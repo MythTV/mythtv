@@ -8,9 +8,6 @@
 
 */
 
-#include "../config.h"
-
-
 #include <qapplication.h>
 #include <qsqldatabase.h>
 #include <qfile.h>
@@ -20,21 +17,16 @@
 using namespace std;
 #include <unistd.h>
 
-#ifdef MYTHLIB_SUPPORT 
-#include <mythtv/mythcontext.h>
-#endif
-
 #include "mfd.h"
-
+#include "settings.h"
 
 //
-//  If configure said to include libmyth support, then we do.
+//  This is a global object that anyone can ask for a setting value. If
+//  everything was compiled with myth lib support, it basicly wraps calls to
+//  gContext
 //
 
-#if MYTHLIB_SUPPORT
-MythContext *gContext;
-#endif
-
+Settings *mfdContext;
 
 //
 //  This is the center of the universe
@@ -149,15 +141,18 @@ int main(int argc, char **argv)
 
     QSqlDatabase *db = NULL;
 
+    mfdContext = new Settings(MYTH_BINARY_VERSION);
+    
+
 #ifdef MYTHLIB_SUPPORT
-    gContext = new MythContext(MYTH_BINARY_VERSION, false, false);
+    //gContext = new MythContext(MYTH_BINARY_VERSION, false, false);
     db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!db)
     {
         cerr << "mfd: Couldn't connect to database. Giving up." << endl; 
         return -1;
     }
-         if(!gContext->OpenDatabase(db))
+    if(!mfdContext->openDatabase(db))
     {
         cerr << "mfd: Couldn't open database. I go away now." << endl;
         return -1;
@@ -185,7 +180,7 @@ int main(int argc, char **argv)
    
     bool log_stdout = false;
 #ifdef MYTHLIB_SUPPORT
-    if(gContext->GetNumSetting("MFDLogFlag", 0))
+    if(mfdContext->getNumSetting("MFDLogFlag", 0))
     {
         log_stdout = true;
     }
@@ -202,12 +197,11 @@ int main(int argc, char **argv)
                                 
     delete db;
 
-#ifdef MYTHLIB_SUPPORT
-    if(gContext)
+    if(mfdContext)
     {
-        delete gContext;
+        delete mfdContext;
     }
-#endif
+
     return 0;
 }
 

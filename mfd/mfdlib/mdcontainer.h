@@ -18,9 +18,10 @@
 #include <qwaitcondition.h>
 
 #include "metadata.h"
-#include "mdmonitor.h"
+
 
 class MFD;
+
 
 enum MetadataCollectionContentType
 {
@@ -56,14 +57,18 @@ class MetadataContainer
 
     void                log(const QString &log_message, int verbosity);
     void                warning(const QString &warning_message);
-    virtual bool        tryToUpdate();
+    //virtual bool        tryToUpdate();
     int                 getIdentifier(){return unique_identifier;}
     bool                isAudio();
     bool                isVideo();
     bool                isLocal();
     uint                getMetadataCount();
     uint                getPlaylistCount();
+
+    Metadata*           getMetadata(int item_id);
     QIntDict<Metadata>* getMetadata(){return current_metadata;}
+
+    Playlist*           getPlaylist(int pl_id);
     QIntDict<Playlist>* getPlaylists(){return current_playlists;}
 
   protected:
@@ -97,12 +102,12 @@ class MetadataMythDBContainer: public MetadataContainer
 
     ~MetadataMythDBContainer();
     
-    bool    tryToUpdate();
+    //bool    tryToUpdate();
     
   private:
   
     QSqlDatabase    *db;
-    MetadataMonitor *metadata_monitor;
+    // MetadataMonitor *metadata_monitor;
 
 };
                             

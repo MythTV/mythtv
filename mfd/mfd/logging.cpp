@@ -10,13 +10,10 @@
 
 #include "../config.h"
 
-#include "logging.h"
-
 #include <qdatetime.h>
 
-#ifdef MYTHLIB_SUPPORT
-#include <mythtv/mythcontext.h>
-#endif
+#include "logging.h"
+#include "settings.h"
 
 MFDLogger::MFDLogger(bool log_stdout, int verbosity_level)
           :QObject()
@@ -40,9 +37,7 @@ MFDLogger::MFDLogger(bool log_stdout, int verbosity_level)
     if(!log_to_stdout)
     {
         QString logfile_name = QString(PREFIX) + "/share/mythtv/";
-#ifdef MYTHLIB_SUPPORT
-            logfile_name = gContext->GetSetting("MFDLogLocation", logfile_name);
-#endif
+        logfile_name = mfdContext->getSetting("MFDLogLocation", logfile_name);
         logfile_name.append("/mfd.log");
         logging_file.setName(logfile_name);
         if(!logging_file.open(IO_WriteOnly))

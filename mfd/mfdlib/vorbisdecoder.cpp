@@ -31,9 +31,7 @@ using namespace std;
 #include "recycler.h"
 //  #include "metadata.h"
 
-#ifdef MYTHLIB_SUPPORT
-#include <mythtv/mythcontext.h>
-#endif
+#include "settings.h"
 
 // static functions for OggVorbis
 
@@ -107,10 +105,8 @@ VorbisDecoder::VorbisDecoder(const QString &file, DecoderFactory *d,
     chan = 0;
     output_size = 0;
 
-#ifdef MYTHLIB_SUPPORT
-    filename_format = gContext->GetSetting("NonID3FileNameFormat").upper();
-    ignore_id3 = gContext->GetNumSetting("Ignore_ID3", 0);
-#endif
+    filename_format = mfdContext->GetSetting("NonID3FileNameFormat").upper();
+    ignore_id3 = mfdContext->GetNumSetting("Ignore_ID3", 0);
 
 }
 

@@ -4,6 +4,8 @@ include (../settings.pro)
     error(Missing config.pro: please run the configure script)
 }
 
+INCLUDEPATH *= /usr/include/cdda
+
 TEMPLATE = lib
 CONFIG += thread dll
 TARGET = mfdlib
@@ -29,6 +31,8 @@ SOURCES += vorbisdecoder.cpp maddecoder.cpp
 HEADERS += flacdecoder.h   cddecoder.h
 SOURCES += flacdecoder.cpp cddecoder.cpp
 
+HEADERS += metadata.h   mdcontainer.h   settings.h
+SOURCES += metadata.cpp mdcontainer.cpp settings.cpp
 
 LIBS += -logg -lvorbisfile -lvorbis  -lmad -lid3tag -lcdaudio \
         -lFLAC -lcdda_interface -lcdda_paranoia

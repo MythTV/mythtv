@@ -31,7 +31,8 @@ DaapServer::DaapServer(MFD *owner, int identity)
       :MFDHttpPlugin(owner, identity, 3689, "daap server", 2)
 {
     first_update = true;
-    metadata_containers = owner->getMetadataContainers();    
+    metadata_server = owner->getMetadataServer();
+    metadata_containers = metadata_server->getMetadataContainers();    
     QString local_hostname = "unknown";
     char my_hostname[2049];
     if(gethostname(my_hostname, 2048) < 0)
@@ -60,8 +61,6 @@ DaapServer::DaapServer(MFD *owner, int identity)
 
 void DaapServer::handleIncoming(HttpRequest *http_request, int client_id)
 {
-    metadata_audio_generation = parent->getMetadataAudioGeneration();
-
     //
     //  Create a DaapRequest object that will be built up to understand the
     //  request that has just come in from a client
@@ -136,16 +135,17 @@ void DaapServer::handleIncoming(HttpRequest *http_request, int client_id)
         //
 
         
-        if(daap_request->getDatabaseVersion() != parent->getMetadataAudioGeneration() &&
+        uint audio_generation = metadata_server->getMetadataAudioGeneration();
+        if(daap_request->getDatabaseVersion() != audio_generation &&
            daap_request->getDatabaseVersion() != 0)
         {
             log(QString(": a client asked for a database request, "
                         "but has stale db reference "
                         "(mfd db# = %1, client db# = %2)")
-                        .arg(parent->getMetadataAudioGeneration())
+                        .arg(audio_generation)
                         .arg(daap_request->getDatabaseVersion()), 9);
 
-            sendUpdate(http_request, parent->getMetadataAudioGeneration());
+            sendUpdate(http_request, audio_generation);
         }
         else
         {
@@ -182,13 +182,14 @@ void DaapServer::handleIncoming(HttpRequest *http_request, int client_id)
         //
 
 
-        if(daap_request->getDatabaseVersion() != parent->getMetadataAudioGeneration())
+        uint audio_generation = metadata_server->getMetadataAudioGeneration();
+        if(daap_request->getDatabaseVersion() != audio_generation)
         {
             log(QString(": a client asked for and will get an update "
                         "(mfd db# = %1, client db# = %2)")
-                        .arg(parent->getMetadataAudioGeneration())
+                        .arg(audio_generation)
                         .arg(daap_request->getDatabaseVersion()), 9);
-            sendUpdate(http_request, parent->getMetadataAudioGeneration());
+            sendUpdate(http_request, audio_generation);
         }
         else
         {
@@ -574,9 +575,9 @@ void DaapServer::sendDatabaseList(HttpRequest *http_request)
                         //<< Tag('mper') << (u64) 543675286654 << end 
 
                         << Tag('minm') << service_name.utf8() << end 
-                        << Tag('mimc') << (u32) parent->getAllAudioMetadataCount() << end 
+                        << Tag('mimc') << (u32) metadata_server->getAllAudioMetadataCount() << end 
              
-                        << Tag('mctc') << (u32) parent->getAllAudioPlaylistCount() << end 
+                        << Tag('mctc') << (u32) metadata_server->getAllAudioPlaylistCount() << end 
                     << end
                 << end 
              << end;
@@ -593,18 +594,20 @@ void DaapServer::sendDatabase(HttpRequest *http_request, DaapRequest *daap_reque
         return;
     }
 
+    uint audio_count = metadata_server->getAllAudioMetadataCount();
+
     TagOutput response;
     response << Tag( 'adbs' ) << Tag('mstt') << (u32) DAAP_OK << end 
              << Tag('muty') << (u8) 0 << end 
-             << Tag('mtco') << (u32) parent->getAllAudioMetadataCount() << end 
-             << Tag('mrco') << (u32) parent->getAllAudioMetadataCount() << end 
+             << Tag('mtco') << (u32) audio_count << end 
+             << Tag('mrco') << (u32) audio_count << end 
              << Tag('mlcl') ;
              
              //
              // Lock all the metadata before we do this
              //
              
-             parent->lockMetadata();
+             metadata_server->lockMetadata();
              
              //
              // Iterate over all the containers, and then over every item in
@@ -645,7 +648,7 @@ void DaapServer::sendDatabase(HttpRequest *http_request, DaapRequest *daap_reque
                     
                                 response << Tag('mikd') << (u8) 2 << end;
                                 response << Tag('asdk') << (u8) 0 << end;
-                                response << Tag('miid') << (u32) which_item->getId() << end;
+                                response << Tag('miid') << (u32) which_item->getUniversalId() << end;
                                 response << Tag('minm') << which_item->getTitle().utf8() << end;
 
                                 //
@@ -836,7 +839,7 @@ void DaapServer::sendDatabase(HttpRequest *http_request, DaapRequest *daap_reque
             }
             response << end 
                      << end;
-            parent->unlockMetadata();
+            metadata_server->unlockMetadata();
 
     sendTag( http_request, response.data() );
 }
@@ -845,7 +848,7 @@ void DaapServer::sendDatabaseItem(HttpRequest *http_request, u32 song_id, DaapRe
 {
     
 
-    Metadata *which_one = parent->getMetadata(song_id);
+    Metadata *which_one = metadata_server->getMetadataByUniversalId(song_id);
     if(which_one)
     {
         if(which_one->getType() == MDT_audio)
@@ -967,7 +970,7 @@ void DaapServer::sendContainers(HttpRequest *http_request, DaapRequest *daap_req
                     response << Tag('minm') << service_name.utf8() << end ;
                 }
              
-                response << Tag('mimc') << (u32) parent->getAllAudioMetadataCount() << end ;
+                response << Tag('mimc') << (u32) metadata_server->getAllAudioMetadataCount() << end ;
              response << end;
              
              //
@@ -999,7 +1002,7 @@ void DaapServer::sendContainers(HttpRequest *http_request, DaapRequest *daap_req
                 
                             if((u64) daap_request->getParsedMetaContentCodes() & DAAP_META_ITEMID)
                             {
-                                response << Tag('miid') << (u32) a_playlist->getId() << end ;
+                                response << Tag('miid') << (u32) a_playlist->getUniversalId() << end ;
                             }
              
                             if((u64) daap_request->getParsedMetaContentCodes() & DAAP_META_ITEMNAME)
@@ -1040,7 +1043,7 @@ void DaapServer::sendContainer(HttpRequest *http_request, u32 container_id, int 
     
     if(container_id != 1)
     {
-        the_playlist = parent->getPlaylist(container_id);
+        the_playlist = metadata_server->getPlaylistByUniversalId(container_id);
         if(!the_playlist)
         {
             warning("asked for a playlist it can't find");
@@ -1053,7 +1056,7 @@ void DaapServer::sendContainer(HttpRequest *http_request, u32 container_id, int 
     }
     else
     {
-        how_many = parent->getAllAudioMetadataCount();
+        how_many = metadata_server->getAllAudioMetadataCount();
     }
     
     TagOutput response;
@@ -1070,8 +1073,8 @@ void DaapServer::sendContainer(HttpRequest *http_request, u32 container_id, int 
                 //
 
                 
-                parent->lockMetadata();
-                parent->lockPlaylists();
+                metadata_server->lockMetadata();
+                metadata_server->lockPlaylists();
 
                 if(container_id != 1)
                 {
@@ -1117,8 +1120,8 @@ void DaapServer::sendContainer(HttpRequest *http_request, u32 container_id, int 
                                         AudioMetadata *which_item = (AudioMetadata*)iterator.current();
                                         response << Tag('mlit') 
                                                  << Tag('mikd') << (u8) 2  << end
-                                                 << Tag('miid') << (u32) which_item->getId() << end 
-                                                 << Tag('mcti') << (u32) which_item->getId() << end 
+                                                 << Tag('miid') << (u32) which_item->getUniversalId() << end 
+                                                 << Tag('mcti') << (u32) which_item->getUniversalId() << end 
                                                  << end;
                                     }
                                 }
@@ -1127,8 +1130,8 @@ void DaapServer::sendContainer(HttpRequest *http_request, u32 container_id, int 
                     }
                 }
 
-                parent->unlockPlaylists();
-                parent->unlockMetadata();
+                metadata_server->unlockPlaylists();
+                metadata_server->unlockMetadata();
 
              response << end 
              << end;

@@ -294,9 +294,9 @@ bool ZeroConfigResponder::registerService(
     {
         strict_service_type = "_daap._tcp.";
     }
-    if(service_type == "mmdp")
+    if(service_type == "mdcap")
     {
-        strict_service_type = "_mmdp._tcp.";
+        strict_service_type = "_mdcap._tcp.";
     }
 
     if(strict_service_type.length() < 1)

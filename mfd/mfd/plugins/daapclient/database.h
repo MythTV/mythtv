@@ -15,7 +15,7 @@
 #include <qstring.h>
 
 #include "../../mfd.h"
-#include "../../mdcontainer.h"
+#include "mdcontainer.h"
 
 class Database
 {

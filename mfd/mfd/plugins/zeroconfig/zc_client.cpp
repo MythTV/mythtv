@@ -189,7 +189,7 @@ const QString& MFDService::getFormalServiceDescription()
     {
         formal_type = "daap";
     }
-    else if(service_type == "_mmdp._tcp.")
+    else if(service_type == "_mdcap._tcp.")
     {
         formal_type = "mmdp";
     }
@@ -240,7 +240,7 @@ const QString& MFDService::getFormalServiceRemoval()
     {
         formal_type = "daap";
     }
-    else if(service_type == "_mmdp._tcp.")
+    else if(service_type == "_mdcap._tcp.")
     {
         formal_type = "mmdp";
     }
@@ -522,7 +522,7 @@ void ZeroConfigClient::run()
     browseForService(&mDNSStorage, "_mfdp._tcp.");
     browseForService(&mDNSStorage, "_macp._tcp.");
     browseForService(&mDNSStorage, "_daap._tcp.");
-    browseForService(&mDNSStorage, "_mmdp._tcp.");
+    browseForService(&mDNSStorage, "_mdcap._tcp.");
 
     //
     //  Set up some file descriptors and a pipe. This lets a separate thread

@@ -31,12 +31,14 @@ Database::Database(
     expected_numb_items = l_expected_numb_items;
     expected_numb_containers = l_expected_numb_containers;
     the_mfd = my_mfd;
+    /*
     my_metadatacontainer = new MetadataContainer(
                                                     the_mfd, 
                                                     the_mfd->bumpMetadataContainerIdentifier(),
                                                     MCCT_audio,
                                                     MCLT_lan
                                                 );
+    */
 }
 
 

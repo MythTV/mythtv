@@ -301,6 +301,14 @@ void MFDServicePlugin::run()
 
 }
 
+void MFDServicePlugin::stop()
+{
+    keep_going_mutex.lock();
+        keep_going = false;
+    keep_going_mutex.unlock();
+    wakeUp();
+}
+
 
 
 bool MFDServicePlugin::initServerSocket()

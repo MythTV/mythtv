@@ -16,14 +16,9 @@ using namespace std;
 #include <qapplication.h>
 #include <qdir.h>
 
-#ifdef MYTHLIB_SUPPORT
-#include <mythtv/mythcontext.h>
-#endif
-
-
 #include "mdcontainer.h"
-#include "mfd.h"
-#include "../mfdlib/mfd_events.h"
+#include "../mfd/mfd.h"
+#include "mfd_events.h"
 
 MetadataContainer::MetadataContainer(
                                         MFD *l_parent, 
@@ -56,11 +51,13 @@ void MetadataContainer::warning(const QString &warning_message)
     log(warn_string, 1);
 }
 
+/*
 bool MetadataContainer::tryToUpdate()
 {
     warning("someone called tryToUpdate() on MetadataContainer base class");
     return false;
 }
+*/
 
 bool MetadataContainer::isAudio()
 {
@@ -109,6 +106,24 @@ uint MetadataContainer::getPlaylistCount()
     return 0;
 }
 
+Metadata* MetadataContainer::getMetadata(int item_id)
+{
+    if(current_metadata)
+    {
+        return current_metadata->find(item_id);
+    }
+    return NULL;
+}
+
+Playlist* MetadataContainer::getPlaylist(int pl_id)
+{
+    if(current_playlists)
+    {
+        return current_playlists->find(pl_id);
+    }
+    return NULL;
+}
+
 MetadataContainer::~MetadataContainer()
 {
 }
@@ -138,20 +153,23 @@ MetadataMythDBContainer::MetadataMythDBContainer(
         //  Ah, a mythmusic collection
         //
 
-        metadata_monitor = new MetadataMythMusicMonitor(parent, unique_identifier, db);
-        metadata_monitor->start();
+        //metadata_monitor = new MetadataMythMusicMonitor(parent, unique_identifier, db);
+        //metadata_monitor->start();
     }
 
     current_metadata = NULL;
 }
 
+/*
 bool MetadataMythDBContainer::tryToUpdate()
 {
     parent->lockMetadata();
     parent->lockPlaylists();
 
-    bool return_value = metadata_monitor->getCurrentGeneration(current_metadata, current_playlists);
+    // bool return_value = metadata_monitor->getCurrentGeneration(current_metadata, current_playlists);
 
+    bool return_value = true;
+    
     parent->unlockMetadata();
     parent->unlockPlaylists();
 
@@ -169,6 +187,7 @@ bool MetadataMythDBContainer::tryToUpdate()
     }
     return return_value;
 }
+*/
 
 MetadataMythDBContainer::~MetadataMythDBContainer()
 {

@@ -30,14 +30,59 @@ class MetadataServer : public MFDServicePlugin
   
     MetadataServer(MFD *owner, int port);
     ~MetadataServer();
+
     void    run();
     void    doSomething(const QStringList &tokens, int socket_identifier);
-    void    startMetadataCheck();
+
+    void                         lockMetadata();
+    void                         unlockMetadata();
+
+    void                         lockPlaylists();
+    void                         unlockPlaylists();
+
+    QPtrList<MetadataContainer>* getMetadataContainers(){return metadata_containers;}
+    uint                         getMetadataAudioGeneration();
+    uint                         getAllAudioMetadataCount();
+    uint                         getAllAudioPlaylistCount();
+
+    Metadata*                    getMetadataByUniversalId(uint id);
+    Playlist*                    getPlaylistByUniversalId(uint id);
+
+
+
+    //uint                         getMetadataVideoGeneration(){return metadata_video_generation;}
+    //int                          bumpMetadataId();
+    //int                          bumpPlaylistId();
+    //void                         lockPlaylists();
+    //void                         unlockPlaylists();
+    //Playlist*                    getPlaylist(int id);
+
+    // void makeMetadataContainers();
+    //int  bumpMetadataAudioGeneration();
+    //int  bumpMetadataVideoGeneration();
+    
+
 
   private:
-  
-    bool    checkMetadata();
+
+    QPtrList<MetadataContainer> *metadata_containers;
+    QMutex                      metadata_mutex;
+    QMutex                      playlists_mutex;
+
+    QMutex                      metadata_audio_generation_mutex;
+    uint                        metadata_audio_generation;
+
+    //int                         metadata_container_identifier;
+
+    //uint                        metadata_video_generation;
     
+    //int                         metadata_id;
+    //int                         playlist_id;
+
+    //QMutex                      bump_metadata_id_mutex;
+    //QMutex                      bump_playlist_id_mutex;
+
+  
 };
 
 

@@ -36,21 +36,9 @@ class MFD : public QObject
     MFD(QSqlDatabase *db, int port, bool log_stdout, int logging_verbosity);
     ~MFD();
     
-    QPtrList<MetadataContainer>* getMetadataContainers(){return metadata_containers;}
-    uint                         getMetadataAudioGeneration(){return metadata_audio_generation;}
-    uint                         getMetadataVideoGeneration(){return metadata_video_generation;}
-    int                          bumpMetadataId();
-    int                          bumpPlaylistId();
-    uint                         getAllAudioMetadataCount();
-    uint                         getAllAudioPlaylistCount();
-    void                         lockMetadata();
-    void                         unlockMetadata();
-    void                         lockPlaylists();
-    void                         unlockPlaylists();
-    Metadata*                    getMetadata(int id);
-    Playlist*                    getPlaylist(int id);
+    QSqlDatabase*   getDatabase(){return db;}
+    MetadataServer* getMetadataServer(){return metadata_server;}
 
-    int  bumpMetadataContainerIdentifier();
     
   public slots:
   
@@ -81,14 +69,9 @@ class MFD : public QObject
     void sendMessage(MFDClientSocket *where, const QString &what);
     void sendMessage(const QString &the_message);
     void doListCapabilities(const QStringList &tokens, MFDClientSocket *socket);
-    void makeMetadataContainers();
-
-    //int  bumpMetadataContainerIdentifier();
-    int  bumpMetadataAudioGeneration();
-    int  bumpMetadataVideoGeneration();
-    
 
     QSqlDatabase                *db;
+    MetadataServer              *metadata_server;
     MFDLogger                   *mfd_log;
     MFDPluginManager            *plugin_manager;
     MFDServerSocket             *server_socket;
@@ -96,23 +79,7 @@ class MFD : public QObject
     bool                        shutting_down;    
     bool                        watchdog_flag;
     int                         port_number;
-
-    QPtrList<MetadataContainer> *metadata_containers;
-    int                         metadata_container_identifier;
-
-    uint                        metadata_audio_generation;
-    uint                        metadata_video_generation;
     
-    int                         metadata_id;
-    int                         playlist_id;
-
-    QMutex                      bump_metadata_id_mutex;
-    QMutex                      bump_playlist_id_mutex;
-
-    QMutex                      metadata_mutex;
-    QMutex                      playlist_mutex;
-    
-    MetadataServer              *metadata_server;
 };
 
 #endif  // mfd_h_

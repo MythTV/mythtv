@@ -13,6 +13,7 @@ zeroconfig="yes"
 audio="yes"
 daapserver="yes"
 daapclient="yes"
+mmusic="yes"
 
 for opt do
   case "$opt" in
@@ -36,12 +37,17 @@ for opt do
   ;;
   --disable-daapclient) daapclient="no"
   ;;
+  --enable-mythmusic) mmusic="yes"
+  ;;
+  --disable-mythmusic) mmusic="no"
+  ;;
   --enable-all)
       zeroconfig="yes"
       audio="yes"
       daapserver="yes"
       daapclient="yes"
       mythlib="yes"
+      mmusic="yes"
   ;;
   --disable-all)
       zeroconfig="no"
@@ -49,9 +55,18 @@ for opt do
       daapserver="no"
       daapclient="no"
       mythlib="no"
+      mmusic="no"
   ;;
   esac
 done
+
+#
+#   Sanity checking
+#
+
+if test "$mythlib" = "no" ; then
+    mmusic="no"
+fi
 
 if test x"$1" = x"-h" -o x"$1" = x"--help" ; then
 cat << EOF
@@ -62,13 +77,15 @@ Options: [defaults in brackets after descriptions]
 Standard options:
   --help               print this message
   --enable-mythlib     use mythlib/db for settings and content [default=yes] 
-  --enable-zeroconfig  enable auto discovery of mfd services   [default=yes]
+  --enable-zeroconfig  enable auto discovery of services       [default=yes]
   --enable-audio       enable audio playing                    [default=yes]
   --enable-daapserver  enable serving audio via daap           [default=yes]
   --enable-daapclient  enable consuming audio via daap         [default=yes]
+  --enable-mythmusic   enable serving mythmusic audio content  [default=yes]
 
 All options can be turned off with --disable-foo
-
+Some options will be automatically turned off if they make no sense 
+(e.g. you can't include mythmusic if you turn off mythlib support)
 
 EOF
 exit 1
@@ -205,6 +222,22 @@ fi
 
 if test "$daapclient" = "no" ; then
     echo "                daap client support: no"
+fi
+
+#
+#   Myth Music
+#
+
+if test "$mmusic" = "yes" ; then
+    echo "                  mythmusic support: yes"        
+    echo "#    Build the myth music plugin " >> ./config.pro
+    echo " " >> ./config.pro
+    echo "SUBDIRS += ./mfd/plugins/mmusic " >> ./config.pro
+    echo " " >> ./config.pro
+fi
+
+if test "$mmusic" = "no" ; then
+    echo "                  mythmusic support: no"
 fi
 
 
