@@ -60,8 +60,6 @@ class Scheduler : public QObject
 
     void PruneOldRecords(void);
     void AddNewRecords(void);
-    void MarkOverlaps(void);
-    void MarkTooManys(void);
     bool FindNextConflict(ProgramInfo *p, RecIter &iter);
     void MarkOtherShowings(ProgramInfo *p);
     void BackupRecStatus(void);
@@ -70,7 +68,6 @@ class Scheduler : public QObject
     void SchedNewRecords(void);
     void MoveHigherRecords(void);
     void PruneRedundants(void);
-    void MarkConflicts(void);
 
     void findAllScheduledPrograms(list<ProgramInfo *> &proglist);
     void CheckShutdownServer(int prerollseconds, QDateTime &idleSince,

@@ -127,7 +127,21 @@ static bool comp_recstart(ProgramInfo *a, ProgramInfo *b)
         return a->recstartts < b->recstartts;
     if (a->recendts != b->recendts)
         return a->recendts < b->recendts;
-    return a->chanid < b->chanid;
+
+    // Note: the PruneRedundants logic depends on the following
+    if (a->recordid != b->recordid)
+        return a->recordid < b->recordid;
+    if (a->chansign != "" && b->chansign != "")
+    {
+        if (a->chansign != b->chansign)
+            return a->chansign < b->chansign;
+    }
+    else
+    {
+        if (a->chanid != b->chanid)
+            return a->chanid < b->chanid;
+    }
+    return a->recstatus < b->recstatus;
 }
 
 static QDateTime schedTime;
@@ -206,10 +220,7 @@ bool Scheduler::FillRecordLists(void)
 
     PruneOldRecords();
     AddNewRecords();
-
-    MarkOverlaps();
-    MarkTooManys();
-    //cout << "after mark overlaps:" << endl;
+    //cout << "after add records:" << endl;
     //PrintList();
 
     reclist.sort(comp_priority);
@@ -229,13 +240,12 @@ bool Scheduler::FillRecordLists(void)
         //PrintList();
     }
 
-    PruneRedundants();
-    //cout << "after prune redundants:" << endl;
+    reclist.sort(comp_recstart);
+    //cout << "after recstart sort:" << endl;
     //PrintList();
 
-    MarkConflicts();
-    reclist.sort(comp_recstart);
-
+    PruneRedundants();
+    //cout << "after prune redundants:" << endl;
     //PrintList();
 
     return hasconflicts;
@@ -346,57 +356,6 @@ void Scheduler::PruneOldRecords(void)
                 p->recstatus = rsRecorded;
             dreciter++;
         }
-    }
-}
-
-void Scheduler::MarkOverlaps(void)
-{
-    RecIter i = reclist.begin();
-    for ( ; i != reclist.end(); i++)
-    {
-        ProgramInfo *p = (*i);
-        if (p->recstatus != rsUnknown)
-            continue;
-
-        RecIter j = i;
-        for (j++; j != reclist.end(); j++)
-        {
-            ProgramInfo *q = (*j);
-            if (q->recstatus != rsUnknown)
-                continue;
-
-            if (p->recordid != q->recordid &&
-                p->IsSameTimeslot(*q))
-            {
-                int ppri = RecTypePriority(p->rectype);
-                int qpri = RecTypePriority(q->rectype);
-                if (ppri < qpri || 
-                    (ppri == qpri && p->recordid < q->recordid))
-                    q->recstatus = rsOverlap;
-                else
-                {
-                    p->recstatus = rsOverlap;
-                    break;
-                }
-            }
-        }
-    }
-}
-
-void Scheduler::MarkTooManys(void)
-{
-    QMap<int, bool> allowmap;
-
-    RecIter i = reclist.begin();
-    for ( ; i != reclist.end(); i++)
-    {
-        ProgramInfo *p = (*i);
-        if (p->recstatus != rsUnknown)
-            continue;
-        if (!allowmap.contains(p->recordid))
-            allowmap[p->recordid] = p->AllowRecordingNewEpisodes(db);
-        if (!allowmap[p->recordid])
-            p->recstatus = rsTooManyRecordings;
     }
 }
 
@@ -567,52 +526,15 @@ void Scheduler::MoveHigherRecords(void)
 
 void Scheduler::PruneRedundants(void)
 {
+    ProgramInfo *lastp = NULL;
+    hasconflicts = false;
+
     RecIter i = reclist.begin();
     while (i != reclist.end())
     {
         ProgramInfo *p = *i;
-        bool deletedp = false;
 
-        RecIter j = i;
-        j++;
-        while (j != reclist.end())
-        {
-            ProgramInfo *q = *j;
-
-            if (p->recordid == q->recordid && 
-                p->IsSameTimeslot(*q))
-            {
-                if (q->recstatus != rsWillRecord)
-                {
-                    delete q;
-                    j = reclist.erase(j);
-                    continue;
-                }
-                else
-                {
-                    delete p;
-                    i = reclist.erase(i);
-                    deletedp = true;
-                    break;
-                }
-            }
-
-            j++;
-        }
-
-        if (!deletedp)
-            i++;
-    }
-}
-
-void Scheduler::MarkConflicts(void)
-{
-    hasconflicts = false;
-
-    RecIter i = reclist.begin();
-    for ( ; i != reclist.end(); i++)
-    {
-        ProgramInfo *p = *i;
+        // Check for rsConflict
         if (p->recstatus == rsUnknown)
         {
             p->recstatus = rsConflict;
@@ -622,6 +544,19 @@ void Scheduler::MarkConflicts(void)
         {
             p->cardid = 0;
             p->inputid = 0;
+        }
+
+        // Check for redundant against last non-deleted
+        if (lastp == NULL || lastp->recordid != p->recordid ||
+            !lastp->IsSameTimeslot(*p))
+        {
+            lastp = p;
+            i++;
+        }
+        else
+        {
+            delete p;
+            i = reclist.erase(i);
         }
     }
 }
@@ -1111,6 +1046,8 @@ void *Scheduler::SchedulerThread(void *param)
 void Scheduler::AddNewRecords(void) {
     QMap<RecordingType, int> recTypeRecPriorityMap;
     RecList tmpList;
+    ProgramInfo *lastp = NULL;
+    QMap<int, bool> allowmap;
 
     QMap<int, bool> cardMap;
     QMap<int, EncoderLink *>::Iterator enciter = m_tvList->begin();
@@ -1199,7 +1136,10 @@ void Scheduler::AddNewRecords(void) {
 "   )"
 "  )"
 " )"
-");")
+") "
+// Note: the rsOverlap code below depends on this ordering
+"ORDER BY program.starttime,program.endtime,program.chanid,"
+"cardinput.cardinputid,record.recordid;")
         .arg(kAllRecord)
         .arg(kFindOneRecord)
         .arg(kChannelRecord)
@@ -1216,109 +1156,136 @@ void Scheduler::AddNewRecords(void) {
 
     while (result.next())
     {
+        // Don't bother if card isn't on-line of end time has already passed
         int cardid = result.value(24).toInt();
         if (threadrunning && !cardMap.contains(cardid))
             continue;
+        QDateTime recendts = result.value(19).toDateTime();
+        if (recendts < schedTime)
+            continue;
 
-        ProgramInfo *proginfo = new ProgramInfo;
-        proginfo->recstatus = rsUnknown;
-        proginfo->chanid = result.value(0).toString();
-        proginfo->sourceid = result.value(1).toInt();
-        proginfo->startts = result.value(2).toDateTime();
-        proginfo->endts = result.value(3).toDateTime();
-        proginfo->title = QString::fromUtf8(result.value(4).toString());
-        proginfo->subtitle = QString::fromUtf8(result.value(5).toString());
-        proginfo->description = QString::fromUtf8(result.value(6).toString());
-        proginfo->chanstr = result.value(7).toString();
-        proginfo->chansign = result.value(8).toString();
-        proginfo->channame = QString::fromUtf8(result.value(9).toString());
-        proginfo->category = QString::fromUtf8(result.value(11).toString());
-        proginfo->recpriority = result.value(12).toInt();
-        proginfo->dupin = RecordingDupInType(result.value(13).toInt());
-        proginfo->dupmethod =
-            RecordingDupMethodType(result.value(22).toInt());
-        proginfo->rectype = RecordingType(result.value(15).toInt());
-        proginfo->recordid = result.value(16).toInt();
-        proginfo->override = result.value(17).toInt();
+        ProgramInfo *p = new ProgramInfo;
+        p->recstatus = rsUnknown;
+        p->chanid = result.value(0).toString();
+        p->sourceid = result.value(1).toInt();
+        p->startts = result.value(2).toDateTime();
+        p->endts = result.value(3).toDateTime();
+        p->title = QString::fromUtf8(result.value(4).toString());
+        p->subtitle = QString::fromUtf8(result.value(5).toString());
+        p->description = QString::fromUtf8(result.value(6).toString());
+        p->chanstr = result.value(7).toString();
+        p->chansign = result.value(8).toString();
+        p->channame = QString::fromUtf8(result.value(9).toString());
+        p->category = QString::fromUtf8(result.value(11).toString());
+        p->recpriority = result.value(12).toInt();
+        p->dupin = RecordingDupInType(result.value(13).toInt());
+        p->dupmethod = RecordingDupMethodType(result.value(22).toInt());
+        p->rectype = RecordingType(result.value(15).toInt());
+        p->recordid = result.value(16).toInt();
+        p->override = result.value(17).toInt();
 
-        proginfo->recstartts = result.value(18).toDateTime();
-        proginfo->recendts = result.value(19).toDateTime();
-        proginfo->chancommfree = result.value(23).toInt();
-        proginfo->cardid = cardid;
-        proginfo->inputid = result.value(25).toInt();
-        proginfo->shareable = result.value(26).toInt();
+        p->recstartts = result.value(18).toDateTime();
+        p->recendts = recendts;
+        p->chancommfree = result.value(23).toInt();
+        p->cardid = cardid;
+        p->inputid = result.value(25).toInt();
+        p->shareable = result.value(26).toInt();
 
-        if (!recTypeRecPriorityMap.contains(proginfo->rectype))
-            recTypeRecPriorityMap[proginfo->rectype] = 
-                proginfo->GetRecordingTypeRecPriority(proginfo->rectype);
-        proginfo->recpriority += recTypeRecPriorityMap[proginfo->rectype];
+        if (!recTypeRecPriorityMap.contains(p->rectype))
+            recTypeRecPriorityMap[p->rectype] = 
+                p->GetRecordingTypeRecPriority(p->rectype);
+        p->recpriority += recTypeRecPriorityMap[p->rectype];
 
-        if (proginfo->override == 1)
-            proginfo->recpriority += 50;
+        if (p->override == 1)
+            p->recpriority += 50;
 
-        if (proginfo->recstartts >= proginfo->recendts)
+        if (p->recstartts >= p->recendts)
         {
             // pre/post-roll are invalid so ignore
-            proginfo->recstartts = proginfo->startts;
-            proginfo->recendts = proginfo->endts;
+            p->recstartts = p->startts;
+            p->recendts = p->endts;
         }
 
-        proginfo->repeat = result.value(20).toInt();
-        proginfo->recgroup = result.value(21).toString();
+        p->repeat = result.value(20).toInt();
+        p->recgroup = result.value(21).toString();
 
-        if (proginfo->override == 2)
-            proginfo->recstatus = rsManualOverride;
-        else if ((proginfo->rectype != kSingleRecord) &&
-                 (proginfo->override != 1) &&
-                 (~proginfo->dupmethod & kDupCheckNone))
-        {
-            if (proginfo->dupin & kDupsInOldRecorded)
-            {
-                if (result.value(10).toInt())
-                    proginfo->recstatus = rsPreviousRecording;
-            }
-            else if (proginfo->dupin & kDupsInRecorded)
-            {
-                if (result.value(14).toInt())
-                    proginfo->recstatus = rsCurrentRecording;
-            }
-        }
-
-        proginfo->schedulerid = 
-            proginfo->startts.toString() + "_" + proginfo->chanid;
+        p->schedulerid = 
+            p->startts.toString() + "_" + p->chanid;
 
         // would save many queries to create and populate a
         // ScheduledRecording and put it in the proginfo at the
         // same time, since it will be loaded later anyway with
         // multiple queries
 
-        if (proginfo->title == QString::null)
-            proginfo->title = "";
-        if (proginfo->subtitle == QString::null)
-            proginfo->subtitle = "";
-        if (proginfo->description == QString::null)
-            proginfo->description = "";
-        if (proginfo->category == QString::null)
-            proginfo->category = "";
-        if (proginfo->chansign == QString::null)
-            proginfo->chansign = "";
+        if (p->title == QString::null)
+            p->title = "";
+        if (p->subtitle == QString::null)
+            p->subtitle = "";
+        if (p->description == QString::null)
+            p->description = "";
+        if (p->category == QString::null)
+            p->category = "";
+        if (p->chansign == QString::null)
+            p->chansign = "";
 
-        if (proginfo->recendts < schedTime)
-            delete proginfo;
+        // Chedk if already in reclist and don't bother if so
+        RecIter rec = reclist.begin();
+        for ( ; rec != reclist.end(); rec++)
+        {
+            ProgramInfo *r = *rec;
+            if (p->IsSameProgramTimeslot(*r))
+            {
+                delete p;
+                p = NULL;
+                break;
+            }
+        }
+        if (p == NULL)
+            continue;
+
+        // Check for rsTooManyRecordings
+        if (!allowmap.contains(p->recordid))
+            allowmap[p->recordid] = p->AllowRecordingNewEpisodes(db);
+        if (!allowmap[p->recordid])
+            p->recstatus = rsTooManyRecordings;
+
+        // Check for rsCurrentRecording and rsPreviousRecording
+        if (p->override == 2)
+            p->recstatus = rsManualOverride;
+        else if (p->rectype != kSingleRecord &&
+                 p->override != 1 &&
+                 !(p->dupmethod & kDupCheckNone))
+        {
+            if (p->dupin & kDupsInOldRecorded)
+            {
+                if (result.value(10).toInt())
+                    p->recstatus = rsPreviousRecording;
+            }
+            if (p->dupin & kDupsInRecorded)
+            {
+                if (result.value(14).toInt())
+                    p->recstatus = rsCurrentRecording;
+            }
+        }
+
+        // Check for rsOverlap against last non-rsOverlap
+        if (lastp == NULL || lastp->recordid == p->recordid ||
+            !lastp->IsSameTimeslot(*p))
+            lastp = p;
         else
         {
-            RecIter rec = reclist.begin();
-            for ( ; rec != reclist.end(); rec++)
-            {
-                ProgramInfo *r = *rec;
-                if (proginfo->IsSameProgramTimeslot(*r))
-                    break;
-            }
-            if (rec == reclist.end())
-                tmpList.push_back(proginfo);
+            int lpri = RecTypePriority(lastp->rectype);
+            int cpri = RecTypePriority(p->rectype);
+            if (lpri <= cpri)
+                p->recstatus = rsOverlap;
             else
-                delete proginfo;
+            {
+                lastp->recstatus = rsOverlap;
+                lastp = p;
+            }
         }
+
+        tmpList.push_back(p);
     }
 
     RecIter tmp = tmpList.begin();
