@@ -151,7 +151,7 @@ void WeatherSock::startConnect()
 			timeout_cnt = 0;
 		}	
          	parent->processEvents();
-         	usleep(50);
+         	usleep(200000);
 		
 		tmpState = httpSock->state();
 		timeout_cnt++;
