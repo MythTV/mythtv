@@ -600,7 +600,7 @@
     </message>
     <message>
         <source>NEE</source>
-        <translation>NEE</translation>
+        <translation type="obsolete">NEE</translation>
     </message>
     <message>
         <source>E</source>
@@ -608,7 +608,7 @@
     </message>
     <message>
         <source>SEE</source>
-        <translation>SEE</translation>
+        <translation type="obsolete">SEE</translation>
     </message>
     <message>
         <source>SE</source>
@@ -632,7 +632,7 @@
     </message>
     <message>
         <source>SWW</source>
-        <translation>SOO</translation>
+        <translation type="obsolete">SOO</translation>
     </message>
     <message>
         <source>W</source>
@@ -640,7 +640,7 @@
     </message>
     <message>
         <source>NWW</source>
-        <translation>NOO</translation>
+        <translation type="obsolete">NOO</translation>
     </message>
     <message>
         <source>NW</source>
@@ -649,6 +649,22 @@
     <message>
         <source>NNW</source>
         <translation>NNO</translation>
+    </message>
+    <message>
+        <source>ENE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ESE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>WSW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>WNW</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -19,17 +19,17 @@ void strings_null() {
 	String::WindDirection::tr("N");
 	String::WindDirection::tr("NNE");
 	String::WindDirection::tr("NE");
-	String::WindDirection::tr("NEE");
+	String::WindDirection::tr("ENE");
 	String::WindDirection::tr("E");
-	String::WindDirection::tr("SEE");
+	String::WindDirection::tr("ESE");
 	String::WindDirection::tr("SE");
 	String::WindDirection::tr("SSE");
 	String::WindDirection::tr("S");
 	String::WindDirection::tr("SSW");
 	String::WindDirection::tr("SW");
-	String::WindDirection::tr("SWW");
+	String::WindDirection::tr("WSW");
 	String::WindDirection::tr("W");
-	String::WindDirection::tr("NWW");
+	String::WindDirection::tr("WNW");
 	String::WindDirection::tr("NW");
 	String::WindDirection::tr("NNW");
 EOF

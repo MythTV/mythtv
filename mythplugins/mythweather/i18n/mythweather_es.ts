@@ -480,15 +480,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>NEE</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>E</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>SEE</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -512,15 +504,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>SWW</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>W</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>NWW</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -529,6 +513,22 @@
     </message>
     <message>
         <source>NNW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ENE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ESE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>WSW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>WNW</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
