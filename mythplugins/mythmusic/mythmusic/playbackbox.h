@@ -110,15 +110,11 @@ class PlaybackBox : public MythDialog
 
     MainVisual *mainvisual;
 
-	//
-	//	thor feb 12 2003
-	//    
-	QString	visual_mode;
-    int		visual_mode_delay;
-    QTimer	*visual_mode_timer;
-    QTimer	*lcd_update_timer;
-	bool	visualizer_is_active;
-
+    QString visual_mode;
+    int	visual_mode_delay;
+    QTimer *visual_mode_timer;
+    QTimer *lcd_update_timer;
+    bool visualizer_is_active;
 };
 
 #endif

@@ -100,17 +100,6 @@ private:
 
 };
 
-
-//
-//	thor	feb 13 2002
-//
-//	Not sure these ever worked in Myth
-//
-//
-
-
-/*
-
 class StereoScope : public VisualBase
 {
 public:
@@ -119,7 +108,7 @@ public:
 
     void resize( const QSize &size );
     bool process( VisualNode *node );
-    void draw( QPainter *p, const QColor &back );
+    bool draw( QPainter *p, const QColor &back );
 
 protected:
     QColor startColor, targetColor;
@@ -137,10 +126,8 @@ public:
    virtual ~MonoScope();
 			    
    bool process( VisualNode *node );
-   void draw( QPainter *p, const QColor &back );
+   bool draw( QPainter *p, const QColor &back );
 };  
-
-*/
 
 class LogScale
 {
@@ -161,6 +148,5 @@ private:
     int s, r;
 };
 
-    
 #endif // __mainvisual_h
 

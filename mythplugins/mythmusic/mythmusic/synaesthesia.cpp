@@ -489,9 +489,7 @@ bool Synaesthesia::process(VisualNode *node)
 bool Synaesthesia::draw(QPainter *p, const QColor &back)
 {
     if (!outputImage)
-    {
         return false;
-	}
 
     register unsigned long *ptr2 = (unsigned long*)output;
 

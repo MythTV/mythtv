@@ -8,4 +8,5 @@ moc_playbackbox.cpp
 moc_scrolllabel.cpp
 moc_streaminput.cpp
 moc_themedmenu.cpp
+moc_visualize.cpp
 mythmusic

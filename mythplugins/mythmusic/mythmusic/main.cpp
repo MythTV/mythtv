@@ -281,20 +281,14 @@ int main(int argc, char *argv[])
         exit(0);
     }
 
-	//
-	//	thor	feb 12 2003
-	//
-	//
     QString lcd_host = gContext->GetSetting("LCDHost");
     QString lcd_port = gContext->GetSetting("LCDPort");
     int lcd_port_number = lcd_port.toInt();
-    if(lcd_host.length() > 0 && lcd_port_number > 1024)
+    if (lcd_host.length() > 0 && lcd_port_number > 1024)
     {
-		gContext->LCDconnectToHost(lcd_host, lcd_port_number);
-	}
-	
-		
-	
+        gContext->LCDconnectToHost(lcd_host, lcd_port_number);
+    }
+
     LoadDefaultPlaylist(db, playlist);
     runMenu(themedir, db, paths, playlist, startdir);
     SaveDefaultPlaylist(db, playlist);

@@ -53,61 +53,43 @@ MainVisual::MainVisual(QWidget *parent, const char *name)
 
 MainVisual::~MainVisual()
 {
-	if(vis)
-	{
-	    delete vis;
-	    vis = 0;
-	}
+    if(vis)
+    {
+        delete vis;
+        vis = 0;
+    }
 }
 
 void MainVisual::setVisual( const QString &visualname )
 {
     VisualBase *newvis = 0;
 
-	//
-	//	thor	feb 12 2003
-	//
-	if(visualname == "Random")
-	{
-
+    if(visualname == "Random")
+    {
 #ifdef OPENGL_SUPPORT
-		int i = rand() % 3;
+        int i = rand() % 3;
 #else
-		int i = rand() % 2;
+        int i = rand() % 2;
 #endif
-		if(i == 0)
-		{
-			newvis = new Spectrum;
-		}
+        if(i == 0)
+            newvis = new Spectrum;
 #ifdef OPENGL_SUPPORT
-		else if(i == 1)
-		{
-			newvis = new Gears(this);
-		}
+        else if(i == 1)
+            newvis = new Gears(this);
 #endif
-		else
-		{
-			newvis = new Synaesthesia;
-		}
-	}
+        else
+            newvis = new Synaesthesia;
+    }
 #ifdef OPENGL_SUPPORT
-	else if(visualname == "Gears")
-	{
-		newvis = new Gears(this);
-	}
+    else if(visualname == "Gears")
+        newvis = new Gears(this);
 #endif
     else if (visualname == "Spectrum")
-    {
         newvis = new Spectrum;
-	}
     else if (visualname == "Synaesthesia")
-    {
         newvis = new Synaesthesia;
-    }
     else
-    {
     	newvis = new Blank;
-    }
     	
     setVis( newvis );
 }
@@ -122,8 +104,8 @@ void MainVisual::setVis( VisualBase *newvis )
     vis = newvis;
     if ( vis )
     {
-		vis->resize( size() );
-	}
+        vis->resize( size() );
+    }
 
     // force an update
     timer->stop();
@@ -146,48 +128,33 @@ void MainVisual::add(Buffer *b, unsigned long w, int c, int p)
     len /= (p / 8);
     
     if (len > 512)
-    {
-		len = 512;
-	}
+        len = 512;
 
     cnt = len;
 
     if (c == 2) 
     {
-		l = new short[len];
-		r = new short[len];
+        l = new short[len];
+        r = new short[len];
 
-		if (p == 8)
-		{
-			stereo16_from_stereopcm8(l, r, b->data, cnt);
-		}
-		else if (p == 16)
-		{
-	    	stereo16_from_stereopcm16(l, r, (short *) b->data, cnt);
-	    }
+        if (p == 8)
+            stereo16_from_stereopcm8(l, r, b->data, cnt);
+        else if (p == 16)
+            stereo16_from_stereopcm16(l, r, (short *) b->data, cnt);
     } 
     else if (c == 1) 
     {
-		l = new short[len];
+        l = new short[len];
 
-		if (p == 8)
-		{
-	    	mono16_from_monopcm8(l, b->data, cnt);
-	    }
-		else if (p == 16)
-		{
-	    	mono16_from_monopcm16(l, (short *) b->data, cnt);
-	    }
+        if (p == 8)
+            mono16_from_monopcm8(l, b->data, cnt);
+        else if (p == 16)
+            mono16_from_monopcm16(l, (short *) b->data, cnt);
     } 
     else
-    {
-		len = 0;
-	}
-
-
+        len = 0;
 
     nodes.append(new VisualNode(l, r, len, w));
-    
 }
 
 void MainVisual::timeout()
@@ -224,16 +191,10 @@ void MainVisual::timeout()
 
     if ( vis ) 
     {
-		QPainter p(&pixmap);
-		if(vis->draw( &p, Qt::black ))
-		{
-			bitBlt(this, 0, 0, &pixmap);
-		}
+        QPainter p(&pixmap);
+        if (vis->draw(&p, Qt::black))
+            bitBlt(this, 0, 0, &pixmap);
     } 
-    else
-    {
-		//pixmap.fill( backgroundColor() );
-	}
 
     if (! playing && stop)
 	timer->stop();
@@ -250,7 +211,7 @@ void MainVisual::resizeEvent( QResizeEvent *event )
     pixmap.fill(backgroundColor());
     QWidget::resizeEvent( event );
     if ( vis )
-	vis->resize( size() );
+        vis->resize( size() );
 }
 
 void MainVisual::customEvent(QCustomEvent *event)
@@ -284,17 +245,6 @@ void MainVisual::hideEvent(QHideEvent *e)
     emit hidingVisualization();
     QDialog::hideEvent(e);
 }
-
-
-/*
-
-	//
-	//	thor	feb 13 2002
-	//
-	//	Not sure that StereoScope of Monoscope ever worked ?
-	//
-	
-
 
 StereoScope::StereoScope()
     : rubberband( true ), falloff( 1.0 ), fps( 30 )
@@ -417,7 +367,7 @@ bool StereoScope::process( VisualNode *node )
     return allZero;
 }
 
-void StereoScope::draw( QPainter *p, const QColor &back )
+bool StereoScope::draw( QPainter *p, const QColor &back )
 {
     double *magnitudesp = magnitudes.data();
     double r, g, b, per;
@@ -498,6 +448,8 @@ void StereoScope::draw( QPainter *p, const QColor &back )
 		     i, (int)((size.height() * 3 / 4) + 
                      magnitudesp[i + size.width()]));
     }
+
+    return true;
 }
 
 MonoScope::MonoScope()
@@ -532,7 +484,7 @@ bool MonoScope::process( VisualNode *node )
                     if ( val > 0. )
                     {
                         val = 0.;
-					}
+                    }
                 } 
                 else 
                 {
@@ -540,13 +492,13 @@ bool MonoScope::process( VisualNode *node )
                     if ( val < 0. )
                     {
                         val = 0.;
-					}
+                    }
                 }
             } 
             else
             {
                 val = 0.;
-			}
+            }
 
             for (s = index; s < indexTo && s < node->length; s++) 
             {
@@ -556,17 +508,17 @@ bool MonoScope::process( VisualNode *node )
                 if (tmp > 0)
                 {
                     val = (tmp > val) ? tmp : val;
-				}
+                }
                 else
                 {
-					val = (tmp < val) ? tmp : val;
-				}
+                    val = (tmp < val) ? tmp : val;
+                }
             }
 
             if ( val != 0. )
             {
                 allZero = FALSE;
-			}
+            }
             magnitudesp[ i ] = val;
             index = indexTo;
         }
@@ -599,7 +551,7 @@ bool MonoScope::process( VisualNode *node )
     return allZero;
 }
 
-void MonoScope::draw( QPainter *p, const QColor &back )
+bool MonoScope::draw( QPainter *p, const QColor &back )
 {
     double *magnitudesp = magnitudes.data();
     double r, g, b, per;
@@ -642,9 +594,9 @@ void MonoScope::draw( QPainter *p, const QColor &back )
         p->drawLine( i - 1, (int)(size.height() / 2 + magnitudesp[ i - 1 ]),
                      i, (int)(size.height() / 2 + magnitudesp[ i ] ));
     }
-}
 
-*/
+    return true;
+}
 
 LogScale::LogScale(int maxscale, int maxrange)
     : indices(0), s(0), r(0)
@@ -711,10 +663,10 @@ int LogScale::operator[](int index)
 
 VisualBase::~VisualBase()
 {
-	//
-	//	This is only here so 
-	//	that derived classes
-	//	can destruct properly
-	//
+    //
+    //	This is only here so 
+    //	that derived classes
+    //	can destruct properly
+    //
 }
 
