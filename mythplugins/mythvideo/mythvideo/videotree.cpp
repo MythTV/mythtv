@@ -552,6 +552,10 @@ void VideoTree::playVideo(int node_number)
             }
         }
 
+        // See if this is being handled by a plugin..
+        if (gContext->GetMainWindow()->HandleMedia(handler, filename))
+            return;
+
         QString arg;
         arg.sprintf("\"%s\"", 
                     filename.replace(QRegExp("\""), "\\\"").utf8().data());

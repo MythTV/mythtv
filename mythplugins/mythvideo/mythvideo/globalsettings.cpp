@@ -109,7 +109,9 @@ public:
         setLabel(QObject::tr("Default Player"));
         setValue("mplayer -fs -zoom -quiet -vo xv %s");
         setHelpText(QObject::tr("This is the command used for any file "
-                    "that the extension is not specifically defined."));
+                    "that the extension is not specifically defined. "
+                    "You may also enter the name of one of the playback "
+                    "plugins such as 'Internal' or 'MythXine'."));
     };
 };
 
