@@ -204,7 +204,7 @@ if ($passes==1) {
 else {
   print "Doing a two pass encode.\n";
   my $pass1="$nicestr " . mencoder . " -idx $path$show.nuv -fps $fps -oac mp3lame -lameopts vbr=3:br=$aud_br -ovc lavc -lavcopts vcodec=mpeg4:vbitrate=$vid_br:vpass=1 -vop lavcdeint,scale=$scale -aspect 4:3 -o $outname.avi";
-  my $pass2="$nicestr " . mencoder . " -idx $path$show.nuv -fps $fps -oac mp3lame -lameopts vbr=3:br=$aud_br -ovc lavc -lavcopts vcodec=mpeg4:vbitrate=$vid_br:vhq:v4mv:vpass=1 -vop lavcdeint,scale=$scale -aspect 4:3 -o $outname.avi";
+  my $pass2="$nicestr " . mencoder . " -idx $path$show.nuv -fps $fps -oac mp3lame -lameopts vbr=3:br=$aud_br -ovc lavc -lavcopts vcodec=mpeg4:vbitrate=$vid_br:vhq:v4mv:vpass=2 -vop lavcdeint,scale=$scale -aspect 4:3 -o $outname.avi";
   print "\tPASS ONE=$pass1\n";
   print "\tPASS TWO=$pass2\n";
 
