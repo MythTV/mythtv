@@ -380,7 +380,9 @@ void LCD::veryBadThings(int anError)
 	{
 		cerr << "Why? There was an error reading from the socket." << endl ;  
 	}
-	socket->clearPendingData();
+	
+	//  Uncomment this once we require Qt >= 3.1
+	//socket->clearPendingData();
 	socket->close();
 	
 }
