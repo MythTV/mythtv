@@ -3,7 +3,7 @@ CONFIG += release
 
 PREFIX = /usr/local
 
-LIBVERSION = 0.15
+LIBVERSION = 0.16
 
 INCLUDEPATH += $${PREFIX}/include
 INCLUDEPATH *= /usr/local/include
