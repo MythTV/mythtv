@@ -294,15 +294,7 @@ class ListBoxSetting: public StringSelectSetting {
 public:
     virtual QWidget* configWidget(QWidget* parent, const char* widgetName = 0);
 
-signals:
-    void itemAdded(QString);
-
 protected slots:
-    void addItem(const QString& label, QString value) {
-        (void)value;
-        emit itemAdded(label);
-    };
-
     void setValueByLabel(const QString& label);
 };
 
@@ -310,6 +302,16 @@ class RadioSetting: public StringSelectSetting {
 public:
     virtual QWidget* configWidget(QWidget* parent, const char* widgetName = 0);
 };
+
+// class ImageSelectSetting: public StringSelectSetting {
+// public:
+//     virtual QWidget* configWidget(QWidget* parent, const char* widgetName = 0);
+
+//     virtual void addImageSelection(const QString& label,
+//                                    QString value=QString::null,
+//                                    bool select=false);
+//     virtual void addSelection(
+// };
 
 class BooleanSetting: virtual public Setting {
     Q_OBJECT
