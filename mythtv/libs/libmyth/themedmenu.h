@@ -200,6 +200,7 @@ class ThemedMenu : public MythDialog
     int visiblerowlimit;
     int maxrows;
     int visiblerows;
+    int columns;
 
     QPixmap *uparrow;
     QRect uparrowRect;

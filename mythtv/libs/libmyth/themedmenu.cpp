@@ -1103,7 +1103,7 @@ void ThemedMenu::layoutButtons(void)
 {
     int numbuttons = buttonList.size();
   
-    int columns = buttonArea.width() / buttonnormal->width();
+    columns = buttonArea.width() / buttonnormal->width();
     maxrows = buttonArea.height() / buttonnormal->height();
 
     if (maxrows < 2)
@@ -1251,39 +1251,28 @@ bool ThemedMenu::makeRowVisible(int newrow, int oldrow, bool forcedraw)
     if (buttonRows[newrow].visible)
         return true;
 
-    int need = abs(newrow - oldrow);
-    if (need != 1)
-    {
-        cerr << "moving: " << need << " rows, bad.\n";
-        return false;
-    }
-
     if (newrow > oldrow)
     {
-        vector<MenuRow>::iterator menuiter = buttonRows.begin();
-        for (; menuiter != buttonRows.end(); menuiter++)
+        int row;
+        for (row = newrow; row >= 0; row--)
         {
-            if ((*menuiter).visible)
-            {
-                (*menuiter).visible = false;
-                break;
-            }
+            if (row > newrow - visiblerows)
+                buttonRows[row].visible = true;
+            else
+                buttonRows[row].visible = false;
         }
     }
     else
     {
-        vector<MenuRow>::reverse_iterator menuiter = buttonRows.rbegin();
-        for (; menuiter != buttonRows.rend(); menuiter++)
+        int row;
+        for (row = newrow; row < (int)buttonRows.size(); row++)
         {
-            if ((*menuiter).visible)
-            {
-                (*menuiter).visible = false;
-                break;
-            }
+            if (row < newrow + visiblerows)
+                buttonRows[row].visible = true;
+            else
+                buttonRows[row].visible = false;
         }
     }
-
-    buttonRows[newrow].visible = true;
 
     positionButtons(false);
 
@@ -1667,10 +1656,25 @@ void ThemedMenu::keyPressEvent(QKeyEvent *e)
         QString action = actions[i];
         handled = true;
 
+        if (columns == 1)
+        {
+            if (action == "LEFT")
+                action = "ESCAPE";
+            else if (action == "RIGHT")
+                action = "SELECT";
+        }
+
         if (action == "UP")
         { 
             if (currentrow > 0)
                 currentrow--;
+
+            if (currentcolumn >= buttonRows[currentrow].numitems)
+                currentcolumn = buttonRows[currentrow].numitems - 1;
+        }
+        else if (action == "PAGEUP")
+        {
+            currentrow = max(currentrow - visiblerowlimit, 0);
 
             if (currentcolumn >= buttonRows[currentrow].numitems)
                 currentcolumn = buttonRows[currentrow].numitems - 1;
@@ -1684,6 +1688,14 @@ void ThemedMenu::keyPressEvent(QKeyEvent *e)
         {
             if (currentrow < (int)buttonRows.size() - 1)
                 currentrow++;
+
+            if (currentcolumn >= buttonRows[currentrow].numitems)
+                currentcolumn = buttonRows[currentrow].numitems - 1;
+        }
+        else if (action == "PAGEDOWN")
+        {
+            currentrow = min(currentrow + visiblerowlimit,
+                             (int)buttonRows.size() - 1);
 
             if (currentcolumn >= buttonRows[currentrow].numitems)
                 currentcolumn = buttonRows[currentrow].numitems - 1;
