@@ -6495,7 +6495,8 @@
   database with new data.
 
   To restore the channel icons, you will need to perform one of two
-  steps:
+  steps.  Both are dependant on the channel_copy table you created
+  above.
 
   If you're running MySQL v3, execute the following.  Note that the
   select command is very long.  You can press ENTER at the end of each
@@ -6504,8 +6505,8 @@
 
 
        $ mysql -u root mythconverg
-       mysql>create table channel_temp;
-       mysql>select c.chanid, c.channum, c.sourceid, c.callsign, c.name, cb.icon,
+       mysql>create table channel_temp
+       select c.chanid, c.channum, c.sourceid, c.callsign, c.name, cb.icon,
        c.finetune, c.videofilters, c.xmltvid, c.contrast, c.brightness,
        c.colour, c.freqid, c.recpriority, c.hue, c.tvformat,
        c.commfree, c.visible, c.outputfilters
@@ -6525,7 +6526,8 @@
 
 
        $ mysql -u root mythconverg
-       mysql>UPDATE channel,channel_copy SET channel.icon = channel_copy.icon WHERE channel.callsign = channel_copy.callsign;
+       mysql>UPDATE channel,channel_copy SET channel.icon = channel_copy.icon
+       WHERE channel.callsign = channel_copy.callsign;
        mysql>drop table channel_copy;
        mysql>exit
        $

@@ -5535,15 +5535,16 @@ in <ref id="VideoSources" name="Video Sources">.
 Once you're done running setup, run <bf>mythfilldatabase</bf> to populate
 the database with new data.
 
-To restore the channel icons, you will need to perform one of two steps:
+To restore the channel icons, you will need to perform one of two steps. 
+Both are dependant on the channel_copy table you created above.
 
 If you're running MySQL v3, execute the following.  Note that the
 select command is very long.  You can press ENTER at the end of each line;
 the command won't be evaluated until you end the statement with a semicolon.
 <tscreen><verb>
 $ mysql -u root mythconverg
-mysql>create table channel_temp;
-mysql>select c.chanid, c.channum, c.sourceid, c.callsign, c.name, cb.icon,
+mysql>create table channel_temp
+select c.chanid, c.channum, c.sourceid, c.callsign, c.name, cb.icon,
 c.finetune, c.videofilters, c.xmltvid, c.contrast, c.brightness,
 c.colour, c.freqid, c.recpriority, c.hue, c.tvformat,
 c.commfree, c.visible, c.outputfilters
@@ -5561,7 +5562,8 @@ If you are running MySQL v4, it's a little simpler. The next command is
 one long string:
 <tscreen><verb>
 $ mysql -u root mythconverg
-mysql>UPDATE channel,channel_copy SET channel.icon = channel_copy.icon WHERE channel.callsign = channel_copy.callsign;
+mysql>UPDATE channel,channel_copy SET channel.icon = channel_copy.icon 
+WHERE channel.callsign = channel_copy.callsign;
 mysql>drop table channel_copy;
 mysql>exit
 $
@@ -6345,6 +6347,8 @@ Markey's update to the filter docs.  Modify non-master backend config based
 on Scott Rowe's suggestion. Initial version for v00.15.00.  Bruce's mod to
 removing unwanted DD channels.  Chris Pinkham's save icon thing for MySQL
 v3.  Update rest of gossamer-threads links. Axel Thimms' Fedora update.
+Adjust the MySQL v3 instructions since I wasn't paying attention the first
+time.
 
 -->
 
