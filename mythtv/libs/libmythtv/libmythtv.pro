@@ -14,6 +14,9 @@ DEPENDPATH += ../libmyth ../libavcodec ../libavformat
 LIBS += -L../libmyth -L../libavcodec -L../libavformat
 LIBS += -lmyth-$${LIBVERSION} -lmythavcodec-$${LIBVERSION} -lmythavformat-$${LIBVERSION} $$EXTRA_LIBS
 
+isEmpty(QMAKE_EXTENSION_SHLIB) {
+  QMAKE_EXTENSION_SHLIB=so
+}
 TARGETDEPS += ../libmyth/libmyth-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 TARGETDEPS += ../libavcodec/libmythavcodec-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 TARGETDEPS += ../libavformat/libmythavformat-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}

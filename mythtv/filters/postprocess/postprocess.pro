@@ -16,6 +16,9 @@ DEPENDPATH += ../../libs/libmythtv ../../libs/libavcodec
 LIBS += -L../../libs/libavcodec
 LIBS += -lmythavcodec-$${LIBVERSION}
 
+isEmpty(QMAKE_EXTENSION_SHLIB) {
+  QMAKE_EXTENSION_SHLIB=so
+}
 TARGETDEPS += ../../libs/libavcodec/libmythavcodec-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 
 QMAKE_CFLAGS_RELEASE += -Wno-missing-prototypes
