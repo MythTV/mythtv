@@ -387,13 +387,13 @@ void ScheduledRecording::fromProgramInfo(ProgramInfo* proginfo,
     endTime->setValue(proginfo->endts.time());
     endDate->setValue(proginfo->endts.date());
     category->setValue(proginfo->category);
+    seriesid->setValue(proginfo->seriesid);
+    programid->setValue(proginfo->programid);
 
     profile->fillSelections(db);
     dupin->setValue(0);
     dupmethod->setValue(0);
     autoexpire->setValue(gContext->GetNumSetting("AutoExpireDefault", 0));
-    seriesid->setValue(proginfo->seriesid);
-    programid->setValue(proginfo->programid);
     maxepisodes->setValue(0);
     maxnewest->setValue(0);
     startoffset->setValue(0);
@@ -422,6 +422,8 @@ void ScheduledRecording::makeOverride(ProgramInfo* proginfo)
     endTime->setValue(proginfo->endts.time());
     endDate->setValue(proginfo->endts.date());
     category->setValue(proginfo->category);
+    seriesid->setValue(proginfo->seriesid);
+    programid->setValue(proginfo->programid);
 
     profile->setChanged();
     dupin->setChanged();
