@@ -11,65 +11,65 @@
     </message>
     <message>
         <source>Edit..</source>
-        <translation type="unfinished"></translation>
+        <translation>Bearbeiten..</translation>
     </message>
     <message>
         <source>Delete..</source>
-        <translation type="unfinished"></translation>
+        <translation>Löschen..</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this capture card?</source>
-        <translation type="unfinished"></translation>
+        <translation>Soll diese Capture Karte wirklich gelöscht werden?</translation>
     </message>
     <message>
         <source>Yes, delete capture card</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja, Karte löschen</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation type="unfinished"></translation>
+        <translation>Nicht löschen</translation>
     </message>
 </context>
 <context>
     <name>ChannelEditor</name>
     <message>
         <source>Channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Sender</translation>
     </message>
     <message>
         <source>Are you sure you would like to delete this channel?</source>
-        <translation type="unfinished"></translation>
+        <translation>Soll dieser Sender wirklich gelöscht werden?</translation>
     </message>
     <message>
         <source>Yes, delete the channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja, Sender löschen</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation type="unfinished"></translation>
+        <translation>Nicht löschen</translation>
     </message>
     <message>
         <source>Channel Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Sendermenü</translation>
     </message>
     <message>
         <source>Edit..</source>
-        <translation type="unfinished"></translation>
+        <translation>Bearbeiten..</translation>
     </message>
     <message>
         <source>Delete..</source>
-        <translation type="unfinished"></translation>
+        <translation>Löschen..</translation>
     </message>
 </context>
 <context>
     <name>ChannelRecPriority</name>
     <message>
         <source>The theme you are using does not contain a &apos;recprioritychannels&apos; element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Escape out of it to return to the menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ihr aktuelles Layout enthält kein &apos;recprioritychannels&apos; Element. Bitte kontaktieren Sie den Autor des Layouts und fragen Sie Ihn nach einer aktuelleren Version.&lt;br&gt;&lt;br&gt;Der folgende Bildschirm wird leer sein. Drücken Sie ESC um zurück ins Menü zu gelangen.</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">Ok</translation>
+        <translation>Ok</translation>
     </message>
 </context>
 <context>
@@ -213,7 +213,7 @@
     </message>
     <message>
         <source>Description:</source>
-        <translation>Beschreibung:</translation>
+        <translation>Inhalt:</translation>
     </message>
     <message>
         <source>Save this scheduled recording and exit</source>
@@ -251,11 +251,11 @@
     <name>MythPopupBox</name>
     <message>
         <source>OK</source>
-        <translation type="unfinished">Ok</translation>
+        <translation>Ok</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Abbrechen</translation>
+        <translation>Abbrechen</translation>
     </message>
 </context>
 <context>
@@ -385,15 +385,15 @@
     </message>
     <message>
         <source>, %0.2f GB free</source>
-        <translation type="unfinished"></translation>
+        <translation>, %0.2f GB frei</translation>
     </message>
     <message>
         <source>Yes, but record this episode again next time</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja, aber diese Folge wieder aufnehmen</translation>
     </message>
     <message>
         <source>Yes, delete it</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja, bitte löschen</translation>
     </message>
     <message>
         <source>Status Icons</source>
@@ -401,27 +401,27 @@
     </message>
     <message>
         <source>Commercials are flagged</source>
-        <translation type="unfinished"></translation>
+        <translation>Werbung wurde markiert</translation>
     </message>
     <message>
         <source>An editing cutlist is present</source>
-        <translation type="unfinished"></translation>
+        <translation>Schnittpunkte sind gesetzt</translation>
     </message>
     <message>
         <source>The program is able to auto-expire</source>
-        <translation type="unfinished"></translation>
+        <translation>Autom. löschen ist erlaubt</translation>
     </message>
     <message>
         <source>Commercials are being flagged</source>
-        <translation type="unfinished"></translation>
+        <translation>Wird auf Werbung untersucht</translation>
     </message>
     <message>
         <source>A bookmark is set</source>
-        <translation type="unfinished"></translation>
+        <translation>Lesezeichen ist gesetzt</translation>
     </message>
     <message>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>Ok</translation>
     </message>
 </context>
 <context>
@@ -503,59 +503,67 @@
     </message>
     <message>
         <source>Program Listings</source>
-        <translation type="unfinished"></translation>
+        <translation>Fernsehprogramm</translation>
     </message>
     <message>
         <source>New Title Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Nach neuen Titeln suchen</translation>
     </message>
     <message>
         <source>Title Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Titelsuche</translation>
     </message>
     <message>
         <source>Description Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Inhaltssuche</translation>
     </message>
     <message>
         <source>Channel Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Sendersuche</translation>
     </message>
     <message>
         <source>Category Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Genresuche</translation>
     </message>
     <message>
         <source>Movie Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Spielfilmsuche</translation>
     </message>
     <message>
         <source>Unknown Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Unbekannte Suche</translation>
     </message>
     <message>
         <source>Select Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Sender wählen</translation>
     </message>
     <message>
         <source>Select Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategorie wählen</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">Ok</translation>
+        <translation>Ok</translation>
     </message>
     <message>
         <source>Movie</source>
-        <translation type="unfinished"></translation>
+        <translation>Spielfilm</translation>
     </message>
     <message>
         <source>Enter Search Phrase</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Suchtext eingeben</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">Löschen</translation>
+        <translation>Löschen</translation>
+    </message>
+    <message>
+        <source>Select Phrase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;New Phrase&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -590,11 +598,11 @@
     </message>
     <message>
         <source>The theme you are using does not contain a &apos;recpriorityprograms&apos; element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Escape out of it to return to the menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ihr aktuelles Layout enthält kein &apos;recprioritychannels&apos; Element. Bitte kontaktieren Sie den Autor des Layouts und fragen Sie Ihn nach einer aktuelleren Version.&lt;br&gt;&lt;br&gt;Der folgende Bildschirm wird leer sein. Drücken Sie ESC um zurück ins Menü zu gelangen.</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">Ok</translation>
+        <translation>Ok</translation>
     </message>
 </context>
 <context>
@@ -789,7 +797,7 @@
     </message>
     <message>
         <source>Rank</source>
-        <translation type="unfinished">Wertung</translation>
+        <translation>Wertung</translation>
     </message>
     <message>
         <source>Auto-Expire recordings</source>
@@ -885,7 +893,7 @@
     </message>
     <message>
         <source>Description:</source>
-        <translation>Beschreibung:</translation>
+        <translation>Inhalt:</translation>
     </message>
     <message>
         <source>Pre-scaling theme images</source>
@@ -1269,7 +1277,7 @@
     </message>
     <message>
         <source>Aggressive Soundcard Buffering</source>
-        <translation>Aggressive Audiopuffer</translation>
+        <translation>Aggressiver Audiopuffer</translation>
     </message>
     <message>
         <source>If this is set, MythTV will pretend to have a smaller soundcard buffer than is really present.  This may speed up seeking, but can also cause playback problems.</source>
@@ -1977,14 +1985,6 @@
         <translation>Werbung: %1 sekunden</translation>
     </message>
     <message>
-        <source>Pre-Roll Minutes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Post-Roll Minutes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Notify, but do not skip</source>
         <translation>Nur Hinweisen</translation>
     </message>
@@ -2058,11 +2058,11 @@
     </message>
     <message>
         <source>Manual Conflict</source>
-        <translation type="unfinished"></translation>
+        <translation>Manueller Konflikt</translation>
     </message>
     <message>
         <source>Auto Conflict</source>
-        <translation type="unfinished"></translation>
+        <translation>Autom. Konflikt</translation>
     </message>
     <message>
         <source>Overlap</source>
@@ -2194,11 +2194,11 @@
     </message>
     <message>
         <source>Use program recording priorities to resolve conflicts.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nutze Aufnahmeprioritäten um Überschneidungen zu vermeiden.</translation>
     </message>
     <message>
         <source>Recording Priorities First.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aufnahmeprioritäten zuerst.</translation>
     </message>
     <message>
         <source>Use recording priorities to resolve conflicts before using traditional conflict resolution.</source>
@@ -2298,39 +2298,39 @@
     </message>
     <message>
         <source>Not Flagged</source>
-        <translation type="unfinished"></translation>
+        <translation>Nicht markiert</translation>
     </message>
     <message>
         <source>Record new and delete oldest once maximum count is reached</source>
-        <translation type="unfinished"></translation>
+        <translation>Neue Folgen aufnehmen und ggf. die älteste löschen</translation>
     </message>
     <message>
         <source>Use video as timebase</source>
-        <translation type="unfinished"></translation>
+        <translation>Nutze Video als Zeitbasis</translation>
     </message>
     <message>
         <source>Use the video as the timebase and warp the audio to keep it in sync. (Experimental)</source>
-        <translation type="unfinished"></translation>
+        <translation>Benutzt den Videodatenstrom als Zeitbasis und passt den Audiodatenstrom an, um synchron zu bleiben. (Experimentell)</translation>
     </message>
     <message>
         <source>Use GUI size for TV playback</source>
-        <translation type="unfinished"></translation>
+        <translation>GUI Größe für TV-Bild verwenden</translation>
     </message>
     <message>
         <source>If checked, use the above size for TV. If unchecked, use full screen.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, wird das Fernsehbild auf GUI Größe angepasst, ansonsten auf Vollbildgröße.</translation>
     </message>
     <message>
         <source>If this is set, captions will be on by default when playing back recordings or watching live TV.  Closed Captioning can be turned on or off by pressing &apos;T&apos; during playback.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, werden Untertitel beim Fernsehen sowie bei der Wiedergabe von Aufnahmen eingeblendet. Mit der Taste T können Untertitel während der Wiedergabe ein- und ausgeblendet werden.</translation>
     </message>
     <message>
         <source>No Prompt on Exit</source>
-        <translation type="unfinished"></translation>
+        <translation>Sofortiges beenden</translation>
     </message>
     <message>
         <source>If set, you will not be prompted when pressing the exit key.  Instead, MythTV will immediately exit.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesezt, beendet sich MythTV nach drücken der EXIT-Taste ohne nachzufragen.</translation>
     </message>
     <message>
         <source>Alpha - Transparent (CPU Usage - High)</source>
@@ -2350,175 +2350,175 @@
     </message>
     <message>
         <source>Display Genre Colors</source>
-        <translation type="unfinished"></translation>
+        <translation>Genrefarben anzeigen</translation>
     </message>
     <message>
         <source>Colorize program guide using  genre colors. (Not available for all grabbers.)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategorien in der Programmübersicht farblich markieren. (Nicht bei allen XMLTV Quellen verfügbar.)</translation>
     </message>
     <message>
         <source>Display Genre Text</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategorien anzeigen</translation>
     </message>
     <message>
         <source>(Not available for all grabbers.)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Nicht bei allen XMLTV Quellen verfügbar.)</translation>
     </message>
     <message>
         <source>Monitor CD/DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>CD/DVD Lw beobachten</translation>
     </message>
     <message>
         <source>This enables support for monitoring your CD/DVD drives for new disks and launchingthe proper plugin to handle them.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dies aktiviert die Unterstützung zur Überwachung Ihrer CD/DVD Laufwerke für neue Medien und den Start passender Plugins für deren Handhabung.</translation>
     </message>
     <message>
         <source>Use HW XVMC MPEG Decoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Nutze XVMC H/W MPEG Dekoder</translation>
     </message>
     <message>
         <source>Use VIA HW MPEG Decoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Nutze Via H/W MPEG Dekoder</translation>
     </message>
     <message>
         <source>Hardware Decoding Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Hardware Dekodereinstellungen</translation>
     </message>
     <message>
         <source>Deleted</source>
-        <translation type="unfinished"></translation>
+        <translation>Gelöscht</translation>
     </message>
     <message>
         <source>Stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>Gestoppt</translation>
     </message>
     <message>
         <source>Recorded</source>
-        <translation type="unfinished"></translation>
+        <translation>Aufgenommen</translation>
     </message>
     <message>
         <source>Recording</source>
-        <translation type="unfinished">Aufnehmen</translation>
+        <translation>Aufnehmen</translation>
     </message>
     <message>
         <source>Previous Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Vorherige Aufnahme</translation>
     </message>
     <message>
         <source>Current Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktuelle Aufnahme</translation>
     </message>
     <message>
         <source>Max Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Max. Aufnahmen</translation>
     </message>
     <message>
         <source>Manual Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Manueller Abbruch</translation>
     </message>
     <message>
         <source>Low Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Niedrige Priorität</translation>
     </message>
     <message>
         <source>Low Disk Space</source>
-        <translation type="unfinished"></translation>
+        <translation>Knapper Speicherplatz</translation>
     </message>
     <message>
         <source>Tuner Busy</source>
-        <translation type="unfinished"></translation>
+        <translation>Tuner belegt</translation>
     </message>
     <message>
         <source>This showing conflicts with one or more other scheduled programs.</source>
-        <translation type="unfinished"></translation>
+        <translation>Diese Sendung überschneidet sich mit einer geplanten Aufnahme.</translation>
     </message>
     <message>
         <source>This showing will be recorded.</source>
-        <translation type="unfinished"></translation>
+        <translation>Diese Sendung wird aufgenommen.</translation>
     </message>
     <message>
         <source>This showing is being recorded.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dies Sendung wird gerade aufgenommen.</translation>
     </message>
     <message>
         <source>This showing was recorded.</source>
-        <translation type="unfinished"></translation>
+        <translation>Diese Sendung wurde aufgenommen.</translation>
     </message>
     <message>
         <source>This showing was recorded but was stopped before recording was completed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Diese Sendung wurde aufgenommen aber vorzeitig abgebrochen.</translation>
     </message>
     <message>
         <source>This showing was recorded but was deleted before recording was completed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Diese Sendung wurde aufgenommen aber vorzeitig gelöscht.</translation>
     </message>
     <message>
         <source>The status of this showing is unknown.</source>
-        <translation type="unfinished"></translation>
+        <translation>Der Status dieser Sendung ist unbekannt.</translation>
     </message>
     <message>
         <source>This showing will not be recorded because </source>
-        <translation type="unfinished"></translation>
+        <translation>Diese Sendung wird nicht aufgenommen weil</translation>
     </message>
     <message>
         <source>This showing was not recorded because </source>
-        <translation type="unfinished"></translation>
+        <translation>Diese Sendung wurde nicht aufgenommen weil</translation>
     </message>
     <message>
         <source>it was manually set to not record.</source>
-        <translation type="unfinished"></translation>
+        <translation>sie manuell geblockt wurde.</translation>
     </message>
     <message>
         <source>this episode was previously recorded according to the duplicate policy chosen for this title.</source>
-        <translation type="unfinished"></translation>
+        <translation>nach den Kriterien für Wiederholungen diese Folge schon aufgenommen wurde.</translation>
     </message>
     <message>
         <source>this episode was previously recorded and is still available in the list of recordings.</source>
-        <translation type="unfinished"></translation>
+        <translation>diese Folge schon aufgenommen und noch nicht gelöscht wurde.</translation>
     </message>
     <message>
         <source>this episode will be recorded at another time instead.</source>
-        <translation type="unfinished"></translation>
+        <translation>diese Folge wird zu einer anderen Zeit aufgenommen.</translation>
     </message>
     <message>
         <source>too many recordings of this program have already been recorded.</source>
-        <translation type="unfinished"></translation>
+        <translation>für diese Serie wurden schon zu viele Folgen aufgenommen.</translation>
     </message>
     <message>
         <source>it was manually cancelled.</source>
-        <translation type="unfinished"></translation>
+        <translation>sie manuell abgebrochen wurde.</translation>
     </message>
     <message>
         <source>another program with a higher recording priority will be recorded.</source>
-        <translation type="unfinished"></translation>
+        <translation>eine andere Sendung mit höherer Priorität aufgenommen wird.</translation>
     </message>
     <message>
         <source>another program was manually chosen to be recorded instead.</source>
-        <translation type="unfinished"></translation>
+        <translation>manuell eine andere Sendung zum aufnehmen gewählt wurde.</translation>
     </message>
     <message>
         <source>another program was automatically chosen to be recorded instead.</source>
-        <translation type="unfinished"></translation>
+        <translation>automatisch eine andere Sendung zum aufnehmen bestimmt wurde.</translation>
     </message>
     <message>
         <source>it is covered by another scheduled recording for the same program.</source>
-        <translation type="unfinished"></translation>
+        <translation>sie bereits durch eine andere Aufnahme derselben Serie abgedeckt ist.</translation>
     </message>
     <message>
         <source>there wasn&apos;t enough disk space available.</source>
-        <translation type="unfinished"></translation>
+        <translation>nicht genug Plattenplatz zur Verfügung stand.</translation>
     </message>
     <message>
         <source>the tuner card was already being used.</source>
-        <translation type="unfinished"></translation>
+        <translation>der Tuner belegt war.</translation>
     </message>
     <message>
         <source>you should never see this.</source>
-        <translation type="unfinished"></translation>
+        <translation>sie diesen Text nicht sehen sollten.</translation>
     </message>
     <message>
         <source>ProfileGroup</source>
-        <translation type="unfinished"></translation>
+        <translation>Profilgruppe</translation>
     </message>
     <message>
         <source>Transcoders</source>
@@ -2526,27 +2526,27 @@
     </message>
     <message>
         <source>New Profile Group Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Name der Profilgruppe</translation>
     </message>
     <message>
         <source>Delete profile group:</source>
-        <translation type="unfinished"></translation>
+        <translation>Lösche Profilgruppe:</translation>
     </message>
     <message>
         <source>Yes, delete group</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja, Gruppe löschen</translation>
     </message>
     <message>
         <source>No, Don&apos;t delete group</source>
-        <translation type="unfinished"></translation>
+        <translation>Nein, Gruppe nicht löschen</translation>
     </message>
     <message>
         <source>Skip Unflagged Commercials</source>
-        <translation type="unfinished"></translation>
+        <translation>Nicht markierte Werbung auslassen</translation>
     </message>
     <message>
         <source>Try to skip commercial breaks even if they have not been flagged.  This does not always work well and can disrupt playback if commercial breaks aren&apos;t detected properly.</source>
-        <translation type="unfinished"></translation>
+        <translation>Versucht Werbepausen zu überspringen auch wenn sie nicht markiert sind. Dies funktioniert nicht immer zuverlässig und kann die Wiedergabe stören.</translation>
     </message>
     <message>
         <source>This global setting is ignored in case of conflicts with other scheduled programs.</source>
@@ -2570,7 +2570,7 @@
     </message>
     <message>
         <source>Channel Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Senderoptionen</translation>
     </message>
     <message>
         <source>Video Source</source>
@@ -2578,7 +2578,7 @@
     </message>
     <message>
         <source>Sort Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Sortierreihenfolge</translation>
     </message>
     <message>
         <source>Hide channels without channel number.</source>
@@ -2586,11 +2586,11 @@
     </message>
     <message>
         <source>Channel Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Sendername</translation>
     </message>
     <message>
         <source>Channel Number</source>
-        <translation type="unfinished"></translation>
+        <translation>Senderplatz</translation>
     </message>
     <message>
         <source>[Not Selected]</source>
@@ -2598,15 +2598,15 @@
     </message>
     <message>
         <source>Callsign</source>
-        <translation type="unfinished"></translation>
+        <translation>Senderkürzel</translation>
     </message>
     <message>
         <source>TV Format</source>
-        <translation type="unfinished"></translation>
+        <translation>TV Norm</translation>
     </message>
     <message>
         <source>If this channel uses a format other than TV Format in the General Backend Setup screen, set it here.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls dieser Sender eine Norm abweichend von &apos;TV Norm&apos; verwendet, dann bitte hier auswählen.</translation>
     </message>
     <message>
         <source>Icon</source>
@@ -2614,7 +2614,7 @@
     </message>
     <message>
         <source>Video filters</source>
-        <translation type="unfinished"></translation>
+        <translation>Videofilter</translation>
     </message>
     <message>
         <source>XMLTV ID</source>
@@ -2622,36 +2622,37 @@
     </message>
     <message>
         <source>Frequency ID</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanal (Frequency ID)</translation>
     </message>
     <message>
         <source>Finetune</source>
-        <translation type="unfinished"></translation>
+        <translation>Feinabstimmung</translation>
     </message>
     <message>
         <source>Contrast</source>
-        <translation type="unfinished"></translation>
+        <translation>Kontrast</translation>
     </message>
     <message>
         <source>Brightness</source>
-        <translation type="unfinished"></translation>
+        <translation>Helligkeit</translation>
     </message>
     <message>
         <source>Color</source>
-        <translation type="unfinished"></translation>
+        <translation>Farbe</translation>
     </message>
     <message>
         <source>Hue</source>
-        <translation type="unfinished"></translation>
+        <translation>Farbton</translation>
     </message>
     <message>
         <source>Frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>Frequenz</translation>
     </message>
     <message>
         <source>[Common] Frequency (Option has no default)
 The frequency for this channel in hz.</source>
-        <translation type="unfinished"></translation>
+        <translation>[Common] Frequenz (Option hat keine Voreinstellung)
+Die Frequenz des Senders in Hz.</translation>
     </message>
     <message>
         <source>Symbol Rate</source>
@@ -2664,7 +2665,7 @@ The frequency for this channel in hz.</source>
     </message>
     <message>
         <source>Satellite</source>
-        <translation type="unfinished"></translation>
+        <translation>Satellit</translation>
     </message>
     <message>
         <source>[NONE CONFIGURED]</source>
@@ -2672,7 +2673,7 @@ The frequency for this channel in hz.</source>
     </message>
     <message>
         <source>Polarity</source>
-        <translation type="unfinished"></translation>
+        <translation>Polarität</translation>
     </message>
     <message>
         <source>[DVB-S] Polarity (Option has no default)
@@ -2681,11 +2682,11 @@ The frequency for this channel in hz.</source>
     </message>
     <message>
         <source>Horizontal</source>
-        <translation type="unfinished"></translation>
+        <translation>Horizontal</translation>
     </message>
     <message>
         <source>Vertical</source>
-        <translation type="unfinished"></translation>
+        <translation>Vertikal</translation>
     </message>
     <message>
         <source>Right Circular</source>
@@ -2735,7 +2736,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Modulation</source>
-        <translation type="unfinished"></translation>
+        <translation>Modulation</translation>
     </message>
     <message>
         <source>[DVB-C] Modulation (Default: Auto)
@@ -2839,35 +2840,35 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Channel Options - Common</source>
-        <translation type="unfinished"></translation>
+        <translation>Senderoptionen - Allgemeines</translation>
     </message>
     <message>
         <source>Channel Options - Video 4 Linux</source>
-        <translation type="unfinished"></translation>
+        <translation>Senderoptionen - Video 4 Linux</translation>
     </message>
     <message>
         <source>Channel Options - DVB</source>
-        <translation type="unfinished"></translation>
+        <translation>Senderoptionen - DVB</translation>
     </message>
     <message>
         <source>Channel Options - DVB Pids &amp; IDs</source>
-        <translation type="unfinished"></translation>
+        <translation>Senderoptionen - DVB Pids &amp; IDs</translation>
     </message>
     <message>
         <source>A comma separated list of pids for each type. Note that currently MythTV only supports recording and not playback of multiple audio or video pids. It does not support showing teletext or subtitles either, but these do not crash the player as audio and video might.</source>
-        <translation type="unfinished"></translation>
+        <translation>Eine durch Komma getrennte Liste von PIDs für jeden Typ. MythTV unterstützt im Moment nur die Aufnahme aber nicht die Wiedergabe von mehreren Audio oder Video PIDs. Ebenso werden momentan weder Untertitel noch Teletext unterstützt, diese bringen den Player jedoch nicht zum Absturz wie es bei Audio und Video passieren könnte.</translation>
     </message>
     <message>
         <source>Profile Group Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Name der Profilgruppe</translation>
     </message>
     <message>
         <source>Hostname</source>
-        <translation type="unfinished"></translation>
+        <translation>Rechnername</translation>
     </message>
     <message>
         <source>Card-Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Kartentyp</translation>
     </message>
     <message>
         <source>Failed to retrieve provider list</source>
@@ -2875,18 +2876,20 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>You probably need to update XMLTV.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vermutlich müssen Sie XMLTV aktualisieren.</translation>
     </message>
     <message>
         <source>Please wait while MythTV retrieves the list of available channels.
 You may wish to check the output as it
 runs by switching to the terminal from which you started
 this program.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bitte warten während MythTV eine Liste der verfügbaren Sender einliest.
+Bitte beobachten Sie die Meldungen, die Sie im Terminal vorfinden
+in dem Sie dieses Programm gestartet haben.</translation>
     </message>
     <message>
         <source>Failed to retrieve channel information.</source>
-        <translation type="unfinished"></translation>
+        <translation>Konnte keine Senderinformationen einlesen.</translation>
     </message>
     <message>
         <source>MythTV was unable to retrieve channel information for your provider.
@@ -2909,7 +2912,7 @@ this program.</source>
     </message>
     <message>
         <source>Warning.</source>
-        <translation type="unfinished"></translation>
+        <translation>Warnung.</translation>
     </message>
     <message>
         <source>You MUST run &apos;mythfilldatabase --manual the first time,
@@ -2919,7 +2922,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Card type</source>
-        <translation type="unfinished"></translation>
+        <translation>Kartentyp</translation>
     </message>
     <message>
         <source>Change the cardtype to the appropriate type for the capture card you are configuring.</source>
@@ -2955,23 +2958,23 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>ERROR, No inputs found</source>
-        <translation type="unfinished"></translation>
+        <translation>FEHLER, Keine Eingänge gefunden</translation>
     </message>
     <message>
         <source>ERROR, V4L support unavailable on Windows</source>
-        <translation type="unfinished"></translation>
+        <translation>FEHLER, V4L Unterstützung unter Windows nicht verfügbar</translation>
     </message>
     <message>
         <source>[All VideoSources]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Alle Videoquellen]</translation>
     </message>
     <message>
         <source>[No VideoSources Defined]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Keine Videoquellen definiert]</translation>
     </message>
     <message>
         <source>[No Channels Defined]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Keine Sender definiert]</translation>
     </message>
     <message>
         <source>Load &amp; Tune</source>
@@ -3011,11 +3014,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>FAILED TO OPEN CARD, CHECK CONSOLE!!</source>
-        <translation type="unfinished"></translation>
+        <translation>KONNTE DIE KARTE NICHT ANSPRECHEN, KONSOLE KONTROLLIEREN!</translation>
     </message>
     <message>
         <source>Advanced Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>Erweiterte Konfiguration</translation>
     </message>
     <message>
         <source>XMLTV listings grabber</source>
@@ -3035,7 +3038,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Channel frequency table</source>
-        <translation type="unfinished"></translation>
+        <translation>Tabelle der Senderfrequenzen</translation>
     </message>
     <message>
         <source>Use default unless this source uses a different frequency table than the system wide table defined in the General settings.</source>
@@ -3135,7 +3138,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Channels</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sender</translation>
     </message>
     <message>
         <source>This box contains all channels from the selected video source. Select a channel here and press the &apos;Load and Tune&apos; button to load the channel settings into the previous screen and try to tune it.</source>
@@ -3311,19 +3314,19 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>TV format</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">TV Norm</translation>
     </message>
     <message>
         <source>The TV standard to use for viewing TV.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Fernsehnorm in Ihrer Umgebung.</translation>
     </message>
     <message>
         <source>VBI format</source>
-        <translation type="unfinished"></translation>
+        <translation>VBI Norm</translation>
     </message>
     <message>
         <source>VBI stands for Vertical Blanking Interrupt.  VBI is used to carry Teletext and Closed Captioning data.</source>
-        <translation type="unfinished"></translation>
+        <translation>VBI steht für &apos;Vertical Blanking Interrupt&apos; (dt. Austastlücke). In ihr werden Teletext- und Untertitelinformationen übertragen.</translation>
     </message>
     <message>
         <source>Select the appropriate frequency table for your system.  If you have an antenna, use a &quot;-bcast&quot; frequency.</source>
@@ -3335,7 +3338,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>How large the live TV buffer is allowed to grow.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die maximale Größe des TV Buffers.</translation>
     </message>
     <message>
         <source>Minimum free Live TV buffer (MB)</source>
@@ -3471,6 +3474,14 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>MasterBackend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Early (minutes)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>End Late   (minutes)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3842,46 +3853,46 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Adjust Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Aufnahme anpassen</translation>
     </message>
     <message>
         <source>Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Aufnahme</translation>
     </message>
     <message>
         <source>Jump To</source>
-        <translation type="unfinished"></translation>
+        <translation>Springe zu</translation>
     </message>
 </context>
 <context>
     <name>VideoSourceEditor</name>
     <message>
         <source>Video sources</source>
-        <translation type="unfinished"></translation>
+        <translation>Videoquellen</translation>
     </message>
     <message>
         <source>Video Source Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Videoquellen Menü</translation>
     </message>
     <message>
         <source>Edit..</source>
-        <translation type="unfinished"></translation>
+        <translation>Bearbeiten..</translation>
     </message>
     <message>
         <source>Delete..</source>
-        <translation type="unfinished"></translation>
+        <translation>Löschen..</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this video source?</source>
-        <translation type="unfinished"></translation>
+        <translation>Soll diese Videoquelle wirklich gelöscht werden?</translation>
     </message>
     <message>
         <source>Yes, delete video source</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja, Videoquelle löschen</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation type="unfinished"></translation>
+        <translation>Nicht löschen</translation>
     </message>
 </context>
 <context>

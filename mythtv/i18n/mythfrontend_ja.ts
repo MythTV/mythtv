@@ -534,10 +534,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enter Search Phrase</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>OK</source>
         <translation type="unfinished">はい</translation>
     </message>
@@ -547,6 +543,14 @@
     </message>
     <message>
         <source>Movie</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Phrase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;New Phrase&gt;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1898,11 +1902,11 @@
     </message>
     <message>
         <source>Pre-Roll Minutes</source>
-        <translation>前録画秒</translation>
+        <translation type="obsolete">前録画秒</translation>
     </message>
     <message>
         <source>Post-Roll Minutes</source>
-        <translation>後録画秒</translation>
+        <translation type="obsolete">後録画秒</translation>
     </message>
     <message>
         <source>Notify, but do not skip</source>
@@ -3411,6 +3415,14 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>MasterBackend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Early (minutes)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>End Late   (minutes)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

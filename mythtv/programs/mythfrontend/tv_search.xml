@@ -3,36 +3,42 @@
    <button>
       <type>TV_PROGFIND</type>
       <text>Titles</text>
+      <text lang="DE">Titel</text>
       <action>TV_SEARCH_TITLE</action>
    </button>
 
    <button>
       <type>TV_PROGFIND</type>
       <text>Descriptions</text>
+      <text lang="DE">Inhalt</text>
       <action>TV_SEARCH_DESC</action>
    </button>
 
    <button>
       <type>TV_PROGFIND</type>
       <text>Channels</text>
+      <text lang="DE">Sender</text>
       <action>TV_SEARCH_CHANNEL</action>
    </button>
 
    <button>
       <type>TV_PROGFIND</type>
       <text>Categories</text>
+      <text lang="DE">Kategorie</text>
       <action>TV_SEARCH_CATEGORY</action>
    </button>
 
    <button>
       <type>TV_PROGFIND</type>
       <text>Movies</text>
+      <text lang="DE">Spielfilme</text>
       <action>TV_SEARCH_MOVIE</action>
    </button>
 
    <button>
       <type>TV_PROGFIND</type>
       <text>New Titles</text>
+      <text lang="DE">Neue Titel</text>
       <action>TV_SEARCH_NEW</action>
    </button>
 

@@ -549,12 +549,16 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enter Search Phrase</source>
+        <source>Delete</source>
+        <translation type="unfinished">Borrar</translation>
+    </message>
+    <message>
+        <source>Select Phrase</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Delete</source>
-        <translation type="unfinished">Borrar</translation>
+        <source>&lt;New Phrase&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1917,14 +1921,6 @@
     </message>
     <message>
         <source>Commercial: %1 seconds</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Pre-Roll Minutes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Post-Roll Minutes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3386,6 +3382,14 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>MasterBackend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Early (minutes)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>End Late   (minutes)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

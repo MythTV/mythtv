@@ -116,6 +116,7 @@
    <button>
       <type>WEBPAGE</type>
       <text>Web</text>
+      <text lang="DE">WWW</text>
       <text lang="JA">ウェブ</text>
       <action>PLUGIN mythbookmarkmanager</action>
       <depends>mythbookmarkmanager</depends>
