@@ -103,7 +103,9 @@ IconView::~IconView()
 
 void IconView::paintEvent(QPaintEvent *e)
 {
-    QRect r = e->rect();
+    e = e;
+
+    QRect r = QRect(0, 0, screenwidth, screenheight);
     QPainter p(this);
 
     QPixmap pix(r.size());
