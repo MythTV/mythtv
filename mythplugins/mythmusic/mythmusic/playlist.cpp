@@ -995,20 +995,22 @@ void PlaylistsContainer::deletePlaylist(int kill_me)
 
 QString PlaylistsContainer::getPlaylistName(int index, bool &reference)
 {
-    if(active_playlist->getID() == index)
+    if(active_playlist)
     {
-        return active_playlist->getName();
-    }
-
-    Playlist *a_list;
-    for(a_list = all_other_playlists->last(); a_list; a_list = all_other_playlists->prev())
-    {
-        if(a_list->getID() == index)
+        if(active_playlist->getID() == index)
         {
-            return a_list->getName();   
+            return active_playlist->getName();
+        }
+
+        Playlist *a_list;
+        for(a_list = all_other_playlists->last(); a_list; a_list = all_other_playlists->prev())
+        {
+            if(a_list->getID() == index)
+            {
+                return a_list->getName();   
+            }
         }
     }
-    
     cerr << "playlist.o: Asked to getPlaylistName() with an index number I couldn't find" << endl ;
     reference = true;
     return "Something is Wrong";

@@ -76,7 +76,6 @@ DatabaseBox::DatabaseBox(PlaylistsContainer *all_playlists,
     QString templevel, temptitle;
     temptitle  = tr("Active Play Queue");
     allcurrent = new PlaylistTitle(listview, temptitle);
-    the_playlists->setActiveWidget(allcurrent);
     templevel = "genre";
     temptitle = tr("All My Playlists");
     alllists = new TreeCheckItem(listview, temptitle, templevel, 0);
@@ -193,6 +192,7 @@ void DatabaseBox::keepFilling()
         {
             allmusic->setText(0, "All My Music");
             fill_list_timer->stop();
+            the_playlists->setActiveWidget(allcurrent);
             active_playlist = the_playlists->getActive();
             active_playlist->putYourselfOnTheListView(allcurrent);
             the_playlists->showRelevantPlaylists(alllists);
@@ -989,7 +989,7 @@ ReadCDThread::ReadCDThread(PlaylistsContainer *all_the_playlists, AllMusic *all_
 void ReadCDThread::run()
 {
     CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
-    int tracknum = decoder->getNumTracks();
+    int tracknum = decoder->getNumCDAudioTracks();
 
     bool setTitle = false;
     bool redo = false;
@@ -997,6 +997,7 @@ void ReadCDThread::run()
     if(tracknum != all_music->getCDTrackCount())
     {
         cd_status_changed = true;
+        cout << "set cd_status_changed to true " << endl ;
     }
     else
     {
@@ -1012,58 +1013,67 @@ void ReadCDThread::run()
 
     if(tracknum > 0)
     {
+        
         //  Check the last track to see if it's different
         //  than whatever it was before
-        Metadata *checker = decoder->getMetadata(tracknum);
-        if(!all_music->checkCDTrack(checker))
+        Metadata *checker = decoder->getLastMetadata();
+        if(checker)
         {
-            redo = true;
-            cd_status_changed = true;
-            all_music->clearCDData();
-            the_playlists->clearCDList();
-        }
-        else
-        {
-            cd_status_changed = false;
-        }
-
-        delete checker;
-    } 
-
-    while (tracknum > 0 && redo) 
-    {
-        Metadata *track = decoder->getMetadata(tracknum);
-        if (!track)
-            continue;
-
-        all_music->addCDTrack(track);
-
-        if (!setTitle)
-        {
-            
-            QString parenttitle = " ";
-            if(track->Artist().length() > 0)
+            if(!all_music->checkCDTrack(checker))
             {
-                    parenttitle += track->Artist();
-                    parenttitle += " ~ "; 
-            }
-            if(track->Album().length() > 0)
-            {
-                    parenttitle += track->Album();
+                redo = true;
+                cd_status_changed = true;
+        cout << "set cd_status_changed to true in this instance" << endl ;
+                all_music->clearCDData();
+                the_playlists->clearCDList();
             }
             else
             {
-                parenttitle = " Unknown";
-                cerr << "databasebox.o: Couldn't find your CD. It may not be in the freedb database." << endl;
-                cerr << "               More likely, however, is that you need to delete ~/.cddb and" << endl;
-                cerr << "               ~/.cdserverrc and restart mythmusic. Have a nice day." << endl;
+                cd_status_changed = false;
             }
-            all_music->setCDTitle(parenttitle);
-            setTitle = true;
+            delete checker;
         }
+        else
+        {
+            cerr << "databasebox.o: The cddecoder said it had audio tracks, but it won't tell me about them" << endl;
+        }
+    } 
 
-        delete track;
-        tracknum--;
+    int actual_tracknum = decoder->getNumTracks();
+
+    while (actual_tracknum > 0 && redo) 
+    {
+        Metadata *track = decoder->getMetadata(actual_tracknum);
+        if (track)
+        {
+            all_music->addCDTrack(track);
+
+            if (!setTitle)
+            {
+            
+                QString parenttitle = " ";
+                if(track->Artist().length() > 0)
+                {
+                        parenttitle += track->Artist();
+                        parenttitle += " ~ "; 
+                }
+                if(track->Album().length() > 0)
+                {
+                        parenttitle += track->Album();
+                }
+                else
+                {
+                    parenttitle = " Unknown";
+                    cerr << "databasebox.o: Couldn't find your CD. It may not be in the freedb database." << endl;
+                    cerr << "               More likely, however, is that you need to delete ~/.cddb and" << endl;
+                    cerr << "               ~/.cdserverrc and restart mythmusic. Have a nice day." << endl;
+                }
+                all_music->setCDTitle(parenttitle);
+                setTitle = true;
+            }
+            delete track;
+        }
+        actual_tracknum--;
     }
 
     delete decoder;

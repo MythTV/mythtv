@@ -51,7 +51,9 @@ Ripper::Ripper(QSqlDatabase *ldb, MythMainWindow *parent, const char *name)
     cd_finish(cdrom_fd);
     
     CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
-    Metadata *track = decoder->getMetadata(db, 1);
+    
+
+    Metadata *track = decoder->getLastMetadata();
 
     bigvb = new QVBoxLayout(this, 0);
 
@@ -136,45 +138,43 @@ Ripper::Ripper(QSqlDatabase *ldb, MythMainWindow *parent, const char *name)
     table->setCurrentCell(0, 1);
 
     int row = 0;
-    int tracknum = 1;
     QString label;
     int length, min, sec;
 
-    while (track)
+    for(int i = 0; i < decoder->getNumTracks(); i++)
     {
-        length = track->Length() / 1000;
-        min = length / 60;
-        sec = length % 60;
+        track = decoder->getMetadata(i + 1);
+        if(track)
+        {
+            length = track->Length() / 1000;
+            min = length / 60;
+            sec = length % 60;
 
-        table->setNumRows(tracknum);
+            table->setNumRows(row + 1);
 
-        table->setRowHeight(row, (int)(30 * hmult));
+            table->setRowHeight(row, (int)(30 * hmult));
 
-        label.sprintf("%d", tracknum);
-        table->setText(row, 0, label);
+            label.sprintf("%d", i+1);
+            table->setText(row, 0, label);
 
-        table->setText(row, 1, track->Title());
+            table->setText(row, 1, track->Title());
 
-        label.sprintf("%02d:%02d", min, sec);
-        table->setText(row, 2, label);
+            label.sprintf("%02d:%02d", min, sec);
+            table->setText(row, 2, label);
 
-        row++;
-        tracknum++;
-
-        delete track;
-        track = decoder->getMetadata(db, tracknum);
+            row++;
+            delete track;
+        }
     }
 
-    if (track)
-        delete track; 
+    totaltracks = decoder->getNumCDAudioTracks();
+
     delete decoder;
 
     connect(table, SIGNAL(valueChanged(int, int)), this, 
             SLOT(tableChanged(int, int)));
 
-    tracknum--;
 
-    totaltracks = tracknum;
 
     MythPushButton *ripit = new MythPushButton(tr("Import this CD"), firstdiag);
     vbox->addWidget(ripit);
@@ -298,7 +298,7 @@ void Ripper::ripthedisc(void)
 
     QString findir = gContext->GetSetting("MusicLocation");
 
-    for (int i = 0; i < totaltracks; i++)
+    for (int i = 0; i < decoder->getNumTracks(); i++)
     {
         Encoder *encoder;
 
@@ -306,41 +306,43 @@ void Ripper::ripthedisc(void)
         current->reset();
 
         Metadata *track = decoder->getMetadata(db, i + 1);
-
-        textstatus = tr("Copying from CD:\n") + track->Title();       
-        statusline->setText(textstatus);
-
-        current->setProgress(0);
-        current->reset();
-
-        qApp->processEvents();
-
-        outfile = findir;
-
-        fixFilename(outfile, track->Artist());
-        mkdir(outfile, 0777);
-        fixFilename(outfile, track->Album());
-        mkdir(outfile, 0777);
-        fixFilename(outfile, track->Title());
-
-        if (encodequal < 3)
+        if(track)
         {
-            outfile += ".ogg";
-            encoder = new VorbisEncoder(outfile, encodequal, track); 
+            textstatus = tr("Copying from CD:\n") + track->Title();       
+            statusline->setText(textstatus);
+
+            current->setProgress(0);
+            current->reset();
+
+            qApp->processEvents();
+
+            outfile = findir;
+
+            fixFilename(outfile, track->Artist());
+            mkdir(outfile, 0777);
+            fixFilename(outfile, track->Album());
+            mkdir(outfile, 0777);
+            fixFilename(outfile, track->Title());
+
+            if (encodequal < 3)
+            {
+                outfile += ".ogg";
+                encoder = new VorbisEncoder(outfile, encodequal, track); 
+            }
+            else
+            {
+                outfile += ".flac";
+                encoder = new FlacEncoder(outfile, encodequal, track); 
+            }
+
+            ripTrack(cddevice, encoder, i + 1);
+
+            overall->setProgress(i + 1);
+            qApp->processEvents();
+
+            delete encoder;
+            delete track;
         }
-        else
-        {
-            outfile += ".flac";
-            encoder = new FlacEncoder(outfile, encodequal, track); 
-        }
-
-        ripTrack(cddevice, encoder, i + 1);
-
-        overall->setProgress(i + 1);
-        qApp->processEvents();
-
-        delete encoder;
-        delete track;
     }
 
     bool EjectCD = gContext->GetNumSetting("EjectCDAfterRipping",1);

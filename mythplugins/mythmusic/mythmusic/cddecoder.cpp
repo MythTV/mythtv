@@ -294,12 +294,38 @@ int CdDecoder::getNumTracks(void)
         return 0;
     }
 
-    int retval = 0;
-    for( ; retval < discinfo.disc_total_tracks; retval++)
+    int retval = discinfo.disc_total_tracks;
+
+    cd_finish(cd);
+
+    return retval;
+}
+
+int CdDecoder::getNumCDAudioTracks(void)
+{
+    int cd = cd_init_device((char *)devicename.ascii());
+
+    struct disc_info discinfo;
+    if (cd_stat(cd, &discinfo) != 0)
     {
-        if(discinfo.disc_track[retval].track_type != CDAUDIO_TRACK_AUDIO)
+        error("Couldn't stat CD, Error.");
+        cd_finish(cd);
+        return 0;
+    }
+
+    if (!discinfo.disc_present)
+    {
+        error("No disc present");
+        cd_finish(cd);
+        return 0;
+    }
+
+    int retval = 0;
+    for( int i = 0 ; i < discinfo.disc_total_tracks; ++i)
+    {
+        if(discinfo.disc_track[i].track_type == CDAUDIO_TRACK_AUDIO)
         {
-            break;
+            ++retval;
         }
     }
 
@@ -325,6 +351,21 @@ Metadata *CdDecoder::getMetadata(int track)
 {
     settracknum = track;
     return getMetadata();
+}
+
+Metadata *CdDecoder::getLastMetadata()
+{
+    Metadata *return_me;
+    for(int i = getNumTracks(); i > 0; --i)
+    {
+        settracknum = i;
+        return_me = getMetadata();
+        if(return_me)
+        {
+            return return_me;
+        }            
+    }
+    return NULL;
 }
 
 Metadata *CdDecoder::getMetadata()
