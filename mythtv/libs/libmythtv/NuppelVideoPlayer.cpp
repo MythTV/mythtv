@@ -820,7 +820,7 @@ void NuppelVideoPlayer::SetAudiotime(void)
     if (audbuf_timecode == 0)
         return;
 
-    int soundcard_buffer;
+    int soundcard_buffer = 0;
     int totalbuffer;
 
     /* We want to calculate 'audiotime', which is the timestamp of the audio
@@ -1979,13 +1979,13 @@ void NuppelVideoPlayer::UpdateSeekAmount(bool up)
 {
     QRect rect;
     rect.setTop(video_height * 3 / 16);
-    rect.setBottom(video_height * 5 / 16);
+    rect.setBottom(video_height * 6 / 16);
     rect.setLeft(video_width * 3 / 8);
     rect.setRight(video_width * 15 / 16);
 
     if (seekamountpos > 0 && !up)
         seekamountpos--;
-    if (seekamountpos < 10 && up) 
+    if (seekamountpos < 9 && up) 
         seekamountpos++;
 
     QString text = "";
@@ -2236,8 +2236,8 @@ bool NuppelVideoPlayer::IsInDelete(void)
     bool indelete = false;
     bool ret = false;
 
-    QMap<long long, int>::Iterator i = deleteMap.begin();
-    for (; i != deleteMap.end(); ++i)
+    QMap<long long, int>::Iterator i;
+    for (i = deleteMap.begin(); i != deleteMap.end(); ++i)
     {
         if (ret)
             break;
@@ -2267,9 +2267,10 @@ bool NuppelVideoPlayer::IsInDelete(void)
             indelete = true;
             first = false;
         }
+        first = false;
     }
 
-    if (indelete) 
+    if (indelete && framesPlayed >= startpos) 
         ret = true;
 
     return ret;
