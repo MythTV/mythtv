@@ -1020,7 +1020,9 @@ void ProgFinder::selectSearchData()
 
     QSqlQuery query = m_db->exec(thequery);
  
-    if (query.numRowsAffected() == -1)
+    int rows = query.numRowsAffected();
+
+    if (rows == -1)
     {
         cerr << "MythProgFind: Error executing query! (selectSearchData)\n";
         cerr << "MythProgFind: QUERY = " << thequery << endl;
@@ -1031,16 +1033,16 @@ void ProgFinder::selectSearchData()
 
     listCount = 0;
 
-    if (query.numRowsAffected() < showsPerListing)
+    if (rows < showsPerListing)
     {
 	progData = new QString[showsPerListing];
 	for (int i = 0; i < showsPerListing; i++)
                progData[i] = "**!0";
     }
     else
-    	progData = new QString[(int)query.numRowsAffected()];
+    	progData = new QString[(int)rows];
 
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.isActive() && rows > 0)
     {
         while (query.next())
         {
@@ -1054,7 +1056,7 @@ void ProgFinder::selectSearchData()
 	}
     }
 
-    if (query.numRowsAffected() < showsPerListing)
+    if (rows < showsPerListing)
 	listCount = showsPerListing;
 
     curProgram = 0;
@@ -1168,7 +1170,9 @@ void ProgFinder::getRecordingInfo()
 
     QSqlQuery query = m_db->exec(thequery);
 
-    if (query.numRowsAffected() == -1)
+    int rows = query.numRowsAffected();
+
+    if (rows == -1)
     {
         cerr << "MythProgFind: Error executing query! (getRecordingInfo)\n";
         cerr << "MythProgFind: QUERY = " << thequery << endl;
@@ -1176,12 +1180,12 @@ void ProgFinder::getRecordingInfo()
     }
 
     recordingCount = 0;
-    if (query.numRowsAffected() > 0)
+    if (rows > 0)
     {
 
-    curRecordings = new recordingRecord[(int)query.numRowsAffected()];
+    curRecordings = new recordingRecord[(int)rows];
 
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.isActive() && rows > 0)
     {
         while (query.next())
         {
@@ -1230,7 +1234,9 @@ void ProgFinder::selectShowData(QString progTitle)
 
     QSqlQuery query = m_db->exec(thequery);
 
-    if (query.numRowsAffected() == -1)
+    int rows = query.numRowsAffected();
+
+    if (rows == -1)
     {
 	cerr << "MythProgFind: Error executing query! (selectShowData)\n";
 	cerr << "MythProgFind: QUERY = " << thequery << endl;
@@ -1239,16 +1245,18 @@ void ProgFinder::selectShowData(QString progTitle)
 
     showCount = 0;
  
-    if (query.numRowsAffected() < showsPerListing)
+    if (rows < showsPerListing)
     {
 	showData = new showRecord[showsPerListing];
 	for (int i = 0; i < showsPerListing; i++)
 		showData[i].title = "**!0";
     }
     else
-    	showData = new showRecord[query.numRowsAffected()];
+    {
+    	showData = new showRecord[rows];
+    }
 
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.isActive() && rows > 0)
     {
         while (query.next())
         {
@@ -1319,7 +1327,7 @@ void ProgFinder::selectShowData(QString progTitle)
         }
     }
 
-    if (query.numRowsAffected() < showsPerListing)
+    if (rows < showsPerListing)
 	showCount = showsPerListing;
 
     curShow = 0;
@@ -1365,8 +1373,10 @@ void ProgFinder::getSearchData(int charNum)
 			.arg(searchData[charNum]).arg((int)(showsPerListing / 2) + 1).arg(progStart.toString("yyyyMMddhhmm50"));
 
     QSqlQuery query = m_db->exec(thequery);
- 
-    if (query.numRowsAffected() == -1)
+
+    int rows = query.numRowsAffected();
+
+    if (rows == -1)
     {
         cerr << "MythProgFind: Error executing query! (getSearchData)\n";
         cerr << "MythProgFind: QUERY = " << thequery << endl;
@@ -1376,7 +1386,7 @@ void ProgFinder::getSearchData(int charNum)
     startPlace = (int)(charNum*showsPerListing);
     dataNum = (int)(showsPerListing / 2);
 
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.isActive() && rows > 0)
     {
         while (query.next())
         {
@@ -1389,7 +1399,7 @@ void ProgFinder::getSearchData(int charNum)
 	}
     }
 
-    if (query.numRowsAffected() >= (int)(showsPerListing / 2))
+    if (rows >= (int)(showsPerListing / 2))
     {
 
     thequery = QString("SELECT title "
@@ -1402,10 +1412,12 @@ void ProgFinder::getSearchData(int charNum)
 
     query = m_db->exec(thequery);
 
+    int rows = query.numRowsAffected();
+
     startPlace = (int)(charNum*showsPerListing) + ((int)(showsPerListing / 2) - 1);
     dataNum = 0;
 
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.isActive() && rows > 0)
     {
         while (query.next())
         {
