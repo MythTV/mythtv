@@ -34,7 +34,18 @@ class VideoManager : public MythDialog
     ~VideoManager(void);
     void VideoManager::processEvents() { qApp->processEvents(); }
     
-
+  public slots:
+    void slotManualIMDB();
+    void slotAutoIMDB();
+    void slotEditMeta();
+    void slotRemoveVideo();
+    void slotResetMeta();
+    void slotDoCancel();
+    void slotDoFilter();
+    void slotToggleBrowseable();
+    
+    
+  
   protected slots:
     void selected();
     void videoMenu();
@@ -58,6 +69,10 @@ class VideoManager : public MythDialog
     void copyFinished(QNetworkOperation *op);
 
   private:
+    void handleIMDBList();
+    void handleIMDBManual();
+    void doParental(int amount);
+    
     bool updateML;
     bool noUpdate;
     int debug;
@@ -69,6 +84,9 @@ class VideoManager : public MythDialog
 
     void LoadWindow(QDomElement &);
     void parseContainer(QDomElement &);
+
+    void cancelPopup();
+    
     XMLParse *theme;
     QDomElement xmldata;
 
@@ -135,7 +153,11 @@ class VideoManager : public MythDialog
     QString movieNumber;
     QStringList movieGenres;
     QStringList movieCountries;
+
+    MythPopupBox* popup;
+    bool expectingPopup;
     
+        
     QString theMovieName;
     bool allowselect;
     bool isbusy;

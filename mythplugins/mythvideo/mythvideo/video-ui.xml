@@ -210,17 +210,17 @@
       <textarea name="keyslbl_one" draworder="4" align="left">
         <area>15,275,200,30</area>
         <font>keysfont</font>
-        <value>0-9: Edit</value>
+        <value>SELECT: Edit</value>
       </textarea>
       <textarea name="keyslbl_two" draworder="4" align="center">
-        <area>300,275,200,30</area>
+        <area>280,275,240,30</area>
         <font>keysfont</font>
-        <value>Menu/Info: Manual IMDB</value>
+        <value></value>
       </textarea>
       <textarea name="keyslbl_three" draworder="4" align="right">
         <area>580,275,200,30</area>
         <font>keysfont</font>
-        <value>Enter/OK: Auto IMDB</value>
+        <value>MENU: Options</value>        
       </textarea>
     </container>
     
@@ -942,13 +942,13 @@
         
     <window name="filter">
 
-	<font name="title" face="Arial">
-		<color>#ffffff</color>
-		<dropcolor>#000000</dropcolor>
-		<size>18</size>
-		<shadow>3,3</shadow>
-		<bold>yes</bold>
-	</font>
+    <font name="title" face="Arial">
+        <color>#ffffff</color>
+        <dropcolor>#000000</dropcolor>
+        <size>18</size>
+        <shadow>3,3</shadow>
+        <bold>yes</bold>
+    </font>
 
 	<font name="display" face="Arial">
 		<color>#ffffff</color>
@@ -1091,7 +1091,7 @@
 		</textbutton>
 
 		<textarea name="numvideos_text" draworder="0">
-			<area>10,50,300,100</area>
+			<area>10,50,400,100</area>
 			<font>display</font>
 			<value>Aucune video</value>
 		</textarea>

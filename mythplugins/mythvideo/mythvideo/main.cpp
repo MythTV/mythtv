@@ -62,9 +62,13 @@ void setupKeys(void)
     REG_JUMP("Video Listings", "The MythVideo video listings", "", 
              runVideoTree);
 
-    REG_KEY("Video","DELETE","Delete video","D");
+    
     REG_KEY("Video","FILTER","Open video filter dialog","F");
+    
+    REG_KEY("Video","DELETE","Delete video","D");
     REG_KEY("Video","BROWSE","Change browsable in video manager","B");
+    REG_KEY("Video","INCPARENT","Increase Parental Level","Right");
+    REG_KEY("Video","DECPARENT","Decrease Parental Level","Left");
 
 
 }

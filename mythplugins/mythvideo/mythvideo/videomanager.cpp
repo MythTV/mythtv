@@ -31,6 +31,10 @@ VideoManager::VideoManager(QSqlDatabase *ldb,
     debug = 0;
     isbusy = false;    // ignores keys when true (set when doing http request)
 
+    expectingPopup = false;
+    popup = NULL;
+    
+
     currentVideoFilter = new VideoFilterSettings(db,false);
     RefreshMovieList();
 
@@ -119,30 +123,31 @@ void VideoManager::keyPressEvent(QKeyEvent *e)
         handled = true;
         if (action == "SELECT" && allowselect)
         {
-            selected();
+            if (m_state == SHOWING_IMDBLIST)
+                handleIMDBList();
+            else if(m_state == SHOWING_IMDBMANUAL)
+                handleIMDBManual();
+            else
+               slotEditMeta();
             return;
         }
-        else if (action == "0" || action == "1" || action == "2" ||
+        else if ((action == "0" || action == "1" || action == "2" ||
                  action == "3" || action == "4" || action == "5" ||
                  action == "6" || action == "7" || action == "8" ||
-                 action == "9")
+                 action == "9") && (m_state == SHOWING_IMDBMANUAL))
         {
-            if (allowselect && m_state == SHOWING_MAINWINDOW)
-                editMetadata();
-            else if (m_state != SHOWING_MAINWINDOW)
-                num(action);
+            num(action);
             return;
         }
- 	if (action == "DELETE")
-		RemoveCurrentItem();
-	else if (action == "BROWSE"){
-	    if (m_state == SHOWING_MAINWINDOW){ 
- 		curitem->setBrowse(!curitem->Browse());
-		curitem->updateDatabase(db);
-        	RefreshMovieList();
-        	update(infoRect);
-	    }
-        }else if (action == "UP")
+        else if (action == "DELETE")
+            slotRemoveVideo();
+        else if (action == "BROWSE" && (m_state == SHOWING_MAINWINDOW))
+            slotToggleBrowseable();
+        else if (action == "INCPARENT")
+            doParental(1);
+        else if (action == "DECPARENT")
+            doParental(-1);
+        else if (action == "UP")
             cursorUp();
         else if (action == "DOWN")
             cursorDown();
@@ -158,21 +163,9 @@ void VideoManager::keyPressEvent(QKeyEvent *e)
             exitWin();
         else if ((action == "MENU") || (action == "INFO"))
              videoMenu();
-	else if (action == "FILTER")
-		if (m_state == SHOWING_MAINWINDOW){
-			VideoFilterDialog *vfd = new VideoFilterDialog(db,
-					//NULL,
-					currentVideoFilter,
-					gContext->GetMainWindow(),
-					"filter",
-					"video-",
-					"Video Filter Dialog");
-			vfd->exec();
-			delete vfd;
-			RefreshMovieList();
-			update(fullRect);
-		}
-	else
+        else if (action == "FILTER" && (m_state == SHOWING_MAINWINDOW))
+            slotDoFilter();
+        else
             handled = false;
     }
 
@@ -182,7 +175,7 @@ void VideoManager::keyPressEvent(QKeyEvent *e)
 
 void VideoManager::num(const QString &text)
 {
-    if (m_state == SHOWING_IMDBMANUAL)
+    if(m_state == SHOWING_IMDBMANUAL)
     {
         curIMDBNum = curIMDBNum + text;
         update(imdbEnterRect);
@@ -304,8 +297,7 @@ QString VideoManager::GetMoviePoster(QString movieNum)
     if (!dir.exists())
         dir.mkdir(fileprefix);
 
-    VERBOSE(VB_ALL, QString("Copying '%1' -> '%2'...").arg(uri)
-           .arg(fileprefix));
+    VERBOSE(VB_ALL, QString("Copying '%1' -> '%2'...").arg(uri).arg(fileprefix));
     QUrlOperator *op = new QUrlOperator();
     connect(op, SIGNAL(finished(QNetworkOperation*)), 
           this, SLOT(copyFinished(QNetworkOperation*)) );
@@ -327,15 +319,18 @@ QString VideoManager::GetMoviePoster(QString movieNum)
     }
 
     QString localfile = "";
-    if (iscopycomplete) {
-        if (iscopysuccess){
-           localfile = fileprefix + "/" + uri.section('/', -1);
-	   QString extension = uri.right(uri.length()-uri.findRev('.'));
-	   if (dir.rename (localfile, fileprefix +"/" + movieNum + extension)){
-		localfile = fileprefix +"/" + movieNum + extension;
-	   }
- 	}
-    } else {
+    if (iscopycomplete)
+    {
+        if (iscopysuccess)
+        {
+            localfile = fileprefix + "/" + uri.section('/', -1);
+            QString extension = uri.right(uri.length()-uri.findRev('.'));
+            if (dir.rename (localfile, fileprefix +"/" + movieNum + extension))
+                localfile = fileprefix +"/" + movieNum + extension;
+        }
+    }
+    else
+    {
        op->stop();
 
        QString err = QString("Copying of '%1' timed out").arg(uri);
@@ -521,13 +516,14 @@ QString VideoManager::executeExternal(QStringList args, QString purpose)
         }
     }
 
-    if (err != "") {
+    if (err != "")
+    {
         if (purpose == "")
             purpose = "Command";
+
         cerr << err << endl;
         MythPopupBox::showOkPopup(gContext->GetMainWindow(),
-			QObject::tr(purpose + " failed"),
-                        QObject::tr(err + "\n\nCheck VideoManager Settings"));
+        QObject::tr(purpose + " failed"), QObject::tr(err + "\n\nCheck VideoManager Settings"));
         ret = "#ERROR";
     }
     VERBOSE(VB_ALL, ret); 
@@ -998,32 +994,34 @@ void VideoManager::exitWin()
         emit accept();
 }
 
-void VideoManager::cursorLeft()
+void VideoManager::doParental(int amount)
 {
     int curshowlevel = curitem->ShowLevel();
 
-    curshowlevel--;
-    if (curshowlevel > -1)
+    curshowlevel += amount;
+    
+    if ( (curshowlevel > -1) && (curshowlevel < 5))
     {
         curitem->setShowLevel(curshowlevel);
         curitem->updateDatabase(db);
         RefreshMovieList();
         update(infoRect);
     }
+
+
+}
+
+void VideoManager::cursorLeft()
+{
+    if(expectingPopup)
+        cancelPopup();
+    else
+        exitWin();
 }
 
 void VideoManager::cursorRight()
 {
-    int curshowlevel = curitem->ShowLevel();
-
-    curshowlevel++;
-    if (curshowlevel < 5)
-    {
-        curitem->setShowLevel(curshowlevel);
-        curitem->updateDatabase(db);
-        RefreshMovieList();
-        update(infoRect);
-    }
+    videoMenu();
 }
 
 void VideoManager::cursorDown()
@@ -1328,6 +1326,29 @@ void VideoManager::pageUp()
 
 void VideoManager::videoMenu()
 {
+    popup = new MythPopupBox(gContext->GetMainWindow(), "video popup");
+
+    expectingPopup = true;
+
+    popup->addLabel(tr("Select action:"));
+    popup->addLabel("");
+
+    QButton *editButton = popup->addButton(tr("Edit Metadata"), this, SLOT(slotEditMeta()));
+
+    popup->addButton(tr("Search IMDB"), this, SLOT(slotAutoIMDB()));    
+    popup->addButton(tr("Manually Enter IMDB #"), this, SLOT(slotManualIMDB()));
+    popup->addButton(tr("Reset Metadata"), this, SLOT(slotResetMeta()));
+    popup->addButton(tr("Toggle Browseable"), this, SLOT(slotToggleBrowseable()));
+    popup->addButton(tr("Remove Video"), this, SLOT(slotRemoveVideo()));
+    popup->addButton(tr("Filter Display"), this, SLOT(slotDoFilter()));
+    popup->addButton(tr("Cancel"), this, SLOT(slotDoCancel()));
+
+    popup->ShowPopup(this, SLOT(slotDoCancel()));
+    
+    editButton->setFocus();    
+    
+
+#if 0
     QPainter p(this);
     if (m_state == SHOWING_MAINWINDOW || m_state == SHOWING_EDITWINDOW)
     {
@@ -1348,22 +1369,12 @@ void VideoManager::videoMenu()
        m_state = SHOWING_IMDBLIST;
        update(movieListRect);
     }
+#endif
 }
 
 
 void VideoManager::editMetadata()
 {
-    EditMetadataDialog *md_editor = new EditMetadataDialog(db,
-                                                           curitem,
-                                                           gContext->GetMainWindow(),
-                                                           "edit_metadata",
-                                                           "video-",
-                                                           "edit metadata dialog");
-    md_editor->exec();
-    delete md_editor;
-    curitem->fillDataFromID(db);
-    RefreshMovieList();
-    update(infoRect);
 }
 
 void VideoManager::doWaitBackground(QPainter& p,const QString& titleText)
@@ -1389,13 +1400,160 @@ void VideoManager::doWaitBackground(QPainter& p,const QString& titleText)
 
 void VideoManager::selected()
 {
-    // Do queries 
+}
+
+void VideoManager::RemoveCurrentItem()
+{
+}
+ 
+void VideoManager::ResetCurrentItem()
+{
+    QString coverFile = tr("No Cover");
+
+    curitem->guessTitle();
+    curitem->setCoverFile(coverFile);
+    curitem->setYear(1895);
+    curitem->setInetRef("00000000");
+    curitem->setDirector(tr("Unknown"));
+    curitem->setPlot(tr("None"));
+    curitem->setUserRating(0.0);
+    curitem->setRating(tr("NR"));
+    curitem->setLength(0);
+    curitem->setShowLevel(1);
+    movieGenres.clear();
+    curitem->setGenres(movieGenres);
+    movieCountries.clear();
+    curitem->setCountries(movieCountries);
+    curitem->updateDatabase(db);
+    RefreshMovieList();
+
+}
+
+
+void VideoManager::slotManualIMDB()
+{
+    cancelPopup();
+    
+    backup.begin(this);
+    backup.drawPixmap(0, 0, myBackground);
+    backup.end();
+    curIMDBNum = "";
+    m_state = SHOWING_IMDBMANUAL;
+    update(fullRect);
+    movieNumber = "";
+}
+
+void VideoManager::handleIMDBManual()
+{
+    QPainter p(this);
+    movieNumber = curIMDBNum;
+
+    backup.begin(this);
+    grayOut(&backup);
+    doWaitBackground(p, curIMDBNum);
+    backup.end();
+
+    qApp->processEvents();
+
+    GetMovieData(curIMDBNum);
+
+    backup.begin(this);
+    backup.drawPixmap(0, 0, myBackground);
+    backup.end();
+    qApp->processEvents(); // Without this we get drawing errors.
+
+
+    m_state = SHOWING_MAINWINDOW;
+    noUpdate = false;
+    update(infoRect);
+    update(listRect);
+    update(fullRect);
+}
+
+void VideoManager::handleIMDBList()
+{
+    QPainter p(this);
+    
+    for (QStringList::Iterator it = movieList.begin();
+         it != movieList.end(); ++it)
+    {
+        QString data = (*it).data();
+        QString movie = data.section(':', 1);
+        if (curitemMovie == movie)
+        {
+            movieNumber = data.section(':', 0, 0);
+            break;
+        }
+    }
+
+    if (movieNumber == "cancel")
+    {
+        QString movieCoverFile = GetMoviePoster(QString("Local"));
+        if (movieCoverFile != "<NULL>")
+        {
+            curitem->setCoverFile(movieCoverFile);
+            curitem->updateDatabase(db);
+            RefreshMovieList();
+        }
+
+        backup.begin(this);
+        backup.drawPixmap(0, 0, myBackground);
+        backup.end();
+        m_state = SHOWING_MAINWINDOW;
+        update(fullRect);
+        movieNumber = "";
+        return;
+    }
+    else if (movieNumber == "manual")
+         slotManualIMDB();
+    else if (movieNumber == "reset")
+         slotResetMeta();
+    else if (movieNumber == "") {
+        return;
+    }
+    else
+    {
+        if (movieNumber.isNull() || movieNumber.length() == 0)
+        {
+            ResetCurrentItem();
+            backup.begin(this);
+            backup.drawPixmap(0, 0, myBackground);
+            backup.end();
+            update(fullRect);
+            return;
+        }
+        //cout << "GETTING MOVIE #" << movieNumber << endl;
+        backup.begin(this);
+        grayOut(&backup);
+        doWaitBackground(p, movieNumber);
+        backup.end();
+        qApp->processEvents();
+
+        GetMovieData(movieNumber);
+
+        backup.begin(this);
+        backup.drawPixmap(0, 0, myBackground);
+        backup.end();
+        qApp->processEvents(); // Without this we get drawing errors.
+
+        m_state = SHOWING_MAINWINDOW;
+        update(infoRect);
+        update(listRect);
+        update(fullRect);
+        movieNumber = "";
+    }
+}
+
+void VideoManager::slotAutoIMDB()
+{
+    cancelPopup();
+
+    // Do queries
     QPainter p(this);
     if (m_state == SHOWING_MAINWINDOW || m_state == SHOWING_EDITWINDOW)
     {
-//       QString movieTitle = curitem->Title();
        m_state = SHOWING_EDITWINDOW;
- 
+
        backup.flush();
        backup.begin(this);
        grayOut(&backup);
@@ -1406,8 +1564,8 @@ void VideoManager::selected()
        backup.flush();
 
       int ret = GetMovieListing(curitem->Title());
-//      int ret = GetMovieListing(curitem->Filename().section('/', -1));
-      VERBOSE(VB_ALL, 
+
+      VERBOSE(VB_ALL,
               QString("GetMovieList returned %1 possible matches").arg(ret));
       if (ret == 1) {
           if (movieNumber.isNull() || movieNumber.length() == 0)
@@ -1445,184 +1603,118 @@ void VideoManager::selected()
           update(listRect);
       }
    }
-   else if (m_state == SHOWING_IMDBLIST)
-   {
-       for (QStringList::Iterator it = movieList.begin(); 
-            it != movieList.end(); ++it)
-       {
-           QString data = (*it).data();
-           QString movie = data.section(':', 1);
-           if (curitemMovie == movie)
-           {
-               movieNumber = data.section(':', 0, 0);
-               break;
-           }
-       }
 
-       if (movieNumber == "cancel")
-       {
-           QString movieCoverFile = GetMoviePoster(QString("Local"));
-           if (movieCoverFile != "<NULL>")
-           {
-               curitem->setCoverFile(movieCoverFile);
-               curitem->updateDatabase(db);
-               RefreshMovieList();
-           }
- 
-           backup.begin(this);
-           backup.drawPixmap(0, 0, myBackground);
-           backup.end();
-           m_state = SHOWING_MAINWINDOW;
-           update(fullRect);
-           movieNumber = "";
-           return;
-       }
-       else if (movieNumber == "manual")
-       {
-           backup.begin(this);
-           backup.drawPixmap(0, 0, myBackground);
-           backup.end();
-           curIMDBNum = "";
-           m_state = SHOWING_IMDBMANUAL;
-           update(fullRect);
-           movieNumber = "";
-           return;
-       } 
-       else if (movieNumber == "reset")
-       {
-           ResetCurrentItem();
-           QString movieCoverFile = GetMoviePoster(QString("Local"));
-           if (movieCoverFile != "<NULL>")
-           {
-               curitem->setCoverFile(movieCoverFile);
-               curitem->updateDatabase(db);
-               RefreshMovieList();
-           }
- 
-           backup.begin(this);
-           backup.drawPixmap(0, 0, myBackground);
-           backup.end();
- 
-           m_state = SHOWING_MAINWINDOW;
-           update(fullRect);
-           movieNumber = "";
-           return;
-       }
-       else if (movieNumber == "remove")
-       {
-	   RemoveCurrentItem();
-
-           backup.begin(this);
-           backup.drawPixmap(0, 0, myBackground);
-           backup.end();
- 
-           m_state = SHOWING_MAINWINDOW;
-           update(fullRect);
-           movieNumber = "";
-           return;
-       }
-       else if (movieNumber == "") {
-           return;
-       }
-       else
-       {
-           if (movieNumber.isNull() || movieNumber.length() == 0)
-           {
-               ResetCurrentItem();
-               backup.begin(this);
-               backup.drawPixmap(0, 0, myBackground);
-               backup.end();
-               update(fullRect);
-               return;
-           }
-           //cout << "GETTING MOVIE #" << movieNumber << endl;
-           backup.begin(this);
-           grayOut(&backup);
-           doWaitBackground(p, movieNumber);
-           backup.end();
-           qApp->processEvents();
-            
-           GetMovieData(movieNumber);
-
-           backup.begin(this);
-           backup.drawPixmap(0, 0, myBackground);
-           backup.end();
-           qApp->processEvents(); // Without this we get drawing errors.
-           
-           m_state = SHOWING_MAINWINDOW;
-           update(infoRect);
-           update(listRect);
-           update(fullRect);
-           movieNumber = "";
-       }
-   }
-   else if (m_state == SHOWING_IMDBMANUAL)
-   {
-      movieNumber = curIMDBNum;
-
-      backup.begin(this);
-      grayOut(&backup);
-      doWaitBackground(p, curIMDBNum);
-      backup.end();
-
-      qApp->processEvents();
-
-      GetMovieData(curIMDBNum);
-      
-      backup.begin(this);
-      backup.drawPixmap(0, 0, myBackground);
-      backup.end();
-      qApp->processEvents(); // Without this we get drawing errors.
-
-
-      m_state = SHOWING_MAINWINDOW;
-      noUpdate = false;
-      update(infoRect);
-      update(listRect);
-      update(fullRect);
-    }
 }
 
-void VideoManager::RemoveCurrentItem(){
-     if (m_state ==SHOWING_MAINWINDOW){
-	   bool okcancel;
-	   MythPopupBox * ConfirmationDialog = 
-		new MythPopupBox (gContext->GetMainWindow());
-	   okcancel = ConfirmationDialog->showOkCancelPopup(
-				gContext->GetMainWindow(),
-				"",
-				tr("Delete this file ?"),
-				false);
-	   if (okcancel)
-		   if (curitem->Remove(db))
-        	       RefreshMovieList();
-		   else
-		   ConfirmationDialog->showOkPopup(
-				gContext->GetMainWindow(),
-				"",
-				tr("delete failed"));
-	   delete ConfirmationDialog;
-    }
-}
- 
-void VideoManager::ResetCurrentItem()
+void VideoManager::slotEditMeta()
 {
-    QString coverFile = tr("No Cover");
+    EditMetadataDialog* md_editor = new EditMetadataDialog(db, curitem, gContext->GetMainWindow(),
+                                                           "edit_metadata", "video-",
+                                                           "edit metadata dialog");
+    
+    
+    md_editor->exec();
+    delete md_editor;
+    cancelPopup();
+    curitem->fillDataFromID(db);
 
-    curitem->guessTitle();
-    curitem->setCoverFile(coverFile);
-    curitem->setYear(1895);
-    curitem->setInetRef("00000000");
-    curitem->setDirector(tr("Unknown"));
-    curitem->setPlot(tr("None"));
-    curitem->setUserRating(0.0);
-    curitem->setRating(tr("NR"));
-    curitem->setLength(0);
-    curitem->setShowLevel(1);
-    movieGenres.clear();
-    curitem->setGenres(movieGenres);
-    movieCountries.clear();
-    curitem->setCountries(movieCountries);
+    RefreshMovieList();
+    update(infoRect);
+}
+
+void VideoManager::slotRemoveVideo()
+{
+    cancelPopup();
+    if (m_state == SHOWING_MAINWINDOW)
+    {
+        bool okcancel;
+        MythPopupBox * ConfirmationDialog = new MythPopupBox (gContext->GetMainWindow());
+        okcancel = ConfirmationDialog->showOkCancelPopup( gContext->GetMainWindow(), "",
+                                                          tr("Delete this file?"), false);
+
+        if (okcancel)
+        {
+            if (curitem->Remove(db))
+                RefreshMovieList();
+            else
+                ConfirmationDialog->showOkPopup(gContext->GetMainWindow(), "", tr("delete failed"));
+        }
+
+        delete ConfirmationDialog;
+    }
+
+}
+
+
+void VideoManager::slotDoCancel()
+{
+    if (!expectingPopup)
+        return;
+
+    cancelPopup();
+}
+
+void VideoManager::cancelPopup(void)
+{
+    expectingPopup = false;
+
+    if(popup)
+    {
+        popup->hide();
+        delete popup;
+
+        popup = NULL;
+
+        update(fullRect);
+        setActiveWindow();
+    }
+}
+
+
+void VideoManager::slotResetMeta()
+{
+    cancelPopup();
+
+    ResetCurrentItem();
+    QString movieCoverFile = GetMoviePoster(QString("Local"));
+    if (movieCoverFile != "<NULL>")
+    {
+        curitem->setCoverFile(movieCoverFile);
+        curitem->updateDatabase(db);
+        RefreshMovieList();
+    }
+
+    backup.begin(this);
+    backup.drawPixmap(0, 0, myBackground);
+    backup.end();
+
+    m_state = SHOWING_MAINWINDOW;
+    update(fullRect);
+    movieNumber = "";
+    return;
+}
+
+
+void VideoManager::slotDoFilter()
+{
+    cancelPopup();
+    
+    VideoFilterDialog *vfd = new VideoFilterDialog(db, currentVideoFilter,
+                                                   gContext->GetMainWindow(),
+                                                   "filter", "video-", "Video Filter Dialog");
+    vfd->exec();
+    delete vfd;
+    RefreshMovieList();
+    update(fullRect);
+
+}
+
+void VideoManager::slotToggleBrowseable()
+{
+    cancelPopup();
+    
+    curitem->setBrowse(!curitem->Browse());
     curitem->updateDatabase(db);
     RefreshMovieList();
+    update(infoRect);
 }
