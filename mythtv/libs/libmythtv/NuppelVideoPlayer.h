@@ -119,8 +119,9 @@ class NuppelVideoPlayer
     void TranscodeWriteText(void (*func)(void *, unsigned char *, int, int, int), void *ptr);
 
     int FlagCommercials(bool showPercentage = false, bool fullSpeed = false,
-                        bool *abortFlag = NULL);
-    bool RebuildSeekTable(bool showPercentage = true, StatusCallback cb = NULL, void* cbData = NULL);
+                        int *controlFlag = NULL);
+    bool RebuildSeekTable(bool showPercentage = true, StatusCallback cb = NULL,
+                          void* cbData = NULL);
 
     VideoFrame *GetCurrentFrame(int &w, int &h);
     void ReleaseCurrentFrame(VideoFrame *frame);

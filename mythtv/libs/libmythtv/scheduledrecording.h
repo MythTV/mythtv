@@ -21,6 +21,12 @@ class SRRecSearchType;
 class SRProfileSelector;
 class SRDupIn;
 class SRDupMethod;
+class SRAutoTranscode;
+class SRAutoCommFlag;
+class SRAutoUserJob1;
+class SRAutoUserJob2;
+class SRAutoUserJob3;
+class SRAutoUserJob4;
 class SRAutoExpire;
 class SRStartOffset;
 class SREndOffset;
@@ -66,6 +72,8 @@ public:
     int GetMaxEpisodes(void) const;
     bool GetMaxNewest(void) const;
 
+    int GetAutoRunJobs(void) const;
+
     void setStart(const QDateTime& start);
     void setEnd(const QDateTime& end);
     void setRecPriority(int recpriority);
@@ -110,6 +118,12 @@ public:
     void setProfileObj( SRProfileSelector* val) {profile = val;}
     void setDupInObj(SRDupIn* val) {dupin = val;}
     void setDupMethodObj(SRDupMethod* val) {dupmethod = val;}
+    void setAutoTranscodeObj(SRAutoTranscode* val) {autotranscode = val;}
+    void setAutoCommFlagObj(SRAutoCommFlag* val) {autocommflag = val;}
+    void setAutoUserJob1Obj(SRAutoUserJob1* val) {autouserjob1 = val;}
+    void setAutoUserJob2Obj(SRAutoUserJob2* val) {autouserjob2 = val;}
+    void setAutoUserJob3Obj(SRAutoUserJob3* val) {autouserjob3 = val;}
+    void setAutoUserJob4Obj(SRAutoUserJob4* val) {autouserjob4 = val;}
     void setAutoExpireObj(SRAutoExpire* val) {autoexpire = val;}
     void setStartOffsetObj(SRStartOffset* val) {startoffset = val;}
     void setEndOffsetObj(SREndOffset* val) {endoffset = val;}
@@ -161,6 +175,12 @@ protected:
     class SRProfileSelector* profile;
     class SRDupIn* dupin;
     class SRDupMethod* dupmethod;
+    class SRAutoTranscode* autotranscode;
+    class SRAutoCommFlag* autocommflag;
+    class SRAutoUserJob1* autouserjob1;
+    class SRAutoUserJob2* autouserjob2;
+    class SRAutoUserJob3* autouserjob3;
+    class SRAutoUserJob4* autouserjob4;
     class SRAutoExpire* autoexpire;
     class SRStartOffset* startoffset;
     class SREndOffset* endoffset;

@@ -17,7 +17,6 @@ using namespace std;
 #include "autoexpire.h"
 #include "scheduler.h"
 #include "transcoder.h"
-#include "commercialflag.h"
 #include "mainserver.h"
 #include "encoderlink.h"
 #include "remoteutil.h"
@@ -26,12 +25,13 @@ using namespace std;
 #include "libmythtv/programinfo.h"
 #include "libmyth/mythcontext.h"
 #include "libmythtv/dbcheck.h"
+#include "libmythtv/jobqueue.h"
 
 QMap<int, EncoderLink *> tvList;
 AutoExpire *expirer = NULL;
 Scheduler *sched = NULL;
 Transcoder *trans = NULL;
-CommercialFlagger *commflag = NULL;
+JobQueue *jobqueue = NULL;
 QString pidfile;
 QString lockfile_location;
 HouseKeeper *housekeeping = NULL;
@@ -297,6 +297,11 @@ int main(int argc, char **argv)
                             print_verbose_messages |= VB_COMMFLAG;
                             verboseString += " " + *it;
                         }
+                        else if(!strcmp(*it,"jobqueue"))
+                        {
+                            print_verbose_messages |= VB_JOBQUEUE;
+                            verboseString += " " + *it;
+                        }
                         else if(!strcmp(*it,"audio"))
                         {
                             print_verbose_messages |= VB_AUDIO;
@@ -355,7 +360,8 @@ int main(int argc, char **argv)
                     "-v or --verbose debug-level    Prints more information" << endl <<
                     "                               Accepts any combination (separated by comma)" << endl << 
                     "                               of all,none,quiet,record,playback,channel," << endl <<
-                    "                               osd,file,schedule,network,commflag,audio,libav" << endl <<
+                    "                               osd,file,schedule,network,commflag,audio," << endl <<
+                    "                               libav,jobqueue" << endl <<
                     "--printexpire                  List of auto-expire programs" << endl <<
                     "--printsched                   Upcoming scheduled programs" << endl <<
                     "--version                      Version information" << endl;
@@ -452,8 +458,8 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    QSqlDatabase *flagthread = QSqlDatabase::addDatabase("QMYSQL3", "FLAGDB");
-    if (!flagthread)
+    QSqlDatabase *jobthread = QSqlDatabase::addDatabase("QMYSQL3", "JOBDB");
+    if (!jobthread)
     {
         cerr << "Couldn't connect to database\n";
         return -1;
@@ -470,7 +476,7 @@ int main(int argc, char **argv)
         !gContext->OpenDatabase(expthread) ||
         !gContext->OpenDatabase(hkthread) ||
         !gContext->OpenDatabase(transthread) ||
-        !gContext->OpenDatabase(flagthread) ||
+        !gContext->OpenDatabase(jobthread) ||
         !gContext->OpenDatabase(msdb))
     {
         cerr << "Couldn't open database\n";
@@ -561,8 +567,8 @@ int main(int argc, char **argv)
     QSqlDatabase *trandb = QSqlDatabase::database("TRANSDB");
     trans = new Transcoder(&tvList, trandb);
 
-    QSqlDatabase *flagdb = QSqlDatabase::database("FLAGDB");
-    commflag = new CommercialFlagger(ismaster, flagdb);
+    QSqlDatabase *jobdb = QSqlDatabase::database("JOBDB");
+    jobqueue = new JobQueue(ismaster, jobdb);
 
     VERBOSE(VB_ALL, QString("%1 version: %2 www.mythtv.org")
                             .arg(binname).arg(MYTH_BINARY_VERSION));

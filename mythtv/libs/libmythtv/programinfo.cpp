@@ -12,6 +12,7 @@
 #include "commercial_skip.h"
 #include "dialogbox.h"
 #include "remoteutil.h"
+#include "jobqueue.h"
 
 using namespace std;
 
@@ -630,6 +631,17 @@ QString ProgramInfo::GetProgramRecordingProfile(QSqlDatabase *db)
     return record->getProfileName();
 }
 
+int ProgramInfo::GetAutoRunJobs(QSqlDatabase *db)
+{
+    if (record == NULL) 
+    {
+        record = new ScheduledRecording();
+        record->loadByProgram(db, this);
+    }
+
+    return record->GetAutoRunJobs();
+}
+
 bool ProgramInfo::AllowRecordingNewEpisodes(QSqlDatabase *db)
 {
     if (record == NULL) 
@@ -890,6 +902,35 @@ QString ProgramInfo::GetRecordFilename(const QString &prefix)
     
     return retval;
 }               
+
+QString ProgramInfo::GetPlaybackURL(QString playbackHost) {
+    QString tmpURL;
+    QString m_hostname = gContext->GetHostName();
+
+    if (playbackHost == "")
+        playbackHost = m_hostname;
+
+    tmpURL = GetRecordFilename(gContext->GetSettingOnHost("RecordFilePrefix",
+                                                          hostname));
+
+    if (playbackHost == hostname)
+        return tmpURL;
+
+    if (playbackHost == m_hostname)
+    {
+        QFile checkFile(tmpURL);
+
+        if (checkFile.exists())
+            return tmpURL;
+    }
+
+    tmpURL = QString("myth://") +
+             gContext->GetSettingOnHost("BackendServerIP", hostname) + ":" +
+             gContext->GetSettingOnHost("BackendServerPort", hostname) + "/" +
+             GetRecordBasename();
+
+    return tmpURL;
+}
 
 void ProgramInfo::StartedRecording(QSqlDatabase *db)
 {

@@ -34,6 +34,18 @@
       <bold>yes</bold>
     </font>
 
+    <font name="status_error" face="Arial">
+      <color>#ff0000</color>
+      <size>16</size>
+      <bold>yes</bold>
+    </font>
+
+    <font name="status_warning" face="Arial">
+      <color>#ff8429</color>
+      <size>16</size>
+      <bold>yes</bold>
+    </font>
+
     <container name="topbar">
       <area>0,0,800,200</area>
       <textarea name="heading" draworder="0">
@@ -78,8 +90,11 @@
        <fcnfont name="status" function="active"></fcnfont>
        <fcnfont name="status" function="inactive"></fcnfont>
        <fcnfont name="status_selected" function="selected"></fcnfont>
-       <column number="1" width="490" context="-1"></column>
+       <fcnfont name="status_error" function="error"></fcnfont>
+       <fcnfont name="status_warning" function="warning"></fcnfont>
+       <column number="1" width="480" context="-1"></column>
        <items>11</items>
+       <image function="selectionbar" filename="status-bar.png" location="-3,-2"></image>
        <image function="uparrow" filename="uparrow.png" location="475,18"></image>
        <image function="downarrow" filename="downarrow.png" location="475,305"></image>
       </listarea>

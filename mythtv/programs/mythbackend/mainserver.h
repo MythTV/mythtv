@@ -49,6 +49,14 @@ class MainServer : public QObject
     void readSocket();
 
   private:
+    typedef struct deletestruct
+    {
+        MainServer *ms;
+        QString chanid;
+        QDateTime starttime;
+        QString filename;
+    } DeleteStruct;
+
     void HandleAnnounce(QStringList &slist, QStringList commands, 
                         RefSocket *socket);
     void HandleDone(QSocket *socket);
@@ -104,8 +112,8 @@ class MainServer : public QObject
 
     bool isRingBufSock(QSocket *sock);
 
-    static void *SpawnDeleteRecordedMarkup(void *param);
-    void DoSpawnDeleteRecordedMarkup(QString chanid, QString startts);
+    static void *SpawnDeleteThread(void *param);
+    void DoDeleteThread(DeleteStruct *ds);
 
     QMap<int, EncoderLink *> *encoderList;
 

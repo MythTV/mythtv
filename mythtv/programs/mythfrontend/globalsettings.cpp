@@ -431,47 +431,6 @@ static BackendComboBox *CommercialSkipMethod()
     return bc;
 }
 
-static BackendComboBox *CommercialSkipCPU()
-{
-    BackendComboBox *bc = new BackendComboBox("CommercialSkipCPU");
-    bc->setLabel(QObject::tr("CPU Usage"));
-    bc->addSelection(QObject::tr("Low"), "0");
-    bc->addSelection(QObject::tr("Medium"), "1");
-    bc->addSelection(QObject::tr("High"), "2");
-    bc->setHelpText(QObject::tr("This setting determines approximately how "
-                    "much CPU Commercial Detection threads will consume. "
-                    "On 'High', all available CPU time will be used "
-                    "which may cause problems on slow systems." ));
-    return bc;
-}
-
-static BackendComboBox *CommercialSkipHost()
-{
-    BackendComboBox *bc = new BackendComboBox("CommercialSkipHost");
-    bc->setLabel(QObject::tr("Commercial Detection Processing Host"));
-
-    bc->addSelection(QObject::tr("Default"), "Default");
-
-    QSqlDatabase *db = QSqlDatabase::database();
-    QString thequery = QString("SELECT DISTINCT hostname from settings");
-    QSqlQuery query = db->exec(thequery);
-
-    if (query.isActive() && query.numRowsAffected() > 0)
-        while (query.next())
-        {
-            if ((query.value(0).toString() != "") &&
-                (query.value(0).toString() != QString::null))
-                bc->addSelection(query.value(0).toString(),
-                                 query.value(0).toString());
-        }
-
-    bc->setHelpText(QObject::tr("Select 'Default' to run Commercial "
-                    "Detection on the same backend which created a "
-                    "recording, or select a hostname to run all detection "
-                    "jobs on a specific host."));
-    return bc;
-}
-
 static GenericComboBox *AutoCommercialSkip()
 {
     GenericComboBox *gc = new GenericComboBox("AutoCommercialSkip");
@@ -2502,22 +2461,16 @@ PlaybackSettings::PlaybackSettings()
     addChild(seek);
 
     VerticalConfigurationGroup* comms = new VerticalConfigurationGroup(false);
-    comms->setLabel(QObject::tr("Commercial Detection"));
+    comms->setLabel(QObject::tr("Commercial Skip"));
     comms->addChild(AutoCommercialFlag());
     comms->addChild(CommercialSkipMethod());
-    comms->addChild(CommercialSkipCPU());
-    comms->addChild(CommercialSkipHost());
     comms->addChild(AggressiveCommDetect());
+    comms->addChild(CommSkipAllBlanks());
+    comms->addChild(CommRewindAmount());
+    comms->addChild(CommNotifyAmount());
+    comms->addChild(AutoCommercialSkip());
+    comms->addChild(TryUnflaggedSkip());
     addChild(comms);
-
-    VerticalConfigurationGroup* comms2 = new VerticalConfigurationGroup(false);
-    comms2->setLabel(QObject::tr("Commercial Detection (Playback)"));
-    comms2->addChild(CommSkipAllBlanks());
-    comms2->addChild(CommRewindAmount());
-    comms2->addChild(CommNotifyAmount());
-    comms2->addChild(AutoCommercialSkip());
-    comms2->addChild(TryUnflaggedSkip());
-    addChild(comms2);
 
     VerticalConfigurationGroup* oscan = new VerticalConfigurationGroup(false);
     oscan->setLabel(QObject::tr("Overscan"));

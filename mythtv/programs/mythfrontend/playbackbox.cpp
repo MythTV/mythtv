@@ -32,6 +32,7 @@ using namespace std;
 #include "programinfo.h"
 #include "scheduledrecording.h"
 #include "remoteutil.h"
+#include "jobqueue.h"
 
 PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent, 
                          const char *name)
@@ -1800,17 +1801,13 @@ void PlaybackBox::doBeginFlagging()
     QSqlDatabase *db = QSqlDatabase::database();
 
     ProgramInfo *tmpItem = findMatchingProg(curitem);
-    QString detectionHost = gContext->GetSetting("CommercialSkipHost");
-
-    if (detectionHost == "Default")
-        detectionHost = "master";
 
     if (curitem->IsCommProcessing(db))
     {
-        message = QString("GLOBAL_COMMFLAG STOP %1 %2 %3")
-                          .arg(curitem->chanid)
-                          .arg(curitem->startts.toString(Qt::ISODate))
-                          .arg(detectionHost);
+        int jobID = JobQueue::GetJobID(db, JOB_COMMFLAG, curitem->chanid,
+                                       curitem->startts);
+        JobQueue::StopJob(db, jobID);
+
         if (tmpItem)
         {
             tmpItem->programflags &= ~FL_EDITING;
@@ -1819,18 +1816,20 @@ void PlaybackBox::doBeginFlagging()
     }
     else
     {
-        message = QString("GLOBAL_COMMFLAG START %1 %2 %3")
-                          .arg(curitem->chanid)
-                          .arg(curitem->startts.toString(Qt::ISODate))
-                          .arg(detectionHost);
+        QString jobHost = "";
+
+        if (gContext->GetNumSetting("JobsRunOnRecordHost", 0))
+            jobHost = tmpItem->hostname;
+
+        JobQueue::QueueJob(db, JOB_COMMFLAG, curitem->chanid, curitem->startts,
+                           jobHost);
+
         if (tmpItem)
         {
             tmpItem->programflags |= FL_EDITING;
             tmpItem->programflags &= ~FL_COMMFLAG;
         }
     }
-
-    RemoteSendMessage(message);
 
     update(listRect);
 }

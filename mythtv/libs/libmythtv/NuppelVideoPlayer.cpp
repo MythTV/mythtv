@@ -31,6 +31,7 @@ using namespace std;
 #include "decoderbase.h"
 #include "nuppeldecoder.h"
 #include "avformatdecoder.h"
+#include "jobqueue.h"
 
 extern "C" {
 #include "vbitext/vbi.h"
@@ -3141,10 +3142,13 @@ bool NuppelVideoPlayer::LastFrameIsBlank(void)
 }
 
 int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
-                                       bool *abortFlag)
+                                       int *controlFlag)
 {
     int comms_found = 0;
     int percentage = 0;
+    int jobID = -1;
+    bool flaggingPaused = false;
+    int flagFPS;
 
     killplayer = false;
     framesPlayed = 0;
@@ -3190,47 +3194,96 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
             printf( "%6lld", 0LL );
     }
 
+    if (!showPercentage)
+    {
+        m_db->lock();
+        jobID = JobQueue::GetJobID(m_db->db(), JOB_COMMFLAG,
+                                  m_playbackinfo->chanid,
+                                  m_playbackinfo->startts);
+        JobQueue::ChangeJobStatus(m_db->db(), jobID, JOB_RUNNING,
+                                  "0% " + QObject::tr("Completed"));
+        m_db->unlock();
+    }
+
     while (!eof)
     {
-        if (abortFlag && *abortFlag)
+        if (controlFlag && *controlFlag)
         {
-            playing = false;
-            killplayer = true;
+            if (*controlFlag == JOB_STOP)
+            {
+                playing = false;
+                killplayer = true;
 
+                m_db->lock();
+                m_playbackinfo->SetCommFlagged(COMM_FLAG_NOT_FLAGGED, m_db->db());
+                m_db->unlock();
+
+                return(0);
+            }
+            else if (*controlFlag == JOB_PAUSE)
+            {
+                if (!flaggingPaused)
+                {
+                    m_db->lock();
+                    JobQueue::ChangeJobStatus(m_db->db(), jobID, JOB_PAUSED,
+                                              QObject::tr("Paused"));
+                    m_db->unlock();
+
+                    flaggingPaused = true;
+                }
+                sleep(1);
+                continue;
+            }
+        }
+
+        if (flaggingPaused)
+        {
             m_db->lock();
-            m_playbackinfo->SetCommFlagged(COMM_FLAG_NOT_FLAGGED, m_db->db());
+            JobQueue::ChangeJobStatus(m_db->db(), jobID, JOB_RUNNING,
+                                      QObject::tr("Restarting"));
+            JobQueue::ChangeJobFlags(m_db->db(), jobID, JOB_RUN);
             m_db->unlock();
 
-            return(0);
+            flaggingPaused = false;
         }
 
         // sleep a little so we don't use all cpu even if we're niced
         if (!fullSpeed)
             usleep(10000);
 
-        if ((showPercentage) &&
-            ((framesPlayed % 50) == 0))
+
+        if ((framesPlayed % 100) == 0)
         {
-            if (totalFrames)
+            percentage = framesPlayed * 100 / totalFrames;
+            if (showPercentage)
             {
-                int flagFPS;
-                float elapsed = flagTime.elapsed() / 1000.0;
+                if (totalFrames)
+                {
+                    float elapsed = flagTime.elapsed() / 1000.0;
 
-                if (elapsed)
-                    flagFPS = (int)(framesPlayed / elapsed);
+                    if (elapsed)
+                        flagFPS = (int)(framesPlayed / elapsed);
+                    else
+                        flagFPS = 0;
+
+                    printf( "\b\b\b\b\b\b\b\b\b\b\b" );
+                    printf( "%3d%%/%3dfps", percentage, flagFPS );
+                }
                 else
-                    flagFPS = 0;
-
-                percentage = framesPlayed * 100 / totalFrames;
-                printf( "\b\b\b\b\b\b\b\b\b\b\b" );
-                printf( "%3d%%/%3dfps", percentage, flagFPS );
+                {
+                    printf( "\b\b\b\b\b\b" );
+                    printf( "%6lld", framesPlayed );
+                }
+                fflush( stdout );
             }
             else
             {
-                printf( "\b\b\b\b\b\b" );
-                printf( "%6lld", framesPlayed );
+                m_db->lock();
+                JobQueue::ChangeJobComment(m_db->db(), jobID,
+                                          QString("%1% ").arg(percentage) + 
+                                          QObject::tr("Completed"));
+                m_db->unlock();
             }
-            fflush( stdout );
         }
 
         commDetect->ProcessNextFrame(videoOutput->GetLastDecodedFrame(),
@@ -3278,6 +3331,22 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
         decoder->SetPositionMap();
 
     m_playbackinfo->SetCommFlagged(COMM_FLAG_DONE, m_db->db());
+
+    if (!showPercentage)
+    {
+        int fps = 0;
+        float elapsed = flagTime.elapsed() / 1000.0;
+
+        if (elapsed)
+            fps = (int)(totalFrames / elapsed);
+
+        JobQueue::ChangeJobStatus(m_db->db(), jobID, JOB_STOPPING,
+                                  QString("100% ") +
+                                  QObject::tr("Completed, %1 FPS").arg(fps) +
+                                  ", " + QString("%1").arg(comms_found) + " " +
+                                  QObject::tr("Commercial Breaks Found"));
+    }
+
     m_db->unlock();
 
     return(comms_found);

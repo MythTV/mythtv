@@ -109,8 +109,7 @@ void FlagCommercials(QSqlDatabase *db, QString chanid, QString starttime)
             return;
     }
 
-    filename = program_info->GetRecordFilename(
-                            gContext->GetSetting("RecordFilePrefix"));
+    filename = program_info->GetPlaybackURL();
 
     if (testmode)
     {

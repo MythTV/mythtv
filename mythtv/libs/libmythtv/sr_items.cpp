@@ -63,6 +63,31 @@ void SRSchedOptionsGroup::setEnabled(bool isScheduled, bool multiEpisode)
 }
 
 
+SRJobQueueGroup::SRJobQueueGroup(ScheduledRecording& _rec, ManagedList* _parentList, ManagedListGroup* _group,
+                                             QObject* _parent)
+                     : ManagedListGroup(QObject::tr("Post Recording Processing"), _group, _parentList,
+                                        _parent, "postProcessing"),
+                       schedRec(_rec)
+{
+    autoTranscode = new SRAutoTranscode(_rec, _parentList, this);
+//    addItem(autoTranscode->getItem(), -1);
+
+    autoCommFlag = new SRAutoCommFlag(_rec, _parentList, this);
+    addItem(autoCommFlag->getItem(), -1);
+
+    autoUserJob1 = new SRAutoUserJob1(_rec, _parentList, this);
+    addItem(autoUserJob1->getItem(), -1);
+
+    autoUserJob2 = new SRAutoUserJob2(_rec, _parentList, this);
+    addItem(autoUserJob2->getItem(), -1);
+
+    autoUserJob3 = new SRAutoUserJob3(_rec, _parentList, this);
+    addItem(autoUserJob3->getItem(), -1);
+
+    autoUserJob4 = new SRAutoUserJob4(_rec, _parentList, this);
+    addItem(autoUserJob4->getItem(), -1);
+}
+
 SRStorageOptionsGroup::SRStorageOptionsGroup(ScheduledRecording& _rec, ManagedList* _parentList, 
                                              ManagedListGroup* _group, QObject* _parent)
                      : ManagedListGroup(QObject::tr("Storage Options"), _group, _parentList,

@@ -24,6 +24,7 @@ using namespace std;
 #include "NuppelVideoPlayer.h"
 #include "channel.h"
 #include "mythdbcon.h"
+#include "jobqueue.h"
 #include "scheduledrecording.h"
 
 #ifdef USING_IVTV
@@ -715,21 +716,30 @@ void TVRec::TeardownRecorder(bool killFile)
 
         if (!prematurelystopped)
         {
-            if ((gContext->GetNumSetting("AutoCommercialFlag", 1)) &&
-                (prevRecording->chancommfree == 0))
+            int jobTypes;
+
+            pthread_mutex_lock(&db_lock);
+            jobTypes = prevRecording->GetAutoRunJobs(db_conn);
+            pthread_mutex_unlock(&db_lock);
+
+            if (prevRecording->chancommfree)
+                jobTypes = jobTypes & (~JOB_COMMFLAG);
+
+//            if (autoTranscode)
+//                jobTypes |= JOB_TRANSCODE;
+
+            if (jobTypes)
             {
-                QString detectionHost =
-                            gContext->GetSetting("CommercialSkipHost");
+                QString jobHost = "";
 
-                if (detectionHost == "Default")
-                    detectionHost = gContext->GetHostName();
+                if (gContext->GetNumSetting("JobsRunOnRecordHost", 0))
+                    jobHost = gContext->GetHostName();
 
-                QString message = QString("GLOBAL_COMMFLAG START %1 %2 %3")
-                           .arg(prevRecording->chanid)
-                           .arg(prevRecording->recstartts.toString(Qt::ISODate))
-                           .arg(detectionHost);
-                MythEvent me(message);
-                gContext->dispatch(me);
+                pthread_mutex_lock(&db_lock);
+                JobQueue::QueueJobs(db_conn, jobTypes,
+                                    prevRecording->chanid,
+                                    prevRecording->recstartts, jobHost);
+                pthread_mutex_unlock(&db_lock);
             }
 
             if (autoTranscode)

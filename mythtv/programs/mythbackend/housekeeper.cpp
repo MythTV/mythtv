@@ -13,6 +13,7 @@
 using namespace std;
 
 #include "housekeeper.h"
+#include "jobqueue.h"
 
 #include "libmyth/mythcontext.h"
 
@@ -100,6 +101,7 @@ void HouseKeeper::updateLastrun(const QString &dbTag)
 void HouseKeeper::RunHouseKeeping(void)
 {
     int period, maxhr, minhr;
+    QString dbTag;
     // wait a little for main server to come up and things to settle down
     sleep(10);
 
@@ -107,6 +109,7 @@ void HouseKeeper::RunHouseKeeping(void)
     {
         gContext->LogEntry("mythbackend", LP_DEBUG,
                            "Running housekeeping thread", "");
+
         // These tasks are only done from the master backend
         if (isMaster)
         {
@@ -155,8 +158,15 @@ void HouseKeeper::RunHouseKeeping(void)
                     }
                 }
             }
+
+            if (wantToRun("JobQueueCleanup", 1, 0, 24))
+                JobQueue::CleanupOldJobsInQueue(db);
         }
-    
+
+        dbTag = QString("JobQueueRecover-%1").arg(gContext->GetHostName());
+        if (wantToRun(dbTag, 1, 0, 24))
+            JobQueue::RecoverOldJobsInQueue(db);
+
         sleep(300);
     }
 } 

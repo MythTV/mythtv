@@ -53,7 +53,7 @@ enum FlagMask {
     FL_CUTLIST   = 0x02,
     FL_AUTOEXP   = 0x04,
     FL_EDITING   = 0x08,
-    FL_BOOKMARK  = 0x10,
+    FL_BOOKMARK  = 0x10
 };
 
 enum RecStatusType {
@@ -133,6 +133,7 @@ class ProgramInfo
 
     QString GetRecordBasename(void);
     QString GetRecordFilename(const QString &prefix);
+    QString GetPlaybackURL(QString playbackHost = "");
 
     QString MakeUniqueKey(void) const;
 
@@ -155,6 +156,8 @@ class ProgramInfo
     bool IsCommProcessing(QSqlDatabase *db);
     void SetAutoExpire(bool autoExpire, QSqlDatabase *db);
     bool GetAutoExpireFromRecorded(QSqlDatabase *db);
+
+    int GetAutoRunJobs(QSqlDatabase *db);
 
     void GetCutList(QMap<long long, int> &delMap, QSqlDatabase *db);
     void SetCutList(QMap<long long, int> &delMap, QSqlDatabase *db);

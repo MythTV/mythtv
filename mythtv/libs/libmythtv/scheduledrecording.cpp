@@ -6,6 +6,7 @@
 #include "sr_items.h"
 #include "sr_root.h"
 #include "sr_dialog.h"
+#include "jobqueue.h"
 
 #include <qlayout.h>
 #include <qlabel.h>
@@ -24,6 +25,12 @@ ScheduledRecording::ScheduledRecording()
     dupin = NULL;
     dupmethod = NULL;
     autoexpire = NULL;
+    autotranscode = NULL;
+    autocommflag = NULL;
+    autouserjob1 = NULL;
+    autouserjob2 = NULL;
+    autouserjob3 = NULL;
+    autouserjob4 = NULL;
     startoffset = NULL;
     endoffset = NULL;
     maxepisodes = NULL;
@@ -292,6 +299,25 @@ bool ScheduledRecording::GetAutoExpire(void) const {
 
 void ScheduledRecording::SetAutoExpire(bool expire) {
     autoexpire->setValue(expire);
+}
+
+int ScheduledRecording::GetAutoRunJobs(void) const {
+    int result = 0;
+
+    if (autotranscode->getValue().toInt())
+        result |= JOB_TRANSCODE;
+    if (autocommflag->getValue().toInt())
+        result |= JOB_COMMFLAG;
+    if (autouserjob1->getValue().toInt())
+        result |= JOB_USERJOB1;
+    if (autouserjob2->getValue().toInt())
+        result |= JOB_USERJOB2;
+    if (autouserjob3->getValue().toInt())
+        result |= JOB_USERJOB3;
+    if (autouserjob4->getValue().toInt())
+        result |= JOB_USERJOB4;
+
+    return result;
 }
 
 int ScheduledRecording::GetMaxEpisodes(void) const {
@@ -654,6 +680,14 @@ void ScheduledRecording::setDefault(QSqlDatabase *db, bool haschannel)
     
     autoexpire->setValue(gContext->GetNumSetting("AutoExpireDefault", 0));
 
+    autotranscode->setValue(0);
+    autocommflag->setValue(gContext->GetNumSetting("AutoCommercialFlag", 1));
+
+    autouserjob1->setValue(0);
+    autouserjob2->setValue(0);
+    autouserjob3->setValue(0);
+    autouserjob4->setValue(0);
+
     recgroup->fillSelections(db);    
     recgroup->setValue("Default");
 }
@@ -694,6 +728,12 @@ void ScheduledRecording::makeOverride(void)
     dupin->setChanged();
     dupmethod->setChanged();
     autoexpire->setChanged();
+    autotranscode->setChanged();
+    autocommflag->setChanged();
+    autouserjob1->setChanged();
+    autouserjob2->setChanged();
+    autouserjob3->setChanged();
+    autouserjob4->setChanged();
     maxepisodes->setChanged();
     maxnewest->setChanged();
     startoffset->setChanged();

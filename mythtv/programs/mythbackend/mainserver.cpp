@@ -34,6 +34,7 @@ using namespace std;
 #include "scheduler.h"
 #include "httpstatus.h"
 #include "programinfo.h"
+#include "jobqueue.h"
 
 class ProcessRequestThread : public QThread
 {
@@ -942,84 +943,103 @@ void MainServer::HandleQueueTranscode(QStringList &slist, PlaybackSock *pbs,
     return;
 }
 
-struct DeleteStruct
-{
-    QString filename;
-};
-
-static void *SpawnDelete(void *param)
+void *MainServer::SpawnDeleteThread(void *param)
 {
     DeleteStruct *ds = (DeleteStruct *)param;
-    QString filename = ds->filename;
 
-    unlink(filename.ascii());
-    
-    filename += ".png";
-    unlink(filename.ascii());
-    
-    filename = ds->filename;
-    filename += ".bookmark";
-    unlink(filename.ascii());
-    
-    filename = ds->filename;
-    filename += ".cutlist";
-    unlink(filename.ascii());
-
-    sleep(2);
-
-    MythEvent me("RECORDING_LIST_CHANGE");
-    gContext->dispatch(me);
-
-    delete ds;
-
-    return NULL;
-}
-
-struct DeleteRecordedMarkupStruct
-{
-    MainServer *ms;
-    QString chanid;
-    QString startts;
-};
-
-void *MainServer::SpawnDeleteRecordedMarkup(void *param)
-{
-    DeleteRecordedMarkupStruct *ds = (DeleteRecordedMarkupStruct *)param;
     MainServer *ms = ds->ms;
-    ms->DoSpawnDeleteRecordedMarkup(ds->chanid, ds->startts);
+    ms->DoDeleteThread(ds);
 
     delete ds;
 
     return NULL;
 }
 
-void MainServer::DoSpawnDeleteRecordedMarkup(QString chanid, QString startts)
+void MainServer::DoDeleteThread(DeleteStruct *ds)
 {
-    QString name = QString("recmarkup%1%2").arg(getpid()).arg(rand());
+    QString logInfo = QString("chanid %1 at %2")
+                              .arg(ds->chanid).arg(ds->starttime.toString());
+                             
+    QString name = QString("deleteThread%1%2").arg(getpid()).arg(rand());
+    MythSqlDatabase *delete_db = new MythSqlDatabase(name);
+    QSqlDatabase *db = NULL;
 
-    MythSqlDatabase *recmarkup_db = new MythSqlDatabase(name);
-
-    QString thequery = QString("DELETE FROM recordedmarkup WHERE chanid = %1 "
-                               "AND starttime = %2;")
-                              .arg(chanid).arg(startts);
-
-    if (!recmarkup_db || !recmarkup_db->isOpen())
+    if (!delete_db || !delete_db->isOpen())
     {
-        QString msg = QString("ERROR deleting recordedmarkup for chanid "
-                              "%1 recorded at %2, unable to open DB "
-                              "connection.")
-                              .arg(chanid).arg(startts);
+        QString msg = QString("ERROR opening database connection for Delete "
+                              "Thread for chanid %1 recorded at %2.")
+                              .arg(ds->chanid).arg(ds->starttime.toString());
         VERBOSE(VB_GENERAL, msg);
-        return;
+        gContext->LogEntry("mythbackend", LP_ERROR, "Delete Recording",
+                           QString("Unable to open database connection for %1.")
+                                   .arg(logInfo));
+        delete_db = NULL;
+    }
+    else
+    {
+        db = delete_db->db();
+    }
+    QSqlQuery query(QString::null, db);
+
+    if (db)
+        JobQueue::DeleteAllJobs(db, ds->chanid, ds->starttime);
+
+
+    // Take care of deleting any related files
+    QFile checkFile(ds->filename);
+
+    if (checkFile.exists())
+    {
+        QString filename;
+
+        filename = ds->filename;
+        unlink(filename.ascii());
+    
+        filename = ds->filename + ".png";
+        unlink(filename.ascii());
+    
+        filename = ds->filename + ".bookmark";
+        unlink(filename.ascii());
+    
+        filename = ds->filename + ".cutlist";
+        unlink(filename.ascii());
+
+        sleep(2);
+
+        // Notify the frontend so it can requery for Free Space
+        MythEvent me("RECORDING_LIST_CHANGE");
+        gContext->dispatch(me);
+    }
+    else
+    {
+        VERBOSE(VB_ALL, QString("Strange, file: %1 doesn't exist.")
+                                .arg(ds->filename));
+        gContext->LogEntry("mythbackend", LP_WARNING, "Delete Recording",
+                           QString("File %1 does not exist for %2.")
+                                   .arg(ds->filename).arg(logInfo));
     }
 
-    QSqlDatabase *db = recmarkup_db->db();
+    if (db)
+    {
+        query.prepare("DELETE FROM recordedmarkup "
+                      "WHERE chanid = :CHANID AND starttime = :STARTTIME;");
+        query.bindValue(":CHANID", ds->chanid);
+        query.bindValue(":STARTTIME", ds->starttime);
 
-    QSqlQuery query = db->exec(thequery);
-    if (!query.isActive())
-        MythContext::DBError("Recorded program deletion (2)", query);
+        query.exec();
 
-    delete recmarkup_db;
+        if (!query.isActive())
+        {
+            MythContext::DBError("Recorded program delete recordedmarkup",
+                                 query);
+            gContext->LogEntry("mythbackend", LP_ERROR, "Delete Recording",
+                               QString("Error deleting recordedmarkup for %1.")
+                                       .arg(logInfo));
+        }
+    }
+
+    if (delete_db)
+        delete delete_db;
 }
 
 void MainServer::HandleCheckRecordingActive(QStringList &slist, 
@@ -1218,12 +1238,28 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
         SendResponse(pbssock, outputlist);
     }
 
-    QString message = QString("GLOBAL_COMMFLAG START %1 %2 %3")
-                              .arg(pginfo->chanid)
-                              .arg(pginfo->startts.toString(Qt::ISODate))
-                              .arg(gContext->GetHostName());
-    MythEvent me(message);
-    gContext->dispatch(me);
+    int jobTypes;
+
+    dblock.lock();
+    jobTypes = pginfo->GetAutoRunJobs(m_db);
+
+    if (pginfo->chancommfree)
+        jobTypes = jobTypes & (~JOB_COMMFLAG);
+
+//    if (autoTranscode)
+//        jobTypes |= JOB_TRANSCODE;
+
+    if (jobTypes)
+    {
+        QString jobHost = "";
+
+        if (gContext->GetNumSetting("JobsRunOnRecordHost", 0))
+            jobHost = pginfo->hostname;
+
+        JobQueue::QueueJobs(m_db, jobTypes, pginfo->chanid,
+                            pginfo->recstartts, jobHost);
+    }
+    dblock.unlock();
 
     delete pginfo;
 }
@@ -1308,22 +1344,6 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
 
     MythContext::KickDatabase(m_db);
 
-    if (pginfo->IsCommProcessing(m_db))
-    {
-        QString message = QString("GLOBAL_COMMFLAG STOP %1 %2 master")
-                                 .arg(pginfo->chanid)
-                                 .arg(pginfo->recstartts.toString(Qt::ISODate));
-        MythEvent me(message);
-        gContext->dispatch(me);
-
-        int loop = 0;
-        while ((pginfo->IsCommProcessing(m_db)) && loop < 20)
-        {
-            usleep(100000);
-            loop++;
-        }
-    }
-
     QSqlQuery query(QString::null, m_db);
     query.prepare("DELETE FROM recorded WHERE chanid = :CHANID AND "
                   "title = :TITLE AND starttime = :STARTTIME AND "
@@ -1340,55 +1360,34 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
 
     dblock.unlock();
 
-    DeleteRecordedMarkupStruct *ds = new DeleteRecordedMarkupStruct;
-    ds->chanid = pginfo->chanid;
-    ds->startts = startts;
-    ds->ms = this;
+    QString fileprefix = gContext->GetFilePrefix();
+    QString filename = pginfo->GetRecordFilename(fileprefix);
+    QFile checkFile(filename);
+    bool fileExists = checkFile.exists();
 
-    pthread_t deleterecordedmarkupthread;
+    DeleteStruct *ds = new DeleteStruct;
+    ds->ms = this;
+    ds->filename = filename;
+    ds->chanid = pginfo->chanid;
+    ds->starttime = pginfo->recstartts;
+
+    pthread_t deleteThread;
     pthread_attr_t attr;
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 
-    pthread_create(&deleterecordedmarkupthread, &attr,
-                   SpawnDeleteRecordedMarkup, ds);
-
-    QString fileprefix = gContext->GetFilePrefix();
-    QString filename = pginfo->GetRecordFilename(fileprefix);
-    QFile checkFile(filename);
-
-    if (checkFile.exists())
-    {
-        DeleteStruct *ds = new DeleteStruct;
-        ds->filename = filename;
-
-        pthread_t deletethread;
-        pthread_attr_t attr;
-        pthread_attr_init(&attr);
-        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-
-        pthread_create(&deletethread, &attr, SpawnDelete, ds);
-    }
-    else
-    {
-        VERBOSE(VB_ALL, QString("Strange, file: %1 doesn't exist.")
-                               .arg(filename));
-
-        if (pbssock)
-        {
-            QStringList outputlist;
-            outputlist << "BAD: Tried to delete a file that was in "
-                          "the database but wasn't on the disk.";
-            SendResponse(pbssock, outputlist);
-
-            delete pginfo;
-            return;
-        }
-    }
+    pthread_create(&deleteThread, &attr, SpawnDeleteThread, ds);
 
     if (pbssock)
     {
-        QStringList outputlist = QString::number(recnum);
+        QStringList outputlist;
+
+        if (fileExists)
+            outputlist = QString::number(recnum);
+        else
+            outputlist << "BAD: Tried to delete a file that was in "
+                          "the database but wasn't on the disk.";
+
         SendResponse(pbssock, outputlist);
     }
 
@@ -3274,6 +3273,144 @@ void MainServer::PrintStatus(QSocket *socket)
        }
        os  << "    </div>\r\n";
    }
+
+    os << "  </div>\r\n\r\n"
+       << "  <div class=\"content\">\r\n"
+       << "    <h2>Job Queue</h2>\r\n";
+
+    // Job Queue Entries -----------------
+    QMap<int, JobQueueEntry> jobs;
+    QMap<int, JobQueueEntry>::Iterator it;
+    dblock.lock();
+    JobQueue::GetJobsInQueue(m_db, jobs,
+                             JOB_LIST_NOT_DONE | JOB_LIST_ERROR |
+                             JOB_LIST_RECENT);
+    dblock.unlock();
+
+    if (jobs.size())
+    {
+        QString lastchanid = "";
+        QDateTime laststarttime = QDateTime::currentDateTime();
+        QString timeDateFormat;
+        QString indent = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+
+        timeDateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d") +
+                         " " + gContext->GetSetting("TimeFormat", "h:mm AP");
+
+
+        os << "    Jobs currently in Queue or recently ended:\r\n<br />"
+           << "<table border=0 cellpadding=0 cellspacing=6>\r\n"
+           << "<tr>"
+           << "<th align=left colspan=3>Title/Subtitle</th>"
+           << "<th align=left>Channel</th>"
+           << "<th align=left>Program StartTime</th></tr>\r\n"
+           << "<tr>"
+           << "<th align=left>" << indent << "Job</th>"
+           << "<th align=left>Host</th>"
+           << "<th align=left>Status</th>"
+           << "<th align=left>Status Time</th>"
+           << "<th align=left>Comment</th></tr>"
+           << "\r\n";
+
+        os << "<tr><td colspan=5 bgcolor=#000000 height=3></td></tr>\r\n";
+
+        for (it = jobs.begin(); it != jobs.end(); ++it)
+        {
+            bool sameRecording = false;
+            QString chanid = it.data().chanid;
+            QDateTime starttime = it.data().starttime;
+            ProgramInfo *pginfo;
+
+            dblock.lock();
+            pginfo = ProgramInfo::GetProgramFromRecorded(m_db, chanid,
+                                                         starttime);
+            dblock.unlock();
+
+            if (!pginfo)
+                continue;
+
+           QString qstrTitle = pginfo->title.replace(QRegExp("\""), 
+                                                        "&quot;");
+           QString qstrSubtitle = pginfo->subtitle.replace(
+                                                 QRegExp("\""), "&quot;");
+            if ((lastchanid != chanid) ||
+                (laststarttime != starttime))
+            {
+                if (lastchanid != "")
+                    os << "<tr><td colspan=5 bgcolor=#999999 height=1></td>"
+                          "</tr>\r\n";
+
+                os << "<tr><td colspan=3 valign=top>" << qstrTitle;
+
+                if (qstrSubtitle != "")
+                    os << "<br>" << indent << "&quot;" << qstrSubtitle
+                       << "&quot;";
+
+                os << "</td>"
+                   << "<td valign=top>" << pginfo->channame << " "
+                      << pginfo->chanstr
+                      << "</td>"
+                   << "<td valign=top>" << starttime.toString(timeDateFormat)
+                   << "</td>"
+                   << "</tr>\r\n";
+
+                sameRecording = true;
+            }
+
+            dblock.lock();
+            os << "<tr><td valign=top>" << indent
+                  << JobQueue::JobText(it.data().type) << "</td>";
+            dblock.unlock();
+
+            if (it.data().status != JOB_QUEUED)
+            {
+                os << "<td valign=top>";
+                if (it.data().hostname == "")
+                    os << QObject::tr("master");
+                else
+                    os << it.data().hostname;
+                os << "</td>";
+            }
+            else
+            {
+                os << "<td>&nbsp;</td>";
+            }
+
+            os << "<td valign=top><b>";
+
+            if (it.data().status == JOB_ABORTED)
+                os << "<font color='#ff8429'>";
+            else if (it.data().status == JOB_ERRORED)
+                os << "<font color='#ff0000'>";
+            else if (it.data().status == JOB_FINISHED)
+                os << "<font color='#0000ff'>";
+            else
+                os << "<font color='#000000'>";
+
+            os << JobQueue::StatusText(it.data().status);
+
+            os << "</font></b></td>"
+               << "<td valign=top>"
+                  << it.data().statustime.toString(timeDateFormat)
+                  << "</td>";
+
+            if (it.data().comment != "")
+            {
+                os << "<td valign=top>" << it.data().comment << "</td>";
+            }
+            os << "</tr>\r\n";
+
+            lastchanid = chanid;
+            laststarttime = starttime;
+
+            delete pginfo;
+        }
+        os << "</table>\r\n\r\n";
+    }
+    else
+    {
+        os << "    Job Queue is currently empty.\r\n\r\n";
+    }
 
     os << "  </div>\r\n\r\n  <div class=\"content\">\r\n"
        << "    <h2>Machine information</h2>\r\n"

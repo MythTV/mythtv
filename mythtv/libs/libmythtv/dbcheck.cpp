@@ -8,7 +8,7 @@ using namespace std;
 
 #include "mythcontext.h"
 
-const QString currentDatabaseVersion = "1056";
+const QString currentDatabaseVersion = "1057";
 
 void UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -1003,6 +1003,45 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 ""
 };
         performActualUpdate(updates, "1056", dbver);
+    }
+
+    if (dbver == "1056")
+    {
+        const QString updates[] = {
+"CREATE TABLE jobqueue ("
+"    id INTEGER NOT NULL AUTO_INCREMENT,"
+"    chanid INTEGER(10) NOT NULL,"
+"    starttime DATETIME NOT NULL,"
+"    inserttime DATETIME NOT NULL,"
+"    type INTEGER NOT NULL,"
+"    cmds INTEGER NOT NULL DEFAULT 0,"
+"    flags INTEGER NOT NULL DEFAULT 0,"
+"    status INTEGER NOT NULL DEFAULT 0,"
+"    statustime TIMESTAMP NOT NULL,"
+"    hostname VARCHAR(255) NOT NULL DEFAULT '',"
+"    args BLOB NOT NULL DEFAULT '',"
+"    comment VARCHAR(128) NOT NULL DEFAULT '',"
+"    PRIMARY KEY(id),"
+"    UNIQUE(chanid, starttime, type, inserttime)"
+");",
+"ALTER TABLE record ADD COLUMN autotranscode TINYINT(1) NOT NULL DEFAULT 0;",
+"ALTER TABLE record ADD COLUMN autocommflag TINYINT(1) NOT NULL DEFAULT 0;",
+"ALTER TABLE record ADD COLUMN autouserjob1 TINYINT(1) NOT NULL DEFAULT 0;",
+"ALTER TABLE record ADD COLUMN autouserjob2 TINYINT(1) NOT NULL DEFAULT 0;",
+"ALTER TABLE record ADD COLUMN autouserjob3 TINYINT(1) NOT NULL DEFAULT 0;",
+"ALTER TABLE record ADD COLUMN autouserjob4 TINYINT(1) NOT NULL DEFAULT 0;",
+""
+};
+        performActualUpdate(updates, "1057", dbver);
+
+        if (gContext->GetNumSetting("AutoCommercialFlag", 1))
+        {
+            QSqlDatabase *db = QSqlDatabase::database();
+
+            QSqlQuery query(QString::null, db);
+            query.prepare("UPDATE record SET autocommflag = 1;");
+            query.exec();
+        }
     }
 }
 

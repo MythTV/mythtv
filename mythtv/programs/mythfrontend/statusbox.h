@@ -30,6 +30,7 @@ class StatusBox : public MythDialog
     void doTunerStatus();
     void doDVBStatus();
     void doLogEntries();
+    void doJobQueueStatus();
     void clicked();
     void setHelpText();
 
@@ -52,6 +53,7 @@ class StatusBox : public MythDialog
 
     QMap<int, QString> contentLines;
     QMap<int, QString> contentDetail;
+    QMap<int, QString> contentFont;
     QMap<int, QString> contentData;
 
     MythMainWindow *my_parent;

@@ -21,6 +21,9 @@ RootSRGroup::RootSRGroup(ScheduledRecording& _rec,ManagedList* _parentList, QObj
     storageOptions = new SRStorageOptionsGroup(_rec, _parentList, this, this);
     addItem(storageOptions, -1);
 
+    jobQueue = new SRJobQueueGroup(_rec, _parentList, this, this);
+    addItem(jobQueue, -1);
+
     detailsButton = new ManagedListItem(QObject::tr("Program details"),
                                          _parentList, this, "showDetails");
     addItem(detailsButton, -1);
@@ -83,4 +86,5 @@ void RootSRGroup::itemChanged(ManagedListItem*)
 
     schedOptions->setEnabled(isScheduled, multiEpisode);
     storageOptions->setEnabled(isScheduled, multiEpisode);
+    jobQueue->setEnabled(isScheduled);
 }

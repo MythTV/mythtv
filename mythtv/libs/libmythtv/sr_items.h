@@ -327,6 +327,26 @@ class SRSchedOptionsGroup : public ManagedListGroup
         ScheduledRecording& schedRec;
 };
 
+class SRJobQueueGroup : public ManagedListGroup
+{
+    Q_OBJECT
+    
+    public:
+        SRJobQueueGroup(ScheduledRecording& _rec, ManagedList* _list, ManagedListGroup* _group, QObject* _parent);
+        
+    protected:
+
+        friend class SRRootGroup;
+        class SRAutoTranscode* autoTranscode;
+        class SRAutoCommFlag* autoCommFlag;
+        class SRAutoUserJob1* autoUserJob1;
+        class SRAutoUserJob2* autoUserJob2;
+        class SRAutoUserJob3* autoUserJob3;
+        class SRAutoUserJob4* autoUserJob4;
+
+        ScheduledRecording& schedRec;
+};
+
 
 class SRStorageOptionsGroup : public ManagedListGroup
 {
@@ -469,6 +489,94 @@ class SRProgramid: public LineEditSetting, public SimpleSRSetting
         {
             setVisible(false);
         };
+};
+
+class SRAutoTranscode: public SRSelectSetting 
+{
+    public:
+        SRAutoTranscode(ScheduledRecording& _parent, ManagedList* _list, ManagedListGroup* _group)
+            : SRSelectSetting(_parent, "autoTranscodeList", "[ Automatically Transcode ]", _group, 
+                              "autotranscode", _list) 
+        {
+            addSelection("Transcode new recordings", 1);
+            addSelection("Do not Transcode new recordings", 0);
+            setValue(0);
+            _parent.setAutoTranscodeObj(this);
+        }
+};
+
+class SRAutoCommFlag: public SRSelectSetting 
+{
+    public:
+        SRAutoCommFlag(ScheduledRecording& _parent, ManagedList* _list, ManagedListGroup* _group)
+            : SRSelectSetting(_parent, "autoCommFlagList", "[ Automatically Commercial Flag ]", _group, 
+                              "autocommflag", _list) 
+        {
+            addSelection("Commercial Flag new recordings", 1);
+            addSelection("Do not Commercial Flag new recordings", 0);
+            setValue(1);
+            _parent.setAutoCommFlagObj(this);
+        }
+};
+
+class SRAutoUserJob1: public SRSelectSetting 
+{
+    public:
+        SRAutoUserJob1(ScheduledRecording& _parent, ManagedList* _list, ManagedListGroup* _group)
+            : SRSelectSetting(_parent, "autoUserJob1List", "[ Automatically Run User Job #1 ]", _group, 
+                              "autouserjob1", _list) 
+        {
+            QString desc = gContext->GetSetting("UserJobDesc1");
+            addSelection("Run '" + desc + "'", 1);
+            addSelection("Do not run '" + desc + "' for new recordings", 0);
+            setValue(0);
+            _parent.setAutoUserJob1Obj(this);
+        }
+};
+
+class SRAutoUserJob2: public SRSelectSetting 
+{
+    public:
+        SRAutoUserJob2(ScheduledRecording& _parent, ManagedList* _list, ManagedListGroup* _group)
+            : SRSelectSetting(_parent, "autoUserJob2List", "[ Automatically Run User Job #2 ]", _group, 
+                              "autouserjob2", _list) 
+        {
+            QString desc = gContext->GetSetting("UserJobDesc2");
+            addSelection("Run '" + desc + "'", 1);
+            addSelection("Do not run '" + desc + "' for new recordings", 0);
+            setValue(0);
+            _parent.setAutoUserJob2Obj(this);
+        }
+};
+
+class SRAutoUserJob3: public SRSelectSetting 
+{
+    public:
+        SRAutoUserJob3(ScheduledRecording& _parent, ManagedList* _list, ManagedListGroup* _group)
+            : SRSelectSetting(_parent, "autoUserJob3List", "[ Automatically Run User Job #3 ]", _group, 
+                              "autouserjob3", _list) 
+        {
+            QString desc = gContext->GetSetting("UserJobDesc3");
+            addSelection("Run '" + desc + "'", 1);
+            addSelection("Do not run '" + desc + "' for new recordings", 0);
+            setValue(0);
+            _parent.setAutoUserJob3Obj(this);
+        }
+};
+
+class SRAutoUserJob4: public SRSelectSetting 
+{
+    public:
+        SRAutoUserJob4(ScheduledRecording& _parent, ManagedList* _list, ManagedListGroup* _group)
+            : SRSelectSetting(_parent, "autoUserJob4List", "[ Automatically Run User Job #4 ]", _group, 
+                              "autouserjob4", _list) 
+        {
+            QString desc = gContext->GetSetting("UserJobDesc4");
+            addSelection("Run '" + desc + "'", 1);
+            addSelection("Do not run '" + desc + "' for new recordings", 0);
+            setValue(0);
+            _parent.setAutoUserJob4Obj(this);
+        }
 };
 
 class SRAutoExpire: public SRBoolSetting

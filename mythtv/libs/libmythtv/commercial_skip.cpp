@@ -667,7 +667,9 @@ void CommDetect::BuildBlankFrameCommList(void)
             // end of breaks
             int gap_length = bframes[x] - bframes[i];
             if (((aggressiveDetection) &&
-                 ((abs((int)(gap_length - (15 * fps))) < 10 ) ||
+                 ((abs((int)(gap_length - (5 * fps))) < 5 ) ||
+                  (abs((int)(gap_length - (10 * fps))) < 7 ) ||
+                  (abs((int)(gap_length - (15 * fps))) < 10 ) ||
                   (abs((int)(gap_length - (20 * fps))) < 11 ) ||
                   (abs((int)(gap_length - (30 * fps))) < 12 ) ||
                   (abs((int)(gap_length - (45 * fps))) < 13 ) ||
@@ -675,7 +677,9 @@ void CommDetect::BuildBlankFrameCommList(void)
                   (abs((int)(gap_length - (90 * fps))) < 10 ) ||
                   (abs((int)(gap_length - (120 * fps))) < 10 ))) ||
                 ((!aggressiveDetection) &&
-                 ((abs((int)(gap_length - (15 * fps))) < 13 ) ||
+                 ((abs((int)(gap_length - (5 * fps))) < 11 ) ||
+                  (abs((int)(gap_length - (10 * fps))) < 12 ) ||
+                  (abs((int)(gap_length - (15 * fps))) < 13 ) ||
                   (abs((int)(gap_length - (20 * fps))) < 15 ) ||
                   (abs((int)(gap_length - (30 * fps))) < 17 ) ||
                   (abs((int)(gap_length - (45 * fps))) < 19 ) ||

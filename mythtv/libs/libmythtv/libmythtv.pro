@@ -48,7 +48,7 @@ HEADERS += recorderbase.h channelbase.h vsync.h proglist.h hdtvrecorder.h
 HEADERS += fifowriter.h filtermanager.h videooutbase.h videoout_null.h xbox.h
 HEADERS += dbcheck.h udpnotify.h channeleditor.h channelsettings.h
 HEADERS += osdlistbtntype.h blend.h datadirect.h sr_dialog.h
-HEADERS += sr_items.h sr_root.h recordingtypes.h
+HEADERS += sr_items.h sr_root.h recordingtypes.h jobqueue.h
 
 SOURCES += commercial_skip.cpp frequencies.c guidegrid.cpp #infodialog.cpp 
 SOURCES += infostructs.cpp jitterometer.cpp minilzo.cpp NuppelVideoPlayer.cpp 
@@ -61,7 +61,7 @@ SOURCES += videoout_null.cpp xbox.cpp dbcheck.cpp profilegroup.cpp
 SOURCES += udpnotify.cpp channeleditor.cpp channelsettings.cpp
 SOURCES += osdsurface.cpp osdlistbtntype.cpp blend.c datadirect.cpp
 SOURCES += sr_dialog.cpp sr_root.cpp sr_items.cpp decoderbase.cpp
-SOURCES += recordingtypes.cpp
+SOURCES += recordingtypes.cpp jobqueue.cpp
 
 
 linux {

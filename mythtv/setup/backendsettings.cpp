@@ -451,6 +451,210 @@ public:
     };
 };
 
+class JobQueueMaxSimultaneousJobs: public SpinBoxSetting,
+                                   public BackendHostSetting {
+public:
+    JobQueueMaxSimultaneousJobs():
+        SpinBoxSetting(1, 5, 1),
+        BackendHostSetting("JobQueueMaxSimultaneousJobs") {
+        setLabel(QObject::tr("Maximum simultaneous jobs on this backend"));
+        setHelpText(QObject::tr("The Job Queue will be limited to running "
+                    "this many simultaneous jobs on this backend."));
+        setValue(1);
+    };
+};
+
+class JobQueueCheckFrequency: public SpinBoxSetting,
+                              public BackendHostSetting {
+public:
+    JobQueueCheckFrequency():
+        SpinBoxSetting(10, 300, 5),
+        BackendHostSetting("JobQueueCheckFrequency") {
+        setLabel(QObject::tr("Job Queue Check frequency (in seconds)"));
+        setHelpText(QObject::tr("When looking for new jobs to process, the "
+                    "Job Queue will wait this long between checks."));
+        setValue(60);
+    };
+};
+
+class JobQueueCPU: public ComboBoxSetting, public BackendHostSetting {
+public:
+    JobQueueCPU():
+        BackendHostSetting("JobQueueCPU") {
+
+        setLabel(QObject::tr("CPU Usage"));
+        addSelection(QObject::tr("Low"), "0");
+        addSelection(QObject::tr("Medium"), "1");
+        addSelection(QObject::tr("High"), "2");
+        setHelpText(QObject::tr("This setting controls approximately how "
+                    "much CPU jobs in the queue may consume. "
+                    "On 'High', all available CPU time may be used "
+                    "which could cause problems on slower systems." ));
+    };
+};
+
+class JobsRunOnRecordHost: public CheckBoxSetting, public BackendSetting {
+public:
+    JobsRunOnRecordHost():
+        BackendSetting("JobsRunOnRecordHost") {
+        setLabel(QObject::tr("Run Jobs only on original recording host"));
+        setValue(false);
+        setHelpText(QObject::tr("If set, jobs in the queue will be required "
+                                "to run on the backend that made the "
+                                "original recording."));
+    };
+};
+
+class UserJobDesc1: public LineEditSetting, public BackendSetting {
+public:
+    UserJobDesc1():
+        BackendSetting("UserJobDesc1") {
+        setLabel(QObject::tr("User Job #1 Description"));
+        setValue("User Job #1");
+        setHelpText(QObject::tr("The Description for this User Job."));
+    };
+};
+
+class UserJob1: public LineEditSetting, public BackendSetting {
+public:
+    UserJob1():
+        BackendSetting("UserJob1") {
+        setLabel(QObject::tr("User Job #1 Command"));
+        setValue("");
+        setHelpText(QObject::tr("The command to run whenever this User Job "
+                    "number is scheduled."));
+    };
+};
+
+class UserJobDesc2: public LineEditSetting, public BackendSetting {
+public:
+    UserJobDesc2():
+        BackendSetting("UserJobDesc2") {
+        setLabel(QObject::tr("User Job #2 Description"));
+        setValue("User Job #2");
+        setHelpText(QObject::tr("The Description for this User Job."));
+    };
+};
+
+class UserJob2: public LineEditSetting, public BackendSetting {
+public:
+    UserJob2():
+        BackendSetting("UserJob2") {
+        setLabel(QObject::tr("User Job #2 Command"));
+        setValue("");
+        setHelpText(QObject::tr("The command to run whenever this User Job "
+                    "number is scheduled."));
+    };
+};
+
+class UserJobDesc3: public LineEditSetting, public BackendSetting {
+public:
+    UserJobDesc3():
+        BackendSetting("UserJobDesc3") {
+        setLabel(QObject::tr("User Job #3 Description"));
+        setValue("User Job #3");
+        setHelpText(QObject::tr("The Description for this User Job."));
+    };
+};
+
+class UserJob3: public LineEditSetting, public BackendSetting {
+public:
+    UserJob3():
+        BackendSetting("UserJob3") {
+        setLabel(QObject::tr("User Job #3 Command"));
+        setValue("");
+        setHelpText(QObject::tr("The command to run whenever this User Job "
+                    "number is scheduled."));
+    };
+};
+
+class UserJobDesc4: public LineEditSetting, public BackendSetting {
+public:
+    UserJobDesc4():
+        BackendSetting("UserJobDesc4") {
+        setLabel(QObject::tr("User Job #4 Description"));
+        setValue("User Job #4");
+        setHelpText(QObject::tr("The Description for this User Job."));
+    };
+};
+
+class UserJob4: public LineEditSetting, public BackendSetting {
+public:
+    UserJob4():
+        BackendSetting("UserJob4") {
+        setLabel(QObject::tr("User Job #4 Command"));
+        setValue("");
+        setHelpText(QObject::tr("The command to run whenever this User Job "
+                    "number is scheduled."));
+    };
+};
+
+class JobAllowTranscode: public CheckBoxSetting, public BackendHostSetting {
+public:
+    JobAllowTranscode():
+        BackendHostSetting("JobAllowTranscode") {
+        setLabel(QObject::tr("Allow Transcoding jobs"));
+        setValue(true);
+        setHelpText(QObject::tr("Allow jobs of this type to run on this "
+                                "backend."));
+    };
+};
+
+class JobAllowCommFlag: public CheckBoxSetting, public BackendHostSetting {
+public:
+    JobAllowCommFlag():
+        BackendHostSetting("JobAllowCommFlag") {
+        setLabel(QObject::tr("Allow Commercial Detection jobs"));
+        setValue(true);
+        setHelpText(QObject::tr("Allow jobs of this type to run on this "
+                                "backend."));
+    };
+};
+
+class JobAllowUserJob1: public CheckBoxSetting, public BackendHostSetting {
+public:
+    JobAllowUserJob1():
+        BackendHostSetting("JobAllowUserJob1") {
+        setLabel(QObject::tr("Allow 'User Job #1' jobs"));
+        setValue(false);
+        setHelpText(QObject::tr("Allow jobs of this type to run on this "
+                                "backend."));
+    };
+};
+
+class JobAllowUserJob2: public CheckBoxSetting, public BackendHostSetting {
+public:
+    JobAllowUserJob2():
+        BackendHostSetting("JobAllowUserJob2") {
+        setLabel(QObject::tr("Allow 'User Job #2' jobs"));
+        setValue(false);
+        setHelpText(QObject::tr("Allow jobs of this type to run on this "
+                                "backend."));
+    };
+};
+
+class JobAllowUserJob3: public CheckBoxSetting, public BackendHostSetting {
+public:
+    JobAllowUserJob3():
+        BackendHostSetting("JobAllowUserJob3") {
+        setLabel(QObject::tr("Allow 'User Job #3' jobs"));
+        setValue(false);
+        setHelpText(QObject::tr("Allow jobs of this type to run on this "
+                                "backend."));
+    };
+};
+
+class JobAllowUserJob4: public CheckBoxSetting, public BackendHostSetting {
+public:
+    JobAllowUserJob4():
+        BackendHostSetting("JobAllowUserJob4") {
+        setLabel(QObject::tr("Allow 'User Job #4' jobs"));
+        setValue(false);
+        setHelpText(QObject::tr("Allow jobs of this type to run on this "
+                                "backend."));
+    };
+};
+
 
 BackendSettings::BackendSettings() {
     VerticalConfigurationGroup* server = new VerticalConfigurationGroup(false);
@@ -505,5 +709,42 @@ BackendSettings::BackendSettings() {
     
     group4->addChild(new WOLslaveBackendsCommand());
     addChild(group4);
+
+    VerticalConfigurationGroup* group5 = new VerticalConfigurationGroup(false);
+    group5->setLabel(QObject::tr("Job Queue (Host-Specific)"));
+    group5->addChild(new JobQueueMaxSimultaneousJobs());
+    group5->addChild(new JobsRunOnRecordHost());
+    group5->addChild(new JobQueueCheckFrequency());
+
+    HorizontalConfigurationGroup* group5a =
+              new HorizontalConfigurationGroup(false, false);
+    VerticalConfigurationGroup* group5a1 =
+              new VerticalConfigurationGroup(false, false);
+    group5a1->addChild(new JobQueueCPU());
+//    group5a1->addChild(new JobAllowTranscode());
+    group5a1->addChild(new JobAllowCommFlag());
+    group5a1->addChild(new JobAllowUserJob1());
+    group5a->addChild(group5a1);
+
+    VerticalConfigurationGroup* group5a2 =
+            new VerticalConfigurationGroup(false, false);
+    group5a2->addChild(new JobAllowUserJob2());
+    group5a2->addChild(new JobAllowUserJob3());
+    group5a2->addChild(new JobAllowUserJob4());
+    group5a->addChild(group5a2);
+    group5->addChild(group5a);
+    addChild(group5);    
+
+    VerticalConfigurationGroup* group6 = new VerticalConfigurationGroup(false);
+    group6->setLabel(QObject::tr("Job Queue (Global)"));
+    group6->addChild(new UserJobDesc1());
+    group6->addChild(new UserJob1());
+    group6->addChild(new UserJobDesc2());
+    group6->addChild(new UserJob2());
+    group6->addChild(new UserJobDesc3());
+    group6->addChild(new UserJob3());
+    group6->addChild(new UserJobDesc4());
+    group6->addChild(new UserJob4());
+    addChild(group6);    
 }
 

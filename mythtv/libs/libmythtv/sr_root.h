@@ -31,6 +31,7 @@ class RootSRGroup : public ManagedListGroup
 
          class SRSchedOptionsGroup* schedOptions;
          class SRStorageOptionsGroup* storageOptions;
+         class SRJobQueueGroup* jobQueue;
          
          class SRRecordingType* recType;
 };

@@ -16,6 +16,7 @@ using namespace std;
 #include "remoteutil.h"
 #include "programinfo.h"
 #include "tv.h"
+#include "jobqueue.h"
 
 StatusBox::StatusBox(MythMainWindow *parent, const char *name)
          : MythDialog(parent, name)
@@ -37,6 +38,7 @@ StatusBox::StatusBox(MythMainWindow *parent, const char *name)
         icon_list->SetItemText(item_count++, QObject::tr("DVB Status"));
 #endif
     icon_list->SetItemText(item_count++, QObject::tr("Log Entries"));
+    icon_list->SetItemText(item_count++, QObject::tr("Job Queue"));
     icon_list->SetItemCurrent(0);
     icon_list->SetActive(true);
 
@@ -103,7 +105,11 @@ void StatusBox::updateContent()
         list_area->ResetList();
         for (int x = startPos; (x - startPos) <= contentSize; x++)
             if (contentLines.contains(x))
+            {
                 list_area->SetItemText(x - startPos, contentLines[x]);
+                if (contentFont.contains(x))
+                    list_area->EnableForcedFont(x - startPos, contentFont[x]);
+            }
     }
 
     // If we are scrolling, the determine the item to highlight
@@ -413,6 +419,10 @@ void StatusBox::setHelpText()
             helptext->SetText(QObject::tr("Log Entries shows any unread log "
                                           "entries from the system if you "
                                           "have logging enabled"));
+        if (currentItem == QObject::tr("Job Queue"))
+            helptext->SetText(QObject::tr("Job Queue shows any jobs currently "
+                                          "in Myth's Job Queue such as a "
+                                          "commercial flagging job."));
     }
     update(TopRect);
 }
@@ -442,6 +452,7 @@ void StatusBox::clicked()
         list_area->ResetList();
         contentLines.clear();
         contentDetail.clear();
+        contentFont.clear();
         contentData.clear();
 
         QString currentItem;
@@ -459,6 +470,9 @@ void StatusBox::clicked()
 
         if (currentItem == QObject::tr("Log Entries"))
             doLogEntries();
+
+        if (currentItem == QObject::tr("Job Queue"))
+            doJobQueueStatus();
     }
 }
 
@@ -473,6 +487,7 @@ void StatusBox::doListingsStatus()
 
     contentLines.clear();
     contentDetail.clear();
+    contentFont.clear();
     doScroll = false;
 
     qdtNow = QDateTime::currentDateTime();
@@ -556,6 +571,7 @@ void StatusBox::doTunerStatus()
 
     contentLines.clear();
     contentDetail.clear();
+    contentFont.clear();
 
     if (query.isActive() && query.numRowsAffected())
     {
@@ -611,6 +627,7 @@ void StatusBox::doDVBStatus(void)
   
     contentLines.clear();
     contentDetail.clear();
+    contentFont.clear();
  
     QString Status = QObject::tr("Details of DVB error statistics for last 48 "
                                  "hours:\n");
@@ -696,6 +713,7 @@ void StatusBox::doLogEntries(void)
 
     contentLines.clear();
     contentDetail.clear();
+    contentFont.clear();
     contentData.clear();
 
     QSqlDatabase *db = QSqlDatabase::database();
@@ -747,6 +765,76 @@ void StatusBox::doLogEntries(void)
                                             "level.");
     }
       
+    contentTotalLines = count;
+    update(ContentRect);
+}
+
+void StatusBox::doJobQueueStatus()
+{
+    QMap<int, JobQueueEntry> jobs;
+    QMap<int, JobQueueEntry>::Iterator it;
+    int count = 0;
+
+    QString detail;
+    QSqlDatabase *db = QSqlDatabase::database();
+
+    JobQueue::GetJobsInQueue(db, jobs,
+                             JOB_LIST_NOT_DONE | JOB_LIST_ERROR |
+                             JOB_LIST_RECENT);
+
+    doScroll = true;
+
+    contentLines.clear();
+    contentDetail.clear();
+    contentFont.clear();
+    contentData.clear();
+
+    if (jobs.size())
+    {
+        for (it = jobs.begin(); it != jobs.end(); ++it)
+        {
+            QString chanid = it.data().chanid;
+            QDateTime starttime = it.data().starttime;
+            ProgramInfo *pginfo;
+
+            pginfo = ProgramInfo::GetProgramFromRecorded(db, chanid, starttime);
+
+            if (!pginfo)
+                continue;
+
+            detail = pginfo->title + "\n" +
+                     pginfo->channame + " " + pginfo->chanstr +
+                         " @ " + starttime.toString(timeDateFormat) + "\n" +
+                     tr("Job:") + " " + JobQueue::JobText(it.data().type) +
+                     "     " + tr("Status: ") +
+                     JobQueue::StatusText(it.data().status);
+
+            if (it.data().status != JOB_QUEUED)
+                detail += " (" + it.data().hostname + ")";
+
+            detail += "\n" + it.data().comment;
+
+            contentLines[count] = pginfo->title + " @ " +
+                                  starttime.toString(timeDateFormat);
+
+            contentDetail[count] = detail;
+
+            if (it.data().status == JOB_ERRORED)
+                contentFont[count] = "error";
+            else if (it.data().status == JOB_ABORTED)
+                contentFont[count] = "warning";
+
+            count++;
+
+            delete pginfo;
+        }
+    }
+    else
+    {
+        contentLines[count++] = QObject::tr("Job Queue is currently empty.");
+        doScroll = false;
+    }
+
     contentTotalLines = count;
     update(ContentRect);
 }
