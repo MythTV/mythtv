@@ -1012,6 +1012,31 @@ void NuppelVideoRecorder::StartRecording(void)
         vc.name[4] == '8')
         correct_bttv = true;
 
+    int channelinput = 0;
+
+    if (channelObj)
+        channelinput = channelObj->GetCurrentInputNum();
+
+    vchan.channel = channelinput;
+
+    if (ioctl(fd, VIDIOCGCHAN, &vchan) < 0)
+        perror("VIDIOCGCHAN");
+
+    // if channel has a audio then activate it
+    if (!skip_btaudio && (vchan.flags & VIDEO_VC_AUDIO) == VIDEO_VC_AUDIO) {
+        if (ioctl(fd, VIDIOCGAUDIO, &va)<0)
+            perror("VIDIOCGAUDIO");
+
+        va.flags &= ~VIDEO_AUDIO_MUTE; // now this really has to work
+
+        va.volume = volume * 65535 / 100;
+
+        if (ioctl(fd, VIDIOCSAUDIO, &va) < 0)
+            perror("VIDIOCSAUDIO");
+        //if (ioctl(fd, VIDIOCSCHAN, &vchan) < 0)
+        //    perror("VIDIOCSCHAN");
+    }
+
     if ((vc.type & VID_TYPE_MJPEG_ENCODER) && hardware_encode)
     {
         DoMJPEG();
@@ -1051,31 +1076,6 @@ void NuppelVideoRecorder::StartRecording(void)
         errored = true;
         return;
     }
-
-    int channelinput = 0;
- 
-    if (channelObj)
-        channelinput = channelObj->GetCurrentInputNum();
-
-    vchan.channel = channelinput;
-
-    if (ioctl(fd, VIDIOCGCHAN, &vchan) < 0) 
-        perror("VIDIOCGCHAN");
-
-    // if channel has a audio then activate it
-    if (!skip_btaudio && (vchan.flags & VIDEO_VC_AUDIO) == VIDEO_VC_AUDIO) {
-        if (ioctl(fd, VIDIOCGAUDIO, &va)<0) 
-            perror("VIDIOCGAUDIO"); 
-
-        va.flags &= ~VIDEO_AUDIO_MUTE; // now this really has to work
-
-        va.volume = volume * 65535 / 100;
-
-        if (ioctl(fd, VIDIOCSAUDIO, &va) < 0) 
-            perror("VIDIOCSAUDIO");
-        //if (ioctl(fd, VIDIOCSCHAN, &vchan) < 0)
-        //    perror("VIDIOCSCHAN");
-    } 
 
     mm.height = h;
     mm.width  = w;
@@ -1162,10 +1162,18 @@ void NuppelVideoRecorder::DoV4L2(void)
     struct v4l2_format     vfmt;
     struct v4l2_buffer     vbuf;
     struct v4l2_requestbuffers vrbuf;
+    struct v4l2_control    vc;
 
     memset(&vfmt, 0, sizeof(vfmt));
     memset(&vbuf, 0, sizeof(vbuf));
     memset(&vrbuf, 0, sizeof(vrbuf));
+    memset(&vc, 0, sizeof(vc));
+
+    vc.id = V4L2_CID_AUDIO_MUTE;
+    vc.value = 0;
+
+    if (ioctl(fd, VIDIOC_S_CTRL, &vc) < 0)
+        perror("VIDIOC_S_CTRL:V4L2_CID_AUDIO_MUTE");
 
     vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
