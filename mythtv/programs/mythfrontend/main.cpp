@@ -10,7 +10,6 @@ using namespace std;
 #include "tv.h"
 #include "playbackbox.h"
 #include "viewscheduled.h"
-#include "themesetup.h"
 #include "globalsettings.h"
 #include "recordingprofile.h"
 
@@ -100,19 +99,6 @@ void startTV(MythContext *context)
             nextstate = tv->GetState();
         }
     }
-}
-
-void themesSettings(MythContext *context)
-{ 
-    QSqlDatabase *db = QSqlDatabase::database();
-    ThemeSetup ts(context, db);
-    ts.Show();
-
-    qApp->unlock();
-    ts.exec();
-    qApp->lock();
-
-    menu->ReloadTheme();
 }
 
 void TVMenuCallback(void *data, QString &selection)
