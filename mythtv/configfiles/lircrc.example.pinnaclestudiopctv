@@ -1,8 +1,9 @@
 # lircrc.example.pinnaclestudiopctv
-# 2003-02-22, Robert Kulagowski
+# 2003-04-08, Robert Kulagowski
 # mailto:rkulagow@rocketmail.com
 # Native support for volume and mute within MythTV now
 # Commercial skipping button
+# repeat = for volume and channel
 
 # These are standard definitions which should exist on any remote control
 
@@ -96,19 +97,21 @@ end
 #    config = Key  CurrentWindow
 # end
 
-# begin
-#    prog = irxevent
+begin
+   prog = irxevent
 # This is the open rectangle with the dark rectangle in the upper right
-#    button = Fullscreen
-#    config = Key  CurrentWindow
-# end
+# Toggle PiP on/off
+   button = Fullscreen
+   config = Key V CurrentWindow
+end
 
-# begin
-#    prog = irxevent
+begin
+   prog = irxevent
 # This is the Zoom button
-#    button = Zoom
-#    config = Key  CurrentWindow
-# end
+# Change focus for PiP (to change channel in the other window)
+   button = Zoom
+   config = Key B CurrentWindow
+end
 
 begin
     prog = irxevent
@@ -116,34 +119,45 @@ begin
     config = Key Shift-bar CurrentWindow
 end
 
+# Note the "repeat =" strings in the volume and channel.
+# This means that if you hold down the key, every nth instance will be
+# passed.  This depends on your system, so you may want to increase or
+# decrease this and see what happens.  repeat = 1 is probably too
+# fast.
+
 begin
     prog = irxevent
     button = vol+
-    config = Key bracketright CurrentWindow
+    repeat = 5
+    config = Key braceright CurrentWindow
 end
 
 begin
     prog = irxevent
     button = vol-
+    repeat = 5
     config = Key bracketleft CurrentWindow    
 end
 
-# begin
-#    prog = irxevent
+begin
+   prog = irxevent
 # This is the Ch. button with the arrowed semicircle around it
-#    button = Chan_Last
-#    config = Key  CurrentWindow
-# end
+# Swap the PiP windows
+   button = Chan_Last
+   config = Key N CurrentWindow
+end
 
 begin
     prog = irxevent
     button = channel+
+    repeat = 7
     config = Key Up CurrentWindow
 end
 
 begin
     prog = irxevent
     button = channel-
+    repeat = 7
     config = Key Down CurrentWindow
 end
 
@@ -192,7 +206,7 @@ begin
    prog = irxevent
    button = next
 # This is the "Triangle Bar" symbol on the remote.  Like the Tivo jump to end button
-# Use for commercial skip
+# Use for forward commercial skip
     config = Key Z CurrentWindow
 end
 
@@ -204,12 +218,12 @@ begin
     config = Key Page_Down CurrentWindow
  end
 
-# begin
-#   prog = irxevent
-#   button = Record
+begin
+  prog = irxevent
+  button = Record
 # Not used for anything yet
-#    config = Key  CurrentWindow
-#end
+   config = Key R CurrentWindow
+end
 
 begin
     prog = irxevent
