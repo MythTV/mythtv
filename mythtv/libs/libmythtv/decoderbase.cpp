@@ -178,7 +178,7 @@ bool DecoderBase::PosMapFromEnc(void)
         m_positionMap.push_back(e);
     }
     VERBOSE(VB_PLAYBACK, QString("Position map filled to: %1")
-            .arg(m_positionMap[m_positionMap.size()-1].index));
+            .arg((long int) m_positionMap[m_positionMap.size()-1].index));
 
     return true;
 }
