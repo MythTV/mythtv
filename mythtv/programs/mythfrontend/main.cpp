@@ -228,7 +228,9 @@ void showStatus(void)
     mfdLastRunEnd = gContext->GetSetting("mythfilldatabaseLastRunEnd");
     mfdLastRunStatus = gContext->GetSetting("mythfilldatabaseLastRunStatus");
 
-    Status = "Last mythfilldatabase guide update:";
+    Status = QString("Myth version: ") + MYTH_BINARY_VERSION;
+
+    Status += "\nLast mythfilldatabase guide update:";
     Status += "\n   Started:   ";
     Status += mfdLastRunStart;
     if (mfdLastRunEnd > mfdLastRunStart)  //if end < start, it's still running.
