@@ -90,7 +90,6 @@ class ProgramInfo
     int cardid;
     bool conflictfixed;
 
-
     QString schedulerid;
 
 private:
