@@ -420,7 +420,14 @@ QString MythContextPrivate::getResponse(const QString &query,
         cout << "  ";
     
     char response[80];
+    cin.clear();
     cin.getline(response, 80);
+    if (!cin.good())
+    {
+        cout << endl;
+        VERBOSE(VB_IMPORTANT, "Read from stdin failed");
+        return NULL;
+    }
 
     QString qresponse = response;
 
@@ -433,6 +440,8 @@ QString MythContextPrivate::getResponse(const QString &query,
 int MythContextPrivate::intResponse(const QString &query, int def)
 {
     QString str_resp = getResponse(query, QString("%1").arg(def));
+    if (!str_resp)
+        return false;
     bool ok;
     int resp = str_resp.toInt(&ok);
     return (ok ? resp : def);
@@ -471,7 +480,7 @@ bool MythContextPrivate::PromptForDatabaseParams(void)
         response = getResponse("Would you like to configure the database "
                                "connection now?",
                                "yes");
-        if (response.left(1).lower() != "y")
+        if (!response || response.left(1).lower() != "y")
             return false;
         
         params.dbHostName = getResponse("Database host name:",
