@@ -323,6 +323,8 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
         if (e->key() == Key_Escape || e->key() == Key_4)
         {
             visualizer_status = 1;
+            QString visual_workaround = mainvisual->getCurrentVisual();
+            mainvisual->setVisual("Blank");
             if(visual_blackhole)
             {
                 mainvisual->setGeometry(visual_blackhole->getScreenArea());
@@ -332,6 +334,7 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
                 mainvisual->setGeometry(screenwidth + 10, screenheight + 10, 160, 160);
             }
             setUpdatesEnabled(true);
+            mainvisual->setVisual(visual_workaround);
             handled = true;
         }
     }
