@@ -48,7 +48,10 @@ MythNews::MythNews(QSqlDatabase *db, MythMainWindow *parent,
     dir = QDir(fileprefix);
     if (!dir.exists())
         dir.mkdir(fileprefix);
-
+    
+    zoom = QString("-z %1").arg(gContext->GetNumSetting("WebBrowserZoomLevel",200));
+    browser = gContext->GetSetting("WebBrowserCommand", PREFIX "/bin/mythbrowser");
+    
     // Initialize variables
 
     m_InColumn     = 0;
@@ -89,7 +92,6 @@ MythNews::MythNews(QSqlDatabase *db, MythMainWindow *parent,
     }
     
     // Now do the actual work
-
     m_RetrieveTimer = new QTimer(this);
     connect(m_RetrieveTimer, SIGNAL(timeout()),
             this, SLOT(slotRetrieveNews()));
@@ -98,7 +100,7 @@ MythNews::MythNews(QSqlDatabase *db, MythMainWindow *parent,
 
     slotRetrieveNews();
 
-    slotSiteSelected(0);
+    slotSiteSelected((NewsSite*) m_NewsSites.first());
 }
 
 MythNews::~MythNews()
@@ -398,7 +400,11 @@ void MythNews::cursorDown(bool page)
 
 void MythNews::cursorRight()
 {
-    if (m_InColumn == 1) return;
+    if (m_InColumn == 1)
+    {
+        slotViewArticle();
+        return;
+    }
 
     m_InColumn++;
 
@@ -412,7 +418,11 @@ void MythNews::cursorRight()
 
 void MythNews::cursorLeft()
 {
-    if (m_InColumn == 0) return;
+    if (m_InColumn == 0)
+    {
+        accept();
+        return;
+    }
 
     m_InColumn--;
 
@@ -501,15 +511,12 @@ void MythNews::processAndShowNews(NewsSite* site)
         update(m_InfoRect);
     } 
 }
-
-void MythNews::slotSiteSelected(UIListBtnTypeItem *item)
+void MythNews::slotSiteSelected(NewsSite* site)
 {
-    if (!item || !item->getData())
+    if(!site)
         return;
-    
+        
     m_UIArticles->Reset();
-
-    NewsSite *site = (NewsSite*) item->getData();
 
     for (NewsArticle* article = site->articleList().first(); article;
          article = site->articleList().next()) {
@@ -523,6 +530,14 @@ void MythNews::slotSiteSelected(UIListBtnTypeItem *item)
     update(m_InfoRect);
 }
 
+void MythNews::slotSiteSelected(UIListBtnTypeItem *item)
+{
+    if (!item || !item->getData())
+        return;
+    
+    slotSiteSelected((NewsSite*) item->getData());
+}
+
 void MythNews::slotArticleSelected(UIListBtnTypeItem*)
 {
     update(m_ArticlesRect);
@@ -531,20 +546,15 @@ void MythNews::slotArticleSelected(UIListBtnTypeItem*)
 
 void MythNews::slotViewArticle()
 {
-    NewsArticle *article  = NULL;
     UIListBtnTypeItem *articleUIItem = m_UIArticles->GetItemCurrent();
 
     if (articleUIItem && articleUIItem->getData())
-        article = (NewsArticle*) articleUIItem->getData();
-    if (article)
     {
-        QString cmd = gContext->GetSetting("WebBrowserCommand", 
-                                           PREFIX "/bin/mythbrowser");
-        QString zoom = QString(" -z %1")
-                            .arg(gContext->GetNumSetting("WebBrowserZoomLevel",
-                                                         200));
-        cmd += zoom;
-        cmd += article->articleURL();
-        myth_system( cmd );
-    }
+        NewsArticle *article = (NewsArticle*) articleUIItem->getData();
+        if(article)
+        {
+            QString cmd = QString( "%1 %2 %3").arg(browser).arg(zoom).arg(article->articleURL());
+            myth_system( cmd );
+        }
+     } 
 }

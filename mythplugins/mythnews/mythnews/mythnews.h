@@ -81,13 +81,17 @@ private:
 
     QString        timeFormat;
     QString        dateFormat;
-
+    QString        zoom;
+    QString        browser;
+    
 private slots:
     void slotViewArticle();
     void slotRetrieveNews();
     void slotNewsRetrieved(NewsSite* site);
 
     void slotSiteSelected(UIListBtnTypeItem *item);
+    void slotSiteSelected(NewsSite*);
+    
     void slotArticleSelected(UIListBtnTypeItem *item);
 };
 
