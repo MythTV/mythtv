@@ -39,10 +39,14 @@ DVDTitleInfo::DVDTitleInfo()
     seconds = 0;
     audio_tracks.clear();
     audio_tracks.setAutoDelete(true);
-
+    subtitles.clear();
+    subtitles.setAutoDelete(true);
+    
     is_selected = false;
     selected_quality = 0;
+
     selected_audio = 1;
+    selected_subtitle = -1;
     use_ac3 = gContext->GetNumSetting("MTDac3flag");
     name = "";
 }
@@ -71,9 +75,15 @@ void DVDTitleInfo::addAudio(DVDAudioInfo *new_audio_track)
     audio_tracks.append(new_audio_track);
 }
 
+void DVDTitleInfo::addSubTitle(DVDSubTitleInfo *new_subtitle)
+{
+    subtitles.append(new_subtitle);
+}
+
 DVDTitleInfo::~DVDTitleInfo()
 {
     audio_tracks.clear();
+    subtitles.clear();
 }
 
 /*

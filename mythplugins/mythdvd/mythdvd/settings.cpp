@@ -100,6 +100,19 @@ public:
     };
 };
 
+class SubTitleCommand: public LineEditSetting, public GlobalSetting {
+public:
+    SubTitleCommand():
+        GlobalSetting("SubTitleCommand"){
+        setLabel("Subtitle arguments:");
+        setValue("-sid %s");
+        setHelpText("If you choose any subtitles for ripping, this "
+                    "command is added to the end of the Title Play "
+                    "Command to allow previewing of subtitles. If  "
+                    "present %s will be set to the subtitle track. ");
+    };
+};
+
 class TranscodeCommand: public LineEditSetting, public GlobalSetting {
 public:
     TranscodeCommand():
@@ -197,13 +210,18 @@ RipperSettings::RipperSettings()
     rippersettings->setLabel("DVD Ripper Settings");
     rippersettings->addChild(new SetRipDirectory());
     rippersettings->addChild(new TitlePlayCommand());
+    rippersettings->addChild(new SubTitleCommand());
     rippersettings->addChild(new TranscodeCommand());
-    rippersettings->addChild(new MTDPortNumber());
-    rippersettings->addChild(new MTDNiceLevel());
-    rippersettings->addChild(new MTDRipSize());
-    rippersettings->addChild(new MTDLogFlag());
-    rippersettings->addChild(new MTDac3Flag());
-    rippersettings->addChild(new MTDxvidFlag());
     addChild(rippersettings);
+
+    VerticalConfigurationGroup* mtdsettings = new VerticalConfigurationGroup(false);
+    mtdsettings->setLabel("MTD Settings");
+    mtdsettings->addChild(new MTDPortNumber());
+    mtdsettings->addChild(new MTDNiceLevel());
+    mtdsettings->addChild(new MTDRipSize());
+    mtdsettings->addChild(new MTDLogFlag());
+    mtdsettings->addChild(new MTDac3Flag());
+    mtdsettings->addChild(new MTDxvidFlag());
+    addChild(mtdsettings);
 }
 

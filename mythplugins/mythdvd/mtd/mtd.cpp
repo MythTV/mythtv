@@ -390,6 +390,7 @@ void MTD::sendMessage(QSocket *where, const QString &what)
 {
     QString message = what;
     message.append("\n");
+    //cout << "Sending : " << message;
     where->writeBlock(message.latin1(), message.length());
 }
 
@@ -481,6 +482,23 @@ void MTD::sendMediaReport(QSocket *socket)
                             .arg(audio_tracks->at(j)->getAudioString())
                            );
             }
+            
+            //
+            //  For each subtitle, send the id number, the lang code, and the name
+            //
+            QPtrList<DVDSubTitle> *subtitles = dvd_titles->at(i)->getSubTitles();
+            for(uint j = 0; j < subtitles->count(); j++)
+            {
+                sendMessage(socket, QString("media dvd title-subtitle %1 %2 %3 %4")
+                            .arg(dvd_titles->at(i)->getTrack())
+                            .arg(subtitles->at(j)->getID())
+                            .arg(subtitles->at(j)->getLanguage())
+                            .arg(subtitles->at(j)->getName())
+                           );
+            }
+            
+            
+            
         }
         titles_mutex->unlock();
     }
@@ -565,7 +583,7 @@ void MTD::startDVD(const QStringList &tokens)
     QString flat = tokens.join(" ");
     bool ok;
 
-    if(tokens.count() < 8)
+    if(tokens.count() < 9)
     {
         emit writeToLog(QString("bad dvd job request: %1").arg(flat));
         return;
@@ -610,7 +628,14 @@ void MTD::startDVD(const QStringList &tokens)
         ac3_flag = true;
     }
 
-    QDir dest_dir(tokens[6]);
+    int subtitle_track = tokens[6].toInt(&ok);
+    if(!ok)
+    {
+        emit writeToLog(QString("bad subtitle reference in job request: %1").arg(flat));
+        return;
+    }
+
+    QDir dest_dir(tokens[7]);
     if(!dest_dir.exists())
     {
         emit writeToLog(QString("bad destination directory in job request: %1").arg(flat));
@@ -618,7 +643,7 @@ void MTD::startDVD(const QStringList &tokens)
     }
 
     QString file_name = "";
-    for(uint i=7; i < tokens.count(); i++)
+    for(uint i=8; i < tokens.count(); i++)
     {
         file_name += tokens[i];
         if(i != tokens.count() - 1)
@@ -709,7 +734,8 @@ void MTD::startDVD(const QStringList &tokens)
                                                     ac3_flag,
                                                     db,
                                                     audio_track,
-                                                    numb_seconds);
+                                                    numb_seconds,
+                                                    subtitle_track);
         job_threads.append(new_job);
         new_job->start();
        

@@ -223,43 +223,49 @@
             -->
             <textarea name="playtime_text" draworder="0" align="right">
                 <font>display</font>
-                <area>50,40,250,30</area>
+                <area>50,35,250,30</area>
                 <value>Length:</value>
             </textarea>
 
             <textarea name="ripcheck_text" draworder="0" align="right">
                 <font>display</font>
-                <area>50,80,250,30</area>
+                <area>50,75,250,30</area>
                 <value>Select:</value>
             </textarea>
 
             <textarea name="ripname_text" draworder="0" align="right">
                 <font>display</font>
-                <area>50,120,250,30</area>
+                <area>50,110,250,30</area>
                 <value>Name:</value>
-            </textarea>
-
-            <textarea name="ripaudio_text" draworder="0" align="right">
-                <font>display</font>
-                <area>50,160,250,30</area>
-                <value>Audio Track:</value>
             </textarea>
 
             <textarea name="ripquality_text" draworder="0" align="right">
                 <font>display</font>
-                <area>50,200,250,30</area>
+                <area>50,145,250,30</area>
                 <value>Quality:</value>
+            </textarea>
+
+            <textarea name="ripaudio_text" draworder="0" align="right">
+                <font>display</font>
+                <area>50,180,250,30</area>
+                <value>Audio Track:</value>
             </textarea>
 
             <textarea name="ripacthree_text" draworder="0" align="right">
                 <font>display</font>
-                <area>50,240,250,30</area>
+                <area>50,215,250,30</area>
                 <value>AC3 Audio:</value>
+            </textarea>
+
+            <textarea name="subtitle_text" draworder="0" align="right">
+                <font>display</font>
+                <area>50,250,250,30</area>
+                <value>Subtitles:</value>
             </textarea>
 
             <textarea name="ripview_text" draworder="0" align="right">
                 <font>display</font>
-                <area>50,280,250,30</area>
+                <area>50,285,250,30</area>
                 <value>View:</value>
             </textarea>
 
@@ -271,12 +277,12 @@
 
             <textarea name="playlength_text" draworder="0" align="left">
                 <font>display</font>
-                <area>312,40,300,40</area>
+                <area>312,35,300,40</area>
                 <value>0:00:00</value>
             </textarea>
 
             <checkbox name="ripcheck" draworder="0">
-                <position>310,75</position>
+                <position>310,70</position>
                 <image function="checked" filename="md_checked.png"></image>
                 <image function="unchecked" filename="md_unchecked.png"></image>
                 <image function="checked_high" filename="md_checked_high.png"></image>
@@ -284,19 +290,19 @@
             </checkbox>      
             
             <blackhole name="editor_hack" draworder="0">
-                <area>312,115,300,40</area>
+                <area>312,105,300,40</area>
             </blackhole>
 
-            <selector name="audio_select" draworder="0">
-                <area>310,155,300,40</area>
+            <selector name="quality_select" draworder="0">
+                <area>310,140,300,40</area>
                 <font>display</font>
                 <image function="on" filename="md_leftright_on.png"></image>
                 <image function="off" filename="md_leftright_off.png"></image>
                 <image function="pushed" filename="md_leftright_pushed.png"></image>
             </selector>      
             
-            <selector name="quality_select" draworder="0">
-                <area>310,195,300,40</area>
+            <selector name="audio_select" draworder="0">
+                <area>310,175,300,40</area>
                 <font>display</font>
                 <image function="on" filename="md_leftright_on.png"></image>
                 <image function="off" filename="md_leftright_off.png"></image>
@@ -304,15 +310,23 @@
             </selector>      
             
             <checkbox name="ripacthree" draworder="0">
-                <position>310,235</position>
+                <position>310,210</position>
                 <image function="checked" filename="md_checked.png"></image>
                 <image function="unchecked" filename="md_unchecked.png"></image>
                 <image function="checked_high" filename="md_checked_high.png"></image>
                 <image function="unchecked_high" filename="md_unchecked_high.png"></image>
             </checkbox>      
             
+            <selector name="subtitle_select" draworder="0">
+                <area>310,245,300,40</area>
+                <font>display</font>
+                <image function="on" filename="md_leftright_on.png"></image>
+                <image function="off" filename="md_leftright_off.png"></image>
+                <image function="pushed" filename="md_leftright_pushed.png"></image>
+            </selector>      
+            
             <pushbutton name="view_button" draworder="0">
-                <position>310,275</position>
+                <position>310,280</position>
                 <image function="on" filename="md_blankbutton_on.png"></image>
                 <image function="off" filename="md_blankbutton_off.png"></image>
                 <image function="pushed" filename="md_blankbutton_pushed.png"></image>

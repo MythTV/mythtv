@@ -48,6 +48,7 @@ class TitleDialog : public MythThemedDialog
     void changeName(QString new_name);
     void setAudio(int);
     void setQuality(int which_quality);
+    void setSubTitle(int which_subtitle);
     void toggleAC3(bool);
     void ripTitles();
     void takeFocusAwayFromEditor(bool up_or_down);
@@ -72,6 +73,7 @@ class TitleDialog : public MythThemedDialog
     UIBlackHoleType     *editor_hack;
     UISelectorType      *audio_select;
     UISelectorType      *quality_select;
+    UISelectorType      *subtitle_select;
     UICheckBoxType      *ripcheck;
     UICheckBoxType      *ripacthree;
     UITextType          *playlength_text;

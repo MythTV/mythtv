@@ -547,7 +547,8 @@ DVDTranscodeThread::DVDTranscodeThread(MTD *owner,
                                        bool do_ac3,
                                        QSqlDatabase *ldb,
                                        int which_audio,
-                                       int numb_seconds)
+                                       int numb_seconds,
+                                       int subtitle_track_numb)
                  :DVDThread(owner,
                             drive_mutex, 
                             dvd_device, 
@@ -570,6 +571,7 @@ DVDTranscodeThread::DVDTranscodeThread(MTD *owner,
     {
         length_in_seconds = 1;
     }
+    subtitle_track = subtitle_track_numb;
 }
 
 void DVDTranscodeThread::run()
@@ -639,7 +641,7 @@ void DVDTranscodeThread::run()
     {
         if(!runTranscode(1))
         {
-            cleanUp();
+            wipeClean();
             return;
         }
     }
@@ -710,6 +712,18 @@ bool DVDTranscodeThread::buildTranscodeCommandLine()
     
     tc_arguments.clear();
     tc_arguments.append(tc_command);
+    
+    //
+    //  Check if we are doing subtitles
+    //
+    
+    if(subtitle_track > -1)
+    {
+        tc_arguments.append("-x");
+        tc_arguments.append("vob");
+        tc_arguments.append("-J");
+        tc_arguments.append(QString("extsub=%1").arg(subtitle_track));
+    }
     
     
     //
@@ -938,7 +952,8 @@ bool DVDTranscodeThread::buildTranscodeCommandLine()
         tc_arguments.append("1,twopass.log");
     }    
     
-
+    // cout << "transcode command: " << tc_arguments.join(" ") << endl;
+    
     tc_process = new QProcess(tc_arguments);
     tc_process->setWorkingDirectory(*working_directory);
     return true;

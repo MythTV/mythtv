@@ -17,6 +17,30 @@
 #include <dvdread/dvd_reader.h>
 #include <dvdread/ifo_read.h>
 
+class DVDSubTitle
+{
+    //
+    //  A DVDTitle (below) holds zero or more
+    //  of these objects, each describing available
+    //  subtitles.
+    //
+  
+  public:
+    
+    DVDSubTitle(int subtitle_id, const QString &a_language){id = subtitle_id; language = a_language;}
+
+    void    setName(const QString &a_name){name = a_name;}
+    QString getLanguage(){return language;}
+    QString getName(){return name;}
+    int     getID(){return id;}
+    
+  private:
+  
+    int     id;
+    QString language;
+    QString name;
+};
+
 class DVDAudio
 {
     //
@@ -91,10 +115,12 @@ class DVDTitle
     uint    getInputID(){return dvdinput_id;}
     
 
-    void                printYourself();
-    void                addAudio(DVDAudio *new_audio_track);
-    QPtrList<DVDAudio>* getAudioTracks(){return &audio_tracks;}
-        
+    void                   printYourself();
+    void                   addAudio(DVDAudio *new_audio_track);
+    QPtrList<DVDAudio>*    getAudioTracks(){return &audio_tracks;}
+    void                   addSubTitle(DVDSubTitle *new_subitle);
+    QPtrList<DVDSubTitle>* getSubTitles(){return &subtitles;}        
+    
   private:
   
     uint    numb_chapters;
@@ -116,8 +142,8 @@ class DVDTitle
     QString video_format;
     uint    dvdinput_id;
     
-    QPtrList<DVDAudio>  audio_tracks;
-
+    QPtrList<DVDAudio>    audio_tracks;
+    QPtrList<DVDSubTitle> subtitles;
 };
 
 class DVDProbe

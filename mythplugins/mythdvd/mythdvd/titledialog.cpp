@@ -77,9 +77,6 @@ TitleDialog::TitleDialog(QSqlDatabase *ldb,
             dvd_titles->at(i)->setName(QString("%1 - Title %2").arg(disc_name).arg(i + 1));
         }
     }
-    //
-    //  Now go through again and set the names
-    //
 
     showCurrentTitle();
     
@@ -137,6 +134,19 @@ void TitleDialog::showCurrentTitle()
             } 
             quality_select->setToItem(current_title->getQuality());            
         }
+        
+        if(subtitle_select)
+        {
+            subtitle_select->cleanOut();
+            subtitle_select->addItem(-1, "None");
+            QPtrList<DVDSubTitleInfo> *subtitles = current_title->getSubTitles();
+            for(uint j = 0; j < subtitles->count(); ++j)
+            {
+                subtitle_select->addItem(subtitles->at(j)->getID(), subtitles->at(j)->getName());
+            }
+            subtitle_select->setToItem(current_title->getSubTitle());
+        }
+        
         if(ripacthree)
         {
             ripacthree->setState(current_title->getAC3());
@@ -323,6 +333,11 @@ void TitleDialog::setQuality(int which_quality)
     current_title->setQuality(which_quality);
 }
 
+void TitleDialog::setSubTitle(int which_subtitle)
+{
+    current_title->setSubTitle(which_subtitle);
+}
+
 void TitleDialog::setAudio(int audio_index)
 {
     current_title->setAudio(audio_index);
@@ -423,11 +438,23 @@ void TitleDialog::viewTitle()
     player_string = player_string.replace(QRegExp("%t"), QString("%1").arg(current_title->getTrack()));
     player_string = player_string.replace(QRegExp("%a"), QString("%1").arg(audio_track));
     player_string = player_string.replace(QRegExp("%c"), QString("%1").arg(channels));
+    
+    if(current_title->getSubTitle() > -1)
+    {
+        QString player_append = gContext->GetSetting("SubTitleCommand");
+        if(player_append.length() > 1)
+        {
+            player_append = player_append.replace(QRegExp("%s"), QString("%1").arg(current_title->getSubTitle()));
+            player_string += " ";
+            player_string += player_append;
+        }
+    }
+    // cout << "PLAYER STRING: " << player_string << endl;
 
     myth_system(player_string);
     gContext->GetMainWindow()->raise();
     gContext->GetMainWindow()->setActiveWindow();
-    gContext->GetMainWindow()->currentWidget()->setFocus();
+    
 }
 
 void TitleDialog::ripTitles()
@@ -447,7 +474,7 @@ void TitleDialog::ripTitles()
             //  The spec for this command, which I'm
             //  making up on the fly is:
             //  
-            //  job {type} {title #} {audio_track} {quality} {ac3 flag} {directory to end up in} {name}
+            //  job {type} {title #} {audio_track} {quality} {ac3 flag} {subtitle #} {directory to end up in} {name}
             //
             
             
@@ -462,11 +489,12 @@ void TitleDialog::ripTitles()
                 return; 
             }            
             
-            QString job_string = QString("job dvd %1 %2 %3 %4 %5 %6")
+            QString job_string = QString("job dvd %1 %2 %3 %4 %5 %6 %7")
                                  .arg(dvd_titles->at(i)->getTrack())
                                  .arg(dvd_titles->at(i)->getAudio())
                                  .arg(dvd_titles->at(i)->getQuality())
                                  .arg(dvd_titles->at(i)->getAC3())
+                                 .arg(dvd_titles->at(i)->getSubTitle())
                                  .arg(destination_directory)
                                  .arg(dvd_titles->at(i)->getName());
             
@@ -515,6 +543,7 @@ void TitleDialog::wireUpTheme()
         editor_hack->allowFocus(true);
         QFont f( "arial", 14, QFont::Bold);
         name_editor = new MythRemoteLineEdit(&f, this);
+        name_editor->setFocusPolicy(QWidget::NoFocus);
         name_editor->setGeometry(editor_hack->getScreenArea());
         connect(editor_hack, SIGNAL(takingFocus()), 
                 name_editor, SLOT(setFocus()));
@@ -542,6 +571,12 @@ void TitleDialog::wireUpTheme()
     if(quality_select)
     {
         connect(quality_select, SIGNAL(pushed(int)), this, SLOT(setQuality(int)));
+    }
+
+    subtitle_select = getUISelectorType("subtitle_select");
+    if(subtitle_select)
+    {
+        connect(subtitle_select, SIGNAL(pushed(int)), this, SLOT(setSubTitle(int)));
     }
     ripacthree = getUICheckBoxType("ripacthree");
     if(ripacthree)

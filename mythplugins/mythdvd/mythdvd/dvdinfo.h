@@ -16,6 +16,26 @@
 #include <dvdread/dvd_reader.h>
 #include <dvdread/ifo_read.h>
 
+class DVDSubTitleInfo
+{
+    //
+    //  Holds information about available
+    //  subtitles
+
+  public:
+      
+    DVDSubTitleInfo(int subtitle_id, const QString &subtitle_name)
+                   {id = subtitle_id; name = subtitle_name;}
+    
+    int     getID(){return id;}
+    QString getName(){return name;}
+    
+  private:
+  
+    int     id;
+    QString name;  
+};
+
 class DVDAudioInfo
 {
     //
@@ -66,6 +86,7 @@ class DVDTitleInfo
     void    setSelected(bool yes_or_no){is_selected = yes_or_no;}
     void    setQuality(int a_level){selected_quality = a_level;}
     void    setAudio(int which_track){selected_audio = which_track;}
+    void    setSubTitle(int which_subtitle){selected_subtitle = which_subtitle;}
     void    setName(QString a_name){name = a_name;}
     void    setInputID(uint a_uint){dvdinput_id = a_uint;}
     void    setAC3(bool y_or_n){use_ac3 = y_or_n;}
@@ -83,12 +104,15 @@ class DVDTitleInfo
     int     getQuality(){return selected_quality;}
     QString getName(){return name;}
     int     getAudio(){return selected_audio;}
+    int     getSubTitle(){return selected_subtitle;}
     uint    getInputID(){return dvdinput_id;}
     bool    getAC3(){return use_ac3;}
 
-    void                    addAudio(DVDAudioInfo *new_audio_track);
-    QPtrList<DVDAudioInfo>* getAudioTracks(){return &audio_tracks;}
-    DVDAudioInfo*           getAudioTrack(int which_one){return audio_tracks.at(which_one);}
+    void                       addAudio(DVDAudioInfo *new_audio_track);
+    void                       addSubTitle(DVDSubTitleInfo *new_subtitle);
+    QPtrList<DVDAudioInfo>*    getAudioTracks(){return &audio_tracks;}
+    QPtrList<DVDSubTitleInfo>* getSubTitles(){return &subtitles;}
+    DVDAudioInfo*              getAudioTrack(int which_one){return audio_tracks.at(which_one);}
         
   private:
   
@@ -100,11 +124,13 @@ class DVDTitleInfo
     uint    minutes;
     uint    seconds;
     
-    QPtrList<DVDAudioInfo>  audio_tracks;
+    QPtrList<DVDAudioInfo>    audio_tracks;
+    QPtrList<DVDSubTitleInfo> subtitles;
 
     bool    is_selected;
     int     selected_quality;
     int     selected_audio;
+    int     selected_subtitle;
     bool    use_ac3;
     QString name;
     

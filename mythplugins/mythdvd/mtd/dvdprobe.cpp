@@ -194,6 +194,8 @@ DVDTitle::DVDTitle()
     vsize = 0;
     audio_tracks.clear();
     audio_tracks.setAutoDelete(true);
+    subtitles.clear();
+    subtitles.setAutoDelete(true);
 
     hsize = 0;
     vsize = 0;
@@ -332,6 +334,34 @@ void DVDTitle::addAudio(DVDAudio *new_audio_track)
     audio_tracks.append(new_audio_track);
 }
 
+void DVDTitle::addSubTitle(DVDSubTitle *new_subtitle)
+{
+    //
+    //  Check if this langauge already exists
+    //  (which happens a lot)
+    //
+    
+    int lang_count = 0;
+    for(uint i = 0; i < subtitles.count(); ++i)
+    {
+        if(subtitles.at(i)->getLanguage() == 
+           new_subtitle->getLanguage())
+        {
+            ++lang_count;
+        }
+    }
+    if(lang_count == 0)
+    {
+        new_subtitle->setName(QString("<%1>").arg(new_subtitle->getLanguage()));
+    }
+    else
+    {
+        ++lang_count;
+        new_subtitle->setName(QString("<%1> (%2)").arg(new_subtitle->getLanguage()).arg(lang_count));
+    }
+    subtitles.append(new_subtitle);
+}
+
 void DVDTitle::determineInputID(QSqlDatabase *db)
 {
     if(!db)
@@ -388,6 +418,7 @@ void DVDTitle::determineInputID(QSqlDatabase *db)
 DVDTitle::~DVDTitle()
 {
     audio_tracks.clear();
+    subtitles.clear();
 }
 
 /*
@@ -595,15 +626,14 @@ bool DVDProbe::probe()
                     new_title->setTime(hour.toUInt(), minute.toUInt(), second.toUInt(),
                                        framerate);
                     
-                    //
-                    //  and now, wave the diving rod over audio bits
-                    //
-                    
-                    
                     vtsi_mat_t *vtsi_mat = NULL;
                     vtsi_mat = video_transport_file->vtsi_mat;
                     if(vtsi_mat)
                     {
+                        //
+                        //  and now, wave the diving rod over audio bits
+                        //
+                    
                         for(int j=0; j < vtsi_mat->nr_of_vts_audio_streams; j++)
                         {
                             audio_attr_t *audio_attributes = &vtsi_mat->vts_audio_attr[j];
@@ -612,11 +642,36 @@ bool DVDProbe::probe()
                             new_title->addAudio(new_audio);
                         }
 
+                        //
+                        //  divine, with any luck, subtitles
+                        //
                         
+                        for(int j=0; j < vtsi_mat->nr_of_vts_subp_streams; j++)
+                        {
+                            subp_attr_t *sub_attributes = &vtsi_mat->vts_subp_attr[j];
+                            if( sub_attributes->type           == 0 &&
+                                sub_attributes->zero1          == 0 &&
+                                sub_attributes->lang_code      == 0 &&
+                                sub_attributes->lang_extension == 0 &&
+                                sub_attributes->zero2          == 0)
+                            {
+                                // ignore this sub attribute
+                            }
+                            else
+                            {
+                                QString zee_language = "";
+                                zee_language.sprintf("%c%c", sub_attributes->lang_code>>8, 
+                                                             sub_attributes->lang_code & 0xff);
+                                DVDSubTitle *new_subtitle = new DVDSubTitle(j, zee_language);
+                                new_title->addSubTitle(new_subtitle);
+                                //printf("subtitle %02d=<%c%c> ", j, sub_attributes->lang_code>>8, sub_attributes->lang_code & 0xff);
+                                //if(sub_attributes->lang_extension) printf("ext=%d", sub_attributes->lang_extension);
+                            }
+                        }
+                                                
                         //
                         //  Figure out size, aspect ratio, etc.
                         //
-                        
                         
                         video_attr_t *video_attributes = &vtsi_mat->vts_video_attr;
                       

@@ -887,6 +887,28 @@ void DVDRipBox::handleMedia(QStringList tokens)
         new_audio->setChannels(tokens[5].toInt());
         which_title->addAudio(new_audio);
     }
+    else if(tokens[2] == "title-subtitle")
+    {
+        DVDTitleInfo *which_title = dvd_info->getTitle(tokens[3].toUInt());
+        if(!which_title)
+        {
+            cerr << "dvdripbox.o: Asked to add a subtitle for a title that doesn't exist" << endl;
+            return;
+        }
+        
+        QString name_string = "";
+        for(uint i = 6; i < tokens.count(); i++)
+        {
+            name_string += tokens[i];
+            if(i < tokens.count() - 1)
+            {
+                name_string += " ";
+            }
+        }
+        DVDSubTitleInfo *new_subtitle = new DVDSubTitleInfo(tokens[4].toInt(), name_string);
+        which_title->addSubTitle(new_subtitle);
+        //cout << "Just added a subtitle of id " << new_subtitle->getID() << " and name of " << new_subtitle->getName() << endl;
+    }
     
 }
 
