@@ -145,10 +145,6 @@ NuppelVideoRecorder::NuppelVideoRecorder(ChannelBase *channel)
     inpixfmt = FMT_YV12;
     correct_bttv = false;
 
-    setorigaudio = false;
-    origaudio = new struct video_audio;
-
-
     usingv4l2 = false;
 
     prev_bframe_save_pos = -1;
@@ -157,8 +153,6 @@ NuppelVideoRecorder::NuppelVideoRecorder(ChannelBase *channel)
 
 NuppelVideoRecorder::~NuppelVideoRecorder(void)
 {
-    if (origaudio)
-        delete origaudio;
     if (weMadeBuffer)
         delete ringBuffer;
     if (rtjc)
@@ -1022,16 +1016,9 @@ void NuppelVideoRecorder::StartRecording(void)
 
         if (ioctl(fd, VIDIOCGAUDIO, &va)<0) 
             perror("VIDIOCGAUDIO"); 
-        memcpy(origaudio, &va, sizeof(struct video_audio));
-        setorigaudio = true;
+
         //if (!quiet) 
         //    fprintf(stderr, "audio volume was '%d'\n", va.volume);
-
-        // I don't know why this was here, but it causes me to get
-        // audio from the wrong input (but only in certain situations).  This took a
-        // VERY LONG TIME to track down.
-        // -mdz
-        //va.audio = 0;
 
         va.flags &= ~VIDEO_AUDIO_MUTE; // now this really has to work
 
@@ -1534,9 +1521,6 @@ void NuppelVideoRecorder::KillChildren(void)
 {
     childrenLive = false;
    
-    if (!usingv4l2 && setorigaudio && ioctl(fd, VIDIOCSAUDIO, origaudio) < 0)
-        perror("VIDIOCSAUDIO");
-
     pthread_join(write_tid, NULL);
     pthread_join(audio_tid, NULL);
     if (vbimode)

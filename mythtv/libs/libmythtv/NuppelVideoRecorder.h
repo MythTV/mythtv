@@ -146,7 +146,6 @@ class NuppelVideoRecorder : public RecorderBase
     int quiet;
     int rawmode;
     int usebttv;
-    struct video_audio *origaudio;
 
     CommDetect *commDetect;
 
@@ -263,8 +262,6 @@ class NuppelVideoRecorder : public RecorderBase
     long long prev_keyframe_save_pos;
 
     ChannelBase *channelObj;
-
-    bool setorigaudio;
 
     bool skip_btaudio;
 
