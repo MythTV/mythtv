@@ -1,0 +1,21 @@
+<mythmenu name="MUSIC_SETTINGS">
+
+   <button>
+      <type>GAME</type>
+      <text>General Settings</text>
+      <text lang="IT">Impostazioni generali</text>
+      <text lang="ES">Opciones Generales</text>
+      <text lang="CA">Opcions Generals</text>
+      <text lang="DE">Allgemeines</text>
+      <text lang="DK">Generelle indstillinger</text>
+      <text lang="NL">Algemeen</text>
+      <action>GAME_SETTINGS</action>
+   </button>
+
+   <button>
+      <type>GAME</type>
+      <text>Scan for Games</text>
+      <action>SEARCH_FOR_GAMES</action>
+   </button>
+
+</mythmenu>

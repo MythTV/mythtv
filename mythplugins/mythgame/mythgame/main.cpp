@@ -14,6 +14,56 @@ using namespace std;
 #include <mythtv/themedmenu.h>
 #include <mythtv/mythcontext.h>
 
+struct GameData
+{
+    QSqlDatabase *db;
+};
+
+void GameCallback(void *data, QString &selection)
+{
+    GameData *ddata = (GameData *)data;
+    QString sel = selection.lower();
+
+    (void)ddata;
+
+    if (sel == "game_settings")
+    {
+        MythGameSettings settings;
+        settings.exec(QSqlDatabase::database());
+    }
+    else if (sel == "search_for_games")
+    {
+        GameHandler::processAllGames();
+    }
+}
+
+void runMenu(QString which_menu)
+{
+    QString themedir = gContext->GetThemeDir();
+    QSqlDatabase *db = QSqlDatabase::database();
+
+    ThemedMenu *diag = new ThemedMenu(themedir.ascii(), which_menu,
+                                      gContext->GetMainWindow(), "game menu");
+
+    GameData data;
+    data.db = db;
+
+    diag->setCallback(GameCallback, &data);
+    diag->setKillable();
+
+    if (diag->foundTheme())
+    {
+        gContext->LCDswitchToTime();
+        diag->exec();
+    }
+    else
+    {
+        cerr << "Couldn't find theme " << themedir << endl;
+    }
+
+    delete diag;
+}
+
 extern "C" {
 int mythplugin_init(const char *libversion);
 int mythplugin_run(void);
@@ -82,9 +132,7 @@ int mythplugin_run(void)
 
 int mythplugin_config(void)
 {
-    MythGameSettings settings;
-    settings.exec(QSqlDatabase::database());
-
+    runMenu("game_settings.xml");
     return 0;
 }
 
