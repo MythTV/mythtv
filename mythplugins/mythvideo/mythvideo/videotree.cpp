@@ -180,11 +180,15 @@ void VideoTree::setParentalLevel(int which_level)
     
         //  
         //  Tell the tree list to highlight the 
-        //  first leaf and then draw the GUI as
+        //  first child and then draw the GUI as
         //  it now stands
         //
     
-        video_tree_list->enter();
+        video_tree_list->setCurrentNode(video_tree_data);
+        if(video_tree_data->childCount() > 0)
+        {
+            video_tree_list->setCurrentNode(video_tree_data->getChildAt(0, 0));
+        }
         updateForeground();
     }
 }
@@ -258,13 +262,6 @@ void VideoTree::buildVideoList()
         
         buildFileList(gContext->GetSetting("VideoStartupDir"));
 
-        /*
-        if(browser_mode_files.count() < 1)
-        {
-            video_tree_data->addNode("No files found", -1, false);
-        }
-        */        
-        
         for(uint i=0; i < browser_mode_files.count(); i++)
         {
             QString file_string = *(browser_mode_files.at(i));
@@ -286,6 +283,7 @@ void VideoTree::buildVideoList()
                 {
                     QString title = (*an_it);
                     where_to_add->addNode(title.section(".",0,0), i, true);
+                    
                 }
                 else
                 {
