@@ -61,6 +61,8 @@ typedef struct
 
 #define H263HDR(s)              ((s)<<13)
 #define H263HDR_GETSZ(h)        (((h)>>13) & 0x7)
+#define H263HDR_GETSBIT(h)      (((h)>>3) & 0x7)
+#define H263HDR_GETEBIT(h)      ((h) & 0x7)
 
 #define H263_SRC_SQCIF          1
 #define H263_SRC_QCIF           2
@@ -180,6 +182,7 @@ private:
     void OpenSocket();
     void CloseSocket();
     void StreamInVideo();
+    int  appendVideoPacket(VIDEOBUFFER *picture, int curLen, RTPPACKET *JBuf, int mLen);
     void StreamInAudio();
     void PlayOutAudio();
     bool isSpeakerHungry();

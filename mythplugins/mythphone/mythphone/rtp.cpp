@@ -827,8 +827,7 @@ void rtp::StreamInVideo()
                         ++rxSeqNum;
                         mLen = JBuf->len - RTP_HEADER_SIZE - sizeof(H263_RFC2190_HDR);
                         rxTimestamp += mLen;
-                        if ((pictureIndex + mLen) <= (int)sizeof(picture->video))
-                            memcpy(&picture->video[pictureIndex], JBuf->RtpData+sizeof(H263_RFC2190_HDR), mLen);
+                        pictureIndex = appendVideoPacket(picture, pictureIndex, JBuf, mLen);
                         if (JBuf->RtpMPT & RTP_PAYLOAD_MARKER_BIT)
                         {
                             markerSetOnLastPacket = true;
@@ -846,7 +845,6 @@ void rtp::StreamInVideo()
                             }
                         }
                         pJitter->FreeJBuffer(JBuf);
-                        pictureIndex += mLen;
                     }
 
                     // Check rxed frame was not too big
@@ -920,6 +918,28 @@ void rtp::StreamInVideo()
     }
 }
 
+int rtp::appendVideoPacket(VIDEOBUFFER *picture, int curLen, RTPPACKET *JBuf, int mLen)
+{
+    if ((curLen + mLen) <= (int)sizeof(picture->video))
+    {
+        H263_RFC2190_HDR *h263Hdr = (H263_RFC2190_HDR *)JBuf->RtpData;
+        int bitOffset = H263HDR_GETSBIT(h263Hdr->h263hdr);
+        if ((bitOffset == 0) || (curLen == 0))
+        {
+            memcpy(&picture->video[curLen], JBuf->RtpData+sizeof(H263_RFC2190_HDR), mLen);
+            curLen += mLen;
+        }
+        else
+        {
+            uchar mask = (0xFF >> bitOffset) << bitOffset;
+            picture->video[curLen-1] &= mask; // Keep most sig bits from last frame
+            picture->video[curLen-1] |= (*(JBuf->RtpData+sizeof(H263_RFC2190_HDR)) & (~mask));
+            memcpy(&picture->video[curLen], JBuf->RtpData+sizeof(H263_RFC2190_HDR)+1, mLen-1);
+            curLen += mLen-1;
+        }
+    }
+    return curLen;
+}
 
 void rtp::initVideoBuffers(int Num)
 {
