@@ -238,6 +238,19 @@ bool VideoOutputVIA::CreateViaBuffers(void)
         data->lpSubSurface += data->ddLock.SubDev.dwSUBPhysicalAddr[0];
 
         close(data->fd);
+
+        for (int i = 0; i < 16; i++)
+        {
+            data->reorder_palette[i * 4] = i * 16;
+            data->reorder_palette[i * 4 + 1] = 127;
+            data->reorder_palette[i * 4 + 2] = 127;
+
+            data->VIASubPict.dwRamTab[i] = 
+                           *(unsigned long *)(data->reorder_palette + (i * 4));
+        }
+
+        data->VIASubPict.dwTaskType = VIA_TASK_SP_RAMTAB;
+        VIASUBPicture(&data->VIASubPict);
     }
     else
         cerr << "Couldn't open /dev/mem to map overlay surface\n";
@@ -431,4 +444,25 @@ void VideoOutputVIA::ProcessFrame(VideoFrame *frame, OSD *osd,
                                   vector<VideoFilter *> &filterList,
                                   NuppelVideoPlayer *pipPlayer)
 {
+    if (osd)
+    {
+        VideoFrame tmpframe;
+        tmpframe.codec = FMT_IA44;
+        tmpframe.buf = (unsigned char *)data->lpSubSurface;
+
+        if (!DisplayOSD(&tmpframe, osd, data->ddLock.SubDev.dwPitch))
+        {
+            data->VIASubPict.dwTaskType = VIA_TASK_SP_DISPLAY_DISABLE;
+            VIASUBPicture(&data->VIASubPict);
+            return;
+        }
+
+        data->VIASubPict.dwSPLeft = 0;
+        data->VIASubPict.dwSPTop = 0;
+        data->VIASubPict.dwSPWidth = XJ_width;
+        data->VIASubPict.dwSPHeight = XJ_height;
+        data->VIASubPict.dwDisplayBuffIndex = 0;
+        data->VIASubPict.dwTaskType = VIA_TASK_SP_DISPLAY;
+        VIASUBPicture(&data->VIASubPict);
+    } 
 }

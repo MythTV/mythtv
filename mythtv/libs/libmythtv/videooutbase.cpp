@@ -475,7 +475,7 @@ void VideoOutput::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
     }
 }
 
-bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
+bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd, int stride)
 {
     bool retval = false;
 
@@ -489,21 +489,21 @@ bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
                 case FMT_YV12:
                 {
                     unsigned char *yuvptr = frame->buf;
-                    BlendSurfaceToYV12(surface, yuvptr);
+                    BlendSurfaceToYV12(surface, yuvptr, stride);
                     retval = surface->Changed();
                     break;
                 }
                 case FMT_AI44:
                 {
                     unsigned char *ai44ptr = frame->buf;
-                    BlendSurfaceToI44(surface, ai44ptr, true);
+                    BlendSurfaceToI44(surface, ai44ptr, true, stride);
                     retval = true;
                     break;
                 }
                 case FMT_IA44:
                 {
                     unsigned char *ia44ptr = frame->buf;
-                    BlendSurfaceToI44(surface, ia44ptr, false);
+                    BlendSurfaceToI44(surface, ia44ptr, false, stride);
                     retval = true;
                     break;
                 }
@@ -516,10 +516,13 @@ bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
     return retval;
 }
  
-void VideoOutput::BlendSurfaceToYV12(OSDSurface *surface, unsigned char *yuvptr)
+void VideoOutput::BlendSurfaceToYV12(OSDSurface *surface, unsigned char *yuvptr,
+                                     int stride)
 {
     unsigned char *uptrdest = yuvptr + surface->width * surface->height;
     unsigned char *vptrdest = uptrdest + surface->width * surface->height / 4;
+
+    (void)stride;
 
     QMemArray<QRect> rects = surface->usedRegions.rects();
     QMemArray<QRect>::Iterator it = rects.begin();
@@ -583,7 +586,7 @@ blendimageyv12end:
 }
 
 void VideoOutput::BlendSurfaceToI44(OSDSurface *surface, unsigned char *yuvptr,
-                                    bool ifirst)
+                                    bool ifirst, int stride)
 {
     int ashift = ifirst ? 0 : 4;
     int amask = ifirst ? 0x0f : 0xf0;
@@ -591,7 +594,10 @@ void VideoOutput::BlendSurfaceToI44(OSDSurface *surface, unsigned char *yuvptr,
     int ishift = ifirst ? 4 : 0;
     int imask = ifirst ? 0xf0 : 0x0f; 
 
-    memset(yuvptr, 0x0, XJ_width * XJ_height);
+    if (stride < 0)
+        stride = XJ_width;
+
+    memset(yuvptr, 0x0, stride * XJ_height);
 
     QMemArray<QRect> rects = surface->usedRegions.rects();
     QMemArray<QRect>::Iterator it = rects.begin();
@@ -610,13 +616,15 @@ void VideoOutput::BlendSurfaceToI44(OSDSurface *surface, unsigned char *yuvptr,
         unsigned char *alpha;
 
         int yoffset;
+        int destyoffset;
 
         for (int y = startline; y <= endline; y++)
         {
             yoffset = y * surface->width;
+            destyoffset = y * stride;
 
             src = surface->y + yoffset + startcol;
-            dest = yuvptr + yoffset + startcol;
+            dest = yuvptr + destyoffset + startcol;
             alpha = surface->alpha + yoffset + startcol;
 
             for (int x = startcol; x <= endcol; x++)

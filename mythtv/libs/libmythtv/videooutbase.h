@@ -87,11 +87,12 @@ class VideoOutput
 
   protected:
     void ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer);
-    bool DisplayOSD(VideoFrame *frame, OSD *osd);
+    bool DisplayOSD(VideoFrame *frame, OSD *osd, int stride = -1);
 
-    void BlendSurfaceToYV12(OSDSurface *surface, unsigned char *yuvptr);
+    void BlendSurfaceToYV12(OSDSurface *surface, unsigned char *yuvptr,
+                            int stride = -1);
     void BlendSurfaceToI44(OSDSurface *surface, unsigned char *yuvptr,
-                           bool alphafirst);   
+                           bool alphafirst, int stride = -1);   
  
     int XJ_width, XJ_height;
     float XJ_aspect;
