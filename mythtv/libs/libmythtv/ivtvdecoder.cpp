@@ -40,7 +40,6 @@ IvtvDecoder::IvtvDecoder(NuppelVideoPlayer *parent, QSqlDatabase *db,
     firstgoppos = 0;
     prevgoppos = 0;
 
-    ntsc = true;
     fps = 29.97;
     validvpts = false;
 
