@@ -26,7 +26,7 @@ RootSRGroup::RootSRGroup(ScheduledRecording& _rec,ManagedList* _parentList, QObj
     addItem(detailsButton, -1);
     connect(detailsButton, SIGNAL(selected(ManagedListItem*)), &_rec, SLOT(runShowDetails()));
 
-    upcomingButton = new ManagedListItem("List upcoming episodes",
+    upcomingButton = new ManagedListItem(QObject::tr("List upcoming episodes"),
                                          _parentList, this, "listUpcoming");
     addItem(upcomingButton, -1);
     connect(upcomingButton, SIGNAL(selected(ManagedListItem*)), &_rec, SLOT(runProgList()));

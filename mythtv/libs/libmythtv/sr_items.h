@@ -173,28 +173,28 @@ class SRRecordingType : public SRSelectSetting
 
         void addNormalSelections(bool haschannel)
         {
-            addSelection("Do not record this program", kNotRecording);
+            addSelection(QObject::tr("Do not record this program"), kNotRecording);
 
             if (haschannel)
-                addSelection("Record only this showing", kSingleRecord);
+                addSelection(QObject::tr("Record only this showing"), kSingleRecord);
 
-            addSelection("Record one showing of this program", kFindOneRecord);
+            addSelection(QObject::tr("Record one showing of this program"), kFindOneRecord);
 
             if (haschannel)
             {
-                addSelection("Record in this timeslot every week", kWeekslotRecord);
-                addSelection("Record in this timeslot every day",  kTimeslotRecord);
-                addSelection("Record at any time on this channel", kChannelRecord);
+                addSelection(QObject::tr("Record in this timeslot every week"), kWeekslotRecord);
+                addSelection(QObject::tr("Record in this timeslot every day"),  kTimeslotRecord);
+                addSelection(QObject::tr("Record at any time on this channel"), kChannelRecord);
             }
 
-           addSelection("Record at any time on any channel", kAllRecord);
+           addSelection(QObject::tr("Record at any time on any channel"), kAllRecord);
         }
 
         void addOverrideSelections(void)
         {
-            addSelection("Record this showing with normal options", kNotRecording);
-            addSelection("Record this showing with override options", kOverrideRecord);
-            addSelection("Do not allow this showing to be recorded", kDontRecord);
+            addSelection(QObject::tr("Record this showing with normal options"), kNotRecording);
+            addSelection(QObject::tr("Record this showing with override options"), kOverrideRecord);
+            addSelection(QObject::tr("Do not allow this showing to be recorded"), kDontRecord);
         }
 
 
@@ -208,11 +208,11 @@ class SRStartOffset : public SRBoundedIntegerSetting
                      : SRBoundedIntegerSetting( -120, 120, 10, 1, _parent, "startoffsetList", "startoffset",
                                                 _group, _list, true)
         {
-            setTemplates("Start recording %1 minutes late",
-                         "Start recording %1 minute late",
-                         "Start recording on time",
-                         "Start recording %1 minute early",
-                         "Start recording %1 minutes early");
+            setTemplates(QObject::tr("Start recording %1 minutes late"),
+                         QObject::tr("Start recording %1 minute late"),
+                         QObject::tr("Start recording on time"),
+                         QObject::tr("Start recording %1 minute early"),
+                         QObject::tr("Start recording %1 minutes early"));
 
             _parent.setStartOffsetObj(this);
         }
@@ -227,9 +227,9 @@ class SREndOffset : public SRBoundedIntegerSetting
                      : SRBoundedIntegerSetting( -120, 240, 10, 1, _parent, "endoffsetList", "endoffset",
                                                 _group, _list)
         {
-            setTemplates("End recording %1 minutes early", "End recording %1 minute early",
-                         "End recording on time", "End recording %1 minute late",
-                         "End recording %1 minutes late");
+            setTemplates(QObject::tr("End recording %1 minutes early"), QObject::tr("End recording %1 minute early"),
+                         QObject::tr("End recording on time"), QObject::tr("End recording %1 minute late"),
+                         QObject::tr("End recording %1 minutes late"));
 
             _parent.setEndOffsetObj(this);
         }
@@ -242,9 +242,9 @@ class SRDupIn : public SRSelectSetting
         SRDupIn(ScheduledRecording& _parent, ManagedList* _list, ManagedListGroup* _group)
             : SRSelectSetting(_parent, "dupInList", "[ Check for duplicates in ]", _group, "dupin", _list )
         {
-            addSelection("Look for duplicates in current and previous recordings", kDupsInAll);
-            addSelection("Look for duplicates in current recordings only", kDupsInRecorded);
-            addSelection("Look for duplicates in previous recordings only", kDupsInOldRecorded);
+            addSelection(QObject::tr("Look for duplicates in current and previous recordings"), kDupsInAll);
+            addSelection(QObject::tr("Look for duplicates in current recordings only"), kDupsInRecorded);
+            addSelection(QObject::tr("Look for duplicates in previous recordings only"), kDupsInOldRecorded);
             setValue(kDupsInAll);
             _parent.setDupInObj(this);
         }
@@ -255,16 +255,16 @@ class SRDupMethod: public SRSelectSetting
 {
     public:
         SRDupMethod(ScheduledRecording& _parent, ManagedList* _list, ManagedListGroup* _group)
-            : SRSelectSetting(_parent, "dupMethodList", "[ Match duplicates with ]", _group,
+            : SRSelectSetting(_parent, "dupMethodList", QObject::tr("[ Match duplicates with ]"), _group,
                               "dupmethod", _list)
         {
             if (gContext->GetNumSetting("HaveRepeats", 0))
-                addSelection("Record new episodes only", kDupCheckNewEpi);
+                addSelection(QObject::tr("Record new episodes only"), kDupCheckNewEpi);
 
-            addSelection("Match duplicates using subtitle & description", kDupCheckSubDesc);
-            addSelection("Match duplicates using subtitle", kDupCheckSub);
-            addSelection("Match duplicates using description", kDupCheckDesc);
-            addSelection("Don't match duplicates", kDupCheckNone);
+            addSelection(QObject::tr("Match duplicates using subtitle & description"), kDupCheckSubDesc);
+            addSelection(QObject::tr("Match duplicates using subtitle"), kDupCheckSub);
+            addSelection(QObject::tr("Match duplicates using description"), kDupCheckDesc);
+            addSelection(QObject::tr("Don't match duplicates"), kDupCheckNone);
             setValue(kDupCheckSubDesc);
             _parent.setDupMethodObj(this);
         }
@@ -284,7 +284,7 @@ class SRRecSearchType: public IntegerSetting, public SimpleSRSetting
 class SRProfileSelector: public SRSelectSetting {
     public:
         SRProfileSelector(ScheduledRecording& _parent, ManagedList* _list, ManagedListGroup* _group)
-            : SRSelectSetting(_parent, "profileList", "[ Select recording Profile ]", _group, "profile", _list )
+            : SRSelectSetting(_parent, "profileList", QObject::tr("[ Select recording Profile ]"), _group, "profile", _list )
         {
             _parent.setProfileObj(this);
         }
@@ -491,7 +491,7 @@ class SRAutoExpire: public SRBoolSetting
 {
     public:
         SRAutoExpire(ScheduledRecording& _parent, ManagedListGroup* _group, ManagedList* _list)
-                    : SRBoolSetting(_parent, "Allow auto expire", "Don't allow auto expire",
+                    : SRBoolSetting(_parent, QObject::tr("Allow auto expire"), QObject::tr("Don't allow auto expire"),
                                     "autoExpireItem", "autoexpire", _group, _list )
         {
             _parent.setAutoExpireObj(this);
@@ -504,8 +504,8 @@ class SRMaxNewest: public SRBoolSetting
 {
     public:
         SRMaxNewest(ScheduledRecording& _parent, ManagedListGroup* _group, ManagedList* _list)
-                   : SRBoolSetting(_parent, "Delete oldest if this recording exceedes the max episodes",
-                                   "Don't record if this would exceed the max episodes", "maxnewestItem",
+                   : SRBoolSetting(_parent, QObject::tr("Delete oldest if this recording exceedes the max episodes"),
+                                   QObject::tr("Don't record if this would exceed the max episodes"), "maxnewestItem",
                                    "maxnewest", _group, _list )
         {
             setValue(false);
@@ -523,7 +523,7 @@ class SRMaxEpisodes : public SRBoundedIntegerSetting
                  : SRBoundedIntegerSetting( 0, 100, 5, 1, _parent, "maxepisodesList", "maxepisodes",
                                             _group, _list)
     {
-        setTemplates("", "", "No episode limit", "Keep only one episode.", "Keep at most %1 episodes");
+        setTemplates("", "", QObject::tr("No episode limit"), QObject::tr("Keep only one episode."), QObject::tr("Keep at most %1 episodes"));
         _parent.setMaxEpisodesObj(this);
     }
 };
@@ -565,8 +565,9 @@ class SRRecPriority: public SRBoundedIntegerSetting
                     : SRBoundedIntegerSetting( -99, 99, 5, 1, _parent, "recpriorityList", "recpriority",
                                                _group, _list)
         {
-            setTemplates( "Reduce priority by %1", "Reduce priority by %1", "Normal recording priority",
-                          "Raise priority by %1", "Raise priority by %1" );
+            setTemplates( QObject::tr("Reduce priority by %1"), QObject::tr("Reduce priority by %1"),
+			  QObject::tr("Normal recording priority"),
+                          QObject::tr("Raise priority by %1"), QObject::tr("Raise priority by %1") );
             setValue(0);
             _parent.setRecPriorityObj(this);
         }
