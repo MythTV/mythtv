@@ -1,7 +1,7 @@
 #ifndef SCHEDULEDRECORDING_H
 #define SCHEDULEDRECORDING_H
 
-#include "libmyth/settings.h"
+#include "settings.h"
 #include <qdatetime.h>
 
 #include <list>
