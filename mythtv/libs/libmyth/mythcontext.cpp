@@ -917,6 +917,13 @@ void MythContext::LoadQtConfig(void)
         // Note the possibly changed screen settings
         d->GetScreenBounds();
     }
+    else if (d->m_width <= 0 || d->m_height <= 0)
+    {
+        // For some reason, the screen resolution has not been stored yet.
+        // This could be some strange error, or we could be bootstrapping
+        // before connecting to a database. Either way, store screen size
+        d->GetScreenBounds();
+    }
     
     
 
