@@ -35,4 +35,4 @@ str OSDFont=helr.ttf
 str TVFormat=NTSC
 str FreqTable=us-cable
 
-str ProgramGuidePath=../epg/epg
+str ProgramGuidePath=../epg/mythepg
