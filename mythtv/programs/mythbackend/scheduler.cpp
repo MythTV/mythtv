@@ -231,6 +231,8 @@ bool Scheduler::FillRecordList(void)
     schedMoveHigher = (bool)gContext->GetNumSetting("SchedMoveHigher");
     schedTime = QDateTime::currentDateTime();
 
+    MythContext::KickDatabase(db);
+
     VERBOSE(VB_SCHEDULE, "PruneOldRecords...");
     PruneOldRecords();
     VERBOSE(VB_SCHEDULE, "AddNewRecords...");

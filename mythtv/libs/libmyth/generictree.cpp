@@ -258,19 +258,8 @@ int GenericTree::getPosition()
 
 int GenericTree::getPosition(int ordering_index)
 {
-    if (ordering_index == -1)
-        return getPosition();
-
     if (m_parent)
-    {
-        if (m_parent->getOrderingIndex() != ordering_index)
-        {
-            m_parent->reorderSubnodes(ordering_index);
-            m_parent->setOrderingIndex(ordering_index);
-        }
-
         return m_parent->getChildPosition(this, ordering_index);
-    }
     return 0;
 }
 
