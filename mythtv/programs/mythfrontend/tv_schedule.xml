@@ -58,7 +58,7 @@
       <text lang="DE">Wortsuche</text>
       <text lang="SV">Sök ord</text>
       <text lang="NL">Zoek Woorden</text>
-      <text lang="JA">リスト検索</text>
+      <text lang="JA">単語検索</text>
       <alttext>Search</alttext>
       <alttext lang="SV">Sök</alttext>
       <alttext lang="DE">Wörter</alttext>
@@ -70,6 +70,7 @@
       <text>Search Lists</text>
       <text lang="SV">Sök listor</text>
       <text lang="NL">Overzichtslijsten</text>
+      <text lang="JA">リスト検索</text>
       <text lang="DE">Listensuche</text>
       <alttext>Lists</alttext>
       <alttext lang="DE">Listen</alttext>

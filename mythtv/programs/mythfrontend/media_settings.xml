@@ -82,6 +82,7 @@
      <type>SETTINGS_FM</type>
      <text>Radio Settings</text>
      <text lang="SV">Radioinställningar</text>
+     <text lang="JA">ラジオ設定</text>
      <text lang="DE">Radio Einstellungen</text>
      <alttext lang="DE">Radio</alttext>
      <action>CONFIGPLUGIN mythfm</action>

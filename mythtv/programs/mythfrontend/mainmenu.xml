@@ -66,6 +66,7 @@
     <button>
       <type>PHONE</type>
       <text>Phone</text>
+      <text lang="JA">電話</text>
       <text lang="DE">Telephon</text>
       <action>PLUGIN mythphone</action>
       <depends>mythphone</depends>

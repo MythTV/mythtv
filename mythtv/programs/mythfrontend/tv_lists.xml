@@ -45,6 +45,7 @@
       <text>Time</text>
       <text lang="NL">Tijdstip</text>
       <text lang="SV">Tid</text>
+      <text lang="JA">時間</text>
       <text lang="DE">Sendezeit</text>
       <action>TV_SEARCH_TIME</action>
    </button>

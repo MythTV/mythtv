@@ -45,6 +45,7 @@
      <type>SETTINGS_RECIPE</type>
      <text>Recipe Settings</text>
      <text lang="SV">ReceptinstÃ¤llningar</text>
+     <text lang="JA">レシピ設定</text>
      <text lang="DE">Rezepte Einstellungen</text>
      <alttext lang="DE">Rezepte</text>
      <action>CONFIGPLUGIN mythrecipe</action>

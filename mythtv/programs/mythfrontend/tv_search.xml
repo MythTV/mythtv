@@ -16,7 +16,7 @@
       <text lang="DE">Inhalt</text>
       <text lang="SV">Nyckelord</text>
       <text lang="NL">Beschrijving</text>      
-      <text lang="JA">å†…å®¹</text>
+      <text lang="JA">キーワード</text>
       <action>TV_SEARCH_KEYWORD</action>
    </button>
    
@@ -24,6 +24,7 @@
       <type>TV_SEARCH_PEOPLE</type>
       <text>People</text>
       <text lang="SV">Person</text>
+      <text lang="JA">人</text>
       <text lang="DE">Personen</text>
       <action>TV_SEARCH_PEOPLE</action>
    </button>
@@ -31,6 +32,7 @@
    <button>
       <type>TV_SEARCH_POWER</type>
       <text>Advanced</text>
+      <text lang="JA">アドバンスト</text>
       <text lang="DE">Erweitert</text>
       <action>TV_SEARCH_POWER</action>
    </button>
