@@ -225,7 +225,7 @@ public:
     };
 public slots:
     virtual void setValue(int newValue) {
-        Setting::setValue(QString("%1").arg(newValue));
+        Setting::setValue(QString::number(newValue));
         emit valueChanged(newValue);
     };
 signals:
@@ -288,7 +288,7 @@ public slots:
         setValue(values[which]);
     };
 
-    virtual QString getCurrentLabel(void) const {
+    virtual QString getSelectionLabel(void) const {
         if (!isSet)
             return QString::null;
         return labels[current];
@@ -442,6 +442,44 @@ protected:
 class HostnameSetting: virtual public Setting {
 public:
     HostnameSetting();
+};
+
+class ChannelSetting: virtual public StringSelectSetting {
+public:
+    ChannelSetting() {
+        setLabel("Channel");
+    };
+
+    static void fillSelections(QSqlDatabase* db, StringSelectSetting* setting);
+    virtual void fillSelections(QSqlDatabase* db) {
+        fillSelections(db, this);
+    };
+};
+
+class QDate;
+class DateSetting: virtual public Setting {
+    Q_OBJECT
+public:
+    QDate dateValue(void) const;
+
+    virtual QWidget* configWidget(ConfigurationGroup* cg, QWidget* parent,
+                                  const char* widgetName = 0);
+
+ public slots:
+    void setValue(const QDate& newValue);
+};
+
+class QTime;
+class TimeSetting: virtual public Setting {
+    Q_OBJECT
+public:
+    QTime timeValue(void) const;
+
+    virtual QWidget* configWidget(ConfigurationGroup* cg, QWidget* parent,
+                                  const char* widgetName = 0);
+
+ public slots:
+    void setValue(const QTime& newValue);
 };
 
 class DBStorage: virtual public Setting {

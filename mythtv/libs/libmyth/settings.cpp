@@ -23,6 +23,7 @@
 #include <qapplication.h>
 #include <qwidget.h>
 #include <unistd.h>
+#include <qdatetime.h>
 
 #include "mythcontext.h"
 #include "mythwizard.h"
@@ -426,6 +427,35 @@ void PathSetting::addSelection(const QString& label,
     ComboBoxSetting::addSelection(label, value, select);
 }
 
+QTime TimeSetting::timeValue(void) const {
+    return QTime::fromString(getValue(), Qt::ISODate);
+}
+
+void TimeSetting::setValue(const QTime& newValue) {
+    Setting::setValue(newValue.toString(Qt::ISODate));
+}
+
+QWidget* TimeSetting::configWidget(ConfigurationGroup* cg, QWidget* parent,
+                                   const char* widgetName) {
+    
+    //QString timeformat = m_context->GetSetting("TimeFormat", "h:mm AP");
+    return NULL;
+}
+
+QDate DateSetting::dateValue(void) const {
+    return QDate::fromString(getValue(), Qt::ISODate);
+}
+
+void DateSetting::setValue(const QDate& newValue) {
+    Setting::setValue(newValue.toString(Qt::ISODate));
+}
+
+QWidget* DateSetting::configWidget(ConfigurationGroup* cg, QWidget* parent,
+                                   const char* widgetName) {
+    //QString dateformat = m_context->GetSetting("DateFormat", "ddd MMMM d");
+    return NULL;
+}
+
 QWidget* RadioSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
                                     const char* widgetName) {
     QButtonGroup* widget = new QButtonGroup(parent, widgetName);
@@ -690,4 +720,17 @@ HostnameSetting::HostnameSetting(void)  {
         buf[sizeof(buf)-1] = 0;
         setValue(QString(buf));
     }
+}
+
+void ChannelSetting::fillSelections(QSqlDatabase* db, StringSelectSetting* setting) {
+
+    // this should go somewhere else, in something that knows about
+    // channels and how they're stored in the database.  We're just a
+    // selector.
+
+    QSqlQuery result = db->exec("SELECT name, chanid FROM channel");
+    if (result.isActive() && result.numRowsAffected() > 0)
+        while (result.next())
+            setting->addSelection(result.value(0).toString(),
+                                  QString::number(result.value(1).toInt()));
 }
