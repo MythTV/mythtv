@@ -536,6 +536,15 @@ void MythNews::slotViewArticle()
 
     if (articleUIItem && articleUIItem->getData())
         article = (NewsArticle*) articleUIItem->getData();
-    if(article)
-        myth_system( QString( "mythbrowser %1").arg(article->articleURL()));
+    if (article)
+    {
+        QString cmd = gContext->GetSetting("WebBrowserCommand", 
+                                           PREFIX "/bin/mythbrowser");
+        QString zoom = QString(" -z %1")
+                            .arg(gContext->GetNumSetting("WebBrowserZoomLevel",
+                                                         200));
+        cmd += zoom;
+        cmd += article->articleURL();
+        myth_system( cmd );
+    }
 }
