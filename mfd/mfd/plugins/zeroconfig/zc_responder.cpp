@@ -459,13 +459,38 @@ void ZeroConfigResponder::run()
 		mDNSPosixProcessFDSet(&mDNSStorage_responder, &readfds);
     }
 
+
+
     file_descriptors_mutex.unlock();
     fd_watcher->stop();
     fd_watcher->wait();
     delete fd_watcher;
     fd_watcher = NULL;
     
+    removeAllServices();
 
+    
+    
+    //
+    //  Be nice to the rest of the network and properly remove all service
+    //  from mDNS land.
+    //
+    
+    bool keep_flushing = true;
+    while(keep_flushing)
+    {
+        mDNS_Execute(&mDNSStorage_responder);
+        
+        //
+        //  Give the network a bit of time to respond
+        //
+        
+        msleep(200);
+        if(registered_services.count() < 1)
+        {
+            keep_flushing = false;
+        }
+    }
 }
 
 void ZeroConfigResponder::addRequest(const QStringList &tokens, int socket_identifier)
@@ -479,6 +504,19 @@ void ZeroConfigResponder::addRequest(const QStringList &tokens, int socket_ident
                     .arg(things_to_do.count()));
         }
     things_to_do_mutex.unlock();
+}
+
+void ZeroConfigResponder::removeAllServices()
+{
+    QPtrListIterator<RegisteredService> iterator(registered_services);
+    RegisteredService *a_service;
+    while ( (a_service = iterator.current()) != 0 )
+    {
+        ++iterator;
+        
+        mDNS_DeregisterService(&mDNSStorage_responder, a_service->getCoreService());
+    }
+    
 }
 
 bool ZeroConfigResponder::removeService(const QString &service_name)

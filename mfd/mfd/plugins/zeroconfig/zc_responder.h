@@ -74,6 +74,7 @@ class ZeroConfigResponder: public MFDBasePlugin
                             const QString& service_text
                         );
     bool removeService(const QString &service_name);
+    void removeAllServices();
 
     void handleRegistrationCallback(
                                     mDNS *const m, 
