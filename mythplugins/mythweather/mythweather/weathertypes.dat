@@ -10,7 +10,7 @@
 22,Mostly Sunny,sunny.png
 24,Sunny,sunny.png
 25,Scattered Flurries,flurries.png
-26,AM Clouds/PM Sun,acouldpsun.png
+26,AM Clouds/PM Sun,acloudpsun.png
 29,PM Showers,showers.png
 31,Rain/Snow Showers,rainsnow.png
 32,Few Snow Showers,flurries.png
@@ -34,8 +34,10 @@
 84,Snow Showers,snowshow.png
 85,Rain to Snow,rainsnow.png
 86,PM Rain/Snow,snowshow.png
+90,Snow/Wind,snowshow.png
 92,PM Rain/Snow/Wind,rainsnow.png
 93,Rain/Snow Showers/Wind,rainsnow.png
+94,Rain/Snow/Wind,rainsnow.png
 98,Light Snow,flurries.png
 100,PM Snow,snowshow.png
 101,Few Snow Showers/Wind,snowshow.png
@@ -49,6 +51,7 @@
 130,Rain to Snow/Wind,rainsnow.png
 132,Snow to Wintry Mix,snowshow.png
 133,PM Snow Showers/Wind,snowshow.png
+135,Snow and Ice to Rain,rainsnow.png
 146,AM Light Snow/Wind,snowshow.png
 150,PM Light Rain/Wind,showers.png
 155,PM Snow Shower,snowshow.png
