@@ -1,7 +1,7 @@
 using namespace std;
 #include "screensaver.h"
 #include "screensaver-null.h"
-#ifdef USING_X11
+#if defined(Q_WS_X11)
 #include "screensaver-x11.h"
 #endif
 #ifdef CONFIG_DARWIN
@@ -11,7 +11,7 @@ using namespace std;
 
 ScreenSaverControl* ScreenSaverControl::get(void)
 {
-#ifdef USING_X11
+#if defined(Q_WS_X11)
     return new ScreenSaverX11();
 #endif
 #ifdef CONFIG_DARWIN
