@@ -86,6 +86,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
     eof = 0;
 
     keyframedist = 30;
+    usepre = 3;
 
     lastaudiolen = 0;
     wpos = rpos = 0;
@@ -1577,7 +1578,6 @@ void NuppelVideoPlayer::StartPlaying(void)
     consecutive_blanks = 0;
 
     killplayer = false;
-    usepre = 3;
 
     framesPlayed = 0;
 
