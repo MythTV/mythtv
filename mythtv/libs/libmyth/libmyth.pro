@@ -24,5 +24,6 @@ SOURCES += util.cpp mythwizard.cpp volumecontrol.h
 inc.path = $${PREFIX}/include/mythtv/
 inc.files  = dialogbox.h lcddevice.h themedmenu.h mythcontext.h 
 inc.files += mythwidgets.h remotefile.h util.h oldsettings.h volumecontrol.h
+inc.files += settings.h
 
 INSTALLS += inc
