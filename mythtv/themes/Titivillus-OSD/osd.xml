@@ -246,7 +246,7 @@
       <font>largeinfofont</font>
     </textarea>
     <slider name="statusslider" type="fill">
-      <area>60,425,410,22</area>
+      <area>60,425,442,22</area>
       <filename>fill-blue.png</filename>
     </slider>
     <textarea name="slidertext" align="center">
