@@ -316,7 +316,7 @@ static void *SpawnDelete(void *param)
 {
     DeleteStruct *ds = (DeleteStruct *)param;
     QString filename = ds->filename;
-    
+
     unlink(filename.ascii());
     
     filename += ".png";
@@ -329,6 +329,8 @@ static void *SpawnDelete(void *param)
     filename = ds->filename;
     filename += ".cutlist";
     unlink(filename.ascii());
+
+    sleep(2);
 
     MythEvent me("RECORDING_LIST_CHANGE");
     ds->context->dispatch(me);

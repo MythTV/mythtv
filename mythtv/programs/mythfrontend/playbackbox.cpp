@@ -37,6 +37,8 @@ PlaybackBox::PlaybackBox(MythContext *context, BoxType ltype, QWidget *parent,
     rbuffer = NULL;
     nvp = NULL;
 
+    ignoreevents = false;
+
     QVBoxLayout *vbox = new QVBoxLayout(this, (int)(15 * wmult));
 
     QString message = "Select a recording to ";
@@ -264,6 +266,7 @@ void PlaybackBox::killPlayer(void)
         QTime curtime = QTime::currentTime();
         curtime = curtime.addSecs(2);
 
+        ignoreevents = true;
         listview->SetAllowKeypress(false);
         while (!nvp->IsPlaying())
         {
@@ -275,6 +278,7 @@ void PlaybackBox::killPlayer(void)
             qApp->lock();
         }
         listview->SetAllowKeypress(true);
+        ignoreevents = false;
 
         nvp->StopPlaying();
         pthread_join(decoder, NULL);
@@ -309,6 +313,7 @@ void PlaybackBox::startPlayer(ProgramInfo *rec)
     QTime curtime = QTime::currentTime();
     curtime = curtime.addSecs(2);
  
+    ignoreevents = true;
     listview->SetAllowKeypress(false);
 
     while (nvp && !nvp->IsPlaying())
@@ -322,14 +327,23 @@ void PlaybackBox::startPlayer(ProgramInfo *rec)
     }
 
     listview->SetAllowKeypress(true);
+    ignoreevents = false;
 }
 
 void PlaybackBox::changed(QListViewItem *lvitem)
 {
+    //if (ignoreevents)
+    //    return;
+
+    ignoreevents = true;
+
     killPlayer();
 
     if (!title)
+    {
+        ignoreevents = false;
         return;
+    }
 
     ProgramListItem *pgitem = (ProgramListItem *)lvitem;
     if (!pgitem)
@@ -340,7 +354,13 @@ void PlaybackBox::changed(QListViewItem *lvitem)
         subtitle->setText("");
         description->setText("");
         if (pixlabel)
-            pixlabel->setPixmap(QPixmap(0, 0));
+        {
+            QPixmap temp((int)(160 * wmult), (int)(120 * hmult));
+            temp.fill(black);
+
+            pixlabel->setPixmap(temp);
+        }
+        ignoreevents = false;
         return;
     }
    
@@ -383,17 +403,21 @@ void PlaybackBox::changed(QListViewItem *lvitem)
     description->setMinimumWidth(descwidth);
     description->setMaximumHeight((int)(80 * hmult));
 
-    QPixmap *pix = pgitem->getPixmap();
+    if (pixlabel)
+    {
+        QPixmap *pix = pgitem->getPixmap();
+        if (pix)
+            pixlabel->setPixmap(*pix);
+    }
 
-    if (pixlabel && pix)
-        pixlabel->setPixmap(*pix);
+    ignoreevents = false;
 
     timer->start(1000 / 30);
 }
 
 void PlaybackBox::selected(QListViewItem *lvitem)
 {
-    if (!lvitem)
+    if (!lvitem || ignoreevents)
         return;
 
     switch (type) 
@@ -405,7 +429,12 @@ void PlaybackBox::selected(QListViewItem *lvitem)
 
 void PlaybackBox::play(QListViewItem *lvitem)
 {
+    if (!lvitem || ignoreevents)
+        return;
+
     killPlayer();
+
+    ignoreevents = true;
 
     ProgramListItem *pgitem = (ProgramListItem *)lvitem;
     ProgramInfo *rec = pgitem->getProgramInfo();
@@ -416,6 +445,7 @@ void PlaybackBox::play(QListViewItem *lvitem)
     tv->Init();
     tv->Playback(tvrec);
 
+    ignoreevents = true;
     listview->SetAllowKeypress(false);
     qApp->unlock();
     while (tv->IsPlaying() || tv->ChangingState())
@@ -427,39 +457,38 @@ void PlaybackBox::play(QListViewItem *lvitem)
     }
     qApp->lock();
     listview->SetAllowKeypress(true);
+    ignoreevents = false;
 
     if (tv->getRequestDelete())
     {
-        m_context->DeleteRecording(rec);
-
-        if (lvitem->itemBelow())
-        {
-            listview->setCurrentItem(lvitem->itemBelow());
-            listview->setSelected(lvitem->itemBelow(), true);
-        }
-        else if (lvitem->itemAbove())
-        {
-            listview->setCurrentItem(lvitem->itemAbove());
-            listview->setSelected(lvitem->itemAbove(), true);
-        }
-        else
-            changed(NULL);
-
-        delete lvitem;
+        remove(lvitem);
     }
 
     delete tv;
 
     FillList(true);
 
+    ignoreevents = false;
+
     timer->start(1000 / 30);
 }
 
 void PlaybackBox::remove(QListViewItem *lvitem)
 {
+    if (!lvitem || ignoreevents)
+        return;
+
     killPlayer();
-       
+
+    ignoreevents = true;
+
     ProgramListItem *pgitem = (ProgramListItem *)lvitem;
+    if (!pgitem)
+    {
+        ignoreevents = false;
+        return;
+    }
+
     ProgramInfo *rec = pgitem->getProgramInfo();
 
     QString message = "Are you sure you want to delete:<br><br>";
@@ -517,23 +546,17 @@ void PlaybackBox::remove(QListViewItem *lvitem)
             changed(NULL);
 
         delete lvitem;
-    }    
+    }
 
-    setActiveWindow();
-    raise();
+    ignoreevents = false;
 
-    timer->start(1000 / 30);
+    timer->start(1000 / 30);    
 }
 
-void PlaybackBox::GetFreeSpaceStats(int &totalspace, int &usedspace)
-{
-    m_context->GetFreeSpace(totalspace, usedspace);
-}
- 
 void PlaybackBox::UpdateProgressBar(void)
 {
     int total, used;
-    GetFreeSpaceStats(total, used);
+    m_context->GetFreeSpace(total, used);
 
     QString usestr;
     usestr.sprintf("Storage: %d,%03d MB used out of %d,%03d MB total", 
@@ -547,6 +570,9 @@ void PlaybackBox::UpdateProgressBar(void)
 
 void PlaybackBox::timeout(void)
 {
+    if (ignoreevents)
+        return;
+
     if (!nvp && pixlabel)
     {
         if (m_context->GetNumSetting("PlaybackPreview") == 1)
@@ -583,6 +609,9 @@ void PlaybackBox::timeout(void)
     delete [] outputbuf;
 
     QPixmap *pmap = pixlabel->pixmap();
+    if (!pmap || pmap->isNull())
+        return;
+
     QPainter p(pmap);
 
     p.drawImage(0, 0, img);
@@ -595,6 +624,9 @@ void PlaybackBox::timeout(void)
 
 void PlaybackBox::customEvent(QCustomEvent *e)
 {
+    if (ignoreevents)
+        return;
+
     if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
     {
         MythEvent *me = (MythEvent *)e;

@@ -37,7 +37,6 @@ class PlaybackBox : public MythDialog
 
   private:
     QListViewItem *FillList(bool selectsomething);
-    void GetFreeSpaceStats(int &totalspace, int &usedspace); 
     void UpdateProgressBar(void);
 
     BoxType type;
@@ -65,6 +64,7 @@ class PlaybackBox : public MythDialog
     pthread_t decoder;
 
     QDateTime lastUpdateTime;
+    bool ignoreevents;
 };
 
 #endif
