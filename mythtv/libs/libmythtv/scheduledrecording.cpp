@@ -15,7 +15,7 @@ int RecTypePriority(RecordingType rectype)
 {
     if (rectype == kChannelRecord ||
         rectype == kAllRecord)
-        return rectype+2;
+        return rectype+3;
     else
         return rectype;
 }
