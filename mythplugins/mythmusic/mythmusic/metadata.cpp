@@ -141,9 +141,13 @@ void Metadata::dumpToDatabase(QSqlDatabase *db, QString startdir)
                                  "AND ( genre = \"%4\" ) AND "
                                  "( year = \"%5\" ) AND ( tracknum = \"%6\" ) "
                                  "AND ( length = \"%7\" ) );")
-                                 .arg(artist.latin1()).arg(album.latin1())
-                                 .arg(title.latin1()).arg(genre).arg(year)
-                                 .arg(tracknum).arg(length).arg(sqlfilename);
+                                 .arg(artist.latin1())
+                                 .arg(album.latin1())
+                                 .arg(title.latin1())
+                                 .arg(genre)
+                                 .arg(year)
+                                 .arg(tracknum)
+                                 .arg(length);
     QSqlQuery query = db->exec(checkquery);
     if (query.isActive() && query.numRowsAffected() > 0)
         return;
@@ -151,9 +155,14 @@ void Metadata::dumpToDatabase(QSqlDatabase *db, QString startdir)
     QString thequery = QString("INSERT INTO musicmetadata (artist,album,title,"
                                "genre,year,tracknum,length,filename) VALUES "
                                "(\"%1\",\"%2\",\"%3\",\"%4\",%5,%6,%7,\"%8\");")
-                              .arg(artist.latin1()).arg(album.latin1())
-                              .arg(title.latin1()).arg(genre).arg(year)
-                              .arg(tracknum).arg(length).arg(sqlfilename);
+                              .arg(artist.latin1())
+                              .arg(album.latin1())
+                              .arg(title.latin1())
+                              .arg(genre)
+                              .arg(year)
+                              .arg(tracknum)
+                              .arg(length)
+                              .arg(sqlfilename);
     db->exec(thequery);
 
     // easiest way to ensure we've got 'id' filled.
