@@ -1,11 +1,11 @@
                                    MythWeather 
-			           Release 0.9
+			          Release 0.10
 
 BUILD/CONFIGURATION INSTRUCTIONS
 --------------------------------
 
 Requirements:
-	MythTV (v0.9) installed and working
+	MythTV (v0.10) installed and working
 	Internet Access (to get the weather!)
 
 
@@ -23,7 +23,7 @@ Compiling note:  If you get an error on building this, that says something
 
 Once the make is completed, do a 'make install'.  
 
-- mythweather will go into /usr/local/bin
+- libmythweather.so will go into /usr/local/lib/mythtv/plugins
 - images and data files will be put into the newly created
   /usr/local/share/mythtv/mythweather directory
 
