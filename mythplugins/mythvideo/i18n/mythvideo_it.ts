@@ -166,6 +166,14 @@
         <source>Default Player</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Newly scanned files are browsable by default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, newly scanned files in the Video Manager will be marked as browsable and will appear in the &apos;Browse&apos; menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>VideoBrowser</name>

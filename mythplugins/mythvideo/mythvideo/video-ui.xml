@@ -101,6 +101,7 @@
         <value lang="ES">Director:</value>
         <value lang="CA">Director:</value>
         <value lang="DK">Instruktør:</value>
+        <value lang="DE">Regisseur:</value>
         <value lang="PT">Director:</value>
         <value lang="SV">Regissör:</value>
       </textarea>
@@ -115,6 +116,7 @@
         <value lang="ES">Año:</value>
         <value lang="CA">Any:</value>
         <value lang="DK">Udgivet:</value>
+        <value lang="DE">Jahr:</value>
         <value lang="PT">Ano:</value>
         <value lang="SV">År:</value>
       </textarea>
@@ -129,6 +131,7 @@
         <value lang="ES">Clasificación:</value>
         <value lang="CA">Classificació:</value>
         <value lang="DK">Klassifikation:</value>
+        <value lang="DE">Freigabe:</value>
         <value lang="PT">Classificação:</value>
         <value lang="SV">Klassificering:</value>
       </textarea>
@@ -143,6 +146,7 @@
         <value lang="ES">Nivel de acceso:</value>
         <value lang="CA">Nivell d'accés:</value>
         <value lang="DK">Voksen niveau:</value>
+        <value lang="DE">Kindersicherungs-Level:</value>
         <value lang="PT">Nível de Acesso:</value>
         <value lang="SV">Barnlåsnivå:</value>
       </textarea>
@@ -156,6 +160,7 @@
         <value>Browsable:</value>
         <value lang="PT">Visionável:</value>
         <value lang="SV">Blädderbar:</value>
+        <value lang="DE">Listbar:</value>
         <value lang="CA">Llistable:</value>
       </textarea>
       <textarea name="browseable" draworder="4">
@@ -169,6 +174,7 @@
         <value lang="ES">Duración:</value>
         <value lang="CA">Duració:</value>
         <value lang="DK">Længde:</value>
+        <value lang="DE">Länge:</value>
         <value lang="PT">Duração:</value>
         <value lang="SV">Längd:</value>
       </textarea>
@@ -183,6 +189,7 @@
         <value lang="ES">Resumen:</value>
         <value lang="CA">Resum:</value>
         <value lang="DK">Resumé:</value>
+        <value lang="DE">Handlung:</value>
         <value lang="PT">Resumo:</value>
         <value lang="SV">Handling:</value>
       </textarea>
@@ -197,6 +204,7 @@
         <value lang="ES">Nombre del archivo:</value>
         <value lang="CA">Nom de l'arxiu:</value>
         <value lang="DK">Filnavn:</value>
+        <value lang="DE">Dateiname:</value>
         <value lang="PT">Ficheiro:</value>
         <value lang="SV">Filnamn:</value>
       </textarea>
@@ -211,6 +219,7 @@
         <value lang="ES">Carátula:</value>
         <value lang="CA">Caràtula:</value>
         <value lang="DK">Omslagsfil:</value>
+        <value lang="DE">Cover-Datei:</value>
         <value lang="PT">Ficheiro de Capa:</value>
         <value lang="SV">Fil för omslagsbild:</value>
       </textarea>
@@ -223,6 +232,7 @@
         <font>labels</font>
         <value>IMDB Num.:</value>
         <value lang="PT">Chave IMDB:</value>
+        <value lang="DE">IMDB-Nr.:</value>
         <value lang="SV">IMDB-nummer:</value>
       </textarea>
       <textarea name="inetref" draworder="4">
@@ -259,6 +269,7 @@
         <value lang="PT">0-9: Editar</value>
         <value lang="SV">0-9: Redigera</value>
         <value lang="CA">0-9: Editar</value>
+        <value lang="DE">0-9: Editieren</value>
         <value lang="ES">0-9: Editar</value>
       </textarea>
       <textarea name="keyslbl_two" draworder="4" align="center">
@@ -268,6 +279,7 @@
         <value lang="PT">Menu/Info: IMDB Manual</value>
         <value lang="SV">Meny/Info: Manuell IMDB</value>
         <value lang="CA">Menu/Info: IMDB Manual</value>
+        <value lang="DE">Menu/Info: IMDB manuell</value>
         <value lang="ES">Menu/Info: IMDB Manual</value>
       </textarea>
       <textarea name="keyslbl_three" draworder="4" align="right">
@@ -277,6 +289,7 @@
         <value lang="PT">Enter/OK: IMDB Automático</value>
         <value lang="SV">Enter/OK: Automatisk IMDB</value>
         <value lang="CA">Enter/OK: IMDB Automàtic</value>
+        <value lang="CA">Enter/OK: IMDB automatisch</value>
         <value lang="ES">Enter/OK: IMDB Automático</value>
       </textarea>
     </container>
@@ -290,6 +303,7 @@
         <value lang="ES">obteniendo información...</value>
         <value lang="CA">obtenint informació...</value>
         <value lang="DK">Henter information...</value>
+        <value lang="DE">Hole Daten...</value>
         <value lang="PT">A obter a informação...</value>
         <value lang="SV">hämtar data...</value>
       </textarea>
@@ -300,6 +314,7 @@
         <value lang="ES">[ buscando ]</value>
         <value lang="CA">[ cercant ]</value>
         <value lang="DK">[ leder efter ]</value>
+        <value lang="DE">[ suche nach ]</value>
         <value lang="PT">[ a obter ]</value>
         <value lang="SV">[ letar efter ]</value>
       </textarea>
@@ -341,6 +356,7 @@
         <value lang="ES">Introducir IMDB #</value>
         <value lang="CA">IntroduÏr IMDB #</value>
         <value lang="DK">Indtast IMDB #</value>
+        <value lang="DE">Eingabe IMDB #</value>
         <value lang="PT">Chave IMDB #</value>
         <value lang="SV">Mata in IMDB-nummer</value>
         <area>0,15,360,25</area>
@@ -360,6 +376,7 @@
         <value lang="ES">cargando...</value>
         <value lang="CA">carregant...</value>
         <value lang="DK">Indlæser...</value>
+        <value lang="DE">Lade...</value>
         <value lang="PT">A carregar...</value>
         <value lang="SV">laddar...</value>
       </textarea>
@@ -377,6 +394,7 @@
          <value lang="ES">No encuentro vídeos</value>
          <value lang="CA">No trovo vídeos</value>
          <value lang="DK">Ingen videoer fundet</value>
+         <value lang="DE">Keine Videos gefunden</value>
          <value lang="PT">Não foram encontrados nenhuns filmes</value>
          <value lang="SV">Inga filmer funna</value>
          <multiline>yes</multiline> 
@@ -474,6 +492,7 @@
         <value lang="ES">Cursor izq/der para navegar</value>
         <value lang="CA">Cursor esq/dreta per navegar</value>
         <value lang="DK">Brug venstre og højre piletast</value>
+        <value lang="DE">Verwende Links-/Rechts-Pfeiltasten</value>
         <value lang="PT">Use os cursores Esquerda e Direita</value>
         <value lang="SV">Använd vänster och höger piltangent</value>
       </textarea>
@@ -507,6 +526,7 @@
         <value lang="ES">Director</value>
         <value lang="CA">Director</value>
         <value lang="DK">Instrueret af:</value>
+        <value lang="DE">Regie:</value>
         <value lang="PT">Dirigido por</value>
         <value lang="SV">Regisserad av:</value>
       </textarea>
@@ -521,6 +541,7 @@
         <value lang="ES">Año:</value>
         <value lang="CA">Any:</value>
         <value lang="DK">Udgivet:</value>
+        <value lang="DE">Jahr:</value>
         <value lang="PT">Ano:</value>
         <value lang="SV">År:</value>
       </textarea>
@@ -535,6 +556,7 @@
         <value lang="ES">Resumen:</value>
         <value lang="CA">Resum:</value>
         <value lang="DK">Resumé:</value>
+        <value lang="DE">Handlung:</value>
         <value lang="PT">Resumo:</value>
         <value lang="SV">Handling:</value>
       </textarea>
@@ -550,6 +572,7 @@
         <value lang="ES">Clasificación:</value>
         <value lang="CA">Classificació:</value>
         <value lang="DK">Klassifikation:</value>
+        <value lang="DE">Freigabe:</value>
         <value lang="PT">Classificação:</value>
         <value lang="SV">Klassificering:</value>
       </textarea>
@@ -565,6 +588,7 @@
         <value lang="ES">Duración:</value>
         <value lang="CA">Duració:</value>
         <value lang="DK">Længde:</value>
+        <value lang="DE">Länge:</value>
         <value lang="PT">Duração:</value>
         <value lang="SV">Längd:</value>
       </textarea>
@@ -587,6 +611,7 @@
         <value lang="ES">cargando...</value>
         <value lang="CA">carregant...</value>
         <value lang="DK">Indlæser...</value>
+        <value lang="DE">Lade...</value>
         <value lang="PT">A Carregar...</value>
         <value lang="SV">Laddar...</value>
       </textarea>
@@ -604,6 +629,7 @@
          <value lang="ES">No encuentro vídeos</value>
          <value lang="CA">No trovo vídeos</value>
          <value lang="DK">Ingen videoer fundet</value>
+         <value lang="DE">Keine Videos gefunden</value>
          <value lang="PT">Não foram encontrados nenhuns filmes</value>
          <value lang="SV">Inga filmer funna</value>
          <multiline>yes</multiline>
@@ -711,6 +737,7 @@
                 <font>labelfont</font>
                 <value>File:</value>
                 <value lang="DK">Fil:</value>
+                <value lang="DE">Datei:</value>
                 <value lang="PT">Ficheiro:</value>
                 <value lang="SV">Fil:</value>
                 <value lang="CA">Arxiu:</value>
@@ -721,6 +748,7 @@
                 <font>labelfont</font>
                 <value>Player:</value>
                 <value lang="DK">Afspiller:</value>
+                <value lang="DE">Abspieler:</value>
                 <value lang="PT">Comando:</value>
                 <value lang="SV">Spelare:</value>
                 <value lang="CA">Comanda:</value>
@@ -781,6 +809,7 @@
                 <font>title</font>
                 <value>MythVideo File Associations</value>
                 <value lang="PT">Associação de Ficheiros do MythVideo</value>
+                <value lang="DE">MythVideo-Dateiverknüpfungen</value>
                 <value lang="SV">Filassociationer för videospelaren</value>
                 <value lang="CA">Associació d'arxius a MythVideo</value>
                 <value lang="ES">Asociación de archivos a MythVideo</value>
@@ -793,6 +822,7 @@
                 <font>display</font>
                 <value>Extension:</value>
                 <value lang="PT">Extensão:</value>
+                <value lang="DE">Erweiterung:</value>
                 <value lang="SV">Filändelse:</value>
                 <value lang="CA">Extensió:</value>
                 <value lang="ES">Extensión:</value>
@@ -803,6 +833,7 @@
                 <font>display</font>
                 <value>Command:</value>
                 <value lang="PT">Comando:</value>
+                <value lang="DE">Kommando:</value>
                 <value lang="SV">Kommando:</value>
                 <value lang="CA">Comanda:</value>
                 <value lang="ES">Comando:</value>
@@ -813,6 +844,7 @@
                 <font>display</font>
                 <value>Use default player:</value>
                 <value lang="PT">Usar cliente padrão:</value>
+                <value lang="DE">Standard-Abspieler:</value>
                 <value lang="SV">Använd standardspelare:</value>
                 <value lang="CA">Reproductor:</value>
                 <value lang="ES">Reproductor:</value>
@@ -824,6 +856,7 @@
                 <value>Ignore:</value>
                 <value lang="PT">Ignorar:</value>
                 <value lang="SV">Ignorera:</value>
+                <value lang="DE">Ignoriere:</value>
                 <value lang="CA">Ignorar:</value>
                 <value lang="ES">Ignorar:</value>
             </textarea>
@@ -916,6 +949,7 @@
                 <font>title</font>
                 <value>Edit Video Information</value>
                 <value lang="PT">Editar Informação do Filme</value>
+                <value lang="DE">Video-Informationen editieren</value>
                 <value lang="SV">Redigera filminformation</value>
                 <value lang="CA">Editar Informació del vídeo</value>
                 <value lang="ES">Editar Información del video</value>
@@ -930,6 +964,7 @@
                 <font>display</font>
                 <value>Name:</value>
                 <value lang="PT">Nome:</value>
+                <value lang="DE">Name:</value>
                 <value lang="SV">Namn:</value>
                 <value lang="CA">Nom:</value>
                 <value lang="ES">Nombre:</value>
@@ -940,6 +975,7 @@
                 <font>display</font>
                 <value>Parental Control:</value>
                 <value lang="PT">Nível de Acesso:</value>
+                <value lang="DE">Kindersicherungs-Level:</value>
                 <value lang="SV">Barnlås:</value>
                 <value lang="CA">Nivell d'Accès:</value>
                 <value lang="ES">Nível de Acceso:</value>
@@ -950,6 +986,7 @@
                 <font>display</font>
                 <value>File to Always Play Next:</value>
                 <value lang="PT">Ficheiro para Tocar Depois:</value>
+                <value lang="DE">Datei immer anschließend spielen:</value>
                 <value lang="SV">Fil som alltid spelas efter denna:</value>
                 <value lang="CA">Arxiu a reproduir després:</value>
                 <value lang="ES">Archivo a reproducir después:</value>
@@ -960,6 +997,7 @@
                 <font>display</font>
                 <value>Include while Browsing:</value>
                 <value lang="PT">Incluir ao Navegar:</value>
+                <value lang="DE">Beim Listen berücksichtigen:</value>
                 <value lang="SV">Inkludera vid bläddring:</value>
                 <value lang="CA">Incloure al llistar:</value>
                 <value lang="ES">Incluir al listar:</value>
@@ -970,6 +1008,7 @@
                 <font>display</font>
                 <value>Cover Art:</value>
                 <value lang="PT">Imagem de Capa:</value>
+                <value lang="DE">Cover-Bild:</value>
                 <value lang="SV">Omslagsbild:</value>
                 <value lang="CA">Imatge de caràtula:</value>
                 <value lang="ES">Imagen de portada:</value>
@@ -980,6 +1019,7 @@
                 <font>display</font>
                 <value>Unique Player Command:</value>
                 <value lang="PT">Comando de Execução Especial:</value>
+                <value lang="DE">Spezielles Abspielkommando:</value>
                 <value lang="SV">Kommando för uppspelning:</value>
                 <value lang="CA">Comanda d'execució específica:</value>
                 <value lang="ES">Comando de ejecución específica:</value>
@@ -1028,6 +1068,7 @@
                 <font>display</font>
                 <value>/path/to/the/thing.jpg</value>
                 <value lang="PT">/directoria/para/a/imagem.jpg</value>
+                <value lang="DE">/pfad/zum/bild.jpg</value>
                 <value lang="SV">/sökväg/till/bilden.jpg</value>
                 <value lang="CA">/directori/per/la/imatge.jpg</value>
                 <value lang="ES">/directorio/para/la/imagen.jpg</value>
