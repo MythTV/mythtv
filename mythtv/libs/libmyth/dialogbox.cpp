@@ -21,7 +21,7 @@ DialogBox::DialogBox(MythContext *context, const QString &text,
     setGeometry(0, 0, screenwidth, screenheight);
     setFixedSize(QSize(screenwidth, screenheight));
 
-    setFont(QFont("Arial", (int)(context->GetBigFontSize() * hmult), 
+    setFont(QFont("Arial", (int)(context->GetMediumFontSize() * hmult), 
             QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
