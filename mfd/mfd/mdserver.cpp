@@ -1200,6 +1200,9 @@ void MetadataServer::possiblySendUpdate(HttpInRequest *http_request, int client_
 
 void MetadataServer::sendContainers(HttpInRequest *http_request, MdcapRequest *mdcap_request)
 {
+    QTime container_timer;
+    container_timer.start();
+    
     //
     //  This method is called whenever we get an http request for
     //  "/containers". We need to figure out whether it's a request for
@@ -1266,21 +1269,30 @@ void MetadataServer::sendContainers(HttpInRequest *http_request, MdcapRequest *m
                         if(a_metadata->getType() == MDT_audio)
                         {
                             AudioMetadata *audio_metadata = (AudioMetadata *)a_metadata;
-                            response.addAddedItemGroup();
-                                response.addItemType(audio_metadata->getType());
-                                response.addItemId(audio_metadata->getId());
-                                response.addItemUrl(audio_metadata->getUrl().toString());
-                                response.addItemRating(audio_metadata->getRating());
-                                response.addItemLastPlayed(audio_metadata->getLastPlayed().toTime_t());
-                                response.addItemPlayCount(audio_metadata->getPlayCount());
-                                response.addItemArtist(audio_metadata->getArtist());
-                                response.addItemAlbum(audio_metadata->getAlbum());
-                                response.addItemTitle(audio_metadata->getTitle());
-                                response.addItemGenre(audio_metadata->getGenre());
-                                response.addItemYear(audio_metadata->getYear());
-                                response.addItemTrack(audio_metadata->getTrack());
-                                response.addItemLength(audio_metadata->getLength());
-                            response.endGroup();
+                            if(!container->isLocal() && getLocalEquivalent(a_metadata))
+                            {
+                                //
+                                //  No need to list item, as a local equivalent will appear instead
+                                //
+                            }
+                            else
+                            {
+                                response.addAddedItemGroup();
+                                    response.addItemType(audio_metadata->getType());
+                                    response.addItemId(audio_metadata->getId());
+                                    response.addItemUrl(audio_metadata->getUrl().toString());
+                                    response.addItemRating(audio_metadata->getRating());
+                                    response.addItemLastPlayed(audio_metadata->getLastPlayed().toTime_t());
+                                    response.addItemPlayCount(audio_metadata->getPlayCount());
+                                    response.addItemArtist(audio_metadata->getArtist());
+                                    response.addItemAlbum(audio_metadata->getAlbum());
+                                    response.addItemTitle(audio_metadata->getTitle());
+                                    response.addItemGenre(audio_metadata->getGenre());
+                                    response.addItemYear(audio_metadata->getYear());
+                                    response.addItemTrack(audio_metadata->getTrack());
+                                    response.addItemLength(audio_metadata->getLength());
+                                response.endGroup();
+                            }
                         }
                         else
                         {
@@ -1291,6 +1303,9 @@ void MetadataServer::sendContainers(HttpInRequest *http_request, MdcapRequest *m
                 response.endGroup();
 
             response.endGroup();
+            log(QString("built full update (+%1) mdcap payload in %2 second(s)")
+                .arg(metadata->count())
+                .arg(container_timer.elapsed() / 1000.0), 7);
             metadata_mutex.unlock();
             sendResponse(http_request, response);
         }
@@ -1328,21 +1343,30 @@ void MetadataServer::sendContainers(HttpInRequest *http_request, MdcapRequest *m
                                 if(a_metadata->getType() == MDT_audio)
                                 {
                                     AudioMetadata *audio_metadata = (AudioMetadata *)a_metadata;
-                                    response.addAddedItemGroup();
-                                        response.addItemType(audio_metadata->getType());
-                                        response.addItemId(audio_metadata->getId());
-                                        response.addItemUrl(audio_metadata->getUrl().toString());
-                                        response.addItemRating(audio_metadata->getRating());
-                                        response.addItemLastPlayed(audio_metadata->getLastPlayed().toTime_t());
-                                        response.addItemPlayCount(audio_metadata->getPlayCount());
-                                        response.addItemArtist(audio_metadata->getArtist());
-                                        response.addItemAlbum(audio_metadata->getAlbum());
-                                        response.addItemTitle(audio_metadata->getTitle());
-                                        response.addItemGenre(audio_metadata->getGenre());
-                                        response.addItemYear(audio_metadata->getYear());
-                                        response.addItemTrack(audio_metadata->getTrack());
-                                        response.addItemLength(audio_metadata->getLength());
-                                    response.endGroup();
+                                    if(!container->isLocal() && getLocalEquivalent(a_metadata))
+                                    {
+                                        //
+                                        //  No need to list item, as a local equivalent will appear instead
+                                        //
+                                    }
+                                    else
+                                    {
+                                        response.addAddedItemGroup();
+                                            response.addItemType(audio_metadata->getType());
+                                            response.addItemId(audio_metadata->getId());
+                                            response.addItemUrl(audio_metadata->getUrl().toString());
+                                            response.addItemRating(audio_metadata->getRating());
+                                            response.addItemLastPlayed(audio_metadata->getLastPlayed().toTime_t());
+                                            response.addItemPlayCount(audio_metadata->getPlayCount());
+                                            response.addItemArtist(audio_metadata->getArtist());
+                                            response.addItemAlbum(audio_metadata->getAlbum());
+                                            response.addItemTitle(audio_metadata->getTitle());
+                                            response.addItemGenre(audio_metadata->getGenre());
+                                            response.addItemYear(audio_metadata->getYear());
+                                            response.addItemTrack(audio_metadata->getTrack());
+                                            response.addItemLength(audio_metadata->getLength());
+                                        response.endGroup();
+                                    }
                                 }
                                 else
                                 {
@@ -1370,6 +1394,10 @@ void MetadataServer::sendContainers(HttpInRequest *http_request, MdcapRequest *m
                 
 
             response.endGroup();
+            log(QString("built delta update (+%1/-%2) mdcap payload in %3 second(s)")
+                .arg(metadata_additions.count())
+                .arg(metadata_deletions.count())
+                .arg(container_timer.elapsed() / 1000.0), 7);
             metadata_mutex.unlock();
             sendResponse(http_request, response);
         }
