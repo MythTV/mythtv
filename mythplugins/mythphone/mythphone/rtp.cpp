@@ -1224,14 +1224,17 @@ void rtp::StreamInVideo()
                         // Pass received picture to app
                         rtpMutex.lock();
                         if (rxedVideoFrames.count() < 3)    // Limit no of buffes tied up queueing to app
+                        {
                             rxedVideoFrames.append(picture);
+                            rtpMutex.unlock();
+                        }
                         else
                         {
+                            rtpMutex.unlock();
                             freeVideoBuffer(picture);
                             framesInDiscarded++;
                             cout << "Discarding frame, app consuming too slowly\n";
                         }
-                        rtpMutex.unlock();
                         if (eventWindow)
                             QApplication::postEvent(eventWindow, new RtpEvent(RtpEvent::RxVideoFrame));
                         picture = 0;
