@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.01.28 (xris)
+#Last Updated: 2005.01.29 (xris)
 #
 #  transcode.pm
 #
@@ -84,9 +84,10 @@ package export::transcode;
     }
 
     sub export {
-        my $self    = shift;
-        my $episode = shift;
-        my $suffix  = (shift or '');
+        my $self       = shift;
+        my $episode    = shift;
+        my $suffix     = (shift or '');
+        my $skip_audio = shift;
     # Init the commands
         my $transcode     = '';
         my $mythtranscode = '';
@@ -94,9 +95,10 @@ package export::transcode;
         load_finfo($episode);
     # Start the transcode command
         $transcode = "nice -n $Args{'nice'} transcode"
-                        # -V is now the default, but need to keep using it because people are still using an older version of transcode
+                   # -V is now the default, but need to keep using it because people are still using an older version of transcode
                     .' -V'                     # use YV12/I420 instead of RGB, for faster processing
                     #.' -u 100,'.($num_cpus);   # Take advantage of multiple CPU's?  currently disabled because it actually seems to slow things down
+                    .' --print_status 16'      # Only print status every 16 frames -- prevents buffer-related slowdowns
                     ;
     # Not an mpeg
         unless ($episode->{'finfo'}{'is_mpeg'}) {
@@ -108,7 +110,9 @@ package export::transcode;
             }
         # Here, we have to fork off a copy of mythtranscode (no need to use --fifosync with transcode -- it seems to do this on its own)
             $mythtranscode = "nice -n $Args{'nice'} mythtranscode --showprogress -p autodetect -c $episode->{'channel'} -s $episode->{'start_time_sep'} -f \"/tmp/fifodir_$$/\"";
-            # let transcode handle the cutlist -- got too annoyed with the first/last frame(s) showing up no matter what I told mythtranscode
+        # On no-audio encodes, we need to do something to keep mythtranscode's audio buffers from filling up available RAM
+        #    $mythtranscode .= ' --fifosync' if ($skip_audio);
+        # let transcode handle the cutlist -- got too annoyed with the first/last frame(s) showing up no matter what I told mythtranscode
             #$mythtranscode .= ' --honorcutlist' if ($self->{'use_cutlist'});
         }
     # Figure out the input files
