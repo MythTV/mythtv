@@ -400,7 +400,7 @@ void VideoTree::handleTreeListEntry(int node_int, IntVector*)
             {
                 QString the_file = *(browser_mode_files.at(node_int));
                 QString base_name = the_file.section("/", -1);
-                video_title->SetText(base_name.section(".", 0, 0));
+                video_title->SetText(base_name.section(".", 0, -2));
                 video_file->SetText(base_name);
                 extension = the_file.section(".", -1);
                 player = gContext->GetSetting("VideoDefaultPlayer");
