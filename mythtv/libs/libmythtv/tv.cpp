@@ -591,7 +591,8 @@ void TV::ChangeChannel(bool up)
     nvr->Reset();
     nvr->Unpause();
 
-    usleep(500000);
+    //usleep(500000);
+
     nvp->ResetPlaying();
     while (!nvp->ResetYet())
         usleep(5);
