@@ -31,6 +31,8 @@ BumpScope::BumpScope(long int winid)
         return;
     }
 
+    SDL_ShowCursor(0);
+
     rgb_buf = NULL;
     bpl = 0;
 

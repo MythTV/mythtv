@@ -8,6 +8,7 @@
 #include <qtoolbutton.h>
 #include <qtimer.h>
 #include <qmutex.h>
+#include <qvaluevector.h>
 
 #include <mythtv/mythwidgets.h>
 
@@ -71,6 +72,7 @@ class PlaybackBox : public MythDialog
   private:
     void setupListView(void);
 
+    double computeIntelligentWeight(Metadata &mdata, double currentDateTime);
     void setupPlaylist(void);
 
     QPixmap scalePixmap(const char **xpmdata);
@@ -89,7 +91,7 @@ class PlaybackBox : public MythDialog
     QSqlDatabase *db;
 
     QValueList<Metadata> *plist;
-    QValueList<int> playlistorder;
+    QValueVector<int> playlistorder;
     QMutex listlock;
 
     int playlistindex;

@@ -1,5 +1,5 @@
                              MythMusic
-                       Release (towards 0.8)
+                            Release 0.8
 
 
 There'll be more information here later, but for now:
@@ -48,7 +48,7 @@ the documentation and the mailing list archives at http://www.mythtv.org
 Ok.  Once you've got all the prerequisites installed, on to compiling.
 There's a configure script in the main distribution directory, but it does
 not check for all of the above packages. It's just a tiny little script that
-lets you turn on and off support for the fftw and OpenGL libraries. Run it
+lets you turn on and off support for the fftw, OpenGL, and SDL libraries. Run it
 with './configure --help' to see what you can set.
 
 Now type 'make' in the main distribution directory. 
@@ -71,8 +71,8 @@ You'll probably want to edit the mythmusic-settings.txt file to set where
 your existing music is stored.  This'll also be where new music shows up after
 it's ripped.
 
-MythMusic will also read the theme.txt and mysql.txt settings files used by
-MythTV, so any changes you made to those will be carried over into this.
+MythMusic will also read the mysql.txt settings files used by MythTV, so any 
+changes you made to those will be carried over into this.
 
 The final thing to do is add the musicdb/metadata.sql file to your existing
 database setup from MythTV.

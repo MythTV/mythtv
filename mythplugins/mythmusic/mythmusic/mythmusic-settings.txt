@@ -58,7 +58,7 @@ VisualMode=Random
 
 # How many seconds to wait before turning on the visualizer automatically
 # (0 = no automatic, manual button press only)
-VisualModeDelay=10
+VisualModeDelay=0
 
 # Amount to scale down the visualization by (only used by the Goom vis
 # currently) Valid values are 1 (no scaling down) and 2 (halve the value)

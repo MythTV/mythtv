@@ -1,3 +1,7 @@
+UPGRADING FROM RELEASE 0.7
+--------------------------
+You need to add musicdb/0-7-to-0-8.sql to your database.
+
 UPGRADING FROM RELEASE 0.6
 --------------------------
 Nothing important has changed.

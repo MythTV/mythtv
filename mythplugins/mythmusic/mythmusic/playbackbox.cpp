@@ -511,6 +511,26 @@ void PlaybackBox::jumpToItem(QListViewItem *curItem)
     }
 }
 
+double PlaybackBox::computeIntelligentWeight(Metadata & mdata, 
+                                             double currentDateTime)
+{
+    int rating;
+    int playcount;
+    double lastplay;
+    double ratingValue = 0;
+    double playcountValue = 0;
+    double lastplayValue = 0;
+
+    rating = mdata.Rating();
+    playcount = mdata.PlayCount();
+    lastplay = mdata.LastPlay();
+    ratingValue = (double)rating / 10;
+    playcountValue = (double)playcount / 50;
+    lastplayValue = (currentDateTime - lastplay) / currentDateTime * 2000;
+    return (35 * ratingValue - 25 * playcountValue + 25 * lastplayValue +
+            15 * (double)rand() / (RAND_MAX + 1.0));
+}
+
 void PlaybackBox::setupPlaylist(void)
 {
     if (playlistorder.size() > 0)
@@ -528,6 +548,10 @@ void PlaybackBox::setupPlaylist(void)
         shuffleindex = 0;
         return;
     }
+
+    // Reserve QValueVector memory up front
+    // to decrease memory allocation overhead
+    playlistorder.reserve(plist->size());
 
     if (shufflemode == 0)
     {
@@ -578,36 +602,17 @@ void PlaybackBox::setupPlaylist(void)
 
         int i, j, temp;
         double tempd;
-        int rating;
-        int playcount;
-        double lastplay;
         QDateTime cTime = QDateTime::currentDateTime();
         double currentDateTime = cTime.toString("yyyyMMddhhmmss").toDouble();
-        double ratingValue = 0;
-        double playcountValue = 0;
-        double lastplayValue = 0;
         double weight;
 
-        QValueList<double> playlistweight;
-
-        for (i = 0; i < max; i++)
-            playlistweight.push_back(0);
+        QValueVector<double> playlistweight;
+        playlistweight.reserve(max);
 
         for (i = 0; i < max; i++)
         {
-            curMeta = (*plist)[i];
-            rating = curMeta.Rating();
-            playcount = curMeta.PlayCount();
-            lastplay = curMeta.LastPlay();
-            ratingValue = (double)rating / 10;
-            playcountValue = (double)playcount / 50;
-            lastplayValue = (currentDateTime - lastplay) / 
-                            currentDateTime * 2000;
-            weight = (35 * ratingValue - 25 * playcountValue + 
-                      25 * lastplayValue + 
-                      15 * (double)rand() / (RAND_MAX + 1.0));
-
-            playlistweight[i] = weight;
+            weight = computeIntelligentWeight((*plist)[i], currentDateTime); 
+            playlistweight.push_back(weight);
             playlistorder.push_back(i);
         }
 
