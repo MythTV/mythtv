@@ -19,6 +19,8 @@ LIBS += -lmythavcodec-$$LIBVERSION -lmyth-$$LIBVERSION $$EXTRA_LIBS
 DEPENDPATH += ../libs/libmythtv ../libs/libmyth ../libs/libavcodec
 DEPENDPATH += ../libs/libavformat
 
+INCLUDEPATH += ../libs/libmythtv/dvbdev
+
 # Input
 HEADERS += backendsettings.h
 SOURCES += main.cpp backendsettings.cpp
