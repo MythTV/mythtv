@@ -1059,6 +1059,7 @@ void MythListView::keyPressEvent(QKeyEvent *e)
     }
 
     QListView::keyPressEvent(e);
+    emit unhandledKeyPress(e);
 }
 
 void MythListView::focusInEvent(QFocusEvent *e)

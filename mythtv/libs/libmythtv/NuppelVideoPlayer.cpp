@@ -323,7 +323,7 @@ void NuppelVideoPlayer::InitVideo(void)
     }
 }
 
-void NuppelVideoPlayer::Reinit(void)
+void NuppelVideoPlayer::ReinitVideo(void)
 {
     pthread_mutex_lock(&video_buflock);
 
@@ -341,6 +341,7 @@ void NuppelVideoPlayer::Reinit(void)
     int dispx = 0, dispy = 0, dispw = video_width, disph = video_height;
 
     videoOutput->GetDrawSize(dispx, dispy, dispw, disph);
+
     osd->Reinit(video_width, video_height, (int)ceil(video_frame_rate),
                 dispx, dispy, dispw, disph);
 
@@ -359,6 +360,12 @@ void NuppelVideoPlayer::Reinit(void)
     pthread_mutex_unlock(&video_buflock);
 
     ClearAfterSeek();
+}
+
+void NuppelVideoPlayer::ReinitAudio(void)
+{
+    if (audioOutput)
+        audioOutput->Reconfigure(audio_bits, audio_channels, audio_samplerate);
 }
 
 void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps, 
@@ -2756,7 +2763,7 @@ void NuppelVideoPlayer::ReencoderAddKFA(
 
 int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
                                     RecordingProfile &profile,
-                                    bool honorCutList, bool forceKeyFrames,
+                                    bool honorCutList, bool framecontrol,
                                     bool chkTranscodeDB, QString fifodir)
 { 
     NuppelVideoRecorder *nvr;
@@ -2831,13 +2838,6 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
         cerr << "Unknown video codec: " << setting << endl;
     }
 
-    if (setting == decoder->GetEncodingType() && !forceKeyFrames &&
-        !deleteMap.isEmpty() && honorCutList)
-    {
-        decoder->SetRawVideoState(true);
-        cout << "Reencoding video in 'raw' mode\n";
-    }
-
     setting = profile.byName("audiocodec")->getValue();
     if (setting == "MP3") 
     {
@@ -2896,6 +2896,37 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
     frame.height = video_height;
     frame.size = video_width * video_height * 3 / 2;
 
+    FIFOWriter::FIFOWriter *fifow = NULL;
+
+    if (fifodir != NULL)
+    {
+        QString audfifo = fifodir + QString("/audout");
+        QString vidfifo = fifodir + QString("/vidout");
+        //framecontrol is true if we want to enforce fifo sync.
+        fifow = new FIFOWriter::FIFOWriter(2, framecontrol);
+
+        if (!fifow->FIFOInit(0, QString("video"), vidfifo, frame.size, 50) ||
+            !fifow->FIFOInit(1, QString("audio"), audfifo, 128000, 25))
+        {
+           cerr << "Error initializing fifo writer.  Aborting" << endl;
+           delete fifow;
+           delete outRingBuffer;
+           delete nvr;
+           unlink(outputname);
+           return REENCODE_ERROR;
+        }
+        cout << "CreatedThreads\n";
+    }
+
+    bool forceKeyFrames = (fifow == NULL) ? framecontrol : false;
+
+    if (setting == decoder->GetEncodingType() && !forceKeyFrames &&
+        fifow == NULL && !deleteMap.isEmpty() && honorCutList)
+    {
+        decoder->SetRawVideoState(true);
+        cout << "Reencoding video in 'raw' mode\n";
+    }
+
     decoder->setExactSeeks(true);
     decoder->GetFrame(0);
     int rawaudio = decoder->GetRawAudioState();
@@ -2919,27 +2950,6 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
                 ++i;
             }
         }
-    }
-
-    FIFOWriter::FIFOWriter *fifow = NULL;
-
-    if (fifodir != NULL) 
-    {
-        QString audfifo = fifodir + QString("/audout");
-        QString vidfifo = fifodir + QString("/vidout");
-        fifow = new FIFOWriter::FIFOWriter(2);
-
-        if (!fifow->FIFOInit(0, QString("video"), vidfifo, frame.size, 50) ||
-            !fifow->FIFOInit(1, QString("audio"), audfifo, 128000, 25))
-        {
-           cerr << "Error initializing fifo writer.  Aborting" << endl;
-           delete fifow;
-           delete outRingBuffer;
-           delete nvr;
-           unlink(outputname);
-           return REENCODE_ERROR;
-        }
-        cout << "CreatedThreads\n";
     }
 
     frame.frameNumber = 0;

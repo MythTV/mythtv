@@ -1,15 +1,13 @@
 /*
-	
-	mythlcd.h
-	
+    mythlcd.h
+    
     (c) 2002, 2003 Thor Sigvaldason and Isaac Richards
-	
-	Part of the mythTV project
-	
-	This header file just defines a demo widget that
-	will let you see what the lcddevice is capable 
-	of doing. 
-	
+    
+    Part of the mythTV project
+    
+    This header file just defines a demo widget that
+    will let you see what the lcddevice is capable 
+    of doing. 
 */
 
 
@@ -26,33 +24,31 @@
 
 class MythLCD : public QWidget
 {
-	Q_OBJECT
-	
-	public:
-	
-		MythLCD(QWidget *parent=0, const char *name=0);
+    Q_OBJECT
+  public:
+    MythLCD(QWidget *parent=0, const char *name=0);
 
-	public slots:
-	
-		void	doTime();
-		void	doChannel();
-		void	doMusic();
-		void	doProgress();
-		void	doMenuPop();
-		
-		void	generateFakeMusicData();
-		void	generateFakeProgressData();
-		
-	private:
-	
-		QTimer		*fakeMusicTimer;
-		QTimer		*fakeProgressTimer;
+  public slots:
+    
+    void doTime();
+    void doChannel();
+    void doMusic();
+    void doProgress();
+    void doMenuPop();
+      
+    void generateFakeMusicData();
+    void generateFakeProgressData();
+        
+  private:  
+    QTimer *fakeMusicTimer;
+    QTimer *fakeProgressTimer;
 
-		float		fakeValues[10];
-		float		fakeProgress;
-		int			valuesStep;
-	
+    float fakeValues[10];
+    float fakeProgress;
+    int valuesStep;    
+
+    LCD *lcddev;
 };
 
-#endif	
+#endif    
 

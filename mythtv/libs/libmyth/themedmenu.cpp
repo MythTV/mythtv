@@ -27,6 +27,8 @@ ThemedMenu::ThemedMenu(const char *cdir, const char *menufile,
 {
     ignorekeys = false;
 
+    lcddev = gContext->GetLCDDevice();
+
     QString dir = QString(cdir) + "/";
     QString filename = dir + "theme.xml";
 
@@ -988,9 +990,29 @@ void ThemedMenu::parseMenu(QString menuname, int row, int col)
 
     drawInactiveButtons();
 
-    titleText = "MYTH-";
-    titleText +=  menumode;
-    gContext->LCDpopMenu(activebutton->text, titleText);
+    if (lcddev)
+    {
+        titleText = "MYTH-";
+        titleText += menumode;
+        QPtrList<LCDMenuItem> menuItems;
+        menuItems.setAutoDelete(true);
+        bool selected;
+
+        for (int r = 0; r < (int)buttonRows.size(); r++)
+        {
+            if (r == currentrow)
+                selected = true;
+            else
+                selected = false;
+
+            if (currentcolumn < buttonRows[r].numitems)
+                menuItems.append(new LCDMenuItem(selected, NOTCHECKABLE,
+                                 buttonRows[r].buttons[currentcolumn]->text));
+        }
+
+        if (!menuItems.isEmpty())
+            lcddev->switchToMenu(&menuItems, titleText);
+    }
 
     selection = "";
     update(menuRect());
@@ -1647,7 +1669,27 @@ void ThemedMenu::keyPressEvent(QKeyEvent *e)
             makeRowVisible(currentrow, oldrow);
 
         activebutton = buttonRows[currentrow].buttons[currentcolumn];
-        gContext->LCDpopMenu(activebutton->text, titleText);
+        if (lcddev)
+        {
+            // Build a list of the menu items
+            QPtrList<LCDMenuItem> menuItems;
+            menuItems.setAutoDelete(true);
+            bool selected;
+            for (int r = 0; r < (int)buttonRows.size(); r++)
+            {
+                if (r == currentrow)
+                    selected = true;
+                else
+                    selected = false;
+
+                if (currentcolumn < buttonRows[r].numitems)
+                    menuItems.append(new LCDMenuItem(selected, NOTCHECKABLE,
+                                     buttonRows[r].buttons[currentcolumn]->text));
+            }
+
+            if (!menuItems.isEmpty())
+                lcddev->switchToMenu(&menuItems, titleText);
+        }
         update(watermarkRect);
         update(lastbutton->posRect);
         update(activebutton->posRect);

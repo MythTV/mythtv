@@ -8,11 +8,13 @@
 #include <qptrlist.h>
 #include <qpixmap.h>
 #include <qpushbutton.h>
+#include <qevent.h>
 
 #include <vector>
 using namespace std;
 
 #include "uitypes.h"
+#include "lcddevice.h"
 
 class XMLParse;
 class UIType;
@@ -27,6 +29,20 @@ class UIBlackHoleType;
 class UIImageType;
 class UIStatusBarType;
 class LayerSet;
+
+const int kExternalKeycodeEventType = 33213;
+
+class ExternalKeycodeEvent : public QCustomEvent
+{
+  public:
+    ExternalKeycodeEvent(const int key) 
+           : QCustomEvent(kExternalKeycodeEventType), keycode(key) {}
+
+    int getKeycode() { return keycode; }
+
+  private:
+    int keycode;
+};
 
 class MythMainWindow : public QDialog
 {
@@ -45,6 +61,8 @@ class MythMainWindow : public QDialog
    protected:
     void keyPressEvent(QKeyEvent *e);
     void customEvent(QCustomEvent *ce);
+
+    QObject *getTarget(QKeyEvent &key);
 
     float wmult, hmult;
     int screenwidth, screenheight;
@@ -117,6 +135,8 @@ class MythProgressDialog: public MythDialog
   private:
     QProgressBar *progress;
     int steps;
+
+    QPtrList<LCDTextItem> *textItems;
 };
 
 class MythThemedDialog : public MythDialog

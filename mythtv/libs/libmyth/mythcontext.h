@@ -52,7 +52,7 @@ class MythEvent : public QCustomEvent
     QString extradata;
 };
 
-#define MYTH_BINARY_VERSION "0.11.08132003-1"
+#define MYTH_BINARY_VERSION "0.12.08182003-1"
 #define MYTH_SCHEMA_VERSION "1003"
 
 extern bool print_verbose_messages;
@@ -61,7 +61,7 @@ class MythContext : public QObject
 {
     Q_OBJECT
   public:
-    MythContext(const QString &binversion, bool gui = true);
+    MythContext(const QString &binversion, bool gui = true, bool lcd = true);
     virtual ~MythContext();
 
     QString GetMasterHostPrefix(void);
@@ -130,16 +130,7 @@ class MythContext : public QObject
     void SetMainWindow(MythMainWindow *mainwin);
     MythMainWindow *GetMainWindow(void);
 
-    void LCDconnectToHost(QString hostname, unsigned int port);
-    void LCDswitchToTime();
-    void LCDswitchToMusic(QString artist, QString track);
-    void LCDsetLevels(int numb_levels, float *levels);
-    void LCDswitchToChannel(QString channum = "", QString title = "", 
-                            QString subtitle = "");
-    void LCDsetChannelProgress(float percentViewed);
-    void LCDswitchToNothing();
-    void LCDpopMenu(QString menu_choice, QString menu_title);
-    void LCDdestroy();
+    LCD *GetLCDDevice(void) { return lcd_device; }
 
     bool TestPopupVersion(const QString &name, const QString &libversion,
                           const QString &pluginversion);	

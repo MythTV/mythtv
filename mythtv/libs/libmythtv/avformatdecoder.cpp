@@ -347,6 +347,8 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                 m_parent->SetAudioParams(16, enc->channels, enc->sample_rate);
                 audio_sample_size = enc->channels * 2;
                 audio_sampling_rate = enc->sample_rate;
+                current_audio_channels = enc->channels;
+                current_audio_sample_rate = enc->sample_rate;
                 break;
             }
             default:
@@ -417,6 +419,37 @@ bool AvFormatDecoder::CheckVideoParams(int width, int height)
         switch (enc->codec_type)
         {
             case CODEC_TYPE_VIDEO:
+            {
+                AVCodec *codec = enc->codec;
+                avcodec_close(enc);
+                avcodec_open(enc, codec);
+                break;
+            }
+            default:
+                break;
+        }
+    }
+
+    return true;
+}
+
+bool AvFormatDecoder::CheckAudioParams(int freq, int channels)
+{
+    if (freq == current_audio_sample_rate && channels == current_audio_channels)
+        return false;
+
+    QString chan = "stereo";
+    if (channels == 1)
+        chan = "mono";
+
+    cerr << "Audio has changed: " << freq << "hz " << chan << endl;
+
+    for (int i = 0; i < ic->nb_streams; i++)
+    {
+        AVCodecContext *enc = &ic->streams[i]->codec;
+        switch (enc->codec_type)
+        {
+            case CODEC_TYPE_AUDIO:
             {
                 AVCodec *codec = enc->codec;
                 avcodec_close(enc);
@@ -582,6 +615,7 @@ static const float avfmpeg2_aspect[16]={
     0,    1.0,    -3.0/4.0,    -9.0/16.0,    -1.0/2.21,
 };
 
+uint32_t     avfmpa_freq[4] = {441, 480, 320, 0};
 
 float AvFormatDecoder::GetMpegAspect(AVCodecContext *context,
                                      int aspect_ratio_info,
@@ -710,7 +744,7 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                     {
                         m_parent->SetVideoParams(width, height, fps,
                                                  keyframedist, aspect);
-                        m_parent->Reinit();
+                        m_parent->ReinitVideo();
                         current_width = width;
                         current_height = height;
                         current_aspect = aspect;
@@ -742,6 +776,37 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
             }
         }
  
+        if (len > 0 && curstream->codec.codec_type == CODEC_TYPE_AUDIO)
+        {
+            AVCodecContext *context = &(curstream->codec);
+            if (context->codec_id == CODEC_ID_MP2 ||
+                context->codec_id == CODEC_ID_MP3LAME)
+            {
+                if (ptr[0] == 0xff && (ptr[1] & 0xf0) == 0xf0)
+                {
+                    int freq = avfmpa_freq[(ptr[2] & 0x0c) >> 2] * 100;
+                    int mode = (ptr[3] >> 6) & 3;
+                    int channels;
+                    if (mode == 3)
+                        channels = 1;
+                    else
+                        channels = 2;
+
+                    if (CheckAudioParams(freq, channels))
+                    {
+                        current_audio_sample_rate = freq;
+                        current_audio_channels = channels;
+
+                        audio_sample_size = channels * 2;
+                        audio_sampling_rate = freq;
+
+                        m_parent->SetAudioParams(16, channels, freq);
+                        m_parent->ReinitAudio();
+                    }
+                }
+            }
+        }
+
         while (len > 0)
         {
             switch (curstream->codec.codec_type)

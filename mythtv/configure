@@ -947,7 +947,7 @@ if test "$lshared" = "yes" ; then
 fi
 if test "$lcdproc" = "yes" ; then
   echo "BUILD_LCD=yes" >> config.mak
-  echo "#define LCD_DEVICE" >> $TMPH
+  echo "#define LCD_DEVICE 1" >> $TMPH
 fi
 echo "" >>config.mak
 # if you do not want to use encoders, disable that.

@@ -20,7 +20,7 @@
 
 bool print_verbose_messages = false;    
 
-MythContext::MythContext(const QString &binversion, bool gui)
+MythContext::MythContext(const QString &binversion, bool gui, bool lcd)
            : QObject()
 {
     qInitNetworkProtocols();
@@ -78,8 +78,11 @@ MythContext::MythContext(const QString &binversion, bool gui)
     expectingReply = false;
 
     mainWindow = NULL;
-	
-    lcd_device = new LCD();
+
+    if (lcd)
+        lcd_device = new LCD();
+    else
+        lcd_device = NULL;
 }
 
 MythContext::~MythContext()
@@ -96,6 +99,9 @@ MythContext::~MythContext()
         serverSock->close();
         delete serverSock;
     }
+
+    if (lcd_device)
+        delete lcd_device;
 }
 
 void MythContext::ConnectToMasterServer(void)
@@ -1005,55 +1011,6 @@ void MythContext::dispatchNow(MythEvent &e)
         QApplication::sendEvent(obj, &e);
         obj = listeners.next();
     }
-}
-
-void MythContext::LCDconnectToHost(QString hostname, unsigned int port)
-{
-    lcd_device->connectToHost(hostname, port);
-}
-
-void MythContext::LCDswitchToTime()
-{
-    lcd_device->switchToTime();
-}
-
-void MythContext::LCDswitchToMusic(QString artist, QString track)
-{
-    lcd_device->switchToMusic(artist, track);
-}
-
-void MythContext::LCDsetLevels(int numb_levels, float *levels)
-{
-    lcd_device->setLevels(numb_levels, levels);
-}
-
-void MythContext::LCDswitchToChannel(QString channum, 
-                                     QString title, 
-                                     QString subtitle)
-{
-    lcd_device->switchToChannel(channum, title, subtitle);
-}
-
-void MythContext::LCDsetChannelProgress(float percentViewed)
-{
-    lcd_device->setChannelProgress(percentViewed);
-}
-
-void MythContext::LCDswitchToNothing()
-{
-    lcd_device->switchToNothing();
-}
-
-void MythContext::LCDpopMenu(QString menu_choice, QString menu_title)
-{
-    lcd_device->popMenu(menu_choice, menu_title);
-}
-
-void MythContext::LCDdestroy()
-{
-    lcd_device->shutdown();
-    delete lcd_device;
-    lcd_device = NULL;
 }
 
 QString MythContext::GetLanguage(void)

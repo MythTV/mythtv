@@ -456,10 +456,9 @@ int main(int argc, char **argv)
 
     lcd_host = gContext->GetSetting("LCDHost");
     lcd_port = gContext->GetNumSetting("LCDPort");
-    if (lcd_host.length() > 0 && lcd_port > 1024)
-    {
-        gContext->LCDconnectToHost(lcd_host, lcd_port);
-    }
+
+    if (lcd_host.length() > 0 && lcd_port > 1024 && gContext->GetLCDDevice())
+        gContext->GetLCDDevice()->connectToHost(lcd_host, lcd_port);
 
     if (a.argc() == 2)
     {

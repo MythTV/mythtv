@@ -292,10 +292,10 @@ class MythListView : public QListView
     void SetAllowKeypress(bool allow) { allowkeypress = allow; }
     bool GetAllowKeypress(void) { return allowkeypress; }
     void DontFixSpaceBar(void) { fixspace = false; }
-    void ensureItemVCentered ( const QListViewItem * i );
+    void ensureItemVCentered (const QListViewItem *i);
 
   protected:
-    void keyPressEvent( QKeyEvent *e );
+    void keyPressEvent(QKeyEvent *e);
     void focusInEvent(QFocusEvent *e);
 
   signals:
@@ -303,6 +303,7 @@ class MythListView : public QListView
     void deletePressed(QListViewItem *);
     void infoPressed(QListViewItem *);
     void numberPressed(QListViewItem *, int);
+    void unhandledKeyPress(QKeyEvent *);
 
   private:
     bool allowkeypress;

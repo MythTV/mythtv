@@ -105,7 +105,7 @@ class NuppelVideoPlayer
 
     int ReencodeFile(char *inputname, char *outputname,
                      RecordingProfile &profile, bool honorCutList = false,
-                     bool forceKeyFrames = false, bool chkTranscodeDB = false,
+                     bool framecontrol = false, bool chkTranscodeDB = false,
                      QString fifodir = NULL);
 
     int FlagCommercials(bool showPercentage = false, bool fullSpeed = false);
@@ -161,7 +161,8 @@ class NuppelVideoPlayer
 
     bool GetLimitKeyRepeat(void) { return limitKeyRepeat; }
 
-    void Reinit(void);
+    void ReinitVideo(void);
+    void ReinitAudio(void);
 
  protected:
     void OutputVideoLoop(void);

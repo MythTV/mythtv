@@ -200,7 +200,7 @@ int main(int argc, char **argv)
         dup2(logfd, 2);
     }
 
-    gContext = new MythContext(MYTH_BINARY_VERSION, false);
+    gContext = new MythContext(MYTH_BINARY_VERSION, false, false);
 
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!db)

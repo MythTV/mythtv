@@ -198,6 +198,8 @@ class ThemedMenu : public MythDialog
 
     QPoint watermarkPos;
     QRect watermarkRect;
+
+    LCD *lcddev;
 };
 
 #endif

@@ -5,6 +5,7 @@
 #include <qapplication.h>
 #include <qlayout.h>
 #include <qobjectlist.h>
+#include <qdir.h>
 
 #include <iostream>
 using namespace std;
@@ -18,6 +19,7 @@ using namespace std;
 #include "uitypes.h"
 #include "xmlparse.h"
 #include "mythdialogs.h"
+#include "lcddevice.h"
 
 #ifdef USE_LIRC
 static void *SpawnLirc(void *param)
@@ -124,9 +126,19 @@ void MythMainWindow::keyPressEvent(QKeyEvent *e)
 
 void MythMainWindow::customEvent(QCustomEvent *ce)
 {
-    (void)ce;
+    if (ce->type() == kExternalKeycodeEventType)
+    {
+        ExternalKeycodeEvent *eke = (ExternalKeycodeEvent *)ce;
+        int keycode = eke->getKeycode();
+
+        QKeyEvent key(QEvent::KeyPress, keycode, 0, Qt::NoButton);
+
+        QObject *key_target = getTarget(key);
+
+        QApplication::sendEvent(key_target, &key);
+    }
 #ifdef USE_LIRC
-    if (ce->type() == kLircKeycodeEventType && !ignore_lirc_keys) 
+    else if (ce->type() == kLircKeycodeEventType && !ignore_lirc_keys) 
     {
         LircKeycodeEvent *lke = (LircKeycodeEvent *)ce;
         int keycode = lke->getKeycode();
@@ -139,32 +151,7 @@ void MythMainWindow::customEvent(QCustomEvent *ce)
             QKeyEvent key(lke->isKeyDown() ? QEvent::KeyPress :
                           QEvent::KeyRelease, k, k >> 24, mod, text);
 
-            // Make the key events go to the widgets almost
-            // the same way Qt would.
-
-            QObject *key_target = NULL;
-            if (!key_target)
-                key_target = QWidget::keyboardGrabber();
-
-            if (!key_target)
-            {
-                QWidget *focus_widget = qApp->focusWidget();
-                if (focus_widget && focus_widget->isEnabled())
-                {
-                    key_target = focus_widget;
-
-                    // Yes this is special code for handling the
-                    // the escape key.
-                    if (key.key() == Key_Escape &&
-                        focus_widget->topLevelWidget())
-                    {
-                        key_target = focus_widget->topLevelWidget();
-                    }
-                }
-            }
-
-            if (!key_target)
-                key_target = this;
+            QObject *key_target = getTarget(key);
 
             QApplication::sendEvent(key_target, &key);
         }
@@ -175,13 +162,38 @@ void MythMainWindow::customEvent(QCustomEvent *ce)
                                            " your key mappings.\n";
         }
     }
-
-    if (ce->type() == kLircMuteEventType)
+    else if (ce->type() == kLircMuteEventType)
     {
         LircMuteEvent *lme = (LircMuteEvent *)ce;
         ignore_lirc_keys = lme->eventsMuted();
     }
 #endif
+}
+
+QObject *MythMainWindow::getTarget(QKeyEvent &key)
+{
+    QObject *key_target = NULL;
+
+    key_target = QWidget::keyboardGrabber();
+
+    if (!key_target)
+    {
+        QWidget *focus_widget = qApp->focusWidget();
+        if (focus_widget && focus_widget->isEnabled())
+        {
+            key_target = focus_widget;
+
+            // Yes this is special code for handling the
+            // the escape key.
+            if (key.key() == Key_Escape && focus_widget->topLevelWidget())
+                key_target = focus_widget->topLevelWidget();
+        }
+    }
+
+    if (!key_target)
+        key_target = this;
+
+    return key_target;
 }
 
 MythDialog::MythDialog(MythMainWindow *parent, const char *name, bool setsize)
@@ -388,7 +400,20 @@ MythProgressDialog::MythProgressDialog(const QString &message, int totalSteps)
     if (steps == 0)
         steps = 1;
 
-    gContext->LCDswitchToChannel(message);
+    LCD *lcddev = gContext->GetLCDDevice();
+
+    if (lcddev)
+    {
+        textItems = new QPtrList<LCDTextItem>;
+        textItems->setAutoDelete(true);
+
+        textItems->clear();
+        textItems->append(new LCDTextItem(1, ALIGN_CENTERED, message, "Generic",
+                          false));
+        lcddev->switchToGeneric(textItems);
+    }
+    else 
+        textItems = NULL;
 
     show();
 
@@ -398,12 +423,22 @@ MythProgressDialog::MythProgressDialog(const QString &message, int totalSteps)
 void MythProgressDialog::Close(void)
 {
     accept();
-    gContext->LCDswitchToTime();
+
+    if (textItems)
+    {
+        LCD *lcddev = gContext->GetLCDDevice();
+        lcddev->switchToNothing();
+        lcddev->switchToTime();
+        delete textItems;
+    }
 }
 
 void MythProgressDialog::setProgress(int curprogress)
 {
-    gContext->LCDsetChannelProgress( (curprogress + 0.0) / (steps * 1000.0));
+    float fProgress = (float)curprogress / (steps * 1000.0);
+    LCD *lcddev = gContext->GetLCDDevice();
+    if (lcddev)
+        lcddev->setGenericProgress(fProgress);
     progress->setProgress(curprogress);
     if (curprogress % steps == 0)
         qApp->processEvents();

@@ -49,9 +49,9 @@ int main(int argc, char **argv)
     lcd_host = gContext->GetSetting("LCDHost");
     lcd_port = gContext->GetNumSetting("LCDPort");
 
-    if (lcd_host.length() > 0 && lcd_port > 1024)
+    if (lcd_host.length() > 0 && lcd_port > 1024 && gContext->GetLCDDevice())
     {
-        gContext->LCDconnectToHost("localhost", 13666);
+        gContext->GetLCDDevice()->connectToHost("localhost", 13666);
         MythLCD mythLCD;
         a.setMainWidget(&mythLCD);
         mythLCD.show();

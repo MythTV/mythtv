@@ -38,6 +38,8 @@ void usage(char *progname)
     cerr << "\t--fifodir      or -f: Directory to write fifos to\n";
     cerr << "\t\tIf --fifodir is specified, 'audout' and 'vidout'\n";
     cerr << "\t\twill be created in the specified directory\n";
+    cerr << "\t--fifosync          : Enforce fifo sync\n";
+    cerr << "\t\t(use only if audio and video fifos are read independantly)\n";
     cerr << "\t--help         or -h: Prints this help statement.\n";
 }
 
@@ -46,6 +48,7 @@ int main(int argc, char *argv[])
     QString chanid, starttime, profilename;
     QString fifodir = NULL;
     bool useCutlist = false, keyframesonly = false, use_db = false;
+    bool fifosync = false;
     srand(time(NULL));
 
     QApplication a(argc, argv, false);
@@ -137,6 +140,10 @@ int main(int argc, char *argv[])
                 return -1;
             }
         }
+        else if (!strcmp(a.argv()[argpos],"--fifosync"))
+        {
+            fifosync = true;
+        }
         else if (!strcmp(a.argv()[argpos],"-h") ||
                  !strcmp(a.argv()[argpos],"--help")) 
         {
@@ -148,6 +155,16 @@ int main(int argc, char *argv[])
     if (!found_profile || !found_chanid || !found_starttime) 
     {
          cerr << "Must specify -p, -c, and -s options!\n";
+         return -1;
+    }
+    if (keyframesonly && fifodir != NULL)
+    {
+         cerr << "Cannot specify both --fifodir and --allkeys\n";
+         return -1;
+    }
+    if (fifosync && fifodir == NULL)
+    {
+         cerr << "Must specify --fifodir to use --fifosync\n";
          return -1;
     }
 
@@ -197,7 +214,8 @@ int main(int argc, char *argv[])
 
     int result = nvp->ReencodeFile((char *)infile.ascii(),
                                    (char *)tmpfile.ascii(),
-                                   profile, useCutlist, keyframesonly, use_db,
+                                   profile, useCutlist, 
+                                   (fifosync || keyframesonly), use_db,
                                    fifodir);
     int retval;
     if (result == REENCODE_OK)

@@ -11,7 +11,7 @@ using namespace std;
 class FIFOWriter
 {
   public:
-    FIFOWriter(int count);
+    FIFOWriter(int count, bool sync);
    ~FIFOWriter();
 
     int FIFOInit(int id, QString desc, QString name, long size, int num_bufs);
@@ -38,6 +38,7 @@ class FIFOWriter
      long *maxblksize;
      int *killwr, *fbcount;
      int num_fifos;
+     bool usesync;
      int cur_id;
 };
 

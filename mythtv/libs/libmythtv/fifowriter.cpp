@@ -13,9 +13,10 @@
 #include <iostream>
 using namespace std;
 
-FIFOWriter::FIFOWriter(int count)
+FIFOWriter::FIFOWriter(int count, bool sync)
 {
     num_fifos = count;
+    usesync = sync;
     maxblksize = new long[count];
     killwr = new int[count];
     fbcount = new int[count];
@@ -72,14 +73,14 @@ int FIFOWriter::FIFOInit(int id, QString desc, QString name, long size,
     filename[id] = name;
     fbdesc[id] = desc;
     killwr[id] = 0;
-    fbcount[id] = num_bufs;
+    fbcount[id] = (usesync) ? 2 : num_bufs;
 
     fifo_buf[id] = new struct fifo_buf;
     struct fifo_buf *fifoptr = fifo_buf[id];
-    for (int i = 0; i< num_bufs; i++)
+    for (int i = 0; i < fbcount[id]; i++)
     {
         fifoptr->data = new unsigned char[maxblksize[id]];
-        if (i == num_bufs - 1)
+        if (i == fbcount[id] - 1)
             fifoptr->next = fifo_buf[id];
         else
             fifoptr->next = new struct fifo_buf;
@@ -151,13 +152,17 @@ void FIFOWriter::FIFOWrite(int id, void *buffer, long blksize)
     while (fb_inptr[id]->next == fb_outptr[id])
     {
         bool blocking = false;
-        for(int i = 0; i < num_fifos; i++)
+        if (!usesync)
         {
-            if (i == id)
-                continue;
-            if (fb_inptr[i] == fb_outptr[i])
-                blocking = true;
+            for(int i = 0; i < num_fifos; i++)
+            {
+                if (i == id)
+                    continue;
+                if (fb_inptr[i] == fb_outptr[i])
+                    blocking = true;
+            }
         }
+
         if (blocking)
         {
             struct fifo_buf *tmpfifo;

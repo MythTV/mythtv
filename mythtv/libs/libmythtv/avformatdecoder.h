@@ -74,6 +74,7 @@ class AvFormatDecoder : public DecoderBase
     void SeekReset(void);
 
     bool CheckVideoParams(int width, int height);
+    bool CheckAudioParams(int freq, int channels);
 
     RingBuffer *ringBuffer;
 
@@ -124,6 +125,9 @@ class AvFormatDecoder : public DecoderBase
     int current_width;
     int current_height;
     float current_aspect;
+
+    int current_audio_channels;
+    int current_audio_sample_rate;
 
     QPtrList<AVPacket> storedPackets;
 };

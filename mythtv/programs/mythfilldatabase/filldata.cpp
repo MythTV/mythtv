@@ -1283,40 +1283,40 @@ bool grabData(Source source, int offset)
     QString xmltv_grabber = source.xmltvgrabber;
 
     if (xmltv_grabber == "tv_grab_uk")
-        command.sprintf("nice -19 %s --days 7 --config-file '%s' --output %s",
+        command.sprintf("nice %s --days 7 --config-file '%s' --output %s",
                         xmltv_grabber.ascii(), configfile.ascii(), 
                         filename.ascii());
     else if (xmltv_grabber == "tv_grab_nz")
-        command.sprintf("nice -19 %s -n 1 -f %d -o '%s'",
+        command.sprintf("nice %s -n 1 -f %d -o '%s'",
                         xmltv_grabber.ascii(), offset,
                         filename.ascii());
     else if (xmltv_grabber == "tv_grab_de")
-        command.sprintf("nice -19 %s --days 7 --output %s",
+        command.sprintf("nice %s --days 7 --output %s",
                         xmltv_grabber.ascii(),
                         filename.ascii());
     else if (xmltv_grabber == "tv_grab_nl")
-        command.sprintf("nice -19 %s --output %s",
+        command.sprintf("nice %s --output %s",
                         xmltv_grabber.ascii(),
                         filename.ascii());
     else if (xmltv_grabber == "tv_grab_fi")
         // Use the default of 10 days for Finland's grabber
-        command.sprintf("nice -19 %s --offset %d --config-file '%s' --output %s",
+        command.sprintf("nice %s --offset %d --config-file '%s' --output %s",
                         xmltv_grabber.ascii(), offset,
                         configfile.ascii(), filename.ascii());
     else if (xmltv_grabber == "tv_grab_es")
         // Use fixed of 4 days for Spanish grabber
-        command.sprintf("nice -19 %s --days=4 --offset %d --config-file '%s' --output %s",
+        command.sprintf("nice %s --days=4 --offset %d --config-file '%s' --output %s",
                         xmltv_grabber.ascii(), offset,
                         configfile.ascii(), filename.ascii());
     else if (xmltv_grabber == "tv_grab_sn")
         // Use fixed interval of 14 days for Swedish/Norwegian grabber
-        command.sprintf("nice -19 %s --days 14 --config-file '%s' --output %s",
+        command.sprintf("nice %s --days 14 --config-file '%s' --output %s",
                         xmltv_grabber.ascii(), configfile.ascii(),
                         filename.ascii());
     else
     {
         isNorthAmerica = true;
-        command.sprintf("nice -19 %s --days 1 --offset %d --config-file '%s' "
+        command.sprintf("nice %s --days 1 --offset %d --config-file '%s' "
                         "--output %s", xmltv_grabber.ascii(),
                         offset, configfile.ascii(), filename.ascii());
     }

@@ -558,7 +558,7 @@ int Channel::ChangeColourAttribute(int attrib, const char *name, bool up)
         card_value = *setfield;
     }
 
-    if (current_value < -1) // Couldn't get from database
+    if (current_value < 0) // Couldn't get from database
     {
         if (up)
         {
