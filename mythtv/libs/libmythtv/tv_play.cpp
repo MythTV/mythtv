@@ -4163,7 +4163,7 @@ void TV::ToggleSleepTimer(const QString time)
             if (time.length() > 11)
             {
                 bool intRead = false;
-                int mins = time.right(time.length() - 11).toInt(&intRead);
+                mins = time.right(time.length() - 11).toInt(&intRead);
 
                 if (intRead)
                 {
