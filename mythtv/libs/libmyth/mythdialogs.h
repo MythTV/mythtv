@@ -110,6 +110,9 @@ class MythDialog : public QFrame
 
     void setNoErase(void);
 
+  signals:
+    void menuButtonPressed();
+
   public slots:
     int exec();
     virtual void done( int );

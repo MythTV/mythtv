@@ -206,9 +206,7 @@ int ProfileGroupEditor::exec(QSqlDatabase* db) {
     redraw = false;
     load(db);
     dialog = new ConfigurationDialogWidget(gContext->GetMainWindow());
-    QAccel *popaccel = new QAccel(dialog);
-    popaccel->connectItem(popaccel->insertItem(Key_D), this,
-                          SLOT(callDelete()));
+    connect(dialog, SIGNAL(menuButtonPressed()), this, SLOT(callDelete()));
     int width = 0, height = 0;
     float wmult = 0, hmult = 0;
 

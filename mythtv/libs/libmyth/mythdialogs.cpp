@@ -563,6 +563,8 @@ void MythDialog::keyPressEvent( QKeyEvent *e )
                 else
                     focusNextPrevChild(true);
             }
+            else if (action == "MENU")
+                emit menuButtonPressed();
         }
     }
 }
