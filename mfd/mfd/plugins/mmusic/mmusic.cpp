@@ -738,16 +738,17 @@ void MMusicWatcher::compareToMasterList(MusicFileMap &music_files, const QString
     int music_files_at_a_time = mfdContext->getNumSetting("MusicFilesAtATime", 100);
     int counter = 0;
     MusicFileMap::Iterator it;
-    for ( it = music_files.begin(); it != music_files.end(); )
+    it = music_files.begin();
+    while(counter < music_files_at_a_time && it != music_files.end())
     {
+        counter++;
+
         if(master_list.find(it.key()) == master_list.end())
         {
             //
             //  New file found
             //
 
-            counter++;
-            
             MusicFile new_master_item(it.key(), it.data().lastModified());
             if(new_master_item.calculateMythDigest())
             {
@@ -769,12 +770,6 @@ void MMusicWatcher::compareToMasterList(MusicFileMap &music_files, const QString
 
             //
             //  It's there, but it changed modification dates
-            //
-            
-            counter++;
-
-
-            //
             //  Try and update it's metadata
             //
 
@@ -809,30 +804,18 @@ void MMusicWatcher::compareToMasterList(MusicFileMap &music_files, const QString
         }
 
         //
-        //  Remove this one
+        //  Remove this one, step back to the beginning of the list
         //  
         
         music_files.remove(it);
+        it = music_files.begin();
+    }
 
-        if(counter < music_files_at_a_time && keep_going)
-        {
-            ++it;
-        }
-        else
-        {
-            it = music_files.end();
-            
-            //
-            //  We have done music_files_at_a_time worth of files, but there
-            //  are still more to do. We set force_sweep on again so that
-            //  the next batch will get looked at right away.
-            //
-            
-            force_sweep_mutex.lock();
-                force_sweep = true;
-            force_sweep_mutex.unlock();
-            
-        }
+    if(music_files.count() > 0)
+    {
+        force_sweep_mutex.lock();
+            force_sweep = true;
+        force_sweep_mutex.unlock();
     }
 }
 
