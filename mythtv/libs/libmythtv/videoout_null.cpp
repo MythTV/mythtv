@@ -92,7 +92,10 @@ bool VideoOutputNull::CreateNullBuffers(void)
         vbuffers[i].bpp = 12;
         vbuffers[i].size = XJ_height * XJ_width * 3 / 2;
         vbuffers[i].codec = FMT_YV12;
-        vbuffers[i].buf = new unsigned char[vbuffers[i].size];
+        vbuffers[i].buf = new unsigned char[vbuffers[i].size + 64];
+        memset(vbuffers[i].buf, 0, XJ_height * XJ_width);
+        memset(vbuffers[i].buf + XJ_height * XJ_width, 127, 
+               XJ_height * XJ_width / 2);
     }
 
     return true;
