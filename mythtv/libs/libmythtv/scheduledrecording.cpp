@@ -635,18 +635,22 @@ void ScheduledRecording::setDefault(QSqlDatabase *db, bool haschannel)
 void ScheduledRecording::setProgram(ProgramInfo *proginfo)
 {
     m_pginfo = proginfo;
-    title->setValue(proginfo->title);
-    subtitle->setValue(proginfo->subtitle);
-    description->setValue(proginfo->description);
-    channel->setValue(proginfo->chanid);
-    station->setValue(proginfo->chansign);
-    startDate->setValue(proginfo->startts.date());
-    startTime->setValue(proginfo->startts.time());
-    endDate->setValue(proginfo->endts.date());
-    endTime->setValue(proginfo->endts.time());
-    seriesid->setValue(proginfo->seriesid);
-    programid->setValue(proginfo->programid);
-    category->setValue(proginfo->category);
+    
+    if(proginfo)
+    {
+        title->setValue(proginfo->title);
+        subtitle->setValue(proginfo->subtitle);
+        description->setValue(proginfo->description);
+        channel->setValue(proginfo->chanid);
+        station->setValue(proginfo->chansign);
+        startDate->setValue(proginfo->startts.date());
+        startTime->setValue(proginfo->startts.time());
+        endDate->setValue(proginfo->endts.date());
+        endTime->setValue(proginfo->endts.time());
+        seriesid->setValue(proginfo->seriesid);
+        programid->setValue(proginfo->programid);
+        category->setValue(proginfo->category);
+    }
 }
 
 void ScheduledRecording::makeOverride(void)
