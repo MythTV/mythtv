@@ -11,6 +11,7 @@
 #include <qcursor.h>
 #include <qdir.h>
 #include <qimage.h>
+#include <qbitmap.h>
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -573,36 +574,39 @@ void PhoneUIBox::DrawLocalWebcamImage()
     unsigned char *rgb32Frame = webcam->GetVideoFrame(localClient);
     if (rgb32Frame != 0)
     {
-        if (!fullScreen) // In full-screen mode local webcam does not get displayed, only remote webcam
+        // Digital Zoom/pan parameters
+        int zx = (wcWidth-zoomWidth)/2;
+        zx += (zx*wPan/10);
+        zx = (zx >> 1) << 1; // Make sure its even
+        int zy = (wcHeight-zoomHeight)/2;
+        zy += (zy*hPan/10);
+        zy = (zy >> 1) << 1; // Make sure its even
+    
+        QImage ScaledImage;
+    
+        QImage Image(rgb32Frame, wcWidth, wcHeight, 32, (QRgb *)0, 0, QImage::LittleEndian);
+        
+        QRect puthere;
+        if (!fullScreen) // In full-screen mode local webcam gets drawn as an inset when remote pic gets drawn
+            puthere = localWebcamArea->getScreenArea();
+        else
+            puthere = QRect(screenwidth-WC_INSET_WIDTH, screenheight-WC_INSET_HEIGHT,     
+                            WC_INSET_WIDTH, WC_INSET_HEIGHT);
+        if (zoomFactor == 10) // No Zoom; just scale the webcam image to the local window size
         {
-            // Digital Zoom/pan parameters
-            int zx = (wcWidth-zoomWidth)/2;
-            zx += (zx*wPan/10);
-            zx = (zx >> 1) << 1; // Make sure its even
-            int zy = (wcHeight-zoomHeight)/2;
-            zy += (zy*hPan/10);
-            zy = (zy >> 1) << 1; // Make sure its even
-        
-            QPixmap Pixmap;
-            QImage ScaledImage;
-        
-            QImage Image(rgb32Frame, wcWidth, wcHeight, 32, (QRgb *)0, 0, QImage::LittleEndian);
-        
-            QRect puthere = localWebcamArea->getScreenArea();
-            if (zoomFactor == 10) // No Zoom; just scale the webcam image to the local window size
-            {
-                ScaledImage = Image.scale(puthere.width(), puthere.height(), QImage::ScaleMin);
-            }
-            else
-            {
-                QImage zoomedImage = Image.copy(zx, zy, zoomWidth, zoomHeight);
-                ScaledImage = zoomedImage.scale(puthere.width(), puthere.height(), QImage::ScaleMin);
-            }
-            
-            // Draw the local webcam image
-            Pixmap = ScaledImage;
-            bitBlt(this, puthere.x(), puthere.y(), &Pixmap);
+            ScaledImage = Image.scale(puthere.width(), puthere.height(), QImage::ScaleMin);
         }
+        else
+        {
+            QImage zoomedImage = Image.copy(zx, zy, zoomWidth, zoomHeight);
+            ScaledImage = zoomedImage.scale(puthere.width(), puthere.height(), QImage::ScaleMin);
+        }
+        
+        // Draw the local webcam image if not in full-screen, else it gets drawn later
+        if (!fullScreen) 
+            bitBlt(this, puthere.x(), puthere.y(), &ScaledImage);
+        else
+            savedLocalWebcam = ScaledImage;
         webcam->FreeVideoBuffer(localClient, rgb32Frame);
     }
 }
@@ -665,8 +669,8 @@ void PhoneUIBox::TransmitLocalWebcamImage()
 
 void PhoneUIBox::ProcessRxVideoFrame()
 {
-    QPixmap Pixmap;
     QImage ScaledImage;
+    QImage *imageToDisplay;
     VIDEOBUFFER *v;
 
     if (VideoOn && rtpVideo && (v = rtpVideo->getRxedVideo()))
@@ -687,12 +691,29 @@ void PhoneUIBox::ProcessRxVideoFrame()
             if ((v->w != rxVideoArea.width()) || (v->h != rxVideoArea.height()))
             {
                 ScaledImage = rxImage.scale(rxVideoArea.width(), rxVideoArea.height(), QImage::ScaleMin);
-                Pixmap = ScaledImage;
+                imageToDisplay = &ScaledImage;
             }
             else
-                Pixmap = rxImage;
-            bitBlt(this, rxVideoArea.x(), rxVideoArea.y(), &Pixmap);
+                imageToDisplay = &rxImage;
 
+            // Fullscreen mode - draw on the local webcam as an inset image            
+            if ((fullScreen) && (!savedLocalWebcam.isNull())) // In full-screen mode, don't overdraw the inset local webcam 
+            {
+                QPixmap fsPixmap(screenwidth, screenheight);
+                fsPixmap.fill(Qt::black);
+                QPainter p(&fsPixmap);
+                p.drawImage((screenwidth-imageToDisplay->width())/2, 
+                            (screenheight-imageToDisplay->height())/2,
+                            *imageToDisplay);
+                p.drawImage(screenwidth-WC_INSET_WIDTH, screenheight-WC_INSET_HEIGHT,
+                            savedLocalWebcam);
+                p.setPen(Qt::white);
+                p.drawRect(screenwidth-WC_INSET_WIDTH, screenheight-WC_INSET_HEIGHT,
+                           WC_INSET_WIDTH, WC_INSET_HEIGHT);
+                bitBlt(this, rxVideoArea.x(), rxVideoArea.y(), &fsPixmap);
+            }
+            else
+                bitBlt(this, rxVideoArea.x(), rxVideoArea.y(), imageToDisplay);
         }
         rtpVideo->freeVideoBuffer(v);
     }

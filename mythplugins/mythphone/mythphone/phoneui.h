@@ -35,6 +35,10 @@ class PhoneUIStatusBar;
 
 #define MAX_DISPLAY_IM_MSGS    5        // No lines of IM per mythdialog box
 
+// Dimensions of local webcam window when viewing fullscreen
+#define WC_INSET_WIDTH        (176)
+#define WC_INSET_HEIGHT       (144)
+
 class PhoneUIBox : public MythThemedDialog
 {
 
@@ -162,6 +166,7 @@ class PhoneUIBox : public MythThemedDialog
     uchar rxRgbBuffer[MAX_RGB_704_576];
     uchar yuvBuffer1[MAX_YUV_704_576];
     uchar yuvBuffer2[MAX_YUV_704_576];
+    QImage savedLocalWebcam;
 
     UIManagedTreeListType *DirectoryList;
 
