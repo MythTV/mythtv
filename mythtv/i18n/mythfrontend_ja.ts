@@ -462,6 +462,14 @@
         <source>There are no recordings in this display group</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Stop Transcoding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Begin Transcoding</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ProgFinder</name>
@@ -578,7 +586,7 @@
     </message>
     <message>
         <source>Movie</source>
-        <translation>映画</translation>
+        <translation type="obsolete">映画</translation>
     </message>
 </context>
 <context>
@@ -872,7 +880,7 @@
     </message>
     <message>
         <source>Make the video look normal on a progressive display (i.e. monitor).  Deinterlace requires that your CPU supports SSE instructions.  Enabling this without proper CPU support will cause the program to segfault. See the HOWTO document for more information.</source>
-        <translation>プログレッシブディスプレイ(例 モニター)で正常にビデオを見られるにする．デインターレースはCPがUSSEをサポートしている必要が有ります．対応してないCPUで有効にした場合セグメンテーションフォールトが起こります．詳細はHOWTOを御覧下さい．</translation>
+        <translation type="obsolete">プログレッシブディスプレイ(例 モニター)で正常にビデオを見られるにする．デインターレースはCPがUSSEをサポートしている必要が有ります．対応してないCPUで有効にした場合セグメンテーションフォールトが起こります．詳細はHOWTOを御覧下さい．</translation>
     </message>
     <message>
         <source>Extra audio buffering</source>
@@ -1052,7 +1060,7 @@
     </message>
     <message>
         <source>When exiting sticky keys fast forward/rewind mode, reposition before resuming normal playback.  This is to compensate for the reaction time between seeing where to resume playback and actually exiting fast forward/rewind mode.</source>
-        <translation>スティッキーキーの高速早送り・巻き戻しが終わったとき，再生を再開する前に位置を戻します．これは見た目の再生位置と，実際に早送り・巻き戻しが終わった位置のズレを補正するためのものです．</translation>
+        <translation type="obsolete">スティッキーキーの高速早送り・巻き戻しが終わったとき，再生を再開する前に位置を戻します．これは見た目の再生位置と，実際に早送り・巻き戻しが終わった位置のズレを補正するためのものです．</translation>
     </message>
     <message>
         <source>Number of seconds for OSD information</source>
@@ -1982,7 +1990,7 @@
     </message>
     <message>
         <source>If set, pressing the sticky rewind key in fast forward mode will switch to rewind mode, and vice versa.  If not set, doing so will decrease the speed in the current direction or switch to play mode if the speed can&apos;t be decreased further.</source>
-        <translation>これをセットすると，早送りをしているときに巻き戻しキーを押すと巻き戻しモードになります(逆も同じ)．セットしない場合，早送り(巻き戻し)の向きは変えずに速度が下がっていき，最後には再生モードになります．</translation>
+        <translation type="obsolete">これをセットすると，早送りをしているときに巻き戻しキーを押すと巻き戻しモードになります(逆も同じ)．セットしない場合，早送り(巻き戻し)の向きは変えずに速度が下がっていき，最後には再生モードになります．</translation>
     </message>
     <message>
         <source>Use Recording Priorities</source>
@@ -3194,7 +3202,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>If your local timezone does not match the timezone returned by XMLTV, use this setting to have mythfilldatabase adjust the program start and end times.None will disable this feature, Auto will automatically detect your local timezone</source>
-        <translation>ローカルタイムゾーンがXMLTVの出力するタイムゾーンと合わない場合，mythfilldatabaseはこの設定を使って放送時間を修正します．Autoを設定すると自動的にローカルタイムゾーンを検出しようと試みます．</translation>
+        <translation type="obsolete">ローカルタイムゾーンがXMLTVの出力するタイムゾーンと合わない場合，mythfilldatabaseはこの設定を使って放送時間を修正します．Autoを設定すると自動的にローカルタイムゾーンを検出しようと試みます．</translation>
     </message>
     <message>
         <source>Master Backend Override</source>
@@ -3466,7 +3474,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>A command executed before the backend would shutdown. The return value of the command determines if the backend is allowed to shutdown. 0 - yes, 1 - reinitializes the idleing, 2 - reset the backend to wait for a frontend again</source>
-        <translation>バックエンドがシャットダウンする前のコマンド。コマンドの戻り値でバックエンドはの動作が決まります。0 - シャットダウン, 1 - 再初期化, 2 - リセットしてフロントエンドを待ちます</translation>
+        <translation type="obsolete">バックエンドがシャットダウンする前のコマンド。コマンドの戻り値でバックエンドはの動作が決まります。0 - シャットダウン, 1 - 再初期化, 2 - リセットしてフロントエンドを待ちます</translation>
     </message>
     <message>
         <source>Block shutdown before client connected</source>
@@ -4205,6 +4213,46 @@ Myth will now exit.</source>
         <source>If enabled, the master backend will stream and delete files if it finds them in the video directory. Useful if you are using a central storage location, like a NFS share, and your slave backend isn&apos;t running.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Make the video look normal on a progressive display (i.e. monitor).  Deinterlace requires that your CPU supports SSE instructions.  Enabling this without proper CPU support will cause the program to segfault. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When exiting sticky keys fast forward/rewind mode, reposition before resuming normal playback. This compensates for the reaction time between seeing where to resume playback and actually exiting seeking.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, pressing the sticky rewind key in fast forward mode switches to rewind mode, and vice versa. If not set, it will decrease the current speed or switch to play mode if the speed can&apos;t be decreased further.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wait for ATSC signal lock (msec)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV can check the signal strength When you tune into a HDTV or other over-the-air digital station. This value is the number of milliseconds to allow before we give up trying to get an acceptible signal.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC Signal Threshold</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Threshold for a signal to be considered acceptible. If you set this too low Myth may crash, if you set it too low you may not be able to tune to channels on which reception is good.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General (page 2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If your local timezone does not match the timezone returned by XMLTV, use this setting to have mythfilldatabase adjust the program start and end times.None disables this feature, Auto automatically detects your local timezone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A command executed before the backend would shutdown. The return value determines if the backend can shutdown. 0 - yes, 1 - restart idleing, 2 - reset the backend to wait for frontend</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScheduledRecording</name>
@@ -4602,6 +4650,14 @@ Myth will now exit.</source>
     <message>
         <source>TXT</source>
         <translation>TXT</translation>
+    </message>
+    <message>
+        <source>Stop Transcoding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Begin Transcoding</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
