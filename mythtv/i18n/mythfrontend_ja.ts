@@ -239,6 +239,22 @@
         <source>or</source>
         <translation>または</translation>
     </message>
+    <message>
+        <source>Match an exact title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Match an exact episode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error was found when checking</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The database error was</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>DataDirectLineupSelector</name>

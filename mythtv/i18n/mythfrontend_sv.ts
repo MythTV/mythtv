@@ -209,6 +209,22 @@
         <source>or</source>
         <translation>eller</translation>
     </message>
+    <message>
+        <source>Match an exact title</source>
+        <translation>Matcha en specifik titel</translation>
+    </message>
+    <message>
+        <source>Match an exact episode</source>
+        <translation>Matcha ett specifikt avsnitt</translation>
+    </message>
+    <message>
+        <source>An error was found when checking</source>
+        <translation>Ett fel hittades</translation>
+    </message>
+    <message>
+        <source>The database error was</source>
+        <translation>Databasfelet var</translation>
+    </message>
 </context>
 <context>
     <name>DataDirectLineupSelector</name>

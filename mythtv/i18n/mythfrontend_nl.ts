@@ -210,6 +210,22 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
         <source>or</source>
         <translation>of</translation>
     </message>
+    <message>
+        <source>Match an exact title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Match an exact episode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error was found when checking</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The database error was</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>DataDirectLineupSelector</name>
