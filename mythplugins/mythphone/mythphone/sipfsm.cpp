@@ -107,6 +107,15 @@ void SipContainer::HangupCall()
     EventQLock.unlock();
 }
 
+void SipContainer::ModifyCall(QString audCodec, QString vidCodec)
+{
+    EventQLock.lock();
+    EventQ.append("MODIFYCALL");
+    EventQ.append(audCodec);
+    EventQ.append(vidCodec);
+    EventQLock.unlock();
+}
+
 void SipContainer::UiOpened(QObject *callingApp)
 {
     EventQLock.lock();
@@ -272,10 +281,14 @@ void SipThread::SipThreadWorker()
 #endif
 
     // Open a file for writing debug info into
+#ifndef WIN32
     QString debugFileName = MythContext::GetConfDir() + "/MythPhone/siplog.txt";
     debugFile = new QFile(debugFileName);
     if (debugFile->open(IO_WriteOnly))
         debugStream = new QTextStream (debugFile);
+#else
+    debugStream = 0;
+#endif
 
     SipFsm *sipFsm = new SipFsm();
 
@@ -322,7 +335,9 @@ void SipThread::SipThreadWorker()
         debugFile->close();
         delete debugFile;
     }
+#ifndef WIN32
     delete vxml;
+#endif
 }
 
 void SipThread::CheckUIEvents(SipFsm *sipFsm)
@@ -369,6 +384,17 @@ void SipThread::CheckUIEvents(SipFsm *sipFsm)
     }
     else if (event == "HANGUPCALL")
         sipFsm->HangUp();
+    else if (event == "MODIFYCALL")
+    {
+        EventQLock.lock();
+        it = EventQ.begin();
+        QString audioCodec = *it;
+        it = EventQ.remove(it);
+        QString videoCodec = *it;
+        EventQ.remove(it);
+        EventQLock.unlock();
+        sipFsm->ModifyCall(audioCodec, videoCodec);
+    }
     else if (event == "UIOPENED")
     {
         sipFsm->StatusChanged("OPEN");
@@ -814,6 +840,18 @@ void SipFsm::HangUp()
     if (Call)
         if (Call->FSM(SIP_HANGUP) == SIP_IDLE)
             DestroyFsm(Call);
+}
+
+
+void SipFsm::ModifyCall(QString audioCodec, QString videoCodec)
+{
+    SipCall *Call = MatchCall(primaryCall);
+    if (Call)
+    {
+        if ((Call->ModifyCodecs(audioCodec, videoCodec)) && 
+            (Call->FSM(SIP_MODIFYSESSION) == SIP_IDLE))
+            DestroyFsm(Call);
+    }
 }
 
 
@@ -1300,6 +1338,7 @@ QString SipFsmBase::EventtoString(int Event)
     case SIP_IM_TIMEOUT:          return "IM_TIMEOUT";
     case SIP_USER_MESSAGE:        return "USER_IM";
     case SIP_KICKWATCH:           return "KICKWATCH";
+    case SIP_MODIFYSESSION:       return "MODIFYSESS";
     default:
         break;
     }
@@ -1311,19 +1350,22 @@ QString SipFsmBase::StatetoString(int S)
 {
     switch (S)
     {
-    case SIP_IDLE:              return "IDLE";
-    case SIP_OCONNECTING1:      return "OCONNECT1";
-    case SIP_OCONNECTING2:      return "OCONNECT2";
-    case SIP_ICONNECTING:       return "ICONNECT";
-    case SIP_CONNECTED:         return "CONNECTED";
-    case SIP_DISCONNECTING:     return "DISCONNECT ";
-    case SIP_CONNECTED_VXML:    return "CONNECT-VXML";  // A false state! Only used to indicate to frontend 
-    case SIP_SUB_SUBSCRIBED:    return "SUB_SUBSCRIBED";
-    case SIP_WATCH_TRYING:      return "WTCH_TRYING"; 
-    case SIP_WATCH_ACTIVE:      return "WTCH_ACTIVE"; 
-    case SIP_WATCH_STOPPING:    return "WTCH_STOPPING";
-    case SIP_WATCH_HOLDOFF:     return "WTCH_HOLDDOFF";
-    case SIP_IM_ACTIVE:         return "IM_ACTIVE";
+    case SIP_IDLE:                  return "IDLE";
+    case SIP_OCONNECTING1:          return "OCONNECT1";
+    case SIP_OCONNECTING2:          return "OCONNECT2";
+    case SIP_ICONNECTING:           return "ICONNECT";
+    case SIP_ICONNECTING_WAITACK:   return "ICONNECT_WA";
+    case SIP_CONNECTED:             return "CONNECTED";
+    case SIP_DISCONNECTING:         return "DISCONNECT ";
+    case SIP_CONNECTED_VXML:        return "CONNECT-VXML";  // A false state! Only used to indicate to frontend 
+    case SIP_SUB_SUBSCRIBED:        return "SUB_SUBSCRIBED";
+    case SIP_WATCH_TRYING:          return "WTCH_TRYING"; 
+    case SIP_WATCH_ACTIVE:          return "WTCH_ACTIVE"; 
+    case SIP_WATCH_STOPPING:        return "WTCH_STOPPING";
+    case SIP_WATCH_HOLDOFF:         return "WTCH_HOLDDOFF";
+    case SIP_IM_ACTIVE:             return "IM_ACTIVE";
+    case SIP_CONNECT_MODIFYING1:    return "CONN_MOD1";
+    case SIP_CONNECT_MODIFYING2:    return "CONN_MOD2";
 
     default:
         break;
@@ -1381,6 +1423,7 @@ void SipCall::initialise()
     rxVideoResolution = "CIF";
     txVideoResolution = "CIF";
     viaRegProxy = 0;
+    ModifyAudioCodec = -1;
 
     MyUrl = 0;
     MyContactUrl = 0;
@@ -1432,6 +1475,27 @@ void SipCall::initialise()
 }
 
 
+bool SipCall::ModifyCodecs(QString audioCodec, QString videoCodec)
+{
+    ModifyAudioCodec = -1;
+    for (int n=0; n<MAX_AUDIO_CODECS; n++)
+    {
+        if (CodecList[n].Encoding == audioCodec)
+            ModifyAudioCodec = n;
+    }
+
+    if (ModifyAudioCodec == -1)
+        return false;
+
+    if (videoCodec == "H.263")
+        allowVideo = true;
+    else if (videoCodec != "UNCHANGED")
+        allowVideo = false;
+
+    return true;
+}
+
+
 int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
 {
     (void)Value;
@@ -1441,6 +1505,16 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
     if (sipMsg != 0)
         ParseSipMsg(Event, sipMsg);
 
+    if (State == SIP_IDLE) // Setup local variables on first event
+    {
+        if (UseNat())
+            sipLocalIP = sipNatIP;
+        MyContactUrl = new SipUrl(myDisplayName, sipUsername, sipLocalIP, sipLocalPort);
+        if (viaRegProxy == 0)
+            MyUrl = new SipUrl(myDisplayName, sipUsername, sipLocalIP, sipLocalPort);
+        else
+            MyUrl = new SipUrl(myDisplayName, viaRegProxy->registeredAs(), viaRegProxy->registeredTo(), viaRegProxy->registeredPort());
+    }
 
     switch(Event | State)
     {
@@ -1477,21 +1551,11 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
             break;
         }
 #endif
-        if (UseNat(remoteUrl->getHostIp()))
-            sipLocalIP = sipNatIP;
-        MyContactUrl = new SipUrl(myDisplayName, sipUsername, sipLocalIP, sipLocalPort);
-        if (viaRegProxy == 0)
-            MyUrl = new SipUrl(myDisplayName, sipUsername, sipLocalIP, sipLocalPort);
-        else
-            MyUrl = new SipUrl(myDisplayName, viaRegProxy->registeredAs(), viaRegProxy->registeredTo(), viaRegProxy->registeredPort());
         BuildSendInvite(0);
         State = SIP_OCONNECTING1;
         break;
     case SIP_IDLE_INVITE:
         cseq = sipMsg->getCSeqValue();
-        if (UseNat(remoteUrl->getHostIp()))
-            sipLocalIP = sipNatIP;
-        MyContactUrl = new SipUrl(myDisplayName, sipUsername, sipLocalIP, sipLocalPort);
 #ifdef SIPREGISTRAR
         if ((toUrl->getUser() == sipUsername)) && (toUrl->getHost() ==  "Volkaerts"))
 #endif
@@ -1537,6 +1601,8 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
         break;
     case SIP_OCONNECTING1_INVITESTATUS_1xx:
         (parent->Timer())->Stop(this, SIP_RETX);
+        if ((sipMsg->getStatusCode() == 180) && (eventWindow))
+            QApplication::postEvent(eventWindow, new SipEvent(SipEvent::SipRingbackTone)); 
         parent->SetNotification("CALLSTATUS", "", QString::number(sipMsg->getStatusCode()), sipMsg->getReasonPhrase());
         State = SIP_OCONNECTING2;
         break;
@@ -1561,6 +1627,13 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
             State = SIP_IDLE;
         }
         break;
+    
+    case SIP_OCONNECTING2_INVITESTATUS_1xx:
+        if ((sipMsg->getStatusCode() == 180) && (eventWindow))
+            QApplication::postEvent(eventWindow, new SipEvent(SipEvent::SipRingbackTone)); 
+        parent->SetNotification("CALLSTATUS", "", QString::number(sipMsg->getStatusCode()), sipMsg->getReasonPhrase());
+        break;
+
     case SIP_OCONNECTING1_INVITESTATUS_2xx:
         (parent->Timer())->Stop(this, SIP_RETX);
         // Fall through
@@ -1569,6 +1642,20 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
         if (audioPayloadIdx != -1) // INVITE had a codec we support; proces
         {
             BuildSendAck();
+            if (eventWindow)
+            {
+                QApplication::postEvent(eventWindow, new SipEvent(SipEvent::SipCeaseRingbackTone)); 
+                QApplication::postEvent(eventWindow, new SipEvent(SipEvent::SipStartMedia, 
+                                                                  remoteIp,
+                                                                  CodecList[audioPayloadIdx].Payload,
+                                                                  CodecList[audioPayloadIdx].Encoding,
+                                                                  videoPayload,
+                                                                  (videoPayload == 34 ? "H263" : ""),
+                                                                  dtmfPayload,
+                                                                  remoteAudioPort,
+                                                                  remoteVideoPort,
+                                                                  rxVideoResolution));
+            }                                                      
             State = SIP_CONNECTED;
         }
         else
@@ -1576,6 +1663,8 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
             cerr << "2xx STATUS did not contain a valid Audio codec\n";
             BuildSendAck();  // What is the right thing to do here?
             BuildSendBye(0);
+            if (eventWindow)
+                QApplication::postEvent(eventWindow, new SipEvent(SipEvent::SipCeaseRingbackTone)); 
             State = SIP_DISCONNECTING;
         }
         break;
@@ -1583,21 +1672,31 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
         // This is usually because we sent the INVITE to ourselves, & when we receive it matches the call-id for this call leg
         (parent->Timer())->Stop(this, SIP_RETX);
         BuildSendCancel(0);
+        if (eventWindow)
+            QApplication::postEvent(eventWindow, new SipEvent(SipEvent::SipCeaseRingbackTone)); 
         State = SIP_DISCONNECTING;
         break;
     case SIP_OCONNECTING1_HANGUP:
         (parent->Timer())->Stop(this, SIP_RETX);
         BuildSendCancel(0);
+        if (eventWindow)
+            QApplication::postEvent(eventWindow, new SipEvent(SipEvent::SipCeaseRingbackTone)); 
         State = SIP_IDLE;
         break;
     case SIP_OCONNECTING1_RETX:
         if (Retransmit(false))
             (parent->Timer())->Start(this, t1, SIP_RETX);
         else
+        {
+            if (eventWindow)
+                QApplication::postEvent(eventWindow, new SipEvent(SipEvent::SipCeaseRingbackTone)); 
             State = SIP_IDLE;
+        }
         break;
     case SIP_OCONNECTING2_HANGUP:
         BuildSendCancel(0);
+        if (eventWindow)
+            QApplication::postEvent(eventWindow, new SipEvent(SipEvent::SipCeaseRingbackTone)); 
         State = SIP_DISCONNECTING;
         break;
     case SIP_ICONNECTING_INVITE:
@@ -1605,14 +1704,43 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
         break;
     case SIP_ICONNECTING_ANSWER:
         BuildSendStatus(200, "INVITE", cseq, SIP_OPT_SDP | SIP_OPT_CONTACT, -1, BuildSdpResponse());
-        State = SIP_CONNECTED;
+        if (eventWindow)
+            QApplication::postEvent(eventWindow, new SipEvent(SipEvent::SipCeaseAlertUser)); 
+        State = SIP_ICONNECTING_WAITACK;
         break;
     case SIP_ICONNECTING_CANCEL:
+        if (eventWindow)
+            QApplication::postEvent(eventWindow, new SipEvent(SipEvent::SipCeaseAlertUser)); 
+    case SIP_ICONNECTING_WAITACK_CANCEL:
         BuildSendStatus(200, "CANCEL", sipMsg->getCSeqValue()); //200 Ok
         State = SIP_IDLE;
         break;
-    case SIP_CONNECTED_ACK:
+    case SIP_ICONNECTING_WAITACK_ACK:
         (parent->Timer())->Stop(this, SIP_RETX); // Stop resending 200 OKs
+        if (eventWindow)
+            QApplication::postEvent(eventWindow, new SipEvent(SipEvent::SipStartMedia,
+                                                              remoteIp,
+                                                              CodecList[audioPayloadIdx].Payload,
+                                                              CodecList[audioPayloadIdx].Encoding,
+                                                              videoPayload,
+                                                              (videoPayload == 34 ? "H263" : ""),
+                                                              dtmfPayload,
+                                                              remoteAudioPort,
+                                                              remoteVideoPort,
+                                                              rxVideoResolution));
+        State = SIP_CONNECTED;
+        break;
+    case SIP_ICONNECTING_WAITACK_RETX:
+        if (Retransmit(false))
+            (parent->Timer())->Start(this, t1, SIP_RETX);
+        else
+            State = SIP_IDLE;
+        break;
+    case SIP_ICONNECTING_WAITACK_HANGUP:
+        BuildSendBye(0);
+        State = SIP_DISCONNECTING;
+        break;
+    case SIP_CONNECTED_ACK:
         break;
     case SIP_CONNECTED_INVITESTATUS_2xx:
         Retransmit(true); // Resend our ACK
@@ -1621,7 +1749,11 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
         if (Retransmit(false))
             (parent->Timer())->Start(this, t1, SIP_RETX);
         else
+        {
             State = SIP_IDLE;
+            if (eventWindow)
+                QApplication::postEvent(eventWindow, new SipEvent(SipEvent::SipStopMedia));
+        }
         break;
     case SIP_CONNECTED_BYE:
         (parent->Timer())->Stop(this, SIP_RETX); 
@@ -1629,6 +1761,8 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
         {
             cseq = sipMsg->getCSeqValue();
             BuildSendStatus(200, "BYE", cseq); //200 Ok
+            if (eventWindow)
+                QApplication::postEvent(eventWindow, new SipEvent(SipEvent::SipStopMedia));
             State = SIP_IDLE;
         }
         else
@@ -1636,6 +1770,8 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
         break;
     case SIP_CONNECTED_HANGUP:
         BuildSendBye(0);
+        if (eventWindow)
+            QApplication::postEvent(eventWindow, new SipEvent(SipEvent::SipStopMedia));
         State = SIP_DISCONNECTING;
         break;
     case SIP_DISCONNECTING_ACK:
@@ -1680,12 +1816,108 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
         BuildSendStatus(200, "BYE", sipMsg->getCSeqValue()); //200 Ok
         State = SIP_IDLE;
         break;
-
-    // Events ignored in states
-    case SIP_OCONNECTING2_INVITESTATUS_1xx:
-        parent->SetNotification("CALLSTATUS", "", QString::number(sipMsg->getStatusCode()), sipMsg->getReasonPhrase());
+        
+    // REINVITE FSM        
+    case SIP_CONNECTED_MODIFYSESSION:
+        BuildSendReInvite(0);
+        State = SIP_CONNECT_MODIFYING1;
         break;
-
+    case SIP_CONNECTED_INVITE:
+        GetSDPInfo(sipMsg);
+        if (audioPayloadIdx != -1) // INVITE had a codec we support; proces
+        {
+            BuildSendStatus(200, "INVITE", cseq, SIP_OPT_SDP | SIP_OPT_CONTACT, -1, BuildSdpResponse());
+            State = SIP_CONNECT_MODIFYING2;
+        }
+        else
+        {
+            BuildSendStatus(488, "INVITE", sipMsg->getCSeqValue()); //488 Not Acceptable Here
+            State = SIP_CONNECTED; // Ignore media change request
+        }
+        break;
+    case SIP_CONNMOD1_INVITESTATUS_1xx:
+        break;
+    case SIP_CONNMOD1_INVITESTATUS_2xx:
+        (parent->Timer())->Stop(this, SIP_RETX);
+        GetSDPInfo(sipMsg);
+        if (audioPayloadIdx != -1) // INVITE had a codec we support; proces
+        {
+            BuildSendAck();
+            if (eventWindow)
+            {
+                QApplication::postEvent(eventWindow, new SipEvent(SipEvent::SipChangeMedia, 
+                                                                  remoteIp,
+                                                                  CodecList[audioPayloadIdx].Payload,
+                                                                  CodecList[audioPayloadIdx].Encoding,
+                                                                  videoPayload,
+                                                                  (videoPayload == 34 ? "H263" : ""),
+                                                                  dtmfPayload,
+                                                                  remoteAudioPort,
+                                                                  remoteVideoPort,
+                                                                  rxVideoResolution));
+            }                                                      
+            State = SIP_CONNECTED;
+        }
+        else
+        {
+            cerr << "2xx STATUS on reINVITE did not contain a valid Audio codec\n";
+            BuildSendAck();  
+            State = SIP_CONNECTED;
+        }
+        break;
+    case SIP_CONNMOD1_INVITESTATUS_3456:
+        (parent->Timer())->Stop(this, SIP_RETX);
+        if (((sipMsg->getStatusCode() == 407) || (sipMsg->getStatusCode() == 401)) && 
+            (viaRegProxy != 0) && (viaRegProxy->isRegistered())) // Authentication Required
+        {
+            if (!sentAuthenticated) // This avoids loops where we are not authenticating properly
+            {
+                BuildSendAck();
+                BuildSendReInvite(sipMsg);
+            }
+        }
+        else // Unknown status message, return to connected state without changing media
+        {
+            BuildSendAck();
+            State = SIP_CONNECTED;
+        }
+        break;
+    case SIP_CONNMOD1_RETX:
+        if (Retransmit(false))
+            (parent->Timer())->Start(this, t1, SIP_RETX);
+        else
+        {
+            if (eventWindow)
+                QApplication::postEvent(eventWindow, new SipEvent(SipEvent::SipStopMedia));
+            State = SIP_IDLE;
+        }
+        break;
+    case SIP_CONNMOD2_RETX:
+        if (Retransmit(false))
+            (parent->Timer())->Start(this, t1, SIP_RETX);
+        else
+        {
+            if (eventWindow)
+                QApplication::postEvent(eventWindow, new SipEvent(SipEvent::SipStopMedia));
+            State = SIP_IDLE;
+        }
+        break;
+    case SIP_CONNMOD2_ACK:
+        (parent->Timer())->Stop(this, SIP_RETX); // Stop resending 200 OKs
+        if (eventWindow)
+            QApplication::postEvent(eventWindow, new SipEvent(SipEvent::SipChangeMedia,
+                                                              remoteIp,
+                                                              CodecList[audioPayloadIdx].Payload,
+                                                              CodecList[audioPayloadIdx].Encoding,
+                                                              videoPayload,
+                                                              (videoPayload == 34 ? "H263" : ""),
+                                                              dtmfPayload,
+                                                              remoteAudioPort,
+                                                              remoteVideoPort,
+                                                              rxVideoResolution));
+        State = SIP_CONNECTED;
+        break;
+        
     // Everything else is an error, just flag it for now
     default:
         SipFsm::Debug(SipDebugEvent::SipErrorEv, "SIP CALL FSM Error; received " + EventtoString(Event) + " in state " + StatetoString(State) + "\n\n");
@@ -1696,10 +1928,8 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
     return State;
 }
 
-bool SipCall::UseNat(QString destIPAddress)
+bool SipCall::UseNat()
 {
-    (void)destIPAddress;
-    // User to check subnets but this was a flawed concept; now checks a configuration item per-remote user
     return !disableNat;
 }
 
@@ -1732,6 +1962,40 @@ void SipCall::BuildSendInvite(SipMsg *authMsg)
     //Invite.addAllow();
     Invite.addContact(*MyContactUrl);
     addSdpToInvite(Invite, allowVideo);
+    
+    parent->Transmit(Invite.string(), retxIp = remoteUrl->getHostIp(), retxPort = remoteUrl->getPort());
+    retx = Invite.string();
+    t1 = 500;
+    (parent->Timer())->Start(this, t1, SIP_RETX);
+}
+
+
+
+void SipCall::BuildSendReInvite(SipMsg *authMsg)
+{
+    SipMsg Invite("INVITE");
+    Invite.addRequestLine(*remoteUrl);
+    Invite.addVia(sipLocalIP, sipLocalPort);
+    Invite.addFrom(*MyUrl, myTag);
+    Invite.addTo(*remoteUrl);
+    Invite.addCallId(CallId);
+    Invite.addCSeq(++cseq);
+    Invite.addUserAgent();
+
+    if (authMsg)
+    {
+        if (authMsg->getAuthMethod() == "Digest")
+            Invite.addAuthorization(authMsg->getAuthMethod(), viaRegProxy->registeredAs(), viaRegProxy->registeredPasswd(), authMsg->getAuthRealm(), authMsg->getAuthNonce(), remoteUrl->formatReqLineUrl(), authMsg->getStatusCode() == 407);
+        else
+            cout << "SIP: Unknown Auth Type: " << authMsg->getAuthMethod() << endl;
+        sentAuthenticated = true;
+    }
+    else    
+        sentAuthenticated = false;
+
+    //Invite.addAllow();
+    Invite.addContact(*MyContactUrl);
+    addSdpToInvite(Invite, allowVideo, ModifyAudioCodec);
     
     parent->Transmit(Invite.string(), retxIp = remoteUrl->getHostIp(), retxPort = remoteUrl->getPort());
     retx = Invite.string();
@@ -1903,6 +2167,13 @@ void SipCall::AlertUser(SipMsg *rxMsg)
                     CallerUrl += ":" + QString::number(from->getPort());
             }
             CallersDisplayName = from->getDisplay();
+            
+            if (eventWindow)
+                QApplication::postEvent(eventWindow, new SipEvent(SipEvent::SipAlertUser, 
+                                                                  CallersUserid,
+                                                                  CallerUrl,
+                                                                  CallersDisplayName,
+                                                                  videoPayload == -1));
         }
         else
             cerr << "What no from in INVITE?  It is invalid then.\n";
@@ -1976,12 +2247,17 @@ void SipCall::GetSDPInfo(SipMsg *sipMsg)
 
 
 
-void SipCall::addSdpToInvite(SipMsg& msg, bool advertiseVideo)
+void SipCall::addSdpToInvite(SipMsg& msg, bool advertiseVideo, int audioCodec)
 {
     SipSdp sdp(sipLocalIP, sipAudioRtpPort, advertiseVideo ? sipVideoRtpPort : 0);
 
-    for (int n=0; (n<MAX_AUDIO_CODECS) && (CodecList[n].Payload != -1); n++)
-        sdp.addAudioCodec(CodecList[n].Payload, CodecList[n].Encoding + "/8000");
+    if ((audioCodec < 0) || (audioCodec >= MAX_AUDIO_CODECS))
+    {
+        for (int n=0; (n<MAX_AUDIO_CODECS) && (CodecList[n].Payload != -1); n++)
+            sdp.addAudioCodec(CodecList[n].Payload, CodecList[n].Encoding + "/8000");
+    }
+    else
+        sdp.addAudioCodec(CodecList[audioCodec].Payload, CodecList[audioCodec].Encoding + "/8000");
 
     // Signal support for DTMF
     sdp.addAudioCodec(101, "telephone-event/8000", "0-11");

@@ -80,6 +80,15 @@ static HostSpinBox *TransmitFPS()
     return gc;
 };
 
+static HostLineEdit *TransmitBandwidth()
+{
+    HostLineEdit *gc = new HostLineEdit("TransmitBandwidth");
+    gc->setLabel(QObject::tr("Max Transmit Bandwidth Kbps"));
+    gc->setValue("256");
+    gc->setHelpText(QObject::tr("Enter the upspeed bandwidth of your local WAN in Kbps. "));
+    return gc;
+};
+
 /*
 --------------- General VXML Settings ---------------
 */
@@ -348,6 +357,7 @@ MythPhoneSettings::MythPhoneSettings()
     webcamSet->addChild(MicrophoneDevice());
     webcamSet->addChild(TxResolution());
     webcamSet->addChild(TransmitFPS());
+    webcamSet->addChild(TransmitBandwidth());
     webcamSet->addChild(CaptureResolution());
     addChild(webcamSet);
 }

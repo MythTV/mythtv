@@ -214,7 +214,7 @@ void Webcam::camClose()
     }
 #else
     capCaptureStop(hwndCap);
-    capDriverDisconnect(hwndCap);
+    capPreview(hwndCap, false);
 #endif
 
     if (picbuff1)
@@ -536,6 +536,24 @@ wcClient *Webcam::RegisterClient(int format, int fps, QObject *eventWin)
     WebcamLock.unlock();
 
     return client;
+}
+
+void Webcam::ChangeClientFps(wcClient *client, int fps)
+{
+    if (client == 0)
+        return;
+        
+    if (fps == 0)
+    {
+        fps = 10;
+        cerr << "Webcam requested fps of zero\n";
+    }
+
+    WebcamLock.lock();
+    client->fps = fps;
+    client->actualFps = fps;
+    client->interframeTime = 1000/fps;
+    WebcamLock.unlock();
 }
 
 void Webcam::UnregisterClient(wcClient *client)

@@ -1,3 +1,4 @@
+SOURCES  = ../mythphone/directory.cpp
 SOURCES += ../mythphone/phoneui.cpp
 SOURCES += ../mythphone/PhoneSettings.cpp
 

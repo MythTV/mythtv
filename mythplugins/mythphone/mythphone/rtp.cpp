@@ -53,12 +53,14 @@ rtp::rtp(QWidget *callingApp, int localPort, QString remoteIP, int remotePort, i
         audioPayload = -1;
         dtmfPayload = -1;
         initVideoBuffers(10);
+        pTxShaper = new TxShaper(28000, 1000, 50); // 28k bytes/sec is 256kbps less 28kbps for speech
     }
     else
     {
         videoPayload = -1;
         audioPayload = mediaPay;
         dtmfPayload = dtmfPay;
+        pTxShaper = 0;
     }
     
     // Setup a DTMF Signal Analysis filter to capture DTMF from the inband signal if RFC2833 is not
@@ -73,8 +75,10 @@ rtp::rtp(QWidget *callingApp, int localPort, QString remoteIP, int remotePort, i
     // task to prevent race conditions
     pkIn = 0;
     pkOut = 0;
+    pkOutDrop = 0;
     pkMissed = 0;
     pkLate = 0;
+    pkInDisc = 0;
     framesIn = 0;
     framesOut = 0;
     framesOutDiscarded = 0;
@@ -90,8 +94,10 @@ rtp::rtp(QWidget *callingApp, int localPort, QString remoteIP, int remotePort, i
     hwndLast = callingApp->winId();
 #endif
 
+    rtpInitialise();
+
     killRtpThread = false;
-    start();
+    start(TimeCriticalPriority);
 }
 
 rtp::~rtp()
@@ -105,6 +111,8 @@ rtp::~rtp()
     destroyVideoBuffers();
     if (DTMFFilter)
         delete DTMFFilter;
+    if (pTxShaper)
+        delete pTxShaper;
 }
 
 void rtp::run()
@@ -127,7 +135,6 @@ void rtp::rtpAudioThreadWorker()
     QTime timeNextTx;
     bool micFirstTime = true;
 
-    rtpInitialise();
     OpenSocket();
     StartTxRx();
 
@@ -200,7 +207,6 @@ void rtp::rtpAudioThreadWorker()
 
 void rtp::rtpVideoThreadWorker()
 {
-    rtpInitialise();
     OpenSocket();
     eventCond = new QWaitCondition();
     rtpListener *videoListener = new rtpListener(rtpSocket, eventCond);
@@ -276,8 +282,10 @@ void rtp::rtpInitialise()
 
     pkIn = 0;
     pkOut = 0;
+    pkOutDrop = 0;
     pkMissed = 0;
     pkLate = 0;
+    pkInDisc = 0;
     bytesIn = 0;
     bytesOut = 0;
     bytesToSpeaker = 0;
@@ -298,7 +306,7 @@ void rtp::rtpInitialise()
     if (videoPayload != -1)
     {
         Codec = 0;
-    		rtpMPT = videoPayload;
+        rtpMPT = videoPayload;
     }
     else
     {
@@ -337,7 +345,7 @@ void rtp::StartTxRx()
 
     // Open the audio devices
     if ((rxMode == RTP_RX_AUDIO_TO_SPEAKER) && (txMode == RTP_TX_AUDIO_FROM_MICROPHONE) && (spkDevice == micDevice))
-        speakerFd = OpenAudioDevice(spkDevice, O_RDWR);    
+        microphoneFd = speakerFd = OpenAudioDevice(spkDevice, O_RDWR);    
     else
     {
         if (rxMode == RTP_RX_AUDIO_TO_SPEAKER)
@@ -470,21 +478,24 @@ void rtp::StartTxRx()
         return;
     }
 
-	MicDevice = SpeakerDevice = WAVE_MAPPER;
+    MicDevice = SpeakerDevice = WAVE_MAPPER;
     WAVEOUTCAPS AudioCap;
     int numAudioDevs = waveOutGetNumDevs();
     for (int i=0; i<=numAudioDevs; i++)
     {
         MMRESULT err = waveOutGetDevCaps(i, &AudioCap, sizeof(AudioCap));
-        if (err == MMSYSERR_NOERROR)
-        {
-            if (spkDevice == AudioCap.szPname)
-                SpeakerDevice = i;
-            if (micDevice == AudioCap.szPname)
-                MicDevice = i;
-        }
+        if ((err == MMSYSERR_NOERROR) && (spkDevice == AudioCap.szPname))
+            SpeakerDevice = i;
     }
 
+    WAVEINCAPS AudioInCap;
+    numAudioDevs = waveInGetNumDevs();
+    for (i=0; i<=numAudioDevs; i++)
+    {
+        MMRESULT err = waveInGetDevCaps(i, &AudioInCap, sizeof(AudioInCap));
+        if ((err == MMSYSERR_NOERROR) && (micDevice == AudioInCap.szPname))
+            MicDevice = i;
+    }
 
     StartTx();
     StartRx();
@@ -499,70 +510,70 @@ int b;
 char TextBuffer[100];
 
 
-	micCurrBuffer = 0;
+    micCurrBuffer = 0;
 
-	wfx.cbSize = 0;
-	wfx.nAvgBytesPerSec = 16000;
-	wfx.nBlockAlign = 2;
-	wfx.nChannels = 1;
-	wfx.nSamplesPerSec = 8000;
-	wfx.wBitsPerSample = 16;
-	wfx.wFormatTag = WAVE_FORMAT_PCM;
+    wfx.cbSize = 0;
+    wfx.nAvgBytesPerSec = 16000;
+    wfx.nBlockAlign = 2;
+    wfx.nChannels = 1;
+    wfx.nSamplesPerSec = 8000;
+    wfx.wBitsPerSample = 16;
+    wfx.wFormatTag = WAVE_FORMAT_PCM;
 
-	// First just query to check there is a compatible Mic.
-	if (dwResult = waveInOpen(0, MicDevice, &wfx, 0, 0, WAVE_FORMAT_QUERY))
-	{
-		//UpdateDebug("Error waveInOpen Query %d\r\n", dwResult);
-		return FALSE;
-	}
+    // First just query to check there is a compatible Mic.
+    if (dwResult = waveInOpen(0, MicDevice, &wfx, 0, 0, WAVE_FORMAT_QUERY))
+    {
+        //UpdateDebug("Error waveInOpen Query %d\r\n", dwResult);
+        return FALSE;
+    }
 
-	// Now actually open the device
-	dwResult = waveInOpen(&hMicrophone, MicDevice, &wfx, 0, 0, CALLBACK_NULL);
-	if (dwResult)
-	{
-		//UpdateDebug("Error waveInOpen Query %d\r\n", dwResult);
-		return FALSE;
-	}
+    // Now actually open the device
+    dwResult = waveInOpen(&hMicrophone, MicDevice, &wfx, 0, 0, CALLBACK_NULL);
+    if (dwResult)
+    {
+        //UpdateDebug("Error waveInOpen Query %d\r\n", dwResult);
+        return FALSE;
+    }
 
-	// Inform the wave device of where to put the data
-	for (b=0; b<NUM_MIC_BUFFERS; b++)
-	{
-		micBufferDescr[b].lpData = (LPSTR)(MicBuffer[b]);
-		micBufferDescr[b].dwBufferLength = txPCMSamplesPerPacket * sizeof(short); 
-		//micBufferDescr[b].dwBytesRecorded = 0L;
-		micBufferDescr[b].dwFlags = 0L;
-		//micBufferDescr[b].dwUser = 0L;
-		//micBufferDescr[b].lpNext = ((b==(NUM_MIC_BUFFERS-1)) ? (&micBufferDescr[0]) : (&micBufferDescr[b+1]));
-		if (dwResult = waveInPrepareHeader(hMicrophone, &(micBufferDescr[b]), sizeof(WAVEHDR)))
-		{	
-			waveInGetErrorText(dwResult, TextBuffer, sizeof(TextBuffer));
-			//UpdateDebug("Error waveInPrepareHeader %d %d\r\n%s\r\n", b, dwResult, TextBuffer);
-			return FALSE;
-		}
-	}
+    // Inform the wave device of where to put the data
+    for (b=0; b<NUM_MIC_BUFFERS; b++)
+    {
+        micBufferDescr[b].lpData = (LPSTR)(MicBuffer[b]);
+        micBufferDescr[b].dwBufferLength = txPCMSamplesPerPacket * sizeof(short); 
+        //micBufferDescr[b].dwBytesRecorded = 0L;
+        micBufferDescr[b].dwFlags = 0L;
+        //micBufferDescr[b].dwUser = 0L;
+        //micBufferDescr[b].lpNext = ((b==(NUM_MIC_BUFFERS-1)) ? (&micBufferDescr[0]) : (&micBufferDescr[b+1]));
+        if (dwResult = waveInPrepareHeader(hMicrophone, &(micBufferDescr[b]), sizeof(WAVEHDR)))
+        {
+            waveInGetErrorText(dwResult, TextBuffer, sizeof(TextBuffer));
+            //UpdateDebug("Error waveInPrepareHeader %d %d\r\n%s\r\n", b, dwResult, TextBuffer);
+            return FALSE;
+        }
+    }
 
-	// Start recording the data into the buffer
-	if (dwResult = waveInStart(hMicrophone))
-	{
-		//UpdateDebug("Error waveInStart %d\r\n", dwResult);
-		return FALSE;
-	}
+    // Start recording the data into the buffer
+    if (dwResult = waveInStart(hMicrophone))
+    {
+        //UpdateDebug("Error waveInStart %d\r\n", dwResult);
+        return FALSE;
+    }
 
-	// Send a buffer to fill
-	for (b=0; b<NUM_MIC_BUFFERS; b++)
-	{
-		if (dwResult = waveInAddBuffer(hMicrophone, &(micBufferDescr[b]), sizeof(WAVEHDR)))
-		{
-			//UpdateDebug("Error waveInAddBuffer %d\r\n", dwResult);
-			return FALSE;
-		}
-	}
+    // Send a buffer to fill
+    for (b=0; b<NUM_MIC_BUFFERS; b++)
+    {
+        if (dwResult = waveInAddBuffer(hMicrophone, &(micBufferDescr[b]), sizeof(WAVEHDR)))
+        {
+            //UpdateDebug("Error waveInAddBuffer %d\r\n", dwResult);
+            return FALSE;
+        }
+    }
 
-	MicrophoneOn = TRUE;
+    MicrophoneOn = TRUE;
 
-	//UpdateDebug("Microphone started\r\n");
+    //UpdateDebug("Microphone started\r\n");
 
-	return TRUE;	
+    return TRUE;	
 }
 
 bool rtp::StartRx()
@@ -570,50 +581,50 @@ bool rtp::StartRx()
 DWORD   dwResult;
 int b;
 
-	spkInBuffer = 0;
-	rxTimestamp = SpkJitter;
-	rxSeqNum = 0;
-	rxFirstFrame = TRUE;
+    spkInBuffer = 0;
+    rxTimestamp = SpkJitter;
+    rxSeqNum = 0;
+    rxFirstFrame = TRUE;
 
-	// Playback the buffer through the speakers
-	WAVEFORMATEX wfx;
-	wfx.cbSize = 0;
-	wfx.nAvgBytesPerSec = 16000;
-	wfx.nBlockAlign = 2;
-	wfx.nChannels = 1;
-	wfx.nSamplesPerSec = 8000;
-	wfx.wBitsPerSample = 16;
-	wfx.wFormatTag = WAVE_FORMAT_PCM;
+    // Playback the buffer through the speakers
+    WAVEFORMATEX wfx;
+    wfx.cbSize = 0;
+    wfx.nAvgBytesPerSec = 16000;
+    wfx.nBlockAlign = 2;
+    wfx.nChannels = 1;
+    wfx.nSamplesPerSec = 8000;
+    wfx.wBitsPerSample = 16;
+    wfx.wFormatTag = WAVE_FORMAT_PCM;
 
-	if (dwResult = waveOutOpen(&hSpeaker, SpeakerDevice, &wfx, 0, 0L, WAVE_FORMAT_QUERY))
-	{
-		//UpdateDebug("waveOutOpen Query error %d", dwResult);
-		return FALSE;
-	}
+    if (dwResult = waveOutOpen(&hSpeaker, SpeakerDevice, &wfx, 0, 0L, WAVE_FORMAT_QUERY))
+    {
+        //UpdateDebug("waveOutOpen Query error %d", dwResult);
+        return FALSE;
+    }
 
-	if (dwResult = waveOutOpen(&hSpeaker, SpeakerDevice, &wfx, 0, 0L, CALLBACK_NULL))
-	{
-		//UpdateDebug("waveOutOpen error %d", dwResult);
-		return FALSE;
-	}
+    if (dwResult = waveOutOpen(&hSpeaker, SpeakerDevice, &wfx, 0, 0L, CALLBACK_NULL))
+    {
+        //UpdateDebug("waveOutOpen error %d", dwResult);
+        return FALSE;
+    }
 
-	for (b=0; b<NUM_SPK_BUFFERS; b++)
-	{
-		spkBufferDescr[b].lpData = (LPSTR)(SpkBuffer[b]);
-		spkBufferDescr[b].dwBufferLength = rxPCMSamplesPerPacket * sizeof(short);
-		spkBufferDescr[b].dwFlags = 0L;
-		spkBufferDescr[b].dwLoops = 0L;
-		//spkBufferDescr[b].lpNext = ((b==(NUM_SPK_BUFFERS-1)) ? (&spkBufferDescr[0]) : (&spkBufferDescr[b+1]));
-	
-		if (dwResult = waveOutPrepareHeader(hSpeaker, &(spkBufferDescr[b]), sizeof(WAVEHDR)))
-		{
-			//UpdateDebug("waveOutPrepareHeader error %d", dwResult);
-			return FALSE;
-		}
-	}
+    for (b=0; b<NUM_SPK_BUFFERS; b++)
+    {
+        spkBufferDescr[b].lpData = (LPSTR)(SpkBuffer[b]);
+        spkBufferDescr[b].dwBufferLength = rxPCMSamplesPerPacket * sizeof(short);
+        spkBufferDescr[b].dwFlags = 0L;
+        spkBufferDescr[b].dwLoops = 0L;
+        //spkBufferDescr[b].lpNext = ((b==(NUM_SPK_BUFFERS-1)) ? (&spkBufferDescr[0]) : (&spkBufferDescr[b+1]));
 
-	//UpdateDebug("Speaker started\r\n");
-	SpeakerOn = TRUE;
+        if (dwResult = waveOutPrepareHeader(hSpeaker, &(spkBufferDescr[b]), sizeof(WAVEHDR)))
+        {
+            //UpdateDebug("waveOutPrepareHeader error %d", dwResult);
+            return FALSE;
+        }
+    }
+
+    //UpdateDebug("Speaker started\r\n");
+    SpeakerOn = TRUE;
 
     return true;
 }
@@ -666,33 +677,33 @@ DWORD   dwResult;
 int b;
 char TextBuffer[100];
 
-	SpeakerOn = FALSE;
+    SpeakerOn = FALSE;
 
-	if (dwResult = waveOutReset(hSpeaker))
-	{
-		waveOutGetErrorText(dwResult, TextBuffer, sizeof(TextBuffer));
-		//UpdateDebug("Error waveInStop %d\r\n %s\r\n", dwResult, TextBuffer);
-		return FALSE;
-	}
+    if (dwResult = waveOutReset(hSpeaker))
+    {
+        waveOutGetErrorText(dwResult, TextBuffer, sizeof(TextBuffer));
+        //UpdateDebug("Error waveInStop %d\r\n %s\r\n", dwResult, TextBuffer);
+        return FALSE;
+    }
 
-	for (b=0; b<NUM_SPK_BUFFERS; b++)
-	{
-		if (dwResult = waveOutUnprepareHeader(hSpeaker, &(spkBufferDescr[0]), sizeof(WAVEHDR)))
-		{
-			waveOutGetErrorText(dwResult, TextBuffer, sizeof(TextBuffer));
-			//UpdateDebug("Error waveOutUnprepareHeader %d %s\r\n", dwResult, TextBuffer);
-			return FALSE;
-		}
-	}
+    for (b=0; b<NUM_SPK_BUFFERS; b++)
+    {
+        if (dwResult = waveOutUnprepareHeader(hSpeaker, &(spkBufferDescr[0]), sizeof(WAVEHDR)))
+        {
+            waveOutGetErrorText(dwResult, TextBuffer, sizeof(TextBuffer));
+            //UpdateDebug("Error waveOutUnprepareHeader %d %s\r\n", dwResult, TextBuffer);
+            return FALSE;
+        }
+    }
 
-	if (dwResult = waveOutClose(hSpeaker))
-	{
-		waveOutGetErrorText(dwResult, TextBuffer, sizeof(TextBuffer));
-		//UpdateDebug("Error waveOutClose %d\r\n %s\r\n", dwResult, TextBuffer);
-		return FALSE;
-	}
+    if (dwResult = waveOutClose(hSpeaker))
+    {
+        waveOutGetErrorText(dwResult, TextBuffer, sizeof(TextBuffer));
+        //UpdateDebug("Error waveOutClose %d\r\n %s\r\n", dwResult, TextBuffer);
+        return FALSE;
+    }
 
-	return TRUE;	
+    return TRUE;	
 }
 
 #endif
@@ -720,8 +731,8 @@ void rtp::CheckSendStatistics()
         if (eventWindow)
             QApplication::postEvent(eventWindow, 
                         new RtpEvent(RtpEvent::RtpStatisticsEv, this, now, statsMsPeriod,
-                                     pkIn, pkOut, pkMissed, pkLate, bytesIn, bytesOut, 
-                                     bytesToSpeaker, framesIn, framesOut, 
+                                     pkIn, pkOut, pkMissed, pkLate, pkInDisc, pkOutDrop, 
+                                     bytesIn, bytesOut, bytesToSpeaker, framesIn, framesOut, 
                                      framesInDiscarded, framesOutDiscarded));
     }
 }
@@ -730,6 +741,8 @@ void rtp::OpenSocket()
 {
     rtpSocket = new QSocketDevice (QSocketDevice::Datagram);
     rtpSocket->setBlocking(false);
+    rtpSocket->setSendBufferSize(49152);
+    rtpSocket->setReceiveBufferSize(49152);
 
 #ifndef WIN32
     QString ifName = gContext->GetSetting("SipBindInterface");
@@ -1000,7 +1013,7 @@ void rtp::StreamInAudio()
                 else // No received frames, free the buffer
                     pJitter->FreeJBuffer(JBuf);
             } 
-		
+
             // No free buffers, still get the data from the socket but dump it. Unlikely to recover from this by
             // ourselves so we really need to discard all queued frames and reset the receiver
             else
@@ -1052,12 +1065,12 @@ void rtp::PlayOutAudio()
                     m = write(speakerFd, (uchar *)SpkBuffer[spkInBuffer], PlayLen);
 #else
                     if (waveOutWrite(hSpeaker, &(spkBufferDescr[spkInBuffer]), sizeof(WAVEHDR)))
-	    			{
-		    			//UpdateDebug("waveOutWrite error %d", dwResult);
-    					//return;
-				    }
-    				int NextInBuffer = (spkInBuffer+1)%NUM_SPK_BUFFERS;
-	    			spkInBuffer = NextInBuffer;
+                    {
+                        //UpdateDebug("waveOutWrite error %d", dwResult);
+                        //return;
+                    }
+                    int NextInBuffer = (spkInBuffer+1)%NUM_SPK_BUFFERS;
+                    spkInBuffer = NextInBuffer;
 #endif
                     bytesToSpeaker += m;
                 }
@@ -1200,10 +1213,13 @@ void rtp::StreamInVideo()
             int vidLen = pJitter->GotAllBufsInFrame(rxSeqNum, sizeof(H263_RFC2190_HDR));
             if (vidLen == 0) 
             {
+                ushort valid, missing;
+                pJitter->CountMissingPackets(rxSeqNum, valid, missing);
                 cout << "RTP Dropping video frame: Lost Packet\n";
                 rxSeqNum = pJitter->DumpAllJBuffers(true) + 1;
                 framesInDiscarded++;
-                pkMissed++; // Actually may have missed more than one, but good enough for now
+                pkMissed += missing;
+                pkInDisc += valid;
             }
             else
             {
@@ -1465,6 +1481,13 @@ void rtp::transmitQueuedVideo()
 
     if (queuedVideo)
     {
+        if ((pTxShaper) && (!pTxShaper->OkToSend()))
+        {
+            cout << "Dropped video frame bceause shaper says so\n";
+            freeVideoBuffer(queuedVideo);
+            return;
+        }
+    
         framesOut++;
         
         RTPPACKET videoPacket;
@@ -1487,7 +1510,6 @@ void rtp::transmitQueuedVideo()
         case 128: h263Hdr->h263hdr = H263HDR(H263_SRC_SQCIF); break;
         }
 
-        int pkCnt=0;                  
         while (queuedLen > 0)
         {
             txSequenceNumber += 1; // Increment seq-num; don't increment timestamp
@@ -1504,14 +1526,21 @@ void rtp::transmitQueuedVideo()
             if (queuedLen == 0)
                 videoPacket.RtpMPT |= RTP_PAYLOAD_MARKER_BIT;  // Last packet has Marker bit set as per RFC 2190
     
-            bytesOut += (UDP_HEADER_SIZE+RTP_HEADER_SIZE+sizeof(H263_RFC2190_HDR)+pkLen);
             if (rtpSocket)
-                rtpSocket->writeBlock((char *)&videoPacket.RtpVPXCC, RTP_HEADER_SIZE+sizeof(H263_RFC2190_HDR)+pkLen, yourIP, yourPort);
-            pkCnt++;
-            pkOut++;
+            {
+                if (rtpSocket->writeBlock((char *)&videoPacket.RtpVPXCC, RTP_HEADER_SIZE+sizeof(H263_RFC2190_HDR)+pkLen, yourIP, yourPort) == -1)
+                    pkOutDrop++;
+                else
+                {
+                    pkOut++;
+                    int sentBytes = (UDP_HEADER_SIZE+RTP_HEADER_SIZE+sizeof(H263_RFC2190_HDR)+pkLen);
+                    bytesOut += sentBytes;
+                    if (pTxShaper)
+                        pTxShaper->Send(sentBytes);
+                }
+            }
         }
 
-        //cout << "Transmitted Video Frame, len " << queuedVideo->len << " as " << pkCnt << " packets\n";
         freeVideoBuffer(queuedVideo);
     }
 }
@@ -1542,9 +1571,13 @@ void rtp::StreamOut(RTPPACKET &RTPpacket)
         // as long as we are only doing one stream any hard
         // coded value will do, they must be unique for each stream
 
-        pkOut++;
-        bytesOut += (UDP_HEADER_SIZE+RTPpacket.len+RTP_HEADER_SIZE);
-        rtpSocket->writeBlock((char *)&RTPpacket.RtpVPXCC, RTPpacket.len+RTP_HEADER_SIZE, yourIP, yourPort);
+        if (rtpSocket->writeBlock((char *)&RTPpacket.RtpVPXCC, RTPpacket.len+RTP_HEADER_SIZE, yourIP, yourPort) == -1)
+            pkOutDrop++;
+        else
+        {
+            bytesOut += (UDP_HEADER_SIZE+RTPpacket.len+RTP_HEADER_SIZE);
+            pkOut++;
+        }
     }
 }
 
@@ -1567,9 +1600,9 @@ bool rtp::fillPacketfromMic(RTPPACKET &RTPpacket)
         if ((micBufferDescr[micCurrBuffer].dwFlags & WHDR_DONE) != 0)
         {
             memcpy(buffer, MicBuffer[micCurrBuffer], txPCMSamplesPerPacket*sizeof(short));
-		    int NextBuffer = ((micCurrBuffer+1)%NUM_MIC_BUFFERS);
-		    waveInAddBuffer(hMicrophone, &(micBufferDescr[micCurrBuffer]), sizeof(WAVEHDR));
-		    micCurrBuffer = NextBuffer;
+            int NextBuffer = ((micCurrBuffer+1)%NUM_MIC_BUFFERS);
+            waveInAddBuffer(hMicrophone, &(micBufferDescr[micCurrBuffer]), sizeof(WAVEHDR));
+            micCurrBuffer = NextBuffer;
         }
         else
             return false;
@@ -1610,6 +1643,64 @@ void rtp::fillPacketfromBuffer(RTPPACKET &RTPpacket)
         }
     }
     rtpMutex.unlock();
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//                                     TRANSMIT SHAPER
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+TxShaper::TxShaper(int bw, int period, int granularity)
+{
+    txGranularity = granularity;
+    historySize = period/granularity;
+    txHistory = new int[historySize];
+    for (int cnt=0; cnt<historySize; cnt++)
+        txHistory[cnt]=0;
+    txWindowTotal = 0;
+    maxBandwidth = bw;
+    itTail = 0;
+    itHead = 0;
+
+    timestamp.start();
+    timeLastFlush = 0;
+    timeLastSend = 0;
+}
+
+TxShaper::~TxShaper()
+{
+    delete txHistory;
+}
+
+bool TxShaper::OkToSend()
+{
+    flushHistory();
+    return (txWindowTotal < maxBandwidth);
+}
+
+void TxShaper::Send(int Bytes)
+{
+    flushHistory();
+    int timeThisSend = timestamp.elapsed();
+    itHead += ((timeThisSend - timeLastSend) / txGranularity);
+    itHead %= historySize;
+    txHistory[itHead] += Bytes;    
+    txWindowTotal += Bytes;
+    timeLastSend = timeThisSend;
+}
+
+void TxShaper::flushHistory()
+{
+    int timeNow = timestamp.elapsed();
+    for (int i=timeLastFlush; i<timeNow; i+=txGranularity)
+    {
+        txWindowTotal -= txHistory[itTail];
+        txHistory[itTail++] = 0;
+        if (itTail>=historySize)
+            itTail = 0;
+    }
+    timeLastFlush = timeNow;
 }
 
 
@@ -1726,6 +1817,31 @@ RTPPACKET *Jitter::DequeueJBuffer(ushort seqNum, int &reason)
         reason = JB_REASON_MISSING;
 
     return 0;
+}
+
+void Jitter::CountMissingPackets(ushort seq, ushort &cntValid, ushort &cntMissing)
+{
+    RTPPACKET *head = first();
+    cntValid=0;
+    cntMissing=0;
+
+    while (head != 0) 
+    {
+        if (head->RtpSequenceNumber == seq) 
+            cntValid++;
+        else if ((head->RtpSequenceNumber > seq) && 
+                 (head->RtpSequenceNumber < seq+100))
+        {
+            cntMissing += (head->RtpSequenceNumber - seq);
+        }
+        else
+        {
+            cout << "Big gap in RTP sequence numbers, possibly restarted\n";
+            cntMissing++; // No way to know how many were actually missed
+        }
+        seq = head->RtpSequenceNumber + 1;
+        head = next();
+    }
 }
 
 int Jitter::GotAllBufsInFrame(ushort seq, int offset)

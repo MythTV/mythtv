@@ -47,7 +47,12 @@ public:
     enum Type { RxVideoFrame = (QEvent::User + 300), RtpDebugEv, RtpStatisticsEv };
 
     RtpEvent(Type t, QString s="") : QCustomEvent(t) { text=s; }
-    RtpEvent(Type t, rtp *r, QTime tm, int ms, int s1, int s2, int s3, int s4, int s5, int s6, int s7, int s8, int s9, int s10, int s11) : QCustomEvent(t) { rtpThread=r; timestamp=tm; msPeriod = ms; pkIn=s1; pkOut=s2; pkMiss=s3; pkLate=s4; byteIn=s5; byteOut=s6; bytePlayed=s7; framesIn=s8; framesOut=s9; framesInDisc=s10; framesOutDisc=s11;}
+    RtpEvent(Type t, rtp *r, QTime tm, int ms, int s1, int s2, int s3, int s4, int s5, int s6, 
+             int s7, int s8, int s9, int s10, int s11, int s12, int s13) : QCustomEvent(t) 
+             { rtpThread=r; timestamp=tm; msPeriod = ms; pkIn=s1; pkOut=s2; pkMiss=s3; pkLate=s4; 
+               pkInDisc=s5; pkOutDrop=s6;
+               byteIn=s7; byteOut=s8; bytePlayed=s9; framesIn=s10; framesOut=s11; framesInDisc=s12; 
+               framesOutDisc=s13;}
     ~RtpEvent()                 {  }
     QString msg()               { return text;}
     rtp *owner()                { return rtpThread; }
@@ -55,6 +60,8 @@ public:
     int getPkMissed()           { return pkMiss; }
     int getPkLate()             { return pkLate; }
     int getPkOut()              { return pkOut; }
+    int getPkInDisc()           { return pkInDisc; }
+    int getPkOutDrop()          { return pkOutDrop; }
     int getBytesIn()            { return byteIn; }
     int getBytesOut()           { return byteOut; }
     int getFramesIn()           { return framesIn; }
@@ -72,8 +79,10 @@ private:
     int msPeriod;
     int pkIn;
     int pkOut;
+    int pkOutDrop;
     int pkMiss;
     int pkLate;
+    int pkInDisc;
     int framesIn;
     int framesOut;
     int framesInDisc;
@@ -88,13 +97,13 @@ private:
 
 typedef struct RTPPACKET
 {
-  int     len;                       // Not part of the RTP frame itself
-	uchar	  RtpVPXCC;
-	uchar	  RtpMPT;
-	ushort  RtpSequenceNumber;
-	ulong	  RtpTimeStamp;
-	ulong   RtpSourceID;
-	uchar	  RtpData[IP_MAX_MTU-RTP_HEADER_SIZE-UDP_HEADER_SIZE];
+    int     len;                       // Not part of the RTP frame itself
+    uchar   RtpVPXCC;
+    uchar   RtpMPT;
+    ushort  RtpSequenceNumber;
+    ulong   RtpTimeStamp;
+    ulong   RtpSourceID;
+    uchar   RtpData[IP_MAX_MTU-RTP_HEADER_SIZE-UDP_HEADER_SIZE];
 } RTPPACKET;
 
 typedef struct 
@@ -159,6 +168,7 @@ public:
     virtual int Encode(short *In, uchar *out, int Samples, short &maxPower, int gain);
     virtual int Silence(uchar *out, int ms);
     virtual QString WhoAreYou();
+    virtual int bandwidth() { return 0; };
 private:
 };
 
@@ -184,11 +194,36 @@ public:
     int AnyData() { return count(); };
     bool isPacketQueued(ushort Seq);
     int GotAllBufsInFrame(ushort seq, int offset);
+    void CountMissingPackets(ushort seq, ushort &cntValid, ushort &cntMissing);
     void Debug();
 
 
 private:
     QPtrList<RTPPACKET> FreeJitterQ;
+};
+
+
+class TxShaper
+{
+public:
+    TxShaper(int bw, int period, int granularity);
+    ~TxShaper();
+    bool OkToSend();
+    void Send(int Bytes);
+    void setMaxBandwidth(int bytesPerSec) {maxBandwidth = bytesPerSec; }
+    
+private:    
+    void flushHistory();
+    int historySize;
+    int *txHistory;
+    int txGranularity;
+    int txWindowTotal;
+    int maxBandwidth;
+    int itTail;
+    int itHead;
+    QTime timestamp;
+    int timeLastFlush;
+    int timeLastSend;
 };
 
 
@@ -229,11 +264,13 @@ public:
     bool toggleMute()         { micMuted = !micMuted; return micMuted; }
     void getPower(short &m, short &s) { m = micPower; s = spkPower; micPower = 0; spkPower = 0; }
     bool queueVideo(VIDEOBUFFER *v) { bool res=false; rtpMutex.lock(); if (videoToTx==0) {videoToTx=v; if (eventCond) eventCond->wakeAll(); res=true; } else framesOutDiscarded++; rtpMutex.unlock(); return res; }
+    bool readyForVideo() { bool res=true; rtpMutex.lock(); if (pTxShaper) res = pTxShaper->OkToSend(); rtpMutex.unlock(); return res; }
     VIDEOBUFFER *getRxedVideo()     { rtpMutex.lock(); VIDEOBUFFER *b=rxedVideoFrames.take(0); rtpMutex.unlock(); return b; }
     VIDEOBUFFER *getVideoBuffer(int len=0);
     void freeVideoBuffer(VIDEOBUFFER *Buf);
     void PlayToneToSpeaker(short *tone, int Samples);
-
+    void setMaxBandwidth(int kbps) { rtpMutex.lock(); if (pTxShaper) pTxShaper->setMaxBandwidth(kbps*1000/8); rtpMutex.unlock(); }
+    int  getCodecBandwidth() { int res=0; rtpMutex.lock(); if (Codec) res = Codec->bandwidth(); rtpMutex.unlock(); return res; }
 
 private:
     void rtpThreadWorker();
@@ -299,6 +336,7 @@ private:
     QWaitCondition *eventCond;
     codec   *Codec;
     Jitter *pJitter;
+    TxShaper *pTxShaper;
     int rxMsPacketSize;
     int txMsPacketSize;
     int rxPCMSamplesPerPacket;
@@ -359,6 +397,8 @@ private:
     int pkOut;
     int pkMissed;
     int pkLate;
+    int pkOutDrop;
+    int pkInDisc;
     int bytesIn;
     int bytesOut;
     int bytesToSpeaker;

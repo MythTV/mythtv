@@ -21,7 +21,8 @@ public:
     virtual int Decode(uchar *In, short *out, int Len, short &maxPower);
     virtual int Encode(short *In, uchar *out, int Samples, short &maxPower, int gain);
     virtual int Silence(uchar *out, int ms);
-    virtual QString WhoAreYou() { return "G711a"; };
+    virtual QString WhoAreYou() { return "G711a"; }
+    virtual int bandwidth()     { return 106; } // 106kbps including PPP and ATM overheads
 private:
 };
 
@@ -34,6 +35,7 @@ public:
     virtual int Encode(short *In, uchar *out, int Samples, short &maxPower, int gain);
     virtual int Silence(uchar *out, int ms);
     virtual QString WhoAreYou() { return "G711u"; };
+    virtual int bandwidth()     { return 106; } // 106kbps including PPP and ATM overheads
 private:
 };
 
@@ -46,6 +48,7 @@ public:
     virtual int Encode(short *In, uchar *out, int Samples, short &maxPower, int gain);
     virtual int Silence(uchar *out, int ms);
     virtual QString WhoAreYou() { return "GSM"; };
+    virtual int bandwidth()     { return 43; } // 43kbps including PPP and ATM overheads
 private:
     gsm gsmEncData;
     gsm gsmDecData;
@@ -62,6 +65,7 @@ public:
     virtual int Encode(short *In, uchar *out, int Samples, short &maxPower, int gain);
     virtual int Silence(uchar *out, int ms);
     virtual QString WhoAreYou() { return "G729"; };
+    virtual int bandwidth()     { return 43; } // 43kbps including PPP and ATM overheads
 private:
 };
 #endif

@@ -36,25 +36,26 @@
 
 int g711ulaw::Encode(short *In, unsigned char *Out, int Samples, short &maxPower, int gain)
 {
-	int Count = Samples;
-	while (Count-- > 0)
-	{
-    maxPower = QMAX(maxPower, *In);
-		*Out++ = PCM2G711U(*In++);
-	}
-	return Samples;
+    (void)gain;
+    int Count = Samples;
+    while (Count-- > 0)
+    {
+        maxPower = QMAX(maxPower, *In);
+        *Out++ = PCM2G711U(*In++);
+    }
+    return Samples;
 }
 
 int g711ulaw::Decode(unsigned char *In, short *Out, int Len, short &maxPower)
 {
-	int Count = Len;
-	while (Count-- > 0)
-	{
-		*Out = G711U2PCM(*In++);
-    maxPower = QMAX(maxPower, *Out);
-    *Out++;
-	}
-	return (Len*sizeof(short));
+    int Count = Len;
+    while (Count-- > 0)
+    {
+        *Out = G711U2PCM(*In++);
+        maxPower = QMAX(maxPower, *Out);
+        *Out++;
+    }
+    return (Len*sizeof(short));
 }
 
 int g711ulaw::Silence(uchar *out, int ms)
@@ -66,25 +67,26 @@ int g711ulaw::Silence(uchar *out, int ms)
 
 int g711alaw::Encode(short *In, unsigned char *Out, int Samples, short &maxPower, int gain)
 {
-	int Count = Samples;
-	while (Count-- > 0)
-	{
-    maxPower = QMAX(maxPower, *In);
-		*Out++ = PCM2G711A(*In++);
-	}
-	return Samples;
+    (void)gain;
+    int Count = Samples;
+    while (Count-- > 0)
+    {
+       maxPower = QMAX(maxPower, *In);
+        *Out++ = PCM2G711A(*In++);
+    }
+    return Samples;
 }
 
 int g711alaw::Decode(unsigned char *In, short *Out, int Len, short &maxPower)
 {
-	int Count = Len;
-	while (Count-- > 0)
-	{
-		*Out = G711A2PCM(*In++);
-    maxPower = QMAX(maxPower, *Out);
-    Out++;
-	}
-	return (Len*sizeof(short));
+    int Count = Len;
+    while (Count-- > 0)
+    {
+        *Out = G711A2PCM(*In++);
+        maxPower = QMAX(maxPower, *Out);
+        Out++;
+    }
+    return (Len*sizeof(short));
 }
 
 int g711alaw::Silence(uchar *out, int ms)

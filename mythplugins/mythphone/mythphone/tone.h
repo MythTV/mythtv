@@ -15,21 +15,23 @@
 #include <qptrlist.h>
 #include <qthread.h>
 
+#ifndef WIN32
 #include <mythtv/mythwidgets.h>
 #include <mythtv/dialogbox.h>
 #include <mythtv/volumecontrol.h>
-
 #include "directory.h"
+#endif
+
 #include "webcam.h"
 #include "wavfile.h"
 #include "rtp.h"
 
 
-
-
 class Tone : public QObject
 {
+#ifndef WIN32
   Q_OBJECT
+#endif
 
   public:
         Tone(int freqHz, int volume, int ms, QObject *parent = 0, const char * = 0);
@@ -41,11 +43,11 @@ class Tone : public QObject
         void sum(int freqHz, int volume);
         short *getAudio() { return toneBuffer; };
         int getSamples() { return Samples; };
-        bool Playing() { return (spkDev != -1); };
+        bool Playing();
 
         void Play(QString deviceName, bool loop);
         void Stop();
-        int  OpenSpeaker(QString devName);
+        void OpenSpeaker(QString devName);
         void CloseSpeaker();
    
   public slots:
@@ -54,10 +56,31 @@ class Tone : public QObject
   private:
         int     Samples;
         short  *toneBuffer;
-        int     spkDev;
         bool    Loop;
         QTimer *audioTimer;
         int     playPtr;
+#ifdef WIN32        
+        HWAVEOUT    hSpeaker;
+        WAVEHDR     spkBufferDescr;
+#else        
+        int         hSpeaker;
+#endif        
+};
+
+
+class TelephonyTones
+{
+  public:
+    enum ToneId { TONE_RINGBACK, TONE_INCOMING_CALL };
+    
+    TelephonyTones();
+    ~TelephonyTones();
+    Tone *TTone(ToneId Id);
+    Tone *dtmf(int n);
+    
+  private:
+    QMap<ToneId, Tone *> tone;
+    QMap<int, Tone *> toneDtmf;
 };
 
 

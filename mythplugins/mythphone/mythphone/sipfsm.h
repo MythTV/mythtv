@@ -38,11 +38,40 @@
 class SipEvent : public QCustomEvent
 {
 public:
-    enum Type { SipStateChange = (QEvent::User + 400), SipNotification  };
+    enum Type { SipStateChange = (QEvent::User + 400), SipNotification, SipStartMedia, SipStopMedia, SipChangeMedia, 
+                SipAlertUser, SipCeaseAlertUser, SipRingbackTone, SipCeaseRingbackTone };
 
     SipEvent(Type t) : QCustomEvent(t) {}
+    SipEvent(Type t, QString rIp, int ap, QString ac, int vp, QString vc, int dp, int rap, int rvp, QString vr) : QCustomEvent(t) 
+    {
+        audPayload=ap; vidPayload=vp; dtmfPayload=dp; remoteAudioPort=rap; remoteVideoPort=rvp;
+        audCodec=ac; vidCodec=vc; vidResolution=vr;
+        remoteIp=rIp;
+    }
+    SipEvent(Type t, QString cUser, QString cUrl, QString cName, bool cAudio) : QCustomEvent(t) 
+    {
+        callerUser = cUser; callerName = cName; callerUrl = cUrl; callIsAudioOnly = cAudio;
+    }
     ~SipEvent() {}
+    int getAudioPayload() { return audPayload; }
+    int getVideoPayload() { return vidPayload; }
+    int getDTMFPayload()  { return dtmfPayload; }
+    int getAudioPort()    { return remoteAudioPort; }
+    int getVideoPort()    { return remoteVideoPort; }
+    QString getRemoteIp() { return remoteIp; }
+    QString getAudioCodec() { return audCodec; }
+    QString getVideoCodec() { return vidCodec; }
+    QString getVideoRes()   { return vidResolution; }
+    QString getCallerUser() { return callerUser; }
+    QString getCallerUrl()  { return callerUrl; }
+    QString getCallerName() { return callerName; }
+    bool    getCallIsAudioOnly() { return callIsAudioOnly; }
 
+private:
+    int audPayload, vidPayload, dtmfPayload, remoteAudioPort, remoteVideoPort;
+    QString audCodec, vidCodec, vidResolution, remoteIp;
+    QString callerUser, callerName, callerUrl;
+    bool callIsAudioOnly;
 };
 
 class SipDebugEvent : public QCustomEvent
@@ -65,9 +94,12 @@ private:
 #define SIP_OCONNECTING1        0x2    // Invite sent, no response yet
 #define SIP_OCONNECTING2        0x3    // Invite sent, 1xx response
 #define SIP_ICONNECTING         0x4
-#define SIP_CONNECTED           0x5
-#define SIP_DISCONNECTING       0x6
-#define SIP_CONNECTED_VXML      0x7    // This is a false state, only used as indication back to the frontend
+#define SIP_ICONNECTING_WAITACK 0x5
+#define SIP_CONNECTED           0x6
+#define SIP_DISCONNECTING       0x7
+#define SIP_CONNECTED_VXML      0x8    // This is a false state, only used as indication back to the frontend
+#define SIP_CONNECT_MODIFYING1  0x9    // Connected; sent a re-Invite to modify the SDP
+#define SIP_CONNECT_MODIFYING2  0xA    // Connected; rxed a re-Invite and sent a 200ok, waiting for ACK
 
 // Registration States
 #define SIP_REG_DISABLED        0x01   // Proxy registration turned off
@@ -126,6 +158,7 @@ private:
 #define SIP_IM_TIMEOUT          0x1E00
 #define SIP_USER_MESSAGE        0x1F00
 #define SIP_KICKWATCH           0x2000
+#define SIP_MODIFYSESSION       0x2100
 
 #define SIP_CMD(s)              (((s)==SIP_INVITE) || ((s)==SIP_ACK) || ((s)==SIP_BYE) || ((s)==SIP_CANCEL) || ((s)==SIP_REGISTER) || ((s)==SIP_SUBSCRIBE) || ((s)==SIP_NOTIFY) || ((s)==SIP_MESSAGE) || ((s)==SIP_INFO))
 #define SIP_STATUS(s)           (((s)==SIP_INVITESTATUS_2xx) || ((s)==SIP_INVITESTATUS_1xx) || ((s)==SIP_INVITESTATUS_3456xx) || ((s)==SIP_BYTESTATUS) || ((s)==SIP_CANCELSTATUS) || ((s)==SIP_SUBSTATUS) || ((s)==SIP_NOTSTATUS) || ((s)==SIP_MESSAGESTATUS) || ((s)==SIP_INFOSTATUS) )
@@ -151,6 +184,10 @@ private:
 #define SIP_ICONNECTING_INVITE            (SIP_ICONNECTING   | SIP_INVITE)
 #define SIP_ICONNECTING_ANSWER            (SIP_ICONNECTING   | SIP_ANSWER)
 #define SIP_ICONNECTING_CANCEL            (SIP_ICONNECTING   | SIP_CANCEL)
+#define SIP_ICONNECTING_WAITACK_ACK       (SIP_ICONNECTING_WAITACK | SIP_ACK)
+#define SIP_ICONNECTING_WAITACK_RETX      (SIP_ICONNECTING_WAITACK | SIP_RETX)
+#define SIP_ICONNECTING_WAITACK_CANCEL    (SIP_ICONNECTING_WAITACK | SIP_CANCEL)
+#define SIP_ICONNECTING_WAITACK_HANGUP    (SIP_ICONNECTING_WAITACK | SIP_HANGUP)
 #define SIP_CONNECTED_ACK                 (SIP_CONNECTED     | SIP_ACK)
 #define SIP_CONNECTED_INVITESTATUS_2xx    (SIP_CONNECTED     | SIP_INVITESTATUS_2xx)
 #define SIP_CONNECTED_RETX                (SIP_CONNECTED     | SIP_RETX)
@@ -162,6 +199,14 @@ private:
 #define SIP_DISCONNECTING_CANCEL          (SIP_DISCONNECTING | SIP_CANCEL)
 #define SIP_DISCONNECTING_CANCELSTATUS    (SIP_DISCONNECTING | SIP_CANCELSTATUS)
 #define SIP_DISCONNECTING_BYE             (SIP_DISCONNECTING | SIP_BYE)
+#define SIP_CONNECTED_MODIFYSESSION       (SIP_CONNECTED     | SIP_MODIFYSESSION)
+#define SIP_CONNECTED_INVITE              (SIP_CONNECTED     | SIP_INVITE)
+#define SIP_CONNMOD1_INVITESTATUS_1xx     (SIP_CONNECT_MODIFYING1 | SIP_INVITESTATUS_1xx)
+#define SIP_CONNMOD1_INVITESTATUS_2xx     (SIP_CONNECT_MODIFYING1 | SIP_INVITESTATUS_2xx)
+#define SIP_CONNMOD1_INVITESTATUS_3456    (SIP_CONNECT_MODIFYING1 | SIP_INVITESTATUS_3456xx)
+#define SIP_CONNMOD1_RETX                 (SIP_CONNECT_MODIFYING1 | SIP_RETX)
+#define SIP_CONNMOD2_ACK                  (SIP_CONNECT_MODIFYING2 | SIP_ACK)
+#define SIP_CONNMOD2_RETX                 (SIP_CONNECT_MODIFYING2 | SIP_RETX)
 
 // Registration FSM Actions - combination of event and state to give a "switch"able value
 #define SIP_REG_TRYING_STATUS             (SIP_REG_TRYING    | SIP_REGSTATUS)
@@ -244,6 +289,7 @@ class SipContainer
     void PlaceNewCall(QString Mode, QString uri, QString name, bool disableNat);
     void AnswerRingingCall(QString Mode, bool disableNat);
     void HangupCall();
+    void ModifyCall(QString audCodec, QString vidCodec="UNCHANGED");
     void UiOpened(QObject *);
     void UiClosed();
     void UiWatch(QStrList uriList);
@@ -424,21 +470,23 @@ class SipCall : public SipFsmBase
             { ip=remoteIp; aport=remoteAudioPort; vport=remoteVideoPort; audPay = CodecList[audioPayloadIdx].Payload; 
               audCodec = CodecList[audioPayloadIdx].Encoding; dtmfPay = dtmfPayload; vidPay = videoPayload; 
               vidCodec = (vidPay == 34 ? "H263" : ""); vidRes = rxVideoResolution; }
+    bool ModifyCodecs(QString audioCodec, QString videoCodec);
 
   private:
     int       State;
     int       callRef;
 
     void initialise();
-    bool UseNat(QString destIPAddress);
+    bool UseNat();
     void ForwardMessage(SipMsg *msg);
     void BuildSendInvite(SipMsg *authMsg);
+    void BuildSendReInvite(SipMsg *authMsg);
     void BuildSendAck();
     void BuildSendBye(SipMsg *authMsg);
     void BuildSendCancel(SipMsg *authMsg);
     void AlertUser(SipMsg *rxMsg);
     void GetSDPInfo(SipMsg *sipMsg);
-    void addSdpToInvite(SipMsg& msg, bool advertiseVideo);
+    void addSdpToInvite(SipMsg& msg, bool advertiseVideo, int audioCodec=-1);
     QString BuildSdpResponse();
 
     QString DestinationUri;
@@ -462,6 +510,7 @@ class SipCall : public SipFsmBase
     int     dtmfPayload;
     bool    allowVideo;
     bool    disableNat;
+    int     ModifyAudioCodec;
 
     QString myDisplayName;	// The name to display when I call others
     QString sipLocalIP;
@@ -558,6 +607,7 @@ class SipFsm : public QWidget
     void NewCall(bool audioOnly, QString uri, QString DispName, QString videoMode, bool DisableNat);
     void HangUp(void);
     void Answer(bool audioOnly, QString videoMode, bool DisableNat);
+    void ModifyCall(QString audioCodec, QString videoCodec);
     void StatusChanged(char *newStatus);
     void DestroyFsm(SipFsmBase *Fsm);
     void CheckRxEvent();

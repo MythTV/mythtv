@@ -122,6 +122,8 @@ class Webcam : public QThread
     int  GetContrast(void) { return (vPic.contrast);};
     int  GetHue(void) { return (vPic.hue);};
     QString GetName(void) { return vCaps.name; };
+#else
+    HWND GetHwnd() { return hwndCap; };    
 #endif
     void SetFlip(bool b) { wcFlip=b; }
 
@@ -135,6 +137,7 @@ class Webcam : public QThread
 
     wcClient *RegisterClient(int format, int fps, QObject *eventWin);
     void UnregisterClient(wcClient *client);
+    void ChangeClientFps(wcClient *client, int fps);
     unsigned char *GetVideoFrame(wcClient *client);
     void FreeVideoBuffer(wcClient *client, unsigned char *buffer);
     void ProcessFrame(unsigned char *frame, int fSize);

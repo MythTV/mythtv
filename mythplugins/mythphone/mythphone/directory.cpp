@@ -707,19 +707,19 @@ void DirectoryContainer::writeTree()
 {
 
     // First create the special trees
-    speeddialTree     = TreeRoot->addNode("Speed Dials", 0, true);
+    speeddialTree     = TreeRoot->addNode(QObject::tr("Speed Dials"), 0, true);
     speeddialTree->setAttribute(0, TA_DIR);
     speeddialTree->setAttribute(1, 0); // No identifier required
     speeddialTree->setAttribute(2, 0); // Sort Order
-    voicemailTree   = TreeRoot->addNode("Voicemail", 0, true);
+    voicemailTree   = TreeRoot->addNode(QObject::tr("Voicemail"), 0, true);
     voicemailTree->setAttribute(0, TA_VMAIL);
     voicemailTree->setAttribute(1, 0);
     voicemailTree->setAttribute(2, 1); 
-    placedcallsTree   = TreeRoot->addNode("Placed Calls", 0, true);
+    placedcallsTree   = TreeRoot->addNode(QObject::tr("Placed Calls"), 0, true);
     placedcallsTree->setAttribute(0, TA_DIR);
     placedcallsTree->setAttribute(1, 0);
     placedcallsTree->setAttribute(2, 2);
-    receivedcallsTree = TreeRoot->addNode("Received Calls", 0, true);
+    receivedcallsTree = TreeRoot->addNode(QObject::tr("Received Calls"), 0, true);
     receivedcallsTree->setAttribute(0, TA_DIR);
     receivedcallsTree->setAttribute(1, 0);
     receivedcallsTree->setAttribute(2, 2);

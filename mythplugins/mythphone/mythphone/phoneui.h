@@ -129,10 +129,13 @@ class PhoneUIBox : public MythThemedDialog
     void    addNewDirectoryEntry(QString Name, QString Url, QString Dir, QString fn, QString sn, QString ph, bool isSpeed, bool OnHomeLan);
     void    doCallPopup(DirEntry *entry, QString DialorAnswer, bool audioOnly);
     void    drawCallPopupCallHistory(MythPopupBox *popup, CallRecord *call);
-    void    startRTP();
+    void    startRTP(int audioPayload, int videoPayload, int dtmfPayload, int audioPort, int videoPort, 
+                     QString remoteIp, QString audioCodec, QString videoCodec, QString videoRes);
+    void    stopRTP(bool stopAudio=true, bool stopVideo=true);
+    void    alertUser(QString callerUser, QString callerName, QString callerUrl, bool inAudioOnly);
     void    showStatistics(bool showVideo);
-    void    updateAudioStatistics(int pkIn, int pkLost, int pkLate, int pkOut, int bIn, int bOut);
-    void    updateVideoStatistics(int pkIn, int pkLost, int pkLate, int pkOut, int bIn, int bOut, int fIn, int fOut, int fDiscIn, int fDiscOut);
+    void    updateAudioStatistics(int pkIn, int pkLost, int pkLate, int pkOut, int pkInDisc, int pkOutDrop, int bIn, int bOut);
+    void    updateVideoStatistics(int pkIn, int pkLost, int pkLate, int pkOut, int pkInDisc, int pkOutDrop, int bIn, int bOut, int fIn, int fOut, int fDiscIn, int fDiscOut);
 
     void    wireUpTheme();
     DirectoryContainer *DirContainer;
@@ -141,8 +144,9 @@ class PhoneUIBox : public MythThemedDialog
     int    State;
     rtp    *rtpAudio;
     rtp    *rtpVideo;
-    Tone   *ringbackTone;
-    Tone   *toneDtmf[12]; // 0..9, * and #
+    QString audioCodecInUse;
+    QString videoCodecInUse;
+    TelephonyTones Tones;
     Tone   *vmail;
 
     Webcam  *webcam;
@@ -150,6 +154,7 @@ class PhoneUIBox : public MythThemedDialog
     wcClient *txClient;
     int wcWidth, wcHeight, txWidth, txHeight, rxWidth, rxHeight;
     int wcDeliveredFrames;
+    int wcDroppedFrames;
     QString txVideoMode;
     int zoomWidth, zoomHeight, zoomFactor;
     int hPan, wPan;
@@ -161,12 +166,12 @@ class PhoneUIBox : public MythThemedDialog
     H263Container *h263;
     QTimer *powerDispTimer;
     QTimer *OnScreenClockTimer;
-    int ConnectTime;
+    QTime ConnectTime;
  
     VolumeControl     *volume_control;
     QTimer            *volume_display_timer;
     UIStatusBarType   *volume_status;
-    enum {VOL_VOLUME, VOL_MICVOLUME, VOL_BRIGHTNESS, VOL_CONTRAST, VOL_COLOUR, VOL_TXSIZE, VOL_TXRATE } VolumeMode;
+    enum {VOL_VOLUME, VOL_MICVOLUME, VOL_BRIGHTNESS, VOL_CONTRAST, VOL_COLOUR, VOL_TXSIZE, VOL_TXRATE, VOL_AUDCODEC } VolumeMode;
 
     int camBrightness, camContrast, camColour, txFps;
 
@@ -212,7 +217,8 @@ class PhoneUIBox : public MythThemedDialog
     QLabel *audioPkInOutLabel;
     QLabel *audioBytesInOutLabel;
     QLabel *audioAvgBwLabel;
-    QLabel *videoPkInOutLabel;
+    QLabel *videoPkInLabel;
+    QLabel *videoPkOutLabel;
     QLabel *videoBytesInOutLabel;
     QLabel *videoAvgBwLabel;
     QLabel *videoFramesInOutDiscLabel;

@@ -11,7 +11,7 @@
     </message>
     <message>
         <source>Remove from Speed Dials</source>
-        <translation>Aus der Schnellwahlliste entfernen</translation>
+        <translation>Aus der Kurzwahlliste entfernen</translation>
     </message>
     <message>
         <source>Save this in the Directory</source>
@@ -23,7 +23,7 @@
     </message>
     <message>
         <source>Make this a Speeddial</source>
-        <translation>Schnellwahl erzeugen</translation>
+        <translation>zur Kurzwahlliste hinzufügen</translation>
     </message>
     <message>
         <source>Delete this Entry</source>
@@ -69,19 +69,221 @@
         <source>ADD DIRECTORY</source>
         <translation>Adressbuch hinzufügen</translation>
     </message>
-</context>
-<context>
-    <name>QObject</name>
     <message>
-        <source>
-
-A directory entry already exists with this URL.</source>
-        <translation>Es existiert bereits ein Eintrag mit dieser Adresse im Adressbuch. </translation>
+        <source>Registered to</source>
+        <translation>Registriert auf</translation>
+    </message>
+    <message>
+        <source>as</source>
+        <translation>als</translation>
+    </message>
+    <message>
+        <source>Not Registered</source>
+        <translation>Nicht registriert</translation>
+    </message>
+    <message>
+        <source>Directory</source>
+        <translation>Verzeichnis</translation>
+    </message>
+    <message>
+        <source>Speed Dials</source>
+        <translation>Kurzwahl</translation>
+    </message>
+    <message>
+        <source>No Active Calls</source>
+        <translation>Keine offenen Verbindungen</translation>
+    </message>
+    <message>
+        <source>Caller is Leaving Voicemail</source>
+        <translation>Anrufer hinterläßt eine Sprachnachricht</translation>
+    </message>
+    <message>
+        <source>Trying to Contact Remote Party</source>
+        <translation>Versuche die Gegenstelle zu erreichen</translation>
+    </message>
+    <message>
+        <source>Audio and Video Looped to </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incoming Call</source>
+        <translation>Eingehender Anruf</translation>
+    </message>
+    <message>
+        <source>Hanging Up</source>
+        <translation>Lege auf</translation>
+    </message>
+    <message>
+        <source>Call History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Voicemail</source>
+        <translation>Sprachnachrichten</translation>
+    </message>
+    <message>
+        <source>Nickname</source>
+        <translation>Spitzname</translation>
+    </message>
+    <message>
+        <source>First Name</source>
+        <translation>Vorname</translation>
+    </message>
+    <message>
+        <source>(Optional)</source>
+        <translation>(Optional)</translation>
+    </message>
+    <message>
+        <source>Surname</source>
+        <translation>Nachname</translation>
+    </message>
+    <message>
+        <source>URL</source>
+        <translation>URL</translation>
+    </message>
+    <message>
+        <source>Default Photo</source>
+        <translation>Bild</translation>
+    </message>
+    <message>
+        <source>To Directory</source>
+        <translation>Im Verzeichnis</translation>
+    </message>
+    <message>
+        <source>Business Card</source>
+        <translation>Visitenkarte</translation>
+    </message>
+    <message>
+        <source>Latest Calls:</source>
+        <translation>Letzte Anrufe:</translation>
+    </message>
+    <message>
+        <source>Videocall</source>
+        <translation>Videoanruf</translation>
+    </message>
+    <message>
+        <source>Voice-Only</source>
+        <translation>nur Sprache</translation>
+    </message>
+    <message>
+        <source>Send an Instant Message</source>
+        <translation>Eine Kurznachricht senden</translation>
+    </message>
+    <message>
+        <source>You Called </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>They Called </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You missed their call </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Today</source>
+        <translation>Heute</translation>
+    </message>
+    <message>
+        <source>Yesterday</source>
+        <translation>Gestern</translation>
+    </message>
+    <message>
+        <source>at</source>
+        <translation>um</translation>
+    </message>
+    <message>
+        <source> for %d min</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Packets In/Out/Lost/Late:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Average Kbps In/Out: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resolution In/Out:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>x</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Average Kbps In/Out:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Frames In/Out/Discarded:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Average FPS In/Out:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Webcam FPS Actual/Used:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Webcam FPS Hw/Driver/Used:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Volume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mic Volume (not impl.)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Brightness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Contrast</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Colour</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transmit Video Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transmit Video FPS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Up/Down - Change       Left/Right - Adjust</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dial</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>OK</source>
-        <translation>OK</translation>
+        <translation>Ok</translation>
     </message>
+    <message>
+        <source>A directory entry already exists with this URL.</source>
+        <translation>Es existiert bereits ein Eintrag mit dieser URL.</translation>
+    </message>
+</context>
+<context>
+    <name>QObject</name>
     <message>
         <source>Webcam device</source>
         <translation>Webcam-Gerät</translation>
@@ -325,6 +527,22 @@ A directory entry already exists with this URL.</source>
     <message>
         <source>Method to use for NAT traversal; needs a Frontend restart after changing. Choose NONE if you have a public IP address, choose MANUAL if your ISP always gives you the same public address and manually enter this address below. Choose Web Server if you have a dynamic NAT address and enter a web address like http://checkip.dyndns.org below. </source>
         <translation>Methode zum NAT-Überqueren; Änderungen benötigen einen Frontendneustart. None wählen, wenn eine öffentliche IP-Adresse benutzt wird, Manual falls der ISP immer die gleiche öffentliche Adresse vergibt (unten eingeben). Web Server wählen, falls eine dynamische NAT-Adresse benutzt wird; dabei eine Adresse eingeben wie z.B.: http://meineip.dyndns.org.</translation>
+    </message>
+    <message>
+        <source>Speed Dials</source>
+        <translation>Kurzwahl</translation>
+    </message>
+    <message>
+        <source>Voicemail</source>
+        <translation>Sprachnachrichten</translation>
+    </message>
+    <message>
+        <source>Placed Calls</source>
+        <translation>Anrufe</translation>
+    </message>
+    <message>
+        <source>Received Calls</source>
+        <translation>empf. Anrufe</translation>
     </message>
 </context>
 </TS>
