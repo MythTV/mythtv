@@ -20,4 +20,10 @@
      <depends>gamemenu.xml</depends>
    </button>
 
+   <button>
+     <type>IMAGES</type>
+     <text>Images</text>
+     <action>EXEC mythgallery</action>
+     <depends>mythgallery-settings.txt</depends>
+   </button>
 </mythmenu>
