@@ -45,7 +45,11 @@ class PlaybackBox : public MythDialog
     void stopSelected();
     void deleteSelected();
     void expireSelected();
+    void showMenu();
     void showActionsSelected();
+    void showRecGroupChanger();
+    void showRecGroupChooser();
+    void showRecGroupPasswordChanger();
 
     void doPlay();
 
@@ -66,6 +70,14 @@ class PlaybackBox : public MythDialog
     void exitWin();
 
     void setUpdateFreeSpace() { updateFreeSpace = true; }
+
+    void chooseComboBoxChanged(void);
+    void chooseSetViewGroup(void);
+    void chooseEditChanged(const QString &newText);
+    void changeComboBoxChanged(void);
+    void changeSetRecGroup(void);
+    void changeRecGroupPassword();
+    void changeOldPasswordChanged(const QString &newText);
 
   protected:
     void paintEvent(QPaintEvent *);
@@ -130,6 +142,9 @@ class PlaybackBox : public MythDialog
     bool fileExists(ProgramInfo *pginfo);
 
     void showIconHelp();
+
+    QString getRecGroupPassword(QString recGroup);
+    void fillRecGroupPasswordCache(void);
 
     QTimer *timer;
     NuppelVideoPlayer *nvp;
@@ -197,6 +212,23 @@ class PlaybackBox : public MythDialog
     QTimer *freeSpaceTimer;
     int freeSpaceTotal;
     int freeSpaceUsed;
+
+    QString groupDisplayName;
+    QString recGroup;
+    QString recGroupPassword;
+    QString curGroupPassword;
+    QMap <QString, QString> recGroupType;
+    QMap <QString, QString> recGroupPwCache;
+
+    MythPopupBox *choosePopup;
+    MythListBox *chooseListBox;
+    MythComboBox *chooseComboBox;
+    MythLineEdit *chooseLineEdit;
+    MythLineEdit *chooseOldPassword;
+    MythLineEdit *chooseNewPassword;
+    MythPushButton *chooseOkButton;
+    MythPushButton *chooseDeleteButton;
+    QString chooseGroupPassword;
 };
 
 #endif

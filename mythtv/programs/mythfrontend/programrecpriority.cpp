@@ -67,7 +67,10 @@ ProgramRecPriorityInfo& ProgramRecPriorityInfo::operator=(const ProgramInfo &oth
     recstatus = other.recstatus;
     recordid = other.recordid;
     rectype = other.rectype;
-    recdups = other.recdups;
+    dupin = other.dupin;
+    dupmethod = other.dupmethod;
+    recgroup = other.recgroup;
+    chancommfree = other.chancommfree;
 
     sourceid = other.sourceid;
     inputid = other.inputid;

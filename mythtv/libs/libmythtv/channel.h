@@ -44,6 +44,8 @@ class Channel : public ChannelBase
 
     void SetFd(int fd); 
 
+    bool IsCommercialFree() { return commfree; }
+
   private:
     int GetCurrentChannelNum(const QString &channame);
 
@@ -64,6 +66,8 @@ class Channel : public ChannelBase
     QString currentFormat;
 
     int defaultFreqTable;
+
+    bool commfree;
 };
 
 #endif

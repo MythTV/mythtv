@@ -2577,6 +2577,12 @@ void NuppelVideoPlayer::ToggleLetterbox(void)
         videoOutput->ToggleLetterbox();
 }
 
+void NuppelVideoPlayer::Zoom(int direction)
+{
+    if (videoOutput)
+        videoOutput->Zoom(direction);
+}
+
 void NuppelVideoPlayer::ExposeEvent(void)
 {
     if (videoOutput)
@@ -3185,11 +3191,19 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed)
     commDetect->SetCommSkipAllBlanks(
         gContext->GetNumSetting("CommSkipAllBlanks", 1));
 
+    QTime flagTime;
+    flagTime.start();
+
     // the meat of the offline commercial detection code, scan through whole
     // file looking for indications of commercial breaks
     GetFrame(1,true);
     if (showPercentage)
-        printf( "%3d%%", 0 );
+    {
+        if (totalFrames)
+            printf( "%3d%%/      ", 0 );
+        else
+            printf( "%6lld", 0 );
+    }
 
     while (!eof)
     {
@@ -3198,13 +3212,21 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed)
             usleep(10000);
 
         if ((showPercentage) &&
-            ((framesPlayed % 100) == 0))
+            ((framesPlayed % 50) == 0))
         {
             if (totalFrames)
             {
+                int flagFPS;
+                float elapsed = flagTime.elapsed() / 1000.0;
+
+                if (elapsed)
+                    flagFPS = (int)(framesPlayed / elapsed);
+                else
+                    flagFPS = 0;
+
                 percentage = framesPlayed * 100 / totalFrames;
-                printf( "\b\b\b\b" );
-                printf( "%3d%%", percentage );
+                printf( "\b\b\b\b\b\b\b\b\b\b\b" );
+                printf( "%3d%%/%3dfps", percentage, flagFPS );
             }
             else
             {

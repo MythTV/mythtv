@@ -19,6 +19,7 @@ class VideoOutputDX : public VideoOutput
 
     void InputChanged(int width, int height, float aspect);
     void AspectChanged(float aspect);
+    void Zoom(int direction);
 
     void EmbedInWidget(WId wid, int x, int y, int w, int h);
     void StopEmbedding(void);

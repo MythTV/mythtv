@@ -20,11 +20,22 @@ enum RecordingType
 
 int RecTypePriority(RecordingType rectype);
 
-enum RecordingDupsType
+enum RecordingDupInType
 {
-    kRecordDupsNever = 0,
-    kRecordDupsIfDeleted,
-    kRecordDupsAlways
+    kDupsInRecorded     = 0x01,
+    kDupsInOldRecorded  = 0x02,
+    kDupsInAll          = 0x0F
+};
+
+
+enum RecordingDupMethodType
+{
+    kDupCheckNone     = 0x01,
+    kDupCheckSub      = 0x02,
+    kDupCheckDesc     = 0x04,
+    kDupCheckSubDesc  = 0x06,
+    kDupAllowEmpty    = 0x10,
+    kDupEmptySubDesc  = 0x16
 };
 
 class ProgramInfo;
@@ -49,6 +60,7 @@ public:
     void setStart(const QDateTime& start);
     void setEnd(const QDateTime& end);
     void setRecPriority(int recpriority);
+    void setRecGroup(const QString& recgroup);
 
     virtual MythDialog* dialogWidget(MythMainWindow *parent, 
                                      const char *name = 0);
@@ -94,7 +106,8 @@ private:
     ID* id;
     class SRRecordingType* type;
     class SRProfileSelector* profile;
-    class SRRecordDups* recorddups;
+    class SRDupIn* dupin;
+    class SRDupMethod* dupmethod;
     class SRAutoExpire* autoexpire;
     class SRPreRoll* preroll;
     class SRPostRoll* postroll;
@@ -110,6 +123,7 @@ private:
     class SREndDate* endDate;
     class SRCategory* category;
     class SRRecPriority* recpriority;
+    class SRRecGroup* recgroup;
 
     ProgramInfo* m_pginfo;
 };

@@ -24,6 +24,7 @@ ProgramInfo::ProgramInfo(void)
     chanstr = "";
     chansign = "";
     channame = "";
+    chancommfree = 0;
 
     pathname = "";
     filesize = 0;
@@ -40,13 +41,15 @@ ProgramInfo::ProgramInfo(void)
     recstatus = rsUnknown;
     recordid = 0;
     rectype = kNotRecording;
-    recdups = kRecordDupsNever;
+    dupin = kDupsInAll;
+    dupmethod = kDupCheckSubDesc;
 
     sourceid = -1;
     inputid = -1;
     cardid = -1;
     schedulerid = "";
     recpriority = 0;
+    recgroup = QObject::tr("Default");
 
     repeat = false;
 
@@ -63,6 +66,7 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other)
     chanstr = other.chanstr;
     chansign = other.chansign;
     channame = other.channame;
+    chancommfree = other.chancommfree;
     pathname = other.pathname;
     filesize = other.filesize;
     hostname = other.hostname;
@@ -80,13 +84,15 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other)
     recstatus = other.recstatus;
     recordid = other.recordid;
     rectype = other.rectype;
-    recdups = other.recdups;
+    dupin = other.dupin;
+    dupmethod = other.dupmethod;
 
     sourceid = other.sourceid;
     inputid = other.inputid;
     cardid = other.cardid;
     schedulerid = other.schedulerid;
     recpriority = other.recpriority;
+    recgroup = other.recgroup;
     programflags = other.programflags;
 
     repeat = other.repeat;
@@ -107,6 +113,7 @@ ProgramInfo &ProgramInfo::operator=(const ProgramInfo &other)
     chanstr = other.chanstr;
     chansign = other.chansign;
     channame = other.channame;
+    chancommfree = other.chancommfree;
     pathname = other.pathname;
     filesize = other.filesize;
     hostname = other.hostname;
@@ -124,13 +131,15 @@ ProgramInfo &ProgramInfo::operator=(const ProgramInfo &other)
     recstatus = other.recstatus;
     recordid = other.recordid;
     rectype = other.rectype;
-    recdups = other.recdups;
+    dupin = other.dupin;
+    dupmethod = other.dupmethod;
 
     sourceid = other.sourceid;
     inputid = other.inputid;
     cardid = other.cardid;
     schedulerid = other.schedulerid;
     recpriority = other.recpriority;
+    recgroup = other.recgroup;
     programflags = other.programflags;
 
     repeat = other.repeat;
@@ -176,11 +185,14 @@ void ProgramInfo::ToStringList(QStringList &list)
     list << QString::number(recstatus);
     list << QString::number(recordid);
     list << QString::number(rectype);
-    list << QString::number(recdups);
+    list << QString::number(dupin);
+    list << QString::number(dupmethod);
     list << recstartts.toString(Qt::ISODate);
     list << recendts.toString(Qt::ISODate);
     list << QString::number(repeat);
     list << QString::number(programflags);
+    list << ((recgroup != "") ? recgroup : QObject::tr("Default"));
+    list << QString::number(chancommfree);
 }
 
 void ProgramInfo::FromStringList(QStringList &list, int offset)
@@ -222,11 +234,14 @@ void ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
     recstatus = RecStatusType((*(it++)).toInt());
     recordid = (*(it++)).toInt();
     rectype = RecordingType((*(it++)).toInt());
-    recdups = RecordingDupsType((*(it++)).toInt());
+    dupin = RecordingDupInType((*(it++)).toInt());
+    dupmethod = RecordingDupMethodType((*(it++)).toInt());
     recstartts = QDateTime::fromString(*(it++), Qt::ISODate);
     recendts = QDateTime::fromString(*(it++), Qt::ISODate);
     repeat = (*(it++)).toInt();
     programflags = (*(it++)).toInt();
+    recgroup = *(it++);
+    chancommfree = (*(it++)).toInt();
 
     if (title == " ")
         title = "";
@@ -250,6 +265,8 @@ void ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
         channame = "";
     if (chansign == " ")
         chansign = "";
+    if (recgroup == " ")
+        recgroup = QObject::tr("Default");
 }
 
 void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
@@ -277,6 +294,7 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
 
     progMap["category"] = category;
     progMap["callsign"] = chansign;
+    progMap["commfree"] = chancommfree;
     progMap["starttime"] = startts.toString(timeFormat);
     progMap["startdate"] = startts.toString(shortDateFormat);
     progMap["endtime"] = endts.toString(timeFormat);
@@ -308,6 +326,7 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
     progMap["type"] = progMap["rec_str"];
 
     progMap["recpriority"] = recpriority;
+    progMap["recgroup"] = recgroup;
     progMap["programflags"] = programflags;
 
     progMap["timedate"] = recstartts.date().toString(dateFormat) + ", " +
@@ -354,7 +373,8 @@ void ProgramInfo::GetProgramListByQuery(QSqlDatabase *db,
 
     thequery = QString("SELECT channel.chanid,starttime,endtime,title,"
                        "subtitle,description,category,channel.channum,"
-                       "channel.callsign,channel.name,previouslyshown "
+                       "channel.callsign,channel.name,previouslyshown,"
+                       "channel.commfree "
                        "FROM program,channel ")
                        + where;
 
@@ -381,6 +401,8 @@ void ProgramInfo::GetProgramListByQuery(QSqlDatabase *db,
             proginfo->chansign = query.value(8).toString();
             proginfo->channame = query.value(9).toString();
             proginfo->repeat = query.value(10).toInt();
+            proginfo->chancommfree = query.value(11).toInt();
+
             proginfo->spread = -1;
 
             if (proginfo->title == QString::null)
@@ -421,7 +443,8 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(QSqlDatabase *db,
    
     thequery = QString("SELECT channel.chanid,starttime,endtime,title,subtitle,"
                        "description,category,channel.channum,channel.callsign, "
-                       "channel.name,previouslyshown FROM program,channel "
+                       "channel.name,previouslyshown,channel.commfree "
+                       "FROM program,channel "
                        "WHERE program.chanid = %1 AND starttime < %2 AND "
                        "endtime > %3 AND program.chanid = channel.chanid;")
                        .arg(channel).arg(ltime).arg(ltime);
@@ -448,6 +471,7 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(QSqlDatabase *db,
         proginfo->chansign = query.value(8).toString();
         proginfo->channame = query.value(9).toString();
         proginfo->repeat = query.value(10).toInt();
+        proginfo->chancommfree = query.value(11).toInt();
         proginfo->spread = -1;
 
         if (proginfo->title == QString::null)
@@ -493,7 +517,7 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
    
     thequery = QString("SELECT recorded.chanid,starttime,endtime,title, "
                        "subtitle,description,channel.channum, "
-                       "channel.callsign,channel.name "
+                       "channel.callsign,channel.name,channel.commfree "
                        "FROM recorded "
                        "LEFT JOIN channel "
                        "ON recorded.chanid = channel.chanid "
@@ -522,6 +546,7 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
         proginfo->chanstr = query.value(6).toString();
         proginfo->chansign = query.value(7).toString();
         proginfo->channame = query.value(8).toString();
+        proginfo->chancommfree = query.value(9).toInt();
         proginfo->spread = -1;
 
         if (proginfo->title == QString::null)
@@ -720,6 +745,25 @@ void ProgramInfo::ApplyRecordRecPriorityChange(QSqlDatabase *db,
     record->save(db);
 }
 
+void ProgramInfo::ApplyRecordRecGroupChange(QSqlDatabase *db,
+                                        const QString &newrecgroup)
+{
+    MythContext::KickDatabase(db);
+
+    QString starts = recstartts.toString("yyyyMMddhhmm");
+    starts += "00";
+
+    QString querystr = QString("UPDATE recorded SET recgroup = '%1', "
+                               "starttime = '%2' WHERE chanid = '%3' AND "
+                               "starttime = '%4';").arg(newrecgroup).arg(starts)
+                                                   .arg(chanid).arg(starts);
+    QSqlQuery query = db->exec(querystr);
+    if (!query.isActive())
+        MythContext::DBError("RecGroup update", querystr);
+
+    recgroup = newrecgroup;
+}
+
 void ProgramInfo::ToggleRecord(QSqlDatabase *db)
 {
     RecordingType curType = GetProgramRecordingStatus(db);
@@ -753,13 +797,29 @@ void ProgramInfo::ToggleRecord(QSqlDatabase *db)
 
 bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
 {
-    if (title == other.title &&
-        subtitle.length() > 2 &&
-        description.length() > 2 &&
-        subtitle == other.subtitle &&
-        description == other.description)
+    if (title != other.title)
+        return false;
+
+    if (rectype == kFindOneRecord)
         return true;
-    if (title == other.title && rectype == kFindOneRecord)
+
+    QString tmpsubtitle = subtitle;
+    QString tmpdescription = description;
+
+    tmpsubtitle.replace(QRegExp("^ *"),"");
+    tmpdescription.replace(QRegExp("^ *"),"");
+
+    if ((~dupmethod & kDupCheckNone) &&
+        (((dupmethod & kDupCheckSub) &&
+          ((dupmethod & kDupAllowEmpty) ||
+           (tmpsubtitle != "")) &&
+          (subtitle == other.subtitle)) ||
+         (~dupmethod & kDupCheckSub)) &&
+        (((dupmethod & kDupCheckDesc) &&
+          ((dupmethod & kDupAllowEmpty) ||
+           (tmpdescription != "")) &&
+          (description == other.description)) ||
+         (~dupmethod & kDupCheckDesc)))
         return true;
     else
         return false;
@@ -845,13 +905,13 @@ void ProgramInfo::StartedRecording(QSqlDatabase *db)
 
     QString query;
     query = QString("INSERT INTO recorded (chanid,starttime,endtime,title,"
-                    "subtitle,description,hostname,category,autoexpire) "
-                    "VALUES(%1,\"%2\",\"%3\",\"%4\",\"%5\",\"%6\",\"%7\","
-                    "\"%8\",%9);")
+                    "subtitle,description,hostname,category,autoexpire,recordid) "
+                    "VALUES(%1,\"%2\",\"%3\",\"%4\",\"%5\",\"%6\",\"%7\",\"%8\"")
                     .arg(chanid).arg(starts).arg(ends).arg(sqltitle.utf8()) 
                     .arg(sqlsubtitle.utf8()).arg(sqldescription.utf8())
-                    .arg(gContext->GetHostName()).arg(sqlcategory.utf8())
-                    .arg(record->GetAutoExpire());
+                    .arg(gContext->GetHostName()).arg(sqlcategory.utf8());
+    query += QString(",%1,%2);")
+                    .arg(record->GetAutoExpire()).arg(recordid);
 
     QSqlQuery qquery = db->exec(query);
     if (!qquery.isActive())
@@ -1767,7 +1827,8 @@ void ProgramInfo::FillInRecordInfo(vector<ProgramInfo *> &reclist)
         recstatus = found->recstatus;
         recordid = found->recordid;
         rectype = found->rectype;
-        recdups = found->recdups;
+        dupin = found->dupin;
+        dupmethod = found->dupmethod;
         recstartts = found->recstartts;
         recendts = found->recendts;
     }
@@ -1942,7 +2003,13 @@ void ProgramInfo::handleRecording(QSqlDatabase *db)
     if (recstatus == rsWillRecord)
     {
         diag.AddButton(QObject::tr("Don't record it"));
-        if (subtitle != "" && description != "")
+        if ((dupmethod & kDupCheckNone) ||
+            ((dupmethod & kDupCheckSub) &&
+             ((subtitle != "") ||
+              (dupmethod & kDupAllowEmpty))) ||
+            ((dupmethod & kDupCheckDesc) &&
+             ((description != "") ||
+              (dupmethod & kDupAllowEmpty))))
             diag.AddButton(QObject::tr("Never record this episode"));
     }
 

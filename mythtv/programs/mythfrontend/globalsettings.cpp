@@ -178,6 +178,63 @@ public:
     };
 };
 
+class AllRecGroupPassword: public LineEditSetting, public BackendSetting {
+public:
+    AllRecGroupPassword():
+        BackendSetting("AllRecGroupPassword") {
+        setLabel(QObject::tr("Password required to view all recordings"));
+        setValue("");
+        setHelpText(QObject::tr("If given, a password must be entered to "
+                                "view the complete list of all recordings."));
+    };
+};
+
+class DisplayRecGroup: public ComboBoxSetting, public GlobalSetting {
+public:
+    DisplayRecGroup():
+        GlobalSetting("DisplayRecGroup") {
+        setLabel(QObject::tr("Default Recording Group to display"));
+
+        QSqlDatabase *db = QSqlDatabase::database();
+        QString thequery = QString("SELECT DISTINCT recgroup from recorded");
+        QSqlQuery query = db->exec(thequery);
+
+        if (query.isActive() && query.numRowsAffected() > 0)
+            while (query.next())
+                addSelection(query.value(0).toString(),
+                             query.value(0).toString());
+        addSelection(QObject::tr("All"),
+                     QObject::tr("All"));
+
+        setHelpText(QObject::tr("Default Recording Group to display "
+                                "on the view recordings screen."));
+    };
+};
+
+class RememberRecGroup: public CheckBoxSetting, public GlobalSetting {
+public:
+    RememberRecGroup():
+        GlobalSetting("RememberRecGroup") {
+        setLabel(QObject::tr("Save current Recording Group view when changed"));
+        setValue(true);
+        setHelpText(QObject::tr("Remember the last selected Recording Group "
+                                "instead of displaying the Default group "
+                                "whenever you enter the playback screen."));
+    };
+};
+
+class UseCategoriesAsRecGroups: public CheckBoxSetting, public GlobalSetting {
+public:
+    UseCategoriesAsRecGroups():
+        GlobalSetting("UseCategoriesAsRecGroups") {
+        setLabel(QObject::tr("Use program categories as display groups"));
+        setValue(false);
+        setHelpText(QObject::tr("Add the list of program categories to the "
+                    "list of Recording Groups used for display.  Only programs "
+                    "in non-password protected groups will be listed."));
+    };
+};
+
 class JumpAmount: public SpinBoxSetting, public GlobalSetting {
 public:
     JumpAmount():
@@ -1621,6 +1678,18 @@ PlaybackSettings::PlaybackSettings()
     gen2->addChild(new UDPNotifyPort());
     addChild(gen2);
 
+    VerticalConfigurationGroup* pbox = new VerticalConfigurationGroup(false);
+    pbox->setLabel(QObject::tr("View Recordings"));
+    pbox->addChild(new PlayBoxOrdering());
+    pbox->addChild(new GeneratePreviewPixmaps());
+    pbox->addChild(new PreviewPixmapOffset());
+    pbox->addChild(new PlaybackPreview());
+    pbox->addChild(new AllRecGroupPassword());
+    pbox->addChild(new DisplayRecGroup());
+    pbox->addChild(new RememberRecGroup());
+    pbox->addChild(new UseCategoriesAsRecGroups());
+    addChild(pbox);
+
     addChild(new HwDecSettings());
 
     VerticalConfigurationGroup* seek = new VerticalConfigurationGroup(false);
@@ -1674,16 +1743,8 @@ GeneralSettings::GeneralSettings()
     general->addChild(new ChannelOrdering());
     general->addChild(new SmartChannelChange());
     general->addChild(new AdvancedRecord());
+    general->addChild(new DisplayChanNum());
     addChild(general);
-
-    VerticalConfigurationGroup* gen2 = new VerticalConfigurationGroup(false);
-    gen2->setLabel(QObject::tr("General"));
-    gen2->addChild(new PlayBoxOrdering());
-    gen2->addChild(new DisplayChanNum());
-    gen2->addChild(new GeneratePreviewPixmaps());
-    gen2->addChild(new PreviewPixmapOffset());
-    gen2->addChild(new PlaybackPreview());
-    addChild(gen2);
 
     VerticalConfigurationGroup* autoexp = new VerticalConfigurationGroup(false);
     autoexp->setLabel(QObject::tr("Global Auto Expire Settings"));

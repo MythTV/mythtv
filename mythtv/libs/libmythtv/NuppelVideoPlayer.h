@@ -175,6 +175,7 @@ class NuppelVideoPlayer
     void ReinitAudio(void);
 
     void ToggleLetterbox(void);
+    void Zoom(int direction);
     int GetLetterbox(void);
 
     void ExposeEvent(void);

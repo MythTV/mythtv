@@ -31,6 +31,12 @@ void VideoOutputNull::AspectChanged(float aspect)
     MoveResize();
 }
 
+void VideoOutputNull::Zoom(int direction)
+{
+    VideoOutput::Zoom(direction);
+    MoveResize();
+}
+
 void VideoOutputNull::InputChanged(int width, int height, float aspect)
 {
     VideoOutput::InputChanged(width, height, aspect);

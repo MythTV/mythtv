@@ -245,6 +245,8 @@ class TV : public QObject
     QString browsechanid;
     QString browsestarttime;
 
+    bool zoomMode;
+
     ProgramInfo *playbackinfo;
 
     QSqlDatabase *m_db;

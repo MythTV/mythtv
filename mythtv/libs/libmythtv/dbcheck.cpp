@@ -8,7 +8,7 @@ using namespace std;
 
 #include "mythcontext.h"
 
-const QString currentDatabaseVersion = "1028";
+const QString currentDatabaseVersion = "1029";
 
 void UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -46,7 +46,7 @@ void InitializeDatabase(void);
 void UpgradeTVDatabaseSchema(void)
 {
     QString dbver = gContext->GetSetting("DBSchemaVer");
-    
+
     if (dbver == currentDatabaseVersion)
         return;
 
@@ -579,6 +579,27 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 ""
 };
         performActualUpdate(updates, "1028", dbver);
+    }
+
+    if (dbver == "1028") {
+        const QString updates[] = {
+"ALTER TABLE channel ADD COLUMN commfree TINYINT NOT NULL default '0';",
+"ALTER TABLE record ADD COLUMN recgroup VARCHAR(32) default 'Default';",
+"ALTER TABLE record ADD COLUMN dupmethod INT NOT NULL DEFAULT 6;",
+"ALTER TABLE record ADD COLUMN dupin INT NOT NULL DEFAULT 15;",
+"UPDATE record SET dupmethod = 1 WHERE recorddups = 2;",
+"UPDATE record SET dupin = 2 WHERE recorddups = 1;",
+"ALTER TABLE record DROP COLUMN recorddups;",
+"ALTER TABLE recorded ADD COLUMN recgroup VARCHAR(32) default 'Default';",
+"ALTER TABLE recorded ADD COLUMN recordid INT DEFAULT NULL;",
+"CREATE TABLE recgrouppassword ("
+"  recgroup VARCHAR(32) NOT NULL PRIMARY KEY, "
+"  password VARCHAR(10) NOT NULL, "
+"  UNIQUE(recgroup)"
+");",
+""
+};
+        performActualUpdate(updates, "1029", dbver);
     }
 };
 

@@ -90,15 +90,35 @@ public:
     };
 };
 
-class SRRecordDups: public ComboBoxSetting, public SRSetting {
+class SRDupIn: public ComboBoxSetting, public SRSetting {
 public:
-    SRRecordDups(const ScheduledRecording& parent):
-        SRSetting(parent, "recorddups") {
-        setLabel(QObject::tr("Record duplicates"));
-        addSelection(QObject::tr("Never"), QString::number(kRecordDupsNever));
-        addSelection(QObject::tr("If deleted"),
-                     QString::number(kRecordDupsIfDeleted));
-        addSelection(QObject::tr("Always"), QString::number(kRecordDupsAlways));
+    SRDupIn(const ScheduledRecording& parent):
+        SRSetting(parent, "dupin") {
+        setLabel(QObject::tr("Duplicate Location"));
+        addSelection(QObject::tr("All places"),
+                 QString::number(kDupsInAll));
+        addSelection(QObject::tr("Current Recs"),
+                 QString::number(kDupsInRecorded));
+        addSelection(QObject::tr("Previous Recs"),
+                 QString::number(kDupsInOldRecorded));
+    };
+};
+
+class SRDupMethod: public ComboBoxSetting, public SRSetting {
+public:
+    SRDupMethod(const ScheduledRecording& parent):
+        SRSetting(parent, "dupmethod") {
+        setLabel(QObject::tr("Duplicate Check"));
+        addSelection(QObject::tr("Sub & Desc"),
+                 QString::number(kDupCheckSubDesc));
+        addSelection(QObject::tr("Even if Empty"),
+                 QString::number(kDupEmptySubDesc));
+        addSelection(QObject::tr("Subtitle"),
+                 QString::number(kDupCheckSub));
+        addSelection(QObject::tr("Description"),
+                 QString::number(kDupCheckDesc));
+        addSelection(QObject::tr("None"),
+                 QString::number(kDupCheckNone));
     };
 };
 
@@ -113,7 +133,7 @@ public:
 class SRPreRoll: public SpinBoxSetting, public SRSetting {
 public:
     SRPreRoll(const ScheduledRecording& parent):
-        SpinBoxSetting(-60, 60, 10, true),
+        SpinBoxSetting(-120, 120, 10, true),
         SRSetting(parent, "preroll") {
         setLabel(QObject::tr("Start Early (minutes)"));
     };
@@ -122,7 +142,7 @@ public:
 class SRPostRoll: public SpinBoxSetting, public SRSetting {
 public:
     SRPostRoll(const ScheduledRecording& parent):
-        SpinBoxSetting(-60, 240, 10, true),
+        SpinBoxSetting(-120, 240, 10, true),
         SRSetting(parent, "postroll") {
         setLabel(QObject::tr("End Late   (minutes)"));
     };
@@ -133,8 +153,7 @@ public:
     SRMaxEpisodes(const ScheduledRecording& parent):
         SpinBoxSetting(0, 60, 1),
         SRSetting(parent, "maxepisodes") {
-        setLabel(QObject::tr("Maximum number of episodes to keep "
-                             "(set to 0 for ALL)"));
+        setLabel(QObject::tr("Max episodes"));
     };
 };
 
@@ -142,8 +161,7 @@ class SRMaxNewest: public CheckBoxSetting, public SRSetting {
 public:
     SRMaxNewest(const ScheduledRecording& parent):
         SRSetting(parent, "maxnewest") {
-        setLabel(QObject::tr("Record new and delete oldest once "
-                             "maximum count is reached"));
+        setLabel(QObject::tr("Delete oldest over Max"));
         setValue(false);
     };
 };
@@ -221,6 +239,27 @@ public:
     };
 };
 
+class SRRecGroup: public ComboBoxSetting, public SRSetting {
+public:
+    SRRecGroup(const ScheduledRecording& parent):
+        ComboBoxSetting(true),
+        SRSetting(parent, "recgroup") {
+        setLabel(QObject::tr("Recording Group"));
+        addSelection(QObject::tr("Default"), QObject::tr("Default"));
+
+        QSqlDatabase *m_db = QSqlDatabase::database();
+        QString thequery = QString("SELECT DISTINCT recgroup from recorded "
+                                   "WHERE recgroup <> '%1'")
+                                   .arg(QObject::tr("Default"));
+        QSqlQuery query = m_db->exec(thequery);
+
+        if (query.isActive() && query.numRowsAffected() > 0)
+            while (query.next())
+                addSelection(query.value(0).toString(),
+                             query.value(0).toString());
+    };
+};
+
 class SRCategory: public LineEditSetting, public SRSetting {
 public:
     SRCategory(const ScheduledRecording& parent):
@@ -233,7 +272,8 @@ ScheduledRecording::ScheduledRecording() {
     addChild(id = new ID());
     addChild(type = new SRRecordingType(*this));
     addChild(profile = new SRProfileSelector(*this));
-    addChild(recorddups = new SRRecordDups(*this));
+    addChild(dupin = new SRDupIn(*this));
+    addChild(dupmethod = new SRDupMethod(*this));
     addChild(autoexpire = new SRAutoExpire(*this));
     addChild(maxepisodes = new SRMaxEpisodes(*this));
     addChild(preroll = new SRPreRoll(*this));
@@ -249,6 +289,7 @@ ScheduledRecording::ScheduledRecording() {
     addChild(endDate = new SREndDate(*this));
     addChild(category = new SRCategory(*this));
     addChild(recpriority = new SRRecPriority(*this));
+    addChild(recgroup = new SRRecGroup(*this));
 
     m_pginfo = NULL;
 }
@@ -265,6 +306,7 @@ void ScheduledRecording::fromProgramInfo(ProgramInfo* proginfo)
     endDate->setValue(proginfo->endts.date());
     category->setValue(proginfo->category);
     recpriority->setValue(proginfo->recpriority);
+    recgroup->setValue(proginfo->recgroup);
     autoexpire->setValue(gContext->GetNumSetting("AutoExpireDefault", 0));
 }
 
@@ -397,10 +439,15 @@ void ScheduledRecording::save(QSqlDatabase* db) {
 }
 
 void ScheduledRecording::remove(QSqlDatabase* db) {
-    QString query = QString("DELETE FROM record WHERE recordid = %1").arg(getRecordID());
+    QString query = QString("DELETE FROM record WHERE recordid = %1")
+                            .arg(getRecordID());
     db->exec(query);
-    query = QString("DELETE FROM recordoverride WHERE recordid = %1").arg(getRecordID());
+    query = QString("DELETE FROM recordoverride WHERE recordid = %1")
+                    .arg(getRecordID());
     db->exec(query);
+    query = QString("UPDATE recordid FROM recorded SET recordid = NULL "
+                    "WHERE recordid = %1")
+                    .arg(getRecordID());
 }
 
 void ScheduledRecording::signalChange(QSqlDatabase* db) {
@@ -549,13 +596,14 @@ MythDialog* ScheduledRecording::dialogWidget(MythMainWindow *parent,
     vbox1->addWidget(profile->configWidget(this, dialog));
     vbox1->addWidget(recpriority->configWidget(this, dialog));
     vbox1->addWidget(autoexpire->configWidget(this, dialog));
+    vbox1->addWidget(maxepisodes->configWidget(this, dialog));
+    vbox1->addWidget(maxnewest->configWidget(this, dialog));
 
-    vbox2->addWidget(recorddups->configWidget(this, dialog));
+    vbox2->addWidget(recgroup->configWidget(this, dialog));
     vbox2->addWidget(preroll->configWidget(this, dialog));
     vbox2->addWidget(postroll->configWidget(this, dialog));
-
-    vbox->addWidget(maxepisodes->configWidget(this, dialog));
-    vbox->addWidget(maxnewest->configWidget(this, dialog));
+    vbox2->addWidget(dupmethod->configWidget(this, dialog));
+    vbox2->addWidget(dupin->configWidget(this, dialog));
 
     MythPushButton *button = new MythPushButton(tr("See a list of all up-coming"
                                                    " episodes/playtimes."),
@@ -661,6 +709,10 @@ void ScheduledRecording::setEnd(const QDateTime& end) {
 
 void ScheduledRecording::setRecPriority(int newrecpriority) {
     recpriority->setValue(newrecpriority);
+}
+
+void ScheduledRecording::setRecGroup(const QString& newrecgroup) {
+    recgroup->setValue(newrecgroup);
 }
 
 QString ScheduledRecording::getProfileName(void) const {

@@ -26,6 +26,7 @@ class VideoOutputDirectfb: public VideoOutput
 
     void InputChanged(int width, int height, float aspect);
     void AspectChanged(float aspect);
+    void Zoom(int direction);
 
     //void EmbedInWidget(unsigned long wid, int x, int y, int w, int h);
     //void StopEmbedding(void);

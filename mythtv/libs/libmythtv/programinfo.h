@@ -7,7 +7,7 @@
 #include <qmap.h>
 #include "scheduledrecording.h"
 
-#define NUMPROGRAMLINES 29
+#define NUMPROGRAMLINES 31
 
 enum MarkTypes {
     MARK_UPDATED_CUT = -3,
@@ -80,7 +80,7 @@ class ProgramInfo
     // returns 0 for one-time, 1 for weekdaily, 2 for weekly
     int IsProgramRecurring(void);
 
-    // checks title, subtitle, description
+    // checks for duplicates according to dupmethod
     bool IsSameProgram(const ProgramInfo& other) const;
     // checks chanid, start/end times, sourceid, cardid, inputid.
     bool IsSameTimeslot(const ProgramInfo& other) const;
@@ -100,6 +100,8 @@ class ProgramInfo
                                const QDateTime &newstartts,
                                const QDateTime &newendts);
     void ApplyRecordRecPriorityChange(QSqlDatabase *db, int);
+    void ApplyRecordRecGroupChange(QSqlDatabase *db,
+                               const QString &newrecgroup);
     void ToggleRecord(QSqlDatabase *dB);
 
     ScheduledRecording* GetScheduledRecording(QSqlDatabase *db) 
@@ -204,6 +206,8 @@ class ProgramInfo
     QString chansign;
     QString channame;
     int recpriority;
+    QString recgroup;
+    int chancommfree;
 
     QString pathname;
     long long filesize;
@@ -225,7 +229,8 @@ class ProgramInfo
     RecStatusType recstatus;
     unsigned recordid;
     RecordingType rectype;
-    RecordingDupsType recdups;
+    RecordingDupInType dupin;
+    RecordingDupMethodType dupmethod;
 
     int sourceid;
     int inputid;

@@ -95,6 +95,16 @@ LiveTV Browse Mode:
 - R/r           Toggle recording of current program (cycles through types)
 - ESC/O         Exit Browse mode.
 
+Playback Recording Zoom Mode:
+- Left          Move video to Left
+- Right         Move video to Right
+- Up            Move video Up
+- Down          Move video Down
+- PageUp        Zoom In
+- PageDown      Zoom Out
+- Enter/Space   Exit Zoom mode leaving picture at current size and position
+- ESC           Exit Zoom mode and return to original size.
+
 If you have two or more tuner cards:
 
 - V toggle Picture-in-picture on or off

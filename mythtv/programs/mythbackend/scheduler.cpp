@@ -509,13 +509,13 @@ void Scheduler::PruneList(void)
                 if (((second->conflicting && !first->conflicting) ||
                      second->recstartts < now.addSecs(-15) || first->override == 1) 
                     && second->override != 1 
-                    && second->recdups != kRecordDupsAlways)
+                    && ~second->dupmethod & kDupCheckNone)
                 {
                     second->recording = false;
                     second->recstatus = rsOtherShowing;
                 }
                 else if (first->override != 1
-                         && first->recdups != kRecordDupsAlways)
+                         && ~first->dupmethod & kDupCheckNone)
                 {
                     first->recording = false;
                     first->recstatus = rsOtherShowing;
@@ -1683,12 +1683,12 @@ void Scheduler::findAllProgramsToRecord(list<ProgramInfo*>& proglist) {
 "program.title, program.subtitle, program.description, "
 "channel.channum, channel.callsign, channel.name, "
 "oldrecorded.starttime IS NOT NULL AS oldrecduplicate, program.category, "
-"record.recpriority + channel.recpriority, record.recorddups, "
+"record.recpriority + channel.recpriority, record.dupin, "
 "recorded.starttime IS NOT NULL as recduplicate, record.type, "
 "record.recordid, recordoverride.type, "
 "program.starttime - INTERVAL record.preroll minute, "
 "program.endtime + INTERVAL record.postroll minute, "
-"program.previouslyshown "
+"program.previouslyshown, record.recgroup, record.dupmethod "
 "FROM record "
 " INNER JOIN channel ON (channel.chanid = program.chanid) "
 " INNER JOIN program ON (program.title = record.title) "
@@ -1696,17 +1696,17 @@ void Scheduler::findAllProgramsToRecord(list<ProgramInfo*>& proglist) {
 "  ( "
 "    oldrecorded.title IS NOT NULL AND oldrecorded.title <> '' AND program.title = oldrecorded.title "
 "     AND "
-"    oldrecorded.subtitle IS NOT NULL AND oldrecorded.subtitle <> '' AND program.subtitle = oldrecorded.subtitle "
+"    (((record.dupmethod & 0x02) = 0) OR (oldrecorded.subtitle IS NOT NULL AND (oldrecorded.subtitle <> '' OR record.dupmethod & 0x10) AND program.subtitle = oldrecorded.subtitle)) "
 "     AND "
-"    oldrecorded.description IS NOT NULL AND oldrecorded.description <> '' AND program.description = oldrecorded.description"
+"    (((record.dupmethod & 0x04) = 0) OR (oldrecorded.description IS NOT NULL AND (oldrecorded.description <> '' OR record.dupmethod & 0x10) AND program.description = oldrecorded.description)) "
 "  ) "
 " LEFT JOIN recorded ON "
 "  ( "
 "    recorded.title IS NOT NULL AND recorded.title <> '' AND program.title = recorded.title "
 "     AND "
-"    recorded.subtitle IS NOT NULL AND recorded.subtitle <> '' AND program.subtitle = recorded.subtitle "
+"    (((record.dupmethod & 0x02) = 0) OR (recorded.subtitle IS NOT NULL AND (recorded.subtitle <> '' OR record.dupmethod & 0x10) AND program.subtitle = recorded.subtitle)) "
 "     AND "
-"    recorded.description IS NOT NULL AND recorded.description <> '' AND program.description = recorded.description"
+"    (((record.dupmethod & 0x04) = 0) OR (recorded.description IS NOT NULL AND (recorded.description <> '' OR record.dupmethod & 0x10) AND program.description = recorded.description)) "
 "  ) "
 " LEFT JOIN recordoverride ON "
 "  ( "
@@ -1775,7 +1775,9 @@ void Scheduler::findAllProgramsToRecord(list<ProgramInfo*>& proglist) {
              proginfo->channame = QString::fromUtf8(result.value(9).toString());
              proginfo->category = QString::fromUtf8(result.value(11).toString());
              proginfo->recpriority = result.value(12).toInt();
-             proginfo->recdups = RecordingDupsType(result.value(13).toInt());
+             proginfo->dupin = RecordingDupInType(result.value(13).toInt());
+             proginfo->dupmethod =
+                 RecordingDupMethodType(result.value(22).toInt());
              proginfo->rectype = RecordingType(result.value(15).toInt());
              proginfo->recordid = result.value(16).toInt();
              proginfo->override = result.value(17).toInt();
@@ -1796,30 +1798,31 @@ void Scheduler::findAllProgramsToRecord(list<ProgramInfo*>& proglist) {
              }
 
              proginfo->repeat = result.value(20).toInt();
+             proginfo->recgroup = result.value(21).toString();
 
              if (proginfo->override == 2)
              {
                  proginfo->recording = false;
                  proginfo->recstatus = rsManualOverride;
              }
-             else if (proginfo->rectype != kSingleRecord &&
-                      proginfo->override != 1 &&
-                      proginfo->recdups != kRecordDupsAlways)
+             else if ((proginfo->rectype != kSingleRecord) &&
+                      (proginfo->override != 1) &&
+                      (~proginfo->dupmethod & kDupCheckNone))
              {
-                 if (proginfo->recdups == kRecordDupsIfDeleted)
-                 {
-                     if (result.value(14).toInt())
-                     {
-                         proginfo->recording = false;
-                         proginfo->recstatus = rsCurrentRecording;
-                     }
-                 }
-                 else
+                 if (proginfo->dupin & kDupsInOldRecorded)
                  {
                      if (result.value(10).toInt())
                      {
                          proginfo->recording = false;
                          proginfo->recstatus = rsPreviousRecording;
+                     }
+                 }
+                 else if (proginfo->dupin & kDupsInRecorded)
+                 {
+                     if (result.value(14).toInt())
+                     {
+                         proginfo->recording = false;
+                         proginfo->recstatus = rsCurrentRecording;
                      }
                  }
              }
@@ -1854,7 +1857,8 @@ void Scheduler::findAllScheduledPrograms(list<ProgramInfo*>& proglist)
     QString query = QString("SELECT record.chanid, record.starttime, "
 "record.startdate, record.endtime, record.enddate, record.title, "
 "record.subtitle, record.description, record.recpriority, record.type, "
-"channel.name, record.recordid FROM record "
+"channel.name, record.recordid, record.recgroup, record.dupin, "
+"record.dupmethod FROM record "
 "LEFT JOIN channel ON (channel.chanid = record.chanid) "
 "ORDER BY title ASC;");
 
@@ -1892,11 +1896,20 @@ void Scheduler::findAllScheduledPrograms(list<ProgramInfo*>& proglist)
             }
 
             proginfo->title = QString::fromUtf8(result.value(5).toString());
+
             if (proginfo->rectype == kSingleRecord)
-                proginfo->subtitle = QString::fromUtf8(result.value(6).toString());
-            proginfo->description = QString::fromUtf8(result.value(7).toString());
+                proginfo->subtitle =
+                    QString::fromUtf8(result.value(6).toString());
+
+            proginfo->description =
+                QString::fromUtf8(result.value(7).toString());
             proginfo->recpriority = result.value(8).toInt();
             proginfo->channame = QString::fromUtf8(result.value(10).toString());
+            proginfo->recgroup = result.value(12).toString();
+            proginfo->dupin = RecordingDupInType(result.value(13).toInt());
+            proginfo->dupmethod =
+                RecordingDupMethodType(result.value(14).toInt());
+
             proginfo->recstartts = proginfo->startts;
             proginfo->recendts = proginfo->endts;
 

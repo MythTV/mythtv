@@ -573,6 +573,12 @@ void VideoOutputDirectfb::AspectChanged(float aspect)
     cerr << "AspectChanged()" << endl;
 }
 
+void VideoOutputDirectfb::Zoom(int direction)
+{
+    //**FIXME - -do something here
+    cerr << "Zoom()" << endl;
+}
+
 bool VideoOutputDirectfb::CreateDirectfbBuffers(void)
 {
     for (int i = 0; i < numbuffers + 1; i++)

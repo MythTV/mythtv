@@ -154,6 +154,7 @@ TV::TV(QSqlDatabase *db)
     editmode = false;
     queuedTranscode = false;
     browsemode = false;
+    zoomMode = false;
     prbuffer = NULL;
     nvp = NULL;
     osd = NULL;
@@ -1060,6 +1061,46 @@ void TV::ProcessKeypress(QKeyEvent *e)
             return;
     }
 
+    if (zoomMode)
+    {
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        {
+            action = actions[i];
+            handled = true;
+
+            if (action == "UP" || action == "CHANNELUP")
+                nvp->Zoom(kZoomUp);
+            else if (action == "DOWN" || action == "CHANNELDOWN")
+                nvp->Zoom(kZoomDown);
+            else if (action == "LEFT")
+                nvp->Zoom(kZoomLeft);
+            else if (action == "RIGHT")
+                nvp->Zoom(kZoomRight);
+            else if (action == "ESCAPE")
+            {
+                nvp->Zoom(kZoomHome);
+                zoomMode = false;
+            }
+            else if (action == "SELECT")
+            {
+                zoomMode = false;
+                QString desc = tr("Zoom Mode OFF");
+                QString curTime = "";
+                int pos = nvp->calcSliderPos(curTime);
+                osd->StartPause(pos, false, desc, curTime, 1);
+                update_osd_pos = false;
+            }
+            else if (action == "JUMPFFWD")
+                nvp->Zoom(kZoomIn);
+            else if (action == "JUMPRWND")
+                nvp->Zoom(kZoomOut);
+            else
+                handled = false;
+        }
+
+        return;
+    }
+
     if (nvp->GetOSD() && osd->DialogShowing(dialogname))
     {
         for (unsigned int i = 0; i < actions.size() && !handled; i++)
@@ -1134,7 +1175,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                     else if (!paused)
                         activenvp->Play(1.0, true);
                 }     
-	        else if (dialogname == "ccwarningstring")
+            else if (dialogname == "ccwarningstring")
                 {
                     if (osd->GetDialogResponse(dialogname) == 1)
                         ChangeChannelByString(lastCC, true);
@@ -3072,6 +3113,9 @@ void TV::DoProgramMenu(void)
     else
         options += tr("Auto Expire");
 
+    if (!zoomMode)
+        options += tr("Activate Zoom Mode");
+
     options += tr("Cancel");
 
     osd->NewDialogBox(dialogname, message, options, 10); 
@@ -3110,12 +3154,25 @@ void TV::ProgramMenuAction(int result)
             if (playbackinfo->GetAutoExpireFromRecorded(m_db))
             {
                 playbackinfo->SetAutoExpire(false, m_db);
-                desc = "Auto-Expire OFF";
+                desc = tr("Auto-Expire OFF");
             }
             else
             {
                 playbackinfo->SetAutoExpire(true, m_db);
-                desc = "Auto-Expire ON";
+                desc = tr("Auto-Expire ON");
+            }
+            break;
+
+        case 3:
+            if (!zoomMode)
+            {
+                zoomMode = true;
+                desc = tr("Zoom Mode ON");
+            }
+            else
+            {
+                zoomMode = false;
+                desc = tr("Zoom Mode OFF");
             }
             break;
     }

@@ -342,7 +342,8 @@ bool Channel::SetChannelByString(const QString &chan)
     }
 
     pthread_mutex_lock(db_lock);
-    QString thequery = QString("SELECT finetune, freqid, tvformat, freqtable "
+    QString thequery = QString("SELECT finetune, freqid, tvformat, "
+                                   "freqtable, commfree "
                                "FROM channel "
                                "LEFT JOIN videosource USING (sourceid) "
                                "WHERE channum = \"%1\" AND "
@@ -364,6 +365,7 @@ bool Channel::SetChannelByString(const QString &chan)
     QString freqid = query.value(1).toString();
     QString tvformat = query.value(2).toString();
     QString freqtable = query.value(3).toString();
+    commfree = query.value(4).toBool();
 
     if (freqtable == "default" || freqtable.isNull() || freqtable.isEmpty())
         SetFreqTable(defaultFreqTable);

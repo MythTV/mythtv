@@ -619,11 +619,16 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
     dblock.lock();
     MythContext::KickDatabase(m_db);
 
-    thequery = "SELECT recorded.chanid,starttime,endtime,title,subtitle,"
-               "description,hostname,channum,name,callsign,commflagged,cutlist,"
-               "autoexpire,editing,bookmark,category FROM recorded "
+    thequery = "SELECT recorded.chanid,recorded.starttime,recorded.endtime,"
+               "recorded.title,recorded.subtitle,recorded.description,"
+               "recorded.hostname,channum,name,callsign,commflagged,cutlist,"
+               "recorded.autoexpire,editing,bookmark,recorded.category,"
+               "recorded.recgroup,record.dupin,record.dupmethod,"
+               "record.recordid "
+               "FROM recorded "
+               "LEFT JOIN record ON recorded.recordid = record.recordid "
                "LEFT JOIN channel ON recorded.chanid = channel.chanid "
-               "ORDER BY starttime";
+               "ORDER BY recorded.starttime";
 
     if (type == "Delete")
         thequery += " DESC";
@@ -653,6 +658,13 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             proginfo->subtitle = QString::fromUtf8(query.value(4).toString());
             proginfo->description = QString::fromUtf8(query.value(5).toString());
             proginfo->hostname = query.value(6).toString();
+
+            if (query.value(16) != NULL)
+                proginfo->dupin = RecordingDupInType(query.value(16).toInt());
+            if (query.value(17) != NULL)
+                proginfo->dupmethod = RecordingDupMethodType(query.value(17).toInt());
+            if (query.value(18) != NULL)
+                proginfo->recordid = query.value(18).toInt();
 
             if (proginfo->hostname.isEmpty() || proginfo->hostname.isNull())
                 proginfo->hostname = gContext->GetHostName();
@@ -693,6 +705,8 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             QString test = query.value(15).toString();
             if (test != QString::null) 
                proginfo->category = QString::fromUtf8(test);
+
+            proginfo->recgroup = query.value(16).toString();
 
             QString lpath = proginfo->GetRecordFilename(fileprefix);
             PlaybackSock *slave = NULL;

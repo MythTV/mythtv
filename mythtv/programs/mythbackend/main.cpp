@@ -120,6 +120,7 @@ int main(int argc, char **argv)
 
     bool daemonize = false;
     bool printsched = false;
+    bool nosched = false;
     bool printexpire = false;
     for (int argpos = 1; argpos < a.argc(); ++argpos)
     {
@@ -249,6 +250,10 @@ int main(int argc, char **argv)
         else if (!strcmp(a.argv()[argpos],"--printsched"))
         {
             printsched = true;
+        } 
+        else if (!strcmp(a.argv()[argpos],"--nosched"))
+        {
+            nosched = true;
         } 
         else if (!strcmp(a.argv()[argpos],"--printexpire"))
         {
@@ -430,6 +435,10 @@ int main(int argc, char **argv)
     {
         cerr << "Starting up as the master server.\n";
         ismaster = true;
+
+        if (nosched)
+            cerr << "******** The Scheduler has been DISABLED with "
+                    "the --nosched option ********\n";
     }
     else
     {
@@ -438,7 +447,7 @@ int main(int argc, char **argv)
  
     bool runsched = setupTVs(ismaster);
 
-    if (ismaster && runsched)
+    if (ismaster && runsched && !nosched)
     {
         QSqlDatabase *scdb = QSqlDatabase::database("SUBDB");
         sched = new Scheduler(true, &tvList, scdb);

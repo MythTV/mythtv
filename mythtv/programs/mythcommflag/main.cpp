@@ -50,7 +50,7 @@ void FlagCommercials(QSqlDatabase *db, QString chanid, QString starttime)
 
     if (!quiet)
     {
-        printf( "%-6.6s  %-14.14s  %-44.44s  ",
+        printf( "%-6.6s  %-14.14s  %-41.41s  ",
             chanid.ascii(), starttime.ascii(), program_info->title.ascii());
         fflush( stdout );
     
@@ -408,9 +408,9 @@ int main(int argc, char *argv[])
         if (a.argc() == 1)
             printf( "ALL Un-flagged programs\n" );
         printf( "ChanID  Start Time      "
-                "Title                                         Breaks\n" );
+                "Title                                      Breaks\n" );
         printf( "------  --------------  "
-                "--------------------------------------------  ------\n" );
+                "-----------------------------------------  ------\n" );
     }
 
     if (!chanid.isEmpty() && !starttime.isEmpty())

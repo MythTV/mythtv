@@ -772,8 +772,8 @@ void MythContext::SaveSetting(const QString &key, const QString &newValue)
     {
         KickDatabase(d->m_db);
 
-        QString querystr = QString("DELETE FROM settings WHERE value = '%1' "
-                                   "AND hostname = '%2';")
+        QString querystr = QString("DELETE FROM settings WHERE value = \"%1\" "
+                                   "AND hostname = \"%2\";")
                                   .arg(key).arg(d->m_localhostname);
 
         QSqlQuery result = d->m_db->exec(querystr);
@@ -781,7 +781,7 @@ void MythContext::SaveSetting(const QString &key, const QString &newValue)
             MythContext::DBError("Clear setting", querystr);
 
         querystr = QString("INSERT settings ( value, data, hostname ) "
-                           "VALUES ( '%1', '%2', '%3' );")
+                           "VALUES ( \"%1\", \"%2\", \"%3\" );")
                            .arg(key).arg(newValue).arg(d->m_localhostname);
 
         result = d->m_db->exec(querystr);

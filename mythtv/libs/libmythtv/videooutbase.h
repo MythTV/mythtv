@@ -49,6 +49,17 @@ enum PIPLocations
     kPIPBottomRight
 };
 
+enum ZoomDirections
+{
+    kZoomHome = 0,
+    kZoomIn,
+    kZoomOut,
+    kZoomUp,
+    kZoomDown,
+    kZoomLeft,
+    kZoomRight
+};
+
 class VideoOutput
 {
   public:
@@ -74,6 +85,7 @@ class VideoOutput
     virtual void StopEmbedding(void);
 
     virtual void MoveResize(void);
+    virtual void Zoom(int direction);
  
     virtual void GetDrawSize(int &xoff, int &yoff, int &width, int &height);
 
@@ -153,6 +165,9 @@ class VideoOutput
     int XJ_width, XJ_height;
     float XJ_aspect;
 
+    int w_mm;
+    int h_mm;
+
     int img_xoff, img_yoff;
     float img_hscanf, img_vscanf;
 
@@ -170,6 +185,10 @@ class VideoOutput
     int letterbox;
 
     int PIPLocation;
+
+    int ZoomedIn;
+    int ZoomedUp;
+    int ZoomedRight;
 
     VideoFrame *vbuffers;
 

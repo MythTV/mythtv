@@ -107,6 +107,16 @@ void VideoOutputVIA::AspectChanged(float aspect)
     pthread_mutex_unlock(&lock);
 }
 
+void VideoOutputVIA::Zoom(int direction)
+{
+    pthread_mutex_lock(&lock);
+
+    VideoOutput::Zoom(direction);
+    MoveResize();
+
+    pthread_mutex_unlock(&lock);
+}
+
 void VideoOutputVIA::InputChanged(int width, int height, float aspect)
 {
     pthread_mutex_lock(&lock);
@@ -144,7 +154,6 @@ bool VideoOutputVIA::Init(int width, int height, float aspect,
                           WId winid, int winx, int winy, int winw, 
                           int winh, WId embedid)
 {
-    int w_mm, h_mm;
     bool usingXinerama;
     int event_base, error_base;
 
@@ -172,8 +181,13 @@ bool VideoOutputVIA::Init(int width, int height, float aspect,
                                             &error_base) &&
                      XineramaIsActive(data->XJ_disp));
 
-    if (w_mm == 0 || h_mm == 0 || usingXinerama )
+    if (w_mm == 0 || h_mm == 0 || usingXinerama ||
+            gContext->GetNumSetting("GuiSizeForTV", 0))
+    {
+        w_mm = (int)(300 * XJ_aspect);
+        h_mm = 300;
         data->display_aspect = XJ_aspect;
+    }
     else
         data->display_aspect = (float)w_mm / h_mm;
 

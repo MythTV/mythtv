@@ -81,6 +81,10 @@ VideoOutput::VideoOutput()
 
     needrepaint = false;
 
+    ZoomedIn = 0;
+    ZoomedUp = 0;
+    ZoomedRight = 0;
+
     piptmpbuf = NULL;
     pipscontext = NULL;
 
@@ -91,6 +95,9 @@ VideoOutput::VideoOutput()
     desired_pipw = 160;
 
     allowpreviewepg = true;
+
+    w_mm = 400;
+    h_mm = 300;
 }
 
 VideoOutput::~VideoOutput()
@@ -352,14 +359,9 @@ void VideoOutput::MoveResize(void)
         }
     }
 
-    // Manage aspect ratio and letterbox settings.  XJ_aspect is the
-    // (desired) video aspect ratio.  GetDisplayAspect provides the
-    // actual display aspect ratio, in mm not pixels.  In addition,
-    // letterbox == 2 indicates a zoom mode (large overscan).  Do no
-    // conversion between x and y sizes in pixels, as pixels are not
-    // necessarily square.
-    // n.b. assumes aspect < 1.4 is 4:3 and > 1.4 is 16:9; other
-    // aspect ratios wil cause incorrect results
+    // Manage aspect ratio and letterbox settings.  Code should take into
+    // account the aspect ratios of both the video as well as the actual
+    // screen to allow proper letterboxing to take place.
     
     //cout << "XJ aspect " << XJ_aspect << endl;
     //cout << "Display aspect " << GetDisplayAspect() << endl;
@@ -371,16 +373,13 @@ void VideoOutput::MoveResize(void)
         // Video is 4:3
         if (letterbox == -1)
             letterbox = 0;
-        if (GetDisplayAspect() <= 1.4)
+
+        if (GetDisplayAspect() > (XJ_aspect * 0.97))
         {
-            // Display is 4:3 - do nothing
-        }
-        else 
-        {
-            // Display is 16:9 - pillarbox it
-            // image in center, 3/4 of the overall width
-            dispxoff += (dispwoff/8);
-            dispwoff = dispwoff*3/4;
+            float pixNeeded = (h_mm * XJ_aspect) * ((float)dispw / w_mm);
+
+            dispxoff += (dispwoff - (int)pixNeeded) / 2;
+            dispwoff = (int)pixNeeded;
         }
     }
     else 
@@ -388,16 +387,13 @@ void VideoOutput::MoveResize(void)
         // Video is 16:9
         if (letterbox == -1)
             letterbox = 1;
-        if (GetDisplayAspect() <= 1.4)
+
+        if ((GetDisplayAspect() * 0.97) < XJ_aspect)
         {
-            // Display is 4:3 -- letterbox it
-            // image in center, 3/4 of the overall height
-            dispyoff += (disphoff/8);
-            disphoff = disphoff*3/4;
-        }
-        else
-        {
-            // Display is 16:9 - do nothing
+            float pixNeeded = (w_mm / XJ_aspect) * ((float)disph / h_mm);
+
+            dispyoff += (disphoff - (int)pixNeeded) / 2;
+            disphoff = (int)pixNeeded;
         }
     }
 
@@ -411,6 +407,27 @@ void VideoOutput::MoveResize(void)
         dispwoff = dispwoff*4/3;
         dispyoff -= (disphoff/6);
         disphoff = disphoff*4/3;
+    }
+
+    if (ZoomedIn)
+    {
+        int oldDW = dispwoff;
+        int oldDH = disphoff;
+        dispwoff = (int)(dispwoff * (1 + (ZoomedIn * .01)));
+        disphoff = (int)(disphoff * (1 + (ZoomedIn * .01)));
+
+        dispxoff += (oldDW - dispwoff) / 2;
+        dispyoff += (oldDH - disphoff) / 2;
+    }
+
+    if (ZoomedUp)
+    {
+        dispyoff = (int)(dispyoff * (1 - (ZoomedUp * .01)));
+    }
+
+    if (ZoomedRight)
+    {
+        dispxoff = (int)(dispxoff * (1 - (ZoomedRight * .01)));
     }
 
     //printf("After: %dx%d%+d%+d\n", dispwoff, disphoff, dispxoff, 
@@ -427,6 +444,46 @@ void VideoOutput::MoveResize(void)
            .arg(imgx).arg(imgy).arg(imgw).arg(imgh));
 
     DrawUnusedRects();
+}
+
+void VideoOutput::Zoom(int direction)
+{
+    switch (direction)
+    {
+        case kZoomHome:
+                ZoomedIn = 0;
+                ZoomedUp = 0;
+                ZoomedRight = 0;
+                break;
+        case kZoomIn:
+                if (ZoomedIn < 200)
+                    ZoomedIn += 10;
+                else
+                    ZoomedIn = 0;
+                break;
+        case kZoomOut:
+                if (ZoomedIn > -50)
+                    ZoomedIn -= 10;
+                else
+                    ZoomedIn = 0;
+                break;
+        case kZoomUp:
+                if (ZoomedUp < 90)
+                    ZoomedUp += 10;
+                break;
+        case kZoomDown:
+                if (ZoomedUp > -90)
+                    ZoomedUp -= 10;
+                break;
+        case kZoomLeft:
+                if (ZoomedRight < 90)
+                    ZoomedRight += 10;
+                break;
+        case kZoomRight:
+                if (ZoomedRight > -90)
+                    ZoomedRight -= 10;
+                break;
+    }
 }
 
 void VideoOutput::ToggleLetterbox(void)

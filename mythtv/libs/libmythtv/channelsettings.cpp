@@ -154,6 +154,17 @@ public:
     };
 };
 
+class CommFree: public CheckBoxSetting, public CSetting {
+public:
+    CommFree(const ChannelID& id):
+        CheckBoxSetting(), CSetting(id, "commfree") {
+        setLabel("Commercial Free");
+        setHelpText(QObject::tr("If set automatic commercial flagging will "
+                "be skipped for this channel.  Useful for "
+                "premium channels like HBO."));
+    };
+};
+
 /*****************************************************************************
         Channel Options - Video 4 Linux
  *****************************************************************************/
@@ -530,6 +541,7 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID& id)
     addChild(new Icon(id));
     addChild(new VideoFilters(id));
     addChild(new XmltvID(id));
+    addChild(new CommFree(id));
 };
 
 ChannelOptionsV4L::ChannelOptionsV4L(const ChannelID& id)

@@ -75,7 +75,25 @@ void MythComboBox::focusOutEvent(QFocusEvent *e)
     this->unsetPalette();
 
     if (lineEdit())
+    {
         lineEdit()->unsetPalette();
+
+        // commit change if the user was editting an entry
+        QString curText = currentText();
+        int i;
+        bool foundItem = false;
+
+        for(i = 0; i < count(); i++)
+            if (curText == text(i))
+                foundItem = true;
+
+        if ( !foundItem )
+        {
+            insertItem(curText);
+            setCurrentItem(count()-1);
+            removeItem(count()-1);
+        }
+    }
 
     QComboBox::focusOutEvent(e);
 }

@@ -658,7 +658,8 @@ void TVRec::TeardownRecorder(bool killFile)
 
         if (!prematurelystopped)
         {
-            if (gContext->GetNumSetting("AutoCommercialFlag", 1))
+            if ((gContext->GetNumSetting("AutoCommercialFlag", 1)) &&
+                (prevRecording->chancommfree == 0))
                 FlagCommercials();
 
             if (autoTranscode)

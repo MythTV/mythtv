@@ -1266,6 +1266,17 @@
         <font>info</font>
         <multiline>yes</multiline>
       </textarea>
+<!--
+      <textarea name="recgroupinfo" draworder="6">
+        <area>250,100,140,30</area>
+        <font>info</font>
+        <value>Rec Group:</value>
+      </textarea>
+      <textarea name="recgroup" draworder="6">
+        <area>400,100,180,35</area>
+        <font>info</font>
+      </textarea>
+-->
 
       <image name="commflagged" draworder="6">
         <filename>commflagged.png</filename>
