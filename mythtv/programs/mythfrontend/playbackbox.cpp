@@ -58,7 +58,8 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     skipCnt = 0;
     
     previewPixmap = NULL;
-    previewProgramInfo = NULL;
+    previewStartts = QDateTime::currentDateTime();
+    previewChanid = "";
     
     updateFreeSpace = true;
     freeSpaceTotal = 0;
@@ -2043,7 +2044,8 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
         return retpixmap;
         
     // Check and see if we've already tried this one.    
-    if (pginfo == previewProgramInfo)
+    if (pginfo->startts == previewStartts &&
+        pginfo->chanid == previewChanid)
     {
         if (previewPixmap)
             retpixmap = *previewPixmap;
@@ -2068,7 +2070,8 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
     previewPixmap = gContext->LoadScalePixmap(filename);
     if (previewPixmap)
     {
-        previewProgramInfo = pginfo;
+        previewStartts = pginfo->startts;
+        previewChanid = pginfo->chanid;
         retpixmap = *previewPixmap;
         return retpixmap;
     }
@@ -2083,7 +2086,8 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
         if (previewPixmap)
         {
             retpixmap = *previewPixmap;
-            previewProgramInfo = pginfo;
+            previewStartts = pginfo->startts;
+            previewChanid = pginfo->chanid;
             return retpixmap;
         }
 
@@ -2113,7 +2117,8 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
     }
 
     retpixmap = *previewPixmap;
-    previewProgramInfo = pginfo;
+    previewStartts = pginfo->startts;
+    previewChanid = pginfo->chanid;
 
     return retpixmap;
 }
