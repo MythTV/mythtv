@@ -34,8 +34,10 @@
 
 #ifdef USING_OPENGL_VSYNC
 #define GLX_GLXEXT_PROTOTYPES
+#define XMD_H 1
 #include <GL/glx.h>
 #include <GL/gl.h>
+#undef GLX_ARB_get_proc_address
 #include <GL/glxext.h>
 #endif
 
