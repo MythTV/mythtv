@@ -1,7 +1,7 @@
 This is the README file for the MythLCD package.
-September 19, 2002
+September 21, 2002
 
-Version: 0.1
+Version: 0.1 (still)
 (c) 2002 Thor Sigvaldason (mythtv@lamedomainname.com) 
 and Isaac Richards (ijr@po.cwru.edu)
 
@@ -25,16 +25,8 @@ Contents
 1.0 About
 =========
 
-	MythLCD is essentially a single C++ object which can act as an
-LCDproc client for MythTV applications. That means that data from a running
-MythTV thread (channel information, music data, etc.) can be displayed on an
-LCD screen on your MythTV box (or, since LCDproc is client/server based,
-just about anywhere else instead).
-
-	Note that at this very early stage, MythLCD is not actually
-integrated into ANY of the MythTV/mythMusic/etc. code. It comes in
-a standalone directory, with a little toy application (called mythlcd) that
-just shows off how it could work. See TODO for when this might change.
+	MythLCD is a little toy application that demonstrates how to use an
+lcddevice which is an object available in libmyth.
 
 
 2.0 Installation
@@ -54,8 +46,16 @@ use/debug/play with mythLCD code.
 type make. You may want to remove -DLCD_DEVICE_DEBUG from the CXXFLAGS line
 in the Makefile, as it generates a lot of output. Note that the Makefile is
 hand assembled and has nothing to do with higher level MythTV Makefiles.
-This will change as the code is integrated into the rest of MythTV (see
-TODO).
+This will (hopefully) change soon.
+	
+	IMPORTANT: a standard ./configure, make, make install at the MC/
+level does not currently declare -DLCD_DEVICE in the compile and linking
+lines for libmyth. To actually use mythlcd and/or the lcddevice object in
+libmyth, you need to go into the libmyth subdirectory, do a Make clean, hand
+edit the Makefile to add -DLCD_DEVICE to the CXXFLAGS definition, and then
+make again. Then come back to MC/programs/mythlcd and do a make. You may
+also need to fiddle with your LD_LIBRARY_PATH if libmyth is only built and
+not installed anywhere. This will (hopefully) change soon.
 
 
 3.0 FAQs
@@ -68,6 +68,5 @@ TODO).
 =============	
 	
 	Debug code and extend features
-	Integrate into MythTV code tree
-	Integrate into MythMusic code tree
+	Make the Myth programs actually use the object
 
