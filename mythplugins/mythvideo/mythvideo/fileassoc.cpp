@@ -513,7 +513,7 @@ void FileAssocDialog::wireUpTheme()
     if(command_hack)
     {
         command_hack->allowFocus(true);
-        QFont f( "arial", 14, QFont::Bold);
+        QFont f = gContext->GetMediumFont();
         command_editor = new MythRemoteLineEdit(&f, this);
         command_editor->setFocusPolicy(QWidget::NoFocus);
         command_editor->setGeometry(command_hack->getScreenArea());

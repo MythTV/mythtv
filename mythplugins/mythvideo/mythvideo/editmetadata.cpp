@@ -329,7 +329,7 @@ void EditMetadataDialog::wireUpTheme()
     if(title_hack)
     {
         title_hack->allowFocus(true);
-        QFont f( "arial", 14, QFont::Bold);
+        QFont f = gContext->GetMediumFont();
         title_editor = new MythRemoteLineEdit(&f, this);
         title_editor->setFocusPolicy(QWidget::NoFocus);
         title_editor->setGeometry(title_hack->getScreenArea());
@@ -345,7 +345,7 @@ void EditMetadataDialog::wireUpTheme()
     if(player_hack)
     {
         player_hack->allowFocus(true);
-        QFont f( "arial", 14, QFont::Bold);
+        QFont f = gContext->GetMediumFont();
         player_editor = new MythRemoteLineEdit(&f, this);
         player_editor->setFocusPolicy(QWidget::NoFocus);
         player_editor->setGeometry(player_hack->getScreenArea());
