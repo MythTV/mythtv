@@ -1274,12 +1274,12 @@ public:
         SpinBoxSetting(1, 48, 1), GlobalSetting("QtFontSmall") {
         setLabel(QObject::tr("\"Small\" font"));
         setValue(12);
-        setHelpText(QObject::tr("Default size is 12."));
     };
 };
 
-// EPG settings
 
+
+// EPG settings
 class EPGScrollType: public CheckBoxSetting, public GlobalSetting {
 public:
     EPGScrollType():
@@ -1493,6 +1493,20 @@ public:
                     "options screen."));
     };
 };
+
+class EPGRecThreshold: public SpinBoxSetting, public GlobalSetting {
+public:
+    EPGRecThreshold():
+        SpinBoxSetting(1, 600, 1), GlobalSetting("SelChangeRecThreshold") {
+        setLabel(QObject::tr("Record Threshold"));
+        setValue(16);
+        setHelpText(QObject::tr("If the option to use select to change the channel "
+                                "is on, pressing select on a show that is at least "
+                                "this many minutes into the future will schedule a "
+                                "recording."));
+    };
+};
+
 
 
 class AudioSettings: public VerticalConfigurationGroup,
@@ -2192,6 +2206,7 @@ EPGSettings::EPGSettings()
     gen->addChild(new UnknownCategory());
     gen->addChild(new DefaultTVChannel());
     gen->addChild(new SelectChangesChannel());
+    gen->addChild(new EPGRecThreshold());
     addChild(gen);
 }
 

@@ -100,6 +100,9 @@ class GuideGrid : public MythDialog
 
     int m_context;
 
+    bool selectChangesChannel;
+    int selectRecThreshold;
+    
     int gridfilltype;
     int scrolltype;
 

@@ -123,6 +123,9 @@ GuideGrid::GuideGrid(MythMainWindow *parent, const QString &channel, TV *player,
 
     scrolltype = gContext->GetNumSetting("EPGScrollType", 1);
 
+    selectChangesChannel = gContext->GetNumSetting("SelectChangesChannel", 0);
+    selectRecThreshold = gContext->GetNumSetting("SelChangeRecThreshold", 16);
+    
     LayerSet *container = NULL;
     container = theme->GetSet("guide");
     if (container)
@@ -356,13 +359,13 @@ void GuideGrid::keyPressEvent(QKeyEvent *e)
                 escape();
             else if (action == "SELECT")
             {                         
-                if(m_player && gContext->GetNumSetting("SelectChangesChannel", 0))
+                if(m_player && selectChangesChannel)
                 {
                     // See if this show is far enough into the future that it's probable
                     // that the user wanted to schedule it to record instead of changing the channel.
                     ProgramInfo *pginfo = m_programInfos[m_currentRow][m_currentCol];
                     if (pginfo && (pginfo->title != unknownTitle) &&
-                        pginfo->SecsTillStart() >= gContext->GetNumSetting("SelChangeRecThreshold", 960))
+                        ((pginfo->SecsTillStart() / 60) >= selectRecThreshold))
                     {
                         editRecording();
                     }
