@@ -18,8 +18,9 @@ class XvVideoOutput
     void Show(int width, int height);
     int CheckEvents(void);
 
-  private:
     void ToggleFullScreen();
+
+  private:
     void sizehint(int x, int y, int width, int height, int max);
     void Exit(void);
 

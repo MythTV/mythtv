@@ -242,6 +242,9 @@ void XvVideoOutput::Exit(void)
     if (scratchspace)
         delete [] scratchspace;
 
+    if (XJ_image)
+        XFree(XJ_image);
+
     XvUngrabPort(XJ_disp, xv_port, CurrentTime);
     XDestroyWindow(XJ_disp, XJ_win);
     XCloseDisplay(XJ_disp);

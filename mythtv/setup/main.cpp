@@ -149,12 +149,6 @@ void getSources(void)
         char *home = getenv("HOME");
         QString filename = QString("%1/.mythtv/%2.xmltv").arg(home).arg(name);
 
-        QFile file(filename);
-        if (file.exists())
-        {
-            file.remove();
-        }
-
         QString xmltv_grabber = context->GetSetting("XMLTVGrab");
 
         cout << "\n\nConfiguring channel source #" << i+1 << endl;
@@ -362,11 +356,11 @@ int main(int argc, char *argv[])
     setupSources();
 
     cout << endl << endl;
-    cout << "Now, please run 'mythfilldatabase' to populate the database with "
-            "channel information.\n";
+    cout << "Now, please run 'mythfilldatabase' to populate the database\n";
+    cout << "with channel information.\n";
     cout << endl;
     cout << "If you are are using the following xmltv grabbers:\n";
-    cout << "  tv_grab_uk, tv_grab_de, tv_grab_sn\n";
+    cout << "  tv_grab_uk, tv_grab_de, tv_grab_sn\n\n";
     cout << "You _MUST_ run 'mythfilldatabase --manual the first time, "
          << "instead\n";
     cout << "of just 'mythfilldatabase'.  These grabbers do not provide\n";

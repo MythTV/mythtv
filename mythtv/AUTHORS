@@ -25,3 +25,6 @@ Non-integer channel fixes, customizable date displays:
     Jens Lohmann-Hansen <JensLH at adslhome.dk>
 Modifyable install prefix, recording/scheduler improvements:
     Jim Radford <jim at blackbean.org>
+Keybinding to toggle fullscreen playback:
+    Erik Arendse <erik.arendse at bigfoot.com>
+

@@ -20,6 +20,8 @@ using namespace std;
 #include "effects.h"
 #include "yuv2rgb.h"
 
+extern pthread_mutex_t avcodeclock;
+
 NuppelVideoPlayer::NuppelVideoPlayer(void)
 {
     playing = false;
@@ -618,8 +620,14 @@ unsigned char *NuppelVideoPlayer::DecodeFrame(struct rtframeheader *frameheader,
             InitAVCodec(frameheader->comptype - '3');
 
         int gotpicture = 0;
+#ifdef EXTRA_LOCKING
+        pthread_mutex_lock(&avcodeclock);
+#endif
         int ret = avcodec_decode_video(mpa_ctx, &mpa_picture, &gotpicture,
                                        lstrm, frameheader->packetlength);
+#ifdef EXTRA_LOCKING
+        pthread_mutex_unlock(&avcodeclock);
+#endif
 
         if (ret < 0)
         {
@@ -1067,6 +1075,12 @@ int NuppelVideoPlayer::CheckEvents(void)
     return ret;
 }
 
+void NuppelVideoPlayer::ToggleFullScreen(void)
+{
+    if (videoOutput)
+        videoOutput->ToggleFullScreen();
+}
+
 void NuppelVideoPlayer::OutputVideoLoop(void)
 {
     unsigned char *X11videobuf = NULL;
@@ -1192,7 +1206,8 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         /* compute new value of nexttrigger */
         /* doing the gettimeofday here helps resync faster when it's somehow 
            got a huge delay */
-        gettimeofday(&nexttrigger, NULL);
+        if (!disablevideo)
+            gettimeofday(&nexttrigger, NULL);
         nexttrigger.tv_usec += (int)(1000000 / video_frame_rate);
 
         /* Apply just a little feedback. The ComputeAudiotime() function is

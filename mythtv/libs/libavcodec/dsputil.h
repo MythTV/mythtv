@@ -257,12 +257,12 @@ typedef struct MDCTContext {
     FFTContext fft;
 } MDCTContext;
 
-int mdct_init(MDCTContext *s, int nbits, int inverse);
-void imdct_calc(MDCTContext *s, FFTSample *output, 
+int ff_mdct_init(MDCTContext *s, int nbits, int inverse);
+void ff_imdct_calc(MDCTContext *s, FFTSample *output, 
                 const FFTSample *input, FFTSample *tmp);
-void mdct_calc(MDCTContext *s, FFTSample *out, 
+void ff_mdct_calc(MDCTContext *s, FFTSample *out, 
                const FFTSample *input, FFTSample *tmp);
-void mdct_end(MDCTContext *s);
+void ff_mdct_end(MDCTContext *s);
 
 /* FDCT */
 
@@ -274,5 +274,15 @@ typedef struct FDCTContext {
 void fdct_ifast(FDCTContext *s, DCTELEM *data);
 void ff_jpeg_fdct_islow(FDCTContext *s, DCTELEM *data);
 void ff_fdct_mmx(FDCTContext *s, DCTELEM *block);
+
+#if !defined(_ISOC9X_SOURCE)
+/* XXX: add ISOC specific test to avoid specific BSD testing. */
+/* better than nothing implementation. */
+/* btw, rintf() is existing on fbsd too -- alex */
+static inline long int lrintf(float x)
+{
+    return (int)(rint(x));
+}
+#endif
 
 #endif

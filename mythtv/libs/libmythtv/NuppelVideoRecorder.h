@@ -216,9 +216,6 @@ class NuppelVideoRecorder
 
     bool pip;
 
-    static int numencoders;
-    static pthread_mutex_t avcodeclock;
-
     QString videoFilterList;
     vector<VideoFilter *> videoFilters;
 };

@@ -122,7 +122,7 @@ static void wma_lsp_to_curve_init(WMADecodeContext *s, int frame_len);
 #include "wmadata.h"
 
 #ifdef DEBUG_TRACE
-
+#include <stdarg.h>
 int frame_count;
 
 static FILE *flog;
@@ -245,7 +245,7 @@ static int wma_decode_init(AVCodecContext * avctx)
     s->bit_rate = avctx->bit_rate;
     s->block_align = avctx->block_align;
 
-    if (avctx->codec_id == CODEC_ID_WMAV1) {
+    if (avctx->codec->id == CODEC_ID_WMAV1) {
         s->version = 1;
     } else {
         s->version = 2;
@@ -270,14 +270,22 @@ static int wma_decode_init(AVCodecContext * avctx)
     /* compute MDCT block size */
     if (s->sample_rate <= 16000) {
         s->frame_len_bits = 9;
-    } else if (s->sample_rate <= 32000 && s->version == 1) {
+    } else if (s->sample_rate <= 22050 || 
+               (s->sample_rate <= 32000 && s->version == 1)) {
         s->frame_len_bits = 10;
     } else {
         s->frame_len_bits = 11;
     }
     s->frame_len = 1 << s->frame_len_bits;
     if (s->use_variable_block_len) {
-        s->nb_block_sizes = s->frame_len_bits - BLOCK_MIN_BITS + 1;
+        int nb_max, nb;
+        nb = ((flags2 >> 3) & 3) + 1;
+        if ((s->bit_rate / s->nb_channels) >= 32000)
+            nb += 2;
+        nb_max = s->frame_len_bits - BLOCK_MIN_BITS;
+        if (nb > nb_max)
+            nb = nb_max;
+        s->nb_block_sizes = nb + 1;
     } else {
         s->nb_block_sizes = 1;
     }
@@ -352,8 +360,8 @@ static int wma_decode_init(AVCodecContext * avctx)
            s->block_align);
     printf("bps=%f bps1=%f high_freq=%f bitoffset=%d\n", 
            bps, bps1, high_freq, s->byte_offset_bits);
-    printf("use_noise_coding=%d use_exp_vlc=%d\n",
-           s->use_noise_coding, s->use_exp_vlc);
+    printf("use_noise_coding=%d use_exp_vlc=%d nb_block_sizes=%d\n",
+           s->use_noise_coding, s->use_exp_vlc, s->nb_block_sizes);
 #endif
 
     /* compute the scale factor band sizes for each MDCT block size */
@@ -472,7 +480,7 @@ static int wma_decode_init(AVCodecContext * avctx)
 
     /* init MDCT */
     for(i = 0; i < s->nb_block_sizes; i++)
-        mdct_init(&s->mdct_ctx[i], s->frame_len_bits - i + 1, 1);
+        ff_mdct_init(&s->mdct_ctx[i], s->frame_len_bits - i + 1, 1);
     
     /* init MDCT windows : simple sinus window */
     for(i = 0; i < s->nb_block_sizes; i++) {
@@ -1116,8 +1124,8 @@ static int wma_decode_block(WMADecodeContext *s)
 
             n = s->block_len;
             n4 = s->block_len / 2;
-            imdct_calc(&s->mdct_ctx[bsize], 
-                       output, s->coefs[ch], s->mdct_tmp);
+            ff_imdct_calc(&s->mdct_ctx[bsize], 
+                          output, s->coefs[ch], s->mdct_tmp);
 
             /* XXX: optimize all that by build the window and
                multipying/adding at the same time */
@@ -1183,7 +1191,7 @@ static int wma_decode_frame(WMADecodeContext *s, int16_t *samples)
         iptr = s->frame_out[ch];
 
         for(i=0;i<n;i++) {
-            a = lrint(*iptr++);
+            a = lrintf(*iptr++);
             if (a > 32767)
                 a = 32767;
             else if (a < -32768)
@@ -1295,7 +1303,7 @@ static int wma_decode_end(AVCodecContext *avctx)
     int i;
 
     for(i = 0; i < s->nb_block_sizes; i++)
-        mdct_end(&s->mdct_ctx[i]);
+        ff_mdct_end(&s->mdct_ctx[i]);
     for(i = 0; i < s->nb_block_sizes; i++)
         av_free(s->windows[i]);
 

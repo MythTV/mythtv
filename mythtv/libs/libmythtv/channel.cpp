@@ -137,7 +137,7 @@ bool Channel::SetChannelByString(const QString &chan)
 
     int finetune = 0;
 
-    if (pParent->CheckChannel(chan, finetune))
+    if (pParent->CheckChannel(this, chan, finetune))
     {
         if (GetCurrentInput() == "Television")
         {
@@ -187,7 +187,7 @@ int Channel::GetCurrentChannelNum(const QString &channame)
 
 bool Channel::ChannelUp(void)
 {
-    QString nextchan = pParent->GetNextChannel(true);
+    QString nextchan = pParent->GetNextChannel(this, true);
     if (SetChannelByString(nextchan))
         return true;
 
@@ -220,7 +220,7 @@ bool Channel::ChannelUp(void)
 
 bool Channel::ChannelDown(void)
 {
-    QString nextchan = pParent->GetNextChannel(false);
+    QString nextchan = pParent->GetNextChannel(this, false);
     if (SetChannelByString(nextchan))
         return true;
 

@@ -700,6 +700,12 @@ void TV::SetupPipRecorder(void)
 
     pipnvr->SetMP3Quality(9);
 
+    nvr->SetMP4TargetBitrate(context->GetNumSetting("TargetBitrate"));
+    nvr->SetMP4ScaleBitrate(1); //context->GetNumSetting("ScaleBitrate"));
+    nvr->SetMP4Quality(context->GetNumSetting("MaxQuality"),
+                       context->GetNumSetting("MinQuality"),
+                       context->GetNumSetting("QualDiff"));
+
     if (pipaudiosamplerate > 0)
         pipnvr->SetAudioSampleRate(pipaudiosamplerate);
     else
@@ -810,13 +816,6 @@ void TV::SetupPipPlayer(void)
     pipnvp->SetAudioSampleRate(context->GetNumSetting("AudioSampleRate"));
     pipnvp->SetAudioDevice(context->GetSetting("AudioDevice"));
     pipnvp->SetLength(playbackLen);
-
-    if (context->GetNumSetting("Deinterlace"))
-    {
-        if (filters.length() > 1)
-            filters += ",";
-        filters += "linearblend";
-    }
 }
 
 void TV::TeardownPlayer(void)
@@ -1056,6 +1055,12 @@ void TV::ProcessKeypress(int keypressed)
 
     switch (keypressed) 
     {
+        case 'f': case 'F':
+        {
+            nvp->ToggleFullScreen();
+            break;
+        }
+
         case 's': case 'S': case 'p': case 'P': 
         {
             doing_ff = false;
@@ -1496,7 +1501,7 @@ void TV::ChannelCommit(void)
 void TV::ChangeChannelByString(QString &name)
 {
     int finetuning = 0;
-    if (!CheckChannel(name, finetuning))
+    if (!CheckChannel(activechannel, name, finetuning))
         return;
 
     if (activenvp == nvp)
@@ -1541,24 +1546,24 @@ void TV::UpdateOSD(void)
 {
     QString title, subtitle, desc, category, starttime, endtime;
     QString callsign, iconpath;
-    GetChannelInfo(title, subtitle, desc, category, starttime, endtime, 
-                   callsign, iconpath);
+    GetChannelInfo(activechannel, title, subtitle, desc, category, starttime, 
+                   endtime, callsign, iconpath);
 
     osd->SetInfoText(title, subtitle, desc, category, starttime, endtime,
                      callsign, iconpath, osd_display_time);
-    osd->SetChannumText(channel->GetCurrentName(), osd_display_time);
+    osd->SetChannumText(activechannel->GetCurrentName(), osd_display_time);
 }
 
 void TV::UpdateOSDInput(void)
 {
     QString dummy = "";
-    osd->SetInfoText(channel->GetCurrentInput(), dummy, dummy, dummy, dummy, 
-                     dummy, dummy, dummy, osd_display_time);
+    osd->SetInfoText(activechannel->GetCurrentInput(), dummy, dummy, dummy, 
+                     dummy, dummy, dummy, dummy, osd_display_time);
 }
 
-void TV::GetChannelInfo(QString &title, QString &subtitle, QString &desc, 
-                        QString &category, QString &starttime, QString &endtime,
-                        QString &callsign, QString &iconpath)
+void TV::GetChannelInfo(Channel *chan, QString &title, QString &subtitle, 
+                        QString &desc, QString &category, QString &starttime, 
+                        QString &endtime, QString &callsign, QString &iconpath)
 {
     title = "";
     subtitle = "";
@@ -1579,9 +1584,9 @@ void TV::GetChannelInfo(QString &title, QString &subtitle, QString &desc,
 
     strftime(curtimestr, 128, "%Y%m%d%H%M%S", loctime);
    
-    QString channelname = channel->GetCurrentName();
-    QString channelinput = channel->GetCurrentInput();
-    QString device = channel->GetDevice();
+    QString channelname = chan->GetCurrentName();
+    QString channelinput = chan->GetCurrentInput();
+    QString device = chan->GetDevice();
  
     QString thequery = QString("SELECT starttime,endtime,title,subtitle,"
                                "description,category,callsign,icon "
@@ -1684,7 +1689,7 @@ void TV::GetDevices(int cardnum, QString &video, QString &audio, int &rate)
     }
 }
 
-bool TV::CheckChannel(const QString &channum, int &finetuning)
+bool TV::CheckChannel(Channel *chan, const QString &channum, int &finetuning)
 {
     finetuning = 0;
 
@@ -1693,8 +1698,8 @@ bool TV::CheckChannel(const QString &channum, int &finetuning)
 
     bool ret = false;
 
-    QString channelinput = channel->GetCurrentInput();
-    QString device = channel->GetDevice();
+    QString channelinput = chan->GetCurrentInput();
+    QString device = chan->GetDevice();
 
     QString thequery = QString("SELECT channel.finetune FROM "
                                "channel,capturecard,cardinput "
@@ -1724,15 +1729,15 @@ bool TV::CheckChannel(const QString &channum, int &finetuning)
     return ret;
 }
 
-QString TV::GetNextChannel(bool direction)
+QString TV::GetNextChannel(Channel *chan, bool direction)
 {
     QString ret = "";
 
-    QString channum = channel->GetCurrentName();
-    QString channelinput = channel->GetCurrentInput();
-    QString device = channel->GetDevice();
+    QString channum = chan->GetCurrentName();
+    QString channelinput = chan->GetCurrentInput();
+    QString device = chan->GetDevice();
 
-    QString channelorder = channel->GetOrdering();
+    QString channelorder = chan->GetOrdering();
 
     QString thequery = QString("SELECT %1 FROM "
                                "channel,capturecard,cardinput "

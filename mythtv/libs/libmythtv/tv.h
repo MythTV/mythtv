@@ -55,9 +55,9 @@ class TV
     bool IsPlaying(void) { return StateIsPlaying(internalState); }
     bool IsRecording(void) { return StateIsRecording(internalState); }
 
-    bool CheckChannel(const QString &channum, int &finetuning); 
+    bool CheckChannel(Channel *chan, const QString &channum, int &finetuning); 
     bool ChangeExternalChannel(const QString &channum);
-    QString GetNextChannel(bool direction);
+    QString GetNextChannel(Channel *chan, bool direction);
 
  protected:
     void doLoadMenu(void);
@@ -85,9 +85,9 @@ class TV
     
     void UpdateOSD(void);
     void UpdateOSDInput(void);
-    void GetChannelInfo(QString &title, QString &subtitle, QString &desc, 
-                        QString &category, QString &starttime, QString &endtime,
-                        QString &callsign, QString &iconpath);
+    void GetChannelInfo(Channel *chan, QString &title, QString &subtitle, 
+                        QString &desc, QString &category, QString &starttime, 
+                        QString &endtime, QString &callsign, QString &iconpath);
 
     void GetDevices(int cardnum, QString &video, QString &audio, int &rate);
 

@@ -18,8 +18,7 @@ using namespace std;
 
 #define KEYFRAMEDIST   30
 
-pthread_mutex_t NuppelVideoRecorder::avcodeclock = PTHREAD_MUTEX_INITIALIZER;
-int NuppelVideoRecorder::numencoders = 0;
+pthread_mutex_t avcodeclock = PTHREAD_MUTEX_INITIALIZER;
 
 NuppelVideoRecorder::NuppelVideoRecorder(void)
 {
@@ -95,7 +94,6 @@ NuppelVideoRecorder::NuppelVideoRecorder(void)
     seektable = new vector<struct seektable_entry>;
 
     pip = false;
-    numencoders++;
 
     videoFilterList = "";
 }
@@ -137,7 +135,6 @@ NuppelVideoRecorder::~NuppelVideoRecorder(void)
 
     if (mpa_codec)
         avcodec_close(mpa_ctx);
-    numencoders--;
 
     if (mpa_ctx)
         free(mpa_ctx);
@@ -1362,12 +1359,14 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
 
         mpa_ctx->key_frame = wantkeyframe;
 
-        if (numencoders > 1)
-            pthread_mutex_lock(&avcodeclock);
+#ifdef EXTRA_LOCKING
+        pthread_mutex_lock(&avcodeclock);
+#endif
         tmp = avcodec_encode_video(mpa_ctx, (unsigned char *)strm, 
                                    w * h + (w * h) / 2, &mpa_picture); 
-        if (numencoders > 1)
-            pthread_mutex_unlock(&avcodeclock);
+#ifdef EXTRA_LOCKING
+        pthread_mutex_unlock(&avcodeclock);
+#endif
     }
     else
     {

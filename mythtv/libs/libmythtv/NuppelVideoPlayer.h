@@ -103,6 +103,8 @@ class NuppelVideoPlayer
 
     void SetWatchingRecording(bool mode) { watchingrecording = mode; }
 
+    void ToggleFullScreen(void);
+
  protected:
     void OutputAudioLoop(void);
     void OutputVideoLoop(void);
