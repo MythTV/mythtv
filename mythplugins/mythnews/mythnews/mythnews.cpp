@@ -27,6 +27,7 @@
 #include <qpainter.h>
 #include <qdir.h>
 #include <qtimer.h>
+#include <qregexp.h>
 
 #include "mythnews.h"
 
@@ -553,8 +554,17 @@ void MythNews::slotViewArticle()
         NewsArticle *article = (NewsArticle*) articleUIItem->getData();
         if(article)
         {
-            QString cmd = QString( "%1 %2 %3").arg(browser).arg(zoom).arg(article->articleURL());
-            myth_system( cmd );
+            QString cmdUrl(article->articleURL());
+            cmdUrl = QRegExp::escape(cmdUrl);
+            int i = cmdUrl.find(QRegExp("[;&]"), 0);
+            while (i != -1)
+            {
+                cmdUrl = cmdUrl.insert(i, "\\");
+                i = cmdUrl.find(QRegExp("[;&]"), i + 2); 
+            }
+            QString cmd = QString("%1 %2 %3")
+                                 .arg(browser).arg(zoom).arg(cmdUrl);
+            myth_system(cmd);
         }
-     } 
+    } 
 }
