@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2004-05-08, v0.14.13
+<date>2004-05-xx, v0.15.00
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -23,7 +23,7 @@ name="http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html"> or as a PDF
 at <url url="http://www.mythtv.org/docs/mythtv-HOWTO.pdf"
 name="http://www.mythtv.org/docs/mythtv-HOWTO.pdf">.
 
-This HOWTO is for MythTV v0.14.
+This HOWTO is for MythTV v0.15.
 
 <sect1>Mailing lists / getting help.
 <p>It's recommended that you join the user list at <url
@@ -34,8 +34,8 @@ name="http://mythtv.org/cgi-bin/mailman/listinfo/mythtv-dev">.  Please keep
 the developer list strictly for development-related issues.
 
 Searchable archives for the lists are available at <url
-url="http://www.gossamer-threads.com/archive/MythTV_C2/"
-name="http://www.gossamer-threads.com/archive/MythTV_C2/">.
+url="http://www.gossamer-threads.com/lists/mythtv/"
+name="http://www.gossamer-threads.com/lists/mythtv/">.
 
 <sect1>IRC.
 <p>There are two IRC channels dedicated to MythTV which can be found on
@@ -70,12 +70,6 @@ American environment. If you have installation instructions for a different
 region or Linux distribution, please send them to the author so that it can
 be included in other versions of this document.
 
-<!-- Website seems to point to a temporary holder page
-Hans Kruse has setup a website that focuses on running MythTV in a non-North
-American environment.  See the website at <url
-url="http://mythtv.nicenemo.net" name="http://mythtv.nicenemo.net">.
--->
-
 Pre-compiled binaries are available for a number of distributions.  See
 section <ref id="precompiled" name="Software::Pre-compiled packages"> for
 more information.
@@ -90,6 +84,9 @@ to install MythTV onto a VIA Epia M machine.
 
 See <url url="http://mysettopbox.tv" name="http://mysettopbox.tv"> if you'd
 like to install a custom version of Knoppix optimized for MythTV.
+
+See <url url="http://bit.blkbk.com/" name="http://bit.blkbk.com/"> if you'd
+like to install MythTV on an XBox.
 
 <sect>Checking prerequisites. 
 <p>You must ensure that any firewalls (either hardware, or a software
@@ -113,8 +110,8 @@ configuration, and how happy they are with the results.
 
 If you have specific questions about the suitability of specific hardware
 choices, you can consult the archives of the mythtv-users mailing list at
-<url url="http://www.gossamer-threads.com/archive/MythTV_C2/Users_F11/"
-name="http://www.gossamer-threads.com/archive/MythTV_C2/Users_F11/"> or
+<url url="http://www.gossamer-threads.com/lists/mythtv/"
+name="http://www.gossamer-threads.com/lists/mythtv/"> or
 post a question to the list.
 <sect2>CPU Type and Speed
 <p>Selection of CPU type and speed is one of the trickiest elements of
@@ -212,6 +209,11 @@ capacity for additional hard drives, read through the <ref id="LVM"
 name="LVM"> and <ref id="advancedpartitionformatting" name="Advanced
 Partition Formatting"> sections for some pointers.
 
+Because MythTV creates very large files, a filesystem that does well at
+deleting large files is important.  Numerous benchmarks show that XFS and
+JFS do very well at this task.  You are strongly encouraged to consider
+either of these for your MythTV filesystem.
+
 <label id="video_capture_device">
 <sect2>Video Capture Device 
 <p>In order to capture video, MythTV will need one or more video capture
@@ -277,7 +279,7 @@ encoding. Using either a G200 MJPEG encoder card, or a MPEG-2 encoder card
 supported by the IvyTV project <url url="http://ivtv.sourceforge.net/"
 name="http://ivtv.sourceforge.net/"> such as the Hauppauge PVR-250, PVR-350,
 Avermedia M179, Hauppauge "Freestyle" or Yuan M600 cards will allow you to
-use dedicated hardware encoders rather than your CPU. Release 0.14 of MythTV
+use dedicated hardware encoders rather than your CPU. Release 0.15 of MythTV
 is able to use these MPEG-2 encoders as an input device for live TV and for
 scheduled recordings.  (The PVR-350 can simultaneously be used as an output
 device.) Using the on-board MPEG-2 encoder drastically reduces the CPU
@@ -426,8 +428,8 @@ organized by manufacturer.
 Reports here are based on what users of the cards have posted on the
 mythtv-users mailing list, so if you need configuration details, please
 search the archives at <url
-url="http://www.gossamer-threads.com/archive/MythTV_C2/Users_F11/"
-name="http://www.gossamer-threads.com/archive/MythTV_C2/Users_F11/"> using
+url="http://www.gossamer-threads.com/lists/mythtv/"
+name="http://www.gossamer-threads.com/lists/mythtv/"> using
 the card name in your search string.
 
 <sect3>ATI
@@ -1105,12 +1107,12 @@ name="http://www.mythtv.org/mailman/listinfo/mythtv-dev/"> mailing lists.
 </caption>
 </figure>
 
-<bf>CVS only</bf>: If you are in North America you will use the DataDirect
+If you are in North America you will use the DataDirect
 grabber which is built-in to MythTV.  You <em>do not</em> need to install
 XMLTV, but you need <bf>wget</bf> version 1.9.1 or higher.
 
 Get XMLTV from <url url="http://xmltv.sourceforge.net"
-name="http://xmltv.sourceforge.net">.  Download the latest version (0.5.32).
+name="http://xmltv.sourceforge.net">.  Download the latest version (0.5.34).
 
 <code>
 NOTE for Mandrake users:  If you have added a "PLF" mirror, you may skip the
@@ -1200,6 +1202,8 @@ does not have <bf>XMLTV</bf>, so you may install the XMLTV prerequisites by typi
 and skip straight to the XMLTV compilation step.
 
 <sect2>Other distributions and manual installation.
+<p>
+<!--
 <p><figure loc="here">
 <eps file="stop.eps" height="1cm">
 <img src="stop.png">
@@ -1235,12 +1239,12 @@ $ su
 # exit
 $ 
 </verb></tscreen>
-
+-->
 Continuing on:
 
 <label id="untarring_xmltv">Untar the xmltv file:
 <tscreen><verb>
-$ tar -xjf xmltv-0.5.32.tar.bz2
+$ tar -xjf xmltv-0.5.34.tar.bz2
 </verb></tscreen>
 Install the xmltv prerequisites:
 
@@ -1257,7 +1261,7 @@ cpan> exit
 
 Change to the XMLTV directory and compile it:
 <tscreen><verb>
-$ cd xmltv-0.5.32
+$ cd xmltv-0.5.34
 $ perl Makefile.PL
 </verb></tscreen>
 You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes" to
@@ -1275,7 +1279,6 @@ $ su
 </verb></tscreen>
 
 <sect1>Configuring the Zap2It.com DataDirect service. <label id="ConfigureDD">
-<p><bf>CVS Only</bf>
 <p>Zap2It DataDirect is a service provided by Zap2It, a subsidiary of
 Tribune Media Services.  TMS is one of the primary providers for program
 listing data in the United States and Canada.  There are a number of
@@ -1283,13 +1286,13 @@ advantages to using DataDirect rather than the standard XMLTV
 <tt>tv_grab_na</tt> grabber.
 
 <itemize>
+<item>The <tt>tv_grab_na</tt> grabber is no longer supported and will not be
+fixed when problems occur.
 <item>It's much faster, because the grabber isn't downloading hundreds of
 HTML pages and trying to parse the program data out of the HTML.
 <item>It contains more program information.
 <item>It's easier on the Zap2It servers, since they're not generating
 hundreds of custom HTML pages when you scrape their listings.
-<item>The <tt>tv_grab_na</tt> grabber is no longer supported and will not be
-fixed when problems occur.
 <item>The service is available free of charge by periodically filling in
 surveys similar to the one presented during registration, and the data
 provider has no intention of charging for it in the future.
@@ -1316,8 +1319,8 @@ simplest thing is to immediately start using DataDirect.
 <sect1>Manually building MythTV.
 <p>Unpack MythTV
 <tscreen><verb>
-$ tar -xjf mythtv-0.14.tar.bz2
-$ cd mythtv-0.14
+$ tar -xjf mythtv-0.15.tar.bz2
+$ cd mythtv-0.15
 $ ./configure
 </verb></tscreen>
 
@@ -2094,7 +2097,7 @@ to control MythTV.  MythTV now includes native support for lirc and can
 interact directly with 
 
 <tscreen><verb>
-$ cd ~/mythtv-0.14/configfiles
+$ cd ~/mythtv-0.15/configfiles
 $ cp lircrc.example ~/.lircrc
 </verb></tscreen> 
 or
@@ -2464,7 +2467,6 @@ space bar to begin.  The first field asks for the name of the video source.
 You may choose something easy to remember, like "Antenna" or "Cable".  Once
 you've chosen a name, press the down arrow to move to the next field.  
 
-<bf>CVS Only</bf>
 If you're in North America, change the grabber to "DataDirect", then
 continue pressing the down arrow to move to the next field.  Fill in the
 username and password that you have established with DataDirect, then move
@@ -2475,14 +2477,11 @@ DataDirect.
 
 The setup program will contact the Zap2It servers and get your account
 information.  Once you're done, you may click the Finish button and skip the
-next few paragraphs, since they only apply to users that are using the
-external XMLTV script to get their guide data.
+next few paragraphs in this document since they only apply to users that are
+using the external XMLTV script to get their guide data.
 
 If you wish to continue using the XMLTV grabber, then move to the Zip/postal
 code field and put in the appropriate value.
-
-<bf>NOTE</bf>:  As of 2004-05-04, the <bf>tv_grab_na</bf> grabber still
-works, but you are strongly discouraged from using it.
 
 If you're outside of North America, then some manual interaction will be
 required with XMLTV.
@@ -2577,21 +2576,21 @@ the steps outlined in the section called <ref id="mythbackend_autostart"
 name="I'd like to automatically start mythbackend at system boot time">.
 
 <sect1>Configuring a non-master backend. <label id="nonmaster_backend">
-<p>Configuration of a non-master backend follows the same general procedure
-as that of the master backend, with the exception that you skip over the
-"Video Sources" step.  All possible video sources need to be defined on the
-master backend system; only the master backend will query a listings
-provider to obtain guide data for all the slave backends.
+<p>Ensure that you've granted access to the master MySQL database for remote
+backends as discussed in the section titled <ref id="modify_perm_mysql"
+name="Modifying access to the MySQL database for multiple systems"> and that
+you've edited the <tt>/usr/local/share/mythtv/mysql.txt</tt> file and put
+the correct IP address for the database server.
 
 Make sure that the IP addresses on the General setup screen are accurate. 
 If the slave backend can't communicate with the master backend due to IP
 address misconfiguration then MythTV will not function properly.
 
-Ensure that you've granted access to the master MySQL database for remote
-backends as discussed in the section titled <ref id="modify_perm_mysql"
-name="Modifying access to the MySQL database for multiple systems"> and that
-you've edited the <tt>/usr/local/share/mythtv/mysql.txt</tt> file and put
-the correct IP address for the database server.
+Configuration of a non-master backend follows the same general procedure
+as that of the master backend, with the exception that you skip over the
+"Video Sources" step.  All possible video sources need to be defined on the
+master backend system; only the master backend will query a listings
+provider to obtain guide data for all the non-master backends.
 
 <figure loc="here">
 <eps file="stop.eps" height="1cm">
@@ -2817,7 +2816,7 @@ during playback. These filters can be used to improve or modify the video
 image, including hiding the effects of an interlaced image or reducing the
 effects of noise in a poor video signal. The following is a brief
 introduction to introduce you to the filters that are available in MythTV
-version 0.14.
+version 0.15.
 <sect2>Applying filters
 <p>One or more filters can be included in a "filter chain". The filters to
 be used are identified in a "filter string". A filter string is a group of
@@ -2871,9 +2870,10 @@ deinterlacing in your filter string, you should not check "Deinterlace
 playback".
 </caption>
 </figure>
+
 o  The "kerneldeint" filter
 
-Kerneldeint is a more complex deinterlacing filter, which applies a filter
+Kerneldeint is a more complex deinterlacing filter which applies a filter
 kernel using input from several lines.  It generally removes combing without
 a "ghost" image, sometimes leaving a faint outline of the the image from the
 other field. It is considered to be less distracting to watch than
@@ -2886,6 +2886,40 @@ option defaults to 0.  If set to a non-zero value, it will cause the filter
 to skip chroma, and filter only the luminance.  It may be useful on some
 capture cards which do not capture the chroma fields of interlaced video
 correctly.
+
+o The "onefield" filter
+
+This is a simple one-field deinterlacing filter that uses only one field of
+the interlaced video.  By default it keeps the top field, though passing the
+parameter "bottom" will cause it to keep the bottom field instead.
+
+This filter is primarily useful for those who display 1080i HDTV signals
+with a video mode that has 540 pixels vertically.  The advantage over other
+deinterlacing filters is that scenes with motion never show combing or
+ghosting.
+
+o The "adjust" filter
+
+This filter adjusts the digital values for luma and chroma to ensure that
+they will fall within the ranges specified in the ITU-R601 standard. By
+default, this corrects a known problem for the luma range used by bt8x8
+chips which causes video to look washed out. If parameters are passed, there
+need to be exactly six. However, passing a single parameter of "-1" will
+disable the filter.
+
+1: luma minimum input value (int)
+2: luma maximum input value (int)
+3: luma gamma correction (float)
+4: chroma minimum input value (int)
+5: chroma maximum input value (int)
+6: chroma gamma correction (float)
+
+The default bt8x8 correction values are equivalent to
+"16:253:1.0:2:253:1.0".  Output ranges are fixed at ITU-R601 values (16-235
+luma, 16-240 chroma).
+
+<bf>NOTE</bf>: If it is not already specified in the filter chain, this
+filter will be automatically applied when recording with the "bttv" driver.
 
 o  The "quickdnr" filter
 
@@ -3637,8 +3671,8 @@ Mandrake Control Center.
 <sect1>Completing the installation.
 <p>
 <tscreen><verb>
-$ tar -xjf mythweb-0.14.tar.bz2
-$ cd mythweb-0.14
+$ tar -xjf mythweb-0.15.tar.bz2
+$ cd mythweb-0.15
 $ su
 # mkdir /var/www/html/mythweb
 # cp -r . /var/www/html/mythweb
@@ -3689,8 +3723,8 @@ would perform the following command:
 Once you have satisfied the prerequisites for your distribution, download
 and install the application:
 <tscreen><verb>
-$ tar -xjf mythgallery-0.14.tar.bz2
-$ cd mythgallery-0.14
+$ tar -xjf mythgallery-0.15.tar.bz2
+$ cd mythgallery-0.15
 $ ./configure --enable-opengl
 $ qmake mythgallery.pro
 $ make
@@ -4462,9 +4496,8 @@ fan has fallen off/broken and your system is overheating when asked to
 perform a CPU intensive task like encoding video.
 
 <sect1>Troubleshooting audio. <label id="Troubleshooting_Audio">
-<p>By Bruce Markey, <url url="mailto:bjm@lvcm.com"
-name="mailto:bjm@lvcm.com">
-
+<!-- By Bruce Markey -->
+<p>
 <figure loc="here">
 <eps file="stop.eps" height="1cm">
 <img src="stop.png">
@@ -4475,6 +4508,7 @@ id="troubleshooting_pvraudio" name="this"> in the PVR-250 <ref id="pvr250"
 name="section"> for more information.
 </caption>
 </figure>
+
 Audio appears to be one of the bigger issues that users run into on the
 mailing list.  If the audio isn't configured correctly, then MythTV will
 often appear to hang, when in fact it is trying to manipulate the audio
@@ -4987,16 +5021,21 @@ what's going on.
 
 <sect1>Removing unwanted channels.
 <p>If <bf>mythfilldatabase</bf> grabbed a channel which you do not want to
-include in your TV listings, you can remove the entries from the xmltv
-config file and the MySQL database.  This often happens with premium
+include in your TV listings, you can remove the entries from the grabber
+configuration and the MySQL database.  This often happens with premium
 channels; for example, HBO or Showtime may be available on your cable TV
 system, but is scrambled because you're not a subscriber to that channel. 
 Since you can never watch it, you want to get rid of it.
 
-First, comment out the channel from the ~/.mythtv/&lt;sourcename&gt;.xmltv
-file by inserting the word "not " (including the space) in front of the
-unwanted entry. This will prevent <bf>xmltv</bf> from grabbing future
-listings.
+If you are using the DataDirect service, login to your account at
+<url url="http://labs.zap2it.com/" name="http://labs.zap2it.com/"> to
+modify your lineup. Uncheck the boxes for any unwanted channels, and they
+will no longer be included in your download.
+
+If you are using a grabber from XMLTV, comment out the channel from the
+<tt>~/.mythtv/&lt;sourcename&gt;.xmltv</tt> file by inserting the word "not
+" (including the space) in front of the unwanted entry. This will prevent
+<bf>xmltv</bf> from grabbing future listings.
 
 Next, delete the unwanted item from the channel table so that it will not
 appear in the EPG or when changing channels.  To delete the data from the
@@ -5316,6 +5355,7 @@ name of the system was "frontend1" and we're going to change it to
 break things.  You <em>MUST</em> use this indirect method.
 </caption>
 </figure> 
+
 1.  Stop all backends.  If you run <bf>mythbackend</bf> from a terminal
 session, press control-c. If your backends are started with an init
 script, you would do something like the following:
@@ -5457,7 +5497,6 @@ driveropts=burnfree -dao -v tsize="$TSIZE"s -
 
 <sect1>Migrating from XMLTV to DataDirect. <label id="MigratingtoDD">
 <!-- Mostly from a post by Bruce Markey -->
-<p><bf>CVS Only</bf>
 <p>DataDirect will use different information for your video sources and
 channels than was used by XMLTV. The following will clear your old
 information in a way that will allow your EPG and existing recording rules
@@ -5465,7 +5504,7 @@ to continue to work as you'd expect.
 
 The first step is to create a backup of your database using the
 instructions found in <ref id="backupdb" name="I'd like to save or restore
-my database.">.
+my database.">
 
 <bf>NOTE</bf>: Examine the contents of the backup file to be sure that the
 backup succeeded before modifying your database.
@@ -5478,6 +5517,8 @@ Next, start <bf>mysql</bf> and perform the following commands:
 <tscreen><verb>
 $ mysql -u root mythconverg
 mysql>CREATE TABLE channel_copy SELECT * FROM channel;
+mysql>exit
+$
 </verb></tscreen>
 
 Run the MythTV setup program.  When the setup program prompts "Would you
@@ -5491,12 +5532,37 @@ in <ref id="VideoSources" name="Video Sources">.
 Once you're done running setup, run <bf>mythfilldatabase</bf> to populate
 the database with new data.
 
-Finally, run mysql again.  The next command is one long string:
+To restore the channel icons, you will need to perform one of two steps:
+
+If you're running MySQL v3, execute the following.  Note that the
+select command is very long.  You can press ENTER at the end of each line;
+the command won't be evaluated until you end the statement with a semicolon.
+<tscreen><verb>
+$ mysql -u root mythconverg
+mysql>create table channel_temp;
+mysql>select c.chanid, c.channum, c.sourceid, c.callsign, c.name, cb.icon,
+c.finetune, c.videofilters, c.xmltvid, c.contrast, c.brightness,
+c.colour, c.freqid, c.recpriority, c.hue, c.tvformat,
+c.commfree, c.visible, c.outputfilters
+from channel c
+left join channel_copy cb on (c.callsign = cb.callsign);
+mysql>truncate channel;
+mysql>insert channel select * from channel_temp;
+mysql>drop table channel_temp;
+mysql>drop table channel_copy;
+mysql>exit
+$
+</verb></tscreen>
+
+If you are running MySQL v4, it's a little simpler. The next command is
+one long string:
 <tscreen><verb>
 $ mysql -u root mythconverg
 mysql>UPDATE channel,channel_copy SET channel.icon = channel_copy.icon WHERE channel.callsign = channel_copy.callsign;
+mysql>drop table channel_copy;
+mysql>exit
+$
 </verb></tscreen>
-to restore the channel icons.
 <sect>Example Configurations.
 <p>This section contains configurations which you may find useful.
 <sect1>Hauppauge PVR-250/350 hardware MPEG-2 encoder. <label id="pvr250">
@@ -5900,8 +5966,8 @@ $ su
 <tt>lirc_i2c.c:296: unknown field 'owner' specified in initializer</tt>, you
 will need to edit the file and comment out a line in the source code.  See
 message <url
-url="http://www.gossamer-threads.com/perl/mailarc/gforum.cgi?post=86696"
-name="http://www.gossamer-threads.com/perl/mailarc/gforum.cgi?post=86696">
+url="http://www.gossamer-threads.com/lists/mythtv/users/40136"
+name="http://www.gossamer-threads.com/lists/mythtv/users/40136">
 for detailed instructions.
 </caption>
 </figure>
@@ -6205,8 +6271,8 @@ url="http://aurora.zemris.fer.hr/filesystems/big.html"
 name="http://aurora.zemris.fer.hr/filesystems/big.html">) that provide
 insight into filesystem performance under conditions relevant to MythTV
 usage.  In addition, some limited testing (archived at <url
-url="http://www.gossamer-threads.com/perl/mailarc/gforum.cgi?post=106656;search_string=filesystem;guest=2417820&amp;t=search_engine#106656"
-name="http://www.gossamer-threads.com/perl/mailarc/gforum.cgi?post=106656;search_string=filesystem;guest=2417820&amp;t=search_engine#106656">)
+url="http://www.gossamer-threads.com/lists/mythtv/users/52672"
+name="http://www.gossamer-threads.com/lists/mythtv/users/52672">)
 with very large files (10 gigabytes) was reported in the MythTV Users
 mailing list.
 
@@ -6269,62 +6335,41 @@ issues if you do not have the spare CPU capacity to handle XFS, potentially
 leading to dropped frames.
 </article>
 <!-- Revision History
-v0.14.00, 2004-01-31.  Initial version for MythTV v0.14.  Rename docs
-version to match.  Standardize spelling of RTjpeg.  Add section on Channel
-Editor in setup.  Remove duplicate note in 10.5.  Make keys.txt its own
-subsection.
-v0.14.01, 2004-02-01.  Add blurb on changing default keys with mythweb. 
-Changed wording on Debian woody; no debs because of Qt3.1.  Added Mandrake
-9.2 to thac's list.
-v0.14.02, 2004-02-06.  Christian Hoenig's docs for Shutdown / Wakeup -
-Someone who actually uses this will need to look them over and send me
-feedback.  Version bump for XMLTV.  Add some Debian stuff.  Expand on
-distcc.  Modify lirc examples in settings.
-v0.14.03, 2004-02-22.  Comment out the largefile4 stuff; tests by William
-Powers shows that it's really slow with deletes.  Move the Debian build-req
-stuff up into the software pre-requisites section.  Edit some stuff, start
-standardizing on Master / Slave terminology throughout.  Standardize on
-"MySQL" when referring to the product.  Add a section about the mailing
-lists to maybe make it standout some more.  Add Larry Matter's mythgallery
-contribution.  Add Jerry Rubinow's HDTV contribution.  HDTV people:  check
-on it and let me know if the CPU statement is correct.  Other edits
-throughout.  Vishnu Natchu's removing unwanted channels update.
-v0.14.04, 2004-02-24.  Add note on new Mandrake qtdir3.sh script.  Version
-bump for XMLTV.  Fix some typos.  Add David Blevin's keys.txt tables for
-section 11.  Add some initial graphics.  TODO:  go back and set the various
-levels; some things are nice to know, some are requirements.
-v0.14.05, 2004-02-26.  Convert some "stop"s to "warnings".  Add additional
-stuff for the various zoom modes.  Add wireless (might work, YMMV).  Change
-the section title for 7 to "Configuring Sound."  William Powers' Advanced
-Partitioning contribution.
-v0.14.06, 2004-03-14.  Fix things.  Ramon Redondo's mysql priv contribution. 
-Bump XMLTV version.  David Blevins' DVD burning contribution.
-v0.14.07, 2004-03-21.  Update DVB; TwinHan card is supported by
-linuxtv.org DVB driver.  Don't know if anyone is using it in US though. 
-Change some more "stop"s to "notes".
-v0.14.08, 2004-04-15.  XMLTV version bump.  Start adding stuff for data
-direct. Include all gdb output, not just backtrace (mdz).  Add additional
-configure step for mythmusic.  (even though the text does talk about it.)
-Add some more text on mythfilldatabase -help
-v0.14.09, 2004-05-05.  Change Mandrake instructions for DataDirect; they've
-already got the 0.5.32 grabber installed.  Alter DataDirect instructions. 
-Add section on modifying /etc/security/console.perms; put troubleshooting
-pointer back to it.  Add a section on migrating to DataDirect.  Add section
-on using the native mythfilldatabase scheduler.
-v0.14.10, 2004-05-05.  Update migration instructions for DataDirect.  It's for
-CVS.  Add some forward and backwards pointers in the Migration document.
-v0.14.11, 2004-05-06.  Add section on IRC and how to contribute.  Add wget
-1.9.1 requirement for DataDirect.
-v0.14.12, 2004-05-07.  Update DataDirect section (Bruce Markey)
-v0.14.13, 2004-05-08.  Update DataDirect section (Isaac).  Bruce's truncate
-stuff will now be handled in the code.
+
+v0.15.00, 2004-05-xx  Bump XMLTV version.  Update link to gossamer threads
+archive.  Add statement that XFS or JFS are really the way to go.  Add Bruce
+Markey's update to the filter docs.  Modify non-master backend config based
+on Scott Rowe's suggestion. Initial version for v00.15.00.  Bruce's mod to
+removing unwanted DD channels.  Chris Pinkham's save icon thing for MySQL
+v3.  Update rest of gossamer-threads links.
+
 -->
 
 <!--
 To create documentation, run "make" in the docs/ subdirectory
 -->
-<!--cd /lib/modules/$kern-vers
-rm ./kernel/3rdparty/ivtv/*
-find . -name "msp3400*" -exec rm {} \;
+
+<!-- Basic Style Guide for the HOWTO.
+
+Paths are specified with <tt>
+
+Program names are specified with <bf>
+
+Use full close tags, such as </tt> rather than the "/>" shortcut.
+
+For a URL link, the url= and name= should be the same.  This ensures that
+users who are reading the text version of the document will see what the URL
+is.
+
+For "Notes", the format is <bf>NOTE</bf>: text here.
+
+label id's must be contained on one line.  If they break across the right
+margin the wrapped text will be considered as text and not a destination.
+
+Don't make a section "a" if there's no section "b". Same for numbers; no
+number 1 if there's no number 2, etc.
+
+Itemized and enumerated items should be full sentences, and should end with
+a period.
 
 -->

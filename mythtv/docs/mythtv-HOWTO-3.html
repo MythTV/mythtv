@@ -35,7 +35,7 @@ website will let you browse what other users have reported as their hardware
 configuration, and how happy they are with the results.</P>
 <P>If you have specific questions about the suitability of specific hardware
 choices, you can consult the archives of the mythtv-users mailing list at
-<A HREF="http://www.gossamer-threads.com/archive/MythTV_C2/Users_F11/">http://www.gossamer-threads.com/archive/MythTV_C2/Users_F11/</A> or
+<A HREF="http://www.gossamer-threads.com/lists/mythtv/">http://www.gossamer-threads.com/lists/mythtv/</A> or
 post a question to the list.</P>
 <H3>CPU Type and Speed</H3>
 
@@ -130,6 +130,10 @@ expansion right from the beginning.  If your case and power supply have the
 capacity for additional hard drives, read through the 
 <A HREF="mythtv-HOWTO-22.html#LVM">LVM</A> and 
 <A HREF="mythtv-HOWTO-22.html#advancedpartitionformatting">Advanced Partition Formatting</A> sections for some pointers.</P>
+<P>Because MythTV creates very large files, a filesystem that does well at
+deleting large files is important.  Numerous benchmarks show that XFS and
+JFS do very well at this task.  You are strongly encouraged to consider
+either of these for your MythTV filesystem.</P>
 <P>
 <A NAME="video_capture_device"></A> </P>
 <H3>Video Capture Device </H3>
@@ -199,7 +203,7 @@ encoding. Using either a G200 MJPEG encoder card, or a MPEG-2 encoder card
 supported by the IvyTV project 
 <A HREF="http://ivtv.sourceforge.net/">http://ivtv.sourceforge.net/</A> such as the Hauppauge PVR-250, PVR-350,
 Avermedia M179, Hauppauge "Freestyle" or Yuan M600 cards will allow you to
-use dedicated hardware encoders rather than your CPU. Release 0.14 of MythTV
+use dedicated hardware encoders rather than your CPU. Release 0.15 of MythTV
 is able to use these MPEG-2 encoders as an input device for live TV and for
 scheduled recordings.  (The PVR-350 can simultaneously be used as an output
 device.) Using the on-board MPEG-2 encoder drastically reduces the CPU
@@ -345,7 +349,7 @@ organized by manufacturer.</P>
 <P>Reports here are based on what users of the cards have posted on the
 mythtv-users mailing list, so if you need configuration details, please
 search the archives at 
-<A HREF="http://www.gossamer-threads.com/archive/MythTV_C2/Users_F11/">http://www.gossamer-threads.com/archive/MythTV_C2/Users_F11/</A> using
+<A HREF="http://www.gossamer-threads.com/lists/mythtv/">http://www.gossamer-threads.com/lists/mythtv/</A> using
 the card name in your search string.</P>
 
 <H3>ATI</H3>

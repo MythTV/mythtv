@@ -314,15 +314,19 @@ what's going on.</P>
 </H2>
 
 <P>If <B>mythfilldatabase</B> grabbed a channel which you do not want to
-include in your TV listings, you can remove the entries from the xmltv
-config file and the MySQL database.  This often happens with premium
+include in your TV listings, you can remove the entries from the grabber
+configuration and the MySQL database.  This often happens with premium
 channels; for example, HBO or Showtime may be available on your cable TV
 system, but is scrambled because you're not a subscriber to that channel. 
 Since you can never watch it, you want to get rid of it.</P>
-<P>First, comment out the channel from the &nbsp;/.mythtv/&lt;sourcename&gt;.xmltv
-file by inserting the word "not " (including the space) in front of the
-unwanted entry. This will prevent <B>xmltv</B> from grabbing future
-listings.</P>
+<P>If you are using the DataDirect service, login to your account at
+<A HREF="http://labs.zap2it.com/">http://labs.zap2it.com/</A> to
+modify your lineup. Uncheck the boxes for any unwanted channels, and they
+will no longer be included in your download.</P>
+<P>If you are using a grabber from XMLTV, comment out the channel from the
+<CODE>~/.mythtv/&lt;sourcename&gt;.xmltv</CODE> file by inserting the word "not
+" (including the space) in front of the unwanted entry. This will prevent
+<B>xmltv</B> from grabbing future listings.</P>
 <P>Next, delete the unwanted item from the channel table so that it will not
 appear in the EPG or when changing channels.  To delete the data from the
 database we need to perform some steps.  First, assuming that HBO is channel
@@ -678,8 +682,8 @@ name of the system was "frontend1" and we're going to change it to
 <CAPTION><B>NOTE</B>:  Changing the hostname using direct SQL update commands will
 break things.  You <EM>MUST</EM> use this indirect method.</CAPTION>
 </FIGURE>
- 
-1.  Stop all backends.  If you run <B>mythbackend</B> from a terminal
+ </P>
+<P>1.  Stop all backends.  If you run <B>mythbackend</B> from a terminal
 session, press control-c. If your backends are started with an init
 script, you would do something like the following:
 <BLOCKQUOTE><CODE>
@@ -847,14 +851,13 @@ driveropts=burnfree -dao -v tsize="$TSIZE"s -
 <H2><A NAME="MigratingtoDD"></A> <A NAME="ss21.19">21.19</A> <A HREF="mythtv-HOWTO.html#toc21.19">Migrating from XMLTV to DataDirect. </A>
 </H2>
 
-<P><B>CVS Only</B></P>
 <P>DataDirect will use different information for your video sources and
 channels than was used by XMLTV. The following will clear your old
 information in a way that will allow your EPG and existing recording rules
 to continue to work as you'd expect.</P>
 <P>The first step is to create a backup of your database using the
 instructions found in 
-<A HREF="#backupdb">I'd like to save or restore my database.</A>.</P>
+<A HREF="#backupdb">I'd like to save or restore my database.</A></P>
 <P><B>NOTE</B>: Examine the contents of the backup file to be sure that the
 backup succeeded before modifying your database.</P>
 <P><B>NOTE</B>: The MythTV DataDirect grabber requires <B>wget</B> version
@@ -865,6 +868,8 @@ database.</P>
 <PRE>
 $ mysql -u root mythconverg
 mysql>CREATE TABLE channel_copy SELECT * FROM channel;
+mysql>exit
+$
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -877,15 +882,41 @@ in
 <A HREF="mythtv-HOWTO-9.html#VideoSources">Video Sources</A>.</P>
 <P>Once you're done running setup, run <B>mythfilldatabase</B> to populate
 the database with new data.</P>
-<P>Finally, run mysql again.  The next command is one long string:
+<P>To restore the channel icons, you will need to perform one of two steps:</P>
+<P>If you're running MySQL v3, execute the following.  Note that the
+select command is very long.  You can press ENTER at the end of each line;
+the command won't be evaluated until you end the statement with a semicolon.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mysql -u root mythconverg
+mysql>create table channel_temp;
+mysql>select c.chanid, c.channum, c.sourceid, c.callsign, c.name, cb.icon,
+c.finetune, c.videofilters, c.xmltvid, c.contrast, c.brightness,
+c.colour, c.freqid, c.recpriority, c.hue, c.tvformat,
+c.commfree, c.visible, c.outputfilters
+from channel c
+left join channel_copy cb on (c.callsign = cb.callsign);
+mysql>truncate channel;
+mysql>insert channel select * from channel_temp;
+mysql>drop table channel_temp;
+mysql>drop table channel_copy;
+mysql>exit
+$
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>If you are running MySQL v4, it's a little simpler. The next command is
+one long string:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ mysql -u root mythconverg
 mysql>UPDATE channel,channel_copy SET channel.icon = channel_copy.icon WHERE channel.callsign = channel_copy.callsign;
+mysql>drop table channel_copy;
+mysql>exit
+$
 </PRE>
 </CODE></BLOCKQUOTE>
-
-to restore the channel icons.</P>
+</P>
 <HR>
 <A HREF="mythtv-HOWTO-22.html">Next</A>
 <A HREF="mythtv-HOWTO-20.html">Previous</A>

@@ -178,8 +178,7 @@ Once you have no additional cards to setup, press ESC.</P>
 space bar to begin.  The first field asks for the name of the video source.
 You may choose something easy to remember, like "Antenna" or "Cable".  Once
 you've chosen a name, press the down arrow to move to the next field.  </P>
-<P><B>CVS Only</B>
-If you're in North America, change the grabber to "DataDirect", then
+<P>If you're in North America, change the grabber to "DataDirect", then
 continue pressing the down arrow to move to the next field.  Fill in the
 username and password that you have established with DataDirect, then move
 to the "Retrieve Listings" button and press the space bar.  </P>
@@ -187,12 +186,10 @@ to the "Retrieve Listings" button and press the space bar.  </P>
 DataDirect.</P>
 <P>The setup program will contact the Zap2It servers and get your account
 information.  Once you're done, you may click the Finish button and skip the
-next few paragraphs, since they only apply to users that are using the
-external XMLTV script to get their guide data.</P>
+next few paragraphs in this document since they only apply to users that are
+using the external XMLTV script to get their guide data.</P>
 <P>If you wish to continue using the XMLTV grabber, then move to the Zip/postal
 code field and put in the appropriate value.</P>
-<P><B>NOTE</B>:  As of 2004-05-04, the <B>tv_grab_na</B> grabber still
-works, but you are strongly discouraged from using it.</P>
 <P>If you're outside of North America, then some manual interaction will be
 required with XMLTV.</P>
 <P>Once you have chosen your provider, press RETURN to continue.  XMLTV will
@@ -290,19 +287,19 @@ the steps outlined in the section called
 <H2><A NAME="nonmaster_backend"></A> <A NAME="ss9.3">9.3</A> <A HREF="mythtv-HOWTO.html#toc9.3">Configuring a non-master backend. </A>
 </H2>
 
-<P>Configuration of a non-master backend follows the same general procedure
-as that of the master backend, with the exception that you skip over the
-"Video Sources" step.  All possible video sources need to be defined on the
-master backend system; only the master backend will query a listings
-provider to obtain guide data for all the slave backends.</P>
-<P>Make sure that the IP addresses on the General setup screen are accurate. 
-If the slave backend can't communicate with the master backend due to IP
-address misconfiguration then MythTV will not function properly.</P>
 <P>Ensure that you've granted access to the master MySQL database for remote
 backends as discussed in the section titled 
 <A HREF="mythtv-HOWTO-6.html#modify_perm_mysql">Modifying access to the MySQL database for multiple systems</A> and that
 you've edited the <CODE>/usr/local/share/mythtv/mysql.txt</CODE> file and put
 the correct IP address for the database server.</P>
+<P>Make sure that the IP addresses on the General setup screen are accurate. 
+If the slave backend can't communicate with the master backend due to IP
+address misconfiguration then MythTV will not function properly.</P>
+<P>Configuration of a non-master backend follows the same general procedure
+as that of the master backend, with the exception that you skip over the
+"Video Sources" step.  All possible video sources need to be defined on the
+master backend system; only the master backend will query a listings
+provider to obtain guide data for all the non-master backends.</P>
 <P>
 <FIGURE>
 <EPS FILE="stop.eps">

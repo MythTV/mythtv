@@ -94,7 +94,7 @@ during playback. These filters can be used to improve or modify the video
 image, including hiding the effects of an interlaced image or reducing the
 effects of noise in a poor video signal. The following is a brief
 introduction to introduce you to the filters that are available in MythTV
-version 0.14.</P>
+version 0.15.</P>
 <H3>Applying filters</H3>
 
 <P>One or more filters can be included in a "filter chain". The filters to
@@ -141,9 +141,9 @@ playback" has been checked. If you use "kerneldeint" or "linearblend" for
 deinterlacing in your filter string, you should not check "Deinterlace
 playback".</CAPTION>
 </FIGURE>
-
-o  The "kerneldeint" filter</P>
-<P>Kerneldeint is a more complex deinterlacing filter, which applies a filter
+</P>
+<P>o  The "kerneldeint" filter</P>
+<P>Kerneldeint is a more complex deinterlacing filter which applies a filter
 kernel using input from several lines.  It generally removes combing without
 a "ghost" image, sometimes leaving a faint outline of the the image from the
 other field. It is considered to be less distracting to watch than
@@ -155,6 +155,32 @@ option defaults to 0.  If set to a non-zero value, it will cause the filter
 to skip chroma, and filter only the luminance.  It may be useful on some
 capture cards which do not capture the chroma fields of interlaced video
 correctly.</P>
+<P>o The "onefield" filter</P>
+<P>This is a simple one-field deinterlacing filter that uses only one field of
+the interlaced video.  By default it keeps the top field, though passing the
+parameter "bottom" will cause it to keep the bottom field instead.</P>
+<P>This filter is primarily useful for those who display 1080i HDTV signals
+with a video mode that has 540 pixels vertically.  The advantage over other
+deinterlacing filters is that scenes with motion never show combing or
+ghosting.</P>
+<P>o The "adjust" filter</P>
+<P>This filter adjusts the digital values for luma and chroma to ensure that
+they will fall within the ranges specified in the ITU-R601 standard. By
+default, this corrects a known problem for the luma range used by bt8x8
+chips which causes video to look washed out. If parameters are passed, there
+need to be exactly six. However, passing a single parameter of "-1" will
+disable the filter.</P>
+<P>1: luma minimum input value (int)
+2: luma maximum input value (int)
+3: luma gamma correction (float)
+4: chroma minimum input value (int)
+5: chroma maximum input value (int)
+6: chroma gamma correction (float)</P>
+<P>The default bt8x8 correction values are equivalent to
+"16:253:1.0:2:253:1.0".  Output ranges are fixed at ITU-R601 values (16-235
+luma, 16-240 chroma).</P>
+<P><B>NOTE</B>: If it is not already specified in the filter chain, this
+filter will be automatically applied when recording with the "bttv" driver.</P>
 <P>o  The "quickdnr" filter</P>
 <P>A fast temporal denoiser. This can take 1, 2 or 4 parameters, each being a
 value from "0" for the least filtering to "255" for the greatest filtering.
