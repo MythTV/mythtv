@@ -302,6 +302,16 @@ void ProgLister::cursorUp(bool page)
 
 void ProgLister::prevView(void)
 {
+    if (type == plTime)
+    {
+        searchTime = searchTime.addSecs(-3600);
+        curView = 0;
+        viewList[curView] = searchTime.toString(fullDateFormat);
+        viewTextList[curView] = viewList[curView];
+        refillAll = true;
+        return;
+    }
+
     if (viewList.count() < 2)
         return;
 
@@ -315,6 +325,15 @@ void ProgLister::prevView(void)
 
 void ProgLister::nextView(void)
 {
+    if (type == plTime)
+    {
+        searchTime = searchTime.addSecs(3600);
+        curView = 0;
+        viewList[curView] = searchTime.toString(fullDateFormat);
+        viewTextList[curView] = viewList[curView];
+        refillAll = true;
+        return;
+    }
     if (viewList.count() < 2)
         return;
 
@@ -1254,8 +1273,7 @@ void ProgLister::fillItemList(void)
 
         if (qphrase == "movies")
         {
-            where += "AND (program.category_type = 'movie' ";
-            where += "AND program.airdate >= YEAR(NOW() - INTERVAL 2 YEAR)) ";
+            where += "AND program.category_type = 'movie' ";
         }
         else if (qphrase == "series")
         {

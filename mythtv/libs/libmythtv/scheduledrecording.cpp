@@ -487,27 +487,30 @@ void ScheduledRecording::runProgList(void)
 {
     ProgLister *pl = NULL;
 
-    if (!m_pginfo)
+    if(search->intValue() && getRecordID())
     {
+        ScheduledRecording rule;
+        rule.loadByID(QSqlDatabase::database(), getRecordID());
+
         switch (search->intValue())
         {
         case kTitleSearch:
-            pl = new ProgLister(plTitleSearch, description->getValue(),
+            pl = new ProgLister(plTitleSearch, rule.description->getValue(),
                                 QSqlDatabase::database(),
                                 gContext->GetMainWindow(), "proglist");
             break;
         case kKeywordSearch:
-            pl = new ProgLister(plKeywordSearch, description->getValue(),
+            pl = new ProgLister(plKeywordSearch, rule.description->getValue(),
                                 QSqlDatabase::database(),
                                 gContext->GetMainWindow(), "proglist");
             break;
         case kPeopleSearch:
-            pl = new ProgLister(plPeopleSearch, description->getValue(),
+            pl = new ProgLister(plPeopleSearch, rule.description->getValue(),
                                 QSqlDatabase::database(),
                                 gContext->GetMainWindow(), "proglist");
             break;
         case kPowerSearch:
-            pl = new ProgLister(plPowerSearch, QString(title->getValue())
+            pl = new ProgLister(plPowerSearch, QString(rule.title->getValue())
                                 .remove(" (" + tr("Power Search") + ")"),
                                 QSqlDatabase::database(),
                                 gContext->GetMainWindow(), "proglist");
@@ -520,19 +523,11 @@ void ScheduledRecording::runProgList(void)
         }
     }
     else
-    {
-        if(search->intValue())
-            pl = new ProgLister(plTitle, m_pginfo->title,
-                                QSqlDatabase::database(),
-                                gContext->GetMainWindow(), "proglist");
-        else
-            pl = new ProgLister(plTitle, title->getValue(),
-                                QSqlDatabase::database(),
-                                gContext->GetMainWindow(), "proglist");
-    }
+        pl = new ProgLister(plTitle, title->getValue(),
+                            QSqlDatabase::database(),
+                            gContext->GetMainWindow(), "proglist");
     pl->exec();
     delete pl;
-    //proglistButton->setFocus();
 }
 
 void ScheduledRecording::runShowDetails(void)
