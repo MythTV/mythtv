@@ -9,19 +9,36 @@
 .Nd export nuv files created by mythtv to other formats
 .Sh SYNOPSIS
 .Nm
-.Op Fl Fl title string
-.Op Fl Fl subtitle string
-.Op Fl Fl description string
-.Op Fl Fl debug
-.Op Fl Fl mode mode
+.Op Fl Fl title=\fRstring\fR
+.Op Fl Fl subtitle=\fRstring\fR
+.Op Fl Fl description=\fRstring\fR
+.Op Fl Fl infile=\fRfile\fR
+.Op Fl Fl chanid=\fRchannel\fR
+.Op Fl Fl mode=\fRmode\fR
 .Op Fl Fl search-only
 .Op Fl Fl confirm
-.Op Fl Fl nice
+.Op Fl Fl nice=\fRnicelevel\fR
+.Op Fl Fl noserver
+.Op Fl Fl debug
+.Op Fl Fl cutlist
+.Op Fl Fl path=\fRsavepath\fR
+.Op Fl Fl height=\fRheight\fR
+.Op Fl Fl width=\fRwidth\fR
+
+.Op Fl Fl ffmpeg
+.Op Fl Fl deinterlace
+.Op Fl Fl denoise
+.Op Fl Fl crop
+
+.Op Fl Fl transcode
+.Op Fl Fl deinterlace
+.Op Fl Fl denoise
+.Op Fl Fl crop
+.Op Fl Fl zoom_filter=\fRfiltername\fR
 
 .Sh DESCRIPTION
 .Nm
-is a perl script built to assist in exporting .NUV files from mythtv into various formats. Most of the usage is interactive with the program.
-
+is a program written in perl built to assist in exporting .NUV files from mythtv into various formats. Most of the usage is interactive with the program.
 .Sh OPTIONS
 The following command line options are available:
 .Bl -tag -width indent
@@ -35,6 +52,20 @@ search on title for programs
 search on subtitle for programs
 .It Fl Fl description
 search on description for programs
+.It Fl Fl infile
+use argument as the file to transcode from
+.It Fl Fl chanid
+uses a given channel ID to select the recording to transcode
+.It Fl Fl noserver
+This does something without a server, locally only
+.It Fl Fl cutlist
+Use the mythtv cutlists to remove portions of the recordings (i.e. commercials)
+.It Fl Fl path
+define the path for nuvexport to save exported files to, defaults to "."
+.It Fl Fl height
+Set the height of the output file
+.It Fl Fl width
+Set the width of the output file
 .It Fl Fl nice
 sets the nicelevel for nuvexport to run at (values from 0-20)
 .It Fl Fl help
@@ -43,12 +74,34 @@ brings up help
 enables debugging information, as well as changes reencode behavior to print out actions rather then executing them. useful for understanding what programs are being run by nuvexport to do the reencoding work
 .It Fl Fl mode mode
 used for running nuvexport in a given mode, current accepted values are : xvid, dvd, vcd, dvcd, wmv, mp3, mpeg2_cut and nuv_sql
+.It Fl Fl ffmpeg
+Uses ffmpeg as the re-encoder process
+.Bl -tag -width indent
+.It Fl Fl deinterlace
+deinterlaces the output file
+.It Fl Fl denoise
+uses noise reduction filters to clean up the output
+.It Fl Fl crop
+crops the broadcast overscan
 .El
-
+.It Fl Fl transcode
+Uses transcode as the re-encoder process
+.Bl -tag -width indent
+.It Fl Fl deinterlace
+deinterlaces the output file
+.It Fl Fl denoise
+uses noise reduction filters to clean up the output
+.It Fl Fl crop
+crops the broadcast overscan
+.It Fl Fl zoom_filter
+uses a zoom filter as specified
+.El
+.El
+.El
 .Sh USAGE
 As mentioned, the program is interactive, and is fairly self explanitory.  The following are the basic steps to export a file from mythtv.
 .Bd -literal
-1) Choose export type from the prompts, detaisl of the choices are below 
+1) Choose export type from the prompts, details of the choices are below 
     in EXPORT TYPES section
 2) Choose from the show titles.
 3) Choose a specific show from the titles, you may select a number of 
@@ -57,10 +110,8 @@ As mentioned, the program is interactive, and is fairly self explanitory.  The f
 5) the following questions are usually ok to leave with defaults, 
     especially if you are unsure as to their function
 .Ed 
-
 .Sh DIAGNOSTICS
 .Ex -std
-
 .Sh DEPENDANCIES
 .Nm
 depends on the following programs to work
@@ -74,7 +125,6 @@ avidemux2 : demultiplexes MPEG2 files
 Xvfb : used to keep avidemux2 from requiring a X11 GUI frontend
 lvemux : remultiplex MPEG2 files
 .Ed
-
 .Sh EXPORT TYPES
 Supported export formats:
 .Pp
@@ -92,7 +142,6 @@ MPEG2->MPEG2 cut - cuts commercials tagged by mythtv and gives
 nuv and sql - dumps mysql database so it can be moved to another 
     mythtv backend
 .Ed
-
 .Sh SEE ALSO
 .Xr transcode 1 ,
 .Xr mythtranscode 1 ,
@@ -104,17 +153,14 @@ nuv and sql - dumps mysql database so it can be moved to another
 .Xr nuvexport-dvcd 1 ,
 .Xr nuvexport-dvd 1 ,
 .Xr nuvexport-wmv 1
-
 .Sh HISTORY
 Once upon a time, Chris wrote nuvexport, then Gavin helped, then Paul came along to make documentation.  No minstrels were eaten this time, but there was still  much rejoicing.
 .Pp
-
 .Sh AUTHOR
 .Bd -literal
-Main code by:  Chris Petersen (mythtv@forevermore.net)
-Additional exporter work:  Gavin Hurlbut (gjhurlbu@gmail.com)
-ManPage by: Paul Greidanus (paul@majestik.org)
+Main code by:  Chris Petersen (mythtv_at_forevermore_dot_net)
+Additional exporter work:  Gavin Hurlbut (gjhurlbu_at_gmail_dot_com)
+ManPage by: Paul Greidanus (paul_at_majestik_dot_org)
 .Ed
-
 .Sh BUGS
 Please check http://www.forevermore.net/mythtv to check on current status of nuvexport, and to check on any bugs
