@@ -399,15 +399,7 @@ void ProgramInfo::WriteRecordedToDB(QSqlDatabase *db)
 
     QSqlQuery qquery = db->exec(query);
     if (!qquery.isActive())
-    {
-        cerr << "DB Error: recorded program insertion failed, SQL query "
-             << "was:" << endl;
-        cerr << query << endl;
-        cerr << "Driver error was:" << endl;
-        cerr << qquery.lastError().driverText() << endl;
-        cerr << "Database error was:" << endl;
-        cerr << qquery.lastError().databaseText() << endl;
-    }
+        MythContext::DBError("WriteRecordedToDB (recorded)", qquery);
 
     query = QString("INSERT INTO oldrecorded (chanid,starttime,endtime,title,"
                     "subtitle,description) "
@@ -417,15 +409,7 @@ void ProgramInfo::WriteRecordedToDB(QSqlDatabase *db)
 
     qquery = db->exec(query);
     if (!qquery.isActive())
-    {
-        cerr << "DB Error: recorded program insertion failed, SQL query "
-             << "was:" << endl;
-        cerr << query << endl;
-        cerr << "Driver error was:" << endl;
-        cerr << qquery.lastError().driverText() << endl;
-        cerr << "Database error was:" << endl;
-        cerr << qquery.lastError().databaseText() << endl;
-    }
+        MythContext::DBError("WriteRecordedToDB (oldrecorded)", qquery);
 
     GetProgramRecordingStatus(db);
     record->doneRecording(db, *this);
