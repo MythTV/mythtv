@@ -12,7 +12,6 @@
 
 #include <qstring.h>
 #include <qstringlist.h>
-#include <qsqldatabase.h>
 
 #include "../config.h"
 
@@ -24,8 +23,6 @@ class Settings
 
     Settings();
     ~Settings();
-
-    int    openDatabase(QSqlDatabase *db);
 
     QString GetSetting(const QString &key, const QString &defaultval = "");
     QString getSetting(const QString &key, const QString &defaultval = "");

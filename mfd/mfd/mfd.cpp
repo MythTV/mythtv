@@ -23,7 +23,7 @@
 
 extern SignalThread *signal_thread;
 
-MFD::MFD(QSqlDatabase *ldb, int port, bool log_stdout, int logging_verbosity)
+MFD::MFD(int port, bool log_stdout, int logging_verbosity)
     :QObject()
 {
     //
@@ -42,16 +42,6 @@ MFD::MFD(QSqlDatabase *ldb, int port, bool log_stdout, int logging_verbosity)
     signal_thread = new SignalThread(this);
     signal_thread->start();
 
-    //
-    //  Assign the database if one exists
-    //
-    
-    db = NULL;
-    if(ldb)
-    {
-        db = ldb;
-    }
-    
     //
     //  Create the log (possibly to stdout)
     //

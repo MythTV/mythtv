@@ -11,7 +11,6 @@
 #include <signal.h>
 
 #include <qapplication.h>
-#include <qsqldatabase.h>
 #include <qfile.h>
 #include <qtextstream.h>
 
@@ -153,25 +152,10 @@ int main(int argc, char **argv)
     }
 
     //
-    //  Get the Myth context and db hooks
-    //    
-
-
-    QSqlDatabase *db = NULL;
-
+    //  Create an object to get settings from
+    //
+    
     mfdContext = new Settings();
-
-    db = QSqlDatabase::addDatabase("QMYSQL3");
-    if (!db)
-    {
-        cerr << "mfd: Couldn't connect to database. Giving up." << endl; 
-        return -1;
-    }
-    if(!mfdContext->openDatabase(db))
-    {
-        cerr << "mfd: Couldn't open database. I go away now." << endl;
-        return -1;
-    }
 
     //
     //  Figure out port to listen on
@@ -208,11 +192,9 @@ int main(int argc, char **argv)
 
     UpgradeMusicDatabaseSchema();
 
-    the_mfd = new MFD(db, assigned_port, log_stdout, logging_verbosity);
+    the_mfd = new MFD(assigned_port, log_stdout, logging_verbosity);
     a.exec();
                                 
-    delete db;
-
     if(mfdContext)
     {
         delete mfdContext;

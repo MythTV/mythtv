@@ -12,7 +12,6 @@
 
 #include <qdatetime.h>
 #include <qmutex.h>
-#include <qsqldatabase.h>
 #include <qvaluelist.h>
 
 #include "mfd_plugin.h"
@@ -65,7 +64,7 @@ class MMusicWatcher: public MFDServicePlugin
     void            run();
     bool            sweepMetadata();
     void            checkForDeletions(MusicFileMap &music_files, const QString &startdir);
-    bool            checkDataSources(const QString &startdir, QSqlDatabase *a_db);
+    bool            checkDataSources(const QString &startdir);
     void            removeAllMetadata();
     void            buildFileList(const QString &directory, MusicFileMap &music_files);
     void            compareToMasterList(MusicFileMap &music_files, const QString &startdir);
@@ -88,7 +87,6 @@ class MMusicWatcher: public MFDServicePlugin
     QTime           metadata_sweep_time;
     bool            force_sweep;
     QMutex          force_sweep_mutex;
-    QSqlDatabase    *db;
 
     QIntDict<Metadata>  *new_metadata;
     QIntDict<Playlist>  *new_playlists;

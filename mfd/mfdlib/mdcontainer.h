@@ -11,7 +11,6 @@
 */
 
 #include <qstring.h>
-#include <qsqldatabase.h>
 #include <qintdict.h>
 #include <qptrlist.h>
 #include <qthread.h>

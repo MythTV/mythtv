@@ -16,8 +16,6 @@
 
 #ifdef AAC_AUDIO_SUPPORT
 
-#include <qsqldatabase.h>
-
 #include "decoder.h"
 
 #include <mp4ff.h>

@@ -1,4 +1,3 @@
-#include <qsqldatabase.h>
 #include <qstring.h>
 #include <qdir.h>
 
@@ -7,16 +6,17 @@ using namespace std;
 
 #include "dbcheck.h"
 
-#include "settings.h"
+#include "mythtv/mythcontext.h"
+#include "mythtv/mythdbcon.h"
 
-const QString currentDatabaseVersion = "1003";
+const QString currentDatabaseVersion = "1005";
 
 static void UpdateDBVersionNumber(const QString &newnumber)
 {
-    QSqlDatabase *db_conn = QSqlDatabase::database();
+    MSqlQuery query(MSqlQuery::InitCon());
 
-    db_conn->exec("DELETE FROM settings WHERE value='MusicDBSchemaVer';");
-    db_conn->exec(QString("INSERT INTO settings (value, data, hostname) "
+    query.exec("DELETE FROM settings WHERE value='MusicDBSchemaVer';");
+    query.exec(QString("INSERT INTO settings (value, data, hostname) "
                           "VALUES ('MusicDBSchemaVer', %1, NULL);")
                          .arg(newnumber));
 }
@@ -24,17 +24,17 @@ static void UpdateDBVersionNumber(const QString &newnumber)
 static void performActualUpdate(const QString updates[], QString version,
                                 QString &dbver)
 {
-    QSqlDatabase *db_conn = QSqlDatabase::database();
-
     VERBOSE(VB_ALL, QString("Upgrading to MythMusic schema version ") + 
             version);
+
+    MSqlQuery query(MSqlQuery::InitCon());
 
     int counter = 0;
     QString thequery = updates[counter];
 
     while (thequery != "")
     {
-        db_conn->exec(thequery);
+        query.exec(thequery);
         counter++;
         thequery = updates[counter];
     }
@@ -45,7 +45,7 @@ static void performActualUpdate(const QString updates[], QString version,
 
 void UpgradeMusicDatabaseSchema(void)
 {
-    QString dbver = mfdContext->GetSetting("MusicDBSchemaVer");
+    QString dbver = gContext->GetSetting("MusicDBSchemaVer");
     
     if (dbver == currentDatabaseVersion)
         return;
@@ -86,22 +86,22 @@ void UpgradeMusicDatabaseSchema(void)
 
     if (dbver == "1000")
     {
-        QString startdir = mfdContext->GetSetting("MusicLocation");
+        QString startdir = gContext->GetSetting("MusicLocation");
         startdir = QDir::cleanDirPath(startdir);
         if (!startdir.endsWith("/"))
             startdir += "/";
 
-        QSqlDatabase *db_conn = QSqlDatabase::database();
+        MSqlQuery query(MSqlQuery::InitCon());
         // urls as filenames are NOT officially supported yet
-        QSqlQuery query("SELECT filename, intid FROM musicmetadata WHERE "
-                        "filename NOT LIKE ('%://%');", db_conn);
-        QSqlQuery modify;
+        query.exec("SELECT filename, intid FROM musicmetadata WHERE "
+                        "filename NOT LIKE ('%://%');");
 
-        if (query.isActive() && query.numRowsAffected() > 0)
+        if (query.isActive() && query.size() > 0)
         {
             int i = 0;
             QString intid, name, newname;
 
+            MSqlQuery modify(MSqlQuery::InitCon());
             while (query.next())
             {
                 name = query.value(0).toString();
@@ -127,6 +127,7 @@ void UpgradeMusicDatabaseSchema(void)
 };
         performActualUpdate(updates, "1001", dbver);
     }
+
     if (dbver == "1001")
     {
         const QString updates[] = {
@@ -154,14 +155,12 @@ void UpgradeMusicDatabaseSchema(void)
 
         performActualUpdate(updates, "1002", dbver);
     }
-
+    
     if (dbver == "1002")
     {
         VERBOSE(VB_ALL, "Updating music metadata to be UTF-8 in the database");
 
-        QSqlDatabase *db_conn = QSqlDatabase::database();
-
-        QSqlQuery query(QString::null, db_conn);
+        MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT intid, artist, album, title, genre, "
                       "filename FROM musicmetadata ORDER BY intid;");
 
@@ -176,7 +175,7 @@ void UpgradeMusicDatabaseSchema(void)
                 QString genre = query.value(4).toString();
                 QString filename = query.value(5).toString();
 
-                QSqlQuery subquery(QString::null, db_conn);
+                MSqlQuery subquery(MSqlQuery::InitCon());
                 subquery.prepare("UPDATE musicmetadata SET "
                                  "artist = :ARTIST, album = :ALBUM, "
                                  "title = :TITLE, genre = :GENRE, "
@@ -204,7 +203,7 @@ void UpgradeMusicDatabaseSchema(void)
                 int id = query.value(0).toInt();
                 QString name = query.value(1).toString();
 
-                QSqlQuery subquery(QString::null, db_conn);
+                MSqlQuery subquery(MSqlQuery::InitCon());
                 subquery.prepare("UPDATE musicplaylist SET "
                                  "name = :NAME WHERE playlistid = :ID ;");
                 subquery.bindValue(":NAME", name.utf8());
@@ -222,7 +221,7 @@ void UpgradeMusicDatabaseSchema(void)
 };
         performActualUpdate(updates, "1003", dbver);
     }
-
+    
     if (dbver == "1003")
     {
         const QString updates[] = {

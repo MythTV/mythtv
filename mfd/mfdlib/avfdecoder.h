@@ -6,8 +6,6 @@
 
 #ifdef WMA_AUDIO_SUPPORT
 
-#include <qsqldatabase.h>
-
 #include "decoder.h"
 #include <mythtv/ffmpeg/avformat.h>
 #include <mythtv/ffmpeg/avcodec.h>

@@ -13,6 +13,8 @@
 #include <qdir.h>
 #include <qfileinfo.h>
 
+#include <mythtv/mythdbcon.h>
+
 #include "mmusic.h"
 #include "mfd_events.h"
 #include "settings.h"
@@ -76,17 +78,6 @@ MMusicWatcher::MMusicWatcher(MFD *owner, int identity)
     //
     
     desired_database_version = "1005";
-
-    //
-    //  pointer to the database
-    //
-    
-    db = parent->getDatabase();
-    if(!db)
-    {
-        warning("cant't talk to database ... I'm out of here");
-        return;
-    }
 
     //
     //  Initialize our container and set things up for a clean slate
@@ -388,7 +379,7 @@ bool MMusicWatcher::sweepMetadata()
     //  sensible
     //
 
-    if(!checkDataSources(startdir, db))
+    if(!checkDataSources(startdir))
     {
         //
         //  Somethings wrong, so no metadata can exist.
@@ -549,7 +540,9 @@ void MMusicWatcher::checkForDeletions(MusicFileMap &music_files, const QString &
     delete_timer.start();
     int count = 0;
     
-    QSqlQuery query("SELECT intid, filename FROM musicmetadata ;", db);
+    MSqlQuery query(MSqlQuery::InitCon());
+    
+    query.exec("SELECT intid, filename FROM musicmetadata ;");
     
     if(query.isActive())
     {
@@ -564,7 +557,8 @@ void MMusicWatcher::checkForDeletions(MusicFileMap &music_files, const QString &
                     //
 
                     ++count;
-                    QSqlQuery delete_query;
+                    
+                    MSqlQuery delete_query(MSqlQuery::InitCon());
                     delete_query.prepare("DELETE FROM musicmetadata WHERE intid = ?");
                     delete_query.bindValue(0, query.value(0).toUInt());
                     delete_query.exec();
@@ -589,7 +583,7 @@ void MMusicWatcher::checkForDeletions(MusicFileMap &music_files, const QString &
     
 }
 
-bool MMusicWatcher::checkDataSources(const QString &startdir, QSqlDatabase *a_db)
+bool MMusicWatcher::checkDataSources(const QString &startdir)
 {
 
     //
@@ -657,7 +651,9 @@ bool MMusicWatcher::checkDataSources(const QString &startdir, QSqlDatabase *a_db
     //  Make sure the db exists, and we can see the two tables
     //
     
-    QSqlQuery query("SELECT COUNT(filename) FROM musicmetadata;", a_db);
+    MSqlQuery query(MSqlQuery::InitCon());
+    
+    query.exec("SELECT COUNT(filename) FROM musicmetadata;");
     
     if(!query.isActive())
     {
@@ -670,9 +666,9 @@ bool MMusicWatcher::checkDataSources(const QString &startdir, QSqlDatabase *a_db
         
     }
     
-    QSqlQuery pl_query("SELECT COUNT(playlistid) FROM musicplaylist ", a_db);
+    query.exec("SELECT COUNT(playlistid) FROM musicplaylist ");
 
-    if(!pl_query.isActive())
+    if(!query.isActive())
     {
         if(!sent_playlist_table_warning)
         {
@@ -992,7 +988,7 @@ AudioMetadata* MMusicWatcher::loadFromDatabase(
     QString sqlfilename = file_name;
     sqlfilename = sqlfilename.remove(0, non_const_startdir.length());
 
-    QSqlQuery query(NULL, db);
+    MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT intid, artist, album, title, genre, "
                   "year, tracknum, length, rating, "
@@ -1212,7 +1208,8 @@ AudioMetadata *MMusicWatcher::checkNewFile(
         QString sqlfilename = filename;
         sqlfilename = sqlfilename.remove(0, non_const_startdir.length());
         
-        QSqlQuery query(NULL, db);
+        MSqlQuery query(MSqlQuery::InitCon());
+
         query.prepare("INSERT INTO musicmetadata (filename, mythdigest) "
                       "values ( ? , ?)");
 
@@ -1228,19 +1225,18 @@ AudioMetadata *MMusicWatcher::checkNewFile(
             return NULL;
         }
         
-        QSqlQuery retrieve_query(NULL, db);
-        retrieve_query.prepare("SELECT intid FROM musicmetadata "
+        query.prepare("SELECT intid FROM musicmetadata "
                                "WHERE mythdigest = ? ;");
-        retrieve_query.bindValue(0, new_item->getMythDigest());
-        retrieve_query.exec();
-        if(retrieve_query.numRowsAffected() < 1)
+        query.bindValue(0, new_item->getMythDigest());
+        query.exec();
+        if(query.numRowsAffected() < 1)
         {
             warning("failed to get back something we _just_ put in "
                     "the database");
             delete new_item;
             return NULL;
         }
-        retrieve_query.next();
+        query.next();
         
         //
         //  Set some values for new data
@@ -1249,7 +1245,7 @@ AudioMetadata *MMusicWatcher::checkNewFile(
         QDateTime earliest_possible;
         earliest_possible.setTime_t(0);
         
-        new_item->setDbId(retrieve_query.value(0).toUInt());
+        new_item->setDbId(query.value(0).toUInt());
         new_item->setDateAdded(QDateTime::currentDateTime());
         new_item->setLastPlayed(earliest_possible);
         new_item->setId(bumpMetadataId());
@@ -1336,9 +1332,8 @@ void MMusicWatcher::persistMetadata(AudioMetadata *an_item)
     //  Long and ugly, but easy to see what is going on
     //
 
+    MSqlQuery query(MSqlQuery::InitCon());
 
-    QSqlQuery query(NULL, db);
-    
     query.prepare("UPDATE musicmetadata SET "
                   "title = ? , "
                   "artist = ? , "
@@ -1482,8 +1477,8 @@ void MMusicWatcher::loadPlaylists()
     //  deal with frontend/user interaction for changes to playlist(s).
     //
 
+    MSqlQuery query(MSqlQuery::InitCon());
 
-    QSqlQuery query(NULL, db);
     query.prepare("SELECT name, songlist, playlistid FROM musicplaylist "
                   "WHERE name != ? "
                   "AND name != ? "
@@ -1598,7 +1593,7 @@ void MMusicWatcher::persistPlaylist(Playlist *a_playlist)
         }
     }
     
-    QSqlQuery query(NULL, db);
+    MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("UPDATE musicplaylist SET songlist = ?, name = ? WHERE "
                   "playlistid = ? ;");

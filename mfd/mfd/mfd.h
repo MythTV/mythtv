@@ -11,7 +11,6 @@
 */
 
 #include <qobject.h>
-#include <qsqldatabase.h>
 #include <qstringlist.h>
 
 #include "pluginmanager.h"
@@ -33,10 +32,9 @@ class MFD : public QObject
 
   public:
   
-    MFD(QSqlDatabase *db, int port, bool log_stdout, int logging_verbosity);
+    MFD(int port, bool log_stdout, int logging_verbosity);
     ~MFD();
     
-    QSqlDatabase*       getDatabase(){return db;}
     MetadataServer*     getMetadataServer(){return metadata_server;}
     MFDPluginManager*   getPluginManager(){return plugin_manager;}
     
@@ -70,7 +68,6 @@ class MFD : public QObject
     void sendMessage(const QString &the_message);
     void doListCapabilities(const QStringList &tokens, MFDClientSocket *socket);
 
-    QSqlDatabase                *db;
     MetadataServer              *metadata_server;
     MFDLogger                   *mfd_log;
     MFDPluginManager            *plugin_manager;

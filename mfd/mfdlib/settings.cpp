@@ -25,15 +25,9 @@ MythContext *gContext;
 
 Settings::Settings()
 {
-    gContext = new MythContext(MYTH_BINARY_VERSION, false);
+    gContext = new MythContext(MYTH_BINARY_VERSION);
+    gContext->Init(false);
 }
-
-int Settings::openDatabase(QSqlDatabase *db)
-{
-    return gContext->OpenDatabase(db);
-}
-
-
 
 QString Settings::GetSetting(const QString &key, const QString &defaultval)
 {
