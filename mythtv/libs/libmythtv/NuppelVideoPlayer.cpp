@@ -20,7 +20,6 @@ using namespace std;
 #include "mythdbcon.h"
 #include "dialogbox.h"
 #include "NuppelVideoPlayer.h"
-#include "NuppelVideoRecorder.h"
 #include "audiooutput.h"
 #include "recordingprofile.h"
 #include "osdtypes.h"
@@ -34,6 +33,8 @@ using namespace std;
 #include "nuppeldecoder.h"
 #include "avformatdecoder.h"
 #include "jobqueue.h"
+
+#include "NuppelVideoRecorder.h"
 
 extern "C" {
 #include "vbitext/vbi.h"
