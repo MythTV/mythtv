@@ -98,7 +98,10 @@ void CardInput::loadByInput(QSqlDatabase* db, int _cardid, QString _inputname) {
 }
 
 void CardInput::save(QSqlDatabase* db) {
-    if (sourceid->getValue() != "0")
+    if (sourceid->getValue() == "0")
+        // "None" is represented by the lack of a row
+        db->exec(QString("DELETE FROM cardinput WHERE cardinputid = %1").arg(getInputID()));
+    else
         VerticalConfigurationGroup::save(db);
 }
 
