@@ -417,17 +417,19 @@ void MythContext::ThemeWidget(QWidget *widget)
             QString pmapname = m_themepathname +
                          m_qtThemeSettings->GetSetting("TiledBackgroundPixmap");
 
+            int width, height;
+            float wmult, hmult;
+
+            GetScreenSettings(width, wmult, height, hmult);
+
+
             bgpixmap = LoadScalePixmap(pmapname);
             if (bgpixmap)
             {
-                QPixmap background(GetNumSetting("GuiWidth", m_width),
-                                   GetNumSetting("GuiHeight", m_height));
+                QPixmap background(width, height);
                 QPainter tmp(&background);
 
-                tmp.drawTiledPixmap(0, 0,
-                                    GetNumSetting("GuiWidth", m_width),
-                                    GetNumSetting("GuiHeight", m_height),
-                                    *bgpixmap);
+                tmp.drawTiledPixmap(0, 0, width, height, *bgpixmap);
                 tmp.end();
 
                 m_backgroundimage = background;
