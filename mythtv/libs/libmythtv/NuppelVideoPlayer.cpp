@@ -765,6 +765,7 @@ void NuppelVideoPlayer::OutputAudioLoop(void)
 	    //ioctl(audiofd, SNDCTL_DSP_RESET, NULL);
 	    //usleep(50);
 	    
+	    audiotime = 0; // mark 'audiotime' as invalid.
 	    WriteAudio(zeros, 1024);
 	    //printf("audio waiting for unpause\n");
 	    continue;
@@ -772,6 +773,7 @@ void NuppelVideoPlayer::OutputAudioLoop(void)
 	
         if (prebuffering)
         {
+	    audiotime = 0; // mark 'audiotime' as invalid
 	    WriteAudio(zeros, 1024);
 
 	    //printf("audio thread waiting for prebuffer\n");
