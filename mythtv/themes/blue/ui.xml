@@ -1825,11 +1825,11 @@
 
     <container name="program_info">
       <area>20,20,760,275</area>
-      <textarea name="title" draworder="6">
+      <textarea name="banner" draworder="6">
         <area>0,0,760,45</area>
         <font>title</font>
       </textarea>
-      <textarea name="subtitle" draworder="6">
+      <textarea name="episode" draworder="6">
         <area>0,45,760,40</area>
         <font>subtitle</font>
       </textarea>
