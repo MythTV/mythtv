@@ -242,6 +242,8 @@ void MythContextPrivate::LoadDatabaseSettings(bool reload)
         VERBOSE(VB_IMPORTANT, "Unable to read configuration file mysql.txt");
         if (!FixSettingsFile())
             exit(-29);
+        else
+            parent->LoadSettingsFiles("mysql.txt");
     }
 
     // Even if we have loaded the settings file, it may be incomplete,
