@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2004-01-24, v0.13.14
+<date>2004-01-29, v0.13.15
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -2463,20 +2463,155 @@ processor will be able to deinterlace correctly.
 On an AMD processor, look for "3dnow" in the cpuinfo line; "3dnow" is AMD's
 implementation of SSE instructions, so if your processor has 3dnow you
 shouldn't have any issues with deinterlacing.
+<sect2>Video Filters
+<!-- Submitted by Bruce Markey -->
+<p>MythTV provides a facility to include video filters while recording and
+during playback. These filters can be used to improve or modify the video
+image, including hiding the effects of an interlaced image or reducing the
+effects of noise in a poor video signal. The following is a brief
+introduction to introduce you to the filters that are available in MythTV
+version 0.14.
+<sect2>Applying filters
+<p>One or more filters can be included in a "filter chain". The filters to
+be used are identified in a "filter string". A filter string is a group of
+filter names and parameters separated by commas.  To include parameters, the
+filter name is followed by "=" and the parameter information. There should
+be no spaces in the filter string. Here is an example filter string:
+
+With parameters: <tt>kerneldeint=10:1,denoise3d=12</tt>
+Without: <tt>kerneldeint,denoise3d</tt>
+
+Recording filters are set for each individual channel. These may be used
+when encoding in software (MPEG-4, RTJPEG) but do not apply when using a
+capture card with hardware encoding such as those supported by the ivtv
+driver, DVB, HDTV or MJPEG cards. You can run MythTV's "setup" program and
+select the "Channel Editor". On the first page for each channel, you can
+enter a filter string in the box titled "Video filters". If you are running
+"mythweb" on your web server, you can click on "Settings" then "Channels"
+and enter filter strings in the "videofilters" column.
+
+Playback filters are per-host and apply to any recording you watch from the
+frontend where filters have been applied. From "mythfrontend" go to
+Setup->TV Settings->Playback. Enter your filter string in the box titled
+"Custom Filters".
+
+<sect2>Currently Available Filters
+<p>o  The "invert" filter
+
+Invert ignores any parameters and inverts the pixel values of the video
+frames.  In other words, a negative image. This would rarely be useful but
+may be a good example to verify that your filter strings take effect.
+
+o  The "linearblend" filter
+
+This is the filter that is used when "Deinterlace playback" has been
+checked.  It is a simple deinterlacing filter that ignores parameters and
+works by blending adjacent lines.  It replaces combing in interlaced video
+with a less distracting "ghost" image.
+
+o  The "kerneldeint" filter
+
+Kerneldeint is a more complex deinterlacing filter, which applies a filter
+kernel using input from several lines.  It generally removes combing without
+a "ghost" image, sometimes leaving a faint outline of the the image from the
+other field. It is considered to be less distracting to watch than
+linearblend or no filter at all. It accepts one or two integer parameters
+separated by a colon.
+
+The first parameter is the filter threshold and defaults to 12. Adjacent
+lines differing by more than the threshold value are filtered. The second
+option defaults to 0.  If set to a non-zero value, it will cause the filter
+to skip chroma, and filter only the luminance.  It may be useful on some
+capture cards which do not capture the chroma fields of interlaced video
+correctly.
+
+o  The "quickdnr" filter
+
+A fast temporal denoiser. This can take 1, 2 or 4 parameters, each being a
+value from "0" for the least filtering to "255" for the greatest filtering.
+With one parameter, the filter will compute the values it should use for all
+of its variables. Two parameters will set the filter strength for luma and
+chroma independently. If you are interested in how the algorithm works, you
+may examine the source code to see how four parameter are used.
+
+o  The "denoise3d" filter
+
+A slower denoiser that applies a spatial and temporal low-pass filter. The
+spatial filter can remove some noise that quickdnr can't, but a more
+powerful CPU is needed.  This filter accepts 3 float parameters:
+
+<itemize>
+<item>luma spatial filter strength
+<item>chroma spatial filter strength
+<item>luma temporal filter strength
+</itemize>
+
+Reasonable defaults will be selected for omitted parameters.  The chroma
+temporal filter strength is calculated from the other filter strengths.
+
+o  The "crop" filter
+
+Covers edges of video with black bars.  This helps improve video quality
+when the edges of the frame are distorted. By default, this removes 16
+pixels from each edge. This can optionally take four parameters representing
+top:left:bottom:right. The number times 16 is the number of pixels to remove
+so, for example, the default is "=1:1:1:1".
+
+o  The "forceyv12" and "forceyuv422p" filters
+
+These force the filter manager to use the given format.  You can use one of
+these at the head of a filter chain to change the capture format. The most
+likely use would be forceyuv422p to use YUV422P capture on cards with known
+chroma interlacing problems with YV12.
+
+There are some filters included in the MythTV source code that should 
+not be used:
+
+o  The "forcergb24" and "forceargb32" filters
+
+The two RGB formats should not be used because there is no conversion filter
+for them yet.
+
+o  The "convert" filter
+
+It exists but don't use it.  The filter manager uses this filter
+automatically when it is unable to match the input/output formats of two
+adjacent filters.
+
+o  The "postprocess" filter
+
+While this exists in MythTV source code, it is currently not recommended for
+use.
+
+<sect2>Usage Considerations
+
+<p>There are trade-offs to consider when deciding if it would be wise to use
+a filter. Any processing will modify the original image so you should assess
+if the filter has made a noticeable improvement to the picture in order to
+justify the impact of the processing.  Adding any filter will inherently
+increase CPU usage. The impact can vary dramatically depending on your CPU
+type and speed, the resolution of the recording, which filters you are using
+and other factors. You can only determine what is right for you through
+experimentation. However, as a starting point, here are some filter strings
+that you may find useful:
+
+For typical broadcast stations:	"kerneldeint,denoise3d"
+
+For stations with poor signal quality: "kerneldeint,denoise3d=12"
 
 <sect1>Recording 
 <p>Depending on your capture card, MythTV offers different video encoders. 
 The following types of hardware encoding cards are supported:
 <itemize>
 <item>MJPEG - Zoran-based cards; see <url url="http://mjpeg.sourceforge.net" name="http://mjpeg.sourceforge.net">
-<item>MPEG2 - iTVC15 based cards (Hauppague PVR-250/PVR-350); see <url url="http://ivtv.sourceforge.net" name="http://ivtv.sourceforge.net">
+<item>MPEG-2 - iTVC15 based cards (Hauppague PVR-250/PVR-350); see <url url="http://ivtv.sourceforge.net" name="http://ivtv.sourceforge.net">
 <item>HDTV - pcHDTV cards; see <url url="http://pchdtv.com" name="http://pchdtv.com">
 <item>DVB - cards supporting DVB; see <url url="http://linuxtv.org" name="http://linuxtv.org">
 </itemize>
 For cards without hardware encoding capabilities (all cards supported by
 V4L not listed above), Myth includes two methods for software encoding:
-RTjpeg and MPEG4.  RTjpeg has significantly fewer CPU demands than MPEG4,
-but it generates larger files than MPEG4 for a given recording.
+RTjpeg and MPEG-4.  RTjpeg has significantly fewer CPU demands than MPEG-4,
+but it generates larger files than MPEG-4 for a given recording.
 
 For DVB and HDTV cards, no further configuration is required after
 setting up the card using the 'setup' program.
@@ -2498,7 +2633,7 @@ backend system, creating a custom profile will affect both of them.  This
 option should not be needed otherwise.
 
 The 'Transcoders' group is a little different from the others.  Selecting
-this group will result in a menu with the following options: 'RTjpeg/MPEG4'
+this group will result in a menu with the following options: 'RTjpeg/MPEG-4'
 and 'MPEG-2'.  These types indicate what transcoder options will be used for
 a given input type (i.e. the 'MPEG-2' settings would be used to transcode
 MPEG-2 files into MPEG-4.  The source of the MPEG-2 stream (DVB, HDTV, or
@@ -4377,6 +4512,17 @@ start them from terminal consoles.
 8.  Quit and restart all frontends.  Delete the <tt>mythtv_backup.sql</tt>
 and <tt>mythtv_restore.sql</tt> files.
 
+<sect1>Can I run MythTV on my Tivo?
+<sect1>Can I run MythTV on my ReplayTV?
+<p>No.
+
+While it is true that the TiVo runs the Linux kernel, and TiVo has released
+their changes to the kernel under the GPL, the TiVo is <em>not</em> a
+general-purpose computer, and there is no programming information available
+for the custom hardware contained within a TiVo.
+
+The ReplayTV runs VxWorks, a Real Time Operating System from Wind River
+Systems.
 <sect>Example Configurations.
 <p>This section contains configurations which you may find useful.
 <sect1>Hauppauge PVR-250/350 hardware MPEG-2 encoder. <label id="pvr250">
@@ -5077,6 +5223,9 @@ directory like CVS used to.
 v0.13.14, 2004-01-24.  Add pointer to main mythtv page for PAL problems with
 release 0.13.  Add a little verbiage to the changing hostname instructions. 
 Explicit instructions on removing msp3400 during the ivtv compile.
+v0.13.15, 2004-01-29.  Add Bruce Markey's filter docs.  Add dedicated
+section on running MythTV on Tivo / ReplayTV.  If anyone wants to add text
+about tivoweb or dvarchive for the ReplayTV to be more accurater, send it.
 -->
 
 <!--

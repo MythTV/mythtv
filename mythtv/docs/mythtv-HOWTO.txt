@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2004-01-24, v0.13.14
+  2004-01-29, v0.13.15
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -122,6 +122,10 @@
      10.2 Appearance
      10.3 Program Guide
      10.4 Playback
+        10.4.1 Video Filters
+        10.4.2 Applying filters
+        10.4.3 Currently Available Filters
+        10.4.4 Usage Considerations
      10.5 Recording
      10.6 Xbox Frontends
 
@@ -217,6 +221,8 @@
      21.12 Advanced Backend Configurations.
      21.13 What is this transcoder thing, and how do I use it?
      21.14 Changing your hostname.
+     21.15 Can I run MythTV on my Tivo?
+     21.16 Can I run MythTV on my ReplayTV?
 
   22. Example Configurations.
      22.1 Hauppauge PVR-250/350 hardware MPEG-2 encoder.
@@ -269,6 +275,7 @@
   install MythTV.  A mini-distribution removes many of the "general
   purpose" workstation / server software packages that may be installed
   by default if you use one of the big-name OS packages.
+
 
   See http://linpvr.org/ <http://linpvr.org/> if you'd like to install
   MythTV onto a VIA Epia M machine.
@@ -400,6 +407,7 @@
   See the Troubleshooting ``section'' for more information.
 
 
+
   [1m3.1.4.  Filesystems[0m
 
   MythTV creates large files, many in excess of 2GB.  You [4mmust[24m use a
@@ -466,8 +474,6 @@
 
        # lsmod |grep bttv
 
-
-
   You want to see the bttv module listed.
 
   [1m3.1.5.2.  Hardware MPEG-2 encoders.[0m
@@ -532,6 +538,7 @@
   be used to capture over-the-air HDTV.  There are no known capture
   devices which will allow you to capture the HDTV output from a set-top
   box commonly found with digital cable systems or satellite systems.
+
 
   [1m3.1.6.  Hardware known NOT to work and other issues.[0m
 
@@ -599,13 +606,13 @@
   card.  You may also run xvinfo; look for your video card to be listed
   as one of the adapters.
 
-
   If you want to use MythTV with a standard television, you will need a
   physical connection from your video card to your TV set, which can
   either be a TV-out port on the card itself or an external adapter that
   converts the VGA signal to an appropriate video signal. "Appropriate"
   depends on a number of factors, such as video standard (NTSC vs PAL)
   type of input connection (Composite vs SVideo), etc.
+
   Note that with some video cards and X drivers, Xvideo extensions are
   only supported on the VGA output, and not on the TV output.
 
@@ -737,7 +744,6 @@
   driver.
 
 
-
   [1m3.1.9.6.  Other Options[0m
 
   Some devices with onboard TV-out capability, such as XBoxes converted
@@ -803,7 +809,6 @@
   commonly found in that distribution.  Any issues with MythTV installed
   via a pre-compiled package [1mMUST [22mbe raised with the packager.
 
-
   If you use any of the pre-compiled packages you may not need to
   perform any additional configuration steps in this HOWTO.  The next
   logical step is ``configuring MySQL'', which you may or may not have
@@ -864,7 +869,6 @@
   Instructions for Fedora may be found at http://wilsonet.com/mythtv/
   <http://wilsonet.com/mythtv/> Just like 3rd-party packages, any 3rd-
   party documentation problems should be brought up with the maintainer.
-
 
 
   [1m3.2.1.2.  Mandrake[0m
@@ -3154,6 +3158,153 @@
   AMD's implementation of SSE instructions, so if your processor has
   3dnow you shouldn't have any issues with deinterlacing.
 
+  [1m10.4.1.  Video Filters[0m
+
+  MythTV provides a facility to include video filters while recording
+  and during playback. These filters can be used to improve or modify
+  the video image, including hiding the effects of an interlaced image
+  or reducing the effects of noise in a poor video signal. The following
+  is a brief introduction to introduce you to the filters that are
+  available in MythTV version 0.14.
+
+  [1m10.4.2.  Applying filters[0m
+
+  One or more filters can be included in a "filter chain". The filters
+  to be used are identified in a "filter string". A filter string is a
+  group of filter names and parameters separated by commas.  To include
+  parameters, the filter name is followed by "=" and the parameter
+  information. There should be no spaces in the filter string. Here is
+  an example filter string:
+
+  With parameters: kerneldeint=10:1,denoise3d=12 Without:
+  kerneldeint,denoise3d
+
+  Recording filters are set for each individual channel. These may be
+  used when encoding in software (MPEG-4, RTJPEG) but do not apply when
+  using a capture card with hardware encoding such as those supported by
+  the ivtv driver, DVB, HDTV or MJPEG cards. You can run MythTV's
+  "setup" program and select the "Channel Editor". On the first page for
+  each channel, you can enter a filter string in the box titled "Video
+  filters". If you are running "mythweb" on your web server, you can
+  click on "Settings" then "Channels" and enter filter strings in the
+  "videofilters" column.
+
+  Playback filters are per-host and apply to any recording you watch
+  from the frontend where filters have been applied. From "mythfrontend"
+  go to Setup->TV Settings->Playback. Enter your filter string in the
+  box titled "Custom Filters".
+  [1m10.4.3.  Currently Available Filters[0m
+
+  o  The "invert" filter
+
+  Invert ignores any parameters and inverts the pixel values of the
+  video frames.  In other words, a negative image. This would rarely be
+  useful but may be a good example to verify that your filter strings
+  take effect.
+
+  o  The "linearblend" filter
+
+  This is the filter that is used when "Deinterlace playback" has been
+  checked.  It is a simple deinterlacing filter that ignores parameters
+  and works by blending adjacent lines.  It replaces combing in
+  interlaced video with a less distracting "ghost" image.
+
+  o  The "kerneldeint" filter
+
+  Kerneldeint is a more complex deinterlacing filter, which applies a
+  filter kernel using input from several lines.  It generally removes
+  combing without a "ghost" image, sometimes leaving a faint outline of
+  the the image from the other field. It is considered to be less
+  distracting to watch than linearblend or no filter at all. It accepts
+  one or two integer parameters separated by a colon.
+
+  The first parameter is the filter threshold and defaults to 12.
+  Adjacent lines differing by more than the threshold value are
+  filtered. The second option defaults to 0.  If set to a non-zero
+  value, it will cause the filter to skip chroma, and filter only the
+  luminance.  It may be useful on some capture cards which do not
+  capture the chroma fields of interlaced video correctly.
+
+  o  The "quickdnr" filter
+
+  A fast temporal denoiser. This can take 1, 2 or 4 parameters, each
+  being a value from "0" for the least filtering to "255" for the
+  greatest filtering.  With one parameter, the filter will compute the
+  values it should use for all of its variables. Two parameters will set
+  the filter strength for luma and chroma independently. If you are
+  interested in how the algorithm works, you may examine the source code
+  to see how four parameter are used.
+
+  o  The "denoise3d" filter
+
+  A slower denoiser that applies a spatial and temporal low-pass filter.
+  The spatial filter can remove some noise that quickdnr can't, but a
+  more powerful CPU is needed.  This filter accepts 3 float parameters:
+
+
+  +o  luma spatial filter strength
+
+  +o  chroma spatial filter strength
+
+  +o  luma temporal filter strength
+
+  Reasonable defaults will be selected for omitted parameters.  The
+  chroma temporal filter strength is calculated from the other filter
+  strengths.
+
+  o  The "crop" filter
+
+  Covers edges of video with black bars.  This helps improve video
+  quality when the edges of the frame are distorted. By default, this
+  removes 16 pixels from each edge. This can optionally take four
+  parameters representing top:left:bottom:right. The number times 16 is
+  the number of pixels to remove so, for example, the default is
+  "=1:1:1:1".
+
+  o  The "forceyv12" and "forceyuv422p" filters
+
+  These force the filter manager to use the given format.  You can use
+  one of these at the head of a filter chain to change the capture
+  format. The most likely use would be forceyuv422p to use YUV422P
+  capture on cards with known chroma interlacing problems with YV12.
+
+  There are some filters included in the MythTV source code that should
+  not be used:
+
+  o  The "forcergb24" and "forceargb32" filters
+
+  The two RGB formats should not be used because there is no conversion
+  filter for them yet.
+
+  o  The "convert" filter
+
+  It exists but don't use it.  The filter manager uses this filter
+  automatically when it is unable to match the input/output formats of
+  two adjacent filters.
+
+  o  The "postprocess" filter
+
+  While this exists in MythTV source code, it is currently not
+  recommended for use.
+
+
+  [1m10.4.4.  Usage Considerations[0m
+
+  There are trade-offs to consider when deciding if it would be wise to
+  use a filter. Any processing will modify the original image so you
+  should assess if the filter has made a noticeable improvement to the
+  picture in order to justify the impact of the processing.  Adding any
+  filter will inherently increase CPU usage. The impact can vary
+  dramatically depending on your CPU type and speed, the resolution of
+  the recording, which filters you are using and other factors. You can
+  only determine what is right for you through experimentation. However,
+  as a starting point, here are some filter strings that you may find
+  useful:
+
+  For typical broadcast stations: "kerneldeint,denoise3d"
+
+  For stations with poor signal quality: "kerneldeint,denoise3d=12"
+
 
   [1m10.5.  Recording[0m
 
@@ -3164,7 +3315,7 @@
   +o  MJPEG - Zoran-based cards; see http://mjpeg.sourceforge.net
      <http://mjpeg.sourceforge.net>
 
-  +o  MPEG2 - iTVC15 based cards (Hauppague PVR-250/PVR-350); see
+  +o  MPEG-2 - iTVC15 based cards (Hauppague PVR-250/PVR-350); see
      http://ivtv.sourceforge.net <http://ivtv.sourceforge.net>
 
   +o  HDTV - pcHDTV cards; see http://pchdtv.com <http://pchdtv.com>
@@ -3174,9 +3325,9 @@
 
      For cards without hardware encoding capabilities (all cards
      supported by V4L not listed above), Myth includes two methods for
-     software encoding: RTjpeg and MPEG4.  RTjpeg has significantly
-     fewer CPU demands than MPEG4, but it generates larger files than
-     MPEG4 for a given recording.
+     software encoding: RTjpeg and MPEG-4.  RTjpeg has significantly
+     fewer CPU demands than MPEG-4, but it generates larger files than
+     MPEG-4 for a given recording.
 
   For DVB and HDTV cards, no further configuration is required after
   setting up the card using the 'setup' program.  For all other cards,
@@ -3186,12 +3337,11 @@
   types of cards you have installed you may see:
 
 
-
-  (Create new profile group)
-  Software Encoders
-  Hardware MPEG Encoders
-  Hardware MJPEG Encoders
-  Trancoders
+       (Create new profile group)
+       Software Encoders
+       Hardware MPEG Encoders
+       Hardware MJPEG Encoders
+       Trancoders
 
 
 
@@ -3203,7 +3353,7 @@
 
   The 'Transcoders' group is a little different from the others.
   Selecting this group will result in a menu with the following options:
-  'RTjpeg/MPEG4' and 'MPEG-2'.  These types indicate what transcoder
+  'RTjpeg/MPEG-4' and 'MPEG-2'.  These types indicate what transcoder
   options will be used for a given input type (i.e. the 'MPEG-2'
   settings would be used to transcode MPEG-2 files into MPEG-4.  The
   source of the MPEG-2 stream (DVB, HDTV, or PVR-x50) does not matter.
@@ -3239,6 +3389,7 @@
   best to leave the default as-is until you're sure that MythTV is
   operational.
 
+
   [1mNOTE[22m: although the width and height can be changed to almost anything,
   if you start MythTV and don't see video or you get "segmentation
   fault" errors, it is likely that the video4linux (v4l) subsystem did
@@ -3250,7 +3401,6 @@
 
   MythTV is able to control the LED on the Xbox to indicate backend
   recording status.
-
 
   To control the LED, you will need the [1mblink [22mprogram from the xbox-
   linux project, which is installed as /bin/led on GentooX.  On Xebian
@@ -3303,6 +3453,7 @@
   "KDE".
 
 
+
   [1m11.1.  Using themes with MythTV.[0m
 
   MythTV is "themeable", meaning that the visual appearance of the
@@ -3313,12 +3464,11 @@
   Once it's on your machine, you must move the file and untar it:
 
 
-
-  $ su
-  # cp funhouse.tar.gz /usr/local/share/mythtv/themes
-  # cd /usr/local/share/mythtv/themes
-  # tar -xzf funhouse.tar.gz
-  # exit
+       $ su
+       # cp funhouse.tar.gz /usr/local/share/mythtv/themes
+       # cd /usr/local/share/mythtv/themes
+       # tar -xzf funhouse.tar.gz
+       # exit
 
 
 
@@ -3368,13 +3518,13 @@
   dependent on MythTV being installed and operational.
 
 
+
   [1m12.1.  Installation and prerequisites.[0m
 
   Download mythweb from http://www.mythtv.org/ <http://www.mythtv.org/>
   and save it to a location where you can find it.  The next step
   depends on whether your distribution has a web server and if you have
   PHP support.
-
 
 
   [1m12.1.1.  Mandrake 9.0[0m
@@ -3502,33 +3652,32 @@
   Here is an example script that a user may want to run on import:
 
 
+       #!/bin/csh
 
-  #!/bin/csh
+       if ($#argv == 0) then
+               echo "Usage: $0 dest_dir"
+               exit
+       endif
 
-  if ($#argv == 0) then
-          echo "Usage: $0 dest_dir"
-          exit
-  endif
+       cd $argv[1]
 
-  cd $argv[1]
+       # get stuff over the network
+       wget http://www.somesite.dom/dir/file1.jpg
+       wget http://www.somesite.dom/dir/file2.jpg
+       wget http://www.somesite.dom/dir/file3.jpg
 
-  # get stuff over the network
-  wget http://www.somesite.dom/dir/file1.jpg
-  wget http://www.somesite.dom/dir/file2.jpg
-  wget http://www.somesite.dom/dir/file3.jpg
+       # stuff that requires manual module loading and/or fs mounting
+       modprobe camera_module
+       mount /dev/camera /mnt/camera
+       cp /mnt/camera/* $argv[1]
+       umount /mnt/camera
+       rmmod camera_module
 
-  # stuff that requires manual module loading and/or fs mounting
-  modprobe camera_module
-  mount /dev/camera /mnt/camera
-  cp /mnt/camera/* $argv[1]
-  umount /mnt/camera
-  rmmod camera_module
-
-  # perform some processing
-  foreach pname (`ls *.jpg`)
-          jpegtran -flip vertical $pname > $pname.new
-          mv $pname.new $pname
-  end
+       # perform some processing
+       foreach pname (`ls *.jpg`)
+               jpegtran -flip vertical $pname > $pname.new
+               mv $pname.new $pname
+       end
 
 
 
@@ -3558,6 +3707,7 @@
   +o  CDParanoia
 
 
+
   [1m15.1.  Manual installation of prerequisites.[0m
 
   These instructions are for distributions which don't have pre-compiled
@@ -3567,14 +3717,15 @@
   <http://www.mars.org/home/rob/proj/mpeg/>  Save it to a directory you
   can find later.
 
-  $ tar -xzf mad-0.14.2b.tar.gz
-  $ cd mad-0.14.2b
-  $ ./configure
-  $ make
-  $ su
-  # make install
-  # exit
-  $
+
+       $ tar -xzf mad-0.14.2b.tar.gz
+       $ cd mad-0.14.2b
+       $ ./configure
+       $ make
+       $ su
+       # make install
+       # exit
+       $
 
 
 
@@ -3615,20 +3766,23 @@
   install:
 
 
-       $ tar -xzf libcdaudio-0.99.9.tar.gz
-       $ cd libcdaudio-0.99.9
-       $ ./configure
-       $ make
-       $ su
-       # make install
-       # exit
-       $
+
+  $ tar -xzf libcdaudio-0.99.9.tar.gz
+  $ cd libcdaudio-0.99.9
+  $ ./configure
+  $ make
+  $ su
+  # make install
+  # exit
+  $
 
 
 
   Download cdparanoia from http://www.xiph.org/paranoia/down.html
   <http://www.xiph.org/paranoia/download/cdparanoia-III-
   alpha9.8.src.tgz>.
+
+
        $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
        $ cd cdparanoia-III-alpha9.8
        $ ./configure
@@ -3691,6 +3845,8 @@
 
        # urpmi libfftw2 libfftw2-devel
 
+
+
   OpenGL should be installed on practically all distributions.  However,
   you will need the devel module.  In Mandrake 9.1 it may be installed
   by typing:
@@ -3741,7 +3897,6 @@
   getting MythMusic going. Make sure that you run ./configure first.  If
   you wish to use the new visualizations, make sure you install the
   prerequisites.  Run ./configure --help for help.
-
 
 
   ______________________________________________________________________
@@ -3795,7 +3950,6 @@
 
   Genre/Artist/Album/Title Artist/Genre/Album/Title Artist/Album/Title
   (with Genre left as Unknown)
-
   The track number is optional but can be specified with the title by
   using the TRACK_TITLE keyword instead of TITLE.  If TRACK_TITLE is
   used, then the filename can have a space, hyphen, or underscore
@@ -3985,12 +4139,13 @@
   Change into the MythVideo directory, then make and make install:
 
 
-       $ cd mythvideo
-       $ qmake mythvideo.pro
-       $ make
-       $ su
-       # make install
-       # exit
+
+  $ cd mythvideo
+  $ qmake mythvideo.pro
+  $ make
+  $ su
+  # make install
+  # exit
 
 
 
@@ -4000,6 +4155,7 @@
 
        $ cd videodb
        $ mysql -u mythtv -p < metadata.sql
+
 
 
   See MythVideo's README file for additional information.
@@ -4044,11 +4200,12 @@
   ./configure
 
 
-       $ ./configure --enable-transcode
-       $ qmake mythdvd.pro
-       $ make
-       $ su
-       # make install
+
+  $ ./configure --enable-transcode
+  $ qmake mythdvd.pro
+  $ make
+  $ su
+  # make install
 
 
 
@@ -4105,11 +4262,12 @@
   First, you should check that your kernel has been enabled for DMA:
 
 
-       [mythtv@pvr mythtv]$ dmesg |grep DMA
-           ide0: BM-DMA at 0xd800-0xd807, BIOS settings: hda:DMA, hdb:DMA
-           ide1: BM-DMA at 0xd808-0xd80f, BIOS settings: hdc:DMA, hdd:pio
-       hda: 156301488 sectors (80026 MB) w/2048KiB Cache, CHS=9729/255/63, UDMA(33)
-       hdb: 80043264 sectors (40982 MB) w/2048KiB Cache, CHS=4982/255/63, UDMA(33)
+
+  [mythtv@pvr mythtv]$ dmesg |grep DMA
+      ide0: BM-DMA at 0xd800-0xd807, BIOS settings: hda:DMA, hdb:DMA
+      ide1: BM-DMA at 0xd808-0xd80f, BIOS settings: hdc:DMA, hdd:pio
+  hda: 156301488 sectors (80026 MB) w/2048KiB Cache, CHS=9729/255/63, UDMA(33)
+  hdb: 80043264 sectors (40982 MB) w/2048KiB Cache, CHS=4982/255/63, UDMA(33)
 
 
 
@@ -4124,6 +4282,7 @@
 
 
        # hdparm -d /dev/hd?
+
 
 
   will tell you the DMA status for your hard drives.  If you run [1mhdparm[0m
@@ -4169,8 +4328,6 @@
 
   Some compile errors are worse than others.  If you get an error that
   doesn't abort the compilation, and says something like:
-
-
        cc1plus: warning: changing search order for system directory
        "/usr/local/include"
        cc1plus: warning:   as it has already been specified as a non-system
@@ -4232,23 +4389,24 @@
   Finally, check:
 
 
-       Section "Monitor"
-           Identifier "monitor1"
-           VendorName "Plug'n Play"
-           HorizSync 30-85
-           VertRefresh 50-160
 
-           # Sony Vaio C1(X,XS,VE,VN)?
-           # 1024x480 @ 85.6 Hz, 48 kHz hsync
-           ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
+  Section "Monitor"
+      Identifier "monitor1"
+      VendorName "Plug'n Play"
+      HorizSync 30-85
+      VertRefresh 50-160
 
-           # TV fullscreen mode or DVD fullscreen output.
-           # 768x576 @ 79 Hz, 50 kHz hsync
-           ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
+      # Sony Vaio C1(X,XS,VE,VN)?
+      # 1024x480 @ 85.6 Hz, 48 kHz hsync
+      ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
 
-           # 768x576 @ 100 Hz, 61.6 kHz hsync
-           ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
-       EndSection
+      # TV fullscreen mode or DVD fullscreen output.
+      # 768x576 @ 79 Hz, 50 kHz hsync
+      ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
+
+      # 768x576 @ 100 Hz, 61.6 kHz hsync
+      ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
+  EndSection
 
 
 
@@ -4294,8 +4452,6 @@
 
   Edit the settings.pro file.  Make sure that the top of the file looks
   like this:
-
-
        $ cat settings.pro
        CONFIG += debug
        #CONFIG += release
@@ -4445,6 +4601,7 @@
        # fuser -v /dev/dsp
 
 
+
   To disable aRts in KDE, go to KDE->Control Center->Sound->Sound System
   and uncheck the "Start aRts soundserver on KDE startup" box.  Run #
   killall artsd from the command line to stop the artsd program.
@@ -4506,7 +4663,6 @@
   +o  fvwm
 
   +o  blackbox  (using "Sloppy Focus" and "Focus New Windows")
-
 
 
   [1m20.17.  My PVR-250 card doesn't show inputs in the setup screen.[0m
@@ -4574,6 +4730,7 @@
   the symlink for you when the qt3 package was installed.  The first
   choice is the better solution.
 
+
   [1m20.23.  make: *** No rule to make target /mkspecs/default/qmake.conf',[0m
   [1mneeded by Makefile'.  Stop.[0m
 
@@ -4616,6 +4773,7 @@
   support.'' for examples on finding and removing old versions of lirc.
 
 
+
   [1m20.29.  MySQL not connecting correctly.[0m
 
   Your [1mMySQL [22minstallation may have networking turned off.  Check that
@@ -4636,7 +4794,6 @@
   decoding video.  Users have reported that rather than speeding up
   their video it appears to be doing the opposite.  You may want to
   check that your color depth is set for 24bpp.
-
 
 
   [1m20.32.  My computer is loading a media player application when I[0m
@@ -4701,7 +4858,6 @@
   synchronization.
 
 
-
   [1m21.1.1.  mythtranscode example[0m
 
   First, start [1mmythtranscode[22m.  You will need to determine the channel
@@ -4744,8 +4900,9 @@
   Or to play directly using mplayer (again 1.0PRE1 or later is needed):
 
 
-       mplayer -audiofile audout -audio-demuxer 20 -rawaudio rate=32000 \
-       -rawvideo on:w=640:h=480:fps=29.97 vidout
+
+  mplayer -audiofile audout -audio-demuxer 20 -rawaudio rate=32000 \
+  -rawvideo on:w=640:h=480:fps=29.97 vidout
 
 
 
@@ -4805,6 +4962,7 @@
   +o  544x240
 
   +o  480x240
+
 
   +o  352x240
 
@@ -4892,7 +5050,6 @@
   image inside the screen. Underscan is useful for computer monitors so
   that toolbars and scrollbars at the edges can be seen.
 
-
   For best results, match the X display area as close as possible to the
   edges of the physical screen. This can only be adjusted by your tv-out
   device or by the settings for the television set. Many sets have these
@@ -4937,10 +5094,9 @@
   lose all of your settings and will need to re-run the mc.sql script to
   setup the database structure before running the setup program.
 
-
-       $ mysql -u root
-       mysql> drop database mythconverg;
-       mysql> quit
+  $ mysql -u root
+  mysql> drop database mythconverg;
+  mysql> quit
 
 
 
@@ -5020,8 +5176,8 @@
   the channel that has been removed:
 
 
-  $ mysql -u root mythconverg
-  mysql> delete from program where chanid = '1015';
+       $ mysql -u root mythconverg
+       mysql> delete from program where chanid = '1015';
 
 
 
@@ -5062,26 +5218,26 @@
   mailto:pat@netburp.com <mailto:pat@netburp.com> using fvwm:
 
 
-       $ cat > .xinitrc
-       fvwm &
-       mythfrontend
-       ^D
-       $ cat > .fvwmrc
-       Style myth* NoTitle, NoHandles, Sticky, WindowListSkip, SloppyFocus, GrabFocus, BorderWidth 0
-       ^D
-       $
+
+  $ cat > .xinitrc
+  fvwm &
+  mythfrontend
+  ^D
+  $ cat > .fvwmrc
+  Style myth* NoTitle, NoHandles, Sticky, WindowListSkip, SloppyFocus, GrabFocus, BorderWidth 0
+  ^D
+  $
 
 
 
   The following also works with blackbox:
 
 
-
-  $ cat > .xinitrc
-  xset -dpms s off &
-  irxevent &
-  mythfrontend &
-  blackbox
+       $ cat > .xinitrc
+       xset -dpms s off &
+       irxevent &
+       mythfrontend &
+       blackbox
 
 
 
@@ -5123,9 +5279,10 @@
   etc.sysconfig.mythbackend should be copied to /etc/sysconfig/:
 
 
-       $ cd contrib
-       $ su
-       # cp etc.sysconfig.mythbackend /etc/sysconfig/mythbackend
+
+  $ cd contrib
+  $ su
+  # cp etc.sysconfig.mythbackend /etc/sysconfig/mythbackend
 
 
 
@@ -5137,11 +5294,10 @@
   runlevels 3, 4 or 5:
 
 
-
-  $ su
-  # chkconfig --level 345 mythbackend on
-  # exit
-  $
+       $ su
+       # chkconfig --level 345 mythbackend on
+       # exit
+       $
 
 
 
@@ -5183,12 +5339,13 @@
   following:
 
 
-       # /etc/security/msec/perm.local
-       # Local overrides to the msec program
-       #
-       # Full file path                user.group              permissions
-       /var/log/mythtv/                root.mythtv             775
-       /var/log/mythtv/*               root.mythtv             664
+
+  # /etc/security/msec/perm.local
+  # Local overrides to the msec program
+  #
+  # Full file path                user.group              permissions
+  /var/log/mythtv/                root.mythtv             775
+  /var/log/mythtv/*               root.mythtv             664
 
 
 
@@ -5196,11 +5353,10 @@
   may add it by typing:
 
 
-
-  $ cd contrib
-  $ su
-  # cat etc.security.msec.perm.local >> /etc/security/msec/perm.local
-  # exit
+       $ cd contrib
+       $ su
+       # cat etc.security.msec.perm.local >> /etc/security/msec/perm.local
+       # exit
 
 
 
@@ -5322,7 +5478,6 @@
   program under the host-specific settings: set the Transcoder Auto-run
   checkbox
 
-
   For either manual or automatic transcoding: start mythbackend start
   mythfrontend select setup, and the Transcoding recording profile.  now
   select either RTJPEG or MPEG-4 (selecting any of the hardware encoders
@@ -5375,7 +5530,8 @@
   hostname in the current session, run:
 
 
-       # hostname kidsroom
+
+  # hostname kidsroom
 
 
 
@@ -5435,16 +5591,27 @@
        # /etc/init.d/mythbackend start
 
 
-
   8.  Quit and restart all frontends.  Delete the mythtv_backup.sql and
   mythtv_restore.sql files.
 
 
+  [1m21.15.  Can I run MythTV on my Tivo?[0m
+
+  [1m21.16.  Can I run MythTV on my ReplayTV?[0m
+
+  No.
+
+  While it is true that the TiVo runs the Linux kernel, and TiVo has
+  released their changes to the kernel under the GPL, the TiVo is [4mnot[24m a
+  general-purpose computer, and there is no programming information
+  available for the custom hardware contained within a TiVo.
+
+  The ReplayTV runs VxWorks, a Real Time Operating System from Wind
+  River Systems.
+
   [1m22.  Example Configurations.[0m
 
   This section contains configurations which you may find useful.
-
-
 
   [1m22.1.  Hauppauge PVR-250/350 hardware MPEG-2 encoder.[0m
 
@@ -5488,13 +5655,12 @@
   This should create an ivtv directory.  Switch to it and perform the
   following commands:
 
-
-       $ cd ivtv/utils
-       $ wget http://hauppauge.lightpath.net/software/pvr250/pvr250_17_21288.exe
-       $ su
-       # ./ivtvfwextract.pl pvr250_17_21288.exe
-       # exit
-       $ cd ../driver
+  $ cd ivtv/utils
+  $ wget http://hauppauge.lightpath.net/software/pvr250/pvr250_17_21288.exe
+  $ su
+  # ./ivtvfwextract.pl pvr250_17_21288.exe
+  # exit
+  $ cd ../driver
 
 
 
@@ -5508,6 +5674,8 @@
 
 
        KERNELDIR= /lib/modules/$(KERNVER)/build
+
+
 
   edit it so that it looks like:
 
@@ -5571,6 +5739,7 @@
        add above ivtv lirc_dev lirc_i2c
 
 
+
   [1mNOTE[22m:  You must specify the tuner type manually.  See
   ~/ivtv/driver/tuner.h for a listing of tuners.  In the above example,
   tuner type=2 is a Phillips NTSC.  Use an appropriate tuner type for
@@ -5609,7 +5778,6 @@
        # exit
 
 
-
   Check that the card is being recognized on the PCI bus:
 
 
@@ -5632,11 +5800,10 @@
   Check that the ivtv driver has created a new video device:
 
 
-
-  $ ls -l /dev/v4l/vi*
-  crw-------    1 mythtv   sys       81, 224 Dec 31  1969 vbi0
-  crw-------    1 mythtv   sys       81,   0 Dec 31  1969 video0
-  crw-------    1 mythtv   sys       81,  32 Dec 31  1969 video32
+       $ ls -l /dev/v4l/vi*
+       crw-------    1 mythtv   sys       81, 224 Dec 31  1969 vbi0
+       crw-------    1 mythtv   sys       81,   0 Dec 31  1969 video0
+       crw-------    1 mythtv   sys       81,  32 Dec 31  1969 video32
 
 
 
@@ -5733,12 +5900,12 @@
 
 
 
-       $ su
-       # uname -a
-       Linux frontend 2.4.22-9mdk #1 sam sep 13 06:54:11 CEST 2003 i686 unknown
-       unknown GNU/Linux
-       # rpm -qa|grep kernel-source
-       kernel-source-2.4.22-9mdk
+  $ su
+  # uname -a
+  Linux frontend 2.4.22-9mdk #1 sam sep 13 06:54:11 CEST 2003 i686 unknown
+  unknown GNU/Linux
+  # rpm -qa|grep kernel-source
+  kernel-source-2.4.22-9mdk
 
 
 
@@ -5757,39 +5924,39 @@
   programs on your system:
 
 
-  $ su
-  # updatedb
-  # locate lirc_i2c|grep `uname -r`
-  /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_i2c.c
-  /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_i2c.o.gz
+       $ su
+       # updatedb
+       # locate lirc_i2c|grep `uname -r`
+       /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_i2c.c
+       /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_i2c.o.gz
 
-  # locate lirc_dev|grep `uname -r`
-  /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.c
-  /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.h
-  /usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.stamp
-  /usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.ver
-  /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_dev.o.gz
+       # locate lirc_dev|grep `uname -r`
+       /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.c
+       /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.h
+       /usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.stamp
+       /usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.ver
+       /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_dev.o.gz
 
-  # locate irw|grep "/usr"
-  /usr/bin/irw
-  /usr/local/bin/irw
-  /usr/local/man/man1/irw.1
+       # locate irw|grep "/usr"
+       /usr/bin/irw
+       /usr/local/bin/irw
+       /usr/local/man/man1/irw.1
 
-  # locate lircd|grep "/usr"
-  /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lircd.conf.RM-050
-  /usr/share/man/man8/lircd.8.bz2
-  /usr/share/doc/lirc-0.6.6/html/lircd.html
-  /usr/sbin/lircd
-  /usr/local/sbin/lircd
-  /usr/local/man/man8/lircd.8
+       # locate lircd|grep "/usr"
+       /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lircd.conf.RM-050
+       /usr/share/man/man8/lircd.8.bz2
+       /usr/share/doc/lirc-0.6.6/html/lircd.html
+       /usr/sbin/lircd
+       /usr/local/sbin/lircd
+       /usr/local/man/man8/lircd.8
 
-  # locate irxevent|grep "/usr"
-  /usr/share/man/man1/irxevent.1.bz2
-  /usr/share/doc/lirc-0.6.6/html/irxevent.html
-  /usr/share/doc/lirc-0.6.6/irxevent.keys
-  /usr/bin/irxevent
-  /usr/local/bin/irxevent
-  /usr/local/man/man1/irxevent.1
+       # locate irxevent|grep "/usr"
+       /usr/share/man/man1/irxevent.1.bz2
+       /usr/share/doc/lirc-0.6.6/html/irxevent.html
+       /usr/share/doc/lirc-0.6.6/irxevent.keys
+       /usr/bin/irxevent
+       /usr/local/bin/irxevent
+       /usr/local/man/man1/irxevent.1
 
 
 
@@ -5820,9 +5987,9 @@
   work correctly.  Download the patch and install:
 
 
-  $ cd lirc-0.7.0pre2
-  $ wget http://delvare.nerim.net/i2c/other/lirc-CVS-i2c-2.8.0.patch
-  $ patch -p1 < lirc-CVS-i2c-2.8.0.patch
+       $ cd lirc-0.7.0pre2
+       $ wget http://delvare.nerim.net/i2c/other/lirc-CVS-i2c-2.8.0.patch
+       $ patch -p1 < lirc-CVS-i2c-2.8.0.patch
 
 
 
@@ -5857,8 +6024,6 @@
 
   As a part of the make install process, LIRC will create the
   appropriate device for you in /dev.  Check to make sure:
-
-
        $ ls -l /dev/lirc*
        crw-r--r--    1 root     root      61,   0 Sep 18 15:36 /dev/lirc
        srw-rw-rw-    1 root     root            0 Sep 18 15:38 /dev/lircd=
@@ -5871,22 +6036,21 @@
   your /var/log/messages and /var/log/lircd files.
 
 
-
-  $ su
-  # modprobe lirc_i2c
-  # lsmod
-  Module                  Size  Used by    Not tainted
-  lirc_i2c                5124   0
-  lirc_dev               10096   1  [lirc_i2c]
-  ...
-  # lircd
-  # tail /var/log/messages
-  Sep 18 15:38:26 frontend kernel: lirc_i2c: chip found @ 0x18 (Hauppauge IR)
-  Sep 18 15:38:26 frontend kernel: lirc_dev: lirc_register_plugin:sample_rate:
-  10
-  ...
-  # tail /var/log/lircd
-  Sep 18 15:24:52 frontend lircd 0.7.0pre2: lircd(hauppauge) ready
+       $ su
+       # modprobe lirc_i2c
+       # lsmod
+       Module                  Size  Used by    Not tainted
+       lirc_i2c                5124   0
+       lirc_dev               10096   1  [lirc_i2c]
+       ...
+       # lircd
+       # tail /var/log/messages
+       Sep 18 15:38:26 frontend kernel: lirc_i2c: chip found @ 0x18 (Hauppauge IR)
+       Sep 18 15:38:26 frontend kernel: lirc_dev: lirc_register_plugin:sample_rate:
+       10
+       ...
+       # tail /var/log/lircd
+       Sep 18 15:24:52 frontend lircd 0.7.0pre2: lircd(hauppauge) ready
 
 
 
@@ -5923,6 +6087,7 @@
      running modprobe -r lirc_i2c as root first, then modprobe lirc_i2c
      and try again.
 
+
   +o  What path does modinfo lirc_i2c and modinfo lirc_dev show?  It
      should be in /lib/modules/{your kernel version}/misc/
 
@@ -5935,10 +6100,9 @@
   this:
 
 
-
-  # Native lirc support
-  CONFIG += using_lirc
-  EXTRA_LIBS += -llirc_client
+       # Native lirc support
+       CONFIG += using_lirc
+       EXTRA_LIBS += -llirc_client
 
 
 
@@ -5983,6 +6147,7 @@
   You should now have native LIRC support within MythTV.
 
 
+
   [1m22.3.  Logical Volume Manager (LVM).[0m
 
   LVM greatly increases the flexibility you have in managing your
@@ -5996,7 +6161,6 @@
   If you don't understand how to partition a drive, or how to change the
   partition type you should stop and look at documentation on how to
   perform these steps.
-
 
   [1mBIG FAT WARNING[22m:  Using an incorrect parameter can make your files
   inaccessible, prevent your computer from booting, etc.  Be careful!
