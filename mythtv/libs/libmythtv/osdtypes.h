@@ -67,6 +67,8 @@ class OSDSet : public QObject
     void SetWantsUpdates(bool updates) { m_wantsupdates = updates; }
     bool NeedsUpdate(void) { return m_needsupdate; }
 
+    void SetDrawEveryFrame(bool draw) { m_draweveryframe = draw; }
+    
   signals:
     void OSDClosed(int);
 
@@ -106,6 +108,8 @@ class OSDSet : public QObject
     int m_lastupdate;
 
     int currentOSDFunctionalType;
+
+    bool m_draweveryframe;
 };
 
 class OSDType
@@ -154,6 +158,9 @@ class OSDTypeText : public OSDType
     void SetRightJustified(bool right) { m_right = right; }
     bool GetRightJustified() { return m_right; }
 
+    void SetScrolling(int x, int y) { m_scroller = true; m_scrollx = x;
+                                      m_scrolly = y; }
+
     QRect DisplayArea() { return m_displaysize; }
 
     void Draw(OSDSurface *surface, int fade, int maxfade, int xoff, int yoff);
@@ -174,6 +181,20 @@ class OSDTypeText : public OSDType
 
     bool m_multiline;
     bool m_usingalt;
+
+    bool m_scroller;
+    int m_scrollx;
+    int m_scrolly;
+
+    int m_scrollstartx;
+    int m_scrollendx;
+    int m_scrollposx;
+
+    int m_scrollstarty;
+    int m_scrollendy;
+    int m_scrollposy;
+
+    bool m_scrollinit;
 };
     
 class OSDTypeImage : public OSDType

@@ -457,6 +457,9 @@ void OSD::parseTextArea(OSDSet *container, QDomElement &element)
     QString statictext = "";
     QString defaulttext = "";
     bool multiline = false;
+    bool scroller = false;
+    int scrollx = 0;
+    int scrolly = 0;
 
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
@@ -496,6 +499,20 @@ void OSD::parseTextArea(OSDSet *container, QDomElement &element)
             else if (info.tagName() == "value")
             {
                 defaulttext = getFirstText(info);
+            }
+            else if (info.tagName() == "scroller")
+            {
+                if (getFirstText(info).lower() == "yes")
+                    scroller = true;
+            }
+            else if (info.tagName() == "scrollmovement")
+            {
+                QPoint pos = parsePoint(getFirstText(info));
+                pos.setX((int)(pos.x() * wmult));
+                pos.setY((int)(pos.y() * hmult));
+
+                scrollx = pos.x();
+                scrolly = pos.y();
             }
             else
             {
@@ -541,6 +558,17 @@ void OSD::parseTextArea(OSDSet *container, QDomElement &element)
             text->SetCentered(true);
         else if (align.lower() == "right")
             text->SetRightJustified(true);
+    }
+
+    if (scroller)
+    {
+        if (scrollx == 0 && scrolly == 0)
+        {
+            cerr << "Text area set as scrolling, but no movement\n";
+            scrollx = -5;
+        }
+
+        text->SetScrolling(scrollx, scrolly);
     }
 }
 
@@ -1755,12 +1783,11 @@ void OSD::RemoveSet(OSDSet *set)
 }
 
 /* Ken Bass additions for notify_info container */
-void OSD::StartNotify(UDPNotifyOSDSet *notifySet)
+void OSD::StartNotify(UDPNotifyOSDSet *notifySet, int displaytime)
 {
     if (!notifySet)
         return;
 
-    int displaytime = 5;
     vector<UDPNotifyOSDTypeText *> *textList;
 
     osdlock.lock();

@@ -102,7 +102,7 @@ class OSD : public QObject
 
     void SetFrameInterval(int frint);
 
-    void StartNotify(UDPNotifyOSDSet *notifySet);
+    void StartNotify(UDPNotifyOSDSet *notifySet, int displaytime = 5);
     void ClearNotify(UDPNotifyOSDSet *notifySet);
 
  private:

@@ -244,4 +244,16 @@
     </positionrects>
   </container>
 
+  <container name="news_scroller" priority="20">
+    <box name="background">
+      <area>0,434,640,40</area>
+    </box>
+    <textarea name="text_scroll">
+      <area>0,440,640,40</area>
+      <font>settings</font>
+      <scroller>yes</scroller>
+      <scrollmovement>-3,0</scrollmovement> <!-- only x movement for now -->
+    </textarea>
+  </container>
+
 </mythosdtheme>

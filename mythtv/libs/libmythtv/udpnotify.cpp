@@ -128,25 +128,21 @@ UDPNotify::UDPNotify(TV *tv, int udp_port)
     setList = new vector<UDPNotifyOSDSet *>;
 
     // Address to listen to - listen on all interfaces
-    bcastaddr.setAddress("255.255.255.255");
+    bcastaddr.setAddress("0.0.0.0");
   
     // Setup UDP receive socket and install notifier
     m_udp_port = udp_port;
 
     qsd = new QSocketDevice(QSocketDevice::Datagram);
-    if (!qsd->bind( bcastaddr, udp_port))
+    if (!qsd->bind(bcastaddr, udp_port))
     {
         cerr << "Could not bind to UDP notify port: " << udp_port << endl;
         qsn = NULL;
     }
     else
     {
-        // Enable broadcast capability on socket 
-        int one = 1; 
-        setsockopt(qsd->socket(), SOL_SOCKET, SO_BROADCAST, &one, sizeof(one));
-
         // Create the notifier
-        qsn = new QSocketNotifier(qsd->socket(),QSocketNotifier::Read );
+        qsn = new QSocketNotifier(qsd->socket(), QSocketNotifier::Read);
 
         // Connect the Notifier to the incming data slot
         connect(qsn, SIGNAL(activated(int)), this, SLOT(incomingData(int)));
@@ -314,7 +310,9 @@ void UDPNotify::incomingData(int socket)
         cout << errorMsg << endl;
         return;
     }
-  
+ 
+    int displaytime = 5;
+ 
     QDomElement docElem = doc.documentElement();
     if (!docElem.isNull())
     {
@@ -331,6 +329,9 @@ void UDPNotify::incomingData(int socket)
             return;
         }
 
+        QString disptime = docElem.attribute("displaytime", "");
+        if (!disptime.isNull() && !disptime.isEmpty())
+            displaytime = disptime.toInt();
     }
 
     QDomNode n = docElem.firstChild();
@@ -343,7 +344,7 @@ void UDPNotify::incomingData(int socket)
             {
                 UDPNotifyOSDSet *container = parseContainer(e);
                 if (container)
-                    osd->StartNotify(container);
+                    osd->StartNotify(container, displaytime);
             }
             else
             {

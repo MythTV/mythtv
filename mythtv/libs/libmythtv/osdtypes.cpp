@@ -31,6 +31,8 @@ OSDSet::OSDSet(const QString &name, bool cache, int screenwidth,
     m_timeleft = 0;
     m_allowfade = true;
 
+    m_draweveryframe = false;
+
     m_screenwidth = screenwidth;
     m_screenheight = screenheight;
     m_wmult = wmult;
@@ -342,6 +344,15 @@ void OSDSet::Draw(OSDSurface *surface, bool actuallydraw)
 
     m_hasdisplayed = true;
 
+    if (m_wantsupdates &&
+        ((m_timeleft + 999999) / 1000000 != m_lastupdate))
+        m_needsupdate = true;
+    else
+        m_needsupdate = false;
+
+    if (m_draweveryframe)
+        m_needsupdate = true;
+
     if (m_notimeout)
         return;
 
@@ -376,11 +387,6 @@ void OSDSet::Draw(OSDSurface *surface, bool actuallydraw)
 
     if (m_timeleft <= 0 && m_fadetime <= 0)
         m_displaying = false;
-    else if (m_wantsupdates && 
-             ((m_timeleft + 999999) / 1000000 != m_lastupdate))
-        m_needsupdate = true;
-    else
-        m_needsupdate = false; 
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
@@ -411,6 +417,10 @@ OSDTypeText::OSDTypeText(const QString &name, TTFFont *font,
     m_centered = false;
     m_right = false;
     m_usingalt = false;
+
+    m_scroller = false;
+    m_scrollx = m_scrolly = 0;
+    m_scrollinit = false;
 }
 
 OSDTypeText::OSDTypeText(const OSDTypeText &other)
@@ -425,6 +435,9 @@ OSDTypeText::OSDTypeText(const OSDTypeText &other)
     m_multiline = other.m_multiline;
     m_usingalt = other.m_usingalt;
     m_right = other.m_right;
+    m_scroller = other.m_scroller;
+    m_scrollx = other.m_scrollx;
+    m_scrolly = other.m_scrolly;
 }
 
 OSDTypeText::~OSDTypeText()
@@ -439,12 +452,14 @@ void OSDTypeText::SetAltFont(TTFFont *font)
 void OSDTypeText::SetText(const QString &text)
 {
     m_message = text;
+    m_scrollinit = false;
 }
 
 void OSDTypeText::SetDefaultText(const QString &text)
 {
     m_message = text;
     m_default_msg = text;
+    m_scrollinit = false;
 }
 
 void OSDTypeText::Reinit(float wchange, float hchange)
@@ -467,6 +482,9 @@ void OSDTypeText::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
 
     if (m_message.contains("%d"))
         m_parent->SetWantsUpdates(true);
+
+    if (m_scroller)
+        m_parent->SetDrawEveryFrame(true);
 
     m_font->CalcWidth(m_message, &textlength);
 
@@ -539,7 +557,53 @@ void OSDTypeText::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
         drawrect.setTop(m_displaysize.top() + m_font->Size() * (lines) * 3 / 2);
         DrawString(surface, drawrect, line, fade, maxfade, xoff, yoff);
     }           
-    else        
+    else if (m_scroller)
+    {
+        if (!m_scrollinit)
+        {
+            if (m_scrollx < 0)
+            {
+                int numspaces = m_displaysize.width() / m_font->SpaceWidth();
+                for (int i = 0; i < numspaces; i++)
+                    m_message.prepend(" ");
+
+                int messagewidth = 0;
+                m_font->CalcWidth(m_message, &messagewidth);
+                m_scrollstartx = 0;
+                m_scrollendx = 0 - (messagewidth);
+                m_scrollposx = m_scrollstartx;
+                m_displaysize.setWidth(messagewidth);
+            }
+            else if (m_scrollx > 0)
+            {
+                int messagewidth = 0;
+                m_font->CalcWidth(m_message, &messagewidth);
+                m_scrollstartx = 0 - (messagewidth);
+                m_scrollendx = m_displaysize.width();
+                m_scrollposx = m_scrollstartx;
+                m_displaysize.setWidth(messagewidth);
+            }
+            
+            m_scrollstarty = 0;
+            m_scrollendy = 0;
+            m_scrollposy = 0;
+
+            m_scrollinit = true;
+        }
+        else
+        {
+            m_scrollposx += m_scrollx;
+            m_scrollposy += m_scrolly;
+
+            if ((m_scrollx < 0 && m_scrollposx < m_scrollendx) ||
+                (m_scrollx > 0 && m_scrollposx > m_scrollendx))
+                m_parent->Hide();
+        }
+
+        DrawString(surface, m_displaysize, m_message, fade, maxfade, 
+                   xoff + m_scrollposx, yoff + m_scrollposy);
+    }
+    else       
         DrawString(surface, m_displaysize, m_message, fade, maxfade, xoff, 
                    yoff);
 }           
