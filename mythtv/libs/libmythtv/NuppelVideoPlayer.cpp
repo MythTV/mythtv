@@ -879,7 +879,6 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
     while (!gotvideo)
     {
 	long long currentposition = ringBuffer->GetReadPosition();
-        long long startpos = ringBuffer->Seek(0, SEEK_CUR);
         if (ringBuffer->Read(&frameheader, FRAMEHEADERSIZE) != FRAMEHEADERSIZE)
         {
             eof = 1;
@@ -890,11 +889,9 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
                frameheader.frametype != 'S' && frameheader.frametype != 'T' &&
                frameheader.frametype != 'R' && frameheader.frametype != 'X')
         {
-            ringBuffer->Seek(startpos, SEEK_SET);
-            char dummychar;
-            ringBuffer->Read(&dummychar, 1);
-
-            startpos = ringBuffer->Seek(0, SEEK_CUR);
+	  /* we didnt get a known frametype! 
+	     so move down one char and look again... */
+            ringBuffer->Seek(1-FRAMEHEADERSIZE, SEEK_CUR);
 
             if (ringBuffer->Read(&frameheader, FRAMEHEADERSIZE) 
                 != FRAMEHEADERSIZE)
@@ -1206,7 +1203,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
             else
             {
                 //printf("video waiting for unpause\n");
-                usleep(50); 
+                usleep(5000);
 
                 if (!disablevideo)
                 {
@@ -1252,10 +1249,10 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         delay = (nexttrigger.tv_sec - now.tv_sec) * 1000000 +
                 (nexttrigger.tv_usec - now.tv_usec); // uSecs
 
-        if (delay > 100000)
+        if ( delay > 200000 )
         {
             cout << "Delaying to next trigger: " << delay << endl;
-            delay = 100000;
+            delay = 200000;
         }
 
         /* trigger */
@@ -1264,41 +1261,37 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 
         if (!disablevideo)
         {
-            videoOutput->Show(video_width, video_height);
+	    videoOutput->Show(video_width, video_height);
         }
         /* a/v sync assumes that when 'XJ_show' returns, that is the instant
            the frame has become visible on screen */
-
+	
         //output_jmeter->RecordCycleTime();
-
+	
         /* compute new value of nexttrigger */
-        /* doing the gettimeofday here helps resync faster when it's somehow 
-           got a huge delay */
-        if (!disablevideo)
-            gettimeofday(&nexttrigger, NULL);
         nexttrigger.tv_usec += (int)(1000000 / video_frame_rate);
-
+	
         /* Apply just a little feedback. The ComputeAudiotime() function is
            jittery, so if we try to correct our entire A/V drift on each frame,
            video output is jerky. Instead, correct a fraction of the computed
 	   drift on each frame.
-
+	   
 	   In steady state, very little feedback is needed. However, if we are
 	   far out of sync, we need more feedback. So, we case on this. */
         if (audiofd > 0)
         {
-            laudiotime = GetAudiotime(); // ms, same scale as timecodes
-
-            if (laudiotime != 0) // laudiotime = 0 after a seek
-            {
-                /* if we were perfect, timecodes[rpos] and laudiotime would
-                   match and this adjustment wouldn't do anything */
-               avsync_delay = (timecodes[rpos] - laudiotime) * 1000; // uSecs
-
-	       if(avsync_delay < -100000 || avsync_delay > 100000)
-		 nexttrigger.tv_usec += avsync_delay / 10; // re-syncing
-	       else
-		 nexttrigger.tv_usec += avsync_delay / 50; // steady state
+	    laudiotime = GetAudiotime(); // ms, same scale as timecodes
+	    
+	    if (laudiotime != 0) // laudiotime = 0 after a seek
+	    {
+		/* if we were perfect, timecodes[rpos] and laudiotime would
+		   match and this adjustment wouldn't do anything */
+		avsync_delay = (timecodes[rpos] - laudiotime) * 1000; // uSecs
+		
+		if(avsync_delay < -100000 || avsync_delay > 100000)
+		    nexttrigger.tv_usec += avsync_delay / 3; // re-syncing
+		else
+		    nexttrigger.tv_usec += avsync_delay / 50; // steady state
             }
         }
 
