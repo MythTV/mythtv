@@ -347,13 +347,13 @@ void CommDetect::BuildMasterCommList(void)
         long long max_scene = 0;
 
         it = blankCommBreakMap.begin();
-        for(int i = 0; i < blankCommBreakMap.size(); i++)
+        for(unsigned int i = 0; i < blankCommBreakMap.size(); i++)
             if ((it.data() == MARK_COMM_END) &&
                 (it.key() > max_blank))
                     max_blank = it.key();
 
         it = sceneChangeCommMap.begin();
-        for(int i = 0; i < sceneChangeCommMap.size(); i++)
+        for(unsigned int i = 0; i < sceneChangeCommMap.size(); i++)
             if ((it.data() == MARK_COMM_END) &&
                 (it.key() > max_scene))
                 max_scene = it.key();
@@ -465,11 +465,13 @@ void CommDetect::BuildBlankFrameCommList(void)
         i = 1;
 
     // eliminate any blank frames at end of commercials
+    bool first_comm = true;
     for(; i < (commercials-1); i++)
     {
-        long long int r = c_start[i];
+        long long r = c_start[i];
 
-        if (r < (30 * frame_rate)) 
+        if ((r < (30 * frame_rate)) &&
+            (first_comm))
             r = 1;
 
         blankCommMap[r] = MARK_COMM_START;
@@ -499,6 +501,7 @@ void CommDetect::BuildBlankFrameCommList(void)
         }
 
         blankCommMap[r] = MARK_COMM_END;
+        first_comm = false;
     }
 
     blankCommMap[c_start[i]] = MARK_COMM_START;
@@ -526,8 +529,8 @@ void CommDetect::BuildSceneChangeCommList(void)
         {
             if (section_start == -1)
             {
-                long long f = (long long)((s + 1) * frame_rate);
-                for(int i = 0; i < frame_rate; i++, f--)
+                long long f = (long long)(s * frame_rate);
+                for(int i = 0; i < frame_rate; i++, f++)
                 {
                     if (sceneChangeMap.contains(f))
                     {
@@ -550,7 +553,10 @@ void CommDetect::BuildSceneChangeCommList(void)
             {
                 if (sceneChangeMap.contains(f))
                 {
-                    sceneChangeCommMap[f] = MARK_COMM_END;
+                    if (sceneChangeCommMap.contains(f))
+                        sceneChangeCommMap.erase(f);
+                    else
+                        sceneChangeCommMap[f] = MARK_COMM_END;
                     i = (int)(frame_rate) + 1;
                     found_end = true;
                 }
@@ -567,6 +573,32 @@ void CommDetect::BuildSceneChangeCommList(void)
 
     if (section_start >= 0)
         sceneChangeCommMap[framesProcessed] = MARK_COMM_END;
+
+    QMap<long long, int>::Iterator it;
+    QMap<long long, int>::Iterator prev;
+    QMap<long long, int> deleteMap;
+
+    it = sceneChangeCommMap.begin();
+    prev = it;
+    if (it != sceneChangeCommMap.end())
+    {
+        it++;
+        while (it != sceneChangeCommMap.end())
+        {
+            if ((it.data() == MARK_COMM_END) &&
+                (it.key() - prev.key()) < (30 * frame_rate))
+            {
+                deleteMap[it.key()] = 1;
+                deleteMap[prev.key()] = 1;
+            }
+            prev++;
+            if (it != sceneChangeCommMap.end())
+                it++;
+        }
+
+        for (it = deleteMap.begin(); it != deleteMap.end(); ++it)
+            sceneChangeCommMap.erase(it.key());
+    }
 }
 
 void CommDetect::MergeBlankCommList(void)

@@ -3257,7 +3257,27 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
         }
 
         if (direction < 0)
+        {
             commBreakIter--;
+
+            int skipped_seconds = (int)((commBreakIter.key() -
+                    framesPlayed) / video_frame_rate);
+
+            if (skipped_seconds > -3)
+            {
+                if (commBreakIter == commBreakMap.begin())
+                {
+                    QString comm_msg = QString("Start of program.");
+                    int spos = GetStatusbarPos();
+                    osd->StartPause(spos, false, "SKIP", comm_msg, 1);
+
+                    JumpToFrame(0);
+                    return true;
+                }
+                else
+                    commBreakIter--;
+            }
+        }
 
         if (osd)
         {
