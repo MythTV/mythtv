@@ -671,6 +671,7 @@ void NuppelVideoPlayer::StartPlaying(void)
                 memcpy(prebuf[prebuffered], videobuf, videosize);
                 prebuffered++;
                 fnum++;
+		framesPlayed++;
                 continue;
             }
             else
@@ -707,7 +708,7 @@ void NuppelVideoPlayer::StartPlaying(void)
                 usecs = (long int)((1000000/video_frame_rate)/2);
         }
 
-        if (usecs > -1000000/video_frame_rate) 
+        if (1 || usecs > -1000000/video_frame_rate) 
         {
             if (deinterlace)
                 linearBlendYUV420(videobuf3, video_width, video_height);
@@ -782,8 +783,9 @@ void NuppelVideoPlayer::DoRewind(void)
     int normalframes = desiredFrame - lastKey;
 
     long long keyPos = positionList[lastKey / 30];
-
-    ringBuffer->Seek(keyPos, SEEK_SET);
+    long long diff = keyPos - ringBuffer->GetReadPosition();
+    
+    ringBuffer->Seek(diff, SEEK_CUR);
     framesPlayed = lastKey;
 
     int fileend = 0;
@@ -867,8 +869,9 @@ void NuppelVideoPlayer::DoFastForward(void)
     {
         lastKey = desiredKey;
         long long keyPos = positionList[lastKey / 30];
+        long long diff = keyPos - ringBuffer->GetReadPosition();
 
-        ringBuffer->Seek(keyPos, SEEK_SET);
+        ringBuffer->Seek(diff, SEEK_CUR);
         framesPlayed = lastKey;
     }
     else  

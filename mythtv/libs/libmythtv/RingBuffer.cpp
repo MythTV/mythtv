@@ -162,11 +162,15 @@ long long RingBuffer::Seek(long long pos, int whence)
     else
     {
         ret = lseek(fd2, pos, whence);
-
 	if (whence == SEEK_SET)
+        {
 	    readpos = ret;
+        }
 	else if (whence == SEEK_CUR)
+        {
             readpos += pos;
+	    totalreadpos += pos;
+	}
     }
     return ret;
 }
