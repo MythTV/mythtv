@@ -267,22 +267,36 @@ void DRMVideoSync::WaitForFrame(int sync_delay)
     // Offset for externally-provided A/V sync delay
     OffsetTimeval(m_nexttrigger, sync_delay);
     
-    // Do the wait
     m_delay = CalcDelay();
-    
-    if (m_delay > 0) 
+    //cerr << "WaitForFrame at : " << m_delay;
+
+    // Always sync to the next retrace execpt when we are very late.
+    if (m_delay > -(m_refresh_interval/2)) 
     {
         drm_wait_vblank_t blank;
         blank.request.type = DRM_VBLANK_RELATIVE;
-        blank.request.sequence =
-            (int)(ceil((double)m_delay / m_refresh_interval));
+        blank.request.sequence = 1;
         drmWaitVBlank(m_dri_fd, &blank);
-	m_delay = CalcDelay();
-	// cerr << blank.request.sequence << " m_delay " << m_delay << endl;
+        m_delay = CalcDelay();
+        // cerr << "\tDelay at sync: " << m_delay;
     }
+    //cerr  << endl;
 
+    if (m_delay > 0)
+    {
+        // Wait for any remaining retrace intervals in one pass.
+        int n = m_delay / m_refresh_interval + 1;
+
+        drm_wait_vblank_t blank;
+        blank.request.type = DRM_VBLANK_RELATIVE;
+        blank.request.sequence = n;
+        drmWaitVBlank(m_dri_fd, &blank);
+        m_delay = CalcDelay();
+        //cerr << "Wait " << n << " intervals. Count " << blank.request.sequence;
+        //cerr  << " Delay " << m_delay << endl;
+    }
     KeepPhase();
-    
+
     UpdateNexttrigger();
 }
 
@@ -347,6 +361,14 @@ void nVidiaVideoSync::WaitForFrame(int sync_delay)
     
     m_delay = CalcDelay();
 
+    // Always sync to the next retrace execpt when we are very late.
+    if (m_delay > -(m_refresh_interval/2))
+    {
+        dopoll();
+        m_delay = CalcDelay();
+    }
+
+    // Wait for any remaining retrace intervals.
     while (m_delay > 0)
     {
         dopoll();
@@ -416,7 +438,7 @@ bool OpenGLVideoSync::TryInit()
     vis = glXChooseVisual(m_display, 0, attribList);
     if (vis == NULL) 
     {
-	VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: No appropriate visual found");
+        VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: No appropriate visual found");
         return false;
     }
     swa.colormap = XCreateColormap(m_display, RootWindow(m_display, 0),
@@ -459,37 +481,36 @@ void OpenGLVideoSync::Start()
 
 void OpenGLVideoSync::WaitForFrame(int sync_delay)
 {
-    //if (sync_delay)
-        //cout << "Sync delay: " << sync_delay << endl;
-    // Offset for externally-provided A/V sync delay
+    unsigned int count, n;
+    int r;
+
     OffsetTimeval(m_nexttrigger, sync_delay);
-    
-    // Do the wait
+
     m_delay = CalcDelay();
-    //cout << "Delay " << m_delay;
+    //cerr << "WaitForFrame at : " << m_delay;
 
-    int n = 0;
-    while (m_delay > 0) 
+    // Always sync to the next retrace execpt when we are very late.
+    if (m_delay > -(m_refresh_interval/2)) 
     {
-        unsigned int count;
-        int r;
-        //int n = (int)ceil((double)m_delay / m_refresh_interval);
-        //cout << "Waiting " << n << " intervals" << endl;
         r = glXMakeCurrent(m_display, m_drawable, m_context);
-        //cout << "glxmc: " << r << endl;
         r = glXGetVideoSyncSGI(&count);
-        //cout << "glxgvs: " << r << " count " << count << endl;
-        // sleep for n frame intervals
-        //r = glXWaitVideoSyncSGI(n+1, (count+n)%(n+1) ,&count);
         r = glXWaitVideoSyncSGI(2, (count+1)%2 ,&count);
-        //cout << "glxwvs: " << r << " count " << count << endl;
         m_delay = CalcDelay();
-        n++;
+        //cerr << "\tDelay at sync: " << m_delay;
     }
+    //cerr << endl;
 
+    if (m_delay > 0)
+    {
+        // Wait for any remaining retrace intervals in one pass.
+        n = m_delay / m_refresh_interval + 1;
+        r = glXWaitVideoSyncSGI((n+1), (count+n)%(n+1), &count);
+        m_delay = CalcDelay();
+        //cerr << "Wait " << n << " intervals. Count " << count;
+        //cerr  << " Delay " << m_delay << endl;
+    }
     KeepPhase();
-    //cout << " after " << n << " " << m_delay << endl;
-    
+
     UpdateNexttrigger();
 }
 
@@ -538,7 +559,7 @@ bool RTCVideoSync::TryInit()
     if (ioctl(m_rtcfd, RTC_PIE_ON, 0) < 0)
     {
         VERBOSE(VB_PLAYBACK, QString("RTCVideoSync: Could not enable periodic "
-		"timer interrupts, %1.").arg(strerror(errno)));
+                "timer interrupts, %1.").arg(strerror(errno)));
         return false;
     }
     
