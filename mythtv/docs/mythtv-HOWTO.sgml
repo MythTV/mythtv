@@ -1867,7 +1867,7 @@ Note the spelling in the following commands.
 <tscreen><verb>
 $ amixer set Master,0 100%,100% unmute
 $ amixer set Line,0 75%,75% mute captur
-$ amixer set Capture,0 100%,100% mute captur
+$ amixer set Capture,0 100%,100% captur
 $ su
 # alsactl store
 # exit

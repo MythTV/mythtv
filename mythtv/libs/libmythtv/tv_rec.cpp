@@ -288,7 +288,7 @@ void TVRec::StopRecording(void)
     {
         nextState = RemoveRecording(internalState);
         changeState = true;
-        prematurelystopped = true;
+        prematurelystopped = false;
 
         while (changeState)
             usleep(50);

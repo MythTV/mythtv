@@ -2372,26 +2372,34 @@ void ProgramInfo::handleRecording(QSqlDatabase *db)
     message += RecStatusDesc();
 
     DialogBox diag(gContext->GetMainWindow(), message);
-    int button = 1, ok = -1, react = -1, addov = -1, forget = -1, clearov = -1,
-        ednorm = -1, edcust = -1;
+    int button = 1, ok = -1, react = -1, stop = -1, addov = -1, forget = -1,
+        clearov = -1, ednorm = -1, edcust = -1;
 
     diag.AddButton(QObject::tr("OK"));
     ok = button++;
 
-    if (recendts > now &&
-        (recstatus == rsStopped ||
-         recstatus == rsDeleted))
+    if (recstartts < now && recendts > now)
     {
-        diag.AddButton(QObject::tr("Reactivate"));
-        react = button++;
+        if (recstatus == rsStopped || recstatus == rsDeleted)
+        {
+            diag.AddButton(QObject::tr("Reactivate"));
+            react = button++;
+        }
+        else
+        {
+            diag.AddButton(QObject::tr("Stop recording"));
+            stop = button++;
+        }
     }
-
     if (recendts > now)
     {
         if (rectype != kSingleRecord && rectype != kOverrideRecord)
         {
-            diag.AddButton(QObject::tr("Don't record"));
-            addov = button++;
+            if (recstartts > now)
+            {
+                diag.AddButton(QObject::tr("Don't record"));
+                addov = button++;
+            }
             if (rectype != kFindOneRecord &&
                 !programid.contains(QRegExp("^SH.*0000$")) &&
                 ((!(dupmethod & kDupCheckNone) && programid != "") ||
@@ -2429,6 +2437,11 @@ void ProgramInfo::handleRecording(QSqlDatabase *db)
 
     if (ret == react)
         RemoteReactivateRecording(this);
+    else if (ret == stop)
+    {
+        RemoteStopRecording(this);
+        FinishedRecording(db, false);
+    }
     else if (ret == addov)
         ApplyRecordStateChange(db, kDontRecord);
     else if (ret == forget)

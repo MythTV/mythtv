@@ -426,7 +426,7 @@ void ScheduledRecording::addHistory(QSqlDatabase* db,
 {
     QSqlQuery result(QString::null, db);
 
-    result.prepare("INSERT INTO oldrecorded (chanid,starttime,"
+    result.prepare("REPLACE INTO oldrecorded (chanid,starttime,"
                    "endtime,title,subtitle,description,category,"
                    "seriesid,programid) "
                    "VALUES(:CHANID,:START,:END,:TITLE,:SUBTITLE,:DESC,"
