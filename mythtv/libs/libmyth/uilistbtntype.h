@@ -102,7 +102,7 @@ class UIListTreeType : public UIType
     void GoHome();
     void select();
     QStringList getRouteToCurrent();
-    void tryToSetCurrent(QStringList route);
+    bool tryToSetCurrent(QStringList route);
     int  getDepth();
     void setActive(bool x);
     bool isActive(){ return list_tree_active; } 

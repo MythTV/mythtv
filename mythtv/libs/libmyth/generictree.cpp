@@ -294,7 +294,7 @@ GenericTree* GenericTree::getChildAt(uint reference, int ordering_index)
 {
     if (reference >= m_ordered_subnodes->count())
     {
-        cerr << "GenericTree: out of bounds request to getChildAt()\n";
+        // cerr << "GenericTree: out of bounds request to getChildAt()\n";
         return NULL;
     }
 

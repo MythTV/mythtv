@@ -218,7 +218,11 @@ void UIListTreeType::SetTree(UIListGenericTree *toplevel)
 
     if (!currentpos)
     {
-        cerr << "No top-level children?\n";
+        //
+        //  Not really an error, as UIListTreeType is perfectly capable of drawing an empty list.
+        //
+
+        // cerr << "No top-level children?\n";
         return;
     }
 
@@ -608,7 +612,7 @@ QStringList UIListTreeType::getRouteToCurrent()
     return route_to_current;
 }
 
-void UIListTreeType::tryToSetCurrent(QStringList route)
+bool UIListTreeType::tryToSetCurrent(QStringList route)
 {
 
 
@@ -635,7 +639,7 @@ void UIListTreeType::tryToSetCurrent(QStringList route)
 
     if (route.count() < 2)
     {
-        return;
+        return false;
     }
     
     //
@@ -644,7 +648,7 @@ void UIListTreeType::tryToSetCurrent(QStringList route)
     
     if (!currentpos || !currentlevel)
     {
-        return;
+        return false;
     }
 
     //
@@ -653,7 +657,7 @@ void UIListTreeType::tryToSetCurrent(QStringList route)
     
     if (currentpos->getParent()->getString() != route[0])
     {
-        return;
+        return false;
     }
 
     //
@@ -663,7 +667,7 @@ void UIListTreeType::tryToSetCurrent(QStringList route)
     GenericTree *first_child = currentpos->getParent()->getChildByName(route[1]);
     if (!first_child)
     {
-        return;
+        return false;
     } 
     else
     {
@@ -701,6 +705,8 @@ void UIListTreeType::tryToSetCurrent(QStringList route)
         }
         ++it;
     }
+    
+    return keep_going;
 }
 
 int UIListTreeType::getDepth()
