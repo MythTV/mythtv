@@ -35,21 +35,21 @@ MythWeather configuration is now done in MythWeather...
 To enter the configuration section, press 'i'. From here you can select:
 
 1. Units (lets you pick between Imperial and SI)
-2. Location (pick the letter your city begins with, then find your city in the list,
-	     see below for key binding which should make this quicker).
-3. Aggressiveness Value (this is how fast MythWeather will timeout while trying to get 
-			 weather data).
+2. Location (pick the letter your city begins with, then find your city in the 
+   list, see below for key binding which should make this quicker).
+3. Aggressiveness Value (this is how fast MythWeather will timeout while trying
+   to get weather data).
 
-NOTE: You don't need to do anything other than pick the desired setting. Once highlighted,
-      just hit the left arrow key to go to another setting or when you are finished with
-      the configuration, hit the 'i' key again to save. If you want to cancel your changes
-      press the ESCAPE key.
+NOTE: You don't need to do anything other than pick the desired setting. Once 
+      highlighted, just hit the left arrow key to go to another setting or when
+      you are finished with the configuration, hit the 'i' key again to save. 
+      If you want to cancel your changes press the ESCAPE key.
 
-NOTE: If you keep getting "!!! 3 Failed Attempts !!!" (everytime you try), pick a city
-      that is nearby.
+NOTE: If you keep getting "!!! 3 Failed Attempts !!!" (everytime you try), 
+      pick a city that is nearby.
 
-NOTE: If you can't find your city but you can find it at MSNBC.com's Weather Site, let me
-      know the city name/accid.
+NOTE: If you can't find your city but you can find it at MSNBC.com's Weather 
+      Site, let me know the city name/accid.
 
 
 MYTHWEATHER KEYBOARD COMMANDS
@@ -59,10 +59,12 @@ MYTHWEATHER KEYBOARD COMMANDS
    Right Key		Goes forward one page, see above.
    'p' Key		Pause, wait on the current page until space is hit
 			again.
-   Numeric Keys		You can check other weather by keying in other ZIP codes.
+   Numeric Keys		You can check other weather by keying in other ZIP 
+                        codes.
    Enter Key		Switch between celsius and fahrenheit. Can also
 			be used a way to force a data update.
-   'm' Key		Resets the location to the database default, then updates the data.
+   'm' Key		Resets the location to the database default, then 
+                        updates the data.
 
    From within Configuration:
    

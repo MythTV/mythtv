@@ -38,7 +38,7 @@ Weather::Weather(QSqlDatabase *db, QWidget *parent, const char *name)
        : MythDialog(parent, name)
 {
     config = db;
-    debug = false;
+    debug = true;
     validArea = true;
     convertData = false;
     gotLetter = false;
@@ -57,7 +57,7 @@ Weather::Weather(QSqlDatabase *db, QWidget *parent, const char *name)
 
 
     if (debug == true)
-        cout << "MythWeather: Reading InstrallPrefix from context.\n";
+        cout << "MythWeather: Reading InstallPrefix from context.\n";
 
     baseDir = gContext->GetInstallPrefix();
     if (debug == true)
@@ -2566,11 +2566,12 @@ if (pageNum == 4)
 	page5Dia->setPaletteBackgroundColor(main_bgColor);
 	page5Dia->setFrameStyle( QFrame::Panel | QFrame::Raised );
    	QHBoxLayout *ext5  = new QHBoxLayout(0, 0, 0);
-	QVBoxLayout *ext5v = new QVBoxLayout(0, 10, 10);
+	QVBoxLayout *ext5v = new QVBoxLayout(0, (int)(10 * hmult), 
+                                             (int)(10 * hmult));
 	QLabel *spc = new QLabel("", page5Dia);
 
-	spc->setMinimumWidth((int)2);
-	spc->setMaximumWidth((int)2);
+	spc->setMinimumWidth((int)(2 * wmult));
+	spc->setMaximumWidth((int)(2 * wmult));
 	spc->setPaletteBackgroundColor(topbot_bgColor);
 
    	ext5->addStrut((int)(310*wmult));
@@ -2580,20 +2581,20 @@ if (pageNum == 4)
 	lbUnits = new QLabel(" Temperature Units ", page5Dia);
 	lbUnits->setPaletteBackgroundColor(topbot_bgColor);
 	lbUnits->setAlignment(Qt::AlignCenter);
-	lbUnits->setMaximumWidth((int)250);
-	lbUnits->setMinimumWidth((int)250);
+	lbUnits->setMaximumWidth((int)(250 * wmult));
+	lbUnits->setMinimumWidth((int)(250 * wmult));
 	lbUnits->setMaximumHeight((int)(2*fontMet.height()));
 	lbUnits->setFrameStyle( QFrame::Panel | QFrame::Raised );
 	lbLocal = new QLabel("Location", page5Dia);
 	lbLocal->setAlignment(Qt::AlignCenter);
-	lbLocal->setMaximumWidth((int)250);
-	lbLocal->setMinimumWidth((int)250);
+	lbLocal->setMaximumWidth((int)(250 * wmult));
+	lbLocal->setMinimumWidth((int)(250 * wmult));
 	lbLocal->setMaximumHeight((int)(2*fontMet.height()));
 	lbLocal->setFrameStyle( QFrame::Panel | QFrame::Raised );
 	lbAggr = new QLabel("Aggressiveness", page5Dia);
 	lbAggr->setAlignment(Qt::AlignCenter);
-	lbAggr->setMaximumWidth((int)250);
-	lbAggr->setMinimumWidth((int)250);
+	lbAggr->setMaximumWidth((int)(250 * wmult));
+	lbAggr->setMinimumWidth((int)(250 * wmult));
 	lbAggr->setMaximumHeight((int)(2*fontMet.height()));
 	lbAggr->setFrameStyle( QFrame::Panel | QFrame::Raised );
 
@@ -2638,7 +2639,8 @@ if (pageNum == 4)
 	SIUnits->setMaximumWidth((int)(398*wmult));
 	SIUnits->setMinimumWidth((int)(398*wmult));
 
-	QVBoxLayout *unitBox = new QVBoxLayout(unitType, 10, 10);
+	QVBoxLayout *unitBox = new QVBoxLayout(unitType, (int)(10 * hmult), 
+                                               (int)(10 * hmult));
 	QVBoxLayout *aggrBox = new QVBoxLayout(aggressv, 0, 0);
 	QHBoxLayout *locBox = new QHBoxLayout(location, 0, 0);
 	QVBoxLayout *letBox = new QVBoxLayout(0, 0, 0);
@@ -3033,7 +3035,7 @@ bool Weather::GetWeatherData()
 
 	if (internetData->checkError() == 10)
 	{
-		lbUpdated->setText("!!! 3 Failed Attempted !!! Waiting 5 minutes and trying again.");
+		lbUpdated->setText("!!! 3 Failed Attempts !!! Waiting 5 minutes and trying again.");
 		update_Timer->changeInterval((int)(1000 * 60 * 5));
 		cout << "MythWeather: Invalid Area or Fatal Error.\n";
 		delete internetData;
@@ -3052,7 +3054,7 @@ bool Weather::GetWeatherData()
 	{
 		lbUpdated->setText("!!! Timeout Limit Reached !!! Change your aggressiveness level.");
                 update_Timer->changeInterval((int)(1000 * 60 * 5));
-                cout << "MythWeather: Timeout error, change agressiveness variable.\n";
+                cout << "MythWeather: Timeout error, change aggressiveness variable.\n";
                 delete internetData;
                 return false;
 	}
