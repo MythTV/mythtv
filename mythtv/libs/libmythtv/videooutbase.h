@@ -121,7 +121,7 @@ class VideoOutput
 
     virtual void DrawSlice(VideoFrame *frame, int x, int y, int w, int h);
 
-    virtual void DrawUnusedRects(void) = 0;
+    virtual void DrawUnusedRects(bool sync = true) = 0;
 
     virtual float GetDisplayAspect(void) { return 4.0/3; }
 

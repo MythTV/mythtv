@@ -881,6 +881,12 @@ void VideoOutputXv::PrepareFrame(VideoFrame *buffer, FrameScanType t)
             return;
         }
 
+        if (needrepaint)
+        {
+            DrawUnusedRects(false);
+            needrepaint = false;
+        }
+
         if (colorid == GUID_YV12_PLANAR)
         {
             int width = buffer->width;
@@ -933,12 +939,6 @@ void VideoOutputXv::PrepareFrame(VideoFrame *buffer, FrameScanType t)
             XvShmPutImage(data->XJ_disp, xv_port, data->XJ_curwin, data->XJ_gc,
                           image, src_x, src_y, src_w, src_h, dispxoff, dest_y,
                           dispwoff, disphoff, False);
-        }
-
-        if (needrepaint)
-        {
-            DrawUnusedRects();
-            needrepaint = false;
         }
 
         pthread_mutex_unlock(&lock);
@@ -1041,7 +1041,7 @@ void VideoOutputXv::Show(FrameScanType )
     pthread_mutex_unlock(&lock);
 }
 
-void VideoOutputXv::DrawUnusedRects(void)
+void VideoOutputXv::DrawUnusedRects(bool sync)
 {
     // boboff assumes the smallest interlaced resolution is 480 lines
     int boboff = (int)round(((float)disphoff) / 480 - 0.001f);
@@ -1071,7 +1071,9 @@ void VideoOutputXv::DrawUnusedRects(void)
         XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, 
                        dispx, dispyoff + disphoff, 
                        dispw, (dispy + disph) - (dispyoff + disphoff));
-    XSync(data->XJ_disp, false);
+
+    if (sync)
+        XSync(data->XJ_disp, false);
 }
 
 float VideoOutputXv::GetDisplayAspect(void)

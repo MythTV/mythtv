@@ -30,7 +30,7 @@ class VideoOutputXv : public VideoOutput
 
     int GetRefreshRate(void);
 
-    void DrawUnusedRects(void);
+    void DrawUnusedRects(bool sync = true);
 
     float GetDisplayAspect(void);
 

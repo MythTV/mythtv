@@ -25,7 +25,7 @@ class VideoOutputQuartz : public VideoOutput
 
     int GetRefreshRate(void);
 
-    void DrawUnusedRects(void);
+    void DrawUnusedRects(bool sync = true);
 
     void UpdatePauseFrame(void);
     void ProcessFrame(VideoFrame *frame, OSD *osd,

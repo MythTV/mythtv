@@ -912,7 +912,7 @@ void VideoOutputXvMC::PrepareFrame(VideoFrame *buffer, FrameScanType t)
 
     if (needrepaint)
     {
-        DrawUnusedRects();
+        DrawUnusedRects(false);
         needrepaint = false;
     }
 
@@ -965,11 +965,29 @@ void VideoOutputXvMC::Show(FrameScanType scan)
     if (data->p_render_surface_visible != NULL)
         data->p_render_surface_visible->state &= ~MP_XVMC_STATE_DISPLAY_PENDING;
 
+    // XXX Ugly hack.  With bobdeint, holding this lock takes too much time
+    // away from the decoding process, and coming back from a pause can
+    // result in a very low buffer situation, causing jerky playback.
+    // Let's just hope that the XvMC driver's a bit threadsafe.
+    if (field != 3)
+        pthread_mutex_unlock(&lock);
+
+    int yoff = dispyoff;
+    int hoff = disphoff;
+    if (!hasVLDAcceleration())
+    {
+        yoff += halfLineSrc;
+        hoff -= halfLineSrc;
+    }
+
     XvMCPutSurface(data->XJ_disp, surf, data->XJ_curwin,
                    imgx, imgy, imgw, src_h,
-                   dispxoff, dispyoff + halfLineSrc,
-                   dispwoff, disphoff - halfLineSrc, field);
+                   dispxoff, yoff, dispwoff, hoff, field);
 
+    if (field != 3)
+        pthread_mutex_lock(&lock);
+
+/*  Doesn't seem necessary.
     if (data->p_render_surface_visible && 
         (data->p_render_surface_visible != showingsurface))
     {
@@ -986,21 +1004,26 @@ void VideoOutputXvMC::Show(FrameScanType scan)
             XvMCGetSurfaceStatus(data->XJ_disp, surf, &status);
         }
     }
+*/
 
     data->p_render_surface_visible = data->p_render_surface_to_show;
 
+    if (data->curosd && data->curosd != osdframe)
+    {
+        DiscardFrame(data->curosd);
+        data->curosd = NULL;
+    }
+
+    if (osdframe)
+    {
+        data->p_render_surface_visible = osdren;
+        data->curosd = osdframe;
+    } 
+ 
     if (!m_deinterlacing || (m_deinterlacing && scan != kScan_Interlaced))
     {
         data->p_render_surface_to_show = NULL;
-
-        if (osdframe)
-        {
-            data->p_render_surface_visible = osdren;
-            if (data->curosd)
-                DiscardFrame(data->curosd);
-            data->curosd = osdframe;
-            render->p_osd_target_surface_render = NULL;
-        }
+        render->p_osd_target_surface_render = NULL;
     }
 
     pthread_mutex_unlock(&lock);
@@ -1088,7 +1111,7 @@ void VideoOutputXvMC::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
     render->next_free_data_block_num = 0;
 }
 
-void VideoOutputXvMC::DrawUnusedRects(void)
+void VideoOutputXvMC::DrawUnusedRects(bool sync)
 {
     // boboff assumes the smallest interlaced resolution is 480 lines
     int boboff = (int) round(((float)disphoff)/480 - 0.001f);
@@ -1116,7 +1139,9 @@ void VideoOutputXvMC::DrawUnusedRects(void)
         XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, 
                        dispx, dispyoff+disphoff, 
                        dispw, (dispy+disph)-(dispyoff+disphoff));
-    XSync(data->XJ_disp, false);
+
+    if (sync)
+        XSync(data->XJ_disp, false);
 }
 
 float VideoOutputXvMC::GetDisplayAspect(void)

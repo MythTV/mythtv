@@ -1658,7 +1658,7 @@ void VideoOutputQuartz::Show(FrameScanType t)
     data->pixelLock.unlock();
 }
 
-void VideoOutputQuartz::DrawUnusedRects(void)
+void VideoOutputQuartz::DrawUnusedRects(bool)
 {
 }
 

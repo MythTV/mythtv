@@ -160,7 +160,7 @@ void VideoOutputNull::Show(FrameScanType )
 {
 }
 
-void VideoOutputNull::DrawUnusedRects(void)
+void VideoOutputNull::DrawUnusedRects(bool)
 {
 }
 

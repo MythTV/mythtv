@@ -585,7 +585,7 @@ void VideoOutputDirectfb::Show(FrameScanType t)
 */
 }
 
-void VideoOutputDirectfb::DrawUnusedRects(void)
+void VideoOutputDirectfb::DrawUnusedRects(bool)
 {
     /* DirectFB only draws what is needed :-) */
 }

@@ -313,7 +313,7 @@ void VideoOutputIvtv::Show(FrameScanType )
 {
 }
 
-void VideoOutputIvtv::DrawUnusedRects(void) 
+void VideoOutputIvtv::DrawUnusedRects(bool) 
 { 
 }
 

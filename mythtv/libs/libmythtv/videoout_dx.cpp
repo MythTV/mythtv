@@ -437,7 +437,7 @@ void VideoOutputDX::Show(FrameScanType )
     }
 }
 
-void VideoOutputDX::DrawUnusedRects(void)
+void VideoOutputDX::DrawUnusedRects(bool)
 {
 }
 

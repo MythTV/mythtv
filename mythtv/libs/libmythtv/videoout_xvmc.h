@@ -31,7 +31,7 @@ class VideoOutputXvMC : public VideoOutput
 
     void DrawSlice(VideoFrame *frame, int x, int y, int w, int h);
 
-    void DrawUnusedRects(void);
+    void DrawUnusedRects(bool sync = true);
 
     float GetDisplayAspect(void);
 
