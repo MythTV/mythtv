@@ -13,6 +13,8 @@ package gui_text;
 					 'query_stage'    => 'show',
 					 'show_choice'    => '',
 					 'episode_choice' => undef,
+					 'start_time'     => 0,
+					 'end_time'       => 0,
 					 @_		#allows user-specified attributes to override the defaults
 					};
 		return bless($self, $class);
@@ -25,7 +27,27 @@ package gui_text;
 		# Clear the screen
 			system('clear');
 		# Stage "quit" means, well, quit...
-			last if ($self->stage eq 'quit');
+			if ($self->stage eq 'quit') {
+			# Report the duration
+				if ($self->{start_time} && $self->{end_time}) {
+					my $seconds = $self->{end_time} - $self->{start_time};
+					my $timestr = '';
+				# How many hours?
+					my $hours = int($seconds / 3600);
+					$timestr .= $hours.'h ' if ($hours > 0);
+					$seconds  = $seconds % 3600;
+				# Minutes
+					my $minutes = int($seconds / 60);
+					$timestr .= $minutes.'m ' if ($minutes > 0);
+					$seconds  = $seconds % 60;
+				# Generate a nice
+					$timestr .= $seconds.'s' if ($seconds > 0);
+				# Notify the user
+					$self->notify("Encode lasted: $timestr");
+				}
+			# Leave the loop so we can quit
+				last;
+			}
 		# Are we asking the user which show to encode?
 			if (!$self->{show_choice} || $self->stage eq 'show') {
 				$self->query_shows;
@@ -146,7 +168,9 @@ package gui_text;
 			<STDIN>;
 		}
 		elsif ($Functions[$choice-1]->{enabled}) {
+			$self->{start_time} = time();
 			$Functions[$choice-1]->execute($self->{episode_choice});
+			$self->{end_time}   = time();
 			$self->stage('quit');
 		}
 	}
