@@ -475,7 +475,7 @@
 
   <buttondef name="TV_SEARCH_KEYWORDS">
     <image>text-blank.png</image>
-    <watermarkimage>watermark/tv_searchlistings.png</watermarkimage>
+    <watermarkimage>watermark/search_keywords.png</watermarkimage>
     <offset>0,0</offset>
   </buttondef>
   
@@ -497,7 +497,7 @@
 
   <buttondef name="TV_SEARCH_MOVIES">
     <image>text-blank.png</image>
-    <watermarkimage>watermark/tv_searchlistings.png</watermarkimage>
+    <watermarkimage>watermark/search_movies.png</watermarkimage>
     <offset>0,0</offset>
   </buttondef>
 
