@@ -692,7 +692,8 @@ void ProgLister::fillItemList(void)
                         "WHERE channel.visible = 1 "
                         "AND oldtitle IS NULL AND program.endtime > %1 "
                         "AND program.chanid = channel.chanid "
-                        "AND ( program.airdate = 0 OR "
+                        "AND (( program.airdate = 0 OR "
+                        "programid NOT LIKE \"MV\%\" ) OR "
                         "program.airdate >= YEAR(NOW() - INTERVAL 1 YEAR)) "
                         "GROUP BY title ORDER BY starttime LIMIT 500;")
                         .arg(startTime.toString("yyyyMMddhhmm50"));
@@ -751,7 +752,8 @@ void ProgLister::fillItemList(void)
     else if (type == plMovies) // list movies
     {
         where = QString("WHERE channel.visible = 1 "
-                        "AND program.category_type LIKE \"\%%1\%\" "
+                        "AND (program.category_type LIKE \"\%%1\%\" "
+                        "OR programid LIKE \"MV\%\") "
                         "AND program.endtime > %2 "
                         "AND program.chanid = channel.chanid "
                         "GROUP BY starttime,endtime,channum,callsign "
