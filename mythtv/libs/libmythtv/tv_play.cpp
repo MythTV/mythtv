@@ -292,7 +292,7 @@ int TV::PlayFromRecorder(int recordernum)
 
     if (recorder)
     {
-        cout << "PlayFromRecorder : recorder already exists!";
+        cerr << "PlayFromRecorder : recorder already exists!";
         return -1;
     }
 
@@ -443,7 +443,7 @@ void TV::HandleStateChange(void)
             recorder = RemoteGetExistingRecorder(playbackinfo);
             if (!recorder->IsValidRecorder())
             {
-                cout << "ERROR: couldn't find recorder for in-progress "
+                cerr << "ERROR: couldn't find recorder for in-progress "
                      << "recording\n";
                 nextState = kState_WatchingPreRecorded;
                 delete recorder;
@@ -757,7 +757,7 @@ void TV::RunTV(void)
                 nextState = RemovePlaying(internalState);
                 changeState = true;
                 endOfRecording = true;
-                cout << ">> Player timeout\n";
+                VERBOSE(VB_PLAYBACK, ">> Player timeout");
             }
         }
 

@@ -8,6 +8,7 @@ using namespace std;
 #include "NuppelVideoPlayer.h"
 #include "remoteencoder.h"
 #include "programinfo.h"
+#include "mythcontext.h"
 
 #ifdef USING_XVMC
 extern "C" {
@@ -401,7 +402,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     dump_format(ic, 0, filename, 0);
     if (hasFullPositionMap)
-        cout << "Position map found\n";
+        VERBOSE(VB_PLAYBACK, "Position map found");
 
     return hasFullPositionMap;
 }
@@ -974,7 +975,7 @@ bool AvFormatDecoder::DoRewind(long long desiredFrame)
 
     if (keyPos == 0)
     {
-        cout << "unknown position: " << lastKey << endl;
+        cerr << "Unknown seek position: " << lastKey << endl;
         return false;
     }
 

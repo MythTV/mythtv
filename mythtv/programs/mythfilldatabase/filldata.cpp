@@ -1286,6 +1286,10 @@ bool grabData(Source source, int offset)
         command.sprintf("nice %s --days 7 --config-file '%s' --output %s",
                         xmltv_grabber.ascii(), configfile.ascii(), 
                         filename.ascii());
+    else if (xmltv_grabber == "tv_grab_au")
+        command.sprintf("nice %s --days 7 --config-file '%s' --output %s",
+                        xmltv_grabber.ascii(), configfile.ascii(),
+                        filename.ascii());
     else if (xmltv_grabber == "tv_grab_nz")
         command.sprintf("nice %s -n 1 -f %d -o '%s'",
                         xmltv_grabber.ascii(), offset,
@@ -1382,7 +1386,7 @@ bool fillData(QValueList<Source> &sourcelist)
         QString xmltv_grabber = (*it).xmltvgrabber;
         if (xmltv_grabber == "tv_grab_uk" || xmltv_grabber == "tv_grab_de" ||
             xmltv_grabber == "tv_grab_fi" || xmltv_grabber == "tv_grab_es" ||
-            xmltv_grabber == "tv_grab_nl")
+            xmltv_grabber == "tv_grab_nl" || xmltv_grabber == "tv_grab_au")
         {
             // tv_grab_uk|de doesn't support the --offset option, so just grab a 
             // week.
@@ -1434,8 +1438,7 @@ bool fillData(QValueList<Source> &sourcelist)
                                          query);
             }
         }
-        else if (xmltv_grabber == "tv_grab_na" || 
-                 xmltv_grabber == "tv_grab_aus")
+        else if (xmltv_grabber == "tv_grab_na")
         {
             if (!grabData(*it, 1))
                 ++failures;

@@ -978,12 +978,14 @@ void NuppelVideoPlayer::InitExAVSync(void)
 
     if (!disablevideo)
     {
-        cout << "Video timing method: " << timing_type << endl;
+        QString msg = QString("Video timing method: %1").arg(timing_type);
+        VERBOSE(VB_PLAYBACK, msg);
         refreshrate = videoOutput->GetRefreshRate();
         if (refreshrate <= 0)
             refreshrate = frame_interval;
-        cout << "Refresh rate: " << refreshrate << ", frame interval: "
-             << frame_interval << endl;
+        msg = QString("Refresh rate: %1, frame interval: %2")
+              .arg(refreshrate).arg(frame_interval);
+        VERBOSE(VB_PLAYBACK, msg);
     }
 }
 
@@ -1054,7 +1056,7 @@ void NuppelVideoPlayer::ExAVSync(void)
     }
 
     if (output_jmeter && output_jmeter->RecordCycleTime())
-        cout << avsync_delay  / 1000 << endl;
+        cout << avsync_delay / 1000 << endl;
 
     /* The value of nexttrigger is perfect -- we calculated it to
        be exactly one frame time after the previous frame,
@@ -1152,7 +1154,9 @@ void NuppelVideoPlayer::OldAVSync(void)
     {
         if (delay > 200000)
         {
-            cout << "Delaying to next trigger: " << delay << endl;
+            QString msg = QString("Delaying to next trigger: %1")
+                          .arg(delay);
+            VERBOSE(VB_PLAYBACK, msg);
             delay = 200000;
             delay_clipping = true;
         }
@@ -1193,7 +1197,7 @@ void NuppelVideoPlayer::OldAVSync(void)
        the frame has become visible on screen */
 
     if (output_jmeter && output_jmeter->RecordCycleTime())
-        cout << avsync_delay / 1000 << endl;
+        cerr << avsync_delay / 1000 << endl;
 
     /* The value of nexttrigger is perfect -- we calculated it to
         be exactly one frame time after the previous frame,
@@ -2961,7 +2965,7 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
         int audio_size = audio_samplerate * audio_bits * audio_channels / 8;
         // framecontrol is true if we want to enforce fifo sync.
         if (framecontrol)
-            cout << "Enforcing sync on fifos\n";
+            VERBOSE(VB_GENERAL, "Enforcing sync on fifos");
         fifow = new FIFOWriter::FIFOWriter(2, framecontrol);
 
         if (!fifow->FIFOInit(0, QString("video"), vidfifo, frame.size, 50) ||
@@ -2974,7 +2978,7 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
            unlink(outputname);
            return REENCODE_ERROR;
         }
-        cout << "CreatedThreads\n";
+        VERBOSE(VB_GENERAL, "Created fifos. Waiting for connection.");
     }
 
     bool forceKeyFrames = (fifow == NULL) ? framecontrol : false;
@@ -2983,7 +2987,7 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
         fifow == NULL && !deleteMap.isEmpty() && honorCutList)
     {
         decoder->SetRawVideoState(true);
-        cout << "Reencoding video in 'raw' mode\n";
+        VERBOSE(VB_GENERAL, "Reencoding video in 'raw' mode");
     }
 
     decoder->setExactSeeks(true);
@@ -3028,9 +3032,11 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
             {
                 while((i.data() == 1) && (i != last))
                 {
-                    cout << "ReencodeFile: Fast-Forwarding from " << i.key();
+                    QString msg = QString("Fast-Forwarding from %1")
+                                  .arg((int)i.key());
                     i++;
-                    cout << " to " << i.key() << endl;
+                    msg += QString(" to %1").arg((int)i.key());
+                    VERBOSE(VB_GENERAL, msg);
                     decoder->DoFastForward(i.key());
                     frame.buf = vbuffers[vpos].buf;
                     frame.timecode = timecodes[vpos];
@@ -3057,9 +3063,11 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
             int delta = viddelta - auddelta;
             if (abs(delta) < 500 && abs(delta) >= vidFrameTime)
             {
-                cout << "Audio is " << abs(delta) << " ms "
-                     << ((delta > 0) ? "ahead of" : "behind")
-                     << " video at # " << frame.frameNumber << endl;
+               QString msg = QString("Audio is %1ms %2 video at # %3")
+                          .arg(abs(delta))
+                          .arg(((delta > 0) ? "ahead of" : "behind"))
+                          .arg((int)frame.frameNumber);
+                VERBOSE(VB_GENERAL, msg);
                 dropvideo = (delta > 0) ? 1 : -1;
                 wait_recover = 0;
             }
@@ -3081,7 +3089,8 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
                         count++;
                         delta -= (int)vidFrameTime;
                     }
-                    cout << "Added " << count << " blank video frames" << endl;
+                    QString msg = QString("Added %1 blank video frames")
+                                  .arg(count);
                     frame.frameNumber += count;
                     dropvideo = 0;
                     wait_recover = 0;

@@ -94,15 +94,15 @@ void DVBChannel::Close()
     for (vector_int::iterator i = pid.begin(); i != pid.end(); i++)
         if (*i > 0)
             close(*i);
-    cout << "DVBChannel: Closed DVB demux devices!" << endl;
+    VERBOSE(VB_CHANNEL, "DVBChannel: Closed DVB demux devices!");
 }
 
 bool DVBChannel::SetPID()
 {
-    cout << "SetPID: ";
+    QString msg = QString("SetPID: ");
     for (vector_int::iterator j = pid.begin(); j != pid.end(); j++)
-        cout << " " << *j;
-    cout << endl;
+        msg += QString(" %1").arg(*j);
+    VERBOSE(VB_CHANNEL, msg);
 
     if (!Open(pid.size()))
         return false;
@@ -449,7 +449,8 @@ bool DVBChannel::SetChannelByString(const QString &chan)
 {
     if (curchannelname == chan)
         return true;
-    cout << "DVBChannel: Changing to channel " << chan << " on card " << cardnum << endl;
+    VERBOSE(VB_CHANNEL, QString("DVBChannel: Changing to channel %1 on card %2")
+                        .arg(chan).arg(cardnum));
 
 #ifdef USING_DVB
     QSqlDatabase* db_conn;

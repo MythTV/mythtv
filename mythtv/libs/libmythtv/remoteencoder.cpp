@@ -79,7 +79,7 @@ QSocket *RemoteEncoder::openControlSocket(const QString &host, short port)
 
     if (sock->state() != QSocket::Connected)
     {
-        cout << "Could not connect to server\n";
+        VERBOSE(VB_GENERAL, "Could not connect to server");
         return NULL;
     }
 

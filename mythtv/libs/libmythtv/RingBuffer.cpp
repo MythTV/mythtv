@@ -790,7 +790,8 @@ void RingBuffer::ReadAheadThread(void)
         if (readsallowed && used < fill_min && !ateof)
         {
             readsallowed = false;
-            cerr << "rebuffering (" << used << " " << fill_min << ")\n";
+            VERBOSE(VB_GENERAL, QString ("rebuffering (%1 %2)").arg(used)
+                                                               .arg(fill_min));
         }
 
         pthread_rwlock_unlock(&rwlock);

@@ -536,7 +536,6 @@ void ProgFinder::update_timeout()
                                    (float)searchCount));
             QString data = QString(" Loading Data...%1% Complete")
                                   .arg(amountDone);
-            cout << data << endl;
           
             LayerSet *container = theme->GetSet("selector");
             if (container)

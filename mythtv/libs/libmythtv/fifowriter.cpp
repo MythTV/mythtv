@@ -9,6 +9,7 @@
 #include <math.h>
 
 #include "fifowriter.h"
+#include "mythcontext.h"
 
 #include <iostream>
 using namespace std;
@@ -68,7 +69,7 @@ int FIFOWriter::FIFOInit(int id, QString desc, QString name, long size,
         perror(NULL);
         return false;
     }
-    cout << "Created " << desc.ascii() << " fifo: " << name.ascii() << endl;
+    VERBOSE(VB_GENERAL, QString("Created %1 fifo: %2").arg(desc).arg(name));
     maxblksize[id] = size;
     filename[id] = name;
     fbdesc[id] = desc;
@@ -169,8 +170,9 @@ void FIFOWriter::FIFOWrite(int id, void *buffer, long blksize)
             fb_inptr[id]->next = new struct fifo_buf;
             fb_inptr[id]->next->data = new unsigned char[maxblksize[id]];
             fb_inptr[id]->next->next = tmpfifo;
-            cout << "allocating additonal buffer for : " << fbdesc[id].ascii()
-                 << "(" << ++fbcount[id] << ")" << endl;
+            QString msg = QString("allocating additonal buffer for : %1(%2)")
+                          .arg(fbdesc[id]).arg(++fbcount[id]);
+            VERBOSE(VB_FILE, msg);
         }
         else
         {

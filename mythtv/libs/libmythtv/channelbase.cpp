@@ -10,6 +10,7 @@
 #include "channel.h"
 #include "frequencies.h"
 #include "tv.h"
+#include "mythcontext.h"
 
 #include <iostream>
 using namespace std;
@@ -127,7 +128,7 @@ bool ChannelBase::ChangeExternalChannel(const QString &channum)
     QString command = QString("%1 %2").arg(externalChanger[currentcapchannel])
                                       .arg(channum);
 
-    cout << "External channel change: " << command << endl;
+    VERBOSE(VB_CHANNEL, QString("External channel change: %1").arg(command));
     pid_t child = fork();
     if (child < 0)
     {

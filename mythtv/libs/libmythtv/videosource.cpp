@@ -111,7 +111,10 @@ void XMLTV_na_config::save(QSqlDatabase* db) {
     int ret = system(command);
 
     if (ret != 0)
-        cout << command << endl << "exited with status " << ret << endl;
+    {
+        VERBOSE(VB_GENERAL, command);
+        VERBOSE(VB_GENERAL, QString("exited with status %1").arg(ret));
+    }
 }
 
 void XMLTV_uk_config::save(QSqlDatabase* db) {
@@ -128,7 +131,10 @@ void XMLTV_uk_config::save(QSqlDatabase* db) {
 
     int ret = system(command);
     if (ret != 0)
-        cout << command << endl << "exited with status " << ret << endl;
+    {
+        VERBOSE(VB_GENERAL, command);
+        VERBOSE(VB_GENERAL, QString("exited with status %1").arg(ret));
+    }
 }
 
 void XMLTV_generic_config::save(QSqlDatabase* db) {
@@ -147,16 +153,19 @@ void XMLTV_generic_config::save(QSqlDatabase* db) {
 
     int ret = system(command);
     if (ret != 0)
-        cout << command << endl << "exited with status " << ret << endl;
+    {
+        VERBOSE(VB_GENERAL, command);
+        VERBOSE(VB_GENERAL, QString("exited with status %1").arg(ret));
+    }
 
     if (grabber == "tv_grab_de" || grabber == "tv_grab_sn" || 
         grabber == "tv_grab_fi" || grabber == "tv_grab_es" ||
         grabber == "tv_grab_nl") 
     {
-        cout << "You _MUST_ run 'mythfilldatabase --manual the first time, "
+        cerr << "You _MUST_ run 'mythfilldatabase --manual the first time, "
              << "instead\n";
-        cout << "of just 'mythfilldatabase'.  Your grabber does not provide\n";
-        cout << "channel numbers, so you have to set them manually.\n";
+        cerr << "of just 'mythfilldatabase'.  Your grabber does not provide\n";
+        cerr << "channel numbers, so you have to set them manually.\n";
     }
 
 }

@@ -210,7 +210,8 @@ int main(int argc, char *argv[])
         StoreTranscodeState(pginfo, TRANSCODE_STARTED, useCutlist);
     NuppelVideoPlayer *nvp = new NuppelVideoPlayer(db, pginfo);
 
-    cout << "Transcoding from " << infile << " to " << tmpfile << "\n";
+    VERBOSE(VB_GENERAL, QString("Transcoding from %1 to %2")
+                        .arg(infile).arg(tmpfile));
 
     int result = nvp->ReencodeFile((char *)infile.ascii(),
                                    (char *)tmpfile.ascii(),
@@ -222,22 +223,22 @@ int main(int argc, char *argv[])
     {
         if (use_db)
             StoreTranscodeState(pginfo, TRANSCODE_FINISHED, useCutlist);
-        cout << "Transcoding " << infile << " done\n";
+        VERBOSE(VB_GENERAL, QString("Transcoding %1 done").arg(infile));
         retval = 0;
     } 
     else if (result == REENCODE_CUTLIST_CHANGE)
     {
         if (use_db)
             StoreTranscodeState(pginfo, TRANSCODE_RETRY, useCutlist);
-        cout << "Transcoding " << infile 
-             << " aborted because of cutlist update\n";
+        VERBOSE(VB_GENERAL, QString("Transcoding %1 aborted because of "
+                                    "cutlist update").arg(infile));
         retval = 1;
     }
     else
     {
         if (use_db)
             StoreTranscodeState(pginfo, TRANSCODE_FAILED, useCutlist);
-        cout << "Transcoding " << infile << " failed\n";
+        VERBOSE(VB_GENERAL, QString("Transcoding %1 failed").arg(infile));
         retval = -1;
     }
 

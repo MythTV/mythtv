@@ -97,7 +97,9 @@ void Channel::SetFormat(const QString &format)
 
         while (ioctl(videofd, VIDIOC_ENUMINPUT, &vin) >= 0)
         {
-            cout << "Probed: " << device << " - " << vin.name << endl;
+            QString msg = QString("Probed: %1 - %2").arg(device)
+                            .arg((char *)vin.name);
+            VERBOSE(VB_CHANNEL, msg)
             channelnames[vin.index] = (char *)vin.name;
             inputChannel[vin.index] = "";
             inputTuneTo[vin.index] = "";
@@ -168,7 +170,8 @@ void Channel::SetFormat(const QString &format)
         test.channel = i;
         ioctl(videofd, VIDIOCGCHAN, &test);
 
-        cout << "Probed: " << device << " - " << test.name << endl;
+        VERBOSE(VB_CHANNEL, QString("Probed: %1 - %2").arg(device)
+                            .arg(test.name));
         channelnames[i] = test.name;
         inputChannel[i] = "";
         inputTuneTo[i] = "";

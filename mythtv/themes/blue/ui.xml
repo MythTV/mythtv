@@ -137,6 +137,11 @@
         <catcolor category="TIEMPO" color="#33ff99"></catcolor>
         <catcolor category="SHOW" color="sienna"></catcolor>
 
+        <!-- Categories introduced by tv_grab_au -->
+        <catcolor category="Childrens" color="MediumSlateBlue"></catcolor>
+        <catcolor category="Movie" color="Blue"></catcolor>
+        <catcolor category="Live" color="DarkOrange3"></catcolor>
+
         <!-- categories used by the NextView EPG service -->
         <!-- (available in some european countries) -->
         <catcolor category="news" color="DarkOrange3"></catcolor>

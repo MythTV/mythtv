@@ -113,6 +113,8 @@ int main(int argc, char **argv)
     QApplication a(argc, argv, false);
 
     QString logfile = "";
+    QString verboseString = QString(" important general");
+
     bool daemonize = false;
     bool printsched = false;
     bool printexpire = false;
@@ -140,7 +142,58 @@ int main(int argc, char **argv)
             daemonize = true;
         } else if (!strcmp(a.argv()[argpos],"-v") ||
                    !strcmp(a.argv()[argpos],"--verbose")) {
-            print_verbose_messages = true;
+            if (a.argc() > argpos) {
+                QStringList verboseOpts;
+                verboseOpts.split(',',a.argv()[argpos+1]);
+                ++argpos;
+                for (QStringList::Iterator it = verboseOpts.begin(); 
+                     it != verboseOpts.end(); ++it )
+                {
+                    if(!strcmp(*it,"none"))
+                    {
+                        print_verbose_messages = VB_NONE;
+                        verboseString = "";
+                    }
+                    else if(!strcmp(*it,"all"))
+                    {
+                        print_verbose_messages = VB_ALL;
+                        verboseString = "all";
+                    }
+                    else if(!strcmp(*it,"quiet"))
+                    {
+                        print_verbose_messages = VB_IMPORTANT;
+                        verboseString = "important";
+                    }
+                    else if(!strcmp(*it,"record"))
+                    {
+                        print_verbose_messages |= VB_RECORD;
+                        verboseString += " " + *it;
+                    }
+                    else if(!strcmp(*it,"playback"))
+                    {
+                        print_verbose_messages |= VB_PLAYBACK;
+                        verboseString += " " + *it;
+                    }
+                    else if(!strcmp(*it,"channel"))
+                    {
+                        print_verbose_messages |= VB_CHANNEL;
+                        verboseString += " " + *it;
+                    }
+                    else if(!strcmp(*it,"osd"))
+                    {
+                        print_verbose_messages |= VB_OSD;
+                        verboseString += " " + *it;
+                    }
+                    else if(!strcmp(*it,"file"))
+                    {
+                        print_verbose_messages |= VB_FILE;
+                        verboseString += " " + *it;
+                    }
+                }
+            } else {
+                cerr << "Missing argument to -v/--verbose option\n";
+                return -1;
+            }
         } else if (!strcmp(a.argv()[argpos],"--printsched")) {
             printsched = true;
         } else if (!strcmp(a.argv()[argpos],"--printexpire")) {
@@ -152,7 +205,9 @@ int main(int argc, char **argv)
                     "-p or --pidfile filename       Write PID of mythbackend " <<
                                                     "to filename" << endl <<
                     "-d or --daemon                 Runs mythbackend as a daemon" << endl <<
-                    "-v or --verbose                Prints more information" << endl <<
+                    "-v or --verbose debug-level    Prints more information" << endl <<
+                    "                               Allowed values are all,none,quiet,record," << endl <<
+                    "                               playback,channel,osd,file" << endl <<
                     "--printexpire                  List of auto-expire programs" << endl <<
                     "--printsched                   Upcoming scheduled programs" << endl;
             return -1;
@@ -309,7 +364,7 @@ int main(int argc, char **argv)
     QSqlDatabase *trandb = QSqlDatabase::database("TRANSDB");
     trans = new Transcoder(&tvList, trandb);
 
-    VERBOSE("Verbose mode activated.");
+    VERBOSE(VB_ALL, QString("Enabled verbose msgs :%1").arg(verboseString));
 
     lockfile_location = gContext->GetSetting("RecordFilePrefix") + "/nfslockfile.lock";
     int nfsfd = -1;

@@ -391,7 +391,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
     if (commands[1] == "Playback")
     {
         bool wantevents = commands[3].toInt();
-        VERBOSE("MainServer::HandleAnnounce Playback");
+        VERBOSE(VB_GENERAL, "MainServer::HandleAnnounce Playback");
         cout << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") 
              << " adding: " << commands[2] << " as a player " 
              << wantevents << endl;
@@ -500,7 +500,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
     }
     else if (commands[1] == "FileTransfer")
     {
-        VERBOSE("MainServer::HandleAnnounce FileTransfer");
+        VERBOSE(VB_GENERAL, "MainServer::HandleAnnounce FileTransfer");
         cout << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
              << " adding: " << commands[2] << " as a remote file transfer"
              << endl;
@@ -1114,7 +1114,7 @@ void MainServer::HandleLockTuner(PlaybackSock *pbs)
         {
             QString msg = QString("Cardid %1 LOCKed for external use on %2.")
                                   .arg(retval).arg(pbshost);
-            VERBOSE(msg);
+            VERBOSE(VB_GENERAL, msg);
 
             QString querystr = QString("SELECT videodevice, audiodevice, "
                                             "vbidevice "
@@ -1179,7 +1179,7 @@ void MainServer::HandleFreeTuner(int cardid, PlaybackSock *pbs)
         
         QString msg = QString("Cardid %1 FREED from external use on %2.")
                               .arg(cardid).arg(pbs->getHostname());
-        VERBOSE(msg);
+        VERBOSE(VB_GENERAL, msg);
 
         dblock.lock();
         ScheduledRecording::signalChange(m_db);

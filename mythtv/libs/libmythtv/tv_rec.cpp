@@ -184,10 +184,10 @@ int TVRec::StartRecording(ProgramInfo *rcinfo)
 
     if (changeState)
     {
-        VERBOSE("backend still changing state, waiting..");
+        VERBOSE(VB_RECORD, "backend still changing state, waiting..");
         while (changeState)
             usleep(50);
-        VERBOSE("changing state finished, starting now");
+        VERBOSE(VB_RECORD, "changing state finished, starting now");
     }
 
     if (internalState == kState_WatchingLiveTV && !cancelNextRecording)
@@ -1707,7 +1707,7 @@ void TVRec::ToggleChannelFavorite(void)
                            .arg(favid);
 
         query = db_conn->exec(thequery);
-        cout << "Removing Favorite.\n";
+        VERBOSE(VB_RECORD, "Removing Favorite.");
     }
     else
     {
@@ -1716,7 +1716,7 @@ void TVRec::ToggleChannelFavorite(void)
                            .arg(chanid);
 
         query = db_conn->exec(thequery);
-        cout << "Adding Favorite.\n";
+        VERBOSE(VB_RECORD, "Adding Favorite.");
     }
     pthread_mutex_unlock(&db_lock);
 }

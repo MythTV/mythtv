@@ -17,6 +17,7 @@ using namespace std;
 #include "ttfont.h"
 #include "osd.h"
 #include "osdtypes.h"
+#include "mythcontext.h"
 #include "libmyth/oldsettings.h"
 
 OSD::OSD(int width, int height, int frint, const QString &font, 
@@ -842,10 +843,10 @@ bool OSD::LoadTheme(void)
     int errorColumn = 0;
 
     if (!doc.setContent(&f, false, &errorMsg, &errorLine, &errorColumn))
-    {
-        cout << "Error parsing: " << themefile << endl;
-        cout << "at line: " << errorLine << "  column: " << errorColumn << endl;
-        cout << errorMsg << endl;
+    { 
+        cerr << "Error parsing: " << themefile << endl;
+        cerr << "at line: " << errorLine << "  column: " << errorColumn << endl;
+        cerr << errorMsg << endl;
         f.close();
         return false;
     }

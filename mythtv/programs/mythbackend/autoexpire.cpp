@@ -66,7 +66,7 @@ void AutoExpire::RunExpirer(void)
             QString msg = QString("Running AutoExpire: Want %1 Gigs free but "
                                   "only have %2.")
                                   .arg(minFree).arg(freespace);
-            VERBOSE(msg);
+            VERBOSE(VB_GENERAL, msg);
 
             FillExpireList();
 
@@ -80,7 +80,7 @@ void AutoExpire::RunExpirer(void)
                                       .arg(pginfo->title)
                                       .arg(pginfo->startts.toString())
                                       .arg((int)(pginfo->filesize/1024/1024));
-                VERBOSE(msg);
+                VERBOSE(VB_GENERAL, msg);
 
                 QString message =
                            QString("AUTO_EXPIRE %1 %2")
@@ -111,7 +111,7 @@ void AutoExpire::RunExpirer(void)
                               .arg(freespace);
             }
 
-            VERBOSE(msg);
+            VERBOSE(VB_GENERAL, msg);
         }
 
         pthread_mutex_unlock(&expirerLock);
@@ -171,7 +171,7 @@ void AutoExpire::ExpireEpisodesOverMax(void)
                                           "too many episodes.")
                                           .arg(maxIter.key())
                                           .arg(query.value(1).toString());
-                    VERBOSE(msg);
+                    VERBOSE(VB_GENERAL, msg);
 
                     QString message = QString("AUTO_EXPIRE %1 %2")
                                               .arg(query.value(0).toString())

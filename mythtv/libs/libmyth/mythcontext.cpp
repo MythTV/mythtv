@@ -18,7 +18,7 @@
 #include "dialogbox.h"
 #include "mythdialogs.h"
 
-bool print_verbose_messages = false;    
+int print_verbose_messages = VB_IMPORTANT | VB_GENERAL;
 
 MythContext::MythContext(const QString &binversion, bool gui, bool lcd)
            : QObject()

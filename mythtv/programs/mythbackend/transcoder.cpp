@@ -248,7 +248,7 @@ struct TranscodeData *Transcoder::CheckTranscodeTable(bool skipPartial)
                 // Discard this transcoding, and do nothing
                 QString filename = pinfo->GetRecordFilename(fileprefix);
                 filename += ".tmp";
-                cout << "Deleting " << filename << endl;
+                VERBOSE(VB_GENERAL, QString("Deleting %1").arg(filename));
                 unlink(filename);
                 DeleteTranscode(pinfo);
             }
@@ -258,7 +258,7 @@ struct TranscodeData *Transcoder::CheckTranscodeTable(bool skipPartial)
                 // transcode didn't finish delete partial transcode
                 QString filename = pinfo->GetRecordFilename(fileprefix);
                 filename += ".tmp";
-                cout << "Deleting " << filename << endl;
+                VERBOSE(VB_GENERAL, QString("Deleting %1").arg(filename));
                 unlink(filename);
                 UpdateTranscoder(pinfo, TRANSCODE_QUEUED |
                                         (flags & TRANSCODE_USE_CUTLIST));

@@ -155,7 +155,7 @@ void HDTVRecorder::StartRecording(void)
 
                 if (buf[0] != 0x47) 
                 {
-                    cout<<"Bad SYNC byte!!!"<<endl;
+                    VERBOSE(VB_RECORD, "Bad SYNC byte!!!");
                     errors++;
                     insync = 0;
                     break;

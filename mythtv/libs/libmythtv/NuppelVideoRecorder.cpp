@@ -319,7 +319,7 @@ bool NuppelVideoRecorder::SetupAVCodec(void)
 
     if (!mpa_codec)
     {
-        cout << "error finding codec\n";
+        cerr << "error finding codec: " << codec.ascii() << endl;
         return false;
     }
 
@@ -2668,7 +2668,9 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
         if (fnum != (last_block+1)) 
         {
             audio_behind = fnum - (last_block+1);
-            printf("audio behind %d %d\n", last_block, fnum);
+            QString msg = QString("audio behind %1 %2")
+                          .arg(last_block).arg(fnum);
+            VERBOSE(VB_RECORD, msg);
         }
     }
 
@@ -2762,7 +2764,7 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
     // 'uncountable' video frame drop -> material==worthless
     if (audio_behind > 0) 
     {
-        cerr << "audio behind\n";
+        VERBOSE(VB_RECORD, "audio behind");
         frameheader.frametype = 'A'; // audio frame
         frameheader.comptype  = 'N'; // output a nullframe with
         frameheader.packetlength = 0;

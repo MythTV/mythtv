@@ -10,6 +10,7 @@ using namespace std;
 #include "nuppeldecoder.h"
 #include "NuppelVideoPlayer.h"
 #include "remoteencoder.h"
+#include "mythcontext.h"
 
 #include "minilzo.h"
 
@@ -706,7 +707,8 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
         pthread_mutex_unlock(&avcodeclock);
         if (ret < 0)
         {
-            cout << "decoding error: " << ret << " back from avcodec\n";
+            VERBOSE(VB_PLAYBACK, QString("decoding error: %1 back from avcodec")
+                                 .arg(ret));
             return false;
         }
 
@@ -1064,7 +1066,7 @@ bool NuppelDecoder::DoRewind(long long desiredFrame)
 
     if (keyPos == 0)
     {
-        cout << "unknown position: " << lastKey << endl;
+        cerr << "Unknown seek position: " << lastKey << endl;
         return false;
     }
 

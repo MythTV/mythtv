@@ -179,10 +179,10 @@ void DVBRecorder::StartRecording()
                     }
                     pid_changed = false;
 
-                    cout << "filtering pids:";
+                    QString msg = QString ("filtering pids:");
                     for (vector_int::iterator j=pid.begin();j !=pid.end(); j++)
-                      cout << " " << *j;
-                    cout << endl;
+                      msg += QString(" %1").arg(*j);
+                    VERBOSE(VB_RECORD, msg);
                 }
 
                 /* This function call fulfills 2 purposes:

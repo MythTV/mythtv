@@ -1162,7 +1162,7 @@ void Scheduler::RunScheduler(void)
             FillEncoderFreeSpaceCache();
             FillRecordLists();
             lastupdate = curtime;
-            VERBOSE("Found changes in the todo list.");
+            VERBOSE(VB_GENERAL, "Found changes in the todo list.");
 
             // Determine if the user wants us to start recording early
             // and by how many seconds
@@ -1202,7 +1202,7 @@ void Scheduler::RunScheduler(void)
                                       .arg(nextRecording->sourceid)
                                       .arg(nexttv->getFreeSpace());
 
-                VERBOSE(msg);
+                VERBOSE(VB_GENERAL, msg);
 
                 RemoveRecording(nextRecording);
                 nextRecording = NULL;
@@ -1220,7 +1220,7 @@ void Scheduler::RunScheduler(void)
                                       .arg(nextRecording->cardid)
                                       .arg(nextRecording->sourceid);
 
-                VERBOSE(msg);
+                VERBOSE(VB_GENERAL, msg);
 
                 RemoveRecording(nextRecording);
                 nextRecording = NULL;
@@ -1235,7 +1235,7 @@ void Scheduler::RunScheduler(void)
                 secsleft -= prerollseconds;
             }
 
-//            VERBOSE(secsleft << " seconds until " << nextRecording->title);
+//            VERBOSE(VB_GENERAL, secsleft << " seconds until " << nextRecording->title);
 
             if (secsleft > 30)
                 break;
@@ -1268,7 +1268,7 @@ void Scheduler::RunScheduler(void)
                                              .arg(nextRecording->cardid)
                                              .arg(nextRecording->sourceid);
 
-                VERBOSE(msg);
+                VERBOSE(VB_GENERAL, msg);
 
                 AddToDontRecord(nextRecording);
                 RemoveRecording(nextRecording);

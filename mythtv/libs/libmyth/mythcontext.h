@@ -2,6 +2,7 @@
 #define MYTHCONTEXT_H_
 
 #include <qstring.h>
+#include <qdatetime.h>
 #include <qpixmap.h>
 #include <qpalette.h>
 #include <qobject.h>
@@ -20,8 +21,20 @@ class QSocket;
 class LCD;
 class MythMainWindow;
 
-#define VERBOSE(args...) \
-if (print_verbose_messages) \
+enum VerboseMask {
+    VB_IMPORTANT = 0x01,
+    VB_GENERAL   = 0x02,
+    VB_RECORD    = 0x04,
+    VB_PLAYBACK  = 0x08,
+    VB_CHANNEL   = 0x10,
+    VB_OSD       = 0x20,
+    VB_FILE      = 0x40,
+    VB_NONE      = 0x00,
+    VB_ALL       = 0xff
+};
+
+#define VERBOSE(mask,args...) \
+if (print_verbose_messages & (mask) != 0) \
     cout << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") \
          << " " << args << endl;
 
@@ -52,10 +65,10 @@ class MythEvent : public QCustomEvent
     QString extradata;
 };
 
-#define MYTH_BINARY_VERSION "0.12.08182003-1"
+#define MYTH_BINARY_VERSION "0.12.08242003-1"
 #define MYTH_SCHEMA_VERSION "1003"
 
-extern bool print_verbose_messages;
+extern int print_verbose_messages;
 
 class MythContext : public QObject
 {
