@@ -272,20 +272,24 @@ int adjustFilter (VideoFilter *vf, VideoFrame *frame)
                         mm_cpool + 1, mm_cpool + 2);
     else
         adjustRegion(frame->buf, frame->buf + filter->yend, filter->ytable);
+
     if (filter->cfilt)
         adjustRegionMMX(frame->buf + filter->yend, frame->buf + filter->cend,
                         filter->ctable, &(filter->cshift), &(filter->cscale),
                         &(filter->cmin), mm_cpool + 3, mm_cpool + 4);
     else
         adjustRegion(frame->buf + filter->yend, frame->buf + filter->cend,
-                     filter->ytable);
+                     filter->ctable);
+
     if (filter->yfilt || filter->cfilt)
         emms();
+
 #else /* i386 */
     adjustRegion(frame->buf, frame->buf + filter->yend, filter->ytable);
     adjustRegion(frame->buf + filter->yend, frame->buf + filter->cend,
-                 filter->ytable);
+                 filter->ctable);
 #endif /* i386 */
+
     TF_END(filter, "Adjust: ");
     return 0;
 }
@@ -386,7 +390,7 @@ newAdjustFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
     filter->yfilt = fillTableMMX (filter->ytable, &(filter->yshift),
                                     &(filter->yscale), &(filter->ymin),
                                     ymin, ymax, 16, 235, ygamma);
-    filter->yfilt = fillTableMMX (filter->ctable, &(filter->cshift),
+    filter->cfilt = fillTableMMX (filter->ctable, &(filter->cshift),
                                     &(filter->cscale), &(filter->cmin),
                                     cmin, cmax, 16, 240, cgamma);
 #else /* i386 */
