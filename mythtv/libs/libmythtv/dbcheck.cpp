@@ -793,14 +793,6 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
         performActualUpdate(updates, "1042", dbver);
     }
 
-    if (dbver == "1042")
-    {
-        const QString updates[] = {
-"INSERT INTO settings SET value=\"DataDirectMessage\";",
-""
-};
-        performActualUpdate(updates, "1043", dbver);
-    }
 
 }
 
