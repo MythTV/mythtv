@@ -450,14 +450,19 @@ void SelectManagedListItem::select()
 
 void SelectManagedListItem::doGoBack()
 {
+
     if(curItem == (itemCount - 1) )
         curItem = lastItem;
     else
         text = QString( "[ %1 ]").arg(getCurItemText());
     
     if(curItem != lastItem)
+    {
+        text = getCurItemText();
+        valueText = getCurItemValue();
         changed();
-        
+    }   
+    
     ManagedListGroup::doGoBack();
 }
 
