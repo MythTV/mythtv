@@ -17,3 +17,6 @@ str TreeLevels=artist album title
 # Automatically lookup an audio CD if it's present and show its information in
 # the Music Selection Tree
 #int AutoLookupCD=1
+
+# Shuffle mode for the player.  Can be either normal(the default) or random.
+#str PlayMode=random

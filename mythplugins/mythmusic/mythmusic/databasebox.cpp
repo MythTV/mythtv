@@ -30,6 +30,8 @@ DatabaseBox::DatabaseBox(MythContext *context, QSqlDatabase *ldb,
     setGeometry(0, 0, screenwidth, screenheight);
     setFixedSize(QSize(screenwidth, screenheight));
 
+    context->ThemeWidget(this);
+
     setFont(QFont("Arial", (int)(m_context->GetMediumFontSize() * hmult), 
             QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));

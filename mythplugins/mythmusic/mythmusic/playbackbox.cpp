@@ -96,7 +96,7 @@ PlaybackBox::PlaybackBox(MythContext *context, QSqlDatabase *ldb,
             QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
-    context->ThemeWidget(this);
+    //context->ThemeWidget(this);
 
     QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
 
@@ -111,20 +111,23 @@ PlaybackBox::PlaybackBox(MythContext *context, QSqlDatabase *ldb,
     topdisplay->setMidLineWidth(3);
     topdisplay->setFrameShape(QFrame::Panel);
     topdisplay->setFrameShadow(QFrame::Sunken);
-    topdisplay->setPaletteBackgroundColor(QColor("grey"));
+    topdisplay->setPaletteBackgroundColor(palette().color(QPalette::Active,
+                                                          QColorGroup::Mid));
 
     QVBoxLayout *framebox = new QVBoxLayout(topdisplay, (int)(10 * wmult));
 
     titlelabel = new ScrollLabel(topdisplay);
     titlelabel->setText("  ");
-    titlelabel->setPaletteBackgroundColor(QColor("grey"));
+    titlelabel->setPaletteBackgroundColor(palette().color(QPalette::Active,
+                                                          QColorGroup::Mid));
     framebox->addWidget(titlelabel);   
 
     QHBoxLayout *framehbox = new QHBoxLayout(framebox);
 
     timelabel = new QLabel(topdisplay);
     timelabel->setText("  ");
-    timelabel->setPaletteBackgroundColor(QColor("grey"));
+    timelabel->setPaletteBackgroundColor(palette().color(QPalette::Active,
+                                                         QColorGroup::Mid));
     timelabel->setAlignment(AlignRight);
     framehbox->addWidget(timelabel);
 
@@ -251,6 +254,13 @@ PlaybackBox::PlaybackBox(MythContext *context, QSqlDatabase *ldb,
     repeatmode = false;  
 
     curMeta = ((*plist)[playlistindex]);
+
+    QString playmode = m_context->GetSetting("PlayMode");
+    if(playmode == "random")
+    {
+        toggleShuffle();
+        curMeta = ((*plist)[shuffleindex]);
+    }
 
     setupPlaylist();
 
