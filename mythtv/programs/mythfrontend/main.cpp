@@ -18,6 +18,7 @@ using namespace std;
 #include "manualbox.h"
 #include "manualschedule.h"
 #include "playbackbox.h"
+#include "previousbox.h"
 #include "viewscheduled.h"
 #include "programrecpriority.h"
 #include "channelrecpriority.h"
@@ -195,6 +196,16 @@ void startDelete(void)
     qApp->lock();
 }
 
+void startPrevious(void)
+{
+    PreviousBox previous( QSqlDatabase::database(), gContext->GetMainWindow(), 
+                    "previous box");
+
+    qApp->unlock();
+    previous.exec();
+    qApp->lock();
+}
+
 void startManual(void)
 {
     ManualBox manbox(gContext->GetMainWindow(), "manual box");
@@ -350,6 +361,8 @@ void TVMenuCallback(void *data, QString &selection)
         startSearchNew();
     else if (sel == "tv_search_time")
         startSearchTime();
+    else if (sel == "tv_previous")
+        startPrevious();
     else if (sel == "settings appearance") 
     {
         AppearanceSettings settings;

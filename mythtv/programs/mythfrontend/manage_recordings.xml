@@ -58,4 +58,10 @@
       <action>TV_DELETE</action>
    </button>
 
+   <button>
+      <type>TV_PREVIOUS</type>
+      <text>Previously Recorded</text>
+      <action>TV_PREVIOUS</action>
+   </button>
+
 </mythmenu>

@@ -608,6 +608,12 @@
     <offset>0,0</offset>
   </buttondef>
 
+  <buttondef name="TV_PREVIOUS">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/tv_previous.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
   <buttondef name="TV_STATUS">
     <image>text-blank.png</image>
     <watermarkimage>watermark/tv_status.png</watermarkimage>

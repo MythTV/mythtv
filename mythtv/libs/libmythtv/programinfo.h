@@ -309,6 +309,8 @@ class ProgramList: public QPtrList<ProgramInfo> {
         return FromProgram(db, sql, dummySched);
     }
 
+    bool FromOldRecorded(QSqlDatabase *db, const QString sql);
+
     bool FromRecorded(QSqlDatabase *db, const QString sql,
                       ProgramList &schedList);
     bool FromRecorded(QSqlDatabase *db, const QString sql) {

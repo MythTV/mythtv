@@ -2722,6 +2722,52 @@ bool ProgramList::FromProgram(QSqlDatabase *db, const QString sql,
     return true;
 }
 
+bool ProgramList::FromOldRecorded(QSqlDatabase *db, const QString sql)
+{
+    clear();
+
+    QString querystr = QString(
+        "SELECT oldrecorded.chanid, starttime, endtime, "
+        "    title, subtitle, description, category, seriesid, programid, "
+        "    channel.channum, channel.callsign, channel.name "
+        "FROM oldrecorded "
+        "LEFT JOIN channel ON oldrecorded.chanid = channel.chanid "
+         "%1 ").arg(sql);
+
+    QSqlQuery query = db->exec(querystr);
+    if (!query.isActive())
+    {
+        MythContext::DBError("ProgramList::FromOldRecorded", querystr);
+        return false;
+    }
+
+    while (query.next())
+    {
+        ProgramInfo *p = new ProgramInfo;
+        p->chanid = query.value(0).toString();
+        p->startts = QDateTime::fromString(query.value(1).toString(),
+                                           Qt::ISODate);
+        p->endts = QDateTime::fromString(query.value(2).toString(),
+                                         Qt::ISODate);
+        p->recstartts = p->startts;
+        p->recendts = p->endts;
+        p->lastmodified = p->startts;
+        p->title = QString::fromUtf8(query.value(3).toString());
+        p->subtitle = QString::fromUtf8(query.value(4).toString());
+        p->description = QString::fromUtf8(query.value(5).toString());
+        p->category = QString::fromUtf8(query.value(6).toString());
+        p->seriesid = query.value(7).toString();
+        p->programid = query.value(8).toString();
+        p->chanstr = query.value(9).toString();
+        p->chansign = QString::fromUtf8(query.value(10).toString());
+        p->channame = QString::fromUtf8(query.value(11).toString());
+
+        append(p);
+    }
+
+    return true;
+}
+
 bool ProgramList::FromRecorded(QSqlDatabase *, const QString, ProgramList&)
 {
     clear();
