@@ -195,10 +195,11 @@ MythMainWindow::MythMainWindow(QWidget *parent, const char *name, bool modal)
     d->ignore_joystick_keys = false;
     pthread_t js_tid;
 
-    pthread_attr_init(&attr);
-    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+    pthread_attr_t attr2;
+    pthread_attr_init(&attr2);
+    pthread_attr_setdetachstate(&attr2, PTHREAD_CREATE_DETACHED);
 
-    pthread_create(&js_tid, &attr, SpawnJoystickMenu, this);
+    pthread_create(&js_tid, &attr2, SpawnJoystickMenu, this);
 #endif
 
     d->keyContexts.setAutoDelete(true);
