@@ -24,6 +24,8 @@ class Scheduler : public QObject
     bool CheckForChanges(void);
     bool FillRecordLists(bool doautoconflicts = true);
 
+    void FillEncoderFreeSpaceCache();
+
     void RemoveRecording(ProgramInfo *pginfo);
 
     list<ProgramInfo *> *getAllPending(void) { return &recordingList; }

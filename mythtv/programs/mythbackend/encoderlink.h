@@ -21,12 +21,18 @@ class EncoderLink
     PlaybackSock *getSocket() { return sock; }
     QString getHostname() { return hostname; }
 
+    QString recordfileprefix;
+
     TVRec *getTV() { return tv; }
 
     bool isLocal() { return local; }
 
     bool isConnected();
     int getCardId() { return m_capturecardnum; }
+
+    void cacheFreeSpace();
+    bool isLowOnFreeSpace();
+    int getFreeSpace() { return freeSpace; }
 
     bool IsBusy(void);
     bool IsBusyRecording(void);
@@ -97,6 +103,8 @@ class EncoderLink
 
     PlaybackSock *sock;
     QString hostname;
+
+    int freeSpace;
 
     TVRec *tv;
 

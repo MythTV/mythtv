@@ -145,6 +145,16 @@ class comp_proginfo
     }
 };
 
+void Scheduler::FillEncoderFreeSpaceCache()
+{
+    QMap<int, EncoderLink *>::Iterator enciter = m_tvList->begin();
+    for (; enciter != m_tvList->end(); ++enciter)
+    {
+        EncoderLink *enc = enciter.data();
+        enc->cacheFreeSpace();
+    }
+}
+
 bool Scheduler::FillRecordLists(bool doautoconflicts)
 {
     if (rankMap.size() > 0)
@@ -903,6 +913,8 @@ list<ProgramInfo *> *Scheduler::CopyList(list<ProgramInfo *> *sourcelist)
                 EncoderLink *enc = (*m_tvList)[second->cardid];
                 if (enc->WouldConflict(second))
                     continue;
+                if (enc->isLowOnFreeSpace())
+                    continue;
                 placed = true;
                 break;
             }
@@ -991,6 +1003,9 @@ void Scheduler::DoMultiCard(void)
                         continue;
                     }
 
+                    if (((*m_tvList)[second->cardid])->isLowOnFreeSpace())
+                        continue;
+
                     if (!Conflict(first, second))
                     {
                         bool allclear = true;
@@ -1039,6 +1054,9 @@ void Scheduler::DoMultiCard(void)
                     {
                         continue;
                     }
+
+                    if (((*m_tvList)[first->cardid])->isLowOnFreeSpace())
+                        continue;
 
                     if (!Conflict(first, second))
                     {
@@ -1113,9 +1131,6 @@ void Scheduler::RunScheduler(void)
     QDateTime lastupdate = QDateTime::currentDateTime().addDays(-1);
 
     QString recordfileprefix = gContext->GetFilePrefix();
-    struct statfs statbuf;
-    int freespace = -1;
-    bool lastFreeStatus = true;
 
     list<ProgramInfo *>::iterator recIter;
 
@@ -1131,6 +1146,7 @@ void Scheduler::RunScheduler(void)
         if (CheckForChanges() ||
             (lastupdate.date().day() != curtime.date().day()))
         {
+            FillEncoderFreeSpaceCache();
             FillRecordLists();
             lastupdate = curtime;
             VERBOSE("Found changes in the todo list.");
@@ -1138,38 +1154,6 @@ void Scheduler::RunScheduler(void)
             // Determine if the user wants us to start recording early
             // and by how many seconds
             prerollseconds = gContext->GetNumSetting("RecordPreRoll");
-        }
-
-        if (statfs(recordfileprefix.ascii(), &statbuf) == 0) {
-            freespace = statbuf.f_bfree / (1024*1024/statbuf.f_bsize);
-        }
-
-        if (freespace < 250)
-        {
-            pthread_mutex_unlock(&schedulerLock);
-
-            if (lastFreeStatus)
-            {
-                QString msg = QString("WARNING: Recording Scheduling Halted! "
-                                      "Free disk space has fallen to %1 Megs.")
-                                      .arg(freespace);
-                VERBOSE(msg);
-                lastFreeStatus = false;
-            }
-
-            sleep(1);
-            continue;
-        }
-        else
-        {
-            if (!lastFreeStatus)
-            {
-                QString msg = QString("Recording Scheduling Resumed.  Free "
-                                      "disk space has risen to %1 Megs.")
-                                      .arg(freespace);
-                VERBOSE(msg);
-                lastFreeStatus = true;
-            }
         }
 
         recIter = recordingList.begin();
@@ -1193,6 +1177,25 @@ void Scheduler::RunScheduler(void)
 
             if (secsleft - prerollseconds > 35)
                 break;
+
+            if (recording && nexttv->isLowOnFreeSpace())
+            {
+                QString msg = QString("SUPPRESSED recording \"%1\" on channel: "
+                                      "%2 on cardid: %3, sourceid %4.  Only "
+                                      "%5 Megs of disk space available.")
+                                      .arg(nextRecording->title)
+                                      .arg(nextRecording->chanid)
+                                      .arg(nextRecording->cardid)
+                                      .arg(nextRecording->sourceid)
+                                      .arg(nexttv->getFreeSpace());
+
+                VERBOSE(msg);
+
+                RemoveRecording(nextRecording);
+                nextRecording = NULL;
+                recIter = recordingList.begin();
+                continue;
+            }
 
             if ((recording && !nexttv->IsBusyRecording()) || !recording)
             {

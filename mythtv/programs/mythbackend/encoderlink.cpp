@@ -8,6 +8,9 @@ using namespace std;
 #include "tv.h"
 #include "programinfo.h"
 
+#include <sys/stat.h>
+#include <sys/vfs.h>
+
 #include "libmyth/mythcontext.h"
 
 EncoderLink::EncoderLink(int capturecardnum, PlaybackSock *lsock, 
@@ -30,6 +33,8 @@ EncoderLink::EncoderLink(int capturecardnum, TVRec *ltv)
     tv = ltv;
     local = true;
     m_capturecardnum = capturecardnum;
+
+    recordfileprefix = gContext->GetSetting("RecordFilePrefix");
 
     endRecordingTime = QDateTime::currentDateTime().addDays(-2);
     startRecordingTime = endRecordingTime;
@@ -151,6 +156,55 @@ bool EncoderLink::WouldConflict(ProgramInfo *rec)
         return true;
 
     if (rec->startts < endRecordingTime)
+        return true;
+
+    return false;
+}
+
+void EncoderLink::cacheFreeSpace()
+{
+    freeSpace = -1;
+
+    if (local)
+    {
+        struct statfs statbuf;
+        if (statfs(recordfileprefix.ascii(), &statbuf) == 0)
+        {
+            freeSpace = statbuf.f_bfree / (1024*1024/statbuf.f_bsize);
+        }
+    }
+    else if (sock)
+    {
+        int totalspace = 0;
+        int usedspace = 0;
+
+        sock->GetFreeSpace(totalspace, usedspace);
+
+        if (totalspace)
+        {
+            freeSpace = totalspace - usedspace;
+        }
+        else
+        {
+            struct statfs statbuf;
+            if (statfs(recordfileprefix.ascii(), &statbuf) == 0)
+            {
+                freeSpace = statbuf.f_bfree / (1024*1024/statbuf.f_bsize);
+            }
+        }
+    }
+    else
+    {
+        freeSpace = 0;
+    }
+}
+
+bool EncoderLink::isLowOnFreeSpace()
+{
+    if (!isConnected())
+        return true;
+   
+    if ((freeSpace >= 0) && (freeSpace < 250))
         return true;
 
     return false;
