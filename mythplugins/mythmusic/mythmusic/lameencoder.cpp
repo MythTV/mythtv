@@ -1,3 +1,28 @@
+/*
+    MP3 encoding support using liblame for MythMusic
+
+    (c) 2003 Stefan Frank
+    
+    Please send an e-mail to sfr@gmx.net if you have
+    questions or comments.
+
+    Project Website:  http://www.mythtv.org/
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+*/
+
 #include <qstring.h>
 #include <qcstring.h>
 #include <qapplication.h>
@@ -41,49 +66,39 @@ void LameEncoder::init_id3tags(lame_global_flags *gf, Metadata *metadata)
     id3tag_v2_only(gf);
 }
 
-int LameEncoder::init_encoder(lame_global_flags *gf, int quality, int vbr)
+int LameEncoder::init_encoder(lame_global_flags *gf, int quality, bool vbr)
 {
     int lameret = 0;
-    int algoqual = 2, vbrqual = 0;
     int meanbitrate = 128;
+    int preset = STANDARD;
 
     switch (quality)
     {
-        case 0:                         // low
-            //algoqual = 7;
+        case 0:                         // low, always use CBR
             meanbitrate = 128;
+            vbr = false;
             break;
         case 1:                         // medium
-            //algoqual = 5;
             meanbitrate = 192;
             break;
         case 2:                         // high
-            //algoqual = 2;
             meanbitrate = 256;
+            preset = EXTREME;
             break;
     }
 
-    lame_set_preset(gf, STANDARD);
-    lame_set_num_channels(gf, channels);
-    lame_set_mode(gf, channels == 2 ? STEREO : MONO);
-    lame_set_in_samplerate(gf, samplerate);
-    lame_set_out_samplerate(gf, samplerate);
-
     if (vbr)
-    {
-        lame_set_VBR(gf, vbr_abr);
-        lame_set_VBR_mean_bitrate_kbps(gf, meanbitrate);
-    } 
+        lame_set_preset(gf, preset);
     else
     {
+        lame_set_preset(gf, meanbitrate);
         lame_set_VBR(gf, vbr_off);
-        lame_set_brate(gf, meanbitrate);
-        lame_set_VBR_min_bitrate_kbps(gf, lame_get_brate(gf));
     }
 
-    lame_set_VBR_q(gf, vbrqual);
-    lame_set_bWriteVbrTag(gf, 0);
-    lame_set_quality(gf, algoqual);
+    if (channels == 1)
+    {
+        lame_set_mode(gf, MONO);
+    }
 
     lameret = lame_init_params(gf);
 
@@ -91,13 +106,12 @@ int LameEncoder::init_encoder(lame_global_flags *gf, int quality, int vbr)
 }
 
 LameEncoder::LameEncoder(const QString &outfile, int qualitylevel,
-                         Metadata *metadata)
+                         Metadata *metadata, bool vbr)
            : Encoder(outfile, qualitylevel, metadata)
 { 
     channels = 2;
     bits = 16;
     samplerate = 44100;
-    vbr = 0;           // use constant bitrate for now
 
     bytes_per_sample = channels * bits / 8;
     samples_per_channel = 0; 
