@@ -14,8 +14,8 @@ with this, as it won't work.
 You don't need any other software installed.  MythGallery uses Qt's internal
 image handling routines for basically everything.
 
-Ok, on to compiling. Just type 'qmake' then 'make' in the main distribution 
-directory.
+Ok, on to compiling. Just type 'qmake mythgallery.pro' then 'make' in the 
+main distribution directory.
 
 Compiling note:  If you get an error on building this, that says something
                  about 'mkspecs', then you don't have the QTDIR environment
