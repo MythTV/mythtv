@@ -1,5 +1,5 @@
 /*
- * crop v 0.1
+ * crop v 0.2
  * (C)opyright 2003, Debabrata Banerjee
  * GNU GPL 2 or later
  * 
@@ -31,31 +31,22 @@
 #include "filter.h"
 #include "frame.h"
 
-//#define TIME_FILTER
-#ifdef TIME_FILTER
-#include <sys/time.h>
-#ifndef TIME_INTERVAL
-#define TIME_INTERVAL 300
-#endif /* undef TIME_INTERVAL */
-#endif /* TIME_FILTER */
-
 static const char FILTER_NAME[] = "crop";
 
 typedef struct ThisFilter
 {
   VideoFilter vf;
 
-  int Luma_size;
-  int UV_size;
+  int Chroma_plane_size;
+  int Luma_plane_size;
+ 
   int width;
   int height;
-  int Chroma_plane_size;
-  int yc1,yc2,xc1,xc2;
 
-#ifdef TIME_FILTER
-    int frames;
-    double seconds;
-#endif /* TIME_FILTER */
+  int cropY1, cropY2;
+  int cropC1, cropC2, cropC3;
+  int xcrop1, xcrop2;
+  int xcropYint, xcropCint, xcropend;
 
 } ThisFilter;
 
@@ -164,73 +155,55 @@ int mm_support(void) // From linearblend
 }
 
 int crop(VideoFilter *f, VideoFrame *frame)
-{  
+{
   ThisFilter *tf = (ThisFilter *)f;
   uint64_t *buf=(uint64_t *)frame->buf;
-  int x,y; 
-  const uint64_t UV_black=0x7f7f7f7f7f7f7f7fLL;
+  int x,y;
+  const uint64_t Y_black=0x1010101010101010LL;
+  const uint64_t UV_black=0x8080808080808080LL;
   
-#ifdef TIME_FILTER
-  struct timeval t1;
-  gettimeofday (&t1, NULL);
-#endif /* TIME_FILTER */
+  
+  for(y = 0; y < tf->cropY1; y += 2) {// Y Luma
+    buf[y] = Y_black;
+    buf[y + 1] = Y_black;
+  }
 
-  // Y Luma
-  for(y = 0;y < (tf->yc1 * 2 * tf->height);y += 2) {
-    buf[y]=0;
-    buf[y + 1]=0;
+  for(y = tf->cropY2; y < tf->Luma_plane_size; y += 2) {
+    buf[y] = Y_black;
+    buf[y + 1] = Y_black;
   }
-  for(y = tf->yc2 * 2 *tf->height;y < tf->Luma_size;y += 2) {
-    buf[y]=0;
-    buf[y + 1]=0;
+  
+  for(y = tf->Luma_plane_size; y < tf->cropC1; y++) {// Y Chroma
+    buf[y] = UV_black;
+    buf[y + tf->Chroma_plane_size] = UV_black;
   }
-  // Y Chroma
-  for(y = tf->Luma_size ;y < (tf->Luma_size + ((tf->height * tf->yc1 *4) >> 3));y++) {
-    buf[y]= UV_black;
-    buf[y + tf->Chroma_plane_size]= UV_black;
-  }
-  for(y = (tf->Luma_size + ((tf->height * tf->yc2 * 4) >>3));y < (tf->Luma_size + tf->Chroma_plane_size);y++) {
-    buf[y]= UV_black;
-    buf[y + tf->Chroma_plane_size]= UV_black;
-  }
-  // X Luma
-  for(y = tf->yc1 * 2 * tf->height;y < tf->yc2 * 2 * tf->height;y += (tf->height >> 3)) {
-    for(x = 0;x < tf->xc1;x++) {
-      buf[y + x * 2]=0;
-      buf[y + x * 2 + 1]=0;
-    }
-    for(x = tf->xc2;x < (tf->width >> 4);x++) {
-      buf[y + x * 2]=0;
-      buf[y + x * 2 + 1]=0;
-    }
-  }
-  // X Chroma
-  for(y = (tf->Luma_size+((tf->height * tf->yc1 * 4) >> 3)); y < (tf->Luma_size + ((tf->height * tf->yc2 * 4) >> 3)); y += (tf->height >> 4)) {
-    for(x = 0;x < tf->xc1;x++) {
-      buf[y + x]= UV_black;
-      buf[y + x + tf->Chroma_plane_size]= UV_black;
-    }
-    for(x = tf->xc2;x < (tf->width >> 4);x++) {
-      buf[y + x]= UV_black;
-      buf[y + x + tf->Chroma_plane_size]= UV_black;
-    }
+
+  for(y = tf->cropC2; y < tf->cropC3; y++) {
+    buf[y] = UV_black;
+    buf[y + tf->Chroma_plane_size] = UV_black;
   }
  
-#ifdef TIME_FILTER
-  struct timeval t2;
-  gettimeofday (&t2, NULL);
-  tf->seconds +=
-    (t2.tv_sec - t1.tv_sec) + (t2.tv_usec - t1.tv_usec) * .000001;
-  tf->frames = (tf->frames + 1) % TIME_INTERVAL;
-  if (tf->frames == 0)
-    {
-      fprintf (stderr,
-	       "crop: filter timed at %3f frames/sec for %dx%d\n",
-	       TIME_INTERVAL / tf->seconds, tf->width,
-	       tf->height);
-      tf->seconds = 0;
+  for(y = tf->cropY1; y < tf->cropY2; y += tf->xcropYint) { // X Luma
+    for(x = 0; x <  tf->xcrop1; x++) {
+      buf[y + (x << 1)] = Y_black;
+      buf[y + (x << 1) + 1] = Y_black;
     }
-#endif /* TIME_FILTER */
+    for(x = tf->xcrop2; x < tf->xcropend; x++) {
+      buf[y + (x << 1)] = Y_black;
+      buf[y + (x << 1) + 1] = Y_black;
+    }
+  }
+
+  for(y = tf->cropC1; y < tf->cropC2; y+= tf->xcropCint) { // X Chroma
+    for(x = 0; x <  tf->xcrop1; x++) {
+      buf[y + x] = UV_black;
+      buf[y + x + tf->Chroma_plane_size] = UV_black;
+    }
+    for(x = tf->xcrop2; x < tf->xcropend; x++) {
+      buf[y + x] = UV_black;
+      buf[y + x + tf->Chroma_plane_size] = UV_black;
+    }
+  }
  
   return 0;
 }
@@ -240,91 +213,58 @@ int cropMMX(VideoFilter *f, VideoFrame *frame)
   ThisFilter *tf = (ThisFilter *)f;  
   uint64_t *buf=(uint64_t *)frame->buf;
   int y,x; 
-  const uint64_t UV_black=0x7f7f7f7f7f7f7f7fLL;
+  const uint64_t Y_black=0x1010101010101010LL;
+  const uint64_t UV_black=0x8080808080808080LL;
 
-#ifdef TIME_FILTER
-  struct timeval t1;
-  gettimeofday (&t1, NULL);
-#endif /* TIME_FILTER */
-
-  asm volatile("pxor %%mm0,%%mm0    \n\t"
+  asm volatile("movq (%1),%%mm0    \n\t"	       
 	       "movq (%0),%%mm1    \n\t"
-	       : : "r" (&UV_black)
-	       );
-  // Y Luma
-  for(y = 0;y < (tf->yc1*tf->height << 1);y+=2) { 
+	       : : "r" (&UV_black), "r"(&Y_black));
+  
+  for(y = 0; y < tf->cropY1; y += 2) { // Y Luma
     asm volatile("movq %%mm0, (%0)    \n\t"
 		 "movq %%mm0, 8(%0)    \n\t"
-		 : : "r" (buf+y)
-		 );
+		 : : "r" (buf + y));
   }
-  for(y = tf->yc2*tf->height << 1;y < tf->Luma_size;y+=2) {
-    asm volatile("movq %%mm0, (%0)    \n\t"
-		 "movq %%mm0, 8(%0)    \n\t"
-		 : : "r" (buf+y)
-		 );
-  }
-  // Y Chroma
-  for(y = tf->Luma_size ;y < (tf->Luma_size+((tf->height * tf->yc1 << 2) >> 3));y++) {
-    asm volatile("movq %%mm1, (%0)    \n\t"
-		 "movq %%mm1, (%1)    \n\t"
-		 : : "r" (buf+y), "r" (buf + y + tf->Chroma_plane_size)
-		 );
-  }
-  for(y = (tf->Luma_size+((tf->height*tf->yc2 << 2) >> 3));y < (tf->Luma_size + tf->Chroma_plane_size);y++) {
-    asm volatile("movq %%mm1, (%0)    \n\t"
-		 "movq %%mm1, (%1)    \n\t"
-		 : : "r" (buf+y), "r" (buf + y + tf->Chroma_plane_size)
-		 );
-  }
-  // X Luma
-  for(y = (tf->yc1 * tf->height << 1);y < tf->yc2 * 2 * tf->height;y += (tf->height >> 3)) {
-    for(x = 0;x < tf->xc1;x++) {
-      asm volatile("movq %%mm0, (%0)    \n\t"
-		   "movq %%mm0, 8(%0)    \n\t"
-		   : : "r" (buf + y +(x << 1))
-		   );
-    }
-    for(x = tf->xc2;x < (tf->width >> 4);x++) {
-      asm volatile("movq %%mm0, (%0)    \n\t"
-		   "movq %%mm0, 8(%0)    \n\t"
-		   : : "r" (buf + y + (x << 1))
-		   );
-    }
-  }
-  // X Chroma
-  for(y = (tf->Luma_size + ((tf->height * tf->yc1 * 4) >> 3)); y < (tf->Luma_size + ((tf->height * tf->yc2 * 4) >> 3)); y+=(tf->height >> 4)) {
-    for(x=0;x < tf->xc1;x++) {
-       
-      asm volatile("movq %%mm1, (%0)    \n\t"
-		   "movq %%mm1, (%1)    \n\t"
-		   : : "r" (buf + y + x), "r" (buf + y + x + tf->Chroma_plane_size)
-		   );
-    }
-    for(x= tf->xc2;x < (tf->width >> 4);x++) {
-      asm volatile("movq %%mm1, (%0)    \n\t"
-		   "movq %%mm1, (%1)    \n\t"
-		   : : "r" (buf + y + x), "r" (buf + y + x + tf->Chroma_plane_size)
-		   );
-    }
-  }
-  asm volatile("emms\n\t");
 
-#ifdef TIME_FILTER
-  struct timeval t2;
-  gettimeofday (&t2, NULL);
-  tf->seconds +=
-    (t2.tv_sec - t1.tv_sec) + (t2.tv_usec - t1.tv_usec) * .000001;
-  tf->frames = (tf->frames + 1) % TIME_INTERVAL;
-  if (tf->frames == 0)
-    {
-      fprintf (stderr,
-	       "crop: filter timed at %3f frames/sec for %dx%d\n",
-	       TIME_INTERVAL / tf->seconds, tf->width,
-	       tf->height);
-      tf->seconds = 0;
-    }
-#endif /* TIME_FILTER */
+  for(y = tf->cropY2; y < tf->Luma_plane_size; y += 2) {
+    asm volatile("movq %%mm0, (%0)    \n\t"
+		 "movq %%mm0, 8(%0)    \n\t"
+		 : : "r" (buf + y));
+  }
+
+  for(y = tf->Luma_plane_size; y < tf->cropC1; y++) // Y Chroma
+    asm volatile("movq %%mm1, (%0)    \n\t"
+		 "movq %%mm1, (%1)    \n\t"
+		 : : "r" (buf + y), "r" (buf + y + tf->Chroma_plane_size));
+
+  for(y = tf->cropC2; y < tf->cropC3; y++)
+    asm volatile("movq %%mm1, (%0)    \n\t"
+		 "movq %%mm1, (%1)    \n\t"
+		 : : "r" (buf + y), "r" (buf + y + tf->Chroma_plane_size));
+ 
+  for(y = tf->cropY1; y < tf->cropY2; y += tf->xcropYint) { // X Luma
+    for(x = 0; x < tf->xcrop1; x++)
+      asm volatile("movq %%mm0, (%0)    \n\t"
+		   "movq %%mm0, 8(%0)    \n\t"
+		   : : "r" (buf + y + (x << 1)));
+    for(x = tf->xcrop2; x < tf->xcropend; x++)
+      asm volatile("movq %%mm0, (%0)    \n\t"
+		   "movq %%mm0, 8(%0)    \n\t"
+		   : : "r" (buf + y + (x << 1)));
+  }
+
+  for(y = tf->cropC1; y < tf->cropC2; y += tf->xcropCint) { // X Chroma
+    for(x=0; x < tf->xcrop1; x++)
+      asm volatile("movq %%mm1, (%0)    \n\t"
+		   "movq %%mm1, (%1)    \n\t"
+		   : : "r" (buf + y + x), "r" (buf + y + x + tf->Chroma_plane_size));
+    for(x = tf->xcrop2; x < tf->xcropend; x++)
+      asm volatile("movq %%mm1, (%0)    \n\t"
+		   "movq %%mm1, (%1)    \n\t"
+		   : : "r" (buf + y + x), "r" (buf + y + x + tf->Chroma_plane_size));
+  }
+
+  asm volatile("emms\n\t");
 
   return 0;
 }
@@ -335,6 +275,8 @@ VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt,
 {
   unsigned int Param1, Param2, Param3, Param4;
   ThisFilter *filter;
+
+  int yp1,yp2,xp1,xp2;
 
   if (inpixfmt != FMT_YV12 || outpixfmt != FMT_YV12)
     {
@@ -350,33 +292,39 @@ VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt,
       return NULL;
     }
 
-
-  filter->Luma_size = (*width * *height) / 8;
-  filter->UV_size = *width * *height / 2 + filter->Luma_size;
-  filter->width = *width;
-  filter->height = *height;
+  filter->Luma_plane_size = (*width * *height) / 8;
   filter->Chroma_plane_size = (*height * *width / 4) / 8;
+  filter->cropC3 = filter->Luma_plane_size + filter->Chroma_plane_size;
+  filter->xcropend = *width / 16;
+  filter->xcropYint = *width / 8;
+  filter->xcropCint = *width / 16;
 
   if (options && (sscanf(options, "%u:%u:%u:%u", &Param1, &Param2, &Param3, &Param4) == 4)) { 
-    filter->yc1 = (uint8_t) Param1;
-    filter->xc1 = (uint8_t) Param2;
-    filter->yc2 = (*height/16) - (uint8_t) Param3;
-    filter->xc2 = (*width/16) - (uint8_t) Param4;
+    yp1 = (uint8_t) Param1;
+    yp2 = (uint8_t) Param3;
+    xp1 = (uint8_t) Param2;
+    xp2 = (uint8_t) Param4;
   }
   else {
-    filter->yc1 = 1;
-    filter->xc1 = 1;
-    filter->yc2 = (*height/16) - 1;
-    filter->xc2 = (*width/16) - 1;
+    yp1 = 1;
+    yp2 = 1;
+    xp1 = 1;
+    xp2 = 1;
   }
+
+  // linear addresses of 8-byte-block planes
+  filter->cropY1 = yp1 * *width * 2;
+  filter->cropY2 = ((*height/16) - yp2) * *width * 2;
+  filter->cropC1 = filter->Luma_plane_size+(*width * (yp1 * 4) / 8);
+  filter->cropC2 = filter->Luma_plane_size + ((*width * (*height/16 - yp2) * 4) / 8);
+  filter->xcrop1 = xp1;
+  filter->xcrop2 = (*width/16) - xp2;
   
-  
-  if(mm_support() > MM_MMXEXT)
-    filter->vf.filter = &cropMMX;
+  if(mm_support() > MM_MMX) filter->vf.filter = &cropMMX;
   else filter->vf.filter = &crop;
 
-  
   filter->vf.cleanup = NULL;
+
   return (VideoFilter *)filter;
 }
 
@@ -391,7 +339,7 @@ FilterInfo filter_table[] =
     {
       symbol:     "new_filter",
       name:       "crop",
-      descript:   "crops picture by macroblock (intervals",
+      descript:   "crops picture by macroblock intervals",
       formats:    FmtList,
       libname:    NULL
     },

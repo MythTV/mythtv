@@ -308,6 +308,8 @@ bool VideoOutputXvMC::Init(int width, int height, float aspect,
 
     data->XJ_gc = XCreateGC(data->XJ_disp, data->XJ_win, 0, 0);
     XJ_depth = DefaultDepthOfScreen(data->XJ_screen);
+    XFlush(data->XJ_disp);
+    XSync(data->XJ_disp, false);
 
     XvImageFormatValues *xvfmv;
     int num_subpic;
@@ -412,7 +414,16 @@ bool VideoOutputXvMC::CreateXvMCBuffers(void)
 
     if (ret != Success)
     {
-        cerr << "Unable to create XvMC Context\n";
+        cerr << "Unable to create XvMC Context return status:" << ret ;
+        switch (ret)
+        {
+            case XvBadPort: cerr << " XvBadPort"; break;
+            case BadValue:  cerr << " BadValue" ; break;
+            case BadMatch:  cerr << " BadMatch" ; break;
+            case BadAlloc:  cerr << " BadAlloc" ; break;
+            default:        cerr << " unrecognized return value"; break;
+        }
+        cerr << endl;
         return false;
     }
 
@@ -436,7 +447,9 @@ bool VideoOutputXvMC::CreateXvMCBuffers(void)
         if (ret != Success)
         {
             cerr << "Unable to create XvMC Macro Blocks\n";
+            XvMCDestroyBlocks(data->XJ_disp,&(data->data_blocks[i]));
             XvMCDestroyContext(data->XJ_disp, &data->ctx);
+            return false;
         }
     }
 
@@ -486,6 +499,7 @@ bool VideoOutputXvMC::CreateXvMCBuffers(void)
 
     if (rez == Success)
     {
+        data->subpicture_alloc = true;
         XvMCClearSubpicture(data->XJ_disp, &data->subpicture, 0, 0, XJ_width,
                             XJ_height, data->subpicture_clear_color);
 
@@ -500,9 +514,9 @@ bool VideoOutputXvMC::CreateXvMCBuffers(void)
 
         data->xvimage->data = data->shminfo.shmaddr;
 
-        shmctl(data->shminfo.shmid, IPC_RMID, 0);
-
         XShmAttach(data->XJ_disp, &data->shminfo);
+
+        shmctl(data->shminfo.shmid, IPC_RMID, 0);
 
         if (data->subpicture.num_palette_entries > 0)
         {
@@ -533,7 +547,10 @@ bool VideoOutputXvMC::CreateXvMCBuffers(void)
         }
     }
     else
+    {
         data->subpicture_mode = NO_SUBPICTURE;
+        data->subpicture_alloc = false;
+    }
 
     XSync(data->XJ_disp, 0);
 
@@ -558,7 +575,7 @@ void VideoOutputXvMC::Exit(void)
 
 void VideoOutputXvMC::DeleteXvMCBuffers()
 {
-    for (int i = 0; i < numbuffers; i++)
+    for (int i = 0; i < 8; i++)
     {
         XvMCDestroyMacroBlocks(data->XJ_disp, &data->mv_blocks[i]);
         XvMCDestroyBlocks(data->XJ_disp, &data->data_blocks[i]);
@@ -588,6 +605,9 @@ void VideoOutputXvMC::DeleteXvMCBuffers()
 
         data->subpicture_alloc = false;
         XFree(data->xvimage);
+        XFlush(data->XJ_disp);
+        XSync(data->XJ_disp, false);
+
 
         if (data->palette)
             delete [] data->palette;
