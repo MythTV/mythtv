@@ -936,8 +936,10 @@ bool TVRec::SetVideoFiltersForChannel(Channel *chan, const QString &channum)
 int TVRec::GetChannelValue(const QString &channel_field,Channel *chan, 
                            const QString &channum)
 {
+    int retval = -1;
+
     if (!db_conn)
-        return true;
+        return retval;
 
     pthread_mutex_lock(&db_lock);
 
@@ -961,26 +963,16 @@ int TVRec::GetChannelValue(const QString &channel_field,Channel *chan,
     QSqlQuery query = db_conn->exec(thequery);
 
     if (!query.isActive())
-        MythContext::DBError("getcontrastforchannel", query);
+        MythContext::DBError("getchannelvalue", query);
     else if (query.numRowsAffected() > 0)
     {
         query.next();
 
-        if (query.value(0) == "")
-        {
-            pthread_mutex_unlock(&db_lock);
-            return -1;
-        }
-        else
-        {
-            pthread_mutex_unlock(&db_lock);
-            return query.value(0).toInt();
-        }
+        retval = query.value(0).toInt();
     }
 
     pthread_mutex_unlock(&db_lock);
-
-    return -1;
+    return retval;
 }
 
 void TVRec::SetChannelValue(QString &field_name,int value, Channel *chan,
