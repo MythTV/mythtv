@@ -84,7 +84,7 @@ public:
     };
 
     void fillSelections(QSqlDatabase* db) {
-        addSelection("[No Source Selected]", "0");
+        addSelection("[Not Selected]", "0");
 
         QSqlQuery query = db->exec(QString(
             "SELECT name, sourceid FROM videosource"));
@@ -106,7 +106,7 @@ public:
 class Rank: public SpinBoxSetting, public CSetting {
 public:
     Rank(const ChannelID& id):
-        SpinBoxSetting(0,256,1), CSetting(id, "rank") {
+        SpinBoxSetting(-99,99,1), CSetting(id, "rank") {
         setLabel("Rank");
     };
 };
@@ -139,14 +139,6 @@ public:
         Channel Options - Video 4 Linux
  *****************************************************************************/
 
-class Contrast: public SliderSetting, public CSetting {
-public:
-    Contrast(const ChannelID& id):
-        SliderSetting(0,32768,1), CSetting(id, "contrast") {
-        setLabel("Contrast");
-    };
-};
-
 class Freqid: public LineEditSetting, public CSetting {
 public:
     Freqid(const ChannelID& id):
@@ -158,15 +150,23 @@ public:
 class Finetune: public SliderSetting, public CSetting {
 public:
     Finetune(const ChannelID& id):
-        SliderSetting(0,32768,1), CSetting(id, "finetune") {
+        SliderSetting(-200,200,1), CSetting(id, "finetune") {
         setLabel("Finetune");
+    };
+};
+
+class Contrast: public SliderSetting, public CSetting {
+public:
+    Contrast(const ChannelID& id):
+        SliderSetting(0,65535,655), CSetting(id, "contrast") {
+        setLabel("Contrast");
     };
 };
 
 class Brightness: public SliderSetting, public CSetting {
 public:
     Brightness(const ChannelID& id):
-        SliderSetting(0,32768,1), CSetting(id, "brightness") {
+        SliderSetting(0,65535,655), CSetting(id, "brightness") {
         setLabel("Brightness");
     };
 };
@@ -174,7 +174,7 @@ public:
 class Colour: public SliderSetting, public CSetting {
 public:
     Colour(const ChannelID& id):
-        SliderSetting(0,32768,1), CSetting(id, "colour") {
+        SliderSetting(0,65535,655), CSetting(id, "colour") {
         setLabel("Colour");
     };
 };
@@ -182,7 +182,7 @@ public:
 class Hue: public SliderSetting, public CSetting {
 public:
     Hue(const ChannelID& id):
-        SliderSetting(0,32768,1), CSetting(id, "hue") {
+        SliderSetting(0,65535,655), CSetting(id, "hue") {
         setLabel("Hue");
     };
 };
