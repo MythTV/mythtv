@@ -51,8 +51,6 @@ using namespace std;
 #include "transform.h"
 #include "dvbtypes.h"
 #include "dvbdev.h"
-#include "dvbsections.h"
-#include "dvbcam.h"
 #include "dvbchannel.h"
 #include "dvbrecorder.h"
 
@@ -72,9 +70,6 @@ DVBRecorder::DVBRecorder(DVBChannel* advbchannel): RecorderBase()
 
     wait_for_seqstart = true;
     wait_for_seqstart_enabled = true;
-
-    dvbsections = NULL;
-    dvbcam = NULL;
 }
 
 DVBRecorder::~DVBRecorder()
@@ -103,12 +98,12 @@ void DVBRecorder::ChannelChanged(dvb_channel_t& chan)
 
     if (wait_for_seqstart_enabled)
         wait_for_seqstart = true;
+    else
+        wait_for_seqstart = false;
 
     channel_changed = true;
 
     framesWritten = 0;
-    keyframedist = 0;
-    gopset = false;
     prev_gop_save_pos = -1;
     memset(prvpkt, 0, 3);
 }
@@ -130,17 +125,6 @@ bool DVBRecorder::Open()
     connect(dvbchannel, SIGNAL(ChannelChanged(dvb_channel_t&)),
             this, SLOT(ChannelChanged(dvb_channel_t&)));
 
-    if (dvbchannel->GetCardType() == FE_QPSK)
-    {
-        dvbsections = new DVBSections(cardnum);
-        connect(dvbchannel, SIGNAL(ChannelChanged(dvb_channel_t&)),
-                dvbsections, SLOT(ChannelChanged(dvb_channel_t&)));
-
-        dvbcam = new DVBCam(cardnum);
-        connect(dvbsections, SIGNAL(ChannelChanged(dvb_channel_t&, uint8_t*, int)),
-                dvbcam, SLOT(ChannelChanged(dvb_channel_t&, uint8_t*, int)));
-    }
-
     dvbchannel->RecorderStarted();
 
     isopen = true;
@@ -151,9 +135,6 @@ void DVBRecorder::Close()
 {
     if (!isopen)
         return;
-
-    delete dvbsections;
-    delete dvbcam;
 
     CloseFilters();
 
@@ -192,6 +173,8 @@ void DVBRecorder::OpenFilters(dvb_pid_t& pids, dmx_pes_type_t type)
     {
         int this_pid = pids[i];
 
+        RECORD(QString("Adding pid %1, type %1").arg(this_pid).arg((int)type));
+
         if (this_pid < 0x10 || this_pid > 0x1fff)
             WARNING(QString("PID value (%1) is outside dvb specification.")
                             .arg(this_pid));
@@ -205,6 +188,11 @@ void DVBRecorder::OpenFilters(dvb_pid_t& pids, dmx_pes_type_t type)
                 ERRNO(QString("Could not open filter device for pid %1.")
                       .arg(this_pid));
                 continue;
+            }
+
+            if (ioctl(fd_tmp, DMX_SET_BUFFER_SIZE, DMX_BUF_SIZE) == -1)
+            {
+                ERRNO("DMX_SET_BUFFER_SIZE failed for pid " << this_pid);
             }
 
             params.pid = this_pid;
@@ -277,6 +265,9 @@ void DVBRecorder::SetDemuxFilters(dvb_pids_t& pids)
     OpenFilters(pids.subtitle,    DMX_PES_SUBTITLE);
     OpenFilters(pids.pcr,         DMX_PES_PCR);
     OpenFilters(pids.other,       DMX_PES_OTHER);
+
+    pid_ipack[pids.audio[0]]->pv = (struct ipack_s *)pid_ipack[pids.video[0]];
+    pid_ipack[pids.video[0]]->pa = (struct ipack_s *)pid_ipack[pids.audio[0]];
 }
 
 void DVBRecorder::CorrectStreamNumber(ipack* ip, int pid)
@@ -300,6 +291,7 @@ void DVBRecorder::StartRecording()
     bool receiving = false;
     unsigned char pktbuf[MPEG_TS_SIZE];
     struct pollfd polls;
+    map<uint16_t, bool> pid_valid;
 
     polls.fd = fd_dvr;
     polls.events = POLLIN;
@@ -363,6 +355,11 @@ void DVBRecorder::StartRecording()
                 uint8_t cc = pktbuf[3] & 0xf;
                 uint8_t content = (pktbuf[3] & 0x30) >> 4;
 
+                if (pktbuf[1] & 0x80){
+                    WARNING("Uncorrectable error in packet, dropped.");
+                    continue;
+                }
+
                 if (pid_ipack.find(pid) == pid_ipack.end())
                     continue;
             
@@ -374,14 +371,22 @@ void DVBRecorder::StartRecording()
             
                 if (content & 0x1)
                 {
-                    contcounter[pid]++;
-                    if (contcounter[pid] > 15)
-                        contcounter[pid] = 0;
-            
-                    if (contcounter[pid] != cc)
-                    {
-                        WARNING("Transport Stream Continuity Error.");
+                    if (pid_valid[pid] == false) {
+                        pid_valid[pid] = true;
                         contcounter[pid] = cc;
+                    }
+                    else {
+                        contcounter[pid]++;
+                        if (contcounter[pid] > 15)
+                            contcounter[pid] = 0;
+
+                        if (contcounter[pid] != cc)
+                        {
+                            WARNING("Transport Stream Continuity Error. PID = " << pid );
+                            RECORD(QString("PID %1 contcounter %2 cc %3")
+                                   .arg(pid).arg(contcounter[pid]).arg(cc));
+                            contcounter[pid] = cc;
+                        }            
                     }
                 }
             
@@ -503,8 +508,6 @@ void DVBRecorder::LocalProcessData(unsigned char *buffer, int len)
                 if (state >= SLICE_MIN && state <= SLICE_MAX)
                     continue;
 
-                // TODO: Could SeqStart appear in the middle of a pkt?
-                //       If so, rewrite this packet, if not remove TODO.
                 if (state == SEQ_START)
                     wait_for_seqstart = false;
 
@@ -513,13 +516,6 @@ void DVBRecorder::LocalProcessData(unsigned char *buffer, int len)
                     case GOP_START:
                     {
                         long long startpos = ringBuffer->GetFileWritePosition();
-
-                        if (!gopset && framesWritten > 0)
-                        {
-                            keyframedist = framesWritten;
-                            GENERAL("Setting KeyFrameDist to " << keyframedist);
-                            gopset = true;
-                        }                          
 
                         positionMap[framesWritten] = startpos;
 

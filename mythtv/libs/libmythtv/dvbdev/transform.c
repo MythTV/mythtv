@@ -1686,6 +1686,10 @@ void init_ipack(ipack *p, int size,
 	p->has_ai = 0;
 	p->has_vi = 0;
 	p->start = 0;
+	p->muxr = 0;
+	p->start_header = 0;
+	p->vi.bit_rate = 0;
+	p->ai.bit_rate = 0;
 }
 
 void free_ipack(ipack * p)
@@ -1941,60 +1945,63 @@ void ps_pes(ipack *p)
 {
 	int check;
 	uint8_t pbuf[PS_HEADER_L2];
-	static int muxr = 0;
-	static int ai = 0;
-	static int vi = 0;
-	static int start = 0;
-	static uint32_t SCR = 0;
+	uint32_t SCR = 0;
+	ipack *pv, *pa;
 
+	pv = pa = p;
+	//fprintf(stderr, "PS_PES: MPEG %d ID 0x%2x\n", p->mpeg, p->buf[3]);
 	if (p->mpeg == 2){
 		switch(p->buf[3]){
 		case VIDEO_STREAM_S ... VIDEO_STREAM_E:
+			if (p->pa)
+				pa = p->pa;
 			if (!p->has_vi){
 				if(get_vinfo(p->buf, p->count, &p->vi,1) >=0) {
 					p->has_vi = 1;
-					vi = p->vi.bit_rate;
 				}
 			} 			
 			break;
 
 		case AUDIO_STREAM_S ... AUDIO_STREAM_E:
+			if (p->pv)
+				pv = p->pv;
 			if (!p->has_ai){
 				if(get_ainfo(p->buf, p->count, &p->ai,1) >=0) {
 					p->has_ai = 1;
-					ai = p->ai.bit_rate;
 				}
 			} 
 			break;
 		}
 
-		if (p->has_vi && vi && !muxr){
-			muxr = (vi+ai)/400;
+		if (pv->has_vi && pv->vi.bitrate && !pv->muxr){
+			pv->muxr = (pv->vi.bit_rate+pa->ai.bitrate)/400;
 		}
+		//fprintf(stderr, "PS_PES: start %d muxr %d vi %d b7 0x%2x has_ai %d\n",
+		//		p->start_header, p->muxr, p->vi.bit_rate, p->buf[7], p->has_ai);
 
-		if ( start && muxr && (p->buf[7] & PTS_ONLY) && (p->has_ai || 
+		if ( pv->start_header && pv->muxr && (p->buf[7] & PTS_ONLY) && (p->has_ai ||
 				       p->buf[9+p->buf[8]+4] == 0xb3)){  
 			SCR = trans_pts_dts(p->pts)-3600;
 			
 			check = write_ps_header(pbuf,
 						SCR,
-						muxr, 1, 0, 0, 1, 1, 1, 
+						pv->muxr, 1, 0, 0, 1, 1, 1, 
 						0, 0, 0, 0, 0, 0);
 
 			p->func(pbuf, check , p->data);
 		}
 
-		if (muxr && !start && vi){
+		if (pv->muxr && !pv->start_header && pv->vi.bit_rate){
 			SCR = trans_pts_dts(p->pts)-3600;
 			check = write_ps_header(pbuf,
 						SCR, 
-						muxr, 1, 0, 0, 1, 1, 1, 
+						pv->muxr, 1, 0, 0, 1, 1, 1, 
 						0xC0, 0, 64, 0xE0, 1, 460);
-			start = 1;
+			pv->start_header = 1;
 			p->func(pbuf, check , p->data);
 		}
 
-		if (start)
+		if (pv->start_header)
 			p->func(p->buf, p->count, p->data);
 	}
 }

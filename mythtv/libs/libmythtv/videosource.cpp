@@ -371,7 +371,7 @@ int CCSetting::getCardID(void) const {
 
 int CaptureCardEditor::exec(QSqlDatabase* db) {
     while (ConfigurationDialog::exec(db) == QDialog::Accepted)
-        edit(getValue().toInt());
+        edit();
 
     return QDialog::Rejected;
 }
@@ -384,7 +384,7 @@ void CaptureCardEditor::load(QSqlDatabase* db) {
 
 int VideoSourceEditor::exec(QSqlDatabase* db) {
     while (ConfigurationDialog::exec(db) == QDialog::Accepted)
-        edit(getValue().toInt());
+        edit();
 
     return QDialog::Rejected;
 }
@@ -397,7 +397,7 @@ void VideoSourceEditor::load(QSqlDatabase* db) {
 
 int CardInputEditor::exec(QSqlDatabase* db) {
     while (ConfigurationDialog::exec(db) == QDialog::Accepted)
-        edit(getValue().toInt());
+        cardinputs[getValue().toInt()]->exec(db);
 
     return QDialog::Rejected;
 }
@@ -562,5 +562,269 @@ void TunerCardInput::fillSelections(const QString& device) {
     QStringList inputs = VideoDevice::probeInputs(device);
     for(QStringList::iterator i = inputs.begin(); i != inputs.end(); ++i)
         addSelection(*i);
+}
+
+class DVBSignalMeter: public ProgressSetting, public TransientStorage {
+public:
+    DVBSignalMeter(int steps): ProgressSetting(steps), TransientStorage() {};
+};
+
+class DVBVideoSource: public ComboBoxSetting {
+public:
+    DVBVideoSource() {
+        setLabel("VideoSource");
+    };
+
+    void save(QSqlDatabase* db) { (void)db; };
+    void load(QSqlDatabase* _db) {
+        db = _db;
+        fillSelections();
+    };
+
+    void fillSelections() {
+        clearSelections();
+        QSqlQuery query;
+        query = db->exec(QString("SELECT videosource.name,videosource.sourceid "
+                                 "FROM videosource,capturecard,cardinput "
+                                 "WHERE capturecard.cardtype='DVB' "
+                                 "AND videosource.sourceid=cardinput.sourceid "
+                                 "AND cardinput.cardid=capturecard.cardid"));
+        if (!query.isActive())
+            MythContext::DBError("VideoSource", query);
+
+        if (query.numRowsAffected() > 0) {
+            addSelection("[All VideoSources]", "ALL");
+            while(query.next())
+                addSelection(query.value(0).toString(),
+                              query.value(1).toString());
+        } else
+            addSelection("[No VideoSources Defined]", "0");
+    };
+
+private:
+    QSqlDatabase* db;
+};
+
+void DVBChannels::fillSelections(const QString& videoSource) 
+{
+    if (db == NULL)
+        return;
+    clearSelections();
+    QSqlQuery query;
+    QString thequery = "SELECT name,chanid FROM channel";
+    if (videoSource != "All")
+        thequery += QString(" WHERE sourceid='%1'").arg(videoSource);
+    query = db->exec(thequery);
+    if (!query.isActive()) {
+        MythContext::DBError("Selecting Testchannels", query);
+        return;
+    }
+
+    if (query.numRowsAffected() > 0) {
+        while (query.next())
+            addSelection(query.value(0).toString(),
+                         query.value(1).toString());
+    } else
+        addSelection("[No Channels Defined]", "0");
+}
+
+class DVBLoadTuneButton: public ButtonSetting, public TransientStorage {
+public:
+    DVBLoadTuneButton() {
+        setLabel("Load & Tune");
+        setHelpText("Will load the selected channel above into the previous"
+                    " screen, and try to tune it. If it fails to tune the"
+                    " channel, press back and check the settings.");
+    };
+};
+
+class DVBTuneOnlyButton: public ButtonSetting, public TransientStorage {
+public:
+    DVBTuneOnlyButton() {
+        setLabel("Tune Only");
+        setHelpText("Will ONLY try to tune the previous screen, not alter it."
+                    " If it fails to tune, press back and check the settings.");
+    };
+};
+
+#ifndef USING_DVB
+DVBCardVerificationWizard::DVBCardVerificationWizard(int cardNum)
+{
+    (void)cardNum;
+}
+
+DVBCardVerificationWizard::~DVBCardVerificationWizard()
+{
+}
+
+void DVBCardVerificationWizard::tuneConfigscreen()
+{
+}
+
+void DVBCardVerificationWizard::tunePredefined()
+{
+}
+
+#else
+
+DVBCardVerificationWizard::DVBCardVerificationWizard(int cardNum) {
+    chan = new DVBChannel(cardNum);
+
+    cid.setValue(0);
+    addChild(dvbopts = new DVBSignalChannelOptions(cid));
+
+    VerticalConfigurationGroup* testGroup = new VerticalConfigurationGroup(false,true);
+    testGroup->setLabel(QString("Card Verification Wizard (DVB#%1)").arg(cardNum));
+    testGroup->setUseLabel(false);
+
+    DVBVideoSource* source;
+
+    sl = new DVBStatusLabel();
+    DVBSignalMeter* sn = new DVBSignalMeter(65535);
+    DVBSignalMeter* ss = new DVBSignalMeter(65535);
+    testGroup->addChild(sl);
+    testGroup->addChild(sn);
+    testGroup->addChild(ss);
+
+    HorizontalConfigurationGroup* lblGroup = new HorizontalConfigurationGroup(false,true);
+#warning FIXME: BER & UB Do not work without reading TS?
+    DVBInfoLabel* ber = new DVBInfoLabel("Bit Error Rate");
+    DVBInfoLabel* un  = new DVBInfoLabel("Uncorrected Blocks");
+    lblGroup->addChild(ber);
+    lblGroup->addChild(un);
+    testGroup->addChild(lblGroup);
+
+    HorizontalConfigurationGroup* chanGroup = new HorizontalConfigurationGroup(false,true);
+    chanGroup->addChild(source = new DVBVideoSource());
+    chanGroup->addChild(channels = new DVBChannels());
+    testGroup->addChild(chanGroup);
+
+    HorizontalConfigurationGroup* btnGroup = new HorizontalConfigurationGroup(false,true);
+    DVBLoadTuneButton* loadtune = new DVBLoadTuneButton();
+    DVBTuneOnlyButton* tuneonly = new DVBTuneOnlyButton();
+    btnGroup->addChild(loadtune);
+    btnGroup->addChild(tuneonly);
+    testGroup->addChild(btnGroup);
+
+    sn->setLabel("Signal/Noise");
+    ss->setLabel("Signal Strength");
+
+    addChild(testGroup);
+
+    connect(source, SIGNAL(valueChanged(const QString&)),
+            channels, SLOT(fillSelections(const QString&)));
+
+    connect(chan, SIGNAL(StatusSignalToNoise(int)), sn, SLOT(setValue(int)));
+    connect(chan, SIGNAL(StatusSignalStrength(int)), ss, SLOT(setValue(int)));
+    connect(chan, SIGNAL(StatusBitErrorRate(int)), ber, SLOT(set(int)));
+    connect(chan, SIGNAL(StatusUncorrectedBlocks(int)), un, SLOT(set(int)));
+#warning FIXME: Protect DVB driver access.
+    connect(chan, SIGNAL(Status(QString)), sl, SLOT(set(QString)));
+
+    connect(loadtune, SIGNAL(pressed()), this, SLOT(tunePredefined()));
+    connect(tuneonly, SIGNAL(pressed()), this, SLOT(tuneConfigscreen()));
+}
+
+DVBCardVerificationWizard::~DVBCardVerificationWizard()
+{
+    delete chan;
+}
+
+void DVBCardVerificationWizard::tuneConfigscreen() {
+    dvb_channel_t chan_opts;
+
+    if (!chan->Open())
+    {
+        setLabel("FAILED TO OPEN CARD, CHECK CONSOLE!!");
+        return;
+    }
+
+    bool parseOK = true;
+    switch (chan->GetCardType())
+    {
+#warning FIXME: Protect DVB driver access.
+        case FE_QPSK:
+            parseOK = chan->ParseQPSK(
+                dvbopts->getFrequency(), dvbopts->getInversion(),
+                dvbopts->getSymbolrate(), dvbopts->getFec(),
+                dvbopts->getPolarity(),
+#warning FIXME: Static Diseqc options.
+                QString("0"), QString("0"),
+#warning FIXME: Static LNB options.
+                QString("11700000"), QString("10600000"),
+                QString("9750000"), chan_opts.tuning);
+            break;
+        case FE_QAM:
+            parseOK = chan->ParseQAM(
+                dvbopts->getFrequency(), dvbopts->getInversion(),
+                dvbopts->getSymbolrate(), dvbopts->getFec(),
+                dvbopts->getModulation(), chan_opts.tuning);
+            break;
+        case FE_OFDM:
+            parseOK = chan->ParseOFDM(
+                dvbopts->getFrequency(), dvbopts->getInversion(),
+                dvbopts->getBandwidth(), dvbopts->getCodeRateHP(),
+                dvbopts->getCodeRateLP(), dvbopts->getConstellation(),
+                dvbopts->getTransmissionMode(), dvbopts->getGuardInterval(),
+                dvbopts->getHierarchy(), chan_opts.tuning);
+            break;
+    }
+
+    chan->Tune(chan_opts,true);
+}
+
+void DVBCardVerificationWizard::tunePredefined() {
+    cid.setValue(channels->getValue().toInt());
+    dvbopts->load(db);
+    tuneConfigscreen();
+}
+#endif
+
+DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent):
+  VerticalConfigurationGroup(false,true), parent(a_parent) {
+    setUseLabel(false);
+
+    advcfg = new TransButtonSetting();
+    advcfg->setLabel("Advanced Configuration");
+
+    DVBCardNum* cardnum = new DVBCardNum(parent);
+    cardname = new DVBCardName();
+    cardtype = new DVBCardType();
+
+    addChild(cardnum);
+    addChild(cardname);
+    addChild(cardtype);
+    addChild(new DVBAudioDevice(parent));
+    addChild(new DVBVbiDevice(parent));
+    addChild(new DVBDefaultInput(parent));
+    addChild(advcfg);
+
+    connect(cardnum, SIGNAL(valueChanged(const QString&)),
+            this, SLOT(probeCard(const QString&)));
+    connect(cardnum, SIGNAL(valueChanged(const QString&)),
+            &parent, SLOT(setDvbCard(const QString&)));
+    connect(advcfg, SIGNAL(pressed()), &parent, SLOT(execDVBConfigMenu()));
+    cardnum->setValue(0);
+}
+
+void CaptureCard::execDVBConfigMenu() {
+    DVBAdvancedConfigMenu acm(*this);
+    acm.exec(db);
+}
+
+void DVBAdvancedConfigMenu::execCVW() {
+    DVBCardVerificationWizard cvw(parent.getDvbCard().toInt());
+    cvw.exec(db);
+}
+
+void DVBAdvancedConfigMenu::execACW() {
+    DVBAdvConfigurationWizard acw(parent);
+    acw.exec(db);
+}
+
+void DVBAdvancedConfigMenu::execSAT() {
+// FIXME: TODO: Satellite Editor.
+    //DVBSatelliteWizard sw;
+    //sw.exec(db);
 }
 

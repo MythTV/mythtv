@@ -21,7 +21,7 @@ class Configurable: virtual public QObject {
     Q_OBJECT
 public:
     Configurable():
-        visible(true) {};
+        labelAboveWidget(false), visible(true) {};
     virtual ~Configurable() {};
 
     // Create and return a widget for configuring this entity
@@ -43,12 +43,16 @@ public:
     // A label displayed to the user
     void setLabel(QString str) { label = str; };
     QString getLabel(void) const { return label; };
+    void setLabelAboveWidget(bool l = true) { labelAboveWidget = l; }
 
     void setHelpText(QString str) { helptext = str; };
     QString getHelpText(void) const { return helptext; }
 
     void setVisible(bool b) { visible = b; };
     bool isVisible(void) const { return visible; };
+
+protected:
+    bool labelAboveWidget; 
 
 private:
     QString configName;
@@ -95,7 +99,8 @@ class ConfigurationGroup: virtual public Configurable
 {
     Q_OBJECT
   public:
-    ConfigurationGroup(bool luselabel = true) { uselabel = luselabel; }
+    ConfigurationGroup(bool luselabel = true, bool luseframe = true) 
+             { uselabel = luselabel; useframe = luseframe; }
     virtual ~ConfigurationGroup();
 
 
@@ -110,6 +115,7 @@ class ConfigurationGroup: virtual public Configurable
     virtual void save(QSqlDatabase* db);
 
     void setUseLabel(bool useit) { uselabel = useit; }
+    void setUseFrame(bool useit) { useframe = useit; }
 
   signals:
     void changeHelpText(QString);
@@ -118,12 +124,13 @@ class ConfigurationGroup: virtual public Configurable
     typedef vector<Configurable*> childList;
     childList children;
     bool uselabel;
+    bool useframe;
 };
 
 class VerticalConfigurationGroup: virtual public ConfigurationGroup {
  public:
-    VerticalConfigurationGroup(bool uselabel = true) 
-                : ConfigurationGroup(uselabel) { }
+    VerticalConfigurationGroup(bool uselabel = true, bool useframe = true) 
+                : ConfigurationGroup(uselabel, useframe) { }
 
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
                                   const char* widgetName = 0);
@@ -131,8 +138,8 @@ class VerticalConfigurationGroup: virtual public ConfigurationGroup {
 
 class HorizontalConfigurationGroup: virtual public ConfigurationGroup {
  public:
-    HorizontalConfigurationGroup(bool uselabel = true) 
-                : ConfigurationGroup(uselabel) { }
+    HorizontalConfigurationGroup(bool uselabel = true, bool useframe = true) 
+                : ConfigurationGroup(uselabel, useframe) { }
 
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
                                   const char* widgetName = 0);
@@ -178,6 +185,9 @@ public:
 
     // Show a dialogWidget, and save if accepted
     int exec(QSqlDatabase* db, bool saveOnExec = true);
+
+protected:
+    MythDialog *dialog;
 };
 
 // A wizard is a group with one child per page
@@ -299,6 +309,20 @@ public slots:
         return labels[current];
     };
 
+    virtual int getValueIndex(QString value) {
+        selectionList::iterator iter = values.begin();
+        int ret = 0;
+        while (iter != values.end()) {
+            if (*iter == value) {
+                return ret;
+            } else {
+                ret++;
+                iter++;
+            }
+        }
+        return 0;
+    };
+
 protected:
     typedef vector<QString> selectionList;
     selectionList labels;
@@ -342,11 +366,26 @@ private:
 class ListBoxSetting: public SelectSetting {
     Q_OBJECT
 public:
+    ListBoxSetting(): widget(NULL) { }
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
                                   const char* widgetName = 0);
 
+signals:
+    void accepted(int);
+    void menuButtonPressed(int);
+
 protected slots:
     void setValueByLabel(const QString& label);
+    void addSelection(const QString& label,
+                      QString value=QString::null,
+                      bool select=false) {
+        if (widget != NULL)
+            widget->insertItem(label);
+        SelectSetting::addSelection(label, value, select);
+    };
+    void widgetDestroyed() { widget=NULL; };
+protected:
+    MythListBox* widget;
 };
 
 class RadioSetting: public SelectSetting {
@@ -542,6 +581,59 @@ public:
 
     virtual void load(QSqlDatabase* db) { (void)db; };
     virtual void save(QSqlDatabase* db);
+};
+
+class ButtonSetting: virtual public Setting {
+    Q_OBJECT
+public:
+    virtual QWidget* configWidget(ConfigurationGroup* cg, QWidget* parent,
+                                  const char* widgetName=0);
+signals:
+    void pressed();
+};
+
+class TransButtonSetting: public ButtonSetting, public TransientStorage {
+public:
+    TransButtonSetting() {};
+};
+
+class ConfigPopupDialogWidget: public MythPopupBox {
+public:
+    ConfigPopupDialogWidget(MythMainWindow* parent, const char* widgetName=0):
+        MythPopupBox(parent, widgetName) {};
+
+    virtual void keyPressEvent(QKeyEvent* e);
+    void accept() { MythPopupBox::accept(); };
+    void reject() { MythPopupBox::reject(); };
+};
+
+class ConfigurationPopupDialog: virtual public Configurable {
+    Q_OBJECT
+public:
+    ConfigurationPopupDialog() { dialog=NULL; };
+    ~ConfigurationPopupDialog() { delete dialog; };
+
+    virtual MythDialog* dialogWidget(MythMainWindow* parent,
+                                     const char* widgetName=0);
+    int exec(QSqlDatabase* db, bool saveOnAccept=true);
+
+public slots:
+    void accept() { if (dialog) dialog->accept(); };
+    void reject() { if (dialog) dialog->reject(); };
+
+protected:
+    ConfigPopupDialogWidget* dialog;
+};
+
+class ProgressSetting: virtual public IntegerSetting {
+public:
+    ProgressSetting(int _totalSteps): totalSteps(_totalSteps) {};
+
+    QWidget* configWidget(ConfigurationGroup* cg, QWidget* parent,
+                          const char* widgetName = 0);
+
+private:
+    int totalSteps;
 };
 
 #endif

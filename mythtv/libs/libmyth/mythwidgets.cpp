@@ -838,78 +838,6 @@ void MythButtonGroup::moveFocus(int key)
     }
 }
 
-void MythPushButton::drawButton(QPainter * p)
-{
-    int diw = 0;
-    if ( isDefault() || autoDefault() ) {
-        diw = style().pixelMetric(QStyle::PM_ButtonDefaultIndicator, this);
-
-        if ( diw > 0 ) {
-            if (backgroundMode() == X11ParentRelative) {
-                erase( 0, 0, width(), diw );
-                erase( 0, 0, diw, height() );
-                erase( 0, height() - diw, width(), diw );
-                erase( width() - diw, 0, diw, height() );
-            } else if ( parentWidget() && parentWidget()->backgroundPixmap() ){
-                // pseudo tranparency
-                p->drawTiledPixmap( 0, 0, width(), diw,
-                                    *parentWidget()->backgroundPixmap(),
-                                        x(), y() );
-                p->drawTiledPixmap( 0, 0, diw, height(),
-                                    *parentWidget()->backgroundPixmap(),
-                                        x(), y() );
-                p->drawTiledPixmap( 0, height()-diw, width(), diw,
-                                    *parentWidget()->backgroundPixmap(),
-                                        x(), y() );
-                p->drawTiledPixmap( width()-diw, 0, diw, height(),
-                                    *parentWidget()->backgroundPixmap(),
-                                    x(), y() );
-            } else {
-                p->fillRect( 0, 0, width(), diw,
-                             colorGroup().brush(QColorGroup::Background) );
-                p->fillRect( 0, 0, diw, height(),
-                             colorGroup().brush(QColorGroup::Background) );
-                p->fillRect( 0, height()-diw, width(), diw,
-                             colorGroup().brush(QColorGroup::Background) );
-                p->fillRect( width()-diw, 0, diw, height(),
-                             colorGroup().brush(QColorGroup::Background) );
-            }
-        }
-    }
-
-
-    QStyle::SFlags flags = QStyle::Style_Default;
-    if (isEnabled())
-        flags |= QStyle::Style_Enabled;
-    if (hasFocus())
-        flags |= QStyle::Style_MouseOver;
-    if (isDown())
-        flags |= QStyle::Style_Down;
-    if (isOn())
-        flags |= QStyle::Style_On;
-    if (! isOn() && ! isDown())
-        flags |= QStyle::Style_Raised;
-
-    if (!origcolor.isValid())
-        origcolor = palette().color(QPalette::Inactive, QColorGroup::Button);
-
-    QColor set;
-
-    if (flags & QStyle::Style_MouseOver)
-        set = colorGroup().highlight();
-    else
-        set = origcolor;
-
-    QPalette pal = palette();
-    pal.setColor(QPalette::Active, QColorGroup::Button, set);
-    setPalette(pal);
-
-    style().drawControl(QStyle::CE_PushButton, p, this, rect(),
-                        colorGroup(), flags);
-
-    drawButtonLabel(p);
-}
-
 void MythPushButton::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
@@ -954,6 +882,22 @@ void MythPushButton::keyReleaseEvent(QKeyEvent *e)
 
     if (!handled)
         QPushButton::keyReleaseEvent(e);
+}
+
+void MythPushButton::focusInEvent(QFocusEvent *e)
+{
+    emit changeHelpText(helptext);
+
+    QColor highlight = colorGroup().highlight();
+
+    this->setPaletteBackgroundColor(highlight);
+    QPushButton::focusInEvent(e);
+}
+
+void MythPushButton::focusOutEvent(QFocusEvent *e)
+{
+    this->unsetPalette();
+    QPushButton::focusOutEvent(e);
 }
 
 MythListView::MythListView(QWidget *parent)
@@ -1074,10 +1018,20 @@ void MythListBox::keyPressEvent(QKeyEvent* e)
                 QListBox::keyPressEvent(e);
                 handled = true;
             }
+            else if (action == "MENU")
+                emit menuButtonPressed(currentItem());
+            else if (action == "SELECT")
+                emit accepted(currentItem());
         }
     }
 
     if (!handled)
         e->ignore();
+}
+
+void MythListBox::focusInEvent(QFocusEvent *e)
+{
+    emit changeHelpText(helptext);
+    QListBox::focusInEvent(e);
 }
 

@@ -239,13 +239,13 @@ void ProfileGroupEditor::callDelete(void)
         result.next();
         QString message = QString("Delete profile group:\n'%1'?")
                                   .arg(ProfileGroup::getName(db, id));
-        Myth2ButtonDialog *dlg = new Myth2ButtonDialog(
-                                       gContext->GetMainWindow(),
-                                       "", message, "Yes, delete group",
-                                       "No, Don't delete group", 2);
-        int value = dlg->exec();
-        delete dlg;
-        if (value == 1)
+
+        int value = MythPopupBox::show2ButtonPopup(gContext->GetMainWindow(),
+                                                   "", message, 
+                                                   "Yes, delete group",
+                                                   "No, Don't delete group", 2);
+
+        if (value == 0)
         {
             query = QString("DELETE codecparams FROM codecparams, "
                             "recordingprofiles WHERE " 

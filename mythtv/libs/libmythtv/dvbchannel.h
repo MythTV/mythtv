@@ -21,6 +21,8 @@ using namespace std;
 #include "dvbdiseqc.h"
 
 class TVRec;
+class DVBCam;
+class DVBSections;
 
 class DVBChannel : public QObject, public ChannelBase
 {
@@ -71,6 +73,7 @@ signals:
     void StatusBitErrorRate(int val);
     void StatusUncorrectedBlocks(int val);
     void Status(fe_status_t status);
+    void StatusString(QString val);
 
 private:
     static void* StatusMonitorHelper(void*);
@@ -107,6 +110,9 @@ private:
     bool pauseStatusMonitor;
 
     DVBDiSEqC* diseqc;
+
+    DVBCam*      dvbcam;
+    DVBSections* dvbsct;
 };
 
 #endif

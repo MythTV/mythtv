@@ -17,6 +17,7 @@
 
 #include "libmyth/mythcontext.h"
 #include "libmythtv/videosource.h"
+#include "libmythtv/channeleditor.h"
 #include "libmyth/themedmenu.h"
 #include "backendsettings.h"
 
@@ -83,6 +84,9 @@ void SetupMenuCallback(void* data, QString& selection) {
     } else if (sel == "card inputs") {
         CardInputEditor cie(db);
         cie.exec(db);
+    } else if (sel == "channel editor") {
+        ChannelEditor ce;
+        ce.exec(db);
     }
 }
 

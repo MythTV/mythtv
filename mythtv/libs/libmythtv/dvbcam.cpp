@@ -58,6 +58,7 @@ DVBCam::DVBCam(int cardNum): cardnum(cardNum)
     exitCiThread = false;
     ciThreadRunning = false;
     noCardSupport = false;
+    ciHandler = NULL;
 }
 
 DVBCam::~DVBCam()
@@ -132,15 +133,21 @@ void DVBCam::CiHandlerLoop()
         usleep(250);
         if (!ciHandler->Process())
             continue;
+        for (int s=0; s<ciHandler->NumSlots(); s++)
+        {
+            const unsigned short *caids = ciHandler->GetCaSystemIds(s);
+            // TODO: Only set cam with correct id.
+            if (caids != NULL)
+            {
+                cCiCaPmt capmt(chan_opts.serviceID);
 
-        cCiCaPmt capmt(chan_opts.serviceID);
+                capmt.AddCaDescriptor(pmtlen, pmtbuf);
 
-        capmt.AddCaDescriptor(pmtlen, pmtbuf);
+                SetPids(capmt, chan_opts.pids);
 
-        SetPids(capmt, chan_opts.pids);
-
-        for (int i=0; i<ciHandler->NumSlots(); i++)
-            ciHandler->SetCaPmt(capmt,i);
+                ciHandler->SetCaPmt(capmt,s);
+            }
+        }
     }
     
     ciThreadRunning = false;

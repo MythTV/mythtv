@@ -83,10 +83,8 @@ private:
     bool cleartimeonpause;
 
     long long framesWritten;
-    int keyframedist;
     unsigned char prvpkt[3];
 
-    bool gopset;
     bool wait_for_seqstart;
     bool wait_for_seqstart_enabled;
 
@@ -103,14 +101,12 @@ private:
     int fd_dvr;
     vector<int> fd_demux;
     pid_ipack_t pid_ipack;
-    map<uint8_t,uint8_t> contcounter;
+    map<uint16_t,uint8_t> contcounter;
     QString pid_string;
 
     dvb_channel_t   chan_opts;
 
     DVBChannel*     dvbchannel;
-    DVBSections*    dvbsections;
-    DVBCam*         dvbcam;
 };
 
 #endif

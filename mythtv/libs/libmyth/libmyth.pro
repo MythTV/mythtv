@@ -27,7 +27,7 @@ inc.files  = dialogbox.h lcddevice.h themedmenu.h mythcontext.h
 inc.files += mythwidgets.h remotefile.h util.h oldsettings.h volumecontrol.h
 inc.files += settings.h uitypes.h xmlparse.h mythplugin.h mythdialogs.h
 inc.files += audiooutput.h inetcomms.h httpcomms.h mythmedia.h mythcdrom.h 
-inc.files += mythmediamonitor.h
+inc.files += mythmediamonitor.h mythwizard.h
 
 using_alsa {
     DEFINES += USE_ALSA

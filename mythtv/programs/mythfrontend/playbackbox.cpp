@@ -154,7 +154,7 @@ void PlaybackBox::killPlayerSafe(void)
     if (state != kStopped)
     {
         state = kStopping;
-        while(state != kStopped)
+        while (state != kStopped)
         {
             /* NOTE: need unlock/process/lock here because we need
 	       to allow updateVideo() to run to handle changes in states */

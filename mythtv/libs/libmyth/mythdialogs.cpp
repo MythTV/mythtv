@@ -197,8 +197,8 @@ void MythMainWindow::detach(QWidget *child)
 
     if (current)
     {
-        current->setFocus();
         current->setEnabled(true);
+        current->setFocus();
     }
 
     if (d->exitingtomain)
@@ -425,6 +425,8 @@ void MythMainWindow::RegisterMediaHandler(const QString &destination,
                                           void (*callback)(void),
                                           int mediaType)
 {
+    (void)key;
+
     if (d->mediaHandlerMap.count(destination) == 0) 
     {
         MHData mhd = { callback, mediaType, destination, description };
@@ -444,7 +446,7 @@ void MythMainWindow::RegisterMediaHandler(const QString &destination,
 void MythMainWindow::keyPressEvent(QKeyEvent *e)
 {
     QWidget *current = currentWidget();
-    if (current)
+    if (current && current->isEnabled())
         qApp->notify(current, e);
     else
         QDialog::keyPressEvent(e);
@@ -963,9 +965,12 @@ void MythPopupBox::defaultButtonPressedHandler(void)
         if (objs->isWidgetType())
         {
             QWidget *widget = (QWidget *)objs;
-            if (widget->hasFocus())
-                break;
-            i++;
+            if (widget->isA("MythPushButton"))
+            {
+                if (widget->hasFocus())
+                    break;
+                i++;
+            }
         }
     }
     done(i);
@@ -998,7 +1003,27 @@ bool MythPopupBox::showOkCancelPopup(MythMainWindow *parent, QString title,
     else
         cancelButton->setFocus();
 
-    return (popup.ExecPopup() == 1);
+    return (popup.ExecPopup() == 0);
+}
+
+int MythPopupBox::show2ButtonPopup(MythMainWindow *parent, QString title,
+                                   QString message, QString button1msg,
+                                   QString button2msg, int defvalue)
+{
+    MythPopupBox popup(parent, title);
+
+    popup.addLabel(message, Medium, true);
+    popup.addLabel("");
+
+    QButton *but1 = popup.addButton(button1msg);
+    QButton *but2 = popup.addButton(button2msg);
+
+    if (defvalue == 1)
+        but1->setFocus();
+    else
+        but2->setFocus();
+
+    return popup.ExecPopup();
 }
 
 MythProgressDialog::MythProgressDialog(const QString &message, int totalSteps)
@@ -1859,118 +1884,6 @@ MythPasswordDialog::~MythPasswordDialog()
 /*
 ---------------------------------------------------------------------
  */
-
-Myth2ButtonDialog::Myth2ButtonDialog(MythMainWindow *parent, QString title1,
-                                     QString message, QString button1msg,
-                                     QString button2msg, int defvalue)
-                 : MythDialog(parent, title1, false)
-{
-    gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
-    QFont bigFont = gContext->GetBigFont();
-    QFont medFont = gContext->GetMediumFont();
-
-    popup = new MythPopupBox(gContext->GetMainWindow(), "2 button dialog");
-    popup->setFrameStyle( QFrame::Box | QFrame::Plain );
-    gContext->ThemeWidget(popup);
-    QLabel *msg = new QLabel(tr(message), popup);
-    msg->setBackgroundOrigin(ParentOrigin);
-    QLabel *filler1 = new QLabel("", popup);
-    filler1->setBackgroundOrigin(ParentOrigin);
-
-    QLabel *title = new QLabel(title1, popup);
-    title->setBackgroundOrigin(ParentOrigin);
-    title->setFont(bigFont);
-    title->setMaximumWidth((int)(width() / 2));
-
-    QLabel *filler2 = new QLabel("", popup);
-    filler2->setBackgroundOrigin(ParentOrigin);
-
-    but1 = new MythPushButton(tr(button1msg), popup);
-    but2 = new MythPushButton(tr(button2msg), popup);
-
-    popup->addWidget(msg, false);
-    popup->addWidget(filler1, false);
-    popup->addWidget(title, false);
-    popup->addWidget(filler2, false);
-    popup->addWidget(but1, false);
-    popup->addWidget(but2, false);
-
-    if (defvalue == 1)
-        but1->setFocus();
-    else
-        but2->setFocus();
-
-    msg->adjustSize();
-    filler1->adjustSize();
-    filler2->adjustSize();
-    title->adjustSize();
-    but1->adjustSize();
-    but2->adjustSize();
-
-    popup->polish();
-
-    int x, y, maxw, poph;
-    poph = msg->height() + filler1->height() +
-           title->height() + but1->height() + but2->height() +
-           (int)(110 * hmult);
-    popup->setMinimumHeight(poph);
-    maxw = 0;
-
-    if (title->width() > maxw)
-        maxw = title->width();
-    if (but1->width() > maxw)
-        maxw = but1->width();
-    if (but2->width() > maxw)
-        maxw = but2->width();
-
-    maxw += (int)(80 * wmult);
-
-    x = (int)(screenwidth / 2) - (int)(maxw / 2);
-    y = (int)(screenheight / 2) - (int)(poph / 2);
-
-    popup->setFixedSize(maxw, poph);
-    popup->setGeometry(x, y, maxw, poph);
-//    popup->setFocusPolicy(StrongFocus);
-    popup->Show();
-    grabKeyboard();
-}
-
-void Myth2ButtonDialog::keyPressEvent(QKeyEvent *e)
-{
-    bool handled = false;
-    QStringList actions;
-    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
-    {
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
-        {
-            QString action = actions[i];
-            handled = true;
-
-            if (action == "ESCAPE")
-                done(0);
-            else if (action == "SELECT")
-            {
-                if (but1->hasFocus())
-                    done(1);
-                else
-                    done(2);
-            }
-            else if (action == "UP" || action == "DOWN")
-            {
-                if (but1->hasFocus())
-                    but2->setFocus();
-                else
-                    but1->setFocus();
-            }
-            else
-                handled = false;
-        }
-    }
-}
-
-/*
----------------------------------------------------------------------
-*/
 
 MythImageFileDialog::MythImageFileDialog(QString *result,
                                          QString top_directory,

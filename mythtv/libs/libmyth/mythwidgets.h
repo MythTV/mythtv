@@ -225,6 +225,7 @@ class MythButtonGroup : public QButtonGroup
 
 class MythPushButton : public QPushButton
 {
+    Q_OBJECT
   public:
     MythPushButton(QWidget *parent, const char *name = 0)
                  : QPushButton(parent, name)
@@ -234,12 +235,21 @@ class MythPushButton : public QPushButton
                  : QPushButton(text, parent)
                   { setBackgroundOrigin(WindowOrigin); }
 
-    void drawButton(QPainter *p);
+    void setHelpText(const QString &help) { helptext = help; }
+
     void keyPressEvent(QKeyEvent *e);
     void keyReleaseEvent(QKeyEvent *e);
 
+  signals:
+    void changeHelpText(QString);
+
+  protected:
+    void focusInEvent(QFocusEvent *e);
+    void focusOutEvent(QFocusEvent *e);
+
   private:
     QColor origcolor;
+    QString helptext;
 };
 
 class MythCheckBox: public QCheckBox
@@ -277,14 +287,27 @@ class MythListView : public QListView
 
 class MythListBox: public QListBox {
     Q_OBJECT
-public:
+  public:
     MythListBox(QWidget* parent): QListBox(parent) {};
 
     virtual void keyPressEvent(QKeyEvent* e);
 
-public slots:
+    void setHelpText(QString help) { helptext = help; }
+
+  protected:
+    void focusInEvent(QFocusEvent *e);
+
+  public slots:
     void setCurrentItem(const QString& text);
     void setCurrentItem(int index) { QListBox::setCurrentItem(index); };
+
+  signals:
+    void changeHelpText(QString);
+    void accepted(int);
+    void menuButtonPressed(int);
+
+  private:
+    QString helptext;
 };
 
 #endif

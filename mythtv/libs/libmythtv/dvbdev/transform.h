@@ -214,6 +214,10 @@ extern "C" {
 		int fd2;
 		int ffd;
 		int playing;
+		int start_header;
+		int muxr;
+		struct ipack_s *pv;
+		struct ipack_s *pa;
 	} ipack;
 
 	void instant_repack (uint8_t *buf, int count, ipack *p);

@@ -6,16 +6,24 @@ TEMPLATE = app
 CONFIG -= moc
 CONFIG += thread
 
-INCLUDEPATH += ../libs/
-LIBS +=  -L../libs/libmyth -L../libs/libmythtv
+INCLUDEPATH += ../libs/libmythtv ../libs ../libs/libmyth ../libs/libdvbdev
+DEPENDPATH += ../libs/libmythtv ../libs/libmyth ../libs/libvbitext
+DEPENDPATH += ../libs/libavcodec ../libs/libavformat
+LIBS += -L../libs/libmyth -L../libs/libmythtv -L../libs/libvbitext
+LIBS += -L../libs/libavformat -L../libs/libavcodec
 
 include ( ../settings.pro )
 
-LIBS += -lmyth-$$LIBVERSION -lmythtv $$EXTRA_LIBS
+LIBS += -lmythtv -lavformat -lavcodec -lvbitext -lmyth-$$LIBVERSION
+LIBS += $$EXTRA_LIBS -lmp3lame
 
-DEPENDPATH += ../libs/libmyth ../libs/libmythtv
+TARGETDEPS += ../libs/libmythtv/libmythtv.a
+TARGETDEPS += ../libs/libavcodec/libavcodec.a
+TARGETDEPS += ../libs/libvbitext/libvbitext.a
+TARGETDEPS += ../libs/libavformat/libavformat.a
 
 # Input
+HEADERS += backendsettings.h
 SOURCES += main.cpp backendsettings.cpp
 
 menu.path = $${PREFIX}/share/mythtv/

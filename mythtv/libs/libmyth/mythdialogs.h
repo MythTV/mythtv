@@ -172,6 +172,9 @@ class MythPopupBox : public MythDialog
                             QString message);
     static bool showOkCancelPopup(MythMainWindow *parent, QString title,
                                   QString message, bool focusOk);
+    static int show2ButtonPopup(MythMainWindow *parent, QString title,
+                                QString message, QString button1msg,
+                                QString button2msg, int defvalue);
 
   signals:
     void popupDone();
@@ -301,22 +304,6 @@ class MythPasswordDialog: public MythDialog
     MythLineEdit        *password_editor;
     QString             target_text;
     bool                *success_flag;
-};
-
-class Myth2ButtonDialog: public MythDialog
-{
-    Q_OBJECT
-  public:
-    Myth2ButtonDialog(MythMainWindow *parent, QString title, QString message,
-                      QString button1, QString button2, int defvalue);
-    ~Myth2ButtonDialog() { releaseKeyboard(); delete popup; };
-
-  protected:
-    void keyPressEvent(QKeyEvent *e);
-
-  private:
-    MythPopupBox *popup;
-    MythPushButton *but1, *but2;
 };
 
 class MythImageFileDialog: public MythThemedDialog

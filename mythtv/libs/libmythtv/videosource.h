@@ -7,6 +7,12 @@
 #include <qdir.h>
 #include <qstringlist.h>
 
+#include "channelsettings.h"
+
+#ifdef USING_DVB
+#include "dvbchannel.h"
+#endif
+
 class VideoSource;
 class VSSetting: public SimpleDBStorage {
 protected:
@@ -367,14 +373,23 @@ public:
     };
 };
 
-class DVBUseTS: public CheckBoxSetting, public CCSetting {
+class DVBSwFilter: public CheckBoxSetting, public CCSetting {
 public:
-    DVBUseTS(const CaptureCard& parent):
-        CCSetting(parent, "use_ts") {
-        setLabel("Use Transport Stream for recording");
-        setHelpText("This option is to get around filtering limitations on some"
-                    " DVB cards. Most users should not activate this option,"
-                    " because of compatability problems.");
+    DVBSwFilter(const CaptureCard& parent):
+        CCSetting(parent, "use_swfilter") {
+        setLabel("Do NOT use DVB driver for filtering.");
+        setHelpText("(BROKEN) This option is used to get around filtering"
+                    " limitations on some DVB cards.");
+    };
+};
+
+class DVBRecordTS: public CheckBoxSetting, public CCSetting {
+public:
+    DVBRecordTS(const CaptureCard& parent):
+        CCSetting(parent, "record_ts") {
+        setLabel("Record the TS, not PS.");
+        setHelpText("This will make the backend not perform Transport Stream"
+                    " to Program Stream conversion.");
     };
 };
 
@@ -421,6 +436,141 @@ public:
     };
 };
 
+class DVBSignalChannelOptions: public ChannelOptionsDVB {
+public:
+    DVBSignalChannelOptions(ChannelID& id): ChannelOptionsDVB(id) {};
+    void load(QSqlDatabase* db) {
+        if (id.intValue() != 0)
+            ChannelOptionsDVB::load(db);
+    };
+    void save(QSqlDatabase* db) { (void)db; };
+};
+
+class DVBChannels: public ComboBoxSetting {
+    Q_OBJECT
+public:
+    DVBChannels() : db(NULL)
+    {
+        setLabel("Channels");
+        setHelpText("This box contains all channels from the selected video"
+                    " source. Select a channel here and press the 'Load and"
+                    " Tune' button to load the channel settings into the"
+                    " previous screen and try to tune it.");
+    }
+
+    void save(QSqlDatabase* db) { (void)db; };
+    void load(QSqlDatabase* _db) {
+        db = _db;
+        fillSelections("All");
+    };
+public slots:
+    void fillSelections(const QString& videoSource);
+
+private:
+    QSqlDatabase* db;
+};
+
+class DVBInfoLabel: public LabelSetting, public TransientStorage {
+    Q_OBJECT
+public:
+    DVBInfoLabel(QString label):
+      LabelSetting(), TransientStorage() {
+        setLabel(label);
+    };
+public slots:
+    void set(int val) {
+        setValue(QString("%1").arg(val));
+    };
+};
+
+class DVBStatusLabel: public LabelSetting, public TransientStorage {
+    Q_OBJECT
+public:
+    DVBStatusLabel() {
+        setLabel("Status");
+    };
+public slots:
+    void set(QString str) {
+        setValue(str);
+    };
+};
+
+class DVBCardVerificationWizard: public ConfigurationWizard {
+    Q_OBJECT
+public:
+    DVBCardVerificationWizard(int cardNum);
+    ~DVBCardVerificationWizard(); 
+
+    void load(QSqlDatabase* _db) {
+        db = _db;
+        ConfigurationWizard::load(db);
+    };
+
+private slots:
+    void tuneConfigscreen();
+    void tunePredefined();
+
+private:
+    QSqlDatabase* db;
+    ChannelID cid;
+#ifdef USING_DVB
+    DVBChannel* chan;
+    DVBSignalChannelOptions* dvbopts;
+    DVBChannels* channels;
+#endif
+};
+
+class DVBAdvConfigurationWizard: public ConfigurationWizard {
+public:
+    DVBAdvConfigurationWizard(CaptureCard& parent) {
+        VerticalConfigurationGroup* rec = new VerticalConfigurationGroup(false);
+        rec->setLabel("Recorder Options");
+        rec->setUseLabel(false);
+
+        rec->addChild(new DVBSwFilter(parent));
+        rec->addChild(new DVBRecordTS(parent));
+        addChild(rec);
+    };
+};
+
+class DVBAdvancedConfigMenu: public ConfigurationPopupDialog,
+                             public VerticalConfigurationGroup {
+    Q_OBJECT
+public:
+    DVBAdvancedConfigMenu(CaptureCard& a_parent): parent(a_parent) {
+        setLabel("Configuration Options");
+        TransButtonSetting* advcfg = new TransButtonSetting();
+        TransButtonSetting* verify = new TransButtonSetting();
+        TransButtonSetting* satellite = new TransButtonSetting();
+
+        advcfg->setLabel("Advanced Configuration");
+        verify->setLabel("Card Verification Wizard");
+        satellite->setLabel("Satellite Configuration");
+
+        addChild(advcfg);
+        addChild(verify);
+        addChild(satellite);
+
+        connect(advcfg, SIGNAL(pressed()), this, SLOT(execACW()));
+        connect(verify, SIGNAL(pressed()), this, SLOT(execCVW()));
+        connect(satellite, SIGNAL(pressed()), this, SLOT(execSAT()));
+    };
+
+    void exec(QSqlDatabase* _db) {
+        db = _db;
+        ConfigurationPopupDialog::exec(db);
+    };
+
+public slots:
+    void execCVW();
+    void execACW();
+    void execSAT();
+
+private:
+    CaptureCard& parent;
+    QSqlDatabase* db;
+};
+
 class CardType: public ComboBoxSetting, public CCSetting {
 public:
     CardType(const CaptureCard& parent);
@@ -430,7 +580,7 @@ public:
 class V4LConfigurationGroup: public VerticalConfigurationGroup {
 public:
     V4LConfigurationGroup(CaptureCard& a_parent):
-        VerticalConfigurationGroup(false),
+        VerticalConfigurationGroup(false, true),
         parent(a_parent) {
         setUseLabel(false);
 
@@ -454,26 +604,11 @@ private:
 class DVBConfigurationGroup: public VerticalConfigurationGroup {
     Q_OBJECT
 public:
-    DVBConfigurationGroup(CaptureCard& a_parent):
-        VerticalConfigurationGroup(false),
-        parent(a_parent) {
-        setUseLabel(false);
+    DVBConfigurationGroup(CaptureCard& a_parent);
 
-        DVBCardNum* cardnum = new DVBCardNum(parent);
-        cardname = new DVBCardName();
-        cardtype = new DVBCardType();
-
-        addChild(cardnum);
-        addChild(cardname);
-        addChild(cardtype);
-        addChild(new DVBUseTS(parent));
-        addChild(new DVBAudioDevice(parent));
-        addChild(new DVBVbiDevice(parent));
-        addChild(new DVBDefaultInput(parent));
-
-        connect(cardnum, SIGNAL(valueChanged(const QString&)),
-                this, SLOT(probeCard(const QString&)));
-        cardnum->setValue(0);
+    void load(QSqlDatabase* _db) {
+        db = _db;
+        VerticalConfigurationGroup::load(db);
     };
 
 public slots:
@@ -482,28 +617,38 @@ public slots:
 private:
     CaptureCard& parent;
 
+    QSqlDatabase *db;
     DVBCardName* cardname;
     DVBCardType* cardtype;
+    TransButtonSetting *advcfg;
 };
 
 class CaptureCardGroup: public VerticalConfigurationGroup,
                         public TriggeredConfigurationGroup {
+    Q_OBJECT
 public:
-    CaptureCardGroup(CaptureCard& parent) {
+    CaptureCardGroup(CaptureCard& parent):
+        VerticalConfigurationGroup(false, true) {
         CardType* cardtype = new CardType(parent);
         addChild(cardtype);
         setTrigger(cardtype);
         setSaveAll(false);
 
         addTarget("V4L", new V4LConfigurationGroup(parent));
-        addTarget("MPEG", new V4LConfigurationGroup(parent));
-        addTarget("MJPEG", new V4LConfigurationGroup(parent));
-        addTarget("HDTV", new V4LConfigurationGroup(parent));
         addTarget("DVB", new DVBConfigurationGroup(parent));
+    };
+
+protected slots:
+    virtual void triggerChanged(const QString& value) {
+        QString own = value;
+        if (own == "HDTV" || own == "MPEG" || own == "MJPEG")
+            own = "V4L";
+        TriggeredConfigurationGroup::triggerChanged(own);
     };
 };
 
 class CaptureCard: public ConfigurationWizard {
+    Q_OBJECT
 public:
     CaptureCard() {
         // must be first
@@ -519,9 +664,20 @@ public:
         return id->intValue();
     };
 
+    QString getDvbCard() { return dvbCard; };
+
     void loadByID(QSqlDatabase* db, int id);
 
     static void fillSelections(QSqlDatabase* db, SelectSetting* setting);
+
+    void load(QSqlDatabase* _db) {
+        db = _db;
+        ConfigurationWizard::load(db);
+    };
+
+public slots:
+    void execDVBConfigMenu();
+    void setDvbCard(const QString& card) { dvbCard = card; };
 
 private:
     class ID: virtual public IntegerSetting,
@@ -541,6 +697,8 @@ private:
 
 private:
     ID* id;
+    QSqlDatabase* db;
+    QString dvbCard;
 };
 
 class CardInput;
@@ -700,18 +858,64 @@ public:
         setLabel("Capture cards");
     };
 
+    virtual MythDialog* dialogWidget(MythMainWindow* parent,
+                                     const char* widgetName=0) {
+        dialog=ConfigurationDialog::dialogWidget(parent, widgetName);
+        connect(dialog, SIGNAL(menuButtonPressed()), this, SLOT(menu()));
+        return dialog;
+    };
+
     virtual int exec(QSqlDatabase* db);
     virtual void load(QSqlDatabase* db);
     virtual void save(QSqlDatabase* db) { (void)db; };
 
-protected slots:
-    void edit(int id) {
+public slots:
+    void menu() {
+        if (getValue().toInt() == 0) {
+            CaptureCard cc;
+            cc.exec(db);
+        } else {
+            int val = MythPopupBox::show2ButtonPopup(gContext->GetMainWindow(),
+                                                     "",
+                                                     "Capture Card Menu", 
+                                                     "Edit..",
+                                                     "Delete..", 1);
+
+            if (val == 0)
+                edit();
+            else if (val == 1)
+                del(); 
+        }
+    };
+
+    void edit() {
         CaptureCard cc;
-
-        if (id != 0)
-            cc.loadByID(db,id);
-
+        if (getValue().toInt() != 0)
+            cc.loadByID(db,getValue().toInt());
         cc.exec(db);
+    };
+
+    void del() {
+        int val = MythPopupBox::show2ButtonPopup(gContext->GetMainWindow(), "",
+                                           "Are you sure you want to delete "
+                                           "this capture card?", 
+                                           "Yes, delete capture card",
+                                           "No, don't", 2);
+        if (val == 0)
+        {
+            QSqlQuery query;
+
+            query = db->exec(QString("DELETE FROM capturecard"
+                                     " WHERE cardid='%1'").arg(getValue()));
+            if (!query.isActive())
+                MythContext::DBError("Deleting Capture Card", query);
+
+            query = db->exec(QString("DELETE FROM cardinput"
+                                     " WHERE cardid='%1'").arg(getValue()));
+            if (!query.isActive())
+                MythContext::DBError("Deleting Card Input", query);
+            load(db);
+        }
     };
 
 protected:
@@ -726,18 +930,60 @@ public:
         setLabel("Video sources");
     };
 
+    virtual MythDialog* dialogWidget(MythMainWindow* parent,
+                                     const char* widgetName=0) {
+        dialog = ConfigurationDialog::dialogWidget(parent, widgetName);
+        connect(dialog, SIGNAL(menuButtonPressed()), this, SLOT(menu()));
+        return dialog;
+    };
+
     virtual int exec(QSqlDatabase* db);
     virtual void load(QSqlDatabase* db);
     virtual void save(QSqlDatabase* db) { (void)db; };
 
-protected slots:
-    void edit(int id) {
-        VideoSource vs;
+public slots:
+    void menu() {
+        if (getValue().toInt() == 0) {
+            VideoSource vs;
+            vs.exec(db);
+        } else {
+            int val = MythPopupBox::show2ButtonPopup(gContext->GetMainWindow(),
+                                                     "",
+                                                     "Video Source Menu",
+                                                     "Edit..",
+                                                     "Delete..", 1);
 
-        if (id != 0)
-            vs.loadByID(db,id);
+            if (val == 0)
+                emit edit();
+            else if (val == 1)
+                emit del();
+        }
+    };
+
+    void edit() {
+        VideoSource vs;
+        if (getValue().toInt() != 0)
+            vs.loadByID(db,getValue().toInt());
 
         vs.exec(db);
+    };
+
+    void del() {
+        int val = MythPopupBox::show2ButtonPopup(gContext->GetMainWindow(), "",
+                                           "Are you sure you want to delete "
+                                           "this video source?",
+                                           "Yes, delete video source",
+                                           "No, don't", 2);
+
+        if (val == 0)
+        {
+            QSqlQuery query = db->exec(QString("DELETE FROM videosource"
+                                               " WHERE sourceid='%1'")
+                                               .arg(getValue()));
+            if (!query.isActive())
+                MythContext::DBError("Deleting VideoSource", query);
+            load(db);
+        }
     };
 
 protected:
@@ -745,7 +991,6 @@ protected:
 };
 
 class CardInputEditor: public ListBoxSetting, public ConfigurationDialog {
-    Q_OBJECT
 public:
     CardInputEditor(QSqlDatabase* _db):
         db(_db) {
@@ -756,11 +1001,6 @@ public:
     virtual int exec(QSqlDatabase* db);
     virtual void load(QSqlDatabase* db);
     virtual void save(QSqlDatabase* db) { (void)db; };
-
-protected slots:
-    void edit(int id) {
-        cardinputs[id]->exec(db);
-    };
 
 protected:
     vector<CardInput*> cardinputs;

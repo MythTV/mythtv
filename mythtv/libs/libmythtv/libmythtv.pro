@@ -30,6 +30,7 @@ HEADERS += recorderbase.h mpegrecorder.h channelbase.h
 HEADERS += vsync.h proglist.h hdtvrecorder.h fifowriter.h filtermanager.h
 HEADERS += videooutbase.h videoout_null.h xbox.h
 HEADERS += ivtvdecoder.h videoout_ivtv.h dbcheck.h udpnotify.h
+HEADERS += channeleditor.h channelsettings.h
 
 SOURCES += channel.cpp commercial_skip.cpp frequencies.c guidegrid.cpp
 SOURCES += infodialog.cpp infostructs.cpp jitterometer.cpp minilzo.cpp 
@@ -42,7 +43,7 @@ SOURCES += mpegrecorder.cpp channelbase.cpp filtermanager.cpp
 SOURCES += vsync.c proglist.cpp hdtvrecorder.cpp videooutbase.cpp 
 SOURCES += fifowriter.cpp videoout_null.cpp xbox.cpp
 SOURCES += ivtvdecoder.cpp videoout_ivtv.cpp dbcheck.cpp profilegroup.cpp
-SOURCES += udpnotify.cpp
+SOURCES += udpnotify.cpp channeleditor.cpp channelsettings.cpp
 
 using_xv {
     SOURCES += videoout_xv.cpp

@@ -51,6 +51,9 @@ using namespace std;
 #include "dvbchannel.h"
 #include "dvbrecorder.h"
 #include "dvbdiseqc.h"
+#include "dvbcam.h"
+#include "dvbsections.h"
+
 
 DVBChannel::DVBChannel(int aCardNum, TVRec *parent)
            : ChannelBase(parent), cardnum(aCardNum)
@@ -61,11 +64,19 @@ DVBChannel::DVBChannel(int aCardNum, TVRec *parent)
     diseqc = NULL;
     pauseStatusMonitor = false;
 
+    dvbcam = NULL;
+    dvbsct = NULL;
+
     pthread_mutex_init(&chan_opts.lock, NULL);
 }
 
 DVBChannel::~DVBChannel()
 {
+    if (!dvbsct)
+        delete dvbsct;
+    if (!dvbcam)
+        delete dvbcam;
+
     if (isOpen && (fd_frontend > 0))
         close(fd_frontend);
 }
@@ -76,7 +87,7 @@ bool DVBChannel::Open()
         return true;
 
     fd_frontend = open(dvbdevice(DVB_DEV_FRONTEND, cardnum),
-                        O_RDWR | O_NONBLOCK);
+                       O_RDWR | O_NONBLOCK);
     if(fd_frontend < 0)
     {
         ERRNO("Opening DVB frontend device failed.");
@@ -88,6 +99,10 @@ bool DVBChannel::Open()
         ERRNO("Failed to get frontend information.")
         return false;
     }
+
+    dvbsct = new DVBSections(cardnum);
+    connect(this, SIGNAL(ChannelChanged(dvb_channel_t&)),
+            dvbsct, SLOT(ChannelChanged(dvb_channel_t&)));
 
     if (info.type == FE_QPSK)
     {
@@ -102,6 +117,10 @@ bool DVBChannel::Open()
             diseqc = new DVBDiSEqC(cardnum, fd_frontend);
             diseqc->DiseqcReset();
         }
+
+        dvbcam = new DVBCam(cardnum);
+        connect(dvbsct, SIGNAL(ChannelChanged(dvb_channel_t&, uint8_t*, int)),
+                dvbcam, SLOT(ChannelChanged(dvb_channel_t&, uint8_t*, int)));
     }
 
     GENERAL(QString("Using DVB card %1, with frontend %2.")
@@ -585,7 +604,19 @@ void DVBChannel::StatusMonitorLoop()
         
         ioctl(fd_frontend, FE_READ_STATUS, &status);
         emit Status(status);
-        
+       
+        QString str = "";
+        if (status & FE_TIMEDOUT) {
+            str = "Timed out waiting for signal.";
+        } else {
+            if (status & FE_HAS_SIGNAL)  str += "SIGNAL ";
+            if (status & FE_HAS_CARRIER) str += "CARRIER ";
+            if (status & FE_HAS_VITERBI) str += "VITERBI ";
+            if (status & FE_HAS_SYNC) str += "SYNC ";
+            if (status & FE_HAS_LOCK) str += "LOCK ";
+        }
+        emit StatusString(str);
+
         usleep(250*1000);
     }
 }

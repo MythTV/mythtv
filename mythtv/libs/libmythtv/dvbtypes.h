@@ -26,7 +26,8 @@ using namespace std;
 #include "transform.h"
 
 #define MPEG_TS_SIZE 188
-#define DMX_DONT_FILTER 0x1fff
+#define DMX_BUF_SIZE  64 * 1024
+#define DMX_DONT_FILTER 0x2000
 
 typedef vector<uint16_t> dvb_pid_t;
 typedef vector<uint16_t> dvb_caid_t;
@@ -86,5 +87,8 @@ typedef map<uint16_t, ipack*> pid_ipack_t;
 
 #define CHANNEL(args...) \
     VERBOSE(VB_CHANNEL, QString("DVB#%1 ").arg(cardnum) << args);
+
+#define RECORD(args...) \
+    VERBOSE(VB_RECORD, QString("DVB#%1 ").arg(cardnum) << args);
 
 #endif // DVB_TYPES_H
