@@ -13,7 +13,7 @@ package export_MP3;
 					 'name'            => 'Export to MP3',
 					 'enabled'         => 1,
 					 'started'         => 0,
-					 'fifodir'         => "fifodir.$$",
+					 'fifodir'         => "/tmp/fifodir.$$",
 					 'children'        => [],
 					 'errors'          => undef,
 					 'episode'         => undef,

@@ -35,7 +35,7 @@ package export_DVD;
 					 'episode'         => undef,
 					 'is_cli'          => 0,
 					# Variables specific to export_DVD
-					 'fifodir'         => "fifodir.$$",
+					 'fifodir'         => "/tmp/fifodir.$$",
 					 'default_outfile' => 'Untitled',
 					 'savepath'        => '.',
 					 'outfile'         => 'out.mpg',

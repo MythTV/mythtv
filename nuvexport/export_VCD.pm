@@ -13,7 +13,7 @@ package export_VCD;
 					 'name'            => 'Export to VCD',
 					 'enabled'         => 1,
 					 'started'         => 0,
-					 'fifodir'         => "fifodir.$$",
+					 'fifodir'         => "/tmp/fifodir.$$",
 					 'children'        => [],
 					 'errors'          => undef,
 					 'episode'         => undef,

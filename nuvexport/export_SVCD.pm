@@ -34,7 +34,7 @@ package export_SVCD;
 					 'episode'         => undef,
 					 'is_cli'          => 0,
 					# Variables specific to export_SVCD
-					 'fifodir'         => "fifodir.$$",
+					 'fifodir'         => "/tmp/fifodir.$$",
 					 'default_outfile' => 'Untitled',
 					 'savepath'        => '.',
 					 'outfile'         => 'out.mpg',

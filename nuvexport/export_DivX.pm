@@ -16,7 +16,7 @@ package export_DivX;
 					 'episode'     => undef,
 					 'savepath'    => '.',
 					 'outfile'     => 'out.avi',
-                                         'fifodir'     => "fifodir.$$",
+					 'fifodir'     => "/tmp/fifodir.$$",
 					 'use_cutlist' => 0,
 					 'a_bitrate'   => 64,
 					 'v_bitrate'   => 256,
