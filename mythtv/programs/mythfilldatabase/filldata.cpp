@@ -2452,6 +2452,10 @@ void clearOldDBEntries(void)
                      "DATE_SUB(CURRENT_DATE, INTERVAL %d DAY);", offset);
     query.exec(querystr);
 
+    querystr.sprintf("DELETE FROM programgenres WHERE starttime <= "
+                     "DATE_SUB(CURRENT_DATE, INTERVAL %d DAY);", offset);
+    query.exec(querystr);
+
     querystr.sprintf("DELETE FROM credits WHERE starttime <= "
                      "DATE_SUB(CURRENT_DATE, INTERVAL %d DAY);", offset);
     query.exec(querystr);
