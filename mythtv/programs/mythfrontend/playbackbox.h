@@ -54,6 +54,7 @@ class PlaybackBox : public MythDialog
     QProgressBar *progressbar;
 
     int descwidth;
+    int titlewidth;
 
     void killPlayer(void);
     void startPlayer(ProgramInfo *rec);

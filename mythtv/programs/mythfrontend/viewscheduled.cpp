@@ -192,7 +192,16 @@ void ViewScheduled::changed(QListViewItem *lvitem)
     else
         description->setText("");
 
-    description->setMinimumWidth((int)(500 * wmult));
+    int minwidth = (int)(500 * wmult);
+
+    title->setMinimumWidth(minwidth);
+    title->setMaximumWidth(minwidth);
+
+    subtitle->setMinimumWidth(minwidth);
+    subtitle->setMaximumWidth(minwidth);
+
+    description->setMinimumWidth(minwidth);
+    description->setMaximumWidth(minwidth);
 }
 
 void ViewScheduled::selected(QListViewItem *lvitem)

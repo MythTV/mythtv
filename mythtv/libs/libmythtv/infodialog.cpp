@@ -65,8 +65,20 @@ InfoDialog::InfoDialog(MythContext *context, ProgramInfo *pginfo,
     descriptionfield->setAlignment(Qt::WordBreak | Qt::AlignLeft | 
                                    Qt::AlignTop);
 
-    descriptionfield->setMinimumWidth((int)(800 * wmult) - 
-                                      descriptionlabel->width() - 100);
+    qApp->processEvents();
+
+    int descwidth = (int)(800 * wmult) - descriptionlabel->width() - 100;
+    int titlewidth = (int)(760 * wmult);
+
+    titlefield->setMinimumWidth(titlewidth);
+    titlefield->setMaximumWidth(titlewidth);
+
+    subtitlefield->setMinimumWidth(descwidth);
+    subtitlefield->setMaximumWidth(descwidth);
+
+    descriptionfield->setMinimumWidth(descwidth);
+    descriptionfield->setMaximumWidth(descwidth);
+
     grid->addMultiCellWidget(titlefield, 0, 0, 0, 1, Qt::AlignLeft);
     grid->addMultiCellWidget(date, 1, 1, 0, 1, Qt::AlignLeft);
     grid->addWidget(subtitlelabel, 2, 0, Qt::AlignLeft | Qt::AlignTop);

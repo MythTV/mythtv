@@ -180,6 +180,7 @@ PlaybackBox::PlaybackBox(MythContext *context, BoxType ltype, QWidget *parent,
     descwidth = screenwidth - desclabel->width() - 4 * (int)(10 * wmult);
     if (pixlabel)
         descwidth -= pixlabel->width();
+    titlewidth = descwidth + desclabel->width();
 
     if (item)
     {
@@ -397,8 +398,13 @@ void PlaybackBox::changed(QListViewItem *lvitem)
     else
         description->setText("");
 
+    title->setMinimumWidth(titlewidth);
+    title->setMaximumWidth(titlewidth);
+
     subtitle->setMinimumWidth(descwidth);
+    subtitle->setMaximumWidth(descwidth);
     description->setMinimumWidth(descwidth);
+    description->setMaximumWidth(descwidth);
     description->setMaximumHeight((int)(80 * hmult));
 
     if (pixlabel)
