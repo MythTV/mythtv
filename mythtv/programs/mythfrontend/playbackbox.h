@@ -2,7 +2,7 @@
 #define PLAYBACKBOX_H_
 
 #include <qwidget.h>
-#include <qdialog.h>
+#include "libmyth/mythwidgets.h"
 
 #include <pthread.h>
 
@@ -16,7 +16,7 @@ class QTimer;
 class ProgramInfo;
 class MythContext;
 
-class PlaybackBox : public QDialog
+class PlaybackBox : public MyDialog
 {
     Q_OBJECT
   public:
@@ -26,8 +26,6 @@ class PlaybackBox : public QDialog
                 const char *name = 0);
    ~PlaybackBox(void);
     
-    void Show();
-  
   protected slots:
     void selected(QListViewItem *);
     void remove(QListViewItem *);
@@ -53,7 +51,6 @@ class PlaybackBox : public QDialog
     QLabel *freespace;
     QProgressBar *progressbar;
 
-    float wmult, hmult;
     int descwidth;
 
     void killPlayer(void);
@@ -63,8 +60,6 @@ class PlaybackBox : public QDialog
     NuppelVideoPlayer *nvp;
     RingBuffer *rbuffer;
     pthread_t decoder;
-
-    MythContext *m_context;
 };
 
 #endif

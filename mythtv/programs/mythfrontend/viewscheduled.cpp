@@ -23,27 +23,12 @@ using namespace std;
     
 ViewScheduled::ViewScheduled(MythContext *context, QSqlDatabase *ldb,
                              QWidget *parent, const char *name)
-             : QDialog(parent, name)
+             : MyDialog(context, parent, name)
 {
     db = ldb;
-    m_context = context;
 
     title = NULL;
 
-    int screenwidth = 0, screenheight = 0;
-    wmult = 0, hmult = 0;
-
-    context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
-
-    setGeometry(0, 0, screenwidth, screenheight);
-    setFixedSize(QSize(screenwidth, screenheight));
-
-    setFont(QFont("Arial", (int)(m_context->GetMediumFontSize() * hmult), 
-            QFont::Bold));
-    setCursor(QCursor(Qt::BlankCursor));
-
-    context->ThemeWidget(this);
-           
     QVBoxLayout *vbox = new QVBoxLayout(this, (int)(10 * wmult));
 
     desclabel = new QLabel("Select a recording to view:", this);
@@ -69,12 +54,6 @@ ViewScheduled::ViewScheduled(MythContext *context, QSqlDatabase *ldb,
 
     listview->setSorting(-1);
     listview->setAllColumnsShowFocus(TRUE);
-
-    listview->viewport()->setPalette(palette());
-    listview->horizontalScrollBar()->setPalette(palette());
-    listview->verticalScrollBar()->setPalette(palette());
-    listview->header()->setPalette(palette());
-    listview->header()->setFont(font());
 
     connect(listview, SIGNAL(returnPressed(QListViewItem *)), this,
             SLOT(selected(QListViewItem *)));
@@ -167,12 +146,6 @@ void ViewScheduled::FillList(void)
 
     listview->setCurrentItem(listview->firstChild());
     listview->setSelected(listview->firstChild(), true);
-}
-
-void ViewScheduled::Show()
-{
-    showFullScreen();
-    setActiveWindow();
 }
 
 void ViewScheduled::changed(QListViewItem *lvitem)
@@ -329,6 +302,7 @@ void ViewScheduled::handleConflicting(ProgramInfo *rec)
     if (ret == 1)
     {
         SetRecTimeDialog srt(m_context,rec,db);
+        srt.Show();
         srt.exec();
     }
     else

@@ -3,13 +3,14 @@
 
 #include <qwidget.h>
 #include <qlabel.h>
-#include <qdialog.h>
 #include <qstring.h>
 #include <qtimer.h>
 #include <qpixmap.h>
 #include <qdatetime.h>
 #include <qptrlist.h>
 #include <vector>
+
+#include "mythwidgets.h"
 
 using namespace std;
 
@@ -26,7 +27,7 @@ namespace libmyth
 #define MAX_DISPLAY_CHANS 8
 #define DISPLAY_TIMES 30
 
-class GuideGrid : public QDialog
+class GuideGrid : public MyDialog
 {
     Q_OBJECT
   public:
@@ -135,9 +136,6 @@ class GuideGrid : public QDialog
     bool showInfo;
     bool showIcon;
 
-    int screenwidth, screenheight;
-    float wmult, hmult;
-
     bool showtitle;
     bool usetheme;
     QColor fgcolor;
@@ -175,7 +173,6 @@ class GuideGrid : public QDialog
     QColor misChanIcon_fgColor;
     int progArrow_Type;
 
-    MythContext *m_context;
     Settings *m_settings;
 
     void (*embedcallback)(void *data, unsigned long wid, int x, int y,

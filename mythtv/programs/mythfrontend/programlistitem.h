@@ -9,25 +9,6 @@
 class MythContext;
 class TV;
 
-class MyListView : public QListView
-{
-    Q_OBJECT
-  public:
-    MyListView(QWidget *parent) : QListView(parent) { allowkeypress = true; }
- 
-    void SetAllowKeypress(bool allow) { allowkeypress = allow; }
-
-  protected:
-    void keyPressEvent( QKeyEvent *e );
-
-  signals:
-    void playPressed(QListViewItem *);
-    void deletePressed(QListViewItem *);
-
-  private:
-    bool allowkeypress;
-};
-
 class ProgramListItem : public QListViewItem
 {   
   public:

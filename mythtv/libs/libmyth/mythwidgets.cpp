@@ -1,10 +1,12 @@
 #include <qstyle.h>
 #include <qpainter.h>
+#include <qcursor.h>
 
 #include <iostream>
 using namespace std;
 
 #include "mythwidgets.h"
+#include "mythcontext.h"
 
 void MyToolButton::drawButton( QPainter * p )
 {
@@ -125,3 +127,63 @@ void MyPushButton::drawButton( QPainter * p )
 
     drawButtonLabel(p);
 }
+
+MyDialog::MyDialog(MythContext *context, QWidget *parent, const char *name,
+                   bool modal)
+        : QDialog(parent, name, modal)
+{
+    m_context = context;
+
+    context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
+
+    setGeometry(0, 0, screenwidth, screenheight);
+    setFixedSize(QSize(screenwidth, screenheight));
+
+    setFont(QFont("Arial", (int)(context->GetMediumFontSize() * hmult),
+            QFont::Bold));
+    setCursor(QCursor(Qt::BlankCursor));
+
+    context->ThemeWidget(this);
+}
+
+void MyDialog::Show(void)
+{
+    showFullScreen();
+    setActiveWindow();
+}
+
+MyListView::MyListView(QWidget *parent)
+          : QListView(parent)
+{
+    allowkeypress = true;
+
+    viewport()->setPalette(palette());
+    horizontalScrollBar()->setPalette(palette());
+    verticalScrollBar()->setPalette(palette());
+    header()->setPalette(palette());
+    header()->setFont(font());
+
+    setAllColumnsShowFocus(TRUE);
+}
+
+void MyListView::keyPressEvent(QKeyEvent *e)
+{
+    if (!allowkeypress)
+        return;
+
+    if (currentItem() && !currentItem()->isEnabled())
+    {
+    }
+    else
+    {
+        switch(e->key())
+        {
+            case 'd': case 'D': emit deletePressed(currentItem()); return;
+            case 'p': case 'P': emit playPressed(currentItem()); return;
+            case Key_Space: emit spacePressed(currentItem()); return;
+        }
+    }
+
+    QListView::keyPressEvent(e);
+}
+

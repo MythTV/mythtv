@@ -280,8 +280,6 @@ QDialog* ConfigurationWizard::dialogWidget(QWidget* parent,
                                            const char* widgetName) {
     QWizard* wizard = new QWizard(parent, widgetName, TRUE, 0);
 
-    wizard->resize(600, 480); // xxx
-
     unsigned i;
     for(i = 0 ; i < children.size() ; ++i)
         if (children[i]->isVisible()) {

@@ -21,18 +21,9 @@ using namespace std;
 ThemedMenu::ThemedMenu(MythContext *context, const char *cdir, 
                        const char *menufile, 
                        QWidget *parent, const char *name)
-          : QDialog(parent, name)
+          : MyDialog(context, parent, name)
 {
-    m_context = context;
-  
-    context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
-
-    setGeometry(0, 0, screenwidth, screenheight);
-    setFixedWidth(screenwidth);
-    setFixedHeight(screenheight);
-
     setPalette(QPalette(QColor(250, 250, 250)));
-    setCursor(QCursor(Qt::BlankCursor));
 
     QString dir = QString(cdir) + "/";
 
@@ -721,11 +712,6 @@ void ThemedMenu::parseMenu(QString menuname)
 
     selection = "";
     update(menuRect());
-}
-
-void ThemedMenu::Show()
-{
-    showFullScreen();
 }
 
 QPoint ThemedMenu::parsePoint(QString text)

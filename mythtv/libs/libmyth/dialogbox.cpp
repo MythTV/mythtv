@@ -12,22 +12,8 @@
 DialogBox::DialogBox(MythContext *context, const QString &text, 
                      const char *checkboxtext,
                      QWidget *parent, const char *name)
-         : QDialog(parent, name)
+         : MyDialog(context, parent, name)
 {
-    int screenheight = 0, screenwidth = 0;
-    float wmult = 0, hmult = 0;
-
-    context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
-
-    setGeometry(0, 0, screenwidth, screenheight);
-    setFixedSize(QSize(screenwidth, screenheight));
-
-    setFont(QFont("Arial", (int)(context->GetMediumFontSize() * hmult), 
-            QFont::Bold));
-    setCursor(QCursor(Qt::BlankCursor));
-
-    context->ThemeWidget(this);
-
     QLabel *maintext = new QLabel(text, this);
     maintext->setBackgroundOrigin(WindowOrigin);
     maintext->setAlignment(Qt::WordBreak | Qt::AlignLeft | Qt::AlignTop);
@@ -59,13 +45,6 @@ void DialogBox::AddButton(const QString &title)
     buttongroup->insert(button);
 
     box->addWidget(button, 0);
-}
-
-void DialogBox::Show()
-{
-    showFullScreen();
-    raise();
-    setActiveWindow();
 }
 
 void DialogBox::buttonPressed(int which)

@@ -28,37 +28,17 @@ void RecordingProfile::loadByID(QSqlDatabase* db, int profileId) {
 
 RecordingProfileBrowser::RecordingProfileBrowser(MythContext* context,
                                                  QWidget* parent,
-                                                 QSqlDatabase* _db):
-    QDialog(parent), db(_db) {
-
-    m_context = context;
-
-    int screenwidth, screenheight;
-    float wmult, hmult;
-    context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
-    setGeometry(0, 0, screenwidth, screenheight);
-    setFixedSize(QSize(screenwidth, screenheight));
-
-    context->ThemeWidget(this);
-
-    setFont(QFont("Arial", (int)(context->GetMediumFontSize() * hmult),
-            QFont::Bold));
-    setCursor(QCursor(Qt::BlankCursor));
-
+                                                 QSqlDatabase* _db)
+                       : MyDialog(context, parent), db(_db) 
+{
 
     QVBoxLayout* vbox = new QVBoxLayout(this, (int)(15 * wmult));
 
-    listview = new QListView(this);
+    listview = new MyListView(this);
     vbox->addWidget(listview);
 
     listview->addColumn("Profile");
     listview->setAllColumnsShowFocus(TRUE);
-
-    listview->viewport()->setPalette(palette());
-    listview->horizontalScrollBar()->setPalette(palette());
-    listview->verticalScrollBar()->setPalette(palette());
-    listview->header()->setPalette(palette());
-    listview->header()->setFont(font());
 
     idMap[new QListViewItem(listview, "(Create new profile)")] = 0;
 

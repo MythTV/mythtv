@@ -30,27 +30,17 @@ GuideGrid::GuideGrid(MythContext *context, const QString &channel,
                      void (*embedcb)(void *data, unsigned long wid, int x, 
                                      int y, int w, int h), void *data,
                      QWidget *parent, const char *name)
-         : QDialog(parent, name)
+         : MyDialog(context, parent, name)
 {
     DISPLAY_CHANS = 6;
 
     embedcallback = embedcb;
     callbackdata = data;
-    m_context = context;
     m_settings = context->settings();
-
-    m_context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
-
-    setGeometry(0, 0, screenwidth, screenheight);
-    setFixedSize(QSize(screenwidth, screenheight));
-
-    setCursor(QCursor(Qt::BlankCursor));
 
     usetheme = m_settings->GetNumSetting("ThemeQt");
     showtitle = m_settings->GetNumSetting("EPGShowTitle");
     showIcon = m_settings->GetNumSetting("EPGShowChannelIcon");
-
-    m_context->ThemeWidget(this);
 
     bgcolor = paletteBackgroundColor();
     fgcolor = paletteForegroundColor();

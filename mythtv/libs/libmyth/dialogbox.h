@@ -2,15 +2,16 @@
 #define DIALOGBOX_H_
 
 #include <qwidget.h>
-#include <qdialog.h>
 #include <qcheckbox.h>
+
+#include "mythwidgets.h"
 
 class QVBoxLayout;
 class QButtonGroup;
 class QString;
 class MythContext;
 
-class DialogBox : public QDialog
+class DialogBox : public MyDialog
 {
     Q_OBJECT
   public:
@@ -19,7 +20,6 @@ class DialogBox : public QDialog
               QWidget *parent = 0, const char *name = 0);
 
     void AddButton(const QString &title);
-    void Show();
 
     bool getCheckBoxState(void) {  if (checkbox) return checkbox->isChecked();
                                    return false; }

@@ -2,9 +2,9 @@
 #define INFODIALOG_H_
 
 #include <qwidget.h>
-#include <qdialog.h>
 
 #include "programinfo.h"
+#include "mythwidgets.h"
 
 class QLabel;
 class QCheckBox;
@@ -15,7 +15,7 @@ class QListViewItem;
 namespace libmyth
 {
 
-class InfoDialog : public QDialog
+class InfoDialog : public MyDialog
 {
     Q_OBJECT
   public:
@@ -35,9 +35,7 @@ class InfoDialog : public QDialog
     RecordingType recordstatus;
     ProgramInfo *myinfo;
 
-    MythContext *m_context;
-
-    QListView *lview;
+    MyListView *lview;
 };
 
 }

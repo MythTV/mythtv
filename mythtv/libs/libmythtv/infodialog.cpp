@@ -37,25 +37,10 @@ class RecListItem : public QListViewItem
 
 InfoDialog::InfoDialog(MythContext *context, ProgramInfo *pginfo, 
                        QWidget *parent, const char *name)
-          : QDialog(parent, name)
+          : MyDialog(context, parent, name)
 {
-    m_context = context;
-
-    int screenheight = 0, screenwidth = 0;
-    float wmult = 0, hmult = 0;
-
-    m_context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
-
     int bigfont = m_context->GetBigFontSize();
     int mediumfont = m_context->GetMediumFontSize();
-
-    setGeometry(0, 0, screenwidth, screenheight);
-    setFixedSize(QSize(screenwidth, screenheight));
-
-    setFont(QFont("Arial", (int)(mediumfont * hmult), QFont::Bold));
-    setCursor(QCursor(Qt::BlankCursor));
-
-    m_context->ThemeWidget(this);
 
     QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
 
@@ -110,7 +95,7 @@ InfoDialog::InfoDialog(MythContext *context, ProgramInfo *pginfo,
 
     RecListItem *selectItem = NULL;
 
-    lview = new QListView(this);
+    lview = new MyListView(this);
     lview->addColumn("Selections");
     lview->setColumnWidth(0, (int)(750 * wmult));
     lview->setSorting(-1, false);
@@ -118,10 +103,6 @@ InfoDialog::InfoDialog(MythContext *context, ProgramInfo *pginfo,
     lview->setItemMargin((int)(hmult * mediumfont / 2));
     lview->setFixedHeight((int)(225 * hmult));
     lview->header()->hide();
-
-    lview->viewport()->setPalette(palette());
-    lview->horizontalScrollBar()->setPalette(palette());
-    lview->verticalScrollBar()->setPalette(palette());
 
     connect(lview, SIGNAL(returnPressed(QListViewItem *)), this,
             SLOT(selected(QListViewItem *)));

@@ -2,11 +2,12 @@
 #define THEMESETUP_H_
 
 #include <qwidget.h>
-#include <qdialog.h>
 #include <qstring.h>
 #include <qpixmap.h>
 #include <pthread.h>
 #include <vector>
+
+#include "libmyth/mythwidgets.h"
 
 using namespace std;
 
@@ -33,7 +34,7 @@ class Thumbnail
     bool isdir;
 };
 
-class ThemeSetup : public QDialog
+class ThemeSetup : public MyDialog
 {
     Q_OBJECT
   public:
@@ -53,9 +54,6 @@ class ThemeSetup : public QDialog
     
     QFont *m_font;
 
-    int screenwidth, screenheight;
-    float wmult, hmult;
-
     QColor fgcolor;
     QColor highlightcolor;
 
@@ -66,8 +64,6 @@ class ThemeSetup : public QDialog
     unsigned int screenposition;
 
     int currow, curcol;
-
-    MythContext *m_context;
 
     QSqlDatabase *db;
 };

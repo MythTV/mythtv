@@ -2,7 +2,8 @@
 #define VIEWSCHEDULED_H_
 
 #include <qwidget.h>
-#include <qdialog.h>
+
+#include "libmyth/mythwidgets.h"
 
 class QSqlDatabase;
 class QListViewItem;
@@ -11,15 +12,13 @@ class QLabel;
 class ProgramInfo;
 class MythContext;
 
-class ViewScheduled : public QDialog
+class ViewScheduled : public MyDialog
 {
     Q_OBJECT
   public:
     ViewScheduled(MythContext *context, QSqlDatabase *ldb, QWidget *parent = 0, 
                   const char *name = 0);
 
-    void Show();
-  
   protected slots:
     void selected(QListViewItem *);
     void changed(QListViewItem *);
@@ -41,10 +40,6 @@ class ViewScheduled : public QDialog
     QLabel *chan;
 
     MyListView *listview;
-
-    MythContext *m_context;
-
-    float wmult, hmult;
 };
 
 #endif

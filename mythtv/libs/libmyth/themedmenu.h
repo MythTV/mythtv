@@ -2,10 +2,11 @@
 #define THEMEDMENU_H_
 
 #include <qwidget.h>
-#include <qdialog.h>
 #include <qvaluelist.h>
 #include <qdom.h>
 #include <qmap.h>
+
+#include "mythwidgets.h"
 
 #include <vector>
 
@@ -44,7 +45,7 @@ struct MenuRow
 
 class MythContext;
 
-class ThemedMenu : public QDialog
+class ThemedMenu : public MyDialog
 {
     Q_OBJECT
   public:
@@ -53,8 +54,6 @@ class ThemedMenu : public QDialog
    ~ThemedMenu();
 
     bool foundTheme() { return foundtheme; }
-
-    void Show();
 
     void setCallback(void (*lcallback)(void *, QString &), void *data) 
                                         { callback = lcallback;
@@ -105,10 +104,6 @@ class ThemedMenu : public QDialog
 
     void drawText(QPainter *p, QRect &rect, int textflags, QString text);
 
-    float wmult, hmult;
-
-    int screenwidth, screenheight;
-
     QString prefix;
     
     QRect buttonArea;    
@@ -154,8 +149,6 @@ class ThemedMenu : public QDialog
 
     bool killable;
     int exitModifier;
-
-    MythContext *m_context;
 };
 
 #endif

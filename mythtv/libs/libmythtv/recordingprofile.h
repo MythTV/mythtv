@@ -3,8 +3,9 @@
 
 #include "libmyth/settings.h"
 #include "libmyth/mythcontext.h"
+#include "libmyth/mythwidgets.h"
+
 #include <qlistview.h>
-#include <qdialog.h>
 #include <vector>
 
 class RecordingProfile;
@@ -380,7 +381,7 @@ private:
     ImageSize* imageSize;
 };
 
-class RecordingProfileBrowser: public QDialog {
+class RecordingProfileBrowser: public MyDialog {
     Q_OBJECT
 public:
     RecordingProfileBrowser(MythContext* context, QWidget* parent, QSqlDatabase* db);
@@ -394,10 +395,9 @@ protected slots:
     };
 
 protected:
-    QListView* listview;
+    MyListView* listview;
     map<QListViewItem*,int> idMap;
     QSqlDatabase* db;
-    MythContext *m_context;
 };
 
 class RecordingProfileEditor: public RecordingProfileBrowser {

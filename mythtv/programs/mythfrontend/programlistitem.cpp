@@ -12,27 +12,6 @@
 
 #include "libmyth/mythcontext.h"
 
-void MyListView::keyPressEvent(QKeyEvent *e)
-{
-    if (!allowkeypress)
-        return;
-
-    if (currentItem() && !currentItem()->isEnabled())
-    {
-    }
-    else
-    {
-        switch(e->key())
-        {
-            case 'd': case 'D': emit deletePressed(currentItem()); return;
-            case 'p': case 'P': emit playPressed(currentItem()); return;
-            case Key_Space: emit spacePressed(currentItem()); return;
-        }
-    }
-
-    QListView::keyPressEvent(e);
-}
-
 ProgramListItem::ProgramListItem(MythContext *context, QListView *parent, 
                                  ProgramInfo *lpginfo, int type)
                : QListViewItem(parent)

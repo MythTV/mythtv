@@ -13,19 +13,9 @@ using namespace std;
 
 ThemeSetup::ThemeSetup(MythContext *context,  QSqlDatabase *ldb,
                        QWidget *parent, const char *name)
-          : QDialog(parent, name)
+          : MyDialog(context, parent, name)
 {
-    m_context = context;
     db = ldb;
-
-    context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
-
-    setGeometry(0, 0, screenwidth, screenheight);
-    setFixedSize(QSize(screenwidth, screenheight));
-
-    setCursor(QCursor(Qt::BlankCursor));
-
-    context->ThemeWidget(this);
 
     fgcolor = paletteForegroundColor();
     highlightcolor = fgcolor;

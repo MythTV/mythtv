@@ -7,6 +7,11 @@
 #include <qlineedit.h>
 #include <qpushbutton.h>
 #include <qtoolbutton.h>
+#include <qdialog.h>
+#include <qlistview.h>
+#include <qheader.h>
+
+class MythContext;
 
 // These widgets follow these general navigation rules:
 //
@@ -153,6 +158,42 @@ class MyPushButton : public QPushButton
 
   private:
     QColor origcolor;
+};
+
+class MyDialog : public QDialog
+{
+  public:
+    MyDialog(MythContext *context, QWidget *parent = 0, const char *name = 0,
+             bool modal = FALSE);
+    
+    void Show();
+
+    float getHFactor(void) { return hmult; }
+    float getWFactor(void) { return wmult; }
+
+  protected:
+    MythContext *m_context;
+    float wmult, hmult;
+    int screenwidth, screenheight;
+};
+
+class MyListView : public QListView
+{
+    Q_OBJECT
+  public:
+    MyListView(QWidget *parent);
+
+    void SetAllowKeypress(bool allow) { allowkeypress = allow; }
+
+  protected:
+    void keyPressEvent( QKeyEvent *e );
+
+  signals:
+    void playPressed(QListViewItem *);
+    void deletePressed(QListViewItem *);
+
+  private:
+    bool allowkeypress;
 };
 
 #endif

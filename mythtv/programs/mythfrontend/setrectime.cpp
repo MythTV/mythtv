@@ -39,27 +39,13 @@ private:
 SetRecTimeDialog::SetRecTimeDialog(MythContext *context, ProgramInfo *rec,
                                    QSqlDatabase *ldb, QWidget *parent,
                                    const char *name)
-                : QDialog(parent, name)
+                : MyDialog(context, parent, name)
 {
-    m_context = context;
     m_proginfo = rec;
     db = ldb;
 
-    int screenheight = 0, screenwidth = 0;
-    float wmult = 0, hmult = 0;
-
-    m_context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
-
     int bigfont = m_context->GetBigFontSize();
     int mediumfont = m_context->GetMediumFontSize();
-
-    setGeometry(0, 0, screenwidth, screenheight);
-    setFixedSize(QSize(screenwidth, screenheight));
-
-    setFont(QFont("Arial", (int)(mediumfont * hmult), QFont::Bold));
-    setCursor(QCursor(Qt::BlankCursor));
-
-    m_context->ThemeWidget(this);
 
     QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
 
@@ -133,7 +119,7 @@ SetRecTimeDialog::SetRecTimeDialog(MythContext *context, ProgramInfo *rec,
 
     SRTListItem *selectItem = NULL;
 
-    lview = new QListView(this);
+    lview = new MyListView(this);
     lview->addColumn("Selections");
     lview->setColumnWidth(0, (int)(650 * wmult));
     lview->setSorting(-1, false);
@@ -141,12 +127,6 @@ SetRecTimeDialog::SetRecTimeDialog(MythContext *context, ProgramInfo *rec,
     lview->setItemMargin((int)(hmult * mediumfont / 2));
     lview->setFixedHeight((int)(225 * hmult));
     lview->header()->hide();
-
-    lview->viewport()->setPalette(palette());
-    lview->horizontalScrollBar()->setPalette(palette());
-    lview->verticalScrollBar()->setPalette(palette());
-    lview->header()->setPalette(palette());
-    lview->header()->setFont(font());
 
     connect(lview, SIGNAL(returnPressed(QListViewItem *)), this,
             SLOT(selected(QListViewItem *)));
@@ -171,9 +151,6 @@ SetRecTimeDialog::SetRecTimeDialog(MythContext *context, ProgramInfo *rec,
 
     lview->setCurrentItem(selectItem);
     lview->setSelected(selectItem, true);
-
-    showFullScreen();
-    setActiveWindow();
 }
 
 QLabel *SetRecTimeDialog::getDateLabel(ProgramInfo *pginfo)

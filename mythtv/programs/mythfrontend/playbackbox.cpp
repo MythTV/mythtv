@@ -29,27 +29,14 @@ using namespace std;
 
 PlaybackBox::PlaybackBox(MythContext *context, BoxType ltype, QWidget *parent, 
                          const char *name)
-           : QDialog(parent, name)
+           : MyDialog(context, parent, name)
 {
     type = ltype;
-    m_context = context;
 
     title = NULL;
     rbuffer = NULL;
     nvp = NULL;
 
-    int screenheight = 0, screenwidth = 0;
-    context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
-
-    setGeometry(0, 0, screenwidth, screenheight);
-    setFixedSize(QSize(screenwidth, screenheight));
-
-    setFont(QFont("Arial", (int)(context->GetMediumFontSize() * hmult), 
-            QFont::Bold));
-    setCursor(QCursor(Qt::BlankCursor));
-
-    context->ThemeWidget(this);
-    
     QVBoxLayout *vbox = new QVBoxLayout(this, (int)(15 * wmult));
 
     QString message = "Select a recording to ";
@@ -81,13 +68,6 @@ PlaybackBox::PlaybackBox(MythContext *context, BoxType ltype, QWidget *parent,
     }
 
     listview->setSorting(-1, false);
-    listview->setAllColumnsShowFocus(TRUE);
-
-    listview->viewport()->setPalette(palette());
-    listview->horizontalScrollBar()->setPalette(palette());
-    listview->verticalScrollBar()->setPalette(palette());
-    listview->header()->setPalette(palette());
-    listview->header()->setFont(font());
 
     connect(listview, SIGNAL(returnPressed(QListViewItem *)), this,
             SLOT(selected(QListViewItem *)));
@@ -217,13 +197,6 @@ PlaybackBox::~PlaybackBox(void)
 {
     killPlayer();
     delete timer;
-}
-
-void PlaybackBox::Show()
-{
-    showFullScreen();
-    raise();
-    setActiveWindow();
 }
 
 static void *SpawnDecoder(void *param)

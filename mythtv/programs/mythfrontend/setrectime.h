@@ -2,11 +2,11 @@
 #define SETRECTIME_H_
 
 #include <qwidget.h>
-#include <qdialog.h>
+
+#include "libmyth/mythwidgets.h"
 
 class QSqlDatabase;
 class QListViewItem;
-class QListView;
 class QLabel;
 class TV;
 class Scheduler;
@@ -14,7 +14,7 @@ class ProgramInfo;
 class MythContext;
 class QDateTimeEdit;
 
-class SetRecTimeDialog : public QDialog
+class SetRecTimeDialog : public MyDialog
 {
     Q_OBJECT
   public:
@@ -45,14 +45,12 @@ class SetRecTimeDialog : public QDialog
 
     Scheduler *sched;
 
-    QListView *lview;
+    MyListView *lview;
 
-    MythContext *m_context;
     ProgramInfo *m_oldproginfo;
     ProgramInfo *m_proginfo;
     QDateTimeEdit *m_startte;
     QDateTimeEdit *m_endte;
-
 };
 
 #endif
