@@ -54,16 +54,16 @@ RemoteFile::~RemoteFile()
         delete sock;
 }
 
-void RemoteFile::Start(bool events)
+void RemoteFile::Start(void)
 {
     if (!controlSock)
     {
-        controlSock = openSocket(true, events);
-        sock = openSocket(false, events);
+        controlSock = openSocket(true);
+        sock = openSocket(false);
     }
 }
 
-QSocket *RemoteFile::openSocket(bool control, bool events)
+QSocketDevice *RemoteFile::openSocket(bool control)
 {
     QUrl qurl(path);
 
@@ -71,33 +71,15 @@ QSocket *RemoteFile::openSocket(bool control, bool events)
     int port = qurl.port();
     QString dir = qurl.path();
 
-    qApp->lock();
-    QSocket *sock = new QSocket();
-    sock->connectToHost(host, port);
-    qApp->unlock();
-
-    int num = 0;
-    while (sock->state() == QSocket::HostLookup ||
-           sock->state() == QSocket::Connecting)
+    QSocketDevice *sock = new QSocketDevice(QSocketDevice::Stream);
+    
+    if (!connectSocket(sock, host, port))
     {
-        if (events)
-            qApp->processEvents();
-
-        usleep(50);
-        num++;
-        if (num > 500)
-        {
-            cerr << host << ": connection timed out.\n";
-            exit(1);
-        }
-    }
-
-    if (sock->state() != QSocket::Connected)
-    {
-        cout << "Could not connect to server\n";
+        cerr << "Could not connect to server\n";
+        delete sock;
         return NULL;
     }
-
+    
     QString hostname = gContext->GetHostName();
 
     QStringList strlist;
@@ -106,7 +88,7 @@ QSocket *RemoteFile::openSocket(bool control, bool events)
     {
         strlist = QString("ANN Playback %1 %2").arg(hostname).arg(false);
         WriteStringList(sock, strlist);
-        ReadStringList(sock, strlist);
+        ReadStringList(sock, strlist, true);
     }
     else
     {
@@ -116,7 +98,7 @@ QSocket *RemoteFile::openSocket(bool control, bool events)
             strlist << dir;
 
             WriteStringList(sock, strlist);
-            ReadStringList(sock, strlist);
+            ReadStringList(sock, strlist, true);
 
             recordernum = strlist[1].toInt();
             filesize = decodeLongLong(strlist, 2);
@@ -126,7 +108,7 @@ QSocket *RemoteFile::openSocket(bool control, bool events)
             strlist = QString("ANN RingBuffer %1 %2").arg(hostname)
                              .arg(recordernum);
             WriteStringList(sock, strlist);
-            ReadStringList(sock, strlist);
+            ReadStringList(sock, strlist, true);
         }
     }
     
@@ -143,7 +125,7 @@ bool RemoteFile::isOpen(void)
     return (sock != NULL && controlSock != NULL);
 }
 
-QSocket *RemoteFile::getSocket(void)
+QSocketDevice *RemoteFile::getSocket(void)
 {
     return sock;
 }
@@ -158,14 +140,24 @@ void RemoteFile::Close(void)
 
     lock.lock();
     WriteStringList(controlSock, strlist);
-    ReadStringList(controlSock, strlist);
+    if (!ReadStringList(controlSock, strlist, true))
+    {
+        cerr << "Remote file timeout.\n";
+    }
+    
     lock.unlock();
 
     qApp->lock();
     if (sock)
-        sock->close();
+    {
+        delete sock;
+        sock = NULL;
+    }    
     if (controlSock)
-        controlSock->close();
+    {
+        delete controlSock;
+        controlSock = NULL;
+    }    
     qApp->unlock();
 }
 
@@ -187,7 +179,8 @@ void RemoteFile::Reset(void)
         qApp->unlock();
         lock.unlock();
 
-        // cerr << avail << " bytes available during reset.\n";
+        VERBOSE(VB_NETWORK, QString ("%1 bytes available during reset.")
+                                      .arg(avail));
         usleep(30000);
     }
 }
@@ -200,9 +193,9 @@ bool RemoteFile::RequestBlock(int size)
 
     lock.lock();
     WriteStringList(controlSock, strlist);
-    ReadStringList(controlSock, strlist);
+    ReadStringList(controlSock, strlist, true);
     lock.unlock();
-
+    
     return strlist[0].toInt();
 }
 
@@ -235,12 +228,12 @@ int RemoteFile::Read(void *data, int size, bool singlefile)
     int ret;
     unsigned tot = 0;
     unsigned zerocnt = 0;
-
+    
     qApp->lock();
-    while (sock->bytesAvailable() < (unsigned)size)
+    while (sock->bytesAvailable() < size)
     {
-        int reqsize = 128000;
-        if (singlefile && size - sock->bytesAvailable() < 128000)
+        int reqsize = 64000;
+        if (singlefile && size - sock->bytesAvailable() < 64000)
             reqsize = size - sock->bytesAvailable();
         qApp->unlock();
 
@@ -256,7 +249,7 @@ int RemoteFile::Read(void *data, int size, bool singlefile)
         qApp->lock();
     }
 
-    if (sock->bytesAvailable() >= (unsigned)size)
+    if (sock->bytesAvailable() >= size)
     {
         ret = sock->readBlock(((char *)data) + tot, size - tot);
         tot += ret;
@@ -268,15 +261,15 @@ int RemoteFile::Read(void *data, int size, bool singlefile)
     return tot;
 }
 
-bool RemoteFile::SaveAs(QByteArray &data, bool events)
+bool RemoteFile::SaveAs(QByteArray &data)
 {
-    Start(events);
+    Start();
 
     if (filesize < 0)
         return false;
 
     data.resize(filesize);
-    Read(data.data(), filesize, events);
+    Read(data.data(), filesize);
 
     return true;
 } 

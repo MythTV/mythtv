@@ -9,6 +9,8 @@
 #include <qptrlist.h>
 #include <qevent.h>
 #include <qmutex.h>
+#include <qsocketdevice.h>
+#include <qnetwork.h> 
 
 #include <vector>
 using namespace std;
@@ -71,7 +73,7 @@ class MythEvent : public QCustomEvent
     QString extradata;
 };
 
-#define MYTH_BINARY_VERSION "0.13.11282003-1"
+#define MYTH_BINARY_VERSION "0.13.12012003-1"
 
 extern int print_verbose_messages;
 
@@ -147,9 +149,9 @@ class MythContext : public QObject
     void dispatch(MythEvent &e);
     void dispatchNow(MythEvent &e);
 
-    bool SendReceiveStringList(QStringList &strlist);
+    bool SendReceiveStringList(QStringList &strlist, bool quickTimeout = false);
 
-    QImage *CacheRemotePixmap(const QString &url, bool needevents = true);
+    QImage *CacheRemotePixmap(const QString &url);
 
     void SetMainWindow(MythMainWindow *mainwin);
     MythMainWindow *GetMainWindow(void);
@@ -159,12 +161,12 @@ class MythContext : public QObject
     bool TestPopupVersion(const QString &name, const QString &libversion,
                           const QString &pluginversion);
 
-    bool IsDoingNetworkStuff(void) { return expectingReply; }
-
     void SetDisableLibraryPopup(bool check) { disablelibrarypopup = check; }
-
+    
   private slots:
-    void readSocket();
+    void EventSocketRead();
+    void EventSocketConnected();
+    void EventSocketClosed();
 
   private:
     void SetPalette(QWidget *widget);
@@ -188,11 +190,9 @@ class MythContext : public QObject
     int m_xbase, m_ybase;
     int m_height, m_width;
 
-    QSocket *serverSock;
     QString m_localhostname;
 
     QMutex serverSockLock;
-    bool expectingReply;
 
     QPtrList<QObject> listeners;
 
@@ -214,7 +214,8 @@ class MythContext : public QObject
 
     int bigfontsize, mediumfontsize, smallfontsize; 
 
-    bool isconnecting;
+    QSocketDevice *serverSock;
+    QSocket *eventSock;
 
     bool disablelibrarypopup;
 };

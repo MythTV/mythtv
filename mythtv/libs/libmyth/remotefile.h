@@ -5,7 +5,7 @@
 #include <qmutex.h>
 
 class MythContext;
-class QSocket;
+class QSocketDevice;
 
 class RemoteFile
 {
@@ -14,10 +14,10 @@ class RemoteFile
                int recordernum = -1);
    ~RemoteFile();
 
-    QSocket *getSocket();
+    QSocketDevice *getSocket();
     bool isOpen(void);
 
-    void Start(bool events = false);
+    void Start(void);
 
     void Close(void);
     bool RequestBlock(int size);
@@ -27,17 +27,17 @@ class RemoteFile
     int Read(void *data, int size, bool singlefile = false);
     void Reset(void);
 
-    bool SaveAs(QByteArray &data, bool events = true);
+    bool SaveAs(QByteArray &data);
 
     long long GetFileSize(void);
 
   private:
-    QSocket *openSocket(bool control, bool events = false);
+    QSocketDevice *openSocket(bool control);
 
     QString path;
 
-    QSocket *sock;
-    QSocket *controlSock;
+    QSocketDevice *sock;
+    QSocketDevice *controlSock;
 
     long long readposition;
     int recordernum;

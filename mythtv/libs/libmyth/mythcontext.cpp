@@ -9,6 +9,9 @@
 #include <qurl.h>
 #include <qnetwork.h>
 
+#include <qsocketdevice.h>
+#include <qhostaddress.h>
+
 #include "mythcontext.h"
 #include "oldsettings.h"
 #include "themedmenu.h"
@@ -39,7 +42,6 @@ MythContext::MythContext(const QString &binversion, bool gui, bool lcd)
     m_settings = new Settings;
     m_qtThemeSettings = new Settings;
 
-    isconnecting = false;
     language = "";
     m_themeloaded = false;
     m_backgroundimage = NULL;
@@ -79,7 +81,14 @@ MythContext::MythContext(const QString &binversion, bool gui, bool lcd)
         m_height = GetNumSetting("GuiHeight");
 
     serverSock = NULL;
-    expectingReply = false;
+    eventSock = new QSocket(0);
+    
+    connect(eventSock, SIGNAL(connected()), 
+             this, SLOT(EventSocketConnected()));
+    connect(eventSock, SIGNAL(readyRead()), 
+             this, SLOT(EventSocketRead()));
+    connect(eventSock, SIGNAL(connectionClosed()), 
+             this, SLOT(EventSocketClosed()));
 
     mainWindow = NULL;
 
@@ -100,11 +109,9 @@ MythContext::~MythContext()
     if (m_qtThemeSettings)
         delete m_qtThemeSettings;
     if (serverSock)
-    {
-        serverSock->close();
         delete serverSock;
-    }
-
+    if (eventSock)
+        delete eventSock;
     if (lcd_device)
         delete lcd_device;
 }
@@ -121,48 +128,19 @@ bool MythContext::ConnectServer(const QString &hostname, int port)
     if (serverSock)
         return true;
 
-    isconnecting = true;
-
-    serverSock = new QSocket();
-
     VERBOSE(VB_GENERAL, QString("Connecting to backend server: %1:%2")
             .arg(hostname).arg(port));
 
-    serverSock->connectToHost(hostname, port);
-
-    int num = 0;
-    while (serverSock->state() == QSocket::HostLookup ||
-           serverSock->state() == QSocket::Connecting)
+    serverSock = new QSocketDevice(QSocketDevice::Stream);
+   
+    if (!connectSocket(serverSock, hostname, port))
     {
-        qApp->processEvents();
-        usleep(50);
-        num++;
-        if (num > 100)
-        {
-            cerr << "Connection timed out.\n";
-            cerr << "You probably should modify the Master Server settings\n";
-            cerr << "in the setup program and set the proper IP address.\n";
-            if (m_height && m_width)
-            {
-                MythPopupBox::showOkPopup(mainWindow, "connection failure",
-                                          tr("Connection to the master backend "
-                                             "server timed out.  You probably "
-                                             "should modify the Master Server "
-                                             "setting in the setup program and "
-                                             "set the proper IP address "
-                                             "there."));
-            }
-            serverSock->close();
-            delete serverSock;
-            serverSock = NULL;
-            isconnecting = false;
-            return false;
-        }
-    }
-
-    if (serverSock->state() != QSocket::Connected)
-    {
-        cout << "Could not connect to backend server\n";
+        delete serverSock;
+        serverSock = NULL;
+        
+        cerr << "Connection timed out.\n";
+        cerr << "You probably should modify the Master Server settings\n";
+        cerr << "in the setup program and set the proper IP address.\n";
         if (m_height && m_width)
         {
             MythPopupBox::showOkPopup(mainWindow, "connection failure",
@@ -171,21 +149,17 @@ bool MythContext::ConnectServer(const QString &hostname, int port)
                                          "the IP address set for it in the "
                                          "setup program correct?"));
         }
-        serverSock->close();
-        delete serverSock;
-        serverSock = NULL;
-        isconnecting = false;
+        
         return false;
     }
-
-    QString str = QString("ANN Playback %1 %2").arg(m_localhostname).arg(true);
+    
+    QString str = QString("ANN Playback %1 %2").arg(m_localhostname).arg(false);
     QStringList strlist = str;
     WriteStringList(serverSock, strlist);
-    ReadStringList(serverSock, strlist);
-
-    connect(serverSock, SIGNAL(readyRead()), this, SLOT(readSocket()));
-    isconnecting = false;
-
+    ReadStringList(serverSock, strlist, true);
+    
+    eventSock->connectToHost(hostname, port);
+    
     return true;
 }
 
@@ -195,9 +169,9 @@ QString MythContext::GetMasterHostPrefix(void)
 
     if (!serverSock)
         ConnectToMasterServer();
-
+    
     if (serverSock)
-        ret = QString("myth://%1:%2/").arg(serverSock->peerName())
+        ret = QString("myth://%1:%2/").arg(serverSock->peerAddress().toString())
                                       .arg(serverSock->peerPort());
     return ret;
 }
@@ -945,7 +919,7 @@ QPixmap *MythContext::LoadScalePixmap(QString filename, bool fromcache)
     return ret;
 }
 
-QImage *MythContext::CacheRemotePixmap(const QString &url, bool needevents)
+QImage *MythContext::CacheRemotePixmap(const QString &url)
 {
     QUrl qurl = url;
     if (qurl.host() == "")
@@ -959,7 +933,7 @@ QImage *MythContext::CacheRemotePixmap(const QString &url, bool needevents)
     RemoteFile *rf = new RemoteFile(url, true);
 
     QByteArray data;
-    bool ret = rf->SaveAs(data, needevents);
+    bool ret = rf->SaveAs(data);
 
     delete rf;
 
@@ -981,74 +955,68 @@ void MythContext::SetSetting(const QString &key, const QString &newValue)
     m_settings->SetSetting(key, newValue);
 }
 
-bool MythContext::SendReceiveStringList(QStringList &strlist)
+bool MythContext::SendReceiveStringList(QStringList &strlist, bool quickTimeout)
 {
-    if (isconnecting)
-        return false;
-
+    serverSockLock.lock();
+    
     if (!serverSock)
         ConnectToMasterServer();
 
-    if (!serverSock)
-        return false;
-
-    serverSockLock.lock();
-    expectingReply = true;
-
-    WriteStringList(serverSock, strlist);
-    bool ok = ReadStringList(serverSock, strlist);
-
-    while (ok && strlist[0] == "BACKEND_MESSAGE")
+    bool ok = false;
+    
+    if (serverSock)
     {
-        // oops, not for us
-        QString message = strlist[1];
-        QString extra = strlist[2];
+        WriteStringList(serverSock, strlist);
+        ok = ReadStringList(serverSock, strlist, quickTimeout);
 
-        MythEvent me(message, extra);
-        dispatch(me);
+        // this should be obsolete...
+        while (ok && strlist[0] == "BACKEND_MESSAGE")
+        {
+            // oops, not for us
+            cerr << "SRSL you shouldn't see this!!";
+            QString message = strlist[1];
+            QString extra = strlist[2];
 
-        ok = ReadStringList(serverSock, strlist);
-    }
+            MythEvent me(message, extra);
+            dispatch(me);
 
-    if (!ok)
-    {
-        qApp->lock();
-        cout << "Connection to backend server lost\n";
-        MythPopupBox::showOkPopup(mainWindow, "connection failure",
-                                  tr("The connection to the master backend "
-                                     "server has gone away for some reason.. "
-                                     "Is it running?"));
+            ok = ReadStringList(serverSock, strlist, quickTimeout);
+        }
+        // .
 
-        serverSock->close();
-        delete serverSock;
-        serverSock = NULL;
-        qApp->unlock();
-    }
+        if (!ok)
+        {
+            qApp->lock();
+            cout << "Connection to backend server lost\n";
+            MythPopupBox::showOkPopup(mainWindow, "connection failure",
+                             tr("The connection to the master backend "
+                                "server has gone away for some reason.. "
+                                "Is it running?"));
 
-    expectingReply = false;
+            delete serverSock;
+            serverSock = NULL;
+            qApp->unlock();
+        }
+    }    
+
     serverSockLock.unlock();
-
+    
     return ok;
 }
 
-void MythContext::readSocket(void)
+void MythContext::EventSocketRead(void)
 {
-    if (expectingReply)
-        return;
-
-    serverSockLock.lock();
-
-    while (serverSock->state() == QSocket::Connected &&
-           serverSock->bytesAvailable() > 0)
+    while (eventSock->state() == QSocket::Connected &&
+           eventSock->bytesAvailable() > 0)
     {
         QStringList strlist;
-        if (!ReadStringList(serverSock, strlist))
+        if (!ReadStringList(eventSock, strlist))
             continue;
 
         QString prefix = strlist[0];
         QString message = strlist[1];
         QString extra = strlist[2];
-
+        
         if (prefix != "BACKEND_MESSAGE")
         {
             cerr << "Received a: " << prefix << " message from the backend\n";
@@ -1060,8 +1028,19 @@ void MythContext::readSocket(void)
             dispatch(me);
         }
     }
+}
 
-    serverSockLock.unlock();
+void MythContext::EventSocketConnected(void)
+{
+    QString str = QString("ANN Playback %1 %2").arg(m_localhostname).arg(true);
+    QStringList strlist = str;
+    WriteStringList(eventSock, strlist);
+    ReadStringList(eventSock, strlist);
+}
+
+void MythContext::EventSocketClosed(void)
+{
+    cerr << "Errm, event socket just closed.\n";
 }
 
 void MythContext::addListener(QObject *obj)

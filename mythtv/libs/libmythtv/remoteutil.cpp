@@ -166,7 +166,7 @@ RemoteEncoder *RemoteRequestRecorder(void)
 {
     QStringList strlist = "GET_FREE_RECORDER";
 
-    if (!gContext->SendReceiveStringList(strlist))
+    if (!gContext->SendReceiveStringList(strlist, true))
         return NULL;
 
     int num = strlist[0].toInt();

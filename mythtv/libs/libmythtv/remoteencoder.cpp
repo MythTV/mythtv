@@ -54,45 +54,34 @@ void RemoteEncoder::SendReceiveStringList(QStringList &strlist)
     pthread_mutex_lock(&lock);
 
     WriteStringList(controlSock, strlist);
-    ReadStringList(controlSock, strlist);
+    if (!ReadStringList(controlSock, strlist, true))
+    {
+        cerr << "Remote encoder not responding.\n";
+    }
 
     pthread_mutex_unlock(&lock);
 }
 
-QSocket *RemoteEncoder::openControlSocket(const QString &host, short port)
+QSocketDevice *RemoteEncoder::openControlSocket(const QString &host, short port)
 {
-    qApp->lock();
-    QSocket *sock = new QSocket();
-    sock->connectToHost(host, port);
-    qApp->unlock();
-
-    int num = 0;
-    while (sock->state() == QSocket::HostLookup ||
-           sock->state() == QSocket::Connecting)
+    QSocketDevice *sock = new QSocketDevice(QSocketDevice::Stream);
+    if (!connectSocket(sock, host, port))
     {
-        usleep(50);
-        num++;
-        if (num > 100)
-        {
-            cerr << "Connection timed out.\n";
-            exit(0);
-        }
+        cerr << "Connection timed out.\n";
+        delete sock;
+        sock = NULL;
     }
-
-    if (sock->state() != QSocket::Connected)
+    else
     {
-        VERBOSE(VB_GENERAL, "Could not connect to server");
-        return NULL;
-    }
-
-    QString hostname = gContext->GetHostName();
+        QString hostname = gContext->GetHostName();
  
-    QStringList strlist;
+        QStringList strlist;
 
-    strlist = QString("ANN Playback %1 %2").arg(hostname).arg(false);
-    WriteStringList(sock, strlist);
-    ReadStringList(sock, strlist);
-
+        strlist = QString("ANN Playback %1 %2").arg(hostname).arg(false);
+        WriteStringList(sock, strlist);
+        ReadStringList(sock, strlist, true);
+    }    
+    
     return sock;
 }
 

@@ -10,6 +10,17 @@ class QImage;
 class QPainter;
 class QFont;
 
+// QSockectDevice (frontend)
+bool connectSocket(QSocketDevice *socket, const QString &host, int port);
+
+bool WriteStringList(QSocketDevice *socket, QStringList &list);
+bool ReadStringList(QSocketDevice *socket, QStringList &list,
+                    bool quickTimeout = false);
+
+bool WriteBlock(QSocketDevice *socket, void *data, int len);
+int ReadBlock(QSocketDevice *socket, void *data, int maxlen);
+
+// QSockect (backend)
 bool WriteStringList(QSocket *socket, QStringList &list);
 bool ReadStringList(QSocket *socket, QStringList &list);
 

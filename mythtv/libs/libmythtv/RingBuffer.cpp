@@ -351,7 +351,10 @@ void RingBuffer::Init(void)
     fill_threshold = -1;
     fill_min = -1;
 
-    readblocksize = 128000;
+    readblocksize = 64000; // we only have max. 130k socket buffer size
+                           // we request readblocksize * 2
+                           // averages ~100k/read
+//  readblocksize = 128000;
     requestedbytes = 0;
 
     recorder_num = 0;
@@ -481,11 +484,11 @@ int RingBuffer::safe_read(RemoteFile *rf, void *data, unsigned sz)
     bool hiteof = false;
     int reqsize = readblocksize;
 
-    QSocket *sock = rf->getSocket();
+    QSocketDevice *sock = rf->getSocket();
 
     do 
     {
-        if (requestedbytes > reqsize * 3)
+        if (requestedbytes >= reqsize * 2)
             break;
 
         if (rf->RequestBlock(reqsize))
@@ -496,11 +499,9 @@ int RingBuffer::safe_read(RemoteFile *rf, void *data, unsigned sz)
         }
         requestedbytes += reqsize;
     }
-    while (requestedbytes <= reqsize * 2);
- 
-    qApp->lock();
+    while (requestedbytes < reqsize * 2);
+    
     unsigned int available = sock->bytesAvailable();
-    qApp->unlock();
 
     while (available < sz) 
     {
@@ -515,9 +516,7 @@ int RingBuffer::safe_read(RemoteFile *rf, void *data, unsigned sz)
         if (stopreads)
             break;
 
-        qApp->lock();
         available = sock->bytesAvailable();
-        qApp->unlock();
 
         if (available >= sz)
             break;
@@ -525,16 +524,12 @@ int RingBuffer::safe_read(RemoteFile *rf, void *data, unsigned sz)
         usleep(100);
     }
 
-    qApp->lock();
     available = sock->bytesAvailable();
-    qApp->unlock();
 
     while (available > 0 && tot < sz && !stopreads)
     {
-        qApp->lock();
         ret = sock->readBlock(((char *)data) + tot, sz - tot);
         available = sock->bytesAvailable();
-        qApp->unlock();
 
         tot += ret;
     }
@@ -610,7 +605,6 @@ int RingBuffer::ReadBufAvail(void)
         ret = rbwpos - rbrpos;
     else
         ret = READ_AHEAD_SIZE - rbrpos + rbwpos;
-
     readAheadLock.unlock();
     return ret;
 }
