@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-02-24, v1.099
+  2003-02-28, v1.100
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -2579,14 +2579,6 @@
   However, if you are upgrading an existing 0.7 system, you [4mmust[24m run the
   database/0-7-to-0-8.sql script before running the setup program to
   ensure that the database structure is up to date.
-
-  Next, you must edit the /usr/local/share/mythtv/backend_settings.txt
-  file.  Specify the IP address or hostname of the back-end server and
-  port.  You may specify localhost if the front-end and back-end
-  programs will be running on the same machine.  This file is read by
-  the backend server during start-up.
-
-  [1mNOTE[22m:  Do not change the port settings.  Leave them as-is.
 
   Once you're done editing the file, start the setup program:
 
