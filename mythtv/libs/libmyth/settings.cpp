@@ -19,7 +19,6 @@
 #include <qtabdialog.h>
 #include <qfile.h>
 #include <qlistview.h>
-#include <qcursor.h>
 #include <qapplication.h>
 #include <qwidget.h>
 #include <unistd.h>
@@ -648,7 +647,6 @@ int ConfigurationDialog::exec(QSqlDatabase* db, bool saveOnAccept)
     load(db);
 
     MythDialog* dialog = dialogWidget(gContext->GetMainWindow());
-    dialog->setCursor(QCursor(Qt::ArrowCursor));
     dialog->Show();
 
     int ret;
@@ -1008,7 +1006,6 @@ int ConfigurationPopupDialog::exec(QSqlDatabase* db, bool saveOnAccept)
     load(db);
 
     dialog = (ConfigPopupDialogWidget*)dialogWidget(gContext->GetMainWindow());
-    dialog->setCursor(QCursor(Qt::ArrowCursor));
     dialog->ShowPopup(this);
 
     int ret;

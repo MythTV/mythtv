@@ -1764,39 +1764,24 @@ void ProgramInfo::FillInRecordInfo(vector<ProgramInfo *> &reclist)
 
 void ProgramInfo::Save(QSqlDatabase *db)
 {
-    QString querystr;
-    QString escaped_title;
-    QString escaped_subtitle;
-    QString escaped_description;
-    QString escaped_category;
+    QSqlQuery query(QString::null, db);
 
-    escaped_title = title;
-    escaped_title.replace(QRegExp("\""), QString("\\\""));
+    query.prepare("REPLACE INTO program (chanid,starttime,endtime,"
+                  "title,subtitle,description,category,airdate,"
+                  "stars) VALUES(:CHANID,:STARTTIME,:ENDTIME,:TITLE,"
+                  ":SUBTITLE,:DESCRIPTION,:CATEGORY,:AIRDATE,:STARS);");
+    query.bindValue(":CHANID", chanid.toInt());
+    query.bindValue(":STARTTIME", startts.toString("yyyyMMddhhmmss"));
+    query.bindValue(":ENDTIME", endts.toString("yyyyMMddhhmmss"));
+    query.bindValue(":TITLE", title.utf8());
+    query.bindValue(":SUBTITLE", subtitle.utf8());
+    query.bindValue(":DESCRIPTION", description.utf8());
+    query.bindValue(":CATEGORY", category.utf8());
+    query.bindValue(":AIRDATE", "0");
+    query.bindValue(":STARS", "0");
 
-    escaped_subtitle = subtitle;
-    escaped_subtitle.replace(QRegExp("\""), QString("\\\""));
-
-    escaped_description = description;
-    escaped_description.replace(QRegExp("\""), QString("\\\""));
-
-    escaped_category = category;
-    escaped_category.replace(QRegExp("\""), QString("\\\""));
-
-    querystr.sprintf("INSERT INTO program (chanid,starttime,endtime,"
-                    "title,subtitle,description,category,airdate,"
-                    "stars) VALUES(%d,\"%s\",\"%s\",\"%s\",\"%s\", "
-                    "\"%s\",\"%s\",\"%s\",\"%s\");",
-                    chanid.toInt(),
-                    startts.toString("yyyyMMddhhmmss").ascii(),
-                    endts.toString("yyyyMMddhhmmss").ascii(),
-                    escaped_title.utf8().data(),
-                    escaped_subtitle.utf8().data(),
-                    escaped_description.utf8().data(),
-                    escaped_category.utf8().data(),
-                    "0",
-                    "0");
-
-    QSqlQuery query = db->exec(querystr.utf8().data());
+    if (!query.exec())
+        MythContext::DBError("Saving program", query);
 }
 
 QGridLayout* ProgramInfo::DisplayWidget(QWidget *parent)

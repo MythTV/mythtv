@@ -215,7 +215,6 @@ int ProfileGroupEditor::exec(QSqlDatabase* db) {
     QVBoxLayout* layout = new QVBoxLayout(dialog, (int)(20 * hmult));
     layout->addWidget(configWidget(NULL, dialog));
 
-    dialog->setCursor(QCursor(Qt::ArrowCursor));
     dialog->Show();
 
     ret = dialog->exec();
