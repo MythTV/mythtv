@@ -2958,7 +2958,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>CD/DVDを監視する</translation>
     </message>
     <message>
-        <source>This enables support for monitoring your CD/DVD drives for new disks and launchingthe proper plugin to handle them.</source>
+        <source>This enables support for monitoring your CD/DVD drives for new disks and launching the proper plugin to handle them.</source>
         <translation>CD/DVDドライブを監視して，ディスクが挿入された時にプラグインを起動します．</translation>
     </message>
     <message>

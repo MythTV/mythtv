@@ -2121,7 +2121,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This enables support for monitoring your CD/DVD drives for new disks and launchingthe proper plugin to handle them.</source>
+        <source>This enables support for monitoring your CD/DVD drives for new disks and launching the proper plugin to handle them.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

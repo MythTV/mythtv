@@ -2121,7 +2121,7 @@
         <translation>CD/DVD Lw beobachten</translation>
     </message>
     <message>
-        <source>This enables support for monitoring your CD/DVD drives for new disks and launchingthe proper plugin to handle them.</source>
+        <source>This enables support for monitoring your CD/DVD drives for new disks and launching the proper plugin to handle them.</source>
         <translation>Dies aktiviert die Unterstützung zur Überwachung Ihrer CD/DVD Laufwerke für neue Medien und den Start passender Plugins für deren Handhabung.</translation>
     </message>
     <message>
