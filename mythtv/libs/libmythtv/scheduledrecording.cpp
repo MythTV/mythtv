@@ -440,9 +440,9 @@ void ScheduledRecording::addHistory(const ProgramInfo& proginfo)
 
     result.prepare("REPLACE INTO oldrecorded (chanid,starttime,"
                    "endtime,title,subtitle,description,category,"
-                   "seriesid,programid,findid) "
+                   "seriesid,programid,findid,recordid) "
                    "VALUES(:CHANID,:START,:END,:TITLE,:SUBTITLE,:DESC,"
-                   ":CATEGORY,:SERIESID,:PROGRAMID,:FINDID);");
+                   ":CATEGORY,:SERIESID,:PROGRAMID,:FINDID,:RECORDID);");
     result.bindValue(":CHANID", proginfo.chanid);
     result.bindValue(":START", proginfo.recstartts.toString(Qt::ISODate));
     result.bindValue(":END", proginfo.recendts.toString(Qt::ISODate));
@@ -453,6 +453,7 @@ void ScheduledRecording::addHistory(const ProgramInfo& proginfo)
     result.bindValue(":SERIESID", proginfo.seriesid.utf8());
     result.bindValue(":PROGRAMID", proginfo.programid.utf8());
     result.bindValue(":FINDID", proginfo.findid);
+    result.bindValue(":RECORDID", proginfo.recordid);
 
     result.exec();
 
@@ -487,12 +488,23 @@ void ScheduledRecording::forgetHistory(const ProgramInfo& proginfo)
     {
         MythContext::DBError("forgetHistory", result);
     }
-    else
+
+    if (proginfo.findid)
     {
-        // The removal of an entry from oldrecorded may affect near-future
-        // scheduling decisions, so recalculate
-        signalChange(0);
+        result.prepare("UPDATE oldrecorded SET findid = 0 WHERE "
+                       "recordid = :RECORDID AND findid = :FINDID");
+        result.bindValue(":RECORDID", proginfo.recordid);
+        result.bindValue(":FINDID", proginfo.findid);
+    
+        result.exec();
+        if (!result.isActive())
+        {
+            MythContext::DBError("forgetFindHistory", result);
+        }
     }
+    // The removal of an entry from oldrecorded may affect near-future
+    // scheduling decisions, so recalculate
+    signalChange(0);
 }
 
 
