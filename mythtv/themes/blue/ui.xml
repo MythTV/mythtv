@@ -194,6 +194,7 @@
         <recordstatus type="ChannelRecord" image="gg-rs-channel.png"></recordstatus>
         <recordstatus type="AllRecord" image="gg-rs-all.png"></recordstatus>
         <recordstatus type="WeekslotRecord" image="gg-rs-weekslot.png"></recordstatus>
+        <recordstatus type="FindOneRecord" image="gg-rs-findone.png"></recordstatus>
         <arrow direction="left" image="gg-arrow-left.png"></arrow>
         <arrow direction="right" image="gg-arrow-right.png"></arrow>
         <font>descinfo</font>
@@ -433,6 +434,7 @@
         <recordstatus type="ChannelRecord" image="gg-rs-channel.png"></recordstatus>
         <recordstatus type="AllRecord" image="gg-rs-all.png"></recordstatus>
         <recordstatus type="WeekslotRecord" image="gg-rs-weekslot.png"></recordstatus>
+        <recordstatus type="FindOneRecord" image="gg-rs-findone.png"></recordstatus>
         <arrow direction="left" image="gg-arrow-left.png"></arrow>
         <arrow direction="right" image="gg-arrow-right.png"></arrow>
         <font>descinfo</font>
