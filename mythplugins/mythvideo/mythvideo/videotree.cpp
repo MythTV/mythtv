@@ -328,6 +328,11 @@ void VideoTree::buildVideoList()
         }
         else if (query.numRowsAffected() > 0)
         {
+            QString prefix = gContext->GetSetting("VideoStartupDir");
+            if(prefix.length() < 1)
+            {
+                  cerr << "videotree.o: Seems unlikely that this is going to work" << endl;
+            }
             while (query.next())
             {
                 unsigned int idnum = query.value(0).toUInt();
@@ -342,11 +347,7 @@ void VideoTree::buildVideoList()
                 if (myData->ShowLevel() <= current_parental_level && myData->ShowLevel() != 0)
                 {
                     QString file_string = myData->Filename();
-                    QString prefix = gContext->GetSetting("VideoStartupDir");
-                    if(prefix.length() < 1)
-                    {
-                        cerr << "videotree.o: Seems unlikely that this is going to work" << endl;
-                    }
+
                     file_string.remove(0, prefix.length());
                     QStringList list(QStringList::split("/", file_string));
 
