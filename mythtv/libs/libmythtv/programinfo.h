@@ -34,8 +34,12 @@ class ProgramInfo
     // returns 0 for one-time, 1 for weekdaily, 2 for weekly
     int IsProgramRecurring(void);
 
+    // checks title, subtitle, description
     bool IsSameProgram(const ProgramInfo& other) const;
+    // checks chanid, start/end times, sourceid, cardid, inputid.
     bool IsSameTimeslot(const ProgramInfo& other) const;
+    // checks chanid, start/end times, sourceid
+    bool IsSameProgramTimeslot(const ProgramInfo& other) const;
 
     void Save(void);
 

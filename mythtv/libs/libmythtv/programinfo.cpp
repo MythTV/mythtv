@@ -542,6 +542,16 @@ bool ProgramInfo::IsSameTimeslot(const ProgramInfo& other) const
         return false;
 }
 
+bool ProgramInfo::IsSameProgramTimeslot(const ProgramInfo &other) const
+{
+    if (chanid == other.chanid &&
+        startts == other.startts &&
+        endts == other.endts &&
+        sourceid == other.sourceid)
+        return true;
+    return false;
+}
+
 QString ProgramInfo::GetRecordBasename(void)
 {
     QString starts = startts.toString("yyyyMMddhhmm");

@@ -6,4 +6,4 @@ TEMPLATE = subdirs
 
 # Directories
 SUBDIRS += mythepg mythprogfind menutest mythfilldatabase mythtranscode 
-SUBDIRS += mythtv mythbackend mythfrontend mythcommflag
+SUBDIRS += mythtv mythbackend mythfrontend mythcommflag mythlcd

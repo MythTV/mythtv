@@ -84,6 +84,11 @@ class Scheduler : public QObject
     pthread_mutex_t schedulerLock;
 
     bool threadrunning;
+
+    void AddToDontRecord(ProgramInfo *pginfo);
+    void PruneDontRecords(void);
+
+    QValueList<ProgramInfo> dontRecordList;
 };
 
 #endif

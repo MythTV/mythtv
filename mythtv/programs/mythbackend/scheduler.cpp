@@ -155,6 +155,8 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
         recordingList.pop_back();
     }
 
+    PruneDontRecords();
+
     ScheduledRecording::findAllProgramsToRecord(db, recordingList);
 
     QMap<QString, bool> foundlist;
@@ -204,9 +206,9 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
         MarkConflictsToRemove();
         if (doautoconflicts)
         {
-            RemoveConflicts();
+            //RemoveConflicts();
             GuessConflicts();
-            RemoveConflicts();
+            //RemoveConflicts();
         }
         MarkConflicts();
     }
@@ -230,6 +232,38 @@ void Scheduler::PrintList(void)
     }
 
     cout << "---  print list end  ---\n";
+}
+
+void Scheduler::AddToDontRecord(ProgramInfo *pginfo)
+{
+    bool found = false;
+
+    QValueList<ProgramInfo>::Iterator dreciter = dontRecordList.begin();
+    for (; dreciter != dontRecordList.end(); ++dreciter)
+    {
+        if ((*dreciter).IsSameProgramTimeslot(*pginfo))
+        {
+            found = true;
+            break;
+        }
+    }
+
+    if (!found)
+        dontRecordList.append(*pginfo);
+}
+
+void Scheduler::PruneDontRecords(void)
+{
+    QDateTime curtime = QDateTime::currentDateTime();
+
+    QValueList<ProgramInfo>::Iterator dreciter = dontRecordList.begin();
+    while (dreciter != dontRecordList.end())
+    {
+        if ((*dreciter).endts < curtime)
+            dreciter = dontRecordList.remove(dreciter);
+        else
+            dreciter++;
+    }
 }
 
 void Scheduler::RemoveRecording(ProgramInfo *pginfo)
@@ -334,6 +368,18 @@ void Scheduler::PruneList(void)
         }
 
         bool removed = false;
+
+        // check the "don't record" list (deleted programs, already started
+        // conflicting programs, etc.
+
+        QValueList<ProgramInfo>::Iterator dreciter = dontRecordList.begin();
+        for (; dreciter != dontRecordList.end(); ++dreciter)
+        {
+            if ((*dreciter).IsSameProgramTimeslot(*rec))
+            {
+                rec->recording = false;
+            }
+        }
 
         QMap<int, EncoderLink *>::Iterator enciter = m_tvList->begin();
         for (; enciter != m_tvList->end(); ++enciter)
@@ -698,7 +744,7 @@ void Scheduler::GuessConflicts(void)
         ProgramInfo *first = (*i);
         if (first->recording && first->conflicting)
         {
-            list<ProgramInfo *> *conflictList = getConflicting(first);
+            list<ProgramInfo *> *conflictList = getConflicting(first, true);
             GuessSingle(first, conflictList);
             delete conflictList;
         }
@@ -967,6 +1013,8 @@ void Scheduler::RunScheduler(void)
             nextrectime = nextRecording->startts;
             secsleft = curtime.secsTo(nextrectime);
 
+            bool recording = nextRecording->recording;
+
 //            VERBOSE(secsleft << " seconds until " << nextRecording->title);
 
             if (secsleft > 35)
@@ -981,7 +1029,7 @@ void Scheduler::RunScheduler(void)
             // cerr << "nexttv = " << nextRecording->cardid;
             // cerr << " title: " << nextRecording->title << endl;
 
-            if (nexttv->GetState() == kState_WatchingLiveTV &&
+            if (recording && nexttv->GetState() == kState_WatchingLiveTV &&
                 secsleft <= 30 && secsleft > 0)
             {
                 QString id = nextRecording->schedulerid; 
@@ -993,7 +1041,7 @@ void Scheduler::RunScheduler(void)
                 }
             }
 
-            if (secsleft <= -2)
+            if (recording && secsleft <= -2)
             {
                 if (responseList.contains(nextRecording->schedulerid) &&
                     responseList[nextRecording->schedulerid] == false)
@@ -1008,12 +1056,23 @@ void Scheduler::RunScheduler(void)
                     << "\" on channel: " << nextRecording->chanid.toInt()-1000
                     << " on cardid: " << nextRecording->cardid << ", sourceid: "
                     << nextRecording->sourceid);
+                    AddToDontRecord(nextRecording);
                     RemoveRecording(nextRecording);
                     nextRecording = NULL;
                     recIter = recordingList.begin();
                     resetIter = true;
                 }
             }
+ 
+            if (!recording && secsleft <= -2)
+            {
+                AddToDontRecord(nextRecording);
+                RemoveRecording(nextRecording);
+                nextRecording = NULL;
+                recIter = recordingList.begin();
+                resetIter = true;
+            }
+
             if (resetIter)
                 resetIter = false;
             else
