@@ -229,7 +229,11 @@ void MainServer::ProcessRequest(QStringList &listline, QStringList &tokens,
     }
     else if (command == "GET_FREE_RECORDER")
     {
-        HandleGetFreeRecorder(pbs);
+        if (tokens.size() != 2)
+            cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+                 << " Bad GET_FREE_RECORDER" << endl;
+        else
+            HandleGetFreeRecorder(tokens[1], pbs);
     }
     else if (command == "QUERY_RECORDER")
     {
@@ -910,23 +914,34 @@ void MainServer::HandleGetConflictingRecordings(QStringList &slist,
     delete pginfo;
 }
 
-void MainServer::HandleGetFreeRecorder(PlaybackSock *pbs)
+void MainServer::HandleGetFreeRecorder(QString prefhost, PlaybackSock *pbs)
 {
     QStringList strlist;
     int retval = -1;
 
     EncoderLink *encoder = NULL;
+    QString enchost;
 
     QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
     for (; iter != encoderList->end(); ++iter)
     {
         EncoderLink *elink = iter.data();
 
-        if (elink->isConnected() && !elink->isBusy())
+        if (elink->isLocal())
+            enchost = gContext->GetHostName();
+        else
+            enchost = elink->getHostname();
+
+        if (enchost == prefhost && elink->isConnected() && !elink->isBusy())
         {
             encoder = elink;
             retval = iter.key();
             break;
+        }
+        if (retval == -1 && elink->isConnected() && !elink->isBusy())
+        {
+            encoder = elink;
+            retval = iter.key();
         }
     }
 
