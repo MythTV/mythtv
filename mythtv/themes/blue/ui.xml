@@ -1320,7 +1320,7 @@
         <column number="3" width="110" context="0"></column>
         <column number="4" width="110" context="1"></column>
         <items>7</items>
-        <image function="selectionbar" filename="bar.png" location="-13,-7"></image>
+        <image function="selectionbar" filename="bar.png" location="-20,-13"></image>
         <image function="uparrow" filename="uparrow.png" location="743,12"></image>
         <image function="downarrow" filename="downarrow.png" location="743,251"></image>
       </listarea>
