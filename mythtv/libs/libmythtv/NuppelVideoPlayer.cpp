@@ -1163,6 +1163,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
     int laudiotime;
     int delay, avsync_delay;
 
+    int delay_clipping = 0;
     struct timeval nexttrigger, now; 
 
     gettimeofday(&nexttrigger, NULL);
@@ -1260,15 +1261,35 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         delay = (nexttrigger.tv_sec - now.tv_sec) * 1000000 +
                 (nexttrigger.tv_usec - now.tv_usec); // uSecs
 
+
+	/* If delay is something silly, like > 200ms or < 0ms, 
+	   we clip it to these amounts. */
         if ( delay > 200000 )
         {
             cout << "Delaying to next trigger: " << delay << endl;
             delay = 200000;
+	    delay_clipping = 1;
         }
 
         /* trigger */
         if (delay > 0)
             usleep(delay);
+	else
+	    delay_clipping = 1;
+
+	/* The time right now is a good approximation of nexttrigger. */
+	/* It's not perfect, because usleep() is only pseudo-
+	   approximate about waking us up. So we jitter a few ms. */
+	/* The value of nexttrigger is perfect -- we calculated it to
+	   be exactly one frame time after the previous frame,
+	   plus just enough feedback to stay synchronized with audio. */
+	/* UNLESS... we had to clip. In this case, resync nexttrigger
+	   with the wall clock. */
+	if(delay_clipping)
+	{
+	    gettimeofday(&nexttrigger, NULL);
+	    delay_clipping = 0;
+	}
 
         if (!disablevideo)
         {
