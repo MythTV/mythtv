@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2005-02-, v0.17.00
+  2005-02-05, v0.17.00
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -1209,7 +1209,7 @@
 
 
   ______________________________________________________________________
-  NOTE:  Qt v3.1 is required.
+  NOTE:  Qt v3.1 or higher is required.
 
   NOTE:  If you are going to be using RPMs to install various
   components, you should be aware that not all packages include the necessary
@@ -1219,14 +1219,6 @@
   NOTE:  Other than where noted, Mandrake 9.1 and 10.0 users may follow the
   Mandrake 9.0 instructions.
   ______________________________________________________________________
-
-
-  There appears to be issues with ALSA and simultaneously recording and
-  playing sound, which is a core requirement for MythTV.  If you are not
-  running ALSA 0.9.0rc6 or higher and experience lock-ups of your system
-  when trying to use MythTV, then please check the main ALSA website and
-  upgrade to the latest version, or see if your distribution has already
-  packaged the latest ALSA drivers.
 
 
   [1m3.2.3.  Graphical installation tools[0m
@@ -1290,6 +1282,7 @@
   from the command line.
 
 
+
   [1m3.2.4.1.  Mandrake[0m
 
   [1murpmi [22mis the simplest tool for installation of packages from the
@@ -1347,7 +1340,7 @@
   comment. The line should have at least:
 
 
-  USE="mysql alsa"
+       USE="mysql alsa"
 
 
 
@@ -1394,25 +1387,24 @@
   and executing:
 
 
-
-  sh-2.05b# apt-get build-dep mythtv
-  Reading Package Lists...
-  Building Dependency Tree...
-  The following NEW packages will be installed:
-    debconf-utils debhelper file fontconfig gettext html2text intltool-debian
-    libaudio2 libexpat1 libfontconfig1 libfontconfig1-dev libfreetype6
-    libfreetype6-dev libglib2.0-0 libjpeg62 libjpeg62-dev liblame-dev liblame0
-    liblcms1 liblcms1-dev libmagic1 libmng-dev libmng1 libmysqlclient-dev
-    libmysqlclient12 libogg-dev libogg0 libpng12-0 libpng12-dev libqt3-headers
-    libqt3-mt-dev libqt3c102-mt libvorbis-dev libvorbis0a libvorbisenc2
-    libvorbisfile3 libxcursor-dev libxcursor1 libxft2 libxft2-dev libxrender-dev
-    libxrender1 mysql-common pkg-config po-debconf qt3-dev-tools xfree86-common
-    xlibmesa-gl-dev xlibmesa-glu-dev xlibmesa3-gl xlibmesa3-glu xlibs xlibs-dev
-    zlib1g-dev
-  0 upgraded, 54 newly installed, 0 to remove and 0 not upgraded.
-  Need to get 0B/24.0MB of archives.
-  After unpacking 78.7MB of additional disk space will be used.
-  Do you want to continue? [Y/n]
+       sh-2.05b# apt-get build-dep mythtv
+       Reading Package Lists...
+       Building Dependency Tree...
+       The following NEW packages will be installed:
+         debconf-utils debhelper file fontconfig gettext html2text intltool-debian
+         libaudio2 libexpat1 libfontconfig1 libfontconfig1-dev libfreetype6
+         libfreetype6-dev libglib2.0-0 libjpeg62 libjpeg62-dev liblame-dev liblame0
+         liblcms1 liblcms1-dev libmagic1 libmng-dev libmng1 libmysqlclient-dev
+         libmysqlclient12 libogg-dev libogg0 libpng12-0 libpng12-dev libqt3-headers
+         libqt3-mt-dev libqt3c102-mt libvorbis-dev libvorbis0a libvorbisenc2
+         libvorbisfile3 libxcursor-dev libxcursor1 libxft2 libxft2-dev libxrender-dev
+         libxrender1 mysql-common pkg-config po-debconf qt3-dev-tools xfree86-common
+         xlibmesa-gl-dev xlibmesa-glu-dev xlibmesa3-gl xlibmesa3-glu xlibs xlibs-dev
+         zlib1g-dev
+       0 upgraded, 54 newly installed, 0 to remove and 0 not upgraded.
+       Need to get 0B/24.0MB of archives.
+       After unpacking 78.7MB of additional disk space will be used.
+       Do you want to continue? [Y/n]
 
 
 
@@ -1460,6 +1452,9 @@
   programs, if it is not already there.  You do this, as root, by
   editing /etc/ld.so.conf, then running [1mldconfig[22m. There are many ways to
   do this; one that works is to enter this series of commands:
+
+
+
        $ su -
        # echo /usr/local/lib >> /etc/ld.so.conf
        # /sbin/ldconfig
@@ -1533,16 +1528,17 @@
             [1mNOTE[22m: ^D means press CTRL and d at the same time.
 
 
-       $ su
-       # cd /etc/profile.d
-       cat > mythtv.sh
-       export QTDIR=/usr/lib/qt3
-       export PATH=$PATH:/usr/lib/qt3/bin
-       ^D
 
-       # chmod a+x mythtv.sh
-       # exit
-       $ exit
+  $ su
+  # cd /etc/profile.d
+  cat > mythtv.sh
+  export QTDIR=/usr/lib/qt3
+  export PATH=$PATH:/usr/lib/qt3/bin
+  ^D
+
+  # chmod a+x mythtv.sh
+  # exit
+  $ exit
 
 
 
