@@ -245,6 +245,8 @@ class NuppelVideoRecorder : public RecorderBase
     long long prev_keyframe_save_pos;
 
     ChannelBase *channelObj;
+
+    bool setorigaudio;
 };
 
 #endif

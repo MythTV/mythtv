@@ -136,6 +136,7 @@ NuppelVideoRecorder::NuppelVideoRecorder(ChannelBase *channel)
     
     videoFilterList = "";
 
+    setorigaudio = false;
     origaudio = new struct video_audio;
 
     memset(&subtitle, 0, sizeof(subtitle));
@@ -823,6 +824,7 @@ void NuppelVideoRecorder::StartRecording(void)
         if (ioctl(fd, VIDIOCGAUDIO, &va)<0) 
             perror("VIDIOCGAUDIO"); 
         memcpy(origaudio, &va, sizeof(struct video_audio));
+        setorigaudio = true;
         //if (!quiet) 
         //    fprintf(stderr, "audio volume was '%d'\n", va.volume);
         va.audio = 0;
@@ -831,7 +833,7 @@ void NuppelVideoRecorder::StartRecording(void)
         if ((volume == -1 && va.volume < 32768) || volume != -1) 
         {
             if (volume == -1) 
-                va.volume = 32768;            // no more silence 8-)
+                va.volume = 65535;            // no more silence 8-)
             else 
                 va.volume = volume;
             if (!quiet) 
@@ -877,44 +879,37 @@ void NuppelVideoRecorder::StartRecording(void)
         if (ioctl(fd, VIDIOCSYNC, &frame)<0) 
         {
             syncerrors++;
-            if (syncerrors < 10)
-                perror("VIDIOCSYNC0");
-            else
-            {
-                cerr << "Multiple bttv errors, recording aborted\n";
-                encoding = false;
-                break;
-            }
+            if (syncerrors > 10)
+                cerr << "Multiple bttv errors, further messages supressed\n";
+            else if (syncerrors == 10)
+                perror("VIDIOCSYNC");
         }
         else 
         {
             BufferIt(buf+vm.offsets[0], video_buffer_size);
             //memset(buf+vm.offsets[0], 0, video_buffer_size);
-            if (ioctl(fd, VIDIOCMCAPTURE, &mm)<0) 
-                perror("VIDIOCMCAPTURE0");
         }
+
+        if (ioctl(fd, VIDIOCMCAPTURE, &mm)<0) 
+            perror("VIDIOCMCAPTURE0");
 
         frame = 1;
         mm.frame = 1;
         if (ioctl(fd, VIDIOCSYNC, &frame)<0) 
         {
             syncerrors++;
-            if (syncerrors < 10)
-                perror("VIDIOCSYNC1");
-            else
-            {
-                cerr << "Multiple bttv errors, recording aborted\n";
-                encoding = false;
-                break;
-            }
+            if (syncerrors == 10)
+                cerr << "Multiple bttv errors, further messages supressed\n";
+            else if (syncerrors < 10)
+                perror("VIDIOCSYNC");
         }
         else 
         {
             BufferIt(buf+vm.offsets[1], video_buffer_size);
             //memset(buf+vm.offsets[1], 0, video_buffer_size);
-            if (ioctl(fd, VIDIOCMCAPTURE, &mm)<0) 
-                perror("VIDIOCMCAPTURE1");
         }
+        if (ioctl(fd, VIDIOCMCAPTURE, &mm)<0) 
+            perror("VIDIOCMCAPTURE1");
     }
 
     munmap(buf, vm.size);
@@ -1255,7 +1250,7 @@ void NuppelVideoRecorder::KillChildren(void)
 {
     childrenLive = false;
    
-    if (!usingv4l2 && ioctl(fd, VIDIOCSAUDIO, origaudio) < 0)
+    if (!usingv4l2 && setorigaudio && ioctl(fd, VIDIOCSAUDIO, origaudio) < 0)
         perror("VIDIOCSAUDIO");
 
     pthread_join(write_tid, NULL);
