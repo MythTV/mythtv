@@ -136,6 +136,14 @@ void MythContext::LoadSettingsFiles(const QString &filename)
 
 void MythContext::LoadQtConfig(void)
 {
+    m_height = QApplication::desktop()->height();
+    m_width = QApplication::desktop()->width();
+
+    if (GetNumSetting("GuiWidth") > 0)
+        m_width = GetNumSetting("GuiWidth");
+    if (GetNumSetting("GuiHeight") > 0)
+        m_height = GetNumSetting("GuiHeight");
+
     if (m_qtThemeSettings)
         delete m_qtThemeSettings;
 

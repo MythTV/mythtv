@@ -1255,6 +1255,22 @@ void ThemedMenu::ReloadTheme(void)
         delete buttonactive;
     buttonactive = NULL;
 
+    gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
+
+    int x, y, w, h;
+    GetMythTVGeometry(qt_xdisplay(), qt_xscreen(), &x, &y, &w, &h);
+
+    setGeometry(x, y, screenwidth, screenheight);
+    setFixedSize(QSize(screenwidth, screenheight));
+
+    setFont(QFont("Arial", (int)(gContext->GetMediumFontSize() * hmult),
+            QFont::Bold));
+    setCursor(QCursor(Qt::BlankCursor));
+
+    gContext->ThemeWidget(this);
+
+    showFullScreen();
+
     QString theme = gContext->GetSetting("Theme");
     QString themedir = gContext->FindThemeDir(theme);
  
