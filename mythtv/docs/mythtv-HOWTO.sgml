@@ -4310,9 +4310,8 @@ type
 <tscreen><verb>(gdb) thread apply all bt full
 </verb></tscreen>
 
-The backtrace information for all the threads should be posted to the
-mythtv-dev mailing list, along with the steps you followed to get the
-program to crash.
+All of the output from gdb should be posted to the mythtv-dev mailing
+list, along with the steps you followed to get the program to crash.
 
 If you're trying to troubleshoot and you can't get back to the gdb window
 for some reason, it may be easier to use two systems or to start
@@ -6139,6 +6138,7 @@ Bump XMLTV version.  David Blevins' DVD burning contribution.
 v0.14.07, 2004-03-21.  Update DVB; TwinHan card is supported by
 linuxtv.org DVB driver.  Don't know if anyone is using it in US though. 
 Change some more "stop"s to "notes".
+v0.14.08, 2004-03-25  Include all gdb output, not just backtrace (mdz)
 -->
 
 <!--
