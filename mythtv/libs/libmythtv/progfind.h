@@ -58,14 +58,8 @@ class ProgFinder : public MythDialog
 
     Q_OBJECT
   public:
-    ProgFinder(QWidget *parent = 0, const char *name = 0);
+    ProgFinder(MythMainWindow *parent, const char *name = 0);
    ~ProgFinder();
-
-  protected:
-    void hideEvent(QHideEvent *e);
-
-  signals:
-    void killTheApp();
 
   private slots:
     void update_timeout();
@@ -81,7 +75,8 @@ class ProgFinder : public MythDialog
     void select();
 
   protected:
-    void paintEvent(QPaintEvent *);
+    void paintEvent(QPaintEvent *e);
+    void keyPressEvent(QKeyEvent *e);
 
   private:
     void LoadWindow(QDomElement &);
@@ -112,8 +107,6 @@ class ProgFinder : public MythDialog
     showRecord *showData;
     recordingRecord *curRecordings;
 
-    QAccel *accel;
-
     TV *m_player;
 
     QString baseDir;
@@ -142,6 +135,8 @@ class ProgFinder : public MythDialog
 
     QString dateFormat;
     QString timeFormat;
+
+    bool allowkeypress;
 };
 
 #endif

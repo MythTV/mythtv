@@ -24,42 +24,6 @@ using namespace std;
 #include "NuppelVideoPlayer.h"
 #include "programinfo.h"
 
-// cheat and put the keycodes here
-#define wsUp            0x52 + 256
-#define wsDown          0x54 + 256
-#define wsLeft          0x51 + 256
-#define wsRight         0x53 + 256
-#define wsPageUp        0x55 + 256
-#define wsPageDown      0x56 + 256
-#define wsEnd           0x57 + 256
-#define wsBegin         0x58 + 256
-#define wsEscape        0x1b + 256
-#define wsZero          0xb0 + 256
-#define wsOne           0xb1 + 256
-#define wsTwo           0xb2 + 256
-#define wsThree         0xb3 + 256
-#define wsFour          0xb4 + 256
-#define wsFive          0xb5 + 256
-#define wsSix           0xb6 + 256
-#define wsSeven         0xb7 + 256
-#define wsEight         0xb8 + 256
-#define wsNine          0xb9 + 256
-#define wsEnter         0x8d + 256
-#define wsReturn        0x0d + 256
-#define wsF1            0xbe + 256
-#define wsF2            0xbf + 256
-#define wsF3            0xc0 + 256
-#define wsF4            0xc1 + 256
-#define wsF5            0xc2 + 256
-#define wsF6            0xc3 + 256
-#define wsF7            0xc4 + 256
-#define wsF8            0xc5 + 256
-#define wsF9            0xc6 + 256
-#define wsF10           0xc7 + 256
-#define wsF11           0xc8 + 256
-#define wsF12           0xc9 + 256
-
-
 enum SeekSpeeds {
   SSPEED_NORMAL_WITH_DISPLAY = 0,
   SSPEED_SLOW_1,
@@ -138,6 +102,8 @@ TV::TV(QSqlDatabase *db)
     times_pressed = 0;
     last_channel = "";
 
+    myWindow = NULL;
+
     deinterlace_mode = DEINTERLACE_NONE;
     gContext->addListener(this);
 
@@ -147,7 +113,7 @@ TV::TV(QSqlDatabase *db)
     connect(prevChannelTimer, SIGNAL(timeout()), SLOT(SetPreviousChannel()));
 }
 
-void TV::Init(void)
+void TV::Init(bool createWindow)
 {
     fftime = gContext->GetNumSetting("FastForwardAmount", 30);
     rewtime = gContext->GetNumSetting("RewindAmount", 5);
@@ -165,6 +131,15 @@ void TV::Init(void)
     changeState = false;
 
     watchingLiveTV = false;
+
+    if (createWindow)
+    {
+        myWindow = new MythDialog(gContext->GetMainWindow(), "tv playback");
+        myWindow->installEventFilter(this);
+        myWindow->setNoErase();
+        myWindow->show();
+        qApp->processEvents();
+    }
 
     if (gContext->GetNumSetting("MythControlsVolume", 1))
         volumeControl = new VolumeControl(true);
@@ -188,6 +163,8 @@ TV::~TV(void)
         delete nvp;
     if (volumeControl)
         delete volumeControl;
+    if (myWindow)
+        delete myWindow;
 }
 
 TVState TV::LiveTV(void)
@@ -205,7 +182,7 @@ TVState TV::LiveTV(void)
                                "cancel one of the in-progress recordings from "
                                "the delete menu.");
     
-            DialogBox diag(title);
+            DialogBox diag(gContext->GetMainWindow(), title);
             diag.AddButton(tr("Cancel and go back to the TV menu"));
 
             diag.Show();
@@ -732,8 +709,15 @@ void TV::RunTV(void)
 
         if (nvp)
         {
-            if ((keypressed = nvp->CheckEvents()))
+            if (keyList.size() > 0)
+            { 
+                keyListLock.lock();
+                keypressed = keyList.front();
+                keyList.pop_front();
+                keyListLock.unlock();
+
                 ProcessKeypress(keypressed);
+            }
             else if (stickykeys)
             {
                 if (doing_ff)
@@ -793,6 +777,23 @@ void TV::RunTV(void)
     HandleStateChange();
 }
 
+bool TV::eventFilter(QObject *o, QEvent *e)
+{
+    (void)o;
+
+    if (e->type() != QEvent::KeyPress)
+        return false;
+
+    QKeyEvent *k = (QKeyEvent *)e;
+  
+    // can't process these events in the Qt event loop. 
+    keyListLock.lock();
+    keyList.push_back(k->key());
+    keyListLock.unlock();
+
+    return true;
+}
+
 void TV::ProcessKeypress(int keypressed)
 {
     bool was_doing_ff_rew = false;
@@ -800,9 +801,8 @@ void TV::ProcessKeypress(int keypressed)
     if (editmode)
     {   
         nvp->DoKeypress(keypressed);
-        if (keypressed == wsEscape || 
-            keypressed == 'e' || keypressed == 'E' ||
-            keypressed == 'm' || keypressed == 'M')
+        if (keypressed == Key_Escape || 
+            keypressed == Key_E || keypressed == Key_M)
             editmode = nvp->GetEditMode();
         return;
     }
@@ -812,14 +812,20 @@ void TV::ProcessKeypress(int keypressed)
         int passThru = 0;
         switch (keypressed)
         {
-            case wsUp: BrowseDispInfo(BROWSE_UP); break;
-            case wsDown: BrowseDispInfo(BROWSE_DOWN); break;
-            case wsLeft: BrowseDispInfo(BROWSE_LEFT); break;
-            case wsRight: BrowseDispInfo(BROWSE_RIGHT); break;
-            case wsEscape: BrowseEnd(false); break;
-            case ' ': case wsEnter: case wsReturn: BrowseEnd(true); break;
-            case 'r': case 'R': BrowseToggleRecord(); break;
-            case '[': case ']': case '|': passThru = 1; break;
+            case Key_Up: BrowseDispInfo(BROWSE_UP); break;
+            case Key_Down: BrowseDispInfo(BROWSE_DOWN); break;
+            case Key_Left: BrowseDispInfo(BROWSE_LEFT); break;
+            case Key_Right: BrowseDispInfo(BROWSE_RIGHT); break;
+
+            case Key_Escape: BrowseEnd(false); break;
+
+            case Key_Space: case Key_Enter:
+            case Key_Return: BrowseEnd(true); break;
+
+            case Key_R: BrowseToggleRecord(); break;
+
+            case Key_BracketLeft: case Key_BracketRight:
+            case Key_Bar: passThru = 1; break;
         }
 
         if (!passThru)
@@ -830,9 +836,9 @@ void TV::ProcessKeypress(int keypressed)
     {
         switch (keypressed)
         {
-            case wsUp: osd->DialogUp(dialogname); break;
-            case wsDown: osd->DialogDown(dialogname); break;
-            case ' ': case wsEnter: case wsReturn: 
+            case Key_Up: osd->DialogUp(dialogname); break;
+            case Key_Down: osd->DialogDown(dialogname); break;
+            case Key_Space: case Key_Enter: case Key_Return: 
             {
                 osd->TurnDialogOff(dialogname);
                 if (dialogname == "exitplayoptions") 
@@ -869,39 +875,39 @@ void TV::ProcessKeypress(int keypressed)
 
     switch (keypressed) 
     {
-        case 'f': case 'F':
+        case Key_F:
         {
             nvp->ToggleFullScreen();
             break;
         }
  
-        case 't': case 'T':
+        case Key_T:
         {
             nvp->ToggleCC();
             break;
         }
-        case 'z': case 'Z':
+        case Key_Z:
         {
             doing_ff = false;
             doing_rew = false;
             DoSkipCommercials(1);
             break;
         }
-        case 'q': case 'Q':
+        case Key_Q:
         {
             doing_ff = false;
             doing_rew = false;
             DoSkipCommercials(-1);
             break;
         }
-        case 's': case 'S': case 'p': case 'P': 
+        case Key_S: case Key_P: 
         {
             doing_ff = false;
             doing_rew = false;
             DoPause();
             break;
         }
-        case wsRight: case 'd': case 'D': case wsF8: 
+        case Key_Right: case Key_D: case Key_F8: 
         {
             if (stickykeys)
             {
@@ -920,7 +926,7 @@ void TV::ProcessKeypress(int keypressed)
             DoFF(); 
             break;
         }
-        case wsLeft: case 'a': case 'A': case wsF5:
+        case Key_Left: case Key_A: case Key_F5:
         {
             if (stickykeys)
             {
@@ -939,17 +945,17 @@ void TV::ProcessKeypress(int keypressed)
             DoRew(); 
             break;
         }
-        case wsPageUp:
+        case Key_PageUp:
         {
             DoJumpAhead(); 
             break;
         }
-        case wsPageDown:
+        case Key_PageDown:
         {
             DoJumpBack(); 
             break;
         }
-        case wsEscape:
+        case Key_Escape:
         {
             if (StateIsPlaying(internalState) && 
                 gContext->GetNumSetting("PlaybackExitPrompt")) 
@@ -974,9 +980,9 @@ void TV::ProcessKeypress(int keypressed)
             }
             break;
         }
-        case '[':  case wsF10: ChangeVolume(false); break;
-        case ']':  case wsF11: ChangeVolume(true); break;
-        case '|':  case wsF9: ToggleMute(); break;
+        case Key_BracketLeft: case Key_F10: ChangeVolume(false); break;
+        case Key_BracketRight: case Key_F11: ChangeVolume(true); break;
+        case Key_Bar:  case Key_F9: ToggleMute(); break;
 
         default: 
         {
@@ -984,16 +990,16 @@ void TV::ProcessKeypress(int keypressed)
             {
                 switch (keypressed)
                 {
-                    case wsZero:  case '0': ff_rew_index = SSPEED_NORMAL_WITH_DISPLAY; break;
-                    case wsOne:   case '1': ff_rew_index = SSPEED_SLOW_1; break;
-                    case wsTwo:   case '2': ff_rew_index = SSPEED_SLOW_2; break;
-                    case wsThree: case '3': ff_rew_index = SSPEED_NORMAL; break;
-                    case wsFour:  case '4': ff_rew_index = SSPEED_FAST_1; break;
-                    case wsFive:  case '5': ff_rew_index = SSPEED_FAST_2; break;
-                    case wsSix:   case '6': ff_rew_index = SSPEED_FAST_3; break;
-                    case wsSeven: case '7': ff_rew_index = SSPEED_FAST_4; break;
-                    case wsEight: case '8': ff_rew_index = SSPEED_FAST_5; break;
-                    case wsNine:  case '9': ff_rew_index = SSPEED_FAST_6; break;
+                    case Key_0: ff_rew_index = SSPEED_NORMAL_WITH_DISPLAY; break;
+                    case Key_1: ff_rew_index = SSPEED_SLOW_1; break;
+                    case Key_2: ff_rew_index = SSPEED_SLOW_2; break;
+                    case Key_3: ff_rew_index = SSPEED_NORMAL; break;
+                    case Key_4: ff_rew_index = SSPEED_FAST_1; break;
+                    case Key_5: ff_rew_index = SSPEED_FAST_2; break;
+                    case Key_6: ff_rew_index = SSPEED_FAST_3; break;
+                    case Key_7: ff_rew_index = SSPEED_FAST_4; break;
+                    case Key_8: ff_rew_index = SSPEED_FAST_5; break;
+                    case Key_9: ff_rew_index = SSPEED_FAST_6; break;
 
                     default:
                        doing_ff = false;
@@ -1010,30 +1016,30 @@ void TV::ProcessKeypress(int keypressed)
     {
         switch (keypressed)
         {
-            case 'i': case 'I': ToggleOSD(); break;
+            case Key_I: ToggleOSD(); break;
 
-            case wsUp: ChangeChannel(CHANNEL_DIRECTION_UP); break;
-            case wsDown: ChangeChannel(CHANNEL_DIRECTION_DOWN); break;
-            case '/': ChangeChannel(CHANNEL_DIRECTION_FAVORITE); break;
+            case Key_Up: ChangeChannel(CHANNEL_DIRECTION_UP); break;
+            case Key_Down: ChangeChannel(CHANNEL_DIRECTION_DOWN); break;
+            case Key_Slash: ChangeChannel(CHANNEL_DIRECTION_FAVORITE); break;
 
-            case '?': ToggleChannelFavorite(); break;
+            case Key_Question: ToggleChannelFavorite(); break;
 
-            case 'c': case 'C': ToggleInputs(); break;
+            case Key_C: ToggleInputs(); break;
 
-            case wsZero: case wsOne: case wsTwo: case wsThree: case wsFour:
-            case wsFive: case wsSix: case wsSeven: case wsEight:
-            case wsNine: case '0': case '1': case '2': case '3': case '4':
-            case '5': case '6': case '7': case '8': case '9':
+            case Key_0: case Key_1: case Key_2: case Key_3: case Key_4:
+            case Key_5: case Key_6: case Key_7: case Key_8: case Key_9:
                      ChannelKey(keypressed); break;
 
-            case ' ': case wsEnter: case wsReturn: ChannelCommit(); break;
+            case Key_Space: case Key_Enter: case Key_Return: 
+                     ChannelCommit(); break;
 
-            case 'M': case 'm': LoadMenu(); break;
+            case Key_M: LoadMenu(); break;
 
-            case 'V': case 'v': TogglePIPView(); break;
-            case 'B': case 'b': ToggleActiveWindow(); break;
-            case 'N': case 'n': SwapPIP(); break;
+            case Key_V: TogglePIPView(); break;
+            case Key_B: ToggleActiveWindow(); break;
+            case Key_N: SwapPIP(); break;
 
+/*
             // Contrast, brightness, colour of the input source
             case 'j': ChangeContrast(false); break;
             case 'J': ChangeContrast(true); break;
@@ -1043,9 +1049,9 @@ void TV::ProcessKeypress(int keypressed)
             case 'L': ChangeColour(true); break;
 
             case 'x': ChangeDeinterlacer(); break;
-            case 'o': case 'O': BrowseStart(); break;
-
-            case 'H': case 'h': PreviousChannel(); break;
+*/
+            case Key_O: BrowseStart(); break;
+            case Key_H: PreviousChannel(); break;
 
             default: break;
         }
@@ -1054,15 +1060,14 @@ void TV::ProcessKeypress(int keypressed)
     {
         switch (keypressed)
         {
-            case 'i': case 'I': DoInfo(); break;
-            case ' ': case wsEnter: case wsReturn: 
+            case Key_I: DoInfo(); break;
+            case Key_Space: case Key_Enter: case Key_Return: 
             {
                 if (!was_doing_ff_rew)
                     nvp->SetBookmark(); 
                 break;
             }
-            case 'e': case 'E': 
-            case 'm': case 'M': editmode = nvp->EnableEdit(); break;
+            case Key_E: case Key_M: editmode = nvp->EnableEdit(); break;
             default: break;
         }
     }

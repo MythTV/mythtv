@@ -44,9 +44,8 @@ QString startGuide(void)
 int startManaged(void)
 {
     QSqlDatabase *db = QSqlDatabase::database();
-    ViewScheduled vsb(db);
+    ViewScheduled vsb(db, gContext->GetMainWindow(), "view scheduled");
 
-    vsb.Show();
     qApp->unlock();
     vsb.exec();
     qApp->lock();
@@ -56,9 +55,8 @@ int startManaged(void)
 
 int startPlayback(void)
 {
-    PlaybackBox pbb(PlaybackBox::Play);
+    PlaybackBox pbb(PlaybackBox::Play, gContext->GetMainWindow(), "play");
 
-    pbb.Show();
     qApp->unlock();
     pbb.exec();
     qApp->lock();
@@ -68,9 +66,9 @@ int startPlayback(void)
 
 int startDelete(void)
 {
-    PlaybackBox delbox(PlaybackBox::Delete);
+    PlaybackBox delbox(PlaybackBox::Delete, gContext->GetMainWindow(), 
+                       "delete");
    
-    delbox.Show();
     qApp->unlock();
     delbox.exec();
     qApp->lock();
@@ -80,9 +78,8 @@ int startDelete(void)
 
 int startManual(void)
 {
-    ManualBox manbox;
+    ManualBox manbox(gContext->GetMainWindow(), "manual box");
 
-    manbox.Show();
     qApp->unlock();
     manbox.exec();
     qApp->lock();
@@ -146,6 +143,7 @@ void TVMenuCallback(void *data, QString &selection)
         AppearanceSettings settings;
         settings.exec(QSqlDatabase::database());
         gContext->LoadQtConfig();
+        gContext->GetMainWindow()->Init();
         menu->ReloadTheme();
     } else if (sel == "settings recording") {
         RecordingProfileEditor editor(QSqlDatabase::database());
@@ -171,15 +169,13 @@ int handleExit(void)
 {
     QString title = QObject::tr("Do you really want to exit MythTV?");
 
-    DialogBox diag(title);
+    DialogBox diag(gContext->GetMainWindow(), title);
     diag.AddButton(QObject::tr("No"));
     diag.AddButton(QObject::tr("Yes, Exit now"));
     diag.AddButton(QObject::tr("Yes, Exit and shutdown the computer"));
 //    bool haltNwakeup = context->GetNumSetting("UseHaltWakeup");
 //    if (haltNwakeup)
 //        diag.AddButton("Yes, Shutdown and set wakeup time");
-
-    diag.Show();
 
     int result = diag.exec();
     switch (result)
@@ -210,7 +206,8 @@ void haltnow(int how)
 
 int RunMenu(QString themedir)
 {
-    menu = new ThemedMenu(themedir.ascii(), "mainmenu.xml");
+    menu = new ThemedMenu(themedir.ascii(), "mainmenu.xml", 
+                          gContext->GetMainWindow(), "mainmenu");
     menu->setCallback(TVMenuCallback, gContext);
    
     int exitstatus = 0;
@@ -218,7 +215,6 @@ int RunMenu(QString themedir)
     if (menu->foundTheme())
     {
         do {
-            menu->Show();
             menu->exec();
         } while (!(exitstatus = handleExit()));
     }
@@ -339,6 +335,10 @@ int main(int argc, char **argv)
     }
 
     gContext->LoadQtConfig();
+
+    MythMainWindow *mainWindow = new MythMainWindow();
+    mainWindow->Show();
+    gContext->SetMainWindow(mainWindow);
 
     lcd_host = gContext->GetSetting("LCDHost");
     lcd_port = gContext->GetNumSetting("LCDPort");

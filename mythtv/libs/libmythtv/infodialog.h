@@ -15,16 +15,16 @@ class InfoDialog : public MythDialog
 {
     Q_OBJECT
   public:
-    InfoDialog(ProgramInfo *pginfo, QWidget *parent = 0, const char *name = 0);
+    InfoDialog(ProgramInfo *pginfo, MythMainWindow *parent, 
+               const char *name = 0);
 
   protected slots:
     void selected(QListViewItem *);
 
-  protected:
-    void hideEvent(QHideEvent *e);
-
   private:
     QLabel *getDateLabel(ProgramInfo *pginfo);
+
+    void keyPressEvent(QKeyEvent *e);
   
     int programtype;
     ScheduledRecording::RecordingType recordstatus;

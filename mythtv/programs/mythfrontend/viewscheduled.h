@@ -15,7 +15,8 @@ class ViewScheduled : public MythDialog
 {
     Q_OBJECT
   public:
-    ViewScheduled(QSqlDatabase *ldb, QWidget *parent = 0, const char *name = 0);
+    ViewScheduled(QSqlDatabase *ldb, MythMainWindow *parent, 
+                  const char *name = 0);
     ~ViewScheduled();
 
   signals:

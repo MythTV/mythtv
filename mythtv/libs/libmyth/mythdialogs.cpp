@@ -3,6 +3,7 @@
 #include <qvbox.h>
 #include <qapplication.h>
 #include <qlayout.h>
+#include <qobjectlist.h>
 
 #include <iostream>
 using namespace std;
@@ -13,6 +14,11 @@ using namespace std;
 
 MythMainWindow::MythMainWindow(QWidget *parent, const char *name, bool modal)
               : QDialog(parent, name, modal)
+{
+    Init();
+}
+
+void MythMainWindow::Init(void)
 {
     gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
@@ -37,9 +43,57 @@ void MythMainWindow::Show(void)
     setActiveWindow();
 }
 
-MythDialog::MythDialog(QWidget *parent, const char *name, bool modal)
-          : QDialog(parent, name, modal)
+void MythMainWindow::attach(QWidget *child)
 {
+    widgetList.push_back(child);
+    child->raise();
+    child->setFocus();
+}
+
+void MythMainWindow::detach(QWidget *child)
+{
+    if (widgetList.back() != child)
+    {
+        cerr << "Not removing top most widget, error\n";
+        return;
+    }
+
+    widgetList.pop_back();
+    QWidget *current = currentWidget();
+
+    if (current)
+        current->setFocus();
+}
+
+QWidget *MythMainWindow::currentWidget(void)
+{
+    if (widgetList.size() > 0)
+        return widgetList.back();
+    return NULL;
+}
+
+void MythMainWindow::keyPressEvent(QKeyEvent *e)
+{
+    QWidget *current = currentWidget();
+    if (current)
+        qApp->notify(current, e);
+    else
+        QDialog::keyPressEvent(e);
+}
+
+MythDialog::MythDialog(MythMainWindow *parent, const char *name, bool setsize)
+          : QFrame(parent, name)
+{
+    rescode = 0;
+
+    if (!parent)
+    {
+        cerr << "Trying to create a dialog without a parent.\n";
+        return;
+    }
+
+    in_loop = false;
+
     gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
     int x = 0, y = 0, w = 0, h = 0;
@@ -47,25 +101,173 @@ MythDialog::MythDialog(QWidget *parent, const char *name, bool modal)
     GetMythTVGeometry(qt_xdisplay(), qt_xscreen(), &x, &y, &w, &h);
 #endif
 
-    setGeometry(x, y, screenwidth, screenheight);
-    setFixedSize(QSize(screenwidth, screenheight));
+    setFont(QFont("Arial", (int)(gContext->GetMediumFontSize() * hmult),
+            QFont::Bold));
+    setCursor(QCursor(Qt::BlankCursor));
+
+    if (setsize)
+    {
+        setGeometry(x, y, screenwidth, screenheight);
+        setFixedSize(QSize(screenwidth, screenheight));
+        gContext->ThemeWidget(this);
+    }
+
+    parent->attach(this);
+    m_parent = parent;
+}
+
+MythDialog::~MythDialog()
+{
+    m_parent->detach(this);
+}
+
+void MythDialog::setNoErase(void)
+{
+    WFlags flags = getWFlags();
+    flags |= WRepaintNoErase;
+    setWFlags(flags);
+}
+
+void MythDialog::Show(void)
+{
+    show();
+}
+
+void MythDialog::done(int r)
+{
+    hide();
+    setResult(r);
+    close();
+}
+
+void MythDialog::accept()
+{
+    done(Accepted);
+}
+
+void MythDialog::reject()
+{
+    done(Rejected);
+}
+
+int MythDialog::exec()
+{
+    if (in_loop) 
+    {
+        qWarning("MythDialog::exec: Recursive call detected.");
+        return -1;
+    }
+
+    setResult(0);
+
+    Show();
+
+    in_loop = TRUE;
+    qApp->enter_loop();
+
+    int res = result();
+
+    return res;
+}
+
+void MythDialog::hide()
+{
+    if (isHidden())
+        return;
+
+    // Reimplemented to exit a modal when the dialog is hidden.
+    QWidget::hide();
+    if (in_loop)  
+    {
+        in_loop = FALSE;
+        qApp->exit_loop();
+    }
+}
+
+void MythDialog::keyPressEvent( QKeyEvent *e )
+{
+    //   Calls reject() if Escape is pressed. Simulates a button
+    //   click for the default button if Enter is pressed. Move focus
+    //   for the arrow keys. Ignore the rest.
+    if ( e->state() == 0 || ( e->state() & Keypad && e->key() == Key_Enter ) ) {
+        switch ( e->key() ) {
+        case Key_Escape:
+            reject();
+            break;
+        case Key_Up:
+        case Key_Left:
+            if ( focusWidget() &&
+                 ( focusWidget()->focusPolicy() == QWidget::StrongFocus ||
+                   focusWidget()->focusPolicy() == QWidget::WheelFocus ) ) {
+                break;
+            }
+            // call ours, since c++ blocks us from calling the one
+            // belonging to focusWidget().
+            focusNextPrevChild( FALSE );
+            break;
+        case Key_Down:
+        case Key_Right:
+            if ( focusWidget() &&
+                 ( focusWidget()->focusPolicy() == QWidget::StrongFocus ||
+                   focusWidget()->focusPolicy() == QWidget::WheelFocus ) ) {
+                break;
+            }
+            focusNextPrevChild( TRUE );
+            break;
+        default:
+            return;
+        }
+    }
+}
+
+MythPopupBox::MythPopupBox(MythMainWindow *parent, const char *name)
+            : MythDialog(parent, name, false)
+{
+    int w, h;
+    float wmult, hmult;
+
+    gContext->GetScreenSettings(w, wmult, h, hmult);
+
+    setLineWidth(3);
+    setMidLineWidth(3);
+    setFrameShape(QFrame::Panel);
+    setFrameShadow(QFrame::Raised);
+    setPalette(parent->palette());
+    setFont(parent->font());
+    setCursor(QCursor(Qt::BlankCursor));
+
+    vbox = new QVBoxLayout(this, (int)(10 * hmult));
+}
+
+void MythPopupBox::addWidget(QWidget *widget, bool setAppearance)
+{
+    if (setAppearance == true)
+    {
+         widget->setPalette(palette());
+         widget->setFont(font());
+    }
+    vbox->addWidget(widget);
+}
+
+MythProgressDialog::MythProgressDialog(const QString &message, int totalSteps)
+                  : MythDialog(gContext->GetMainWindow(), "progress", false)
+{
+    int screenwidth, screenheight;
+    float wmult, hmult;
+
+    gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
+
+    int x = 0, y = 0, w = 0, h = 0;
+#ifndef QWS
+    GetMythTVGeometry(qt_xdisplay(), qt_xscreen(), &x, &y, &w, &h);
+#endif
 
     setFont(QFont("Arial", (int)(gContext->GetMediumFontSize() * hmult),
             QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
     gContext->ThemeWidget(this);
-}
 
-void MythDialog::Show(void)
-{
-    showFullScreen();
-    setActiveWindow();
-}
-
-MythProgressDialog::MythProgressDialog(const QString &message, int totalSteps)
-                  : MythDialog(NULL, 0, true)
-{
     int yoff = screenheight / 3;
     int xoff = screenwidth / 10;
     setGeometry(xoff, yoff, screenwidth - xoff * 2, yoff);
@@ -83,24 +285,20 @@ MythProgressDialog::MythProgressDialog(const QString &message, int totalSteps)
     vbox->setMargin((int)(15 * wmult));
 
     QLabel *msglabel = new QLabel(vbox);
-    msglabel->setBackgroundOrigin(WindowOrigin);
+    msglabel->setBackgroundOrigin(ParentOrigin);
     msglabel->setText(message);
 
     progress = new QProgressBar(totalSteps, vbox);
-    progress->setBackgroundOrigin(WindowOrigin);
+    progress->setBackgroundOrigin(ParentOrigin);
     progress->setProgress(0);
 
     steps = totalSteps / 1000;
     if (steps == 0)
         steps = 1;
 
-    reparent(NULL, WType_TopLevel | WStyle_Customize | WStyle_NoBorder |
-             (getWFlags() & 0xffff0000), QPoint(xoff, yoff));
-    raise();
-    show();
-    setActiveWindow();
-
     gContext->LCDswitchToChannel(message);
+
+    show();
 
     qApp->processEvents();
 }
@@ -127,14 +325,11 @@ void MythProgressDialog::keyPressEvent(QKeyEvent *e)
         MythDialog::keyPressEvent(e);
 }
 
-
-MythThemedDialog::MythThemedDialog(QString window_name,
-                                   QString theme_filename,
-                                   QWidget *parent,
-                                   const char* name)
+MythThemedDialog::MythThemedDialog(MythMainWindow *parent, QString window_name,
+                                   QString theme_filename, const char* name)
                 : MythDialog(parent, name)
 {
-    setWFlags(Qt::WRepaintNoErase); //  widgets draw themselves completely
+    setNoErase();
     context = -1;
     my_containers.clear();
     widget_with_current_focus = NULL;

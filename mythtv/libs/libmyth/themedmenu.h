@@ -62,7 +62,7 @@ class ThemedMenu : public MythDialog
     Q_OBJECT
   public:
     ThemedMenu(const char *cdir, const char *menufile, 
-               QWidget *parent = 0, const char *name = 0);
+               MythMainWindow *parent, const char *name = 0);
    ~ThemedMenu();
 
     bool foundTheme() { return foundtheme; }

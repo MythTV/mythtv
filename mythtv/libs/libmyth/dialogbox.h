@@ -13,8 +13,8 @@ class DialogBox : public MythDialog
 {
     Q_OBJECT
   public:
-    DialogBox(const QString &text, const char *checkboxtext = 0,
-              QWidget *parent = 0, const char *name = 0);
+    DialogBox(MythMainWindow *parent, const QString &text, 
+              const char *checkboxtext = 0, const char *name = 0);
 
     void AddButton(const QString &title);
 

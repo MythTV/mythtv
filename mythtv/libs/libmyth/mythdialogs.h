@@ -7,6 +7,10 @@
 #include <qdom.h>
 #include <qptrlist.h>
 #include <qpixmap.h>
+#include <qpushbutton.h>
+
+#include <vector>
+using namespace std;
 
 #include "uitypes.h"
 
@@ -28,23 +32,72 @@ class MythMainWindow : public QDialog
     MythMainWindow(QWidget *parent = 0, const char *name = 0, 
                    bool modal = FALSE);
 
-    virtual void Show();
+    void Init(void);
+    void Show(void);
+
+    void attach(QWidget *child);
+    void detach(QWidget *child);
+
+    QWidget *currentWidget(void);
 
    protected:
+    void keyPressEvent(QKeyEvent *e);
+
     float wmult, hmult;
     int screenwidth, screenheight;
+
+    vector<QWidget *> widgetList;
 };
 
-class MythDialog : public QDialog
+class MythDialog : public QFrame
 {
+    Q_OBJECT
   public:
-    MythDialog(QWidget *parent = 0, const char *name = 0, bool modal = FALSE);
+    MythDialog(MythMainWindow *parent, const char *name = 0, 
+               bool setsize = true);
+   ~MythDialog();
+
+    enum DialogCode { Rejected, Accepted };
+
+    int result(void) const { return rescode; }
 
     virtual void Show();
 
-   protected:
+    void hide();
+
+    void setNoErase(void);
+
+  public slots:
+    int exec();
+
+  protected slots:
+    virtual void done( int );
+    virtual void accept();
+    virtual void reject();
+
+  protected:
+    void setResult(int r) { rescode = r; }
+    void keyPressEvent(QKeyEvent *e);
+
     float wmult, hmult;
     int screenwidth, screenheight;
+ 
+    MythMainWindow *m_parent;
+
+    int rescode;
+
+    bool in_loop;
+};
+
+class MythPopupBox : public MythDialog
+{
+  public:
+    MythPopupBox(MythMainWindow *parent, const char *name = 0);
+
+    void addWidget(QWidget *widget, bool setAppearance = true);
+
+  private:
+    QVBoxLayout *vbox;
 };
 
 class MythProgressDialog: public MythDialog
@@ -65,8 +118,8 @@ class MythThemedDialog : public MythDialog
 {
     Q_OBJECT
   public:
-    MythThemedDialog(QString window_name, QString theme_filename = "",
-                     QWidget *parent = 0, const char *name = 0);
+    MythThemedDialog(MythMainWindow *parent, QString window_name,
+                     QString theme_filename = "", const char *name = 0);
 
     virtual void loadWindow(QDomElement &);
     virtual void parseContainer(QDomElement &);

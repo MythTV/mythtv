@@ -32,6 +32,10 @@ int main(int argc, char **argv)
     }
 
     gContext->LoadQtConfig();
+
+    MythMainWindow *mainWindow = new MythMainWindow();
+    mainWindow->Show();
+    gContext->SetMainWindow(mainWindow);
     
     QString chanstr = RunProgramGuide(startchannel);
 

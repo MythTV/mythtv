@@ -8,7 +8,6 @@
 */
 
 #include <qlabel.h>
-#include <qaccel.h>
 #include <qlayout.h>
 #include <qdatetime.h>
 #include <qtimer.h>
@@ -36,11 +35,12 @@ void RunProgramFind(bool thread)
     if (thread)
         qApp->lock();
 
-    ProgFinder programFind;
+    ProgFinder programFind(gContext->GetMainWindow(), "program finder");
+
+    programFind.Show();
 
     if (thread)
     {
-        programFind.show();
         qApp->unlock();
 
         while (programFind.isVisible())
@@ -52,11 +52,13 @@ void RunProgramFind(bool thread)
     return;
 }
 
-ProgFinder::ProgFinder(QWidget *parent, const char *name)
+ProgFinder::ProgFinder(MythMainWindow *parent, const char *name)
           : MythDialog(parent, name)
 {
     running = true;
     m_db = QSqlDatabase::database();
+
+    allowkeypress = true;
 
     baseDir = gContext->GetInstallPrefix();
 
@@ -65,23 +67,6 @@ ProgFinder::ProgFinder(QWidget *parent, const char *name)
 
     timeFormat = gContext->GetSetting("TimeFormat");
     dateFormat = gContext->GetSetting("DateFormat");
-
-    accel = new QAccel(this);
-    accel->connectItem(accel->insertItem(Key_Left), this, SLOT(cursorLeft()));
-    accel->connectItem(accel->insertItem(Key_Right), this, SLOT(cursorRight()));
-    accel->connectItem(accel->insertItem(Key_Enter), this, SLOT(select()));
-    accel->connectItem(accel->insertItem(Key_Return), this, SLOT(select()));
-    accel->connectItem(accel->insertItem(Key_Space), this, SLOT(select()));
-    accel->connectItem(accel->insertItem(Key_Up), this, SLOT(cursorUp()));
-    accel->connectItem(accel->insertItem(Key_Down), this, SLOT(cursorDown()));
-    accel->connectItem(accel->insertItem(Key_PageUp), this, SLOT(pageUp()));
-    accel->connectItem(accel->insertItem(Key_PageDown), this, SLOT(pageDown()));
-    accel->connectItem(accel->insertItem(Key_3), this, SLOT(pageUp()));
-    accel->connectItem(accel->insertItem(Key_9), this, SLOT(pageDown()));
-    accel->connectItem(accel->insertItem(Key_I), this, SLOT(getInfo()));
-    accel->connectItem(accel->insertItem(Key_4), this, SLOT(showGuide()));
-    accel->connectItem(accel->insertItem(Key_Escape), this, SLOT(escape()));
-    connect(this, SIGNAL(killTheApp()), this, SLOT(accept()));
 
     theme = new XMLParse();
     theme->SetWMult(wmult);
@@ -142,14 +127,9 @@ ProgFinder::ProgFinder(QWidget *parent, const char *name)
 
     update_Timer->start((int)(100));
 
-    WFlags flags = getWFlags();
-    flags |= WRepaintNoErase;
-    setWFlags(flags);
+    setNoErase();
 
     showInfo = false;
-
-    showFullScreen();
-    setActiveWindow();
 }
 
 ProgFinder::~ProgFinder()
@@ -166,7 +146,32 @@ ProgFinder::~ProgFinder()
     delete update_Timer;
 
     delete theme;
-    delete accel;
+}
+
+void ProgFinder::keyPressEvent(QKeyEvent *e)
+{
+    if (!allowkeypress)
+        return;
+
+    switch (e->key())
+    {
+        case Key_Left: case Key_A: cursorLeft(); break;
+        case Key_Right: case Key_D: cursorRight(); break;
+        case Key_Down: case Key_S: cursorDown(); break;
+        case Key_Up: case Key_W: cursorUp(); break;
+
+        case Key_I: case Key_Space:
+        case Key_Enter: case Key_Return: select(); break;
+
+        case Key_PageUp: case Key_3: pageUp(); break;
+        case Key_PageDown: case Key_9: pageDown(); break;
+
+        case Key_4: showGuide(); break;
+
+        case Key_C: case Key_M: case Key_Escape: escape(); break;
+ 
+        default: MythDialog::keyPressEvent(e);
+    }
 }
 
 void ProgFinder::updateBackground(void)
@@ -373,12 +378,7 @@ void ProgFinder::escape()
     hide();
 
     unsetCursor();
-    emit killTheApp();
-}
-
-void ProgFinder::hideEvent(QHideEvent *e)
-{
-    QDialog::hideEvent(e);
+    emit accept();
 }
 
 void ProgFinder::showGuide()
@@ -387,7 +387,7 @@ void ProgFinder::showGuide()
     hide();
 
     unsetCursor();
-    emit killTheApp();
+    emit accept();
 }
 
 void ProgFinder::LoadWindow(QDomElement &element)
@@ -440,14 +440,12 @@ void ProgFinder::getInfo()
 
         if (curPick)
         {
-            InfoDialog diag(curPick, this, "Program Info");
-            diag.setCaption("BLAH!!!");
+            InfoDialog diag(curPick, gContext->GetMainWindow(), "Program Info");
             diag.exec();
         }
         else
-        {
             return;
-        }
+
         showInfo = 0;
 
         curPick->GetProgramRecordingStatus(m_db);
@@ -931,7 +929,7 @@ void ProgFinder::selectSearchData()
     if (running == false)
         return;
 
-    accel->setEnabled(false);
+    allowkeypress = false;
     QDateTime progStart = QDateTime::currentDateTime();
     QString thequery;
     QString data;
@@ -1049,7 +1047,7 @@ void ProgFinder::selectSearchData()
         listCount = showsPerListing;
 
     curProgram = 0;
-    accel->setEnabled(true);
+    allowkeypress = true;
     showProgramList();
 }
 
@@ -1216,7 +1214,7 @@ void ProgFinder::selectShowData(QString progTitle)
     if (running == false)
         return;
 
-    accel->setEnabled(false);
+    allowkeypress = false;
     QDateTime progStart = QDateTime::currentDateTime();
     QDateTime progEnd;
     QString thequery;
@@ -1320,7 +1318,7 @@ void ProgFinder::selectShowData(QString progTitle)
         showCount = showsPerListing;
 
     curShow = 0;
-    accel->setEnabled(true);
+    allowkeypress = true;
     showShowingList();
 }
 

@@ -33,8 +33,9 @@ class RecListItem : public QListViewItem
     ScheduledRecording::RecordingType m_type;
 };
 
-InfoDialog::InfoDialog(ProgramInfo *pginfo, QWidget *parent, const char *name)
-          : MythDialog(parent, name, true)
+InfoDialog::InfoDialog(ProgramInfo *pginfo, MythMainWindow *parent, 
+                       const char *name)
+          : MythDialog(parent, name)
 {
     int bigfont = gContext->GetBigFontSize();
     int mediumfont = gContext->GetMediumFontSize();
@@ -160,9 +161,6 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, QWidget *parent, const char *name)
     lview->setSelected(selectItem, true);
  
     myinfo = pginfo;
-     
-    showFullScreen();
-    setActiveWindow();
 }
 
 QLabel *InfoDialog::getDateLabel(ProgramInfo *pginfo)
@@ -182,10 +180,15 @@ QLabel *InfoDialog::getDateLabel(ProgramInfo *pginfo)
     return date;
 }
 
-void InfoDialog::hideEvent(QHideEvent *e)
+void InfoDialog::keyPressEvent(QKeyEvent *e)
 {
-//    selected(NULL);
-    QDialog::hideEvent(e);
+    switch (e->key())
+    { 
+        case Key_Space: case Key_Return: case Key_Enter:
+        case Key_Up: case Key_Down:  qApp->notify(lview, e); break;
+
+        default: MythDialog::keyPressEvent(e);
+    }
 }
 
 void InfoDialog::selected(QListViewItem *selitem)

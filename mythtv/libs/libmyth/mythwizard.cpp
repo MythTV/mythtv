@@ -94,8 +94,8 @@ public:
 
 };
 
-MythWizard::MythWizard(QWidget *parent, const char *name, bool modal)
-    : MythDialog(parent, name, modal)
+MythWizard::MythWizard(MythMainWindow *parent, const char *name)
+          : MythDialog(parent, name)
 {
     d = new MythWizardPrivate();
     d->current = 0; // not quite true, but...
@@ -161,7 +161,7 @@ void MythWizard::Show()
 void MythWizard::setFont( const QFont & font )
 {
     QApplication::postEvent( this, new QEvent( QEvent::LayoutHint ) );
-    QDialog::setFont( font );
+    setFont( font );
 }
 
 void MythWizard::addPage( QWidget * page, const QString & title )
@@ -542,7 +542,7 @@ bool MythWizard::eventFilter( QObject * o, QEvent * e )
 	if ( c->child() && c->child()->isWidgetType() )
 	    removePage( (QWidget *)c->child() );
     }
-    return QDialog::eventFilter( o, e );
+    return QWidget::eventFilter( o, e );
 }
 
 void MythWizard::keyPressEvent(QKeyEvent* e) 

@@ -35,14 +35,11 @@ class GuideGrid : public MythDialog
 {
     Q_OBJECT
   public:
-    GuideGrid(const QString &channel, TV *player = NULL,
-              QWidget *parent = 0, const char *name = 0);
+    GuideGrid(MythMainWindow *parent, const QString &channel, TV *player = NULL,
+              const char *name = 0);
    ~GuideGrid();
 
     QString getLastChannel(void);
-
-  signals:
-    void killTheApp();
 
   protected slots:
     void cursorLeft();
@@ -81,6 +78,8 @@ class GuideGrid : public MythDialog
     void timeout();
 
   private:
+    void keyPressEvent(QKeyEvent *e);
+
     void updateBackground(void);
     void paintDate(QPainter *);
     void paintChannels(QPainter *);

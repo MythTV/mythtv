@@ -31,7 +31,8 @@ public:
     void setStart(const QDateTime& start);
     void setEnd(const QDateTime& end);
 
-    virtual MythDialog* dialogWidget(QWidget* parent=NULL, const char* name=0);
+    virtual MythDialog* dialogWidget(MythMainWindow *parent, 
+                                     const char *name = 0);
     virtual void save(QSqlDatabase* db);
 
     void loadByID(QSqlDatabase* db, int id);

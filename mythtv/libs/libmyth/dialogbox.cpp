@@ -12,8 +12,9 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythwidgets.h"
 
-DialogBox::DialogBox(const QString &text, const char *checkboxtext,
-                     QWidget *parent, const char *name)
+DialogBox::DialogBox(MythMainWindow *parent, const QString &text, 
+                     const char *checkboxtext,
+                     const char *name)
          : MythDialog(parent, name)
 {
     QLabel *maintext = new QLabel(text, this);
@@ -43,6 +44,10 @@ DialogBox::DialogBox(const QString &text, const char *checkboxtext,
 void DialogBox::AddButton(const QString &title)
 {
     MythPushButton *button = new MythPushButton(title, this);
+
+    if (buttongroup->count() == 0)
+        button->setFocus();
+
     buttongroup->insert(button);
 
     box->addWidget(button, 0);
@@ -50,9 +55,6 @@ void DialogBox::AddButton(const QString &title)
 
 void DialogBox::buttonPressed(int which)
 {
-    if (buttongroup->find(which) == checkbox)
-    {
-    }
-    else
-        done(which+1);
+    if (buttongroup->find(which) != checkbox)
+        done(which + 1);
 }

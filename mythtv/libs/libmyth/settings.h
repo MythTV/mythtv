@@ -163,9 +163,9 @@ protected:
 
 class ConfigurationDialogWidget: public MythDialog {
 public:
-    ConfigurationDialogWidget(QWidget* parent = NULL, 
+    ConfigurationDialogWidget(MythMainWindow *parent, 
                               const char* widgetName = 0):
-        MythDialog(parent, widgetName, TRUE) {};
+        MythDialog(parent, widgetName) {};
 
     virtual void keyPressEvent(QKeyEvent* e);
 };
@@ -173,7 +173,7 @@ public:
 class ConfigurationDialog: virtual public Configurable {
 public:
     // Make a modal dialog containing configWidget
-    virtual MythDialog* dialogWidget(QWidget* parent,
+    virtual MythDialog* dialogWidget(MythMainWindow *parent,
                                      const char* widgetName = 0);
 
     // Show a dialogWidget, and save if accepted
@@ -184,7 +184,7 @@ public:
 class ConfigurationWizard: public ConfigurationDialog,
                            public ConfigurationGroup {
 public:
-    virtual MythDialog* dialogWidget(QWidget* parent,
+    virtual MythDialog* dialogWidget(MythMainWindow *parent,
                                      const char* widgetName=0);
 };
 

@@ -3,7 +3,6 @@
 #include <qfont.h>
 #include <qsqldatabase.h>
 #include <qsqlquery.h>
-#include <qaccel.h>
 #include <math.h>
 #include <qcursor.h>
 #include <qapplication.h>
@@ -39,11 +38,12 @@ QString RunProgramGuide(QString startchannel, bool thread, TV *player)
     if (startchannel == QString::null)
         startchannel = "";
 
-    GuideGrid gg(startchannel, player);
+    GuideGrid gg(gContext->GetMainWindow(), startchannel, player, "guidegrid");
+
+    gg.Show();
 
     if (thread)
     {
-        gg.show();
         qApp->unlock();
 
         while (gg.isVisible())
@@ -53,6 +53,7 @@ QString RunProgramGuide(QString startchannel, bool thread, TV *player)
         gg.exec();
 
     chanstr = gg.getLastChannel();
+
     if (thread)
         qApp->lock();
 
@@ -65,7 +66,7 @@ QString RunProgramGuide(QString startchannel, bool thread, TV *player)
     return chanstr;
 }
 
-GuideGrid::GuideGrid(const QString &channel, TV *player, QWidget *parent, 
+GuideGrid::GuideGrid(MythMainWindow *parent, const QString &channel, TV *player,
                      const char *name)
          : MythDialog(parent, name)
 {
@@ -196,53 +197,6 @@ GuideGrid::GuideGrid(const QString &channel, TV *player, QWidget *parent,
     fillProgramInfos();
     //int fillprogs = clock.elapsed();
 
-    QAccel *accel = new QAccel(this);
-    accel->connectItem(accel->insertItem(Key_Left), this, SLOT(cursorLeft()));
-    accel->connectItem(accel->insertItem(Key_Right), this, SLOT(cursorRight()));
-    accel->connectItem(accel->insertItem(Key_Down), this, SLOT(cursorDown()));
-    accel->connectItem(accel->insertItem(Key_Up), this, SLOT(cursorUp()));
-
-    accel->connectItem(accel->insertItem(Key_A), this, SLOT(cursorLeft()));
-    accel->connectItem(accel->insertItem(Key_D), this, SLOT(cursorRight()));
-    accel->connectItem(accel->insertItem(Key_S), this, SLOT(cursorDown()));
-    accel->connectItem(accel->insertItem(Key_W), this, SLOT(cursorUp()));
-
-    accel->connectItem(accel->insertItem(Key_Home), this, SLOT(dayLeft()));
-    accel->connectItem(accel->insertItem(Key_End), this, SLOT(dayRight()));
-    accel->connectItem(accel->insertItem(CTRL + Key_Left), this, 
-                       SLOT(pageLeft()));
-    accel->connectItem(accel->insertItem(CTRL + Key_Right), this, 
-                       SLOT(pageRight()));
-    accel->connectItem(accel->insertItem(Key_PageUp), this, SLOT(pageUp()));
-    accel->connectItem(accel->insertItem(Key_PageDown), this, SLOT(pageDown()));
-    accel->connectItem(accel->insertItem(CTRL + Key_Up), this,
-                       SLOT(pageUp()));
-    accel->connectItem(accel->insertItem(CTRL + Key_Down), this,
-                       SLOT(pageDown()));
-
-    accel->connectItem(accel->insertItem(Key_7), this, SLOT(dayLeft()));
-    accel->connectItem(accel->insertItem(Key_1), this, SLOT(dayRight()));
-    accel->connectItem(accel->insertItem(Key_4), this, 
-                       SLOT(toggleGuideListing()));
-    accel->connectItem(accel->insertItem(Key_6), this, SLOT(showProgFinder()));
-    accel->connectItem(accel->insertItem(Key_3), this, SLOT(pageUp()));
-    accel->connectItem(accel->insertItem(Key_9), this, SLOT(pageDown()));
-    accel->connectItem(accel->insertItem(Key_Slash), this, 
-                       SLOT(toggleChannelFavorite()));
-
-    accel->connectItem(accel->insertItem(Key_C), this, SLOT(escape()));
-    accel->connectItem(accel->insertItem(Key_Escape), this, SLOT(escape()));
-    accel->connectItem(accel->insertItem(Key_M), this, SLOT(enter()));
-
-    accel->connectItem(accel->insertItem(Key_I), this, SLOT(displayInfo()));
-    accel->connectItem(accel->insertItem(Key_Space), this, SLOT(displayInfo()));
-    accel->connectItem(accel->insertItem(Key_Enter), this, SLOT(displayInfo()));
-    accel->connectItem(accel->insertItem(Key_Return), this, SLOT(displayInfo()));
-    accel->connectItem(accel->insertItem(Key_R), this, SLOT(quickRecord()));
-    accel->connectItem(accel->insertItem(Key_X), this, SLOT(channelUpdate()));
-
-    connect(this, SIGNAL(killTheApp()), this, SLOT(accept()));
-
     timeCheck = NULL;
     timeCheck = new QTimer(this);
     connect(timeCheck, SIGNAL(timeout()), SLOT(timeout()) );
@@ -253,14 +207,7 @@ GuideGrid::GuideGrid(const QString &channel, TV *player, QWidget *parent,
 
     updateBackground();
 
-    WFlags flags = getWFlags();
-    flags |= WRepaintNoErase;
-    setWFlags(flags);
-
-    showFullScreen();
-    setActiveWindow();
-    raise();
-    setFocus();
+    setNoErase();
 }
 
 GuideGrid::~GuideGrid()
@@ -280,6 +227,49 @@ GuideGrid::~GuideGrid()
     m_channelInfos.clear();
 
     delete theme;
+}
+
+void GuideGrid::keyPressEvent(QKeyEvent *e)
+{
+    if (e->state() == Qt::ControlButton)
+    {
+        switch (e->key())
+        {
+            case Key_Left: pageLeft(); return;
+            case Key_Right: pageRight(); return;
+            case Key_Up: pageUp(); return;
+            case Key_Down: pageDown(); return;
+            default: break;
+        }
+    }
+
+    switch (e->key())
+    {
+        case Key_Left: case Key_A: cursorLeft(); break;
+        case Key_Right: case Key_D: cursorRight(); break;
+        case Key_Down: case Key_S: cursorDown(); break;
+        case Key_Up: case Key_W: cursorUp(); break;
+
+        case Key_Home: case Key_7: dayLeft(); break;
+        case Key_End: case Key_1: dayRight(); break;
+        case Key_PageUp: case Key_3: pageUp(); break;
+        case Key_PageDown: case Key_9: pageDown(); break;
+      
+        case Key_4: toggleGuideListing(); break;
+        case Key_6: showProgFinder(); break;   
+      
+        case Key_Slash: toggleChannelFavorite(); break;
+ 
+        case Key_C: case Key_M: case Key_Escape: escape(); break;
+
+        case Key_I: case Key_Space: 
+        case Key_Enter: case Key_Return:  displayInfo(); break;
+
+        case Key_R: quickRecord(); break;
+        case Key_X: channelUpdate(); break;
+
+        default: MythDialog::keyPressEvent(e);
+    }
 }
 
 void GuideGrid::updateBackground(void)
@@ -1403,7 +1393,7 @@ void GuideGrid::enter()
 
     unsetCursor();
     selectState = 1;
-    emit killTheApp();
+    emit accept();
 }
 
 void GuideGrid::escape()
@@ -1416,7 +1406,7 @@ void GuideGrid::escape()
     }
 
     unsetCursor();
-    emit killTheApp();
+    emit accept();
 }
 
 void GuideGrid::quickRecord()
@@ -1452,8 +1442,7 @@ void GuideGrid::displayInfo()
 
     if (pginfo)
     {
-        InfoDialog diag(pginfo, this, "Program Info");
-        diag.setCaption("BLAH!!!");
+        InfoDialog diag(pginfo, gContext->GetMainWindow(), "Program Info");
         diag.exec();
     }
     else

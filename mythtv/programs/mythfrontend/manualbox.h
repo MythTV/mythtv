@@ -22,7 +22,7 @@ class ManualBox : public MythDialog
     Q_OBJECT
   public:
 
-    ManualBox(QWidget *parent = 0, const char *name = 0);
+    ManualBox(MythMainWindow *parent, const char *name = 0);
    ~ManualBox(void);
    
   signals:

@@ -48,7 +48,6 @@ struct XvData
     Window XJ_win;
     Window XJ_curwin;
     GC XJ_gc;
-    XSizeHints hints;
     Screen *XJ_screen;
     Display *XJ_disp;
     XShmSegmentInfo *XJ_SHMInfo;
@@ -71,7 +70,6 @@ XvVideoOutput::XvVideoOutput(void)
     XJ_started = 0; 
     xv_port = -1; 
     scratchspace = NULL; 
-    created_win = false;
 
     data = new XvData();
 }
@@ -102,39 +100,13 @@ int XvVideoOutput::GetRefreshRate(void)
     return (int)rate;
 }
 
-void XvVideoOutput::sizehint(int x, int y, int width, int height, int max)
-{
-    data->hints.flags = PPosition | PSize | PWinGravity | PBaseSize;
-    data->hints.x = x; 
-    data->hints.y = y; 
-    data->hints.width = width; 
-    data->hints.height = height;
-    if (max)
-    {
-        data->hints.max_width = width; 
-        data->hints.max_height = height;
-        data->hints.flags |= PMaxSize;
-    }
-    else
-    {
-        data->hints.max_width = 0; 
-        data->hints.max_height = 0; 
-    }
-    data->hints.base_width = 160;
-    data->hints.base_height = 120;
-    data->hints.win_gravity = StaticGravity;
-    XSetWMNormalHints(data->XJ_disp, data->XJ_win, &(data->hints));
-}
-
-bool XvVideoOutput::Init(int width, int height, char *window_name, 
-                         char *icon_name, int num_buffers, 
-                         unsigned char **out_buffers, unsigned int wid)
+bool XvVideoOutput::Init(int width, int height, int num_buffers, 
+                         unsigned char **out_buffers, unsigned int winid,
+                         int winx, int winy, int winw, int winh, 
+                         unsigned int embedid)
 {
     pthread_mutex_init(&lock, NULL);
 
-    XWMHints wmhints;
-    XTextProperty windowName, iconName;
-    XClassHint hint;
     int (*old_handler)(Display *, XErrorEvent *);
     int i, ret;
     XJ_caught_error = 0;
@@ -144,9 +116,6 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
     int p_num_adaptors;
 
     XvAdaptorInfo *ai;
-
-    hint.res_name = window_name;
-    hint.res_class = window_name;
 
     XJ_width = width;
     XJ_height = height;
@@ -252,24 +221,10 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
                       &XJ_screenwidth, &XJ_screenheight);
 #endif
 
-    oldx = curx = XJ_screenx + 4; 
-    oldy = cury = XJ_screeny + 20;
-    oldw = curw = XJ_width;
-    oldh = curh = XJ_height;
-
-    // if non-XV mode then run @ GUI size
-    if ( xv_port == -1 )
-    {
-        curx = XJ_screenx;
-        cury = XJ_screeny;
-        curw = gContext->GetNumSetting("GuiWidth", XJ_screenwidth);
-        curh = gContext->GetNumSetting("GuiHeight", XJ_screenheight);
-
-        if (curw == 0)
-            curw = XJ_screenwidth;
-        if (curh == 0)
-            curh = XJ_screenheight;
-    }
+    oldx = curx = winx; 
+    oldy = cury = winy;
+    oldw = curw = winw;
+    oldh = curh = winh;
 
     dispx = 0; dispy = 0;
     dispw = curw; disph = curh;
@@ -278,56 +233,19 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
 
     embedding = false;
 
-    bool createwindow = true;
-    if (wid > 0)
+    if (winid <= 0)
     {
-        data->XJ_win = wid;
-        data->XJ_curwin = data->XJ_win;
-        createwindow = false;
+        cerr << "Bad winid given to output\n";
+        return false;
     }
 
-    if (createwindow)
-    {
-        if (XJ_aspect)
-            curw = 4 * curh / 3;
+    data->XJ_curwin = data->XJ_win = winid;
+    dispx = 0;
+    dispy = 0;
+    
+    if (embedid > 0)
+        data->XJ_curwin = data->XJ_win = embedid;
 
-        data->XJ_win = XCreateSimpleWindow(data->XJ_disp, data->XJ_root, curx,
-                                           cury, curw, curh, 0, 
-                                           XJ_white, XJ_black);
-        data->XJ_curwin = data->XJ_win;
-        created_win = true;
-
-        if (!data->XJ_win) 
-        {  
-            printf("create window failed\n");
-            return false; 
-        } 
-
-        XSetClassHint(data->XJ_disp, data->XJ_win, &hint);
- 
-        /* tell window manager about our window */
-
-        sizehint(curx, cury, curw, curh, 0);
-  
-        wmhints.input=True;
-        wmhints.flags=InputHint;
-
-        XStringListToTextProperty(&window_name, 1 ,&windowName);
-        XStringListToTextProperty(&icon_name, 1 ,&iconName);
-
-
-        XSetWMProperties(data->XJ_disp, data->XJ_win, 
-                         &windowName, &iconName,
-                         NULL, 0, &(data->hints), &wmhints, NULL);
-
-        XFree(iconName.value);
-        XFree(windowName.value);
-  
-        XSelectInput(data->XJ_disp, data->XJ_win,
-                     ExposureMask|KeyPressMask|StructureNotifyMask);
-        XMapRaised(data->XJ_disp, data->XJ_win);
-    }
- 
     old_handler = XSetErrorHandler(XJ_error_catcher);
     XSync(data->XJ_disp, 0);
 
@@ -483,11 +401,10 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
     {
         return false;
     }
+
+    MoveResize();
   
     XJ_started = 1;
-
-    if (createwindow)
-        ToggleFullScreen();
 
     if ((xv_port != -1) &&
         (colorid != GUID_I420_PLANAR))
@@ -552,40 +469,9 @@ void XvVideoOutput::Exit(void)
             }
         }
 
-        if (created_win)
-            XDestroyWindow(data->XJ_disp, data->XJ_win);
         XFreeGC(data->XJ_disp, data->XJ_gc);
         XCloseDisplay(data->XJ_disp);
     }
-}
-
-void XvVideoOutput::decorate(int dec)
-{
-   dec = dec;
-}
-
-void XvVideoOutput::hide_cursor(void)
-{
-    Cursor no_ptr;
-    Pixmap bm_no;
-    XColor black, dummy;
-    Colormap colormap;
-    static char no_data[] = { 0,0,0,0,0,0,0,0 };
-
-    colormap = DefaultColormap(data->XJ_disp, DefaultScreen(data->XJ_disp));
-    XAllocNamedColor(data->XJ_disp, colormap, "black", &black, &dummy);
-    bm_no = XCreateBitmapFromData(data->XJ_disp, data->XJ_win, no_data, 8, 8);
-    no_ptr = XCreatePixmapCursor(data->XJ_disp, bm_no, bm_no, &black, &black, 
-                                 0, 0);
-
-    XDefineCursor(data->XJ_disp, data->XJ_win, no_ptr);
-    XFreeCursor(data->XJ_disp, no_ptr);
-    XFreePixmap(data->XJ_disp, bm_no);
-}
-
-void XvVideoOutput::show_cursor(void)
-{
-    XDefineCursor(data->XJ_disp, data->XJ_win, 0);
 }
 
 void XvVideoOutput::ToggleFullScreen(void)
@@ -600,8 +486,6 @@ void XvVideoOutput::ToggleFullScreen(void)
         XJ_fullscreen = 0; 
 
         curx = oldx; cury = oldy; curw = oldw; curh = oldh;
-        show_cursor();
-        decorate(1);
     } 
     else 
     {
@@ -612,8 +496,6 @@ void XvVideoOutput::ToggleFullScreen(void)
         cury = XJ_screeny;
         curw = XJ_screenwidth;
         curh = XJ_screenheight + 4;
-        hide_cursor();
-        decorate(0);
     }
 
     dispx = 0;
@@ -646,8 +528,7 @@ void XvVideoOutput::EmbedInWidget(unsigned long wid, int x, int y, int w, int h)
 
     embedding = true;
 
-    if (!created_win)
-        MoveResize();
+    MoveResize();
 
     pthread_mutex_unlock(&lock);
 }

@@ -84,11 +84,12 @@ void SetupMenuCallback(void* data, QString& selection) {
     }
 }
 
-void SetupMenu(void) {
+void SetupMenu(void) 
+{
     QString theme = gContext->GetSetting("Theme", "blue");
 
     ThemedMenu* menu = new ThemedMenu(gContext->FindThemeDir(theme),
-                                      "setup.xml");
+                                      "setup.xml", gContext->GetMainWindow());
 
     menu->setCallback(SetupMenuCallback, gContext);
     menu->setKillable();
@@ -122,6 +123,10 @@ int main(int argc, char *argv[])
     gContext->SetSetting("ThemeQt", "1");
     gContext->SetSetting("Theme", "blue");
     gContext->LoadQtConfig();
+
+    MythMainWindow *mainWindow = new MythMainWindow();
+    mainWindow->Show();
+    gContext->SetMainWindow(mainWindow);
 
     char *home = getenv("HOME");
     QString fileprefix = QString(home) + "/.mythtv";

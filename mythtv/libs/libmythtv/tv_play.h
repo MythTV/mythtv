@@ -6,6 +6,8 @@
 #include <qdatetime.h>
 #include <pthread.h>
 #include <qvaluevector.h>
+#include <qvaluelist.h>
+#include <qmutex.h>
 
 #include "tv.h"
 
@@ -19,6 +21,7 @@ class VolumeControl;
 class NuppelVideoPlayer;
 class RingBuffer;
 class ProgramInfo;
+class MythDialog;
 
 class TV : public QObject
 {
@@ -27,7 +30,7 @@ class TV : public QObject
     TV(QSqlDatabase *db);
    ~TV(void);
 
-    void Init(void);
+    void Init(bool createWindow = true);
 
     TVState LiveTV(void);
     void StopLiveTV(void) { exitPlayer = true; }
@@ -83,6 +86,8 @@ class TV : public QObject
 
     void RunTV(void);
     static void *EventThread(void *param);
+
+    bool eventFilter(QObject *o, QEvent *e);
 
   private:
     void SetChannel(bool needopen = false);
@@ -213,6 +218,11 @@ class TV : public QObject
     unsigned int times_pressed;
     QTimer *prevChannelTimer;
     QString last_channel;
+
+    MythDialog *myWindow;
+
+    QValueList<int> keyList;
+    QMutex keyListLock;
 };
 
 #endif

@@ -30,7 +30,8 @@ using namespace std;
 #include "programinfo.h"
 #include "remoteutil.h"
 
-PlaybackBox::PlaybackBox(BoxType ltype, QWidget *parent, const char *name)
+PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent, 
+                         const char *name)
            : MythDialog(parent, name)
 {
     type = ltype;
@@ -111,12 +112,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, QWidget *parent, const char *name)
 
     updateBackground();
 
-    WFlags flags = getWFlags();
-    flags |= WRepaintNoErase;
-    setWFlags(flags);
-
-    showFullScreen();
-    setActiveWindow();
+    setNoErase();
 
     connect(timer, SIGNAL(timeout()), this, SLOT(timeout()));
 
@@ -1237,9 +1233,6 @@ void PlaybackBox::play(ProgramInfo *rec)
     }
     noUpdate = false;
 
-    showFullScreen();
-    setActiveWindow();
-
     ignoreevents = false;
 
     update(fullRect);
@@ -1371,7 +1364,7 @@ void PlaybackBox::showDeletePopup(int types)
     backup.end();
     noUpdate = true;
 
-    popup = new MythPopupBox(this);
+    popup = new MythPopupBox(gContext->GetMainWindow(), "delete popup");
     popup->setFrameStyle( QFrame::Box | QFrame::Plain );
     if (graphicPopup == false)
         popup->setPaletteBackgroundColor(popupBackground);
@@ -1383,34 +1376,32 @@ void PlaybackBox::showDeletePopup(int types)
         msg = new QLabel(tr("You have finished watching:"), popup);
     else if (types == 2)
         msg = new QLabel(tr("Are you sure you want to delete:"), popup);
-    msg->setBackgroundOrigin(WindowOrigin); 
+    msg->setBackgroundOrigin(ParentOrigin); 
     msg->setPaletteForegroundColor(popupForeground);
     QLabel *filler1 = new QLabel("", popup);
-    filler1->setBackgroundOrigin(WindowOrigin);
+    filler1->setBackgroundOrigin(ParentOrigin);
     QLabel *title = new QLabel(delitem->title, popup);
     title->setPaletteForegroundColor(popupForeground);
-    title->setBackgroundOrigin(WindowOrigin);
+    title->setBackgroundOrigin(ParentOrigin);
     title->setFont(bigFont);
     title->setMaximumWidth((int)(width() / 2));
     QLabel *subtitle = new QLabel("\"" + delitem->subtitle + "\"", popup);
     subtitle->setPaletteForegroundColor(popupForeground);
-    subtitle->setBackgroundOrigin(WindowOrigin);
+    subtitle->setBackgroundOrigin(ParentOrigin);
     QLabel *times = new QLabel(timedate, popup);
     times->setPaletteForegroundColor(popupForeground);
-    times->setBackgroundOrigin(WindowOrigin);
-    QLabel *desc = new QLabel(descrip, popup);
-    desc->setPaletteForegroundColor(popupForeground);
-    desc->setBackgroundOrigin(WindowOrigin);
+    times->setBackgroundOrigin(ParentOrigin);
     QLabel *filler2 = new QLabel("", popup);
-    filler2->setBackgroundOrigin(WindowOrigin);
+    filler2->setBackgroundOrigin(ParentOrigin);
     QLabel *msg2 = NULL;
+
     if (types == 1)
-        msg2 = new QLabel(tr("Delete this recording? It will be gone forever."),
-                          popup);
-    else if (types == 2)
-            msg2 = new QLabel(tr("It will be gone forever."), popup);
+        msg2 = new QLabel(tr("Delete this recording?"), popup);
+    else
+        msg2 = new QLabel(" ", popup);
+
     msg2->setPaletteForegroundColor(popupForeground);
-    msg2->setBackgroundOrigin(WindowOrigin);
+    msg2->setBackgroundOrigin(ParentOrigin);
 
     MythPushButton *yesButton = new MythPushButton(tr("Yes, get rid of it"),
                                                    popup);
@@ -1431,10 +1422,6 @@ void PlaybackBox::showDeletePopup(int types)
     else
         subtitle->hide();
     popup->addWidget(times, false);
-    if ((delitem->description).stripWhiteSpace().length() > 0)
-        popup->addWidget(desc, false);
-    else
-        desc->hide();
     popup->addWidget(filler2, false);
     popup->addWidget(msg2, false);
 
@@ -1449,7 +1436,6 @@ void PlaybackBox::showDeletePopup(int types)
     title->adjustSize();
     times->adjustSize();
     subtitle->adjustSize();
-    desc->adjustSize();
     yesButton->adjustSize();
     noButton->adjustSize();
 
@@ -1458,7 +1444,7 @@ void PlaybackBox::showDeletePopup(int types)
     int x, y, maxw, poph;
     poph = msg->height() + msg2->height() + filler1->height() + 
            filler2->height() + title->height() + times->height() + 
-           desc->height() + yesButton->height() + noButton->height();
+           yesButton->height() + noButton->height() + (int)(170 * hmult);
     popup->setMaximumHeight(poph);
     maxw = 0;
 
@@ -1471,10 +1457,13 @@ void PlaybackBox::showDeletePopup(int types)
     if (noButton->width() > maxw)
         maxw = noButton->width();
 
+    maxw += (int)(80 * wmult);
+ 
     x = (int)(width() / 2) - (int)(maxw / 2);
-    y = (int)(height() / 2) - (int)(popup->height() / 1.5);
+    y = (int)(height() / 2) - (int)(poph / 2);
 
-    popup->move(x, y);
+    popup->setFixedSize(maxw, poph);
+    popup->setGeometry(x, y, maxw, poph);
 
     popup->Show();
 

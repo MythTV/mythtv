@@ -26,7 +26,7 @@ class PlaybackBox : public MythDialog
   public:
     typedef enum { Play, Delete } BoxType;
 
-    PlaybackBox(BoxType ltype, QWidget *parent = 0, const char *name = 0);
+    PlaybackBox(BoxType ltype, MythMainWindow *parent, const char *name = 0);
    ~PlaybackBox(void);
    
     void customEvent(QCustomEvent *e);

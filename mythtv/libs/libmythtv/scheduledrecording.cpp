@@ -431,7 +431,8 @@ void ScheduledRecording::forgetHistory(QSqlDatabase* db,
         MythContext::DBError("forgetHistory", result);
 }
 
-MythDialog* ScheduledRecording::dialogWidget(QWidget* parent, const char* name)
+MythDialog* ScheduledRecording::dialogWidget(MythMainWindow *parent, 
+                                             const char *name)
 {
     float wmult, hmult;
     int screenwidth, screenheight;

@@ -44,6 +44,12 @@ int main(int argc, char *argv[])
     int port = gContext->GetNumSetting("MasterServerPort", 6543);
     gContext->ConnectServer(server, port);
 
+    gContext->LoadQtConfig();
+
+    MythMainWindow *mainWindow = new MythMainWindow();
+    mainWindow->Show();
+    gContext->SetMainWindow(mainWindow);
+
     TV *tv = new TV(db);
     tv->Init();
 

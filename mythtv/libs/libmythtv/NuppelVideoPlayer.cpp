@@ -37,24 +37,6 @@ extern "C" {
 
 #include "remoteencoder.h"
 
-#define wsUp            0x52 + 256
-#define wsDown          0x54 + 256
-#define wsLeft          0x51 + 256
-#define wsRight         0x53 + 256
-#define wsEscape        0x1b + 256
-#define wsZero          0xb0 + 256
-#define wsOne           0xb1 + 256
-#define wsTwo           0xb2 + 256
-#define wsThree         0xb3 + 256
-#define wsFour          0xb4 + 256
-#define wsFive          0xb5 + 256
-#define wsSix           0xb6 + 256
-#define wsSeven         0xb7 + 256
-#define wsEight         0xb8 + 256
-#define wsNine          0xb9 + 256
-#define wsEnter         0x8d + 256
-#define wsReturn        0x0d + 256
-
 NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
                                      ProgramInfo *info)
 {
@@ -303,10 +285,24 @@ void NuppelVideoPlayer::UnpauseAudio(void)
 
 void NuppelVideoPlayer::InitVideo(void)
 {
-    char name[] = "MythTV"; 
+    MythMainWindow *window = gContext->GetMainWindow();
+    if (!window)
+    {
+        cerr << "No main window, aborting\n";
+        exit(0);
+    }
+
+    QWidget *widget = window->currentWidget();
+    if (!widget)
+    {
+        cerr << "No top level widget, aborting\n";
+        exit(0);
+    }
+
     videoOutput = new XvVideoOutput();
-    videoOutput->Init(video_width, video_height, name, name, MAXVBUFFER + 1, 
-                      vbuffer, embedid);
+    videoOutput->Init(video_width, video_height, MAXVBUFFER + 1, vbuffer, 
+                      widget->winId(), 0, 0, widget->width(), widget->height(),
+                      embedid);
     if (embedid > 0)
     {
         videoOutput->EmbedInWidget(embedid, embx, emby, embw, embh);
@@ -2312,9 +2308,9 @@ void NuppelVideoPlayer::DoKeypress(int keypress)
     {
         switch(keypress)
         {
-            case wsUp: osd->DialogUp(dialogname); break;
-            case wsDown: osd->DialogDown(dialogname); break;
-            case ' ': case wsEnter: case wsReturn: 
+            case Qt::Key_Up: osd->DialogUp(dialogname); break;
+            case Qt::Key_Down: osd->DialogDown(dialogname); break;
+            case Qt::Key_Space: case Qt::Key_Enter: case Qt::Key_Return: 
             {
                 osd->TurnDialogOff(dialogname); 
                 HandleResponse();
@@ -2330,12 +2326,12 @@ void NuppelVideoPlayer::DoKeypress(int keypress)
 
     switch (keypress)
     {
-        case ' ': case wsEnter: case wsReturn:
+        case Qt::Key_Space: case Qt::Key_Enter: case Qt::Key_Return:
         {
             HandleSelect();
             break;
         }
-        case wsLeft: case 'a': case 'A': 
+        case Qt::Key_Left: case Qt::Key_A: 
         {
             if (seekamount > 0)
             {
@@ -2349,7 +2345,7 @@ void NuppelVideoPlayer::DoKeypress(int keypress)
             UpdateTimeDisplay();
             break;           
         }
-        case wsRight: case 'd': case 'D':
+        case Qt::Key_Right: case Qt::Key_D:
         {
             if (seekamount > 0)
             {
@@ -2363,19 +2359,19 @@ void NuppelVideoPlayer::DoKeypress(int keypress)
             UpdateTimeDisplay();
             break;
         }
-        case wsUp: 
+        case Qt::Key_Up: case Qt::Key_W:
         {
             UpdateSeekAmount(true);
             UpdateTimeDisplay();
             break;
         }
-        case wsDown:
+        case Qt::Key_Down: case Qt::Key_S:
         {
             UpdateSeekAmount(false);
             UpdateTimeDisplay();
             break; 
         }
-        case 'c': case 'C':
+        case Qt::Key_C:
         {
             QMap<long long, int>::Iterator it;
             for (it = deleteMap.begin(); it != deleteMap.end(); ++it)
@@ -2385,7 +2381,7 @@ void NuppelVideoPlayer::DoKeypress(int keypress)
             UpdateEditSlider();
             break;
         }
-        case 'z': case 'Z':
+        case Qt::Key_Z:
         {
             if (hascommbreaktable)
             {
@@ -2401,7 +2397,7 @@ void NuppelVideoPlayer::DoKeypress(int keypress)
             }
             break;
         }
-        case wsEscape: case 'e': case 'E': case 'm': case 'M':
+        case Qt::Key_Escape: case Qt::Key_E: case Qt::Key_M:
         {
             DisableEdit();
             break;

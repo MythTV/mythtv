@@ -540,8 +540,8 @@ void ConfigurationDialogWidget::keyPressEvent(QKeyEvent* e) {
     }
 }
 
-MythDialog* ConfigurationDialog::dialogWidget(QWidget* parent,
-                                              const char* widgetName) 
+MythDialog* ConfigurationDialog::dialogWidget(MythMainWindow *parent,
+                                              const char *widgetName) 
 {
     MythDialog* dialog = new ConfigurationDialogWidget(parent, widgetName);
 
@@ -560,7 +560,7 @@ int ConfigurationDialog::exec(QSqlDatabase* db)
 {
     load(db);
 
-    MythDialog* dialog = dialogWidget(NULL);
+    MythDialog* dialog = dialogWidget(gContext->GetMainWindow());
     dialog->setCursor(QCursor(Qt::ArrowCursor));
     dialog->Show();
 
@@ -574,9 +574,9 @@ int ConfigurationDialog::exec(QSqlDatabase* db)
     return ret;
 }
 
-MythDialog* ConfigurationWizard::dialogWidget(QWidget* parent,
-                                              const char* widgetName) {
-    MythWizard* wizard = new MythWizard(parent, widgetName, TRUE);
+MythDialog* ConfigurationWizard::dialogWidget(MythMainWindow *parent,
+                                              const char *widgetName) {
+    MythWizard* wizard = new MythWizard(parent, widgetName);
 
     connect(this, SIGNAL(changeHelpText(QString)), wizard,
             SLOT(setHelpText(QString)));

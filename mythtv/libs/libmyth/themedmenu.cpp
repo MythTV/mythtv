@@ -21,7 +21,7 @@ using namespace std;
 #include "mythplugin.h"
 
 ThemedMenu::ThemedMenu(const char *cdir, const char *menufile, 
-                       QWidget *parent, const char *name)
+                       MythMainWindow *parent, const char *name)
           : MythDialog(parent, name)
 {
     ignorekeys = false;
@@ -925,8 +925,7 @@ void ThemedMenu::parseMenu(QString menuname, int row, int col)
         activebutton = buttonRows[currentrow].buttons[currentcolumn];
     }
 
-    WFlags flags = getWFlags();
-    setWFlags(flags | Qt::WRepaintNoErase);
+    setNoErase();
 
     menulevel++;
 
@@ -1505,8 +1504,6 @@ void ThemedMenu::ReloadTheme(void)
 
     gContext->ThemeWidget(this);
 
-    showFullScreen();
-
     QString themedir = gContext->GetThemeDir();
     parseSettings(themedir, "theme.xml");
 
@@ -1576,7 +1573,8 @@ void ThemedMenu::keyPressEvent(QKeyEvent *e)
         case Key_Space:
         {
             handleAction(activebutton->action);
-	    break;
+            handled = true;
+            break;
         }
         case Key_Escape:
         {
@@ -1586,6 +1584,7 @@ void ThemedMenu::keyPressEvent(QKeyEvent *e)
             else if (killable || e->state() == exitModifier)
                 done(0);
             handled = true;
+            break;
         }
         default: break;
     }
@@ -1601,7 +1600,7 @@ void ThemedMenu::keyPressEvent(QKeyEvent *e)
         update(activebutton->posRect);
     }
     else
-        QDialog::keyPressEvent(e);
+        MythDialog::keyPressEvent(e);
 
     ignorekeys = false;
 } 
@@ -1669,9 +1668,6 @@ void ThemedMenu::handleAction(QString &action)
             callback(callbackdata, selection);
         }
     }   
-
-    showFullScreen();
-    setActiveWindow();
 }
 
 bool ThemedMenu::findDepends(QString file)

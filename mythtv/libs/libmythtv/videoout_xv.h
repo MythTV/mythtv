@@ -9,9 +9,9 @@ class XvVideoOutput
     XvVideoOutput();
    ~XvVideoOutput();
 
-    bool Init(int width, int height, char *window_name, 
-              char *icon_name, int num_buffers, 
-              unsigned char **out_buffers, unsigned int wid = 0);
+    bool Init(int width, int height, int num_buffers, 
+              unsigned char **out_buffers, unsigned int winid,
+              int winx, int winy, int winw, int winh, unsigned int embedid = 0);
     void PrepareFrame(unsigned char *buffer, int width, int height);
     void Show();
     int CheckEvents(void);
@@ -28,12 +28,7 @@ class XvVideoOutput
     int GetRefreshRate(void);
 
   private:
-    void sizehint(int x, int y, int width, int height, int max);
     void Exit(void);
-
-    void decorate(int dec); 
-    void hide_cursor(void);
-    void show_cursor(void);
 
     XvData *data;
 
@@ -57,7 +52,6 @@ class XvVideoOutput
     int dispx, dispy, dispw, disph;
     int olddispx, olddispy, olddispw, olddisph;
     bool embedding;
-    bool created_win;
 
     int xv_port;
     int colorid;

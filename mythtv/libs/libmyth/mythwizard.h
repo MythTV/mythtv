@@ -50,7 +50,7 @@ class Q_EXPORT MythWizard : public MythDialog
     Q_PROPERTY(QFont titleFont READ titleFont WRITE setTitleFont)
 
 public:
-    MythWizard(QWidget* parent = 0, const char* name = 0, bool modal = FALSE);
+    MythWizard(MythMainWindow* parent, const char* name = 0);
     ~MythWizard();
 
     void Show();

@@ -22,7 +22,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "remoteutil.h"
 
-ViewScheduled::ViewScheduled(QSqlDatabase *ldb, QWidget *parent, 
+ViewScheduled::ViewScheduled(QSqlDatabase *ldb, MythMainWindow *parent, 
                              const char *name)
              : MythDialog(parent, name)
 {
@@ -96,13 +96,8 @@ ViewScheduled::ViewScheduled(QSqlDatabase *ldb, QWidget *parent,
     updateBackground();
 
     FillList();
-
-    WFlags flags = getWFlags();
-    flags |= WRepaintNoErase;
-    setWFlags(flags);
-
-    showFullScreen();
-    setActiveWindow();
+ 
+    setNoErase();
 
     gContext->addListener(this);
 }
@@ -689,8 +684,7 @@ void ViewScheduled::edit()
 
     if (rec)
     {
-        InfoDialog diag(rec, this, "Program Info");
-        diag.setCaption("BLAH!!!");
+        InfoDialog diag(rec, gContext->GetMainWindow(), "Program Info");
         diag.exec();
 
         QString thequery = "UPDATE settings SET data = \"yes\" WHERE value = "
@@ -730,8 +724,7 @@ void ViewScheduled::selected()
     }
     else if (rec)
     {
-        InfoDialog diag(rec, this, "Program Info");
-        diag.setCaption("BLAH!!!");
+        InfoDialog diag(rec, gContext->GetMainWindow(), "Program Info");
         diag.exec();
 
         ScheduledRecording::signalChange(db);
@@ -749,15 +742,10 @@ void ViewScheduled::handleNotRecording(ProgramInfo *rec)
                          "it conflicts with another scheduled recording.  Do "
                          "you want to re-enable this recording?");
 
-    DialogBox diag(message);
+    DialogBox diag(gContext->GetMainWindow(), message);
 
-    QString button = tr("Yes, I want to record it.");
-    diag.AddButton(button);
-
-    button = tr("No, leave it disabled.");
-    diag.AddButton(button);
-
-    diag.Show();
+    diag.AddButton(tr("Yes, I want to record it."));
+    diag.AddButton(tr("No, leave it disabled."));
 
     int ret = diag.exec();
 
@@ -825,26 +813,6 @@ void ViewScheduled::handleConflicting(ProgramInfo *rec)
 {
     chooseConflictingProgram(rec);
     return;
-#if 0
-    DialogBox diag("How do you want to resolve this conflict?");
-
-    diag.AddButton("Adjust this program's recording time");
-    diag.AddButton("Record only one program in this timeslot");
-
-    diag.Show();
-    int ret = diag.exec();
-
-    if (ret == 1)
-    {
-        SetRecTimeDialog srt(rec, db);
-        srt.Show();
-        srt.exec();
-    }
-    else
-    {
-        chooseConflictingProgram(rec);
-    }
-#endif
 }
 
 void ViewScheduled::handleDuplicate(ProgramInfo *rec)
@@ -852,10 +820,9 @@ void ViewScheduled::handleDuplicate(ProgramInfo *rec)
     QString message = tr("Recording this program has been suppressed because "
                          "it has already been recorded in the past.");
 
-    DialogBox diag(message);
+    DialogBox diag(gContext->GetMainWindow(), message);
     diag.AddButton(tr("OK"));
     diag.AddButton(tr("Unsuppress recording"));
-    diag.Show();
     int ret = diag.exec();
     if (ret == 2)
     {
@@ -878,8 +845,9 @@ void ViewScheduled::chooseConflictingProgram(ProgramInfo *rec)
     QString message = tr("The follow scheduled recordings conflict with each "
                          "other.  Which would you like to record?");
 
-    DialogBox diag(message, tr("Remember this choice and use it automatically "
-                               "in the future"));
+    DialogBox diag(gContext->GetMainWindow(), message, 
+                   tr("Remember this choice and use it automatically "
+                      "in the future"));
  
     QString button; 
     button = rec->title + QString("\n");
@@ -906,7 +874,6 @@ void ViewScheduled::chooseConflictingProgram(ProgramInfo *rec)
         diag.AddButton(button);
     }
 
-    diag.Show();
     int ret = diag.exec();
     int boxstatus = diag.getCheckBoxState();
 

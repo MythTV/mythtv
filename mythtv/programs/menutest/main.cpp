@@ -22,7 +22,20 @@ int main(int argc, char **argv)
         exit(0);
     }
 
-    ThemedMenu *diag = new ThemedMenu(argv[1], argv[2]);
+    QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
+    if (!gContext->OpenDatabase(db))
+    {
+        printf("couldn't open db\n");
+        return -1;
+    }
+
+    gContext->LoadQtConfig();
+
+    MythMainWindow *mainWindow = new MythMainWindow();
+    mainWindow->Show();
+    gContext->SetMainWindow(mainWindow);
+
+    ThemedMenu *diag = new ThemedMenu(argv[1], argv[2], mainWindow, "menutest");
 
     diag->Show();
     int result = diag->exec();

@@ -31,44 +31,8 @@ using namespace std;
 #include "programinfo.h"
 #include "remoteutil.h"
 
-struct QtToXKeyMap
-{
-    int     xKey;
-    int     qtKey;
-};
-
-// cheat and put the keycodes here
-#define wsUp            0x52 + 256
-#define wsDown          0x54 + 256
-#define wsLeft          0x51 + 256
-#define wsRight         0x53 + 256
-#define wsPageUp        0x55 + 256
-#define wsPageDown      0x56 + 256
-#define wsEnd           0x57 + 256
-#define wsBegin         0x58 + 256
-#define wsEscape        0x1b + 256
-#define wsZero          0xb0 + 256
-#define wsOne           0xb1 + 256
-#define wsTwo           0xb2 + 256
-#define wsThree         0xb3 + 256
-#define wsFour          0xb4 + 256
-#define wsFive          0xb5 + 256
-#define wsSix           0xb6 + 256
-#define wsSeven         0xb7 + 256
-#define wsEight         0xb8 + 256
-#define wsNine          0xb9 + 256
-#define wsEnter         0x8d + 256
-#define wsReturn        0x0d + 256
-
-QtToXKeyMap gKeyMap[] =
-{
-    {wsUp, Qt::Key_Up}, {wsDown, Qt::Key_Down}, {wsLeft, Qt::Key_Left}, 
-    {wsRight, Qt::Key_Right}, {wsEnd, Qt::Key_End}, {wsBegin, Qt::Key_Home}, 
-    {wsEscape, Qt::Key_Escape}, {wsEnter, Qt::Key_Enter}, {wsReturn, Qt::Key_Return},
-};
-
-ManualBox::ManualBox(QWidget *parent, const char *name)
-           : MythDialog(parent, name)
+ManualBox::ManualBox(MythMainWindow *parent, const char *name)
+         : MythDialog(parent, name)
 {
     m_tv = NULL;
 
@@ -80,7 +44,6 @@ ManualBox::ManualBox(QWidget *parent, const char *name)
     label->setBackgroundOrigin(WindowOrigin);
     label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
     vbox->addWidget(label);
-
 
     // Video
     m_boxframe = new QHBox(this);
@@ -104,7 +67,6 @@ ManualBox::ManualBox(QWidget *parent, const char *name)
     hbox->addWidget(m_boxframe);
 
     //hbox->addWidget(m_pixlabel);
-
     
     // Title edit box
     hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
@@ -118,7 +80,6 @@ ManualBox::ManualBox(QWidget *parent, const char *name)
     m_title = new MythLineEdit( this, "title" );
     m_title->setBackgroundOrigin(WindowOrigin);
     hbox->addWidget(m_title);
-
     
     // Subtitle edit box
     hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
@@ -175,9 +136,6 @@ ManualBox::ManualBox(QWidget *parent, const char *name)
     m_timer = new QTimer(this);
     m_refreshTimer = new QTimer(this);
 
-    showFullScreen();
-    setActiveWindow();
-
     connect(this, SIGNAL(dismissWindow()), this, SLOT(accept()));
 
     connect(m_title, SIGNAL(textChanged(const QString &)), this, SLOT(textChanged(const QString &)));
@@ -211,46 +169,9 @@ bool ManualBox::eventFilter(QObject *, QEvent *e)
         if (NULL != m_tv)
         {
             QKeyEvent* k = (QKeyEvent*)e;
-            int key = k->ascii();
-            unsigned int index;
-
-            if (0 == key)
-            {
-                index = 0;
-
-                while (index < sizeof(gKeyMap) / sizeof(gKeyMap[0]))
-                {
-                    if (gKeyMap[index].qtKey == k->key())
-                    {
-                        key = gKeyMap[index].xKey;
-                        break;
-                    }
-                    index++;
-                }
-            }
-
-            int validKeys[] = {
-                wsUp, wsDown,
-                'c', 'C',
-                'i', 'I',
-                '/', '?',
-                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-                wsEnter, wsReturn, ' ',
-                'j', 'J', 'k', 'K', 'l', 'L',
-            };
-            
-            index = 0;
-            while (index < sizeof(validKeys) / sizeof(validKeys[0]))
-            {
-                if (key == validKeys[index])
-                {
-                    qApp->unlock();
-                    m_tv->ProcessKeypress(key);
-                    qApp->lock();
-                    break;
-                }
-                index++;
-            }
+            qApp->unlock();
+            m_tv->ProcessKeypress(k->key());
+            qApp->lock();
         }
     }
 
@@ -282,7 +203,7 @@ void ManualBox::startPlayer(void)
 
         QSqlDatabase *db = QSqlDatabase::database();
         m_tv = new TV(db);
-        m_tv->Init();
+        m_tv->Init(false);
         m_tv->EmbedOutput(m_pixlabel->winId(), 0, 0, (int)(320 * wmult), (int)(240 * hmult));
         nextstate = m_tv->LiveTV();
         
