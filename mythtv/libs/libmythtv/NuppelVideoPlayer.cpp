@@ -302,14 +302,39 @@ void NuppelVideoPlayer::InitSound(void)
         return;
     }
 
-    audiofd = open(audiodevice.ascii(), O_WRONLY);
+    QTime curtime = QTime::currentTime();
+    curtime = curtime.addSecs(2);
+
+    audiofd = -1;
+
+    while (QTime::currentTime() < curtime && audiofd == -1)
+    {
+        audiofd = open(audiodevice.ascii(), O_WRONLY | O_NONBLOCK);
+        if (errno != EAGAIN && errno != EINTR)
+        {
+            if (errno == EBUSY)
+            {
+                cerr << "ERROR: something is currently using: " << audiodevice
+                     << "\nFix this, then run mythfrontend again\n";
+                exit(0);
+            }
+            perror("open");
+        }
+        if (audiofd < 0)
+            usleep(50);
+    }
+
     if (audiofd == -1)
     {
         cerr << "player: Can't open audio device: " << audiodevice << endl;
-        perror("open audio:");
         disableaudio = true;
         return;
     }
+
+    close(audiofd);
+    audiofd = -1;
+
+    audiofd = open(audiodevice.ascii(), O_WRONLY);
 
     if (ioctl(audiofd, SNDCTL_DSP_SAMPLESIZE, &audio_bits) < 0 ||
         ioctl(audiofd, SNDCTL_DSP_CHANNELS, &audio_channels) < 0 ||
