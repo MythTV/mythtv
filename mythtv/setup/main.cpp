@@ -161,6 +161,9 @@ int main(int argc, char *argv[])
     if (dboxProg.exec() == 2)
         clearAllDB();
 
+    REG_KEY("qt", "DELETE", "Delete", "D");
+    REG_KEY("qt", "EDIT", "Edit", "E");
+
     SetupMenu();
 
     cout << "If this is the master backend server:\n";

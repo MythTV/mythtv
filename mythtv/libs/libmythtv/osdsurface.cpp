@@ -237,7 +237,7 @@ void OSDSurface::ClearUsed(void)
         endline = drawRect.bottom();
 
         cwidth = drawRect.width();
-        uvcwidth = width / 2;
+        uvcwidth = cwidth / 2;
 
         for (int line = startline; line <= endline; line++)
         {
@@ -245,7 +245,7 @@ void OSDSurface::ClearUsed(void)
 
             memset(y + yoffset + startcol, 0, cwidth);
             memset(alpha + yoffset + startcol, 0, cwidth);
-            if ((line & 2) == 0)
+//            if ((line & 2) == 0)
             {
                 memset(u + yoffset / 4 + startcol / 2, 127, uvcwidth);
                 memset(v + yoffset / 4 + startcol / 2, 127, uvcwidth);

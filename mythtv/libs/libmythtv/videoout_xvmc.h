@@ -14,6 +14,7 @@ class VideoOutputXvMC : public VideoOutput
 
     bool Init(int width, int height, float aspect, WId winid,
               int winx, int winy, int winw, int winh, WId embedid = 0);
+    bool SetupDeinterlace(bool interlaced);
     bool NeedsDoubleFramerate() const;
     bool ApproveDeintFilter(const QString& filtername) const;
     void PrepareFrame(VideoFrame *buffer, FrameScanType);
@@ -45,6 +46,7 @@ class VideoOutputXvMC : public VideoOutput
     inline bool hasVLDAcceleration() const;
 
   private:
+    void InitColorKey(void);
     void Exit(void);
     bool CreateXvMCBuffers(void);
     void DeleteXvMCBuffers(void);
@@ -67,7 +69,6 @@ class VideoOutputXvMC : public VideoOutput
 
     pthread_mutex_t lock;
 
-    int colorkey;
     int chroma;
 };
 

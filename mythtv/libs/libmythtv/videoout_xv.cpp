@@ -503,6 +503,24 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
     pauseFrame.qstride = 0;
     pauseFrame.frameNumber = scratchFrame->frameNumber;
 
+    InitColorKey();
+    
+    if (gContext->GetNumSetting("UseOutputPictureControls", 0))
+    {
+        ChangePictureAttribute(kPictureAttribute_Brightness, brightness);
+        ChangePictureAttribute(kPictureAttribute_Contrast, contrast);
+        ChangePictureAttribute(kPictureAttribute_Colour, colour);
+        ChangePictureAttribute(kPictureAttribute_Hue, hue);
+    }
+
+    XJ_started = true;
+
+    return true;
+}
+
+void VideoOutputXv::InitColorKey(void)
+{
+    int ret = Success;
     data->needdrawcolor = true;
 
     Atom xv_atom;
@@ -518,7 +536,12 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
             {
                 xv_atom = XInternAtom(data->XJ_disp, "XV_AUTOPAINT_COLORKEY",
                                       False);
-                if (xv_atom != None)
+                if (xv_atom == None)
+                    continue;
+
+                if (m_deinterlacing && m_deintfiltername == "bobdeint")
+                    XvSetPortAttribute(data->XJ_disp, xv_port, xv_atom, 0);
+                else
                 {
                     ret = XvSetPortAttribute(data->XJ_disp, xv_port, xv_atom,
                                              1);
@@ -539,27 +562,24 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
                                      &data->colorkey);
             if (ret != Success)
             {
-                cerr << "Couldn't get the color key color, and we need it.\n";
-                cerr << "You likely won't get any video.\n";
+                VERBOSE(VB_IMPORTANT,
+                        "Couldn't get the color key color, and we need it.\n"
+                        "You likely won't get any video.");
                 data->colorkey = 0;
             }
         }
     }
 
     MoveResize();
-
-    if (gContext->GetNumSetting("UseOutputPictureControls", 0))
-    {
-        ChangePictureAttribute(kPictureAttribute_Brightness, brightness);
-        ChangePictureAttribute(kPictureAttribute_Contrast, contrast);
-        ChangePictureAttribute(kPictureAttribute_Colour, colour);
-        ChangePictureAttribute(kPictureAttribute_Hue, hue);
-    }
-
-    XJ_started = true;
-
-    return true;
 }
+
+bool VideoOutputXv::SetupDeinterlace(bool interlaced)
+{
+    bool deint = VideoOutput::SetupDeinterlace(interlaced);
+    InitColorKey();
+    return deint;
+}
+
 bool VideoOutputXv::ApproveDeintFilter(const QString& filtername) const
 {
     if (filtername == "bobdeint")
@@ -702,6 +722,9 @@ void VideoOutputXv::Exit(void)
 {
     if (XJ_started) 
     {
+        m_deinterlacing = false;
+        InitColorKey();
+
         XJ_started = false;
 
         if ( xv_port != -1 )
@@ -874,8 +897,9 @@ void VideoOutputXv::PrepareFrame(VideoFrame *buffer, FrameScanType t)
 
         int src_x = imgx, src_y = imgy, src_w = imgw, src_h = imgh;
         int dest_y = dispyoff;
+        bool drawn = false;
 
-        if (m_deinterlacing)
+        if (m_deinterlacing && (m_deintfiltername == "bobdeint"))
         {
             if ((t == kScan_Interlaced && buffer->top_field_first == 1) ||
                 (t == kScan_Intr2ndField && buffer->top_field_first == 0))
@@ -883,6 +907,10 @@ void VideoOutputXv::PrepareFrame(VideoFrame *buffer, FrameScanType t)
                 // Show top field
                 src_y = imgy / 2;
                 src_h = imgh / 2;
+                XvShmPutImage(data->XJ_disp, xv_port, data->XJ_curwin,
+                              data->XJ_gc, image, src_x, src_y, src_w, src_h,
+                              dispxoff, dest_y, dispwoff, disphoff, False);
+                drawn = true;
             }
             else if ((t == kScan_Interlaced && buffer->top_field_first == 0) ||
                      (t == kScan_Intr2ndField && buffer->top_field_first == 1))
@@ -890,13 +918,28 @@ void VideoOutputXv::PrepareFrame(VideoFrame *buffer, FrameScanType t)
                 // Show bottom field
                 src_y = (buffer->height + imgy) / 2;
                 src_h = imgh / 2;
-                dest_y++;
+                int halfLineSrc = (int)round(((float)disphoff) / imgh - 0.001f);
+                src_h -= (halfLineSrc) ? 1 : 0;
+                XvShmPutImage(data->XJ_disp, xv_port, data->XJ_curwin,
+                              data->XJ_gc, image, src_x, src_y, src_w, src_h,
+                              dispxoff, dest_y   + halfLineSrc,
+                              dispwoff, disphoff - halfLineSrc, False);
+                drawn = true;
             }
         }
 
-        XvShmPutImage(data->XJ_disp, xv_port, data->XJ_curwin, data->XJ_gc,
-                      image, src_x, src_y, src_w, src_h, dispxoff, dest_y,
-                      dispwoff, disphoff, False);
+        if (!drawn)
+        {
+            XvShmPutImage(data->XJ_disp, xv_port, data->XJ_curwin, data->XJ_gc,
+                          image, src_x, src_y, src_w, src_h, dispxoff, dest_y,
+                          dispwoff, disphoff, False);
+        }
+
+        if (needrepaint)
+        {
+            DrawUnusedRects();
+            needrepaint = false;
+        }
 
         pthread_mutex_unlock(&lock);
     }
@@ -1000,11 +1043,15 @@ void VideoOutputXv::Show(FrameScanType )
 
 void VideoOutputXv::DrawUnusedRects(void)
 {
+    // boboff assumes the smallest interlaced resolution is 480 lines
+    int boboff = (int)round(((float)disphoff) / 480 - 0.001f);
+    boboff = (m_deinterlacing && m_deintfiltername == "bobdeint") ? boboff : 0;
+
     if (data->needdrawcolor)
     {
         XSetForeground(data->XJ_disp, data->XJ_gc, data->colorkey);
         XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, dispx, 
-                       dispy, dispw, disph);
+                       dispy + boboff, dispw, disph);
     }
 
     // Draw black in masked areas
@@ -1012,18 +1059,18 @@ void VideoOutputXv::DrawUnusedRects(void)
 
     if (dispxoff > dispx) // left
         XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, 
-                       dispx, dispy, dispxoff-dispx, disph);
-    if (dispxoff+dispwoff < dispx+dispw) // right
+                       dispx, dispy, dispxoff - dispx, disph);
+    if (dispxoff + dispwoff < dispx + dispw) // right
         XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, 
-                       dispxoff+dispwoff, dispy, 
-                       (dispx+dispw)-(dispxoff+dispwoff), disph);
-    if (dispyoff > dispy) // bottom
+                       dispxoff + dispwoff, dispy, 
+                       (dispx + dispw) - (dispxoff + dispwoff), disph);
+    if (dispyoff + boboff > dispy) // top of screen
         XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, 
-                       dispx, dispy, dispw, dispyoff-dispy);
-    if (dispyoff+disphoff < dispy+disph) // top
+                       dispx, dispy, dispw, dispyoff + boboff-dispy);
+    if (dispyoff + disphoff < dispy + disph) // bottom of screen
         XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, 
-                       dispx, dispyoff+disphoff, 
-                       dispw, (dispy+disph)-(dispyoff+disphoff));
+                       dispx, dispyoff + disphoff, 
+                       dispw, (dispy + disph) - (dispyoff + disphoff));
     XSync(data->XJ_disp, false);
 }
 

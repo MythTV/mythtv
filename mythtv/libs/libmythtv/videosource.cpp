@@ -9,6 +9,7 @@
 #include <qcursor.h>
 #include <qlayout.h>
 #include <qfile.h>
+#include <qmap.h>
 #include <iostream>
 
 #ifdef USING_DVB
@@ -607,21 +608,77 @@ void VideoSource::loadByID(QSqlDatabase* db, int sourceid) {
 
 class VideoDevice: public PathSetting, public CCSetting {
 public:
-    VideoDevice(const CaptureCard& parent):
-        PathSetting(true),
-        CCSetting(parent, "videodevice") {
+    VideoDevice(const CaptureCard& parent,
+                uint minor_min=0, uint minor_max=UINT_MAX):
+        PathSetting(true), CCSetting(parent, "videodevice")
+    {
         setLabel(QObject::tr("Video device"));
-        QDir dev("/dev", "video*", QDir::Name, QDir::System);
-        fillSelectionsFromDir(dev);
-        dev.setPath("/dev/v4l");
-        fillSelectionsFromDir(dev);
+
+        // /dev/v4l/video*
+        QDir dev("/dev/v4l", "video*", QDir::Name, QDir::System);
+        fillSelectionsFromDir(dev, minor_min, minor_max, false);
+
+        // /dev/video*
+        dev.setPath("/dev");
+        fillSelectionsFromDir(dev, minor_min, minor_max, false);
+
+        // /dev/dtv/video*
         dev.setPath("/dev/dtv");
-        fillSelectionsFromDir(dev);
+        fillSelectionsFromDir(dev, minor_min, minor_max, false);
+
+        // /dev/dtv*
+        dev.setPath("/dev");
+        dev.setNameFilter("dtv*");
+        fillSelectionsFromDir(dev, minor_min, minor_max, false);
+
+        VERBOSE(VB_IMPORTANT, "");
     };
+
+    void fillSelectionsFromDir(const QDir& dir,
+                               uint minor_min, uint minor_max,
+                               bool allow_duplicates)
+    {
+        const QFileInfoList *il = dir.entryInfoList();
+        if (!il)
+            return;
+        
+        QFileInfoListIterator it( *il );
+        QFileInfo *fi;
+        
+        for(; (fi = it.current()) != 0; ++it)
+        {
+            struct stat st;
+            QString filepath = fi->absFilePath();
+            int err = lstat(filepath, &st);
+            if (0==err)
+            {
+                if (S_ISCHR(st.st_mode))
+                {
+                    uint minor_num = minor(st.st_rdev);
+                    // this is a character device, if in minor range to list
+                    if (minor_min<=minor_num && 
+                        minor_max>=minor_num &&
+                        (allow_duplicates ||
+                         (minor_list.find(minor_num)==minor_list.end())))
+                    {
+                        addSelection(filepath);
+                        minor_list[minor_num]=1;
+                    }
+                }
+            }
+            else
+            {
+                VERBOSE(VB_IMPORTANT,
+                        QString("Could not stat file: %1").arg(filepath));
+            }
+        }
+    }
 
     static QStringList probeInputs(QString device);
     static QStringList fillDVBInputs(int dvb_diseqc_type);
     static QValueList<DVBDiseqcInputList> fillDVBInputsDiseqc(int dvb_diseqc_type);
+private:
+    QMap<uint, uint> minor_list;
 };
 
 class VbiDevice: public PathSetting, public CCSetting {
@@ -883,6 +940,47 @@ private:
     CaptureCard& parent;
 };
 
+class MPEGConfigurationGroup: public VerticalConfigurationGroup
+{
+  public:
+    MPEGConfigurationGroup(CaptureCard& a_parent):
+        parent(a_parent)
+    {
+        setUseLabel(false);
+
+        VideoDevice* device;
+        TunerCardInput* input;
+
+        addChild(device = new VideoDevice(parent, 0, 15));
+        addChild(input = new TunerCardInput(parent));
+        connect(device, SIGNAL(valueChanged(const QString&)),
+                input, SLOT(fillSelections(const QString&)));
+        input->fillSelections(device->getValue());
+    };
+  private:
+    CaptureCard& parent;
+};
+
+class pcHDTVConfigurationGroup: public VerticalConfigurationGroup
+{
+  public:
+    pcHDTVConfigurationGroup(CaptureCard& a_parent): 
+        parent(a_parent)
+    {
+        setUseLabel(false);
+
+        VideoDevice *atsc_device = new VideoDevice(parent, 32);
+        TunerCardInput *atsc_input = new TunerCardInput(parent);
+        addChild(atsc_device);
+        addChild(atsc_input);
+        connect(atsc_device, SIGNAL(valueChanged(const QString&)),
+                atsc_input, SLOT(fillSelections(const QString&)));
+        atsc_input->fillSelections(atsc_device->getValue());
+    };
+  private:
+    CaptureCard& parent;
+};
+
 CaptureCardGroup::CaptureCardGroup(CaptureCard& parent)
 {
     setLabel(QObject::tr("Capture Card Setup"));
@@ -894,14 +992,14 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard& parent)
 
     addTarget("V4L", new V4LConfigurationGroup(parent));
     addTarget("DVB", new DVBConfigurationGroup(parent));
+    addTarget("HDTV", new pcHDTVConfigurationGroup(parent));
+    addTarget("MPEG", new MPEGConfigurationGroup(parent));
     addTarget("FIREWIRE", new FirewireConfigurationGroup(parent));
 }
 
 void CaptureCardGroup::triggerChanged(const QString& value) 
 {
-    QString own = value;
-    if (own == "HDTV" || own == "MPEG" || own == "MJPEG")
-        own = "V4L";
+    QString own = (value == "MJPEG") ? "V4L" : value;
     TriggeredConfigurationGroup::triggerChanged(own);
 }
 
@@ -1330,6 +1428,8 @@ MythDialog* CaptureCardEditor::dialogWidget(MythMainWindow* parent,
 {
     dialog = ConfigurationDialog::dialogWidget(parent, widgetName);
     connect(dialog, SIGNAL(menuButtonPressed()), this, SLOT(menu()));
+    connect(dialog, SIGNAL(editButtonPressed()), this, SLOT(edit()));
+    connect(dialog, SIGNAL(deleteButtonPressed()), this, SLOT(del()));
     return dialog;
 }
 
@@ -1391,6 +1491,8 @@ MythDialog* VideoSourceEditor::dialogWidget(MythMainWindow* parent,
 {
     dialog = ConfigurationDialog::dialogWidget(parent, widgetName);
     connect(dialog, SIGNAL(menuButtonPressed()), this, SLOT(menu()));
+    connect(dialog, SIGNAL(editButtonPressed()), this, SLOT(edit()));
+    connect(dialog, SIGNAL(deleteButtonPressed()), this, SLOT(del()));
     return dialog;
 }
 

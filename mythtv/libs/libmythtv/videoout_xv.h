@@ -16,6 +16,7 @@ class VideoOutputXv : public VideoOutput
 
     bool Init(int width, int height, float aspect, WId winid,
               int winx, int winy, int winw, int winh, WId embedid = 0);
+    bool SetupDeinterlace(bool interlaced);
     bool ApproveDeintFilter(const QString& filtername) const;
     void PrepareFrame(VideoFrame *buffer, FrameScanType);
     void Show(FrameScanType );
@@ -41,6 +42,7 @@ class VideoOutputXv : public VideoOutput
     int ChangePictureAttribute(int attributeType, int newValue);
 
   private:
+    void InitColorKey(void);
     void Exit(void);
     bool CreateXvBuffers(void);
     bool CreateShmBuffers(void);

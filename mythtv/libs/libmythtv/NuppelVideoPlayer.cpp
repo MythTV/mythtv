@@ -1554,7 +1554,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
             //printf("video waiting for unpause\n");
             usleep(frame_interval);
 
-            videoOutput->Show(m_scan);
+            videoOutput->Show(kScan_Ignore);
             videosync->Start();
             continue;
         }

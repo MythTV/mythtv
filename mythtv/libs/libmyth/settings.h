@@ -173,12 +173,17 @@ protected:
 };
 
 class ConfigurationDialogWidget: public MythDialog {
+    Q_OBJECT
 public:
     ConfigurationDialogWidget(MythMainWindow *parent, 
                               const char* widgetName = 0):
         MythDialog(parent, widgetName) {};
 
     virtual void keyPressEvent(QKeyEvent* e);
+
+signals:
+    void editButtonPressed();
+    void deleteButtonPressed();
 };
 
 class ConfigurationDialog: virtual public Configurable {

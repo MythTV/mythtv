@@ -685,6 +685,10 @@ void ConfigurationDialogWidget::keyPressEvent(QKeyEvent* e)
                 accept();
             else if (action == "ESCAPE")
                 reject();
+            else if (action == "EDIT")
+                emit editButtonPressed();
+            else if (action == "DELETE")
+                emit deleteButtonPressed();
             else
                 handled = false;
         }

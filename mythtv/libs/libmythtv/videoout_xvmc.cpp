@@ -122,6 +122,9 @@ struct XvMCData
     XShmSegmentInfo shminfo;
     XvImage *xvimage;
     unsigned char *palette;
+
+    int colorkey;
+    bool needdrawcolor;
 };
 
 static int XJ_error_catcher(Display * d, XErrorEvent * xeev)
@@ -510,43 +513,7 @@ bool VideoOutputXvMC::Init(int width, int height, float aspect,
         return false;
     }
 
-    Atom xv_atom;  
-    XvAttribute *attributes;
-    int attrib_count;
-    bool needdrawcolor = true;
-
-    attributes = XvQueryPortAttributes(data->XJ_disp, xv_port, &attrib_count);
-    if (attributes)
-    {
-        for (int i = 0; i < attrib_count; i++)
-        {
-            if (!strcmp(attributes[i].name, "XV_AUTOPAINT_COLORKEY"))
-            {
-                xv_atom = XInternAtom(data->XJ_disp, "XV_AUTOPAINT_COLORKEY",
-                                      False);
-                if (xv_atom != None)
-                {
-                    ret = XvSetPortAttribute(data->XJ_disp, xv_port, xv_atom,
-                                             1);
-                    if (ret == Success)
-                        needdrawcolor = false;
-                }
-            }
-        }
-        XFree(attributes);
-    }
-
-    xv_atom = XInternAtom(data->XJ_disp, "XV_COLORKEY", False);
-    if (xv_atom != None)
-    {
-        ret = XvGetPortAttribute(data->XJ_disp, xv_port, xv_atom, &colorkey);
-        if (ret == Success)
-        {
-            needdrawcolor = true;
-        }
-    }
-
-    MoveResize();
+    InitColorKey();
 
     if (gContext->GetNumSetting("UseOutputPictureControls", 0))
     {
@@ -559,6 +526,68 @@ bool VideoOutputXvMC::Init(int width, int height, float aspect,
     XJ_started = true;
 
     return true;
+}
+
+void VideoOutputXvMC::InitColorKey(void)
+{
+    int ret = Success;
+    data->needdrawcolor = true;
+
+    Atom xv_atom;
+    XvAttribute *attributes;
+    int attrib_count;
+
+    attributes = XvQueryPortAttributes(data->XJ_disp, xv_port, &attrib_count);
+    if (attributes)
+    {
+        for (int i = 0; i < attrib_count; i++)
+        {
+            if (!strcmp(attributes[i].name, "XV_AUTOPAINT_COLORKEY"))
+            {
+                xv_atom = XInternAtom(data->XJ_disp, "XV_AUTOPAINT_COLORKEY",
+                                      False);
+                if (xv_atom == None)
+                    continue;
+
+                if (m_deinterlacing && m_deintfiltername == "bobdeint")
+                    XvSetPortAttribute(data->XJ_disp, xv_port, xv_atom, 0);
+                else
+                {
+                    ret = XvSetPortAttribute(data->XJ_disp, xv_port, xv_atom,
+                                             1);
+                    //if (ret == Success)
+                    //    data->needdrawcolor = false;
+                }
+            }
+        }
+        XFree(attributes);
+    }
+
+    if (data->needdrawcolor)
+    {
+        xv_atom = XInternAtom(data->XJ_disp, "XV_COLORKEY", False);
+        if (xv_atom != None)
+        {
+            ret = XvGetPortAttribute(data->XJ_disp, xv_port, xv_atom, 
+                                     &data->colorkey);
+            if (ret != Success)
+            {
+                VERBOSE(VB_IMPORTANT,
+                        "Couldn't get the color key color, and we need it.\n"
+                        "You likely won't get any video.");
+                data->colorkey = 0;
+            }
+        }
+    }
+
+    MoveResize();
+}
+
+bool VideoOutputXvMC::SetupDeinterlace(bool interlaced)
+{
+    bool deint = VideoOutput::SetupDeinterlace(interlaced);
+    InitColorKey();
+    return deint;
 }
 
 bool VideoOutputXvMC::NeedsDoubleFramerate() const
@@ -735,6 +764,9 @@ void VideoOutputXvMC::Exit(void)
 {
     if (XJ_started) 
     {
+        m_deinterlacing = false;
+        InitColorKey();
+
         XJ_started = false;
 
         DeleteXvMCBuffers();
@@ -890,20 +922,24 @@ void VideoOutputXvMC::PrepareFrame(VideoFrame *buffer, FrameScanType t)
 void VideoOutputXvMC::Show(FrameScanType scan)
 {
     int field = 3;
+    int src_h = imgh;
+    int halfLineSrc = 0;
 
-    if (m_deinterlacing)
+    VideoFrame *buffer = data->lastframe;
+
+    if (m_deinterlacing && buffer)
     {
-        switch (scan) 
+        if ((scan == kScan_Interlaced && buffer->top_field_first == 1) ||
+            (scan == kScan_Intr2ndField && buffer->top_field_first == 0))
         {
-            case kScan_Interlaced:
-                field = 1;
-                break;
-            case kScan_Intr2ndField:
-                field = 2;
-                break;
-            default:
-                field = 3;
-                break;
+            field = 1;
+        }
+        else if ((scan == kScan_Interlaced && buffer->top_field_first == 0) ||
+                 (scan == kScan_Intr2ndField && buffer->top_field_first == 1))
+        {
+            field = 2;
+            halfLineSrc = (int) round(((float)disphoff)/imgh - 0.001f);
+            //src_h -= (halfLineSrc) ? 2 : 0;
         }
     }
 
@@ -929,8 +965,10 @@ void VideoOutputXvMC::Show(FrameScanType scan)
     if (data->p_render_surface_visible != NULL)
         data->p_render_surface_visible->state &= ~MP_XVMC_STATE_DISPLAY_PENDING;
 
-    XvMCPutSurface(data->XJ_disp, surf, data->XJ_curwin, imgx, imgy, imgw, 
-                   imgh, dispxoff, dispyoff, dispwoff, disphoff, field);
+    XvMCPutSurface(data->XJ_disp, surf, data->XJ_curwin,
+                   imgx, imgy, imgw, src_h,
+                   dispxoff, dispyoff + halfLineSrc,
+                   dispwoff, disphoff - halfLineSrc, field);
 
     if (data->p_render_surface_visible && 
         (data->p_render_surface_visible != showingsurface))
@@ -951,16 +989,18 @@ void VideoOutputXvMC::Show(FrameScanType scan)
 
     data->p_render_surface_visible = data->p_render_surface_to_show;
 
-    if (!m_deinterlacing || (m_deinterlacing && field == 2))
+    if (!m_deinterlacing || (m_deinterlacing && scan != kScan_Interlaced))
+    {
         data->p_render_surface_to_show = NULL;
 
-    if (osdframe)
-    {
-        data->p_render_surface_visible = osdren;
-        if (data->curosd)
-            DiscardFrame(data->curosd);
-        data->curosd = osdframe;
-        render->p_osd_target_surface_render = NULL;
+        if (osdframe)
+        {
+            data->p_render_surface_visible = osdren;
+            if (data->curosd)
+                DiscardFrame(data->curosd);
+            data->curosd = osdframe;
+            render->p_osd_target_surface_render = NULL;
+        }
     }
 
     pthread_mutex_unlock(&lock);
@@ -1050,9 +1090,16 @@ void VideoOutputXvMC::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
 
 void VideoOutputXvMC::DrawUnusedRects(void)
 {
-    XSetForeground(data->XJ_disp, data->XJ_gc, colorkey);
-    XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, dispx, dispy,
-                   dispw, disph);
+    // boboff assumes the smallest interlaced resolution is 480 lines
+    int boboff = (int) round(((float)disphoff)/480 - 0.001f);
+    boboff = (m_deinterlacing && m_deintfiltername == "bobdeint") ? boboff : 0;
+
+    if (data->needdrawcolor)
+    {
+        XSetForeground(data->XJ_disp, data->XJ_gc, data->colorkey);
+        XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc,
+                       dispx, dispy+boboff, dispw, disph);
+    }
 
     XSetForeground(data->XJ_disp, data->XJ_gc, XJ_black);
     if (dispxoff > dispx) // left
@@ -1062,10 +1109,10 @@ void VideoOutputXvMC::DrawUnusedRects(void)
         XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, 
                        dispxoff+dispwoff, dispy, 
                        (dispx+dispw)-(dispxoff+dispwoff), disph);
-    if (dispyoff > dispy) // bottom
+    if (dispyoff+boboff > dispy) // top of screen
         XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, 
-                       dispx, dispy, dispw, dispyoff-dispy);
-    if (dispyoff+disphoff < dispy+disph) // top
+                       dispx, dispy, dispw, dispyoff+boboff-dispy);
+    if (dispyoff+disphoff < dispy+disph) // bottom of screen
         XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, 
                        dispx, dispyoff+disphoff, 
                        dispw, (dispy+disph)-(dispyoff+disphoff));
