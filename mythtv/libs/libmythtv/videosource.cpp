@@ -766,13 +766,14 @@ public:
     };
 };
 
-class DVBSwFilter: public CheckBoxSetting, public CCSetting {
+class DVBHwDecoder: public CheckBoxSetting, public CCSetting {
 public:
-    DVBSwFilter(const CaptureCard& parent):
-        CCSetting(parent, "dvb_swfilter") {
-        setLabel(QObject::tr("Do NOT use DVB driver for filtering."));
-        setHelpText(QObject::tr("(BROKEN) This option is used to get around "
-                    "filtering limitations on some DVB cards."));
+    DVBHwDecoder(const CaptureCard& parent):
+        CCSetting(parent, "dvb_hw_decoder") {
+        setLabel(QObject::tr("Use hardware MPEG decoder"));
+        setHelpText(QObject::tr("If your DVB card has a built in MPEG decoder "
+                    "you can activate it here. "
+                    "(Only for full featured cards & certain USB devices)."));
     };
 };
 
@@ -1982,7 +1983,7 @@ public:
         VerticalConfigurationGroup* rec = new VerticalConfigurationGroup(false);        rec->setLabel(QObject::tr("Recorder Options"));
         rec->setUseLabel(false);
 
-        rec->addChild(new DVBSwFilter(parent));
+        rec->addChild(new DVBHwDecoder(parent));
         rec->addChild(new DVBRecordTS(parent));
         rec->addChild(new DVBNoSeqStart(parent));
         rec->addChild(new DVBOnDemand(parent));

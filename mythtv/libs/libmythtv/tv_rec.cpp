@@ -701,7 +701,7 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
         nvr->SetOptionsFromProfile(&profile, videodev, audiodev, vbidev, ispip);
 
         nvr->SetOption("dvb_on_demand", dvb_options.dvb_on_demand);
-        nvr->SetOption("swfilter", dvb_options.swfilter);
+        nvr->SetOption("hw_decoder", dvb_options.hw_decoder);
         nvr->SetOption("recordts", dvb_options.recordts);
         nvr->SetOption("wait_for_seqstart", dvb_options.wait_for_seqstart);
         nvr->SetOption("dmx_buf_size", dvb_options.dmx_buf_size);
@@ -1115,7 +1115,7 @@ void TVRec::GetDevices(int cardnum, QString &video, QString &vbi,
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT videodevice,vbidevice,audiodevice,"
                   "audioratelimit,defaultinput,cardtype,"
-                  "dvb_swfilter, dvb_recordts,"
+                  "dvb_hw_decoder, dvb_recordts,"
                   "dvb_wait_for_seqstart,dvb_dmx_buf_size,"
                   "dvb_pkt_buf_size, skipbtaudio, dvb_on_demand,"
                   "firewire_port, firewire_node, firewire_speed,"
@@ -1153,7 +1153,7 @@ void TVRec::GetDevices(int cardnum, QString &video, QString &vbi,
         if (test != QString::null)
             type = QString::fromUtf8(test);
 
-        dvb_opts.swfilter = query.value(6).toInt();
+        dvb_opts.hw_decoder = query.value(6).toInt();
         dvb_opts.recordts = query.value(7).toInt();
         dvb_opts.wait_for_seqstart = query.value(8).toInt();
         dvb_opts.dmx_buf_size = query.value(9).toInt();

@@ -70,10 +70,8 @@ DVBRecorder::DVBRecorder(DVBChannel* advbchannel): DTVRecorder()
     dvbchannel = advbchannel;
 
     _dvb_on_demand_option = false;
-    _software_filter_option = false;
+    _hw_decoder_option = false;
     _record_transport_stream_option = false;
-
-    _software_filter_open = false;
 
     _continuity_error_count = 0;
     _stream_overflow_count = 0;
@@ -87,6 +85,7 @@ DVBRecorder::DVBRecorder(DVBChannel* advbchannel): DTVRecorder()
 
     pat_pkt = new uint8_t[188];
     pmt_pkt = new uint8_t[188];
+    pmt_version = 0;
 }
 
 DVBRecorder::~DVBRecorder()
@@ -105,8 +104,8 @@ void DVBRecorder::SetOption(const QString &name, int value)
 {
     if (name == "cardnum")
         _card_number_option = value;
-    else if (name == "swfilter")
-        _software_filter_option = (value == 1);
+    else if (name == "hw_decoder")
+        _hw_decoder_option = (value == 1);
     else if (name == "recordts")
         _record_transport_stream_option = (value == 1);
 #if 0
@@ -148,6 +147,13 @@ void DVBRecorder::ChannelChanged(dvb_channel_t& chan)
     m_pmt = chan.pmt;
 
     AutoPID();
+
+    /* Rev the PMT version since PIDs are changing */
+    if (pmt_version >= 31)
+        pmt_version = 0;
+    else
+        pmt_version++;
+
     dvbchannel->SetCAPMT(m_pmt);
 
     _reset_pid_filters = true;
@@ -223,11 +229,9 @@ void DVBRecorder::CloseFilters()
         }
     }
     pid_ipack.clear();
-
-    _software_filter_open = false;
 }
 
-void DVBRecorder::OpenFilters(uint16_t pid, ES_Type type)
+void DVBRecorder::OpenFilters(uint16_t pid, ES_Type type, dmx_pes_type_t pes_type)
 {
     VERBOSE(VB_RECORD, QString("DVB#%1 ").arg(_card_number_option) << QString("Adding pid %1").arg(pid));
 
@@ -236,77 +240,31 @@ void DVBRecorder::OpenFilters(uint16_t pid, ES_Type type)
         WARNING(QString("PID value (%1) is outside DVB specification.")
                         .arg(pid));
 
-    if (!_software_filter_option || !_software_filter_open)
+    struct dmx_pes_filter_params params;
+    memset(&params, 0, sizeof(params));
+    params.input = DMX_IN_FRONTEND;
+    params.output = DMX_OUT_TS_TAP;
+    params.flags = DMX_IMMEDIATE_START;
+    params.pid = pid;
+    params.pes_type = pes_type;
+
+    int fd_tmp = open(dvbdevice(DVB_DEV_DEMUX,_card_number_option), O_RDWR);
+
+    if (fd_tmp < 0)
     {
-        struct dmx_pes_filter_params params;
-        memset(&params, 0, sizeof(params));
-        params.input = DMX_IN_FRONTEND;
-        params.output = DMX_OUT_TS_TAP;
-        params.flags = DMX_IMMEDIATE_START;
-        params.pes_type = DMX_PES_OTHER;
-
-        if ( _software_filter_option )
-        {
-            params.pes_type = DMX_PES_OTHER;
-            params.pid = DMX_DONT_FILTER;
-        }
-        else
-        {
-            params.pid = pid;
-            switch ( type ) 
-            {
-                case ES_TYPE_VIDEO_MPEG1:
-                case ES_TYPE_VIDEO_MPEG2:
-                case ES_TYPE_VIDEO_MPEG4:
-                case ES_TYPE_VIDEO_H264:
-                    params.pes_type = DMX_PES_VIDEO;
-                    break;
-                case ES_TYPE_AUDIO_MPEG1:
-                case ES_TYPE_AUDIO_MPEG2:
-                case ES_TYPE_AUDIO_AAC:
-                case ES_TYPE_AUDIO_AC3:
-                case ES_TYPE_AUDIO_DTS:
-                    params.pes_type = DMX_PES_AUDIO;
-                    break;
-                case ES_TYPE_TELETEXT:
-                    params.pes_type = DMX_PES_TELETEXT;
-                    break;
-                case ES_TYPE_SUBTITLE:
-                    params.pes_type = DMX_PES_SUBTITLE;
-                    break;
-                case ES_TYPE_DATA:
-                    params.pes_type = DMX_PES_PCR;
-                    break;
-                default:
-                    params.pes_type = DMX_PES_OTHER;
-                    break;
-            }
-        }
-
-        int fd_tmp = open(dvbdevice(DVB_DEV_DEMUX,_card_number_option), O_RDWR);
-
-        if (fd_tmp < 0)
-        {
-            ERRNO(QString("Could not open demux device."));
-            return;
-        }
-
-        if (_software_filter_option)
-        {
-            GENERAL("Using Software Filtering.");
-            _software_filter_open = true;
-        }
-
-        if (ioctl(fd_tmp, DMX_SET_PES_FILTER, &params) < 0)
-        {
-            close(fd_tmp);
-
-            ERRNO(QString("Failed to set demux filter."));
-            return;
-        }
-
-        _pid_filters.push_back(fd_tmp);
+        ERRNO(QString("Could not open demux device."));
+        return;
     }
+
+    if (ioctl(fd_tmp, DMX_SET_PES_FILTER, &params) < 0)
+    {
+        close(fd_tmp);
+
+        ERRNO(QString("Failed to set demux filter."));
+        return;
+    }
+
+    _pid_filters.push_back(fd_tmp);
 
     if (_record_transport_stream_option)
     {
@@ -381,15 +339,50 @@ void DVBRecorder::SetDemuxFilters()
     {
         if ((*es).Record)
         {
-            OpenFilters((*es).PID, (*es).Type);
+            int pid = (*es).PID;
+            dmx_pes_type_t pes_type;
+            
+            if (_hw_decoder_option)
+            {
+                switch ((*es).Type)
+                {
+                    case ES_TYPE_AUDIO_MPEG1:
+                    case ES_TYPE_AUDIO_MPEG2:
+                        pes_type = DMX_PES_AUDIO;
+                        break;
+                    case ES_TYPE_VIDEO_MPEG1:
+                    case ES_TYPE_VIDEO_MPEG2:
+                        pes_type = DMX_PES_VIDEO;
+                        break;
+                    case ES_TYPE_TELETEXT:
+                        pes_type = DMX_PES_TELETEXT;
+                        break;
+                    case ES_TYPE_SUBTITLE:
+                        pes_type = DMX_PES_SUBTITLE;
+                        break;
+                    default:
+                        pes_type = DMX_PES_OTHER;
+                        break;
+                }
+            }
+            else
+                pes_type = DMX_PES_OTHER;
 
-            if ((*es).PID == m_pmt.PCRPID)
+            OpenFilters(pid, (*es).Type, pes_type);
+
+            if (_hw_decoder_option)
+            {
+                // Set PCRPID if it's not the same as video
+                if ((pes_type == DMX_PES_VIDEO) && (pid != m_pmt.PCRPID) && (m_pmt.PCRPID != 0))
+                    OpenFilters(m_pmt.PCRPID, ES_TYPE_UNKNOWN, DMX_PES_PCR);
+            }
+            else if (pid == m_pmt.PCRPID)
                 need_pcr_pid = false;
         }
     }
 
-    if (_record_transport_stream_option && need_pcr_pid)
-        OpenFilters(m_pmt.PCRPID, ES_TYPE_UNKNOWN);
+    if (!_hw_decoder_option && need_pcr_pid && (m_pmt.PCRPID != 0))
+        OpenFilters(m_pmt.PCRPID, ES_TYPE_UNKNOWN, DMX_PES_OTHER);
 
 
     if (_pid_filters.size() == 0 && pid_ipack.size() == 0)
@@ -409,6 +402,8 @@ void DVBRecorder::AutoPID()
 
     isVideo.clear();
 
+    RECORD(QString("AutoPID for ServiceID=%1, PCRPID=%2").arg(m_pmt.ServiceID).arg(m_pmt.PCRPID));
+
     // Wanted languages:
     QStringList Languages = QStringList::split(",", gContext->GetSetting("PreferredLanguages", ""));
 
@@ -421,7 +416,8 @@ void DVBRecorder::AutoPID()
     StreamTypes += ES_TYPE_AUDIO_AC3;
     if (_record_transport_stream_option)
     {
-        // PS recorder can't handle these
+        // The following types are only supported with TS recording
+        StreamTypes += ES_TYPE_AUDIO_DTS;
         StreamTypes += ES_TYPE_AUDIO_AAC;
         StreamTypes += ES_TYPE_TELETEXT;
         StreamTypes += ES_TYPE_SUBTITLE;
@@ -459,10 +455,9 @@ void DVBRecorder::AutoPID()
                 continue; // Ignore this stream
         }
 
-        if (!_record_transport_stream_option)
+        if (_hw_decoder_option)
         {
-            // The MPEG PS decoder in Myth currently only handles one stream
-            // of each type, so make sure we don't already have one
+            // Limit hardware decoders to one A/V stream
             switch ((*es).Type)
             {
                 case ES_TYPE_VIDEO_MPEG1:
@@ -477,16 +472,10 @@ void DVBRecorder::AutoPID()
                         continue; // Ignore this stream
                     break;
 
-                case ES_TYPE_AUDIO_AC3:
-                    if (flagged.contains(ES_TYPE_AUDIO_AC3))
-                        continue; // Ignore this stream
-                    break;
-
                 default:
                     break;
             }
         }
-
 
         if (Languages.isEmpty() // No specific language wanted
             || (*es).Language.isEmpty() // Component has no language
@@ -669,6 +658,7 @@ void DVBRecorder::ReadFromDMX()
                 continue;
             }
 
+#ifndef USING_SOFTCAM
             if (scrambling)
             {
                 if (!scrambled[pid])
@@ -684,7 +674,7 @@ void DVBRecorder::ReadFromDMX()
                 RECORD(QString("PID %1 is unscrambled").arg(pid));
                 scrambled[pid] = false;
             }
-            
+#endif            
             if (content & 0x1)
             {
                 if (_continuity_count[pid] == 16)
@@ -783,7 +773,6 @@ void DVBRecorder::LocalProcessDataPS(unsigned char *buffer, int len)
             case PRIVATE_STREAM1:
                 break;
             case AUDIO_STREAM_S ... AUDIO_STREAM_E:
-                buffer[3] = 0xc0; // fix audio ID to 0xC0
                 break;
 
             case VIDEO_STREAM_S ... VIDEO_STREAM_E:
@@ -795,7 +784,6 @@ void DVBRecorder::LocalProcessDataPS(unsigned char *buffer, int len)
                 unsigned int state = 0xFFFFFFFF, v = 0;
                 int prvcount = -1;
 
-                buffer[3] = 0xe0; // fix video ID to 0xE0
                 while (bufptr < &buffer[pos] + datalen)
                 {
                     if (++prvcount < 3)
@@ -933,7 +921,7 @@ void DVBRecorder::CreatePMT(uint8_t *ts_packet) {
     p++;                // section length (set later)
     pmt[p++] = 0;       // program number (ServiceID)
     pmt[p++] = 1;       // program number (ServiceID)
-    pmt[p++] = 0xC3;    // Version + Current/Next
+    pmt[p++] = 0xC1 + (pmt_version << 1);    // Version + Current/Next
     pmt[p++] = 0;       // Current Section
     pmt[p++] = 0;       // Last Section
     pmt[p++] = (m_pmt.PCRPID >> 8) & 0x1F;

@@ -48,7 +48,7 @@ private:
     void LocalProcessDataTS(unsigned char *buffer, int len);
 
     void CloseFilters();
-    void OpenFilters(uint16_t pid, ES_Type type);
+    void OpenFilters(uint16_t pid, ES_Type type, dmx_pes_type_t pes_type);
     void SetDemuxFilters();
     void AutoPID();
 
@@ -59,7 +59,7 @@ private:
     int  _card_number_option;
     bool _record_transport_stream_option;
     bool _dvb_on_demand_option;
-    bool _software_filter_option;
+    bool _hw_decoder_option;
 
     // DVB stuff
     DVBChannel*     dvbchannel;
@@ -67,7 +67,6 @@ private:
     PMTObject       m_pmt;
     unsigned char   prvpkt[3];
     vector<int>     _pid_filters;
-    bool            _software_filter_open;
     bool            _reset_pid_filters; // set when we want to generate a new filter set
 
     // Stream IDs for the PS recorder
@@ -79,6 +78,7 @@ private:
     static const int PMT_PID;
     int pat_cc;
     int pmt_cc;
+    uint8_t pmt_version;
     int pkts_until_pat_pmt;
 
     // statistics

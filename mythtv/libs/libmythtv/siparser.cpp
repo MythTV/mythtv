@@ -760,6 +760,14 @@ void SIParser::ParsePMT(tablehead_t* head, uint8_t* buffer, int size)
 
                 switch (descriptor_tag)
                 {
+                    case 0x05: // Registration Descriptor
+                        {
+                            QString format = QString::fromLatin1((const char*) descriptor + 2, 4);
+                            if (format == "DTS1")
+                                e.Type = ES_TYPE_AUDIO_DTS;
+                        }
+                        break;
+
                     case 0x0A: // ISO 639 Language Descriptor
                         e.Language = ParseDescriptorLanguage(descriptor, descriptor_len);
                         break;

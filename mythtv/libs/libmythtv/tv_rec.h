@@ -32,7 +32,7 @@ typedef enum
 
 typedef struct _dvb_options_t
 {
-    int swfilter;
+    int hw_decoder;
     int recordts;
     int wait_for_seqstart;
     int dmx_buf_size;
