@@ -3,7 +3,7 @@
 
 ### BEGIN INIT INFO
 # Provides:       mythbackend
-# Required-Start: $network $remote_fs $mysql
+# Required-Start: $network $remote_fs mysql
 # Required-Stop:
 # Default-Start:  2 3 5
 # Default-Stop:
@@ -77,7 +77,7 @@ case "$1" in
 
 	echo "Starting service MythTV Backend"
 	
-	$MBE -l $logdir/mythbackend.log &> $logdir/mythbackend.error.log &
+	startproc $MBE -l $logdir/mythbackend.log 2>> $logdir/mythbackend.error.log &
 
 	# Rmember status and be verbose
 	rc_status -v
