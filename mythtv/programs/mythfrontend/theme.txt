@@ -1,1 +1,1 @@
-str Theme=liquid
+str Theme=blue
