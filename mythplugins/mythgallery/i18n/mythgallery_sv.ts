@@ -3,7 +3,7 @@
     <name>IconView</name>
     <message>
         <source>Caching thumbnails...</source>
-        <translation>Skapar bilder för förhandsvisning...</translation>
+        <translation type="obsolete">Skapar bilder för förhandsvisning...</translation>
     </message>
     <message>
         <source>Import pictures?</source>
@@ -24,6 +24,14 @@
     <message>
         <source>OK</source>
         <translation>OK</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sorry: OpenGL support not available</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -76,12 +84,36 @@
         <source>Slideshow Delay</source>
         <translation>Visningstid vid bildspel</translation>
     </message>
+    <message>
+        <source>Use OpenGL transitions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check this to enable OpenGL based slideshow transitions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Type of OpenGL transition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the type of OpenGL transition used between pictures in slideshow mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gallery Directory does not exist or is unreadable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ok</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SingleView</name>
     <message>
         <source>Filename: </source>
-        <translation>Filnamn:</translation>
+        <translation type="obsolete">Filnamn:</translation>
     </message>
     <message>
         <source>Created: </source>
@@ -125,7 +157,11 @@
     </message>
     <message>
         <source>OK</source>
-        <translation>OK</translation>
+        <translation type="obsolete">OK</translation>
+    </message>
+    <message>
+        <source>Folder: </source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

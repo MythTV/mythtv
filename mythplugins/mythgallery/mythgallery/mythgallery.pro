@@ -25,7 +25,7 @@ installimages.files = images/*.png
 INSTALLS += installimages uifiles
 
 # Input
-HEADERS += iconview.h singleview.h gallerysettings.h dbcheck.h \
-           thumbgenerator.h qtiffio.h
-SOURCES += iconview.cpp main.cpp singleview.cpp gallerysettings.cpp dbcheck.cpp \
-           thumbgenerator.cpp qtiffio.cpp
+HEADERS += iconview.h singleview.h gallerysettings.h dbcheck.h 
+HEADERS += thumbgenerator.h qtiffio.h
+SOURCES += iconview.cpp main.cpp singleview.cpp gallerysettings.cpp dbcheck.cpp
+SOURCES += thumbgenerator.cpp qtiffio.cpp

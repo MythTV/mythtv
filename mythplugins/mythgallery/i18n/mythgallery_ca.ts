@@ -3,7 +3,7 @@
     <name>IconView</name>
     <message>
         <source>Caching thumbnails...</source>
-        <translation>Preparant previsualitzacions...</translation>
+        <translation type="obsolete">Preparant previsualitzacions...</translation>
     </message>
     <message>
         <source>Import pictures?</source>
@@ -24,6 +24,14 @@
     <message>
         <source>OK</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sorry: OpenGL support not available</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -76,6 +84,30 @@
         <source>Slideshow Delay</source>
         <translation>Temps d&apos;espera</translation>
     </message>
+    <message>
+        <source>Use OpenGL transitions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check this to enable OpenGL based slideshow transitions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Type of OpenGL transition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the type of OpenGL transition used between pictures in slideshow mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gallery Directory does not exist or is unreadable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ok</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SingleView</name>
@@ -100,10 +132,6 @@
         <translation>Angle de rotació</translation>
     </message>
     <message>
-        <source>OK</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>pixels</source>
         <translation>píxels</translation>
     </message>
@@ -117,7 +145,7 @@
     </message>
     <message>
         <source>Filename: </source>
-        <translation>Nom d&apos;arxiu:</translation>
+        <translation type="obsolete">Nom d&apos;arxiu:</translation>
     </message>
     <message>
         <source>Created: </source>
@@ -126,6 +154,10 @@
     <message>
         <source>Modified: </source>
         <translation>Modificat:</translation>
+    </message>
+    <message>
+        <source>Folder: </source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
