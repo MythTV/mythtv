@@ -211,6 +211,11 @@ In the Watch Recordings Screen
 - M to change the view or to set a group password
 - I to move a program from one Recording Group to another
 
+Watch Recordings Screen
+-----------------------
+
+- F1 to get a popup on the meaning of the icons
+
 Remote Controls
 ---------------
 
