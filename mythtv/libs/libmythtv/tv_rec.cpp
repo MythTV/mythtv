@@ -382,7 +382,7 @@ void TVRec::HandleStateChange(void)
 
         RecordingProfile profile;
         if (curRecording) {
-	    int profileID = curRecording->GetScheduledRecording()->getProfileID();
+	    int profileID = curRecording->GetScheduledRecording(db_conn)->getProfileID();
 	    if (profileID > 0)
                 profile.loadByID(db_conn, profileID);
             else

@@ -160,6 +160,7 @@ void ProgramInfo::GetProgramRangeDateTime(QPtrList<ProgramInfo> *proglist, QStri
                        "starttime <= %3 AND program.chanid = channel.chanid "
                        "ORDER BY starttime;")
                        .arg(channel).arg(ltime).arg(rtime);
+    // allowed to use default connection
     query.exec(thequery);
 
     if (query.isActive() && query.numRowsAffected() > 0)
@@ -298,28 +299,30 @@ int ProgramInfo::IsProgramRecurring(void)
     return 0;
 }
 
-ScheduledRecording::RecordingType ProgramInfo::GetProgramRecordingStatus()
+ScheduledRecording::RecordingType ProgramInfo::GetProgramRecordingStatus(QSqlDatabase *db)
 {
     if (record == NULL) {
         record = new ScheduledRecording();
-        record->loadByProgram(QSqlDatabase::database(), *this);
+        record->loadByProgram(db, *this);
     }
 
     return record->getRecordingType();
 }
 
 // newstate uses same values as return of GetProgramRecordingState
-void ProgramInfo::ApplyRecordStateChange(ScheduledRecording::RecordingType newstate)
+void ProgramInfo::ApplyRecordStateChange(QSqlDatabase *db, 
+                                         ScheduledRecording::RecordingType newstate)
 {
-    GetProgramRecordingStatus();
+    GetProgramRecordingStatus(db);
     record->setRecordingType(newstate);
-    record->save(QSqlDatabase::database());
+    record->save(db);
 }
 
-void ProgramInfo::ApplyRecordTimeChange(const QDateTime &newstartts, 
+void ProgramInfo::ApplyRecordTimeChange(QSqlDatabase *db,
+                                        const QDateTime &newstartts, 
                                         const QDateTime &newendts)
 {
-    GetProgramRecordingStatus();
+    GetProgramRecordingStatus(db);
     if (record->getRecordingType() != ScheduledRecording::NotRecording) {
         record->setStart(newstartts);
         record->setEnd(newendts);
@@ -422,6 +425,6 @@ void ProgramInfo::WriteRecordedToDB(QSqlDatabase *db)
         cerr << qquery.lastError().databaseText() << endl;
     }
 
-    GetProgramRecordingStatus();
-    record->doneRecording(QSqlDatabase::database(), *this);
+    GetProgramRecordingStatus(db);
+    record->doneRecording(db, *this);
 }

@@ -24,12 +24,14 @@ class ProgramInfo
     bool IsSameProgram(const ProgramInfo& other) const;
     bool IsSameTimeslot(const ProgramInfo& other) const;
 
-    ScheduledRecording::RecordingType GetProgramRecordingStatus(void);
-    void ApplyRecordStateChange(ScheduledRecording::RecordingType newstate);
-    void ApplyRecordTimeChange(const QDateTime &newstartts,
+    ScheduledRecording::RecordingType GetProgramRecordingStatus(QSqlDatabase *db);
+    void ApplyRecordStateChange(QSqlDatabase *db,
+                                ScheduledRecording::RecordingType newstate);
+    void ApplyRecordTimeChange(QSqlDatabase *db, 
+                               const QDateTime &newstartts,
                                const QDateTime &newendts);
-    ScheduledRecording* GetScheduledRecording(void) {
-        GetProgramRecordingStatus();
+    ScheduledRecording* GetScheduledRecording(QSqlDatabase *db) {
+        GetProgramRecordingStatus(db);
         return record;
     };
 

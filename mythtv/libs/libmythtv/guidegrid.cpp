@@ -65,7 +65,9 @@ GuideGrid::GuideGrid(MythContext *context, const QString &channel,
     embedcallback = embedcb;
     callbackdata = data;
 
-    context->KickDatabase(QSqlDatabase::database());
+    m_db = QSqlDatabase::database();
+
+    context->KickDatabase(m_db);
 
     usetheme = m_context->GetNumSetting("ThemeQt");
     showtitle = m_context->GetNumSetting("EPGShowTitle");
@@ -1189,7 +1191,7 @@ void GuideGrid::paintPrograms(QPainter *p)
                                  ydifference * (y + 1));
 
                     ScheduledRecording::RecordingType recordtype;
-                    recordtype = pginfo->GetProgramRecordingStatus();
+                    recordtype = pginfo->GetProgramRecordingStatus(m_db);
                     if (recordtype > ScheduledRecording::NotRecording)
                     {
                         tmp.setPen(QPen(red, (int)(2 * wmult)));
@@ -1295,7 +1297,7 @@ void GuideGrid::paintPrograms(QPainter *p)
                             if (x == 0)
                                 xend += (int)(1 * tmpwmult);
 
-                            if (pginfo->GetProgramRecordingStatus() ==
+                            if (pginfo->GetProgramRecordingStatus(m_db) ==
                                 ScheduledRecording::NotRecording)
                             {
                                 // CURRENT PROGRAM HIGHLIGHT COLOR
@@ -1328,7 +1330,7 @@ void GuideGrid::paintPrograms(QPainter *p)
                     }
 
                     ScheduledRecording::RecordingType recordtype;
-                    recordtype = pginfo->GetProgramRecordingStatus();
+                    recordtype = pginfo->GetProgramRecordingStatus(m_db);
                     if (recordtype > ScheduledRecording::NotRecording)
                     {
                         tmp.setPen(QPen(yellow, (int)(2 * wmult)));
@@ -1546,7 +1548,7 @@ void GuideGrid::updateTopInfo()
     descriptionfield->setText(pginfo->description);
 
     ScheduledRecording::RecordingType recordtype;
-    recordtype = pginfo->GetProgramRecordingStatus();
+    recordtype = pginfo->GetProgramRecordingStatus(m_db);
     switch (recordtype) {
     case ScheduledRecording::NotRecording:
          recordingfield->setText("Not Recording");
@@ -2055,15 +2057,15 @@ void GuideGrid::escape()
 void GuideGrid::quickRecord()
 {
     ProgramInfo *pginfo = m_programInfos[m_currentRow][m_currentCol];
-    ScheduledRecording::RecordingType currType = pginfo->GetProgramRecordingStatus();
+    ScheduledRecording::RecordingType currType = pginfo->GetProgramRecordingStatus(m_db);
 
     if (!pginfo)
         return;
 
     if (currType == ScheduledRecording::SingleRecord)
-        pginfo->ApplyRecordStateChange(ScheduledRecording::NotRecording);
+        pginfo->ApplyRecordStateChange(m_db, ScheduledRecording::NotRecording);
     else if (currType == ScheduledRecording::NotRecording)
-        pginfo->ApplyRecordStateChange(ScheduledRecording::SingleRecord);
+        pginfo->ApplyRecordStateChange(m_db, ScheduledRecording::SingleRecord);
 
     fillProgramInfos();
     update(programRect());
@@ -2086,7 +2088,7 @@ void GuideGrid::displayInfo()
 
     showInfo = 0;
 
-    pginfo->GetProgramRecordingStatus();
+    pginfo->GetProgramRecordingStatus(m_db);
 
     setActiveWindow();
     setFocus();

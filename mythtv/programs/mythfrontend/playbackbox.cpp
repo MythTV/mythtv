@@ -61,7 +61,7 @@ PlaybackBox::PlaybackBox(MythContext *context, BoxType ltype, QWidget *parent,
     if (type == Delete)
     {
         listview->setColumnWidth(0, (int)(200 * wmult)); 
-        listview->setColumnWidth(1, (int)(455 * wmult));
+        listview->setColumnWidth(1, (int)(450 * wmult));
         listview->setColumnWidth(2, (int)(90 * wmult));
     }
     else

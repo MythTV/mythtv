@@ -280,8 +280,7 @@ bool ScheduledRecording::loadByProgram(QSqlDatabase* db,
         .arg(proginfo.startts.date().toString(Qt::ISODate))
         .arg(proginfo.endts.date().toString(Qt::ISODate));
 
-    QSqlQuery result;
-    result.exec(query);
+    QSqlQuery result = db->exec(query);
     if (result.isActive()) {
         if (result.numRowsAffected() > 0) {
             result.next();
@@ -344,13 +343,12 @@ void ScheduledRecording::signalChange(QSqlDatabase* db) {
 }
 
 bool ScheduledRecording::hasChanged(QSqlDatabase* db) {
-    QSqlQuery query;
     QString thequery;
     
     bool retval = false;
 
     thequery = "SELECT data FROM settings WHERE value = \"RecordChanged\";";
-    query = db->exec(thequery);
+    QSqlQuery query = db->exec(thequery);
 
     if (query.isActive() && query.numRowsAffected() > 0)
     {

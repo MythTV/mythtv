@@ -19,6 +19,7 @@ class ProgramInfo;
 class TimeInfo;
 class ChannelInfo;
 class MythContext;
+class QSqlDatabase;
 
 #define MAX_DISPLAY_CHANS 8
 #define DISPLAY_TIMES 30
@@ -192,6 +193,8 @@ class GuideGrid : public MythDialog
     QString currentTimeColor;
 
     QTimer *timeCheck;
+
+    QSqlDatabase *m_db;
 };
 
 #endif

@@ -94,7 +94,7 @@ InfoDialog::InfoDialog(MythContext *context, ProgramInfo *pginfo,
     f->setLineWidth((int)(4 * hmult));
     vbox->addWidget(f);    
 
-    recordstatus = pginfo->GetProgramRecordingStatus();
+    recordstatus = pginfo->GetProgramRecordingStatus(QSqlDatabase::database());
 
     if (recordstatus == ScheduledRecording::TimeslotRecord && programtype == 0)
     {
@@ -207,7 +207,8 @@ void InfoDialog::selected(QListViewItem *selitem)
     currentSelected = realitem->GetType();
 
     if (currentSelected != recordstatus)
-        myinfo->ApplyRecordStateChange(currentSelected);
+        myinfo->ApplyRecordStateChange(QSqlDatabase::database(),
+                                       currentSelected);
 
     if (selitem)
         accept();

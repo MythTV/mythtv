@@ -52,12 +52,11 @@ Scheduler::~Scheduler()
 
 void Scheduler::setupCards(void)
 {
-    QSqlQuery query, subquery;
     QString thequery;
 
     thequery = "SELECT NULL FROM capturecard;";
 
-    query = db->exec(thequery);
+    QSqlQuery query = db->exec(thequery);
 
     numcards = -1;
     numinputs = -1;
@@ -94,7 +93,7 @@ void Scheduler::setupCards(void)
             thequery = QString("SELECT cardinputid FROM cardinput WHERE "
                                "sourceid = %1 ORDER BY cardinputid;")
                               .arg(source);
-            subquery = db->exec(thequery);
+            QSqlQuery subquery = db->exec(thequery);
             
             if (subquery.isActive() && subquery.numRowsAffected() > 0)
             {
@@ -367,15 +366,16 @@ void Scheduler::PruneList(void)
 
         ProgramInfo *first = (*i);
 
-        if (first->GetProgramRecordingStatus() > ScheduledRecording::SingleRecord &&
+        if (first->GetProgramRecordingStatus(db) > ScheduledRecording::SingleRecord &&
             (first->subtitle.length() > 2 && first->description.length() > 2))
         {
             if (FindInOldRecordings(first))
             {
-                cout << "Pruning duplicate program:" << endl
+                cout << "Pruning duplicate program (already recorded):" << endl
                      << first->title << endl
                      << first->subtitle << endl
-                     << first->description << endl;
+                     << first->description << endl
+                     << first->startts.toString() << endl;
                 delete first;
                 deliter = i.base();
                 deliter--;
@@ -455,7 +455,6 @@ list<ProgramInfo *> *Scheduler::getConflicting(ProgramInfo *pginfo,
 void Scheduler::CheckOverride(ProgramInfo *info,
                               list<ProgramInfo *> *conflictList)
 {
-    QSqlQuery query;
     QString thequery;
 
     QString starts = info->startts.toString("yyyyMMddhhmm");
@@ -468,7 +467,7 @@ void Scheduler::CheckOverride(ProgramInfo *info,
                        "endtime = %3;").arg(info->chanid).arg(starts)
                        .arg(ends);
 
-    query = db->exec(thequery);
+    QSqlQuery query = db->exec(thequery);
 
     if (query.isActive() && query.numRowsAffected() > 0)
     {
@@ -488,7 +487,6 @@ void Scheduler::CheckOverride(ProgramInfo *info,
 void Scheduler::MarkSingleConflict(ProgramInfo *info,
                                    list<ProgramInfo *> *conflictList)
 {
-    QSqlQuery query;
     QString thequery;
 
     list<ProgramInfo *>::iterator i;
@@ -504,7 +502,7 @@ void Scheduler::MarkSingleConflict(ProgramInfo *info,
                        "preferendtime = %3;").arg(info->chanid)
                        .arg(starts).arg(ends);
  
-    query = db->exec(thequery);
+    QSqlQuery query = db->exec(thequery);
 
     if (query.isActive() && query.numRowsAffected() > 0)
     {
@@ -635,14 +633,14 @@ void Scheduler::RemoveConflicts(void)
 ProgramInfo *Scheduler::GetBest(ProgramInfo *info, 
                                 list<ProgramInfo *> *conflictList)
 {
-    ScheduledRecording::RecordingType type = info->GetProgramRecordingStatus();
+    ScheduledRecording::RecordingType type = info->GetProgramRecordingStatus(db);
     ProgramInfo *best = info;
 
     list<ProgramInfo *>::iterator i;
     for (i = conflictList->begin(); i != conflictList->end(); i++)
     {
         ProgramInfo *test = (*i);
-        ScheduledRecording::RecordingType testtype = test->GetProgramRecordingStatus();
+        ScheduledRecording::RecordingType testtype = test->GetProgramRecordingStatus(db);
         cerr << (int)type << " vs. " << (int)testtype << endl;
         if (testtype < type)
         {

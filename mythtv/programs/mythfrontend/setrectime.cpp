@@ -200,7 +200,7 @@ void SetRecTimeDialog::selected(QListViewItem *selitem)
     {
         QDateTime sdt = m_startte->dateTime();
         QDateTime edt = m_endte->dateTime();
-        m_proginfo->ApplyRecordTimeChange(sdt, edt);
+        m_proginfo->ApplyRecordTimeChange(db, sdt, edt);
     }
 
     if (selitem)
