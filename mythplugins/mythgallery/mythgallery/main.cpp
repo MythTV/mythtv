@@ -20,16 +20,14 @@ int mythplugin_config(void);
 
 int mythplugin_init(const char *libversion)
 {
-    QString lib = libversion;
-    if (lib != MYTH_BINARY_VERSION)
-    {
-        cerr << "This plugin was compiled against libmyth version: " 
-             << MYTH_BINARY_VERSION 
-             << "\nbut the library is version: " << libversion << endl;
-        cerr << "You probably want to recompile everything, and do a\n"
-             << "'make distclean' first.\n";
-        return -1; 
-    }
+    if (!gContext->TestPopupVersion("mythgallery", libversion, 
+                                    MYTH_BINARY_VERSION))
+        return -1;
+
+
+    GallerySettings settings;
+    settings.load(QSqlDatabase::database());
+    settings.save(QSqlDatabase::database());    
 
     return 0;
 }
