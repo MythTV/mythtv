@@ -212,14 +212,45 @@ void DVBCam::CiHandlerLoop()
             pthread_mutex_lock(&pmt_lock);
             if (caids != NULL && pmtbuf != NULL)
             {
-                if (first_send)
+                if (!first_send)
                 {
-                    GENERAL(QString("CAM - Sending PMT to slot %1.").arg(s));
-                    first_send = false;
+                    pthread_mutex_unlock(&pmt_lock);
+                    continue;
+                }
+                first_send = false;
+                GENERAL(QString("CAM - Sending PMT to slot %1.").arg(s));
+
+                cCiCaPmt capmt(chan_opts.serviceID, CPLM_FIRST);
+
+                uint16_t prg_len = ((*(pmtbuf+2)&0x0f)<<8) | *(pmtbuf+3);
+                uint8_t *b = pmtbuf + 3;
+                uint8_t *e = pmtbuf + 4 + prg_len;
+                if (e+2 > pmtbuf+pmtlen)
+                {
+                    pthread_mutex_unlock(&pmt_lock);
+                    continue;
                 }
 
-                cCiCaPmt capmt(chan_opts.serviceID);
-                capmt.AddCaDescriptor(pmtlen, pmtbuf);
+                do {
+                    uint8_t tag = *(b+1);
+                    uint8_t len = *(b+2);
+                    if (b+2+len > e)
+                        break;
+                    if (tag == 0x09)
+                    {
+                        uint16_t ca_system_id = ((*(b+3))<<8) | *(b+4);
+                        for (int i=0; caids[i] != 0; i++)
+                        {
+                            if (ca_system_id == caids[i])
+                            {
+                                fprintf(stderr,"Adding CA Descriptor (SID=%0.4X)\n", ca_system_id);
+                                capmt.AddCaDescriptor(len + 2, b+1);
+                            }
+                        }
+                    }
+                    b += len + 2;
+                } while (b+2 <= e);
+
                 SetPids(capmt, chan_opts.pids);
 
                 ciHandler->SetCaPmt(capmt,s);

@@ -205,7 +205,6 @@ void DVBSections::ThreadLoop()
         {
             // FIXME: Handle POLLERR
             if (! (pollArray[i].revents & POLLIN || pollArray[i].revents & POLLPRI) )
-            // FIXME: does this jump to for or while? it should go to for
                 continue;
 
             int rsz = read(pollArray[i].fd, &buffer, MAX_SECTION_SIZE);
@@ -220,7 +219,7 @@ void DVBSections::ThreadLoop()
                 head.section_number = buffer[6];
                 head.section_last   = buffer[7];
 
-                ParseTable(&head, &buffer[8], rsz - sizeof(tablehead_t));
+                ParseTable(&head, &buffer[8], rsz - 8);
 
                 continue;
             }
@@ -312,9 +311,9 @@ void DVBSections::ParsePMT(tablehead_t* head, uint8_t* buffer, int size)
     if (curpmtsize == 0 && head->table_id_ext == curprogram)
     {
         pthread_mutex_lock(&pmap_lock);
-        curpmtbuf = (uint8_t*)realloc(curpmtbuf, size - 4);
-        memcpy(curpmtbuf, &buffer[4], size - 4);
-        curpmtsize = size - 4;
+        curpmtbuf = (uint8_t*)realloc(curpmtbuf, size);
+        memcpy(curpmtbuf, buffer, size);
+        curpmtsize = size;
         pthread_mutex_unlock(&pmap_lock);
 
         ChannelChanged(chan_opts, curpmtbuf, curpmtsize);
