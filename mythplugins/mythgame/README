@@ -14,7 +14,8 @@ If you don't have that done, don't even bother with this, as it won't work.
 You will need zlib and zlib-dev, however they're named on your distribution of
 choice.
 
-Ok, on to compiling. Just type 'make' in the main distribution directory.
+Ok, on to compiling. Just type 'qmake' then 'make' in the main distribution 
+directory.
 
 Compiling note:  If you get an error on building this, that says something
                  about 'mkspecs', then you don't have the QTDIR environment
