@@ -1245,9 +1245,8 @@ void Scheduler::BuildNewRecordsQueries(QStringList &from, QStringList &where)
         {
         case kPowerSearch:
             from << result.value(2).toString();
-            where << QString("record.recordid = %1 AND %2")
+            where << QString("record.recordid = %1 %2")
                 .arg(result.value(0).toString())
-                .arg(result.value(2).toString())
                 .arg(qphrase);
             break;
         case kTitleSearch:

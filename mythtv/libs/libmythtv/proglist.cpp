@@ -44,6 +44,7 @@ ProgLister::ProgLister(ProgListType pltype, const QString &view,
         case plTitleSearch:   searchtype = kTitleSearch;   break;
         case plKeywordSearch: searchtype = kKeywordSearch; break;
         case plPeopleSearch:  searchtype = kPeopleSearch;  break;
+        case plPowerSearch:   searchtype = kPowerSearch;   break;
         default:              searchtype = kNoSearch;      break;
     }
 
@@ -84,11 +85,20 @@ ProgLister::ProgLister(ProgListType pltype, const QString &view,
     choosePopup = NULL;
     chooseListBox = NULL;
     chooseLineEdit = NULL;
+    chooseEditButton = NULL;
     chooseOkButton = NULL;
     chooseDeleteButton = NULL;
     chooseRecordButton = NULL;
     chooseDay = NULL;
     chooseHour = NULL;
+
+    powerPopup = NULL;
+    powerTitleEdit = NULL;
+    powerSubtitleEdit = NULL;
+    powerDescEdit = NULL;
+    powerCatType = NULL;
+    powerCategory = NULL;
+    powerStation = NULL;
 
     curView = -1;
     fillViewList(view);
@@ -230,6 +240,7 @@ void ProgLister::updateBackground(void)
                 case plTitleSearch: value = tr("Title Search"); break;
                 case plKeywordSearch: value = tr("Keyword Search"); break;
                 case plPeopleSearch: value = tr("People Search"); break;
+                case plPowerSearch: value = tr("Power Search"); break;
                 case plChannel: value = tr("Channel Search"); break;
                 case plCategory: value = tr("Category Search"); break;
                 case plMovies: value = tr("Movie Search"); break;
@@ -317,7 +328,7 @@ void ProgLister::nextView(void)
 
 void ProgLister::setViewFromList(void)
 {
-    if (!choosePopup || !chooseListBox)
+    if (!choosePopup || (!chooseListBox && !chooseEditButton))
         return;
 
     int view = chooseListBox->currentItem();
@@ -330,6 +341,16 @@ void ProgLister::setViewFromList(void)
         {
             if (chooseLineEdit)
                 chooseLineEdit->setFocus();
+            return;
+        }
+    }
+    if (type == plPowerSearch)
+    {
+        view--;
+        if (view < 0)
+        {
+            if (chooseEditButton)
+                powerEdit();
             return;
         }
     }
@@ -358,17 +379,25 @@ void ProgLister::chooseEditChanged(void)
 
 void ProgLister::chooseListBoxChanged(void)
 {
-    if (!chooseListBox || !chooseLineEdit)
+    if (!chooseListBox)
         return;
 
     int view = chooseListBox->currentItem() - 1;
 
-    if (view < 0)
-        chooseLineEdit->setText("");
-    else
-        chooseLineEdit->setText(viewList[view]);
+    if (chooseLineEdit)
+    {
+        if (view < 0)
+            chooseLineEdit->setText("");
+        else
+            chooseLineEdit->setText(viewList[view]);
 
-    chooseDeleteButton->setEnabled(view >= 0);
+        chooseDeleteButton->setEnabled(view >= 0);
+    }
+    else if (chooseEditButton)
+    {
+        chooseDeleteButton->setEnabled(view >= 0);
+        chooseRecordButton->setEnabled(view >= 0);
+    }
 }
 
 void ProgLister::setViewFromEdit(void)
@@ -421,12 +450,84 @@ void ProgLister::setViewFromEdit(void)
     refillAll = true;
 }
 
-void ProgLister::addSearchRecord(void)
+void ProgLister::setViewFromPowerEdit()
 {
-    if (!choosePopup || !chooseListBox || !chooseLineEdit)
+    if (!powerPopup || !choosePopup || !chooseListBox)
         return;
 
-    QString text = chooseLineEdit->text();
+    QString text = "";
+    text =     powerTitleEdit->text().replace(":","%").replace("*","%") + ":";
+    text += powerSubtitleEdit->text().replace(":","%").replace("*","%") + ":";
+    text +=     powerDescEdit->text().replace(":","%").replace("*","%") + ":";
+
+    if (powerCatType->currentItem() > 0)
+        text += typeList[powerCatType->currentItem()];
+    text += ":";
+    if (powerCategory->currentItem() > 0)
+        text += categoryList[powerCategory->currentItem()];
+    text += ":";
+    if (powerStation->currentItem() > 0)
+        text += stationList[powerStation->currentItem()];
+
+    if (text == ":::::")
+        return;
+
+    int oldview = chooseListBox->currentItem() - 1;
+    int newview = viewList.findIndex(text);
+
+    QString querystr = NULL;
+    QString qphrase = NULL;
+
+    if (newview < 0 || newview != oldview)
+    {
+        if (oldview >= 0)
+        {
+            qphrase = viewList[oldview].utf8();
+            qphrase.replace("\'", "\\\'");
+
+            querystr = QString("DELETE FROM keyword "
+                               "WHERE phrase = '%1' AND searchtype = '%2';")
+                               .arg(qphrase).arg(searchtype);
+            QSqlQuery query;
+            query.exec(querystr);
+        }
+        if (newview < 0)
+        {
+            qphrase = text.utf8();
+            qphrase.replace("\'", "\\\'");
+
+            querystr = QString("REPLACE INTO keyword (phrase, searchtype)"
+                               "VALUES('%1','%2');")
+                               .arg(qphrase).arg(searchtype);
+            QSqlQuery query;
+            query.exec(querystr);
+        }
+    }
+    powerPopup->done(0);
+
+    fillViewList(text);
+
+    curView = viewList.findIndex(text);
+
+    curItem = -1;
+    refillAll = true;
+}
+
+void ProgLister::addSearchRecord(void)
+{
+    if (!choosePopup || !chooseListBox)
+        return;
+
+    QString text = "";
+
+    if (chooseLineEdit)
+        text = chooseLineEdit->text();
+    else if (chooseEditButton)
+        text = viewList[curView];
+    else
+        return;
+
+    QString what = text;
 
     if (text.stripWhiteSpace().length() == 0)
         return;
@@ -436,9 +537,20 @@ void ProgLister::addSearchRecord(void)
         VERBOSE(VB_IMPORTANT, "Unknown search in ProgLister");
         return;
     }
+    if (searchtype == kPowerSearch)
+    {
+        if (text == "" || text == ":::::")
+            return;
+
+        what = powerStringToSQL(text);
+
+        if (what == "")
+            return;
+    }
+
 
     ScheduledRecording record;
-    record.loadBySearch(db, searchtype, text);
+    record.loadBySearch(db, searchtype, text, what);
     record.exec(db);
 
     setViewFromEdit();
@@ -477,7 +589,8 @@ void ProgLister::deleteKeyword(void)
         view = chooseListBox->count() - 2;
 
     chooseListBox->setSelected(view + 1, true);
-    if (viewList.count() < 1)
+
+    if (viewList.count() < 1 && chooseLineEdit)
         chooseLineEdit->setFocus();
     else
         chooseListBox->setFocus();
@@ -620,6 +733,78 @@ void ProgLister::chooseView(void)
             refillAll = true;
         }
     }
+    else if (type == plPowerSearch)
+    {
+        int oldView = curView;
+
+        choosePopup = new MythPopupBox(gContext->GetMainWindow(), "");
+        choosePopup->addLabel(tr("Select Search"));
+
+        chooseListBox = new MythListBox(choosePopup);
+        chooseListBox->setScrollBar(false);
+        chooseListBox->setBottomScrollBar(false);
+        chooseListBox->insertItem(tr("<New Search>"));
+        chooseListBox->insertStringList(viewTextList);
+        if (curView < 0)
+            chooseListBox->setCurrentItem(0);
+        else
+            chooseListBox->setCurrentItem(curView + 1);
+        choosePopup->addWidget(chooseListBox);
+
+        chooseEditButton = new MythPushButton(choosePopup);
+        chooseEditButton->setText(tr("Edit"));
+        choosePopup->addWidget(chooseEditButton);
+
+        chooseDeleteButton = new MythPushButton(choosePopup);
+        chooseDeleteButton->setText(tr("Delete"));
+        choosePopup->addWidget(chooseDeleteButton);
+
+        chooseRecordButton = new MythPushButton(choosePopup);
+        chooseRecordButton->setText(tr("Record"));
+        choosePopup->addWidget(chooseRecordButton);
+
+        chooseDeleteButton->setEnabled(curView >= 0);
+        chooseRecordButton->setEnabled(curView >= 0);
+
+        connect(chooseListBox, SIGNAL(accepted(int)), this,
+                               SLOT(setViewFromList()));
+        connect(chooseListBox, SIGNAL(menuButtonPressed(int)),chooseEditButton,
+                               SLOT(setFocus()));
+        connect(chooseListBox, SIGNAL(selectionChanged()), this,
+                               SLOT(chooseListBoxChanged()));
+        connect(chooseEditButton, SIGNAL(clicked()), this, 
+                                  SLOT(powerEdit()));
+        connect(chooseDeleteButton, SIGNAL(clicked()), this,
+                                    SLOT(deleteKeyword()));
+        connect(chooseRecordButton, SIGNAL(clicked()), this,
+                                    SLOT(addSearchRecord()));
+
+        if (viewList.count() < 1)
+            chooseEditButton->setFocus();
+        else
+            chooseListBox->setFocus();
+        choosePopup->ExecPopup();
+
+        delete chooseEditButton;
+        chooseEditButton = NULL;
+        delete chooseDeleteButton;
+        chooseDeleteButton = NULL;
+        delete chooseRecordButton;
+        chooseRecordButton = NULL;
+        delete chooseListBox;
+        chooseListBox = NULL;
+        delete choosePopup;
+        choosePopup = NULL;
+
+        if (viewList.count() < 1 || (oldView < 0 && curView < 0))
+            reject();
+        else if (curView < 0)
+        {
+            curView = 0;
+            curItem = -1;
+            refillAll = true;
+        }
+    }
     else if (type == plTime)
     {
         choosePopup = new MythPopupBox(gContext->GetMainWindow(), "");
@@ -668,6 +853,183 @@ void ProgLister::chooseView(void)
         delete choosePopup;
         choosePopup = NULL;
     }
+}
+
+void ProgLister::powerEdit()
+{
+    int view = chooseListBox->currentItem() - 1;
+    QString text = ":::::";
+
+    if (view >= 0)
+        text = viewList[view];
+
+    QStringList field = QStringList::split( ":", text, true);
+
+    if ( field.count() != 6)
+    {
+        VERBOSE(VB_IMPORTANT, QString("Error. PowerSearch %1 has %2 fields")
+                .arg(text).arg(field.count()));
+    }
+
+    powerPopup = new MythPopupBox(gContext->GetMainWindow(), "");
+    powerPopup->addLabel(tr("Edit Power Search Fields"));
+
+    powerPopup->addLabel(tr("Optional title phrase:"));
+    powerTitleEdit = new MythRemoteLineEdit(powerPopup);
+    powerPopup->addWidget(powerTitleEdit);
+
+    powerPopup->addLabel(tr("Optional subtitle phrase:"));
+    powerSubtitleEdit = new MythRemoteLineEdit(powerPopup);
+    powerPopup->addWidget(powerSubtitleEdit);
+
+    powerPopup->addLabel(tr("Optional description phrase:"));
+    powerDescEdit = new MythRemoteLineEdit(powerPopup);
+    powerPopup->addWidget(powerDescEdit);
+
+    powerCatType = new MythComboBox(false, powerPopup);
+    powerCatType->insertItem("(Any Program Type)");
+    typeList.clear();
+    typeList << "";
+    powerCatType->insertItem(tr("Movies"));
+    typeList << "movie";
+    powerCatType->insertItem(tr("Series"));
+    typeList << "series";
+    powerCatType->insertItem(tr("Show"));
+    typeList << "tvshow";
+    powerCatType->insertItem(tr("Sports"));
+    typeList << "sports";
+    powerCatType->setCurrentItem(typeList.findIndex(field[3]));
+    powerPopup->addWidget(powerCatType);
+
+    powerCategory = new MythComboBox(false, powerPopup);
+    powerCategory->insertItem("(Any Category)");
+    categoryList.clear();
+    categoryList << "";
+
+    QString querystr = "SELECT category FROM program GROUP BY category;";
+    QSqlQuery query;
+    query.exec(querystr);
+    if (query.isActive() && query.numRowsAffected())
+    {
+        while (query.next())
+        {
+            QString category = query.value(0).toString();
+            if (category <= " " || category == NULL)
+                continue;
+            category = QString::fromUtf8(query.value(0).toString());
+            powerCategory->insertItem(category);
+            categoryList << category;
+            if (category == field[4])
+                powerCategory->setCurrentItem(powerCategory->count() - 1);
+        }
+    }
+    powerPopup->addWidget(powerCategory);
+
+    powerStation = new MythComboBox(false, powerPopup);
+    powerStation->insertItem("(Any Station)");
+    stationList.clear();
+    stationList << "";
+
+    querystr = "SELECT channel.chanid, channel.channum, "
+               "channel.callsign, channel.name FROM channel "
+               "WHERE channel.visible = 1 "
+               "GROUP BY callsign "
+               "ORDER BY " + channelOrdering + ";";
+    QSqlQuery cquery;
+    cquery.exec(querystr);
+    if (cquery.isActive() && cquery.numRowsAffected())
+    {
+        while (cquery.next())
+        {
+            QString chanid = cquery.value(0).toString();
+            QString channum = cquery.value(1).toString();
+            QString chansign = QString::fromUtf8(cquery.value(2).toString());
+            QString channame = QString::fromUtf8(cquery.value(3).toString());
+
+            QString chantext = channelFormat;
+            chantext.replace("<num>", channum)
+                .replace("<sign>", chansign)
+                .replace("<name>", channame);
+
+            viewList << chanid;
+            viewTextList << chantext;
+
+            powerStation->insertItem(chantext);
+            stationList << chansign;
+            if (chansign == field[5])
+                powerStation->setCurrentItem(powerStation->count() - 1);
+        }
+    }
+    powerPopup->addWidget(powerStation);
+
+    powerOkButton = new MythPushButton(powerPopup);
+    powerOkButton->setText(tr("OK"));
+    powerPopup->addWidget(powerOkButton);
+
+    connect(powerOkButton, SIGNAL(clicked()), this, 
+                           SLOT(setViewFromPowerEdit()));
+
+    powerTitleEdit->setText(field[0]);
+    powerSubtitleEdit->setText(field[1]);
+    powerDescEdit->setText(field[2]);
+
+    powerTitleEdit->setFocus();
+    choosePopup->done(0);
+    powerPopup->ExecPopup();
+
+    delete powerTitleEdit;
+    powerTitleEdit = NULL;
+    delete powerSubtitleEdit;
+    powerSubtitleEdit = NULL;
+    delete powerDescEdit;
+    powerDescEdit = NULL;
+
+    delete powerCatType;
+    powerCatType = NULL;
+    delete powerCategory;
+    powerCategory = NULL;
+    delete powerStation;
+    powerStation = NULL;
+
+    delete powerOkButton;
+    powerOkButton = NULL;
+    delete powerPopup;
+    powerPopup = NULL;
+}
+
+QString ProgLister::powerStringToSQL(QString &qphrase)
+{
+    QString str = "";
+
+    qphrase.replace("\"","\\\"");
+
+    QStringList field = QStringList::split( ":", qphrase, true);
+
+    if ( field.count() != 6)
+    {
+        VERBOSE(VB_IMPORTANT, QString("Error. PowerSearch %1 has %2 fields")
+                .arg(qphrase).arg(field.count()));
+        return str;
+    }
+    if (field[0])
+        str += QString("AND program.title LIKE \"\%%1\%\" ")
+                       .arg(field[0]);
+    if (field[1])
+        str += QString("AND program.subtitle LIKE \"\%%1\%\" ")
+                       .arg(field[1]);
+    if (field[2])
+        str += QString("AND program.description LIKE \"\%%1\%\" ")
+                       .arg(field[2]);
+    if (field[3])
+        str += QString("AND program.category_type=\"%1\" ")
+                       .arg(field[3]);
+    if (field[4])
+        str += QString("AND program.category=\"%1\" ")
+                       .arg(field[4]);
+    if (field[5])
+        str += QString("AND channel.callsign=\"%1\" ")
+                       .arg(field[5]);
+    return str;
 }
 
 void ProgLister::quickRecord()
@@ -778,7 +1140,7 @@ void ProgLister::fillViewList(const QString &view)
             curView = viewList.findIndex(view);
     }
     else if (type == plTitleSearch || type == plKeywordSearch ||
-             type == plPeopleSearch)
+             type == plPeopleSearch || type == plPowerSearch)
     {
         QString querystr = QString("SELECT phrase FROM keyword "
                                    "WHERE searchtype = '%1';")
@@ -917,6 +1279,13 @@ void ProgLister::fillItemList(void)
                         "  AND program.endtime > %1 "
                         "  AND people.name LIKE '\%%2\%' ")
                         .arg(startstr).arg(qphrase);
+    }
+    else if (type == plPowerSearch) // complex search
+    {
+        where = QString("WHERE channel.visible = 1 "
+                        "  AND program.endtime > %1 "
+                        "  %2 ")
+                        .arg(startstr).arg(powerStringToSQL(qphrase));
     }
     else if (type == plChannel) // list by channel
     {
@@ -1141,4 +1510,3 @@ void ProgLister::customEvent(QCustomEvent *e)
 
     allowEvents = true;
 }
-

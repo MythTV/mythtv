@@ -84,7 +84,8 @@ public:
 
     virtual void loadByID(QSqlDatabase* db, int id);
     virtual void loadByProgram(QSqlDatabase* db, ProgramInfo* proginfo);
-    virtual void loadBySearch(QSqlDatabase *db, RecSearchType lsearch, QString what);
+    virtual void loadBySearch(QSqlDatabase *db, RecSearchType lsearch,
+                              QString text, QString what);
 
     virtual int exec(QSqlDatabase* db, bool saveOnExec = true, bool doLoad = false)
         { return ConfigurationDialog::exec(db, saveOnExec, doLoad); }    

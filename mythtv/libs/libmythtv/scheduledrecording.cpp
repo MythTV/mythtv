@@ -106,6 +106,7 @@ void ScheduledRecording::loadByProgram(QSqlDatabase* db, ProgramInfo* proginfo)
 
 void ScheduledRecording::loadBySearch(QSqlDatabase *db,
                                       RecSearchType lsearch,
+                                      QString textname,
                                       QString forwhat)
 {
     int rid = 0;
@@ -132,6 +133,9 @@ void ScheduledRecording::loadBySearch(QSqlDatabase *db,
         
         switch (lsearch)
         {
+        case kPowerSearch:
+            searchType = "(" +  QObject::tr("Power Search") + ")";
+            break;
         case kTitleSearch:
             searchType = "(" +  QObject::tr("Title Search") + ")";
             break;
@@ -145,7 +149,7 @@ void ScheduledRecording::loadBySearch(QSqlDatabase *db,
             searchType = "(" +  QObject::tr("Unknown Search") + ")";
             break;
         }
-        QString ltitle = QString("%1 %2").arg(forwhat).arg(searchType);
+        QString ltitle = QString("%1 %2").arg(textname).arg(searchType);
         title->setValue(ltitle);
         description->setValue(forwhat);
     } 

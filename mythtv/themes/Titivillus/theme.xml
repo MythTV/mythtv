@@ -492,10 +492,16 @@
     <watermarkimage>watermark/search_keywords.png</watermarkimage>
     <offset>0,0</offset>
   </buttondef>
-  
+
   <buttondef name="TV_SEARCH_PEOPLE">
     <image>text-blank.png</image>
     <watermarkimage>watermark/search_people.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="TV_SEARCH_POWER">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/search_power.png</watermarkimage>
     <offset>0,0</offset>
   </buttondef>
 

@@ -60,4 +60,10 @@
       <action>TV_SEARCH_NEW</action>
    </button>
 
+   <button>
+      <type>TV_SEARCH_POWER</type>
+      <text>Advanced</text>
+      <action>TV_SEARCH_POWER</action>
+   </button>
+
 </mythmenu>

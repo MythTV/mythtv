@@ -475,6 +475,12 @@
     <offset>0,0</offset>
   </buttondef>
 
+  <buttondef name="TV_SEARCH_POWER">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/search.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
   <buttondef name="TV_SEARCH_KEYWORDS">
     <image>text-blank.png</image>
     <watermarkimage>watermark/search.png</watermarkimage>

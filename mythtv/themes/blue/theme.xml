@@ -407,8 +407,13 @@
     <image>record.png</image>
     <offset>20,10</offset>
   </buttondef>
-  
+
   <buttondef name="TV_SEARCH_PEOPLE">
+    <image>record.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="TV_SEARCH_POWER">
     <image>record.png</image>
     <offset>20,10</offset>
   </buttondef>
