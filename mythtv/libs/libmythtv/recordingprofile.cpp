@@ -6,6 +6,8 @@
 #include <qlayout.h>
 #include <iostream>
 
+#include "managedlist.h"
+
 #define TRANSCODER_GROUP 6
 
 QString RecordingProfileParam::whereClause(void) {
@@ -797,8 +799,8 @@ int RecordingProfileEditor::exec(QSqlDatabase* db) {
     return QDialog::Rejected;
 }
 
-void RecordingProfile::fillSelections(QSqlDatabase* db, SelectSetting* setting,
-                                      int group) {
+void RecordingProfile::fillSelections(QSqlDatabase* db, SelectSetting* setting, int group)
+{
     if (group == 0)
     {
        for(int i = 0; availProfiles[i] != ""; i++)
@@ -824,6 +826,42 @@ void RecordingProfile::fillSelections(QSqlDatabase* db, SelectSetting* setting,
                 {
                     setting->addSelection(result.value(0).toString(),
                                           result.value(1).toString());    
+                }
+            }
+        }
+    }
+}
+
+void RecordingProfile::fillSelections(QSqlDatabase* db, SelectManagedListItem* setting, int group)
+{
+    if (group == 0)
+    {
+       for(int i = 0; availProfiles[i] != ""; i++)
+       {
+          QString tempLabel(QObject::tr("Record using the \"%1\" profile"));
+          setting->addSelection(QString(tempLabel).arg(availProfiles[i]), availProfiles[i], false);
+       }
+    }
+    else
+    {
+        QString query = QString("SELECT name, id FROM recordingprofiles "
+                                "WHERE profilegroup = %1 ORDER BY id;")
+                                .arg(group);
+
+        QSqlQuery result = db->exec(query);
+        if (result.isActive() && result.numRowsAffected() > 0)
+        {
+            while (result.next())
+            {
+                if(group == TRANSCODER_GROUP)
+                {
+                    setting->addSelection(QString( "From %1").arg(result.value(0).toString()),
+                                          result.value(1).toString());
+                }
+                else
+                {
+                    setting->addSelection(result.value(0).toString() ,result.value(1).toString(), false);
+
                 }
             }
         }
