@@ -641,3 +641,28 @@ UIBlackHoleType* MythThemedDialog::getUIBlackHoleType(QString name)
     return oops;
 }
 
+UIImageType* MythThemedDialog::getUIImageType(QString name)
+{
+
+    UIImageType* oops = NULL;
+    
+    QPtrListIterator<LayerSet> an_it(my_containers);
+    LayerSet *looper;
+
+    while( (looper = an_it.current()) != 0)
+    {
+        UIType *hunter = looper->GetType(name);
+        if(hunter)
+        {
+            UIImageType *hunted;
+            if( (hunted = dynamic_cast<UIImageType*>(hunter)) )
+            {
+                return hunted;
+            }
+        }
+        ++an_it;
+    }
+
+    return oops;
+}
+

@@ -303,6 +303,8 @@ class UIListType : public UIType
 
 class UIImageType : public UIType
 {
+    Q_OBJECT
+
   public:
     UIImageType(const QString &, const QString &, int, QPoint);
     ~UIImageType();
@@ -321,6 +323,15 @@ class UIImageType : public UIType
     QPixmap GetImage() { return img; }
     int GetSize() { return m_force_x; }
     virtual void Draw(QPainter *, int, int);
+
+  public slots:
+  
+    //
+    //  We have to redefine this, as pixmaps
+    //  are not of a fixed size
+    //
+
+    void refresh();
 
   protected:
 
@@ -554,6 +565,8 @@ class UIManagedTreeListType : public UIType
     bool    prevActive(bool wrap_around, bool traverse_up_down);
     void    select();
     void    activate();
+    void    enter();
+    void    deactivate(){active_node = NULL;}
     
   signals:
 

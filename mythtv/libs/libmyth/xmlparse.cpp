@@ -274,6 +274,7 @@ void XMLParse::parseImage(LayerSet *container, QDomElement &element)
     {
         image->SetContext(context);
     }
+    image->SetParent(container);
     container->AddType(image);
 }
 

@@ -1310,6 +1310,13 @@ void UIImageType::LoadImage()
         }
         delete sourceImg;
     }
+    
+    //
+    //  On the odd chance we are owned by a 
+    //  MythThemedDialog, ask to be re-painted
+    //
+    
+    refresh();
 }
 
 void UIImageType::Draw(QPainter *dr, int drawlayer, int context)
@@ -1338,6 +1345,40 @@ void UIImageType::Draw(QPainter *dr, int drawlayer, int context)
     {
             cerr << "   +UIImageType::Draw() <- outside (layer = " << drawlayer
                  << ", widget layer = " << m_order << "\n";
+    }
+}
+
+void UIImageType::refresh()
+{
+    //
+    //  Figure out how big we are
+    //  and where we are in screen
+    //  coordinates
+    //
+    
+    QRect r = QRect(m_displaypos.x(),
+                    m_displaypos.y(),
+                    img.width(),
+                    img.height());
+    
+    if(m_parent)
+    {
+        r.moveBy(m_parent->GetAreaRect().left(),
+                 m_parent->GetAreaRect().top());
+
+        //
+        //  Tell someone who cares
+        //
+    
+        emit requestUpdate(r);
+    }
+    else
+    {
+        //
+        //  This happens when parent isn't set, 
+        //  usually during initial parsing.
+        //
+        emit requestUpdate();
     }
 }
 
@@ -1400,7 +1441,7 @@ void UIRepeatedImageType::calculateScreenArea()
                     m_displaypos.y(),
                     img.width() * 10,   //  that needs to be theme-ui.xml defined soon
                     img.height());
-                           
+
     r.moveBy(m_parent->GetAreaRect().left(),
              m_parent->GetAreaRect().top());
 
@@ -2916,6 +2957,14 @@ void UIManagedTreeListType::activate()
     {
         emit requestUpdate(screen_corners[active_bin]);
         emit nodeSelected(active_node->getInt(), active_node->getAttributes());
+    }
+}
+
+void UIManagedTreeListType::enter()
+{
+    if(current_node)
+    {
+        emit nodeEntered(current_node->getInt(), current_node->getAttributes());
     }
 }
 
