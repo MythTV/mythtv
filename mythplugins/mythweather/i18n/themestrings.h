@@ -29,6 +29,9 @@ void strings_null() {
     ThemeUI::tr("HEAVY");
     ThemeUI::tr("HEAVY");
     ThemeUI::tr("HEAVY");
+    ThemeUI::tr("COLD");
+    ThemeUI::tr("COLDEST");
+    ThemeUI::tr("CLOUD TEMPERATURE");
     ThemeUI::tr("Enter Zip Code");
     ThemeUI::tr("weather setup");
     ThemeUI::tr("To save, press 'i' - to cancel, hit escape");

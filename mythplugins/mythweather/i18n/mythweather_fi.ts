@@ -634,6 +634,18 @@
         <source>To save, press &apos;i&apos; - to cancel, hit escape</source>
         <translation>Talletetaan painamalla &apos;i&apos;, ESC peruuttaa</translation>
     </message>
+    <message>
+        <source>COLD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>COLDEST</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CLOUD TEMPERATURE</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Weather</name>

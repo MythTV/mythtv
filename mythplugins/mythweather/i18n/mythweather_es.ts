@@ -634,6 +634,18 @@
         <source>To save, press &apos;i&apos; - to cancel, hit escape</source>
         <translation>Para guardar, pulse &apos;i&apos; - para cancelar, para cancelar salga</translation>
     </message>
+    <message>
+        <source>COLD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>COLDEST</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CLOUD TEMPERATURE</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Weather</name>
