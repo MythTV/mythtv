@@ -15,6 +15,7 @@
 #include <qptrlist.h>
 
 #include "mfd_plugin.h"
+#include "../../mdserver.h"
 
 #include "output.h"
 #include "decoder.h"
@@ -29,7 +30,8 @@ class AudioPlugin: public MFDServicePlugin
     void    run();
     void    doSomething(const QStringList &tokens, int socket_identifier);
 
-    bool    playAudio(QUrl url);
+    bool    playUrl(QUrl url);
+    bool    playMetadata(int collection_id, int metadata_id);
     void    stopAudio();
     void    pauseAudio(bool true_or_false);
     void    seekAudio(int seek_amount);
@@ -53,6 +55,7 @@ class AudioPlugin: public MFDServicePlugin
     int     current_bitrate;
     int     current_frequency;
     QMutex play_data_mutex;
+    MetadataServer *metadata_server;
 };
 
 #endif  // audio_h_

@@ -100,6 +100,7 @@ void DaapInstance::run()
     //  daap server
     //
     
+    service_details_mutex.lock();
     QHostAddress daap_server_address;
     if(!daap_server_address.setAddress(server_address))
     {
@@ -150,6 +151,9 @@ void DaapInstance::run()
     log(QString("sent daap request: \"%1\"")
         .arg(first_request.getRequestString()), 9);
     
+    service_details_mutex.unlock();
+    
+    int a_socket = -1;
     while(keep_going)
     {
         //
@@ -201,14 +205,38 @@ void DaapInstance::run()
         {
             if(client_socket_to_daap_server)
             {
-                if(FD_ISSET(client_socket_to_daap_server->socket(), &readfds))
+                a_socket = client_socket_to_daap_server->socket();
+                if(a_socket > 0)
+                {
+                    if(FD_ISSET(client_socket_to_daap_server->socket(), &readfds))
+                    {
+                        //
+                        //  Excellent ... the daap server is sending us some data.
+                        //
+                
+                        handleIncoming();
+                    }
+                }
+                else
                 {
                     //
-                    //  Excellent ... the daap server is sending us some data.
+                    //  Our daap server disappeared on us
                     //
-                
-                    handleIncoming();
+                    
+                    log("daap server seems to have disappeared, this instance will exit", 6);
+                    
+                    keep_going_mutex.lock();
+                        keep_going = false;
+                    keep_going_mutex.unlock();
                 }
+            }
+            else
+            {
+                log("something deleted our socket so this instance will exit",6);
+                keep_going_mutex.lock();
+                    keep_going = false;
+                keep_going_mutex.unlock();
+                a_socket = 0;
             }
             if(FD_ISSET(u_shaped_pipe[0], &readfds))
             {
@@ -220,12 +248,13 @@ void DaapInstance::run()
         }
     }
     
+    
     //
     //  If we're logged in, send a logoff (just being polite)
     //  But don't bother waiting for a response
     //
     
-    if(logged_in)
+    if(logged_in && a_socket > 0)
     {
         DaapRequest logout_request(this, "/logout", server_address);
         logout_request.addGetVariable("session-id", session_id);
@@ -243,6 +272,14 @@ void DaapInstance::run()
         delete client_socket_to_daap_server;
         client_socket_to_daap_server = NULL;
     }
+    
+    //
+    //  Remove any metadata we are responsible for by deleting the database
+    //  objects
+    //
+    
+    databases.clear();
+    
 }
 
 void DaapInstance::stop()
@@ -377,6 +414,7 @@ void DaapInstance::handleIncoming()
             //  Well, something is borked. Give up on this daap server.
             //
             
+            service_details_mutex.lock();
             warning(QString("given up on "
                             "\"%1\" (%2:%3)")
                             .arg(service_name)
@@ -384,6 +422,7 @@ void DaapInstance::handleIncoming()
                             .arg(server_port));
             delete client_socket_to_daap_server;
             client_socket_to_daap_server = NULL;
+            service_details_mutex.unlock();
         }
     }
     
@@ -460,11 +499,13 @@ bool DaapInstance::checkServerType(const QString &server_description)
                 }
                 else
                 {
+                    service_details_mutex.lock();
                     daap_server_type = DAAP_SERVER_ITUNESLESSTHAN401;
                     log(QString("discovered service "
                                 "named \"%1\" is being served by "
                                 "iTunes (v < 4.1 !!)")
                                 .arg(service_name), 2);
+                    service_details_mutex.unlock();
                     return true;
                 }
             }
@@ -472,11 +513,13 @@ bool DaapInstance::checkServerType(const QString &server_description)
         }
         else if(server_description.left(6) == "MythTV")
         {
+            service_details_mutex.lock();
             daap_server_type = DAAP_SERVER_MYTH;
             log(QString("discovered service "
                         "named \"%1\" is being served by "
                         "another myth box :-)")
                         .arg(service_name), 2);
+            service_details_mutex.unlock();
         }
         else
         {
@@ -856,6 +899,7 @@ void DaapInstance::doServerInfoResponse(TagInput& dmap_data)
                 dmap_data >> a_string;
                 {
                     QString q_string = QString::fromUtf8(a_string.c_str());
+                    service_details_mutex.lock();
                     if(q_string != service_name)
                     {
                         warning(QString("got conflicting names for "
@@ -865,6 +909,7 @@ void DaapInstance::doServerInfoResponse(TagInput& dmap_data)
                                         .arg(q_string)
                                         .arg(service_name));
                     }
+                    service_details_mutex.unlock();
                 }
                 break;
                 
@@ -1068,10 +1113,12 @@ void DaapInstance::doLoginResponse(TagInput& dmap_data)
     if(session_id != -1 && login_status)
     {
         logged_in = true;
+        service_details_mutex.lock();
         log(QString("managed to log "
                     "on to \"%1\" and will start loading "
                     "metadata ... ")
                     .arg(service_name), 5);
+        service_details_mutex.unlock();
 
         //
         //  Time to use our new session id to get ourselves an /update
@@ -1088,10 +1135,12 @@ void DaapInstance::doLoginResponse(TagInput& dmap_data)
     }
     else
     {
+        service_details_mutex.lock();
         warning(QString("could not log on "
                         "to \"%1\" (password protected?) "
                         "and is giving up")
                         .arg(service_name));
+        service_details_mutex.unlock();
     }  
 }
 
@@ -1171,6 +1220,7 @@ void DaapInstance::doUpdateResponse(TagInput& dmap_data)
         //  time of see what kind of databases are available
         //
         
+        service_details_mutex.lock();
         log(QString("now figured out that "
                     "\"%1\" (%2:%3) is on generation %4")
                     .arg(service_name)
@@ -1181,6 +1231,7 @@ void DaapInstance::doUpdateResponse(TagInput& dmap_data)
         DaapRequest database_request(this, "/databases", server_address);
         database_request.addGetVariable("session-id", session_id);
         database_request.addGetVariable("revision-number", new_metadata_generation);
+        service_details_mutex.unlock();
 
         if(metadata_generation > 1)
         {
@@ -1408,6 +1459,7 @@ void DaapInstance::parseDatabaseListings(TagInput& dmap_data, int how_many)
 
         if(need_new_database)
         {
+            service_details_mutex.lock();
             Database *new_database = new Database(
                                                     new_database_id,
                                                     new_database_name,
@@ -1419,11 +1471,28 @@ void DaapInstance::parseDatabaseListings(TagInput& dmap_data, int how_many)
                                                     server_address,
                                                     server_port
                                              );
+            service_details_mutex.unlock();
             log(QString("creating new database with daap server id of %1")
                 .arg(new_database_id), 9);
             databases.append(new_database);
         }
     }
+}
+
+bool DaapInstance::isThisYou(QString a_name, QString an_address, uint a_port)
+{
+    bool return_value = false;
+    service_details_mutex.lock();
+        if(
+            a_name == service_name &&
+            an_address == server_address &&
+            a_port == server_port
+          )
+        {
+            return_value = true;
+        }
+    service_details_mutex.unlock();
+    return return_value;
 }
 
 DaapInstance::~DaapInstance()

@@ -97,7 +97,7 @@ void DaapClient::run()
         }
     
         timeout_mutex.lock();
-            timeout.tv_sec = 30;
+            timeout.tv_sec = 10;
             timeout.tv_usec = 0;
         timeout_mutex.unlock();
 
@@ -132,6 +132,26 @@ void DaapClient::run()
             if(FD_ISSET(client_socket_to_mfd->socket(), &readfds))
             {
                 readSocket();
+            }
+        }
+        
+        //
+        //  Clean out any instances that have exited (because, for example,
+        //  the daap server they were talking to went away)
+        //
+        
+        DaapInstance *an_instance;
+        QPtrListIterator<DaapInstance> iter( daap_instances );
+
+        while ( (an_instance = iter.current()) != 0 )
+        {
+            ++iter;
+            if(an_instance->finished())
+            {
+                daap_instances.remove(an_instance);
+                log(QString("removed a daap client instance (total now %1)")
+                    .arg(daap_instances.count()), 5);
+                    
             }
         }
     }
@@ -217,6 +237,8 @@ void DaapClient::addDaapServer(QString server_address, uint server_port, QString
     DaapInstance *new_daap_instance = new DaapInstance(parent, this, server_address, server_port, service_name);
     new_daap_instance->start();
     daap_instances.append(new_daap_instance);
+    log(QString("added a daap client instance (total now %1)")
+        .arg(daap_instances.count()), 5);
 }
 
 void DaapClient::removeDaapServer(QString server_address, uint server_port, QString service_name)
@@ -225,6 +247,23 @@ void DaapClient::removeDaapServer(QString server_address, uint server_port, QStr
         .arg(service_name)
         .arg(server_address)
         .arg(server_port), 10);
+
+    //
+    //  Try and find it
+    //
+    
+    DaapInstance *an_instance;
+    for ( an_instance = daap_instances.first(); an_instance; an_instance = daap_instances.next() )
+    {
+        if(an_instance->isThisYou(service_name, server_address, server_port))
+        {
+            an_instance->stop();
+            an_instance->wakeUp();
+            break;
+        }
+    }
+    
+
 }
 
 DaapClient::~DaapClient()

@@ -47,6 +47,7 @@ class MetadataServer : public MFDServicePlugin
     uint                         getAllLocalAudioPlaylistCount();
 
     Metadata*                    getMetadataByUniversalId(uint id);
+    Metadata*                    getMetadataByContainerAndId(int container_id, int metadata_id);
     Playlist*                    getPlaylistByUniversalId(uint id);
     
 

@@ -191,6 +191,35 @@ Metadata* MetadataServer::getMetadataByUniversalId(uint universal_id)
     return return_value;
 }
 
+Metadata* MetadataServer::getMetadataByContainerAndId(int container_id, int metadata_id)
+{
+    metadata_mutex.lock();
+
+    //
+    //  Find the collection
+    //
+    
+    Metadata *return_value = NULL;
+    
+    MetadataContainer * a_container;
+    for (
+            a_container = metadata_containers->first(); 
+            a_container; 
+            a_container = metadata_containers->next()
+        )
+    {
+        if(a_container->getIdentifier() == container_id)
+        {
+            return_value = a_container->getMetadata(metadata_id);
+            break; 
+        }
+    }
+    
+    metadata_mutex.unlock();
+    
+    return return_value;
+}
+
 Playlist* MetadataServer::getPlaylistByUniversalId(uint universal_id)
 {
 
@@ -316,12 +345,20 @@ void MetadataServer::deleteContainer(int container_id)
             local_audio_metadata_containers->remove(target);
         }
         
+
         //
         //  Take it off our master list, which automatically destructs it
         //
         
         metadata_containers->remove(target);
         
+        //
+        //  Log the destruction
+        //
+
+        log(QString("container %1 has been deleted")
+            .arg(container_id), 4);
+
         //
         //  Finally we bump the relevant generation twice (so no plugin will
         //  ask for deltas, cause deltas only last for one change in

@@ -236,8 +236,7 @@ bool DaapRequest::sendBlock(std::vector<char> block_to_send, QSocketDevice *wher
                     //
                     
                     parent->warning("daap request seems to have "
-                                    "lost contact with the server "
-                                    "... this is bad");
+                                    "lost contact with the server ");
                     return false;
                 
                 }

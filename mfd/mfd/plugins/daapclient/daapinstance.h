@@ -56,6 +56,7 @@ class DaapInstance: public QThread
     void handleIncoming();
     void processResponse(DaapResponse *daap_response);
     bool checkServerType(const QString &server_description);
+    bool isThisYou(QString a_name, QString an_address, uint a_port);
 
     //
     //  Methods to handle the various responses we can get from a DAAP
@@ -75,6 +76,7 @@ class DaapInstance: public QThread
     QMutex      keep_going_mutex;
     MFD         *the_mfd;
     DaapClient  *parent;
+    QMutex      service_details_mutex;
     QString     server_address;
     uint        server_port;
     QString     service_name;

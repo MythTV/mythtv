@@ -14,6 +14,7 @@
 
 #include "audio.h"
 #include "audiooutput.h"
+#include "daapinput.h"
 
 AudioPlugin::AudioPlugin(MFD *owner, int identity)
       :MFDServicePlugin(owner, identity, 2343, "audio")
@@ -27,6 +28,7 @@ AudioPlugin::AudioPlugin(MFD *owner, int identity)
     is_paused = false;
     audio_device = "/dev/dsp";  //  <--- ewww ... change that soon
     state_of_play_mutex = new QMutex(true);    
+    metadata_server = parent->getMetadataServer();
 }
 
 void AudioPlugin::swallowOutputUpdate(int numb_seconds, int channels, int bitrate, int frequency)
@@ -111,16 +113,50 @@ void AudioPlugin::doSomething(const QStringList &tokens, int socket_identifier)
     {
         if(tokens[0] == "play")
         {
-            if(tokens.count() < 2)
+            if(tokens.count() < 3)
             {
                 ok = false;
             }
             else
             {
-                QUrl play_url(tokens[1]);
-                if(!playAudio(play_url))
+                if(tokens[1] == "url")
                 {
-                    ok = false;
+                    QUrl play_url(tokens[2]);
+                    if(!playUrl(play_url))
+                    {
+                        ok = false;
+                    }
+                }
+                else if(tokens[1] == "item" || tokens[1] == "metadata")
+                {
+                    if(tokens.count() < 4)
+                    {
+                        ok = false;
+                    }
+                    else
+                    {
+                        bool parsed_ok = true;
+                        int collection_id = tokens[2].toInt(&parsed_ok);
+                        if(!parsed_ok)
+                        {
+                            ok = false;
+                        }
+                        else
+                        {
+                            int metadata_id = tokens[3].toInt(&parsed_ok);
+                            if(!parsed_ok)
+                            {
+                                ok = false;
+                            }
+                            else
+                            {
+                                if(!playMetadata(collection_id, metadata_id))
+                                {
+                                    ok = false;
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -175,12 +211,15 @@ void AudioPlugin::doSomething(const QStringList &tokens, int socket_identifier)
 
     if(!ok)
     {
-        warning(QString("did not understand these tokens: %1").arg(tokens.join(" ")));
+        warning(QString("did not understand or had "
+               "problems with these tokens: %1")
+               .arg(tokens.join(" ")));
         huh(tokens, socket_identifier);
     }
 }
 
-bool AudioPlugin::playAudio(QUrl url)
+
+bool AudioPlugin::playUrl(QUrl url)
 {
 
     //
@@ -204,6 +243,12 @@ bool AudioPlugin::playAudio(QUrl url)
                     .arg(path));
             return false;
         }
+    }
+    else if(url.protocol() == "daap")
+    {
+        //
+        //  Some way to check that this still exists?
+        //
     }
     
     //
@@ -239,77 +284,55 @@ bool AudioPlugin::playAudio(QUrl url)
             start_output = true;
         }
     
+        //
+        //  Choose the QIODevice (derived) to serve as input
+        // 
+    
+        QString url_path = url.path();
+    
         if(url.protocol() == "file")
         {
-            QString file_path = url.path();
         
             //
             //  Correct Qt *always* wanting a "/" in a url path.
             //
 
-            QFileInfo fi( file_path );
+            QFileInfo fi( url_path );
             if( fi.extension() == "cda")
             {
-                file_path = file_path.section('/', -1, -1);
+                url_path = url_path.section('/', -1, -1);
             }        
 
+            input = new QFile(url_path);
+        }
+        else if(url.protocol() == "daap")
+        {
+            input = new DaapInput(url);
+        }
+        else
+        {
+            warning(QString("have no idea how to play this protocol: %1")
+                    .arg(url.toString()));
+            delete output;
+            output = NULL;
+            input = NULL;
+            state_of_play_mutex->unlock();
+            return false;
+        }
 
-
-            input = new QFile(file_path);
-
-            if(decoder && !decoder->factory()->supports(file_path))
-            {
-                decoder = 0;
-            }
+        if(decoder && !decoder->factory()->supports(url_path))
+        {
+            decoder = 0;
+        }
         
+        if(!decoder)
+        {
+        
+            decoder = Decoder::create(url_path, input, output);
             if(!decoder)
             {
-        
-                decoder = Decoder::create(file_path, input, output);
-                if(!decoder)
-                {
-                    warning(QString("passed unsupported file in unsupported format: %1")
-                            .arg(file_path));
-                    delete output;
-                    output = NULL;
-                    delete input;
-                    input = NULL;
-                    state_of_play_mutex->unlock();
-                    return false;
-                }
-                decoder->setBlockSize(globalBlockSize);
-            }
-            else
-            {
-                decoder->setInput(input);
-                decoder->setOutput(output);
-            }
-        
-            play_data_mutex.lock();
-                elapsed_time = 0;
-            play_data_mutex.unlock();
-        
-            if(decoder->initialize())
-            {
-                if(output)
-                {
-                    if(start_output)
-                    {
-                        output->start();
-                    }
-                    else
-                    {
-                        output->resetTime();
-                    }
-                }
-                decoder->start();
-                is_playing = true;
-                is_paused = false;
-                state_of_play_mutex->unlock();
-                return true;
-            }
-            else
-            {
+                warning(QString("passed unsupported url in unsupported format: %1")
+                        .arg(url.toString()));
                 delete output;
                 output = NULL;
                 delete input;
@@ -317,10 +340,94 @@ bool AudioPlugin::playAudio(QUrl url)
                 state_of_play_mutex->unlock();
                 return false;
             }
+            decoder->setBlockSize(globalBlockSize);
+        }
+        else
+        {
+            decoder->setInput(input);
+            decoder->setOutput(output);
+        }
+        
+        play_data_mutex.lock();
+            elapsed_time = 0;
+        play_data_mutex.unlock();
+        
+        if(decoder->initialize())
+        {
+            if(output)
+            {
+                if(start_output)
+                {
+                    output->start();
+                }
+                else
+                {
+                    output->resetTime();
+                }
+            }
+            decoder->start();
+            is_playing = true;
+            is_paused = false;
+            state_of_play_mutex->unlock();
+            return true;
+        }
+        else
+        {
+            warning(QString("decoder barfed on "
+                    "initialization of %1")
+                    .arg(url.toString()));
+            delete output;
+            output = NULL;
+            delete input;
+            input = NULL;
+            state_of_play_mutex->unlock();
+            return false;
         }
         
     state_of_play_mutex->unlock();
     return false;
+}
+
+bool AudioPlugin::playMetadata(int collection_id, int metadata_id)
+{
+
+    //
+    //  See if this id's lead to a real metadata object before we mess with
+    //  anything else
+    //
+    
+    Metadata *metadata_to_play = 
+            metadata_server->getMetadataByContainerAndId(
+                                                            collection_id,
+                                                            metadata_id
+                                                        );
+    
+    if(!metadata_to_play)
+    {
+        warning(QString("was asked to play container %1 "
+                        "item %2, but that does not exist")
+                        .arg(collection_id)
+                        .arg(metadata_id));
+        return false;
+    }
+
+    //
+    //  Make sure we can cast this to Audio metadata
+    //
+    
+    if(metadata_to_play->getType() == MDT_audio)
+    {
+        AudioMetadata *audio_metadata_to_play = (AudioMetadata *)metadata_to_play;
+        return playUrl(audio_metadata_to_play->getUrl());
+    }
+    else
+    {
+        warning(QString("was asked to play container %1 "
+                        "item %2, which is not audio content")
+                        .arg(collection_id)
+                        .arg(metadata_id));
+        return false;
+    }
 }
 
 void AudioPlugin::stopAudio()
