@@ -94,6 +94,7 @@ void TV::InitKeys(void)
 
 
     REG_KEY("TV Playback", "PAUSE", "Pause", "P");
+    REG_KEY("TV Playback", "DELETE", "Delete Program", "D");
     REG_KEY("TV Playback", "SEEKFFWD", "Fast Forward", "Right");
     REG_KEY("TV Playback", "SEEKRWND", "Rewind", "Left");
     REG_KEY("TV Playback", "CHANNELUP", "Channel up", "Up");
@@ -1665,6 +1666,15 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 }
                 else
                     handled = false;
+            }
+            else if (action == "DELETE")
+            {
+                NormalSpeed();
+                StopFFRew();
+
+                requestDelete = true;
+                exitPlayer = true;
+                wantsToQuit = true;
             }
             else if (action == "TOGGLEEDIT")
                 DoEditMode();
