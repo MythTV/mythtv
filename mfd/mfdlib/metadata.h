@@ -109,6 +109,18 @@ class AudioMetadata : public Metadata
                     int l_tracknum = 0, 
                     int l_length = 0
                  );
+                 
+    AudioMetadata(
+                    QString filename,
+                    QString l_artist,
+                    QString l_album,
+                    QString l_title,
+                    QString l_genre,
+                    int     l_year,
+                    int     l_tracknum,
+                    int     l_length
+                 );
+                 
     ~AudioMetadata();
 
 
@@ -144,6 +156,8 @@ class AudioMetadata : public Metadata
     int length;
 };
 
+/*
+
 class AudioDBMetadata : public AudioMetadata
 {
   public:
@@ -172,23 +186,24 @@ class AudioDBMetadata : public AudioMetadata
     bool changed;
 };
 
+*/
+
 
 
 class Playlist
 {
   public:
   
-    Playlist(int l_collection_id, QString new_name, QString raw_songlist, uint new_id, uint new_dbid);
+    Playlist(int l_collection_id, QString new_name, QString raw_songlist, uint new_id);
     ~Playlist();
 
     uint             getId(){return id;}
     uint             getUniversalId();
-    uint             getDatabaseId(){return db_id;}
     QString          getName(){return name;}
     uint             getCount(){return song_references.count();}
     QValueList<uint> getList(){return song_references;}
     void             mapDatabaseToId(QIntDict<Metadata> *the_metadata);    
-    
+    uint             getCollectionId(){return collection_id;}    
     
   private:
   
@@ -196,7 +211,6 @@ class Playlist
     QValueList<uint> song_references;
     QValueList<uint> db_references;
     uint             id;
-    uint             db_id;
     uint             collection_id;
 };
 

@@ -37,9 +37,10 @@ class CdDecoder : public Decoder
     int getNumTracks(void);
     int getNumCDAudioTracks(void);
 
+    AudioMetadata* getMetadata();
+
     /*
     Metadata *getMetadata(QSqlDatabase *db, int track);
-    Metadata *getMetadata(QSqlDatabase *db);
     Metadata *getMetadata(int track);
     Metadata *getMetadata();
     Metadata *getLastMetadata();

@@ -277,6 +277,8 @@ int MetadataServer::bumpContainerId()
 void MetadataServer::doAtomicDataSwap(
                                         MetadataContainer *which_one,
                                         QIntDict<Metadata>* new_metadata,
+                                        QValueList<int> metadata_additions,
+                                        QValueList<int> metadata_deletions,
                                         QIntDict<Playlist>* new_playlists
                                      )
 {
@@ -306,14 +308,13 @@ void MetadataServer::doAtomicDataSwap(
         
         if(target)
         {
-            cout << "I'm supposed to swap the data with "
-                 << new_metadata->count() 
-                 << " items and "
-                 << new_playlists->count()
-                 << " playlists "
-                 << endl;
-                 
-            target->dataSwap(new_metadata, new_playlists);
+
+            target->dataSwap(
+                                new_metadata, 
+                                metadata_additions,
+                                metadata_deletions,
+                                new_playlists
+                            );
             if(target->isAudio())
             {
                 metadata_audio_generation_mutex.lock();

@@ -21,20 +21,9 @@
 
 #include "output.h"
 #include "decoder_event.h"
+#include "metadata.h"
 
-//  class Metadata;
 class DecoderFactory;
-
-//  class QSqlDatabase;
-//  class QObject;
-//  class QIODevice;
-//  class QThread;
-
-//  class OutputEvent;
-
-//  class Buffer;
-//  class Recycler;
-//  class Output;
 
 class Decoder : public QThread 
 {
@@ -70,9 +59,8 @@ class Decoder : public QThread
     static Decoder *create(const QString &, QIODevice *, Output *, 
                            bool = FALSE);
 
-    //  virtual Metadata *getMetadata(QSqlDatabase *db) = 0;
-    //  virtual void commitMetadata(Metadata *mdata) = 0;
-
+    virtual AudioMetadata *getMetadata() = 0;
+    
   protected:
     Decoder(DecoderFactory *, QIODevice *, Output *);
 
@@ -82,16 +70,11 @@ class Decoder : public QThread
 
     QString filename;
 
-    /*
-    void getMetadataFromFilename(const QString filename, const QString regext,
-                                 QString &artist, QString &album,
-                                 QString &title, QString &genre, int &tracknum);
-    */
-
     QString filename_format;
     int ignore_id3;
 
   private:
+
     DecoderFactory *fctry;
 
     QPtrList<QObject> listeners;

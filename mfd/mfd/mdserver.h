@@ -12,6 +12,7 @@
 
 */
 
+#include <qvaluelist.h>
 
 #include "../mfdlib/mfd_plugin.h"
 
@@ -58,6 +59,8 @@ class MetadataServer : public MFDServicePlugin
     void                         doAtomicDataSwap(
                                                     MetadataContainer *which_one,
                                                     QIntDict<Metadata>* new_metadata,
+                                                    QValueList<int> metadata_additions,
+                                                    QValueList<int> metadata_deletions,
                                                     QIntDict<Playlist>* new_playlists
                                                  );
 

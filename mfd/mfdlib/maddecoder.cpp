@@ -555,98 +555,95 @@ enum mad_flow MadDecoder::madError(struct mad_stream *stream,
     return MAD_FLOW_STOP;
 }
 
-/*
-Metadata *MadDecoder::getMetadata(QSqlDatabase *db)
-{
-    Metadata *testdb = new Metadata(filename);
-    if (testdb->isInDatabase(db))
-        return testdb;
 
-    delete testdb;
+AudioMetadata *MadDecoder::getMetadata()
+{
 
     QString artist = "", album = "", title = "", genre = "";
     int year = 0, tracknum = 0, length = 0;
 
-    if (!ignore_id3)
+    // use ID3 header
+
+    id3_file *id3file = id3_file_open(filename.ascii(), 
+                                      ID3_FILE_MODE_READONLY);
+    if (!id3file)
     {
-        // use ID3 header
-        id3_file *id3file = id3_file_open(filename.ascii(), 
-                                          ID3_FILE_MODE_READONLY);
-        if (!id3file)
-        {
-            return NULL;
-        }
+        return NULL;
+    }
 
-        id3_tag *tag = id3_file_tag(id3file);
+    id3_tag *tag = id3_file_tag(id3file);
 
-        if (!tag)
-        {
-            id3_file_close(id3file);
-            return NULL;
-        }
-
-        struct {
-            char const *id;
-            char const *name;
-        } const info[] = {
-            { ID3_FRAME_TITLE,  "Title"  },
-            { ID3_FRAME_ARTIST, "Artist" },
-            { ID3_FRAME_ALBUM,  "Album"  },
-            { ID3_FRAME_YEAR,   "Year"   },
-            { ID3_FRAME_TRACK,  "Track"  },
-            { ID3_FRAME_GENRE,  "Genre"  },
-        };
-
-        for (unsigned int i = 0; i < sizeof(info) / sizeof(info[0]); ++i)
-        {
-            struct id3_frame *frame = id3_tag_findframe(tag, info[i].id, 0);
-            if (!frame)
-                continue;
-
-            id3_ucs4_t const *ucs4;
-            id3_latin1_t *latin1;
-            union id3_field *field;
-            unsigned int nstrings;
-
-            field = &frame->fields[1];
-            nstrings = id3_field_getnstrings(field);
-
-            for (unsigned int j = 0; j < nstrings; ++j)
-            {
-                ucs4 = id3_field_getstrings(field, j);
-                assert(ucs4);
-
-                if (!strcmp(info[i].id, ID3_FRAME_GENRE))
-                    ucs4 = id3_genre_name(ucs4);
-
-                latin1 = id3_ucs4_latin1duplicate(ucs4);
-                if (!latin1)
-                    continue;
-
-                switch (i)
-                {
-                    case 0: title += (char *)latin1; break;
-                    case 1: artist += (char *)latin1; break;
-                    case 2: album += (char *)latin1; break;
-                    case 3: if (year == 0) 
-                                year = atoi((char *)latin1); break;
-                    case 4: if (tracknum == 0) 
-                                tracknum = atoi((char *)latin1); break;
-                    case 5: genre += (char *)latin1; break;
-                    default: break;
-                }
-
-                free(latin1);
-            }
-        }
-
+    if (!tag)
+    {
         id3_file_close(id3file);
+        return NULL;
     }
-    else
+
+    struct 
     {
-        getMetadataFromFilename(filename, QString(".mp3$"), artist, album, 
-                                title, genre, tracknum);
+        char const *id;
+        char const *name;
+    } 
+    const info[] = {
+                    { ID3_FRAME_TITLE,  "Title"  },
+                    { ID3_FRAME_ARTIST, "Artist" },
+                    { ID3_FRAME_ALBUM,  "Album"  },
+                    { ID3_FRAME_YEAR,   "Year"   },
+                    { ID3_FRAME_TRACK,  "Track"  },
+                    { ID3_FRAME_GENRE,  "Genre"  },
+                   };
+
+    for (unsigned int i = 0; i < sizeof(info) / sizeof(info[0]); ++i)
+    {
+        struct id3_frame *frame = id3_tag_findframe(tag, info[i].id, 0);
+        if (!frame)
+        {
+            continue;
+        }
+
+        id3_ucs4_t const *ucs4;
+        id3_latin1_t *latin1;
+        union id3_field *field;
+        unsigned int nstrings;
+
+        field = &frame->fields[1];
+        nstrings = id3_field_getnstrings(field);
+
+        for (unsigned int j = 0; j < nstrings; ++j)
+        {
+            ucs4 = id3_field_getstrings(field, j);
+            assert(ucs4);
+
+            if (!strcmp(info[i].id, ID3_FRAME_GENRE))
+            {
+                ucs4 = id3_genre_name(ucs4);
+            }
+
+            latin1 = id3_ucs4_latin1duplicate(ucs4);
+            
+            if (!latin1)
+            {
+                continue;
+            }
+
+            switch (i)
+            {
+                case 0: title += (char *)latin1; break;
+                case 1: artist += (char *)latin1; break;
+                case 2: album += (char *)latin1; break;
+                case 3: if (year == 0) 
+                            year = atoi((char *)latin1); break;
+                case 4: if (tracknum == 0) 
+                            tracknum = atoi((char *)latin1); break;
+                case 5: genre += (char *)latin1; break;
+                default: break;
+            }
+
+            free(latin1);
+        }
     }
+
+    id3_file_close(id3file);
 
     struct mad_stream stream;
     struct mad_header header;
@@ -746,20 +743,19 @@ Metadata *MadDecoder::getMetadata(QSqlDatabase *db)
         length = alt_length;
     }
 
-    Metadata *retdata = new Metadata(filename, artist, album, title, genre,
-                                     year, tracknum, length);
-
-    retdata->dumpToDatabase(db);
+    AudioMetadata *retdata = new AudioMetadata(
+                                                filename, 
+                                                artist, 
+                                                album, 
+                                                title, 
+                                                genre,
+                                                year, 
+                                                tracknum, 
+                                                length
+                                              );
 
     return retdata;
 }
-
-void MadDecoder::commitMetadata(Metadata *mdata)
-{
-    mdata = mdata;
-}
-*/
-
 
 bool MadDecoderFactory::supports(const QString &source) const
 {

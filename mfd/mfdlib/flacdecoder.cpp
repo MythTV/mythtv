@@ -433,14 +433,9 @@ E=VALUE" */
         char *field_value;
 } Argument_VcField;
 
-/*
-Metadata *FlacDecoder::getMetadata(QSqlDatabase *db)
-{
-    Metadata *testdb = new Metadata(filename);
-    if (testdb->isInDatabase(db))
-        return testdb;
 
-    delete testdb;
+AudioMetadata *FlacDecoder::getMetadata()
+{
 
     QString artist = "", album = "", title = "", genre = "";
     int year = 0, tracknum = 0, length = 0;
@@ -458,6 +453,7 @@ Metadata *FlacDecoder::getMetadata(QSqlDatabase *db)
     }
 
     bool found_vc_block = false;
+
     FLAC__StreamMetadata *block = 0;
     FLAC__Metadata_Iterator *iterator = FLAC__metadata_iterator_new();
 
@@ -490,32 +486,32 @@ Metadata *FlacDecoder::getMetadata(QSqlDatabase *db)
     FLAC__ASSERT(0 != block);
     FLAC__ASSERT(block->type == FLAC__METADATA_TYPE_VORBIS_COMMENT);
 
-    if (ignore_id3)
-    {
-        getMetadataFromFilename(filename, QString(".flac$"), artist, album, 
-                                title, genre, tracknum);
-    }
-    else
-    {
-        artist = getComment(block, "artist");
-        album = getComment(block, "album");
-        title = getComment(block, "title");
-        genre = getComment(block, "genre");
-        tracknum = getComment(block, "tracknumber").toInt(); 
-        year = getComment(block, "date").toInt();
-    }
+    artist = getComment(block, "artist");
+    album = getComment(block, "album");
+    title = getComment(block, "title");
+    genre = getComment(block, "genre");
+    tracknum = getComment(block, "tracknumber").toInt(); 
+    year = getComment(block, "date").toInt();
 
-    Metadata *retdata = new Metadata(filename, artist, album, title, genre,
-                                     year, tracknum, length);
+
+    AudioMetadata *retdata = new AudioMetadata(
+                                                filename, 
+                                                artist, 
+                                                album, 
+                                                title, 
+                                                genre,
+                                                year, 
+                                                tracknum, 
+                                                length
+                                              );
 
     FLAC__metadata_chain_delete(chain);
     FLAC__metadata_iterator_delete(iterator);
 
-    retdata->dumpToDatabase(db);
-
     return retdata;
 }    
 
+/*
 void FlacDecoder::commitMetadata(Metadata *mdata)
 {
     FILE *input = fopen(filename.ascii(), "r");
@@ -588,6 +584,8 @@ void FlacDecoder::commitMetadata(Metadata *mdata)
     FLAC__metadata_chain_delete(chain);
     FLAC__metadata_iterator_delete(iterator);
 }
+*/
+
 
 QString FlacDecoder::getComment(FLAC__StreamMetadata *block, const char *label)
 {
@@ -614,6 +612,7 @@ QString FlacDecoder::getComment(FLAC__StreamMetadata *block, const char *label)
     return retstr;
 }
 
+/*
 void FlacDecoder::setComment(FLAC__StreamMetadata *block, const char *label,
                              const QString &data)
 {

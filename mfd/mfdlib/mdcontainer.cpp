@@ -51,14 +51,6 @@ void MetadataContainer::warning(const QString &warning_message)
     log(warn_string, 1);
 }
 
-/*
-bool MetadataContainer::tryToUpdate()
-{
-    warning("someone called tryToUpdate() on MetadataContainer base class");
-    return false;
-}
-*/
-
 bool MetadataContainer::isAudio()
 {
     if(content_type == MCCT_audio)
@@ -124,81 +116,20 @@ Playlist* MetadataContainer::getPlaylist(int pl_id)
     return NULL;
 }
 
-void MetadataContainer::dataSwap(QIntDict<Metadata>* new_metadata, QIntDict<Playlist>* new_playlists)
+void MetadataContainer::dataSwap(
+                                    QIntDict<Metadata>* new_metadata, 
+                                    QValueList<int> metadata_in,
+                                    QValueList<int> metadata_out,
+                                    QIntDict<Playlist>* new_playlists
+                                )
 {
     current_metadata = new_metadata;
     current_playlists = new_playlists;
+    metadata_additions = metadata_in;
+    metadata_deletions = metadata_out;
 }
 
 MetadataContainer::~MetadataContainer()
 {
 }
 
-/*
----------------------------------------------------------------------
-*/
-
-/*
-
-MetadataMythDBContainer::MetadataMythDBContainer(
-                                        MFD *l_parent, 
-                                        int l_unique_identifier,
-                                        MetadataCollectionContentType  l_content_type,
-                                        MetadataCollectionLocationType l_location_type,
-                                        QSqlDatabase *l_db
-                                    )
-                        :MetadataContainer(l_parent, l_unique_identifier, l_content_type, l_location_type)
-{
-    db = l_db;
-    if(!db)
-    {
-        warning("metadata container was told to load metadata from a non existent database");
-    }
-    
-    if(content_type == MCCT_audio)
-    {
-        //
-        //  Ah, a mythmusic collection
-        //
-
-        //metadata_monitor = new MetadataMythMusicMonitor(parent, unique_identifier, db);
-        //metadata_monitor->start();
-    }
-
-    current_metadata = NULL;
-}
-
-
-bool MetadataMythDBContainer::tryToUpdate()
-{
-    parent->lockMetadata();
-    parent->lockPlaylists();
-
-    // bool return_value = metadata_monitor->getCurrentGeneration(current_metadata, current_playlists);
-
-    bool return_value = true;
-    
-    parent->unlockMetadata();
-    parent->unlockPlaylists();
-
-    if(return_value)
-    {
-        log(QString("metadata mythdb container with id of %1 has updated its metadata (items = %2, playlists = %3)")
-            .arg(unique_identifier)
-            .arg(getMetadataCount())
-            .arg(getPlaylistCount()), 4);
-
-    }
-    else
-    {
-        warning("metadata mythdb container wanted to update metadata, but there doesn't seem to be any new metadata");
-    }
-    return return_value;
-}
-
-
-MetadataMythDBContainer::~MetadataMythDBContainer()
-{
-}
-
-*/

@@ -339,14 +339,10 @@ void VorbisDecoder::run()
     deinit();
 }
 
-/*
-Metadata *VorbisDecoder::getMetadata(QSqlDatabase *db)
-{
-    Metadata *testdb = new Metadata(filename);
-    if (testdb->isInDatabase(db))
-        return testdb;
 
-    delete testdb;
+
+AudioMetadata *VorbisDecoder::getMetadata()
+{
 
     QString artist = "", album = "", title = "", genre = "";
     int year = 0, tracknum = 0, length = 0;
@@ -354,7 +350,9 @@ Metadata *VorbisDecoder::getMetadata(QSqlDatabase *db)
     FILE *input = fopen(filename.ascii(), "r");
 
     if (!input)
+    {
         return NULL;
+    }
 
     OggVorbis_File vf;
     vorbis_comment *comment = NULL;
@@ -368,36 +366,29 @@ Metadata *VorbisDecoder::getMetadata(QSqlDatabase *db)
     comment = ov_comment(&vf, -1);
     length = (int)ov_time_total(&vf, -1) * 1000;
 
-    if (ignore_id3)
-    {
-        getMetadataFromFilename(filename, QString(".ogg$"), artist, album, 
-                                title, genre, tracknum);
-    }
-    else
-    {
-        artist = getComment(comment, "artist");
-        album = getComment(comment, "album");
-        title = getComment(comment, "title");
-        genre = getComment(comment, "genre");
-        tracknum = atoi(getComment(comment, "tracknumber").ascii()); 
-        year = atoi(getComment(comment, "date").ascii());
-    }
+    artist = getComment(comment, "artist");
+    album = getComment(comment, "album");
+    title = getComment(comment, "title");
+    genre = getComment(comment, "genre");
+    tracknum = atoi(getComment(comment, "tracknumber").ascii()); 
+    year = atoi(getComment(comment, "date").ascii());
 
     ov_clear(&vf);
 
-    Metadata *retdata = new Metadata(filename, artist, album, title, genre,
-                                     year, tracknum, length);
-
-    retdata->dumpToDatabase(db);
+    AudioMetadata *retdata = new AudioMetadata(
+                                                filename, 
+                                                artist, 
+                                                album, 
+                                                title, 
+                                                genre,
+                                                year, 
+                                                tracknum, 
+                                                length
+                                              );
 
     return retdata;
+
 }    
-
-void VorbisDecoder::commitMetadata(Metadata *mdata)
-{
-    mdata = mdata;  // -Wall annoyance
-}
-
 
 QString VorbisDecoder::getComment(vorbis_comment *vc, const char *label)
 {
@@ -412,7 +403,7 @@ QString VorbisDecoder::getComment(vorbis_comment *vc, const char *label)
 
     return retstr;
 }
-*/
+
 
 bool VorbisDecoderFactory::supports(const QString &source) const
 {

@@ -17,7 +17,6 @@
 
 #include <vorbis/vorbisfile.h>
 
-//  class Metadata;
 
 class VorbisDecoder : public Decoder
 {
@@ -30,8 +29,7 @@ class VorbisDecoder : public Decoder
     void seek(double);
     void stop();
 
-    // Metadata *getMetadata(QSqlDatabase *db);
-    // void commitMetadata(Metadata *mdata);
+    AudioMetadata *getMetadata();
 
   private:
     void run();
@@ -53,7 +51,7 @@ class VorbisDecoder : public Decoder
     unsigned long output_size;
     double totalTime, seekTime;
 
-    // QString getComment(vorbis_comment *comment, const char *label);
+    QString getComment(vorbis_comment *comment, const char *label);
 };
 
 #endif

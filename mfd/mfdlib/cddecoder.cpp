@@ -359,13 +359,18 @@ Metadata* CdDecoder::getMetadata(QSqlDatabase *x, int track)
     settracknum = track;
     return getMetadata();
 }
+*/
 
-Metadata* CdDecoder::getMetadata(QSqlDatabase *x)
+AudioMetadata* CdDecoder::getMetadata()
 {
+    return NULL;
+/*
     x = x ;
     return getMetadata();
+*/
 }
 
+/*
 Metadata *CdDecoder::getMetadata(int track)
 {
     settracknum = track;

@@ -1083,10 +1083,11 @@ void DaapServer::sendContainer(HttpRequest *http_request, u32 container_id, int 
                     UINTList::iterator iter;
                     for ( iter = songs_in_list.begin(); iter != songs_in_list.end(); ++iter )
                     {
+                            int actual_id = (*iter) + (METADATA_UNIVERSAL_ID_DIVIDER * the_playlist->getCollectionId());
                             response << Tag('mlit') 
                                      << Tag('mikd') << (u8) 2  << end
-                                     << Tag('miid') << (u32) (*iter) << end 
-                                     << Tag('mcti') << (u32) (*iter) << end 
+                                     << Tag('miid') << (u32) actual_id << end 
+                                     << Tag('mcti') << (u32) actual_id << end 
                                      << end;
                     }
                 }

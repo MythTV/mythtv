@@ -33,7 +33,7 @@ class FlacDecoder : public Decoder
     void doWrite(const FLAC__Frame *frame, const FLAC__int32 * const buffer[]);
     //  void setFlacMetadata(const FLAC__StreamMetadata *metadata);
 
-    //  Metadata *getMetadata(QSqlDatabase *db);
+    AudioMetadata *getMetadata();
     //  void commitMetadata(Metadata *mdata);
 
   private:
@@ -58,7 +58,7 @@ class FlacDecoder : public Decoder
     double totalTime, seekTime;
     unsigned long totalsamples;
 
-    //  QString getComment(FLAC__StreamMetadata *block, const char *label);
+    QString getComment(FLAC__StreamMetadata *block, const char *label);
     //  void setComment(FLAC__StreamMetadata *block, const char *label,
     //                const QString &data);
 };

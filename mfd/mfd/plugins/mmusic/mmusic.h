@@ -13,6 +13,7 @@
 #include <qdatetime.h>
 #include <qmutex.h>
 #include <qsqldatabase.h>
+#include <qvaluelist.h>
 
 #include "mfd_plugin.h"
 #include "../../mdserver.h"
@@ -38,12 +39,9 @@ class MMusicWatcher: public MFDServicePlugin
     void    run();
     bool    sweepMetadata();
     void    buildFileList(QString &directory, MusicLoadedMap &music_files);
-    bool    checkNewMusicFile(const QString &filename);
+    bool    checkNewMusicFile(const QString &filename, const QString &startdir);
 
   private:
-  
-    int             bumpMetadataId();
-    int             bumpPlaylistId();
   
     QTime           metadata_sweep_time;
     bool            first_time;
@@ -51,20 +49,19 @@ class MMusicWatcher: public MFDServicePlugin
     QMutex          force_sweep_mutex;
     QSqlDatabase    *db;
 
-    QMutex              metadata_mutex;
-
     QIntDict<Metadata>  *current_metadata;
     QIntDict<Metadata>  *new_metadata;
-
     QIntDict<Playlist>  *current_playlists;
-    QIntDict<Playlist>  *new_playlists;
     
     MetadataServer      *metadata_server;
     MetadataContainer   *metadata_container;
     int                  container_id;
 
-    int                  metadata_id;
-    int                  playlist_id;
+    QValueList<QString> files_to_ignore;
+
+    QValueList<int>     metadata_additions;
+    QValueList<int>     metadata_deletions;
+
 };
 
 

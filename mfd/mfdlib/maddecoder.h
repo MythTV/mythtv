@@ -19,7 +19,6 @@ extern "C" {
 #include <mad.h>
 }
 
-// class Metadata;
 
 class MadDecoder : public Decoder
 {
@@ -36,8 +35,7 @@ class MadDecoder : public Decoder
     static const int maxFrameCheck;
     static const int initialFrameSize;
 
-    // Metadata *getMetadata(QSqlDatabase *db);
-    // void commitMetadata(Metadata *mdata);
+    AudioMetadata *getMetadata();
 
 private:
     void run();

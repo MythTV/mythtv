@@ -9,13 +9,14 @@
 */
 
 #include <qdir.h>
+#include <qfileinfo.h>
 #include <qregexp.h>
 #include <qdatetime.h>
 
 #include "mmusic.h"
 #include "mfd_events.h"
 #include "settings.h"
-
+#include "decoder.h"
 
 
 
@@ -32,21 +33,22 @@ MMusicWatcher::MMusicWatcher(MFD *owner, int identity)
     //  On startup, we want it to sweep
     //
 
+    first_time = true;
     force_sweep = true;
 
     //
-    //  Create new (and empty) current metadata collections and playlists
+    //  At startup we have no new and no current data. Note that we have 2
+    //  metadata lists, but only 1 playlist one. The metadata can change on
+    //  disc (someone drops in a file), but the playlists can't. At some
+    //  point (once there's a client!), the playlists will get changed and
+    //  we'll need to persist them back. For now, we just load them and
+    //  leave it at that
     //
 
     current_metadata = new QIntDict<Metadata>;
-    current_metadata->setAutoDelete(true);
-    new_metadata = NULL;
-    metadata_id = 1;
+    new_metadata = new QIntDict<Metadata>;
+    current_playlists = NULL;
 
-    current_playlists = new QIntDict<Playlist>;
-    current_playlists->setAutoDelete(true);
-    new_playlists = NULL;
-    playlist_id = 1;
 
     //
     //  Put these collections into a new container that the metadata server
@@ -83,9 +85,17 @@ void MMusicWatcher::run()
         //  set force sweep on.
         //
 
-        //if( metadata_sweep_time.elapsed() >  5000 || force_sweep)
-        if( metadata_sweep_time.elapsed() >  300000 || force_sweep)
+        if( metadata_sweep_time.elapsed() >  5000 || force_sweep)
+        //if( metadata_sweep_time.elapsed() >  300000 || force_sweep)
         {
+            //
+            //  Toggle forced sweeping back off
+            //
+
+            force_sweep_mutex.lock();
+                force_sweep = false;
+            force_sweep_mutex.unlock();
+            
             //
             //  Check to see if anything has changed
             //
@@ -96,7 +106,25 @@ void MMusicWatcher::run()
                 //  Do the atomic switchero (sing it with me now ...)
                 //
                 
-                metadata_server->doAtomicDataSwap(metadata_container, new_metadata, new_playlists);
+                metadata_server->doAtomicDataSwap(  metadata_container, 
+                                                    new_metadata, 
+                                                    metadata_additions,
+                                                    metadata_deletions,
+                                                    current_playlists
+                                                 );
+                
+                //
+                //  Out with the old, in with the new
+                //
+                
+                if(current_metadata)
+                {
+                    delete current_metadata;
+                    current_metadata = NULL;
+                }
+                
+                current_metadata = new_metadata;
+                new_metadata = NULL;
 
                 //
                 //  Something changed. Fire off an event (this will tell the
@@ -106,14 +134,6 @@ void MMusicWatcher::run()
                 MetadataChangeEvent *mce = new MetadataChangeEvent(unique_identifier);
                 QApplication::postEvent(parent, mce);    
             }
-            
-            //
-            //  Toggle forced sweeping back off
-            //
-            
-            force_sweep_mutex.lock();
-                force_sweep = false;
-            force_sweep_mutex.unlock();
             
             //
             //  In any case, reset the time stamp
@@ -136,6 +156,55 @@ void MMusicWatcher::run()
 
 bool MMusicWatcher::sweepMetadata()
 {
+
+    //
+    //  Make sure we have somewhere to look
+    //
+
+    QString startdir = mfdContext->GetSetting("MusicLocation");
+    if(startdir.length() < 1)
+    {
+        warning("cannot look for music file paths "
+                "starting with a null string");
+        return false;
+    }
+    startdir = QDir::cleanDirPath(startdir);
+    if(!startdir.endsWith("/"));
+    {
+        startdir += "/";
+    }
+
+    //
+    //  Make sure the place to look exists, is a directory, and is readable
+    //            
+
+    QFileInfo starting_directory(startdir);
+    if (!starting_directory.exists())
+    {
+        warning(QString("cannot look for files, directory "
+                        "does not exist: \"%1\"")
+                        .arg(startdir));
+        return false;
+    }
+
+    if (!starting_directory.isDir())
+    {
+        warning(QString("cannot look for files, starting "
+                        "point is not a directory: \"%1\"")
+                        .arg(startdir));
+        return false;
+    }
+
+    if (!starting_directory.isReadable())
+    {
+        warning(QString("cannot look for files, starting "
+                        "directory is not readable "
+                        "(permissions?): \"%1\"")
+                        .arg(startdir));
+        return false;
+    }
+
+
     QTime sweep_timer;
     sweep_timer.start();
     log("beginning content sweep", 3);
@@ -165,7 +234,8 @@ bool MMusicWatcher::sweepMetadata()
 
         QSqlQuery pl_query = db->exec(pl_query_string);
 
-        new_playlists = new QIntDict<Playlist>;
+        current_playlists = new QIntDict<Playlist>;
+        current_playlists->setAutoDelete(true);
         
                                                                                                                                                                                                                                                                                                                                      
         
@@ -179,10 +249,9 @@ bool MMusicWatcher::sweepMetadata()
                                                             container_id,
                                                             pl_query.value(0).toString(), 
                                                             pl_query.value(1).toString(),
-                                                            bumpPlaylistId(), 
                                                             pl_query.value(2).toUInt()
                                                          );
-                    new_playlists->insert(new_playlist->getId(), new_playlist);
+                    current_playlists->insert(pl_query.value(2).toUInt(), new_playlist);
                 }
             }
             else
@@ -203,25 +272,9 @@ bool MMusicWatcher::sweepMetadata()
         //  As this is not the first time, we want to persist what's in memory
         //  back to the database
         //
-
-
-        //  soon
+        //  ... errr ... real soon now
     }
     
-    QString startdir = mfdContext->GetSetting("MusicLocation");
-    startdir = QDir::cleanDirPath(startdir);
-    if(!startdir.endsWith("/"));
-    {
-        startdir += "/";
-    }
-            
-            
-
-    if(startdir.length() < 2)
-    {
-        warning("cannot look for music file paths starting with a null string");
-        return false;
-    }
 
     //
     //  Create a collection of variables that store flags about whether a
@@ -244,7 +297,7 @@ bool MMusicWatcher::sweepMetadata()
     //  Now, see what's in the database
     //    
     
-    QSqlQuery query("SELECT filename FROM musicmetadata;", db);
+    QSqlQuery query("SELECT filename, intid FROM musicmetadata;", db);
 
     if (query.isActive())
     {
@@ -278,10 +331,10 @@ bool MMusicWatcher::sweepMetadata()
     //  Next step is to make the database reflect what's on the file system.
     //
 
+    int files_scanned = 0;
     QRegExp quote_regex("\"");
     for (mf_iterator = music_files.begin(); mf_iterator != music_files.end(); ++mf_iterator)
     {
-
         if (*mf_iterator == MFL_in_myth_database)
         {
             //
@@ -291,7 +344,10 @@ bool MMusicWatcher::sweepMetadata()
             
             
             QString name(mf_iterator.key());
+            log(QString("removed metadata from db, file no longer exists: \"%1\"")
+                        .arg(name), 8);
             name.replace(quote_regex, "\"\"");
+            name.remove(0,startdir.length());
             QString querystr = QString("DELETE FROM musicmetadata WHERE "
                                        "filename=\"%1\"").arg(name);
             query.exec(querystr);
@@ -301,14 +357,33 @@ bool MMusicWatcher::sweepMetadata()
         }
         else if(*mf_iterator == MFL_on_file_system)
         {
-            if(checkNewMusicFile(mf_iterator.key()))
+            if(checkNewMusicFile(mf_iterator.key(), startdir))
             {
                 something_changed = true;
+                
+                //
+                //  If we've scanned say ... 20 files ... someone may well
+                //  be waiting for music data to show up ... so we stop. The
+                //  rest will get caught on the next sweep. Really. And the next
+                //  sweep will come soon, because we set to sweep again right away.
+                //
+                //  Plus, this is also a good way to get back to the main
+                //  run() loop fairly frequently, where we check if the mfd
+                //  is trying to shut us down.
+                //
+                
+                ++files_scanned;
+                if(files_scanned >= 20)
+                {
+                    force_sweep_mutex.lock();
+                        force_sweep = true;
+                    force_sweep_mutex.unlock();
+                    break;
+                }
             }
         }
 
     }
-
 
     //
     //  OK, build the new metadata list of music files in memory if any of
@@ -321,25 +396,10 @@ bool MMusicWatcher::sweepMetadata()
         //
         //  Make a new collection
         //
-
-        metadata_mutex.lock();
-        if(new_metadata)
-        {
-            //
-            //  We seem to be building collections faster than the rest of
-            //  the mfd can switch over to them
-            //
-            
-            warning("buidling a new metadata collection on top of an existing one");
-            delete new_metadata;
-        }
-
+        
         new_metadata = new QIntDict<Metadata>;
         new_metadata->setAutoDelete(true);
-    
-        new_playlists = new QIntDict<Playlist>;
-        new_playlists->setAutoDelete(true);
-    
+
         //
         //  Load the metadata
         //
@@ -354,6 +414,7 @@ bool MMusicWatcher::sweepMetadata()
         {
             while(query.next())
             {
+            
                 //
                 //  fiddle with the fact that Qt and MySQL can't agree on a friggin
                 //  DateTime format
@@ -370,10 +431,9 @@ bool MMusicWatcher::sweepMetadata()
                     timestamp.insert(16, ':');
                 }
 
-                AudioDBMetadata *new_audio = new AudioDBMetadata
+                AudioMetadata *new_audio = new AudioMetadata
                                     (
                                         container_id,
-                                        bumpMetadataId(),
                                         query.value(0).toInt(),
                                         QUrl(startdir + query.value(8).toString()),
                                         query.value(9).toInt(),
@@ -399,18 +459,59 @@ bool MMusicWatcher::sweepMetadata()
             //  metadata id's that exist now in memory
             //
             
-            QIntDictIterator<Playlist> pl_it( *new_playlists );
+            QIntDictIterator<Playlist> pl_it( *current_playlists );
             for ( ; pl_it.current(); ++pl_it )
             {
                 pl_it.current()->mapDatabaseToId(new_metadata);
             }
             
-            metadata_mutex.unlock();
-            log(QString("found %1 audio file(s) and %2 playlist(s) "
-                        "in %3 second(s)")
+            //
+            //  Ah Ha ... so ... we have a new set of metadata ... how does
+            //  it compare to the old set (what are the deltas!)
+            //
+            
+            
+            metadata_additions.clear();
+            metadata_deletions.clear();
+            
+            //
+            //  find everything that's new
+            //
+
+            QIntDictIterator<Metadata> iter(*new_metadata);
+            for (; iter.current(); ++iter)
+            {
+                int an_integer = iter.currentKey();
+                if(!current_metadata->find(an_integer))
+                {
+                    metadata_additions.push_back(an_integer);
+                }
+            }
+            
+            //
+            //  find everything that's old
+            //
+            
+            QIntDictIterator<Metadata> another_iter(*current_metadata);
+            for (; another_iter.current(); ++another_iter)
+            {
+                int an_integer = another_iter.currentKey();
+                if(!new_metadata->find(an_integer))
+                {
+                    metadata_deletions.push_back(an_integer);
+                }
+            }
+            
+            log(QString("found %1 file(s) and %2 playlist(s) "
+                        "in %3 second(s) with %4 additions and %5 deletions ")
                        .arg(new_metadata->count())
-                       .arg(new_playlists->count())
-                       .arg(sweep_timer.elapsed() / 1000.0), 2);
+                       .arg(current_playlists->count())
+                       .arg(sweep_timer.elapsed() / 1000.0)
+                       .arg(metadata_additions.count())
+                       .arg(metadata_deletions.count())
+                       , 2);
+                       
+            
             return true;
         }
         else
@@ -498,24 +599,104 @@ void MMusicWatcher::buildFileList(QString &directory, MusicLoadedMap &music_file
 }
 
 
-bool MMusicWatcher::checkNewMusicFile(const QString &filename)
+bool MMusicWatcher::checkNewMusicFile(const QString &filename, const QString &startdir)
 {
-    cout << "Checking: " << filename << endl;
-    return true;
+    //
+    //  Have we seen this puppy before ?
+    //
+    
+    if(files_to_ignore.find(filename) != files_to_ignore.end())
+    {
+        return false;
+    }
+    
+    //
+    //  We have found a new file. Either it should get added to the database
+    //  (if it's supported and decodable) or we log a warning and then ignore it.
+    //
+
+    
+    Decoder *decoder = Decoder::create(filename, NULL, NULL, true);
+    
+    if(decoder)
+    {
+        AudioMetadata *new_metadata = decoder->getMetadata();
+        if(new_metadata)
+        {
+            //
+            //  We have a valid, playable new file, we need to stick it in
+            //  the database
+            //
+            
+            QString insert_artist = new_metadata->getArtist();
+            QString insert_album =  new_metadata->getAlbum();
+            QString insert_title =  new_metadata->getTitle();
+            QString insert_genre =  new_metadata->getGenre();
+            QString insert_filename = filename;
+                    insert_filename.remove(0, startdir.length());
+            
+            
+            if(insert_title == "")
+            {
+                insert_title = filename;
+            }
+            
+            insert_artist.replace(QRegExp("\""), QString("\\\""));
+            insert_album.replace(QRegExp("\""), QString("\\\""));
+            insert_title.replace(QRegExp("\""), QString("\\\""));
+            insert_genre.replace(QRegExp("\""), QString("\\\""));
+            insert_filename.replace(QRegExp("\""), QString("\\\""));
+
+            QString thequery = QString("INSERT INTO musicmetadata (artist,album,title,"
+                               "genre,year,tracknum,length,filename) VALUES "
+                               "(\"%1\",\"%2\",\"%3\",\"%4\",%5,%6,%7,\"%8\");")
+                              .arg(insert_artist.latin1())
+                              .arg(insert_album.latin1())
+                              .arg(insert_title.latin1())
+                              .arg(insert_genre.latin1())
+                              .arg(new_metadata->getYear())
+                              .arg(new_metadata->getTrack())
+                              .arg(new_metadata->getLength())
+                              .arg(insert_filename);
+            db->exec(thequery);
+            log(QString("found and inserted new music item called \"%1\"")
+                        .arg(insert_title), 8);
+            delete new_metadata;
+            return true;
+        }
+        else
+        {
+            warning(QString("found file that is not openable/decodable: \"%1\"")
+                            .arg(filename));
+            files_to_ignore.push_back(filename);
+        }
+    }
+    else
+    {
+        //
+        //  Put it on the ignore list
+        //   
+        
+        warning(QString("can not find a decoder for this file: \"%1\"")
+                .arg(filename));
+        files_to_ignore.push_back(filename);
+    }
+    return false;
 }
 
-int MMusicWatcher::bumpMetadataId()
-{
-    ++metadata_id;
-    return metadata_id;
-}
-
-int MMusicWatcher::bumpPlaylistId()
-{
-    ++playlist_id;
-    return playlist_id;
-}
 
 MMusicWatcher::~MMusicWatcher()
 {
+    if(current_metadata)
+    {
+        delete current_metadata;
+    }
+    if(new_metadata)
+    {
+        delete new_metadata;
+    }
+    if(current_playlists)
+    {
+        delete current_playlists;
+    }
 }

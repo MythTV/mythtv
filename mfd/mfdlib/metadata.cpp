@@ -93,6 +93,33 @@ AudioMetadata::AudioMetadata(
     length = l_length;
 }                            
 
+AudioMetadata::AudioMetadata(
+                             QString filename,
+                             QString l_artist,
+                             QString l_album,
+                             QString l_title,
+                             QString l_genre,
+                             int     l_year,
+                             int     l_tracknum,
+                             int     l_length
+                            )
+              :Metadata(
+                        -1,
+                        -1, 
+                        filename
+                       )
+{
+    url = filename;
+    artist = l_artist;
+    album = l_album;
+    title = l_title;
+    year = l_year;
+    tracknum = l_tracknum;
+    length = l_length;
+    genre = l_genre;
+}
+
+
 AudioMetadata::~AudioMetadata()
 {
 }
@@ -100,6 +127,7 @@ AudioMetadata::~AudioMetadata()
 /*
 ---------------------------------------------------------------------
 */
+/*
 
 AudioDBMetadata::AudioDBMetadata(
                                   int l_collection_id,
@@ -143,14 +171,15 @@ AudioDBMetadata::~AudioDBMetadata()
 {
 }
 
+*/
+
 /*
 ---------------------------------------------------------------------
 */
 
-Playlist::Playlist(int l_collection_id, QString new_name, QString raw_songlist, uint new_id, uint new_dbid)
+Playlist::Playlist(int l_collection_id, QString new_name, QString raw_songlist, uint new_id)
 {
     collection_id = l_collection_id;
-    db_id = new_dbid;
     id = new_id;
     name = new_name;
 
@@ -178,7 +207,7 @@ void Playlist::mapDatabaseToId(QIntDict<Metadata> *the_metadata)
         QIntDictIterator<Metadata> md_it( *the_metadata );
         for ( ; md_it.current(); ++md_it )
         {
-            if((uint) md_it.current()->getDatabaseId() == (*iter))
+            if((uint) md_it.current()->getId() == (*iter))
             {
                 which_one = md_it.current();
                 break;

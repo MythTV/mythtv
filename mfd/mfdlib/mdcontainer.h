@@ -16,6 +16,7 @@
 #include <qptrlist.h>
 #include <qthread.h>
 #include <qwaitcondition.h>
+#include <qvaluelist.h>
 
 #include "metadata.h"
 
@@ -57,7 +58,6 @@ class MetadataContainer
 
     void                log(const QString &log_message, int verbosity);
     void                warning(const QString &warning_message);
-    //virtual bool        tryToUpdate();
     int                 getIdentifier(){return unique_identifier;}
     bool                isAudio();
     bool                isVideo();
@@ -71,7 +71,12 @@ class MetadataContainer
     Playlist*           getPlaylist(int pl_id);
     QIntDict<Playlist>* getPlaylists(){return current_playlists;}
 
-    void                dataSwap(QIntDict<Metadata>* new_metadata, QIntDict<Playlist>* new_playlists);
+    void                dataSwap(   
+                                    QIntDict<Metadata>* new_metadata, 
+                                    QValueList<int> metadata_in,
+                                    QValueList<int> metadata_out,
+                                    QIntDict<Playlist>* new_playlists
+                                );
  
   protected:
   
@@ -82,39 +87,11 @@ class MetadataContainer
     MetadataCollectionLocationType location_type;
 
     QIntDict<Metadata>   *current_metadata;
+    QValueList<int>      metadata_additions;
+    QValueList<int>      metadata_deletions;
+    
     QIntDict<Playlist>   *current_playlists;
+    
 };
-
-/*
-
-class MetadataMythDBContainer: public MetadataContainer
-{
-    //
-    //  A container that works off myth DB tables
-    //
-    
-  public:
-  
-    MetadataMythDBContainer(
-                            MFD *l_parent,
-                            int l_unique_identifier,
-                            MetadataCollectionContentType  l_content_type,
-                            MetadataCollectionLocationType l_location_type,
-                            QSqlDatabase *l_db
-                           );
-
-    ~MetadataMythDBContainer();
-    
-    //bool    tryToUpdate();
-    
-  private:
-  
-    QSqlDatabase    *db;
-    // MetadataMonitor *metadata_monitor;
-
-};
-                            
-*/
-
 
 #endif
