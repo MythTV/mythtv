@@ -14,6 +14,7 @@ using namespace std;
 
 class Settings;
 class QSqlDatabase;
+class QSqlQuery;
 class ProgramInfo;
 class RemoteEncoder;
 
