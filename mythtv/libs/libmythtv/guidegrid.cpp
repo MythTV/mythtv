@@ -109,7 +109,17 @@ GuideGrid::GuideGrid(MythMainWindow *parent, const QString &channel, TV *player,
     LoadWindow(xmldata);
 
     showFavorites = gContext->GetNumSetting("EPGShowFavorites", 0);
-    gridfilltype = gContext->GetNumSetting("EPGFillType", 6);
+    gridfilltype = gContext->GetNumSetting("EPGFillType", UIGuideType::Alpha);
+    if (gridfilltype < (int)UIGuideType::Alpha)
+    { // update old settings to new fill types
+        if (gridfilltype == 5)
+            gridfilltype = UIGuideType::Dense;
+        else
+            gridfilltype = UIGuideType::Alpha;
+            
+        gContext->SaveSetting("EPGFillType", gridfilltype);
+    }
+
     scrolltype = gContext->GetNumSetting("EPGScrollType", 1);
 
     LayerSet *container = NULL;
@@ -117,8 +127,16 @@ GuideGrid::GuideGrid(MythMainWindow *parent, const QString &channel, TV *player,
     if (container)
     {
         UIGuideType *type = (UIGuideType *)container->GetType("guidegrid");
-        if (type)
+        if (type) 
+        {
             type->SetFillType(gridfilltype);
+            type->SetShowCategoryColors(
+                   gContext->GetNumSetting("EPGShowCategoryColors", 1));
+            type->SetShowCategoryText(
+                   gContext->GetNumSetting("EPGShowCategoryText", 1));
+        }
+        if (gridfilltype == UIGuideType::Eco)    
+            container->SetDrawFontShadow(false);
     }
 
     timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
@@ -132,6 +150,15 @@ GuideGrid::GuideGrid(MythMainWindow *parent, const QString &channel, TV *player,
         UITextType *type = (UITextType *)container->GetType("time");
         if (type)
             type->SetText(curTime);
+        if (gridfilltype == UIGuideType::Eco)    
+            container->SetDrawFontShadow(false);
+    }
+    
+    container = theme->GetSet("program_info");
+    if (container)
+    {
+        if (gridfilltype == UIGuideType::Eco)    
+            container->SetDrawFontShadow(false);
     }
 
     channelOrdering = gContext->GetSetting("ChannelOrdering", "channum + 0");
@@ -151,6 +178,8 @@ GuideGrid::GuideGrid(MythMainWindow *parent, const QString &channel, TV *player,
         type = (UIBarType *)container->GetType("chans");
         if (type)
             type->SetSize(dNum);
+        if (gridfilltype == UIGuideType::Eco)    
+            container->SetDrawFontShadow(false);
     }
 
     container = theme->GetSet("timebar");
@@ -164,6 +193,8 @@ GuideGrid::GuideGrid(MythMainWindow *parent, const QString &channel, TV *player,
         type = (UIBarType *)container->GetType("times");
         if (type)
             type->SetSize(dNum);
+        if (gridfilltype == UIGuideType::Eco)    
+            container->SetDrawFontShadow(false);
     }
     m_originalStartTime = QDateTime::currentDateTime();
 
@@ -596,9 +627,10 @@ void GuideGrid::fillProgramInfos(void)
         type = (UIGuideType *)container->GetType("guidegrid");
         if (type)
         {
-            type->ResetData();
             type->SetWindow(this);
             type->SetScreenLocation(programRect.topLeft());
+            type->SetNumRows(DISPLAY_CHANS);
+            type->ResetData();
         }
     }
 
@@ -615,6 +647,9 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
     UIGuideType *type = NULL;
     if (container)
         type = (UIGuideType *)container->GetType("guidegrid");
+
+    if (type)
+        type->ResetRow(row);
  
     QPtrList<ProgramInfo> *proglist;
     ProgramInfo *program;
@@ -813,12 +848,9 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
                 else
                     recStat = 2;
 
-                type->SetProgramInfo(row + 1, cnt, tempRect, proginfo->title,
+                type->SetProgramInfo(row, cnt, tempRect, proginfo->title,
                                      proginfo->category, arrow, recFlag, 
-                                     recStat);
-
-                if (isCurrent == true)
-                    type->SetCurrentArea(tempRect);
+                                     recStat, isCurrent);
 
                 cnt++;
             }

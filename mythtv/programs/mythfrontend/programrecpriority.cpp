@@ -84,13 +84,9 @@ ProgramRecPriority::ProgramRecPriority(QSqlDatabase *ldb, MythMainWindow *parent
 {
     db = ldb;
 
-    doingSel = false;
-
     curitem = NULL;
     bgTransBackup = NULL;
     pageDowner = false;
-
-    allowKeys = true;
 
     listCount = 0;
     dataCount = 0;
@@ -140,7 +136,7 @@ ProgramRecPriority::ProgramRecPriority(QSqlDatabase *ldb, MythMainWindow *parent
 
     FillList();
     sortType = (SortType)gContext->GetNumSetting("ProgramRecPrioritySorting", 
-												 (int)byTitle);
+                                                 (int)byTitle);
 
     SortList(); 
     inList = inData = 0;
@@ -161,9 +157,6 @@ ProgramRecPriority::~ProgramRecPriority()
 
 void ProgramRecPriority::keyPressEvent(QKeyEvent *e)
 {
-    if (!allowKeys)
-        return;
-
     bool handled = false;
     QStringList actions;
     if (gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e, actions))
@@ -281,9 +274,6 @@ void ProgramRecPriority::updateBackground(void)
 
 void ProgramRecPriority::paintEvent(QPaintEvent *e)
 {
-    if (doingSel)
-        return;
-
     QRect r = e->rect();
     QPainter p(this);
  
@@ -404,13 +394,8 @@ void ProgramRecPriority::cursorUp(bool page)
 
 void ProgramRecPriority::edit(void)
 {
-    if (doingSel)
-        return;
-
     if (!curitem)
         return;
-
-    doingSel = true;
 
     ProgramRecPriorityInfo *rec = curitem;
 
@@ -496,8 +481,6 @@ void ProgramRecPriority::edit(void)
 
         update(fullRect);
     }
-
-    doingSel = false;
 }
 
 void ProgramRecPriority::changeRecPriority(int howMuch) 
@@ -550,9 +533,7 @@ void ProgramRecPriority::FillList(void)
 
     programData.clear();
 
-    allowKeys = false;
     RemoteGetAllScheduledRecordings(recordinglist);
-    allowKeys = true;
 
     vector<ProgramInfo *>::reverse_iterator pgiter = recordinglist.rbegin();
 

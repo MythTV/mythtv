@@ -68,11 +68,6 @@ class ViewScheduled : public MythDialog
 
     int listsize;
 
-    bool allowEvents;
-    bool allowUpdates;
-    bool updateAll;
-    bool refillAll;
-
     bool showAll;
 };
 

@@ -266,9 +266,11 @@ unsigned ThreadedFileWriter::BufFree()
 
 /**********************************************************************/
 
-RingBuffer::RingBuffer(const QString &lfilename, bool write, bool needevents)
+RingBuffer::RingBuffer(const QString &lfilename, bool write, bool usereadahead)
 {
     Init();
+
+    startreadahead = usereadahead;
 
     normalfile = true;
     filename = (QString)lfilename;
@@ -308,7 +310,8 @@ RingBuffer::RingBuffer(const QString &lfilename, bool write, bool needevents)
         if (is_local)
             fd2 = open(filename.ascii(), O_RDONLY|O_LARGEFILE|O_STREAMING);
         else
-            remotefile = new RemoteFile(filename, needevents);
+            remotefile = new RemoteFile(filename);
+
         writemode = false;
     }
 
@@ -339,7 +342,7 @@ RingBuffer::RingBuffer(const QString &lfilename, long long size,
     }
     else
     {
-        remotefile = new RemoteFile(filename, false, recorder_num);
+        remotefile = new RemoteFile(filename, recorder_num);
     }
 
     wrapcount = 0;
@@ -348,6 +351,8 @@ RingBuffer::RingBuffer(const QString &lfilename, long long size,
 
 void RingBuffer::Init(void)
 {
+    startreadahead = true;
+
     readaheadrunning = false;
     readaheadpaused = false;
     wantseek = false;
@@ -393,13 +398,10 @@ RingBuffer::~RingBuffer(void)
 
 void RingBuffer::Start(void)
 {
-    if (remotefile)
-        remotefile->Start();
-
     if ((normalfile && writemode) || (!normalfile && !recorder_num))
     {
     }
-    else if (!readaheadrunning)
+    else if (!readaheadrunning && startreadahead)
         StartupReadAheadThread();
 }
 
@@ -573,6 +575,7 @@ void RingBuffer::ResetReadAhead(long long newinternal)
 
 void RingBuffer::StartupReadAheadThread(void)
 {
+cout << "starting read ahead\n";
     readaheadrunning = false;
 
     pthread_create(&reader, NULL, startReader, this);
@@ -854,9 +857,18 @@ int RingBuffer::Read(void *buf, int count)
         {
             if (!readaheadrunning)
             {
-                ret = safe_read(fd2, buf, count);
-                totalreadpos += ret;
-                readpos += ret;
+                if (remotefile)
+                {
+                    ret = safe_read(remotefile, buf, count);
+                    totalreadpos += ret;
+                    readpos += ret;
+                }
+                else
+                {
+                    ret = safe_read(fd2, buf, count);
+                    totalreadpos += ret;
+                    readpos += ret;
+                }
             }
             else
             {

@@ -1124,12 +1124,36 @@ public:
     EPGFillType():
         GlobalSetting("EPGFillType") {
         setLabel(QObject::tr("Guide Shading Method"));
-        addSelection(QObject::tr("Colorized (alpha)"), "6");
-        addSelection(QObject::tr("Colorized (shaded)"), "5");
-        addSelection(QObject::tr("Embossed (shaded)"), "3");
-        addSelection(QObject::tr("Embossed (solid)"), "4");
-        addSelection(QObject::tr("Rounded (shaded)"), "1");
-        addSelection(QObject::tr("Rounded (solid)"), "2");
+        QString val = "";
+        addSelection(QObject::tr("Alpha - Transparent (CPU Usage - High)"), 
+                     val.left(0).setNum((int)UIGuideType::Alpha));
+        addSelection(QObject::tr("Blender - Transparent (CPU Usage - Middle)"), 
+                     val.left(0).setNum((int)UIGuideType::Dense));
+        addSelection(QObject::tr("Eco - Transparent (CPU Usage - Low)"), 
+                     val.left(0).setNum((int)UIGuideType::Eco));
+        addSelection(QObject::tr("Solid (CPU Usage - Middle)"), 
+                     val.left(0).setNum((int)UIGuideType::Solid));
+    };
+};
+
+class EPGShowCategoryColors: public CheckBoxSetting, public GlobalSetting {
+public:
+    EPGShowCategoryColors():
+        GlobalSetting("EPGShowCategoryColors") {
+        setLabel(QObject::tr("Display Genre Colors"));
+        setHelpText(QObject::tr("Colorize program guide using "
+                    " genre colors. (Not available for all grabbers.)"));
+        setValue(true);
+    };
+};
+
+class EPGShowCategoryText: public CheckBoxSetting, public GlobalSetting {
+public:
+    EPGShowCategoryText():
+        GlobalSetting("EPGShowCategoryText") {
+        setLabel(QObject::tr("Display Genre Text"));
+        setHelpText(QObject::tr("(Not available for all grabbers.)"));
+        setValue(true);
     };
 };
 
@@ -1537,6 +1561,8 @@ EPGSettings::EPGSettings()
     epg->setLabel(QObject::tr("Program Guide"));
 
     epg->addChild(new EPGFillType());
+    epg->addChild(new EPGShowCategoryColors());
+    epg->addChild(new EPGShowCategoryText());
     epg->addChild(new EPGScrollType());
     epg->addChild(new EPGShowChannelIcon());
     epg->addChild(new EPGChanDisplay());

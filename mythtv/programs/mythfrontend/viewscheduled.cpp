@@ -27,11 +27,6 @@ ViewScheduled::ViewScheduled(QSqlDatabase *ldb, MythMainWindow *parent,
 {
     db = ldb;
 
-    allowEvents = true;
-    allowUpdates = true;
-    updateAll = false;
-    refillAll = false;
-
     dateformat = gContext->GetSetting("ShortDateFormat", "M/d");
     timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
     displayChanNum = gContext->GetNumSetting("DisplayChanNum");
@@ -83,11 +78,6 @@ ViewScheduled::~ViewScheduled()
 
 void ViewScheduled::keyPressEvent(QKeyEvent *e)
 {
-    if (!allowEvents)
-        return;
-
-    allowEvents = false;
-
     bool handled = false;
     QStringList actions;
     if (gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e, actions))
@@ -122,20 +112,6 @@ void ViewScheduled::keyPressEvent(QKeyEvent *e)
 
     if (!handled)
         MythDialog::keyPressEvent(e);
-
-    if (refillAll)
-    {
-        allowUpdates = false;
-        do
-        {
-            refillAll = false;
-            FillList();
-        } while (refillAll);
-        allowUpdates = true;
-        update(fullRect);
-    }
-
-    allowEvents = true;
 }
 
 void ViewScheduled::LoadWindow(QDomElement &element)
@@ -194,25 +170,17 @@ void ViewScheduled::updateBackground(void)
 
 void ViewScheduled::paintEvent(QPaintEvent *e)
 {
-    if (!allowUpdates)
-    {
-        updateAll = true;
-        return;
-    }
-
     QRect r = e->rect();
     QPainter p(this);
  
-    if (updateAll || r.intersects(listRect))
+    if (r.intersects(listRect))
         updateList(&p);
-    if (updateAll || r.intersects(infoRect))
+    if (r.intersects(infoRect))
         updateInfo(&p);
-    if (updateAll || r.intersects(conflictRect))
+    if (r.intersects(conflictRect))
         updateConflict(&p);
-    if (updateAll || r.intersects(showLevelRect))
+    if (r.intersects(showLevelRect))
         updateShowLevel(&p);
-
-    updateAll = false;
 }
 
 void ViewScheduled::cursorDown(bool page)
@@ -511,30 +479,14 @@ void ViewScheduled::customEvent(QCustomEvent *e)
     if (message != "SCHEDULE_CHANGE")
         return;
 
-    refillAll = true;
-
-    if (!allowEvents)
-        return;
-
-    allowEvents = false;
-
-    allowUpdates = false;
-    do
-    {
-        refillAll = false;
-        FillList();
-    } while (refillAll);
-    allowUpdates = true;
+    FillList();
     update(fullRect);
-
-    allowEvents = true;
 }
 
 void ViewScheduled::setShowAll(bool all)
 {
-    if (showAll == all)
-        return;
-
     showAll = all;
-    refillAll = true;
+
+    FillList();
+    update(fullRect);
 }

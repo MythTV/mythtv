@@ -461,7 +461,7 @@ void NuppelVideoRecorder::Initialize(void)
     if (!ringBuffer)
     {
         cerr << "Warning: Old ringbuf creation\n";
-        ringBuffer = new RingBuffer(NULL, "output.nuv", true);
+        ringBuffer = new RingBuffer("output.nuv", true);
         weMadeBuffer = true;
         livetv = false;
     }

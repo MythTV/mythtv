@@ -13,7 +13,9 @@ class ThreadedFileWriter;
 class RingBuffer
 {
   public:
-    RingBuffer(const QString &lfilename, bool write, bool needevents = false);
+    // can explicitly disable the readahead thread here, or just by not
+    // calling Start()
+    RingBuffer(const QString &lfilename, bool write, bool usereadahead = true);
     RingBuffer(const QString &lfilename, long long size, long long smudge,
                RemoteEncoder *enc = NULL);
     
@@ -113,6 +115,7 @@ class RingBuffer
     QMutex readAheadLock;
     pthread_t reader;
 
+    bool startreadahead;
     char *readAheadBuffer;
     bool readaheadrunning;
     bool readaheadpaused;

@@ -970,7 +970,7 @@ QImage *MythContext::CacheRemotePixmap(const QString &url)
         return &(imageCache[url]);
     }
 
-    RemoteFile *rf = new RemoteFile(url, true);
+    RemoteFile *rf = new RemoteFile(url);
 
     QByteArray data;
     bool ret = rf->SaveAs(data);

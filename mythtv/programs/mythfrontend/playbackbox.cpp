@@ -37,23 +37,32 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
 {
     type = ltype;
 
+    state = kStopped;
+
     rbuffer = NULL;
     nvp = NULL;
 
-    ignoreevents = false;
+    // Number of items available in list, showData.count() for "All Programs"
+    // In other words, this is the number of shows selected by the title selec.
+    titleitems = 0;         
+    
+    // How full the actual list is (list in this context being the number
+    // of spaces available for data to be shown).
+    listCount = 0;          
+                            
+    inTitle = true;         // Cursor in Title Listing
+    skipNum = 0;            // Amount of records to skip (for scrolling)
 
-    titleitems = 0;         // Number of items available in list, = showData.count() for "All Programs"
-                         // In other words, this is the number of shows selected by the title selector
-    listCount = 0;         // How full the actual list is (list in this context being the number
-                         // of spaces available for data to be shown).
-    inTitle = true;      // Cursor in Title Listing
-    skipNum = 0;         // Amount of records to skip (for scrolling)
     curShowing = 0;         // Where in the list (0 - # in list)
-    pageDowner = false;         // Is there enough records to page down?
+    pageDowner = false;     // Is there enough records to page down?
     skipUpdate = false;
     skipCnt = 0;
 
-    leftRight = false;   // If change is left or right, don't restart video
+    updateFreeSpace = true;
+    freeSpaceTotal = 0;
+    freeSpaceUsed = 0;
+
+    leftRight = false;      // If change is left or right, don't restart video
     playingVideo = false;
     graphicPopup = true;
     expectingPopup = false;
@@ -68,8 +77,6 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     infoRect = QRect(0, 0, 0, 0);
     usageRect = QRect(0, 0, 0, 0);
     videoRect = QRect(0, 0, 0, 0);
-
-    noUpdate = false;
 
     showDateFormat = gContext->GetSetting("ShortDateFormat", "M/d");
     showTimeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
@@ -119,12 +126,15 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
 
     timer->start(500);
     gContext->addListener(this);
+
+    freeSpaceTimer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(setUpdateFreeSpace()));
 }
 
 PlaybackBox::~PlaybackBox(void)
 {
     gContext->removeListener(this);
-    killPlayer();
+    killPlayerSafe();
     delete timer;
     delete theme;
     delete bgTransBackup;
@@ -132,6 +142,30 @@ PlaybackBox::~PlaybackBox(void)
         delete curitem;
     if (titleData)
         delete [] titleData;
+}
+
+/* blocks until playing has stopped */
+void PlaybackBox::killPlayerSafe(void)
+{
+    /* don't process any keys while we are trying to let the nvp stop */
+    /* if the user keeps selecting new recordings we will never stop playing */
+    setEnabled(false);
+
+    if (state != kStopped)
+    {
+        state = kStopping;
+        while(state != kStopped)
+        {
+            /* NOTE: need unlock/process/lock here because we need
+	       to allow updateVideo() to run to handle changes in states */
+            qApp->unlock();
+            qApp->processEvents();
+            usleep(500);
+            qApp->lock();
+        }
+    }
+
+    setEnabled(true);
 }
 
 void PlaybackBox::LoadWindow(QDomElement &element)
@@ -230,21 +264,12 @@ void PlaybackBox::parsePopup(QDomElement &element)
 
 void PlaybackBox::exitWin()
 {
-    if (ignoreevents)
-        return;
-
-    noUpdate = true;
-    timer->stop();
-    killPlayer();
-
+    killPlayerSafe();
     accept();
 }
 
 void PlaybackBox::updateBackground(void)
 {
-    if (noUpdate == true)
-        return; 
-
     QPixmap bground(size());
     bground.fill(this, 0, 0);
 
@@ -267,55 +292,47 @@ void PlaybackBox::paintEvent(QPaintEvent *e)
     if (e->erased())
         skipUpdate = false;
 
-    if (noUpdate == false)
-    {
-        QRect r = e->rect();
-        QPainter p(this);
+    QRect r = e->rect();
+    QPainter p(this);
 
-        if (r.intersects(listRect) && skipUpdate == false)
-        {
-            updateShowTitles(&p);
-        }
-        if (r.intersects(infoRect) && skipUpdate == false)
-        {
-            updateInfo(&p);
-        }
-        if (r.intersects(usageRect) && skipUpdate == false)
-        {
-            updateUsage(&p);
-        }
-        if (r.intersects(videoRect) && ignoreevents == false)
-        {
-            updateVideo(&p);
-        }
-        skipCnt--;
-        if (skipCnt < 0)
-        {
-            skipUpdate = true;
-            skipCnt = 0;
-        }
+    if (r.intersects(listRect) && skipUpdate == false)
+    {
+        updateShowTitles(&p);
+    }
+    if (r.intersects(infoRect) && skipUpdate == false)
+    {
+        updateInfo(&p);
+    }
+    if (r.intersects(usageRect) && skipUpdate == false)
+    {
+        updateUsage(&p);
+    }
+    if (r.intersects(videoRect))
+    {
+        updateVideo(&p);
+    }
+
+    skipCnt--;
+    if (skipCnt < 0)
+    {
+        skipUpdate = true;
+        skipCnt = 0;
     }
 }
 
 void PlaybackBox::grayOut(QPainter *tmp)
 {
-    if (noUpdate == false)
-    {
-        int transparentFlag = gContext->GetNumSetting("PlayBoxShading", 0);
-        if (transparentFlag == 0)
-            tmp->fillRect(QRect(QPoint(0, 0), size()), 
-                          QBrush(QColor(10, 10, 10), Dense4Pattern));
-        else if (transparentFlag == 1)
-            tmp->drawPixmap(0, 0, *bgTransBackup, 0, 0, (int)(800*wmult), 
-                            (int)(600*hmult));
-    }
+    int transparentFlag = gContext->GetNumSetting("PlayBoxShading", 0);
+    if (transparentFlag == 0)
+        tmp->fillRect(QRect(QPoint(0, 0), size()), 
+                      QBrush(QColor(10, 10, 10), Dense4Pattern));
+    else if (transparentFlag == 1)
+        tmp->drawPixmap(0, 0, *bgTransBackup, 0, 0, (int)(800*wmult), 
+                        (int)(600*hmult));
 }
 
 void PlaybackBox::updateInfo(QPainter *p)
 {
-    if (noUpdate == true)
-        return;
-
     QMap<QString, QString> regexpMap;
     QRect pr = infoRect;
     QPixmap pix(pr.size());
@@ -325,10 +342,9 @@ void PlaybackBox::updateInfo(QPainter *p)
     if (showData.count() > 0 && curitem)
     {
         QSqlDatabase *m_db = QSqlDatabase::database();
-        ignoreevents = true;
 
         if (playingVideo == true)
-            killPlayer();
+            state = kChanging;
 
         curitem->ToMap(m_db, regexpMap);
 
@@ -408,8 +424,6 @@ void PlaybackBox::updateInfo(QPainter *p)
         tmp.end();
         p->drawPixmap(pr.topLeft(), pix);
 
-        ignoreevents = false;
-
         timer->start(500);
     }
     else
@@ -427,10 +441,10 @@ void PlaybackBox::updateInfo(QPainter *p)
 
 void PlaybackBox::updateVideo(QPainter *p)
 {
-    if (noUpdate == true)
-        return;
-
-    if (((playbackPreview == 0) || !playingVideo) && curitem)
+    /* show a still frame if the user doesn't want a video preview or nvp 
+     * hasn't started playing the video preview yet */
+    if (((playbackPreview == 0) || !playingVideo || (state == kStarting) || 
+        (state == kChanging)) && curitem)
     {
         QPixmap temp = getPixmap(curitem);
         if (temp.width() > 0)
@@ -438,11 +452,52 @@ void PlaybackBox::updateVideo(QPainter *p)
             p->drawPixmap(videoRect.x(), videoRect.y(), temp);
         }
     }
-    else
+
+    /* if we have no nvp and aren't playing yet */
+    /* if we have an item we should start playing */
+    if (!nvp && playingVideo == false && curitem)
+    {
+        ProgramInfo *rec = curitem;
+
+        if (fileExists(rec) == false)
+        {
+            cerr << "Error: File missing\n";
+
+            state = kStopping;
+            return;
+        }
+        state = kStarting;
+    }
+
+    if (state == kChanging)
+    {
+        state = kStarting;
+        if (nvp)
+            killPlayer();
+
+        startPlayer(curitem);
+    }
+
+    if (state == kStarting)
     {
         if (!nvp)
-            return;
+            startPlayer(curitem);
 
+        if (nvp->IsPlaying())
+            state = kPlaying;
+    }
+
+    if (state == kStopping)
+    {
+        if (nvp)
+            killPlayer();
+
+        state = kStopped;
+    }
+
+    /* if we are playing and nvp is running, then grab a new video frame */
+    if ((state == kPlaying) && nvp->IsPlaying())
+    {
         int w = 0, h = 0;
         VideoFrame *frame = nvp->GetCurrentFrame(w, h);
 
@@ -465,31 +520,21 @@ void PlaybackBox::updateVideo(QPainter *p)
 
         p->drawImage(videoRect.x(), videoRect.y(), img);
     }
+
+    /* have we timed out waiting for nvp to start? */
+    if ((state == kPlaying) && !nvp->IsPlaying())
+    {
+        if (nvpTimeout.elapsed() > 2000)
+        {
+            killPlayer();
+            startPlayer(curitem);
+            state = kStarting;
+        }
+    }
 }
 
 void PlaybackBox::updateUsage(QPainter *p)
 {
-    if (noUpdate == true)
-        return; 
-
-    int total = 0, used = 0;
-    noUpdate = true;
-    if (connected)
-        RemoteGetFreeSpace(total, used);
-    noUpdate = false;
-
-    QString usestr;
-
-    double perc = (double)((double)used / (double)total);
-    perc = ((double)100 * (double)perc);
-    usestr.sprintf("%d", (int)perc);
-    usestr = usestr + tr("% used");
-
-    QString rep;
-    rep.sprintf(tr(", %d,%03d MB free"), (total - used) / 1000, 
-                                         (total - used) % 1000);
-    usestr = usestr + rep;
-
     LayerSet *container = NULL;
     container = theme->GetSet("usage");
     if (container)
@@ -504,6 +549,26 @@ void PlaybackBox::updateUsage(QPainter *p)
                 return;
         }
 
+        if (updateFreeSpace && connected)
+        {
+            updateFreeSpace = false;
+            RemoteGetFreeSpace(freeSpaceTotal, freeSpaceUsed);
+            freeSpaceTimer->start(15000);
+        }    
+
+        QString usestr;
+
+        double perc = (double)((double)freeSpaceUsed / (double)freeSpaceTotal);
+        perc = ((double)100 * (double)perc);
+        usestr.sprintf("%d", (int)perc);
+        usestr = usestr + tr("% used");
+
+        QString rep;
+        rep.sprintf(tr(", %d,%03d MB free"), 
+                    (freeSpaceTotal - freeSpaceUsed) / 1000, 
+                    (freeSpaceTotal - freeSpaceUsed) % 1000);
+        usestr = usestr + rep;
+
         QRect pr = usageRect;
         QPixmap pix(pr.size());
         pix.fill(this, pr.topLeft());
@@ -513,11 +578,12 @@ void PlaybackBox::updateUsage(QPainter *p)
         if (ttype)
             ttype->SetText(usestr);
 
-        UIStatusBarType *sbtype = (UIStatusBarType *)container->GetType("usedbar");
+        UIStatusBarType *sbtype = 
+                               (UIStatusBarType *)container->GetType("usedbar");
         if (sbtype)
         {
-            sbtype->SetUsed(used);
-            sbtype->SetTotal(total);
+            sbtype->SetUsed(freeSpaceUsed);
+            sbtype->SetTotal(freeSpaceTotal);
         }
 
         if (type != Delete)
@@ -538,9 +604,6 @@ void PlaybackBox::updateUsage(QPainter *p)
 
 void PlaybackBox::updateShowTitles(QPainter *p)
 {
-    if (noUpdate == true)
-        return; 
-
     int cnt = 0;
     int h = 0;
     int pastSkip = (int)skipNum;
@@ -962,8 +1025,6 @@ bool PlaybackBox::FillList()
     if (order == 0 && type != Delete)
         cnt = 100;
 
-    noUpdate = true;
-
     showData.clear();
     showDateData.clear();
     if (showList.count() > 0)
@@ -1028,8 +1089,6 @@ bool PlaybackBox::FillList()
 
     lastUpdateTime = QDateTime::currentDateTime();
 
-    noUpdate = false;
-
     return (infoList != NULL);
 }
 
@@ -1053,7 +1112,6 @@ void PlaybackBox::killPlayer(void)
         QTime timeout;
         timeout.start();
 
-        ignoreevents = true;
         while (!nvp->IsPlaying())
         {
             if (timeout.elapsed() > 2000)
@@ -1061,26 +1119,11 @@ void PlaybackBox::killPlayer(void)
                 cerr << "Took too long to start playing\n";
                 break;
             }
-            qApp->unlock();
-            qApp->processEvents();
             usleep(50);
-            qApp->lock();
         }
         timeout.restart();
 
         rbuffer->Pause();
-        while (!rbuffer->isPaused())
-        {
-            if (timeout.elapsed() > 2000)
-            {
-                cerr << "Took too long to pause ringbuffer\n";
-                break;
-            }
-            qApp->unlock();
-            qApp->processEvents();
-            usleep(50);
-            qApp->lock();
-        }
 
         nvp->StopPlaying();
 
@@ -1091,22 +1134,15 @@ void PlaybackBox::killPlayer(void)
                 cerr << "Took too long to stop playing\n";
                 break;
             }
-            qApp->unlock();
-            qApp->processEvents();
             usleep(50);
-            qApp->lock();
         }
 
-        qApp->unlock();
         pthread_join(decoder, NULL);
         delete nvp;
         delete rbuffer;
-        qApp->lock();
 
         nvp = NULL;
         rbuffer = NULL;
-
-        ignoreevents = false;
     }
 }        
 
@@ -1122,7 +1158,7 @@ void PlaybackBox::startPlayer(ProgramInfo *rec)
             return;
         }
 
-        rbuffer = new RingBuffer(rec->pathname, false, true);
+        rbuffer = new RingBuffer(rec->pathname, false, false);
 
         nvp = new NuppelVideoPlayer();
         nvp->SetRingBuffer(rbuffer);
@@ -1132,33 +1168,21 @@ void PlaybackBox::startPlayer(ProgramInfo *rec)
                             gContext->GetInstallPrefix());
         QString filters = "";
         nvp->SetVideoFilters(filters);
- 
+
         pthread_create(&decoder, NULL, SpawnDecoder, nvp);
 
-        QTime timeout;
-        timeout.start();
- 
-        ignoreevents = true;
+        nvpTimeout.start();
 
-        while (nvp && !nvp->IsPlaying())
-        {
-            if (timeout.elapsed() > 2000)
-                break;
-            usleep(50);
-            qApp->unlock();
-            qApp->processEvents();
-            qApp->lock();
-        }
-
-        ignoreevents = false;
+        state = kStarting;
+        timer->start(1000 / 30); 
     }
 }
 
 void PlaybackBox::playSelected()
 {
-    killPlayer();
+    state = kStopping;
 
-    if (!curitem || ignoreevents)
+    if (!curitem)
         return;
      
     play(curitem);
@@ -1166,9 +1190,9 @@ void PlaybackBox::playSelected()
 
 void PlaybackBox::stopSelected()
 {
-    killPlayer();
+    state = kStopping;
 
-    if (!curitem || ignoreevents)
+    if (!curitem)
         return;
 
     stop(curitem);
@@ -1176,9 +1200,9 @@ void PlaybackBox::stopSelected()
 
 void PlaybackBox::deleteSelected()
 {
-    killPlayer();
+    state = kStopping;
 
-    if (!curitem || ignoreevents)
+    if (!curitem)
         return;
 
     remove(curitem);
@@ -1186,9 +1210,9 @@ void PlaybackBox::deleteSelected()
 
 void PlaybackBox::expireSelected()
 {
-    killPlayer();
+    state = kStopping;
 
-    if (!curitem || ignoreevents)
+    if (!curitem)
         return;
 
     expire(curitem);
@@ -1196,9 +1220,9 @@ void PlaybackBox::expireSelected()
 
 void PlaybackBox::selected()
 {
-    killPlayer();
+    state = kStopping;
 
-    if (!curitem || ignoreevents)
+    if (!curitem)
         return;
 
     switch (type) 
@@ -1210,9 +1234,9 @@ void PlaybackBox::selected()
 
 void PlaybackBox::showActionsSelected()
 {
-    killPlayer();
+    state = kStopping;
 
-    if (!curitem || ignoreevents)
+    if (!curitem)
         return;
 
     showActions(curitem);
@@ -1220,28 +1244,25 @@ void PlaybackBox::showActionsSelected()
 
 void PlaybackBox::play(ProgramInfo *rec)
 {
-    if (!rec || ignoreevents)
+    if (!rec)
         return;
-
-    ignoreevents = true;
 
     if (fileExists(rec) == false)
     {
         cerr << "Error: " << rec->pathname << " file not found\n";
-        ignoreevents = false;
-        killPlayer();
+        state = kStopping;
         return;
     }
 
     ProgramInfo *tvrec = new ProgramInfo(*rec);
 
     QSqlDatabase *db = QSqlDatabase::database();
-    noUpdate = true;
 
     TV *tv = new TV(db);
     tv->Init();
 
-    ignoreevents = true;
+    setEnabled(false);
+
     if (tv->Playback(tvrec))
     {
         while (tv->GetState() != kState_None)
@@ -1252,9 +1273,8 @@ void PlaybackBox::play(ProgramInfo *rec)
             qApp->lock();
         }
     }
-    noUpdate = false;
 
-    ignoreevents = false;
+    setEnabled(true);
 
     update(fullRect);
 
@@ -1287,30 +1307,16 @@ void PlaybackBox::play(ProgramInfo *rec)
     connected = FillList();
     skipUpdate = false;
     update(fullRect);
-
-    ignoreevents = false;
-
-    timer->start(500);
 }
 
 void PlaybackBox::stop(ProgramInfo *rec)
 {
-    if (noUpdate)
-        return;
-
-    noUpdate = true;
     RemoteStopRecording(rec);
-    noUpdate = false;
 }
 
 void PlaybackBox::doRemove(ProgramInfo *rec, bool forgetHistory)
 {
-    if (noUpdate)
-        return;
-
-    noUpdate = true;
     RemoteDeleteRecording(rec, forgetHistory);
-    noUpdate = false;
 
     if (titleitems == 1)
     {
@@ -1369,12 +1375,7 @@ void PlaybackBox::doRemove(ProgramInfo *rec, bool forgetHistory)
 
 void PlaybackBox::remove(ProgramInfo *toDel)
 {
-    if (ignoreevents)
-        return;
-
-    killPlayer();
-
-    ignoreevents = true;
+    state = kStopping;
 
     delitem = new ProgramInfo(*toDel);
     showDeletePopup(delitem, 2);
@@ -1382,12 +1383,7 @@ void PlaybackBox::remove(ProgramInfo *toDel)
 
 void PlaybackBox::expire(ProgramInfo *toExp)
 {
-    if (ignoreevents)
-        return;
-
-    killPlayer();
-
-    ignoreevents = true;
+    state = kStopping;
 
     delitem = new ProgramInfo(*toExp);
     showDeletePopup(delitem, 3);
@@ -1395,12 +1391,7 @@ void PlaybackBox::expire(ProgramInfo *toExp)
 
 void PlaybackBox::showActions(ProgramInfo *toExp)
 {
-    if (ignoreevents)
-        return;
-
     killPlayer();
-
-    ignoreevents = true;
 
     delitem = new ProgramInfo(*toExp);
     showActionPopup(delitem);
@@ -1408,15 +1399,14 @@ void PlaybackBox::showActions(ProgramInfo *toExp)
 
 void PlaybackBox::showDeletePopup(ProgramInfo *program, int types)
 {
-    ignoreevents = true;
-
     timer->stop();
     playingVideo = false;
+
+    updateFreeSpace = true;
 
     backup.begin(this);
     grayOut(&backup);
     backup.end();
-    noUpdate = true;
 
     popup = new MythPopupBox(gContext->GetMainWindow(), graphicPopup,
                              popupForeground, popupBackground,
@@ -1500,15 +1490,12 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, int types)
 
 void PlaybackBox::showActionPopup(ProgramInfo *program)
 {
-    ignoreevents = true;
-
     timer->stop();
     playingVideo = false;
 
     backup.begin(this);
     grayOut(&backup);
     backup.end();
-    noUpdate = true;
 
     popup = new MythPopupBox(gContext->GetMainWindow(), graphicPopup,
                              popupForeground, popupBackground,
@@ -1581,12 +1568,9 @@ void PlaybackBox::cancelPopup(void)
     popup->hide();
     expectingPopup = false;
 
-    noUpdate = false;
     backup.begin(this);
     backup.drawPixmap(0, 0, myBackground);
     backup.end();
-
-    ignoreevents = false;
 
     delete popup;
     popup = NULL;
@@ -1743,18 +1727,13 @@ void PlaybackBox::doCancel(void)
 
 void PlaybackBox::promptEndOfRecording(ProgramInfo *rec)
 {
-    if (!rec || ignoreevents)
+    if (!rec)
         return;
 
-    killPlayer();
-
-    ignoreevents = true;
+    state = kStopping;
 
     if (!rec)
-    {
-        ignoreevents = false;
         return;
-    }
 
     delitem = new ProgramInfo(*rec);
     showDeletePopup(delitem, 1);
@@ -1767,49 +1746,14 @@ void PlaybackBox::UpdateProgressBar(void)
 
 void PlaybackBox::timeout(void)
 {
-    if (ignoreevents == true)
-        return;
-    if (noUpdate)
-        return;
-
     if (showData.count() == 0)
         return;
 
-    if (!nvp && playingVideo == false)
-    {
-        if (playbackPreview == 1)
-        {
-            if (curitem)
-            {
-                ProgramInfo *rec = curitem;
-
-                if (fileExists(rec) == false)
-                {
-                    cerr << "Error: File Missing!\n";
-                    QPixmap temp((int)(160 * wmult), (int)(120 * hmult));
-
-                    killPlayer();
-                    return;
-                }
-
-                startPlayer(rec);
-            }
-        }
-    }
-
     update(videoRect);
-
-    if (playbackPreview == 0)
-        timer->stop();
-    else
-        timer->start(1000 / 30);
 }
 
 void PlaybackBox::keyPressEvent(QKeyEvent *e)
 {
-    if (ignoreevents || noUpdate)
-        return;
-
     bool handled = false;
 
     QStringList actions;
@@ -1859,9 +1803,6 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
 
 void PlaybackBox::customEvent(QCustomEvent *e)
 {
-    if (ignoreevents || noUpdate)
-        return;
-
     if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
     {
         MythEvent *me = (MythEvent *)e;
@@ -1884,9 +1825,7 @@ bool PlaybackBox::fileExists(ProgramInfo *pginfo)
 {
     if (pginfo->pathname.left(7) == "myth://")
     {
-        noUpdate = true;
         bool ret = RemoteCheckFile(pginfo);
-        noUpdate = false;
         return ret;
     }
 
@@ -1909,7 +1848,6 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
     int screenheight = 0, screenwidth = 0;
     float wmult = 0, hmult = 0;
 
-    noUpdate = true;
     gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
     tmppix = gContext->LoadScalePixmap(filename);
@@ -1917,7 +1855,6 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
     {
         retpixmap = *tmppix;
         delete tmppix;
-        noUpdate = false;
         return retpixmap;
     }
 
@@ -1932,13 +1869,11 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
         {
             retpixmap = *tmppix;
             delete tmppix;
-            noUpdate = false;
             return retpixmap;
         }
 
         image = gContext->CacheRemotePixmap(filename);
     }
-    noUpdate = false;
 
     if (image)
     {

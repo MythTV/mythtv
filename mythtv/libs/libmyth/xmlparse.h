@@ -42,7 +42,8 @@ class XMLParse
     void parseCheckBox(LayerSet *, QDomElement &);
     void parseSelector(LayerSet *, QDomElement &);
     void parseBlackHole(LayerSet *, QDomElement &);
-  
+    void parseListBtnArea(LayerSet *, QDomElement &); 
+ 
   private:
     QMap<QString, fontProp> fontMap;
     QMap<QString, LayerSet*> layerMap;

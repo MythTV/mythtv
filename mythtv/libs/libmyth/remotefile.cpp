@@ -10,7 +10,7 @@ using namespace std;
 #include "util.h"
 #include "mythcontext.h"
 
-RemoteFile::RemoteFile(const QString &url, bool needevents, int lrecordernum)
+RemoteFile::RemoteFile(const QString &url, int lrecordernum)
 {
     type = 0;
     path = url;
@@ -32,16 +32,8 @@ RemoteFile::RemoteFile(const QString &url, bool needevents, int lrecordernum)
         recordernum = -1;
     }
 
-    if (needevents)
-    {
-        controlSock = NULL;
-        sock = NULL;
-    }
-    else
-    {
-        controlSock = openSocket(true);
-        sock = openSocket(false);
-    }
+    controlSock = openSocket(true);
+    sock = openSocket(false);
 }
 
 RemoteFile::~RemoteFile()
@@ -51,15 +43,6 @@ RemoteFile::~RemoteFile()
         delete controlSock;
     if (sock)
         delete sock;
-}
-
-void RemoteFile::Start(void)
-{
-    if (!controlSock)
-    {
-        controlSock = openSocket(true);
-        sock = openSocket(false);
-    }
 }
 
 QSocketDevice *RemoteFile::openSocket(bool control)
@@ -298,8 +281,6 @@ int RemoteFile::Read(void *data, int size)
 
 bool RemoteFile::SaveAs(QByteArray &data)
 {
-    Start();
-
     if (filesize < 0)
         return false;
 

@@ -13,6 +13,7 @@
 #include <qfont.h>
 #include <qpixmap.h>
 #include <qpainter.h>
+#include <qptrlist.h>
 
 #include "mythwidgets.h"
 #include "util.h"
@@ -61,6 +62,8 @@ class LayerSet
     void    ClearAllText(void);
     void    SetTextByRegexp(QMap<QString, QString> &regexpMap);
 
+    void    SetDrawFontShadow(bool state);
+
     void    UseAlternateArea(bool useAlt);
 
   private:
@@ -90,6 +93,7 @@ class UIType : public QObject
     int  GetContext(){return m_context;}
     void SetDebug(bool db) { m_debug = db; }
     void allowFocus(bool yes_or_no){takes_focus = yes_or_no;}
+    void SetDrawFontShadow(bool state) { drawFontShadow = state; }
     QString Name();
 
 
@@ -98,7 +102,8 @@ class UIType : public QObject
     virtual void Draw(QPainter *, int, int);
     virtual void calculateScreenArea();
     QRect   getScreenArea(){return screen_area;}
-    QString cutDown(QString, QFont *, bool multiline = false, int ow = -1, int oh = -1);
+    QString cutDown(const QString &data, QFont *font, bool multiline = false, 
+                    int overload_width = -1, int overload_height = -1);
     QString getName(){return m_name;}
 
     
@@ -131,9 +136,8 @@ class UIType : public QObject
     LayerSet *m_parent;
     bool     has_focus;
     bool     takes_focus;
-    QRect    screen_area;   //  The area I occupy in
-                            //  real screen coordinates
-
+    QRect    screen_area;   // The area, in real screen coordinates
+    bool     drawFontShadow;
 };
 
 class UIBarType : public UIType
@@ -176,73 +180,145 @@ class UIBarType : public UIType
 
 };
 
+class AlphaTable
+{
+  public:
+    AlphaTable();
+    ~AlphaTable();
+    AlphaTable(const QColor &color, int alpha);
+   
+    unsigned char r[256], g[256], b[256];
+  
+  private:  
+    void maketable(unsigned char* data, int channel, int alpha);
+};
+
+class AlphaBlender
+{
+  public:
+    AlphaBlender();
+    ~AlphaBlender();
+    void init(int alpha = 96, int cacheSize = 30);
+    void addColor(const QColor &color);
+    void blendImage(const QImage &image, const QColor &color);
+  
+  private:
+    QDict<AlphaTable> alphaTables;
+    int alpha;
+};
+
 class UIGuideType : public UIType
 {
   public:
-    UIGuideType(const QString &name, int);
+    UIGuideType(const QString &name, int order);
     ~UIGuideType();
 
-    void Draw(QPainter *, int, int);
+    enum FillType { Alpha = 10, Dense, Eco, Solid };
 
-    void SetJustification(int jst) { m_justification = jst; }
-    void SetCutDown(bool cut) { m_cutdown = cut; }
-    void SetFont(fontProp *font) { m_font = font; }
-    void SetFillType(int type) { m_filltype = type; }
+    void Draw(QPainter *dr, int drawlayer, int context);
 
-    void SetWindow(MythDialog *win) { m_window = win; }
-    void SetRecordingColors(QString reccol, QString concol) 
-                          { m_reccolor = reccol; m_concolor = concol; }
-    void SetSelectorColor(QString col) { m_selcolor = col; }
-    void SetSelectorType(int type) { m_seltype = type; }
-    void SetSolidColor(QString col) { m_solidcolor = col; }
-    void SetCategoryColors(QMap<QString, QString> catC)
-                          { categoryColors = catC; }
-    void SetProgramInfo(unsigned int, int, QRect, QString, QString, int, int, int);
-    void SetCurrentArea(QRect myArea) { curArea = myArea; }
-    void ResetData() { drawArea.clear(); dataMap.clear(); m_count = 0;
-                       categoryMap.clear(); recType.clear(); recStat.clear();
-                       countMap.clear(); arrowUsage.clear(); }
-    void ResetRow(unsigned int);
-    void SetArea(QRect area) { m_area = area; }
-    void SetScreenLocation(QPoint sl) { m_screenloc = sl; }
-    void SetTextOffset(QPoint to) { m_textoffset = to; }
-    void LoadImage(int, QString);
-    void SetArrow(int, QString);
+    void SetJustification(int jst);
+    void SetCutDown(bool state) { cutdown = state; }
+    void SetFont(fontProp *font) { this->font = font; }
+    void SetFillType(int type) { filltype = type; }
+    void SetShowCategoryColors(bool state) { drawCategoryColors = state; }
+    void SetShowCategoryText(bool state) { drawCategoryText = state; }
+    void SetSelectorType(int type) { seltype = type; }
+    void SetNumRows(int numRows) { this->numRows = numRows; }
+    void SetWindow(MythDialog *win) { window = win; }
+    
+    void SetRecordingColors(const QString &reccol, const QString &concol) 
+                  { reccolor = QColor(reccol); concolor = QColor(concol); }
+    void SetSelectorColor(const QString &col) { selcolor = QColor(col); }
+    void SetSolidColor(const QString &col) { solidcolor = QColor(col); }
+    void SetCategoryColors(const QMap<QString, QString> &catColors);
+    
+    void SetArea(const QRect &area) { this->area = area; }
+    void SetScreenLocation(const QPoint &sl) { screenloc = sl; }
+    void SetTextOffset(const QPoint &to) { textoffset = to; }
+    void SetArrow(int, const QString &file);
+    void LoadImage(int, const QString &file);
+    void SetProgramInfo(int row, int col, const QRect &area,
+                        const QString &title, const QString &category,
+                        int arrow, int recType, int recStat, bool selected);
+    void ResetData();
+    void ResetRow(int row);
 
   private:
 
-    QRect m_area;
-    QPoint m_textoffset;
-    QPoint m_screenloc;
-    MythDialog *m_window;
-    void drawCurrent(QPainter *);
-    void drawBox(QPainter *, int, QString);
-    void drawBackground(QPainter *, int); 
-    void drawText(QPainter *, int);
-    void drawRecType(QPainter *, int);
-    void Blender(QPainter *, QRect, int, QString force = "");
-    //QString cutDown(QString, QFont *, int, int);
-    int m_justification;
-    fontProp *m_font;
-    QString m_solidcolor;
-    QString m_selcolor;
-    int m_seltype;
-    QString m_reccolor;
-    QString m_concolor;
-    int m_filltype;
-    bool m_cutdown;
-    QRect curArea;
-    unsigned int m_count;
-    QMap<unsigned int, int> countMap;
-    QMap<QString, QString> categoryColors;
-    QMap<int, QRect> drawArea;
-    QMap<int, QString> dataMap;
-    QMap<int, QString> categoryMap;
-    QMap<int, int> recType;
-    QMap<int, int> recStat;
-    QMap<int, QPixmap> recImages;
-    QMap<int, QPixmap> arrowImages;
-    QMap<int, int> arrowUsage;
+    class UIGTCon
+    {
+      public:
+        UIGTCon() { arrow = recType = recStat = 0; };
+        UIGTCon(const QRect &drawArea, const QString &title, 
+                const QString &category, int arrow, int recType, int recStat)
+        {
+            this->drawArea = drawArea;
+            this->title = title;
+            this->category = category.stripWhiteSpace();
+            this->arrow = arrow;
+            this->recType = recType;
+            this->recStat = recStat;
+        }
+
+        UIGTCon(const UIGTCon &o)
+        {
+            drawArea = o.drawArea;
+            title = o.title;
+            category = o.category;
+            categoryColor = o.categoryColor;
+            arrow = o.arrow;
+            recType = o.recType;
+            recStat = o.recStat;
+        }        
+        
+        QRect drawArea;
+        QString title;
+        QString category;
+        QColor categoryColor;
+        int arrow;
+        int recType;
+        int recStat;
+    };
+    
+    void drawBackground(QPainter *dr, UIGTCon *data); 
+    void drawBox(QPainter *dr, UIGTCon *data, const QColor &color);
+    void drawText(QPainter *dr, UIGTCon *data);
+    void drawRecType(QPainter *dr, UIGTCon *data);
+    void drawCurrent(QPainter *dr, UIGTCon *data);
+    
+    QPtrList<UIGTCon> *allData;
+    UIGTCon selectedItem;
+    
+    QPixmap recImages[15];
+    QPixmap arrowImages[15];
+    
+    int maxRows;
+    int numRows;
+    
+    MythDialog *window;
+    QRect area;
+    QPoint textoffset;
+    QPoint screenloc;
+
+    int justification;
+    bool multilineText;
+    fontProp *font;
+    QColor solidcolor;
+    
+    QColor selcolor;
+    int seltype;
+    
+    QColor reccolor;
+    QColor concolor;
+    
+    int filltype;
+    bool cutdown;
+    bool drawCategoryColors;
+    bool drawCategoryText;
+
+    QMap<QString, QColor> categoryColors;
+    AlphaBlender alphaBlender;
 };
 
 class UIListType : public UIType
@@ -875,6 +951,103 @@ class UIBlackHoleType : public UIType
   protected:
   
     QRect area;
+};
+
+// ********************************************************************
+
+class UIListBtnType : public UIType
+{
+    Q_OBJECT
+
+  public:
+
+    typedef struct {
+        QString text;
+        bool    checked;
+    } UIListBtnTypeItem;
+    
+    UIListBtnType(const QString& name, const QRect& area, int order,
+                        bool showArrow=true, bool showScrollArrows=false,
+                        bool showChecked=false);
+    ~UIListBtnType();
+
+    void SetFontActive(fontProp *font);
+    void SetFontInactive(fontProp *font);
+    
+    void SetSpacing(int spacing) {m_itemSpacing = spacing;}
+    void SetMargin(int margin) {m_itemMargin = margin;}
+    void SetItemRegColor(const QColor& beg, const QColor& end, uint alpha);
+    void SetItemSelColor(const QColor& beg, const QColor& end, uint alpha);
+    void Draw(QPainter *, int order, int);
+
+    void SetActive(bool active) {m_active = active;}
+
+    void Reset();
+    void AddItem(const QString& text);
+    void SetItemCurrent(int current);
+    int  GetItemCurrent();
+    int  GetCount();
+    const UIListBtnTypeItem* GetItem(int itemPos);
+    
+    void MoveDown();
+    void MoveUp();
+    void Toggle();
+
+  private:
+
+    void Init();
+    void LoadPixmap(QPixmap& pix, const QString& fileName);
+
+    int   m_order;
+    QRect m_rect;
+    QRect m_contentsRect;
+    QRect m_arrowsRect;
+    QRect m_itemTextRect;
+    QRect m_itemCheckRect;
+    QRect m_itemArrowRect;
+    
+    int   m_itemHeight;
+    int   m_itemSpacing;
+    int   m_itemMargin;
+    uint  m_itemsVisible;
+
+    bool  m_active;
+    bool  m_showScrollArrows;
+    bool  m_showArrow;
+    bool  m_showChecked;
+    bool  m_showUpArrow;
+    bool  m_showDnArrow;
+    
+    QPixmap   m_itemRegPix;
+    QPixmap   m_itemSelActPix;
+    QPixmap   m_itemSelInactPix;
+    QPixmap   m_upArrowRegPix;
+    QPixmap   m_dnArrowRegPix;
+    QPixmap   m_upArrowActPix;
+    QPixmap   m_dnArrowActPix;
+    QPixmap   m_arrowPix;
+    QPixmap   m_checkPix;
+
+    QColor    m_itemRegBeg;
+    QColor    m_itemRegEnd;
+    QColor    m_itemSelBeg;
+    QColor    m_itemSelEnd;
+    uint      m_itemRegAlpha;
+    uint      m_itemSelAlpha;
+
+    fontProp* m_fontActive;
+    fontProp* m_fontInactive;
+
+    bool      m_initialized;
+
+    UIListBtnTypeItem* m_topItem;
+    UIListBtnTypeItem* m_selItem;
+    QPtrList<UIListBtnTypeItem> m_itemList;
+    
+  signals:
+
+    void itemSelected(int itemPos);
+    void itemChecked(int itemPos, bool checked);
 };
 
 #endif

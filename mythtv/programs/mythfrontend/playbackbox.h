@@ -65,6 +65,8 @@ class PlaybackBox : public MythDialog
 
     void exitWin();
 
+    void setUpdateFreeSpace() { updateFreeSpace = true; }
+
   protected:
     void paintEvent(QPaintEvent *);
     void keyPressEvent(QKeyEvent *e);
@@ -83,7 +85,6 @@ class PlaybackBox : public MythDialog
     void showActions(ProgramInfo *);
 
     bool skipUpdate;
-    bool noUpdate;
     bool pageDowner;
     bool connected;
     ProgramInfo *curitem;
@@ -112,6 +113,7 @@ class PlaybackBox : public MythDialog
     BoxType type;
 
     void killPlayer(void);
+    void killPlayerSafe(void);
     void startPlayer(ProgramInfo *rec);
 
     void doRemove(ProgramInfo *, bool forgetHistory);
@@ -129,8 +131,14 @@ class PlaybackBox : public MythDialog
     RingBuffer *rbuffer;
     pthread_t decoder;
 
+    typedef enum 
+    { kStarting, kPlaying, kStopping, kStopped, kChanging } playerStateType;
+
+    playerStateType state;
+
+    QTime nvpTimeout;    
+ 
     QDateTime lastUpdateTime;
-    bool ignoreevents;
     bool graphicPopup;
     bool playbackPreview;
     bool generatePreviewPixmap;
@@ -170,6 +178,11 @@ class PlaybackBox : public MythDialog
     QColor popupHighlight;
 
     bool expectingPopup;
+
+    bool updateFreeSpace;
+    QTimer *freeSpaceTimer;
+    int freeSpaceTotal;
+    int freeSpaceUsed;
 };
 
 #endif

@@ -820,6 +820,10 @@ void XMLParse::parseContainer(QDomElement &element, QString &newname, int &conte
             {
                 parseListArea(container, info);
             }
+            else if (info.tagName() == "listbtnarea")
+            {
+                parseListBtnArea(container, info);
+            }
             else if (info.tagName() == "textarea")
             {
                 parseTextArea(container, info);
@@ -2218,3 +2222,147 @@ void XMLParse::parseBlackHole(LayerSet *container, QDomElement &element)
     container->AddType(bh);
 }
 
+void XMLParse::parseListBtnArea(LayerSet *container, QDomElement &element)
+{
+    QRect   area = QRect(0,0,0,0);
+    QString fontActive;
+    QString fontInactive;
+    bool    showArrow = true;
+    bool    showScrollArrows = false;
+    bool    showChecked = false;
+    int     draworder = 0;
+    QColor  grUnselectedBeg(Qt::black);
+    QColor  grUnselectedEnd(80,80,80);
+    uint    grUnselectedAlpha(100);
+    QColor  grSelectedBeg(82,202,56);
+    QColor  grSelectedEnd(52,152,56);
+    uint    grSelectedAlpha(255);
+    int     spacing = 2;
+    int     margin = 3;
+
+    QString name = element.attribute("name", "");
+    if (name.isEmpty()) {
+        std::cerr << "ListBtn area needs a name" << std::endl;
+        exit(0);
+    }
+
+    QString layerNum = element.attribute("draworder", "");
+    if (layerNum.isNull() && layerNum.isEmpty())
+    {
+        cerr << "ListBtn area needs a draworder\n";
+        exit(0);
+    }
+    
+    draworder = layerNum.toInt();
+    for (QDomNode child = element.firstChild(); !child.isNull();
+         child = child.nextSibling()) {
+        QDomElement info = child.toElement();
+        if (!info.isNull())
+        {
+            if (info.tagName() == "area")
+            {
+                area = parseRect(getFirstText(info));
+                normalizeRect(area);
+            }
+            else if (info.tagName() == "fcnfont")
+            {
+                QString fontName = info.attribute("name", "");
+                QString fontFcn  = info.attribute("function", "");
+
+                if (fontFcn.lower() == "active")
+                    fontActive = fontName;
+                else if (fontFcn.lower() == "inactive")
+                    fontInactive = fontFcn;
+                else {
+                    std::cerr << "Unknown font function for listbtn area: "
+                              << fontFcn 
+                              << std::endl;
+                    exit(0);
+                }
+            }
+            else if (info.tagName() == "showarrow") {
+                if (getFirstText(info).lower() == "no")
+                    showArrow = false;
+            }
+            else if (info.tagName() == "showchecks") {
+                if (getFirstText(info).lower() == "yes")
+                    showChecked = true;
+            }
+            else if (info.tagName() == "showscrollarrows") {
+                if (getFirstText(info).lower() == "yes")
+                    showScrollArrows = true;
+            }
+            else if (info.tagName() == "gradient") {
+
+                if (info.attribute("type","").lower() == "selected") {
+                    grSelectedBeg = QColor(info.attribute("start"));
+                    grSelectedEnd = QColor(info.attribute("end"));
+                    grSelectedAlpha = info.attribute("alpha","255").toUInt();
+                }
+                else if (info.attribute("type","").lower() == "unselected") {
+                    grUnselectedBeg = QColor(info.attribute("start"));
+                    grUnselectedEnd = QColor(info.attribute("end"));
+                    grUnselectedAlpha = info.attribute("alpha","100").toUInt();
+                }
+                else {
+                    std::cerr << "Unknown type for gradient in listbtn area"
+                              << std::endl;
+                    exit(0);
+                }
+
+                if (!grSelectedBeg.isValid() || !grSelectedEnd.isValid() ||
+                    !grUnselectedBeg.isValid() || !grUnselectedEnd.isValid()) {
+                    std::cerr << "Unknown color for gradient in listbtn area"
+                              << std::endl;
+                    exit(0);
+                }
+
+                if (grSelectedAlpha > 255 || grUnselectedAlpha > 255) {
+                    std::cerr << "Incorrect alpha for gradient in listbtn area"
+                              << std::endl;
+                    exit(0);
+                }
+            }
+            else if (info.tagName() == "spacing") {
+                spacing = getFirstText(info).toInt();
+            }
+            else if (info.tagName() == "margin") {
+                margin = getFirstText(info).toInt();
+            }
+            else
+            {
+                std::cerr << "Unknown tag in listbtn area: " << info.tagName() << endl;
+                exit(0);
+            }
+            
+        }
+    }
+
+    fontProp *fpActive = GetFont(fontActive);
+    if (!fpActive)
+    {
+        cerr << "Unknown font: " << fontActive << " in listbtn area: " << name << endl;
+        exit(0);
+    }
+    
+    fontProp *fpInactive = GetFont(fontInactive);
+    if (!fpInactive)
+    {
+        cerr << "Unknown font: " << fontInactive << " in listbtn area: " << name << endl;
+        exit(0);
+    }
+    
+
+    UIListBtnType *l = new UIListBtnType(name, area, draworder, showArrow,
+                                         showScrollArrows, showChecked);
+    l->SetScreen(wmult, hmult);
+    l->SetFontActive(fpActive);
+    l->SetFontInactive(fpInactive);
+    l->SetItemRegColor(grUnselectedBeg, grUnselectedEnd, grUnselectedAlpha);
+    l->SetItemSelColor(grSelectedBeg, grSelectedEnd, grSelectedAlpha);
+    l->SetSpacing((int)(spacing*hmult));
+    l->SetMargin((int)(margin*wmult));
+    
+    container->AddType(l);
+    
+}

@@ -415,7 +415,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
         if (!ringBuffer)
         {
             cerr << "Warning: Old player ringbuf creation\n";
-            ringBuffer = new RingBuffer(NULL, filename, false);
+            ringBuffer = new RingBuffer(filename, false);
             weMadeBuffer = true;
             livetv = false;
         }
@@ -3080,7 +3080,7 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
 
     // Input setup
     nvr = new NuppelVideoRecorder(NULL);
-    ringBuffer = new RingBuffer(filename, false, false);
+    ringBuffer = new RingBuffer(filename, false);
 
     audioOutput = new AudioReencodeBuffer(audio_bits, audio_channels);
     AudioReencodeBuffer *arb = ((AudioReencodeBuffer*)audioOutput);
@@ -3188,7 +3188,7 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
 
         nvr->AudioInit(true);
 
-        outRingBuffer = new RingBuffer(outputname, true, false);
+        outRingBuffer = new RingBuffer(outputname, true);
         nvr->SetRingBuffer(outRingBuffer);
         nvr->WriteHeader();
         nvr->StreamAllocate();

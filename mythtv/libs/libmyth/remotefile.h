@@ -10,14 +10,11 @@ class QSocketDevice;
 class RemoteFile
 {
   public:
-    RemoteFile(const QString &url, bool needevents = false, 
-               int recordernum = -1);
+    RemoteFile(const QString &url, int recordernum = -1);
    ~RemoteFile();
 
     QSocketDevice *getSocket();
     bool isOpen(void);
-
-    void Start(void);
 
     void Close(void);
 

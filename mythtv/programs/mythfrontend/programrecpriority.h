@@ -88,9 +88,6 @@ class ProgramRecPriority : public MythDialog
     int listsize;
 
     SortType sortType;
-
-    bool allowKeys;
-    bool doingSel;
 };
 
 #endif

@@ -176,6 +176,9 @@ void MythMainWindow::Show(void)
 
 void MythMainWindow::attach(QWidget *child)
 {
+    if (currentWidget())
+        currentWidget()->setEnabled(false);
+
     d->widgetList.push_back(child);
     child->raise();
     child->setFocus();
@@ -193,7 +196,10 @@ void MythMainWindow::detach(QWidget *child)
     QWidget *current = currentWidget();
 
     if (current)
+    {
         current->setFocus();
+        current->setEnabled(true);
+    }
 
     if (d->exitingtomain)
         QApplication::postEvent(this, new ExitToMainMenuEvent());
