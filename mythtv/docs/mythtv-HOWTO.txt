@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-09-19, v2.79
+  2003-09-21, v2.80
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -201,16 +201,16 @@
         21.11.2 Gentoo
      21.12 Advanced Backend Configurations.
      21.13 What is this transcoder thing, and how do I use it?
+     21.14 Troubleshooting the Hauppauge PVR-250 IR remote
 
   22. Example Configurations
      22.1 Hauppauge PVR-250/350 hardware MPEG-2 encoder. I'd like to use a hardware MPEG-2 encoder (ie, a PVR-250/350).
      22.2 Hauppauge PVR-250 remote and MythTV's native LIRC support.
-     22.3 Linux Volume Manager (LVM).
+     22.3 Logical Volume Manager (LVM).
         22.3.1 ReiserFS
         22.3.2 ext2 or ext3
      22.4 Advanced Partition Formatting.
         22.4.1 Ext3
-
   ______________________________________________________________________
 
   [1m1.  How to obtain this document.[0m
@@ -5084,6 +5084,14 @@
   with the new as soon as it is no longer in use.
 
 
+  [1m21.14.  Troubleshooting the Hauppauge PVR-250 IR remote[0m
+
+  The most likely issue is that you have incompatible versions of the
+  [1mlirc_i2c [22mand [1mlirc_dev [22mmodules and the various [1mlircd [22mprograms.  See the
+  section called ``Hauppauge PVR-250 remote and MythTV's native LIRC
+  support.'' for examples on finding and removing old versions of lirc.
+
+
   [1m22.  Example Configurations[0m
 
   This section contains configurations which you may find useful.
@@ -5106,6 +5114,8 @@
   Install the Mandrake kernel source.  If you are using a different
   Mandrake kernel level (ie, not 2.4.21-0.16mdk as in the example below,
   then alter the [1murpmi [22mcommand appropriately.)
+
+
        $ uname -a
        Linux pvr 2.4.21-0.16mdk #1 Fri Apr 11 06:51:54 CEST 2003 i686 unknown
        unknown GNU/Linux
@@ -5155,14 +5165,15 @@
   Add the following to /etc/modules.conf:
 
 
-       alias char-major-81     videodev
-       alias char-major-81-0   ivtv
-       alias char-major-61 lirc_i2c
-       options ivtv debug=1
-       options tuner type=2
-       options msp3400 once=1 simple=1
-       add below ivtv msp3400 saa7115 tuner
-       add above ivtv lirc_dev lirc_i2c
+
+  alias char-major-81     videodev
+  alias char-major-81-0   ivtv
+  alias char-major-61 lirc_i2c
+  options ivtv debug=1
+  options tuner type=2
+  options msp3400 once=1 simple=1
+  add below ivtv msp3400 saa7115 tuner
+  add above ivtv lirc_dev lirc_i2c
 
 
 
@@ -5216,8 +5227,6 @@
        crw-------    1 mythtv   sys       81, 224 Dec 31  1969 vbi0
        crw-------    1 mythtv   sys       81,   0 Dec 31  1969 video0
        crw-------    1 mythtv   sys       81,  32 Dec 31  1969 video32
-
-
 
   In this case, the ivtv device is video0.
 
@@ -5278,6 +5287,18 @@
   "parm:        standard int", then you're not loading the correct
   msp3400.
 
+  Check to ensure that you're loading the correct msp3400 module.
+
+
+
+  # modinfo msp3400
+  filename:    /lib/modules/2.4.22-9mdk/kernel/drivers/media/video/msp3400.o
+
+
+
+  Check that the path is correct for your kernel version, and that the
+  driver being loaded is in /media/video and not some other directory.
+
   [1mNOTE[22m:  Some people report "ghosting" issues with their PVR-250s, where
   there is a faint copy of whatever is on the screen appearing to the
   right of the image.  If you have this issue, it's fairly obvious.
@@ -5291,6 +5312,8 @@
 
 
        /path/to/ivtv/utils/test_ioctl --set-codec-params=dnr_mode=0,dnr_temporal=0
+
+
 
   [1m22.2.  Hauppauge PVR-250 remote and MythTV's native LIRC support.[0m
 
@@ -5320,15 +5343,6 @@
 
 
 
-  Next, you need to remove the kernel modules for LIRC that Mandrake has
-  packaged for you.  They won't work, and will cause problems later.
-
-
-
-       # rm -rf /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc
-
-
-
   If you've already installed LIRC from the Mandrake packages, it's
   going to be version 0.6.6, and that won't work.  Uninstall it:
 
@@ -5337,6 +5351,57 @@
        # urpme lirc lirc-remotes liblirc-devel
        # rm -rf /dev/lirc*
        # exit
+
+
+  Check to ensure that you don't have other versions of lirc modules and
+  programs on your system:
+
+
+       $ su
+       # updatedb
+       # locate lirc_i2c|grep `uname -r`
+       /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_i2c.c
+       /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_i2c.o.gz
+
+       # locate lirc_dev|grep `uname -r`
+       /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.c
+       /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.h
+       /usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.stamp
+       /usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.ver
+       /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_dev.o.gz
+
+       # locate irw|grep "/usr"
+       /usr/bin/irw
+       /usr/local/bin/irw
+       /usr/local/man/man1/irw.1
+
+       # locate lircd|grep "/usr"
+       /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lircd.conf.RM-050
+       /usr/share/man/man8/lircd.8.bz2
+       /usr/share/doc/lirc-0.6.6/html/lircd.html
+       /usr/sbin/lircd
+       /usr/local/sbin/lircd
+       /usr/local/man/man8/lircd.8
+
+       # locate irxevent|grep "/usr"
+       /usr/share/man/man1/irxevent.1.bz2
+       /usr/share/doc/lirc-0.6.6/html/irxevent.html
+       /usr/share/doc/lirc-0.6.6/irxevent.keys
+       /usr/bin/irxevent
+       /usr/local/bin/irxevent
+       /usr/local/man/man1/irxevent.1
+
+
+
+  As you can see, there were a number of different versions of lirc
+  already installed on this system.  They must be removed.
+
+
+       $ su
+       # rm -rf /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc
+       # rm -rf /usr/sbin/lircd /usr/local/sbin/lircd
+       # rm -rf /usr/bin/irxevent /usr/local/bin/irxevent
+       # rm -rf /usr/bin/irw /usr/local/bin/irw
 
 
 
@@ -5351,12 +5416,9 @@
   Mandrake now includes i2c version 2.8.0 which changes the semantics of
   some low-level calls.  You will need to patch LIRC in order for it to
   work correctly.  Download the patch and install:
-
-
-
-  $ cd lirc-0.7.0pre2
-  $ wget http://delvare.free.fr/i2c/other/lirc-CVS-i2c-2.8.0.patch
-  $ patch -p1 < lirc-CVS-i2c-2.8.0.patch
+       $ cd lirc-0.7.0pre2
+       $ wget http://delvare.free.fr/i2c/other/lirc-CVS-i2c-2.8.0.patch
+       $ patch -p1 < lirc-CVS-i2c-2.8.0.patch
 
 
 
@@ -5449,6 +5511,9 @@
      running modprobe -r lirc_i2c as root first, then modprobe lirc_i2c
      and try again.
 
+  +o  What path does modprobe lirc_i2c and modprobe lirc_dev show?  It
+     should be in /lib/modules/{your kernel version}/misc/
+
   If none of the above works, and [1mirw [22mstill isn't showing keypresses,
   then you will need to ask your question on the LIRC list.
 
@@ -5479,7 +5544,6 @@
   .lircrc file is in your home directory and has a "." as the first
   character.
 
-
   Since we're using native LIRC support within MythTV, copy the
   configfiles/hauppauge-lircrc-nativelirc file into your .mythtv/
   directory and call it lircrc.  It has a slightly different format than
@@ -5506,7 +5570,7 @@
   You should now have native LIRC support within MythTV.
 
 
-  [1m22.3.  Linux Volume Manager (LVM).[0m
+  [1m22.3.  Logical Volume Manager (LVM).[0m
 
   LVM greatly increases the flexibility you have in managing your
   storage than traditional physical partitions. This section will

@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-09-19, v2.79
+<date>2003-09-21, v2.80
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -4098,6 +4098,13 @@ transcoding.
 Once the transcode is complete, mythbackend will replace the old file
 with the new as soon as it is no longer in use.
 
+<sect1>Troubleshooting the Hauppauge PVR-250 IR remote
+<p>The most likely issue is that you have incompatible versions of the
+<bf>lirc_i2c</bf> and <bf>lirc_dev</bf> modules and the various
+<bf>lircd</bf> programs.  See the section called <ref id="hauppauge_remote"
+name="Hauppauge PVR-250 remote and MythTV's native LIRC support."> for
+examples on finding and removing old versions of lirc.
+
 <sect>Example Configurations
 <p>This section contains configurations which you may find useful.
 <sect1>Hauppauge PVR-250/350 hardware MPEG-2 encoder.
@@ -4270,6 +4277,15 @@ root): <tt>modinfo msp3400 | grep "parm: *standard"</tt>.  If you don't get
 a line that says: "parm:        standard int", then you're not loading the
 correct msp3400.
 
+Check to ensure that you're loading the correct msp3400 module.
+<tscreen><verb> 
+# modinfo msp3400
+filename:    /lib/modules/2.4.22-9mdk/kernel/drivers/media/video/msp3400.o
+</verb></tscreen>
+
+Check that the path is correct for your kernel version, and that the driver
+being loaded is in <tt>/media/video</tt> and not some other directory.
+
 <bf>NOTE</bf>:  Some people report "ghosting" issues with their PVR-250s,
 where there is a faint copy of whatever is on the screen appearing to the
 right of the image.  If you have this issue, it's fairly obvious.  This is a
@@ -4309,13 +4325,6 @@ unknown GNU/Linux
 kernel-source-2.4.22-9mdk
 </verb></tscreen>
 
-Next, you need to remove the kernel modules for LIRC that Mandrake has
-packaged for you.  They won't work, and will cause problems later.
-
-<tscreen><verb>
-# rm -rf /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc
-</verb></tscreen>
-
 If you've already installed LIRC from the Mandrake packages, it's going to
 be version 0.6.6, and that won't work.  Uninstall it:
 <tscreen><verb>
@@ -4323,6 +4332,53 @@ $ su
 # urpme lirc lirc-remotes liblirc-devel
 # rm -rf /dev/lirc*
 # exit
+</verb></tscreen>
+
+Check to ensure that you don't have other versions of lirc modules and
+programs on your system:
+<tscreen><verb>
+$ su
+# updatedb
+# locate lirc_i2c|grep `uname -r`
+/usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_i2c.c
+/lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_i2c.o.gz
+
+# locate lirc_dev|grep `uname -r`
+/usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.c
+/usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.h
+/usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.stamp
+/usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.ver
+/lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_dev.o.gz
+
+# locate irw|grep "/usr"
+/usr/bin/irw
+/usr/local/bin/irw
+/usr/local/man/man1/irw.1
+
+# locate lircd|grep "/usr"
+/usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lircd.conf.RM-050
+/usr/share/man/man8/lircd.8.bz2
+/usr/share/doc/lirc-0.6.6/html/lircd.html
+/usr/sbin/lircd
+/usr/local/sbin/lircd
+/usr/local/man/man8/lircd.8
+
+# locate irxevent|grep "/usr"
+/usr/share/man/man1/irxevent.1.bz2
+/usr/share/doc/lirc-0.6.6/html/irxevent.html
+/usr/share/doc/lirc-0.6.6/irxevent.keys
+/usr/bin/irxevent
+/usr/local/bin/irxevent
+/usr/local/man/man1/irxevent.1
+</verb></tscreen>
+As you can see, there were a number of different versions of lirc already
+installed on this system.  They must be removed.
+<tscreen><verb>
+$ su
+# rm -rf /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc
+# rm -rf /usr/sbin/lircd /usr/local/sbin/lircd
+# rm -rf /usr/bin/irxevent /usr/local/bin/irxevent
+# rm -rf /usr/bin/irw /usr/local/bin/irw
 </verb></tscreen>
 
 Download the lirc-0.7.0pre2 tarball:
@@ -4409,6 +4465,8 @@ by all groups?
 <item>If you think you may have had old LIRC device drivers you may need to
 reboot to ensure that they're totally out of the system.  Try running
 modprobe -r lirc_i2c as root first, then modprobe lirc_i2c and try again.
+<item>What path does modprobe lirc_i2c and modprobe lirc_dev show?  It
+should be in /lib/modules/{your kernel version}/misc/
 </itemize>
 
 If none of the above works, and <bf>irw</bf> still isn't showing keypresses,
@@ -4459,7 +4517,7 @@ $ su
 
 You should now have native LIRC support within MythTV.
 
-<sect1>Linux Volume Manager (LVM). <label id="LVM">
+<sect1>Logical Volume Manager (LVM). <label id="LVM">
 <!-- Contributed by Martin Smith martin at spamcop.net -->
 <p>LVM greatly increases the flexibility you have in managing your storage
 than traditional physical partitions. This section will provide some brief
@@ -4782,6 +4840,9 @@ v2.78, 2003-09-18.  Fix a dangling pointer and a split header.
 v2.79, 2003-09-19.  Create a dedicated "examples" section, move stuff to it. 
 Get rid of some old crap.  Talk about LVM sooner in the doc.  Add a section
 for MythNews.
+v2.80, 2003-09-21.  Fix LVM acronym.  Explicit filenames for lirc to look
+for if it's not working.  modinfo examples of pathname to check that the
+correct modules are being loaded.  "Troubleshooting PVR-250" section.
 -->
 
 <!--
