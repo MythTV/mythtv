@@ -649,10 +649,7 @@ void TV::HandleStateChange(void)
         gContext->DisableScreensaver();
         StartPlayerAndRecorder(true, false);
         if (recorder->IsRecording())
-        {
             StartPlayerAndRecorder(false, true);
-            UpdateOSDInput();
-        }
         else
         {
             VERBOSE(VB_IMPORTANT, "LiveTV not successfully started");
@@ -788,8 +785,10 @@ void TV::HandleStateChange(void)
     changeState = false;
 
     if (internalState == kState_WatchingLiveTV)
+    {
+        UpdateOSDInput();
         UpdateLCD();
-
+    }
     if (recorder)
         recorder->FrontendReady();
 }
@@ -2807,8 +2806,8 @@ void TV::UpdateOSDInput(void)
     if (osd)
         osd->SetSettingsText(msg, 3);
     else
-        VERBOSE(VB_IMPORTANT, QString("TV: Unable to show tuner (%1) on OSD.")
-                                      .arg(msg));
+        VERBOSE(VB_OSD, QString("TV: Unable to display input ID (%1) on OSD.")
+                                .arg(msg));
 }
 
 void TV::UpdateLCD(void)
