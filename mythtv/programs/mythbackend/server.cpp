@@ -10,7 +10,7 @@ MythServer::MythServer(int port, QObject *parent)
     if (!ok())
     {
         cerr << "Failed to bind port: " << port << endl;
-        exit(0);
+        exit(1);
     }
 }
 

@@ -298,7 +298,8 @@ int main(int argc, char **argv)
          
         if (logfd < 0)
         {
-            perror("open(logfile)");
+            perror(logfile.ascii());
+            cerr << "Error opening logfile\n";
             return -1;
         }
     }
@@ -309,7 +310,8 @@ int main(int argc, char **argv)
         pidfs.open(pidfile.ascii());
         if (!pidfs)
         {
-            perror("open(pidfile)");
+            perror(pidfile.ascii());
+            cerr << "Error opening pidfile";
             return -1;
         }
     }
@@ -345,35 +347,35 @@ int main(int argc, char **argv)
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!db)
     {
-        printf("Couldn't connect to database\n");
+        cerr << "Couldn't connect to database\n";
         return -1;
     }
 
     QSqlDatabase *subthread = QSqlDatabase::addDatabase("QMYSQL3", "SUBDB");
     if (!subthread)
     {
-        printf("Couldn't connect to database\n");
+        cerr << "Couldn't connect to database\n";
         return -1;
     }
 
     QSqlDatabase *expthread = QSqlDatabase::addDatabase("QMYSQL3", "EXPDB");
     if (!expthread)
     {
-        printf("Couldn't connect to database\n");
+        cerr << "Couldn't connect to database\n";
         return -1;
     }
 
     QSqlDatabase *transthread = QSqlDatabase::addDatabase("QMYSQL3", "TRANSDB");
     if (!transthread)
     {
-        printf("Couldn't connect to database\n");
+        cerr << "Couldn't connect to database\n";
         return -1;
     }
 
     QSqlDatabase *msdb = QSqlDatabase::addDatabase("QMYSQL3", "MSDB");
     if (!msdb)
     {
-        printf("Couldn't connect to database\n");
+        cerr << "Couldn't connect to database\n";
         return -1;
     }
 
@@ -382,7 +384,7 @@ int main(int argc, char **argv)
         !gContext->OpenDatabase(transthread) ||
         !gContext->OpenDatabase(msdb))
     {
-        printf("couldn't open db\n");
+        cerr << "Couldn't open database\n";
         return -1;
     }
 
@@ -477,8 +479,8 @@ int main(int argc, char **argv)
        nfsfd = open(lockfile_location.ascii(), O_WRONLY|O_CREAT|O_APPEND, 0664);
        if (nfsfd < 0) 
        {
-           perror("open"); 
-           cerr << "Unable to open lockfile \'" << lockfile_location << "\'!\n"
+           perror(lockfile_location.ascii()); 
+           cerr << "Unable to open lockfile!\n"
                 << "Be sure that \'" << gContext->GetSetting("RecordFilePrefix")
                 << "\' exists and that both \nthe directory and that "
                 << "file are writeble by this user.\n";
