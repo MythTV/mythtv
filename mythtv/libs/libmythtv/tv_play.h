@@ -137,6 +137,7 @@ class TV : public QObject
     void BrowseStart(void);
     void BrowseEnd(bool change);
     void BrowseDispInfo(int direction);
+    void BrowseToggleRecord(void);
 
     int osd_display_time;
 

@@ -802,6 +802,7 @@ void TV::ProcessKeypress(int keypressed)
             case wsRight: BrowseDispInfo(BROWSE_RIGHT); break;
             case wsEscape: BrowseEnd(false); break;
             case ' ': case wsEnter: case wsReturn: BrowseEnd(true); break;
+            case 'r': case 'R': BrowseToggleRecord(); break;
         }
         return;
     }
@@ -1270,7 +1271,7 @@ void TV::DoInfo(void)
         oset->Display(false);
 
         QMap<QString, QString> regexpMap;
-        playbackinfo->ToMap(regexpMap);
+        playbackinfo->ToMap(m_db, regexpMap);
         osd->SetTextByRegexp("program_info", regexpMap, osd_display_time);
     }
     else
@@ -1703,6 +1704,7 @@ void TV::GetNextProgram(RemoteEncoder *enc, int direction,
     regexpMap["endtime"] = endts.toString(tmFmt);
     regexpMap["enddate"] = endts.toString(dtFmt);
     regexpMap["channum"] = channum;
+    regexpMap["chanid"] = chanid;
     regexpMap["iconpath"] = iconpath;
 
     seconds = startts.secsTo(endts);
@@ -1758,6 +1760,7 @@ void TV::GetChannelInfo(RemoteEncoder *enc, QMap<QString, QString> &regexpMap)
     regexpMap["endtime"] = endts.toString(tmFmt);
     regexpMap["enddate"] = endts.toString(dtFmt);
     regexpMap["channum"] = channum;
+    regexpMap["chanid"] = chanid;
     regexpMap["iconpath"] = iconpath;
 
     seconds = startts.secsTo(endts);
@@ -2064,6 +2067,29 @@ void TV::BrowseDispInfo(int direction)
     browsechanid = regexpMap["chanid"];
     browsestarttime = regexpMap["dbstarttime"];
 
+    QDateTime startts = QDateTime::fromString(browsestarttime, Qt::ISODate);
+    ProgramInfo *program_info = ProgramInfo::GetProgramAtDateTime(
+                                      browsechanid, startts );
+    program_info->ToMap(m_db, regexpMap);
+
     osd->SetTextByRegexp("browse_info", regexpMap, -1);
+
+    delete program_info;
+}
+
+void TV::BrowseToggleRecord(void)
+{
+    QMap<QString, QString> regexpMap;
+    QDateTime startts = QDateTime::fromString(browsestarttime, Qt::ISODate);
+
+    ProgramInfo *program_info = ProgramInfo::GetProgramAtDateTime(
+                                      browsechanid, startts );
+    program_info->ToggleRecord(m_db);
+
+    program_info->ToMap(m_db, regexpMap);
+
+    osd->SetTextByRegexp("browse_info", regexpMap, -1);
+
+    delete program_info;
 }
 

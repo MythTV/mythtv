@@ -32,6 +32,7 @@ class ProgramInfo
     void ApplyRecordTimeChange(QSqlDatabase *db, 
                                const QDateTime &newstartts,
                                const QDateTime &newendts);
+    void ToggleRecord(QSqlDatabase *dB);
     ScheduledRecording* GetScheduledRecording(QSqlDatabase *db) {
         GetProgramRecordingStatus(db);
         return record;
@@ -46,7 +47,7 @@ class ProgramInfo
 
     void ToStringList(QStringList &list);
     void FromStringList(QStringList &list, int offset);
-    void ToMap(QMap<QString, QString> &progMap);
+    void ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap);
 
     void SetBookmark(long long pos, QSqlDatabase *db);
     long long GetBookmark(QSqlDatabase *db);

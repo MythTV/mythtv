@@ -346,6 +346,13 @@ void OSDTypeText::Draw(unsigned char *screenptr, int vid_width, int vid_height,
                     sprintf(word, "%d", timeleft);
                 }
             }
+
+            if ((!length) && (!strcmp(word, "\n")))
+            {
+                word = strtok(NULL, " ");
+                continue;
+            }
+
             m_font->CalcWidth(word, &textlength);
             if ((textlength + m_font->SpaceWidth() + length > maxlength) ||
                 (!strcmp(word, "\n")))

@@ -2009,7 +2009,7 @@ bool NuppelVideoPlayer::EnableEdit(void)
     dialogname = "";
 
     QMap<QString, QString> regexpMap;
-    m_playbackinfo->ToMap(regexpMap);
+    m_playbackinfo->ToMap(m_db, regexpMap);
     osd->SetTextByRegexp("editmode", regexpMap, -1);
 
     UpdateEditSlider();

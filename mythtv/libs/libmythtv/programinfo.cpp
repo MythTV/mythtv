@@ -173,12 +173,13 @@ void ProgramInfo::FromStringList(QStringList &list, int offset)
         channame = "";
 }
 
-void ProgramInfo::ToMap(QMap<QString, QString> &progMap)
+void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
 {
     QString tmFmt = gContext->GetSetting("TimeFormat");
     QString dtFmt = gContext->GetSetting("ShortDateFormat");
     QString length;
     int hours, minutes, seconds;
+    ScheduledRecording::RecordingType recordtype;
 
     progMap["title"] = title;
     progMap["subtitle"] = subtitle;
@@ -189,7 +190,8 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap)
     progMap["startdate"] = startts.toString(dtFmt);
     progMap["endtime"] = endts.toString(tmFmt);
     progMap["enddate"] = endts.toString(dtFmt);
-    progMap["channum"] = channame;
+    progMap["channum"] = chanstr;
+    progMap["chanid"] = chanid;
     progMap["iconpath"] = "";
 
     seconds = startts.secsTo(endts);
@@ -199,6 +201,41 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap)
     minutes = minutes % 60;
     length.sprintf("%d:%02d", hours, minutes);
     progMap["lentime"] = length;
+
+    recordtype = GetProgramRecordingStatus(db);
+    progMap["rec_str"] = "";
+    progMap["rec_type"] = "";
+    switch (recordtype) {
+    case ScheduledRecording::NotRecording:
+             progMap["rec_str"] = "Not Recording";
+             progMap["rec_type"] = "";
+             break;
+    case ScheduledRecording::SingleRecord:
+             progMap["rec_str"] = "Recording Once";
+             progMap["rec_type"] = "R";
+             break;
+    case ScheduledRecording::TimeslotRecord:
+             progMap["rec_str"] = "Timeslot Recording";
+             progMap["rec_type"] = "T";
+             break;
+    case ScheduledRecording::ChannelRecord:
+             progMap["rec_str"] = "Channel Recording";
+             progMap["rec_type"] = "C";
+             break;
+    case ScheduledRecording::AllRecord:
+             progMap["rec_str"] = "All Recording";
+             progMap["rec_type"] = "A";
+             break;
+    }
+
+    QSqlQuery query;
+    QString thequery;
+    thequery = QString("SELECT icon FROM channel WHERE chanid = %1")
+                       .arg(chanid);
+    query.exec(thequery);
+    if (query.isActive() && query.numRowsAffected() > 0)
+        if (query.next())
+            progMap["iconpath"] = query.value(0).toString();
 }
 
 int ProgramInfo::CalculateLength(void)
@@ -436,6 +473,28 @@ void ProgramInfo::ApplyRecordTimeChange(QSqlDatabase *db,
     }
 }
 
+void ProgramInfo::ToggleRecord(QSqlDatabase *db)
+{
+    ScheduledRecording::RecordingType curType = GetProgramRecordingStatus(db);
+
+    switch (curType) {
+    case ScheduledRecording::NotRecording:
+             ApplyRecordStateChange(db, ScheduledRecording::SingleRecord);
+             break;
+    case ScheduledRecording::SingleRecord:
+             ApplyRecordStateChange(db, ScheduledRecording::TimeslotRecord);
+             break;
+    case ScheduledRecording::TimeslotRecord:
+             ApplyRecordStateChange(db, ScheduledRecording::ChannelRecord);
+             break;
+    case ScheduledRecording::ChannelRecord:
+             ApplyRecordStateChange(db, ScheduledRecording::AllRecord);
+             break;
+    case ScheduledRecording::AllRecord:
+             ApplyRecordStateChange(db, ScheduledRecording::NotRecording);
+             break;
+    }
+}
 
 bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
 {

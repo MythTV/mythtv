@@ -63,6 +63,7 @@ LiveTV Browse Mode:
 - Up            browse program on channel above current listed channel/program.
 - Down          browse program on channel below current listed channel/program.
 - Enter/Space   change channel to channel of current listed program.
+- R/r           Toggle recording of current program (cycles through types)
 - ESC           Exit Browse mode.
 
 If you have two tuner cards:
