@@ -77,6 +77,8 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
     QSqlQuery query;
     QSqlQuery subquery;
 
+    QDateTime curTime = QDateTime::currentDateTime();
+
     thequery = "SELECT channum,starttime,endtime,title,subtitle,description "
                "FROM singlerecord;";
 
@@ -103,7 +105,10 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
             if (proginfo->description == QString::null)
                 proginfo->description = "";
 
-            recordingList.push_back(proginfo);
+            if (proginfo->startts < curTime)
+                delete proginfo;
+            else 
+                recordingList.push_back(proginfo);
         }
     }
 
@@ -269,23 +274,6 @@ void Scheduler::RemoveFirstRecording(void)
         return;
 
     ProgramInfo *rec = recordingList.front();
-
-    if (rec->recordtype == 1)
-    {
-        QString starts = rec->startts.toString("yyyyMMddhhmm");
-        QString ends = rec->endts.toString("yyyyMMddhhmm");
-   
-        starts += "00";
-        ends += "00";
- 
-        QSqlQuery query;                                          
-        QString thequery;
-        thequery = QString("DELETE FROM singlerecord WHERE channum = %s AND "
-                           "starttime = %s AND endtime = %s;").arg(rec->channum)
-                           .arg(starts).arg(ends);
-
-        query = db->exec(thequery);
-    }
 
     delete rec;
     recordingList.pop_front();

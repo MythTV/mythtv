@@ -339,5 +339,15 @@ void ProgramInfo::WriteRecordedToDB(QSqlDatabase *db)
     {
         printf("couldn't insert recording into db\n");
     }
+
+    if (recordtype == 1)
+    {
+        query = QString("DELETE FROM singlerecord WHERE channum = %s AND "
+                           "starttime = %s AND endtime = %s;").arg(channum)
+                           .arg(starts).arg(ends);
+
+        qquery = db->exec(query);
+    }
+
 }
 
