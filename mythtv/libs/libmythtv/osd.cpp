@@ -586,6 +586,9 @@ void OSD::Display(unsigned char *yuvptr)
         if (pausemovementperframe == 0)
             hidingpause = false;
 
+        if (fadingframes > 0)
+            fadingframes -= 2;
+
         pauseyoffset = CalcNewOffset(pausebackground, pauseyoffset);
         if (pauseyoffset < 0)
             hidingpause = false;
