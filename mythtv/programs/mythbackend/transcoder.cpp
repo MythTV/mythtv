@@ -252,6 +252,8 @@ struct TranscodeData *Transcoder::CheckTranscodeTable(bool skipPartial)
                 filename += ".tmp";
                 VERBOSE(VB_GENERAL, QString("Deleting %1").arg(filename));
                 unlink(filename);
+                filename += ".map";
+                unlink(filename);
                 DeleteTranscode(pinfo);
             }
             else if ((!skipPartial && status != TRANSCODE_FINISHED) ||
@@ -261,6 +263,8 @@ struct TranscodeData *Transcoder::CheckTranscodeTable(bool skipPartial)
                 QString filename = pinfo->GetRecordFilename(fileprefix);
                 filename += ".tmp";
                 VERBOSE(VB_GENERAL, QString("Deleting %1").arg(filename));
+                unlink(filename);
+                filename += ".map";
                 unlink(filename);
                 UpdateTranscoder(pinfo, TRANSCODE_QUEUED |
                                         (flags & TRANSCODE_USE_CUTLIST));
@@ -304,6 +308,12 @@ struct TranscodeData *Transcoder::CheckTranscodeTable(bool skipPartial)
                                         .arg(MARK_KEYFRAME);
                         db_conn->exec(query);
                     }
+                    QString mapfile = tmpfile + ".map";
+                    if (QFile::exists(mapfile))
+                    {
+                        importMapFile(pinfo, mapfile);
+                        unlink(mapfile);
+                    }
                 }
             }
             else if (status == TRANSCODE_FAILED)
@@ -341,6 +351,44 @@ bool Transcoder::isFileInUse(ProgramInfo *pginfo)
             return true;
     }
     return false;
+}
+
+void Transcoder::importMapFile(ProgramInfo *pinfo, QString mapfile)
+{
+    QMap <long long, long long> posMap;
+    QFile file(mapfile);
+    if (! file.open( IO_ReadOnly ) )
+    {
+        // Do Some error checking here
+        unlink(mapfile);
+        return;
+    }
+    QTextStream stream( &file );
+
+    int type;
+    bool done = false;
+    while (!done && !stream.atEnd())
+    {
+        QString line = stream.readLine(); // line of text excluding '\n'
+        QStringList linelist = QStringList::split(" ", line);
+        if (linelist.isEmpty() || linelist.count() != 2 ||
+            linelist.first() != QString("Type:"))
+            continue;
+        type = linelist.last().toInt();
+        done = true;
+    }
+    if (! done)
+        return;
+    while (!stream.atEnd())
+    {
+        QString line = stream.readLine(); // line of text excluding '\n'
+        QStringList linelist = QStringList::split(" ", line);
+        if (linelist.isEmpty() || linelist.count() != 2)
+            continue;
+        posMap[linelist.first().toLongLong()] = linelist.last().toLongLong();
+    }
+    file.close();
+    pinfo->SetPositionMap(posMap, type, db_conn);
 }
 
 void Transcoder::TranscodePoll()

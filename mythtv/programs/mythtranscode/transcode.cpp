@@ -273,6 +273,9 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
         if (!GetProfile(profileName, encodingType)) {
             return REENCODE_ERROR;
         }
+        vidsetting = profile.byName("videocodec")->getValue();
+        if (vidsetting == "MPEG-2")
+            return REENCODE_MPEG2TRANS;
         // Recorder setup
         nvr->SetFrameRate(video_frame_rate);
 
@@ -284,7 +287,6 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
         nvr->SetOption("tvformat", gContext->GetSetting("TVFormat"));
         nvr->SetOption("vbiformat", gContext->GetSetting("VbiFormat"));
 
-        vidsetting = profile.byName("videocodec")->getValue();
         if (vidsetting == "MPEG-4")
         {
             nvr->SetOption("codec", "mpeg4");

@@ -101,7 +101,7 @@ static int put_pack_header(AVFormatContext *ctx,
     if (s->is_mpeg2) {
         /* clock extension */
         put_bits(&pb, 9, 0);
-        put_bits(&pb, 1, 1);
+//        put_bits(&pb, 1, 1);
     }
     put_bits(&pb, 1, 1);
     put_bits(&pb, 22, s->mux_rate);
@@ -528,7 +528,7 @@ static void compute_pts_dts(AVStream *st, int64_t *ppts, int64_t *pdts,
                 pts = timestamp + (st->codec.max_b_frames + 1) * frame_delay;
             }
         }
-#if 1
+#if 0
         printf("pts=%0.3f dts=%0.3f pict_type=%c\n", 
                pts / 90000.0, dts / 90000.0, 
                av_get_pict_type_char(st->codec.coded_frame->pict_type));

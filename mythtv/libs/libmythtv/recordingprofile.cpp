@@ -506,6 +506,18 @@ public:
 
         addTarget("MPEG-4", params);
 
+        // We'll eventually want to add MPEG2 software encoding params here
+        params = new VerticalConfigurationGroup(false);
+        params->setLabel(QObject::tr("MPEG-4 Parameters"));
+        params->addChild(new MPEG4bitrate(parent));
+        params->addChild(new MPEG4MaxQuality(parent));
+        params->addChild(new MPEG4MinQuality(parent));
+        params->addChild(new MPEG4QualDiff(parent));
+        params->addChild(new MPEG4ScaleBitrate(parent));
+        params->addChild(new MPEG4OptionVHQ(parent));
+        params->addChild(new MPEG4Option4MV(parent));
+        addTarget("MPEG-2", params);
+
         params = new VerticalConfigurationGroup();
         params->setLabel(QObject::tr("Hardware MJPEG Parameters"));
         params->addChild(new HardwareMJPEGQuality(parent));

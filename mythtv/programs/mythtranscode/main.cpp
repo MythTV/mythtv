@@ -14,11 +14,14 @@ using namespace std;
 #include "programinfo.h"
 #include "mythcontext.h"
 #include "transcode.h"
+#include "mpeg2trans.h"
 
 MythContext *gContext;
 QSqlDatabase *db;
 
 void StoreTranscodeState(ProgramInfo *pginfo, int status, bool useCutlist);
+void UpdatePositionMap(QMap <long long, long long> &posMap, QString mapfile,
+                       ProgramInfo *pginfo);
 
 void usage(char *progname) 
 {
@@ -28,6 +31,7 @@ void usage(char *progname)
     cerr << "\t--chanid       or -c: Takes a channel id. REQUIRED\n";
     cerr << "\t--starttime    or -s: Takes a starttime for the\n";
     cerr << "\t\trecording. REQUIRED\n";
+    cerr << "\t--infile       or -i: Input file (Alternative to -c and -s)\n";
     cerr << "\t--profile      or -p: Takes a profile number of 'autodetect'\n";
     cerr << "\t\trecording profile. REQUIRED\n";
     cerr << "\t--honorcutlist or -l: Specifies whether to use the cutlist.\n";
@@ -38,16 +42,20 @@ void usage(char *progname)
     cerr << "\t\tIf --fifodir is specified, 'audout' and 'vidout'\n";
     cerr << "\t\twill be created in the specified directory\n";
     cerr << "\t--fifosync          : Enforce fifo sync\n";
+    cerr << "\t--buildindex   or -b: Build a new keyframe index\n";
     cerr << "\t\t(use only if audio and video fifos are read independantly)\n";
     cerr << "\t--help         or -h: Prints this help statement.\n";
 }
 
 int main(int argc, char *argv[])
 {
-    QString chanid, starttime, profilename;
+    QString chanid, starttime, infile;
+    QString profilename = QString("autodetect");
     QString fifodir = NULL;
     bool useCutlist = false, keyframesonly = false, use_db = false;
-    bool fifosync = false;
+    bool build_index = false, fifosync = false;
+    QMap<long long, int> deleteMap;
+    QMap<long long, long long> posMap;
     srand(time(NULL));
 
     QApplication a(argc, argv, false);
@@ -57,7 +65,7 @@ int main(int argc, char *argv[])
 
     int found_starttime = 0;
     int found_chanid = 0;
-    int found_profile = 0;
+    int found_infile = 0;
 
     for (int argpos = 1; argpos < a.argc(); ++argpos)
     {
@@ -93,13 +101,28 @@ int main(int argc, char *argv[])
                 return -1;
             }
         } 
+        else if (!strcmp(a.argv()[argpos],"-i") ||
+                 !strcmp(a.argv()[argpos],"--infile")) 
+        {
+            if (a.argc() > argpos) 
+            {
+                infile = a.argv()[argpos + 1];
+                found_infile = 1;
+                ++argpos;
+            } 
+            else 
+            {
+                cerr << "Missing argument to -i/--infile option\n";
+                usage(a.argv()[0]);
+                return -1;
+            }
+        } 
         else if (!strcmp(a.argv()[argpos],"-p") ||
                  !strcmp(a.argv()[argpos],"--profile")) 
         {
             if (a.argc() > argpos) 
             {
                 profilename = a.argv()[argpos + 1];
-                found_profile = 1;
                 ++argpos;
             } 
             else 
@@ -113,6 +136,24 @@ int main(int argc, char *argv[])
                  !strcmp(a.argv()[argpos],"--honorcutlist")) 
         {
             useCutlist = true;
+            if (found_infile)
+            {
+                QStringList cutlist;
+                cutlist = QStringList::split( " ", a.argv()[argpos + 1]);
+                for (QStringList::Iterator it = cutlist.begin(); 
+                     it != cutlist.end(); ++it )
+                {
+                    QStringList startend;
+                    startend = QStringList::split("-", *it);
+                    if (startend.count() == 2)
+                    {
+                        cerr << "Cutting from: " << startend.first().toInt()
+                             << " to: " << startend.last().toInt() <<"\n";
+                        deleteMap[startend.first().toInt()] = 1;
+                        deleteMap[startend.last().toInt()] = 0;
+                    }
+                }
+            }
         }
         else if (!strcmp(a.argv()[argpos],"-k") ||
                  !strcmp(a.argv()[argpos],"--allkeys")) 
@@ -123,6 +164,11 @@ int main(int argc, char *argv[])
                  !strcmp(a.argv()[argpos],"--database"))
         {
             use_db = true;
+        }
+        else if (!strcmp(a.argv()[argpos],"-b") ||
+                 !strcmp(a.argv()[argpos],"--buildindex"))
+        {
+            build_index = true;
         }
         else if (!strcmp(a.argv()[argpos],"-f") ||
                  !strcmp(a.argv()[argpos],"--fifodir"))
@@ -151,9 +197,20 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (!found_profile || !found_chanid || !found_starttime) 
+    if ((! found_infile && !(found_chanid && found_starttime)) ||
+        (found_infile && (found_chanid || found_starttime)) ) 
     {
-         cerr << "Must specify -p, -c, and -s options!\n";
+         cerr << "Must specify -i OR -c AND -s options!\n";
+         return -1;
+    }
+    if (found_infile && (use_db || build_index))
+    {
+         cerr << "Can't specify --database or --buildindex with --infile\n";
+         return -1;
+    }
+    if (use_db and build_index)
+    {
+         cerr << "Can't specify both --database and --buildindex\n";
          return -1;
     }
     if (keyframesonly && fifodir != NULL)
@@ -182,21 +239,34 @@ int main(int argc, char *argv[])
 
     MythContext::KickDatabase(db);
 
-    QDateTime startts = QDateTime::fromString(starttime, Qt::ISODate);
-    ProgramInfo *pginfo = ProgramInfo::GetProgramFromRecorded(db, chanid, startts);
-
-    if (!pginfo)
+    ProgramInfo *pginfo = NULL;
+    if (!found_infile)
     {
-        cerr << "Couldn't find recording " << chanid << " " << startts.toString() << endl;
-        return -1;
-    }
+        QDateTime startts = QDateTime::fromString(starttime, Qt::ISODate);
+        pginfo = ProgramInfo::GetProgramFromRecorded(db, chanid, startts);
 
-    QString fileprefix = gContext->GetFilePrefix();
-    QString infile = pginfo->GetRecordFilename(fileprefix);
+        if (!pginfo)
+        {
+            cerr << "Couldn't find recording " << chanid << " " 
+                 << startts.toString() << endl;
+            return -1;
+        }
+
+        QString fileprefix = gContext->GetFilePrefix();
+        infile = pginfo->GetRecordFilename(fileprefix);
+    }
     QString tmpfile = infile + ".tmp";
 
     if (use_db) 
         StoreTranscodeState(pginfo, TRANSCODE_STARTED, useCutlist);
+    if (found_infile)
+    {
+        MPEG2trans *mpeg2trans = new MPEG2trans(&deleteMap);
+        mpeg2trans->DoTranscode(infile, tmpfile);
+        mpeg2trans->BuildKeyframeIndex(tmpfile, posMap);
+        UpdatePositionMap(posMap, tmpfile + ".map", NULL);
+        exit(0);
+    }
     Transcode *transcode = new Transcode(db, pginfo);
 
     VERBOSE(VB_GENERAL, QString("Transcoding from %1 to %2")
@@ -209,6 +279,26 @@ int main(int argc, char *argv[])
                                    (fifosync || keyframesonly), use_db,
                                    fifodir);
     int retval;
+    if (result == REENCODE_MPEG2TRANS)
+    {
+        if (useCutlist)
+            pginfo->GetCutList(deleteMap, db);
+        MPEG2trans *mpeg2trans = new MPEG2trans(&deleteMap);
+        if (build_index)
+        {
+            mpeg2trans->BuildKeyframeIndex(infile, posMap);
+            UpdatePositionMap(posMap, NULL, pginfo);
+        }
+        else
+        {
+            mpeg2trans->DoTranscode(infile, tmpfile);
+            mpeg2trans->BuildKeyframeIndex(tmpfile, posMap);
+            UpdatePositionMap(posMap, tmpfile + ".map", NULL);
+        }
+        // this is a hack, since the mpeg2 transcoder doesn't return anything
+        // useful yet.
+        result = REENCODE_OK;
+    }
     if (result == REENCODE_OK)
     {
         if (use_db)
@@ -282,3 +372,20 @@ void StoreTranscodeState(ProgramInfo *pginfo, int status, bool useCutlist)
     db->exec(query);
 }
 
+void UpdatePositionMap(QMap <long long, long long> &posMap, QString mapfile,
+                       ProgramInfo *pginfo)
+{
+    if (pginfo)
+    {
+        pginfo->SetPositionMap(posMap, MARK_GOP_BYFRAME, db);
+    }
+    else if (mapfile)
+    {
+        FILE *mapfh = fopen(mapfile, "w");
+        QMap<long long, long long>::Iterator i;
+        fprintf (mapfh, "Type: %d\n", MARK_GOP_BYFRAME);
+        for (i = posMap.begin(); i != posMap.end(); ++i)
+            fprintf(mapfh, "%lld %lld\n", i.key(), i.data());
+        fclose(mapfh);
+    }
+}

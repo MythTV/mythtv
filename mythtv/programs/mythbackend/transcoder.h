@@ -38,6 +38,7 @@ class Transcoder : public QObject
     void StopTranscoder(ProgramInfo *pinfo);
     void DeleteTranscode(ProgramInfo *pinfo);
     void CheckDoneTranscoders(void);
+    void importMapFile(ProgramInfo *pinfo, QString mapfile);
     bool isFileInUse(ProgramInfo *pginfo);
 
     bool transcodePoll;

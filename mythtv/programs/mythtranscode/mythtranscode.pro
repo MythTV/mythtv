@@ -1,4 +1,5 @@
-INCLUDEPATH += ../../libs/ ../../libs/libmyth ../../libs/libmythtv
+INCLUDEPATH += ../../libs/ ../../libs/libmyth ../../libs/libmythtv \
+               ../../libs/libavcodec ../../libs/libavformat
 
 LIBS += -L../../libs/libmyth -L../../libs/libmythtv -L../../libs/libavcodec
 LIBS += -L../../libs/libavformat
@@ -17,4 +18,4 @@ LIBS += -lmythtv-$$LIBVERSION -lmythavformat-$$LIBVERSION
 LIBS += -lmythavcodec-$$LIBVERSION -lmyth-$$LIBVERSION $$EXTRA_LIBS
 
 # Input
-SOURCES += main.cpp transcode.cpp
+SOURCES += main.cpp transcode.cpp mpeg2trans.cpp

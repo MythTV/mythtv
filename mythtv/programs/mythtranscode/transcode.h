@@ -8,6 +8,7 @@
 #include "fifowriter.h"
 #include "programinfo.h"
 
+#define REENCODE_MPEG2TRANS      2
 #define REENCODE_OK              1
 #define REENCODE_CUTLIST_CHANGE -1
 #define REENCODE_ERROR           0
