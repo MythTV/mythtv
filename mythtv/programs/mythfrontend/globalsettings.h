@@ -299,6 +299,28 @@ public:
     };
 };
 
+class AllowQuitShutdown: public ComboBoxSetting, public GlobalSetting {
+public:
+    AllowQuitShutdown():
+        GlobalSetting("AllowQuitShutdown") {
+        setLabel("System shutdown");
+        addSelection("No", "0");
+        addSelection("Control", "1");
+        addSelection("Meta", "2");
+        addSelection("Alt", "3");
+        addSelection("No modifier", "4");
+    };
+};
+
+class HaltCommand: public LineEditSetting, public GlobalSetting {
+public:
+    HaltCommand():
+        GlobalSetting("HaltCommand") {
+        setLabel("Halt command");
+        setValue("halt");
+    };
+};
+
 // Theme settings
 
 class ThemeSelector: public ImageSelectSetting, public GlobalSetting {
@@ -508,6 +530,8 @@ public:
     };
 };
 
+// PIP settings
+
 class PIPBufferSize: public SpinBoxSetting, public GlobalSetting {
 public:
     PIPBufferSize():
@@ -599,6 +623,9 @@ public:
 
         addChild(new UnknownTitle());
         addChild(new UnknownCategory());
+
+        addChild(new AllowQuitShutdown());
+        addChild(new HaltCommand());
     };
 };
 
