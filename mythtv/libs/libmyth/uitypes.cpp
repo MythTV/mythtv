@@ -113,6 +113,7 @@ UIListType::UIListType(const QString &name, QRect area, int dorder, UIFontPairTy
     m_text = text;
     m_order = dorder;
     m_active = false;
+    m_columns = 0;
     m_current = -1;
     m_count = 0;
     m_justification = 0;
