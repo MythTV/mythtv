@@ -10,6 +10,9 @@ include ( ../../settings.pro )
 
 INCLUDEPATH += ../
 
+QMAKE_CXXFLAGS_RELEASE += `freetype-config --cflags`
+QMAKE_CXXFLAGS_DEBUG += `freetype-config --cflags`
+
 # Input
 HEADERS += effects.h filter.h format.h frame.h jitterometer.h lzoconf.h 
 HEADERS += minilzo.h mmx.h NuppelVideoPlayer.h NuppelVideoRecorder.h osd.h 

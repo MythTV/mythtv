@@ -156,9 +156,8 @@ OSD::OSD(int width, int height, const QString &filename, const QString &prefix,
     enableosd = true;
 
     int mwidth, twidth;
-    Efont_extents(info_font, "M M", NULL, NULL, &twidth, NULL, NULL, NULL, 
-                  NULL);
-    Efont_extents(info_font, "M", NULL, NULL, &mwidth, NULL, NULL, NULL, NULL);
+    info_font->CalcWidth("M M", &twidth); 
+    info_font->CalcWidth("M", &mwidth);
 
     space_width = twidth - (mwidth * 2);
 }
@@ -166,11 +165,11 @@ OSD::OSD(int width, int height, const QString &filename, const QString &prefix,
 OSD::~OSD(void)
 {
     if (info_font)
-        Efont_free(info_font);
+        delete info_font;
     if (channum_font)
-        Efont_free(channum_font);
+        delete channum_font;
     if (pausesliderfont)
-        Efont_free(pausesliderfont);
+        delete pausesliderfont;
     if (infobackground)
         delete infobackground;
     if (infoicon)
@@ -231,38 +230,45 @@ QString OSD::FindTheme(QString name)
     return "";
 }
 
-Efont *OSD::LoadFont(QString name, int size)
+TTFFont *OSD::LoadFont(QString name, int size)
 {
     char *home = getenv("HOME");
     QString fullname = QString(home) + "/.mythtv/" + name;
-    Efont *font = Efont_load((char *)fullname.ascii(), size, vid_width,
-                             vid_height);
+    TTFFont *font = new TTFFont((char *)fullname.ascii(), size, vid_width,
+                                vid_height);
 
-    if (font)
+    if (font->isValid())
         return font;
 
+    delete font;
     fullname = fontprefix + "/share/mythtv/" + name;
 
-    font = Efont_load((char *)fullname.ascii(), size, vid_width,
+    font = new TTFFont((char *)fullname.ascii(), size, vid_width,
                        vid_height);
 
-    if (font)
+    if (font->isValid())
         return font;
 
+    delete font;
     if (themepath != "")
     {
         fullname = themepath + "/" + name;
-        font = Efont_load((char *)fullname.ascii(), size, vid_width,
-                          vid_height);
-        if (font)
+        font = new TTFFont((char *)fullname.ascii(), size, vid_width,
+                           vid_height);
+        if (font->isValid())
             return font;
     }
 
-    fullname = name;
-    font = Efont_load((char *)fullname.ascii(), size,
-                           vid_width, vid_height);
+    delete font;
 
-    return font;
+    fullname = name;
+    font = new TTFFont((char *)fullname.ascii(), size, vid_width, vid_height);
+
+    if (font->isValid())
+        return font;
+    
+    delete font;
+    return NULL;
 }
 
 bool OSD::LoadTheme(void)
@@ -731,11 +737,10 @@ void OSD::DisplayPause(unsigned char *yuvptr)
 }
 
 void OSD::DrawStringCentered(unsigned char *yuvptr, QRect rect,
-                             const QString &text, Efont *font)
+                             const QString &text, TTFFont *font)
 {
     int textlength = 0;
-    Efont_extents(info_font, text, NULL, NULL, &textlength, NULL, NULL, NULL,
-                  NULL);
+    font->CalcWidth(text, &textlength);
 
     int xoffset = (rect.width() - textlength) / 2;
 
@@ -746,7 +751,7 @@ void OSD::DrawStringCentered(unsigned char *yuvptr, QRect rect,
 }
 
 void OSD::DrawStringWithOutline(unsigned char *yuvptr, QRect rect, 
-                                const QString &text, Efont *font,
+                                const QString &text, TTFFont *font,
                                 bool rightjustify)
 {
     int x = rect.left();
@@ -754,27 +759,26 @@ void OSD::DrawStringWithOutline(unsigned char *yuvptr, QRect rect,
     int maxx = rect.right();
     int maxy = rect.bottom();
 
-    EFont_draw_string(yuvptr, x - 1, y - 1, text, font, maxx, maxy, false,
+    font->DrawString(yuvptr, x - 1, y - 1, text, maxx, maxy, false,
+                     rightjustify);
+
+    font->DrawString(yuvptr, x + 1, y - 1, text, maxx, maxy, false,
+                     rightjustify);
+
+    font->DrawString(yuvptr, x - 1, y + 1, text, maxx, maxy, false,
                       rightjustify);
 
-    EFont_draw_string(yuvptr, x + 1, y - 1, text, font, maxx, maxy, false,
+    font->DrawString(yuvptr, x + 1, y + 1, text, maxx, maxy, false,
                       rightjustify);
 
-    EFont_draw_string(yuvptr, x - 1, y + 1, text, font, maxx, maxy, false,
-                      rightjustify);
-
-    EFont_draw_string(yuvptr, x + 1, y + 1, text, font, maxx, maxy, false,
-                      rightjustify);
-
-    EFont_draw_string(yuvptr, x, y, text, font, maxx, maxy, true, rightjustify);
+    font->DrawString(yuvptr, x, y, text, maxx, maxy, true, rightjustify);
 }    
 
 void OSD::DrawStringIntoBox(QRect rect, const QString &text, 
                             unsigned char *screen)
 {
     int textlength = 0;
-    Efont_extents(info_font, text, NULL, NULL, &textlength, NULL, NULL, NULL,
-                  NULL);
+    info_font->CalcWidth(text, &textlength);
 
     rect.setLeft(rect.left() + 5);
     rect.setRight(rect.right() - 5);
@@ -806,8 +810,7 @@ void OSD::DrawStringIntoBox(QRect rect, const QString &text,
                     sprintf(word, "%d", timeleft);
                 }
             }
-            Efont_extents(info_font, word, NULL, NULL, &textlength,
-                          NULL, NULL, NULL, NULL);
+            info_font->CalcWidth(word, &textlength);
             if (textlength + space_width + length > maxlength)
             {
                 QRect drawrect = rect;

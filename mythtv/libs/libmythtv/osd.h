@@ -1,7 +1,6 @@
 #ifndef OSD_H
 #define OSD_H
 
-#include "ttfont.h"
 #include <qstring.h>
 #include <qrect.h>
 #include <qpoint.h>
@@ -10,7 +9,8 @@
 
 class QImage;
 class OSDImage;
-    
+class TTFFont;
+ 
 class OSD
 {
  public:
@@ -48,7 +48,7 @@ class OSD
   
  private:
     void SetNoThemeDefaults();
-    Efont *LoadFont(QString name, int size); 
+    TTFFont *LoadFont(QString name, int size); 
     QString FindTheme(QString name);
    
     bool LoadTheme();
@@ -61,10 +61,10 @@ class OSD
                            unsigned char *screen);
 
     void DrawStringCentered(unsigned char *yuvptr, QRect rect,
-                            const QString &text, Efont *font);
+                            const QString &text, TTFFont *font);
 
     void DrawStringWithOutline(unsigned char *yuvptr, QRect rect, 
-                               const QString &text, Efont *font,
+                               const QString &text, TTFFont *font,
                                bool rightjustify = false);
 
     void DrawRectangle(QRect &rect, unsigned char *screen);
@@ -89,7 +89,7 @@ class OSD
     QString infotext;
     QString subtitletext;
     QString desctext;
-    Efont *info_font;
+    TTFFont *info_font;
     int infofontsize;
     OSDImage *infobackground;
  
@@ -102,7 +102,7 @@ class OSD
     QRect channumRect; 
     QString channumtext;
     bool show_channum;
-    Efont *channum_font;
+    TTFFont *channum_font;
     int channumfontsize;
 
     int displayframes;
@@ -139,7 +139,7 @@ class OSD
     QRect pausesliderRect;
     QString pausestatus;
     int pausesliderfontsize;
-    Efont *pausesliderfont;
+    TTFFont *pausesliderfont;
     int pauseyoffset;
     int pausemovementperframe;
     bool hidingpause;
