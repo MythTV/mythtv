@@ -82,7 +82,8 @@ class MythMainWindow : public QGLWidget
     void keyPressEvent(QKeyEvent *e);
     void customEvent(QCustomEvent *ce);
     void closeEvent(QCloseEvent *e);
-
+    void paintEvent(QPaintEvent *e);
+    
     void ExitToMainMenu();
 
     QObject *getTarget(QKeyEvent &key);
@@ -90,6 +91,8 @@ class MythMainWindow : public QGLWidget
     MythMainWindowPrivate *d;
 
     bool m_bAllowInput;
+    
+    QRegion m_repaint_region;
 };
 
 MythMainWindow *GetMythMainWindow();

@@ -118,6 +118,7 @@ class MythMainWindowPrivate
     MythPainter *painter;
 
     bool AllowInput;
+
 };
 
 // Make keynum in QKeyEvent be equivalent to what's in QKeySequence
@@ -175,6 +176,7 @@ MythMainWindow::MythMainWindow()
     d->AllowInput = false;
 
     d->painter = new MythOpenGLPainter();
+    //d->painter = new MythQtPainter();
 
     Init();
 
@@ -234,6 +236,8 @@ MythMainWindow::MythMainWindow()
     d->drawTimer->start(1000 / 70);
 
     d->AllowInput = true;
+
+    m_repaint_region = QRegion(QRect(0,0,0,0));
 }
 
 MythMainWindow::~MythMainWindow()
@@ -270,50 +274,72 @@ void MythMainWindow::drawTimeout(void)
 {
     bool redraw = false;
 
+    if(!m_repaint_region.isEmpty())
+    {
+        redraw = true;
+    }
+    
     QValueVector<MythScreenStack *>::Iterator it;
     for (it = d->stackList.begin(); it != d->stackList.end(); ++it)
     {
-         QValueVector<MythScreenType *> drawList;
-         (*it)->GetDrawOrder(drawList);
+    
+        //
+        //  Shouldn't we be pushing down the redraw region here (ie. the
+        //  thing passed to us by Qt/Window events that said "this region
+        //  needs to be redrawn")?
+        //
 
-         QValueVector<MythScreenType *>::Iterator screenit;
-         for (screenit = drawList.begin(); screenit != drawList.end();
-              ++screenit)
-         {
-             (*screenit)->Pulse();
-         }
+        QValueVector<MythScreenType *> drawList;
+        (*it)->GetDrawOrder(drawList);
+
+        QValueVector<MythScreenType *>::Iterator screenit;
+        for (screenit = drawList.begin(); screenit != drawList.end();
+             ++screenit)
+        {
+            (*screenit)->Pulse();
+        }
 
          // Should we care if non-top level screens need redrawing?
-         MythScreenType *top = (*it)->GetTopScreen();
-         if (top && top->NeedsRedraw())
-             redraw = true;
+         // Good Question
+        MythScreenType *top = (*it)->GetTopScreen();
+        if (top && top->NeedsRedraw())
+            redraw = true;
     }
 
     if (!redraw)
+    {
         return;
+    }
 
     d->painter->Begin(this);
 
     for (it = d->stackList.begin(); it != d->stackList.end(); ++it)
     {
-         QValueVector<MythScreenType *> redrawList;
-         (*it)->GetDrawOrder(redrawList);
+        QValueVector<MythScreenType *> redrawList;
+        (*it)->GetDrawOrder(redrawList);
 
-         QValueVector<MythScreenType *>::Iterator screenit;
-         for (screenit = redrawList.begin(); screenit != redrawList.end(); 
-              ++screenit)
-         {
-             (*screenit)->Draw(d->painter, 0, 0);
-         }
+        QValueVector<MythScreenType *>::Iterator screenit;
+        for (screenit = redrawList.begin(); screenit != redrawList.end(); 
+             ++screenit)
+        {
+            (*screenit)->Draw(d->painter, 0, 0);
+        }
     }
 
     d->painter->End();
+    
+    m_repaint_region = QRegion(QRect(0,0,0,0));
 }
 
 void MythMainWindow::closeEvent(QCloseEvent *e)
 {
     (void)e;
     qApp->quit();
+}
+
+void MythMainWindow::paintEvent(QPaintEvent *pe)
+{
+    m_repaint_region = m_repaint_region.unite(pe->region());
 }
 
 void MythMainWindow::Init(void)
