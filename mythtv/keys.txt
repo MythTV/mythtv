@@ -156,7 +156,7 @@ EPG
   a recording.
   -  If you select "Record this showing" while watching Live TV you can
      "Instant Record" a program.
-- Space and Enter will allow you resolve conflicts or change overrides.
+- Space or Enter will allow you resolve conflicts or change overrides.
   If the program is not already scheduled to record, it will act like 
   pressing I instead.
 - Pressing M when on a channel will change to that channel.
@@ -216,7 +216,7 @@ In the Watch Recordings Screen
 Watch Recordings Screen
 -----------------------
 
-- F1 to get a popup on the meaning of the icons
+- "1" or F1 to get a popup on the meaning of the icons
 
 Remote Controls
 ---------------
