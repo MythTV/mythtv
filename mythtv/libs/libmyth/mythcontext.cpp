@@ -1242,7 +1242,7 @@ void MythContext::DBError(const QString &where, const QSqlQuery& query)
          << query.executedQuery() << endl
          << DBErrorMessage(query.lastError()) << endl;
 #else
-    cerr << "Query was:" << endl;
+    cerr << "Query was:" << endl
          << query.lastQuery() << endl
          << DBErrorMessage(query.lastError()) << endl;
 #endif
