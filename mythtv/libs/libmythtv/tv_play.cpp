@@ -142,6 +142,7 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "SKIPCOMMERCIAL", "Skip Commercial", "Z,End");
     REG_KEY("TV Playback", "SKIPCOMMBACK", "Skip Commercial (Reverse)",
             "Q,Home");
+    REG_KEY("TV Playback", "JUMPSTART", "Jump to the start of the recording.", "Ctrl+B");            
     REG_KEY("TV Playback", "TOGGLEBROWSE", "Toggle channel browse mode", "O");
     REG_KEY("TV Playback", "TOGGLERECORD", "Toggle recording status of current "
             "program", "R");
@@ -178,8 +179,7 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "GUIDE", "Show the Program Guide", "S");
     REG_KEY("TV Playback", "TOGGLESLEEP", "Toggle the Sleep Timer", "F8");
     REG_KEY("TV Playback", "PLAY", "Play", "");
-
-
+    
     REG_KEY("TV Editing", "CLEARMAP", "Clear editing cut points", "C,Q,Home");
     REG_KEY("TV Editing", "LOADCOMMSKIP", "Load cut list from commercial skips",
             "Z,End");
@@ -525,7 +525,7 @@ int TV::PlayFromRecorder(int recordernum)
 
     if (recorder)
     {
-        cerr << "PlayFromRecorder : recorder already exists!";
+        cerr << "PlayFromRecorder (" << recordernum << ") : recorder already exists!";
         return -1;
     }
 
@@ -1577,6 +1577,10 @@ void TV::ProcessKeypress(QKeyEvent *e)
             DoSeek(-jumptime * 60, tr("Jump Back"));
         else if (action == "JUMPFFWD")
             DoSeek(jumptime * 60, tr("Jump Ahead"));
+        else if (action == "JUMPSTART" && activenvp)
+        {
+            DoSeek(-activenvp->GetFramesPlayed(), tr("Jump to Begining"));
+        }
         else if (action == "ESCAPE")
         {
             if (osd)

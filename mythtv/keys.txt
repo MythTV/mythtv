@@ -55,6 +55,7 @@ Watching TV or a recording
 - Left (if a jump amount is entered) to jump back that amount.
 - Right (if a jump amount is entered) to jump ahead that amount.
 - F8 to toggle the sleep timer 30m->1hr->1hr30m->2hr->Off
+- Ctrl+B to jump to the begining of the recording / ringbuffer.
 
 Without the stickykeys option selected:
 
