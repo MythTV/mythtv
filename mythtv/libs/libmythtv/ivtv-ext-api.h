@@ -1,7 +1,12 @@
 #define IVTV_IOC_FWAPI          0xFFEE7701 /*just some values i picked for now*/
 #define IVTV_IOC_ZCOUNT         0xFFEE7702 
+#ifdef __FreeBSD__
+#define IVTV_IOC_G_CODEC        _IOR  ('V', 73, struct ivtv_ioctl_codec)
+#define IVTV_IOC_S_CODEC        _IOWR ('V', 74, struct ivtv_ioctl_codec)
+#else
 #define IVTV_IOC_G_CODEC        0xFFEE7703
 #define IVTV_IOC_S_CODEC        0xFFEE7704
+#endif
 
 #define IVTV_MBOX_MAX_DATA 16
 
