@@ -469,7 +469,7 @@ int av_find_stream_info(AVFormatContext *ic)
         min_read_size = 125000;
     }
     /* max read size is 2 seconds of video max */
-    max_read_size = min_read_size * 20;
+    max_read_size = min_read_size * 5;
 
     /* set initial codec state */
     for(i=0;i<ic->nb_streams;i++) {

@@ -157,7 +157,7 @@ public:
         setSaveAll(false);
 
         addTarget("tv_grab_na", new XMLTV_na_config(parent));
-        grabber->addSelection("North America", "tv_grab_na");
+        grabber->addSelection("North America (xmltv)", "tv_grab_na");
 
         addTarget("gist", new Grabber_gist_config(parent));
         grabber->addSelection("North America (gist)", "gist");
