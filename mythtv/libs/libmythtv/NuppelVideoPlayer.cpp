@@ -2968,13 +2968,13 @@ o  Store the variance.
 o  Analyze, looking for a frame that's not black
 o  Write the time marker to a bookmark file.
 
-It's not a perfect "commerical detector", since it's actually just looking
+It's not a perfect "commercial detector", since it's actually just looking
 for black frames, but it will let you skip pretty quickly, since you can
 jump over stuff.  
 
 Note, routine will get confused if there's a dark scene in the middle
 of a program.  Later versions of the routine can check the audio levels
-during each block being analyzed, or see if the "commericial" is in the
+during each block being analyzed, or see if the "commercial" is in the
 correct place with respect to when commericals usually happen.
 
 */
@@ -3095,6 +3095,7 @@ printf("Frame Number %lld i=%d, x:%d,y:%d Y=%d\n",framesPlayed,i,x,y,pixel_Y[i])
 			
             //Now, get the average
             for(i=0;i<200;i++) average_Y+=pixel_Y[i];
+            average_Y /= 200;
 printf("Average: %d\n",average_Y);
             //square the difference of each pixel from the average
             for(i=0;i<200;i++) squared_difference[i]=(pixel_Y[i]-average_Y)*(pixel_Y[i]-average_Y);
