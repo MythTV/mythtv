@@ -73,6 +73,9 @@ void MpegRecorder::Initialize(void)
 
 void MpegRecorder::StartRecording(void)
 {
+#ifndef HAVE_V4L2
+    return;
+#else
     if (childrenLive)
     {
         cerr << "Error: children are already alive\n";
@@ -163,6 +166,7 @@ void MpegRecorder::StartRecording(void)
     KillChildren();
 
     recording = false;
+#endif
 }
 
 void MpegRecorder::StopRecording(void)
