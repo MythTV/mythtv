@@ -51,6 +51,7 @@ class VideoManager : public MythDialog
     void paintEvent(QPaintEvent *);
     void keyPressEvent(QKeyEvent *e);
     void validateUp();
+    void doWaitBackground(QPainter& p, const QString& titleText);
 
   private slots:
     void num(const QString &text);

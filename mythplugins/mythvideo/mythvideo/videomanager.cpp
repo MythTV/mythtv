@@ -305,8 +305,10 @@ QString VideoManager::GetMoviePoster(QString movieNum)
 
     op->copy(uri, "file:" + fileprefix);
 
-    // wait for completion for up to 5 seconds
-    for (int i = 0; i < 500; i++) {
+    int nTimeout = gContext->GetNumSetting("PosterDownloadTimeout", 30) * 100;
+
+    // wait for completion
+    for (int i = 0; i < nTimeout; i++) {
        if (!iscopycomplete) {
           qApp->processEvents();
           usleep(10000);
@@ -326,9 +328,16 @@ QString VideoManager::GetMoviePoster(QString movieNum)
  	}
     } else {
        op->stop();
+
        QString err = QString("Copying of '%1' timed out").arg(uri);
        cerr << err << endl;
        VERBOSE(VB_ALL, err);
+
+       MythPopupBox::showOkPopup( gContext->GetMainWindow(),
+                                  QObject::tr("Could not retrieve poster"),
+                                  QObject::tr("A movie poster exists for this movie but "
+                                              "Myth could not retrieve it within a reasonable "
+                                              "amount of time.\n"));
     }
     delete op;
     return localfile;
@@ -1348,6 +1357,27 @@ void VideoManager::editMetadata()
     update(infoRect);
 }
 
+void VideoManager::doWaitBackground(QPainter& p,const QString& titleText)
+{
+    // set the title for the wait background
+    LayerSet *container = NULL;
+    container = theme->GetSet("inetwait");
+    cout << "Wait background activated" << endl;
+    if (container)
+    {
+       UITextType *type = (UITextType *)container->GetType("title");
+       if (type)
+           type->SetText(titleText);
+
+       container->Draw(&p, 0, 0);
+       container->Draw(&p, 1, 0);
+       container->Draw(&p, 2, 0);
+       container->Draw(&p, 3, 0);
+    }
+
+
+}
+
 void VideoManager::selected()
 {
     // Do queries 
@@ -1363,19 +1393,7 @@ void VideoManager::selected()
        backup.end();
 
        // set the title for the wait background
-       LayerSet *container = NULL;
-       container = theme->GetSet("inetwait");
-       if (container)
-       {
-          UITextType *type = (UITextType *)container->GetType("title");
-          if (type)
-              type->SetText(curitem->Title());
- 
-          container->Draw(&p, 0, 0);
-          container->Draw(&p, 1, 0);
-          container->Draw(&p, 2, 0);
-          container->Draw(&p, 3, 0);
-       }
+       doWaitBackground(p, curitem->Title());
        backup.flush();
 
       int ret = GetMovieListing(curitem->Title());
@@ -1484,7 +1502,7 @@ void VideoManager::selected()
        else if (movieNumber == "remove")
        {
 	   RemoveCurrentItem();
- 
+
            backup.begin(this);
            backup.drawPixmap(0, 0, myBackground);
            backup.end();
@@ -1509,10 +1527,19 @@ void VideoManager::selected()
                return;
            }
            //cout << "GETTING MOVIE #" << movieNumber << endl;
+           backup.begin(this);
+           grayOut(&backup);
+           doWaitBackground(p, movieNumber);
+           backup.end();
+           qApp->processEvents();
+            
            GetMovieData(movieNumber);
+
            backup.begin(this);
            backup.drawPixmap(0, 0, myBackground);
            backup.end();
+           qApp->processEvents(); // Without this we get drawing errors.
+           
            m_state = SHOWING_MAINWINDOW;
            update(infoRect);
            update(listRect);
@@ -1523,12 +1550,26 @@ void VideoManager::selected()
    else if (m_state == SHOWING_IMDBMANUAL)
    {
       movieNumber = curIMDBNum;
+
+      backup.begin(this);
+      grayOut(&backup);
+      doWaitBackground(p, curIMDBNum);
+      backup.end();
+
+      qApp->processEvents();
+
       GetMovieData(curIMDBNum);
+      
       backup.begin(this);
       backup.drawPixmap(0, 0, myBackground);
       backup.end();
+      qApp->processEvents(); // Without this we get drawing errors.
+
+
       m_state = SHOWING_MAINWINDOW;
       noUpdate = false;
+      update(infoRect);
+      update(listRect);
       update(fullRect);
     }
 }
