@@ -79,6 +79,8 @@ class ProgramInfo
     long long GetBookmark(QSqlDatabase *db);
     bool IsEditing(QSqlDatabase *db);
     void SetEditing(bool edit, QSqlDatabase *db);
+    void SetAutoExpire(bool autoExpire, QSqlDatabase *db);
+    bool GetAutoExpireFromRecorded(QSqlDatabase *db);
 
     void GetCutList(QMap<long long, int> &delMap, QSqlDatabase *db);
     void SetCutList(QMap<long long, int> &delMap, QSqlDatabase *db);

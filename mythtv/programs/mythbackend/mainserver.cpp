@@ -311,6 +311,18 @@ void MainServer::customEvent(QCustomEvent *e)
     {
         MythEvent *me = (MythEvent *)e;
 
+        if (me->Message().left(11) == "AUTO_EXPIRE")
+        {
+            QStringList tokens = QStringList::split(" ", me->Message());
+            QDateTime startts = QDateTime::fromString(tokens[2], Qt::ISODate);
+            ProgramInfo *pinfo = ProgramInfo::GetProgramFromRecorded(tokens[1],
+                                                                     startts);
+
+            DoHandleDeleteRecording(pinfo, NULL);
+
+            return;
+        }
+
         if (me->Message().left(6) == "LOCAL_")
             return;
 
@@ -685,6 +697,12 @@ void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs)
     ProgramInfo *pginfo = new ProgramInfo();
     pginfo->FromStringList(slist, 1);
 
+    DoHandleDeleteRecording(pginfo, pbs);
+}
+
+void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
+{
+
     if (ismaster && pginfo->hostname != gContext->GetHostName())
     {
         PlaybackSock *slave = getSlaveByHostname(pginfo->hostname);
@@ -698,8 +716,12 @@ void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs)
            if (num > 0)
               (*encoderList)[num]->StopRecording();
 
-           QStringList outputlist = "0";
-           WriteStringList(pbs->getSocket(), outputlist);
+           if (pbs)
+           {
+               QStringList outputlist = "0";
+               WriteStringList(pbs->getSocket(), outputlist);
+           }
+
            delete pginfo;
            return;
         }
@@ -787,14 +809,20 @@ void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs)
         cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
              << " Strange.  File: " << filename << " doesn't exist." << endl;
 
-        QStringList outputlist;
-        outputlist << "BAD: Tried to delete a file that was in "
-                      "the database but wasn't on the disk.";
-        WriteStringList(pbs->getSocket(), outputlist);
+        if (pbs)
+        {
+            QStringList outputlist;
+            outputlist << "BAD: Tried to delete a file that was in "
+                          "the database but wasn't on the disk.";
+            WriteStringList(pbs->getSocket(), outputlist);
+        }
     }
 
-    QStringList outputlist = QString::number(recnum);
-    WriteStringList(pbs->getSocket(), outputlist);
+    if (pbs)
+    {
+        QStringList outputlist = QString::number(recnum);
+        WriteStringList(pbs->getSocket(), outputlist);
+    }
 
     delete pginfo;
 }

@@ -215,6 +215,63 @@ public:
     };
 };
 
+class AggressiveCommDetect: public CheckBoxSetting, public BackendSetting {
+public:
+    AggressiveCommDetect():
+        BackendSetting("AggressiveCommDetect") {
+        setLabel("Strict Commercial Detection");
+        setValue(true);
+        setHelpText("Turn on stricter Commercial Detection code.  If some "
+                    "commercials are not being detected, try turning this "
+                    "setting OFF.");
+    };
+};
+
+class AutoExpireDiskThreshold: public SpinBoxSetting, public BackendSetting {
+public:
+    AutoExpireDiskThreshold():
+        SpinBoxSetting(0, 200, 1),
+        BackendSetting("AutoExpireDiskThreshold") {
+        setLabel("Auto Expire Free Disk Space Threshold (in Gigabytes)");
+        setHelpText("Trigger AutoExpire when free space in Gigabytes goes "
+                    "below this value.  Turn OFF AutoExpire by setting to 0.");
+        setValue(0);
+    };
+};
+
+class AutoExpireFrequency: public SpinBoxSetting, public BackendSetting {
+public:
+    AutoExpireFrequency():
+        SpinBoxSetting(1, 60, 1),
+        BackendSetting("AutoExpireFrequency") {
+        setLabel("Auto Expire Frequency (in minutes)");
+        setHelpText("Number of minutes the AutoExpire process will wait "
+                    "between each time that it checks for free disk space.");
+        setValue(1);
+    };
+};
+
+class AutoExpireMethod: public ComboBoxSetting, public BackendSetting {
+public:
+    AutoExpireMethod():
+        BackendSetting("AutoExpireMethod") {
+        setLabel("Auto Expire Method");
+        addSelection("Oldest Show First", "1");
+        setHelpText("Method used to determine which recorded shows to "
+                    "AutoExpire first.");
+    };
+};
+
+class AutoExpireDefault: public CheckBoxSetting, public BackendSetting {
+public:
+    AutoExpireDefault():
+        BackendSetting("AutoExpireDefault") {
+        setLabel("Auto-Expire Default");
+        setValue(true);
+        setHelpText("Turn Auto-Expire ON by default on new recordings.");
+    };
+};
+
 class RecordPreRoll: public SpinBoxSetting, public GlobalSetting {
 public:
     RecordPreRoll():
@@ -984,6 +1041,7 @@ PlaybackSettings::PlaybackSettings()
     comms->setLabel("Commercial Detection");
     comms->addChild(new AutoCommercialFlag());
     comms->addChild(new CommercialSkipMethod());
+    comms->addChild(new AggressiveCommDetect());
     comms->addChild(new AutoCommercialSkip());
     addChild(comms);
 
@@ -1017,6 +1075,14 @@ GeneralSettings::GeneralSettings()
     general->addChild(new GeneratePreviewPixmaps());
     general->addChild(new PlaybackPreview());
     addChild(general);
+
+    VerticalConfigurationGroup* autoexp = new VerticalConfigurationGroup(false);
+    autoexp->setLabel("Global Auto Expire Settings");
+    autoexp->addChild(new AutoExpireDiskThreshold());
+    autoexp->addChild(new AutoExpireFrequency());
+    autoexp->addChild(new AutoExpireMethod());
+    autoexp->addChild(new AutoExpireDefault());
+    addChild(autoexp);
 }
 
 EPGSettings::EPGSettings()

@@ -71,6 +71,14 @@ public:
     };
 };
 
+class SRAutoExpire: public CheckBoxSetting, public SRSetting {
+public:
+    SRAutoExpire(const ScheduledRecording& parent):
+        SRSetting(parent, "autoexpire") {
+        setLabel(QObject::tr("Auto-Expire recordings"));
+    };
+};
+
 class SRChannel: public ChannelSetting, public SRSetting {
 public:
     SRChannel(const ScheduledRecording& parent): SRSetting(parent, "chanid") {
@@ -156,6 +164,7 @@ ScheduledRecording::ScheduledRecording() {
     addChild(id = new ID());
     addChild(type = new SRRecordingType(*this));
     addChild(profile = new SRProfileSelector(*this));
+    addChild(autoexpire = new SRAutoExpire(*this));
     addChild(channel = new SRChannel(*this));
     addChild(title = new SRTitle(*this));
     addChild(subtitle = new SRSubtitle(*this));
@@ -182,6 +191,7 @@ void ScheduledRecording::fromProgramInfo(ProgramInfo* proginfo)
     endDate->setValue(proginfo->endts.date());
     category->setValue(proginfo->category);
     rank->setValue(proginfo->rank.toInt());
+    autoexpire->setValue(gContext->GetNumSetting("AutoExpireDefault", 0));
 }
 
 void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
@@ -437,6 +447,14 @@ void ScheduledRecording::setRecordingType(ScheduledRecording::RecordingType newT
     type->setValue((int)newType);
 }
 
+bool ScheduledRecording::GetAutoExpire(void) const {
+    return(autoexpire->getValue().toInt());
+}
+
+void ScheduledRecording::SetAutoExpire(bool expire) {
+    autoexpire->setValue(expire);
+}
+
 void ScheduledRecording::save(QSqlDatabase* db) {
     if (type->isChanged() && getRecordingType() == NotRecording)
         remove(db);
@@ -589,6 +607,7 @@ MythDialog* ScheduledRecording::dialogWidget(MythMainWindow *parent,
     vbox->addWidget(type->configWidget(this, dialog));
     vbox->addWidget(profile->configWidget(this, dialog));
     vbox->addWidget(rank->configWidget(this, dialog));
+    vbox->addWidget(autoexpire->configWidget(this, dialog));
 
 //    f = new QFrame(dialog);
 //    f->setFrameStyle(QFrame::HLine | QFrame::Plain);

@@ -52,8 +52,8 @@ class MythEvent : public QCustomEvent
     QString extradata;
 };
 
-#define MYTH_BINARY_VERSION "0.10.06232003-1"
-#define MYTH_SCHEMA_VERSION "1000"
+#define MYTH_BINARY_VERSION "0.10.07062003-1"
+#define MYTH_SCHEMA_VERSION "1001"
 
 extern bool print_verbose_messages;
 
@@ -120,6 +120,7 @@ class MythContext : public QObject
     void addListener(QObject *obj);
     void removeListener(QObject *obj);
     void dispatch(MythEvent &e);
+    void dispatchNow(MythEvent &e);
 
     void SendReceiveStringList(QStringList &strlist);
 

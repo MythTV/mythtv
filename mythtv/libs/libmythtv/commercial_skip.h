@@ -24,6 +24,8 @@ class CommDetect
     void SetBlankFrameDetection(bool onOff)  { detectBlankFrames = onOff; }
     void SetSceneChangeDetection(bool onOff) { detectSceneChanges = onOff; }
 
+    void SetAggressiveDetection(bool onOff)  { aggressiveDetection = onOff; }
+
     void ClearAllMaps(void);
     void GetCommBreakMap(QMap<long long, int> &marks);
     void SetBlankFrameMap(QMap<long long, int> &blanks);
@@ -50,6 +52,8 @@ class CommDetect
     bool CheckSceneHasChanged(void);
 
     int GetAvgBrightness(void);
+
+    bool aggressiveDetection;
 
     int width;
     int height;

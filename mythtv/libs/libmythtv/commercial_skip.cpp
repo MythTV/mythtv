@@ -38,6 +38,8 @@ void CommDetect::Init(int w, int h, double fps)
     detectBlankFrames = true;
     detectSceneChanges = false;
 
+    aggressiveDetection = true;
+
     lastFrameWasBlank = false;
     lastFrameWasSceneChange = false;
 
@@ -432,17 +434,46 @@ void CommDetect::BuildBlankFrameCommList(void)
             // have blanks inbetween commercials just at the beginning and
             // end of breaks
             int gap_length = bframes[x] - bframes[i];
-            if ((abs((int)(gap_length - (15 * frame_rate))) < 10 ) ||
-                (abs((int)(gap_length - (20 * frame_rate))) < 11 ) ||
-                (abs((int)(gap_length - (30 * frame_rate))) < 12 ) ||
-                (abs((int)(gap_length - (45 * frame_rate))) < 13 ) ||
-                (abs((int)(gap_length - (60 * frame_rate))) < 15 ) ||
-                (abs((int)(gap_length - (90 * frame_rate))) < 10 ))
+            if (((aggressiveDetection) &&
+                 ((abs((int)(gap_length - (15 * frame_rate))) < 10 ) ||
+                  (abs((int)(gap_length - (20 * frame_rate))) < 11 ) ||
+                  (abs((int)(gap_length - (30 * frame_rate))) < 12 ) ||
+                  (abs((int)(gap_length - (45 * frame_rate))) < 13 ) ||
+                  (abs((int)(gap_length - (60 * frame_rate))) < 15 ) ||
+                  (abs((int)(gap_length - (90 * frame_rate))) < 10 ))) ||
+                ((!aggressiveDetection) &&
+                 ((abs((int)(gap_length - (15 * frame_rate))) < 13 ) ||
+                  (abs((int)(gap_length - (20 * frame_rate))) < 15 ) ||
+                  (abs((int)(gap_length - (30 * frame_rate))) < 17 ) ||
+                  (abs((int)(gap_length - (45 * frame_rate))) < 19 ) ||
+                  (abs((int)(gap_length - (60 * frame_rate))) < 20 ) ||
+                  (abs((int)(gap_length - (90 * frame_rate))) < 20 ))))
             {
                 c_start[commercials] = bframes[i];
                 c_end[commercials] = bframes[x] - 1;
                 commercials++;
                 i = x-1;
+                x = frames;
+            }
+
+            if ((!aggressiveDetection) &&
+                ((abs((int)(gap_length - (30 * frame_rate)))
+                                            < (int)(frame_rate * 0.85)) ||
+                 (abs((int)(gap_length - (60 * frame_rate)))
+                                            < (int)(frame_rate * 0.95)) ||
+                 (abs((int)(gap_length - (90 * frame_rate)))
+                                            < (int)(frame_rate * 1.05)) ||
+                 (abs((int)(gap_length - (120 * frame_rate)))
+                                            < (int)(frame_rate * 1.15))) &&
+                ((x + 2) < frames) &&
+                ((i + 2) < frames) &&
+                ((bframes[i] + 1) == bframes[i+1]) &&
+                ((bframes[x] + 1) == bframes[x+1]))
+            {
+                c_start[commercials] = bframes[i];
+                c_end[commercials] = bframes[x];
+                commercials++;
+                i = x;
                 x = frames;
             }
         }
@@ -629,6 +660,8 @@ void CommDetect::MergeBlankCommList(void)
         }
     }
 
+
+    // make temp copy of commercial break list
     it = blankCommBreakMap.begin();
     prev = it;
     it++;
@@ -645,6 +678,8 @@ void CommDetect::MergeBlankCommList(void)
     tmpMap_it++;
     for(; tmpMap_it != tmpMap.end(); ++tmpMap_it, ++tmpMap_prev)
     {
+        // if we find any segments less than 35 seconds between commercial
+        // breaks include those segments in the commercial break.
         if (((tmpMap_prev.data() + (35 * frame_rate)) > tmpMap_it.key()) &&
             ((tmpMap_prev.data() - tmpMap_prev.key()) > (35 * frame_rate)) &&
             ((tmpMap_it.data() - tmpMap_it.key()) > (35 * frame_rate)))

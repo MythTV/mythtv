@@ -1186,6 +1186,16 @@ void PlaybackBox::deleteSelected()
     remove(curitem);
 }
 
+void PlaybackBox::expireSelected()
+{
+    killPlayer();
+
+    if (!curitem || ignoreevents)
+        return;
+
+    expire(curitem);
+}
+
 void PlaybackBox::selected()
 {
     killPlayer();
@@ -1346,6 +1356,19 @@ void PlaybackBox::remove(ProgramInfo *toDel)
     showDeletePopup(2);
 }
 
+void PlaybackBox::expire(ProgramInfo *toExp)
+{
+    if (ignoreevents)
+        return;
+
+    killPlayer();
+
+    ignoreevents = true;
+
+    delitem = new ProgramInfo(*toExp);
+    showDeletePopup(3);
+}
+
 void PlaybackBox::showDeletePopup(int types)
 {
     QFont bigFont("Arial", (int)(gContext->GetBigFontSize() * hmult), 
@@ -1389,6 +1412,8 @@ void PlaybackBox::showDeletePopup(int types)
         msg = new QLabel(tr("You have finished watching:"), popup);
     else if (types == 2)
         msg = new QLabel(tr("Are you sure you want to delete:"), popup);
+    else if (types == 3)
+        msg = new QLabel(tr("Allow this program to AutoExpire?"), popup);
     msg->setBackgroundOrigin(ParentOrigin); 
     msg->setPaletteForegroundColor(popupForeground);
     QLabel *filler1 = new QLabel("", popup);
@@ -1416,8 +1441,13 @@ void PlaybackBox::showDeletePopup(int types)
     msg2->setPaletteForegroundColor(popupForeground);
     msg2->setBackgroundOrigin(ParentOrigin);
 
-    MythPushButton *yesButton = new MythPushButton(tr("Yes, get rid of it"),
-                                                   popup);
+    MythPushButton *yesButton;
+
+    if ((types == 1) || (types == 2))
+        yesButton = new MythPushButton(tr("Yes, get rid of it"), popup);
+    else
+        yesButton = new MythPushButton(tr("Yes, AutoExpire"), popup);
+
     MythPushButton *noButton = NULL;
 
     if (types == 1)
@@ -1426,6 +1456,8 @@ void PlaybackBox::showDeletePopup(int types)
     else if (types == 2)
         noButton = new MythPushButton(tr("No, keep it, I changed my mind"),
                                       popup);
+    else if (types == 3)
+        noButton = new MythPushButton(tr("No, Do Not AutoExpire"), popup);
 
     popup->addWidget(msg, false);
     popup->addWidget(filler1, false);
@@ -1440,7 +1472,17 @@ void PlaybackBox::showDeletePopup(int types)
 
     popup->addWidget(yesButton, false);
     popup->addWidget(noButton, false);
-    noButton->setFocus();
+
+    if ((types == 1) || (types == 2))
+        noButton->setFocus();
+    else
+    {
+        QSqlDatabase *db = QSqlDatabase::database();
+        if (delitem->GetAutoExpireFromRecorded(db))
+            yesButton->setFocus();
+        else
+            noButton->setFocus();
+    }
   
     msg->adjustSize();
     msg2->adjustSize();
@@ -1481,8 +1523,17 @@ void PlaybackBox::showDeletePopup(int types)
 
     popup->Show();
 
-    connect(yesButton, SIGNAL(pressed()), this, SLOT(doDelete()));
-    connect(noButton, SIGNAL(pressed()), this, SLOT(noDelete()));
+    if ((types == 1) || (types == 2))
+    {
+        connect(yesButton, SIGNAL(pressed()), this, SLOT(doDelete()));
+        connect(noButton, SIGNAL(pressed()), this, SLOT(noDelete()));
+    }
+    else if (types == 3)
+    {
+        connect(yesButton, SIGNAL(pressed()), this, SLOT(doAutoExpire()));
+        connect(noButton, SIGNAL(pressed()), this, SLOT(noAutoExpire()));
+    }
+
     QAccel *popaccel = new QAccel(popup);
     popaccel->connectItem(popaccel->insertItem(Key_Escape), this, 
                           SLOT(noDelete()));
@@ -1515,6 +1566,60 @@ void PlaybackBox::noDelete()
 void PlaybackBox::doDelete()
 {
     doRemove(delitem);
+
+    popup->hide();
+
+    noUpdate = false;
+    backup.begin(this);
+    backup.drawPixmap(0, 0, myBackground);
+    backup.end();
+
+    ignoreevents = false;
+
+    delete popup;
+    delete delitem;
+    delitem = NULL;
+
+    skipUpdate = false;
+    skipCnt = 2;
+    update(fullRect);
+
+    setActiveWindow();
+
+    timer->start(1000 / 30);
+}
+
+void PlaybackBox::noAutoExpire()
+{
+    QSqlDatabase *db = QSqlDatabase::database();
+    delitem->SetAutoExpire(false, db);
+
+    popup->hide();
+
+    noUpdate = false;
+    backup.begin(this);
+    backup.drawPixmap(0, 0, myBackground);
+    backup.end();
+
+    ignoreevents = false;
+    delete delitem;
+    delete popup;
+    popup = NULL;
+    delitem = NULL;
+
+    skipUpdate = false;
+    skipCnt = 2;
+    update(fullRect);
+
+    setActiveWindow();
+
+    timer->start(1000 / 30);
+}
+
+void PlaybackBox::doAutoExpire()
+{
+    QSqlDatabase *db = QSqlDatabase::database();
+    delitem->SetAutoExpire(true, db);
 
     popup->hide();
 
@@ -1613,6 +1718,9 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
         {
             case Key_D: 
                 deleteSelected(); 
+                break;
+            case Key_I: 
+                expireSelected(); 
                 break;
             case Key_P: 
                 playSelected(); 

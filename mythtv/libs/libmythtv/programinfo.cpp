@@ -636,6 +636,11 @@ void ProgramInfo::StartedRecording(QSqlDatabase *db)
     if (!db)
         return;
 
+    if (record == NULL) {
+        record = new ScheduledRecording();
+        record->loadByProgram(db, this);
+    }
+
     QString starts = startts.toString("yyyyMMddhhmm");
     QString ends = endts.toString("yyyyMMddhhmm");
 
@@ -654,12 +659,13 @@ void ProgramInfo::StartedRecording(QSqlDatabase *db)
 
     QString query;
     query = QString("INSERT INTO recorded (chanid,starttime,endtime,title,"
-                    "subtitle,description,hostname,category) "
+                    "subtitle,description,hostname,category,autoexpire) "
                     "VALUES(%1,\"%2\",\"%3\",\"%4\",\"%5\",\"%6\",\"%7\","
-                    "\"%8\");")
+                    "\"%8\",%9);")
                     .arg(chanid).arg(starts).arg(ends).arg(sqltitle.utf8()) 
                     .arg(sqlsubtitle.utf8()).arg(sqldescription.utf8())
-                    .arg(gContext->GetHostName()).arg(sqlcategory.utf8());
+                    .arg(gContext->GetHostName()).arg(sqlcategory.utf8())
+                    .arg(record->GetAutoExpire());
 
     QSqlQuery qquery = db->exec(query);
     if (!qquery.isActive())
@@ -759,8 +765,50 @@ void ProgramInfo::SetEditing(bool edit, QSqlDatabase *db)
         MythContext::DBError("Edit status update", querystr);
 }
 
+void ProgramInfo::SetAutoExpire(bool autoExpire, QSqlDatabase *db)
+{
+    MythContext::KickDatabase(db);
+
+    QString starts = startts.toString("yyyyMMddhhmm");
+    starts += "00";
+
+    QString querystr = QString("UPDATE recorded SET autoexpire = '%1', "
+                               "starttime = '%2' WHERE chanid = '%3' AND "
+                               "starttime = '%4';").arg(autoExpire).arg(starts)
+                                                   .arg(chanid).arg(starts);
+    QSqlQuery query = db->exec(querystr);
+    if (!query.isActive())
+        MythContext::DBError("AutoExpire update", querystr);
+}
+
+bool ProgramInfo::GetAutoExpireFromRecorded(QSqlDatabase *db)
+{
+    MythContext::KickDatabase(db);
+
+    QString starts = startts.toString("yyyyMMddhhmm");
+    starts += "00";
+
+    QString querystr = QString("SELECT autoexpire FROM recorded WHERE "
+                               "chanid = '%1' AND starttime = '%2';")
+                              .arg(chanid).arg(starts);
+
+    bool result = false;
+    QSqlQuery query = db->exec(querystr);
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        query.next();
+
+        result = query.value(0).toInt();
+    }
+
+    return(result);
+}
+
 void ProgramInfo::GetCutList(QMap<long long, int> &delMap, QSqlDatabase *db)
 {
+//    GetMarkupMap(delMap, db, MARK_CUT_START);
+//    GetMarkupMap(delMap, db, MARK_CUT_END, true);
+
     delMap.clear();
 
     MythContext::KickDatabase(db);
@@ -803,6 +851,10 @@ void ProgramInfo::GetCutList(QMap<long long, int> &delMap, QSqlDatabase *db)
 
 void ProgramInfo::SetCutList(QMap<long long, int> &delMap, QSqlDatabase *db)
 {
+//    ClearMarkupMap(db, MARK_CUT_START);
+//    ClearMarkupMap(db, MARK_CUT_END);
+//    SetMarkupMap(delMap, db);
+
     QString cutdata;
     char tempc[256];
 

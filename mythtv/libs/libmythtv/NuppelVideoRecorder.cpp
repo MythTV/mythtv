@@ -677,6 +677,10 @@ void NuppelVideoRecorder::StartRecording(void)
             commDetect->Init(w, h, video_frame_rate);
         else
             commDetect = new CommDetect(w, h, video_frame_rate);
+
+        commDetect->SetAggressiveDetection(
+                        gContext->GetNumSetting("AggressiveCommDetect", 1));
+
     }
 
     // save the start time

@@ -46,9 +46,13 @@ class PlaybackBox : public MythDialog
     void selected();
     void playSelected();
     void deleteSelected();
+    void expireSelected();
 
     void doDelete();
     void noDelete();
+
+    void doAutoExpire();
+    void noAutoExpire();
 
     void exitWin();
 
@@ -65,6 +69,7 @@ class PlaybackBox : public MythDialog
     QPainter backup;
     void play(ProgramInfo *);
     void remove(ProgramInfo *);
+    void expire(ProgramInfo *);
 
     bool skipUpdate;
     bool noUpdate;

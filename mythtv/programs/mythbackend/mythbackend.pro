@@ -30,9 +30,9 @@ using_dvb {
 }
 
 # Input
-HEADERS += encoderlink.h filetransfer.h httpstatus.h mainserver.h playbacksock.h
-HEADERS += scheduler.h server.h transcoder.h
+HEADERS += autoexpire.h encoderlink.h filetransfer.h httpstatus.h mainserver.h
+HEADERS += playbacksock.h scheduler.h server.h transcoder.h
 
-SOURCES += encoderlink.cpp filetransfer.cpp httpstatus.cpp main.cpp 
-SOURCES += mainserver.cpp playbacksock.cpp scheduler.cpp server.cpp
+SOURCES += autoexpire.cpp encoderlink.cpp filetransfer.cpp httpstatus.cpp
+SOURCES += main.cpp mainserver.cpp playbacksock.cpp scheduler.cpp server.cpp
 SOURCES += transcoder.cpp

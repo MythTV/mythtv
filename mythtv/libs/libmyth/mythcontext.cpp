@@ -783,6 +783,16 @@ void MythContext::dispatch(MythEvent &e)
     }
 }
 
+void MythContext::dispatchNow(MythEvent &e)
+{
+    QObject *obj = listeners.first();
+    while (obj)
+    {
+        QApplication::sendEvent(obj, &e);
+        obj = listeners.next();
+    }
+}
+
 void MythContext::LCDconnectToHost(QString hostname, unsigned int port)
 {
     lcd_device->connectToHost(hostname, port);

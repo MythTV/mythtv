@@ -13,6 +13,7 @@
 using namespace std;
 
 #include "tv.h"
+#include "autoexpire.h"
 #include "scheduler.h"
 #include "transcoder.h"
 #include "mainserver.h"
@@ -23,6 +24,7 @@ using namespace std;
 
 QMap<int, EncoderLink *> tvList;
 MythContext *gContext;
+AutoExpire *expirer = NULL;
 Scheduler *sched = NULL;
 Transcoder *trans = NULL;
 QString pidfile;
@@ -112,6 +114,7 @@ int main(int argc, char **argv)
     QString logfile = "";
     bool daemonize = false;
     bool printsched = false;
+    bool printexpire = false;
     for(int argpos = 1; argpos < a.argc(); ++argpos)
         if (!strcmp(a.argv()[argpos],"-l") ||
             !strcmp(a.argv()[argpos],"--logfile")) {
@@ -139,6 +142,8 @@ int main(int argc, char **argv)
             print_verbose_messages = true;
         } else if (!strcmp(a.argv()[argpos],"--printsched")) {
             printsched = true;
+        } else if (!strcmp(a.argv()[argpos],"--printexpire")) {
+            printexpire = true;
         } else {
             cerr << "Invalid argument: " << a.argv()[argpos] << endl <<
                     "Valid options are: " << endl <<
@@ -209,6 +214,13 @@ int main(int argc, char **argv)
         return -1;
     }
 
+    QSqlDatabase *expthread = QSqlDatabase::addDatabase("QMYSQL3", "EXPDB");
+    if (!expthread)
+    {
+        printf("Couldn't connect to database\n");
+        return -1;
+    }
+
     QSqlDatabase *transthread = QSqlDatabase::addDatabase("QMYSQL3", "TRANSDB");
     if (!transthread)
     {
@@ -217,6 +229,7 @@ int main(int argc, char **argv)
     }
 
     if (!gContext->OpenDatabase(db) || !gContext->OpenDatabase(subthread) ||
+        !gContext->OpenDatabase(expthread) ||
         !gContext->OpenDatabase(transthread))
     {
         printf("couldn't open db\n");
@@ -233,6 +246,14 @@ int main(int argc, char **argv)
         sched = new Scheduler(false, &tvList, db);
         sched->FillRecordLists(false);
         sched->PrintList();
+        cleanup();
+        exit(0);
+    }
+
+    if (printexpire) {
+        expirer = new AutoExpire(false, db);
+        expirer->FillExpireList();
+        expirer->PrintExpireList();
         cleanup();
         exit(0);
     }
@@ -270,6 +291,9 @@ int main(int argc, char **argv)
         QSqlDatabase *scdb = QSqlDatabase::database("SUBDB");
         sched = new Scheduler(true, &tvList, scdb);
     }
+
+    QSqlDatabase *expdb = QSqlDatabase::database("EXPDB");
+    expirer = new AutoExpire(true, expdb);
 
 //    QSqlDatabase *trandb = QSqlDatabase::database("TRANSDB");
 //    trans = new Transcoder(&tvList, trandb);

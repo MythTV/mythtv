@@ -92,6 +92,7 @@ CREATE TABLE IF NOT EXISTS record
     category VARCHAR(64) NULL,
     profile INT UNSIGNED NOT NULL DEFAULT 0,
     rank INT(10) DEFAULT '0' NOT NULL,
+    autoexpire INT DEFAULT '0' NOT NULL,
     INDEX (chanid, starttime),
     INDEX (title)
 );
@@ -108,6 +109,7 @@ CREATE TABLE IF NOT EXISTS recorded
     bookmark VARCHAR(128) NULL,
     editing INT UNSIGNED NOT NULL DEFAULT 0,
     cutlist TEXT NULL,
+    autoexpire INT DEFAULT '0' NOT NULL,
     PRIMARY KEY (chanid, starttime),
     INDEX (endtime)
 );

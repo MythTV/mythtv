@@ -403,6 +403,9 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
 
     commDetect = new CommDetect(video_width, video_height, video_frame_rate);
 
+    commDetect->SetAggressiveDetection(
+                    gContext->GetNumSetting("AggressiveCommDetect", 1));
+
     return 0;
 }
 
