@@ -94,6 +94,8 @@ MainServer::MainServer(bool master, int port, int statusport,
 
     recordfileprefix = gContext->GetFilePrefix();
 
+    masterBackendOverride = gContext->GetSetting("MasterBackendOverride", 0);
+
     mythserver = new MythServer(port);
     connect(mythserver, SIGNAL(newConnect(QSocket *)), 
             SLOT(newConnection(QSocket *)));
@@ -464,6 +466,9 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
     QSqlQuery query;
     QString thequery;
 
+    QString ip = gContext->GetSetting("BackendServerIP");
+    QString port = gContext->GetSetting("BackendServerPort");
+
     dblock.lock();
     MythContext::KickDatabase(QSqlDatabase::database());
 
@@ -528,21 +533,17 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             }
 
             QString lpath = proginfo->GetRecordFilename(fileprefix);
-            QString ip = gContext->GetSetting("BackendServerIP");
-            QString port = gContext->GetSetting("BackendServerPort");
             PlaybackSock *slave = NULL;
             QFile checkFile(lpath);
-            bool MasterBackendOverride = gContext->GetSetting("MasterBackendOverride",0);
 
             if (proginfo->hostname != gContext->GetHostName())
             {
                 slave = getSlaveByHostname(proginfo->hostname);
             }
-            if ( 
-                 (MasterBackendOverride && checkFile.exists() ) || 
-                 (proginfo->hostname == gContext->GetHostName() ) ||
-                 (!slave && checkFile.exists() )
-               )
+
+            if ((masterBackendOverride && checkFile.exists()) || 
+                (proginfo->hostname == gContext->GetHostName()) ||
+                (!slave && checkFile.exists()))
             {
                 if (pbs->isLocal())
                     proginfo->pathname = lpath;

@@ -519,10 +519,11 @@ int RingBuffer::safe_read(RemoteFile *rf, void *data, unsigned sz)
     available = sock->bytesAvailable();
     qApp->unlock();
 
-    if (available > 0)
+    while (available > 0 && tot < sz && !stopreads)
     {
         qApp->lock();
         ret = sock->readBlock(((char *)data) + tot, sz - tot);
+        available = sock->bytesAvailable();
         qApp->unlock();
 
         tot += ret;
@@ -754,7 +755,7 @@ void RingBuffer::ReadAheadThread(void)
             rbwpos = (rbwpos + ret) % READ_AHEAD_SIZE;
             pthread_mutex_unlock(&readAheadLock);
 
-            if (ret != totfree && normalfile)
+            if (ret != totfree && normalfile && !stopreads)
             {
                 ateof = true;
             }

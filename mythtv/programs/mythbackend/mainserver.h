@@ -97,6 +97,8 @@ class MainServer : public QObject
     QMutex dblock;
     QMutex threadPoolLock;
     vector<ProcessRequestThread *> threadPool;
+
+    bool masterBackendOverride;
 };
 
 #endif

@@ -548,7 +548,7 @@ void OSDTypeImage::LoadImage(const QString &filename, float wmult, float hmult,
 
         url += filename;
 
-        QImage *cached = gContext->CacheRemotePixmap(url);
+        QImage *cached = gContext->CacheRemotePixmap(url, false);
         if (cached)
             tmpimage = *cached;
     }

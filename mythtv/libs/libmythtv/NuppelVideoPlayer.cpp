@@ -1385,7 +1385,8 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         /* a/v sync assumes that when 'Show' returns, that is the instant
            the frame has become visible on screen */
 
-        // output_jmeter->RecordCycleTime();
+        //if (output_jmeter->RecordCycleTime())
+        //    cout << avsync_delay  / 1000 << endl;
 
 
         /* The value of nexttrigger is perfect -- we calculated it to
