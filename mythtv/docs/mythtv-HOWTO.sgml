@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-03-25, v2.04
+<date>2003-03-27, v2.04
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -734,6 +734,11 @@ $ su
 $ su
 # mysql < /usr/share/mythtv/database/mc.sql
 </verb></tscreen>
+
+If you've already got a copy of the database installed and need to update the
+schema, use the <tt>-f</tt> flag to force <bf>mysql</bf> to continue setting
+up the tables even if they already exist.  By default, <bf>mysql</bf> will
+stop at the first error.
 
 <sect2>Modifying access to the MySQL database for multiple systems <label
 id="modify_perm_mysql">
@@ -1601,7 +1606,21 @@ $ mythbackend
 </verb></tscreen>
 
 mythbackend will print information about connections and what it's doing to
-the console.
+the console.  If you'd like to see the options that are available for
+mythbackend, type <tt>mythbackend -h</tt> for help.
+
+As of 2003-03-27, the available options are:
+<tscreen><verb>
+$ mythbackend -h
+Invalid argument: -h
+Valid options are:
+-l or --logfile filename       Writes STDERR and STDOUT messages to filename
+-p or --pidfile filename       Write PID of mythbackend to filename
+-d or --daemon                 Runs mythbackend as a daemon
+</verb></tscreen>
+
+Running mythbackend as a daemon and using the logfile option will allow you
+to have mythbackend automatically start at reboot.
 
 <sect1>Configuring a non-master backend.
 <p>Configuration of a non-master backend follows the same general procedure
@@ -2742,6 +2761,7 @@ MSP34xx is no guarantee that you will be able to use the btaudio module.
 As of 2003-03-27, the following cards are known to work with btaudio:
 <itemize>
 <item>Hauppauge WinTV-radio with dbx-TV stereo, model 401
+<item>Hauppauge WinTV-Theater, model 495
 <item>ATI TV Wonder
 </itemize>
 
@@ -2750,11 +2770,14 @@ The following cards do not work:
 <item>Pinnacle Studio PCTV Pro - note: this has a MSP34xx, but it's not
 wired correctly to the BT878 chip.
 <item>ATI TV Wonder VE
+<item>Leadtek Winfast 2000 XP (PAL, UK)
+<item>I/O Magic PC-PVR.  No MSP34xx chip.
 </itemize>
 
 The following cards have been reported to work, but have issues:
 <itemize>
-<item>Avermedia AVerTV Studio (no digital DSP output, "whiney noise")
+<item>Avermedia AVerTV Studio (no digital DSP output, "whiney noise" on
+analog)
 </itemize>
 
 See <tt>contrib/example.modules.conf.for.btaudio</tt> for an example file on
@@ -2776,7 +2799,8 @@ getting the kernel-source.  More on DPMS / screensaver
 v2.03, 2003-03-24.  Added note about ivtv.  Less terse instructions to
 create a /mnt/store directory if you don't already have one.
 v2.04, 2003-03-27.  Added information on btaudio.  Added information on full
-duplex issues as reported by mythbackend.
+duplex issues as reported by mythbackend.  Added information on -f flag to
+mysql.  Added info on mythbackend command-line options.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

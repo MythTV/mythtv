@@ -187,7 +187,22 @@ $ mythbackend
 </CODE></BLOCKQUOTE>
 </P>
 <P>mythbackend will print information about connections and what it's doing to
-the console.</P>
+the console.  If you'd like to see the options that are available for
+mythbackend, type <CODE>mythbackend -h</CODE> for help.</P>
+<P>As of 2003-03-27, the available options are:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mythbackend -h
+Invalid argument: -h
+Valid options are:
+-l or --logfile filename       Writes STDERR and STDOUT messages to filename
+-p or --pidfile filename       Write PID of mythbackend to filename
+-d or --daemon                 Runs mythbackend as a daemon
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Running mythbackend as a daemon and using the logfile option will allow you
+to have mythbackend automatically start at reboot.</P>
 
 <H2><A NAME="ss9.2">9.2</A> <A HREF="mythtv-HOWTO.html#toc9.2">Configuring a non-master backend.</A>
 </H2>

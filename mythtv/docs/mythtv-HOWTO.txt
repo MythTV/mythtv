@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-03-25, v2.04
+  2003-03-27, v2.04
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -885,6 +885,11 @@
        $ su
        # mysql < /usr/share/mythtv/database/mc.sql
 
+  If you've already got a copy of the database installed and need to
+  update the schema, use the -f flag to force [1mmysql [22mto continue setting
+  up the tables even if they already exist.  By default, [1mmysql [22mwill stop
+  at the first error.
+
   [1m6.4.5.  Modifying access to the MySQL database for multiple systems[0m
 
   If you're going to have multiple systems accessing a master database,
@@ -900,8 +905,8 @@
 
   This example has no security at all, and allows access from any host.
 
-       $ mysql -u root mythconverg
-       mysql> grant all on mythconverg.* to mythtv@"%" identified by "mythtv";
+  $ mysql -u root mythconverg
+  mysql> grant all on mythconverg.* to mythtv@"%" identified by "mythtv";
 
   For a more secure setup, you can restrict which machines or subnets
   have access. If you have a complete DNS system operational, you could
@@ -1002,15 +1007,15 @@
 
   Start with the alsa-driver package:
 
-       $ tar -xjf alsa-driver-0.9.x.tar.bz2
-       $ cd alsa-driver-0.9.x
-       $ ./configure --with-cards=XXX --with-sequencer=yes
-       $ make
-       $ su
-       # make install
-       # ./snddevices
-       # exit
-       $
+  $ tar -xjf alsa-driver-0.9.x.tar.bz2
+  $ cd alsa-driver-0.9.x
+  $ ./configure --with-cards=XXX --with-sequencer=yes
+  $ make
+  $ su
+  # make install
+  # ./snddevices
+  # exit
+  $
 
   This will compile and install the kernel modules and initialization
   scripts, as well as create device nodes in /dev.
@@ -1206,7 +1211,6 @@
 
   At this point, if you're using a serial receiver, check that the link
   has been correctly made in /dev
-
        $ ls -l /dev/li*
        lr-xr-xr-x    1 root     root            5 Jan 27 09:00 /dev/lirc -> ttyS0
        srw-rw-rw-    1 root     root            0 Jan 27 15:01 /dev/lircd=
@@ -1218,6 +1222,7 @@
   as root.  If it still doesn't work, then you must create the link
   manually.  In this example, the IR device is connected to ttyS0.  If
   it were connected to "COM2", then use ttyS1, etc.
+
        $ su
        # cd /dev
        # ln -sf ttyS0 lirc
@@ -1317,6 +1322,7 @@
   Follow the on-screen directions to train your remote and define keys.
   If your remote ends up working well, you should consider submitting
   your lircd.conf file back to the lirc developers. Once finished:
+
        $ su
        # cp myremote /etc/lircd.conf
 
@@ -1359,7 +1365,7 @@
 
   if you've got a Pinnacle Studio PCTV remote.
 
-  $ irw
+       $ irw
 
   Start pressing the keys on your remote; [1mirw [22mwill print the name of the
   button as it is defined in your /etc/lircd.conf. If you don't see any-
@@ -1386,17 +1392,17 @@
 
   The lircrc.example file has this:
 
-       begin
-           prog = irxevent
-           button = ChannelUp
-           config = Key Up CurrentWindow
-       end
+  begin
+      prog = irxevent
+      button = ChannelUp
+      config = Key Up CurrentWindow
+  end
 
-       begin
-           prog = irxevent
-           button = ChannelDown
-           config = Key Down CurrentWindow
-       end
+  begin
+      prog = irxevent
+      button = ChannelDown
+      config = Key Down CurrentWindow
+  end
 
   but the /etc/lircd.conf that comes in the lircd package defines the
   buttons for the Pinnacle Studio PCTV as:
@@ -1407,17 +1413,17 @@
   rather than "ChannelUp" and "ChannelDown".  I added the following to
   my /home/[yourusername]/.lircrc file:
 
-  begin
-      prog = irxevent
-      button = channel+
-      config = Key Up CurrentWindow
-  end
+       begin
+           prog = irxevent
+           button = channel+
+           config = Key Up CurrentWindow
+       end
 
-  begin
-      prog = irxevent
-      button = channel-
-      config = Key Down CurrentWindow
-  end
+       begin
+           prog = irxevent
+           button = channel-
+           config = Key Down CurrentWindow
+       end
 
   which took care of basic functionality.  Because the PCTV Studio
   remote has additional buttons, look at the configfiles/lircrc.exam-
@@ -1456,19 +1462,19 @@
   Depending on whether you have your serial port driver configured as a
   kernel module you might see the following message during make:
 
-  lirc_sir.c:56:2: warning: #warning
-  "******************************************"
+       lirc_sir.c:56:2: warning: #warning
+       "******************************************"
 
-  lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
+       lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
 
-  lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
+       lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
 
-  lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
+       lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
 
-  lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
+       lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
 
-  lirc_sir.c:61:2: warning: #warning
-  "******************************************"
+       lirc_sir.c:61:2: warning: #warning
+       "******************************************"
 
   If you do receive this statement make sure to run the [1msetserial[0m
   command before you load the lirc_sir module. Follow this with the
@@ -1483,15 +1489,15 @@
   The configuration for starting [1mlircd [22mdiffers if you're going to be
   sending and receiving IR versus just receiving.
 
-       # cd /etc/rc.d
-       # cat >> rc.local
-       echo "Starting lircd"
-       setserial /dev/ttySx uart none        # (if required)
-       modprobe lirc_sir
-       /usr/local/sbin/lircd
-       ^D
-       # exit
-       $
+  # cd /etc/rc.d
+  # cat >> rc.local
+  echo "Starting lircd"
+  setserial /dev/ttySx uart none        # (if required)
+  modprobe lirc_sir
+  /usr/local/sbin/lircd
+  ^D
+  # exit
+  $
 
   At this point you have to populate the /etc/lircd.conf file with the
   proper codes for your A/V remote. You should be able to find your
@@ -1504,10 +1510,10 @@
   being received. If everything is configured correctly you should see
   something similar to the following:
 
-  $ irw
-  0000000000007ff0 00 1 gi-motorola-dct2000
-  000000000000bff8 00 2 gi-motorola-dct2000
-  000000000000f7f0 00 ENTER gi-motorola-dct2000
+       $ irw
+       0000000000007ff0 00 1 gi-motorola-dct2000
+       000000000000bff8 00 2 gi-motorola-dct2000
+       000000000000f7f0 00 ENTER gi-motorola-dct2000
 
   Once you've verified lirc is working you can press [1mCTRL-C [22mto exit [1mirw[0m
   and configure the channel changing script.
@@ -1536,7 +1542,6 @@
 
   See contrib/channel.pl for the actual file.  Copy it to
   /usr/local/bin/
-
   The last statement within the perl script is the lirc rc command. This
   is the command that transmits the code to your cable/dss box. Make
   sure to have the IRDA device within a few feet of the box.
@@ -1732,7 +1737,20 @@
        $ mythbackend
 
   mythbackend will print information about connections and what it's
-  doing to the console.
+  doing to the console.  If you'd like to see the options that are
+  available for mythbackend, type mythbackend -h for help.
+
+  As of 2003-03-27, the available options are:
+
+       $ mythbackend -h
+       Invalid argument: -h
+       Valid options are:
+       -l or --logfile filename       Writes STDERR and STDOUT messages to filename
+       -p or --pidfile filename       Write PID of mythbackend to filename
+       -d or --daemon                 Runs mythbackend as a daemon
+
+  Running mythbackend as a daemon and using the logfile option will
+  allow you to have mythbackend automatically start at reboot.
 
   [1m9.2.  Configuring a non-master backend.[0m
 
@@ -1955,11 +1973,11 @@
 
   Once it's on your machine, you must move the file and untar it:
 
-  $ su
-  # cp funhouse.tar.gz /usr/local/share/mythtv/themes
-  # cd /usr/local/share/mythtv/themes
-  # tar -xjf funhouse.tar.gz
-  # exit
+       $ su
+       # cp funhouse.tar.gz /usr/local/share/mythtv/themes
+       # cd /usr/local/share/mythtv/themes
+       # tar -xjf funhouse.tar.gz
+       # exit
 
   The theme will now be available in the mythfrontend Appearance
   section.
@@ -2115,14 +2133,14 @@
   Download FLAC from http://flac.sourceforge.net
   <http://flac.sourceforge.net> and install:
 
-  $ tar -xzf flac-1.1.0.tar.gz
-  $ cd flac-1.1.0
-  $ ./configure
-  $ make
-  $ su
-  # make install
-  # exit
-  $
+       $ tar -xzf flac-1.1.0.tar.gz
+       $ cd flac-1.1.0
+       $ ./configure
+       $ make
+       $ su
+       # make install
+       # exit
+       $
 
   Download libcdaudio from libcdaudio.sourceforge.net
   <http://sourceforge.net/project/showfiles.php?group_id=27134> and
@@ -2141,17 +2159,17 @@
   <http://www.xiph.org/paranoia/download/cdparanoia-III-
   alpha9.8.src.tgz>.
 
-       $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
-       $ cd cdparanoia-III-alpha9.8
-       $ ./configure
-       $ make
-       $ su
-       # make install
-       # cd /usr/lib
-       # ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
-       # ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
-       # exit
-       $
+  $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
+  $ cd cdparanoia-III-alpha9.8
+  $ ./configure
+  $ make
+  $ su
+  # make install
+  # cd /usr/lib
+  # ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
+  # ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
+  # exit
+  $
 
   [1m15.2.  Mandrake 9.0[0m
 
@@ -2168,6 +2186,7 @@
   a mirror site and then present the command-line configuration text for
   that mirror.  You will most likely need to add a "Contrib" mirror to
   your setup.  Once you have done that, you can proceed.
+
        # urpmi libmad0 libmad0-devel libflac4 libflac4-devel libcdaudio cdparanoia
        # urpmi libcdda0 libcdda0-devel libvorbis0 libvorbis0-devel
 
@@ -2194,7 +2213,6 @@
   SDL may be obtained from http://www.libsdl.org
   <http://www.libsdl.org>.  On Mandrake 9.1, you may install it by
   executing: # urpmi libsdl1.2 libsdl1.2-devel
-
   [1m15.3.  Red Hat Linux 8.0[0m
 
   Red Hat provides packages for several of the pre-requisites, making
@@ -2309,17 +2327,17 @@
 
   These are the keyboard commands for MythWeather:
 
-       Left Key             Goes back one page, and extends the time spent
-                            on the page you are on.
-       Right Key            Goes forward one page, see above.
-       Space                Pause, wait on the current page until space is hit
-                            again.
-       Numeric Keys         You can check other weather by keying in other ZIP codes.
-       Enter Key            Switch between Celsius and Fahrenheit. Can also
-                            be used a way to force a data update.
-       "m" Key              Resets the location to the database default, then updates the data.
-       "i"                  Enter / Save settings
-       ESC                  Exit the settings screen without saving / Exit the program
+  Left Key             Goes back one page, and extends the time spent
+                       on the page you are on.
+  Right Key            Goes forward one page, see above.
+  Space                Pause, wait on the current page until space is hit
+                       again.
+  Numeric Keys         You can check other weather by keying in other ZIP codes.
+  Enter Key            Switch between Celsius and Fahrenheit. Can also
+                       be used a way to force a data update.
+  "m" Key              Resets the location to the database default, then updates the data.
+  "i"                  Enter / Save settings
+  ESC                  Exit the settings screen without saving / Exit the program
 
   MythWeather also has an "Aggressiveness" setting.  This affects how
   long MythWeather waits for data from the msnbc.com website before
@@ -2366,7 +2384,6 @@
   +o  You have an AMD K6-2 or VIA C3 processor.  If you have either of
      these, make sure that you you followed the instructions in this
      ``section''.
-
   +o  You have an early production Intel Celeron, Pentium Pro or Pentium
      II.  If you have any of these processors, make sure that your
      ``deinterlace'' variable is set correctly.  Your CPU needs to
@@ -2396,6 +2413,7 @@
 
   This is most likely because your hard drive isn't setup to use DMA.
   Use the [1mhdparm [22mprogram to check and enable DMA.
+
        # hdparm -d /dev/hd?
 
   will tell you the DMA status for your hard drives.  If you run [1mhdparm[0m
@@ -2425,10 +2443,10 @@
   Some compile errors are worse than others.  If you get an error that
   doesn't abort the compilation, and says something like:
 
-       cc1plus: warning: changing search order for system directory
-       "/usr/local/include"
-       cc1plus: warning:   as it has already been specified as a non-system
-       directory
+  cc1plus: warning: changing search order for system directory
+  "/usr/local/include"
+  cc1plus: warning:   as it has already been specified as a non-system
+  directory
 
   then it shouldn't be a problem.
 
@@ -2451,11 +2469,11 @@
 
   Edit your /etc/X11/XF86Config-4 file, and look for:
 
-  Section "ServerFlags"
-      #DontZap # disable <Crtl><Alt><BS> (server abort)
-      #DontZoom # disable <Crtl><Alt><KP_+>/<KP_-> (resolution switching)
-      AllowMouseOpenFail # allows the server to start up even if the mouse doesn't work
-  EndSection
+       Section "ServerFlags"
+           #DontZap # disable <Crtl><Alt><BS> (server abort)
+           #DontZoom # disable <Crtl><Alt><KP_+>/<KP_-> (resolution switching)
+           AllowMouseOpenFail # allows the server to start up even if the mouse doesn't work
+       EndSection
 
   Add Option "NoPM" "true" and Option "BlankTime" "0"to the ServerFlags
   section.
@@ -2476,23 +2494,23 @@
 
   Finally, check:
 
-       Section "Monitor"
-           Identifier "monitor1"
-           VendorName "Plug'n Play"
-           HorizSync 30-85
-           VertRefresh 50-160
+  Section "Monitor"
+      Identifier "monitor1"
+      VendorName "Plug'n Play"
+      HorizSync 30-85
+      VertRefresh 50-160
 
-           # Sony Vaio C1(X,XS,VE,VN)?
-           # 1024x480 @ 85.6 Hz, 48 kHz hsync
-           ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
+      # Sony Vaio C1(X,XS,VE,VN)?
+      # 1024x480 @ 85.6 Hz, 48 kHz hsync
+      ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
 
-           # TV fullscreen mode or DVD fullscreen output.
-           # 768x576 @ 79 Hz, 50 kHz hsync
-           ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
+      # TV fullscreen mode or DVD fullscreen output.
+      # 768x576 @ 79 Hz, 50 kHz hsync
+      ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
 
-           # 768x576 @ 100 Hz, 61.6 kHz hsync
-           ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
-       EndSection
+      # 768x576 @ 100 Hz, 61.6 kHz hsync
+      ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
+  EndSection
 
   Ensure that there isn't an Option "DPMS" in the Monitor configuration.
 
@@ -2548,6 +2566,7 @@
 
   At this point, you now have debug-enabled software ready.  Let's
   assume that the problem you're having is in the setup program.
+
        $ cd setup
        $ gdb ./setup
 
@@ -2632,7 +2651,7 @@
   instructions on disabling the sound manager.  If you wish to see what
   application is grabbing a resource, you can use the fuser command:
 
-       # fuser -v /dev/dsp
+  # fuser -v /dev/dsp
 
   To disable aRts in KDE, go to KDE->Control Center->Sound->Sound System
   and uncheck the "Start aRts soundserver on KDE startup" box.  Run #
@@ -2686,11 +2705,11 @@
 
   Download the source to MPlayer and patch:
 
-       $ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90rc1.tar.bz2
-       $ tar -xjf MPlayer-0.90rc1.tar.bz2
-       $ cp mplayer-0.90pre10+mythtv.patch MPlayer-0.90rc1
-       $ cd MPlayer-0.90rc1
-       $ patch -p1 < mplayer-0.90pre10+mythtv.patch
+  $ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90rc1.tar.bz2
+  $ tar -xjf MPlayer-0.90rc1.tar.bz2
+  $ cp mplayer-0.90pre10+mythtv.patch MPlayer-0.90rc1
+  $ cd MPlayer-0.90rc1
+  $ patch -p1 < mplayer-0.90pre10+mythtv.patch
 
   At this point, you can read the MPlayer documentation and start the
   compile process.
@@ -2904,6 +2923,8 @@
 
   +o  Hauppauge WinTV-radio with dbx-TV stereo, model 401
 
+  +o  Hauppauge WinTV-Theater, model 495
+
   +o  ATI TV Wonder
 
   The following cards do not work:
@@ -2913,9 +2934,14 @@
 
   +o  ATI TV Wonder VE
 
+  +o  Leadtek Winfast 2000 XP (PAL, UK)
+
+  +o  I/O Magic PC-PVR.  No MSP34xx chip.
+
   The following cards have been reported to work, but have issues:
 
-  +o  Avermedia AVerTV Studio (no digital DSP output, "whiney noise")
+  +o  Avermedia AVerTV Studio (no digital DSP output, "whiney noise" on
+     analog)
 
   See contrib/example.modules.conf.for.btaudio for an example file on
   how to configure btaudio on your system.
