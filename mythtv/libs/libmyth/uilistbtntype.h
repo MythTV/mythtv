@@ -108,6 +108,7 @@ class UIListTreeType : public UIType
     bool isActive(){ return list_tree_active; } 
     void enter();
     void moveAwayFrom(UIListGenericTree *node);
+    int  getNumbItemsVisible();
 
   signals:
     
@@ -200,6 +201,7 @@ class UIListBtnType : public UIType
     int   GetDrawOffset(void) { return m_xdrawoffset; }
 
     QRect GetArea(void) { return m_rect; }
+    uint   GetNumbItemsVisible(){ return m_itemsVisible; }
 
   private:
     void  Init();

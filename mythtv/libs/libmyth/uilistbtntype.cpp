@@ -760,6 +760,14 @@ void UIListTreeType::moveAwayFrom(UIListGenericTree *node)
     }
 }
 
+int UIListTreeType::getNumbItemsVisible()
+{
+    if(!currentlevel)
+    {
+        return 0;
+    }
+    return (int) currentlevel->GetNumbItemsVisible();
+}
 
 //////////////////////////////////////////////////////////////////////////////
 
