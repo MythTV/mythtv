@@ -404,7 +404,10 @@ bool IvtvDecoder::ReadWrite(int onlyvideo)
             if (videndofframe)
             {
                 if (vidanyframes)
+                {
                     framesRead++;
+                    return false;
+                }
                 vidanyframes = 1;
             }
             return true;
