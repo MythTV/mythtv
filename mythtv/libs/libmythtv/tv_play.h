@@ -150,7 +150,7 @@ class TV : public QObject
     void DoArbSeek(int dir);
     void NormalSpeed(void);
     void ChangeSpeed(int direction);
-    void ChangeTimeStretch(int dir);
+    void ChangeTimeStretch(int dir, bool allowEdit = true);
     float StopFFRew(void);
     void ChangeFFRew(int direction);
     void SetFFRew(int index);

@@ -3292,10 +3292,11 @@ void TV::ChangeVolume(bool up)
     }
 }
 
-void TV::ChangeTimeStretch(int dir)
+void TV::ChangeTimeStretch(int dir, bool allowEdit)
 {
     float new_normal_speed = normal_speed + 0.05*dir;
-    stretchAdjustment = true;
+    stretchAdjustment = allowEdit;
+
     if (new_normal_speed > 2.0 || new_normal_speed < 0.48)
         return;
 
@@ -3856,7 +3857,8 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
         {
             normal_speed = stretch;   // alter speed before display
         }
-        ChangeTimeStretch(0);   // just display
+
+        ChangeTimeStretch(0, !floatRead);   // just display
     }
     else if (action.left(11) == "TOGGLESLEEP")
     {
