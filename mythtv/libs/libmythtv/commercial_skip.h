@@ -176,6 +176,7 @@ class CommDetect : public QObject
     int horizSpacing;
     int vertSpacing;
     int border;
+    int blankFrameMaxDiff;
     double fps;
     double fpm;
     bool blankFramesOnly;

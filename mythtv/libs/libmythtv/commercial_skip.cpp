@@ -117,6 +117,7 @@ void CommDetect::Init(int w, int h, double frame_rate, int method)
     blankFrameCount = 0;
 
     border = gContext->GetNumSetting("CommBorder", 20);
+    blankFrameMaxDiff = gContext->GetNumSetting("CommBlankFrameMaxDiff", 25);
 
     aggressiveDetection = true;
     currentAspect = COMM_ASPECT_WIDE;
@@ -338,7 +339,6 @@ void CommDetect::ProcessNextFrame(VideoFrame *frame, long long frame_number)
 
 bool CommDetect::CheckFrameIsBlank(void)
 {
-    int MaxDiff = 25;
     int DarkBrightness = 80;
     int DimBrightness = 120;
     int BoxBrightness = 30;
@@ -453,7 +453,7 @@ bool CommDetect::CheckFrameIsBlank(void)
     totalMinBrightness += min;
     DimAVG = min + 10;
 
-    if ((max - min) <= MaxDiff)
+    if ((max - min) <= blankFrameMaxDiff)
         return(true);
 
     if ((!aggressiveDetection) &&
