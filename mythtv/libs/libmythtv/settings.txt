@@ -18,50 +18,6 @@ str BufferName=/mnt/store/ringbuf.nuv
 # Path to store recordings in
 str RecordFilePrefix=/mnt/store/
  
-# Record settings (these are now pretty much all in the database -mdz)
-#
-# Video settings
-#
-# Resolution to capture at
-#int Width=480
-#int Height=480
-# What codec to use?  Tested values are rtjpeg (the default) and mpeg4
-#str Codec=rtjpeg
-#
-# I normally use 640x480 with the mpeg4 codec and the below settings.
-#
-#
-# RTjpeg specific settings
-#
-# Quality level to capture at (higher better, 255 being best)
-#int Quality=170
-# Motion Levels (lower better, 0 being best)
-#int LumaFilter=0
-#int ChromaFilter=0
-#
-# MPEG4 specific settings
-# 
-# Desired bitrate, in bits/second.  2200 means about a gigabyte an hour.
-#int TargetBitrate=3300
-# Scale bitrate by frame size.  If this is set to 1, the target bitrate given
-# above will be used as a guideline for 640x480.  Other resolutions will scale
-# the target bitrate down according to the framesize.
-#int ScaleBitrate=1
-# Maximum quality level.  1 is best, 31 is worst
-#int MaxQuality=2
-# Minimum quality level.  1 is best, 31 is worst
-#int MinQuality=15
-# Maximum quality difference between frames.
-int QualDiff=3
-#
-# Hardware MJPEG specific settings
-#
-# Quality level (0 - 100)
-int HardwareMJPEGQuality=100
-# Decimation (as in lavrec) -- overrides the video size set above.
-# 1 is 720x480, 2 is 352x240 (at least in NTSC-land).
-int HardwareMJPEGDecimation=2
-# 
 # Audio settings
 #
 # dsp device -- output only

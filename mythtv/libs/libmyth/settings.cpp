@@ -287,6 +287,7 @@ QDialog* ConfigurationWizard::dialogWidget(QWidget* parent,
         if (children[i]->isVisible()) {
             QWidget* child = children[i]->configWidget(parent);
             wizard->addPage(child, children[i]->getLabel());
+            wizard->setHelpEnabled(child, false);
             if (i == children.size()-1)
                 // Last page always has finish enabled for now
                 // stuff should have sane defaults anyway

@@ -38,7 +38,7 @@ public:
     BufferName():
         GlobalSetting("BufferName") {
         setLabel("Live TV buffer");
-        setValue("/var/cache/mythtv/ringbuf.nuv");
+        setValue("/mnt/store/ringbuf.nuv");
     }
 };
         
@@ -68,7 +68,7 @@ public:
     RecordFilePrefix():
         GlobalSetting("RecordFilePrefix") {
         setLabel("Directory to hold recordings");
-        setValue("/var/lib/mythtv");
+        setValue("/mnt/store/");
     };
 };
 
@@ -153,6 +153,8 @@ public:
         setLabel("OSD theme");
 
         addSelection("defaultosd");
+        addSelection("blueosd");
+        addSelection("oldosd");
         addSelection("none");
     };
 };
