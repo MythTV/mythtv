@@ -285,7 +285,7 @@ void MameHandler::processGames()
                                && (tmp_counter < 16)) {
                                 tmp_array =
                                     QStringList::split(" ", chip[tmp_counter]);
-                                if (!strcmp(tmp_array[3], "name")) {
+                                if (tmp_array[3] && !strcmp(tmp_array[3], "name")) {
                                         if (!strcmp(tmp_array[2], "cpu")) {
                                                 if (!strcmp(rom->Cpu1(), "-"))
                                                         rom->setCpu1(tmp_array[4]);
@@ -317,7 +317,7 @@ void MameHandler::processGames()
                         }
 
                         tmp_array = QStringList::split(" ", video);
-                        if (!strcmp(tmp_array[2], "vector")) {
+                        if (tmp_array[2] && !strcmp(tmp_array[2], "vector")) {
                                 rom->setVector(TRUE);
                         } else {
                                 rom->setVector(FALSE);
@@ -340,8 +340,7 @@ void MameHandler::processGames()
                         }
                         tmp_array.clear();
 
-                        tmp_array =
-                            QStringList::split(" ", driver_status);
+                        tmp_array = QStringList::split(" ", driver_status);
                         if ((tmp_array[2])
                             && !strcmp(tmp_array[2], "good")) {
                                 rom->setWorking(TRUE);
