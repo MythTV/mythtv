@@ -38,7 +38,7 @@
       <textarea name="helptext" draworder="0">
         <area>30,60,760,80</area>
         <font>title</font>
-        <value>This screen show the status of various system components</value>
+        <value>This screen displays the status of various system components</value>
         <multiline>yes</multiline>
       </textarea>
     </container>
