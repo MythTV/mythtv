@@ -141,7 +141,7 @@ void SRRecGroup::showNewRecGroup()
                                                          " enter the group name"), newGroup);
     if (ok)
     {
-        addSelection(QString(QObject::tr("Store in the \"%1\" recording group")).arg(newGroup), newGroup, true);
+        addSelection(QString(QObject::tr("Store in the \"%1\" recording group")).arg(newGroup), newGroup);
         selectItem->selectValue(newGroup);
     }
 }

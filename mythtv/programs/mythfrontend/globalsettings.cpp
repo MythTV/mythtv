@@ -299,8 +299,10 @@ static GenericComboBox *DisplayRecGroup()
     if (query.isActive() && query.numRowsAffected() > 0)
         while (query.next())
             if (query.value(0).toString() != "Default")
-                gc->addSelection(query.value(0).toString(),
-                                 query.value(0).toString());
+            {
+                QString recgroup = QString::fromUtf8(query.value(0).toString());
+                gc->addSelection(recgroup, recgroup);
+            }
 
     gc->setHelpText(QObject::tr("Default Recording Group to display "
                     "on the View Recordings screen."));

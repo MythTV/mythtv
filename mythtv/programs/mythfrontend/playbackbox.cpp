@@ -2419,16 +2419,18 @@ void PlaybackBox::showRecGroupChooser(void)
 
     if (query.isActive() && query.numRowsAffected() > 0)
         while (query.next())
-            if (query.value(0).toString() != recGroup)
-            {
-                QString key = query.value(0).toString();
+        {
+            QString key = QString::fromUtf8(query.value(0).toString());
 
+            if (key != recGroup)
+            {
                 if (key == "Default")
                     groups += tr("Default");
                 else
                     groups += key;
                 recGroupType[key] = "recgroup";
             }
+        }
 
     if (gContext->GetNumSetting("UseCategoriesAsRecGroups"))
     {
@@ -2437,14 +2439,16 @@ void PlaybackBox::showRecGroupChooser(void)
 
         if (query.isActive() && query.numRowsAffected() > 0)
             while (query.next())
-                if ((query.value(0).toString() != recGroup) &&
-                    (query.value(0).toString() != ""))
+            {
+                QString key = QString::fromUtf8(query.value(0).toString());
+
+                if ((key != recGroup) && (key != ""))
                 {
-                    QString key = query.value(0).toString();
                     groups += key;
                     if ( !recGroupType.contains(key))
                         recGroupType[key] = "category";
                 }
+            }
     }
 
     if (recGroup != "All Programs")

@@ -667,7 +667,7 @@ void PreviousBox::removalDialog()
         thequery = QString("DELETE FROM oldrecorded "
                            "WHERE title = \"%1\"")
                            .arg(pi->title);
-        db->exec(thequery);
+        db->exec(thequery.utf8());
         fillItemList();
     }
 

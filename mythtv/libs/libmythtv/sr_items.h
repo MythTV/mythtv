@@ -674,7 +674,7 @@ class SRRecGroup: public SRSelectSetting
                                        SLOT(showNewRecGroup()));
 
             addSelection(QString(QObject::tr("Store in the \"%1\" recording group"))
-                         .arg(QObject::tr("Default")), "Default", false);
+                         .arg(QObject::tr("Default")), "Default");
 
             QString thequery = QString("SELECT DISTINCT recgroup from recorded "
                                        "WHERE recgroup <> 'Default'");
@@ -684,9 +684,10 @@ class SRRecGroup: public SRSelectSetting
             {
                 while (query.next())
                 {
-                    addSelection(QString(QObject::tr("Store in the \"%1\" recording "
-                                                     "group")).arg(query.value(0).toString()),
-                                 query.value(0).toString(), false);
+                    QString recgroup = QString::fromUtf8(query.value(0).toString());
+
+                    addSelection(QString(QObject::tr("Store in the \"%1\" recording group")).arg(recgroup),
+                                 recgroup);
                 }
             }
 
@@ -696,8 +697,12 @@ class SRRecGroup: public SRSelectSetting
 
             if (query.isActive() && query.numRowsAffected() > 0)
                 while (query.next())
-                    addSelection(QString(QObject::tr("Store in the \"%1\" recording group")).arg(query.value(0).toString()),
-                                 query.value(0).toString(), false);
+                {
+                    QString recgroup = QString::fromUtf8(query.value(0).toString());
+                    addSelection(QString(QObject::tr("Store in the \"%1\" recording group")).arg(recgroup),
+                                 recgroup);
+                }
+
         }
 
 

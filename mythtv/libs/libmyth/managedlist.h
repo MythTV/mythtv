@@ -502,7 +502,7 @@ class SelectManagedListSetting : public ManagedListSetting
                                  QString _table, QString _column, ManagedList* _parentList=NULL)
                                : ManagedListSetting(_table, _column, _parentList)
         {
-            constructListItem(QObject::tr(listText), _group, _parentList, listName);
+            constructListItem(listText, _group, _parentList, listName);
             listItem = selectItem;
 
             connect(listItem, SIGNAL(changed(ManagedListItem*)), this, SLOT(itemChanged(ManagedListItem*)));
@@ -517,41 +517,27 @@ class SelectManagedListSetting : public ManagedListSetting
         }
 
     public:
-        ManagedListItem* addSelection(const QString& label, const QString& value, bool trans = true )
+        ManagedListItem* addSelection(const QString& label, const QString& value)
         {
             if (selectItem)
-            {
-                if (trans)
-                    return selectItem->addSelection(QObject::tr(label), value);
-                else
-                    return selectItem->addSelection(label, value);
-            }
+                return selectItem->addSelection(label, value);
 
             return NULL;
         }
 
-        ManagedListItem* addButton(const QString& label, const QString& value, bool trans = true )
+        ManagedListItem* addButton(const QString& label, const QString& value)
         {
             if (selectItem)
-            {
-                if (trans)
-                    return selectItem->addButton(QObject::tr(label), value);
-                else
-                    return selectItem->addButton(label, value);
-            }
+                return selectItem->addButton(label, value);
 
             return NULL;
         }
 
-        ManagedListItem* addSelection(const QString& label, int value, bool trans = true )
+        ManagedListItem* addSelection(const QString& label, int value)
         {
             if (selectItem)
-            {
-                if (trans)
-                    return selectItem->addSelection(QObject::tr(label), QString::number(value));
-                else
-                    return selectItem->addSelection(label, QString::number(value));
-            }
+                return selectItem->addSelection(label, QString::number(value));
+
             return NULL;
         }
 
@@ -574,7 +560,7 @@ class BoolManagedListSetting : public ManagedListSetting
         {
             boolListItem = new BoolManagedListItem(false, _group, _parentList, this, ItemName);
             listItem = boolListItem;
-            boolListItem->setLabels(QObject::tr(trueText), QObject::tr(falseText));
+            boolListItem->setLabels(trueText, falseText);
             connect(listItem, SIGNAL(changed(ManagedListItem*)), this, SLOT(itemChanged(ManagedListItem*)));
         }
 

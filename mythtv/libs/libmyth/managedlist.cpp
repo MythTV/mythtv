@@ -104,9 +104,9 @@ void IntegerManagedListItem::setShortTemplates(const QString& negStr, const QStr
 
 #define ASSIGN_TEMPLATE(x,y,z) \
     if (x.find("%1") != -1) \
-        y = QString(tr(x)).arg(abs(z)); \
+        y = QString(x).arg(abs(z)); \
     else \
-        y = tr(x);
+        y = x;
 
 
 

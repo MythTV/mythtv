@@ -17,7 +17,7 @@ QString ProfileGroupParam::setClause(void) {
     return QString("id = %1, %2 = '%3'")
         .arg(parent.getProfileNum())
         .arg(getColumn())
-        .arg(getValue());
+        .arg(getValue().utf8());
 }
 
 void ProfileGroup::HostName::fillSelections(QSqlDatabase *db)
@@ -78,7 +78,7 @@ void ProfileGroup::fillSelections(QSqlDatabase* db, SelectSetting* setting) {
                if (! match)
                    continue;
             }
-            QString value = result.value(0).toString();
+            QString value = QString::fromUtf8(result.value(0).toString());
             if (result.value(2).toString() != NULL &&
                 result.value(2).toString() != "")
                 value += QString(" (%1)").arg(result.value(2).toString());
@@ -96,7 +96,7 @@ QString ProfileGroup::getName(QSqlDatabase *db, int group)
     if (result.isActive() && result.numRowsAffected() > 0)
     {
         result.next();
-        return result.value(0).toString();
+        return QString::fromUtf8(result.value(0).toString());
     }
     return NULL;
 }
@@ -106,7 +106,7 @@ bool ProfileGroup::allowedGroupName(void)
     QString query = QString("SELECT DISTINCT id FROM profilegroups WHERE "
                             "name = '%1' AND hostname = '%2';")
                             .arg(getName()).arg(host->getValue());
-    QSqlQuery result = db->exec(query);
+    QSqlQuery result = db->exec(query.utf8());
     if (result.isActive() && result.numRowsAffected() > 0)
         return false;
     return true;
