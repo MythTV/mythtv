@@ -183,6 +183,9 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
 
     if (createwindow)
     {
+        if (XJ_aspect)
+            curw = 4 * curh / 3;
+
         data->XJ_win = XCreateSimpleWindow(data->XJ_disp, data->XJ_root, curx, 
                                            cury, XJ_width, XJ_height, 0, 
                                            XJ_white, XJ_black);
@@ -401,9 +404,6 @@ void XvVideoOutput::ToggleFullScreen(void)
     if (XJ_fullscreen)
     {
         XJ_fullscreen = 0; 
-
-        if (XJ_aspect)
-            curw = 4 * curh / 3;
 
         curx = oldx; cury = oldy; curw = oldw; curh = oldh;
         show_cursor();
