@@ -1973,8 +1973,8 @@ void ps_pes(ipack *p)
 			break;
 		}
 
-		if (pv->has_vi && pv->vi.bitrate && !pv->muxr){
-			pv->muxr = (pv->vi.bit_rate+pa->ai.bitrate)/400;
+		if (pv->has_vi && pv->vi.bit_rate && !pv->muxr){
+			pv->muxr = (pv->vi.bit_rate+pa->ai.bit_rate)/400;
 		}
 		//fprintf(stderr, "PS_PES: start %d muxr %d vi %d b7 0x%2x has_ai %d\n",
 		//		p->start_header, p->muxr, p->vi.bit_rate, p->buf[7], p->has_ai);
