@@ -15,7 +15,7 @@ Watching TV or a recording
 - P to pause / unpause.
 - Left arrow to rewind the configured number of seconds.  (default is 5)
 - Right arrow to fast forward the configured number of seconds. (default is 30)
-- C to hange inputs on TV Tuner card
+- C to change inputs on TV Tuner card
 - ESC quits
 - I puts the Onscreen Display up again
 - M brings up the electronic program guide (Grid) -- see the EPG section.
