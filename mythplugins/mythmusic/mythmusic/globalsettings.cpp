@@ -48,6 +48,8 @@ public:
         fillSelectionsFromDir(dev);
         dev.setNameFilter("scd*");
         fillSelectionsFromDir(dev);
+        dev.setNameFilter("hd*");
+        fillSelectionsFromDir(dev);
 
         dev.setNameFilter("cdrom*");
         dev.setPath("/dev/cdroms");

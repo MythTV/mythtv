@@ -44,8 +44,8 @@ void CheckFreeDBServerFile(void)
         cddbconf.conf_access = CDDB_ACCESS_REMOTE;
         list.list_len = 1;
         strncpy(list.list_host[0].host_server.server_name,
-                "www.freedb.org", 256);
-        strncpy(list.list_host[0].host_addressing, "cgi-bin/cddb.cgi", 256);
+                "freedb.freedb.org", 256);
+        strncpy(list.list_host[0].host_addressing, "~cddb/cddb.cgi", 256);
         list.list_host[0].host_server.server_port = 80;
         list.list_host[0].host_protocol = CDDB_MODE_HTTP;
 
