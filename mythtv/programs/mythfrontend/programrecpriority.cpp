@@ -470,7 +470,7 @@ void ProgramRecPriority::edit(void)
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT recpriority, type, inactive FROM"
                       " record WHERE recordid = :RECORDID ;");
-        query.bindValue("RECORDID", recid);
+        query.bindValue(":RECORDID", recid);
 
         if (query.exec() && query.isActive())
             if (query.size() > 0)
