@@ -41,6 +41,8 @@ class PlaylistDialog : public MythThemedDialog
     bool commitEdits();
     ~PlaylistDialog();
 
+    UIListGenericTree* getWorkingPlaylist(){return working_playlist_tree; }
+
   public slots:
   
     void handlePlaylistEntered(UIListTreeType*, UIListGenericTree*);

@@ -353,6 +353,7 @@ void MfeDialog::handleTreeSignals(UIListGenericTree *node)
                   )
                 {
 
+                    QString playlist_name = node->getString();
                     mfd_id_for_playlist_dialog = current_mfd->getId();
                     playlist_dialog = new PlaylistDialog(
                                                         gContext->GetMainWindow(),
@@ -364,12 +365,17 @@ void MfeDialog::handleTreeSignals(UIListGenericTree *node)
                                                         pristine_content_tree,
                                                         working_playlist_tree,
                                                         working_content_tree,
-                                                        node->getString()
+                                                        playlist_name
                                                         );
                     playlist_dialog->exec();
                     if(playlist_dialog->commitEdits())
                     {
-                        cout << "we should now be commiting edits" << endl;
+                        mfd_interface->commitListEdits(
+                                                        mfd_id_for_playlist_dialog,
+                                                        playlist_dialog->getWorkingPlaylist(),
+                                                        false,
+                                                        playlist_name
+                                                      );
                     }
                     delete playlist_dialog;
                     playlist_dialog = NULL;

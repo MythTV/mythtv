@@ -397,7 +397,6 @@ bool PlaylistDialog::commitEdits()
     //  disappear. As long as we're not running pristine and at least one
     //  change occured, say YUP.
     //
-    //
     
     if (current_content_tree == working_content_tree)
     {
@@ -418,6 +417,9 @@ bool PlaylistDialog::commitEdits()
         //
         
         mfd_interface->stopPlaylistCheck();
+        cerr << "Playlist editor exited before working copy was finished. "
+             << "Edits will be lost. Remind someone to fix this."
+             << endl;
 
     }
     return false;
