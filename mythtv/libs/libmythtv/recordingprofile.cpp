@@ -250,7 +250,7 @@ public:
             SpinBoxSetting(160,maxwidth,16),
             CodecParam(parent, "width") {
             setLabel("Width");
-            setValue(maxwidth);
+            setValue(480);
         };
     };
 
@@ -260,7 +260,7 @@ public:
             SpinBoxSetting(160,maxheight,16),
             CodecParam(parent, "height") {
             setLabel("Height");
-            setValue(maxheight);
+            setValue(480);
         };
     };
 
