@@ -26,15 +26,6 @@
       <action>TV_SCHEDULE</action>
    </button>
 
-
-   <button>
-      <type>TV_SCHEDULE</type>
-      <text>Update Program Guide</text>
-      <text lang="NL">Update Programmagids</text>
-      <alttext>Update</alttext>
-      <action>EXEC /etc/cron.daily/haaltvdata</action>
-   </button>
-
    <button>
       <type>TV_PROGFIND</type>
       <text>Program Finder</text>
