@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.03.02 (xris)
+#Last Updated: 2005.03.31 (xris)
 #
 #  ffmpeg.pm
 #
@@ -19,6 +19,9 @@ package export::ffmpeg;
     use nuv_export::cli;
     use nuv_export::ui;
     use mythtv::recordings;
+
+# In case people would rather use yuvdenoise to deinterlace
+    add_arg('deint_in_yuvdenoise|deint-in-yuvdenoise', 'Deinterlace in yuvdenoise instead of ffmpeg');
 
 # Check for ffmpeg
     sub init_ffmpeg {
@@ -110,11 +113,15 @@ package export::ffmpeg;
                 $ffmpeg .= " -i /tmp/fifodir_$$/vidout -f yuv4mpegpipe -";
                 $ffmpeg .= " 2> /dev/null | ";
                 $ffmpeg .= "$NICE yuvdenoise -r 16";
-                if ($self->{'deinterlace'}) {
-                    $ffmpeg .= " -F";
+                if ($self->val('fast_denoise')) {
+                    $ffmpeg .= ' -f';
                 }
                 if ($self->{'crop'}) {
                     $ffmpeg .= " -b $crop_w,$crop_h,-$crop_w,-$crop_h";
+                }
+            # Deinterlace in yuvdenoise
+                if ($self->val('deint_in_yuvdenoise') && $self->val('deinterlace')) {
+                    $ffmpeg .= " -F";
                 }
                 $ffmpeg .= " 2> /dev/null | ";
                 $videofifo = '-';
@@ -137,13 +144,12 @@ package export::ffmpeg;
             $ffmpeg .= " -r " . $episode->{'finfo'}{'fps'};
             $ffmpeg .= " -i $videofifo";
 
-        # Filters
-            if ($self->{'deinterlace'} && !$self->{'noise_reduction'}) {
+        # Deinterlace in ffmpeg only if the user wants to
+            if ($self->val('deinterlace') && !$self->val('noise_reduction') && !$self->val('deint_in_yuvdenoise')) {
                 $ffmpeg .= " -deinterlace";
             }
-
-            if ($self->{'crop'}) {
-
+        # Crop
+            if ($self->val('crop')) {
                 $ffmpeg .= " -croptop $crop_h -cropbottom $crop_h";
                 $ffmpeg .= " -cropleft $crop_w -cropright $crop_w";
             }

@@ -33,6 +33,7 @@ package export::generic;
     add_arg('width|h_res|w=s',               'Output width.');
     add_arg('deinterlace!',                  'Deinterlace video.');
     add_arg('noise_reduction|denoise|nr!',   'Enable noise reduction.');
+    add_arg('fast_denoise|fast-denoise',     'Use fast noise reduction instead of standard.');
     add_arg('crop!',                         'Crop out broadcast overscan.');
 
 # Load defaults

@@ -91,6 +91,12 @@
 #
 #    fast_denoise = yes
 #
+# By default, nuvexport's ffmpeg module lets ffmpeg handle deinterlacing.
+# I've found that this provides the best results, but if you wish to let
+# yuvdenoise do it instead, set deint_in_yuvdenoise to a true value.
+#
+#    deint_in_yuvdenoise = yes
+#
 </ffmpeg>
 
 <transcode>
