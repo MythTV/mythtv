@@ -164,7 +164,7 @@ void CardInput::loadByInput(QSqlDatabase* db, int _cardid, QString _inputname) {
         loadByID(db, result.value(0).toInt());
     } else {
         load(db); // new
-        cardid->setValue(QString("%1").arg(_cardid));
+        cardid->setValue(QString::number(_cardid));
         inputname->setValue(_inputname);
     }
 }
@@ -195,10 +195,7 @@ int CaptureCardEditor::exec(QSqlDatabase* db) {
 void CaptureCardEditor::load(QSqlDatabase* db) {
     clearSelections();
     addSelection("(New capture card)", "0");
-    QSqlQuery query = db->exec("SELECT videodevice, cardid FROM capturecard;");
-    if (query.isActive() && query.numRowsAffected() > 0)
-        while (query.next())
-            addSelection(query.value(0).toString(), query.value(1).toString());
+    CaptureCard::fillSelections(db, this);
 }
 
 int VideoSourceEditor::exec(QSqlDatabase* db) {
@@ -211,11 +208,7 @@ int VideoSourceEditor::exec(QSqlDatabase* db) {
 void VideoSourceEditor::load(QSqlDatabase* db) {
     clearSelections();
     addSelection("(New video source)", "0");
-    QSqlQuery query = db->exec("SELECT name, sourceid FROM videosource;");
-    if (query.isActive() && query.numRowsAffected() > 0)
-        while (query.next())
-            addSelection(query.value(0).toString(), query.value(1).toString());
-
+    VideoSource::fillSelections(db, this);
 }
 
 int CardInputEditor::exec(QSqlDatabase* db) {
@@ -227,6 +220,11 @@ int CardInputEditor::exec(QSqlDatabase* db) {
 
 void CardInputEditor::load(QSqlDatabase* db) {
     clearSelections();
+
+    // We do this manually because we want custom labels.  If
+    // StringSelectSetting provided a facility to edit the labels, we
+    // could use CaptureCard::fillSelections
+
     QSqlQuery capturecards = db->exec("SELECT cardid,videodevice FROM capturecard;");
     if (capturecards.isActive() && capturecards.numRowsAffected() > 0)
         while (capturecards.next()) {
@@ -261,7 +259,7 @@ void CardInputEditor::load(QSqlDatabase* db) {
                 CardInput* cardinput = new CardInput(m_context);
                 cardinput->loadByInput(db, cardid, input);
                 cardinputs.push_back(cardinput);
-                QString index = QString("%1").arg(cardinputs.size()-1);
+                QString index = QString::number(cardinputs.size()-1);
 
                 QString label = QString("%1 (%2) -> %3")
                     .arg(videodevice)
