@@ -168,7 +168,7 @@ public:
 
         setLabel("Minimum quality");
         setValue(15);
-	setHelpText("Leave this alone unless you know exactly what you are doing.");
+	setHelpText("Modifying the default may have severe consequences.");
     };
 };
 
@@ -180,7 +180,7 @@ public:
 
         setLabel("Maximum quality");
         setValue(2);
-	setHelpText("Leave this alone unless you know exactly what you are doing.");
+	setHelpText("Modifying the default may have severe consequences.");
     };
 };
 
@@ -190,7 +190,7 @@ public:
         CodecParam(parent, "mpeg4qualdiff"),
         SliderSetting(1,31,1) {
 
-        setLabel("Leave this alone unless you know exactly what you are doing.");
+        setLabel("Modifying the default may have severe consequences.");
         setValue(3);
     };
 };
