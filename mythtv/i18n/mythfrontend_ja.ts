@@ -191,47 +191,47 @@
     </message>
     <message>
         <source>Queued</source>
-        <translation type="unfinished">待機中</translation>
+        <translation>待機中</translation>
     </message>
     <message>
         <source>Pending</source>
-        <translation type="unfinished">保留中</translation>
+        <translation>保留中</translation>
     </message>
     <message>
         <source>Starting</source>
-        <translation type="unfinished">開始中</translation>
+        <translation>開始中</translation>
     </message>
     <message>
         <source>Running</source>
-        <translation type="unfinished">実行中</translation>
+        <translation>実行中</translation>
     </message>
     <message>
         <source>Paused</source>
-        <translation type="unfinished">一時停止中</translation>
+        <translation>一時停止中</translation>
     </message>
     <message>
         <source>Stopping</source>
-        <translation type="unfinished">停止中</translation>
+        <translation>停止中</translation>
     </message>
     <message>
         <source>Done (Invalid status!)</source>
-        <translation type="unfinished">終了 (無効なステータス)</translation>
+        <translation>終了 (無効なステータス)</translation>
     </message>
     <message>
         <source>Finished</source>
-        <translation type="unfinished">完了</translation>
+        <translation>完了</translation>
     </message>
     <message>
         <source>Aborted</source>
-        <translation type="unfinished">異常終了</translation>
+        <translation>異常終了</translation>
     </message>
     <message>
         <source>Errored</source>
-        <translation type="unfinished">エラー発生</translation>
+        <translation>エラー発生</translation>
     </message>
     <message>
         <source>Undefined</source>
-        <translation type="unfinished">未完了</translation>
+        <translation>未完了</translation>
     </message>
 </context>
 <context>
@@ -557,38 +557,38 @@
     </message>
     <message>
         <source>Yes, and allow re-record</source>
-        <translation type="unfinished">はい, 再録画可能にする</translation>
+        <translation>はい, 再録画可能にする</translation>
     </message>
     <message>
         <source>^(The |A |An )</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>PreviousBox</name>
     <message>
         <source>Previously Recorded</source>
-        <translation type="unfinished"></translation>
+        <translation>以前の録画</translation>
     </message>
     <message>
         <source>Select Sort Order</source>
-        <translation type="unfinished"></translation>
+        <translation>並び順選択</translation>
     </message>
     <message>
         <source>Sort by Title</source>
-        <translation type="unfinished"></translation>
+        <translation>タイトルで並び替え</translation>
     </message>
     <message>
         <source>Reverse Title</source>
-        <translation type="unfinished"></translation>
+        <translation>タイトル逆順</translation>
     </message>
     <message>
         <source>Sort by Time</source>
-        <translation type="unfinished"></translation>
+        <translation>時間で並び替え</translation>
     </message>
     <message>
         <source>Reverse Time</source>
-        <translation type="unfinished"></translation>
+        <translation>時間逆順</translation>
     </message>
 </context>
 <context>
@@ -682,91 +682,91 @@
     </message>
     <message>
         <source>Power Search</source>
-        <translation type="unfinished"></translation>
+        <translation>パワーサーチ</translation>
     </message>
     <message>
         <source>Select Rating</source>
-        <translation type="unfinished"></translation>
+        <translation>レーティング選択</translation>
     </message>
     <message>
         <source>Select List</source>
-        <translation type="unfinished"></translation>
+        <translation>リスト選択</translation>
     </message>
     <message>
         <source>Select</source>
-        <translation type="unfinished"></translation>
+        <translation>選択</translation>
     </message>
     <message>
         <source>Select Search</source>
-        <translation type="unfinished"></translation>
+        <translation>検索選択</translation>
     </message>
     <message>
         <source>&lt;New Search&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;新規検索&gt;</translation>
     </message>
     <message>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>編集</translation>
     </message>
     <message>
         <source>Edit Power Search Fields</source>
-        <translation type="unfinished"></translation>
+        <translation>パワーサーチフィールドを編集</translation>
     </message>
     <message>
         <source>Optional title phrase:</source>
-        <translation type="unfinished"></translation>
+        <translation>オプションのタイトルフレーズ:</translation>
     </message>
     <message>
         <source>Optional subtitle phrase:</source>
-        <translation type="unfinished"></translation>
+        <translation>オプションのサブタイトルフレーズ:</translation>
     </message>
     <message>
         <source>Optional description phrase:</source>
-        <translation type="unfinished"></translation>
+        <translation>オプションの内容フレーズ:</translation>
     </message>
     <message>
         <source>Movies</source>
-        <translation type="unfinished"></translation>
+        <translation>映画</translation>
     </message>
     <message>
         <source>Series</source>
-        <translation type="unfinished"></translation>
+        <translation>シリーズ</translation>
     </message>
     <message>
         <source>Show</source>
-        <translation type="unfinished"></translation>
+        <translation>番組</translation>
     </message>
     <message>
         <source>Sports</source>
-        <translation type="unfinished"></translation>
+        <translation>スポーツ</translation>
     </message>
     <message>
         <source>All</source>
-        <translation type="unfinished">全て</translation>
+        <translation>全て</translation>
     </message>
     <message>
         <source>Specials</source>
-        <translation type="unfinished"></translation>
+        <translation>スペシャル</translation>
     </message>
     <message>
         <source>4 stars</source>
-        <translation type="unfinished"></translation>
+        <translation>4星</translation>
     </message>
     <message>
         <source>At least 3 1/2 stars</source>
-        <translation type="unfinished"></translation>
+        <translation>3 1/2星以上</translation>
     </message>
     <message>
         <source>At least 3 stars</source>
-        <translation type="unfinished"></translation>
+        <translation>3星以上</translation>
     </message>
     <message>
         <source>At least 2 stars</source>
-        <translation type="unfinished"></translation>
+        <translation>2星以上</translation>
     </message>
     <message>
         <source>Power Recording Rule</source>
-        <translation type="unfinished"></translation>
+        <translation>パワーレコーディングルール</translation>
     </message>
 </context>
 <context>
@@ -825,27 +825,27 @@
     </message>
     <message>
         <source>^(The |A |An )</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Recording with override options</source>
-        <translation type="unfinished"></translation>
+        <translation>個別設定オプションで録画</translation>
     </message>
     <message>
         <source>Recording in this timeslot</source>
-        <translation type="unfinished"></translation>
+        <translation>この時間帯で録画</translation>
     </message>
     <message>
         <source>Recording on this channel</source>
-        <translation type="unfinished"></translation>
+        <translation>このチャンネルで録画</translation>
     </message>
     <message>
         <source>Recording one showing</source>
-        <translation type="unfinished"></translation>
+        <translation>この番組だけ録画</translation>
     </message>
     <message>
         <source>Not allowed to record this showing</source>
-        <translation type="unfinished"></translation>
+        <translation>この番組は録画されません</translation>
     </message>
 </context>
 <context>
@@ -2990,7 +2990,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>The amount of time the master backend idles before it shuts down all backends. Set to 0 to disable auto shutdown.</source>
-        <translation>マスターバックエンドが他のバックエンドをシャットダウンさせる前の，待ち時間を指定します．0をセットすると自動シャットダウンを無効化できます．</translation>
+        <translation>マスターバックエンドがシャットダウンするまでのアイドル時間を指定します．0をセットすると自動シャットダウンしません。</translation>
     </message>
     <message>
         <source>Max. wait for recording (min)</source>
@@ -3006,7 +3006,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>The amount of time the master backend will be woken up before a recording starts.</source>
-        <translation>録画開始から何秒前にマスターバックエンドが起動するかを指定します．</translation>
+        <translation>録画開始から何秒前にマスターバックエンドを起動させるかを指定します．</translation>
     </message>
     <message>
         <source>Wakeup time format</source>
@@ -3014,11 +3014,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>The format of the time string passed to the &apos;setWakeuptime Command&apos; as $time. See QT::QDateTime.toString() for details. Set to &apos;time_t&apos; for seconds since epoch.</source>
-        <translation>&apos;setWakeuptime Command&apos;に$timeとして渡される，時間を表す文字列のフォーマットを指定します．詳細はQT::QDateTime.toString()を参照してください．エポック秒を指定するには&apos;time_t&apos;を入力します．</translation>
+        <translation>&apos;起動時間設定コマンド&apos;に$timeとして渡される，時間を表す文字列のフォーマットを指定します．詳細はQT::QDateTime.toString()を参照してください．エポック秒を指定するには&apos;time_t&apos;を入力します．</translation>
     </message>
     <message>
         <source>Set wakeuptime command</source>
-        <translation>起動時間コマンドの設定</translation>
+        <translation>起動時間設定コマンド</translation>
     </message>
     <message>
         <source>The command used to set the time (passed as $time) to wake up the masterbackend</source>
@@ -3740,7 +3740,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Commercial Free</source>
-        <translation type="unfinished">CMフリー</translation>
+        <translation>CMフリー</translation>
     </message>
     <message>
         <source>S</source>
@@ -3901,11 +3901,11 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>another program with a higher priority will be recorded.</source>
-        <translation type="unfinished">他の番組の方が優先順位が高いので録画されます。</translation>
+        <translation>他の番組の方が優先順位が高いので録画されます。</translation>
     </message>
     <message>
         <source>this episode will be recorded at a later time.</source>
-        <translation type="unfinished">この番組はあとで録画されます。</translation>
+        <translation>この番組はあとで録画されます。</translation>
     </message>
     <message>
         <source>Category:  </source>
@@ -3967,7 +3967,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Using your keyboard or the numbers keys on your remote enter the group name</source>
-        <translation type="unfinished">キーボードかリモコンの番号キーでグループ名を入力してください</translation>
+        <translation>キーボードかリモコンの番号キーでグループ名を入力してください</translation>
     </message>
     <message>
         <source>Store in the &quot;%1&quot; recording group</source>
@@ -4035,7 +4035,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Bob (2x framerate)</source>
-        <translation type="unfinished">Bob (2x フレームレート)</translation>
+        <translation>Bob (2x フレームレート)</translation>
     </message>
     <message>
         <source>One field</source>
@@ -4055,11 +4055,11 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Default Recording Group to display on the View Recordings screen.</source>
-        <translation type="unfinished">既定の録画グループを録画画面に表示する。</translation>
+        <translation>既定の録画グループを録画画面に表示する。</translation>
     </message>
     <message>
         <source>Show group name instead of &quot;All Programs&quot;</source>
-        <translation type="unfinished">&quot;全番組&quot;の変わりにグループ名を表示する</translation>
+        <translation>&quot;全番組&quot;の変わりにグループ名を表示する</translation>
     </message>
     <message>
         <source>Use the name of the display group currently being shown in place of the term &quot;All Programs&quot; in the playback screen.</source>
@@ -4067,7 +4067,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Start in Title section</source>
-        <translation type="unfinished">タイトル選択から開始する</translation>
+        <translation>タイトル選択から開始する</translation>
     </message>
     <message>
         <source>If enabled, the selector highlight will start on the Program titles window, otherwise the selector will default to the recordings.</source>
@@ -4075,7 +4075,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Show group summary</source>
-        <translation type="unfinished">グループ合計を表示する</translation>
+        <translation>グループ合計を表示する</translation>
     </message>
     <message>
         <source>This determines the method used by MythTV to detect when commercials start and end.  You must have &apos;Automatically Flag Commercials&apos; enabled to use anything other than &apos;Blank Frame&apos;.</source>
@@ -4083,19 +4083,19 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>CPU Usage</source>
-        <translation type="unfinished">CPU使用</translation>
+        <translation>CPU使用</translation>
     </message>
     <message>
         <source>Low</source>
-        <translation type="unfinished">低</translation>
+        <translation>低</translation>
     </message>
     <message>
         <source>Medium</source>
-        <translation type="unfinished">中</translation>
+        <translation>中</translation>
     </message>
     <message>
         <source>High</source>
-        <translation type="unfinished">高</translation>
+        <translation>高</translation>
     </message>
     <message>
         <source>Enable stricter Commercial Detection code.  Disable if some commercials are not being detected.</source>
@@ -4107,7 +4107,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Commercial Skip Notify Amount</source>
-        <translation type="unfinished"></translation>
+        <translation>CMスキップ通知秒数</translation>
     </message>
     <message>
         <source>If set, MythTV will act like a commercial begins this many seconds early.  This can be useful when commercial notification is used in place of automatic skipping.</source>
@@ -4139,7 +4139,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Always display Closed Captioning</source>
-        <translation type="unfinished"></translation>
+        <translation>クローズドキャプションを常に表示する</translation>
     </message>
     <message>
         <source>If enabled, captions will be displayed when playing back recordings or watching live TV.  Closed Captioning can be turned on or off by pressing &quot;T&quot; during playback.</source>
@@ -4175,7 +4175,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Generate thumbnail preview images of recordings</source>
-        <translation type="unfinished">サムネイルのプレビューイメージを作成する</translation>
+        <translation>サムネイルのプレビューイメージを作成する</translation>
     </message>
     <message>
         <source>If enabled, a static image of the recording will be displayed on the &quot;Watch a Recording&quot; menu.</source>
@@ -4199,11 +4199,11 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>System Exit key</source>
-        <translation type="unfinished">システム終了キー</translation>
+        <translation>システム終了キー</translation>
     </message>
     <message>
         <source>Confirm Exit</source>
-        <translation type="unfinished">終了時確認</translation>
+        <translation>終了時確認</translation>
     </message>
     <message>
         <source>When enabled, MythTV will prompt for confirmation when you press the System Exit key.</source>
@@ -4215,7 +4215,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Use Arrow Key Accelerators</source>
-        <translation type="unfinished">矢印キー加速を使用する</translation>
+        <translation>矢印キー加速を使用する</translation>
     </message>
     <message>
         <source>If enabled, Arrow key accelerators will be used, with LEFT performing an exit action and RIGHT selecting the current item.</source>
@@ -4223,7 +4223,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Display Size - Width</source>
-        <translation type="unfinished">ディスプレイサイズ - 幅</translation>
+        <translation>ディスプレイサイズ - 幅</translation>
     </message>
     <message>
         <source>Horizontal size of the monitor or TV, is used to calculate the actual aspect ratio of the display. This will override the DisplaySize from the system.</source>
@@ -4231,7 +4231,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Display Size - Height</source>
-        <translation type="unfinished">ディスプレイサイズ - 高さ</translation>
+        <translation>ディスプレイサイズ - 高さ</translation>
     </message>
     <message>
         <source>Vertical size of the monitor or TV, is used to calculate the actual aspect ratio of the display. This will override the DisplaySize from the system.</source>
@@ -4255,7 +4255,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>X</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Horizontal resolution of video mode which needs a special output resolution.</source>
@@ -4263,7 +4263,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Y</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Vertical resolution of video mode which needs a special output resolution.</source>
@@ -4279,7 +4279,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Alt Aspect</source>
-        <translation type="unfinished">Alt アスペクト</translation>
+        <translation>Alt アスペクト</translation>
     </message>
     <message>
         <source>If X&apos;s DisplaySize indicates 16:9, fudge vertical size into 4:3, and visa-versa</source>
@@ -4287,19 +4287,19 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>GUI Size (px)</source>
-        <translation type="unfinished">GUIサイズ (px)</translation>
+        <translation>GUIサイズ (px)</translation>
     </message>
     <message>
         <source>Default Display (px)</source>
-        <translation type="unfinished">デフォルトディスプレイ (px)</translation>
+        <translation>デフォルトディスプレイ (px)</translation>
     </message>
     <message>
         <source>Physical Size</source>
-        <translation type="unfinished">物理サイズ</translation>
+        <translation>物理サイズ</translation>
     </message>
     <message>
         <source>Toggles between windowed and borderless operation.</source>
-        <translation type="unfinished">ウィンドウの枠あり、無しを切り替える</translation>
+        <translation>ウィンドウの枠あり、無しを切り替える.</translation>
     </message>
     <message>
         <source>At startup, MythTV will change the Qt widget style to this setting.  If &quot;Desktop Style&quot; is selected, MythTV will use the existing desktop setting.</source>
@@ -4307,7 +4307,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Time limit for ATSC signal lock (msec)</source>
-        <translation type="unfinished">ATSCシグナルロック(msec) のタイムリミット</translation>
+        <translation>ATSCシグナルロック(msec) のタイムリミット</translation>
     </message>
     <message>
         <source>MythTV can check the signal strength when you tune into a HDTV or other over-the-air digital station. This value is the number of milliseconds to allow before MythTV gives up trying to get an acceptable signal.</source>
@@ -4319,15 +4319,15 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Avoid conflicts between live TV and scheduled shows.</source>
-        <translation type="unfinished"></translation>
+        <translation>ライブTVと録画の衝突を避ける</translation>
     </message>
     <message>
         <source>If enabled, live TV will choose a tuner card that is less likely to have scheduled recordings rather than the best card available.</source>
-        <translation type="unfinished"></translation>
+        <translation>これを有効にすると、ライブテレビは利用可能な最良のカードではなく録音を予定しておりそうでないチューナー・カードを選ぶでしょう。</translation>
     </message>
     <message>
         <source>Floating Program Guide Selector</source>
-        <translation type="unfinished"></translation>
+        <translation>フローティングプログラムガイドセレクター</translation>
     </message>
     <message>
         <source>If enabled, the program guide&apos;s selector will be free to move throughout the guide, otherwise it will stay in the center of the guide at all times.</source>
@@ -4335,15 +4335,15 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Colorize program guide using genre colors. (Not available for all grabbers.)</source>
-        <translation type="unfinished"></translation>
+        <translation>プログラムガイドでジャンルの色を使用する。(利用できないグラバーもあります。)</translation>
     </message>
     <message>
         <source>Only display &apos;favorite&apos; channels</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;お気に入り&apos;のチャンネルのみ表示する</translation>
     </message>
     <message>
         <source>If enabled, the EPG will initially display only the channels marked as favorites. Pressing &quot;4&quot; will toggle between displaying favorites and all channels.</source>
-        <translation type="unfinished"></translation>
+        <translation>EPGは、お気に入りとしてマークしたチャンネルだけを最初に表示するでしょう。「4」を押すとお気に入りとすべてのチャンネルを切り替えます。</translation>
     </message>
     <message>
         <source>Move higher priority programs to other cards and showings when resolving conflicts.  This can be used to record lower priority programs that would otherwise not be recorded, but risks missing a higher priority program if the schedule changes.</source>
@@ -4363,7 +4363,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Default LED color</source>
-        <translation type="unfinished">既定のLED色</translation>
+        <translation>既定のLED色</translation>
     </message>
     <message>
         <source>Sets the LED color when it is not being used for status indication.</source>
@@ -4371,7 +4371,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Sets the LED color when a backend is recording.</source>
-        <translation type="unfinished">バックエンドが録画中のLED色</translation>
+        <translation>バックエンドが録画中のLED色.</translation>
     </message>
     <message>
         <source>This specifies how frequently (in seconds) to check if a recording is in progress in order to update the Xbox LED.</source>
@@ -4379,7 +4379,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Use hardware XvMC MPEG Decoding</source>
-        <translation type="unfinished">ハードウェアXvMC MPEGデコードを使用する</translation>
+        <translation>ハードウェアXvMC MPEGデコードを使用する</translation>
     </message>
     <message>
         <source>Sample interval for DVB signal statistics (in seconds)</source>
@@ -4391,7 +4391,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Log MythTV events to database</source>
-        <translation type="unfinished">MythTVのイベントをデータベースに記録する</translation>
+        <translation>MythTVのイベントをデータベースに記録する</translation>
     </message>
     <message>
         <source>If enabled, MythTV modules will send event details to the database, where they can be viewed with MythLog or periodically emailed to the administrator.</source>
@@ -4399,7 +4399,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Maximum Number of Entries per Module</source>
-        <translation type="unfinished">モジュールごとの最大保存数</translation>
+        <translation>モジュールごとの最大保存数</translation>
     </message>
     <message>
         <source>This enables the periodic cleanup of the events stored in the Myth database (see &quot;Log MythTV events to database&quot; on the previous page).</source>
@@ -4407,7 +4407,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>The number of days between log cleanup runs.</source>
-        <translation type="unfinished">データベースクリーンナップ実行間隔日数。</translation>
+        <translation>データベースクリーンナップ実行間隔日数。</translation>
     </message>
     <message>
         <source>This setting and the following one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11 AM and 1 PM.</source>
@@ -4423,7 +4423,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>LCD Backlight Always On</source>
-        <translation type="unfinished">LCDバックライトを常時点灯</translation>
+        <translation>LCDバックライトを常時点灯</translation>
     </message>
     <message>
         <source>Turn on the backlight permanently. Need to restart mythfrontend to (de)activate it.</source>
@@ -4431,332 +4431,333 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Directed By</source>
-        <translation type="unfinished">監督 </translation>
+        <translation>監督 </translation>
     </message>
     <message>
         <source>Go Back</source>
-        <translation type="unfinished">戻る</translation>
+        <translation>戻る</translation>
     </message>
     <message>
         <source>No Change</source>
-        <translation type="unfinished">変更無し</translation>
+        <translation>変更無し</translation>
     </message>
     <message>
         <source>Do not record this program</source>
-        <translation type="unfinished">今番組を録画しない</translation>
+        <translation>今番組を録画しない</translation>
     </message>
     <message>
         <source>Record only this showing</source>
-        <translation type="unfinished">この番組のみ録画</translation>
+        <translation>この番組のみ録画</translation>
     </message>
     <message>
         <source>Record one showing of this program</source>
-        <translation type="unfinished">この番組を一回の放送分だけ録画する</translation>
+        <translation>この番組を一回の放送分だけ録画する</translation>
     </message>
     <message>
         <source>Record in this timeslot every week</source>
-        <translation type="unfinished">毎週この時間帯を録画する</translation>
+        <translation>毎週この時間帯を録画する</translation>
     </message>
     <message>
         <source>Record in this timeslot every day</source>
-        <translation type="unfinished">毎日この時間帯を録画する</translation>
+        <translation>毎日この時間帯を録画する</translation>
     </message>
     <message>
         <source>Record at any time on this channel</source>
-        <translation type="unfinished">このチャンネルでいつでも録画する</translation>
+        <translation>このチャンネルでいつでも録画する</translation>
     </message>
     <message>
         <source>Record at any time on any channel</source>
-        <translation type="unfinished">いつでもどのチャンネルでも録画する</translation>
+        <translation>いつでもどのチャンネルでも録画する</translation>
     </message>
     <message>
         <source>Record this showing with normal options</source>
-        <translation type="unfinished">ノーマルオプションでこの番組を録画します</translation>
+        <translation>ノーマルオプションでこの番組を録画します</translation>
     </message>
     <message>
         <source>Record this showing with override options</source>
-        <translation type="unfinished">個別設定オプションでこの番組を録画します</translation>
+        <translation>個別設定オプションでこの番組を録画します</translation>
     </message>
     <message>
         <source>Do not allow this showing to be recorded</source>
-        <translation type="unfinished">この番組を録画しない</translation>
+        <translation>この番組を録画しない</translation>
     </message>
     <message>
         <source>Start recording %1 minutes late</source>
-        <translation type="unfinished">録画を%1分遅れで開始</translation>
+        <translation>録画を%1分遅れで開始</translation>
     </message>
     <message>
         <source>Start recording %1 minute late</source>
-        <translation type="unfinished">録画を%1分遅れで開始</translation>
+        <translation>録画を%1分遅れで開始</translation>
     </message>
     <message>
         <source>Start recording on time</source>
-        <translation type="unfinished">録画を予定通りに開始</translation>
+        <translation>録画を予定通りに開始</translation>
     </message>
     <message>
         <source>Start recording %1 minute early</source>
-        <translation type="unfinished">録画を%1分早く開始</translation>
+        <translation>録画を%1分早く開始</translation>
     </message>
     <message>
         <source>Start recording %1 minutes early</source>
-        <translation type="unfinished">録画を%1分早く開始</translation>
+        <translation>録画を%1分早く開始</translation>
     </message>
     <message>
         <source>End recording %1 minutes early</source>
-        <translation type="unfinished">録画を%1分早く終了</translation>
+        <translation>録画を%1分早く終了</translation>
     </message>
     <message>
         <source>End recording %1 minute early</source>
-        <translation type="unfinished">録画を%1分早く終了</translation>
+        <translation>録画を%1分早く終了</translation>
     </message>
     <message>
         <source>End recording on time</source>
-        <translation type="unfinished">録画を予定通りに終了</translation>
+        <translation>録画を予定通りに終了</translation>
     </message>
     <message>
         <source>End recording %1 minute late</source>
-        <translation type="unfinished">録画を%1分遅く終了</translation>
+        <translation>録画を%1分遅く終了</translation>
     </message>
     <message>
         <source>End recording %1 minutes late</source>
-        <translation type="unfinished">録画を%1分遅く終了</translation>
+        <translation>録画を%1分遅く終了</translation>
     </message>
     <message>
         <source>Look for duplicates in current and previous recordings</source>
-        <translation type="unfinished">現在と以前の録画で重複を探します</translation>
+        <translation>現在と以前の録画で重複を探します</translation>
     </message>
     <message>
         <source>Look for duplicates in current recordings only</source>
-        <translation type="unfinished">現在の録画で重複を探します</translation>
+        <translation>現在の録画で重複を探します</translation>
     </message>
     <message>
         <source>Look for duplicates in previous recordings only</source>
-        <translation type="unfinished">以前の録画で重複を探します</translation>
+        <translation>以前の録画で重複を探します</translation>
     </message>
     <message>
         <source>[ Match duplicates with ]</source>
-        <translation type="unfinished">[ 重複発見 ]</translation>
+        <translation>[ 重複発見 ]</translation>
     </message>
     <message>
         <source>Record new episodes only</source>
-        <translation type="unfinished">新しい番組のみ録画</translation>
+        <translation>新しい番組のみ録画</translation>
     </message>
     <message>
         <source>Match duplicates using subtitle &amp; description</source>
-        <translation type="unfinished">重複一致にサブタイトルと内容を使う</translation>
+        <translation>重複一致にサブタイトル&amp;内容を使う</translation>
     </message>
     <message>
         <source>Match duplicates using subtitle</source>
-        <translation type="unfinished">重複一致にサブタイトルを使う</translation>
+        <translation>重複一致にサブタイトルを使う</translation>
     </message>
     <message>
         <source>Match duplicates using description</source>
-        <translation type="unfinished">重複一致に内容を使う</translation>
+        <translation>重複一致に内容を使う</translation>
     </message>
     <message>
         <source>Don&apos;t match duplicates</source>
-        <translation type="unfinished">重複一致しない</translation>
+        <translation>重複一致しない</translation>
     </message>
     <message>
         <source>[ Select recording Profile ]</source>
-        <translation type="unfinished">[ 録画プロファイル選択 ]</translation>
+        <translation>[ 録画プロファイル選択 ]</translation>
     </message>
     <message>
         <source>Allow auto expire</source>
-        <translation type="unfinished">自動削除を有効にする</translation>
+        <translation>自動削除を有効にする</translation>
     </message>
     <message>
         <source>Don&apos;t allow auto expire</source>
-        <translation type="unfinished">自動削除を有効にしない</translation>
+        <translation>自動削除を有効にしない</translation>
     </message>
     <message>
         <source>Delete oldest if this would exceede the max episodes</source>
-        <translation type="unfinished">最大番組数を超えたら古い方から削除する</translation>
+        <translation>最大番組数を超えたら古い方から削除する</translation>
     </message>
     <message>
         <source>Don&apos;t record if this would exceed the max episodes</source>
-        <translation type="unfinished">最大番組数を超えたら録画しない</translation>
+        <translation>最大番組数を超えたら録画しない</translation>
     </message>
     <message>
         <source>No episode limit</source>
-        <translation type="unfinished">番組数制限無し</translation>
+        <translation>番組数制限無し</translation>
     </message>
     <message>
         <source>Keep only one episode.</source>
-        <translation type="unfinished">1番組のみ保持する</translation>
+        <translation>1番組のみ保持する.</translation>
     </message>
     <message>
         <source>Keep at most %1 episodes</source>
-        <translation type="unfinished">%1番組を保持する</translation>
+        <translation>%1番組を保持する</translation>
     </message>
     <message>
         <source>Reduce priority by %1</source>
-        <translation type="unfinished">%1優先順位を下げる</translation>
+        <translation>%1優先順位を下げる</translation>
     </message>
     <message>
         <source>Normal recording priority</source>
-        <translation type="unfinished">通常の録画優先順位</translation>
+        <translation>通常の録画優先順位</translation>
     </message>
     <message>
         <source>Raise priority by %1</source>
-        <translation type="unfinished">%1優先順位を上げる</translation>
+        <translation>%1優先順位を上げる</translation>
     </message>
     <message>
         <source>List upcoming episodes</source>
-        <translation type="unfinished">これからの番組一覧</translation>
+        <translation>これからの番組一覧</translation>
     </message>
     <message>
         <source>Show the program guide when starting Live TV</source>
-        <translation type="unfinished">TV放送時に番組ガイドを表示する</translation>
+        <translation>TV放送時に番組ガイドを表示する</translation>
     </message>
     <message>
         <source>Listings Status</source>
-        <translation type="unfinished">ステータス一覧</translation>
+        <translation>ステータス一覧</translation>
     </message>
     <message>
         <source>Tuner Status</source>
-        <translation type="unfinished">チューナーステータス</translation>
+        <translation>チューナーステータス</translation>
     </message>
     <message>
         <source>DVB Status</source>
-        <translation type="unfinished">DVBステータス</translation>
+        <translation>DVBステータス</translation>
     </message>
     <message>
         <source>Log Entries</source>
-        <translation type="unfinished">ログエントリー</translation>
+        <translation>ログエントリー</translation>
     </message>
     <message>
         <source>Acknowledge all log entries at this priority level or lower?</source>
-        <translation type="unfinished">全てのログエントリーはこの優先順位より低いですか?</translation>
+        <translation>全てのログエントリーはこの優先順位より低いですか?</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation type="unfinished">はい</translation>
+        <translation>はい</translation>
     </message>
     <message>
         <source>Setting priority level to %1</source>
-        <translation type="unfinished">優先順位を%1にする</translation>
+        <translation>優先順位を%1にする</translation>
     </message>
     <message>
         <source>Listings Status shows the latest status information from mythfilldatabase</source>
-        <translation type="unfinished">ステータス一覧はmythfilldatabaseの最新の状況を表示します</translation>
+        <translation>ステータス一覧はmythfilldatabaseの最新の状況を表示します</translation>
     </message>
     <message>
         <source>Tuner Status shows the current information about the state of backend tuner cards</source>
-        <translation type="unfinished">チューナーステータスはバックエンドのチューナーカードの現在の状況を表示します</translation>
+        <translation>チューナーステータスはバックエンドのチューナーカードの現在の状況を表示します</translation>
     </message>
     <message>
         <source>DVB Status shows the quality statistics of all DVB cards, if present</source>
-        <translation type="unfinished">DVBステータスは可能なときは全てのDVBカードの品質統計を表示します</translation>
+        <translation>DVBステータスは可能なときは全てのDVBカードの品質統計を表示します</translation>
     </message>
     <message>
         <source>Log Entries shows any unread log entries from the system if you have logging enabled</source>
-        <translation type="unfinished">ログエントリーはログを有効にしているときに未読のログを表示します。</translation>
+        <translation>ログエントリーはログを有効にしているときに未読のログを表示します</translation>
     </message>
     <message>
         <source>Acknowledge this log entry?</source>
-        <translation type="unfinished">このログエントリーを確認しましたか?</translation>
+        <translation>このログエントリーを確認しましたか?</translation>
     </message>
     <message>
         <source>Myth version:</source>
-        <translation type="unfinished">Mythバージョン:</translation>
+        <translation>Mythバージョン:</translation>
     </message>
     <message>
         <source>Last mythfilldatabase guide update:</source>
-        <translation type="unfinished">最後のmythfilldatabaseでのガイド更新:</translation>
+        <translation>最後のmythfilldatabaseでのガイド更新:</translation>
     </message>
     <message>
         <source>Started:   </source>
-        <translation type="unfinished">開始: </translation>
+        <translation>開始: </translation>
     </message>
     <message>
         <source>Finished: </source>
-        <translation type="unfinished">終了: </translation>
+        <translation>終了: </translation>
     </message>
     <message>
         <source>Result: </source>
-        <translation type="unfinished">結果: </translation>
+        <translation>結果: </translation>
     </message>
     <message>
         <source>There&apos;s no guide data available!</source>
-        <translation type="unfinished">ガイドデータを利用できません</translation>
+        <translation>ガイドデータを利用できません!</translation>
     </message>
     <message>
         <source>Have you run mythfilldatabase?</source>
-        <translation type="unfinished">mythfilldatabaseを実行してますか?</translation>
+        <translation>mythfilldatabaseを実行してますか?</translation>
     </message>
     <message>
         <source>There is guide data until </source>
-        <translation type="unfinished">ガイドデータは</translation>
+        <translation>ガイドデータは</translation>
     </message>
     <message>
         <source>days</source>
-        <translation type="unfinished">日</translation>
+        <translation>日</translation>
     </message>
     <message>
         <source>day</source>
-        <translation type="unfinished">日</translation>
+        <translation>日</translation>
     </message>
     <message>
         <source>WARNING: is mythfilldatabase running?</source>
-        <translation type="unfinished">注意: mythfilldatabaseは実行してますか?</translation>
+        <translation>注意: mythfilldatabaseは実行してますか?</translation>
     </message>
     <message>
         <source>DataDirect Status: </source>
-        <translation type="unfinished">DataDirect ステータス</translation>
+        <translation>DataDirect ステータス:</translation>
     </message>
     <message>
         <source>Details of DVB error statistics for last 48 hours:
 </source>
-        <translation type="unfinished">過去48時間のDVBエラーの統計</translation>
+        <translation>過去48時間のDVBエラーの統計:
+</translation>
     </message>
     <message>
         <source>Recording period from %1 to %2</source>
-        <translation type="unfinished">録画%1から%2まで</translation>
+        <translation>録画%1から%2まで</translation>
     </message>
     <message>
         <source>Encoder %1 Min SNR: %2 Avg SNR: %3 Min BER %4 Avg BER %5 Cont Errs: %6 Overflows: %7</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>There is no DVB signal quality data available to display.</source>
-        <translation type="unfinished"></translation>
+        <translation>DVB信号品質データを表示できません。</translation>
     </message>
     <message>
         <source>No items found at priority level %1 or lower.</source>
-        <translation type="unfinished">優先順位が%1より低いのもがありません。</translation>
+        <translation>優先順位が%1より低いのもがありません。</translation>
     </message>
     <message>
         <source>Use 1-8 to change priority level.</source>
-        <translation type="unfinished">1-8を使って優先順位を変更してください。</translation>
+        <translation>1-8を使って優先順位を変更してください。</translation>
     </message>
     <message>
         <source>Completed</source>
-        <translation type="unfinished">完了</translation>
+        <translation>完了</translation>
     </message>
     <message>
         <source>Paused</source>
-        <translation type="unfinished">一時停止中</translation>
+        <translation>一時停止中</translation>
     </message>
     <message>
         <source>Restarting</source>
-        <translation type="unfinished">再開中</translation>
+        <translation>再開中</translation>
     </message>
     <message>
         <source>Completed, %1 FPS</source>
-        <translation type="unfinished">完了, %1 FPS</translation>
+        <translation>完了, %1 FPS</translation>
     </message>
     <message>
         <source>Commercial Breaks Found</source>
-        <translation type="unfinished">CM終了発見</translation>
+        <translation>CM終了発見</translation>
     </message>
     <message>
         <source>Post Recording Processing</source>
-        <translation type="unfinished">録画後の処理</translation>
+        <translation>録画後の処理</translation>
     </message>
     <message>
         <source>Black background for Closed Captioning</source>
-        <translation type="unfinished">クローズドキャンプションで黒の背景を使用する</translation>
+        <translation>クローズドキャンプションで黒の背景を使用する</translation>
     </message>
     <message>
         <source>If enabled, captions will be displayed over a black space for maximum contrast. Otherwise, captions will use outlined text over the picture.</source>
@@ -4768,31 +4769,31 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Default size is 12.</source>
-        <translation type="unfinished">規定のサイズは12です。</translation>
+        <translation>規定のサイズは12です。</translation>
     </message>
     <message>
         <source>Use HW XVMC VLD Decoding (Via only)</source>
-        <translation type="unfinished"></translation>
+        <translation>HW XVMC VLDデコードを使用 (VIAのみ)</translation>
     </message>
     <message>
         <source>Commercial Skip</source>
-        <translation type="unfinished">CMスキップ</translation>
+        <translation>CMスキップ</translation>
     </message>
     <message>
         <source>Job Queue</source>
-        <translation type="unfinished">ジョブキュー</translation>
+        <translation>ジョブキュー</translation>
     </message>
     <message>
         <source>Job Queue shows any jobs currently in Myth&apos;s Job Queue such as a commercial flagging job.</source>
-        <translation type="unfinished">CM検出などのジョブを表示する</translation>
+        <translation>CM検出などのジョブを表示する.</translation>
     </message>
     <message>
         <source>Job Queue is currently empty.</source>
-        <translation type="unfinished">ジョブキューは現在は空です。</translation>
+        <translation>ジョブキューは現在は空です。</translation>
     </message>
     <message>
         <source>Maximum simultaneous jobs on this backend</source>
-        <translation type="unfinished">このバックエンドの最大同時ジョブ数</translation>
+        <translation>このバックエンドの最大同時ジョブ数</translation>
     </message>
     <message>
         <source>The Job Queue will be limited to running this many simultaneous jobs on this backend.</source>
@@ -4800,7 +4801,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Job Queue Check frequency (in seconds)</source>
-        <translation type="unfinished">ジョブキュー監視間隔 (秒)</translation>
+        <translation>ジョブキュー監視間隔 (秒)</translation>
     </message>
     <message>
         <source>When looking for new jobs to process, the Job Queue will wait this long between checks.</source>
@@ -4812,7 +4813,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Run Jobs only on original recording host</source>
-        <translation type="unfinished"></translation>
+        <translation>ジョブは録画もとのホストでのみ実行する</translation>
     </message>
     <message>
         <source>If set, jobs in the queue will be required to run on the backend that made the original recording.</source>
@@ -4820,15 +4821,15 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>User Job #1 Description</source>
-        <translation type="unfinished">ユーザージョブ #1 内容</translation>
+        <translation>ユーザージョブ #1 内容</translation>
     </message>
     <message>
         <source>The Description for this User Job.</source>
-        <translation type="unfinished">このユーザージョブの内容。</translation>
+        <translation>このユーザージョブの内容。</translation>
     </message>
     <message>
         <source>User Job #1 Command</source>
-        <translation type="unfinished">ユーザージョブ #1 コマンド</translation>
+        <translation>ユーザージョブ #1 コマンド</translation>
     </message>
     <message>
         <source>The command to run whenever this User Job number is scheduled.</source>
@@ -4836,169 +4837,169 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>User Job #2 Description</source>
-        <translation type="unfinished">ユーザージョブ #2 内容</translation>
+        <translation>ユーザージョブ #2 内容</translation>
     </message>
     <message>
         <source>User Job #2 Command</source>
-        <translation type="unfinished">ユーザージョブ #2 コマンド</translation>
+        <translation>ユーザージョブ #2 コマンド</translation>
     </message>
     <message>
         <source>User Job #3 Description</source>
-        <translation type="unfinished">ユーザージョブ #3 内容</translation>
+        <translation>ユーザージョブ #3 内容</translation>
     </message>
     <message>
         <source>User Job #3 Command</source>
-        <translation type="unfinished">ユーザージョブ #3 コマンド</translation>
+        <translation>ユーザージョブ #3 コマンド</translation>
     </message>
     <message>
         <source>User Job #4 Description</source>
-        <translation type="unfinished">ユーザージョブ #4 内容</translation>
+        <translation>ユーザージョブ #4 内容</translation>
     </message>
     <message>
         <source>User Job #4 Command</source>
-        <translation type="unfinished">ユーザージョブ #4 コマンド</translation>
+        <translation>ユーザージョブ #4 コマンド</translation>
     </message>
     <message>
         <source>Allow Transcoding jobs</source>
-        <translation type="unfinished">トランスコーディングジョブを有効にする</translation>
+        <translation>トランスコーディングジョブを有効にする</translation>
     </message>
     <message>
         <source>Allow jobs of this type to run on this backend.</source>
-        <translation type="unfinished">このバックエンドでこのタイプのジョブを有効にする</translation>
+        <translation>このバックエンドでこのタイプのジョブを有効にする.</translation>
     </message>
     <message>
         <source>Allow Commercial Detection jobs</source>
-        <translation type="unfinished">CM検知ジョブを有効にする</translation>
+        <translation>CM検知ジョブを有効にする</translation>
     </message>
     <message>
         <source>Allow &apos;User Job #1&apos; jobs</source>
-        <translation type="unfinished">&apos;ユーザージョブ #1&apos; を有効にする</translation>
+        <translation>&apos;ユーザージョブ #1&apos; を有効にする</translation>
     </message>
     <message>
         <source>Allow &apos;User Job #2&apos; jobs</source>
-        <translation type="unfinished">&apos;ユーザージョブ #2&apos; を有効にする</translation>
+        <translation>&apos;ユーザージョブ #2&apos; を有効にする</translation>
     </message>
     <message>
         <source>Allow &apos;User Job #3&apos; jobs</source>
-        <translation type="unfinished">&apos;ユーザージョブ #3&apos; を有効にする</translation>
+        <translation>&apos;ユーザージョブ #3&apos; を有効にする</translation>
     </message>
     <message>
         <source>Allow &apos;User Job #4&apos; jobs</source>
-        <translation type="unfinished">&apos;ユーザージョブ #4&apos; を有効にする</translation>
+        <translation>&apos;ユーザージョブ #4&apos; を有効にする</translation>
     </message>
     <message>
         <source>Job Queue (Host-Specific)</source>
-        <translation type="unfinished">ジョブキュー (ホスト独自)</translation>
+        <translation>ジョブキュー (ホスト独自)</translation>
     </message>
     <message>
         <source>Job Queue (Global)</source>
-        <translation type="unfinished">ジョブキュー (全体)</translation>
+        <translation>ジョブキュー (全体)</translation>
     </message>
     <message>
         <source>(New Channel)</source>
-        <translation type="unfinished"></translation>
+        <translation>(新しいチャンネル)</translation>
     </message>
     <message>
         <source>star</source>
-        <translation type="unfinished"></translation>
+        <translation>スター</translation>
     </message>
     <message>
         <source>Title</source>
-        <translation type="unfinished"></translation>
+        <translation>タイトル</translation>
     </message>
     <message>
         <source>Description</source>
-        <translation type="unfinished"></translation>
+        <translation>内容</translation>
     </message>
     <message>
         <source>Part %1 of %2, </source>
-        <translation type="unfinished"></translation>
+        <translation>%1 / %2</translation>
     </message>
     <message>
         <source>HDTV</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>CC</source>
         <comment>Close Captioned</comment>
-        <translation type="unfinished">CC</translation>
+        <translation>CC</translation>
     </message>
     <message>
         <source>Subtitled</source>
-        <translation type="unfinished"></translation>
+        <translation>サブタイトル</translation>
     </message>
     <message>
         <source>Stereo</source>
-        <translation type="unfinished"></translation>
+        <translation>ステレオ</translation>
     </message>
     <message>
         <source>Category</source>
-        <translation type="unfinished"></translation>
+        <translation>カテゴリー</translation>
     </message>
     <message>
         <source>Type</source>
         <comment>category_type</comment>
-        <translation type="unfinished">タイプ</translation>
+        <translation>タイプ</translation>
     </message>
     <message>
         <source>Episode Number</source>
-        <translation type="unfinished"></translation>
+        <translation>番組ナンバー</translation>
     </message>
     <message>
         <source>Original Airdate</source>
-        <translation type="unfinished"></translation>
+        <translation>初回放送日</translation>
     </message>
     <message>
         <source>Program ID</source>
-        <translation type="unfinished"></translation>
+        <translation>番組ID</translation>
     </message>
     <message>
         <source>Actors</source>
-        <translation type="unfinished"></translation>
+        <translation>俳優</translation>
     </message>
     <message>
         <source>Guest Star</source>
-        <translation type="unfinished"></translation>
+        <translation>ゲストスター</translation>
     </message>
     <message>
         <source>Director</source>
-        <translation type="unfinished"></translation>
+        <translation>ディレクター</translation>
     </message>
     <message>
         <source>Filesize</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルサイズ</translation>
     </message>
     <message>
         <source>Recording Group</source>
-        <translation type="unfinished"></translation>
+        <translation>録画グループ</translation>
     </message>
     <message>
         <source>Stop recording</source>
-        <translation type="unfinished"></translation>
+        <translation>録画停止</translation>
     </message>
     <message>
         <source>Power Search</source>
-        <translation type="unfinished"></translation>
+        <translation>パワーサーチ</translation>
     </message>
     <message>
         <source>Commercial Flag new recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>新しい録画でのCMマーク</translation>
     </message>
     <message>
         <source>Do not Commercial Flag new recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>新しい録画でCMマークしない</translation>
     </message>
     <message>
         <source>Run &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;%1&apos;実行</translation>
     </message>
     <message>
         <source>Do not run &apos;%1&apos; for new recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>新しい録画のために&apos;%1&apos;を実行しない</translation>
     </message>
     <message>
         <source>Re-record programs which have been automatically expired</source>
-        <translation type="unfinished"></translation>
+        <translation>自動削除された番組を再録画する</translation>
     </message>
     <message>
         <source>If set, programs that are automatically deleted (expired) will be allowed to re-recorded if they are shown again.</source>
@@ -5010,7 +5011,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Scale video as necessary</source>
-        <translation type="unfinished"></translation>
+        <translation>必要なときにビデオサイズを変更する</translation>
     </message>
     <message>
         <source>If checked, video will be scaled to fit your window or screen. If unchecked, video will never be made larger than its actual pixel size.</source>
@@ -5018,7 +5019,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Frames to skip in fullscreen mode</source>
-        <translation type="unfinished"></translation>
+        <translation>フルスクリーンモードのときフレームをスキップする</translation>
     </message>
     <message>
         <source>Video displayed in fullscreen or non-windowed mode will skip this many frames for each frame drawn. Set to 0 to show every frame. Only valid when either &quot;Use GUI size for TV playback&quot; or &quot;Run the frontend in a window&quot; is not checked.</source>
@@ -5026,7 +5027,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Video in main window</source>
-        <translation type="unfinished"></translation>
+        <translation>メインウィンドウでビデオ</translation>
     </message>
     <message>
         <source>If checked, video will be displayed in the main GUI window. Disable this when you only want video on the desktop or in a floating window. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
@@ -5034,7 +5035,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Frames to skip</source>
-        <translation type="unfinished"></translation>
+        <translation>フレームスキップ</translation>
     </message>
     <message>
         <source>Video in the main window will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
@@ -5042,7 +5043,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Opacity</source>
-        <translation type="unfinished"></translation>
+        <translation>不透明度</translation>
     </message>
     <message>
         <source>The opacity of the main window. Set to 100 for completely opaque, set to 0 for completely transparent.</source>
@@ -5050,7 +5051,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Video in floating window</source>
-        <translation type="unfinished"></translation>
+        <translation>フローティングウィンドウでビデオ</translation>
     </message>
     <message>
         <source>If checked, video will be displayed in a floating window. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
@@ -5066,7 +5067,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Video in the dock</source>
-        <translation type="unfinished"></translation>
+        <translation>ドックでビデオ</translation>
     </message>
     <message>
         <source>If checked, video will be displayed in the application&apos;s dock icon. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
@@ -5078,7 +5079,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Video on the desktop</source>
-        <translation type="unfinished"></translation>
+        <translation>デスクトップでビデオ</translation>
     </message>
     <message>
         <source>If checked, video will be displayed on the desktop, behind the Finder icons. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
@@ -5090,123 +5091,123 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Mac OS X video settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Mac OS X ビデオ設定</translation>
     </message>
     <message>
         <source>Keep this episode in the list</source>
-        <translation type="unfinished"></translation>
+        <translation>この番組をリストに保存しておく</translation>
     </message>
     <message>
         <source>Remove this episode from the list</source>
-        <translation type="unfinished"></translation>
+        <translation>この番組をリストから削除する</translation>
     </message>
     <message>
         <source>Remove all episodes for this title</source>
-        <translation type="unfinished"></translation>
+        <translation>このタイトルの番組を全て削除する</translation>
     </message>
     <message>
         <source>Machine Status</source>
-        <translation type="unfinished"></translation>
+        <translation>マシーンステータス</translation>
     </message>
     <message>
         <source>Machine Status shows some operating system statistics of this machine</source>
-        <translation type="unfinished"></translation>
+        <translation>マシーンステータス このマシーンのOSの情報を表示します</translation>
     </message>
     <message>
         <source>and the MythTV server</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTVサーバーの状態も含めて</translation>
     </message>
     <message>
         <source>Delete Job?</source>
-        <translation type="unfinished"></translation>
+        <translation>ジョブを削除する？</translation>
     </message>
     <message>
         <source>Pause</source>
-        <translation type="unfinished"></translation>
+        <translation>一時停止</translation>
     </message>
     <message>
         <source>Stop</source>
-        <translation type="unfinished">停止</translation>
+        <translation>停止</translation>
     </message>
     <message>
         <source>Job Queue Actions:</source>
-        <translation type="unfinished"></translation>
+        <translation>ジョブキュー動作:</translation>
     </message>
     <message>
         <source>Resume</source>
-        <translation type="unfinished"></translation>
+        <translation>レジューム</translation>
     </message>
     <message>
         <source>Requeue Job?</source>
-        <translation type="unfinished"></translation>
+        <translation>ジョブをもう一度キューに入れる？</translation>
     </message>
     <message>
         <source>used</source>
-        <translation type="unfinished"></translation>
+        <translation>使用済</translation>
     </message>
     <message>
         <source>free</source>
-        <translation type="unfinished"></translation>
+        <translation>空き</translation>
     </message>
     <message>
         <source>Uptime</source>
-        <translation type="unfinished"></translation>
+        <translation>稼働時間</translation>
     </message>
     <message>
         <source>System</source>
-        <translation type="unfinished"></translation>
+        <translation>システム</translation>
     </message>
     <message>
         <source>This machine</source>
-        <translation type="unfinished"></translation>
+        <translation>このマシーン</translation>
     </message>
     <message>
         <source>Load</source>
-        <translation type="unfinished"></translation>
+        <translation>負荷</translation>
     </message>
     <message>
         <source>unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>不明</translation>
     </message>
     <message>
         <source>failed</source>
-        <translation type="unfinished"></translation>
+        <translation>失敗</translation>
     </message>
     <message>
         <source>RAM</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Swap</source>
-        <translation type="unfinished"></translation>
+        <translation>スワップ</translation>
     </message>
     <message>
         <source>MythTV server</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTVサーバー</translation>
     </message>
     <message>
         <source>Disk space:</source>
-        <translation type="unfinished"></translation>
+        <translation>ディスク空き容量:</translation>
     </message>
     <message>
         <source>Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>録画</translation>
     </message>
     <message>
         <source>DB error - RecordFilePrefix unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>データベースエラー - RecordFilePrefix 不明</translation>
     </message>
     <message>
         <source>TV buffer</source>
-        <translation type="unfinished"></translation>
+        <translation>TVバッファー</translation>
     </message>
     <message>
         <source>DB error - LiveBufferDir unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>データベースエラー - LiveBufferDir 不明</translation>
     </message>
     <message>
         <source>Follow Symlinks when deleting files</source>
-        <translation type="unfinished"></translation>
+        <translation>削除するときにシンボリックリンクを辿る</translation>
     </message>
     <message>
         <source>This will cause Myth to follow symlinks when recordings and related files are deleted, instead of deleting the symlink and leaving the actual file.</source>
@@ -5214,26 +5215,57 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Would you like to clear all capture card settings before starting configuration?</source>
-        <translation type="unfinished"></translation>
+        <translation>構成の前に全てのキャプチャーカードの設定を削除しますか？</translation>
     </message>
     <message>
         <source>No, leave my card settings alone</source>
-        <translation type="unfinished"></translation>
+        <translation>いいえ、カード設定を削除しません</translation>
     </message>
     <message>
         <source>Yes, delete my card settings</source>
-        <translation type="unfinished"></translation>
+        <translation>はい、カード設定を削除します。</translation>
     </message>
     <message>
         <source>Would you like to clear all program and channel settings before starting configuration?</source>
-        <translation type="unfinished"></translation>
+        <translation>構成の前に全ての番組とチャンネル設定を削除しますか？</translation>
     </message>
     <message>
         <source>No, leave my program settings alone</source>
-        <translation type="unfinished"></translation>
+        <translation>いいえ、削除しません</translation>
     </message>
     <message>
         <source>Yes, delete my program settings</source>
+        <translation>はい、削除します</translation>
+    </message>
+    <message>
+        <source>%1% Completed @ %2 fps.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>tv_grab_jp configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ScheduledRecording</name>
+    <message>
+        <source>%1 on channel %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 on channel %2 (%3%4 - %5)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 on channel %2 (%3 %4 - %5)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You should not see this</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5241,31 +5273,31 @@ MythTVは終了します。</translation>
     <name>StatusBox</name>
     <message>
         <source>Tuner %1 </source>
-        <translation type="unfinished">チューナー %1 </translation>
+        <translation>チューナー %1 </translation>
     </message>
     <message>
         <source>is watching live TV</source>
-        <translation type="unfinished">はTV放送を見ている</translation>
+        <translation>はTV放送を見ている</translation>
     </message>
     <message>
         <source>is recording</source>
-        <translation type="unfinished">録画している</translation>
+        <translation>録画している</translation>
     </message>
     <message>
         <source>is not recording</source>
-        <translation type="unfinished">録画していない</translation>
+        <translation>録画していない</translation>
     </message>
     <message>
         <source>Job:</source>
-        <translation type="unfinished">ジョブ:</translation>
+        <translation>ジョブ:</translation>
     </message>
     <message>
         <source>Status: </source>
-        <translation type="unfinished">ステータス:</translation>
+        <translation>ステータス:</translation>
     </message>
     <message>
         <source>is not available</source>
-        <translation type="unfinished"></translation>
+        <translation>利用不可</translation>
     </message>
 </context>
 <context>
@@ -5664,55 +5696,55 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Jump to Beginning</source>
-        <translation type="unfinished">始めにジャンプ</translation>
+        <translation>始めにジャンプ</translation>
     </message>
     <message>
         <source>Try Again</source>
-        <translation type="unfinished"></translation>
+        <translation>再試行</translation>
     </message>
     <message>
         <source>Time Stretch %1X</source>
-        <translation type="unfinished"></translation>
+        <translation>タイムストレッチ %1X</translation>
     </message>
     <message>
         <source>Adjust Time Stretch</source>
-        <translation type="unfinished"></translation>
+        <translation>タイムストレッチ調整</translation>
     </message>
     <message>
         <source>Adjust</source>
-        <translation type="unfinished"></translation>
+        <translation>調整</translation>
     </message>
     <message>
         <source>0.5X</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>0.9X</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>1.0X</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>1.1X</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>1.5X</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>2.0X</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Sleep</source>
-        <translation type="unfinished"></translation>
+        <translation>スリープ</translation>
     </message>
     <message>
         <source>Sleep Off</source>
-        <translation type="unfinished"></translation>
+        <translation>スリープ オフ</translation>
     </message>
 </context>
 <context>
@@ -5779,11 +5811,11 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Select a recording to permanently delete:</source>
-        <translation>完全に削除する録画を選択してください:</translation>
+        <translation type="obsolete">完全に削除する録画を選択してください:</translation>
     </message>
     <message>
         <source>Select a recording to view:</source>
-        <translation>再生する録画を選択してください:</translation>
+        <translation type="obsolete">再生する録画を選択してください:</translation>
     </message>
     <message>
         <source>Sorry, No Recordings Available</source>
@@ -5840,6 +5872,30 @@ MythTVは終了します。</translation>
     <message>
         <source>]  = </source>
         <translation>]  = </translation>
+    </message>
+    <message>
+        <source>Select a recording to permanently erase</source>
+        <translation type="unfinished">削除する録画を選択してください</translation>
+    </message>
+    <message>
+        <source>Select a recording to watch</source>
+        <translation type="unfinished">再生する録画を選択してください</translation>
+    </message>
+    <message>
+        <source>Source:</source>
+        <translation type="unfinished">ソース:</translation>
+    </message>
+    <message>
+        <source>(1) Sort by Title    (2) Sort by Priority    (4) Sort by Type</source>
+        <translation type="unfinished">(1) タイトルで並び替え (2) 優先順位で並び替え (4) タイプで並び替え</translation>
+    </message>
+    <message>
+        <source>System Status - Select a category to view the status</source>
+        <translation type="unfinished">システムステータス - 表示するカテゴリーを選択してください</translation>
+    </message>
+    <message>
+        <source>This screen displays the status of various system components</source>
+        <translation type="unfinished">この画面は様様なシステムステータスを表示します</translation>
     </message>
 </context>
 <context>

@@ -117,6 +117,7 @@
    <button>
       <type>TV_CUSTOM_RECORD</type>
       <text>Custom Record</text>
+      <text lang="JA">カスタム録画</text>
       <action>TV_CUSTOM_RECORD</action>
    </button>
 
