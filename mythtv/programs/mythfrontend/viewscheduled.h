@@ -35,11 +35,6 @@ class ViewScheduled : public MythDialog
     void FillList(void);
     QMap<QString, ProgramInfo> conflictData;
 
-    void handleConflicting(ProgramInfo *rec);
-    void handleRecording(ProgramInfo *rec);
-    void handleNotRecording(ProgramInfo *rec);
-    void chooseConflictingProgram(ProgramInfo *rec);
-
     void grayOut(QPainter *);
     void updateBackground(void);
     void updateList(QPainter *);

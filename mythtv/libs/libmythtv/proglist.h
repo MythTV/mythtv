@@ -23,10 +23,12 @@ class ProgLister : public MythDialog
     void cursorDown(bool page = false);
     void cursorUp(bool page = false);
     void select();
+    void edit();
 
   protected:
     void paintEvent(QPaintEvent *);
     void keyPressEvent(QKeyEvent *e);
+    void quickRecord(void);
 
   private:
     QString title;
@@ -51,7 +53,6 @@ class ProgLister : public MythDialog
     bool allowKeys;
     bool doingSel;
 
-    void setRecText(UITextType *type, RecordingType rectype);
     void updateBackground(void);
     void updateList(QPainter *);
     void updateInfo(QPainter *);

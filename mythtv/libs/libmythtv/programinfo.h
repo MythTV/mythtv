@@ -140,9 +140,12 @@ class ProgramInfo
                         long long min_frame = -1, long long max_frame = -1);
 
     void DeleteHistory(QSqlDatabase *db);
-    void SetOverride(QSqlDatabase *db, int override);
     QString NoRecordText(void);
+    QString NoRecordChar(void);
+    QString RecordingText(void);
     void FillInRecordInfo(vector<ProgramInfo *> &reclist);
+    void EditScheduled(QSqlDatabase *db);
+    void EditRecording(QSqlDatabase *db);
 
     static void GetProgramListByQuery(QSqlDatabase *db,
                                         QPtrList<ProgramInfo> *proglist,
@@ -204,6 +207,11 @@ class ProgramInfo
     QString schedulerid;
 
 private:
+    void handleRecording(QSqlDatabase *db);
+    void handleNotRecording(QSqlDatabase *db);
+    void handleConflicting(QSqlDatabase *db);
+    void setOverride(QSqlDatabase *db, int override);
+
     class ScheduledRecording* record;
 };
 

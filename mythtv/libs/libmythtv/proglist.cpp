@@ -106,8 +106,10 @@ void ProgLister::keyPressEvent(QKeyEvent *e)
         case Key_Down: cursorDown(false); break;
         case Key_PageUp: case Key_9: cursorUp(true); break;
         case Key_PageDown: case Key_3: cursorDown(true); break;
-	case Key_Space: case Key_Enter: case Key_Return: case Key_I:
+	case Key_Space: case Key_Enter: case Key_Return:
                 select(); break;
+        case Key_I: case Key_M:  edit(); break;
+        case Key_R: quickRecord(); break;
         case Key_Escape: done(0); break;
         default: /*MythDialog::keyPressEvent(e);*/ break;
     }
@@ -276,36 +278,53 @@ void ProgLister::cursorUp(bool page)
 	inList = 0;
 }
 
+void ProgLister::quickRecord()
+{
+    ProgramInfo *pi = progList.at(curProg);
+
+    pi->ToggleRecord(db);
+
+    fillProgList();
+    update(fullRect);
+}
+
 void ProgLister::select()
 {
     ProgramInfo *pi = progList.at(curProg);
 
     doingSel = true;
 
-    if ((gContext->GetNumSetting("AdvancedRecord", 0)) ||
-	(pi->GetProgramRecordingStatus(db) > kAllRecord))
-    {
-	ScheduledRecording record;
-	record.loadByProgram(db, pi);
-	record.exec(db);
-    }
-    else
-    {
-	InfoDialog diag(pi, gContext->GetMainWindow(), "Program Info");
-	diag.exec();
-    }
-
-    doingSel = false;
+    allowKeys = false;
+    pi->EditRecording(db);
+    allowKeys = true;
 
     fillProgList();
     update(fullRect);
+
+    doingSel = false;
+}
+
+void ProgLister::edit()
+{
+    ProgramInfo *pi = progList.at(curProg);
+
+    doingSel = true;
+
+    allowKeys = false;
+    pi->EditScheduled(db);
+    allowKeys = true;
+
+    fillProgList();
+    update(fullRect);
+
+    doingSel = false;
 }
 
 void ProgLister::fillProgList(void)
 {
     QString where = QString("WHERE program.title = \"%1\" AND "
 			    "program.chanid = channel.chanid "
-			    "AND program.starttime > %2 "
+			    "AND program.endtime > %2 "
 			    "ORDER BY program.starttime,channel.channum;")
 	                    .arg(title.utf8())
 	                    .arg(curTime.toString("yyyyMMddhhmm50"));
@@ -315,6 +334,20 @@ void ProgLister::fillProgList(void)
     progList.clear();
     ProgramInfo::GetProgramListByQuery(db, &progList, where);
     dataCount = progList.count();
+
+    ProgramInfo *p;
+    vector<ProgramInfo *> recList;
+    RemoteGetAllPendingRecordings(recList);
+
+    for (p = progList.first(); p; p = progList.next())
+        p->FillInRecordInfo(recList);
+
+    while (!recList.empty())
+    {
+        p = recList.back();
+        delete p;
+        recList.pop_back();
+    }
 
     allowKeys = true;
 }
@@ -363,8 +396,10 @@ void ProgLister::updateList(QPainter *p)
 			    ltype->SetItemText(cnt, 3, title);
 			else
 			    ltype->SetItemText(cnt, 3, pi->subtitle);
-			if (pi->GetProgramRecordingStatus(db))
-			    ltype->EnableForcedFont(cnt, "recording");
+                        if (pi->conflicting)
+                            ltype->EnableForcedFont(cnt, "conflicting");
+                        else if (pi->recording)
+                            ltype->EnableForcedFont(cnt, "recording");
 
                         cnt++;
                         listCount++;
@@ -403,34 +438,6 @@ void ProgLister::updateList(QPainter *p)
     p->drawPixmap(pr.topLeft(), pix);
 }
 
-void ProgLister::setRecText(UITextType *type, RecordingType rectype)
-{
-    switch (rectype)
-    {
-        case kSingleRecord:
-	    type->SetText(tr("Recording just this showing"));
-	    break;
-        case kTimeslotRecord:
-	    type->SetText(tr("Recording every day when shown in this timeslot"));
-	    break;
-        case kWeekslotRecord:
-	    type->SetText(tr("Recording every week when shown in this timeslot"));
-	    break;
-        case kChannelRecord:
-	    type->SetText(tr("Recording when shown on this channel"));
-	    break;
-        case kAllRecord:
-	    type->SetText(tr("Recording all showings"));
-	    break;
-        case kNotRecording:
-	    type->SetText(tr("Not recording this showing"));
-	    break;
-        default:
-	    type->SetText(tr("Error!"));
-	    break;
-    }
-}
-
 void ProgLister::updateInfo(QPainter *p)
 {
     int rectyperank, chanrank, progrank, totalrank;
@@ -463,7 +470,7 @@ void ProgLister::updateInfo(QPainter *p)
 
             type = (UITextType *)container->GetType("type");
             if (type)
-		setRecText(type, pi->GetProgramRecordingStatus(db));
+                type->SetText(pi->RecordingText());
 
             type = (UITextType *)container->GetType("description");
             if (type) {

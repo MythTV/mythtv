@@ -106,7 +106,7 @@ void ViewScheduled::keyPressEvent(QKeyEvent *e)
         switch (e->key())
         {
             case Key_Space: case Key_Enter: case Key_Return: selected(); return;
-            case Key_I: edit(); return;
+            case Key_I: case Key_M: edit(); return;
             case Key_Escape:
                 gContext->SaveSetting("ViewSchedShowLevel", (int)showLevel);
                 done(MythDialog::Accepted);
@@ -479,22 +479,7 @@ void ViewScheduled::updateList(QPainter *p)
                         if (tempInfo->recording)
                             tempCard = QString::number(tempInfo->cardid);
                         else
-                        {
-                            switch (tempInfo->norecord)
-                            {
-                            case nrManualOverride:    tempCard = "X"; break;
-                            case nrPreviousRecording: tempCard = "P"; break;
-                            case nrCurrentRecording:  tempCard = "C"; break;
-                            case nrOtherShowing:      tempCard = "O"; break;
-                            case nrTooManyRecordings: tempCard = "T"; break;
-                            case nrDontRecordList:    tempCard = "D"; break;
-                            case nrLowerRanking:      tempCard = "R"; break;
-                            case nrManualConflict:    tempCard = "M"; break;
-                            case nrAutoConflict:      tempCard = "A"; break;
-                            case nrOverlap:           tempCard = "V"; break;
-                            default:                  tempCard = "-"; break;
-                            }
-                        }
+                            tempCard = tempInfo->NoRecordChar();
 
                         if (cnt == inList)
                         {
@@ -685,24 +670,9 @@ void ViewScheduled::edit()
 
     doingSel = true;
 
-    ProgramInfo *rec = curitem;
-
-    MythContext::KickDatabase(db);
-
-    if ((gContext->GetNumSetting("AdvancedRecord", 0)) ||
-        (rec->GetProgramRecordingStatus(db) > kAllRecord))
-    {
-        ScheduledRecording record;
-        record.loadByProgram(db, rec);
-        record.exec(db);
-    }
-    else
-    {
-        InfoDialog diag(rec, gContext->GetMainWindow(), "Program Info");
-        diag.exec();
-    }
-
-    ScheduledRecording::signalChange(db);
+    allowKeys = false;
+    curitem->EditScheduled(db);
+    allowKeys = true;
 
     FillList();
     update(fullRect);
@@ -717,316 +687,13 @@ void ViewScheduled::selected()
 
     doingSel = true;
 
-    ProgramInfo *rec = curitem;
+    allowKeys = false;
+    curitem->EditRecording(db);
+    allowKeys = true;
 
-    MythContext::KickDatabase(db);
-
-    if (rec->conflicting)
-        handleConflicting(rec);
-    else if (rec->recording)
-        handleRecording(rec);
-    else
-        handleNotRecording(rec);
+    FillList();
+    update(fullRect);
 
     doingSel = false;
 }
 
-void ViewScheduled::handleNotRecording(ProgramInfo *rec)
-{
-    QString message = QString("This showing will not be recorded because %1.")
-        .arg(rec->NoRecordText());
-
-    DialogBox diag(gContext->GetMainWindow(), tr(message));
-    diag.AddButton(tr("OK"));
-
-    if (rec->norecord != nrTooManyRecordings &&
-        rec->norecord != nrDontRecordList &&
-        rec->norecord != nrLowerRanking &&
-        rec->norecord != nrOverlap)
-        diag.AddButton(tr("Record it anyway"));
-
-    int ret = diag.exec();
-
-    if (ret <= 1)
-        return;
-
-    if (rec->norecord != nrManualConflict &&
-        rec->norecord != nrAutoConflict)
-    {
-        rec->SetOverride(db, 1);
-        FillList();
-        update(fullRect);
-        return;
-    }
-
-    QString pstart = rec->startts.toString("yyyyMMddhhmm");
-    pstart += "00";
-    QString pend = rec->endts.toString("yyyyMMddhhmm");
-    pend += "00";
-
-    QString thequery;
-    thequery = QString("INSERT INTO conflictresolutionoverride (chanid,"
-                       "starttime, endtime) VALUES (%1, %2, %3);")
-                       .arg(rec->chanid).arg(pstart).arg(pend);
-
-    QSqlQuery qquery = db->exec(thequery);
-    if (!qquery.isActive())
-    {
-        cerr << "DB Error: conflict resolution insertion failed, SQL query "
-             << "was:" << endl;
-        cerr << thequery << endl;
-    }
-
-    allowKeys = false;
-    vector<ProgramInfo *> *conflictlist = RemoteGetConflictList(rec, false);
-    allowKeys = true;
-
-    if (!conflictlist)
-        return;
-
-    QString dstart, dend;
-    vector<ProgramInfo *>::iterator i;
-    for (i = conflictlist->begin(); i != conflictlist->end(); i++)
-    {
-        dstart = (*i)->startts.toString("yyyyMMddhhmm");
-        dstart += "00";
-        dend = (*i)->endts.toString("yyyyMMddhhmm");
-        dend += "00";
-
-        thequery = QString("DELETE FROM conflictresolutionoverride WHERE "
-                           "chanid = %1 AND starttime = %2 AND "
-                           "endtime = %3;")
-                           .arg((*i)->chanid).arg(dstart).arg(dend);
-
-        qquery = db->exec(thequery);
-        if (!qquery.isActive())
-        {
-            cerr << "DB Error: conflict resolution deletion failed, SQL query "
-                 << "was:" << endl;
-            cerr << thequery << endl;
-        }
-    }
-
-    vector<ProgramInfo *>::iterator iter = conflictlist->begin();
-    for (; iter != conflictlist->end(); iter++)
-    {
-        delete (*iter);
-    }
-    delete conflictlist;
-
-    ScheduledRecording::signalChange(db);
-
-    FillList();
-    update(fullRect);
-}
-
-void ViewScheduled::handleConflicting(ProgramInfo *rec)
-{
-    chooseConflictingProgram(rec);
-    return;
-}
-
-void ViewScheduled::handleRecording(ProgramInfo *rec)
-{
-    QString message = "This showing will be recorded.";
-
-    DialogBox diag(gContext->GetMainWindow(), tr(message));
-    diag.AddButton(tr("OK"));
-    diag.AddButton(tr("Don't record it"));
-
-    int ret = diag.exec();
-
-    if (ret <= 1)
-      return;
-
-    rec->SetOverride(db, 2);
-    FillList();
-    update(fullRect);
-}
-
-void ViewScheduled::chooseConflictingProgram(ProgramInfo *rec)
-{
-    allowKeys = false;
-    vector<ProgramInfo *> *conflictlist = RemoteGetConflictList(rec, true);
-    allowKeys = true;
-
-    if (!conflictlist)
-        return;
-
-    QString message = tr("The follow scheduled recordings conflict with each "
-                         "other.  Which would you like to record?");
-
-    DialogBox diag(gContext->GetMainWindow(), message, 
-                   tr("Remember this choice and use it automatically "
-                      "in the future"));
- 
-    QString button; 
-    button = rec->title + QString("\n");
-    button += rec->recstartts.toString(dateformat + " " + timeformat);
-    if (gContext->GetNumSetting("DisplayChanNum") != 0)
-        button += " on " + rec->channame + " [" + rec->chansign + "]";
-    else
-        button += QString(" on channel ") + rec->chanstr;
-
-    diag.AddButton(button);
-
-    vector<ProgramInfo *>::iterator i = conflictlist->begin();
-    for (; i != conflictlist->end(); i++)
-    {
-        ProgramInfo *info = (*i);
-
-        button = info->title + QString("\n");
-        button += info->recstartts.toString(dateformat + " " + timeformat);
-        if (gContext->GetNumSetting("DisplayChanNum") != 0)
-            button += " on " + info->channame + " [" + info->chansign + "]";
-        else
-            button += QString(" on channel ") + info->chanstr;
-
-        diag.AddButton(button);
-    }
-
-    int ret = diag.exec();
-    int boxstatus = diag.getCheckBoxState();
-
-    if (ret == 0)
-    {
-        vector<ProgramInfo *>::iterator iter = conflictlist->begin();
-        for (; iter != conflictlist->end(); iter++)
-        {
-            delete (*iter);
-        }
-
-        delete conflictlist;
-        return;
-    }
-
-    ProgramInfo *prefer = NULL;
-    vector<ProgramInfo *> *dislike = new vector<ProgramInfo *>;
-    if (ret == 2)
-    {
-        prefer = rec;
-        for (i = conflictlist->begin(); i != conflictlist->end(); i++)
-            dislike->push_back(*i);
-    }
-    else
-    {
-        dislike->push_back(rec);
-        int counter = 3;
-        for (i = conflictlist->begin(); i != conflictlist->end(); i++) 
-        {
-            if (counter == ret)
-                prefer = (*i);
-            else
-                dislike->push_back(*i);
-            counter++;
-        }
-    }
-
-    if (!prefer)
-    {
-        printf("Ack, no preferred recording\n");
-        delete dislike;
-        vector<ProgramInfo *>::iterator iter = conflictlist->begin();
-        for (; iter != conflictlist->end(); iter++)
-        {
-            delete (*iter);
-        }
-
-        delete conflictlist;
-        return;
-    }
-
-    QString thequery;
-
-    if (boxstatus == 1)
-    {
-        for (i = dislike->begin(); i != dislike->end(); i++)
-        {
-            QString sqltitle1 = prefer->title;
-            QString sqltitle2 = (*i)->title;
-
-            sqltitle1.replace(QRegExp("\""), QString("\\\""));
-            sqltitle2.replace(QRegExp("\""), QString("\\\""));
-
-            thequery = QString("INSERT INTO conflictresolutionany "
-                               "(prefertitle, disliketitle) VALUES "
-                               "(\"%1\", \"%2\");").arg(sqltitle1.utf8())
-                               .arg(sqltitle2.utf8());
-            QSqlQuery qquery = db->exec(thequery);
-            if (!qquery.isActive())
-            {
-                cerr << "DB Error: conflict resolution insertion failed, SQL "
-                     << "query was:" << endl;
-                cerr << thequery << endl;
-            }
-        }
-    } 
-    else
-    {
-        QString pstart = prefer->startts.toString("yyyyMMddhhmm");
-        pstart += "00";
-        QString pend = prefer->endts.toString("yyyyMMddhhmm");
-        pend += "00";
-
-        QString dstart, dend;
-
-        for (i = dislike->begin(); i != dislike->end(); i++)
-        {
-            dstart = (*i)->startts.toString("yyyyMMddhhmm");
-            dstart += "00";
-            dend = (*i)->endts.toString("yyyyMMddhhmm");
-            dend += "00";
-
-            thequery = QString("INSERT INTO conflictresolutionsingle "
-                               "(preferchanid, preferstarttime, "
-                               "preferendtime, dislikechanid, "
-                               "dislikestarttime, dislikeendtime) VALUES "
-                               "(%1, %2, %3, %4, %5, %6);") 
-                               .arg(prefer->chanid).arg(pstart).arg(pend)
-                               .arg((*i)->chanid).arg(dstart).arg(dend);
-
-            QSqlQuery qquery = db->exec(thequery);
-            if (!qquery.isActive())
-            {
-                cerr << "DB Error: conflict resolution insertion failed, SQL "
-                     << "query was:" << endl;
-                cerr << thequery << endl;
-            }
-        }
-    }  
-
-    QString dstart, dend;
-    for (i = dislike->begin(); i != dislike->end(); i++)
-    {
-        dstart = (*i)->startts.toString("yyyyMMddhhmm");
-        dstart += "00";
-        dend = (*i)->endts.toString("yyyyMMddhhmm");
-        dend += "00";
-
-        thequery = QString("DELETE FROM conflictresolutionoverride WHERE "
-                           "chanid = %1 AND starttime = %2 AND "
-                           "endtime = %3;").arg((*i)->chanid).arg(dstart)
-                           .arg(dend);
-
-        QSqlQuery qquery = db->exec(thequery);
-        if (!qquery.isActive())
-        {
-            cerr << "DB Error: conflict resolution deletion failed, SQL query "
-                 << "was:" << endl;
-            cerr << thequery << endl;
-        }
-    }
-
-    delete dislike;
-    vector<ProgramInfo *>::iterator iter = conflictlist->begin();
-    for (; iter != conflictlist->end(); iter++)
-    {
-        delete (*iter);
-    }
-    delete conflictlist;
-
-    ScheduledRecording::signalChange(db);
-
-    FillList();
-    update(fullRect);
-}
