@@ -102,6 +102,10 @@ UPGRADING FROM PREVIEW RELEASE 2
 Follow the above instructions to add record.sql.  Do the same thing for 
 conflict.sql.  Again, not needed for a new install.
 
+UPGRADING FROM PREVIEW RELEASE 3
+--------------------------------
+Do the same thing for conflictupdate.sql.  Not needed for a new install.
+
 Once the database is setup, run the filldata script also in the same directory.
 This'll take awhile, as it's populating the database with the next week's worth
 of program information.
