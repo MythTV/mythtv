@@ -67,9 +67,10 @@ GuideGrid::GuideGrid(const QString &channel, TV *player, QWidget *parent,
                      const char *name)
          : MythDialog(parent, name)
 {
-    DISPLAY_CHANS = 6;
+    desiredDisplayChans = DISPLAY_CHANS = 6;
     DISPLAY_TIMES = 30;
     int maxchannel = 0;
+    showFavorites = false;
 
     m_player = player;
     m_db = QSqlDatabase::database();
@@ -101,7 +102,7 @@ GuideGrid::GuideGrid(const QString &channel, TV *player, QWidget *parent,
     if (programGuideType == 1)
     {
 	int dNum = gContext->GetNumSetting("chanPerPage", 8);
-	DISPLAY_CHANS = dNum;
+	desiredDisplayChans = DISPLAY_CHANS = dNum;
 
 	dNum = gContext->GetNumSetting("timePerPage", 5);
         if (dNum > 5)
@@ -168,21 +169,21 @@ GuideGrid::GuideGrid(const QString &channel, TV *player, QWidget *parent,
         createProgramLabel(titlefontsize, progfontsize);
     else
     {
-	if (showProgramBar == 1)
-	{
-		setupColorScheme();
-		QBoxLayout *mainHold = new QVBoxLayout( this );
-    		mainHold->setResizeMode(QLayout::Minimum);
-    		mainHold->addStrut((int)(800*wmult));
+        if (showProgramBar == 1)
+        {
+            setupColorScheme();
+            QBoxLayout *mainHold = new QVBoxLayout( this );
+            mainHold->setResizeMode(QLayout::Minimum);
+            mainHold->addStrut((int)(800*wmult));
 
-    		QHBoxLayout *holdA = new QHBoxLayout(0, 0, 0);
+            QHBoxLayout *holdA = new QHBoxLayout(0, 0, 0);
 
-		holdA->addStrut( (int)((int)(600*hmult) - (int)(1.5*25*hmult)) );
+            holdA->addStrut( (int)((int)(600*hmult) - (int)(1.5*25*hmult)) );
 
-    		mainHold->addLayout(holdA, 0);
+            mainHold->addLayout(holdA, 0);
 
-		createProgramBar(mainHold);
-	}
+            createProgramBar(mainHold);
+        }
     }
 
     QAccel *accel = new QAccel(this);
@@ -211,9 +212,11 @@ GuideGrid::GuideGrid(const QString &channel, TV *player, QWidget *parent,
 
     accel->connectItem(accel->insertItem(Key_7), this, SLOT(dayLeft()));
     accel->connectItem(accel->insertItem(Key_1), this, SLOT(dayRight()));
+    accel->connectItem(accel->insertItem(Key_4), this, SLOT(toggleGuideListing()));
     accel->connectItem(accel->insertItem(Key_6), this, SLOT(showProgFinder()));
     accel->connectItem(accel->insertItem(Key_3), this, SLOT(pageUp()));
     accel->connectItem(accel->insertItem(Key_9), this, SLOT(pageDown()));
+    accel->connectItem(accel->insertItem(Key_Slash), this, SLOT(toggleChannelFavorite()));
 
     accel->connectItem(accel->insertItem(Key_C), this, SLOT(escape()));
     accel->connectItem(accel->insertItem(Key_Escape), this, SLOT(escape()));
@@ -238,7 +241,7 @@ GuideGrid::GuideGrid(const QString &channel, TV *player, QWidget *parent,
 
     if (programGuideType == 0 && showProgramBar == 1)
     {
-	// One second timer for clock
+        // One second timer for clock
         timeCheck = new QTimer(this);
         connect(timeCheck, SIGNAL(timeout()), SLOT(timeout()) );
         timeCheck->start(1000);
@@ -375,65 +378,65 @@ void GuideGrid::setupColorScheme()
 
 void GuideGrid::createProgramBar(QBoxLayout *holdingTank)
 {
-	QLabel *leftFiller = NULL;
-        QLabel *currentButton = new QLabel("   (4) Current Programs   ", this);
-        QLabel *futureButton = new QLabel("   (6) Program Finder   ", this);
-        QLabel *rightFiller = new QLabel("   ", this);
+    QLabel *leftFiller = NULL;
+    currentButton = new QLabel("   (4) Current Programs   ", this);
+    QLabel *futureButton = new QLabel("   (6) Program Finder   ", this);
+    QLabel *rightFiller = new QLabel("   ", this);
 
-	QTime new_time = QTime::currentTime();
-    	QString curTime = new_time.toString("h:mm:ss ap");
+    QTime new_time = QTime::currentTime();
+    QString curTime = new_time.toString("h:mm:ss ap");
 
-	if (programGuideType ==0 && showProgramBar == 1)
-	{
- 		currentTime = new QLabel("  " + curTime, this);
-    		currentTime->setMaximumHeight((int)(1.5*25*hmult));
-		currentTime->setMinimumHeight((int)(1.5*25*hmult));
-    		currentTime->setMaximumWidth((int)(800*wmult));
-    		currentTime->setPaletteBackgroundColor(chan_bgColor);
-    		currentTime->setPaletteForegroundColor(chan_fgColor);
-		currentTime->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	}
-	else
-	{
-		leftFiller = new QLabel("   ", this);
-		leftFiller->setMaximumWidth((int)(800*wmult));
-        	leftFiller->setMaximumHeight((int)(1.5*25*hmult));
-        	leftFiller->setMinimumHeight((int)(1.5*25*hmult));
-        	leftFiller->setPaletteForegroundColor(chan_fgColor);
-        	leftFiller->setPaletteBackgroundColor(chan_bgColor);
-        	leftFiller->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	}
+    if (programGuideType ==0 && showProgramBar == 1)
+    {
+        currentTime = new QLabel("  " + curTime, this);
+        currentTime->setMaximumHeight((int)(1.5*25*hmult));
+        currentTime->setMinimumHeight((int)(1.5*25*hmult));
+        currentTime->setMaximumWidth((int)(800*wmult));
+        currentTime->setPaletteBackgroundColor(chan_bgColor);
+        currentTime->setPaletteForegroundColor(chan_fgColor);
+        currentTime->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    }
+    else
+    {
+        leftFiller = new QLabel("   ", this);
+        leftFiller->setMaximumWidth((int)(800*wmult));
+        leftFiller->setMaximumHeight((int)(1.5*25*hmult));
+        leftFiller->setMinimumHeight((int)(1.5*25*hmult));
+        leftFiller->setPaletteForegroundColor(chan_fgColor);
+        leftFiller->setPaletteBackgroundColor(chan_bgColor);
+        leftFiller->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    }
 
-        currentButton->setMaximumWidth((int)(800*wmult));
-        currentButton->setMaximumHeight((int)(1.5*25*hmult));
-        currentButton->setMinimumHeight((int)(1.5*25*hmult));
-        currentButton->setPaletteForegroundColor(time_fgColor);
-        currentButton->setPaletteBackgroundColor(time_bgColor);
-        currentButton->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    currentButton->setMaximumWidth((int)(800*wmult));
+    currentButton->setMaximumHeight((int)(1.5*25*hmult));
+    currentButton->setMinimumHeight((int)(1.5*25*hmult));
+    currentButton->setPaletteForegroundColor(time_fgColor);
+    currentButton->setPaletteBackgroundColor(time_bgColor);
+    currentButton->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 
-        futureButton->setMaximumWidth((int)(800*wmult));
-        futureButton->setMaximumHeight((int)(1.5*25*hmult));
-        futureButton->setMinimumHeight((int)(1.5*25*hmult));
-        futureButton->setPaletteForegroundColor(chan_fgColor);
-        futureButton->setPaletteBackgroundColor(chan_bgColor);
-        futureButton->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    futureButton->setMaximumWidth((int)(800*wmult));
+    futureButton->setMaximumHeight((int)(1.5*25*hmult));
+    futureButton->setMinimumHeight((int)(1.5*25*hmult));
+    futureButton->setPaletteForegroundColor(chan_fgColor);
+    futureButton->setPaletteBackgroundColor(chan_bgColor);
+    futureButton->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 
-        rightFiller->setMaximumWidth((int)(800*wmult));
-        rightFiller->setMaximumHeight((int)(1.5*25*hmult));
-        rightFiller->setMinimumHeight((int)(1.5*25*hmult));
-        rightFiller->setPaletteForegroundColor(chan_fgColor);
-        rightFiller->setPaletteBackgroundColor(chan_bgColor);
-        rightFiller->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    rightFiller->setMaximumWidth((int)(800*wmult));
+    rightFiller->setMaximumHeight((int)(1.5*25*hmult));
+    rightFiller->setMinimumHeight((int)(1.5*25*hmult));
+    rightFiller->setPaletteForegroundColor(chan_fgColor);
+    rightFiller->setPaletteBackgroundColor(chan_bgColor);
+    rightFiller->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 
-        QHBoxLayout *bottomInfo = new QHBoxLayout(0, 0, 0);
-	if (programGuideType ==0 && showProgramBar == 1)
-        	bottomInfo->addWidget(currentTime, 0, 0);
-	else if (leftFiller)
-		bottomInfo->addWidget(leftFiller, 0, 0);
-        bottomInfo->addWidget(currentButton, 0, 0);
-        bottomInfo->addWidget(futureButton, 0, 0);
-        bottomInfo->addWidget(rightFiller, 0, 0);
-        holdingTank->addLayout(bottomInfo, 0);
+    QHBoxLayout *bottomInfo = new QHBoxLayout(0, 0, 0);
+    if (programGuideType == 0 && showProgramBar == 1)
+        bottomInfo->addWidget(currentTime, 0, 0);
+    else if (leftFiller)
+        bottomInfo->addWidget(leftFiller, 0, 0);
+    bottomInfo->addWidget(currentButton, 0, 0);
+    bottomInfo->addWidget(futureButton, 0, 0);
+    bottomInfo->addWidget(rightFiller, 0, 0);
+    holdingTank->addLayout(bottomInfo, 0);
 }
 
 void GuideGrid::createProgramLabel(int titlefontsize, int progfontsize)
@@ -452,9 +455,8 @@ void GuideGrid::createProgramLabel(int titlefontsize, int progfontsize)
 
     if (showProgramBar == 1)
     {
-    	holdB->addStrut( (int)((int)(300*hmult) - (int)(1.5*25*hmult)) );
-
-	createProgramBar(mainHold);
+        holdB->addStrut( (int)((int)(300*hmult) - (int)(1.5*25*hmult)) );
+        createProgramBar(mainHold);
     }
 
     QVBoxLayout *holdC = new QVBoxLayout(0, (int)(10 * wmult), -1);
@@ -569,7 +571,7 @@ void GuideGrid::createProgramLabel(int titlefontsize, int progfontsize)
     recordingfield = new QLabel("", this);
     recordingfield->setBackgroundOrigin(WindowOrigin);
     recordingfield->setMaximumWidth((int)(440 * wmult) -
-				   recordinglabel->width() - (int)(50*wmult));
+                                    recordinglabel->width() - (int)(50*wmult));
     QLabel *blankfield = new QLabel("", this);
     blankfield->setBackgroundOrigin(WindowOrigin);
 
@@ -610,7 +612,7 @@ void GuideGrid::timeout()
     QString curTime = new_time.toString("h:mm:ss ap");
 
     if (currentTime != NULL)
-    	currentTime->setText("  " + curTime);
+        currentTime->setText("  " + curTime);
 
     if (programGuideType == 1)
     {
@@ -622,17 +624,41 @@ void GuideGrid::timeout()
     }
 }
 
-void GuideGrid::fillChannelInfos(int &maxchannel)
+void GuideGrid::fillChannelInfos(int &maxchannel, bool gotostartchannel)
 {
     m_channelInfos.clear();
 
-    QString thequery;
+    QString queryfav;
     QSqlQuery query;
 
-    thequery = "SELECT channum,callsign,icon,chanid FROM channel "
-               "ORDER BY " + channelOrdering + ";";
-    query.exec(thequery);
-    
+    QString queryall = "SELECT channel.channum, channel.callsign, "
+                       "channel.icon, channel.chanid, favorites.favid "
+                       "FROM channel LEFT JOIN favorites ON "
+                       "favorites.chanid = channel.chanid ORDER BY " +
+                       channelOrdering + ";";
+
+    if (showFavorites)
+    {
+        queryfav = "SELECT channel.channum, channel.callsign, "
+                   "channel.icon, channel.chanid, favorites.favid "
+                   "FROM favorites, channel WHERE "
+                   "channel.chanid = favorites.chanid ORDER BY " + 
+                   channelOrdering + ";";
+
+        query.exec(queryfav);   
+
+        // If we don't have any favorites, then just show regular listings.
+        if (!query.isActive() || query.numRowsAffected() == 0)
+        {
+            showFavorites = (!showFavorites);
+            query.exec(queryall);
+        }
+    }
+    else
+    {
+        query.exec(queryall);
+    }
+ 
     bool set = false;
     maxchannel = 0;
     
@@ -651,9 +677,10 @@ void GuideGrid::fillChannelInfos(int &maxchannel)
             if (val.chanstr == QString::null)
                 val.chanstr = "";
             val.chanid = query.value(3).toInt();
+            val.favid = query.value(4).toInt();
             val.icon = NULL;
         
-            if (val.chanstr == m_startChanStr && !set)
+            if (gotostartchannel && val.chanstr == m_startChanStr && !set)
             {
                 m_currentStartChannel = m_channelInfos.size();
                 set = true;
@@ -931,6 +958,10 @@ void GuideGrid::paintChannels(QPainter *p)
         QFontMetrics lfm(*m_chanFont);
         int bheight = lfm.height();
 
+        QString favstr = "";
+        if (chinfo->favid > 0)
+            favstr = "*";
+
         if (programGuideType != 1)
         {
             if (chinfo->iconpath != "none" && chinfo->iconpath != "" && 
@@ -959,13 +990,16 @@ void GuideGrid::paintChannels(QPainter *p)
                              chinfo->chanstr);
             }
 
+            QString callsignstr = favstr + " " + chinfo->callsign + " " + 
+                                  favstr;
+
             tmp.setFont(*m_chanCallsignFont);
             QFontMetrics fm(*m_chanCallsignFont);
-            int width = fm.width(chinfo->callsign);
+            int width = fm.width(callsignstr);
             int height = fm.height();
             tmp.drawText((cr.width() - width) / 2, 
                          ydifference * y + yoffset + bheight + height, 
-                         chinfo->callsign);
+                         callsignstr);
 
             tmp.drawLine(0, ydifference * (y + 1), cr.right(), 
                          ydifference * (y + 1));
@@ -975,9 +1009,10 @@ void GuideGrid::paintChannels(QPainter *p)
             QString chData;
 
             if (gContext->GetNumSetting("DisplayChanNum") != 0)
-                chData = chinfo->callsign;
+                chData = chinfo->callsign + " " + favstr;
             else
-                chData = chinfo->chanstr + " " + chinfo->callsign;
+                chData = chinfo->chanstr + " " + chinfo->callsign + " " + 
+                         favstr;
 
             int width = lfm.width(chData);
 
@@ -1828,27 +1863,27 @@ QRect GuideGrid::programRect() const
         unsigned int programheight = (int)((600 - min_dateheight - 
                                            titleheight) * wmult);
 
-	if (showProgramBar == 0)
-        	programheight = DISPLAY_CHANS * (int)(programheight / DISPLAY_CHANS);
-	else
-		programheight = (DISPLAY_CHANS * (int)(programheight / DISPLAY_CHANS)) - 
-				(int)(25 * 1.5);
+        if (showProgramBar == 0)
+            programheight = DISPLAY_CHANS * (int)(programheight / DISPLAY_CHANS);
+        else
+            programheight = (DISPLAY_CHANS * (int)(programheight / DISPLAY_CHANS)) - (int)(25 * 1.5);
 
         unsigned int programwidth = (int)((800 - min_datewidth) * hmult);
         programwidth = DISPLAY_TIMES * (int)(programwidth / DISPLAY_TIMES);
 
-	if (showProgramBar == 0)
-	{
-        	r = QRect((int)(800 * wmult) - programwidth, 
-                    (int)(600 * hmult) - programheight - titleheight,
-                    programwidth, programheight);
-	}
-	else
-	{
-		r = QRect((int)(800 * wmult) - programwidth,
-                    (int)(600 * hmult) - programheight - titleheight - (int)(hmult*1.5*25),
-                    programwidth, programheight);
-	}
+        if (showProgramBar == 0)
+        {
+            r = QRect((int)(800 * wmult) - programwidth, 
+                      (int)(600 * hmult) - programheight - titleheight,
+                      programwidth, programheight);
+        }
+        else
+        {
+            r = QRect((int)(800 * wmult) - programwidth,
+                      (int)(600 * hmult) - programheight - titleheight - 
+                      (int)(hmult*1.5*25),
+                      programwidth, programheight);
+        }
     }
     else
     {
@@ -1858,14 +1893,14 @@ QRect GuideGrid::programRect() const
 
         unsigned int programheight;
 
-	if (showProgramBar == 1)
+        if (showProgramBar == 1)
         {
-		programheight = (int)( (int)(300*hmult) - (int)(min_dateheight*2.5*hmult) );
-	}
-	else
-	{
-		programheight = (int)((int)(300*hmult) - (int)(min_dateheight*hmult));;;
-	}
+            programheight = (int)((int)(300*hmult) - (int)(min_dateheight*2.5*hmult) );
+        }
+        else
+        {
+            programheight = (int)((int)(300*hmult) - (int)(min_dateheight*hmult));
+        }
 
         programheight = DISPLAY_CHANS * (int)(programheight / DISPLAY_CHANS);
 
@@ -1873,17 +1908,18 @@ QRect GuideGrid::programRect() const
         programwidth = DISPLAY_TIMES * (int)(programwidth / DISPLAY_TIMES);
 
         if (showProgramBar == 1)
-	{
+        {
              r = QRect((int)(800 * wmult) - programwidth,
-                  (int)(600 * hmult) - programheight - (int)(hmult*1.5*min_dateheight),
-                  programwidth, programheight);
-	}
-	else
-	{
-	     r = QRect((int)(800 * wmult) - programwidth,
-                  (int)(600 * hmult) - programheight,
-                  programwidth, programheight);
-	}
+                       (int)(600 * hmult) - programheight - 
+                       (int)(hmult*1.5*min_dateheight),
+                       programwidth, programheight);
+        }
+        else
+        {
+            r = QRect((int)(800 * wmult) - programwidth,
+                      (int)(600 * hmult) - programheight,
+                      programwidth, programheight);
+        }
     }
 
     return r;
@@ -1900,7 +1936,7 @@ QRect GuideGrid::titleRect() const
     QRect r;
     if (showProgramBar == 0)
     {
-    	r = QRect(0, programRect().bottom() + 1, fullRect().width(), 
+        r = QRect(0, programRect().bottom() + 1, fullRect().width(), 
                   fullRect().height() - programRect().bottom());
     }
     else
@@ -1909,6 +1945,86 @@ QRect GuideGrid::titleRect() const
                   fullRect().height() - (int)(25*1.5*hmult) - programRect().bottom());
     }
     return r;
+}
+
+void GuideGrid::toggleGuideListing()
+{
+    showFavorites = (!showFavorites);
+    generateListings();
+}
+
+void GuideGrid::generateListings()
+{
+    m_currentStartChannel = 0;
+    m_currentRow = 0;
+
+    int maxchannel = 0;
+    DISPLAY_CHANS = desiredDisplayChans;
+    fillChannelInfos(maxchannel);
+    if (DISPLAY_CHANS > maxchannel)
+        DISPLAY_CHANS = maxchannel;
+
+    fillProgramInfos();
+
+    if (showProgramBar == 1)
+    {    
+        if (showFavorites)
+            currentButton->setText("   (4) All Programs   ");
+        else
+            currentButton->setText("   (4) Favorite Programs   ");
+    }
+
+    update(channelRect());
+    update(programRect());
+    if (showtitle)
+        update(titleRect());
+    if (programGuideType == 1)
+        update(infoRect());
+}
+
+void GuideGrid::toggleChannelFavorite()
+{
+    QString thequery;
+    QSqlQuery query;
+
+    // Get current channel id, and make sure it exists...
+    int chanNum = m_currentRow + m_currentStartChannel;
+    if (chanNum >= (int)m_channelInfos.size())
+        chanNum -= (int)m_channelInfos.size();
+    if (chanNum < 0)
+        chanNum = 0;
+
+    int favid = m_channelInfos[chanNum].favid;
+    int chanid = m_channelInfos[chanNum].chanid;
+
+    if (favid > 0) 
+    {
+        thequery = QString("DELETE FROM favorites WHERE favid = '%1'")
+                           .arg(favid);
+
+        query.exec(thequery);
+    }
+    else
+    {
+        // We have no favorites record...Add one to toggle...
+        thequery = QString("INSERT INTO favorites (chanid) VALUES ('%1')")
+                           .arg(chanid);
+
+        query.exec(thequery);
+    }
+
+    if (showFavorites)
+        generateListings();
+    else
+    {
+        int maxchannel = 0;
+        DISPLAY_CHANS = desiredDisplayChans;
+        fillChannelInfos(maxchannel, false);
+        if (DISPLAY_CHANS > maxchannel)
+            DISPLAY_CHANS = maxchannel;
+
+        update(channelRect());
+    }
 }
 
 void GuideGrid::cursorLeft()
@@ -2226,11 +2342,10 @@ void GuideGrid::showProgFinder()
 
     if (programGuideType == 1)
     {
-    	if (m_player)
-        	m_player->EmbedOutput(forvideo->winId(), 0, 0,
-                              forvideo->width(), forvideo->height());
+        if (m_player)
+            m_player->EmbedOutput(forvideo->winId(), 0, 0,
+                                  forvideo->width(), forvideo->height());
     }
-
 }
 
 void GuideGrid::enter()

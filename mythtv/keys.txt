@@ -28,6 +28,8 @@ Watching TV or a recording
 - ] to increase volume
 - | to toggle mute
 - Z to skip through current commercial(s)
+- / to jump to the next "favorite" channel
+- ? to mark/unmark the current channel as a "favorite"
 
 Without the stickykeys option selected:
 
@@ -92,6 +94,9 @@ EPG
   are selected for the highlighted entry.
 - Pressing X will change the channel to the currently selected channel without
   leaving the EPG (Most useful in the alternate EPG)
+- Pressing '/' will mark/unmark the current channel as a "favorite"
+- Pressing 4 will toggle the guide listing between all channels and filtered
+  "favorites".
 
 Remote Controls
 ---------------

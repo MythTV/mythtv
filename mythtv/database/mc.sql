@@ -143,6 +143,12 @@ CREATE TABLE IF NOT EXISTS cardinput
     preference INT,
     shareable CHAR DEFAULT 'N'
 );
+CREATE TABLE IF NOT EXISTS favorites (
+    favid int(11) unsigned NOT NULL auto_increment,
+    userid int(11) unsigned NOT NULL default '0',
+    chanid int(11) unsigned NOT NULL default '0',
+    PRIMARY KEY (favid)
+);
 
 INSERT INTO recordingprofiles (name) VALUES ('Default');
 INSERT INTO recordingprofiles (name) VALUES ('Live TV');

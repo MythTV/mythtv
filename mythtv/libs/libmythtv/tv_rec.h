@@ -40,7 +40,7 @@ class TVRec
 
     bool CheckChannel(Channel *chan, const QString &channum, int &finetuning); 
     bool ChangeExternalChannel(const QString &channum);
-    QString GetNextChannel(Channel *chan, bool direction);
+    QString GetNextChannel(Channel *chan, int channeldirection);
 
     bool IsReallyRecording(void);
     float GetFramerate(void);
@@ -56,7 +56,8 @@ class TVRec
     void StopLiveTV(void);
     void PauseRecorder(void);
     void ToggleInputs(void);
-    void ChangeChannel(bool direction);
+    void ToggleChannelFavorite(void);
+    void ChangeChannel(int channeldirection);
     void SetChannel(QString name);
     void ChangeColour(bool direction);
     void ChangeContrast(bool direction);

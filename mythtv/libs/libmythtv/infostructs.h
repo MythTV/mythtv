@@ -17,6 +17,7 @@ class ChannelInfo
     QString iconpath;
     QString chanstr;
     int chanid;
+    int favid;
 
     QPixmap *icon;
 };

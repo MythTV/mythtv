@@ -49,7 +49,8 @@ class EncoderLink
     void StopLiveTV(void);
     void PauseRecorder(void);
     void ToggleInputs(void);
-    void ChangeChannel(bool direction);
+    void ToggleChannelFavorite(void);
+    void ChangeChannel(int channeldirection);
     void SetChannel(QString name);
     void ChangeContrast(bool direction);
     void ChangeBrightness(bool direction);

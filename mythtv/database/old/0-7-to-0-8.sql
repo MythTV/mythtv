@@ -1,5 +1,12 @@
 USE mythconverg;
 
+CREATE TABLE IF NOT EXISTS favorites (
+    favid int(11) unsigned NOT NULL auto_increment,
+    userid int(11) unsigned NOT NULL default '0',
+    chanid int(11) unsigned NOT NULL default '0',
+    PRIMARY KEY (favid)
+);
+
 CREATE TABLE IF NOT EXISTS recordingprofiles
 (
     id INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,

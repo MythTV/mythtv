@@ -861,10 +861,11 @@ bool TVRec::CheckChannel(Channel *chan, const QString &channum, int &finetuning)
     return ret;
 }
 
-QString TVRec::GetNextChannel(Channel *chan, bool direction)
+QString TVRec::GetNextChannel(Channel *chan, int channeldirection)
 {
     QString ret = "";
 
+    // Get info on the current channel we're on
     QString channum = chan->GetCurrentName();
     QString channelinput = chan->GetCurrentInput();
     QString device = chan->GetDevice();
@@ -924,23 +925,35 @@ QString TVRec::GetNextChannel(Channel *chan, bool direction)
         return ret;
     }
 
+    // Now let's try finding the next channel in the desired direction
     QString comp = ">";
     QString ordering = "";
+    QString fromfavorites = "";
+    QString wherefavorites = "";
 
-    if (direction == false)
+    if (channeldirection == CHANNEL_DIRECTION_DOWN)
     {
         comp = "<";
         ordering = " DESC ";
     }
+    else if (channeldirection == CHANNEL_DIRECTION_FAVORITE)
+    {
+        fromfavorites = ",favorites";
+        wherefavorites = "AND favorites.chanid = channel.chanid";
+    }
 
+    // Just a note, %9 is the limit here.
     thequery = QString("SELECT channel.channum FROM channel,capturecard,"
-                       "cardinput WHERE channel.%1 %2 \"%3\" AND "
+                       "cardinput%1 WHERE "
+                       "channel.%2 %3 \"%4\" %5 AND "
                        "channel.sourceid = cardinput.sourceid AND "
-                       "cardinput.inputname = \"%4\" AND "
+                       "cardinput.inputname = \"%6\" AND "
                        "cardinput.cardid = capturecard.cardid AND "
-                       "capturecard.videodevice = \"%5\" ORDER BY %6 %7 "
+                       "capturecard.videodevice = \"%7\" "
+                       "ORDER BY %8 %9 "
                        "LIMIT 1;")
-                       .arg(channelorder).arg(comp).arg(id)
+                       .arg(fromfavorites).arg(channelorder)
+                       .arg(comp).arg(id).arg(wherefavorites)
                        .arg(channelinput).arg(device)
                        .arg(channelorder).arg(ordering);
 
@@ -956,19 +969,24 @@ QString TVRec::GetNextChannel(Channel *chan, bool direction)
     }
     else
     {
-        if (direction)        
-            comp = "<";
-        else
+        // Couldn't find the channel going in the desired direction, 
+        // so loop around and find it on the flip side...
+        comp = "<";
+        if (channeldirection == CHANNEL_DIRECTION_DOWN) 
             comp = ">";
 
+        // again, %9 is the limit for this
         thequery = QString("SELECT channel.channum FROM channel,capturecard,"
-                           "cardinput WHERE channel.%1 %2 \"%3\" AND "
+                           "cardinput%1 WHERE "
+                           "channel.%2 %3 \"%4\" %5 AND "
                            "channel.sourceid = cardinput.sourceid AND "
-                           "cardinput.inputname = \"%4\" AND "
+                           "cardinput.inputname = \"%6\" AND "
                            "cardinput.cardid = capturecard.cardid AND "
-                           "capturecard.videodevice = \"%5\" ORDER BY %6 %7 "
+                           "capturecard.videodevice = \"%7\" "
+                           "ORDER BY %8 %9 "
                            "LIMIT 1;")
-                           .arg(channelorder).arg(comp).arg(id)
+                           .arg(fromfavorites).arg(channelorder)
+                           .arg(comp).arg(id).arg(wherefavorites)
                            .arg(channelinput).arg(device)
                            .arg(channelorder).arg(ordering);
 
@@ -1146,11 +1164,13 @@ void TVRec::ToggleInputs(void)
     UnpauseRingBuffer();
 }
 
-void TVRec::ChangeChannel(bool direction)
+void TVRec::ChangeChannel(int channeldirection)
 {
     rbuffer->Reset();
     
-    if (direction)
+    if (channeldirection == CHANNEL_DIRECTION_FAVORITE)
+        channel->NextFavorite();
+    else if (channeldirection == CHANNEL_DIRECTION_UP)
         channel->ChannelUp();
     else
         channel->ChannelDown();
@@ -1159,6 +1179,79 @@ void TVRec::ChangeChannel(bool direction)
     nvr->Unpause();
 
     UnpauseRingBuffer();
+}
+
+void TVRec::ToggleChannelFavorite(void)
+{
+    // Get current channel id...
+    QString channum = channel->GetCurrentName();
+    QString channelinput = channel->GetCurrentInput();
+    QString device = channel->GetDevice();
+
+    pthread_mutex_lock(&db_lock);
+
+    MythContext::KickDatabase(db_conn);
+
+    QString thequery = QString("SELECT channel.chanid FROM "
+                               "channel,capturecard,cardinput "
+                               "WHERE channel.channum = \"%1\" AND "
+                               "channel.sourceid = cardinput.sourceid AND "
+                               "cardinput.inputname = \"%2\" AND "
+                               "cardinput.cardid = capturecard.cardid AND "
+                               "capturecard.videodevice = \"%3\";")
+                               .arg(channum).arg(channelinput).arg(device);
+
+    QSqlQuery query = db_conn->exec(thequery);
+
+    QString chanid = QString::null;
+
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        query.next();
+
+        chanid = query.value(0).toString();
+    }
+    else
+    {
+        pthread_mutex_unlock(&db_lock);
+        cerr << "Channel: \'" << channum << "\' was not found in the database.";
+        cerr << "\nMost likely, your DefaultTVChannel setting is wrong.";
+        cerr << "\nCould not toggle favorite.\n";
+        return;
+    }
+
+    // Check if favorite exists for that chanid...
+    thequery = QString("SELECT favorites.favid FROM favorites WHERE "
+                       "favorites.chanid = \"%1\""
+                       "LIMIT 1;")
+                       .arg(chanid);
+
+    query = db_conn->exec(thequery);
+
+    if (!query.isActive())
+        MythContext::DBError("togglechannelfavorite", query);
+    else if (query.numRowsAffected() > 0)
+    {
+        // We have a favorites record...Remove it to toggle...
+        query.next();
+        QString favid = query.value(0).toString();
+
+        thequery = QString("DELETE FROM favorites WHERE favid = \"%1\"")
+                           .arg(favid);
+
+        query = db_conn->exec(thequery);
+        cout << "Removing Favorite.\n";
+    }
+    else
+    {
+        // We have no favorites record...Add one to toggle...
+        thequery = QString("INSERT INTO favorites (chanid) VALUES (\"%1\")")
+                           .arg(chanid);
+
+        query = db_conn->exec(thequery);
+        cout << "Adding Favorite.\n";
+    }
+    pthread_mutex_unlock(&db_lock);
 }
 
 void TVRec::ChangeContrast(bool direction)

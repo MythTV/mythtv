@@ -268,11 +268,22 @@ void EncoderLink::ToggleInputs(void)
     cerr << "Should be local only query: ToggleInputs\n";
 }
 
-void EncoderLink::ChangeChannel(bool direction)
+void EncoderLink::ToggleChannelFavorite(void)
 {
     if (local)
     {
-        tv->ChangeChannel(direction);
+        tv->ToggleChannelFavorite();
+        return;
+    }
+
+    cerr << "Should be local only query: ToggleChannelFavorite\n";
+}
+
+void EncoderLink::ChangeChannel(int channeldirection)
+{
+    if (local)
+    {
+        tv->ChangeChannel(channeldirection);
         return;
     }
 

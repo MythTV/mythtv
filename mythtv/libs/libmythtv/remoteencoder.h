@@ -35,7 +35,8 @@ class RemoteEncoder
     void ChangeContrast(bool direction);
     void ChangeBrightness(bool direction);
     void ChangeColour(bool direction);
-    void ChangeChannel(bool direction);
+    void ChangeChannel(int channeldirection);
+    void ToggleChannelFavorite(void);
     void SetChannel(QString channel);
     bool CheckChannel(QString channel);
     void GetChannelInfo(QString &title, QString &subtitle, QString &desc, 

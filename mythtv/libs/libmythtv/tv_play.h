@@ -59,7 +59,8 @@ class TV : public QObject
  private:
     void SetChannel(bool needopen = false);
 
-    void ChangeChannel(bool up);
+    void ToggleChannelFavorite(void);
+    void ChangeChannel(int direction);
     void ChangeChannelByString(QString &name);
 
     void ChangeVolume(bool up);

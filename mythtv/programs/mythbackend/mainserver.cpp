@@ -801,10 +801,15 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         enc->ToggleInputs();
         retlist << "ok";
     }
+    else if (command == "TOGGLE_CHANNEL_FAVORITE")
+    {
+        enc->ToggleChannelFavorite();
+        retlist << "ok";
+    }
     else if (command == "CHANGE_CHANNEL")
     {
-        bool up = slist[2].toInt(); 
-        enc->ChangeChannel(up);
+        int direction = slist[2].toInt(); 
+        enc->ChangeChannel(direction);
         retlist << "ok";
     }
     else if (command == "SET_CHANNEL")

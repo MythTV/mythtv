@@ -196,7 +196,7 @@ int Channel::GetCurrentChannelNum(const QString &channame)
 
 bool Channel::ChannelUp(void)
 {
-    QString nextchan = pParent->GetNextChannel(this, true);
+    QString nextchan = pParent->GetNextChannel(this, CHANNEL_DIRECTION_UP);
     if (SetChannelByString(nextchan))
         return true;
 
@@ -229,7 +229,7 @@ bool Channel::ChannelUp(void)
 
 bool Channel::ChannelDown(void)
 {
-    QString nextchan = pParent->GetNextChannel(this, false);
+    QString nextchan = pParent->GetNextChannel(this, CHANNEL_DIRECTION_DOWN);
     if (SetChannelByString(nextchan))
         return true;
 
@@ -257,7 +257,14 @@ bool Channel::ChannelDown(void)
         }
     }
 
-    return false;
+    return finished;
+}
+
+bool Channel::NextFavorite(void)
+{
+    QString nextchan = pParent->GetNextChannel(this, 
+                                               CHANNEL_DIRECTION_FAVORITE);
+    return SetChannelByString(nextchan);
 }
 
 QString Channel::GetCurrentName(void)

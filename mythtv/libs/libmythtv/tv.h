@@ -1,6 +1,10 @@
 #ifndef TV_H
 #define TV_H
 
+#define CHANNEL_DIRECTION_UP 0
+#define CHANNEL_DIRECTION_DOWN 1
+#define CHANNEL_DIRECTION_FAVORITE 2
+
 typedef enum 
 {
     kState_Error = -1,

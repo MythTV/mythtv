@@ -845,9 +845,11 @@ void TV::ProcessKeypress(int keypressed)
         {
             case 'i': case 'I': UpdateOSD(); break;
 
-            case wsUp: ChangeChannel(true); break;
+            case wsUp: ChangeChannel(CHANNEL_DIRECTION_UP); break;
+            case wsDown: ChangeChannel(CHANNEL_DIRECTION_DOWN); break;
+            case '/': ChangeChannel(CHANNEL_DIRECTION_FAVORITE); break;
 
-            case wsDown: ChangeChannel(false); break;
+            case '?': ToggleChannelFavorite(); break;
 
             case 'c': case 'C': ToggleInputs(); break;
 
@@ -1221,7 +1223,12 @@ void TV::ToggleInputs(void)
     activenvp->Unpause();
 }
 
-void TV::ChangeChannel(bool up)
+void TV::ToggleChannelFavorite(void)
+{
+    activerecorder->ToggleChannelFavorite();
+}
+
+void TV::ChangeChannel(int direction)
 {
     bool muted = false;
 
@@ -1244,7 +1251,7 @@ void TV::ChangeChannel(bool up)
 
     activerecorder->Pause();
     activerbuffer->Reset();
-    activerecorder->ChangeChannel(up);
+    activerecorder->ChangeChannel(direction);
 
     activenvp->ResetPlaying();
     while (!activenvp->ResetYet())

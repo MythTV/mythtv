@@ -226,11 +226,19 @@ void RemoteEncoder::ToggleInputs(void)
     SendReceiveStringList(strlist);
 }
 
-void RemoteEncoder::ChangeChannel(bool direction)
+void RemoteEncoder::ToggleChannelFavorite(void)
+{
+    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    strlist << "TOGGLE_CHANNEL_FAVORITE";
+
+    SendReceiveStringList(strlist);
+}
+
+void RemoteEncoder::ChangeChannel(int channeldirection)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
     strlist << "CHANGE_CHANNEL";
-    strlist << QString::number((int)direction);
+    strlist << QString::number(channeldirection);
 
     SendReceiveStringList(strlist);
 }

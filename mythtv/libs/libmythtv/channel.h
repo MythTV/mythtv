@@ -26,6 +26,7 @@ class Channel
     bool SetChannelByString(const QString &chan); 
     bool ChannelUp(void);
     bool ChannelDown(void);
+    bool NextFavorite(void);
 
     int ChangeColour(bool up);
     int ChangeBrightness(bool up);

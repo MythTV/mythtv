@@ -60,6 +60,9 @@ class GuideGrid : public MythDialog
     void pageRight();
     void pageDown();
     void pageUp();
+    void toggleGuideListing();
+    void toggleChannelFavorite();
+    void generateListings();
 
     void enter();
     void escape();
@@ -91,7 +94,7 @@ class GuideGrid : public MythDialog
     QRect titleRect() const;
     QRect infoRect() const;
 
-    void fillChannelInfos(int &maxchannel);
+    void fillChannelInfos(int &maxchannel, bool gotostartchannel = true);
 
     void fillTimeInfos();
 
@@ -117,6 +120,7 @@ class GuideGrid : public MythDialog
     QLabel *descriptionfield;
     QLabel *currentTime;
     QLabel *currentChan;
+    QLabel *currentButton;
 
     QFont *m_timeFont;
     QFont *m_chanFont;
@@ -142,6 +146,7 @@ class GuideGrid : public MythDialog
     bool selectState;
     bool showInfo;
     bool showIcon;
+    bool showFavorites;
 
     bool showtitle;
     bool usetheme;
@@ -152,6 +157,7 @@ class GuideGrid : public MythDialog
 
     int startChannel;
     int programGuideType;
+    int desiredDisplayChans;
     int DISPLAY_CHANS;
     int DISPLAY_TIMES;
 
