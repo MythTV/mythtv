@@ -739,17 +739,6 @@ public:
     };
 };
 
-class ChannelSorting: public ComboBoxSetting, public GlobalSetting {
-public:
-    ChannelSorting():
-        GlobalSetting("ChannelSorting") {
-        setLabel("Display order of channels");
-        addSelection("channum + 0");
-        addSelection("chanid");
-        addSelection("callsign");
-    };
-};
-
 class DefaultTVChannel: public LineEditSetting, public GlobalSetting {
 public:
     DefaultTVChannel():
@@ -820,6 +809,17 @@ public:
     };
 };
 
+MainGeneralSettings::MainGeneralSettings()
+{
+    AudioSettings *audio = new AudioSettings();
+    addChild(audio);
+
+    VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
+    general->addChild(new AllowQuitShutdown());
+    general->addChild(new HaltCommand());
+    addChild(general);
+}
+
 PlaybackSettings::PlaybackSettings()
 {
     VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
@@ -831,9 +831,6 @@ PlaybackSettings::PlaybackSettings()
     general->addChild(new FixedAspectRatio());
     addChild(general);
 
-    AudioSettings *audio = new AudioSettings();
-    addChild(audio);
-
     VerticalConfigurationGroup* seek = new VerticalConfigurationGroup(false);
     seek->setLabel("Seeking");
     seek->addChild(new FastForwardAmount());
@@ -841,10 +838,14 @@ PlaybackSettings::PlaybackSettings()
     seek->addChild(new StickyKeys());
     seek->addChild(new ExactSeeking());
     seek->addChild(new JumpAmount());
-    seek->addChild(new AutoCommercialFlag());
-    seek->addChild(new CommercialSkipMethod());
-    seek->addChild(new AutoCommercialSkip());
     addChild(seek);
+
+    VerticalConfigurationGroup* comms = new VerticalConfigurationGroup(false);
+    comms->setLabel("Commercial Detection");
+    comms->addChild(new AutoCommercialFlag());
+    comms->addChild(new CommercialSkipMethod());
+    comms->addChild(new AutoCommercialSkip());
+    addChild(comms);
 
     VerticalConfigurationGroup* oscan = new VerticalConfigurationGroup(false);
     oscan->setLabel("Overscan");
@@ -853,6 +854,14 @@ PlaybackSettings::PlaybackSettings()
     oscan->addChild(new XScanDisplacement());
     oscan->addChild(new YScanDisplacement());
     addChild(oscan);
+
+    VerticalConfigurationGroup* osd = new VerticalConfigurationGroup(false);
+    osd->setLabel("On-screen display");
+    osd->addChild(new OSDTheme());
+    osd->addChild(new OSDDisplayTime());
+    osd->addChild(new OSDFont());
+    osd->addChild(new OSDCCFont());
+    addChild(osd);
 }
 
 GeneralSettings::GeneralSettings()
@@ -861,23 +870,11 @@ GeneralSettings::GeneralSettings()
     general->setLabel("General");
     general->addChild(new RecordOverTime());
     general->addChild(new PlayBoxOrdering());
+    general->addChild(new ChannelOrdering());
+    general->addChild(new DisplayChanNum());
+    general->addChild(new GeneratePreviewPixmaps());
+    general->addChild(new PlaybackPreview());
     addChild(general);
-
-    VerticalConfigurationGroup* general2 = new VerticalConfigurationGroup(false);
-    general2->setLabel("General");
-    general2->addChild(new ChannelOrdering());
-    general2->addChild(new ChannelSorting());
-    general2->addChild(new DisplayChanNum());
-    addChild(general2);
-
-    VerticalConfigurationGroup* general3 = new VerticalConfigurationGroup(false);
-    general3->setLabel("General");
-    general3->addChild(new GeneratePreviewPixmaps());
-    general3->addChild(new PlaybackPreview());
-    general3->addChild(new XineramaScreen());
-    general3->addChild(new AllowQuitShutdown());
-    general3->addChild(new HaltCommand());
-    addChild(general3);
 }
 
 EPGSettings::EPGSettings()
@@ -907,6 +904,7 @@ AppearanceSettings::AppearanceSettings()
 
     theme->addChild(new ThemeSelector());
     theme->addChild(new RandomTheme());
+    theme->addChild(new XineramaScreen());
     theme->addChild(new GuiWidth());
     theme->addChild(new GuiHeight());
     addChild(theme);
@@ -928,13 +926,5 @@ AppearanceSettings::AppearanceSettings()
     qttheme->addChild(new PlayBoxTransparency());
     qttheme->addChild(new PlayBoxShading());
     addChild(qttheme);
-
-    VerticalConfigurationGroup* osd = new VerticalConfigurationGroup(false);
-    osd->setLabel("On-screen display");
-    osd->addChild(new OSDTheme());
-    osd->addChild(new OSDDisplayTime());
-    osd->addChild(new OSDFont());
-    osd->addChild(new OSDCCFont());
-    addChild(osd);
 }
 

@@ -718,6 +718,12 @@ list<ProgramInfo *> *Scheduler::CopyList(list<ProgramInfo *> *sourcelist)
             {
                 second->inputid = sourceToInput[first->sourceid][z];
                 second->cardid = inputToCard[second->inputid];
+ 
+                if (!m_tvList->contains(second->cardid))
+                {
+                    cerr << "missing: " << second->cardid << " in tvList\n";
+                    continue;
+                }
 
                 EncoderLink *enc = (*m_tvList)[second->cardid];
                 if (enc->WouldConflict(second))
@@ -799,6 +805,12 @@ void Scheduler::DoMultiCard(void)
                     second->inputid = sourceToInput[second->sourceid][z];
                     second->cardid = inputToCard[second->inputid];
 
+                    if (!m_tvList->contains(second->cardid))
+                    {
+                        cerr << "Missing: " << second->cardid << " in tvList\n";
+                        continue;
+                    }
+
                     if (((*m_tvList)[second->cardid])->WouldConflict(second))
                     {
                         continue;
@@ -841,6 +853,12 @@ void Scheduler::DoMultiCard(void)
                 {
                     first->inputid = sourceToInput[first->sourceid][z];
                     first->cardid = inputToCard[first->inputid];
+
+                    if (!m_tvList->contains(first->cardid))
+                    {
+                        cerr << "Missing: " << first->cardid << " in tvList\n";
+                        continue;
+                    }
 
                     if (((*m_tvList)[first->cardid])->WouldConflict(first))
                     {
@@ -945,7 +963,7 @@ void Scheduler::RunScheduler(void)
 
             if (secsleft > 35)
                 break;
- 
+
             if (m_tvList->find(nextRecording->cardid) == m_tvList->end())
             {
                 cerr << "invalid cardid " << nextRecording->cardid << endl;

@@ -129,7 +129,7 @@ GuideGrid::GuideGrid(const QString &channel, TV *player, QWidget *parent,
             type->SetText(curTime);
     }
 
-    channelOrdering = gContext->GetSetting("ChannelSorting", "channum + 0");
+    channelOrdering = gContext->GetSetting("ChannelOrdering", "channum + 0");
     dateformat = gContext->GetSetting("DateFormat", "ddd MMMM d");
     unknownTitle = gContext->GetSetting("UnknownTitle", "Unknown");
     unknownCategory = gContext->GetSetting("UnknownCategory", "Unknown");

@@ -37,13 +37,4 @@
       <action>TV_DELETE</action>
    </button> 
 
-   <button>
-      <type>SETUP</type>
-      <text>Setup</text>
-      <text lang="IT">Impostazioni</text>
-      <text lang="ES">Configurar</text>
-      <text lang="CA">Configurar</text>
-      <action>MENU tv_settings.xml</action>
-   </button>
-
 </mythmenu>

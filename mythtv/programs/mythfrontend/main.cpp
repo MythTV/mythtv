@@ -152,6 +152,9 @@ void TVMenuCallback(void *data, QString &selection)
     } else if (sel == "settings general") {
         GeneralSettings settings;
         settings.exec(QSqlDatabase::database());
+    } else if (sel == "settings maingeneral") {
+        MainGeneralSettings mainsettings;
+        mainsettings.exec(QSqlDatabase::database());
         menu->ReloadExitKey();
     } else if (sel == "settings playback") {
         PlaybackSettings settings;

@@ -56,4 +56,13 @@
      <depends>mythweather</depends>
    </button>
 
+   <button>
+      <type>SETUP</type>
+      <text>Setup</text>
+      <text lang="IT">Impostazioni</text>
+      <text lang="ES">Configurar</text>
+      <text lang="CA">Configurar</text>
+      <action>MENU main_settings.xml</action>
+   </button>
+
 </mythmenu>

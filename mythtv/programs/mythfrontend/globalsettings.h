@@ -53,7 +53,6 @@ public:
     PlaybackSettings();
 };
 
-// Temporary dumping ground for things that have not been properly categorized yet
 class GeneralSettings: virtual public ConfigurationWizard {
 public:
     GeneralSettings();
@@ -69,5 +68,9 @@ public:
     AppearanceSettings();
 };
 
+class MainGeneralSettings: virtual public ConfigurationWizard {
+public:
+    MainGeneralSettings();
+};
 
 #endif
