@@ -33,9 +33,11 @@ class LiveBufferPrefix: public LineEditSetting, public BackendSetting {
 public:
     LiveBufferPrefix():
         BackendSetting("LiveBufferDir") {
-        setLabel("Directory to hold the live-tv buffers");
+        setLabel("Directory to hold the Live-TV buffers");
         setValue("/mnt/store/");
-        setHelpText("All live-tv buffers will get stored in this directory.");
+        setHelpText("All Live-TV buffers will get stored in this directory. "
+                    "These buffers are used to allow you to pause, fast "
+                    "forward and rewind through live TV.");
     };
 };
 
@@ -76,6 +78,9 @@ public:
         addSelection("argentina");
         addSelection("canada-cable");
         addSelection("australia-optus");
+        setHelpText("Select the appropriate frequency table for your "
+                    "system.  If you have an antenna, use a \"-bcast\" "
+                    "frequency.");
     };
 };
 
@@ -87,7 +92,7 @@ public:
 
         setLabel("Live TV buffer (GB)");
         setValue(5);
-        setHelpText("How large the live tv buffer is allowed to grow");
+        setHelpText("How large the live TV buffer is allowed to grow.");
     };
 };
 
@@ -97,8 +102,8 @@ public:
         SliderSetting(1, 100, 1),
         BackendSetting("MaxBufferFill") {
         setValue(50);
-        setHelpText("How full the live tv buffer is allowed to grow before "
-                    "forcing an unpause");
+        setHelpText("How full the live TV buffer is allowed to grow before "
+                    "forcing an unpause.");
     };
 };
 
