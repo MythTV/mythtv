@@ -875,6 +875,16 @@ void TV::ProcessKeypress(int keypressed)
             case Key_Space: case Key_Enter: case Key_Return: 
             {
                 osd->TurnDialogOff(dialogname);
+                if (dialogname == "alreadybeingedited")
+                {
+                    int result = osd->GetDialogResponse(dialogname);
+                    dialogname = "";
+                    if (result == 1) 
+                    {
+                       playbackinfo->SetEditing(false, m_db);
+                       editmode = nvp->EnableEdit();
+                    }
+                }
                 if (dialogname == "exitplayoptions") 
                 {
                     int result = osd->GetDialogResponse(dialogname);
@@ -1128,7 +1138,26 @@ void TV::ProcessKeypress(int keypressed)
                 }
                 break;
             }
-            case Key_E: case Key_M: editmode = nvp->EnableEdit(); break;
+            case Key_E: case Key_M: 
+            {
+               if (playbackinfo->IsEditing(m_db))
+               {
+                   nvp->Pause();
+
+                   dialogname = "alreadybeingedited";
+
+                   QString message = tr("This program is currently being edited");
+
+                   QStringList options;
+                   options += tr("Continue Editing");
+                   options += tr("Do not edit");
+
+                   osd->NewDialogBox(dialogname, message, options, 0); 
+                   break;
+               }
+            editmode = nvp->EnableEdit();
+            break;        
+            }
             default: break;
         }
     }
