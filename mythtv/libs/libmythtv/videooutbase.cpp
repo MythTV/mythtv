@@ -156,6 +156,8 @@ bool VideoOutput::Init(int width, int height, float aspect, WId winid,
 
     imgx = winx; imgy = winy;
     imgw = XJ_width; imgh = XJ_height;
+    if (imgw == 1920 && imgh == 1088)
+        imgh = 1080; // ATSC 1920x1080
 
     brightness = gContext->GetNumSettingOnHost("PlaybackBrightness", 
                                                gContext->GetHostName(), 50);
@@ -290,6 +292,8 @@ void VideoOutput::MoveResize(void)
     xoff = img_xoff; yoff = img_yoff;
     dispxoff = dispx; dispyoff = dispy;
     dispwoff = dispw; disphoff = disph;
+    if (imgw == 1920 && imgh == 1088)
+        imgh = 1080; // ATSC 1920x1080
 
 /*
     Here we apply playback over/underscanning and offsetting (if any apply).
@@ -305,8 +309,8 @@ void VideoOutput::MoveResize(void)
     if (img_vscanf > 0) 
     {
         // Veritcal overscan. Move the Y start point in original image.
-        imgy = (int)floor(0.5 + XJ_height * img_vscanf);
-        imgh = (int)floor(0.5 + XJ_height * (1 - 2 * img_vscanf));
+        imgy = (int)floor(0.5 + imgh * img_vscanf);
+        imgh = (int)floor(0.5 + imgh * (1 - 2 * img_vscanf));
 
         // If there is an offset, apply it now that we have a room.
         // To move the image down, move the start point up.
