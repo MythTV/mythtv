@@ -121,107 +121,107 @@
     <name>CustomRecord</name>
     <message>
         <source>Power Search Recording Rule Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>パワーサーチ録画ルール編集</translation>
     </message>
     <message>
         <source>Rule Name</source>
-        <translation type="unfinished"></translation>
+        <translation>ルール名</translation>
     </message>
     <message>
         <source>Match words in the title</source>
-        <translation type="unfinished"></translation>
+        <translation>タイトルの単語に一致</translation>
     </message>
     <message>
         <source>Match in any descriptive field</source>
-        <translation type="unfinished"></translation>
+        <translation>どこかの項目に一致</translation>
     </message>
     <message>
         <source>Limit by category</source>
-        <translation type="unfinished"></translation>
+        <translation>カテゴリーによる制限</translation>
     </message>
     <message>
         <source>New episodes only</source>
-        <translation type="unfinished"></translation>
+        <translation>新しい番組のみ</translation>
     </message>
     <message>
         <source>Exclude unidentified episodes (Data Direct)</source>
-        <translation type="unfinished"></translation>
+        <translation>未確認の番組を除く(Data Direct)</translation>
     </message>
     <message>
         <source>Exclude unidentified episodes (XMLTV)</source>
-        <translation type="unfinished"></translation>
+        <translation>未確認の番組を除く(XMLTV)</translation>
     </message>
     <message>
         <source>Category type</source>
-        <translation type="unfinished"></translation>
+        <translation>カテゴリータイプ</translation>
     </message>
     <message>
         <source>Limit movies by the year of release</source>
-        <translation type="unfinished"></translation>
+        <translation>放送日で映画を制限</translation>
     </message>
     <message>
         <source>Minimum star rating (0.0 to 1.0 for movies only)</source>
-        <translation type="unfinished"></translation>
+        <translation>最小スターレイティング(0.0 - 1.0 映画のみ)</translation>
     </message>
     <message>
         <source>Exclude one station</source>
-        <translation type="unfinished"></translation>
+        <translation>一つの放送局を除く</translation>
     </message>
     <message>
         <source>Match related callsigns</source>
-        <translation type="unfinished"></translation>
+        <translation>コールサインの先頭と一致</translation>
     </message>
     <message>
         <source>Only channels from a specific video source</source>
-        <translation type="unfinished"></translation>
+        <translation>指定のビデオソースのチャンネルのみ</translation>
     </message>
     <message>
         <source>Only channels marked as commercial free</source>
-        <translation type="unfinished"></translation>
+        <translation>CMカットをマークしたチャンネルのみ</translation>
     </message>
     <message>
         <source>Anytime on a specific day of the week</source>
-        <translation type="unfinished"></translation>
+        <translation>指定の曜日でいつでも</translation>
     </message>
     <message>
         <source>Only on weekdays (Monday through Friday)</source>
-        <translation type="unfinished"></translation>
+        <translation>月曜から金曜のみ</translation>
     </message>
     <message>
         <source>Only on weekends</source>
-        <translation type="unfinished"></translation>
+        <translation>土曜日と日曜日</translation>
     </message>
     <message>
         <source>Only in primetime</source>
-        <translation type="unfinished"></translation>
+        <translation>ゴールデンタイムのみ</translation>
     </message>
     <message>
         <source>Not in primetime</source>
-        <translation type="unfinished"></translation>
+        <translation>ゴールデンタイムのほか</translation>
     </message>
     <message>
         <source>Multiple sports teams (complete example)</source>
-        <translation type="unfinished"></translation>
+        <translation>複数のスポーツチーム(完全な例)</translation>
     </message>
     <message>
         <source>Sci-fi B-movies (complete example)</source>
-        <translation type="unfinished"></translation>
+        <translation>SF B級映画(完全な例)</translation>
     </message>
     <message>
         <source>Add this example clause</source>
-        <translation type="unfinished"></translation>
+        <translation>この例の条件を追加</translation>
     </message>
     <message>
         <source>Test</source>
-        <translation type="unfinished"></translation>
+        <translation>テスト</translation>
     </message>
     <message>
         <source>Record</source>
-        <translation type="unfinished">録画</translation>
+        <translation>録画</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>キャンセル</translation>
     </message>
     <message>
         <source>or</source>
@@ -461,11 +461,11 @@
     <name>MythSearchDialog</name>
     <message>
         <source>OK</source>
-        <translation type="unfinished">はい</translation>
+        <translation>はい</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>キャンセル</translation>
     </message>
 </context>
 <context>
@@ -687,39 +687,41 @@
     </message>
     <message>
         <source>Play from beginning</source>
-        <translation type="unfinished"></translation>
+        <translation>最初から再生</translation>
     </message>
     <message>
         <source>Play from bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation>ブックマークから再生</translation>
     </message>
     <message>
         <source>A preserved episode is ignored in calculations for deleting episodes above the limit.  Auto-expiration is used to remove eligable programs when disk space is low.</source>
-        <translation type="unfinished"></translation>
+        <translation>保存されたエピソードは制限を超えたエピソードを削除するための計算で無視されます。
+自動満了はディスクスペースが低いときに適任の番組を削除すのに使用されます。
+</translation>
     </message>
     <message>
         <source>Do not preserve this episode</source>
-        <translation type="unfinished"></translation>
+        <translation>この番組を保存しない</translation>
     </message>
     <message>
         <source>Preserve this episode</source>
-        <translation type="unfinished"></translation>
+        <translation>この番組を保存する</translation>
     </message>
     <message>
         <source>Play from...</source>
-        <translation type="unfinished"></translation>
+        <translation>ここから再生...</translation>
     </message>
     <message>
         <source>Storage Options</source>
-        <translation type="unfinished">保存オプション</translation>
+        <translation>保存オプション</translation>
     </message>
     <message>
         <source>Recording Options</source>
-        <translation type="unfinished"></translation>
+        <translation>録画オプション</translation>
     </message>
     <message>
         <source>Job Options</source>
-        <translation type="unfinished"></translation>
+        <translation>ジョブオプション</translation>
     </message>
 </context>
 <context>
@@ -750,19 +752,19 @@
     </message>
     <message>
         <source>NOTE: removing items from this list will not delete any recordings.</source>
-        <translation type="unfinished"></translation>
+        <translation>注意： このリストから削除しても録画された物は削除されません。</translation>
     </message>
     <message>
         <source>Keep this episode in the list</source>
-        <translation type="unfinished">この番組をリストに保存しておく</translation>
+        <translation>この番組をリストに保存しておく</translation>
     </message>
     <message>
         <source>Remove this episode from the list</source>
-        <translation type="unfinished">この番組をリストから削除する</translation>
+        <translation>この番組をリストから削除する</translation>
     </message>
     <message>
         <source>Remove all episodes for this title</source>
-        <translation type="unfinished">このタイトルの番組を全て削除する</translation>
+        <translation>このタイトルの番組を全て削除する</translation>
     </message>
 </context>
 <context>
@@ -4285,7 +4287,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Trigger AutoExpire when available disk space is below this value.  Disable AutoExpire by setting to 0.</source>
-        <translation type="unfinished"></translation>
+        <translation>ディスクの空き容量がこの値を下回ると自動削除を開始します。0にすると無効になります。</translation>
     </message>
     <message>
         <source>How often the AutoExpire process checks for free disk space.</source>
@@ -5409,7 +5411,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>%1% Completed @ %2 fps.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1%終了 (%2fps).</translation>
     </message>
     <message>
         <source>Use custom identifier for frontend preferences</source>
@@ -5417,59 +5419,59 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Wake-On-LAN settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Wake-On-LAN設定</translation>
     </message>
     <message>
         <source>Database Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>データベース設定</translation>
     </message>
     <message>
         <source>All database settings take effect when you restart this program.</source>
-        <translation type="unfinished"></translation>
+        <translation>全てのデータベースの設定変更はこのプログラムの再起動後に有効になります。</translation>
     </message>
     <message>
         <source>Myth could not connect to the database. Please verify your database settings below.</source>
-        <translation type="unfinished"></translation>
+        <translation>データベースに接続できない時はデータベースの設定を確認してください。</translation>
     </message>
     <message>
         <source>Host name</source>
-        <translation type="unfinished"></translation>
+        <translation>ホスト名</translation>
     </message>
     <message>
         <source>The host name or IP address of the machine hosting the database. This information is required.</source>
-        <translation type="unfinished"></translation>
+        <translation>データベースサーバーのホスト名かIPアドレスを指定してください。必須項目です。</translation>
     </message>
     <message>
         <source>Database</source>
-        <translation type="unfinished"></translation>
+        <translation>データベース</translation>
     </message>
     <message>
         <source>The name of the database. This information is required.</source>
-        <translation type="unfinished"></translation>
+        <translation>データベースの名称です。必須項目です。</translation>
     </message>
     <message>
         <source>User</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザー</translation>
     </message>
     <message>
         <source>The user name to use while connecting to the database. This information is required.</source>
-        <translation type="unfinished"></translation>
+        <translation>データベースに接続する時に使用するユーザー名です。必須項目です。</translation>
     </message>
     <message>
         <source>The password to use while connecting to the database. This information is required.</source>
-        <translation type="unfinished"></translation>
+        <translation>データベースに接続する時に使用するパスワード名です。必須項目です。</translation>
     </message>
     <message>
         <source>Database type</source>
-        <translation type="unfinished"></translation>
+        <translation>データベースタイプ</translation>
     </message>
     <message>
         <source>MySQL</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>The database implementation used for your server.</source>
-        <translation type="unfinished"></translation>
+        <translation>使用しているデータベース。</translation>
     </message>
     <message>
         <source>If this frontend&apos;s host name changes often, check this box and provide a network-unique name to identify it. If unchecked, the frontend machine&apos;s local host name will be used to save preferences in the database.</source>
@@ -5477,43 +5479,43 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Custom identifier</source>
-        <translation type="unfinished"></translation>
+        <translation>カスタムID</translation>
     </message>
     <message>
         <source>An identifier to use while saving the settings for this frontend.</source>
-        <translation type="unfinished"></translation>
+        <translation>このIDはフロントエンドの設定を保存する時に使用します。</translation>
     </message>
     <message>
         <source>Use Wake-On-LAN to wake database</source>
-        <translation type="unfinished"></translation>
+        <translation>データベースを起動する時にWake-On-LANを使用する</translation>
     </message>
     <message>
         <source>If checked, the frontend will use Wake-On-LAN parameters to reconnect to the database server.</source>
-        <translation type="unfinished"></translation>
+        <translation>これをチェックすると、データベースサーバーに歳接続する時にWake-On-LANを使用します。</translation>
     </message>
     <message>
         <source>Reconnect time</source>
-        <translation type="unfinished"></translation>
+        <translation>再接続時間</translation>
     </message>
     <message>
         <source>The time in seconds to wait for the server to wake up.</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーが起動する間で待つ時間を秒で指定してください。</translation>
     </message>
     <message>
         <source>Retry attempts</source>
-        <translation type="unfinished"></translation>
+        <translation>リトライ回数</translation>
     </message>
     <message>
         <source>The number of retries to wake the server before the frontend gives up.</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーを起動するリトライ回数を指定してください。</translation>
     </message>
     <message>
         <source>Wake command</source>
-        <translation type="unfinished"></translation>
+        <translation>起動コマンド</translation>
     </message>
     <message>
         <source>The command executed on this frontend to wake up the database server.</source>
-        <translation type="unfinished"></translation>
+        <translation>フロントエンドがデータベースサーバーを起動するためのコマンドです。</translation>
     </message>
     <message>
         <source>Deinterlace algorithm. &apos;Kernel&apos; require SSE. &apos;Bob&apos; requires Xv or XvMC video out.</source>
@@ -5521,7 +5523,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Enable gamma correction for video</source>
-        <translation type="unfinished"></translation>
+        <translation>映像のガンマ補正を有効</translation>
     </message>
     <message>
         <source>If checked, QuickTime will correct the gamma of the video to match your monitor.  Turning this off can save some CPU cycles.</source>
@@ -5537,19 +5539,19 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Recording Host</source>
-        <translation type="unfinished"></translation>
+        <translation>録画ホスト</translation>
     </message>
     <message>
         <source>Would you like to clear all program data and channel settings before starting configuration? This will not affect any existing recordings.</source>
-        <translation type="unfinished"></translation>
+        <translation>全ての番組データとチャンネル設定をよろしいですか？既存の録画には何の影響が有りません。</translation>
     </message>
     <message>
         <source>No, leave my channel settings alone</source>
-        <translation type="unfinished"></translation>
+        <translation>いいえ、チャンネル設定はそのままにしておく</translation>
     </message>
     <message>
         <source>Yes, delete my channel settings</source>
-        <translation type="unfinished"></translation>
+        <translation>はい、チャンネル設定を削除します</translation>
     </message>
 </context>
 <context>
@@ -6094,11 +6096,11 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Select a recording to permanently delete:</source>
-        <translation type="unfinished">完全に削除する録画を選択してください:</translation>
+        <translation>完全に削除する録画を選択してください:</translation>
     </message>
     <message>
         <source>Select a recording to view:</source>
-        <translation type="unfinished">再生する録画を選択してください:</translation>
+        <translation>再生する録画を選択してください:</translation>
     </message>
     <message>
         <source>Sorry, No Recordings Available</source>
