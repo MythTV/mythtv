@@ -22,7 +22,6 @@
 
 #include "progfind.h"
 #include "proglist.h"
-#include "infodialog.h"
 #include "infostructs.h"
 #include "programinfo.h"
 #include "oldsettings.h"

@@ -38,7 +38,7 @@ QMAKE_CXXFLAGS_DEBUG += `freetype-config --cflags`
 # libmythtv proper
 
 HEADERS += commercial_skip.h filter.h format.h frame.h frequencies.h 
-HEADERS += guidegrid.h infodialog.h infostructs.h jitterometer.h lzoconf.h 
+HEADERS += guidegrid.h infostructs.h jitterometer.h lzoconf.h #infodialog.h
 HEADERS += minilzo.h mmx.h NuppelVideoPlayer.h NuppelVideoRecorder.h osd.h 
 HEADERS += osdtypes.h programinfo.h profilegroup.h recordingprofile.h 
 HEADERS += remoteencoder.h remoteutil.h RingBuffer.h scheduledrecording.h 
@@ -48,9 +48,9 @@ HEADERS += recorderbase.h channelbase.h vsync.h proglist.h hdtvrecorder.h
 HEADERS += fifowriter.h filtermanager.h videooutbase.h videoout_null.h xbox.h
 HEADERS += dbcheck.h udpnotify.h channeleditor.h channelsettings.h
 HEADERS += osdlistbtntype.h blend.h datadirect.h sr_dialog.h
-HEADERS += sr_items.h sr_root.h
+HEADERS += sr_items.h sr_root.h recordingtypes.h
 
-SOURCES += commercial_skip.cpp frequencies.c guidegrid.cpp infodialog.cpp 
+SOURCES += commercial_skip.cpp frequencies.c guidegrid.cpp #infodialog.cpp 
 SOURCES += infostructs.cpp jitterometer.cpp minilzo.cpp NuppelVideoPlayer.cpp 
 SOURCES += osd.cpp osdtypes.cpp programinfo.cpp recordingprofile.cpp 
 SOURCES += remoteencoder.cpp remoteutil.cpp RingBuffer.cpp RTjpegN.cpp 
@@ -61,6 +61,7 @@ SOURCES += videoout_null.cpp xbox.cpp dbcheck.cpp profilegroup.cpp
 SOURCES += udpnotify.cpp channeleditor.cpp channelsettings.cpp
 SOURCES += osdsurface.cpp osdlistbtntype.cpp blend.c datadirect.cpp
 SOURCES += sr_dialog.cpp sr_root.cpp sr_items.cpp decoderbase.cpp
+SOURCES += recordingtypes.cpp
 
 
 linux {

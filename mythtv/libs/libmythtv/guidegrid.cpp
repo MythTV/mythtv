@@ -20,7 +20,6 @@ using namespace std;
 
 #include "mythcontext.h"
 #include "guidegrid.h"
-#include "infodialog.h"
 #include "infostructs.h"
 #include "programinfo.h"
 #include "oldsettings.h"

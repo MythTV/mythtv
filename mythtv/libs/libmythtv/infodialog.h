@@ -2,7 +2,6 @@
 #define INFODIALOG_H_
 
 #include "mythwidgets.h"
-#include "scheduledrecording.h"
 
 class QLabel;
 class QCheckBox;

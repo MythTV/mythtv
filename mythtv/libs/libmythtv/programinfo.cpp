@@ -11,7 +11,6 @@
 #include "mythcontext.h"
 #include "commercial_skip.h"
 #include "dialogbox.h"
-#include "infodialog.h"
 #include "remoteutil.h"
 
 using namespace std;
@@ -793,6 +792,19 @@ void ProgramInfo::ToggleRecord(QSqlDatabase *db)
             ApplyRecordStateChange(db, kOverrideRecord);
             break;
     }
+}
+
+ScheduledRecording* ProgramInfo::GetScheduledRecording(QSqlDatabase *db)
+{
+    GetProgramRecordingStatus(db);
+    return record;
+}
+
+int ProgramInfo::getRecordID(QSqlDatabase *db)
+{
+    GetProgramRecordingStatus(db);
+    recordid = record->getRecordID();
+    return recordid;
 }
 
 bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const

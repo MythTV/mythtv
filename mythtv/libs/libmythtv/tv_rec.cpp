@@ -24,6 +24,7 @@ using namespace std;
 #include "NuppelVideoPlayer.h"
 #include "channel.h"
 #include "mythdbcon.h"
+#include "scheduledrecording.h"
 
 #ifdef USING_IVTV
 #include "mpegrecorder.h"

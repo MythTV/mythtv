@@ -6,6 +6,7 @@
 #include "programinfo.h"
 
 #include "libmyth/mythcontext.h"
+#include "libmyth/mythdialogs.h"
 
 #include <iostream>
 using namespace std;

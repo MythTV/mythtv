@@ -18,7 +18,6 @@ using namespace std;
 
 #include "proglist.h"
 #include "scheduledrecording.h"
-#include "infodialog.h"
 #include "dialogbox.h"
 #include "mythcontext.h"
 #include "remoteutil.h"

@@ -5,4 +5,4 @@
 TEMPLATE = subdirs
 
 # Directories
-SUBDIRS += libavcodec libavformat libmyth libmythtv libmythui
+SUBDIRS += libavcodec libavformat libmyth libmythtv #libmythui

@@ -16,11 +16,11 @@
 using namespace std;
 
 #include "channelrecpriority.h"
-#include "infodialog.h"
 #include "tv.h"
 
 #include "dialogbox.h"
 #include "mythcontext.h"
+#include "scheduledrecording.h"
 #include "infostructs.h"
 
 ChannelRecPriority::ChannelRecPriority(QSqlDatabase *ldb, 

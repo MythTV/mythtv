@@ -1,12 +1,15 @@
 #ifndef PROGRAMINFO_H_
 #define PROGRAMINFO_H_
 
+#include "recordingtypes.h"
+
 #include <qsqldatabase.h>
 #include <qstring.h>
 #include <qdatetime.h>
 #include <qmap.h>
-#include "scheduledrecording.h"
+#include <vector>
 
+using namespace std;
 
 #define NUMPROGRAMLINES 38
 
@@ -75,6 +78,8 @@ enum RecStatusType {
 };
 
 class QSqlDatabase;
+class ScheduledRecording;
+class QGridLayout;
 
 class ProgramInfo
 {
@@ -114,18 +119,9 @@ class ProgramInfo
                                const QString &newrecgroup);
     void ToggleRecord(QSqlDatabase *dB);
 
-    ScheduledRecording* GetScheduledRecording(QSqlDatabase *db) 
-    {
-        GetProgramRecordingStatus(db);
-        return record;
-    };
+    ScheduledRecording* GetScheduledRecording(QSqlDatabase *db);
 
-    int getRecordID(QSqlDatabase *db)
-    {
-        GetProgramRecordingStatus(db);
-        recordid = record->getRecordID();
-        return recordid;
-    }
+    int getRecordID(QSqlDatabase *db);
 
     void StartedRecording(QSqlDatabase *db);
     void FinishedRecording(QSqlDatabase* db, bool prematurestop);

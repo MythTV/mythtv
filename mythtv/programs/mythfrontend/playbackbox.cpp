@@ -29,7 +29,7 @@ using namespace std;
 
 #include "mythcontext.h"
 #include "programinfo.h"
-#include "infodialog.h"
+#include "scheduledrecording.h"
 #include "remoteutil.h"
 
 PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent, 
