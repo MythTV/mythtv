@@ -1,12 +1,14 @@
 /*
-	events.cpp
+	mfd_events.cpp
 
 	(c) 2003 Thor Sigvaldason and Isaac Richards
 	Part of the mythTV project
 	
+	Methods. These are explained in the header file.
 */
 
-#include "events.h"
+#include "mfd_events.h"
+
 
 LoggingEvent::LoggingEvent(const QString & init_logging_string, int init_logging_verbosity)
              :QCustomEvent(65432)
@@ -24,6 +26,7 @@ int LoggingEvent::getVerbosity()
 {
     return logging_verbosity;
 }
+
 
 /*
 ---------------------------------------------------------------------

@@ -47,6 +47,7 @@
 #include "select.h"
 
 
+
 ////////
 // globals
 
@@ -79,26 +80,38 @@ void handleSelectTimeout( httpd *server, const int fDesc )
 
 void handleSelectRead( httpd *server, const int fDesc ) 
 {
-	if(fDesc == server->serverSock) {
+	if(fDesc == server->serverSock)
+	{
 		if ( server->clients->handleNew(server) < 0 )  
 			perror( "(accept)" );
-	} else {
-		if (server->clients->handleExisting(fDesc) > 0) {
+	} 
+	else 
+	{
+		if (server->clients->handleExisting(fDesc) > 0) 
+		{
 			server->clients->erase(fDesc);
-		} else {
+		} 
+		else 
+		{
 			server->clientSock = fDesc;
                         server->clients->address(fDesc, server->clientAddr);
-			if (httpdReadRequest(server) < 0) {
+			if (httpdReadRequest(server) < 0)
+			{
 				httpdEndRequest(server);
-			} else {
+			} 
+			else 
+			{
 				httpdProcessRequest(server); 
-				if (server->request.version < 1.1 || server->request.close) {
+				if (server->request.version < 1.1 || server->request.close)
+				{
 					httpdEndRequest(server);
-				} else {
+				} 
+				else 
+				{
 					httpdSuspendRequest(server);
 				}
 			}
-              }
+        }
 	}
 }
 
@@ -147,7 +160,8 @@ int calcFDWrite(httpd *server, fd_set &fdWrite)
 }
 
 
-int httpdSelectLoop( httpd *server, struct timeval& timeout_ ) {
+int httpdSelectLoop( httpd *server, struct timeval& timeout_) 
+{
 	timeval timeout;
 
 	// autoreap children
@@ -160,7 +174,8 @@ int httpdSelectLoop( httpd *server, struct timeval& timeout_ ) {
 		
 	FD_ZERO(&fdWrite);
 	
-	while( !gFinished || (pendingWrites != 0) ) {
+	while( !gFinished || (pendingWrites != 0))
+	{
 		timeout = timeout_;
 
 		calcFDRead(server, fdRead);
@@ -169,21 +184,47 @@ int httpdSelectLoop( httpd *server, struct timeval& timeout_ ) {
 
 		ret = select( maxSocket+1, &fdRead, &fdWrite, NULL, &timeout );
 
-		if ( ret < 0 ) {
+        //
+        //  Callback to the daapserver
+        //
+        
+        if(server->selectCallbackFunction != NULL)
+        {
+            bool should_keep_going = true;
+            (server->selectCallbackFunction)(&should_keep_going);
+            if(!should_keep_going)
+            {
+                gFinished = 1;
+            }
+        }
+
+		if ( ret < 0 )
+		{
 			// select returned an error
 			handleSelectError( server );
-		} else if (ret == 0) {
+		} 
+		else if (ret == 0) 
+		{
 			// timeout hit
 			for( int i = minSocket; i <= maxSocket; i++ ) 
-				if( FD_ISSET( i, &fdWrite ))
+			{
+                if( FD_ISSET( i, &fdWrite ))
+                {
 					handleSelectTimeout(server, i);
-		} else {
+			    }
+			}
+		} 
+		else 
+		{
 			// handle i/o
-			for( int i = minSocket; i <= maxSocket; i++ ) {
-				if( FD_ISSET( i, &fdRead )) {
+			for( int i = minSocket; i <= maxSocket; i++ )
+			{
+				if( FD_ISSET( i, &fdRead ))
+				{
 					handleSelectRead(server, i);
 				}
-				if( FD_ISSET( i, &fdWrite )) {
+				if( FD_ISSET( i, &fdWrite ))
+				{
 					handleSelectWrite(server, i);
 				}
 			}
@@ -191,6 +232,14 @@ int httpdSelectLoop( httpd *server, struct timeval& timeout_ ) {
 
 		pendingWrites = calcFDWrite(server, fdWrite);
 	}
+
+    //
+    //  Close the friggin socket
+    //
+    
+    close(server->serverSock);
+    
+
 
 	return gReturn;
 }

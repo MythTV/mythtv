@@ -78,4 +78,5 @@ void ZeroConfigSupervisor::doSomething(const QStringList &tokens, int socket_ide
 
 ZeroConfigSupervisor::~ZeroConfigSupervisor()
 {
+    log("zeroconfig supervisor is being killed off", 10);
 }

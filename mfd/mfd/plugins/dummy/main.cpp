@@ -13,7 +13,6 @@
 
 Dummy *a_dummy = NULL;
 
-
 //
 //  We define a very basic interface
 //  into this plugin that the plugin

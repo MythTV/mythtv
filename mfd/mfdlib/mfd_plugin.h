@@ -1,7 +1,7 @@
-#ifndef MFDPLUGIN_H_
-#define MFDPLUGIN_H_
+#ifndef MFD_PLUGIN_H_
+#define MFD_PLUGIN_H_
 /*
-	mfdplugin.h
+	mfd_plugin.h
 
 	(c) 2003 Thor Sigvaldason and Isaac Richards
 	Part of the mythTV project
@@ -10,12 +10,15 @@
 
 */
 
-
+#include <qapplication.h>
+#include <qobject.h>
 #include <qthread.h>
+#include <qmutex.h>
 #include <qstringlist.h>
+#include <qsocketdevice.h>
 
-#include "mfd.h"
-
+#include "../mfd/mfd.h"
+ 
 class SocketBuffer
 {
     //

@@ -5,7 +5,21 @@
 GENERAL INFO
 ------------
 
-	The mfd is really cool. Audio, networking, zeroconfig.
+INSTALL:
+
+	./config
+    qmake
+    make
+    make install
+
+RUN:
+
+    to start it: mfd
+    to stop it:  mfdctl stop
+
+    You can just CTRL-C the daemon, but other zeroconfig-aware applications
+will not know that's gone away.
+
 
 
 INFORMATION FOR DEVELOPERS

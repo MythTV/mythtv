@@ -10,7 +10,7 @@
 #include <qapplication.h>
 #include <qfileinfo.h>
 
-#include "../../events.h"
+#include "mfd_events.h"
 
 #include "audio.h"
 #include "audiooutput.h"

@@ -20,7 +20,6 @@
 #include <qapplication.h>
 
 #include "zc_supervisor.h"
-#include "../../events.h"
 
 static  mDNS mDNSStorage;                       // mDNS core uses this to store its globals
 static  mDNS_PlatformSupport PlatformStorage;   // Stores this platform's globals
@@ -645,6 +644,8 @@ void ZeroConfigClient::run()
         
     }
 
+    log("zeroconfig client is leaving its event loop", 10);
+
     //
     //  Stop the sub thread
     //
@@ -780,6 +781,7 @@ void ZeroConfigClient::doSomething(const QStringList &tokens, int socket_identif
 
 ZeroConfigClient::~ZeroConfigClient()
 {
+    log("zeroconfig client is being killed off", 10);
     dns_questions.clear();
     available_services.clear();
     if(fd_watcher)

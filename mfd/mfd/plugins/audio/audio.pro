@@ -1,5 +1,7 @@
 include (../../../settings.pro)
 
+INCLUDEPATH += ../../../mfdlib
+
 TEMPLATE = lib
 CONFIG += plugin thread
 TARGET = mfdplugin-audio
@@ -9,9 +11,6 @@ INSTALLS += target
 
 HEADERS +=          audio.h   
 SOURCES += main.cpp audio.cpp 
-
-HEADERS += ../../mfdplugin.h   ../../events.h
-SOURCES += ../../mfdplugin.cpp ../../events.cpp
 
 HEADERS += visual.h constants.h
 

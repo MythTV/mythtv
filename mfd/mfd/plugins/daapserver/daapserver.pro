@@ -1,28 +1,30 @@
 include (../../../settings.pro)
 
+INCLUDEPATH += ../../../mfdlib
 
 TEMPLATE = lib
 CONFIG += plugin thread
+
+QMAKE_CXXFLAGS_RELEASE  += -Wno-multichar 
+QMAKE_CXXFLAGS_DEBUG    += -Wno-multichar
+
 TARGET = mfdplugin-daapserver
 
 target.path = $${PREFIX}/lib/mythtv/mfdplugins
 INSTALLS += target
 
-HEADERS += ../../mfdplugin.h   ../../events.h
-SOURCES += ../../mfdplugin.cpp ../../events.cpp
+#HEADERS += ./daapd/types.h     \
+#           ./daapd/dboutput.h  \
+#           ./daapd/parsemp3.h  \
+#           ./daapd/songcache.h      
 
-HEADERS += ./httpd_persistent/config.h       \
-           ./httpd_persistent/httpd.h        \
-           ./httpd_persistent/httpd_priv.h   \
-           ./httpd_persistent/select.h
+#SOURCES += ./daapd/db.cc       \
+#           ./daapd/dboutput.cc \
+#           ./daapd/parsemp3.cc \
+#           ./daapd/songcache.cc
 
-SOURCES += ./httpd_persistent/api.cpp        \
-           ./httpd_persistent/ip_acl.cpp     \ 
-           ./httpd_persistent/protocol.cpp   \
-           ./httpd_persistent/select.cpp     \
-           ./httpd_persistent/version.cpp
+HEADERS +=          daapserver.h   request.h   session.h   mcc_bitfield.h
+SOURCES += main.cpp daapserver.cpp request.cpp session.cpp
 
-
-HEADERS +=          daapserver.h
-SOURCES += main.cpp daapserver.cpp
+LIBS += -L./daaplib/ -ldaaplib -lid3tag -lz -L./httpd_persistent -lhttpd_persistent
 

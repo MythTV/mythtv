@@ -20,6 +20,7 @@
 **
 */
 
+
 /*
 **  libhttpd Header File
 */
@@ -31,7 +32,6 @@
 */
 
 #ifndef LIB_HTTPD_H
-
 #define LIB_HTTPD_H 1
 
 #if !defined(__ANSI_PROTO)
@@ -193,6 +193,7 @@ struct httpd {
 		*errorLog;
 	void	(*siteFunction)(httpd *server, void *data);
 	void 	*callbackData;
+	void    (*selectCallbackFunction)(bool *continue_flag);
 }; 
 
 
@@ -208,6 +209,7 @@ int httpdAddStaticContent __ANSI_PROTO((httpd*,char*,char*,int,int(*)(httpd *),c
 int httpdAddWildcardContent __ANSI_PROTO((httpd*,char*,int(*)(httpd *),char*));
 int httpdAddCWildcardContent __ANSI_PROTO((httpd*,char*,int(*)(httpd *),void(*)(httpd *)));
 void httpdAddCSiteContent __ANSI_PROTO((httpd*,void(*)(httpd *,void *),void*));
+void httpdAddSelectCallback __ANSI_PROTO((httpd*,void(*)(bool *)));
 int httpdAddVariable __ANSI_PROTO((httpd*,char*, char*));
 int httpdGetConnection __ANSI_PROTO((httpd*, struct timeval*));
 int httpdReadRequest __ANSI_PROTO((httpd*));
@@ -223,6 +225,7 @@ void httpdSuspendRequest __ANSI_PROTO((httpd*));
 void httpdEndRequest __ANSI_PROTO((httpd*));
 
 httpd *httpdCreate __ANSI_PROTO((char*, int));
+void httpdDestroy __ANSI_PROTO((httpd*));
 void httpdFreeVariables __ANSI_PROTO((httpd*));
 void httpdDumpVariables __ANSI_PROTO((httpd*));
 void httpdWrite __ANSI_PROTO((httpd*, char*, int));
@@ -251,7 +254,7 @@ httpAcl *httpdAddAcl __ANSI_PROTO((httpd*, httpAcl*, char*, int));
 int httpdAuthenticate __ANSI_PROTO((httpd*, char*));
 int httpdForceAuthenticate __ANSI_PROTO((httpd*, char*));
 
-int httpdSelectLoop( httpd *server, struct timeval& timeout_ );
+int httpdSelectLoop( httpd *server, struct timeval& timeout_);
 
 /***********************************************************************
 ** Standard header file footer.  

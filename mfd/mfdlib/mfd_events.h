@@ -1,7 +1,7 @@
-#ifndef EVENTS_H_
-#define EVENTS_H_
+#ifndef MFD_EVENTS_H_
+#define MFD_EVENTS_H_
 /*
-	events.h
+	mfd_events.h
 
 	(c) 2003 Thor Sigvaldason and Isaac Richards
 	Part of the mythTV project
@@ -17,7 +17,6 @@
 
 class LoggingEvent : public QCustomEvent
 {
-
     //
     //  Simple way to let any sub-object or thread
     //  post something to the log
@@ -64,7 +63,7 @@ class AllClientEvent: public QCustomEvent
     //
     //  Like the above SocketEvent, this lets anything anywhere (at any
     //  "thread depth" send a message, but it goes to *all* currently
-    //  connected clients.
+    //  connected clients)
     //
 
   public:
@@ -117,7 +116,6 @@ class ServiceEvent : public QCustomEvent
     QString text;
     
 };
-
 
 
 #endif

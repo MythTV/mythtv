@@ -9,7 +9,14 @@
 	Headers for the daap server
 */
 
-#include "../../mfdplugin.h"
+#include "mfd_plugin.h"
+
+struct httpd;
+
+#include "daaplib/basic.h"
+
+#include "request.h"
+#include "session.h"
 
 class DaapServer: public MFDServicePlugin
 {
@@ -17,8 +24,35 @@ class DaapServer: public MFDServicePlugin
   public:
 
     DaapServer(MFD *owner, int identity);
+    ~DaapServer();
+    
     void    run();
-        
+    void    parseIncomingRequest(httpd *server);
+    void    parsePath(httpd *server, DaapRequest *daap_request);
+    void    sendServerInfo(httpd *server);
+    void    sendTag(httpd *server, const Chunk& c);
+    void    sendLogin(httpd *server, u32 session_id);
+    void    parseVariables(httpd *server, DaapRequest *daap_request);
+    void    sendUpdate(httpd *server, u32 database_version);
+    void    sendMetadata(httpd *server, QString request_path, DaapRequest *daap_request);
+    void    sendDatabaseList(httpd *server);
+    void    sendDatabase(httpd *server, DaapRequest *daap_request);
+    void    sendDatabaseItem(httpd *server, u32 song_id);
+    void    sendContainers(httpd *server, DaapRequest *daap_request);
+    void    sendContainer(httpd *server);
+    bool    wantsToContinue(){return keep_going;}
+
+
+
+
+    DaapSessions daap_sessions;
+  private:
+  
+    MetadataContainer        *all_the_metadata;
+    QIntDict<AudioMetadata>  *current_metadata;
+    QString service_name;
+
+    bool    first_update;
 };
 
 #endif  // daapserver_h_

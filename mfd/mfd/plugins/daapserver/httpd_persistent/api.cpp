@@ -320,6 +320,7 @@ httpd *httpdCreate(
 void httpdDestroy(
 	httpd	*server)
 {
+
 	if (server == NULL)
 		return;
 	if (server->host)
@@ -809,6 +810,13 @@ void httpdAddCSiteContent(
 	server->callbackData = data;
 }
 
+void httpdAddSelectCallback(
+    httpd   *server,
+    void    (*function)(bool *continue_flag)
+    )
+{
+    server->selectCallbackFunction = function;
+}
 
 int httpdAddStaticContent(
 	httpd	*server,

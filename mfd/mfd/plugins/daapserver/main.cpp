@@ -11,7 +11,7 @@
 #include "daapserver.h"
 #include "../../mfd.h"
 
-DaapServer *daap_server = NULL;
+extern DaapServer *daap_server;
 
 extern "C" {
 bool         mfdplugin_init(MFD*, int);

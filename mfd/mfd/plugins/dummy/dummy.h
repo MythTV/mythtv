@@ -11,7 +11,7 @@
 
 */
 
-#include "../../mfdplugin.h"
+#include "mfd_plugin.h"
 
 
 class Dummy: public MFDCapabilityPlugin

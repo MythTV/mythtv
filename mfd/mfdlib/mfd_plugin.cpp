@@ -1,5 +1,5 @@
 /*
-	mfdplugin.cpp
+	mfd_plugin.cpp
 
 	(c) 2003 Thor Sigvaldason and Isaac Richards
 	Part of the mythTV project
@@ -8,11 +8,14 @@
 
 */
 
-#include <qapplication.h>
+#include <iostream>
+using namespace std;
+
+#include <qobject.h>
 #include <qregexp.h>
 
-#include "mfdplugin.h"
-#include "events.h"
+#include "mfd_plugin.h"
+#include "mfd_events.h"
 
 
 MFDBasePlugin::MFDBasePlugin(MFD *owner, int identifier)
@@ -74,7 +77,7 @@ void MFDBasePlugin::sendMessage(const QString &message)
     allclient_mutex.lock();
         if(parent)
         {
-            AllClientEvent *ace = new AllClientEvent(message);
+            AllClientEvent* ace = new AllClientEvent(message);
             QApplication::postEvent(parent, ace);    
         }
     allclient_mutex.unlock();

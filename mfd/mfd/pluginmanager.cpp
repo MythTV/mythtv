@@ -14,7 +14,7 @@
 #include <qregexp.h>
 
 #include "pluginmanager.h"
-#include "events.h"
+#include "../mfdlib/mfd_events.h"
 #include "mfd.h"
 
 

@@ -20,7 +20,6 @@ using namespace std;
 #include <mythtv/mythcontext.h>
 
 #include "mfd.h"
-#include "events.h"
 
 MythContext *gContext;
 

@@ -18,7 +18,6 @@
 #include <qapplication.h>
 
 #include "zc_supervisor.h"
-#include "../../events.h"
 
 static  mDNS mDNSStorage_responder;                       // mDNS core uses this to store its globals
 static  mDNS_PlatformSupport PlatformStorage_responder;   // Stores this platform's globals
@@ -459,7 +458,7 @@ void ZeroConfigResponder::run()
 		mDNSPosixProcessFDSet(&mDNSStorage_responder, &readfds);
     }
 
-
+    log("zeroconfig responder is leaving its event loop", 10);
 
     file_descriptors_mutex.unlock();
     fd_watcher->stop();
@@ -582,6 +581,7 @@ void ZeroConfigResponder::doSomething(const QStringList &tokens, int socket_iden
 
 ZeroConfigResponder::~ZeroConfigResponder()
 {
+    log("zeroconfig responder is being killed off", 10);
     registered_services.clear();
 }
 

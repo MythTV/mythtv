@@ -14,7 +14,7 @@
 #include <qurl.h>
 #include <qptrlist.h>
 
-#include "../../mfdplugin.h"
+#include "mfd_plugin.h"
 
 #include "output.h"
 #include "decoder.h"

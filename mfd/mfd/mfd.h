@@ -10,9 +10,6 @@
 
 */
 
-#include <iostream>
-using namespace std;
-
 #include <qobject.h>
 #include <qsqldatabase.h>
 #include <qstringlist.h>
@@ -20,6 +17,8 @@ using namespace std;
 #include "pluginmanager.h"
 #include "serversocket.h"
 #include "logging.h"
+#include "mdcontainer.h"
+
 
 class MFD : public QObject
 {
@@ -35,10 +34,9 @@ class MFD : public QObject
   
     MFD(QSqlDatabase *db, int port, bool log_stdout, int logging_verbosity);
     ~MFD();
-    
-    void shallowPrintHello(){cout << "This is a shallow hello from the mfd" << endl;}
-    void deepPrintHello();
-    
+    MetadataContainer*   getMetadataContainer();
+
+    void    debugSayHello();
     
   public slots:
   
@@ -71,6 +69,7 @@ class MFD : public QObject
     void doListCapabilities(const QStringList &tokens, MFDClientSocket *socket);
 
     QSqlDatabase               *db;
+    MetadataContainer          *metadata_container;
     MFDLogger                  *mfd_log;
     MFDPluginManager           *plugin_manager;
     MFDServerSocket            *server_socket;

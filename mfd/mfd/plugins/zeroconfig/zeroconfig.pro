@@ -1,5 +1,6 @@
 include (../../../settings.pro)
 
+INCLUDEPATH += ../../../mfdlib
 
 TEMPLATE = lib
 CONFIG += plugin thread
@@ -22,10 +23,10 @@ DEFINES +=          NOT_HAVE_SA_LEN
 
 DEFINES +=          MDNS_DEBUGMSGS=0
 
-HEADERS +=          zc_supervisor.h   zc_responder.h   zc_client.h   ../../mfdplugin.h   ../../events.h       \
+HEADERS +=          zc_supervisor.h   zc_responder.h   zc_client.h \
                     ./apple/mDNSClientAPI.h ./apple/mDNSPosix.h ./apple/mDNSUNP.h ./apple/mDNSDebug.h
 
-SOURCES += main.cpp zc_supervisor.cpp zc_responder.cpp zc_client.cpp ../../mfdplugin.cpp ../../events.cpp     \
+SOURCES += main.cpp zc_supervisor.cpp zc_responder.cpp zc_client.cpp \
                     ./apple/mDNS.c          ./apple/mDNSPosix.c ./apple/mDNSUNP.c  
 
 

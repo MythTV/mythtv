@@ -15,13 +15,7 @@
 #include <qtimer.h>
 
 #include "mfd.h"
-#include "events.h"
-
-
-void MFD::deepPrintHello()
-{
-    cout << "This is a deep hello from the mfd " << endl;
-}
+#include "../mfdlib/mfd_events.h"
 
 
 MFD::MFD(QSqlDatabase *ldb, int port, bool log_stdout, int logging_verbosity)
@@ -45,6 +39,17 @@ MFD::MFD(QSqlDatabase *ldb, int port, bool log_stdout, int logging_verbosity)
     {
         db = ldb;
     }
+    if(db == NULL)
+    {
+        cerr << "We'll get nowhere without a database" << endl;
+        exit(0);
+    }
+    
+    //
+    //  Create the uber metadata container
+    //
+    
+    metadata_container = new MetadataContainer(this, db);
     
     //
     //  Create the log (possibly to stdout)
@@ -78,6 +83,16 @@ MFD::MFD(QSqlDatabase *ldb, int port, bool log_stdout, int logging_verbosity)
             this, SLOT(endConnection(MFDClientSocket *)));
 
     
+}
+
+void MFD::debugSayHello()
+{
+    cout << "Hello from the mfd" << endl;
+}
+
+MetadataContainer*  MFD::getMetadataContainer()
+{
+    return metadata_container;
 }
 
 void MFD::customEvent(QCustomEvent *ce)
@@ -361,7 +376,7 @@ void MFD::doListCapabilities(const QStringList& tokens, MFDClientSocket *socket)
 
 void MFD::shutDown()
 {
-    log("beginning shutdown", 3);
+    log("beginning shutdown", 1);
 
     //
     //  Clean things up and go away.
@@ -420,6 +435,13 @@ void MFD::shutDown()
             break;
         }
     }
+
+    //
+    //  Turn off the metadata
+    //
+    
+    metadata_container->shutDown();
+    
     
     //
     //  Log the shutdown
@@ -517,4 +539,17 @@ MFD::~MFD()
         delete mfd_log;
         mfd_log = NULL;
     }
+    
+    if(metadata_container)
+    {
+        delete metadata_container;
+        metadata_container = NULL;
+    }
+}
+
+
+
+extern "C" void __MFD__debugSayHello(MFD *an_mfd)
+{
+    an_mfd->debugSayHello();
 }

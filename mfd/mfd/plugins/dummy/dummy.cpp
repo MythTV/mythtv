@@ -28,11 +28,6 @@ Dummy::Dummy(MFD *owner, int identity)
 
     log("a dummy plugin is being created", 10);
 
-   
-    cout << "Yes, we're all eagerly anticipating a cleaner client daemon" << endl;
-    cout << "This isn't it. " << endl;
-    cout << "Patience is a virtue." << endl;
-   
 
 }
 

@@ -11,4 +11,6 @@ SUBDIRS += ./mfd/plugins/dummy
 SUBDIRS += ./mfd/plugins/zeroconfig 
  
 SUBDIRS += ./mfd/plugins/audio 
+SUBDIRS += ./mfd/plugins/daapserver/daaplib 
+SUBDIRS += ./mfd/plugins/daapserver/httpd_persistent 
 SUBDIRS += ./mfd/plugins/daapserver 

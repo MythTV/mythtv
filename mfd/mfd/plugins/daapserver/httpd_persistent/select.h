@@ -333,6 +333,6 @@ int getMaxSocket(httpd *server);
 void calcFDRead(httpd *server, fd_set &fdRead); 
 int calcFDWrite(fd_set &fdWrite);
 
-int httpdSelectLoop( httpd *server, struct timeval timeout );
+int httpdSelectLoop( httpd *server, struct timeval timeout);
 
 #endif

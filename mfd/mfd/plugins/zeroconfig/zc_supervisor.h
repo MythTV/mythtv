@@ -12,7 +12,8 @@
 	
 */
 
-#include "../../mfdplugin.h"
+#include "mfd_plugin.h"
+
 #include "zc_responder.h"
 #include "zc_client.h"
 
