@@ -48,6 +48,7 @@ Ripper::Ripper(MythContext *context, QSqlDatabase *ldb, QWidget *parent,
 
     QLabel *inst = new QLabel("Please select a quality level and check the "
                               "album information below:", firstdiag);
+    inst->setBackgroundOrigin(WindowOrigin);
     vbox->addWidget(inst);
 
     QHBoxLayout *qualbox = new QHBoxLayout(vbox, 10);
@@ -56,18 +57,22 @@ Ripper::Ripper(MythContext *context, QSqlDatabase *ldb, QWidget *parent,
     qualitygroup->hide();
 
     QRadioButton *lowvorb = new QRadioButton("Low", firstdiag);
+    lowvorb->setBackgroundOrigin(WindowOrigin);
     qualbox->addWidget(lowvorb);
     qualitygroup->insert(lowvorb);
 
     QRadioButton *medvorb = new QRadioButton("Medium", firstdiag);
+    medvorb->setBackgroundOrigin(WindowOrigin);
     qualbox->addWidget(medvorb);
     qualitygroup->insert(medvorb);
 
     QRadioButton *highvorb = new QRadioButton("High", firstdiag);
+    highvorb->setBackgroundOrigin(WindowOrigin);
     qualbox->addWidget(highvorb);
     qualitygroup->insert(highvorb);
 
     QRadioButton *perfectflac = new QRadioButton("Perfect", firstdiag);
+    perfectflac->setBackgroundOrigin(WindowOrigin);
     qualbox->addWidget(perfectflac);
     qualitygroup->insert(perfectflac);
 
@@ -77,6 +82,7 @@ Ripper::Ripper(MythContext *context, QSqlDatabase *ldb, QWidget *parent,
     QGridLayout *grid = new QGridLayout(vbox, 1, 1, 20);
     
     QLabel *artistl = new QLabel("Artist: ", firstdiag);
+    artistl->setBackgroundOrigin(WindowOrigin);
     artistedit = new MythLineEdit(firstdiag);
     if (track)
     {
@@ -87,6 +93,7 @@ Ripper::Ripper(MythContext *context, QSqlDatabase *ldb, QWidget *parent,
             this, SLOT(artistChanged(const QString &)));
 
     QLabel *albuml = new QLabel("Album: ", firstdiag);
+    albuml->setBackgroundOrigin(WindowOrigin);
     albumedit = new MythLineEdit(firstdiag);
     if (track)
     {
@@ -249,18 +256,22 @@ void Ripper::ripthedisc(void)
     QVBoxLayout *vb = new QVBoxLayout(newdiag, 20);
 
     QLabel *totallabel = new QLabel(tots, newdiag);
+    totallabel->setBackgroundOrigin(WindowOrigin);
     totallabel->setAlignment(AlignAuto | AlignVCenter | ExpandTabs | WordBreak);
     vb->addWidget(totallabel);
 
     overall = new QProgressBar(totaltracks * 2, newdiag);
+    overall->setBackgroundOrigin(WindowOrigin);
     overall->setProgress(0);
     vb->addWidget(overall);
     
     statusline = new QLabel(" ", newdiag);
+    statusline->setBackgroundOrigin(WindowOrigin);
     statusline->setAlignment(AlignAuto | AlignVCenter | ExpandTabs | WordBreak);
     vb->addWidget(statusline);
     
     current = new QProgressBar(1, newdiag);
+    current->setBackgroundOrigin(WindowOrigin);
     current->setProgress(0);
     vb->addWidget(current);
 
