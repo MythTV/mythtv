@@ -3003,6 +3003,7 @@ ChanInfo *xawtvChannel(QString &id, QString &channel, QString &fine)
     chaninfo->finetune = fine;
     chaninfo->freqid = channel;
     chaninfo->iconpath = "";
+    chaninfo->tvformat = "Default";
 
     return chaninfo;
 }
