@@ -38,16 +38,7 @@ insert into settings (value, data) VALUES ('locale', 'YOUR_ZIPCODE_OR_AREA_ID');
       insert into settings (value, data) VALUES ('SIUnits', 'Yes');
 
 3. Exit out of the SQL server
-4. Edit 'mainmenu.xml' in /usr/local/share/mythtv, add the following:
-
-<button>
-     <type>WEATHER</type>
-     <text>Weather</text>
-     <action>EXEC mythweather</action>
-     <depends>mythweather</depends>
-</button>
-
-5. You're done! Enjoy! See below if you have any problems, ideas, concerns...
+4. You're done! Enjoy! See below if you have any problems, ideas, concerns...
 
 
 MYTHWEATHER KEYBOARD COMMANDS
