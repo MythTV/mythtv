@@ -8,7 +8,7 @@ LIBVERSION = 0.14
 INCLUDEPATH += $${PREFIX}/include
 INCLUDEPATH *= /usr/local/include
 
-LIBPATH += $${PREFIX}/lib
+LIBS *= -L$${PREFIX}/lib
 
 DEFINES += _GNU_SOURCE
 DEFINES += PREFIX=\"$${PREFIX}\"
