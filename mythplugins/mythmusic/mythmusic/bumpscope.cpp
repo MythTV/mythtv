@@ -587,6 +587,12 @@ const QString &BumpScopeFactory::name(void) const
     return name;
 }
 
+const QString &BumpScopeFactory::description(void) const
+{
+    static QString name(QObject::tr("BumpScope"));
+    return name;
+}
+
 VisualBase *BumpScopeFactory::create(MainVisual *parent, long int winid)
 {
     (void)parent;

@@ -81,6 +81,7 @@ class SynaesthesiaFactory : public VisFactory
 {
   public:
     const QString &name(void) const;
+    const QString &description(void) const;
     VisualBase *create(MainVisual *parent, long int winid);
 };
 

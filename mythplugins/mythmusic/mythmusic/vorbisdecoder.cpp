@@ -409,7 +409,7 @@ const QString &VorbisDecoderFactory::extension() const
 
 const QString &VorbisDecoderFactory::description() const
 {
-    static QString desc("Ogg Vorbis Audio");
+    static QString desc(QObject::tr("Ogg Vorbis Audio"));
     return desc;
 }
 

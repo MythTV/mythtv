@@ -395,7 +395,8 @@ void Ripper::ripthedisc(void)
 
     gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
-    MythDialog *newdiag = new MythDialog(gContext->GetMainWindow(), "ripping");
+    MythDialog *newdiag = new MythDialog(gContext->GetMainWindow(), 
+                                         tr("Ripping..."));
     
     newdiag->setFont(QFont("Arial", (int)(gContext->GetBigFontSize() * hmult),
                      QFont::Bold));

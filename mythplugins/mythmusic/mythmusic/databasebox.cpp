@@ -88,7 +88,7 @@ DatabaseBox::DatabaseBox(PlaylistsContainer *all_playlists,
     if(cd_checking_flag)
     {
         temptitle = all_music->getCDTitle();
-        temptitle = "Blechy Blech Blah";
+        temptitle = tr("Blechy Blech Blah");
         templevel = "cd";
         cditem = new CDCheckItem(listview, temptitle, templevel, 0);
     }
@@ -151,14 +151,14 @@ void DatabaseBox::showWaiting()
         if (numb_wait_dots > 3)
             numb_wait_dots = 1;
 
-        QString a_string = "All My Music ~ Loading Music Data ";
+        QString a_string = tr("All My Music ~ Loading Music Data ");
 
         // Set Loading Message on the LCD
         QPtrList<LCDTextItem> textItems;
         textItems.setAutoDelete(true);
 
         textItems.append(new LCDTextItem(1, ALIGN_CENTERED, 
-                         "Loading Music Data", "Generic", false));
+                         tr("Loading Music Data"), "Generic", false));
         gContext->GetLCDDevice()->switchToGeneric(&textItems);
 
         for (int i = 0; i < numb_wait_dots; i++)
@@ -179,7 +179,7 @@ void DatabaseBox::keepFilling()
 
         if (all_music->putYourselfOnTheListView(allmusic, 100))
         {
-            allmusic->setText(0, "All My Music");
+            allmusic->setText(0, tr("All My Music"));
             fill_list_timer->stop();
             the_playlists->setActiveWidget(allcurrent);
             active_playlist = the_playlists->getActive();
@@ -1007,7 +1007,7 @@ void ReadCDThread::run()
                     parenttitle += track->Album();
                 else
                 {
-                    parenttitle = " Unknown";
+                    parenttitle = " " + QObject::tr("Unknown");
                     cerr << "databasebox.o: Couldn't find your CD. It may not "
                             "be in the freedb database." << endl;
                     cerr << "               More likely, however, is that you "

@@ -178,6 +178,12 @@ const QString &GoomFactory::name(void) const
     return name;
 }
 
+const QString &GoomFactory::description(void) const
+{
+    static QString name(QObject::tr("Goom"));
+    return name;
+}
+
 VisualBase *GoomFactory::create(MainVisual *parent, long int winid)
 {
     (void)parent;

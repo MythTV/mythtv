@@ -171,9 +171,16 @@ int MainVisual::numVisualizers( void ) const
         return visualizers.size();
 }
 
-QString MainVisual::getCurrentVisual( void ) const
+QString MainVisual::getCurrentVisual(void) const
 {
     return current_visual_name;
+}
+
+QString MainVisual::getCurrentVisualDesc(void) const
+{
+    /* XXX This should be changed to a real call to visual->description() 
+     * it works as long as ::name and ::desc uses the same string */
+    return QObject::tr(current_visual_name);
 }
 
 void MainVisual::prepare()
@@ -725,6 +732,12 @@ const QString &StereoScopeFactory::name(void) const
     return name;
 }
 
+const QString &StereoScopeFactory::description(void) const
+{
+    static QString name(QObject::tr("StereoScope"));
+    return name;
+}
+
 VisualBase *StereoScopeFactory::create(MainVisual *parent, long int winid)
 {
     (void)parent;
@@ -735,6 +748,12 @@ VisualBase *StereoScopeFactory::create(MainVisual *parent, long int winid)
 const QString &MonoScopeFactory::name(void) const
 {
     static QString name("MonoScope");
+    return name;
+}
+
+const QString &MonoScopeFactory::description(void) const
+{
+    static QString name(QObject::tr("MonoScope"));
     return name;
 }
 

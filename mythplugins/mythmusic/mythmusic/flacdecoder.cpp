@@ -628,7 +628,7 @@ const QString &FlacDecoderFactory::extension() const
 
 const QString &FlacDecoderFactory::description() const
 {
-    static QString desc("FLAC Audio");
+    static QString desc(QObject::tr("FLAC Audio"));
     return desc;
 }
 

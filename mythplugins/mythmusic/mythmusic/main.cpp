@@ -250,7 +250,7 @@ void startPlayback(PlaylistsContainer *all_playlists, AllMusic *all_music)
 void startDatabaseTree(PlaylistsContainer *all_playlists, AllMusic *all_music)
 {
     DatabaseBox dbbox(all_playlists, all_music, gContext->GetMainWindow(),
-                      "music database");
+                      QObject::tr("music database"));
     qApp->unlock();
     dbbox.exec();
     qApp->lock();
@@ -258,7 +258,7 @@ void startDatabaseTree(PlaylistsContainer *all_playlists, AllMusic *all_music)
 
 void startRipper(QSqlDatabase *db)
 {
-    Ripper rip(db, gContext->GetMainWindow(), "cd ripper");
+    Ripper rip(db, gContext->GetMainWindow(), QObject::tr("cd ripper"));
 
     qApp->unlock();
     rip.exec();
@@ -404,8 +404,8 @@ int mythplugin_run(void)
     else
     {
         DialogBox *no_db_dialog = new DialogBox(gContext->GetMainWindow(),
-                     "\n\nYou have no MythMusic tables in your database.");
-        no_db_dialog->AddButton("OK, I'll read the documentation");
+             QObject::tr("\n\nYou have no MythMusic tables in your database."));
+        no_db_dialog->AddButton(QObject::tr("OK, I'll read the documentation"));
         no_db_dialog->exec();
 
         delete no_db_dialog;

@@ -61,6 +61,7 @@ class SpectrumFactory : public VisFactory
 {
   public:
     const QString &name(void) const;
+    const QString &description(void) const;
     VisualBase *create(MainVisual *parent, long int winid);
 };
 
@@ -83,6 +84,7 @@ class BlankFactory : public VisFactory
 {
   public:
     const QString &name(void) const;
+    const QString &description(void) const;
     VisualBase *create(MainVisual *parent, long int winid);
 };
 
@@ -126,6 +128,7 @@ class GearsFactory : public VisFactory
 {
   public:
     const QString &name(void) const;
+    const QString &description(void) const;
     VisualBase *create(MainVisual *parent, long int winid);
 };
 

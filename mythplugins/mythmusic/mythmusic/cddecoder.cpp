@@ -456,7 +456,7 @@ Metadata *CdDecoder::getMetadata()
 
     if (artist.lower().left(7) == "various")
     {
-        artist = "Various Artists";
+        artist = QObject::tr("Various Artists");
     }
 
     Metadata *retdata = new Metadata(filename, artist, album, title, genre,
@@ -535,7 +535,7 @@ const QString &CdDecoderFactory::extension() const
 
 const QString &CdDecoderFactory::description() const
 {
-    static QString desc("Ogg Vorbis Audio");
+    static QString desc(QObject::tr("Ogg Vorbis Audio"));
     return desc;
 }
 

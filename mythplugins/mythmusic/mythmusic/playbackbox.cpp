@@ -988,7 +988,7 @@ void PlaybackBox::constructPlaylistTree()
     if (playlist_tree)
         delete playlist_tree;
 
-    playlist_tree = new GenericTree("playlist root", 0);
+    playlist_tree = new GenericTree(tr("playlist root"), 0);
     playlist_tree->setAttribute(0, 0);
     playlist_tree->setAttribute(1, 0);
     playlist_tree->setAttribute(2, 0);
@@ -1133,13 +1133,13 @@ void PlaybackBox::customEvent(QCustomEvent *event)
             //  Hack around for cd bitrates
             if (oe->bitrate() < 2000)
             {
-                info_string.sprintf("%d kbps   %.1f kHz   %s ch",
+                info_string.sprintf("%d "+tr("kbps")+ "   %.1f "+ tr("kHz")+ "   %s "+ tr("ch"),
                                    oe->bitrate(), float(oe->frequency()) / 1000.0,
                                    oe->channels() > 1 ? "2" : "1");
             }
             else
             {
-                info_string.sprintf("%.1f kHz   %s ch",
+                info_string.sprintf("%.1f "+ tr("kHz")+ "   %s "+ tr("ch"),
                                    float(oe->frequency()) / 1000.0,
                                    oe->channels() > 1 ? "2" : "1");
             }
@@ -1152,7 +1152,7 @@ void PlaybackBox::customEvent(QCustomEvent *event)
                     info_text->SetText(info_string);
                 if (current_visualization_text)
                 {
-                    current_visualization_text->SetText(mainvisual->getCurrentVisual());
+                    current_visualization_text->SetText(mainvisual->getCurrentVisualDesc());
                     current_visualization_text->refresh();
                 }
             }
@@ -1321,7 +1321,7 @@ void PlaybackBox::toggleFullBlankVisualizer()
         }
         if (current_visualization_text)
         {
-            current_visualization_text->SetText(mainvisual->getCurrentVisual());
+            current_visualization_text->SetText(mainvisual->getCurrentVisualDesc());
             current_visualization_text->refresh();
         }
         setUpdatesEnabled(true);

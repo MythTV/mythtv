@@ -12,7 +12,7 @@ Track::Track(int x, AllMusic *all_music_ptr)
     my_widget = NULL;
     parent = NULL;    
     bad_reference = false;
-    label = "Not Initialized";
+    label = QObject::tr("Not Initialized");
     cd_flag = false;
 }
 
@@ -393,7 +393,7 @@ Playlist::Playlist(AllMusic *all_music_ptr)
 {
     //  fallback values
     playlistid = 0;
-    name = "oops";
+    name = QObject::tr("oops");
     raw_songlist = "";
     songs.setAutoDelete(true);  //  mine!
     all_available_music = all_music_ptr;
@@ -616,7 +616,7 @@ void Playlist::fillSonglistFromSongs()
             }
             else
             {
-                a_list += QString(",%1").arg(it->getValue());
+                a_list += QString(QObject::tr(",%1")).arg(it->getValue());
             }
         }
     }  
@@ -758,7 +758,7 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
                 Metadata *tmpdata = all_available_music->getMetadata(it->getValue());
                 if (tmpdata)
                 {
-                    QString a_string = QString("%1 ~ %2").arg(tmpdata->Artist()).arg(tmpdata->Title());
+                    QString a_string = QString(QObject::tr("%1 ~ %2")).arg(tmpdata->Artist()).arg(tmpdata->Title());
                     GenericTree *added_node = tree_to_write_to->addNode(a_string, it->getValue(), true);
                     ++a_counter;
                     added_node->setAttribute(0, 1);
@@ -804,7 +804,7 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
             Metadata *tmpdata = all_available_music->getMetadata(it->getValue() * -1);
             if (tmpdata)
             {
-                QString a_string = QString("%1 ~ %2").arg(tmpdata->Artist()).arg(tmpdata->Title());
+                QString a_string = QString(QObject::tr("%1 ~ %2")).arg(tmpdata->Artist()).arg(tmpdata->Title());
                 GenericTree *added_node = tree_to_write_to->addNode(a_string, it->getValue() * -1, true);
                 ++a_counter;
                 added_node->setAttribute(0, 1);
@@ -821,13 +821,13 @@ void PlaylistsContainer::writeTree(GenericTree *tree_to_write_to)
 {
     all_available_music->writeTree(tree_to_write_to);
 
-    GenericTree *sub_node = tree_to_write_to->addNode("All My Playlists", 1);
+    GenericTree *sub_node = tree_to_write_to->addNode(QObject::tr("All My Playlists"), 1);
     sub_node->setAttribute(0, 1);
     sub_node->setAttribute(1, 1);
     sub_node->setAttribute(2, 1);
     sub_node->setAttribute(3, 1);
     
-    GenericTree *subsub_node = sub_node->addNode("Active Play Queue", 0);
+    GenericTree *subsub_node = sub_node->addNode(QObject::tr("Active Play Queue"), 0);
     subsub_node->setAttribute(0, 0);
     subsub_node->setAttribute(1, 0);
     subsub_node->setAttribute(2, rand());
@@ -845,7 +845,7 @@ void PlaylistsContainer::writeTree(GenericTree *tree_to_write_to)
     if(cd_playlist.count() > 0)
     {
         ++a_counter;
-        QString a_string = "CD: ";
+        QString a_string = QObject::tr("CD: ");
         a_string += all_available_music->getCDTitle();
         GenericTree *cd_node = sub_node->addNode(a_string, 0);
         cd_node->setAttribute(0, 0);
@@ -920,7 +920,7 @@ void PlaylistsContainer::copyNewPlaylist(QString name)
     all_other_playlists->append(new_list);
     active_playlist->copyTracks(new_list, false);
     pending_writeback_index = 0;
-    active_widget->setText(0, "Active Play Queue");
+    active_widget->setText(0, QObject::tr("Active Play Queue"));
     active_playlist->removeAllTracks();
     active_playlist->addTrack(new_list->getID() * -1, true, false);
 }
@@ -931,7 +931,7 @@ void PlaylistsContainer::setActiveWidget(PlaylistTitle *widget)
     if(active_widget && pending_writeback_index > 0)
     {
         bool bad = false;
-        QString newlabel = QString("Active Play Queue (%1)").arg(getPlaylistName(pending_writeback_index, bad));
+        QString newlabel = QString(QObject::tr("Active Play Queue (%1)")).arg(getPlaylistName(pending_writeback_index, bad));
         active_widget->setText(0, newlabel);
     }    
 }
@@ -950,7 +950,7 @@ void PlaylistsContainer::popBackPlaylist()
     active_playlist->removeAllTracks();
     backup_playlist->copyTracks(active_playlist, true);
     pending_writeback_index = 0;
-    active_widget->setText(0, "Active Play Queue");
+    active_widget->setText(0, QObject::tr("Active Play Queue"));
 
     active_playlist->Changed();
     backup_playlist->Changed();
@@ -965,7 +965,7 @@ void PlaylistsContainer::copyToActive(int index)
     if(active_widget)
     {
         bool bad = false;
-        QString newlabel = QString("Active Play Queue (%1)").arg(getPlaylistName(index, bad));
+        QString newlabel = QString(QObject::tr("Active Play Queue (%1)")).arg(getPlaylistName(index, bad));
         active_widget->setText(0, newlabel);
     }    
     active_playlist->removeAllTracks();
@@ -992,7 +992,7 @@ void PlaylistsContainer::renamePlaylist(int index, QString new_name)
         list_to_rename->Changed();
         if(list_to_rename->getID() == pending_writeback_index)
         {
-            QString newlabel = QString("Active Play Queue (%1)").arg(new_name);
+            QString newlabel = QString(QObject::tr("Active Play Queue (%1)")).arg(new_name);
             active_widget->setText(0, newlabel);
         }
     }
@@ -1054,7 +1054,7 @@ QString PlaylistsContainer::getPlaylistName(int index, bool &reference)
     }
     cerr << "playlist.o: Asked to getPlaylistName() with an index number I couldn't find" << endl ;
     reference = true;
-    return "Something is Wrong";
+    return QObject::tr("Something is Wrong");
 }
 
 bool Playlist::containsReference(int to_check, int depth)
@@ -1263,6 +1263,6 @@ void PlaylistsContainer::clearActive()
     backup_playlist->Changed();
     active_playlist->Changed();
     pending_writeback_index = 0;
-    active_widget->setText(0, "Active Play Queue");
+    active_widget->setText(0, QObject::tr("Active Play Queue"));
 }
 

@@ -627,6 +627,12 @@ const QString &SynaesthesiaFactory::name(void) const
     return name;
 }
 
+const QString &SynaesthesiaFactory::description(void) const
+{
+    static QString name(QObject::tr("Synaesthesia"));
+    return name;
+}
+
 VisualBase *SynaesthesiaFactory::create(MainVisual *parent, long int winid)
 {
     (void)parent;

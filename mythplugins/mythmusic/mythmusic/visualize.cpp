@@ -217,8 +217,10 @@ bool Spectrum::draw(QPainter *p, const QColor &back)
     p->fillRect(0, 0, size.width(), size.height(), back);
     p->setPen(Qt::white);
     p->setFont(QFont("Helvetica", 12));
-    p->drawText(size.width() / 2 - 200, size.height() / 2 - 20, 400, 20, Qt::AlignCenter, "Visualization requires FFT library");
-    p->drawText(size.width() / 2 - 200, size.height() / 2, 400, 20, Qt::AlignCenter, "Did you run configure?");
+    p->drawText(size.width() / 2 - 200, size.height() / 2 - 20, 400, 20, 
+                Qt::AlignCenter, QObject::tr("Visualization requires FFT library"));
+    p->drawText(size.width() / 2 - 200, size.height() / 2, 400, 20, 
+                Qt::AlignCenter, QObject::tr("Did you run configure?"));
 #endif
     
     return true;
@@ -227,6 +229,12 @@ bool Spectrum::draw(QPainter *p, const QColor &back)
 const QString &SpectrumFactory::name(void) const
 {
     static QString name("Spectrum");
+    return name;
+}
+
+const QString &SpectrumFactory::description(void) const
+{
+    static QString name(QObject::tr("Spectrum"));
     return name;
 }
 
@@ -270,6 +278,12 @@ bool Blank::draw(QPainter *p, const QColor &back)
 const QString &BlankFactory::name(void) const
 {
     static QString name("Blank");
+    return name;
+}
+
+const QString &BlankFactory::description(void) const
+{
+    static QString name(QObject::tr("Blank"));
     return name;
 }
 
@@ -669,6 +683,12 @@ void Gears::paintGL()
 const QString &GearsFactory::name(void) const
 {
     static QString name("Gears");
+    return name;
+}
+
+const QString &GearsFactory::description(void) const
+{
+    static QString name(QObject::tr("Gears"));
     return name;
 }
 

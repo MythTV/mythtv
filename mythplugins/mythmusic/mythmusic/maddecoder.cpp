@@ -756,7 +756,7 @@ const QString &MadDecoderFactory::extension() const
 
 const QString &MadDecoderFactory::description() const
 {
-    static QString desc("MPEG Layer 1/2/3 Audio (MAD decoder)");
+    static QString desc(QObject::tr("MPEG Layer 1/2/3 Audio (MAD decoder)"));
     return desc;
 }
 

@@ -75,6 +75,7 @@ public:
     void setVisual( const QString &visualname );
 
     QString getCurrentVisual() const;
+    QString getCurrentVisualDesc() const;
     int numVisualizers() const;
 
     void add(Buffer *, unsigned long, int, int);
@@ -122,6 +123,7 @@ class VisFactory
 {
   public:
     virtual const QString &name(void) const = 0;
+    virtual const QString &description(void) const = 0;
     virtual VisualBase *create(MainVisual *parent, long int winid) = 0;
 };
 
@@ -157,6 +159,7 @@ class StereoScopeFactory : public VisFactory
 {
   public:
     const QString &name(void) const;
+    const QString &description(void) const;
     VisualBase *create(MainVisual *parent, long int winid);
 };
 
@@ -164,6 +167,7 @@ class MonoScopeFactory : public VisFactory
 {
   public:
     const QString &name(void) const;
+    const QString &description(void) const;
     VisualBase *create(MainVisual *parent, long int winid);
 };
 

@@ -108,13 +108,13 @@ bool Metadata::isInDatabase(QSqlDatabase *db)
 void Metadata::dumpToDatabase(QSqlDatabase *db)
 {
     if (artist == "")
-        artist = "Unknown";
+        artist = QObject::tr("Unknown Artist");
     if (album == "")
-        album = "Unknown";
+        album = QObject::tr("Unknown Album");
     if (title == "")
         title = filename;
     if (genre == "")
-        genre = "Unknown";
+        genre = QObject::tr("Unknown Genre");
 
     title.replace(QRegExp("\""), QString("\\\""));
     artist.replace(QRegExp("\""), QString("\\\""));
@@ -368,7 +368,7 @@ AllMusic::AllMusic(QSqlDatabase *ldb, QString path_assignment, QString a_startdi
     startdir = a_startdir;
     done_loading = false;
     
-    cd_title = "CD -- none";
+    cd_title = QObject::tr("CD -- none");
 
     //  How should we sort?
     setSorting(path_assignment);
@@ -579,7 +579,7 @@ void AllMusic::buildTree()
 
 void AllMusic::writeTree(GenericTree *tree_to_write_to)
 {
-    GenericTree *sub_node = tree_to_write_to->addNode("All My Music", 0);
+    GenericTree *sub_node = tree_to_write_to->addNode(QObject::tr("All My Music"), 0);
     sub_node->setAttribute(0, 0);
     sub_node->setAttribute(1, 0);
     sub_node->setAttribute(2, 0);
@@ -670,10 +670,10 @@ void AllMusic::putCDOnTheListView(CDCheckItem *where)
         }
         else
         {
-            title_string = "Unknown";
+            title_string = QObject::tr("Unknown");
         }
-        QString title_temp = QString("%1 - %2").arg((*anit).Track()).arg(title_string);
-        QString level_temp = "title";
+        QString title_temp = QString(QObject::tr("%1 - %2")).arg((*anit).Track()).arg(title_string);
+        QString level_temp = QObject::tr("title");
         CDCheckItem *new_item = new CDCheckItem(where, title_temp, level_temp, (*anit).Track());
         new_item->setOn(false); //  Avoiding -Wall     
     }  
@@ -728,19 +728,19 @@ QString AllMusic::getLabel(int an_id, bool *error_flag)
    
         if (!music_map.contains(an_id))
         {
-            a_label = QString("Missing database entry: %1").arg(an_id);
+            a_label = QString(QObject::tr("Missing database entry: %1")).arg(an_id);
             *error_flag = true;
             return a_label;
         }
       
         a_label += music_map[an_id]->Artist();
-        a_label += " ~ ";
+        a_label += QObject::tr(" ~ ");
         a_label += music_map[an_id]->Title();
     
 
         if(a_label.length() < 1)
         {
-            a_label = "Ooops";
+            a_label = QObject::tr("Ooops");
             *error_flag = true;
         }
         else
@@ -756,7 +756,7 @@ QString AllMusic::getLabel(int an_id, bool *error_flag)
         {
             if( (*anit).Track() == an_id * -1)
             {
-                a_label = QString("%1 ~ %2").arg((*anit).Artist()).arg((*anit).Title());
+                a_label = QString(QObject::tr("%1 ~ %2")).arg((*anit).Artist()).arg((*anit).Title());
                 *error_flag = false;
                 return a_label;
             }
@@ -812,7 +812,7 @@ void AllMusic::save()
 void AllMusic::clearCDData()
 {
     cd_data.clear();
-    cd_title = "CD -- none";
+    cd_title = QObject::tr("CD -- none");
 }
 
 void AllMusic::addCDTrack(Metadata *the_track)
@@ -966,8 +966,8 @@ void MusicNode::putYourselfOnTheListView(TreeCheckItem *parent, bool show_node)
     anit.toLast();
     while( (a_track = anit.current() ) != 0)
     {
-        QString title_temp = QString("%1 - %2").arg(a_track->Track()).arg(a_track->Title());
-        QString level_temp = "title";
+        QString title_temp = QString(QObject::tr("%1 - %2")).arg(a_track->Track()).arg(a_track->Title());
+        QString level_temp = QObject::tr("title");
         TreeCheckItem *new_item = new TreeCheckItem(current_parent, title_temp, level_temp, a_track->ID());
         --anit;
         new_item->setOn(false); //  Avoiding -Wall     
@@ -1004,7 +1004,7 @@ void MusicNode::writeTree(GenericTree *tree_to_write_to, int a_counter)
     int RandomWeight = gContext->GetNumSetting("IntelliRandomWeight", 2);
     while( (a_track = anit.current() ) != 0)
     {
-        QString title_temp = QString("%1 - %2").arg(a_track->Track()).arg(a_track->Title());
+        QString title_temp = QString(QObject::tr("%1 - %2")).arg(a_track->Track()).arg(a_track->Title());
         GenericTree *subsub_node = sub_node->addNode(title_temp, a_track->ID(), true);
         subsub_node->setAttribute(0, 1);
         subsub_node->setAttribute(1, track_counter);    // regular order
