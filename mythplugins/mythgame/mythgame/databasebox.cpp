@@ -118,13 +118,13 @@ void DatabaseBox::editSettings(QListViewItem *item)
 {
     TreeItem *tcitem = (TreeItem *)item;
 
-    if (tcitem->childCount() <= 0)
-    {
-        GameHandler::EditSettings(this, tcitem->getRomInfo());
-    }
-    else if("system" == tcitem->getLevel())
+    if("system" == tcitem->getLevel())
     {
         GameHandler::EditSystemSettings(this, tcitem->getRomInfo());
+    }
+    else if (tcitem->childCount() <= 0)
+    {
+        GameHandler::EditSettings(this, tcitem->getRomInfo());
     }
 }
 
