@@ -199,6 +199,7 @@ void Decoder::getMetadataFromFilename(const QString filename,
             title = part_str;
             title.replace(QRegExp(QString("^[0-9][0-9] "), FALSE),
                           QString(""));
+            title = title.simplifyWhiteSpace();
         }
     }
 }

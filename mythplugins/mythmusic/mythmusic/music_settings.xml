@@ -24,4 +24,9 @@
       <action>MUSIC_SET_PLAYER</action>
    </button>
 
+   <button>
+      <type>MUSIC</type>
+      <text>Ripper Settings</text>
+      <action>MUSIC_SET_RIPPER</action>
+   </button>
 </mythmenu>

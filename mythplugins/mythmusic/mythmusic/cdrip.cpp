@@ -29,6 +29,7 @@ extern "C" {
 #include "cddecoder.h"
 #include "encoder.h"
 #include "vorbisencoder.h"
+#include "lameencoder.h"
 #include "flacencoder.h"
 
 #include <mythtv/mythcontext.h>
@@ -78,20 +79,20 @@ Ripper::Ripper(QSqlDatabase *ldb, MythMainWindow *parent, const char *name)
     qualitygroup->setFrameStyle(QFrame::NoFrame);
     qualitygroup->hide();
 
-    QRadioButton *lowvorb = new QRadioButton(tr("Low"), firstdiag);
-    lowvorb->setBackgroundOrigin(WindowOrigin);
-    qualbox->addWidget(lowvorb);
-    qualitygroup->insert(lowvorb);
+    QRadioButton *lowquality = new QRadioButton(tr("Low"), firstdiag);
+    lowquality->setBackgroundOrigin(WindowOrigin);
+    qualbox->addWidget(lowquality);
+    qualitygroup->insert(lowquality);
 
-    QRadioButton *medvorb = new QRadioButton(tr("Medium"), firstdiag);
-    medvorb->setBackgroundOrigin(WindowOrigin);
-    qualbox->addWidget(medvorb);
-    qualitygroup->insert(medvorb);
+    QRadioButton *mediumquality = new QRadioButton(tr("Medium"), firstdiag);
+    mediumquality->setBackgroundOrigin(WindowOrigin);
+    qualbox->addWidget(mediumquality);
+    qualitygroup->insert(mediumquality);
 
-    QRadioButton *highvorb = new QRadioButton(tr("High"), firstdiag);
-    highvorb->setBackgroundOrigin(WindowOrigin);
-    qualbox->addWidget(highvorb);
-    qualitygroup->insert(highvorb);
+    QRadioButton *highquality = new QRadioButton(tr("High"), firstdiag);
+    highquality->setBackgroundOrigin(WindowOrigin);
+    qualbox->addWidget(highquality);
+    qualitygroup->insert(highquality);
 
     QRadioButton *perfectflac = new QRadioButton(tr("Perfect"), firstdiag);
     perfectflac->setBackgroundOrigin(WindowOrigin);
@@ -361,6 +362,7 @@ void Ripper::ripthedisc(void)
 
     QString textstatus;
     QString cddevice = gContext->GetSetting("CDDevice");
+    QString encodertype = gContext->GetSetting("EncoderType");
 
     QString outfile;
     CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
@@ -368,6 +370,10 @@ void Ripper::ripthedisc(void)
     int encodequal = qualitygroup->id(qualitygroup->selected());
 
     QString findir = gContext->GetSetting("MusicLocation");
+
+    bool fileundergenre = gContext->GetNumSetting("FileUnderGenre", 0);
+    bool fileunderartist = gContext->GetNumSetting("FileUnderArtist", 1);
+    bool fileunderalbum = gContext->GetNumSetting("FileUnderAlbum", 1);
 
     for (int i = 0; i < decoder->getNumTracks(); i++)
     {
@@ -389,10 +395,23 @@ void Ripper::ripthedisc(void)
 
             outfile = findir;
 
-            fixFilename(outfile, track->Artist());
-            mkdir(outfile, 0777);
-            fixFilename(outfile, track->Album());
-            mkdir(outfile, 0777);
+            if (fileundergenre)
+            {
+                fixFilename(outfile, track->Genre());
+                mkdir(outfile, 0777);
+            }
+
+            if (fileunderartist)
+            {
+                fixFilename(outfile, track->Artist());
+                mkdir(outfile, 0777);
+            }
+
+            if (fileunderalbum)
+            {
+                fixFilename(outfile, track->Album());
+                mkdir(outfile, 0777);
+            }
 
             QString tempstr;
             tempstr.sprintf("%02d - %s", track->Track(), 
@@ -402,8 +421,16 @@ void Ripper::ripthedisc(void)
 
             if (encodequal < 3)
             {
-                outfile += ".ogg";
-                encoder = new VorbisEncoder(outfile, encodequal, track); 
+                if (encodertype == "mp3")
+                {
+                    outfile += ".mp3";
+                    encoder = new LameEncoder(outfile, encodequal, track);
+                }
+                else // ogg
+                {
+                    outfile += ".ogg";
+                    encoder = new VorbisEncoder(outfile, encodequal, track); 
+                }
             }
             else
             {

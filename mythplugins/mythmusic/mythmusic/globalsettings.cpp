@@ -131,6 +131,61 @@ public:
     };
 };
 
+class FileUnderGenre: public CheckBoxSetting, public GlobalSetting {
+public:
+    FileUnderGenre():
+    GlobalSetting("FileUnderGenre") {
+        setLabel("Genre");
+        setValue(false);
+        setHelpText("If set, ripped music files will be saved under a "
+                    "subdirectory named for the detected music genre.");
+    };
+};
+
+class EncoderType: public ComboBoxSetting, public GlobalSetting {
+public:
+    EncoderType():
+        GlobalSetting("EncoderType") {
+        setLabel("Encoding");
+        addSelection("Ogg Vorbis", "ogg");
+        addSelection("Lame (MP3)", "mp3");
+        setHelpText("Audio encoder to use for CD ripping. Note that the "
+                    "quality level 'Perfect' will use the FLAC encoder.");
+    };
+};
+
+class FileUnderArtist: public CheckBoxSetting, public GlobalSetting {
+public:
+    FileUnderArtist():
+        GlobalSetting("FileUnderArtist") {
+        setLabel("Artist");
+        setValue(true);
+        setHelpText("If set, ripped music files will be saved under a "
+                    "subdirectory named for the detected artist.");
+    };
+};
+
+class FileUnderAlbum: public CheckBoxSetting, public GlobalSetting {
+public:
+    FileUnderAlbum():
+        GlobalSetting("FileUnderAlbum") {
+        setLabel("Album");
+        setValue(true);
+        setHelpText("If set, ripped music files will be saved under a "
+                    "subdirectory named for the detected album.");
+     };
+};
+
+class CDRipPath: public HorizontalConfigurationGroup {
+public:
+    CDRipPath() {
+        setLabel("Ripped audio filing scheme");
+        addChild(new FileUnderGenre());
+        addChild(new FileUnderArtist());
+        addChild(new FileUnderAlbum());
+    };
+}; 
+
 class ParanoiaLevel: public ComboBoxSetting, public GlobalSetting {
 public:
     ParanoiaLevel():
@@ -413,20 +468,13 @@ GeneralSettings::GeneralSettings()
     general->setLabel("General Settings");
     general->addChild(new SetMusicDirectory());
     general->addChild(new AudioDevice());
+    general->addChild(new CDDevice());
     general->addChild(new TreeLevels());
     general->addChild(new NonID3FileNameFormat());
     general->addChild(new IgnoreID3Tags());
     general->addChild(new AutoLookupCD());
     general->addChild(new KeyboardAccelerators());
     addChild(general);
-
-    VerticalConfigurationGroup *general2 = new VerticalConfigurationGroup(false);
-    general2->setLabel("General Settings");
-    general2->addChild(new CDDevice());
-    general2->addChild(new PostCDRipScript());
-    general2->addChild(new ParanoiaLevel());
-    general2->addChild(new EjectCD());
-    addChild(general2);
 }
 
 PlayerSettings::PlayerSettings()
@@ -451,4 +499,16 @@ PlayerSettings::PlayerSettings()
     playersettings2->addChild(new VisualScaleWidth());
     playersettings2->addChild(new VisualScaleHeight());
     addChild(playersettings2);
+}
+
+RipperSettings::RipperSettings()
+{
+    VerticalConfigurationGroup* rippersettings = new VerticalConfigurationGroup(false);
+    rippersettings->setLabel("CD Ripper Settings");
+    rippersettings->addChild(new CDRipPath());
+    rippersettings->addChild(new PostCDRipScript());
+    rippersettings->addChild(new EncoderType());
+    rippersettings->addChild(new ParanoiaLevel());
+    rippersettings->addChild(new EjectCD());
+    addChild(rippersettings);
 }

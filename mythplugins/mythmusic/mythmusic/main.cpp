@@ -312,6 +312,11 @@ void MusicCallback(void *data, QString &selection)
         PlayerSettings settings;
         settings.exec(QSqlDatabase::database());
     }
+    else if (sel == "music_set_ripper")
+    {
+        RipperSettings settings;
+        settings.exec(QSqlDatabase::database());
+    }
 }
 
 void runMenu(QString paths, QString startdir,

@@ -37,4 +37,9 @@ public:
     PlayerSettings();
 };
 
+class RipperSettings: virtual public ConfigurationWizard {
+public:
+    RipperSettings();
+};
+
 #endif
