@@ -16,10 +16,10 @@
       <bold>yes</bold>
       <italics>yes</italics>
       <centered>yes</centered>
-      <outline>
+<!--      <outline>
          <color>black</color>
          <size>2</size>
-      </outline>
+      </outline> -->
       <shadow>
          <color>black</color>
          <offset>3,3</offset>
@@ -81,6 +81,16 @@
   <buttondef name="WEATHER">
     <image>weather.png</image>
     <offset>20,20</offset>
+  </buttondef>
+
+  <buttondef name="GAME">
+    <image>game.png</image>
+    <offset>15,10</offset>
+  </buttondef>
+
+  <buttondef name="IMAGES">
+    <image>images.png</image>
+    <offset>15,10</offset>
   </buttondef>
 
 </myththeme>

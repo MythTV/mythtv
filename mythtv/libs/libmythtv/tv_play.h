@@ -141,6 +141,7 @@ class TV : public QObject
     int stickykeys;
     bool doing_ff;
     bool doing_rew;
+    int ff_rew_index;
     float ff_rew_scaling;
 
     OSD *osd;

@@ -1,6 +1,7 @@
 #include <unistd.h>
 #include <qsqldatabase.h>
 #include <qsqlquery.h>
+#include <qregexp.h>
 #include <qstring.h>
 #include <qdatetime.h>
 
@@ -334,11 +335,18 @@ bool Scheduler::FindInOldRecordings(ProgramInfo *pginfo)
     if (pginfo->subtitle.length() <= 2 || pginfo->description.length() < 2)
         return false;
 
+    QString title=pginfo->title;
+    QString subtitle=pginfo->subtitle;
+    QString description=pginfo->description;
+
+    title.replace(QRegExp("\""), QString("\\\""));
+    subtitle.replace(QRegExp("\""), QString("\\\""));
+    description.replace(QRegExp("\""), QString("\\\""));
+
     thequery = QString("SELECT NULL FROM oldrecorded WHERE "
                        "title = \"%1\" AND subtitle = \"%2\" AND "
-                       "description = \"%3\";").arg(pginfo->title.utf8())
-                       .arg(pginfo->subtitle.utf8())
-                       .arg(pginfo->description.utf8());
+                       "description = \"%3\";").arg(title.utf8())
+                       .arg(subtitle.utf8()).arg(description.utf8());
 
     QSqlQuery query = db->exec(thequery);
 

@@ -43,6 +43,37 @@ using namespace std;
 #define wsEnter         0x8d + 256
 #define wsReturn        0x0d + 256
 
+enum SeekSpeeds {
+  SSPEED_NORMAL_WITH_DISPLAY = 0,
+  SSPEED_SLOW_1,
+  SSPEED_SLOW_2,
+  SSPEED_NORMAL,
+  SSPEED_FAST_1,
+  SSPEED_FAST_2,
+  SSPEED_FAST_3,
+  SSPEED_FAST_4,
+  SSPEED_FAST_5,
+  SSPEED_FAST_6,
+  SSPEED_MAX
+};
+
+struct SeekSpeedInfo {
+  QString   dispString;
+  float  scaling;
+};
+
+SeekSpeedInfo seek_speed_array[] =
+  {{"", 0.0},
+   {"1/4X", 0.25},
+   {"1/2X", 0.50},
+   {"1X", 1.00},
+   {"1.5X", 1.50},
+   {"2X", 2.24},
+   {"3X", 3.34},
+   {"8X", 7.48},
+   {"10X", 11.18},
+   {"16X", 16.72}};
+
 void *SpawnDecode(void *param)
 {
     NuppelVideoPlayer *nvp = (NuppelVideoPlayer *)param;
@@ -543,6 +574,7 @@ void TV::TeardownPlayer(void)
     paused = false;
     doing_ff = false;
     doing_rew = false;
+    ff_rew_index = SSPEED_NORMAL;
     ff_rew_scaling = 1.0;
 
     nvp = NULL;
@@ -595,6 +627,7 @@ void TV::RunTV(void)
     doing_ff = false;
     doing_rew = false;
     ff_rew_scaling = 1.0;
+    ff_rew_index = SSPEED_NORMAL;
 
     int pausecheck = 0;
 
@@ -623,7 +656,7 @@ void TV::RunTV(void)
                     DoFF();
                 else if (doing_rew)
                     DoRew();
-                if (ff_rew_scaling > 0)
+                if (ff_rew_index > SSPEED_NORMAL)
                     usleep(50000);
             }
         }
@@ -760,14 +793,38 @@ void TV::ProcessKeypress(int keypressed)
         }
         case wsRight: case 'd': case 'D': 
         {
-            doing_ff = true;
+            if (stickykeys)
+            {
+                if (doing_ff)
+                    ff_rew_index = (++ff_rew_index % SSPEED_MAX);
+                else
+                {
+                    doing_ff = true;
+                    ff_rew_index = SSPEED_NORMAL;
+                }
+            }
+            else
+                ff_rew_index = SSPEED_NORMAL;
+
             doing_rew = false;
             DoFF(); 
             break;
         }
         case wsLeft: case 'a': case 'A': 
         {
-            doing_rew = true;
+            if (stickykeys)
+            {
+                if (doing_rew)
+                    ff_rew_index = (++ff_rew_index % SSPEED_MAX);
+                else
+                {
+                    doing_rew = true;
+                    ff_rew_index = SSPEED_NORMAL;
+                }
+            }
+            else
+                ff_rew_index = SSPEED_NORMAL;
+
             doing_ff = false;
             DoRew(); 
             break;
@@ -817,16 +874,16 @@ void TV::ProcessKeypress(int keypressed)
             {
                 switch (keypressed)
                 {
-                    case wsZero:   case '0': ff_rew_scaling =  0.00; break;
-                    case wsOne:    case '1': ff_rew_scaling =  0.25; break;
-                    case wsTwo:    case '2': ff_rew_scaling =  0.50; break;
-                    case wsThree:  case '3': ff_rew_scaling =  1.00; break;
-                    case wsFour:   case '4': ff_rew_scaling =  1.50; break;
-                    case wsFive:   case '5': ff_rew_scaling =  2.24; break;
-                    case wsSix:    case '6': ff_rew_scaling =  3.34; break;
-                    case wsSeven:  case '7': ff_rew_scaling =  7.48; break;
-                    case wsEight:  case '8': ff_rew_scaling = 11.18; break;
-                    case wsNine:   case '9': ff_rew_scaling = 16.72; break;
+                    case wsZero:  case '0': ff_rew_index = SSPEED_NORMAL_WITH_DISPLAY; break;
+                    case wsOne:   case '1': ff_rew_index = SSPEED_SLOW_1; break;
+                    case wsTwo:   case '2': ff_rew_index = SSPEED_SLOW_2; break;
+                    case wsThree: case '3': ff_rew_index = SSPEED_NORMAL; break;
+                    case wsFour:  case '4': ff_rew_index = SSPEED_FAST_1; break;
+                    case wsFive:  case '5': ff_rew_index = SSPEED_FAST_2; break;
+                    case wsSix:   case '6': ff_rew_index = SSPEED_FAST_3; break;
+                    case wsSeven: case '7': ff_rew_index = SSPEED_FAST_4; break;
+                    case wsEight: case '8': ff_rew_index = SSPEED_FAST_5; break;
+                    case wsNine:  case '9': ff_rew_index = SSPEED_FAST_6; break;
 
                     default:
                        doing_ff = false;
@@ -1119,11 +1176,15 @@ void TV::DoFF(void)
     if (internalState == kState_WatchingLiveTV)
         slidertype = true;
 
+    ff_rew_scaling = seek_speed_array[ff_rew_index].scaling;
+    QString scaleString = "Forward ";
+    scaleString += seek_speed_array[ff_rew_index].dispString;
+
     if (activenvp == nvp)
     {
         QString desc = "";
         int pos = calcSliderPos((int)(fftime * ff_rew_scaling), desc);
-        osd->StartPause(pos, slidertype, "Forward", desc, 2);
+        osd->StartPause(pos, slidertype, scaleString, desc, 2);
     }
 
     activenvp->FastForward(fftime * ff_rew_scaling);
@@ -1135,11 +1196,15 @@ void TV::DoRew(void)
     if (internalState == kState_WatchingLiveTV)
         slidertype = true;
 
+    ff_rew_scaling = seek_speed_array[ff_rew_index].scaling;
+    QString scaleString = "Rewind ";
+    scaleString += seek_speed_array[ff_rew_index].dispString;
+
     if (activenvp == nvp)
     {
         QString desc = "";
         int pos = calcSliderPos(0 - (int)(rewtime * ff_rew_scaling), desc);
-        osd->StartPause(pos, slidertype, "Rewind", desc, 2);
+        osd->StartPause(pos, slidertype, scaleString, desc, 2);
     }
 
     activenvp->Rewind(rewtime * ff_rew_scaling);

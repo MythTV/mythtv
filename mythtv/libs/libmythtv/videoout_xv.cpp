@@ -603,7 +603,7 @@ void XvVideoOutput::StopEmbedding(void)
     pthread_mutex_unlock(&lock);
 }
 
-void inline scale_image( unsigned char *src, int src_w, int src_h,
+inline void scale_image( unsigned char *src, int src_w, int src_h,
         unsigned char *dest, int dest_w, int dest_h, int bpp )
 {
     int src_rows[dest_h];
