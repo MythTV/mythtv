@@ -66,7 +66,7 @@ CREATE TABLE conflictresolutionoverride
     channum INT UNSIGNED NOT NULL,
     starttime TIMESTAMP NOT NULL,
     endtime TIMESTAMP NOT NULL,
-    PRIMARY KEY (channum, starttime),
+    INDEX (channum, starttime),
     INDEX (endtime)
 );
 CREATE TABLE conflictresolutionsingle
@@ -77,7 +77,7 @@ CREATE TABLE conflictresolutionsingle
     dislikechannum INT UNSIGNED NOT NULL,
     dislikestarttime TIMESTAMP NOT NULL,
     dislikeendtime TIMESTAMP NOT NULL,
-    PRIMARY KEY (preferchannum, preferstarttime),
+    INDEX (preferchannum, preferstarttime),
     INDEX (preferendtime)
 );
 CREATE TABLE conflictresolutionany

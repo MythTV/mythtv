@@ -7,6 +7,7 @@
 #include <qlistview.h>
 #include <qdatetime.h>
 #include <qapplication.h>
+#include <qregexp.h>
 
 #include "viewscheduled.h"
 #include "infostructs.h"
@@ -250,7 +251,7 @@ void ViewScheduled::handleNotRecording(ProgramInfo *rec)
 
 void ViewScheduled::handleConflicting(ProgramInfo *rec)
 {
-    list<ProgramInfo *> *conflictlist = sched->getConflicting(rec, false);
+    list<ProgramInfo *> *conflictlist = sched->getConflicting(rec, true);
 
     QString message = "The follow scheduled recordings conflict with each other.  Which would you like to record?";
 
@@ -303,6 +304,7 @@ void ViewScheduled::handleConflicting(ProgramInfo *rec)
                 prefer = (*i);
             else
                 dislike->push_back(*i);
+            counter++;
         }
     }
 

@@ -7,7 +7,7 @@ CREATE TABLE oldrecorded
     title VARCHAR(128) NULL,
     subtitle VARCHAR(128) NULL,
     description TEXT NULL,
-    PRIMARY KEY (channum, starttime),
+    INDEX (channum, starttime),
     INDEX (endtime),
     INDEX (title)
 );
@@ -16,7 +16,7 @@ CREATE TABLE conflictresolutionoverride
     channum INT UNSIGNED NOT NULL,
     starttime TIMESTAMP NOT NULL, 
     endtime TIMESTAMP NOT NULL,
-    PRIMARY KEY (channum, starttime),
+    INDEX (channum, starttime),
     INDEX (endtime)
 );
 CREATE TABLE conflictresolutionsingle
