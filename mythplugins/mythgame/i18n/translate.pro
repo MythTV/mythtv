@@ -7,6 +7,7 @@ SOURCES += ../mythgame/nessettingsdlg.cpp
 SOURCES += ../mythgame/pcsettingsdlg.cpp
 SOURCES += ../mythgame/sneshandler.cpp
 SOURCES += ../mythgame/snessettingsdlg.cpp
+SOURCES += ./themestrings.h
 
 TRANSLATIONS  = mythgame_it.ts mythgame_es.ts mythgame_ca.ts
 TRANSLATIONS += mythgame_nl.ts mythgame_de.ts mythgame_dk.ts

@@ -689,4 +689,23 @@ Please enter the correct path and try again.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
+<context>
+    <name>ThemeUI</name>
+    <message>
+        <source>System:</source>
+        <translation>System:</translation>
+    </message>
+    <message>
+        <source>Year:</source>
+        <translation>År:</translation>
+    </message>
+    <message>
+        <source>Genre:</source>
+        <translation>Genre:</translation>
+    </message>
+    <message>
+        <source>Favorite:</source>
+        <translation>Genre:</translation>
+    </message>
+</context>
 </TS>

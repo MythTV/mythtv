@@ -715,4 +715,23 @@ Please enter the correct path and try again.</source>
         <translation type="obsolete">  (erro no ficheiro)</translation>
     </message>
 </context>
+<context>
+    <name>ThemeUI</name>
+    <message>
+        <source>System:</source>
+        <translation>Sistema:</translation>
+    </message>
+    <message>
+        <source>Year:</source>
+        <translation>Ano:</translation>
+    </message>
+    <message>
+        <source>Genre:</source>
+        <translation>Género:</translation>
+    </message>
+    <message>
+        <source>Favorite:</source>
+        <translation>Género:</translation>
+    </message>
+</context>
 </TS>

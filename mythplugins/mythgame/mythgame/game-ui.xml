@@ -92,8 +92,6 @@
         <area>13,75,150,35</area>
         <font>infofont</font>
         <value>System:</value>
-        <value lang="PT">Sistema:</value>
-        <value lang="SV">System:</value>
       </textarea>
 
       <textarea name="systemname" draworder="6">
@@ -105,8 +103,6 @@
         <area>13,110,150,35</area>
         <font>infofont</font>
         <value>Year:</value>
-        <value lang="PT">Ano:</value>
-        <value lang="SV">År:</value>
       </textarea>
 
       <textarea name="yearname" draworder="6">
@@ -118,8 +114,6 @@
         <area>13,140,150,35</area>
         <font>infofont</font>
         <value>Genre:</value>
-        <value lang="PT">Género:</value>
-        <value lang="SV">Genre:</value>
       </textarea>
 
       <textarea name="genrename" draworder="6">
@@ -131,8 +125,6 @@
         <area>13,170,150,35</area>
         <font>infofont</font>
         <value>Favorite:</value>
-        <value lang="PT">Género:</value>
-        <value lang="SV">Genre:</value>
       </textarea>
 
       <textarea name="showfavorite" draworder="6">
