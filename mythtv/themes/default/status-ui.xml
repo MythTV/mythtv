@@ -79,7 +79,9 @@
        <fcnfont name="status" function="inactive"></fcnfont>
        <fcnfont name="status_selected" function="selected"></fcnfont>
        <column number="1" width="490" context="-1"></column>
-       <items>12</items>
+       <items>11</items>
+       <image function="uparrow" filename="uparrow.png" location="475,18"></image>
+       <image function="downarrow" filename="downarrow.png" location="475,305"></image>
       </listarea>
       <image name="datalines" draworder="0" fleximage="no">
         <filename>cr-lines.png</filename>

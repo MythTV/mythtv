@@ -25,6 +25,7 @@ StatusBox::StatusBox(MythMainWindow *parent, const char *name)
     int item_count = 0;
     dateFormat = gContext->GetSetting("ShortDateFormat", "M/d");
     timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
+    timeDateFormat = timeFormat + " " + dateFormat;
 
     setNoErase();
     LoadTheme();
@@ -84,7 +85,7 @@ void StatusBox::updateContent()
     // the point at which to start the content list so that the current item
     // is in the center
     int startPos = 0; 
-    if (contentPos > contentMid)
+    if (contentPos >= contentMid)
         startPos = contentPos - contentMid;
  
     if (content  == NULL) return;
@@ -95,8 +96,8 @@ void StatusBox::updateContent()
     // the offset we determined above.  If we are before the midpoint or 
     // close to the end, we stop moving the content up or down to let the 
     // hightlight move up and down with fixed content
-    if (((contentPos > contentMid) &&
-         (contentPos <= (contentTotalLines - contentMid))) ||
+    if (((contentPos >= contentMid) &&
+         (contentPos < (contentTotalLines - contentMid))) ||
         (contentPos == 0))
     {
         list_area->ResetList();
@@ -112,7 +113,7 @@ void StatusBox::updateContent()
 
         if (contentPos < contentMid)
             newPos = contentPos;
-        else if (contentPos > (contentTotalLines - contentMid))
+        else if (contentPos >= (contentTotalLines - contentMid))
             newPos = contentSize - (contentTotalLines - contentPos);
         else
             newPos = contentMid;
@@ -126,8 +127,8 @@ void StatusBox::updateContent()
         }
     }
 
-    list_area->SetUpArrow(contentPos > 0);
-    list_area->SetDownArrow((contentPos + contentSize) < contentTotalLines);
+    list_area->SetUpArrow(startPos > 0);
+    list_area->SetDownArrow((startPos + contentSize) < contentTotalLines);
 
     container->Draw(&tmp, 0, 0);
     container->Draw(&tmp, 1, 0);
@@ -688,14 +689,10 @@ void StatusBox::doDVBStatus(void)
 
 void StatusBox::doLogEntries(void)
 {
-    QString timeDateFormat;
     QString line;
     int count = 0;
  
     doScroll = true;
-
-    timeDateFormat = gContext->GetSetting("TimeFormat", "h:mm AP") + " " +
-                     gContext->GetSetting("ShortDateFormat", "M/d");
 
     contentLines.clear();
     contentDetail.clear();

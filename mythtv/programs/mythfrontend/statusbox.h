@@ -48,7 +48,7 @@ class StatusBox : public MythDialog
     int contentPos;
     int contentMid;
     int min_level;
-    QString dateFormat, timeFormat;
+    QString dateFormat, timeFormat, timeDateFormat;
 
     QMap<int, QString> contentLines;
     QMap<int, QString> contentDetail;
