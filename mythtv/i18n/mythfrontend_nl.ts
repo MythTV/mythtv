@@ -13,6 +13,18 @@
         <source>No, don&apos;t</source>
         <translation>Nee, niet doen</translation>
     </message>
+    <message>
+        <source>Advanced Configuration</source>
+        <translation type="unfinished">Geavanceerde Configuratie</translation>
+    </message>
+    <message>
+        <source>Recording Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Diseqc</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CaptureCardEditor</name>
@@ -242,7 +254,7 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
     </message>
     <message>
         <source>Record one showing of this program</source>
-        <translation>Dit programma eenmalig opnemen.</translation>
+        <translation type="obsolete">Dit programma eenmalig opnemen.</translation>
     </message>
     <message>
         <source>Don&apos;t record this showing</source>
@@ -275,6 +287,10 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
     <message>
         <source>Cancel</source>
         <translation type="obsolete">Annuleer</translation>
+    </message>
+    <message>
+        <source>Record one showing of this title</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -712,6 +728,26 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
         <source>Job Options</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Show group list as recording groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show group list as titles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playlist Actions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There are %1 items in the list.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shuffle Play</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PreviousBox</name>
@@ -1013,6 +1049,14 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
         <source>Not allowed to record this showing</source>
         <translation>Deze aflevering opnemen is niet toegestaan</translation>
     </message>
+    <message>
+        <source>Recording a showing daily</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording a showing weekly</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -1142,11 +1186,11 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
     </message>
     <message>
         <source>Channel Recording</source>
-        <translation>Opname per Zender</translation>
+        <translation type="obsolete">Opname per Zender</translation>
     </message>
     <message>
         <source>All Recording</source>
-        <translation>Alles Opnemen</translation>
+        <translation type="obsolete">Alles Opnemen</translation>
     </message>
     <message>
         <source>Air Date:</source>
@@ -1260,7 +1304,7 @@ Opmerking: Niet te laag zetten.</translation>
     </message>
     <message>
         <source>Automatically flag commercials after a recording completes.</source>
-        <translation>Reclame automatisch markeren nadat de opname voltooid is.</translation>
+        <translation type="obsolete">Reclame automatisch markeren nadat de opname voltooid is.</translation>
     </message>
     <message>
         <source>Strict Commercial Detection</source>
@@ -2010,15 +2054,15 @@ Opmerking: Niet te laag zetten.</translation>
     </message>
     <message>
         <source>Single Recording</source>
-        <translation>Eenmalige Opname</translation>
+        <translation type="obsolete">Eenmalige Opname</translation>
     </message>
     <message>
         <source>Daily Recording</source>
-        <translation>Dagelijkse Opname</translation>
+        <translation type="obsolete">Dagelijkse Opname</translation>
     </message>
     <message>
         <source>Weekly Recording</source>
-        <translation>Wekelijkse Opname</translation>
+        <translation type="obsolete">Wekelijkse Opname</translation>
     </message>
     <message>
         <source>Conflicting</source>
@@ -2182,11 +2226,11 @@ Opmerking: Niet te laag zetten.</translation>
     </message>
     <message>
         <source>Previous Recording</source>
-        <translation>Vorige Opname</translation>
+        <translation type="obsolete">Vorige Opname</translation>
     </message>
     <message>
         <source>Current Recording</source>
-        <translation>Huidige Opname</translation>
+        <translation type="obsolete">Huidige Opname</translation>
     </message>
     <message>
         <source>Max Recordings</source>
@@ -2403,7 +2447,7 @@ Opmerking: Niet te laag zetten.</translation>
     <message>
         <source>[Common] Frequency (Option has no default)
 The frequency for this channel in hz.</source>
-        <translation>[Gebruikelijke] Frequentie (optie heeft geen standaard)
+        <translation type="obsolete">[Gebruikelijke] Frequentie (optie heeft geen standaard)
 De frequentie voor dit kanaal in Hz.</translation>
     </message>
     <message>
@@ -2417,11 +2461,11 @@ De frequentie voor dit kanaal in Hz.</translation>
     </message>
     <message>
         <source>Satellite</source>
-        <translation>Satelliet</translation>
+        <translation type="obsolete">Satelliet</translation>
     </message>
     <message>
         <source>[NONE CONFIGURED]</source>
-        <translation>[NIETS GECONFIGUREERD]</translation>
+        <translation type="obsolete">[NIETS GECONFIGUREERD]</translation>
     </message>
     <message>
         <source>Polarity</source>
@@ -2430,7 +2474,7 @@ De frequentie voor dit kanaal in Hz.</translation>
     <message>
         <source>[DVB-S] Polarity (Option has no default)
 ???</source>
-        <translation>[DVB-S] Polariteit (optie heeft geen standaard)
+        <translation type="obsolete">[DVB-S] Polariteit (optie heeft geen standaard)
 ???</translation>
     </message>
     <message>
@@ -2478,15 +2522,15 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>6 Mhz</source>
-        <translation>6 MHz</translation>
+        <translation type="obsolete">6 MHz</translation>
     </message>
     <message>
         <source>7 Mhz</source>
-        <translation>7 MHz</translation>
+        <translation type="obsolete">7 MHz</translation>
     </message>
     <message>
         <source>8 Mhz</source>
-        <translation>8 MHz</translation>
+        <translation type="obsolete">8 MHz</translation>
     </message>
     <message>
         <source>Modulation</source>
@@ -2562,36 +2606,12 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Video</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Teletext</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Subtitle</source>
-        <translation>Ondertitel</translation>
-    </message>
-    <message>
-        <source>Pcr</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Service ID</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Provider ID</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Transport ID</source>
-        <translation></translation>
+        <translation type="obsolete">Ondertitel</translation>
     </message>
     <message>
         <source>Network ID</source>
-        <translation>Netwerk ID</translation>
+        <translation type="obsolete">Netwerk ID</translation>
     </message>
     <message>
         <source>Channel Options - Common</source>
@@ -2603,15 +2623,15 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Channel Options - DVB</source>
-        <translation>Kanaal Opties - DVB</translation>
+        <translation type="obsolete">Kanaal Opties - DVB</translation>
     </message>
     <message>
         <source>Channel Options - DVB Pids &amp; IDs</source>
-        <translation>Kanaal Opties - DVB Pids &amp; IDs</translation>
+        <translation type="obsolete">Kanaal Opties - DVB Pids &amp; IDs</translation>
     </message>
     <message>
         <source>A comma separated list of pids for each type. Note that currently MythTV only supports recording and not playback of multiple audio or video pids. It does not support showing teletext or subtitles either, but these do not crash the player as audio and video might.</source>
-        <translation>Een door comma&apos;s gescheiden lijst van pids voor elk type. MythTV ondersteund enkel opnemen en niet afspelen van meerdere audio of video pids. Teletext of ondertitels worden ook niet ondersteund, maar deze zorgen niet voor een crasch van de speler (audio en video misschien wel).</translation>
+        <translation type="obsolete">Een door comma&apos;s gescheiden lijst van pids voor elk type. MythTV ondersteund enkel opnemen en niet afspelen van meerdere audio of video pids. Teletext of ondertitels worden ook niet ondersteund, maar deze zorgen niet voor een crasch van de speler (audio en video misschien wel).</translation>
     </message>
     <message>
         <source>Profile Group Name</source>
@@ -2695,7 +2715,7 @@ Uw grabber levert geen kanaalnummers, die moet u handmatig invoeren.</translatio
     </message>
     <message>
         <source>pcHDTV ATSC capture card</source>
-        <translation>pcHDTV ATSC TV-kaart</translation>
+        <translation type="obsolete">pcHDTV ATSC TV-kaart</translation>
     </message>
     <message>
         <source>Digital Video Broadcast card (DVB)</source>
@@ -2715,43 +2735,35 @@ Uw grabber levert geen kanaalnummers, die moet u handmatig invoeren.</translatio
     </message>
     <message>
         <source>[All VideoSources]</source>
-        <translation>[Alle VideoBronnen]</translation>
+        <translation type="obsolete">[Alle VideoBronnen]</translation>
     </message>
     <message>
         <source>[No VideoSources Defined]</source>
-        <translation>[Geen VideoBronnen Ingesteld]</translation>
+        <translation type="obsolete">[Geen VideoBronnen Ingesteld]</translation>
     </message>
     <message>
         <source>[No Channels Defined]</source>
-        <translation>[Geen Kanalen Ingesteld]</translation>
+        <translation type="obsolete">[Geen Kanalen Ingesteld]</translation>
     </message>
     <message>
         <source>Load &amp; Tune</source>
-        <translation>Laad &amp; Tune</translation>
+        <translation type="obsolete">Laad &amp; Tune</translation>
     </message>
     <message>
         <source>Will load the selected channel above into the previous screen, and try to tune it. If it fails to tune the channel, press back and check the settings.</source>
-        <translation>Zal het geselecteerde kanaal laden in het vorige scherm en proberen af te stemmen. Wanneer dit mislukt, ga terug en contoleer de instellingen.</translation>
+        <translation type="obsolete">Zal het geselecteerde kanaal laden in het vorige scherm en proberen af te stemmen. Wanneer dit mislukt, ga terug en contoleer de instellingen.</translation>
     </message>
     <message>
         <source>Tune Only</source>
-        <translation>Enkel Afstemmen</translation>
+        <translation type="obsolete">Enkel Afstemmen</translation>
     </message>
     <message>
         <source>Will ONLY try to tune the previous screen, not alter it. If it fails to tune, press back and check the settings.</source>
-        <translation>Probeert ENKEL het vorige scherm af te stellen, niet te veranderen. Wanneer dit mislukt, ga terug en contoleer de instellingen.</translation>
+        <translation type="obsolete">Probeert ENKEL het vorige scherm af te stellen, niet te veranderen. Wanneer dit mislukt, ga terug en contoleer de instellingen.</translation>
     </message>
     <message>
         <source>Card Verification Wizard (DVB#</source>
-        <translation>Kaart Verificatie Wizard (DVB#</translation>
-    </message>
-    <message>
-        <source>Bit Error Rate</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Uncorrected Blocks</source>
-        <translation></translation>
+        <translation type="obsolete">Kaart Verificatie Wizard (DVB#</translation>
     </message>
     <message>
         <source>Signal/Noise</source>
@@ -2763,7 +2775,7 @@ Uw grabber levert geen kanaalnummers, die moet u handmatig invoeren.</translatio
     </message>
     <message>
         <source>FAILED TO OPEN CARD, CHECK CONSOLE!!</source>
-        <translation>KAART OPENEN MISLUKT, CONTROLEER CONSOLE!!</translation>
+        <translation type="obsolete">KAART OPENEN MISLUKT, CONTROLEER CONSOLE!!</translation>
     </message>
     <message>
         <source>Advanced Configuration</source>
@@ -2855,11 +2867,11 @@ Uw grabber levert geen kanaalnummers, die moet u handmatig invoeren.</translatio
     </message>
     <message>
         <source>Record the TS, not PS.</source>
-        <translation>Neem de TS op, niet PS.</translation>
+        <translation type="obsolete">Neem de TS op, niet PS.</translation>
     </message>
     <message>
         <source>This will make the backend not perform Transport Stream to Program Stream conversion.</source>
-        <translation>Dit maakt dat de backend geen conversie van &quot;Transport Stream&quot; naar &quot;Program Stream&quot; uitvoert.</translation>
+        <translation type="obsolete">Dit maakt dat de backend geen conversie van &quot;Transport Stream&quot; naar &quot;Program Stream&quot; uitvoert.</translation>
     </message>
     <message>
         <source>Normally the dvb-recording will drop packets from the card untill a sequence start header is seen. This option turns off this feature.</source>
@@ -2875,11 +2887,11 @@ Uw grabber levert geen kanaalnummers, die moet u handmatig invoeren.</translatio
     </message>
     <message>
         <source>Channels</source>
-        <translation>Kanalen</translation>
+        <translation type="obsolete">Kanalen</translation>
     </message>
     <message>
         <source>This box contains all channels from the selected video source. Select a channel here and press the &apos;Load and Tune&apos; button to load the channel settings into the previous screen and try to tune it.</source>
-        <translation>Dit bevat alle kanalen van de geselecteerde videobron. Selecteer hier een kanaal en druk op &apos;Laad &amp; Tune&apos; om de instellingen van het kanaal in het vorige venster te laden en af te stellen.</translation>
+        <translation type="obsolete">Dit bevat alle kanalen van de geselecteerde videobron. Selecteer hier een kanaal en druk op &apos;Laad &amp; Tune&apos; om de instellingen van het kanaal in het vorige venster te laden en af te stellen.</translation>
     </message>
     <message>
         <source>Status</source>
@@ -2887,35 +2899,35 @@ Uw grabber levert geen kanaalnummers, die moet u handmatig invoeren.</translatio
     </message>
     <message>
         <source>Select the type of satellite equipment you have. Selecting &apos;Finish&apos; on this screen will only save the type, and not the individual satellite, move down to the list to do this.</source>
-        <translation>Selecteer het type van uw satelliet-apparatuur. Selecteren zal enkel het type bewaren, en niet de individuele satelliet. Dat kan beneden in de lijst.</translation>
+        <translation type="obsolete">Selecteer het type van uw satelliet-apparatuur. Selecteren zal enkel het type bewaren, en niet de individuele satelliet. Dat kan beneden in de lijst.</translation>
     </message>
     <message>
         <source>Satellites</source>
-        <translation>Satellieten</translation>
+        <translation type="obsolete">Satellieten</translation>
     </message>
     <message>
         <source>Select the satellite you want to configure and press the &apos;menu&apos; key, and edit the satellite, when you are done configuring, press &apos;OK&apos; to leave this wizard.</source>
-        <translation>Selecteer de satelliet die u wil configureren en druk op &apos;menu&apos;-toets om te configureren. Als u klaar bent druk dan &apos;OK&apos; om de wizard te verlaten.</translation>
+        <translation type="obsolete">Selecteer de satelliet die u wil configureren en druk op &apos;menu&apos;-toets om te configureren. Als u klaar bent druk dan &apos;OK&apos; om de wizard te verlaten.</translation>
     </message>
     <message>
         <source>Satellite Configuration</source>
-        <translation>Satelliet Configuratie</translation>
+        <translation type="obsolete">Satelliet Configuratie</translation>
     </message>
     <message>
         <source>Satellite Name</source>
-        <translation>Satelliet Naam</translation>
+        <translation type="obsolete">Satelliet Naam</translation>
     </message>
     <message>
         <source>A textual representation of this satellite or cluster of satellites.</source>
-        <translation>Een tekstuele representatie van deze satelliet of een cluster van satellieten.</translation>
+        <translation type="obsolete">Een tekstuele representatie van deze satelliet of een cluster van satellieten.</translation>
     </message>
     <message>
         <source>Satellite Position</source>
-        <translation>Positie Satelliet</translation>
+        <translation type="obsolete">Positie Satelliet</translation>
     </message>
     <message>
         <source>A textual representation of which position the satellite is located at (&apos;1W&apos;)</source>
-        <translation>Een tekstuele representatie van de positie van deze satelliet (&apos;1W&apos;)</translation>
+        <translation type="obsolete">Een tekstuele representatie van de positie van deze satelliet (&apos;1W&apos;)</translation>
     </message>
     <message>
         <source>LNB LOF Switch</source>
@@ -2923,7 +2935,7 @@ Uw grabber levert geen kanaalnummers, die moet u handmatig invoeren.</translatio
     </message>
     <message>
         <source>This defines at what frequency (in hz) the LNB will do a switch from high to low setting, and vice versa.</source>
-        <translation>Dit bepaalt op welke frequentie (in Hz) de LNB een switch zal doen van hoge naar lage instelling, en omgekeerd.</translation>
+        <translation type="obsolete">Dit bepaalt op welke frequentie (in Hz) de LNB een switch zal doen van hoge naar lage instelling, en omgekeerd.</translation>
     </message>
     <message>
         <source>LNB LOF High</source>
@@ -2931,7 +2943,7 @@ Uw grabber levert geen kanaalnummers, die moet u handmatig invoeren.</translatio
     </message>
     <message>
         <source>This defines the offset (in hz) the frequency coming from the lnb will be in high setting.</source>
-        <translation>Dit bepaalt de afwijking (in Hz) van de frequentie (van de LNB) in hoge instelling.</translation>
+        <translation type="obsolete">Dit bepaalt de afwijking (in Hz) van de frequentie (van de LNB) in hoge instelling.</translation>
     </message>
     <message>
         <source>LNB LOF Low</source>
@@ -2939,7 +2951,7 @@ Uw grabber levert geen kanaalnummers, die moet u handmatig invoeren.</translatio
     </message>
     <message>
         <source>This defines the offset (in hz) the frequency coming from the lnb will be in low setting.</source>
-        <translation>Dit bepaalt de afwijking (in Hz) van de frequentie (van de LNB) in lage instelling.</translation>
+        <translation type="obsolete">Dit bepaalt de afwijking (in Hz) van de frequentie (van de LNB) in lage instelling.</translation>
     </message>
     <message>
         <source>Recorder Options</source>
@@ -2947,11 +2959,11 @@ Uw grabber levert geen kanaalnummers, die moet u handmatig invoeren.</translatio
     </message>
     <message>
         <source>Configuration Options</source>
-        <translation>Configuratie Opties</translation>
+        <translation type="obsolete">Configuratie Opties</translation>
     </message>
     <message>
         <source>Card Verification Wizard</source>
-        <translation>Kaart Verificatie Wizard</translation>
+        <translation type="obsolete">Kaart Verificatie Wizard</translation>
     </message>
     <message>
         <source>Capture device</source>
@@ -3210,7 +3222,7 @@ Als er een opname start binnen deze tijdsperiode, zal de backend niet uitschakel
     </message>
     <message>
         <source>Find One Recording</source>
-        <translation>Vind één opname</translation>
+        <translation type="obsolete">Vind één opname</translation>
     </message>
     <message>
         <source>Check this option for budget BT878 based DVB-T cards such as the AverTV DVB-T that require the audio volume left alone.</source>
@@ -3226,7 +3238,7 @@ Als er een opname start binnen deze tijdsperiode, zal de backend niet uitschakel
     </message>
     <message>
         <source>Find One Recording types will receive this additional recording priority value.</source>
-        <translation>Vind 1 Opname krijgt deze waarde aan zijn prioriteit toegevoegd.</translation>
+        <translation type="obsolete">Vind 1 Opname krijgt deze waarde aan zijn prioriteit toegevoegd.</translation>
     </message>
     <message>
         <source>Length of time to retain DVB signal data (in days)</source>
@@ -3693,12 +3705,8 @@ Best in te schakelen wanneer u interlaced video wil encoderen.</translation>
         <translation>Beeldverhouding aanpassen</translation>
     </message>
     <message>
-        <source>16/9 Anamorphic</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>4/3 Normal</source>
-        <translation>4/3 Normaal</translation>
+        <translation type="obsolete">4/3 Normaal</translation>
     </message>
     <message>
         <source>16/9 Zoom</source>
@@ -3710,7 +3718,7 @@ Best in te schakelen wanneer u interlaced video wil encoderen.</translation>
     </message>
     <message>
         <source>This will override any aspect ratio in the recorded stream, the same as pressing the W Key during playback.</source>
-        <translation>Dit zal de beeldverhouding in de opgenomen stream aanpassen, hetzelfde als W drukken tijdens afspelen.</translation>
+        <translation type="obsolete">Dit zal de beeldverhouding in de opgenomen stream aanpassen, hetzelfde als W drukken tijdens afspelen.</translation>
     </message>
     <message>
         <source>GUI width (px)</source>
@@ -4601,7 +4609,7 @@ Zet op &quot;0&quot; om uit te schakelen.</translation>
     </message>
     <message>
         <source>Record one showing of this program</source>
-        <translation>Dit programma eenmalig opnemen.</translation>
+        <translation type="obsolete">Dit programma eenmalig opnemen.</translation>
     </message>
     <message>
         <source>Record in this timeslot every week</source>
@@ -4721,7 +4729,7 @@ Zet op &quot;0&quot; om uit te schakelen.</translation>
     </message>
     <message>
         <source>Delete oldest if this would exceede the max episodes</source>
-        <translation>Wis oudste indien meer afleveringen dan max toegelaten</translation>
+        <translation type="obsolete">Wis oudste indien meer afleveringen dan max toegelaten</translation>
     </message>
     <message>
         <source>Don&apos;t record if this would exceed the max episodes</source>
@@ -5346,7 +5354,7 @@ Werkt mogelijk alleen wanneer uitgevoerd in een venster.</translation>
     </message>
     <message>
         <source>Follow Symlinks when deleting files</source>
-        <translation>Volg symlinks bij het verwijderen van bestanden</translation>
+        <translation type="obsolete">Volg symlinks bij het verwijderen van bestanden</translation>
     </message>
     <message>
         <source>This will cause Myth to follow symlinks when recordings and related files are deleted, instead of deleting the symlink and leaving the actual file.</source>
@@ -5506,6 +5514,342 @@ Werkt mogelijk alleen wanneer uitgevoerd in een venster.</translation>
     </message>
     <message>
         <source>Yes, delete my channel settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scan for channels(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This button will scan for digital channels.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Advanced editing options for digital channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use on air guide</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set the guide information will be taken from the On Air Channel guide.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to initialize video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error was encountered while displaying video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Return to Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Searching for Logo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>d</source>
+        <comment>RecTypeChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>w</source>
+        <comment>RecTypeChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Single Record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record Daily</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record Weekly</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Find One</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Find Daily</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Find Weekly</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>x</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previously Recorded</source>
+        <translation type="unfinished">Eerder Opgenomen</translation>
+    </message>
+    <message>
+        <source>Currently Recorded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Inactive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>this recording schedule is inactive.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Find ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[Common] Frequency (Option has no default)
+The frequency for this channel in Hz.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[DVB-S] Polarity (Option has no default)
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>6 MHz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>7 MHz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>8 MHz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transport</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Capture Card</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scanning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scan Activity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record one showing of this title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record one showing of this title every week</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record one showing of this title every day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This recording schedule is inactive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This recording schedule is active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete oldest if this would exceed the max episodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record in TS format instead of PS.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disables Transport Stream to Program Stream conversion. TS recording results in slightly bigger files, but reduces the risk for processing errors.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC Input Type: (DVB-S)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the input type for DVB-S cards. Leave as Single LNB/Input for DVB-C or DVB-T. The inputs are mapped from Input Connections option on the main menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>pcHDTV capture card (HD-2000, HD-3000)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This defines at what frequency (in Hz) the LNB will do a switch from high to low setting, and vice versa.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This defines the offset (in Hz) the frequency coming from the lnb will be in high setting.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This defines the offset (in Hz) the frequency coming from the lnb will be in low setting.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC Satellite Location</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The longitude of the satellite you are aiming at.  For western hemisphere use a negative value.  Value is in decimal.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Free to air channels only.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, only free to air channels will be used.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The Latitude of your satellite dishes location on the Earth..  This is used with DiSEqC Motor Support.  Format 35.78 for 35.78 degrees North Longitude</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The Longitude of your satellite dishes location on the Earth..  This is used with DiSEqC Motor Support.  Format -78.93 for 78.93 degrees West Longitude</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Diseqc Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the default policy used for the Auto-Commercial Flagging setting when a new scheduled recording is created.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use libmpeg2 for decoding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, libmpeg2 will be used instead of ffmpeg for decoding MPEG-1 and MPEG-2 video frames. This can be faster. Not available when XvMC is used.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>4/3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>16/9</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>16/9 Stretch</source>
+        <translation type="unfinished">16/9 Uitgerekt</translation>
+    </message>
+    <message>
+        <source>This will override any aspect ratio in the recorded stream, the same as pressing the W Key during playback. Fill will &quot;fill&quot; the screen with the image clipping as required. Fill is useful when using 4:3 interlaced TV&apos;s for display.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HD Ringbuffer size (KB)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The HD device ringbuffer allows the backend to weather moments of stress. The larger the ringbuffer, the longer the moments of stress can be. However, setting the size too large can cause swapping, which is detrimental.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Find One, Find Weekly and Find Daily recording types will receive this additional recording priority value.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Follow symbolic links when deleting files</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ScanProgressPopup</name>
+    <message>
+        <source>Scan Progress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tuning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Annuleer</translation>
+    </message>
+</context>
+<context>
+    <name>ScanWizardScanType</name>
+    <message>
+        <source>Scan Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ScanWizardScanner</name>
+    <message>
+        <source>Scanning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ScanWizard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error tuning to transport</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error detecting card type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error parsing parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ScanWizardTuningPage</name>
+    <message>
+        <source>Tuning</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ScheduledRecording</name>
+    <message>
+        <source>or later</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5985,6 +6329,14 @@ Werkt mogelijk alleen wanneer uitgevoerd in een venster.</translation>
     <message>
         <source>Sleep Off</source>
         <translation>Slaapstand uit</translation>
+    </message>
+    <message>
+        <source>Fill</source>
+        <translation type="unfinished">Vullen</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation type="unfinished">Uit</translation>
     </message>
 </context>
 <context>

@@ -43,6 +43,18 @@
         <source>No, don&apos;t</source>
         <translation>いいえ</translation>
     </message>
+    <message>
+        <source>Advanced Configuration</source>
+        <translation type="unfinished">詳細設定</translation>
+    </message>
+    <message>
+        <source>Recording Options</source>
+        <translation type="unfinished">録画オプション</translation>
+    </message>
+    <message>
+        <source>Diseqc</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CaptureCardEditor</name>
@@ -271,7 +283,7 @@
     </message>
     <message>
         <source>Record one showing of this program</source>
-        <translation>この番組を一回の放送分だけ録画する</translation>
+        <translation type="obsolete">この番組を一回の放送分だけ録画する</translation>
     </message>
     <message>
         <source>Don&apos;t record this showing</source>
@@ -284,6 +296,10 @@
     <message>
         <source>Record this showing with normal options</source>
         <translation>ノーマルオプションでこの番組を録画します</translation>
+    </message>
+    <message>
+        <source>Record one showing of this title</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -723,6 +739,26 @@
         <source>Job Options</source>
         <translation>ジョブオプション</translation>
     </message>
+    <message>
+        <source>Show group list as recording groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show group list as titles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playlist Actions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There are %1 items in the list.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shuffle Play</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PreviousBox</name>
@@ -1023,6 +1059,14 @@
         <source>Not allowed to record this showing</source>
         <translation>この番組は録画されません</translation>
     </message>
+    <message>
+        <source>Recording a showing daily</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording a showing weekly</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -1152,11 +1196,11 @@
     </message>
     <message>
         <source>Channel Recording</source>
-        <translation>チャンネル録画</translation>
+        <translation type="obsolete">チャンネル録画</translation>
     </message>
     <message>
         <source>All Recording</source>
-        <translation>全録画</translation>
+        <translation type="obsolete">全録画</translation>
     </message>
     <message>
         <source>Air Date:</source>
@@ -1268,7 +1312,7 @@
     </message>
     <message>
         <source>Automatically flag commercials after a recording completes.</source>
-        <translation>録画終了時に自動的にCMをマークする．</translation>
+        <translation type="obsolete">録画終了時に自動的にCMをマークする．</translation>
     </message>
     <message>
         <source>Strict Commercial Detection</source>
@@ -2022,15 +2066,15 @@
     </message>
     <message>
         <source>Single Recording</source>
-        <translation>一回録画</translation>
+        <translation type="obsolete">一回録画</translation>
     </message>
     <message>
         <source>Daily Recording</source>
-        <translation>毎日録画</translation>
+        <translation type="obsolete">毎日録画</translation>
     </message>
     <message>
         <source>Weekly Recording</source>
-        <translation>毎週録画</translation>
+        <translation type="obsolete">毎週録画</translation>
     </message>
     <message>
         <source>Conflicting</source>
@@ -2211,7 +2255,7 @@
     <message>
         <source>[Common] Frequency (Option has no default)
 The frequency for this channel in hz.</source>
-        <translation>[共通] 周波数 (既定値はありません)
+        <translation type="obsolete">[共通] 周波数 (既定値はありません)
 このチャンネルの周波数をHzで指定します．</translation>
     </message>
     <message>
@@ -2226,11 +2270,11 @@ The frequency for this channel in hz.</source>
     </message>
     <message>
         <source>Satellite</source>
-        <translation>衛星</translation>
+        <translation type="obsolete">衛星</translation>
     </message>
     <message>
         <source>[NONE CONFIGURED]</source>
-        <translation>[未設定]</translation>
+        <translation type="obsolete">[未設定]</translation>
     </message>
     <message>
         <source>Polarity</source>
@@ -2239,7 +2283,7 @@ The frequency for this channel in hz.</source>
     <message>
         <source>[DVB-S] Polarity (Option has no default)
 ???</source>
-        <translation>[DVB-S] 極性 (既定値はありません)
+        <translation type="obsolete">[DVB-S] 極性 (既定値はありません)
 ???</translation>
     </message>
     <message>
@@ -2288,15 +2332,15 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>6 Mhz</source>
-        <translation>6 MHz</translation>
+        <translation type="obsolete">6 MHz</translation>
     </message>
     <message>
         <source>7 Mhz</source>
-        <translation>7 MHz</translation>
+        <translation type="obsolete">7 MHz</translation>
     </message>
     <message>
         <source>8 Mhz</source>
-        <translation>8 MHz</translation>
+        <translation type="obsolete">8 MHz</translation>
     </message>
     <message>
         <source>Modulation</source>
@@ -2380,35 +2424,35 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Video</source>
-        <translation>ビデオ</translation>
+        <translation type="obsolete">ビデオ</translation>
     </message>
     <message>
         <source>Teletext</source>
-        <translation>文字放送</translation>
+        <translation type="obsolete">文字放送</translation>
     </message>
     <message>
         <source>Subtitle</source>
-        <translation>サブタイトル</translation>
+        <translation type="obsolete">サブタイトル</translation>
     </message>
     <message>
         <source>Pcr</source>
-        <translation>Pcr</translation>
+        <translation type="obsolete">Pcr</translation>
     </message>
     <message>
         <source>Service ID</source>
-        <translation>サービスID</translation>
+        <translation type="obsolete">サービスID</translation>
     </message>
     <message>
         <source>Provider ID</source>
-        <translation>プロバイダーID</translation>
+        <translation type="obsolete">プロバイダーID</translation>
     </message>
     <message>
         <source>Transport ID</source>
-        <translation>トランスポートID</translation>
+        <translation type="obsolete">トランスポートID</translation>
     </message>
     <message>
         <source>Network ID</source>
-        <translation>ネットワークID</translation>
+        <translation type="obsolete">ネットワークID</translation>
     </message>
     <message>
         <source>Channel Options - Common</source>
@@ -2420,15 +2464,15 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Channel Options - DVB</source>
-        <translation>チャンネルオプション - DVB</translation>
+        <translation type="obsolete">チャンネルオプション - DVB</translation>
     </message>
     <message>
         <source>Channel Options - DVB Pids &amp; IDs</source>
-        <translation>チャンネルオプション - DVB Pids &amp; IDs</translation>
+        <translation type="obsolete">チャンネルオプション - DVB Pids &amp; IDs</translation>
     </message>
     <message>
         <source>A comma separated list of pids for each type. Note that currently MythTV only supports recording and not playback of multiple audio or video pids. It does not support showing teletext or subtitles either, but these do not crash the player as audio and video might.</source>
-        <translation>カンマ区切りのPIDリストです．今のところMythTVは録画だけをサポートしていて，多重音声や映像のPIDの再生はサポートしていないので注意してください．文字放送やサブタイトルの表示もサポートしていませんが，プレーヤをクラッシュさせることはありません．</translation>
+        <translation type="obsolete">カンマ区切りのPIDリストです．今のところMythTVは録画だけをサポートしていて，多重音声や映像のPIDの再生はサポートしていないので注意してください．文字放送やサブタイトルの表示もサポートしていませんが，プレーヤをクラッシュさせることはありません．</translation>
     </message>
     <message>
         <source>Not Flagged</source>
@@ -2452,11 +2496,11 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Previous Recording</source>
-        <translation>前の録画</translation>
+        <translation type="obsolete">前の録画</translation>
     </message>
     <message>
         <source>Current Recording</source>
-        <translation>現在の録画</translation>
+        <translation type="obsolete">現在の録画</translation>
     </message>
     <message>
         <source>Max Recordings</source>
@@ -2642,7 +2686,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>pcHDTV ATSC capture card</source>
-        <translation>pcHDTV ATSC キャプチャーカード</translation>
+        <translation type="obsolete">pcHDTV ATSC キャプチャーカード</translation>
     </message>
     <message>
         <source>Digital Video Broadcast card (DVB)</source>
@@ -2662,43 +2706,43 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>[All VideoSources]</source>
-        <translation>[全てのビデオソース]</translation>
+        <translation type="obsolete">[全てのビデオソース]</translation>
     </message>
     <message>
         <source>[No VideoSources Defined]</source>
-        <translation>[ビデオソースが設定されていません]</translation>
+        <translation type="obsolete">[ビデオソースが設定されていません]</translation>
     </message>
     <message>
         <source>[No Channels Defined]</source>
-        <translation>[チャンネルが設定されていません]</translation>
+        <translation type="obsolete">[チャンネルが設定されていません]</translation>
     </message>
     <message>
         <source>Load &amp; Tune</source>
-        <translation>表示 &amp; 調整</translation>
+        <translation type="obsolete">表示 &amp; 調整</translation>
     </message>
     <message>
         <source>Will load the selected channel above into the previous screen, and try to tune it. If it fails to tune the channel, press back and check the settings.</source>
-        <translation>選択されたチャンネルを前の画面に表示するので，調整して下さい．調整できない場合は戻って設定を確認して下さい．</translation>
+        <translation type="obsolete">選択されたチャンネルを前の画面に表示するので，調整して下さい．調整できない場合は戻って設定を確認して下さい．</translation>
     </message>
     <message>
         <source>Tune Only</source>
-        <translation>調整のみ</translation>
+        <translation type="obsolete">調整のみ</translation>
     </message>
     <message>
         <source>Will ONLY try to tune the previous screen, not alter it. If it fails to tune, press back and check the settings.</source>
-        <translation>前の画面の調整を試みるだけで，変更はしません．調整できない場合は戻って設定を確認して下さい．</translation>
+        <translation type="obsolete">前の画面の調整を試みるだけで，変更はしません．調整できない場合は戻って設定を確認して下さい．</translation>
     </message>
     <message>
         <source>Card Verification Wizard (DVB#</source>
-        <translation>カード確認ウィザード (DVB#</translation>
+        <translation type="obsolete">カード確認ウィザード (DVB#</translation>
     </message>
     <message>
         <source>Bit Error Rate</source>
-        <translation>ビットエラーレート</translation>
+        <translation type="obsolete">ビットエラーレート</translation>
     </message>
     <message>
         <source>Uncorrected Blocks</source>
-        <translation>未訂正ブロック</translation>
+        <translation type="obsolete">未訂正ブロック</translation>
     </message>
     <message>
         <source>Signal/Noise</source>
@@ -2710,7 +2754,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>FAILED TO OPEN CARD, CHECK CONSOLE!!</source>
-        <translation>カードをオープンできませんでした．コンソールを確認して下さい!!</translation>
+        <translation type="obsolete">カードをオープンできませんでした．コンソールを確認して下さい!!</translation>
     </message>
     <message>
         <source>Advanced Configuration</source>
@@ -2802,11 +2846,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Record the TS, not PS.</source>
-        <translation>TS録画 (PSではなく)</translation>
+        <translation type="obsolete">TS録画 (PSではなく)</translation>
     </message>
     <message>
         <source>This will make the backend not perform Transport Stream to Program Stream conversion.</source>
-        <translation>バックエンドがトランスポートストリームからプログラムストリームへの変換をしないようにします．</translation>
+        <translation type="obsolete">バックエンドがトランスポートストリームからプログラムストリームへの変換をしないようにします．</translation>
     </message>
     <message>
         <source>Wait for SEQ start header.</source>
@@ -2826,11 +2870,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Channels</source>
-        <translation>チャンネル</translation>
+        <translation type="obsolete">チャンネル</translation>
     </message>
     <message>
         <source>This box contains all channels from the selected video source. Select a channel here and press the &apos;Load and Tune&apos; button to load the channel settings into the previous screen and try to tune it.</source>
-        <translation>選択したビデオソースのすべてのチャンネルが含まれています．チャンネルを選んで&apos;表示 &amp; 調整&apos;ボタンを押し，前の画面のチャンネル設定で調整してみてください．</translation>
+        <translation type="obsolete">選択したビデオソースのすべてのチャンネルが含まれています．チャンネルを選んで&apos;表示 &amp; 調整&apos;ボタンを押し，前の画面のチャンネル設定で調整してみてください．</translation>
     </message>
     <message>
         <source>Status</source>
@@ -2838,35 +2882,35 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Select the type of satellite equipment you have. Selecting &apos;Finish&apos; on this screen will only save the type, and not the individual satellite, move down to the list to do this.</source>
-        <translation>衛星機器のタイプを選択します．この画面で&apos;完了&apos;を押してもタイプしか保存されません．個々の衛星についてはリストを選択してください．</translation>
+        <translation type="obsolete">衛星機器のタイプを選択します．この画面で&apos;完了&apos;を押してもタイプしか保存されません．個々の衛星についてはリストを選択してください．</translation>
     </message>
     <message>
         <source>Satellites</source>
-        <translation>衛星</translation>
+        <translation type="obsolete">衛星</translation>
     </message>
     <message>
         <source>Select the satellite you want to configure and press the &apos;menu&apos; key, and edit the satellite, when you are done configuring, press &apos;OK&apos; to leave this wizard.</source>
-        <translation>設定したい衛星を選択し，&apos;メニュー&apos;キーを押して編集してください．設定が終わったら&apos;OK&apos;を押してウィザードを終了します．</translation>
+        <translation type="obsolete">設定したい衛星を選択し，&apos;メニュー&apos;キーを押して編集してください．設定が終わったら&apos;OK&apos;を押してウィザードを終了します．</translation>
     </message>
     <message>
         <source>Satellite Configuration</source>
-        <translation>衛星設定</translation>
+        <translation type="obsolete">衛星設定</translation>
     </message>
     <message>
         <source>Satellite Name</source>
-        <translation>衛星名</translation>
+        <translation type="obsolete">衛星名</translation>
     </message>
     <message>
         <source>A textual representation of this satellite or cluster of satellites.</source>
-        <translation>この衛星(または衛星群)の表示名．</translation>
+        <translation type="obsolete">この衛星(または衛星群)の表示名．</translation>
     </message>
     <message>
         <source>Satellite Position</source>
-        <translation>衛星位置</translation>
+        <translation type="obsolete">衛星位置</translation>
     </message>
     <message>
         <source>A textual representation of which position the satellite is located at (&apos;1W&apos;)</source>
-        <translation>衛星が(&apos;1W&apos;)に位置しているときの表示名</translation>
+        <translation type="obsolete">衛星が(&apos;1W&apos;)に位置しているときの表示名</translation>
     </message>
     <message>
         <source>LNB LOF Switch</source>
@@ -2874,7 +2918,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>This defines at what frequency (in hz) the LNB will do a switch from high to low setting, and vice versa.</source>
-        <translation>LNBが高周波から低周波に切り替わるときの周波数をHzで指定します．</translation>
+        <translation type="obsolete">LNBが高周波から低周波に切り替わるときの周波数をHzで指定します．</translation>
     </message>
     <message>
         <source>LNB LOF High</source>
@@ -2882,7 +2926,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>This defines the offset (in hz) the frequency coming from the lnb will be in high setting.</source>
-        <translation>LNBが高周波設定のときの，周波数のオフセットをHzで指定します．</translation>
+        <translation type="obsolete">LNBが高周波設定のときの，周波数のオフセットをHzで指定します．</translation>
     </message>
     <message>
         <source>LNB LOF Low</source>
@@ -2890,7 +2934,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>This defines the offset (in hz) the frequency coming from the lnb will be in low setting.</source>
-        <translation>LNBが低周波設定のときの，周波数のオフセットをHzで指定します．</translation>
+        <translation type="obsolete">LNBが低周波設定のときの，周波数のオフセットをHzで指定します．</translation>
     </message>
     <message>
         <source>Recorder Options</source>
@@ -2898,11 +2942,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Configuration Options</source>
-        <translation>設定オプション</translation>
+        <translation type="obsolete">設定オプション</translation>
     </message>
     <message>
         <source>Card Verification Wizard</source>
-        <translation>カード確認ウィザード</translation>
+        <translation type="obsolete">カード確認ウィザード</translation>
     </message>
     <message>
         <source>Capture device</source>
@@ -3250,7 +3294,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Find One Recording</source>
-        <translation>１回検索録画</translation>
+        <translation type="obsolete">１回検索録画</translation>
     </message>
     <message>
         <source>Check this option for budget BT878 based DVB-T cards such as the AverTV DVB-T that require the audio volume left alone.</source>
@@ -3302,7 +3346,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Find One Recording types will receive this additional recording priority value.</source>
-        <translation>1回検索録画にはこの録画優先順位の値が加算されます.</translation>
+        <translation type="obsolete">1回検索録画にはこの録画優先順位の値が加算されます.</translation>
     </message>
     <message>
         <source>Length of time to retain DVB signal data (in days)</source>
@@ -3710,11 +3754,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>16/9 Anamorphic</source>
-        <translation>16/9 アナモルフィック</translation>
+        <translation type="obsolete">16/9 アナモルフィック</translation>
     </message>
     <message>
         <source>4/3 Normal</source>
-        <translation>4/3 ノーマル</translation>
+        <translation type="obsolete">4/3 ノーマル</translation>
     </message>
     <message>
         <source>16/9 Zoom</source>
@@ -3726,7 +3770,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>This will override any aspect ratio in the recorded stream, the same as pressing the W Key during playback.</source>
-        <translation>これは録画再生時に使用されます。再生時にWキーを押すのと同じです。</translation>
+        <translation type="obsolete">これは録画再生時に使用されます。再生時にWキーを押すのと同じです。</translation>
     </message>
     <message>
         <source>GUI width (px)</source>
@@ -4623,7 +4667,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Record one showing of this program</source>
-        <translation>この番組を一回の放送分だけ録画する</translation>
+        <translation type="obsolete">この番組を一回の放送分だけ録画する</translation>
     </message>
     <message>
         <source>Record in this timeslot every week</source>
@@ -4743,7 +4787,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Delete oldest if this would exceede the max episodes</source>
-        <translation>最大番組数を超えたら古い方から削除する</translation>
+        <translation type="obsolete">最大番組数を超えたら古い方から削除する</translation>
     </message>
     <message>
         <source>Don&apos;t record if this would exceed the max episodes</source>
@@ -5379,7 +5423,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Follow Symlinks when deleting files</source>
-        <translation>削除するときにシンボリックリンクを辿る</translation>
+        <translation type="obsolete">削除するときにシンボリックリンクを辿る</translation>
     </message>
     <message>
         <source>This will cause Myth to follow symlinks when recordings and related files are deleted, instead of deleting the symlink and leaving the actual file.</source>
@@ -5552,6 +5596,342 @@ MythTVは終了します。</translation>
     <message>
         <source>Yes, delete my channel settings</source>
         <translation>はい、チャンネル設定を削除します</translation>
+    </message>
+    <message>
+        <source>Scan for channels(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This button will scan for digital channels.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Advanced editing options for digital channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use on air guide</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set the guide information will be taken from the On Air Channel guide.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to initialize video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error was encountered while displaying video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Return to Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Searching for Logo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>d</source>
+        <comment>RecTypeChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>w</source>
+        <comment>RecTypeChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Single Record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record Daily</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record Weekly</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Find One</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Find Daily</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Find Weekly</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>x</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previously Recorded</source>
+        <translation type="unfinished">以前の録画</translation>
+    </message>
+    <message>
+        <source>Currently Recorded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Inactive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>this recording schedule is inactive.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Find ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[Common] Frequency (Option has no default)
+The frequency for this channel in Hz.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[DVB-S] Polarity (Option has no default)
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>6 MHz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>7 MHz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>8 MHz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transport</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Capture Card</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scanning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scan Activity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record one showing of this title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record one showing of this title every week</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record one showing of this title every day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This recording schedule is inactive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This recording schedule is active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete oldest if this would exceed the max episodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record in TS format instead of PS.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disables Transport Stream to Program Stream conversion. TS recording results in slightly bigger files, but reduces the risk for processing errors.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC Input Type: (DVB-S)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the input type for DVB-S cards. Leave as Single LNB/Input for DVB-C or DVB-T. The inputs are mapped from Input Connections option on the main menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>pcHDTV capture card (HD-2000, HD-3000)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This defines at what frequency (in Hz) the LNB will do a switch from high to low setting, and vice versa.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This defines the offset (in Hz) the frequency coming from the lnb will be in high setting.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This defines the offset (in Hz) the frequency coming from the lnb will be in low setting.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC Satellite Location</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The longitude of the satellite you are aiming at.  For western hemisphere use a negative value.  Value is in decimal.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Free to air channels only.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, only free to air channels will be used.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The Latitude of your satellite dishes location on the Earth..  This is used with DiSEqC Motor Support.  Format 35.78 for 35.78 degrees North Longitude</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The Longitude of your satellite dishes location on the Earth..  This is used with DiSEqC Motor Support.  Format -78.93 for 78.93 degrees West Longitude</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Diseqc Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation type="unfinished">全て</translation>
+    </message>
+    <message>
+        <source>This is the default policy used for the Auto-Commercial Flagging setting when a new scheduled recording is created.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use libmpeg2 for decoding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, libmpeg2 will be used instead of ffmpeg for decoding MPEG-1 and MPEG-2 video frames. This can be faster. Not available when XvMC is used.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>4/3</source>
+        <translation type="unfinished">4/3</translation>
+    </message>
+    <message>
+        <source>16/9</source>
+        <translation type="unfinished">16/9</translation>
+    </message>
+    <message>
+        <source>16/9 Stretch</source>
+        <translation type="unfinished">16/9 伸張</translation>
+    </message>
+    <message>
+        <source>This will override any aspect ratio in the recorded stream, the same as pressing the W Key during playback. Fill will &quot;fill&quot; the screen with the image clipping as required. Fill is useful when using 4:3 interlaced TV&apos;s for display.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HD Ringbuffer size (KB)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The HD device ringbuffer allows the backend to weather moments of stress. The larger the ringbuffer, the longer the moments of stress can be. However, setting the size too large can cause swapping, which is detrimental.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Find One, Find Weekly and Find Daily recording types will receive this additional recording priority value.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Follow symbolic links when deleting files</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ScanProgressPopup</name>
+    <message>
+        <source>Scan Progress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tuning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ScanWizardScanType</name>
+    <message>
+        <source>Scan Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ScanWizardScanner</name>
+    <message>
+        <source>Scanning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ScanWizard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error tuning to transport</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error detecting card type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error parsing parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ScanWizardTuningPage</name>
+    <message>
+        <source>Tuning</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ScheduledRecording</name>
+    <message>
+        <source>or later</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6030,6 +6410,14 @@ MythTVは終了します。</translation>
     <message>
         <source>Sleep Off</source>
         <translation>スリープ オフ</translation>
+    </message>
+    <message>
+        <source>Fill</source>
+        <translation type="unfinished">埋める</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation type="unfinished">オフ</translation>
     </message>
 </context>
 <context>

@@ -13,6 +13,18 @@
         <source>No, don&apos;t</source>
         <translation>Non</translation>
     </message>
+    <message>
+        <source>Advanced Configuration</source>
+        <translation type="unfinished">Configuration avancée</translation>
+    </message>
+    <message>
+        <source>Recording Options</source>
+        <translation type="unfinished">Options d&apos;enregistrement</translation>
+    </message>
+    <message>
+        <source>Diseqc</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CaptureCardEditor</name>
@@ -241,7 +253,7 @@
     </message>
     <message>
         <source>Record one showing of this program</source>
-        <translation>Enregistrer une diffusion de cette émission</translation>
+        <translation type="obsolete">Enregistrer une diffusion de cette émission</translation>
     </message>
     <message>
         <source>Don&apos;t record this showing</source>
@@ -254,6 +266,10 @@
     <message>
         <source>Record this showing with normal options</source>
         <translation>Enregistrer cette émission avec les options standard</translation>
+    </message>
+    <message>
+        <source>Record one showing of this title</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -687,6 +703,26 @@
         <source>Job Options</source>
         <translation>Option de tâche</translation>
     </message>
+    <message>
+        <source>Show group list as recording groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show group list as titles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playlist Actions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There are %1 items in the list.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shuffle Play</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PreviousBox</name>
@@ -967,6 +1003,14 @@
         <source>Error!</source>
         <translation>Erreur!</translation>
     </message>
+    <message>
+        <source>Recording a showing daily</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording a showing weekly</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -1016,7 +1060,7 @@
     </message>
     <message>
         <source>Automatically flag commercials after a recording completes.</source>
-        <translation>Automatiquement identifier les pubs après un enregistrement.</translation>
+        <translation type="obsolete">Automatiquement identifier les pubs après un enregistrement.</translation>
     </message>
     <message>
         <source>Strict Commercial Detection</source>
@@ -1686,11 +1730,11 @@
     </message>
     <message>
         <source>Single Recording</source>
-        <translation>Enregistrement unique</translation>
+        <translation type="obsolete">Enregistrement unique</translation>
     </message>
     <message>
         <source>Daily Recording</source>
-        <translation>Enregistrement quotidien</translation>
+        <translation type="obsolete">Enregistrement quotidien</translation>
     </message>
     <message>
         <source>Conflicting</source>
@@ -1963,7 +2007,7 @@
     <message>
         <source>[Common] Frequency (Option has no default)
 The frequency for this channel in hz.</source>
-        <translation>[Commun]Fréquence (cette option n&apos;a pas de valeur par défaut) 
+        <translation type="obsolete">[Commun]Fréquence (cette option n&apos;a pas de valeur par défaut) 
 La fréquence de cette chaîne en Hz</translation>
     </message>
     <message>
@@ -1978,11 +2022,11 @@ La fréquence de cette chaîne en Hz</translation>
     </message>
     <message>
         <source>Satellite</source>
-        <translation>Satellite</translation>
+        <translation type="obsolete">Satellite</translation>
     </message>
     <message>
         <source>[NONE CONFIGURED]</source>
-        <translation>[RIEN CONFIGURE]</translation>
+        <translation type="obsolete">[RIEN CONFIGURE]</translation>
     </message>
     <message>
         <source>Polarity</source>
@@ -1991,7 +2035,7 @@ La fréquence de cette chaîne en Hz</translation>
     <message>
         <source>[DVB-S] Polarity (Option has no default)
 ???</source>
-        <translation>[DVB-S] Polarité (Cette option n&apos;a pas de valeur par défaut) 
+        <translation type="obsolete">[DVB-S] Polarité (Cette option n&apos;a pas de valeur par défaut) 
 ???</translation>
     </message>
     <message>
@@ -2024,15 +2068,15 @@ La fréquence de cette chaîne en Hz</translation>
     </message>
     <message>
         <source>6 Mhz</source>
-        <translation>6 MHz</translation>
+        <translation type="obsolete">6 MHz</translation>
     </message>
     <message>
         <source>7 Mhz</source>
-        <translation>7 MHz</translation>
+        <translation type="obsolete">7 MHz</translation>
     </message>
     <message>
         <source>8 Mhz</source>
-        <translation>8 MHz</translation>
+        <translation type="obsolete">8 MHz</translation>
     </message>
     <message>
         <source>Modulation</source>
@@ -2072,35 +2116,35 @@ La fréquence de cette chaîne en Hz</translation>
     </message>
     <message>
         <source>Video</source>
-        <translation>Vidéo</translation>
+        <translation type="obsolete">Vidéo</translation>
     </message>
     <message>
         <source>Teletext</source>
-        <translation>Télétexte</translation>
+        <translation type="obsolete">Télétexte</translation>
     </message>
     <message>
         <source>Subtitle</source>
-        <translation>Sous-titre</translation>
+        <translation type="obsolete">Sous-titre</translation>
     </message>
     <message>
         <source>Pcr</source>
-        <translation>Pcr</translation>
+        <translation type="obsolete">Pcr</translation>
     </message>
     <message>
         <source>Service ID</source>
-        <translation>ID de service</translation>
+        <translation type="obsolete">ID de service</translation>
     </message>
     <message>
         <source>Provider ID</source>
-        <translation>ID d&apos;opérateur</translation>
+        <translation type="obsolete">ID d&apos;opérateur</translation>
     </message>
     <message>
         <source>Transport ID</source>
-        <translation>ID de transport</translation>
+        <translation type="obsolete">ID de transport</translation>
     </message>
     <message>
         <source>Network ID</source>
-        <translation>ID de réseau</translation>
+        <translation type="obsolete">ID de réseau</translation>
     </message>
     <message>
         <source>Channel Options - Common</source>
@@ -2112,11 +2156,11 @@ La fréquence de cette chaîne en Hz</translation>
     </message>
     <message>
         <source>Channel Options - DVB</source>
-        <translation>Options de chaînes -DVB</translation>
+        <translation type="obsolete">Options de chaînes -DVB</translation>
     </message>
     <message>
         <source>Channel Options - DVB Pids &amp; IDs</source>
-        <translation>Options de chaînes - Pids et IDs de DVB</translation>
+        <translation type="obsolete">Options de chaînes - Pids et IDs de DVB</translation>
     </message>
     <message>
         <source>TXT off</source>
@@ -2348,19 +2392,19 @@ La fréquence de cette chaîne en Hz</translation>
     </message>
     <message>
         <source>Weekly Recording</source>
-        <translation>Enregistrement Hebdomadaire</translation>
+        <translation type="obsolete">Enregistrement Hebdomadaire</translation>
     </message>
     <message>
         <source>Channel Recording</source>
-        <translation>Enregistrement de chaîne</translation>
+        <translation type="obsolete">Enregistrement de chaîne</translation>
     </message>
     <message>
         <source>All Recording</source>
-        <translation>Toujours enregistré</translation>
+        <translation type="obsolete">Toujours enregistré</translation>
     </message>
     <message>
         <source>Find One Recording</source>
-        <translation>Trouver un enregistrement</translation>
+        <translation type="obsolete">Trouver un enregistrement</translation>
     </message>
     <message>
         <source>Override Recording</source>
@@ -2453,11 +2497,11 @@ La fréquence de cette chaîne en Hz</translation>
     </message>
     <message>
         <source>Previous Recording</source>
-        <translation>enregistrement précédent</translation>
+        <translation type="obsolete">enregistrement précédent</translation>
     </message>
     <message>
         <source>Current Recording</source>
-        <translation>enregistrement courant</translation>
+        <translation type="obsolete">enregistrement courant</translation>
     </message>
     <message>
         <source>Earlier Showing</source>
@@ -2845,7 +2889,7 @@ La fréquence de cette chaîne en Hz</translation>
     </message>
     <message>
         <source>Record one showing of this program</source>
-        <translation>Enregistre une diffusion de cette émission</translation>
+        <translation type="obsolete">Enregistre une diffusion de cette émission</translation>
     </message>
     <message>
         <source>Record in this timeslot every week</source>
@@ -3095,11 +3139,11 @@ Votre carte d&apos;acquisition n&apos;a pas fourni de canaux. Vous devez les sai
     </message>
     <message>
         <source>Record the TS, not PS.</source>
-        <translation>Enregistrer le TS, pas le PS.</translation>
+        <translation type="obsolete">Enregistrer le TS, pas le PS.</translation>
     </message>
     <message>
         <source>This will make the backend not perform Transport Stream to Program Stream conversion.</source>
-        <translation>Cela empêchera le BackEnd d&apos;effectuer la conversion d&apos;un Flux de Transport vers un Flux de Programme.</translation>
+        <translation type="obsolete">Cela empêchera le BackEnd d&apos;effectuer la conversion d&apos;un Flux de Transport vers un Flux de Programme.</translation>
     </message>
     <message>
         <source>Wait for SEQ start header.</source>
@@ -3127,7 +3171,7 @@ Votre carte d&apos;acquisition n&apos;a pas fourni de canaux. Vous devez les sai
     </message>
     <message>
         <source>Satellites</source>
-        <translation>Satellites</translation>
+        <translation type="obsolete">Satellites</translation>
     </message>
     <message>
         <source>Capture Card Setup</source>
@@ -3155,7 +3199,7 @@ Votre carte d&apos;acquisition n&apos;a pas fourni de canaux. Vous devez les sai
     </message>
     <message>
         <source>pcHDTV ATSC capture card</source>
-        <translation>Carte de capture ATSC pcHDTV</translation>
+        <translation type="obsolete">Carte de capture ATSC pcHDTV</translation>
     </message>
     <message>
         <source>Capture device</source>
@@ -3195,35 +3239,35 @@ Votre carte d&apos;acquisition n&apos;a pas fourni de canaux. Vous devez les sai
     </message>
     <message>
         <source>[All VideoSources]</source>
-        <translation>[Toutes les sources vidéos]</translation>
+        <translation type="obsolete">[Toutes les sources vidéos]</translation>
     </message>
     <message>
         <source>[No VideoSources Defined]</source>
-        <translation>[Aucune source vidéo définie]</translation>
+        <translation type="obsolete">[Aucune source vidéo définie]</translation>
     </message>
     <message>
         <source>Load &amp; Tune</source>
-        <translation>Charger &amp; régler</translation>
+        <translation type="obsolete">Charger &amp; régler</translation>
     </message>
     <message>
         <source>Will load the selected channel above into the previous screen, and try to tune it. If it fails to tune the channel, press back and check the settings.</source>
-        <translation>Chargera la chaîne sélectionnée dans l&apos;écran précédent et tentera de la régler. En cas d&apos;échec, pressez retour et vérifiez les réglages.</translation>
+        <translation type="obsolete">Chargera la chaîne sélectionnée dans l&apos;écran précédent et tentera de la régler. En cas d&apos;échec, pressez retour et vérifiez les réglages.</translation>
     </message>
     <message>
         <source>Tune Only</source>
-        <translation>Réglage seul</translation>
+        <translation type="obsolete">Réglage seul</translation>
     </message>
     <message>
         <source>Will ONLY try to tune the previous screen, not alter it. If it fails to tune, press back and check the settings.</source>
-        <translation>Essaiera SEULEMENT de régler l&apos;écran précédent et ne le modifiera pas. En cas d&apos;échec, appuyez sur retour et vérifiez les réglages.</translation>
+        <translation type="obsolete">Essaiera SEULEMENT de régler l&apos;écran précédent et ne le modifiera pas. En cas d&apos;échec, appuyez sur retour et vérifiez les réglages.</translation>
     </message>
     <message>
         <source>Card Verification Wizard (DVB#</source>
-        <translation>Assistant de vérification de carte (DVB Nº</translation>
+        <translation type="obsolete">Assistant de vérification de carte (DVB Nº</translation>
     </message>
     <message>
         <source>Uncorrected Blocks</source>
-        <translation>Blocs incorrects</translation>
+        <translation type="obsolete">Blocs incorrects</translation>
     </message>
     <message>
         <source>Signal/Noise</source>
@@ -3235,7 +3279,7 @@ Votre carte d&apos;acquisition n&apos;a pas fourni de canaux. Vous devez les sai
     </message>
     <message>
         <source>FAILED TO OPEN CARD, CHECK CONSOLE!!</source>
-        <translation>IMPOSSIBLE D&apos;OUVRIR LA CARTE, VEUILLEZ VÉRIFIER LA CONSOLE!!</translation>
+        <translation type="obsolete">IMPOSSIBLE D&apos;OUVRIR LA CARTE, VEUILLEZ VÉRIFIER LA CONSOLE!!</translation>
     </message>
     <message>
         <source>Advanced Configuration</source>
@@ -3247,7 +3291,7 @@ Votre carte d&apos;acquisition n&apos;a pas fourni de canaux. Vous devez les sai
     </message>
     <message>
         <source>This defines at what frequency (in hz) the LNB will do a switch from high to low setting, and vice versa.</source>
-        <translation>Cette valeur définit à quelle fréquence (en Hz), le LNB doit commuter des paramètres élevés vers les paramètres faibles et vice versa.</translation>
+        <translation type="obsolete">Cette valeur définit à quelle fréquence (en Hz), le LNB doit commuter des paramètres élevés vers les paramètres faibles et vice versa.</translation>
     </message>
     <message>
         <source>LNB LOF High</source>
@@ -3255,7 +3299,7 @@ Votre carte d&apos;acquisition n&apos;a pas fourni de canaux. Vous devez les sai
     </message>
     <message>
         <source>This defines the offset (in hz) the frequency coming from the lnb will be in high setting.</source>
-        <translation>Cette valeur défini l&apos;offset (en Hz) de la fréquence qui provient du LNB en paramétrage élevé.</translation>
+        <translation type="obsolete">Cette valeur défini l&apos;offset (en Hz) de la fréquence qui provient du LNB en paramétrage élevé.</translation>
     </message>
     <message>
         <source>LNB LOF Low</source>
@@ -3263,7 +3307,7 @@ Votre carte d&apos;acquisition n&apos;a pas fourni de canaux. Vous devez les sai
     </message>
     <message>
         <source>This defines the offset (in hz) the frequency coming from the lnb will be in low setting.</source>
-        <translation>Cette valeur défini l&apos;offset (en Hz) de la fréquence qui provient du LNB en paramétrage faible.</translation>
+        <translation type="obsolete">Cette valeur défini l&apos;offset (en Hz) de la fréquence qui provient du LNB en paramétrage faible.</translation>
     </message>
     <message>
         <source>Recorder Options</source>
@@ -3271,11 +3315,11 @@ Votre carte d&apos;acquisition n&apos;a pas fourni de canaux. Vous devez les sai
     </message>
     <message>
         <source>Configuration Options</source>
-        <translation>Options de configuration</translation>
+        <translation type="obsolete">Options de configuration</translation>
     </message>
     <message>
         <source>Card Verification Wizard</source>
-        <translation>Assistant de vérification de carte</translation>
+        <translation type="obsolete">Assistant de vérification de carte</translation>
     </message>
     <message>
         <source>Region</source>
@@ -3295,7 +3339,7 @@ Votre carte d&apos;acquisition n&apos;a pas fourni de canaux. Vous devez les sai
     </message>
     <message>
         <source>Channels</source>
-        <translation>Chaines</translation>
+        <translation type="obsolete">Chaines</translation>
     </message>
     <message>
         <source>Status</source>
@@ -3623,7 +3667,7 @@ Votre carte d&apos;acquisition n&apos;a pas fourni de canaux. Vous devez les sai
     </message>
     <message>
         <source>16/9 Anamorphic</source>
-        <translation>16/9 anamorphosé</translation>
+        <translation type="obsolete">16/9 anamorphosé</translation>
     </message>
     <message>
         <source>16/9 Zoom</source>
@@ -4410,7 +4454,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Follow Symlinks when deleting files</source>
-        <translation>Suivre les liens symboliques lors de la suppression</translation>
+        <translation type="obsolete">Suivre les liens symboliques lors de la suppression</translation>
     </message>
     <message>
         <source>This will cause Myth to follow symlinks when recordings and related files are deleted, instead of deleting the symlink and leaving the actual file.</source>
@@ -4722,7 +4766,7 @@ La plupart des cartes peuvent l&apos;autodétecter. Laisser en mode auto sauf si
     </message>
     <message>
         <source>A comma separated list of pids for each type. Note that currently MythTV only supports recording and not playback of multiple audio or video pids. It does not support showing teletext or subtitles either, but these do not crash the player as audio and video might.</source>
-        <translation>Une liste séparé par des virgule des Pids de chaque type. Notez qu&apos;actuellement, MythTV ne supporte que l&apos;enregistrement et pas la lecture de pids audio et video multiples. Il ne sait pas non plus afficher le télétexte et les sous-titres. ceci ne doit plas planter le serveur comme c&apos;est le cas pour l&apos;audio et la vidéo.</translation>
+        <translation type="obsolete">Une liste séparé par des virgule des Pids de chaque type. Notez qu&apos;actuellement, MythTV ne supporte que l&apos;enregistrement et pas la lecture de pids audio et video multiples. Il ne sait pas non plus afficher le télétexte et les sous-titres. ceci ne doit plas planter le serveur comme c&apos;est le cas pour l&apos;audio et la vidéo.</translation>
     </message>
     <message>
         <source>%1 of %2</source>
@@ -4778,7 +4822,7 @@ La plupart des cartes peuvent l&apos;autodétecter. Laisser en mode auto sauf si
     </message>
     <message>
         <source>Delete oldest if this would exceede the max episodes</source>
-        <translation>Effacer les épisodes les plus vieux si le maximum d&apos;épisode possible est dépassé</translation>
+        <translation type="obsolete">Effacer les épisodes les plus vieux si le maximum d&apos;épisode possible est dépassé</translation>
     </message>
     <message>
         <source>Reduce priority by %1</source>
@@ -4798,7 +4842,7 @@ La plupart des cartes peuvent l&apos;autodétecter. Laisser en mode auto sauf si
     </message>
     <message>
         <source>Select the satellite you want to configure and press the &apos;menu&apos; key, and edit the satellite, when you are done configuring, press &apos;OK&apos; to leave this wizard.</source>
-        <translation>Sélectionner le satellite que vous voulez configurer et pressez la touche \&quot;menu\&quot; pour éditer le satellite. Lorsque vous avez fini, appuyer sur \&quot;OK\&quot; pour quitter cet assistant.</translation>
+        <translation type="obsolete">Sélectionner le satellite que vous voulez configurer et pressez la touche \&quot;menu\&quot; pour éditer le satellite. Lorsque vous avez fini, appuyer sur \&quot;OK\&quot; pour quitter cet assistant.</translation>
     </message>
     <message>
         <source>Leave this blank unless you have an external tuner that is connected to the tuner input of your card. If so, you will need to specify the preset channel for the signal (normally 3 or 4).</source>
@@ -4826,11 +4870,11 @@ La plupart des cartes peuvent l&apos;autodétecter. Laisser en mode auto sauf si
     </message>
     <message>
         <source>[No Channels Defined]</source>
-        <translation>[Aucune chaîne de définie]</translation>
+        <translation type="obsolete">[Aucune chaîne de définie]</translation>
     </message>
     <message>
         <source>Bit Error Rate</source>
-        <translation>Taux d&apos;erreur</translation>
+        <translation type="obsolete">Taux d&apos;erreur</translation>
     </message>
     <message>
         <source>Default input</source>
@@ -4838,7 +4882,7 @@ La plupart des cartes peuvent l&apos;autodétecter. Laisser en mode auto sauf si
     </message>
     <message>
         <source>This box contains all channels from the selected video source. Select a channel here and press the &apos;Load and Tune&apos; button to load the channel settings into the previous screen and try to tune it.</source>
-        <translation>Cette boite contient toutes les chaines de la source vidéo sélectionnée. Sélectionnez une chaine ici et appuyer sur le bouton \&quot;Load and Tune\&quot; pour charger les paramètres du canal dans l&apos;écran précédent et les affiner.</translation>
+        <translation type="obsolete">Cette boite contient toutes les chaines de la source vidéo sélectionnée. Sélectionnez une chaine ici et appuyer sur le bouton \&quot;Load and Tune\&quot; pour charger les paramètres du canal dans l&apos;écran précédent et les affiner.</translation>
     </message>
     <message>
         <source>Independent Muting of Left and Right Audio Channels</source>
@@ -4898,7 +4942,7 @@ La plupart des cartes peuvent l&apos;autodétecter. Laisser en mode auto sauf si
     </message>
     <message>
         <source>4/3 Normal</source>
-        <translation>Normal 4/3</translation>
+        <translation type="obsolete">Normal 4/3</translation>
     </message>
     <message>
         <source>Separate video modes for GUI and TV playback</source>
@@ -5170,7 +5214,7 @@ La plupart des cartes peuvent l&apos;autodétecter. Laisser en mode auto sauf si
     </message>
     <message>
         <source>Select the type of satellite equipment you have. Selecting &apos;Finish&apos; on this screen will only save the type, and not the individual satellite, move down to the list to do this.</source>
-        <translation>Sélectionner le type d&apos;équipement satellite que vous possédez. Choisir &apos;Fin&apos; sur cet écran ne sauvera que le type, et non le satellite individuel. Il faut descendre dans la liste afin de réaliser cette opération.</translation>
+        <translation type="obsolete">Sélectionner le type d&apos;équipement satellite que vous possédez. Choisir &apos;Fin&apos; sur cet écran ne sauvera que le type, et non le satellite individuel. Il faut descendre dans la liste afin de réaliser cette opération.</translation>
     </message>
     <message>
         <source>Digital Video Broadcast card (DVB)</source>
@@ -5182,23 +5226,23 @@ La plupart des cartes peuvent l&apos;autodétecter. Laisser en mode auto sauf si
     </message>
     <message>
         <source>Satellite Configuration</source>
-        <translation>Configuration du satellite</translation>
+        <translation type="obsolete">Configuration du satellite</translation>
     </message>
     <message>
         <source>Satellite Name</source>
-        <translation>Nom du satellite</translation>
+        <translation type="obsolete">Nom du satellite</translation>
     </message>
     <message>
         <source>A textual representation of this satellite or cluster of satellites.</source>
-        <translation>Une représentation textuelle de ce satellite ou de cette grappe de satellites.</translation>
+        <translation type="obsolete">Une représentation textuelle de ce satellite ou de cette grappe de satellites.</translation>
     </message>
     <message>
         <source>Satellite Position</source>
-        <translation>Position du satellite</translation>
+        <translation type="obsolete">Position du satellite</translation>
     </message>
     <message>
         <source>A textual representation of which position the satellite is located at (&apos;1W&apos;)</source>
-        <translation>Une représentation textuelle de la position de ce satellite (&apos;1W&apos;)</translation>
+        <translation type="obsolete">Une représentation textuelle de la position de ce satellite (&apos;1W&apos;)</translation>
     </message>
     <message>
         <source>Video source name</source>
@@ -5238,7 +5282,7 @@ La plupart des cartes peuvent l&apos;autodétecter. Laisser en mode auto sauf si
     </message>
     <message>
         <source>This will override any aspect ratio in the recorded stream, the same as pressing the W Key during playback.</source>
-        <translation>Permet de surcharger n&apos;importe quel format d&apos;image défini dans un enregistrement, c&apos;est le même résultat que l&apos;utilisation de la touche W durant la lecture.</translation>
+        <translation type="obsolete">Permet de surcharger n&apos;importe quel format d&apos;image défini dans un enregistrement, c&apos;est le même résultat que l&apos;utilisation de la touche W durant la lecture.</translation>
     </message>
     <message>
         <source>Display Size - Width</source>
@@ -5270,7 +5314,7 @@ La plupart des cartes peuvent l&apos;autodétecter. Laisser en mode auto sauf si
     </message>
     <message>
         <source>Find One Recording types will receive this additional recording priority value.</source>
-        <translation>Les types \&quot;trouver un enregistrement\&quot; reçoivent cette valeur de priorité supplémentaire.</translation>
+        <translation type="obsolete">Les types \&quot;trouver un enregistrement\&quot; reçoivent cette valeur de priorité supplémentaire.</translation>
     </message>
     <message>
         <source>If enabled, the Select key will change the channel while using the program guide during live TV.  If disabled, the select key will bring up the recording options screen.</source>
@@ -5415,6 +5459,342 @@ La plupart des cartes peuvent l&apos;autodétecter. Laisser en mode auto sauf si
     <message>
         <source>Yes, delete my channel settings</source>
         <translation>Oui, effacer mes paramètres de chaînes</translation>
+    </message>
+    <message>
+        <source>Scan for channels(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This button will scan for digital channels.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Advanced editing options for digital channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use on air guide</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set the guide information will be taken from the On Air Channel guide.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to initialize video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error was encountered while displaying video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Return to Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Searching for Logo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>d</source>
+        <comment>RecTypeChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>w</source>
+        <comment>RecTypeChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Single Record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record Daily</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record Weekly</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Find One</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Find Daily</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Find Weekly</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>x</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previously Recorded</source>
+        <translation type="unfinished">Précédemment enregistré</translation>
+    </message>
+    <message>
+        <source>Currently Recorded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Inactive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>this recording schedule is inactive.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Find ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[Common] Frequency (Option has no default)
+The frequency for this channel in Hz.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[DVB-S] Polarity (Option has no default)
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>6 MHz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>7 MHz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>8 MHz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transport</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Capture Card</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scanning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scan Activity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record one showing of this title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record one showing of this title every week</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record one showing of this title every day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This recording schedule is inactive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This recording schedule is active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete oldest if this would exceed the max episodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record in TS format instead of PS.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disables Transport Stream to Program Stream conversion. TS recording results in slightly bigger files, but reduces the risk for processing errors.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC Input Type: (DVB-S)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the input type for DVB-S cards. Leave as Single LNB/Input for DVB-C or DVB-T. The inputs are mapped from Input Connections option on the main menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>pcHDTV capture card (HD-2000, HD-3000)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This defines at what frequency (in Hz) the LNB will do a switch from high to low setting, and vice versa.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This defines the offset (in Hz) the frequency coming from the lnb will be in high setting.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This defines the offset (in Hz) the frequency coming from the lnb will be in low setting.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC Satellite Location</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The longitude of the satellite you are aiming at.  For western hemisphere use a negative value.  Value is in decimal.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Free to air channels only.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, only free to air channels will be used.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The Latitude of your satellite dishes location on the Earth..  This is used with DiSEqC Motor Support.  Format 35.78 for 35.78 degrees North Longitude</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The Longitude of your satellite dishes location on the Earth..  This is used with DiSEqC Motor Support.  Format -78.93 for 78.93 degrees West Longitude</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Diseqc Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation type="unfinished">Tout</translation>
+    </message>
+    <message>
+        <source>This is the default policy used for the Auto-Commercial Flagging setting when a new scheduled recording is created.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use libmpeg2 for decoding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, libmpeg2 will be used instead of ffmpeg for decoding MPEG-1 and MPEG-2 video frames. This can be faster. Not available when XvMC is used.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>4/3</source>
+        <translation type="unfinished">4/3</translation>
+    </message>
+    <message>
+        <source>16/9</source>
+        <translation type="unfinished">16/9</translation>
+    </message>
+    <message>
+        <source>16/9 Stretch</source>
+        <translation type="unfinished">Étirement 16/9</translation>
+    </message>
+    <message>
+        <source>This will override any aspect ratio in the recorded stream, the same as pressing the W Key during playback. Fill will &quot;fill&quot; the screen with the image clipping as required. Fill is useful when using 4:3 interlaced TV&apos;s for display.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HD Ringbuffer size (KB)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The HD device ringbuffer allows the backend to weather moments of stress. The larger the ringbuffer, the longer the moments of stress can be. However, setting the size too large can cause swapping, which is detrimental.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Find One, Find Weekly and Find Daily recording types will receive this additional recording priority value.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Follow symbolic links when deleting files</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ScanProgressPopup</name>
+    <message>
+        <source>Scan Progress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tuning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Annuler</translation>
+    </message>
+</context>
+<context>
+    <name>ScanWizardScanType</name>
+    <message>
+        <source>Scan Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ScanWizardScanner</name>
+    <message>
+        <source>Scanning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ScanWizard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error tuning to transport</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error detecting card type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error parsing parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ScanWizardTuningPage</name>
+    <message>
+        <source>Tuning</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ScheduledRecording</name>
+    <message>
+        <source>or later</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5889,6 +6269,14 @@ La plupart des cartes peuvent l&apos;autodétecter. Laisser en mode auto sauf si
     <message>
         <source>TXT</source>
         <translation>TXT</translation>
+    </message>
+    <message>
+        <source>Fill</source>
+        <translation type="unfinished">Remplir</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation type="unfinished">Éteint</translation>
     </message>
 </context>
 <context>

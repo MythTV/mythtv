@@ -13,6 +13,18 @@
         <source>No, don&apos;t</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Advanced Configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Diseqc</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CaptureCardEditor</name>
@@ -240,10 +252,6 @@
         <translation>Para ver a lista dos programas que vão dar de seguida, use a tecla &apos;5&apos;</translation>
     </message>
     <message>
-        <source>Record one showing of this program</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Don&apos;t record this showing</source>
         <translation type="unfinished"></translation>
     </message>
@@ -253,6 +261,10 @@
     </message>
     <message>
         <source>Record this showing with normal options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record one showing of this title</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -687,6 +699,26 @@
         <source>Job Options</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Show group list as recording groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show group list as titles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playlist Actions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There are %1 items in the list.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shuffle Play</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PreviousBox</name>
@@ -971,6 +1003,14 @@
         <source>Not allowed to record this showing</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Recording a showing daily</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording a showing weekly</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -1187,10 +1227,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Automatically flag commercials after a recording completes.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Strict Commercial Detection</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1260,11 +1296,11 @@
     </message>
     <message>
         <source>Channel Recording</source>
-        <translation type="unfinished">Gravar neste Canal</translation>
+        <translation type="obsolete">Gravar neste Canal</translation>
     </message>
     <message>
         <source>All Recording</source>
-        <translation type="unfinished">Gravar em Todos os Canais</translation>
+        <translation type="obsolete">Gravar em Todos os Canais</translation>
     </message>
     <message>
         <source>Air Date:</source>
@@ -1964,16 +2000,8 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Single Recording</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Daily Recording</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Weekly Recording</source>
-        <translation type="unfinished">Gravação Semanal</translation>
+        <translation type="obsolete">Gravação Semanal</translation>
     </message>
     <message>
         <source>Conflicting</source>
@@ -2133,14 +2161,6 @@
     </message>
     <message>
         <source>Recording</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Previous Recording</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Current Recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2356,11 +2376,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>[Common] Frequency (Option has no default)
-The frequency for this channel in hz.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Symbol Rate</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2370,20 +2385,7 @@ The frequency for this channel in hz.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Satellite</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>[NONE CONFIGURED]</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Polarity</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>[DVB-S] Polarity (Option has no default)
-???</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2426,18 +2428,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>[DVB-C/T] Bandwidth (Default: Auto)
 ???</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>6 Mhz</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>7 Mhz</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>8 Mhz</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2513,55 +2503,11 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Video</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Teletext</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Subtitle</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Pcr</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Service ID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Provider ID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Transport ID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Network ID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Channel Options - Common</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Channel Options - Video 4 Linux</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Channel Options - DVB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Channel Options - DVB Pids &amp; IDs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>A comma separated list of pids for each type. Note that currently MythTV only supports recording and not playback of multiple audio or video pids. It does not support showing teletext or subtitles either, but these do not crash the player as audio and video might.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2638,10 +2584,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>pcHDTV ATSC capture card</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Digital Video Broadcast card (DVB)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2658,55 +2600,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>[All VideoSources]</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>[No VideoSources Defined]</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>[No Channels Defined]</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Load &amp; Tune</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Will load the selected channel above into the previous screen, and try to tune it. If it fails to tune the channel, press back and check the settings.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Tune Only</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Will ONLY try to tune the previous screen, not alter it. If it fails to tune, press back and check the settings.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Card Verification Wizard (DVB#</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Bit Error Rate</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Uncorrected Blocks</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Signal/Noise</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Signal Strength</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>FAILED TO OPEN CARD, CHECK CONSOLE!!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2798,14 +2696,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Record the TS, not PS.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This will make the backend not perform Transport Stream to Program Stream conversion.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Normally the dvb-recording will drop packets from the card untill a sequence start header is seen. This option turns off this feature.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2818,47 +2708,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Channels</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This box contains all channels from the selected video source. Select a channel here and press the &apos;Load and Tune&apos; button to load the channel settings into the previous screen and try to tune it.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Status</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select the type of satellite equipment you have. Selecting &apos;Finish&apos; on this screen will only save the type, and not the individual satellite, move down to the list to do this.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Satellites</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select the satellite you want to configure and press the &apos;menu&apos; key, and edit the satellite, when you are done configuring, press &apos;OK&apos; to leave this wizard.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Satellite Configuration</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Satellite Name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>A textual representation of this satellite or cluster of satellites.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Satellite Position</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>A textual representation of which position the satellite is located at (&apos;1W&apos;)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2866,15 +2716,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This defines at what frequency (in hz) the LNB will do a switch from high to low setting, and vice versa.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>LNB LOF High</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This defines the offset (in hz) the frequency coming from the lnb will be in high setting.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2882,19 +2724,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This defines the offset (in hz) the frequency coming from the lnb will be in low setting.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Recorder Options</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Configuration Options</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Card Verification Wizard</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3150,10 +2980,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Find One Recording</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Check this option for budget BT878 based DVB-T cards such as the AverTV DVB-T that require the audio volume left alone.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3163,10 +2989,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Find One Recordings Priority</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Find One Recording types will receive this additional recording priority value.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3630,23 +3452,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>16/9 Anamorphic</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>4/3 Normal</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>16/9 Zoom</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>4/3 Zoom</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This will override any aspect ratio in the recorded stream, the same as pressing the W Key during playback.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4495,10 +4305,6 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Record one showing of this program</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Record in this timeslot every week</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4612,10 +4418,6 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Don&apos;t allow auto expire</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Delete oldest if this would exceede the max episodes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5238,10 +5040,6 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Follow Symlinks when deleting files</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>This will cause Myth to follow symlinks when recordings and related files are deleted, instead of deleting the symlink and leaving the actual file.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5399,6 +5197,342 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Yes, delete my channel settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scan for channels(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This button will scan for digital channels.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Advanced editing options for digital channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use on air guide</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set the guide information will be taken from the On Air Channel guide.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to initialize video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error was encountered while displaying video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Return to Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Searching for Logo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>d</source>
+        <comment>RecTypeChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>w</source>
+        <comment>RecTypeChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Single Record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record Daily</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record Weekly</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Find One</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Find Daily</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Find Weekly</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>x</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previously Recorded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Currently Recorded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Inactive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>this recording schedule is inactive.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Find ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[Common] Frequency (Option has no default)
+The frequency for this channel in Hz.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[DVB-S] Polarity (Option has no default)
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>6 MHz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>7 MHz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>8 MHz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transport</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Capture Card</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scanning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scan Activity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record one showing of this title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record one showing of this title every week</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record one showing of this title every day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This recording schedule is inactive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This recording schedule is active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete oldest if this would exceed the max episodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record in TS format instead of PS.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disables Transport Stream to Program Stream conversion. TS recording results in slightly bigger files, but reduces the risk for processing errors.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC Input Type: (DVB-S)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the input type for DVB-S cards. Leave as Single LNB/Input for DVB-C or DVB-T. The inputs are mapped from Input Connections option on the main menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>pcHDTV capture card (HD-2000, HD-3000)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This defines at what frequency (in Hz) the LNB will do a switch from high to low setting, and vice versa.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This defines the offset (in Hz) the frequency coming from the lnb will be in high setting.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This defines the offset (in Hz) the frequency coming from the lnb will be in low setting.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC Satellite Location</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The longitude of the satellite you are aiming at.  For western hemisphere use a negative value.  Value is in decimal.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Free to air channels only.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, only free to air channels will be used.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The Latitude of your satellite dishes location on the Earth..  This is used with DiSEqC Motor Support.  Format 35.78 for 35.78 degrees North Longitude</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The Longitude of your satellite dishes location on the Earth..  This is used with DiSEqC Motor Support.  Format -78.93 for 78.93 degrees West Longitude</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Diseqc Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the default policy used for the Auto-Commercial Flagging setting when a new scheduled recording is created.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use libmpeg2 for decoding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, libmpeg2 will be used instead of ffmpeg for decoding MPEG-1 and MPEG-2 video frames. This can be faster. Not available when XvMC is used.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>4/3</source>
+        <translation type="unfinished">4/3</translation>
+    </message>
+    <message>
+        <source>16/9</source>
+        <translation type="unfinished">16/9</translation>
+    </message>
+    <message>
+        <source>16/9 Stretch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This will override any aspect ratio in the recorded stream, the same as pressing the W Key during playback. Fill will &quot;fill&quot; the screen with the image clipping as required. Fill is useful when using 4:3 interlaced TV&apos;s for display.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HD Ringbuffer size (KB)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The HD device ringbuffer allows the backend to weather moments of stress. The larger the ringbuffer, the longer the moments of stress can be. However, setting the size too large can cause swapping, which is detrimental.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Find One, Find Weekly and Find Daily recording types will receive this additional recording priority value.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Follow symbolic links when deleting files</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ScanProgressPopup</name>
+    <message>
+        <source>Scan Progress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tuning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Cancelar</translation>
+    </message>
+</context>
+<context>
+    <name>ScanWizardScanType</name>
+    <message>
+        <source>Scan Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ScanWizardScanner</name>
+    <message>
+        <source>Scanning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ScanWizard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error tuning to transport</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error detecting card type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error parsing parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ScanWizardTuningPage</name>
+    <message>
+        <source>Tuning</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ScheduledRecording</name>
+    <message>
+        <source>or later</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5877,6 +6011,14 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Sleep Off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fill</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Off</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
