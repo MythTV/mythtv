@@ -18,7 +18,7 @@ using namespace std;
 
 bool HouseKeeper_filldb_running = false;
 
-void reapChild(int sig)
+void reapChild(int /* sig */)
 {
     (void)wait(0);
     HouseKeeper_filldb_running = false;
