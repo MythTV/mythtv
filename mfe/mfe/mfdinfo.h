@@ -33,16 +33,27 @@ class MfdInfo
     void                    setPreviousTreePosition(QStringList tree_list){previous_tree_position = tree_list;}
     QStringList             getPreviousTreePosition(){return previous_tree_position;}
     
+    bool                    getShowingMenu(){return showing_menu;}
+    void                    setShowingMenu(bool y_or_n){showing_menu = y_or_n;}
+    
     AudioMetadata*          getAudioMetadata(int collection_id, int item_id);
 
+    void                    setCurrentPlayingData(int which_container, int which_metadata, int numb_seconds);
+    QString                 getPlayingString(){return playing_string;}
+    void                    clearCurrentPlayingData(){playing_string = "";}
+    double                  getPercentPlayed(){return played_percentage;}
+    
   private:
   
     int         id;
     QString     name;
     QString     host;
+    bool        showing_menu;
 
     MfdContentCollection *mfd_content_collection;
     QStringList previous_tree_position;
+    QString playing_string;
+    double      played_percentage;
 };
 
 

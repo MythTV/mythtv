@@ -47,10 +47,15 @@
                 <area>100,12,600,40</area>
                 <value>M for Menu ... should scroll</value>
             </textarea>
-            <image name="mfe_time_bar" draworder="0" fleximage="no">
-                <filename>mfe_time_bar.png</filename>
+
+            <statusbar name="time_progress" draworder="0" whitespace="15">
+                <context>-1</context>
+                <container fleximage="no">mfe_time_bar_back.png</container>
+                <fill>mfe_time_bar.png</fill>
                 <position>58,64</position>
-            </image>
+                <orientation>LeftToRight</orientation>
+            </statusbar>
+
         </container>
 
     

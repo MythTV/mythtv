@@ -53,6 +53,9 @@ class MfeDialog : public MythThemedDialog
 
     void wireUpTheme();
     void connectUpMfd();    
+    void syncToCurrentMfd();
+    void updateConnectionList();
+    void switchToMfd(int an_mfd_id);
     
     MfdInterface    *mfd_interface;   
 
@@ -89,7 +92,9 @@ class MfeDialog : public MythThemedDialog
     //  GUI widgets
     //
     
-    UITextType *current_mfd_text;
+    UITextType       *current_mfd_text;
+    UITextType       *now_playing_text;
+    UIStatusBarType  *time_progress;
 };
 
 
