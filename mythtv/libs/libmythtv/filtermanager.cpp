@@ -477,7 +477,8 @@ VideoFilter * FilterManager::LoadFilter(FilterInfo *FiltInfo,
         VERBOSE(VB_IMPORTANT, QString("FilterManager: dlopen did not report "
                 "an error, but returned NULL for symbol '%1' from shared "
                 "library '%2'")
-                .arg(FiltInfo->symbol,FiltInfo->libname));
+                .arg(FiltInfo->symbol)
+		.arg(FiltInfo->libname));
         return NULL;
     }
 
