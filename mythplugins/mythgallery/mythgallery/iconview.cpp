@@ -46,6 +46,32 @@ extern "C" {
 #endif
 
 
+int ThumbItem::GetRotationAngle(QSqlDatabase *db)
+{
+    QSqlQuery query(QString::null, db);
+    query.prepare("SELECT angle FROM gallerymetadata WHERE "
+                  "image = :PATH ;");
+    query.bindValue(":PATH", path.utf8());
+
+    if (query.exec() && query.isActive() && query.size() > 0)
+    {
+        query.next();
+        return query.value(0).toInt();
+    }
+
+    return GalleryUtil::getNaturalRotation(path);
+}
+
+void ThumbItem::SetRotationAngle(int angle, QSqlDatabase *db)
+{
+    QSqlQuery query(QString::null, db);
+    query.prepare("REPLACE INTO gallerymetadata SET image = :IMAGE , "
+                  "angle = :ANGLE ;");
+    query.bindValue(":IMAGE", path.utf8());
+    query.bindValue(":ANGLE", angle);
+    query.exec();
+}
+
 IconView::IconView(QSqlDatabase *db, const QString& galleryDir,
                    MythMainWindow* parent, const char* name )
     : MythDialog(parent, name)
