@@ -163,15 +163,15 @@
     <name>MythContext</name>
     <message>
         <source>Connection to the master backend server timed out.  You probably should modify the Mater Server setting in the setup program and set the proper IP address there.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tiempo de espera agotado para conectar con el backend. Probablemente debes de configurar correctamente la dirección IP.</translation>
     </message>
     <message>
         <source>Could not connect to the master backend server -- is it running?  Is the IP address set for it in the setup program correct?</source>
-        <translation type="unfinished"></translation>
+        <translation>No puedo conectar con el servidor backend, ¿está funcionando? ¿La IP establecida en la configuración es la correcta?</translation>
     </message>
     <message>
         <source>The connection to the master backend server has gone away for some reason.. Is it running?</source>
-        <translation type="unfinished"></translation>
+        <translation>Se perdió la conexión con el backend por alguna razón.... ¿está funcionando?</translation>
     </message>
 </context>
 <context>
@@ -1172,7 +1172,7 @@
     </message>
     <message>
         <source>4:3 Zoom</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoom 4:3</translation>
     </message>
 </context>
 <context>

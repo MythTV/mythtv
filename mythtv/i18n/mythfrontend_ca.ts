@@ -163,15 +163,15 @@
     <name>MythContext</name>
     <message>
         <source>Connection to the master backend server timed out.  You probably should modify the Mater Server setting in the setup program and set the proper IP address there.</source>
-        <translation type="unfinished"></translation>
+        <translation>La connexió amb el backend ha fallat. Probablement hauries de comprovar que tens d&apos;adreça IP correcta a la configuració.</translation>
     </message>
     <message>
         <source>Could not connect to the master backend server -- is it running?  Is the IP address set for it in the setup program correct?</source>
-        <translation type="unfinished"></translation>
+        <translation>No puc connectar al servidor backend... el tens funcionant? tens l&apos;adreça IP ben configurada?</translation>
     </message>
     <message>
         <source>The connection to the master backend server has gone away for some reason.. Is it running?</source>
-        <translation type="unfinished"></translation>
+        <translation>He perdut la connexió amb el servidor backend. Està funcionant?</translation>
     </message>
 </context>
 <context>
@@ -1224,7 +1224,7 @@
     </message>
     <message>
         <source>4:3 Zoom</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoom 4:3</translation>
     </message>
 </context>
 <context>

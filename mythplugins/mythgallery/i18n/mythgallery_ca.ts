@@ -74,7 +74,7 @@
     </message>
     <message>
         <source>Slideshow Delay</source>
-        <translation type="unfinished"></translation>
+        <translation>Temps d&apos;espera</translation>
     </message>
 </context>
 <context>

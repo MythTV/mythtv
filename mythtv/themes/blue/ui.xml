@@ -761,6 +761,8 @@
         <value lang="DK">Kanal rangering</value>
         <value lang="PT">Ordenação de Canais</value>
         <value lang="SV">Kanalrankning</value>
+        <value lang="CA">Rànquing de canals</value>
+        <value lang="ES">Ranking de canales</value>
       </textarea>
       <image name="filler" draworder="0" fleximage="yes">
         <filename>rk-background.png</filename>
@@ -774,6 +776,8 @@
         <value lang="DK">(1) Sortér efter Titel  (2) Sortér efter Rang</value>
         <value lang="PT">(1) Ordenar por Canal  (2) Ordenar por Preferência</value>
         <value lang="SV">(1) Sortera efter titel  (2) Sortera efter rank</value>
+        <value lang="ES">(1) Ordenar por Canal  (2) Ordenar por Preferencia</value>
+        <value lang="CA">(1) Ordenar per Canal  (2) Ordenar per Preferència</value>
       </textarea>
     </container>
 
@@ -819,6 +823,8 @@
         <value lang="DK">Rang:</value>
         <value lang="PT">Preferência:</value>
         <value lang="SV">Rank:</value>
+        <value lang="ES">Ranking:</value>
+        <value lang="CA">Rànquing:</value>
       </textarea>
       <textarea name="rank" draworder="6">
         <area>200,90,400,30</area>
@@ -947,6 +953,8 @@
         <value lang="DK">Program rangering</value>
         <value lang="PT">Programas Preferenciais</value>
         <value lang="SV">Programrankning</value>
+        <value lang="CA">Rànquing per programes</value>
+        <value lang="ES">Ranking por programas</value>
       </textarea>
       <textarea name="ranklabel" draworder="0">
         <area>625,20,800,40</area>
@@ -956,6 +964,8 @@
         <value lang="DK">Rang</value>
         <value lang="PT">Preferência</value>
         <value lang="SV">Rank</value>
+        <value lang="ES">Ranking</value>
+        <value lang="CA">Rànquing</value>
       </textarea>
       <textarea name="finalranklabel" draworder="0">
         <area>690,20,800,40</area>
@@ -965,6 +975,8 @@
         <value lang="DK">Slutrang</value>
         <value lang="PT">Preferência Final</value>
         <value lang="SV">Slutrank</value>
+        <value lang="CA">Rànquing final</value>
+        <value lang="ES">Ranking final</value>
       </textarea>
       <image name="filler" draworder="0" fleximage="yes">
         <filename>rk-background.png</filename>
@@ -978,6 +990,8 @@
         <value lang="DK">(1) Sortér efter Titel  (2) Sortér efter Rang</value>
         <value lang="PT">(1) Ordenar por Título  (2) Ordenar por Preferência</value>
         <value lang="SV">(1) Sortera efter titel  (2) Sortera efter rank</value>
+        <value lang="ES">(1) Ordenar por Título  (2) Ordenar por Preferencia</value>
+        <value lang="CA">(1) Ordenar per Títol  (2) Ordenar per Preferència</value>
       </textarea>
     </container>
 
@@ -1023,6 +1037,8 @@
         <value lang="DK">Optagelsestype:</value>
         <value lang="PT">Tipo de Gravação:</value>
         <value lang="SV">Inspelningstyp:</value>
+        <value lang="CA">Tipus de gravació:</value>
+        <value lang="ES">Tipo de grabación:</value>
       </textarea>
       <textarea name="type" draworder="6">
         <area>200,70,430,30</area>
@@ -1054,6 +1070,8 @@
         <value lang="DK">Kanal:</value>
         <value lang="PT">Canal:</value>
         <value lang="SV">Kanal:</value>
+        <value lang="ES">Canal:</value>
+        <value lang="CA">Canal:</value>
       </textarea>
       <textarea name="channel" draworder="6">
         <area>200,100,400,30</area>
@@ -1085,6 +1103,8 @@
         <value lang="DK">Rang:</value>
         <value lang="PT">Preferência:</value>
         <value lang="SV">Rank:</value>
+        <value lang="ES">Ranking:</value>
+        <value lang="CA">Rànquing:</value>
       </textarea>
       <textarea name="rank" draworder="6">
         <area>200,130,400,30</area>
@@ -1803,6 +1823,8 @@
         <value>Program Listings</value>
         <value lang="PT">Lista de Programas</value>
         <value lang="SV">Programlistning</value>
+        <value lang="CA">Llista de programes</value>
+        <value lang="ES">Lista de Programas</value>
       </textarea>
       <image name="filler" draworder="0" fleximage="yes">
         <filename>rk-background.png</filename>
@@ -1862,6 +1884,8 @@
          <value lang="DK">Ingen visninger af dette program fundet. </value>
          <value lang="PT">Não foram encontradas listas para este programa.</value>
          <value lang="SV">Inga visningar funna av detta program. </value>
+         <value lang="ES">No se encuentra este programa en la lista.</value>
+         <value lang="CA">Aquest programa no el trovo llistat.</value>
          <multiline>yes</multiline>
       </textarea>
     </container>
