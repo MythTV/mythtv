@@ -252,7 +252,7 @@ void VideoBrowser::RefreshMovieList()
     updateML = true;
     m_list.clear();
 
-    QString thequery = QString("SELECT intid FROM %1 %2 %3")
+    QString thequery = QString("SELECT intid, browse FROM %1 %2 %3")
 		.arg(currentVideoFilter->BuildClauseFrom())
 		.arg(currentVideoFilter->BuildClauseWhere())
 		.arg(currentVideoFilter->BuildClauseOrderBy());
@@ -264,15 +264,19 @@ void VideoBrowser::RefreshMovieList()
     {
         while (query.next())
         {
-           unsigned int idnum = query.value(0).toUInt();
-
-           myData = new Metadata();
-           myData->setID(idnum);
-           myData->fillDataFromID(db);
-           if (myData->ShowLevel() <= currentParentalLevel && myData->ShowLevel() != 0)
-               m_list.append(*myData);
-
-           delete myData;
+            unsigned int idnum = query.value(0).toUInt();
+            bool is_browsable = query.value(1).toBool();
+            if(is_browsable)
+            {
+                myData = new Metadata();
+                myData->setID(idnum);
+                myData->fillDataFromID(db);
+                if (myData->ShowLevel() <= currentParentalLevel && myData->ShowLevel() != 0)
+                {
+                    m_list.append(*myData);
+                }
+                delete myData;
+            }
         }
     }
     updateML = false;
