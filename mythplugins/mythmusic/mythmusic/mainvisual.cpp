@@ -17,14 +17,11 @@
 #include <qpainter.h>
 #include <qevent.h>
 #include <qapplication.h>
-#include <qcheckbox.h>
-#include <qradiobutton.h>
-#include <qsettings.h>
 #include <qspinbox.h>
 #include <qpixmap.h>
-#include <qimage.h>
 #include <qcursor.h>
 #include <qstring.h>
+#include <qregexp.h>
 
 #include <math.h>
 #include <stdio.h>
@@ -126,6 +123,8 @@ void MainVisual::setVis( VisualBase *newvis )
 int MainVisual::numVisualizers( void ) const
 {
     QString visualname = gContext->GetSetting("VisualMode");
+    visualname.simplifyWhiteSpace();
+    visualname.replace(QRegExp("\\s"), ",");
     QStringList visualizers = QStringList::split(",", visualname);
 
     if (visualizers.contains("Random"))

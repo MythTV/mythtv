@@ -1,4 +1,5 @@
 #include <qapplication.h>
+#include <qregexp.h>
 #include <stdlib.h>
 #include <iostream>
 using namespace std;
@@ -129,6 +130,9 @@ PlaybackBox::PlaybackBox(QString window_name,
     mainvisual->setGeometry(visual_blackhole->getScreenArea());
     
     visual_mode = gContext->GetSetting("VisualMode");
+    visual_mode.simplifyWhiteSpace();
+    visual_mode.replace(QRegExp("\\s"), ",");
+
     QString visual_delay = gContext->GetSetting("VisualModeDelay");
     bool delayOK;
     visual_mode_delay = visual_delay.toInt(&delayOK);
