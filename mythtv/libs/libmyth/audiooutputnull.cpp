@@ -4,7 +4,9 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include <time.h>
-#include <sys/soundcard.h>
+#ifdef USING_OSS
+    #include <sys/soundcard.h>
+#endif
 #include <sys/ioctl.h>
 #include <cerrno>
 #include <cstring>
@@ -18,10 +20,10 @@ using namespace std;
 #include "audiooutputnull.h"
 
 AudioOutputNULL::AudioOutputNULL(QString audiodevice, int laudio_bits, 
-                               int laudio_channels, int laudio_samplerate,
-                               AudioOutputSource source, bool set_initial_vol)
-              : AudioOutputBase(audiodevice, laudio_bits,
-                              laudio_channels, laudio_samplerate, source, set_initial_vol)
+                                 int laudio_channels, int laudio_samplerate,
+                                 AudioOutputSource source, bool set_initial_vol)
+               : AudioOutputBase(audiodevice, laudio_bits, laudio_channels,
+                                 laudio_samplerate, source, set_initial_vol)
 {
     Reconfigure(laudio_bits, laudio_channels, laudio_samplerate);
     current_buffer_size = 0;
@@ -71,7 +73,8 @@ int AudioOutputNULL::readOutputData(unsigned char *read_buffer, int max_length)
 
     pcm_output_buffer_mutex.lock();
     memcpy(read_buffer, pcm_output_buffer, amount_to_read);
-    memmove(pcm_output_buffer, pcm_output_buffer + amount_to_read, current_buffer_size - amount_to_read);
+    memmove(pcm_output_buffer, pcm_output_buffer + amount_to_read,
+            current_buffer_size - amount_to_read);
     current_buffer_size -= amount_to_read;
     pcm_output_buffer_mutex.unlock();
     
