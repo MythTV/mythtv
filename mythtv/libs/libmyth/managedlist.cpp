@@ -236,7 +236,7 @@ bool ManagedListGroup::addItem(ManagedListItem* item, int where)
     
     itemCount = itemList.count();
     if(parentList)
-        connect( item, SIGNAL(changed(ManagedListItem*)), parentList, SLOT(itemChanged(ManagedListItem*)));
+        connect(item, SIGNAL(changed(ManagedListItem*)), parentList, SLOT(itemChanged(ManagedListItem*)));
     return true;
 }
 
@@ -245,7 +245,7 @@ void ManagedListGroup::doGoBack()
     getParentList()->setCurGroup(parentGroup);
 }
 
-void ManagedListGroup::cursorRight(bool page)
+void ManagedListGroup::cursorRight(bool)
 {
     getParentList()->setCurGroup(this);
 }
@@ -301,13 +301,15 @@ SelectManagedListItem::SelectManagedListItem(const QString& baseTxt, ManagedList
     goBack->setText(QString("[ %1 ]").arg(QObject::tr("No Change")));
 }
         
-void SelectManagedListItem::addSelection(const QString& label, QString value, bool select)
+ManagedListItem* SelectManagedListItem::addSelection(const QString& label, QString value, bool select)
 {
+    ManagedListItem* ret = NULL;
     
     if (value == QString::null)
         value = label;
     
     bool found = false;
+    
     for(ManagedListItem* tempItem = itemList.first(); tempItem; tempItem = itemList.next() )
     {
         if((tempItem->getText() == label) || (tempItem->getValue() == value))
@@ -315,6 +317,7 @@ void SelectManagedListItem::addSelection(const QString& label, QString value, bo
             found = true;
             tempItem->setValue(value);
             tempItem->setText(label);
+            ret = tempItem;
             break;
         }
     
@@ -325,7 +328,7 @@ void SelectManagedListItem::addSelection(const QString& label, QString value, bo
         ManagedListItem* newItem = new ManagedListItem(label, parentList, this, label);
         newItem->setValue(value);        
         addItem(newItem);
-        
+        ret = newItem;
         connect(newItem, SIGNAL(selected(ManagedListItem*)), this, SLOT(itemSelected(ManagedListItem* )));
     } 
    
@@ -351,6 +354,7 @@ void SelectManagedListItem::addSelection(const QString& label, QString value, bo
 
     emit selectionAdded(label, value);
     
+    return ret;
 }
         
 void SelectManagedListItem::clearSelections(void)
@@ -364,7 +368,7 @@ void SelectManagedListItem::clearSelections(void)
 }
 
 
-void SelectManagedListItem::cursorRight(bool page)
+void SelectManagedListItem::cursorRight(bool)
 {
     if(!enabled)
         return;
@@ -379,7 +383,7 @@ void SelectManagedListItem::cursorRight(bool page)
     changed();
 }
 
-void SelectManagedListItem::cursorLeft(bool page)
+void SelectManagedListItem::cursorLeft(bool)
 {
     if(!enabled)
         return;

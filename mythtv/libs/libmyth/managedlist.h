@@ -49,8 +49,8 @@ class ManagedListItem : public QObject
         void setText(const QString& newText) { text = newText; emit changed(this); }
  
     public slots:
-        virtual void cursorLeft(bool page = false) { canceled(); }
-        virtual void cursorRight(bool page = false) { selected(); }
+        virtual void cursorLeft(bool) { canceled(); }
+        virtual void cursorRight(bool) { selected(); }
         virtual void select() { selected(); }
         virtual void gotFocus() {}
         
@@ -173,8 +173,8 @@ class BoolManagedListItem : public ManagedListItem
         
     
     public slots:        
-        virtual void cursorLeft(bool page = false) { if(enabled) setValue(!boolValue()); }
-        virtual void cursorRight(bool page = false) { if(enabled) setValue(!boolValue()); }
+        virtual void cursorLeft(bool) { if(enabled) setValue(!boolValue()); }
+        virtual void cursorRight(bool) { if(enabled) setValue(!boolValue()); }
     
     protected:
         virtual void syncTextToValue();
@@ -273,7 +273,7 @@ class SelectManagedListItem : public ManagedListGroup
     public:
         SelectManagedListItem(const QString& baseText, ManagedListGroup* pGroup, ManagedList* parentList, 
                               QObject* _parent=NULL, const char* _name=0);
-        virtual void addSelection(const QString& label, QString value=QString::null, bool select=false);
+        virtual ManagedListItem* addSelection(const QString& label, QString value=QString::null, bool select=false);
 
         virtual void clearSelections(void);
         
@@ -342,7 +342,7 @@ class ManagedListSetting: public SimpleDBStorage
         ManagedListItem* listItem;
     
     public slots:
-        void itemChanged(ManagedListItem* itm) { syncDBFromItem(); }
+        void itemChanged(ManagedListItem*) { syncDBFromItem(); }
     
     
     
@@ -418,25 +418,25 @@ class SelectManagedListSetting : public ManagedListSetting
         }
         
     public:    
-        void addSelection(const QString& label, const QString& value, bool trans = true ) 
+        ManagedListItem* addSelection(const QString& label, const QString& value, bool trans = true ) 
         {
             if(selectItem)
             {
                 if(trans)
-                    selectItem->addSelection(QObject::tr(label), value);
+                    return selectItem->addSelection(QObject::tr(label), value);
                 else
-                    selectItem->addSelection(label, value);
+                    return selectItem->addSelection(label, value);
             }
         }
 
-        void addSelection(const QString& label, int value, bool trans = true ) 
+        ManagedListItem* addSelection(const QString& label, int value, bool trans = true ) 
         {
             if(selectItem)
             {
                 if(trans)
-                    selectItem->addSelection(QObject::tr(label), QString::number(value));
+                    return selectItem->addSelection(QObject::tr(label), QString::number(value));
                 else
-                    selectItem->addSelection(label, QString::number(value));
+                    return selectItem->addSelection(label, QString::number(value));
             }
         }        
     
