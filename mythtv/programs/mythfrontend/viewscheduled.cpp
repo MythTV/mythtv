@@ -95,7 +95,7 @@ ViewScheduled::ViewScheduled(QSqlDatabase *ldb, QWidget *parent,
 
 ViewScheduled::~ViewScheduled()
 {
-
+    gContext->removeListener(this);
     //delete XMLParse;
     delete accel;
     delete bgTransBackup;
