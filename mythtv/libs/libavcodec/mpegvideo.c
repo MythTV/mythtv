@@ -323,11 +323,16 @@ static int alloc_picture(MpegEncContext *s, Picture *pic, int shared){
     }
     
     if(pic->qscale_table==NULL){
-        if (s->encoding) {        
+        if (s->encoding) {
             CHECKED_ALLOCZ(pic->mb_var   , s->mb_num * sizeof(int16_t))
             CHECKED_ALLOCZ(pic->mc_mb_var, s->mb_num * sizeof(int16_t))
             CHECKED_ALLOCZ(pic->mb_mean  , s->mb_num * sizeof(int8_t))
             CHECKED_ALLOCZ(pic->mb_cmp_score, s->mb_num * sizeof(int32_t))
+        }else {
+            pic->mb_var = NULL;
+            pic->mc_mb_var = NULL;
+            pic->mb_mean = NULL;
+            pic->mb_cmp_score = NULL;
         }
 
         CHECKED_ALLOCZ(pic->mbskip_table , s->mb_num * sizeof(uint8_t)+1) //the +1 is for the slice end check

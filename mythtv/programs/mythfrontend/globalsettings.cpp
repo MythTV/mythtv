@@ -354,6 +354,18 @@ public:
     };
 };
 
+class AggressiveBuffer: public CheckBoxSetting, public GlobalSetting {
+public:
+    AggressiveBuffer():
+       GlobalSetting("AggressiveSoundcardBuffer") {
+       setLabel("Aggressive Soundcard Buffering");
+       setValue(false);
+       setHelpText("If this is set, MythTV will pretend to have a smaller "
+                   "soundcard buffer than is really present.  Can speed up "
+                   "seeking, but can also cause playback problems.");
+    };
+};
+
 class FixedAspectRatio: public CheckBoxSetting, public GlobalSetting {
 public:
     FixedAspectRatio():
@@ -766,6 +778,7 @@ PlaybackSettings::PlaybackSettings()
     general->setLabel("General playback");
     general->addChild(new Deinterlace());
     general->addChild(new ReduceJitter());
+    general->addChild(new AggressiveBuffer());
     general->addChild(new PlaybackExitPrompt());
     general->addChild(new EndOfRecordingExitPrompt());
     general->addChild(new FixedAspectRatio());

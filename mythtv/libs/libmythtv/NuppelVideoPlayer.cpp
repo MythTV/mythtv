@@ -345,6 +345,9 @@ void NuppelVideoPlayer::InitSound(void)
     if(audio_buffer_unused < 0)
        audio_buffer_unused = 0;
 
+    if (!gContext->GetNumSetting("AggressiveSoundcardBuffer", 0))
+        audio_buffer_unused = 0;
+
     if (ioctl(audiofd, SNDCTL_DSP_GETCAPS, &caps) >= 0 && 
         !(caps & DSP_CAP_REALTIME))
     {
@@ -1558,6 +1561,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 {
     int laudiotime;
     int delay, avsync_delay;
+    bool delay_clipping = false;
 
     struct timeval nexttrigger, now; 
   
@@ -1673,27 +1677,62 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         delay = (nexttrigger.tv_sec - now.tv_sec) * 1000000 +
                 (nexttrigger.tv_usec - now.tv_usec); // uSecs
 
-        /* If delay is sometwhat more than a frame or < 0ms, 
-           we clip it to these amounts and reset nexttrigger */
-        if ( delay > 40000 )
+        if (reducejitter)
         {
-            // cerr << "Delaying to next trigger: " << delay << endl;
-            delay = 40000;
-            usleep(delay);
+            /* If delay is sometwhat more than a frame or < 0ms, 
+               we clip it to these amounts and reset nexttrigger */
+            if ( delay > 40000 )
+            {
+                // cerr << "Delaying to next trigger: " << delay << endl;
+                delay = 40000;
+                usleep(delay);
 
-            gettimeofday(&nexttrigger, NULL);
-        }
-        else if (delay <= 0)
-        {
-            // cerr << "clipped negative delay " << delay << endl;
-            gettimeofday(&nexttrigger, NULL);
+                gettimeofday(&nexttrigger, NULL);
+            }
+            else if (delay <= 0)
+            {
+                // cerr << "clipped negative delay " << delay << endl;
+                gettimeofday(&nexttrigger, NULL);
+            }
+            else
+            {
+                if (!disablevideo)
+                    ReduceJitter(&nexttrigger);
+                else
+                    usleep(delay);
+            }
         }
         else
         {
-            if (!disablevideo && reducejitter)
-                ReduceJitter(&nexttrigger);
-            else
+            if (delay > 200000)
+            {
+                cout << "Delaying to next trigger: " << delay << endl;
+                delay = 200000;
+                delay_clipping = true;
+            }
+
+            /* trigger */
+            if (delay > 0)
                 usleep(delay);
+            else
+            {
+                //cout << "clipped negative delay: " << delay << endl;
+                delay_clipping = true; 
+            }
+
+            /* The time right now is a good approximation of nexttrigger. */
+            /* It's not perfect, because usleep() is only pseudo-
+               approximate about waking us up. So we jitter a few ms. */
+            /* The value of nexttrigger is perfect -- we calculated it to
+               be exactly one frame time after the previous frame, 
+               plus just enough feedback to stay synchronized with audio. */
+            /* UNLESS... we had to clip.  In this case, resync nexttrigger
+               with the wall clock. */
+            if (delay_clipping)
+            {
+                gettimeofday(&nexttrigger, NULL);
+                delay_clipping = false;
+            }
         }
 
         if (!disablevideo)
