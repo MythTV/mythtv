@@ -311,9 +311,10 @@ int main(int argc, char *argv[])
             cout << "\n";
             cout << "--sleep\n";
             cout << "   Give up some cpu time after processing each frame.\n";
+            cout << "\n";
             cout << "--quiet\n";
             cout << "   Turn OFF display (also causes the program to sleep\n";
-            cout << "   to sleep a little every frame so it doesn't hog cpu)\n";
+            cout << "   a little every frame so it doesn't hog cpu)\n";
             cout << "   (takes precedence over --blanks if specified first)\n";
             cout << "\n";
             cout << "--blanks\n";
