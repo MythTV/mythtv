@@ -347,7 +347,7 @@ class MythPopupBox : public QFrame
   public:
     MythPopupBox(QWidget *parent);
 
-    void addWidget(QWidget *widget);
+    void addWidget(QWidget *widget, bool setAppearance = true);
 
   private:
     QVBoxLayout *vbox;

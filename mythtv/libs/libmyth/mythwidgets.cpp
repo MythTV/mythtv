@@ -1058,10 +1058,12 @@ MythPopupBox::MythPopupBox(QWidget *parent)
     vbox = new QVBoxLayout(this, (int)(10 * hmult));
 }
 
-void MythPopupBox::addWidget(QWidget *widget)
+void MythPopupBox::addWidget(QWidget *widget, bool setAppearance)
 {
-    widget->setPalette(palette());
-    widget->setFont(font());
+    if (setAppearance == true)
+    {
+         widget->setPalette(palette());
+         widget->setFont(font());
+    }
     vbox->addWidget(widget);
 }
-
