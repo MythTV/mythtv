@@ -500,6 +500,9 @@ ProgInfo *parseProgram(QDomElement &element, int localTimezoneOffset)
         pginfo->stars != "" && pginfo->airdate != "")
         pginfo->catType = "movie";
 
+    if (pginfo->airdate == "")
+        pginfo->airdate = QDate::currentDate().toString("yyyy");
+
     return pginfo;
 }
                   
