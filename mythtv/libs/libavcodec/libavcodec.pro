@@ -40,6 +40,11 @@ contains( CONFIG_XVMC, yes ) {
     SOURCES += xvmcvideo.c
 }
 
+using_viahwslice {
+    SOURCES += viaslice.c
+    DEFINES += HAVE_VIASLICE
+}
+
 contains( AMR_NV, yes) {
     SOURCES += amr.c
 }

@@ -7,7 +7,8 @@ typedef enum FrameType_
     FMT_RGB24 = 0,
     FMT_YV12,
     FMT_XVMC_IDCT_MPEG2,
-    FMT_XVMC_MOCO_MPEG2
+    FMT_XVMC_MOCO_MPEG2,
+    FMT_VIA_HWSLICE
 } VideoFrameType;
 
 typedef struct VideoFrame_

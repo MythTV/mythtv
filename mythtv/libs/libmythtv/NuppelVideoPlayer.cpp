@@ -36,13 +36,18 @@ extern "C" {
 
 #include "remoteencoder.h"
 
-#ifndef USING_XVMC
-const int kPrebufferFrames = 12;
-const int kNeedFreeFrames = 1;
-#else
-#include "videoout_xvmc.h"
+// FIXME: move to video output 
+#ifdef USING_XVMC
 const int kPrebufferFrames = 4;
 const int kNeedFreeFrames = 2;
+#include "videoout_xvmc.h"
+#elif defined(USING_VIASLICE)
+const int kPrebufferFrames = 1;
+const int kNeedFreeFrames = 1;
+#include "videoout_viaslice.h"
+#else
+const int kPrebufferFrames = 12;
+const int kNeedFreeFrames = 1;
 #endif
 
 
@@ -313,11 +318,14 @@ void NuppelVideoPlayer::InitVideo(void)
         exit(0);
     }
 
-#ifndef USING_XVMC
-    videoOutput = new VideoOutputXv();
-#else
+#ifdef USING_XVMC
     videoOutput = new VideoOutputXvMC();
     decoder->setLowBuffers();
+#elif defined(USING_VIASLICE)
+    videoOutput = new VideoOutputVIA();
+    decoder->setLowBuffers();
+#else
+    videoOutput = new VideoOutputXv();
 #endif
 
     if (gContext->GetNumSetting("DecodeExtraAudio", 0))

@@ -17,10 +17,12 @@ extern "C" {
 }
 using namespace std;
 
-#ifndef USING_XVMC
-#define MAXVBUFFER 31
-#else
+#ifdef USING_XVMC
 #define MAXVBUFFER 7
+#elif defined(USING_VIASLICE)
+#define MAXVBUFFER 4
+#else
+#define MAXVBUFFER 31
 #endif
 
 #define MAXTBUFFER 21

@@ -40,10 +40,6 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    QString server = gContext->GetSetting("MasterServerIP", "localhost");
-    int port = gContext->GetNumSetting("MasterServerPort", 6543);
-    gContext->ConnectServer(server, port);
-
     gContext->LoadQtConfig();
 
     MythMainWindow *mainWindow = new MythMainWindow();

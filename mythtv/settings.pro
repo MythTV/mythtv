@@ -36,3 +36,7 @@ EXTRA_LIBS = -L/usr/X11R6/lib -lXinerama -lXv -lX11 -lXext -lXxf86vm -lfreetype
 # XvMC support, modify as necessary.  Do not enable this.
 #CONFIG += using_xvmc
 #EXTRA_LIBS += -lXvMCNVIDIA -lXvMC
+
+# VIA cle266 support
+#CONFIG += using_viahwslice
+#EXTRA_LIBS += -lddmpeg

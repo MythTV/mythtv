@@ -42,3 +42,9 @@ using_xvmc {
     HEADERS += videoout_xvmc.h
     DEFINES += USING_XVMC
 }
+
+using_viahwslice {
+    SOURCES += videoout_viaslice.cpp
+    SOURCES += videoout_viaslice.h
+    DEFINES += USING_VIASLICE
+}
