@@ -145,16 +145,17 @@ class UIGuideType : public UIType
     void SetSolidColor(QString col) { m_solidcolor = col; }
     void SetCategoryColors(QMap<QString, QString> catC)
                           { categoryColors = catC; }
-    void SetProgramInfo(unsigned int, int, QRect, QString, QString, int);
+    void SetProgramInfo(unsigned int, int, QRect, QString, QString, int, int);
     void SetCurrentArea(QRect myArea) { curArea = myArea; }
     void ResetData() { drawArea.clear(); dataMap.clear(); m_count = 0;
                        categoryMap.clear(); recStatus.clear();
-                       countMap.clear(); }
+                       countMap.clear(); arrowUsage.clear(); }
     void ResetRow(unsigned int);
     void SetArea(QRect area) { m_area = area; }
     void SetScreenLocation(QPoint sl) { m_screenloc = sl; }
     void SetTextOffset(QPoint to) { m_textoffset = to; }
     void LoadImage(int, QString);
+    void SetArrow(int, QString);
 
   private:
     QRect m_area;
@@ -185,6 +186,8 @@ class UIGuideType : public UIType
     QMap<int, QString> categoryMap;
     QMap<int, int> recStatus;
     QMap<int, QPixmap> recImages;
+    QMap<int, QPixmap> arrowImages;
+    QMap<int, int> arrowUsage;
 };
 
 class UIListType : public UIType

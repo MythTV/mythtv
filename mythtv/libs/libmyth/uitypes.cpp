@@ -357,6 +357,7 @@ UIGuideType::UIGuideType(const QString &name, int order)
     dataMap.clear();
     categoryMap.clear();
     recStatus.clear();
+    arrowUsage.clear();
 }
 
 UIGuideType::~UIGuideType()
@@ -529,6 +530,27 @@ void UIGuideType::drawRecStatus(QPainter *dr, int num)
         dr->drawPixmap(area.right() - recImg.width(), 
                        area.bottom() - recImg.height(), recImg);
     }
+    if (arrowUsage[num] != 0)
+    {
+        QPixmap user;
+        if (arrowUsage[num] == 1 || arrowUsage[num] == 3)
+        {
+            user = arrowImages[0];
+
+             dr->drawPixmap(area.left(), 
+                            area.top() + (int)(area.height() / 2) - (int)(user.height() / 2), 
+                            user);
+        }
+        if (arrowUsage[num] == 2 || arrowUsage[num] == 3)
+        {
+            user = arrowImages[1];
+
+            dr->drawPixmap(area.right() - user.width(),
+                            area.top() + (int)(area.height() / 2) - (int)(user.height() / 2),
+                            user);
+
+        }
+    }
 }
 
 void UIGuideType::drawBox(QPainter *dr, int num, QString color)
@@ -698,6 +720,16 @@ void UIGuideType::drawText(QPainter *dr, int num)
     area.setHeight(area.height() - m_textoffset.x());
     area.setWidth(area.width() - m_textoffset.y());
 
+    if (arrowUsage[num] == 1 || arrowUsage[num] == 3)
+    {
+        area.setLeft(area.left() + arrowImages[0].width());
+    }
+    if (arrowUsage[num] == 2 || arrowUsage[num] == 3)
+    {
+        area.setRight(area.right() - arrowImages[1].width());
+    }
+    
+
     if (m_cutdown == true)
         msg = cutDown(msg, &(m_font->face), area.width(), area.height());
     if (m_cutdown == true && m_debug == true)
@@ -753,7 +785,7 @@ void UIGuideType::ResetRow(unsigned int row)
 }
 
 void UIGuideType::SetProgramInfo(unsigned int row, int num, QRect area, 
-                                 QString title, QString genre, int recFlag)
+                                 QString title, QString genre, int arrow, int recFlag)
 {
     if (num > countMap[row])
         countMap[row] = num;
@@ -761,6 +793,7 @@ void UIGuideType::SetProgramInfo(unsigned int row, int num, QRect area,
     recStatus[(int)(row * 100) + num] = recFlag;
     drawArea[(int)(row * 100) + num] = area;
     categoryMap[(int)(row * 100) + num] = genre;
+    arrowUsage[(int)(row * 100) + num] = arrow;
     if (row > m_count)
         m_count = row;
 }
@@ -818,6 +851,61 @@ void UIGuideType::LoadImage(int recType, QString file)
         delete sourceImg;
     }
     recImages[recType] = img;
+}
+
+void UIGuideType::SetArrow(int dir, QString file)
+{
+    QString tfile = "";
+    QString baseDir = gContext->GetInstallPrefix();
+    QString themeDir = gContext->FindThemeDir("");
+    themeDir = themeDir + gContext->GetSetting("Theme") + "/";
+    baseDir = baseDir + "/share/mythtv/themes/default/";
+
+    QFile checkFile(themeDir + file);
+
+    if (checkFile.exists())
+        tfile = themeDir + file;
+    else
+        tfile = baseDir + file;
+    checkFile.setName(tfile);
+    if (!checkFile.exists())
+        tfile = "/tmp/" + file;
+
+    checkFile.setName(tfile);
+    if (!checkFile.exists())
+        tfile = file;
+
+    if (m_debug == true)
+        cerr << "     -Filename: " << file << endl;
+
+    QPixmap img;
+    if (m_hmult == 1 && m_wmult == 1)
+    {
+        img.load(tfile);
+    }
+    else
+    {
+        QImage *sourceImg = new QImage();
+        if (sourceImg->load(tfile))
+        {
+            QImage scalerImg;
+            int doX = sourceImg->width();
+            int doY = sourceImg->height();
+
+            scalerImg = sourceImg->smoothScale((int)(doX * m_wmult),
+                                              (int)(doY * m_hmult));
+            img.convertFromImage(scalerImg);
+            if (m_debug == true)
+                    cerr << "     -Image: " << file << " loaded.\n";
+        }
+        else
+        {
+            if (m_debug == true)
+                cerr << "     -Image: " << file << " failed to load.\n";
+        }
+        delete sourceImg;
+    }
+    arrowImages[dir] = img;
 }
 
 // **************************************************************

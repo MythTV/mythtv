@@ -297,6 +297,7 @@ void XMLParse::parseGuideGrid(LayerSet *container, QDomElement &element)
     bool multiline = false;
     QMap<QString, QString> catColors;
     QMap<int, QString> recImgs;
+    QMap<int, QString> arrows;
 
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
@@ -388,6 +389,18 @@ void XMLParse::parseGuideGrid(LayerSet *container, QDomElement &element)
 
                 recImgs[inttype] = img;
             }
+            else if (info.tagName() == "arrow")
+            {
+                QString dir = "";
+                QString imag = "";
+                dir = info.attribute("direction");
+                imag = info.attribute("image");
+
+                if (dir == "left")
+                    arrows[0] = imag;
+                else 
+                    arrows[1] = imag;
+            }
             else if (info.tagName() == "catcolor")
             {
                 QString cat = "";
@@ -427,6 +440,9 @@ void XMLParse::parseGuideGrid(LayerSet *container, QDomElement &element)
         guide->SetSelectorType(1);
     else
         guide->SetSelectorType(2); // solid
+
+    guide->SetArrow(0, arrows[0]);
+    guide->SetArrow(1, arrows[1]);
 
     int jst = Qt::AlignLeft | Qt::AlignTop;
     if (multiline == true)
