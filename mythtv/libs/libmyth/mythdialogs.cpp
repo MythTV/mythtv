@@ -176,11 +176,6 @@ MythMainWindow::MythMainWindow(QWidget *parent, const char *name, bool modal,
 {
     d = new MythMainWindowPrivate;
 
-    if (gContext->GetNumSetting("RunFrontendInWindow", 0))
-        d->does_fill_screen = false;
-    else
-        d->does_fill_screen = true;
-
     Init();
     d->exitingtomain = false;
     d->exitmenucallback = false;
@@ -270,10 +265,18 @@ void MythMainWindow::Init(void)
 #endif
 #endif
 
+    if (gContext->GetNumSetting("RunFrontendInWindow", 0))
+        d->does_fill_screen = false;
+    else
+        d->does_fill_screen = true;
+
     // Set window border based on fullscreen attribute
     Qt::WFlags flags = 0;
     if (d->does_fill_screen)
-        flags = Qt::WStyle_Customize | Qt::WStyle_NoBorder;
+        flags = Qt::WStyle_Customize  |
+                Qt::WStyle_NoBorder   |
+                Qt::WStyle_StaysOnTop |
+                Qt::WX11BypassWM;
     else
         flags = Qt::WStyle_Customize | Qt::WStyle_NormalBorder;
 

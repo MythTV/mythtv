@@ -67,6 +67,7 @@ class ChanInfo
                                       name = other.name;
                                       freqid = other.freqid;
                                       finetune = other.finetune;
+                                      tvformat = other.tvformat;
                                     }
 
     QString callsign;

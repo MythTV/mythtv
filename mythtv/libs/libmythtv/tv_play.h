@@ -140,6 +140,7 @@ class TV : public QObject
     void SwitchCards(void);
 
     void ToggleSleepTimer(void);
+    void ToggleSleepTimer(const QString);
 
     void DoInfo(void);
     void DoPlay(void);

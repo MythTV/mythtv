@@ -3845,6 +3845,10 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
         }
         ChangeTimeStretch(0);   // just display
     }
+    else if (action.left(11) == "TOGGLESLEEP")
+    {
+        ToggleSleepTimer(action.left(13));
+    }
     else if (action.left(17) == "TOGGLEPICCONTROLS")
     {
         picAdjustment = action.right(1).toInt();
@@ -4052,6 +4056,18 @@ void TV::BuildOSDTreeMenu(void)
     subitem = new OSDGenericTree(item, tr("1.5X"), "TOGGLESTRETCH1.5");
     subitem = new OSDGenericTree(item, tr("2.0X"), "TOGGLESTRETCH2.0");
 
+    // add sleep items to menu
+    QString SleepOn = tr("Sleep 60");
+    QString SleepOff = tr("Sleep Off");
+
+    QString sleepval = sleepTimer->isActive() ? SleepOff : SleepOn;
+
+    item = new OSDGenericTree(treeMenu, tr("Sleep"), "TOGGLESLEEP");
+    subitem = new OSDGenericTree(item, sleepval, "TOGGLESLEEPONOFF");
+    subitem = new OSDGenericTree(item, "30", "TOGGLESLEEP30");
+    subitem = new OSDGenericTree(item, "60", "TOGGLESLEEP60");
+    subitem = new OSDGenericTree(item, "90", "TOGGLESLEEP90");
+    subitem = new OSDGenericTree(item, "120", "TOGGLESLEEP120");
 }
 
 void TV::ToggleAutoExpire(void)
@@ -4124,3 +4140,75 @@ void TV::SetManualZoom(bool zoomON)
         update_osd_pos = false;
     }
 }
+
+void TV::ToggleSleepTimer(const QString time)
+{
+    const int minute(60*1000);
+    int mins(0);
+
+    if (sleepTimer)
+    {
+        if (time == "TOGGLESLEEPON")
+        {
+            if (sleepTimer->isActive())
+                sleepTimer->stop();
+            else
+            {
+                mins = 60;
+                sleepTimer->start(mins *minute);
+            }
+        }
+        else
+        {
+            if (time.length() > 11)
+            {
+                bool intRead = false;
+                int mins = time.right(time.length() - 11).toInt(&intRead);
+
+                if (intRead)
+                {
+                    // catch 120 -> 240 mins
+                    if (mins < 30)
+                    {
+                        mins *= 10;
+                    }
+                }
+                else
+                {
+                    mins = 0;
+                    cout << "Invalid time " << time << endl;
+                }
+            }
+            else
+            {
+                cout << "Invalid time string " << time << endl;
+            }
+
+            if (sleepTimer->isActive())
+            {
+                sleepTimer->stop();
+            }
+
+            if (mins)
+                sleepTimer->start(mins * minute);
+        }
+               
+        // display OSD
+        if (osd && !browsemode)
+        {
+            QString out;
+
+            if (mins != 0)
+                out = tr("Sleep") + " " + QString::number(mins);
+            else
+                out = tr("Sleep") + " " + sleep_timer_array[0].dispString;
+
+            osd->SetSettingsText(out, 3);
+        }
+    }
+    else
+    {
+        cout << "No sleep timer?";
+    }
+}
+
