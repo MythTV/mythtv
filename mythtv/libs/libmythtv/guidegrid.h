@@ -8,22 +8,23 @@
 #include <vector>
 
 #include "libmyth/mythwidgets.h"
+#include <qdom.h>
+#include "uitypes.h"
+#include "xmlparse.h"
+#include "libmythtv/programinfo.h"
 
 using namespace std;
 
-class QFont;
 class ProgramInfo;
 class TimeInfo;
 class ChannelInfo;
 class QSqlDatabase;
 class TV;
 class QTimer;
-class QLabel;
 class QWidget;
 
 #define MAX_DISPLAY_CHANS 8
 #define MAX_DISPLAY_TIMES 30
-
 
 // Use this function to instantiate a guidegrid instance.
 QString RunProgramGuide(QString startchannel, bool thread = false, 
@@ -80,19 +81,62 @@ class GuideGrid : public MythDialog
     void timeout();
 
   private:
-    void paintDate(QPainter *p);
-    void paintChannels(QPainter *p);
-    void paintTimes(QPainter *p);
-    void paintPrograms(QPainter *p);
-    void paintTitle(QPainter *p);
+    void updateBackground(void);
+    void paintDate(QPainter *);
+    void paintChannels(QPainter *);
+    void paintTimes(QPainter *);
+    void paintPrograms(QPainter *);
+    void paintCurrentInfo(QPainter *);
+    void paintInfo(QPainter *);
+ 
+    void resizeImage(QPixmap *, QString);
+    void LoadWindow(QDomElement &);
+    void parseContainer(QDomElement &);
+    XMLParse *theme;
+    QDomElement xmldata;
+
+    int m_context;
+
+    int rectProgLeft;
+    int rectProgTop;
+    int rectProgWidth;
+    int rectProgHeight;
+    int rectInfoLeft;
+    int rectInfoTop;
+    int rectInfoWidth;
+    int rectInfoHeight;
+    int rectDateLeft;
+    int rectDateTop;
+    int rectDateWidth;
+    int rectDateHeight;
+    int rectChanLeft;
+    int rectChanTop;
+    int rectChanWidth;
+    int rectChanHeight;
+    int rectTimeLeft;
+    int rectTimeTop;
+    int rectTimeWidth;
+    int rectTimeHeight;
+    int rectCurILeft;
+    int rectCurITop;
+    int rectCurIWidth;
+    int rectCurIHeight;
+    int rectVideoLeft;
+    int rectVideoTop;
+    int rectVideoWidth;
+    int rectVideoHeight;
+
+    int gridfilltype;
+    int scrolltype;
 
     QRect fullRect() const;
     QRect dateRect() const;
     QRect channelRect() const;
     QRect timeRect() const;
     QRect programRect() const;
-    QRect titleRect() const;
     QRect infoRect() const;
+    QRect curInfoRect() const;
+    QRect videoRect() const;
 
     void fillChannelInfos(int &maxchannel, bool gotostartchannel = true);
 
@@ -101,32 +145,11 @@ class GuideGrid : public MythDialog
     void fillProgramInfos(void);
     void fillProgramRowInfos(unsigned int row);
 
-    QBrush getBGColor(const QString &category);
-    
     void setStartChannel(int newStartChannel);
 
-    void updateTopInfo();
     void createProgramLabel(int, int);
-    void setupColorScheme();
-    void createProgramBar(QBoxLayout *);
 
     QString getDateLabel(ProgramInfo *pginfo);
-
-    QLabel *titlefield;
-    QLabel *channelimage;
-    QLabel *recordingfield;
-    QLabel *date;
-    QLabel *subtitlefield;
-    QLabel *descriptionfield;
-    QLabel *currentTime;
-    QLabel *currentChan;
-    QLabel *currentButton;
-
-    QFont *m_timeFont;
-    QFont *m_chanFont;
-    QFont *m_chanCallsignFont;
-    QFont *m_progFont;
-    QFont *m_titleFont;
 
     vector<ChannelInfo> m_channelInfos;
     TimeInfo *m_timeInfos[MAX_DISPLAY_TIMES];
@@ -143,51 +166,23 @@ class GuideGrid : public MythDialog
     int m_currentCol;
     int showProgramBar;
 
-    bool selectState;
+    QLabel *forvideo;
+
     bool showInfo;
-    bool showIcon;
+    bool selectState;
     bool showFavorites;
     bool displaychannum;
 
     bool showtitle;
     bool usetheme;
-    QColor fgcolor;
-    QColor bgcolor;
-
-    QLabel *forvideo;
 
     int startChannel;
-    int programGuideType;
-    int altTransparent;
     int desiredDisplayChans;
     int DISPLAY_CHANS;
     int DISPLAY_TIMES;
 
     QDateTime firstTime;
     QDateTime lastTime;
-
-    QColor curTimeChan_bgColor;
-    QColor curTimeChan_fgColor;
-    QColor date_bgColor;
-    QColor date_dsColor;
-    QColor date_fgColor;
-    QColor chan_bgColor;
-    QColor chan_dsColor;
-    QColor chan_fgColor;
-    QColor time_bgColor;
-    QColor time_dsColor;
-    QColor time_fgColor;
-    QColor prog_bgColor;
-    QColor prog_fgColor;
-    QColor progLine_Color;
-    QColor progArrow_Color;
-    QColor curProg_bgColor;
-    QColor curRecProg_bgColor;
-    QColor curProg_dsColor;
-    QColor curProg_fgColor;
-    QColor misChanIcon_bgColor;
-    QColor misChanIcon_fgColor;
-    int progArrow_Type;
 
     TV *m_player;
 
@@ -196,7 +191,6 @@ class GuideGrid : public MythDialog
     QString timeformat;
     QString unknownTitle;
     QString unknownCategory;
-    bool showCurrentTime;
     QString currentTimeColor;
 
     QTimer *timeCheck;
