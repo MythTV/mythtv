@@ -2065,7 +2065,6 @@ void TVRec::SetReadThreadSock(QSocket *sock)
 
 int TVRec::RequestRingBufferBlock(int size)
 {
-    char buffer[256001];
     int tot = 0;
     int ret = 0;
 
@@ -2076,6 +2075,8 @@ int TVRec::RequestRingBufferBlock(int size)
         readthreadLock.unlock();
         return -1;
     }
+
+    char *buffer = new char[256001];
 
     while (tot < size && !rbuffer->GetStopReads() && readthreadlive)
     {
@@ -2100,6 +2101,8 @@ int TVRec::RequestRingBufferBlock(int size)
             break; // we hit eof
     }
     readthreadLock.unlock();
+
+    delete[] buffer;
 
     if (ret < 0)
         tot = -1;

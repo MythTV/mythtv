@@ -319,9 +319,6 @@ void MpegRecorder::StartRecording(void)
         return;
     }
 
-    unsigned char buffer[256001];
-    int ret;
-
     if (!SetupRecording())
     {
         cerr << "Error initializing recording\n";
@@ -330,6 +327,8 @@ void MpegRecorder::StartRecording(void)
 
     encoding = true;
     recording = true;
+    unsigned char *buffer = new unsigned char[256001];
+    int ret;
 
     while (encoding)
     {
@@ -364,6 +363,7 @@ void MpegRecorder::StartRecording(void)
 
     FinishRecording();
 
+    delete[] buffer;
     recording = false;
 }
 
