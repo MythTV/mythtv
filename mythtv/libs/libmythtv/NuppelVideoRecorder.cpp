@@ -232,7 +232,7 @@ void NuppelVideoRecorder::StartRecording(void)
     rtjc->SetFormat(&i);
     rtjc->SetSize(&w, &h);
     rtjc->SetQuality(&Q);
-    i = 1;
+    i = 0;
     rtjc->SetIntra(&i, &M1, &M2);
 
     if (childrenLive)
@@ -366,6 +366,12 @@ void NuppelVideoRecorder::StartRecording(void)
     encoding = true;
 
     while (encoding) {
+	if (paused)
+        {
+	    usleep(50);
+	    gettimeofday(&stm, &tzone);
+	    continue;
+	}
         frame = 0;
         mm.frame = 0;
         if (ioctl(fd, VIDIOCSYNC, &frame)<0) 
@@ -388,6 +394,9 @@ void NuppelVideoRecorder::StartRecording(void)
         }
     }
 
+    close(fd);
+    munmap(buf, vm.size);
+    
     KillChildren();
 }
 
@@ -564,6 +573,11 @@ int NuppelVideoRecorder::CreateNuppelFile(void)
     return(0);
 }
 
+void NuppelVideoRecorder::Reset(void)
+{
+    CreateNuppelFile();
+}    
+
 void *NuppelVideoRecorder::WriteThread(void *param)
 {
     NuppelVideoRecorder *nvr = (NuppelVideoRecorder *)param;
@@ -645,6 +659,12 @@ void NuppelVideoRecorder::doAudioThread(void)
     ioctl(afd,SNDCTL_DSP_SETTRIGGER,&trigger);
 
     while (childrenLive) {
+	if (paused)
+	{
+            usleep(50);
+            continue;
+        }
+
         gettimeofday(&anow, &tzone);
 
         if (audio_buffer_size != (lastread = read(afd, buffer,
@@ -664,7 +684,7 @@ void NuppelVideoRecorder::doAudioThread(void)
             continue;
         }
 
-        tcres = (anow.tv_sec-stm.tv_sec)*1000 + now.tv_usec/1000 - 
+        tcres = (anow.tv_sec-stm.tv_sec)*1000 + anow.tv_usec/1000 - 
                 stm.tv_usec/1000;
         audiobuffer[act]->sample = act_audio_sample;
         audiobuffer[act]->timecode = tcres;
@@ -691,6 +711,13 @@ void NuppelVideoRecorder::doWriteThread(void)
     while (childrenLive)
     {
         act = act_video_encode;
+	
+	if (paused)
+	{
+            usleep(50);
+	    actuallypaused = true;
+            continue;
+	}
         if (!videobuffer[act]->freeToEncode && 
             !audiobuffer[act_audio_encode]->freeToEncode)
         {
@@ -762,6 +789,7 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
 
     if (lf == 0) 
     { // this will be triggered every new file
+        fnum = 0;
         lf = fnum-2;
         startnum = fnum;
     }

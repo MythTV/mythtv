@@ -10,6 +10,8 @@
 #include "XJ.h"
 #include "settings.h"
 
+#include "channel.h"
+
 void *SpawnEncode(void *param)
 {
     NuppelVideoRecorder *nvr = (NuppelVideoRecorder *)param;
@@ -31,7 +33,18 @@ void *SpawnDecode(void *param)
 int main(int argc, char *argv[])
 {
   Settings settings("settings.txt");
-  
+
+  Channel *channel = new Channel("/dev/video");
+
+  channel->Open();
+
+  channel->SetFormat(settings.GetSetting("TVFormat"));
+  channel->SetFreqTable(settings.GetSetting("FreqTable"));
+
+  channel->SetChannelByString("3");
+
+  channel->Close();
+
   pthread_t encode, decode; 
   
   long long filesize = settings.GetNumSetting("BufferSize");
@@ -51,7 +64,7 @@ int main(int argc, char *argv[])
                      settings.GetNumSetting("Height"));
   nvr->SetMP3Quality(settings.GetNumSetting("MP3Quality"));
   nvr->Initialize();
-  
+ 
   NuppelVideoPlayer *nvp = new NuppelVideoPlayer();
   nvp->SetRingBuffer(rbuffer);
   nvp->SetRecorder(nvr);
@@ -61,6 +74,8 @@ int main(int argc, char *argv[])
 
   while (!nvr->IsRecording())
       usleep(50);
+
+  channel->SetFd(nvr->GetVideoFd());
 
   sleep(1);
   pthread_create(&decode, NULL, SpawnDecode, nvp);
@@ -85,6 +100,49 @@ int main(int argc, char *argv[])
                case wsRight: nvp->FastForward(5); break;
                case wsLeft: nvp->Rewind(5); break;
                case wsEscape: nvp->StopPlaying(); break;
+               case wsUp: {
+                            nvp->Pause();
+			    while (!nvp->GetPause()) 
+                                   usleep(5);
+
+                            nvr->Pause();
+                            while (nvr->GetPause())
+                                 usleep(50);
+				 
+                            rbuffer->Reset();
+			    channel->ChannelUp();
+
+			    nvr->Reset();
+			    nvr->Unpause();
+			    
+			    usleep(500000);
+			    nvp->ResetPlaying();
+			    while (!nvp->ResetYet())
+                                usleep(50);
+			    nvp->Unpause();
+                          } break;
+               case wsDown: {
+                            nvp->Pause();
+                            while (!nvp->GetPause())
+                                   usleep(5);
+
+                            nvr->Pause();
+                            while (nvr->GetPause())
+                                 usleep(50);
+
+                            rbuffer->Reset();
+
+                            channel->ChannelDown();
+
+                            nvr->Reset();
+                            nvr->Unpause();
+
+                            usleep(500000);
+                            nvp->ResetPlaying();
+                            while (!nvp->ResetYet())
+                                usleep(50);
+                            nvp->Unpause();
+                          } break;
                default: break;
            }
       }

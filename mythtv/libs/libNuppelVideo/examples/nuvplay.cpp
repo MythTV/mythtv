@@ -47,6 +47,7 @@ int main(int argc, char *argv[])
   else filename=argv[optind];
 
   NuppelVideoPlayer *nvp = new NuppelVideoPlayer();
+  nvp->SetDeinterlace(deinterlace);
   nvp->SetFileName(filename);
   nvp->StartPlaying(); 
  

@@ -133,14 +133,12 @@ int NuppelVideoPlayer::InitSubs(void)
         return -1;
     }
 
+    positionMap = new map<long long, long long>;
     return 0;
 }
 
-int NuppelVideoPlayer::OpenFile(void)
+int NuppelVideoPlayer::OpenFile(bool skipDsp)
 {
-    if (InitSubs() < 0)
-        return -1;
-
     struct rtframeheader frameheader;
     int    startpos;
     int    foundit=0;
@@ -194,6 +192,9 @@ int NuppelVideoPlayer::OpenFile(void)
         fprintf(stderr, "Incompatible video height, reducing to %d\n", 
                 video_height);
     }
+
+    if (skipDsp)
+        return 0;
 
     startpos = ringBuffer->Seek(0, SEEK_CUR);
 
@@ -449,7 +450,7 @@ unsigned char *NuppelVideoPlayer::GetFrame(int *timecode, int onlyvideo,
 	    }
 	    else if (frameheader.comptype == 'V')
             {
-		positionList[framesPlayed / 30] = currentposition;
+		(*positionMap)[framesPlayed / 30] = currentposition;
 		lastKey = framesPlayed;
 	    }
         }
@@ -596,6 +597,7 @@ void NuppelVideoPlayer::StartPlaying(void)
     
     now.tv_sec = 0;
 
+    InitSubs();
     OpenFile();
 
     videosize = video_width * video_height * 3 / 2;
@@ -617,21 +619,42 @@ void NuppelVideoPlayer::StartPlaying(void)
     rewindtime = 0;
     fftime = 0;
 
+    resetplaying = false;
+    
     //if (getuid() == 0)
     //    nice(-10);
 
     while (!eof && !killplayer)
     {
-        if (paused)
+	if (resetplaying)
 	{
-            if (livetv && ringBuffer->GetFreeSpace() < 0)
+            ClearAfterSeek();
+            prebuffered = 0;
+            actpre = 0;
+            now.tv_sec = 0;
+	    framesPlayed = 0;
+	    resetplaying = false;
+	    actuallyreset = true;
+	    OpenFile(true);
+	    delete positionMap;
+	    positionMap = new map<long long, long long>;
+        }
+	    
+        if (paused)
+	{ 
+            actuallypaused = true;
+            if (livetv && ringBuffer->GetFreeSpace() < -1000)
+            {
                 paused = false;
+		printf("forced unpause\n");
+	    }
 	    else
             {
                 usleep(50);
                 continue;
             }
 	}
+	
 	if (rewindtime > 0)
 	{
 	    rewindtime *= video_frame_rate;
@@ -656,7 +679,7 @@ void NuppelVideoPlayer::StartPlaying(void)
 	}
 
         videobuf = GetFrame(&timecode, audiofd <= 0, &audiodata, &audiodatalen);
-        if (eof)
+	if (eof)
             continue;
         if (audiodatalen != 0)
             WriteAudio(audiodata, audiodatalen);
@@ -740,21 +763,6 @@ void NuppelVideoPlayer::StartPlaying(void)
     XJ_exit();
 }
 
-bool NuppelVideoPlayer::TogglePause(void)
-{
-    paused = !paused;
-    return paused;
-}
-void NuppelVideoPlayer::FastForward(float seconds)
-{
-    fftime = seconds;
-}
-
-void NuppelVideoPlayer::Rewind(float seconds)
-{
-    rewindtime = seconds;
-}
-
 void NuppelVideoPlayer::DoRewind(void)
 {
     if (rewindtime < 5)
@@ -771,14 +779,14 @@ void NuppelVideoPlayer::DoRewind(void)
         lastKey = 1;
 
     int normalframes = desiredFrame - lastKey;
-    long long keyPos = positionList[lastKey / 30];
+    long long keyPos = (*positionMap)[lastKey / 30];
     long long curPosition = ringBuffer->GetReadPosition();
     long long diff = keyPos - curPosition;
   
     while (ringBuffer->GetFreeSpaceWithReadChange(diff) < 0)
     {
         lastKey += 30;
-        keyPos = positionList[lastKey / 30];
+        keyPos = (*positionMap)[lastKey / 30];
         diff = keyPos - curPosition;
         normalframes = 0;
     }
@@ -863,10 +871,10 @@ void NuppelVideoPlayer::DoFastForward(void)
     int normalframes = desiredFrame - desiredKey;
     int fileend = 0;
 
-    if (positionList.find(desiredKey / 30) != positionList.end())
+    if (positionMap->find(desiredKey / 30) != positionMap->end())
     {
         lastKey = desiredKey;
-        long long keyPos = positionList[lastKey / 30];
+        long long keyPos = (*positionMap)[lastKey / 30];
         long long diff = keyPos - ringBuffer->GetReadPosition();
 
         ringBuffer->Seek(diff, SEEK_CUR);
@@ -883,7 +891,7 @@ void NuppelVideoPlayer::DoFastForward(void)
             {
                 if (frameheader.comptype == 'V')
                 {
-                    positionList[framesPlayed / 30] = 
+                    (*positionMap)[framesPlayed / 30] = 
                                                  ringBuffer->GetReadPosition();
                     lastKey = framesPlayed;
                 }

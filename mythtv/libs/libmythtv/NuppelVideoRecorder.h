@@ -42,14 +42,21 @@ class NuppelVideoRecorder
    
     void Initialize(void);
     void StartRecording(void);
-    void StopRecording(void) { encoding = false; }
+    void StopRecording(void) { encoding = false; } 
     
-    bool IsRecording(void) { return encoding; }
+    void Pause(void) { paused = true; actuallypaused = false; }
+    void Unpause(void) { paused = false; }
+    bool GetPause(void) { return actuallypaused; }
+    
+    bool IsRecording(void) { return childrenLive; }
    
     long long GetFramesWritten(void) { return framesWritten; } 
 
     void SetMP3Quality(int quality) { mp3quality = quality; }
 
+    int GetVideoFd(void) { return fd; }
+    void Reset(void);
+    
  protected:
     static void *WriteThread(void *param);
     static void *AudioThread(void *param);
@@ -144,6 +151,8 @@ class NuppelVideoRecorder
     double video_frame_rate;
 
     bool livetv;
+    bool paused;
+    bool actuallypaused;
 };
 
 #endif

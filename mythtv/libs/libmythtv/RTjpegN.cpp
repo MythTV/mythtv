@@ -278,8 +278,9 @@ fprintf(stdout, "\n\n");
 /* Stream to Block  (decoding)                        */
 /*                                                    */
 
-int RTjpeg::s2b(int16_t *data, int8_t *strm, uint8_t bt8, int32_t *qtbl)
+int RTjpeg::s2b(int16_t *data, int8_t *strm, uint8_t bt8, int32_t *qtbla)
 {
+ uint32_t *qtbl = (uint32_t *)qtbla;
  int ci;
  register int co;
  register int i;
@@ -480,8 +481,9 @@ int RTjpeg::b2s(int16_t *data, int8_t *strm, uint8_t bt8)
  return (int)co;
 }
 
-int RTjpeg::s2b(int16_t *data, int8_t *strm, uint8_t bt8, int32_t *qtbl)
+int RTjpeg::s2b(int16_t *data, int8_t *strm, uint8_t bt8, uint32_t *qtbla)
 {
+ uint32_t *qtbl = (uint32_t *)qtbla;
  int ci=1, co=1, tmp;
  register int i;
 

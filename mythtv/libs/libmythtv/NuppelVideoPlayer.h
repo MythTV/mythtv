@@ -42,9 +42,15 @@ class NuppelVideoPlayer
     void SetDeinterlace(bool set) { deinterlace = set; }
     bool GetDeinterlace(void) { return deinterlace; }
 
-    bool TogglePause(void);
-    void FastForward(float seconds);
-    void Rewind(float seconds);
+    bool TogglePause(void) { return (paused = !paused); }
+    void Pause(void) { paused = true; actuallypaused = false; }
+    void Unpause(void) { paused = false; }
+    bool GetPause(void) { return actuallypaused; }
+    
+    void FastForward(float seconds) { fftime = seconds; }
+    void Rewind(float seconds) { rewindtime = seconds; }
+    void ResetPlaying(void) { resetplaying = true; actuallyreset = false; }
+    bool ResetYet(void) { return actuallyreset; }
 
     float GetFrameRate(void) { return video_frame_rate; } 
     long long GetFramesPlayed(void) { return framesPlayed; }
@@ -58,7 +64,7 @@ class NuppelVideoPlayer
 
     int InitSubs(void);
     
-    int OpenFile(void);
+    int OpenFile(bool skipDsp = false);
     int CloseFile(void);
 
     unsigned char *DecodeFrame(struct rtframeheader *frameheader,
@@ -117,6 +123,7 @@ class NuppelVideoPlayer
     uint8_t *planes[3];
 
     int paused;
+    bool actuallypaused;
 
     bool playing;
 
@@ -129,11 +136,14 @@ class NuppelVideoPlayer
     
     bool livetv;
 
-    map<long long, long long> positionList;
+    map<long long, long long> *positionMap;
     long long lastKey;
     
     float rewindtime, fftime;
     NuppelVideoRecorder *nvr;
+
+    bool resetplaying;
+    bool actuallyreset;
 };
 
 #endif

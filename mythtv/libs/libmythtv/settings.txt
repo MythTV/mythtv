@@ -8,10 +8,10 @@ str BufferName=/mnt/store/ringbuf.nuv
 
 # Record settings
 # Resolution to capture at
-int Width=640
-int Height=240
+int Width=704
+int Height=480
 # Quality level to capture at (higher better, 255 being best)
-int Quality=200
+int Quality=140
 # Motion Levels (lower better, 0 being best)
 int LumaFilter=0
 int ChromaFilter=0
@@ -21,3 +21,7 @@ int MP3Quality=7
 # Playback options
 # Deinterlace playback (1 for on, 0 for no) -- adds to CPU usage
 int Deinterlace=1
+
+# TV options
+str TVFormat=NTSC
+str FreqTable=us-cable

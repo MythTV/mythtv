@@ -30,6 +30,8 @@ class RingBuffer
 
     long long GetFreeSpaceWithReadChange(long long readchange);
 
+    void Reset(void);
+
  private:
     string filename;
     

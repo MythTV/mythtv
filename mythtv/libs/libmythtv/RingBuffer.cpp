@@ -56,6 +56,23 @@ RingBuffer::~RingBuffer(void)
         close(fd2);
 }
 
+void RingBuffer::Reset(void)
+{
+    if (!normalfile)
+    {
+        close(fd);
+        close(fd2);
+
+        fd = open(filename.c_str(), O_WRONLY|O_CREAT|O_LARGEFILE, 0644);
+        fd2 = open(filename.c_str(), O_RDONLY|O_LARGEFILE);
+ 
+        totalwritepos = writepos = 0;
+        totalreadpos = readpos = 0;
+
+        wrapcount = 0;
+    }
+}
+
 int RingBuffer::Read(void *buf, int count)
 {
     int ret = -1;

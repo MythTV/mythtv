@@ -329,7 +329,7 @@ void XJ_show(int width, int height)
 {
   XvShmPutImage(XJ_disp, xv_port, XJ_win, XJ_gc, XJ_image, 0, 0, width, 
                 height, 0, 0, curw, curh, False);
-  XFlush(XJ_disp);
+  XSync(XJ_disp, True);
 }
 
 int XJ_CheckEvents(void)

@@ -13,9 +13,11 @@ CXXLINK = $(CXX) $(CXXFLAGS) -o $@
 
 NUVLIBS = `lib/nuppelvideo-config --libs`
 
-.SUFFIXES: .cpp .o
+.SUFFIXES: .cpp .c .o
 
 .cpp.o:
+	$(CXXCOMPILE) -c $< -o $@
+.c.o:
 	$(CXXCOMPILE) -c $< -o $@
 
 all: libNuppelVideo.a nuvplay nuvrec tv 
@@ -26,7 +28,7 @@ NUVPLAYLDF =-Llib/ -lNuppelVideo $(NUVLIBS)
 NUVRECOBJ = nuvrec.o
 NUVRECLDF = -Llib/ -lNuppelVideo $(NUVLIBS)
 
-TVOBJ = tv.o settings.o
+TVOBJ = tv.o settings.o channel.o frequencies.o
 TVLDF = -Llib/ -lNuppelVideo $(NUVLIBS)
 
 libNuppelVideo.a:

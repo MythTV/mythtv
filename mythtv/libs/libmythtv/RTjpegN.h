@@ -73,7 +73,7 @@ class RTjpeg
 
 private:
     int b2s(int16_t *data, int8_t *strm, uint8_t bt8);
-    int s2b(int16_t *data, int8_t *strm, uint8_t bt8, int32_t *qtbl);
+    int s2b(int16_t *data, int8_t *strm, uint8_t bt8, int32_t *qtbla);
 
     void QuantInit(void);
     void Quant(int16_t *block, int32_t *qtbl);
