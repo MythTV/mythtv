@@ -1,6 +1,8 @@
 #include <qfile.h>
 #include <cmath>
 #include <iostream>
+#include <mythtv/mythdbcon.h>
+
 
 using namespace std;
 
@@ -82,30 +84,28 @@ bool Metadata::Remove()
     if (isremoved)
     {
         MSqlQuery query(MSqlQuery::InitCon());
-        QString thequery;
 
-        thequery.sprintf("DELETE FROM videometadatagenre "
-                        " WHERE idvideo = %d",id);
-        query.exec(thequery);
-        if (!query.isActive()){
+        query.prepare("DELETE FROM videometadatagenre WHERE idvideo = :ID");
+        query.bindValue(":ID", id);
+        if (!query.exec()) {
             MythContext::DBError("delete from videometadatagenre", query);
         }
-        thequery.sprintf("DELETE FROM videometadatacountry "
-                        " WHERE idvideo = %d",id);
-        query.exec(thequery);
-        if (!query.isActive()){
+
+        query.prepare("DELETE FROM videometadatacountry WHERE idvideo = :ID");
+        query.bindValue(":ID", id);
+        if (!query.exec()) {
             MythContext::DBError("delete from videometadatacountry", query);
         }
-        thequery.sprintf("DELETE FROM videometadata "
-                        " WHERE intid = %d",id);
-        query.exec(thequery);
-        if (!query.isActive()){
+
+        query.prepare("DELETE FROM videometadata WHERE intid = :ID");
+        query.bindValue(":ID", id);
+        if (!query.exec()) {
             MythContext::DBError("delete from videometadata", query);
         }
-        thequery = QString("DELETE FROM filemarkup WHERE filename = '%1'")
-                           .arg(filename);
-        query.exec(thequery);
-        if (!query.isActive()){
+
+        query.prepare("DELETE FROM filemarkup WHERE filename = :FILENAME");
+        query.bindValue(":FILENAME", filename);
+        if (!query.exec()){
             MythContext::DBError("delete from filemarkup", query);
         }
 

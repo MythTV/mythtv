@@ -378,26 +378,24 @@ void DVDTitle::addSubTitle(DVDSubTitle *new_subtitle)
 
 void DVDTitle::determineInputID()
 {
-    QString q_string = QString("SELECT intid FROM dvdinput WHERE "
-                              "hsize = %1 and "
-                              "vsize = %2 and "
-                              "ar_num = %3 and "
-                              "ar_denom = %4 and "
-                              "fr_code = %5 and "
-                              "letterbox = %6 and "
-                              "v_format = \"%7\" ;")
-                              .arg(hsize)
-                              .arg(vsize)
-                              .arg(ar_numerator)
-                              .arg(ar_denominator)
-                              .arg(fr_code)
-                              .arg(letterbox)
-                              .arg(video_format);
-
     MSqlQuery a_query(MSqlQuery::InitCon());
-    a_query.exec(q_string);
+    a_query.prepare("SELECT intid FROM dvdinput WHERE "
+                              "hsize = :HSIZE and "
+                              "vsize = :VSIZE and "
+                              "ar_num = :ARNUM and "
+                              "ar_denom = :ARDENOM and "
+                              "fr_code = :FRCODE and "
+                              "letterbox = :LETTERBOX and "
+                              "v_format = :VFORMAT;");
+    a_query.bindValue(":HSIZE", hsize);
+    a_query.bindValue(":VSIZE", vsize);
+    a_query.bindValue(":ARNUM", ar_numerator);
+    a_query.bindValue(":ARDENOM", ar_denominator);
+    a_query.bindValue(":FRCODE", fr_code);
+    a_query.bindValue(":LETTERBOX", letterbox);
+    a_query.bindValue(":VFORMAT", video_format);
     
-    if(a_query.isActive() && a_query.numRowsAffected() > 0)
+    if(a_query.exec() && a_query.isActive() && a_query.size() > 0)
     {
         a_query.next();
         dvdinput_id = a_query.value(0).toInt();

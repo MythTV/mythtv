@@ -72,8 +72,7 @@ void MTDJob::setSubjob(double a_number)
 */
 
 
-DVDRipBox::DVDRipBox(QSqlDatabase *ldb,
-                     MythMainWindow *parent, QString window_name,
+DVDRipBox::DVDRipBox(MythMainWindow *parent, QString window_name,
                      QString theme_filename, const char *name)
 
            : MythThemedDialog(parent, window_name, theme_filename, name)
@@ -96,7 +95,6 @@ DVDRipBox::DVDRipBox(QSqlDatabase *ldb,
     //  Set some startup defaults
     //
     
-    db = ldb;
     client_socket = NULL;
     tried_mtd = false;
     connected = false;
@@ -944,8 +942,7 @@ void DVDRipBox::goRipScreen()
     }
     stopStatusPolling();
     block_media_requests = true;
-    TitleDialog title_dialog(db, 
-                             client_socket, 
+    TitleDialog title_dialog(client_socket, 
                              dvd_info->getName(), 
                              dvd_info->getTitles(), 
                              gContext->GetMainWindow(),

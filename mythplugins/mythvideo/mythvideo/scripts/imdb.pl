@@ -321,6 +321,8 @@ sub getMoviePoster {
       if ($1) { $movie_title = $1; }
       $movie_title =~ /(.*), The$/i;
       if ($1) { $movie_title = $1; }
+
+      $movie_title =~ s/\"//g; # if we give amazon quotes they give them back
       
       if (defined $opt_d) { print "# Movie title is: $movie_title\n"; }
       

@@ -5,7 +5,6 @@
 #include <qstring.h>
 
 #include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
 #include <qpixmap.h>
 #include <qimage.h>
 

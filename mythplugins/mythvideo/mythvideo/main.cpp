@@ -402,13 +402,11 @@ void SearchDir(QString &directory)
 
 bool IgnoreExtension(QString extension)
 {
-    
-    QString q_string = QString("SELECT f_ignore FROM videotypes WHERE extension = \"%1\" ;")
-                              .arg(extension);
     MSqlQuery a_query(MSqlQuery::InitCon());
-    a_query.exec(q_string);
+    a_query.prepare("SELECT f_ignore FROM videotypes WHERE extension = :EXT");
+    a_query.bindValue(":EXT", extension);
 
-    if(a_query.isActive() && a_query.size() > 0)
+    if(a_query.exec() && a_query.isActive() && a_query.size() > 0)
     {
         //
         //  This extension is a recognized

@@ -93,7 +93,7 @@ void DiscCheckingThread::run()
 
 
 
-MTD::MTD(QSqlDatabase *ldb, int port, bool log_stdout)
+MTD::MTD(int port, bool log_stdout)
     :QObject()
 {
     keep_running = true;
@@ -103,20 +103,6 @@ MTD::MTD(QSqlDatabase *ldb, int port, bool log_stdout)
     nice(nice_priority);
     nice_level = nice_priority;
 
-    //
-    //  Reference db pointer
-    //
-    
-    if(ldb)
-    {
-        db = ldb;
-    }
-    else
-    {
-        cerr << "mtd.o: Not going to have much luck running without a database pointer. Bye." << endl ;
-        exit(0);        
-    }
-    
     //
     //  Create the socket to listen to for connections
     //
@@ -190,7 +176,7 @@ MTD::MTD(QSqlDatabase *ldb, int port, bool log_stdout)
         cerr << "dvdripbox.o: Can't get a value for DVD device location. Did you run setup?" << endl;
         exit(0);
     }
-    dvd_probe = new DVDProbe(dvd_device, db);
+    dvd_probe = new DVDProbe(dvd_device);
     disc_checking_thread = new DiscCheckingThread(this, dvd_probe, dvd_drive_access, titles_mutex);
     disc_checking_thread->start();
     disc_checking_timer = new QTimer();
@@ -770,7 +756,6 @@ void MTD::startDVD(const QStringList &tokens)
                                                     nice_level,
                                                     quality,
                                                     ac3_flag,
-                                                    db,
                                                     audio_track,
                                                     numb_seconds,
                                                     subtitle_track);

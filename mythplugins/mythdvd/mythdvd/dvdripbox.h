@@ -10,7 +10,6 @@
 #ifndef DVDRIPBOX_H_
 #define DVDRIPBOX_H_
 
-#include <qsqldatabase.h>
 #include <qregexp.h>
 #include <qtimer.h>
 #include <qptrlist.h>
@@ -83,8 +82,7 @@ class DVDRipBox : public MythThemedDialog
 
     typedef QValueVector<int> IntVector;
     
-    DVDRipBox(QSqlDatabase *ldb,
-              MythMainWindow *parent, QString window_name,
+    DVDRipBox(MythMainWindow *parent, QString window_name,
               QString theme_filename, const char *name = 0);
 
     ~DVDRipBox(void);
@@ -123,7 +121,6 @@ class DVDRipBox : public MythThemedDialog
     void    createSocket();
 
     QSocket          *client_socket;
-    QSqlDatabase     *db;
     QTimer           *status_timer;
     bool             tried_mtd;
     bool             connected;

@@ -144,11 +144,10 @@ int main(int argc, char **argv)
    
     LanguageSettings::load("mythdvd");
     
-    new MTD(db, assigned_port, log_stdout);
+    new MTD(assigned_port, log_stdout);
     
     a.exec();
                                 
-    delete db;
     delete gContext;
     return 0;
 #else

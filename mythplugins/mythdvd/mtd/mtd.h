@@ -10,7 +10,6 @@
 
 */
 
-#include <qsqldatabase.h>
 #include <qobject.h>
 #include <qstringlist.h>
 #include <qptrlist.h>
@@ -58,7 +57,7 @@ class MTD : public QObject
 
   public:
   
-    MTD(QSqlDatabase *ldb, int port, bool log_stdout);
+    MTD(int port, bool log_stdout);
     bool threadsShouldContinue(){return keep_running;}
     bool isItOkToStartTranscoding();
     
@@ -90,7 +89,6 @@ class MTD : public QObject
   
     MTDLogger           *mtd_log;    
     MTDServerSocket     *server_socket;
-    QSqlDatabase        *db;
     QPtrList<JobThread> job_threads;
     QMutex              *dvd_drive_access;
     QMutex              *titles_mutex;
