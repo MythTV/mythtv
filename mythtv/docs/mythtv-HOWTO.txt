@@ -69,14 +69,15 @@
   9. Using mythtv.
      9.1 Using themes with mythtv.
 
-  10. Using mythweb.
+  10. mythweb.
+     10.1 Installation.
+        10.1.1 Mandrake 9.0
+
   11. Using mythgallery.
   12. Using mythgame.
 
 
   ______________________________________________________________________
-
-
 
   [1m1.  Introduction.[0m
 
@@ -97,9 +98,9 @@
 
   For users with a Debian system, the mythtv program has been packaged
   by Matt Zimmerman  <mailto:mdz@debian.org> and is available at
-  http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/
-  <http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/>  The mailing list
-  message for this announcement can be accessed at
+  http://dijkstra.csh.rit.edu:8088/~mdz/debian/dists/woody/mythtv/
+  <http://dijkstra.csh.rit.edu:8088/~mdz/debian/dists/woody/mythtv/>
+  The mailing list message for this announcement can be accessed at
   http://www.snowman.net/pipermail/mythtv-dev/2002-November/001116.html
   <http://www.snowman.net/pipermail/mythtv-
   dev/2002-November/001116.html>.
@@ -1142,7 +1143,47 @@
   theme while [1mmythfrontend [22mis still running.
 
 
-  [1m10.  Using mythweb.[0m
+  [1m10.  mythweb.[0m
+
+  mythweb allows you to use a web page to control various aspects of
+  your mythtv system.  mythweb is a separate application, but it's
+  dependant on mythtv being installed and operational.
+
+
+  [1m10.1.  Installation.[0m
+
+  Download mythweb from http://www.mythtv.org/ <http://www.mythtv.org/>
+  and save it to a location where you can find it.  The next step
+  depends on whether your distribution has a web server and if you have
+  php support.
+
+
+  [1m10.1.1.  Mandrake 9.0[0m
+
+  Mandrake 9.0 has [1mapache [22mand [1mphp [22mpre-packaged, so installation is quite
+  simple.  Once you have installed the two programs, either with the
+  graphical installer (see instructions in ``Graphic Install Tools'') or
+  through the command line (section ``Command Line''), and you've
+  ensured that the [1mapache [22mserver will start at boot using the Mandrake
+  Control Center, do the following:
+
+
+       % tar -xjf mythweb-0.7.tar.bz2
+       % cd mythweb-0.7
+       % su
+       # mkdir /var/www/html/mythweb
+       # cp -r . /var/www/html/mythweb
+       # exit
+       %
+
+
+
+  To access the web page, open a web browser and use [1mhttp://[name or ip[0m
+  [1maddress]/mythweb/[0m
+
+  [1mNOTE[22m: Make sure that you have a trailing slash on the URL, otherwise
+  you will get a 404 Page not Found error.
+
 
   [1m11.  Using mythgallery.[0m
 

@@ -92,7 +92,7 @@ gcc, freetype2-devel and qt-devel.  If you're going to use a remote control
 with mythtv, you're going to need the cdialog package in order to compile
 lircd.
 
-<sect2>Graphical installation tools.
+<sect2>Graphical installation tools. <label id="graphicinstalltools_">
 <sect3>Mandrake 9.0
 
 <p>On systems running KDE, a tool which will allow you to see what packages
@@ -149,7 +149,7 @@ sure "mysql-server" is checked.
 
 Click Install to continue.
 
-<sect2>Command-line installation.
+<sect2>Command-line installation. <label id="CLIinstalltools_">
 <p> This section details the various methods for installing pre-requisites
 from the command line.
 
@@ -893,7 +893,40 @@ exit and restart <bf>mythfrontend</bf> for it to take effect.
 have in progress, so make sure that the system isn't busy if you modify the
 theme while <bf>mythfrontend</bf> is still running.
 
-<sect>Using mythweb.
+<sect>mythweb.
+<p>mythweb allows you to use a web page to control various aspects of your
+mythtv system.  mythweb is a separate application, but it's dependant on
+mythtv being installed and operational.
+
+<sect1>Installation.
+<p>Download mythweb from <url url="http://www.mythtv.org/"
+name="http://www.mythtv.org/"> and save it to a location where you can find
+it.  The next step depends on whether your distribution has a web server and
+if you have php support.
+
+<sect2>Mandrake 9.0
+<p>Mandrake 9.0 has <bf>apache</bf> and <bf>php</bf> pre-packaged, so
+installation is quite simple.  Once you have installed the two programs,
+either with the graphical installer (see instructions in <ref
+id="graphicinstalltools_" name="Graphic Install Tools">) or through the
+command line (section <ref id="CLIinstalltools_" name="Command Line">), and
+you've ensured that the <bf>apache</bf> server will start at boot using the
+Mandrake Control Center, do the following:
+<tscreen><verb>
+% tar -xjf mythweb-0.7.tar.bz2
+% cd mythweb-0.7
+% su
+# mkdir /var/www/html/mythweb
+# cp -r . /var/www/html/mythweb
+# exit
+%
+</verb></tscreen>
+To access the web page, open a web browser and use <bf>http://[name or ip
+address]/mythweb/</bf>
+
+<bf>NOTE</bf>: Make sure that you have a trailing slash on the URL,
+otherwise you will get a <tt>404 Page not Found</tt> error.
+
 <sect>Using mythgallery.
 <sect>Using mythgame.
 
