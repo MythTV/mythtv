@@ -2425,17 +2425,17 @@ void NuppelVideoPlayer::UpdateSeekAmount(bool up)
 
     switch (seekamountpos)
     {
-        case 0: text = "cut point"; seekamount = -2; break;
-        case 1: text = "keyframe"; seekamount = -1; break;
-        case 2: text = "1 frame"; seekamount = 1; break;
-        case 3: text = "0.5 seconds"; seekamount = fps / 2; break;
-        case 4: text = "1 second"; seekamount = fps; break;
-        case 5: text = "5 seconds"; seekamount = fps * 5; break;
-        case 6: text = "20 seconds"; seekamount = fps * 20; break;
-        case 7: text = "1 minute"; seekamount = fps * 60; break;
-        case 8: text = "5 minutes"; seekamount = fps * 300; break;
-        case 9: text = "10 minutes"; seekamount = fps * 600; break;
-        default: text = "error"; seekamount = fps; break;
+        case 0: text = QObject::tr("cut point"); seekamount = -2; break;
+        case 1: text = QObject::tr("keyframe"); seekamount = -1; break;
+        case 2: text = QObject::tr("1 frame"); seekamount = 1; break;
+        case 3: text = QObject::tr("0.5 seconds"); seekamount = fps / 2; break;
+        case 4: text = QObject::tr("1 second"); seekamount = fps; break;
+        case 5: text = QObject::tr("5 seconds"); seekamount = fps * 5; break;
+        case 6: text = QObject::tr("20 seconds"); seekamount = fps * 20; break;
+        case 7: text = QObject::tr("1 minute"); seekamount = fps * 60; break;
+        case 8: text = QObject::tr("5 minutes"); seekamount = fps * 300; break;
+        case 9: text = QObject::tr("10 minutes"); seekamount = fps * 600; break;
+        default: text = QObject::tr("error"); seekamount = fps; break;
     }
 
     QMap<QString, QString> regexpMap;
@@ -2467,7 +2467,7 @@ void NuppelVideoPlayer::UpdateTimeDisplay(void)
 
     QString cutmarker = "";
     if (IsInDelete(framesPlayed))
-        cutmarker = "cut";
+        cutmarker = QObject::tr("cut");
 
     QMap<QString, QString> regexpMap;
     regexpMap["timedisplay"] = timestr;
@@ -2498,16 +2498,16 @@ void NuppelVideoPlayer::HandleSelect(void)
 
     if (deletepoint)
     {
-        QString message = "You are close to an existing cut point.  Would you "
-                          "like to:";
-        QString option1 = "Delete this cut point";
-        QString option2 = "Move this cut point to the current position";
-        QString option3 = "Flip directions - delete to the ";
+        QString message = QObject::tr("You are close to an existing cut point.  Would you " 
+                          "like to:");
+        QString option1 = QObject::tr("Delete this cut point");
+        QString option2 = QObject::tr("Move this cut point to the current position");
+        QString option3 = QObject::tr("Flip directions - delete to the ");
         if (direction == 0)
-            option3 += "right";
+            option3 += QObject::tr("right");
         else
-            option3 += "left";
-        QString option4 = "Cancel";
+            option3 += QObject::tr("left");
+        QString option4 = QObject::tr("Cancel");
 
         dialogname = "deletemark";
         dialogtype = 0;
@@ -2522,10 +2522,10 @@ void NuppelVideoPlayer::HandleSelect(void)
     }
     else
     {
-        QString message = "Insert a new cut point?";
-        QString option1 = "Delete before this frame";
-        QString option2 = "Delete after this frame";
-        QString option3 = "Cancel";
+        QString message = QObject::tr("Insert a new cut point?");
+        QString option1 = QObject::tr("Delete before this frame");
+        QString option2 = QObject::tr("Delete after this frame");
+        QString option3 = QObject::tr("Cancel");
 
         dialogname = "addmark";
         dialogtype = 1;
@@ -3247,10 +3247,10 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
                 {
                     int skipped_seconds = (int)((commBreakIter.key() -
                             framesPlayed) / video_frame_rate);
-                    QString comm_msg = QString("Auto-Skip %1 seconds")
+                    QString comm_msg = QString(QObject::tr("Auto-Skip %1 seconds"))
                                       .arg(skipped_seconds);
                     int spos = GetStatusbarPos();
-                    osd->StartPause(spos, false, "SKIP", comm_msg, 1);
+                    osd->StartPause(spos, false, QObject::tr("SKIP"), comm_msg, 1);
                 }
 
                 JumpToFrame(commBreakIter.key());
@@ -3448,10 +3448,10 @@ void NuppelVideoPlayer::SkipCommercialsByBlanks(void)
                     blank_seq_found = 1;
 
                     commercials_found++;
-                    comm_msg = QString("Found %1 sec. commercial")
+                    comm_msg = QString(QObject::tr("Found %1 sec. commercial"))
                                       .arg(*comm_length);
        
-                    osd->StartPause(spos, false, "SKIP", comm_msg, 5);
+                    osd->StartPause(spos, false, QObject::tr("SKIP"), comm_msg, 5);
                 }
                 break;
             }
@@ -3508,9 +3508,9 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
         if ((commBreakIter == commBreakMap.begin()) &&
             (direction < 0))
         {
-            QString comm_msg = QString("At Start of program.");
+            QString comm_msg = QString(QObject::tr("At Start of program."));
             int spos = GetStatusbarPos();
-            osd->StartPause(spos, false, "SKIP", comm_msg, 1);
+            osd->StartPause(spos, false, QObject::tr("SKIP"), comm_msg, 1);
 
             JumpToFrame(0);
             return true;
@@ -3519,9 +3519,9 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
         if ((commBreakIter == commBreakMap.end()) &&
             (direction > 0))
         {
-            QString comm_msg = QString("At End, can not Skip.");
+            QString comm_msg = QString(QObject::tr("At End, can not Skip."));
             int spos = GetStatusbarPos();
-            osd->StartPause(spos, false, "SKIP", comm_msg, 1);
+            osd->StartPause(spos, false, QObject::tr("SKIP"), comm_msg, 1);
             return false;
         }
 
@@ -3536,9 +3536,9 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
             {
                 if (commBreakIter == commBreakMap.begin())
                 {
-                    QString comm_msg = QString("Start of program.");
+                    QString comm_msg = QString(QObject::tr("Start of program."));
                     int spos = GetStatusbarPos();
-                    osd->StartPause(spos, false, "SKIP", comm_msg, 1);
+                    osd->StartPause(spos, false, QObject::tr("SKIP"), comm_msg, 1);
 
                     JumpToFrame(0);
                     return true;
@@ -3552,10 +3552,10 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
         {
             int skipped_seconds = (int)((commBreakIter.key() -
                     framesPlayed) / video_frame_rate);
-            QString comm_msg = QString("Auto-Skip %1 seconds")
+            QString comm_msg = QString(QObject::tr("Auto-Skip %1 seconds"))
                                   .arg(skipped_seconds);
             int spos = GetStatusbarPos();
-            osd->StartPause(spos, false, "SKIP", comm_msg, 1);
+            osd->StartPause(spos, false, QObject::tr("SKIP"), comm_msg, 1);
         }
         JumpToFrame(commBreakIter.key());
         commBreakIter++;

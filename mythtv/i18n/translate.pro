@@ -10,6 +10,7 @@ SOURCES += ../libs/libmythtv/progfind.cpp
 SOURCES += ../libs/libmythtv/scheduledrecording.cpp
 SOURCES += ../libs/libmythtv/infodialog.cpp
 SOURCES += ../libs/libmythtv/tv_play.cpp
+SOURCES += ../libs/libmythtv/NuppelVideoPlayer.cpp
 
 TRANSLATIONS  = mythfrontend_it.ts mythfrontend_es.ts mythfrontend_ca.ts
 TRANSLATIONS += mythfrontend_nl.ts

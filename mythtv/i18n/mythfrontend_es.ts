@@ -3,23 +3,23 @@
     <name>GuideGrid</name>
     <message>
         <source>Recording Once</source>
-        <translation type="unfinished"></translation>
+        <translation>Grabar una vez</translation>
     </message>
     <message>
         <source>Timeslot Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Grabar en esta franja horaria</translation>
     </message>
     <message>
         <source>Channel Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Grabar en el canal</translation>
     </message>
     <message>
         <source>All Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Grabar en todas partes</translation>
     </message>
     <message>
         <source>Not Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>No grabar</translation>
     </message>
 </context>
 <context>
@@ -86,6 +86,13 @@
     <message>
         <source>minutes</source>
         <translation>minutos</translation>
+    </message>
+</context>
+<context>
+    <name>NuppelVideoPlayer</name>
+    <message>
+        <source>SKIP</source>
+        <translation type="obsolete">SALTO</translation>
     </message>
 </context>
 <context>
@@ -187,6 +194,118 @@
     <message>
         <source>Do you really want to exit MythTV?</source>
         <translation>¿Realmente desea salir de MythTV?</translation>
+    </message>
+    <message>
+        <source>cut point</source>
+        <translation>punto de corte</translation>
+    </message>
+    <message>
+        <source>keyframe</source>
+        <translation>fotograma</translation>
+    </message>
+    <message>
+        <source>1 frame</source>
+        <translation>Un fotograma</translation>
+    </message>
+    <message>
+        <source>0.5 seconds</source>
+        <translation>medio segundo</translation>
+    </message>
+    <message>
+        <source>1 second</source>
+        <translation>Un segundo</translation>
+    </message>
+    <message>
+        <source>5 seconds</source>
+        <translation>5 segundos</translation>
+    </message>
+    <message>
+        <source>20 seconds</source>
+        <translation>20 segundos</translation>
+    </message>
+    <message>
+        <source>1 minute</source>
+        <translation>Un minuto</translation>
+    </message>
+    <message>
+        <source>5 minutes</source>
+        <translation>5 minutos</translation>
+    </message>
+    <message>
+        <source>10 minutes</source>
+        <translation>10 minutos</translation>
+    </message>
+    <message>
+        <source>error</source>
+        <translation>error</translation>
+    </message>
+    <message>
+        <source>You are close to an existing cut point.  Would you like to:</source>
+        <translation>Está cerca de un punto de corte. ¿Que quiere Ud. hacer?:</translation>
+    </message>
+    <message>
+        <source>Delete this cut point</source>
+        <translation>Borrar este punto de corte</translation>
+    </message>
+    <message>
+        <source>Move this cut point to the current position</source>
+        <translation>Mover el punto de corte a esta posición</translation>
+    </message>
+    <message>
+        <source>Flip directions - delete to the </source>
+        <translation>Canviar direcciones - borrar hacia la </translation>
+    </message>
+    <message>
+        <source>right</source>
+        <translation>derecha</translation>
+    </message>
+    <message>
+        <source>left</source>
+        <translation>izquierda</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Abandonar</translation>
+    </message>
+    <message>
+        <source>Insert a new cut point?</source>
+        <translation>¿Insertar un nuevo punto de corte?</translation>
+    </message>
+    <message>
+        <source>Delete before this frame</source>
+        <translation>Borrar antes de este fotograma</translation>
+    </message>
+    <message>
+        <source>Delete after this frame</source>
+        <translation>Borrar después de este fotograma</translation>
+    </message>
+    <message>
+        <source>Auto-Skip %1 seconds</source>
+        <translation>Salto automático de %1 segs</translation>
+    </message>
+    <message>
+        <source>SKIP</source>
+        <translation>SALTO</translation>
+    </message>
+    <message>
+        <source>Found %1 sec. commercial</source>
+        <translation>Encontrados %1 segs. de anuncios</translation>
+    </message>
+    <message>
+        <source>At Start of program.</source>
+        <translation>AL inicio del programa.</translation>
+    </message>
+    <message>
+        <source>At End, can not Skip.</source>
+        <translation>Al final, no puedo saltar.</translation>
+    </message>
+    <message>
+        <source>Start of program.</source>
+        <translation>Inicio del programa.</translation>
+    </message>
+    <message>
+        <source>cut</source>
+        <translation>cortes</translation>
     </message>
 </context>
 <context>
@@ -351,7 +470,7 @@
     </message>
     <message>
         <source>Searching...</source>
-        <translation type="unfinished"></translation>
+        <translation>Buscando...</translation>
     </message>
 </context>
 <context>
@@ -386,11 +505,15 @@
     </message>
     <message>
         <source>Time Conflict</source>
-        <translation type="unfinished"></translation>
+        <translation>Conflicto en el tiempo</translation>
     </message>
     <message>
         <source>No Conflicts</source>
-        <translation type="unfinished"></translation>
+        <translation>Sin conflictos</translation>
+    </message>
+    <message>
+        <source>Unsuppress recording</source>
+        <translation>Desuprimir grabación</translation>
     </message>
 </context>
 </TS>

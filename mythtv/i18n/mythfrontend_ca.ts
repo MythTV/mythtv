@@ -3,23 +3,23 @@
     <name>GuideGrid</name>
     <message>
         <source>Recording Once</source>
-        <translation type="unfinished"></translation>
+        <translation>Gravar una sola vegada</translation>
     </message>
     <message>
         <source>Timeslot Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Gravar en la franja horària</translation>
     </message>
     <message>
         <source>Channel Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Gravar en aquest canal</translation>
     </message>
     <message>
         <source>All Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Gravar sempre</translation>
     </message>
     <message>
         <source>Not Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>No gravar</translation>
     </message>
 </context>
 <context>
@@ -86,6 +86,65 @@
     <message>
         <source>minutes</source>
         <translation>minuts</translation>
+    </message>
+</context>
+<context>
+    <name>NuppelVideoPlayer</name>
+    <message>
+        <source>You are close to an existing cut point.  Would you like to:</source>
+        <translation type="obsolete">Estas a prop de un punt de tall. Què vols fer?:</translation>
+    </message>
+    <message>
+        <source>Delete this cut point</source>
+        <translation type="obsolete">Esborrar aquest punt de tall</translation>
+    </message>
+    <message>
+        <source>Move this cut point to the current position</source>
+        <translation type="obsolete">Moure el punt de tall fins aquí</translation>
+    </message>
+    <message>
+        <source>Flip directions - delete to the </source>
+        <translation type="obsolete">Canviar direccions - esborrar fins aqui</translation>
+    </message>
+    <message>
+        <source>Insert a new cut point?</source>
+        <translation type="obsolete">Insertar un nou punt de tall?</translation>
+    </message>
+    <message>
+        <source>Delete before this frame</source>
+        <translation type="obsolete">Esborrar avans d&apos;aquest punt</translation>
+    </message>
+    <message>
+        <source>Delete after this frame</source>
+        <translation type="obsolete">ESborrar després d&apos;aquest punt</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="obsolete">Cancel·lar</translation>
+    </message>
+    <message>
+        <source>Auto-Skip %1 seconds</source>
+        <translation type="obsolete">Salt automàtic de %1 seg</translation>
+    </message>
+    <message>
+        <source>SKIP</source>
+        <translation type="obsolete">SALT</translation>
+    </message>
+    <message>
+        <source>Found %1 sec. commercial</source>
+        <translation type="obsolete">He trovat %1 seg. d&apos;anuncis</translation>
+    </message>
+    <message>
+        <source>At Start of program.</source>
+        <translation type="obsolete">A l&apos;inici del programa.</translation>
+    </message>
+    <message>
+        <source>At End, can not Skip.</source>
+        <translation type="obsolete">Al final, no puc saltar.</translation>
+    </message>
+    <message>
+        <source>Start of program.</source>
+        <translation type="obsolete">Inici del programa.</translation>
     </message>
 </context>
 <context>
@@ -188,6 +247,118 @@
         <source>Do you really want to exit MythTV?</source>
         <translation>Realment vol sortir de MythTV?</translation>
     </message>
+    <message>
+        <source>cut point</source>
+        <translation>Punt de tall</translation>
+    </message>
+    <message>
+        <source>keyframe</source>
+        <translation>fotograma</translation>
+    </message>
+    <message>
+        <source>1 frame</source>
+        <translation>1 fotograma</translation>
+    </message>
+    <message>
+        <source>0.5 seconds</source>
+        <translation>mig segon</translation>
+    </message>
+    <message>
+        <source>1 second</source>
+        <translation>Un segon</translation>
+    </message>
+    <message>
+        <source>5 seconds</source>
+        <translation>5 segons</translation>
+    </message>
+    <message>
+        <source>20 seconds</source>
+        <translation>20 segons</translation>
+    </message>
+    <message>
+        <source>1 minute</source>
+        <translation>1 minut</translation>
+    </message>
+    <message>
+        <source>5 minutes</source>
+        <translation>5 minuts</translation>
+    </message>
+    <message>
+        <source>10 minutes</source>
+        <translation>10 minuts</translation>
+    </message>
+    <message>
+        <source>error</source>
+        <translation>error</translation>
+    </message>
+    <message>
+        <source>You are close to an existing cut point.  Would you like to:</source>
+        <translation>Estas a prop de un punt de tall. Què vols fer?:</translation>
+    </message>
+    <message>
+        <source>Delete this cut point</source>
+        <translation>Esborrar aquest punt de tall</translation>
+    </message>
+    <message>
+        <source>Move this cut point to the current position</source>
+        <translation>Moure el punt de tall fins aquí</translation>
+    </message>
+    <message>
+        <source>Flip directions - delete to the </source>
+        <translation>Canviar direccions - esborrar cap a </translation>
+    </message>
+    <message>
+        <source>right</source>
+        <translation>la dreta</translation>
+    </message>
+    <message>
+        <source>left</source>
+        <translation>l&apos;esquerra</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Cancel·lar</translation>
+    </message>
+    <message>
+        <source>Insert a new cut point?</source>
+        <translation>Insertar un nou punt de tall?</translation>
+    </message>
+    <message>
+        <source>Delete before this frame</source>
+        <translation>Esborrar avans d&apos;aquest punt</translation>
+    </message>
+    <message>
+        <source>Delete after this frame</source>
+        <translation>Esborrar després d&apos;aquest punt</translation>
+    </message>
+    <message>
+        <source>Auto-Skip %1 seconds</source>
+        <translation>Salt automàtic de %1 seg</translation>
+    </message>
+    <message>
+        <source>SKIP</source>
+        <translation>SALT</translation>
+    </message>
+    <message>
+        <source>Found %1 sec. commercial</source>
+        <translation>He trovat %1 seg. d&apos;anuncis</translation>
+    </message>
+    <message>
+        <source>At Start of program.</source>
+        <translation>A l&apos;inici del programa.</translation>
+    </message>
+    <message>
+        <source>At End, can not Skip.</source>
+        <translation>Al final, no puc saltar.</translation>
+    </message>
+    <message>
+        <source>Start of program.</source>
+        <translation>Inici del programa.</translation>
+    </message>
+    <message>
+        <source>cut</source>
+        <translation>talls</translation>
+    </message>
 </context>
 <context>
     <name>ScheduledRecording</name>
@@ -231,7 +402,7 @@
     </message>
     <message>
         <source>Cancel and go back to the TV menu</source>
-        <translation>Cancel.la i retoroa al menú de TV</translation>
+        <translation>Cancel.la i retorna al menú de TV</translation>
     </message>
     <message>
         <source>Record and watch while it records</source>
@@ -351,7 +522,7 @@
     </message>
     <message>
         <source>Searching...</source>
-        <translation type="unfinished"></translation>
+        <translation>Cercant...</translation>
     </message>
 </context>
 <context>
@@ -386,11 +557,15 @@
     </message>
     <message>
         <source>Time Conflict</source>
-        <translation type="unfinished"></translation>
+        <translation>Conflicte en el temps</translation>
     </message>
     <message>
         <source>No Conflicts</source>
-        <translation type="unfinished"></translation>
+        <translation>Sense conflictes</translation>
+    </message>
+    <message>
+        <source>Unsuppress recording</source>
+        <translation>Dessuprimir gravació</translation>
     </message>
 </context>
 </TS>

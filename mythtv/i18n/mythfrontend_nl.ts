@@ -89,6 +89,13 @@
     </message>
 </context>
 <context>
+    <name>NuppelVideoPlayer</name>
+    <message>
+        <source>SKIP</source>
+        <translation type="obsolete">Overslaan</translation>
+    </message>
+</context>
+<context>
     <name>PlaybackBox</name>
     <message>
         <source>% used</source>
@@ -187,6 +194,118 @@
     <message>
         <source>Yes, Exit and shutdown the computer</source>
         <translation>Ja, sluit nu af en zet de computer uit</translation>
+    </message>
+    <message>
+        <source>cut point</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>keyframe</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1 frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0.5 seconds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1 second</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>5 seconds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>20 seconds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1 minute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>5 minutes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>10 minutes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are close to an existing cut point.  Would you like to:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete this cut point</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move this cut point to the current position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Flip directions - delete to the </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Insert a new cut point?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete before this frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete after this frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto-Skip %1 seconds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SKIP</source>
+        <translation type="unfinished">Overslaan</translation>
+    </message>
+    <message>
+        <source>Found %1 sec. commercial</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>At Start of program.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>At End, can not Skip.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start of program.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>cut</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -391,6 +510,10 @@
     <message>
         <source>Remember this choice and use it automatically in the future</source>
         <translation>Onthou deze keuze en gebruik ze later automatisch</translation>
+    </message>
+    <message>
+        <source>Unsuppress recording</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
