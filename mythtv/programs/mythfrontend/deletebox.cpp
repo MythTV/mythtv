@@ -8,6 +8,10 @@
 #include <qdatetime.h>
 #include <qprogressbar.h>
 #include <qapplication.h>
+#include <qtimer.h>
+#include <qimage.h>
+#include <qpainter.h>
+#include <unistd.h>
 
 #include <unistd.h>
 #include <stdio.h>
@@ -19,8 +23,11 @@
 #include "dialogbox.h"
 #include "programlistitem.h"
 #include "settings.h"
+#include "NuppelVideoPlayer.h"
+#include "yuv2rgb.h"
 
 extern Settings *globalsettings;
+extern char installprefix[];
 
 DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb, 
                      QWidget *parent, const char *name)
@@ -40,8 +47,8 @@ DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
     if (globalsettings->GetNumSetting("GuiHeight") > 0)
         screenheight = globalsettings->GetNumSetting("GuiHeight");
 
-    float wmult = screenwidth / 800.0;
-    float hmult = screenheight / 600.0;
+    wmult = screenwidth / 800.0;
+    hmult = screenheight / 600.0;
 
     setGeometry(0, 0, screenwidth, screenheight);
     setFixedWidth(screenwidth);
@@ -163,7 +170,27 @@ DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
     UpdateProgressBar();
     vbox->addWidget(progressbar);
 
+    nvp = NULL;
+    timer = new QTimer(this);
+    
     listview->setCurrentItem(listview->firstChild());
+
+    connect(timer, SIGNAL(timeout()), this, SLOT(timeout()));
+    timer->start(1000 / 30);
+}
+
+DeleteBox::~DeleteBox(void)
+{
+    if (nvp)
+    {
+        nvp->StopPlaying();
+        pthread_join(decoder, NULL);
+        delete nvp;
+        delete rbuffer;
+
+        nvp = NULL;
+        rbuffer = NULL;
+    }
 }
 
 void DeleteBox::Show()
@@ -172,8 +199,30 @@ void DeleteBox::Show()
     setActiveWindow();
 }
 
+static void *SpawnDecoder(void *param)
+{
+    NuppelVideoPlayer *nvp = (NuppelVideoPlayer *)param;
+    nvp->StartPlaying();
+    return NULL;
+}
+
 void DeleteBox::changed(QListViewItem *lvitem)
 {
+    timer->stop();
+    while (timer->isActive())
+        usleep(50);
+
+    if (nvp)
+    {
+        nvp->StopPlaying();
+        pthread_join(decoder, NULL);
+        delete nvp;
+        delete rbuffer;
+
+        nvp = NULL;
+        rbuffer = NULL;
+    }
+
     ProgramListItem *pgitem = (ProgramListItem *)lvitem;
     if (!pgitem)
         return;
@@ -182,6 +231,19 @@ void DeleteBox::changed(QListViewItem *lvitem)
         return;
 
     ProgramInfo *rec = pgitem->getProgramInfo();
+
+    rbuffer = new RingBuffer(rec->GetRecordFilename(fileprefix), false);
+
+    nvp = new NuppelVideoPlayer();
+    nvp->SetRingBuffer(rbuffer);
+    nvp->SetAsPIP();
+    nvp->SetOSDFontName(globalsettings->GetSetting("OSDFont"), 
+                        installprefix);
+ 
+    pthread_create(&decoder, NULL, SpawnDecoder, nvp);
+
+    while (!nvp->IsPlaying())
+         usleep(50);
 
     QDateTime startts = rec->startts;
     QDateTime endts = rec->endts;
@@ -206,6 +268,8 @@ void DeleteBox::changed(QListViewItem *lvitem)
                                              
     if (pix)                                 
         pixlabel->setPixmap(*pix);
+
+    timer->start(1000 / 30);
 }
 
 void DeleteBox::selected(QListViewItem *lvitem)
@@ -326,3 +390,35 @@ void DeleteBox::UpdateProgressBar(void)
     progressbar->setTotalSteps(total);
     progressbar->setProgress(used);
 }
+
+void DeleteBox::timeout(void)
+{
+    if (!nvp)
+        return;
+
+    int w = 0, h = 0;
+    unsigned char *buf = nvp->GetCurrentFrame(w, h);
+
+    if (w == 0 || h == 0)
+        return;
+
+    unsigned char *outputbuf = new unsigned char[w * h * 4];
+    yuv2rgb_fun convert = yuv2rgb_init_mmx(32, MODE_RGB);
+
+    convert(outputbuf, buf, buf + (w * h), buf + (w * h * 5 / 4), w, h);
+
+    QImage img(outputbuf, w, h, 32, NULL, 65536 * 65536, QImage::LittleEndian);
+    img = img.scale(160 * wmult, 120 * hmult);
+
+    delete [] outputbuf;
+
+    QPixmap *pmap = pixlabel->pixmap();
+    QPainter p(pmap);
+
+    p.drawImage(0, 0, img);
+    p.end();
+
+    bitBlt(pixlabel, 0, (pixlabel->contentsRect().height() - 120 * hmult) / 2, 
+           pmap);
+}
+

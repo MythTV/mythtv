@@ -19,6 +19,7 @@
  * alternative bitstream reader & writer by Michael Niedermayer <michaelni@gmx.at>
  */
 #include "avcodec.h"
+#include "common.h"
 
 void init_put_bits(PutBitContext *s, 
                    UINT8 *buffer, int buffer_size,

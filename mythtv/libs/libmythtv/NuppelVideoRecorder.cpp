@@ -79,6 +79,14 @@ NuppelVideoRecorder::NuppelVideoRecorder(void)
     maxquality = 2;
     minquality = 31;
     qualdiff = 3;
+
+    oldtc = 0;
+    startnum = 0;
+    frameofgop = 0;
+    lasttimecode = 0;
+    audio_behind = 0;
+
+    pip = false;
 }
 
 NuppelVideoRecorder::~NuppelVideoRecorder(void)
@@ -714,7 +722,6 @@ void NuppelVideoRecorder::BufferIt(unsigned char *buf)
 {
     int act;
     long tcres;
-    static long int oldtc = 0;
     int fn;
 
     act = act_video_buffer;
@@ -1107,9 +1114,6 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
     int tmp, r = 0, out_len = OUT_LEN;
     struct rtframeheader frameheader;
     int xaa, freecount = 0, compressthis;
-    static int startnum = 0;
-    static int frameofgop = 0;
-    static int lasttimecode = 0;
     int raw = 0;
     int timeperframe = 40;
     uint8_t *planes[3];
@@ -1212,7 +1216,7 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
     }
 
     dropped = (((fnum-lf)>>1) - 1); // should be += 0 ;-)
-
+    
     if (dropped>0)
     {
 //	printf("recorder dropped = '%ld' fnum = '%d' lf = '%d'\n", dropped, fnum, lf);
@@ -1226,7 +1230,7 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
     // exact count because of that we should have no problems with audio 
     // sync, as long as we don't loose audio samples :-/
   
-    while (dropped > 0) 
+    while (0 && dropped > 0) 
     {
         frameheader.timecode = lasttimecode + timeperframe;
 	/*
@@ -1311,7 +1315,6 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
 void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
 {
     struct rtframeheader frameheader;
-    static int audio_behind = 0;
     double mt;
     double eff;
     double abytes;

@@ -14,6 +14,7 @@ include ( ../config.mak )
 }
 
 QMAKE_CFLAGS_RELEASE = $$OPTFLAGS -Wall -Wno-missing-prototypes -Wno-unused -Wno-sign-compare -DHAVE_AV_CONFIG_H -I.. -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE
+QMAKE_CFLAGS_DEBUG = -g -Wall -Wno-missing-prototypes -Wno-unused -Wno-sign-compare -DHAVE_AV_CONFIG_H -I.. -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE
 
 # Input
 SOURCES += common.c utils.c mem.c allcodecs.c mpegvideo.c h263.c jrevdct.c

@@ -15,7 +15,7 @@ class Channel
     Channel(TV *parent, const QString &videodevice);
    ~Channel(void);
 
-    void Open(void);
+    bool Open(void);
     void Close(void);
 
     void SetFormat(const QString &format);

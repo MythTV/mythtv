@@ -285,6 +285,7 @@ int main(int argc, char **argv)
 
     globalsettings = new Settings;
 
+    globalsettings->LoadSettingsFiles("settings.txt", installprefix);
     globalsettings->LoadSettingsFiles("theme.txt", installprefix);
     globalsettings->LoadSettingsFiles("mysql.txt", installprefix);
 

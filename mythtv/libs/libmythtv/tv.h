@@ -66,7 +66,7 @@ class TV
 
  private:
     void ChangeChannel(bool up);
-    void ChangeChannel(char *name);
+    void ChangeChannelByString(QString &name);
     
     void ChannelKey(int key);
     void ChannelCommit(void);
@@ -90,10 +90,14 @@ class TV
 
     void SetupRecorder();
     void TeardownRecorder(bool killFile = false);
-
+    void SetupPipRecorder();
+    void TeardownPipRecorder();
+    
     void SetupPlayer();
     void TeardownPlayer();
-
+    void SetupPipPlayer();
+    void TeardownPipPlayer();
+    
     void ProcessKeypress(int keypressed);
 
     void StateToString(TVState state, QString &statestr);
@@ -105,6 +109,10 @@ class TV
 
     void WriteRecordedRecord();
 
+    void TogglePIPView(void);
+    void ToggleActiveWindow(void);
+    void SwapPIP(void);
+    
     NuppelVideoRecorder *nvr;
     NuppelVideoPlayer *nvp;
 
@@ -132,7 +140,7 @@ class TV
 
     float frameRate;
 
-    pthread_t event, encode, decode;
+    pthread_t event, encode, decode, pipencode, pipdecode;
     bool changeState;
     TVState nextState;
     QString inputFilename, outputFilename;
@@ -148,6 +156,16 @@ class TV
     int rewtime;
 
     OSD *osd;
+
+    NuppelVideoRecorder *pipnvr;
+    NuppelVideoPlayer *pipnvp;
+    Channel *pipchannel;
+    RingBuffer *piprbuffer;
+
+    NuppelVideoRecorder *activenvr;
+    NuppelVideoPlayer *activenvp;
+    RingBuffer *activerbuffer;
+    Channel *activechannel;
 };
 
 #endif

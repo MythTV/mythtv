@@ -14,18 +14,14 @@ char theprefix[] = "/usr/local";
 void *SpawnEncode(void *param)
 {
     NuppelVideoRecorder *nvr = (NuppelVideoRecorder *)param;
-
     nvr->StartRecording();
-  
     return NULL;
 }
 
 void *SpawnDecode(void *param)
 {
     NuppelVideoPlayer *nvp = (NuppelVideoPlayer *)param;
-
     nvp->StartPlaying();
-
     return NULL;
 }
 
@@ -40,15 +36,20 @@ TV::TV(const QString &startchannel)
     ConnectDB();
     
     channel = new Channel(this, settings->GetSetting("V4LDevice"));
-
     channel->Open();
-
     channel->SetFormat(settings->GetSetting("TVFormat"));
     channel->SetFreqTable(settings->GetSetting("FreqTable"));
-
     channel->SetChannelByString(startchannel);
-
     channel->Close();  
+
+    pipchannel = new Channel(this, settings->GetSetting("PIPV4LDevice"));
+    if (pipchannel->Open())
+    {
+        pipchannel->SetFormat(settings->GetSetting("TVFormat"));
+        pipchannel->SetFreqTable(settings->GetSetting("FreqTable"));
+        pipchannel->SetChannelByString(startchannel);
+        pipchannel->Close();
+    }
 
     fftime = settings->GetNumSetting("FastForwardAmount");
     if (fftime <= 0)
@@ -58,9 +59,10 @@ TV::TV(const QString &startchannel)
     if (rewtime <= 0)
         rewtime = 5;
 
-    nvr = NULL;
-    nvp = NULL;
-    prbuffer = rbuffer = NULL;
+    nvr = pipnvr = activenvr = NULL;
+    nvp = pipnvp = activenvp = NULL;
+    prbuffer = rbuffer = piprbuffer = activerbuffer = NULL;
+    activechannel = channel;
 
     menurunning = false;
 
@@ -535,6 +537,10 @@ void TV::HandleStateChange(void)
         while (!nvr->IsRecording())
             usleep(50);
 
+        activenvr = nvr;
+        activerbuffer = rbuffer;
+        activechannel = channel;
+
         // evil.
         channel->SetFd(nvr->GetVideoFd());
 
@@ -552,15 +558,24 @@ void TV::HandleStateChange(void)
         while (!nvp->IsPlaying())
             usleep(50);
 
+        activenvp = nvp;
         frameRate = nvp->GetFrameRate();
 	osd = nvp->GetOSD();
     }
 
     if (closeRecorder)
+    {
         TeardownRecorder(killRecordingFile);
+        if (pipnvr)
+            TeardownPipRecorder();
+    }
 
     if (closePlayer)
+    {
         TeardownPlayer();
+        if (pipnvp)
+            TeardownPipPlayer();
+    }
 }
 
 void TV::SetupRecorder(void)
@@ -591,10 +606,45 @@ void TV::SetupRecorder(void)
     
     nvr->SetMP3Quality(settings->GetNumSetting("MP3Quality"));
     nvr->SetAudioSampleRate(settings->GetNumSetting("AudioSampleRate"));
-    nvr->SetAudioDevice(settings->GetSetting("AudioDevice"));
+
+    QString auddevice = settings->GetSetting("RecordAudioDevice");
+    if (auddevice.length() < 2)
+        auddevice = settings->GetSetting("AudioDevice");
+    nvr->SetAudioDevice(auddevice);
     nvr->SetAudioCompression(!settings->GetNumSetting("DontCompressAudio"));
 
     nvr->Initialize();
+}
+
+void TV::SetupPipRecorder(void)
+{
+    if (pipnvr)
+    {
+        printf("Attempting to setup a recorder, but it already exists\n");
+        return;
+    }
+
+    pipnvr = new NuppelVideoRecorder();
+    pipnvr->SetRingBuffer(piprbuffer);
+    pipnvr->SetAsPIP();
+    pipnvr->SetVideoDevice(settings->GetSetting("PIPV4LDevice"));
+    pipnvr->SetResolution(160, 128);
+    pipnvr->SetTVFormat(settings->GetSetting("TVFormat"));
+
+    pipnvr->SetCodec("rtjpeg");
+    pipnvr->SetRTJpegMotionLevels(0, 0);
+    pipnvr->SetRTJpegQuality(255);
+
+    pipnvr->SetMP3Quality(9);
+    pipnvr->SetAudioSampleRate(settings->GetNumSetting("AudioSampleRate"));
+
+    QString auddevice = settings->GetSetting("PIPRecordAudioDevice");
+    if (auddevice.length() < 2)
+        auddevice = settings->GetSetting("AudioDevice");
+    pipnvr->SetAudioDevice(auddevice);
+    pipnvr->SetAudioCompression(!settings->GetNumSetting("DontCompressAudio"));
+
+    pipnvr->Initialize();
 }
 
 void TV::TeardownRecorder(bool killFile)
@@ -628,6 +678,17 @@ void TV::TeardownRecorder(bool killFile)
     }
 }    
 
+void TV::TeardownPipRecorder(void)
+{
+    if (pipnvr)
+    {
+        pipnvr->StopRecording();
+        pthread_join(pipencode, NULL);
+        delete pipnvr;
+    }
+    pipnvr = NULL;
+}
+
 void TV::SetupPlayer(void)
 {
     if (nvp)
@@ -647,6 +708,26 @@ void TV::SetupPlayer(void)
     nvp->SetLength(playbackLen);
     osd_display_time = settings->GetNumSetting("OSDDisplayTime");
     osd = NULL;
+}
+
+void TV::SetupPipPlayer(void)
+{
+    if (pipnvp)
+    {
+        printf("Attempting to setup a player, but it already exists.\n");
+        return;
+    }
+
+    pipnvp = new NuppelVideoPlayer();
+    pipnvp->SetAsPIP();
+    pipnvp->SetRingBuffer(piprbuffer);
+    pipnvp->SetRecorder(pipnvr);
+    pipnvp->SetDeinterlace((bool)settings->GetNumSetting("Deinterlace"));
+    pipnvp->SetOSDFontName(settings->GetSetting("OSDFont"), theprefix);
+    pipnvp->SetOSDThemeName(settings->GetSetting("OSDTheme"));
+    pipnvp->SetAudioSampleRate(settings->GetNumSetting("AudioSampleRate"));
+    pipnvp->SetAudioDevice(settings->GetSetting("AudioDevice"));
+    pipnvp->SetLength(playbackLen);
 }
 
 void TV::TeardownPlayer(void)
@@ -680,6 +761,21 @@ void TV::TeardownPlayer(void)
             prbuffer = rbuffer = NULL;
         }
     }
+}
+
+void TV::TeardownPipPlayer(void)
+{
+    if (pipnvp)
+    {
+        piprbuffer->StopReads();
+        pipnvp->StopPlaying();
+        pthread_join(pipdecode, NULL);
+        delete pipnvp;
+    }
+    pipnvp = NULL;
+
+    delete piprbuffer;
+    piprbuffer = NULL;
 }
 
 char *TV::GetScreenGrab(ProgramInfo *rcinfo, int secondsin, int &bufferlen,
@@ -784,12 +880,6 @@ void TV::RunTV(void)
                 QString desc = "";
                 int pos = calcSliderPos(0, desc);
                 osd->UpdatePause(pos, desc);
-                //fprintf(stderr, "\r Paused: %f seconds behind realtime (%f%% buffer left)", (float)(nvr->GetFramesWritten() - nvp->GetFramesPlayed()) / frameRate, (float)rbuffer->GetFreeSpace() / (float)rbuffer->GetFileSize() * 100.0);
-            }
-            else
-            {
-                //fprintf(stderr, "\r                                                                      ");
-                //fprintf(stderr, "\r Playing: %f seconds behind realtime", (float)(nvr->GetFramesWritten() - nvp->GetFramesPlayed()) / frameRate);
             }
 
             if (channelqueued && nvp->GetOSD() && !osd->Visible())
@@ -829,8 +919,8 @@ void TV::ProcessKeypress(int keypressed)
 
         case wsEscape: exitPlayer = true; break;
 
-        case 'e': case 'E': nvp->ToggleEdit(); break;
-        case ' ': nvp->AdvanceOneFrame(); break;
+//        case 'e': case 'E': nvp->ToggleEdit(); break;
+//        case ' ': nvp->AdvanceOneFrame(); break;
         default: break;
     }
 
@@ -856,9 +946,101 @@ void TV::ProcessKeypress(int keypressed)
 
             case 'M': case 'm': LoadMenu(); break;
 
+            case 'V': case 'v': TogglePIPView(); break;
+            case 'B': case 'b': ToggleActiveWindow(); break;
+            case 'N': case 'n': SwapPIP(); break;
+
             default: break;
         }
     }
+}
+
+void TV::TogglePIPView(void)
+{
+    if (!pipnvp)
+    {
+        if (!pipchannel->Open())
+            return;
+
+        pipchannel->Close();
+
+        long long filesize = settings->GetNumSetting("PIPBufferSize");
+        filesize = filesize * 1024 * 1024 * 1024;
+        long long smudge = settings->GetNumSetting("PIPMaxBufferFill");
+        smudge = smudge * 1024 * 1024;
+
+        piprbuffer = new RingBuffer(settings->GetSetting("PIPBufferName"),
+                                    filesize, smudge);
+
+        SetupPipRecorder();
+        pthread_create(&pipencode, NULL, SpawnEncode, pipnvr);
+
+        while (!pipnvr->IsRecording())
+            usleep(50);
+    
+        pipchannel->SetFd(pipnvr->GetVideoFd());
+
+        SetupPipPlayer();
+        pthread_create(&pipdecode, NULL, SpawnDecode, pipnvp);
+
+        while (!pipnvp->IsPlaying())
+            usleep(50);
+
+        nvp->SetPipPlayer(pipnvp);        
+    }
+    else
+    {
+        if (activenvp != nvp)
+            ToggleActiveWindow();
+
+        nvp->SetPipPlayer(NULL);
+        while (!nvp->PipPlayerSet())
+            usleep(50);
+	
+        TeardownPipRecorder();
+        TeardownPipPlayer();        
+    }
+}
+
+void TV::ToggleActiveWindow(void)
+{
+    if (!pipnvp)
+        return;
+
+    if (activenvp == nvp)
+    {
+        activenvp = pipnvp;
+        activenvr = pipnvr;
+        activerbuffer = piprbuffer;
+        activechannel = pipchannel;
+    }
+    else
+    {
+        activenvp = nvp;
+        activenvr = nvr;
+        activerbuffer = rbuffer;
+        activechannel = channel;
+    }
+}
+
+void TV::SwapPIP(void)
+{
+    if (!pipnvp)
+        return;
+
+    QString pipchanname = pipchannel->GetCurrentName();
+    QString bigchanname = channel->GetCurrentName();
+
+    if (activenvp != nvp)
+        ToggleActiveWindow();
+
+    ChangeChannelByString(pipchanname);
+
+    ToggleActiveWindow();
+
+    ChangeChannelByString(bigchanname);
+
+    ToggleActiveWindow();
 }
 
 int TV::calcSliderPos(int offset, QString &desc)
@@ -927,7 +1109,10 @@ int TV::calcSliderPos(int offset, QString &desc)
 
 void TV::DoPause(void)
 {
-    paused = nvp->TogglePause();
+    paused = activenvp->TogglePause();
+
+    if (activenvp != nvp)
+        return;
 
     if (paused)
     {
@@ -951,11 +1136,14 @@ void TV::DoFF(void)
     if (internalState == kState_WatchingLiveTV)
         slidertype = true;
 
-    QString desc = "";
-    int pos = calcSliderPos(fftime, desc);
-    osd->StartPause(pos, slidertype, "Forward", desc, 1);
+    if (activenvp == nvp)
+    {
+        QString desc = "";
+        int pos = calcSliderPos(fftime, desc);
+        osd->StartPause(pos, slidertype, "Forward", desc, 1);
+    }
 
-    nvp->FastForward(fftime);
+    activenvp->FastForward(fftime);
 }
 
 void TV::DoRew(void)
@@ -967,78 +1155,89 @@ void TV::DoRew(void)
     if (internalState == kState_WatchingLiveTV)
         slidertype = true;
 
-    QString desc = "";
-    int pos = calcSliderPos(0 - rewtime, desc);
-    osd->StartPause(pos, slidertype, "Rewind", desc, 1);
+    if (activenvp == nvp)
+    {
+        QString desc = "";
+        int pos = calcSliderPos(0 - rewtime, desc);
+        osd->StartPause(pos, slidertype, "Rewind", desc, 1);
+    }
 
-    nvp->Rewind(rewtime);
+    activenvp->Rewind(rewtime);
 }
 
 void TV::ToggleInputs(void)
 {
-    if (paused)
-        osd->EndPause();
-    paused = false;
+    if (activenvp == nvp)
+    {
+        if (paused)
+            osd->EndPause();
+        paused = false;
+    }
 
-    nvp->Pause();
-    while (!nvp->GetPause())
+    activenvp->Pause();
+    while (!activenvp->GetPause())
         usleep(5);
 
-    nvr->Pause();
-    while (!nvr->GetPause())
+    activenvr->Pause();
+    while (!activenvr->GetPause())
         usleep(5);
 
-    rbuffer->Reset();
+    activerbuffer->Reset();
 
-    channel->ToggleInputs();
+    activechannel->ToggleInputs();
 
-    nvr->Reset();
-    nvr->Unpause();
+    activenvr->Reset();
+    activenvr->Unpause();
 
-    nvp->ResetPlaying();
-    while (!nvp->ResetYet())
+    activenvp->ResetPlaying();
+    while (!activenvp->ResetYet())
         usleep(5);
 
     usleep(300000);
 
-    UpdateOSD();
+    if (activenvp == nvp)
+        UpdateOSD();
 
-    nvp->Unpause();
+    activenvp->Unpause();
 }
 
 void TV::ChangeChannel(bool up)
 {
-    if (paused)
-        osd->EndPause();
-    paused = false;
+    if (activenvp == nvp)
+    {
+        if (paused)
+            osd->EndPause();
+        paused = false;
+    }
 
-    nvp->Pause();
-    while (!nvp->GetPause())
+    activenvp->Pause();
+    while (!activenvp->GetPause())
         usleep(5);
 
-    nvr->Pause();
-    while (!nvr->GetPause())
+    activenvr->Pause();
+    while (!activenvr->GetPause())
         usleep(5);
 
-    rbuffer->Reset();
+    activerbuffer->Reset();
 
     if (up)
-        channel->ChannelUp();
+        activechannel->ChannelUp();
     else
-        channel->ChannelDown();
+        activechannel->ChannelDown();
 
-    nvr->Reset();
-    nvr->Unpause();
+    activenvr->Reset();
+    activenvr->Unpause();
 
-    nvp->ResetPlaying();
-    while (!nvp->ResetYet())
+    activenvp->ResetPlaying();
+    while (!activenvp->ResetYet())
         usleep(5);
 
     usleep(300000);
 
-    UpdateOSD();
+    if (activenvp == nvp)
+        UpdateOSD();
 
-    nvp->Unpause();
+    activenvp->Unpause();
 
     channelqueued = false;
     channelKeys[0] = channelKeys[1] = channelKeys[2] = ' ';
@@ -1064,7 +1263,9 @@ void TV::ChannelKey(int key)
         channelkeysstored++;
     }
     channelKeys[3] = 0;
-    osd->SetChannumText(channelKeys, 2);
+
+    if (activenvp == nvp)
+        osd->SetChannumText(channelKeys, 2);
 
     channelqueued = true;
 }
@@ -1074,50 +1275,55 @@ void TV::ChannelCommit(void)
     if (!channelqueued)
         return;
 
-    ChangeChannel(channelKeys);
+    QString chan = channelKeys;
+    ChangeChannelByString(chan);
 
     channelqueued = false;
     channelKeys[0] = channelKeys[1] = channelKeys[2] = ' ';
     channelkeysstored = 0;
 }
 
-void TV::ChangeChannel(char *name)
+void TV::ChangeChannelByString(QString &name)
 {
-    if (!CheckChannel(name))
+    if (!CheckChannel((char *)name.ascii()))
         return;
 
-    if (paused)
-        osd->EndPause();
-    paused = false;
+    if (activenvp == nvp)
+    {
+        if (paused)
+            osd->EndPause();
+        paused = false;
+    }
 
-    nvp->Pause();
-    while (!nvp->GetPause())
+    activenvp->Pause();
+    while (!activenvp->GetPause())
         usleep(5);
 
-    nvr->Pause();
-    while (!nvr->GetPause())
+    activenvr->Pause();
+    while (!activenvr->GetPause())
         usleep(5);
 
-    rbuffer->Reset();
+    activerbuffer->Reset();
 
-    int channum = atoi(name) - 1;
-    int prevchannel = channel->GetCurrent() - 1;
-    
-    if (!channel->SetChannel(channum))
-        channel->SetChannel(prevchannel);
+    QString chan = name.stripWhiteSpace();
+    QString prevchan = activechannel->GetCurrentName();
 
-    nvr->Reset();
-    nvr->Unpause();
+    if (!activechannel->SetChannelByString(chan))
+        activechannel->SetChannelByString(prevchan);
 
-    nvp->ResetPlaying();
-    while (!nvp->ResetYet())
+    activenvr->Reset();
+    activenvr->Unpause();
+
+    activenvp->ResetPlaying();
+    while (!activenvp->ResetYet())
         usleep(5);
 
     usleep(300000);
 
-    UpdateOSD();
+    if (activenvp == nvp)
+        UpdateOSD();
 
-    nvp->Unpause();
+    activenvp->Unpause();
 }
 
 void TV::UpdateOSD(void)

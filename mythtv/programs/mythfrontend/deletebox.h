@@ -4,12 +4,17 @@
 #include <qwidget.h>
 #include <qdialog.h>
 
+#include <pthread.h>
+
 class QSqlDatabase;
 class QListViewItem;
 class MyListView;
 class QLabel;
 class QProgressBar;
 class TV;
+class NuppelVideoPlayer;
+class RingBuffer;
+class QTimer;
 
 class DeleteBox : public QDialog
 {
@@ -17,13 +22,15 @@ class DeleteBox : public QDialog
   public:
     DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb, QWidget *parent = 0, 
               const char *name = 0);
-
+   ~DeleteBox(void);
+    
     void Show();
   
   protected slots:
     void selected(QListViewItem *);
     void changed(QListViewItem *);
-
+    void timeout(void);
+    
   private:
     void GetFreeSpaceStats(int &totalspace, int &usedspace); 
     void UpdateProgressBar(void);
@@ -43,6 +50,13 @@ class DeleteBox : public QDialog
     QProgressBar *progressbar;
  
     QString fileprefix;
+
+    float wmult, hmult;
+
+    QTimer *timer;
+    NuppelVideoPlayer *nvp;
+    RingBuffer *rbuffer;
+    pthread_t decoder;
 };
 
 #endif

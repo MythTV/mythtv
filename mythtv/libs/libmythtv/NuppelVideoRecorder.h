@@ -36,7 +36,8 @@ class NuppelVideoRecorder
    ~NuppelVideoRecorder();
 
     void SetRingBuffer(RingBuffer *rbuf) { ringBuffer = rbuf; }
-
+    void SetAsPIP(void) { pip = true; }
+    
     void SetCodec(QString desiredcodec) { codec = desiredcodec; }
     void SetRTJpegMotionLevels(int lM1, int lM2) { M1 = lM1; M2 = lM2; }
     void SetRTJpegQuality(int quality) { Q = quality; }
@@ -182,7 +183,12 @@ class NuppelVideoRecorder
     
     int last_block;
     int firsttc;
-
+    long int oldtc;
+    int startnum;
+    int frameofgop;
+    int lasttimecode;
+    int audio_behind;
+    
     bool useavcodec;
 
     AVCodec *mpa_codec;
@@ -195,6 +201,8 @@ class NuppelVideoRecorder
     int minquality;
     int qualdiff;
     QString codec;
+
+    bool pip;
 };
 
 #endif

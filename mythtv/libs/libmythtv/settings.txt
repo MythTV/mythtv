@@ -17,6 +17,9 @@ str RecordFilePrefix=/mnt/store
 #
 # V4L device
 str V4LDevice=/dev/video
+# Audio device to record with
+str RecordAudioDevice=/dev/dsp
+#
 # Resolution to capture at
 int Width=480
 int Height=480
@@ -82,3 +85,11 @@ str OSDFont=helr.ttf
 str TVFormat=NTSC
 #
 str FreqTable=us-cable
+
+# Picture-in-picture options
+#int PIPBufferSize=1
+#int PIPMaxBufferFill=50
+#str PIPBufferName=/mnt/store/ringbuf2.nuv
+#str PIPV4LDevice=/dev/video1
+#str PIPRecordAudioDevice=/dev/dsp
+

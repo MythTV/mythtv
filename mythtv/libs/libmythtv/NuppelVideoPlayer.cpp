@@ -59,6 +59,11 @@ NuppelVideoPlayer::NuppelVideoPlayer(void)
 
     mpa_codec = 0;
     osdtheme = "none";
+
+    disablevideo = disableaudio = false;
+
+    setpipplayer = pipplayer = NULL;
+    needsetpipplayer = false;
 }
 
 NuppelVideoPlayer::~NuppelVideoPlayer(void)
@@ -88,10 +93,24 @@ NuppelVideoPlayer::~NuppelVideoPlayer(void)
     CloseAVCodec();
 }
 
+bool NuppelVideoPlayer::GetPause(void)
+{
+    if (disableaudio)
+    {
+        return (actuallypaused && video_actually_paused);
+    }
+    return (actuallypaused && audio_actually_paused && video_actually_paused);
+}
+ 
 void NuppelVideoPlayer::InitSound(void)
 {
     int bits = 16, stereo = 1, speed = audio_samplerate;
 
+    if (disableaudio)
+    {
+        audiofd = -1;
+        return;
+    }
     audiofd = open(audiodevice.ascii(), O_WRONLY);
     if (audiofd == -1)
     {
@@ -761,9 +780,52 @@ void NuppelVideoPlayer::ResetNexttrigger(struct timeval *nexttrigger)
     NormalizeTimeval(nexttrigger);
 }
 
+unsigned char *NuppelVideoPlayer::GetCurrentFrame(int &w, int &h)
+{
+    w = video_width;
+    h = video_height;
+    return vbuffer[rpos];
+}
+
+void NuppelVideoPlayer::ShowPip(unsigned char *xvidbuf)
+{
+    int pipw, piph;
+
+    unsigned char *pipimage = pipplayer->GetCurrentFrame(pipw, piph);
+
+    if (!pipimage)
+        return;
+
+    int xoff = 50;
+    int yoff = 50;
+    
+    for (int i = 0; i < piph; i++)
+    {
+        memcpy(xvidbuf + (i + yoff) * video_width + xoff,
+               pipimage + i * pipw, pipw);
+    }
+
+    xoff /= 2;
+    yoff /= 2;
+
+    unsigned char *uptr = xvidbuf + video_width * video_height;
+    unsigned char *vptr = xvidbuf + video_width * video_height * 5 / 4;
+    int vidw = video_width / 2;
+
+    unsigned char *pipuptr = pipimage + pipw * piph;
+    unsigned char *pipvptr = pipimage + pipw * piph * 5 / 4;
+    pipw /= 2;
+
+    for (int i = 0; i < piph / 2; i ++)
+    {
+        memcpy(uptr + (i + yoff) * vidw + xoff, pipuptr + i * pipw, pipw);
+        memcpy(vptr + (i + yoff) * vidw + xoff, pipvptr + i * pipw, pipw);
+    }
+}
+
 void NuppelVideoPlayer::OutputVideoLoop(void)
 {
-    unsigned char *X11videobuf;
+    unsigned char *X11videobuf = NULL;
     int videosize;
     int laudiotime;
     int delay, avsync_delay;
@@ -777,11 +839,18 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
     videosize = video_width * video_height * 3 / 2;
 
     char name[] = "MythTV"; 
-    X11videobuf = XJ_init(video_width, video_height, name, name);
+    if (!disablevideo)
+        X11videobuf = XJ_init(video_width, video_height, name, name);
 
     int pause_rpos = 0;
     while (!eof && !killplayer)
     {
+        if (needsetpipplayer)
+        {
+            pipplayer = setpipplayer;
+            needsetpipplayer = false;
+        }
+
         if (paused)
         {
             if (!video_actually_paused)
@@ -809,10 +878,15 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
             {
                 //printf("video waiting for unpause\n");
                 usleep(50);
-                memcpy(X11videobuf, vbuffer[pause_rpos], videosize);
-                osd->Display(X11videobuf);
-                XJ_show(video_width, video_height);
-                ResetNexttrigger(&nexttrigger);
+                if (!disablevideo)
+                {
+                    memcpy(X11videobuf, vbuffer[pause_rpos], videosize);
+                    if (pipplayer)
+                        ShowPip(X11videobuf);
+                    osd->Display(X11videobuf);
+                    XJ_show(video_width, video_height);
+                    ResetNexttrigger(&nexttrigger);
+                }
                 continue;
             }
         }
@@ -846,9 +920,14 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         if (delay > 0)
             usleep(delay);
 
-        memcpy(X11videobuf, vbuffer[rpos], videosize);
-        osd->Display(X11videobuf);
-        XJ_show(video_width, video_height);
+        if (!disablevideo)
+        {
+            memcpy(X11videobuf, vbuffer[rpos], videosize);
+            if (pipplayer)
+                ShowPip(X11videobuf);
+            osd->Display(X11videobuf);
+            XJ_show(video_width, video_height);
+        }
         /* a/v sync assumes that when 'XJ_show' returns, that is the instant
            the frame has become visible on screen */
 
@@ -891,7 +970,8 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         pthread_mutex_unlock(&video_buflock);
     }
 
-    XJ_exit();             
+    if (!disablevideo)
+        XJ_exit();             
 }
 
 void NuppelVideoPlayer::OutputAudioLoop(void)

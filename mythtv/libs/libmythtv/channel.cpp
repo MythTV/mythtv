@@ -26,11 +26,12 @@ Channel::~Channel(void)
         close(videofd);
 }
 
-void Channel::Open(void)
+bool Channel::Open(void)
 {
     videofd = open(device.ascii(), O_RDWR);
     if (videofd > 0)
         isopen = true;
+    return isopen;
 }
 
 void Channel::Close(void)
@@ -139,7 +140,7 @@ bool Channel::SetChannelByString(const QString &chan)
             break;
         }
     }
-
+    
     if (foundit)
     {
         if (currentcapchannel != 0)
@@ -156,10 +157,10 @@ bool Channel::SetChannel(int i)
     char channame[128];
  
     if (currentcapchannel == 0)
-        sprintf(channame, "%d", i+1);
+        sprintf(channame, "%s", curList[i].name);
     else
-        sprintf(channame, "%s:%d", channelnames[currentcapchannel].ascii(), 
-                                   i+1);
+        sprintf(channame, "%s:%s", channelnames[currentcapchannel].ascii(), 
+                                   curList[i].name);
 
     if (pParent->CheckChannel(channame))
     {
@@ -174,7 +175,7 @@ bool Channel::SetChannel(int i)
         }
         else
         {
-            sprintf(channame, "%d", i+1);
+            sprintf(channame, "%s", curList[i].name);
             return pParent->ChangeExternalChannel(channame);
         }
     }
@@ -222,8 +223,8 @@ QString Channel::GetCurrentName(void)
     {
         QString ret = channelnames[currentcapchannel];
         ret += ":";
-        char temp[10];
-        sprintf(temp, "%d", curchannel);
+        char temp[128];
+        sprintf(temp, "%s", curList[curchannel].name);
 
         ret += temp;
         return temp;

@@ -28,12 +28,15 @@ using namespace std;
 #define AUDBUFSIZE 512000
 
 class NuppelVideoRecorder;
+class NuppelVideoPlayer;
 
 class NuppelVideoPlayer
 {
  public:
     NuppelVideoPlayer();
    ~NuppelVideoPlayer();
+
+    void SetAsPIP(void) { disableaudio = disablevideo = true; }
 
     void SetAudioDevice(QString device) { audiodevice = device; }
     void SetFileName(QString lfilename) { filename = lfilename; }
@@ -57,8 +60,7 @@ class NuppelVideoPlayer
                        audio_actually_paused = false; 
                        video_actually_paused = false; }
     void Unpause(void) { paused = false; }
-    bool GetPause(void) { return (actuallypaused && audio_actually_paused &&
-                                  video_actually_paused); }
+    bool GetPause(void);
    
     bool ToggleEdit(void) { editmode = !editmode; return editmode; }
     void AdvanceOneFrame(void) { advancedecoder = true; } 
@@ -87,6 +89,12 @@ class NuppelVideoPlayer
 
     void ReencodeFile(char *inputname, char *outputname);
 
+    unsigned char *GetCurrentFrame(int &w, int &h);
+
+    void SetPipPlayer(NuppelVideoPlayer *pip) { setpipplayer = pip; 
+                                                needsetpipplayer = true; }
+    bool PipPlayerSet(void) { return !needsetpipplayer; }
+    
  protected:
     void OutputAudioLoop(void);
     void OutputVideoLoop(void);
@@ -123,7 +131,9 @@ class NuppelVideoPlayer
     int vbuffer_numfree(void); // number of free slots in the video buffer
 
     void ResetNexttrigger(struct timeval *tv);
- 
+
+    void ShowPip(unsigned char *xvidbuf);
+
     int deinterlace;
     
     int audiofd;
@@ -233,6 +243,13 @@ class NuppelVideoPlayer
     AVCodec *mpa_codec;
     AVCodecContext mpa_ctx;
     AVPicture mpa_picture;
+
+    bool disablevideo;
+    bool disableaudio;
+
+    NuppelVideoPlayer *pipplayer;
+    NuppelVideoPlayer *setpipplayer;
+    bool needsetpipplayer;
 };
 
 #endif

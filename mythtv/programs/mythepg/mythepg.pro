@@ -13,7 +13,7 @@ INCLUDEPATH += ../libmythtv ../libNuppelVideo
 
 # Input
 HEADERS += guidegrid.h infodialog.h infostructs.h ../libmythtv/programinfo.h
-HEADERS += ../libNuppelvideo/settings.h
+HEADERS += ../libNuppelVideo/settings.h
 
 SOURCES += guidegrid.cpp infodialog.cpp infostructs.cpp main.cpp
 SOURCES += ../libmythtv/programinfo.cpp ../libNuppelVideo/settings.cpp
