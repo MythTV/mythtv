@@ -637,9 +637,27 @@ void PlaybackBox::CycleVisualizer()
     // and the user currently has a visualizer active
     if (mainvisual->numVisualizers() > 1 && visualizer_status > 0)
     {
-        if (visual_mode != "Random")
+        QStringList allowed_modes = QStringList::split(",", visual_mode);
+        if (allowed_modes[0].stripWhiteSpace().endsWith("*"))
         {
-            QStringList allowed_modes = QStringList::split(",", visual_mode);
+            //User has a favorite, but requested the next in the list
+            //Find the current position in the list
+            QString current_visual = mainvisual->getCurrentVisual();
+            unsigned int index = 0;
+            while ((index < allowed_modes.size()) &&
+                   (!allowed_modes[index++].stripWhiteSpace().startsWith(current_visual))) { }
+            // index is 1 greater than the current visualizer's index
+            if (index >= allowed_modes.size()) {
+                index = 0;
+            }
+            new_visualizer = allowed_modes[index].stripWhiteSpace();
+            // Make sure the asterisk isn't passed through
+            if (new_visualizer.endsWith("*")) {
+                new_visualizer.truncate(new_visualizer.length() - 1);
+            }
+        }
+        else if (visual_mode != "Random")
+        {
             //Find a visual thats not like the previous visual
             do
             {

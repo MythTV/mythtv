@@ -98,7 +98,16 @@ void MainVisual::setVisual( const QString &visualname )
 
     allowed_modes = QStringList::split(",", visualname);
 
-    if (allowed_modes.contains("Random"))
+    if (allowed_modes[0].stripWhiteSpace().endsWith("*"))
+    {
+        // User has a favorite
+        // The asterisk should only be passed in at startup, so start with
+        // the user's favorite
+
+        current_visual_name = allowed_modes[0].stripWhiteSpace();
+        current_visual_name.truncate(current_visual_name.length() - 1);
+    }
+    else if (allowed_modes.contains("Random"))
     {
         //
         //  Pick anything from compile time options
