@@ -76,12 +76,13 @@ end
 
 # Below are keys used with the Pinnacle/Miro remote
 
-# begin
-#    prog = irxevent
+begin
+   prog = irxevent
 # This is the "P" key below the power button
-#    button = Preview
-#    config = Key  CurrentWindow
-# end
+# We'll call it "Purge", for "Delete"
+   button = Preview
+   config = Key D CurrentWindow
+end
 
 # begin
 #    prog = irxevent
@@ -90,12 +91,12 @@ end
 #    config = Key  CurrentWindow
 # end
 
-# begin
-#    prog = irxevent
+begin
+   prog = irxevent
 # This is the "I" key
-#    button = Info
-#    config = Key  CurrentWindow
-# end
+   button = Info
+   config = Key I CurrentWindow
+end
 
 begin
    prog = irxevent
