@@ -2,23 +2,19 @@
 
    <button>
       <type>TV_RECPRIORITIES_SETTINGS_GENERAL</type>
-      <text>General</text>
-      <text lang="DE">Allgemeines</text>
-      <text lang="DK">Generelt</text>
-      <text lang="NL">Algemeen</text>
-      <text lang="PT">Configurações Gerais</text>
-      <text lang="FR">Général</text>
-      <text lang="SV">Generellt</text>
-      <text lang="JA">一般</text>
-      <text lang="FI">Yleiset Asetukset</text>
-      <text lang="ZH_TW">一般</text>
+      <text>Set Recording Priorities</text>
+      <text lang="DE">Aufnahmen</text>
+      <text lang="SV">Inspelningsprioriteter</text>
+      <alttext>Recording Priorities</alttext>
+      <alttext lang="DE">Aufnahmen</alttext>
+      <alttext lang="SV">Inspelning</alttext>
       <action>SETTINGS GENERALRECPRIORITIES</action>
    </button>
 
    <button>
       <type>TV_RECPRIORITIES_CHANNEL</type>
       <text>Set Channel Recording Priorities</text>
-      <text lang="DE">Aufnahmeprioritäten</text>
+      <text lang="DE">Sender</text>
       <text lang="SV">Kanalprioriteter</text>
       <text lang="FR">Fixer les priorités des chaînes</text>
       <text lang="JA">チャンネル録画優先順位設定</text>
@@ -28,7 +24,8 @@
       <alttext>Channel Priorities</alttext>
       <alttext lang="FR">Priorités</alttext>
       <alttext lang="JA">チャンネル優先順位</alttext>
-      <alttext lang="DE">Prioritäten</alttext>
+      <alttext lang="DE">Sender</alttext>
+      <alttext lang="SV">Kanal</alttext>
       <alttext lang="NL">Prioriteiten</alttext>      
       <action>SETTINGS CHANNELRECPRIORITIES</action>
    </button>
