@@ -20,7 +20,7 @@ SingleView::SingleView(QSqlDatabase *db, vector<Thumbnail> *imagelist, int pos,
     rotateAngle = 0; 
     imageRotateAngle = 0;
 
-    m_font = new QFont("Arial", (int)(gContext->GetSmallFontSize() * hmult), 
+    m_font = new QFont("Arial", (int)(gContext->GetMediumFontSize() * hmult), 
                        QFont::Bold);
 
     images = imagelist;

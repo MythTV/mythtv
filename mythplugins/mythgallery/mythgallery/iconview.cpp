@@ -21,7 +21,7 @@ IconView::IconView(QSqlDatabase *db, const QString &startdir,
     fgcolor = paletteForegroundColor();
     highlightcolor = fgcolor;
 
-    m_font = new QFont("Arial", (int)(gContext->GetSmallFontSize() * hmult), 
+    m_font = new QFont("Arial", (int)(gContext->GetMediumFontSize() * hmult), 
                        QFont::Bold);
 
     thumbw = screenwidth / (THUMBS_W + 1);
