@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.09.26 (xris)
+#Last Updated: 2004.10.03 (xris)
 #
 #   mythtv::recordings
 #
@@ -65,6 +65,7 @@ package mythtv::recordings;
     my $count;
     foreach my $file (@Files) {
         next unless ($file =~ /\.nuv$/);
+        next if ($file =~ /^ringbuf/);
         $count++;
     # Print a progress dot
         print "\r", sprintf('%.0f', 100 * ($count / @Files)), '% ';
