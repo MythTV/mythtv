@@ -112,7 +112,7 @@ void UpgradeMusicDatabaseSchema(void)
                     modify.exec(QString("UPDATE musicmetadata SET "
                                 "filename = \"%1\" "
                                 "WHERE filename = \"%2\" AND intid = %3;")
-                                .arg(newname, name, intid));
+                                .arg(newname).arg(name).arg(intid));
                     if (modify.isActive())
                         i += modify.numRowsAffected();
                 }
