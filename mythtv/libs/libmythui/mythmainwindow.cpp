@@ -229,8 +229,6 @@ MythMainWindow::MythMainWindow()
     RegisterKey("Global", "8", "8", "8");
     RegisterKey("Global", "9", "9", "9");
 
-    qApp->setOverrideCursor(QCursor(Qt::BlankCursor));
-
     setAutoBufferSwap(false);
 
     d->drawTimer = new QTimer(this);
@@ -244,8 +242,6 @@ MythMainWindow::MythMainWindow()
 
 MythMainWindow::~MythMainWindow()
 {
-    qApp->restoreOverrideCursor();
-
     while (!d->stackList.isEmpty())
     {
         delete d->stackList.back();
@@ -352,20 +348,20 @@ void MythMainWindow::Init(void)
     setGeometry(d->xbase, d->ybase, d->screenwidth, d->screenheight);
     setFixedSize(QSize(d->screenwidth, d->screenheight));
 
-/*
-    setFont(gContext->GetMediumFont());
-    setCursor(QCursor(Qt::BlankCursor));
-*/
+    //setFont(gContext->GetMediumFont());
+
+    bool hideCursor = gContext->GetNumSetting("HideMouseCursor", 1);
+    setCursor((hideCursor) ? (Qt::BlankCursor) : (Qt::ArrowCursor));
+#ifdef QWS
+#if QT_VERSION >= 0x030300
+    QWSServer::setCursorVisible(!hideCursor);
+#endif
+#endif
+
     setGeometry(100, 100, 800, 600);
 
     if (d->painter->GetName() != "OpenGL")
         setFixedSize(QSize(800, 600));
-
-#ifdef QWS
-#if QT_VERSION >= 0x030300
-    QWSServer::setCursorVisible(false);
-#endif
-#endif
 
     WFlags flags = getWFlags();
     flags |= WRepaintNoErase;

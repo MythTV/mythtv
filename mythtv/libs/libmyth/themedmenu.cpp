@@ -2176,7 +2176,6 @@ void ThemedMenuPrivate::ReloadTheme(void)
     parent->setFixedSize(QSize(screenwidth, screenheight));
 
     parent->setFont(gContext->GetMediumFont());
-    parent->setCursor(QCursor(Qt::BlankCursor));
 
     gContext->ThemeWidget(parent);
 

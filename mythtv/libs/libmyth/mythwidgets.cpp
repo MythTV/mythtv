@@ -369,8 +369,6 @@ void MythRemoteLineEdit::Init()
     //  works across most 3.x.x versions of Qt.
     setTextFormat(Qt::PlainText);    
 
-    setCursor(QCursor(Qt::BlankCursor));
-
     cycle_time = 3000;
 
     pre_cycle_text_upto = "";

@@ -234,13 +234,10 @@ MythMainWindow::MythMainWindow(QWidget *parent, const char *name, bool modal,
     RegisterKey("Global", "7", "7", "7");
     RegisterKey("Global", "8", "8", "8");
     RegisterKey("Global", "9", "9", "9");
-
-    qApp->setOverrideCursor(QCursor(Qt::BlankCursor));
 }
 
 MythMainWindow::~MythMainWindow()
 {
-    qApp->restoreOverrideCursor();
     delete d;
 }
 
@@ -258,11 +255,12 @@ void MythMainWindow::Init(void)
     setFixedSize(QSize(d->screenwidth, d->screenheight));
 
     setFont(gContext->GetMediumFont());
-    setCursor(QCursor(Qt::BlankCursor));
 
+    bool hideCursor = gContext->GetNumSetting("HideMouseCursor", 1);
+    setCursor((hideCursor) ? (Qt::BlankCursor) : (Qt::ArrowCursor));
 #ifdef QWS
 #if QT_VERSION >= 0x030300
-    QWSServer::setCursorVisible(false);
+    QWSServer::setCursorVisible(!hideCursor);
 #endif
 #endif
 
@@ -886,7 +884,6 @@ MythDialog::MythDialog(MythMainWindow *parent, const char *name, bool setsize)
     defaultSmallFont = gContext->GetSmallFont();
 
     setFont(defaultMediumFont);
-    setCursor(QCursor(Qt::BlankCursor));
 
     if (setsize)
     {
@@ -1041,7 +1038,6 @@ MythPopupBox::MythPopupBox(MythMainWindow *parent, const char *name)
     setPalette(parent->palette());
     popupForegroundColor = foregroundColor ();
     setFont(parent->font());
-    setCursor(QCursor(Qt::BlankCursor));
 
     hpadding = gContext->GetNumSetting("PopupHeightPadding", 120);
     wpadding = gContext->GetNumSetting("PopupWidthPadding", 80);
@@ -1070,7 +1066,6 @@ MythPopupBox::MythPopupBox(MythMainWindow *parent, bool graphicPopup,
     setFrameStyle(QFrame::Box | QFrame::Plain);
     setPalette(parent->palette());
     setFont(parent->font());
-    setCursor(QCursor(Qt::BlankCursor));
 
     hpadding = gContext->GetNumSetting("PopupHeightPadding", 120);
     wpadding = gContext->GetNumSetting("PopupWidthPadding", 80);
@@ -1412,7 +1407,6 @@ MythProgressDialog::MythProgressDialog(const QString &message, int totalSteps)
     gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
     setFont(gContext->GetMediumFont());
-    setCursor(QCursor(Qt::BlankCursor));
 
     gContext->ThemeWidget(this);
 

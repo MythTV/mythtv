@@ -1354,6 +1354,19 @@ class VideoModeSettings: public VerticalConfigurationGroup,
 };
 #endif
 
+static HostCheckBox *HideMouseCursor()
+{
+    HostCheckBox *gc = new HostCheckBox("HideMouseCursor");
+    gc->setLabel(QObject::tr("Hide Mouse Cursor in Myth"));
+    gc->setValue(true);
+    gc->setHelpText(QObject::tr("Toggles mouse cursor visibility. "
+                                "Most of the Myth GUI does not respond "
+                                "to mouse clicks, this is only to avoid "
+                                "\"losing\" your mouse cursor."));
+    return gc;
+};
+
+
 static HostCheckBox *RunInWindow()
 {
     HostCheckBox *gc = new HostCheckBox("RunFrontendInWindow");
@@ -2952,6 +2965,7 @@ AppearanceSettings::AppearanceSettings()
     screen->addChild(GuiOffsetX());
     screen->addChild(GuiOffsetY());
     screen->addChild(GuiSizeForTV());
+    screen->addChild(HideMouseCursor());
     screen->addChild(RunInWindow());
     addChild(screen);
 
