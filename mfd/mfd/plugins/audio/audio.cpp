@@ -832,7 +832,7 @@ void AudioPlugin::playFromPlaylist(int augment_index)
     uint playlist_size = 0;
     if(!playlist_mode)
     {
-        warning("platFromPlaylist() called, but we're not in playlist mode");
+        warning("playFromPlaylist() called, but we're not in playlist mode");
         return;
     }
     
