@@ -2679,16 +2679,6 @@ bool NuppelVideoPlayer::EnableEdit(void)
         for (it = deleteMap.begin(); it != deleteMap.end(); ++it)
              AddMark(it.key(), it.data());
     }
-    else
-        if (hascommbreaktable)
-        {
-            QMap<long long, int>::Iterator it;
-            for (it = commBreakMap.begin(); it != commBreakMap.end(); ++it)
-                if (it.data() == MARK_COMM_START)
-                    AddMark(it.key(), 1);
-                else
-                    AddMark(it.key(), 0);
-        }
 
     m_playbackinfo->SetEditing(true, m_db);
 
@@ -2716,6 +2706,10 @@ void NuppelVideoPlayer::DisableEdit(void)
     {
         hasdeletetable = true;
         SetDeleteIter();
+    }
+    else
+    {
+        hasdeletetable = false;
     }
    
     m_playbackinfo->SetEditing(false, m_db);
@@ -2790,6 +2784,29 @@ void NuppelVideoPlayer::DoKeypress(int keypress)
             UpdateSeekAmount(false);
             UpdateTimeDisplay();
             break; 
+        }
+        case 'c': case 'C':
+        {
+            QMap<long long, int>::Iterator it;
+            for (it = deleteMap.begin(); it != deleteMap.end(); ++it)
+                osd->HideEditArrow(it.key());
+
+            deleteMap.clear();
+            UpdateEditSlider();
+            break;
+        }
+        case 'z': case 'Z':
+        {
+            if (hascommbreaktable)
+            {
+                QMap<long long, int>::Iterator it;
+                for (it = commBreakMap.begin(); it != commBreakMap.end(); ++it)
+                    if (it.data() == MARK_COMM_START)
+                        AddMark(it.key(), 1);
+                    else
+                        AddMark(it.key(), 0);
+            }
+            break;
         }
         case wsEscape: case 'e': case 'E': case 'm': case 'M':
         {
