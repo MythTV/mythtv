@@ -27,6 +27,7 @@ using namespace std;
 #include "tv.h"
 #include "progfind.h"
 #include "util.h"
+#include "remoteutil.h"
 
 QString RunProgramGuide(QString startchannel, bool thread, TV *player)
 {
@@ -201,6 +202,7 @@ GuideGrid::GuideGrid(MythMainWindow *parent, const QString &channel, TV *player,
 
     //int fillchannels = clock.elapsed();
     //clock.restart();
+    fillRecordInfos();
     fillProgramInfos();
     //int fillprogs = clock.elapsed();
 
@@ -238,6 +240,13 @@ GuideGrid::~GuideGrid()
 
     m_channelInfos.clear();
 
+    while (!m_recList.empty())
+    {
+        ProgramInfo *p = m_recList.back();
+        delete p;
+        m_recList.pop_back();
+    }
+
     delete theme;
     delete updateLock;
 }
@@ -257,7 +266,9 @@ void GuideGrid::keyPressEvent(QKeyEvent *e)
        
     if(e->key() != Key_Control)
         keyDown = true;    
-    
+
+    if (ignoreevents)
+        return;
     ignoreevents = true;  //prevent customEvent from updating
     updateLock->lock();    //wait if customEvent is updating 
     
@@ -285,6 +296,8 @@ void GuideGrid::keyPressEvent(QKeyEvent *e)
             case Key_End: case Key_1: dayRight(); break;
             case Key_PageUp: case Key_3: pageUp(); break;
             case Key_PageDown: case Key_9: pageDown(); break;
+            case Key_Less: case Key_Comma: pageLeft(); break;
+            case Key_Greater: case Key_Period: pageRight(); break;
 
             case Key_4: toggleGuideListing(); break;
             case Key_6: showProgFinder(); break;   
@@ -294,8 +307,9 @@ void GuideGrid::keyPressEvent(QKeyEvent *e)
             case Key_C: case Key_Escape: escape(); break;
             case Key_M: enter(); break;
 
-            case Key_I: case Key_Space: 
-            case Key_Enter: case Key_Return:  displayInfo(); break;
+            case Key_Space: case Key_Enter: 
+            case Key_Return: editRecording(); break;
+            case Key_I: editScheduled(); break;
 
             case Key_R: quickRecord(); break;
             case Key_X: channelUpdate(); break;
@@ -303,15 +317,16 @@ void GuideGrid::keyPressEvent(QKeyEvent *e)
             default: MythDialog::keyPressEvent(e);
         }
     }
-    
+
     if(doProgramInfoUpdate) 
     {
+        fillRecordInfos();
         fillProgramInfos();
         update(fullRect);
     }
     
     ignoreevents = false;
-    
+
     updateLock->unlock();
 }
 
@@ -561,6 +576,18 @@ void GuideGrid::fillTimeInfos()
     m_currentEndTime = t;
 }
 
+void GuideGrid::fillRecordInfos(void)
+{
+    while (!m_recList.empty())
+    {
+        ProgramInfo *p = m_recList.back();
+        delete p;
+        m_recList.pop_back();
+    }
+
+    RemoteGetAllPendingRecordings(m_recList);
+}
+
 void GuideGrid::fillProgramInfos(void)
 {
     LayerSet *container = NULL;
@@ -576,6 +603,7 @@ void GuideGrid::fillProgramInfos(void)
             type->SetScreenLocation(programRect.topLeft());
         }
     }
+
     for (int y = 0; y < DISPLAY_CHANS; y++)
     {
         fillProgramRowInfos(y);
@@ -634,6 +662,9 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
 
     ProgramInfo::GetProgramRangeDateTime(m_db, proglist, chanid, starttime, 
                                          endtime);
+
+    for (program = proglist->first(); program; program = proglist->next())
+            program->FillInRecordInfo(m_recList);
 
     QDateTime ts = m_currentStartTime;
 
@@ -697,7 +728,6 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
 
     int arrow = 0;
     int cnt = 0;
-    int recFlag = 0;
     int spread = 1;
     QDateTime lastprog; 
     QRect tempRect;
@@ -755,39 +785,44 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
 
             if (type)
             {
-                recFlag = 0;
-                RecordingType recordtype;
-                recordtype = proginfo->GetProgramRecordingStatus(m_db);
-                if (recordtype > kNotRecording)
+                int recFlag;
+                switch (proginfo->rectype) 
                 {
-                    switch (recordtype) 
-                    {
-                        case kSingleRecord:
-                            recFlag = 1;
-                            break;
-                        case kTimeslotRecord:
-                            recFlag = 2;
-                            break;
-                        case kChannelRecord:
-                            recFlag = 3;
-                            break;
-                        case kAllRecord:
-                            recFlag = 4;
-                            break;
-                        case kWeekslotRecord:
-                            recFlag = 5;
-                            break;
-                        case kNotRecording:
-                            break;
-                    }
+                case kSingleRecord:
+                    recFlag = 1;
+                    break;
+                case kTimeslotRecord:
+                    recFlag = 2;
+                    break;
+                case kChannelRecord:
+                    recFlag = 3;
+                    break;
+                case kAllRecord:
+                    recFlag = 4;
+                    break;
+                case kWeekslotRecord:
+                    recFlag = 5;
+                    break;
+                case kNotRecording:
+                default:
+                    recFlag = 0;
+                    break;
                 }
 
+                int recStat;
+                if (!proginfo->recording)
+                    recStat = 0;
+                else if (!proginfo->conflicting)
+                    recStat = 1;
+                else
+                    recStat = 2;
+
                 type->SetProgramInfo(row + 1, cnt, tempRect, proginfo->title,
-                                     proginfo->category, arrow, recFlag);
+                                     proginfo->category, arrow, recFlag, 
+                                     recStat);
+
                 if (isCurrent == true)
-                { 
                     type->SetCurrentArea(tempRect);
-                }
 
                 cnt++;
             }
@@ -812,7 +847,10 @@ void GuideGrid::customEvent(QCustomEvent *e)
                 return;
             }    
             updateLock->lock();
+            ignoreevents = true; 
+            fillRecordInfos();
             fillProgramInfos();
+            ignoreevents = false;
             updateLock->unlock();
             update(fullRect);
         }
@@ -826,7 +864,7 @@ void GuideGrid::paintEvent(QPaintEvent *e)
 
     if (!showInfo)
     {
-        ignoreevents = true;
+        updateLock->lock(); 
         if (r.intersects(infoRect))
             paintInfo(&p);
         if (r.intersects(dateRect))
@@ -839,7 +877,7 @@ void GuideGrid::paintEvent(QPaintEvent *e)
             paintPrograms(&p);
         if (r.intersects(curInfoRect))
             paintCurrentInfo(&p);
-        ignoreevents = false;
+        updateLock->unlock();
     }
 }
 
@@ -1046,31 +1084,6 @@ void GuideGrid::paintInfo(QPainter *p)
     QPixmap pix(pr.size());
     pix.fill(this, pr.topLeft());
     QPainter tmp(&pix);
-    QString recStatus = "";
-
-    RecordingType recordtype;
-    recordtype = pginfo->GetProgramRecordingStatus(m_db);
-    switch (recordtype) 
-    {
-        case kSingleRecord:
-            recStatus = tr("Recording Once");
-            break;
-        case kTimeslotRecord:
-            recStatus = tr("Timeslot Recording");
-            break;
-        case kWeekslotRecord:
-            recStatus = tr("Weekly Recording");
-            break;
-        case kChannelRecord:
-            recStatus = tr("Channel Recording");
-            break;
-        case kAllRecord:
-            recStatus = tr("All Recording");
-            break;
-        case kNotRecording:
-            recStatus = tr("Not Recording");
-            break;
-    }
 
     int chanNum = m_currentRow + m_currentStartChannel;
     if (chanNum >= (int)m_channelInfos.size())
@@ -1111,7 +1124,7 @@ void GuideGrid::paintInfo(QPainter *p)
             type->SetText(pginfo->description);
         type = (UITextType *)container->GetType("recordingstatus");
         if (type)
-            type->SetText(recStatus);
+            type->SetText(pginfo->RecordingText());
         UIImageType *itype = (UIImageType *)container->GetType("icon");
         if (itype)
         {
@@ -1150,6 +1163,7 @@ void GuideGrid::generateListings()
     if (DISPLAY_CHANS > maxchannel)
         DISPLAY_CHANS = maxchannel;
 
+    fillRecordInfos();
     fillProgramInfos();
     update(fullRect);
 }
@@ -1525,15 +1539,14 @@ void GuideGrid::quickRecord()
 
     pginfo->ToggleRecord(m_db);
 
+    fillRecordInfos();
     fillProgramInfos();
     update(programRect);
     update(infoRect);
 }
 
-void GuideGrid::displayInfo()
+void GuideGrid::editRecording()
 {
-    showInfo = 1;
-
     ProgramInfo *pginfo = m_programInfos[m_currentRow][m_currentCol];
 
     if (!pginfo)
@@ -1542,34 +1555,46 @@ void GuideGrid::displayInfo()
     if (pginfo->title == unknownTitle)
         return;
 
-    if (pginfo)
-    {
-        FocusPolicy storeFocus = focusPolicy();
-        setFocusPolicy(QWidget::NoFocus);
-        if ((gContext->GetNumSetting("AdvancedRecord", 0)) ||
-            (pginfo->GetProgramRecordingStatus(m_db) > kAllRecord))
-        {
-            ScheduledRecording record;
-            record.loadByProgram(m_db, pginfo);
-            record.exec(m_db);
-        }
-        else
-        {
-            InfoDialog diag(pginfo, gContext->GetMainWindow(), "Program Info");
-            diag.exec();
-        }
-        setFocusPolicy(storeFocus);
-    }
-    else
-        return;
+    showInfo = 1;
+
+    FocusPolicy storeFocus = focusPolicy();
+    setFocusPolicy(QWidget::NoFocus);
+    pginfo->EditRecording(m_db);
+    setFocusPolicy(storeFocus);
 
     showInfo = 0;
-
-    pginfo->GetProgramRecordingStatus(m_db);
 
     setActiveWindow();
     setFocus();
 
+    fillRecordInfos();
+    fillProgramInfos();
+    update(fullRect);
+}
+
+void GuideGrid::editScheduled()
+{
+    ProgramInfo *pginfo = m_programInfos[m_currentRow][m_currentCol];
+
+    if (!pginfo)
+        return;
+
+    if (pginfo->title == unknownTitle)
+        return;
+
+    showInfo = 1;
+
+    FocusPolicy storeFocus = focusPolicy();
+    setFocusPolicy(QWidget::NoFocus);
+    pginfo->EditScheduled(m_db);
+    setFocusPolicy(storeFocus);
+
+    showInfo = 0;
+
+    setActiveWindow();
+    setFocus();
+
+    fillRecordInfos();
     fillProgramInfos();
     update(fullRect);
 }

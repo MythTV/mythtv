@@ -96,7 +96,8 @@
         <area>0,0,645,386</area>
         <solidcolor>#003256</solidcolor>
         <selector type="box" color="#ffff33"></selector>
-        <recordingcolor>#ff6600</recordingcolor> <!--use #ae5500 for non shaded-->
+        <recordingcolor>#00aa00</recordingcolor>
+        <conflictingcolor>#ff6600</conflictingcolor>
         <cutdown>no</cutdown>
         <multiline>yes</multiline>
         <textoffset>9,6</textoffset>
@@ -340,7 +341,8 @@
         <area>0,0,645,266</area>
         <solidcolor>#003256</solidcolor>
         <selector type="box" color="#ffff33"></selector>
-        <recordingcolor>#ff6600</recordingcolor> <!--use #ae5500 for non shaded-->
+        <recordingcolor>#00aa00</recordingcolor>
+        <conflictingcolor>#ff6600</conflictingcolor>
         <textoffset>9,6</textoffset>
         <catcolor category="Educational" color="CornflowerBlue"></catcolor>
         <catcolor category="Adult" color="thistle3"></catcolor>

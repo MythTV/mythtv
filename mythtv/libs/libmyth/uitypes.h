@@ -189,16 +189,17 @@ class UIGuideType : public UIType
     void SetFillType(int type) { m_filltype = type; }
 
     void SetWindow(MythDialog *win) { m_window = win; }
-    void SetRecordingColor(QString col) { m_reccolor = col; }
+    void SetRecordingColors(QString reccol, QString concol) 
+                          { m_reccolor = reccol; m_concolor = concol; }
     void SetSelectorColor(QString col) { m_selcolor = col; }
     void SetSelectorType(int type) { m_seltype = type; }
     void SetSolidColor(QString col) { m_solidcolor = col; }
     void SetCategoryColors(QMap<QString, QString> catC)
                           { categoryColors = catC; }
-    void SetProgramInfo(unsigned int, int, QRect, QString, QString, int, int);
+    void SetProgramInfo(unsigned int, int, QRect, QString, QString, int, int, int);
     void SetCurrentArea(QRect myArea) { curArea = myArea; }
     void ResetData() { drawArea.clear(); dataMap.clear(); m_count = 0;
-                       categoryMap.clear(); recStatus.clear();
+                       categoryMap.clear(); recType.clear(); recStat.clear();
                        countMap.clear(); arrowUsage.clear(); }
     void ResetRow(unsigned int);
     void SetArea(QRect area) { m_area = area; }
@@ -217,7 +218,7 @@ class UIGuideType : public UIType
     void drawBox(QPainter *, int, QString);
     void drawBackground(QPainter *, int); 
     void drawText(QPainter *, int);
-    void drawRecStatus(QPainter *, int);
+    void drawRecType(QPainter *, int);
     void Blender(QPainter *, QRect, int, QString force = "");
     //QString cutDown(QString, QFont *, int, int);
     int m_justification;
@@ -226,6 +227,7 @@ class UIGuideType : public UIType
     QString m_selcolor;
     int m_seltype;
     QString m_reccolor;
+    QString m_concolor;
     int m_filltype;
     bool m_cutdown;
     QRect curArea;
@@ -235,7 +237,8 @@ class UIGuideType : public UIType
     QMap<int, QRect> drawArea;
     QMap<int, QString> dataMap;
     QMap<int, QString> categoryMap;
-    QMap<int, int> recStatus;
+    QMap<int, int> recType;
+    QMap<int, int> recStat;
     QMap<int, QPixmap> recImages;
     QMap<int, QPixmap> arrowImages;
     QMap<int, int> arrowUsage;

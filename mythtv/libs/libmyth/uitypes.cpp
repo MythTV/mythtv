@@ -514,7 +514,8 @@ UIGuideType::UIGuideType(const QString &name, int order)
     drawArea.clear();
     dataMap.clear();
     categoryMap.clear();
-    recStatus.clear();
+    recType.clear();
+    recStat.clear();
     arrowUsage.clear();
 }
 
@@ -549,13 +550,15 @@ void UIGuideType::Draw(QPainter *dr, int drawlayer, int context)
         {
             i = it.key();
 
-            if (recStatus[i] == 0)
+            if (recStat[i] == 0)
                 drawBackground(dr, i);
-            else
+            else if (recStat[i] == 1)
                 drawBox(dr, i, m_reccolor);
+            else
+                drawBox(dr, i, m_concolor);
 
             drawText(dr, i);
-            drawRecStatus(dr, i);
+            drawRecType(dr, i);
         }
         drawCurrent(dr);
     }
@@ -674,7 +677,7 @@ void UIGuideType::drawCurrent(QPainter *dr)
   }
  }
 
-void UIGuideType::drawRecStatus(QPainter *dr, int num)
+void UIGuideType::drawRecType(QPainter *dr, int num)
 {
     int breakin = 2;
     QRect area = drawArea[num];
@@ -683,9 +686,9 @@ void UIGuideType::drawRecStatus(QPainter *dr, int num)
     area.setHeight(area.height() - (int)(2*breakin));
     area.setWidth(area.width() - (int)(2*breakin));
  
-    if (recStatus[num] != 0)
+    if (recType[num] != 0)
     {
-        QPixmap recImg = recImages[recStatus[num]];
+        QPixmap recImg = recImages[recType[num]];
 
         dr->drawPixmap(area.right() - recImg.width(), 
                        area.bottom() - recImg.height(), recImg);
@@ -953,19 +956,22 @@ void UIGuideType::ResetRow(unsigned int row)
         if (!dataMap.contains(i))
             return;
         dataMap.remove(i);
-        recStatus.remove(i);
+        recType.remove(i);
+        recStat.remove(i);
         drawArea.remove(i);
         categoryMap.remove(i);
     }
 }
 
 void UIGuideType::SetProgramInfo(unsigned int row, int num, QRect area, 
-                                 QString title, QString genre, int arrow, int recFlag)
+                                 QString title, QString genre, int arrow, 
+                                 int rect, int recs)
 {
     if (num > countMap[row])
         countMap[row] = num;
     dataMap[(int)(row * 100) + num] = title;
-    recStatus[(int)(row * 100) + num] = recFlag;
+    recType[(int)(row * 100) + num] = rect;
+    recStat[(int)(row * 100) + num] = recs;
     drawArea[(int)(row * 100) + num] = area;
     categoryMap[(int)(row * 100) + num] = genre;
     arrowUsage[(int)(row * 100) + num] = arrow;

@@ -69,7 +69,8 @@ class GuideGrid : public MythDialog
     void channelUpdate();
 
     void quickRecord();
-    void displayInfo();
+    void editRecording();
+    void editScheduled();
 
     void customEvent(QCustomEvent *e);
 
@@ -115,6 +116,7 @@ class GuideGrid : public MythDialog
 
     void fillTimeInfos();
 
+    void fillRecordInfos(void);
     void fillProgramInfos(void);
     void fillProgramRowInfos(unsigned int row);
 
@@ -128,6 +130,7 @@ class GuideGrid : public MythDialog
     TimeInfo *m_timeInfos[MAX_DISPLAY_TIMES];
     QPtrList<ProgramInfo> *m_programs[MAX_DISPLAY_CHANS];
     ProgramInfo *m_programInfos[MAX_DISPLAY_CHANS][MAX_DISPLAY_TIMES];
+    vector<ProgramInfo *> m_recList;
 
     QDateTime m_originalStartTime;
     QDateTime m_currentStartTime;

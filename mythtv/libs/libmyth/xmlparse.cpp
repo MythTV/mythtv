@@ -418,6 +418,7 @@ void XMLParse::parseGuideGrid(LayerSet *container, QDomElement &element)
     QString seltype = "";
     QString selcolor = "";
     QString reccolor = "";
+    QString concolor = "";
     QRect area;
     QPoint textoff = QPoint(0, 0);
     bool cutdown = true;
@@ -482,6 +483,10 @@ void XMLParse::parseGuideGrid(LayerSet *container, QDomElement &element)
             else if (info.tagName() == "recordingcolor")
             {
                 reccolor = getFirstText(info);
+            }
+            else if (info.tagName() == "conflictingcolor")
+            {
+                concolor = getFirstText(info);
             }
             else if (info.tagName() == "multiline")
             {
@@ -562,7 +567,9 @@ void XMLParse::parseGuideGrid(LayerSet *container, QDomElement &element)
     guide->SetArea(area);
     guide->SetCategoryColors(catColors);
     guide->SetTextOffset(textoff);
-    guide->SetRecordingColor(reccolor);
+    if (concolor == "")
+        concolor = reccolor;
+    guide->SetRecordingColors(reccolor, concolor);
     guide->SetSelectorColor(selcolor);
     for (int i = 1; i < 6; i++)
         guide->LoadImage(i, recImgs[i]);

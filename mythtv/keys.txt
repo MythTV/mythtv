@@ -128,13 +128,17 @@ EPG
 - The keys A, D, S, W perform the same as left, right, down and up.
 - PageUp and PageDown move the channel list up or down a page.
 - Home and End move the highlight left or right by one day.
-- Control-Left and Control Right move the highlight left or right by one page.
+- Control-Left and Control Right and < and > move the highlight left or 
+  right by one page.
 - The keys 9, 3, 7 and 1 (like a numeric keypad) perform the same as PageUp,
   PageDown, Home and End.
-- I or Space or Enter will bring up more information about a show, and allow
-  you to schedule a recording.
+- I will bring up more information about a show, and allow  you to schedule 
+  a recording.
   -  If you select "Record this showing" while watching Live TV you can
      "Instant Record" a program.
+- Space and Enter will allow you resolve conflicts or change overrides.
+  If the program is not already scheduled to record, it will act like 
+  pressing I instead.
 - Pressing M when on a channel will change to that channel.
 - Pressing ESC or C exits without changing the channel.
 - Pressing R will change the current item from Recording/Not-Recording.
