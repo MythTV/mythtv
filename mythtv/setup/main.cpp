@@ -121,6 +121,10 @@ int main(int argc, char *argv[])
         return -1;
     }
 
+    // XXX something needs to be done to fix this
+//     context->SetNumSetting("GuiWidth", xxx);
+//     context->SetNumSetting("GuiHeight", xxx);
+
     context->LoadQtConfig();
 
     char *home = getenv("HOME");
@@ -130,12 +134,10 @@ int main(int argc, char *argv[])
     if (!dir.exists())
         dir.mkdir(fileprefix);
 
-    QString response = getResponse("This will clear all program/channel/recording/card "
-                                   "info from the database.\nProceed?", "y");
+    QString response = getResponse("Would you like to clear all program/channel/recording/card\n"
+                                   "settings before starting configuration?", "n");
     if (response == "y")
-      clearDB();
-    else if (response != "!")
-      exit(1);
+        clearDB();
 
     CaptureCardEditor cce(context, db);
     cce.exec(db);
