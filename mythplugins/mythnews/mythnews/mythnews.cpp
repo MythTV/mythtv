@@ -59,6 +59,7 @@ MythNews::MythNews(QSqlDatabase *db, MythMainWindow *parent,
     m_InColumn = 0;
     m_CurSite    = 0;
     m_CurArticle = 0;
+    m_ItemsPerListing = 0;
 
     if (m_ItemsPerListing < 1)
         m_ItemsPerListing = 7;
