@@ -100,7 +100,7 @@ void Decoder::metadataSanityCheck(QString *artist, QString *album, QString *titl
 {
     if(artist->length() < 1)
     {
-        artist->append("Unkown Artist");
+        artist->append("Unknown Artist");
     }
     
     if(album->length() < 1)
