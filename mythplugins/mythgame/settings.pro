@@ -12,5 +12,6 @@ DEFINES += _GNU_SOURCE
 DEFINES += PREFIX=\"$${PREFIX}\"
 release {
         QMAKE_CXXFLAGS_RELEASE = -O3 -march=pentiumpro -fomit-frame-pointer
+        QMAKE_CFLAGS_RELEASE = $${QMAKE_CXXFLAGS_RELEASE}
 }
 
