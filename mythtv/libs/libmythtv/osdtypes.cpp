@@ -1750,7 +1750,7 @@ void OSDTypeCC::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
             else
             {
                 x = (cc->x + 3) * displaywidth / 36 + xoffset;
-                y = cc->y * displayheight / 19 + yoffset;
+                y = cc->y * displayheight / 17 + yoffset;
             }
 
             int maxx = x + textlength;

@@ -232,7 +232,9 @@ class NuppelVideoPlayer
 
     int UpdateDelay(struct timeval *nexttrigger);
 
-    void ShowText();
+    void ShowText(void);
+    void ResetCC(void);
+    void UpdateCC(unsigned char *inpos);
 
     void UpdateTimeDisplay(void);
     void UpdateSeekAmount(bool up);
@@ -300,6 +302,7 @@ class NuppelVideoPlayer
     QWaitCondition decoderThreadPaused, videoThreadPaused;
  
     bool cc;
+    int ccmode;
 
     bool playing;
     bool decoder_thread_alive;
@@ -380,8 +383,9 @@ class NuppelVideoPlayer
     bool tryunflaggedskip;
 
     QString cclines[4];
-    int ccindent[4];
-    int lastccrow;
+    int ccptr;
+    int cccol[4];
+    int ccrow[4];
 
     DecoderBase *decoder;
 

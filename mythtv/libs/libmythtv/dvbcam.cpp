@@ -204,10 +204,55 @@ void DVBCam::CiHandlerLoop()
         if (!ciHandler->Process())
             continue;
 
+        if (ciHandler->HasUserIO())
+        {
+            cCiEnquiry* enq = ciHandler->GetEnquiry();
+            if (enq != NULL)
+            {
+                if (enq->Text() != NULL)
+                    cerr << "Message from CAM: " << enq->Text() << endl;
+                delete enq;
+            }
+
+            cCiMenu* menu = ciHandler->GetMenu();
+            if (menu != NULL)
+            {
+                if (menu->TitleText() != NULL)
+                    cerr << "CAM Menu Title: " << menu->TitleText() << endl;
+                if (menu->SubTitleText() != NULL)
+                    cerr << "CAM Menu SubTitle: " << menu->SubTitleText() << endl;
+                if (menu->BottomText() != NULL)
+                    cerr << "CAM Menu BottomText: " << menu->BottomText() << endl;
+
+                for (int i=0; i<menu->NumEntries(); i++)
+                if (menu->Entry(i) != NULL)
+                    cerr << "CAM Menu Entry(" << i << "): " << menu->Entry(i) << endl;
+                
+                if (menu->Selectable())
+                {
+                    cerr << "Menu is selectable" << endl;
+                }
+
+                if (menu->NumEntries() > 0)
+                {
+                    cerr << "Selecting first entry" << endl;
+                    menu->Select(0);
+                }
+                else
+                {
+                    cerr << "Canceling menu" << endl;
+                    menu->Cancel();
+                }
+
+                delete menu;
+            }
+
+            first_send = true;
+        }
+
         for (int s=0; s<ciHandler->NumSlots(); s++)
         {
             const unsigned short *caids = ciHandler->GetCaSystemIds(s);
-            // TODO: Only set cam with correct id.
 
             pthread_mutex_lock(&pmt_lock);
             if (caids != NULL && pmtbuf != NULL)

@@ -196,8 +196,11 @@ void DVBSections::ThreadLoop()
 
         if (ret < 0)
         {
-            ERRNO("Poll failed while waiting for Section");
             pthread_mutex_unlock(&poll_lock);
+            if (errno == EAGAIN || errno == EINTR)
+                continue;
+
+            ERRNO("Poll failed while waiting for Section");
             continue;
         }
 

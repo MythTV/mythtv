@@ -190,11 +190,28 @@ struct cc *cc_open(const char *vbi_name)
 	return 0;
     }
 
+    cc->badvbi = 0;
+    cc->lasttc = 0;
     cc->lastcode = -1;
-    cc->ccmode = 0;
+    cc->lastcodetc = 0;
 
-    cc->ccbuf[0] = "";
-    cc->ccbuf[1] = "";
+    cc->ccmode = -1;
+    cc->txtmode[0] = 0;
+    cc->txtmode[1] = 0;
+    for (int i = 0; i < 4; i++)
+    {
+        cc->lastrow[i] = 0;
+        cc->newrow[i] = 0;
+        cc->newcol[i] = 0;
+        cc->timecode[i] = 0;
+        cc->row[i] = 0;
+        cc->col[i] = 0;
+        cc->rowcount[i] = 0;
+        cc->style[i] = 0;
+        cc->linecont[i] = 0;
+        cc->resumetext[i] = 0;
+        cc->ccbuf[i] = "";
+    }
 
     return cc;
 }

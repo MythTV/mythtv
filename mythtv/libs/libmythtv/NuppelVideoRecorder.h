@@ -118,7 +118,10 @@ class NuppelVideoRecorder : public RecorderBase
     void DoMJPEG(void);
 
     void FormatTeletextSubtitles(struct VBIData *vbidata);
-    void FormatCC(struct ccsubtitle *subtitle, struct cc *cc, int data);
+    void FormatCC(struct cc *cc, int data);
+    void ResetCC(struct cc *cc, int mode);
+    void BufferCC(struct cc *cc, int mode, int len, int clr);
+    int NewRowCC(struct cc *cc, int mode, int len);
     
     bool encoding;
     
@@ -252,8 +255,6 @@ class NuppelVideoRecorder : public RecorderBase
     int hmjpg_maxw;
 
     bool cleartimeonpause;
-
-    struct ccsubtitle subtitle;
 
     bool usingv4l2;
     int channelfd;

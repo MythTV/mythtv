@@ -148,7 +148,6 @@ NuppelVideoRecorder::NuppelVideoRecorder(ChannelBase *channel)
     setorigaudio = false;
     origaudio = new struct video_audio;
 
-    memset(&subtitle, 0, sizeof(subtitle));
 
     usingv4l2 = false;
 
@@ -1882,11 +1881,21 @@ void NuppelVideoRecorder::Reset(void)
         audbuf->freeToBuffer = 1;
     }
 
+    for (int i = 0; i < text_buffer_count; i++)
+    {
+        txtbuffertype *txtbuf = textbuffer[i];
+        txtbuf->buffer = new unsigned char[text_buffer_size];
+        txtbuf->freeToEncode = 0;
+        txtbuf->freeToBuffer = 1;
+    }
+
     act_video_encode = 0;
     act_video_buffer = 0;
     act_audio_encode = 0;
     act_audio_buffer = 0;
     act_audio_sample = 0;
+    act_text_encode = 0;
+    act_text_buffer = 0;
 
     audiobytes = 0;
     effectivedsp = 0;
@@ -2236,80 +2245,140 @@ void NuppelVideoRecorder::FormatTeletextSubtitles(struct VBIData *vbidata)
     textbuffer[act]->freeToEncode = 1;
 }
 
-void NuppelVideoRecorder::FormatCC(struct ccsubtitle *subtitle, 
-                                   struct cc *cc, int data)
+void NuppelVideoRecorder::FormatCC(struct cc *cc, int data)
 {
     struct timeval tnow;
     gettimeofday (&tnow, &tzone);
 
-    int act = act_text_buffer;
-    if (!textbuffer[act]->freeToBuffer)
-    {
-        cerr << act << " ran out of free TEXT buffers :-(\n";
-        return;
-    }
-
     // calculate timecode:
     // compute the difference  between now and stm (start time)
-    textbuffer[act]->timecode = (tnow.tv_sec - stm.tv_sec) * 1000 +
-                                 tnow.tv_usec / 1000 - stm.tv_usec / 1000;
+    int tc = (tnow.tv_sec - stm.tv_sec) * 1000 +
+             tnow.tv_usec / 1000 - stm.tv_usec / 1000;
 
     const int rowdata[] = { 11, -1, 1, 2, 3, 4, 12, 13,
                             14, 15, 5, 6, 7, 8, 9, 10 };
     const char *specialchar[] =
-    { "~A®", "~A°", "~A½", "~A¿", "(TM)", "~A¢", "~A£", "o/~ ",
-      "~Aà", " ", "~Aè", "~Aâ", "~Aê", "~Aî", "~Aô", "~Aû"
+    { "®", "°", "½", "¿", "(TM)", "¢", "£", "o/~ ",
+      "à", " ", "è", "â", "ê", "î", "ô", "û"
     };
 
-    int b1, b2, row, len, x;
+    int b1, b2, len, x;
+    int mode;
 
     if (data == -1)              // invalid data. flush buffers to be safe.
     {
         // TODO: write textbuffer[act]
         //printf (" TODO: write textbuffer[act]\n");
-        memset(subtitle, 0, sizeof(subtitle));
-        cc->ccbuf[0] = "";
-        cc->ccbuf[1] = "";
+        for (mode = 0; mode < 4; mode++)
+            ResetCC(cc, mode);
+        cc->ccmode = 0;
+        cc->txtmode[0] = 0;
+        cc->txtmode[1] = 0;
         return;
     }
 
     b1 = data & 0x7f;
     b2 = (data >> 8) & 0x7f;
-    len = cc->ccbuf[cc->ccmode].length();
-
-    if (b1 & 0x60 && data != cc->lastcode)       // text
+    if (cc->ccmode >= 0)
     {
-        cc->ccbuf[cc->ccmode] += (char)b1;
-        len++;
-        if (b2 & 0x60)
+        mode = (cc->txtmode[cc->ccmode] << 1) | cc->ccmode;
+        len = cc->ccbuf[mode].length();
+    }
+    else
+    {
+        mode = -1;
+        len = 0;
+    }
+
+    // bttv-0.9 VBI reads are pretty reliable (1 read/33367us).
+    // bttv-0.7 reads don't seem to work as well so if read intervals
+    // vary from this, be more conservative in detecting duplicate
+    // CC codes.
+    int dup_text_fudge, dup_ctrl_fudge;
+    if (cc->badvbi < 100 && b1 != 0 && b2 != 0)
+    {
+        int d = tc - cc->lasttc;
+        if (d < 25 || d > 42)
+            cc->badvbi++;
+        else if (cc->badvbi > 0)
+            cc->badvbi--;
+    }
+    if (cc->badvbi < 4)
+    {
+        dup_text_fudge = -2;  // should pick up all codes
+        dup_ctrl_fudge = 33 - 4;  // should pick up 1st, 4th, 6th, 8th, ... codes
+    }
+    else
+    {
+        dup_text_fudge = 4;
+        dup_ctrl_fudge = 33 - 4;
+    }
+
+    if (b1 & 0x60 &&
+        (data != cc->lastcode ||
+         tc > (cc->lastcodetc + 33 + dup_text_fudge)))
+        // text codes
+    {
+        if (mode >= 0)
         {
-            cc->ccbuf[cc->ccmode] += (char)b2;
+            cc->lastcodetc += 33;
+            cc->timecode[mode] = tc;
+
+            // commit row number only when first text code
+            // comes in
+            if (cc->newrow[mode])
+                len = NewRowCC(cc, mode, len);
+
+            cc->ccbuf[mode] += (char)b1;
             len++;
+            cc->col[mode]++;
+            if (b2 & 0x60)
+            {
+                cc->ccbuf[mode] += (char)b2;
+                len++;
+                cc->col[mode]++;
+            }
         }
     }
-    else if ((b1 & 0x10) && (b2 > 0x1F) && (data != cc->lastcode))
-        // codes are always transmitted twice (apparently not,
-        // ignore the second occurance)
+    else if ((b1 & 0x10) && (b2 > 0x1F) &&
+             (data != cc->lastcode ||
+              tc > (cc->lastcodetc + 67 + dup_ctrl_fudge)))
+        // control codes
     {
-        cc->ccmode = (b1 >> 3) & 1;
-        len = cc->ccbuf[cc->ccmode].length();
+        cc->lastcodetc += 67;
+
+        int newccmode = (b1 >> 3) & 1;
+        int newtxtmode = cc->txtmode[newccmode];
+        if ((b1 & 0x06) == 0x04) {
+            if ((b2 == 0x29) || (b2 == 0x2c)) {
+                // CC1,2
+                newtxtmode = 0;
+            } else if (b2 == 0x2A) {
+                // TXT1,2
+                newtxtmode = 1;
+            }
+        }
+        cc->ccmode = newccmode;
+        cc->txtmode[newccmode] = newtxtmode;
+        mode = (newtxtmode << 1) | cc->ccmode;
+
+        cc->timecode[mode] = tc;
+        len = cc->ccbuf[mode].length();
 
         if (b2 & 0x40)           //preamble address code (row & indent)
         {
-            row = rowdata[((b1 << 1) & 14) | ((b2 >> 5) & 1)];
-            subtitle->row = row;
-            if (len != 0)
-            {
-                cc->ccbuf[cc->ccmode] += (char)'\n';
-                len++;
-            }
+            cc->newrow[mode] = rowdata[((b1 << 1) & 14) | ((b2 >> 5) & 1)];
+            if (cc->newrow[mode] == -1)
+                // bogus code?
+                cc->newrow[mode] = cc->lastrow[mode] + 1;
 
             if (b2 & 0x10)        //row contains indent flag
-                for (x = 0; x < (b2 & 0x0F) << 1; x++)
-                {
-                    cc->ccbuf[cc->ccmode] += ' ';
-                    len++;
-                }
+                cc->newcol[mode] = (b2 & 0x0E) << 1;
+            else
+                cc->newcol[mode] = 0;
+
+            // row, indent settings are not final
+            // until text code arrives
         }
         else
         {
@@ -2322,14 +2391,21 @@ void NuppelVideoRecorder::FormatCC(struct ccsubtitle *subtitle,
                    */
                    break;
                case 0x01:          //midrow or char
+                   if (cc->newrow[mode])
+                       len = NewRowCC(cc, mode, len);
+
                    switch (b2 & 0x70)
                    {
                        case 0x20:      //midrow attribute change
                            // TODO: we _do_ want colors, is that an attribute?
+                           cc->ccbuf[mode] += ' ';
+                           len = cc->ccbuf[mode].length();
+                           cc->col[mode]++;
                            break;
                        case 0x30:      //special character..
-                           cc->ccbuf[cc->ccmode] += specialchar[b2 & 0x0f];
-                           len = cc->ccbuf[cc->ccmode].length();
+                           cc->ccbuf[mode] += specialchar[b2 & 0x0f];
+                           len = cc->ccbuf[mode].length();
+                           cc->col[mode]++;
                            break;
                    }
                    break;
@@ -2339,83 +2415,303 @@ void NuppelVideoRecorder::FormatCC(struct ccsubtitle *subtitle,
                    switch (b2)
                    {
                        case 0x21:      //backspace
-                           cc->ccbuf[cc->ccmode].remove(len - 1, 1);
-                           len = cc->ccbuf[cc->ccmode].length();
+                           // add backspace if line has been encoded already
+                           if (cc->newrow[mode])
+                               len = NewRowCC(cc, mode, len);
+
+                           if (len == 0 ||
+                               cc->ccbuf[mode].left(1) == "\b")
+                           {
+                               cc->ccbuf[mode] += (char)'\b';
+                               len++;
+                               cc->col[mode]--;
+                           }
+                           else
+                           {
+                               cc->ccbuf[mode].remove(len - 1, 1);
+                               len = cc->ccbuf[mode].length();
+                               cc->col[mode]--;
+                           }
                            break;
                        case 0x25:      //2 row caption
-                           subtitle->rowcount = 2;
+                           cc->rowcount[mode] = 2;
+                           cc->style[mode] = CC_STYLE_ROLLUP;
                            break;
                        case 0x26:      //3 row caption
-                           subtitle->rowcount = 3;
+                           cc->rowcount[mode] = 3;
+                           cc->style[mode] = CC_STYLE_ROLLUP;
                            break;
                        case 0x27:      //4 row caption
-                           subtitle->rowcount = 4;
-                           break;
-                       case 0x29:      //resume direct caption
-                           //printf ("\nresume direct caption\n");
-                           subtitle->resumedirect = 1;
-                           break;
-                       case 0x2B:      //resume text display
-                           subtitle->resumetext = 1;
-                           break;
-                       case 0x2C:      //erase displayed memory
-                           subtitle->clr = 1;
-                           memcpy(textbuffer[act]->buffer, subtitle,
-                                  sizeof(ccsubtitle));
-                           textbuffer[act]->bufferlen = sizeof(ccsubtitle);
-                           textbuffer[act]->freeToBuffer = 0;
-                           act_text_buffer++;
-                           if (act_text_buffer >= text_buffer_count)
-                               act_text_buffer = 0;
-                           textbuffer[act]->freeToEncode = 1;
+                           cc->rowcount[mode] = 4;
+                           cc->style[mode] = CC_STYLE_ROLLUP;
                            break;
                        case 0x2D:      //carriage return
-                           if (cc->ccmode == 1)
-                               break;
-                       case 0x2F:      //end caption + swap memory
-                       case 0x20:      //resume caption (new caption)
-                           subtitle->len = len;
-                           if (!len)
-                               break;
-                           memcpy(textbuffer[act]->buffer, subtitle,
-                                  sizeof(ccsubtitle));
-                           memcpy((char *)textbuffer[act]->buffer +
-                                  sizeof(ccsubtitle), 
-                                  cc->ccbuf[cc->ccmode].ascii(),
-                                  subtitle->len);
-                           textbuffer[act]->bufferlen = subtitle->len + 
-                                                        sizeof(ccsubtitle);
-                           textbuffer[act]->freeToBuffer = 0;
-                           act_text_buffer++;
-                           if (act_text_buffer >= text_buffer_count)
-                               act_text_buffer = 0;
-                           textbuffer[act]->freeToEncode = 1;
+                           if (cc->newrow[mode])
+                               len = NewRowCC(cc, mode, len);
 
-                           /*
-                           if (subtitle->len)
-                           printf("CC text channel %i: %s\n", cc->ccmode + 1,
-                                  cc->ccbuf[cc->ccmode]);
-                           fflush (stdout);
-                           */
-                       /* fallthrough */
+                           if (len)
+                           {
+                               // flush
+                               BufferCC(cc, mode, len, 0);
+                               cc->ccbuf[mode] = "";
+                               cc->row[mode] = 0;
+                               cc->col[mode] = 0;
+                           }
+                           cc->linecont[mode] = 0;
+                           break;
+
+                       case 0x29:      //resume direct caption (paint-on style)
+                           if (cc->style[mode] == CC_STYLE_ROLLUP && len)
+                           {
+                               // flush
+                               BufferCC(cc, mode, len, 0);
+                               cc->ccbuf[mode] = "";
+                               cc->row[mode] = 0;
+                               cc->col[mode] = 0;
+                           }
+                           cc->style[mode] = CC_STYLE_PAINT;
+                           cc->rowcount[mode] = 0;
+                           cc->linecont[mode] = 0;
+                           break;
+
+                       case 0x2B:      //resume text display
+                           cc->resumetext[mode] = 1;
+                           break;
+                       case 0x2C:      //erase displayed memory
+                           BufferCC(cc, mode, 0, 1);
+                           if (cc->style[mode] != CC_STYLE_POPUP)
+                           {
+                               cc->row[mode] = 0;
+                               cc->col[mode] = 0;
+                           }
+                           cc->linecont[mode] = 0;
+                           break;
+
+                       case 0x20:      //resume caption (pop-up style)
+                           if (cc->style[mode] != CC_STYLE_POPUP)
+                           {
+                               // clear and flush
+                               BufferCC(cc, mode, len, 1);
+                               cc->ccbuf[mode] = "";
+                               cc->row[mode] = 0;
+                               cc->col[mode] = 0;
+                           }
+                           cc->style[mode] = CC_STYLE_POPUP;
+                           cc->rowcount[mode] = 0;
+                           cc->linecont[mode] = 0;
+                           break;
+                       case 0x2F:      //end caption + swap memory
+                           if (cc->style[mode] != CC_STYLE_ROLLUP)
+                           {
+                               // clear and flush
+                               BufferCC(cc, mode, len, 1);
+                               cc->ccbuf[mode] = "";
+                               cc->row[mode] = 0;
+                               cc->col[mode] = 0;
+                           }
+                           cc->style[mode] = CC_STYLE_POPUP;
+                           cc->rowcount[mode] = 0;
+                           cc->linecont[mode] = 0;
+                           break;
+
                        case 0x2A:      //text restart
                        case 0x2E:      //erase non-displayed memory
-                           memset(subtitle, 0, sizeof(ccsubtitle));
-                           cc->ccbuf[cc->ccmode] = "";
-                       break;
+                           ResetCC(cc, mode);
+                           break;
                    }
                    break;
                case 0x07:          //misc (TAB)
-                   for (x = 0; x < (b2 & 0x03); x++)
+                   if (cc->newrow[mode])
                    {
-                       cc->ccbuf[cc->ccmode] += ' ';
-                       len++;
+                       cc->newcol[mode] += (b2 & 0x03);
+                       len = NewRowCC(cc, mode, len);
                    }
+                   else
+                       // illegal?
+                       for (x = 0; x < (b2 & 0x03); x++)
+                       {
+                           cc->ccbuf[mode] += ' ';
+                           len++;
+                           cc->col[mode]++;
+                       }
                    break;
            }
         }
     }
-    cc->lastcode = data;
+
+    for (mode = 0; mode < 4; mode++)
+    {
+        len = cc->ccbuf[mode].length();
+        if (((tc - cc->timecode[mode]) > 100) &&
+            (cc->style[mode] != CC_STYLE_POPUP) && len)
+        {
+            // flush unfinished line if waiting too long
+            // in paint-on or scroll-up mode
+            cc->timecode[mode] = tc;
+            BufferCC(cc, mode, len, 0);
+            cc->ccbuf[mode] = "";
+            cc->row[mode] = cc->lastrow[mode];
+            cc->linecont[mode] = 1;
+        }
+    }
+
+    if (data != cc->lastcode)
+    {
+        cc->lastcode = data;
+        cc->lastcodetc = tc;
+    }
+    cc->lasttc = tc;
+}
+
+void NuppelVideoRecorder::ResetCC(struct cc *cc, int mode)
+{
+//    cc->lastrow[mode] = 0;
+//    cc->newrow[mode] = 0;
+//    cc->newcol[mode] = 0;
+//    cc->timecode[mode] = 0;
+    cc->row[mode] = 0;
+    cc->col[mode] = 0;
+    cc->rowcount[mode] = 0;
+//    cc->style[mode] = CC_STYLE_POPUP;
+    cc->linecont[mode] = 0;
+    cc->resumetext[mode] = 0;
+    cc->ccbuf[mode] = "";
+}
+
+void NuppelVideoRecorder::BufferCC(struct cc *cc, int mode, int len, int clr)
+{
+    int act = act_text_buffer;
+    if (!textbuffer[act]->freeToBuffer)
+    {
+        cerr << act << " ran out of free TEXT buffers :-(\n";
+        return;
+    }
+
+    textbuffer[act]->timecode = cc->timecode[mode];
+
+    // NOTE:  text_buffer_size happens to be > (sizeof(ccsubtitle)+255)
+    if (len > 255)
+        len = 255;
+
+    unsigned char f;
+    unsigned char *bp = textbuffer[act]->buffer;
+    *(bp++) = cc->row[mode];
+    *(bp++) = cc->rowcount[mode];
+    *(bp++) = cc->style[mode];
+    // overload resumetext field
+    f = cc->resumetext[mode];
+    switch (mode)
+    {
+        case 1 : f |= CC_CC2;  break;
+        case 2 : f |= CC_TXT1; break;
+        case 3 : f |= CC_TXT2; break;
+        default: f |= CC_CC1;
+    }
+    if (cc->linecont[mode])
+        f |= CC_LINE_CONT;
+    *(bp++) = f;
+    *(bp++) = clr;
+    *(bp++) = len;
+    if (len)
+    {
+        memcpy(bp,
+               cc->ccbuf[mode].ascii(),
+               len);
+        textbuffer[act]->bufferlen = len + sizeof(ccsubtitle);
+    }
+    else
+        textbuffer[act]->bufferlen = sizeof(ccsubtitle);
+
+    textbuffer[act]->freeToBuffer = 0;
+    act_text_buffer++;
+    if (act_text_buffer >= text_buffer_count)
+        act_text_buffer = 0;
+    textbuffer[act]->freeToEncode = 1;
+
+    cc->resumetext[mode] = 0;
+}
+
+int NuppelVideoRecorder::NewRowCC(struct cc *cc, int mode, int len)
+{
+    if (cc->style[mode] == CC_STYLE_ROLLUP)
+    {
+        if (len == 0)
+            cc->row[mode] = cc->newrow[mode];
+        else
+        {
+            // previous line was likely missing a carriage return
+            if (cc->row[mode] == 0)
+                cc->row[mode] = cc->newrow[mode];
+
+            BufferCC(cc, mode, len, 0);
+            cc->ccbuf[mode] = "";
+            len = 0;
+            cc->col[mode] = 0;
+            cc->linecont[mode] = 0;
+        }
+    }
+    else
+    {
+        // popup/paint style
+
+        if (cc->row[mode] == 0)
+        {
+            if (len == 0)
+                cc->row[mode] = cc->newrow[mode];
+            else
+            {
+                // previous line was missing a row address
+                // - assume it was one row up
+                cc->ccbuf[mode] += (char)'\n';
+                len++;
+                if (cc->row[mode] == 0)
+                    cc->row[mode] = cc->newrow[mode] - 1;
+                else
+                    cc->row[mode]--;
+            }
+        }
+        else if (cc->newrow[mode] > cc->lastrow[mode])
+        {
+            // next line can be more than one row away
+            for (int i = 0; i < (cc->newrow[mode] - cc->lastrow[mode]); i++)
+            {
+                cc->ccbuf[mode] += (char)'\n';
+                len++;
+            }
+            cc->col[mode] = 0;
+        }
+        else if (cc->newrow[mode] == cc->lastrow[mode])
+        {
+            // same row
+            // - assume new line appends to current line
+            cc->newcol[mode] -= cc->col[mode];
+            if (cc->newcol[mode] < 0)
+                cc->newcol[mode] = 0;
+        }
+        else
+        {
+            // next line goes upwards (not legal?)
+            // - flush
+            BufferCC(cc, mode, len, 0);
+            cc->ccbuf[mode] = "";
+            cc->row[mode] = cc->newrow[mode];
+            cc->col[mode] = 0;
+            cc->linecont[mode] = 0;
+            len = 0;
+        }
+    }
+
+    cc->lastrow[mode] = cc->newrow[mode];
+    cc->newrow[mode] = 0;
+
+    for (int x = 0; x < cc->newcol[mode]; x++)
+    {
+        cc->ccbuf[mode] += ' ';
+        len++;
+        cc->col[mode]++;
+    }
+
+    return len;
 }
 
 static void vbi_event(struct VBIData *data, struct vt_event *ev)
@@ -2470,9 +2766,6 @@ void NuppelVideoRecorder::doVbiThread(void)
             return;
     }
 
-    struct ccsubtitle subtitle;
-    memset(&subtitle, 0, sizeof(subtitle));
-
     struct VBIData vbicallbackdata;
     vbicallbackdata.nvr = this;
 
@@ -2517,7 +2810,7 @@ void NuppelVideoRecorder::doVbiThread(void)
                 }
                 break;
             case 2:
-                FormatCC(&subtitle, cc, cc_handler(cc));
+                FormatCC(cc, cc_handler(cc));
                 break;
         }
     }

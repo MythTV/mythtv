@@ -1055,7 +1055,13 @@ bool DVBChannel::Tune(dvb_channel_t& channel, bool all)
         polls.events = POLLIN;
         polls.revents = 0;
 
-        poll_return = poll(&polls, 1, 150);
+        for (;;)
+        {
+            poll_return = poll(&polls, 1, 150);
+            if (poll_return == -1 && (errno == EAGAIN || errno == EINTR))
+                continue;
+            break;
+        }
 
         if (poll_return > 0)
         {

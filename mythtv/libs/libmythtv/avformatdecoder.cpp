@@ -860,6 +860,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
 {
     AVCodecContext *context = &(stream->codec);
     unsigned char *bufptr = pkt->data;
+    unsigned char *bufend = pkt->data + pkt->size;
     unsigned int state = 0xFFFFFFFF, v = 0;
     
     int prvcount = -1;
@@ -881,7 +882,25 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
             {
                 case SEQ_START:
                 {
+                    int size = 8;
+                    if (bufptr + size > bufend) 
+                        return;
                     unsigned char *test = bufptr;
+                    if (test[size - 1] & 0x40) 
+                        size += 64;
+                    if (bufptr + size > bufend) 
+                        return;
+                    if (test[size - 1] & 0x80) 
+                        size += 64;
+                    if ((bufptr + size + 4) > bufend) 
+                        return;
+                    test = bufptr + size;
+                    if (test[0] != 0x0 || test[1] != 0x0 || test[2] != 0x1) {
+                        cerr << "avfd: sequence header size mismatch" << endl;
+                        continue;
+                    }
+
+                    test = bufptr;
                     int width = (test[0] << 4) | (test[1] >> 4);
                     int height = ((test[1] & 0xff) << 8) | test[2];
 

@@ -758,6 +758,7 @@ QWidget* ListBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
 
     widget = new MythListBox(box);
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
+    widget->setHelpText(getHelpText());
 
     for(unsigned int i = 0 ; i < labels.size() ; ++i) {
         widget->insertItem(labels[i]);
@@ -765,9 +766,6 @@ QWidget* ListBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
             widget->setCurrentItem(i);
     }
 
-    // xxx, needs to update the listbox when a selection is added
-//     connect(this, SIGNAL(selectionAdded(const QString&, QString)),
-//             widget, SLOT(insertItem(QString)));
     connect(widget, SIGNAL(destroyed()),
             this, SLOT(widgetDestroyed()));
     connect(this, SIGNAL(selectionsCleared()),

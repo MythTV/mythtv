@@ -82,7 +82,7 @@ ssize_t safe_read(int filedes, void *buffer, size_t size)
 {
   for (;;) {
       ssize_t p = read(filedes, buffer, size);
-      if (p < 0 && errno == EINTR) {
+      if (p < 0 && (errno == EINTR || errno == EAGAIN)) {
          dsyslog("EINTR while reading from file handle %d - retrying", filedes);
          continue;
          }
@@ -423,7 +423,20 @@ int cCiTransportConnection::RecvTPDU(void)
   pfd[0].fd = fd;
   pfd[0].events = POLLIN;
   lastResponse = ERROR;
-  if (poll(pfd, 1, CAM_READ_TIMEOUT) && (pfd[0].revents & POLLIN) && tpdu->Read(fd) == OK && tpdu->Tcid() == tcid) {
+
+  for (;;) {
+      int ret = poll(pfd, 1, CAM_READ_TIMEOUT);
+      if (ret == -1 && (errno == EAGAIN || errno == EINTR))
+          continue;
+      break;
+  }
+
+  if (
+        (pfd[0].revents & POLLIN) &&
+        tpdu->Read(fd) == OK &&
+        tpdu->Tcid() == tcid
+     )
+  {
      switch (state) {
        case stIDLE:     break;
        case stCREATION: if (tpdu->Tag() == T_CTC_REPLY) {
@@ -1643,87 +1656,4 @@ bool cCiHandler::Reset(int Slot)
 bool cCiHandler::connected() const
 {
   return _connected;
-}
-
-int tcp_listen(struct sockaddr_in *name,int sckt, unsigned long address)
-{
-	int sock;
-	name->sin_family = AF_INET;
-	name->sin_port = htons (sckt);
-	name->sin_addr.s_addr = address;
-
-	if ((sock = socket(PF_INET, SOCK_STREAM, 0)) == -1){
-		perror("ip socket");
-		return (-1);
-	}
-
-	if(bind(sock, (struct sockaddr *) name, 
-		sizeof(struct sockaddr)) == -1){
-		perror("bind");
-		return (-2);
-	}
-	
-	if (listen(sock, 10)){
-		perror("listen");
-		return (-3);
-	}
-	
-	return sock;
-}
-
-int udp_listen(struct sockaddr_un *name, char const * const filename)
-{
-	int sock;
-	name->sun_family = AF_UNIX;
-	snprintf(name->sun_path, 108, "%s", filename);
-
-	if ((sock = socket(PF_UNIX, SOCK_STREAM, 0)) == -1){
-		perror("ip socket");
-		return (-1);
-	}
-
-	if(bind(sock, (struct sockaddr *) name, 
-		sizeof(struct sockaddr)) == -1){
-		perror("bind");
-		return (-2);
-	}
-	
-	if (listen(sock, 10)){
-		perror("listen");
-		return (-3);
-	}
-	
-	return sock;
-}
-
-int accept_tcp(int ip_sock,struct sockaddr_in *ip_name)
-{
-	socklen_t len;
-	int conn;
-	
-	len =   (socklen_t) sizeof(struct sockaddr); 
-
-	if((conn = accept(ip_sock, (struct sockaddr *)ip_name, &len)) < 0) {
-		perror("accept");
-		return -1;
-	}
-	fprintf(stderr,"New connection established.\n");
-
-	return conn;
-}
-
-int accept_udp(int ip_sock,struct sockaddr_un *ip_name)
-{
-	socklen_t len;
-	int conn;
-	
-	len =   (socklen_t) sizeof(struct sockaddr); 
-
-	if((conn = accept(ip_sock, (struct sockaddr *)ip_name, &len)) < 0) {
-		perror("accept");
-		return -1;
-	}
-	fprintf(stderr,"New connection established.\n");
-
-	return conn;
 }

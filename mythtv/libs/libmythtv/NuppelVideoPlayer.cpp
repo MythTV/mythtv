@@ -172,7 +172,14 @@ NuppelVideoPlayer::NuppelVideoPlayer(MythSqlDatabase *ldb,
     pausevideo = false;
 
     cc = false;
-    lastccrow = 0;
+    ccmode = 1;
+    for (int j = 0; j < 4; j++)
+    {
+        cclines[j] = "";
+        cccol[j] = 0;
+        ccrow[j] = 0;
+    }
+    ccptr = 0;
 
     limitKeyRepeat = false;
 
@@ -822,111 +829,7 @@ void NuppelVideoPlayer::ShowText(void)
         }
         else if (txtbuffers[rtxt].type == 'C')
         {
-            int j;
-            unsigned char *inpos = txtbuffers[rtxt].buffer;
-            struct ccsubtitle subtitle;
-
-            memcpy(&subtitle, inpos, sizeof(subtitle));
-            inpos += sizeof(subtitle);
-
-            if (subtitle.clr)
-            {
-                //printf ("erase displayed memory\n");
-                for (j = 0; j < 4; j++)
-                {
-                    cclines[j] = "";
-                }
-                osd->ClearAllCCText();
-            }
-
-            if (subtitle.len)
-            {
-                unsigned char *end = inpos + subtitle.len;
-                int row;
-
-                if (subtitle.row == 0)
-                    subtitle.row = lastccrow;
-
-                lastccrow = subtitle.row;
-
-                if (subtitle.rowcount == 0)
-                {
-                    // overwrite
-                    row = 0;
-                }
-                else
-                {
-                    if (subtitle.rowcount > 4)
-                    {
-                        subtitle.rowcount = 4;
-                    }
-                    // scroll up one line
-                    for (j = 0; j < subtitle.rowcount - 1 && j < 4; j++)
-                    {
-                        cclines[j] = cclines[j + 1];
-                        ccindent[j] = ccindent[j + 1];
-                    }
-                    cclines[subtitle.rowcount - 1] = "";
-                    row = subtitle.rowcount - 1;
-                }
-
-                while (inpos < end)
-                {
-                    ccindent[row] = 0;
-                    while ((inpos < end) && *inpos != 0 && (char)*inpos == ' ')
-                    {
-                        inpos++;
-                        ccindent[row]++;
-                    }
-
-                    unsigned char *cur = inpos;
-
-                    //null terminate at EOL
-                    while (cur < end && *cur != '\n' && *cur != 0)
-                        cur++;
-                    *cur = 0;
-
-                    if (subtitle.rowcount > 0 && row >= subtitle.rowcount)
-                    {
-                        // multi-line in scroll mode -- shouldn't happen?
-                        // scroll up again
-                        for (j = 0; j < subtitle.rowcount - 1 && j < 4; j++)
-                        {
-                             cclines[j] = cclines[j + 1];
-                             ccindent[j] = ccindent[j + 1];
-                        }
-                        row = subtitle.rowcount - 1;
-                    }
-
-                    if (row < 4)
-                    {
-                        cclines[row++] = QString((const char *)inpos);
-                        //printf ("CC text: %s\n", inpos);
-                    }
-#if 0
-                    else
-                    {
-                        printf("CC overflow: %s\n", inpos);
-                    }
-#endif
-
-                    inpos = cur + 1;
-                }
-
-                if (subtitle.rowcount == 0)
-                    subtitle.rowcount = row;
-
-            }
-
-            //redraw
-            osd->ClearAllCCText ();
-            for (j = 0; j < subtitle.rowcount && j < 4; j++)
-            {
-                if (cclines[j].isNull() || cclines[j].isEmpty())
-                    continue;
-                osd->AddCCText(cclines[j], ccindent[j], subtitle.row + j, 
-                               1, false);
-            }
+            UpdateCC(txtbuffers[rtxt].buffer);
         }
 
         text_buflock.lock();
@@ -936,6 +839,177 @@ void NuppelVideoPlayer::ShowText(void)
         text_buflock.unlock();
     }
 }
+
+void NuppelVideoPlayer::ResetCC(void)
+{
+    for (int j = 0; j < 4; j++)
+    {
+        cclines[j] = "";
+        cccol[j] = 0;
+        ccrow[j] = 0;
+    }
+    ccptr = 0;
+    if (osd)
+        osd->ClearAllCCText();
+}
+
+void NuppelVideoPlayer::UpdateCC(unsigned char *inpos)
+{
+    int j;
+    struct ccsubtitle subtitle;
+
+    memcpy(&subtitle, inpos, sizeof(subtitle));
+    inpos += sizeof(ccsubtitle);
+
+    // skip undisplayed streams
+    unsigned char dispmode;
+    switch (ccmode)
+    {
+        case 2 : dispmode = CC_CC2;  break;
+        case 3 : dispmode = CC_TXT1; break;
+        case 4 : dispmode = CC_TXT2; break;
+        default: dispmode = CC_CC1;
+    }
+    if ((subtitle.resumetext & CC_MODE_MASK) != dispmode)
+        return;
+
+    if (subtitle.row == 0)
+        subtitle.row = 1;
+
+    if (subtitle.clr)
+    {
+        //printf ("erase displayed memory\n");
+        ResetCC();
+    }
+
+    if (subtitle.len)
+    {
+        unsigned char *end = inpos + subtitle.len;
+        int row = 0;
+        int linecont = (subtitle.resumetext & CC_LINE_CONT);
+            
+        while (inpos < end)
+        {
+            if (linecont)
+            {
+                // append to last line
+                ccptr--;
+                if (ccptr < 0)
+                    ccptr = 3;
+                // backspace into existing line if needed
+                int bscnt = 0;
+                while ((inpos < end) && *inpos != 0 && (char)*inpos == '\b')
+                {
+                    bscnt++;
+                    inpos++;
+                }
+                if (bscnt)
+                    cclines[ccptr].remove(cclines[ccptr].length() - 1, 1);
+            }
+            else
+            {
+                // new line:  count spaces to calculate column position
+                cccol[ccptr] = 0;
+                while ((inpos < end) && *inpos != 0 && (char)*inpos == ' ')
+                {
+                    inpos++;
+                    cccol[ccptr]++;
+                }
+            }
+
+            unsigned char *cur = inpos;
+
+            //null terminate at EOL
+            while (cur < end && *cur != '\n' && *cur != 0)
+                cur++;
+            *cur = 0;
+
+#if 0
+            if (row >= 4)
+                printf("CC overflow: %s\n", (const char *)inpos);
+#endif
+
+            if (*inpos != 0)
+            {
+                if (linecont)
+                    cclines[ccptr] += QString((const char *)inpos);
+                else
+                {
+                    cclines[ccptr] = QString((const char *)inpos);
+                    row++;
+                }
+                ccrow[ccptr] = subtitle.row;
+                ccptr++;
+                if (ccptr >= 4)
+                    ccptr = 0;
+            }
+            subtitle.row++;
+            inpos = cur + 1;
+            linecont = 0;
+        }
+
+        int lastccptr = ccptr - 1;
+        if (lastccptr < 0)
+            lastccptr = 3;
+
+        // set row position
+        if (subtitle.rowcount == 0 || row > 1)
+        {
+            // multi-line text
+            // - fix display of old (badly-encoded) files
+            for (j = 0; j < 4; j++)
+                if (ccrow[lastccptr] > 15)
+                    ccrow[j] -= (ccrow[lastccptr] - 15);
+        }
+        else
+        {
+            // scrolling text
+            // - scroll up previous lines
+            // - if caption is at bottom, row address is for last
+            // row
+            // - if caption is at top, row address is for first row (?)
+            if (subtitle.rowcount > 4)
+                subtitle.rowcount = 4;
+            int tmpccptr = lastccptr;
+            int uprow;
+            if (ccrow[lastccptr] - subtitle.rowcount < 0)
+                ccrow[lastccptr] = subtitle.rowcount;
+            uprow = ccrow[lastccptr] - 1;
+            for (j = 1; j < 4; j++)
+            {
+                tmpccptr--;
+                if (tmpccptr < 0)
+                    tmpccptr = 3;
+                if (j < subtitle.rowcount)
+                    ccrow[tmpccptr] = uprow--;
+                else
+                {
+                    cclines[tmpccptr] = "";
+                    ccrow[tmpccptr] = 0;
+                    cccol[tmpccptr] = 0;
+                }
+            }
+        }
+    }
+
+    //redraw
+    osd->ClearAllCCText ();
+    for (j = 0; j < 4; j++)
+    {
+        if (cclines[j].isNull() || cclines[j].isEmpty())
+            continue;
+        if (ccrow[j] < 1)
+        {
+            cclines[j] = "";
+            ccrow[j] = 0;
+            cccol[j] = 0;
+            continue;
+        }
+        osd->AddCCText(cclines[j], cccol[j], ccrow[j],
+                       1, false);
+    }
+}
+
 
 #define MAXWARPDIFF 0.0005 // Max amount the warpfactor can change in 1 frame
 #define WARPMULTIPLIER 1000000000 // How much do we multiply the warp by when 
@@ -1711,19 +1785,28 @@ void NuppelVideoPlayer::StartPlaying(void)
         audioOutput = AudioOutput::OpenAudio(audiodevice, audio_bits,
                                              audio_channels, audio_samplerate);
 
-        DialogBox *dialog = NULL;
+        DialogBox *dialog = NULL ;
         if (audioOutput == NULL)
+        {
+            qApp->lock();
             dialog = new DialogBox(gContext->GetMainWindow(),
                                    QObject::tr("Unable to create AudioOutput."));
+        }
         else if (audioOutput->GetError() != QString::null)
+        {
+            qApp->lock();
             dialog = new DialogBox(gContext->GetMainWindow(),
                                    audioOutput->GetError());
+        }
+
         if (dialog != NULL)
         {
             dialog->AddButton(QObject::tr("Continue WITHOUT AUDIO!"));
             dialog->AddButton(QObject::tr("Return to menu."));
             int ret = dialog->exec();
             delete dialog;
+
+            qApp->unlock();
 
             if (audioOutput)
             {
@@ -2254,6 +2337,7 @@ void NuppelVideoPlayer::ClearAfterSeek(void)
 
     for (int i = 0; i < MAXTBUFFER; i++)
         txtbuffers[i].timecode = 0;
+    ResetCC();
 
     wtxt = 0;
     rtxt = 0;

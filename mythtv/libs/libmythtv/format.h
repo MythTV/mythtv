@@ -185,4 +185,17 @@ typedef struct ccsubtitle
     unsigned char len; //length of string to follow
 } ccsubtitle;
 
+// resumedirect codes
+#define CC_STYLE_POPUP   0x00
+#define CC_STYLE_PAINT   0x01
+#define CC_STYLE_ROLLUP  0x02
+
+// resumetext special codes
+#define CC_LINE_CONT  0x02
+#define CC_MODE_MASK  0xf0
+#define CC_CC1        0x00
+#define CC_CC2        0x10
+#define CC_TXT1       0x20
+#define CC_TXT2       0x30
+
 #endif

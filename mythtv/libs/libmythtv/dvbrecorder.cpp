@@ -427,7 +427,13 @@ void DVBRecorder::StartRecording()
             emit Unpaused();
         }
 
-        ret = poll(&polls, 1, 1000);
+        for (;;)
+        {
+            ret = poll(&polls, 1, 1000);
+            if (ret == -1 && (errno == EAGAIN || errno == EINTR))
+                continue;
+            break;
+        }
 
         if (ret == 0 && --dataflow < 1)
             WARNING("No data from card in 1 second.");
