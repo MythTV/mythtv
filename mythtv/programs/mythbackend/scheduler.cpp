@@ -213,26 +213,36 @@ bool Scheduler::FillRecordLists(void)
     schedMoveHigher = (bool)gContext->GetNumSetting("SchedMoveHigher");
     schedTime = QDateTime::currentDateTime();
 
+    VERBOSE(VB_SCHEDULE, "PruneOldRecords...");
     PruneOldRecords();
+    VERBOSE(VB_SCHEDULE, "AddNewRecords...");
     AddNewRecords();
 
+    VERBOSE(VB_SCHEDULE, "Sort by priority...");
     reclist.sort(comp_priority);
 
+    VERBOSE(VB_SCHEDULE, "BuildListMaps...");
     BuildListMaps();
 
+    VERBOSE(VB_SCHEDULE, "SchedNewRecords...");
     SchedNewRecords();
 
     if (schedMoveHigher)
     {
+        VERBOSE(VB_SCHEDULE, "Sort retrylist...");
         retrylist.sort(comp_retry);
+        VERBOSE(VB_SCHEDULE, "MoveHigherRecords...");
         MoveHigherRecords();
         retrylist.clear();
     }
 
+    VERBOSE(VB_SCHEDULE, "ClearListMaps...");
     ClearListMaps();
 
+    VERBOSE(VB_SCHEDULE, "Sort by time...");
     reclist.sort(comp_recstart);
 
+    VERBOSE(VB_SCHEDULE, "PruneRedundants...");
     PruneRedundants();
 
     return hasconflicts;
@@ -1248,6 +1258,7 @@ void Scheduler::AddNewRecords(void) {
         .arg(kTimeslotRecord)
         .arg(kWeekslotRecord);
 
+    VERBOSE(VB_SCHEDULE, " |-- Start DB Query...");
     QSqlQuery result = db->exec(query);
 
     if (!result.isActive())
@@ -1256,6 +1267,8 @@ void Scheduler::AddNewRecords(void) {
         return;
     }
 
+    VERBOSE(VB_SCHEDULE, QString(" |-- Processing %1 results...")
+                          .arg(result.size()));
     while (result.next())
     {
         // Don't bother if card isn't on-line of end time has already passed
@@ -1401,6 +1414,7 @@ void Scheduler::AddNewRecords(void) {
         tmpList.push_back(p);
     }
 
+    VERBOSE(VB_SCHEDULE, " +-- Cleanup...");
     // Delete existing programs that were reactivated
     RecIter rec = reclist.begin();
     while (rec != reclist.end())
