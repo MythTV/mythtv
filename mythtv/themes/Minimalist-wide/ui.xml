@@ -1145,7 +1145,7 @@
       </textarea>
 
       <textarea name="subtitle" draworder="6">
-        <area>25,55,1000,40</area>
+        <area>25,55,1000,44</area>
         <font>subtitle</font>
       </textarea>
 
