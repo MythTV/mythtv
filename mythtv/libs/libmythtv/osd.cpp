@@ -328,6 +328,8 @@ void OSD::parseImage(OSDSet *container, QDomElement &element)
     QString filename = "";
     QPoint pos = QPoint(0, 0);
 
+    QPoint scale = QPoint(-1, -1);
+
     for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling())
     {
@@ -344,6 +346,12 @@ void OSD::parseImage(OSDSet *container, QDomElement &element)
                 pos.setX((int)(pos.x() * wmult + xoffset));
                 pos.setY((int)(pos.y() * hmult + yoffset));
             }
+            else if (info.tagName() == "staticsize")
+            {
+                scale = parsePoint(getFirstText(info));
+                scale.setX((int)(scale.x() * wmult));
+                scale.setY((int)(scale.y() * hmult));
+            }
             else
             {
                 cerr << "Unknown: " << info.tagName() << " in image\n";
@@ -355,7 +363,8 @@ void OSD::parseImage(OSDSet *container, QDomElement &element)
     if (filename != "")
         filename = themepath + filename;
 
-    OSDTypeImage *image = new OSDTypeImage(name, filename, pos, wmult, hmult);
+    OSDTypeImage *image = new OSDTypeImage(name, filename, pos, wmult, hmult,
+                                           scale.x(), scale.y());
     container->AddType(image);
 }
 
@@ -363,6 +372,7 @@ void OSD::parseTextArea(OSDSet *container, QDomElement &element)
 {
     QRect area = QRect(0, 0, 0, 0);
     QString font = "", altfont = "";
+    QString statictext = "";
     bool multiline = false;
 
     QString name = element.attribute("name", "");
@@ -396,6 +406,10 @@ void OSD::parseTextArea(OSDSet *container, QDomElement &element)
                 if (getFirstText(info).lower() == "yes")
                     multiline = true;
             }
+            else if (info.tagName() == "statictext")
+            {
+                statictext = getFirstText(info);
+            }
             else
             {
                 cerr << "Unknown tag in textarea: " << info.tagName() << endl;
@@ -426,6 +440,18 @@ void OSD::parseTextArea(OSDSet *container, QDomElement &element)
         }
         else
             text->SetAltFont(ttffont);
+    }
+
+    if (statictext != "")
+        text->SetText(statictext);
+
+    QString align = element.attribute("align", "");
+    if (!align.isNull() && !align.isEmpty())
+    {
+        if (align.lower() == "center")
+            text->SetCentered(true);
+        else if (align.lower() == "right")
+            text->SetRightJustified(true);
     }
 }
 

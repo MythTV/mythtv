@@ -50,7 +50,8 @@
       <font>infofont</font>
     </textarea>
     <image name="channelicon"> <!-- set internally, doesn't need a filename -->
-      <position>10,290</position>
+      <position>7,288</position>
+      <staticsize>36,36</staticsize> <!-- resize the image to these dimensions -->
     </image>
     <textarea name="callsign">
        <area>48,294,112,27</area>
@@ -60,6 +61,18 @@
        <area>568,294,60,27</area>
        <font>infofont</font>
     </textarea>
+ <!-- just some examples.  The textarea is displaying a static message.
+      Possible values for align are 'right' and 'center'.  Leaving align
+      off entirely will just left justify things.
+    <box name="testbox">
+       <area>50,50,300,100</area>
+    </box>
+    <textarea name="test" align="right">
+       <area>50,50,300,100</area>
+       <font>infofontgray</font>
+       <statictext>Blah blah blah</statictext>
+    </textarea>
+  -->
   </container>
 
   <container name="status" priority="10" fademovement="0,6">

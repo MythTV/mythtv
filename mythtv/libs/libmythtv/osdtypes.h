@@ -121,6 +121,9 @@ class OSDTypeText : public OSDType
     void SetCentered(bool docenter) { m_centered = docenter; }
     bool GetCentered() { return m_centered; }
 
+    void SetRightJustified(bool right) { m_right = right; }
+    bool GetRightJustified() { return m_right; }
+
     QRect DisplayArea() { return m_displaysize; }
 
     void Draw(unsigned char *screenptr, int vid_width, int vid_height,
@@ -138,6 +141,8 @@ class OSDTypeText : public OSDType
     TTFFont *m_altfont;
 
     bool m_centered;
+    bool m_right;
+
     bool m_multiline;
     bool m_usingalt;
 };
@@ -155,8 +160,12 @@ class OSDTypeImage : public OSDType
     void LoadImage(const QString &filename, float wmult, float hmult, 
                    int scalew = -1, int scaleh = -1);
 
+    void SetStaticSize(int scalew, int scaleh) { m_scalew = scalew;
+                                                 m_scaleh = scaleh; }
+
     QPoint DisplayPos() { return m_displaypos; }
     void SetPosition(QPoint pos) { m_displaypos = pos; }
+
     QRect ImageSize() { return m_imagesize; }
 
     void Draw(unsigned char *screenptr, int vid_width, int vid_height, 
@@ -176,6 +185,8 @@ class OSDTypeImage : public OSDType
     unsigned char *m_vbuffer;
 
     unsigned char *m_alpha;
+
+    int m_scalew, m_scaleh;
 };
 
 class OSDTypePosSlider : public OSDTypeImage

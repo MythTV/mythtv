@@ -229,6 +229,7 @@ OSDTypeText::OSDTypeText(const QString &name, TTFFont *font,
     m_displaysize = displayrect;
     m_multiline = false;
     m_centered = false;
+    m_right = false;
     m_usingalt = false;
 }
 
@@ -334,12 +335,14 @@ void OSDTypeText::DrawString(unsigned char *screenptr, int vid_width,
                              int vid_height, QRect rect, const QString &text, 
                              int fade, int maxfade, int xoff, int yoff)
 {
-    if (m_centered)
+    if (m_centered || m_right)
     {
         int textlength = 0;
         m_font->CalcWidth(text, &textlength);
 
-        int xoffset = (rect.width() - textlength) / 2;
+        int xoffset = rect.width() - textlength;
+        if (m_centered)
+            xoffset /= 2;
 
         if (xoffset > 0)
             rect.moveBy(xoffset, 0);
@@ -384,6 +387,9 @@ OSDTypeImage::OSDTypeImage(const QString &name, const QString &filename,
     m_isvalid = false;
     m_imagesize = QRect(0, 0, 0, 0);
 
+    m_scalew = scalew;
+    m_scaleh = scaleh;
+
     LoadImage(filename, wmult, hmult, scalew, scaleh);
 }
 
@@ -395,6 +401,8 @@ OSDTypeImage::OSDTypeImage(const OSDTypeImage &other)
     m_imagesize = other.m_imagesize;
     m_isvalid = other.m_isvalid;
     m_name = other.m_name;
+    m_scalew = other.m_scalew;
+    m_scaleh = other.m_scaleh;
 
     m_alpha = m_yuv = NULL;
     if (m_isvalid)
@@ -463,6 +471,11 @@ void OSDTypeImage::LoadImage(const QString &filename, float wmult, float hmult,
 
     if (tmpimage.width() == 0)
         return;
+
+    if (scalew > 0 && m_scalew > 0)
+        scalew = m_scalew;
+    if (scaleh > 0 && m_scaleh > 0)
+        scaleh = m_scaleh;
 
     int width = 0, height = 0;
 
