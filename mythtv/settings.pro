@@ -55,7 +55,8 @@ DEFINES += USING_IVTV
 # LCDProc support
 #DEFINES += LCD_DEVICE
 
-# Default audio output, OSS
+# Default audio output, OSS.  
+# Do NOT disable unless compiling on a non-linux platform.
 CONFIG += using_oss
 
 # Native ALSA support

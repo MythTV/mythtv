@@ -26,17 +26,21 @@ SOURCES += generictree.cpp managedlist.cpp DisplayRes.cpp
 SOURCES += volumecontrol.cpp volumebase.cpp audiooutputbase.cpp
 SOURCES += dbsettings.cpp screensaver.cpp screensaver-null.cpp output.cpp
 
-LIBS += -L../libmythsamplerate
-LIBS += -lmythsamplerate-$${LIBVERSION}
+INCLUDEPATH += ../libmythsamplerate ../libmythsoundtouch ../..
+DEPENDPATH += ../libmythsamplerate ../libmythsoundtouch
 
-INCLUDEPATH += ../libmythsamplerate
+LIBS += -L../libmythsamplerate -lmythsamplerate-$${LIBVERSION}
+LIBS += -L../libmythsoundtouch -lmythsoundtouch-$${LIBVERSION}
 
-LIBS += -L../libmythsoundtouch
-LIBS += -lmythsoundtouch-$${LIBVERSION}
+isEmpty(QMAKE_EXTENSION_SHLIB) {
+  QMAKE_EXTENSION_SHLIB=so
+}
+isEmpty(QMAKE_EXTENSION_LIB) {
+  QMAKE_EXTENSION_LIB=a
+}
 
-INCLUDEPATH += ../libmythsoundtouch
-
-INCLUDEPATH += ../..
+TARGETDEPS += ../libmythsamplerate/libmythsamplerate-$${LIBVERSION}.$${QMAKE_EXTENSION_LIB}
+TARGETDEPS += ../libmythsoundtouch/libmythsoundtouch-$${LIBVERSION}.$${QMAKE_EXTENSION_LIB}
 
 inc.path = $${PREFIX}/include/mythtv/
 inc.files  = dialogbox.h lcddevice.h themedmenu.h mythcontext.h mythdbcon.h
