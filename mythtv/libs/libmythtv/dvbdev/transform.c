@@ -427,6 +427,7 @@ void send_ipack(ipack *p)
             switch (streamid & 0xF8){
             case 0x80:
                 p->count += 4;
+                p->buf[8] = p->hlength;
                 p->buf[9] = streamid;
                 p->buf[10] = 0;
                 p->buf[11] = (ac3_off >> 8)& 0xFF;
@@ -473,18 +474,17 @@ static void write_ipack(ipack *p, uint8_t *data, int count)
         case PRIV_TS_AC3: /* keep this as default */
         default:
         {
-            int ac3_off;
-            ac3_off = get_ac3info(data, count, &ai,0);
-            if (ac3_off>=0 && ai.framesize){
-                p->buf[p->count] = 0x80;
-                p->buf[p->count+1] = (p->size - p->count
-                              - 4 - ac3_off)/ 
-                    ai.framesize + 1;
-                p->buf[p->count+2] = (ac3_off >> 8)& 0xFF;
-                p->buf[p->count+3] = (ac3_off)& 0xFF;
-                p->count+=4;
-                
-            }
+            /*
+             * add in a dummy 4 byte audio header
+             * to match mpeg dvd standard. The values
+             * will be filled in later (in send_ipack)
+             * when it has a full packet to search
+             */
+            p->buf[p->count] = 0x80;
+            p->buf[p->count+1] = 0;
+            p->buf[p->count+2] = 0;
+            p->buf[p->count+3] = 0;
+            p->count+=4;
         }
         break;
         }

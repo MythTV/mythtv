@@ -1533,6 +1533,12 @@ static int mpegps_read_packet(AVFormatContext *s,
     st->codec.codec_id = codec_id;
     if (codec_id != CODEC_ID_PCM_S16BE)
         st->need_parsing = 1;
+
+    /* notify the callback of the change in streams */
+    if (s->streams_changed) {
+        s->streams_changed(s->stream_change_data);
+    }
+
  found:
     if (startcode >= 0xa0 && startcode <= 0xbf) {
         int b1, freq;

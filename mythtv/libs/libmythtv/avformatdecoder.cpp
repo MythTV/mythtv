@@ -644,11 +644,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         {
             VERBOSE(VB_IMPORTANT, 
                     QString("AvFormatDecoder: Could not find decoder for "
-                            "codec (%1) aborting.")
+                            "codec (%1), ignoring.")
                            .arg(enc->codec_id));
-            av_close_input_file(ic);
-            ic = NULL;
-            scanerror = -1;
             continue;
         }
 
