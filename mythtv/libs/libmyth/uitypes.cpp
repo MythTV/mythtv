@@ -1051,7 +1051,7 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
 
                     if (j == 1)
                     {
-                        offsetLeft = m_leftarrow.width();
+                        offsetLeft = m_leftarrow.width() + m_leftarrow_loc.x();
                         if (tempArrows & ARROW_LEFT)
                             dr->drawPixmap(left + m_leftarrow_loc.x(),
                                        m_area.top() + (int)(i * m_selheight) + m_leftarrow_loc.y(),
@@ -1061,7 +1061,7 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
 
                     if (j == m_columns)
                     {
-                        offsetRight = m_rightarrow.width();
+                        offsetRight = m_rightarrow.width()  - m_rightarrow_loc.x();
                         if (tempArrows & ARROW_RIGHT)
                             dr->drawPixmap(m_area.right() - offsetRight + m_rightarrow_loc.x(),
                                        m_area.top() + (int)(i * m_selheight) + m_rightarrow_loc.y(),
@@ -1168,7 +1168,7 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
 
                 if (j == 1)
                 {
-                    offsetLeft = m_leftarrow.width();
+                    offsetLeft = m_leftarrow.width() + m_leftarrow_loc.x();
                     if (tempArrows & ARROW_LEFT)
                     {
                         dr->drawPixmap(left + m_leftarrow_loc.x(),
@@ -1179,7 +1179,7 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
 
                 if (j == m_columns)
                 {
-                    offsetRight = m_rightarrow.width();
+                    offsetRight = m_rightarrow.width() - m_rightarrow_loc.x();
                     if (tempArrows & ARROW_RIGHT)
                     {
                         dr->drawPixmap(m_area.right() - offsetRight + m_rightarrow_loc.x(),
