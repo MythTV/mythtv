@@ -19,6 +19,8 @@ class ThemedMenu : public MythDialog
   public:
     ThemedMenu(const char *cdir, const char *menufile, 
                MythMainWindow *parent, const char *name = 0);
+    ThemedMenu(const char *cdir, const char *menufile,
+               MythMainWindow *parent, bool allowreorder = true);
    ~ThemedMenu();
 
     bool foundTheme(void);
@@ -36,6 +38,8 @@ class ThemedMenu : public MythDialog
     void keyPressEvent(QKeyEvent *e);
 
   private:
+    void Init(const char *cdir, const char *menufile);
+
     ThemedMenuPrivate *d;
 };
 

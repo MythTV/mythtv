@@ -95,7 +95,8 @@ void SetupMenu(void)
     QString theme = gContext->GetSetting("Theme", "blue");
 
     ThemedMenu* menu = new ThemedMenu(gContext->FindThemeDir(theme),
-                                      "setup.xml", gContext->GetMainWindow());
+                                      "setup.xml", gContext->GetMainWindow(),
+                                      false);
 
     menu->setCallback(SetupMenuCallback, gContext);
     menu->setKillable();

@@ -118,7 +118,7 @@ void FilterManager::LoadFilterLib(QString Path)
                 NewFilt->name = strdup(FiltInfo->name);
                 NewFilt->descript = strdup(FiltInfo->descript);
 
-                for (i = 0; FiltInfo->formats[i].in >= 0; i++)
+                for (i = 0; FiltInfo->formats[i].in != FMT_NONE; i++)
                      ;
 
                 NewFilt->formats = new FmtConv[i + 1];
@@ -185,7 +185,7 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
         FI = FiltInfoChain.at(i);
         if (FiltInfoChain.count() - i == 1)
         {
-            for (FC = FI->formats; FC->in != -1; FC++)
+            for (FC = FI->formats; FC->in != FMT_NONE; FC++)
             {
                 if (FC->out == outpixfmt && FC->in == ifmt)
                 {
@@ -201,9 +201,9 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
         else
         {
             FI2 = FiltInfoChain.at(i+1);
-            for (FC = FI->formats; FC->in != -1; FC++)
+            for (FC = FI->formats; FC->in != FMT_NONE; FC++)
             {
-                for (FC2 = FI2->formats; FC2->in != -1; FC2++)
+                for (FC2 = FI2->formats; FC2->in != FMT_NONE; FC2++)
                 {
                     if (FC->in == ifmt && FC->out == FC2->in)
                     {
@@ -229,7 +229,7 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
         else
             FC = FI->formats;
 
-        if (FC->in != ifmt && (i > 0 || ifmt != -1))
+        if (FC->in != ifmt && (i > 0 || ifmt != FMT_NONE))
         {
             if (!Convert)
             {
@@ -270,7 +270,8 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
         ifmt = FC->out;
     }
 
-    if (ifmt != outpixfmt && outpixfmt != -1)
+    if (ifmt != outpixfmt && outpixfmt != FMT_NONE &&
+        (FiltInfoChain.count() || inpixfmt != FMT_NONE))
     {
         if (!Convert)
         {
@@ -362,20 +363,20 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
 
     if (FiltChain)
     {
-        if (inpixfmt == -1)
+        if (inpixfmt == FMT_NONE)
             inpixfmt = FmtList.first()->in;
-        if (outpixfmt == -1)
+        if (outpixfmt == FMT_NONE)
             inpixfmt = FmtList.last()->out;
         width = postfilt_width;
         height = postfilt_height;
     }
     else
     {
-        if (inpixfmt == -1 && outpixfmt == -1)
+        if (inpixfmt == FMT_NONE && outpixfmt == FMT_NONE)
             inpixfmt = outpixfmt = FMT_YV12;
-        else if (inpixfmt == -1)
+        else if (inpixfmt == FMT_NONE)
             inpixfmt = outpixfmt;
-        else if (outpixfmt == -1)
+        else if (outpixfmt == FMT_NONE)
             outpixfmt = inpixfmt;
     }
 

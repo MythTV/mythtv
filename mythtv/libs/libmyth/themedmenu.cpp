@@ -210,6 +210,8 @@ class ThemedMenuPrivate
     QRect watermarkRect;
 
     LCD *lcddev;
+
+    bool allowreorder;
 };
 
 ThemedMenuPrivate::ThemedMenuPrivate(ThemedMenu *lparent, float lwmult, 
@@ -221,6 +223,8 @@ ThemedMenuPrivate::ThemedMenuPrivate(ThemedMenu *lparent, float lwmult,
     hmult = lhmult;
     screenwidth = lscreenwidth;
     screenheight = lscreenheight;
+
+    allowreorder = true;
 
     logo = NULL;
     buttonnormal = NULL;
@@ -1327,7 +1331,7 @@ void ThemedMenuPrivate::layoutButtons(void)
         for (int j = 0; j < columns && iter != buttonList.end(); 
              j++, iter++)
         {
-            if (columns == 3 && j == 1)
+            if (columns == 3 && j == 1 && allowreorder)
                 newrow.buttons.insert(newrow.buttons.begin(), &(*iter));
             else
                 newrow.buttons.push_back(&(*iter));
@@ -2111,11 +2115,26 @@ bool ThemedMenuPrivate::checkPinCode(const QString &timestamp_setting,
 }
 
 ThemedMenu::ThemedMenu(const char *cdir, const char *menufile,
+                       MythMainWindow *parent, bool allowreorder)
+          : MythDialog(parent, 0)
+{
+    d = new ThemedMenuPrivate(this, wmult, hmult, screenwidth, screenheight);
+    d->allowreorder = allowreorder;
+
+    Init(cdir, menufile);
+}
+
+ThemedMenu::ThemedMenu(const char *cdir, const char *menufile,
                        MythMainWindow *parent, const char *name)
           : MythDialog(parent, name)
 {
     d = new ThemedMenuPrivate(this, wmult, hmult, screenwidth, screenheight);
 
+    Init(cdir, menufile);
+}
+
+void ThemedMenu::Init(const char *cdir, const char *menufile)
+{
     QString dir = QString(cdir) + "/";
     QString filename = dir + "theme.xml";
 
@@ -2213,4 +2232,3 @@ void ThemedMenu::keyPressEvent(QKeyEvent *e)
 
     d->ignorekeys = false;
 }
-

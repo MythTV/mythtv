@@ -189,10 +189,8 @@ bool DVBChannel::GetChannelOptions(QString channum)
     QSqlDatabase    *db_conn;
     pthread_mutex_t db_lock;
 
-    int chnumber = channum.toInt();
-
-    if (!pParent->CheckChannel( (ChannelBase*)this, channum,
-                                db_conn, db_lock))
+    if (!pParent->CheckChannel((ChannelBase*)this, channum,
+                               db_conn, db_lock))
     {
         ERROR("Failed to verify channel integrity.");
         return false;
@@ -202,7 +200,7 @@ bool DVBChannel::GetChannelOptions(QString channum)
     MythContext::KickDatabase(db_conn);
 
     thequery = QString("SELECT chanid FROM channel WHERE channum='%1'")
-                       .arg(chnumber);
+                       .arg(channum);
     query = db_conn->exec(thequery);
 
     if (!query.isActive())

@@ -1,5 +1,5 @@
 /*
- * Quick DNR 0.7
+ * Quick DNR 0.8
  * (C)opyright 2003, Debabrata Banerjee
  * GNU GPL 2 or later
  * 
@@ -24,12 +24,11 @@
 
 //Double thresholded filter
 #define LUMA_THRESHOLD1_DEFAULT 10
-#define LUMA_THRESHOLD2_DEFAULT 2
+#define LUMA_THRESHOLD2_DEFAULT 1
 #define CHROMA_THRESHOLD1_DEFAULT 20
-#define CHROMA_THRESHOLD2_DEFAULT 4
+#define CHROMA_THRESHOLD2_DEFAULT 2
 
 //#define QUICKDNR_DEBUG
-//#define TIME_FILTER
 
 static const char FILTER_NAME[] = "quickdnr";
 
@@ -45,7 +44,9 @@ typedef struct ThisFilter
   uint8_t Luma_threshold1, Luma_threshold2;
   uint8_t Chroma_threshold1, Chroma_threshold2;
   uint8_t *average;
+
   TF_STRUCT;
+
 } ThisFilter;
 
 #define MM_MMX    0x0001 /* standard MMX */
@@ -232,11 +233,11 @@ int quickdnr2(VideoFilter *f, VideoFrame *frame)
       frame->buf[y] = tf->average[y];
     }
     else tf->average[y] = frame->buf[y];
-  }
+ }
 
-  TF_END(tf, "QuickDNR: ");
+ TF_END(tf, "QuickDNR: ");
  
-  return 0;
+ return 0;
 }
 
 #ifdef i386
@@ -357,11 +358,9 @@ int quickdnr2MMX(VideoFilter *f, VideoFrame *frame)
 
   asm volatile("prefetch 64(%0)     \n\t" //Experimental values from athlon
 	       "prefetch 64(%1)     \n\t"
-	       "prefetch 64(%2)     \n\t"
 	       "movq (%0), %%mm4    \n\t"
 	       "movq (%1), %%mm5    \n\t"
-	       "movq (%2), %%mm6    \n\t"
-	       : : "r" (&sign_convert), "r" (&tf->Luma_threshold_mask1), "r" (&tf->Chroma_threshold_mask1)
+	       : : "r" (&sign_convert), "r" (&tf->Luma_threshold_mask1)
 	       );
 
   for(y = 0;y < (tf->Luma_size);y += 8) { //Luma
@@ -372,28 +371,7 @@ int quickdnr2MMX(VideoFilter *f, VideoFrame *frame)
 		 "movq (%1), %%mm1     \n\t" //buf
 		 "movq %%mm0, %%mm2    \n\t"
 		 "movq %%mm1, %%mm3    \n\t"
-		 "movq %%mm1, %%mm7    \n\t"
-
-		 "pcmpgtb %%mm0, %%mm1 \n\t" //Secondary threshold
-		 "psubb %%mm0, %%mm3   \n\t" 
-		 "psubb %%mm7, %%mm0   \n\t" 
-		 "pand %%mm1, %%mm3    \n\t" 
-		 "pandn %%mm0,%%mm1    \n\t"
-		 "por %%mm1, %%mm3     \n\t"
-
-		 "paddb %%mm4, %%mm3   \n\t"
-		 "pcmpgtb (%2) , %%mm3 \n\t"
-
-		 "pavgb %%mm2, %%mm7   \n\t"
-
-		 "pand %%mm3, %%mm7    \n\t"
-		 "pandn %%mm2,%%mm3    \n\t"
-		 "por %%mm7, %%mm3     \n\t" //mm3 becomes av
-
-		 "movq (%1), %%mm1     \n\t" //reload registers
-		 "movq %%mm3, %%mm0    \n\t" 
-		 "movq %%mm3, %%mm2    \n\t"
-		 "movq %%mm1, %%mm3    \n\t"
+		 "movq %%mm1, %%mm6    \n\t"
 		 "movq %%mm1, %%mm7    \n\t"
 
 		 "pcmpgtb %%mm0, %%mm1 \n\t" //1 if av greater
@@ -401,14 +379,36 @@ int quickdnr2MMX(VideoFilter *f, VideoFrame *frame)
 		 "psubb %%mm7, %%mm0   \n\t" //mm0=av-buf
 		 "pand %%mm1, %%mm3    \n\t" //select buf
 		 "pandn %%mm0,%%mm1    \n\t" //select av
-		 "por %%mm1, %%mm3     \n\t" //mm3=abs()
+		 "por %%mm1, %%mm3     \n\t" //mm3=abs(buf-av)
 
 		 "paddb %%mm4, %%mm3   \n\t" //hack! No proper unsigned mmx compares!
 		 "pcmpgtb %%mm5, %%mm3 \n\t" //compare diff with mask
-	       
+		 
+		 "movq %%mm2, %%mm0    \n\t" //reload registers
+		 "movq %%mm7, %%mm1    \n\t"
+
+		 "pcmpgtb %%mm0, %%mm1 \n\t" //Secondary threshold
+		 "psubb %%mm0, %%mm6   \n\t"
+		 "psubb %%mm7, %%mm0   \n\t"
+		 "pand %%mm1, %%mm6    \n\t"
+		 "pandn %%mm0,%%mm1    \n\t"
+		 "por %%mm1, %%mm6     \n\t"
+
+		 "paddb %%mm4, %%mm6   \n\t"
+		 "pcmpgtb (%2), %%mm6  \n\t"
+
+		 "movq %%mm2, %%mm0    \n\t"
+
+ 		 "pavgb %%mm7, %%mm2   \n\t"
+
+		 "pand %%mm6, %%mm2    \n\t"
+		 "pandn %%mm0,%%mm6    \n\t"
+		 "por %%mm2, %%mm6     \n\t" // Combined new/keep average
+
 		 "pand %%mm3, %%mm7    \n\t"
-		 "pandn %%mm2,%%mm3    \n\t"
-		 "por %%mm7, %%mm3     \n\t"
+		 "pandn %%mm6,%%mm3    \n\t"
+		 "por %%mm7, %%mm3     \n\t" // Combined new/keep average
+
 		 "movq %%mm3, (%0)     \n\t"
 		 "movq %%mm3, (%1)     \n\t"
 		 : : "r" (av_p), "r" (buf), "r" (&tf->Luma_threshold_mask2)
@@ -416,6 +416,11 @@ int quickdnr2MMX(VideoFilter *f, VideoFrame *frame)
     buf++;
     av_p++;
   }
+
+  asm volatile("prefetch 64(%0)     \n\t" //Experimental values from athlon
+	       "movq (%1), %%mm5    \n\t"
+	       : : "r" (&sign_convert), "r" (&tf->Chroma_threshold_mask1)
+	       );
 
   for(y = tf->Luma_size;y < tf->UV_size;y += 8) { //Chroma
     asm volatile("prefetchw 384(%0)    \n\t" //Experimental values for athlon
@@ -425,28 +430,7 @@ int quickdnr2MMX(VideoFilter *f, VideoFrame *frame)
 		 "movq (%1), %%mm1     \n\t" //buf
 		 "movq %%mm0, %%mm2    \n\t"
 		 "movq %%mm1, %%mm3    \n\t"
-		 "movq %%mm1, %%mm7    \n\t"
-
-		 "pcmpgtb %%mm0, %%mm1 \n\t" //Secondary threshold
-		 "psubb %%mm0, %%mm3   \n\t" 
-		 "psubb %%mm7, %%mm0   \n\t" 
-		 "pand %%mm1, %%mm3    \n\t" 
-		 "pandn %%mm0,%%mm1    \n\t"
-		 "por %%mm1, %%mm3     \n\t"
-
-		 "paddb %%mm4, %%mm3   \n\t"
-		 "pcmpgtb (%2) , %%mm3 \n\t"
-
-		 "pavgb %%mm2, %%mm7   \n\t"
-
-		 "pand %%mm3, %%mm7    \n\t"
-		 "pandn %%mm2,%%mm3    \n\t"
-		 "por %%mm7, %%mm3     \n\t" //mm3 becomes av
-
-		 "movq (%1), %%mm1     \n\t" //reload registers
-		 "movq %%mm3, %%mm0    \n\t" 
-		 "movq %%mm3, %%mm2    \n\t"
-		 "movq %%mm1, %%mm3    \n\t"
+		 "movq %%mm1, %%mm6    \n\t"
 		 "movq %%mm1, %%mm7    \n\t"
 
 		 "pcmpgtb %%mm0, %%mm1 \n\t" //1 if av greater
@@ -454,14 +438,36 @@ int quickdnr2MMX(VideoFilter *f, VideoFrame *frame)
 		 "psubb %%mm7, %%mm0   \n\t" //mm0=av-buf
 		 "pand %%mm1, %%mm3    \n\t" //select buf
 		 "pandn %%mm0,%%mm1    \n\t" //select av
-		 "por %%mm1, %%mm3     \n\t" //mm3=abs()
+		 "por %%mm1, %%mm3     \n\t" //mm3=abs(buf-av)
 
 		 "paddb %%mm4, %%mm3   \n\t" //hack! No proper unsigned mmx compares!
-		 "pcmpgtb %%mm6, %%mm3 \n\t" //compare diff with mask
-	       
+		 "pcmpgtb %%mm5, %%mm3 \n\t" //compare diff with mask
+		 
+		 "movq %%mm2, %%mm0    \n\t" //reload registers
+		 "movq %%mm7, %%mm1    \n\t"
+
+		 "pcmpgtb %%mm0, %%mm1 \n\t" //Secondary threshold
+		 "psubb %%mm0, %%mm6   \n\t"
+		 "psubb %%mm7, %%mm0   \n\t"
+		 "pand %%mm1, %%mm6    \n\t"
+		 "pandn %%mm0,%%mm1    \n\t"
+		 "por %%mm1, %%mm6     \n\t"
+
+		 "paddb %%mm4, %%mm6   \n\t"
+		 "pcmpgtb (%2), %%mm6  \n\t"
+
+		 "movq %%mm2, %%mm0    \n\t"
+
+ 		 "pavgb %%mm7, %%mm2   \n\t"
+
+		 "pand %%mm6, %%mm2    \n\t"
+		 "pandn %%mm0,%%mm6    \n\t"
+		 "por %%mm2, %%mm6     \n\t" //Combined new/keep average
+
 		 "pand %%mm3, %%mm7    \n\t"
-		 "pandn %%mm2,%%mm3    \n\t"
-		 "por %%mm7, %%mm3     \n\t"
+		 "pandn %%mm6,%%mm3    \n\t"
+		 "por %%mm7, %%mm3     \n\t" //Combined new/keep average
+
 		 "movq %%mm3, (%0)     \n\t"
 		 "movq %%mm3, (%1)     \n\t"
 		 : : "r" (av_p), "r" (buf), "r" (&tf->Chroma_threshold_mask2)
@@ -530,15 +536,15 @@ VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt,
     case 1:
       //These might be better as logarithmic if this gets used a lot.
       filter->Luma_threshold1 = ((uint8_t) Param1) * 40 / 255;
-      filter->Luma_threshold2 = ((uint8_t) Param1) * 8 / 255;
+      filter->Luma_threshold2 = ((uint8_t)  Param1) * 4/255 > 2 ? 2 : ((uint8_t)  Param1) * 4/255;
       filter->Chroma_threshold1 = ((uint8_t) Param1) * 80 / 255;
-      filter->Chroma_threshold2 = ((uint8_t) Param1) * 16 / 255;
-      double_threshold = 1;
+      filter->Chroma_threshold2 = ((uint8_t)  Param1) * 8/255 > 4 ? 4 : ((uint8_t)  Param1) * 8/255;
+      double_threshold = 1; 
       break;
     case 2:
       filter->Luma_threshold1 = (uint8_t) Param1;
       filter->Chroma_threshold1 = (uint8_t) Param2;
-      double_threshold = -1;
+      double_threshold = 0;
       break;
     case 4:
       filter->Luma_threshold1 = (uint8_t) Param1;
@@ -625,7 +631,7 @@ FilterInfo filter_table[] =
   {
     symbol:     "new_filter",
     name:       "quickdnr",
-    descript:   "removes noise with a fast thresholded average filter",
+    descript:   "removes noise with a fast single/double thresholded average filter",
     formats:    FmtList,
     libname:    NULL
   },
