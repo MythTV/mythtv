@@ -26,7 +26,7 @@ NetFlasher::NetFlasher(UIImageType *icon)
 
 void NetFlasher::flash(int numb_times, int on_duration, int off_duration)
 {
-    my_timer->stop();
+    stopNow();
     flash_on_time = on_duration;
     flash_off_time = off_duration;
     numb_cycles = numb_times;
@@ -36,12 +36,18 @@ void NetFlasher::flash(int numb_times, int on_duration, int off_duration)
     my_timer->start( flash_on_time, TRUE ); 
 }
 
-void NetFlasher::stop()
+void NetFlasher::stopNow()
 {
     my_timer->stop();
     numb_cycles = 0;
     cycle_counter = 0;
     my_icon->hide();
+}
+
+void NetFlasher::stop()
+{
+    numb_cycles = 1;
+    cycle_counter = 2;
 }
 
 void NetFlasher::timerDone()

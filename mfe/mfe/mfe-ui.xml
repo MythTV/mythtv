@@ -229,7 +229,7 @@
                 <font>subtitle</font>
                 <value>Playlist</value>
             </textarea>
-            <textarea name="playlist_subtitle" draworder="0" align="center">
+            <textarea name="content_subtitle" draworder="0" align="center">
                 <area>450,50,300,30</area>
                 <font>subtitle</font>
                 <value>Available Content</value>
@@ -271,8 +271,14 @@
                 <position>367,28</position>
             </image>
             
+            
             <image name="playlist_greyout" draworder="0" fleximage="no">
                 <filename>mfe_greylistbox.png</filename>
+                <position>0,0</position>
+            </image>
+
+            <image name="playlist_greyout_high" draworder="0" fleximage="no">
+                <filename>mfe_greylistbox_high.png</filename>
                 <position>0,0</position>
             </image>
 
@@ -288,10 +294,12 @@
                 <fcnfont name="inactive" function="inactive"></fcnfont>
             </listtreearea>
 
+            <!--
             <image name="content_greyout" draworder="0" fleximage="no">
                 <filename>mfe_greylistbox.png</filename>
                 <position>390,0</position>
             </image>
+            -->
 
         </container>
 

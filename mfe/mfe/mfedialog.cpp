@@ -541,6 +541,19 @@ void MfeDialog::mfdDiscovered(int which_mfd, QString name, QString host, bool fo
             }
             syncToCurrentMfd();
         }
+        if(playlist_dialog && mfd_id_for_playlist_dialog == which_mfd)
+        {
+            //
+            //  Oh crap. User in the middle of editing a playlist, and the
+            //  mfd went away. Not much we can do here, as even if we tried
+            //  to grab the current edits the user has made, we literaly
+            //  have nowhere to send them.
+            //
+
+            playlist_dialog->close();
+
+        }
+        
     }
     updateConnectionList();
 }

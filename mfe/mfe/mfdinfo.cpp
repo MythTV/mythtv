@@ -83,11 +83,43 @@ void MfdInfo::toggleItem(UIListGenericTree *node, bool turn_on)
     }
 }
 
-void MfdInfo::toggleTree(UIListTreeType *menu, UIListGenericTree *playlist_tree, UIListGenericTree *node, bool turn_on)
+void MfdInfo::toggleTree(
+                            UIListTreeType *menu, 
+                            UIListGenericTree *playlist_tree, 
+                            UIListGenericTree *node, 
+                            bool turn_on,
+                            QIntDict<bool> *playlist_additions,
+                            QIntDict<bool> *playlist_deletions
+                        )
 {
     if (mfd_content_collection)
     {
-        mfd_content_collection->toggleTree(menu, playlist_tree, node, turn_on);
+        mfd_content_collection->toggleTree(
+                                            menu, 
+                                            playlist_tree, 
+                                            node, 
+                                            turn_on,
+                                            playlist_additions,
+                                            playlist_deletions
+                                          );
+    }
+}
+
+void MfdInfo::updatePlaylistDeltas(
+                                    QIntDict<bool> *playlist_additions,
+                                    QIntDict<bool> *playlist_deletions,
+                                    bool addition,
+                                    int item_id
+                                  )
+{
+    if (mfd_content_collection)
+    {
+        mfd_content_collection->updatePlaylistDeltas(
+                                                        playlist_additions, 
+                                                        playlist_deletions,
+                                                        addition,
+                                                        item_id
+                                                    );
     }
 }
 
@@ -155,6 +187,15 @@ void MfdInfo::markNodeAsHeld(UIListGenericTree *node, bool held_or_not)
     {
         mfd_content_collection->markNodeAsHeld(node, held_or_not);
     }
+}
+
+int MfdInfo::countTracks(UIListGenericTree *playlist_tree)
+{
+    if (mfd_content_collection)
+    {
+        return mfd_content_collection->countTracks(playlist_tree);
+    }
+    return 0;
 }
 
 void MfdInfo::printTree(UIListGenericTree *node, int depth)

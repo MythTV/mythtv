@@ -90,10 +90,10 @@ PlaylistDialog::PlaylistDialog(
     allowEditing(false);
 
     //
-    //  Almost tautologically, at startup, nothing has been edited
+    //  Almost tautologically, at startup, nothing has been moved around
     //
     
-    something_changed = false;
+    something_changed_position = false;
 
     //
     //  Now that the user is effectively locked out of touching anything,
@@ -104,8 +104,24 @@ PlaylistDialog::PlaylistDialog(
     mfd_interface->startPlaylistCheck(
                                         current_mfd->getMfdContentCollection(),
                                         working_playlist_tree,
-                                        working_content_tree
+                                        working_content_tree,
+                                        &playlist_additions,    // empty
+                                        &playlist_deletions
                                      );
+                                     
+    //
+    //  Calculate and show the number of tracks on the playlist in question
+    //
+ 
+    countAndDisplayPlaylistTracks();
+
+    //
+    //  Resize the two QIntDict's that keep track of local additions and
+    //  deletions to nice big prime numbers
+    //
+    
+    playlist_additions.resize(9973);
+    playlist_deletions.resize(9973);
 } 
 
 void PlaylistDialog::allowEditing(bool yes_or_no)
@@ -114,10 +130,8 @@ void PlaylistDialog::allowEditing(bool yes_or_no)
     
     if (editing_allowed)
     {
-        playlist_greyout->hide();
-        content_greyout->hide();
 
-        if(net_flasher)
+        if (net_flasher)
         {
             net_flasher->stop();
         }
@@ -128,12 +142,9 @@ void PlaylistDialog::allowEditing(bool yes_or_no)
     }
     else
     {
-        playlist_greyout->show();
-        content_greyout->show();
-
-        if(net_flasher)
+        if (net_flasher)
         {
-            net_flasher->flash(0);
+            net_flasher->flash();
         }
     }
 }
@@ -142,7 +153,7 @@ void PlaylistDialog::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     
-    if(holding_track)
+    if (holding_track)
     {
         //
         //  User is moving a track around in the playlist, so only a limited
@@ -190,9 +201,9 @@ void PlaylistDialog::keyPressEvent(QKeyEvent *e)
             
         case Key_Left:
         
-            if(current_menu == content_tree_menu)
+            if (current_menu == content_tree_menu)
             {
-                if(current_menu->getDepth() > 0)
+                if (current_menu->getDepth() > 0)
                 {
                     current_menu->MoveLeft();
                 }
@@ -202,6 +213,7 @@ void PlaylistDialog::keyPressEvent(QKeyEvent *e)
                     playlist_tree_menu->setActive(true);
                     content_tree_menu->setActive(false);
                     current_menu->enter();
+                    countAndDisplayPlaylistTracks();
                 }
             }
             else
@@ -213,12 +225,13 @@ void PlaylistDialog::keyPressEvent(QKeyEvent *e)
             
         case Key_Right:
         
-            if(current_menu == playlist_tree_menu)
+            if (current_menu == playlist_tree_menu)
             {
                 current_menu = content_tree_menu;
                 playlist_tree_menu->setActive(false);
                 content_tree_menu->setActive(true);
                 current_menu->enter();
+                countAndDisplayPlaylistTracks();
             }
             else
             {
@@ -242,7 +255,7 @@ void PlaylistDialog::keyPressEvent(QKeyEvent *e)
     //  menus correctly
     //
     
-    if(current_menu == playlist_tree_menu)
+    if (current_menu == playlist_tree_menu)
     {
         leftarrow_on->hide();
         leftarrow_off->show();
@@ -253,7 +266,7 @@ void PlaylistDialog::keyPressEvent(QKeyEvent *e)
     {
         rightarrow_on->hide();
         rightarrow_off->show();
-        if(current_menu->getDepth() < 1)
+        if (current_menu->getDepth() < 1)
         {
             leftarrow_on->show();
             leftarrow_off->hide();
@@ -287,9 +300,12 @@ void PlaylistDialog::playlistCheckDone()
     playlist_tree_menu->SetTree(working_playlist_tree);
     content_tree_menu->SetTree(working_content_tree);
 
-    playlist_tree_menu->tryToSetCurrent(route_to_playlist);
     content_tree_menu->tryToSetCurrent(route_to_content);
-    
+    if(!playlist_tree_menu->tryToSetCurrent(persistent_route_to_playlist))
+    {
+        playlist_tree_menu->tryToSetCurrent(route_to_playlist);
+    }
+
     playlist_tree_menu->RefreshCurrentLevel();
     content_tree_menu->RefreshCurrentLevel();
 
@@ -297,6 +313,8 @@ void PlaylistDialog::playlistCheckDone()
     allowEditing(true);
 
     current_menu->enter();
+    
+    countAndDisplayPlaylistTracks();
 }
 
 void PlaylistDialog::swapToNewPristine()
@@ -306,9 +324,15 @@ void PlaylistDialog::swapToNewPristine()
     //  Oh well.
     //
     
+    if (holding_track)
+    {
+        stopHoldingTrack();
+    }
+
     allowEditing(false);
 
-    QStringList route_to_playlist = playlist_tree_menu->getRouteToCurrent();
+
+    persistent_route_to_playlist = playlist_tree_menu->getRouteToCurrent();
     QStringList route_to_content = content_tree_menu->getRouteToCurrent();
 
     int which_collection = pristine_playlist_tree->getAttribute(0);
@@ -342,13 +366,15 @@ void PlaylistDialog::swapToNewPristine()
     playlist_tree_menu->SetTree(current_playlist_tree);
     content_tree_menu->SetTree(current_content_tree);
 
-    playlist_tree_menu->tryToSetCurrent(route_to_playlist);
     content_tree_menu->tryToSetCurrent(route_to_content);
+    playlist_tree_menu->tryToSetCurrent(persistent_route_to_playlist);
     
     playlist_tree_menu->RefreshCurrentLevel();
     content_tree_menu->RefreshCurrentLevel();
 
     current_menu->enter();
+
+    countAndDisplayPlaylistTracks();
 
     //
     //  Set the tree checking thread working again
@@ -357,7 +383,9 @@ void PlaylistDialog::swapToNewPristine()
     mfd_interface->startPlaylistCheck(
                                         current_mfd->getMfdContentCollection(),
                                         working_playlist_tree,
-                                        working_content_tree
+                                        working_content_tree,
+                                        &playlist_additions,
+                                        &playlist_deletions
                                      );
 
 }
@@ -371,9 +399,13 @@ bool PlaylistDialog::commitEdits()
     //
     //
     
-    if(current_content_tree == working_content_tree)
+    if (current_content_tree == working_content_tree)
     {
-        if(something_changed)
+        if (
+              something_changed_position   ||
+            ! playlist_additions.isEmpty() ||
+            ! playlist_deletions.isEmpty()
+           )
         {
             return true;
         }
@@ -394,20 +426,20 @@ bool PlaylistDialog::commitEdits()
 void PlaylistDialog::handlePlaylistEntered(UIListTreeType*, UIListGenericTree *node)
 {
 
-    if(current_menu != playlist_tree_menu)
+    if (current_menu != playlist_tree_menu)
     {
         return;
     }
 
-    if(node)
+    if (node)
     {
-        if(node->getAttribute(3) < 0)
+        if (node->getAttribute(3) < 0)
         {
             ClientPlaylist *playlist = current_mfd->getAudioPlaylist(
                                                                         node->getAttribute(0),
                                                                         node->getInt()
                                                                      );
-            if(playlist)
+            if (playlist)
             {                                                                    
                 setDisplayInfo(
                                 true, 
@@ -424,13 +456,13 @@ void PlaylistDialog::handlePlaylistEntered(UIListTreeType*, UIListGenericTree *n
             }
            
         }
-        else if(node->getAttribute(3) > 0)
+        else if (node->getAttribute(3) > 0)
         {
             AudioMetadata *audio_item = current_mfd->getAudioMetadata(
                                                                         node->getAttribute(0),
                                                                         node->getInt()
                                                                      );
-            if(audio_item)
+            if (audio_item)
             {                                                                    
                 setDisplayInfo(
                                 false, 
@@ -467,7 +499,7 @@ void PlaylistDialog::handlePlaylistSelected(UIListTreeType*, UIListGenericTree *
     //  reality), then user should not be able to  select anything
     //
 
-    if(!editing_allowed)
+    if (!editing_allowed)
     {
         return;
     }
@@ -476,7 +508,7 @@ void PlaylistDialog::handlePlaylistSelected(UIListTreeType*, UIListGenericTree *
     //  Deal with moving tracks up and down within the playlist column
     //
     
-    if(holding_track)
+    if (holding_track)
     {
         cerr << "playlistdialog.o: should not be possible to select a node " 
              << "while holding track is true "
@@ -490,7 +522,7 @@ void PlaylistDialog::handlePlaylistSelected(UIListTreeType*, UIListGenericTree *
 
 void PlaylistDialog::startHoldingTrack(UIListGenericTree *node)
 {
-    if(holding_track)
+    if (holding_track)
     {
         cerr << "playlistdialog.o: startHoldingTrack() called, but "
              << "holding_track is already true "
@@ -522,8 +554,8 @@ void PlaylistDialog::stopHoldingTrack()
 
 void PlaylistDialog::moveHeldUpDown(bool up_or_down)
 {
-    something_changed = true;
-    if(held_track)
+    something_changed_position = true;
+    if (held_track)
     {
         held_track->movePositionUpDown(up_or_down);
         playlist_tree_menu->RedrawCurrent();
@@ -538,7 +570,7 @@ void PlaylistDialog::moveHeldUpDown(bool up_or_down)
 
 void PlaylistDialog::handleContentEntered(UIListTreeType*, UIListGenericTree *node)
 {
-    if(node)
+    if (node)
     {
     
         /*
@@ -557,13 +589,13 @@ void PlaylistDialog::handleContentEntered(UIListTreeType*, UIListGenericTree *no
             cout << "\t  att3 is " << node->getAttribute(3) << endl;
         */
     
-        if(node->getInt() < 0)
+        if (node->getInt() < 0)
         {
             ClientPlaylist *playlist = current_mfd->getAudioPlaylist(
                                                                         node->getAttribute(0),
                                                                         node->getInt() * -1
                                                                      );
-            if(playlist)
+            if (playlist)
             {                                                                    
                 setDisplayInfo(
                                 true, 
@@ -580,13 +612,13 @@ void PlaylistDialog::handleContentEntered(UIListTreeType*, UIListGenericTree *no
             }
            
         }
-        else if(node->getInt() > 0)
+        else if (node->getInt() > 0)
         {
             AudioMetadata *audio_item = current_mfd->getAudioMetadata(
                                                                         node->getAttribute(0),
                                                                         node->getInt()
                                                                      );
-            if(audio_item)
+            if (audio_item)
             {                                                                    
                 setDisplayInfo(
                                 false, 
@@ -611,7 +643,7 @@ void PlaylistDialog::handleContentEntered(UIListTreeType*, UIListGenericTree *no
 
             fillWhatWeKnow(node, genre_string, artist_string, album_string);
 
-            if(
+            if (
                 genre_string.length() < 1 &&
                 artist_string.length() < 1 &&
                 album_string.length() < 1)
@@ -646,17 +678,17 @@ void PlaylistDialog::handleContentSelected(UIListTreeType* , UIListGenericTree *
     //  reality), then user should not be able to check anything
     //
 
-    if(!editing_allowed)
+    if (!editing_allowed)
     {
         return;
     }
 
-    if(!node)
+    if (!node)
     {
         cerr << "PlaylistDialog::handleContentSelected() called with a NULL node!" << endl;
     }
 
-    if(!node->getActive())
+    if (!node->getActive())
     {
         return;
     }
@@ -666,9 +698,7 @@ void PlaylistDialog::handleContentSelected(UIListTreeType* , UIListGenericTree *
     //  node it is.
     //
     
-    something_changed = true;
-    
-    if(node->getInt() != 0)
+    if (node->getInt() != 0)
     {
     
         //
@@ -677,15 +707,17 @@ void PlaylistDialog::handleContentSelected(UIListTreeType* , UIListGenericTree *
         
         int current_state = node->getCheck();
         
-        if(current_state == 0)
+        if (current_state == 0)
         {
             toggleItem(node, true);
+            updatePlaylistDeltas(true, node->getInt());
         }
-        else if(current_state == 2)
+        else if (current_state == 2)
         {
             toggleItem(node, false);
+            updatePlaylistDeltas(false, node->getInt());
         }
-        else if(current_state == 1)
+        else if (current_state == 1)
         {
             cerr << "leaf content nodes should not be partially on!" << endl;
         }
@@ -702,7 +734,7 @@ void PlaylistDialog::handleContentSelected(UIListTreeType* , UIListGenericTree *
         //  at the bottom (so the user can see the new thing go on)
         //
     
-        if(current_state == 0)
+        if (current_state == 0)
         {
             playlist_tree_menu->SetTree(current_playlist_tree);
             playlist_tree_menu->MoveDown(UIListTreeType::MoveMax);
@@ -716,7 +748,7 @@ void PlaylistDialog::handleContentSelected(UIListTreeType* , UIListGenericTree *
             //  visible.
             //
 
-            if(current_playlist_tree->childCount() <= playlist_tree_menu->getNumbItemsVisible())
+            if (current_playlist_tree->childCount() <= playlist_tree_menu->getNumbItemsVisible())
             {
                 playlist_tree_menu->MoveUp(UIListTreeType::MoveMax);
             }
@@ -736,11 +768,11 @@ void PlaylistDialog::handleContentSelected(UIListTreeType* , UIListGenericTree *
         
         int current_state = node->getCheck();
         
-        if(current_state == 0 || current_state == 1)
+        if (current_state == 0 || current_state == 1)
         {
             toggleTree(node, true);
         }
-        else if(current_state == 2)
+        else if (current_state == 2)
         {
             toggleTree(node, false);
         }
@@ -751,7 +783,7 @@ void PlaylistDialog::handleContentSelected(UIListTreeType* , UIListGenericTree *
 
         content_tree_menu->refresh();
 
-        if(current_state == 0 || current_state == 1)
+        if (current_state == 0 || current_state == 1)
         {
             playlist_tree_menu->SetTree(current_playlist_tree);
             playlist_tree_menu->MoveDown(UIListTreeType::MoveMax);
@@ -765,7 +797,7 @@ void PlaylistDialog::handleContentSelected(UIListTreeType* , UIListGenericTree *
             //  visible.
             //
 
-            if(current_playlist_tree->childCount() <= playlist_tree_menu->getNumbItemsVisible())
+            if (current_playlist_tree->childCount() <= playlist_tree_menu->getNumbItemsVisible())
             {
                 playlist_tree_menu->MoveUp(UIListTreeType::MoveMax);
             }
@@ -776,8 +808,56 @@ void PlaylistDialog::handleContentSelected(UIListTreeType* , UIListGenericTree *
             }
         }
     }
+    
+    countAndDisplayPlaylistTracks();
+    
 }    
 
+
+void PlaylistDialog::countAndDisplayPlaylistTracks()
+{
+
+    //
+    //  Ask the client library helper to count the tracks on the playlist we
+    //  are editing.
+    //
+    
+    int numb_tracks = current_mfd->countTracks(current_playlist_tree);
+    
+    if (numb_tracks < 1)
+    {
+        playlist_subtitle->SetText(QString("Playlist: No tracks"));
+        
+        //
+        //  No tracks, so we need to show the correct empty container
+        //
+        
+        if (current_menu == playlist_tree_menu)
+        {
+            empty_grey->hide();
+            empty_grey_high->show();
+        }
+        else
+        {
+            empty_grey->show();
+            empty_grey_high->hide();
+        }
+
+    }
+    else if (numb_tracks == 1)
+    {
+            empty_grey->hide();
+            empty_grey_high->hide();
+        playlist_subtitle->SetText(QString("Playlist: 1 track"));
+    }
+    else
+    {
+            empty_grey->hide();
+            empty_grey_high->hide();
+        playlist_subtitle->SetText(QString("Playlist: %1 tracks").arg(numb_tracks));
+    }
+    
+}
 
 void PlaylistDialog::setDisplayInfo(
                                 bool is_a_playlist,
@@ -787,7 +867,7 @@ void PlaylistDialog::setDisplayInfo(
                                 const QString &string4
                             )
 {
-    if(is_a_playlist)
+    if (is_a_playlist)
     {
         genre_label->hide();
         artist_label->hide();
@@ -835,7 +915,7 @@ void PlaylistDialog::clearDisplayInfo(bool clear_only_right)
     album_text->SetText("");
     title_text->SetText("");
 
-    if(clear_only_right)
+    if (clear_only_right)
     {
         mfe_genre_icon->show();
         mfe_artist_icon->show();
@@ -879,24 +959,24 @@ void PlaylistDialog::fillWhatWeKnow(
                                     QString &album_string
                                    )
 {
-    if(node)
+    if (node)
     {
-        if(node->getAttribute(3) == 1)
+        if (node->getAttribute(3) == 1)
         {
             genre_string = node->getString();
         }
-        else if(node->getAttribute(3) == 2)
+        else if (node->getAttribute(3) == 2)
         {
             artist_string = node->getString();
         }
-        else if(node->getAttribute(3) == 3)
+        else if (node->getAttribute(3) == 3)
         {
             album_string = node->getString();
         }
         GenericTree *parent = node->getParent();
-        if(parent)
+        if (parent)
         {
-            if( UIListGenericTree *parent_node = dynamic_cast<UIListGenericTree*>(parent))
+            if ( UIListGenericTree *parent_node = dynamic_cast<UIListGenericTree*>(parent))
             {
                 fillWhatWeKnow(parent_node, genre_string, artist_string, album_string);
             }
@@ -935,9 +1015,32 @@ void PlaylistDialog::toggleTree(UIListGenericTree *node, bool turn_on)
     //  or deleted entries
     //
 
-    current_mfd->toggleTree(playlist_tree_menu, current_playlist_tree, node, turn_on);
+    current_mfd->toggleTree(
+                            playlist_tree_menu, 
+                            current_playlist_tree, 
+                            node, 
+                            turn_on, 
+                            &playlist_additions,
+                            &playlist_deletions
+                           );
     
 }                                   
+
+void PlaylistDialog::updatePlaylistDeltas(bool addition, int item_id)
+{
+    //
+    //  We own the addition and deletions lists, but we ask the mfd client
+    //  lib to do the calculating for us
+    //
+
+    current_mfd->updatePlaylistDeltas(
+                                        &playlist_additions,
+                                        &playlist_deletions,
+                                        addition,
+                                        item_id
+                                     );
+}
+
 
 void PlaylistDialog::wireUpTheme()
 {
@@ -955,6 +1058,15 @@ void PlaylistDialog::wireUpTheme()
         cerr << "no content_tree in your theme doofus" << endl;
     }
     
+
+    playlist_subtitle = getUITextType("playlist_subtitle");
+    playlist_subtitle->SetText("Ha Ha Ha");
+    
+    empty_grey = getUIImageType("playlist_greyout");
+    empty_grey->hide();
+    
+    empty_grey_high = getUIImageType("playlist_greyout_high");
+    empty_grey_high->hide();
     
     genre_text = getUITextType("genre_text");
     artist_text = getUITextType("artist_text");
@@ -994,15 +1106,12 @@ void PlaylistDialog::wireUpTheme()
     
 
     network_icon = getUIImageType("net_flasher");
-    if(network_icon)
+    if (network_icon)
     {
         network_icon->hide();
         net_flasher = new NetFlasher(network_icon);
     }
  
-    playlist_greyout = getUIImageType("playlist_greyout");
-    content_greyout = getUIImageType("content_greyout");
-    
     connect(
             playlist_tree_menu, 
             SIGNAL(itemEntered(UIListTreeType*, UIListGenericTree*)),
@@ -1042,7 +1151,7 @@ void PlaylistDialog::wireUpTheme()
 
 PlaylistDialog::~PlaylistDialog()
 {
-    if(net_flasher)
+    if (net_flasher)
     {
         delete net_flasher;
         net_flasher = NULL;

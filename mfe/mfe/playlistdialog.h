@@ -54,6 +54,7 @@ class PlaylistDialog : public MythThemedDialog
     void startHoldingTrack(UIListGenericTree *node);
     void stopHoldingTrack();
     void moveHeldUpDown(bool up_or_down);
+    void countAndDisplayPlaylistTracks();
     void setDisplayInfo(
                         bool is_a_playlist,
                         const QString &string1 = "", 
@@ -71,6 +72,7 @@ class PlaylistDialog : public MythThemedDialog
 
     void toggleItem(UIListGenericTree *node, bool turn_on);
     void toggleTree(UIListGenericTree *node, bool turn_on);
+    void updatePlaylistDeltas(bool addition, int item_id);
     void wireUpTheme();
 
     //
@@ -96,6 +98,10 @@ class PlaylistDialog : public MythThemedDialog
     UITextType          *album_label;
     UITextType          *title_label;
 
+    UITextType          *playlist_subtitle;
+    UIImageType         *empty_grey;
+    UIImageType         *empty_grey_high;
+
     UIImageType         *mfe_genre_icon;
     UIImageType         *mfe_artist_icon;
     UIImageType         *mfe_album_icon;
@@ -108,9 +114,6 @@ class PlaylistDialog : public MythThemedDialog
     UITextType          *edit_title;
     UIImageType         *network_icon;
 
-    UIImageType         *playlist_greyout;
-    UIImageType         *content_greyout;
-    
     //
     //  Thing that flashes to indicate network (ie. mdcap data arrival)
     //  activity.
@@ -141,7 +144,28 @@ class PlaylistDialog : public MythThemedDialog
     UIListGenericTree*  held_track;
 
     bool                editing_allowed;
-    bool                something_changed;
+    bool                something_changed_position;
+
+    //
+    //  Fast Qt collection class for keeping track of edits
+    //
+    
+    QIntDict<bool>  playlist_additions;
+    QIntDict<bool>  playlist_deletions;
+
+    //
+    //  String list for saving the route to the current playlist node
+    //  through a working->pristine->working cycyle
+    //
+    
+    QStringList persistent_route_to_playlist;
+
+    //
+    //  A little timer used to stop screenflashing where
+    //  working->pristine->working cycles happen too fast to bother actually
+    //  showing them
+    //
+
 };
 
 

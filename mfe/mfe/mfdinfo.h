@@ -41,7 +41,23 @@ class MfdInfo
     UIListGenericTree*      getPlaylistTree(int collection_id, int playlist_id, bool pristine=false);
     UIListGenericTree*      getContentTree(int collection_id, bool pristine=false);
     void                    toggleItem(UIListGenericTree *node, bool turn_on);
-    void                    toggleTree(UIListTreeType *menu, UIListGenericTree *playlist_tree, UIListGenericTree *node, bool turn_on);
+
+    void                    toggleTree(
+                                        UIListTreeType *menu, 
+                                        UIListGenericTree *playlist_tree, 
+                                        UIListGenericTree *node, 
+                                        bool turn_on,
+                                        QIntDict<bool> *playlist_additions,
+                                        QIntDict<bool> *playlist_deletions
+                                      );
+
+    void                    updatePlaylistDeltas(
+                                                    QIntDict<bool> *playlist_additions,
+                                                    QIntDict<bool> *playlist_deletions,
+                                                    bool addition,
+                                                    int item_id
+                                                );
+
     void                    alterPlaylist(UIListTreeType *menu, UIListGenericTree *playlist_tree, UIListGenericTree *node, bool turn_on);
     void                    setCurrentPlayingData();
     bool                    setCurrentPlayingData(int which_container, int which_metadata, int numb_seconds);
@@ -57,6 +73,7 @@ class MfdInfo
     void                    isStopped(bool yon){is_stopped = yon;}
     void                    markNodeAsHeld(UIListGenericTree* node, bool held_or_not);
     void                    printTree(UIListGenericTree* node, int depth=0);
+    int                     countTracks(UIListGenericTree *playlist_tree);
     
   private:
   

@@ -22,7 +22,8 @@ class NetFlasher : public QObject
     NetFlasher(UIImageType *my_icon);
     ~NetFlasher();
 
-    void flash(int numb_times = 2, int on_duration = 200, int off_duration = 200);
+    void flash(int numb_times = 2, int on_duration = 600, int off_duration = 200);
+    void stopNow();
     void stop();
     
   public slots:
