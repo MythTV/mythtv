@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-09-18, v2.77
+  2003-09-18, v2.78
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -5108,9 +5108,9 @@
 
 
   Your modules.conf file should have already been modified if you've
-  followed the instructions above for installing the PVR-250.  [1mmodprobe[0m
-  the lirc_i2c driver, run the [1mlircd [22mprogram and then check your
-  /var/log/messages and /var/log/lircd files.
+  followed the instructions ``above'' for installing the PVR-250.
+  [1mmodprobe [22mthe lirc_i2c driver, run the [1mlircd [22mprogram and then check
+  your /var/log/messages and /var/log/lircd files.
 
 
        $ su

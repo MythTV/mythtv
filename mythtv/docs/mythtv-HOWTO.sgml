@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-09-18, v2.77
+<date>2003-09-18, v2.78
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -4030,8 +4030,7 @@ To turn off DNR, add the following to your <tt>rc.local</tt>:
 /path/to/ivtv/utils/test_ioctl --set-codec-params=dnr_mode=0,dnr_temporal=0
 </verb></tscreen>
 
-<sect1>I'd like to use the remote that came with my Hauppauge PVR-250 and
-use MythTV's native LIRC support.
+<sect1>I'd like to use the remote that came with my Hauppauge PVR-250 and use MythTV's native LIRC support.
 <label id="hauppauge_remote">
 <p><bf>NOTE</bf>:  THE FOLLOWING DOCUMENTATION IS PROVIDED AS-IS AND IS
 NOT GUARANTEED TO WORK WITH YOUR DISTRIBUTION.  FOR LIRC DRIVER ASSISTANCE,
@@ -4113,7 +4112,7 @@ srw-rw-rw-    1 root     root            0 Sep 18 15:38 /dev/lircd=
 </verb></tscreen>
 
 Your <tt>modules.conf</tt> file should have already been modified if you've
-followed the instructions above for installing the PVR-250. 
+followed the instructions <ref id="pvr250" name="above"> for installing the PVR-250. 
 <bf>modprobe</bf> the lirc_i2c driver, run the <bf>lircd</bf> program and
 then check your <tt>/var/log/messages</tt> and <tt>/var/log/lircd</tt>
 files.
@@ -4766,6 +4765,7 @@ v2.77, 2003-09-18.  Add a check for lirc_i2c and lirc_dev in unusual places.
 Stupid Mandrake.  Add section for lirc-0.7.0/Hauppauge remotes.  Discuss
 native lirc support.  Start thinking about a re-write of the lirc section -
 it's confusing.
+v2.78, 2003-09-18.  Fix a dangling pointer and a split header.
 -->
 
 <!--

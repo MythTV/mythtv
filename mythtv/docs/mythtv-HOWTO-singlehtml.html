@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2003-09-18, v2.77
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2003-09-18, v2.78
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -190,7 +190,7 @@ necessary.</EM>
 <LI><A NAME="toc20.8">20.8</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.8">btaudio </A>
 <LI><A NAME="toc20.9">20.9</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.9">Removing unwanted channels.</A>
 <LI><A NAME="toc20.10">20.10</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.10">I'd like to use a hardware MPEG-2 encoder (ie, a PVR-250/350).</A>
-<LI><A NAME="toc20.11">20.11</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.11">I'd like to use the remote that came with my Hauppauge PVR-250 and</A>
+<LI><A NAME="toc20.11">20.11</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.11">I'd like to use the remote that came with my Hauppauge PVR-250 and use MythTV's native LIRC support.</A>
 <LI><A NAME="toc20.12">20.12</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.12">I'd like to use NFS.</A>
 <LI><A NAME="toc20.13">20.13</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.13">I'd like to automatically start mythbackend at system boot time.</A>
 <LI><A NAME="toc20.14">20.14</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.14">Advanced Backend Configurations. </A>
@@ -4599,8 +4599,8 @@ firmware issue, apparently.  There are two ways around this:
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="hauppauge_remote"></A> <A NAME="ss20.11">20.11</A> <A HREF="#toc20.11">I'd like to use the remote that came with my Hauppauge PVR-250 and</A>
-use MythTV's native LIRC support.</H2>
+<H2><A NAME="hauppauge_remote"></A> <A NAME="ss20.11">20.11</A> <A HREF="#toc20.11">I'd like to use the remote that came with my Hauppauge PVR-250 and use MythTV's native LIRC support.</A>
+</H2>
 
 <P><B>NOTE</B>:  THE FOLLOWING DOCUMENTATION IS PROVIDED AS-IS AND IS
 NOT GUARANTEED TO WORK WITH YOUR DISTRIBUTION.  FOR LIRC DRIVER ASSISTANCE,
@@ -4694,7 +4694,8 @@ srw-rw-rw-    1 root     root            0 Sep 18 15:38 /dev/lircd=
 </CODE></BLOCKQUOTE>
 </P>
 <P>Your <CODE>modules.conf</CODE> file should have already been modified if you've
-followed the instructions above for installing the PVR-250. 
+followed the instructions 
+<A HREF="#pvr250">above</A> for installing the PVR-250. 
 <B>modprobe</B> the lirc_i2c driver, run the <B>lircd</B> program and
 then check your <CODE>/var/log/messages</CODE> and <CODE>/var/log/lircd</CODE>
 files.
