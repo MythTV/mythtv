@@ -425,7 +425,7 @@ public:
         setValue(true);
         setHelpText(QObject::tr("When using Blank Frame Detection and "
                     "Auto-Flagging, flag blank frames following commercial "
-                    "breaks as part of the the commercial break."));
+                    "breaks as part of the commercial break."));
     };
 };
 
