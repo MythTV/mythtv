@@ -82,6 +82,7 @@ class Weather : public MythDialog
     void parseContainer(QDomElement &);
     XMLParse *theme;
     QDomElement xmldata;
+    UIAnimatedImageType* AnimatedImage;
 
     void SetText(LayerSet *, QString, QString);
 
@@ -139,6 +140,9 @@ class Weather : public MythDialog
     void updateLetters();
     void loadAccidBreaks();
     bool GetWeatherData();
+    bool GetAnimatedRadarMap();
+    bool GetStaticRadarMap();
+    bool downloadImage(QString URL, QString filename);
     bool gotDataHook;
     void setWeatherTypeIcon(QString[]);
     void setWeatherIcon(QString);

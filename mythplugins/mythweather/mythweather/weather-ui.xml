@@ -454,13 +454,13 @@
       </textarea>
       <textarea name="tempforecast" draworder="5">
         <context>4</context>
-        <area>260,313,500,90</area>
+        <area>260,313,500,100</area>
         <font>todayfont</font>
         <multiline>yes</multiline>
       </textarea>
       <textarea name="condforecast" draworder="5">
         <context>4</context>
-        <area>260,429,500,90</area>
+        <area>260,429,500,100</area>
         <font>todayfont</font>
         <multiline>yes</multiline>
       </textarea>
@@ -562,6 +562,15 @@
         <staticsize>765,500</staticsize>
         <skipin>0,58</skipin>
       </image>
+      <animatedimage name="animatedradarimg" draworder="6">
+        <context>5</context>
+        <position>18,132</position>
+        <staticsize>765,500</staticsize>
+        <skipin>0,58</skipin>
+        <interval>200</interval>
+        <startinterval>1000</startinterval>
+        <imagecount>6</imagecount>
+      </animatedimage>
       <image name="logo" draworder="7">
         <context>5</context>
         <filename>logo.png</filename>

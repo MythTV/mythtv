@@ -33,6 +33,7 @@
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/inetcomms.h>
+#include <mythtv/httpcomms.h>
 
 
 
@@ -88,6 +89,28 @@ Weather::Weather(QSqlDatabase *db, int appCode, MythMainWindow *parent,
     theme->SetHMult(hmult);
     theme->LoadTheme(xmldata, "weather", "weather-");
     LoadWindow(xmldata);
+
+    LayerSet *container = theme->GetSet("weatherpages");
+    AnimatedImage = NULL;
+    if (container)
+    {
+       AnimatedImage = (UIAnimatedImageType *)container->GetType("animatedradarimg");
+       if (AnimatedImage)
+       {
+           if (debug == true)
+             cout << "MythWeather: UIAnimatedImage found" << endl;
+           AnimatedImage->SetWindow((MythDialog*) this);
+           AnimatedImage->Pause();
+           //connect(Image, SIGNAL(requestUpdate(const QRect &)),this,
+           //    SLOT(updateAnimated(const QRect &)));
+       }
+       else
+       {
+          cerr << "MythWeather: The theme you are using does not contain an 'AnimatedImage' element" << endl;
+          cerr << "Please contact the theme creator and ask if they could please update it." << endl;
+          cerr << "Will fallback to using a static radar image." << endl;
+       }
+    }
 
     updateBackground();
 
@@ -1960,6 +1983,15 @@ void Weather::SetText(LayerSet *container, QString widget, QString text)
 void Weather::showLayout(int pageNum)
 {
    currentPage = pageNum;
+
+   if (AnimatedImage)
+   {
+       if (currentPage == 5)
+           AnimatedImage->UnPause();
+       else
+           AnimatedImage->Pause();
+   }
+
    update(fullRect);
 }
 
@@ -2265,23 +2297,10 @@ float Weather::GetFloat(QString tag)
 bool Weather::GetWeatherData()
 {
     QUrl weatherDataURL("http://www.msnbc.com/m/chnk/d/weather_d_src.asp?acid=" + locale);
-    QUrl weatherMapLink1URL(QString("http://w3.weather.com/weather/map/%1"
-                                    "?from=LAPmaps&setcookie=1 HTTP/1.1\n"
-                                    "Connection: close\nHost: w3.weather.com\n\n\n")
-                                    .arg(locale));
-
 
     INETComms *weatherData = new INETComms(weatherDataURL);
-    INETComms *weatherMapLink1 = new INETComms(weatherMapLink1URL);
 
-    if (debug)
-    { 
-    cerr << "MythWeather: Grabbing Weather From: " << weatherDataURL.toString() << endl;
-    cerr << "MythWeather: Grabbing Weather Map Link (part 1) From: " 
-         << weatherMapLink1URL.toString() << endl;
-    }
     VERBOSE(VB_NETWORK, QString("Grabbing weather from: %1").arg(weatherDataURL.toString()));
-    VERBOSE(VB_NETWORK, QString("Grabbing weather map(1) from: %1").arg(weatherMapLink1URL.toString()));
 
     while (!weatherData->isDone())
     {
@@ -2291,13 +2310,6 @@ bool Weather::GetWeatherData()
 
     }
     
-    while (!weatherMapLink1->isDone())
-    {
-        qApp->processEvents();
-        if (stopProcessing)
-            return false;
-    }
-     
     LayerSet *container = theme->GetSet("weatherpages");
     if (container)
         SetText(container, "updatetime", updated);
@@ -2320,12 +2332,40 @@ bool Weather::GetWeatherData()
         return false;
     }
 
+    delete weatherData;
+    weatherData = NULL;
+
+     // try to get some animated radar maps
+     if (GetAnimatedRadarMap())
+         return true;
+
+     // could not get animated radar maps so try to find a static map instead
+     if (!GetStaticRadarMap())
+        return false;
+
+     return true;
+}
+
+bool Weather::GetStaticRadarMap()
+{
+    QUrl weatherMapLink1URL(QString("http://w3.weather.com/weather/map/%1"
+                                    "?from=LAPmaps&setcookie=1 HTTP/1.1\n"
+                                    "Connection: close\nHost: w3.weather.com\n\n\n")
+                                    .arg(locale));
+
+    INETComms *weatherMapLink1 = new INETComms(weatherMapLink1URL);
+
+    while (!weatherMapLink1->isDone())
+    {
+        qApp->processEvents();
+        if (stopProcessing)
+            return false;
+    }
+
     QString tempData = "";
     tempData = weatherMapLink1->getData();
 
-    delete weatherData;
     delete weatherMapLink1;
-    weatherData = NULL;
     weatherMapLink1 = NULL;
 
     QString mapLoc = parseData(tempData, "if (isMinNS4) var mapNURL = \"", "\";");
@@ -2358,7 +2398,7 @@ bool Weather::GetWeatherData()
     if (imageLoc == "<NULL>")
     {
         VERBOSE(VB_IMPORTANT, "MythWeather: Warning: Failed to find link to map image.");
-        return true;
+        return false;
     }
 
     char *home = getenv("HOME");
@@ -2390,6 +2430,7 @@ bool Weather::GetWeatherData()
     if (debug)
         cerr << "Done.\n";
 
+    LayerSet *container = theme->GetSet("weatherpages");
     if (container)
     {
         QString filename = imageLoc.mid(imageLoc.findRev("/"), imageLoc.length() - imageLoc.findRev("/"));
@@ -2405,6 +2446,126 @@ bool Weather::GetWeatherData()
     }
     
     return true;
+}
+
+bool Weather::GetAnimatedRadarMap()
+{
+     if (AnimatedImage == NULL)
+         return false;
+
+     // find radar maps url's
+     QString sURL = "http://w3.weather.com/weather/map/" + locale +
+        "?name=index_large_animated&day=1";// HTTP/1.1\nConnection: close\n" +
+        //"Host: w3.weather.com\n\n\n";
+     QString tempData = "";
+
+     if (debug)
+        cerr << "MythWeather: Grabbing Weather Map Link (part 1) From: "
+              << sURL << endl;
+     tempData = HttpComms::getHttp(sURL, weatherTimeoutInt, 3, 3);
+
+     QString mapLoc = parseData(tempData, "if (isMinNS4) var mapNURL = \"", "\";");
+     if (mapLoc == "<NULL>")
+         return false;
+
+     mapLoc = "http://w3.weather.com/" + mapLoc;
+     if (debug)
+        cerr << "MythWeather: Grabbing Weather Map Link (part 2) From: "
+           << mapLoc << endl;
+
+     tempData = HttpComms::getHttp(mapLoc, weatherTimeoutInt, 3, 3);
+
+     QString imageLoc = parseData(tempData, "var thisMap = ['", "']");
+     if (imageLoc == "<NULL>")
+     {
+         if (debug)
+             cerr << "MythWeather: Warning: Failed to find link to map image.\n";
+
+         return false;
+     }
+
+     char *home = getenv("HOME");
+     QString fileprefix = QString(home) + "/.mythtv";
+
+     QDir dir(fileprefix);
+     if (!dir.exists())
+         dir.mkdir(fileprefix);
+
+     fileprefix += "/MythWeather";
+
+     dir = QDir(fileprefix);
+     if (!dir.exists())
+         dir.mkdir(fileprefix);
+
+     if (debug)
+         cerr << "MythWeather: Map File Prefix: " << fileprefix << endl;
+
+     // delete existing radar maps
+     for (int x = 1; x <= 6; x++)
+         QFile::remove(QString(fileprefix + "/radar%1.jpg").arg(x));
+
+     if (debug)
+         cerr << "MythWeather: Copying Map Files from Server (" << imageLoc << ")...\n";
+
+     for (int x = 1; x <= 6; x++)
+     {
+         sURL = QString("http://image.weather.com" + imageLoc + "%1L.jpg").arg(x);
+         if (!downloadImage(sURL, QString(fileprefix + "/radar%1.jpg").arg(x)))
+             cerr << "Failed to download image from:" << sURL << endl;
+     }
+
+     if (debug)
+         cerr << "MythWeather: Download radar images done.\n";
+
+     if (AnimatedImage)
+     {
+         AnimatedImage->SetFilename(fileprefix + "/radar%1.jpg");
+         AnimatedImage->ReloadImages();
+     }
+     return true;
+}
+
+// synchronous function to download images
+bool Weather::downloadImage(QString URL, QString filename)
+{
+     QPtrList<QNetworkOperation> NetOps;
+
+     if (debug)
+        cerr << "MythWeather: downloadImage() URL: " << URL << endl;
+
+     QUrlOperator *op = new QUrlOperator();
+     stopProcessing = false;
+     urlTimer->start(weatherTimeoutInt);
+
+     NetOps = op->copy(URL, filename, false, false);
+
+     while (NetOps.at(1)->state() != QNetworkProtocol::StDone)
+     {
+           qApp->processEvents();
+           usleep(10000);
+           if (NetOps.at(0)->state() == QNetworkProtocol::StFailed)
+           {
+               cerr << "MythWeather: downloadImage() get failed!!" << endl;
+               return false;
+           }
+           if (NetOps.at(1)->state() == QNetworkProtocol::StFailed)
+           {
+               cerr << "MythWeather: downloadImage() put failed!!" << endl;
+               return false;
+           }
+
+           if (stopProcessing)
+           {
+               cerr << "MythWeather: downloadImage() timeout" << endl;
+               return false;
+           }
+     }
+     urlTimer->stop();
+
+     if (debug)
+         cerr << "MythWeather: downloadImage() success" << endl;;
+
+     return true;
 }
 
 void Weather::radarImgDone(QNetworkOperation *op)
