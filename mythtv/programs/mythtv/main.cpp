@@ -8,9 +8,9 @@
 
 int main(int argc, char *argv[])
 {
-    MythContext *context = new MythContext();
-
     QApplication a(argc, argv);
+
+    MythContext *context = new MythContext();
 
     QString startChannel = context->GetSetting("DefaultTVChannel");
     if (startChannel == "")
