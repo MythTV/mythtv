@@ -27,8 +27,8 @@ TARGETDEPS += ../../libs/libmythtv/libmythtv.a
 TARGETDEPS += ../../libs/libavcodec/libavcodec.a
 
 # Input
-HEADERS += playbackbox.h programlistitem.h viewscheduled.h themesetup.h
+HEADERS += playbackbox.h programlistitem.h viewscheduled.h 
 HEADERS += globalsettings.h setrectime.h
 
 SOURCES += main.cpp playbackbox.cpp programlistitem.cpp viewscheduled.cpp
-SOURCES += themesetup.cpp globalsettings.cpp setrectime.cpp
+SOURCES += globalsettings.cpp setrectime.cpp

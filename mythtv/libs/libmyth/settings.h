@@ -368,11 +368,13 @@ public:
                                    QImage* image,
                                    QString value=QString::null,
                                    bool select=false);
-signals:
-    void imageSelectionAdded(const QString& label, QImage* image, QString value);
+protected slots:
+    void imageSet(int);
 
 protected:
     vector<QImage*> images;
+    QLabel *imagelabel;
+    float m_hmult, m_wmult;
 };
 
 class BooleanSetting: virtual public Setting {

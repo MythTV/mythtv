@@ -697,7 +697,6 @@ void ImageSelectSetting::addImageSelection(const QString& label,
                                            bool select) {
     images.push_back(image);
     addSelection(label, value, select);
-    emit imageSelectionAdded(label, image, value);
 }
 
 ImageSelectSetting::~ImageSelectSetting() {
@@ -707,35 +706,63 @@ ImageSelectSetting::~ImageSelectSetting() {
     }
 }
 
+void ImageSelectSetting::imageSet(int num)
+{
+    if (num >= (int)images.size())
+        return;
+
+    QImage temp = *(images[current]);
+    temp = temp.smoothScale((int)(184 * m_hmult), (int)(138 * m_hmult),
+                            QImage::ScaleMin);
+
+    QPixmap tmppix(temp);
+    imagelabel->setPixmap(tmppix);
+}
+
 QWidget* ImageSelectSetting::configWidget(ConfigurationGroup *cg, 
                                           QWidget* parent, float hmult,
                                           const char* widgetName) 
 {
-    (void)hmult;
+    m_hmult = hmult;
+    m_wmult = hmult;
 
-    QWidget* box = new QVBox(parent, widgetName);
+    QWidget* box = new QHBox(parent, widgetName);
     box->setBackgroundOrigin(QWidget::WindowOrigin);
 
     QLabel* label = new QLabel(box);
     label->setText(getLabel());
     label->setBackgroundOrigin(QWidget::WindowOrigin);
-    MythImageSelector* widget = new MythImageSelector(box);
+
+    MythComboBox *widget = new MythComboBox(false, box);
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
 
-    for(unsigned int i = 0 ; i < images.size() ; ++i)
-        widget->insertItem(labels[i], images[i]);
+    imagelabel = new QLabel(box);
+    imagelabel->setBackgroundOrigin(QWidget::WindowOrigin);
+
+    for (unsigned int i = 0 ; i < images.size() ; ++i)
+        widget->insertItem(labels[i]);
 
     if (isSet)
         widget->setCurrentItem(current);
+    else
+        current = 0;
+    
+    QImage temp = *(images[current]);
+    temp = temp.smoothScale((int)(184 * hmult), (int)(138 * hmult), 
+                            QImage::ScaleMin);
 
-    connect(widget, SIGNAL(selectionChanged(int)),
-            this, SLOT(setValue(int)));
-    connect(this, SIGNAL(imageSelectionAdded(const QString&,QImage*,QString)),
-            widget, SLOT(insertItem(const QString&,QImage*)));
+    QPixmap tmppix(temp);
+    imagelabel->setPixmap(tmppix);
+
+    connect(widget, SIGNAL(highlighted(int)), this, SLOT(setValue(int)));
+    connect(widget, SIGNAL(highlighted(int)), this, SLOT(imageSet(int)));
+
     connect(this, SIGNAL(selectionsCleared()),
             widget, SLOT(clear()));
 
-    cg = cg;
+    if (cg)
+        connect(widget, SIGNAL(changeHelpText(QString)), cg, 
+                SIGNAL(changeHelpText(QString)));
 
     return box;
 }
