@@ -332,7 +332,11 @@ bool Channel::SetChannelByString(const QString &chan)
     pthread_mutex_t db_lock;
 
     if (!pParent->CheckChannel(this, chan, db_conn, db_lock))
+    {
+        VERBOSE(VB_IMPORTANT, QString("CheckChannel failed. Please verify "
+                "channel \"%1\" in the \"setup\" Channel Editor.").arg(chan));
         return false;
+    }
 
     pthread_mutex_lock(&db_lock);
     QString thequery = QString("SELECT finetune, freqid, tvformat, freqtable "
