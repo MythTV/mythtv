@@ -613,16 +613,14 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
 
 void NuppelVideoPlayer::OutputVideoLoop(void)
 {
-    //struct timeval startt, nowt;
-    //int framesdisplayed = 0;
     unsigned char *X11videobuf;
     int videosize;
     int laudiotime;
     int delay, avsync_delay;
 
-    struct timeval lasttrigger, now; 
+    struct timeval nexttrigger, now; 
 
-    gettimeofday(&lasttrigger, NULL);
+    gettimeofday(&nexttrigger, NULL);
   
     Jitterometer *output_jmeter = new Jitterometer("video_output", 100);
 
@@ -662,50 +660,59 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
            continue;
         }
 
-        /* do video output */
+        /* if we get here, we're actually going to do video output */
   
-        /* first calculate an open-loop value of 'delay', that is how long we
-           will sleep before waking up and kicking out the next frame. Open 
-           loop means we don't have any sort of feedback for A/V sync */
+        // calculate 'delay', that we need to get from 'now' to 'nexttrigger'
         gettimeofday(&now, NULL);
 
-        delay = (int)(1000000.0 / video_frame_rate); // uSecs
-        delay -= (now.tv_sec - lasttrigger.tv_sec) * 1000000 +
-                  now.tv_usec - lasttrigger.tv_usec; // uSecs
-
-        /* second, apply just a little feedback. The ComputeAudioTime()
-           function is jittery, so if we try to correct our entire A/V drift
-           on each frame, video output is jerky. Instead, correct 1/12 of the
-           computed drift on each frame. This value was arrived at through 
-           trial and error, it's a tradeoff between a/v sync and video jitter */
-        if (audiofd > 0)
-        {
-            laudiotime = GetAudiotime(); // ms, same scale as timecodes
-            while (laudiotime == 0)
-            {
-                usleep(100);
-                laudiotime = GetAudiotime();
-            }
-            avsync_delay = (timecodes[rpos] - laudiotime) * 1000; // uSecs
-
-            delay += (avsync_delay - delay) / 12;
-
-            delay -= (int)((100000.0 / video_frame_rate) * usepre);
-        }
-
+        delay = (nexttrigger.tv_sec - now.tv_sec) * 1000000 +
+                (nexttrigger.tv_usec - now.tv_usec); // uSecs
         /* trigger */
         if (delay > 0)
             usleep(delay);
-        gettimeofday(&lasttrigger, NULL);
 
         memcpy(X11videobuf, vbuffer[rpos], videosize);
-        // this memcpy is the most expensive thing this thread does...
-
         osd->Display(X11videobuf);
- 
         XJ_show(video_width, video_height);
+        /* a/v sync assumes that when 'XJ_show' returns, that is the instant
+           the frame has become visible on screen */
 
         output_jmeter->RecordCycleTime();
+
+        /* compute new value of nexttrigger */
+        nexttrigger.tv_usec += (int)(1000000 / video_frame_rate);
+
+        /* Apply just a little feedback. The ComputeAudiotime() function is
+           jittery, so if we try to correct our entire A/V drift on each frame,
+           video output is jerky. Instead, correct 1/12 of the computed drift
+           on each frame.
+ 
+           This value (1/12) was arrived at through trial and error, it's a 
+           tradeoff between a/v sync and video jitter */
+        if (audiofd > 0)
+        {
+            laudiotime = GetAudiotime(); // ms, same scale as timecodes
+
+            if (laudiotime != 0) // laudiotime = 0 after a seek
+            {
+                /* if we were perfect, timecodes[rpos] and laudiotime would
+                   match and this adjustment wouldn't do anything */
+               avsync_delay = (timecodes[rpos] - laudiotime) * 1000; // uSecs
+               nexttrigger.tv_usec += avsync_delay / 12;
+            }
+        }
+
+        /* normalize nexttrigger */
+        while (nexttrigger.tv_usec > 999999)
+        {
+            nexttrigger.tv_sec++;
+            nexttrigger.tv_usec -= 1000000;
+        }
+        while (nexttrigger.tv_usec < 0)
+        {
+            nexttrigger.tv_sec--;
+            nexttrigger.tv_usec += 1000000;
+        }
 
         /* update rpos */
         pthread_mutex_lock(&video_buflock);
@@ -713,22 +720,6 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
                           // nothing
             rpos = (rpos + 1) % MAXVBUFFER;
         pthread_mutex_unlock(&video_buflock);
-
-        //if (framesdisplayed == 60)
-        //{
-        //    gettimeofday(&nowt, NULL);
-       
-        //    double timedif = (nowt.tv_sec - startt.tv_sec) * 1000000 +
-        //                     (nowt.tv_usec - startt.tv_usec);
-            
-        //    printf("FPS played: %f\n", 60000000.0 / timediff);
-            
-        //    startt.tv_sec = nowt.tv_sec;
-        //    startt.tv_usec = nowt.tv_usec;
-
-        //    framesdisplayed = 0;
-        //}
-        //framesdisplayed++;
     }
 
     XJ_exit();             

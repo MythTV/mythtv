@@ -21,10 +21,11 @@ NUVLIBS = `libNuppelVideo/nuppelvideo-config --libs` `mysql_config --libs`
 .c.o:
 	$(CXXCOMPILE) -c $< -o $@
 
-all: libNuppelVideo.a examples mythtv 
+all: libNuppelVideo.a examples libmythtv.a mythtv
 
-TVOBJ = main.o tv.o settings.o channel.o frequencies.o
-TVLDF = -LlibNuppelVideo/ -lNuppelVideo $(NUVLIBS)
+LIBTVOBJ = tv.o settings.o channel.o frequencies.o
+TVOBJ = main.o
+TVLDF = -L. -lmythtv -LlibNuppelVideo/ -lNuppelVideo $(NUVLIBS)
 
 libNuppelVideo.a:
 	$(MAKE) -C libNuppelVideo
@@ -32,7 +33,12 @@ libNuppelVideo.a:
 examples:
 	$(MAKE) -C examples
 
-mythtv: $(TVOBJ) libNuppelVideo.a
+libmythtv.a: $(LIBTVOBJ)
+	@rm -f libmythtv.a
+	ar cru libmythtv.a $(LIBTVOBJ)
+	ranlib libmythtv.a
+
+mythtv: $(TVOBJ) libNuppelVideo.a libmythtv.a
 	@rm -f mythtv
 	$(CXXLINK) $(TVOBJ) $(TVLDF)
 
@@ -41,5 +47,5 @@ mythtv: $(TVOBJ) libNuppelVideo.a
 #	 install -m 755 tv /usr/local/bin
 
 clean:	
-	rm -f *.o mythtv
+	rm -f *.o mythtv libmythtv.a
 	$(DO_MAKE)
