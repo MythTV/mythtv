@@ -178,7 +178,7 @@ void GuideGrid::fillTimeInfos()
         int mins = t.time().minute();
 
         int sqlmins;        
-        if (mins > 30)
+        if (mins >= 30)
         {
             mins = 30;
             sqlmins = 45;
