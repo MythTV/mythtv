@@ -83,7 +83,7 @@ namespace soundtouch
         #endif // FLOAT_SAMPLES
 
         #ifdef ALLOW_OPTIMIZATIONS
-            #if WIN32 || __i386__
+            #if WIN32 || __MMX__ || MMX
                 // Allow MMX optimizations
                 #define ALLOW_MMX   1
             #endif

@@ -53,10 +53,20 @@ typedef	union {
 			      : /* nothing */ \
 			      : "m" (mem))
 
+#define	mmx_a2r(op,a_off,a_reg,reg) \
+	__asm__ __volatile__ (#op " " #a_off "(%0), %%" #reg \
+			      : /* nothing */ \
+			      : "r" (a_reg))
+
 #define	mmx_r2m(op,reg,mem) \
 	__asm__ __volatile__ (#op " %%" #reg ", %0" \
 			      : "=m" (mem) \
 			      : /* nothing */ )
+
+#define	mmx_r2a(op,reg,a_off,a_reg) \
+	__asm__ __volatile__ (#op " %%" #reg ", " #a_off "(%0)" \
+			      : /* nothing */ \
+			      : "r"(a_reg))
 
 #define	mmx_r2r(op,regs,regd) \
 	__asm__ __volatile__ (#op " %" #regs ", %" #regd)
@@ -74,8 +84,10 @@ typedef	union {
 						      : /* nothing */ )
 
 #define	movq_m2r(var,reg)	mmx_m2r (movq, var, reg)
+#define	movq_a2r(off,var,reg)	mmx_a2r (movq, off, var, reg)
 #define	movq_r2m(reg,var)	mmx_r2m (movq, reg, var)
 #define	movq_r2r(regs,regd)	mmx_r2r (movq, regs, regd)
+#define	movq_r2a(reg,off,var)	mmx_r2a (movq, reg, off, var)
 
 #define	packssdw_m2r(var,reg)	mmx_m2r (packssdw, var, reg)
 #define	packssdw_r2r(regs,regd) mmx_r2r (packssdw, regs, regd)
@@ -123,6 +135,7 @@ typedef	union {
 #define	pcmpgtw_r2r(regs,regd)	mmx_r2r (pcmpgtw, regs, regd)
 
 #define	pmaddwd_m2r(var,reg)	mmx_m2r (pmaddwd, var, reg)
+#define	pmaddwd_a2r(of,var,reg) mmx_a2r (pmaddwd, of, var, reg)
 #define	pmaddwd_r2r(regs,regd)	mmx_r2r (pmaddwd, regs, regd)
 
 #define	pmulhw_m2r(var,reg)	mmx_m2r (pmulhw, var, reg)
