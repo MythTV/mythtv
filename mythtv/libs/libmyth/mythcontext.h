@@ -40,6 +40,7 @@ enum VerboseMask {
     VB_SCHEDULE  = 0x0080,
     VB_NETWORK   = 0x0100,
     VB_COMMFLAG  = 0x0200,
+    VB_AUDIO     = 0x0400,
     VB_NONE      = 0x0000,
     VB_ALL       = 0xffff
 };

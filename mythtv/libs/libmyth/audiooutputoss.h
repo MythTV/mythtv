@@ -47,6 +47,7 @@ private:
     void WriteAudio(unsigned char *aubuf, int size);
 
     inline int getSpaceOnSoundcard(void);
+    void SetFragSize(void);
     void SetAudiotime(void);
 
     bool killaudio;
@@ -61,6 +62,7 @@ private:
     int audio_bits;
     int audio_samplerate;
     int audio_buffer_unused;
+    int fragment_size;
 
 
     bool pauseaudio, audio_actually_paused;

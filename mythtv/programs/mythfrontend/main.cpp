@@ -755,6 +755,11 @@ int main(int argc, char **argv)
                             print_verbose_messages |= VB_COMMFLAG;
                             verboseString += " " + *it;
                         }
+                        else if(!strcmp(*it,"audio"))
+                        {
+                            print_verbose_messages |= VB_AUDIO;
+                            verboseString += " " + *it;
+                        }
                         else
                         {
                             cerr << "Unknown argument for -v/--verbose: "
@@ -787,8 +792,8 @@ int main(int argc, char **argv)
                     "-l or --logfile filename       Writes STDERR and STDOUT messages to filename" << endl <<
                     "-v or --verbose debug-level    Prints more information" << endl <<
                     "                               Accepts any combination (separated by comma)" << endl << 
-                    "                               of all,none,quiet,record,playback," << endl <<
-                    "                               channel,osd,file,schedule,network,commflag" << endl <<
+                    "                               of all,none,quiet,record,playback,channel," << endl <<
+                    "                               osd,file,schedule,network,commflag,audio" << endl <<
                     "--version                      Version information" << endl <<
                     "<plugin>                       Initialize and run this plugin" << endl;
             return -1;

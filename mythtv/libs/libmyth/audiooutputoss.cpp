@@ -110,6 +110,8 @@ void AudioOutputOSS::Reconfigure(int laudio_bits, int laudio_channels,
 
     fcntl(audiofd, F_SETFL, fcntl(audiofd, F_GETFL) & ~O_NONBLOCK);
 
+    SetFragSize();
+
     bool err = false;
 
     if (audio_channels > 2)
@@ -142,9 +144,12 @@ void AudioOutputOSS::Reconfigure(int laudio_bits, int laudio_channels,
     
     audio_buf_info info;
     ioctl(audiofd, SNDCTL_DSP_GETOSPACE, &info);
+    fragment_size = info.fragsize;
 
-    audio_buffer_unused = info.bytes - audio_bytes_per_sample * 
-                          audio_samplerate / 10;
+    VERBOSE(VB_GENERAL, QString("Audio fragment size: %1")
+                                 .arg(fragment_size));
+
+    audio_buffer_unused = info.bytes - (fragment_size * 4);
     if(audio_buffer_unused < 0)
        audio_buffer_unused = 0;
 
@@ -174,14 +179,48 @@ void AudioOutputOSS::Reconfigure(int laudio_bits, int laudio_channels,
     
     pthread_mutex_unlock(&avsync_lock);
     pthread_mutex_unlock(&audio_buflock);
-    //printf("Ending reconfigure\n");
+    VERBOSE(VB_AUDIO, "Ending reconfigure");
+}
+
+/**
+ * Set the fragsize to something slightly smaller than the number of bytes of
+ * audio for one frame of video.
+ */
+void AudioOutputOSS::SetFragSize()
+{
+    // I think video_frame_rate isn't necessary. Someone clearly thought it was
+    // useful but I don't see why. Let's just hardcode 30 for now...
+    // if there's a problem, it can be added back.
+    const int video_frame_rate = 30;
+    const int bits_per_byte = 8;
+
+    // get rough measurement of audio bytes per frame of video
+    int fbytes = (audio_bits * audio_channels * audio_samplerate) / 
+                        (bits_per_byte * video_frame_rate);
+
+    // find the next smaller number that's a power of 2 
+    // there's probably a better way to do this
+    int count = 0;
+    while ( fbytes >> 1 )
+    {
+        fbytes >>= 1;
+        count++;
+    }
+
+    if (count > 4)
+    {
+        // High order word is the max number of fragments
+        int frag = 0x7fff0000 + count;
+        ioctl(audiofd, SNDCTL_DSP_SETFRAGMENT, &frag);
+        // ignore failure, since we check the actual fragsize before use
+    }
 }
 
 void AudioOutputOSS::KillAudio()
 {
     killAudioLock.lock();
 
-    //printf("Killing AudioOutputDSP\n");
+    VERBOSE(VB_AUDIO, "Killing AudioOutputDSP");
     if (output_audio)
     {
         killaudio = true;
@@ -257,7 +296,7 @@ void AudioOutputOSS::SetTimecode(long long timecode)
 
 void AudioOutputOSS::SetEffDsp(int dsprate)
 {
-    //printf("SetEffDsp: %d\n", dsprate);
+    VERBOSE(VB_AUDIO, QString("SetEffDsp: %1").arg(dsprate));
     effdsp = dsprate;
 }
 
@@ -365,7 +404,8 @@ void AudioOutputOSS::SetAudiotime(void)
 void AudioOutputOSS::AddSamples(char *buffers[], int samples, 
                                 long long timecode)
 {
-    //printf("AddSamples[] %d\n", samples * audio_bytes_per_sample);
+    VERBOSE(VB_AUDIO, QString("AddSamples[] %1")
+                              .arg(samples * audio_bytes_per_sample));
     pthread_mutex_lock(&audio_buflock);
 
     int audio_bytes = audio_bits / 8;
@@ -375,7 +415,7 @@ void AudioOutputOSS::AddSamples(char *buffers[], int samples,
     {
         if (blocking)
         {
-            //printf("Waiting for free space\n");
+            VERBOSE(VB_AUDIO, "Waiting for free space");
             // wait for more space
             pthread_cond_wait(&audio_bufsig, &audio_buflock);
             afree = audiofree(false);
@@ -413,7 +453,8 @@ void AudioOutputOSS::AddSamples(char *buffers[], int samples,
 
 void AudioOutputOSS::AddSamples(char *buffer, int samples, long long timecode)
 {
-    //printf("AddSamples %d\n", samples * audio_bytes_per_sample);
+    VERBOSE(VB_AUDIO, QString("AddSamples %1")
+                              .arg(samples * audio_bytes_per_sample));
     pthread_mutex_lock(&audio_buflock);
 
     int afree = audiofree(false);
@@ -424,7 +465,7 @@ void AudioOutputOSS::AddSamples(char *buffer, int samples, long long timecode)
     {
         if (blocking)
         {
-            //printf("Waiting for free space\n");
+            VERBOSE(VB_AUDIO, "Waiting for free space");
             // wait for more space
             pthread_cond_wait(&audio_bufsig, &audio_buflock);
             afree = audiofree(false);
@@ -486,11 +527,10 @@ inline int AudioOutputOSS::getSpaceOnSoundcard(void)
 
 void AudioOutputOSS::OutputAudioLoop(void)
 {
-    int bytesperframe;
     int space_on_soundcard;
-    unsigned char zeros[1024];
+    unsigned char zeros[fragment_size];
  
-    bzero(zeros, 1024);
+    bzero(zeros, fragment_size);
 
     while (!killaudio)
     {
@@ -507,13 +547,15 @@ void AudioOutputOSS::OutputAudioLoop(void)
             // should this use ioctl(audio_fd, SNDCTL_DSP_POST, 0) instead ?
             
             space_on_soundcard = getSpaceOnSoundcard();
-            if (1024 < space_on_soundcard)
+            if (fragment_size < space_on_soundcard)
             {
-                WriteAudio(zeros, 1024);
+                WriteAudio(zeros, fragment_size);
             }
             else
             {
-                //printf("waiting for space to write 1024 zeros on soundcard which has %d bytes free\n",space_on_soundcard);
+                VERBOSE(VB_AUDIO, QString("waiting for space to write 1024 "
+                        "zeros on soundcard which has %1 bytes free")
+                        .arg(space_on_soundcard));
                 usleep(50);
             }
 
@@ -524,18 +566,12 @@ void AudioOutputOSS::OutputAudioLoop(void)
 
         /* do audio output */
         
-        /* approximate # of audio bytes for each frame. */
-// I think video_frame_rate isn't necessary. Someone clearly thought it was
-// useful but I don't see why. Let's just hardcode 30 for now...
-// if there's a problem, it can be added back.
-#define video_frame_rate 30
-        bytesperframe = audio_bytes_per_sample * 
-                        (int)(effdsp / 100.0 / video_frame_rate + 0.5);
-        
         // wait for the buffer to fill with enough to play
-        if (bytesperframe >= audiolen(true))
-        { 
-            //printf("audio thread waiting for buffer to fill (bytesperframe=%d,audiolen=%d\n", bytesperframe, audiolen(true));
+        if (fragment_size >= audiolen(true))
+        {
+            VERBOSE(VB_AUDIO, QString("audio thread waiting for buffer to fill"
+                                      " fragment_size=%1, audiolen=%2")
+                                      .arg(fragment_size).arg(audiolen(true)));
             usleep(200);
             continue;
         }
@@ -544,9 +580,10 @@ void AudioOutputOSS::OutputAudioLoop(void)
         // without blocking.  We don't want to block while holding audio_buflock
         
         space_on_soundcard = getSpaceOnSoundcard();
-        if (bytesperframe > space_on_soundcard)
+        if (fragment_size > space_on_soundcard)
         {
-            //printf("waiting for space to write %d bytes on soundcard whish has %d bytes free\n", bytesperframe, space_on_soundcard);
+            VERBOSE(VB_AUDIO, QString("Waiting for space on soundcard: "
+                                 "space=%1").arg(space_on_soundcard));
             numlowbuffer++;
             if (numlowbuffer > 5 && audio_buffer_unused)
             {
@@ -564,22 +601,25 @@ void AudioOutputOSS::OutputAudioLoop(void)
 
         // re-check audiolen() in case things changed.
         // for example, ClearAfterSeek() might have run
-        if (bytesperframe < audiolen(false))
+        if (fragment_size < audiolen(false))
         {
             int bdiff = AUDBUFSIZE - raud;
-            if (bytesperframe > bdiff)
+            if (fragment_size > bdiff)
             {
-                WriteAudio(audiobuffer + raud, bdiff);
-                WriteAudio(audiobuffer, bytesperframe - bdiff);
+                // always want to write whole fragments
+                unsigned char fragment[fragment_size];
+                memcpy(fragment, audiobuffer + raud, bdiff);
+                memcpy(fragment + bdiff, audiobuffer, fragment_size - bdiff);
+                WriteAudio(fragment, fragment_size);
             }
             else
             {
-                WriteAudio(audiobuffer + raud, bytesperframe);
+                WriteAudio(audiobuffer + raud, fragment_size);
             }
 
             /* update raud */
-            raud = (raud + bytesperframe) % AUDBUFSIZE;
-            //printf("Broadcasting free space avail\n");
+            raud = (raud + fragment_size) % AUDBUFSIZE;
+            VERBOSE(VB_AUDIO, "Broadcasting free space avail");
             pthread_cond_broadcast(&audio_bufsig);
         }
         pthread_mutex_unlock(&audio_buflock); // end critical section
@@ -589,9 +629,10 @@ void AudioOutputOSS::OutputAudioLoop(void)
 
 void *AudioOutputOSS::kickoffOutputAudioLoop(void *player)
 {
-    //printf("kickoffOutputAudioLoop: pid = %d\n", getpid());
+    VERBOSE(VB_AUDIO, QString("kickoffOutputAudioLoop: pid = %1")
+                              .arg(getpid()));
     ((AudioOutputOSS *)player)->OutputAudioLoop();
-    //printf("kickoffOutputAudioLoop exiting\n");
+    VERBOSE(VB_AUDIO, "kickoffOutputAudioLoop exiting");
     return NULL;
 }
 
