@@ -224,8 +224,7 @@ package export_SVCD;
 		$command .= " | nice -n 19 mpeg2enc --format 5 --quantisation $self->{quantisation} --quantisation-reduction 2"
 					." --video-bitrate $self->{v_bitrate} --aspect 2 --frame-rate $framerate"
 					#.($pulldown ? ' --frame-rate 1 --3-2-pulldown' : " --frame-rate $framerate")
-					#." --interlace-mode 1 --motion-search-radius 24 --video-buffer 230"
-					." --interlace-mode 0 --motion-search-radius 24 --video-buffer 230"
+					." --interlace-mode 1 --motion-search-radius 24 --video-buffer 230"
 					." --nonvideo-bitrate $self->{a_bitrate} --sequence-length 795"
 					." --reduction-4x4 1 --reduction-2x2 1 --keep-hf"
 					.($cpus > 1 ? " --multi-thread $cpus" : '')
