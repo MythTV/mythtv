@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS recordingprofiles
 (
     id INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
-    name VARCHAR(128) NOT NULL,
-    videocodec VARCHAR(128) NOT NULL,
+    name VARCHAR(128),
+    videocodec VARCHAR(128),
     audiocodec VARCHAR(128),
     UNIQUE(name)
 );
