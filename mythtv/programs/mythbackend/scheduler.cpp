@@ -1416,6 +1416,7 @@ void Scheduler::AddNewRecords(void) {
         .arg(kWeekslotRecord);
 
     VERBOSE(VB_SCHEDULE, QString(" |-- Start DB Query %1...").arg(clause));
+    //cerr << query << endl;
     QSqlQuery result = db->exec(query);
 
     if (!result.isActive())
@@ -1533,14 +1534,14 @@ void Scheduler::AddNewRecords(void) {
                  !p->reactivate &&
                  !(p->dupmethod & kDupCheckNone))
         {
-            if (p->dupmethod == kDupCheckNewEpi && p->repeat)
+            if (p->dupin == kDupsNewEpi && p->repeat)
                 p->recstatus = rsRepeat;
         
-            if (p->dupin & kDupsInOldRecorded &&
+            if (((p->dupin & kDupsInOldRecorded) || (p->dupin == kDupsNewEpi)) &&
                 result.value(10).toInt())
                 p->recstatus = rsPreviousRecording;
             
-            if (p->dupin & kDupsInRecorded &&
+            if (((p->dupin & kDupsInRecorded) || (p->dupin == kDupsNewEpi)) &&
                 result.value(14).toInt())
                 p->recstatus = rsCurrentRecording;
         }

@@ -36,6 +36,10 @@ using namespace std;
 #define HAVE_FDATASYNC
 #endif
 
+#define READ_TEST_SIZE 2048
+#define OPEN_READ_ATTEMPTS 5
+
+
 class ThreadedFileWriter
 {
 public:
@@ -81,7 +85,7 @@ static unsigned safe_write(int fd, const void *data, unsigned sz)
     unsigned tot = 0;
     unsigned errcnt = 0;
 
-    while (tot < sz) 
+    while (tot < sz)
     {
         ret = write(fd, (char *)data + tot, sz - tot);
         if (ret < 0)
@@ -96,14 +100,14 @@ static unsigned safe_write(int fd, const void *data, unsigned sz)
                      "ERROR: file I/O problem in safe_write(), errcnt = %d",
                      errcnt);
             perror(msg);
-            if (errcnt == 3) 
+            if (errcnt == 3)
                 break;
         }
         else
         {
             tot += ret;
         }
-        if (tot < sz) 
+        if (tot < sz)
             usleep(1000);
     }
     return tot;
@@ -179,10 +183,10 @@ unsigned ThreadedFileWriter::Write(const void *data, unsigned count)
         first = 0;
         usleep(5000);
     }
-   
+
     if (no_writes)
         return 0;
- 
+
     if ((wpos + count) > tfw_buf_size)
     {
         int first_chunk_size = tfw_buf_size - wpos;
@@ -261,7 +265,7 @@ void ThreadedFileWriter::DiskLoop()
     while (!in_dtor || BufUsed() > 0)
     {
         size = BufUsed();
-        
+
         if ((!in_dtor) &&
             (!flush) &&
             ((unsigned)size < tfw_min_write_size))
@@ -334,6 +338,7 @@ unsigned ThreadedFileWriter::BufFree()
 
 RingBuffer::RingBuffer(const QString &lfilename, bool write, bool usereadahead)
 {
+    int openAttempts = OPEN_READ_ATTEMPTS;
     Init();
 
     startreadahead = usereadahead;
@@ -344,7 +349,7 @@ RingBuffer::RingBuffer(const QString &lfilename, bool write, bool usereadahead)
     if (write)
     {
         tfw = new ThreadedFileWriter(filename.ascii(),
-                                     O_WRONLY|O_TRUNC|O_CREAT|O_LARGEFILE, 
+                                     O_WRONLY|O_TRUNC|O_CREAT|O_LARGEFILE,
                                      0644);
         writemode = true;
     }
@@ -374,7 +379,39 @@ RingBuffer::RingBuffer(const QString &lfilename, bool write, bool usereadahead)
             is_local = true;
 
         if (is_local)
-            fd2 = open(filename.ascii(), O_RDONLY|O_LARGEFILE|O_STREAMING);
+        {
+            char buf[READ_TEST_SIZE];
+            while (openAttempts > 0)
+            {
+                int ret;
+                openAttempts--;
+                
+                fd2 = open(filename.ascii(), O_RDONLY|O_LARGEFILE|O_STREAMING);
+                
+                if (!fd2)
+                {
+                    VERBOSE( VB_IMPORTANT, QString("Could not open %1.  %2 retries remaining.")
+                                           .arg(filename).arg(openAttempts));
+                    usleep(500000);
+                }
+                else
+                {
+                    if ((ret = read(fd2, buf, READ_TEST_SIZE)) != READ_TEST_SIZE)
+                    {
+                        VERBOSE( VB_IMPORTANT, QString("Invalid file handle when opening %1.  "
+                                                       "%2 retries remaining.")
+                                                       .arg(filename).arg(openAttempts));
+                        close(fd2);
+                        usleep(500000);
+                    }
+                    else
+                    {
+                        lseek(fd2, 0, SEEK_SET);
+                        openAttempts = 0;
+                    }
+                }
+            }
+        }
         else
             remotefile = new RemoteFile(filename);
 
@@ -384,7 +421,7 @@ RingBuffer::RingBuffer(const QString &lfilename, bool write, bool usereadahead)
     smudgeamount = 0;
 }
 
-RingBuffer::RingBuffer(const QString &lfilename, long long size, 
+RingBuffer::RingBuffer(const QString &lfilename, long long size,
                        long long smudge, RemoteEncoder *enc)
 {
     Init();
@@ -398,11 +435,11 @@ RingBuffer::RingBuffer(const QString &lfilename, long long size,
     normalfile = false;
     filename = (QString)lfilename;
     filesize = size;
-   
+
     if (recorder_num == 0)
     {
-        tfw = new ThreadedFileWriter(filename.ascii(), 
-                                     O_WRONLY|O_CREAT|O_TRUNC|O_LARGEFILE, 
+        tfw = new ThreadedFileWriter(filename.ascii(),
+                                     O_WRONLY|O_CREAT|O_TRUNC|O_LARGEFILE,
                                      0644);
         fd2 = open(filename.ascii(), O_RDONLY|O_LARGEFILE|O_STREAMING);
     }
@@ -500,10 +537,10 @@ void RingBuffer::Reset(void)
         if (readaheadrunning)
             ResetReadAhead(0);
     }
-   
+
     numfailures = 0;
     commserror = false;
- 
+
     pthread_rwlock_unlock(&rwlock);
 }
 
@@ -514,7 +551,7 @@ int RingBuffer::safe_read(int fd, void *data, unsigned sz)
     unsigned errcnt = 0;
     unsigned zerocnt = 0;
 
-    while (tot < sz) 
+    while (tot < sz)
     {
         ret = read(fd, (char *)data + tot, sz - tot);
         if (ret < 0)
@@ -525,7 +562,7 @@ int RingBuffer::safe_read(int fd, void *data, unsigned sz)
             perror("ERROR: file I/O problem in 'safe_read()'");
             errcnt++;
             numfailures++;
-            if (errcnt == 3) 
+            if (errcnt == 3)
                 break;
         }
         else if (ret > 0)
@@ -539,7 +576,7 @@ int RingBuffer::safe_read(int fd, void *data, unsigned sz)
                 break;
 
             zerocnt++;
-            if ((normalfile && zerocnt > 15) || 
+            if ((normalfile && zerocnt > 15) ||
                 zerocnt >= 50) // 3 second timeout with usleep(60000)
             {
                 break;
@@ -627,7 +664,7 @@ int RingBuffer::ReadBufFree(void)
 int RingBuffer::ReadBufAvail(void)
 {
     int ret = 0;
-    
+
     readAheadLock.lock();
 
     if (rbwpos >= rbrpos)
@@ -728,7 +765,7 @@ void RingBuffer::ReadAheadThread(void)
     pausereadthread = false;
 
     readAheadBuffer = new char[READ_AHEAD_SIZE + 256000];
-    
+
     ResetReadAhead(0);
     totfree = ReadBufFree();
 
@@ -776,14 +813,14 @@ void RingBuffer::ReadAheadThread(void)
             {
                 if (remotefile)
                 {
-                    ret = safe_read(remotefile, readAheadBuffer + rbwpos, 
+                    ret = safe_read(remotefile, readAheadBuffer + rbwpos,
                                     totfree);
 
                     if (internalreadpos + totfree > filesize)
                     {
                         int toread = filesize - readpos;
                         int left = totfree - toread;
- 
+
                         internalreadpos = left;
                     }
                     else
@@ -798,7 +835,7 @@ void RingBuffer::ReadAheadThread(void)
                     int left = totfree - toread;
                     lseek(fd2, 0, SEEK_SET);
 
-                    ret = safe_read(fd2, readAheadBuffer + rbwpos + toread, 
+                    ret = safe_read(fd2, readAheadBuffer + rbwpos + toread,
                                     left);
                     ret += toread;
 
@@ -834,7 +871,7 @@ void RingBuffer::ReadAheadThread(void)
         }
 
         if (!readsallowed && used >= fill_min)
-            readsallowed = true;        
+            readsallowed = true;
 
         if (readsallowed && used < fill_min && !ateof)
         {
@@ -847,13 +884,13 @@ void RingBuffer::ReadAheadThread(void)
             readsAllowedWait.wakeAll();
 
         availWaitMutex.lock();
-        if (commserror || ateof || stopreads || 
+        if (commserror || ateof || stopreads ||
             (wanttoread <= used && wanttoread > 0))
         {
             availWait.wakeAll();
         }
         availWaitMutex.unlock();
-            
+
         pthread_rwlock_unlock(&rwlock);
 
         if ((used >= fill_threshold || wantseek) && !pausereadthread)
@@ -880,7 +917,7 @@ int RingBuffer::ReadFromBuf(void *buf, int count)
         readone = true;
         Unpause();
     }
-    else 
+    else
         while (!readsallowed && !stopreads)
         {
             if (!readsAllowedWait.wait(5000))
@@ -991,7 +1028,7 @@ int RingBuffer::Read(void *buf, int count)
         if (remotefile)
         {
             ret = ReadFromBuf(buf, count);
-  
+
             if (readpos + ret > filesize)
             {
                 int toread = filesize - readpos;
@@ -1038,16 +1075,16 @@ int RingBuffer::Read(void *buf, int count)
                 int toread = filesize - readpos;
 
                 ret = safe_read(fd2, buf, toread);
-  
+
                 int left = count - toread;
                 lseek(fd2, 0, SEEK_SET);
 
                 ret = safe_read(fd2, (char *)buf + toread, left);
                 ret += toread;
- 
+
                 totalreadpos += ret;
                 readpos = left;
-            } 
+            }
             else
             {
                 ret = safe_read(fd2, buf, count);
@@ -1155,7 +1192,7 @@ long long RingBuffer::GetFileWritePosition(void)
 
 long long RingBuffer::Seek(long long pos, int whence)
 {
-    wantseek = true;  
+    wantseek = true;
     pthread_rwlock_wrlock(&rwlock);
     wantseek = false;
 
@@ -1170,7 +1207,7 @@ long long RingBuffer::Seek(long long pos, int whence)
                 ret = lseek(fd2, pos, whence);
             else
             {
-                long long realseek = readpos + pos;        
+                long long realseek = readpos + pos;
                 ret = lseek(fd2, realseek, SEEK_SET);
             }
         }
@@ -1267,7 +1304,7 @@ long long RingBuffer::GetFreeSpaceWithReadChange(long long readchange)
         if (readchange > 0)
             readchange = 0 - (filesize - readchange);
 
-        return GetFreeSpace() + readchange; 
+        return GetFreeSpace() + readchange;
     }
     else
     {
@@ -1290,9 +1327,9 @@ long long RingBuffer::GetWritePosition(void)
     return writepos;
 }
 
-long long RingBuffer::GetTotalWritePosition(void) 
-{ 
-    return totalwritepos; 
+long long RingBuffer::GetTotalWritePosition(void)
+{
+    return totalwritepos;
 }
 
 long long RingBuffer::GetRealFileSize(void)
