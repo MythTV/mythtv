@@ -1686,7 +1686,7 @@ void NuppelVideoPlayer::StartPlaying(void)
     if (OpenFile() < 0)
         return;
 
-    if (!disableaudio || nvp->forceVideoOutput == kVideoOutput_IVTV)
+    if (!disableaudio || forceVideoOutput == kVideoOutput_IVTV)
     {
         bool setVolume = gContext->GetNumSetting("MythControlsVolume", 1);
         audioOutput = AudioOutput::OpenAudio(audiodevice, audio_bits,
