@@ -34,6 +34,9 @@ class Scheduler
       void CheckOverride(ProgramInfo *info, list<ProgramInfo *> *conflictList);
       void RemoveConflicts(void);
 
+      void GuessSingle(ProgramInfo *info, list<ProgramInfo *> *conflictList);
+      void GuessConflicts(void);
+
       bool Conflict(ProgramInfo *a, ProgramInfo *b);
       
 

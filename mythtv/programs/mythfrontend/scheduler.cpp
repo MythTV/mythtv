@@ -214,7 +214,11 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
         MarkConflicts();
         MarkConflictsToRemove();
         if (doautoconflicts)
+        {
             RemoveConflicts();
+            GuessConflicts();
+            RemoveConflicts();
+        }
         MarkConflicts();
     }
 
@@ -546,6 +550,79 @@ void Scheduler::RemoveConflicts(void)
         {
             delete first;
             recordingList.erase(del);
+        }
+    }
+}
+
+void Scheduler::GuessSingle(ProgramInfo *info, 
+                            list<ProgramInfo *> *conflictList)
+{
+    int type = info->recordtype;
+    ProgramInfo *best = info;
+    list<ProgramInfo *>::iterator i;
+ 
+    if (conflictList->size() == 0)
+    {
+        info->conflicting = false;
+        return;
+    }
+
+    for (i = conflictList->begin(); i != conflictList->end(); i++)
+    {
+        ProgramInfo *test = (*i);
+        if (test->recordtype < type)
+        {
+            best = test;
+            type = test->recordtype;
+            break;
+        }
+        else if (test->recordtype == type)
+        {
+            if (test->startts < info->startts)
+            {
+                best = test;
+                break;
+            }
+            if (test->startts.secsTo(test->endts) > 
+                info->startts.secsTo(info->endts))
+            {
+                best = test;
+                break;
+            }
+            if (test->channum.toInt() < info->channum.toInt())
+            {
+                best = test;
+                break;
+            }
+        }
+    }
+
+    if (best == info)
+    {
+        for (i = conflictList->begin(); i != conflictList->end(); i++)
+        {
+            ProgramInfo *pginfo = (*i);
+            pginfo->recording = false;
+        }
+        best->conflicting = false;
+    }
+    else
+    {
+        info->recording = false;
+    } 
+}
+
+void Scheduler::GuessConflicts(void)
+{
+    list<ProgramInfo *>::iterator i = recordingList.begin();
+    for (; i != recordingList.end(); i++)
+    {
+        ProgramInfo *first = (*i);
+        if (first->recording && first->conflicting)
+        {
+            list<ProgramInfo *> *conflictList = getConflicting(first);
+            GuessSingle(first, conflictList);
+            delete conflictList;
         }
     }
 }

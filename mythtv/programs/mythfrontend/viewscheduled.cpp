@@ -76,7 +76,7 @@ ViewScheduled::ViewScheduled(QString prefix, TV *ltv, QSqlDatabase *ldb,
     QGridLayout *grid = new QGridLayout(vbox, 4, 2, 1);
     
     title = new QLabel(" ", this);
-    title->setFont(QFont("Arial", 25, QFont::Bold));
+    title->setFont(QFont("Arial", 20, QFont::Bold));
 
     QLabel *datelabel = new QLabel("Airdate: ", this);
     date = new QLabel(" ", this);
