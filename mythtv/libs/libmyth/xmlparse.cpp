@@ -36,7 +36,7 @@ bool XMLParse::LoadTheme(QDomElement &ele, QString winName, QString specialfile)
         f.setName(themefile);
         if (!f.open(IO_ReadOnly))
         {
-            cerr << "Can't open: " << themefile << endl;
+            cerr << "XMLParse::LoadTheme(): Can't open: " << themefile << endl;
             return false;
         }
     }

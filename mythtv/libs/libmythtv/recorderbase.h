@@ -23,9 +23,8 @@ class RecorderBase
     float GetFrameRate(void) { return video_frame_rate; }
     void SetFrameRate(float rate) { video_frame_rate = rate; }
 
-    void SetBaseOption(const QString &opt, const QString &value);
-
-    virtual void SetEncodingOption(const QString &opt, int value) = 0;
+    virtual void SetOption(const QString &opt, const QString &value);
+    virtual void SetOption(const QString &opt, int value);
     virtual void ChangeDeinterlacer(int deint_mode) = 0;
     virtual void SetVideoFilters(QString &filters) = 0;
 

@@ -6,45 +6,45 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
+#include <qsqldatabase.h>
+
 #include "videodev_myth.h"
 #include "channel.h"
 #include "frequencies.h"
 #include "tv.h"
+#include "mythcontext.h"
 
 #include <iostream>
 using namespace std;
 
 Channel::Channel(TVRec *parent, const QString &videodevice)
+       : ChannelBase(parent)
 {
     device = videodevice;
     isopen = false;
     videofd = -1;
-    curchannelname = "";
     curList = 0;
     totalChannels = 0;
-    pParent = parent;
     usingv4l2 = false;
     videomode = VIDEO_MODE_NTSC;
-    capchannels = 0;
-    currentcapchannel = -1;
-    
-    channelorder = "channum + 0";
 }
 
 Channel::~Channel(void)
 {
-    if (isopen)
-        close(videofd);
+    Close();
 }
 
 bool Channel::Open(void)
 {
+    if (isopen)
+        return true;
+
     videofd = open(device.ascii(), O_RDWR);
     if (videofd > 0)
         isopen = true;
     else
     {
-         cout << "Can't open: " << device << endl;
+         cerr << "Channel::Open(): Can't open: " << device << endl;
          perror(device.ascii());
          return false;
     }
@@ -66,15 +66,27 @@ void Channel::Close(void)
 {
     if (isopen)
         close(videofd);
+    isopen = false;
     videofd = -1;
+}
+
+void Channel::SetFd(int fd)
+{
+    if (fd > 0)
+    {
+        videofd = fd;
+        isopen = true;
+    }
+    else
+    {
+        videofd = -1;
+        isopen = false;
+    }
 }
 
 void Channel::SetFormat(const QString &format)
 {
-    if (!isopen)
-        Open();
-
-    if (!isopen)
+    if (!Open())
         return;
    
     if (usingv4l2)
@@ -187,105 +199,31 @@ void Channel::SetFreqTable(const QString &name)
         i++;
         listname = (char *)chanlists[i].name;
     }
+
     if (!curList)
     {
         curList = chanlists[1].list;
         totalChannels = chanlists[1].count;
     }
 }
- 
-bool Channel::SetChannelByString(const QString &chan)
-{
-    if (!isopen)
-        Open();
-    if (!isopen)
-        return false;
-
-    if (curchannelname == chan)
-        return true;
-
-    int finetune = 0;
-
-    if (pParent->CheckChannel(this, chan, finetune))
-    {
-        if (externalChanger[currentcapchannel].isEmpty())
-        {
-            int i = GetCurrentChannelNum(chan);
-            if (i == -1 || !TuneTo(chan, finetune))
-                return false;
-        }
-        else if (!ChangeExternalChannel(chan))
-            return false;
-
-        curchannelname = chan;
-
-        pParent->SetVideoFiltersForChannel(this, chan);
-        SetContrast();
-        SetColour();
-        SetBrightness();
-
-        inputChannel[currentcapchannel] = curchannelname;
-
-        return true;
-    }
-
-    return false;
-}
-
-bool Channel::TuneTo(const QString &chan, int finetune)
-{
-    int i = GetCurrentChannelNum(chan);
-    int frequency = curList[i].freq * 16 / 1000 + finetune;
-
-    if (usingv4l2)
-    {
-        struct v4l2_frequency vf;
-        memset(&vf, 0, sizeof(vf));
-        vf.frequency = frequency;
-        vf.type = V4L2_TUNER_ANALOG_TV;
-
-        if (ioctl(videofd, VIDIOC_S_FREQUENCY, &vf) < 0)
-        {
-            perror("VIDIOC_S_FREQUENCY");
-            return false;
-        }
-        return true;
-    }
-
-    if (ioctl(videofd, VIDIOCSFREQ, &frequency) == -1)
-    {
-        perror("VIDIOCSFREQ");
-        return false;
-    }
-
-    return true;
-}
 
 int Channel::GetCurrentChannelNum(const QString &channame)
 {
-    bool foundit = false;
-    int i;
-    for (i = 0; i < totalChannels; i++)
+    for (int i = 0; i < totalChannels; i++)
     {
         if (channame == curList[i].name)
-        {
-            foundit = true;
-            break;
-        }
+            return i;
     }
 
-    if (foundit)
-        return i;
-    
     return -1;
 }
 
 bool Channel::ChannelUp(void)
 {
-    QString nextchan = pParent->GetNextChannel(this, CHANNEL_DIRECTION_UP);
-    if (SetChannelByString(nextchan))
+    if (ChannelBase::ChannelUp())
         return true;
 
+    QString nextchan;
     bool finished = false;
     int chancount = 0;
     int curchannel = GetCurrentChannelNum(curchannelname);
@@ -315,10 +253,10 @@ bool Channel::ChannelUp(void)
 
 bool Channel::ChannelDown(void)
 {
-    QString nextchan = pParent->GetNextChannel(this, CHANNEL_DIRECTION_DOWN);
-    if (SetChannelByString(nextchan))
+    if (ChannelBase::ChannelDown())
         return true;
 
+    QString nextchan;
     bool finished = false;
     int chancount = 0;
     int curchannel = GetCurrentChannelNum(curchannelname);
@@ -346,67 +284,90 @@ bool Channel::ChannelDown(void)
     return finished;
 }
 
-bool Channel::NextFavorite(void)
+bool Channel::SetChannelByString(const QString &chan)
 {
-    QString nextchan = pParent->GetNextChannel(this, 
-                                               CHANNEL_DIRECTION_FAVORITE);
-    return SetChannelByString(nextchan);
-}
+    if (!Open())
+        return false;
 
-QString Channel::GetCurrentName(void)
-{
-    return curchannelname;
-}
+    if (curchannelname == chan)
+        return true;
 
-QString Channel::GetCurrentInput(void)
-{
-    return channelnames[currentcapchannel];
-}
+    QSqlDatabase *db_conn;
+    pthread_mutex_t db_lock;
 
-void Channel::ToggleInputs(void)
-{
-    int newcapchannel = currentcapchannel;
+    if (!pParent->CheckChannel(this, chan, db_conn, db_lock))
+        return false;
 
-    do 
+    pthread_mutex_lock(&db_lock);
+    QString thequery = QString("SELECT finetune "
+                               " FROM channel WHERE channum = \"%1\";")
+                               .arg(chan);
+
+    QSqlQuery query = db_conn->exec(thequery);
+    if (!query.isActive())
+        MythContext::DBError("fetchtuningparamschanid", query);
+    if (query.numRowsAffected() <= 0)
     {
-        newcapchannel = (newcapchannel + 1) % capchannels;
-    } while (inputTuneTo[newcapchannel].isEmpty());
-
-    SwitchToInput(newcapchannel, true);
-}
-
-QString Channel::GetInputByNum(int capchannel)
-{
-    if (capchannel > capchannels)
-        return "";
-    return channelnames[capchannel];
-}
-
-int Channel::GetInputByName(const QString &input)
-{
-    for (int i = capchannels-1; i >= 0; i--)
-        if (channelnames[i] == input)
-            return i;
-    return -1;
-}
-
-void Channel::SwitchToInput(const QString &inputname)
-{
-    int input = GetInputByName(inputname);
-
-    if (input >= 0)
-        SwitchToInput(input, true);
-}
-
-void Channel::SwitchToInput(const QString &inputname, const QString &chan)
-{
-    int input = GetInputByName(inputname);
-
-    if (input >= 0)
-    {
-        SwitchToInput(input, false);
-        SetChannelByString(chan);
+        pthread_mutex_unlock(&db_lock);
+        return false;
     }
+    query.next();
+
+    int finetune = query.value(0).toInt();
+
+    pthread_mutex_unlock(&db_lock);
+
+    // Tune
+    if (externalChanger[currentcapchannel].isEmpty())
+    {
+        if (!TuneTo(chan, finetune))
+            return false;
+    }
+    else if (!ChangeExternalChannel(chan))
+        return false;
+
+    curchannelname = chan;
+
+    pParent->SetVideoFiltersForChannel(this, chan);
+    SetContrast();
+    SetColour();
+    SetBrightness();
+
+    inputChannel[currentcapchannel] = curchannelname;
+
+    return true;
+}
+
+bool Channel::TuneTo(const QString &channum, int finetune)
+{
+    int i = GetCurrentChannelNum(channum);
+    if (i == -1)
+        return false;
+
+    int frequency = curList[i].freq * 16 / 1000 + finetune;
+
+    if (usingv4l2)
+    {
+        struct v4l2_frequency vf;
+        memset(&vf, 0, sizeof(vf));
+        vf.frequency = frequency;
+        vf.type = V4L2_TUNER_ANALOG_TV;
+
+        if (ioctl(videofd, VIDIOC_S_FREQUENCY, &vf) < 0)
+        {
+            perror("VIDIOC_S_FREQUENCY");
+            return false;
+        }
+        return true;
+    }
+
+    if (ioctl(videofd, VIDIOCSFREQ, &frequency) == -1)
+    {
+        perror("VIDIOCSFREQ");
+        return false;
+    }
+
+    return true;
 }
 
 void Channel::SwitchToInput(int newcapchannel, bool setstarting)
@@ -450,7 +411,6 @@ void Channel::SetContrast()
 
     if (ioctl(videofd, VIDIOCGPICT, &vid_pic) < 0)
     {
-        perror("VIDIOCGPICT");
         return;
     }
 
@@ -462,7 +422,6 @@ void Channel::SetContrast()
 
         if (ioctl(videofd, VIDIOCSPICT, &vid_pic) < 0)
         {
-            perror("VIDIOCSPICT");
             return;
         }
     }
@@ -477,7 +436,6 @@ void Channel::SetBrightness()
 
     if (ioctl(videofd, VIDIOCGPICT, &vid_pic) < 0)
     {
-        perror("VIDIOCGPICT");
         return;
     }
 
@@ -489,7 +447,6 @@ void Channel::SetBrightness()
 
         if (ioctl(videofd, VIDIOCSPICT, &vid_pic) < 0)
         {
-            perror("VIDIOCSPICT");
             return;
         }
     }
@@ -504,7 +461,6 @@ void Channel::SetColour()
 
     if (ioctl(videofd, VIDIOCGPICT, &vid_pic) < 0)
     {
-        perror("VIDIOCGPICT");
         return;
     }
 
@@ -516,7 +472,6 @@ void Channel::SetColour()
 
         if (ioctl(videofd, VIDIOCSPICT, &vid_pic) < 0)
         {
-            perror("VIDIOCSPICT");
             return;
         }
     }
@@ -538,7 +493,6 @@ int Channel::ChangeContrast(bool up)
 
     if (ioctl(videofd, VIDIOCGPICT, &vid_pic) < 0)
     {
-        perror("VIDIOCGPICT");
         return -1;
     }
     if (current_contrast < -1) // Couldn't get from database
@@ -575,7 +529,6 @@ int Channel::ChangeContrast(bool up)
 
     if (ioctl(videofd, VIDIOCSPICT, &vid_pic) < 0)
     {
-        perror("VIDIOCSPICT");
         return -1;
     }
 
@@ -596,7 +549,6 @@ int Channel::ChangeBrightness(bool up)
 
     if (ioctl(videofd, VIDIOCGPICT, &vid_pic) < 0)
     {
-        perror("VIDIOCGPICT");
         return -1;
     }
     if (current_brightness < -1) // Couldn't get from database
@@ -634,7 +586,6 @@ int Channel::ChangeBrightness(bool up)
 
     if (ioctl(videofd, VIDIOCSPICT, &vid_pic) < 0)
     {
-        perror("VIDIOCSPICT");
         return -1;
     }
 
@@ -655,7 +606,6 @@ int Channel::ChangeColour(bool up)
 
     if (ioctl(videofd, VIDIOCGPICT, &vid_pic) < 0)
     {
-        perror("VIDIOCGPICT");
         return -1;
     }
     if (current_colour < -1) // Couldn't get from database
@@ -692,55 +642,8 @@ int Channel::ChangeColour(bool up)
 
     if (ioctl(videofd, VIDIOCSPICT, &vid_pic) < 0)
     {
-        perror("VIDIOCSPICT");
         return -1;
     }
     
     return vid_pic.colour / 655;
 }
-
-bool Channel::ChangeExternalChannel(const QString &channum)
-{
-    if (externalChanger[currentcapchannel].isEmpty())
-        return false;
-
-    QString command = QString("%1 %2").arg(externalChanger[currentcapchannel])
-                                      .arg(channum);
-
-    cout << "External channel change: " << command << endl;
-    pid_t child = fork();
-    if (child < 0)
-    {
-        perror("fork");
-    }
-    else if (child == 0)
-    {
-        for(int i = 3; i < sysconf(_SC_OPEN_MAX) - 1; ++i)
-            close(i);
-        execl("/bin/sh", "sh", "-c", command.ascii(), NULL);
-        perror("exec");
-        exit(1);
-    }
-    else
-    {
-        int status;
-        if (waitpid(child, &status, 0) < 0)
-        {
-            perror("waitpid");
-        }
-        else if (status != 0)
-        {
-            cerr << "External channel change command exited with status "
-                 << status << endl;
-            return false;
-        }
-    }
-
-    return true;
-}
-
-void Channel::StoreInputChannels(void)
-{
-    pParent->StoreInputChannels(inputChannel);
-}
-

@@ -1,5 +1,28 @@
 <!DOCTYPE TS><TS>
 <context>
+    <name>GuideGrid</name>
+    <message>
+        <source>Recording Once</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Timeslot Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>InfoDialog</name>
     <message>
         <source>Episode:</source>
@@ -326,6 +349,10 @@
         <source>SKIP</source>
         <translation>SALTO</translation>
     </message>
+    <message>
+        <source>Searching...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ViewScheduled</name>
@@ -356,6 +383,14 @@
     <message>
         <source>Remember this choice and use it automatically in the future</source>
         <translation>Recordar esta opción y usarla automáticamente en el futuro</translation>
+    </message>
+    <message>
+        <source>Time Conflict</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Conflicts</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

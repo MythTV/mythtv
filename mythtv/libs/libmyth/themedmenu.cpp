@@ -619,7 +619,7 @@ void ThemedMenu::parseSettings(QString dir, QString menuname)
 
     if (!f.open(IO_ReadOnly))
     {
-        cout << "Can't open: " << filename << endl;
+        cerr << "ThemedMenu::parseSettings(): Can't open: " << filename << endl;
         return;
     }
 

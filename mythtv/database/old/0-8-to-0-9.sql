@@ -24,6 +24,26 @@ CREATE TABLE IF NOT EXISTS transcoding (
     isdone INT UNSIGNED NOT NULL DEFAULT 0
 );
 
+CREATE TABLE IF NOT EXISTS channel_dvb
+(
+    chanid INT UNSIGNED NOT NULL PRIMARY KEY,
+    listingid VARCHAR(20) NULL,
+    pids VARCHAR(50),
+    freq INT UNSIGNED,
+    pol CHAR DEFAULT 'V',
+    symbol_rate INT UNSIGNED NULL,
+    tone INT UNSIGNED NULL,
+    diseqc INT UNSIGNED NULL,
+    inversion VARCHAR(10) NULL,
+    bandwidth VARCHAR(10) NULL,
+    hp_code_rate VARCHAR(10) NULL,
+    lp_code_rate VARCHAR(10) NULL,
+    modulation VARCHAR(10) NULL,
+    transmission_mode VARCHAR(10) NULL,
+    guard_interval VARCHAR(10) NULL,
+    hierarchy VARCHAR(10) NULL
+);
+
 ALTER TABLE program ADD COLUMN previouslyshown TINYINT NOT NULL default '0';
 
 ALTER TABLE videosource ADD COLUMN userid VARCHAR(128) NOT NULL default '';
@@ -35,4 +55,7 @@ CREATE INDEX title ON program (title(10));
 INSERT INTO recordingprofiles (name) VALUES ('Transcode');
 
 ALTER TABLE recordedmarkup ADD COLUMN offset VARCHAR(32) NULL; 
+
+ALTER TABLE capturecard ADD COLUMN use_ts INT NULL;
+ALTER TABLE capturecard ADD COLUMN dvb_type CHAR NULL;
   

@@ -544,6 +544,7 @@
         <area>20,70,160,30</area>
         <font>info</font>
         <value>Airdate:</value>
+        <value lang="IT">Trasmissione del:</value>
         <value lang="ES">Fecha de emisiÃ³ón:</value>
         <value lang="CA">Data d'emisiÃ³ó:</value>
       </textarea>
@@ -555,6 +556,7 @@
         <area>20,100,160,30</area>
         <font>info</font>
         <value>Channel:</value>
+        <value lang="IT">Canale:</value>
         <value lang="ES">Canal:</value>
         <value lang="CA">Canal:</value>
       </textarea>
@@ -566,6 +568,7 @@
         <area>20,130,160,30</area>
         <font>info</font>
         <value>Description:</value>
+        <value lang="IT">Descrizione:</value>
         <value lang="ES">DescripciÃ³ón:</value>
         <value lang="CA">DescripciÃ³ó:</value>
       </textarea>
@@ -744,6 +747,7 @@
         <area>20,70,160,30</area>
         <font>info</font>
         <value>Airdate:</value>
+        <value lang="IT">Trasmissione del:</value>
         <value lang="ES">Fecha de emisiÃ³ón:</value>
         <value lang="CA">Data d'emisiÃ³ó:</value>
       </textarea>
@@ -755,6 +759,7 @@
         <area>20,100,160,30</area>
         <font>info</font>
         <value>Channel:</value>
+        <value lang="IT">Canale:</value>
         <value lang="ES">Canal:</value>
         <value lang="CA">Canal:</value>
       </textarea>
@@ -766,6 +771,7 @@
         <area>20,130,160,30</area>
         <font>info</font>
         <value>Description:</value>
+        <value lang="IT">Descrizione:</value>
         <value lang="ES">DescripciÃ³ón:</value>
         <value lang="CA">DescripciÃ³ó:</value>
       </textarea>
@@ -791,6 +797,7 @@
         <area>20,70,160,30</area>
         <font>info</font>
         <value>Airdate:</value>
+        <value lang="IT">Trasmissione del:</value>
         <value lang="ES">Fecha de emisiÃ³ón:</value>
         <value lang="CA">Data d'emisiÃ³ó:</value>
       </textarea>
@@ -802,6 +809,7 @@
         <area>20,100,160,30</area>
         <font>info</font>
         <value>Channel:</value>
+        <value lang="IT">Canale:</value>
         <value lang="ES">Canal:</value>
         <value lang="CA">Canal:</value>
       </textarea>
@@ -813,6 +821,7 @@
         <area>20,130,160,30</area>
         <font>info</font>
         <value>Description:</value>
+        <value lang="IT">Descrizione:</value>
         <value lang="ES">DescripciÃ³ón:</value>
         <value lang="CA">DescripciÃ³ó:</value>
       </textarea>

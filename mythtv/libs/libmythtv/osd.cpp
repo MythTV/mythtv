@@ -786,7 +786,7 @@ bool OSD::LoadTheme(void)
 
     if (!f.open(IO_ReadOnly))
     {
-        cout << "Can't open: " << themefile << endl;
+        cerr << "OSD::LoadTheme(): Can't open: " << themefile << endl;
         return false; 
     }
 

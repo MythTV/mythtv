@@ -15,16 +15,14 @@ using namespace std;
 
 #include "mpegrecorder.h"
 #include "RingBuffer.h"
-
 #include "mythcontext.h"
+#include "programinfo.h"
 
 extern "C" {
 #include "../libavcodec/avcodec.h"
 #include "../libavformat/avformat.h"
 extern AVInputFormat mpegps_demux;
 }
-
-#include "programinfo.h"
 
 MpegRecorder::MpegRecorder()
 {
@@ -52,51 +50,14 @@ MpegRecorder::~MpegRecorder()
         close(readfd);
 }
 
-void MpegRecorder::SetEncodingOption(const QString &opt, int value)
+void MpegRecorder::SetOption(const QString &opt, int value)
 {
     if (opt == "width")
         width = value;
     else if (opt == "height")
         height = value;
     else
-        cerr << "Unknown option: " << opt << ": " << value << endl;
-}
-
-void MpegRecorder::ChangeDeinterlacer(int deint_mode)
-{
-    (void)deint_mode;
-}
-
-void MpegRecorder::SetVideoFilters(QString &filters)
-{
-    (void)filters;
-}
-
-void MpegRecorder::Initialize(void)
-{
-}
-
-static void mpg_write_packet(void *opaque, uint8_t *buf, int buf_size)
-{
-    (void)opaque;
-    (void)buf;
-    (void)buf_size;
-}
-
-static int mpg_read_packet(void *opaque, uint8_t *buf, int buf_size)
-{
-    (void)opaque;
-    (void)buf;
-    (void)buf_size;
-    return 0;
-}
-
-static int mpg_seek_packet(void *opaque, int64_t offset, int whence)
-{
-    (void)opaque;
-    (void)offset;
-    (void)whence;
-    return 0;
+        RecorderBase::SetOption(opt, value);
 }
 
 void MpegRecorder::StartRecording(void)
@@ -140,44 +101,11 @@ void MpegRecorder::StartRecording(void)
     unsigned char buffer[256001];
     int ret;
 
-    encoding = true;
-    recording = true;
-
-    AVInputFormat *fmt = &mpegps_demux;
-    fmt->flags |= AVFMT_NOFILE;
-
-    ic = (AVFormatContext *)av_mallocz(sizeof(AVFormatContext));
-    if (!ic)
+    if (!SetupRecording())
     {
-        cerr << "Couldn't allocate context\n";
+        cerr << "Error initializing recording\n";
         return;
     }
-
-    QString filename = "blah.mpg";
-    char *cfilename = (char *)filename.ascii();
-    AVFormatParameters params;
-
-    ic->pb.buffer_size = 256001;
-    ic->pb.buffer = NULL;
-    ic->pb.buf_ptr = NULL;
-    ic->pb.write_flag = 0;
-    ic->pb.buf_end = NULL;
-    ic->pb.opaque = this;
-    ic->pb.read_packet = mpg_read_packet;
-    ic->pb.write_packet = mpg_write_packet;
-    ic->pb.seek = mpg_seek_packet;
-    ic->pb.pos = 0;
-    ic->pb.must_flush = 0;
-    ic->pb.eof_reached = 0;
-    ic->pb.is_streamed = 0;
-    ic->pb.max_packet_size = 0;
-
-    int err = av_open_input_file(&ic, cfilename, fmt, 0, &params);
-    if (err < 0)
-    {
-        cerr << "Couldn't initialize decocder\n";
-        return;
-    } 
 
     encoding = true;
     recording = true;
@@ -211,6 +139,84 @@ void MpegRecorder::StartRecording(void)
             ProcessData(buffer, ret);
     }
 
+    FinishRecording();
+
+    recording = false;
+}
+
+int MpegRecorder::GetVideoFd(void)
+{
+    return chanfd;
+}
+
+// start common code to the dvbrecorder class.
+
+static void mpg_write_packet(void *opaque, uint8_t *buf, int buf_size)
+{
+    (void)opaque;
+    (void)buf;
+    (void)buf_size;
+}
+
+static int mpg_read_packet(void *opaque, uint8_t *buf, int buf_size)
+{
+    (void)opaque;
+    (void)buf;
+    (void)buf_size;
+    return 0;
+}
+
+static int mpg_seek_packet(void *opaque, int64_t offset, int whence)
+{
+    (void)opaque;
+    (void)offset;
+    (void)whence;
+    return 0;
+}
+
+bool MpegRecorder::SetupRecording(void)
+{
+    AVInputFormat *fmt = &mpegps_demux;
+    fmt->flags |= AVFMT_NOFILE;
+
+    ic = (AVFormatContext *)av_mallocz(sizeof(AVFormatContext));
+    if (!ic)
+    {
+        cerr << "Couldn't allocate context\n";
+        return false;
+    }
+
+    QString filename = "blah.mpg";
+    char *cfilename = (char *)filename.ascii();
+    AVFormatParameters params;
+
+    ic->pb.buffer_size = 256001;
+    ic->pb.buffer = NULL;
+    ic->pb.buf_ptr = NULL;
+    ic->pb.write_flag = 0;
+    ic->pb.buf_end = NULL;
+    ic->pb.opaque = this;
+    ic->pb.read_packet = mpg_read_packet;
+    ic->pb.write_packet = mpg_write_packet;
+    ic->pb.seek = mpg_seek_packet;
+    ic->pb.pos = 0;
+    ic->pb.must_flush = 0;
+    ic->pb.eof_reached = 0;
+    ic->pb.is_streamed = 0;
+    ic->pb.max_packet_size = 0;
+
+    int err = av_open_input_file(&ic, cfilename, fmt, 0, &params);
+    if (err < 0)
+    {
+        cerr << "Couldn't initialize decocder\n";
+        return false;
+    }    
+
+    return true;
+}
+
+void MpegRecorder::FinishRecording(void)
+{
     if (curRecording)
     {
         pthread_mutex_lock(db_lock);
@@ -218,8 +224,20 @@ void MpegRecorder::StartRecording(void)
         curRecording->SetPositionMap(positionMap, db_conn);
         pthread_mutex_unlock(db_lock);
     }
+}
 
-    recording = false;
+void MpegRecorder::ChangeDeinterlacer(int deint_mode)
+{
+    (void)deint_mode;
+}
+
+void MpegRecorder::SetVideoFilters(QString &filters)
+{
+    (void)filters;
+}
+
+void MpegRecorder::Initialize(void)
+{
 }
 
 #define GOP_START     0x000001B8
@@ -353,11 +371,6 @@ bool MpegRecorder::IsRecording(void)
 long long MpegRecorder::GetFramesWritten(void)
 {
     return framesWritten;
-}
-
-int MpegRecorder::GetVideoFd(void)
-{
-    return chanfd;
 }
 
 void MpegRecorder::TransitionToFile(const QString &lfilename)

@@ -1,20 +1,27 @@
-#ifndef MPEGRECORDER_H_
-#define MPEGRECORDER_H_
+#ifndef DVBRECORDER_H_
+#define DVBRECORDER_H_
 
+#include <vector>
 #include "recorderbase.h"
 
+class DVBChannel;
 struct AVFormatContext;
 struct AVPacket;
 
-class MpegRecorder : public RecorderBase
+/* Grabs the video/audio MPEG data from a DVB (a digital TV standard) card. */
+
+class DVBRecorder : public RecorderBase
 {
   public:
-    MpegRecorder();
-   ~MpegRecorder();
+    DVBRecorder(const DVBChannel* dvbchannel);
+   ~DVBRecorder();
 
-    void SetOption(const QString &opt, int value);
+  // Generic MPEG
+  public:
+    void SetOption(const QString &name, int value);
     void SetOption(const QString &name, const QString &value)
-                       { RecorderBase::SetOption(name, value); }
+                                       { RecorderBase::SetOption(name, value); }
+    void SetPID(const vector<int>& some_pids);
     void ChangeDeinterlacer(int deint_mode);
     void SetVideoFilters(QString &filters);
 
@@ -56,15 +63,26 @@ class MpegRecorder : public RecorderBase
 
     int width, height;
 
-    int chanfd;
-    int readfd;
-
     AVFormatContext *ic;
 
     int keyframedist;
     bool gopset;
 
     QMap<long long, long long> positionMap;
+
+  // DVB-specific
+  protected:
+    bool Open();
+    void Close();
+
+    bool isopen;
+    int dvr_fd; // see dvbchannel.h
+    int cardnum; // dito
+    bool was_paused;
+
+    vector<int> pid;
+    bool pid_changed;
+    const DVBChannel* channel;
 };
 
 #endif

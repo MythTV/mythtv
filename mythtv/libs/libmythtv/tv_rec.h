@@ -14,7 +14,7 @@ using namespace std;
 
 class QSqlDatabase;
 class QSocket;
-class Channel;
+class ChannelBase;
 class ProgramInfo;
 class RingBuffer;
 class NuppelVideoRecorder;
@@ -55,22 +55,25 @@ class TVRec
     bool IsPlaying(void) { return StateIsPlaying(internalState); }
     bool IsRecording(void) { return StateIsRecording(internalState); }
 
-    bool CheckChannel(Channel *chan, const QString &channum, int &finetuning); 
-    void SetChannelValue(QString &field_name,int value, Channel *chan,
+    bool CheckChannel(ChannelBase *chan, const QString &channum, 
+                      QSqlDatabase *& a_db_conn, pthread_mutex_t &a_db_lock); 
+    void SetChannelValue(QString &field_name,int value, ChannelBase *chan,
                          const QString &channum);
-    int GetChannelValue(const QString &channel_field,Channel *chan, 
+    int GetChannelValue(const QString &channel_field, ChannelBase *chan, 
                         const QString &channum);
-    bool SetVideoFiltersForChannel(Channel *chan, const QString &channum);
-    QString GetNextChannel(Channel *chan, int channeldirection);
+    bool SetVideoFiltersForChannel(ChannelBase *chan, const QString &channum);
+    QString GetNextChannel(ChannelBase *chan, int channeldirection);
     QString GetNextRelativeChanID(QString channum, int channeldirection);
     void DoGetNextChannel(QString &channum, QString channelinput,
-                                QString device, QString channelorder,
-                                int channeldirection, QString &chanid);
+                          int cardid, QString channelorder,
+                          int channeldirection, QString &chanid);
 
     void RetrieveInputChannels(map<int, QString> &inputChannel,
                                map<int, QString> &inputTuneTo,
                                map<int, QString> &externalChanger);
     void StoreInputChannels(map<int, QString> &inputChannel);
+
+    RecorderBase *GetRecorder(void);
 
     bool IsReallyRecording(void);
     float GetFramerate(void);
@@ -131,14 +134,14 @@ class TVRec
  private:
     void SetChannel(bool needopen = false);
 
-    void GetChannelInfo(Channel *chan, QString &title, QString &subtitle, 
+    void GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle, 
                         QString &desc, QString &category, QString &starttime, 
                         QString &endtime, QString &callsign, QString &iconpath,
                         QString &channelname, QString &chanid);
 
     void GetDevices(int cardnum, QString &video, QString &vbi, QString &audio,
                     int &rate, QString &defaultinput, QString &startchannel,
-                    QString &type);
+                    QString &type, int &use_ts, char &dvb_type);
 
     void ConnectDB(int cardnum);
     void DisconnectDB(void);
@@ -159,7 +162,7 @@ class TVRec
 
     RecorderBase *nvr;
     RingBuffer *rbuffer;
-    Channel *channel;
+    ChannelBase *channel;
 
     int deinterlace_mode;
 

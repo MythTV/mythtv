@@ -1,3 +1,6 @@
+#include <iostream>
+using namespace std;
+
 #include "recorderbase.h"
 
 #include "RingBuffer.h"
@@ -48,7 +51,7 @@ void RecorderBase::SetDB(QSqlDatabase *db, pthread_mutex_t *lock)
     db_lock = lock;
 }
 
-void RecorderBase::SetBaseOption(const QString &name, const QString &value)
+void RecorderBase::SetOption(const QString &name, const QString &value)
 {
     if (name == "codec")
         codec = value;
@@ -82,3 +85,9 @@ void RecorderBase::SetBaseOption(const QString &name, const QString &value)
             vbimode = 0;
     }
 }
+
+void RecorderBase::SetOption(const QString &name, int value)
+{
+    cerr << "Unknown int option: " << name << ": " << value << endl;
+}
+

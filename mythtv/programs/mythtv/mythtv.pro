@@ -1,4 +1,4 @@
-INCLUDEPATH += ../../libs/libmythtv ../../libs
+INCLUDEPATH += ../../libs/libmythtv ../../libs/libmythtv ../../libs
 
 LIBS += -L../../libs/libmythtv -L../../libs/libavcodec -L../../libs/libmyth
 LIBS += -L../../libs/libvbitext -L../../libs/libavformat

@@ -1,4 +1,4 @@
-INCLUDEPATH += ../../libs/libmythtv ../../libs
+INCLUDEPATH += ../../libs/libmythtv ../../libs/libmythtv ../../libs
 
 LIBS += -L../../libs/libmythtv -L../../libs/libavcodec -L../../libs/libmyth
 LIBS += -L../../libs/libvbitext -L../../libs/libavformat
@@ -21,6 +21,13 @@ TARGETDEPS += ../../libs/libmythtv/libmythtv.a
 TARGETDEPS += ../../libs/libavcodec/libavcodec.a
 TARGETDEPS += ../../libs/libvbitext/libvbitext.a
 TARGETDEPS += ../../libs/libavformat/libavformat.a
+
+using_dvb {
+    LIBS += -ldvbdev
+    LIBS += -L../../libs/libdvbdev
+    TARGETDEPS += ../../libs/libdvbdev/libdvbdev.a
+    DEPENDPATH += ../../libs/libdvbdev
+}
 
 # Input
 HEADERS += encoderlink.h filetransfer.h httpstatus.h mainserver.h playbacksock.h

@@ -207,23 +207,23 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
     progMap["rec_type"] = "";
     switch (recordtype) {
     case ScheduledRecording::NotRecording:
-             progMap["rec_str"] = "Not Recording";
+             progMap["rec_str"] = QObject::tr("Not Recording");
              progMap["rec_type"] = "";
              break;
     case ScheduledRecording::SingleRecord:
-             progMap["rec_str"] = "Recording Once";
+             progMap["rec_str"] = QObject::tr("Recording Once");
              progMap["rec_type"] = "R";
              break;
     case ScheduledRecording::TimeslotRecord:
-             progMap["rec_str"] = "Timeslot Recording";
+             progMap["rec_str"] = QObject::tr("Timeslot Recording");
              progMap["rec_type"] = "T";
              break;
     case ScheduledRecording::ChannelRecord:
-             progMap["rec_str"] = "Channel Recording";
+             progMap["rec_str"] = QObject::tr("Channel Recording");
              progMap["rec_type"] = "C";
              break;
     case ScheduledRecording::AllRecord:
-             progMap["rec_str"] = "All Recording";
+             progMap["rec_str"] = QObject::tr("All Recording");
              progMap["rec_type"] = "A";
              break;
     }

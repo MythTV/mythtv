@@ -53,7 +53,9 @@ class NuppelVideoRecorder : public RecorderBase
     NuppelVideoRecorder();
    ~NuppelVideoRecorder();
 
-    void SetEncodingOption(const QString &opt, int value);
+    void SetOption(const QString &name, int value);
+    void SetOption(const QString &name, const QString &value)
+                  { RecorderBase::SetOption(name, value); }
     void ChangeDeinterlacer(int deint_mode);   
  
     void Initialize(void);

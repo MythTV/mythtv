@@ -2638,9 +2638,9 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
     return (char *)outputbuf;
 }
 
-#define SetOption(profile, name) { \
+#define SetProfileOption(profile, name) { \
     int value = profile.byName(name)->getValue().toInt(); \
-    nvr->SetEncodingOption(name, value); \
+    nvr->SetOption(name, value); \
 }
 
 bool NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
@@ -2669,32 +2669,32 @@ bool NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
     nvr->SetFrameRate(video_frame_rate);
 
     // this is ripped from tv_rec SetupRecording. It'd be nice to consolodate
-    nvr->SetEncodingOption("width", video_width);
-    nvr->SetEncodingOption("height", video_height);
+    nvr->SetOption("width", video_width);
+    nvr->SetOption("height", video_height);
 
-    nvr->SetBaseOption("tvformat", gContext->GetSetting("TVFormat"));
-    nvr->SetBaseOption("vbiformat", gContext->GetSetting("VbiFormat"));
+    nvr->SetOption("tvformat", gContext->GetSetting("TVFormat"));
+    nvr->SetOption("vbiformat", gContext->GetSetting("VbiFormat"));
 
     QString setting = profile.byName("videocodec")->getValue();
     if (setting == "MPEG-4") 
     {
-        nvr->SetBaseOption("codec", "mpeg4");
+        nvr->SetOption("codec", "mpeg4");
 
-        SetOption(profile, "mpeg4bitrate");
-        SetOption(profile, "mpeg4scalebitrate");
-        SetOption(profile, "mpeg4maxquality");
-        SetOption(profile, "mpeg4minquality");
-        SetOption(profile, "mpeg4qualdiff");
-        SetOption(profile, "mpeg4optionvhq");
-        SetOption(profile, "mpeg4option4mv");
+        SetProfileOption(profile, "mpeg4bitrate");
+        SetProfileOption(profile, "mpeg4scalebitrate");
+        SetProfileOption(profile, "mpeg4maxquality");
+        SetProfileOption(profile, "mpeg4minquality");
+        SetProfileOption(profile, "mpeg4qualdiff");
+        SetProfileOption(profile, "mpeg4optionvhq");
+        SetProfileOption(profile, "mpeg4option4mv");
         nvr->SetupAVCodec();
     } 
     else if (setting == "RTjpeg") 
     {
-        nvr->SetBaseOption("codec", "rtjpeg");
-        SetOption(profile, "rtjpegquality");
-        SetOption(profile, "rtjpegchromafilter");
-        SetOption(profile, "rtjpeglumafilter");
+        nvr->SetOption("codec", "rtjpeg");
+        SetProfileOption(profile, "rtjpegquality");
+        SetProfileOption(profile, "rtjpegchromafilter");
+        SetProfileOption(profile, "rtjpeglumafilter");
     } 
     else 
     {
@@ -2704,14 +2704,14 @@ bool NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
     setting = profile.byName("audiocodec")->getValue();
     if (setting == "MP3") 
     {
-        nvr->SetEncodingOption("audiocompression", 1);
-        SetOption(profile, "mp3quality");
-        SetOption(profile, "samplerate");
+        nvr->SetOption("audiocompression", 1);
+        SetProfileOption(profile, "mp3quality");
+        SetProfileOption(profile, "samplerate");
         decoder->SetRawFrameState(true);
     } 
     else if (setting == "Uncompressed") 
     {
-        nvr->SetEncodingOption("audiocompression", 0);
+        nvr->SetOption("audiocompression", 0);
     } 
     else 
     {
@@ -2780,7 +2780,7 @@ bool NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
             // audio is fully decoded, so we need to reencode it
             if ((audioframesize = audiolen(false))) 
             {
-                nvr->SetEncodingOption("audioframesize", audioframesize);
+                nvr->SetOption("audioframesize", audioframesize);
                 int starttime = audbuf_timecode - 
                                 (int)((audioframesize * 100000.0)
                                 / (audio_bytes_per_sample * effdsp));

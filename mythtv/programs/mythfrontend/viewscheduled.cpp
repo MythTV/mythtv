@@ -554,7 +554,7 @@ void ViewScheduled::updateConflict(QPainter *p)
         {
            UITextType *type = (UITextType *)container->GetType("status");
            if (type)
-               type->SetText("Time Conflict");
+               type->SetText(tr("Time Conflict"));
         }
     }
     else
@@ -563,7 +563,7 @@ void ViewScheduled::updateConflict(QPainter *p)
         {
            UITextType *type = (UITextType *)container->GetType("status");
            if (type)
-               type->SetText("No Conflicts");
+               type->SetText(tr("No Conflicts"));
         }
     }
 

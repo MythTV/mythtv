@@ -202,7 +202,7 @@ NuppelVideoRecorder::~NuppelVideoRecorder(void)
     }
 }
 
-void NuppelVideoRecorder::SetEncodingOption(const QString &opt, int value)
+void NuppelVideoRecorder::SetOption(const QString &opt, int value)
 {
     if (opt == "width")
         w = value;
@@ -253,7 +253,7 @@ void NuppelVideoRecorder::SetEncodingOption(const QString &opt, int value)
     else if (opt == "audioframesize")
         audio_buffer_size = value;
     else
-        cerr << "Unknown encoding setting: " << opt << endl;
+        RecorderBase::SetOption(opt, value);
 }
 
 void NuppelVideoRecorder::Pause(bool clear)

@@ -1,0 +1,11 @@
+This allows to tune to a certain channel, doing all the nasty device driver interface work. It also does (part of) the work to read and postprocess (demux) the data.
+
+One goal is to be able to read several channels at the same time on the same transport stream using a single budget card only (e.g. Nova - this doesn't work with full cards with MPEG decoder). I don't think I can do that directly with the hardware or driver demux, I need to do that in userspace here.
+
+Maybe I can reduce the amount of data to process by using the hardware demux to filter out all unwanted data and then later demux in userspace to part the different channels, but I think the current drivers are limited to 8 hardware PIDs, which would allow for max. 4 channels with video and one audio stream each. Not sure, if that is sufficient or workable.
+
+* tune_it() tunes the DVB card. implemented solely by tune.c/h, stolen from dvbstream.
+* set_ts_filter() sets the PID filters in the DVB hardware or driver. Implemented solely within dvbdev.c, stolen from dvbstream.
+* ts_to_ps() filters for certain (currently 2) PIDs in (userlevel) software and also converts an MPEG TS to an MPEG PS. (I can't believe that I spent 3 days to write this simple function, including finding a suitable base lib). Implemented using the prestine mpegtools files transform.c/h, ringbuffy.c/h, remux.c/h and ctools.c/h.
+
+Ben Bucksch

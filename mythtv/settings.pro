@@ -18,3 +18,9 @@ release {
 }
 
 EXTRA_LIBS = -L/usr/X11R6/lib -lXinerama -lXv -lX11 -lXext
+
+# DVB stuff
+#CONFIG += using_dvb
+#DEFINES += USING_DVB
+#INCLUDEPATH += /usr/src/linux/include/linux/dvb/
+

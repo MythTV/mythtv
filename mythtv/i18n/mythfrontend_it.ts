@@ -2,34 +2,6 @@
 <context>
     <name>GuideGrid</name>
     <message>
-        <source>Episode:</source>
-        <translation type="obsolete">Episodio: </translation>
-    </message>
-    <message>
-        <source>Recording:</source>
-        <translation type="obsolete">Registrazione: </translation>
-    </message>
-    <message>
-        <source>Description:</source>
-        <translation type="obsolete">Descrizione: </translation>
-    </message>
-    <message>
-        <source>   (6) Program Finder   </source>
-        <translation type="obsolete">   (6) Ricerca Programmi    </translation>
-    </message>
-    <message>
-        <source>   (4) All Programs   </source>
-        <translation type="obsolete">   (4) Tutti i Programmi   </translation>
-    </message>
-    <message>
-        <source>   (4) Favorite Programs   </source>
-        <translation type="obsolete">    (4) Programmi Preferiti   </translation>
-    </message>
-    <message>
-        <source>Not Recording</source>
-        <translation>Nessuna Registrazione</translation>
-    </message>
-    <message>
         <source>Recording Once</source>
         <translation>Registrazione singolo evento</translation>
     </message>
@@ -45,16 +17,20 @@
         <source>All Recording</source>
         <translation>Reg. aut. su tutti i canali</translation>
     </message>
+    <message>
+        <source>Not Recording</source>
+        <translation>Nessuna registrazione</translation>
+    </message>
 </context>
 <context>
     <name>InfoDialog</name>
     <message>
         <source>Episode:</source>
-        <translation>Episodio: </translation>
+        <translation>Episodio:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation>Descrizione: </translation>
+        <translation>Descrizione:</translation>
     </message>
     <message>
         <source>Record this program whenever it&apos;s shown anywhere</source>
@@ -89,19 +65,15 @@
     </message>
     <message>
         <source>Space</source>
-        <translation>Spazio</translation>
+        <translation type="obsolete">Spazio</translation>
     </message>
     <message>
         <source>Point</source>
-        <translation>Punto</translation>
+        <translation type="obsolete">Punto</translation>
     </message>
     <message>
         <source>Comma</source>
-        <translation>Virgola</translation>
-    </message>
-    <message>
-        <source>Erase</source>
-        <translation type="obsolete">Cancella</translation>
+        <translation type="obsolete">Virgola</translation>
     </message>
     <message>
         <source>Title:</source>
@@ -109,15 +81,15 @@
     </message>
     <message>
         <source>Channel:</source>
-        <translation>Canale:</translation>
+        <translation type="obsolete">Canale:</translation>
     </message>
     <message>
         <source>Start: (YYYY/MM/DD)</source>
-        <translation>Inizio: (AAAA/MM/GG)</translation>
+        <translation type="obsolete">Inizio: (AAAA/MM/GG)</translation>
     </message>
     <message>
         <source>(HH:MM)</source>
-        <translation>(HH:MM)</translation>
+        <translation type="obsolete">(HH:MM)</translation>
     </message>
     <message>
         <source>Duration:</source>
@@ -129,19 +101,31 @@
     </message>
     <message>
         <source>Confirm recording</source>
-        <translation>Conferma registrazione</translation>
+        <translation type="obsolete">Conferma registrazione</translation>
     </message>
     <message>
         <source>Manual recording</source>
-        <translation>Registrazione manuale</translation>
+        <translation type="obsolete">Registrazione manuale</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation>Sconosciuto</translation>
+        <translation type="obsolete">Sconosciuto</translation>
     </message>
     <message>
         <source>Rubber</source>
-        <translation>Cancella</translation>
+        <translation type="obsolete">Cancella</translation>
+    </message>
+    <message>
+        <source>Subtitle:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -209,27 +193,62 @@
         <source>Not recording this showing</source>
         <translation>Nessuna registrazione</translation>
     </message>
+    <message>
+        <source>No Programs</source>
+        <translation>Nessun programma</translation>
+    </message>
+    <message>
+        <source>There are no available programs under this search. Please select another search.</source>
+        <translation>Non ci sono programmi disponibili con questa ricerca. Seleziona un&apos;altra ricerca</translation>
+    </message>
+    <message>
+        <source>Error!</source>
+        <translation>Errore!</translation>
+    </message>
+    <message>
+        <source>       !! No Programs !!</source>
+        <translation>       !! Nessun Programma !!</translation>
+    </message>
+</context>
+<context>
+    <name>QObject</name>
+    <message>
+        <source>Do you really want to exit MythTV?</source>
+        <translation>Vuoi veramente uscire da MythTV?</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>No</translation>
+    </message>
+    <message>
+        <source>Yes, Exit now</source>
+        <translation>Si, esci subito</translation>
+    </message>
+    <message>
+        <source>Yes, Exit and shutdown the computer</source>
+        <translation>Si, esci e spengi il computer</translation>
+    </message>
 </context>
 <context>
     <name>ScheduledRecording</name>
     <message>
         <source>Episode:</source>
-        <translation>Episodio: </translation>
+        <translation>Episodio:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation>Descrizione: </translation>
+        <translation>Descrizione:</translation>
     </message>
 </context>
 <context>
     <name>SetRecTimeDialog</name>
     <message>
         <source>Episode:</source>
-        <translation>Episodio: </translation>
+        <translation>Episodio:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation>Descrizione: </translation>
+        <translation>Descrizione:</translation>
     </message>
     <message>
         <source>Start Time: </source>
@@ -286,53 +305,97 @@
         <source>Delete this recording</source>
         <translation>Cancella questa registrazione</translation>
     </message>
+    <message>
+        <source>%02d:%02d:%02d behind  --  %.2f%% full</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%02d:%02d:%02d behind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%02d:%02d behind  --  %.2f%% full</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%02d:%02d behind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%02d:%02d:%02d of %02d:%02d:%02d</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%02d:%02d of %02d:%02d</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paused</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Forward </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rewind </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump Ahead</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump Back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Searching...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SKIP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Brightness %1 %</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust Picture</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Contrast %1 %</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Colour %1 %</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Volume %1 %</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust Volume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mute On</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mute Off</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ViewScheduled</name>
-    <message>
-        <source>Channel: </source>
-        <translation type="obsolete">Canale: </translation>
-    </message>
-    <message>
-        <source>Episode: </source>
-        <translation type="obsolete">Episodio: </translation>
-    </message>
-    <message>
-        <source>Description: </source>
-        <translation type="obsolete">Descrizione: </translation>
-    </message>
-    <message>
-        <source>Airdate: </source>
-        <translation type="obsolete">Trasmissione del: </translation>
-    </message>
-    <message>
-        <source>Select a recording to view:</source>
-        <translation type="obsolete">Seleziona la registrazione da vedere:</translation>
-    </message>
-    <message>
-        <source>Chan</source>
-        <translation type="obsolete">Canale</translation>
-    </message>
-    <message>
-        <source>Date</source>
-        <translation type="obsolete">Data</translation>
-    </message>
-    <message>
-        <source>Title</source>
-        <translation type="obsolete">Titolo</translation>
-    </message>
-    <message>
-        <source>Conflicting recordings are highlighted in &lt;font color=&quot;red&quot;&gt;red&lt;/font&gt;.&lt;br&gt;Deactivated recordings are highlighted in &lt;font color=&quot;gray&quot;&gt;gray&lt;/font&gt;.</source>
-        <translation type="obsolete">Le registrazioni in conflitto sono evidenziate in &lt;font color=&quot;red&quot;&gt;rosso&lt;/font&gt;.&lt;br&gt;Le registrazioni disattivate sono evidenziate in &lt;font color=&quot;gray&quot;&gt;grigio&lt;/font&gt;.</translation>
-    </message>
-    <message>
-        <source>You have time conflicts.</source>
-        <translation type="obsolete">Hai dei conflitti nelle registrazioni</translation>
-    </message>
-    <message>
-        <source>You have no recording conflicts.</source>
-        <translation type="obsolete">Non hai nessun conflitto nelle registrazioni</translation>
-    </message>
     <message>
         <source>Recording this program has been deactivated because it conflicts with another scheduled recording.  Do you want to re-enable this recording?</source>
         <translation>La registrazione di questo programma e&apos; stata disattivata perche&apos; in conflitto con altre. Vuoi riattivare la registrazione?</translation>

@@ -976,19 +976,19 @@ void GuideGrid::paintInfo(QPainter *p)
     switch (recordtype) 
     {
         case ScheduledRecording::SingleRecord:
-            recStatus = "Recording Once";
+            recStatus = tr("Recording Once");
             break;
         case ScheduledRecording::TimeslotRecord:
-            recStatus = "Timeslot Recording";
+            recStatus = tr("Timeslot Recording");
             break;
         case ScheduledRecording::ChannelRecord:
-            recStatus = "Channel Recording";
+            recStatus = tr("Channel Recording");
             break;
         case ScheduledRecording::AllRecord:
-            recStatus = "All Recording";
+            recStatus = tr("All Recording");
             break;
         case ScheduledRecording::NotRecording:
-            recStatus = "Not Recording";
+            recStatus = tr("Not Recording");
             break;
     }
 

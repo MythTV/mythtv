@@ -21,8 +21,10 @@ using namespace std;
 #include "recorderbase.h"
 #include "NuppelVideoRecorder.h"
 #include "mpegrecorder.h"
+#include "dvbrecorder.h"
 #include "NuppelVideoPlayer.h"
 #include "channel.h"
+#include "dvbchannel.h"
 #include "commercial_skip.h"
 
 void *SpawnEncode(void *param)
@@ -57,20 +59,33 @@ TVRec::TVRec(int capturecardnum)
     audiosamplerate = -1;
 
     QString inputname, startchannel;
+    int use_ts = 0;
+    char dvb_type = '\0';
 
     GetDevices(capturecardnum, videodev, vbidev, audiodev, audiosamplerate,
-               inputname, startchannel, cardtype);
+               inputname, startchannel, cardtype, use_ts, dvb_type);
 
-    channel = new Channel(this, videodev);
-    channel->Open();
-    channel->SetFormat(gContext->GetSetting("TVFormat"));
-    channel->SetFreqTable(gContext->GetSetting("FreqTable"));
-    if (inputname.isEmpty())
-        channel->SetChannelByString(startchannel);
+    if (cardtype == "DVB")
+    {
+        channel = new DVBChannel(this, videodev.toInt(), use_ts == 1, dvb_type);
+        if (channel->SetChannelByString(startchannel))
+            channel->SetChannelOrdering(chanorder);
+        // don't close this channel, otherwise we cannot read data
+    }
     else
-        channel->SwitchToInput(inputname, startchannel);
-    channel->SetChannelOrdering(chanorder);
-    channel->Close();
+    {
+        Channel *achannel = new Channel(this, videodev);
+        channel = achannel;
+        channel->Open();
+        achannel->SetFormat(gContext->GetSetting("TVFormat"));
+        achannel->SetFreqTable(gContext->GetSetting("FreqTable"));
+        if (inputname.isEmpty())
+            channel->SetChannelByString(startchannel);
+        else
+            channel->SwitchToInput(inputname, startchannel);
+        channel->SetChannelOrdering(chanorder);
+        channel->Close();
+    }
 }
 
 void TVRec::Init(void)
@@ -456,6 +471,7 @@ void TVRec::HandleStateChange(void)
     if (closeRecorder)
     {
         TeardownRecorder(killRecordingFile);
+        channel->SetFd(-1);
     }
 
     changeState = false;
@@ -464,7 +480,7 @@ void TVRec::HandleStateChange(void)
 void TVRec::SetOption(RecordingProfile &profile, const QString &name)
 {
     int value = profile.byName(name)->getValue().toInt();
-    nvr->SetEncodingOption(name, value);
+    nvr->SetOption(name, value);
 }
 
 void TVRec::SetupRecorder(RecordingProfile &profile) 
@@ -473,19 +489,27 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
     {
         nvr = new MpegRecorder();
         nvr->SetRingBuffer(rbuffer);
-        nvr->SetBaseOption("videodevice", videodev);
-        nvr->SetBaseOption("tvformat", gContext->GetSetting("TVFormat"));
-        nvr->SetBaseOption("vbiformat", gContext->GetSetting("VbiFormat"));
+        nvr->SetOption("videodevice", videodev);
+        nvr->SetOption("tvformat", gContext->GetSetting("TVFormat"));
+        nvr->SetOption("vbiformat", gContext->GetSetting("VbiFormat"));
 
         SetOption(profile, "width");
         SetOption(profile, "height");
 
         if (ispip)
         {
-            nvr->SetEncodingOption("width", 160);
-            nvr->SetEncodingOption("height", 128);
+            nvr->SetOption("width", 160);
+            nvr->SetOption("height", 128);
         }
 
+        nvr->Initialize();
+        return;
+    }
+    else if (cardtype == "DVB")
+    {
+        nvr = new DVBRecorder(dynamic_cast<DVBChannel*>(channel));
+        nvr->SetRingBuffer(rbuffer);
+        nvr->SetOption("cardnum", videodev.toInt());
         nvr->Initialize();
         return;
     }
@@ -496,16 +520,16 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
 
     nvr->SetRingBuffer(rbuffer);
 
-    nvr->SetBaseOption("videodevice", videodev);
-    nvr->SetBaseOption("vbidevice", vbidev);
-    nvr->SetBaseOption("tvformat", gContext->GetSetting("TVFormat"));
-    nvr->SetBaseOption("vbiformat", gContext->GetSetting("VbiFormat"));
-    nvr->SetBaseOption("audiodevice", audiodev);
+    nvr->SetOption("videodevice", videodev);
+    nvr->SetOption("vbidevice", vbidev);
+    nvr->SetOption("tvformat", gContext->GetSetting("TVFormat"));
+    nvr->SetOption("vbiformat", gContext->GetSetting("VbiFormat"));
+    nvr->SetOption("audiodevice", audiodev);
 
     QString setting = profile.byName("videocodec")->getValue();
     if (setting == "MPEG-4") 
     {
-        nvr->SetBaseOption("codec", "mpeg4");
+        nvr->SetOption("codec", "mpeg4");
 
         SetOption(profile, "mpeg4bitrate");
         SetOption(profile, "mpeg4scalebitrate");
@@ -517,7 +541,7 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
     } 
     else if (setting == "RTjpeg") 
     {
-        nvr->SetBaseOption("codec", "rtjpeg");
+        nvr->SetOption("codec", "rtjpeg");
 
         SetOption(profile, "rtjpegquality");
         SetOption(profile, "rtjpegchromafilter");
@@ -525,7 +549,7 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
     } 
     else if (setting == "Hardware MJPEG") 
     {
-        nvr->SetBaseOption("codec", "hardware-mjpeg");
+        nvr->SetOption("codec", "hardware-mjpeg");
 
         SetOption(profile, "hardwaremjpegquality");
         SetOption(profile, "hardwaremjpeghdecimation");
@@ -537,12 +561,12 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
     setting = profile.byName("audiocodec")->getValue();
     if (setting == "MP3") 
     {
-        nvr->SetEncodingOption("audiocompression", 1);
+        nvr->SetOption("audiocompression", 1);
         SetOption(profile, "mp3quality");
         SetOption(profile, "samplerate");
     } 
     else if (setting == "Uncompressed") 
-        nvr->SetEncodingOption("audiocompression", 0);
+        nvr->SetOption("audiocompression", 0);
     else 
         cerr << "Unknown audio codec: " << setting << endl;
 
@@ -551,17 +575,23 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
 
     if (ispip)
     {
-        nvr->SetBaseOption("codec", "rtjpeg");
+        nvr->SetOption("codec", "rtjpeg");
 
-        nvr->SetEncodingOption("width", 160);
-        nvr->SetEncodingOption("height", 128);
-        nvr->SetEncodingOption("rtjpegchromafilter", 0);
-        nvr->SetEncodingOption("rtjpeglumafilter", 0);
-        nvr->SetEncodingOption("rtjpegquality", 255);
-        nvr->SetEncodingOption("audiocompression", 0);
+        nvr->SetOption("width", 160);
+        nvr->SetOption("height", 128);
+        nvr->SetOption("rtjpegchromafilter", 0);
+        nvr->SetOption("rtjpeglumafilter", 0);
+        nvr->SetOption("rtjpegquality", 255);
+        nvr->SetOption("audiocompression", 0);
     }
  
     nvr->Initialize();
+}
+
+// Needed by DVBChannel to set the PIDs of DVBRecorder
+RecorderBase* TVRec::GetRecorder()
+{
+    return nvr;
 }
 
 void TVRec::TeardownRecorder(bool killFile)
@@ -778,7 +808,7 @@ void TVRec::RunTV(void)
     HandleStateChange();
 }
 
-void TVRec::GetChannelInfo(Channel *chan, QString &title, QString &subtitle, 
+void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
                            QString &desc, QString &category, 
                            QString &starttime, QString &endtime, 
                            QString &callsign, QString &iconpath, 
@@ -812,7 +842,6 @@ void TVRec::GetChannelInfo(Channel *chan, QString &title, QString &subtitle,
    
     channelname = chan->GetCurrentName();
     QString channelinput = chan->GetCurrentInput();
-    QString device = chan->GetDevice();
  
     QString thequery = QString("SELECT starttime,endtime,title,subtitle,"
                                "description,category,callsign,icon,"
@@ -824,10 +853,10 @@ void TVRec::GetChannelInfo(Channel *chan, QString &title, QString &subtitle,
                                "channel.sourceid = cardinput.sourceid AND "
                                "cardinput.inputname = \"%4\" AND "
                                "cardinput.cardid = capturecard.cardid AND "
-                               "capturecard.videodevice = \"%5\" AND "
+                               "capturecard.cardid = \"%5\" AND "
                                "capturecard.hostname = \"%6\";")
                                .arg(channelname).arg(curtimestr).arg(curtimestr)
-                               .arg(channelinput).arg(device)
+                               .arg(channelinput).arg(m_capturecardnum)
                                .arg(gContext->GetHostName());
 
     QSqlQuery query = db_conn->exec(thequery);
@@ -871,10 +900,10 @@ void TVRec::GetChannelInfo(Channel *chan, QString &title, QString &subtitle,
                                    "channel.sourceid = cardinput.sourceid AND "
                                    "cardinput.inputname = \"%2\" AND "
                                    "cardinput.cardid = capturecard.cardid AND "
-                                   "capturecard.videodevice = \"%3\" AND "
+                                   "capturecard.cardid = \"%3\" AND "
                                    "capturecard.hostname = \"%4\";")
                                    .arg(channelname)
-                                   .arg(channelinput).arg(device)
+                                   .arg(channelinput).arg(m_capturecardnum)
                                    .arg(gContext->GetHostName());
 
         QSqlQuery query = db_conn->exec(thequery);
@@ -935,7 +964,8 @@ void TVRec::DisconnectDB(void)
 
 void TVRec::GetDevices(int cardnum, QString &video, QString &vbi, 
                        QString &audio, int &rate, QString &defaultinput,
-                       QString &startchan, QString &type)
+                       QString &startchan, QString &type, int &use_ts,
+                       char &dvb_type)
 {
     video = "";
     vbi = "";
@@ -949,7 +979,8 @@ void TVRec::GetDevices(int cardnum, QString &video, QString &vbi,
     MythContext::KickDatabase(db_conn);
 
     QString thequery = QString("SELECT videodevice,vbidevice,audiodevice,"
-                               "audioratelimit,defaultinput,cardtype "
+                               "audioratelimit,defaultinput,cardtype, "
+                               "use_ts,dvb_type "
                                "FROM capturecard WHERE cardid = %1;")
                               .arg(cardnum);
 
@@ -980,6 +1011,10 @@ void TVRec::GetDevices(int cardnum, QString &video, QString &vbi,
         test = query.value(5).toString();
         if (test != QString::null)
             type = QString::fromUtf8(test);
+        use_ts = query.value(6).toInt();
+        test = query.value(7).toString();
+        if (test != QString::null)
+            dvb_type = test[0].latin1();
 
         if (testnum > 0)
             rate = testnum;
@@ -1009,31 +1044,39 @@ void TVRec::GetDevices(int cardnum, QString &video, QString &vbi,
     pthread_mutex_unlock(&db_lock);
 }
 
-bool TVRec::CheckChannel(Channel *chan, const QString &channum, int &finetuning)
+bool TVRec::CheckChannel(QString name)
 {
-    finetuning = 0;
+    QSqlDatabase* dummy1;
+    pthread_mutex_t dummy2;
+    return CheckChannel(channel, name, dummy1, dummy2);
+}
 
+bool TVRec::CheckChannel(ChannelBase *chan, const QString &channum, 
+                         QSqlDatabase *&a_db_conn, pthread_mutex_t &a_db_lock)
+{
     if (!db_conn)
         return true;
 
-    pthread_mutex_lock(&db_lock);
+    a_db_conn = db_conn;
+    a_db_lock = db_lock;
 
+    pthread_mutex_lock(&db_lock);
     MythContext::KickDatabase(db_conn);
 
     bool ret = false;
 
     QString channelinput = chan->GetCurrentInput();
-    QString device = chan->GetDevice();
 
-    QString thequery = QString("SELECT channel.finetune FROM "
+    QString thequery = QString("SELECT channel.chanid FROM "
                                "channel,capturecard,cardinput "
                                "WHERE channel.channum = \"%1\" AND "
                                "channel.sourceid = cardinput.sourceid AND "
                                "cardinput.inputname = \"%2\" AND "
                                "cardinput.cardid = capturecard.cardid AND "
-                               "capturecard.videodevice = \"%3\" AND "
+                               "capturecard.cardid = \"%3\" AND "
                                "capturecard.hostname = \"%4\";")
-                               .arg(channum).arg(channelinput).arg(device)
+                               .arg(channum).arg(channelinput)
+                               .arg(m_capturecardnum)
                                .arg(gContext->GetHostName());
 
     QSqlQuery query = db_conn->exec(thequery);
@@ -1042,10 +1085,6 @@ bool TVRec::CheckChannel(Channel *chan, const QString &channum, int &finetuning)
         MythContext::DBError("checkchannel", query);
     else if (query.numRowsAffected() > 0)
     {
-        query.next();
-
-        finetuning = query.value(0).toInt();
-
         pthread_mutex_unlock(&db_lock);
         return true;
     }
@@ -1061,7 +1100,7 @@ bool TVRec::CheckChannel(Channel *chan, const QString &channum, int &finetuning)
     return ret;
 }
 
-bool TVRec::SetVideoFiltersForChannel(Channel *chan, const QString &channum)
+bool TVRec::SetVideoFiltersForChannel(ChannelBase *chan, const QString &channum)
 {
 
     if (!db_conn)
@@ -1074,7 +1113,6 @@ bool TVRec::SetVideoFiltersForChannel(Channel *chan, const QString &channum)
     bool ret = false;
 
     QString channelinput = chan->GetCurrentInput();
-    QString device = chan->GetDevice();
     QString videoFilters = "";
 
     QString thequery = QString("SELECT channel.videofilters FROM "
@@ -1083,9 +1121,10 @@ bool TVRec::SetVideoFiltersForChannel(Channel *chan, const QString &channum)
                                "channel.sourceid = cardinput.sourceid AND "
                                "cardinput.inputname = \"%2\" AND "
                                "cardinput.cardid = capturecard.cardid AND "
-                               "capturecard.videodevice = \"%3\" AND "
+                               "capturecard.cardid = \"%3\" AND "
                                "capturecard.hostname = \"%4\";")
-                               .arg(channum).arg(channelinput).arg(device)
+                               .arg(channum).arg(channelinput)
+                               .arg(m_capturecardnum)
                                .arg(gContext->GetHostName());
 
     QSqlQuery query = db_conn->exec(thequery);
@@ -1121,7 +1160,7 @@ bool TVRec::SetVideoFiltersForChannel(Channel *chan, const QString &channum)
     return ret;
 }
 
-int TVRec::GetChannelValue(const QString &channel_field,Channel *chan, 
+int TVRec::GetChannelValue(const QString &channel_field, ChannelBase *chan, 
                            const QString &channum)
 {
     int retval = -1;
@@ -1134,7 +1173,6 @@ int TVRec::GetChannelValue(const QString &channel_field,Channel *chan,
     MythContext::KickDatabase(db_conn);
 
     QString channelinput = chan->GetCurrentInput();
-    QString device = chan->GetDevice();
    
     QString thequery = QString("SELECT channel.%1 FROM "
                                "channel,capturecard,cardinput "
@@ -1142,10 +1180,10 @@ int TVRec::GetChannelValue(const QString &channel_field,Channel *chan,
                                "channel.sourceid = cardinput.sourceid AND "
                                "cardinput.inputname = \"%3\" AND "
                                "cardinput.cardid = capturecard.cardid AND "
-                               "capturecard.videodevice = \"%4\" AND "
+                               "capturecard.cardid = \"%4\" AND "
                                "capturecard.hostname = \"%5\";")
                                .arg(channel_field).arg(channum)
-                               .arg(channelinput).arg(device)
+                               .arg(channelinput).arg(m_capturecardnum)
                                .arg(gContext->GetHostName());
 
     QSqlQuery query = db_conn->exec(thequery);
@@ -1163,7 +1201,7 @@ int TVRec::GetChannelValue(const QString &channel_field,Channel *chan,
     return retval;
 }
 
-void TVRec::SetChannelValue(QString &field_name,int value, Channel *chan,
+void TVRec::SetChannelValue(QString &field_name,int value, ChannelBase *chan,
                             const QString &channum)
 {
 
@@ -1175,7 +1213,6 @@ void TVRec::SetChannelValue(QString &field_name,int value, Channel *chan,
     MythContext::KickDatabase(db_conn);
 
     QString channelinput = chan->GetCurrentInput();
-    QString device = chan->GetDevice();
 
     // Only mysql 4.x can do multi table updates so we need two steps to get 
     // the sourceid from the table join.
@@ -1185,9 +1222,10 @@ void TVRec::SetChannelValue(QString &field_name,int value, Channel *chan,
                                "channel.sourceid = cardinput.sourceid AND "
                                "cardinput.inputname = \"%2\" AND "
                                "cardinput.cardid = capturecard.cardid AND "
-                               "capturecard.videodevice = \"%3\" AND "
+                               "capturecard.cardid = \"%3\" AND "
                                "capturecard.hostname = \"%4\";")
-                               .arg(channum).arg(channelinput).arg(device)
+                               .arg(channum).arg(channelinput)
+                               .arg(m_capturecardnum)
                                .arg(gContext->GetHostName());
 
     QSqlQuery query = db_conn->exec(thequery);
@@ -1214,21 +1252,18 @@ void TVRec::SetChannelValue(QString &field_name,int value, Channel *chan,
     pthread_mutex_unlock(&db_lock);
 }
 
-QString TVRec::GetNextChannel(Channel *chan, int channeldirection)
+QString TVRec::GetNextChannel(ChannelBase *chan, int channeldirection)
 {
     QString ret = "";
 
     // Get info on the current channel we're on
     QString channum = chan->GetCurrentName();
-    QString channelinput = chan->GetCurrentInput();
-    QString device = chan->GetDevice();
-    QString channelorder = chan->GetOrdering();
     QString chanid = "";
 
-    DoGetNextChannel(channum, channelinput, device, channelorder,
-                             channeldirection, chanid);
+    DoGetNextChannel(channum, chan->GetCurrentInput(), m_capturecardnum,
+                     chan->GetOrdering(), channeldirection, chanid);
 
-    return(channum);
+    return channum;
 }
 
 QString TVRec::GetNextRelativeChanID(QString channum, int channeldirection)
@@ -1236,20 +1271,18 @@ QString TVRec::GetNextRelativeChanID(QString channum, int channeldirection)
 
     // Get info on the current channel we're on
     QString channum_out = channum;
-    QString channelinput = channel->GetCurrentInput();
-    QString device = channel->GetDevice();
-    QString channelorder = channel->GetOrdering();
     QString chanid = "";
 
-    DoGetNextChannel(channum_out, channelinput, device, channelorder,
-                             channeldirection, chanid);
+    DoGetNextChannel(channum_out, channel->GetCurrentInput(), 
+                     m_capturecardnum, channel->GetOrdering(),
+                     channeldirection, chanid);
 
-    return(chanid);
+    return chanid;
 }
 
 void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
-                                QString device, QString channelorder,
-                                int channeldirection, QString &chanid)
+                             int cardid, QString channelorder,
+                             int channeldirection, QString &chanid)
 {
     pthread_mutex_lock(&db_lock);
 
@@ -1271,10 +1304,10 @@ void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
                                "channel.sourceid = cardinput.sourceid AND "
                                "cardinput.inputname = \"%3\" AND "
                                "cardinput.cardid = capturecard.cardid AND "
-                               "capturecard.videodevice = \"%4\" AND "
+                               "capturecard.cardid = \"%4\" AND "
                                "capturecard.hostname = \"%5\";")
                                .arg(channelorder).arg(channum)
-                               .arg(channelinput).arg(device)
+                               .arg(channelinput).arg(cardid)
                                .arg(gContext->GetHostName());
 
     QSqlQuery query = db_conn->exec(thequery);
@@ -1291,17 +1324,17 @@ void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
     {
         cerr << "Channel: \'" << channum << "\' was not found in the database.";
         cerr << "\nMost likely, the default channel set for this input\n";
-        cerr << "(" << device << " " << channelinput << " )\n";
+        cerr << "(" << cardid << " " << channelinput << " )\n";
         cerr << "in setup is wrong\n";
 
         thequery = QString("SELECT %1 FROM channel,capturecard,cardinput "
                            "WHERE channel.sourceid = cardinput.sourceid AND "
                            "cardinput.inputname = \"%2\" AND "
                            "cardinput.cardid = capturecard.cardid AND "
-                           "capturecard.videodevice = \"%3\" AND "
+                           "capturecard.cardid = \"%3\" AND "
                            "capturecard.hostname = \"%4\" ORDER BY %5 "
                            "LIMIT 1;").arg(channelorder).arg(channelinput)
-                           .arg(device).arg(gContext->GetHostName())
+                           .arg(cardid).arg(gContext->GetHostName())
                            .arg(channelorder);
        
         query = db_conn->exec(thequery);
@@ -1346,9 +1379,9 @@ void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
     QString wherepart = QString("channel.sourceid = cardinput.sourceid AND "
                                 "cardinput.inputname = \"%1\" AND "
                                 "cardinput.cardid = capturecard.cardid AND "
-                                "capturecard.videodevice = \"%2\" AND "
+                                "capturecard.cardid = \"%2\" AND "
                                 "capturecard.hostname = \"%3\" ")
-                                .arg(channelinput).arg(device)
+                                .arg(channelinput).arg(cardid)
                                 .arg(gContext->GetHostName());
 
     thequery = QString("SELECT channel.channum, channel.chanid "
@@ -1549,7 +1582,6 @@ void TVRec::ToggleChannelFavorite(void)
     // Get current channel id...
     QString channum = channel->GetCurrentName();
     QString channelinput = channel->GetCurrentInput();
-    QString device = channel->GetDevice();
 
     pthread_mutex_lock(&db_lock);
 
@@ -1561,9 +1593,10 @@ void TVRec::ToggleChannelFavorite(void)
                                "channel.sourceid = cardinput.sourceid AND "
                                "cardinput.inputname = \"%2\" AND "
                                "cardinput.cardid = capturecard.cardid AND "
-                               "capturecard.videodevice = \"%3\" AND "
+                               "capturecard.cardid = \"%3\" AND "
                                "capturecard.hostname = \"%4\";")
-                               .arg(channum).arg(channelinput).arg(device)
+                               .arg(channum).arg(channelinput)
+                               .arg(m_capturecardnum)
                                .arg(gContext->GetHostName());
 
     QSqlQuery query = db_conn->exec(thequery);
@@ -1657,12 +1690,6 @@ void TVRec::SetChannel(QString name)
     nvr->Unpause();
 
     UnpauseRingBuffer();
-}
-
-bool TVRec::CheckChannel(QString name)
-{
-    int finetune = 0;
-    return CheckChannel(channel, name, finetune);
 }
 
 void TVRec::GetNextProgram(int direction,
