@@ -27,6 +27,7 @@ DatabaseBox::DatabaseBox(PlaylistsContainer *all_playlists,
            : MythDialog(parent, name)
 {
     the_playlists = all_playlists;
+    active_playlist = NULL;
     if(!music_ptr)
     {
         cerr << "databasebox.o: We are not going to get very far with a null pointer to metadata" << endl;
@@ -110,6 +111,8 @@ DatabaseBox::DatabaseBox(PlaylistsContainer *all_playlists,
         fillCD();
     }
     
+    /*
+    
     //  If metadata and playlist loading is already done,
     //  then just show it
 
@@ -118,27 +121,28 @@ DatabaseBox::DatabaseBox(PlaylistsContainer *all_playlists,
     {
         active_playlist = the_playlists->getActive();
         active_playlist->putYourselfOnTheListView(allcurrent);
-        all_music->putYourselfOnTheListView(allmusic);
+        all_music->putYourselfOnTheListView(allmusic, -1);
         the_playlists->showRelevantPlaylists(alllists);
         listview->setOpen(allmusic, true);
         checkTree();
     }
     else
     {
+    
+    */
+    
 
-        //
-        //  Set a timer to keep redoing the fillList
-        //  stuff until the metadata and playlist loading
-        //  threads are done
-        //
+    //
+    //  Set a timer to keep redoing the fillList
+    //  stuff until the metadata and playlist loading
+    //  threads are done
+    //
 
-        wait_counter = 0;
-        fill_list_timer = new QTimer(this);
-        connect(fill_list_timer, SIGNAL(timeout()), this, SLOT(keepFilling()));
-        fill_list_timer->start(300);
-        //allmusic->setCheckable(false);
-        //alllists->setCheckable(false);
-    }
+    wait_counter = 0;
+    numb_wait_dots = 0;
+    fill_list_timer = new QTimer(this);
+    connect(fill_list_timer, SIGNAL(timeout()), this, SLOT(keepFilling()));
+    fill_list_timer->start(20);
 
     listview->setFocus();
 }
@@ -152,33 +156,58 @@ DatabaseBox::~DatabaseBox()
         cd_reader_thread->wait();
         delete cd_reader_thread;
     }
+    all_music->resetListings();
 }
 
+void DatabaseBox::showWaiting()
+{
+    wait_counter++;
+    if(wait_counter > 10)
+    {
+        wait_counter = 0;
+        ++numb_wait_dots; 
+        if(numb_wait_dots > 3)
+        {
+            numb_wait_dots = 1;
+        }
+        QString a_string = "All My Music ~ Loading Music Data ";
+        for(int i = 0; i < numb_wait_dots; i++)
+        {
+            a_string += ".";
+        }
+        allmusic->setText(0, a_string);
+    }
+}
 void DatabaseBox::keepFilling()
 {
     if(all_music->doneLoading() &&
        the_playlists->doneLoading())
     {
-        allmusic->setText(0, "All My Music");
-        all_music->putYourselfOnTheListView(allmusic);
-        fill_list_timer->stop();
-        active_playlist = the_playlists->getActive();
-        active_playlist->putYourselfOnTheListView(allcurrent);
-        the_playlists->showRelevantPlaylists(alllists);
-        listview->setOpen(allmusic, true);
-        listview->ensureItemVisible(listview->currentItem());
-        checkTree();
+        //
+        //  Good, now lets grab some QListItems
+        //
+        //  Say ... I dunno ... 100 at a time?
+        //
+
+        if(all_music->putYourselfOnTheListView(allmusic, 100))
+        {
+            allmusic->setText(0, "All My Music");
+            fill_list_timer->stop();
+            active_playlist = the_playlists->getActive();
+            active_playlist->putYourselfOnTheListView(allcurrent);
+            the_playlists->showRelevantPlaylists(alllists);
+            listview->setOpen(allmusic, true);
+            listview->ensureItemVisible(listview->currentItem());
+            checkTree();
+        }
+        else
+        {
+            showWaiting();
+        }
     }
     else
     {
-        wait_counter++;
-        QString a_string = "All My Music ~ Loading Music Data ";
-        int numb_dots = wait_counter % 4;
-        for(int i = 0; i < numb_dots; i++)
-        {
-            a_string += ".";
-        }
-        allmusic->setText(0, a_string);
+        showWaiting(); 
     }
 }
 
@@ -186,8 +215,11 @@ void DatabaseBox::occasionallyCheckCD()
 {
     if(cd_reader_thread->statusChanged())
     {
-        active_playlist->ripOutAllCDTracksNow();
-        fillCD();
+        if(active_playlist)
+        {
+            active_playlist->ripOutAllCDTracksNow();
+            fillCD();
+        }
     }
     if(!cd_reader_thread->running())
     {
@@ -448,21 +480,27 @@ void DatabaseBox::selected(QListViewItem *item)
     if(CDCheckItem *item_ptr = dynamic_cast<CDCheckItem*>(item))
     {
         //  Something to do with a CD
-        item_ptr->setOn(!item_ptr->isOn());
-        doSelected(item_ptr, true);
-        if (CDCheckItem *item_ptr = dynamic_cast<CDCheckItem*>(item->parent()))
+        if(active_playlist)
         {
-            checkParent(item_ptr);
+            item_ptr->setOn(!item_ptr->isOn());
+            doSelected(item_ptr, true);
+            if (CDCheckItem *item_ptr = dynamic_cast<CDCheckItem*>(item->parent()))
+            {
+                checkParent(item_ptr);
+            }
         }
         
     }
     else if(TreeCheckItem *item_ptr = dynamic_cast<TreeCheckItem*>(item))
     {
-        item_ptr->setOn(!item_ptr->isOn());
-        doSelected(item_ptr, false);
-        if (TreeCheckItem *item_ptr = dynamic_cast<TreeCheckItem*>(item->parent()))
+        if(active_playlist)
         {
-            checkParent(item_ptr);
+            item_ptr->setOn(!item_ptr->isOn());
+            doSelected(item_ptr, false);
+            if (TreeCheckItem *item_ptr = dynamic_cast<TreeCheckItem*>(item->parent()))
+            {
+                checkParent(item_ptr);
+            }
         }
     } 
     else if(PlaylistItem *item_ptr = dynamic_cast<PlaylistTrack*>(item))

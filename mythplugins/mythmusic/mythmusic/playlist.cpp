@@ -1209,14 +1209,7 @@ bool PlaylistsContainer::cleanOutThreads()
     {
         return true;
     }
-#if (QT_VERSION >= 0x030100)
-    playlists_loader->terminate();
-#else
-#warning
-#warning ***   You should think seriously about upgrading your Qt to 3.1 or higher   ***
-#warning
     playlists_loader->wait();
-#endif
     return false;
 }
 

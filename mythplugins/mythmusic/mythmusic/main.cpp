@@ -425,13 +425,17 @@ int mythplugin_run(void)
     runMenu(paths, startdir, all_playlists, all_music, "musicmenu.xml");
 
     //  Automagically save all playlists and metadata (ratings) that have changed
-    if (all_music->cleanOutThreads() &&
-        all_playlists->cleanOutThreads() )
+
+
+    if (all_music->cleanOutThreads())
+    {
+        all_music->save();
+    }
+    if(all_playlists->cleanOutThreads())
     {
         all_playlists->save();
         int x = all_playlists->getPending();
         SavePending(db, x);
-        all_music->save();
     }
 
     delete all_music;

@@ -363,7 +363,7 @@ MetadataLoadingThread::MetadataLoadingThread(AllMusic *parent_ptr)
 void MetadataLoadingThread::run()
 {
     //if you want to simulate a big music collection load
-    //sleep(10); 
+    //sleep(3); 
     parent->resync();
 }
 
@@ -389,6 +389,8 @@ AllMusic::AllMusic(QSqlDatabase *ldb, QString path_assignment, QString a_startdi
 
     all_music.setAutoDelete(true);
     top_nodes.setAutoDelete(true);
+    
+    last_listed = -1;
 }
 
 AllMusic::~AllMusic()
@@ -413,15 +415,7 @@ bool AllMusic::cleanOutThreads()
         return true;
     }
 
-#if (QT_VERSION >= 0x030100)
-    metadata_loader->terminate();
-#else
-#warning
-#warning ***   You should think seriously about upgrading your Qt to 3.1 or higher   ***
-#warning
-    cerr << "metadata.o: If you had Qt > 3.1.x, you would not be waiting right now" << endl;
     metadata_loader->wait();
-#endif
     return false;
 }
 
@@ -439,11 +433,6 @@ void AllMusic::resync()
     
     if(query.isActive() && query.numRowsAffected() > 0)
     {
-//        MythProgressDialog *loadProg;
-//        loadProg = new MythProgressDialog("Loading music metadata", 
-//                                          query.numRowsAffected());
-//        int counter = 0;
-
         while(query.next())
         {
             Metadata *temp = new Metadata
@@ -462,15 +451,18 @@ void AllMusic::resync()
                                         query.value(11).toString()
                                     );
             all_music.append(temp); //  Don't delete temp, as PtrList now owns it
-//            loadProg->setProgress(++counter);
         }
-
-//        loadProg->Close();
-//        delete loadProg;
     }
     else
     {
-        cerr << "metadata.o: Your database is out of whack (no tracks, missing columns, etc.). Not good. " << endl; 
+        if(query.isActive())
+        {
+            cerr << "metadata.o: Your database is out of whack. This is not good." << endl ;
+        }
+        else
+        {
+            cerr << "metadata.o: Your don't seem to have any tracks. That's ok with me if it's ok with you." << endl; 
+        }
     }    
     
     //  To find this data quickly, build a map
@@ -599,22 +591,60 @@ void AllMusic::writeTree(GenericTree *tree_to_write_to)
     }
 }
 
-void AllMusic::putYourselfOnTheListView(TreeCheckItem *where)
+bool AllMusic::putYourselfOnTheListView(TreeCheckItem *where, int how_many)
 {
 
 
     root_node->putYourselfOnTheListView(where, false);
 
-    //  This needs to go backwards
-    
-    QPtrListIterator<MusicNode> iter( top_nodes );
-    MusicNode *traverse;
-    iter.toLast();
-    while ( (traverse = iter.current()) != 0 )
+    if(how_many < 0)
     {
-        traverse->putYourselfOnTheListView(where, true);
-        --iter;
+    
+        QPtrListIterator<MusicNode> iter( top_nodes );
+        MusicNode *traverse;
+        iter.toLast();
+        while ( (traverse = iter.current()) != 0 )
+        {
+            traverse->putYourselfOnTheListView(where, true);
+            --iter;
+        }
+        return true;
     }
+    else
+    {
+        if(last_listed < 0)
+        {
+            last_listed = 0;
+        }
+        
+        QPtrListIterator<MusicNode> iter( top_nodes );
+        MusicNode *traverse;
+        iter.toLast();
+        iter -= last_listed;
+        int numb_this_round = 0;
+
+        while(true)
+        {
+            traverse = iter.current();
+            if(traverse)
+            {
+                traverse->putYourselfOnTheListView(where, true);
+                --iter;
+                ++last_listed;
+                ++numb_this_round;
+                if(numb_this_round >= how_many)
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return true;
+            }
+        }
+    }
+    cerr << "metadata.o: Control defied all possible logic and jumped way out here. World may end shortly. " << endl;
+    return false;
 }
 
 void AllMusic::putCDOnTheListView(CDCheckItem *where)

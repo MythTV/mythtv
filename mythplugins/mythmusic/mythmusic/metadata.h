@@ -200,11 +200,12 @@ class AllMusic
     void        intoTree(Metadata* inserter);
     MusicNode*  findRightNode(Metadata* inserter, uint depth);
     void        setSorting(QString a_paths);
-    void        putYourselfOnTheListView(TreeCheckItem *where);
+    bool        putYourselfOnTheListView(TreeCheckItem *where, int how_many);
     void        putCDOnTheListView(CDCheckItem *where);
     bool        doneLoading(){return done_loading;}
     bool        cleanOutThreads();
     int         getCDTrackCount(){return cd_data.count();}
+    void        resetListings(){last_listed = -1;}
     
   private:
   
@@ -235,6 +236,7 @@ class AllMusic
     
     MetadataLoadingThread   *metadata_loader;
     bool                     done_loading;
+    int                      last_listed;
 
 
 };
