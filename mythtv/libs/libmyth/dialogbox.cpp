@@ -1,3 +1,6 @@
+#include <iostream>
+using namespace std;
+
 #include <qlayout.h>
 #include <qpushbutton.h>
 #include <qbuttongroup.h>
