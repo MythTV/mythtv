@@ -31,6 +31,7 @@ using namespace std;
 
 class NuppelVideoRecorder;
 class NuppelVideoPlayer;
+class XvVideoOutput;
 
 class NuppelVideoPlayer
 {
@@ -95,6 +96,8 @@ class NuppelVideoPlayer
     bool PipPlayerSet(void) { return !needsetpipplayer; }
  
     void SetVideoFilters(QString &filters) { videoFilterList = filters; }
+
+    int CheckEvents(void); 
 
  protected:
     void OutputAudioLoop(void);
@@ -256,6 +259,8 @@ class NuppelVideoPlayer
 
     struct extendeddata extradata;
     bool usingextradata;
+
+    XvVideoOutput *videoOutput;
 };
 
 #endif

@@ -3,6 +3,10 @@
 #include <qfile.h>
 #include <unistd.h>
 
+#include <vector>
+
+using namespace std;
+
 #include "tv.h"
 #include "scheduler.h"
 #include "playbackbox.h"
@@ -18,7 +22,7 @@
 char installprefix[] = "/usr/local";
 
 QString prefix;
-TV *tv;
+vector<TV *> tvList;
 Settings *globalsettings;
 
 QString startGuide(const QString &startchannel)
@@ -33,7 +37,7 @@ QString startGuide(const QString &startchannel)
 int startManaged(void)
 {
     QSqlDatabase *db = QSqlDatabase::database();
-    ViewScheduled vsb(prefix, tv, db);
+    ViewScheduled vsb(prefix, tvList.front(), db);
 
     vsb.Show();
     vsb.exec();
@@ -44,7 +48,7 @@ int startManaged(void)
 int startPlayback(void)
 {
     QSqlDatabase *db = QSqlDatabase::database();  
-    PlaybackBox pbb(prefix, tv, db);
+    PlaybackBox pbb(prefix, tvList.front(), db);
 
     pbb.Show();
 
@@ -56,7 +60,7 @@ int startPlayback(void)
 int startDelete(void)
 {
     QSqlDatabase *db = QSqlDatabase::database();
-    DeleteBox delbox(prefix, tv, db);
+    DeleteBox delbox(prefix, tvList.front(), db);
    
     delbox.Show();
     
@@ -67,6 +71,7 @@ int startDelete(void)
 
 void startTV(void)
 {
+    TV *tv = tvList.front();
     TVState nextstate = tv->LiveTV();
 
     if (nextstate == kState_WatchingLiveTV ||
@@ -103,7 +108,8 @@ int askRecording(TV *tv, ProgramInfo *rec, int timeuntil)
 
 void *runScheduler(void *dummy)
 {
-    TV *tv = (TV *)dummy;
+    dummy = dummy;
+
     QSqlDatabase *db = QSqlDatabase::database("SUBDB");
 
     Scheduler *sched = new Scheduler(db);
@@ -114,12 +120,20 @@ void *runScheduler(void *dummy)
     int asksecs = -1;
     bool asked = false;
 
+    TV *nexttv = NULL;
+
     ProgramInfo *nextRecording = sched->GetNextRecording();
     QDateTime nextrectime;
     if (nextRecording)
     {
         nextrectime = nextRecording->startts;
         asked = false;
+        if (nextRecording->cardid > tvList.size() || nextRecording->cardid < 1)
+        {
+            cerr << "cardid is higher than number of cards.\n";
+            exit(0);
+        }
+        nexttv = tvList[nextRecording->cardid - 1];
     }
     QDateTime curtime = QDateTime::currentDateTime();
 
@@ -139,6 +153,13 @@ void *runScheduler(void *dummy)
             {
                 nextrectime = nextRecording->startts;
                 asked = false;
+                if (nextRecording->cardid > tvList.size() || 
+                    nextRecording->cardid < 1)
+                {
+                    cerr << "invalid cardid " << nextRecording->cardid << endl;
+                    exit(0);
+                }
+                nexttv = tvList[nextRecording->cardid - 1];
             }
         }
 
@@ -148,12 +169,12 @@ void *runScheduler(void *dummy)
             secsleft = curtime.secsTo(nextrectime);
             asksecs = secsleft - 30;
 
-            if (tv->GetState() == kState_WatchingLiveTV && asksecs <= 0)
+            if (nexttv->GetState() == kState_WatchingLiveTV && asksecs <= 0)
             {
                 if (!asked)
                 {
                     asked = true;
-                    int result = askRecording(tv, nextRecording, secsleft);
+                    int result = askRecording(nexttv, nextRecording, secsleft);
 
                     if (result == 3)
                     {
@@ -166,6 +187,14 @@ void *runScheduler(void *dummy)
                         nextrectime = nextRecording->startts;
                         curtime = QDateTime::currentDateTime();
                         secsleft = curtime.secsTo(nextrectime);
+                        if (nextRecording->cardid > tvList.size() ||
+                            nextRecording->cardid < 1)
+                        {
+                            cerr << "invalid cardid " << nextRecording->cardid 
+                                 << endl;
+                            exit(0);
+                        }
+                        nexttv = tvList[nextRecording->cardid - 1];
                     }
                 }
             }
@@ -173,22 +202,28 @@ void *runScheduler(void *dummy)
             {
                 // don't record stuff that's already started..
                 if (secsleft > -30)
-                {
-                    startRecording(tv, nextRecording);
-                }
+                    startRecording(nexttv, nextRecording);
 
                 sched->RemoveFirstRecording();
                 nextRecording = sched->GetNextRecording();
 
                 if (nextRecording)
                 {
-                   nextrectime = nextRecording->startts;
-                   curtime = QDateTime::currentDateTime();
-                   secsleft = curtime.secsTo(nextrectime);
+                    nextrectime = nextRecording->startts;
+                    curtime = QDateTime::currentDateTime();
+                    secsleft = curtime.secsTo(nextrectime);
+                    if (nextRecording->cardid > tvList.size() ||
+                        nextRecording->cardid < 1)
+                    {
+                        cerr << "invalid cardid " << nextRecording->cardid 
+                             << endl;
+                        exit(0);
+                    }
+                    nexttv = tvList[nextRecording->cardid - 1];
                 }
             }
-            //else 
-            //    cout << secsleft << " secs left until " << nextRecording->title << endl;
+//            else 
+//                cout << secsleft << " secs left until " << nextRecording->title << endl;
         }
     }
     
@@ -234,6 +269,29 @@ bool RunMenu(QString themedir)
 
     return true;
 }   
+
+void setupTVs(void)
+{
+    QSqlQuery query;
+
+    int numcards = -1;
+    query.exec("SELECT NULL FROM capturecard;");
+
+    if (query.isActive())
+        numcards = query.numRowsAffected();
+
+    if (numcards < 0)
+    {
+        cerr << "ERROR: no capture cards are defined in the database.\n";
+        exit(0);
+    }
+
+    for (int i = 0; i < numcards; i++)
+    {
+        TV *tv = new TV("3", i+1, i+2);
+        tvList.push_back(tv);
+    }
+}
     
 int main(int argc, char **argv)
 {
@@ -275,10 +333,10 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    tv = new TV("3");
+    setupTVs();
 
-    prefix = tv->GetFilePrefix();
-    QString theprefix = tv->GetInstallPrefix();
+    prefix = (tvList.front())->GetFilePrefix();
+    QString theprefix = (tvList.front())->GetInstallPrefix();
 
     QString themename = globalsettings->GetSetting("Theme");
 
@@ -293,11 +351,10 @@ int main(int argc, char **argv)
     globalsettings->ReadSettings(qttheme);
  
     pthread_t scthread;
-    pthread_create(&scthread, NULL, runScheduler, tv);
+    pthread_create(&scthread, NULL, runScheduler, NULL);
 
     RunMenu(themedir);
 
-    delete tv;
     delete globalsettings;
 
     return 0;

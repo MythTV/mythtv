@@ -79,6 +79,12 @@ bool operator<=(const ProgInfo &a, const ProgInfo &b)
     return (a.start <= b.start);
 }
 
+struct Source
+{
+    int id;
+    QString name;
+};
+
 QDateTime fromXMLTVDate(QString &text)
 {
     int year, month, day, hour, min, sec;
@@ -279,7 +285,7 @@ void fixProgramList(QValueList<ProgInfo> *fixlist)
     }
 }
 
-void handleChannels(QValueList<ChanInfo> *chanlist)
+void handleChannels(int id, QValueList<ChanInfo> *chanlist)
 {
     char *home = getenv("HOME");
     QString fileprefix = QString(home) + "/.mythtv";
@@ -320,51 +326,70 @@ void handleChannels(QValueList<ChanInfo> *chanlist)
         QSqlQuery query;
 
         QString querystr;
-        querystr.sprintf("SELECT * FROM channel WHERE channum = %s;", 
-                         (*i).chanstr.ascii()); 
+        querystr.sprintf("SELECT NULL FROM channel WHERE channum = %s AND "
+                         "sourceid = %d;", (*i).chanstr.ascii(), id); 
 
         query.exec(querystr);
         if (query.isActive() && query.numRowsAffected() > 0)
         {
             querystr.sprintf("UPDATE channel SET icon = \"%s\" WHERE channum = "
-                             "%s AND callsign = \"%s\";", localfile.ascii(), 
-                             (*i).chanstr.ascii(),
-                             (*i).callsign.ascii());
+                             "%s AND callsign = \"%s\" AND sourceid = %d;", 
+                             localfile.ascii(), (*i).chanstr.ascii(),
+                             (*i).callsign.ascii(), id);
         }
         else
         {
-            querystr.sprintf("INSERT INTO channel (channum,callsign,icon) "
-                             "VALUES(%s,\"%s\",\"%s\");", 
-                             (*i).chanstr.ascii(), 
-                             (*i).callsign.ascii(),
-                             localfile.ascii());                  
+            querystr.sprintf("INSERT INTO channel (channum,callsign,icon,"
+                             "sourceid) VALUES(%s,\"%s\",\"%s\", %d);", 
+                             (*i).chanstr.ascii(), (*i).callsign.ascii(),
+                             localfile.ascii(), id);                  
         }
 
         query.exec(querystr);
     } 
 }
 
-void clearDBAtOffset(int offset)
+void clearDBAtOffset(int offset, int chanid)
 {
     int nextoffset = offset + 1;
     QString querystr;
     querystr.sprintf("DELETE FROM program WHERE starttime >= "
                      "DATE_ADD(CURRENT_DATE, INTERVAL %d DAY) "
                      "AND starttime < DATE_ADD(CURRENT_DATE, INTERVAL "
-                     "%d DAY);", offset, nextoffset);
+                     "%d DAY) AND chanid = %d;", offset, nextoffset, chanid);
 
     QSqlQuery query;
 
     query.exec(querystr);
 }
 
-void handlePrograms(int offset, QMap<QString, QValueList<ProgInfo> > *proglist)
+void handlePrograms(int id, int offset, QMap<QString, 
+                    QValueList<ProgInfo> > *proglist)
 {
-    clearDBAtOffset(offset); 
-   
     QMap<QString, QValueList<ProgInfo> >::Iterator mapiter;
     for (mapiter = proglist->begin(); mapiter != proglist->end(); ++mapiter)
     {
+        QSqlQuery query;
+        QString querystr;
+
+        if (mapiter.key() == "")
+            continue;
+
+        int channum = atoi(mapiter.key().ascii());
+
+        querystr.sprintf("SELECT chanid FROM channel WHERE sourceid = %d AND "
+                         "channum = %s;", id, mapiter.key().ascii());
+        query.exec(querystr.ascii());
+
+        if (query.isActive() && query.numRowsAffected() > 0)
+        {
+            query.next();
+            
+            channum = query.value(0).toInt();
+        }
+
+        clearDBAtOffset(offset, channum);
+
         QValueList<ProgInfo> *sortlist = &((*proglist)[mapiter.key()]);
 
         fixProgramList(sortlist);
@@ -372,13 +397,10 @@ void handlePrograms(int offset, QMap<QString, QValueList<ProgInfo> > *proglist)
         QValueList<ProgInfo>::iterator i = sortlist->begin();
         for (; i != sortlist->end(); i++)
         {
-            QSqlQuery query;
-            QString querystr;
- 
-            querystr.sprintf("INSERT INTO program (channum,starttime,endtime,"
-                             "title,subtitle,description,category) VALUES(%s,"
+            querystr.sprintf("INSERT INTO program (chanid,starttime,endtime,"
+                             "title,subtitle,description,category) VALUES(%d,"
                              " %s, %s, \"%s\", \"%s\", \"%s\", \"%s\")", 
-                             (*i).channel.ascii(), (*i).startts.ascii(), 
+                             channum, (*i).startts.ascii(), 
                              (*i).endts.ascii(), (*i).title.utf8().data(), 
                              (*i).subtitle.utf8().data(), 
                              (*i).desc.utf8().data(), 
@@ -388,7 +410,7 @@ void handlePrograms(int offset, QMap<QString, QValueList<ProgInfo> > *proglist)
     }
 }
 
-void grabData(int offset)
+void grabData(Source source, int offset)
 {
     QValueList<ChanInfo> chanlist;
     QMap<QString, QValueList<ProgInfo> > proglist;
@@ -399,9 +421,13 @@ void grabData(int offset)
 
     QString filename = QString(tempfilename);
 
+    char *home = getenv("HOME");
+    QString configfile = QString("%1/.mythtv/%2.xmltv").arg(home)
+                                                       .arg(source.name);
     QString command;
-    command.sprintf("nice -19 tv_grab_na --days 1 --offset %d --output %s", 
-                    offset, filename.ascii());
+    command.sprintf("nice -19 tv_grab_na --days 1 --offset %d "
+                    "--config-file %s --output %s", 
+                    offset, configfile.ascii(), filename.ascii());
 
     system(command.ascii());
 
@@ -410,8 +436,8 @@ void grabData(int offset)
     QFile thefile(filename);
     thefile.remove();
 
-    handleChannels(&chanlist);
-    handlePrograms(offset, &proglist);
+    handleChannels(source.id, &chanlist);
+    handlePrograms(source.id, offset, &proglist);
 }
 
 void clearOldDBEntries(void)
@@ -423,15 +449,17 @@ void clearOldDBEntries(void)
     query.exec(querystr);
 }
 
-void fillData(void)
+void fillData(QValueList<Source> &sourcelist)
 {
-    grabData(1);
+    QValueList<Source>::Iterator it;
+    for (it = sourcelist.begin(); it != sourcelist.end(); ++it)
+        grabData(*it, 1);
 
     for (int i = 0; i < 9; i++)
     {
         int nextoffset = i + 1;
         QString querystr;
-        querystr.sprintf("SELECT * FROM program WHERE starttime >= "
+        querystr.sprintf("SELECT NULL FROM program WHERE starttime >= "
                          "DATE_ADD(CURRENT_DATE, INTERVAL %d DAY) AND "
                          "starttime < DATE_ADD(CURRENT_DATE, INTERVAL %d DAY);",
                          i, nextoffset);
@@ -443,7 +471,10 @@ void fillData(void)
         {
         }
         else
-            grabData(i);
+        {
+            for (it = sourcelist.begin(); it != sourcelist.end(); ++it)
+                grabData(*it, i);
+        }
     }
 
     clearOldDBEntries();
@@ -468,7 +499,27 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    fillData();
+    QValueList<Source> sourcelist;
+
+    QSqlQuery sourcequery;
+    QString querystr = QString("SELECT sourceid,name FROM videosource "
+                               "ORDER BY sourceid;");
+    sourcequery.exec(querystr);
+        
+    if (sourcequery.isActive() && sourcequery.numRowsAffected() > 0)
+    {       
+        while (sourcequery.next())
+        {
+            Source newsource;
+            
+            newsource.id = sourcequery.value(0).toInt();
+            newsource.name = sourcequery.value(1).toString();
+            
+            sourcelist.append(newsource);
+        }   
+    }   
+    
+    fillData(sourcelist);
 
     return 0;
 }

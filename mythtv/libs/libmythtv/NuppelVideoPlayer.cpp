@@ -69,6 +69,8 @@ NuppelVideoPlayer::NuppelVideoPlayer(void)
 
     usingextradata = false;
     memset(&extradata, 0, sizeof(extendeddata));
+
+    videoOutput = NULL;
 }
 
 NuppelVideoPlayer::~NuppelVideoPlayer(void)
@@ -909,6 +911,13 @@ void NuppelVideoPlayer::ShowPip(unsigned char *xvidbuf)
     }
 }
 
+int NuppelVideoPlayer::CheckEvents(void)
+{
+    if (videoOutput)
+        return videoOutput->CheckEvents();
+    return 0;
+}
+
 void NuppelVideoPlayer::OutputVideoLoop(void)
 {
     unsigned char *X11videobuf = NULL;
@@ -926,7 +935,10 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 
     char name[] = "MythTV"; 
     if (!disablevideo)
-        X11videobuf = XJ_init(video_width, video_height, name, name);
+    {
+        videoOutput = new XvVideoOutput();
+        X11videobuf = videoOutput->Init(video_width, video_height, name, name);
+    }
 
     int pause_rpos = 0;
     while (!eof && !killplayer)
@@ -970,7 +982,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
                     if (pipplayer)
                         ShowPip(X11videobuf);
                     osd->Display(X11videobuf);
-                    XJ_show(video_width, video_height);
+                    videoOutput->Show(video_width, video_height);
                     ResetNexttrigger(&nexttrigger);
                 }
                 continue;
@@ -1016,7 +1028,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 
         if (!disablevideo)
         {
-            XJ_show(video_width, video_height);
+            videoOutput->Show(video_width, video_height);
         }
         /* a/v sync assumes that when 'XJ_show' returns, that is the instant
            the frame has become visible on screen */
@@ -1061,7 +1073,10 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
     }
 
     if (!disablevideo)
-        XJ_exit();             
+    {
+        delete videoOutput;
+        videoOutput = NULL;
+    }
 }
 
 void NuppelVideoPlayer::OutputAudioLoop(void)
@@ -1164,6 +1179,7 @@ void *NuppelVideoPlayer::kickoffOutputVideoLoop(void *player)
 
 void NuppelVideoPlayer::StartPlaying(void)
 {
+    killplayer = false;
     usepre = 2;
 
     InitSubs();
@@ -1177,7 +1193,6 @@ void NuppelVideoPlayer::StartPlaying(void)
     osd = new OSD(video_width, video_height, osdfilename, osdprefix, osdtheme);
 
     playing = true;
-    killplayer = false;
   
     framesPlayed = 0;
 

@@ -5,6 +5,7 @@ class ProgramInfo;
 class QSqlDatabase;
  
 #include <list>
+#include <vector>
 using namespace std;
 
 class Scheduler
@@ -22,10 +23,15 @@ class Scheduler
       list<ProgramInfo *> *getAllPending(void) { return &recordingList; }
 
       list<ProgramInfo *> *getConflicting(ProgramInfo *pginfo,
-                                          bool removenonplaying = true);
+                                          bool removenonplaying = true,
+                                          list<ProgramInfo *> *uselist = NULL);
 
   private:
-      void MarkConflicts(void);
+      void setupCards(void);
+
+      void MarkKnownInputs(void);
+
+      void MarkConflicts(list<ProgramInfo *> *uselist = NULL);
       void PruneList(void);
 
       void MarkConflictsToRemove(void);
@@ -41,11 +47,27 @@ class Scheduler
 
       bool FindInOldRecordings(ProgramInfo *pginfo);      
 
+      void PrintList(void);
+
+      ProgramInfo *GetBest(ProgramInfo *info, 
+                           list<ProgramInfo *> *conflictList);
+
+      void DoMultiCard();
+
+      list<ProgramInfo *> *CopyList(list<ProgramInfo *> *sourcelist);
+
       QSqlDatabase *db;
 
       list<ProgramInfo *> recordingList;
 
       bool hasconflicts;
+
+      int numcards;
+      int numsources;
+
+      vector<int> numCardsPerSource;
+      vector<vector<int> > sourceToInput;
+      vector<int> inputToCard;
 };
 
 #endif

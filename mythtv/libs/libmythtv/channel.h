@@ -30,10 +30,14 @@ class Channel
     void SwitchToInput(const QString &input);
  
     QString GetCurrentName(void);
+    QString GetCurrentInput(void);
+
     int GetCurrent(void) { return curchannel + 1; }
     
     void SetFd(int fd) { videofd = fd; } 
- private:
+    QString GetDevice() { return device; }
+
+  private:
     
     QString device;
     bool isopen;  

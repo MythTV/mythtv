@@ -14,13 +14,10 @@
 #include <iostream>
 using namespace std;
 
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
+#include "XJ.h"
+
 #include <X11/keysym.h>
 #include <X11/Xatom.h>
-#include <X11/extensions/Xv.h>
-#include <X11/extensions/Xvlib.h>
-#include <X11/extensions/XShm.h>
 
 extern "C" {
 extern int      XShmQueryExtension(Display*);
@@ -28,43 +25,16 @@ extern int      XShmGetEventBase(Display*);
 extern XvImage  *XvShmCreateImage(Display*, XvPortID, int, char*, int, int, XShmSegmentInfo*);
 }
 
-XShmSegmentInfo XJ_SHMInfo;
-Screen *XJ_screen;
-Display *XJ_disp;
-Window XJ_root,XJ_win;
-XvImage *XJ_image;
-
 #define GUID_YUV12_PLANAR 0x30323449
-
-XEvent XJ_ev;
-GC XJ_gc;
-int XJ_screen_num;
-unsigned long XJ_white,XJ_black;
-int XJ_started=0; 
-int XJ_depth;
-int XJ_caught_error;
-int XJ_width, XJ_height;
-int XJ_screenwidth, XJ_screenheight;
-int XJ_fullscreen;
-
-int oldx, oldy, oldw, oldh;
-int curx, cury, curw, curh;
-
-XSizeHints hints;
-
-int xv_port = -1;
-
-void XJ_toggleFullscreen(void);
 
 int XJ_error_catcher(Display * d, XErrorEvent * xeev)
 {
   d = d; 
   xeev = xeev;
-  ++XJ_caught_error;
   return 0;
 }
 
-void sizehint(int x, int y, int width, int height, int max)
+void XvVideoOutput::sizehint(int x, int y, int width, int height, int max)
 {
    hints.flags = PPosition | PSize | PWinGravity | PBaseSize;
    hints.x = x; hints.y = y; hints.width = width; hints.height = height;
@@ -82,14 +52,14 @@ void sizehint(int x, int y, int width, int height, int max)
    XSetWMNormalHints(XJ_disp, XJ_win, &hints);
 }
 
-unsigned char *XJ_init(int width, int height, char *window_name, 
-                       char *icon_name)
+unsigned char *XvVideoOutput::Init(int width, int height, char *window_name, 
+                                   char *icon_name)
 {
   XWMHints wmhints;
-  char *sbuf;
   XTextProperty windowName, iconName;
   int (*old_handler)(Display *, XErrorEvent *);
   int i, ret;
+  XJ_caught_error = 0;
   
   unsigned int p_version, p_release, p_request_base, p_event_base, p_error_base;
   int p_num_adaptors;
@@ -213,10 +183,10 @@ unsigned char *XJ_init(int width, int height, char *window_name,
     perror("shmget failed:");
     return (NULL);
   }
- 
-  sbuf = XJ_image->data = XJ_SHMInfo.shmaddr = (char *)shmat(XJ_SHMInfo.shmid, 0, 0);
+
+  XJ_image->data = XJ_SHMInfo.shmaddr = (char *)shmat(XJ_SHMInfo.shmid, 0, 0);
   XJ_SHMInfo.readOnly = False;
-  
+ 
   XShmAttach(XJ_disp, &XJ_SHMInfo);
 
   XSync(XJ_disp, 0);
@@ -228,13 +198,12 @@ unsigned char *XJ_init(int width, int height, char *window_name,
   
   XJ_started=1;
 
-  XJ_toggleFullscreen();
+  ToggleFullScreen();
 
-  return((unsigned char *)sbuf);
+  return((unsigned char *)XJ_image->data);
 }
 
-
-void XJ_exit(void)
+void XvVideoOutput::Exit(void)
 {
   if(XJ_started) {
     //if (XJ_image)
@@ -251,12 +220,12 @@ void XJ_exit(void)
   }
 }
 
-static void decorate(int dec)
+void XvVideoOutput::decorate(int dec)
 {
    dec = dec;
 }
 
-static void hide_cursor(void)
+void XvVideoOutput::hide_cursor(void)
 {
   Cursor no_ptr;
   Pixmap bm_no;
@@ -273,12 +242,12 @@ static void hide_cursor(void)
   XFreeCursor(XJ_disp, no_ptr);
 }
 
-static void show_cursor(void)
+void XvVideoOutput::show_cursor(void)
 {
   XDefineCursor(XJ_disp, XJ_win, 0);
 }
 
-void XJ_toggleFullscreen(void)
+void XvVideoOutput::ToggleFullScreen(void)
 {
   if (XJ_fullscreen) {
     XJ_fullscreen = 0; 
@@ -305,14 +274,14 @@ void XJ_toggleFullscreen(void)
   XFlush(XJ_disp);
 }
    
-void XJ_show(int width, int height)
+void XvVideoOutput::Show(int width, int height)
 {
   XvShmPutImage(XJ_disp, xv_port, XJ_win, XJ_gc, XJ_image, 0, 0, width, 
                 height, 0, 0, curw, curh, False);
   XSync(XJ_disp, False);
 }
 
-int XJ_CheckEvents(void)
+int XvVideoOutput::CheckEvents(void)
 {
   if (!XJ_started)
       return 0;

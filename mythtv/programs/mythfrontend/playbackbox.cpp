@@ -82,9 +82,12 @@ PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
     QSqlQuery query;
     QString thequery;
     ProgramListItem *item;
-    
-    thequery = "SELECT channum,starttime,endtime,title,subtitle,description "
-               "FROM recorded ORDER BY starttime;";
+   
+    thequery = "SELECT channel.chanid,starttime,endtime,title,subtitle,"
+               "description,channel.channum FROM recorded,channel "
+               "WHERE recorded.chanid = channel.chanid "
+               "ORDER BY starttime;";
+ 
     query = db->exec(thequery);
 
     if (query.isActive() && query.numRowsAffected() > 0)
@@ -93,7 +96,7 @@ PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
         {
             ProgramInfo *proginfo = new ProgramInfo;
  
-            proginfo->channum = query.value(0).toString();
+            proginfo->chanid = query.value(0).toString();
             proginfo->startts = QDateTime::fromString(query.value(1).toString(),
                                                       Qt::ISODate);
             proginfo->endts = QDateTime::fromString(query.value(2).toString(),
@@ -101,6 +104,7 @@ PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
             proginfo->title = query.value(3).toString();
             proginfo->subtitle = query.value(4).toString();
             proginfo->description = query.value(5).toString();
+            proginfo->chanstr = query.value(6).toString();
             proginfo->conflicting = false;
 
             if (proginfo->title == QString::null)
@@ -110,7 +114,7 @@ PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
             if (proginfo->description == QString::null)
                 proginfo->description = "";
 
-            item = new ProgramListItem(listview, proginfo, 3, tv, fileprefix); 
+            item = new ProgramListItem(listview, proginfo, 3, tv, fileprefix);
         }
     }
     else
@@ -294,7 +298,7 @@ void PlaybackBox::timeout(void)
     int w = 0, h = 0;
     unsigned char *buf = nvp->GetCurrentFrame(w, h);
 
-    if (w == 0 || h == 0)
+    if (w == 0 || h == 0 || !buf)
         return;
 
     unsigned char *outputbuf = new unsigned char[w * h * 4];

@@ -90,8 +90,10 @@ DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
     QString thequery;
     ProgramListItem *item;
     
-    thequery = "SELECT channum,starttime,endtime,title,subtitle,description "
-               "FROM recorded ORDER BY starttime DESC;";
+    thequery = "SELECT channel.chanid,starttime,endtime,title,subtitle,"
+               "description,channel.channum FROM recorded,channel "
+               "WHERE recorded.chanid = channel.chanid "
+               "ORDER BY starttime DESC;";
 
     query = db->exec(thequery);
 
@@ -100,8 +102,9 @@ DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
         while (query.next())
         {
             ProgramInfo *proginfo = new ProgramInfo;
+            QString chanstr;
  
-            proginfo->channum = query.value(0).toString();
+            proginfo->chanid = query.value(0).toString();
             proginfo->startts = QDateTime::fromString(query.value(1).toString(),
                                                       Qt::ISODate);
             proginfo->endts = QDateTime::fromString(query.value(2).toString(),
@@ -109,6 +112,7 @@ DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
             proginfo->title = query.value(3).toString();
             proginfo->subtitle = query.value(4).toString();
             proginfo->description = query.value(5).toString();
+            proginfo->chanstr = query.value(6).toString();
             proginfo->conflicting = false;
 
             if (proginfo->title == QString::null)
@@ -234,7 +238,9 @@ void DeleteBox::startPlayer(ProgramInfo *rec)
     while (!nvp->IsPlaying())
     {
          if (QTime::currentTime() > curtime)
+         {
              break;
+         }
          usleep(50);
     }
 }
@@ -330,9 +336,9 @@ void DeleteBox::selected(QListViewItem *lvitem)
         QString endts = rec->endts.toString("yyyyMMddhhmm");
         endts += "00";
 
-        thequery = QString("DELETE FROM recorded WHERE channum = %1 AND title "
+        thequery = QString("DELETE FROM recorded WHERE chanid = %1 AND title "
                            "= \"%2\" AND starttime = %3 AND endtime = %4;")
-                           .arg(rec->channum).arg(rec->title).arg(startts)
+                           .arg(rec->chanid).arg(rec->title).arg(startts)
                            .arg(endts);
 
         query = db->exec(thequery);
@@ -414,7 +420,7 @@ void DeleteBox::timeout(void)
     int w = 0, h = 0;
     unsigned char *buf = nvp->GetCurrentFrame(w, h);
 
-    if (w == 0 || h == 0)
+    if (w == 0 || h == 0 || !buf)
         return;
 
     unsigned char *outputbuf = new unsigned char[w * h * 4];

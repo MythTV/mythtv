@@ -32,7 +32,7 @@ class OSD;
 class TV
 {
  public:
-    TV(const QString &startchannel);
+    TV(const QString &startchannel, int capturecardnum, int pipcardnum);
    ~TV(void);
 
     TVState LiveTV(void);
@@ -80,12 +80,15 @@ class TV
     void DoRew(void);
     int  calcSliderPos(int offset, QString &desc);
     
-    void UpdateOSD(void); 
-    void GetChannelInfo(QString lchannel, QString &title, QString &subtitle, 
-                        QString &desc, QString &category, QString &starttime,
-                        QString &endtime, QString &callsign, QString &iconpath);
+    void UpdateOSD(void);
+    void UpdateOSDInput(void);
+    void GetChannelInfo(QString &title, QString &subtitle, QString &desc, 
+                        QString &category, QString &starttime, QString &endtime,
+                        QString &callsign, QString &iconpath);
 
-    void ConnectDB(void);
+    void GetDevices(int cardnum, QString &video, QString &audio, int &rate);
+
+    void ConnectDB(int cardnum);
     void DisconnectDB(void);
 
     void LoadMenu(void);
@@ -168,6 +171,11 @@ class TV
     NuppelVideoPlayer *activenvp;
     RingBuffer *activerbuffer;
     Channel *activechannel;
+
+    QString videodev, audiodev;
+    int audiosamplerate;
+    QString pipvideodev, pipaudiodev;
+    int pipaudiosamplerate;
 };
 
 #endif

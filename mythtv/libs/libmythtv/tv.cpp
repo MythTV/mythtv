@@ -5,9 +5,28 @@
 #include <pthread.h>
 #include <qsqldatabase.h>
 
-#include "XJ.h"
 #include "tv.h"
 #include "osd.h"
+
+
+// cheat and put the keycodes here
+#define wsUp            0x52 + 256
+#define wsDown          0x54 + 256
+#define wsLeft          0x51 + 256
+#define wsRight         0x53 + 256
+#define wsEscape        0x1b + 256
+#define wsZero          0xb0 + 256
+#define wsOne           0xb1 + 256
+#define wsTwo           0xb2 + 256
+#define wsThree         0xb3 + 256
+#define wsFour          0xb4 + 256
+#define wsFive          0xb5 + 256
+#define wsSix           0xb6 + 256
+#define wsSeven         0xb7 + 256
+#define wsEight         0xb8 + 256
+#define wsNine          0xb9 + 256
+#define wsEnter         0x8d + 256
+#define wsReturn        0x0d + 256
 
 char theprefix[] = "/usr/local";
 
@@ -25,7 +44,7 @@ void *SpawnDecode(void *param)
     return NULL;
 }
 
-TV::TV(const QString &startchannel)
+TV::TV(const QString &startchannel, int capturecardnum, int pipcardnum)
 {
     settings = new Settings();
 
@@ -33,16 +52,26 @@ TV::TV(const QString &startchannel)
     settings->LoadSettingsFiles("mysql.txt", theprefix);
 
     db_conn = NULL;
-    ConnectDB();
-    
-    channel = new Channel(this, settings->GetSetting("V4LDevice"));
+    ConnectDB(capturecardnum);
+  
+    audiosamplerate = pipaudiosamplerate = -1;
+ 
+    GetDevices(capturecardnum, videodev, audiodev, audiosamplerate);
+
+    pipvideodev = "";
+    pipaudiodev = "";
+
+    if (pipcardnum > 0)
+        GetDevices(pipcardnum, pipvideodev, pipaudiodev, pipaudiosamplerate);
+
+    channel = new Channel(this, videodev);
     channel->Open();
     channel->SetFormat(settings->GetSetting("TVFormat"));
     channel->SetFreqTable(settings->GetSetting("FreqTable"));
     channel->SetChannelByString(startchannel);
     channel->Close();  
 
-    pipchannel = new Channel(this, settings->GetSetting("PIPV4LDevice"));
+    pipchannel = new Channel(this, pipvideodev);
     if (pipchannel->Open())
     {
         pipchannel->SetFormat(settings->GetSetting("TVFormat"));
@@ -116,9 +145,10 @@ TVState TV::LiveTV(void)
         QString cmdline = QString("mythdialog \"MythTV is already recording "
                                   "'%1' on channel %2.  Do you want to:\" "
                                   "\"Stop recording and watch TV\" \"Watch the "
-                                  "in-progress recording\" \"Cancel\"")
+                                  "in-progress recording\" "
+                                  "\"Cancel and go back to the menu\"")
                                   .arg(curRecording->title)
-                                  .arg(curRecording->channum);
+                                  .arg(curRecording->chanstr);
 
         int result = system(cmdline.ascii());
 
@@ -135,6 +165,11 @@ TVState TV::LiveTV(void)
             nextState = kState_WatchingRecording;
             inputFilename = outputFilename;
             changeState = true;
+        }
+        else
+        {
+            nextState = kState_RecordingOnly;
+            changeState = false;
         }
     }
     else if (internalState == kState_None)
@@ -162,7 +197,7 @@ int TV::AllowRecording(ProgramInfo *rcinfo, int timeuntil)
     }
 
     QString message = "MythTV wants to record \"";
-    message += rcinfo->title + "\" on Channel " + rcinfo->channum;
+    message += rcinfo->title + "\" on Channel " + rcinfo->chanstr;
     message += " in %d seconds.  Do you want to:";
 
     QString option1 = "Record and watch while it records";
@@ -390,7 +425,7 @@ void TV::HandleStateChange(void)
               nextState == kState_WatchingOtherRecording))
     {   
         channel->Open();
-        channel->SetChannelByString(curRecording->channum);
+        channel->SetChannelByString(curRecording->chanstr);
         channel->Close();
 
         rbuffer = new RingBuffer(outputFilename, true);
@@ -482,7 +517,7 @@ void TV::HandleStateChange(void)
 
         rbuffer->Reset();
 
-        channel->SetChannelByString(curRecording->channum);
+        channel->SetChannelByString(curRecording->chanstr);
 
         rbuffer->TransitionToFile(outputFilename);
         nvr->WriteHeader(true);
@@ -597,7 +632,7 @@ void TV::SetupRecorder(void)
 
     nvr = new NuppelVideoRecorder();
     nvr->SetRingBuffer(rbuffer);
-    nvr->SetVideoDevice(settings->GetSetting("V4LDevice"));
+    nvr->SetVideoDevice(videodev);
     nvr->SetResolution(settings->GetNumSetting("Width"),
                        settings->GetNumSetting("Height"));
     nvr->SetTVFormat(settings->GetSetting("TVFormat"));
@@ -614,12 +649,13 @@ void TV::SetupRecorder(void)
                        settings->GetNumSetting("QualDiff"));
     
     nvr->SetMP3Quality(settings->GetNumSetting("MP3Quality"));
-    nvr->SetAudioSampleRate(settings->GetNumSetting("AudioSampleRate"));
 
-    QString auddevice = settings->GetSetting("RecordAudioDevice");
-    if (auddevice.length() < 2)
-        auddevice = settings->GetSetting("AudioDevice");
-    nvr->SetAudioDevice(auddevice);
+    if (audiosamplerate > 0)
+        nvr->SetAudioSampleRate(audiosamplerate);
+    else
+        nvr->SetAudioSampleRate(settings->GetNumSetting("AudioSampleRate"));
+
+    nvr->SetAudioDevice(audiodev);
     nvr->SetAudioCompression(!settings->GetNumSetting("DontCompressAudio"));
 
     nvr->Initialize();
@@ -636,7 +672,7 @@ void TV::SetupPipRecorder(void)
     pipnvr = new NuppelVideoRecorder();
     pipnvr->SetRingBuffer(piprbuffer);
     pipnvr->SetAsPIP();
-    pipnvr->SetVideoDevice(settings->GetSetting("PIPV4LDevice"));
+    pipnvr->SetVideoDevice(pipvideodev);
     pipnvr->SetResolution(160, 128);
     pipnvr->SetTVFormat(settings->GetSetting("TVFormat"));
 
@@ -645,12 +681,13 @@ void TV::SetupPipRecorder(void)
     pipnvr->SetRTJpegQuality(255);
 
     pipnvr->SetMP3Quality(9);
-    pipnvr->SetAudioSampleRate(settings->GetNumSetting("AudioSampleRate"));
 
-    QString auddevice = settings->GetSetting("PIPRecordAudioDevice");
-    if (auddevice.length() < 2)
-        auddevice = settings->GetSetting("AudioDevice");
-    pipnvr->SetAudioDevice(auddevice);
+    if (pipaudiosamplerate > 0)
+        pipnvr->SetAudioSampleRate(pipaudiosamplerate);
+    else
+        pipnvr->SetAudioSampleRate(settings->GetNumSetting("AudioSampleRate"));
+
+    pipnvr->SetAudioDevice(pipaudiodev);
     pipnvr->SetAudioCompression(!settings->GetNumSetting("DontCompressAudio"));
 
     pipnvr->Initialize();
@@ -854,7 +891,7 @@ void TV::RunTV(void)
 
         usleep(1000);
 
-        if ((keypressed = XJ_CheckEvents()))
+        if (nvp && (keypressed = nvp->CheckEvents()))
         {
            ProcessKeypress(keypressed);
         }
@@ -1223,7 +1260,7 @@ void TV::ToggleInputs(void)
     usleep(300000);
 
     if (activenvp == nvp)
-        UpdateOSD();
+        UpdateOSDInput();
 
     activenvp->Unpause();
 }
@@ -1355,29 +1392,26 @@ void TV::ChangeChannelByString(QString &name)
 
 void TV::UpdateOSD(void)
 {
-    QString channelname = channel->GetCurrentName();
-    if (channelname.length() > 6)
-    {
-        QString dummy = "";
-        osd->SetInfoText(channelname, dummy, dummy, dummy, dummy, dummy,
-                         dummy, dummy, osd_display_time);
-    }
-    else
-    {
-        QString title, subtitle, desc, category, starttime, endtime;
-        QString callsign, iconpath;
-        GetChannelInfo(channel->GetCurrentName(), title, subtitle, desc, 
-                       category, starttime, endtime, callsign, iconpath);
+    QString title, subtitle, desc, category, starttime, endtime;
+    QString callsign, iconpath;
+    GetChannelInfo(title, subtitle, desc, category, starttime, endtime, 
+                   callsign, iconpath);
 
-        osd->SetInfoText(title, subtitle, desc, category, starttime, endtime,
-                         callsign, iconpath, osd_display_time);
-        osd->SetChannumText(channel->GetCurrentName(), osd_display_time);
-    }
+    osd->SetInfoText(title, subtitle, desc, category, starttime, endtime,
+                     callsign, iconpath, osd_display_time);
+    osd->SetChannumText(channel->GetCurrentName(), osd_display_time);
 }
 
-void TV::GetChannelInfo(QString lchannel, QString &title, QString &subtitle,
-                        QString &desc, QString &category, QString &starttime,
-                        QString &endtime, QString &callsign, QString &iconpath)
+void TV::UpdateOSDInput(void)
+{
+    QString dummy = "";
+    osd->SetInfoText(channel->GetCurrentInput(), dummy, dummy, dummy, dummy, 
+                     dummy, dummy, dummy, osd_display_time);
+}
+
+void TV::GetChannelInfo(QString &title, QString &subtitle, QString &desc, 
+                        QString &category, QString &starttime, QString &endtime,
+                        QString &callsign, QString &iconpath)
 {
     title = "";
     subtitle = "";
@@ -1397,12 +1431,23 @@ void TV::GetChannelInfo(QString lchannel, QString &title, QString &subtitle,
     loctime = localtime(&curtime);
 
     strftime(curtimestr, 128, "%Y%m%d%H%M%S", loctime);
-    
-    QString thequery = QString("SELECT channum,starttime,endtime,title,"
-                               "subtitle,description,category FROM program "
-                               "WHERE channum = %1 AND starttime < %2 AND "
-                               "endtime > %3;").arg(lchannel).arg(curtimestr)
-                               .arg(curtimestr);
+   
+    QString channelname = channel->GetCurrentName();
+    QString channelinput = channel->GetCurrentInput();
+    QString device = channel->GetDevice();
+ 
+    QString thequery = QString("SELECT starttime,endtime,title,subtitle,"
+                               "description,category,callsign,icon "
+                               "FROM program,channel,capturecard,cardinput "
+                               "WHERE channel.channum = %1 "
+                               "AND starttime < %2 AND endtime > %3 AND "
+                               "program.chanid = channel.chanid AND "
+                               "channel.sourceid = cardinput.sourceid AND "
+                               "cardinput.inputname = \"%4\" AND "
+                               "cardinput.cardid = capturecard.cardid AND "
+                               "capturecard.videodevice = \"%5\";")
+                               .arg(channelname).arg(curtimestr).arg(curtimestr)
+                               .arg(channelinput).arg(device);
 
     QSqlQuery query = db_conn->exec(thequery);
 
@@ -1411,42 +1456,34 @@ void TV::GetChannelInfo(QString lchannel, QString &title, QString &subtitle,
     {
         query.next();
 
-        starttime = query.value(1).toString();
-        endtime = query.value(2).toString();
-        test = query.value(3).toString();
+        starttime = query.value(0).toString();
+        endtime = query.value(1).toString();
+        test = query.value(2).toString();
         if (test != QString::null)
             title = QString::fromUtf8(test);
-        test = query.value(4).toString();
+        test = query.value(3).toString();
         if (test != QString::null)
             subtitle = QString::fromUtf8(test);
-        test = query.value(5).toString();
+        test = query.value(4).toString();
         if (test != QString::null)
             desc = QString::fromUtf8(test);
-        test = query.value(6).toString();
+        test = query.value(5).toString();
         if (test != QString::null)
             category = QString::fromUtf8(test);
-    }
-
-    thequery = QString("SELECT callsign,icon FROM channel WHERE channum "
-                       "= %1;").arg(lchannel);
-
-    query = db_conn->exec(thequery);
-    if (query.isActive() && query.numRowsAffected() > 0)
-    {
-        query.next();
-
-        test = query.value(0).toString();
+        test = query.value(6).toString();
         if (test != QString::null)
             callsign = test;
-        test = query.value(1).toString();
+        test = query.value(7).toString();
         if (test != QString::null)
-            iconpath = test; 
+            iconpath = test;
     }
 }
 
-void TV::ConnectDB(void)
+void TV::ConnectDB(int cardnum)
 {
-    db_conn = QSqlDatabase::addDatabase("QMYSQL3", "TV");
+    QString name = QString("TV%1%2").arg(cardnum).arg(rand());
+
+    db_conn = QSqlDatabase::addDatabase("QMYSQL3", name);
     if (!db_conn)
     {
         printf("Couldn't initialize mysql connection\n");
@@ -1472,21 +1509,63 @@ void TV::DisconnectDB(void)
     }
 }
 
+void TV::GetDevices(int cardnum, QString &video, QString &audio, int &rate)
+{
+    video = "";
+    audio = "";
+
+    QString thequery = QString("SELECT videodevice,audiodevice,audioratelimit "
+                               "FROM capturecard WHERE cardid = %1;")
+                              .arg(cardnum);
+
+    QSqlQuery query = db_conn->exec(thequery);
+
+    int testnum = 0;
+
+    QString test;
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        query.next();
+
+        test = query.value(0).toString();
+        if (test != QString::null)
+            video = QString::fromUtf8(test);
+        test = query.value(1).toString();
+        if (test != QString::null)
+            audio = QString::fromUtf8(test);
+        testnum = query.value(2).toInt();
+
+        if (testnum > 0)
+            rate = testnum;
+        else
+            rate = -1;
+    }
+}
+
 bool TV::CheckChannel(QString &channum)
 {
     if (!db_conn)
         return true;
 
     bool ret = false;
-    QString thequery = QString("SELECT * FROM channel WHERE channum = "
-                               "%1;").arg(channum);
+
+    QString channelinput = channel->GetCurrentInput();
+    QString device = channel->GetDevice();
+
+    QString thequery = QString("SELECT NULL FROM channel,capturecard,cardinput "
+                               "WHERE channel.channum = %1 AND "
+                               "channel.sourceid = cardinput.sourceid AND "
+                               "cardinput.inputname = \"%2\" AND "
+                               "cardinput.cardid = capturecard.cardid AND "
+                               "capturecard.videodevice = \"%3\";")
+                               .arg(channum).arg(channelinput).arg(device);
 
     QSqlQuery query = db_conn->exec(thequery);
 
     if (query.isActive() && query.numRowsAffected() > 0)
         return true;
 
-    thequery = "SELECT * FROM channel;";
+    thequery = "SELECT NULL FROM channel;";
     query = db_conn->exec(thequery);
 
     if (query.numRowsAffected() == 0)
@@ -1505,7 +1584,7 @@ bool TV::ChangeExternalChannel(QString &channum)
 
     if (ret > 0)
         return true;
-    return false;
+    return true;
 }
 
 void TV::doLoadMenu(void)
@@ -1514,7 +1593,8 @@ void TV::doLoadMenu(void)
 
     char runname[512];
 
-    sprintf(runname, "%s %s", epgname.ascii(), channel->GetCurrentName().ascii());
+    sprintf(runname, "%s %s", epgname.ascii(), 
+            channel->GetCurrentName().ascii());
     int ret = system(runname);
 
     if (ret > 0)

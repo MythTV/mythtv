@@ -1,26 +1,55 @@
-/* Based on xqcam.c by Paul Chinn <loomer@svpal.org> */
-#include <X11/Xlib.h> 
-extern int XJ_depth;
-extern unsigned char *XJ_init(int width, int height, char *window_name, 
-                              char *icon_name);
-extern void XJ_exit(void);
-extern void XJ_show(int width, int height);
-extern int XJ_CheckEvents(void);
+#ifndef XJ_H_
+#define XJ_H_
 
-#define wsUp            0x52 + 256
-#define wsDown          0x54 + 256
-#define wsLeft          0x51 + 256
-#define wsRight         0x53 + 256
-#define wsEscape        0x1b + 256
-#define wsZero          0xb0 + 256
-#define wsOne           0xb1 + 256
-#define wsTwo           0xb2 + 256
-#define wsThree         0xb3 + 256
-#define wsFour          0xb4 + 256
-#define wsFive          0xb5 + 256
-#define wsSix           0xb6 + 256
-#define wsSeven         0xb7 + 256
-#define wsEight         0xb8 + 256
-#define wsNine          0xb9 + 256
-#define wsEnter         0x8d + 256
-#define wsReturn        0x0d + 256
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <X11/extensions/XShm.h>
+#include <X11/extensions/Xv.h>
+#include <X11/extensions/Xvlib.h>
+
+class XvVideoOutput
+{
+  public:
+    XvVideoOutput() { XJ_started = 0; xv_port = -1; }
+   ~XvVideoOutput() { Exit(); }
+
+    unsigned char *Init(int width, int height, char *window_name, 
+                        char *icon_name);
+    void Show(int width, int height);
+    int CheckEvents(void);
+
+  private:
+    void ToggleFullScreen();
+    void sizehint(int x, int y, int width, int height, int max);
+    void Exit(void);
+
+    void decorate(int dec); 
+    void hide_cursor(void);
+    void show_cursor(void);
+
+    XShmSegmentInfo XJ_SHMInfo;
+    Screen *XJ_screen;
+    Display *XJ_disp;
+    Window XJ_root,XJ_win;
+    XvImage *XJ_image;
+
+    XEvent XJ_ev;
+    GC XJ_gc;
+    int XJ_screen_num;
+    unsigned long XJ_white,XJ_black;
+    int XJ_started;
+    int XJ_depth;
+    int XJ_caught_error;
+    int XJ_width, XJ_height;
+    int XJ_screenwidth, XJ_screenheight;
+    int XJ_fullscreen;
+
+    int oldx, oldy, oldw, oldh;
+    int curx, cury, curw, curh;
+
+    XSizeHints hints;
+
+    int xv_port;
+};
+
+#endif

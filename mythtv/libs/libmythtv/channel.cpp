@@ -142,11 +142,6 @@ bool Channel::SetChannelByString(const QString &chan)
         }
     }
     
-    if (foundit)
-    {
-        if (currentcapchannel != 0)
-            SwitchToInput("Television");
-    }
     if (!foundit)
         return false;
 
@@ -157,11 +152,7 @@ bool Channel::SetChannel(int i)
 {
     QString channame;
  
-    if (currentcapchannel == 0)
-        channame = curList[i].name;
-    else
-        channame = QString("%1:%2").arg(channelnames[currentcapchannel]) 
-                                   .arg(curList[i].name);
+    channame = curList[i].name;
 
     if (pParent->CheckChannel(channame))
     {
@@ -177,7 +168,11 @@ bool Channel::SetChannel(int i)
         else
         {
             channame = curList[i].name;
-            return pParent->ChangeExternalChannel(channame);
+            if (pParent->ChangeExternalChannel(channame))
+            {
+                curchannel = i;
+                return true;
+            }
         }
     }
     return false;
@@ -218,14 +213,12 @@ bool Channel::ChannelDown(void)
 
 QString Channel::GetCurrentName(void)
 {
-    if (currentcapchannel == 0)
-        return curList[curchannel].name;
-    else
-    {
-        QString ret = channelnames[currentcapchannel];
-        ret += QString(":") + curList[curchannel].name;
-        return ret;
-    }
+    return curList[curchannel].name;
+}
+
+QString Channel::GetCurrentInput(void)
+{
+    return channelnames[currentcapchannel];
 }
 
 void Channel::ToggleInputs(void)

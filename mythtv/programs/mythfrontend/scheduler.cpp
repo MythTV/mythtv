@@ -15,6 +15,8 @@ Scheduler::Scheduler(QSqlDatabase *ldb)
 {
     hasconflicts = false;
     db = ldb;
+
+    setupCards();
 }
 
 Scheduler::~Scheduler()
@@ -24,6 +26,83 @@ Scheduler::~Scheduler()
         ProgramInfo *pginfo = recordingList.back();
         delete pginfo;
         recordingList.pop_back();
+    }
+}
+
+void Scheduler::setupCards(void)
+{
+    QSqlQuery query, subquery;
+    QString thequery;
+
+    thequery = "SELECT NULL FROM capturecard;";
+
+    query = db->exec(thequery);
+
+    numcards = -1;
+
+    if (query.isActive())
+        numcards = query.numRowsAffected();
+
+    if (numcards <= 0)
+    {
+        cerr << "ERROR: no capture cards are defined in the database.\n";
+        exit(0);
+    }
+
+    thequery = "SELECT sourceid,name FROM videosource ORDER BY sourceid;";
+
+    query = db->exec(thequery);
+
+    numsources = -1;
+
+    if (query.isActive())
+    {
+        numsources = query.numRowsAffected();
+        numCardsPerSource.resize(numsources);
+        sourceToInput.resize(numsources);
+
+        int i = 0;
+
+        while (query.next())
+        {
+            thequery = QString("SELECT cardinputid FROM cardinput WHERE "
+                               "sourceid = %1 ORDER BY cardid")
+                              .arg(query.value(0).toInt());
+            subquery = db->exec(thequery);
+          
+            if (subquery.isActive() && subquery.numRowsAffected() > 0)
+            {
+                numCardsPerSource[i] = subquery.numRowsAffected();
+ 
+                while (subquery.next())
+                    sourceToInput[i].push_back(subquery.value(0).toInt());
+            }
+            else
+            {
+                numCardsPerSource[i] = -1;
+                cerr << query.value(1).toString() << " is defined, but isn't "
+                     << "attached to a cardinput.\n";
+            }
+            i++;
+        }
+    }
+
+    if (numsources <= 0)
+    {
+        cerr << "ERROR: No channel sources defined in the database\n";
+        exit(0);
+    }
+
+    thequery = "SELECT cardid FROM cardinput ORDER BY cardinputid\n";
+
+    query = db->exec(thequery);
+
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        while (query.next())
+        {
+            inputToCard.push_back(query.value(0).toInt());
+        }  
     }
 }
 
@@ -79,8 +158,9 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
 
     QDateTime curTime = QDateTime::currentDateTime();
 
-    thequery = "SELECT channum,starttime,endtime,title,subtitle,description "
-               "FROM singlerecord;";
+    thequery = "SELECT channel.chanid,sourceid,starttime,endtime,title,"
+               "subtitle,description,channel.channum FROM singlerecord,channel "
+               "WHERE channel.chanid = singlerecord.chanid;";
 
     query = db->exec(thequery);
     if (query.isActive() && query.numRowsAffected() > 0)
@@ -88,14 +168,16 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
         while (query.next())
         {
             ProgramInfo *proginfo = new ProgramInfo;
-            proginfo->title = query.value(3).toString();
-            proginfo->subtitle = query.value(4).toString();
-            proginfo->description = query.value(5).toString();
-            proginfo->startts = QDateTime::fromString(query.value(1).toString(),
+            proginfo->chanid = query.value(0).toString();
+            proginfo->sourceid = query.value(1).toInt();
+            proginfo->startts = QDateTime::fromString(query.value(2).toString(),
                                                       Qt::ISODate);
-            proginfo->endts = QDateTime::fromString(query.value(2).toString(),
+            proginfo->endts = QDateTime::fromString(query.value(3).toString(),
                                                     Qt::ISODate);
-            proginfo->channum = query.value(0).toString();
+            proginfo->title = query.value(4).toString();
+            proginfo->subtitle = query.value(5).toString();
+            proginfo->description = query.value(6).toString();
+            proginfo->chanstr = query.value(7).toString();
             proginfo->recordtype = 1;
 
             if (proginfo->title == QString::null)
@@ -112,17 +194,20 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
         }
     }
 
-    thequery = "SELECT channum,starttime,endtime,title FROM timeslotrecord;";
+    thequery = "SELECT channel.chanid,sourceid,starttime,endtime,title FROM "
+               "timeslotrecord,channel WHERE "
+               "channel.chanid = singlerecord.chanid;";
 
     query = db->exec(thequery);
     if (query.isActive() && query.numRowsAffected() > 0)
     {
         while (query.next())
         {
-            QString channum = query.value(0).toString();
-            QString starttime = query.value(1).toString();
-            QString endtime = query.value(2).toString();
-            QString title = query.value(3).toString();
+            QString chanid = query.value(0).toString();
+            int sourceid = query.value(1).toInt();
+            QString starttime = query.value(2).toString();
+            QString endtime = query.value(3).toString();
+            QString title = query.value(4).toString();
 
             if (title == QString::null)
                 continue;
@@ -138,16 +223,21 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
             sprintf(startquery, "%4d%02d%02d%02d%02d00", curdate.year(),
                     curdate.month(), curdate.day(), hour, min);
 
-            curdate = curdate.addDays(2);
+            curdate = curdate.addDays(7);
             sprintf(endquery, "%4d%02d%02d%02d%02d00", curdate.year(),
                     curdate.month(), curdate.day(), hour, min);
 
-            thequery = QString("SELECT channum,starttime,endtime,title,"
-                               "subtitle,description,category FROM program "
-                               "WHERE channum = %1 AND starttime = %2 AND "
-                               "endtime < %3 AND title = \"%4\";") 
-                               .arg(channum).arg(startquery).arg(endquery)
-                               .arg(title);
+            thequery = QString("SELECT channel.chanid,starttime, "
+                               "endtime,title,subtitle,description,category,"
+                               "channel.channum "
+                               "FROM program,channel WHERE "
+                               "program.chanid = %1 AND "
+                               "starttime = %2 AND endtime < %3 AND "
+                               "title = \"%4\" AND "
+                               "channel.chanid = program.chanid AND "
+                               "channel.sourceid = %5;") 
+                               .arg(chanid).arg(startquery).arg(endquery)
+                               .arg(title).arg(sourceid);
             subquery = db->exec(thequery);
 
             if (subquery.isActive() && subquery.numRowsAffected() > 0)
@@ -155,16 +245,20 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
                 while (subquery.next())
                 {
                     ProgramInfo *proginfo = new ProgramInfo;
-                    proginfo->title = subquery.value(3).toString();
-                    proginfo->subtitle = subquery.value(4).toString();
-                    proginfo->description = subquery.value(5).toString();
+
+                    proginfo->sourceid = sourceid;
+
+                    proginfo->chanid = subquery.value(0).toString();
                     proginfo->startts = 
                              QDateTime::fromString(subquery.value(1).toString(),
                                                    Qt::ISODate);
                     proginfo->endts = 
                              QDateTime::fromString(subquery.value(2).toString(),
                                                    Qt::ISODate);
-                    proginfo->channum = subquery.value(0).toString();
+                    proginfo->title = subquery.value(3).toString();
+                    proginfo->subtitle = subquery.value(4).toString();
+                    proginfo->description = subquery.value(5).toString();
+                    proginfo->chanstr = subquery.value(6).toString();
                     proginfo->recordtype = 2;
 
                     if (proginfo->title == QString::null)
@@ -200,16 +294,19 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
                     curdate.month(), curdate.day(), curtime.hour(), 
                     curtime.minute());
 
-            curdate = curdate.addDays(2);
+            curdate = curdate.addDays(7);
             sprintf(endquery, "%4d%02d%02d%02d%02d00", curdate.year(),
                     curdate.month(), curdate.day(), curtime.hour(), 
                     curtime.minute());
 
-            thequery = QString("SELECT channum,starttime,endtime,title,"
-                               "subtitle,description,category FROM program "
-                               "WHERE starttime >= %1 AND endtime < %2 AND "
-                               "title = \"%3\";").arg(startquery).arg(endquery)
-                               .arg(title);
+            thequery = QString("SELECT channel.chanid,sourceid,starttime,"
+                               "endtime,title,subtitle,description,category,"
+                               "channel.channum "
+                               "FROM program,channel WHERE starttime >= %1 AND "
+                               "endtime < %2 AND title = \"%3\" AND "
+                               "channel.chanid = program.chanid;")
+                               .arg(startquery).arg(endquery).arg(title);
+
             subquery = db->exec(thequery);
 
             if (subquery.isActive() && subquery.numRowsAffected() > 0)
@@ -217,16 +314,20 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
                 while (subquery.next())
                 {
                     ProgramInfo *proginfo = new ProgramInfo;
-                    proginfo->title = subquery.value(3).toString();
-                    proginfo->subtitle = subquery.value(4).toString();
-                    proginfo->description = subquery.value(5).toString();
+
+                    proginfo->chanid = subquery.value(0).toString();
+                    proginfo->sourceid = subquery.value(1).toInt();
                     proginfo->startts = 
-                             QDateTime::fromString(subquery.value(1).toString(),
-                                                   Qt::ISODate);
-                    proginfo->endts = 
                              QDateTime::fromString(subquery.value(2).toString(),
                                                    Qt::ISODate);
-                    proginfo->channum = subquery.value(0).toString();
+                    proginfo->endts = 
+                             QDateTime::fromString(subquery.value(3).toString(),
+                                                   Qt::ISODate);
+                    proginfo->title = subquery.value(4).toString();
+                    proginfo->subtitle = subquery.value(5).toString();
+                    proginfo->description = subquery.value(6).toString();
+                    proginfo->chanstr = subquery.value(7).toString();
+
                     proginfo->recordtype = 3;
 
                     if (proginfo->title == QString::null)
@@ -245,9 +346,17 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
     if (recordingList.size() > 0)
     {
         recordingList.sort(comp_proginfo());
+        MarkKnownInputs();
         MarkConflicts();
-        PruneList();
+        PruneList(); 
         MarkConflicts();
+
+        if (numcards > 1)
+        {
+            DoMultiCard();
+            MarkConflicts();
+        }
+
         MarkConflictsToRemove();
         if (doautoconflicts)
         {
@@ -259,6 +368,18 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
     }
 
     return hasconflicts;
+}
+
+void Scheduler::PrintList(void)
+{
+    list<ProgramInfo *>::iterator i = recordingList.begin();
+    for (; i != recordingList.end(); i++)
+    {
+        ProgramInfo *first = (*i);
+        cout << first->title << " " << first->chanstr << " \"" << first->startts.toString() << "\" " << first->sourceid << " " << first->inputid << " " << first->cardid << " --\t"  << first->conflicting << " " << first->recording << endl;
+    }
+
+    cout << endl << endl;
 }
 
 ProgramInfo *Scheduler::GetNextRecording(void)
@@ -281,28 +402,56 @@ void Scheduler::RemoveFirstRecording(void)
 
 bool Scheduler::Conflict(ProgramInfo *a, ProgramInfo *b)
 {
+    if (a->cardid > 0 && b->cardid > 0)
+    {
+        if (a->cardid != b->cardid)
+            return false;
+    }
+
     if ((a->startts <= b->startts && b->startts < a->endts) ||
-        (b->endts <= a->endts && a->startts < b->endts))
+        (a->startts <  b->endts   && b->endts   < a->endts) ||
+        (b->startts <= a->startts && a->startts < b->endts) ||
+        (b->startts <  a->endts   && a->endts   < b->endts))
         return true;
     return false;
 }
- 
-void Scheduler::MarkConflicts(void)
+
+void Scheduler::MarkKnownInputs(void)
 {
-    hasconflicts = false;
     list<ProgramInfo *>::iterator i = recordingList.begin();
     for (; i != recordingList.end(); i++)
+    {
+        ProgramInfo *first = (*i);
+        if (first->inputid == -1)
+        {
+            if (numCardsPerSource[first->sourceid - 1] == 1)
+            {
+                first->inputid = sourceToInput[first->sourceid - 1][0];
+                first->cardid = inputToCard[first->inputid - 1];
+            }
+        }
+    }
+}
+ 
+void Scheduler::MarkConflicts(list<ProgramInfo *> *uselist)
+{
+    list<ProgramInfo *> *curList = &recordingList;
+    if (uselist)
+        curList = uselist;
+
+    hasconflicts = false;
+    list<ProgramInfo *>::iterator i = curList->begin();
+    for (; i != curList->end(); i++)
     {
         ProgramInfo *first = (*i);
         first->conflicting = false;
     }
 
-    i = recordingList.begin();
-    for (; i != recordingList.end(); i++)
+    for (i = curList->begin(); i != curList->end(); i++)
     {
         list<ProgramInfo *>::iterator j = i;
         j++;
-        for (; j != recordingList.end(); j++)
+        for (; j != curList->end(); j++)
         {
             ProgramInfo *first = (*i);
             ProgramInfo *second = (*j);
@@ -324,7 +473,7 @@ bool Scheduler::FindInOldRecordings(ProgramInfo *pginfo)
     QSqlQuery query;
     QString thequery;
     
-    thequery = QString("SELECT * FROM oldrecorded WHERE "
+    thequery = QString("SELECT NULL FROM oldrecorded WHERE "
                        "title = \"%1\" AND subtitle = \"%2\" AND "
                        "description = \"%3\";").arg(pginfo->title)
                        .arg(pginfo->subtitle).arg(pginfo->description);
@@ -393,21 +542,26 @@ void Scheduler::PruneList(void)
 }
 
 list<ProgramInfo *> *Scheduler::getConflicting(ProgramInfo *pginfo,
-                                               bool removenonplaying)
+                                               bool removenonplaying,
+                                               list<ProgramInfo *> *uselist)
 {
     if (!pginfo->conflicting && removenonplaying)
         return NULL;
 
+    list<ProgramInfo *> *curList = &recordingList;
+    if (uselist)
+        curList = uselist;
+
     list<ProgramInfo *> *retlist = new list<ProgramInfo *>;
 
-    list<ProgramInfo *>::iterator i = recordingList.begin();
-    for (; i != recordingList.end(); i++)
+    list<ProgramInfo *>::iterator i = curList->begin();
+    for (; i != curList->end(); i++)
     {
         ProgramInfo *second = (*i);
 
         if (second->title == pginfo->title && 
             second->startts == pginfo->startts &&
-            second->channum == pginfo->channum)
+            second->chanid == pginfo->chanid)
             continue;
 
         if (removenonplaying && (!pginfo->recording || !second->recording))
@@ -430,9 +584,9 @@ void Scheduler::CheckOverride(ProgramInfo *info,
     QString ends = info->endts.toString("yyyyMMddhhmm");
     ends += "00";
 
-    thequery = QString("SELECT * FROM conflictresolutionoverride WHERE "
-                       "channum = %1 AND starttime = %2 AND "
-                       "endtime = %3;").arg(info->channum).arg(starts)
+    thequery = QString("SELECT NULL FROM conflictresolutionoverride WHERE "
+                       "chanid = %1 AND starttime = %2 AND "
+                       "endtime = %3;").arg(info->chanid).arg(starts)
                        .arg(ends);
 
     query = db->exec(thequery);
@@ -465,10 +619,10 @@ void Scheduler::MarkSingleConflict(ProgramInfo *info,
     QString ends = info->endts.toString("yyyyMMddhhmm");
     ends += "00";
   
-    thequery = QString("SELECT dislikechannum,dislikestarttime,dislikeendtime "
+    thequery = QString("SELECT dislikechanid,dislikestarttime,dislikeendtime "
                        "FROM conflictresolutionsingle WHERE "
-                       "preferchannum = %1 AND preferstarttime = %2 AND "
-                       "preferendtime = %3;").arg(info->channum)
+                       "preferchanid = %1 AND preferstarttime = %2 AND "
+                       "preferendtime = %3;").arg(info->chanid)
                        .arg(starts).arg(ends);
  
     query = db->exec(thequery);
@@ -487,7 +641,7 @@ void Scheduler::MarkSingleConflict(ProgramInfo *info,
             for (; i != conflictList->end(); i++)
             {
                 ProgramInfo *test = (*i);
-                if (test->channum == badchannum && test->startts == badst && 
+                if (test->chanid == badchannum && test->startts == badst && 
                     test->endts == badend)
                 {
                     test->recording = false;
@@ -599,19 +753,13 @@ void Scheduler::RemoveConflicts(void)
     }
 }
 
-void Scheduler::GuessSingle(ProgramInfo *info, 
-                            list<ProgramInfo *> *conflictList)
+ProgramInfo *Scheduler::GetBest(ProgramInfo *info, 
+                                list<ProgramInfo *> *conflictList)
 {
     int type = info->recordtype;
     ProgramInfo *best = info;
-    list<ProgramInfo *>::iterator i;
- 
-    if (conflictList->size() == 0)
-    {
-        info->conflicting = false;
-        return;
-    }
 
+    list<ProgramInfo *>::iterator i;
     for (i = conflictList->begin(); i != conflictList->end(); i++)
     {
         ProgramInfo *test = (*i);
@@ -628,19 +776,36 @@ void Scheduler::GuessSingle(ProgramInfo *info,
                 best = test;
                 break;
             }
-            if (test->startts.secsTo(test->endts) > 
+            if (test->startts.secsTo(test->endts) >
                 info->startts.secsTo(info->endts))
             {
                 best = test;
                 break;
             }
-            if (test->channum.toInt() < info->channum.toInt())
+            if (test->chanid.toInt() < info->chanid.toInt())
             {
                 best = test;
                 break;
             }
         }
     }
+
+    return best;
+}
+
+void Scheduler::GuessSingle(ProgramInfo *info, 
+                            list<ProgramInfo *> *conflictList)
+{
+    ProgramInfo *best = info;
+    list<ProgramInfo *>::iterator i;
+ 
+    if (conflictList->size() == 0)
+    {
+        info->conflicting = false;
+        return;
+    }
+
+    best = GetBest(info, conflictList);
 
     if (best == info)
     {
@@ -670,4 +835,139 @@ void Scheduler::GuessConflicts(void)
             delete conflictList;
         }
     }
+}
+
+list<ProgramInfo *> *Scheduler::CopyList(list<ProgramInfo *> *sourcelist)
+{
+    list<ProgramInfo *> *retlist = new list<ProgramInfo *>;
+
+    list<ProgramInfo *>::iterator i = sourcelist->begin();
+    for (; i != sourcelist->end(); i++)
+    {
+        ProgramInfo *first = (*i);
+        ProgramInfo *second = new ProgramInfo(*first);
+
+        if (second->cardid <= 0)
+        {
+            second->inputid = sourceToInput[first->sourceid - 1][0];
+            second->cardid = inputToCard[second->inputid - 1];
+        }
+
+        retlist->push_back(second);
+    }
+
+    return retlist;
+}
+        
+void Scheduler::DoMultiCard(void)
+{
+    list<ProgramInfo *> *copylist = CopyList(&recordingList);
+
+    MarkConflicts(copylist);
+
+    int numconflicts = 0;
+
+    list<ProgramInfo *> allConflictList;
+    list<bool> canMoveList;
+
+    list<ProgramInfo *>::iterator i;
+    for (i = copylist->begin(); i != copylist->end(); i++)
+    {
+        ProgramInfo *first = (*i);
+        if (first->recording && first->conflicting)
+        {
+            numconflicts++;
+            allConflictList.push_back(first);
+            if (numCardsPerSource[first->sourceid - 1] == 1) 
+                canMoveList.push_back(false);
+            else
+                canMoveList.push_back(true);
+        }
+    }
+
+    list<bool>::iterator biter;
+    for (biter = canMoveList.begin(), i = allConflictList.begin(); 
+         biter != canMoveList.end(); biter++, i++)
+    {
+        ProgramInfo *first = (*i);
+
+        list<ProgramInfo *> *conflictList = getConflicting(first, true, 
+                                                           copylist);
+
+        bool firstmove = *biter;
+
+        list<ProgramInfo *>::iterator j = conflictList->begin();
+        for (; j != conflictList->end(); j++)
+        {
+            ProgramInfo *second = (*j);
+
+            bool secondmove = (numCardsPerSource[second->sourceid - 1] > 1);
+
+            bool fixed = false;
+            if (secondmove)
+            {
+                int storeinput = second->inputid;
+                int numinputs = numCardsPerSource[second->sourceid - 1];
+
+                for (int z = 0; z < numinputs; z++)
+                {
+                    second->inputid = sourceToInput[second->sourceid - 1][z];
+                    second->cardid = inputToCard[second->inputid - 1];
+
+                    if (!Conflict(first, second))
+                    {
+                        fixed = true;
+                        break;
+                    }
+                }
+                if (!fixed)
+                {
+                    second->inputid = storeinput;
+                    second->cardid = inputToCard[second->inputid - 1];
+                }
+            }
+
+            if (!fixed && firstmove)
+            {
+                int storeinput = first->inputid;
+                int numinputs = numCardsPerSource[first->sourceid - 1];
+
+                for (int z = 0; z < numinputs; z++)
+                {
+                    first->inputid = sourceToInput[first->sourceid - 1][z];
+                    first->cardid = inputToCard[first->inputid - 1];
+
+                    if (!Conflict(first, second))
+                    {
+                        fixed = true;
+                        break;
+                    }
+                }
+                if (!fixed)
+                {
+                    first->inputid = storeinput;
+                    first->cardid = inputToCard[first->inputid - 1];
+                }
+            }
+        }
+
+        delete conflictList;
+    }
+
+
+    for (i = recordingList.begin(); i != recordingList.end(); i++)
+    {
+        ProgramInfo *first = (*i);
+        delete first;
+    }
+
+    recordingList.clear();
+
+    for (i = copylist->begin(); i != copylist->end(); i++)
+    {
+        ProgramInfo *first = (*i);
+        recordingList.push_back(first);
+    }
+
+    delete copylist;
 }

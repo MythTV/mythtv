@@ -15,6 +15,9 @@ class ChannelInfo;
 
 using namespace std;
 
+#define DISPLAY_CHANS 6
+#define DISPLAY_TIMES 30
+
 class GuideGrid : public QDialog
 {
     Q_OBJECT
@@ -48,11 +51,13 @@ class GuideGrid : public QDialog
     void paintEvent(QPaintEvent *);
 
   private:
+    void paintDate(QPainter *p);
     void paintChannels(QPainter *p);
     void paintTimes(QPainter *p);
     void paintPrograms(QPainter *p);
 
     QRect fullRect() const;
+    QRect dateRect() const;
     QRect channelRect() const;
     QRect timeRect() const;
     QRect programRect() const;
@@ -70,8 +75,8 @@ class GuideGrid : public QDialog
     QFont *m_largerFont;
 
     vector<ChannelInfo> m_channelInfos;
-    TimeInfo *m_timeInfos[10];
-    ProgramInfo *m_programInfos[10][10];
+    TimeInfo *m_timeInfos[DISPLAY_TIMES];
+    ProgramInfo *m_programInfos[DISPLAY_CHANS][DISPLAY_TIMES];
 
     QDateTime m_originalStartTime;
     QDateTime m_currentStartTime;

@@ -16,6 +16,7 @@ class ChannelInfo
     QString callsign;
     QString iconpath;
     QString chanstr;
+    int chanid;
 
     QPixmap *icon;
 };

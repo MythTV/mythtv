@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
 
     QString startChannel = "3";
 
-    TV *tv = new TV(startChannel);
+    TV *tv = new TV(startChannel, 1, 2);
     tv->LiveTV();
 
     while (tv->GetState() == kState_None)

@@ -3,41 +3,45 @@ GRANT ALL ON mythconverg.* TO mythtv@localhost IDENTIFIED BY "mythtv";
 USE mythconverg;
 CREATE TABLE channel
 (
-    channum INT UNSIGNED NOT NULL PRIMARY KEY,
+    chanid INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
+    channum VARCHAR(5) NOT NULL,
+    sourceid INT UNSIGNED;
     callsign VARCHAR(20) NULL,
     name VARCHAR(20) NULL,
-    icon VARCHAR(255) NULL
+    icon VARCHAR(255) NULL,
+    finetune INT,
+    videofilters VARCHAR(255) NULL
 );
 CREATE TABLE program
 (
-    channum INT UNSIGNED NOT NULL,
+    chanid INT UNSIGNED NOT NULL,
     starttime TIMESTAMP NOT NULL,
     endtime TIMESTAMP NOT NULL,
     title VARCHAR(128) NULL,
     subtitle VARCHAR(128) NULL,
     description TEXT NULL,
     category VARCHAR(64) NULL,
-    PRIMARY KEY (channum, starttime),
+    PRIMARY KEY (chanid, starttime),
     INDEX (endtime)
 );
 CREATE TABLE singlerecord
 (
-    channum INT UNSIGNED NOT NULL,
+    chanid INT UNSIGNED NOT NULL,
     starttime TIMESTAMP NOT NULL,
     endtime TIMESTAMP NOT NULL,
     title VARCHAR(128) NULL,
     subtitle VARCHAR(128) NULL,
     description TEXT NULL,
-    PRIMARY KEY (channum, starttime),
+    PRIMARY KEY (chanid, starttime),
     INDEX (endtime)
 );
 CREATE TABLE timeslotrecord
 (
-    channum INT UNSIGNED NOT NULL,
+    chanid INT UNSIGNED NOT NULL,
     starttime TIME NOT NULL,
     endtime TIME NOT NULL,
     title VARCHAR(128) NULL,
-    PRIMARY KEY(channum, starttime),
+    PRIMARY KEY(chanid, starttime),
     INDEX (endtime)
 );
 CREATE TABLE allrecord
@@ -46,13 +50,13 @@ CREATE TABLE allrecord
 );
 CREATE TABLE recorded
 (
-    channum INT UNSIGNED NOT NULL,
+    chanid INT UNSIGNED NOT NULL,
     starttime TIMESTAMP NOT NULL,
     endtime TIMESTAMP NOT NULL,
     title VARCHAR(128) NULL,
     subtitle VARCHAR(128) NULL,
     description TEXT NULL,
-    PRIMARY KEY (channum, starttime),
+    PRIMARY KEY (chanid, starttime),
     INDEX (endtime)
 );
 CREATE TABLE settings
@@ -63,21 +67,21 @@ CREATE TABLE settings
 );
 CREATE TABLE conflictresolutionoverride
 (
-    channum INT UNSIGNED NOT NULL,
+    chanid INT UNSIGNED NOT NULL,
     starttime TIMESTAMP NOT NULL,
     endtime TIMESTAMP NOT NULL,
-    INDEX (channum, starttime),
+    INDEX (chanid, starttime),
     INDEX (endtime)
 );
 CREATE TABLE conflictresolutionsingle
 (
-    preferchannum INT UNSIGNED NOT NULL,
+    preferchanid INT UNSIGNED NOT NULL,
     preferstarttime TIMESTAMP NOT NULL,
     preferendtime TIMESTAMP NOT NULL,
-    dislikechannum INT UNSIGNED NOT NULL,
+    dislikechanid INT UNSIGNED NOT NULL,
     dislikestarttime TIMESTAMP NOT NULL,
     dislikeendtime TIMESTAMP NOT NULL,
-    INDEX (preferchannum, preferstarttime),
+    INDEX (preferchanid, preferstarttime),
     INDEX (preferendtime)
 );
 CREATE TABLE conflictresolutionany
@@ -89,13 +93,37 @@ CREATE TABLE conflictresolutionany
 );
 CREATE TABLE oldrecorded
 (
-    channum INT UNSIGNED NOT NULL,
+    chanid INT UNSIGNED NOT NULL,
     starttime TIMESTAMP NOT NULL,
     endtime TIMESTAMP NOT NULL,
     title VARCHAR(128) NULL,
     subtitle VARCHAR(128) NULL,
     description TEXT NULL,
-    PRIMARY KEY (channum, starttime),
+    PRIMARY KEY (chanid, starttime),
     INDEX (endtime),
     INDEX (title)
-); 
+);
+CREATE TABLE capturecard
+(
+    cardid INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
+    videodevice VARCHAR(128),
+    audiodevice VARCHAR(128),
+    cardtype VARCHAR(32) DEFAULT 'V4L',
+    audioratelimit INT
+);
+CREATE TABLE videosource
+(
+    sourceid INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
+    name VARCHAR(128)
+);
+CREATE TABLE cardinput
+(
+    cardinputid INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
+    cardid INT UNSIGNED NOT NULL,
+    sourceid INT UNSIGNED NOT NULL,
+    inputname VARCHAR(32) NOT NULL,
+    externalcommand VARCHAR(128) NULL,
+    preference INT,
+    shareable CHAR DEFAULT 'N'
+);
+ 

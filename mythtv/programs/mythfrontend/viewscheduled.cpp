@@ -219,9 +219,9 @@ void ViewScheduled::handleNotRecording(ProgramInfo *rec)
     pend += "00";
 
     QString thequery;
-    thequery = QString("INSERT INTO conflictresolutionoverride (channum, "
+    thequery = QString("INSERT INTO conflictresolutionoverride (chanid,"
                        "starttime, endtime) VALUES (%1, %2, %3);")
-                       .arg(rec->channum).arg(pstart).arg(pend);
+                       .arg(rec->chanid).arg(pstart).arg(pend);
 
     db->exec(thequery);
 
@@ -237,9 +237,9 @@ void ViewScheduled::handleNotRecording(ProgramInfo *rec)
         dend += "00";
 
         thequery = QString("DELETE FROM conflictresolutionoverride WHERE "
-                           "channum = %1 AND starttime = %2 AND "
+                           "chanid = %1 AND starttime = %2 AND "
                            "endtime = %3;")
-                           .arg((*i)->channum).arg(dstart).arg(dend);
+                           .arg((*i)->chanid).arg(dstart).arg(dend);
 
         db->exec(thequery);
     }
@@ -266,7 +266,7 @@ void ViewScheduled::handleConflicting(ProgramInfo *rec)
     QString button; 
     button = rec->title + QString("\n");
     button += rec->startts.toString("ddd MMMM d h:mm AP");
-    button += QString(" on channel ") + rec->channum;
+    button += QString(" on channel ") + rec->chanstr;
 
     diag.AddButton(button);
 
@@ -277,7 +277,7 @@ void ViewScheduled::handleConflicting(ProgramInfo *rec)
 
         button = info->title + QString("\n");
         button += info->startts.toString("ddd MMMM d h:mm AP");
-        button += QString(" on channel ") + info->channum;
+        button += QString(" on channel ") + info->chanstr;
 
         diag.AddButton(button);
     }
@@ -352,12 +352,12 @@ void ViewScheduled::handleConflicting(ProgramInfo *rec)
             dend += "00";
 
             thequery = QString("INSERT INTO conflictresolutionsingle "
-                               "(preferchannum, preferstarttime, "
-                               "preferendtime, dislikechannum, "
+                               "(preferchanid, preferstarttime, "
+                               "preferendtime, dislikechanid, "
                                "dislikestarttime, dislikeendtime) VALUES "
                                "(%1, %2, %3, %4, %5, %6);") 
-                               .arg(prefer->channum).arg(pstart).arg(pend)
-                               .arg((*i)->channum).arg(dstart).arg(dend);
+                               .arg(prefer->chanid).arg(pstart).arg(pend)
+                               .arg((*i)->chanid).arg(dstart).arg(dend);
 
             db->exec(thequery);
         }
@@ -372,8 +372,8 @@ void ViewScheduled::handleConflicting(ProgramInfo *rec)
         dend += "00";
 
         thequery = QString("DELETE FROM conflictresolutionoverride WHERE "
-                           "channum = %1 AND starttime = %2 AND "
-                           "endtime = %3;").arg((*i)->channum).arg(dstart)
+                           "chanid = %1 AND starttime = %2 AND "
+                           "endtime = %3;").arg((*i)->chanid).arg(dstart)
                            .arg(dend);
 
         db->exec(thequery);

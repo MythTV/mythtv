@@ -28,7 +28,9 @@ class ProgramInfo
     QString subtitle;
     QString description;
     QString category;
-    QString channum;
+
+    QString chanid;
+    QString chanstr;
 
     QDateTime startts;
     QDateTime endts;
@@ -39,6 +41,10 @@ class ProgramInfo
     int recordtype;
     bool conflicting;
     bool recording;
+
+    int sourceid;
+    int inputid;
+    int cardid;
 };
 
 ProgramInfo *GetProgramAtDateTime(QString channel, const QString &time);
