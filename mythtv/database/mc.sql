@@ -45,7 +45,8 @@ CREATE TABLE IF NOT EXISTS program
     airdate YEAR NOT NULL,
     stars FLOAT UNSIGNED NOT NULL,
     PRIMARY KEY (chanid, starttime),
-    INDEX (endtime)
+    INDEX (endtime),
+    INDEX (title)
 );
 CREATE TABLE IF NOT EXISTS record
 (
@@ -59,7 +60,9 @@ CREATE TABLE IF NOT EXISTS record
     title VARCHAR(128) NULL,
     subtitle VARCHAR(128) NULL,
     description TEXT NULL,
-    profile INT UNSIGNED NOT NULL DEFAULT 0
+    profile INT UNSIGNED NOT NULL DEFAULT 0,
+    INDEX (chanid, starttime),
+    INDEX (title)
 );
 CREATE TABLE IF NOT EXISTS recorded
 (
