@@ -138,6 +138,8 @@ While watching a recording:
 - X queues the current recording for transcoding.
 - O brings up menu to allow toggling settings such as Commercial Auto-Skip,
     Auto-Expire, etc.
+- D exits the current recording and displays the Delete menu for it.
+
 
 EPG
 ---
