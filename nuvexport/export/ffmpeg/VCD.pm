@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.03.02 (xris)
+#Last Updated: 2005.03.29 (xris)
 #
 #  export::ffmpeg::VCD
 #  Maintained by Gavin Hurlbut <gjhurlbu@gmail.com>
@@ -20,7 +20,7 @@ package export::ffmpeg::VCD;
     sub new {
         my $class = shift;
         my $self  = {
-                     'cli'      => qr/\bdvcd\b/i,
+                     'cli'      => qr/\bvcd\b/i,
                      'name'     => 'Export to VCD',
                      'enabled'  => 1,
                      'errors'   => [],
