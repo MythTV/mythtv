@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
 {
   pthread_t encode, decode;
 
-  RingBuffer *rbuffer = new RingBuffer("ringbuf.nuv", 1024 * 1024 * 5);
+  RingBuffer *rbuffer = new RingBuffer("ringbuf.nuv", 1024 * 1024 * 10);
   
   NuppelVideoRecorder *nvr = new NuppelVideoRecorder();
   nvr->SetRingBuffer(rbuffer);
@@ -48,6 +48,7 @@ int main(int argc, char *argv[])
       usleep(50);
 
   usleep(800000);
+
   pthread_create(&decode, NULL, SpawnDecode, nvp);
 
   while (!nvp->IsPlaying())

@@ -33,6 +33,10 @@ class RingBuffer
 
     long long readpos;
     long long readstart;
+
+    long long filesize;
+
+    long long wrapcount;
 };
 
 #endif

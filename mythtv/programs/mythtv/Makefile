@@ -44,10 +44,10 @@ tv: $(TVOBJ)
 	@rm -f tv
 	$(CXXLINK) $(TVOBJ) $(TVLDF)
 
-install: nuvrec nuvplay 
-	 strip nuvrec nuvplay 
+install: nuvrec nuvplay tv
+	 strip nuvrec nuvplay tv
 	 install -m 755 nuvrec nuvplay /usr/local/bin
 
 clean:	
-	rm -f *.o nuvplay nuvrec
+	rm -f *.o nuvplay nuvrec tv
 	$(DO_MAKE)
