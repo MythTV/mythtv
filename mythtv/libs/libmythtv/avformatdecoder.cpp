@@ -1502,6 +1502,9 @@ void AvFormatDecoder::SetPositionMap(void)
 
 bool AvFormatDecoder::PosMapFromDb()
 {
+    if (!m_db || !m_playbackinfo)
+        return false;
+
     // Overwrites current positionmap with entire contents of database
     QMap<long long, long long> posMap;
 
