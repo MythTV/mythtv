@@ -1213,6 +1213,11 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         }
         */
 
+        else
+        {
+            timing_type = "reduce jitter";
+        }
+
         nice(-19);
     }
 
@@ -1322,7 +1327,10 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         }
 
         if (disablevideo)
-            usleep(delay);
+        {
+            if (delay > 0)
+                usleep(delay);
+        }
         else
         {
             videoOutput->PrepareFrame(vbuffer[rpos], video_width,
@@ -1330,14 +1338,14 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 
             delay = UpdateDelay(&nexttrigger);
 
-            if (delay > 10000)
-            {
-                sched_yield();
-                delay = UpdateDelay(&nexttrigger);
-            }
-
             if (hasvsync)
             {
+                if (delay > 10000)
+                {
+                    sched_yield();
+                    delay = UpdateDelay(&nexttrigger);
+                }
+
                 while (delay + straddle_avoid > 0)
                 {
                     vsync_wait_for_retrace();
@@ -1355,7 +1363,15 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
                 }
             }
             else
-                ReduceJitter(&nexttrigger);
+            {
+                if (reducejitter)
+                    ReduceJitter(&nexttrigger);
+                else
+                {
+		    if (delay > 0)
+                        usleep(delay);
+                }
+            }
 
             // delay = UpdateDelay(&nexttrigger);
             // cerr << timecodes[rpos] << " "
