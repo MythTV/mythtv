@@ -592,9 +592,10 @@ bool JobQueue::DeleteAllJobs(QString chanid, QDateTime starttime)
     if (!query.isActive())
         MythContext::DBError("Abort Pending Jobs", query);
 
-    query.prepare("SELECT chanid, starttime, type FROM jobqueue "
+    query.prepare("UPDATE jobqueue SET cmds = :CMD "
                   "WHERE chanid = :CHANID AND starttime = :STARTTIME "
                   "AND status IN (:STARTING,:RUNNING,:PAUSED,:STOPPING);");
+    query.bindValue(":CMD", JOB_STOP);
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", starttime);
     query.bindValue(":STARTING", JOB_STARTING);
@@ -602,29 +603,10 @@ bool JobQueue::DeleteAllJobs(QString chanid, QDateTime starttime)
     query.bindValue(":PAUSED", JOB_PAUSED);
     query.bindValue(":STOPPING", JOB_STOPPING);
 
-    if (!query.exec() || !query.isActive())
+    if (!query.exec())
     {
         MythContext::DBError("Stop Unfinished Jobs", query);
         return false;
-    }
-
-    if (query.numRowsAffected() > 0)
-    {
-        int jobType;
-        QString chanid;
-        QDateTime starttime;
-        while (query.next())
-        {
-            chanid = query.value(0).toString();
-            starttime = query.value(1).toDateTime();
-            jobType = query.value(2).toInt();
-
-            message = QString("GLOBAL_JOB STOP %1 %2 %3")
-                              .arg(jobType).arg(chanid)
-                              .arg(starttime.toString(Qt::ISODate));
-            MythEvent me(message);
-            gContext->dispatch(me);
-        }
     }
 
     // wait until running job(s) are done
