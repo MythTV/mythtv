@@ -32,10 +32,14 @@ class Scheduler : public QObject
 
     list<ProgramInfo *> *getAllPending(void) { return &recordingList; }
     void getAllPending(list<ProgramInfo *> *retList);
+    void getAllPending(QStringList *strList);
 
     list<ProgramInfo *> *getAllScheduled(void);
-    void getAllScheduled(list<ProgramInfo *> *retList);
+    void getAllScheduled(QStringList *strList);
 
+    void getConflicting(ProgramInfo *pginfo,
+                        bool removenonplaying,
+                        QStringList *strlist);
     list<ProgramInfo *> *getConflicting(ProgramInfo *pginfo,
                                         bool removenonplaying = true,
                                         list<ProgramInfo *> *uselist = NULL);

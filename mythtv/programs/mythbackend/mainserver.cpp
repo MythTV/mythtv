@@ -1201,54 +1201,22 @@ void MainServer::HandleGetPendingRecordings(PlaybackSock *pbs)
 {
     QSocket *pbssock = pbs->getSocket();
 
-    list<ProgramInfo *> recordingList;
+    QStringList strList;
 
-    m_sched->getAllPending(&recordingList);
+    m_sched->getAllPending(&strList);
 
-    QStringList strlist;
-
-    bool conflicts = m_sched->HasConflicts();
-
-    strlist << QString::number(conflicts);
-    strlist << QString::number(recordingList.size());
-
-    list<ProgramInfo *>::iterator iter = recordingList.begin();
-    for (; iter != recordingList.end(); iter++)
-        (*iter)->ToStringList(strlist);
-
-    SendResponse(pbssock, strlist);
-
-    while (recordingList.size() > 0)
-    {
-        ProgramInfo *pginfo = recordingList.back();
-        delete pginfo;
-        recordingList.pop_back();
-    }
+    SendResponse(pbssock, strList);
 }
 
 void MainServer::HandleGetScheduledRecordings(PlaybackSock *pbs)
 {
     QSocket *pbssock = pbs->getSocket();
 
-    list<ProgramInfo *> recordingList;
-    m_sched->getAllScheduled(&recordingList);
+    QStringList strList;
 
-    QStringList strlist;
+    m_sched->getAllScheduled(&strList);
 
-    strlist << QString::number(recordingList.size());
-
-    list<ProgramInfo *>::iterator iter = recordingList.begin();
-    for (; iter != recordingList.end(); iter++)
-        (*iter)->ToStringList(strlist);
-
-    SendResponse(pbssock, strlist);
-
-    while (recordingList.size() > 0)
-    {
-        ProgramInfo *pginfo = recordingList.back();
-        delete pginfo;
-        recordingList.pop_back();
-    }
+    SendResponse(pbssock, strList);
 }
 
 void MainServer::HandleGetConflictingRecordings(QStringList &slist,
@@ -1262,23 +1230,11 @@ void MainServer::HandleGetConflictingRecordings(QStringList &slist,
     ProgramInfo *pginfo = new ProgramInfo();
     pginfo->FromStringList(slist, 1);
 
-    list<ProgramInfo *> *conflictList = m_sched->getConflicting(pginfo, 
-                                                              removenonplaying);
+    QStringList strlist;
 
-    QStringList strlist = QString::number(conflictList->size());
-
-    list<ProgramInfo *>::iterator iter = conflictList->begin();
-    for (; iter != conflictList->end(); iter++)
-        (*iter)->ToStringList(strlist); 
+    m_sched->getConflicting(pginfo, removenonplaying, &strlist);
 
     SendResponse(pbssock, strlist);
-
-    while (conflictList->size() > 0)
-    {
-        ProgramInfo *pginfo = conflictList->back();
-        delete pginfo;
-        conflictList->pop_back();
-    }
 
     delete pginfo;
 }

@@ -543,6 +543,18 @@ void Scheduler::getAllPending(list<ProgramInfo *> *retList)
     }
 }
 
+void Scheduler::getAllPending(QStringList *strList)
+{
+    QMutexLocker lockit(recordingList_lock);
+
+    (*strList) << QString::number(hasconflicts);
+    (*strList) << QString::number(recordingList.size());
+
+    list<ProgramInfo *>::iterator i = recordingList.begin();
+    for (; i != recordingList.end(); i++)
+        (*i)->ToStringList(*strList);
+}
+
 list<ProgramInfo *> *Scheduler::getAllScheduled(void)
 {
     while (scheduledList.size() > 0)
@@ -557,25 +569,34 @@ list<ProgramInfo *> *Scheduler::getAllScheduled(void)
     return &scheduledList;
 }
 
-void Scheduler::getAllScheduled(list<ProgramInfo *> *retList)
+void Scheduler::getAllScheduled(QStringList *strList)
 {
     QMutexLocker lockit(scheduledList_lock);
 
-    while (retList->size() > 0)
-    {
-        ProgramInfo *pginfo = retList->back();
-        delete pginfo;
-        retList->pop_back();
-    }
-
     getAllScheduled();
+
+    (*strList) << QString::number(scheduledList.size());
 
     list<ProgramInfo *>::iterator i = scheduledList.begin();
     for (; i != scheduledList.end(); i++)
-    {
-        ProgramInfo *newInfo = new ProgramInfo(*(*i));
-        retList->push_back(newInfo);
-    }
+        (*i)->ToStringList(*strList);
+}
+
+void Scheduler::getConflicting(ProgramInfo *pginfo,
+                               bool removenonplaying,
+                               QStringList *strlist)
+{
+    QMutexLocker lockit(recordingList_lock);
+
+    list<ProgramInfo *> *curList = getConflicting(pginfo, removenonplaying);
+
+    (*strlist) << QString::number(curList->size());
+
+    list<ProgramInfo *>::iterator i = curList->begin();
+    for (; i != curList->end(); i++)
+        (*i)->ToStringList(*strlist);
+
+    delete curList;
 }
 
 list<ProgramInfo *> *Scheduler::getConflicting(ProgramInfo *pginfo,
