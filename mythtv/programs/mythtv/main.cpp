@@ -113,6 +113,8 @@ int main(int argc, char *argv[])
         return 47; // exit(47)
     }
 
+    print_verbose_messages |= VB_PLAYBACK;
+
     MythMainWindow *mainWindow = new MythMainWindow();
     mainWindow->Init();
     gContext->SetMainWindow(mainWindow);

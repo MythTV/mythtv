@@ -399,6 +399,7 @@ static void pmt_cb(void *opaque, const uint8_t *section, int section_len)
     SectionHeader h1, *h = &h1;
     const uint8_t *p, *p_end;
     int program_info_length, pcr_pid, pid, stream_type, desc_length;
+    int changes = 0;
     
 #ifdef DEBUG_SI
     printf("PMT:\n");
@@ -467,6 +468,7 @@ static void pmt_cb(void *opaque, const uint8_t *section, int section_len)
             if (!pmtInList(ts->pmt_pids_old, pid)) {
                 printf("adding pes stream at pid 0x%x with type %i\n", pid, stream_type);
                 add_pes_stream(ts, pid, stream_type);
+                changes = 1;
             }
             ts->pmt_pids[i]=pid; i++;
             break;
@@ -482,6 +484,7 @@ static void pmt_cb(void *opaque, const uint8_t *section, int section_len)
             printf("closing filter for pid 0x%x\n", ts->pmt_pids_old[i]);
             av_remove_stream(ts->stream, ts->pmt_pids_old[i]);
             mpegts_close_filter(ts, ts->pids[ts->pmt_pids_old[i]]);
+            changes = 1;
         }
     memcpy(ts->pmt_pids_old, ts->pmt_pids, PMT_PIDS_MAX*sizeof(int));
 
@@ -491,6 +494,13 @@ static void pmt_cb(void *opaque, const uint8_t *section, int section_len)
         ts->set_service_cb(ts->set_service_opaque, 0);
     mpegts_close_filter(ts, ts->pmt_filter);
     ts->pmt_filter = NULL;
+
+    /* notify stream_changed listeners */
+    AVFormatContext *s = ts->stream;
+    if (changes && s->streams_changed) {
+        printf("streams_changed()\n");
+        s->streams_changed(s->stream_change_data);
+    }
 }
 
 static void pat_cb(void *opaque, const uint8_t *section, int section_len)
@@ -531,8 +541,10 @@ static void pat_cb(void *opaque, const uint8_t *section, int section_len)
             }
         }
     }
+
     /* not found */
-    ts->set_service_cb(ts->set_service_opaque, -1);
+    if (ts->set_service_cb)
+        ts->set_service_cb(ts->set_service_opaque, -1);
 
  found:
     mpegts_close_filter(ts, ts->pat_filter);
@@ -791,14 +803,17 @@ static void init_stream(AVStream *st, int stream_type, int code)
     av_set_pts_info(st, 60, 1, 90000);
 }
 
-static void create_stream(PESContext *pes, int code)
+static int create_stream(PESContext *pes, int code)
 {
-    pes->st = av_new_stream(pes->stream, pes->pid);
-    if (pes->st) {
-        init_stream(pes->st, pes->stream_type, code);
-        pes->st->priv_data = pes;
-        pes->st->need_parsing = 1;
-    }
+    CHECKED_ALLOCZ(pes->st, sizeof(AVStream));
+    avcodec_get_context_defaults(&pes->st->codec); // sets codec defaults
+    init_stream(pes->st, pes->stream_type, code);  // sets codec type and id
+    pes->st->priv_data = pes;
+    pes->st->need_parsing = 1;
+
+    pes->st = av_add_stream(pes->stream, pes->st, pes->pid);
+fail: //for the CHECKED_ALLOCZ macro
+    return (pes->st)? 0 : -1;
 }
 
 
@@ -842,8 +857,10 @@ static void mpegts_push_data(void *opaque,
                           (code >= 0x1e0 && code <= 0x1ef) ||
                           (code == 0x1bd)))
                         goto skip;
-                    if (!pes->st) 
-                        create_stream(pes, code);
+                    if (!pes->st && -1==create_stream(pes, code)) {
+                        av_log(NULL, AV_LOG_ERROR, "Error: create_stream() failed in mpegts_push_data");
+                        goto skip;
+                    }
                     pes->state = MPEGTS_PESHEADER_FILL;
                     pes->total_size = (pes->header[4] << 8) | pes->header[5];
                     /* NOTE: a zero total size means the PES size is
@@ -938,8 +955,10 @@ static int add_pes_stream(MpegTSContext *ts, int pid, int stream_type)
     }
 
     /* create a PES context */
-    if (!(pes=av_mallocz(sizeof(PESContext))))
+    if (!(pes=av_mallocz(sizeof(PESContext)))) {
+        av_log(NULL, AV_LOG_ERROR, "Error: av_mallocz() failed in add_pes_stream");
         return -1;
+    }
     pes->ts = ts;
     pes->stream = ts->stream;
     pes->pid = pid;
@@ -947,10 +966,17 @@ static int add_pes_stream(MpegTSContext *ts, int pid, int stream_type)
     tss = mpegts_open_pes_filter(ts, pid, mpegts_push_data, pes);
     if (!tss) {
         av_free(pes);
+        av_log(NULL, AV_LOG_ERROR, "Error: unable to open mpegts PES filter in add_pes_stream");
         return -1;
     }
-    if (!pes->st)
-        create_stream(pes, -1);
+    if (!pes->st && -1==create_stream(pes, -1)) {
+        av_log(NULL, AV_LOG_ERROR, "Error: create_stream() failed in add_pes_stream");
+        return -1;
+    }
+
+    assert(pes->stream_type==stream_type);
+    assert(pes->st->codec.codec_type);
+    assert(pes->st->codec.codec_id);
 
     return 0;
 }
@@ -1111,7 +1137,7 @@ static int mpegts_probe(AVProbeData *p)
     score    = analyze(p->buf, TS_PACKET_SIZE    *CHECK_COUNT, TS_PACKET_SIZE, NULL);
     fec_score= analyze(p->buf, TS_FEC_PACKET_SIZE*CHECK_COUNT, TS_FEC_PACKET_SIZE, NULL);
 //    av_log(NULL, AV_LOG_DEBUG, "score: %d, fec_score: %d \n", score, fec_score);
-  
+ 
 // we need a clear definition for the returned score otherwise things will become messy sooner or later
     if     (score > fec_score && score > 6) return AVPROBE_SCORE_MAX + score     - CHECK_COUNT;
     else if(                 fec_score > 6) return AVPROBE_SCORE_MAX + fec_score - CHECK_COUNT;
@@ -1220,7 +1246,7 @@ static int mpegts_read_header(AVFormatContext *s,
                s->ctx_flags |= AVFMTCTX_NOHEADER;
                goto do_pcr;
            }
-            
+           
             /* tune to first service found */
             for(i=0; i<ts->nb_services && ts->set_service_ret; i++){
                 service = ts->services[0];
@@ -1237,7 +1263,7 @@ static int mpegts_read_header(AVFormatContext *s,
             
                 handle_packets(ts, MAX_SCAN_PACKETS);
             }
-            
+           
             /* if could not find service, exit */
             if (ts->set_service_ret != 0)
                 return -1;

@@ -451,8 +451,7 @@ int handleExit(void)
     // first of all find out, if a backend runs on this host...
     bool backendOnLocalhost = false;
 
-    QStringList strlist = "";
-    strlist << "QUERY_IS_ACTIVE_BACKEND";
+    QStringList strlist = "QUERY_IS_ACTIVE_BACKEND";
     strlist << gContext->GetHostName();
 
     gContext->SendReceiveStringList(strlist);

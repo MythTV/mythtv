@@ -558,6 +558,7 @@ int av_read_play(AVFormatContext *s);
 int av_read_pause(AVFormatContext *s);
 void av_close_input_file(AVFormatContext *s);
 AVStream *av_new_stream(AVFormatContext *s, int id);
+AVStream *av_add_stream(AVFormatContext *s, AVStream *st, int id);
 void av_remove_stream(AVFormatContext *s, int id);
 void av_set_pts_info(AVStream *s, int pts_wrap_bits,
                      int pts_num, int pts_den);

@@ -1817,17 +1817,36 @@ void av_close_input_file(AVFormatContext *s)
  */
 AVStream *av_new_stream(AVFormatContext *s, int id)
 {
-    AVStream *st;
+    AVStream *st = av_mallocz(sizeof(AVStream));
+    if (st) {
+        avcodec_get_context_defaults(&st->codec);
+        AVStream *stream = av_add_stream(s, st, id);
+        if (!stream)
+            av_free(st);
+        return stream;
+    }
+    return NULL;
+}
+
+/**
+ * Add a stream to an MPEG media stream. This is used by mpegts 
+ * instead of av_new_stream, so we can track new streams
+ * as indicated by the PMT.
+ *
+ * @param s MPEG media stream handle
+ * @param st new media stream
+ * @param id file format dependent stream id 
+ */
+AVStream *av_add_stream(AVFormatContext *s, AVStream *st, int id)
+{
+    if (!st)
+        return NULL;
 
     av_remove_stream(s, id);
 
     if (s->nb_streams >= MAX_STREAMS)
         return NULL;
 
-    st = av_mallocz(sizeof(AVStream));
-    if (!st)
-        return NULL;
-    avcodec_get_context_defaults(&st->codec);
     if (s->iformat) {
         /* no default bitrate if decoding */
         st->codec.bit_rate = 0;
@@ -1843,27 +1862,28 @@ AVStream *av_new_stream(AVFormatContext *s, int id)
     st->last_IP_pts = AV_NOPTS_VALUE;
 
     s->streams[s->nb_streams++] = st;
-    if (s->streams_changed)
-	s->streams_changed(s->stream_change_data);
     return st;
 }
 
+/**
+ * Remove a stream from a media stream. This is used by mpegts,
+ * so we can track streams as indicated by the PMT.
+ *
+ * @param s MPEG media stream handle
+ * @param id stream id of stream to remove
+ */
 void av_remove_stream(AVFormatContext *s, int id) {
-    //printf("av_remove_stream 0x%x -- IGNORED \n", id);
-    //return; // TODO HACK 
     int i;
     for (i=0; i<s->nb_streams; i++)
-	if (s->streams[i]->id == id) {
-	    printf("av_remove_stream 0x%x\n", id);
-	    s->nb_streams--;
-	    if (s->nb_streams-i>0)
-		memmove(&s->streams[i], &s->streams[i+1], (s->nb_streams-i)*sizeof(AVFormatContext *));
-	    if (s->streams_changed)
-		s->streams_changed(s->stream_change_data);
-	    continue;
-	}
+        if (s->streams[i]->id == id) {
+            printf("av_remove_stream 0x%x\n", id);
+            s->nb_streams--;
+            if (s->nb_streams-i>0)
+                memmove(&s->streams[i], &s->streams[i+1], (s->nb_streams-i)*sizeof(AVFormatContext *));
+            continue;
+        }
     for (i=0; i<s->nb_streams; i++)
-	s->streams[i]->index=i;
+        s->streams[i]->index=i;
 }
 
 /************************************************************/

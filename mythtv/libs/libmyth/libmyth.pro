@@ -22,7 +22,7 @@ SOURCES += util.cpp mythwizard.cpp uitypes.cpp xmlparse.cpp
 SOURCES += mythplugin.cpp mythdialogs.cpp audiooutput.cpp inetcomms.cpp 
 SOURCES += httpcomms.cpp mythmedia.cpp uilistbtntype.cpp uiphoneentry.cpp
 SOURCES += generictree.cpp managedlist.cpp DisplayRes.cpp DisplayResX.cpp
-SOURCES += volumebase.cpp audiooutputbase.cpp
+SOURCES += volumecontrol.cpp volumebase.cpp audiooutputbase.cpp
 
 LIBS += -L../libmythsamplerate
 LIBS += -lmythsamplerate-$${LIBVERSION}
