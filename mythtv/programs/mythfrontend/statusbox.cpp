@@ -741,7 +741,7 @@ void StatusBox::doTunerStatus()
                 ProgramInfo *proginfo = new ProgramInfo;
                 proginfo->FromStringList(strlist, 0);
    
-                Status += proginfo->title;
+                Status += " " + proginfo->title;
                 Status += "\n";
                 Status += proginfo->subtitle;
                 contentDetail[count] = Status;

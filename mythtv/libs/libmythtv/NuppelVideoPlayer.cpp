@@ -3537,7 +3537,7 @@ bool NuppelVideoPlayer::RebuildSeekTable(bool showPercentage, StatusCallback cb,
     if (showPercentage)
     {
         if (totalFrames)
-            printf("           ");
+            printf("             ");
         else
             printf("      ");
         fflush( stdout );
@@ -3567,8 +3567,8 @@ bool NuppelVideoPlayer::RebuildSeekTable(bool showPercentage, StatusCallback cb,
 
                 if (showPercentage)
                 {
-                    printf( "\b\b\b\b\b\b\b\b\b\b\b" );
-                    printf( "%3d%%/%3dfps", percentage, flagFPS );
+                    printf( "\b\b\b\b\b\b\b\b\b\b\b\b\b" );
+                    printf( "%3d%%/%5dfps", percentage, flagFPS );
                 }
             }
             else
@@ -3590,7 +3590,7 @@ bool NuppelVideoPlayer::RebuildSeekTable(bool showPercentage, StatusCallback cb,
     if (showPercentage)
     {
         if (totalFrames)
-            printf( "\b\b\b\b\b" );
+            printf( "\b\b\b\b\b\b\b" );
         printf( "\b\b\b\b\b\b           \b\b\b\b\b\b\b\b\b\b\b" );
     }
 

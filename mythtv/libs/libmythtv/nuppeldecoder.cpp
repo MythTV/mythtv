@@ -1106,7 +1106,6 @@ bool NuppelDecoder::GetFrame(int avignore)
         }
     }
 
-    // temporary fix until framesRead conversion is finished
     framesRead = framesPlayed;
 
     return true;

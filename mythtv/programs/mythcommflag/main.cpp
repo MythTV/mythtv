@@ -607,14 +607,22 @@ int main(int argc, char *argv[])
         VERBOSE(VB_ALL, QString("Enabled verbose msgs :%1").arg(verboseString));
 
         printf( "\n" );
-        printf( "MythTV Commercial Flagging, started at %s", ctime(&time_now));
+        printf( "MythTV Commercial Flagger, started at %s", ctime(&time_now));
 
         printf( "\n" );
         if (!isVideo)
         {
-            printf( "Flagging commercial breaks for:\n" );
-            if (a.argc() == 1)
-                printf( "ALL Un-flagged programs\n" );
+            if (!rebuildSeekTable)
+            {
+                printf( "Flagging commercial breaks for:\n" );
+                if (a.argc() == 1)
+                    printf( "ALL Un-flagged programs\n" );
+            }
+            else
+            {
+                printf( "Rebuilding SeekTable(s) for:\n" );
+            }
+
             printf( "ChanID  Start Time      "
                     "Title                                      " );
             if (rebuildSeekTable)
