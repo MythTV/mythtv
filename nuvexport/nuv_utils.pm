@@ -4,9 +4,6 @@ package nuv_utils;
 	our @ISA = qw/ Exporter /;
 	our @EXPORT = qw/ generate_showtime find_program nuv_info num_cpus fork_command shell_escape mysql_escape Quit /;
 
-# This is used to tell child processes apart from the parent, so that cleanup routines do NOT get run by children.
-	our $is_child = 0;
-
 # Returns a nicely-formatted timestamp from a specified time
 	sub generate_showtime {
 		$showtime = '';
@@ -197,10 +194,10 @@ package nuv_utils;
 		}
 	# $pid defined means that this is now the forked child
 		elsif (defined $pid) {
-			$is_child = 1;
 			system($command);
-		# Don't forget to exit, or we'll keep going back into places that the child shouldn't play
-			exit(0);
+		# Exit using something that won't set off the END block
+			use POSIX;
+			POSIX::_exit(0);
 		}
 	# Couldn't fork, guess we have to quit
 		die "Couldn't fork: $!\n\n$command\n\n";
@@ -228,7 +225,7 @@ package nuv_utils;
 
 	# Allow the functions to clean up after themselves - and make sure that they can, but not if they are marked as child processes
 	END {
-		if (!$is_child && @main::Functions) {
+		if (@main::Functions) {
 			foreach $function (@main::Functions) {
 				$function->cleanup;
 			}
