@@ -100,6 +100,7 @@ typedef struct ReorderBuffer{
 } ReorderBuffer;
 
 typedef struct ScanTable{
+    const UINT8 *scantable;
     UINT8 permutated[64];
     UINT8 raster_end[64];
 } ScanTable;
@@ -297,6 +298,11 @@ typedef struct MpegEncContext {
     ScanTable intra_v_scantable;
     ScanTable inter_scantable; // if inter == intra then intra should be used to reduce tha cache usage
     UINT8 idct_permutation[64];
+    int idct_permutation_type;
+#define FF_NO_IDCT_PERM 1
+#define FF_LIBMPEG2_IDCT_PERM 2
+#define FF_SIMPLE_IDCT_PERM 3
+#define FF_TRANSPOSE_IDCT_PERM 4
 
     void *opaque; /* private data for the user */
 
@@ -413,6 +419,8 @@ typedef struct MpegEncContext {
     UINT8 *bitstream_buffer; //Divx 5.01 puts several frames in a single one, this is used to reorder them
     int bitstream_buffer_size;
     
+    int xvid_build;
+    
     /* lavc specific stuff, used to workaround bugs in libavcodec */
     int ffmpeg_version;
     int lavc_build;
@@ -512,7 +520,7 @@ int DCT_common_init(MpegEncContext *s);
 int MPV_common_init(MpegEncContext *s);
 void MPV_common_end(MpegEncContext *s);
 void MPV_decode_mb(MpegEncContext *s, DCTELEM block[6][64]);
-void MPV_frame_start(MpegEncContext *s, AVCodecContext *avctx);
+int MPV_frame_start(MpegEncContext *s, AVCodecContext *avctx);
 void MPV_frame_end(MpegEncContext *s);
 #ifdef HAVE_MMX
 void MPV_common_init_mmx(MpegEncContext *s);

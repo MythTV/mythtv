@@ -204,7 +204,7 @@ static int decode_slice(MpegEncContext *s){
             if(ret<0){
                 const int xy= s->mb_x + s->mb_y*s->mb_width;
                 if(ret==SLICE_END){
-//printf("%d %d %06X\n", s->mb_x, s->gb.size*8 - get_bits_count(&s->gb), show_bits(&s->gb, 24));
+//printf("%d %d %d %06X\n", s->mb_x, s->mb_y, s->gb.size*8 - get_bits_count(&s->gb), show_bits(&s->gb, 24));
                     s->error_status_table[xy]|= AC_END;
                     if(!s->partitioned_frame)
                         s->error_status_table[xy]|= MV_END|DC_END;
@@ -327,6 +327,8 @@ uint64_t time= rdtsc();
         return 0;
     }
 
+retry:
+    
     if(s->bitstream_buffer_size && buf_size<20){ //divx 5.01+ frame reorder
         init_get_bits(&s->gb, s->bitstream_buffer, s->bitstream_buffer_size);
     }else
@@ -372,6 +374,17 @@ uint64_t time= rdtsc();
             s->workaround_bugs|= FF_BUG_UMP4;
             s->workaround_bugs|= FF_BUG_AC_VLC;
         }
+
+        if(s->divx_version){
+            s->workaround_bugs|= FF_BUG_QPEL_CHROMA;
+        }
+
+        if(s->avctx->fourcc == ff_get_fourcc("XVID") && s->xvid_build==0)
+            s->workaround_bugs|= FF_BUG_QPEL_CHROMA;
+        
+        if(s->xvid_build && s->xvid_build<=1)
+            s->workaround_bugs|= FF_BUG_QPEL_CHROMA;
+
 //printf("padding_bug_score: %d\n", s->padding_bug_score);
 #if 0
         if(s->divx_version==500)
@@ -420,13 +433,12 @@ uint64_t time= rdtsc();
 	    avctx->aspected_height = s->aspected_height;
 	}
 
-        if (s->codec_id==CODEC_ID_H263 && s->codec_id==CODEC_ID_H263)
-            s->gob_index = ff_h263_get_gob_height(s);
-
-        if (MPV_common_init(s) < 0)
-            return -1;
+        goto retry;
     }
-    
+
+    if((s->codec_id==CODEC_ID_H263 || s->codec_id==CODEC_ID_H263P))
+        s->gob_index = ff_h263_get_gob_height(s);
+
     if(ret==FRAME_SKIPED) return get_consumed_bytes(s, buf_size);
     /* skip if the header was thrashed */
     if (ret < 0){
@@ -445,7 +457,8 @@ uint64_t time= rdtsc();
             s->next_p_frame_damaged=0;
     }
 
-    MPV_frame_start(s, avctx);
+    if(MPV_frame_start(s, avctx) < 0)
+        return -1;
 
 #ifdef DEBUG
     printf("qscale=%d\n", s->qscale);
@@ -475,13 +488,14 @@ uint64_t time= rdtsc();
                 break;
         }
         
-        if(s->msmpeg4_version!=4)
+        if(s->msmpeg4_version!=4 && s->h263_pred)
             ff_mpeg4_clean_buffers(s);
 
         decode_slice(s);
+
         s->error_status_table[s->resync_mb_x + s->resync_mb_y*s->mb_width]|= VP_START;
     }
-    
+
     if (s->h263_msmpeg4 && s->msmpeg4_version<4 && s->pict_type==I_TYPE)
         if(msmpeg4_decode_ext_header(s, buf_size) < 0) return -1;
     

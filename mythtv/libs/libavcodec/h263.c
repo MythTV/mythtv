@@ -222,51 +222,25 @@ void h263_encode_picture_header(MpegEncContext * s, int picture_number)
     }
 }
 
+/**
+ * Encodes a group of blocks header.
+ */
 int h263_encode_gob_header(MpegEncContext * s, int mb_line)
 {
-    int pdif=0;
-    
-    /* Check to see if we need to put a new GBSC */
-    /* for RTP packetization                    */
-    if (s->rtp_mode) {
-        pdif = pbBufPtr(&s->pb) - s->ptr_lastgob;
-        if (pdif >= s->rtp_payload_size) {
-            /* Bad luck, packet must be cut before */
-            align_put_bits(&s->pb);
-            flush_put_bits(&s->pb);
-            /* Call the RTP callback to send the last GOB */
-            if (s->rtp_callback) {
-                pdif = pbBufPtr(&s->pb) - s->ptr_lastgob;
-                s->rtp_callback(s->ptr_lastgob, pdif, s->gob_number);
-            }
-            s->ptr_lastgob = pbBufPtr(&s->pb);
-            put_bits(&s->pb, 17, 1); /* GBSC */
-            s->gob_number = mb_line / s->gob_index;
-            put_bits(&s->pb, 5, s->gob_number); /* GN */
-            put_bits(&s->pb, 2, s->pict_type == I_TYPE); /* GFID */
-            put_bits(&s->pb, 5, s->qscale); /* GQUANT */
-            //fprintf(stderr,"\nGOB: %2d size: %d", s->gob_number - 1, pdif);
-            return pdif;
-       } else if (pdif + s->mb_line_avgsize >= s->rtp_payload_size) {
-           /* Cut the packet before we can't */
            align_put_bits(&s->pb);
            flush_put_bits(&s->pb);
            /* Call the RTP callback to send the last GOB */
            if (s->rtp_callback) {
-               pdif = pbBufPtr(&s->pb) - s->ptr_lastgob;
+               int pdif = pbBufPtr(&s->pb) - s->ptr_lastgob;
                s->rtp_callback(s->ptr_lastgob, pdif, s->gob_number);
            }
-           s->ptr_lastgob = pbBufPtr(&s->pb);
            put_bits(&s->pb, 17, 1); /* GBSC */
            s->gob_number = mb_line / s->gob_index;
            put_bits(&s->pb, 5, s->gob_number); /* GN */
            put_bits(&s->pb, 2, s->pict_type == I_TYPE); /* GFID */
            put_bits(&s->pb, 5, s->qscale); /* GQUANT */
            //fprintf(stderr,"\nGOB: %2d size: %d", s->gob_number - 1, pdif);
-           return pdif;
-       }
-   }
-   return 0;
+    return 0;
 }
 
 static inline int decide_ac_pred(MpegEncContext * s, DCTELEM block[6][64], int dir[6])
@@ -619,6 +593,11 @@ void mpeg4_encode_mb(MpegEncContext * s,
                 cbpy ^= 0xf;
                 put_bits(pb2, cbpy_tab[cbpy][1], cbpy_tab[cbpy][0]);
 
+                if(!s->progressive_sequence){
+                    if(cbp)
+                        put_bits(pb2, 1, s->interlaced_dct);
+                }
+    
                 if(interleaved_stats){
                     bits= get_bit_count(&s->pb);
                     s->misc_bits+= bits - s->last_bits;
@@ -4323,6 +4302,8 @@ static int decode_user_data(MpegEncContext *s, GetBitContext *gb){
         skip_bits(gb, 8);
     }
     buf[255]=0;
+    
+    /* divx detection */
     e=sscanf(buf, "DivX%dBuild%d", &ver, &build);
     if(e!=2)
         e=sscanf(buf, "DivX%db%d", &ver, &build);
@@ -4331,11 +4312,10 @@ static int decode_user_data(MpegEncContext *s, GetBitContext *gb){
         s->divx_build= build;
         if(s->picture_number==0){
             //printf("This file was encoded with DivX%d Build%d\n", ver, build);
-            if(ver==500 && build==413){
-                printf("WARNING: this version of DivX is not MPEG4 compatible, trying to workaround these bugs...\n");
-            }
         }
     }
+    
+    /* ffmpeg detection */
     e=sscanf(buf, "FFmpeg%d.%d.%db%d", &ver, &ver2, &ver3, &build);
     if(e!=4)
         e=sscanf(buf, "FFmpeg v%d.%d.%d / libavcodec build: %d", &ver, &ver2, &ver3, &build); 
@@ -4351,6 +4331,15 @@ static int decode_user_data(MpegEncContext *s, GetBitContext *gb){
         //if(s->picture_number==0)
         //    printf("This file was encoded with libavcodec build %d\n", build);
     }
+    
+    /* xvid detection */
+    e=sscanf(buf, "XviD%d", &build);
+    if(e==1){
+        s->xvid_build= build;
+        //if(s->picture_number==0)
+        //    printf("This file was encoded with XviD build %d\n", build);
+    }
+
 //printf("User Data: %s\n", buf);
     return 0;
 }
@@ -4655,6 +4644,10 @@ int intel_h263_decode_picture_header(MpegEncContext *s)
         skip_bits(&s->gb, 8);
     }
     s->f_code = 1;
+
+    s->y_dc_scale_table=
+    s->c_dc_scale_table= ff_mpeg1_dc_scale_table;
+
     return 0;
 }
 

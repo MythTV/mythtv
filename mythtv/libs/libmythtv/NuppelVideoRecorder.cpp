@@ -203,7 +203,6 @@ bool NuppelVideoRecorder::SetupAVCodec(void)
     mpa_ctx->b_frame_strategy = 0;
     mpa_ctx->gop_size = 30;
     mpa_ctx->flags = CODEC_FLAG_TYPE;
-    mpa_ctx->me_method = 5;
     mpa_ctx->key_frame = -1;
     mpa_ctx->rc_max_rate = 0;
     mpa_ctx->rc_min_rate = 0;
