@@ -9,6 +9,8 @@
 #include <time.h>
 #include <math.h>
 #include <qstringlist.h>
+#include <qsqldatabase.h>
+#include <qurl.h>
 
 #include <iostream>
 using namespace std;
@@ -21,6 +23,7 @@ using namespace std;
 #include "yuv2rgb.h"
 #include "osdtypes.h"
 #include "remoteutil.h"
+#include "programinfo.h"
 
 extern "C" {
 #include "../libavcodec/mythav.h"
@@ -50,10 +53,16 @@ extern pthread_mutex_t avcodeclock;
 #define wsEnter         0x8d + 256
 #define wsReturn        0x0d + 256
 
-
-NuppelVideoPlayer::NuppelVideoPlayer(MythContext *context)
+NuppelVideoPlayer::NuppelVideoPlayer(MythContext *context,
+                                     QSqlDatabase *ldb,
+                                     ProgramInfo *info)
 {
     m_context = context;
+    m_db = ldb;
+    m_playbackinfo = NULL;
+
+    if (info)
+        m_playbackinfo = new ProgramInfo(*info);
 
     playing = false;
     audiofd = -1;
@@ -167,6 +176,8 @@ NuppelVideoPlayer::NuppelVideoPlayer(MythContext *context)
 
 NuppelVideoPlayer::~NuppelVideoPlayer(void)
 {
+    if (m_playbackinfo)
+        delete m_playbackinfo;
     if (gf)
         lame_close(gf);
     if (rtjd)
@@ -663,19 +674,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
             deleteIter = deleteMap.begin();
         }
 
-	long long pos = GetBookmark();
-
-	if (pos > 0)
-        {            
-            bool seeks = exactseeks;
-            exactseeks = false;
-
-            fftime = pos;
-            DoFastForward(); 
-            fftime = 0;
-
-            exactseeks = seeks;
-        }
+	bookmarkseek = GetBookmark();
     }
 
     return 0;
@@ -1870,6 +1869,20 @@ void NuppelVideoPlayer::StartPlaying(void)
 
     int pausecheck = 0;
 
+    if (bookmarkseek > 30)
+    {
+        GetFrame(audiofd <= 0);
+
+        bool seeks = exactseeks;
+        exactseeks = false;
+
+        fftime = bookmarkseek;
+        DoFastForward();
+        fftime = 0;
+
+        exactseeks = seeks;
+    }
+
     while (!eof && !killplayer)
     {
 	if (resetplaying)
@@ -2013,34 +2026,12 @@ void NuppelVideoPlayer::SetBookmark(void)
 {
     if (!haspositionmap)
         return;
-
     if (livetv)
         return;
+    if (!m_db || !m_playbackinfo)
+        return;
 
-    long long framenum = framesPlayed;
-    QString filename = ringBuffer->GetFilename();
-    filename += ".bookmark";
-
-    if (filename.left(7) == "myth://")
-    {
-	if(RemoteSetBookmark(m_context, filename, framenum) == false)
-	{
-	    cerr << "Unable to open bookmark file: " << filename << endl;
-	    return;
-	}
-    }
-    else
-    {
-	FILE *bookmarkfile = fopen(filename.ascii(), "w");
-	if (!bookmarkfile)
-	{
-	    cerr << "Unable to open bookmark file: " << bookmarkfile << endl;
-	    return;
-	}
-
-	fprintf(bookmarkfile, "%lld\n", framenum);
-	fclose(bookmarkfile);
-    }
+    m_playbackinfo->SetBookmark(framesPlayed, m_db);
 
     osd->ShowText("bookmark", "Position Saved", video_width * 1 / 8, 
                   video_height * 1 / 8, video_width * 7 / 8, video_height / 2, 
@@ -2049,26 +2040,10 @@ void NuppelVideoPlayer::SetBookmark(void)
 
 long long NuppelVideoPlayer::GetBookmark(void)
 {
-    long long pos = 0;
+    if (!m_db || !m_playbackinfo)
+        return 0;
 
-    QString bookmarkname = ringBuffer->GetFilename();
-    bookmarkname += ".bookmark";
-
-    if (bookmarkname.left(7) == "myth://")
-    {
-        pos = RemoteGetBookmark(m_context, bookmarkname);
-    }
-    else
-    {
-        FILE *bookmarkfile = fopen(bookmarkname.ascii(), "r");
-
-	if (bookmarkfile)
-	{
-            fscanf(bookmarkfile, "%lld", &pos);
-            fclose(bookmarkfile);
-	}
-    }
-    return pos;
+    return m_playbackinfo->GetBookmark(m_db);
 }
 
 bool NuppelVideoPlayer::DoRewind(void)
@@ -2313,7 +2288,7 @@ bool NuppelVideoPlayer::DoFastForward(void)
     if (!exactseeks)
         normalframes = 0;
 
-    if (mpa_codec)
+    if (mpa_codec && desiredKey != lastKey)
         avcodec_flush_buffers(mpa_ctx);
 
     while (normalframes > 0 && !fileend)
@@ -2433,31 +2408,38 @@ void NuppelVideoPlayer::SetDeleteIter(void)
 bool NuppelVideoPlayer::EnableEdit(void)
 {
     editmode = false;
-    if (haspositionmap)
+
+    if (!haspositionmap || !m_playbackinfo || !m_db)
+        return false;
+
+    if (m_playbackinfo->IsEditing(m_db))
+        return false;
+
+    editmode = true;
+    Pause();
+    while (!GetPause())
+        usleep(50);
+    seekamount = keyframedist;
+    seekamountpos = 4;
+
+    dialogname = "";
+    UpdateEditSlider();
+    UpdateTimeDisplay();
+
+    if (hasdeletetable)
     {
-        editmode = true;
-        Pause();
-        while (!GetPause())
-            usleep(50);
-        seekamount = keyframedist;
-        seekamountpos = 4;
+        if (deleteMap.contains(0))
+            deleteMap.erase(0);
+        if (deleteMap.contains(totalFrames))
+            deleteMap.erase(totalFrames);
 
-        dialogname = "";
-        UpdateEditSlider();
-        UpdateTimeDisplay();
-
-        if (hasdeletetable)
-        {
-            if (deleteMap.contains(0))
-                deleteMap.erase(0);
-            if (deleteMap.contains(totalFrames))
-                deleteMap.erase(totalFrames);
-
-            QMap<long long, int>::Iterator it;
-            for (it = deleteMap.begin(); it != deleteMap.end(); ++it)
-                 AddMark(it.key(), it.data());
-        }
+        QMap<long long, int>::Iterator it;
+        for (it = deleteMap.begin(); it != deleteMap.end(); ++it)
+             AddMark(it.key(), it.data());
     }
+
+    m_playbackinfo->SetEditing(true, m_db);
+
     return editmode;   
 }
 
@@ -2483,6 +2465,8 @@ void NuppelVideoPlayer::DisableEdit(void)
         hasdeletetable = true;
         SetDeleteIter();
     }
+   
+    m_playbackinfo->SetEditing(false, m_db);
 
     Unpause();
 }
@@ -2925,57 +2909,15 @@ void NuppelVideoPlayer::SaveCutList(void)
     if (indelete)
         deleteMap[totalFrames] = 0;
 
-    QString filename = ringBuffer->GetFilename();
-    filename += ".cutlist";
-
-    FILE *cutfile = fopen(filename.ascii(), "w");
-    
-    for (i = deleteMap.begin(); i != deleteMap.end(); ++i)
-    {
-        long long frame = i.key();
-        int direction = i.data();
-
-        if (direction == 1)
-            fprintf(cutfile, "%lld - ", frame);
-        else if (direction == 0)
-            fprintf(cutfile, "%lld\n", frame);
-    }
-
-    fclose(cutfile);
-
-    if (deleteMap.isEmpty())
-        unlink(filename.ascii());
+    m_playbackinfo->SetCutList(deleteMap, m_db);
 }
 
 void NuppelVideoPlayer::LoadCutList(void)
 {
-    QString filename = ringBuffer->GetFilename();
-    filename += ".cutlist";
+    if (!m_playbackinfo || !m_db)
+        return;
 
-    deleteMap.clear();
-
-    FILE *cutfile = fopen(filename.ascii(), "r");
-
-    if (cutfile)
-    {
-        char buffer[1024];
-        long long start = 0, end = 0;
-
-        while (!feof(cutfile))
-        {
-            fgets(buffer, 1024, cutfile);
-            if (sscanf(buffer, "%lld - %lld\n", &start, &end) != 2)
-            {
-                cerr << "Malformed cutlist line: " << buffer << endl;
-            }
-            else
-            {
-                deleteMap[start] = 1;
-                deleteMap[end] = 0;
-            }
-        }
-        fclose(cutfile);
-    }
+    m_playbackinfo->GetCutList(deleteMap, m_db);
 }
 
 char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,

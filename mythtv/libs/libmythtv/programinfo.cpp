@@ -4,6 +4,8 @@
 #include <iostream>
 #include <qsocket.h>
 
+#include "mythcontext.h"
+
 using namespace std;
 
 ProgramInfo::ProgramInfo(void)
@@ -427,4 +429,171 @@ void ProgramInfo::WriteRecordedToDB(QSqlDatabase *db)
 
     GetProgramRecordingStatus(db);
     record->doneRecording(db, *this);
+}
+
+void ProgramInfo::SetBookmark(long long pos, QSqlDatabase *db)
+{
+    MythContext::KickDatabase(db);
+
+    char position[128];
+    sprintf(position, "%lld", pos);
+
+    QString starts = startts.toString("yyyyMMddhhmm");
+    starts += "00";
+
+    QString querystr = QString("UPDATE recorded SET bookmark = '%1', "
+                               "starttime = '%2' WHERE chanid = '%3' AND "
+                               "starttime = '%4';").arg(position).arg(starts)
+                                                   .arg(chanid).arg(starts);
+    QSqlQuery query = db->exec(querystr);
+    if (!query.isActive())
+        MythContext::DBError("Save position update", querystr);
+}
+
+long long ProgramInfo::GetBookmark(QSqlDatabase *db)
+{
+    MythContext::KickDatabase(db);
+
+    long long pos = 0;
+
+    QString starts = startts.toString("yyyyMMddhhmm");
+    starts += "00";
+
+    QString querystr = QString("SELECT bookmark FROM recorded WHERE "
+                               "chanid = '%1' AND starttime = '%2';")
+                              .arg(chanid).arg(starts);
+
+    QSqlQuery query = db->exec(querystr);
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        query.next();
+
+        QString result = query.value(0).toString();
+        if (result != QString::null)
+        {
+            sscanf(result.ascii(), "%lld", &pos);
+        }
+    }
+
+    return pos;
+}
+
+bool ProgramInfo::IsEditing(QSqlDatabase *db)
+{
+    MythContext::KickDatabase(db);
+
+    bool result = false;
+
+    QString starts = startts.toString("yyyyMMddhhmm");
+    starts += "00";
+
+    QString querystr = QString("SELECT editing FROM recorded WHERE "
+                               "chanid = '%1' AND starttime = '%2';")
+                              .arg(chanid).arg(starts);
+
+    QSqlQuery query = db->exec(querystr);
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        query.next();
+
+        result = query.value(0).toInt();
+    }
+
+    return result;
+}
+
+void ProgramInfo::SetEditing(bool edit, QSqlDatabase *db)
+{
+    MythContext::KickDatabase(db);
+
+    QString starts = startts.toString("yyyyMMddhhmm");
+    starts += "00";
+
+    QString querystr = QString("UPDATE recorded SET editing = '%1', "
+                               "starttime = '%2' WHERE chanid = '%3' AND "
+                               "starttime = '%4';").arg(edit).arg(starts)
+                                                   .arg(chanid).arg(starts);
+    QSqlQuery query = db->exec(querystr);
+    if (!query.isActive())
+        MythContext::DBError("Edit status update", querystr);
+}
+
+void ProgramInfo::GetCutList(QMap<long long, int> &delMap, QSqlDatabase *db)
+{
+    delMap.clear();
+
+    MythContext::KickDatabase(db);
+
+    QString starts = startts.toString("yyyyMMddhhmm");
+    starts += "00";
+
+    QString querystr = QString("SELECT cutlist FROM recorded WHERE "
+                               "chanid = '%1' AND starttime = '%2';")
+                              .arg(chanid).arg(starts);
+
+    QSqlQuery query = db->exec(querystr);
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        query.next();
+
+        QString cutlist = query.value(0).toString();
+
+        if (cutlist.length() > 1)
+        {
+            QStringList strlist = QStringList::split("\n", cutlist);
+            QStringList::Iterator i;
+
+            for (i = strlist.begin(); i != strlist.end(); ++i)
+            {
+                long long start = 0, end = 0;
+                if (sscanf((*i).ascii(), "%lld - %lld", &start, &end) != 2)
+                {
+                    cerr << "Malformed cutlist list: " << *i << endl;
+                }
+                else
+                {
+                    delMap[start] = 1;
+                    delMap[end] = 0;
+                }
+            }
+        }
+    }
+}
+
+void ProgramInfo::SetCutList(QMap<long long, int> &delMap, QSqlDatabase *db)
+{
+    QString cutdata;
+    char tempc[256];
+
+    QMap<long long, int>::Iterator i;
+
+    for (i = delMap.begin(); i != delMap.end(); ++i)
+    {
+        long long frame = i.key();
+        int direction = i.data();
+
+        if (direction == 1)
+        {
+            sprintf(tempc, "%lld - ", frame);
+            cutdata += tempc;
+        }
+        else if (direction == 0)
+        {
+            sprintf(tempc, "%lld\n", frame);
+            cutdata += tempc;
+        }
+    }
+
+    MythContext::KickDatabase(db);
+
+    QString starts = startts.toString("yyyyMMddhhmm");
+    starts += "00";
+
+    QString querystr = QString("UPDATE recorded SET cutlist = \"%1\", "
+                               "starttime = '%2' WHERE chanid = '%3' AND "
+                               "starttime = '%4';").arg(cutdata).arg(starts)
+                                                   .arg(chanid).arg(starts);
+    QSqlQuery query = db->exec(querystr);
+    if (!query.isActive())
+        MythContext::DBError("cutlist update", querystr);
 }

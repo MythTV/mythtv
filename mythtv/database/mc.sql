@@ -65,6 +65,9 @@ CREATE TABLE IF NOT EXISTS recorded
     subtitle VARCHAR(128) NULL,
     description TEXT NULL,
     hostname VARCHAR(255),
+    bookmark VARCHAR(128) NULL,
+    editing INT UNSIGNED NOT NULL DEFAULT 0,
+    cutlist TEXT NULL,
     PRIMARY KEY (chanid, starttime),
     INDEX (endtime)
 );

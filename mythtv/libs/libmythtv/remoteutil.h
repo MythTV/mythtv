@@ -15,11 +15,6 @@ void RemoteGetFreeSpace(MythContext *context, int &totalspace, int &usedspace);
 
 bool RemoteGetCheckFile(MythContext *context, const QString &url);
 
-long long RemoteGetBookmark(MythContext *context, const QString &url);
-
-bool RemoteSetBookmark(MythContext *context,  const QString &url,
-			  long long pos);
-
 void RemoteDeleteRecording(MythContext *context, ProgramInfo *pginfo);
 
 bool RemoteGetAllPendingRecordings(MythContext *context, 

@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    TV *tv = new TV(context);
+    TV *tv = new TV(context, db);
     tv->Init();
 
     tv->LiveTV();

@@ -22,7 +22,7 @@ class RemoteEncoder;
 class TV : public QObject
 {
  public:
-    TV(MythContext *lcontext);
+    TV(MythContext *lcontext, QSqlDatabase *db);
    ~TV(void);
 
     void Init(void);
@@ -165,6 +165,8 @@ class TV : public QObject
     bool endOfRecording;
 
     ProgramInfo *playbackinfo;
+
+    QSqlDatabase *m_db;
 };
 
 #endif

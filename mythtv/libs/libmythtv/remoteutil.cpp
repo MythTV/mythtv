@@ -1,7 +1,6 @@
 #include <qstringlist.h>
 
 #include "remoteutil.h"
-#include "util.h"
 #include "programinfo.h"
 #include "mythcontext.h"
 #include "remoteencoder.h"
@@ -54,30 +53,6 @@ bool RemoteGetCheckFile(MythContext *context, const QString &url)
 
     bool exists = strlist[0].toInt();
     return exists;
-}
-
-long long RemoteGetBookmark(MythContext *context, const QString &url)
-{
-    QString str = "QUERY_BOOKMARK " + url;
-    QStringList strlist = str;
-
-    context->SendReceiveStringList(strlist);
-
-    long long pos = decodeLongLong(strlist, 0);
-    return pos;
-}
-
-bool RemoteSetBookmark(MythContext *context, const QString &url,
-			  long long pos)
-{
-    QString str = "SET_BOOKMARK " + url;
-    QStringList strlist = str;
-    encodeLongLong(strlist, pos);
-
-    context->SendReceiveStringList(strlist);
-
-    bool written = strlist[0].toInt();
-    return written;
 }
 
 void RemoteDeleteRecording(MythContext *context, ProgramInfo *pginfo)

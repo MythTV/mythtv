@@ -5,6 +5,7 @@
 #include <qstring.h>
 #include <qregexp.h>
 #include <qdatetime.h>
+#include <qmap.h>
 #include "scheduledrecording.h"
 
 #define NUMPROGRAMLINES 15
@@ -44,6 +45,12 @@ class ProgramInfo
     void ToStringList(QStringList &list);
     void FromStringList(QStringList &list, int offset);
 
+    void SetBookmark(long long pos, QSqlDatabase *db);
+    long long GetBookmark(QSqlDatabase *db);
+    bool IsEditing(QSqlDatabase *db);
+    void SetEditing(bool edit, QSqlDatabase *db);
+    void GetCutList(QMap<long long, int> &delMap, QSqlDatabase *db);
+    void SetCutList(QMap<long long, int> &delMap, QSqlDatabase *db);
 
     static void GetProgramRangeDateTime(QPtrList<ProgramInfo> *proglist, QString channel, 
                                         const QString &ltime, const QString &rtime);

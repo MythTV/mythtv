@@ -4,6 +4,8 @@
 #define FFMPEG_VERSION_INT 0x000406
 #define FFMPEG_VERSION     "0.4.6"
 
+#define CONFIG_RISKY 1
+
 #if defined(WIN32) && !defined(__MINGW32__) && !defined(__CYGWIN__)
 #    define CONFIG_WIN32
 #endif
@@ -88,6 +90,7 @@ typedef INT64 int64_t;
 #    endif
 
 #    define snprintf _snprintf
+#    define vsnprintf _vsnprintf
 
 /* CONFIG_WIN32 end */
 #elif defined (CONFIG_OS2)

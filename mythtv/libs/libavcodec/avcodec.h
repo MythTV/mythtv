@@ -1,6 +1,17 @@
 #ifndef AVCODEC_H
 #define AVCODEC_H
 
+/**
+ * @file avcodec.h
+ * @brief 
+ *     external api header
+ */
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "common.h"
 
 #define LIBAVCODEC_VERSION_INT 0x000406
@@ -519,6 +530,7 @@ typedef struct AVCodecContext {
 #define FF_BUG_AC_VLC           32
 #define FF_BUG_QPEL_CHROMA      64
 #define FF_BUG_STD_QPEL         128
+#define FF_BUG_QPEL_CHROMA2     256
 //#define FF_BUG_FAKE_SCALABILITY 16 //autodetection should work 100%
         
     /**
@@ -1244,5 +1256,9 @@ void *av_fast_realloc(void *ptr, int *size, int min_size);
 void av_free_static(void);
 void *__av_mallocz_static(void** location, unsigned int size);
 #define av_mallocz_static(p, s) __av_mallocz_static((void **)(p), s)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* AVCODEC_H */

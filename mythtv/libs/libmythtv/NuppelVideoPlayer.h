@@ -35,11 +35,14 @@ class XvVideoOutput;
 class OSDSet;
 class MythContext;
 class RemoteEncoder;
+class QSqlDatabase;
+class ProgramInfo;
 
 class NuppelVideoPlayer
 {
  public:
-    NuppelVideoPlayer(MythContext *context);
+    NuppelVideoPlayer(MythContext *context, QSqlDatabase *ldb = NULL, 
+                      ProgramInfo *info = NULL);
    ~NuppelVideoPlayer();
 
     void SetAsPIP(void) { disableaudio = disablevideo = true; }
@@ -369,6 +372,11 @@ class NuppelVideoPlayer
 
     unsigned int embedid;
     int embx, emby, embw, embh;
+
+    QSqlDatabase *m_db;
+    ProgramInfo *m_playbackinfo;
+
+    long long bookmarkseek;
 };
 
 #endif

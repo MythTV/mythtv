@@ -12,7 +12,7 @@
 #include <qpainter.h>
 #include <qheader.h>
 #include <qfile.h>
-
+#include <qsqldatabase.h>
 
 #include <unistd.h>
 
@@ -456,7 +456,8 @@ void PlaybackBox::play(QListViewItem *lvitem)
 
     ProgramInfo *tvrec = new ProgramInfo(*rec);
 
-    TV *tv = new TV(m_context);
+    QSqlDatabase *db = QSqlDatabase::database();
+    TV *tv = new TV(m_context, db);
     tv->Init();
     tv->Playback(tvrec);
 

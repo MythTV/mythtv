@@ -47,11 +47,14 @@ void *SpawnDecode(void *param)
     return NULL;
 }
 
-TV::TV(MythContext *lcontext)
+TV::TV(MythContext *lcontext, QSqlDatabase *db)
   : QObject()
 {
     m_context = lcontext;
+    m_db = db;
+
     dialogname = "";
+    playbackinfo = NULL;
     editmode = false;
     prbuffer = NULL;
     nvp = NULL;
@@ -466,7 +469,7 @@ void TV::SetupPlayer(void)
     }
 
     QString filters = "";
-    nvp = new NuppelVideoPlayer(m_context);
+    nvp = new NuppelVideoPlayer(m_context, m_db, playbackinfo);
     nvp->SetRingBuffer(prbuffer);
     nvp->SetRecorder(recorder);
     nvp->SetOSDFontName(m_context->GetSetting("OSDFont"),

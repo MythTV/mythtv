@@ -73,7 +73,8 @@ int startDelete(MythContext *context)
 
 void startTV(MythContext *context)
 {
-    TV *tv = new TV(context);
+    QSqlDatabase *db = QSqlDatabase::database();
+    TV *tv = new TV(context, db);
     tv->Init();
     TVState nextstate = tv->LiveTV();
 

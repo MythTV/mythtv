@@ -18,7 +18,7 @@ protected:
     };
 
     virtual QString setClause(void) {
-        return QString("value = '%1', data = '%1'").arg(getName()).arg(getValue());
+        return QString("value = '%1', data = '%2'").arg(getName()).arg(getValue());
     };
 };
 
