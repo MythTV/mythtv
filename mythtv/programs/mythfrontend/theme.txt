@@ -1,31 +1,3 @@
-# What theme to use.  Themes are stored in /usr/local/share/mythtv/themes/
-str Theme=blue
-
-# The desired dimensions to show the GUI at.  If these are commented out,
-# the GUI will resize to be fullscreen.
-int GuiWidth=800
-int GuiHeight=600
-
-# Overall GUI options
-#
-# Do we color the Qt widgets according to the 'qtlook.txt' file in the theme?
-# (only works for the program guide, currently)
-int ThemeQt=1
-
-# Date format: A meaningful value is "ddd MMMM d" (default); see the QT docs 
-# for formatting
-str DateFormat=ddd MMM d
-# Time format: Meaningful values are "h:mm AP" (default) and "h:mm"; see the
-# QT docs for formatting
-str TimeFormat=h:mm AP
-# Display channel names or just the channel number when showing things to the
-# user.
-int DisplayChanNum=1
-# Some font size configurations
-int QtFontBig=25
-int QtFontMedium=16
-int QtFontSmall=12
-
 # Program Guide Grid specific options
 #
 # Uncomment this to use the alternative EPG layout
