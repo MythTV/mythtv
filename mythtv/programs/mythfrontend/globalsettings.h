@@ -202,8 +202,8 @@ public:
     FreqTable():
         GlobalSetting("FreqTable") {
         setLabel("Channel frequency table");
-        addSelection("us-bcast");
         addSelection("us-cable");
+        addSelection("us-bcast");
         addSelection("us-cable-hrc");
         addSelection("japan-bcast");
         addSelection("japan-cable");
