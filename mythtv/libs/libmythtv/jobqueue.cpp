@@ -1371,10 +1371,11 @@ void JobQueue::DoTranscodeThread(void)
     ProgramInfo *program_info = new ProgramInfo(*m_pginfo);
     int controlTranscoding = JOB_RUN;
     QString key;
+    QString startts = program_info->startts.toString("yyyyMMddhhmm00");
     
     key = QString("%1_%2")
                   .arg(program_info->chanid)
-                  .arg(program_info->startts.toString("yyyyMMddhhmm00"));
+                  .arg(startts);
     int jobID = runningJobIDs[key];
 
     childThreadStarted = true;
@@ -1421,6 +1422,7 @@ void JobQueue::DoTranscodeThread(void)
         if (status == JOB_STOPPING)
         {
             QString tmpfile = filename;
+            QString query;
             tmpfile += ".tmp";
             // Get new filesize
             struct stat st;
@@ -1435,6 +1437,28 @@ void JobQueue::DoTranscodeThread(void)
             if (!gContext->GetNumSetting("SaveTranscoding", 0))
                 unlink(oldfile);
             dblock.lock();
+            if (useCutlist)
+            {
+                query = QString("DELETE FROM recordedmarkup WHERE "
+                                "chanid = '%1' AND starttime = '%2';")
+                                .arg(program_info->chanid).arg(startts);
+                m_db->exec(query);
+                query = QString("UPDATE recorded SET cutlist = NULL, "
+                                "bookmark = NULL, "
+                                "starttime = starttime WHERE "
+                                "chanid = '%1' AND starttime = '%2';")
+                                .arg(program_info->chanid).arg(startts);
+                m_db->exec(query);
+            } else {
+                query = QString("DELETE FROM recordedmarkup WHERE "
+                                "chanid = '%1' AND starttime = '%2' "
+                                "AND type = '%3';")
+                                .arg(program_info->chanid).arg(startts)
+                                .arg(MARK_KEYFRAME);
+                m_db->exec(query);
+            }
+            if (filesize > 0)
+                program_info->SetFilesize(filesize, m_db);
             ChangeJobStatus(m_db, jobID, JOB_FINISHED);
             dblock.unlock();
         } else {
