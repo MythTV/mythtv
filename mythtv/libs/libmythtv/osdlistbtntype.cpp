@@ -261,7 +261,8 @@ bool OSDListTreeType::HandleKeypress(QKeyEvent *e)
 
     bool handled = false;
     QStringList actions;
-    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
+    if (gContext->GetMainWindow()->TranslateKeyPress("TV Playback", e, 
+                                                     actions))
     {
         for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
@@ -322,7 +323,8 @@ bool OSDListTreeType::HandleKeypress(QKeyEvent *e)
                     emit itemSelected(this, currentpos);
                 }
             }
-            else if (action == "ESCAPE" || action == "MENU")
+            else if (action == "ESCAPE" || action == "MENU" ||
+                     action == "CLEAROSD")
                 m_visible = false;
             else if (action == "SELECT")
             {

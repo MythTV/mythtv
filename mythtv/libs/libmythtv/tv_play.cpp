@@ -122,6 +122,7 @@ void TV::InitKeys(void)
     REG_KEY("TV Frontend", "UPCOMING", "List upcoming episodes", "O");
     REG_KEY("TV Frontend", "DETAILS", "Show program details", "U");
 
+    REG_KEY("TV Playback", "CLEAROSD", "Clear OSD", "Backspace");
     REG_KEY("TV Playback", "PAUSE", "Pause", "P");
     REG_KEY("TV Playback", "DELETE", "Delete Program", "D");
     REG_KEY("TV Playback", "SEEKFFWD", "Fast Forward", "Right");
@@ -1333,7 +1334,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
             {
                 ChannelKey('_');
             }
-            else if (action == "TOGGLEBROWSE" || action == "ESCAPE")
+            else if (action == "TOGGLEBROWSE" || action == "ESCAPE" ||
+                     action == "CLEAROSD")
             {
                 ChannelCommit(); 
                 BrowseEnd(false);
@@ -1384,6 +1386,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 nvp->Zoom(kZoomLeft);
             else if (action == "RIGHT")
                 nvp->Zoom(kZoomRight);
+            else if (action == "CLEAROSD")
+                ClearOSD();
             else if (action == "ESCAPE")
             {
                 nvp->Zoom(kZoomHome);
@@ -1421,10 +1425,12 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 osd->DialogUp(dialogname); 
             else if (action == "DOWN")
                 osd->DialogDown(dialogname);
-            else if (action == "SELECT" || action == "ESCAPE"||
+            else if (action == "SELECT" || action == "ESCAPE" || 
+                     action == "CLEAROSD" ||
                      ((arrowAccel) && (action == "LEFT" || action == "RIGHT")))
             {
-                if (action == "ESCAPE" || (arrowAccel && action == "LEFT"))
+                if (action == "ESCAPE" || action == "CLEAROSD" ||
+                    (arrowAccel && action == "LEFT"))
                     osd->DialogAbort(dialogname);
                 osd->TurnDialogOff(dialogname);
                 if (dialogname == "alreadybeingedited")
@@ -1695,20 +1701,14 @@ void TV::ProcessKeypress(QKeyEvent *e)
         {
             DoSeek(-activenvp->GetFramesPlayed(), tr("Jump to Beginning"));
         }
+        else if (action == "CLEAROSD")
+        {
+            ClearOSD();
+        }
         else if (action == "ESCAPE")
         {
-            if (osd)
-            {
-                QStringList osetname;
-                osetname << "program_info" << "channel_number" << "status";
-                if (osd->HideSets(osetname))
-                {
-                    ChannelClear();
-                    while (osd->HideSets(osetname))
-                        usleep(1000);
-                    return;
-                }
-            }
+            if (osd && ClearOSD())
+                return;
 
             NormalSpeed();
             StopFFRew();
@@ -2819,6 +2819,20 @@ void TV::SetPreviousChannel()
         osd->HideSet("channel_number");
 }
 
+bool TV::ClearOSD(void)
+{
+    QStringList hidesets;
+    hidesets << "program_info" << "channel_number" << "status" << "settings";
+    bool res = osd->HideSets(hidesets);
+    if (res)
+    {
+        ChannelClear();
+        while (osd->HideSets(hidesets))
+            usleep(1000);
+    }
+    return res;
+}
+
 void TV::ToggleOSD(void)
 {
     OSDSet *oset = osd->GetSet("program_info");
@@ -3501,6 +3515,8 @@ void TV::BrowseStart(void)
     if (!oset)
         return;
 
+    ClearOSD();
+
     browsemode = true;
 
     QString title, subtitle, desc, category, starttime, endtime;
@@ -3915,6 +3931,8 @@ void TV::ShowOSDTreeMenu(void)
 
     if (nvp->GetOSD())
     {
+        ClearOSD();
+
         OSDListTreeType *tree = osd->ShowTreeMenu("menu", treeMenu);
         if (tree)
         {
@@ -4152,7 +4170,10 @@ void TV::SetManualZoom(bool zoomON)
 
     zoomMode = zoomON;
     if (zoomON)
+    {
+        ClearOSD();
         desc = tr("Zoom Mode ON");
+    }
     else
         desc = tr("Zoom Mode OFF");
 

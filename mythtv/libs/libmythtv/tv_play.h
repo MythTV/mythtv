@@ -163,6 +163,7 @@ class TV : public QObject
     void SetAutoCommercialSkip(int skipMode = 0);
     void SetManualZoom(bool zoomON = false);
  
+    bool ClearOSD(void);
     void ToggleOSD(void); 
     void UpdateOSD(void);
     void UpdateOSDInput(void);
