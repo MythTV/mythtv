@@ -589,15 +589,12 @@ bool ProgramInfo::AllowRecordingNewEpisodes(QSqlDatabase *db)
     if (!maxEpisodes || record->GetMaxNewest())
         return true;
 
-    QString thequery;
-    QString sqltitle = title;
+    QSqlQuery query(QString::null, db);
 
-    sqltitle.replace(QRegExp("\""), QString("\\\""));
+    query.prepare("SELECT count(*) FROM recorded WHERE title = :TITLE;");
+    query.bindValue(":TITLE", title.utf8());
 
-    thequery = QString("SELECT count(*) FROM recorded WHERE title = \"%1\";")
-                       .arg(sqltitle);
-
-    QSqlQuery query = db->exec(thequery);
+    query.exec();
 
     if (query.isActive() && query.numRowsAffected() > 0)
     {
@@ -684,23 +681,24 @@ void ProgramInfo::ApplyRecordRecPriorityChange(QSqlDatabase *db,
 }
 
 void ProgramInfo::ApplyRecordRecGroupChange(QSqlDatabase *db,
-                                        const QString &newrecgroup)
+                                            const QString &newrecgroup)
 {
     MythContext::KickDatabase(db);
 
     QString starts = recstartts.toString("yyyyMMddhhmm");
     starts += "00";
 
-    QString myRecGroup = newrecgroup;
-    myRecGroup.replace(QRegExp("'"), QString("\'"));
+    QSqlQuery query(QString::null, db);
+    query.prepare("UPDATE recorded SET recgroup = :RECGROUP, "
+                  "starttime = :START WHERE chanid = :CHANID AND "
+                  "starttime = :START2;");
+    query.bindValue(":RECGROUP", newrecgroup.utf8());
+    query.bindValue(":START", starts);
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":START2", starts);
 
-    QString querystr = QString("UPDATE recorded SET recgroup = '%1', "
-                               "starttime = '%2' WHERE chanid = '%3' AND "
-                               "starttime = '%4';").arg(myRecGroup).arg(starts)
-                                                   .arg(chanid).arg(starts);
-    QSqlQuery query = db->exec(querystr);
-    if (!query.isActive())
-        MythContext::DBError("RecGroup update", querystr);
+    if (!query.exec())
+        MythContext::DBError("RecGroup update", query);
 
     recgroup = newrecgroup;
 }
@@ -842,46 +840,42 @@ void ProgramInfo::StartedRecording(QSqlDatabase *db)
     starts += "00";
     ends += "00";
 
-    QString sqltitle = title;
-    QString sqlsubtitle = subtitle;
-    QString sqldescription = description;
-    QString sqlcategory = category;
-    QString sqlrecgroup = recgroup;
+    QSqlQuery query(QString::null, db);
 
-    sqltitle.replace(QRegExp("\""), QString("\\\""));
-    sqlsubtitle.replace(QRegExp("\""), QString("\\\""));
-    sqldescription.replace(QRegExp("\""), QString("\\\""));
-    sqlcategory.replace(QRegExp("\""), QString("\\\""));
-    sqlrecgroup.replace(QRegExp("\""), QString("\\\""));
+    query.prepare("INSERT INTO recorded (chanid,starttime,endtime,title,"
+                  "subtitle,description,hostname,category,recgroup,"
+                  "autoexpire,recordid,seriesid,programid,stars,"
+                  "previouslyshown,originalairdate) "
+                  "VALUES(:CHANID,:STARTS,:ENDS,:TITLE,:SUBTITLE,:DESC,"
+                         ":HOSTNAME,:CATEGORY,:RECGROUP,:AUTOEXP,:RECORDID,"
+                         ":SERIESID,:PROGRAMID,:STARS,:REPEAT,:ORIGAIRDATE);");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTS", starts);
+    query.bindValue(":ENDS", ends);
+    query.bindValue(":TITLE", title.utf8());
+    query.bindValue(":SUBTITLE", subtitle.utf8());
+    query.bindValue(":DESC", description.utf8());
+    query.bindValue(":HOSTNAME", gContext->GetHostName());
+    query.bindValue(":CATEGORY", category.utf8());
+    query.bindValue(":RECGROUP", recgroup.utf8());
+    query.bindValue(":AUTOEXP", record->GetAutoExpire());
+    query.bindValue(":RECORDID", recordid);
+    query.bindValue(":SERIESID", seriesid);
+    query.bindValue(":PROGRAMID", programid);
+    query.bindValue(":STARS", stars);
+    query.bindValue(":REPEAT", repeat);
+    query.bindValue(":ORIGAIRDATE", originalAirDate.toString());
 
-    QString query;
-    query = QString("INSERT INTO recorded (chanid,starttime,endtime,title,"
-                    "subtitle,description,hostname,category,recgroup,"
-                    "autoexpire,recordid,seriesid,programid,stars,"
-                    "previouslyshown,originalairdate) "
-                    "VALUES(%1,\"%2\",\"%3\",\"%4\",\"%5\",\"%6\",\"%7\","
-                        "\"%8\",\"%9\"")
-                    .arg(chanid).arg(starts).arg(ends).arg(sqltitle.utf8()) 
-                    .arg(sqlsubtitle.utf8()).arg(sqldescription.utf8())
-                    .arg(gContext->GetHostName()).arg(sqlcategory.utf8())
-                    .arg(sqlrecgroup.utf8());
-                    
-    query += QString(",%1,%2,\"%3\",\"%4\", %5, %6, \"%7\");")
-                    .arg(record->GetAutoExpire()).arg(recordid)
-                    .arg(seriesid).arg(programid).arg(stars)
-                    .arg(repeat).arg(originalAirDate.toString());
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("WriteRecordedToDB", query);
 
-    QSqlQuery qquery = db->exec(query);
-    if (!qquery.isActive())
-        MythContext::DBError("WriteRecordedToDB", qquery);
+    query.prepare("DELETE FROM recordedmarkup WHERE chanid = :CHANID "
+                  "AND starttime = :START;");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":START", starts);
 
-    query = QString("DELETE FROM recordedmarkup WHERE chanid = %1 "
-                    "AND starttime = %2;")
-                    .arg(chanid).arg(starts);
-
-    qquery = db->exec(query);
-    if (!qquery.isActive())
-        MythContext::DBError("Clear markup on record", qquery);
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("Clear markup on record", query);
 }
 
 void ProgramInfo::FinishedRecording(QSqlDatabase* db, bool prematurestop) 
