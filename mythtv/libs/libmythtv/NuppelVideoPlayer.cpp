@@ -520,7 +520,7 @@ void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps,
         video_width = width;
     if (height > 0)
         video_height = height;
-    if (fps > 0)
+    if (fps > 0 && fps < 120)
     {
         video_frame_rate = fps;
         frame_interval = (int)(1000000.0 / video_frame_rate / play_speed);
