@@ -9,4 +9,7 @@
 bool CheckFrameIsBlank(unsigned char *buf, int width, int height);
 void BuildCommListFromBlanks(QMap<long long, int> &blanks, double fps,
         QMap<long long, int> &commMap);
+void MergeCommList(QMap<long long, int> &commMap,
+        QMap<long long, int> &commBreakMap);
+void DeleteCommAtFrame(QMap<long long, int> &commMap, long long frame);
 

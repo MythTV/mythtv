@@ -7,7 +7,7 @@
 
 bool CheckFrameIsBlank(unsigned char *buf, int width, int height)
 {
-    const int pixels_to_check = 200;
+    const int pixels_to_check = 500;
     const unsigned int max_brightness = 80;
 
     int pixels_over_max = 0;
@@ -63,22 +63,17 @@ void BuildCommListFromBlanks(QMap<long long, int> &blanks, double fps,
     int i, x;
     QMap<long long, int>::Iterator it;
 
+    commMap.clear();
+
     for (it = blanks.begin(); it != blanks.end(); ++it)
         bframes[frames++] = it.key();
 
     if (frames == 0)
         return;
 
-    for(i=0, x=0; i < frames; i++ )
-    {
-        if ((( bframes[i] - bframes[i-1] ) == 1 ) ||
-            (( bframes[i] - bframes[i-1] ) > (10 * fps)))
-        {
-            bframes[x++] = bframes[i];
-        }
-    }
-    frames = x;
-
+    // detect individual commercials from blank frames
+    // commercial end is set to frame right before ending blank frame to
+    //    account for instances with only a single blank frame between comms.
     for(i = 0; i < frames; i++ )
     {
         for(x=i+1; x < frames; x++ )
@@ -88,52 +83,109 @@ void BuildCommListFromBlanks(QMap<long long, int> &blanks, double fps,
             // end of breaks
             int gap_length = bframes[x] - bframes[i];
             if ((abs((int)(gap_length - (15 * fps))) < 10 ) ||
-                (abs((int)(gap_length - (20 * fps))) < 10 ) ||
-                (abs((int)(gap_length - (30 * fps))) < 10 ) ||
-                (abs((int)(gap_length - (60 * fps))) < 10 ) ||
-                (abs((int)(gap_length - (90 * fps))) < 20 ) ||
-                (abs((int)(gap_length - (120 * fps))) < 30 ) ||
-                (abs((int)(gap_length - (150 * fps))) < 35 ) ||
-                (abs((int)(gap_length - (180 * fps))) < 40 ))
+                (abs((int)(gap_length - (30 * fps))) < 12 ) ||
+                (abs((int)(gap_length - (45 * fps))) < 13 ) ||
+                (abs((int)(gap_length - (60 * fps))) < 15 ))
             {
                 c_start[commercials] = bframes[i];
-                c_end[commercials] = bframes[x];
+                c_end[commercials] = bframes[x] - 1;
                 commercials++;
+                i = x-1;
                 x = frames;
-                while(( bframes[i] + 1 ) == bframes[i+1] )
-                    i++;
             }
         }
     }
 
+    // eliminate any blank frames at end of commercials
     for(i = 0; i < (commercials-1); i++ )
     {
         long long int r = c_start[i];
-        for(x=0; x<frames; x++ )
-            if (bframes[x] == r)
-                break;
-        while((x>0) && ((bframes[x]-1) == bframes[x-1]))
-        {
-            r--;
-            x--;
-        }
 
         commMap[r] = MARK_COMM_START;
-        while((( c_end[i] == c_start[i+1] ) ||
-               (( c_end[i] + 450 ) > c_start[i+1] )) &&
-              ( i < (commercials-1)))
-            i++;
 
         r = c_end[i];
-        for(x=0; x<frames; x++ )
-            if (bframes[x] == r)
-                break;
-        while((bframes[x] + 1 ) == bframes[x+1])
+        if( i < (commercials-1))
         {
-            r++;
-            x++;
+            for(x=0; x<frames; x++ )
+                if (bframes[x] == r)
+                    break;
+            while(((bframes[x] + 1 ) == bframes[x+1]) &&
+                  (bframes[x+1] < c_start[i+1]))
+            {
+                r++;
+                x++;
+            }
+
+            while((blanks.contains(r+1)) &&
+                  (c_start[i+1] != (r+1)))
+                r++;
         }
+        else
+        {
+            while(blanks.contains(r+1))
+                r++;
+        }
+
         commMap[r] = MARK_COMM_END;
+    }
+}
+
+void MergeCommList(QMap<long long, int> &commMap,
+        QMap<long long, int> &commBreakMap)
+{
+    QMap<long long, int>::Iterator it;
+    QMap<long long, int>::Iterator prev;
+
+    commBreakMap.clear();
+
+    for (it = commMap.begin(); it != commMap.end(); ++it)
+        commBreakMap[it.key()] = it.data();
+
+    it = commMap.begin();
+    prev = it;
+    it++;
+    for(; it != commMap.end(); ++it, ++prev)
+    {
+        if ((((prev.key() + 1) == it.key()) ||
+             ((prev.key() + 300) >= it.key())) &&
+            (prev.data() == MARK_COMM_END) &&
+            (it.data() == MARK_COMM_START))
+        {
+            commBreakMap.erase(prev.key());
+            commBreakMap.erase(it.key());
+        }
+    }
+}
+
+void DeleteCommAtFrame(QMap<long long, int> &commMap, long long frame)
+{
+    long long start = -1;
+    long long end = -1;
+    QMap<long long, int>::Iterator it;
+    QMap<long long, int>::Iterator prev;
+
+    it = commMap.begin();
+    prev = it;
+    it++;
+    for(; it != commMap.end(); ++it, ++prev)
+    {
+        if ((prev.data() == MARK_COMM_START) &&
+            (prev.key() <= frame) &&
+            (it.data() == MARK_COMM_END) &&
+            (it.key() >= frame))
+        {
+            start = prev.key();
+            end = it.key();
+        }
+
+        if ((prev.key() > frame) && (start == -1))
+            return;
+    }
+
+    if (start != -1)
+    {
+        commMap.erase(start);
+        commMap.erase(end);
     }
 }
 
