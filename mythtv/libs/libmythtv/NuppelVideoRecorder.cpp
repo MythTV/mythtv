@@ -2841,7 +2841,7 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
 
         if (lameret < 0)
         {
-            cerr << "lame error, exiting\n";
+            cerr << "lame error '" << lameret << "', exiting\n";
             exit(-1); 
         }
         compressedsize = lameret;
@@ -2850,7 +2850,7 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
                                           7200);
         if (lameret < 0)
         {
-            cerr << "lame error, exiting\n";
+            cerr << "lame error - " << lameret << " - exiting\n";
             exit(-1);
         }
         gaplesssize = lameret;

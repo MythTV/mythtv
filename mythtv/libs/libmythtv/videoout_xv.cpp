@@ -591,7 +591,7 @@ void XvVideoOutput::EmbedInWidget(unsigned long wid, int x, int y, int w, int h)
 
     embedding = true;
 
-    MoveResize();
+//    MoveResize();
 
     pthread_mutex_unlock(&lock);
 }
