@@ -132,7 +132,7 @@
       <color>#DEEAF9</color>
 <!--       <color>white</color> -->
 <!--       <fontname>Kimberley</fontname> -->
-      <fontname>Neuropolitical</fontname>
+      <fontname>Freesans</fontname>
       <fontsize>21</fontsize>
       <bold>yes</bold>
       <italics>no</italics>
@@ -152,7 +152,7 @@
 <!--       <area>50,8,3,0</area> -->
 <!--       <color>#000000</color> -->
       <color>#3C5574</color>
-      <fontname>Neuropolitical</fontname>
+      <fontname>Freesans</fontname>
       <fontsize>21</fontsize>
       <bold>yes</bold>
       <italics>no</italics>
