@@ -1,15 +1,15 @@
-#ifndef XJ_H_
-#define XJ_H_
+#ifndef VIDEOOUT_XV_H_
+#define VIDEOOUT_XV_H_
 
 struct XvData;
 
 #include "frame.h"
 
-class XvVideoOutput
+class VideoOutputXv
 {
   public:
-    XvVideoOutput();
-   ~XvVideoOutput();
+    VideoOutputXv();
+   ~VideoOutputXv();
 
     bool Init(int width, int height, float aspect, int num_buffers, 
               VideoFrame *out_buffers, unsigned int winid,

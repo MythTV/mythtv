@@ -16,7 +16,7 @@
 #include <iostream>
 using namespace std;
 
-#include "XJ.h"
+#include "videoout_xv.h"
 #include "../libmyth/mythcontext.h"
 #include "../libmyth/util.h"
 
@@ -65,7 +65,7 @@ int XJ_error_catcher(Display * d, XErrorEvent * xeev)
   return 0;
 }
 
-XvVideoOutput::XvVideoOutput(void)
+VideoOutputXv::VideoOutputXv(void)
 {
     XJ_started = 0; 
     xv_port = -1; 
@@ -74,13 +74,13 @@ XvVideoOutput::XvVideoOutput(void)
     data = new XvData();
 }
 
-XvVideoOutput::~XvVideoOutput()
+VideoOutputXv::~VideoOutputXv()
 {
     Exit();
     delete data;
 }
 
-void XvVideoOutput::InputChanged(int width, int height, float aspect,
+void VideoOutputXv::InputChanged(int width, int height, float aspect,
                                  int num_buffers, VideoFrame *out_buffers)
 {
     pthread_mutex_lock(&lock);
@@ -110,7 +110,7 @@ void XvVideoOutput::InputChanged(int width, int height, float aspect,
     pthread_mutex_unlock(&lock);
 }
 
-int XvVideoOutput::GetRefreshRate(void)
+int VideoOutputXv::GetRefreshRate(void)
 {
     if (!XJ_started)
         return -1;
@@ -130,7 +130,7 @@ int XvVideoOutput::GetRefreshRate(void)
     return (int)rate;
 }
 
-bool XvVideoOutput::Init(int width, int height, float aspect, int num_buffers, 
+bool VideoOutputXv::Init(int width, int height, float aspect, int num_buffers, 
                          VideoFrame *out_buffers, unsigned int winid,
                          int winx, int winy, int winw, int winh, 
                          unsigned int embedid)
@@ -370,7 +370,7 @@ bool XvVideoOutput::Init(int width, int height, float aspect, int num_buffers,
     return true;
 }
 
-bool XvVideoOutput::CreateXvBuffers(int num_buffers, VideoFrame *out_buffers)
+bool VideoOutputXv::CreateXvBuffers(int num_buffers, VideoFrame *out_buffers)
 {
     data->XJ_SHMInfo = new XShmSegmentInfo[num_buffers];
     for (int i = 0; i < num_buffers; i++)
@@ -416,7 +416,7 @@ bool XvVideoOutput::CreateXvBuffers(int num_buffers, VideoFrame *out_buffers)
     return true;
 }
 
-bool XvVideoOutput::CreateShmBuffers(int num_buffers, VideoFrame *out_buffers)
+bool VideoOutputXv::CreateShmBuffers(int num_buffers, VideoFrame *out_buffers)
 {
     data->XJ_SHMInfo = new XShmSegmentInfo[num_buffers];
 
@@ -467,7 +467,7 @@ bool XvVideoOutput::CreateShmBuffers(int num_buffers, VideoFrame *out_buffers)
     return true;
 }
 
-bool XvVideoOutput::CreateXBuffers(int num_buffers, VideoFrame *out_buffers)
+bool VideoOutputXv::CreateXBuffers(int num_buffers, VideoFrame *out_buffers)
 {
     for (int i = 0; i < num_buffers; i++)
     {
@@ -493,7 +493,7 @@ bool XvVideoOutput::CreateXBuffers(int num_buffers, VideoFrame *out_buffers)
     return true;
 }
 
-void XvVideoOutput::Exit(void)
+void VideoOutputXv::Exit(void)
 {
     if (XJ_started) 
     {
@@ -514,7 +514,7 @@ void XvVideoOutput::Exit(void)
     }
 }
 
-void XvVideoOutput::DeleteXvBuffers()
+void VideoOutputXv::DeleteXvBuffers()
 {
     map<unsigned char *, XvImage *>::iterator iter = data->buffers.begin();
 
@@ -536,7 +536,7 @@ void XvVideoOutput::DeleteXvBuffers()
     data->buffers.clear();
 }
 
-void XvVideoOutput::DeleteShmBuffers()
+void VideoOutputXv::DeleteShmBuffers()
 {
     map<unsigned char *, XImage *>::iterator iter = data->xbuffers.begin();
     for(int i=0; iter != data->xbuffers.end(); ++iter, ++i)
@@ -554,7 +554,7 @@ void XvVideoOutput::DeleteShmBuffers()
     data->xbuffers.clear();
 }
 
-void XvVideoOutput::DeleteXBuffers()
+void VideoOutputXv::DeleteXBuffers()
 {
     // XXX Check this later -- XDestroyImage instead?
     map<unsigned char *, XImage *>::iterator iter = data->xbuffers.begin();
@@ -567,7 +567,7 @@ void XvVideoOutput::DeleteXBuffers()
     data->xbuffers.clear();
 }
 
-void XvVideoOutput::ToggleFullScreen(void)
+void VideoOutputXv::ToggleFullScreen(void)
 {
     if ( xv_port == -1 )
         return;
@@ -601,7 +601,7 @@ void XvVideoOutput::ToggleFullScreen(void)
     pthread_mutex_unlock(&lock);
 }
   
-void XvVideoOutput::EmbedInWidget(unsigned long wid, int x, int y, int w, int h)
+void VideoOutputXv::EmbedInWidget(unsigned long wid, int x, int y, int w, int h)
 {
     if (embedding)
         return;
@@ -626,7 +626,7 @@ void XvVideoOutput::EmbedInWidget(unsigned long wid, int x, int y, int w, int h)
     pthread_mutex_unlock(&lock);
 }
  
-void XvVideoOutput::StopEmbedding(void)
+void VideoOutputXv::StopEmbedding(void)
 {
     if (!embedding)
         return;
@@ -647,7 +647,7 @@ void XvVideoOutput::StopEmbedding(void)
     pthread_mutex_unlock(&lock);
 }
 
-void XvVideoOutput::PrepareFrame(VideoFrame *buffer)
+void VideoOutputXv::PrepareFrame(VideoFrame *buffer)
 {
     if (xv_port != -1)
     {
@@ -772,12 +772,12 @@ void XvVideoOutput::PrepareFrame(VideoFrame *buffer)
     }
 }
 
-void XvVideoOutput::Show()
+void VideoOutputXv::Show()
 {
     XSync(data->XJ_disp, False);
 }
 
-void XvVideoOutput::ResizeVideo(int x, int y, int w, int h)
+void VideoOutputXv::ResizeVideo(int x, int y, int w, int h)
 {
     if (XEventsQueued(data->XJ_disp, QueuedAlready))
         return;
@@ -817,7 +817,7 @@ void XvVideoOutput::ResizeVideo(int x, int y, int w, int h)
     return;
 }
 
-void XvVideoOutput::GetDrawSize(int &xoff, int &yoff, int &width, int &height)
+void VideoOutputXv::GetDrawSize(int &xoff, int &yoff, int &width, int &height)
 {
     xoff = imgx;
     yoff = imgy;
@@ -825,7 +825,7 @@ void XvVideoOutput::GetDrawSize(int &xoff, int &yoff, int &width, int &height)
     height = imgh;
 }
 
-void XvVideoOutput::MoveResize(void)
+void VideoOutputXv::MoveResize(void)
 {
     int yoff, xoff;
 

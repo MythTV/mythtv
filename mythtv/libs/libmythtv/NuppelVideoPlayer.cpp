@@ -18,7 +18,7 @@ using namespace std;
 #include "NuppelVideoRecorder.h"
 #include "audiooutput.h"
 #include "recordingprofile.h"
-#include "XJ.h"
+#include "videoout_xv.h"
 #include "osdtypes.h"
 #include "remoteutil.h"
 #include "programinfo.h"
@@ -290,7 +290,7 @@ void NuppelVideoPlayer::InitVideo(void)
         exit(0);
     }
 
-    videoOutput = new XvVideoOutput();
+    videoOutput = new VideoOutputXv();
     videoOutput->Init(video_width, video_height, video_aspect,
                       MAXVBUFFER + 1, vbuffers, widget->winId(), 
                       0, 0, widget->width(), widget->height(),
