@@ -228,6 +228,11 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
         cury = XJ_screeny;
         curw = gContext->GetNumSetting("GuiWidth", XJ_screenwidth);
         curh = gContext->GetNumSetting("GuiHeight", XJ_screenheight);
+
+        if (curw == 0)
+            curw = XJ_screenwidth;
+        if (curh == 0)
+            curh = XJ_screenheight;
     }
 
     dispx = 0; dispy = 0;
