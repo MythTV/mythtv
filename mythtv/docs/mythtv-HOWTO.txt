@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-06-10, v2.46
+  2003-06-11, v2.47
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -2433,8 +2433,13 @@
   video source.  You may choose something easy to remember, like
   "Antenna" or "Cable".  Once you've chosen a name, press the down arrow
   to move to the next field.  If you're in North America, move to the
-  Zip/postal code field and put in the appropriate value.  If not, then
-  some manual interaction will be required with XMLTV.
+  Zip/postal code field and put in the appropriate value.
+
+  [1mNOTE[22m:  Remove any embedded spaces in the Postal Code.  If your postal
+  code is "T6H 2R7", use "T6H2R7".
+
+  If you're outside of North America, then some manual interaction will
+  be required with XMLTV.
 
   [1mNOTE[22m:  If you are in North America, and you enter your Zip/postal code
   and nothing seems to happen for a very very long time, it is possible
@@ -2504,7 +2509,6 @@
   available for mythbackend, type mythbackend -h for help.
 
   As of 2003-03-27, the available options are:
-
 
 
   $ mythbackend -h

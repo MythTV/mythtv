@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-06-10, v2.46
+<date>2003-06-11, v2.47
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1886,8 +1886,13 @@ space bar to begin.  The first field asks for the name of the video source.
 You may choose something easy to remember, like "Antenna" or "Cable".  Once
 you've chosen a name, press the down arrow to move to the next field.  If
 you're in North America, move to the Zip/postal code field and put in the
-appropriate value.  If not, then some manual interaction will be required
-with XMLTV.
+appropriate value.  
+
+<bf>NOTE</bf>:  Remove any embedded spaces in the Postal Code.  If your
+postal code is "T6H 2R7", use "T6H2R7".
+
+If you're outside of North America, then some manual interaction will be
+required with XMLTV.
 
 <bf>NOTE</bf>:  If you are in North America, and you enter your Zip/postal
 code and nothing seems to happen for a very very long time, it is possible
@@ -3889,6 +3894,9 @@ v2.44, 2003-06-10.  Modify requirements for Gentoo - don't need KDE.
 v2.45, 2003-06-10.  QT vs. Qt  Added some mythmusic FAQ-type stuff.
 v2.46, 2003-06-11.  Added TV-out information by Ray Olszewski.  Adjusted CVS
 references to release.
+v2.47, 2003-06-11.  Added note that Canucks shouldn't use a space in the
+postal code in setup/XMLTV.  (Suggestion by "Chris Thompson" chris at
+hypocrite.org)
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
