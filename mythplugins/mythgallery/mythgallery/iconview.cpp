@@ -623,6 +623,11 @@ void IconView::loadDirectory(const QString& dir)
         m_thumbGen->addFile(item->name);
     }
 
+    if (!m_thumbGen->running())
+    {
+        m_thumbGen->start();
+    }
+
     m_lastRow = QMAX((int)ceilf((float)m_itemList.count()/(float)m_nCols)-1,0);
     m_lastCol = QMAX(m_itemList.count()-m_lastRow*m_nCols-1,0);
 }
@@ -926,6 +931,11 @@ void IconView::actionImport()
     m_itemList.append(item);
     m_itemDict.insert(item->name, item);
     m_thumbGen->addFile(item->name);
+
+    if (!m_thumbGen->running())
+    {
+        m_thumbGen->start();
+    }
 }
 
 void IconView::importFromDir(const QString &fromDir, const QString &toDir)

@@ -51,11 +51,11 @@ void ThumbGenerator::setDirectory(const QString& directory, bool isGallery)
 
 void ThumbGenerator::addFile(const QString& filePath)
 {
+    // Add a file to the list of thumbs.
+    // Must remember to call start after adding all the files!
     m_mutex.lock();
     m_fileList.append(QString(filePath.latin1()));
     m_mutex.unlock();
-    if (!running())
-        start();
 }
 
 void ThumbGenerator::cancel()
