@@ -156,6 +156,15 @@ void Metadata::dumpToDatabase(QSqlDatabase *db)
         coverfile = QObject::tr("None");
     if (inetref == "")
         inetref = "00000000";
+    
+    if(gContext->GetNumSetting("VideoNewBrowsable", 1))
+    {
+        browse = true;
+    }
+    else
+    {
+        browse = false;
+    }
 
     title.replace(QRegExp("\""), QString("\\\""));
     director.replace(QRegExp("\""), QString("\\\""));
@@ -171,13 +180,13 @@ void Metadata::dumpToDatabase(QSqlDatabase *db)
     QString thequery;
     thequery.sprintf("INSERT INTO videometadata (title,director,plot,"
                      "rating,year,userrating,length,filename,showlevel,"
-                     "coverfile,inetref) VALUES "
+                     "coverfile,inetref,browse) VALUES "
                      "(\"%s\",\"%s\",\"%s\",\"%s\",%d,%f,%d,\"%s\",%d,\"%s\","
-                     "\"%s\");",
+                     "\"%s\", %d);",
                      title.utf8().data(), director.utf8().data(),
                      plot.utf8().data(), rating.utf8().data(), year,
                      userrating, length, sqlfilename.utf8().data(), showlevel,
-                     sqlcoverfile.utf8().data(), inetref.utf8().data());
+                     sqlcoverfile.utf8().data(), inetref.utf8().data(),browse);
 
     db->exec(thequery);
 

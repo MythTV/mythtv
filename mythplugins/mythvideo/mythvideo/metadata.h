@@ -4,6 +4,8 @@
 #include <qregexp.h>
 #include <qstring.h>
 
+#include <mythtv/mythcontext.h>
+
 class QSqlDatabase;
 
 class Metadata

@@ -88,6 +88,18 @@ public:
     };
 };
 
+class VideoNewBrowsable: public CheckBoxSetting, public GlobalSetting {
+public:
+    VideoNewBrowsable():
+        GlobalSetting("VideoNewBrowsable") {
+        setLabel(QObject::tr("Newly scanned files are browsable by default"));
+        setValue(true);
+        setHelpText(QObject::tr("If set, newly scanned files in the Video Manager "
+                                "will be marked as browsable and will appear in "
+                                "the 'Browse' menu."));
+    };
+};
+
 //Player Settings
 
 class VideoDefaultPlayer: public LineEditSetting, public GlobalSetting {
@@ -111,6 +123,7 @@ GeneralSettings::GeneralSettings()
     general->addChild(new VideoAggressivePC());
     general->addChild(new VideoListUnknownFiletypes());
     general->addChild(new VideoTreeNoDB());
+    general->addChild(new VideoNewBrowsable());
     addChild(general);
 
 }
