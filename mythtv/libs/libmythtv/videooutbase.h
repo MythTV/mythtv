@@ -194,6 +194,9 @@ class VideoOutput
     int w_mm;
     int h_mm;
 
+    int myth_dsw;
+    int myth_dsh;
+
     int img_xoff, img_yoff;
     float img_hscanf, img_vscanf;
 

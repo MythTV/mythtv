@@ -173,8 +173,15 @@ bool VideoOutputVIA::Init(int width, int height, float aspect,
     data->XJ_screen = DefaultScreenOfDisplay(data->XJ_disp);
     XJ_screen_num = DefaultScreen(data->XJ_disp);
 
-    w_mm = DisplayWidthMM(data->XJ_disp, XJ_screen_num);
-    h_mm = DisplayHeightMM(data->XJ_disp, XJ_screen_num);
+    if (myth_dsw != 0)
+        w_mm = myth_dsw;
+    else
+        w_mm = DisplayWidthMM(data->XJ_disp, XJ_screen_num);
+
+    if (myth_dsh != 0)
+        h_mm = myth_dsh;
+    else
+        h_mm = DisplayHeightMM(data->XJ_disp, XJ_screen_num);
 
     usingXinerama = (XineramaQueryExtension(data->XJ_disp, &event_base, 
                                             &error_base) &&

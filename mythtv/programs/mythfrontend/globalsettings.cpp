@@ -1211,6 +1211,30 @@ public:
     };
 };
 
+class DisplaySizeWidth: public SpinBoxSetting, public GlobalSetting {
+public:
+    DisplaySizeWidth():
+        SpinBoxSetting(0, 10000, 1), GlobalSetting("DisplaySizeWidth") {
+        setLabel(QObject::tr("Display Size - Width"));
+        setValue(0);
+        setHelpText(QObject::tr("Horizontal size of the monitor or TV, is used "
+                    "to calculate the actual aspect ratio of the display. This "
+                    "will override the DisplaySize from the system."));
+    };
+};
+
+class DisplaySizeHeight: public SpinBoxSetting, public GlobalSetting {
+public:
+    DisplaySizeHeight():
+        SpinBoxSetting(0, 10000, 1), GlobalSetting("DisplaySizeHeight") {
+        setLabel(QObject::tr("Display Size - Height"));
+        setValue(0);
+        setHelpText(QObject::tr("Vertical size of the monitor or TV, is used "
+                    "to calculate the actual aspect ratio of the display. This "
+                    "will override the DisplaySize from the system."));
+    };
+};
+
 class GuiSizeForTV: public CheckBoxSetting, public GlobalSetting {
 public:
     GuiSizeForTV() :
@@ -2594,6 +2618,8 @@ AppearanceSettings::AppearanceSettings()
     screen->addChild(new XineramaScreen());
     screen->addChild(new GuiWidth());
     screen->addChild(new GuiHeight());
+//    screen->addChild(new DisplaySizeHeight());
+//    screen->addChild(new DisplaySizeWidth());
     screen->addChild(new GuiOffsetX());
     screen->addChild(new GuiOffsetY());
     screen->addChild(new GuiSizeForTV());

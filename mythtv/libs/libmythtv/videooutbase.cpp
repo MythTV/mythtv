@@ -98,6 +98,9 @@ VideoOutput::VideoOutput()
 
     w_mm = 400;
     h_mm = 300;
+
+    myth_dsw = gContext->GetNumSetting("DisplaySizeWidth", 0);
+    myth_dsh = gContext->GetNumSetting("DisplaySizeHeight", 0);
 }
 
 VideoOutput::~VideoOutput()
