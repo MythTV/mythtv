@@ -9,6 +9,8 @@
  *      channel options used by the dvb hierarcy.
  *
  *  Author(s):
+ *      Taylor Jacob (rtjacob at earthlink.net)
+ *          - Changed tuning and DB structure
  *      Kenneth Aafloy (ke-aa at frisurf.no)
  *          - Rewritten for faster tuning.
  *      Ben Bucksch
@@ -52,54 +54,89 @@ using namespace std;
 #include "dvbrecorder.h"
 #include "dvbdiseqc.h"
 #include "dvbcam.h"
-#include "dvbsections.h"
+#include "dvbsiparser.h"
+#include "dvbsignalmonitor.h"
 
+//Timeout between checking for a tuning lock micro seconds
+#define TUNER_INTERVAL 300000
 
 DVBChannel::DVBChannel(int aCardNum, TVRec *parent)
            : ChannelBase(parent), cardnum(aCardNum)
 {
     fd_frontend = -1;
     force_channel_change = false;
-    isOpen = false;
     diseqc = NULL;
-    monitorRunning = false;
-    monitorClients = 0;
+    currentTID = -1;
 
-    dvbcam = NULL;
-    dvbsct = NULL;
+    siparser = NULL;
+    monitor = NULL;
+    dvbcam = new DVBCam(cardnum);
 
     pthread_mutex_init(&chan_opts.lock, NULL);
 }
 
 DVBChannel::~DVBChannel()
 {
-
     CloseDVB();
+
+    delete dvbcam;
+
+    pthread_mutex_destroy(&chan_opts.lock);
+}
+
+void *DVBChannel::SpawnSectionReader(void *param)
+{
+    DVBSIParser *siparser = (DVBSIParser *)param;
+    siparser->StartSectionReader();
+    return NULL;
 }
 
 void DVBChannel::CloseDVB()
 {
     VERBOSE(VB_ALL, "Closing DVB channel");
-
     if (fd_frontend >= 0)
     {
+        if (monitor)
+        {
+            monitor->Stop();
+            delete monitor;
+            monitor = NULL;
+        }
+
         close(fd_frontend);
         fd_frontend = -1;
-        if (dvbcam)
-            delete dvbcam;
-        dvbcam = NULL;
-        if (dvbsct)
-            delete dvbsct;
-        dvbsct = NULL;
+
+        dvbcam->Stop();
+
+        if (siparser)
+        {
+            siparser->StopSectionReader();
+            pthread_join(siparser_thread, NULL);
+            delete siparser;
+            siparser = NULL;
+        }
+
         if (diseqc)
+        {
             delete diseqc;
-        diseqc = NULL;
-        isOpen = false;
+            diseqc = NULL;
+        }
     }
 }
 
 bool DVBChannel::Open()
 {
+    if (siparser == NULL )
+    {
+        // TODO: Rename sections to PMap and have it ONLY pull the ProgramMap
+        siparser = new DVBSIParser(cardnum);
+        siparser->SetDB(db_conn,db_lock);
+        pthread_create(&siparser_thread,NULL,SpawnSectionReader, siparser);
+
+        connect(siparser,SIGNAL(NewPMT(PMTObject)),this,
+                     SLOT(SetPMT(PMTObject)));
+    }
+
     if (fd_frontend >= 0)
         return true;
 
@@ -114,16 +151,15 @@ bool DVBChannel::Open()
     if (ioctl(fd_frontend, FE_GET_INFO, &info) < 0)
     {
         ERRNO("Failed to get frontend information.")
+        close(fd_frontend);
+        fd_frontend = -1;
         return false;
     }
 
     GENERAL(QString("Using DVB card %1, with frontend %2.")
             .arg(cardnum).arg(info.name));
 
-    dvbsct = new DVBSections(cardnum);
-    connect(this, SIGNAL(ChannelChanged(dvb_channel_t&)),
-            dvbsct, SLOT(ChannelChanged(dvb_channel_t&)));
-
+    // Turn on the power to the LNB
     if (info.type == FE_QPSK)
     {
         if (ioctl(fd_frontend, FE_SET_TONE, SEC_TONE_OFF) < 0)
@@ -139,19 +175,39 @@ bool DVBChannel::Open()
         }
     }
     
-    dvbcam = new DVBCam(cardnum);
-    if (dvbcam->Open())
-    {
-        connect(this, SIGNAL(ChannelChanged(dvb_channel_t&)),
-                dvbcam, SLOT(ChannelChanged(dvb_channel_t&)));
-        connect(dvbsct, SIGNAL(ChannelChanged(dvb_channel_t&, uint8_t*, int)),
-                dvbcam, SLOT(ChannelChanged(dvb_channel_t&, uint8_t*, int)));
-    }
+    dvbcam->Start();
+
+    monitor = new DVBSignalMonitor(cardnum, fd_frontend);
+    monitor->Start();
 
     force_channel_change = true;
     first_tune = true;
 
-    return isOpen = true;
+    return (fd_frontend >= 0 );
+}
+
+/*
+ *  To be used by setup sdt/nit scanner and eit parser.
+ *  mplexid is how the db indexes each transport
+ */
+bool DVBChannel::SetTransportByInt(int mplexid)
+{
+    currentTID = -1;
+
+    if (!GetTransportOptions(mplexid))
+        return false;
+
+    CheckOptions();
+    PrintChannelOptions();
+
+    if (!TuneTransport(chan_opts))
+        return false;
+
+
+printf("Setting currenTID = %d\n",mplexid);
+    currentTID = mplexid;
+
+    return true;
 }
 
 bool DVBChannel::SetChannelByString(const QString &chan)
@@ -159,7 +215,7 @@ bool DVBChannel::SetChannelByString(const QString &chan)
     if (curchannelname == chan && !force_channel_change)
         return true;
 
-    if (!isOpen)
+    if (fd_frontend < 0)
         return false;
 
     force_channel_change = false;
@@ -180,17 +236,22 @@ bool DVBChannel::SetChannelByString(const QString &chan)
         ERROR(QString("Tuning for channel #%1 failed.").arg(chan));
         return false;
     }
+    curchannelname = chan;
 
     GENERAL(QString("Successfully tuned to channel %1.").arg(chan));
 
-    ChannelChanged(chan_opts);
+    if (!chan_opts.pmt.OnAir())
+    {
+        ERROR(QString("Channel #%1 is off air.").arg(chan));
+        return false;
+    }
 
-    curchannelname = chan;
     inputChannel[currentcapchannel] = curchannelname;
 
     return true;
 }
 
+// TODO: Look at better communication with recorder so that only PMAP needs tobe passed
 void DVBChannel::RecorderStarted()
 {
     ChannelChanged(chan_opts);
@@ -205,27 +266,36 @@ void DVBChannel::SwitchToInput(const QString &input, const QString &chan)
     SetChannelByString(chan);
 }
 
+/*
+ * This function called when tuning to a speficic program not just the transport
+ * in general.
+ */
 bool DVBChannel::GetChannelOptions(QString channum)
 {
     QString         thequery;
     QSqlQuery       query;
-    QSqlDatabase    *db_conn;
-    pthread_mutex_t *db_lock;
     QString         inputName;
 
-    if (!pParent->CheckChannel((ChannelBase*)this, channum,
-                               db_conn, db_lock, inputName))
-    {
-        ERROR("Failed to verify channel integrity.");
-        return false;
-    }
-
-    dvbcam->SetDatabase(db_conn, db_lock);
+    if (db_conn == NULL)
+       return false;
 
     pthread_mutex_lock(db_lock);
     MythContext::KickDatabase(db_conn);
 
-    thequery = QString("SELECT channel.chanid "
+// TODO: pParent doesn't exist when you create a DVBChannel from videosource
+//       but this is important (i think) for remote backends
+
+    if (pParent == NULL)
+        thequery = QString("SELECT chanid, serviceid, mplexid "
+                       "FROM channel,cardinput,capturecard WHERE "
+                       "channel.channum='%1' AND "
+                       "cardinput.sourceid = channel.sourceid AND "
+                       "cardinput.videodevice = '%2' AND "
+                       "capturecard.cardid = cardinput.cardid AND "
+                       "capturecard.cardtype = 'DVB'")
+                       .arg(channum).arg(cardnum);
+    else
+        thequery = QString("SELECT chanid, serviceid, mplexid "
                        "FROM channel,cardinput,capturecard WHERE "
                        "channel.channum='%1' AND "
                        "cardinput.sourceid = channel.sourceid AND "
@@ -233,6 +303,7 @@ bool DVBChannel::GetChannelOptions(QString channum)
                        "capturecard.cardid = cardinput.cardid AND "
                        "capturecard.cardtype = 'DVB'")
                        .arg(channum).arg(pParent->GetCaptureCardNum());
+
     query = db_conn->exec(thequery);
 
     if (!query.isActive())
@@ -246,30 +317,97 @@ bool DVBChannel::GetChannelOptions(QString channum)
     }
 
     query.next();
-    int chanid = query.value(0).toInt();    
+    // TODO: Fix structs to be more useful to new DB structure
+    chan_opts.serviceID     = query.value(1).toInt();
 
-    thequery = "SELECT serviceid, networkid, providerid, transportid,"
-               " frequency, inversion, ";
+    int mplexid = query.value(2).toInt();
+
+    pthread_mutex_unlock(db_lock);
+
+    if (!GetTransportOptions(mplexid))
+        return false;
+
+    currentTID = mplexid;
+
+    return true;
+}
+
+bool DVBChannel::GetTransportOptions(int mplexid)
+{
+    QSqlQuery query;
+    QString thequery;
+
+    if (db_conn == NULL)
+       return false;
+
+    pthread_mutex_lock(db_lock);
+    MythContext::KickDatabase(db_conn);
+
+     // TODO: See previous comment about pParent
+    int capturecardnumber;
+    if (pParent == NULL) {
+       thequery = QString("SELECT cardid FROM capturecard "
+                          " WHERE videodevice = %1;").arg(cardnum);
+       query = db_conn->exec(thequery);
+       if (!query.isActive() || query.numRowsAffected() <= 0)
+       {
+           ERROR(QString("Could not find capture card for transport %1")
+                      .arg(mplexid));
+           pthread_mutex_unlock(db_lock);
+           return false;
+       }
+       query.next();
+       capturecardnumber = query.value(0).toInt();
+    }
+    else
+       capturecardnumber = pParent->GetCaptureCardNum();
+
     switch(info.type)
     {
         case FE_QPSK:
-            thequery += QString("symbolrate, fec, polarity, diseqc_type,"
-                                " diseqc_port, lnb_lof_switch, lnb_lof_hi,"
-                                " lnb_lof_lo FROM dvb_channel, dvb_sat "
-                                " WHERE dvb_channel.satid=dvb_sat.satid"
-                                " AND chanid='%1'").arg(chanid);
+            thequery = QString("SELECT frequency, inversion, symbolrate, "
+                               "fec, polarity, dvb_diseqc_type, diseqc_port, "
+                               "diseqc_pos, lnb_lof_switch, lnb_lof_hi, "
+                               "lnb_lof_lo,sistandard FROM dtv_multiplex,cardinput,"
+                               "capturecard WHERE mplexid=%1 AND "
+                               "dtv_multiplex.sourceid = cardinput.sourceid "
+                               "AND capturecard.cardid=%2")
+                               .arg(mplexid)
+                               .arg(capturecardnumber);
             break;
         case FE_QAM:
-            thequery += QString("symbolrate, fec, modulation"
-                                " FROM dvb_channel WHERE chanid='%1'")
-                                .arg(chanid);
+            thequery = QString("SELECT frequency, inversion, symbolrate, "
+                               "fec, modulation, sistandard "
+                               "FROM dtv_multiplex,cardinput,"
+                               "capturecard WHERE mplexid=%1 AND "
+                               "dtv_multiplex.sourceid = cardinput.sourceid "
+                               "AND capturecard.cardid=%2")
+                               .arg(mplexid)
+                               .arg(capturecardnumber);
             break;
         case FE_OFDM:
-            thequery += QString("bandwidth, fec, lp_code_rate, modulation,"
-                                " transmission_mode, guard_interval, hierarchy"
-                                " FROM dvb_channel WHERE chanid='%1'")
-                                .arg(chanid);
+            thequery = QString("SELECT frequency, inversion, "
+                               "bandwidth, hp_code_rate, lp_code_rate, "
+                               "constellation, transmission_mode, "
+                               "guard_interval, hierarchy, sistandard "
+                               "FROM dtv_multiplex,cardinput,"
+                               "capturecard WHERE mplexid=%1 AND "
+                               "dtv_multiplex.sourceid = cardinput.sourceid "
+                               "AND capturecard.cardid=%2")
+                               .arg(mplexid)
+                               .arg(capturecardnumber);
             break;
+#if (DVB_API_VERSION_MINOR == 1)
+        case FE_ATSC:
+            thequery = QString("SELECT frequency, modulation, sistandard "
+                               "FROM dtv_multiplex,cardinput,"
+                               "capturecard WHERE mplexid=%1 AND "
+                               "dtv_multiplex.sourceid = cardinput.sourceid "
+                               "AND capturecard.cardid=%2")
+                               .arg(mplexid)
+                               .arg(capturecardnumber);
+            break;
+#endif
     }
 
     query = db_conn->exec(thequery);
@@ -279,99 +417,18 @@ bool DVBChannel::GetChannelOptions(QString channum)
 
     if (query.numRowsAffected() <= 0)
     {
-        thequery = QString("SELECT satid FROM dvb_channel WHERE chanid='%1'")
-                    .arg(chanid);
-        query = db_conn->exec(thequery);
-
-        if (!query.isActive())
-            MythContext::DBError("GetChannelOptions - Channel Check", query);
-
-        if (query.numRowsAffected() <= 0)
-        {
-            ERROR(QString("Could not find dvb tuning parameters for channel %1"
-                          " with id %2.").arg(channum).arg(chanid));
-        }
-        else if (info.type == FE_QPSK)
-        {
-            int satid = query.value(0).toInt();
-            thequery = QString("SELECT * FROM dvb_sat WHERE satid='%1'")
-                        .arg(satid);
-            query = db_conn->exec(thequery);
-
-            if (!query.isActive())
-                MythContext::DBError("GetChannelOptions - Sat Check", query);
-
-            if (query.numRowsAffected() <= 0)
-                ERROR(QString("Channel %1 is configured with satid=%2, but this"
-                              " satellite does not exist, check your setup.")
-                              .arg(channum).arg(satid));
-        }
-
-        pthread_mutex_unlock(db_lock);
-        return false;
+       ERROR(QString("Could not find dvb tuning parameters for transport %1")
+                      .arg(mplexid));
+       pthread_mutex_unlock(db_lock);
+       return false;
     }
-
-    pthread_mutex_unlock(db_lock);
 
     query.next();
-    if (!ParseQuery(query))
-        return false;    
-
-    if (!GetChannelPids(db_conn, db_lock, chanid))
-        return false;
-
-    return true;
-}
-
-bool DVBChannel::GetChannelPids(QSqlDatabase*& db_conn, 
-                                pthread_mutex_t*& db_lock,
-                                int chanid)
-{
-    dvb_pids_t& pids = chan_opts.pids;
-
-    pids.audio.clear();
-    pids.video.clear();
-    pids.teletext.clear();
-    pids.subtitle.clear();
-    pids.pcr.clear();
-    pids.other.clear();
-
-    // TODO: Also fetch & store language field.
-    pthread_mutex_lock(db_lock);
-    MythContext::KickDatabase(db_conn);
-    QString thequery = QString("SELECT pid, type FROM dvb_pids WHERE chanid=%1")
-                               .arg(chanid);
-    QSqlQuery query = db_conn->exec(thequery);
-
-    if (!query.isActive())
-        MythContext::DBError("GetChannelPids", query);
-
-    if (query.numRowsAffected() <= 0)
-    {
-        ERROR(QString("Unable to find any pids for channel id %1.").arg(chanid));
-        pthread_mutex_unlock(db_lock);
-        return false;
-    }
-
-    int numpids = query.numRowsAffected();
-    while (numpids--)
-    {
-        query.next();
-        int this_pid = query.value(0).toInt();
-
-        switch(query.value(1).toString()[0])
-        {
-            case 'a': pids.audio.push_back(this_pid);     break;
-            case 'v': pids.video.push_back(this_pid);     break;
-            case 't': pids.teletext.push_back(this_pid);  break;
-            case 's': pids.subtitle.push_back(this_pid);  break;
-            case 'p': pids.pcr.push_back(this_pid);       break;
-            case 'o': pids.other.push_back(this_pid);     break;
-            default: WARNING("Invalid type for pid!");
-        }
-    }
-
     pthread_mutex_unlock(db_lock);
+
+    if (!ParseTransportQuery(query))
+        return false;
+
     return true;
 }
 
@@ -395,6 +452,7 @@ void DVBChannel::PrintChannelOptions()
                 case INVERSION_ON: msg += "On"; break;
             }
 
+            // TODO: Make DiSEqC class print options here as well
             //NOTE: Diseqc and LNB is handled by DVBDiSEqC.
             break;
 
@@ -424,6 +482,9 @@ void DVBChannel::PrintChannelOptions()
                 case FEC_1_2: msg += "1/2"; break;
             }
 
+#if (DVB_API_VERSION_MINOR == 1)
+        case FE_ATSC:
+
             msg += " Mod:";
             switch(t.params.u.qam.modulation) {
                 case QPSK: msg += "QPSK"; break;
@@ -433,7 +494,10 @@ void DVBChannel::PrintChannelOptions()
                 case QAM_64: msg += "64"; break;
                 case QAM_32: msg += "32"; break;
                 case QAM_16: msg += "16"; break;
+                case VSB_8: msg += "8VSB"; break;
+                case VSB_16: msg += "16VSB"; break;
             }
+#endif
             break;
 
         case FE_OFDM:
@@ -442,9 +506,9 @@ void DVBChannel::PrintChannelOptions()
             msg += " BW:";
             switch(t.params.u.ofdm.bandwidth) {
                 case BANDWIDTH_AUTO: msg += "Auto"; break;
-                case BANDWIDTH_8_MHZ: msg += "8Mhz"; break;
-                case BANDWIDTH_7_MHZ: msg += "7Mhz"; break;
-                case BANDWIDTH_6_MHZ: msg += "6Mhz"; break;
+                case BANDWIDTH_8_MHZ: msg += "8MHz"; break;
+                case BANDWIDTH_7_MHZ: msg += "7MHz"; break;
+                case BANDWIDTH_6_MHZ: msg += "6MHz"; break;
             }
 
             msg += " HP:";
@@ -484,6 +548,10 @@ void DVBChannel::PrintChannelOptions()
                 case QAM_64: msg += "64"; break;
                 case QAM_32: msg += "32"; break;
                 case QAM_16: msg += "16"; break;
+#if (DVB_API_VERSION_MINOR == 1)
+                case VSB_8: msg += "8vsb"; break;
+                case VSB_16: msg += "16vsb"; break;
+#endif
             }
 
             msg += " TM:";
@@ -589,6 +657,11 @@ void DVBChannel::CheckOptions()
 
             if (!CheckModulation(t.params.u.ofdm.constellation))
                 WARNING("Unsupported constellation parameter.");
+#if (DVB_API_VERSION_MINOR == 1)
+       case FE_ATSC:
+
+            // ATSC doesn't need any validation
+#endif
             break;
     }
 
@@ -631,165 +704,111 @@ bool DVBChannel::CheckModulation(fe_modulation_t& modulation)
         case QAM_128:   if (info.caps & FE_CAN_QAM_128)     return true; break;
         case QAM_256:   if (info.caps & FE_CAN_QAM_256)     return true; break;
         case QAM_AUTO:  if (info.caps & FE_CAN_QAM_AUTO)    return true; break;
+#if (DVB_API_VERSION_MINOR == 1)
+        case VSB_8:     if (info.caps & FE_CAN_8VSB)        return true; break;
+        case VSB_16:    if (info.caps & FE_CAN_16VSB)       return true; break;
+#endif
+
     }
     return false;
-}
-
-bool DVBChannel::FillFrontendStats(dvb_stats_t& stats)
-{
-    if (fd_frontend < 0)
-        return false;
-
-    ioctl(fd_frontend, FE_READ_SNR, &stats.snr);
-    ioctl(fd_frontend, FE_READ_SIGNAL_STRENGTH, &stats.ss);
-    ioctl(fd_frontend, FE_READ_BER, &stats.ber);
-    ioctl(fd_frontend, FE_READ_UNCORRECTED_BLOCKS, &stats.ub);
-    ioctl(fd_frontend, FE_READ_STATUS, &stats.status);
-
-    return true;
-}
-
-void* DVBChannel::StatusMonitorHelper(void* self)
-{
-    ((DVBChannel*)self)->StatusMonitorLoop();
-    return NULL;
-}
-
-void DVBChannel::StatusMonitorLoop()
-{
-    dvb_stats_t stats;
-
-    monitorRunning = true;
-    GENERAL("StatusMonitor Starting");
-
-    while (monitorClients > 0)
-    {
-        if (!isOpen)
-        {
-            usleep(250*1000);
-            continue;
-        }
-        
-        if (FillFrontendStats(stats))
-        {
-            emit Status(stats);
-            emit StatusSignalToNoise(stats.snr);
-            emit StatusSignalStrength(stats.ss);
-            emit StatusBitErrorRate(stats.ber);
-            emit StatusUncorrectedBlocks(stats.ub);
-
-            QString str = "";
-            if (stats.status & FE_TIMEDOUT)
-            {
-                str = "Timed out waiting for signal.";
-            }
-            else
-            {
-                if (stats.status & FE_HAS_SIGNAL)  str += "SIGNAL ";
-                if (stats.status & FE_HAS_CARRIER) str += "CARRIER ";
-                if (stats.status & FE_HAS_VITERBI) str += "VITERBI ";
-                if (stats.status & FE_HAS_SYNC) str += "SYNC ";
-                if (stats.status & FE_HAS_LOCK) str += "LOCK ";
-            }
-            emit Status(str);
-        }
-
-        usleep(250*1000);
-    }
-
-    monitorRunning = false;
-    GENERAL("StatusMonitor Stopping");
-}
-
-void DVBChannel::connectNotify(const char* signal)
-{
-    QString sig = signal;
-    if (sig == SIGNAL(Status(dvb_stats_t &)) ||
-        sig == SIGNAL(Status(QString)))
-    {
-        monitorClients++;
-        if (!monitorRunning)
-        {
-            pthread_attr_t attr;
-            pthread_attr_init(&attr);
-            pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-
-            pthread_create(&statusMonitorThread, &attr,
-                           StatusMonitorHelper, this);
-        }
-    }
-}
-
-void DVBChannel::disconnectNotify(const char* signal)
-{
-    QString sig = signal;
-    if (sig == SIGNAL(Status(dvb_stats_t &)) ||
-        sig == SIGNAL(Status(QString)))
-    {
-        monitorClients--;
-        if (monitorClients < 1)
-            while(monitorRunning)
-                usleep(1000);
-    }
 }
 
 /*****************************************************************************
         Query parser functions for each of the three types of cards.
  *****************************************************************************/
 
-bool DVBChannel::ParseQuery(QSqlQuery& query)
+bool DVBChannel::ParseTransportQuery(QSqlQuery& query)
 {
     pthread_mutex_lock(&chan_opts.lock);
 
-    chan_opts.serviceID     = query.value(0).toInt();
-    chan_opts.networkID     = query.value(1).toInt();
-    chan_opts.providerID    = query.value(2).toInt();
-    chan_opts.transportID   = query.value(3).toInt();
-
     switch(info.type)
     {
+// TODO: Add in Diseqc_Pos when diseqc class supports position as well as switches
         case FE_QPSK:
-            if (!ParseQPSK(query.value(4).toString(), query.value(5).toString(),
+            if (!ParseQPSK(query.value(0).toString(), query.value(1).toString(),
+                           query.value(2).toString(), query.value(3).toString(),
+                           query.value(4).toString(), query.value(5).toString(),
                            query.value(6).toString(), query.value(7).toString(),
                            query.value(8).toString(), query.value(9).toString(),
-                           query.value(10).toString(), query.value(11).toString(),
-                           query.value(12).toString(), query.value(13).toString(),
+                           query.value(10).toString(),
                            chan_opts.tuning))
             {
                 pthread_mutex_unlock(&chan_opts.lock);
                 return false;
             }
+            chan_opts.sistandard = query.value(11).toString();
             break;
         case FE_QAM:
-            if (!ParseQAM(query.value(4).toString(), query.value(5).toString(),
-                         query.value(6).toString(), query.value(7).toString(),
-                         query.value(8).toString(), chan_opts.tuning))
+            if (!ParseQAM(query.value(0).toString(), query.value(1).toString(),
+                          query.value(2).toString(), query.value(3).toString(),
+                          query.value(4).toString(), chan_opts.tuning))
             {
                 pthread_mutex_unlock(&chan_opts.lock);
                 return false;
             }
+            chan_opts.sistandard = query.value(5).toString();
             break;
         case FE_OFDM:
-            if (!ParseOFDM(query.value(4).toString(), query.value(5).toString(),
+            if (!ParseOFDM(query.value(0).toString(), query.value(1).toString(),
+                           query.value(2).toString(), query.value(3).toString(),
+                           query.value(4).toString(), query.value(5).toString(),
                            query.value(6).toString(), query.value(7).toString(),
-                           query.value(8).toString(), query.value(9).toString(),
-                           query.value(10).toString(), query.value(11).toString(),
-                           query.value(12).toString(), chan_opts.tuning))
+                           query.value(8).toString(), chan_opts.tuning))
             {
                 pthread_mutex_unlock(&chan_opts.lock);
                 return false;
             }
+            chan_opts.sistandard = query.value(9).toString();
             break;
+#if (DVB_API_VERSION_MINOR == 1)
+        case FE_ATSC:
+            if (!ParseATSC(query.value(0).toString(), query.value(1).toString(),
+                 chan_opts.tuning))
+            {
+                pthread_mutex_unlock(&chan_opts.lock);
+                return false;
+            }
+            chan_opts.sistandard = query.value(2).toString();
+            break;
+#endif
     }
 
     pthread_mutex_unlock(&chan_opts.lock);
     return true;
 }
 
+bool DVBChannel::ParseATSC(const QString& frequency, const QString modulation,
+                              dvb_tuning_t& t)
+{
+#if (DVB_API_VERSION_MINOR == 1)
+    t.params.frequency = frequency.toInt();
+
+    dvb_vsb_parameters& p = t.params.u.vsb;
+
+    if (modulation == "qam_256")   p.modulation = QAM_256;
+    else if (modulation == "qam_64")    p.modulation = QAM_64;
+    else if (modulation == "8vsb")    p.modulation = VSB_8;
+    else if (modulation == "16vsb")    p.modulation = VSB_16;
+    else {
+        WARNING("Invalid modulationulation parameter '" << modulation
+                << "', falling back to '8vsb'.");
+        p.modulation = VSB_8;
+    }
+#else
+   (void)frequency;
+   (void)modulation;
+   (void)t;
+#endif
+    return true;
+
+}
+
+// TODO: Add in DiseqcPos when diseqc class supports it
 bool DVBChannel::ParseQPSK(const QString& frequency, const QString& inversion,
                            const QString& symbol_rate, const QString& fec_inner,
                            const QString& pol, 
                            const QString& diseqc_type, const QString& diseqc_port,
+                           const QString& diseqc_pos,
                            const QString& lnb_lof_switch, const QString& lnb_lof_hi,
                            const QString& lnb_lof_lo, dvb_tuning_t& t)
 {
@@ -837,6 +856,7 @@ bool DVBChannel::ParseQPSK(const QString& frequency, const QString& inversion,
 
     t.diseqc_type = diseqc_type.toInt();
     t.diseqc_port = diseqc_port.toInt();
+    t.diseqc_pos = diseqc_pos.toFloat();
     t.lnb_lof_switch = lnb_lof_switch.toInt();
     t.lnb_lof_hi = lnb_lof_hi.toInt();
     t.lnb_lof_lo = lnb_lof_lo.toInt();
@@ -898,6 +918,7 @@ bool DVBChannel::ParseQAM(const QString& frequency, const QString& inversion,
     return true;
 }
 
+// TODO: Change to be representative of what dvbscanner stores fields as
 bool DVBChannel::ParseOFDM(const QString& frequency, const QString& inversion,
                            const QString& bandwidth, const QString& coderate_hp,
                            const QString& coderate_lp, const QString& constellation,
@@ -1007,10 +1028,74 @@ bool DVBChannel::ParseOFDM(const QString& frequency, const QString& inversion,
 }
 
 /*****************************************************************************
+  PMT Handler Code 
+*****************************************************************************/
+
+void DVBChannel::SetPMT(PMTObject NewPMT)
+{
+    pthread_mutex_lock(&chan_opts.lock);
+
+    chan_opts.pmt = NewPMT;
+    chan_opts.PMTSet = true;
+
+    pthread_mutex_unlock(&chan_opts.lock);
+
+    // Send the PMT to recorder (needs to be cleaned up some)
+    ChannelChanged(chan_opts);
+
+}
+
+void DVBChannel::SetCAPMT(PMTObject pmt)
+{
+    // This is called from DVBRecorder
+    // when AutoPID is complete
+
+    // Set the PMT for the CAM
+    if (dvbcam->IsRunning())
+        dvbcam->SetPMT(pmt);
+}
+
+/*****************************************************************************
            Tuning functions for each of the three types of cards.
  *****************************************************************************/
-
 bool DVBChannel::Tune(dvb_channel_t& channel, bool all)
+{
+    // This function allows you to tune to more than just a transport, and also
+    // verifies the service exists, and get the PIDs if auto-pid is turned on
+    pthread_mutex_lock(&chan_opts.lock);
+    channel.PMTSet = false;
+    pthread_mutex_unlock(&chan_opts.lock);
+
+    if (!TuneTransport(channel,all))
+        return false;
+
+    GENERAL("Multiplex Locked");
+
+    siparser->AddPMT(channel.serviceID);
+
+
+// TODO: Pick a more reasonable time here
+    for (int x = 0; x < 3000 ; x++)
+    {
+        pthread_mutex_lock(&chan_opts.lock);
+        if (channel.PMTSet == true)
+        {
+            pthread_mutex_unlock(&chan_opts.lock);
+            return true;
+        }
+        pthread_mutex_unlock(&chan_opts.lock);
+        usleep(100);
+    }
+
+    GENERAL("Timeout Getting PMT");
+    return false;
+}
+
+/*
+ *  Tunes the card to a transport but doesnt deal with PIDS.  This is used
+ *  by DVB Setup Scanner and EIT Parser. timeout in millis
+ */
+bool DVBChannel::TuneTransport(dvb_channel_t& channel, bool all, int timeout)
 {
     dvb_tuning_t& tuning = channel.tuning;
 
@@ -1020,15 +1105,11 @@ bool DVBChannel::Tune(dvb_channel_t& channel, bool all)
         return false;
     }
 
-    struct dvb_frontend_event event;
-
     bool reset      = false;
     bool havetuned  = false;
     bool tune       = true;
 
-    int max_poll_timeout_count = 30;
-    int max_frontend_timeout_count = 30;
-    int poll_return;
+    int max_tune_timeout_count = (timeout*1000)/TUNER_INTERVAL;
 
     if (all == true)
         first_tune = true;
@@ -1037,9 +1118,6 @@ bool DVBChannel::Tune(dvb_channel_t& channel, bool all)
         reset      = true;
         first_tune = false;
     }
-
-    struct pollfd polls;
-    polls.fd = fd_frontend;
 
     while (true)
     {
@@ -1059,10 +1137,29 @@ bool DVBChannel::Tune(dvb_channel_t& channel, bool all)
                     if (!TuneOFDM(tuning, reset, havetuned))
                         return false;
                     break;
+#if (DVB_API_VERSION_MINOR == 1)
+                case FE_ATSC:
+                    if (!TuneATSC(tuning, reset, havetuned))
+                        return false;
+                    break;
+#endif
             }
 
+            /* Stop the SIParser.  It will be resumed as soon as a lock is
+               obtained.  For DVB-C/T/S with no Dish Movement it could be
+               immediatly started */
+            siparser->Reset();
+//            siparser->FillPMap(channel.serviceID,30 /* 10 Second Timeout */);
+
             if (havetuned == false)
+            {
+                /* Start the SIParser back now that a lock has been obtained */
+                if (channel.sistandard == "atsc")
+                    siparser->FillPMap(SI_STANDARD_ATSC);
+                else
+                    siparser->FillPMap(SI_STANDARD_DVB);
                 return true;
+            }
 
             tune = false;
             reset = false;
@@ -1070,90 +1167,48 @@ bool DVBChannel::Tune(dvb_channel_t& channel, bool all)
             CHANNEL("Waiting for frontend event after tune.");
         }
 
-        polls.events = POLLIN;
-        polls.revents = 0;
+        fe_status_t stat;
+        int timeout = 0;
+        QString status = "Status: ";
 
-        for (;;)
-        {
-            poll_return = poll(&polls, 1, 150);
-            if (poll_return == -1 && (errno == EAGAIN || errno == EINTR))
-                continue;
-            break;
-        }
-
-        if (poll_return > 0)
-        {
-            if (ioctl(fd_frontend, FE_GET_EVENT, &event) < 0)
-            {
-                if (errno == EOVERFLOW || errno == EAGAIN)
-                    continue;
-
-                ERRNO("Failed getting frontend event.");
+        do {
+            if (ioctl(fd_frontend, FE_READ_STATUS, &stat) < 0)
+                perror("FE_READ_STATUS failed");
+            if (fd_frontend < 0)
                 return false;
+            else if (!(timeout % (1000000/TUNER_INTERVAL)))
+            {
+                uint16_t ss;
+                uint16_t snr;
+                uint32_t ber;
+                uint32_t ub;
+                ioctl(fd_frontend, FE_READ_SIGNAL_STRENGTH, &ss);
+                ioctl(fd_frontend, FE_READ_SNR, &snr);
+                ioctl(fd_frontend, FE_READ_BER, &ber);
+                ioctl(fd_frontend, FE_READ_UNCORRECTED_BLOCKS, &ub);
+                QString msg = QString("DVB signal %1 | snr %2 | ber %3 | unc %4").arg(ss,2,16).arg(snr,2,16).arg(ber,4,16).arg(ub,4,16);
+                GENERAL(msg);
             }
 
-            QString status = "Status: ";
-            if (event.status & FE_HAS_CARRIER)  status += "CARRIER | ";
-            if (event.status & FE_HAS_VITERBI)  status += "VITERBI | ";
-            if (event.status & FE_HAS_SIGNAL)   status += "SIGNAL | ";
-            if (event.status & FE_HAS_SYNC)     status += "SYNC | ";
-            if (event.status & FE_HAS_LOCK)
+            if (stat & FE_HAS_LOCK)
             {
                 status += "LOCK.";
-                CHANNEL(status);
+                GENERAL(status);
+                /* Start the SIParser back now that a lock has been obtained */
+                if (channel.sistandard == "atsc")
+                    siparser->FillPMap(SI_STANDARD_ATSC);
+                else
+                    siparser->FillPMap(SI_STANDARD_DVB);
                 return true;
             }
-            else
-            {
-                status += "NO LOCK!";
-                WARNING(status);
-                continue;
-            }
 
-            if (event.status & FE_TIMEDOUT)
-            {
-                if (max_frontend_timeout_count==0)
-                {
-                    ERROR("Frontend timed out too many times, bailing.");
-                    return false;
-                }
+            usleep(TUNER_INTERVAL);
+        } while (++timeout <= max_tune_timeout_count);
 
-                ERROR("Timed out, waiting for frontend event, retrying.");
-                max_frontend_timeout_count--;
-                continue;
-            }
-
-            if (event.status & FE_REINIT)
-            {
-                ERROR("Frontend was reinitialized, retuning.");
-                reset = tune = true;
-            }
-        }
-        else
-        {
-            if (poll_return == 0)
-            {
-                if (max_poll_timeout_count)
-                {
-                    max_poll_timeout_count--;
-                    continue;
-                }
-                else
-                {
-                    ERROR("Poll timed out too many times, bailing.");
-                    return false;
-                }
-            }
-
-            if (poll_return == -1)
-            {
-                ERRNO("Poll failed waiting for frontend event.");
-                continue;
-            }
-        }
+        status += "NO LOCK!";
+        WARNING(status);
+        return false;
     }
-
-    return true;
 }
 
 bool DVBChannel::TuneQPSK(dvb_tuning_t& tuning, bool reset, bool& havetuned)
@@ -1197,6 +1252,30 @@ bool DVBChannel::TuneQPSK(dvb_tuning_t& tuning, bool reset, bool& havetuned)
 
     tuning.params.frequency = frequency;
 
+    return true;
+}
+
+bool DVBChannel::TuneATSC(dvb_tuning_t& tuning, bool reset, bool& havetuned)
+{
+#if (DVB_API_VERSION_MINOR == 1)
+    if (reset ||
+        prev_tuning.params.frequency != tuning.params.frequency ||
+        prev_tuning.params.u.vsb.modulation != tuning.params.u.vsb.modulation)
+    {
+        if (ioctl(fd_frontend, FE_SET_FRONTEND, &tuning.params) < 0)
+        {
+            ERRNO("Setting Frontend failed.");
+            return false;
+        }
+        prev_tuning.params.frequency = tuning.params.frequency;
+        prev_tuning.params.u.vsb.modulation  = tuning.params.u.vsb.modulation;
+        havetuned = true;
+    }
+#else
+    (void)tuning;
+    (void)reset;
+    (void)havetuned;
+#endif
     return true;
 }
 

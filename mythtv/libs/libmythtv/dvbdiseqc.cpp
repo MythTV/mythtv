@@ -41,6 +41,9 @@
 #include "dvbtypes.h"
 #include "dvbdiseqc.h"
 
+#define TO_RADS (M_PI / 180.0)
+#define TO_DEC (180.0 / M_PI)
+
 DVBDiSEqC::DVBDiSEqC(int _cardnum, int _fd_frontend):
     cardnum(_cardnum), fd_frontend(_fd_frontend)
 {
@@ -201,11 +204,23 @@ bool DVBDiSEqC::SendDiSEqCMessage(dvb_tuning_t& tuning, dvb_diseqc_master_cmd &c
         while (repeats--) 
         {
 
-            GENERAL(QString("DiSEqC Sending 1.1/1.2/1.3 Repeat Command: %1 %2 %3 %4")
+            if (tuning.diseqc_type == 7)
+            {
+                GENERAL(QString("DiSEqC Sending 1.3 Repeat Command: %1 %2 %3 %4 %5")
+                               .arg(cmd.msg[0],2,16)
+                               .arg(cmd.msg[1],2,16)
+                               .arg(cmd.msg[2],2,16)
+                               .arg(cmd.msg[3],2,16)
+                               .arg(cmd.msg[4],2,16));
+            }
+            else
+            {
+                GENERAL(QString("DiSEqC Sending 1.1/1.2 Repeat Command: %1 %2 %3 %4")
                            .arg(cmd.msg[0],2,16)
                            .arg(cmd.msg[1],2,16)
                            .arg(cmd.msg[2],2,16)
                            .arg(cmd.msg[3],2,16));
+            }
 
             cmd.msg[0] = CMD_REPEAT;      
             if (ioctl(fd_frontend, FE_DISEQC_SEND_MASTER_CMD, &cmd) == -1) 
@@ -575,49 +590,43 @@ bool DVBDiSEqC::PositionerDisableLimits()
 }
 
 /*****************************************************************************
-                                Diseqc v1.3 (AKA USALS)
+                                Diseqc v1.3 (Goto X)
  ****************************************************************************/
 
 bool DVBDiSEqC::PositionerGotoAngular(dvb_tuning_t& tuning, bool reset, 
                                       bool& havetuned) 
 {
-    // Some of this code taken from satpos.c from linuxtv.org by J.Mourer
-   
-    // I have not verified this because my dish is not easily accesable and is 
-    // slightly out of alignment so I use DiSEqC 1.2 Stored Positions
+    // TODO: Send information here to FE saying motor is moving and
+    //       to expect a longer than average tuning delay
+    if (prev_tuning.diseqc_pos != tuning.diseqc_pos)
+        GENERAL("DiSEqC Motor Moving");
 
-    double H = 180.0 / M_PI;		// Cheat on Radians
-    double B, GSLon, GSLat, SatLon, Azimuth;
-    int CMD1=0x00,CMD2=0x00;		// Bytes sent to motor
+    int CMD1=0x00 , CMD2=0x00;        // Bytes sent to motor
     double USALS=0.0;
-    int DecimalLookup[11] = 
-       { 0x00, 0x02, 0x03, 0x05, 0x06, 0x08, 0x0A, 0x0B, 0x0D, 0x0E, 0x00 };
-  
-    // Hard Coded Test Values 
-    // These vaules should be stored in the settings table when implimentation 
-    // is complete
-    GSLat = 35.0;
-    GSLon = -78.0;
-    SatLon = -95.0;
+    int DecimalLookup[10] =
+       { 0x00, 0x02, 0x03, 0x05, 0x06, 0x08, 0x0A, 0x0B, 0x0D, 0x0E };
 
-    // Calcualte Azimuth required to aim satellite antenna
-    B = GSLon - SatLon;
-    Azimuth = 180.0 + (H * atan2( tan(B / H), sin(GSLat / H) ) );
-    Azimuth += .5;
+    // Equation lifted from VDR rotor plugin by
+    // Thomas Bergwinkl <Thomas.Bergwinkl@t-online.de>
 
-    if (Azimuth < 180) 
-    {
-        // Bird is east of ground station
-   	USALS=180.0-Azimuth;
-        CMD1=0xE0;
-    } 
+    double P = gContext->GetSetting("Latitude", "").toFloat() * TO_RADS;           // Earth Station Latitude
+    double Ue = gContext->GetSetting("Longitude", "").toFloat() * TO_RADS;           // Earth Station Longitude
+    double Us = tuning.diseqc_pos * TO_RADS;          // Satellite Longitude
+
+    double az = M_PI + atan( tan (Us-Ue) / sin(P) );
+    double x = acos( cos(Us-Ue) * cos(P) );
+    double el = atan( (cos(x) - 0.1513 ) /sin(x) );
+    double Azimuth = atan((-cos(el)*sin(az))/(sin(el)*cos(P)-cos(el)*sin(P)*cos(az)))* TO_DEC;
+
+//    printf("Offset = %f\n",Azimuth);
+
+    if (Azimuth > 0.0)
+        CMD1=0xE0;    // East
     else 
-    {
-        // Bird is west of ground station
-        USALS=Azimuth-180.0;
-        CMD1=0xD0;
-    }
-   
+        CMD1=0xD0;      // West
+
+    USALS = fabs(Azimuth);
+ 
     while (USALS > 16) 
     {
         CMD1++;
@@ -642,10 +651,11 @@ bool DVBDiSEqC::PositionerGotoAngular(dvb_tuning_t& tuning, bool reset,
     // and added to tuning
     // sat_pos be passed into tuning, and be a float not an int./
 
-    GENERAL(QString("DiSEqC 1.3 Motor - Goto Angular Position %1").arg(SatLon));
+    GENERAL(QString("DiSEqC 1.3 Motor - Goto Angular Position %1").arg(tuning.diseqc_pos));
 
     if ((prev_tuning.diseqc_port != tuning.diseqc_port ||
           prev_tuning.tone != tuning.tone ||
+          prev_tuning.diseqc_pos != tuning.diseqc_pos ||
           prev_tuning.voltage != tuning.voltage) || reset)
     {
 
@@ -660,6 +670,7 @@ bool DVBDiSEqC::PositionerGotoAngular(dvb_tuning_t& tuning, bool reset,
         }
 
         prev_tuning.diseqc_port = tuning.diseqc_port;
+        prev_tuning.diseqc_pos = tuning.diseqc_pos;
         prev_tuning.tone = tuning.tone;
         prev_tuning.voltage = tuning.voltage;
         havetuned = true;

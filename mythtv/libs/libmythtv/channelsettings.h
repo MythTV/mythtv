@@ -93,113 +93,27 @@ protected:
     const ChannelID& id;
 };
 
-class DvbSetting: public SimpleDBStorage {
-protected:
-    DvbSetting(const ChannelID& id, QString name):
-      SimpleDBStorage("dvb_channel", name), id(id) {
-        setName(name);
-    };
-
-    virtual QString setClause(void);
-    virtual QString whereClause(void);
-
-    const ChannelID& id;
-};
-
-class DvbPidSetting: public LineEditSetting, public DBStorage {
-public:
-    DvbPidSetting(const ChannelID& id, QString name):
-      LineEditSetting(), DBStorage("dvb_pids", name), id(id) {
-        setHelpText(QObject::tr("A comma separated list of pids for each type. "
-                    "Note that currently MythTV only supports recording and "
-                    "not playback of multiple audio or video pids. It does not "                    "support showing teletext or subtitles either, but these "
-                    "do not crash the player as audio and video might."));
-    };
-
-    void load(QSqlDatabase* db);
-    void save(QSqlDatabase* db);
-private:
-    const ChannelID& id;
-};
+class OnAirGuide;
+class XmltvID;
 
 class ChannelOptionsCommon: public VerticalConfigurationGroup {
+    Q_OBJECT
 public:
     ChannelOptionsCommon(const ChannelID& id);
+    void load(QSqlDatabase* _db);
+public slots:
+    void onAirGuideChanged(bool);
+    void sourceChanged(const QString&);
+
+protected:
+    OnAirGuide *onairguide;
+    XmltvID    *xmltvID;
+    QSqlDatabase *db;
 };
 
 class ChannelOptionsV4L: public VerticalConfigurationGroup {
 public:
     ChannelOptionsV4L(const ChannelID& id);
-};
-
-class DvbFrequency;
-class DvbSymbolrate;
-class DvbSatellite;
-class DvbPolarity;
-class DvbFec;
-class DvbModulation;
-class DvbInversion;
-class DvbBandwidth;
-class DvbConstellation;
-class DvbCoderateLP;
-class DvbCoderateHP;
-class DvbTransmissionMode;
-class DvbGuardInterval;
-class DvbHierarchy;
-
-class ChannelOptionsDVB: public HorizontalConfigurationGroup {
-    Q_OBJECT
-public:
-    ChannelOptionsDVB(const ChannelID& id);
-
-    QString getFrequency();
-    QString getSymbolrate();
-    QString getPolarity();
-    QString getFec();
-    QString getModulation();
-    QString getInversion();
-    
-    QString getBandwidth();
-    QString getConstellation();
-    QString getCodeRateLP();
-    QString getCodeRateHP();
-    QString getTransmissionMode();
-    QString getGuardInterval();
-    QString getHierarchy();
-
-protected:
-    const ChannelID& id;
-
-private:
-    QSqlDatabase* db;
-
-    DvbFrequency* frequency;
-    DvbSymbolrate* symbolrate;
-    DvbSatellite* satellite;
-    DvbPolarity* polarity;
-    DvbFec* fec;
-    DvbModulation* modulation;
-    DvbInversion* inversion;
-
-    DvbBandwidth* bandwidth;
-    DvbConstellation* constellation;
-    DvbCoderateLP* coderate_lp;
-    DvbCoderateHP* coderate_hp;
-    DvbTransmissionMode* trans_mode;
-    DvbGuardInterval* guard_interval;
-    DvbHierarchy* hierarchy;
-};
-
-class ChannelOptionsDVBPids: public HorizontalConfigurationGroup {
-public:
-    ChannelOptionsDVBPids(const ChannelID& id);
-};
-
-/**************************************/
-
-class DvbSatelliteConfiguration: public ConfigurationWizard {
-public:
-
 };
 
 #endif //CHANNELEDITOR_H

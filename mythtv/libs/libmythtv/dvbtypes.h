@@ -12,18 +12,27 @@
 using namespace std;
 
 #include <sys/poll.h>
+#include <sys/ioctl.h>
+#include <sys/param.h>
 #include <cerrno>
 #include <unistd.h>
+#include <qdatetime.h>
+#include <qstringlist.h>
 
 #include <linux/dvb/version.h>
 #if (DVB_API_VERSION != 3)
 #error "DVB driver includes with API version 3 not found!"
 #endif
 
+#ifndef DVB_API_VERSION_MINOR
+#define DVB_API_VERSION_MINOR 0
+#endif
+
 #include <linux/dvb/frontend.h>
 #include <linux/dvb/dmx.h>
 
 #include "transform.h"
+#include "sitypes.h"
 
 #define MPEG_TS_PKT_SIZE 188
 #define DEF_DMX_BUF_SIZE  64 * 1024
@@ -31,6 +40,8 @@ using namespace std;
 #define DMX_DONT_FILTER 0x2000
 
 typedef vector<uint16_t> dvb_pid_t;
+// needs to add provider id so dvbcam doesnt require parsing
+// of the pmt and or the pmtcache
 typedef vector<uint16_t> dvb_caid_t;
 
 typedef struct dvbtuning
@@ -40,43 +51,35 @@ typedef struct dvbtuning
     fe_sec_tone_mode_t  tone;
     unsigned int diseqc_type;
     unsigned int diseqc_port;
+    float        diseqc_pos;
     unsigned int lnb_lof_switch;
     unsigned int lnb_lof_hi;
     unsigned int lnb_lof_lo;
 } dvb_tuning_t;
 
-typedef struct dvbpids
-{
-    dvb_pid_t video;
-    dvb_pid_t audio;
-    dvb_pid_t teletext;
-    dvb_pid_t subtitle;
-    dvb_pid_t pcr;
-    dvb_pid_t other;
-} dvb_pids_t;
-
 typedef struct dvbchannel
 {
     dvb_tuning_t    tuning;
 
-    dvb_pids_t      pids;
-    dvb_caid_t      caids;
+    PMTObject       pmt;
+    bool            PMTSet;
 
-    uint16_t       serviceID;
-    uint16_t       networkID;
-    uint16_t       providerID;
-    uint16_t       transportID;
+    uint16_t        serviceID;
+    uint16_t        networkID;
+    uint16_t        providerID;
+    uint16_t        transportID;
 
-    uint8_t        version;
+    QString         sistandard;
+    uint8_t         version;
     pthread_mutex_t lock;
 } dvb_channel_t;
 
 typedef struct dvbstats
 {
-    unsigned int snr;
-    unsigned int ss;
-    unsigned int ber;
-    unsigned int ub;
+    uint16_t snr;
+    uint16_t ss;
+    uint32_t ber;
+    uint32_t ub;
 
     fe_status_t  status;
 } dvb_stats_t;

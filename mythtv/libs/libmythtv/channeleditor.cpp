@@ -1,7 +1,7 @@
-
 #include <qsqldatabase.h>
 #include "settings.h"
 #include "mythcontext.h"
+#include "mythwidgets.h"
 #include "channeleditor.h"
 
 #include <qapplication.h>
@@ -15,6 +15,11 @@
 
 #include "videosource.h"
 #include "channelsettings.h"
+#include "dvbtransporteditor.h"
+
+#ifdef USING_DVB
+#include "scanwizard.h"
+#endif
 
 ChannelWizard::ChannelWizard(int id, QSqlDatabase* _db)
              : ConfigurationWizard(), db(_db) {
@@ -36,15 +41,6 @@ ChannelWizard::ChannelWizard(int id, QSqlDatabase* _db)
     if (!hasDVB || cardtypes > 1 || id == 0) {
         ChannelOptionsV4L* v4l = new ChannelOptionsV4L(*cid);
         addChild(v4l);
-    }
-
-    // add dvb options if dvb is present
-    if (hasDVB || id == 0)
-    {
-        ChannelOptionsDVB* dvb = new ChannelOptionsDVB(*cid);
-        ChannelOptionsDVBPids* pids = new ChannelOptionsDVBPids(*cid);
-        addChild(dvb);
-        addChild(pids);
     }
 }
 
@@ -209,6 +205,21 @@ ChannelEditor::ChannelEditor():
     addChild(sort);
     addChild(source);
     addChild(hide);
+
+#ifdef USING_DVB
+    buttonScan = new TransButtonSetting();
+    buttonScan->setLabel(QObject::tr("Scan for channels(s)"));
+    buttonScan->setHelpText(QObject::tr("This button will scan for digital channels."));
+    buttonAdvanced = new TransButtonSetting();
+    buttonAdvanced->setLabel(QObject::tr("Advanced"));
+    buttonAdvanced->setHelpText(QObject::tr("Advanced editing options for digital channels"));
+
+    HorizontalConfigurationGroup *h = new HorizontalConfigurationGroup(false, false);
+    h->addChild(buttonScan);
+    h->addChild(buttonAdvanced);
+    addChild(h);
+#endif
+
     connect(source, SIGNAL(valueChanged(const QString&)),
             list, SLOT(setSourceID(const QString&)));
     connect(sort, SIGNAL(valueChanged(const QString&)),
@@ -217,10 +228,24 @@ ChannelEditor::ChannelEditor():
             list, SLOT(setHideMode(bool)));
     connect(list, SIGNAL(accepted(int)), this, SLOT(edit(int)));
     connect(list, SIGNAL(menuButtonPressed(int)), this, SLOT(menu(int)));
+#ifdef USING_DVB
+    connect(buttonScan, SIGNAL(pressed()), this, SLOT(scan()));
+    connect(buttonAdvanced, SIGNAL(pressed()), this, SLOT(advanced()));
+#endif
 }
 
 int ChannelEditor::exec(QSqlDatabase* _db) {
     db = _db;
+
+    //Make sure we have dvb card installed
+#ifdef USING_DVB
+    if (!CardUtil::isCardPresent(db, CardUtil::DVB))
+    {
+        buttonScan->setEnabled(false);
+        buttonAdvanced->setEnabled(false);
+    }
+#endif
+
     while (ConfigurationDialog::exec(db) == QDialog::Accepted)  {}
     return QDialog::Rejected;
 }
@@ -254,10 +279,6 @@ void ChannelEditor::del() {
         if (!query.isActive())
             MythContext::DBError("ChannelEditor Delete Channel", query);
 
-        query = db->exec(QString("DELETE FROM dvb_channel "
-                                 "WHERE chanid ='%1'").arg(id));
-        if (!query.isActive())
-            MythContext::DBError("ChannelEditor Delete DVBChannel", query);
         list->fillSelections();
     }
 }
@@ -280,5 +301,24 @@ void ChannelEditor::menu(int /*iSelected*/) {
         else
             list->setFocus();
     }
+}
+
+void ChannelEditor::scan()
+{
+#ifdef USING_DVB
+    ScanWizard scanwizard(db);
+    scanwizard.exec(db,false,true);
+
+    list->fillSelections();
+    list->setFocus();
+#endif
+}
+
+void ChannelEditor::advanced()
+{
+#ifdef USING_DVB
+    DVBTransportsEditor advancedDialog;
+    advancedDialog.exec(db);
+#endif
 }
 

@@ -8,7 +8,7 @@ using namespace std;
 
 #include "mythcontext.h"
 
-const QString currentDatabaseVersion = "1062";
+const QString currentDatabaseVersion = "1063";
 
 void UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -1091,6 +1091,104 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 ""
 };
         performActualUpdate(updates, "1062", dbver);
+    }
+
+    if (dbver == "1062")
+    {
+        const QString updates[] = {
+"ALTER TABLE cardinput ADD COLUMN freetoaironly TINYINT(1) DEFAULT 1;",
+"ALTER TABLE channel ADD COLUMN useonairguide TINYINT(1) DEFAULT 0;",
+"ALTER TABLE capturecard ADD COLUMN dvb_diseqc_type SMALLINT(6);",
+"ALTER TABLE cardinput ADD COLUMN diseqc_port SMALLINT(6);",
+"ALTER TABLE cardinput ADD COLUMN diseqc_pos FLOAT;",
+"ALTER TABLE cardinput ADD COLUMN lnb_lof_switch INT(11) DEFAULT 11700000;",
+"ALTER TABLE cardinput ADD COLUMN lnb_lof_hi INT(11) DEFAULT 10600000;",
+"ALTER TABLE cardinput ADD COLUMN lnb_lof_lo INT(11) DEFAULT 9750000;",
+"ALTER TABLE channel ADD COLUMN mplexid SMALLINT(6);",
+"ALTER TABLE channel ADD COLUMN serviceid SMALLINT(6);",
+"ALTER TABLE channel ADD COLUMN atscsrcid INT(11) DEFAULT NULL;",
+"CREATE TABLE dtv_multiplex ("
+"  mplexid smallint(6) NOT NULL auto_increment, "
+"  sourceid smallint(6) default NULL,"
+"  transportid int(11) default NULL,"
+"  networkid int(11) default NULL,"
+"  frequency int(11) default NULL,"
+"  inversion char(1) default 'a',"
+"  symbolrate int(11) default NULL,"
+"  fec varchar(10) default 'auto',"
+"  polarity char(1) default NULL,"
+"  modulation varchar(10) default 'auto',"
+"  bandwidth char(1) default 'a',"
+"  lp_code_rate varchar(10) default 'auto',"
+"  transmission_mode char(1) default 'a',"
+"  guard_interval varchar(10) default 'auto',"
+"  visible smallint(1) NOT NULL default '0',"
+"  constellation varchar(10) default 'auto',"
+"  hierarchy varchar(10) default 'auto',"
+"  hp_code_rate varchar(10) default 'auto',"
+"  sistandard varchar(10) default 'dvb',"
+"  serviceversion smallint(6) default 33,"
+"  updatetimestamp timestamp(14) NOT NULL,"
+"  PRIMARY KEY  (mplexid)"
+") TYPE=MyISAM;",
+"DROP TABLE IF EXISTS dvb_channel;",
+"DROP TABLE IF EXISTS dvb_pids;",
+"DROP TABLE IF EXISTS dvb_sat;",
+"CREATE TABLE dtv_privatetypes ("
+"  sitype varchar(4) NOT NULL, "
+"  networkid int(11) NOT NULL, "
+"  private_type varchar(20) NOT NULL, "
+"  private_value varchar(100) NOT NULL "
+");",
+//# UK DVB-T
+"INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',9018,'channel_numbers','131');",
+"INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',9018,'guide_fixup','2');",
+//# Bell ExpressVu Canada
+"INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',256,'guide_fixup','1');",
+"INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',257,'guide_fixup','1');",
+"INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',256,'tv_types','1,150,134,133');",
+"INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',257,'tv_types','1,150,134,133');",
+
+"INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',4100,'sdt_mapping','1');",
+"INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',4101,'sdt_mapping','1');",
+"INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',4102,'sdt_mapping','1');",
+"INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',4103,'sdt_mapping','1');",
+"INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',4104,'sdt_mapping','1');",
+"INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',4105,'sdt_mapping','1');",
+"INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',4106,'sdt_mapping','1');",
+"INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',4107,'sdt_mapping','1');",
+"INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',4097,'sdt_mapping','1');",
+"INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',4098,'sdt_mapping','1');",
+
+"INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',4100,'tv_types','1,145,154');",
+"INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',4101,'tv_types','1,145,154');",
+"INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',4102,'tv_types','1,145,154');",
+"INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',4103,'tv_types','1,145,154');",
+"INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',4104,'tv_types','1,145,154');",
+"INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',4105,'tv_types','1,145,154');",
+"INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',4106,'tv_types','1,145,154');",
+"INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',4107,'tv_types','1,145,154');",
+"INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',4097,'tv_types','1,145,154');",
+"INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',4098,'tv_types','1,145,154');",
+
+"INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',4100,'guide_fixup','1');",
+"INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',4101,'guide_fixup','1');",
+"INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',4102,'guide_fixup','1');",
+"INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',4103,'guide_fixup','1');",
+"INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',4104,'guide_fixup','1');",
+"INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',4105,'guide_fixup','1');",
+"INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',4106,'guide_fixup','1');",
+"INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',4107,'guide_fixup','1');",
+"INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',4097,'guide_fixup','1');",
+"INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',4098,'guide_fixup','1');",
+
+//# NSAB / Sirius
+"INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',94,'tv_types','1,128');",
+//# WUNC Guide
+"INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('atsc',1793,'guide_fixup','3');",
+""
+};
+        performActualUpdate(updates, "1063", dbver);
     }
 }
 

@@ -14,6 +14,26 @@
 #include "dvbchannel.h"
 #endif
 
+class CardUtil
+{
+  public:
+    enum DVB_TYPES {ERROR_OPEN, ERROR_PROBE, QPSK, QAM, OFDM, ATSC};
+    enum DISEQC_TYPES { SINGLE=0, MINI_2, SWITCH_2_1_0, SWITCH_2_1_1,
+                        SWITCH_4_1_0, SWITCH_4_1_1, POSITIONER_1_2,
+                        POSITIONER_X, POSITIONER_1_2_SWITCH_2,
+                        POSITIONER_X_SWITCH_2 };
+    static const QString DVB;
+
+    static bool isCardPresent(QSqlDatabase *db, const QString &strType);
+    static DVB_TYPES cardDVBType(unsigned nVideoDev);
+    static DVB_TYPES cardDVBType(unsigned nVideoDev, QString &name);
+    static int CardUtil::videoDeviceFromCardID(QSqlDatabase* db,
+                                               unsigned nCardID);
+    static bool CardUtil::isDVB(QSqlDatabase *db, unsigned nCardID);
+    static DISEQC_TYPES CardUtil::diseqcType(QSqlDatabase *db,
+                                             unsigned nCardID);
+};
+
 class VideoSource;
 class VSSetting: public SimpleDBStorage {
 protected:
@@ -183,6 +203,9 @@ private:
 private:
     ID* id;
     Name* name;
+
+protected:
+    QSqlDatabase* db;
 };
 
 class CaptureCard;
@@ -201,25 +224,6 @@ protected:
     virtual QString whereClause(void);
 private:
     const CaptureCard& parent;
-};
-
-class DvbSatSetting: virtual public Setting, public SimpleDBStorage {
-protected:
-    DvbSatSetting(const CaptureCard& _parent, int _satnum, QString name):
-        SimpleDBStorage("dvb_sat", name),
-        parent(_parent), satnum(_satnum) {
-        setName(name);
-    };
-
-    int getCardID(void) const;
-    int getSatNum(void) const;
-
-protected:
-    virtual QString setClause(void);
-    virtual QString whereClause(void);
-private:
-    const CaptureCard& parent;
-    int satnum;
 };
 
 class TunerCardInput: public ComboBoxSetting, public CCSetting {
@@ -263,149 +267,37 @@ public:
     };
 };
 
-class DVBDefaultInput: public LineEditSetting, public CCSetting {
-    Q_OBJECT
-public:
-    DVBDefaultInput(const CaptureCard& parent):
-        CCSetting(parent,"defaultinput") {
-        setVisible(false);
-    };
-    void save(QSqlDatabase* db) {
-        changed = true;
-        settingValue = "DVBInput";
-        SimpleDBStorage::save(db);
-    };
-};
+class DVBDiseqcInputList
+{
+  public:
+    DVBDiseqcInputList() { clearValues(); }
+    DVBDiseqcInputList(const QString& in, const QString& prt, 
+                       const QString& pos) : input(in), port(prt), position(pos)
+    {}
 
-class DVBChannels: public ComboBoxSetting {
-    Q_OBJECT
-public:
-    DVBChannels() : db(NULL)
+    void clearValues() 
     {
-        setLabel(QObject::tr("Channels"));
-        setHelpText(QObject::tr("This box contains all channels from the "
-                    "selected video source. Select a channel here and press "
-                    "the 'Load and Tune' button to load the channel settings "
-                    "into the previous screen and try to tune it."));
+        input = "";
+        port = "";
+        position = "";
     }
 
-    void save(QSqlDatabase* db) { (void)db; };
-    void load(QSqlDatabase* _db) {
-        db = _db;
-        fillSelections("All");
-    };
-public slots:
-    void fillSelections(const QString& videoSource);
-
-private:
-    QSqlDatabase* db;
+    QString input;
+    QString port;
+    QString position;
 };
 
-class DVBInfoLabel: public LabelSetting, public TransientStorage {
+class DVBDefaultInput: public ComboBoxSetting, public CCSetting {
     Q_OBJECT
 public:
-    DVBInfoLabel(QString label):
-      LabelSetting(), TransientStorage() {
-        setLabel(label);
-    };
-public slots:
-    void set(int val) {
-        setValue(QString("%1").arg(val));
-    };
-};
 
-class DVBStatusLabel: public LabelSetting, public TransientStorage {
-    Q_OBJECT
-public:
-    DVBStatusLabel() {
-        setLabel(QObject::tr("Status"));
-    };
-public slots:
-    void set(QString str) {
-        setValue(str);
-    };
-};
-
-class DVBSatelliteList: public ListBoxSetting, public TransientStorage {
-    Q_OBJECT
-public:
-    DVBSatelliteList(CaptureCard& _parent);
-
-    void load(QSqlDatabase* _db);
-
-public slots:
-    void fillSelections(const QString& v);
-protected:
-    QSqlDatabase* db;
-    CaptureCard& parent;
-    int satellites;
-};
-
-class DVBSatelliteWizard: public ConfigurationWizard {
-    Q_OBJECT
-public:
-    DVBSatelliteWizard(CaptureCard& _parent);
-
-    int exec(QSqlDatabase* _db) {
-        db = _db;
-        return ConfigurationWizard::exec(db);
+    DVBDefaultInput(const CaptureCard& parent):
+        CCSetting(parent,"defaultinput") {
+        setLabel(QObject::tr("Default input"));
     };
 
 public slots:
-    void editSat(int satnum);
-
-protected:
-    QSqlDatabase* db;
-    CaptureCard& parent;
-    DVBSatelliteList* list;
-};
-
-class DVBSignalChannelOptions;
-
-class DVBCardVerificationWizard: public ConfigurationWizard {
-    Q_OBJECT
-public:
-    DVBCardVerificationWizard(int cardNum);
-    ~DVBCardVerificationWizard(); 
-
-    void load(QSqlDatabase* _db) {
-        db = _db;
-        ConfigurationWizard::load(db);
-    };
-
-private slots:
-    void tuneConfigscreen();
-    void tunePredefined();
-
-private:
-    QSqlDatabase* db;
-    ChannelID cid;
-#ifdef USING_DVB
-    DVBChannel* chan;
-    DVBSignalChannelOptions* dvbopts;
-    DVBChannels* channels;
-#endif
-};
-
-class DVBAdvancedConfigMenu: public ConfigurationPopupDialog,
-                             public VerticalConfigurationGroup {
-    Q_OBJECT
-public:
-    DVBAdvancedConfigMenu(CaptureCard& a_parent);
-
-    void exec(QSqlDatabase* _db) {
-        db = _db;
-        ConfigurationPopupDialog::exec(db);
-    };
-
-public slots:
-    void execCVW();
-    void execACW();
-    void execSAT();
-
-private:
-    CaptureCard& parent;
-    QSqlDatabase* db;
+    void fillSelections(const QString& type);
 };
 
 class CardType: public ComboBoxSetting, public CCSetting {
@@ -416,6 +308,7 @@ public:
 
 class DVBCardName;
 class DVBCardType;
+class DVBDiseqcType;
 
 class DVBConfigurationGroup: public VerticalConfigurationGroup {
     Q_OBJECT
@@ -433,9 +326,11 @@ public slots:
 private:
     CaptureCard& parent;
 
+    DVBDefaultInput* defaultinput;
     QSqlDatabase *db;
     DVBCardName* cardname;
     DVBCardType* cardtype;
+    DVBDiseqcType* diseqctype;
     TransButtonSetting *advcfg;
 };
 
@@ -471,6 +366,8 @@ public:
 
 public slots:
     void execDVBConfigMenu();
+    void execDiseqcWiz();
+    void execAdvConfigWiz();
     void setDvbCard(const QString& card) { dvbCard = card; };
 
 private:
@@ -548,6 +445,9 @@ public:
 
     virtual MythDialog* dialogWidget(MythMainWindow* parent,
                                      const char* widgetName=0);
+
+    bool cardTypesInclude(QSqlDatabase* db, const int& SourceID, 
+                          const QString& thecardtype);
 
     virtual int exec(QSqlDatabase* db);
     virtual void load(QSqlDatabase* db);

@@ -27,6 +27,123 @@
 #include "videodev_myth.h"
 #endif
 
+const QString CardUtil::DVB = "DVB";
+
+bool CardUtil::isCardPresent(QSqlDatabase *db, const QString &strType)
+{
+    QSqlQuery query = db->exec(QString("SELECT count(cardtype)"
+                                       " FROM capturecard, cardinput"
+                                       " WHERE cardinput.cardid = capturecard.cardid"
+                                       " AND capturecard.cardtype=\"%1\""
+                                       " AND capturecard.hostname = \"%2\"")
+                                       .arg(strType).arg(gContext->GetHostName()));
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        query.next();
+        int count = query.value(0).toInt();
+
+        if (count > 0)
+            return true;
+    }
+
+    return false;
+}
+
+enum CardUtil::DVB_TYPES CardUtil::cardDVBType(unsigned nVideoDev,
+                                               QString &name)
+{
+    DVB_TYPES nRet = ERROR_OPEN;
+#ifdef USING_DVB
+    int fd_frontend = open(dvbdevice(DVB_DEV_FRONTEND, nVideoDev),
+                           O_RDWR | O_NONBLOCK);
+    if (fd_frontend >= 0)
+    {
+        struct dvb_frontend_info info;
+        nRet = ERROR_PROBE;
+        if (ioctl(fd_frontend, FE_GET_INFO, &info) >= 0)
+        {
+            name = info.name;
+            switch(info.type)
+            {
+            case FE_QAM:
+                nRet = QAM;
+                break;
+            case FE_QPSK:
+                nRet = QPSK;
+                break;
+            case FE_OFDM:
+                nRet = OFDM;
+                break;
+#if (DVB_API_VERSION_MINOR == 1)
+            case FE_ATSC:
+                nRet = ATSC;
+                break;
+#endif
+            }
+        }
+        close(fd_frontend);
+    }
+#else
+    (void)nVideoDev;
+    (void)name;
+#endif
+    return nRet;
+}
+
+enum CardUtil::DVB_TYPES CardUtil::cardDVBType(unsigned nVideoDev)
+{
+    QString name;
+    return CardUtil::cardDVBType(nVideoDev,name);
+}
+
+int CardUtil::videoDeviceFromCardID(QSqlDatabase *db, unsigned nCardID)
+{
+    int iRet = -1;
+    QSqlQuery query = db->exec(QString("SELECT videodevice FROM capturecard "
+                                       " WHERE capturecard.cardid=%1 ")
+                                       .arg(nCardID));
+
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        query.next();
+        iRet = query.value(0).toInt();
+    }
+    return iRet;
+}
+
+bool CardUtil::isDVB(QSqlDatabase *db, unsigned nCardID)
+{
+    bool fRet = false;
+    QSqlQuery query = db->exec(QString("SELECT cardtype FROM capturecard "
+                                       " WHERE capturecard.cardid=%1")
+                                       .arg(nCardID));
+
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        query.next();
+        if (query.value(0).toString() == "DVB")
+           fRet = true;
+    }
+    return fRet;
+}
+
+enum CardUtil::DISEQC_TYPES CardUtil::diseqcType(QSqlDatabase *db,
+                                                 unsigned nCardID)
+{
+    int iRet = 0;
+    QSqlQuery query = db->exec(QString("SELECT dvb_diseqc_type "
+                                       "FROM capturecard "
+                                       " WHERE capturecard.cardid=%1 ")
+                                       .arg(nCardID));
+
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        query.next();
+        iRet = query.value(0).toInt();
+    }
+    return (DISEQC_TYPES)iRet;
+}
+
 QString VSSetting::whereClause(void) {
     return QString("sourceid = %1").arg(parent.getSourceID());
 }
@@ -45,19 +162,6 @@ QString CCSetting::whereClause(void) {
 QString CCSetting::setClause(void) {
     return QString("cardid = %1, %2 = '%3'")
         .arg(parent.getCardID())
-        .arg(getColumn())
-        .arg(getValue());
-}
-
-QString DvbSatSetting::whereClause(void) {
-    return QString("cardid = %1 AND diseqc_port = %2")
-        .arg(parent.getCardID()).arg(satnum);
-}
-
-QString DvbSatSetting::setClause(void) {
-    return QString("cardid = %1, diseqc_port = %2, %3 = '%4'")
-        .arg(parent.getCardID())
-        .arg(satnum)
         .arg(getColumn())
         .arg(getValue());
 }
@@ -414,9 +518,6 @@ XMLTVConfig::XMLTVConfig(const VideoSource& parent)
     addTarget("tv_grab_no", new XMLTV_generic_config(parent, "tv_grab_no"));
     grabber->addSelection("Norway","tv_grab_no");
 
-    addTarget("tv_grab_uk", new XMLTV_generic_config(parent, "tv_grab_uk"));
-    grabber->addSelection("United Kingdom","tv_grab_uk");
-
     addTarget("tv_grab_uk_rt", new XMLTV_generic_config(parent, "tv_grab_uk_rt"));
     grabber->addSelection("United Kingdom (alternative)","tv_grab_uk_rt");
 
@@ -458,6 +559,32 @@ VideoSource::VideoSource()
     addChild(group);
 }
 
+bool VideoSourceEditor::cardTypesInclude(QSqlDatabase *db, 
+                                         const int &sourceID, 
+                                         const QString &thecardtype) 
+{
+    QString querystr = QString("SELECT count(cardtype)"
+                               " FROM cardinput,capturecard "
+                               " WHERE capturecard.cardid = cardinput.cardid "
+                               " AND cardinput.sourceid=%1 "
+                               " AND capturecard.cardtype=\"%2\"")
+                               .arg(sourceID)
+                               .arg(thecardtype);
+
+    QSqlQuery query = db->exec(querystr);
+
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        query.next();
+        int count = query.value(0).toInt();
+
+        if (count > 0)
+            return true;
+    }
+
+    return false;
+}
+
 void VideoSource::fillSelections(QSqlDatabase* db,
                                  SelectSetting* setting) {
     QString query = QString("SELECT name, sourceid FROM videosource;");
@@ -489,6 +616,8 @@ public:
     };
 
     static QStringList probeInputs(QString device);
+    static QStringList fillDVBInputs(int dvb_diseqc_type);
+    static QValueList<DVBDiseqcInputList> fillDVBInputsDiseqc(int dvb_diseqc_type);
 };
 
 class VbiDevice: public PathSetting, public CCSetting {
@@ -582,9 +711,10 @@ class DVBRecordTS: public CheckBoxSetting, public CCSetting {
 public:
     DVBRecordTS(const CaptureCard& parent):
         CCSetting(parent, "dvb_recordts") {
-        setLabel(QObject::tr("Record the TS, not PS."));
-        setHelpText(QObject::tr("This will make the backend not perform "
-                    "Transport Stream to Program Stream conversion."));
+        setLabel(QObject::tr("Record in TS format instead of PS."));
+        setHelpText(QObject::tr("Disables Transport Stream to Program Stream "
+                    "conversion. TS recording results in slightly bigger files,"
+                    " but reduces the risk for processing errors."));
     };
 };
 
@@ -612,6 +742,26 @@ public:
     };
 };
 
+class DVBDiseqcType: public ComboBoxSetting, public CCSetting {
+public:
+    DVBDiseqcType(const CaptureCard& parent):
+        CCSetting(parent, "dvb_diseqc_type") {
+        setLabel(QObject::tr("DiSEqC Input Type: (DVB-S)"));
+        addSelection("Single LNB / Input","0");
+        addSelection("Tone Switch aka Mini DiSEqC (2-Way)","1");
+        addSelection("DiSEqC v1.0 Switch (2-Way)","2");
+        addSelection("DiSEqC v1.1 Switch (2-Way)","3");
+        addSelection("DiSEqC v1.0 Switch (4-Way)","4");
+        addSelection("DiSEqC v1.1 Switch (4-Way)","5");
+        addSelection("DiSEqC v1.2 Positioner","6");
+        addSelection("DiSEqC v1.3 Positioner (Goto X)","7");
+        setHelpText(QObject::tr("Select the input type for DVB-S cards. "
+                    "Leave as Single LNB/Input for DVB-C or DVB-T. "
+                    "The inputs are mapped from Input Connections option "
+                    "on the main menu"));
+    };
+};
+
 class DVBPidBufferSize: public SpinBoxSetting, public CCSetting {
 public:
     DVBPidBufferSize(const CaptureCard& parent):
@@ -631,81 +781,6 @@ public:
         setValue(188*100);
     };
 };
-
-class DVBSignalChannelOptions: public ChannelOptionsDVB {
-public:
-    DVBSignalChannelOptions(ChannelID& id): ChannelOptionsDVB(id) {};
-    void load(QSqlDatabase* db) {
-        if (id.intValue() != 0)
-            ChannelOptionsDVB::load(db);
-    };
-    void save(QSqlDatabase* db) { (void)db; };
-};
-
-class DVBSatelliteConfigType: public ComboBoxSetting, public CCSetting {
-public:
-    DVBSatelliteConfigType(CaptureCard& parent):
-        CCSetting(parent, "dvb_sat_type") {
-        setLabel(QObject::tr("Type"));
-        addSelection("Single LNB","0");
-        addSelection("Tone Switch aka Mini DiSEqC (2-Way)","1");
-        addSelection("DiSEq v1.0 Switch (2-Way)","2");
-        addSelection("DiSEq v1.1 Switch (2-Way)","3");
-        addSelection("DiSEq v1.0 Switch (4-Way)","4");
-        addSelection("DiSEq v1.1 Switch (4-Way)","5");
-//        addSelection("DiSEqC Positioner","6");
-        setHelpText(QObject::tr("Select the type of satellite equipment you "
-                    "have. Selecting 'Finish' on this screen will only save "
-                    "the type, and not the individual satellite, move down to "
-                    "the list to do this."));
-    };
-};
-
-DVBSatelliteList::DVBSatelliteList(CaptureCard& _parent)
-                : parent(_parent)
-{
-    setLabel(QObject::tr("Satellites"));
-    db = NULL;
-    satellites = 1;
-    setHelpText(QObject::tr("Select the satellite you want to configure "
-                "and press the 'menu' key, and edit the satellite, when "
-                "you are done configuring, press 'OK' to leave this "
-                "wizard."));
-}
-
-void DVBSatelliteList::load(QSqlDatabase* _db)
-{
-    db = _db;
-    clearSelections();
-    QSqlQuery query = db->exec(
-        QString("SELECT name FROM dvb_sat WHERE cardid=%1")
-        .arg(parent.getCardID()));
-    if (!query.isActive())
-        MythContext::DBError("DvbSatelliteList", query);
-    for (int i=0; i<satellites; i++)
-    {
-        QString str = QString("%1. ").arg(i);
-        if (i<query.numRowsAffected())
-        {
-            query.next();
-            str += query.value(0).toString();
-        }
-        else
-            str += "Unconfigured";
-        addSelection(str);
-    }
-}
-
-void DVBSatelliteList::fillSelections(const QString &v)
-{
-    satellites = 1;
-    if (v.toInt() > 0)
-        satellites = 2;
-    if (v.toInt() > 3)
-        satellites = 4;
-    if (db)
-        load(db);
-}
 
 class V4LConfigurationGroup: public VerticalConfigurationGroup {
 public:
@@ -854,6 +929,83 @@ public:
     };
 };
 
+class LNBLofSwitch: public LineEditSetting, public CISetting {
+public:
+    LNBLofSwitch(const CardInput& parent):
+        CISetting(parent, "lnb_lof_switch") {
+        setLabel(QObject::tr("LNB LOF Switch"));
+        setValue("11700000");
+        setHelpText(QObject::tr("This defines at what frequency (in Hz) "
+                    "the LNB will do a switch from high to low setting, "
+                    "and vice versa."));
+    };
+};
+
+class LNBLofHi: public LineEditSetting, public CISetting {
+public:
+    LNBLofHi(const CardInput& parent):
+        CISetting(parent, "lnb_lof_hi") {
+        setLabel(QObject::tr("LNB LOF High"));
+        setValue("10600000");
+        setHelpText(QObject::tr("This defines the offset (in Hz) the "
+                    "frequency coming from the lnb will be in high "
+                    "setting."));
+    };
+};
+
+class LNBLofLo: public LineEditSetting, public CISetting {
+public:
+    LNBLofLo(const CardInput& parent):
+        CISetting(parent, "lnb_lof_lo") {
+        setLabel(QObject::tr("LNB LOF Low"));
+        setValue("9750000");
+        setHelpText(QObject::tr("This defines the offset (in Hz) the "
+                    "frequency coming from the lnb will be in low "
+                    "setting."));
+    };
+};
+
+class DiseqcPos: public LineEditSetting, public CISetting {
+public:
+    DiseqcPos(const CardInput& parent):
+        CISetting(parent, "diseqc_pos") {
+        setLabel(QObject::tr("DiSEqC Satellite Location"));
+        setValue("0.0");
+        setHelpText(QObject::tr("The longitude of the satellite "
+                    "you are aiming at.  For western hemisphere use "
+                    "a negative value.  Value is in decimal."));
+//        setVisible(false);
+    };
+//    void fillSelections(const QString& pos) {
+//        setValue(pos);
+//    };
+};
+
+
+class DiseqcPort: public LabelSetting, public CISetting {
+public:
+    DiseqcPort(const CardInput& parent):
+        CISetting(parent, "diseqc_port") {
+        setVisible(false);
+    };
+    void fillSelections(const QString& port) {
+        setValue(port);
+    };
+};
+
+
+class FreeToAir: public CheckBoxSetting, public CISetting {
+public:
+    FreeToAir(const CardInput& parent):
+        CISetting(parent, "freetoaironly")
+    {
+        setValue(true);
+        setLabel(tr("Free to air channels only."));
+        setHelpText(QObject::tr("If set, only free to air channels will be "
+                    "used."));
+    };
+};
+
 class ExternalChannelCommand: public LineEditSetting, public CISetting {
 public:
     ExternalChannelCommand(const CardInput& parent):
@@ -905,9 +1057,28 @@ public:
     };
 };
 
+class DVBLNBChooser: public ComboBoxSetting {
+public:
+    DVBLNBChooser()
+    {
+        setLabel("LNB Settings: (DVB-S)");
+        addSelection("Universal - 2");
+        addSelection("DBS");
+        addSelection("Universal - 1");
+        addSelection("Custom");
+        setHelpText("Select the LNB Settings for DVB-S cards. "
+                    "For DVB-C and DVB-T you don't need to set these values. ");
+    };
+    void save(QSqlDatabase* db) { (void)db; };
+    void load(QSqlDatabase* db) { (void)db; };
+
+private:
+    QSqlDatabase* db;
+};
+
 class CardInput: public ConfigurationWizard {
 public:
-    CardInput() {
+    CardInput(int DVB = 0) {
         addChild(id = new ID());
 
         ConfigurationGroup *group = new VerticalConfigurationGroup(false);
@@ -915,10 +1086,24 @@ public:
         group->addChild(cardid = new CardID(*this));
         group->addChild(inputname = new InputName(*this));
         group->addChild(sourceid = new SourceID(*this));
-        group->addChild(new InputPreference(*this));
-        group->addChild(new ExternalChannelCommand(*this));
-        group->addChild(new PresetTuner(*this));
+        if (!DVB)
+        {
+            group->addChild(new InputPreference(*this));
+            group->addChild(new ExternalChannelCommand(*this));
+            group->addChild(new PresetTuner(*this));
+        }
         group->addChild(new StartingChannel(*this));
+#ifdef USING_DVB
+        if (DVB)
+        {
+           group->addChild(diseqcpos = new DiseqcPos(*this));
+           group->addChild(diseqcport = new DiseqcPort(*this));
+           group->addChild(lnblofswitch = new LNBLofSwitch(*this));
+           group->addChild(lnblofhi = new LNBLofHi(*this));
+           group->addChild(lnbloflo = new LNBLofLo(*this));
+           group->addChild(new FreeToAir(*this));
+        }
+#endif
         addChild(group);
     };
 
@@ -927,6 +1112,8 @@ public:
     void loadByID(QSqlDatabase* db, int id);
     void loadByInput(QSqlDatabase* db, int cardid, QString input);
     QString getSourceName(void) const { return sourceid->getSelectionLabel(); };
+
+    void fillDiseqcSettingsInput(QString _pos, QString _port);
 
     virtual void save(QSqlDatabase* db);
 
@@ -946,12 +1133,17 @@ private:
         };
     };
 
-private:
     ID* id;
     CardID* cardid;
     InputName* inputname;
     SourceID* sourceid;
     QSqlDatabase* db;
+    DVBLNBChooser *lnbsettings;
+    DiseqcPos* diseqcpos;
+    DiseqcPort* diseqcport;
+    LNBLofSwitch *lnblofswitch;
+    LNBLofLo *lnbloflo;
+    LNBLofHi *lnblofhi;
 };
 
 QString CISetting::whereClause(void) {
@@ -983,6 +1175,35 @@ void CardInput::loadByInput(QSqlDatabase* db, int _cardid, QString _inputname) {
         cardid->setValue(QString::number(_cardid));
         inputname->setValue(_inputname);
     }
+
+    if (CardUtil::isDVB(db,_cardid))
+    {
+        int iVideoDev = CardUtil::videoDeviceFromCardID(db,_cardid);
+        CardUtil::DVB_TYPES dvbType;
+        if ((iVideoDev >= 0) &&
+           ((dvbType = CardUtil::cardDVBType(iVideoDev))>CardUtil::ERROR_PROBE))
+        {
+            if (dvbType == CardUtil::QPSK)
+            {
+                //Check for diseqc type
+                diseqcpos->setVisible(true);
+                lnblofswitch->setVisible(true);
+                lnbloflo->setVisible(true);
+                lnblofhi->setVisible(true);
+                if (CardUtil::diseqcType(db,_cardid) == CardUtil::POSITIONER_X)
+                    diseqcpos->setEnabled(true);
+                else
+                    diseqcpos->setEnabled(false);
+            }
+            else
+            {
+                diseqcpos->setVisible(false);
+                lnblofswitch->setVisible(false);
+                lnbloflo->setVisible(false);
+                lnblofhi->setVisible(false);
+            }
+        }
+    }
 }
 
 void CardInput::save(QSqlDatabase* db) {
@@ -993,20 +1214,19 @@ void CardInput::save(QSqlDatabase* db) {
         ConfigurationWizard::save(db);
 }
 
+void CardInput::fillDiseqcSettingsInput(QString _pos, QString _port) {
+    if (_port != "")
+        diseqcport->setValue(_port);
+    if (_pos != "")
+        diseqcpos->setValue(_pos);
+}
+
 int CISetting::getInputID(void) const {
     return parent.getInputID();
 }
 
 int CCSetting::getCardID(void) const {
     return parent.getCardID();
-}
-
-int DvbSatSetting::getCardID(void) const {
-    return parent.getCardID();
-}
-
-int DvbSatSetting::getSatNum(void) const {
-    return satnum;
 }
 
 int CaptureCardEditor::exec(QSqlDatabase* db) {
@@ -1170,7 +1390,7 @@ void CardInputEditor::load(QSqlDatabase* db) {
     // SelectSetting provided a facility to edit the labels, we
     // could use CaptureCard::fillSelections
 
-    QString thequery = QString("SELECT cardid, videodevice, cardtype "
+    QString thequery = QString("SELECT cardid, videodevice, cardtype, dvb_diseqc_type "
                                "FROM capturecard WHERE hostname = \"%1\";")
                               .arg(gContext->GetHostName());
 
@@ -1182,23 +1402,50 @@ void CardInputEditor::load(QSqlDatabase* db) {
 
             QStringList inputs;
             if (capturecards.value(2).toString() != "DVB")
+            {
                 inputs = VideoDevice::probeInputs(videodevice);
+                for (QStringList::iterator i = inputs.begin(); 
+                     i != inputs.end(); ++i)
+                {
+                    CardInput* cardinput = new CardInput();
+                    cardinput->loadByInput(db, cardid, *i);
+                    cardinputs.push_back(cardinput);
+                    QString index = QString::number(cardinputs.size()-1);
+
+                    QString label = QString("%1 (%2) -> %3")
+                        .arg("[ " + capturecards.value(2).toString() +
+                             " : " + capturecards.value(1).toString() +
+                             " ]")
+                        .arg(*i)
+                        .arg(cardinput->getSourceName());
+                    addSelection(label, index);
+                }
+            }
             else
-                inputs = QStringList("DVBInput");
+            {
+                QValueList<DVBDiseqcInputList> dvbinput;
+                dvbinput = VideoDevice::fillDVBInputsDiseqc(capturecards.value(3).toInt());
 
-            for(QStringList::iterator i = inputs.begin(); i != inputs.end(); ++i) {
-                CardInput* cardinput = new CardInput();
-                cardinput->loadByInput(db, cardid, *i);
-                cardinputs.push_back(cardinput);
-                QString index = QString::number(cardinputs.size()-1);
+                QValueList<DVBDiseqcInputList>::iterator it;
+                for (it = dvbinput.begin(); it != dvbinput.end(); ++it)
+                {
+                    // IS DVB Check for CardInput class
+                    CardInput* cardinput = new CardInput(1);
+                    cardinput->loadByInput(db, cardid, (*it).input);
 
-                QString label = QString("%1 (%2) -> %3")
-                    .arg("[ " + capturecards.value(2).toString() + 
-                         " : " + capturecards.value(1).toString() + 
-                         " ]")
-                    .arg(*i)
-                    .arg(cardinput->getSourceName());
-                addSelection(label, index);
+                    cardinput->fillDiseqcSettingsInput((*it).position,(*it).port);
+
+                    cardinputs.push_back(cardinput);
+                    QString index = QString::number(cardinputs.size()-1);
+
+                    QString label = QString("%1 (%2) -> %3")
+                        .arg("[ " + capturecards.value(2).toString() +
+                             " : " + capturecards.value(1).toString() +
+                             " ]")
+                        .arg((*it).input)
+                        .arg(cardinput->getSourceName());
+                    addSelection(label, index);
+                }
             }
         }
 }
@@ -1208,6 +1455,55 @@ CardInputEditor::~CardInputEditor() {
         delete cardinputs.back();
         cardinputs.pop_back();
     }
+}
+
+QStringList VideoDevice::fillDVBInputs(int dvb_diseqc_type) {
+    QValueList<DVBDiseqcInputList> dvbinput;
+    QStringList inputs;
+
+    dvbinput = fillDVBInputsDiseqc(dvb_diseqc_type);
+
+    QValueList<DVBDiseqcInputList>::iterator it;
+    for (it = dvbinput.begin(); it != dvbinput.end(); ++it)
+        inputs += (*it).input;
+
+    return inputs;
+}
+
+QValueList<DVBDiseqcInputList> VideoDevice::fillDVBInputsDiseqc(int dvb_diseqc_type) {
+    QValueList<DVBDiseqcInputList> list;
+
+    switch (dvb_diseqc_type)
+    {
+        case 1: case 2: case 3:
+            list.append(DVBDiseqcInputList(QString("DiSEqC Switch Input 1"),
+                                           QString("0"), QString("")));
+            list.append(DVBDiseqcInputList(QString("DiSEqC Switch Input 2"),
+                                           QString("1"), QString("")));
+            break;
+        case 4: case 5:
+            list.append(DVBDiseqcInputList(QString("DiSEqC Switch Input 1"),
+                                           QString("0"), QString("")));
+            list.append(DVBDiseqcInputList(QString("DiSEqC Switch Input 2"),
+                                           QString("1"), QString("")));
+            list.append(DVBDiseqcInputList(QString("DiSEqC Switch Input 3"),
+                                           QString("2"), QString("")));
+            list.append(DVBDiseqcInputList(QString("DiSEqC Switch Input 4"),
+                                           QString("3"), QString("")));
+            break;
+        case 6:
+            for (int x=1;x<50;x++)
+                list.append(DVBDiseqcInputList(QString("DiSEqC v1.2 Motor Position %1").arg(x),QString(""),QString("%1").arg(x)));
+            break;
+        case 7:
+            for (int x=1;x<20;x++)
+                list.append ( DVBDiseqcInputList(QString("DiSEqC v1.3 Input %1").arg(x),QString(""),QString("%1").arg(x)));
+            break;
+        default:
+            list.append ( DVBDiseqcInputList(QString("DVBInput"),QString(""),QString("")));
+    }
+
+    return list;
 }
 
 QStringList VideoDevice::probeInputs(QString device) {
@@ -1282,40 +1578,54 @@ QStringList VideoDevice::probeInputs(QString device) {
 void DVBConfigurationGroup::probeCard(const QString& cardNumber)
 {
 #ifdef USING_DVB
-    int fd = open(dvbdevice(DVB_DEV_FRONTEND, cardNumber.toInt()), O_RDWR);
-    if (fd == -1)
+    QString name;
+    bool fEnable=false;
+    switch (CardUtil::cardDVBType(cardNumber.toInt(),name))
     {
-        cardname->setValue(QString("Could not open card #%1!")
-                            .arg(cardNumber));
-        cardtype->setValue(strerror(errno));
-    }
-    else
-    {
-        struct dvb_frontend_info info;
-
-        if (ioctl(fd, FE_GET_INFO, &info) < 0)
-        {
+        case CardUtil::ERROR_OPEN:
+            cardname->setValue(QString("Could not open card #%1!")
+                                       .arg(cardNumber));
+            cardtype->setValue(strerror(errno));
+            break;
+        case CardUtil::ERROR_PROBE:
             cardname->setValue(QString("Could not get card info for card #%1!")
                                       .arg(cardNumber));
             cardtype->setValue(strerror(errno));
-        }
-        else
-        {
-            switch(info.type)
-            {
-                case FE_QPSK:   cardtype->setValue("DVB-S"); break;
-                case FE_QAM:    cardtype->setValue("DVB-C"); break;
-                case FE_OFDM:   cardtype->setValue("DVB-T"); break;
-            }
+            break;
+        case CardUtil::QPSK:
+            cardtype->setValue("DVB-S");
+            cardname->setValue(name);
+            fEnable = true;
+            break;
+        case CardUtil::QAM:
+            cardtype->setValue("DVB-C");
+            cardname->setValue(name);
+            break;
+        case CardUtil::OFDM:
+            cardtype->setValue("DVB-T");
+            cardname->setValue(name);
+            break;
+        case CardUtil::ATSC:
+            cardtype->setValue("ATSC");
+            cardname->setValue(name);
+            break;
 
-            cardname->setValue(info.name);
-        }
-        close(fd);
     }
+    defaultinput->setEnabled(fEnable);
+    diseqctype->setEnabled(fEnable);
 #else
     (void)cardNumber;
     cardtype->setValue(QString("Recompile with DVB-Support!"));
 #endif
+}
+
+void DVBDefaultInput::fillSelections(const QString& type) {
+    clearSelections();
+
+    QStringList inputs = VideoDevice::fillDVBInputs(type.toInt());
+
+    for(QStringList::iterator i = inputs.begin(); i != inputs.end(); ++i)
+        addSelection(*i);
 }
 
 void TunerCardInput::fillSelections(const QString& device) {
@@ -1325,223 +1635,10 @@ void TunerCardInput::fillSelections(const QString& device) {
         return;
 
     QStringList inputs = VideoDevice::probeInputs(device);
+
     for(QStringList::iterator i = inputs.begin(); i != inputs.end(); ++i)
         addSelection(*i);
 }
-
-class DVBSignalMeter: public ProgressSetting, public TransientStorage {
-public:
-    DVBSignalMeter(int steps): ProgressSetting(steps), TransientStorage() {};
-};
-
-class DVBVideoSource: public ComboBoxSetting {
-public:
-    DVBVideoSource() {
-        setLabel("VideoSource");
-    };
-
-    void save(QSqlDatabase* db) { (void)db; };
-    void load(QSqlDatabase* _db) {
-        db = _db;
-        fillSelections();
-    };
-
-    void fillSelections() {
-        clearSelections();
-        QSqlQuery query;
-        query = db->exec(QString("SELECT videosource.name,videosource.sourceid "
-                                 "FROM videosource,capturecard,cardinput "
-                                 "WHERE capturecard.cardtype='DVB' "
-                                 "AND videosource.sourceid=cardinput.sourceid "
-                                 "AND cardinput.cardid=capturecard.cardid"));
-        if (!query.isActive())
-            MythContext::DBError("VideoSource", query);
-
-        if (query.numRowsAffected() > 0) {
-            addSelection(QObject::tr("[All VideoSources]"), "ALL");
-            while(query.next())
-                addSelection(query.value(0).toString(),
-                              query.value(1).toString());
-        } else
-            addSelection(QObject::tr("[No VideoSources Defined]"), "0");
-    };
-
-private:
-    QSqlDatabase* db;
-};
-
-void DVBChannels::fillSelections(const QString& videoSource) 
-{
-    if (db == NULL)
-        return;
-    clearSelections();
-    QSqlQuery query;
-    QString thequery = "SELECT name,chanid FROM channel";
-    if (videoSource != "All")
-        thequery += QString(" WHERE sourceid='%1'").arg(videoSource);
-    query = db->exec(thequery);
-    if (!query.isActive()) {
-        MythContext::DBError("Selecting Testchannels", query);
-        return;
-    }
-
-    if (query.numRowsAffected() > 0) {
-        while (query.next())
-            addSelection(query.value(0).toString(),
-                         query.value(1).toString());
-    } else
-        addSelection(QObject::tr("[No Channels Defined]"), "0");
-}
-
-class DVBLoadTuneButton: public ButtonSetting, public TransientStorage {
-public:
-    DVBLoadTuneButton() {
-        setLabel(QObject::tr("Load & Tune"));
-        setHelpText(QObject::tr("Will load the selected channel above into "
-                    "the previous screen, and try to tune it. If it fails to "
-                    "tune the channel, press back and check the settings."));
-    };
-};
-
-class DVBTuneOnlyButton: public ButtonSetting, public TransientStorage {
-public:
-    DVBTuneOnlyButton() {
-        setLabel(QObject::tr("Tune Only"));
-        setHelpText(QObject::tr("Will ONLY try to tune the previous screen, "
-                    "not alter it. If it fails to tune, press back and check "
-                    "the settings."));
-    };
-};
-
-#ifndef USING_DVB
-DVBCardVerificationWizard::DVBCardVerificationWizard(int cardNum)
-{
-    (void)cardNum;
-}
-
-DVBCardVerificationWizard::~DVBCardVerificationWizard()
-{
-}
-
-void DVBCardVerificationWizard::tuneConfigscreen()
-{
-}
-
-void DVBCardVerificationWizard::tunePredefined()
-{
-}
-
-#else
-
-DVBCardVerificationWizard::DVBCardVerificationWizard(int cardNum) {
-    chan = new DVBChannel(cardNum);
-
-    cid.setValue(0);
-    addChild(dvbopts = new DVBSignalChannelOptions(cid));
-
-    VerticalConfigurationGroup* testGroup = new VerticalConfigurationGroup(false,true);
-    testGroup->setLabel(QObject::tr("Card Verification Wizard (DVB#") + QString("%1)").arg(cardNum));
-    testGroup->setUseLabel(false);
-
-    DVBVideoSource* source;
-
-    DVBStatusLabel* sl = new DVBStatusLabel();
-    DVBSignalMeter* sn = new DVBSignalMeter(65535);
-    DVBSignalMeter* ss = new DVBSignalMeter(65535);
-    testGroup->addChild(sl);
-    testGroup->addChild(sn);
-    testGroup->addChild(ss);
-
-    HorizontalConfigurationGroup* lblGroup = new HorizontalConfigurationGroup(false,true);
-    DVBInfoLabel* ber = new DVBInfoLabel(QObject::tr("Bit Error Rate"));
-    DVBInfoLabel* un  = new DVBInfoLabel(QObject::tr("Uncorrected Blocks"));
-    lblGroup->addChild(ber);
-    lblGroup->addChild(un);
-    testGroup->addChild(lblGroup);
-
-    HorizontalConfigurationGroup* chanGroup = new HorizontalConfigurationGroup(false,true);
-    chanGroup->addChild(source = new DVBVideoSource());
-    chanGroup->addChild(channels = new DVBChannels());
-    testGroup->addChild(chanGroup);
-
-    HorizontalConfigurationGroup* btnGroup = new HorizontalConfigurationGroup(false,true);
-    DVBLoadTuneButton* loadtune = new DVBLoadTuneButton();
-    DVBTuneOnlyButton* tuneonly = new DVBTuneOnlyButton();
-    btnGroup->addChild(loadtune);
-    btnGroup->addChild(tuneonly);
-    testGroup->addChild(btnGroup);
-
-    sn->setLabel(QObject::tr("Signal/Noise"));
-    ss->setLabel(QObject::tr("Signal Strength"));
-
-    addChild(testGroup);
-
-    connect(source, SIGNAL(valueChanged(const QString&)),
-            channels, SLOT(fillSelections(const QString&)));
-
-    connect(chan, SIGNAL(StatusSignalToNoise(int)), sn, SLOT(setValue(int)));
-    connect(chan, SIGNAL(StatusSignalStrength(int)), ss, SLOT(setValue(int)));
-    connect(chan, SIGNAL(StatusBitErrorRate(int)), ber, SLOT(set(int)));
-    connect(chan, SIGNAL(StatusUncorrectedBlocks(int)), un, SLOT(set(int)));
-    connect(chan, SIGNAL(Status(QString)), sl, SLOT(set(QString)));
-
-    connect(loadtune, SIGNAL(pressed()), this, SLOT(tunePredefined()));
-    connect(tuneonly, SIGNAL(pressed()), this, SLOT(tuneConfigscreen()));
-}
-
-DVBCardVerificationWizard::~DVBCardVerificationWizard()
-{
-    delete chan;
-}
-
-void DVBCardVerificationWizard::tuneConfigscreen() {
-    dvb_channel_t chan_opts;
-
-    if (!chan->Open())
-    {
-        setLabel(QObject::tr("FAILED TO OPEN CARD, CHECK CONSOLE!!"));
-        return;
-    }
-
-    bool parseOK = true;
-    switch (chan->GetCardType())
-    {
-        case FE_QPSK:
-            parseOK = chan->ParseQPSK(
-                dvbopts->getFrequency(), dvbopts->getInversion(),
-                dvbopts->getSymbolrate(), dvbopts->getFec(),
-                dvbopts->getPolarity(),
-                //TODO: Static Diseqc options.
-                QString("0"), QString("0"),
-                //TODO: Static LNB options.
-                QString("11700000"), QString("10600000"),
-                QString("9750000"), chan_opts.tuning);
-            break;
-        case FE_QAM:
-            parseOK = chan->ParseQAM(
-                dvbopts->getFrequency(), dvbopts->getInversion(),
-                dvbopts->getSymbolrate(), dvbopts->getFec(),
-                dvbopts->getModulation(), chan_opts.tuning);
-            break;
-        case FE_OFDM:
-            parseOK = chan->ParseOFDM(
-                dvbopts->getFrequency(), dvbopts->getInversion(),
-                dvbopts->getBandwidth(), dvbopts->getCodeRateHP(),
-                dvbopts->getCodeRateLP(), dvbopts->getConstellation(),
-                dvbopts->getTransmissionMode(), dvbopts->getGuardInterval(),
-                dvbopts->getHierarchy(), chan_opts.tuning);
-            break;
-    }
-
-    chan->Tune(chan_opts,true);
-}
-
-void DVBCardVerificationWizard::tunePredefined() {
-    cid.setValue(channels->getValue().toInt());
-    dvbopts->load(db);
-    tuneConfigscreen();
-}
-#endif
 
 DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent):
                        parent(a_parent) {
@@ -1554,20 +1651,33 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent):
     cardname = new DVBCardName();
     cardtype = new DVBCardType();
 
+    defaultinput = new DVBDefaultInput(parent);
+    diseqctype = new DVBDiseqcType(parent);
+
     addChild(cardnum);
     addChild(cardname);
     addChild(cardtype);
+
     addChild(new DVBAudioDevice(parent));
     addChild(new DVBVbiDevice(parent));
-    addChild(new DVBDefaultInput(parent));
+    addChild(diseqctype);
+    addChild(defaultinput);
     addChild(advcfg);
 
     connect(cardnum, SIGNAL(valueChanged(const QString&)),
             this, SLOT(probeCard(const QString&)));
     connect(cardnum, SIGNAL(valueChanged(const QString&)),
             &parent, SLOT(setDvbCard(const QString&)));
+    connect(diseqctype, SIGNAL(valueChanged(const QString&)),
+            defaultinput, SLOT(fillSelections(const QString&)));
     connect(advcfg, SIGNAL(pressed()), &parent, SLOT(execDVBConfigMenu()));
+
+    defaultinput->setEnabled(false);
+    diseqctype->setEnabled(false);
+
     cardnum->setValue(0);
+
+    defaultinput->fillSelections(diseqctype->getValue());
 }
 
 void CaptureCard::execDVBConfigMenu() {
@@ -1584,113 +1694,24 @@ void CaptureCard::execDVBConfigMenu() {
         load(db);
     }
 
-    DVBAdvancedConfigMenu acm(*this);
-    acm.exec(db);
+    MythPopupBox *popup = new MythPopupBox(gContext->GetMainWindow(),
+                             tr("Advanced Configuration"));
+
+    QButton *button;
+    button = popup->addButton(tr("Recording Options"), this, 
+                              SLOT(execAdvConfigWiz()));
+    button->setFocus();
+    button = popup->addButton(tr("Diseqc"), this, SLOT(execDiseqcWiz()));
+    popup->ExecPopup();
+    delete popup;
 }
 
-DVBSatelliteWizard::DVBSatelliteWizard(CaptureCard& _parent)
-                  : parent(_parent) 
+class DVBAdvConfigurationWizard: public ConfigurationWizard
 {
-    VerticalConfigurationGroup* g = new VerticalConfigurationGroup(false);
-    g->setLabel(QObject::tr("Satellite Configuration"));
-    g->setUseLabel(false);
-    DVBSatelliteConfigType* type = new DVBSatelliteConfigType(parent);
-    list = new DVBSatelliteList(parent);
-    connect(type, SIGNAL(valueChanged(const QString&)),
-            list, SLOT(fillSelections(const QString&)));
-    connect(list, SIGNAL(menuButtonPressed(int)),
-            this, SLOT(editSat(int)));
-    g->addChild(type);
-    g->addChild(list);
-    addChild(g);
-}
-
-class SatName: public LineEditSetting, public DvbSatSetting {
 public:
-    SatName(const CaptureCard& parent, int satnum):
-        DvbSatSetting(parent, satnum, "name") {
-        setLabel(QObject::tr("Satellite Name"));
-        setValue("Unnamed");
-        setHelpText(QObject::tr("A textual representation of this "
-                    "satellite or cluster of satellites."));
-    };
-};
-
-class SatPos: public LineEditSetting, public DvbSatSetting {
-public:
-    SatPos(const CaptureCard& parent, int satnum):
-        DvbSatSetting(parent, satnum, "pos") {
-        setLabel(QObject::tr("Satellite Position"));
-        setValue("");
-        setHelpText(QObject::tr("A textual representation of which "
-                    "position the satellite is located at ('1W')"));
-    };
-};
-
-class LofSwitch: public LineEditSetting, public DvbSatSetting {
-public:
-    LofSwitch(const CaptureCard& parent, int satnum):
-        DvbSatSetting(parent, satnum, "lnb_lof_switch") {
-        setLabel(QObject::tr("LNB LOF Switch"));
-        setValue("11700000");
-        setHelpText(QObject::tr("This defines at what frequency (in hz) "
-                    "the LNB will do a switch from high to low setting, "
-                    "and vice versa."));
-    };
-};
-
-class LofHigh: public LineEditSetting, public DvbSatSetting {
-public:
-    LofHigh(const CaptureCard& parent, int satnum):
-        DvbSatSetting(parent, satnum, "lnb_lof_hi") {
-        setLabel(QObject::tr("LNB LOF High"));
-        setValue("10600000");
-        setHelpText(QObject::tr("This defines the offset (in hz) the "
-                    "frequency coming from the lnb will be in high "
-                    "setting."));
-    };
-};
-
-class LofLow: public LineEditSetting, public DvbSatSetting {
-public:
-    LofLow(const CaptureCard& parent, int satnum):
-        DvbSatSetting(parent, satnum, "lnb_lof_lo") {
-        setLabel(QObject::tr("LNB LOF Low"));
-        setValue("9750000");
-        setHelpText(QObject::tr("This defines the offset (in hz) the "
-                    "frequency coming from the lnb will be in low "
-                    "setting."));
-    };
-};
-
-class SatEditor: public ConfigurationWizard {
-public:
-    SatEditor(CaptureCard& _parent, int satnum):
-        parent(_parent) {
-        VerticalConfigurationGroup* g = new VerticalConfigurationGroup(false);
-        g->addChild(new SatName(parent, satnum));
-        g->addChild(new SatPos(parent, satnum));
-        g->addChild(new LofSwitch(parent, satnum));
-        g->addChild(new LofLow(parent, satnum));
-        g->addChild(new LofHigh(parent, satnum));
-        addChild(g);
-    };
-protected:
-    CaptureCard& parent;
-};
-
-void DVBSatelliteWizard::editSat(int satnum)
-{
-    SatEditor ed(parent, satnum);
-    ed.exec(db);
-    list->load(db);
-}
-
-class DVBAdvConfigurationWizard: public ConfigurationWizard {
-public:
-    DVBAdvConfigurationWizard(CaptureCard& parent) {
-        VerticalConfigurationGroup* rec = new VerticalConfigurationGroup(false);
-        rec->setLabel(QObject::tr("Recorder Options"));
+    DVBAdvConfigurationWizard(CaptureCard& parent)
+    {
+        VerticalConfigurationGroup* rec = new VerticalConfigurationGroup(false);        rec->setLabel(QObject::tr("Recorder Options"));
         rec->setUseLabel(false);
 
         rec->addChild(new DVBSwFilter(parent));
@@ -1700,41 +1721,78 @@ public:
         rec->addChild(new DVBPidBufferSize(parent));
         rec->addChild(new DVBBufferSize(parent));
         addChild(rec);
-    };
+    }
 };
 
-DVBAdvancedConfigMenu::DVBAdvancedConfigMenu(CaptureCard& a_parent)
-                     : parent(a_parent) 
+class BackendSettingVS: public SimpleDBStorage, virtual public Configurable
 {
-    setLabel(QObject::tr("Configuration Options"));
-    TransButtonSetting* advcfg = new TransButtonSetting();
-    TransButtonSetting* verify = new TransButtonSetting();
-    TransButtonSetting* satellite = new TransButtonSetting();
+public:
+    BackendSettingVS(QString name): SimpleDBStorage("settings", "data")
+    {
+        setName(name);
+    }
 
-    advcfg->setLabel(QObject::tr("Advanced Configuration"));
-    verify->setLabel(QObject::tr("Card Verification Wizard"));
-    satellite->setLabel(QObject::tr("Satellite Configuration"));
+protected:
+    virtual QString whereClause(void)
+    {
+        return QString("value = '%1'").arg(getName());
+    }
 
-    addChild(advcfg);
-    addChild(verify);
-    addChild(satellite);
+    virtual QString setClause(void)
+    {
+        return QString("value = '%1', data = '%2'").arg(getName()).arg(getValue());
+    }
+};
 
-    connect(advcfg, SIGNAL(pressed()), this, SLOT(execACW()));
-    connect(verify, SIGNAL(pressed()), this, SLOT(execCVW()));
-    connect(satellite, SIGNAL(pressed()), this, SLOT(execSAT()));
-}
+class DiseqcLatitude : public LineEditSetting, public BackendSettingVS
+{
+public:
+    DiseqcLatitude() : BackendSettingVS("latitude")
+    {
+        setLabel("Latitude");
+        setHelpText(QObject::tr("The Latitude of your satellite dishes "
+                    "location on the Earth.. "
+                    " This is used with DiSEqC Motor Support.  Format 35.78"
+                    " for 35.78 degrees North Longitude"));
+    }
+};
 
-void DVBAdvancedConfigMenu::execCVW() {
-    DVBCardVerificationWizard cvw(parent.getDvbCard().toInt());
-    cvw.exec(db);
-}
+class DiseqcLongitude : public LineEditSetting, public BackendSettingVS
+{
+public:
+    DiseqcLongitude() : BackendSettingVS("longitude")
+    {
+        setLabel("Longitude");
+        setHelpText(QObject::tr("The Longitude of your satellite dishes "
+                    "location on the Earth.. "
+                    " This is used with DiSEqC Motor Support.  Format -78.93"
+                    " for 78.93 degrees West Longitude"));
+    }
+};
 
-void DVBAdvancedConfigMenu::execACW() {
-    DVBAdvConfigurationWizard acw(parent);
+class DVBDiseqcConfigurationWizard: public ConfigurationWizard
+{
+public:
+    DVBDiseqcConfigurationWizard()
+    {
+        VerticalConfigurationGroup* rec = new VerticalConfigurationGroup(false);
+        rec->setLabel(QObject::tr("Diseqc Options"));
+        rec->setUseLabel(false);
+
+        rec->addChild(new DiseqcLatitude());
+        rec->addChild(new DiseqcLongitude());
+        addChild(rec);
+    }
+};
+
+void CaptureCard::execAdvConfigWiz()
+{
+    DVBAdvConfigurationWizard acw(*this);
     acw.exec(db);
 }
 
-void DVBAdvancedConfigMenu::execSAT() {
-    DVBSatelliteWizard sw(parent);
-    sw.exec(db);
+void CaptureCard::execDiseqcWiz()
+{
+    DVBDiseqcConfigurationWizard diseqcWiz;
+    diseqcWiz.exec(db);
 }

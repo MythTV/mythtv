@@ -100,7 +100,11 @@ QWidget* VerticalConfigurationGroup::configWidget(ConfigurationGroup *cg,
 
     for(unsigned i = 0 ; i < children.size() ; ++i)
         if (children[i]->isVisible())
-            layout->add(children[i]->configWidget(cg, widget, NULL));
+        {
+            QWidget *child = children[i]->configWidget(cg, widget, NULL);
+            layout->add(child);
+            children[i]->setEnabled(children[i]->isEnabled());
+        }
       
     if (cg)
     {
@@ -139,7 +143,11 @@ QWidget* HorizontalConfigurationGroup::configWidget(ConfigurationGroup *cg,
 
     for(unsigned i = 0 ; i < children.size() ; ++i)
         if (children[i]->isVisible())
-            layout->add(children[i]->configWidget(cg, widget, NULL));
+        {
+            QWidget *child = children[i]->configWidget(cg, widget, NULL);
+            layout->add(child);
+            children[i]->setEnabled(children[i]->isEnabled());
+        }
 
     if (cg)
     {
@@ -354,6 +362,26 @@ QWidget* LineEditSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     return widget;
 }
 
+void LineEditSetting::setEnabled(bool b)
+{
+    Configurable::setEnabled(b);
+    if (edit)
+        edit->setEnabled(b);
+}
+
+void LineEditSetting::setVisible(bool b)
+{
+    Configurable::setVisible(b);
+    if (edit)
+    {
+        //QWidget *parent = edit->parentWidget();
+        if (b)
+            edit->show();
+        else
+            edit->hide();
+    }
+}
+
 QWidget* SliderSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
                                      const char* widgetName) {
     QHBox* widget;
@@ -430,7 +458,7 @@ QWidget* SpinBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     // only set step size if greater than default (1), otherwise
     // this will screw up the single-step/jump behavior of the MythSpinBox
     if (1 < step)
-	spinbox->setLineStep(step);
+        spinbox->setLineStep(step);
     spinbox->setValue(intValue());
 
     connect(spinbox, SIGNAL(valueChanged(int)), this, SLOT(setValue(int)));
@@ -529,6 +557,26 @@ QWidget* ComboBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     return box;
 }
 
+void ComboBoxSetting::setEnabled(bool b)
+{
+    Configurable::setEnabled(b);
+    if (widget)
+        widget->setEnabled(b);
+}
+
+void ComboBoxSetting::setVisible(bool b)
+{
+    Configurable::setVisible(b);
+    if (widget)
+    {
+        //QWidget *parent = widget->parentWidget();
+        if (b)
+            widget->show();
+        else
+            widget->hide();
+    }
+}
+
 void PathSetting::addSelection(const QString& label,
                                QString value,
                                bool select) {
@@ -597,7 +645,7 @@ QWidget* RadioSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
 
 QWidget* CheckBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
                                        const char* widgetName) {
-    MythCheckBox* widget = new MythCheckBox(parent, widgetName);
+    widget = new MythCheckBox(parent, widgetName);
     widget->setHelpText(getHelpText());
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
     widget->setText(getLabel());
@@ -613,6 +661,13 @@ QWidget* CheckBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
                 SIGNAL(changeHelpText(QString)));
 
     return widget;
+}
+
+void CheckBoxSetting::setEnabled(bool fEnabled)
+{
+    BooleanSetting::setEnabled(fEnabled);
+    if (widget)
+        widget->setEnabled(fEnabled);
 }
 
 void ConfigurationDialogWidget::keyPressEvent(QKeyEvent* e) 
@@ -756,6 +811,13 @@ void AutoIncrementStorage::save(QSqlDatabase* db) {
     }
 }
 
+void ListBoxSetting::setEnabled(bool b)
+{
+    Configurable::setEnabled(b);
+    if (widget)
+        widget->setEnabled(b);
+}
+
 QWidget* ListBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent, 
                                       const char* widgetName) {
     QWidget* box = new QVBox(parent, widgetName);
@@ -796,8 +858,16 @@ QWidget* ListBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
                 SIGNAL(changeHelpText(QString)));
 
     widget->setFocus();
+    widget->setSelectionMode(selectionMode);
 
     return box;
+}
+
+void ListBoxSetting::setSelectionMode(MythListBox::SelectionMode mode)
+{
+   selectionMode = mode;
+   if (widget)
+       widget->setSelectionMode(selectionMode);
 }
 
 void ListBoxSetting::setValueByLabel(const QString& label) {
@@ -938,18 +1008,25 @@ QWidget* ButtonSetting::configWidget(ConfigurationGroup* cg, QWidget* parent,
                                      const char* widgetName)
 {
     (void) cg;
-    MythPushButton* widget = new MythPushButton(parent, widgetName);
+    button = new MythPushButton(parent, widgetName);
 
-    widget->setText(getLabel());
-    //widget->setHelpText(getHelpText());
+    button->setText(getLabel());
+    //button->setHelpText(getHelpText());
 
-    connect(widget, SIGNAL(pressed()), this, SIGNAL(pressed()));
+    connect(button, SIGNAL(pressed()), this, SIGNAL(pressed()));
 
     if (cg)
-        connect(widget, SIGNAL(changeHelpText(QString)),
+        connect(button, SIGNAL(changeHelpText(QString)),
                 cg, SIGNAL(changeHelpText(QString)));
 
-    return widget;
+    return button;
+}
+
+void ButtonSetting::setEnabled(bool fEnabled)
+{
+    Configurable::setEnabled(fEnabled);
+    if (button)
+        button->setEnabled(fEnabled);
 }
 
 QWidget* ProgressSetting::configWidget(ConfigurationGroup* cg, QWidget* parent,
@@ -977,6 +1054,7 @@ void ConfigPopupDialogWidget::keyPressEvent(QKeyEvent* e) {
     switch(e->key()) {
     case Key_Escape:
         reject();
+        emit popupDone();
         break;
     default:
         MythDialog::keyPressEvent(e);

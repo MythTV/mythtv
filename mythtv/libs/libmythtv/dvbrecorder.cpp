@@ -45,7 +45,6 @@ using namespace std;
 #include <pthread.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <sys/poll.h>
 
 #include "RingBuffer.h"
 #include "programinfo.h"
@@ -56,74 +55,61 @@ using namespace std;
 #include "dvbchannel.h"
 #include "dvbrecorder.h"
 
-DVBRecorder::DVBRecorder(DVBChannel* advbchannel): RecorderBase()
+extern "C" {
+#include "../libavcodec/avcodec.h"
+#include "../libavformat/avformat.h"
+#include "../libavformat/mpegts.h"
+}
+
+const int DVBRecorder::PMT_PID = 0x10;
+
+DVBRecorder::DVBRecorder(DVBChannel* advbchannel): DTVRecorder()
 {
-    error = false;
-    isopen = false;
-    cardnum = 0;
-    swfilter = false;
-    recordts = false;
-    was_paused = true;
-    channel_changed = true;
+    _card_number_option = 0;
+    _reset_pid_filters = true;
     dvbchannel = advbchannel;
-    dvb_on_demand = false;
 
-    paused = false;
-    mainpaused = false;
-    recording = false;
+    _dvb_on_demand_option = false;
+    _software_filter_option = false;
+    _record_transport_stream_option = false;
 
-    cont_errors = 0;
-    stream_overflows = 0;
-    bad_packets = 0;
+    _software_filter_open = false;
 
-    signal_monitor_interval = 0;
-    expire_data_days = 3;
-    signal_monitor_quit = false;
+    _continuity_error_count = 0;
+    _stream_overflow_count = 0;
+    _bad_packet_count = 0;
 
-    wait_for_seqstart = true;
-    wait_for_seqstart_enabled = true;
-    dmx_buf_size = DEF_DMX_BUF_SIZE;
-    pkt_buf_size = MPEG_TS_PKT_SIZE * 50;
-    pktbuffer = (unsigned char*)malloc(pkt_buf_size);
+    _buffer_size = MPEG_TS_PKT_SIZE * 50;
+    if ((_buffer = new unsigned char[_buffer_size])) {
+        // make valgrind happy, initialize buffer memory
+        memset(_buffer, 0xFF, _buffer_size);
+    }
+
+    pat_pkt = new uint8_t[188];
+    pmt_pkt = new uint8_t[188];
 }
 
 DVBRecorder::~DVBRecorder()
 {
-    if (isopen)
+    if (_stream_fd >= 0)
         Close();
 
-    if (pktbuffer)
-        free(pktbuffer);
+    if (_buffer)
+        delete[] _buffer;
+
+    delete pat_pkt;
+    delete pmt_pkt;
 }
 
 void DVBRecorder::SetOption(const QString &name, int value)
 {
     if (name == "cardnum")
-        cardnum = value;
+        _card_number_option = value;
     else if (name == "swfilter")
-        swfilter = (value == 1);
+        _software_filter_option = (value == 1);
     else if (name == "recordts")
-    {
-        if (value == 1)
-            GENERAL("Was told to record transport stream,"
-                    " but this feature is broken, not enabling.");
-//        recordts = (value == 1);
-    }
-    else if (name == "wait_for_seqstart")
-        wait_for_seqstart_enabled = (value == 1);
-    else if (name == "dmx_buf_size")
-    {
-        if (value != 0)
-            dmx_buf_size = value;
-    }
-    else if (name == "pkt_buf_size")
-    {
-        if (value != 0)
-        {
-            pkt_buf_size = value - (value % MPEG_TS_PKT_SIZE);
-            pktbuffer = (unsigned char*)realloc(pktbuffer, pkt_buf_size);
-        }
-    }
+        _record_transport_stream_option = (value == 1);
+#if 0
     else if (name == "signal_monitor_interval")
     {
         signal_monitor_interval = value;
@@ -131,6 +117,8 @@ void DVBRecorder::SetOption(const QString &name, int value)
         if (signal_monitor_interval < 0)
             signal_monitor_interval = 0; 
     }
+#endif
+#if 0
     else if (name == "expire_data_days")
     {
         expire_data_days = value;
@@ -138,328 +126,419 @@ void DVBRecorder::SetOption(const QString &name, int value)
         if (expire_data_days < 1)
             expire_data_days = 1;
     }
+#endif
     else if (name == "dvb_on_demand")
     {
-        dvb_on_demand = value;
+        _dvb_on_demand_option = value;
     }
     else
-        RecorderBase::SetOption(name, value);
+        DTVRecorder::SetOption(name, value);
 }
 
-void DVBRecorder::SetOptionsFromProfile(RecordingProfile *profile,
+void DVBRecorder::SetOptionsFromProfile(RecordingProfile*, 
                                         const QString &videodev,
-                                        const QString &audiodev,
-                                        const QString &vbidev, int ispip)
+                                        const QString&, const QString&, int)
 {
-    (void)profile;
-    (void)audiodev;
-    (void)vbidev;
-    (void)ispip;
-
     SetOption("cardnum", videodev.toInt());
 }
 
 void DVBRecorder::ChannelChanged(dvb_channel_t& chan)
 {
-    chan_opts = chan;
+    m_pmt = chan.pmt;
 
-    if (wait_for_seqstart_enabled)
-        wait_for_seqstart = true;
-    else
-        wait_for_seqstart = false;
+    AutoPID();
+    dvbchannel->SetCAPMT(m_pmt);
 
-    channel_changed = true;
+    _reset_pid_filters = true;
 
-    framesWritten = 0;
+    _frames_written_count = 0;
     memset(prvpkt, 0, 3);
 }
 
 bool DVBRecorder::Open()
 {
-    if (isopen)
+    if (_stream_fd >= 0)
         return true;
 
-    if (dvb_on_demand && dvbchannel->Open())
+    if (_dvb_on_demand_option && dvbchannel->Open())
     {
         // this is required to trigger a re-tune
         dvbchannel->SetChannelByString(dvbchannel->GetCurrentName());
     }
 
-    fd_dvr = open(dvbdevice(DVB_DEV_DVR,cardnum), O_RDONLY | O_NONBLOCK);
-    if (fd_dvr < 0)
+    _stream_fd = open(dvbdevice(DVB_DEV_DVR,_card_number_option), O_RDONLY | O_NONBLOCK);
+    if (_stream_fd < 0)
     {
-        ERRNO("Recorder: Failed to open dvb device");
+        VERBOSE(VB_IMPORTANT, QString("DVB#%1 ERROR - ").arg(_card_number_option)
+                << "Recorder: Failed to open dvb device"
+                << endl << QString("          (%1) ").arg(errno) << strerror(errno));
         return false;
     }
 
-    GENERAL("Recorder: Card opened successfully.");
+    VERBOSE(VB_GENERAL, QString("DVB#%1 ").arg(_card_number_option)
+            << "Recorder: Card opened successfully.");
 
     connect(dvbchannel, SIGNAL(ChannelChanged(dvb_channel_t&)),
             this, SLOT(ChannelChanged(dvb_channel_t&)));
 
     dvbchannel->RecorderStarted();
 
-    isopen = true;
     return true;
 }
 
 void DVBRecorder::Close()
 {
-    if (!isopen)
+    if (_stream_fd < 0)
         return;
 
     VERBOSE(VB_ALL, "Closing DVB recorder");
 
     CloseFilters();
 
-    if (fd_dvr >= 0)
-        close(fd_dvr);
+    if (_stream_fd >= 0)
+        close(_stream_fd);
 
-    if (dvb_on_demand && dvbchannel)
+    if (_dvb_on_demand_option && dvbchannel)
         dvbchannel->CloseDVB();
 
-    isopen = false;
+    _stream_fd = -1;
 }
 
 void DVBRecorder::CloseFilters()
 {
-    for(unsigned int i=0; i<fd_demux.size(); i++)
-        if (fd_demux[i] >= 0)
-            close(fd_demux[i]);
-    fd_demux.clear();
+    for(unsigned int i=0; i<_pid_filters.size(); i++)
+        if (_pid_filters[i] >= 0)
+            close(_pid_filters[i]);
+    _pid_filters.clear();
 
     pid_ipack_t::iterator iter = pid_ipack.begin();
     for (;iter != pid_ipack.end(); iter++)
     {
-        free_ipack((*iter).second);
-        free((void*)(*iter).second);
+        if ((*iter).second != NULL)
+        {
+            free_ipack((*iter).second);
+            free((void*)(*iter).second);
+        }
     }
     pid_ipack.clear();
-    contcounter.clear();
+
+    _software_filter_open = false;
 }
 
-void DVBRecorder::OpenFilters(dvb_pid_t& pids, dmx_pes_type_t type)
+void DVBRecorder::OpenFilters(uint16_t pid, ES_Type type)
 {
-    struct dmx_pes_filter_params params;
-    params.input = DMX_IN_FRONTEND;
-    params.output = DMX_OUT_TS_TAP;
-    params.flags = DMX_IMMEDIATE_START;
-    params.pes_type = type;
-    params.pid = 0;
+    VERBOSE(VB_RECORD, QString("DVB#%1 ").arg(_card_number_option) << QString("Adding pid %1").arg(pid));
 
-    for (unsigned int i = 0; i < pids.size(); i++)
+    int cardnum = _card_number_option;
+    if (pid < 0x10 || pid > 0x1fff)
+        WARNING(QString("PID value (%1) is outside DVB specification.")
+                        .arg(pid));
+
+    if (!_software_filter_option || !_software_filter_open)
     {
-        int this_pid = pids[i];
+        struct dmx_pes_filter_params params;
+        params.input = DMX_IN_FRONTEND;
+        params.output = DMX_OUT_TS_TAP;
+        params.flags = DMX_IMMEDIATE_START;
+        params.pes_type = DMX_PES_OTHER;
+        params.pid = _software_filter_option ? DMX_DONT_FILTER : pid;
 
-        RECORD(QString("Adding pid %1, type %2").arg(this_pid).arg((int)type));
+        int fd_tmp = open(dvbdevice(DVB_DEV_DEMUX,_card_number_option), O_RDWR);
 
-        if (this_pid < 0x10 || this_pid > 0x1fff)
-            WARNING(QString("PID value (%1) is outside dvb specification.")
-                            .arg(this_pid));
-
-        if ((swfilter && !swfilter_open) || !swfilter)
+        if (fd_tmp < 0)
         {
-            int fd_tmp = open(dvbdevice(DVB_DEV_DEMUX,cardnum), O_RDWR);
-
-            if (fd_tmp < 0)
-            {
-                ERRNO(QString("Could not open filter device for pid %1.")
-                      .arg(this_pid));
-                continue;
-            }
-
-            if (ioctl(fd_tmp, DMX_SET_BUFFER_SIZE, dmx_buf_size) == -1)
-            {
-                ERRNO("DMX_SET_BUFFER_SIZE failed for pid " << this_pid);
-            }
-
-            params.pid = this_pid;
-
-            if (swfilter)
-            {
-                GENERAL("Using Software Filtering.");
-                params.pes_type = DMX_PES_OTHER;
-                params.pid = DMX_DONT_FILTER;
-                swfilter_open = true;
-            }
-
-            if (i)
-                params.pes_type = DMX_PES_OTHER;
-
-            if (ioctl(fd_tmp, DMX_SET_PES_FILTER, &params) < 0)
-            {
-                close(fd_tmp);
-
-                if (swfilter)
-                {
-                    ERRNO("Failed to open pid for Software Filtering.");
-                    break;
-                }
-                else
-                {
-                    ERRNO(QString("Failed to set filter for pid %1.")
-                          .arg(this_pid));
-                    continue;
-                }
-            }
-
-            if (swfilter)
-                params.pid = this_pid;
-
-            fd_demux.push_back(fd_tmp);
+            ERRNO(QString("Could not open demux device."));
+            return;
         }
 
-        if (!recordts)
+        if (_software_filter_option)
         {
-            ipack* ip = (ipack*)malloc(sizeof(ipack));
-            if (ip == NULL)
-            {
-                ERROR(QString("Failed to allocate ipack for pid %1.").arg(this_pid));
-                continue;
-            }
+            GENERAL("Using Software Filtering.");
+            _software_filter_open = true;
+        }
 
-            init_ipack(ip, 2048, ProcessData, 1);
-            ip->data = (void*)this;
+        if (ioctl(fd_tmp, DMX_SET_PES_FILTER, &params) < 0)
+        {
+            close(fd_tmp);
 
-            pid_ipack[this_pid] = ip;
-        } else
-            pid_ipack[this_pid] = NULL;
+            ERRNO(QString("Failed to set demux filter."));
+            return;
+        }
 
-        contcounter[this_pid] = 16;
+        _pid_filters.push_back(fd_tmp);
     }
+
+    if (_record_transport_stream_option)
+    {
+        pid_ipack[pid] = NULL;
+    }
+    else
+    {
+        ipack* ip = (ipack*)malloc(sizeof(ipack));
+        if (ip == NULL)
+        {
+            ERROR(QString("Failed to allocate ipack."));
+            return;
+        }
+
+        switch (type)
+        {
+            case ES_TYPE_VIDEO_MPEG1:
+            case ES_TYPE_VIDEO_MPEG2:
+                init_ipack(ip, 2048, ProcessDataPS);
+                ip->replaceid=0xe0;
+                break;
+
+            case ES_TYPE_AUDIO_MPEG1:
+            case ES_TYPE_AUDIO_MPEG2:
+                init_ipack(ip, 65535, ProcessDataPS); /* don't repack PES */
+                ip->replaceid=0xc0;
+                break;
+
+            case ES_TYPE_AUDIO_AC3:
+                init_ipack(ip, 65535, ProcessDataPS); /* don't repack PES */
+                ip->priv_type=PRIV_TS_AC3;
+                break;
+
+            case ES_TYPE_SUBTITLE:
+            case ES_TYPE_TELETEXT:
+                init_ipack(ip, 65535, ProcessDataPS); /* don't repack PES */
+                ip->priv_type=PRIV_DVB_SUB;
+                break;
+
+            default:
+                init_ipack(ip, 2048, ProcessDataPS);
+                break;
+        }
+
+        ip->data = (void*)this;
+        pid_ipack[pid] = ip;
+    }
+
+    _continuity_count[pid] = 16;
 }
 
-void DVBRecorder::SetDemuxFilters(dvb_pids_t& pids)
+void DVBRecorder::SetDemuxFilters()
 {
+
     CloseFilters();
 
-    if (swfilter)
-        swfilter_open = false;
+    _continuity_count.clear();
+    scrambled.clear();
+    pusi_seen.clear();
+    data_found = false;
+    _wait_for_keyframe = _wait_for_keyframe_option;
+    keyframe_found = false;
 
-/*
-    // FIXME: This should add the pid with PMT not PAT
-    // NOTE: The section filter could report back what pid it's on.
-    if (recordts)
-        pids.other.push_back(0);
-*/
-    OpenFilters(pids.audio,       DMX_PES_AUDIO);
-    OpenFilters(pids.video,       DMX_PES_VIDEO);
-    OpenFilters(pids.teletext,    DMX_PES_TELETEXT);
-    OpenFilters(pids.subtitle,    DMX_PES_SUBTITLE);
-    OpenFilters(pids.pcr,         DMX_PES_PCR);
-    OpenFilters(pids.other,       DMX_PES_OTHER);
-
-    if (fd_demux.size() == 0 && pid_ipack.size() == 0)
+    if (_record_transport_stream_option)
     {
-        ERROR("No PIDS set, please correct your channel setup.");
-        return;
+        bool need_pcr_pid = true;
+
+        // Record all streams flagged for recording
+        QValueList<ElementaryPIDObject>::Iterator es;
+        for (es = m_pmt.Components.begin(); es != m_pmt.Components.end(); ++es)
+        {
+            if ((*es).Record)
+            {
+                OpenFilters((*es).PID, (*es).Type);
+
+                if ((*es).PID == m_pmt.PCRPID)
+                    need_pcr_pid = false;
+            }
+        }
+
+        if (need_pcr_pid)
+            OpenFilters(m_pmt.PCRPID, ES_TYPE_UNKNOWN);
+    }
+    else
+    {
+        // PES recording currently only supports one video and one audio PID (I think???)
+        ElementaryPIDObject *as = m_pmt.PreferredAudioStream();
+        ElementaryPIDObject *vs = m_pmt.PreferredVideoStream();
+//        ElementaryPIDObject *sub = m_pmt.PreferredSubtitleStream();
+
+        if (as)
+            OpenFilters(as->PID, as->Type);
+        if (vs)
+            OpenFilters(vs->PID, vs->Type);
+        //if (sub)
+        //    OpenFilters(sub->PID, sub->Type);
     }
 
-    pid_ipack[pids.audio[0]]->pv = (struct ipack_s *)pid_ipack[pids.video[0]];
-    pid_ipack[pids.video[0]]->pa = (struct ipack_s *)pid_ipack[pids.audio[0]];
+    if (_pid_filters.size() == 0 && pid_ipack.size() == 0)
+    {
+        VERBOSE(VB_IMPORTANT, QString("DVB#%1 ERROR - ").arg(_card_number_option)
+                << "No PIDS set, please correct your channel setup.");
+        return;
+    }
 }
 
-void DVBRecorder::CorrectStreamNumber(ipack* ip, int pid)
+/*
+ *  Process PMT and decide which components should be recorded
+ */
+void DVBRecorder::AutoPID()
 {
-    for (unsigned int i=0; i<chan_opts.pids.audio.size(); i++)
-        if (chan_opts.pids.audio[i] == pid)
-            ip->cid = 0xC0 + i;
+    int cardnum = _card_number_option;
 
-    for (unsigned int i=0; i<chan_opts.pids.video.size(); i++)
-        if (chan_opts.pids.video[i] == pid)
-            ip->cid = 0xE0 + i;
+    isVideo.clear();
+
+    // Wanted languages:
+    QStringList Languages = QStringList::split(",", gContext->GetSetting("PreferredLanguages", ""));
+
+    // Wanted stream types:
+    QValueList<ES_Type> StreamTypes;
+    StreamTypes += ES_TYPE_VIDEO_MPEG1;
+    StreamTypes += ES_TYPE_VIDEO_MPEG2;
+    StreamTypes += ES_TYPE_AUDIO_MPEG1;
+    StreamTypes += ES_TYPE_AUDIO_MPEG2;
+    StreamTypes += ES_TYPE_AUDIO_AC3;
+    StreamTypes += ES_TYPE_AUDIO_AAC;
+    StreamTypes += ES_TYPE_TELETEXT;
+    StreamTypes += ES_TYPE_SUBTITLE;
+
+    QMap<ES_Type, bool> flagged;
+    QValueList<ElementaryPIDObject>::Iterator es;
+    for (es = m_pmt.Components.begin(); es != m_pmt.Components.end(); ++es)
+    {
+        if (!StreamTypes.contains((*es).Type))
+        {
+            // Type not wanted
+            continue;
+        }
+
+        if (((*es).Type == ES_TYPE_AUDIO_MPEG1)
+                || ((*es).Type == ES_TYPE_AUDIO_MPEG2)
+                || ((*es).Type == ES_TYPE_AUDIO_AC3))
+        {
+            bool ignore = false;
+
+            // Check for audio descriptors
+            DescriptorList::Iterator dit;
+            for (dit = (*es).Descriptors.begin(); dit != (*es).Descriptors.end(); ++dit)
+            {
+                // Check for "Hearing impaired" or "Visual impaired commentary" stream
+                if (((*dit).Data[0] == 0x0A) && ((*dit).Data[5] & 0xFE == 0x02))
+                {
+                    ignore = true;
+                    break;
+                }
+            }
+
+            if (ignore)
+                continue; // Ignore this stream
+        }
+
+        if (Languages.isEmpty() // No specific language wanted
+            || (*es).Language.isEmpty() // Component has no language
+            || Languages.contains((*es).Language)) // This language is wanted!
+        {
+            (*es).Record = true;
+            flagged[(*es).Type] = true;
+        }
+    }
+
+    for (es = m_pmt.Components.begin(); es != m_pmt.Components.end(); ++es)
+    {
+        if (StreamTypes.contains((*es).Type) && !flagged.contains((*es).Type))
+        {
+            // We want this stream type but no component was flagged
+            (*es).Record = true;
+        }
+
+        if ((*es).Record)
+        {
+            VERBOSE(VB_RECORD, QString("DVB#%1 ").arg(_card_number_option)
+                << QString("AutoPID selecting PID %1, %2").arg((*es).PID).arg((*es).Description));
+
+            switch ((*es).Type)
+            {
+                case ES_TYPE_VIDEO_MPEG1:
+                case ES_TYPE_VIDEO_MPEG2:
+                    isVideo[(*es).PID] = true;
+                    break;
+
+                default:
+                    // Do nothing
+                    break;
+            }
+        }
+        else
+        {
+            VERBOSE(VB_RECORD, QString("DVB#%1 ").arg(_card_number_option)
+                << QString("AutoPID skipping PID %1, %2").arg((*es).PID).arg((*es).Description));
+        }
+    }
+
+    RECORD(QString("AutoPID Complete - PAT/PMT Loaded for service"));
+
+    if (m_pmt.FTA())
+        RECORD(QString("Service is FTA"))
+    else
+        RECORD(QString("Service has Conditional Access"))
 }
 
 void DVBRecorder::StartRecording()
 {
+    int cardnum = _card_number_option;
     if (!Open())
     {
-        error = true;
+        _error = true;
         return;
     }
 
-    int ret, dataflow = -1;
-    receiving = false;
     struct pollfd polls;
 
-    pthread_t qualthread;
-    bool qthreadexists = false;
-    signal_monitor_quit = false;
-
-    polls.fd = fd_dvr;
+    polls.fd = _stream_fd;
     polls.events = POLLIN;
     polls.revents = 0;
 
-    cont_errors = 0;
-    stream_overflows = 0;
-    bad_packets = 0;
+    _continuity_error_count = 0;
+    _stream_overflow_count = 0;
+    _bad_packet_count = 0;
 
-    // start the thread that logs signal data to the db
+    _request_recording = true;
+    _recording = true;
 
-/*
-    pthread_attr_t attr;
-    pthread_attr_init(&attr);
-    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+    pat_cc = 0x00;
+    pmt_cc = 0x00;
+    pkts_until_pat_pmt = 0;
 
-    if (signal_monitor_interval > 0 &&
-        pthread_create(&qualthread, &attr, QualityMonitorHelper, this) == 0)
+    while (_request_recording)
     {
-        qthreadexists = true;
-        RECORD("DVB Quality monitor is starting at " << 
-               signal_monitor_interval << "s for card " << cardnum);
-    }
-*/
-
-    encoding = true;
-    recording = true;
-
-    emit Started();
-    while (encoding)
-    {
-        if (channel_changed)
+        if (_reset_pid_filters)
         {
-            pthread_mutex_lock(&chan_opts.lock);
-            SetDemuxFilters(chan_opts.pids);
-            pthread_mutex_unlock(&chan_opts.lock);
-            channel_changed = false;
+            SetDemuxFilters();
+            CreatePAT(pat_pkt);
+            CreatePMT(pmt_pkt);
+            _reset_pid_filters = false;
         }
 
-        if (paused)
+        if (_request_pause)
         {
-            receiving = false;
-            mainpaused = true;
-            emit Paused();
+            _paused = true;
             pauseWait.wakeAll();
-            was_paused = true;
             usleep(50);
             continue;
         }
-        else if (was_paused)
+        else if (_paused)
         {
-            was_paused = false;
-            mainpaused = false;
-            emit Unpaused();
+            _paused = false;
         }
 
-        for (;;)
+        int ret;
+        do 
         {
             ret = poll(&polls, 1, 1000);
-            if (ret == -1 && (errno == EAGAIN || errno == EINTR))
-                continue;
-            break;
-        }
+        } while ((-1==ret) && ((EAGAIN==errno) || (EINTR==errno)));
 
-        if (ret == 0 && --dataflow < 1)
-            WARNING("No data from card in 1 second.");
-
-        if (ret == 1 && polls.revents & POLLIN)
+        if (ret == 0)
         {
-            dataflow = 1;
-
-            if (paused)
-                continue;
-
-            ReadFromDMX();
+            WARNING("No data from card in 1 second.");
+        }
+        else if (ret == 1 && polls.revents & POLLIN)
+        {
+            if (!_request_pause)
+                ReadFromDMX();
         }
         else if ((ret < 0) || (ret == 1 && polls.revents & POLLERR))
             ERRNO("Poll failed while waiting for data.");
@@ -469,34 +548,23 @@ void DVBRecorder::StartRecording()
 
     FinishRecording();
 
-    // stop collecting data if the thread was started successfully
-
-    if (qthreadexists)
-    {
-        signal_monitor_quit = true;
-    }
-
-    ExpireQualityData();
-
-    recording = false;
-
-    emit Stopped();
+    _recording = false;
 }
 
 void DVBRecorder::ReadFromDMX()
 {
+    int cardnum = _card_number_option;
     int readsz = 1;
     unsigned char *pktbuf;
 
     while (readsz > 0)
     {
-        readsz = read(fd_dvr, pktbuffer, pkt_buf_size);
-
+        readsz = read(_stream_fd, _buffer, _buffer_size);
         if (readsz < 0)
         {
             if (errno == EOVERFLOW)
             {
-                ++stream_overflows;
+                ++_stream_overflow_count;
                 RECORD("DVB Buffer overflow error detected on read");
                 break;
             }
@@ -516,55 +584,96 @@ void DVBRecorder::ReadFromDMX()
 
         int pkts = readsz / MPEG_TS_PKT_SIZE;
         int curpkt = 0;
+
         while (curpkt < pkts)
         {
-            pktbuf = pktbuffer + (curpkt * MPEG_TS_PKT_SIZE);
+            if (data_found == false)
+            {
+                GENERAL("Data read from DMX - This is for debugging with transform.c")
+                data_found = true;
+            }
+
+            pktbuf = _buffer + (curpkt * MPEG_TS_PKT_SIZE);
             curpkt++;
 
             int pes_offset = 0;
             int pid = ((pktbuf[1]&0x1f) << 8) | pktbuf[2];
+            uint8_t scrambling = (pktbuf[3] >> 6) & 0x03;
             uint8_t cc = pktbuf[3] & 0xf;
             uint8_t content = (pktbuf[3] & 0x30) >> 4;
 
             if (pktbuf[1] & 0x80)
             {
                 WARNING("Uncorrectable error in packet, dropped.");
-                ++bad_packets;
+                ++_bad_packet_count;
                 continue;
             }
 
-            if (pid_ipack.find(pid) == pid_ipack.end())
-                continue;
-            
-            if (!receiving)
+            if (scrambling)
             {
-                receiving = true;
-                emit Receiving();
+                if (!scrambled[pid])
+                {
+                    RECORD(QString("PID %1 is scrambled").arg(pid));
+                    scrambled[pid] = true;
+                }
+                continue; // Drop scrambled TS packet
+            }
+
+            if (scrambled[pid])
+            {
+                RECORD(QString("PID %1 is unscrambled").arg(pid));
+                scrambled[pid] = false;
             }
             
             if (content & 0x1)
             {
-                if (contcounter[pid] == 16)
-                    contcounter[pid] = cc;
+                if (_continuity_count[pid] == 16)
+                    _continuity_count[pid] = cc;
                 else
-                    contcounter[pid]++;
+                    _continuity_count[pid]++;
 
-                if (contcounter[pid] > 15)
-                    contcounter[pid] = 0;
+                if (_continuity_count[pid] > 15)
+                    _continuity_count[pid] = 0;
 
-                if (contcounter[pid] != cc)
+                if (_continuity_count[pid] != cc)
                 {
                     WARNING("Transport Stream Continuity Error. PID = " << pid );
-                    RECORD(QString("PID %1 contcounter %2 cc %3")
-                           .arg(pid).arg(contcounter[pid]).arg(cc));
-                    contcounter[pid] = cc;
-                    ++cont_errors;
-                }            
+                    RECORD(QString("PID %1 _continuity_count %2 cc %3")
+                           .arg(pid).arg(_continuity_count[pid]).arg(cc));
+                    _continuity_count[pid] = cc;
+                    ++_continuity_error_count;
+                }
             }
 
-            if (recordts)
+            if (_record_transport_stream_option)
             {
-                LocalProcessData(&pktbuf[0], readsz);
+                if (isVideo[pid])
+                {
+                    // Check for keyframe
+                    const TSPacket *pkt = reinterpret_cast<const TSPacket*>(pktbuf);
+                    FindKeyframes(pkt);
+                }
+
+                // Sync recording start to first keyframe
+                if (_wait_for_keyframe && !_keyframe_seen)
+                    continue;
+                if (!keyframe_found)
+                {
+                    keyframe_found = true;
+                    RECORD(QString("Found keyframe"));
+                }
+
+                // Sync streams to the first PUSI (after video keyframe)
+                if (!pusi_seen[pid])
+                {
+                    if ((pktbuf[1] & 0x40) == 0)
+                        continue; // No PUSI - drop packet
+
+                    RECORD(QString("Found payload_unit_start_indicator for PID%1").arg(pid));
+                    pusi_seen[pid] = true;
+                }
+
+                LocalProcessDataTS(pktbuf, MPEG_TS_PKT_SIZE);
                 continue;
             }
 
@@ -572,7 +681,6 @@ void DVBRecorder::ReadFromDMX()
             if (ip == NULL)
                 continue;
 
-            CorrectStreamNumber(ip,pid);
             ip->ps = 1;
 
             if ( (pktbuf[1] & 0x40) && (ip->plength == MMAX_PLENGTH-6) )
@@ -595,141 +703,119 @@ void DVBRecorder::ReadFromDMX()
     }
 }
 
-int DVBRecorder::GetVideoFd(void)
-{
-    return -1;
-}
-
-void DVBRecorder::FinishRecording()
-{
-    if (curRecording && db_lock && db_conn)
-    {
-        pthread_mutex_lock(db_lock);
-        MythContext::KickDatabase(db_conn);
-
-        curRecording->SetFilesize(ringBuffer->GetRealFileSize(), db_conn);
-        if (positionMapDelta.size())
-        {
-            curRecording->SetPositionMapDelta(positionMapDelta,
-                                              MARK_GOP_BYFRAME, db_conn);
-            positionMapDelta.clear();
-        }
-
-        pthread_mutex_unlock(db_lock);
-    }
-}
-
-void DVBRecorder::SetVideoFilters(QString &filters)
-{
-    (void)filters;
-}
-
-void DVBRecorder::Initialize(void)
-{
-}
-
 #define SEQ_START     0x000001B3
 #define GOP_START     0x000001B8
 #define PICTURE_START 0x00000100
 #define SLICE_MIN     0x00000101
 #define SLICE_MAX     0x000001af
 
-void DVBRecorder::ProcessData(unsigned char *buffer, int len, void *priv)
+void DVBRecorder::ProcessDataPS(unsigned char *buffer, int len, void *priv)
 {
-    ((DVBRecorder*)priv)->LocalProcessData(buffer, len);
+    ((DVBRecorder*)priv)->LocalProcessDataPS(buffer, len);
 }
 
-void DVBRecorder::LocalProcessData(unsigned char *buffer, int len)
+void DVBRecorder::LocalProcessDataPS(unsigned char *buffer, int len)
 {
-    if (recordts)
+    if (buffer[0] == 0x00 && buffer[1] == 0x00 && buffer[2] == 0x01)
     {
-        // FIXME: Mark gop positions (Combine with HDTVRecorder?)
-        // FIXME: Rewrite PMT/PAT
-        ringBuffer->Write(buffer, len);
-        return;
-    }
-
-    if (buffer[0] == 0x00 && buffer[1] == 0x00 &&
-        buffer[2] == 0x01 && (buffer[3]>>4) == 0xE)
-    {
-        int pos = 8 + buffer[8];
-        int datalen = len - pos;
-
-        unsigned char *bufptr = &buffer[pos];
-        unsigned int state = 0xFFFFFFFF, v = 0;
-        int prvcount = -1;
-
-        while (bufptr < &buffer[pos] + datalen)
+        switch  (buffer[3]) 
         {
-            if (++prvcount < 3)
-                v = prvpkt[prvcount];
-            else
-                v = *bufptr++;
+            case PRIVATE_STREAM1:
+                break;
+            case AUDIO_STREAM_S ... AUDIO_STREAM_E:
+                buffer[3] = 0xc0; // fix audio ID to 0xC0
+                break;
 
-            if (state == 0x000001)
+            case VIDEO_STREAM_S ... VIDEO_STREAM_E:
             {
-                state = ((state << 8) | v) & 0xFFFFFF;
-                if (state >= SLICE_MIN && state <= SLICE_MAX)
-                    continue;
+                int pos = 8 + buffer[8];
+                int datalen = len - pos;
 
-                if (state == SEQ_START)
-                    wait_for_seqstart = false;
+                unsigned char *bufptr = &buffer[pos];
+                unsigned int state = 0xFFFFFFFF, v = 0;
+                int prvcount = -1;
 
-                switch (state)
+                buffer[3] = 0xe0; // fix video ID to 0xE0
+                while (bufptr < &buffer[pos] + datalen)
                 {
-                    case GOP_START:
+                    if (++prvcount < 3)
+                        v = prvpkt[prvcount];
+                    else
+                        v = *bufptr++;
+
+                    if (state == 0x000001)
                     {
-                        long long startpos = ringBuffer->GetFileWritePosition();
+                        state = ((state << 8) | v) & 0xFFFFFF;
+                        if (state >= SLICE_MIN && state <= SLICE_MAX)
+                            continue;
 
-                        if (!positionMap.contains(framesWritten))
+                        if (state == SEQ_START)
+                            _wait_for_keyframe = false;
+
+                        switch (state)
                         {
-                            positionMapDelta[framesWritten] = startpos;
-                            positionMap[framesWritten] = startpos;
-
-                            if (curRecording && db_lock && db_conn &&
-                                ((positionMapDelta.size() % 30) == 0))
+                            case GOP_START:
                             {
-                                pthread_mutex_lock(db_lock);
-                                MythContext::KickDatabase(db_conn);
-                                curRecording->SetPositionMapDelta(
-                                                positionMapDelta, MARK_GOP_BYFRAME,
-                                                db_conn);
-                                curRecording->SetFilesize(startpos, db_conn);
-                                pthread_mutex_unlock(db_lock);
-                                positionMapDelta.clear();
-                            }
-                        }
-                    }
-                    break;
+                                long long startpos = ringBuffer->GetFileWritePosition();
 
-                    case PICTURE_START:
-                        framesWritten++;
-                    break;
+                                if (!_position_map.contains(_frames_written_count))
+                                {
+                                    _position_map_delta[_frames_written_count] = startpos;
+                                    _position_map[_frames_written_count] = startpos;
+
+                                    if (curRecording && db_lock && db_conn &&
+                                        ((_position_map_delta.size() % 30) == 0))
+                                    {
+                                        pthread_mutex_lock(db_lock);
+                                        MythContext::KickDatabase(db_conn);
+                                        curRecording->SetPositionMapDelta(
+                                                           _position_map_delta,
+                                                           MARK_GOP_BYFRAME,
+                                                           db_conn);
+                                        curRecording->SetFilesize(startpos, db_conn);
+                                        pthread_mutex_unlock(db_lock);
+                                        _position_map_delta.clear();
+                                    }
+                                }
+                                break;
+                            }
+
+                            case PICTURE_START:
+                                _frames_written_count++;
+                                break;
+                        }
+                        continue;
+                    }
+                    state = ((state << 8) | v) & 0xFFFFFF;
                 }
-                continue;
+                break;
             }
-            state = ((state << 8) | v) & 0xFFFFFF;
         }
 
-        memcpy(prvpkt, &buffer[len-3], 3);
+        memcpy(prvpkt, &buffer[len - 3], 3);
     }
 
-    if (!wait_for_seqstart)
+    if (!_wait_for_keyframe)
         ringBuffer->Write(buffer, len);
 }
 
-void DVBRecorder::StopRecording(void)
+void DVBRecorder::LocalProcessDataTS(unsigned char *buffer, int len)
 {
-    encoding = false;
+    if (pkts_until_pat_pmt == 0)
+    {
+        ringBuffer->Write(pat_pkt, 188);
+        ringBuffer->Write(pmt_pkt, 188);
+        pkts_until_pat_pmt = 2000;
+    }
+    else
+        pkts_until_pat_pmt--;
+
+    ringBuffer->Write(buffer,len);
 }
 
 void DVBRecorder::Reset(void)
 {
-    error = false;
-    framesWritten = 0;
-
-    positionMap.clear();
-    positionMapDelta.clear();
+    DTVRecorder::Reset();
 
     if (curRecording && db_lock && db_conn)
     {
@@ -740,155 +826,190 @@ void DVBRecorder::Reset(void)
     }
 }
 
-void DVBRecorder::Pause(bool clear)
+void DVBRecorder::CreatePAT(uint8_t *ts_packet)
 {
-    cleartimeonpause = clear;
-    mainpaused = false;
-    paused = true;
+    memset(ts_packet, 0xFF, 188);
+
+    ts_packet[0] = 0x47;                            // sync byte
+    ts_packet[1] = 0x40 | ((PAT_PID >> 8) & 0x1F);  // payload start & PID
+    ts_packet[2] = PAT_PID & 0xFF;                  // PID
+    ts_packet[3] = 0x10 | pat_cc;                   // scrambling, adaptation & continuity counter
+    ts_packet[4] = 0x00;                            // pointer field
+
+    ++pat_cc &= 0x0F;   // inc. continuity counter
+    uint8_t *pat = ts_packet + 5;
+    int p = 0;
+
+    pat[p++] = PAT_TID; // table ID
+    pat[p++] = 0xB0;    // section syntax indicator
+    p++;                // section length (set later)
+    pat[p++] = 0;       // TSID
+    pat[p++] = 1;       // TSID
+    pat[p++] = 0xC3;    // Version + Current/Next
+    pat[p++] = 0;       // Current Section
+    pat[p++] = 0;       // Last Section
+    pat[p++] = 0;
+    pat[p++] = 1;        // Always write ServiceID as 1
+    pat[p++] = (PMT_PID >> 8) & 0x1F;
+    pat[p++] = PMT_PID & 0xFF;
+
+    pat[2] = p + 4 - 3; // section length
+
+    unsigned int crc = mpegts_crc32(pat, p);
+    pat[p++] = (crc >> 24) & 0xFF;
+    pat[p++] = (crc >> 16) & 0xFF;
+    pat[p++] = (crc >> 8) & 0xFF;
+    pat[p++] = crc & 0xFF;
 }
 
-void DVBRecorder::Unpause(void)
-{
-    paused = false;
-}
+void DVBRecorder::CreatePMT(uint8_t *ts_packet) {
+    memset(ts_packet, 0xFF, 188);
 
-bool DVBRecorder::GetPause(void)
-{
-    return mainpaused;
-}
+    ts_packet[0] = 0x47;                            // sync byte
+    ts_packet[1] = 0x40 | ((PMT_PID >> 8) & 0x1F);  // payload start & PID
+    ts_packet[2] = PMT_PID & 0xFF;                  // PID
+    ts_packet[3] = 0x10 | pmt_cc;                   // scrambling, adaptation & continuity counter
+    ts_packet[4] = 0x00;                            // pointer field
 
-void DVBRecorder::WaitForPause(void)
-{
-    if (!mainpaused)
-        if (!pauseWait.wait(1000))
-            ERROR("Waited too long for recorder to pause.");
-}
+    ++pmt_cc &= 0x0F;   // inc. continuity counter
+    uint8_t *pmt = ts_packet + 5;
+    int p = 0;
 
-bool DVBRecorder::IsRecording(void)
-{
-    return recording;
-}
+    pmt[p++] = PMT_TID; // table ID
+    pmt[p++] = 0xB0;    // section syntax indicator
+    p++;                // section length (set later)
+    pmt[p++] = 0;       // program number (ServiceID)
+    pmt[p++] = 1;       // program number (ServiceID)
+    pmt[p++] = 0xC3;    // Version + Current/Next
+    pmt[p++] = 0;       // Current Section
+    pmt[p++] = 0;       // Last Section
+    pmt[p++] = (m_pmt.PCRPID >> 8) & 0x1F;
+    pmt[p++] = m_pmt.PCRPID & 0xFF;
 
-long long DVBRecorder::GetFramesWritten(void)
-{
-    return framesWritten;
-}
-
-long long DVBRecorder::GetKeyframePosition(long long desired)
-{
-    long long ret = -1;
-
-    if (positionMap.find(desired) != positionMap.end())
-        ret = positionMap[desired];
-
-    return ret;
-}
-
-void DVBRecorder::GetBlankFrameMap(QMap<long long, int> &blank_frame_map)
-{
-    (void)blank_frame_map;
-}
-
-// we need the capture card id and I can't see an easy way to get it
-// from this object
-
-int DVBRecorder::GetIDForCardNumber(int cardnum)
-{
-    pthread_mutex_lock(db_lock);
-    int cardid = -1;
-
-    QSqlQuery result = db_conn->exec(QString("SELECT cardid FROM capturecard "
-                                        "WHERE videodevice=\"%1\" AND "
-                                        " cardtype='DVB';").arg(cardnum));
-
-    if (result.isActive() && result.numRowsAffected() > 0)
+    // Write descriptors
+    int program_info_length = 0;
+    DescriptorList::Iterator dit;
+    for (dit = m_pmt.Descriptors.begin(); dit != m_pmt.Descriptors.end(); ++dit)
     {
-        result.next();
-
-        cardid = result.value(0).toInt();
+        int len = (*dit).Length;
+        memcpy(&pmt[p + 2 + program_info_length], (*dit).Data, len);
+        program_info_length += len;
     }
-    else
-        RECORD("Could not get cardid for card number " << cardnum);
 
-    pthread_mutex_unlock(db_lock);
+    // Program info length
+    pmt[p++] = (program_info_length >> 8) & 0x0F;
+    pmt[p++] = program_info_length & 0xFF;
+    p += program_info_length;
 
-    return cardid;
-}
-
-void DVBRecorder::QualityMonitorSample(int cardid,
-                                       dvb_stats_t& sample)
-{
-    QString sql = QString("INSERT INTO dvb_signal_quality("
-                          "sampletime, cardid, fe_snr, fe_ss, fe_ber, "
-                          "fe_unc, myth_cont, myth_over, myth_pkts) "
-                          "VALUES(NOW(), "
-                          "\"%1\",\"%2\",\"%3\",\"%4\","
-                          "\"%5\",\"%6\",\"%7\",\"%8\");")
-        .arg(cardid)
-        .arg(sample.snr & 0xffff)
-        .arg(sample.ss & 0xffff).arg(sample.ber).arg(sample.ub)
-        .arg(cont_errors).arg(stream_overflows).arg(bad_packets);
-
-    QSqlQuery result = db_conn->exec(sql);
-
-    if (!result.isActive())
-        MythContext::DBError("DVB quality sample insert failed", result);
-}
-
-void *DVBRecorder::QualityMonitorThread()
-{
-    dvb_stats_t fe_stats;
-
-    int cardid = GetIDForCardNumber(cardnum);
-
-    // loop until cancelled, wake at intervals and log data
-
-    while (!signal_monitor_quit)
+    QValueList<ElementaryPIDObject>::Iterator es;
+    for (es = m_pmt.Components.begin(); es != m_pmt.Components.end(); ++es)
     {
-        sleep(signal_monitor_interval);
-
-        if (signal_monitor_quit)
-            break;
-
-        if (cardid >= 0 &&
-            db_conn != NULL && db_lock != NULL && dvbchannel != NULL &&
-            dvbchannel -> FillFrontendStats(fe_stats))
+        if ((*es).Record)
         {
-            pthread_mutex_lock(db_lock);
+            // Normalize stream type to make ffmpeg happy
+            uint8_t stream_type;
+            switch ((*es).Type)
+            {
+                case ES_TYPE_VIDEO_MPEG1:
+                    stream_type = STREAM_TYPE_VIDEO_MPEG1;
+                    break;
+                case ES_TYPE_VIDEO_MPEG2:
+                    stream_type = STREAM_TYPE_VIDEO_MPEG2;
+                    break;
+                case ES_TYPE_VIDEO_MPEG4:
+                    stream_type = STREAM_TYPE_VIDEO_MPEG4;
+                    break;
+                case ES_TYPE_VIDEO_H264:
+                    stream_type = STREAM_TYPE_VIDEO_H264;
+                    break;
 
-            QualityMonitorSample(cardid, fe_stats);
+                case ES_TYPE_AUDIO_MPEG1:
+                    stream_type = STREAM_TYPE_AUDIO_MPEG1;
+                    break;
+                case ES_TYPE_AUDIO_MPEG2:
+                    stream_type = STREAM_TYPE_AUDIO_MPEG2;
+                    break;
+                case ES_TYPE_AUDIO_AC3:
+                    stream_type = STREAM_TYPE_AUDIO_AC3;
+                    break;
+                case ES_TYPE_AUDIO_DTS:
+                    stream_type = STREAM_TYPE_AUDIO_DTS;
+                    break;
+                case ES_TYPE_AUDIO_AAC:
+                    stream_type = STREAM_TYPE_AUDIO_AAC;
+                    break;
 
-            pthread_mutex_unlock(db_lock);
+                default:
+                    stream_type = (*es).Orig_Type;
+                    break;
+            }
+            pmt[p++] = stream_type;
+
+            pmt[p++] = ((*es).PID >> 8) & 0x1F;
+            pmt[p++] = (*es).PID & 0xFF;
+
+
+            // Write descriptors
+            int es_info_length = 0;
+            DescriptorList::Iterator dit;
+            for (dit = (*es).Descriptors.begin(); dit != (*es).Descriptors.end(); ++dit)
+            {
+                int len = (*dit).Length;
+                memcpy(&pmt[p + 2 + es_info_length], (*dit).Data, len);
+                es_info_length += len;
+            }
+
+            // ES info length
+            pmt[p++] = (es_info_length >> 8) & 0x0F;
+            pmt[p++] = es_info_length & 0xFF;
+            p += es_info_length;
         }
     }
 
-    RECORD("DVB Quality monitor thread stopped for card " << cardnum);
-    return NULL;
+    pmt[2] = p + 4 - 3; // section length
+
+    unsigned long crc = mpegts_crc32(pmt, p);
+    pmt[p++] = (crc >> 24) & 0xFF;
+    pmt[p++] = (crc >> 16) & 0xFF;
+    pmt[p++] = (crc >> 8) & 0xFF;
+    pmt[p++] = crc & 0xFF;
 }
 
-void DVBRecorder::ExpireQualityData()
+void DVBRecorder::DebugTSHeader(unsigned char* buffer, int len)
 {
-    RECORD("Expiring DVB quality data older than " << expire_data_days <<
-           " day(s)");
+    (void) len;
 
-    pthread_mutex_lock(db_lock);
+    uint8_t sync = buffer[0];
+    uint8_t transport_error = (buffer[1] & 0x80) >> 7;
+    uint8_t payload_start = (buffer[1] & 0x40) >> 6;
+    uint16_t pid = (buffer[1] & 0x1F) << 8 | buffer[2];
+    uint8_t transport_scrambled = (buffer[3] & 0xB0) >> 6;
+    uint8_t adaptation_control = (buffer[3] & 0x30) >> 4;
+    uint8_t counter = buffer[3] & 0x0F;
 
-    QString sql = QString("DELETE FROM dvb_signal_quality "
-                          "WHERE sampletime < "
-                          "SUBDATE(NOW(), INTERVAL \"%1\" DAY);").
-        arg(expire_data_days);
+    int pos=4;
+    if (adaptation_control == 2 || adaptation_control == 3)
+    {
+        unsigned char adaptation_length;
+        adaptation_length = buffer[pos++];
+        pos += adaptation_length;
+    }
 
-    QSqlQuery query = db_conn->exec(sql);
+    QString debugmsg = QString("sync: %1 err: %2 paystart: %3 pid: %4 enc: %5 adaptation: %6 counter: %7")
+                       .arg(sync,2,16)
+                       .arg(transport_error)
+                       .arg(payload_start)
+                       .arg(pid)
+                       .arg(transport_scrambled)
+                       .arg(adaptation_control)
+                       .arg(counter);
 
-    if (!query.isActive())
-        MythContext::DBError("Could not expire DVB signal data",
-                             query);
+    const TSPacket *pkt = reinterpret_cast<const TSPacket*>(&buffer[0]);
+    FindKeyframes(pkt);
 
-    pthread_mutex_unlock(db_lock);
-}
+    int cardnum = _card_number_option;
+    GENERAL(debugmsg);
 
-void *DVBRecorder::QualityMonitorHelper(void *self)
-{
-    return ((DVBRecorder *)self)->QualityMonitorThread();
+//TODO
 }
 

@@ -19,10 +19,11 @@ using namespace std;
 
 #include "dvbtypes.h"
 #include "dvbdiseqc.h"
+#include "dvbsiparser.h"
 
 class TVRec;
 class DVBCam;
-class DVBSections;
+class DVBSignalMonitor;
 
 class DVBChannel : public QObject, public ChannelBase
 {
@@ -37,8 +38,8 @@ public:
 
     fe_type_t GetCardType() { return info.type; };
 
+    bool SetTransportByInt(int mplexid);
     bool SetChannelByString(const QString &chan);
-    bool Tune(dvb_channel_t& channel, bool all=false);
 
     void SetFreqTable(const QString &name);
     void SwitchToInput(const QString &inputname, const QString &chan);
@@ -52,6 +53,7 @@ public:
                    const QString& symbol_rate, const QString& fec_inner,
                    const QString& pol, 
                    const QString& diseqc_type, const QString& diseqc_port,
+                   const QString& diseqc_pos,
                    const QString& lnb_lof_switch, const QString& lnb_lof_hi,
                    const QString& lnb_lof_lo, dvb_tuning_t& t);
 
@@ -65,64 +67,64 @@ public:
                    const QString& trans_mode, const QString& guard_interval,
                    const QString& hierarchy, dvb_tuning_t& p);
 
+    bool ParseATSC(const QString& frequency, const QString modulation,
+                   dvb_tuning_t& t);
+
+    bool Tune(dvb_channel_t& channel, bool all=false);
+    bool TuneTransport(dvb_channel_t& channel, bool all=false, int timeout=30000);
+    int  GetCurrentTransportDBID() { return currentTID; };
+    int  GetCardNum() { return cardnum; };
     void RecorderStarted();
-    bool FillFrontendStats(dvb_stats_t &stats);
+
+    void SetCAPMT(PMTObject pmt);
+
+    DVBSIParser*        siparser;
+    DVBSignalMonitor*   monitor;
+
+public slots:
+    void SetPMT(PMTObject NewPMT);
 
 signals:
     void ChannelChanged(dvb_channel_t& chan);
-
-    void Status(dvb_stats_t &stats);
-    void Status(QString val);
-
-    void StatusSignalToNoise(int);
-    void StatusSignalStrength(int);
-    void StatusBitErrorRate(int);
-    void StatusUncorrectedBlocks(int);
-
-protected:
-    void connectNotify(const char* signal);
-    void disconnectNotify(const char* signal);
+    void Tuning(dvb_channel_t& channel);
 
 private:
-    static void* StatusMonitorHelper(void*);
-    void StatusMonitorLoop();
+    bool GetTransportOptions(int mplexid);
 
     bool GetChannelOptions(QString channum);
-    bool GetChannelPids(QSqlDatabase*& db_conn, pthread_mutex_t*& db_lock,
-                        int chanid);
+
     void PrintChannelOptions();
 
     void CheckOptions();
     bool CheckModulation(fe_modulation_t& modulation);
     bool CheckCodeRate(fe_code_rate_t& rate);
 
+    bool ParseTransportQuery(QSqlQuery& query);
+    bool ParseChannelQuery(QSqlQuery& query);
+
     bool TuneQPSK(dvb_tuning_t& tuning, bool reset, bool& havetuned);
     bool TuneQAM(dvb_tuning_t& tuning, bool reset, bool& havetuned);
     bool TuneOFDM(dvb_tuning_t& tuning, bool reset, bool& havetuned);
+    bool TuneATSC(dvb_tuning_t& tuning, bool reset, bool& havetuned);
 
-    bool ParseQuery(QSqlQuery& query);
+    static void *SpawnSectionReader(void *param);
+    static void *SpawnSIParser(void *param);
 
-private:
-    int cardnum;
+    DVBDiSEqC*          diseqc;
+    DVBCam*             dvbcam;
 
-    struct dvb_frontend_info info;
+    pthread_t           siparser_thread;
 
-    bool force_channel_change;
-    bool first_tune;
-    dvb_channel_t   chan_opts;
-    dvb_tuning_t    prev_tuning;
+    dvb_frontend_info   info;
+    dvb_channel_t       chan_opts;
+    dvb_tuning_t        prev_tuning;
 
-    int fd_frontend;
-    bool isOpen;
+    int     cardnum;
+    volatile int fd_frontend;
+    int     currentTID;
 
-    pthread_t statusMonitorThread;
-    bool monitorRunning;
-    int monitorClients;
-
-    DVBDiSEqC* diseqc;
-
-    DVBCam*      dvbcam;
-    DVBSections* dvbsct;
+    bool    force_channel_change;
+    bool    first_tune;
 };
 
 #endif

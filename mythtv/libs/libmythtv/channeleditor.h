@@ -19,11 +19,16 @@ public slots:
     void del();
     void edit();
     void edit(int);
+    void scan();
+    void advanced();
 
 private:
     ChannelListSetting* list;
     QSqlDatabase* db;
     int id;
+
+    TransButtonSetting *buttonScan;
+    TransButtonSetting *buttonAdvanced;
 };
 
 class ChannelID;

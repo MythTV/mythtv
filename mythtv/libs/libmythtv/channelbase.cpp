@@ -33,27 +33,59 @@ ChannelBase::~ChannelBase(void)
 
 bool ChannelBase::ChannelUp(void)
 {
+    bool fTune = false;
+    QString start;
     QString nextchan = pParent->GetNextChannel(this, CHANNEL_DIRECTION_UP);
-    if (SetChannelByString(nextchan))
-        return true;
-    else
-        return false;
+    start = nextchan;
+
+    do
+    {
+       fTune = SetChannelByString(nextchan);
+       if (!fTune)
+           nextchan = pParent->GetNextChannel(this, CHANNEL_DIRECTION_UP);
+    }
+    while (!fTune && nextchan != start);
+
+    return fTune;
 }
 
 bool ChannelBase::ChannelDown(void)
 {
+    bool fTune = false;
+    QString start;
+
     QString nextchan = pParent->GetNextChannel(this, CHANNEL_DIRECTION_DOWN);
-    if (SetChannelByString(nextchan))
-        return true;
-    else
-        return false;
+    start = nextchan;
+
+    do
+    {
+       fTune = SetChannelByString(nextchan);
+       if (!fTune)
+           nextchan = pParent->GetNextChannel(this, CHANNEL_DIRECTION_DOWN);
+    }
+    while (!fTune && nextchan != start);
+
+    return fTune;
 }
 
 bool ChannelBase::NextFavorite(void)
 {
+    bool fTune = false;
+    QString start;
+
     QString nextchan = pParent->GetNextChannel(this, 
                                                CHANNEL_DIRECTION_FAVORITE);
-    return SetChannelByString(nextchan);
+    start = nextchan;
+    do
+    {
+       fTune = SetChannelByString(nextchan);
+       if (!fTune)
+           nextchan = pParent->GetNextChannel(this,
+                                               CHANNEL_DIRECTION_FAVORITE);
+    }
+    while (!fTune && nextchan != start);
+
+    return fTune;
 }
 
 QString ChannelBase::GetCurrentName(void)

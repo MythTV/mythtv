@@ -77,6 +77,8 @@ DEFINES += USING_OSS
 # Note: INCLUDEPATH should point to the directory with
 #   'linux/dvb/frontend.h', not the directory with frontend.h
 #INCLUDEPATH += /usr/src/linuxtv-dvb-1.0.1/include
+#define the following if you want On Air Guide information
+#DEFINES += USING_DVB_EIT
 
 # Joystick menu support
 CONFIG += using_joystick_menu

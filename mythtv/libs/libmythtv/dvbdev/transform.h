@@ -34,7 +34,14 @@
 #include <netinet/in.h>
 #include <stdio.h>
 #include <unistd.h>
-#include "remux.h"
+
+#ifndef VIDEO_MODE_PAL
+#define VIDEO_MODE_PAL 0
+#endif
+
+#ifndef VIDEO_MODE_NTSC
+#define VIDEO_MODE_NTSC 1
+#endif
 
 #define PROG_STREAM_MAP  0xBC
 #ifndef PRIVATE_STREAM1
@@ -110,137 +117,73 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif				/* __cplusplus */
+#endif                /* __cplusplus */
 
-#define P2P_LENGTH 2048
+    enum{ PRIV_NONE, PRIV_DVD_AC3, PRIV_DVB_SUB, PRIV_TS_AC3};
 
-	enum{NOPES, AUDIO, VIDEO, AC3};
+    typedef struct video_i{
+        uint32_t horizontal_size;
+        uint32_t vertical_size  ;
+        uint32_t aspect_ratio   ;
+        double framerate        ;
+        uint32_t video_format;
+        uint32_t bit_rate       ;
+        uint32_t comp_bit_rate  ;
+        uint32_t vbv_buffer_size;
+        uint32_t CSPF           ;
+        uint32_t off;
+    } VideoInfo;
 
-	typedef struct p2pstruct {
-		int found;
-		uint8_t buf[MMAX_PLENGTH];
-		uint8_t cid;
-		uint8_t subid;
-		uint32_t plength;
-		uint8_t plen[2];
-		uint8_t flag1;
-		uint8_t flag2;
-		uint8_t hlength;
-		uint8_t pts[5];
-		int mpeg;
-		uint8_t check;
-		int fd1;
-		int fd2;
-		int es;
-		int filter;
-		int which;
-		int done;
-		int repack;
-		uint16_t bigend_repack;
-		void (*func)(uint8_t *buf, int count, void *p);
-		int startv;
-                int starta;
-		int64_t apts;
-                int64_t vpts;
-		uint16_t pid;
-		uint16_t pida;
-		uint16_t pidv;
-		uint8_t acounter;
-		uint8_t vcounter;
-		uint8_t count0;
-		uint8_t count1;
-		void *data;
-	} p2p;
+    typedef struct audio_i{
+        int layer;
+        uint32_t bit_rate;
+        uint32_t frequency;
+        uint32_t mode;
+        uint32_t mode_extension;
+        uint32_t emphasis;
+        uint32_t framesize;
+        uint32_t off;
+    } AudioInfo;
+    
+    typedef struct ipack_s {
+        int size;
+        int size_orig;
+        int found;
+        int ps;
+        int has_ai;
+        int has_vi;
+        AudioInfo ai;
+        VideoInfo vi;
+        uint8_t *buf;
+        uint8_t cid;
+        uint32_t plength;
+        uint8_t plen[2];
+        uint8_t flag1;
+        uint8_t flag2;
+        uint8_t hlength;
+        int mpeg;
+        uint8_t check;
+        int which;
+        int done;
+        void *data;
+        void (*func)(uint8_t *buf,  int size, void *priv);
+        int count;
+        int start;
+        int replaceid;
+        int priv_type;
+    } ipack;
 
-	
-	uint64_t trans_pts_dts(uint8_t *pts);
-	int write_ts_header(uint16_t pid, uint8_t *counter, int pes_start, 
-			    uint8_t *buf, uint8_t length);
-	uint16_t get_pid(uint8_t *pid);
-	void init_p2p(p2p *p, void (*func)(uint8_t *buf, int count, void *p),
-		      int repack);
-	void get_pes (uint8_t *buf, int count, p2p *p, void (*func)(p2p *p));
-	void get_pes (uint8_t *buf, int count, p2p *p, void (*func)(p2p *p));
-	void pes_repack(p2p *p);
-	void setup_pes2ts( p2p *p, uint32_t pida, uint32_t pidv, 
-			   void (*ts_write)(uint8_t *buf, int count, void *p));
-	void kpes_to_ts( p2p *p,uint8_t *buf ,int count );
-	void setup_ts2pes( p2p *pa, p2p *pv, uint32_t pida, uint32_t pidv, 
-			   void (*pes_write)(uint8_t *buf, int count, void *p));
-	void kts_to_pes( p2p *p, uint8_t *buf);
-	void pes_repack(p2p *p);
-	void extract_from_pes(int fdin, int fdout, uint8_t id, int es);
-	int64_t pes_dmx(int fdin, int fdouta, int fdoutv, int es);
-	void pes_to_ts2( int fdin, int fdout, uint16_t pida, uint16_t pidv);
-	void ts_to_pes( int fdin, uint16_t pida, uint16_t pidv, int pad);
-	int get_ainfo(uint8_t *mbuf, int count, AudioInfo *ai, int pr);
-	int get_vinfo(uint8_t *mbuf, int count, VideoInfo *vi, int pr);
-	int get_ac3info(uint8_t *mbuf, int count, AudioInfo *ai, int pr);
-	void filter_audio_from_pes(int fdin, int fdout, uint8_t id, 
-				   uint8_t subid);
-
-
-//instant repack
-
-	typedef struct ipack_s {
-		int size;
-		int size_orig;
-		int found;
-		int ps;
-		int has_ai;
-		int has_vi;
-		AudioInfo ai;
-		VideoInfo vi;
-		uint8_t *buf;
-		uint8_t cid;
-		uint32_t plength;
-		uint8_t plen[2];
-		uint8_t flag1;
-		uint8_t flag2;
-		uint8_t hlength;
-		uint8_t pts[5];
-		uint8_t last_pts[5];
-		int mpeg;
-		uint8_t check;
-		int which;
-		int done;
-		void *data;
-		void *data2;
-		void (*func)(uint8_t *buf,  int size, void *priv);
-		int count;
-		int start;
-		int fd;
-		int fd1;
-		int fd2;
-		int ffd;
-		int playing;
-		int start_header;
-		int muxr;
-		struct ipack_s *pv;
-		struct ipack_s *pa;
-	} ipack;
-
-	void instant_repack (uint8_t *buf, int count, ipack *p);
-	void init_ipack(ipack *p, int size,
-			void (*func)(uint8_t *buf,  int size, void *priv),
-			int pad);
-	void free_ipack(ipack * p);
-	void send_ipack(ipack *p);
-	void reset_ipack(ipack *p);		     
-	void ps_pes(ipack *p);
-	// use with ipack structure, repack size and callback func 
-
-	int64_t ts_demux(int fd_in, int fdv_out,int fda_out,uint16_t pida,
-			  uint16_t pidv, int es);
-
-	void ts2es(int fdin,  uint16_t pidv);
-	void ts2es_opt(int fdin,  uint16_t pidv, ipack *p, int verb);
-	void insert_pat_pmt( int fdin, int fdout);
-	void change_aspect(int fdin, int fdout, int aspect);
+    void instant_repack (uint8_t *buf, int count, ipack *p);
+    void init_ipack(ipack *p, int size,
+                    void (*func)(uint8_t *buf,  int size, void *priv));
+    void free_ipack(ipack * p);
+    void send_ipack(ipack *p);
+    void reset_ipack(ipack *p);             
+    void ps_pes(ipack *p);
 
 #ifdef __cplusplus
 }
-#endif				/* __cplusplus */
+#endif                /* __cplusplus */
 
 #endif /* _TS_TRANSFORM_H_*/
 

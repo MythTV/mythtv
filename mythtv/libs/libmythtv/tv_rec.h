@@ -19,6 +19,7 @@ class ProgramInfo;
 class RingBuffer;
 class NuppelVideoRecorder;
 class RecorderBase;
+class SIScan;
 
 typedef enum
 {
@@ -233,6 +234,11 @@ class TVRec
     dvb_options_t dvb_options;
 
     char requestBuffer[256001];
+
+#ifdef USING_DVB
+    SIScan* scanner;
+    pthread_t scanner_thread;
+#endif
 };
 
 #endif

@@ -121,12 +121,12 @@ class cCiCaPmt {
   friend class cCiConditionalAccessSupport;
 private:
   int length;
-  int esInfoLengthPos;
+  int infoLengthPos;
   uint8_t capmt[2048]; ///< XXX is there a specified maximum?
 public:
   cCiCaPmt(int ProgramNumber, uint8_t cplm = CPLM_ONLY);
-  void AddPid(int Pid);
-  void AddCaDescriptor(int Length, uint8_t *Data);
+  void AddElementaryStream(int type, int pid);
+  void AddCaDescriptor(int ca_system_id, int ca_pid, int data_len, uint8_t *data);
   };
 
 #define MAX_CI_SESSION  16 //XXX

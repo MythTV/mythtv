@@ -34,6 +34,7 @@ using namespace std;
 #ifdef USING_DVB
 #include "dvbchannel.h"
 #include "dvbrecorder.h"
+#include "siscan.h"
 #endif
 
 void *SpawnEncode(void *param)
@@ -43,11 +44,25 @@ void *SpawnEncode(void *param)
     return NULL;
 }
 
+#ifdef USING_DVB
+void *SpawnScanner(void *param)
+{
+    SIScan *scanner = (SIScan *)param;
+    scanner->StartScanner();
+    return NULL;
+}
+#endif
+
 TVRec::TVRec(int capturecardnum) 
 {
     db_conn = NULL;
     channel = NULL;
     rbuffer = NULL;
+
+#ifdef USING_DVB
+    scanner = NULL;
+#endif
+
     encode = static_cast<pthread_t>(0);
     nvr = NULL;
     readthreadSock = NULL;
@@ -77,7 +92,12 @@ TVRec::TVRec(int capturecardnum)
     {
 #ifdef USING_DVB
         channel = new DVBChannel(videodev.toInt(), this);
+        channel->SetDB(db_conn, &db_lock);
         channel->Open();
+
+        scanner = new SIScan((DVBChannel *)channel, db_conn, &db_lock, 1);
+        pthread_create(&scanner_thread, NULL, SpawnScanner, scanner);
+
         if (inputname.isEmpty())
             channel->SetChannelByString(startchannel);
         else
@@ -147,6 +167,15 @@ TVRec::~TVRec(void)
     runMainLoop = false;
     pthread_join(event, NULL);
 
+#ifdef USING_DVB
+    if (scanner)
+    {
+        scanner->StopScanner();
+        pthread_join(scanner_thread, NULL);
+        delete scanner;
+    }
+#endif
+
     if (channel)
         delete channel;
     if (rbuffer)
@@ -155,6 +184,8 @@ TVRec::~TVRec(void)
         delete nvr;
     if (db_conn)
         DisconnectDB();
+
+    pthread_mutex_destroy(&db_lock);
 }
 
 TVState TVRec::GetState(void)

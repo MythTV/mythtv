@@ -5,6 +5,8 @@
  *      MythTV      http://www.mythtv.org
  *
  * Author(s):
+ *      Jesper Sorensen
+ *          - Changed to work with Taylor Jacob's DVB rewrite
  *      Kenneth Aafloy
  *          - General Implementation
  *
@@ -32,7 +34,6 @@
  */
 
 #include <qdatetime.h>
-#include <qsqldatabase.h>
 #include <qvariant.h>
 
 #include <iostream>
@@ -50,146 +51,67 @@ using namespace std;
 
 #include "dvbdev.h"
 
-#include "dvbsections.h"
 #include "dvbcam.h"
 #include "dvbchannel.h"
 #include "dvbrecorder.h"
 
 DVBCam::DVBCam(int cardNum): cardnum(cardNum)
 {
-    exitCiThread = false;
     ciThreadRunning = false;
     ciHandler = NULL;
-    pmtbuf = cachedpmtbuf = NULL;
-    pmtlen = 0;
-    first_send = false;
+
     pthread_mutex_init(&pmt_lock, NULL);
 }
 
 DVBCam::~DVBCam()
 {
+    Stop();
+
+    pthread_mutex_destroy(&pmt_lock);
+}
+
+bool DVBCam::Start()
+{
+    exitCiThread = false;
+    have_pmt = false;
+    pmt_sent = false;
+    pmt_updated = false;
+    pmt_added = false;
+
+    ciHandler = cCiHandler::CreateCiHandler(dvbdevice(DVB_DEV_CA, cardnum));
+    if (ciHandler == NULL)
+    {
+        ERROR("CA: Failed to initialize CI handler");
+        return false;
+    }
+
+    pthread_create(&ciHandlerThread, NULL, CiHandlerThreadHelper, this);
+
+    GENERAL("CA: CI handler successfully initialized!");
+
+    return true;
+}
+
+bool DVBCam::Stop()
+{    
     if (ciThreadRunning)
-        Close();
+    {
+        exitCiThread = true;
+        pthread_join(ciHandlerThread, NULL);
+    }
 
     if (ciHandler)
+    {
         delete ciHandler;
-}
-
-bool DVBCam::Open()
-{
-    ciHandler = cCiHandler::CreateCiHandler(dvbdevice(DVB_DEV_CA, cardnum));
-
-    if (ciHandler == NULL)
-        return false;
-
-    GENERAL("CAM - Initialized successfully.");
-
-    pthread_attr_t attr;
-    pthread_attr_init(&attr);
-    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-
-    pthread_create(&ciHandlerThread, &attr, CiHandlerThreadHelper, this);
+        ciHandler = NULL;
+    }
 
     return true;
 }
 
-bool DVBCam::Close()
-{    
-    exitCiThread = true;
-    while(ciThreadRunning)
-        usleep(50);
-
-    return true;
-}
-
-void DVBCam::ChannelChanged(dvb_channel_t& chan)
+bool DVBCam::IsRunning()
 {
-    pthread_mutex_lock(db_lock);
-
-    MythContext::KickDatabase(db);
-    QSqlQuery query = db->exec(QString("SELECT pmtcache FROM dvb_channel"
-                               " WHERE serviceid=%1").arg(chan.serviceID));
-
-    if (!query.isActive())
-    {
-        MythContext::DBError("DVBCam PMT Query", query);
-        return;
-    }
-
-    if (query.numRowsAffected() > 0)
-    {
-        query.next();
-        if (!query.value(0).isNull())
-        {
-            pthread_mutex_lock(&pmt_lock);
-            GENERAL("CAM - Cached PMT found.");
-            QByteArray ba = query.value(0).toByteArray();
-            if (cachedpmtbuf)
-                delete cachedpmtbuf;
-            chan_opts = chan;
-            pmtbuf = cachedpmtbuf = new uint8_t [ba.size()];
-            memcpy(pmtbuf, ba.data(), ba.size());
-            pmtlen = ba.size();
-            first_send = true;
-            pthread_mutex_unlock(&pmt_lock);
-        }
-    }
-
-    pthread_mutex_unlock(db_lock);
-}
-
-void DVBCam::ChannelChanged(dvb_channel_t& chan, uint8_t* pmt, int len)
-{
-    if (chan.serviceID == 0)
-    {
-        ERROR("CAM - ServiceID is not set.");
-        return;
-    }
-
-    pthread_mutex_lock(&pmt_lock);
-
-    bool setpmt = true;
-    if (len == pmtlen && pmtbuf != NULL &&
-        chan.serviceID == chan_opts.serviceID)
-    {
-        if (!memcmp(pmt, pmtbuf, len))
-            setpmt = false;
-    }
-
-    if (setpmt)
-    {
-        chan_opts = chan;
-        pmtbuf = pmt;
-        pmtlen = len;
-        first_send = true;
-    }
-
-    pthread_mutex_unlock(&pmt_lock);
-
-    QByteArray ba;
-    ba.resize(len);
-    memcpy(ba.data(), pmt, len);
-
-    pthread_mutex_lock(db_lock);
-    QSqlQuery query(QString::null, db);
-    query.prepare(QString("UPDATE dvb_channel SET pmtcache=?"
-                  " WHERE serviceid=%1").arg(chan.serviceID));
-    query.bindValue(0, QVariant(ba));
-
-    MythContext::KickDatabase(db);
-    query.exec();
-
-    if (!query.isActive())
-    {
-        MythContext::DBError("DVBCam PMT Update", query);
-        pthread_mutex_unlock(db_lock);
-        return;
-    }
-
-    if (query.numRowsAffected() == 1)
-        GENERAL("CAM - PMT cache updated.");
-
-    pthread_mutex_unlock(db_lock);
+    return ciThreadRunning;
 }
 
 void *DVBCam::CiHandlerThreadHelper(void*self)
@@ -200,172 +122,201 @@ void *DVBCam::CiHandlerThreadHelper(void*self)
 
 void DVBCam::CiHandlerLoop()
 {
+    GENERAL(QString("CA: CI handler thread running"));
+
     ciThreadRunning = true;
 
     while (!exitCiThread)
     {
-        usleep(250);
-        if (!ciHandler->Process())
-            continue;
-
-        if (ciHandler->NeedCaPmt())
-            first_send = true;
-
-        if (ciHandler->HasUserIO())
+        if (ciHandler->Process())
         {
-            cCiEnquiry* enq = ciHandler->GetEnquiry();
-            if (enq != NULL)
+            if (ciHandler->HasUserIO())
             {
-                if (enq->Text() != NULL)
-                    cerr << "Message from CAM: " << enq->Text() << endl;
-                delete enq;
-            }
-
-            cCiMenu* menu = ciHandler->GetMenu();
-            if (menu != NULL)
-            {
-                if (menu->TitleText() != NULL)
-                    cerr << "CAM Menu Title: " << menu->TitleText() << endl;
-                if (menu->SubTitleText() != NULL)
-                    cerr << "CAM Menu SubTitle: " << menu->SubTitleText() << endl;
-                if (menu->BottomText() != NULL)
-                    cerr << "CAM Menu BottomText: " << menu->BottomText() << endl;
-
-                for (int i=0; i<menu->NumEntries(); i++)
-                    if (menu->Entry(i) != NULL)
-                        cerr << "CAM Menu Entry(" << i << "): " << menu->Entry(i) << endl;
-
-                if (menu->Selectable())
+                cCiEnquiry* enq = ciHandler->GetEnquiry();
+                if (enq != NULL)
                 {
-                    cerr << "Menu is selectable" << endl;
+                    if (enq->Text() != NULL)
+                        GENERAL(QString("CAM: Received message: %1").arg(enq->Text()));
+                    delete enq;
                 }
 
-                if (menu->NumEntries() > 0)
+                cCiMenu* menu = ciHandler->GetMenu();
+                if (menu != NULL)
                 {
-                    cerr << "Selecting first entry" << endl;
-                    menu->Select(0);
+                    if (menu->TitleText() != NULL)
+                        GENERAL(QString("CAM: Menu Title: %1").arg(menu->TitleText()));
+                    if (menu->SubTitleText() != NULL)
+                        GENERAL(QString("CAM: Menu SubTitle: %1").arg(menu->SubTitleText()));
+                    if (menu->BottomText() != NULL)
+                        GENERAL(QString("CAM: Menu BottomText: %1").arg(menu->BottomText()));
+
+                    for (int i=0; i<menu->NumEntries(); i++)
+                        if (menu->Entry(i) != NULL)
+                            GENERAL(QString("CAM: Menu Entry: %1").arg(menu->Entry(i)));
+
+                    if (menu->Selectable())
+                    {
+                        GENERAL(QString("CAM: Menu is selectable"));
+                    }
+
+                    if (menu->NumEntries() > 0)
+                    {
+                        GENERAL(QString("CAM: Selecting first entry"));
+                        menu->Select(0);
+                    }
+                    else
+                    {
+                        GENERAL(QString("CAM: Cancelling menu"));
+                    }
+
+                    delete menu;
+                }
+            }
+
+            if ((pmt_sent && (pmt_updated || pmt_added))
+                || (have_pmt && ciHandler->NeedCaPmt()))
+            {
+                GENERAL(QString("CA: CiHandler needs CA_PMT"));
+                pthread_mutex_lock(&pmt_lock);
+
+                if (pmt_sent && pmt_added && !pmt_updated)
+                {
+                    // Send added PMT
+                    while (PMTAddList.size() > 0)
+                    {
+                        PMTObject pmt = PMTAddList.first();
+                        SendPMT(pmt, CPLM_ADD);
+                        PMTList += pmt;
+                        PMTAddList.pop_front();
+                    }
                 }
                 else
                 {
-                    cerr << "Canceling menu" << endl;
-                    menu->Cancel();
+                    // Grab any added PMT
+                    while (PMTAddList.size() > 0)
+                    {
+                        PMTList += PMTAddList.first();
+                        PMTAddList.pop_front();
+                    }
+
+                    int length = PMTList.size();
+                    int count = 0;
+
+                    QValueList<PMTObject>::Iterator pmtit;
+                    for (pmtit = PMTList.begin(); pmtit != PMTList.end(); ++pmtit)
+                    {
+                        uint8_t cplm;
+                        if (length == 1)
+                            cplm = CPLM_ONLY;
+                        else if (count == 0)
+                            cplm = CPLM_FIRST;
+                        else if (count == length - 1)
+                            cplm = CPLM_LAST;
+                        else
+                            cplm = CPLM_MORE;
+
+                        SendPMT(*pmtit, cplm);
+
+                        count++;
+                    }
+
+                    pmt_sent = true;
                 }
 
-                delete menu;
+                pmt_updated = false;
+                pmt_added = false;
+                pthread_mutex_unlock(&pmt_lock);
             }
-
-            first_send = true;
         }
-
-        for (int s=0; s<ciHandler->NumSlots(); s++)
-        {
-            const unsigned short *caids = ciHandler->GetCaSystemIds(s);
-
-            pthread_mutex_lock(&pmt_lock);
-            if (caids != NULL && pmtbuf != NULL)
-            {
-                if (!first_send)
-                {
-                    pthread_mutex_unlock(&pmt_lock);
-                    continue;
-                }
-
-                cCiCaPmt capmt(chan_opts.serviceID, CPLM_FIRST);
-
-                /* FIXME:
-                 * We have to make some kind of CAM association map like VDR has,
-                 * for now we just clear the CAM that has no provider support.
-                 */
-                if (FindCaDescriptors(capmt, caids, s))
-                {
-                    SetPids(capmt, chan_opts.pids);
-                    GENERAL(QString("CAM - Sending PMT to slot %1.").arg(s));
-                    first_send = false;
-                }
-
-                ciHandler->SetCaPmt(capmt,s);
-            }
-            pthread_mutex_unlock(&pmt_lock);
-        }
+        usleep(250);
     }
     
     ciThreadRunning = false;
+    GENERAL(QString("CA: CiHandler thread stopped"));
 }
 
-void DVBCam::SetPids(cCiCaPmt& capmt, dvb_pids_t& pids)
+void DVBCam::SetPMT(PMTObject &pmt)
 {
-    for (unsigned int i=0; i<pids.audio.size(); i++)
-        capmt.AddPid(pids.audio[i]);
-
-    for (unsigned int i=0; i<pids.video.size(); i++)
-        capmt.AddPid(pids.video[i]);
-
-    for (unsigned int i=0; i<pids.teletext.size(); i++)
-        capmt.AddPid(pids.teletext[i]);
-
-    for (unsigned int i=0; i<pids.subtitle.size(); i++)
-        capmt.AddPid(pids.subtitle[i]);
-
-    for (unsigned int i=0; i<pids.pcr.size(); i++)
-        capmt.AddPid(pids.pcr[i]);
-
-    for (unsigned int i=0; i<pids.other.size(); i++)
-        capmt.AddPid(pids.other[i]);
+    GENERAL(QString("CA: SetPMT for ServiceID=%1").arg(pmt.ServiceID));
+    pthread_mutex_lock(&pmt_lock);
+    PMTList.clear();
+    PMTList += pmt;
+    have_pmt = true;
+    pmt_updated = true;
+    pthread_mutex_unlock(&pmt_lock);
 }
 
-bool DVBCam::FindCaDescriptors(cCiCaPmt &capmt, const unsigned short *caids, int slot)
+void DVBCam::AddPMT(PMTObject &pmt)
 {
-    bool found = false;
-    uint16_t prg_len = ((*(pmtbuf+2)&0x0f)<<8) | *(pmtbuf+3);
-    uint8_t *b = pmtbuf + 3;
-    uint8_t *e = pmtbuf + 4 + prg_len;
+    GENERAL(QString("CA: AddPMT for ServiceID=%1").arg(pmt.ServiceID));
+    pthread_mutex_lock(&pmt_lock);
+    PMTAddList += pmt;
+    pmt_added = true;
+    pthread_mutex_unlock(&pmt_lock);
+}
 
-    for ( ;; )
+/*
+ * Send a CA_PMT object to the CAM (see EN50221, section 8.4.3.4)
+ */
+void DVBCam::SendPMT(PMTObject &pmt, uint8_t cplm)
+{
+    for (int s = 0; s < ciHandler->NumSlots(); s++)
     {
-        if (e+2 > pmtbuf+pmtlen)
-            break;
-
-        while ( prg_len > 0 && b+2 <= e )
+        const unsigned short *casids = ciHandler->GetCaSystemIds(s);
+        if (!casids)
         {
-            uint8_t tag = *(b+1);
-            uint8_t len = *(b+2);
+            ERROR(QString("CA: GetCaSystemIds returned NULL!"));
+            continue;
+        }
+        if (!*casids)
+        {
+            ERROR(QString("CA: CAM supports no CA systems!"));
+            continue;
+        }
 
-            if (b+2+len > e)
-                break;
+        GENERAL(QString("CA: Creating CA_PMT, ServiceID=%1").arg(pmt.ServiceID));
+        cCiCaPmt capmt(pmt.ServiceID, cplm);
 
-            prg_len -= len - 2;
-
-            if (tag == 0x09)
+        // Add CA descriptors for the service
+        for (int q = 0; casids[q]; q++)
+        {
+            CAMap::Iterator ca = pmt.CA.find(casids[q]);
+            if (ca != pmt.CA.end())
             {
-                uint16_t ca_system_id = ((*(b+3))<<8) | *(b+4);
-                uint16_t ca_pid = ((*(b+5))<<8) | *(b+6);
-                fprintf(stderr,"Found CA Descriptor (CASID=%0.4X,"
-                        " CAPID=%0.4X)\n", ca_system_id, ca_pid);
+                GENERAL(QString("CA: Adding CA descriptor: CASID=0x%1, ECM PID=%2").arg((*ca).CASystemID, 0, 16).arg((*ca).PID));
+                capmt.AddCaDescriptor((*ca).CASystemID, (*ca).PID, (*ca).Data_Length, (*ca).Data);
+            }
+        }
 
-                for (int i=0; caids[i] != 0; i++)
+        // Add elementary streams + CA descriptors
+        QValueList<ElementaryPIDObject>::Iterator es;
+        for (es = pmt.Components.begin(); es != pmt.Components.end(); ++es)
+        {
+            if ((*es).Record)
+            {
+                GENERAL(QString("CA: Adding stream: %1, PID=%2").arg((*es).Description).arg((*es).PID));
+                capmt.AddElementaryStream((*es).Orig_Type, (*es).PID);
+
+                for (int q = 0; casids[q]; q++)
                 {
-                    if (ca_system_id == caids[i] && ca_pid != 0)
+                    CAMap::Iterator ca = (*es).CA.find(casids[q]);
+                    if (ca != (*es).CA.end())
                     {
-                        if (first_send)
-                            fprintf(stderr,"Adding CA Descriptor (CASID=%0.4X, "
-                                    "CAPID=%0.4X)\n", ca_system_id, ca_pid);
-
-                        capmt.AddCaDescriptor(len + 2, b+1);
-                        found = true;
+                        GENERAL(QString("CA: Adding CA descriptor: CASID=0x%1,ECM PID=%2").arg((*ca).CASystemID, 0, 16).arg((*ca).PID));
+                        capmt.AddCaDescriptor((*ca).CASystemID, (*ca).PID, (*ca).Data_Length, (*ca).Data);
                     }
                 }
             }
-            b += len + 2;
         }
 
-        if (e+5 > pmtbuf+pmtlen)
-            break;
-
-        prg_len = ((*(e+3)&0x0f)<<8) | *(e+4);
-        b = e + 4;
-        e = b + 1 + prg_len;
+        char *cplm_info[] = { "CPLM_MORE", "CPLM_FIRST", "CPLM_LAST", "CPLM_ONLY", "CPLM_ADD", "CPLM_UPDATE" };
+        GENERAL(QString("CA: Sending CA_PMT with %1 to CI slot #%2")
+                    .arg(cplm_info[cplm])
+                    .arg(s));
+        if (!ciHandler->SetCaPmt(capmt, s))
+        {
+            GENERAL(QString("CA: CA_PMT send failed!"));
+        }
     }
-
-    return found;
 }
 

@@ -3,6 +3,7 @@
 
 #include <map>
 #include <qstring.h>
+#include <qsqldatabase.h>
 #include "frequencies.h"
 
 using namespace std;
@@ -64,6 +65,9 @@ class ChannelBase
 
     virtual QString GetOrdering() { return channelorder; }
 
+    void SetDB(QSqlDatabase* _db_conn, pthread_mutex_t* _db_lock)
+        { db_conn = _db_conn; db_lock = _db_lock; };
+
   protected:
     TVRec *pParent;
     QString curchannelname;
@@ -76,6 +80,9 @@ class ChannelBase
     map<int, QString> sourceid;
 
     QString channelorder;
+
+    QSqlDatabase* db_conn;
+    pthread_mutex_t* db_lock;
 
     bool ChangeExternalChannel(const QString &newchan);
 };

@@ -165,7 +165,7 @@ void OSD::SetDefaults(void)
 
         normalizeRect(area);
         normalizeRect(listarea);
-        listarea.moveBy((int)-xoffset*hmult+0.5, (int)-yoffset*hmult+0.5);
+        listarea.moveBy((int)(-xoffset*hmult+0.5), (int)(-yoffset*hmult+0.5));
 
         OSDListTreeType *lb = new OSDListTreeType("menu", area, listarea, 10,
                                                   wmult, hmult);

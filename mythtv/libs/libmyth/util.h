@@ -5,6 +5,8 @@
 #include <qstringlist.h>
 #include <qcolor.h>
 
+#include <time.h>
+
 class QPixmap;
 class QImage;
 class QPainter;

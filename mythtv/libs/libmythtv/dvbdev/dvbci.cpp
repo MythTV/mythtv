@@ -24,10 +24,6 @@
  *
  */
 
-/* XXX TODO
-- update CA descriptors in case they change
-XXX*/
-
 #include "dvbci.h"
 #include <errno.h>
 #include <ctype.h>
@@ -949,11 +945,13 @@ private:
   int state;
   int numCaSystemIds;
   unsigned short caSystemIds[MAXCASYSTEMIDS + 1]; // list is zero terminated!
+  bool needCaPmt;
 public:
   cCiConditionalAccessSupport(int SessionId, cCiTransportConnection *Tc);
   virtual bool Process(int Length = 0, const uint8_t *Data = NULL);
   const unsigned short *GetCaSystemIds(void) { return caSystemIds; }
   bool SendPMT(cCiCaPmt &CaPmt);
+  bool NeedCaPmt(void) { return needCaPmt; }
   };
 
 cCiConditionalAccessSupport::cCiConditionalAccessSupport(int SessionId, cCiTransportConnection *Tc)
@@ -962,6 +960,7 @@ cCiConditionalAccessSupport::cCiConditionalAccessSupport(int SessionId, cCiTrans
   dbgprotocol("New Conditional Access Support (session id %d)\n", SessionId);
   state = 0;
   caSystemIds[numCaSystemIds = 0] = 0;
+  needCaPmt = false;
 }
 
 bool cCiConditionalAccessSupport::Process(int Length, const uint8_t *Data)
@@ -988,6 +987,7 @@ bool cCiConditionalAccessSupport::Process(int Length, const uint8_t *Data)
             dbgprotocol("\n");
             }
             state = 2;
+            needCaPmt = true;
             break;
        default: esyslog("ERROR: CI conditional access support: unknown tag %06X", Tag);
                 return false;
@@ -1005,6 +1005,7 @@ bool cCiConditionalAccessSupport::SendPMT(cCiCaPmt &CaPmt)
 {
   if (state == 2) {
      SendData(AOT_CA_PMT, CaPmt.length, CaPmt.capmt);
+     needCaPmt = false;
      return true;
      }
   return false;
@@ -1349,43 +1350,69 @@ bool cCiEnquiry::Cancel(void)
 cCiCaPmt::cCiCaPmt(int ProgramNumber, uint8_t cplm)
 {
   length = 0;
-  capmt[length++] = cplm;
+  capmt[length++] = cplm; // ca_pmt_list_management
   capmt[length++] = (ProgramNumber >> 8) & 0xFF;
   capmt[length++] =  ProgramNumber       & 0xFF;
   capmt[length++] = 0x01; // version_number, current_next_indicator - apparently vn doesn't matter, but cni must be 1
-  esInfoLengthPos = length;
-  capmt[length++] = 0x00; // program_info_length H (at program level)
-  capmt[length++] = 0x00; // program_info_length L
+
+  // program_info_length
+  infoLengthPos = length;
+  capmt[length++] = 0x00;
+  capmt[length++] = 0x00;
 }
 
-void cCiCaPmt::AddPid(int Pid)
+void cCiCaPmt::AddElementaryStream(int type, int pid)
 {
-  //XXX buffer overflow check???
-  capmt[length++] = 0x00; //XXX stream_type (apparently doesn't matter)
-  capmt[length++] = (Pid >> 8) & 0xFF;
-  capmt[length++] =  Pid       & 0xFF;
-  esInfoLengthPos = length;
-  capmt[length++] = 0x00; // ES_info_length H (at ES level)
-  capmt[length++] = 0x00; // ES_info_length L
+  if (length + 5 > int(sizeof(capmt)))
+  {
+    esyslog("ERROR: buffer overflow in CA_PMT");
+    return;
+  }
+
+  capmt[length++] = type & 0xFF;
+  capmt[length++] = (pid >> 8) & 0xFF;
+  capmt[length++] =  pid       & 0xFF;
+
+  // ES_info_length
+  infoLengthPos = length;
+  capmt[length++] = 0x00;
+  capmt[length++] = 0x00;
 }
 
-void cCiCaPmt::AddCaDescriptor(int Length, uint8_t *Data)
+void cCiCaPmt::AddCaDescriptor(int ca_system_id, int ca_pid, int data_len, uint8_t *data)
 {
-  if (esInfoLengthPos) {
-     if (length + Length < int(sizeof(capmt))) {
-        capmt[length++] = CPCI_OK_DESCRAMBLING;
-        memcpy(capmt + length, Data, Length);
-        length += Length;
-        int l = length - esInfoLengthPos - 2;
-        capmt[esInfoLengthPos]     = (l >> 8) & 0xFF;
-        capmt[esInfoLengthPos + 1] =  l       & 0xFF;
-        }
-     else
-        esyslog("ERROR: buffer overflow in CA descriptor");
-     esInfoLengthPos = 0;
-     }
-  else
-     esyslog("ERROR: adding CA descriptor without Pid!");
+  if (!infoLengthPos)
+  {
+    esyslog("ERROR: adding CA descriptor without program/stream!");
+    return;
+  }
+
+  if (length + data_len + 7 > int(sizeof(capmt)))
+  {
+    esyslog("ERROR: buffer overflow in CA_PMT");
+    return;
+  }
+
+  capmt[length++] = CPCI_OK_DESCRAMBLING; // ca_pmt_cmd_id
+
+  capmt[length++] = 0x09;           // CA descriptor tag
+  capmt[length++] = 4 + data_len;   // descriptor length
+
+  capmt[length++] = (ca_system_id >> 8) & 0xFF;
+  capmt[length++] = ca_system_id & 0xFF;
+  capmt[length++] = (ca_pid >> 8) & 0xFF;
+  capmt[length++] = ca_pid & 0xFF;
+
+  if (data_len > 0)
+  {
+    memcpy(&capmt[length], data, data_len);
+    length += data_len;
+  }
+
+  // update program_info_length/ES_info_length
+  int l = length - infoLengthPos - 2;
+  capmt[infoLengthPos] = (l >> 8) & 0xFF;
+  capmt[infoLengthPos + 1] = l & 0xFF;
 }
 
 // -- cCiHandler -------------------------------------------------------------
@@ -1400,7 +1427,7 @@ cCiHandler::cCiHandler(int Fd, int NumSlots)
   tpl = new cCiTransportLayer(Fd, numSlots);
   tc = NULL;
   fdCa = Fd;
-  needCaPmt = true;
+  needCaPmt = false;
 }
 
 cCiHandler::~cCiHandler()
@@ -1559,7 +1586,6 @@ int cCiHandler::CloseAllSessions(int Slot)
 bool cCiHandler::Process(void)
 {
     bool result = true;
-    needCaPmt = false;
     cMutexLock MutexLock(&mutex);
 
     for (int Slot = 0; Slot < numSlots; Slot++)
@@ -1614,21 +1640,27 @@ bool cCiHandler::Process(void)
         {
             tpl->ResetSlot(Slot);
             result = false;
-//            needCaPmt = true;
         }
         else if (tpl->ModuleReady(Slot))
         {
             dbgprotocol("Module ready in slot %d\n", Slot);
             tpl->NewConnection(Slot);
-            needCaPmt = true;
         }
     }
 
     bool UserIO = false;
+    needCaPmt = false;
     for (int i = 0; i < MAX_CI_SESSION; i++)
     {
         if (sessions[i] && sessions[i]->Process())
+        {
             UserIO |= sessions[i]->HasUserIO();
+            if (sessions[i]->ResourceId() == RI_CONDITIONAL_ACCESS_SUPPORT)
+            {
+                cCiConditionalAccessSupport *cas = (cCiConditionalAccessSupport *) sessions[i];
+                needCaPmt |= cas->NeedCaPmt();
+            }
+        }
     }
     hasUserIO = UserIO;
 

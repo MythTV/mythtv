@@ -55,8 +55,7 @@ HEADERS += recorderbase.h channelbase.h vsync.h proglist.h hdtvrecorder.h
 HEADERS += fifowriter.h filtermanager.h videooutbase.h videoout_null.h xbox.h
 HEADERS += dbcheck.h udpnotify.h channeleditor.h channelsettings.h
 HEADERS += osdlistbtntype.h blend.h datadirect.h sr_dialog.h
-HEADERS += sr_items.h sr_root.h recordingtypes.h jobqueue.h
-HEADERS += dtvrecorder.h
+HEADERS += sr_items.h sr_root.h recordingtypes.h jobqueue.h dtvrecorder.h
 
 SOURCES += commercial_skip.cpp frequencies.c guidegrid.cpp #infodialog.cpp 
 SOURCES += infostructs.cpp jitterometer.cpp minilzo.cpp NuppelVideoPlayer.cpp 
@@ -69,8 +68,7 @@ SOURCES += videoout_null.cpp xbox.cpp dbcheck.cpp profilegroup.cpp
 SOURCES += udpnotify.cpp channeleditor.cpp channelsettings.cpp
 SOURCES += osdsurface.cpp osdlistbtntype.cpp blend.c datadirect.cpp
 SOURCES += sr_dialog.cpp sr_root.cpp sr_items.cpp decoderbase.cpp
-SOURCES += recordingtypes.cpp jobqueue.cpp
-SOURCES += dtvrecorder.cpp
+SOURCES += recordingtypes.cpp jobqueue.cpp dtvrecorder.cpp
 
 
 linux {
@@ -116,15 +114,17 @@ using_ivtv {
 }
 
 using_dvb {
-    SOURCES += dvbrecorder.cpp dvbchannel.cpp dvbdiseqc.cpp dvbsections.cpp 
-    SOURCES += dvbcam.cpp
-    HEADERS += dvbtypes.h dvbrecorder.h dvbchannel.h dvbdiseqc.h
-    HEADERS += dvbsections.h dvbcam.h
+    SOURCES += dvbrecorder.cpp dvbchannel.cpp dvbdiseqc.cpp dvbcam.cpp
+    SOURCES += dvbtransporteditor.cpp dvbsiparser.cpp siparser.cpp siscan.cpp
+    SOURCES += scanwizard.cpp dvbsignalmonitor.cpp sitypes.cpp
+    SOURCES += dvbdev/dvbdev.c dvbdev/transform.c dvbdev/ringbuffy.c 
+    SOURCES += dvbdev/dvbci.cpp
 
-    SOURCES += dvbdev/dvbdev.c dvbdev/transform.c dvbdev/remux.c 
-    SOURCES += dvbdev/ringbuffy.c dvbdev/ctools.c dvbdev/dvbci.cpp
-    HEADERS += dvbdev/dvbdev.h dvbdev/transform.h dvbdev/remux.h 
-    HEADERS += dvbdev/ringbuffy.h dvbdev/ctools.h dvbdev/dvbci.h
+    HEADERS += dvbtypes.h dvbrecorder.h dvbchannel.h dvbdiseqc.h dvbcam.h
+    HEADERS += dvbtransporteditor.h dvbsiparser.h siparser.h siscan.h
+    HEADERS += scanwizard.h dvbsignalmonitor.h sitypes.h
+    HEADERS += dvbdev/dvbdev.h dvbdev/transform.h dvbdev/ringbuffy.h 
+    HEADERS += dvbdev/dvbci.h
 }
 
 using_directfb {
