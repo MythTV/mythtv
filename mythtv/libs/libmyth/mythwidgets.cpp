@@ -75,6 +75,8 @@ bool MythSpinBox::eventFilter(QObject* o, QEvent* e)
     case Key_Right:
         stepUp();
         break;
+    default:
+         return FALSE;
     }
 
     return TRUE;
