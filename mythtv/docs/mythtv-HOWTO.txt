@@ -1,6 +1,6 @@
   Installing and using mythtv
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2002-11-29, v1.042
+  2002-11-29, v1.043
 
   Initially, installation of mythtv seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -510,10 +510,15 @@
        # exit
        %
 
+  [1mNOTE[22m:  Red Hat Linux 8.0 users, make sure that you set your LANG as
+  described in ``Section 4''.
+
+  Continuing on:
+
   Untar the xmltv file:
 
-  % tar -xjf xmltv-0.5.3.tar.bz2
-  % cd xmltv-0.5.3
+       % tar -xjf xmltv-0.5.3.tar.bz2
+       % cd xmltv-0.5.3
 
   Install the xmltv prerequisites:
 
@@ -555,9 +560,9 @@
 
   Switch to superuser:
 
-  % su
-  # make install
-  # exit
+       % su
+       # make install
+       # exit
 
   [1m5.5.  Gentoo.[0m
 
@@ -649,7 +654,7 @@
 
   [1m6.4.1.  Mandrake 9.0[0m
 
-  % mysql -u root < mc.sql
+       % mysql -u root < mc.sql
 
   [1m6.4.2.  Debian 3.0[0m
 
@@ -803,10 +808,10 @@
 
   Once the configuration step is complete:
 
-  % make
-  % su
-  # make install
-  # chmod 666 /dev/lircd
+       % make
+       % su
+       # make install
+       # chmod 666 /dev/lircd
 
   Next, we're going to manually start lircd the first time:
 
@@ -847,6 +852,7 @@
   button as it is defined in your /etc/lircd.conf. If you don't see any-
   thing at this point, you need to troubleshoot further by going back to
   the lirc home page and investigating from there.
+
   If it is working, then press [1mCTRL-C [22mto abort the program.  Once you
   know that your remote is working, you need to run the [1mirxevent[0m
   program, which takes the key presses and sends them to mythtv.

@@ -30,6 +30,7 @@ reference to the "special" instructions for RH 8.0 users.
 v1.041, 2002-11-29.  Added some explanatory text about hdparm.
 v1.042, 2002-11-29.  Cleaned up the text that talks about Tivo and hardware
 based encoders.
+v1.043, 2002-11-29.  More RH 8.0 LANG stuff.
 -->
 <!--
 To create documentation, execute "% linuxdoc -B html mythtv-HOWTO.sgml" or
@@ -40,7 +41,7 @@ To create documentation, execute "% linuxdoc -B html mythtv-HOWTO.sgml" or
 
 <title>Installing and using mythtv
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2002-11-29, v1.042
+<date>2002-11-29, v1.043
 <abstract>
 Initially, installation of mythtv seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -444,6 +445,11 @@ Open a shell prompt:
 # exit
 %
 </verb></tscreen>
+
+<bf>NOTE</bf>:  Red Hat Linux 8.0 users, make sure that you set your LANG as
+described in <ref id="RH80-LANG" name="Section 4">.
+
+Continuing on:
 
 Untar the xmltv file:
 <tscreen><verb>
