@@ -1598,7 +1598,7 @@ void DaapServer::addPlaylistWithinPlaylist(
 }
 
 
-void DaapServer::handleMetadataChange(int which_collection)
+void DaapServer::handleMetadataChange(int which_collection, bool /* external */)
 {
     bool take_action = false;
     uint audio_generation = 0;
