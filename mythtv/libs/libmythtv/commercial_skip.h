@@ -30,6 +30,18 @@ enum frameMaskValues {
     COMM_FRAME_RATING_SYMBOL = 0x0010
 };
 
+enum frameAspects {
+    COMM_ASPECT_NORMAL = 0,
+    COMM_ASPECT_WIDE
+};
+
+enum frameFormats {
+    COMM_FORMAT_NORMAL = 0,
+    COMM_FORMAT_LETTERBOX,
+    COMM_FORMAT_PILLARBOX,
+    COMM_FORMAT_MAX
+};
+
 // Set max comm break length to 00:08:05 minutes & max comm length to 00:02:05
 #define MIN_COMM_BREAK_LENGTH   60
 #define MAX_COMM_BREAK_LENGTH  485
@@ -47,6 +59,7 @@ class CommDetect
     ~CommDetect(void);
 
     void Init(int w, int h, double frame_rate, int method);
+    void SetVideoParams(float aspect);
     void SetCommDetectMethod(int method) { commDetectMethod = method; };
 
     void ProcessNextFrame(VideoFrame *frame, long long frame_number = -1);
@@ -79,7 +92,7 @@ class CommDetect
     void MergeBlankCommList(void);
     void DeleteCommAtFrame(QMap<long long, int> &commMap, long long frame);
 
-    bool FrameIsInCommBreak(long long f, QMap<long long, int> &breakMap);
+    bool FrameIsInBreakMap(long long f, QMap<long long, int> &breakMap);
 
     void DumpMap(QMap<long long, int> &map);
     void DumpLogo(bool fromCurrentFrame = false);
@@ -106,6 +119,8 @@ class CommDetect
         int maxBrightness;
         int avgBrightness;
         int sceneChangePercent;
+        int aspect;
+        int format;
         int flagMask;
     } FrameInfoEntry;
 
@@ -114,11 +129,13 @@ class CommDetect
         long end;
         long frames;
         double length;
-        int bf_count;
-        int logo_count;
-        int rating_count;
-        int sc_count;
-        double sc_rate;
+        int bfCount;
+        int logoCount;
+        int ratingCount;
+        int scCount;
+        double scRate;
+        int formatMatch;
+        int aspectMatch;
         int score;
     } FrameBlock;
 
@@ -134,6 +151,8 @@ class CommDetect
 
     void CleanupFrameInfo(void);
     void DumpFrameInfo(void);
+    void UpdateFrameBlock(FrameBlock *fbp, FrameInfoEntry finfo, int format,
+                          int aspect);
     void DetectEdges(VideoFrame *frame, EdgeMaskEntry *edges, int edgeDiff);
 
     bool aggressiveDetection;
@@ -152,6 +171,7 @@ class CommDetect
     double fpm;
     bool blankFramesOnly;
     int blankFrameCount;
+    int currentAspect;
 
     long long framesProcessed;
 
@@ -200,6 +220,7 @@ class CommDetect
 
     bool lastFrameWasBlank;
     bool lastFrameWasSceneChange;
+    bool decoderFoundAspectChanges;
 
     int histogram[256];
     int lastHistogram[256];

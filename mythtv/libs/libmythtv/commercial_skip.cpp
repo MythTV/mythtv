@@ -27,6 +27,10 @@ CommDetect::CommDetect(int w, int h, double fps, int method)
     logoGoodEdgeThreshold = 0.75;
     logoBadEdgeThreshold = 0.85;
 
+    currentAspect = COMM_ASPECT_WIDE;
+
+    curFrameNumber = -1;
+
     if (getenv("DEBUGCOMMFLAG"))
         verboseDebugging = true;
     else
@@ -115,6 +119,12 @@ void CommDetect::Init(int w, int h, double frame_rate, int method)
     border = gContext->GetNumSetting("CommBorder", 20);
 
     aggressiveDetection = true;
+    currentAspect = COMM_ASPECT_WIDE;
+    decoderFoundAspectChanges = false;
+
+    // Check if close to 4:3
+    if(fabs(((w*1.0)/h) - 1.333333) < 0.1)
+        currentAspect = COMM_ASPECT_NORMAL;
 
     lastFrameWasBlank = false;
     lastFrameWasSceneChange = false;
@@ -166,6 +176,42 @@ void CommDetect::Init(int w, int h, double frame_rate, int method)
     ClearAllMaps();
 }
 
+void CommDetect::SetVideoParams(float aspect)
+{
+    int newAspect = COMM_ASPECT_WIDE;
+
+    VERBOSE(VB_COMMFLAG, QString("CommDetect::SetVideoParams called with "
+                                 "aspect = %1").arg(aspect));
+    // Default to Widescreen but use the same check as VideoOutput::MoveResize()
+    // to determine if is normal 4:3 aspect
+    if(fabs(aspect - 1.333333) < 0.1)
+        newAspect = COMM_ASPECT_NORMAL;
+
+    if (newAspect != currentAspect)
+    {
+        VERBOSE(VB_COMMFLAG,
+                QString("Aspect Ratio changed from %1 to %2 at frame %3")
+                        .arg(currentAspect).arg(newAspect).arg(curFrameNumber));
+
+        if (frameInfo.contains(curFrameNumber))
+        {
+            // pretend that this frame is blank so that we can create test
+            // blocks on real aspect ratio change boundaries.
+            frameInfo[curFrameNumber].flagMask |= COMM_FRAME_BLANK;
+            frameInfo[curFrameNumber].flagMask |= COMM_FRAME_ASPECT_CHANGE;
+            decoderFoundAspectChanges = true;
+        }
+        else if (curFrameNumber != -1)
+        {
+            VERBOSE(VB_COMMFLAG, QString("Unable to keep track of Aspect ratio "
+                                         "change because frameInfo for frame "
+                                         "number %1 does not exist.")
+                                         .arg(curFrameNumber));
+        }
+        currentAspect = newAspect;
+    }
+}
+
 void CommDetect::ProcessNextFrame(VideoFrame *frame, long long frame_number)
 {
     int flagMask = 0;
@@ -184,6 +230,8 @@ void CommDetect::ProcessNextFrame(VideoFrame *frame, long long frame_number)
     fInfo.maxBrightness = -1;
     fInfo.avgBrightness = -1;
     fInfo.sceneChangePercent = -1;
+    fInfo.aspect = currentAspect;
+    fInfo.format = COMM_FORMAT_NORMAL;
     fInfo.flagMask = 0;
 
     frameInfo[curFrameNumber] = fInfo;
@@ -226,7 +274,8 @@ void CommDetect::ProcessNextFrame(VideoFrame *frame, long long frame_number)
     frameInfo[curFrameNumber].flagMask = flagMask;
 
 #ifdef SHOW_DEBUG_WIN
-    printf( "Frame: %6lld -> %04x", curFrameNumber, flagMask );
+    VERBOSE(VB_COMMFLAG,QString().sprintf("Frame: %6lld, Mask %04x",
+                                          curFrameNumber, flagMask ));
     getchar();
     comm_debug_show(frame->buf);
 #endif
@@ -239,6 +288,7 @@ bool CommDetect::CheckFrameIsBlank(void)
     int MaxDiff = 25;
     int DarkBrightness = 80;
     int DimBrightness = 120;
+    int BoxBrightness = 30;
     int DimAVG = 35;
     bool abort = false;
     int max = 0;
@@ -247,9 +297,18 @@ bool CommDetect::CheckFrameIsBlank(void)
     unsigned char pixel;
     int pixelsChecked = 0;
     long long totBrightness = 0;
+    unsigned char rowMax[height];
+    unsigned char colMax[width];
+    int topDarkRow = border;
+    int bottomDarkRow = height - border - 1;
+    int leftDarkCol = border;
+    int rightDarkCol = width - border - 1;
 
     if (!width || !height)
         return(false);
+
+    memset(&rowMax, 0, sizeof(rowMax));
+    memset(&colMax, 0, sizeof(colMax));
 
     for(int y = border; y < (height - border) && !abort;
                         y += vertSpacing)
@@ -272,8 +331,58 @@ bool CommDetect::CheckFrameIsBlank(void)
 
             if (pixel > max)
                 max = pixel;
+
+            if (pixel > rowMax[y])
+                rowMax[y] = pixel;
+
+            if (pixel > colMax[x])
+                colMax[x] = pixel;
         }
     }
+
+    for(int y = border; y < (height - border); y += vertSpacing)
+    {
+        if (rowMax[y] > BoxBrightness)
+            break;
+        else
+            topDarkRow = y;
+    }
+
+    for(int y = border; y < (height - border); y += vertSpacing)
+        if (rowMax[y] >= BoxBrightness)
+            bottomDarkRow = y;
+
+    for(int x = border; x < (width - border); x += horizSpacing)
+    {
+        if (colMax[x] > BoxBrightness)
+            break;
+        else
+            leftDarkCol = x;
+    }
+
+    for(int x = border; x < (width - border); x += horizSpacing)
+        if (colMax[x] >= BoxBrightness)
+            rightDarkCol = x;
+
+    if ((topDarkRow > border) &&
+        (topDarkRow < (height * .20)) &&
+        (bottomDarkRow < (height - border)) &&
+        (bottomDarkRow > (height * .80)))
+    {
+        frameInfo[curFrameNumber].format = COMM_FORMAT_LETTERBOX;
+    }
+    else if ((leftDarkCol > border) &&
+             (leftDarkCol < (width * .20)) &&
+             (rightDarkCol < (width - border)) &&
+             (rightDarkCol > (width * .80)))
+    {
+        frameInfo[curFrameNumber].format = COMM_FORMAT_PILLARBOX;
+    }
+    else
+    {
+        frameInfo[curFrameNumber].format = COMM_FORMAT_NORMAL;
+    }
+
 
     avg = totBrightness / pixelsChecked;
 
@@ -282,8 +391,11 @@ bool CommDetect::CheckFrameIsBlank(void)
     frameInfo[curFrameNumber].avgBrightness = avg;
 
     if (verboseDebugging)
-        printf("Fr: %6lld - Brightness: %03d, %03d, %03d (%lld/%d)\n",
-               curFrameNumber, min, max, avg, totBrightness, pixelsChecked);
+        VERBOSE(VB_COMMFLAG,QString().sprintf("Fr: %6lld - Br: min %03d, max "
+                                             "%03d, avg %03d, fmt %d, asp %d",
+                                             curFrameNumber, min, max, avg,
+                                             frameInfo[curFrameNumber].format,
+                                             frameInfo[curFrameNumber].aspect));
 
     totalMinBrightness += min;
     DimAVG = min + 10;
@@ -556,7 +668,6 @@ bool CommDetect::CheckRatingSymbol(void)
     return(false);
 }
 
-
 void CommDetect::SetMinMaxPixels(VideoFrame *frame)
 {
     if (!logoFrameCount)
@@ -794,7 +905,7 @@ void CommDetect::BuildMasterCommList(void)
                 allTrue = true;
 
                 while ((f <= framesProcessed) && (f < it_b.key()) && (allTrue))
-                    allTrue = FrameIsInCommBreak(f++, sceneCommBreakMap);
+                    allTrue = FrameIsInBreakMap(f++, sceneCommBreakMap);
             }
 
             if (allTrue)
@@ -811,15 +922,38 @@ void CommDetect::BuildMasterCommList(void)
     }
 }
 
+void CommDetect::UpdateFrameBlock(FrameBlock *fbp, FrameInfoEntry finfo,
+                                  int format, int aspect)
+{
+    int value = 0;
+
+    value = finfo.flagMask;
+
+    if (value & COMM_FRAME_LOGO_PRESENT)
+        fbp->logoCount++;
+
+    if (value & COMM_FRAME_RATING_SYMBOL)
+        fbp->ratingCount++;
+
+    if (value & COMM_FRAME_SCENE_CHANGE)
+        fbp->scCount++;
+
+    if (finfo.format == format)
+        fbp->formatMatch++;
+
+    if (finfo.aspect == aspect)
+        fbp->aspectMatch++;
+}
+
 void CommDetect::BuildAllMethodsCommList(void)
 {
     VERBOSE(VB_COMMFLAG, "CommDetect::BuildAllMethodsCommList()");
 
     FrameBlock *fblock;
     FrameBlock *fbp;
+    int value = 0;
     int curBlock = 0;
     int maxBlock = 0;
-    int value = 0;
     int lastScore = 0;
     int thisScore = 0;
     int nextScore = 0;
@@ -830,7 +964,12 @@ void CommDetect::BuildAllMethodsCommList(void)
     long firstLogoFrame = -1;
     bool nextFrameIsBlank = false;
     bool lastFrameWasBlank = false;
+    long formatFrames = 0;
+    int format = COMM_FORMAT_NORMAL;
+    long aspectFrames = 0;
+    int aspect = COMM_ASPECT_NORMAL;
     QString msg;
+    long formatCounts[COMM_FORMAT_MAX];
 
     commBreakMap.clear();
 
@@ -841,14 +980,45 @@ void CommDetect::BuildAllMethodsCommList(void)
 
     fbp = &fblock[curBlock];
     fbp->start = 0;
-    fbp->bf_count = 0;
-    fbp->logo_count = 0;
-    fbp->rating_count = 0;
-    fbp->sc_count = 0;
-    fbp->sc_rate = 0.0;
+    fbp->bfCount = 0;
+    fbp->logoCount = 0;
+    fbp->ratingCount = 0;
+    fbp->scCount = 0;
+    fbp->scRate = 0.0;
+    fbp->formatMatch = 0;
+    fbp->aspectMatch = 0;
     fbp->score = 0;
 
     lastFrameWasBlank = true;
+
+    if (decoderFoundAspectChanges)
+    {
+        for(long i = 0; i < framesProcessed; i++ )
+        {
+            if (frameInfo[i].aspect == COMM_ASPECT_NORMAL)
+                aspectFrames++;
+        }
+
+        if (aspectFrames < (framesProcessed / 2))
+        {
+            aspect = COMM_ASPECT_WIDE;
+            aspectFrames = framesProcessed - aspectFrames;
+        }
+    }
+    else
+    {
+        for(long i = 0; i < framesProcessed; i++ )
+            formatCounts[frameInfo[i].aspect]++;
+       
+        for(int i = 0; i < COMM_FORMAT_MAX; i++)
+        {
+            if (formatCounts[i] > formatFrames)
+            {
+                format = i;
+                formatFrames = formatCounts[i];
+            }
+        }
+    }
 
     while (curFrame <= framesProcessed)
     {
@@ -862,26 +1032,30 @@ void CommDetect::BuildAllMethodsCommList(void)
 
         if (value & COMM_FRAME_BLANK)
         {
-            fbp->bf_count++;
+            fbp->bfCount++;
 
             if (!nextFrameIsBlank || !lastFrameWasBlank)
             {
+                UpdateFrameBlock(fbp, frameInfo[curFrame], format, aspect);
+
                 fbp->end = curFrame;
                 fbp->frames = fbp->end - fbp->start + 1;
                 fbp->length = fbp->frames / fps;
 
-                if ((fbp->sc_count) && (fbp->length > 1.05))
-                    fbp->sc_rate = fbp->sc_count / fbp->length;
+                if ((fbp->scCount) && (fbp->length > 1.05))
+                    fbp->scRate = fbp->scCount / fbp->length;
 
                 curBlock++;
 
                 fbp = &fblock[curBlock];
-                fbp->bf_count = 1;
-                fbp->logo_count = 0;
-                fbp->rating_count = 0;
-                fbp->sc_count = 0;
-                fbp->sc_rate = 0.0;
+                fbp->bfCount = 1;
+                fbp->logoCount = 0;
+                fbp->ratingCount = 0;
+                fbp->scCount = 0;
+                fbp->scRate = 0.0;
                 fbp->score = 0;
+                fbp->formatMatch = 0;
+                fbp->aspectMatch = 0;
                 fbp->start = curFrame;
             }
 
@@ -892,18 +1066,11 @@ void CommDetect::BuildAllMethodsCommList(void)
             lastFrameWasBlank = false;
         }
 
-        if (value & COMM_FRAME_LOGO_PRESENT)
-        {
-            (fbp->logo_count)++;
-            if (firstLogoFrame == -1)
-                firstLogoFrame = curFrame;
-        }
+        UpdateFrameBlock(fbp, frameInfo[curFrame], format, aspect);
 
-        if (value & COMM_FRAME_RATING_SYMBOL)
-            (fbp->rating_count)++;
-
-        if (value & COMM_FRAME_SCENE_CHANGE)
-            (fbp->sc_count)++;
+        if ((value & COMM_FRAME_LOGO_PRESENT) &&
+            (firstLogoFrame == -1))
+            firstLogoFrame = curFrame;
 
         curFrame++;
     }
@@ -912,8 +1079,8 @@ void CommDetect::BuildAllMethodsCommList(void)
     fbp->frames = fbp->end - fbp->start + 1;
     fbp->length = fbp->frames / fps;
 
-    if ((fbp->sc_count) && (fbp->length > 1.05))
-        fbp->sc_rate = fbp->sc_count / fbp->length;
+    if ((fbp->scCount) && (fbp->length > 1.05))
+        fbp->scRate = fbp->scCount / fbp->length;
 
     maxBlock = curBlock;
     curBlock = 0;
@@ -921,19 +1088,20 @@ void CommDetect::BuildAllMethodsCommList(void)
 
     VERBOSE(VB_COMMFLAG, "Initial Block pass");
     VERBOSE(VB_COMMFLAG, "Block StTime StFrm  EndFrm Frames Secs    "
-                         "Bf  Lg Cnt RT Cnt SC Cnt SC Rt Score");
+                         "Bf  Lg Cnt RT Cnt SC Cnt SC Rt FmtMch AspMch Score");
     VERBOSE(VB_COMMFLAG, "----- ------ ------ ------ ------ ------- "
-                         "--- ------ ------ ------ ----- -----" );
+                         "--- ------ ------ ------ ----- ------ ------ -----");
     while (curBlock <= maxBlock)
     {
         fbp = &fblock[curBlock];
 
-        msg.sprintf("%5d %3d:%02d %6ld %6ld %6ld %7.2f %3d %6d %6d %6d %5.2f %5d",
+        msg.sprintf("%5d %3d:%02d %6ld %6ld %6ld %7.2f %3d %6d %6d %6d %5.2f %6d %6d %5d",
                     curBlock, (int)(fbp->start / fps) / 60,
                     (int)((fbp->start / fps )) % 60,
                     fbp->start, fbp->end, fbp->frames, fbp->length,
-                    fbp->bf_count, fbp->logo_count, fbp->rating_count,
-                    fbp->sc_count, fbp->sc_rate, fbp->score);
+                    fbp->bfCount, fbp->logoCount, fbp->ratingCount,
+                    fbp->scCount, fbp->scRate, fbp->formatMatch,
+                    fbp->aspectMatch, fbp->score);
         VERBOSE(VB_COMMFLAG, msg);
 
         if (fbp->frames > fps)
@@ -957,12 +1125,12 @@ void CommDetect::BuildAllMethodsCommList(void)
             }
 
             if ((fbp->length > 4) &&
-                (fbp->logo_count > (fbp->frames * 0.60)) &&
-                (fbp->bf_count < (fbp->frames * 0.10)))
+                (fbp->logoCount > (fbp->frames * 0.60)) &&
+                (fbp->bfCount < (fbp->frames * 0.10)))
             {
                 if (verboseDebugging)
-                    VERBOSE(VB_COMMFLAG, "      length > 4 && logo_count > "
-                                         "frames * 0.60 && bf_count < frames "
+                    VERBOSE(VB_COMMFLAG, "      length > 4 && logoCount > "
+                                         "frames * 0.60 && bfCount < frames "
                                          "* .10");
                 if (fbp->length > MAX_COMM_BREAK_LENGTH)
                 {
@@ -980,15 +1148,15 @@ void CommDetect::BuildAllMethodsCommList(void)
                 }
             }
 
-            if ((logoInfoAvailable) && (fbp->logo_count < (fbp->frames * 0.50)))
+            if ((logoInfoAvailable) && (fbp->logoCount < (fbp->frames * 0.50)))
             {
                 if (verboseDebugging)
-                    VERBOSE(VB_COMMFLAG, "      logoInfoAvailable && logo_count"
+                    VERBOSE(VB_COMMFLAG, "      logoInfoAvailable && logoCount"
                                          " < frames * .50, -10");
                 fbp->score -= 10;
             }
 
-            if (fbp->rating_count > (fbp->frames * 0.05))
+            if (fbp->ratingCount > (fbp->frames * 0.05))
             {
                 if (verboseDebugging)
                     VERBOSE(VB_COMMFLAG, "      rating symbol present > 5% "
@@ -996,20 +1164,19 @@ void CommDetect::BuildAllMethodsCommList(void)
                 fbp->score += 20;
             }
 
-            if ((fbp->sc_rate > 1.0) &&
-                (fbp->logo_count < (fbp->frames * .90)))
+            if ((fbp->scRate > 1.0) &&
+                (fbp->logoCount < (fbp->frames * .90)))
             {
                 if (verboseDebugging)
-                    VERBOSE(VB_COMMFLAG, "      sc_rate > 1.0, -10");
+                    VERBOSE(VB_COMMFLAG, "      scRate > 1.0, -10");
                 fbp->score -= 10;
-            }
 
-            if ((fbp->sc_rate > 2.0) &&
-                (fbp->logo_count < (fbp->frames * .90)))
-            {
-                if (verboseDebugging)
-                    VERBOSE(VB_COMMFLAG, "      sc_rate > 2.0, -10");
-                fbp->score -= 10;
+                if (fbp->scRate > 2.0)
+                {
+                    if (verboseDebugging)
+                        VERBOSE(VB_COMMFLAG, "      scRate > 2.0, -10");
+                    fbp->score -= 10;
+                }
             }
 
             if ((abs((int)(fbp->frames - (15 * fps))) < 5 ) ||
@@ -1029,15 +1196,15 @@ void CommDetect::BuildAllMethodsCommList(void)
 
             if ((logoInfoAvailable) &&
                 (fbp->start >= firstLogoFrame) &&
-                (fbp->logo_count == 0))
+                (fbp->logoCount == 0))
             {
                 if (verboseDebugging)
-                    VERBOSE(VB_COMMFLAG, "      logoInfoAvailable && logo_count"
+                    VERBOSE(VB_COMMFLAG, "      logoInfoAvailable && logoCount"
                                          " == 0, -10");
                 fbp->score -= 10;
             }
 
-            if (fbp->rating_count > (fbp->frames * 0.25))
+            if (fbp->ratingCount > (fbp->frames * 0.25))
             {
                 if (verboseDebugging)
                     VERBOSE(VB_COMMFLAG, "      rating symbol present > 25% "
@@ -1046,12 +1213,80 @@ void CommDetect::BuildAllMethodsCommList(void)
             }
         }
 
-        msg.sprintf("  NOW %3d:%02d %6ld %6ld %6ld %7.2f %3d %6d %6d %6d %5.2f %5d",
+        if (decoderFoundAspectChanges)
+        {
+            if (fbp->aspectMatch > (fbp->frames * .90))
+            {
+                if (verboseDebugging)
+                    VERBOSE(VB_COMMFLAG, "      > 90% of frames match show "
+                                         "aspect, +10");
+                fbp->score += 10;
+
+                if (fbp->aspectMatch > (fbp->frames * .95))
+                {
+                    if (verboseDebugging)
+                        VERBOSE(VB_COMMFLAG, "      > 95% of frames match show "
+                                             "aspect, +10");
+                    fbp->score += 10;
+                }
+            }
+            else if (fbp->aspectMatch < (fbp->frames * .10))
+            {
+                if (verboseDebugging)
+                    VERBOSE(VB_COMMFLAG, "      < 10% of frames match show "
+                                         "aspect, -10");
+                fbp->score -= 10;
+
+                if (fbp->aspectMatch < (fbp->frames * .05))
+                {
+                    if (verboseDebugging)
+                        VERBOSE(VB_COMMFLAG, "      < 5% of frames match show "
+                                             "aspect, -10");
+                    fbp->score -= 10;
+                }
+            }
+        }
+        else if (format != COMM_FORMAT_NORMAL)
+        {
+            if (fbp->formatMatch > (fbp->frames * .90))
+            {
+                if (verboseDebugging)
+                    VERBOSE(VB_COMMFLAG, "      > 90% of frames match show "
+                                         "letter/pillar-box format, +10");
+                fbp->score += 10;
+
+                if (fbp->formatMatch > (fbp->frames * .95))
+                {
+                    if (verboseDebugging)
+                        VERBOSE(VB_COMMFLAG, "      > 95% of frames match show "
+                                             "letter/pillar-box format, +10");
+                    fbp->score += 10;
+                }
+            }
+            else if (fbp->formatMatch < (fbp->frames * .10))
+            {
+                if (verboseDebugging)
+                    VERBOSE(VB_COMMFLAG, "      < 10% of frames match show "
+                                         "letter/pillar-box format, -10");
+                fbp->score -= 10;
+
+                if (fbp->formatMatch < (fbp->frames * .05))
+                {
+                    if (verboseDebugging)
+                        VERBOSE(VB_COMMFLAG, "      < 5% of frames match show "
+                                             "letter/pillar-box format, -10");
+                    fbp->score -= 10;
+                }
+            }
+        }
+
+        msg.sprintf("  NOW %3d:%02d %6ld %6ld %6ld %7.2f %3d %6d %6d %6d %5.2f %6d %6d %5d",
                     (int)(fbp->start / fps) / 60,
                     (int)((fbp->start / fps )) % 60,
                     fbp->start, fbp->end, fbp->frames, fbp->length,
-                    fbp->bf_count, fbp->logo_count, fbp->rating_count,
-                    fbp->sc_count, fbp->sc_rate, fbp->score);
+                    fbp->bfCount, fbp->logoCount, fbp->ratingCount,
+                    fbp->scCount, fbp->scRate, fbp->formatMatch,
+                    fbp->aspectMatch, fbp->score);
         VERBOSE(VB_COMMFLAG, msg);
 
         lastScore = fbp->score;
@@ -1064,19 +1299,20 @@ void CommDetect::BuildAllMethodsCommList(void)
     VERBOSE(VB_COMMFLAG, "============================================");
     VERBOSE(VB_COMMFLAG, "Second Block pass");
     VERBOSE(VB_COMMFLAG, "Block StTime StFrm  EndFrm Frames Secs    "
-                         "Bf  Lg Cnt RT Cnt SC Cnt SC Rt Score");
+                         "Bf  Lg Cnt RT Cnt SC Cnt SC Rt FmtMch AspMch Score");
     VERBOSE(VB_COMMFLAG, "----- ------ ------ ------ ------ ------- "
-                         "--- ------ ------ ------ ----- -----" );
+                         "--- ------ ------ ------ ----- ------ ------ -----");
     while (curBlock <= maxBlock)
     {
         fbp = &fblock[curBlock];
 
-        msg.sprintf("%5d %3d:%02d %6ld %6ld %6ld %7.2f %3d %6d %6d %6d %5.2f %5d",
+        msg.sprintf("%5d %3d:%02d %6ld %6ld %6ld %7.2f %3d %6d %6d %6d %5.2f %6d %6d %5d",
                     curBlock, (int)(fbp->start / fps) / 60,
                     (int)((fbp->start / fps )) % 60,
                     fbp->start, fbp->end, fbp->frames, fbp->length,
-                    fbp->bf_count, fbp->logo_count, fbp->rating_count,
-                    fbp->sc_count, fbp->sc_rate, fbp->score);
+                    fbp->bfCount, fbp->logoCount, fbp->ratingCount,
+                    fbp->scCount, fbp->scRate, fbp->formatMatch,
+                    fbp->aspectMatch, fbp->score);
         VERBOSE(VB_COMMFLAG, msg);
 
         if ((curBlock > 0) && (curBlock < maxBlock))
@@ -1091,7 +1327,7 @@ void CommDetect::BuildAllMethodsCommList(void)
                 fbp->score -= 10;
             }
 
-            if ((fbp->bf_count > (fbp->frames * 0.95)) &&
+            if ((fbp->bfCount > (fbp->frames * 0.95)) &&
                 (fbp->frames < (2*fps)) &&
                 (lastScore < 0 && nextScore < 0))
             {
@@ -1165,12 +1401,13 @@ void CommDetect::BuildAllMethodsCommList(void)
             }
         }
 
-        msg.sprintf("  NOW %3d:%02d %6ld %6ld %6ld %7.2f %3d %6d %6d %6d %5.2f %5d",
+        msg.sprintf("  NOW %3d:%02d %6ld %6ld %6ld %7.2f %3d %6d %6d %6d %5.2f %6d %6d %5d",
                     (int)(fbp->start / fps) / 60,
                     (int)((fbp->start / fps )) % 60,
                     fbp->start, fbp->end, fbp->frames, fbp->length,
-                    fbp->bf_count, fbp->logo_count, fbp->rating_count,
-                    fbp->sc_count, fbp->sc_rate, fbp->score);
+                    fbp->bfCount, fbp->logoCount, fbp->ratingCount,
+                    fbp->scCount, fbp->scRate, fbp->formatMatch,
+                    fbp->aspectMatch, fbp->score);
         VERBOSE(VB_COMMFLAG, msg);
 
         lastScore = fbp->score;
@@ -1180,9 +1417,9 @@ void CommDetect::BuildAllMethodsCommList(void)
     VERBOSE(VB_COMMFLAG, "============================================");
     VERBOSE(VB_COMMFLAG, "FINAL Block stats");
     VERBOSE(VB_COMMFLAG, "Block StTime StFrm  EndFrm Frames Secs    "
-                         "Bf  Lg Cnt RT Cnt SC Cnt SC Rt Score");
+                         "Bf  Lg Cnt RT Cnt SC Cnt SC Rt FmtMch AspMch Score");
     VERBOSE(VB_COMMFLAG, "----- ------ ------ ------ ------ ------- "
-                         "--- ------ ------ ------ ----- -----" );
+                         "--- ------ ------ ------ ----- ------ ------ -----");
     curBlock = 0;
     lastScore = 0;
     breakStart = -1;
@@ -1300,12 +1537,13 @@ void CommDetect::BuildAllMethodsCommList(void)
             breakStart = -1;
         }
 
-        msg.sprintf("%5d %3d:%02d %6ld %6ld %6ld %7.2f %3d %6d %6d %6d %5.2f %5d",
+        msg.sprintf("%5d %3d:%02d %6ld %6ld %6ld %7.2f %3d %6d %6d %6d %5.2f %6d %6d %5d",
                     curBlock, (int)(fbp->start / fps) / 60,
                     (int)((fbp->start / fps )) % 60,
                     fbp->start, fbp->end, fbp->frames, fbp->length,
-                    fbp->bf_count, fbp->logo_count, fbp->rating_count,
-                    fbp->sc_count, fbp->sc_rate, thisScore);
+                    fbp->bfCount, fbp->logoCount, fbp->ratingCount,
+                    fbp->scCount, fbp->scRate, fbp->formatMatch,
+                    fbp->aspectMatch, thisScore);
         VERBOSE(VB_COMMFLAG, msg);
 
         lastScore = thisScore;
@@ -1685,7 +1923,7 @@ void CommDetect::DeleteCommAtFrame(QMap<long long, int> &commMap,
     }
 }
 
-bool CommDetect::FrameIsInCommBreak(long long f, QMap<long long, int> &breakMap)
+bool CommDetect::FrameIsInBreakMap(long long f, QMap<long long, int> &breakMap)
 {
     for(long long i = f; i < framesProcessed; i++)
         if (breakMap.contains(i)) 
@@ -2228,7 +2466,7 @@ void CommDetect::SearchForLogo(NuppelVideoPlayer *nvp, bool fullSpeed)
 
         SetLogoMaskArea();
 
-        VERBOSE(VB_COMMFLAG, QString("Detected potential Logo area: topleft "
+        VERBOSE(VB_COMMFLAG, QString("Testing Logo area: topleft "
                                      "(%1,%2), bottomright (%3,%4)")
                                      .arg(logoMinX).arg(logoMinY)
                                      .arg(logoMaxX).arg(logoMaxY));
@@ -2400,9 +2638,10 @@ void CommDetect::DumpFrameInfo(void)
     for (long i = 1; i <= framesProcessed; i++)
     {
         fi = frameInfo[i];
-        printf("Frame: %6ld -> %3d %3d %3d %3d %04x\n",
+        VERBOSE(VB_COMMFLAG, QString().sprintf(
+               "Frame: %6ld -> %3d %3d %3d %3d %04x",
                i, fi.minBrightness, fi.maxBrightness, fi.avgBrightness,
-               fi.sceneChangePercent, fi.flagMask );
+               fi.sceneChangePercent, fi.flagMask ));
     }
 }
 

@@ -558,7 +558,11 @@ void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps,
         keyframedist = keyframedistance;
 
     if (aspect > 0.0f)
+    {
         video_aspect = aspect;
+        if (commDetect)
+            commDetect->SetVideoParams(aspect);
+    }
 
     if (reinit)
         ReinitVideo();
