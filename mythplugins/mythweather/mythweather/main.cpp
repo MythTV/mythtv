@@ -53,7 +53,7 @@ void runWeather(void)
     int appCode = 0;
 
     QTranslator translator(0);
-    translator.load(PREFIX + QString("/share/mythtv/i18n/mythweather_") +
+    translator.load(gContext->GetTranslationsDir() + QString("mythweather_") +
                     QString(gContext->GetSetting("Language").lower()) +
                     QString(".qm"), ".");
 
@@ -77,7 +77,7 @@ int mythplugin_config(void)
     int appCode = 2;
 
     QTranslator translator(0);
-    translator.load(PREFIX + QString("/share/mythtv/i18n/mythweather_") +
+    translator.load(gContext->GetTranslationsDir() + QString("mythweather_") +
                     QString(gContext->GetSetting("Language").lower()) +
                     QString(".qm"), ".");
 
