@@ -32,7 +32,9 @@ class MdcapInput
     char        popByte();
     uint16_t    popU16();
     uint32_t    popU32();
-    uint        size(){return contents.size();}
+    uint        amountLeft();
+    uint        size(){return amountLeft();}
+   
 
     QString     popName();
     int         popStatus();
@@ -71,6 +73,7 @@ class MdcapInput
   private:
 
     QValueVector<char> contents;
+    int pos;
 };
 
 #endif

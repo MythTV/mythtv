@@ -23,70 +23,60 @@ MdcapInput::MdcapInput(std::vector<char> *raw_data)
         contents.append((*it));
         ++it;
     }
-    // contents = QValueVector<char>(*raw_data);
+    pos = 0;
 }
 
 MdcapInput::MdcapInput(QValueVector<char> *raw_data)
 {
     contents = QValueVector<char>(*raw_data);
+    pos = 0;
 }
 
 char MdcapInput::peekAtNextCode()
 {
-    if(contents.size() > 0)
+    if(amountLeft() > 0)
     {
-        return contents[0];
+        return contents[pos];
     }
+    cerr << "mdcapinput.o: asked to peek at next code, but there's nothing "
+         << "left to peek at" 
+         << endl;
+
     return 0;
+}
+
+uint MdcapInput::amountLeft()
+{
+    int amount_left = contents.size() - pos;
+    if(amount_left < 0)
+    {
+        cerr << "mdcapinput.o: there is less than nothing left "
+             << "of my contents"
+             << endl;
+
+        return 0;
+    }
+    
+    return (uint) amount_left;
 }
 
 char MdcapInput::popGroup(QValueVector<char> *group_contents)
 {
     group_contents->clear();
     int return_value = 0;
-    if(contents.size() < 1)
+    if(amountLeft() < 1)
     {
         return return_value;
     }
     
-    return_value = contents[0];
+    return_value = contents[pos];
     
-    //
-    //  Need to make sure that we are actually positioned on a group
-    //
-    
-    if(
-        return_value != MarkupCodes::server_info_group  &&
-        return_value != MarkupCodes::login_group        &&
-        return_value != MarkupCodes::update_group       &&
-        return_value != MarkupCodes::collection_group   &&
-        return_value != MarkupCodes::item_group         &&
-        return_value != MarkupCodes::added_items_group  &&
-        return_value != MarkupCodes::added_item_group   &&
-        return_value != MarkupCodes::name               &&
-        return_value != MarkupCodes::item_url           &&
-        return_value != MarkupCodes::item_artist        &&
-        return_value != MarkupCodes::item_album         &&
-        return_value != MarkupCodes::item_title         &&
-        return_value != MarkupCodes::item_genre         &&
-        return_value != MarkupCodes::list_group         &&
-        return_value != MarkupCodes::added_lists_group  &&
-        return_value != MarkupCodes::added_list_group   &&
-        return_value != MarkupCodes::list_name
-      )
-    {
-        cerr << "mdcapinput.o: asked to pop a group, but first code "
-             << "is not a group one!"
-             << endl;
-        return 0;
-    }
-
     //
     //  find out how many bytes this group consists of
     //
     
     
-    if(contents.size() < 5)
+    if(amountLeft() < 5)
     {
         cerr << "mdcapinput.o: asked to pop a group, but there are no "
              << "size bytes in the stream " 
@@ -94,17 +84,17 @@ char MdcapInput::popGroup(QValueVector<char> *group_contents)
         return 0;
     }
 
-    uint32_t group_size  = ((int) ((uint8_t) contents[4]));
-             group_size += ((int) ((uint8_t) contents[3])) * 256;
-             group_size += ((int) ((uint8_t) contents[2])) * 256 * 256;
-             group_size += ((int) ((uint8_t) contents[1])) * 256 * 256 * 256;
+    uint32_t group_size  = ((int) ((uint8_t) contents[pos + 4]));
+             group_size += ((int) ((uint8_t) contents[pos + 3])) * 256;
+             group_size += ((int) ((uint8_t) contents[pos + 2])) * 256 * 256;
+             group_size += ((int) ((uint8_t) contents[pos + 1])) * 256 * 256 * 256;
              
     //
     //  Make sure there are at least as many bytes available as the group
     //  size calculation thinks there should be
     //
 
-    if(contents.size() < group_size + 5)
+    if(amountLeft() < group_size + 5)
     {
         cerr << "mdcapinput.o: there are not enough bytes in the stream "
              << "to get as many as the group size code says there should "
@@ -122,18 +112,10 @@ char MdcapInput::popGroup(QValueVector<char> *group_contents)
     group_contents->reserve(group_size);
     for(uint i = 0; i < group_size; i++)
     {
-        group_contents->append(contents[5 + i]);
+        group_contents->append(contents[5 + i + pos]);
     }
 
-    //
-    //  Now rip them out of our permanent content
-    //
-
-    QValueVector<char>::iterator contents_first = contents.begin();
-    QValueVector<char>::iterator contents_last = contents.begin();
-    contents_last += 5 + group_size;
-    contents.erase(contents_first, contents_last);
-
+    pos = pos + 5 + group_size;
     return return_value;
 }
 
@@ -143,7 +125,7 @@ char MdcapInput::popByte()
     //  Pull one char/byte of the front of the contents
     //
     
-    if(contents.size() < 1)
+    if(amountLeft() < 1)
     {
         cerr << "mdcapinput.o: asked to do a popByte(), but the "
              << "content is empty"
@@ -152,14 +134,9 @@ char MdcapInput::popByte()
         return 0;
     }
 
-    char return_value = contents[0];
-    
-    QValueVector<char>::iterator contents_first = contents.begin();
-    QValueVector<char>::iterator contents_last = contents.begin();
-    ++contents_last;
+    char return_value = contents[pos];
 
-    contents.erase(contents_first, contents_last);
-
+    ++pos;
     return return_value;
     
 }
@@ -226,7 +203,7 @@ int MdcapInput::popStatus()
     //    next 2 - 16 bit unsigned integer
     //
     
-    if(contents.size() < 3)
+    if(amountLeft() < 3)
     {
         cerr << "mdcapinput.o: asked to popStatus(), but there are not "
              << "enough bytes left in the stream "
@@ -257,7 +234,7 @@ void MdcapInput::popProtocol(int *major, int *minor)
     //    next 2 - 16 bit minor
     //
     
-    if(contents.size() < 5)
+    if(amountLeft() < 5)
     {
         cerr << "mdcapinput.o: asked to popProtocol(), but there are not "
              << "enough bytes left in the stream "
@@ -294,7 +271,7 @@ uint32_t MdcapInput::popSessionId()
     //    next 4 - 32 bit session id
     //
     
-    if(contents.size() < 5)
+    if(amountLeft() < 5)
     {
         cerr << "mdcapinput.o: asked to popSessionId(), but there are not "
              << "enough bytes left in the stream "
@@ -323,7 +300,7 @@ uint32_t MdcapInput::popCollectionCount()
     //    next 4 - 32 bit integer = number of collections
     //
     
-    if(contents.size() < 5)
+    if(amountLeft() < 5)
     {
         cerr << "mdcapinput.o: asked to popCollectionCount(), but "
              << "there are not enough bytes left in the stream "
@@ -352,7 +329,7 @@ uint32_t MdcapInput::popCollectionId()
     //    next 4 - 32 bit integer = collection id
     //
     
-    if(contents.size() < 5)
+    if(amountLeft() < 5)
     {
         cerr << "mdcapinput.o: asked to popCollectionId(), but "
              << "there are not enough bytes left in the stream "
@@ -381,7 +358,7 @@ uint32_t MdcapInput::popCollectionType()
     //    next 4 - 32 bit integer = collection id
     //
     
-    if(contents.size() < 5)
+    if(amountLeft() < 5)
     {
         cerr << "mdcapinput.o: asked to popCollectionType(), but "
              << "there are not enough bytes left in the stream "
@@ -410,7 +387,7 @@ uint32_t MdcapInput::popCollectionGeneration()
     //    next 4 - 32 bit integer = generation number
     //
     
-    if(contents.size() < 5)
+    if(amountLeft() < 5)
     {
         cerr << "mdcapinput.o: asked to popCollectionGeneration(), but "
              << "there are not enough bytes left in the stream "
@@ -439,7 +416,7 @@ bool MdcapInput::popUpdateType()
     //           1 is true  (full update)
     //
     
-    if(contents.size() < 2)
+    if(amountLeft() < 2)
     {
         cerr << "mdcapinput.o: asked to popUpdateType(), but not enough "
              << "bytes left";
@@ -480,7 +457,7 @@ uint32_t MdcapInput::popTotalItems()
     //    next 4 - 32 bit integer = total items
     //
     
-    if(contents.size() < 5)
+    if(amountLeft() < 5)
     {
         cerr << "mdcapinput.o: asked to popTotalItems(), but "
              << "there are not enough bytes left in the stream "
@@ -508,7 +485,7 @@ uint32_t MdcapInput::popAddedItems()
     //    next 4 - 32 bit integer = total items
     //
     
-    if(contents.size() < 5)
+    if(amountLeft() < 5)
     {
         cerr << "mdcapinput.o: asked to popAddedItems(), but "
              << "there are not enough bytes left in the stream "
@@ -536,7 +513,7 @@ uint32_t MdcapInput::popDeletedItems()
     //    next 4 - 32 bit integer = total items
     //
     
-    if(contents.size() < 5)
+    if(amountLeft() < 5)
     {
         cerr << "mdcapinput.o: asked to popDeletedItems(), but "
              << "there are not enough bytes left in the stream "
@@ -565,7 +542,7 @@ uint8_t MdcapInput::popItemType()
     //  2nd byte - item type
     //
     
-    if(contents.size() < 2)
+    if(amountLeft() < 2)
     {
         cerr << "mdcapinput.o: asked to popItemType(), but "
              << "there are not enough bytes left in the stream "
@@ -593,7 +570,7 @@ uint32_t MdcapInput::popItemId()
     //    next 4 - 32 bit integer = item id
     //
     
-    if(contents.size() < 5)
+    if(amountLeft() < 5)
     {
         cerr << "mdcapinput.o: asked to popItemId(), but "
              << "there are not enough bytes left in the stream "
@@ -621,7 +598,7 @@ uint8_t MdcapInput::popItemRating()
     //  2nd byte - rating (0-10)
     //
     
-    if(contents.size() < 2)
+    if(amountLeft() < 2)
     {
         cerr << "mdcapinput.o: asked to popItemRating(), but "
              << "there are not enough bytes left in the stream "
@@ -649,7 +626,7 @@ uint32_t MdcapInput::popItemLastPlayed()
     //  next 4 - 32 bit integer = seconds since disco
     //
     
-    if(contents.size() < 5)
+    if(amountLeft() < 5)
     {
         cerr << "mdcapinput.o: asked to popItemLastPlayed(), but "
              << "there are not enough bytes left in the stream "
@@ -677,7 +654,7 @@ uint32_t MdcapInput::popItemPlayCount()
     //  next 4 - 32 bit integer = number of times played
     //
     
-    if(contents.size() < 5)
+    if(amountLeft() < 5)
     {
         cerr << "mdcapinput.o: asked to popItemPlayCount(), but "
              << "there are not enough bytes left in the stream "
@@ -705,7 +682,7 @@ uint32_t MdcapInput::popItemYear()
     //  next 4 - 32 bit integer = year
     //
     
-    if(contents.size() < 5)
+    if(amountLeft() < 5)
     {
         cerr << "mdcapinput.o: asked to popItemYear(), but "
              << "there are not enough bytes left in the stream "
@@ -733,7 +710,7 @@ uint32_t MdcapInput::popItemTrack()
     //  next 4 - 32 bit integer = track number
     //
     
-    if(contents.size() < 5)
+    if(amountLeft() < 5)
     {
         cerr << "mdcapinput.o: asked to popTrack(), but "
              << "there are not enough bytes left in the stream "
@@ -761,7 +738,7 @@ uint32_t MdcapInput::popItemLength()
     //  next 4 - 32 bit integer = length in seconds
     //
     
-    if(contents.size() < 5)
+    if(amountLeft() < 5)
     {
         cerr << "mdcapinput.o: asked to popLength(), but "
              << "there are not enough bytes left in the stream "
@@ -939,7 +916,7 @@ int MdcapInput::popListId()
     //  next 4 - 32 bit integer = list id
     //
     
-    if(contents.size() < 5)
+    if(amountLeft() < 5)
     {
         cerr << "mdcapinput.o: asked to popListId(), but "
              << "there are not enough bytes left in the stream "
@@ -997,7 +974,7 @@ uint32_t MdcapInput::popListItem()
     //  next 4 - 32 bit integer = id of the item
     //
     
-    if(contents.size() < 5)
+    if(amountLeft() < 5)
     {
         cerr << "mdcapinput.o: asked to popListItem(), but "
              << "there are not enough bytes left in the stream "
@@ -1025,7 +1002,7 @@ uint32_t MdcapInput::popDeletedList()
     //  next 4 - 32 bit integer = id of the list being deleted
     //
     
-    if(contents.size() < 5)
+    if(amountLeft() < 5)
     {
         cerr << "mdcapinput.o: asked to popDeletedList(), but "
              << "there are not enough bytes left in the stream "
@@ -1053,7 +1030,7 @@ uint32_t MdcapInput::popDeletedItem()
     //  next 4 - 32 bit integer = id of the item being deleted
     //
     
-    if(contents.size() < 5)
+    if(amountLeft() < 5)
     {
         cerr << "mdcapinput.o: asked to popDeletedItem(), but "
              << "there are not enough bytes left in the stream "

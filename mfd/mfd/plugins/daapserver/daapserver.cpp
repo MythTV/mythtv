@@ -1501,6 +1501,8 @@ void DaapServer::handleMetadataChange(int which_collection)
             }
             hanging_updates.clear();
         hanging_updates_mutex.unlock();
+        
+        delete hu_response;
     }
 }
 

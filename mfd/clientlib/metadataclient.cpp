@@ -362,7 +362,9 @@ void MetadataClient::parseServerInfo(MdcapInput &mdcap_input)
     if(group_code != MarkupCodes::server_info_group)
     {
         cerr << "metadataclient.o: asked to parseServerInfo(), but "
-             << "group code was not server_info_group "
+             << "group code was not server_info_group ("
+             << (int) group_code
+             << ")"
              << endl;
         delete group_contents;
         return;

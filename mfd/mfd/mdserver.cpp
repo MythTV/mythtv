@@ -1564,7 +1564,7 @@ void MetadataServer::dealWithHangingUpdates()
     hu_response->setPayload(response.getContents());
 
     //
-    //  Send it out, removing each hanging update from the list as we go
+    //  Send it out, and remove all the hanging updates
     //
         
     hanging_updates_mutex.lock();
@@ -1578,6 +1578,7 @@ void MetadataServer::dealWithHangingUpdates()
 
     hanging_updates_mutex.unlock();
     
+    delete hu_response;
 }
 
 
