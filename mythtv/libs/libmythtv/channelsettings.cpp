@@ -557,7 +557,12 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID& id)
     VerticalConfigurationGroup* left = new VerticalConfigurationGroup(false,true);
     left->addChild(new Channum(id));
     left->addChild(new Callsign(id));
-    left->addChild(new Visible(id));
+
+    HorizontalConfigurationGroup *lefthoz = new HorizontalConfigurationGroup(false,true);
+
+    lefthoz->addChild(new Visible(id));
+    lefthoz->addChild(new CommFree(id));
+    left->addChild(lefthoz);
     group1->addChild(left);
 
     VerticalConfigurationGroup* right = new VerticalConfigurationGroup(false, true);
@@ -572,7 +577,6 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID& id)
     addChild(new VideoFilters(id));
     addChild(new OutputFilters(id));
     addChild(new XmltvID(id));
-    addChild(new CommFree(id));
 };
 
 ChannelOptionsV4L::ChannelOptionsV4L(const ChannelID& id)

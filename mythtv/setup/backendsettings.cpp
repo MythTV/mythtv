@@ -276,8 +276,8 @@ public:
         setHelpText(QObject::tr("If your local timezone does not match the "
                     "timezone returned by XMLTV, use this setting to have "
                     "mythfilldatabase adjust the program start and end times."
-                    "None will disable this feature, Auto will automatically "
-                    "detect your local timezone"));
+                    "None disables this feature, Auto automatically "
+                    "detects your local timezone"));
     };
 };
 
@@ -420,10 +420,10 @@ public:
         setLabel(QObject::tr("Pre Shutdown check-command"));
         setValue("");
         setHelpText(QObject::tr("A command executed before the backend would "
-                    "shutdown. The return value of the command determines if "
-                    "the backend is allowed to shutdown. 0 - yes, "
-                    "1 - reinitializes the idleing, "
-                    "2 - reset the backend to wait for a frontend again"));
+                    "shutdown. The return value determines if "
+                    "the backend can shutdown. 0 - yes, "
+                    "1 - restart idleing, "
+                    "2 - reset the backend to wait for frontend"));
     };
 };
 
