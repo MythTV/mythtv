@@ -709,11 +709,11 @@ SipUrl::SipUrl(QString url, QString DisplayName)
     QString temp = url;
     if (url.startsWith("sip:"))
         url = temp.mid(4);
-    thisUser = url.section('@', 0, 0);
-    temp = url.section('@', 1, 1);
-    thisHostname = temp.section(':', 0, 0);
-    QString PortStr = temp.section(':', 1, 1);
+    QString PortStr = url.section(':', 1, 1);
     thisPort = PortStr.length() > 0 ? PortStr.toInt() : 5060;
+    QString temp1 = url.section(':', 0, 0);
+    thisUser = temp1.section('@', 0, 0);
+    thisHostname = temp1.section('@', 1, 1);
     HostnameToIpAddr();
     encode();
 }

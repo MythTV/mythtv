@@ -153,6 +153,7 @@ public:
     SipUrl(QString dispName, QString User, QString Hostname, int Port);
     SipUrl(SipUrl *orig);
     ~SipUrl();
+    bool operator==(SipUrl &rhs) { return (rhs.thisUser == thisUser); }
     const QString string() { return thisUrl; }
     QString getDisplay() { return thisDisplayName; }
     QString getUser() { return thisUser; }

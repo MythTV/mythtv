@@ -124,6 +124,7 @@ private:
 #define SIP_INFOSTATUS          0x1D00
 #define SIP_IM_TIMEOUT          0x1E00
 #define SIP_USER_MESSAGE        0x1F00
+#define SIP_KICKWATCH           0x2000
 
 #define SIP_CMD(s)              (((s)==SIP_INVITE) || ((s)==SIP_ACK) || ((s)==SIP_BYE) || ((s)==SIP_CANCEL) || ((s)==SIP_REGISTER) || ((s)==SIP_SUBSCRIBE) || ((s)==SIP_NOTIFY) || ((s)==SIP_MESSAGE) || ((s)==SIP_INFO))
 #define SIP_STATUS(s)           (((s)==SIP_INVITESTATUS_2xx) || ((s)==SIP_INVITESTATUS_1xx) || ((s)==SIP_INVITESTATUS_3456xx) || ((s)==SIP_BYTESTATUS) || ((s)==SIP_CANCELSTATUS) || ((s)==SIP_SUBSTATUS) || ((s)==SIP_NOTSTATUS) || ((s)==SIP_MESSAGESTATUS) || ((s)==SIP_INFOSTATUS) )
@@ -194,6 +195,7 @@ private:
 #define SIP_WATCH_HOLDOFF_WATCH           (SIP_WATCH_HOLDOFF  | SIP_WATCH)
 #define SIP_WATCH_HOLDOFF_STOPWATCH       (SIP_WATCH_HOLDOFF  | SIP_STOPWATCH)
 #define SIP_WATCH_HOLDOFF_SUBSCRIBE       (SIP_WATCH_HOLDOFF  | SIP_SUBSCRIBE)
+#define SIP_WATCH_HOLDOFF_KICK            (SIP_WATCH_HOLDOFF  | SIP_KICKWATCH)
 
 
 // Build Options logically OR'ed and sent to build procs
@@ -328,6 +330,7 @@ class SipFsmBase
     virtual ~SipFsmBase();
     virtual int     FSM(int Event, SipMsg *sipMsg=0, void *Value=0) { (void)Event; (void)sipMsg; (void)Value; return 0; }
     virtual QString type()       { return "BASE"; }
+    virtual SipUrl *getUrl()     { return remoteUrl; }
     virtual int     getCallRef() { return -1; }
     QString callId()   { return CallId.string(); }
 
@@ -472,6 +475,7 @@ class SipSubscriber : public SipFsmBase
     ~SipSubscriber();
     virtual int  FSM(int Event, SipMsg *sipMsg=0, void *Value=0);
     virtual QString type() { return "SUBSCRIBER"; };
+    virtual SipUrl *getUrl()     { return watcherUrl; }
 
   private:
     void SendNotify(SipMsg *authMsg);
@@ -495,6 +499,7 @@ class SipWatcher : public SipFsmBase
     ~SipWatcher();
     virtual int  FSM(int Event, SipMsg *sipMsg=0, void *Value=0);
     virtual QString type() { return "WATCHER"; };
+    virtual SipUrl *getUrl()     { return watchedUrl; }
 
   private:
     void SendSubscribe(SipMsg *authMsg);
@@ -556,6 +561,7 @@ class SipFsm : public QWidget
     SipWatcher *CreateWatcherFsm(QString Url);
     SipIM *CreateIMFsm(QString Url="", QString callIdStr="");
     void StopWatchers();
+    void SipFsm::KickWatcher(SipUrl *Url);
     void SendIM(QString destUrl, QString CallId, QString imMsg);
     int numCalls();
     int getPrimaryCall() { return primaryCall; };

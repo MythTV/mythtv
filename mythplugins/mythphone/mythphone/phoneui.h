@@ -259,7 +259,6 @@ class PhoneUIStatusBar : public QObject
     void updateMidCallTime(int Seconds);
     void updateMidCallAudioStats(int pIn, int pMiss, int pLate, int pOut, int bIn, int bOut, int msPeriod);
     void updateMidCallVideoStats(int pIn, int pMiss, int pLate, int pOut, int bIn, int bOut, int msPeriod);
-    void updateMidCallBandwidth(int bIn, int bOut);
     void updateMidCallVideoCodec(QString c);
     void updateMidCallAudioCodec(QString c);
 

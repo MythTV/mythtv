@@ -1021,6 +1021,21 @@ void SipFsm::StopWatchers()
     }
 }
 
+void SipFsm::KickWatcher(SipUrl *Url)
+{
+    SipFsmBase *it=FsmList.first();
+    while (it)
+    {
+        // Because we may delete the instance we need to step onwards before we destroy it
+        SipFsmBase *thisone=it;
+        it=FsmList.next();
+        if ((thisone->type() == "WATCHER") && 
+            (*thisone->getUrl() == *Url) && 
+            (thisone->FSM(SIP_KICKWATCH) == SIP_IDLE))
+            DestroyFsm(thisone);
+    }
+}
+
 void SipFsm::SendIM(QString destUrl, QString CallId, QString imMsg)
 {
     SipCallId sipCallId;
@@ -1256,6 +1271,7 @@ QString SipFsmBase::EventtoString(int Event)
     case SIP_INFOSTATUS:          return "INFOSTATUS";
     case SIP_IM_TIMEOUT:          return "IM_TIMEOUT";
     case SIP_USER_MESSAGE:        return "USER_IM";
+    case SIP_KICKWATCH:           return "KICKWATCH";
     default:
         break;
     }
@@ -2343,6 +2359,10 @@ int SipSubscriber::FSM(int Event, SipMsg *sipMsg, void *Value)
             (parent->Timer())->Start(this, expires*1000, SIP_SUBSCRIBE_EXPIRE); // Expire subscription
             SendNotify(0);
             State = SIP_SUB_SUBSCRIBED;
+            
+            // If this is a client just being turned on, see if we are watching its status
+            // and if so shortcut the retry timers
+            parent->KickWatcher(watcherUrl);
         }
         break;
 
@@ -2496,6 +2516,7 @@ int SipWatcher::FSM(int Event, SipMsg *sipMsg, void *Value)
     case SIP_WATCH_IDLE_WATCH:
     case SIP_WATCH_TRYING_WATCH:
     case SIP_WATCH_HOLDOFF_WATCH:
+    case SIP_WATCH_HOLDOFF_KICK:
         if ((regProxy == 0) || (regProxy->isRegistered()))
             SendSubscribe(0);
         else
