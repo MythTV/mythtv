@@ -705,7 +705,7 @@
         <font>info</font>
       </textarea>
       <textarea name="subdescr" draworder="6">
-        <area>20,70,560,140</area>
+        <area>20,70,720,140</area>
         <font>info</font>
         <multiline>yes</multiline>
 	<value>%SUBTITLE|"|"
@@ -1709,7 +1709,7 @@
         <font>info</font>
       </textarea>
       <textarea name="subdescr" draworder="6">
-        <area>20,70,560,90</area>
+        <area>20,70,720,90</area>
         <font>info</font>
 	<multiline>yes</multiline>
 	<value>%SUBTITLE|"|"
