@@ -204,7 +204,10 @@ void AudioOutputALSA::KillAudio()
     }
 
     if (pcm_handle != NULL)
+    {
 	snd_pcm_close(pcm_handle);
+        pcm_handle = NULL;
+    }
 
     killAudioLock.unlock();
 }
