@@ -196,7 +196,7 @@ void DVDRipBox::connectToMtd(bool try_to_run_mtd)
         //
         //  it should daemonize itself and then return
         //
-        system("mtd");
+        system("mtd -d");
         //
         //  but we need to wait a wee bit for the
         //  socket to open up
