@@ -46,7 +46,6 @@ class VideoGallery : public VideoDialog
     void moveCursor(QString action);
     void exitWin();
     void slotChangeView();
-    void slotItemSelected();
     void handleVideoSelect();
     
   protected:

@@ -27,7 +27,6 @@ class VideoBrowser : public VideoDialog
     virtual ~VideoBrowser();
    
   protected slots:
-    void selected(Metadata *someItem);
     void cursorLeft();
     void cursorRight();
     

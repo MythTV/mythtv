@@ -378,7 +378,7 @@ void VideoManager::copyFinished(QNetworkOperation* op) {
       case QNetworkProtocol::StStopped:
          state = "The operation has been processed but has been stopped before it finished, and is waiting to be processed.";
          break;
-      default: state = "Uknown"; break;
+      default: state = "Unknown"; break;
    }
    VERBOSE(VB_ALL, QString("%1: %2: %3")
            .arg(operation)
@@ -998,6 +998,9 @@ void VideoManager::exitWin()
 
 void VideoManager::doParental(int amount)
 {
+    if (!curitem)
+        return;
+
     int curshowlevel = curitem->ShowLevel();
 
     curshowlevel += amount;
@@ -1333,6 +1336,9 @@ void VideoManager::pageUp()
 
 void VideoManager::videoMenu()
 {
+    if (!curitem)
+        return;
+
     popup = new MythPopupBox(gContext->GetMainWindow(), "video popup");
 
     expectingPopup = true;
@@ -1615,7 +1621,7 @@ void VideoManager::slotEditMeta()
 void VideoManager::slotRemoveVideo()
 {
     cancelPopup();
-    if (m_state == SHOWING_MAINWINDOW)
+    if (curitem && m_state == SHOWING_MAINWINDOW)
     {
         bool okcancel;
         MythPopupBox * ConfirmationDialog = new MythPopupBox (gContext->GetMainWindow());
@@ -1702,6 +1708,9 @@ void VideoManager::slotDoFilter()
 
 void VideoManager::slotToggleBrowseable()
 {
+    if (!curitem)
+        return;
+
     cancelPopup();
     
     curitem->setBrowse(!curitem->Browse());
