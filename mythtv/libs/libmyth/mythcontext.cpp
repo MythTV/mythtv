@@ -154,7 +154,7 @@ void MythContext::LoadQtConfig(void)
     QString themename = GetSetting("Theme");
     QString themedir = FindThemeDir(themename);
     
-    m_settings->SetSetting("ThemePathName", themedir + "/");
+    m_themepathname = themedir + "/";
     
     themedir += "/qtlook.txt";
     m_qtThemeSettings->ReadSettings(themedir);
@@ -372,7 +372,7 @@ void MythContext::ThemeWidget(QWidget *widget)
 
         if (m_qtThemeSettings->GetSetting("BackgroundPixmap") != "")
         {
-            QString pmapname = m_settings->GetSetting("ThemePathName") +
+            QString pmapname = m_themepathname +
                               m_qtThemeSettings->GetSetting("BackgroundPixmap");
 
             bgpixmap = LoadScalePixmap(pmapname);
@@ -384,7 +384,7 @@ void MythContext::ThemeWidget(QWidget *widget)
         }
         else if (m_qtThemeSettings->GetSetting("TiledBackgroundPixmap") != "")
         {
-            QString pmapname = m_settings->GetSetting("ThemePathName") +
+            QString pmapname = m_themepathname +
                          m_qtThemeSettings->GetSetting("TiledBackgroundPixmap");
 
             bgpixmap = LoadScalePixmap(pmapname);

@@ -106,6 +106,7 @@ class MythContext : public QObject
     QString m_installprefix;
 
     bool m_themeloaded;
+    QString m_themepathname;
     QPixmap m_backgroundimage;
     QPalette m_palette;
 
