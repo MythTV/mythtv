@@ -31,3 +31,6 @@ SOURCES += atarihandler.cpp atarirominfo.cpp atarisettingsdlg.cpp
 SOURCES += odyssey2handler.cpp odyssey2rominfo.cpp odyssey2settingsdlg.cpp
 SOURCES += pchandler.cpp pcrominfo.cpp pcsettingsdlg.cpp
 
+macx {
+    QMAKE_LFLAGS += -flat_namespace -undefined suppress
+}

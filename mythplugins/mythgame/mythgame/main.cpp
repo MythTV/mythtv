@@ -106,7 +106,7 @@ int mythplugin_init(const char *libversion)
 void runGames(void)
 {
     QTranslator translator( 0 );
-    translator.load(PREFIX + QString("/share/mythtv/i18n/mythgame_") +
+    translator.load(gContext->GetTranslationsDir() + QString("mythgame_") +
                     QString(gContext->GetSetting("Language").lower()) +
                     QString(".qm"), ".");
     qApp->installTranslator(&translator);
@@ -156,7 +156,7 @@ int mythplugin_run(void)
 int mythplugin_config(void)
 {
     QTranslator translator( 0 );
-    translator.load(PREFIX + QString("/share/mythtv/i18n/mythgame_") +
+    translator.load(gContext->GetTranslationsDir() + QString("mythgame_") +
                     QString(gContext->GetSetting("Language").lower()) +
                     QString(".qm"), ".");
     qApp->installTranslator(&translator);
