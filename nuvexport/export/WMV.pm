@@ -30,6 +30,7 @@ package export::WMV;
                     # ffmpeg-related settings
                      'noise_reduction' => 1,
                      'deinterlace'     => 1,
+                     'crop'            => 1,
                     # WMV-specific settings
                      'a_bitrate'       => 64,
                      'v_bitrate'       => 256,

@@ -21,16 +21,17 @@ package export::transcode;
 # Load the following extra parameters from the commandline
     $cli_args{'deinterlace:s'}             = 1; # Deinterlace video
     $cli_args{'denoise|noise_reduction:s'} = 1; # Enable noise reduction
-    $cli_args{'deinterlace:s'}             = 1; # Transcode-related settings
     $cli_args{'zoom_filter:s'}             = 1; # Which zoom filter to use
     $cli_args{'crop'}                      = 1; # Crop out broadcast overscan
 
 # This superclass defines several object variables:
 #
-#   use_cutlist
+#   path        (defined by generic)
+#   use_cutlist (defined by generic)
 #   denoise
 #   deinterlace
 #   crop
+#   zoom_filter
 #
 
 # Check for transcode

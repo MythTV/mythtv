@@ -20,14 +20,15 @@ package export::ffmpeg;
     use mythtv::recordings;
 
 # Load the following extra parameters from the commandline
-    $cli_args{'cutlist|use_cutlist'} = 1; # Use the myth cutlist
-    $cli_args{'deinterlace:s'}       = 1; # Deinterlace video
-    $cli_args{'denoise|noise_reduction:s'}   = 1; # Enable noise reduction
+    $cli_args{'deinterlace:s'}             = 1; # Deinterlace video
+    $cli_args{'denoise|noise_reduction:s'} = 1; # Enable noise reduction
+    $cli_args{'crop'}                      = 1; # Crop out broadcast overscan
 
 # This superclass defines several object variables:
 #
-#   use_cutlist
-#   noise_reduction
+#   path        (defined by generic)
+#   use_cutlist (defined by generic)
+#   denoise
 #   deinterlace
 #   crop
 #
@@ -60,10 +61,16 @@ package export::ffmpeg;
         $self->{'deinterlace'} = query_text('Enable deinterlacing?',
                                             'yesno',
                                             $self->{'deinterlace'} ? 'Yes' : 'No');
+
     # Crop video to get rid of broadcast padding
-    #    $self->{'crop'} = query_text('Crop ',
-    #                                 'yesno',
-    #                                 $self->{'crop'} ? 'Yes' : 'No');
+        if ($Args{'crop'}) {
+            $self->{'crop'} = 1;
+        }
+        else {
+            $self->{'crop'} = query_text('Crop broadcast overscan (2% border)?',
+                                         'yesno',
+                                         $self->{'crop'} ? 'Yes' : 'No');
+        }
     }
 
     sub export {
@@ -88,12 +95,16 @@ package export::ffmpeg;
 
         my $videofifo = "/tmp/fifodir_$$/vidout";
         my $videotype = 'rawvideo';
+        my $crop_w;
+        my $crop_h;
 
-#    # Crop?
-#        if (1 || $self->{'crop'}) {
-#            my $cropw = sprintf('%.0f', .02 * $episode->{'finfo'}{'width'});
-#            my $croph = sprintf('%.0f', .02 * $episode->{'finfo'}{'height'});
-#        }
+        if ($self->{'crop'}) {
+            $crop_w = sprintf('%.0f', .02 * $episode->{'finfo'}{'width'});
+            $crop_h = sprintf('%.0f', .02 * $episode->{'finfo'}{'height'});
+            # keep crop numbers even
+            $crop_w-- if ($crop_w > 0 && $crop_w % 2);
+            $crop_h-- if ($crop_h > 0 && $crop_h % 2);
+        }
 
         if ($self->{'audioonly'}) {
             $ffmpeg .= "cat /tmp/fifodir_$$/vidout > /dev/null | ";
@@ -107,7 +118,9 @@ package export::ffmpeg;
                 $ffmpeg .= " -i /tmp/fifodir_$$/vidout -f yuv4mpegpipe -";
                 $ffmpeg .= " 2> /dev/null | ";
                 $ffmpeg .= "nice -n $Args{'nice'} yuvdenoise -F -r 16";
-#            $ffmpeg .= " -b $cropw,$croph,-$cropw,-$croph" if( $cropw || $croph );
+                if ($self->{'crop'}) {
+                    $ffmpeg .= " -b $crop_w,$crop_h,-$crop_w,-$crop_h";
+                }
                 $ffmpeg .= " 2> /dev/null | ";
                 $videofifo = "-";
                 $videotype = "yuv4mpegpipe";
@@ -128,6 +141,12 @@ package export::ffmpeg;
         # Filters
             if ($self->{'deinterlace'}) {
                 $ffmpeg .= " -deinterlace";
+            }
+
+            if ($self->{'crop'}) {
+
+                $ffmpeg .= " -croptop $crop_h -cropbottom $crop_h";
+                $ffmpeg .= " -cropleft $crop_w -cropright $crop_w";
             }
         }
 
