@@ -60,6 +60,9 @@ void SingleView::paintEvent(QPaintEvent *e)
     e = e;
 
     erase();
+    QString bgtype = gContext->GetSetting("SlideshowBackground");
+    if (bgtype != "theme" && !bgtype.isEmpty())
+        setPalette(QPalette (QColor(bgtype)));
 
     QPainter p(this);
 

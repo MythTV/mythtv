@@ -20,6 +20,18 @@ public:
     };
 };
 
+class MythGalleryImportDirs: public LineEditSetting, public GlobalSetting {
+public:
+    MythGalleryImportDirs():
+        GlobalSetting("GalleryImportDirs") {
+        setLabel("Paths to import images from");
+        setValue("/mnt/cdrom:/mnt/camera");
+        setHelpText("This is a colon separated list of paths.  If the path "
+                    "in the list is a directory, its contents will be copied. "
+                    "If it is an executable, it will be run.");
+    };
+};
+
 class SlideshowTransition: public ComboBoxSetting, public GlobalSetting {
 public:
     SlideshowTransition() : ComboBoxSetting(true),
@@ -30,6 +42,20 @@ public:
         addSelection("wipe");
         setHelpText("This is the type of transition used between pictures "
                     " in slideshow mode.");
+    }
+};
+
+class SlideshowBackground: public ComboBoxSetting, public GlobalSetting {
+public:
+    SlideshowBackground() : ComboBoxSetting(true),
+      GlobalSetting("SlideshowBackground") {
+        setLabel("Type of background");
+        // use names from /etc/X11/rgb.txt
+        addSelection("theme","");
+        addSelection("black");
+        addSelection("white");
+        setHelpText("This is the type of background for each picture "
+                    " in single view mode.");
     }
 };
 
@@ -49,7 +75,10 @@ GallerySettings::GallerySettings()
     VerticalConfigurationGroup* settings = new VerticalConfigurationGroup(false);
     settings->setLabel("MythGallery Settings");
     settings->addChild(new MythGalleryDir());
+    settings->addChild(new MythGalleryImportDirs());
     settings->addChild(new SlideshowTransition());
+    settings->addChild(new SlideshowBackground());
     settings->addChild(new SlideshowDelay());
     addChild(settings);
 }
+

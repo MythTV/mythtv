@@ -45,6 +45,15 @@ out a level, and hitting 'p' while viewing a single image or while
 an image icon is highlighted will start a slideshow playback of all images 
 in that directory.  Image rotation can be done by pressing the [ and ] keys.
 
+When 'i' is pressed, each item in the import directory search path will be
+examined.  If the item is a directory, its contents will be recursively
+copied to a new directory whose name is the current date and time.  Using this
+method, removable devices can be put in the search path if they use an
+automount system (see the Linux documentation for info on how to use automount
+systems).  If the item is an executable file, it will be executed with 1
+argument consisting of the name of the new subdirectory.  This way, import from
+a removable device can be accomplished without the use of an automount system.
+
 Feel free to subscribe to the development mailing list at:
 http://www.snowman.net/mailman/listinfo/mythtv-dev
 

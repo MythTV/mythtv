@@ -11,12 +11,14 @@
 #include "gallerysettings.h"
 
 #include "mythtv/mythcontext.h"
+#include "mythtv/dialogbox.h"
 
 IconView::IconView(QSqlDatabase *db, const QString &startdir, 
                    MythMainWindow *parent, const char *name)
         : MythDialog(parent, name)
 {
     m_db = db;
+    cacheprogress = NULL;
 
     fgcolor = paletteForegroundColor();
     highlightcolor = fgcolor;
@@ -126,7 +128,14 @@ void IconView::paintEvent(QPaintEvent *e)
              curpos++;
         }
     }
-  
+ 
+    if (cacheprogress)
+    {
+        cacheprogress->Close();
+        delete cacheprogress;
+        cacheprogress = NULL;
+    }
+ 
     tmp.flush();
     tmp.end();
 
@@ -139,6 +148,11 @@ void IconView::fillList(const QString &dir)
 
     if (!d.exists())
         return;
+
+    curdir = d.absPath();
+    QFileInfo cdir(curdir + "/.thumbcache");
+    if (!cdir.exists())
+        d.mkdir(".thumbcache");
 
     d.setNameFilter("*.jpg *.JPG *.jpeg *.JPEG *.png *.PNG *.tiff *.TIFF "
                     "*.bmp *.BMP *.gif *.GIF");
@@ -171,7 +185,26 @@ void IconView::fillList(const QString &dir)
 
 void IconView::loadThumbPixmap(Thumbnail *thumb)
 {
-    QImage tmpimage(thumb->filename);
+    QImage tmpimage;
+    QFileInfo thumbinfo(thumb->filename);
+    QString cachename(curdir + "/.thumbcache/" + thumbinfo.fileName());
+    QFileInfo cacheinfo(cachename);
+
+    // scale thumb and cache it if outdated or not exist
+    if (!cacheinfo.exists() ||
+         (cacheinfo.lastModified() < thumbinfo.lastModified() ) )
+    {
+        if (!cacheprogress)
+            cacheprogress = new MythProgressDialog("Caching thumbnails...", 0);
+        tmpimage.load(thumb->filename);
+        if (tmpimage.width() == 0 || tmpimage.height() == 0)
+            return;
+        QImage tmp2 = tmpimage.smoothScale(thumbw, thumbh, QImage::ScaleMin);
+        tmp2.save(cachename, "JPEG");
+        tmpimage = tmp2;
+    }
+    else
+        tmpimage.load(cachename);
 
     if (tmpimage.width() == 0 || tmpimage.height() == 0)
         return;
@@ -195,10 +228,8 @@ void IconView::loadThumbPixmap(Thumbnail *thumb)
         tmpimage = tmpimage.xForm(matrix);
     }
 
-    QImage tmp2 = tmpimage.smoothScale(thumbw, thumbh, QImage::ScaleMin);
-
     thumb->pixmap = new QPixmap();
-    thumb->pixmap->convertFromImage(tmp2);
+    thumb->pixmap->convertFromImage(tmpimage);
 }
 
 bool IconView::moveDown() 
@@ -362,10 +393,17 @@ void IconView::keyPressEvent(QKeyEvent *e)
             handled = true;
             break;
         }
-        case Key_M: case Key_I:
+        case Key_M:
         {
             GallerySettings settings;
             settings.exec(QSqlDatabase::database());
+            break;
+        }
+        case Key_I:
+        {
+            handled = true;
+            importPics();
+            screenposition = 0;
             break;
         }
         default: break;
@@ -381,6 +419,106 @@ void IconView::keyPressEvent(QKeyEvent *e)
         currow = oldrow;
         curcol = oldcol;
         MythDialog::keyPressEvent(e);
+    }
+}
+
+void IconView::importPics()
+{
+    QFileInfo path;
+    QDir importdir;
+
+    DialogBox importDiag(gContext->GetMainWindow(), tr("Import pictures?"));
+    importDiag.AddButton(tr("No"));
+    importDiag.AddButton(tr("Yes"));
+    if (importDiag.exec() != 2)
+        return;
+
+    QStringList paths = QStringList::split(":",
+                                    gContext->GetSetting("GalleryImportDirs"));
+
+    QString idirname(curdir + "/" +
+                     (QDateTime::currentDateTime()).toString(Qt::ISODate));
+    importdir.mkdir(idirname);
+    importdir.setPath(idirname);
+
+    for (QStringList::Iterator it = paths.begin(); it != paths.end(); ++it)
+    {
+        path.setFile(*it);
+        if (path.isDir() && path.isReadable())
+        {
+            importFromDir(*it,importdir.absPath());
+        } 
+        else if (path.isFile() && path.isExecutable())
+        {
+            QString cmd = *it + " " + importdir.absPath();
+            cerr << "Executing " << cmd << "\n";
+            system(cmd);
+        } 
+        else
+        {
+            cerr << "couldn't read/execute" << *it << "\n";
+        }
+    }
+
+#if QT_VERSION >= 310
+    importdir.refresh();
+    if (importdir.count() == 0)
+#endif
+        // (QT < 3.1) rely on automatic fail if dir not empty
+        if (importdir.rmdir(importdir.absPath()))
+        {
+            DialogBox nopicsDiag(gContext->GetMainWindow(),
+                                 tr("Nothing found to import"));
+            nopicsDiag.AddButton(tr("OK"));
+            nopicsDiag.exec();
+            return;
+        }
+
+    Thumbnail thumb;
+    thumb.filename = importdir.absPath();
+    thumb.isdir = true;
+    thumb.name = importdir.dirName();
+
+    vector<Thumbnail>::iterator thumbshead = thumbs.begin();
+    thumbs.insert(thumbshead, thumb);
+}
+
+void IconView::importFromDir(const QString &fromDir, const QString &toDir)
+{
+    QDir d(fromDir);
+
+    if (!d.exists())
+        return;
+
+    d.setNameFilter("*.jpg *.JPG *.jpeg *.JPEG *.png *.PNG *.tiff *.TIFF "
+                    "*.bmp *.BMP *.gif *.GIF");
+    d.setSorting(QDir::Name | QDir::DirsFirst | QDir::IgnoreCase);
+    d.setFilter(QDir::Files | QDir::Dirs | QDir::NoSymLinks  | QDir::Readable);
+    d.setMatchAllDirs(true);
+    const QFileInfoList *list = d.entryInfoList();
+    if (!list)
+        return;
+    QFileInfoListIterator it(*list);
+    QFileInfo *fi;
+
+    while ((fi = it.current()) != 0)
+    {
+        ++it;
+        if (fi->fileName() == "." || fi->fileName() == "..")
+            continue;
+
+        if (fi->isDir())
+        {
+            QString newdir(toDir + "/" + fi->fileName());
+            d.mkdir(newdir);
+            importFromDir(fi->absFilePath(), newdir);
+        } 
+        else 
+        {
+            cerr << "copying " << fi->absFilePath() << "to " << toDir << "\n";
+            QString cmd = "cp " + fi->absFilePath() + " " + toDir;
+            system(cmd);
+        }
     }
 }
 

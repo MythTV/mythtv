@@ -52,6 +52,8 @@ class IconView : public MythDialog
     bool moveUp();
     bool moveLeft();
     bool moveRight();
+    void importPics();
+    void importFromDir(const QString &fromDir, const QString &toDir);
 
     QFont *m_font;
 
@@ -69,6 +71,8 @@ class IconView : public MythDialog
     QPixmap *foldericon;
 
     QSqlDatabase *m_db;
+    QString curdir;
+    MythProgressDialog *cacheprogress;
 };
 
 #endif
