@@ -18,6 +18,7 @@ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include <qpixmap.h>
 #include <unistd.h>
 
+#include <cmath>
 using namespace std;
 
 #include "metadata.h"
