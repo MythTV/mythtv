@@ -292,8 +292,51 @@ void PreviousBox::nextView(void)
     refillAll = true;
 }
 
+void PreviousBox::setViewFromList(void)
+{
+    if (!choosePopup || !chooseListBox)
+        return;
+
+    int view = chooseListBox->currentItem();
+
+    choosePopup->done(0);
+
+    if (view == curView)
+        return;
+
+    curView = view;
+
+    curItem = -1;
+    refillAll = true;
+}
+
 void PreviousBox::chooseView(void)
 {
+    if (viewList.count() < 2)
+        return;
+
+    choosePopup = new MythPopupBox(gContext->GetMainWindow(), "");
+    choosePopup->addLabel(tr("Select Sort Order"));
+
+    chooseListBox = new MythListBox(choosePopup);
+    chooseListBox->setScrollBar(false);
+    chooseListBox->setBottomScrollBar(false);
+    chooseListBox->insertStringList(viewTextList);
+    if (curView < 0)
+        chooseListBox->setCurrentItem(0);
+    else
+        chooseListBox->setCurrentItem(curView);
+    choosePopup->addWidget(chooseListBox);
+
+    connect(chooseListBox, SIGNAL(accepted(int)), this, SLOT(setViewFromList()));
+
+    chooseListBox->setFocus();
+    choosePopup->ExecPopup();
+
+    delete chooseListBox;
+    chooseListBox = NULL;
+    delete choosePopup;
+    choosePopup = NULL;
 }
 
 void PreviousBox::select()
@@ -330,8 +373,18 @@ void PreviousBox::fillViewList(const QString &view)
     viewList.clear();
     viewTextList.clear();
 
-    viewList << "";
-    viewTextList << "";
+    viewList << "sort by title";
+    viewTextList << tr("Sort by Title");
+
+    viewList << "reverse title";
+    viewTextList << tr("Reverse Title");
+
+    viewList << "sort by time";
+    viewTextList << tr("Sort by Time");
+
+    viewList << "reverse time";
+    viewTextList << tr("Reverse Time");
+
     curView = 0;
 
     if (curView >= (int)viewList.count())
@@ -345,7 +398,15 @@ void PreviousBox::fillItemList(void)
 
     QString where;
 
-    where = QString("ORDER BY oldrecorded.title ");
+    if (viewList[curView] == "reverse time")
+        where = QString("ORDER BY starttime DESC, oldrecorded.chanid ");
+    else if (viewList[curView] == "sort by time")
+        where = QString("ORDER BY starttime, oldrecorded.chanid ");
+    else if (viewList[curView] == "reverse title")
+        where = QString("ORDER BY title DESC, programid, starttime ");
+    else
+        where = QString("ORDER BY title, programid, starttime ");
+
     itemList.FromOldRecorded(db, where);
     
     if (curItem < 0 && itemList.count() > 0)
@@ -431,10 +492,10 @@ void PreviousBox::updateList(QPainter *p)
 
                 ltype->SetItemText(i, 3, tmptitle);
 
-                if (pi->recstatus == rsConflict)
-                    ltype->EnableForcedFont(i, "conflicting");
-                else if (pi->recstatus <= rsWillRecord)
-                    ltype->EnableForcedFont(i, "recording");
+                //if (pi->programid.contains(QRegExp("^SH.*0000$")) ||
+                //    (pi->programid == "" && pi->subtitle == "" &&
+                //      pi->description == ""))
+                //    ltype->EnableForcedFont(i, "inactive");
 
                 if (i + skip == curItem)
                     ltype->SetItemCurrent(i);
@@ -527,7 +588,7 @@ void PreviousBox::removalDialog()
     diag.AddButton(QObject::tr("Remove this episode from the list"));
     rm_episode = button++;
 
-    diag.AddButton(QObject::tr("Remove all episodes with this title"));
+    diag.AddButton(QObject::tr("Remove all episodes for this title"));
     rm_title = button++;
 
     // diag.AddButton(QObject::tr("Remove all that cannot be used for duplicate matching"));

@@ -2761,6 +2761,7 @@ bool ProgramList::FromOldRecorded(QSqlDatabase *db, const QString sql)
         p->chanstr = query.value(9).toString();
         p->chansign = QString::fromUtf8(query.value(10).toString());
         p->channame = QString::fromUtf8(query.value(11).toString());
+        p->recstatus = rsPreviousRecording;
 
         append(p);
     }

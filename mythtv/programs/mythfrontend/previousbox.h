@@ -24,6 +24,7 @@ class PreviousBox : public MythDialog
     void cursorUp(bool page = false);
     void prevView(void);
     void nextView(void);
+    void setViewFromList(void);
     void select(void);
     void edit(void);
     void upcoming(void);
