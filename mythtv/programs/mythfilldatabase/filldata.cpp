@@ -1209,9 +1209,11 @@ time_t toTime_t(QDateTime &dt)
 
 bool grabData(Source source, int offset)
 {
-    char tempfilename[128];
-    strcpy(tempfilename, "/tmp/mythXXXXXX");
-    mkstemp(tempfilename);
+    char tempfilename[] = "/tmp/mythXXXXXX";
+    if (mkstemp(tempfilename) == -1) {
+         perror("mkstemp");
+         exit(1);
+    }
 
     QString filename = QString(tempfilename);
 
