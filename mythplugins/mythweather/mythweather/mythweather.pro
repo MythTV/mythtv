@@ -23,3 +23,7 @@ INSTALLS += installfiles installimages uifiles
 
 HEADERS += weather.h
 SOURCES += main.cpp weather.cpp
+
+macx {
+    QMAKE_LFLAGS += -flat_namespace -undefined suppress
+}
