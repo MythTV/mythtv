@@ -367,6 +367,7 @@ public:
     };
 
     virtual void loadByID(QSqlDatabase* db, int id);
+    virtual void loadByName(QSqlDatabase* db, QString name);
 
     int getProfileNum(void) const {
         return id->intValue();
