@@ -171,8 +171,8 @@ void MythContext::GetScreenSettings(int &width, float &wmult,
         cerr << "m_width: " << m_width << endl;
         cerr << "Falling back to 640x480\n";
 
-        height = 640;
-        width = 480;
+        width = 640;
+        height = 480;
     }
 
     wmult = width / 800.0;
