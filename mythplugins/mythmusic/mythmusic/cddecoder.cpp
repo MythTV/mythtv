@@ -37,7 +37,7 @@ CdDecoder::CdDecoder(const QString &file, DecoderFactory *d,
     output_size = 0;
     settracknum = -1;
 
-    devicename = (char *)(settings->GetSetting("CDDevice").c_str());
+    devicename = settings->GetSetting("CDDevice");
 }
 
 CdDecoder::~CdDecoder(void)

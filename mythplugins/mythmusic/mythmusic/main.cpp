@@ -149,10 +149,10 @@ int main(int argc, char *argv[])
 
     CheckFreeDBServerFile();
 
-    QString startdir = (char *)(settings->GetSetting("MusicLocation").c_str());
+    QString startdir = settings->GetSetting("MusicLocation");
     SearchDir(startdir);
 
-    QString paths = (char *)(settings->GetSetting("TreeLevels").c_str());
+    QString paths = settings->GetSetting("TreeLevels");
     QValueList<Metadata> playlist;
 
     while (1)

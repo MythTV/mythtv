@@ -190,7 +190,7 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
 
     repeat = new MyButton(this);
     repeat->setAutoRaise(true);
-    repeat->setText("Repeat Playlist");
+    repeat->setText("Repeat: Playlist");
     repeat->setFont(QFont("Arial", 14 * hmult, QFont::Bold));
     secondcontrol->addWidget(repeat);
     connect(repeat, SIGNAL(clicked()), this, SLOT(toggleRepeat()));
@@ -384,8 +384,7 @@ void PlaybackBox::play()
     }
     else if (!output)
     {
-        QString adevice;
-        adevice = (char *)(settings->GetSetting("AudioDevice").c_str());
+        QString adevice = settings->GetSetting("AudioDevice");
 
         output = new AudioOutput(outputBufferSize * 1024, adevice);
         output->setBufferSize(outputBufferSize * 1024);
@@ -671,9 +670,9 @@ void PlaybackBox::toggleRepeat()
     repeatmode = !repeatmode;
 
     if (repeatmode)
-        repeat->setText("Repeat Track");
+        repeat->setText("Repeat: Track");
     else
-        repeat->setText("Repeat Playlist");
+        repeat->setText("Repeat: Playlist");
 }
 
 void PlaybackBox::editPlaylist()
@@ -681,7 +680,7 @@ void PlaybackBox::editPlaylist()
     Metadata firstdata = curMeta;
     
     QValueList<Metadata> dblist = *plist; 
-    QString paths = (char *)(settings->GetSetting("TreeLevels").c_str());
+    QString paths = settings->GetSetting("TreeLevels");
     DatabaseBox dbbox(db, paths, &dblist);
 
     dbbox.Show();

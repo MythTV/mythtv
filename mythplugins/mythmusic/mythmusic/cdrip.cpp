@@ -397,15 +397,15 @@ void Ripper::ripthedisc(void)
     qApp->processEvents();
 
     QString textstatus;
-    QString cddevice = (char *)(settings->GetSetting("CDDevice").c_str());
+    QString cddevice = settings->GetSetting("CDDevice");
 
     char tempfile[512], outfile[4096];
     CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
 
     int encodequal = qualitygroup->id(qualitygroup->selected());
 
-    QString tempdir = (char *)(settings->GetSetting("TemporarySpace").c_str());
-    QString findir = (char *)(settings->GetSetting("MusicLocation").c_str());
+    QString tempdir = settings->GetSetting("TemporarySpace");
+    QString findir = settings->GetSetting("MusicLocation");
 
     for (int i = 0; i < totaltracks; i++)
     {
