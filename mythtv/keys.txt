@@ -27,8 +27,8 @@ Watching TV or a recording
 - Page Up to jump back the configured number of minutes.  (default is 10)
 - Page Down to jump ahead the configured number of minutes.  (default is 10)
 - T to toggle close caption support
-- [ to decrease volume
-- ] to increase volume
+- [ or F10 to decrease volume
+- ] or F11 to increase volume
 - | to toggle mute
 - Z to skip to next program marker (beginning/ending of commercial break)
 - Q to skip back to previous program marker
