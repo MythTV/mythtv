@@ -181,6 +181,9 @@ package export::transcode;
         $frames = 0;
         $fps = 0.0;
         my $total_frames = $episode->{'lastgop'} ? ($episode->{'lastgop'} * (($episode->{'finfo'}{'fps'} =~ /^2(?:5|4\.9)/) ? 12 : 15)) : 0;
+    # Keep track of any warnings
+        my $warnings = '';
+        my $critical = 0;
 	# Wait for child processes to finish
         while ((keys %children) > 0) {
             my $l;
@@ -198,6 +201,15 @@ package export::transcode;
                 if ($l =~ /encoding\s+frames\s+\[(\d+)-(\d+)\],\s*([\d\.]+)\s*fps,\s+EMT:\s*([\d:]+),/) {
                     $frames = int($2);
                     $fps    = $3;
+                }
+            # Look for error messages
+                elsif ($l =~ m/\[transcode\] warning/) {
+                    $warnings .= $l;
+                }
+                elsif ($l =~ m/\[transcode\] critical/) {
+                    $warnings .= $l;
+                    $critical  = 1;
+                    last;
                 }
             }
         # Read from the mythtranscode handle?
@@ -224,6 +236,10 @@ package export::transcode;
         if ($mythtranscode) {
             unlink "/tmp/fifodir_$$/audout", "/tmp/fifodir_$$/vidout";
             rmdir "/tmp/fifodir_$$";
+        }
+    # Critical errors?
+        if ($critical) {
+            die "Transcode had critical errors:\n\n$warnings\n";
         }
     }
 
