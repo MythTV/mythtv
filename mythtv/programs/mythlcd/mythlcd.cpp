@@ -19,7 +19,8 @@ MythLCD::MythLCD(QWidget *parent, const char *name )
 	//	Create the LCD device
 	//
 	
-	LCDdisplay = new LCD("localhost", 13666);
+	LCDdisplay = new LCD();
+	LCDdisplay->connectToHost("localhost", 13666);
 
 	resize(200, 210);
 

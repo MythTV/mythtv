@@ -21,7 +21,7 @@
 #include <qapplication.h>
 #include <qtimer.h>
 
-#include "lcddevice.h"
+#include "libmyth/lcddevice.h"
 
 class MythLCD : public QWidget
 {
