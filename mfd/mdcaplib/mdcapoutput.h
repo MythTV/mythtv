@@ -98,6 +98,7 @@ class MdcapOutput
     void addItemYear(int item_year);
     void addItemTrack(int item_track);
     void addItemLength(int item_length); 
+    void addItemDupFlag(bool true_or_false);
 
     //
     //  "element" functions for lists

@@ -535,6 +535,19 @@ void MdcapOutput::addItemLength(int item_length)
     append((uint32_t) item_length);
 }
 
+void MdcapOutput::addItemDupFlag(bool true_or_false)
+{
+    append(MarkupCodes::item_dup_flag);
+    if(true_or_false)
+    {
+        append((uint8_t) 1);
+    }    
+    else
+    {
+        append((uint8_t) 0);
+    }
+}
+
 void MdcapOutput::addListId(int list_id)
 {
     //

@@ -1270,30 +1270,32 @@ void MetadataServer::sendContainers(HttpInRequest *http_request, MdcapRequest *m
                         if(a_metadata->getType() == MDT_audio)
                         {
                             AudioMetadata *audio_metadata = (AudioMetadata *)a_metadata;
-                            if(!container->isLocal() && getLocalEquivalent(a_metadata))
-                            {
+                            response.addAddedItemGroup();
+                                response.addItemType(audio_metadata->getType());
+                                response.addItemId(audio_metadata->getId());
+                                response.addItemUrl(audio_metadata->getUrl().toString());
+                                response.addItemRating(audio_metadata->getRating());
+                                response.addItemLastPlayed(audio_metadata->getLastPlayed().toTime_t());
+                                response.addItemPlayCount(audio_metadata->getPlayCount());
+                                response.addItemArtist(audio_metadata->getArtist());
+                                response.addItemAlbum(audio_metadata->getAlbum());
+                                response.addItemTitle(audio_metadata->getTitle());
+                                response.addItemGenre(audio_metadata->getGenre());
+                                response.addItemYear(audio_metadata->getYear());
+                                response.addItemTrack(audio_metadata->getTrack());
+                                response.addItemLength(audio_metadata->getLength());
+
                                 //
-                                //  No need to list item, as a local equivalent will appear instead
+                                //  If this item is a duplicate of
+                                //  something else that's available
+                                //  locally, let the client know
                                 //
-                            }
-                            else
-                            {
-                                response.addAddedItemGroup();
-                                    response.addItemType(audio_metadata->getType());
-                                    response.addItemId(audio_metadata->getId());
-                                    response.addItemUrl(audio_metadata->getUrl().toString());
-                                    response.addItemRating(audio_metadata->getRating());
-                                    response.addItemLastPlayed(audio_metadata->getLastPlayed().toTime_t());
-                                    response.addItemPlayCount(audio_metadata->getPlayCount());
-                                    response.addItemArtist(audio_metadata->getArtist());
-                                    response.addItemAlbum(audio_metadata->getAlbum());
-                                    response.addItemTitle(audio_metadata->getTitle());
-                                    response.addItemGenre(audio_metadata->getGenre());
-                                    response.addItemYear(audio_metadata->getYear());
-                                    response.addItemTrack(audio_metadata->getTrack());
-                                    response.addItemLength(audio_metadata->getLength());
-                                response.endGroup();
-                            }
+
+                                if(!container->isLocal() && getLocalEquivalent(a_metadata))
+                                {
+                                    response.addItemDupFlag(true);
+                                }
+                            response.endGroup();
                         }
                         else
                         {
@@ -1344,30 +1346,32 @@ void MetadataServer::sendContainers(HttpInRequest *http_request, MdcapRequest *m
                                 if(a_metadata->getType() == MDT_audio)
                                 {
                                     AudioMetadata *audio_metadata = (AudioMetadata *)a_metadata;
-                                    if(!container->isLocal() && getLocalEquivalent(a_metadata))
-                                    {
+                                    response.addAddedItemGroup();
+                                        response.addItemType(audio_metadata->getType());
+                                        response.addItemId(audio_metadata->getId());
+                                        response.addItemUrl(audio_metadata->getUrl().toString());
+                                        response.addItemRating(audio_metadata->getRating());
+                                        response.addItemLastPlayed(audio_metadata->getLastPlayed().toTime_t());
+                                        response.addItemPlayCount(audio_metadata->getPlayCount());
+                                        response.addItemArtist(audio_metadata->getArtist());
+                                        response.addItemAlbum(audio_metadata->getAlbum());
+                                        response.addItemTitle(audio_metadata->getTitle());
+                                        response.addItemGenre(audio_metadata->getGenre());
+                                        response.addItemYear(audio_metadata->getYear());
+                                        response.addItemTrack(audio_metadata->getTrack());
+                                        response.addItemLength(audio_metadata->getLength());
+
                                         //
-                                        //  No need to list item, as a local equivalent will appear instead
+                                        //  If this item is a duplicate of
+                                        //  something else that's available
+                                        //  locally, let the client know
                                         //
-                                    }
-                                    else
-                                    {
-                                        response.addAddedItemGroup();
-                                            response.addItemType(audio_metadata->getType());
-                                            response.addItemId(audio_metadata->getId());
-                                            response.addItemUrl(audio_metadata->getUrl().toString());
-                                            response.addItemRating(audio_metadata->getRating());
-                                            response.addItemLastPlayed(audio_metadata->getLastPlayed().toTime_t());
-                                            response.addItemPlayCount(audio_metadata->getPlayCount());
-                                            response.addItemArtist(audio_metadata->getArtist());
-                                            response.addItemAlbum(audio_metadata->getAlbum());
-                                            response.addItemTitle(audio_metadata->getTitle());
-                                            response.addItemGenre(audio_metadata->getGenre());
-                                            response.addItemYear(audio_metadata->getYear());
-                                            response.addItemTrack(audio_metadata->getTrack());
-                                            response.addItemLength(audio_metadata->getLength());
-                                        response.endGroup();
-                                    }
+
+                                        if(!container->isLocal() && getLocalEquivalent(a_metadata))
+                                        {
+                                            response.addItemDupFlag(true);
+                                        }
+                                    response.endGroup();
                                 }
                                 else
                                 {

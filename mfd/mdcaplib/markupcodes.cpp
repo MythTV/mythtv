@@ -54,6 +54,7 @@ const char MarkupCodes::item_play_count;
 const char MarkupCodes::item_year;
 const char MarkupCodes::item_track;
 const char MarkupCodes::item_length;
+const char MarkupCodes::item_dup_flag;
 const char MarkupCodes::list_id;
 const char MarkupCodes::list_item;
 const char MarkupCodes::deleted_list;

@@ -758,6 +758,47 @@ uint32_t MdcapInput::popItemLength()
     return popU32();    
 }
 
+bool MdcapInput::popItemDupFlag()
+{
+    //
+    //  item dup flag is always 2 bytes
+    //  1st byte - markup code
+    //  2nd byte - 1/0 true/false (item is/isn't a duplicate)
+    //
+    
+    if(amountLeft() < 2)
+    {
+        cerr << "mdcapinput.o: asked to popItemDupFlag(), but "
+             << "there are not enough bytes left in the stream "
+             << endl;
+        return 0;
+    }
+
+    char content_code = popByte();
+    if(content_code != MarkupCodes::item_dup_flag)
+    {
+        cerr << "mdcapinput.o: asked to popItemDupFlag(), but "
+             << "content code is not item_dup_flag "
+             << endl;
+        return 0;       
+    }
+
+    uint8_t flag_value = popByte();
+    if(flag_value == 1)
+    {
+        return true;
+    }
+    else if(flag_value == 0)
+    {
+        return false;
+    }
+    
+    cerr << "mdcapinput.o: asked to popItemDupFlag(), but value was "
+         << "neither true not false"
+         << endl;
+    return false;
+}
+
 QString MdcapInput::popItemUrl()
 {
     QValueVector<char> url_string_vector;

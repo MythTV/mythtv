@@ -10,6 +10,7 @@
 
 #include <iostream>
 using namespace std;
+
 #include <qapplication.h>
 #include <qdatetime.h>
 
@@ -17,12 +18,14 @@ using namespace std;
 
 #include "metadataclient.h"
 #include "mfdinterface.h"
+#include "mfdcontent.h"
 
 #include "mdcaprequest.h"
 #include "mdcapresponse.h"
 #include "events.h"
 
 #include "../mdcaplib/markupcodes.h"
+
 
 MetadataClient::MetadataClient(
                             MfdInterface *the_mfd,
@@ -430,7 +433,9 @@ void MetadataClient::parseServerInfo(MdcapInput &mdcap_input)
                 
             default:
                 cerr << "metadataclient.o getting content codes I don't "
-                     << "understand while doing parseServerInfo(). "
+                     << "understand while doing parseServerInfo() ("
+                     << (int) content_code
+                     << ")"
                      << endl;
                 all_is_well = false;
 
@@ -1382,194 +1387,60 @@ void MetadataClient::printMetadata()
 
 void MetadataClient::buildTree()
 {
-    //
-    //  Build a new tree - this might (?) be faster (FIX ?) if we kept a
-    //  local copy of the previous tree and then did the new one as an
-    //  update to it. At any rate, this is off in it's own mfdinstance
-    //  thread, so the user shouldn't notice (?) that it's slow .... but,
-    //  then again, once we have a way to push playlist changes from the
-    //  client back to the mfd it's going to be pretty stupid to be
-    //  rebuilding all of this everytime a single playlist entry changes ...
-    //  looking forward to patches ...
-    //
-
-
-
-    //  We use attributes the following ways.
-    //
-    //  The basic int (in the constructor) is the item's id.
-    //  The second is the container
-    //  The third means:
-    //          0 - nothing
-    //          1 - metadata item
-    //          2 - playlist item
-    //
-
-    QTime tree_build_timer;
-    tree_build_timer.start();
-
-    GenericTree *new_tree = new GenericTree("Metadata Root", 0, false);
-    new_tree->setAttribute(0, 0);   //  container id;
-    new_tree->setAttribute(1, 0);   //  type of node (neither item nor list);
-
+    QTime collection_build_timer;
+    collection_build_timer.start();
 
     //
-    //  Add the audio root node
-    //  
-    
-    GenericTree *audio_root = new_tree->addNode("Audio Root", 0, false);
-    audio_root->setAttribute(0, 0);
-    audio_root->setAttribute(1, 0);
-    
+    //  Build a complete MfdContentCollection object (all the metadata,
+    //  playlists, and a set of UIListGenericTree's, and all of them sorted)
+    //  that reflects everything available from this mfd.
     //
-    //  Add the three (?)  basic branches to audio content
-    //    
     
-    GenericTree *artist_branch = audio_root->addNode("Artist", 0, false);
-    artist_branch->setAttribute(0, 0);
-    artist_branch->setAttribute(1, 0);
-
-    GenericTree *genre_branch = audio_root->addNode("Genre", 0, false);
-    genre_branch->setAttribute(0, 0);
-    genre_branch->setAttribute(1, 0);
+    MfdContentCollection *new_collection = new MfdContentCollection(getId());
     
-    GenericTree *playlist_branch = audio_root->addNode("Playlist", 0, false);
-    playlist_branch->setAttribute(0, 0);
-    playlist_branch->setAttribute(1, 0);
-    
-    
+  
     //
     //  Iterate over all collections
     //
-            
+    
     QPtrListIterator<MetadataCollection> it( metadata_collections );
     MetadataCollection *a_collection;
     while ( (a_collection = it.current()) != 0 )
     {
+        cout << "@#@#@#@#@#@#@#@#@ Doing a collection called: " << a_collection->getName() << endl;
         ++it;
         
         //
-        //  Iterate over all metadata in this collection
+        //  Add every item in this collection to the content container
         //
         
         QIntDict<Metadata> *metadata = a_collection->getMetadata();
         QIntDictIterator<Metadata> m_it( *metadata ); 
         for ( ; m_it.current(); ++m_it )
         {
-            //
-            //  Put this piece of metadata in all the places it should go
-            //
-      
-            if(AudioMetadata *item = dynamic_cast<AudioMetadata*>(m_it.current()) )
-            {
-                QString album  = item->getAlbum();
-                QString artist = item->getArtist();
-                QString genre  = item->getGenre();
-                QString title  = item->getTitle();
-            
-                //
-                // The Artist --> Album --> Track   branch
-                //
-            
-                GenericTree *artist_node = artist_branch->getChildByName(artist);
-                if(!artist_node)
-                {
-                    artist_node = artist_branch->addNode(artist, 0, false);
-                    artist_node->setAttribute(0, 0);
-                    artist_node->setAttribute(1, 0);
-                }
-            
-                GenericTree *album_node = artist_node->getChildByName(album);
-                if(!album_node)
-                {
-                    album_node = artist_node->addNode(album, 0, false);
-                    album_node->setAttribute(0, 0);
-                    album_node->setAttribute(1, 0);
-                }
-            
-                GenericTree *title_node = album_node->addNode(title, item->getId(), true);
-                title_node->setAttribute(0, a_collection->getId());
-                title_node->setAttribute(1, 1);
-
-
-                //
-                //  Genre --> Artist --> Album --> Track    branch
-                //
-                
-                GenericTree *genre_node = genre_branch->getChildByName(genre);
-                if(!genre_node)
-                {
-                    genre_node = genre_branch->addNode(genre, 0, false);
-                    genre_node->setAttribute(0, 0);
-                    genre_node->setAttribute(1, 0);
-                }
-                
-                artist_node = genre_node->getChildByName(artist);
-                if(!artist_node)
-                {
-                    artist_node = genre_node->addNode(artist, 0, false);
-                    artist_node->setAttribute(0, 0);
-                    artist_node->setAttribute(1, 0);
-                }
-            
-                album_node = artist_node->getChildByName(album);
-                if(!album_node)
-                {
-                    album_node = artist_node->addNode(album, 0, false);
-                    album_node->setAttribute(0, 0);
-                    album_node->setAttribute(1, 0);
-                }
-            
-                title_node = album_node->addNode(title, item->getId(), true);
-                title_node->setAttribute(0, a_collection->getId());
-                title_node->setAttribute(1, 1);
-            }
-            else
-            {
-                cerr << "me know undestand non audio metadata at this point" << endl;
-            }
+            new_collection->addMetadata(m_it.current(), a_collection->getName());
         }
 
+
         //
-        //  Iterate over all playlists in this collection
+        //  Add every playlist in this container
         //
-        
         
         QIntDict<ClientPlaylist> *playlist = a_collection->getPlaylists();
         QIntDictIterator<ClientPlaylist> p_it( *playlist ); 
         for ( ; p_it.current(); ++p_it )
         {
-            GenericTree *playlist_node = playlist_branch->addNode(p_it.current()->getName(), 0, false);
-            playlist_node->setAttribute(0, 0);
-            playlist_node->setAttribute(1, 0);
-
-            //
-            //  Iterate over the entries in this playlist
-            //
-            
-            int counter = 0;
-            QValueList<PlaylistEntry> *the_list = p_it.current()->getListPtr();
-            QValueList<PlaylistEntry>::iterator l_it;
-            for(l_it = the_list->begin(); l_it != the_list->end(); ++l_it)
-            {
-                GenericTree *track_node = playlist_node->addNode((*l_it).getName(), counter, true);
-                track_node->setAttribute(0, a_collection->getId());
-                track_node->setAttribute(1, 2);
-                track_node->setAttribute(2, p_it.current()->getId());
-                ++counter;
-            }
+            new_collection->addPlaylist(p_it.current(), a_collection->getName());
         }
-        
-    }
-
+    }        
 
     //
-    //  If we're in debugging mode, say how long it took to build the tree
+    //  If we're in debugging mode, say how long it took to build all that
     //
     
 #ifdef MFD_DEBUG_BUILD
-    cout << "metadataclient.o: built new metadata tree in "
-         << tree_build_timer.elapsed() / 1000.0
+    cout << "metadataclient.o: built new mfd content container in "
+         << collection_build_timer.elapsed() / 1000.0
          << " second(s)"
          << endl;
 #endif    
@@ -1579,16 +1450,11 @@ void MetadataClient::buildTree()
     //  _EVER_ touch it again)
     //
 
-    MfdMetadataChangedEvent *mce = new MfdMetadataChangedEvent(mfd_id, new_tree);
+    MfdMetadataChangedEvent *mce = new MfdMetadataChangedEvent(mfd_id, new_collection);
     QApplication::postEvent(mfd_interface, mce);
-    
 }
 
 MetadataClient::~MetadataClient()
 {
     metadata_collections.clear();
 }
-
-
-
-

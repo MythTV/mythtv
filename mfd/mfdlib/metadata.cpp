@@ -47,6 +47,7 @@ Metadata::Metadata(
     size = -1;    
     myth_digest = "";
     changed = false;
+    marked_as_duplicate = false;
 }
 
 QString Metadata::getFilePath()

@@ -148,7 +148,6 @@ void MfdInterface::customEvent(QCustomEvent *ce)
                 mfd_to_kill->stop();
                 mfd_to_kill->wait();
                 mfd_instances->remove(mfd_to_kill);
-                cout << "and here I am emiting a kill event" << endl;
                 emit mfdDiscovery(
                                     mfd_to_kill->getId(), 
                                     mfd_to_kill->getName().section(".", 0, 0), 
@@ -191,7 +190,7 @@ void MfdInterface::customEvent(QCustomEvent *ce)
     else if(ce->type() == MFD_CLIENTLIB_EVENT_METADATA)
     {
         MfdMetadataChangedEvent *mce = (MfdMetadataChangedEvent*)ce;
-        swapMetadataTree(mce->getMfd(), mce->getNewTree());
+        swapMetadata(mce->getMfd(), mce->getNewCollection());
     }
     else
     {
@@ -224,44 +223,49 @@ MfdInstance* MfdInterface::findMfd(
     return NULL;
 }                                  
 
-void MfdInterface::swapMetadataTree(int which_mfd, GenericTree *new_tree)
+void MfdInterface::swapMetadata(int which_mfd, MfdContentCollection *new_collection)
 {
     //
     //  One of those darn metadata clients running in a sub thread somewhere
     //  has handed me a new metadata tree
     //
     
-    GenericTree *old_tree = NULL;
+    MfdContentCollection *old_collection = NULL;
     
     //
     //  See if we already have one for this mfd.
     //
     
-    old_tree = metadata_trees.find(which_mfd);
+
+    old_collection = mfd_collections.find(which_mfd);
     
-    if(old_tree)
+    if(old_collection)
     {
-        cout << "swapped in new tree for old" << endl;
-        metadata_trees.remove(which_mfd);
+        cout << "swapped in new collection for old" << endl;
+        mfd_collections.remove(which_mfd);
     }
     else
     {
-        cout << "no old tree, sticking in new one" << endl;
+        cout << "no old collection, sticking in new one" << endl;
     }
     
-    emit metadataChanged(which_mfd, new_tree);
+    emit metadataChanged(which_mfd, new_collection);
     
     //
     //  Keep a reference so we can delete it when the next swap comes in
     //
     
-    metadata_trees.insert(which_mfd, new_tree);
+    mfd_collections.insert(which_mfd, new_collection);
     
     //
     //  Delete the old one
     //
     
-    delete old_tree;
+    if(old_collection)
+    {
+        delete old_collection;
+        old_collection = NULL;
+    }
 }
                                                                                             
 

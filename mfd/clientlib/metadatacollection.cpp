@@ -167,6 +167,7 @@ void MetadataCollection::addItem(MdcapInput &mdcap_input)
     uint new_item_year = 0;
     uint new_item_track = 0;
     uint new_item_length = 0;
+    bool new_item_dup = false;
     
     QString new_item_url;
     QString new_item_title;
@@ -232,6 +233,10 @@ void MetadataCollection::addItem(MdcapInput &mdcap_input)
             case MarkupCodes::item_genre:
                 new_item_genre = mdcap_input.popItemGenre();
                 break;
+                
+            case MarkupCodes::item_dup_flag:
+                new_item_dup = mdcap_input.popItemDupFlag();
+                break;
             
             default:
                 cerr << "metadatacollection.o: unknown tag while doing "
@@ -272,7 +277,10 @@ void MetadataCollection::addItem(MdcapInput &mdcap_input)
                                                         new_item_track,
                                                         new_item_length
                                                     );
-                                                    
+        if(new_item_dup)
+        {
+            new_audio->markAsDuplicate(true);
+        }                                            
         metadata.insert(new_item_id, new_audio);
 
     }

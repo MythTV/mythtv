@@ -12,7 +12,7 @@
 
 #include <qevent.h>
 
-#include <mythtv/generictree.h>
+#include "mfdcontent.h"
 
 #define MFD_CLIENTLIB_EVENT_DISCOVERY  65432
 #define MFD_CLIENTLIB_EVENT_AUDIOPAUSE 65431
@@ -148,16 +148,16 @@ class MfdMetadataChangedEvent: public QCustomEvent
     
   public:
   
-    MfdMetadataChangedEvent(int which_mfd, GenericTree *new_tree);
+    MfdMetadataChangedEvent(int which_mfd, MfdContentCollection *new_collection);
 
-    int          getMfd();
-    GenericTree* getNewTree();
+    int                getMfd();
+    MfdContentCollection* getNewCollection();
     
 
   private:
   
-    int         mfd_id;
-    GenericTree *new_metadata_tree;   
+    int                mfd_id;
+    MfdContentCollection *new_mfd_collection;   
 };
 
 

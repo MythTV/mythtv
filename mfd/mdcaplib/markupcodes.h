@@ -51,42 +51,43 @@ class MarkupCodes
     //  variable length)
     //
     
-    static const char name                  = 16;
-    static const char item_url              = 17;
-    static const char item_artist           = 18;
-    static const char item_album            = 19;
-    static const char item_title            = 20;
-    static const char item_genre            = 21;
-    static const char list_name             = 22;
-    static const char list_item_name        = 23;    
+    static const char name                  = 50;
+    static const char item_url              = 51;
+    static const char item_artist           = 52;
+    static const char item_album            = 53;
+    static const char item_title            = 54;
+    static const char item_genre            = 55;
+    static const char list_name             = 56;
+    static const char list_item_name        = 57;    
     
     //
     //  Simple types of fixed lengths
     //
 
-    static const char status_code           = 32;
-    static const char protocol_version      = 33;
-    static const char session_id            = 34;
-    static const char collection_count      = 35;
-    static const char collection_id         = 36;
-    static const char collection_type       = 37;
-    static const char collection_generation = 38;
-    static const char update_type           = 39;
-    static const char total_items           = 40;
-    static const char added_items           = 41;
-    static const char deleted_items         = 42;
-    static const char deleted_item          = 43;
-    static const char item_type             = 44;
-    static const char item_id               = 45;
-    static const char item_rating           = 46;
-    static const char item_last_played      = 47;
-    static const char item_play_count       = 48;
-    static const char item_year             = 49;
-    static const char item_track            = 50;
-    static const char item_length           = 51;
-    static const char list_id               = 52;
-    static const char list_item             = 53;
-    static const char deleted_list          = 54;    
+    static const char status_code           = 100;
+    static const char protocol_version      = 101;
+    static const char session_id            = 102;
+    static const char collection_count      = 103;
+    static const char collection_id         = 104;
+    static const char collection_type       = 105;
+    static const char collection_generation = 106;
+    static const char update_type           = 107;
+    static const char total_items           = 108;
+    static const char added_items           = 109;
+    static const char deleted_items         = 110;
+    static const char deleted_item          = 111;
+    static const char item_type             = 112;
+    static const char item_id               = 113;
+    static const char item_rating           = 114;
+    static const char item_last_played      = 115;
+    static const char item_play_count       = 116;
+    static const char item_year             = 117;
+    static const char item_track            = 118;
+    static const char item_length           = 119;
+    static const char item_dup_flag         = 120;
+    static const char list_id               = 121;
+    static const char list_item             = 122;
+    static const char deleted_list          = 123;
 
   private:
 

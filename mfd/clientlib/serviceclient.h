@@ -46,6 +46,7 @@ class ServiceClient
     virtual void    handleIncoming();
     void            setName(const QString &a_name){name = a_name;}
     QString         getName(){return name;}
+    int             getId(){return mfd_id;}
     
 
   protected:

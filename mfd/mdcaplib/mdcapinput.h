@@ -56,6 +56,7 @@ class MdcapInput
     uint32_t    popItemYear();
     uint32_t    popItemTrack();
     uint32_t    popItemLength();
+    bool        popItemDupFlag();
     QString     popItemUrl();
     QString     popItemArtist();
     QString     popItemAlbum();

@@ -114,6 +114,9 @@ class Metadata
     void          setChanged(bool y_or_n){changed = y_or_n;}
     bool          getChanged(){return changed;}
 
+    void          markAsDuplicate(bool true_or_false){marked_as_duplicate = true_or_false;}
+    bool          isDuplicate(){return marked_as_duplicate;}
+    
   protected:
 
     int             collection_id;
@@ -134,6 +137,7 @@ class Metadata
     QString         myth_digest;
 
     bool            changed;
+    bool            marked_as_duplicate;
 };
 
 class AudioMetadata : public Metadata

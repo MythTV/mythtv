@@ -127,12 +127,13 @@ MfdAudioPlayingEvent::MfdAudioPlayingEvent(
 
 MfdMetadataChangedEvent::MfdMetadataChangedEvent(
                                                     int which_mfd,
-                                                    GenericTree *new_tree)
+                                                    MfdContentCollection *new_collection
+                                                )
                     :QCustomEvent(MFD_CLIENTLIB_EVENT_METADATA)
 
 {
     mfd_id = which_mfd;
-    new_metadata_tree = new_tree;
+    new_mfd_collection = new_collection;
 }
 
 int MfdMetadataChangedEvent::getMfd()
@@ -140,7 +141,7 @@ int MfdMetadataChangedEvent::getMfd()
     return mfd_id;
 }
 
-GenericTree* MfdMetadataChangedEvent::getNewTree()
+MfdContentCollection* MfdMetadataChangedEvent::getNewCollection()
 {
-    return new_metadata_tree;
+    return new_mfd_collection;
 }
