@@ -49,12 +49,9 @@ use/debug/play with mythLCD code and see the results in a terminal. This can
 be surprisingly useful, as it's an easy way to see the status of a mythbox
 on the display of another computer.
  
-	****IMPORTANT****: a standard ./configure, make, make install at the
-MC/ level of the main MythTV source code does **not** currently declare
--DLCD_DEVICE in the compile and linking lines for libmyth. You're configure
-line needs to be:
-
-	./configure --enable-lcd
+	****IMPORTANT****:  you need to build myth from source for this to
+work. Before building, you need to edit settings.pro and uncomment the
+LCD_DEVICE define.
 
 	Once LCDproc is up and running, go into programs/mythlcd and type
 make. Now just run the program (i.e. ./mythlcd). There is no "make install".
@@ -74,5 +71,5 @@ output to their myth* software (e.g. mythGame, mythWeather, etc.).
 4.0 Plans/TODO
 =============	
 	
-	Make the Myth programs actually use the object
+	Make more modules use the interface.
 
