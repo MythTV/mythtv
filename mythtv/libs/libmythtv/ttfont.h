@@ -7,9 +7,17 @@
 
 #include <qstring.h>
 #include <qmap.h>
+#include <qcolor.h>
+#include <stdint.h>
 
 struct Raster_Map;
 class OSDSurface;
+
+enum kTTF_Color {
+    kTTF_Normal = 0, 
+    kTTF_Outline, 
+    kTTF_Shadow,
+};
 
 class TTFFont
 {
@@ -18,8 +26,10 @@ class TTFFont
              float hmult);
     ~TTFFont();
 
-     // 0-255
-     void setColor(int color) { m_color = color; }
+     // Actually greyscale, keep for compat.
+     void setColor(int color);
+     void setColor(QColor c, kTTF_Color k = kTTF_Normal);
+
      void setOutline(bool outline) { m_outline = outline; }
      void setShadow(int xoff, int yoff) { m_shadowxoff = xoff; 
                                           m_shadowyoff = yoff; }
@@ -48,7 +58,7 @@ class TTFFont
                       int *xorblah, int *yor);
      void merge_text(OSDSurface *surface, Raster_Map *rmap, int offset_x, 
                      int offset_y, int xstart, int ystart, int width, 
-                     int height, int color, int alphamod);
+                     int height, int alphamod, kTTF_Color k = kTTF_Normal);
      bool cache_glyph(unsigned short c);
 
      bool         valid;
@@ -69,7 +79,18 @@ class TTFFont
      bool m_outline;
      int m_shadowxoff;
      int m_shadowyoff;
-     int m_color;
+
+     uint8_t m_color_normal_y;
+     uint8_t m_color_normal_u;
+     uint8_t m_color_normal_v;
+
+     uint8_t m_color_outline_y;
+     uint8_t m_color_outline_u;
+     uint8_t m_color_outline_v;
+
+     uint8_t m_color_shadow_y;
+     uint8_t m_color_shadow_u;
+     uint8_t m_color_shadow_v;
 
      QString m_file;
 

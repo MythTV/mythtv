@@ -8,6 +8,7 @@
 #include <qdir.h>
 #include <qfile.h>
 #include <qcolor.h>
+#include <qregexp.h>
 
 #include <iostream>
 #include <algorithm>
@@ -329,6 +330,7 @@ void OSD::parseFont(QDomElement &element)
     bool outline = false;
     QPoint shadowOffset = QPoint(0, 0);
     int color = 255;
+    QColor color_normal, color_outline, color_shadow;
 
     name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
@@ -358,6 +360,15 @@ void OSD::parseFont(QDomElement &element)
             else if (info.tagName() == "color")
             {
                 color = getFirstText(info).toInt();
+
+                if (info.hasAttribute("normal"))
+                    color_normal = parseColor(info.attribute("normal"));
+
+                if (info.hasAttribute("outline"))
+                    color_outline = parseColor(info.attribute("outline"));
+
+                if (info.hasAttribute("shadow"))
+                    color_shadow = parseColor(info.attribute("shadow"));
             }
             else if (info.tagName() == "outline")
             {
@@ -412,6 +423,15 @@ void OSD::parseFont(QDomElement &element)
     font->setColor(color);
     font->setOutline(outline);
     font->setShadow(shadowOffset.x(), shadowOffset.y());
+
+    if (color_normal.isValid())
+        font->setColor(color_normal, kTTF_Normal);
+
+    if (color_outline.isValid())
+        font->setColor(color_outline, kTTF_Outline);
+
+    if (color_shadow.isValid())
+        font->setColor(color_shadow, kTTF_Shadow);
 
     fontMap[name] = font;
 }
@@ -1169,6 +1189,25 @@ QPoint OSD::parsePoint(QString text)
     QPoint retval(0, 0);
     if (sscanf(text.data(), "%d,%d", &x, &y) == 2)
         retval = QPoint(x, y);
+    return retval;
+}
+
+QColor OSD::parseColor(QString text)
+{
+    QColor retval;
+    QRegExp regexp("#([0-9a-fA-F]){6}");
+    if (regexp.exactMatch(text))
+    {
+        int val;
+        if (sscanf(text.data(), "#%x", &val) == 1)
+            retval = QColor((val >> 16) & 0xff, (val >> 8) & 0xff, val & 0xff);
+    }
+    else
+    {
+        int r, g, b;
+        if (sscanf(text.data(), "%d,%d,%d", &r, &g, &b) == 3)
+            retval = QColor(r, g, b);
+    }
     return retval;
 }
 

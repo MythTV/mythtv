@@ -128,6 +128,7 @@ class OSD : public QObject
     bool LoadTheme();
     void normalizeRect(QRect &rect);
     QPoint parsePoint(QString text);
+    QColor parseColor(QString text);
     QRect parseRect(QString text);
 
     void RemoveSet(OSDSet *set);

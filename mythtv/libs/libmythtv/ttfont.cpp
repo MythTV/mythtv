@@ -45,6 +45,57 @@ struct Raster_Map
     unsigned char *bitmap;
 };
 
+void TTFFont::setColor(int color)
+{
+    color %= 256;
+    m_color_normal_y = color;
+    m_color_normal_u = m_color_normal_v = 128;
+
+    if (m_color_normal_y > 0x80)
+    {
+        m_color_outline_y = 0x20;
+        m_color_outline_u = m_color_outline_v = 128;
+    }
+    else
+    {
+        m_color_outline_y = 0xE0;
+        m_color_outline_u = m_color_outline_v = 128;
+    }
+
+    m_color_shadow_y = 0x20;
+    m_color_shadow_u = m_color_shadow_v = 128;
+}
+
+void TTFFont::setColor(QColor color, kTTF_Color k)
+{
+    float y = (0.299 * color.red()) +
+              (0.587 * color.green()) +
+              (0.114 * color.blue());
+    float u = (0.564 * (color.blue() - y));
+    float v = (0.713 * (color.red() - y));
+
+    switch (k)
+    {
+        case kTTF_Normal:
+            m_color_normal_y = (uint8_t)(y);
+            m_color_normal_u = (uint8_t)(127 + u);
+            m_color_normal_v = (uint8_t)(127 + v);
+            break;
+
+        case kTTF_Outline:
+            m_color_outline_y = (uint8_t)(y);
+            m_color_outline_u = (uint8_t)(127 + u);
+            m_color_outline_v = (uint8_t)(127 + v);
+            break;
+
+        case kTTF_Shadow:
+            m_color_shadow_y = (uint8_t)(y);
+            m_color_shadow_u = (uint8_t)(127 + u);
+            m_color_shadow_v = (uint8_t)(127 + v);
+            break;
+    }
+}
+
 Raster_Map *TTFFont::create_font_raster(int width, int height)
 {
    Raster_Map      *rmap;
@@ -125,6 +176,7 @@ Raster_Map *TTFFont::calc_size(int *width, int *height, const QString &text)
            FT_Load_Glyph(face, j, FT_LOAD_DEFAULT);
            pw += 2; //((face->glyph->metrics.horiBearingX) / 64);
        }
+
        if ((i + 1) == text.length())
        {
            FT_BBox bbox;
@@ -203,15 +255,16 @@ void TTFFont::render_text(Raster_Map *rmap, Raster_Map *rchr,
 
            rtmp = glyphs_cached[j];
        }
+
        // Blit-or the resulting small pixmap into the biggest one
        // We do that by hand, and provide also clipping.
 
-       //if (use_kerning && previous && j)
-       //{
-       //    FT_Vector delta;
-       //    FT_Get_Kerning(face, previous, j, FT_KERNING_DEFAULT, &delta);
-       //    x_offset += delta.x >> 6;
-       //}
+       if (use_kerning && previous && j)
+       {
+           FT_Vector delta;
+           FT_Get_Kerning(face, previous, j, FT_KERNING_DEFAULT, &delta);
+           x_offset += delta.x >> 6;
+       }
 
        xmin = (xmin >> 6) + x_offset;
        ymin = (ymin >> 6) + y_offset;
@@ -295,9 +348,10 @@ void TTFFont::render_text(Raster_Map *rmap, Raster_Map *rchr,
 
 void TTFFont::merge_text(OSDSurface *surface, Raster_Map * rmap, int offset_x, 
                          int offset_y, int xstart, int ystart, int width, 
-                         int height, int color, int alphamod)
+                         int height, int alphamod, kTTF_Color k)
 {
     unsigned char * asrc, * ydst, * udst, * vdst, * adst;
+    uint8_t color_y = 0, color_u = 0, color_v = 0;
 
     if (xstart < 0)
     {
@@ -305,14 +359,17 @@ void TTFFont::merge_text(OSDSurface *surface, Raster_Map * rmap, int offset_x,
         offset_x -= xstart;
         xstart = 0;
     }
+
     if (ystart < 0)
     {
         height += ystart;
         offset_y -= ystart;
         ystart = 0;
     }
+
     if (height + ystart > surface->height)
         height = surface->height - ystart;
+
     if (width + xstart > surface->width)
         width = surface->width - xstart;
 
@@ -322,9 +379,30 @@ void TTFFont::merge_text(OSDSurface *surface, Raster_Map * rmap, int offset_x,
     asrc = rmap->bitmap + rmap->cols * offset_y + offset_x;
     ydst = surface->y + surface->width * ystart + xstart;
     adst = surface->alpha + surface->width * ystart + xstart;
-    udst = surface->u + (surface->width >>1) * (ystart >> 1) + (xstart >> 1);
-    vdst = surface->v + (surface->width >>1) * (ystart >> 1) + (xstart >> 1);
-    (surface->blendcolorfunc) (color, 128, 128, asrc, rmap->width, ydst, udst,
+    udst = surface->u + (surface->width >> 1) * (ystart >> 1) + (xstart >> 1);
+    vdst = surface->v + (surface->width >> 1) * (ystart >> 1) + (xstart >> 1);
+
+    switch(k)
+    {
+        case kTTF_Normal:
+            color_y = m_color_normal_y;
+            color_u = m_color_normal_u;
+            color_v = m_color_normal_v;
+            break;
+        case kTTF_Outline:
+            color_y = m_color_outline_y;
+            color_u = m_color_outline_u;
+            color_v = m_color_outline_v;
+            break;
+        case kTTF_Shadow:
+            color_y = m_color_shadow_y;
+            color_u = m_color_shadow_u;
+            color_v = m_color_shadow_v;
+            break;
+    }
+
+    (surface->blendcolorfunc) (color_y, color_u, color_v,
+                               asrc, rmap->width, ydst, udst,
                                vdst, adst, surface->width, width, height,
                                alphamod, 1, surface->rec_lut,
                                surface->pow_lut);
@@ -394,39 +472,25 @@ void TTFFont::DrawString(OSDSurface *surface, int x, int y,
 	return;
      }
 
-   if (m_color > 255)
-       m_color = 255;
-   if (m_color < 0)
-       m_color = 0;
+   if (m_shadowxoff > 0 || m_shadowyoff > 0)
+   {
+       merge_text(surface, rmap, clipx, clipy, x + m_shadowxoff,
+                  y + m_shadowyoff, width, height, alphamod, kTTF_Shadow);
+   }
 
    if (m_outline)
    {
-       int outlinecolor = 0;
-       if (m_color == 0)
-           outlinecolor = 255;
-
        merge_text(surface, rmap, clipx, clipy, x - 1, y - 1, width, height,
-                  outlinecolor, alphamod);
+                  alphamod, kTTF_Outline);
        merge_text(surface, rmap, clipx, clipy, x + 1, y - 1, width, height,
-                  outlinecolor, alphamod);
+                  alphamod, kTTF_Outline);
        merge_text(surface, rmap, clipx, clipy, x - 1, y + 1, width, height,
-                  outlinecolor, alphamod);
+                  alphamod, kTTF_Outline);
        merge_text(surface, rmap, clipx, clipy, x + 1, y + 1, width, height,
-                  outlinecolor, alphamod);
+                  alphamod, kTTF_Outline);
    }
 
-   if (m_shadowxoff > 0 || m_shadowyoff > 0)
-   {
-       int shadowcolor = 0;
-       if (m_color == 0)
-           shadowcolor = 255;
-    
-       merge_text(surface, rmap, clipx, clipy, x + m_shadowxoff,
-                  y + m_shadowyoff, width, height, shadowcolor, alphamod);
-   }
-
-   merge_text(surface, rmap, clipx, clipy, x, y, width, height, m_color, 
-              alphamod);
+   merge_text(surface, rmap, clipx, clipy, x, y, width, height, alphamod);
 
    destroy_font_raster(rmap);
    destroy_font_raster(rtmp);
@@ -470,7 +534,15 @@ TTFFont::TTFFont(char *file, int size, int video_width, int video_height,
    m_outline = false;
    m_shadowxoff = 0;
    m_shadowyoff = 0;
-   m_color = 255;
+
+   m_color_normal_y = 255;
+   m_color_normal_u = m_color_normal_v = 128;
+
+   m_color_outline_y = 0x40;
+   m_color_outline_u = m_color_outline_v = 128;
+
+   m_color_shadow_y = 0x20;
+   m_color_shadow_u = m_color_shadow_v = 128;
 
    if (!have_library)
    {
@@ -564,7 +636,7 @@ void TTFFont::Init(void)
    for (i = 0; i < 256; ++i)
         cache_glyph(i);
 
-   use_kerning = 0; //FT_HAS_KERNING(face);
+   use_kerning = FT_HAS_KERNING(face);
 
    valid = true;
 
