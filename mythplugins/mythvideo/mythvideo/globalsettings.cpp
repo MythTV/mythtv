@@ -41,7 +41,7 @@ class VideoAggressivePC: public CheckBoxSetting, public GlobalSetting {
 public:
     VideoAggressivePC():
         GlobalSetting("VideoAggressivePC") {
-        setLabel(QObject::tr("Aggresive Parental Control"));
+        setLabel(QObject::tr("Aggressive Parental Control"));
         setValue(false);
         setHelpText(QObject::tr("If set, you will not be able to return "
                     "to this screen and reset the Parental "
@@ -79,7 +79,7 @@ class VideoNewBrowsable: public CheckBoxSetting, public GlobalSetting {
 public:
     VideoNewBrowsable():
         GlobalSetting("VideoNewBrowsable") {
-        setLabel(QObject::tr("Newly scanned files are browsable by default"));
+        setLabel(QObject::tr("Newly scanned files are  by default"));
         setValue(true);
         setHelpText(QObject::tr("If set, newly scanned files in the Video Manager "
                                 "will be marked as browsable and will appear in "
