@@ -1469,6 +1469,8 @@ void Weather::Show()
 {
     m_context->ThemeWidget(this);
     showFullScreen();
+    setActiveWindow();
+    setFocus();
 }
 
 void Weather::UpdateData()
@@ -1539,7 +1541,7 @@ void Weather::UpdateData()
 		char tempHold[32];
 		double tTemp = curTemp.toDouble();
 		double nTemp = (double)(5.0/9.0)*(tTemp - 32.0);
-		sprintf (tempHold, "%.1f", nTemp);
+		sprintf (tempHold, "%d", (int)nTemp);
 		curTemp = tempHold;
 	    }
 	}
@@ -1551,7 +1553,7 @@ void Weather::UpdateData()
                 char tempHold[32];
                 double tTemp = curWind.toDouble();
                 double nTemp = (double)(tTemp*1.6);
-                sprintf (tempHold, "%.1f", nTemp);
+                sprintf (tempHold, "%d", (int)nTemp);
                 curWind = tempHold;
         }
 
@@ -1573,7 +1575,7 @@ void Weather::UpdateData()
                 char tempHold[32];
                 double tTemp = curFeel.toDouble();
                 double nTemp = (5.0/9.0)*(tTemp - 32.0);
-                sprintf (tempHold, "%.1f", nTemp);
+                sprintf (tempHold, "%d", (int)nTemp);
                 curFeel = tempHold;
         }
 	uvIndex = GetString("this.swUV");
@@ -1630,7 +1632,7 @@ void Weather::UpdateData()
                 	char tempHold[32];
                 	double tTemp = holdings[i].toDouble();
                 	double nTemp = (double)(5.0/9.0)*(tTemp - 32.0);
-                	sprintf (tempHold, "%.1f", nTemp);
+                	sprintf (tempHold, "%d", (int)nTemp);
                 	holdings[i] = tempHold;
         	}
 		highTemp[i - 20] = holdings[i];
@@ -1643,7 +1645,7 @@ void Weather::UpdateData()
                         char tempHold[32];
                         double tTemp = holdings[i].toDouble();
                         double nTemp = (double)(5.0/9.0)*(tTemp - 32.0);
-                        sprintf (tempHold, "%.1f", nTemp);
+                        sprintf (tempHold, "%d", (int)nTemp);
                         holdings[i] = tempHold;
                 }
 		lowTemp[i - 40] = holdings[i];
