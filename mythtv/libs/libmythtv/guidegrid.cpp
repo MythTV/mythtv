@@ -1065,8 +1065,6 @@ void GuideGrid::paintPrograms(QPainter *p)
         {
             ProgramInfo *pginfo = m_programInfos[y][x];
 
-            pginfo->GetProgramRecordingStatus();
-
             int spread = 1;
             if (pginfo->startts != lastprog)
             {
@@ -1197,14 +1195,22 @@ void GuideGrid::paintPrograms(QPainter *p)
                         tmp.setPen(QPen(red, (int)(2 * wmult)));
                         QString text;
 
-                        if (recordtype == ScheduledRecording::SingleRecord)
+                        switch (recordtype) {
+                        case ScheduledRecording::SingleRecord:
                             text = "R";
-                        else if (recordtype == ScheduledRecording::TimeslotRecord)
+                            break;
+                        case ScheduledRecording::TimeslotRecord:
                             text = "T";
-                        else if (recordtype == ScheduledRecording::ChannelRecord)
+                            break;
+                        case ScheduledRecording::ChannelRecord:
                             text = "C";
-                        else if (recordtype == ScheduledRecording::AllRecord)
+                            break;
+                        case ScheduledRecording::AllRecord:
                             text = "A";
+                            break;
+                        case ScheduledRecording::NotRecording:
+                            break;
+                        }
 
                         int width = fm.width(text);
 
@@ -1328,14 +1334,22 @@ void GuideGrid::paintPrograms(QPainter *p)
                         tmp.setPen(QPen(yellow, (int)(2 * wmult)));
                         QString text;
 
-                        if (recordtype == ScheduledRecording::SingleRecord)
+                        switch (recordtype) {
+                        case ScheduledRecording::SingleRecord:
                             text = "R";
-                        else if (recordtype == ScheduledRecording::TimeslotRecord)
+                            break;
+                        case ScheduledRecording::TimeslotRecord:
                             text = "T";
-                        else if (recordtype == ScheduledRecording::ChannelRecord)
+                            break;
+                        case ScheduledRecording::ChannelRecord:
                             text = "C";
-                        else if (recordtype == ScheduledRecording::AllRecord)
+                            break;
+                        case ScheduledRecording::AllRecord:
                             text = "A";
+                            break;
+                        case ScheduledRecording::NotRecording:
+                            break;
+                        }
 
                         int width = fm.width(text);
 
@@ -1533,16 +1547,23 @@ void GuideGrid::updateTopInfo()
 
     ScheduledRecording::RecordingType recordtype;
     recordtype = pginfo->GetProgramRecordingStatus();
-    if (recordtype == ScheduledRecording::NotRecording)
-        recordingfield->setText("Not Recording");
-    else if (recordtype == ScheduledRecording::SingleRecord)
+    switch (recordtype) {
+    case ScheduledRecording::NotRecording:
+         recordingfield->setText("Not Recording");
+         break;
+    case ScheduledRecording::SingleRecord:
         recordingfield->setText("Recording Once");
-    else if (recordtype == ScheduledRecording::TimeslotRecord)
+        break;
+    case ScheduledRecording::TimeslotRecord:
         recordingfield->setText("Timeslot Recording");
-    else if (recordtype == ScheduledRecording::ChannelRecord)
+        break;
+    case ScheduledRecording::ChannelRecord:
         recordingfield->setText("Channel Recording");
-    else if (recordtype == ScheduledRecording::AllRecord)
+        break;
+    case ScheduledRecording::AllRecord:
         recordingfield->setText("All Recording");
+        break;
+    }
 
     int chanNum = m_currentRow + m_currentStartChannel;
     if (chanNum >= (int)m_channelInfos.size())
