@@ -220,8 +220,8 @@ public:
     SnesEmulator():
         GlobalSetting("SnesEmulator") {
         setLabel(QObject::tr("SNES Emulator"));
-        addSelection(QObject::tr("SNES9x"), "0");
-        addSelection(QObject::tr("zSNES"), "1");
+        addSelection(QObject::tr("SNES9x"), "SNES9x");
+        addSelection(QObject::tr("zSNES"), "zSNES");
         setHelpText(QObject::tr("Which emulator to use"));
     };
 };
