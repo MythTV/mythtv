@@ -146,6 +146,13 @@ MMusicWatcher::MMusicWatcher(MFD *owner, int identity)
 void MMusicWatcher::run()
 {
     //
+    //  set our priority
+    //
+    
+    int nice_level = mfdContext->getNumSetting("plugin-mmmusic-nice", 18);
+    nice(nice_level);
+    
+    //
     //  pointer to the database
     //
     
@@ -313,8 +320,13 @@ bool MMusicWatcher::sweepMetadata()
         //
 
         removeAllMetadata();
-        latest_sweep.clear();
+        return false;
     }
+
+    //
+    //  If we made it this far, we may need a container (in case we
+    //  recovered from previous checkDataSources() failues)
+    //
 
 
     //
@@ -534,6 +546,21 @@ void MMusicWatcher::removeAllMetadata()
     //
     //  Make the metadata server understand that we have _no_ metadata
     //
+
+    if(metadata_container)
+    {
+        metadata_server->deleteContainer(metadata_container->getIdentifier());
+        metadata_container = NULL;
+        container_id = -1;
+    }        
+    
+    //
+    //  Make sure this object understands it has no metadata
+    //
+    
+    master_list.clear();
+    latest_sweep.clear();
+    files_to_ignore.clear();
     
     
 }

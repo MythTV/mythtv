@@ -541,6 +541,15 @@ void MetadataServer::doAtomicDataSwap(
                                 local_audio_playlist_count 
                                 - target->getPlaylistCount();
                     }
+                    
+                    //
+                    //  Reverse any pruning that we need to
+                    //
+                    
+                    //
+                    //  Actually swap the data
+                    //
+                    
                     target->dataSwap(
                                     new_metadata, 
                                     metadata_additions,
@@ -549,9 +558,16 @@ void MetadataServer::doAtomicDataSwap(
                                     playlist_additions,
                                     playlist_deletions
                                     );
-                                    
+                           
                     new_metadata = NULL;
                     new_playlists = NULL;
+
+
+                    //
+                    //  Perform any new pruning we need to
+                    //
+                    
+                    pruneNewMetadata(target);
 
                     log(QString("container %1 swapped in new data: "
                                 "%2 items (+%3/-%4) and "
@@ -636,7 +652,7 @@ void MetadataServer::doAtomicDataDelta(
                     {
                         local_audio_metadata_count = 
                                 local_audio_metadata_count 
-                                - target->getPlaylistCount();
+                                - target->getMetadataCount();
                         local_audio_playlist_count = 
                                 local_audio_playlist_count 
                                 - target->getPlaylistCount();
@@ -727,6 +743,29 @@ int MetadataServer::getLastDestroyedCollection()
         return_value = last_destroyed_container;
     last_destroyed_mutex.unlock();
     return return_value;
+}
+
+void MetadataServer::pruneNewMetadata(MetadataContainer *container)
+{
+    //
+    //  Check and make sure we are locked
+    //
+
+    if(metadata_mutex.tryLock())
+    {
+        metadata_mutex.unlock();
+        warning("pruneNewMetadata() called without "
+                "metadata_mutex being locked");
+    }
+
+    if(container)
+    {
+        //
+        //  Look at the new metadata and see if we can map non-local to
+        //  local based on mythdigest persistent id's
+        //
+    }    
+    
 }
 
 MetadataServer::~MetadataServer()

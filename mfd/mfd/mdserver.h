@@ -89,7 +89,9 @@ class MetadataServer : public MFDServicePlugin
 
   private:
 
-    int                          bumpContainerId();
+    void                        pruneNewMetadata(MetadataContainer *container);
+
+    int                         bumpContainerId();
 
 
     QPtrList<MetadataContainer> *metadata_containers;

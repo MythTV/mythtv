@@ -75,20 +75,10 @@ class MMusicWatcher: public MFDServicePlugin
     bool            updateMetadata(AudioMetadata* an_item);
     AudioMetadata*  getMetadataFromUrl(QUrl a_url);
     void            persistMetadata(AudioMetadata* an_item);
-    int             bumpMetadataId();
-
-/*
-    bool    checkNewMusicFile(const QString &filename, const QString &startdir);
-    void    prepareNewData();
-    bool    doDeltas();
-
-    int     updateFileList(const QString &startdir, int how_many);
-    void    checkDatabaseAgainstFileList();
-    void    checkFileListAgainstDatabase();
-*/
 
   private:
 
+    int             bumpMetadataId();
     bool            first_time;
   
     QTime           metadata_sweep_time;
