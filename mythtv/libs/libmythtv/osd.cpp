@@ -846,15 +846,17 @@ void OSD::NewDialogBox(const QString &name, const QString &message,
     text->SetMultiLine(true);
     container->AddType(text);
 
+    int offset = (int)(5 * hmult);
+
     for (int i = 1; i <= numoptions; i++)
     {
         int off = numoptions - i + 1;
 
         rect = dialogRect;
-        rect.setTop(rect.bottom() - font->Size() * 2 * off + 5);
-        rect.setBottom(rect.bottom() + font->Size() - 5);
-        rect.setLeft(rect.left() + 5);
-        rect.setRight(rect.right() - 5);
+        rect.setTop(rect.bottom() - font->Size() * 2 * off + offset);
+        rect.setBottom(rect.bottom() + font->Size() - offset);
+        rect.setLeft(rect.left() + offset);
+        rect.setRight(rect.right() - offset);
 
         QString name, option;
         switch (i)
@@ -873,11 +875,13 @@ void OSD::NewDialogBox(const QString &name, const QString &message,
     OSDTypePositionRectangle *opr = new OSDTypePositionRectangle("selector");
     container->AddType(opr);
 
+    offset = (int)(2 * hmult);
+
     for (int i = numoptions; i > 0; i--)
     {
         rect = dialogRect;
-        rect.setTop(rect.bottom() - font->Size() * 2 * i - 2);
-        rect.setBottom(rect.bottom() - font->Size() * 2 * (i - 1) - 2);
+        rect.setTop(rect.bottom() - font->Size() * 2 * i - offset);
+        rect.setBottom(rect.bottom() - font->Size() * 2 * (i - 1) - offset);
         opr->AddPosition(rect);
     }
 
