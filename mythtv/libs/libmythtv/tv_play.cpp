@@ -183,6 +183,9 @@ int TV::LiveTV(bool showDialogs)
     {
         RemoteEncoder *testrec = RemoteRequestRecorder();
 
+        if (!testrec)
+            return 0;
+
         if (!testrec->IsValidRecorder())
         {
             if (showDialogs)
@@ -297,6 +300,8 @@ int TV::PlayFromRecorder(int recordernum)
     }
 
     recorder = RemoteGetExistingRecorder(recordernum);
+    if (!recorder)
+        return -1;
 
     if (recorder->IsValidRecorder())
     {
@@ -441,12 +446,13 @@ void TV::HandleStateChange(void)
         if (nextState == kState_WatchingRecording)
         {
             recorder = RemoteGetExistingRecorder(playbackinfo);
-            if (!recorder->IsValidRecorder())
+            if (!recorder || !recorder->IsValidRecorder())
             {
                 cerr << "ERROR: couldn't find recorder for in-progress "
                      << "recording\n";
                 nextState = kState_WatchingPreRecorded;
-                delete recorder;
+                if (recorder)
+                    delete recorder;
                 activerecorder = recorder = NULL;
             }
             else
@@ -699,7 +705,8 @@ void TV::RunTV(void)
     ff_rew_index = SSPEED_NORMAL;
     speed_index = 0;
 
-    int pausecheck = 0;
+    int updatecheck = 0;
+    update_osd_pos = false;
 
     channelqueued = false;
     channelKeys[0] = channelKeys[1] = channelKeys[2] = channelKeys[3] = ' ';
@@ -774,22 +781,26 @@ void TV::RunTV(void)
             exitPlayer = false;
         }
 
-        if (internalState == kState_WatchingLiveTV || 
-            internalState == kState_WatchingRecording)
+        if (++updatecheck >= 20)
         {
-            pausecheck++;
-            if (paused && !(pausecheck % 20))
+            if (osd && osd->Visible() && update_osd_pos &&
+                internalState == kState_WatchingLiveTV || 
+                internalState == kState_WatchingRecording ||
+                internalState == kState_WatchingPreRecorded)
             {
                 QString desc = "";
                 int pos = nvp->calcSliderPos(0, desc);
                 osd->UpdatePause(pos, desc);
-                pausecheck = 0;
             }
 
+            updatecheck = 0;
+        }
+
+        if (internalState == kState_WatchingLiveTV ||
+            internalState == kState_WatchingRecording)
+        {
             if (channelqueued && nvp->GetOSD() && !osd->Visible())
-            {
                 ChannelCommit();
-            }
         }
     }
   
@@ -819,7 +830,7 @@ bool TV::eventFilter(QObject *o, QEvent *e)
             if (nvp)
                 nvp->ExposeEvent();
             return true;
-	}
+        }
         default:
             return false;
     }
@@ -1132,7 +1143,7 @@ void TV::ProcessKeypress(int keypressed)
                 if (!was_doing_ff_rew)
                 {
                     if (gContext->GetNumSetting("AltClearSavedPosition", 1)
-			&& nvp->GetBookmark())
+                        && nvp->GetBookmark())
                         nvp->ClearBookmark(); 
                     else
                         nvp->SetBookmark(); 
@@ -1169,6 +1180,9 @@ void TV::TogglePIPView(void)
     if (!pipnvp)
     {
         RemoteEncoder *testrec = RemoteRequestRecorder();
+        
+        if (!testrec)
+            return;
 
         if (!testrec->IsValidRecorder())
         {
@@ -1216,7 +1230,7 @@ void TV::TogglePIPView(void)
 
         pipnvp->StopPlaying();
 
-        piprecorder->StopLiveTV();	
+        piprecorder->StopLiveTV();
 
         TeardownPipPlayer();        
     }
@@ -1309,6 +1323,7 @@ void TV::DoInfo(void)
         QString desc = "";
         int pos = nvp->calcSliderPos(0, desc);
         osd->StartPause(pos, false, tr("Position"), desc, osd_display_time);
+        update_osd_pos = true;
     }
 }
 
@@ -1329,6 +1344,7 @@ bool TV::UpdatePosOSD(float time, const QString &mesg)
         bool slidertype = (internalState == kState_WatchingLiveTV);
         int disptime = (mesg == tr("Paused")) ? -1 : 2;
         osd->StartPause(pos, slidertype, mesg, desc, disptime);
+        update_osd_pos = true;
     }
 
     bool res;
@@ -1528,6 +1544,7 @@ void TV::DoSkipCommercials(int direction)
         QString desc = tr("Searching...");
         int pos = nvp->calcSliderPos(0, dummy);
         osd->StartPause(pos, slidertype, tr("Skip"), desc, 6);
+        update_osd_pos = false;
     }
 
     activenvp->SkipCommercials(direction);
@@ -2013,7 +2030,10 @@ void TV::ChangeBrightness(bool up)
     QString text = QString(tr("Brightness %1 %")).arg(brightness);
 
     if (osd)
+    {
         osd->StartPause(brightness * 10, true, tr("Adjust Picture"), text, 5);
+        update_osd_pos = false;
+    }
 }
 
 void TV::ChangeContrast(bool up)
@@ -2023,7 +2043,10 @@ void TV::ChangeContrast(bool up)
     QString text = QString(tr("Contrast %1 %")).arg(contrast);
 
     if (osd)
+    {
         osd->StartPause(contrast * 10, true, tr("Adjust Picture"), text, 5);
+        update_osd_pos = false;
+    }
 }
 
 void TV::ChangeColour(bool up)
@@ -2033,7 +2056,10 @@ void TV::ChangeColour(bool up)
     QString text = QString(tr("Colour %1 %")).arg(colour);
 
     if (osd)
+    {
         osd->StartPause(colour * 10, true, tr("Adjust Picture"), text, 5);
+        update_osd_pos = false;
+    }
 }
 
 void TV::ChangeHue(bool up)
@@ -2043,7 +2069,10 @@ void TV::ChangeHue(bool up)
     QString text = QString(tr("Hue %1 %")).arg(colour);
 
     if (osd)
+    {
         osd->StartPause(colour * 10, true, tr("Adjust Picture"), text, 5);
+        update_osd_pos = false;
+    }
 }
 
 void TV::ChangeVolume(bool up)
@@ -2060,7 +2089,10 @@ void TV::ChangeVolume(bool up)
     QString text = QString(tr("Volume %1 %")).arg(curvol);
 
     if (osd && !browsemode)
+    {
         osd->StartPause(curvol * 10, true, tr("Adjust Volume"), text, 5);
+        update_osd_pos = false;
+    }
 }
 
 void TV::ToggleMute(void)

@@ -72,7 +72,7 @@ class PlaybackBox : public MythDialog
     void keyPressEvent(QKeyEvent *e);
 
   private:
-    void FillList(void);
+    bool FillList(void);
     void UpdateProgressBar(void);
 
     QString cutDown(QString, QFont *, int);
@@ -87,6 +87,7 @@ class PlaybackBox : public MythDialog
     bool skipUpdate;
     bool noUpdate;
     bool pageDowner;
+    bool connected;
     ProgramInfo *curitem;
     ProgramInfo *delitem;
 
@@ -171,8 +172,6 @@ class PlaybackBox : public MythDialog
     QColor popupHighlight;
 
     bool expectingPopup;
-
-    QFont bigFont, medFont;
 };
 
 #endif

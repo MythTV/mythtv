@@ -15,7 +15,8 @@ vector<ProgramInfo *> *RemoteGetRecordedList(bool deltype)
 
     QStringList strlist = str;
 
-    gContext->SendReceiveStringList(strlist);
+    if (!gContext->SendReceiveStringList(strlist))
+        return NULL;
 
     int numrecordings = strlist[0].toInt();
 
@@ -38,10 +39,16 @@ void RemoteGetFreeSpace(int &totalspace, int &usedspace)
 {
     QStringList strlist = QString("QUERY_FREESPACE");
 
-    gContext->SendReceiveStringList(strlist);
-
-    totalspace = strlist[0].toInt();
-    usedspace = strlist[1].toInt();
+    if (gContext->SendReceiveStringList(strlist))
+    {
+        totalspace = strlist[0].toInt();
+        usedspace = strlist[1].toInt();
+    }
+    else
+    {
+        totalspace = 0;
+        usedspace = 0;
+    }
 }
 
 bool RemoteCheckFile(ProgramInfo *pginfo)
@@ -49,10 +56,10 @@ bool RemoteCheckFile(ProgramInfo *pginfo)
     QStringList strlist = "QUERY_CHECKFILE";
     pginfo->ToStringList(strlist);
 
-    gContext->SendReceiveStringList(strlist);
+    if (!gContext->SendReceiveStringList(strlist))
+        return false;
 
-    bool exists = strlist[0].toInt();
-    return exists;
+    return strlist[0].toInt();
 }
 
 void RemoteQueueTranscode(ProgramInfo *pginfo, int state)
@@ -88,7 +95,8 @@ bool RemoteGetAllPendingRecordings(vector<ProgramInfo *> &recordinglist)
 {
     QStringList strlist = QString("QUERY_GETALLPENDING");
 
-    gContext->SendReceiveStringList(strlist);
+    if (!gContext->SendReceiveStringList(strlist))
+        return false;
 
     bool conflicting = strlist[0].toInt();
     int numrecordings = strlist[1].toInt();
@@ -111,7 +119,8 @@ void RemoteGetAllScheduledRecordings(vector<ProgramInfo *> &scheduledlist)
 {
     QStringList strlist = QString("QUERY_GETALLSCHEDULED");
 
-    gContext->SendReceiveStringList(strlist);
+    if (!gContext->SendReceiveStringList(strlist))
+        return;
 
     int numrecordings = strlist[0].toInt();
     int offset = 1;
@@ -133,7 +142,8 @@ vector<ProgramInfo *> *RemoteGetConflictList(ProgramInfo *pginfo,
     QStringList strlist = cmd;
     pginfo->ToStringList(strlist);
 
-    gContext->SendReceiveStringList(strlist);
+    if (!gContext->SendReceiveStringList(strlist))
+        return NULL;
 
     int numrecordings = strlist[0].toInt();
     int offset = 1;
@@ -156,7 +166,8 @@ RemoteEncoder *RemoteRequestRecorder(void)
 {
     QStringList strlist = "GET_FREE_RECORDER";
 
-    gContext->SendReceiveStringList(strlist);
+    if (!gContext->SendReceiveStringList(strlist))
+        return NULL;
 
     int num = strlist[0].toInt();
     QString hostname = strlist[1];
@@ -170,7 +181,8 @@ RemoteEncoder *RemoteGetExistingRecorder(ProgramInfo *pginfo)
     QStringList strlist = "GET_RECORDER_NUM";
     pginfo->ToStringList(strlist);
 
-    gContext->SendReceiveStringList(strlist);
+    if (!gContext->SendReceiveStringList(strlist))
+        return NULL;
 
     int num = strlist[0].toInt();
     QString hostname = strlist[1];
@@ -184,7 +196,8 @@ RemoteEncoder *RemoteGetExistingRecorder(int recordernum)
     QStringList strlist = "GET_RECORDER_FROM_NUM";
     strlist << QString("%1").arg(recordernum);
 
-    gContext->SendReceiveStringList(strlist);
+    if (!gContext->SendReceiveStringList(strlist))
+        return NULL;
 
     QString hostname = strlist[0];
     int port = strlist[1].toInt();
@@ -214,25 +227,31 @@ void RemoteFillProginfo(ProgramInfo *pginfo, const QString &playbackhostname)
     strlist << playbackhostname;
     pginfo->ToStringList(strlist);
 
-    gContext->SendReceiveStringList(strlist);
-
-    pginfo->FromStringList(strlist, 0);
+    if (gContext->SendReceiveStringList(strlist))
+        pginfo->FromStringList(strlist, 0);
 }
 
 int RemoteIsRecording(void)
 {
     QStringList strlist = "QUERY_ISRECORDING";
-    gContext->SendReceiveStringList(strlist);
+
+    if (!gContext->SendReceiveStringList(strlist))
+        return -1;
+
     return strlist[0].toInt();
 }
 
 int RemoteGetRecordingMask(void)
 {
-    int mask=0;
+    int mask = 0;
 
     QString cmd = "QUERY_ISRECORDING";
+
     QStringList strlist = cmd;
-    gContext->SendReceiveStringList(strlist);
+
+    if (!gContext->SendReceiveStringList(strlist))
+        return mask;
+
     int recCount = strlist[0].toInt();
 
     for (int i = 0, j = 0; j < recCount; i++)
@@ -242,11 +261,13 @@ int RemoteGetRecordingMask(void)
         strlist = cmd;
         strlist << "IS_RECORDING";
 
-        gContext->SendReceiveStringList(strlist);
-        if (strlist[0].toInt())
+        if (gContext->SendReceiveStringList(strlist))
         {
-            mask |= 1<<i;
-            j++;       // count active recorder
+            if (strlist[0].toInt())
+            {
+                mask |= 1<<i;
+                j++;       // count active recorder
+            }
         }
     }
 

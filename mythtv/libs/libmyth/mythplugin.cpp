@@ -1,6 +1,7 @@
 #include "mythplugin.h"
 #include "qdict.h"
 #include <iostream>
+#include <dlfcn.h>
 
 #include "mythcontext.h"
 
@@ -23,6 +24,7 @@ int MythPluginManager::MythPlugin::init(const char *libversion)
     if (ifunc)
         return ifunc(libversion);
 
+    cerr << dlerror() << endl;
     return -1;
 }
 

@@ -191,6 +191,7 @@ class TV : public QObject
     int speed_index;
 
     OSD *osd;
+    bool update_osd_pos;
 
     NuppelVideoPlayer *nvp;
     NuppelVideoPlayer *pipnvp;

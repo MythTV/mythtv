@@ -113,10 +113,13 @@ class MythDialog : public QFrame
     int rescode;
 
     bool in_loop;
+
+    QFont defaultBigFont, defaultMediumFont, defaultSmallFont;
 };
 
 class MythPopupBox : public MythDialog
 {
+    Q_OBJECT
   public:
     MythPopupBox(MythMainWindow *parent, const char *name = 0);
     MythPopupBox(MythMainWindow *parent, bool graphicPopup, 
@@ -125,11 +128,30 @@ class MythPopupBox : public MythDialog
 
     void addWidget(QWidget *widget, bool setAppearance = true);
 
-    void ShowPopup(int hpadding = 0, int wpadding = 0);
+    typedef enum { Large, Medium, Small } LabelSize;
+
+    QLabel *addLabel(QString caption, LabelSize size = Medium, 
+                     bool wrap = false);
+
+    QButton *addButton(QString caption, QObject *target = NULL, 
+                       const char *slot = NULL);
+
+    void ShowPopup(QObject *target = NULL, const char *slot = NULL);
+    int ExecPopup(QObject *target = NULL, const char *slot = NULL);
+
+    static void showOkPopup(MythMainWindow *parent, QString title,
+                            QString message);
+    static bool showOkCancelPopup(MythMainWindow *parent, QString title,
+                                  QString message, bool focusOk);
+
+  protected slots:
+    void defaultButtonPressedHandler(void);
+    void defaultExitHandler(void);
 
   private:
     QVBoxLayout *vbox;
     QColor popupForegroundColor;
+    int hpadding, wpadding;
 };
 
 class MythProgressDialog: public MythDialog

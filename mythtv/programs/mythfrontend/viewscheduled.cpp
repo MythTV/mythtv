@@ -766,6 +766,9 @@ void ViewScheduled::handleNotRecording(ProgramInfo *rec)
     vector<ProgramInfo *> *conflictlist = RemoteGetConflictList(rec, false);
     allowKeys = true;
 
+    if (!conflictlist)
+        return;
+
     QString dstart, dend;
     vector<ProgramInfo *>::iterator i;
     for (i = conflictlist->begin(); i != conflictlist->end(); i++)
@@ -843,6 +846,9 @@ void ViewScheduled::chooseConflictingProgram(ProgramInfo *rec)
     allowKeys = false;
     vector<ProgramInfo *> *conflictlist = RemoteGetConflictList(rec, true);
     allowKeys = true;
+
+    if (!conflictlist)
+        return;
 
     QString message = tr("The follow scheduled recordings conflict with each "
                          "other.  Which would you like to record?");

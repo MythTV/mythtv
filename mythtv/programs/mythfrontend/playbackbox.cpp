@@ -99,7 +99,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
         exit(0);
     }
 
-    FillList(); 
+    connected = FillList(); 
 
     curTitle = 0;
 
@@ -108,11 +108,6 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     displayChanNum = gContext->GetNumSetting("DisplayChanNum");
     dateformat = gContext->GetSetting("DateFormat", "ddd MMMM d");
     timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
-
-    bigFont = QFont("Arial", (int)(gContext->GetBigFontSize() * hmult), 
-                    QFont::Bold);
-    medFont = QFont("Arial", (int)(gContext->GetMediumFontSize() * hmult),
-                    QFont::Bold);
 
     nvp = NULL;
     timer = new QTimer(this);
@@ -508,9 +503,10 @@ void PlaybackBox::updateUsage(QPainter *p)
     if (noUpdate == true)
         return; 
 
-    int total, used;
+    int total = 0, used = 0;
     noUpdate = true;
-    RemoteGetFreeSpace(total, used);
+    if (connected)
+        RemoteGetFreeSpace(total, used);
     noUpdate = false;
 
     QString usestr;
@@ -985,7 +981,7 @@ void PlaybackBox::cursorUp(bool page)
     }
 }
 
-void PlaybackBox::FillList()
+bool PlaybackBox::FillList()
 {
     QString chanid = "";
     typedef QMap<QString,QString> ShowData;
@@ -1062,6 +1058,8 @@ void PlaybackBox::FillList()
     lastUpdateTime = QDateTime::currentDateTime();
 
     noUpdate = false;
+
+    return (infoList != NULL);
 }
 
 static void *SpawnDecoder(void *param)
@@ -1316,7 +1314,7 @@ void PlaybackBox::play(ProgramInfo *rec)
 
     delete tvrec;
 
-    FillList();
+    connected = FillList();
     skipUpdate = false;
     update(fullRect);
 
@@ -1350,7 +1348,7 @@ void PlaybackBox::doRemove(ProgramInfo *rec)
         curTitle = 0;
         curShowing = 0;
         skipNum = 0;
-        FillList();
+        connected = FillList();
     }
     else 
     {
@@ -1358,7 +1356,7 @@ void PlaybackBox::doRemove(ProgramInfo *rec)
         if (titleitems < listsize)
             listCount--;
 
-        FillList();
+        connected = FillList();
 
         if (skipNum < 0)
             skipNum = 0;
@@ -1470,28 +1468,40 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, int types)
     initPopup(popup, program, message1, message2);
 
     QString tmpmessage;
+    const char *tmpslot;
 
     switch (types)
     {
-        case 1: case 2: tmpmessage = tr("Yes, get rid of it"); break;
-        case 3: tmpmessage = tr("Yes, AutoExpire"); break;
-        case 4: tmpmessage = tr("Yes, stop recording it"); break;
-        default: tmpmessage = "ERROR ERROR ERROR"; break;
+        case 1: case 2: tmpmessage = tr("Yes, get rid of it"); 
+                        tmpslot = SLOT(doDelete);
+                        break;
+        case 3: tmpmessage = tr("Yes, AutoExpire"); 
+                tmpslot = SLOT(doAutoExpire);
+                break;
+        case 4: tmpmessage = tr("Yes, stop recording it"); 
+                tmpslot = SLOT(doStop);
+                break;
+        default: tmpmessage = "ERROR ERROR ERROR"; tmpslot = NULL; break;
     }
-    MythPushButton *yesButton = new MythPushButton(tmpmessage, popup);
+    QButton *yesButton = popup->addButton(tmpmessage, this, tmpslot);
 
     switch (types)
     {
-        case 1: tmpmessage = tr("No, I might want to watch it again."); break;
-        case 2: tmpmessage = tr("No, keep it, I changed my mind"); break;
-        case 3: tmpmessage = tr("No, do not AutoExpire"); break;
-        case 4: tmpmessage = tr("No, continue recording it"); break;
-        default: tmpmessage = "ERROR ERROR ERROR"; break;
+        case 1: tmpmessage = tr("No, I might want to watch it again."); 
+                tmpslot = SLOT(noDelete());
+                break;
+        case 2: tmpmessage = tr("No, keep it, I changed my mind"); 
+                tmpslot = SLOT(noDelete());
+                break;
+        case 3: tmpmessage = tr("No, do not AutoExpire"); 
+                tmpslot = SLOT(noAutoExpire());
+                break;
+        case 4: tmpmessage = tr("No, continue recording it"); 
+                tmpslot = SLOT(noStop());
+                break;
+        default: tmpmessage = "ERROR ERROR ERROR"; tmpslot = NULL; break;
     }
-    MythPushButton *noButton = new MythPushButton(tmpmessage, popup);
-
-    popup->addWidget(yesButton, false);
-    popup->addWidget(noButton, false);
+    QButton *noButton = popup->addButton(tmpmessage, this, tmpslot);
 
     if (types == 1 || types == 2)
         noButton->setFocus();
@@ -1504,27 +1514,7 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, int types)
             noButton->setFocus();
     }
  
-    popup->ShowPopup(110, 80); 
-
-    if (types == 1 || types == 2)
-    {
-        connect(yesButton, SIGNAL(pressed()), this, SLOT(doDelete()));
-        connect(noButton, SIGNAL(pressed()), this, SLOT(noDelete()));
-    }
-    else if (types == 3)
-    {
-        connect(yesButton, SIGNAL(pressed()), this, SLOT(doAutoExpire()));
-        connect(noButton, SIGNAL(pressed()), this, SLOT(noAutoExpire()));
-    }
-    else if (types == 4)
-    {
-        connect(yesButton, SIGNAL(pressed()), this, SLOT(doStop()));
-        connect(noButton, SIGNAL(pressed()), this, SLOT(noStop()));
-    }
-
-    QAccel *popaccel = new QAccel(popup);
-    popaccel->connectItem(popaccel->insertItem(Key_Escape), this, 
-                          SLOT(doCancel()));
+    popup->ShowPopup(this, SLOT(doCancel())); 
 
     expectingPopup = true;
 }
@@ -1550,47 +1540,22 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
     QSqlDatabase *db = QSqlDatabase::database();
     QDateTime curtime = QDateTime::currentDateTime();
 
-    MythPushButton *playB = new MythPushButton(tr("Play"), popup);
-    connect(playB, SIGNAL(pressed()), this, SLOT(doPlay()));
-    popup->addWidget(playB);
-
-    MythPushButton *tempB;
+    QButton *playButton = popup->addButton(tr("Play"), this, SLOT(doPlay()));
 
     if ((curtime >= program->startts) && (curtime < program->endts))
-    {
-        tempB = new MythPushButton(tr("Stop Recording"), popup);
-        connect(tempB, SIGNAL(pressed()), this, SLOT(askStop()));
-        popup->addWidget(tempB);
-    }
+        popup->addButton(tr("Stop Recording"), this, SLOT(askStop()));
 
     if (delitem->GetAutoExpireFromRecorded(db))
-    {
-        tempB = new MythPushButton(tr("Don't Auto Expire"), popup);
-        connect(tempB, SIGNAL(pressed()), this, SLOT(noAutoExpire()));
-        popup->addWidget(tempB);
-    }
+        popup->addButton(tr("Don't Auto Expire"), this, SLOT(noAutoExpire()));
     else
-    {
-        tempB = new MythPushButton(tr("Auto Expire"), popup);
-        connect(tempB, SIGNAL(pressed()), this, SLOT(doAutoExpire()));
-        popup->addWidget(tempB);
-    }
+        popup->addButton(tr("Auto Expire"), this, SLOT(doAutoExpire()));
 
-    tempB = new MythPushButton(tr("Delete"), popup);
-    connect(tempB, SIGNAL(pressed()), this, SLOT(askDelete()));
-    popup->addWidget(tempB);
+    popup->addButton(tr("Delete"), this, SLOT(askDelete()));
+    popup->addButton(tr("Cancel"), this, SLOT(doCancel()));
 
-    tempB = new MythPushButton(tr("Cancel"), popup);
-    connect(tempB, SIGNAL(pressed()), this, SLOT(doCancel()));
-    popup->addWidget(tempB);
+    popup->ShowPopup(this, SLOT(doCancel()));
 
-    QAccel *popaccel = new QAccel(popup);
-    popaccel->connectItem(popaccel->insertItem(Key_Escape), this,
-                          SLOT(doCancel()));
-
-    popup->ShowPopup(110, 80);
-
-    playB->setFocus();
+    playButton->setFocus();
 
     expectingPopup = true;
 }
@@ -1606,38 +1571,27 @@ void PlaybackBox::initPopup(MythPopupBox *popup, ProgramInfo *program,
                        endts.time().toString(timeformat);
 
     QString descrip = program->description;
-    descrip = cutDownString(descrip, &medFont, (int)(width() / 2));
+    descrip = cutDownString(descrip, &defaultMediumFont, (int)(width() / 2));
     QString titl = program->title;
-    titl = cutDownString(titl, &bigFont, (int)(width() / 2));
+    titl = cutDownString(titl, &defaultBigFont, (int)(width() / 2));
 
     if (message.stripWhiteSpace().length() > 0)
     {
-        QLabel *msg = new QLabel(message, popup);
-        QLabel *filler1 = new QLabel("", popup);
-        popup->addWidget(msg, false);
-        popup->addWidget(filler1, false);
+        popup->addLabel(message);
+        popup->addLabel("");
     }
 
-    QLabel *title = new QLabel(program->title, popup);
-    title->setFont(bigFont);
-    title->setMaximumWidth((int)(width() / 2));
-    popup->addWidget(title, false);
+    QLabel *title = popup->addLabel(program->title, MythPopupBox::Large);
 
     if ((program->subtitle).stripWhiteSpace().length() > 0)
-    {
-        QLabel *subtitle = new QLabel("\"" + program->subtitle + "\"", popup);
-        popup->addWidget(subtitle, false);
-    }
+        popup->addLabel("\"" + program->subtitle + "\"");
 
-    QLabel *times = new QLabel(timedate, popup);
-    popup->addWidget(times, false);
+    popup->addLabel(timedate);
 
     if (message2.stripWhiteSpace().length() > 0)
     {
-        QLabel *filler2 = new QLabel("", popup);
-        QLabel *msg2 = new QLabel(message2, popup);
-        popup->addWidget(filler2, false);
-        popup->addWidget(msg2, false);
+        popup->addLabel("");
+        popup->addLabel(message2);
     }
 }
 
@@ -1912,7 +1866,7 @@ void PlaybackBox::customEvent(QCustomEvent *e)
         {
             if (QDateTime::currentDateTime() > lastUpdateTime.addSecs(1))
             {
-                FillList();      
+                connected = FillList();      
                 update(fullRect);
             }
             if (type == Delete)

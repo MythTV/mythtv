@@ -33,15 +33,15 @@ PlaybackSock::~PlaybackSock()
         delete sock;
 }
 
-void PlaybackSock::SendReceiveStringList(QStringList &strlist)
+bool PlaybackSock::SendReceiveStringList(QStringList &strlist)
 {
     sockLock.lock();
     expectingreply = true;
 
     WriteStringList(sock, strlist);
-    ReadStringList(sock, strlist);
+    bool ok = ReadStringList(sock, strlist);
 
-    while (strlist[0] == "BACKEND_MESSAGE")
+    while (ok && strlist[0] == "BACKEND_MESSAGE")
     {
         // oops, not for us
         QString message = strlist[1];
@@ -50,11 +50,13 @@ void PlaybackSock::SendReceiveStringList(QStringList &strlist)
         MythEvent me(message, extra);
         gContext->dispatch(me);
 
-        ReadStringList(sock, strlist);
+        ok = ReadStringList(sock, strlist);
     }
 
     expectingreply = false;
     sockLock.unlock();
+
+    return ok;
 }
 
 void PlaybackSock::GetFreeSpace(int &totalspace, int &usedspace)

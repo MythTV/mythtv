@@ -57,8 +57,8 @@ MpegRecorder::MpegRecorder()
     keyframedist = 15;
     gopset = false;
 
-    bitrate = 8000;
-    maxbitrate = 16000;
+    bitrate = 4500;
+    maxbitrate = 6000;
     streamtype = 0;
     aspectratio = 2;
     audtype = 2;

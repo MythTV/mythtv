@@ -145,7 +145,10 @@ void startTV(void)
 
     bool showDialogs = true;
     if (!tv->LiveTV(showDialogs))
+    {
+        tv->StopLiveTV();
         quitAll = true;
+    }
 
     while (!quitAll)
     {

@@ -67,7 +67,7 @@ class MythEvent : public QCustomEvent
     QString extradata;
 };
 
-#define MYTH_BINARY_VERSION "0.12.09192003-1"
+#define MYTH_BINARY_VERSION "0.12.10012003-1"
 
 extern int print_verbose_messages;
 
@@ -82,7 +82,7 @@ class MythContext : public QObject
 
     QString GetHostName(void) { return m_localhostname; }
 
-    void ConnectToMasterServer(void);
+    bool ConnectToMasterServer(void);
     bool ConnectServer(const QString &hostname, int port);
 
     QString GetInstallPrefix() { return m_installprefix; }
@@ -123,9 +123,13 @@ class MythContext : public QObject
 
     void SetSetting(const QString &key, const QString &newValue);
 
-    int GetBigFontSize() { return GetNumSetting("QtFontBig", 25); }
-    int GetMediumFontSize() { return GetNumSetting("QtFontMedium", 16); }
-    int GetSmallFontSize() { return GetNumSetting("QtFontSmall", 12); }
+    int GetBigFontSize() { return bigfontsize; }
+    int GetMediumFontSize() { return mediumfontsize; }
+    int GetSmallFontSize() { return smallfontsize; }
+
+    QFont GetBigFont();
+    QFont GetMediumFont();
+    QFont GetSmallFont();
 
     QString GetLanguage(void);
 
@@ -139,7 +143,7 @@ class MythContext : public QObject
     void dispatch(MythEvent &e);
     void dispatchNow(MythEvent &e);
 
-    void SendReceiveStringList(QStringList &strlist);
+    bool SendReceiveStringList(QStringList &strlist);
 
     QImage *CacheRemotePixmap(const QString &url, bool needevents = true);
 
@@ -149,7 +153,7 @@ class MythContext : public QObject
     LCD *GetLCDDevice(void) { return lcd_device; }
 
     bool TestPopupVersion(const QString &name, const QString &libversion,
-                          const QString &pluginversion);	
+                          const QString &pluginversion);
   private slots:
     void readSocket();
 
@@ -198,6 +202,8 @@ class MythContext : public QObject
     int m_screenwidth, m_screenheight;
 
     QString themecachedir;
+
+    int bigfontsize, mediumfontsize, smallfontsize; 
 };
 
 extern MythContext *gContext;

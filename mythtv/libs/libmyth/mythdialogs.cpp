@@ -212,8 +212,11 @@ MythDialog::MythDialog(MythMainWindow *parent, const char *name, bool setsize)
     gContext->GetScreenSettings(xbase, screenwidth, wmult,
                                 ybase, screenheight, hmult);
 
-    setFont(QFont("Arial", (int)(gContext->GetMediumFontSize() * hmult),
-            QFont::Bold));
+    defaultBigFont = gContext->GetBigFont();
+    defaultMediumFont = gContext->GetMediumFont();
+    defaultSmallFont = gContext->GetSmallFont();
+
+    setFont(defaultMediumFont);
     setCursor(QCursor(Qt::BlankCursor));
 
     if (setsize)
@@ -345,6 +348,9 @@ MythPopupBox::MythPopupBox(MythMainWindow *parent, const char *name)
     setFont(parent->font());
     setCursor(QCursor(Qt::BlankCursor));
 
+    hpadding = 110;
+    wpadding = 80;
+
     vbox = new QVBoxLayout(this, (int)(10 * hmult));
 }
 
@@ -365,6 +371,9 @@ MythPopupBox::MythPopupBox(MythMainWindow *parent, bool graphicPopup,
     setPalette(parent->palette());
     setFont(parent->font());
     setCursor(QCursor(Qt::BlankCursor));
+
+    hpadding = 110;
+    wpadding = 80;
 
     vbox = new QVBoxLayout(this, (int)(10 * hmult));
 
@@ -394,7 +403,40 @@ void MythPopupBox::addWidget(QWidget *widget, bool setAppearance)
     vbox->addWidget(widget);
 }
 
-void MythPopupBox::ShowPopup(int hpadding, int wpadding)
+QLabel *MythPopupBox::addLabel(QString caption, LabelSize size, bool wrap)
+{
+    QLabel *label = new QLabel(caption, this);
+    switch (size)
+    {
+        case Large: label->setFont(defaultBigFont); break;
+        case Medium: label->setFont(defaultMediumFont); break;
+        case Small: label->setFont(defaultSmallFont); break;
+    }
+
+    label->setMaximumWidth((int)m_parent->width() / 2);
+    if (wrap)
+        label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
+
+    addWidget(label, false);
+    return label;
+}
+
+QButton *MythPopupBox::addButton(QString caption, QObject *target, 
+                                 const char *slot)
+{
+    if (!target)
+    {
+        target = this;
+        slot = SLOT(defaultButtonPressedHandler());
+    }
+
+    MythPushButton *button = new MythPushButton(caption, this);
+    m_parent->connect(button, SIGNAL(pressed()), target, slot);
+    addWidget(button, false);
+    return button;
+}
+
+void MythPopupBox::ShowPopup(QObject *target, const char *slot)
 {
     const QObjectList *objlist = children();
     QObjectListIt it(*objlist);
@@ -447,7 +489,74 @@ void MythPopupBox::ShowPopup(int hpadding, int wpadding)
     setFixedSize(maxw, poph);
     setGeometry(x, y, maxw, poph);
 
+    if (target && slot)
+    {
+        QAccel *popaccel = new QAccel(this);
+        popaccel->connectItem(popaccel->insertItem(m_parent->Key_Escape),
+                              target, slot);
+    }
+
     Show();
+}
+
+int MythPopupBox::ExecPopup(QObject *target, const char *slot)
+{
+    if (!target)
+        ShowPopup(this, SLOT(defaultExitHandler()));
+    else
+        ShowPopup(target, slot);
+
+    return exec();
+}
+
+void MythPopupBox::defaultButtonPressedHandler(void)
+{
+    const QObjectList *objlist = children();
+    QObjectListIt it(*objlist);
+    QObject *objs;
+    int i = 0;
+    while ((objs = it.current()) != 0)
+    {
+        ++it;
+        if (objs->isWidgetType())
+        {
+            QWidget *widget = (QWidget *)objs;
+            if (widget->hasFocus())
+                break;
+            i++;
+        }
+    }
+    done(i);
+}
+
+void MythPopupBox::defaultExitHandler()
+{
+    done(-1);
+}
+
+void MythPopupBox::showOkPopup(MythMainWindow *parent, QString title,
+                               QString message)
+{
+    MythPopupBox popup(parent, title);
+    popup.addLabel(message, Medium, true);
+    QButton *okButton = popup.addButton(tr("OK"));
+    okButton->setFocus();
+    popup.ExecPopup();
+}
+
+bool MythPopupBox::showOkCancelPopup(MythMainWindow *parent, QString title,
+                                     QString message, bool focusOk)
+{
+    MythPopupBox popup(parent, title);
+    popup.addLabel(message, Medium, true);
+    QButton *okButton = popup.addButton(tr("OK"));
+    QButton *cancelButton = popup.addButton(tr("Cancel"));
+    if (focusOk)
+        okButton->setFocus();
+    else
+        cancelButton->setFocus();
+
+    return (popup.ExecPopup() == 1);
 }
 
 MythProgressDialog::MythProgressDialog(const QString &message, int totalSteps)

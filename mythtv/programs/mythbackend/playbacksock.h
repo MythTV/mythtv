@@ -42,7 +42,7 @@ class PlaybackSock
     void RecordPending(int capturecardnum, ProgramInfo *pginfo, int secsleft);
 
   private:
-    void SendReceiveStringList(QStringList &strlist);
+    bool SendReceiveStringList(QStringList &strlist);
 
     QSocket *sock;
     QString hostname;

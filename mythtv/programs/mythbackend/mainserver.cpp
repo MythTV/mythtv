@@ -170,7 +170,9 @@ void MainServer::ProcessRequest(QSocket *sock)
         return;
 
     QStringList listline;
-    ReadStringList(sock, listline);
+    if (!ReadStringList(sock, listline))
+        return;
+
     QString line = listline[0];
 
     line = line.simplifyWhiteSpace();

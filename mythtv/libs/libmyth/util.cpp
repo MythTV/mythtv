@@ -45,26 +45,35 @@ bool WriteStringList(QSocket *socket, QStringList &list)
     {
         QString msg = payload;
 
-	if (msg.length() > 58)
-	{
-	    msg.truncate(55);
-	    msg += "...";
-	}
-	VERBOSE(VB_NETWORK, msg);
+        if (msg.length() > 58)
+        {
+            msg.truncate(55);
+            msg += "...";
+        }
+        VERBOSE(VB_NETWORK, msg);
     }
+
+    unsigned int errorcount = 0;
+    bool retval = true;
 
     while (size > 0)
     {
         qApp->lock();
         int temp = socket->writeBlock(payload.data() + written, size);
         qApp->unlock();
-	// cerr << "  written: " << temp << endl; //DEBUG
+        // cerr << "  written: " << temp << endl; //DEBUG
         written += temp;
         size -= temp;
         if (size > 0)
         {
             printf("Partial WriteStringList %u\n", written);
             qApp->processEvents();
+
+            if (++errorcount > 50)
+            {
+                retval = false;
+                break;
+            }  
         }
     }
 
@@ -73,7 +82,7 @@ bool WriteStringList(QSocket *socket, QStringList &list)
         socket->flush();
     qApp->unlock();
 
-    return true;
+    return retval;
 }
 
 bool ReadStringList(QSocket *socket, QStringList &list)
@@ -83,6 +92,13 @@ bool ReadStringList(QSocket *socket, QStringList &list)
     qApp->lock();
     while (socket->waitForMore(5) < 8)
     {
+        if (socket->state() != QSocket::Connected)
+        {
+            // dunno if socket->state() wants the app lock.  be safe for now.
+            qApp->unlock();
+            return false;
+        }
+
         qApp->unlock();
         usleep(50);
         qApp->lock();
@@ -106,17 +122,17 @@ bool ReadStringList(QSocket *socket, QStringList &list)
         qApp->lock();
         int temp = socket->readBlock(utf8.data() + read, size);
         qApp->unlock();
-	// cerr << "  read: " << temp << endl; //DEBUG
+        // cerr << "  read: " << temp << endl; //DEBUG
         read += temp;
         size -= temp;
         if (size > 0)
-	{
-	    if (++zerocnt >= 100)
-	    {
-		printf("EOF readStringList %u\n", read);
-		break; 
-	    }
-	    usleep(50);
+        {
+            if (++zerocnt >= 100)
+            {
+                printf("EOF readStringList %u\n", read);
+                break; 
+            }
+            usleep(50);
             qApp->processEvents();
 
             if (zerocnt == 5)
@@ -175,13 +191,13 @@ int ReadBlock(QSocket *socket, void *data, int maxlen)
         read += temp;
         size -= temp;
         if (size > 0)
-	{
-	    if (++zerocnt >= 100)
-	    {
-		printf("EOF ReadBlock %u\n", read);
-		break; 
-	    }
-	    usleep(50);
+        {
+            if (++zerocnt >= 100)
+            {
+                printf("EOF ReadBlock %u\n", read);
+                break; 
+            }
+            usleep(50);
             qApp->processEvents();
         }
     }
@@ -213,9 +229,9 @@ void GetMythTVGeometry(Display *dpy, int screen_num, int *x, int *y,
 {
     int event_base, error_base;
 
-    if( XineramaQueryExtension(dpy, &event_base, &error_base) &&
-        XineramaIsActive(dpy) ) {
-
+    if (XineramaQueryExtension(dpy, &event_base, &error_base) &&
+        XineramaIsActive(dpy)) 
+    {
         XineramaScreenInfo *xinerama_screens;
         XineramaScreenInfo *screen;
         int nr_xinerama_screens;
@@ -226,12 +242,15 @@ void GetMythTVGeometry(Display *dpy, int screen_num, int *x, int *y,
 
         printf("Found %d Xinerama Screens.\n", nr_xinerama_screens);
 
-        if( screen_nr > 0 && screen_nr < nr_xinerama_screens ) {
+        if(screen_nr > 0 && screen_nr < nr_xinerama_screens)
+        {
             screen = &xinerama_screens[screen_nr];
             printf("Using screen %d, %dx%d+%d+%d\n",
                    screen_nr, screen->width, screen->height, screen->x_org, 
                    screen->y_org );
-        } else {
+        } 
+        else 
+        {
             screen = &xinerama_screens[0];
             printf("Using first Xinerama screen, %dx%d+%d+%d\n",
                    screen->width, screen->height, screen->x_org, screen->y_org);
@@ -243,7 +262,9 @@ void GetMythTVGeometry(Display *dpy, int screen_num, int *x, int *y,
         *y = screen->y_org;
 
         XFree(xinerama_screens);
-    } else {
+    } 
+    else 
+    {
         *w = DisplayWidth(dpy, screen_num);
         *h = DisplayHeight(dpy, screen_num);
         *x = 0; *y = 0;
