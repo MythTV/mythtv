@@ -484,6 +484,8 @@ void TV::SetupPlayer(void)
     nvp->SetAudioDevice(gContext->GetSetting("AudioOutputDevice"));
     nvp->SetLength(playbackLen);
     nvp->SetExactSeeks(gContext->GetNumSetting("ExactSeeking"));
+    nvp->SetAutoCommercialSkip(gContext->GetNumSetting("AutoCommercialSkip"));
+    nvp->SetCommercialSkipMethod(gContext->GetNumSetting("CommercialSkipMethod"));
 
     osd_display_time = gContext->GetNumSetting("OSDDisplayTime");
 
@@ -739,7 +741,13 @@ void TV::ProcessKeypress(int keypressed)
             nvp->ToggleCC();
             break;
         }
-
+        case 'z': case 'Z':
+        {
+            doing_ff = false;
+            doing_rew = false;
+            DoSkipCommercials();
+            break;
+        }
         case 's': case 'S': case 'p': case 'P': 
         {
             doing_ff = false;
@@ -1164,6 +1172,22 @@ void TV::DoJumpBack(void)
     activenvp->Rewind(jumptime * 60);
 }
 
+void TV::DoSkipCommercials()
+{
+    bool slidertype = false;
+    if (internalState == kState_WatchingLiveTV)
+        slidertype = true;
+
+    if (activenvp == nvp)
+    {
+        QString desc = "";
+        int pos = calcSliderPos((int)(fftime * ff_rew_scaling), desc);
+        osd->StartPause(pos, slidertype, "Skip Commercial", desc, 2);
+    }
+
+    activenvp->SkipCommercials();
+}
+
 void TV::ToggleInputs(void)
 {
     if (activenvp == nvp)
@@ -1195,6 +1219,14 @@ void TV::ToggleInputs(void)
 
 void TV::ChangeChannel(bool up)
 {
+    bool muted = false;
+
+    if (volumeControl && !volumeControl->GetMute())
+    {
+        volumeControl->ToggleMute();
+        muted = true;
+    }
+
     if (activenvp == nvp)
     {
         if (paused)
@@ -1224,6 +1256,9 @@ void TV::ChangeChannel(bool up)
     channelqueued = false;
     channelKeys[0] = channelKeys[1] = channelKeys[2] = ' ';
     channelkeysstored = 0;
+
+    if (muted)
+        volumeControl->ToggleMute();
 }
 
 void TV::ChannelKey(int key)

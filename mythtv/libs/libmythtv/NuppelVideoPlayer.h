@@ -30,6 +30,9 @@ using namespace std;
 #define MAXTBUFFER 11
 #define AUDBUFSIZE 512000
 
+#define COMMERCIAL_SKIP_OFF     0
+#define COMMERCIAL_SKIP_BLANKS  1
+
 class NuppelVideoPlayer;
 class XvVideoOutput;
 class OSDSet;
@@ -50,6 +53,8 @@ class NuppelVideoPlayer
     void SetFileName(QString lfilename) { filename = lfilename; }
 
     void SetExactSeeks(bool exact) { exactseeks = exact; }
+    void SetAutoCommercialSkip(int autoskip) { autocommercialskip = autoskip; }
+    void SetCommercialSkipMethod(int method) { commercialskipmethod = method; }
 
     void StartPlaying(void);
     void StopPlaying(void) { killplayer = true; }
@@ -71,6 +76,8 @@ class NuppelVideoPlayer
  
     void FastForward(float seconds);
     void Rewind(float seconds);
+
+    void SkipCommercials(void);
 
     void ResetPlaying(void) { resetplaying = true; actuallyreset = false; }
     bool ResetYet(void) { return actuallyreset; }
@@ -156,7 +163,7 @@ class NuppelVideoPlayer
     void SetAudiotime(void);
     bool DecodeFrame(struct rtframeheader *frameheader,
                      unsigned char *strm, unsigned char *outbuf);
-    void GetFrame(int onlyvideo);
+    void GetFrame(int onlyvideo, bool unsafe = false);
 
     void ReduceJitter(struct timeval *nexttrigger);
     
@@ -166,7 +173,16 @@ class NuppelVideoPlayer
     bool DoRewind();
    
     void ClearAfterSeek(); // caller should not hold any locks
-    
+   
+    unsigned int GetFrameVariance(int vposition);
+    int SkipTooCloseToEnd(int frames);
+    void SkipCommercialsByBlanks(void);
+    bool DoSkipCommercials(void);
+    void AutoCommercialSkip(void);
+
+    void JumpToFrame(long long frame);
+    void JumpToNetFrame(long long net) { JumpToFrame(framesPlayed + net); }
+ 
     int audiolen(bool use_lock); // number of valid bytes in audio buffer
     int audiofree(bool use_lock); // number of free bytes in audio buffer
     int vbuffer_numvalid(void); // number of valid slots in video buffer
@@ -380,6 +396,12 @@ class NuppelVideoPlayer
 
     int numbadioctls;
     int numlowbuffer;
+
+    int consecutive_blanks;
+    int vpos;
+    int skipcommercials;
+    int autocommercialskip;
+    int commercialskipmethod;
 };
 
 #endif

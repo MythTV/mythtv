@@ -168,6 +168,30 @@ public:
     };
 };
 
+class CommercialSkipMethod: public ComboBoxSetting, public GlobalSetting {
+public:
+    CommercialSkipMethod():
+        GlobalSetting("CommercialSkipMethod") {
+
+        setLabel("Commercial Skip Method");
+        addSelection("Blank Screen Detection (default)", "1");
+        setHelpText("This determines the method used by MythTV to detect when "
+                    "commercials start and end.  It is used by both the manual "
+                    "and automatic commercial skip functions of MythTV." );
+    };
+};
+
+class AutoCommercialSkip: public CheckBoxSetting, public GlobalSetting {
+public:
+    AutoCommercialSkip():
+        GlobalSetting("AutoCommercialSkip") {
+        setLabel("Automatically Skip Commercials");
+        setValue(false);
+        setHelpText("If enabled, MythTV will attempt to automatically skip "
+                    "commercials using the selected Commercial Skip Method.");
+    };
+};
+
 class RecordOverTime: public SpinBoxSetting, public GlobalSetting {
 public:
     RecordOverTime():
@@ -745,6 +769,8 @@ PlaybackSettings::PlaybackSettings()
     seek->addChild(new StickyKeys());
     seek->addChild(new ExactSeeking());
     seek->addChild(new JumpAmount());
+    seek->addChild(new CommercialSkipMethod());
+//    seek->addChild(new AutoCommercialSkip());
     addChild(seek);
 
     VerticalConfigurationGroup* oscan = new VerticalConfigurationGroup(false);

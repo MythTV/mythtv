@@ -19,9 +19,13 @@ Channel::Channel(TVRec *parent, const QString &videodevice)
     isopen = false;
     videofd = -1;
     curchannelname = "";
+    curList = 0;
+    totalChannels = 0;
+    pParent = parent;
+    videomode = VIDEO_MODE_NTSC;
+    capchannels = 0;
     currentcapchannel = 0;
     
-    pParent = parent;
     channelorder = "channum + 0";
 }
 

@@ -145,6 +145,9 @@ NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
 
     exactseeks = false;
 
+    autocommercialskip = 0;
+    commercialskipmethod = COMMERCIAL_SKIP_BLANKS;
+
     eventvalid = false;
 
     timedisplay = NULL;
@@ -202,7 +205,7 @@ NuppelVideoPlayer::~NuppelVideoPlayer(void)
 
     if (own_vidbufs)
     {
-        for (int i = 0; i < MAXVBUFFER; i++)
+        for (int i = 0; i <= MAXVBUFFER; i++)
         {
             if (vbuffer[i])
                 delete [] vbuffer[i];
@@ -1088,7 +1091,7 @@ void NuppelVideoPlayer::SetAudiotime(void)
     pthread_mutex_unlock(&audio_buflock);
 }
 
-void NuppelVideoPlayer::GetFrame(int onlyvideo)
+void NuppelVideoPlayer::GetFrame(int onlyvideo, bool unsafe)
 {
     int gotvideo = 0;
     int seeked = 0;
@@ -1161,7 +1164,7 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
 
         if (frameheader.frametype == 'V') 
         {
-            while (vbuffer_numfree() == 0)
+            while (vbuffer_numfree() == 0 && !unsafe)
             {
                 //cout << "waiting for video buffer to drain.\n";
                 prebuffering = false;
@@ -1698,7 +1701,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         /* a/v sync assumes that when 'Show' returns, that is the instant
            the frame has become visible on screen */
 
-        // output_jmeter->RecordCycleTime();
+        //output_jmeter->RecordCycleTime();
 
 	/* The value of nexttrigger is perfect -- we calculated it to
 	   be exactly one frame time after the previous frame,
@@ -1917,8 +1920,16 @@ void NuppelVideoPlayer::Rewind(float seconds)
         rewindtime = (int)(seconds * video_frame_rate);
 }
 
+void NuppelVideoPlayer::SkipCommercials(void)
+{
+    if (!skipcommercials)
+        skipcommercials = 1;
+}
+
 void NuppelVideoPlayer::StartPlaying(void)
 {
+    consecutive_blanks = 0;
+
     killplayer = false;
     usepre = 3;
 
@@ -1950,6 +1961,7 @@ void NuppelVideoPlayer::StartPlaying(void)
 
     weseeked = 0;
     rewindtime = fftime = 0;
+    skipcommercials = 0;
 
     resetplaying = false;
     
@@ -1965,7 +1977,7 @@ void NuppelVideoPlayer::StartPlaying(void)
         if (own_vidbufs)
         {
             // initialize and purge buffers
-            for (int i = 0; i < MAXVBUFFER; i++)
+            for (int i = 0; i <= MAXVBUFFER; i++)
                 vbuffer[i] = new unsigned char[video_size];
         }
 
@@ -2095,6 +2107,7 @@ void NuppelVideoPlayer::StartPlaying(void)
             UnpauseVideo();
             rewindtime = 0;
 	}
+
 	if (fftime > 0)
 	{
             fftime = CalcMaxFFTime(fftime);
@@ -2112,10 +2125,24 @@ void NuppelVideoPlayer::StartPlaying(void)
             fftime = 0;
 	}
 
-        GetFrame(audiofd <= 0); // reads next compressed video frame from the
-                                // ringbuffer, decompresses it, and stores it
-                                // in our local buffer. Also reads and
-                                // decompresses any audio frames it encounters
+        if ( skipcommercials )
+        {
+            PauseVideo();
+
+            while (!GetVideoPause())
+                usleep(50);
+
+            DoSkipCommercials();
+            UnpauseVideo();
+
+            skipcommercials = 0;
+            continue;
+        }
+
+        GetFrame(audiofd <= 0);
+
+        if (autocommercialskip)
+            AutoCommercialSkip();
 
         if (hasdeletetable && deleteIter.data() == 1 && 
             framesPlayed >= deleteIter.key())
@@ -2457,6 +2484,44 @@ bool NuppelVideoPlayer::DoFastForward(void)
 
     ClearAfterSeek();
     return true;
+}
+
+void NuppelVideoPlayer::JumpToFrame(long long frame)
+{
+    bool exactstore = exactseeks;
+
+    exactseeks = true;
+    fftime = rewindtime = 0;
+
+    if (frame > framesPlayed)
+    {
+        fftime = frame - framesPlayed;
+        DoFastForward();
+        fftime = 0;
+    }
+    else if (frame < framesPlayed)
+    {
+        rewindtime = framesPlayed - frame;
+        DoRewind();
+        rewindtime = 0;
+    }
+
+    exactseeks = exactstore;
+}
+
+int NuppelVideoPlayer::SkipTooCloseToEnd(int frames)
+{
+    if ((livetv) ||
+        (watchingrecording && nvr_enc && nvr_enc->IsValidRecorder()))
+    {
+        if (nvr_enc->GetFramesWritten() < (framesPlayed + frames))
+            return 1;
+    }
+    else if ((totalFrames) && (totalFrames < (framesPlayed + frames)))
+    {
+        return 1;
+    }
+    return 0;
 }
 
 void NuppelVideoPlayer::ClearAfterSeek(void)
@@ -3071,7 +3136,7 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
 
     own_vidbufs = true;
 
-    for (int i = 0; i < MAXVBUFFER; i++)
+    for (int i = 0; i <= MAXVBUFFER; i++)
         vbuffer[i] = new unsigned char[video_size];
 
     for (int i = 0; i < MAXTBUFFER; i++)
@@ -3331,173 +3396,204 @@ void NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname)
 */
 }
 
-void NuppelVideoPlayer::FindCommercial(char *inputname)
-{ 
-/* Robert Kulagowski, mailto:rkulagow@rocketmail.com
-   2002-11-26
-
-What this routine does.
-o  Reads through the file.
-o  For each frame, get 200 random pixels.  Stay away from the edges, since
-there's usually garbage there.
-o  Get the variance of the pixels.
-o  Store the variance.
-o  Analyze, looking for a frame that's not black
-o  Write the time marker to a bookmark file.
-
-It's not a perfect "commercial detector", since it's actually just looking
-for black frames, but it will let you skip pretty quickly, since you can
-jump over stuff.  
-
-Note, routine will get confused if there's a dark scene in the middle
-of a program.  Later versions of the routine can check the audio levels
-during each block being analyzed, or see if the "commercial" is in the
-correct place with respect to when commericals usually happen.
-
-*/
-
-
-//Using array of 200 pixels.  This will have to be determined if it's too
-//high or too low once the code is working.
-
-    unsigned int average_Y, pixel_Y[200], squared_difference[200], variance, temp;
-    average_Y = variance = temp = 0;
-
+#define VARIANCE_PIXELS 200
+unsigned int NuppelVideoPlayer::GetFrameVariance(int vposition)
+{
+    unsigned int average_Y;
+    unsigned int pixel_Y[VARIANCE_PIXELS];
+    unsigned int variance, temp;
     int i,x,y,top,bottom;
 
+    average_Y = variance = temp = 0;
     i = x = y = top = bottom = 0;
 
-    AVCodecContext *mpa_ctx=NULL;
-    AVCodec *mpa_codec;
-    AVPicture mpa_picture;
+    top = (int)(video_height * .10);
+    bottom = (int)(video_height * .90);
 
-//    inputname = inputname;  //What?
-
-    filename = inputname;
-     
-    InitSubs();
-    OpenFile(false);
-
-    mpa_codec = avcodec_find_encoder(CODEC_ID_MPEG4);
-
-    if (!mpa_codec)
+    // get the pixel values
+    for (i = 0; i < VARIANCE_PIXELS; i++)
     {
-        cout << "error finding codec\n";
-        return;
+        x = 10 + (rand() % (video_width - 10));  // Get away from the edges.
+        y = top + (rand() % (bottom - top));
+        pixel_Y[i] = vbuffer[vposition][y * video_width + x];
     }
 
-    mpa_ctx = avcodec_alloc_context();
+    // get the average
+    for (i = 0; i < VARIANCE_PIXELS; i++)
+        average_Y += pixel_Y[i];
+    average_Y /= VARIANCE_PIXELS;
 
-    mpa_ctx->pix_fmt = PIX_FMT_YUV420P;
+    // get the sum of the squared differences
+    for (i = 0; i < VARIANCE_PIXELS; i++)
+        temp += (pixel_Y[i] - average_Y) * (pixel_Y[i] - average_Y);
 
-    mpa_picture.linesize[0] = video_width;
-    mpa_picture.linesize[1] = video_width / 2;
-    mpa_picture.linesize[2] = video_width / 2;
+    // get the variance
+    variance = (unsigned int)(temp / VARIANCE_PIXELS);
 
-    mpa_ctx->width = video_width;
-    mpa_ctx->height = video_height;
- 
-    mpa_ctx->frame_rate = (int)(video_frame_rate * FRAME_RATE_BASE);
-    mpa_ctx->bit_rate = 1800 * 1000;
-    mpa_ctx->bit_rate_tolerance = 1024 * 8 * 1000;
-    mpa_ctx->qmin = 2;
-    mpa_ctx->qmax = 15;
-    mpa_ctx->max_qdiff = 3;
-    mpa_ctx->qcompress = 0.5;
-    mpa_ctx->qblur = 0.5;
-    mpa_ctx->max_b_frames = 3;
-    mpa_ctx->b_quant_factor = 2.0;
-    mpa_ctx->rc_strategy = 2;
-    mpa_ctx->b_frame_strategy = 0;
-    mpa_ctx->gop_size = 30; 
-    mpa_ctx->flags = CODEC_FLAG_HQ; // | CODEC_FLAG_TYPE; 
-    mpa_ctx->me_method = 5;
-    //mpa_ctx->key_frame = -1; 
+    return variance;
+}
 
-    if (avcodec_open(mpa_ctx, mpa_codec) < 0)
+void NuppelVideoPlayer::AutoCommercialSkip(void)
+{
+    PauseVideo();
+
+    while (!GetVideoPause())
+        usleep(50);
+
+    if (autocommercialskip == COMMERCIAL_SKIP_BLANKS)
     {
-        cerr << "Unable to open FFMPEG/MPEG4 codex\n" << endl;
-        return;
-    }
-
-    int fileend = 0;
-
-    buf = new unsigned char[video_width * video_height * 3 / 2];
-    strm = new unsigned char[video_width * video_height * 2];
-
-//    unsigned char *frame = NULL;
-
-    static unsigned long int tbls[128];
-
-
-    frameheader.frametype = 'D';
-    frameheader.comptype = 'R';
-    frameheader.packetlength = sizeof(tbls);
-
-    unsigned char *outbuffer = new unsigned char[1000 * 1000 * 3];
-
-    while (!fileend)
-    {
-        fileend = (FRAMEHEADERSIZE != ringBuffer->Read(&frameheader,
-                                                       FRAMEHEADERSIZE));
-
-        if (fileend)
-            continue;
-
-        fileend = (ringBuffer->Read(strm, frameheader.packetlength) !=
-                                    frameheader.packetlength);
-
-        if (frameheader.frametype == 'V')
+        int variance = GetFrameVariance(wpos);
+        if (variance < 20)
         {
-            framesPlayed++;
-//            frame = DecodeFrame(&frameheader, strm, outbuffer);
-
-            DecodeFrame(&frameheader, strm, outbuffer);
-
-//            mpa_picture.data[0] = frame;
-            mpa_picture.data[0] = outbuffer;
-
-            //For y values, we want to get out of the letterbox zone.  Estimate
-            //that letterbox is 10% of the top and bottom?
-            top=(int)(video_height*.10);
-            bottom=(int)(video_height*.90);
-
-            for (i=0;i<200;i++)  //Get 200 pixels
+            consecutive_blanks++;
+            if (consecutive_blanks >= 3)
             {
-                x=10+(rand()%(video_width-10));  // Get away from the edges.
-                y=top+(rand()%(bottom-top));
-                pixel_Y[i] = mpa_picture.data[0][y * mpa_picture.linesize[0] + x];
-printf("Frame Number %lld i=%d, x:%d,y:%d Y=%d\n",framesPlayed,i,x,y,pixel_Y[i]);
+                int saved_position = framesPlayed;
+                JumpToNetFrame((long long int)(30 * video_frame_rate - 3));
+
+                // search a 10-frame window for another blank
+                int tries = 10;
+                GetFrame(1, true);
+                while ((tries > 0) && (GetFrameVariance(wpos) >= 20))
+                {
+                     GetFrame(1, true);
+                     tries--;
+                }
+
+                if (tries)
+                {
+                    // found another blank
+ 
+                    consecutive_blanks = 0;
+                    UnpauseVideo();
+                    return;
+                }
+                else
+                {
+                    // no blank found so exit auto-skip
+                    JumpToFrame(saved_position + 1);
+                    UnpauseVideo();
+                    return;
+                }
             }
-			
-            //Now, get the average
-            for(i=0;i<200;i++) average_Y+=pixel_Y[i];
-            average_Y /= 200;
-printf("Average: %d\n",average_Y);
-            //square the difference of each pixel from the average
-            for(i=0;i<200;i++) squared_difference[i]=(pixel_Y[i]-average_Y)*(pixel_Y[i]-average_Y);
-            //Get the sum of the squared_differences
-            for(i=0;i<200;i++) temp+=squared_difference[i];
-            //Determine the variance:
-            variance = (unsigned int)(temp / 200);
-printf("Variance for frame %lld is %d\n",framesPlayed,variance);
-        } 
+        }
+        else if (consecutive_blanks)
+        {
+            consecutive_blanks = 0;
+        }
+    }
 
-/* 
+    UnpauseVideo();
+}
 
-Thoughts on what to do next:
-   1.  Setup an array, analyze the variances in 10 second chunks.  That's
-3000 elements, which isn't crazy.
-   2.  Have a ringbuffer of the last 5 seconds' worth of variance values. 
-Analyze those.  Smaller memory hit, more complicated programming
-   3.  Setup a very big array of thousands of unsigned ints worth of
-variance values, do the entire file first, then go back and analyze.
+void NuppelVideoPlayer::SkipCommercialsByBlanks(void)
+{
+    int scanned_frames;
+    int blanks_found;
+    int found_blank_seq;
+    int first_blank_frame;
+    int saved_position;
+    int min_blank_frame_seq = 1;
 
-*/
+    // rewind 2 seconds in case user hit Skip right after a break
+    JumpToNetFrame((long long int)(-2 * video_frame_rate));
 
-    }  //End of the file
+    // scan through up to 64 seconds to find first break
+    // 64 == 2 seconds we rewound, plus up to 62 seconds to find first break
+    scanned_frames = blanks_found = found_blank_seq = first_blank_frame = 0;
+    saved_position = framesPlayed;
 
-    delete [] outbuffer;
+    while (scanned_frames < (64 * video_frame_rate))
+    {
+        GetFrame(1, true);
+        if (GetFrameVariance(wpos) < 20)
+        {
+            blanks_found++;
+            if (!first_blank_frame)
+                first_blank_frame = framesPlayed;
+            if (blanks_found >= min_blank_frame_seq)
+                break;
+        }
+        else if (blanks_found)
+        {
+            blanks_found = 0;
+            first_blank_frame = 0;
+        }
+        if (SkipTooCloseToEnd(min_blank_frame_seq - blanks_found))
+        {
+            JumpToFrame(saved_position);
+            return;
+        }
 
-    avcodec_close(mpa_ctx);
+        scanned_frames++;
+    }
+
+    if (!first_blank_frame)
+    {
+        JumpToFrame(saved_position);
+        return;
+    }
+
+    // if we make it here, then a blank was found
+    int blank_seq_found = 0;
+    do
+    {
+        int jump_seconds = 14;
+
+        blank_seq_found = 0;
+        saved_position = framesPlayed;
+        while ((framesPlayed - saved_position) < (61 * video_frame_rate))
+        {
+            JumpToNetFrame((long long int)(jump_seconds * video_frame_rate));
+            jump_seconds = 12;
+
+            scanned_frames = blanks_found = found_blank_seq = 0;
+            first_blank_frame = 0;
+            while (scanned_frames < (3 * video_frame_rate))
+            {
+                GetFrame(1, true);
+                if (GetFrameVariance(wpos) < 20)
+                {
+                    blanks_found++;
+                    if (!first_blank_frame)
+                        first_blank_frame = framesPlayed;
+                    if (blanks_found >= min_blank_frame_seq)
+                        break;
+                }
+                else if (blanks_found)
+                {
+                    blanks_found = 0;
+                    first_blank_frame = 0;
+                }
+
+                if (SkipTooCloseToEnd(min_blank_frame_seq - blanks_found))
+                {
+                    JumpToFrame(saved_position);
+                    return;
+                }
+
+                scanned_frames++;
+            }
+
+            if (blanks_found >= min_blank_frame_seq)
+            {
+                blank_seq_found = 1;
+                break;
+            }
+        }
+    } while (blank_seq_found);
+
+    JumpToFrame(saved_position);
+}
+
+bool NuppelVideoPlayer::DoSkipCommercials(void)
+{
+    switch (commercialskipmethod)
+    {
+        case COMMERCIAL_SKIP_BLANKS:
+        default                    : SkipCommercialsByBlanks();
+                                     break;
+    }
+
+    return true;
 }
