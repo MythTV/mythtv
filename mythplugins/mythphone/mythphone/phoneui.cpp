@@ -747,7 +747,11 @@ void PhoneUIBox::ProcessSipStateChange()
             QString callerUser, callerName, callerUrl, callerDisplay;
             sipStack->GetIncomingCaller(callerUser, callerName, callerUrl, inAudioOnly);
 
-            if (callerName.length()>0)
+            // Get a display name from directory or using best field in INVITE
+            DirEntry *entry = DirContainer->FindMatchingDirectoryEntry(callerUrl);
+            if (entry)
+                callerDisplay = entry->getNickName();
+            else if (callerName.length()>0)
                 callerDisplay = callerName;
             else if (callerUser.length()>0)
                 callerDisplay = callerUser;
@@ -762,11 +766,10 @@ void PhoneUIBox::ProcessSipStateChange()
             QString ts = now.toString();
             if (currentCallEntry)
                 delete currentCallEntry;
-            currentCallEntry = new CallRecord(callerName, callerUrl, true, ts);
-
-            DirEntry *entry = DirContainer->FindMatchingDirectoryEntry(currentCallEntry->getUri());
+            currentCallEntry = new CallRecord(callerDisplay, callerUrl, true, ts);
+            
             bool AutoanswerEnabled = gContext->GetNumSetting("SipAutoanswer",1);
-            if (AutoanswerEnabled)
+            if ((AutoanswerEnabled) && (entry)) // Only allow autoanswer from matched entries
                 PlaceorAnswerCall(entry->getUri(), entry->getNickName(), txVideoMode, true);
             else
             {

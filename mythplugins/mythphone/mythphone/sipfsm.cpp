@@ -694,13 +694,9 @@ void SipFsm::NewCall(bool audioOnly, QString uri, QString DispName, QString vide
         // If the dialled number if just a username and we are registered to a proxy, dial
         // via the proxy
         if ((!uri.contains('@')) && (sipRegistration != 0) && (sipRegistration->isRegistered()))
-        {
             uri.append(QString("@") + gContext->GetSetting("SipProxyName"));
-            Call->dialViaProxy(sipRegistration);
-        }
-        else
-            Call->dialViaProxy(0);
 
+        Call->dialViaProxy(sipRegistration);
         Call->to(uri, DispName);
         Call->setDisableNat(DisableNat);
         Call->setAllowVideo(audioOnly ? false : true);
@@ -903,6 +899,9 @@ SipCall *SipFsm::CreateCallFsm()
     if (primaryCall == -1)
         primaryCall = cr;
     FsmList.append(it);
+    
+    it->dialViaProxy(sipRegistration);
+   
     return it;
 }
 
@@ -1753,9 +1752,14 @@ void SipCall::AlertUser(SipMsg *rxMsg)
         if (from)
         {
             CallersUserid = from->getUser();
-            CallerUrl = from->getUser() + "@" + from->getHost();
-            if (from->getPort() != 5060)
-                CallerUrl += ":" + QString::number(from->getPort());
+            if ((viaRegProxy) && (viaRegProxy->registeredTo() == from->getHost()))
+                CallerUrl = from->getUser();
+            else
+            {
+                CallerUrl = from->getUser() + "@" + from->getHost();
+                if (from->getPort() != 5060)
+                    CallerUrl += ":" + QString::number(from->getPort());
+            }
             CallersDisplayName = from->getDisplay();
         }
         else
