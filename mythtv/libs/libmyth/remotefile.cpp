@@ -169,16 +169,25 @@ void RemoteFile::Close(void)
 
 void RemoteFile::Reset(void)
 {
-    usleep(10000);
+    int avail;
+    char *trash;
 
-    pthread_mutex_lock(&lock);
-    qApp->lock();
-    int avail = sock->bytesAvailable();
-    char *trash = new char[avail + 1];
-    sock->readBlock(trash, avail);
-    delete [] trash;
-    qApp->unlock();
-    pthread_mutex_unlock(&lock);
+    usleep(50000);
+
+    while (sock->bytesAvailable() > 0)
+    {
+        pthread_mutex_lock(&lock);
+        qApp->lock();
+        avail = sock->bytesAvailable();
+        trash = new char[avail + 1];
+        sock->readBlock(trash, avail);
+        delete [] trash;
+        qApp->unlock();
+        pthread_mutex_unlock(&lock);
+
+        // cerr << avail << " bytes available during reset.\n";
+        usleep(50000);
+    }
 }
     
 bool RemoteFile::RequestBlock(int size)
@@ -207,14 +216,7 @@ long long RemoteFile::Seek(long long pos, int whence, long long curpos)
 
     strlist.clear();
 
-    usleep(50000);
-
-    qApp->lock();   
-    int avail = sock->bytesAvailable();
-    char *trash = new char[avail + 1];
-    sock->readBlock(trash, avail);
-    delete [] trash;
-    qApp->unlock();
+    Reset();
 
     strlist = QString(query).arg(recordernum);
     strlist << "SEEK" + append;
@@ -232,13 +234,6 @@ long long RemoteFile::Seek(long long pos, int whence, long long curpos)
 
     long long retval = decodeLongLong(strlist, 0);
     readposition = retval;
-
-    qApp->lock();
-    avail = sock->bytesAvailable();
-    trash = new char[avail + 1];
-    sock->readBlock(trash, avail);
-    delete [] trash;
-    qApp->unlock();
 
     return retval;
 }

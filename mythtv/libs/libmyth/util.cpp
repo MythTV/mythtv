@@ -133,6 +133,9 @@ void WriteBlock(QSocket *socket, void *data, int len)
     if (socket->bytesToWrite() > 0)
         socket->flush();
     qApp->unlock();
+
+    while (socket->bytesToWrite() >= written)
+        usleep(50000);
 }
 
 int ReadBlock(QSocket *socket, void *data, int maxlen)
