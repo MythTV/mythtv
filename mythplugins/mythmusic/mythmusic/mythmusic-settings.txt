@@ -34,5 +34,9 @@ NonID3FileNameFormat=GENRE/ARTIST/ALBUM/TRACK_TITLE
 # the Music Selection Tree
 AutoLookupCD=1
 
+# Paranoia level of the cd ripper.  Comment this out for faster ripping, but
+# errors in the audio could occur.
+ParanoiaLevel=full
+
 # Shuffle mode for the player.  Can be either normal(the default) or random.
 #PlayMode=random
