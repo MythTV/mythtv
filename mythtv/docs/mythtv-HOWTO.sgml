@@ -3,7 +3,7 @@
 
 <title>Installing and using mythtv
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2002-12-28, v1.059
+<date>2003-01-01, v1.060
 <abstract>
 Initially, installation of mythtv seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1674,6 +1674,64 @@ within the control panel.
 <tt>mythtv.org</tt>.  Make sure you change your <tt>CVSROOT</tt> to point to
 the new server, delete your old tree, and re-do the checkout.
 
+<sect1>I get segfaults / mythtv isn't doing anything.
+<p>Without details, the developers will not be able to determine if you have
+discovered a genuine code-bug,  or it the problem is with your system.  In
+order to determine what's going on, you must recompile mythtv with debugging
+support and run mythtv within <bf>gdb</bf>, the GNU debugger.
+
+Edit the settings.pro file.  Make sure that the top of the file looks like this:
+<tscreen><verb>
+$ cat settings.pro
+CONFIG += debug
+#CONFIG += release
+</verb></tscreen>
+
+Now, you need to clear out the old versions of the software to ensure that
+you're running with the debugging code, then compile and install.
+
+<tscreen><verb>
+$ make clean
+$ make distclean
+$ make
+$ su
+# make install
+# exit
+</verb></tscreen>
+
+At this point, you now have debug-enabled software ready.  Let's assume that
+the problem you're having is in the <tt>setup</tt> program.
+
+<tscreen><verb>
+$ cd setup
+$ gdb ./setup
+
+GNU gdb 5.2.1-2mdk (Mandrake Linux)
+Copyright 2002 Free Software Foundation, Inc.
+GDB is free software, covered by the GNU General Public License, and you are
+welcome to change it and/or distribute copies of it under certain
+conditions.
+Type "show copying" to see the conditions.
+There is absolutely no warranty for GDB.  Type "show warranty" for details.
+This GDB was configured as "i586-mandrake-linux-gnu"...
+(gdb)
+</verb></tscreen>
+
+<bf>gdb</bf> has a number of options, read the <tt>man</tt> page for more
+information.
+
+Once at the <tt>(gdb)</tt> prompt, type <tt>run</tt> to start program
+execution.  When the program segfaults, type <tt>bt</tt> to get the
+backtrace.  The backtrace should be posted to the mythtv-dev mailing list,
+along with the steps you followed to get the program to crash.
+
+<sect1>Mythtv makes my system crash. 
+<p>mythtv <em>can not</em> crash your system - it is a user-level program. 
+If your system is crashing when you run mythtv, then you have some
+issue with the drivers for your capture card or other hardware, or the CPU
+fan has fallen off/broken and your system is overheating when asked to
+perform a CPU intensive task like encoding video.
+
 <sect>Miscellaneous.
 <sect1>I'd like to watch the files without using mythtv / I'd like to convert the files to some other format.
 <p>Matthew Zimmerman has created a patch for MPlayer / Mencoder
@@ -1867,8 +1925,9 @@ on mythtv-0.8.
 v1.058, 2002-12-27.  Added text on configuring urpmi for Mandrake.
 v1.059, 2002-12-28.  Updated myth-0.8 install docs.  Added big fat warning
 for people that think that development code is supposed to work correctly
-out of the box, or that the initial instructions have any basis in reality. 
-Not that they'll read it.
+out of the box, or that the initial instructions for using the development
+code have any basis in reality. Not that they'll read it.
+v1.060, 2003-01-01.  Added debugging instructions.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
