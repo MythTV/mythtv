@@ -1,6 +1,8 @@
 # lircrc.example.pinnaclestudiopctv
-# 2003-01-17, Robert Kulagowski
+# 2003-02-22, Robert Kulagowski
 # mailto:rkulagow@rocketmail.com
+# Native support for volume and mute within MythTV now
+# Commercial skipping button
 
 # These are standard definitions which should exist on any remote control
 
@@ -108,27 +110,22 @@ end
 #    config = Key  CurrentWindow
 # end
 
-# These are used to implement volume functionality.
-# Make sure that you're running % irexec -d for this to
-# work.
-
 begin
-    prog = irexec
+    prog = irxevent
     button = Mute
-    config = /usr/bin/amixer -q set Master,0 mute
-    config = /usr/bin/amixer -q set Master,0 unmute
+    config = Key | CurrentWindow
 end
 
 begin
-    prog = irexec
+    prog = irxevent
     button = vol+
-    config = /usr/bin/amixer -q set Master,0 10+,10+ unmute
+    config = Key ] CurrentWindow
 end
 
 begin
-    prog = irexec
+    prog = irxevent
     button = vol-
-    config = /usr/bin/amixer -q set Master,0 10-,10- unmute
+    config = Key [ CurrentWindow    
 end
 
 # begin
@@ -191,13 +188,13 @@ begin
     config = Key M CurrentWindow
 end
 
-# begin
-#    prog = irxevent
-#    button = next
+begin
+   prog = irxevent
+   button = next
 # This is the "Triangle Bar" symbol on the remote.  Like the Tivo jump to end button
-# Not used for anything yet
-#    config = Key  CurrentWindow
-# end
+# Use for commercial skip
+    config = Key Z CurrentWindow
+end
 
 begin
    prog = irxevent
