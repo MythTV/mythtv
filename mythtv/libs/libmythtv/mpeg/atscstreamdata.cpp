@@ -130,10 +130,12 @@ void ATSCStreamData::HandleTables(const TSPacket* tspacket, HDTVRecorder* record
 
             for (uint i=0; i<vct.ChannelCount(); i++) {
                 VERBOSE(VB_RECORD, vct.toString(i));
-                if (vct.MinorChannel(i)==(uint)DesiredSubchannel()) {
+                if ((DesiredChannel() == -1 ||
+                    vct.MajorChannel(i)==(uint)DesiredChannel()) &&  
+                    vct.MinorChannel(i)==(uint)DesiredSubchannel()) {
                     VERBOSE(VB_RECORD, QString("***Desired subchannel %1")
                             .arg(DesiredSubchannel()));
-                    if (vct.ProgramNumber(i) != DesiredProgram()) {
+                    if (vct.ProgramNumber(i) != (uint)DesiredProgram()) {
                         VERBOSE(VB_RECORD, 
                                 QString("Resetting desired program from %1"
                                         " to %2").arg(DesiredProgram())

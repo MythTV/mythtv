@@ -15,12 +15,13 @@ class RingBuffer;
 
 class ATSCStreamData : public MPEGStreamData {
   public:
-    ATSCStreamData(int desiredProgram) : 
-        MPEGStreamData(desiredProgram), _mgt_version(-1), 
+    ATSCStreamData(int desiredChannel, int desiredSubchannel) :
+        MPEGStreamData(desiredChannel, desiredSubchannel), _mgt_version(-1),
         _GPS_UTC_offset(13 /* leap seconds as of 2004 */) { ; }
 
-    virtual inline void Reset(int desiredProgram = -1) {
-        MPEGStreamData::Reset(desiredProgram);
+    virtual inline void Reset(int desiredChannel = -1,
+                              int desiredSubchannel = -1) {
+        MPEGStreamData::Reset(desiredChannel, desiredSubchannel);
         _mgt_version = -1;
         _tvct_version.clear();
         _eit_version.clear();

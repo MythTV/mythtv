@@ -103,7 +103,7 @@ extern "C" {
 HDTVRecorder::HDTVRecorder()
     : DTVRecorder(), _atsc_stream_data(0), _resync_count(0)
 {
-    _atsc_stream_data = new ATSCStreamData(DEFAULT_SUBCHANNEL);
+    _atsc_stream_data = new ATSCStreamData(-1, DEFAULT_SUBCHANNEL);
 
     _buffer_size = TSPacket::SIZE * 128;
     if ((_buffer = new unsigned char[_buffer_size])) {
@@ -913,12 +913,16 @@ void HDTVRecorder::ChannelNameChanged(const QString& new_chan)
     VERBOSE(VB_RECORD, QString("Setting frequency for startRecording freqid: %1").arg(freqid));
     pthread_mutex_unlock(db_lock);
 
+    int desired_channel = -1;
     int desired_subchannel = DEFAULT_SUBCHANNEL;
     int pos = freqid.find('-');
     if (pos != -1) 
+    {
+        desired_channel = atoi(freqid.left(pos));
         desired_subchannel = atoi(freqid.mid(pos+1).ascii());
+    }
     else
         VERBOSE(VB_IMPORTANT,
                 QString("Error: Desired subchannel not specified in freqid \"%1\", Using %2.").arg(freqid).arg(desired_subchannel));
-    StreamData()->Reset(desired_subchannel);
+    StreamData()->Reset(desired_channel, desired_subchannel);
 }
