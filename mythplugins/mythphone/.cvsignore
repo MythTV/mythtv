@@ -1,9 +1,3 @@
 diff.diff
 Makefile
-mythphone/config.pro
-mythphone/config.h
-mythphone/moc_phoneui.cpp
-mythphone/moc_tone.cpp
-mythphone/sipfsm.cpp
-mythphone/webcam.cpp
 
