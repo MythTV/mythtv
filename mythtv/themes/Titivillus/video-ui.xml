@@ -516,43 +516,43 @@
 
         <font name="active" face="Arial">
             <color>#ffffff</color>
-	    <size>15</size>
-	    <size:big>18</size:big>
-      	    <size:small>11</size:small>
-      	    <shadow>1,1</shadow>
-    	</font>
+            <size>15</size>
+            <size:big>18</size:big>
+            <size:small>11</size:small>
+            <shadow>1,1</shadow>
+        </font>
         
         <font name="inactive" face="Arial">
             <color>#9999cc</color>
-      	    <size>15</size>
+            <size>15</size>
             <size:big>18</size:big>
-      	    <size:small>11</size:small>
-      	    <shadow>1,1</shadow>
-    	</font>
+            <size:small>11</size:small>
+            <shadow>1,1</shadow>
+        </font>
 
-	<font name="moviedata" face="Arial">
-	      <color>#ffffbb</color>
-	      <size>15</size>
-	      <size:big>18</size:big>
-	      <shadow>1,1</shadow>
-    	</font>
+        <font name="moviedata" face="Arial">
+            <color>#ffffbb</color>
+            <size>15</size>
+            <size:big>18</size:big>
+            <shadow>1,1</shadow>
+        </font>
 
         <font name="selectable" face="Arial">
             <color>#ffffff</color>
             <size>15</size>
-	    <size:big>18</size:big>
+            <size:big>18</size:big>
             <shadow>1,1</shadow>
         </font>
 
-    	<font name="leadfnt" face="Arial">
-	      <color>#ddddff</color>
-	      <dropcolor>#000000</dropcolor>
-	      <shadow>4,4</shadow>
-	      <size>24</size>
-	      <size:big>26</size:big>
-	      <size:small>20</size:small>
-	      <bold>yes</bold>
-	</font>
+        <font name="leadfnt" face="Arial">
+            <color>#ddddff</color>
+            <dropcolor>#000000</dropcolor>
+            <shadow>4,4</shadow>
+            <size>24</size>
+            <size:big>26</size:big>
+            <size:small>20</size:small>
+            <bold>yes</bold>
+        </font>
 
         
         <font name="labelfont" face="Arial">
@@ -574,10 +574,6 @@
                 <filename>background.png</filename>
                 <position>0,10</position>
             </image>
-            <image name="titlelines" draworder="0" fleximage="no">
-                <filename>trans-titles.png</filename>
-                <position>0,10</position>
-            </image>
             <image name="morefiller" draworder="0" fleximage="no">
                 <filename>mv_other_background.png</filename>
                 <position>0,300</position>
@@ -585,8 +581,12 @@
         </container>
 
         <container name="videoselector">
-            <area>0,10,800,315</area>
-            <managedtreelist name="videotreelist" draworder="4" bins="2">
+            <area>0,10,800,295</area>
+            <image name="titlelines" draworder="5" fleximage="no">
+                <filename>trans-titles.png</filename>
+                <position>0,0</position>
+            </image>
+            <managedtreelist name="videotreelist" draworder="1" bins="2">
                 <area>40,10,720,270</area>
                 <image function="selectionbar" filename="mv_selectionbar.png" location="150,-5"> </image>
                 <image function="uparrow" filename="mv_up_arrow.png"></image>
@@ -617,17 +617,17 @@
         </container>
 
         <container name="videoinfo">
-            <area>0,310,800,300</area>
+            <area>0,316,800,300</area>
             <textarea name="video_title" draworder="4">
                 <area>30,10,530,60</area>
                 <font>leadfnt</font>
             </textarea>
-      	
-	    <textarea name="plot" draworder="4">
-        	<area>30,30,530,145</area>
-        	<font>moviedata</font>
-	        <multiline>yes</multiline>
-	    </textarea>
+
+            <textarea name="plot" draworder="4">
+                <area>30,50,525,100</area>
+                <font>moviedata</font>
+                <multiline>yes</multiline>
+            </textarea>
 
             <textarea name="file_label" draworder="4" align="right">
                 <area>30,140,90,40</area>

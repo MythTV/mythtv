@@ -236,7 +236,9 @@ class ProgramInfo
     QDateTime recendts;
 
     
-
+    bool isVideo;
+    int lenMins;
+    
     float stars;
     QDate originalAirDate;
     QDateTime lastmodified;

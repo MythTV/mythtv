@@ -20,7 +20,8 @@ ProgramInfo::ProgramInfo(void)
 {
     spread = -1;
     startCol = -1;
-
+    isVideo = false;
+    lenMins = 0;
     chanstr = "";
     chansign = "";
     channame = "";
@@ -83,7 +84,10 @@ ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
 {
     if (record)
         delete record;
-
+    
+    isVideo = other.isVideo;
+    lenMins = other.lenMins;
+    
     title = other.title;
     subtitle = other.subtitle;
     description = other.description;
@@ -303,14 +307,41 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
     progMap["callsign"] = chansign;
     progMap["commfree"] = chancommfree;
     progMap["outputfilters"] = chanOutputFilters;
-    progMap["starttime"] = startts.toString(timeFormat);
-    progMap["startdate"] = startts.toString(shortDateFormat);
-    progMap["endtime"] = endts.toString(timeFormat);
-    progMap["enddate"] = endts.toString(shortDateFormat);
-    progMap["recstarttime"] = recstartts.toString(timeFormat);
-    progMap["recstartdate"] = recstartts.toString(shortDateFormat);
-    progMap["recendtime"] = recendts.toString(timeFormat);
-    progMap["recenddate"] = recendts.toString(shortDateFormat);
+    if (isVideo)
+    {
+        progMap["starttime"] = "";
+        progMap["startdate"] = "";
+        progMap["endtime"] = "";
+        progMap["enddate"] = "";
+        progMap["recstarttime"] = "";
+        progMap["recstartdate"] = "";
+        progMap["recendtime"] = "";
+        progMap["recenddate"] = "";
+        
+        if (startts.date().year() == 1895)
+        {
+           progMap["startdate"] = "?";
+           progMap["recstartdate"] = "?";
+        }
+        else
+        {
+            progMap["starttime"] = startts.toString("yyyy");
+            progMap["recstarttime"] = startts.toString("yyyy");
+        }
+        
+    }
+    else
+    {
+        progMap["starttime"] = startts.toString(timeFormat);
+        progMap["startdate"] = startts.toString(shortDateFormat);
+        progMap["endtime"] = endts.toString(timeFormat);
+        progMap["enddate"] = endts.toString(shortDateFormat);
+        progMap["recstarttime"] = recstartts.toString(timeFormat);
+        progMap["recstartdate"] = recstartts.toString(shortDateFormat);
+        progMap["recendtime"] = recendts.toString(timeFormat);
+        progMap["recenddate"] = recendts.toString(shortDateFormat);
+    }
+    
     progMap["lastmodifiedtime"] = lastmodified.toString(timeFormat);
     progMap["lastmodifieddate"] = lastmodified.toString(dateFormat);
     progMap["lastmodified"] = lastmodified.toString(dateFormat) + " " +
@@ -330,8 +361,19 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
 
     progMap["filesize"] = longLongToString(filesize);
 
-    seconds = recstartts.secsTo(recendts);
-    minutes = seconds / 60;
+    if (isVideo)
+    {
+        minutes = lenMins;
+        seconds = lenMins * 60;
+    }
+    else
+    {
+        seconds = recstartts.secsTo(recendts);
+        minutes = seconds / 60;
+    }
+    
+    
+    
     progMap["lenmins"] = QString("%1 %2").
         arg(minutes).arg(QObject::tr("minutes"));
     hours   = minutes / 60;
@@ -404,7 +446,10 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
 
 int ProgramInfo::CalculateLength(void)
 {
-    return startts.secsTo(endts);
+    if (isVideo)
+        return lenMins * 60;
+    else
+        return startts.secsTo(endts);
 }
 
 ProgramInfo *ProgramInfo::GetProgramAtDateTime(QSqlDatabase *db,

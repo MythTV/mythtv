@@ -507,7 +507,7 @@ int TV::Playback(ProgramInfo *rcinfo)
     QDateTime curtime = QDateTime::currentDateTime();
     QDateTime endts = rcinfo->endts.addSecs(overrecordseconds);
 
-    if (curtime < endts)
+    if (curtime < endts && !rcinfo->isVideo)
         nextState = kState_WatchingRecording;
     else
         nextState = kState_WatchingPreRecorded;
@@ -1413,6 +1413,27 @@ void TV::ProcessKeypress(QKeyEvent *e)
                             break;
                     }
                 }
+                else if (dialogname == "videoexitplayoptions") 
+                {
+                    int result = osd->GetDialogResponse(dialogname);
+
+                    switch (result)
+                    {
+                        case 0: case 2:
+                            paused = !paused;
+                            DoPause();
+                            break;
+                        case 1:
+                            wantsToQuit = true;
+                            exitPlayer = true;
+                            requestDelete = true;
+                            break;
+                        default:
+                            wantsToQuit = true;
+                            exitPlayer = true;
+                            break;
+                    }
+                }
                 else if (dialogname == "ccwarningdirection")
                 {
                     if (osd->GetDialogResponse(dialogname) == 1)
@@ -1575,7 +1596,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
             StopFFRew();
 
             if (StateIsPlaying(internalState) &&
-                gContext->GetNumSetting("PlaybackExitPrompt") == 1) 
+                gContext->GetNumSetting("PlaybackExitPrompt") == 1 && 
+                (!playbackinfo || !playbackinfo->isVideo)  )
             {
                 nvp->Pause();
 
@@ -1589,6 +1611,20 @@ void TV::ProcessKeypress(QKeyEvent *e)
 
                 dialogname = "exitplayoptions";
                 osd->NewDialogBox(dialogname, message, options, 0);
+            }
+            else if(StateIsPlaying(internalState) &&
+                  gContext->GetNumSetting("PlaybackExitPrompt") == 1 && 
+                  playbackinfo && playbackinfo->isVideo)
+            {
+                nvp->Pause();
+
+                QString vmessage = tr("You are exiting this video");
+
+                QStringList voptions;
+                voptions += tr("Exit to the menu");
+                voptions += tr("Keep watching");
+                dialogname = "videoexitplayoptions";
+                osd->NewDialogBox(dialogname, vmessage, voptions, 0);
             } 
             else 
             {

@@ -63,7 +63,7 @@ class ExitToMainMenuEvent : public QCustomEvent
 #define REG_MEDIA_HANDLER(a, b, c, d, e) gContext->GetMainWindow()->RegisterMediaHandler(a, b, c, d, e)
 #define REG_MEDIAPLAYER(a,b,c) gContext->GetMainWindow()->RegisterMediaPlugin(a, b, c)
 
-typedef  int (*MediaPlayCallback)(const char*);
+typedef  int (*MediaPlayCallback)(const char*, const char*, const char*, const char*, int, const char*);
 
 class MythMainWindowPrivate;
 
@@ -94,9 +94,10 @@ class MythMainWindow : public QDialog
                               void (*callback)(MythMediaDevice* mediadevice), 
                               int mediaType);
 
-    void RegisterMediaPlugin(const QString &name, const QString &desc, 
+    void RegisterMediaPlugin(const QString &name, const QString &desc,
                              MediaPlayCallback fn);
-    bool HandleMedia(QString &handler, const QString &mrl);
+    bool HandleMedia(QString& handler, const QString& mrl, const QString& plot,
+                     const QString& title, const QString& director, int lenMins, const QString& year);
 
     void JumpTo(const QString &destination);
     bool DestinationExists(const QString &destination) const;

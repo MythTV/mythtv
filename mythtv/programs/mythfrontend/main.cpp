@@ -547,31 +547,51 @@ QString RandTheme(QString &themename, QSqlDatabase *db)
     return themename;
 }
 
-int internal_play_media(const char *mrl) 
+int internal_play_media(const char *mrl, const char* plot, const char* title, 
+                        const char* director, int lenMins, const char* year) 
 {
-    int res = -1;
+    int res = -1; 
+    
+   
     TV *tv = new TV();
 
     tv->Init();
+
     ProgramInfo *pginfo = new ProgramInfo();
-    pginfo->endts = QDateTime::currentDateTime().addSecs(-180);
+    pginfo->recstartts = QDateTime::currentDateTime().addSecs((0 - (lenMins + 1)) * 60 );
+    pginfo->recendts = QDateTime::currentDateTime().addSecs(-60);
+    pginfo->recstartts.setDate(QDate::fromString(year));
+    pginfo->lenMins = lenMins;
+    pginfo->isVideo = true;
     pginfo->pathname = mrl;
+    pginfo->description = plot;
+    
+    
+    if (strlen(director))
+        pginfo->subtitle = QString( "%1: %2" ).arg(QObject::tr("Directed By")).arg(director);
+    
+    pginfo->title = title;
 
-    if (tv->Playback(pginfo)) 
+    tv->Playback(pginfo);
+    
+    if (tv->Playback(pginfo))
     {
-       while (tv->GetState() != kState_None) 
-       {
-           qApp->unlock();
-           qApp->processEvents();
-           usleep(50);
-           qApp->lock();
-       }
-       res = 0;
+        while (tv->GetState() != kState_None)
+        {
+            qApp->unlock();
+            qApp->processEvents();
+            usleep(10000);
+            qApp->lock();
+        }
     }
+    
 
+    res = 0;
+    
+    sleep(1);
     delete tv;
     delete pginfo;
-
+    
     return res;
 }
 
