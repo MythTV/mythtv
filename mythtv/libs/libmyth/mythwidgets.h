@@ -155,10 +155,12 @@ class MythRemoteLineEdit : public QTextEdit
         void    shiftState(bool);
         void    cycleState(QString current_choice, QString set);
         void    changeHelpText(QString);
+        void    lostFocus();
 
     protected:
     
         virtual void focusInEvent(QFocusEvent *e);
+        virtual void focusOutEvent(QFocusEvent *e);
         virtual void keyPressEvent(QKeyEvent *e);
 
     private slots:

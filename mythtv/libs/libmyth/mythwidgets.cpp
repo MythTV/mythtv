@@ -591,6 +591,13 @@ void MythRemoteLineEdit::focusInEvent(QFocusEvent *e)
 }
 
 
+void MythRemoteLineEdit::focusOutEvent(QFocusEvent *e)
+{
+    emit lostFocus();
+    QTextEdit::focusOutEvent(e);
+}
+
+
 MythRemoteLineEdit::~MythRemoteLineEdit()
 {
     if(cycle_timer)
