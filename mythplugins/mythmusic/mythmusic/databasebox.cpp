@@ -25,6 +25,7 @@ DatabaseBox::DatabaseBox(MythContext *context, QSqlDatabase *ldb,
     QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
 
     MythListView *listview = new MythListView(this);
+    listview->DontFixSpaceBar();
     listview->addColumn("Select music to be played:");
 
     listview->setSorting(-1);
