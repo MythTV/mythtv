@@ -119,7 +119,7 @@ void ProgramListItem::paintCell(QPainter *p, const QColorGroup &cg,
     QColorGroup _cg(cg);
     QColor c = _cg.text();
 
-    if (!pginfo->recording)
+    if (!pginfo->recording || pginfo->duplicate)
     {
         _cg.setColor(QColorGroup::Text, Qt::gray);
         _cg.setColor(QColorGroup::HighlightedText, Qt::gray);
