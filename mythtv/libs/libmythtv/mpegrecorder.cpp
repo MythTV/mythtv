@@ -14,7 +14,11 @@
 
 extern "C" {
 #include <inttypes.h>
+#ifdef USING_IVTV_HEADER
+#include <linux/ivtv.h>
+#else
 #include "ivtv-ext-api.h"
+#endif
 }
 
 using namespace std;

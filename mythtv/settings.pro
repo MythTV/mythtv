@@ -49,6 +49,8 @@ EXTRA_LIBS += $${LOCAL_LIBDIR_X11} -lXinerama -lXv -lX11 -lXext -lXxf86vm
 # IVTV (PVR-x50) support
 CONFIG += using_ivtv
 DEFINES += USING_IVTV
+# Use the installed ivtv header instead of the local copy (needs >= v0.2)
+#DEFINES += USING_IVTV_HEADER
 
 # LCDProc support
 #DEFINES += LCD_DEVICE

@@ -25,7 +25,11 @@ using namespace std;
 #include "videoout_ivtv.h"
 extern "C" {
 #include <inttypes.h>
+#ifdef USING_IVTV_HEADER
+#include <linux/ivtv.h>
+#else
 #include "ivtv-ext-api.h"
+#endif
 }
 
 #include "libmyth/mythcontext.h"
@@ -85,12 +89,24 @@ void VideoOutputIvtv::ClearOSD(void)
 {
     if (fbfd > 0) 
     {
+#ifdef IVTVFB_IOCTL_BLT_FILL
+        struct ivtvfb_ioctl_blt_fill_args args;
+        args.rasterop = 0xa;
+        args.alpha_mode = 0x1;
+        args.alpha_mask = 0x0;
+        args.width = XJ_width;
+        args.height = XJ_height;
+        args.x = args.y = 0;
+        args.destPixelMask = 0xffffffff;
+        args.colour = 0;
+        if (ioctl(fbfd, IVTVFB_IOCTL_BLT_FILL, &args) < 0) 
+            perror("IVTVFB_IOCTL_BLT_FILL");
+#else
         struct ivtv_osd_coords osdcoords;
         memset(&osdcoords, 0, sizeof(osdcoords));
 
         if (ioctl(fbfd, IVTVFB_IOCTL_GET_ACTIVE_BUFFER, &osdcoords) < 0)
             perror("IVTVFB_IOCTL_GET_ACTIVE_BUFFER");
-
         struct ivtvfb_ioctl_dma_host_to_ivtv_args prep;
         memset(&prep, 0, sizeof(prep));
 
@@ -102,15 +118,8 @@ void VideoOutputIvtv::ClearOSD(void)
 
         if (ioctl(fbfd, IVTVFB_IOCTL_PREP_FRAME, &prep) < 0)
             perror("IVTVFB_IOCTL_PREP_FRAME");
-
-        usleep(20000);
-
-        osdcoords.lines = XJ_height;
-        osdcoords.offset = 0;
-        osdcoords.pixel_stride = XJ_width * 2;
-
-        if (ioctl(fbfd, IVTVFB_IOCTL_SET_ACTIVE_BUFFER, &osdcoords) < 0)
-            perror("IVTVFB_IOCTL_SET_ACTIVE_BUFFER");
+#endif
+        lastcleared = true;
     }
 }
 
@@ -208,6 +217,17 @@ bool VideoOutputIvtv::Init(int width, int height, float aspect,
         memset(osdbuf_aligned, 0x00, osdbufsize);
 
         ClearOSD();
+
+        usleep(20000);
+
+        struct ivtv_osd_coords osdcoords;
+        memset(&osdcoords, 0, sizeof(osdcoords));
+        osdcoords.lines = XJ_height;
+        osdcoords.offset = 0;
+        osdcoords.pixel_stride = XJ_width * 2;
+
+        if (ioctl(fbfd, IVTVFB_IOCTL_SET_ACTIVE_BUFFER, &osdcoords) < 0)
+            perror("IVTVFB_IOCTL_SET_ACTIVE_BUFFER");
     }
 
     cout << "Using the PVR-350 decoder/TV-out\n";
@@ -237,20 +257,6 @@ void VideoOutputIvtv::Open(void)
         return;
     }
 
-    struct v4l2_control ctrl;
-    memset(&ctrl, 0, sizeof(ctrl));
-
-    ctrl.id = V4L2_CID_IVTV_DEC_PREBUFFER;
-    ctrl.value = 0;
-
-    if (ioctl(videofd, VIDIOC_S_CTRL, &ctrl) < 0)
-        perror("VIDIOC_S_CTRL prebuffer");
-
-    ctrl.id = V4L2_CID_IVTV_DEC_NUM_BUFFERS;
-    ctrl.value = 1;
-
-    if (ioctl(videofd, VIDIOC_S_CTRL, &ctrl) < 0)
-        perror("VIDIOC_S_CTRL numbuffers");
 }
 
 void VideoOutputIvtv::EmbedInWidget(WId wid, int x, int y, int w, int h)
@@ -415,7 +421,7 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
         tmpframe.buf = (unsigned char *)osdbuf_aligned;
         tmpframe.width = stride;
         tmpframe.height = XJ_height;
-        
+
         int ret = DisplayOSD(&tmpframe, osd, stride);
 
         if (ret < 0 && !lastcleared)
@@ -435,7 +441,11 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
         if (ret >= 0)
             lastcleared = false;
 
-        if (ret > 0 || drawanyway)
+        if (lastcleared && drawanyway)
+        {
+            ClearOSD();
+        } 
+        else if (ret > 0 || drawanyway)
         {
             struct ivtvfb_ioctl_dma_host_to_ivtv_args prep;
             memset(&prep, 0, sizeof(prep));
@@ -597,4 +607,3 @@ void VideoOutputIvtv::Step(void)
         }
     }
 }
-
