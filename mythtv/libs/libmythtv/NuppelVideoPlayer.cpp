@@ -1411,7 +1411,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         if (prebuffering)
         {
             //printf("prebuffering...\n");
-            usleep(2000);
+            usleep(200);
 	    ResetNexttrigger(&nexttrigger);
             continue;
         }

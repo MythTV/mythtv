@@ -237,11 +237,7 @@ TVState TV::RemoveRecording(TVState state)
 TVState TV::RemovePlaying(TVState state)
 {
     if (StateIsPlaying(state))
-    {
-        if (state == kState_WatchingPreRecorded)
-            return kState_None;
-        return kState_RecordingOnly;
-    }
+        return kState_None;
     return kState_Error;
 }
 
