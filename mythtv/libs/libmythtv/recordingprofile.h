@@ -63,13 +63,14 @@ public:
 };
 
 
-class SampleRate: public CodecParam, public SpinBoxSetting {
+class SampleRate: public CodecParam, public ComboBoxSetting {
 public:
     SampleRate(const RecordingProfile& parent):
-        CodecParam(parent, "samplerate"),
-        SpinBoxSetting(32000,48000,100) {
+        CodecParam(parent, "samplerate") {
         setLabel("Sampling rate");
-        setValue(32000);
+        addSelection("32000");
+        addSelection("44100");
+        addSelection("48000");
     };
 };
 

@@ -129,13 +129,15 @@ public:
     };
 };
 
-class AudioRateLimit: public SpinBoxSetting, public CCSetting {
+class AudioRateLimit: public ComboBoxSetting, public CCSetting {
 public:
     AudioRateLimit(const CaptureCard& parent):
-        SpinBoxSetting(0, 48000, 100),
         CCSetting(parent, "audioratelimit") {
         setLabel("Audio sampling rate limit");
-        setValue(0);
+        addSelection("0");
+        addSelection("32000");
+        addSelection("44100");
+        addSelection("48000");
     };
 };
 
