@@ -111,66 +111,66 @@
     </message>
     <message>
         <source>Compilation Artist:<byte value="x9"/></source>
-        <translation type="unfinished"></translation>
+        <translation>Compilatie Artiest:</translation>
     </message>
 </context>
 <context>
     <name>EditMetadataDialog</name>
     <message>
         <source>Done</source>
-        <translation type="unfinished"></translation>
+        <translation>Klaar</translation>
     </message>
     <message>
         <source>DB Statistics</source>
-        <translation type="unfinished"></translation>
+        <translation>Statistieken</translation>
     </message>
     <message>
         <source>Various Artists</source>
-        <translation type="unfinished">Verschillende Artiesten</translation>
+        <translation>Verschillende Artiesten</translation>
     </message>
     <message>
         <source>Select an Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Kies een Artiest</translation>
     </message>
     <message>
         <source>Select a Compilation Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Kies een Compilatie Artiest</translation>
     </message>
     <message>
         <source>Select an Album</source>
-        <translation type="unfinished"></translation>
+        <translation>Kies een Album</translation>
     </message>
     <message>
         <source>Select a Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>Kies een Genre</translation>
     </message>
     <message>
         <source>Save Changes?</source>
-        <translation type="unfinished"></translation>
+        <translation>Bewaar Wijzigingen?</translation>
     </message>
     <message>
         <source>Save to Database Only</source>
-        <translation type="unfinished"></translation>
+        <translation>Bewaar Enkel In De Database</translation>
     </message>
     <message>
         <source>Save to File Only</source>
-        <translation type="unfinished"></translation>
+        <translation>Pas Enkel Het Bestand Aan</translation>
     </message>
     <message>
         <source>Save to File and Database</source>
-        <translation type="unfinished"></translation>
+        <translation>Bewaar in Bestand en Database</translation>
     </message>
     <message>
         <source>Exit/Do Not Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Stop/Niet Bewaren</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuleer</translation>
     </message>
     <message>
         <source>Are you sure you want to save the modified metadata to the file?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ben je zeker dat je de gewijzigde gegevens in het bestand wil opslaan?</translation>
     </message>
 </context>
 <context>
@@ -396,27 +396,27 @@
     </message>
     <message>
         <source>Smart playlists</source>
-        <translation type="unfinished"></translation>
+        <translation>Slimme Speellijsten</translation>
     </message>
     <message>
         <source>All Tracks</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle Nummers</translation>
     </message>
     <message>
         <source>Tracks by current Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle Nummers Van Deze Artiest</translation>
     </message>
     <message>
         <source>Tracks from current Album</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle Nummers Van Dit Album</translation>
     </message>
     <message>
         <source>Tracks from current Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle Nummers Van Dit Genre</translation>
     </message>
     <message>
         <source>Tracks from current Year</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle Nummers Uit Dit Jaar</translation>
     </message>
 </context>
 <context>
@@ -1041,101 +1041,101 @@ Probeer hdd(of hdc/hdb)=ide-scsi aan uw opstartopties toe te voegen, als uw IDE-
     </message>
     <message>
         <source>Multi-Artist?</source>
-        <translation type="unfinished"></translation>
+        <translation>Verschillende Uitvoereders?</translation>
     </message>
     <message>
         <source>Switch Titles &amp;&amp; Artists</source>
-        <translation type="unfinished"></translation>
+        <translation>Wissel Titels en Uitvoerders</translation>
     </message>
     <message>
         <source>Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Titel</translation>
     </message>
     <message>
         <source>Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Uitvoerder</translation>
     </message>
     <message>
         <source>Length</source>
-        <translation type="unfinished"></translation>
+        <translation>Lengte</translation>
     </message>
 </context>
 <context>
     <name>SmartPLCriteriaRow</name>
     <message>
         <source>Select an Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Kies een Uitvoerder</translation>
     </message>
     <message>
         <source>Select an Album</source>
-        <translation type="unfinished"></translation>
+        <translation>Kies een Album</translation>
     </message>
     <message>
         <source>Select a Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>Kies een Genre</translation>
     </message>
     <message>
         <source>Select a Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Kies een Titel</translation>
     </message>
 </context>
 <context>
     <name>SmartPLOrderByDialog</name>
     <message>
         <source>Order By Fields</source>
-        <translation type="unfinished"></translation>
+        <translation>Sorteren Op</translation>
     </message>
     <message>
         <source>1 Add</source>
-        <translation type="unfinished"></translation>
+        <translation>1 Toevoegen</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>Toevoegen</translation>
     </message>
     <message>
         <source>2 Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>2 Wis</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Wis</translation>
     </message>
     <message>
         <source>3 Move Up</source>
-        <translation type="unfinished"></translation>
+        <translation>3 Naar Boven</translation>
     </message>
     <message>
         <source>Move Up</source>
-        <translation type="unfinished"></translation>
+        <translation>Naar Boven</translation>
     </message>
     <message>
         <source>4 Move Down</source>
-        <translation type="unfinished"></translation>
+        <translation>4 Naar Beneden</translation>
     </message>
     <message>
         <source>Move Down</source>
-        <translation type="unfinished"></translation>
+        <translation>Naar Beneden</translation>
     </message>
     <message>
         <source>5 Ascending</source>
-        <translation type="unfinished"></translation>
+        <translation>5 Oplopend</translation>
     </message>
     <message>
         <source>Ascending</source>
-        <translation type="unfinished"></translation>
+        <translation>Oplopend</translation>
     </message>
     <message>
         <source>6 Descending</source>
-        <translation type="unfinished"></translation>
+        <translation>6 Aflopend</translation>
     </message>
     <message>
         <source>Descending</source>
-        <translation type="unfinished"></translation>
+        <translation>Aflopend</translation>
     </message>
     <message>
         <source>7 OK</source>
-        <translation type="unfinished"></translation>
+        <translation>7 OK</translation>
     </message>
     <message>
         <source>OK</source>
@@ -1146,11 +1146,11 @@ Probeer hdd(of hdc/hdb)=ide-scsi aan uw opstartopties toe te voegen, als uw IDE-
     <name>SmartPLResultViewer</name>
     <message>
         <source>Smart Playlist Result Viewer</source>
-        <translation type="unfinished"></translation>
+        <translation>Resultaatvenster Slimme Speellijst</translation>
     </message>
     <message>
         <source>Exit</source>
-        <translation type="unfinished"></translation>
+        <translation>Stop</translation>
     </message>
     <message>
         <source>ID</source>
@@ -1158,113 +1158,113 @@ Probeer hdd(of hdc/hdb)=ide-scsi aan uw opstartopties toe te voegen, als uw IDE-
     </message>
     <message>
         <source>Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Uitvoerder</translation>
     </message>
     <message>
         <source>Album</source>
-        <translation type="unfinished"></translation>
+        <translation>Album</translation>
     </message>
     <message>
         <source>Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Titel</translation>
     </message>
     <message>
         <source>Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>Genre</translation>
     </message>
     <message>
         <source>Year</source>
-        <translation type="unfinished"></translation>
+        <translation>Jaar</translation>
     </message>
     <message>
         <source>Track No.</source>
-        <translation type="unfinished"></translation>
+        <translation>Titel nr.</translation>
     </message>
 </context>
 <context>
     <name>SmartPlaylistDialog</name>
     <message>
         <source>Smart Playlists</source>
-        <translation type="unfinished"></translation>
+        <translation>Slimme Speellijsten</translation>
     </message>
     <message>
         <source>1 Select</source>
-        <translation type="unfinished"></translation>
+        <translation>1 Kies</translation>
     </message>
     <message>
         <source>Select</source>
-        <translation type="unfinished"></translation>
+        <translation>Kies</translation>
     </message>
     <message>
         <source>2 New</source>
-        <translation type="unfinished"></translation>
+        <translation>2 Nieuw</translation>
     </message>
     <message>
         <source>New</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieuw</translation>
     </message>
     <message>
         <source>3 Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>3 Bewerk</translation>
     </message>
     <message>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Bewerk</translation>
     </message>
     <message>
         <source>4 Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>4 Wis</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Wis</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this SmartPlaylist?</source>
-        <translation type="unfinished"></translation>
+        <translation>Deze Slimme Speellijst verwijderen?</translation>
     </message>
 </context>
 <context>
     <name>SmartPlaylistEditor</name>
     <message>
         <source>Smart Playlist Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Slimme Speellijs Bewerken</translation>
     </message>
     <message>
         <source>Category:</source>
-        <translation type="unfinished"></translation>
+        <translation>Categorie:</translation>
     </message>
     <message>
         <source>Title:</source>
-        <translation type="unfinished">Titel:</translation>
+        <translation>Titel:</translation>
     </message>
     <message>
         <source>Match</source>
-        <translation type="unfinished"></translation>
+        <translation>Match</translation>
     </message>
     <message>
         <source>All</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle</translation>
     </message>
     <message>
         <source>Any</source>
-        <translation type="unfinished"></translation>
+        <translation>Een</translation>
     </message>
     <message>
         <source>Of The Following Conditions</source>
-        <translation type="unfinished"></translation>
+        <translation>Van de Volgende Voorwaarden</translation>
     </message>
     <message>
         <source>Order By:</source>
-        <translation type="unfinished"></translation>
+        <translation>Sorteren Volgens:</translation>
     </message>
     <message>
         <source>Matches:</source>
-        <translation type="unfinished"></translation>
+        <translation>Matches:</translation>
     </message>
     <message>
         <source>Limit:</source>
-        <translation type="unfinished"></translation>
+        <translation>Limiet:</translation>
     </message>
     <message>
         <source></source>
@@ -1272,31 +1272,31 @@ Probeer hdd(of hdc/hdb)=ide-scsi aan uw opstartopties toe te voegen, als uw IDE-
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Anuleer</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Bewaar</translation>
     </message>
     <message>
         <source>Show Results</source>
-        <translation type="unfinished"></translation>
+        <translation>Toon Resultaten</translation>
     </message>
     <message>
         <source>Smart Playlist Categories</source>
-        <translation type="unfinished"></translation>
+        <translation>Categrien Van Slimme Speellijsten</translation>
     </message>
     <message>
         <source>New Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieuwe Categorie</translation>
     </message>
     <message>
         <source>Delete Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Wis Categorie</translation>
     </message>
     <message>
         <source>Rename Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Hernoem Categorie</translation>
     </message>
     <message>
         <source> </source>
@@ -1304,11 +1304,11 @@ Probeer hdd(of hdc/hdb)=ide-scsi aan uw opstartopties toe te voegen, als uw IDE-
     </message>
     <message>
         <source>Are you sure you want to delete this Category?</source>
-        <translation type="unfinished"></translation>
+        <translation>Deze Categorie Verwijderen?</translation>
     </message>
     <message>
         <source>It will also delete any Smart Playlists belonging to this category.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ook Alle Slimme Speellijsten van deze Categorie zullen verdwijnen.</translation>
     </message>
 </context>
 <context>
