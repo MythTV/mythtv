@@ -2476,9 +2476,9 @@ bool Weather::GetWeatherData()
 
 bool Weather::GetStaticRadarMap()
 {
-    QUrl weatherMapLink1URL(QString("http://w3.weather.com/weather/map/%1"
+    QUrl weatherMapLink1URL(QString("http://www.weather.com/weather/map/%1"
                                     "?from=LAPmaps&setcookie=1 HTTP/1.1\n"
-                                    "Connection: close\nHost: w3.weather.com\n\n\n")
+                                    "Connection: close\nHost: www.weather.com\n\n\n")
                                     .arg(locale));
 
     INETComms *weatherMapLink1 = new INETComms(weatherMapLink1URL);
@@ -2500,7 +2500,7 @@ bool Weather::GetStaticRadarMap()
     if (mapLoc == "<NULL>")
         return true;
      
-    QUrl weatherMapLink2URL("http://w3.weather.com/" + mapLoc); 
+    QUrl weatherMapLink2URL("http://www.weather.com/" + mapLoc); 
      
     if (debug)
         cerr << "MythWeather: Grabbing Weather Map Link (part 2) From: " 
@@ -2581,7 +2581,7 @@ bool Weather::GetAnimatedRadarMap()
          return false;
 
      // find radar maps url's
-     QString sURL = "http://w3.weather.com/weather/map/" + locale +
+     QString sURL = "http://www.weather.com/weather/map/" + locale +
         "?name=index_large_animated&day=1";
      QString tempData = "";
 
@@ -2594,7 +2594,7 @@ bool Weather::GetAnimatedRadarMap()
      if (mapLoc == "<NULL>")
          return false;
 
-     mapLoc = "http://w3.weather.com/" + mapLoc;
+     mapLoc = "http://www.weather.com/" + mapLoc;
      if (debug)
         cerr << "MythWeather: Grabbing Weather Map Link (part 2) From: "
            << mapLoc << endl;
