@@ -7,8 +7,8 @@
     email                : sward@relatable.com
  ***************************************************************************/
 
-#ifndef SETTINGS_H
-#define SETTINGS_H
+#ifndef OLDSETTINGS_H
+#define OLDSETTINGS_H
 #include <iostream>
 #include <qstring.h>
 #include <map>
