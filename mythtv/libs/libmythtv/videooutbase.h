@@ -130,7 +130,7 @@ class VideoOutput
     void InitBuffers(int numdecode, bool extra_for_pause, int need_free,
                      int needprebuffer, int keepprebuffer);
 
-    void ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer);
+    virtual void ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer);
     int DisplayOSD(VideoFrame *frame, OSD *osd, int stride = -1);
 
     void BlendSurfaceToYV12(OSDSurface *surface, unsigned char *yuvptr,

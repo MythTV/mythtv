@@ -53,6 +53,8 @@ class VideoOutputIvtv: public VideoOutput
     int GetFramesPlayed(void);
 
   private:
+    void ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer);
+ 
     int videofd;
     int fbfd;
 

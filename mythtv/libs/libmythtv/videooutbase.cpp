@@ -725,7 +725,6 @@ void VideoOutput::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
                 break;
     }
 
-    // FIXME: could pre-init most of this stuff
     if (pipw != desired_pipw || piph != desired_piph)
     {
         DoPipResize(pipw, piph);

@@ -30,6 +30,10 @@ extern "C" {
 
 #include "libmyth/mythcontext.h"
 
+#include "NuppelVideoPlayer.h"
+#include "../libavcodec/avcodec.h"
+#include "yuv2rgb.h"
+
 VideoOutputIvtv::VideoOutputIvtv(void)
 {
     videofd = -1;
@@ -303,13 +307,86 @@ void VideoOutputIvtv::UpdatePauseFrame(void)
 { 
 }
 
+void VideoOutputIvtv::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
+{
+    if (!pipplayer)
+        return;
+
+    int pipw, piph;
+
+    VideoFrame *pipimage = pipplayer->GetCurrentFrame(pipw, piph);
+
+    if (!pipimage || !pipimage->buf || pipimage->codec != FMT_YV12)
+        return;
+
+    int xoff;
+    int yoff;
+
+    unsigned char *pipbuf = pipimage->buf;
+
+    switch (PIPLocation)
+    {
+        default:
+        case kPIPTopLeft:
+                xoff = 30;
+                yoff = 40;
+                break;
+        case kPIPBottomLeft:
+                xoff = 30;
+                yoff = frame->height - piph - 40;
+                break;
+        case kPIPTopRight:
+                xoff = frame->width - pipw - 30;
+                yoff = 40;
+                break;
+        case kPIPBottomRight:
+                xoff = frame->width - pipw - 30;
+                yoff = frame->height - piph - 40;
+                break;
+    }
+
+    if (pipw != desired_pipw || piph != desired_piph)
+    {
+        DoPipResize(pipw, piph);
+
+        if (piptmpbuf && pipscontext)
+        {
+            AVPicture img_in, img_out;
+
+            avpicture_fill(&img_out, (uint8_t *)piptmpbuf, PIX_FMT_YUV420P,
+                           pipw_out, piph_out);
+            avpicture_fill(&img_in, (uint8_t *)pipimage->buf, PIX_FMT_YUV420P,
+                           pipw, piph);
+
+            img_resample(pipscontext, &img_out, &img_in);
+
+            pipw = pipw_out;
+            piph = piph_out;
+
+            pipbuf = piptmpbuf;
+        }
+    }
+
+    unsigned char *outputbuf = new unsigned char[pipw * piph * 4];
+    yuv2rgb_fun convert = yuv2rgb_init_mmx(32, MODE_RGB);
+
+    convert(outputbuf, pipbuf, pipbuf + (pipw * piph), 
+            pipbuf + (pipw * piph * 5 / 4), pipw, piph,
+            pipw * 4, pipw, pipw / 2);
+
+    if (frame->width < 0)
+        frame->width = XJ_width;
+
+    memcpy(frame->buf + yoff * frame->width + xoff,
+           outputbuf, pipw * piph * 4);
+}
+
 void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
                                    FilterChain *filterList, 
                                    NuppelVideoPlayer *pipPlayer) 
 { 
     (void)filterList;
     (void)frame;
-    (void)pipPlayer;
 
     if (fbfd > 0 && osd)
     {
@@ -318,7 +395,9 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
         VideoFrame tmpframe;
         tmpframe.codec = FMT_ARGB32;
         tmpframe.buf = (unsigned char *)osdbuf_aligned;
-
+        tmpframe.width = stride;
+        tmpframe.height = XJ_height;
+        
         int ret = DisplayOSD(&tmpframe, osd, stride);
 
         if (ret < 0 && !lastcleared)
@@ -327,6 +406,14 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
             lastcleared = true;
             drawanyway = true;
         }
+
+#if 0
+        if (pipPlayer)
+        {
+            ShowPip(&tmpframe, pipPlayer);
+            drawanyway = true;
+        }
+#endif
 
         if (ret >= 0)
             lastcleared = false;
