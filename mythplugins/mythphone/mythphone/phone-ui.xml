@@ -240,25 +240,19 @@
 
             <textarea name="caller_text" draworder="1" align="left">
                 <font>statsfont</font>
-                <area>25,10,150,23</area>
+                <area>25,10,200,23</area>
                 <cutdown>yes</cutdown>
             </textarea>
 
             <textarea name="audio_stats_text" draworder="1" align="left">
                 <font>statsfont</font>
-                <area>180,10,215,23</area>
+                <area>230,10,265,23</area>
                 <cutdown>yes</cutdown>
             </textarea>
 
             <textarea name="video_stats_text" draworder="1" align="left">
                 <font>statsfont</font>
-                <area>400,10,200,23</area>
-                <cutdown>yes</cutdown>
-            </textarea>
-
-            <textarea name="bw_stats_text" draworder="1" align="left">
-                <font>statsfont</font>
-                <area>600,10,105,23</area>
+                <area>500,10,210,23</area>
                 <cutdown>yes</cutdown>
             </textarea>
 
