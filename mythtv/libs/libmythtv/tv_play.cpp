@@ -17,6 +17,8 @@ using namespace std;
 #include "remoteutil.h"
 #include "guidegrid.h"
 #include "volumecontrol.h"
+#include "NuppelVideoPlayer.h"
+#include "programinfo.h"
 
 // cheat and put the keycodes here
 #define wsUp            0x52 + 256
@@ -1181,9 +1183,10 @@ void TV::DoSkipCommercials()
 
     if (activenvp == nvp)
     {
-        QString desc = "";
-        int pos = calcSliderPos((int)(fftime * ff_rew_scaling), desc);
-        osd->StartPause(pos, slidertype, "Skip Commercial", desc, 2);
+        QString dummy = "";
+        QString desc = "Searching...";
+        int pos = calcSliderPos(0, dummy);
+        osd->StartPause(pos, slidertype, "SKIP", desc, 6);
     }
 
     activenvp->SkipCommercials();

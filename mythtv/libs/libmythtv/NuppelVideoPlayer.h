@@ -172,7 +172,8 @@ class NuppelVideoPlayer
    
     void ClearAfterSeek(); // caller should not hold any locks
    
-    unsigned int GetFrameVariance(int vposition);
+    bool FrameIsBlank(int vposition);
+    bool LastFrameIsBlank(void) { return FrameIsBlank(vpos); }
     int SkipTooCloseToEnd(int frames);
     void SkipCommercialsByBlanks(void);
     bool DoSkipCommercials(void);

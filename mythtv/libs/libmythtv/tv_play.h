@@ -6,18 +6,14 @@
 
 #include <qobject.h>
 
-#include "NuppelVideoRecorder.h"
-#include "NuppelVideoPlayer.h"
-#include "RingBuffer.h"
-
-#include "channel.h"
-#include "programinfo.h"
-
 class QSqlDatabase;
 class QDateTime;
 class OSD;
 class RemoteEncoder;
 class VolumeControl;
+class NuppelVideoPlayer;
+class RingBuffer;
+class ProgramInfo;
 
 class TV : public QObject
 {

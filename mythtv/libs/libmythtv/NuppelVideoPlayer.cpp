@@ -3407,11 +3407,14 @@ void NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname)
 */
 }
 
-#define VARIANCE_PIXELS 200
-unsigned int NuppelVideoPlayer::GetFrameVariance(int vposition)
+bool NuppelVideoPlayer::FrameIsBlank(int vposition)
 {
+    const int pixels_to_check = 200;
+    const unsigned int max_brightness = 80;
+
+    int pixels_over_max = 0;
     unsigned int average_Y;
-    unsigned int pixel_Y[VARIANCE_PIXELS];
+    unsigned int pixel_Y[pixels_to_check];
     unsigned int variance, temp;
     int i,x,y,top,bottom;
 
@@ -3422,37 +3425,43 @@ unsigned int NuppelVideoPlayer::GetFrameVariance(int vposition)
     bottom = (int)(video_height * .90);
 
     // get the pixel values
-    for (i = 0; i < VARIANCE_PIXELS; i++)
+    for (i = 0; i < pixels_to_check; i++)
     {
         x = 10 + (rand() % (video_width - 10));  // Get away from the edges.
         y = top + (rand() % (bottom - top));
         pixel_Y[i] = vbuffer[vposition][y * video_width + x];
-    }
 
-    // get the average
-    for (i = 0; i < VARIANCE_PIXELS; i++)
+        if (pixel_Y[i] > max_brightness)
+        {
+            pixels_over_max++;
+            if (pixels_over_max > 3)
+                return false;
+        }
+
         average_Y += pixel_Y[i];
-    average_Y /= VARIANCE_PIXELS;
+    }
+    average_Y /= pixels_to_check;
 
     // get the sum of the squared differences
-    for (i = 0; i < VARIANCE_PIXELS; i++)
+    for (i = 0; i < pixels_to_check; i++)
         temp += (pixel_Y[i] - average_Y) * (pixel_Y[i] - average_Y);
 
     // get the variance
-    variance = (unsigned int)(temp / VARIANCE_PIXELS);
+    variance = (unsigned int)(temp / pixels_to_check);
 
-    return variance;
+    if (variance <= 20)
+        return true;
+    return false;
 }
 
 void NuppelVideoPlayer::AutoCommercialSkip(void)
 {
-    PauseVideo();
-
     if (autocommercialskip == COMMERCIAL_SKIP_BLANKS)
     {
-        int variance = GetFrameVariance(vpos);
-        if (variance < 20)
+        if (LastFrameIsBlank())
         {
+            PauseVideo();
+
             consecutive_blanks++;
             if (consecutive_blanks >= 3)
             {
@@ -3463,7 +3472,7 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
                 int tries = 10;
 
                 GetFrame(1, true);
-                while ((tries > 0) && (GetFrameVariance(vpos) >= 20))
+                while ((tries > 0) && (!LastFrameIsBlank()))
                 {
                      GetFrame(1, true);
                      tries--;
@@ -3485,14 +3494,14 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
                     return;
                 }
             }
+
+            UnpauseVideo();
         }
         else if (consecutive_blanks)
         {
             consecutive_blanks = 0;
         }
     }
-
-    UnpauseVideo();
 }
 
 void NuppelVideoPlayer::SkipCommercialsByBlanks(void)
@@ -3503,6 +3512,8 @@ void NuppelVideoPlayer::SkipCommercialsByBlanks(void)
     int first_blank_frame;
     int saved_position;
     int min_blank_frame_seq = 1;
+    int comm_lengths[] = { 30, 15, 60, 0 }; // commercial lengths
+    int comm_window = 2;                    // seconds to scan for break
 
     // rewind 2 seconds in case user hit Skip right after a break
     JumpToNetFrame((long long int)(-2 * video_frame_rate));
@@ -3515,7 +3526,7 @@ void NuppelVideoPlayer::SkipCommercialsByBlanks(void)
     while (scanned_frames < (64 * video_frame_rate))
     {
         GetFrame(1, true);
-        if (GetFrameVariance(vpos) < 20)
+        if (LastFrameIsBlank())
         {
             blanks_found++;
             if (!first_blank_frame)
@@ -3531,6 +3542,8 @@ void NuppelVideoPlayer::SkipCommercialsByBlanks(void)
         if (SkipTooCloseToEnd(min_blank_frame_seq - blanks_found))
         {
             JumpToFrame(saved_position);
+            if (osd)
+                osd->EndPause();
             return;
         }
 
@@ -3540,28 +3553,32 @@ void NuppelVideoPlayer::SkipCommercialsByBlanks(void)
     if (!first_blank_frame)
     {
         JumpToFrame(saved_position);
+        if (osd)
+            osd->EndPause();
         return;
     }
 
     // if we make it here, then a blank was found
     int blank_seq_found = 0;
+    int commercials_found = 0;
     do
     {
-        int jump_seconds = 14;
+        int *comm_length = comm_lengths; 
 
         blank_seq_found = 0;
         saved_position = framesPlayed;
-        while ((framesPlayed - saved_position) < (61 * video_frame_rate))
+        while (*comm_length)
         {
-            JumpToNetFrame((long long int)(jump_seconds * video_frame_rate));
-            jump_seconds = 12;
+            long long int new_frame = saved_position + 
+                       (long long int)((*comm_length - 1) * video_frame_rate);
+            JumpToFrame(new_frame);
 
             scanned_frames = blanks_found = found_blank_seq = 0;
             first_blank_frame = 0;
-            while (scanned_frames < (3 * video_frame_rate))
+            while (scanned_frames < (comm_window * video_frame_rate))
             {
                 GetFrame(1, true);
-                if (GetFrameVariance(vpos) < 20)
+                if (LastFrameIsBlank())
                 {
                     blanks_found++;
                     if (!first_blank_frame)
@@ -3586,13 +3603,46 @@ void NuppelVideoPlayer::SkipCommercialsByBlanks(void)
 
             if (blanks_found >= min_blank_frame_seq)
             {
+                QString comm_msg;
+                double spos = 0.0;
+
                 blank_seq_found = 1;
+
+                commercials_found++;
+                comm_msg = QString("Found %1 sec. commercial")
+                                  .arg(*comm_length);
+       
+                if ((livetv) ||
+                    (watchingrecording && nvr_enc && 
+                     nvr_enc->IsValidRecorder()))
+                {
+                    spos = 1000.0 * framesPlayed / nvr_enc->GetFramesWritten();
+                }
+                else if (totalFrames)
+                {
+                    spos = 1000.0 * framesPlayed / totalFrames;
+                }
+
+                if (osd)
+                    osd->StartPause((int)spos, false, "SKIP", comm_msg, 5);
                 break;
             }
+
+            comm_length++;
         }
     } while (blank_seq_found);
 
+    if (osd)
+        osd->EndPause();
+
     JumpToFrame(saved_position);
+
+    // skip all blank frames so we get right to the show
+    GetFrame(1, true);
+    while (LastFrameIsBlank())
+        GetFrame(1, true);
+
+    ClearAfterSeek();
 }
 
 bool NuppelVideoPlayer::DoSkipCommercials(void)

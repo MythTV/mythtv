@@ -5,6 +5,7 @@ using namespace std;
 
 #include "encoderlink.h"
 #include "tv.h"
+#include "programinfo.h"
 
 EncoderLink::EncoderLink(QSocket *lsock, QString lhostname)
 {

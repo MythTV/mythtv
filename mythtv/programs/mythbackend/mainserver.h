@@ -3,6 +3,8 @@
 
 #include <qmap.h>
 #include <qsocket.h>
+#include <vector>
+using namespace std;
 
 #include "tv.h"
 #include "server.h"

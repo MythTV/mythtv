@@ -3,19 +3,16 @@
 
 #include <qstring.h>
 #include <pthread.h>
-
-#include "NuppelVideoRecorder.h"
-#include "NuppelVideoPlayer.h"
-#include "RingBuffer.h"
-
-#include "channel.h"
-#include "programinfo.h"
+#include <qdatetime.h>
 
 #include "tv.h"
 
 class QSqlDatabase;
-class QDateTime;
 class QSocket;
+class Channel;
+class ProgramInfo;
+class RingBuffer;
+class NuppelVideoRecorder;
 
 class TVRec
 {

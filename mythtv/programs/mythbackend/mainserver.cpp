@@ -20,6 +20,7 @@ using namespace std;
 #include "mainserver.h"
 #include "scheduler.h"
 #include "httpstatus.h"
+#include "programinfo.h"
 
 MainServer::MainServer(int port, int statusport, 
                        QMap<int, EncoderLink *> *tvList)

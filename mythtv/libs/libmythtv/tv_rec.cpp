@@ -15,6 +15,10 @@ using namespace std;
 #include "dialogbox.h"
 #include "recordingprofile.h"
 #include "util.h"
+#include "programinfo.h"
+#include "NuppelVideoRecorder.h"
+#include "NuppelVideoPlayer.h"
+#include "channel.h"
 
 void *SpawnEncode(void *param)
 {
