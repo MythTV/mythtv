@@ -176,11 +176,14 @@ char myHostname[64];
 
     if (gethostname(myHostname, sizeof(myHostname)) == -1)
         myHostname[0] = 0;
+    QString Dir       = "My MythTVs";
     QString Surname   = myHostname;
     QString FirstName = QString("Local Myth Host");
     QString NickName  = gContext->GetSetting("MySipName") + "(" + myHostname + ")";
-    QString Uri       = "MythPhone@" + GetMySipIp();
-    QString Dir       = "My MythTVs";
+    QString Uri       = "MythPhone@" + GetMySipIp() + gContext->GetSetting("SipLocalPort");
+    int     myPort    = atoi((const char *)gContext->GetSetting("SipLocalPort"));
+    if (myPort != 5060)
+        Uri += ":" + QString::number(myPort);
 
 
     // First check if an entry already exists; and if it is up-to-date (IP address etc)
