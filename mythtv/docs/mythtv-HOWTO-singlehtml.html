@@ -1788,6 +1788,23 @@ $ su
 the MythTV directory that you <CODE>cd</CODE>'d to above.</CAPTION>
 </FIGURE>
 </P>
+<H3>Enabling real-time scheduling of the display thread.</H3>
+
+<P>MythTV supports real-time scheduling of the video output thread if it is
+installed SUID root.</P>
+<P>This is an optional, but recommended step.  It can make the video display
+more smoothly.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su 
+# chmod a+s /usr/local/bin/mythfrontend
+# exit
+$
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
 <H3><A NAME="frontend-only"></A> Frontend-only configuration </H3>
 
 <P>Since MythTV uses a client/server architecture, multiple frontend

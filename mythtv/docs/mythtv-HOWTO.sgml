@@ -1481,6 +1481,21 @@ $ su
 the MythTV directory that you <tt>cd</tt>'d to above.
 </caption>
 </figure>
+<sect2>Enabling real-time scheduling of the display thread.
+
+<p>MythTV supports real-time scheduling of the video output thread if it is
+installed SUID root.
+
+This is an optional, but recommended step.  It can make the video display
+more smoothly.
+
+<tscreen><verb>
+$ su 
+# chmod a+s /usr/local/bin/mythfrontend
+# exit
+$
+</verb></tscreen>
+
 <sect2>Frontend-only configuration <label id="frontend-only">
 <p>Since MythTV uses a client/server architecture, multiple frontend
 computers can simultaneously access content on a Myth system.  Live TV,
@@ -6909,7 +6924,8 @@ leading to dropped frames.
 v0.16.00, 2004-09-08.  Version bump.  Cedric Teffts' AMD64 settings.pro
 update, update by bline.  David Greaves' suggestion about mythcommflag and
 the seektable. Add a section on differences between a PVR-250 and a 350. Add
-bugzilla pointer.  Add a section on changing channels on STBs.
+bugzilla pointer.  Add a section on changing channels on STBs.  Add section on
+making mythfrontend SUID root.
 
 -->
 

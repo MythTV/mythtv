@@ -84,7 +84,8 @@
      5.4 Configuring the Zap2It.com DataDirect service
         5.4.1 Introduction
      5.5 Manually building MythTV
-        5.5.1 Frontend-only configuration
+        5.5.1 Enabling real-time scheduling of the display thread.
+        5.5.2 Frontend-only configuration
      5.6 Gentoo
 
   6. MySQL.
@@ -342,7 +343,6 @@
      Other modules in MythTV include:
 
   +o  MythGallery, a picture-viewing application
-
 
   +o  MythVideo, a media-viewer for content not created within MythTV
 
@@ -1967,7 +1967,24 @@
      [1mNOTE[22m:  subsequent configuration steps assume that you are within
   the MythTV directory that you cd'd to above.
 
-  [1m5.5.1.  Frontend-only configuration[0m
+  [1m5.5.1.  Enabling real-time scheduling of the display thread.[0m
+
+  MythTV supports real-time scheduling of the video output thread if it
+  is installed SUID root.
+
+  This is an optional, but recommended step.  It can make the video
+  display more smoothly.
+
+
+
+       $ su
+       # chmod a+s /usr/local/bin/mythfrontend
+       # exit
+       $
+
+
+
+  [1m5.5.2.  Frontend-only configuration[0m
 
   Since MythTV uses a client/server architecture, multiple frontend
   computers can simultaneously access content on a Myth system.  Live
@@ -2010,8 +2027,6 @@
        $ su -
        # emerge --sync # make sure portage is up to date.
        # vi /etc/make.conf
-
-
 
   Add mysql to your USE variable.  i.e. USE="mysql ...."
 
@@ -2124,9 +2139,10 @@
   all, and allows access from any host.
 
 
-       $ mysql -u root mythconverg
-       mysql> grant all on mythconverg.* to mythtv@"%" identified by "mythtv";
-       mysql> flush privileges;
+
+  $ mysql -u root mythconverg
+  mysql> grant all on mythconverg.* to mythtv@"%" identified by "mythtv";
+  mysql> flush privileges;
 
 
 
@@ -2251,9 +2267,9 @@
   Start with the alsa-driver package:
 
 
-       $ tar -xjf alsa-driver-0.9.x.tar.bz2
-       $ cd alsa-driver-0.9.x
-       $ ./configure --with-cards=XXX --with-sequencer=yes
+  $ tar -xjf alsa-driver-0.9.x.tar.bz2
+  $ cd alsa-driver-0.9.x
+  $ ./configure --with-cards=XXX --with-sequencer=yes
 
 
 
@@ -2263,6 +2279,7 @@
 
        mkdir -p include/linux
        touch include/linux/workqueue.h
+
 
 
   Continuing on:
@@ -2307,19 +2324,18 @@
   conflicts in the future.  You should end up with a /etc/modules.conf
   file that has this configuration:
 
-
-       alias char-major-116 snd
-       alias snd-card-0 snd-XXX
-       # module options should go here
-       # OSS/Free portion
-       alias char-major-14 soundcore
-       alias sound-slot-0 snd-card-0
-       # card #1
-       alias sound-service-0-0 snd-mixer-oss
-       alias sound-service-0-1 snd-seq-oss
-       alias sound-service-0-3 snd-pcm-oss
-       alias sound-service-0-8 snd-seq-oss
-       alias sound-service-0-12 snd-pcm-oss
+  alias char-major-116 snd
+  alias snd-card-0 snd-XXX
+  # module options should go here
+  # OSS/Free portion
+  alias char-major-14 soundcore
+  alias sound-slot-0 snd-card-0
+  # card #1
+  alias sound-service-0-0 snd-mixer-oss
+  alias sound-service-0-1 snd-seq-oss
+  alias sound-service-0-3 snd-pcm-oss
+  alias sound-service-0-8 snd-seq-oss
+  alias sound-service-0-12 snd-pcm-oss
 
 
 
@@ -2328,6 +2344,7 @@
   options are descried in the "INSTALL" file in the alsa-driver
   directory or at http://www.alsa-project.org/alsa-doc/
   <http://www.alsa-project.org/alsa-doc/>.
+
   For now we will assume that no extra options are required.  The next
   step is to ensure that the ALSA drivers are started during boot-up.
 
@@ -2368,6 +2385,7 @@
   If it works, you're done installing ALSA!
 
 
+
   [1m7.2.  Setting the mixer from the command line[0m
 
   If you have installed the alsa-utils package, then the [1mamixer [22mprogram
@@ -2386,13 +2404,13 @@
 
 
 
-  $ amixer set Master,0 100%,100% unmute
-  $ amixer set Line,0 75%,75% mute captur
-  $ amixer set Capture,0 100%,100% mute captur
-  $ su
-  # alsactl store
-  # exit
-  $
+       $ amixer set Master,0 100%,100% unmute
+       $ amixer set Line,0 75%,75% mute captur
+       $ amixer set Capture,0 100%,100% mute captur
+       $ su
+       # alsactl store
+       # exit
+       $
 
 
 
@@ -2445,6 +2463,8 @@
   require a kernel recompile, and some don't. However, all at least
   require having the kernel source available as a resource for the lirc
   build process.
+
+
   [1m8.1.  Gentoo[0m
 
   To install lirc on Gentoo, all you need to do is:
@@ -2486,8 +2506,6 @@
        $ su
        # ln -s linux-2.4 /usr/src/linux
        # exit
-
-
 
   [1m8.4.  Obtaining and compiling lirc[0m
 
@@ -2552,8 +2570,6 @@
 
        crw-------    1 root     root      61,   0 Dec 31  1969 lirc
 
-
-
   Some IR receivers (including some homebrew units) use a character
   device as their data interface as opposed to a link to a serial port.
   If the make install step has created a character device for you, don't
@@ -2567,6 +2583,8 @@
   create the link/character device manually.  In this example, the IR
   device is connected to ttyS0.  If it were connected to "COM2", then
   use ttyS1, etc.
+
+
        $ su
        # cd /dev
        # ln -sf ttyS0 lirc
@@ -2682,7 +2700,6 @@
       [1mNOTE to Mandrake 9.1 users[22m: skip to the manual start paragraph
   below.
 
-
   If the lirc configure program / compile did not mention anything about
   a kernel module, then you are finished. If it did mention a kernel
   module, you must edit the /etc/modules.conf file. Add this line as the
@@ -2731,9 +2748,8 @@
   If your remote ends up working well, you should consider submitting
   your lircd.conf file back to the lirc developers. Once finished:
 
-
-       $ su
-       # cp myremote /etc/lircd.conf
+  $ su
+  # cp myremote /etc/lircd.conf
 
 
 
@@ -2803,7 +2819,6 @@
   thing at this point, you need to troubleshoot further by going back to
   the lirc home page and investigating from there.
 
-
   If it is working, then press [1mCTRL-C [22mto abort the program.  Once you
   know that your remote is working, you can either recompile MythTV with
   native lirc support (edit the settings.pro file and remove the "#"
@@ -2859,20 +2874,19 @@
   my /home/[yourusername]/.lircrc file:
 
 
+       begin
+           prog = irxevent
+           button = channel+
+           repeat = 3
+           config = Key Up CurrentWindow
+       end
 
-  begin
-      prog = irxevent
-      button = channel+
-      repeat = 3
-      config = Key Up CurrentWindow
-  end
-
-  begin
-      prog = irxevent
-      button = channel-
-      repeat = 3
-      config = Key Down CurrentWindow
-  end
+       begin
+           prog = irxevent
+           button = channel-
+           repeat = 3
+           config = Key Down CurrentWindow
+       end
 
 
 
@@ -2924,19 +2938,19 @@
   kernel module you might see the following message during make:
 
 
-  lirc_sir.c:56:2: warning: #warning
-  "******************************************"
+       lirc_sir.c:56:2: warning: #warning
+       "******************************************"
 
-  lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
+       lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
 
-  lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
+       lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
 
-  lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
+       lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
 
-  lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
+       lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
 
-  lirc_sir.c:61:2: warning: #warning
-  "******************************************"
+       lirc_sir.c:61:2: warning: #warning
+       "******************************************"
 
 
 
@@ -2982,10 +2996,13 @@
   something similar to the following:
 
 
-       $ irw
-       0000000000007ff0 00 1 gi-motorola-dct2000
-       000000000000bff8 00 2 gi-motorola-dct2000
-       000000000000f7f0 00 ENTER gi-motorola-dct2000
+
+  $ irw
+  0000000000007ff0 00 1 gi-motorola-dct2000
+  000000000000bff8 00 2 gi-motorola-dct2000
+  000000000000f7f0 00 ENTER gi-motorola-dct2000
+
+
 
   Once you've verified lirc is working you can press [1mCTRL-C [22mto exit [1mirw[0m
   and configure the channel changing script.
@@ -3040,8 +3057,6 @@
        $ su -
        # apt-get install libqt3c102-mt-mysql
        # exit
-
-
 
   [1m9.1.  Configuring the Master backend system[0m
 
@@ -3106,8 +3121,8 @@
   machine and restart MySQL.
 
 
-  skip-innodb
-  set-variable=thread_stack=256k
+       skip-innodb
+       set-variable=thread_stack=256k
 
 
 
@@ -3232,9 +3247,6 @@
   ahead and define them all, even if they're not all going to be
   physically connected to the master backend server.  Once you're done,
   press ESC to return to the main screen.
-
-
-
   [1m9.1.4.  Input Connections[0m
 
   The final configuration item is Input Connections.  On this screen,
