@@ -34,8 +34,11 @@ release {
         QMAKE_CXXFLAGS_RELEASE = -O3 -march=k8 -fomit-frame-pointer
     }
     contains( TARGET_ARCH_POWERPC, yes ) {
-        # Do not use -O3, it causes some Qt moc methods to go missing
-        QMAKE_CXXFLAGS_RELEASE = -O2
+        QMAKE_CXXFLAGS_RELEASE = -O3
+        macx {
+            # Auto-inlining causes some Qt moc methods to go missing
+            QMAKE_CXXFLAGS_RELEASE += -fno-inline-functions
+        }
     }
     QMAKE_CFLAGS_RELEASE = $${QMAKE_CXXFLAGS_RELEASE}
 }
