@@ -2196,18 +2196,18 @@ void ProgramInfo::showDetails(QSqlDatabase *db)
            category_type = "tvshow";
     }
 
-    QString msg = "Title:  " + title;
+    QString msg = QObject::tr("Title") + ":  " + title;
 
     if (subtitle != "")
         msg += " - \"" + subtitle + "\"";
 
     if (description  != "")
-        msg += "\nDescription:  " + description;
+        msg += "\n" + QObject::tr("Description") + ":  " + description;
 
     QString attr = "";
 
     if (partnumber > 0)
-        attr = QString("Part %1 of %2, ").arg(partnumber).arg(parttotal);
+        attr = QString(QObject::tr("Part %1 of %2, ")).arg(partnumber).arg(parttotal);
 
     if (rating != "" && rating != "NR")
         attr += rating + ", ";
@@ -2228,15 +2228,15 @@ void ProgramInfo::showDetails(QSqlDatabase *db)
     }
 
     if (hdtv)
-        attr += "HDTV, ";
+        attr += QObject::tr("HDTV") + ", ";
     if (closecaptioned)
-        attr += "CC, ";
+        attr += QObject::tr("CC","Close Captioned") + ", ";
     if (subtitled)
-        attr += "Subtitled, ";
+        attr += QObject::tr("Subtitled") + ", ";
     if (stereo)
-        attr += "Stereo, ";
+        attr += QObject::tr("Stereo") + ", ";
     if (repeat)
-        attr += "Repeat, ";
+        attr += QObject::tr("Repeat") + ", ";
 
     if (attr != "")
     {
@@ -2246,26 +2246,26 @@ void ProgramInfo::showDetails(QSqlDatabase *db)
     msg += "\n";
 
     if (category != "")
-        msg += QObject::tr("Category:  ") + category + "\n";
+        msg += QObject::tr("Category") + ":  " + category + "\n";
 
     if (category_type  != "")
     {
-        msg += QObject::tr("Type:  ") + category_type;
+        msg += QObject::tr("Type","category_type") + ":  " + category_type;
         if (seriesid != "")
             msg += "  (" + seriesid + ")";
         msg += "\n";
     }
 
     if (epinum != "")
-        msg += QObject::tr("Episode Number:  ") + epinum + "\n";
+        msg += QObject::tr("Episode Number") + ":  " + epinum + "\n";
 
     if (hasAirDate && category_type != "movie")
     {
-        msg += QObject::tr("Original Airdate:  ");
+        msg += QObject::tr("Original Airdate") + ":  ";
         msg += originalAirDate.toString(oldDateFormat) + "\n";
     }
     if (programid  != "")
-        msg += QObject::tr("Program ID:  ") + programid + "\n";
+        msg += QObject::tr("Program ID") + ":  " + programid + "\n";
 
     QString role = "", pname = "";
 
@@ -2299,11 +2299,11 @@ void ProgramInfo::showDetails(QSqlDatabase *db)
                     // Only print actors, guest star and director for now.
 
                     if (rstr == "actor")
-                        msg += "Actors:  " + plist + "\n";
+                        msg += QObject::tr("Actors") + ":  " + plist + "\n";
                     if (rstr == "guest_star")
-                        msg += "Guest Star:  " + plist + "\n";
+                        msg += QObject::tr("Guest Star") + ":  " + plist + "\n";
                     if (rstr == "director")
-                        msg += "Director:  " + plist + "\n";
+                        msg += QObject::tr("Director") + ":  " + plist + "\n";
 
                     rstr = role;
                     plist = pname;
@@ -2313,17 +2313,22 @@ void ProgramInfo::showDetails(QSqlDatabase *db)
             //    msg += QString("%1:  %2\n").arg(rstr).arg(plist);
 
             if (rstr == "actor")
-                msg += "Actors:  " + plist + "\n";
+                msg += QObject::tr("Actors") + ":  " + plist + "\n";
             if (rstr == "guest_star")
-                msg += "Guest Star:  " + plist + "\n";
+                msg += QObject::tr("Guest Star") + ":  " + plist + "\n";
             if (rstr == "director")
-                msg += "Director:  " + plist + "\n";
+                msg += QObject::tr("Director") + ":  " + plist + "\n";
         }
     }
     if (filesize > 0)
     {
-        msg += QObject::tr("Filesize:  ") + longLongToString(filesize) + "\n";
-        msg += QObject::tr("Recording Group:  ") + recgroup + "\n";
+        QString tmpSize;
+
+        tmpSize.sprintf("%0.2f ", filesize / 1024.0 / 1024.0 / 1024.0);
+        tmpSize += QObject::tr("GB", "GigaBytes");
+    
+        msg += QObject::tr("Filesize") + ":  " + tmpSize + "\n";
+        msg += QObject::tr("Recording Group") + ":  " + recgroup + "\n";
     }
     DialogBox *details_dialog = new DialogBox(gContext->GetMainWindow(), msg);
     details_dialog->AddButton(QObject::tr("OK"));
