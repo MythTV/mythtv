@@ -58,7 +58,7 @@ static TT_Engine    engine;
 #define TT_VALID(handle) ((handle).z != NULL)
 
 static unsigned char alpha_lut[5] =
-{0, 128, 196, 224, 255};
+{0, 64, 128, 196, 255};
 static unsigned char bounded_palette[9] =
 {0, 1, 2, 3, 4, 4, 4, 4, 4};
 
@@ -304,6 +304,8 @@ merge_text(unsigned char *yuv, TT_Raster_Map * rmap, int offset_x, int offset_y,
 
    if (height + ystart > video_height)
        height = video_height - ystart - 1;
+
+   int tmp1, tmp2;
  
    for (y = 0; y < height; y++)
      {
@@ -316,8 +318,9 @@ merge_text(unsigned char *yuv, TT_Raster_Map * rmap, int offset_x, int offset_y,
 		  src = yuv + (y + ystart) * video_width + (x + xstart);
 		  if (white)
                   {
-		      if (*src < a)
-                          *src = a;
+                      tmp1 = (255 - *src) * a;
+                      tmp2 = *src + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
+                      *src = tmp2 & 0xff;
                       if (a == 255)
                       {
                           offset = ((y + ystart) / 2) * (video_width / 2) + 
@@ -330,8 +333,9 @@ merge_text(unsigned char *yuv, TT_Raster_Map * rmap, int offset_x, int offset_y,
                   }
 		  else
                   {
-                      if (*src > 255 - a)
-                          *src = 255 - a;
+                      tmp1 = (0 - *src) * a;
+                      tmp2 = *src + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
+                      *src = tmp2 & 0xff;
                   }
 	       }
 	     ptr++;
