@@ -443,10 +443,10 @@ void XvVideoOutput::EmbedInWidget(unsigned long wid, int x, int y, int w, int h)
     olddispw = dispw;
     olddisph = disph;
 
-    dispx = x;
-    dispy = y;
-    dispw = w;
-    disph = h;
+    dispxoff = dispx = x;
+    dispyoff = dispy = y;
+    dispwoff = dispw = w;
+    disphoff = disph = h;
 
     embedding = true;
 
@@ -468,6 +468,8 @@ void XvVideoOutput::StopEmbedding(void)
     data->XJ_curwin = data->XJ_win;
 
     embedding = false;
+
+    MoveResize();
 
     pthread_mutex_unlock(&lock);
 }
