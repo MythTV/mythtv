@@ -1,6 +1,5 @@
 #include <qapplication.h>
 #include <qsqldatabase.h>
-#include <qaccel.h>
 #include <stdlib.h>
 #include <iostream>
 using namespace std;

@@ -1,5 +1,4 @@
 #include <qlayout.h>
-#include <qaccel.h>
 #include <qapplication.h>
 #include <qsqldatabase.h>
 #include <qcursor.h>
