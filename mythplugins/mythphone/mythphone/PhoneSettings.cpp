@@ -70,12 +70,13 @@ public:
     };
 };
 
-class TransmitFPS: public LineEditSetting, public GlobalSetting {
+class TransmitFPS: public SpinBoxSetting, public GlobalSetting {
 public:
     TransmitFPS():
+        SpinBoxSetting(1,30,1),
         GlobalSetting("TransmitFPS") {
         setLabel(QObject::tr("Transmit Frames/Second"));
-        setValue(QObject::tr("5"));
+        setValue(5);
         setHelpText(QObject::tr("Number of webcam frames/sec to transmit, from 1 to "
                                 "30. Higher numbers create better results but use more bandwidth."));
     }
