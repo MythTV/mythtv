@@ -94,6 +94,13 @@ bool Metadata::Remove(QSqlDatabase *db)
         if (!query.isActive()){
                 cerr << "metadata.o: The following metadata update failed :" << thequery << endl;
         }
+        thequery = QString("DELETE FROM filemarkup WHERE filename = '%1'")
+                           .arg(filename);
+        query.exec(thequery);
+        if (!query.isActive()){
+                cerr << "metadata.o: The following metadata update failed :" << thequery << endl;
+        }
+
     }
     else
     {
