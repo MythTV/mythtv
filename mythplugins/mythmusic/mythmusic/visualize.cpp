@@ -305,7 +305,14 @@ bool AlbumArt::draw(QPainter *p, const QColor &back)
         curdir.append(fileart);
         art.load(curdir);
         if (art.isNull())
-            return false;
+        {
+            p->fillRect(0, 0, size.width(), size.height(), back);
+            p->setPen(Qt::white);
+            p->setFont(gContext->GetMediumFont());
+            p->drawText(size.width() / 2 - 200, size.height() / 2 - 10, 400, 20, 
+                        Qt::AlignCenter, QObject::tr("?"));
+            return true;
+        }
 
         QSize artsize = art.scale(size, QImage::ScaleMin).size();
 
