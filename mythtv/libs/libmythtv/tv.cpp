@@ -203,6 +203,8 @@ void TV::ChangeChannel(bool up)
 
     UpdateOSD();
 
+    nvp->Unpause();
+
     channelqueued = false;
     channelKeys[0] = channelKeys[1] = channelKeys[2] = ' ';
     channelkeysstored = 0;
