@@ -163,6 +163,12 @@ void RemoteFile::Reset(void)
 
 long long RemoteFile::Seek(long long pos, int whence, long long curpos)
 {
+    if (!sock->isOpen() || sock->error())
+        return 0;
+
+    if (!controlSock->isOpen() || controlSock->error())
+        return 0;
+
     QStringList strlist = QString(query).arg(recordernum);
     strlist << "SEEK" + append;
     encodeLongLong(strlist, pos);
@@ -192,7 +198,7 @@ int RemoteFile::Read(void *data, int size)
     unsigned zerocnt = 0;
     bool error = false;
     bool response = false;
-    
+   
     if (!sock->isOpen() || sock->error())
         return -1;
    

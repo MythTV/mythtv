@@ -17,7 +17,7 @@ extern "C" {
 
 #define FFMPEG_VERSION_INT     0x000408
 #define FFMPEG_VERSION         "0.4.8"
-#define LIBAVCODEC_BUILD       4699
+#define LIBAVCODEC_BUILD       4702
 
 #define LIBAVCODEC_VERSION_INT FFMPEG_VERSION_INT
 #define LIBAVCODEC_VERSION     FFMPEG_VERSION
@@ -94,6 +94,7 @@ enum CodecID {
     CODEC_ID_VMDAUDIO,
     CODEC_ID_MSZH,
     CODEC_ID_ZLIB,
+    CODEC_ID_QTRLE,
 
     /* various pcm "codecs" */
     CODEC_ID_PCM_S16LE,
@@ -111,10 +112,13 @@ enum CodecID {
     CODEC_ID_ADPCM_IMA_DK3,
     CODEC_ID_ADPCM_IMA_DK4,
     CODEC_ID_ADPCM_IMA_WS,
+    CODEC_ID_ADPCM_IMA_SMJPEG,
     CODEC_ID_ADPCM_MS,
     CODEC_ID_ADPCM_4XM,
     CODEC_ID_ADPCM_XA,
     CODEC_ID_ADPCM_ADX,
+    CODEC_ID_ADPCM_EA,
+    CODEC_ID_ADPCM_G726,
 
 	/* AMR */
     CODEC_ID_AMR_NB,
@@ -222,12 +226,6 @@ typedef struct RcOverride{
 /* only for ME compatiblity with old apps */
 extern int motion_estimation_method;
 
-/* ME algos sorted by quality */
-//FIXME remove IMHO
-static const __attribute__((unused)) int Motion_Est_QTab[] =
- { ME_ZERO, ME_PHODS, ME_LOG, ME_X1, ME_EPZS, ME_FULL };
-
-
 #define FF_MAX_B_FRAMES 8
 
 /* encoding support
@@ -271,6 +269,7 @@ static const __attribute__((unused)) int Motion_Est_QTab[] =
 #define CODEC_FLAG_H263P_SLICE_STRUCT 0x10000000
 #define CODEC_FLAG_INTERLACED_ME  0x20000000 ///< interlaced motion estimation
 #define CODEC_FLAG_SVCD_SCAN_OFFSET 0x40000000 ///< will reserve space for SVCD scan offset user data
+#define CODEC_FLAG_CLOSED_GOP     0x80000000
 /* Unsupported options :
  * 		Syntax Arithmetic coding (SAC)
  * 		Reference Picture Selection
@@ -1504,6 +1503,38 @@ typedef struct AVCodecContext {
 #define FF_AA_FASTINT 1 //not implemented yet
 #define FF_AA_INT     2
 #define FF_AA_FLOAT   3
+    /**
+     * Quantizer noise shaping.
+     * - encoding: set by user
+     * - decoding: unused
+     */
+    int quantizer_noise_shaping;
+
+    /**
+     * Thread count.
+     * is used to decide how many independant tasks should be passed to execute()
+     * - encoding: set by user
+     * - decoding: set by user
+     */
+    int thread_count;
+    
+    /**
+     * the codec may call this to execute several independant things. it will return only after
+     * finishing all tasks, the user may replace this with some multithreaded implementation, the
+     * default implementation will execute the parts serially
+     * @param count the number of functions this will be identical to thread_count if possible
+     * - encoding: set by lavc, user can override
+     * - decoding: set by lavc, user can override
+     */
+    int (*execute)(struct AVCodecContext *c, int (*func)(struct AVCodecContext *c2, void *arg), void **arg2, int *ret, int count);
+    
+    /**
+     * Thread opaque.
+     * can be used by execute() to store some per AVCodecContext stuff.
+     * - encoding: set by execute()
+     * - decoding: set by execute()
+     */
+    void *thread_opaque;
 
     /**
      * VIA CLE266 Hardware MPEG decoding
@@ -1707,6 +1738,7 @@ extern AVCodec ra_288_decoder;
 extern AVCodec roq_dpcm_decoder;
 extern AVCodec interplay_dpcm_decoder;
 extern AVCodec xan_dpcm_decoder;
+extern AVCodec qtrle_decoder;
 
 /* pcm codecs */
 #define PCM_CODEC(id, name) \
@@ -1729,10 +1761,13 @@ PCM_CODEC(CODEC_ID_ADPCM_IMA_WAV, adpcm_ima_wav);
 PCM_CODEC(CODEC_ID_ADPCM_IMA_DK3, adpcm_ima_dk3);
 PCM_CODEC(CODEC_ID_ADPCM_IMA_DK4, adpcm_ima_dk4);
 PCM_CODEC(CODEC_ID_ADPCM_IMA_WS, adpcm_ima_ws);
+PCM_CODEC(CODEC_ID_ADPCM_SMJPEG, adpcm_ima_smjpeg);
 PCM_CODEC(CODEC_ID_ADPCM_MS, adpcm_ms);
 PCM_CODEC(CODEC_ID_ADPCM_4XM, adpcm_4xm);
 PCM_CODEC(CODEC_ID_ADPCM_XA, adpcm_xa);
 PCM_CODEC(CODEC_ID_ADPCM_ADX, adpcm_adx);
+PCM_CODEC(CODEC_ID_ADPCM_EA, adpcm_ea);
+PCM_CODEC(CODEC_ID_ADPCM_G726, adpcm_g726);
 
 #undef PCM_CODEC
 
@@ -1846,6 +1881,11 @@ AVFrame *avcodec_alloc_frame(void);
 int avcodec_default_get_buffer(AVCodecContext *s, AVFrame *pic);
 void avcodec_default_release_buffer(AVCodecContext *s, AVFrame *pic);
 void avcodec_default_free_buffers(AVCodecContext *s);
+
+int avcodec_pthread_init(AVCodecContext *s, int thread_count);
+void avcodec_pthread_free(AVCodecContext *s);
+int avcodec_pthread_execute(AVCodecContext *s, int (*func)(AVCodecContext *c2, void *arg2),void **arg, int *ret, int count);
+//FIXME func typedef
 
 /**
  * opens / inits the AVCodecContext.

@@ -1070,7 +1070,7 @@ static int encode_nal(H264Context *h, uint8_t *dst, uint8_t *src, int length, in
 static void encode_rbsp_trailing(PutBitContext *pb){
     int length;
     put_bits(pb, 1, 1);
-    length= (-get_bit_count(pb))&7;
+    length= (-put_bits_count(pb))&7;
     if(length) put_bits(pb, length, 0);
 }
 
@@ -4131,6 +4131,7 @@ static int decode_frame(AVCodecContext *avctx,
     int buf_index;
     
     s->flags= avctx->flags;
+    s->flags2= avctx->flags2;
 
     *data_size = 0;
    

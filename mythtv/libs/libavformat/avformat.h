@@ -199,8 +199,7 @@ typedef struct AVIndexEntry {
 #define AVINDEX_KEYFRAME 0x0001
 /* the following 2 flags indicate that the next/prev keyframe is known, and scaning for it isnt needed */
     int flags;
-    int min_distance;         /* min distance between this and the previous key
-frame, used to avoid unneeded searching */
+    int min_distance;         /* min distance between this and the previous keyframe, used to avoid unneeded searching */
 } AVIndexEntry;
 
 typedef struct AVStream {

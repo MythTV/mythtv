@@ -424,7 +424,7 @@ static void dec2(Real144_internal *glob, int *data, int *inp, int n, int f, int 
 
 /* Uncompress one block (20 bytes -> 160*2 bytes) */
 static int ra144_decode_frame(AVCodecContext * avctx,
-            void *data, int *data_size,
+            void *vdata, int *data_size,
             uint8_t * buf, int buf_size)
 {
   unsigned int a,b,c;
@@ -432,9 +432,13 @@ static int ra144_decode_frame(AVCodecContext * avctx,
   signed short *shptr;
   unsigned int *lptr,*temp;
   const short **dptr;
-  void *datao;
+  int16_t *datao;
+  int16_t *data = vdata;
   Real144_internal *glob=avctx->priv_data;
 
+  if(buf_size==0)
+      return 0;
+  
   datao = data;
   unpack_input(buf,glob->unpacked);
   
@@ -480,10 +484,10 @@ static int ra144_decode_frame(AVCodecContext * avctx,
     shptr=glob->output_buffer;
     while (shptr<glob->output_buffer+BLOCKSIZE) {
       s=*(shptr++)<<2;
-      *((int16_t *)data)=s;
-      if (s>32767) *((int16_t *)data)=32767;
-      if (s<-32767) *((int16_t *)data)=-32768;
-      ((int16_t *)data)++;
+      *data=s;
+      if (s>32767) *data=32767;
+      if (s<-32767) *data=-32768;
+      data++;
     }
     b+=30;
   }
@@ -495,7 +499,7 @@ static int ra144_decode_frame(AVCodecContext * avctx,
   temp=glob->swapbuf2alt;
   glob->swapbuf2alt=glob->swapbuf2;
   glob->swapbuf2=temp;
-  *data_size=data-datao;
+  *data_size=(data-datao)*sizeof(*data);
   return 20;
 }
 

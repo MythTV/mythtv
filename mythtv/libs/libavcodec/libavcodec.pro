@@ -19,7 +19,7 @@ INCLUDEPATH = ../../
 QMAKE_CFLAGS_SHLIB = 
 
 QMAKE_CFLAGS_RELEASE = $$OPTFLAGS -DPIC -fPIC -fomit-frame-pointer -DHAVE_AV_CONFIG_H -I.. -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE
-QMAKE_CFLAGS_DEBUG = -g -O -DHAVE_AV_CONFIG_H -I.. -DPIC -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE
+QMAKE_CFLAGS_DEBUG = -g -O0 -DHAVE_AV_CONFIG_H -I.. -DPIC -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE
 
 # Input
 SOURCES += common.c utils.c mem.c allcodecs.c mpegvideo.c h263.c jrevdct.c
@@ -33,6 +33,7 @@ SOURCES += ffv1.c ra144.c ra288.c vcr1.c cljr.c roqvideo.c dpcm.c
 SOURCES += interplayvideo.c xan.c rpza.c cinepak.c msrle.c msvideo1.c
 SOURCES += vqavideo.c idcinvideo.c adx.c rational.c faandct.c
 SOURCES += 8bps.c parser.c smc.c flicvideo.c truemotion1.c vmdav.c lcl.c
+SOURCES += qtrle.c g726.c
 SOURCES += libpostproc/postprocess.c
 
 inc.path = $${PREFIX}/include/mythtv/ffmpeg/

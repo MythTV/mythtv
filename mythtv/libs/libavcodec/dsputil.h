@@ -45,6 +45,7 @@ void j_rev_dct (DCTELEM *data);
 
 void ff_fdct_mmx(DCTELEM *block);
 void ff_fdct_mmx2(DCTELEM *block);
+void ff_fdct_sse2(DCTELEM *block);
 
 /* encoding scans */
 extern const uint8_t ff_alternate_horizontal_scan[64];
@@ -283,6 +284,11 @@ typedef struct DSPContext {
 #define FF_LIBMPEG2_IDCT_PERM 2
 #define FF_SIMPLE_IDCT_PERM 3
 #define FF_TRANSPOSE_IDCT_PERM 4
+
+    int (*try_8x8basis)(int16_t rem[64], int16_t weight[64], int16_t basis[64], int scale);
+    void (*add_8x8basis)(int16_t rem[64], int16_t basis[64], int scale);
+#define BASIS_SHIFT 16
+#define RECON_SHIFT 6
 
 } DSPContext;
 

@@ -378,7 +378,7 @@ static void jpeg_put_comments(MpegEncContext *s)
     /* JFIF header */
     put_marker(p, APP0);
     put_bits(p, 16, 16);
-    put_string(p, "JFIF"); /* this puts the trailing zero-byte too */
+    put_string(p, "JFIF", 1); /* this puts the trailing zero-byte too */
     put_bits(p, 16, 0x0201); /* v 1.02 */
     put_bits(p, 8, 0); /* units type: 0 - aspect ratio */
     put_bits(p, 16, s->avctx->sample_aspect_ratio.num);
@@ -393,7 +393,7 @@ static void jpeg_put_comments(MpegEncContext *s)
         flush_put_bits(p);
         ptr = pbBufPtr(p);
         put_bits(p, 16, 0); /* patched later */
-        put_string(p, LIBAVCODEC_IDENT);
+        put_string(p, LIBAVCODEC_IDENT, 1);
         size = strlen(LIBAVCODEC_IDENT)+3;
         ptr[0] = size >> 8;
         ptr[1] = size;
@@ -477,7 +477,7 @@ void mjpeg_picture_header(MpegEncContext *s)
 
 static void escape_FF(MpegEncContext *s, int start)
 {
-    int size= get_bit_count(&s->pb) - start*8;
+    int size= put_bits_count(&s->pb) - start*8;
     int i, ff_count;
     uint8_t *buf= s->pb.buf + start;
     int align= (-(size_t)(buf))&3;
@@ -531,11 +531,16 @@ static void escape_FF(MpegEncContext *s, int start)
     }
 }
 
+void ff_mjpeg_stuffing(PutBitContext * pbc)
+{
+    int length;
+    length= (-put_bits_count(pbc))&7;
+    if(length) put_bits(pbc, length, (1<<length)-1);
+}
+
 void mjpeg_picture_trailer(MpegEncContext *s)
 {
-    int pad= (-get_bit_count(&s->pb))&7;
-    
-    put_bits(&s->pb, pad,0xFF>>(8-pad));
+    ff_mjpeg_stuffing(&s->pb);
     flush_put_bits(&s->pb);
 
     assert((s->header_bits&7)==0);
@@ -651,7 +656,7 @@ static int encode_picture_lossless(AVCodecContext *avctx, unsigned char *buf, in
     
     mjpeg_picture_header(s);
 
-    s->header_bits= get_bit_count(&s->pb);
+    s->header_bits= put_bits_count(&s->pb);
 
     if(avctx->pix_fmt == PIX_FMT_RGBA32){
         int x, y, i;
@@ -770,7 +775,7 @@ static int encode_picture_lossless(AVCodecContext *avctx, unsigned char *buf, in
 
     flush_put_bits(&s->pb);
     return pbBufPtr(&s->pb) - s->pb.buf;
-//    return (get_bit_count(&f->pb)+7)/8;
+//    return (put_bits_count(&f->pb)+7)/8;
 }
 
 #endif //CONFIG_ENCODERS
@@ -855,7 +860,6 @@ static int mjpeg_decode_init(AVCodecContext *avctx)
 
     /* ugly way to get the idct & scantable FIXME */
     memset(&s2, 0, sizeof(MpegEncContext));
-    s2.flags= avctx->flags;
     s2.avctx= avctx;
 //    s2->out_format = FMT_MJPEG;
     s2.width = 8;

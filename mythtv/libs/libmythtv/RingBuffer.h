@@ -138,6 +138,10 @@ class RingBuffer
     QMutex availWaitMutex;
 
     QWaitCondition readsAllowedWait;
+
+    int numfailures;
+
+    bool commserror;
 };
 
 #endif

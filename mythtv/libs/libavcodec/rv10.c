@@ -449,6 +449,12 @@ static int rv10_decode_init(AVCodecContext *avctx)
         s->h263_long_vectors=0;
         s->low_delay=1;
         break;
+    case 0x10002000:
+        s->rv10_version= 3;
+        s->h263_long_vectors=1;
+        s->low_delay=1;
+        s->obmc=1;
+        break;
     case 0x10003000:
         s->rv10_version= 3;
         s->h263_long_vectors=1;
@@ -474,8 +480,6 @@ static int rv10_decode_init(AVCodecContext *avctx)
         av_log(s->avctx, AV_LOG_ERROR, "unknown header %X\n", avctx->sub_id);
     }
 //printf("ver:%X\n", avctx->sub_id);
-    s->flags= avctx->flags;
-
     if (MPV_common_init(s) < 0)
         return -1;
 
@@ -588,13 +592,14 @@ static int rv10_decode_packet(AVCodecContext *avctx,
     s->block_wrap[5]= s->mb_width + 2;
     ff_init_block_index(s);
     /* decode each macroblock */
-    for(i=0;i<mb_count;i++) {
+
+    for(s->mb_num_left= mb_count; s->mb_num_left>0; s->mb_num_left--) {
         int ret;
         ff_update_block_index(s);
 #ifdef DEBUG
         printf("**mb x=%d y=%d\n", s->mb_x, s->mb_y);
 #endif
-        
+
 	s->dsp.clear_blocks(s->block[0]);
         s->mv_dir = MV_DIR_FORWARD;
         s->mv_type = MV_TYPE_16X16; 

@@ -30,10 +30,6 @@
 #include "avcodec.h"
 #include "dsputil.h"
 
-#ifndef INT64_MAX
-#define INT64_MAX 9223372036854775807LL
-#endif
-
 #define VLC_BITS 11
 
 typedef enum Predictor{
@@ -1053,7 +1049,7 @@ static int encode_frame(AVCodecContext *avctx, unsigned char *buf, int buf_size,
     }
     emms_c();
     
-    size= (get_bit_count(&s->pb)+31)/32;
+    size= (put_bits_count(&s->pb)+31)/32;
     
     if((s->flags&CODEC_FLAG_PASS1) && (s->picture_number&31)==0){
         int j;

@@ -2741,7 +2741,7 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
         mpa_picture.linesize[0] = frame->width;
         mpa_picture.linesize[1] = frame->width / 2;
         mpa_picture.linesize[2] = frame->width / 2;
-        mpa_picture.pts = timecode;
+        mpa_picture.pts = timecode * 1000;
         mpa_picture.type = FF_BUFFER_TYPE_SHARED;
 
         if (wantkeyframe)

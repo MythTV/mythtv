@@ -60,10 +60,11 @@ void init_put_bits(PutBitContext *s, uint8_t *buffer, int buffer_size)
 #endif
 }
 
-#ifdef CONFIG_ENCODERS
+//#ifdef CONFIG_ENCODERS
+#if 1
 
 /* return the number of bits output */
-int get_bit_count(PutBitContext *s)
+int put_bits_count(PutBitContext *s)
 {
 #ifdef ALT_BITSTREAM_WRITER
     return s->index;
@@ -103,13 +104,14 @@ void flush_put_bits(PutBitContext *s)
 
 #ifdef CONFIG_ENCODERS
 
-void put_string(PutBitContext * pbc, char *s)
+void put_string(PutBitContext * pbc, char *s, int put_zero)
 {
     while(*s){
         put_bits(pbc, 8, *s);
         s++;
     }
-    put_bits(pbc, 8, 0);
+    if(put_zero)
+        put_bits(pbc, 8, 0);
 }
 
 /* bit input functions */

@@ -238,7 +238,8 @@ int avcodec_default_get_buffer(AVCodecContext *s, AVFrame *pic){
             const int h_shift= i==0 ? 0 : h_chroma_shift;
             const int v_shift= i==0 ? 0 : v_chroma_shift;
 
-            buf->linesize[i]= ALIGN(pixel_size*w>>h_shift, s_align);
+            //FIXME next ensures that linesize= 2^x uvlinesize, thats needed because some MC code assumes it
+            buf->linesize[i]= ALIGN(pixel_size*w>>h_shift, s_align<<(h_chroma_shift-h_shift)); 
 
             buf->base[i]= av_mallocz((buf->linesize[i]*h>>v_shift)+16); //FIXME 16
             if(buf->base[i]==NULL) return -1;
@@ -323,6 +324,16 @@ int avcodec_default_reget_buffer(AVCodecContext *s, AVFrame *pic){
     return 0;
 }
 
+int avcodec_default_execute(AVCodecContext *c, int (*func)(AVCodecContext *c2, void *arg2),void **arg, int *ret, int count){
+    int i;
+
+    for(i=0; i<count; i++){
+        int r= func(c, arg[i]);
+        if(ret) ret[i]= r;
+    }
+    return 0;
+}
+
 enum PixelFormat avcodec_default_get_format(struct AVCodecContext *s, enum PixelFormat * fmt){
     return fmt[0];
 }
@@ -351,6 +362,8 @@ void avcodec_get_context_defaults(AVCodecContext *s){
     s->get_buffer= avcodec_default_get_buffer;
     s->release_buffer= avcodec_default_release_buffer;
     s->get_format= avcodec_default_get_format;
+    s->execute= avcodec_default_execute;
+    s->thread_count=1;
     s->me_subpel_quality=8;
     s->lmin= FF_QP2LAMBDA * s->qmin;
     s->lmax= FF_QP2LAMBDA * s->qmax;
@@ -822,7 +835,7 @@ static void av_log_default_callback(AVCodecContext* avctx, int level, const char
     if(avctx && print_prefix)
         fprintf(stderr, "[%s @ %p]", avctx->codec ? avctx->codec->name : "?", avctx);
         
-    print_prefix= (int)strstr(fmt, "\n");
+    print_prefix= strstr(fmt, "\n") != NULL;
         
     vfprintf(stderr, fmt, vl);
 }

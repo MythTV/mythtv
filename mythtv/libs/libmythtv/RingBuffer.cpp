@@ -382,6 +382,9 @@ void RingBuffer::Init(void)
     stopreads = false;
     wanttoread = 0;
 
+    numfailures = 0;
+    commserror = false;
+
     pthread_rwlock_init(&rwlock, NULL);
 }
 
@@ -440,7 +443,10 @@ void RingBuffer::Reset(void)
         if (readaheadrunning)
             ResetReadAhead(0);
     }
-    
+   
+    numfailures = 0;
+    commserror = false;
+ 
     pthread_rwlock_unlock(&rwlock);
 }
 
@@ -458,6 +464,7 @@ int RingBuffer::safe_read(int fd, void *data, unsigned sz)
         {
             perror("ERROR: file I/O problem in 'safe_read()'");
             errcnt++;
+            numfailures++;
             if (errcnt == 3) 
                 break;
         }
@@ -496,6 +503,7 @@ int RingBuffer::safe_read(RemoteFile *rf, void *data, unsigned sz)
         VERBOSE(VB_IMPORTANT, "RemoteFile::Read() failed in RingBuffer::safe_read().");
         rf->Seek(internalreadpos, SEEK_SET);
         ret = 0;
+        numfailures++;
      }
 
     return ret;
@@ -679,7 +687,7 @@ void RingBuffer::ReadAheadThread(void)
         readaheadpaused = false;
 
         pthread_rwlock_rdlock(&rwlock);
-        if (totfree > readblocksize)
+        if (totfree > readblocksize && !commserror)
         {
             // limit the read size
             totfree = readblocksize;
@@ -753,10 +761,13 @@ void RingBuffer::ReadAheadThread(void)
             }
         }
 
+        if (numfailures > 5)
+            commserror = true;
+
         totfree = ReadBufFree();
         used = READ_AHEAD_SIZE - totfree;
 
-        if (ateof)
+        if (ateof || commserror)
         {
             readsallowed = true;
             totfree = 0;
@@ -776,8 +787,11 @@ void RingBuffer::ReadAheadThread(void)
             readsAllowedWait.wakeAll();
 
         availWaitMutex.lock();
-        if (ateof || stopreads || (wanttoread <= used && wanttoread > 0))
+        if (commserror || ateof || stopreads || 
+            (wanttoread <= used && wanttoread > 0))
+        {
             availWait.wakeAll();
+        }
         availWaitMutex.unlock();
             
         pthread_rwlock_unlock(&rwlock);
@@ -796,6 +810,9 @@ void RingBuffer::ReadAheadThread(void)
 
 int RingBuffer::ReadFromBuf(void *buf, int count)
 {
+    if (commserror)
+        return 0;
+
     bool readone = false;
 
     if (readaheadpaused && stopreads)
@@ -840,6 +857,9 @@ int RingBuffer::ReadFromBuf(void *buf, int count)
         avail = ReadBufAvail();
         if (ateof && avail < count)
             count = avail;
+
+        if (commserror)
+            return 0;
     }
 
     if ((ateof || stopreads) && avail < count)
