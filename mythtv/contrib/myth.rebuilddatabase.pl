@@ -68,8 +68,10 @@ my $dbhost = $host;
 my $database = "mythconverg";
 my $user = "mythtv";
 my $pass = "mythtv";
+my $ext = "nuv";
 
 my $date_regx = qr/(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)/;
+my $db_date_regx = qr/(\d\d\d\d)-(\d\d)-(\d\d) (\d\d):(\d\d):(\d\d)/;
 my $channel_regx = qr/(\d\d\d\d)/;
 
 my $script_name = $0;
@@ -98,6 +100,7 @@ if ($argc == 0) {
       --quick_run     - don't prompt for title/subtitle/description just
                         use the default
       --test_mode     - do everything except update the database
+      --ext           - file extensions to scan for
 
     Example 1:
       Assumption: The script is run on DB/backend machine.
@@ -122,13 +125,14 @@ GetOptions('verbose+'=>\$verbose,
 		'show_existing|se'=>\$show_existing,
 		'try_default|td'=>\$try_default,
 		'quick_run|qr'=>\$quick_run,
-		'test_mode|t|tm'=>\$test_mode
+		'test_mode|t|tm'=>\$test_mode,
+        'ext=s'=>\$ext
 		);
 
 my $dbh = DBI->connect("dbi:mysql:database=$database:host=$dbhost",
 		"$user","$pass") or die "Cannot connect to database ($!)\n";
 
-my ($starttime, $endtime, $title, $subtitle, $channel);
+my ($starttime, $endtime, $title, $subtitle, $channel, $description);
 my ($syear, $smonth, $sday, $shour, $sminute, $ssecond, $eyear, $emonth, $eday,
 		$ehour, $eminute, $esecond);
 
@@ -167,12 +171,12 @@ if ($show_existing) {
 		$channel = $row[4];
 
 ## get the pieces of the time
-		if ($starttime =~ m/$date_regx/) {
+		if ($starttime =~ m/$db_date_regx/) {
 			($syear, $smonth, $sday, $shour, $sminute, $ssecond) =
 				($1, $2, $3, $4, $5, $6);
 		}
 
-		if ($endtime =~ m/$date_regx/) {
+		if ($endtime =~ m/$db_date_regx/) {
 			($eyear, $emonth, $eday, $ehour, $eminute, $esecond) =
 				($1, $2, $3, $4, $5, $6);
 		}
@@ -190,7 +194,7 @@ print "\nThese are the files stored in ($dir) and will be checked against\n";
 print "your database to see if the exist.  If they do not, you will be prompted\n";
 print "for a title and subtitle of the entry, and a record will be created.\n\n";
 
-my @files = glob("$dir/*.nuv");
+my @files = glob("$dir/*.$ext");
 
 foreach my $show (@files) {
 	my ($channel, $syear, $smonth, $sday, $shour, $sminute, $ssecond,
@@ -291,7 +295,86 @@ foreach my $show (@files) {
 		} ## if
 	} else {
 # file doesn't match
-		print("Skipping illegal file format: $show\n");
+        print("Non-nuv file $show found.\n");
+        print("Do you want to import? (y/n): ");
+        chomp(my $do_import = <STDIN>);
+        if ($do_import = "y") {
+            print("Enter channel: ");
+            chomp(my $tmp_channel = <STDIN>);
+            if ($tmp_channel) {$channel = $tmp_channel;}
+            
+            print("Enter start time (YYYY-MM-DD HH:MM:SS): ");
+            chomp(my $tmp_starttime = <STDIN>);
+            if ($tmp_starttime) {$starttime = $tmp_starttime;}
+
+            print("Enter end time (YYYY-MM-DD HH:MM:SS): ");
+            chomp(my $tmp_endtime = <STDIN>);
+            if ($tmp_endtime) {$endtime = $tmp_endtime;}
+
+			print "Enter title: ";
+			chomp(my $tmp_title = <STDIN>);
+			if ($tmp_title) {$title = $tmp_title;}
+
+			print "Enter subtitle: ";
+			chomp(my $tmp_subtitle = <STDIN>);
+			if ($tmp_subtitle) {$subtitle = $tmp_subtitle;}
+
+			print "Enter description: ";
+			chomp(my $tmp_description = <STDIN>);
+			if ($tmp_description) {$description = $tmp_description;}
+
+## add records to db
+			my $i = "insert into recorded (chanid, starttime, endtime, title, subtitle, description, hostname) values ((?), (?), (?), (?), (?), (?), (?))";
+
+			$sth = $dbh->prepare($i);
+			if (!$test_mode) {
+				$sth->execute($channel, $starttime, $endtime, $title,
+						$subtitle, $description, $host)
+					or die "Could not execute ($i)\n";
+			} else {
+				print("Test mode: insert would have been done\n");
+				print("  Query: '$i'\n");
+				print("  Query params: '$channel', '$starttime', '$endtime',");
+				print("'$title', '$subtitle', '$description', '$host'\n");
+				
+			}
+
+## rename file to proper format
+            
+		if ($starttime =~ m/$db_date_regx/) {
+			($syear, $smonth, $sday, $shour, $sminute, $ssecond) =
+				($1, $2, $3, $4, $5, $6);
+		}
+
+		if ($endtime =~ m/$db_date_regx/) {
+			($eyear, $emonth, $eday, $ehour, $eminute, $esecond) =
+				($1, $2, $3, $4, $5, $6);
+		}
+
+        my $new_file = "$dir/$channel"."_$syear$smonth$sday$shour$sminute$ssecond"."_$eyear$emonth$eday$ehour$eminute$esecond.nuv";
+        if (!$test_mode) {
+            rename("$show", "$new_file");
+        } else {
+            print("Test mode: rename would have done\n");
+            print("  From: '$show'\n");
+            print("  To: '$new_file'\n");
+        } 
+
+## commercial flag
+ 
+        print("Building a seek table should improve FF/RW and JUMP functions when watching this video\n");
+        print("Do you want to build a seek table for this file? (y/n): ");
+        chomp(my $do_commflag = <STDIN>);
+        if ($do_commflag = "y") {
+            if (!$test_mode) {
+                exec("mythcommflag --file $new_file --rebuild"); 
+            } else { 
+                print("Test mode: exec would have done\n"); 
+                print("  Exec: 'mythcommflag --file $new_file --rebuild'\n");
+            }
+        }
+
+        } else { print("Skipping illegal file format: $show\n"); }
 	}
 } ## foreach loop
 
