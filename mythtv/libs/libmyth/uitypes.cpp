@@ -1054,20 +1054,26 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
         QString tempWrite;
             int left = 0;
         fontProp *tmpfont = NULL;
-        if (m_active == true)
-            tmpfont = &m_fontfcns[m_fonts["active"]];
-        else
-            tmpfont = &m_fontfcns[m_fonts["inactive"]];
         bool lastShown = true;
-        QPoint fontdrop = tmpfont->shadowOffset;
-
-        dr->setFont(tmpfont->face);
+        QPoint fontdrop = QPoint(0, 0);
 
         if (m_debug == true)
             cerr << "   +UIListType::Draw() <- within Layer\n";
 
         for (int i = 0; i < m_count; i++)
         {
+            if (m_active == true)
+                tmpfont = &m_fontfcns[m_fonts["active"]];
+            else
+                tmpfont = &m_fontfcns[m_fonts["inactive"]];
+
+            if (forceFonts[i] != "")
+                tmpfont = &m_fontfcns[forceFonts[i]];
+
+            fontdrop = tmpfont->shadowOffset;  
+
+            dr->setFont(tmpfont->face);
+
             left = m_area.left();
             for (int j = 1; j <= m_columns; j++)
             {
@@ -1075,10 +1081,12 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
                     left = left + columnWidth[j - 1] + m_pad;
 
                 if (m_debug == true)
-                 {
-                    cerr << "      -Column #" << j << ", Column Context: " << columnContext[j]
+                {
+                    cerr << "      -Column #" << j 
+                         << ", Column Context: " << columnContext[j]
                          << ", Draw Context: " << context << endl;
                 }
+
                 if (columnContext[j] != context && columnContext[j] != -1)
                 {
                     lastShown = false;
@@ -1090,7 +1098,8 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
                     if (tempWrite != "***FILLER***")
                     {
                         if (columnWidth[j] > 0)
-                            tempWrite = cutDown(tempWrite, &(tmpfont->face), false, columnWidth[j]);
+                            tempWrite = cutDown(tempWrite, &(tmpfont->face),
+                                                false, columnWidth[j]);
                     }
                     else
                         tempWrite = "";
@@ -1098,25 +1107,23 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
                     if (fontdrop.x() != 0 || fontdrop.y() != 0)
                     {
                         dr->setBrush(tmpfont->dropColor);
-                        dr->setPen(QPen(tmpfont->dropColor, (int)(2 * m_wmult)));
+                        dr->setPen(QPen(tmpfont->dropColor, 
+                                        (int)(2 * m_wmult)));
                         dr->drawText((int)(left + fontdrop.x()),
-                                     (int)(m_area.top() + (int)(i*m_selheight) + fontdrop.y()),
-                                     m_area.width(), m_selheight, m_justification, tempWrite);
+                                     (int)(m_area.top() + (int)(i*m_selheight) +
+                                     fontdrop.y()), m_area.width(), m_selheight,
+                                     m_justification, tempWrite);
                     }
                     dr->setBrush(tmpfont->color);
                     dr->setPen(QPen(tmpfont->color, (int)(2 * m_wmult)));
-                    if (forceFonts[i] != "")
-                    {
-                        dr->setFont(m_fontfcns[forceFonts[i]].face);
-                        QColor myColor = m_fontfcns[forceFonts[i]].color;
-                        dr->setBrush(myColor);
-                        dr->setPen(QPen(myColor, (int)(2 * m_wmult)));
-                    }
+
                     dr->drawText(left, m_area.top() + (int)(i*m_selheight),
-                                 m_area.width(), m_selheight, m_justification, tempWrite);
+                                 m_area.width(), m_selheight, m_justification, 
+                                 tempWrite);
                     dr->setFont(tmpfont->face);
                     if (m_debug == true)
-                        cerr << "   +UIListType::Draw() Data: " << tempWrite << "\n";
+                        cerr << "   +UIListType::Draw() Data: " 
+                             << tempWrite << "\n";
                     lastShown = true;
                  }
               }
@@ -1137,13 +1144,18 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
             tmpfont = &m_fontfcns[m_fonts["selected"]];
         else
             tmpfont = &m_fontfcns[m_fonts["inactive"]];
+
+        if (forceFonts[i] != "")
+            tmpfont = &m_fontfcns[forceFonts[i]];
+
         bool lastShown = true;
         QPoint fontdrop = tmpfont->shadowOffset;
 
         dr->setFont(tmpfont->face);
         dr->drawPixmap(m_area.left() + m_selection_loc.x(),
-                         m_area.top() + m_selection_loc.y() + (int)(m_current * m_selheight),
-                         m_selection);
+                       m_area.top() + m_selection_loc.y() + 
+                       (int)(m_current * m_selheight),
+                       m_selection);
 
         left = m_area.left();
         for (int j = 1; j <= m_columns; j++)
@@ -1153,7 +1165,8 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
 
              if (m_debug == true)
              {
-                 cerr << "      -Column #" << j << ", Column Context: " << columnContext[j]
+                 cerr << "      -Column #" << j 
+                      << ", Column Context: " << columnContext[j]
                       << ", Draw Context: " << context << endl;
              }
              if (columnContext[j] != context && columnContext[j] != -1)
@@ -1165,28 +1178,24 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
                  tempWrite = listData[i + (int)(100*j)];
 
                  if (columnWidth[j] > 0)
-                     tempWrite = cutDown(tempWrite, &(tmpfont->face), false, columnWidth[j]);
+                     tempWrite = cutDown(tempWrite, &(tmpfont->face), false, 
+                                         columnWidth[j]);
         
                  if (fontdrop.x() != 0 || fontdrop.y() != 0)
                  {
                      dr->setBrush(tmpfont->dropColor);
                      dr->setPen(QPen(tmpfont->dropColor, (int)(2 * m_wmult)));
                      dr->drawText((int)(left + fontdrop.x()),
-                                  (int)(m_area.top() + (int)(i*m_selheight) + fontdrop.y()),
-                                  m_area.width(), m_selheight, m_justification, tempWrite);
+                                  (int)(m_area.top() + (int)(i*m_selheight) + 
+                                  fontdrop.y()), m_area.width(), m_selheight, 
+                                  m_justification, tempWrite);
                  }
                  dr->setBrush(tmpfont->color);
                  dr->setPen(QPen(tmpfont->color, (int)(2 * m_wmult)));
-                 if (forceFonts[i] != "")
-                 {   
-                     dr->setFont(m_fontfcns[forceFonts[i]].face);
-                     QColor myColor = m_fontfcns[forceFonts[i]].color;
-                     dr->setBrush(myColor);
-                     dr->setPen(QPen(myColor, (int)(2 * m_wmult)));
-                 }
 
                  dr->drawText(left, m_area.top() + (int)(i*m_selheight),
-                              m_area.width(), m_selheight, m_justification, tempWrite);
+                              m_area.width(), m_selheight, m_justification, 
+                              tempWrite);
 
                  dr->setFont(tmpfont->face);
              }
