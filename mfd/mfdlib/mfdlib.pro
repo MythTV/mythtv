@@ -34,5 +34,8 @@ SOURCES += flacdecoder.cpp cddecoder.cpp
 HEADERS += metadata.h   mdcontainer.h   settings.h
 SOURCES += metadata.cpp mdcontainer.cpp settings.cpp
 
+HEADERS += avfdecoder.h
+SOURCES += avfdecoder.cpp
+
 LIBS += -logg -lvorbisfile -lvorbis  -lmad -lid3tag -lcdaudio \
         -lFLAC -lcdda_interface -lcdda_paranoia

@@ -26,6 +26,11 @@ TARGET = mfd
 LIBS += -lmyth-$$LIBVERSION 
 }
 
+!isEmpty(USE_WMA_AUDIO){
+LIBS += -lmythavformat-$$LIBVERSION
+LIBS += -lmythavcodec-$$LIBVERSION
+}
+
 LIBS += -Wl,-rpath,$${PREFIX}/lib
 
 HEADERS +=          mfd.h   pluginmanager.h   serversocket.h   logging.h   \

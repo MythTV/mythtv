@@ -13,6 +13,7 @@
 
 */
 
+#include "../config.h"
 
 #include <qstring.h>
 #include <qevent.h>
@@ -132,6 +133,17 @@ public:
     const QString &description() const;
     Decoder *create(const QString &, QIODevice *, Output *, bool);
 };
+
+#ifdef WMA_AUDIO_SUPPORT
+class avfDecoderFactory : public DecoderFactory
+{
+public:
+    bool supports(const QString &) const;
+    const QString &extension() const;
+    const QString &description() const;
+    Decoder *create(const QString &, QIODevice *, Output *, bool);
+};
+#endif
 
 
 #endif

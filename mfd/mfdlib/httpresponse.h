@@ -60,7 +60,7 @@ class HttpResponse
     
     void addText(std::vector<char> *buffer, QString text_to_add);
     void createHeaderBlock(std::vector<char> *header_block, int payload_size);
-    bool sendBlock(MFDServiceClientSocket *which_client, std::vector<char> block_to_send);
+    bool sendBlock(MFDServiceClientSocket *which_client, std::vector<char> &block_to_send);
     void streamFile(MFDServiceClientSocket *which_client);
     void convertToWavAndStreamFile(MFDServiceClientSocket *which_client);
     void streamEmptyWav(MFDServiceClientSocket *which_client);

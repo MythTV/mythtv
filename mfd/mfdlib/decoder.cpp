@@ -11,7 +11,6 @@
 
 */
 
-
 #include "decoder.h"
 #include "constants.h"
 #include "buffer.h"
@@ -111,6 +110,9 @@ static void checkFactories()
         Decoder::registerFactory(new MadDecoderFactory);
         Decoder::registerFactory(new FlacDecoderFactory);
         Decoder::registerFactory(new CdDecoderFactory);
+#ifdef WMA_AUDIO_SUPPORT
+        Decoder::registerFactory(new avfDecoderFactory);
+#endif
     }
 }
 

@@ -8,6 +8,13 @@
 
 */
 
+#include "../config.h"
+
+#ifdef WMA_AUDIO_SUPPORT
+#include <mythtv/ffmpeg/avformat.h>
+#include <mythtv/ffmpeg/avcodec.h>
+#endif
+
 #include <iostream>
 using namespace std;
 #include <fcntl.h>
@@ -323,7 +330,6 @@ void HttpResponse::createHeaderBlock(
             addText(header_block, a_header);
         }
         
-               
     }
     else
     {
@@ -353,6 +359,7 @@ void HttpResponse::createHeaderBlock(
     
     /*
         Debuggin Output:
+   
 
     my_request->printHeaders();
     cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& " << endl;
@@ -361,8 +368,8 @@ void HttpResponse::createHeaderBlock(
         cout << header_block->at(i);
     }
     cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& " << endl;
-
-    */
+   
+    */ 
 }
 
 
@@ -425,7 +432,7 @@ void HttpResponse::send(MFDServiceClientSocket *which_client)
 }
 
 
-bool HttpResponse::sendBlock(MFDServiceClientSocket *which_client, std::vector<char> block_to_send)
+bool HttpResponse::sendBlock(MFDServiceClientSocket *which_client, std::vector<char> &block_to_send)
 {
     int nfds = 0;
     fd_set writefds;
@@ -519,7 +526,8 @@ bool HttpResponse::sendBlock(MFDServiceClientSocket *which_client, std::vector<c
                     //
                     //  All done
                     //
-
+            
+                    amount_written += bytes_sent;
                     keep_going = false;
                 }
                 else
@@ -535,6 +543,7 @@ bool HttpResponse::sendBlock(MFDServiceClientSocket *which_client, std::vector<c
             }
         }
     }
+
     return true;
 }
 
@@ -907,7 +916,7 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
         //
         
         OggVorbis_File ov_file;
-        FILE *input_file = fopen(file_to_send->name().ascii(), "rb");
+        FILE *input_file = fopen(file_to_send->name().local8Bit(), "rb");
         if(!input_file)
         {
             if(parent)
@@ -915,7 +924,7 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
                 parent->warning(QString("while trying to convert ogg to wav "
                                         "and stream it, httpresponse could "
                                         "not open file: %1")
-                                        .arg(file_to_send->name().ascii()));
+                                        .arg(file_to_send->name().local8Bit()));
             }
             streamEmptyWav(which_client);
             return;
@@ -931,7 +940,7 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
             {
                 parent->warning(QString("httpresponse does not really think "
                                         "this file is an ogg: %1 ")
-                                        .arg(file_to_send->name().ascii()));
+                                        .arg(file_to_send->name().local8Bit()));
             }
             fclose(input_file);
             streamEmptyWav(which_client);
@@ -1190,7 +1199,7 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
             return;
         }        
 
-        if(!FLAC__file_decoder_set_filename(flac_decoder, file_to_send->name().ascii()))
+        if(!FLAC__file_decoder_set_filename(flac_decoder, file_to_send->name().local8Bit()))
         {
             if(parent)
             {
@@ -1449,7 +1458,388 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
         FLAC__file_decoder_delete(flac_decoder);
 
         return;
-    }    
+    }
+#ifdef WMA_AUDIO_SUPPORT
+    else if(file_to_send->name().section(".", -1, -1) == "wma")
+    {
+
+        //
+        //  Decode and send a .wma (as a wav)
+        //
+
+        AVFormatContext     *format_context = NULL;
+        AVInputFormat       *input_format = NULL;
+        AVFormatParameters  *format_parameters = NULL;
+    
+        av_register_all();  
+        
+        //
+        //  Open the input file
+        //
+
+        if (av_open_input_file(
+                                &format_context, 
+                                file_to_send->name().local8Bit(), 
+                                input_format, 0, 
+                                format_parameters
+                              ) < 0)
+        {
+            if(parent)
+            {
+                parent->warning(QString("httpresponse had problem opening \"%1\"")
+                                .arg(file_to_send->name().local8Bit()));
+            }
+            streamEmptyWav(which_client);
+            return;
+        }
+
+        //
+        //  Determine stream format and populate data in format_context
+        //
+
+        if (av_find_stream_info(format_context) < 0)
+        {
+            if(parent)
+            {
+                parent->warning(QString("httpresponse could not find "
+                                "stream info in \"%1\"")
+                                .arg(file_to_send->name().local8Bit()));
+            }
+            av_close_input_file(format_context);
+            streamEmptyWav(which_client);
+            return;
+        } 
+        
+        //
+        //  Before we can build the WAV header, we need to know how large
+        //  this stream will be when fully decoded. I have no idea how to
+        //  just ask libavformat for a size in bytes of what the decoded
+        //  stream _will_ be, but I do know how to ask it exactly how many
+        //  milliseconds long the content is. I also know that if I multiply
+        //  the sample rate (ie. 44100) times the bits per sample (ie. 16)
+        //  times the number of channels, I know how many bytes the file
+        //  should end up being (with 44 extra for the wav header). 
+        //
+
+
+        //
+        //  We figure out the file size and stuff up here, because if we
+        //  take too long before at least sending our HTTP headers, iTunes
+        //  craps out on us.
+        //
+        
+        av_estimate_timings(format_context);
+        double exact_time_in_micro_seconds = (format_context->duration);
+        int64_t expected_file_size = 44 + ((long)
+                                    (((44100 * 16 * 2)/8) * 
+                                    (exact_time_in_micro_seconds 
+                                    / (AV_TIME_BASE + 0.0))));
+
+        //
+        //  Handle range requests (seeking)
+        //
+        
+        range_begin = stored_skip;
+        range_end = expected_file_size - 1;
+        
+        if(range_end < 0)
+        {
+            range_end = 0;
+        }
+        if(range_begin > range_end)
+        {
+            range_begin = 0;
+        }
+
+        total_possible_range = expected_file_size;
+
+        if(range_begin > 0 && range_begin < 44)
+        {
+            if(parent)
+            {
+                parent->warning("client asked to seek in a wma "
+                                "stream to somewhere inside the "
+                                "header");
+            }
+            range_begin = 44;
+        }
+        
+        header_block.clear();
+        createHeaderBlock(&header_block, ((int) (range_end - range_begin) + 1));
+        if(!sendBlock(which_client, header_block))
+        {
+            if(parent)
+            {
+                parent->warning("httpresponse was not able to send "
+                                "an http header for a wma stream");
+            }
+            av_close_input_file(format_context);
+            return;
+        }
+
+        //
+        //  Store what kind of decoder we need to use
+        //
+        
+        AVCodecContext *audio_decoder_context = &format_context->streams[0]->codec;
+        
+        //
+        //  Store the input format
+        //
+        
+        input_format = format_context->iformat;
+
+        //
+        //  Get a PCM output format
+        //
+        
+        AVOutputFormat *output_format = guess_format("wav", NULL, NULL);
+
+        if(!output_format)
+        {
+            if(parent)
+            {
+                parent->warning(QString("httpresponse could not get "
+                                "an output format for \"%1\"")
+                                .arg(file_to_send->name().local8Bit()));
+            }
+            av_close_input_file(format_context);
+            streamEmptyWav(which_client);
+            return;
+        }
+
+
+        //
+        //  Create and populate the output context
+        //
+        
+        AVFormatContext *output_context = (AVFormatContext *)av_mallocz(sizeof(AVFormatContext));
+        if(!output_context)
+        {
+            if(parent)
+            {
+                parent->warning("httpresponse could not av_mallocz() "
+                                "an output context (memory low?)");
+            }
+            av_close_input_file(format_context);
+            streamEmptyWav(which_client);
+            return;
+        }
+
+        output_context->oformat = output_format;        
+        
+        AVStream *decoded_stream = av_new_stream(output_context, 0);
+        decoded_stream->codec.codec_type = CODEC_TYPE_AUDIO;
+        decoded_stream->codec.codec_id = output_context->oformat->audio_codec;
+        decoded_stream->codec.sample_rate = audio_decoder_context->sample_rate;
+        decoded_stream->codec.channels = audio_decoder_context->channels;
+        decoded_stream->codec.bit_rate = audio_decoder_context->bit_rate;
+    
+        av_set_parameters(output_context, NULL);
+
+        //
+        //  Prepare the decoding codec
+        //        
+
+        AVCodec *decoding_codec = avcodec_find_decoder(audio_decoder_context->codec_id);
+        if(!decoding_codec)
+        {
+            if(parent)
+            {
+                parent->warning(QString("httpresponse could not get "
+                                        "a decoding codec for \"%1\"")
+                                        .arg(file_to_send->name().local8Bit()));
+            }
+            av_free(output_context);
+            av_close_input_file(format_context);
+            streamEmptyWav(which_client);
+            return;
+        }
+
+        //
+        //  Open for decoding
+        //
+
+        if(avcodec_open(audio_decoder_context, decoding_codec) < 0)
+        {
+            if(parent)
+            {
+                parent->warning(QString("httpresponse could not open "
+                                        "a decoding codec for \"%1\"")
+                                        .arg(file_to_send->name().local8Bit()));
+            }
+            av_free(output_context);
+            av_close_input_file(format_context);
+            streamEmptyWav(which_client);
+            return;
+            
+        }
+
+        int total_bytes_sent = 0;
+
+        if(range_begin == 0)
+        {
+            //
+            //  Build the wav header, but only if the client hasn't already
+            //  asked to seek to a point beyond it
+            //
+        
+            unsigned char headbuf[44];
+
+            int bits = 16;
+            int channels = 2;
+            int samplerate = 44100;
+            int bytespersec = (channels * samplerate * bits )/8;
+            int align = channels*bits/8;
+            int samplesize = bits;
+                   
+            memcpy(headbuf, "RIFF", 4);
+            WRITE_U32(headbuf+4, expected_file_size-8);
+            memcpy(headbuf+8, "WAVE", 4);
+            memcpy(headbuf+12, "fmt ", 4);
+            WRITE_U32(headbuf+16, 16);
+            WRITE_U16(headbuf+20, 1); // format
+            WRITE_U16(headbuf+22, channels);
+            WRITE_U32(headbuf+24, samplerate);
+            WRITE_U32(headbuf+28, bytespersec);
+            WRITE_U16(headbuf+32, align);
+            WRITE_U16(headbuf+34, samplesize);
+            memcpy(headbuf+36, "data", 4);
+            WRITE_U32(headbuf+40, expected_file_size - 44);
+
+            payload.clear();
+            payload.insert(payload.begin(), headbuf, headbuf + 44);
+            if(!sendBlock(which_client, payload))
+            {
+                if(parent)
+                {
+                    parent->warning("httpresponse was not able to send "
+                                    "a wav header for a wma");
+                }
+                av_close_input_file(format_context);
+                return;
+            }
+            total_bytes_sent += 44;
+        }
+        
+        
+        bool keep_decoding = true;
+        
+        av_read_play(format_context);
+
+        //
+        //  Seek to where we need to be
+        //
+        
+        int64_t starting_time_in_micro_seconds = (int64_t) 
+                                    ((range_begin / (total_possible_range + 0.0)) 
+                                    * exact_time_in_micro_seconds);
+        if(av_seek_frame(format_context, 0, starting_time_in_micro_seconds) < 0)
+        {
+            if(parent)
+            {
+                parent->warning("failed to seek in wma file, http headers "
+                                "(already sent) have wrong Content-Length");
+            }
+        }
+        
+        AVPacket *pkt;
+        AVPacket pkt1;
+        pkt = &pkt1;
+        unsigned char *ptr;
+        int len, data_size;
+        char samples[AVCODEC_MAX_AUDIO_FRAME_SIZE];
+        bool client_gone = false;
+        while(keep_decoding)
+        {
+            if (av_read_frame(format_context, pkt) < 0)
+            {
+                //
+                //  We're at the end
+                //  
+
+                keep_decoding = false;
+            }
+
+            // Get the pointer to the data and its length
+
+            ptr = pkt->data;
+            len = pkt->size;
+                
+            while (len > 0)  
+            {
+                int dec_len = avcodec_decode_audio(
+                                                    audio_decoder_context, 
+                                                    (short *)samples, 
+                                                    &data_size, 
+                                                    ptr, 
+                                                    len
+                                                  );    
+                if (dec_len < 0) 
+                {
+                    //
+                    //  No audio left in this pkt
+                    //
+                    break;
+                }
+
+                ptr += dec_len;
+                len -= dec_len;
+
+                //
+                //  We want to send as many bytes as we waid we would in the
+                //  http header. But because that was a guesstimate, we need
+                //  to check it here. This may cut off a few microseconds of
+                //  the track. If you don't like that, don't convert wma's
+                //  to wav on the fly :-)
+                //
+
+                payload.clear();
+                if(total_bytes_sent + data_size <= (range_end - range_begin) + 1)
+                {
+                    total_bytes_sent += data_size;
+                    payload.insert(payload.end(), samples, samples + data_size);
+                }
+                else
+                {
+                    total_bytes_sent += ((range_end - range_begin) + 1) - total_bytes_sent;
+                    payload.insert(payload.end(), samples, samples + (((range_end - range_begin) + 1) - total_bytes_sent));
+                    keep_decoding = false; 
+                }
+                if(!sendBlock(which_client, payload))
+                {
+                    keep_decoding = false;
+                    client_gone = true;
+                    break;
+                }
+
+            }
+            av_free_packet(pkt);
+        }
+
+        if(!client_gone)
+        {
+            if(total_bytes_sent < (range_end - range_begin) + 1)
+            {
+                //
+                //  Pad up with 0 level sound if we have not quit sent as much as we said we would
+                //
+            
+                char zero_pad[1];
+                zero_pad[0] = 0;
+                payload.clear();
+                for(int i = 0; i < (((range_end - range_begin) + 1) - total_bytes_sent); i++)
+                {
+                    total_bytes_sent += 1;
+                    payload.insert(payload.end(), zero_pad, zero_pad + 1);
+                }
+                sendBlock(which_client, payload);
+            }
+        }
+        av_free(output_context);
+        av_close_input_file(format_context);
+    }
+#endif
     else
     {
         if(parent)
@@ -1493,33 +1883,35 @@ void HttpResponse::streamEmptyWav(MFDServiceClientSocket *which_client)
     createHeaderBlock(&header_block, file_size);
     if(sendBlock(which_client, header_block))
     {
-        if(range_begin == 0)
-        {
-        
-            char headbuf[file_size];
+        char headbuf[file_size];
 
-            memcpy(headbuf, "RIFF", 4);
-            WRITE_U32(headbuf+4, file_size - 4);
-            memcpy(headbuf+8, "WAVE", 4);
-            memcpy(headbuf+12, "fmt ", 4);
-            WRITE_U32(headbuf+16, 16);
-            WRITE_U16(headbuf+20, 1);
-            WRITE_U16(headbuf+22, 1);
-            WRITE_U32(headbuf+24, 8000);
-            WRITE_U32(headbuf+28, 16000);
-            WRITE_U16(headbuf+32, 2);
-            WRITE_U16(headbuf+34, 16);
-            memcpy(headbuf+36, "data", 4);
-            WRITE_U32(headbuf+40, file_size - 44);
+        memcpy(headbuf, "RIFF", 4);
+        WRITE_U32(headbuf+4, file_size - 4);
+        memcpy(headbuf+8, "WAVE", 4);
+        memcpy(headbuf+12, "fmt ", 4);
+        WRITE_U32(headbuf+16, 16);
+        WRITE_U16(headbuf+20, 1);
+        WRITE_U16(headbuf+22, 1);
+        WRITE_U32(headbuf+24, 8000);
+        WRITE_U32(headbuf+28, 16000);
+        WRITE_U16(headbuf+32, 2);
+        WRITE_U16(headbuf+34, 16);
+        memcpy(headbuf+36, "data", 4);
+        WRITE_U32(headbuf+40, file_size - 44);
             
-            for(int i = 44; i < file_size - 1; i = i + 2)
+        for(int i = 44; i < file_size - 1; i = i + 2)
+        {
+            WRITE_U16(headbuf + i, 0);
+        }
+            
+        payload.clear();
+        payload.insert(payload.begin(), headbuf, headbuf + file_size);
+        if(!sendBlock(which_client, payload))
+        {
+            if(parent)
             {
-                WRITE_U16(headbuf + i, 0);
+                parent->log("failed to sendBlock() while sending empty wav", 9);
             }
-
-            payload.clear();
-            payload.insert(payload.begin(), headbuf, headbuf + file_size);
-            sendBlock(which_client, payload);
         }
     }
     

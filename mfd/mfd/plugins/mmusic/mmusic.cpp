@@ -8,6 +8,8 @@
 
 */
 
+#include "../../../config.h"
+
 #include <qdir.h>
 #include <qfileinfo.h>
 #include <qregexp.h>
@@ -793,9 +795,10 @@ void MMusicWatcher::buildFileList(QString &directory, MusicLoadedMap &music_file
                 fi->extension(FALSE) == "ogg"  ||
                 fi->extension(FALSE) == "flac" ||
                 fi->extension(FALSE) == "mp3"  ||
-                fi->extension(FALSE) == "aac"  ||
-                fi->extension(FALSE) == "m4a"  ||
-                fi->extension(FALSE) == "mp4"
+#ifdef WMA_AUDIO_SUPPORT
+                fi->extension(FALSE) == "wma"  ||
+#endif
+                fi->extension(FALSE) == "m4a"
               )
             {
                 music_files[filename] = MFL_on_file_system;

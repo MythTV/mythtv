@@ -14,6 +14,7 @@ audio="yes"
 daapserver="yes"
 daapclient="yes"
 mmusic="yes"
+wmasupport="yes"
 
 for opt do
   case "$opt" in
@@ -41,6 +42,10 @@ for opt do
   ;;
   --disable-mythmusic) mmusic="no"
   ;;
+  --enable-wmasupport) wmasupport="yes"
+  ;;
+  --disable-wmasupport) wmasupport="no"
+  ;;
   --enable-all)
       zeroconfig="yes"
       audio="yes"
@@ -48,6 +53,7 @@ for opt do
       daapclient="yes"
       mythlib="yes"
       mmusic="yes"
+      wmasupport="yes"
   ;;
   --disable-all)
       zeroconfig="no"
@@ -56,6 +62,7 @@ for opt do
       daapclient="no"
       mythlib="no"
       mmusic="no"
+      wmasupport="no"
   ;;
   esac
 done
@@ -66,6 +73,7 @@ done
 
 if test "$mythlib" = "no" ; then
     mmusic="no"
+    wmasupport="no"
 fi
 
 if test x"$1" = x"-h" -o x"$1" = x"--help" ; then
@@ -79,6 +87,7 @@ Standard options:
   --enable-mythlib     use mythlib/db for settings and content [default=yes] 
   --enable-zeroconfig  enable auto discovery of services       [default=yes]
   --enable-audio       enable audio playing                    [default=yes]
+  --enable-wmasupport  include ability to play wma audio files [default=yes]
   --enable-daapserver  enable serving audio via daap           [default=yes]
   --enable-daapclient  enable consuming audio via daap         [default=yes]
   --enable-mythmusic   enable serving mythmusic audio content  [default=yes]
@@ -182,6 +191,23 @@ fi
 
 if test "$audio" = "no" ; then
     echo "                      audio support: no"
+fi
+
+#
+#   WMA support
+#
+
+if test "$wmasupport" = "yes" ; then
+    echo "                        wma support: yes"        
+    echo "//  Include wma support " >> ./config.h
+    echo " " >> ./config.h
+    echo "#define WMA_AUDIO_SUPPORT 1" >> ./config.h
+    echo " " >> ./config.h
+    echo "USE_WMA_AUDIO = 1 " >> ./options.pro
+fi
+
+if test "$wmasupport" = "no" ; then
+    echo "                        wma support: no"
 fi
 
 #

@@ -161,10 +161,13 @@ void DaapInstance::run()
         FD_ZERO(&readfds);
         if(client_socket_to_daap_server)
         {
-            FD_SET(client_socket_to_daap_server->socket(), &readfds);
-            if(nfds <= client_socket_to_daap_server->socket())
+            if(client_socket_to_daap_server->socket() > 0)
             {
-                nfds = client_socket_to_daap_server->socket() + 1;
+                FD_SET(client_socket_to_daap_server->socket(), &readfds);
+                if(nfds <= client_socket_to_daap_server->socket())
+                {
+                    nfds = client_socket_to_daap_server->socket() + 1;
+                }
             }
         }
         
@@ -595,7 +598,7 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
             QString request_string = QString("/databases/%1/items").arg(which_database);
             DaapRequest update_request(this, request_string, server_address);
             update_request.addGetVariable("session-id", session_id);
-            update_request.addGetVariable("revision-number", metadata_generation);
+            //update_request.addGetVariable("revision-number", metadata_generation);
             
             //
             //  We have to add a meta GET variable listing all the
@@ -1289,6 +1292,7 @@ void DaapInstance::doDatabaseItemsResponse(TagInput& dmap_data)
                 
                 dmap_data >> a_u32_variable;
                 new_numb_items = a_u32_variable;
+                cout << "new_numb_items = " << new_numb_items << endl;
                 break;
                 
             case 'mrco':
@@ -1299,6 +1303,7 @@ void DaapInstance::doDatabaseItemsResponse(TagInput& dmap_data)
                 
                 dmap_data >> a_u32_variable;
                 new_received_numb_items = a_u32_variable;
+                cout << "new_received_numb_items = " << new_received_numb_items << endl;
                 break;
                 
             case 'mlcl':
@@ -1731,8 +1736,18 @@ void DaapInstance::parseItems(TagInput& dmap_data, int how_many)
         
         //
         //  If we have enough data, make a Metadata object
-        //  (once we have the metadata mess sorted out)
         //
+
+        if(new_item_id > -1 && new_item_name.length() > 0)
+        {
+            //
+            //  Make new metadata
+            //  
+        }
+        else
+        {
+            warning("got incomplete data for an item, going to ignore it");
+        }        
         
         
     }
