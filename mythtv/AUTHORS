@@ -35,3 +35,5 @@ Large amount of documentation:
     Robert Kulagowski <rkulagowski at thrupoint.net>
 Alternative EPG layout:
     John Danner <johndanner at psu.edu>
+Graphical setup UI, database backend for configuration, initial direct rendering support
+    Matt Zimmerman <mdz at debian.org>
