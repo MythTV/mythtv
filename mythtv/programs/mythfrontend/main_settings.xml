@@ -29,12 +29,11 @@
      <action>MENU tv_settings.xml</action>
    </button>
 
-
    <button>
      <type>MUSIC</type>
      <text>Music Settings</text>
-     <action>EXEC mythmusic --configure</action>
-     <depends>musicmenu.xml</depends>
+     <action>CONFIGPLUGIN mythmusic</action>
+     <depends>mythmusic</depends>
    </button>
 
    <button>

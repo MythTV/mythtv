@@ -1,15 +1,6 @@
 <mythmenu name="MUSIC_SETTINGS">
 
    <button>
-      <type>SETUP</type>
-      <text>Scan Music</text>
-      <text lang="IT">Rileggi lista brani</text>
-      <text lang="ES">Actualizar lista</text>
-      <text lang="CA">Actualitzar llista</text>
-      <action>SETTINGS_SCAN</action>
-   </button>
-
-   <button>
       <type>MUSIC</type>
       <text>General Settings</text>
       <text lang="IT">Impostazioni generali</text>

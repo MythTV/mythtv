@@ -9,10 +9,10 @@ include (config.pro)
    error(Missing config.pro: please run the configure script)
 }
 
-TEMPLATE = app
-CONFIG += thread
+TEMPLATE = lib
+CONFIG += plugin thread
 TARGET = mythmusic
-target.path = $${PREFIX}/bin
+target.path = $${PREFIX}/lib/mythtv/plugins
 INSTALLS += target
 
 installfiles.path = $${PREFIX}/share/mythtv
@@ -23,7 +23,7 @@ uifiles.files = music-ui.xml images/*.png
 INSTALLS += installfiles uifiles
 
 LIBS += -lmad -lid3tag -logg -lvorbisfile -lvorbis -lvorbisenc -lcdaudio -lFLAC
-LIBS += -lcdda_paranoia -lcdda_interface -L$${PREFIX}/lib -lmyth-$$LIBVERSION
+LIBS += -lcdda_paranoia -lcdda_interface
 
 # Input
 HEADERS += audiooutput.h buffer.h cddecoder.h cdrip.h constants.h databasebox.h 

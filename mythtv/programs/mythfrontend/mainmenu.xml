@@ -15,8 +15,8 @@
      <text lang="NL">Muziek</text>
      <text lang="FR">Musique</text>
      <text lang="DE">Musik</text>
-     <action>EXEC mythmusic</action>
-     <depends>musicmenu.xml</depends>
+     <action>PLUGIN mythmusic</action>
+     <depends>mythmusic</depends>
    </button>
 
    <button>
@@ -55,7 +55,7 @@
      <text lang="FR">Vidéos</text>
      <text lang="DE">Videos</text>
      <action>PLUGIN mythvideo</action>
-     <depends>videomenu.xml</depends>
+     <depends>mythvideo</depends>
    </button>
 
    <button>

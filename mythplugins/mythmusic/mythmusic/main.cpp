@@ -22,8 +22,7 @@ using namespace std;
 
 #include <mythtv/themedmenu.h>
 #include <mythtv/mythcontext.h>
-
-MythContext *gContext;
+#include <mythtv/mythplugin.h>
 
 void CheckFreeDBServerFile(void)
 {
@@ -315,11 +314,13 @@ void MusicCallback(void *data, QString &selection)
     }
 }
 
-void runMenu(QString themedir, QSqlDatabase *db, QString paths,
-             QString startdir,
+void runMenu(QString paths, QString startdir,
              PlaylistsContainer *all_playlists, AllMusic *all_music,
              QString which_menu)
 {
+    QString themedir = gContext->GetThemeDir();
+    QSqlDatabase *db = QSqlDatabase::database();
+
     ThemedMenu *diag = new ThemedMenu(themedir.ascii(), which_menu, 
                                       gContext->GetMainWindow(), "music menu");
 
@@ -347,159 +348,115 @@ void runMenu(QString themedir, QSqlDatabase *db, QString paths,
     delete diag;
 }
 
-int main(int argc, char *argv[])
+extern "C" {
+int mythplugin_init(const char *libversion);
+int mythplugin_run(void);
+int mythplugin_config(void);
+}
+
+int mythplugin_init(const char *libversion)
 {
-    srand(time(NULL));
-
-    QApplication a(argc, argv);
-    QTranslator translator(0);
-    
-    bool configure_general = false;
-    bool configure_player = false;
-    bool configure = false;
-    
-    for(int argpos = 1; argpos < a.argc(); ++argpos)
+    QString lib = libversion;
+    if (lib != MYTH_BINARY_VERSION)
     {
-        if(!strcmp(a.argv()[argpos], "--configure-general"))
-        {
-            configure_general = true;
-        }
-        if(!strcmp(a.argv()[argpos], "--configure-player"))
-        {
-            configure_player = true;
-        }
-        if(!strcmp(a.argv()[argpos], "--configure"))
-        {
-            configure = true;
-        }
-    }
-
-
-
-    //  Load the context
-    gContext = new MythContext(MYTH_BINARY_VERSION);
-    QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
-    if (!db)
-    {
-        printf("Couldn't connect to database\n");
+        cerr << "This plugin was compiled against libmyth version: "
+             << MYTH_BINARY_VERSION
+             << "\nbut the library is version: " << libversion << endl;
+        cerr << "You probably want to recompile everything, and do a\n"
+             << "'make distclean' first.\n";
         return -1;
     }
-    if (!gContext->OpenDatabase(db))
-    {
-        printf("couldn't open db\n");
-        return -1;
-    }
-    gContext->LoadQtConfig();
 
-    MythMainWindow *mainWindow = new MythMainWindow();
-    mainWindow->Show();
-    gContext->SetMainWindow(mainWindow);
+    return 0;
+}
 
-    CheckFreeDBServerFile();
-
+int mythplugin_run(void)
+{
+    QTranslator translator( 0 );
     translator.load(PREFIX + QString("/share/mythtv/i18n/mythmusic_") +
                     QString(gContext->GetSetting("Language").lower()) +
                     QString(".qm"), ".");
-    a.installTranslator(&translator);
+    qApp->installTranslator(&translator);
 
-    //  Handle the theme
-    QString themename = gContext->GetSetting("Theme");
-    QString themedir = gContext->FindThemeDir(themename);
-    if (themedir == "")
-    {
-        cerr << "Couldn't find theme " << themename << endl;
-        db->close();
-        delete gContext;
-        exit(0);
-    }
+    srand(time(NULL));
 
-    if(configure_general)
+    CheckFreeDBServerFile();
+
+    QSqlDatabase *db = QSqlDatabase::database();
+
+    QSqlQuery count_query("SELECT COUNT(*) FROM musicmetadata;", db);
+
+    bool musicdata_exists = false;
+    if (count_query.isActive())
     {
-        GeneralSettings settings;
-        settings.exec(QSqlDatabase::database());
-    }
-    else if(configure_player)
-    {
-        PlayerSettings settings;
-        settings.exec(QSqlDatabase::database());
+        if(count_query.next() && 
+           0 != count_query.value(0).toInt())
+        {
+            musicdata_exists = true;
+        }
     }
     else
     {
-    
-        //  See if we should be talking to an LCDproc daemon
+        DialogBox *no_db_dialog = new DialogBox(gContext->GetMainWindow(),
+                     "\n\nYou have no MythMusic tables in your database.");
+        no_db_dialog->AddButton("OK, I'll read the documentation");
+        no_db_dialog->exec();
 
-        QString lcd_host = gContext->GetSetting("LCDHost");
-        QString lcd_port = gContext->GetSetting("LCDPort");
-        int lcd_port_number = lcd_port.toInt();
-        if (lcd_host.length() > 0 && lcd_port_number > 1024)
-        {
-            gContext->LCDconnectToHost(lcd_host, lcd_port_number);
-        }
-
-        QSqlQuery count_query("SELECT COUNT(*) FROM musicmetadata;", db);
-
-        bool musicdata_exists = false;
-        if (count_query.isActive())
-        {
-            if(count_query.next() && 
-               0 != count_query.value(0).toInt())
-            {
-                musicdata_exists = true;
-            }
-        }
-        else
-        {
-            DialogBox *no_db_dialog = new DialogBox(gContext->GetMainWindow(),
-                         "\n\nYou have no MythMusic tables in your database.");
-            no_db_dialog->AddButton("OK, I'll read the documentation");
-            no_db_dialog->exec();
-            db->close();
-            delete gContext;
-            exit(0);
-        }
-
-        //  Load all available info about songs (once!)
-        QString startdir = gContext->GetSetting("MusicLocation");
-
-        // Only search music files if a directory was specified & there
-        // is no data in the database yet (first run).  Otherwise, user
-        // can choose "Setup" option from the menu to force it.
-        if (startdir != "" && !musicdata_exists)
-            SearchDir(db, startdir);
-
-        QString paths = gContext->GetSetting("TreeLevels");
-        AllMusic *all_music = new AllMusic(db, paths, startdir);
-
-        //  Load all playlists into RAM (once!)
-        PlaylistsContainer *all_playlists = new PlaylistsContainer(db, all_music);
-        all_playlists->setHost(gContext->GetHostName());
-        //  And away we go ...
-        if(configure)
-        {
-            runMenu(themedir, db, paths, startdir, all_playlists, all_music, "music_settings.xml");
-        }
-        else
-        {
-            runMenu(themedir, db, paths, startdir, all_playlists, all_music, "musicmenu.xml");
-        }
-
-        //  Automagically save all playlists and metadata (ratings) that have changed
-        if( all_music->cleanOutThreads() &&
-            all_playlists->cleanOutThreads() )
-        {
-            all_playlists->save();
-            int x = all_playlists->getPending();
-            SavePending(db, x);
-            all_music->save();
-        }
-
-        delete all_music;
-        delete all_playlists;
+        delete no_db_dialog;
+        return -1;
     }
-    
-    //  Clean up
-    gContext->LCDdestroy();
-    db->close();
-    delete gContext;
+
+    //  Load all available info about songs (once!)
+    QString startdir = gContext->GetSetting("MusicLocation");
+
+    // Only search music files if a directory was specified & there
+    // is no data in the database yet (first run).  Otherwise, user
+    // can choose "Setup" option from the menu to force it.
+    if (startdir != "" && !musicdata_exists)
+        SearchDir(db, startdir);
+
+    QString paths = gContext->GetSetting("TreeLevels");
+    AllMusic *all_music = new AllMusic(db, paths, startdir);
+
+    //  Load all playlists into RAM (once!)
+    PlaylistsContainer *all_playlists = new PlaylistsContainer(db, all_music);
+    all_playlists->setHost(gContext->GetHostName());
+    //  And away we go ...
+    runMenu(paths, startdir, all_playlists, all_music, "musicmenu.xml");
+
+    //  Automagically save all playlists and metadata (ratings) that have changed
+    if (all_music->cleanOutThreads() &&
+        all_playlists->cleanOutThreads() )
+    {
+        all_playlists->save();
+        int x = all_playlists->getPending();
+        SavePending(db, x);
+        all_music->save();
+    }
+
+    delete all_music;
+    delete all_playlists;
+
+    qApp->removeTranslator(&translator);
+
     return 0;
 }
+
+int mythplugin_config(void)
+{
+    QTranslator translator( 0 );
+    translator.load(PREFIX + QString("/share/mythtv/i18n/mythmusic_") +
+                    QString(gContext->GetSetting("Language").lower()) +
+                    QString(".qm"), ".");
+    qApp->installTranslator(&translator);
+
+    QString paths = gContext->GetSetting("TreeLevels");
+    QString startdir = gContext->GetSetting("MusicLocation");
+
+    runMenu(paths, startdir, NULL, NULL, "music_settings.xml");
+
+    qApp->removeTranslator(&translator);
+
+    return 0;
+}
+
