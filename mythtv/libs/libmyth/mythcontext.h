@@ -70,9 +70,9 @@ class MythContext : public QObject
 
     void SetSetting(const QString &key, const QString &newValue);
 
-    int GetBigFontSize() { return qtfontbig; }
-    int GetMediumFontSize() { return qtfontmed; }
-    int GetSmallFontSize() { return qtfontsmall; }
+    int GetBigFontSize() { return GetNumSetting("QtFontBig", 25); }
+    int GetMediumFontSize() { return GetNumSetting("QtFontMedium", 25); }
+    int GetSmallFontSize() { return GetNumSetting("QtFontSmall", 25); }
 
     void ThemeWidget(QWidget *widget);
 
@@ -100,9 +100,6 @@ class MythContext : public QObject
 
     void SetPalette(QWidget *widget);
 
-    // font sizes
-    int qtfontbig, qtfontmed, qtfontsmall;
-
     Settings *m_settings;
     Settings *m_qtThemeSettings;
 
@@ -113,7 +110,6 @@ class MythContext : public QObject
     QPalette m_palette;
 
     int m_height, m_width;
-    float m_wmult, m_hmult;
 
     QSocket *serverSock;
     QString m_localhostname;

@@ -35,18 +35,6 @@ MythContext::MythContext(bool gui)
     LoadSettingsFiles("mysql.txt");
     LoadSettingsFiles("theme.txt");
 
-    qtfontbig = GetNumSetting("QtFontBig");
-    if (qtfontbig <= 0)
-        qtfontbig = 25;
-
-    qtfontmed = GetNumSetting("QtFontMedium");
-    if (qtfontmed <= 0)
-        qtfontmed = 25;
-
-    qtfontsmall = GetNumSetting("QtFontSmall");
-    if (qtfontsmall <= 0)
-        qtfontsmall = 25;
-
     if (gui)
     {
         m_height = QApplication::desktop()->height();
@@ -61,9 +49,6 @@ MythContext::MythContext(bool gui)
         m_width = GetNumSetting("GuiWidth");
     if (GetNumSetting("GuiHeight") > 0)
         m_height = GetNumSetting("GuiHeight");
-
-    m_wmult = m_width / 800.0;
-    m_hmult = m_height / 600.0;
 
     serverSock = NULL;
     expectingReply = false;
@@ -179,11 +164,11 @@ void MythContext::LoadQtConfig(void)
 void MythContext::GetScreenSettings(int &width, float &wmult, 
                                     int &height, float &hmult)
 {
-    height = m_height;
-    width = m_width;
+    height = GetNumSetting("GuiHeight", m_height);
+    width = GetNumSetting("GuiWidth", m_width);
 
-    wmult = m_wmult;
-    hmult = m_hmult;
+    wmult = width / 800.0;
+    hmult = height / 600.0;
 }
 
 QString MythContext::FindThemeDir(QString themename)
@@ -433,7 +418,12 @@ QPixmap *MythContext::LoadScalePixmap(QString filename)
 {               
     QPixmap *ret = new QPixmap();
 
-    if (m_width != 800 || m_height != 600)
+    int width, height;
+    float wmult, hmult;
+
+    GetScreenSettings(width, wmult, height, hmult);
+
+    if (width != 800 || height != 600)
     {           
         QImage tmpimage;
 
@@ -443,8 +433,8 @@ QPixmap *MythContext::LoadScalePixmap(QString filename)
             delete ret;
             return NULL;
         }
-        QImage tmp2 = tmpimage.smoothScale((int)(tmpimage.width() * m_wmult),
-                                           (int)(tmpimage.height() * m_hmult));
+        QImage tmp2 = tmpimage.smoothScale((int)(tmpimage.width() * wmult),
+                                           (int)(tmpimage.height() * hmult));
         ret->convertFromImage(tmp2);
     }       
     else
