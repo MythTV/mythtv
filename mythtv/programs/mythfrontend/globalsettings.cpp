@@ -358,6 +358,16 @@ public:
     };
 };
 
+class TimeOffset: public SpinBoxSetting, public GlobalSetting {
+public:
+    TimeOffset():
+        SpinBoxSetting(-12, 12, 1),
+        GlobalSetting("TimeOffset") {
+        setLabel("Time offset for XMLTV listings");
+        setValue(0);
+    };
+};
+
 // Theme settings
 
 class GuiWidth: public SpinBoxSetting, public GlobalSetting {
@@ -387,18 +397,18 @@ public:
     };
 };
 
-class DateFormat: public LineEditSetting, public GlobalSetting {
+class MythDateFormat: public LineEditSetting, public GlobalSetting {
 public:
-    DateFormat():
+    MythDateFormat():
         GlobalSetting("DateFormat") {
         setLabel("Date format");
         setValue("ddd MMMM d");
     };
 };
 
-class TimeFormat: public LineEditSetting, public GlobalSetting {
+class MythTimeFormat: public LineEditSetting, public GlobalSetting {
 public:
-    TimeFormat():
+    MythTimeFormat():
         GlobalSetting("TimeFormat") {
         setLabel("Time format");
         setValue("h:mm AP");
@@ -704,6 +714,7 @@ GeneralSettings::GeneralSettings(MythContext *context)
     general->addChild(new TVFormat());
     general->addChild(new FreqTable());
     general->addChild(new RecordOverTime());
+    general->addChild(new TimeOffset());
     addChild(general);
 
     VerticalConfigurationGroup* general2 = new VerticalConfigurationGroup(false);
@@ -764,8 +775,8 @@ ThemeSettings::ThemeSettings(MythContext *context)
     theme->addChild(new GuiWidth());
     theme->addChild(new GuiHeight());
     theme->addChild(new ThemeQt());
-    theme->addChild(new DateFormat());
-    theme->addChild(new TimeFormat());
+    theme->addChild(new MythDateFormat());
+    theme->addChild(new MythTimeFormat());
 
     addChild(theme);
 }
