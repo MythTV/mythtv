@@ -20,7 +20,7 @@
 #include "rtp.h"
 
 extern "C" {
-#include "libavcodec/avcodec.h"
+#include "mythtv/ffmpeg/avcodec.h"
 }
 
 
