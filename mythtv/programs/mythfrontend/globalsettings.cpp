@@ -594,7 +594,7 @@ public:
 class altEPGChanDisplay: public SpinBoxSetting, public GlobalSetting {
 public:
     altEPGChanDisplay():
-        SpinBoxSetting(3, 9, 1), GlobalSetting("chanPerPage") {
+        SpinBoxSetting(3, 8, 1), GlobalSetting("chanPerPage") {
         setLabel("Channels to Display (in Alternate EPG)");
 	setValue(8);
 	
