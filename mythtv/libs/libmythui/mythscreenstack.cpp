@@ -3,7 +3,9 @@
 #include "mythscreentype.h"
 #include "mythpainter.h"
 
+#include <iostream>
 #include <cassert>
+using namespace std;
 
 #include <qobjectlist.h>
 #include <qapplication.h>

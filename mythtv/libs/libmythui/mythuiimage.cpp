@@ -1,3 +1,6 @@
+#include <iostream>
+using namespace std;
+
 #include "mythuiimage.h"
 #include "mythpainter.h"
 #include "mythmainwindow.h"

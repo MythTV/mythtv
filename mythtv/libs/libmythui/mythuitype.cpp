@@ -305,7 +305,6 @@ int MythUIType::GetAlpha(void)
 
 bool MythUIType::keyPressEvent(QKeyEvent *)
 {
-    // cout << "keyPress happening in something called \"" << name() << "\"" << endl;
     return false;
 }
 

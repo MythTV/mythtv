@@ -14,7 +14,7 @@ HEADERS += mythpainter_ogl.h mythpainter_qt.h
 HEADERS += mythscreenstack.h mythscreentype.h mythuitype.h mythuiimage.h 
 HEADERS += mythuitext.h mythuianimatedimage.h mythlistbutton.h
 HEADERS += oldsettings.h remotefile.h util.h themedmenu.h
-HEADERS += dialogbox.h
+HEADERS += dialogbox.h myththemeddialog.h mythxmlparser.h mythcontainer.h
 
 SOURCES  = mythmainwindow.cpp mythpainter.cpp mythimage.cpp
 SOURCES += mythpainter_ogl.cpp mythpainter_qt.cpp
@@ -23,7 +23,7 @@ SOURCES += mythuitype.cpp mythuiimage.cpp mythuitext.cpp mythuianimatedimage.cpp
 SOURCES += mythlistbutton.cpp
 SOURCES += oldsettings.cpp remotefile.cpp themedmenu.cpp 
 SOURCES += util.cpp
-SOURCES += dialogbox.cpp
+SOURCES += dialogbox.cpp myththemeddialog.cpp mythxmlparser.cpp mythcontainer.cpp
 
 inc.path = $${PREFIX}/include/mythui/
 
@@ -32,7 +32,7 @@ inc.files += mythpainter_ogl.h mythpainter_qt.h
 inc.files += mythscreenstack.h mythscreentype.h mythuitype.h mythuiimage.h 
 inc.files += mythuitext.h mythuianimatedimage.h mythlistbutton.h
 inc.files += oldsettings.h remotefile.h util.h themedmenu.h
-inc.files += dialogbox.h mythfontproperties.h
+inc.files += dialogbox.h mythfontproperties.h myththemeddialog.h
 
 INSTALLS += inc
 

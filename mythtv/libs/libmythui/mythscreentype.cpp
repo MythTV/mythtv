@@ -1,5 +1,8 @@
 #include <cassert>
+#include <iostream>
+using namespace std;
 
+#include "mythcontext.h"
 #include "mythscreentype.h"
 #include "mythscreenstack.h"
 
@@ -15,6 +18,15 @@ MythScreenType::MythScreenType(MythScreenStack *parent, const char *name,
     m_ScreenStack = parent;
 
     m_IsDeleting = false;
+
+    //
+    //  Set the GUI size and multiples from the current settings in the
+    //  database.
+    //
+
+    gContext->GetScreenSettings(xbase, screenwidth, wmult,
+                                ybase, screenheight, hmult);
+
 }
 
 MythScreenType::~MythScreenType()

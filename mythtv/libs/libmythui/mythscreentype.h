@@ -13,7 +13,7 @@ class MythScreenType : public MythUIType
   public:
     MythScreenType(MythScreenStack *parent, const char *name, 
                    bool fullscreen = true);
-   ~MythScreenType();
+    virtual ~MythScreenType();
 
     // if the widget is full screen and obscures widgets below it
     bool IsFullscreen(void);
@@ -40,6 +40,11 @@ class MythScreenType : public MythUIType
     QPtrList<MythUIType> m_FocusWidgetList;
 
     MythScreenStack *m_ScreenStack;
+    
+    float wmult, hmult;
+    int screenwidth, screenheight;
+    int xbase, ybase;
+    
 };
 
 #endif
