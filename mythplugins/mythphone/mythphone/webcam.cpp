@@ -36,6 +36,7 @@ Webcam::Webcam(QObject *parent, const char *name)
   imageLen = 0;
   frameSize = 0;
   fps = 5;
+  killWebcamThread = true; // Leave true whilst its not running
 
   vCaps.name[0] = 0;
   vCaps.maxwidth = 0;
@@ -405,8 +406,11 @@ void Webcam::StartThread()
 
 void Webcam::KillThread()
 {
-    killWebcamThread = true;
-    pthread_join(webcamthread, NULL);
+    if (!killWebcamThread) // Is the thread even running?
+    {
+        killWebcamThread = true;
+        pthread_join(webcamthread, NULL);
+    }
 }
 
 void *Webcam::WebcamThread(void *p)
