@@ -222,8 +222,32 @@ bool Transcoder::isFileInUse(ProgramInfo *pginfo)
 
 void Transcoder::EnqueueTranscode(ProgramInfo *pinfo)
 {
-    ProgramInfo *pinfo_copy = new ProgramInfo(*pinfo);
+    QString query = QString("SELECT * FROM transcoding "
+                            "WHERE chanid = '%1' AND starttime = '%2';")
+                            .arg(pinfo->chanid)
+                            .arg(pinfo->startts.toString("yyyyMMddhhmmss"));
+
+    QSqlQuery result = db_conn->exec(query);
+    if (result.isActive() && result.numRowsAffected() > 0)
+        return;
+
     pthread_mutex_lock(&transqlock);
+    if (!TranscodeQueue.isEmpty())
+    {
+        for (ProgramInfo *pg_iter = TranscodeQueue.first(); pg_iter;
+             pg_iter = TranscodeQueue.next())
+        {
+            if (pg_iter->chanid == pinfo->chanid &&
+                pg_iter->startts == pinfo->startts)
+            {
+                pthread_mutex_unlock(&transqlock);
+                return;
+            }
+        }
+    }
+    // only transcode if this program is not already transcoding
+      
+    ProgramInfo *pinfo_copy = new ProgramInfo(*pinfo);
     TranscodeQueue.append(pinfo_copy);
     pthread_mutex_unlock(&transqlock);
 }

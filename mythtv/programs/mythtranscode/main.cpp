@@ -183,7 +183,7 @@ int main(int argc, char *argv[])
     if (result == REENCODE_OK)
     {
         if (use_db)
-            StoreTranscodeState(pginfo, 0);
+            StoreTranscodeState(pginfo, 2);
         cout << "Transcoding " << infile << " done\n";
         retval = 0;
     } 

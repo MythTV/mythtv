@@ -213,6 +213,10 @@ void MainServer::ProcessRequest(QStringList &listline, QStringList &tokens,
     {
         HandleQueryCheckFile(listline, pbs);
     }
+    else if (command == "QUEUE_TRANSCODE")
+    {
+        HandleQueueTranscode(listline, pbs);
+    }
     else if (command == "DELETE_RECORDING")
     {
         HandleDeleteRecording(listline, pbs);
@@ -620,6 +624,23 @@ void MainServer::HandleFillProgramInfo(QStringList &slist, PlaybackSock *pbs)
     delete pginfo;
 
     WriteStringList(pbs->getSocket(), strlist);
+}
+
+void MainServer::HandleQueueTranscode(QStringList &slist, PlaybackSock *pbs)
+{
+    ProgramInfo *pginfo = new ProgramInfo();
+    pginfo->FromStringList(slist, 1);
+
+    QString message = QString("LOCAL_READY_TO_TRANSCODE %1 %2")
+                            .arg(pginfo->chanid)
+                            .arg(pginfo->startts.toString(Qt::ISODate));
+    MythEvent me(message);
+    gContext->dispatch(me);
+
+    QStringList outputlist = "0";
+    WriteStringList(pbs->getSocket(), outputlist);
+    delete pginfo;
+    return;
 }
 
 struct DeleteStruct

@@ -97,7 +97,6 @@ class NuppelVideoPlayer
     void SetLength(int len) { totalLength = len; }
     int GetLength(void) { return totalLength; }
 
-    void QueueTranscode(void);
     int ReencodeFile(char *inputname, char *outputname,
                      RecordingProfile &profile, bool honorCutList = false,
                      bool forceKeyFrames = false);

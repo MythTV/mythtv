@@ -2533,15 +2533,6 @@ class AudioReencodeBuffer : public AudioOutput
     long long last_audiotime;
 };
 
-void NuppelVideoPlayer::QueueTranscode(void)
-{
-    QString message = QString("LOCAL_READY_TO_TRANSCODE %1 %2")
-                            .arg(m_playbackinfo->chanid)
-                            .arg(m_playbackinfo->startts.toString(Qt::ISODate));
-    MythEvent me(message);
-    gContext->dispatch(me);
-}
-
 int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
                                     RecordingProfile &profile,
                                     bool honorCutList, bool forceKeyFrames)

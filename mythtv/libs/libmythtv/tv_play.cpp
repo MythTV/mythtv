@@ -1398,9 +1398,17 @@ void TV::DoJumpBack(void)
 void TV::DoQueueTranscode(void)
 {
      if (internalState == kState_WatchingPreRecorded &&
-         gContext->GetNumSetting("MaxTranscoders", 0) > 0)
+         gContext->GetNumSetting("MaxTranscoders", 0) > 0 &&
+         gContext->GetNumSetting("TranscoderUseCutlist", 0) > 0)
      {
-         activenvp->QueueTranscode();
+         RemoteQueueTranscode(playbackinfo);
+         if (activenvp == nvp)
+         {
+             QString dummy = "";
+             QString desc = "";
+             int pos = calcSliderPos(0, dummy);
+             osd->StartPause(pos, false, tr("Transcode"), desc, 3);
+         }
      }
 }
 
