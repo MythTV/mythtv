@@ -781,6 +781,10 @@ void XMLParse::parseContainer(QDomElement &element, QString &newname, int &conte
             {
                 parseTextButton(container, info);
             }
+            else if (info.tagName() == "blackhole")
+            {
+                parseBlackHole(container, info);
+            }
             else if (info.tagName() == "area")
             {
                 area = parseRect(getFirstText(info));
@@ -1338,6 +1342,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
     QRect area;
     QRect binarea;
     int bins = 1;
+    int context = -1;
 
     QPixmap uparrow_img;
     QPixmap downarrow_img;
@@ -1410,6 +1415,11 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                 {
                     cerr << "Image needs a filename\n";
                     exit(0);
+                }
+    
+                if(info.tagName() == "context")
+                {
+                    context = getFirstText(info).toInt();
                 }
 
                 if (imgname.lower() == "selectionbar")
@@ -1588,6 +1598,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
     mtl->setBinAreas(bin_corners);
     mtl->SetOrder(order.toInt());
     mtl->SetParent(container);
+    mtl->SetContext(context);
 
     //
     //  Perform moegreen/jdanner font magic
@@ -1879,5 +1890,43 @@ void XMLParse::parseTextButton(LayerSet *container, QDomElement &element)
     tbt->SetParent(container);
     tbt->calculateScreenArea();
     container->AddType(tbt);
+}
+
+void XMLParse::parseBlackHole(LayerSet *container, QDomElement &element)
+{
+    QRect area;
+
+    QString name = element.attribute("name", "");
+    if (name.isNull() || name.isEmpty())
+    {
+        cerr << "BlackHole needs a name\n";
+        exit(0);
+    }
+
+    for (QDomNode child = element.firstChild(); !child.isNull();
+         child = child.nextSibling())
+    {
+        QDomElement info = child.toElement();
+        if (!info.isNull())
+        {
+            if (info.tagName() == "area")
+            {
+                area = parseRect(getFirstText(info));
+                normalizeRect(area);
+            }
+            else
+            {
+                cerr << "Unknown: " << info.tagName() << " in Black Hole\n";
+                exit(0);
+            }
+        }
+    }
+
+
+    UIBlackHoleType *bh = new UIBlackHoleType(name);
+    bh->setArea(area);
+    bh->SetParent(container);
+    bh->calculateScreenArea();
+    container->AddType(bh);
 }
 

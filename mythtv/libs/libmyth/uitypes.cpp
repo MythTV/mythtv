@@ -1286,28 +1286,31 @@ void UIImageType::LoadImage()
 
 void UIImageType::Draw(QPainter *dr, int drawlayer, int context)
 {
-  if (m_context == context || m_context == -1)
-    if (drawlayer == m_order)
+    if (m_context == context || m_context == -1)
     {
-      if (!img.isNull() && m_show == true)
-      {
-        if (m_debug == true)
+        if (drawlayer == m_order)
         {
-            cerr << "   +UIImageType::Draw() <- inside Layer\n";
-            cerr << "       -Drawing @ (" << m_displaypos.x() << ", " << m_displaypos.y() << ")" << endl;
-            cerr << "       -Skip Section: (" << m_drop_x << ", " << m_drop_y << ")\n";
+            if (!img.isNull() && m_show == true)
+            {
+                if (m_debug == true)
+                {
+                    cerr << "   +UIImageType::Draw() <- inside Layer\n";
+                    cerr << "       -Drawing @ (" << m_displaypos.x() << ", " << m_displaypos.y() << ")" << endl;
+                    cerr << "       -Skip Section: (" << m_drop_x << ", " << m_drop_y << ")\n";
+                }
+                dr->drawPixmap(m_displaypos.x(), m_displaypos.y(), img, m_drop_x, m_drop_y);
+            }
+            else if (m_debug == true)
+            {
+                cerr << "   +UIImageType::Draw() <= Image is null\n";
+            }
         }
-        dr->drawPixmap(m_displaypos.x(), m_displaypos.y(), img, m_drop_x, m_drop_y);
-      } else if (m_debug == true)
-            cerr << "   +UIImageType::Draw() <= Image is null\n";
-      
     }
-    else
-        if (m_debug == true)
-        {
+    else if (m_debug == true)
+    {
             cerr << "   +UIImageType::Draw() <- outside (layer = " << drawlayer
                  << ", widget layer = " << m_order << "\n";
-        }
+    }
 }
 
 // ******************************************************************
@@ -2023,6 +2026,7 @@ UIManagedTreeListType::UIManagedTreeListType(const QString & name)
     bins = 0;
     bin_corners.clear();
     screen_corners.clear();
+    route_to_active.clear();
     my_tree_data = NULL;
     current_node = NULL;
     active_node = NULL;
@@ -2030,6 +2034,7 @@ UIManagedTreeListType::UIManagedTreeListType(const QString & name)
     active_bin = 0;
     tree_order = -1;
     visual_order = -1;
+    show_whole_tree = false;
 }
 
 UIManagedTreeListType::~UIManagedTreeListType()
@@ -2072,7 +2077,16 @@ void UIManagedTreeListType::drawText(QPainter *p,
 
 void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
 {
-    context = context;  // Would we ever want to use that?
+
+    //  Do nothing if context is wrong;
+
+    if(m_context != context)
+    {
+        if(m_context != -1)
+        {
+            return;
+        }
+    }
 
     if(drawlayer != m_order)
     {
@@ -2094,8 +2108,21 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
     //  and/or down to tell us what to draw in each bin.
     //
 
+    int starting_bin = 0;
+    int ending_bin = 0;
+    
+    if(show_whole_tree)
+    {
+        starting_bin = bins;
+        ending_bin = 0;
+    }
+    else
+    {
+        starting_bin = bins;
+        ending_bin = bins - 1;
+    }
 
-    for(int i = bins; i > 0; --i)
+    for(int i = starting_bin; i > ending_bin; --i)
     {
         GenericTree *hotspot_node = current_node;
 
@@ -2403,6 +2430,63 @@ void UIManagedTreeListType::moveToNode(QValueList<int> route_of_branches)
     }
     active_node = current_node;
     emit nodeSelected(current_node->getInt(), current_node->getAttributes());
+}
+
+void UIManagedTreeListType::moveToNodesFirstChild(QValueList<int> route_of_branches)
+{
+    GenericTree *finder = my_tree_data->findNode(route_of_branches);
+
+    if(finder)
+    {
+        if(finder->childCount() > 0)
+        {
+            current_node = finder->getChildAt(0, tree_order);
+        }
+        else
+        {
+            current_node = finder;
+        }    
+    }
+    else
+    {
+        current_node = my_tree_data->findLeaf();
+    }
+
+    active_node = current_node;
+    emit nodeSelected(current_node->getInt(), current_node->getAttributes());
+}
+
+QValueList <int> * UIManagedTreeListType::getRouteToActive()
+{
+    if(active_node)
+    {
+        route_to_active.clear();
+        GenericTree *climber = active_node;
+        
+        route_to_active.push_front(climber->getInt());
+        while( (climber = climber->getParent()) )
+        {
+            route_to_active.push_front(climber->getInt());
+        }
+        return &route_to_active;   
+    }
+    return NULL;    
+    return &route_to_active;
+}
+
+bool UIManagedTreeListType::tryToSetActive(QValueList <int> route)
+{
+    if(&route)
+    {
+        GenericTree *a_node = my_tree_data->findNode(route);
+        if(a_node)
+        {
+            active_node = a_node;
+            current_node = a_node;
+            return true;
+        }
+    }
+    return false;
 }
 
 void UIManagedTreeListType::assignTreeData(GenericTree *a_tree)
@@ -2874,5 +2958,20 @@ void UITextButtonType::calculateScreenArea()
     }
     
     screen_area = QRect(x, y, width, height);
+}
+
+// ********************************************************************
+
+UIBlackHoleType::UIBlackHoleType(const QString &name)
+                     : UIType(name)
+{
+}
+
+void UIBlackHoleType::calculateScreenArea()
+{
+    QRect r = area;
+    r.moveBy(m_parent->GetAreaRect().left(),
+             m_parent->GetAreaRect().top());
+    screen_area = r;
 }
 

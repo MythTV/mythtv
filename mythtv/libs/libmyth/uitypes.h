@@ -86,6 +86,7 @@ class UIType : public QObject
     int     getOrder(){return m_order;}
     virtual void Draw(QPainter *, int, int);
     virtual void calculateScreenArea();
+    QRect   getScreenArea(){return screen_area;}
 
     
   public slots:
@@ -472,7 +473,6 @@ class GenericTree
     
   private:
 
-
     QString               my_string;
     QStringList           my_stringlist;
     int                   my_int;
@@ -512,6 +512,9 @@ class UIManagedTreeListType : public UIType
     void    Draw(QPainter *, int drawlayer, int context);
     void    assignTreeData(GenericTree *a_tree);
     void    moveToNode(QValueList<int> route_of_branches);
+    void    moveToNodesFirstChild(QValueList<int> route_of_ranchs);
+    QValueList <int> * getRouteToActive();
+    bool    tryToSetActive(QValueList <int> route);
     void    setHighlightImage(QPixmap an_image){highlight_image = an_image;}
     void    setArrowImages(QPixmap up, QPixmap down, QPixmap left, QPixmap right)
                           {
@@ -531,6 +534,7 @@ class UIManagedTreeListType : public UIType
     void    calculateScreenArea();
     void    setTreeOrdering(int an_int){tree_order = an_int;}
     void    setVisualOrdering(int an_int){visual_order = an_int;}    
+    void    showWholeTree(bool yes_or_no){ show_whole_tree = yes_or_no; }
 
   public slots:
 
@@ -573,7 +577,8 @@ class UIManagedTreeListType : public UIType
     QPixmap                 right_arrow_image;
     QPtrList<QPixmap>       resized_highlight_images;
     QMap<int, QPixmap*>     highlight_map;
-
+    QValueList <int>        route_to_active;
+    bool                    show_whole_tree;
 };
 
 class UIPushButtonType : public UIType
@@ -645,5 +650,26 @@ class UITextButtonType : public UIType
     QTimer   push_timer;
     
 };
+
+class UIBlackHoleType : public UIType
+{
+    //
+    //  This just holds a blank area of the screen
+    //  originally designed to "hold" the place where
+    //  visualizers go in mythmusic playback
+    //
+
+  public:
+      
+    UIBlackHoleType(const QString &name);
+    void calculateScreenArea();
+    void setArea(QRect an_area) { area = an_area; }
+    virtual void Draw(QPainter *, int, int){}
+
+  private:
+  
+    QRect area;
+};
+ 
 
 #endif

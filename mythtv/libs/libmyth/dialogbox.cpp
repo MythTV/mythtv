@@ -68,7 +68,7 @@ MythThemedDialog::MythThemedDialog(QString window_name,
                 : MythDialog(parent, name)
 {
     setWFlags(Qt::WRepaintNoErase); //  widgets draw themselves completely
-    context = 0;
+    context = -1;
     my_containers.clear();
     widget_with_current_focus = NULL;
     focus_taking_widgets.clear();
@@ -182,8 +182,8 @@ void MythThemedDialog::parseContainer(QDomElement &element)
 
     QRect area;
     QString name;
-    int context;
-    theme->parseContainer(element, name, context, area);
+    int a_context;
+    theme->parseContainer(element, name, a_context, area);
     if(name.length() < 1)
     {
         cerr << "dialogbox.o: I told a them object to parse a container and it didn't give me a name back" << endl;
@@ -324,7 +324,7 @@ void MythThemedDialog::updateForeground(const QRect &r)
             
             for(int i = 0; i <= looper->getLayers(); i++)
             {
-                looper->Draw(&offscreen_painter, i, -1);
+                looper->Draw(&offscreen_painter, i, context);
             }
 
             //  
@@ -350,7 +350,6 @@ void MythThemedDialog::updateForeground(const QRect &r)
 
 void MythThemedDialog::paintEvent(QPaintEvent *e)
 {
-    MythDialog::paintEvent(e);
 
     bitBlt( this, 
             e->rect().left(), e->rect().top(), 
@@ -358,6 +357,8 @@ void MythThemedDialog::paintEvent(QPaintEvent *e)
             e->rect().left(), e->rect().top(), 
             e->rect().width(), e->rect().height()
             );
+
+    MythDialog::paintEvent(e);
 }
 
 
@@ -598,6 +599,31 @@ UIRepeatedImageType* MythThemedDialog::getUIRepeatedImageType(QString name)
         {
             UIRepeatedImageType *hunted;
             if( (hunted = dynamic_cast<UIRepeatedImageType*>(hunter)) )
+            {
+                return hunted;
+            }
+        }
+        ++an_it;
+    }
+
+    return oops;
+}
+
+UIBlackHoleType* MythThemedDialog::getUIBlackHoleType(QString name)
+{
+
+    UIBlackHoleType* oops = NULL;
+    
+    QPtrListIterator<LayerSet> an_it(my_containers);
+    LayerSet *looper;
+
+    while( (looper = an_it.current()) != 0)
+    {
+        UIType *hunter = looper->GetType(name);
+        if(hunter)
+        {
+            UIBlackHoleType *hunted;
+            if( (hunted = dynamic_cast<UIBlackHoleType*>(hunter)) )
             {
                 return hunted;
             }
