@@ -55,6 +55,7 @@ class DeleteBox : public QDialog
     QString fileprefix;
 
     float wmult, hmult;
+    int descwidth;
 
     void killPlayer(void);
     void startPlayer(ProgramInfo *rec);

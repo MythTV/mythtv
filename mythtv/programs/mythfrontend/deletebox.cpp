@@ -196,7 +196,11 @@ DeleteBox::DeleteBox(MythContext *context, TV *ltv, QSqlDatabase *ldb,
 
     nvp = NULL;
     timer = new QTimer(this);
-   
+
+    qApp->processEvents();
+    descwidth = screenwidth - desclabel->width() - pixlabel->width() -
+                4 * (int)(10 * wmult);
+
     if (item)
     { 
         listview->setCurrentItem(item);
@@ -328,11 +332,8 @@ void DeleteBox::changed(QListViewItem *lvitem)
     else
         description->setText("");
 
-    int width = date->width();
-    if (width < (int)(350 * wmult))
-        width = (int)(350 * wmult);
-
-    description->setMinimumWidth(width);
+    subtitle->setMinimumWidth(descwidth);
+    description->setMinimumWidth(descwidth);
     description->setMaximumHeight((int)(80 * hmult));
 
     QPixmap *pix = pgitem->getPixmap();      
