@@ -234,7 +234,12 @@ bool VideoOutputVIA::Init(int width, int height, float aspect,
     data->subp_buffer = new unsigned char[1920 * 1080];
     memset(data->subp_buffer, 0, 1920 * 1080);
    
-    VIADriverProc(CREATEDRIVER, NULL);
+    if (VIADriverProc(CREATEDRIVER, NULL))
+    {
+        cerr << "Unable to initialize VIA CLE266 HW Driver, "
+		"please check your installation.\n";
+	exit(1);
+    }
 
     if (!CreateViaBuffers())
         return false;
@@ -275,9 +280,10 @@ bool VideoOutputVIA::CreateViaBuffers(void)
                                            (off_t)data->ddLock.dwPhysicalBase);
         if (data->lpSubSurface == MAP_FAILED)
         {
-            perror("mmap");
+            perror("MMAP ViaSlice Surface failed");
             cerr << "Couldn't map overlay surface\n";
-            data->lpSubSurface = NULL;
+            cerr << "You should run MythTV as root when using ViaSlice\n";
+            exit(1);
         }
 
         data->lpSubSurface += data->ddLock.SubDev.dwSUBPhysicalAddr[0];
@@ -298,22 +304,27 @@ bool VideoOutputVIA::CreateViaBuffers(void)
         VIASUBPicture(&data->VIASubPict);
     }
     else
+    {
+        perror("Open /dev/mem failed");
         cerr << "Couldn't open /dev/mem to map overlay surface\n";
+        cerr << "You should run MythTV as root when using ViaSlice\n";
+        exit(1);
+    }
      
     for (int i = 0; i < 4; i++)
     {
-         data->decode_buffers[i].image_number = i;
-	 data->decode_buffers[i].slice_data = NULL;
-	 data->decode_buffers[i].slice_datalen = 0;
-         data->decode_buffers[i].lastcode = 0;
-         data->decode_buffers[i].slicecount = 1;
+        data->decode_buffers[i].image_number = i;
+        data->decode_buffers[i].slice_data = NULL;
+        data->decode_buffers[i].slice_datalen = 0;
+        data->decode_buffers[i].lastcode = 0;
+        data->decode_buffers[i].slicecount = 1;
 
-	 vbuffers[i].buf = (unsigned char *)&(data->decode_buffers[i]);
-	 vbuffers[i].height = XJ_height;
-	 vbuffers[i].width = XJ_width;
-	 vbuffers[i].bpp = -1;
-	 vbuffers[i].size = sizeof(via_slice_state_t);
-	 vbuffers[i].codec = FMT_VIA_HWSLICE;
+        vbuffers[i].buf = (unsigned char *)&(data->decode_buffers[i]);
+        vbuffers[i].height = XJ_height;
+        vbuffers[i].width = XJ_width;
+        vbuffers[i].bpp = -1;
+        vbuffers[i].size = sizeof(via_slice_state_t);
+        vbuffers[i].codec = FMT_VIA_HWSLICE;
     }
 
     return true;
@@ -461,10 +472,10 @@ void VideoOutputVIA::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
 void VideoOutputVIA::DrawUnusedRects(void)
 {
     XSetForeground(data->XJ_disp, data->XJ_gc, XJ_black);
-    XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, dispx, dispy, 
-                   dispw, dispyoff);
-    XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, dispx,
-                   dispyoff + disphoff, dispw, dispyoff);
+
+    // Clear all background, so that the guide also get's nice video.
+    XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc,
+		   dispx, dispy, dispw, disph);
 
     data->ddUpdateOverlay.rDest.left = dispxoff;
     data->ddUpdateOverlay.rDest.top = dispyoff;
@@ -476,7 +487,7 @@ void VideoOutputVIA::DrawUnusedRects(void)
     data->ddUpdateOverlay.rSrc.right = imgx + imgw;
     data->ddUpdateOverlay.rSrc.bottom = imgy + imgh;
 
-    data->ddUpdateOverlay.dwFlags = DDOVER_SHOW;
+    data->ddUpdateOverlay.dwFlags = DDOVER_SHOW | DDOVER_KEYDEST;
 
     VIADriverProc(UPDATEOVERLAY, &data->ddUpdateOverlay);
 

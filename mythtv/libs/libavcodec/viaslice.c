@@ -74,7 +74,7 @@ int VIA_field_start(MpegEncContext*s, AVCodecContext *avctx)
     VIAMPGSurface.dwConcealMV = s->concealment_motion_vectors;
 
     // XXX: not sure on this
-    VIAMPGSurface.dwSecondField = s->first_field;
+    VIAMPGSurface.dwSecondField = s->first_field?0:1;
 
     // FIXME: fill in from last, next picture_ptr
     VIAMPGSurface.dwOldRefFrame = 0;
@@ -98,6 +98,9 @@ int VIA_field_start(MpegEncContext*s, AVCodecContext *avctx)
     VIAMPGSurface.FHMVRange = s->mpeg_f_code[0][0] - 1;
     VIAMPGSurface.BVMVRange = s->mpeg_f_code[1][1] - 1;
     VIAMPGSurface.BHMVRange = s->mpeg_f_code[1][0] - 1;
+
+    VIAMPGSurface.dwMPEGProgressiveMode = s->progressive_sequence?
+                                          VIA_PROGRESSIVE:VIA_NON_PROGRESSIVE;
 
     VIABeginPicture(&VIAMPGSurface);
 

@@ -33,7 +33,7 @@ class MythSqlDatabase
             return;
         }
 
-        m_dblock = new QMutex();
+        m_dblock = new QMutex(true);
     }
 
    ~MythSqlDatabase()

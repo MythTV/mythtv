@@ -814,10 +814,10 @@ class ExperimentalSync: public CheckBoxSetting, public GlobalSetting {
 public:
     ExperimentalSync():
         GlobalSetting("ExperimentalAVSync") {
-        setLabel(QObject::tr("Experimental A/V Sync"));
+        setLabel(QObject::tr("Video card A/V Sync"));
         setValue(false);
-        setHelpText(QObject::tr("If this is set, more experimental code will "
-                    "be in charge of video output. Use at your own risk."));
+        setHelpText(QObject::tr("Use video card for frame timing (nVidia or "
+                                "OpenGL)."));
     };
 };
 

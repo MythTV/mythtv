@@ -1445,6 +1445,13 @@ void parseFile(QString filename, QValueList<ChanInfo> *chanlist,
                     if (!pginfo->desc.isEmpty())
                         groupingDesc = pginfo->desc + " : ";
                 }
+                else if (pginfo->startts > pginfo->endts)
+                {
+                    cerr << "invalid program (start > end): "
+                         << pginfo->channel << " "
+                         << pginfo->title.local8Bit() << " "
+                         << pginfo->startts << "-" << pginfo->endts << endl;
+                }
                 else
                 {
                     if (pginfo->clumpidx.isEmpty())

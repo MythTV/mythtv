@@ -267,7 +267,7 @@ bool OSDListTreeType::HandleKeypress(QKeyEvent *e)
                     emit itemSelected(this, currentpos);
                 }
             }
-            else if (action == "ESCAPE")
+            else if (action == "ESCAPE" || action == "MENU")
                 m_visible = false;
             else if (action == "SELECT")
                 emit itemSelected(this, currentpos);
@@ -552,8 +552,12 @@ void OSDListBtnType::MoveUp()
         return;
 
     OSDListBtnTypeItem *item = m_itemList.prev();
-    if (!item) 
-        return;
+    if (!item)
+    {
+        item = m_itemList.last();
+        if (!item)
+            return;
+    }
 
     m_selItem = item;
 
@@ -577,9 +581,14 @@ void OSDListBtnType::MoveDown()
 {
     if (m_itemList.find(m_selItem) == -1)
         return;
+
     OSDListBtnTypeItem *item = m_itemList.next();
-    if (!item) 
-        return;
+    if (!item)
+    {
+        item = m_itemList.first();
+        if (!item)
+            return;
+    }
 
     m_selItem = item;
 

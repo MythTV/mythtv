@@ -23,9 +23,9 @@ FIFOWriter::FIFOWriter(int count, bool sync)
     maxblksize = new long[count];
     killwr = new int[count];
     fbcount = new int[count];
-    fifo_buf = new (struct fifo_buf *)[count];
-    fb_inptr = new (struct fifo_buf *)[count];
-    fb_outptr = new (struct fifo_buf *)[count];
+    fifo_buf = new struct fifo_buf *[count];
+    fb_inptr = new struct fifo_buf *[count];
+    fb_outptr = new struct fifo_buf *[count];
     fifothrds = new pthread_t[count];
     fifo_lock = new pthread_mutex_t [count];
     empty_cond = new pthread_cond_t[count];

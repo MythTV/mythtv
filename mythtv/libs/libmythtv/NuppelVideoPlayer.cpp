@@ -1378,7 +1378,7 @@ void NuppelVideoPlayer::InitExAVSync(void)
 {
     QString timing_type = "next trigger";
 
-    if (reducejitter && !disablevideo)
+    if (!disablevideo)
     {
         int ret = vsync_init();
 
@@ -1460,7 +1460,13 @@ void NuppelVideoPlayer::ExAVSync(void)
             videoOutput->Show(m_scan);
 
             // reset the clock if delay and refresh are too close
+            // at either end
             if (delay > -1000 && !lastsync)
+            {
+                nexttrigger.tv_usec -= 2000;
+                NormalizeTimeval(&nexttrigger);
+            }
+            else if (delay < -(frame_interval/2)) 
             {
                 nexttrigger.tv_usec += 2000;
                 NormalizeTimeval(&nexttrigger);

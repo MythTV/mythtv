@@ -403,6 +403,16 @@ bool Channel::SetChannelByString(const QString &chan)
 
     SetFormat(tvformat);
 
+    curchannelname = chan;
+
+    pParent->SetVideoFiltersForChannel(this, chan);
+    SetContrast();
+    SetColour();
+    SetBrightness();
+    SetHue();
+
+    inputChannel[currentcapchannel] = curchannelname;
+
     // Tune
     if (externalChanger[currentcapchannel].isEmpty())
     {
@@ -420,16 +430,6 @@ bool Channel::SetChannelByString(const QString &chan)
     }
     else if (!ChangeExternalChannel(freqid))
         return false;
-
-    curchannelname = chan;
-
-    pParent->SetVideoFiltersForChannel(this, chan);
-    SetContrast();
-    SetColour();
-    SetBrightness();
-    SetHue();
-
-    inputChannel[currentcapchannel] = curchannelname;
 
     return true;
 }
