@@ -1,5 +1,6 @@
-# To build this stuff, you need the linuxdoc tools.  On Debian, this
-# means: linuxdoc-tools linuxdoc-tools-text
+# To build this stuff, you need the linuxdoc tools and htmldoc.  On Debian,
+# this means: linuxdoc-tools linuxdoc-tools-text htmldoc
+#
 #  - mdz
 
 TARGETS = mythtv-HOWTO.txt mythtv-HOWTO.html mythtv-HOWTO-singlehtml.html mythtv-HOWTO.pdf index.html
@@ -16,8 +17,13 @@ validate: mythtv-HOWTO.sgml
 %.txt: %.sgml
 	linuxdoc -B txt $<
 
-%.pdf: %.sgml
-	linuxdoc -B latex -o pdf $<
+# Generate PDF via LaTeX using linuxdoc
+#%.pdf: %.sgml
+#	linuxdoc -B latex -o pdf $<
+
+# Generate PDF via HTML using htmldoc
+%.pdf: %-singlehtml.html
+	htmldoc -f $@ $<
 
 %.html: %.sgml
 	linuxdoc -B html --split=$(LINUXDOC_HTML_SPLIT) --toc=2 $<
