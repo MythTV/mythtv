@@ -31,7 +31,7 @@ ThemeSetup::ThemeSetup(MythContext *context,  QSqlDatabase *ldb,
 
     thumbh = (screenheight - spaceh * (THUMBS_H + 1)) / THUMBS_H;
 
-    fillList("/usr/local/share/mythtv/themes");
+    fillList(PREFIX"/share/mythtv/themes");
     screenposition = 0;
     currow = 0;
     curcol = 0;
