@@ -6,6 +6,8 @@
 
 #include "streaminput.h"
 
+#include "mythtv/mythcontext.h"
+
 #include <qapplication.h>
 #include <qsocket.h>
 
@@ -100,7 +102,8 @@ void StreamInput::readyread()
     }
 
     if (line.left(5) != "*GOOD") {
-	qDebug("server error response: %s", line.local8Bit());
+	VERBOSE(VB_IMPORTANT, QString("server error response: %1")
+                                      .arg(line));
 	stage = -1;
 	return;
     }
