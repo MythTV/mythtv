@@ -668,7 +668,7 @@
         <columnpadding>10</columnpadding>
         <column number="1" width="150" context="-1"></column>
         <column number="2" width="110" context="-1"></column>
-        <column number="3" width="430" context="-1"></column>
+        <column number="3" width="420" context="-1"></column>
         <column number="4" width="20" context="-1"></column>
         <items>9</items>
         <image function="selectionbar" filename="cr-selectbar.png" location="-14,-5"></image>
@@ -694,7 +694,7 @@
       <textarea name="time" draworder="6">
         <area>160,40,420,30</area>
         <font>info</font>
-	<value>%RECSTARTDATE%, %RECSTARTTIME% - %RECENDTIME%</value>
+	<value>%TIMEDATE%</value>
       </textarea>
       <textarea name="subdescr" draworder="6">
         <area>20,70,560,140</area>
@@ -1273,7 +1273,7 @@
       <textarea name="time" draworder="6">
         <area>160,40,420,30</area>
         <font>info</font>
-	<value>%STARTDATE%, %STARTTIME% - %ENDTIME%</value>
+	<value>%TIMEDATE%</value>
       </textarea>
       <textarea name="subdescr" draworder="6">
         <area>20,70,560,180</area>
@@ -1321,7 +1321,7 @@
       <textarea name="time" draworder="6">
         <area>160,40,420,30</area>
         <font>info</font>
-	<value>%STARTDATE%, %STARTTIME% - %ENDTIME%</value>
+	<value>%TIMEDATE%</value>
       </textarea>
       <textarea name="subdescr" draworder="6">
         <area>20,70,560,180</area>
@@ -1686,7 +1686,7 @@
       <textarea name="time" draworder="6">
         <area>160,40,420,30</area>
         <font>info</font>
-	<value>%STARTDATE%, %STARTTIME% - %ENDTIME%</value>
+	<value>%TIMEDATE%</value>
       </textarea>
       <textarea name="subdescr" draworder="6">
         <area>20,70,560,90</area>
