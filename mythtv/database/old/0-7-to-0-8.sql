@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS codecparams
     profile INT UNSIGNED NOT NULL REFERENCES recordingprofiles(id),
     name VARCHAR(128) NOT NULL,
     value VARCHAR(128),
-    PRIMARY KEY (profile, type, name)
+    PRIMARY KEY (profile, name)
 );
 
 ALTER TABLE allrecord ADD COLUMN profile INT UNSIGNED NOT NULL DEFAULT 1 REFERENCES recordingprofile(id);
