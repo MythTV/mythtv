@@ -77,6 +77,7 @@ class MythEvent : public QCustomEvent
 };
 
 #define MYTH_BINARY_VERSION "0.14.20040123-1"
+#define MYTH_PROTO_VERSION "1"
 
 extern int print_verbose_messages;
 
@@ -167,6 +168,9 @@ class MythContext : public QObject
 
     void SetPluginManager(MythPluginManager *pmanager);
     MythPluginManager *getPluginManager(void);
+
+    bool CheckProtoVersion(QSocketDevice* socket);
+    bool CheckProtoVersion(QSocket* socket);
     
   private slots:
     void EventSocketRead();

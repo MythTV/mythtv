@@ -187,7 +187,16 @@ void MainServer::ProcessRequest(QSocket *sock)
     line = line.simplifyWhiteSpace();
     QStringList tokens = QStringList::split(" ", line);
     QString command = tokens[0];
-    if (command == "ANN")
+    //cerr << "command='" << command << "'\n";
+    if (command == "MYTH_PROTO_VERSION")
+    {
+        if (tokens.size() < 2)
+            VERBOSE(VB_ALL, "Bad MYTH_PROTO_VERSION command");
+        else
+            HandleVersion(sock,tokens[1]);
+        return;
+    }
+    else if (command == "ANN")
     {
         if (tokens.size() < 3 || tokens.size() > 4)
             VERBOSE(VB_ALL, "Bad ANN query");
@@ -419,6 +428,24 @@ void MainServer::customEvent(QCustomEvent *e)
     }
 }
 
+void MainServer::HandleVersion(QSocket *socket,QString version)
+{
+    QStringList retlist;
+    if (version != MYTH_PROTO_VERSION)
+    {
+        VERBOSE(VB_GENERAL,
+                "MainServer::HandleVersion - Client speaks protocol version "
+                + version + " but we speak " + MYTH_PROTO_VERSION + "!");
+        retlist << "REJECT" << MYTH_PROTO_VERSION;
+        WriteStringList(socket, retlist);
+        HandleDone(socket);
+        return;
+    }
+
+    retlist << "ACCEPT" << MYTH_PROTO_VERSION;
+    WriteStringList(socket, retlist);
+}
+
 void MainServer::HandleAnnounce(QStringList &slist, QStringList commands, 
                                 QSocket *socket)
 {
@@ -466,7 +493,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         if (iter == encoderList->end())
         {
             VERBOSE(VB_ALL, "Unknown encoder.");
-            exit(0);
+            exit(1);
         }
 
         EncoderLink *enc = iter.data();

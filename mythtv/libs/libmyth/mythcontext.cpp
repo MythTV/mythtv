@@ -276,7 +276,14 @@ bool MythContext::ConnectServer(const QString &hostname, int port)
             break;
     }
     while (cnt <= maxConnTry);
-    
+
+    if (!CheckProtoVersion(d->serverSock))
+    {
+        delete d->serverSock;
+        d->serverSock = NULL;
+        return false;
+    }
+
     QString str = QString("ANN Playback %1 %2")
                          .arg(d->m_localhostname).arg(false);
     QStringList strlist = str;
@@ -1246,8 +1253,51 @@ void MythContext::EventSocketRead(void)
     }
 }
 
+bool MythContext::CheckProtoVersion(QSocketDevice* socket)
+{
+    QStringList strlist = QString("MYTH_PROTO_VERSION %1").arg(MYTH_PROTO_VERSION);
+    WriteStringList(socket, strlist);
+    ReadStringList(socket, strlist, true);
+        
+    if (strlist[0] == "REJECT")
+    {
+        VERBOSE(VB_GENERAL, QString("Protocol version mismatch (frontend=%1,backend=%2)\n")
+                .arg(MYTH_PROTO_VERSION).arg(strlist[1]));
+
+        if (d->m_height && d->m_width)
+        {
+            qApp->lock();
+            MythPopupBox::showOkPopup(d->mainWindow, 
+                                      "Connection failure",
+                                      tr(QString("The server uses network protocol version %1,"
+                                                 "but this client only understands version %2.  "
+                                                 "Make sure you are running compatible versions of"
+                                                 "the backend and frontend")).arg(strlist[1]).arg(MYTH_PROTO_VERSION));
+            qApp->unlock();
+        }
+        return false;
+    }
+    else if (strlist[0] == "ACCEPT")
+    {
+        VERBOSE(VB_ALL, QString("Using protocol version %1").arg(MYTH_PROTO_VERSION));
+        return true;
+    }
+    else
+    {
+        VERBOSE(VB_GENERAL, QString("Unexpected response to MYTH_PROTO_VERSION: %1").arg(strlist[0]));
+        return false;
+    }
+}
+
+bool MythContext::CheckProtoVersion(QSocket* socket) {
+    return CheckProtoVersion(socket->socketDevice());
+}
+
 void MythContext::EventSocketConnected(void)
 {
+    if (!CheckProtoVersion(d->eventSock))
+        return;
+
     QString str = QString("ANN Playback %1 %2")
                          .arg(d->m_localhostname).arg(true);
     QStringList strlist = str;

@@ -73,13 +73,18 @@ QSocketDevice *RemoteEncoder::openControlSocket(const QString &host, short port)
     }
     else
     {
-        QString hostname = gContext->GetHostName();
- 
-        QStringList strlist;
-
-        strlist = QString("ANN Playback %1 %2").arg(hostname).arg(false);
-        WriteStringList(sock, strlist);
-        ReadStringList(sock, strlist, true);
+        if (gContext->CheckProtoVersion(sock))
+        {
+            QString hostname = gContext->GetHostName();
+            QStringList strlist = QString("ANN Playback %1 %2").arg(hostname).arg(false);
+            WriteStringList(sock, strlist);
+            ReadStringList(sock, strlist, true);
+        }
+        else
+        {
+            delete sock;
+            sock = NULL;
+        }
     }    
     
     return sock;
