@@ -688,23 +688,32 @@ void OSD::DisplayDialogNoTheme(unsigned char *yuvptr)
     DarkenBox(dialogRect, yuvptr);
 
     QRect rect = dialogRect;
-    rect.setBottom(rect.bottom() - infofontsize * 2 * 3);
-    DrawStringIntoBox(rect, dialogmessagetext, yuvptr, fadingframes);
+    rect.setBottom(rect.bottom() - infofontsize * 2 * 3 - 5);
+    rect.setTop(rect.top() + 5);
+    rect.setLeft(rect.left() + 5);
+    rect.setRight(rect.right() - 5);
+    DrawStringIntoBox(rect, dialogmessagetext, yuvptr, totalfadeframes);
 
     rect = dialogRect;
-    rect.setTop(rect.bottom() - infofontsize * 2 * 3);
-    rect.setBottom(rect.bottom() - infofontsize * (3 / 2) * 2);
-    DrawStringIntoBox(rect, dialogoptionone, yuvptr, fadingframes);
+    rect.setTop(rect.bottom() - infofontsize * 2 * 3 + 5);
+    rect.setBottom(rect.bottom() - infofontsize * (3 / 2) * 2 - 5);
+    rect.setLeft(rect.left() + 5);
+    rect.setRight(rect.right() - 5);
+    DrawStringIntoBox(rect, dialogoptionone, yuvptr, totalfadeframes);
 
     rect = dialogRect;
-    rect.setTop(rect.bottom() - infofontsize * 2 * 2);
-    rect.setBottom(rect.bottom() - infofontsize / 2);
-    DrawStringIntoBox(rect, dialogoptiontwo, yuvptr, fadingframes);
+    rect.setTop(rect.bottom() - infofontsize * 2 * 2 + 5);
+    rect.setBottom(rect.bottom() - infofontsize / 2 - 5);
+    rect.setLeft(rect.left() + 5);
+    rect.setRight(rect.right() - 5);
+    DrawStringIntoBox(rect, dialogoptiontwo, yuvptr, totalfadeframes);
 
     rect = dialogRect;
-    rect.setTop(rect.bottom() - infofontsize * 2);
-    rect.setBottom(rect.bottom() + infofontsize);
-    DrawStringIntoBox(rect, dialogoptionthree, yuvptr, fadingframes);
+    rect.setTop(rect.bottom() - infofontsize * 2 + 5);
+    rect.setBottom(rect.bottom() + infofontsize - 5);
+    rect.setLeft(rect.left() + 5);
+    rect.setRight(rect.right() - 5);
+    DrawStringIntoBox(rect, dialogoptionthree, yuvptr, totalfadeframes);
 
     rect = dialogRect;
     if (currentdialogoption == 1)
