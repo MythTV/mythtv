@@ -3,6 +3,9 @@
 
 #include <qstring.h>
 #include <pthread.h>
+#include <qvaluevector.h>
+
+#include "tv.h"
 
 #include <qobject.h>
 
@@ -17,7 +20,8 @@ class ProgramInfo;
 
 class TV : public QObject
 {
- public:
+    Q_OBJECT
+  public:
     TV(QSqlDatabase *db);
    ~TV(void);
 
@@ -56,14 +60,20 @@ class TV : public QObject
     void ProcessKeypress(int keypressed);
     void customEvent(QCustomEvent *e);
 
- protected:
+    void AddPreviousChannel(void);
+    void PreviousChannel(void);
+
+  protected slots:
+    void SetPreviousChannel(void);
+
+  protected:
     void doLoadMenu(void);
     static void *MenuHandler(void *param);
 
     void RunTV(void);
     static void *EventThread(void *param);
 
- private:
+  private:
     void SetChannel(bool needopen = false);
 
     void ToggleChannelFavorite(void);
@@ -175,6 +185,12 @@ class TV : public QObject
 
     unsigned int embedid;
     int embx, emby, embw, embh;
+
+    typedef QValueVector<QString> PrevChannelVector;
+    PrevChannelVector channame_vector;
+    unsigned int times_pressed;
+    QTimer *prevChannelTimer;
+    QString last_channel;
 };
 
 #endif

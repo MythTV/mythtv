@@ -7,6 +7,7 @@
 #include <qapplication.h>
 #include <qregexp.h>
 #include <qfile.h>
+#include <qtimer.h>
 
 #include <iostream>
 using namespace std;
@@ -119,9 +120,16 @@ TV::TV(QSqlDatabase *db)
     endOfRecording = false;
     volumeControl = NULL;
     embedid = 0;
+    times_pressed = 0;
+    last_channel = "";
 
     deinterlace_mode = DEINTERLACE_NONE;
     gContext->addListener(this);
+
+    PrevChannelVector channame_vector(30);
+
+    prevChannelTimer = new QTimer(this);
+    connect(prevChannelTimer, SIGNAL(timeout()), SLOT(SetPreviousChannel()));
 }
 
 void TV::Init(void)
@@ -998,6 +1006,8 @@ void TV::ProcessKeypress(int keypressed)
 
             case 'x': ChangeDeinterlacer(); break;
 
+            case 'H': case 'h': PreviousChannel(); break;
+
             default: break;
         }
     }
@@ -1380,9 +1390,15 @@ void TV::ChangeChannel(int direction)
     while (!activenvp->GetPause())
         usleep(5);
 
+    // Save the current channel if this is the first time
+    if (channame_vector.size() == 0)
+        AddPreviousChannel();
+
     activerecorder->Pause();
     activerbuffer->Reset();
     activerecorder->ChangeChannel(direction);
+
+    AddPreviousChannel();
 
     activenvp->ResetPlaying();
     while (!activenvp->ResetYet())
@@ -1467,9 +1483,15 @@ void TV::ChangeChannelByString(QString &name)
     while (!activenvp->GetPause())
         usleep(5);
 
+    // Save the current channel if this is the first time
+    if (channame_vector.size() == 0)
+        AddPreviousChannel();
+
     activerecorder->Pause();
     activerbuffer->Reset();
     activerecorder->SetChannel(name);
+
+    AddPreviousChannel();
 
     activenvp->ResetPlaying();
     while (!activenvp->ResetYet())
@@ -1483,8 +1505,95 @@ void TV::ChangeChannelByString(QString &name)
     activenvp->Unpause();
 }
 
+void TV::AddPreviousChannel(void)
+{
+    // Don't store more than thirty channels.  Remove the first item
+    if (channame_vector.size() > 29)
+    {
+        PrevChannelVector::iterator it;
+        it = channame_vector.begin();
+        channame_vector.erase(it);
+    }
+
+    // Get the current channel and add it to the vector
+    QString dummy = "";
+    QString chan_name = "";
+    activerecorder->GetChannelInfo(dummy, dummy, dummy, dummy, dummy,
+                                   dummy, dummy, dummy, chan_name, dummy);
+
+    // This method builds the stack of previous channels
+    channame_vector.push_back(chan_name);
+}
+
+void TV::PreviousChannel(void)
+{
+    // Save the channel if this is the first time, and return so we don't
+    // change chan to the current chan
+    if (channame_vector.size() == 0)
+        return;
+
+    // Increment the times_pressed counter so we know how far to jump
+    times_pressed++;
+
+    //Figure out the vector the desired channel is in
+    int vector = (channame_vector.size() - times_pressed - 1) % 
+                 channame_vector.size();
+
+    // Display channel name in the OSD for up to 1 second.
+    if (activenvp == nvp && osd)
+    {
+        osd->HideSet("program_info");
+        osd->SetChannumText(channame_vector[vector], 1);
+    }
+
+    // Reset the timer
+    prevChannelTimer->stop();
+    prevChannelTimer->start(750);
+}
+
+void TV::SetPreviousChannel()
+{
+    // Stop the timer
+    prevChannelTimer->stop();
+
+    // Figure out the vector the desired channel is in
+    int vector = (channame_vector.size() - times_pressed - 1) % 
+                 channame_vector.size();
+
+    // Reset the times_pressed counter
+    times_pressed = 0;
+
+    // Only change channel if channame_vector[vector] != current channel
+    QString dummy = "";
+    QString chan_name = "";
+    activerecorder->GetChannelInfo(dummy, dummy, dummy, dummy, dummy,
+                                   dummy, dummy, dummy, chan_name, dummy);
+
+    if (chan_name != channame_vector[vector].latin1())
+    {
+        // Populate the array with the channel
+        for(uint i = 0; i < channame_vector[vector].length(); i++)
+        {
+            channelKeys[i] = (int)*channame_vector[vector].mid(i, 1).latin1();
+        }
+
+        channelqueued = true;
+    }
+
+    //Turn off the OSD Channel Num so the channel changes right away
+    if (activenvp == nvp && osd)
+        osd->HideSet("channel_number");
+}
+
 void TV::UpdateOSD(void)
 {
+    if (osd->Visible())
+    {
+        osd->HideSet("program_info");
+        osd->HideSet("channel_number");
+        return;
+    }
+
     QString title, subtitle, desc, category, starttime, endtime;
     QString callsign, iconpath, channelname, chanid;
 

@@ -18,6 +18,7 @@ using namespace std;
 #include "themedmenu.h"
 #include "mythcontext.h"
 #include "util.h"
+#include "mythplugin.h"
 
 ThemedMenu::ThemedMenu(const char *cdir, const char *menufile, 
                        QWidget *parent, const char *name)
@@ -1460,6 +1461,11 @@ void ThemedMenu::handleAction(QString &action)
         menulevel -= 2;
  
         parseMenu(file);
+    }
+    else if (action.left(7) == "PLUGIN")
+    {
+        QString rest = action.right(action.length() - 7);
+        MythPluginManager::run_plugin(rest.stripWhiteSpace());
     }
     else
     {
