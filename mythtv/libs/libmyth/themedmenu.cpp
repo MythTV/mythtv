@@ -1649,113 +1649,106 @@ void ThemedMenu::keyPressEvent(QKeyEvent *e)
     if (ignorekeys)
         return;
 
-    bool handled = false;
-    ThemedButton *lastbutton = activebutton;
-
     ignorekeys = true;
 
+    ThemedButton *lastbutton = activebutton;
     int oldrow = currentrow;
+    bool handled = false;
 
-    switch (e->key())
+    QStringList actions;
+    gContext->GetMainWindow()->TranslateKeyPress("menu", e, actions);
+
+    for (unsigned int i = 0; i < actions.size(); i++)
     {
-        case Key_Up:
+        QString action = actions[i];
+        if (action == "UP")
         { 
             if (currentrow > 0)
                 currentrow--;
 
             if (currentcolumn >= buttonRows[currentrow].numitems)
                 currentcolumn = buttonRows[currentrow].numitems - 1;
-
             handled = true;
-            break;
         }
-        case Key_Left:
+        else if (action == "LEFT")
         {
             if (currentcolumn > 0)
                 currentcolumn--;
-
             handled = true;
-            break;
         }
-        case Key_Down:
+        else if (action == "DOWN")
         {
             if (currentrow < (int)buttonRows.size() - 1)
                 currentrow++;
 
             if (currentcolumn >= buttonRows[currentrow].numitems)
                 currentcolumn = buttonRows[currentrow].numitems - 1;
-
             handled = true;
-            break;
         }
-        case Key_Right:
+        else if (action == "RIGHT")
         {
             if (currentcolumn < buttonRows[currentrow].numitems - 1)
                 currentcolumn++;
-
             handled = true;
-            break;
         }
-        case Key_Enter:
-        case Key_Return:
-        case Key_Space:
+        else if (action == "SELECT")
         {
             handleAction(activebutton->action);
             lastbutton = NULL;
             handled = true;
-            break;
         }
-        case Key_Escape:
+        else if (action == "ESCAPE")
         {
             QString action = "UPMENU";
             if (menulevel > 1)
                 handleAction(action);
             else if (killable || e->state() == exitModifier)
                 done(0);
+            lastbutton = NULL;
             handled = true;
-            lastbutton = NULL;
-            break;
         }
-        default: break;
     }
 
-    if (handled)
+    if (!handled)
     {
-        if (!buttonRows[currentrow].visible)
-        {
-            makeRowVisible(currentrow, oldrow);
-            lastbutton = NULL;
-        }
-
-        activebutton = buttonRows[currentrow].buttons[currentcolumn];
-        if (lcddev)
-        {
-            // Build a list of the menu items
-            QPtrList<LCDMenuItem> menuItems;
-            menuItems.setAutoDelete(true);
-            bool selected;
-            for (int r = 0; r < (int)buttonRows.size(); r++)
-            {
-                if (r == currentrow)
-                    selected = true;
-                else
-                    selected = false;
-
-                if (currentcolumn < buttonRows[r].numitems)
-                    menuItems.append(new LCDMenuItem(selected, NOTCHECKABLE,
-                                   buttonRows[r].buttons[currentcolumn]->text));
-            }
-
-            if (!menuItems.isEmpty())
-                lcddev->switchToMenu(&menuItems, titleText);
-        }
-        update(watermarkRect);
-        if (lastbutton)
-            update(lastbutton->posRect);
-        update(activebutton->posRect);
-    }
-    else
         MythDialog::keyPressEvent(e);
+        ignorekeys = false;
+        return;
+    }
+
+    if (!buttonRows[currentrow].visible)
+    {
+        makeRowVisible(currentrow, oldrow);
+        lastbutton = NULL;
+    }
+
+    activebutton = buttonRows[currentrow].buttons[currentcolumn];
+    if (lcddev)
+    {
+        // Build a list of the menu items
+        QPtrList<LCDMenuItem> menuItems;
+        menuItems.setAutoDelete(true);
+        bool selected;
+        for (int r = 0; r < (int)buttonRows.size(); r++)
+        {
+            if (r == currentrow)
+                selected = true;
+            else
+                selected = false;
+
+            if (currentcolumn < buttonRows[r].numitems)
+                menuItems.append(new LCDMenuItem(selected, NOTCHECKABLE,
+                                 buttonRows[r].buttons[currentcolumn]->text));
+        }
+
+        if (!menuItems.isEmpty())
+            lcddev->switchToMenu(&menuItems, titleText);
+    }
+
+    update(watermarkRect);
+    if (lastbutton)
+        update(lastbutton->posRect);
+    update(activebutton->posRect);
 
     ignorekeys = false;
 } 

@@ -217,21 +217,6 @@ class MythButtonGroup : public QButtonGroup
     void moveFocus(int key);
 };
 
-class MythToolButton : public QToolButton
-{
-  public:
-    MythToolButton(QWidget *parent) : QToolButton(parent)
-                    { setFocusPolicy(StrongFocus);
-                      setBackgroundOrigin(WindowOrigin); }
-
-    void drawButton(QPainter *p);
-    void keyPressEvent(QKeyEvent *e);
-    void keyReleaseEvent(QKeyEvent *e);
-
-  private:
-    QColor origcolor;
-};
-
 class MythPushButton : public QPushButton
 {
   public:

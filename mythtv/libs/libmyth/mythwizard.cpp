@@ -45,7 +45,8 @@
 #include "qapplication.h"
 #include "qptrlist.h"
 #include "qpainter.h"
-#include "qaccel.h"
+
+#include "mythcontext.h"
 
 class MythWizardPrivate
 {
@@ -78,10 +79,6 @@ public:
     QLabel *help;
 
     QFrame * hbar1, * hbar2;
-
-    QAccel * accel;
-    int backAccel;
-    int nextAccel;
 
     Page * page( const QWidget * w )
     {
@@ -133,12 +130,6 @@ MythWizard::MythWizard(MythMainWindow *parent, const char *name)
 	     this, SLOT(accept()) );
     connect( d->cancelButton, SIGNAL(clicked()),
 	     this, SLOT(reject()) );
-
-    d->accel = new QAccel( this, "arrow-key accel" );
-    d->backAccel = d->accel->insertItem( Qt::ALT + Qt::Key_Left );
-    d->accel->connectItem( d->backAccel, this, SLOT(back()) );
-    d->nextAccel = d->accel->insertItem( Qt::ALT + Qt::Key_Right );
-    d->accel->connectItem( d->nextAccel, this, SLOT(next()) );
 }
 
 MythWizard::~MythWizard()
@@ -293,13 +284,11 @@ void MythWizard::next()
 void MythWizard::setBackEnabled( bool enable )
 {
     d->backButton->setEnabled( enable );
-    d->accel->setItemEnabled( d->backAccel, enable );
 }
 
 void MythWizard::setNextEnabled( bool enable )
 {
     d->nextButton->setEnabled( enable );
-    d->accel->setItemEnabled( d->nextAccel, enable );
 }
 
 void MythWizard::setBackEnabled( QWidget * page, bool enable )
@@ -547,24 +536,38 @@ bool MythWizard::eventFilter( QObject * o, QEvent * e )
 
 void MythWizard::keyPressEvent(QKeyEvent* e) 
 {
-    switch (e->key()) {
-    case Key_Enter:
-    case Key_Return:
-    case Key_Space:
-        if (indexOf(currentPage()) == pageCount()-1)
-            accept();
-        else
-            next();
-        break;
-    case Key_Escape:
-        if (indexOf(currentPage()) == 0)
-            reject();
-        else
-            back();
-        break;
-    default:
-        MythDialog::keyPressEvent(e);
+    bool handled = false;
+    QStringList actions;
+    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
+    {
+        for (unsigned int i = 0; i < actions.size(); i++)
+        {
+            QString action = actions[i];
+            if (action == "SELECT")
+            {
+                if (indexOf(currentPage()) == pageCount()-1)
+                    accept();
+                else
+                    next();
+                handled = true;
+            }
+            else if (action == "ESCAPE")
+            {
+                if (indexOf(currentPage()) == 0)
+                    reject();
+                else
+                {
+                    back();
+                    QApplication::postEvent(gContext->GetMainWindow(), 
+                                            new ExitToMainMenuEvent());
+                }
+                handled = true;
+            }
+        }
     }
+
+    if (!handled)
+        MythDialog::keyPressEvent(e);
 }
 
 void MythWizard::removePage( QWidget * page )

@@ -532,19 +532,30 @@ QWidget* CheckBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     return widget;
 }
 
-void ConfigurationDialogWidget::keyPressEvent(QKeyEvent* e) {
-    switch (e->key()) {
-    case Key_Enter:
-    case Key_Return:
-    case Key_Space:
-        accept();
-        break;
-    case Key_Escape:
-        reject();
-        break;
-    default:
-        MythDialog::keyPressEvent(e);
+void ConfigurationDialogWidget::keyPressEvent(QKeyEvent* e) 
+{
+    bool handled = false;
+    QStringList actions;
+    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
+    {
+        for (unsigned int i = 0; i < actions.size(); i++)
+        {
+            QString action = actions[i];
+            if (action == "SELECT")
+            {
+                handled = true;
+                accept();
+            }
+            else if (action == "ESCAPE")
+            {
+                handled = true;
+                reject();
+            }
+        }
     }
+
+    if (!handled)
+        MythDialog::keyPressEvent(e);
 }
 
 MythDialog* ConfigurationDialog::dialogWidget(MythMainWindow *parent,

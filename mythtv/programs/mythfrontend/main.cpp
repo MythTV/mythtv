@@ -40,16 +40,16 @@ ThemedMenu *menu;
 MythContext *gContext;
 XBox *xbox = NULL;
 
-QString startGuide(void)
+void startGuide(void)
 {
     QString startchannel = gContext->GetSetting("DefaultTVChannel");
     if (startchannel == "")
         startchannel = "3";
 
-    return RunProgramGuide(startchannel);
+    RunProgramGuide(startchannel);
 }
 
-int startManaged(void)
+void startManaged(void)
 {
     QSqlDatabase *db = QSqlDatabase::database();
     ViewScheduled vsb(db, gContext->GetMainWindow(), "view scheduled");
@@ -57,11 +57,9 @@ int startManaged(void)
     qApp->unlock();
     vsb.exec();
     qApp->lock();
-
-    return 0;
 }
 
-int startProgramRecPriorities(void)
+void startProgramRecPriorities(void)
 {
     QSqlDatabase *db = QSqlDatabase::database();
     ProgramRecPriority rsb(db, gContext->GetMainWindow(), "recpri scheduled");
@@ -69,11 +67,9 @@ int startProgramRecPriorities(void)
     qApp->unlock();
     rsb.exec();
     qApp->lock();
-
-    return 0;
 }
 
-int startChannelRecPriorities(void)
+void startChannelRecPriorities(void)
 {
     QSqlDatabase *db = QSqlDatabase::database();
     ChannelRecPriority rch(db, gContext->GetMainWindow(), "recpri channels");
@@ -81,11 +77,9 @@ int startChannelRecPriorities(void)
     qApp->unlock();
     rch.exec();
     qApp->lock();
-
-    return 0;
 }
 
-int startPlayback(void)
+void startPlayback(void)
 {
     PlaybackBox pbb(PlaybackBox::Play, gContext->GetMainWindow(), 
                     "tvplayselect");
@@ -93,11 +87,9 @@ int startPlayback(void)
     qApp->unlock();
     pbb.exec();
     qApp->lock();
-
-    return 0;
 }
 
-int startDelete(void)
+void startDelete(void)
 {
     PlaybackBox delbox(PlaybackBox::Delete, gContext->GetMainWindow(), 
                        "tvplayselect");
@@ -105,30 +97,24 @@ int startDelete(void)
     qApp->unlock();
     delbox.exec();
     qApp->lock();
-
-    return 0;
 }
 
-int startManual(void)
+void startManual(void)
 {
     ManualBox manbox(gContext->GetMainWindow(), "manual box");
 
     qApp->unlock();
     manbox.exec();
     qApp->lock();
-
-    return 0;
 }
 
-int startManualSchedule(void)
+void startManualSchedule(void)
 {
     ManualSchedule mansched(gContext->GetMainWindow(), "manual schedule");
 
     qApp->unlock();
     mansched.exec();
     qApp->lock();
-
-    return 0;
 }
 
 void startTV(void)
@@ -696,6 +682,8 @@ int main(int argc, char **argv)
     mainWindow->Show();
     mainWindow->Init();
     gContext->SetMainWindow(mainWindow);
+
+    REG_JUMP("TV Recording Playback", "", "F12", startPlayback);
 
     gContext->UpdateImageCache();
 

@@ -53,11 +53,17 @@ class ExitToMainMenuEvent : public QCustomEvent
     ExitToMainMenuEvent(void) : QCustomEvent(kExitToMainMenuEventType) {}
 };
 
+#define REG_KEY(a, b, c, d) gContext->GetMainWindow()->RegisterKey(a, b, c, d)
+#define REG_JUMP(a, b, c, d) gContext->GetMainWindow()->RegisterJump(a, b, c, d)
+
+class MythMainWindowPrivate;
+
 class MythMainWindow : public QDialog
 {
   public:
     MythMainWindow(QWidget *parent = 0, const char *name = 0, 
                    bool modal = FALSE);
+    virtual ~MythMainWindow();
 
     void Init(void);
     void Show(void);
@@ -67,8 +73,13 @@ class MythMainWindow : public QDialog
 
     QWidget *currentWidget(void);
 
-    int TranslateKeyPress(const QString &context, int key, 
-                          QValueVector<int> *retvec = NULL);
+    bool TranslateKeyPress(const QString &context, QKeyEvent *e, 
+                           QStringList &actions);
+
+    void RegisterKey(const QString &context, const QString &action,
+                     const QString &description, const QString &key);
+    void RegisterJump(const QString &destination, const QString &description,
+                      const QString &key, void (*callback)(void));
 
   protected:
     void keyPressEvent(QKeyEvent *e);
@@ -78,15 +89,7 @@ class MythMainWindow : public QDialog
 
     QObject *getTarget(QKeyEvent &key);
 
-    float wmult, hmult;
-    int screenwidth, screenheight;
-    int xbase, ybase;
-
-    vector<QWidget *> widgetList;
-
-    bool ignore_lirc_keys;
-
-    bool exitingtomain;
+    MythMainWindowPrivate *d;
 };
 
 class MythDialog : public QFrame

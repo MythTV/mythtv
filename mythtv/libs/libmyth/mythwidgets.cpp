@@ -16,29 +16,46 @@ using namespace std;
 
 void MythComboBox::keyPressEvent(QKeyEvent *e)
 {
-    switch (e->key()) {
-    case Key_Up:
-        focusNextPrevChild(false);
-        break;
-    case Key_Down:
-        focusNextPrevChild(true);
-        break;
-    case Key_Left:
-        if (currentItem() == 0)
-            setCurrentItem(count()-1);
-        else if (count() > 0)
-            setCurrentItem((currentItem() - 1) % count());
-        break;
-    case Key_Right:
-        if (count() > 0)
-            setCurrentItem((currentItem() + 1) % count());
-        break;
-    default:
+    bool handled = false;
+    QStringList actions;
+    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
+    {
+        for (unsigned int i = 0; i < actions.size(); i++)
+        {
+            QString action = actions[i];
+            if (action == "UP")
+            {
+                focusNextPrevChild(false);
+                handled = true;
+            }
+            else if (action == "DOWN")
+            {
+                focusNextPrevChild(true);
+                handled = true;
+            }
+            else if (action == "LEFT")
+            {
+                if (currentItem() == 0)
+                    setCurrentItem(count()-1);
+                else if (count() > 0)
+                    setCurrentItem((currentItem() - 1) % count());
+                handled = true;
+            }
+            else if (action == "RIGHT")
+            {
+                if (count() > 0)
+                    setCurrentItem((currentItem() + 1) % count());
+                handled = true;
+            }
+        }
+    }
+
+    if (!handled)
+    {
         if (editable())
             QComboBox::keyPressEvent(e);
         else
             e->ignore();
-        break;
     }
 }
 
@@ -61,20 +78,33 @@ void MythComboBox::focusOutEvent(QFocusEvent *e)
 
 void MythCheckBox::keyPressEvent(QKeyEvent* e)
 {
-    switch (e->key()) {
-    case Key_Up:
-        focusNextPrevChild(false);
-        break;
-    case Key_Down:
-        focusNextPrevChild(true);
-        break;
-    case Key_Left:
-    case Key_Right:
-        toggle();
-        break;
-    default:
-        e->ignore();
+    bool handled = false;
+    QStringList actions;
+    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
+    {
+        for (unsigned int i = 0; i < actions.size(); i++)
+        {
+            QString action = actions[i];
+            if (action == "UP")
+            {
+                focusNextPrevChild(false);
+                handled = true;
+            }
+            else if (action == "DOWN")
+            {
+                focusNextPrevChild(true);
+                handled = true;
+            }
+            else if (action == "LEFT" || action == "RIGHT")
+            {
+                toggle();
+                handled = true;
+            }
+        }
     }
+
+    if (!handled)
+        e->ignore();
 }
 
 void MythCheckBox::focusInEvent(QFocusEvent *e)
@@ -111,23 +141,37 @@ bool MythSpinBox::eventFilter(QObject* o, QEvent* e)
     if (e->type() != QEvent::KeyPress)
         return FALSE;
 
-    switch (((QKeyEvent*)e)->key()) {
-    case Key_Up:
-        focusNextPrevChild(false);
-        break;
-    case Key_Down:
-        focusNextPrevChild(true);
-        break;
-    case Key_Left:
-        stepDown();
-        break;
-    case Key_Right:
-        stepUp();
-        break;
-    case Key_Enter: case Key_Space: case Key_Return: case Key_Escape:
-        return FALSE;
-    default:
-         return TRUE;
+    bool handled = false;
+    QStringList actions;
+    if (gContext->GetMainWindow()->TranslateKeyPress("qt", (QKeyEvent *)e, 
+                                                     actions))
+    {
+        for (unsigned int i = 0; i < actions.size(); i++)
+        {
+            QString action = actions[i];
+            if (action == "UP")
+            {
+                focusNextPrevChild(false);
+                handled = true;
+            }
+            else if (action == "DOWN")
+            {
+                focusNextPrevChild(true);
+                handled = true;
+            }
+            else if (action == "LEFT")
+            {
+                stepDown();
+                handled = true;
+            }
+            else if (action == "RIGHT")
+            {
+                stepUp();
+                handled = true;
+            }
+            else if (action == "SELECT" || action == "ESCAPE")
+                return FALSE;
+        }
     }
 
     return TRUE;
@@ -151,26 +195,43 @@ void MythSpinBox::focusOutEvent(QFocusEvent *e)
 
 void MythSlider::keyPressEvent(QKeyEvent* e)
 {
-    switch (e->key()) {
-    case Key_Up:
-        focusNextPrevChild(false);
-        break;
-    case Key_Down:
-        focusNextPrevChild(true);
-        break;
-    case Key_Left:
-        setValue(value() - lineStep());
-        break;
-    case Key_Right:
-        setValue(value() + lineStep());
-        break;
-    case Key_Enter:
-    case Key_Return:
-    case Key_Space:
-        e->ignore();
-    default:
-        QSlider::keyPressEvent(e);
+    bool handled = false;
+    QStringList actions;
+    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
+    {
+        for (unsigned int i = 0; i < actions.size(); i++)
+        {
+            QString action = actions[i];
+            if (action == "UP")
+            {
+                focusNextPrevChild(false);
+                handled = true;
+            }
+            else if (action == "DOWN")
+            {
+                focusNextPrevChild(true);
+                handled = true;
+            }
+            else if (action == "LEFT")
+            {
+                setValue(value() - lineStep());
+                handled = true;
+            }
+            else if (action == "RIGHT")
+            {
+                setValue(value() + lineStep());
+                handled = true;
+            }
+            else if (action == "SELECT")
+            {
+                e->ignore();
+                handled = true;
+            }
+        }
     }
+
+    if (!handled)
+        QSlider::keyPressEvent(e);
 }
 
 void MythSlider::focusInEvent(QFocusEvent *e)
@@ -191,20 +252,34 @@ void MythSlider::focusOutEvent(QFocusEvent *e)
 
 void MythLineEdit::keyPressEvent(QKeyEvent *e)
 {
-    switch (e->key()) {
-    case Key_Up:
-        focusNextPrevChild(FALSE);
-        break;
-    case Key_Down:
-        focusNextPrevChild(TRUE);
-        break;
-    case Key_Enter:
-    case Key_Return:
-        e->ignore();
-    default:
+    bool handled = false;
+    QStringList actions;
+    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
+    {
+        for (unsigned int i = 0; i < actions.size(); i++)
+        {
+            QString action = actions[i];
+            if (action == "UP")
+            {
+                focusNextPrevChild(false);
+                handled = true;
+            }
+            else if (action == "DOWN")
+            {
+                focusNextPrevChild(true);
+                handled = true;
+            }
+            else if (action == "SELECT" && e->text().isNull())
+            {
+                e->ignore();
+                handled = true;
+            }
+        }
+    }
+
+    if (!handled)
         if (rw || e->key() == Key_Escape)
             QLineEdit::keyPressEvent(e);
-    }
 }
 
 void MythLineEdit::setText(const QString& text) 
@@ -234,24 +309,24 @@ void MythLineEdit::focusOutEvent(QFocusEvent *e)
     QLineEdit::focusOutEvent(e);
 }
 
-// thor feb 18 2003
-
-MythRemoteLineEdit::MythRemoteLineEdit(QFont *a_font, QWidget * parent, const char * name)
-                   :QTextEdit(parent, name)
+MythRemoteLineEdit::MythRemoteLineEdit(QFont *a_font, QWidget * parent, 
+                                       const char * name)
+                  : QTextEdit(parent, name)
 {
     my_font = a_font;
     this->Init();
 }
 
-MythRemoteLineEdit::MythRemoteLineEdit( QWidget * parent, const char * name)
-    : QTextEdit(parent, name)
+MythRemoteLineEdit::MythRemoteLineEdit(QWidget * parent, const char * name)
+                  : QTextEdit(parent, name)
 {
     my_font = NULL;
     this->Init();
 }
 
-MythRemoteLineEdit::MythRemoteLineEdit( const QString & contents, QWidget * parent, const char * name)
-    : QTextEdit(parent, name)
+MythRemoteLineEdit::MythRemoteLineEdit(const QString & contents, 
+                                       QWidget * parent, const char * name)
+                  : QTextEdit(parent, name)
 {
     my_font = NULL;
     this->Init();
@@ -260,24 +335,18 @@ MythRemoteLineEdit::MythRemoteLineEdit( const QString & contents, QWidget * pare
 
 void MythRemoteLineEdit::Init()
 {
-    //
     //  Bunch of default values
-    //
-
     cycle_timer = new QTimer();
     shift = false;
     active_cycle = false;
     current_choice = "";
     current_set = "";
     
-    //
     //  We need to start out in PlainText format
     //  and only toggle RichText on if we are in
     //  the middle of a character cycle. That's
     //  the only way to do all this in a way which
     //  works across most 3.x.x versions of Qt.
-    //
-
     setTextFormat(Qt::PlainText);    
 
     cycle_time = 3000;
@@ -293,27 +362,21 @@ void MythRemoteLineEdit::Init()
 
     assignHexColors();
 
-    //
     //  Try and make sure it doesn't ever change
-    //    
     setWordWrap(QTextEdit::NoWrap);
     QScrollView::setVScrollBarMode(QScrollView::AlwaysOff);
     QScrollView::setHScrollBarMode(QScrollView::AlwaysOff);
 
-    if(my_font)
-    {
+    if (my_font)
         setFont(*my_font);
-    }
 
     QFontMetrics fontsize(font());
     
-
     setMinimumHeight(fontsize.height() * 5 / 4);
     setMaximumHeight(fontsize.height() * 5 / 4);
 
     connect(cycle_timer, SIGNAL(timeout()), this, SLOT(endCycle()));
 }
-
 
 void MythRemoteLineEdit::startCycle(QString current_choice, QString set)
 {
@@ -330,11 +393,9 @@ void MythRemoteLineEdit::startCycle(QString current_choice, QString set)
     {
         cycle_timer->start(cycle_time, true);
         active_cycle = true;
-        //
         //  Amazingly, Qt (version < 3.1.1) only lets us pull
         //  text out in segments by fiddling around
         //  with selecting it. Oh well.
-        //
         getCursorPosition(&pre_cycle_para, &pre_cycle_pos);
         selectAll(true);
         getSelection(&dummy, &dummy_two, &end_paragraph, &end_position);
@@ -348,7 +409,8 @@ void MythRemoteLineEdit::startCycle(QString current_choice, QString set)
     }
 }
 
-void MythRemoteLineEdit::setCharacterColors(QColor unselected, QColor selected, QColor special)
+void MythRemoteLineEdit::setCharacterColors(QColor unselected, QColor selected,
+                                            QColor special)
 {
     col_unselected = unselected;
     col_selected = selected;
@@ -361,22 +423,20 @@ void MythRemoteLineEdit::updateCycle(QString current_choice, QString set)
     int index;
     QString aString, bString;
 
-    //
     //  Show the characters in the current set being cycled
     //  through, with the current choice in a different color. If the current
     //  character is uppercase X (interpreted as desctructive
     //  backspace) or an underscore (interpreted as a space)
     //  then show these special cases in yet another color.
-    //
     
-    if(shift)
+    if (shift)
     {
         set = set.upper();
         current_choice = current_choice.upper();
     }
 
     bString  = "<B>";
-    if(current_choice == "_" || current_choice == "X")
+    if (current_choice == "_" || current_choice == "X")
     {
         bString += "<FONT COLOR=\"#";
         bString += hex_special;
@@ -396,7 +456,7 @@ void MythRemoteLineEdit::updateCycle(QString current_choice, QString set)
 
     index = set.find(current_choice);
     int length = set.length();
-    if(index < 0 || index > length)
+    if (index < 0 || index > length)
     {
         cerr << "libmyth: MythRemoteLineEdit passed a choice of \"" << current_choice << "\" which is not in set \"" << set << "\"" << endl;
         setText("????");
@@ -421,19 +481,15 @@ void MythRemoteLineEdit::updateCycle(QString current_choice, QString set)
     update();
     setCursorPosition(pre_cycle_para, pre_cycle_pos);
 
-    //
     //  If current selection is delete, 
     //  select the character that may well
     //  get deleted
-    //
     
     if(current_choice == "X" && pre_cycle_pos > 0)
     {
         setSelection(pre_cycle_para, pre_cycle_pos - 1, pre_cycle_para, pre_cycle_pos, 0);
     }
 }
-
-
 
 void MythRemoteLineEdit::assignHexColors()
 {
@@ -447,20 +503,17 @@ void MythRemoteLineEdit::assignHexColors()
     
     sprintf(text, "%.2X%.2X%.2X", col_special.red(), col_special.green(), col_special.blue());
     hex_special = text;
-    
 }
 
 void MythRemoteLineEdit::endCycle()
 {
     QString aString;
     
-    if(active_cycle)
+    if (active_cycle)
     {
-        //
         //  The timer ran out or the user pressed a key
         //  outside of the current set of choices
-        //
-        if(current_choice == "_")       //  Space
+        if (current_choice == "_")       //  Space
         {
             aString  = pre_cycle_text_upto;
             aString += " ";
@@ -468,13 +521,11 @@ void MythRemoteLineEdit::endCycle()
         } 
         else if (current_choice == "X") // destructive backspace
         {
-            //
             //  Deal with special case in a way
             //  that all 3.x.x versions of Qt
             //  can handle
-            //
             
-            if(pre_cycle_text_upto.length() > 0)
+            if (pre_cycle_text_upto.length() > 0)
             {
                 aString = pre_cycle_text_upto.left(pre_cycle_text_upto.length() - 1);
             }
@@ -485,7 +536,7 @@ void MythRemoteLineEdit::endCycle()
             aString += pre_cycle_text_from;
             pre_cycle_pos--;
         }
-        else if(shift)
+        else if (shift)
         {
             aString  = pre_cycle_text_upto;
             aString += current_choice.upper();
@@ -512,43 +563,49 @@ void MythRemoteLineEdit::setText(const QString& text)
 {
     int para, pos;
     
-    //
     //  Isaac had this in the original version
     //  of MythLineEdit, and I'm sure he had
     //  a reason ...
-    //    
     getCursorPosition(&para, &pos);
     QTextEdit::setText(text);
     setCursorPosition(para, pos);
-
 }
-
-
 
 void MythRemoteLineEdit::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
+    QStringList actions;
+    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
+    {
+        for (unsigned int i = 0; i < actions.size(); i++)
+        {
+            QString action = actions[i];
+            if (action == "UP")
+            {
+                handled = true;
+                endCycle();
+                // Need to call very base one because
+                // QTextEdit reimplements it to tab
+                // through links (even if you're in
+                // PlainText Mode !!)
+                QWidget::focusNextPrevChild(false);
+                emit tryingToLooseFocus(false);
+            }
+            else if (action == "DOWN")
+            {
+                handled = true;
+                endCycle();
+                QWidget::focusNextPrevChild(true);
+                emit tryingToLooseFocus(true);
+            }
+        }
+    }
+
+    if (handled)
+        return;
 
     switch(e->key())
     {
-        case Key_Up:
-            handled = true;
-            endCycle();
-            // Need to call very base one because
-            // QTextEdit reimplements it to tab
-            // through links (even if you're in
-            // PlainText Mode !!)
-            QWidget::focusNextPrevChild(false);
-            emit tryingToLooseFocus(false);
-            break;
-   
-        case Key_Down:
-            handled = true;
-            endCycle();
-            QWidget::focusNextPrevChild(true);
-            emit tryingToLooseFocus(true);
-            break;
-    
         case Key_Enter:
         case Key_Return:
             handled = true;
@@ -556,9 +613,7 @@ void MythRemoteLineEdit::keyPressEvent(QKeyEvent *e)
             e->ignore();
             break;
 
-            //
             //  Only eat Key_Space if we are in a cycle
-            //
             
         case Key_Space:
             if(active_cycle)
@@ -569,10 +624,8 @@ void MythRemoteLineEdit::keyPressEvent(QKeyEvent *e)
             }
             break; 
 
-            //
             //  If you want to mess arround with other ways to allocate
-            //  key presses you can just add entried between the quotes
-            //
+            //  key presses you can just add entries between the quotes
 
         case Key_1:
             cycleKeys("_X%-/.?()1");
@@ -635,7 +688,6 @@ void MythRemoteLineEdit::keyPressEvent(QKeyEvent *e)
 
 void MythRemoteLineEdit::setCycleTime(float desired_interval)
 {
-
     if(desired_interval < 0.5 || desired_interval > 10.0)
     {
         cerr << "libmyth: Did not accept key cycle interval of " << desired_interval << " seconds" << endl; 
@@ -646,19 +698,15 @@ void MythRemoteLineEdit::setCycleTime(float desired_interval)
     }
 }
 
-
 void MythRemoteLineEdit::cycleKeys(QString cycle_list)
 {
     int index;
     
-    
-    if(active_cycle)
+    if (active_cycle)
     {
-        if(cycle_list == current_set)
+        if (cycle_list == current_set)
         {
-            //
             //  Regular movement through existing set
-            //
             cycle_timer->changeInterval(cycle_time);
             index = current_set.find(current_choice);
             int length = current_set.length();
@@ -671,23 +719,18 @@ void MythRemoteLineEdit::cycleKeys(QString cycle_list)
         }
         else
         {
-            //
             //  Previous cycle was still active, but user moved
             //  to another keypad key
-            //
             endCycle();
             current_choice = cycle_list.left(1);
             current_set = cycle_list;
             cycle_timer->changeInterval(cycle_time);
             startCycle(current_choice, current_set);
         }
-                
     }
     else
     {
-        //
         //  First press with no cycle of any type active
-        //
         current_choice = cycle_list.left(1);
         current_set = cycle_list;
         startCycle(current_choice, current_set);
@@ -696,16 +739,13 @@ void MythRemoteLineEdit::cycleKeys(QString cycle_list)
 
 void MythRemoteLineEdit::toggleShift()
 {
-    //
     //  Toggle uppercase/lowercase and
     //  update the cycle display if it's
     //  active
-    //
-
     QString temp_choice = current_choice;
     QString temp_set = current_set;
 
-    if(shift)
+    if (shift)
     {
         shift = false;
     }
@@ -715,7 +755,7 @@ void MythRemoteLineEdit::toggleShift()
         temp_choice = current_choice.upper();
         temp_set = current_set.upper();
     }
-    if(active_cycle)
+    if (active_cycle)
     {
         updateCycle(temp_choice, temp_set);  
     }
@@ -732,7 +772,6 @@ void MythRemoteLineEdit::focusInEvent(QFocusEvent *e)
 
     QTextEdit::focusInEvent(e);
 }
-
 
 void MythRemoteLineEdit::focusOutEvent(QFocusEvent *e)
 {
@@ -752,39 +791,39 @@ MythRemoteLineEdit::~MythRemoteLineEdit()
 
 void MythTable::keyPressEvent(QKeyEvent *e)
 {
-    bool handled = false;
-
     if (isEditing() && item(currEditRow(), currEditCol()) &&
         item(currEditRow(), currEditCol())->editType() == QTableItem::OnTyping)
         return;
 
     int tmpRow = currentRow();
-
-    switch (e->key())
+    bool handled = false;
+    QStringList actions;
+    if (gContext->GetMainWindow()->TranslateKeyPress("qt", (QKeyEvent *)e,
+                                                     actions))
     {
-        case Key_Left:
-        case Key_Right:
+        for (unsigned int i = 0; i < actions.size(); i++)
         {
-            handled = true;
-            break;
-        }
-        case Key_Up:
-        {
-            if (tmpRow == 0)
+            QString action = actions[i];
+            if (action == "UP")
             {
-                focusNextPrevChild(FALSE);
+                if (tmpRow == 0)
+                {
+                    focusNextPrevChild(false);
+                    handled = true;
+                }
+            }
+            else if (action == "DOWN")
+            {
+                if (tmpRow == numRows() - 1)
+                {
+                    focusNextPrevChild(true);
+                    handled = true;
+                }
+            }
+            else if (action == "LEFT" || action == "RIGHT")
+            {
                 handled = true;
             }
-            break;
-        }
-        case Key_Down:
-        {
-            if (tmpRow == numRows() - 1)
-            {
-                focusNextPrevChild(TRUE);
-                handled = true;
-            }
-            break;
         }
     }
 
@@ -806,88 +845,6 @@ void MythButtonGroup::moveFocus(int key)
             case Key_Down: focusNextPrevChild(TRUE); break;
             default: break;
         }
-    }
-}
-
-void MythToolButton::drawButton(QPainter *p)
-{
-    QStyle::SCFlags controls = QStyle::SC_ToolButton;
-    QStyle::SCFlags active = QStyle::SC_None;
-
-    if (isDown())
-        active |= QStyle::SC_ToolButton;
-
-    QStyle::SFlags flags = QStyle::Style_Default;
-    if (isEnabled())
-        flags |= QStyle::Style_Enabled;
-    if (hasFocus())
-        flags |= QStyle::Style_MouseOver;
-    if (isDown())
-        flags |= QStyle::Style_Down;
-    if (isOn())
-        flags |= QStyle::Style_On;
-    if (!autoRaise()) {
-        flags |= QStyle::Style_AutoRaise;
-        if (uses3D()) {
-            flags |= QStyle::Style_MouseOver;
-            if (! isOn() && ! isDown())
-                flags |= QStyle::Style_Raised;
-        }
-    } else if (! isOn() && ! isDown())
-        flags |= QStyle::Style_Raised;
-
-    if (!origcolor.isValid())
-        origcolor = palette().color(QPalette::Inactive, QColorGroup::Button);;
-
-    QColor set;
-
-    if (flags & QStyle::Style_MouseOver)
-        set = colorGroup().highlight();
-    else
-        set = origcolor;
-
-    QPalette pal = palette();
-    pal.setColor(QPalette::Active, QColorGroup::Button, set);
-    setPalette(pal);
-
-    style().drawComplexControl(QStyle::CC_ToolButton, p, this, rect(),
-                               colorGroup(), flags, controls, active,
-                               QStyleOption());
-
-    drawButtonLabel(p);
-}
-
-void MythToolButton::keyPressEvent(QKeyEvent *e)
-{
-    switch (e->key())
-    {
-        case Key_Enter:
-        case Key_Return:
-        case Key_Space:
-            setDown(TRUE);
-            emit pressed();
-            break;
-        default:
-            QToolButton::keyPressEvent(e);
-            break;
-    }
-}
-
-void MythToolButton::keyReleaseEvent(QKeyEvent *e)
-{
-    switch (e->key())
-    {
-        case Key_Enter:
-        case Key_Return:
-        case Key_Space:
-        {
-            QKeyEvent tempe(QEvent::KeyRelease, Key_Space, ' ', 0, " ");
-            QToolButton::keyReleaseEvent(&tempe);
-            break;
-        }
-        default:
-            QToolButton::keyReleaseEvent(e);
-            break;
     }
 }
 
@@ -965,36 +922,48 @@ void MythPushButton::drawButton(QPainter * p)
 
 void MythPushButton::keyPressEvent(QKeyEvent *e)
 {
-    switch (e->key())
+    bool handled = false;
+    QStringList actions;
+    if (gContext->GetMainWindow()->TranslateKeyPress("qt", (QKeyEvent *)e,
+                                                     actions))
     {
-        case Key_Enter:
-        case Key_Return:
-        case Key_Space:
-            setDown(TRUE);
-            emit pressed();
-            break;
-        default:
-            QPushButton::keyPressEvent(e);
-            break;
+        for (unsigned int i = 0; i < actions.size(); i++)
+        {
+            QString action = actions[i];
+            if (action == "SELECT")
+            {
+                setDown(true);
+                emit pressed();
+                handled = true;
+            }
+        }
     }
+
+    if (!handled)
+        QPushButton::keyPressEvent(e);
 }
 
 void MythPushButton::keyReleaseEvent(QKeyEvent *e)
 {
-    switch (e->key())
+    bool handled = false;
+    QStringList actions;
+    if (gContext->GetMainWindow()->TranslateKeyPress("qt", (QKeyEvent *)e,
+                                                     actions))
     {
-        case Key_Enter:
-        case Key_Return:
-        case Key_Space:
+        for (unsigned int i = 0; i < actions.size(); i++)
         {
-            QKeyEvent tempe(QEvent::KeyRelease, Key_Space, ' ', 0, " ");
-            QPushButton::keyReleaseEvent(&tempe);            
-            break;
+            QString action = actions[i];
+            if (action == "SELECT")
+            {
+                QKeyEvent tempe(QEvent::KeyRelease, Key_Space, ' ', 0, " ");
+                QPushButton::keyReleaseEvent(&tempe);
+                handled = true;
+            }
         }
-        default:
-            QPushButton::keyReleaseEvent(e);
-            break;
     }
+
+    if (!handled)
+        QPushButton::keyReleaseEvent(e);
 }
 
 MythListView::MythListView(QWidget *parent)
@@ -1031,6 +1000,7 @@ void MythListView::ensureItemVCentered ( const QListViewItem * i )
     }
 }
 
+/* XXX FIXME */
 void MythListView::keyPressEvent(QKeyEvent *e)
 {
     if (!allowkeypress)
@@ -1045,7 +1015,6 @@ void MythListView::keyPressEvent(QKeyEvent *e)
         {
             case 'd': 
             case 'D': 
-            
                 emit deletePressed(currentItem()); 
                 return;
                 
@@ -1165,6 +1134,7 @@ void MythListBox::setCurrentItem(const QString& matchText)
             setCurrentItem(i);
 }
 
+/* XXX FIXME */
 void MythListBox::keyPressEvent(QKeyEvent* e) 
 {
     switch (e->key()) 

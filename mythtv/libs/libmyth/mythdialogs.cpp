@@ -9,6 +9,7 @@
 #include <qregexp.h>
 #include <qaccel.h>
 #include <qfocusdata.h>
+#include <qdict.h>
 
 #include <iostream>
 using namespace std;
@@ -38,12 +39,63 @@ static void *SpawnLirc(void *param)
 }
 #endif
 
+class KeyContext
+{
+  public:
+    void AddMapping(int key, QString action)
+    {
+        actionMap[key] = action;
+    }
+
+    bool GetMapping(int key, QString &action)
+    {
+        if (actionMap.count(key) > 0)
+        {
+            action = actionMap[key];
+            return true;
+        }
+        return false;
+    }
+
+    QMap<int, QString> actionMap;
+};
+
+struct JumpData
+{
+    void (*callback)(void);
+    QString destination;
+    QString description;
+};
+
+class MythMainWindowPrivate
+{
+  public:
+    float wmult, hmult;
+    int screenwidth, screenheight;
+    int xbase, ybase;
+
+    vector<QWidget *> widgetList;
+
+    bool ignore_lirc_keys;
+
+    bool exitingtomain;
+
+    QDict<KeyContext> keyContexts;
+    QMap<int, JumpData> jumpMap;
+
+    void (*exitmenucallback)(void);
+};
+
 MythMainWindow::MythMainWindow(QWidget *parent, const char *name, bool modal)
               : QDialog(parent, name, modal)
 {
+    d = new MythMainWindowPrivate;
+
     Init();
-    ignore_lirc_keys = false;
-    exitingtomain = false;
+    d->ignore_lirc_keys = false;
+    d->exitingtomain = false;
+    d->exitmenucallback = false;
+
 #ifdef USE_LIRC
     pthread_t lirc_tid;
     pthread_attr_t attr;
@@ -52,14 +104,32 @@ MythMainWindow::MythMainWindow(QWidget *parent, const char *name, bool modal)
 
     pthread_create(&lirc_tid, &attr, SpawnLirc, this);
 #endif
+
+    d->keyContexts.setAutoDelete(true);
+
+    RegisterKey("Global", "UP", "Up arrow", "Up");
+    RegisterKey("Global", "DOWN", "Down arrow", "Down");
+    RegisterKey("Global", "LEFT", "Left arrow", "Left");
+    RegisterKey("Global", "RIGHT", "Right arrow", "Right");
+    RegisterKey("Global", "SELECT", "Select", "Return");
+    RegisterKey("Global", "SELECT", "Select", "Enter");
+    RegisterKey("Global", "SELECT", "Select", "Space");
+    RegisterKey("Global", "ESCAPE", "Escape", "Esc");
+    RegisterKey("Global", "MENU", "Pop-up menu", "M");
+    RegisterKey("Global", "INFO", "More information", "I");
+}
+
+MythMainWindow::~MythMainWindow()
+{
+    delete d;
 }
 
 void MythMainWindow::Init(void)
 {
-    gContext->GetScreenSettings(xbase, screenwidth, wmult,
-                                ybase, screenheight, hmult);
-    setGeometry(xbase, ybase, screenwidth, screenheight);
-    setFixedSize(QSize(screenwidth, screenheight));
+    gContext->GetScreenSettings(d->xbase, d->screenwidth, d->wmult,
+                                d->ybase, d->screenheight, d->hmult);
+    setGeometry(d->xbase, d->ybase, d->screenwidth, d->screenheight);
+    setFixedSize(QSize(d->screenwidth, d->screenheight));
 
     setFont(gContext->GetMediumFont());
     setCursor(QCursor(Qt::BlankCursor));
@@ -80,33 +150,33 @@ void MythMainWindow::Show(void)
 
 void MythMainWindow::attach(QWidget *child)
 {
-    widgetList.push_back(child);
+    d->widgetList.push_back(child);
     child->raise();
     child->setFocus();
 }
 
 void MythMainWindow::detach(QWidget *child)
 {
-    if (widgetList.back() != child)
+    if (d->widgetList.back() != child)
     {
         cerr << "Not removing top most widget, error\n";
         return;
     }
 
-    widgetList.pop_back();
+    d->widgetList.pop_back();
     QWidget *current = currentWidget();
 
     if (current)
         current->setFocus();
 
-    if (exitingtomain)
+    if (d->exitingtomain)
         QApplication::postEvent(this, new ExitToMainMenuEvent());
 }
 
 QWidget *MythMainWindow::currentWidget(void)
 {
-    if (widgetList.size() > 0)
-        return widgetList.back();
+    if (d->widgetList.size() > 0)
+        return d->widgetList.back();
     return NULL;
 }
 
@@ -114,7 +184,7 @@ void MythMainWindow::ExitToMainMenu(void)
 {
     QWidget *current = currentWidget();
 
-    if (current)
+    if (current && d->exitingtomain)
     {
         if (current->name() != QString("mainmenu"))
         {
@@ -122,33 +192,121 @@ void MythMainWindow::ExitToMainMenu(void)
             {
                 MythEvent *me = new MythEvent("EXIT_TO_MENU");
                 QApplication::postEvent(current, me);
-                exitingtomain = true;
+                d->exitingtomain = true;
             }
             else if (MythDialog *dial = dynamic_cast<MythDialog*>(current))
             {
+                (void)dial;
                 QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, Key_Escape, 
                                                0, Qt::NoButton);
                 QObject *key_target = getTarget(*key);
                 QApplication::postEvent(key_target, key);
-                exitingtomain = true;
+                d->exitingtomain = true;
             }
         }
         else
         {
-            exitingtomain = false;
+            d->exitingtomain = false;
+            if (d->exitmenucallback)
+            {
+                void (*callback)(void) = d->exitmenucallback;
+                d->exitmenucallback = NULL;
+
+                callback();
+            }
         }
     }
 }
 
-int MythMainWindow::TranslateKeyPress(const QString &context,
-                                      int key, QValueVector<int> *retvec)
+bool MythMainWindow::TranslateKeyPress(const QString &context,
+                                       QKeyEvent *e, QStringList &actions)
 {
-/*
-    if (key == Key_T)
-        QApplication::postEvent(this, new ExitToMainMenuEvent());
-*/
+    int keynum = e->key();
 
-    return false;
+    if (d->jumpMap.count(keynum) > 0 && d->exitmenucallback == NULL)
+    {
+        d->exitingtomain = true;
+        d->exitmenucallback = d->jumpMap[keynum].callback;
+        QApplication::postEvent(this, new ExitToMainMenuEvent());
+        return false;
+    }
+
+    bool retval = false;
+
+    QString action = "";
+    if (d->keyContexts["Global"]->GetMapping(keynum, action))
+    {
+        actions += action;
+        retval = true;
+    }
+
+    if (d->keyContexts[context])
+    {
+        action = "";
+        if (d->keyContexts[context]->GetMapping(keynum, action))
+        {
+            actions += action;
+            retval = true;
+        }
+    }
+
+    return retval;
+}
+
+void MythMainWindow::RegisterKey(const QString &context, const QString &action,
+                                 const QString &description, const QString &key)
+{
+    QKeySequence keyseq(key);
+
+    if (!d->keyContexts[context])
+        d->keyContexts.insert(context, new KeyContext());
+
+    if (!keyseq.isEmpty())
+    {
+        int keynum = keyseq[0];
+        keynum &= ~Qt::UNICODE_ACCEL;
+
+        QString dummyaction = "";
+        if (d->keyContexts[context]->GetMapping(keynum, dummyaction))
+        {
+            VERBOSE(VB_GENERAL, QString("Key %1 is already bound in context "
+                                        "%2.").arg(key).arg(context));
+        }
+        else
+        {
+            d->keyContexts[context]->AddMapping(keynum, action);
+            VERBOSE(VB_GENERAL, QString("Binding: %1 to action: %2 (%3)")
+                                       .arg(keynum).arg(action).arg(context));
+        }
+    }
+}
+
+void MythMainWindow::RegisterJump(const QString &destination, 
+                                  const QString &description,
+                                  const QString &key, void (*callback)(void))
+{
+    QKeySequence keyseq(key);
+
+    if (!keyseq.isEmpty())
+    {
+        int keynum = keyseq[0];
+        keynum &= ~Qt::UNICODE_ACCEL;
+
+        if (d->jumpMap.count(keynum) == 0)
+        {
+            JumpData jd = { callback, destination, description };
+
+            VERBOSE(VB_GENERAL, QString("Binding: %1 to JumpPoint: %2")
+                                       .arg(key).arg(destination));
+
+            d->jumpMap[keynum] = jd;
+        }
+        else
+        {
+            VERBOSE(VB_GENERAL, QString("Key %1 is already bound to a jump "
+                                        "point.").arg(key));
+        }
+    }
 }
 
 void MythMainWindow::keyPressEvent(QKeyEvent *e)
@@ -162,7 +320,7 @@ void MythMainWindow::keyPressEvent(QKeyEvent *e)
 
 void MythMainWindow::customEvent(QCustomEvent *ce)
 {
-    if (ce->type() == kExitToMainMenuEventType)
+    if (ce->type() == kExitToMainMenuEventType && d->exitingtomain)
     {
         ExitToMainMenu();
     }
@@ -350,36 +508,37 @@ void MythDialog::hide(void)
 
 void MythDialog::keyPressEvent( QKeyEvent *e )
 {
-    //   Calls reject() if Escape is pressed. Simulates a button
-    //   click for the default button if Enter is pressed. Move focus
-    //   for the arrow keys. Ignore the rest.
-    if ( e->state() == 0 || ( e->state() & Keypad && e->key() == Key_Enter ) ) {
-        switch ( e->key() ) {
-        case Key_Escape:
-            reject();
-            break;
-        case Key_Up:
-        case Key_Left:
-            if ( focusWidget() &&
-                 ( focusWidget()->focusPolicy() == QWidget::StrongFocus ||
-                   focusWidget()->focusPolicy() == QWidget::WheelFocus ) ) {
-                break;
+    if (e->state() != 0)
+        return;
+
+    QStringList actions;
+    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
+    {
+        for (unsigned int i = 0; i < actions.size(); i++)
+        {
+            QString action = actions[i];
+            if (action == "ESCAPE")
+                reject();
+            else if (action == "UP" || action == "LEFT")
+            {
+                if (focusWidget() &&
+                    (focusWidget()->focusPolicy() == QWidget::StrongFocus ||
+                     focusWidget()->focusPolicy() == QWidget::WheelFocus))
+                {
+                }
+                else
+                    focusNextPrevChild(false);
             }
-            // call ours, since c++ blocks us from calling the one
-            // belonging to focusWidget().
-            focusNextPrevChild( FALSE );
-            break;
-        case Key_Down:
-        case Key_Right:
-            if ( focusWidget() &&
-                 ( focusWidget()->focusPolicy() == QWidget::StrongFocus ||
-                   focusWidget()->focusPolicy() == QWidget::WheelFocus ) ) {
-                break;
+            else if (action == "DOWN" || action == "RIGHT")
+            {
+                if (focusWidget() &&
+                    (focusWidget()->focusPolicy() == QWidget::StrongFocus ||
+                     focusWidget()->focusPolicy() == QWidget::WheelFocus)) 
+                {
+                }
+                else
+                    focusNextPrevChild(true);
             }
-            focusNextPrevChild( TRUE );
-            break;
-        default:
-            return;
         }
     }
 }
@@ -729,9 +888,19 @@ void MythProgressDialog::setProgress(int curprogress)
 
 void MythProgressDialog::keyPressEvent(QKeyEvent *e)
 {
-    if (e->key() == Key_Escape)
-        ;
-    else
+    bool handled = false;
+    QStringList actions;
+    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
+    {
+        for (unsigned int i = 0; i < actions.size(); i++)
+        {
+            QString action = actions[i];
+            if (action == "ESCAPE")
+                handled = true;
+        }
+    }
+
+    if (!handled)
         MythDialog::keyPressEvent(e);
 }
 
@@ -1453,9 +1622,15 @@ MythPasswordDialog::MythPasswordDialog(QString message,
 
 void MythPasswordDialog::keyPressEvent(QKeyEvent *e)
 {
-    if (e->key() == Key_Escape)
+    QStringList actions;
+    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
     {
-        MythDialog::keyPressEvent(e);
+        for (unsigned int i = 0; i < actions.size(); i++)
+        {
+            QString action = actions[i];
+            if (action == "ESCAPE")
+                MythDialog::keyPressEvent(e);
+        }
     }
 }
 
@@ -1558,26 +1733,29 @@ Myth2ButtonDialog::Myth2ButtonDialog(MythMainWindow *parent, QString title1,
 
 void Myth2ButtonDialog::keyPressEvent(QKeyEvent *e)
 {
-    switch (e->key()) 
+    QStringList actions;
+    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
     {
-        case Key_Escape:
-            done(0);
-            break;
-        case Key_Enter:
-        case Key_Return:
-        case Key_Space:
-            if (but1->hasFocus())
-                done(1);
-            else
-                done(2);
-            break;
-        case Key_Up:
-        case Key_Down:
-            if (but1->hasFocus())
-                but2->setFocus();
-            else
-                but1->setFocus();
-            break;
+        for (unsigned int i = 0; i < actions.size(); i++)
+        {
+            QString action = actions[i];
+            if (action == "ESCAPE")
+                done(0);
+            else if (action == "SELECT")
+            {
+                if (but1->hasFocus())
+                    done(1);
+                else
+                    done(2);
+            }
+            else if (action == "UP" || action == "DOWN")
+            {
+                if (but1->hasFocus())
+                    but2->setFocus();
+                else
+                    but1->setFocus();
+            }
+        }
     }
 }
 
@@ -1681,6 +1859,7 @@ MythImageFileDialog::MythImageFileDialog(QString *result,
     
 }
 
+/* XXX FIXME */
 void MythImageFileDialog::keyPressEvent(QKeyEvent *e)
 {
     switch(e->key())
