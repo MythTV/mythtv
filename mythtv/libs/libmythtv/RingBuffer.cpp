@@ -125,6 +125,9 @@ ThreadedFileWriter::~ThreadedFileWriter()
 
 unsigned ThreadedFileWriter::Write(const void *data, unsigned count)
 {
+    if (count == 0)
+        return 0;
+
     int first = 1;
 
     while(count > BufFree())
@@ -886,26 +889,39 @@ int RingBuffer::Read(void *buf, int count)
                 readpos += ret;
             totalreadpos += ret;
         }
-        else if (readpos + count > filesize)
-        {
-            int toread = filesize - readpos;
-
-            ret = safe_read(fd2, buf, toread);
-
-            int left = count - toread;
-            lseek(fd2, 0, SEEK_SET);
-
-            ret = safe_read(fd2, (char *)buf + toread, left);
-            ret += toread;
- 
-            totalreadpos += ret;
-            readpos = left;
-        }
         else
         {
-            ret = safe_read(fd2, buf, count);
-            readpos += ret;
-            totalreadpos += ret;
+            while (totalreadpos + count > totalwritepos - tfw->BufUsed())
+            {
+                usleep(1000);
+                if (stopreads)
+                {
+                    pthread_rwlock_unlock(&rwlock);
+                    return 0;
+                }
+            }
+            
+            if (readpos + count > filesize)
+            {
+                int toread = filesize - readpos;
+
+                ret = safe_read(fd2, buf, toread);
+  
+                int left = count - toread;
+                lseek(fd2, 0, SEEK_SET);
+
+                ret = safe_read(fd2, (char *)buf + toread, left);
+                ret += toread;
+ 
+                totalreadpos += ret;
+                readpos = left;
+            } 
+            else
+            {
+                ret = safe_read(fd2, buf, count);
+                readpos += ret;
+                totalreadpos += ret;
+            }
         }
     }
 
@@ -984,30 +1000,30 @@ int RingBuffer::Write(const void *buf, int count)
 //cout << "write: " << totalwritepos << " " << writepos << " " << count << " " << filesize << endl;
         if (writepos + count > filesize)
         {
-	    int towrite = filesize - writepos;
-	    ret = tfw->Write(buf, towrite);
+            int towrite = filesize - writepos;
+            ret = tfw->Write(buf, towrite);
 
-	    int left = count - towrite;
-	    tfw->Seek(0, SEEK_SET);
+            int left = count - towrite;
+            tfw->Seek(0, SEEK_SET);
 
-	    ret = tfw->Write((char *)buf + towrite, left);
-	    writepos = left;
+            ret = tfw->Write((char *)buf + towrite, left);
+            writepos = left;
 
-	    ret += towrite;
+            ret += towrite;
 
-	    totalwritepos += ret;
-	    wrapcount++;
+            totalwritepos += ret;
+            wrapcount++;
         }
-	else
-	{
-	    ret = tfw->Write(buf, count);
+        else
+        {
+            ret = tfw->Write(buf, count);
             writepos += ret;
-	    totalwritepos += ret;
-	}
+            totalwritepos += ret;
+        }
 
         if (dumpfw)
         {
-	    int ret2 = dumpfw->Write(buf, count);
+            int ret2 = dumpfw->Write(buf, count);
             dumpwritepos += ret2;
         }
     }
