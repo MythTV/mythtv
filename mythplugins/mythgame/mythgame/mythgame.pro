@@ -4,30 +4,23 @@
 
 include ( ../settings.pro )
 
-TEMPLATE = app
-CONFIG += thread
+TEMPLATE = lib
+CONFIG += plugin thread
 TARGET = mythgame
-target.path = $${PREFIX}/bin
+target.path = $${PREFIX}/lib/mythtv/plugins
 INSTALLS += target
-
-installfiles.path = $${PREFIX}/share/mythtv
-installfiles.files = mythgame-settings.txt gamemenu.xml
-
-INSTALLS += installfiles
-
-LIBS += -L$${PREFIX}/lib -lmyth-$$LIBVERSION -lz
 
 # Input
 HEADERS += constants.h databasebox.h gamehandler.h mamehandler.h rominfo.h 
 HEADERS += mamerominfo.h treeitem.h mamesettingsdlg.h extendedlistview.h 
 HEADERS += selectframe.h screenbox.h neshandler.h nesrominfo.h nessettingsdlg.h
 HEADERS += unzip.h sneshandler.h snesrominfo.h snessettingsdlg.h pchandler.h
-HEADERS += pcrominfo.h pcsettingsdlg.h
+HEADERS += pcrominfo.h pcsettingsdlg.h gamesettings.h
 
 SOURCES += databasebox.cpp selectframe.cpp screenbox.cpp
 SOURCES += main.cpp gamehandler.cpp mamehandler.cpp rominfo.cpp neshandler.cpp
 SOURCES += treeitem.cpp mamerominfo.cpp mamesettingsdlg.cpp extendedlistview.cpp
 SOURCES += nesrominfo.cpp nessettingsdlg.cpp unzip.c sneshandler.cpp
 SOURCES += snesrominfo.cpp snessettingsdlg.cpp pchandler.cpp pcrominfo.cpp
-SOURCES += pcsettingsdlg.cpp
+SOURCES += pcsettingsdlg.cpp gamesettings.cpp
 

@@ -10,95 +10,42 @@ using namespace std;
 #include "databasebox.h"
 #include "screenbox.h"
 #include "rominfo.h"
+#include "gamesettings.h"
 
 #include <mythtv/themedmenu.h>
 #include <mythtv/mythcontext.h>
 
-MythContext *gContext;
-
-void startDatabaseTree(QSqlDatabase *db, QString &paths)
-{
-    if(gContext->GetNumSetting("ShotCount")) // this will be a choice in the settings menu.
-    {
-        ScreenBox screenbox(db, paths, gContext->GetMainWindow(), 
-                            "game screen");
-        screenbox.exec();
-    }
-    else
-    {
-        DatabaseBox dbbox(db, paths, gContext->GetMainWindow(), "game list");
-        dbbox.exec();
-    }
+extern "C" {
+int mythplugin_init(const char *libversion);
+int mythplugin_run(void);
+int mythplugin_config(void);
 }
 
-struct GameCBData
+int mythplugin_init(const char *libversion)
 {
-    QString paths;
-    QSqlDatabase *db;
-    QValueList<RomInfo> *romlist;
-};
-
-void GameCallback(void *data, QString &selection)
-{
-    GameCBData *gdata = (GameCBData *)data;
-
-    QString sel = selection.lower();
-
-    if (sel == "game_play")
-        startDatabaseTree(gdata->db, gdata->paths);
-}
-
-void runMenu(QString themedir, QSqlDatabase *db, QString paths, 
-             QValueList<RomInfo> &romlist)
-{
-    ThemedMenu *diag = new ThemedMenu(themedir.ascii(), "gamemenu.xml",
-                                      gContext->GetMainWindow(), "game menu");
-
-    GameCBData data;
-    data.paths = paths;
-    data.db = db;
-    data.romlist = &romlist;
-
-    diag->setCallback(GameCallback, &data);
-    diag->setKillable();
-        
-    if (diag->foundTheme())
+    QString lib = libversion;
+    if (lib != MYTH_BINARY_VERSION)
     {
-        diag->exec();
-    }     
-    else
-    {
-        cerr << "Couldn't find theme " << themedir << endl;
-    }       
-
-    delete diag;
-}
-
-int main(int argc, char *argv[])
-{
-    QApplication a(argc, argv);
-
-    gContext = new MythContext(MYTH_BINARY_VERSION);
-
-    gContext->LoadSettingsFiles("mythgame-settings.txt");
-
-    QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
-    if (!db)
-    {
-        printf("Could not connect to database\n");
-        return -1;
-    }
-    if (!gContext->OpenDatabase(db))
-    {
-        printf("could not open db\n");
+        cerr << "This plugin was compiled against libmyth version: "
+             << MYTH_BINARY_VERSION
+             << "\nbut the library is version: " << libversion << endl;
+        cerr << "You probably want to recompile everything, and do a\n"
+             << "'make distclean' first.\n";
         return -1;
     }
 
-    gContext->LoadQtConfig();
+    return 0;
+}
 
-    MythMainWindow *mainWindow = new MythMainWindow();
-    mainWindow->Show();
-    gContext->SetMainWindow(mainWindow);
+int mythplugin_run(void)
+{
+    QTranslator translator( 0 );
+    translator.load(PREFIX + QString("/share/mythtv/i18n/mythgame_") +
+                    QString(gContext->GetSetting("Language").lower()) +
+                    QString(".qm"), ".");
+    qApp->installTranslator(&translator);
+
+    QSqlDatabase *db = QSqlDatabase::database();
 
     //look for new systems that haven't been added to the database
     //yet and tell them to scan their games
@@ -127,22 +74,28 @@ int main(int argc, char *argv[])
 
     QString paths = gContext->GetSetting("GameTreeLevels");
 
-    QValueList<RomInfo> Romlist;
-
-    QString themename = gContext->GetSetting("Theme");
-
-    QString themedir = gContext->FindThemeDir(themename);
-    if (themedir == "")
+    if(gContext->GetNumSetting("ShotCount")) // this will be a choice in the settings menu.
     {
-        cerr << "Couldn't find theme " << themename << endl;
-        exit(0);
+        ScreenBox screenbox(db, paths, gContext->GetMainWindow(), 
+                            "game screen");
+        screenbox.exec();
+    }
+    else
+    {
+        DatabaseBox dbbox(db, paths, gContext->GetMainWindow(), "game list");
+        dbbox.exec();
     }
 
-    runMenu(themedir, db, paths, Romlist);
-
-    db->close();
-
-    delete gContext;
+    qApp->removeTranslator(&translator);
 
     return 0;
 }
+
+int mythplugin_config(void)
+{
+    GameSettings settings;
+    settings.exec(QSqlDatabase::database());
+
+    return 0;
+}
+
