@@ -9,6 +9,15 @@
 
 #define NUMPROGRAMLINES 20
 
+#define MARK_CUT_START     1
+#define MARK_CUT_END       2
+#define MARK_BLANK_FRAME   3
+#define MARK_COMM_START    4
+#define MARK_COMM_END      5
+#define MARK_GOP_START     6
+#define MARK_BOOKMARK      7
+#define MARK_SCENE_CHANGE  8
+
 class QSqlDatabase;
 
 class ProgramInfo
@@ -57,7 +66,8 @@ class ProgramInfo
     void GetCutList(QMap<long long, int> &delMap, QSqlDatabase *db);
     void SetCutList(QMap<long long, int> &delMap, QSqlDatabase *db);
 
-    void SetBlankFrameList(QMap<long long, int> &frames, QSqlDatabase *db);
+    void SetBlankFrameList(QMap<long long, int> &frames, QSqlDatabase *db,
+                           long long min_frame = -1, long long max_frame = -1);
     void GetBlankFrameList(QMap<long long, int> &frames, QSqlDatabase *db);
 
     void SetCommBreakList(QMap<long long, int> &frames, QSqlDatabase *db);

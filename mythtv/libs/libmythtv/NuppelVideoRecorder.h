@@ -19,6 +19,7 @@
 
 #include "recorderbase.h"
 
+#include "commercial_skip.h"
 #include "minilzo.h"
 #include "format.h"
 
@@ -141,6 +142,8 @@ class NuppelVideoRecorder : public RecorderBase
     int rawmode;
     int usebttv;
     struct video_audio *origaudio;
+
+    CommDetect *commDetect;
 
     int mp3quality;
     char *mp3buf;

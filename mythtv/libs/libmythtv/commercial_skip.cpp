@@ -3,14 +3,44 @@
 #include <qstringlist.h>
 
 #include "commercial_skip.h"
+#include "programinfo.h"
 #include "util.h"
 
-bool CheckFrameIsBlank(unsigned char *buf, int width, int height)
+CommDetect::CommDetect(int w, int h, double fps)
+{
+    width = w;
+    height = h;
+    frame_rate = fps;
+
+    sceneChangeTolerance = 0.95;
+
+    lastFrameWasBlank = false;
+    lastFrame = NULL;
+    memset(lastHistogram, 0, sizeof(lastHistogram));
+}
+
+CommDetect::~CommDetect(void)
+{
+    if (lastFrame)
+        delete [] lastFrame;
+}
+
+void CommDetect::ReInit(int w, int h, double fps)
+{
+    if (lastFrame)
+        delete [] lastFrame;
+
+    CommDetect(w, h, fps);
+}
+
+bool CommDetect::FrameIsBlank(unsigned char *buf)
 {
     const unsigned int max_brightness = 120;
     const unsigned int test_brightness = 80;
     bool line_checked[height];
     bool test = false;
+
+    lastFrameWasBlank = false;
 
     for(int y = 0; y < height; y++)
         line_checked[y] = false;
@@ -38,16 +68,74 @@ bool CheckFrameIsBlank(unsigned char *buf, int width, int height)
     // frame is dim so test average
     if (test)
     {
-        int avg = GetFrameAvgBrightness(buf, width, height);
+        int avg = GetAvgBrightness(buf);
 
         if (avg > 35)
             return(false);
     }
 
+    lastFrameWasBlank = true;
+
     return(true);
 }
 
-int GetFrameAvgBrightness(unsigned char *buf, int width, int height)
+bool CommDetect::SceneChanged(unsigned char *buf)
+{
+    int histogram[256];
+
+    if (!lastFrame)
+    {
+        // first frame so copy to buffer and return
+        lastFrame = new unsigned char[width * height];
+
+        if (lastFrame)
+        {
+            memcpy(lastFrame, buf, width * height);
+            memset(lastHistogram, 0, sizeof(lastHistogram));
+            for(int i = 0; i < (width * height); i++)
+                lastHistogram[buf[i]]++;
+        }
+        else
+            return(false);
+
+        return(false);
+    }
+
+    // compare current frame with last frame here
+    memset(histogram, 0, sizeof(histogram));
+    for(int i = 0; i < (width * height); i++)
+        histogram[buf[i]]++;
+
+    if (lastFrameWasSceneChange)
+    {
+        lastFrameWasSceneChange = false;
+        memcpy(lastHistogram, histogram, sizeof(histogram));
+        return(false);
+    }
+
+    long similar = 0;
+
+    for(int i = 0; i < 256; i++)
+    {
+        if (histogram[i] < lastHistogram[i])
+            similar += histogram[i];
+        else
+            similar += lastHistogram[i];
+    }
+
+    if (similar < (width * height * .91))
+    {
+        lastFrameWasSceneChange = true;
+        memcpy(lastHistogram, histogram, sizeof(histogram));
+        return(true);
+    }
+
+    lastFrameWasSceneChange = false;
+    memcpy(lastHistogram, histogram, sizeof(histogram));
+    return(false);
+}
+
+int CommDetect::GetAvgBrightness(unsigned char *buf)
 {
     int brightness = 0;
     int pixels = 0;
@@ -62,8 +150,8 @@ int GetFrameAvgBrightness(unsigned char *buf, int width, int height)
     return(brightness/pixels);
 }
 
-void BuildCommListFromBlanks(QMap<long long, int> &blanks, double fps,
-         QMap<long long, int> &commMap)
+void CommDetect::BuildCommListFromBlanks(QMap<long long, int> &blanks,
+                                         QMap<long long, int> &commMap)
 {
     long long bframes[blanks.count()*2];
     long long c_start[512];
@@ -92,12 +180,12 @@ void BuildCommListFromBlanks(QMap<long long, int> &blanks, double fps,
             // have blanks inbetween commercials just at the beginning and
             // end of breaks
             int gap_length = bframes[x] - bframes[i];
-            if ((abs((int)(gap_length - (15 * fps))) < 10 ) ||
-                (abs((int)(gap_length - (20 * fps))) < 11 ) ||
-                (abs((int)(gap_length - (30 * fps))) < 12 ) ||
-                (abs((int)(gap_length - (45 * fps))) < 13 ) ||
-                (abs((int)(gap_length - (60 * fps))) < 15 ) ||
-                (abs((int)(gap_length - (90 * fps))) < 10 ))
+            if ((abs((int)(gap_length - (15 * frame_rate))) < 10 ) ||
+                (abs((int)(gap_length - (20 * frame_rate))) < 11 ) ||
+                (abs((int)(gap_length - (30 * frame_rate))) < 12 ) ||
+                (abs((int)(gap_length - (45 * frame_rate))) < 13 ) ||
+                (abs((int)(gap_length - (60 * frame_rate))) < 15 ) ||
+                (abs((int)(gap_length - (90 * frame_rate))) < 10 ))
             {
                 c_start[commercials] = bframes[i];
                 c_end[commercials] = bframes[x] - 1;
@@ -113,8 +201,8 @@ void BuildCommListFromBlanks(QMap<long long, int> &blanks, double fps,
     // don't allow single commercial at head
     // of show unless followed by another
     if ((commercials > 1) &&
-        (c_end[0] < (33 * fps)) &&
-        (c_start[1] > (c_end[0] + 40 * fps)))
+        (c_end[0] < (33 * frame_rate)) &&
+        (c_start[1] > (c_end[0] + 40 * frame_rate)))
         i = 1;
 
     // eliminate any blank frames at end of commercials
@@ -122,7 +210,7 @@ void BuildCommListFromBlanks(QMap<long long, int> &blanks, double fps,
     {
         long long int r = c_start[i];
 
-        if (r < (30 * fps)) 
+        if (r < (30 * frame_rate)) 
             r = 1;
 
         commMap[r] = MARK_COMM_START;
@@ -157,8 +245,8 @@ void BuildCommListFromBlanks(QMap<long long, int> &blanks, double fps,
     commMap[c_end[i]] = MARK_COMM_END;
 }
 
-void MergeCommList(QMap<long long, int> &commMap, double fps,
-        QMap<long long, int> &commBreakMap)
+void CommDetect::MergeCommList(QMap<long long, int> &commMap,
+                               QMap<long long, int> &commBreakMap)
 {
     QMap<long long, int>::Iterator it;
     QMap<long long, int>::Iterator prev;
@@ -168,10 +256,13 @@ void MergeCommList(QMap<long long, int> &commMap, double fps,
 
     commBreakMap.clear();
 
+    if (commMap.isEmpty())
+        return;
+
     for (it = commMap.begin(); it != commMap.end(); ++it)
         commBreakMap[it.key()] = it.data();
 
-    if (commMap.isEmpty() || commBreakMap.isEmpty())
+    if (commBreakMap.isEmpty())
         return;
 
     it = commMap.begin();
@@ -181,7 +272,7 @@ void MergeCommList(QMap<long long, int> &commMap, double fps,
     {
         // if next commercial starts less than 15*fps frames away then merge
         if ((((prev.key() + 1) == it.key()) ||
-             ((prev.key() + (15 * fps)) > it.key())) &&
+             ((prev.key() + (15 * frame_rate)) > it.key())) &&
             (prev.data() == MARK_COMM_END) &&
             (it.data() == MARK_COMM_START))
         {
@@ -206,9 +297,9 @@ void MergeCommList(QMap<long long, int> &commMap, double fps,
     tmpMap_it++;
     for(; tmpMap_it != tmpMap.end(); ++tmpMap_it, ++tmpMap_prev)
     {
-        if (((tmpMap_prev.data() + (35 * fps)) > tmpMap_it.key()) &&
-            ((tmpMap_prev.data() - tmpMap_prev.key()) > (35 * fps)) &&
-            ((tmpMap_it.data() - tmpMap_it.key()) > (35 * fps)))
+        if (((tmpMap_prev.data() + (35 * frame_rate)) > tmpMap_it.key()) &&
+            ((tmpMap_prev.data() - tmpMap_prev.key()) > (35 * frame_rate)) &&
+            ((tmpMap_it.data() - tmpMap_it.key()) > (35 * frame_rate)))
         {
             commBreakMap.erase(tmpMap_prev.data());
             commBreakMap.erase(tmpMap_it.key());
@@ -216,7 +307,8 @@ void MergeCommList(QMap<long long, int> &commMap, double fps,
     }
 }
 
-void DeleteCommAtFrame(QMap<long long, int> &commMap, long long frame)
+void CommDetect::DeleteCommAtFrame(QMap<long long, int> &commMap,
+                                   long long frame)
 {
     long long start = -1;
     long long end = -1;

@@ -66,6 +66,8 @@ NuppelVideoRecorder::NuppelVideoRecorder(void)
     strm = NULL;   
     mp3buf = NULL;
 
+    commDetect = NULL;
+
     act_video_encode = 0;
     act_video_buffer = 0;
     video_buffer_count = 0;
@@ -151,6 +153,8 @@ NuppelVideoRecorder::~NuppelVideoRecorder(void)
         lame_close(gf);  
     if (strm)
         delete [] strm;
+    if (commDetect)
+        delete commDetect;
     if (fd > 0)
         close(fd);
     if (seektable)
@@ -654,6 +658,11 @@ void NuppelVideoRecorder::StartRecording(void)
         cerr << "Couldn't spawn children\n";
         return;
     }
+
+    if (commDetect)
+        commDetect->ReInit(w, h, video_frame_rate);
+    else
+        commDetect = new CommDetect(w, h, video_frame_rate);
 
     // save the start time
     gettimeofday(&stm, &tzone);
@@ -2698,6 +2707,7 @@ void NuppelVideoRecorder::WriteVideo(Frame *frame, bool skipsync, bool forcekey)
     int fnum = frame->frameNumber;
     int timecode = frame->timecode;
     unsigned char *buf = frame->buf;
+    static long long prev_bframe_save_pos = -1;
 
     memset(&frameheader, 0, sizeof(frameheader));
 
@@ -2919,9 +2929,20 @@ void NuppelVideoRecorder::WriteVideo(Frame *frame, bool skipsync, bool forcekey)
     frameofgop++;
     framesWritten++;
 
-    if (!hardware_encode && CheckFrameIsBlank(buf, frame->width, frame->height))
+    if (!hardware_encode && commDetect->FrameIsBlank(buf))
     {
-        blank_frames[framesWritten] = 1;
+        blank_frames[(fnum-startnum)>>1] = 1;
+
+        if ((!livetv) &&
+            ((blank_frames.size() % 15 ) == 0))
+        {
+            pthread_mutex_lock(db_lock);
+            curRecording->ProgramInfo::SetBlankFrameList(blank_frames,
+                db_conn, prev_bframe_save_pos, (fnum-startnum)>>1 );
+            pthread_mutex_unlock(db_lock);
+
+            prev_bframe_save_pos = ((fnum-startnum)>>1) + 1;
+        }
     }
    
     // now we reset the last frame number so that we can find out

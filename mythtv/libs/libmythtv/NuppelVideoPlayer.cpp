@@ -25,7 +25,6 @@ using namespace std;
 #include "remoteutil.h"
 #include "programinfo.h"
 #include "mythcontext.h"
-#include "commercial_skip.h"
 
 #include "decoderbase.h"
 #include "nuppeldecoder.h"
@@ -100,6 +99,8 @@ NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
     ringBuffer = NULL;
     weMadeBuffer = false;
     osd = NULL;
+
+    commDetect = NULL;
 
     audio_bits = 16;
     audio_channels = 2;
@@ -182,6 +183,8 @@ NuppelVideoPlayer::~NuppelVideoPlayer(void)
         delete ringBuffer;
     if (osd)
         delete osd;
+    if (commDetect)
+        delete commDetect;
 
     if (own_vidbufs)
     {
@@ -528,6 +531,8 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
 
 	bookmarkseek = GetBookmark();
     }
+
+    commDetect = new CommDetect(video_width, video_height, video_frame_rate);
 
     return 0;
 }
@@ -2883,8 +2888,8 @@ int NuppelVideoPlayer::FlagCommercials(int show_percentage)
     m_playbackinfo->SetBlankFrameList(blankMap, m_db);
     db_lock.unlock();
 
-    BuildCommListFromBlanks(blankMap, video_frame_rate, commBlankMap);
-    MergeCommList(commBlankMap, video_frame_rate, commBlankBreakMap);
+    commDetect->BuildCommListFromBlanks(blankMap, commBlankMap);
+    commDetect->MergeCommList(commBlankMap, commBlankBreakMap);
 
     // Merge/resolve differences between the lists here
 
@@ -2920,7 +2925,7 @@ int NuppelVideoPlayer::GetStatusbarPos(void)
 
 bool NuppelVideoPlayer::FrameIsBlank(int vposition)
 {
-    return(CheckFrameIsBlank(vbuffer[vposition], video_width, video_height));
+    return(commDetect->FrameIsBlank(vbuffer[vposition]));
 }
 
 void NuppelVideoPlayer::AutoCommercialSkip(void)
@@ -3023,8 +3028,8 @@ void NuppelVideoPlayer::SkipCommercialsByBlanks(void)
     {
         QMap<long long, int> commBlankMap;
 
-        BuildCommListFromBlanks(blankMap, video_frame_rate, commBlankMap);
-        MergeCommList(commBlankMap, video_frame_rate, commBreakMap);
+        commDetect->BuildCommListFromBlanks(blankMap, commBlankMap);
+        commDetect->MergeCommList(commBlankMap, commBreakMap);
         if (!commBreakMap.isEmpty())
         {
             hascommbreaktable = true;
@@ -3166,6 +3171,32 @@ void NuppelVideoPlayer::SkipCommercialsByBlanks(void)
 
 bool NuppelVideoPlayer::DoSkipCommercials(int direction)
 {
+    if (( ! hasblanktable) ||
+        (livetv) ||
+        (watchingrecording && nvr_enc && nvr_enc->IsValidRecorder()))
+    {
+        hasblanktable = false;
+        hascommbreaktable = false;
+        LoadBlankList();
+        if (!blankMap.isEmpty())
+        {
+            hasblanktable = true;
+            blankIter = blankMap.begin();
+            commBreakMap.clear();
+        }
+    }
+
+    if (( ! hascommbreaktable) &&
+        (hasblanktable))
+    {
+        QMap<long long, int> commBlankMap;
+
+        commDetect->BuildCommListFromBlanks(blankMap, commBlankMap);
+        commDetect->MergeCommList(commBlankMap, commBreakMap);
+        if (!commBreakMap.isEmpty())
+            hascommbreaktable = true;
+    }
+
     if (hascommbreaktable)
     {
         SetCommBreakIter();
@@ -3222,20 +3253,6 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
 
         return true;
     }
-    else
-        if (hasblanktable)
-        {
-            QMap<long long, int> commBlankMap;
-
-            BuildCommListFromBlanks(blankMap, video_frame_rate, commBlankMap);
-            MergeCommList(commBlankMap, video_frame_rate, commBreakMap);
-            if (!commBreakMap.isEmpty())
-            {
-                hascommbreaktable = true;
-                return DoSkipCommercials(direction);
-            }
-        }
-
 
     switch (commercialskipmethod)
     {

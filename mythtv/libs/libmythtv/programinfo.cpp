@@ -752,17 +752,37 @@ void ProgramInfo::SetCutList(QMap<long long, int> &delMap, QSqlDatabase *db)
 }
 
 void ProgramInfo::SetBlankFrameList(QMap<long long, int> &frames,
-        QSqlDatabase *db)
+        QSqlDatabase *db, long long min_frame, long long max_frame)
 {
     QMap<long long, int>::Iterator i;
+    QString querystr;
 
     QString starts = startts.toString("yyyyMMddhhmm");
     starts += "00";
 
-    QString querystr = QString("DELETE FROM recordedmarkup "
-                               "WHERE chanid = '%1' AND starttime = '%2' "
-                               "AND type = %3;")
-                               .arg(chanid).arg(starts).arg(MARK_BLANK_FRAME);
+    QString min_comp = " ";
+    QString max_comp = " ";
+
+    if (min_frame >= 0)
+    {
+        char tempc[128];
+        sprintf(tempc, "AND mark >= %lld", min_frame);
+        min_comp += tempc;
+    }
+
+    if (max_frame >= 0)
+    {
+        char tempc[128];
+        sprintf(tempc, "AND mark <= %lld", max_frame);
+        max_comp += tempc;
+    }
+
+    querystr = QString("DELETE FROM recordedmarkup "
+                       "WHERE chanid = '%1' AND starttime = '%2' "
+                       "AND type = %3 %4 %5;")
+                       .arg(chanid).arg(starts)
+                       .arg(MARK_BLANK_FRAME)
+                       .arg(min_comp).arg(max_comp);
     QSqlQuery query = db->exec(querystr);
     if (!query.isActive())
         MythContext::DBError("blank frame list clear", querystr);
@@ -770,6 +790,13 @@ void ProgramInfo::SetBlankFrameList(QMap<long long, int> &frames,
     for (i = frames.begin(); i != frames.end(); ++i)
     {
         long long frame = i.key();
+
+        if ((min_frame >= 0) && (frame < min_frame))
+            continue;
+
+        if ((max_frame >= 0) && (frame > max_frame))
+            continue;
+
         char tempc[128];
         sprintf(tempc, "%lld", frame);
         QString frame_str = tempc;

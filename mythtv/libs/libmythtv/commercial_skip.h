@@ -1,17 +1,39 @@
+#ifndef __COMMERCIAL_SKIP_H__
+#define __COMMERCIAL_SKIP_H__
+
 #include <qmap.h>
 
-#define MARK_CUT_START    1
-#define MARK_CUT_END      2
-#define MARK_BLANK_FRAME  3
-#define MARK_COMM_START   4
-#define MARK_COMM_END     5
-#define MARK_GOP_START    6
+class CommDetect
+{
+  public:
+    CommDetect(int w, int h, double fps);
+    ~CommDetect();
 
-bool CheckFrameIsBlank(unsigned char *buf, int width, int height);
-int GetFrameAvgBrightness(unsigned char *buf, int width, int height);
-void BuildCommListFromBlanks(QMap<long long, int> &blanks, double fps,
-                             QMap<long long, int> &commMap);
-void MergeCommList(QMap<long long, int> &commMap, double fps,
-                   QMap<long long, int> &commBreakMap);
-void DeleteCommAtFrame(QMap<long long, int> &commMap, long long frame);
+    void ReInit(int w, int h, double fps);
 
+    bool FrameIsBlank(unsigned char *buf);
+    bool SceneChanged(unsigned char *buf);
+
+    int GetAvgBrightness(unsigned char *buf);
+
+    void BuildCommListFromBlanks(QMap<long long, int> &blanks,
+                                 QMap<long long, int> &commMap);
+    void MergeCommList(QMap<long long, int> &commMap,
+                       QMap<long long, int> &commBreakMap);
+    void DeleteCommAtFrame(QMap<long long, int> &commMap, long long frame);
+
+  private:
+    int width;
+    int height;
+    double frame_rate;
+
+    double sceneChangeTolerance;
+
+    bool lastFrameWasBlank;
+    bool lastFrameWasSceneChange;
+
+    unsigned char *lastFrame;
+    int lastHistogram[256];
+};
+
+#endif

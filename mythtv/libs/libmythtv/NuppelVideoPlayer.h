@@ -9,6 +9,7 @@
 #include "osd.h"
 #include "jitterometer.h"
 #include "recordingprofile.h"
+#include "commercial_skip.h"
 
 extern "C" {
 #include "filter.h"
@@ -317,6 +318,8 @@ class NuppelVideoPlayer
 
     long long rewindtime, fftime;
     RemoteEncoder *nvr_enc;
+
+    CommDetect *commDetect;
 
     bool resetplaying;
     bool actuallyreset;
