@@ -520,6 +520,8 @@ void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps,
     {
         videosync->SetFrameInterval(frame_interval, m_double_framerate);
         if (!videosync->isInterlaced()) {
+            VERBOSE(VB_IMPORTANT, "Video sync method can't support double "
+                    "framerate (refresh rate too low for bob deint)");
             m_scan = kScan_Ignore;
             m_double_framerate = false;
             if (videoOutput)
@@ -1104,6 +1106,8 @@ void NuppelVideoPlayer::UpdateCC(unsigned char *inpos)
 #define MAXDIVERGE  20  // Maximum number of frames of A/V divergence allowed
                         // before dropping or extending video frames to 
                         // compensate
+#define DIVERGELIMIT 200 // A/V divergence above this amount is clipped
+                         // to avoid bad stream data causing huge pauses
  
 float NuppelVideoPlayer::WarpFactor(void) 
 {
@@ -1211,6 +1215,9 @@ void NuppelVideoPlayer::AVSync(void)
     // close again.  
     if (diverge < -MAXDIVERGE) 
     {
+        if (diverge < -DIVERGELIMIT)
+            diverge = -DIVERGELIMIT;
+
         VERBOSE(VB_PLAYBACK, QString("A/V diverged by %1 frames, dropping "
             "frame to keep audio in sync").arg(diverge));
         lastsync = true;
@@ -1261,6 +1268,9 @@ void NuppelVideoPlayer::AVSync(void)
 
     if (diverge > MAXDIVERGE) 
     {
+        if (diverge > DIVERGELIMIT)
+            diverge = DIVERGELIMIT;
+
         // Audio is way ahead of the video - cut the frame rate
         // until it's almost in sync
         VERBOSE(VB_PLAYBACK, QString("A/V diverged by %1 frames, extending "
