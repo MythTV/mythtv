@@ -108,11 +108,17 @@ bool WriteStringList(QSocketDevice *socket, QStringList &list)
     {
         int temp = socket->writeBlock(payload.data() + written, size);
         // cerr << "  written: " << temp << endl; //DEBUG
+        if (temp < 0)
+        {
+            VERBOSE(VB_GENERAL, "Error writing stringlist");
+            break;
+        }
+
         written += temp;
         size -= temp;
         if (size > 0)
         {
-            printf("Partial WriteStringList %u\n", written);
+            cerr << "Partial WriteStringList " << written << endl;
 
             if (++errorcount > 50)
             {
@@ -139,13 +145,13 @@ bool ReadStringList(QSocketDevice *socket, QStringList &list, bool quickTimeout)
         ++errorcount;
         if (!quickTimeout && errorcount > 1500) // ~30 secs
         {
-            VERBOSE(VB_NETWORK, "ReadStringList timeout.");
+            VERBOSE(VB_GENERAL, "ReadStringList timeout.");
             socket->close();
             return false;
         }
         else if (quickTimeout && errorcount > 150) // ~4 secs
         {
-            VERBOSE(VB_NETWORK, "ReadStringList timeout (quick).");
+            VERBOSE(VB_GENERAL, "ReadStringList timeout (quick).");
             socket->close();
             return false;
         }
@@ -377,11 +383,15 @@ bool WriteBlock(QSocket *socket, void *data, int len)
 
     unsigned int errorcount = 0;
 
+cout << "write block start: " << len << endl;
+
     while (size > 0)
     {
         qApp->lock();
+cout << "socket writeblock\n";
         int temp = socket->writeBlock((char *)data + written, size);
         qApp->unlock();
+cout << "done\n";
         written += temp;
         size -= temp;
         if (size > 0)
@@ -395,14 +405,19 @@ bool WriteBlock(QSocket *socket, void *data, int len)
     }
 
     qApp->lock();
+cout << "flushing\n";
     if (socket->bytesToWrite() > 0)
         socket->flush();
     qApp->unlock();
     
+cout << "done flushing\n";
+
     while (socket->bytesToWrite() >= (unsigned) written)
     {
+cout << socket->bytesToWrite() << " " << written << endl;
         usleep(50000);
     }    
+cout << "done with write\n";
 
     return true;
 }
