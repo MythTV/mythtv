@@ -122,7 +122,7 @@ You have no DVD Device defined.</source>
     </message>
     <message>
         <source>Directory to hold temporary files</source>
-        <translation type="unfinished">Temp. Verzeichnis</translation>
+        <translation>Temp. Verzeichnis</translation>
     </message>
     <message>
         <source>This directory must exist, and the user running MythDVD needs to have write permission to the directory.</source>
@@ -138,7 +138,7 @@ You have no DVD Device defined.</source>
     </message>
     <message>
         <source>Subtitle arguments:</source>
-        <translation type="unfinished">Argumente für Untertitel</translation>
+        <translation>Argumente für Untertitel:</translation>
     </message>
     <message>
         <source>If you choose any subtitles for ripping, this command is added to the end of the Title Play Command to allow previewing of subtitles. If  present %s will be set to the subtitle track. </source>
@@ -150,7 +150,7 @@ You have no DVD Device defined.</source>
     </message>
     <message>
         <source>This is the base (without arguments) command to run transcode on your system.</source>
-        <translation type="unfinished">vollständiger Pfad und Dateiname zu &apos;transcode&apos; (z.B. /usr/bin/transcode)</translation>
+        <translation>vollständiger Pfad und Dateiname zu &apos;transcode&apos; (z.B. /usr/bin/transcode).</translation>
     </message>
     <message>
         <source>MTD port number</source>
