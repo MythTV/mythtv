@@ -142,7 +142,5 @@ macx {
     DEFINES    -= USING_IVTV
     CONFIG     -= using_oss
     DEFINES    -= USING_OSS
-    DEFINES    -= USING_OPENGL_VSYNC
-    EXTRA_LIBS -= -lGL -lGLU
-    CONFIG     -= using_opengl
+    CONFIG     -= using_stick_menu
 }
