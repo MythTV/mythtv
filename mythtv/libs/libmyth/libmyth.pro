@@ -10,7 +10,7 @@ CONFIG += thread dll
 target.path = $${PREFIX}/lib
 INSTALLS = target
 
-VERSION = 0.8.0
+VERSION = 0.9.0
 
 # Input
 HEADERS += dialogbox.h lcddevice.h mythcontext.h mythwidgets.h oldsettings.h  

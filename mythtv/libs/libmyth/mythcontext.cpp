@@ -16,9 +16,19 @@
 #include "remotefile.h"
 #include "lcddevice.h"
 
-MythContext::MythContext(bool gui)
+MythContext::MythContext(const QString &binversion, bool gui)
            : QObject()
 {
+    if (binversion != MYTH_BINARY_VERSION)
+    {
+        cerr << "This app was compiled against libmyth version: " << binversion
+             << "\nbut the library is version: " << MYTH_BINARY_VERSION << endl;
+        cerr << "You probably want to recompile everything, and do a\n"
+             << "'make distclean' first.\n";
+        cerr << "exiting\n";
+        exit(0);
+    }
+
     m_installprefix = PREFIX;
     m_settings = new Settings;
     m_qtThemeSettings = new Settings;

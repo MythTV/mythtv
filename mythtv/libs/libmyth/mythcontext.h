@@ -15,7 +15,7 @@ class Settings;
 class QSqlDatabase;
 class QSqlQuery;
 class QSocket;
-class LCD;				// thor feb 7 2003
+class LCD;
 
 class MythEvent : public QCustomEvent
 {
@@ -44,11 +44,13 @@ class MythEvent : public QCustomEvent
     QString extradata;
 };
 
+#define MYTH_BINARY_VERSION "0.9.04052003-1"
+
 class MythContext : public QObject
 {
     Q_OBJECT
   public:
-    MythContext(bool gui = true);
+    MythContext(const QString &binversion, bool gui = true);
     virtual ~MythContext();
 
     QString GetMasterHostPrefix(void);

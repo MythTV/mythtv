@@ -14,8 +14,6 @@ DEPENDPATH += ../libmyth ../libvbitext ../libavcodec
 QMAKE_CXXFLAGS_RELEASE += `freetype-config --cflags`
 QMAKE_CXXFLAGS_DEBUG += `freetype-config --cflags`
 
-INSTALLS = installfiles
- 
 # Input
 HEADERS += channel.h commercial_skip.h filter.h format.h frame.h frequencies.h 
 HEADERS += guidegrid.h infodialog.h infostructs.h jitterometer.h lzoconf.h 
