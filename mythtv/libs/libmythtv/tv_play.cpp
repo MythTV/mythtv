@@ -316,7 +316,7 @@ void TV::HandleStateChange(void)
         if (nextState == kState_WatchingRecording)
         {
             recorder = m_context->GetExistingRecorder(playbackinfo);
-            if (recorder->IsValidRecorder())
+            if (!recorder->IsValidRecorder())
             {
                 cout << "ERROR: couldn't find recorder for in-progress "
                      << "recording\n";
