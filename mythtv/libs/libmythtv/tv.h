@@ -1,6 +1,8 @@
 #ifndef TV_H
 #define TV_H
 
+#include <mysql.h>
+
 #include "NuppelVideoRecorder.h"
 #include "NuppelVideoPlayer.h"
 #include "RingBuffer.h"
@@ -22,7 +24,14 @@ class TV
     
     void ChannelKey(int key);
     void ChannelCommit(void);
-    
+   
+    void GetChannelInfo(int lchannel, string &title, string &subtitle, 
+                        string &desc, string &category, string &starttime,
+                        string &endtime);
+
+    void ConnectDB(void);
+    void DisconnectDB(void);
+
     NuppelVideoRecorder *nvr;
     NuppelVideoPlayer *nvp;
 
@@ -36,6 +45,8 @@ class TV
     bool channelqueued;
     char channelKeys[4];
     int channelkeysstored;
+
+    MYSQL *db_conn;
 };
 
 #endif

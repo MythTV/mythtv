@@ -7,12 +7,12 @@ CXX=g++
 OPT=-O6 -march=pentiumpro -fomit-frame-pointer -funroll-loops -fexpensive-optimizations -finline-functions
 
 CXXFLAGS  = -IlibNuppelVideo/ -Wall -DMMX -D_GNU_SOURCE -D_REENTRANT 
-CXXFLAGS += $(OPT) $(DEBUG)
+CXXFLAGS += -I/usr/include/mysql $(OPT) $(DEBUG)
 
 CXXCOMPILE = $(CXX) $(CXXFLAGS)
 CXXLINK = $(CXX) $(CXXFLAGS) -o $@
 
-NUVLIBS = `libNuppelVideo/nuppelvideo-config --libs`
+NUVLIBS = `libNuppelVideo/nuppelvideo-config --libs` `mysql_config --libs`
 
 .SUFFIXES: .cpp .c .o
 

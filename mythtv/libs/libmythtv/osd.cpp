@@ -75,7 +75,7 @@ void OSD::Display(unsigned char *yuvptr)
 
     unsigned char *src;
 
-    char c = 128;
+    char c = -128;
     if (show_info)
     {
         for (int y = info_y_start ; y < info_y_end; y++)

@@ -40,9 +40,12 @@ TV::TV(void)
 
     channel->Close();  
 
+    db_conn = NULL;
     nvr = NULL;
     nvp = NULL;
     rbuffer = NULL;
+
+    ConnectDB();
 }
 
 TV::~TV(void)
@@ -57,6 +60,8 @@ TV::~TV(void)
         delete nvp;
     if (nvr)
         delete nvr;
+    if (db_conn)
+        DisconnectDB();
 }
 
 void TV::LiveTV(void)
@@ -135,12 +140,12 @@ void TV::LiveTV(void)
         }
         if (paused)
         {
-//            fprintf(stderr, "\r Paused: %f seconds behind realtime (%f%% buffer left)", (float)(nvr->GetFramesWritten() - nvp->GetFramesPlayed()) / frameRate, (float)rbuffer->GetFreeSpace() / (float)rbuffer->GetFileSize() * 100.0);
+            fprintf(stderr, "\r Paused: %f seconds behind realtime (%f%% buffer left)", (float)(nvr->GetFramesWritten() - nvp->GetFramesPlayed()) / frameRate, (float)rbuffer->GetFreeSpace() / (float)rbuffer->GetFileSize() * 100.0);
         }
         else
         {
-//            fprintf(stderr, "\r                                                                      ");
-//            fprintf(stderr, "\r Playing: %f seconds behind realtime (%lld skipped frames)", (float)(nvr->GetFramesWritten() - nvp->GetFramesPlayed()) / frameRate, nvp->GetFramesSkipped());
+            fprintf(stderr, "\r                                                                      ");
+            fprintf(stderr, "\r Playing: %f seconds behind realtime (%lld skipped frames)", (float)(nvr->GetFramesWritten() - nvp->GetFramesPlayed()) / frameRate, nvp->GetFramesSkipped());
         }
         if (channelqueued && !nvp->OSDVisible())
         {
@@ -189,7 +194,11 @@ void TV::ChangeChannel(bool up)
     while (!nvp->ResetYet())
         usleep(5);
 
-    nvp->SetInfoText("Channel Info Placeholder", osd_display_time);
+    string title, subtitle, desc, category, starttime, endtime;
+    GetChannelInfo(channel->GetCurrent(), title, subtitle, desc, category, 
+                   starttime, endtime);
+
+    nvp->SetInfoText((char *)title.c_str(), osd_display_time);
     nvp->SetChannelText(channel->GetCurrentName(), osd_display_time);
 
     nvp->Unpause();
@@ -255,8 +264,100 @@ void TV::ChangeChannel(char *name)
     while (!nvp->ResetYet())
         usleep(5);
 
-    nvp->SetInfoText("Channel Info Placeholder", osd_display_time);
+    string title, subtitle, desc, category, starttime, endtime;
+    GetChannelInfo(channel->GetCurrent(), title, subtitle, desc, category,
+                   starttime, endtime);
+
+    nvp->SetInfoText((char *)title.c_str(), osd_display_time);
     nvp->SetChannelText(channel->GetCurrentName(), osd_display_time);
 
     nvp->Unpause();
+}
+
+void TV::GetChannelInfo(int lchannel, string &title, string &subtitle,
+                        string &desc, string &category, string &starttime,
+                        string &endtime)
+{
+    title = "";
+    subtitle = "";
+    desc = "";
+    category = "";
+    starttime = "";
+    endtime = "";
+
+    if (!db_conn)
+        return;
+
+    char curtimestr[128];
+    time_t curtime;
+    struct tm *loctime;
+
+    curtime = time(NULL);
+    loctime = localtime(&curtime);
+
+    strftime(curtimestr, 128, "%Y%m%d%H%M%S", loctime);
+
+    char query[1024];
+    sprintf(query, "SELECT * FROM program WHERE channum = %d AND starttime < %s AND endtime > %s;", lchannel, curtimestr, curtimestr);
+
+    MYSQL_RES *res_set;
+
+    if (mysql_query(db_conn, query) == 0)
+    {
+        res_set = mysql_store_result(db_conn);
+  
+        MYSQL_ROW row;
+
+        row = mysql_fetch_row(res_set);
+
+        if (row != NULL)
+        {
+            for (unsigned int i = 0; i < mysql_num_fields(res_set); i++)
+            {
+                switch (i) 
+                {
+                    case 0: break;
+                    case 1: starttime = row[i]; break;
+                    case 2: endtime = row[i]; break;
+                    case 3: if (row[i]) title = row[i]; break;
+                    case 4: if (row[i]) subtitle = row[i]; break;
+                    case 5: if (row[i]) desc = row[i]; break;
+                    case 6: if (row[i]) category = row[i]; break;
+                    default: break;
+                }
+            }
+        }
+
+        mysql_free_result(res_set);
+    }
+
+    printf("title: %s\n", title.c_str());
+    printf("subtitle: %s\n", subtitle.c_str());
+    printf("description: %s\n", desc.c_str());
+    printf("category: %s\n", category.c_str()); 
+}
+
+void TV::ConnectDB(void)
+{
+    db_conn = mysql_init(NULL);
+    if (!db_conn)
+    {
+        printf("Couldn't init mysql connection\n");
+    }
+    else
+    {
+        if (mysql_real_connect(db_conn, "localhost", "mythtv", "mythtv",
+                               "mythconverg", 0, NULL, 0) == NULL)
+        {
+            printf("Couldn't connect to mysql database, no channel info\n");
+            mysql_close(db_conn);
+            db_conn = NULL;
+        }
+    }
+}
+
+void TV::DisconnectDB(void)
+{
+    if (db_conn)
+        mysql_close(db_conn);
 }

@@ -24,7 +24,8 @@ class Channel
     bool ChannelDown(void);
   
     char *GetCurrentName(void);
-
+    int GetCurrent(void) { return curchannel + 1; }
+    
     void SetFd(int fd) { videofd = fd; } 
  private:
     

@@ -1,0 +1,120 @@
+#!/usr/bin/perl -w
+
+use strict;
+use XMLTV qw<best_name read_data>;
+use Date::Manip; Date_Init(); # we call ParseDate() while sorting
+use Log::TraceMessages qw<t d>; Log::TraceMessages::check_argv(); $| = 1;
+use Data::Dumper;
+use Getopt::Long;
+use DBI;
+
+
+# Memoize some subroutines if possible
+eval { require Memoize };
+if ($@) {
+    warn "could not load Memoize module, things will run slowly";
+}
+else {
+    foreach (qw/best_name Date_Cmp ParseDate/) {
+	Memoize::memoize($_) or die "cannot memoize $_: $!";
+    }
+    # clumpidx_cmp() isn't memoized, since it uses undef arguments and
+    # they cause warnings.
+    #
+}
+
+# Prototype declarations
+sub usage( ;$ );
+
+my ($opt_help, $opt_output);
+GetOptions('help' => \$opt_help, 'output=s' => \$opt_output);
+usage(1) if $opt_help;
+my $filename;
+if (@ARGV == 0) {
+    $filename = '-';
+}
+elsif (@ARGV == 1) {
+    $filename = $ARGV[0];
+}
+elsif (@ARGV >= 2) {
+    usage();
+}
+else { die }
+
+my ($encoding, $credits, $channels, $progs) = @{XMLTV::read_data($filename)};
+my @progs = @$progs;
+my %channels = %$channels;
+
+my $dbh = DBI->connect("DBI:mysql:database=mythconverg:host=localhost",
+                       "mythtv", "mythtv", { PrintError => 0 } ) 
+   or die DBI->errstr;
+
+foreach my $id (keys %channels) {
+    my ($channum, $callsign) = split ' ', $id;
+
+    my $name = best_name(['en'], $channels->{$id}->{'display-name'})->[0];
+
+    my $sth = $dbh->prepare("SELECT * FROM channel WHERE channum=$channum");
+    $sth->execute() or die $sth->errstr;
+
+    if ($sth->rows == 0)
+    {
+        $dbh->do("INSERT INTO channel (channum,callsign) VALUES($channum, \"$callsign\")")
+          or die $dbh->errstr;
+        print "ADDED channel: $id , $callsign\n";
+    }
+}
+
+foreach (@progs) {
+    my %h = %$_;
+
+    my ($start, $stop, $channel) = @h{qw(start stop channel)};
+
+    my $title = best_name(['en'], $h{title})->[0];
+    my $subtitle = "";
+    for ($h{'sub-title'}) {
+       if (defined) {
+           $subtitle = best_name(['en'], $h{'sub-title'})->[0];
+       }
+    }
+    my $desc = "";
+    for ($h{desc}) {
+       if (defined) {
+           $desc = best_name(['en'], $h{desc})->[0];
+       }
+    }
+    my $category = "Unknown";
+    for ($h{category}) {
+       if (defined) {
+           $category = best_name(['en'], $h{category})->[0];
+       }
+    }
+ 
+    my ($channum, $callsign) = split ' ', $channel;
+    my ($starttime, $starttz) = split ' ', $start;
+    my ($endtime, $endtz) = split ' ', $stop;
+
+    $dbh->do("INSERT INTO program (channum,starttime,endtime,title,subtitle,description,category) VALUES($channum, $starttime, $endtime, \"$title\", \"$subtitle\", \"$desc\", \"$category\")")
+       or print $dbh->errstr;
+}
+
+$dbh->disconnect();
+
+# If optional parameter true, is 'help message'.
+sub usage( ;$ ) {
+    my $is_help = shift;
+    my $msg = <<END
+$0: sort listings by time, sanity-check and add stop time to programmes
+usage: $0 [--help] [--output FILE] [FILE]
+END
+;
+    if ($is_help) {
+	print $msg;
+	exit(0);
+    }
+    else {
+	print STDERR $msg;
+	exit(1);
+    }
+}
+
