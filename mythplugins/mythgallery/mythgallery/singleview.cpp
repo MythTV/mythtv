@@ -17,6 +17,7 @@
  * ============================================================ */
 
 #include <iostream>
+#include <cmath>
 
 #include <qsqldatabase.h>
 #include <qevent.h>
