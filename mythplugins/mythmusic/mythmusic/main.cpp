@@ -1,5 +1,6 @@
 #include <qdir.h>
 #include <iostream>
+#include <map>
 using namespace std;
 
 #include <qapplication.h>
@@ -72,7 +73,10 @@ void CheckFile(MythContext *context, QString &filename)
     }
 }
 
-void SearchDir(MythContext *context, QString &directory)
+typedef map<QString, bool> MusicLoadedMap;
+
+void BuildFileList(MythContext *context, QString &directory,
+                   MusicLoadedMap &music_files)
 {
     QDir d(directory);
 
@@ -93,9 +97,45 @@ void SearchDir(MythContext *context, QString &directory)
             continue;
         QString filename = fi->absFilePath();
         if (fi->isDir())
-            SearchDir(context, filename);
+            BuildFileList(context, filename, music_files);
         else
-            CheckFile(context, filename);
+            music_files[filename] = false;
+    }
+}
+
+void SearchDir(MythContext *context, QString &directory)
+{
+    MusicLoadedMap music_files;
+    MusicLoadedMap db_files;
+    MusicLoadedMap::iterator iter;
+
+    BuildFileList(context, directory, music_files);
+
+    QSqlQuery query;
+
+    query.exec("SELECT filename FROM musicmetadata;");
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        while (query.next())
+        {
+            QString name = query.value(0).toString();
+            if (name != QString::null)
+            {
+                db_files[name] = false;
+                if ((iter = music_files.find(name)) != music_files.end())
+                {
+                    (*iter).second = true;
+                }
+            }
+        }
+    }
+
+    for (iter = music_files.begin(); iter != music_files.end(); iter++)
+    {
+        if ((*iter).second == false)
+        {
+            CheckFile(context, (*iter).first);
+        }
     }
 }
 
