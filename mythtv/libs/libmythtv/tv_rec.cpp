@@ -590,10 +590,6 @@ void TVRec::SetChannel(bool needopen)
 
     pthread_mutex_unlock(&db_lock);
 
-    cout << "SetChannel:\n"
-         << inputname << endl
-         << chanstr << endl;
-
     channel->SwitchToInput(inputname);
     channel->SetChannelByString(chanstr);
 
