@@ -58,6 +58,7 @@ class VideoManager : public MythDialog
   private:
     bool updateML;
     bool noUpdate;
+    int debug;
 
     QPixmap getPixmap(QString &level);
     QSqlDatabase *db;
@@ -73,7 +74,6 @@ class VideoManager : public MythDialog
     QMap<QString, QString> parseMovieList(QString);
     void ResetCurrentItem();
 
-    HttpComms *httpGrabber;
     void RefreshMovieList();
     QString ratingCountry;
     void GetMovieData(QString);
@@ -133,12 +133,9 @@ class VideoManager : public MythDialog
     int movieRuntime;
     QString movieNumber;
     
-    QTimer *urlTimer;
-    int GetMovieListingTimeoutCounter;
-    bool stopProcessing;
     QString theMovieName;
-
     bool allowselect;
+    bool isbusy;
 };
 
 #endif

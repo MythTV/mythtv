@@ -26,6 +26,8 @@ VideoManager::VideoManager(QSqlDatabase *ldb,
 {
     db = ldb;
     updateML = false;
+    debug = 0;
+    isbusy = false;    // ignores keys when true (set when doing http request)
 
     RefreshMovieList();
 
@@ -49,14 +51,7 @@ VideoManager::VideoManager(QSqlDatabase *ldb,
     listCountMovie = 0;
     dataCountMovie = 0;
 
-    GetMovieListingTimeoutCounter = 0;
-    stopProcessing = false;
-
     m_state = SHOWING_MAINWINDOW;
-    httpGrabber = NULL;
-
-    urlTimer = new QTimer(this);
-    connect(urlTimer, SIGNAL(timeout()), SLOT(GetMovieListingTimeOut()));
 
     theme = new XMLParse();
     theme->SetWMult(wmult);
@@ -100,13 +95,6 @@ VideoManager::VideoManager(QSqlDatabase *ldb,
 
 VideoManager::~VideoManager(void)
 {
-    if (httpGrabber)
-    {
-        httpGrabber->stop();
-        delete httpGrabber;
-    }
-    delete urlTimer;
-
     delete theme;
     delete bgTransBackup;
 
@@ -116,6 +104,9 @@ VideoManager::~VideoManager(void)
 
 void VideoManager::keyPressEvent(QKeyEvent *e)
 {
+    if (isbusy) // ignore keypresses while doing http query 
+        return;
+
     bool handled = false;
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("Video", e, actions);
@@ -247,12 +238,12 @@ static void replaceNumCharRefs(QString &str)
     }
 }
 
+// returns text within 'data' between 'beg' and 'end' matching strings
 QString VideoManager::parseData(QString data, QString beg, QString end)
 {
-    bool debug = false;
     QString ret;
 
-    if (debug == true)
+    if (debug > 2)
     {
         cout << "MythVideo: Parse HTML : Looking for: " << beg << ", ending with: " << end << endl;
     }
@@ -264,13 +255,13 @@ QString VideoManager::parseData(QString data, QString beg, QString end)
 
         replaceNumCharRefs(ret);
 
-        if (debug == true)
+        if (debug > 2)
             cout << "MythVideo: Parse HTML : Returning : " << ret << endl;
         return ret;
     }
     else
     {
-        if (debug == true)
+        if (debug > 2)
             cout << "MythVideo: Parse HTML : Parse Failed...returning <NULL>\n";
         ret = "<NULL>";
         return ret;
@@ -279,10 +270,9 @@ QString VideoManager::parseData(QString data, QString beg, QString end)
 
 QString VideoManager::parseDataAnchorEnd(QString data, QString beg, QString end)
 {
-    bool debug = false;
     QString ret;
 
-    if (debug == true)
+    if (debug > 2)
     {
         cout << "MythVideo: Parse (Anchor End) HTML : Looking for: " << beg << ", ending with: " << end << endl;
     }
@@ -295,13 +285,13 @@ QString VideoManager::parseDataAnchorEnd(QString data, QString beg, QString end)
 
         replaceNumCharRefs(ret);
 
-        if (debug == true)
+        if (debug > 2)
             cout << "MythVideo: Parse HTML : Returning : " << ret << endl;
         return ret;
     }
     else
     {
-        if (debug == true)
+        if (debug > 2)
             cout << "MythVideo: Parse HTML : Parse Failed...returning <NULL>\n";
         ret = "<NULL>";
         return ret;
@@ -395,27 +385,15 @@ QString VideoManager::GetMoviePoster(QString movieNum)
     QString host = "www.imdb.com";
     QString path = "";
 
-    QUrl url("http://" + host + "/title/tt" + movieNum + "/posters");
-
-    //cout << "Grabbing Poster HTML From: " << url.toString() << endl;
-
-    if (httpGrabber)
-    {
-        httpGrabber->stop();
-        delete httpGrabber;
-    }
-
-    httpGrabber = new HttpComms(url);
-
-    while (!httpGrabber->isDone())
-    {
-        qApp->processEvents();
-        usleep(10000);
-    }
-
-    QString res;
-    res = httpGrabber->getData();
-
+    QString url = "http://" + host + "/title/tt" + movieNum + "/posters";
+    if (debug > 0)
+        cout << "Grabbing Poster HTML From: " << url.latin1() << endl;
+    isbusy = true;
+    QString res = HttpComms::getHttp(url);
+    isbusy = false;
+    if (debug > 0)
+        cout << "Got " << res.length() << " byte result: " << res.latin1() 
+             << endl;
 
     QString beg, end, filename = "<NULL>";
 
@@ -429,34 +407,21 @@ QString VideoManager::GetMoviePoster(QString movieNum)
     {
 
         impsite = "http://www.impawards.com" + impsite;
-	//cout << "Retreiving poster from " << impsite << endl; 
-	    
-        QUrl impurl(impsite);
+        if (debug > 0)
+            cout << "Retreiving poster from " << impsite << endl; 
+        isbusy = true;
+        QString impres = HttpComms::getHttp(impsite);
+        isbusy = false;
+        if (debug > 0)
+            cout << "Got " << impres.length() << " bytes: " 
+                 << impres.latin1() << endl; 
 
-        //cout << "Grabbing Poster HTML From: " << url.toString() << endl;
-
-        if (httpGrabber)
-        {
-            httpGrabber->stop();
-            delete httpGrabber;
-        }
-
-        httpGrabber = new HttpComms(impurl);
-
-        while (!httpGrabber->isDone())
-        {
-            qApp->processEvents();
-            usleep(10000);
-        }
-
-	QString impres;
-	
-        impres = httpGrabber->getData();
         beg = "<img SRC=\"posters/";
 	end = "\" ALT";
 
 	filename = parseData(impres, beg, end);
-	//cout << "Imp found: " << filename << endl;
+        if (debug > 0)
+            cout << "Imp found: " << filename << endl;
 
 	host = parseData(impsite, "//", "/");
 	path = impsite.replace(QRegExp("http://" + host), QString(""));
@@ -515,70 +480,48 @@ void VideoManager::GetMovieData(QString movieNum)
     movieNumber = movieNum;
     QString host = "www.imdb.com";
 
-    QUrl url("http://" + host + "/title/tt" + movieNum + "/");
-
-    //cout << "Grabbing Data From: " << url.toString() << endl;
-
-    if (httpGrabber)
-    {
-        httpGrabber->stop();
-        delete httpGrabber;
-    }
-
-    httpGrabber = new HttpComms(url);
-
-    while (!httpGrabber->isDone())
-    {
-        qApp->processEvents();
-        usleep(10000);
-    }
-
-    QString res;
-    res = httpGrabber->getData();
+    QString url = "http://" + host + "/title/tt" + movieNum + "/";
+    if (debug > 0)
+        cout << "Grabbing Data From: " << url.latin1() << endl;
+    isbusy = true;
+    QString res = HttpComms::getHttp(url);
+    isbusy = false;
 
     //cout << "Outputting Movie Data Page\n" << res << endl;
 
     ParseMovieData(res);
 }
 
+// Obtain a movie listing via popular website(s)
 int VideoManager::GetMovieListing(QString movieName)
 {
     int ret = -1;
     QString host = "us.imdb.com";
     theMovieName = movieName;
 
-    QUrl url("http://" + host + "/Tsearch?title=" + movieName + 
-             "&type=fuzzy&from_year=1890" +
-             "&to_year=2010&sort=smart&tv=off&x=12&y=14");
+    QString url = "http://" + host + "/Tsearch?title=" + movieName 
+       + "&from_year=1890&to_year=2010&sort=smart&tv=off&x=12&y=14";
 
-    //cout << "Grabbing Listing From: " << url.toString() << endl;
+    if (debug > 0) 
+        cout << "Grabbing Listing From: " << url.latin1() << endl;
+    isbusy = true;
+    QString res = HttpComms::getHttp(url);
+    isbusy = false;
 
-    if (httpGrabber)
+    // If URL has been redirected to a movie then it was an only match 
+    if (url.find("title/tt") != -1) 
     {
-        httpGrabber->stop();
-        delete httpGrabber;
+        int fnd = url.find("title/tt") + 8;
+        movieNumber = url.mid(fnd, url.findRev("/") - fnd);
+        return 1;  // this does a re-request but simplest for now
     }
 
-    httpGrabber = new HttpComms(url);
-
-    urlTimer->stop();
-    urlTimer->start(10000);
-
-    stopProcessing = false;
-    while (!httpGrabber->isDone())
-    {
-        qApp->processEvents();
-        if (stopProcessing)
-            return 1;
-        usleep(10000);
-    }
-
-    urlTimer->stop();
-
-    QString res;
-    res = httpGrabber->getData();
-
-    QString movies = parseData(res, "<A NAME=\"mov\">Movies</A></H2>", "</TABLE>");
+    QString exact = parseData(res, "<b>Exact Matches</b>", "</table>");
+    QString partial = parseData(res, "<b>Partial Matches</b>", "</table>");
+    QString movies = exact + partial;
+    if (debug > 0)
+        cout << "Got " << movies.length() << " bytes of movies:" 
+             << movies.latin1() << endl;
 
     movieList.clear();
 
@@ -1087,7 +1030,6 @@ void VideoManager::exitWin()
         backup.end();
         update(fullRect);
         noUpdate = false;
-        urlTimer->stop();
     }
     else
         emit accept();
@@ -1639,27 +1581,3 @@ void VideoManager::ResetCurrentItem()
     curitem->updateDatabase(db);
     RefreshMovieList();
 }
-
-void VideoManager::GetMovieListingTimeOut()
-{
-    //Increment the counter and check were not over the limit
-    if(++GetMovieListingTimeoutCounter != 3)
-    {
-        //Try again
-        GetMovieListing(theMovieName);
-    }
-    else
-    {
-        GetMovieListingTimeoutCounter = 0;
-        cerr << "Failed to contact  server" << endl;
-
-        //Set the stopProcessing var so the other thread knows what to do
-        stopProcessing = true;
-
-        //Let the exitWin method take care of closing the dialog screen
-        exitWin();
-    }
-
-    return;
-}
-
