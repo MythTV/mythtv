@@ -1,7 +1,7 @@
 include ( ../../settings.pro )
 
-INCLUDEPATH += ../../libs/libmythui
-DEPENDPATH += ../../libs/libmythui
+INCLUDEPATH += ../../libs/libmythui ../../libs/libmyth
+DEPENDPATH += ../../libs/libmythui ../../libs/libmyth
 
 LIBS += -L../../libs/libmythui -lmythui-$$LIBVERSION
 
