@@ -38,7 +38,7 @@ package mythtv::recordings;
     print "Loading MythTV recording info.\n";
 
 # Query variables we'll use below
-    my ($sh, $sh2, $q, $q2);
+    my ($sh, $sh2, $sh3, $q, $q2);
 
 # Find the directory where the recordings are located
     $q = "SELECT data FROM settings WHERE value='RecordFilePrefix' AND hostname=?";
@@ -58,9 +58,11 @@ package mythtv::recordings;
 # Parse out the record data for each file
     $q = "SELECT title, subtitle, description, hostname, cutlist FROM recorded WHERE chanid=? AND starttime=? AND endtime=?";
     $q2 = "SELECT mark FROM recordedmarkup WHERE chanid=? AND starttime=? AND type=6 ORDER BY mark DESC LIMIT 1";
+    $q3 = "SELECT mark FROM recordedmarkup WHERE chanid=? AND starttime=? AND type=9 ORDER BY mark DESC LIMIT 1";
 
     $sh = $dbh->prepare($q);
     $sh2 = $dbh->prepare($q2);
+    $sh3 = $dbh->prepare($q3);
 
     my $count;
     foreach my $file (@Files) {
@@ -87,6 +89,14 @@ package mythtv::recordings;
         $sh2->execute($channel, "$syear$smonth$sday$shour$sminute$ssecond")
             or die "Could not execute ($q2):  $!\n\n";
         my ($lastgop) = $sh2->fetchrow_array;
+        my $goptype = 6;
+
+        if( !$lastgop ) {
+            $sh3->execute($channel, "$syear$smonth$sday$shour$sminute$ssecond")
+                or die "Could not execute ($q3):  $!\n\n";
+            ($lastgop) = $sh3->fetchrow_array;
+            $goptype = 9;
+        }
     # Defaults
         $episode     = 'Untitled'       unless ($episode =~ /\S/);
         $description = 'No Description' unless ($description =~ /\S/);
@@ -101,7 +111,8 @@ package mythtv::recordings;
                                 'description'    => ($description   or ''),
                                 'hostname'       => ($show_hostname or ''),
                                 'cutlist'        => ($cutlist       or ''),
-                                'lastgop'        => ($lastgop       or ''),
+                                'lastgop'        => ($lastgop       or 0),
+                                'goptype'        => ($goptype       or 0),
                                 'showtime'       => generate_showtime($syear, $smonth, $sday, $shour, $sminute, $ssecond),
                                # This field is too slow to populate here, so it will be populated in ui.pm on-demand
                                 'finfo'          => undef

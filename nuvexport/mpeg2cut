@@ -13,7 +13,7 @@
 #    Xvfb	 - http://www.xfree86.org/
 # or gdk2-cursed - http://zemljanka.sourceforge.net/cursed/
 #
-# Usage: mpeg2cut inputfile outputfile segmentList
+# Usage: mpeg2cut inputfile outputfile lastFrame segmentList
 #	where segmentList is a space separated list of frame regions to keep
 #		(i.e.  -1999 3000-5000 6000-)
 
@@ -66,7 +66,7 @@ fi
 FILENAME=$1
 BASENAME=`basename ${FILENAME} .nuv`
 OUTFILE=$2
-LASTGOP=$3
+LASTFRAME=$3
 VERSION=`echo '$Revision$' | sed -e 's/\$Revision\(\: \)*\([^ $]*\).*\$/\2/'`
 
 echo mpeg2cut v${VERSION}
@@ -77,7 +77,7 @@ echo OutFile \"${OUTFILE}\"
 shift 3
 CUTLIST=$*
 
-echo Last GOP index ${LASTGOP}
+echo Last Frame ${LASTFRAME}
 echo Cutlist \"${CUTLIST}\"
 
 echo -n "Finding the AV Offset to use with lvemux: "
@@ -91,24 +91,6 @@ else
     OFFSET=$((-1 * ${OFFSET}))
     echo ${OFFSET}
 fi
-
-echo -n "Finding framerate: "
-FRAMERATE=`(tcprobe -i ${FILENAME} 2> /dev/null) | grep "frame rate" | \
-    sed -e 's/^.*-f //' | cut -d " " -f 1`
-echo ${FRAMERATE}
-
-if [ .${FRAMERATE}. = .25.000. ]
-then
-    GOPSPACE=12
-else
-    GOPSPACE=15
-fi
-
-# get the largest numbered mark of type 6 * (15 NTSC or 12 PAL), that's the
-# last GOP frame
-
-LASTFRAME=$(( ${LASTGOP} * ${GOPSPACE} ))
-echo Last Frame ${LASTFRAME}
 
 if [ .${MODE}. = .Xvfb. ]
 then

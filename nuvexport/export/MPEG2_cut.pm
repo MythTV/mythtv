@@ -69,9 +69,14 @@ package export::MPEG2_cut;
 
     # Generate some names for the temporary audio and video files
         my $safe_outfile = shell_escape($self->get_outfile($episode, '.mpg'));
+        my $standard = ($episode->{'finfo'}{'fps'} =~ /^2(?:5|4\.9)/) ? 'PAL' : 'NTSC';
+        my $gopsize = ($standard eq 'PAL') ? 12 : 15;
+        my $lastgop = ($episode->{'goptype'} == 6) ? 
+                      ($gopsize * $episode->{'lastgop'}) :
+                      $episode->{'lastgop'};
 
-        my $command = "mpeg2cut $episode->{'filename'} $safe_outfile $episode->{'lastgop'} ";
-
+        my $command = "mpeg2cut $episode->{'filename'} $safe_outfile $lastgop ";
+        
         @cuts = split("\n",$episode->{'cutlist'});
         my @skiplist;
         foreach my $cut (@cuts) {
