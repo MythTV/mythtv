@@ -1,4 +1,4 @@
-#Last Updated: 2005.03.11 (xris)
+#Last Updated: 2005.03.16 (xris)
 #
 #  export::ffmpeg::DivX
 #  Maintained by Gavin Hurlbut <gjhurlbu@gmail.com>
@@ -132,6 +132,7 @@ package export::ffmpeg::DivX;
                                    . ' -b ' . $self->{'v_bitrate'}
                                    . ' -minrate 32 -maxrate '.(2*$self->{'v_bitrate'}).' -bt 32'
                                    . ' -lumi_mask 0.05 -dark_mask 0.02 -scplx_mask 0.7'
+                                   . ' -vtag divx'
                                    . " -s $self->{'width'}x$self->{'height'}"
                                    . " -pass 1 -passlogfile '/tmp/divx.$$.log'"
                                    . ' -f avi';
@@ -144,6 +145,7 @@ package export::ffmpeg::DivX;
                                    . ' -b ' . $self->{'v_bitrate'}
                                    . ' -minrate 32 -maxrate '.(2*$self->{'v_bitrate'}).' -bt 32'
                                    . ' -lumi_mask 0.05 -dark_mask 0.02 -scplx_mask 0.7'
+                                   . ' -vtag divx'
                                    . ' -acodec mp3'
                                    . ' -ab ' . $self->{'a_bitrate'}
                                    . " -s $self->{'width'}x$self->{'height'}"
@@ -155,9 +157,11 @@ package export::ffmpeg::DivX;
             $self->{'ffmpeg_xtra'} = ' -vcodec mpeg4'
                                    . ' -b ' . $self->{'v_bitrate'}
                                    . ' -minrate 32 -maxrate '.(2*$self->{'v_bitrate'}).' -bt 32'
+                                   . ($self->{'vbr'}
+                                       ? " -qmin $self->{'quantisation'} -qmax 31"
+                                       : '')
                                    . ' -lumi_mask 0.05 -dark_mask 0.02 -scplx_mask 0.7'
-                                   . (($self->{'vbr'}) ?
-                                     " -qmin $self->{'quantisation'} -qmax 31" : '')
+                                   . ' -vtag divx'
                                    . ' -acodec mp3'
                                    . ' -ab ' . $self->{'a_bitrate'}
                                    . " -s $self->{'width'}x$self->{'height'}"
