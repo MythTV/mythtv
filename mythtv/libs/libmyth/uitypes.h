@@ -814,6 +814,7 @@ class UISelectorType : public UIPushButtonType
     void unPush();
     void activate(){push(true);}
     void cleanOut(){current_data = NULL; my_data.clear();}
+    void setToItem(int which_item);
  
   signals:
   

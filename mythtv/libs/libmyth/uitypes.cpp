@@ -3759,6 +3759,18 @@ void UISelectorType::addItem(int an_int, const QString &a_string)
     }
 }
 
+void UISelectorType::setToItem(int which_item)
+{
+    for(uint i = 0; i < my_data.count(); i++)
+    {
+        if(my_data.at(i)->getInt() == which_item)
+        {
+            current_data = my_data.at(i);
+            refresh();
+        }
+    }
+}
+
 void UISelectorType::push(bool up_or_down)
 {
     if(currently_pushed)
@@ -3767,7 +3779,6 @@ void UISelectorType::push(bool up_or_down)
     }
     currently_pushed = true;
     push_timer.start(300, TRUE);
-    refresh();
 
     if(current_data)
     {
