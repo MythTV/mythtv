@@ -39,6 +39,7 @@ class AudioCodecName: public ComboBoxSetting, public RecordingProfileParam {
 public:
     AudioCodecName(const RecordingProfile& parent):
         RecordingProfileParam(parent, "audiocodec") {
+        setLabel("Codec");
     };
 };
 
@@ -97,7 +98,7 @@ class VideoCodecName: public ComboBoxSetting, public RecordingProfileParam {
 public:
     VideoCodecName(const RecordingProfile& parent):
         RecordingProfileParam(parent, "videocodec") {
-        setLabel("Video Codec");
+        setLabel("Codec");
     };
 };
 
