@@ -1,3 +1,7 @@
 Makefile
 moc_databasebox.cpp
+moc_inetcomms.cpp
+moc_videobrowser.cpp
+moc_videomanager.cpp
+moc_videotree.cpp
 mythvideo
