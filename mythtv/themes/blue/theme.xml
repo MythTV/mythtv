@@ -368,6 +368,7 @@
     <image>record.png</image>
     <offset>20,10</offset>
   </buttondef>
+  
 
   <buttondef name="TV_MANUAL_SCHEDULE">
     <image>record.png</image>
@@ -389,6 +390,16 @@
 <!-- #################################-->
 
   <buttondef name="TV_SEARCH_TITLES">
+    <image>record.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+  
+  <buttondef name="TV_SEARCH_PEOPLE">
+    <image>record.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+  
+  <buttondef name="TV_SEARCH_KEYWORD">
     <image>record.png</image>
     <offset>20,10</offset>
   </buttondef>

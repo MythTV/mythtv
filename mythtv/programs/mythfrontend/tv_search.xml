@@ -6,6 +6,7 @@
       <text lang="DE">Titel</text>
       <text lang="SV">Titel</text>
       <text lang="JA">タイトル</text>
+      <text lang="NL">Titels«</text>
       <action>TV_SEARCH_TITLE</action>
    </button>
 
@@ -17,12 +18,29 @@
       <text lang="JA">内容</text>
       <action>TV_SEARCH_DESC</action>
    </button>
-
+   
+   <button>
+      <type>TV_SEARCH_PEOPLE</type>
+      <text>People</text>
+      <action>TV_SEARCH_PEOPLE</action>
+   </button>
+   
+   <button>
+      <type>TV_SEARCH_KEYWORD</type>
+      <text>Keywords</text>
+      <text lang="DE">Inhalt</text>
+      <text lang="SV">Beskrivning</text>
+      <text lang="NL">Beschrijving</text>      
+      <text lang="JA">å†…å®¹</text>
+      <action>TV_SEARCH_KEYWORD</action>
+   </button>
+   
    <button>
       <type>TV_SEARCH_CHANNELS</type>
       <text>Channels</text>
       <text lang="DE">Sender</text>
       <text lang="SV">Kanal</text>
+      <text lang="NL">Zender</text>
       <text lang="JA">チャンネル</text>
       <action>TV_SEARCH_CHANNEL</action>
    </button>
@@ -33,6 +51,7 @@
       <text lang="DE">Kategorie</text>
       <text lang="SV">Kategori</text>
       <text lang="JA">カテゴリー</text>
+      <text lang="NL">Categorie</text>
       <action>TV_SEARCH_CATEGORY</action>
    </button>
 
@@ -42,6 +61,7 @@
       <text lang="DE">Spielfilme</text>
       <text lang="SV">Filmer</text>
       <text lang="JA">映画</text>
+      <text lang="NL">Films</text>
       <action>TV_SEARCH_MOVIE</action>
    </button>
 
@@ -51,6 +71,7 @@
       <text lang="DE">Neue Titel</text>
       <text lang="SV">Nya titlar</text>
       <text lang="JA">新タイトル</text>
+      <text lang="NL">Nieuwe Titels</text>
       <action>TV_SEARCH_NEW</action>
    </button>
 
