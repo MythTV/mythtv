@@ -47,6 +47,7 @@ typedef struct ThisFilter
   int cropC1, cropC2, cropC3;
   int xcrop1, xcrop2;
   int xcropYint, xcropCint, xcropend;
+  TF_STRUCT;
 
 } ThisFilter;
 
@@ -161,8 +162,9 @@ int crop(VideoFilter *f, VideoFrame *frame)
   int x,y;
   const uint64_t Y_black=0x1010101010101010LL;
   const uint64_t UV_black=0x8080808080808080LL;
+  TF_VARS;
   
-  
+  TF_START;
   for(y = 0; y < tf->cropY1; y += 2) {// Y Luma
     buf[y] = Y_black;
     buf[y + 1] = Y_black;
@@ -205,6 +207,7 @@ int crop(VideoFilter *f, VideoFrame *frame)
     }
   }
  
+  TF_END(tf, "Crop: ");
   return 0;
 }
 
@@ -215,6 +218,9 @@ int cropMMX(VideoFilter *f, VideoFrame *frame)
   int y,x; 
   const uint64_t Y_black=0x1010101010101010LL;
   const uint64_t UV_black=0x8080808080808080LL;
+  TF_VARS;
+
+  TF_START;
 
   asm volatile("movq (%1),%%mm0    \n\t"	       
 	       "movq (%0),%%mm1    \n\t"
@@ -266,6 +272,7 @@ int cropMMX(VideoFilter *f, VideoFrame *frame)
 
   asm volatile("emms\n\t");
 
+  TF_END(tf, "Crop: ");
   return 0;
 }
 
@@ -324,6 +331,7 @@ VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt,
   else filter->vf.filter = &crop;
 
   filter->vf.cleanup = NULL;
+  TF_INIT(filter);
 
   return (VideoFilter *)filter;
 }

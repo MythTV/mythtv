@@ -12,13 +12,6 @@
 #define ABS(A) ( (A) > 0 ? (A) : -(A) )
 #define CLAMP(A,L,U) ((A)>(U)?(U):((A)<(L)?(L):(A)))
 
-#ifdef TIME_FILTER
-#include <sys/time.h>
-#ifndef TIME_INTERVAL
-#define TIME_INTERVAL 300
-#endif /* undef TIME_INTERVAL */
-#endif /* TIME_FILTER */
-
 #include "mmx.h"
 
 static const mmx_t mm_cpool[] =
@@ -156,10 +149,7 @@ typedef struct ThisFilter
     mmx_t threshold_low;
     mmx_t threshold_high;
     uint8_t *line;
-#ifdef TIME_FILTER
-    int frames;
-    double seconds;
-#endif /* TIME_FILTER */
+    TF_STRUCT;
 } ThisFilter;
 
 void
@@ -361,11 +351,10 @@ static int
 KernelDeint (VideoFilter * f, VideoFrame * frame)
 {
     ThisFilter *filter = (ThisFilter *) f;
-#ifdef TIME_FILTER
-    struct timeval t1;
-    gettimeofday (&t1, NULL);
-#endif /* TIME_FILTER */
-        (filter->filtfunc)(frame->buf, filter->line, filter->width,
+    TF_VARS;
+
+    TF_START;
+    (filter->filtfunc)(frame->buf, filter->line, filter->width,
                            filter->height, filter->threshold);
     if (!filter->skipchroma)
     {
@@ -376,21 +365,7 @@ KernelDeint (VideoFilter * f, VideoFrame * frame)
     }
     if (filter->mm_flags)
         emms();
-#ifdef TIME_FILTER
-    struct timeval t2;
-    gettimeofday (&t2, NULL);
-    filter->seconds +=
-        (t2.tv_sec - t1.tv_sec) + (t2.tv_usec - t1.tv_usec) * .000001;
-    filter->frames = (filter->frames + 1) % TIME_INTERVAL;
-    if (filter->frames == 0)
-    {
-        fprintf (stderr,
-                 "KernelDeint: filter timed at %3f frames/sec for %dx%d\n",
-                 TIME_INTERVAL / filter->seconds, filter->width,
-                 filter->height);
-        filter->seconds = 0;
-    }
-#endif /* TIME_FILTER */
+    TF_END(filter, "KernelDeint: ");
     return 0;
 }
 
@@ -424,7 +399,7 @@ NewKernelDeintFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
     
     numopts = options ? sscanf(options, "%d:%d", &(filter->threshold), &(filter->skipchroma)) : 0;
     if (numopts < 2)
-        filter->skipchroma = 1;
+        filter->skipchroma = 0;
     if (numopts < 1)
         filter->threshold = 12;
 
@@ -460,10 +435,7 @@ NewKernelDeintFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
         free (filter);
         return NULL;
     }
-#ifdef TIME_FILTER
-    filter->seconds = 0;
-    filter->frames = 0;
-#endif
+    TF_INIT(filter);
 
     filter->vf.filter = &KernelDeint;
     filter->vf.cleanup = &CleanupKernelDeintFilter;

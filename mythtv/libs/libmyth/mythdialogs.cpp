@@ -77,6 +77,11 @@ struct MHData
     QString description;
 };
 
+struct MPData {
+    QString description;
+    MediaPlayCallback playFn;
+};
+
 class MythMainWindowPrivate
 {
   public:
@@ -95,6 +100,7 @@ class MythMainWindowPrivate
     QDict<KeyContext> keyContexts;
     QMap<int, JumpData> jumpMap;
     QMap<QString, MHData> mediaHandlerMap;
+    QMap<QString, MPData> mediaPluginMap;
 
     void (*exitmenucallback)(void);
 
@@ -467,6 +473,39 @@ void MythMainWindow::RegisterMediaHandler(const QString &destination,
        VERBOSE(VB_GENERAL, QString("%1 is already registered as a media "
                                    "handler.").arg(destination));
     }
+}
+
+void MythMainWindow::RegisterMediaPlugin(const QString &name, 
+                                         const QString &desc, 
+                                         MediaPlayCallback fn)
+{
+    if (d->mediaPluginMap.count(name) == 0) 
+    {
+        VERBOSE(VB_GENERAL, QString("Registering %1 as a media playback "
+                                    "plugin.").arg(name));
+        MPData mpd = {desc, fn};
+        d->mediaPluginMap[name] = mpd;
+    } 
+    else
+    {
+        VERBOSE(VB_GENERAL, QString("%1 is already registered as a media "
+                                    "playback plugin.").arg(name));
+    }
+}
+
+bool MythMainWindow::HandleMedia(QString &handler, const QString &mrl)
+{
+    if (handler.length() < 1)
+        handler = "Internal";
+
+    // Let's see if we have a plugin that matches the handler name...
+    if (d->mediaPluginMap.count(handler)) 
+    {
+        d->mediaPluginMap[handler].playFn(mrl);
+        return true;
+    }
+
+    return false;
 }
 
 void MythMainWindow::keyPressEvent(QKeyEvent *e)

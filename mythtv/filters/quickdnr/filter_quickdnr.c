@@ -39,14 +39,6 @@
 #define MM_SSE    0x0008 /* SSE functions */
 #define MM_SSE2   0x0010 /* PIV SSE2 functions */
 
-#ifdef TIME_FILTER
-#include <sys/time.h>
-#ifndef TIME_INTERVAL
-#define TIME_INTERVAL 300
-#endif /* undef TIME_INTERVAL */
-#endif /* TIME_FILTER */
-
-
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -69,12 +61,7 @@ typedef struct ThisFilter
   uint8_t Luma_threshold1, Luma_threshold2;
   uint8_t Chroma_threshold1, Chroma_threshold2;
   uint8_t *average;
-
-#ifdef TIME_FILTER
-    int frames;
-    double seconds;
-#endif /* TIME_FILTER */
-
+  TF_STRUCT;
 } ThisFilter;
 
 int mm_support(void) // From linearblend
@@ -213,17 +200,14 @@ int quickdnr2(VideoFilter *f, VideoFrame *frame)
 {  
   ThisFilter *tf = (ThisFilter *)f; 
   int y,t; 
+  TF_VARS;
  
+  TF_START;
   if (tf->first)
   {
     memcpy (tf->average, frame->buf, frame->size);
     tf->first = 0;
   }
-
-#ifdef TIME_FILTER
-    struct timeval t1;
-    gettimeofday (&t1, NULL);
-#endif /* TIME_FILTER */
 
   for(y = 0; y < tf->Luma_size; y++) {
     t = abs(tf->average[y] - frame->buf[y]);
@@ -245,20 +229,7 @@ int quickdnr2(VideoFilter *f, VideoFrame *frame)
     else tf->average[y] = frame->buf[y];
   }
 
-#ifdef TIME_FILTER
-    struct timeval t2;
-    gettimeofday (&t2, NULL);
-    tf->seconds +=
-        (t2.tv_sec - t1.tv_sec) + (t2.tv_usec - t1.tv_usec) * .000001;
-    tf->frames = (tf->frames + 1) % TIME_INTERVAL;
-    if (tf->frames == 0)
-    {
-        fprintf (stderr,
-                 "QuickDNR: filter timed at %3f frames/sec\n",
-                 TIME_INTERVAL / tf->seconds);
-        tf->seconds = 0;
-    }
-#endif /* TIME_FILTER */
+  TF_END(tf, "QuickDNR: ");
  
   return 0;
 }
@@ -270,17 +241,14 @@ int quickdnrMMX(VideoFilter *f, VideoFrame *frame)
   uint64_t *buf = (uint64_t *)frame->buf;
   uint64_t *av_p = (uint64_t *)tf->average;
   const uint64_t sign_convert = 0x8080808080808080LL;
+  TF_VARS;
 
+  TF_START;
   if (tf->first)
   {
     memcpy (tf->average, frame->buf, frame->size);
     tf->first = 0;
   }
-
-#ifdef TIME_FILTER
-    struct timeval t1;
-    gettimeofday (&t1, NULL);
-#endif /* TIME_FILTER */
 
   asm volatile("prefetch 64(%0)     \n\t" //Experimental values from athlon
 	       "prefetch 64(%1)     \n\t"
@@ -357,20 +325,7 @@ int quickdnrMMX(VideoFilter *f, VideoFrame *frame)
 
   asm volatile("emms\n\t");
 
-#ifdef TIME_FILTER
-    struct timeval t2;
-    gettimeofday (&t2, NULL);
-    tf->seconds +=
-        (t2.tv_sec - t1.tv_sec) + (t2.tv_usec - t1.tv_usec) * .000001;
-    tf->frames = (tf->frames + 1) % TIME_INTERVAL;
-    if (tf->frames == 0)
-    {
-        fprintf (stderr,
-                 "QuickDNR: filter timed at %3f frames/sec\n",
-                 TIME_INTERVAL / tf->seconds);
-        tf->seconds = 0;
-    }
-#endif /* TIME_FILTER */
+  TF_END(tf, "QuickDNR: ");
 
   return 0;
 }
@@ -383,18 +338,15 @@ int quickdnr2MMX(VideoFilter *f, VideoFrame *frame)
   uint64_t *buf = (uint64_t *)frame->buf;
   uint64_t *av_p = (uint64_t *)tf->average;
   const uint64_t sign_convert = 0x8080808080808080LL;
-
+  TF_VARS;
+  
+  TF_START;
  
   if (tf->first)
   {
     memcpy (tf->average, frame->buf, frame->size);
     tf->first = 0;
   }
-
-#ifdef TIME_FILTER
-    struct timeval t1;
-    gettimeofday (&t1, NULL);
-#endif /* TIME_FILTER */
 
   asm volatile("prefetch 64(%0)     \n\t" //Experimental values from athlon
 	       "prefetch 64(%1)     \n\t"
@@ -513,20 +465,7 @@ int quickdnr2MMX(VideoFilter *f, VideoFrame *frame)
 
   asm volatile("emms\n\t");
 
-#ifdef TIME_FILTER
-    struct timeval t2;
-    gettimeofday (&t2, NULL);
-    tf->seconds +=
-        (t2.tv_sec - t1.tv_sec) + (t2.tv_usec - t1.tv_usec) * .000001;
-    tf->frames = (tf->frames + 1) % TIME_INTERVAL;
-    if (tf->frames == 0)
-    {
-        fprintf (stderr,
-                 "QuickDNR: filter timed at %3f frames/sec\n",
-                 TIME_INTERVAL / tf->seconds);
-        tf->seconds = 0;
-    }
-#endif /* TIME_FILTER */
+  TF_END(tf, "QuickDNR: ");
 
   return 0;
 }
@@ -558,10 +497,6 @@ VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt,
       fprintf(stderr,"Couldn't allocate memory for filter\n");
       return NULL;
     }
-#ifdef TIME_FILTER
-    struct timeval t1;
-    gettimeofday (&t1, NULL);
-#endif /* TIME_FILTER */
 
   filter->average=malloc(sizeof(uint8_t) * (*width) * 3 / 2 * (*height));
   if (filter->average == NULL)
@@ -641,6 +576,7 @@ VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt,
   else filter->vf.filter = &quickdnr;
 
   filter->first = 1;
+  TF_INIT(filter);
   
 #ifdef QUICKDNR_DEBUG
   fprintf(stderr,"DNR Loaded:%X Params: %u %u Luma1: %d %X%X Luma2: %X%X Chroma1: %d %X%X Chroma2: %X%X\n",

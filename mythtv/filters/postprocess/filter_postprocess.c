@@ -29,12 +29,16 @@ typedef struct ThisFilter
     int srcStride[3];
     int dstStride[3];
     int eprint;
+    TF_STRUCT;
 } ThisFilter;
 
 
 int pp(VideoFilter *vf, VideoFrame *frame)
 {
     ThisFilter* tf = (ThisFilter*)vf;
+    TF_VARS;
+
+    TF_START;
 
     tf->src[0] = tf->dst[0] = frame->buf;
     tf->src[1] = tf->dst[1] = frame->buf + tf->ysize;
@@ -49,6 +53,7 @@ int pp(VideoFilter *vf, VideoFrame *frame)
                     frame->qscale_table, frame->qstride,
                     tf->mode, tf->context, PP_FORMAT_420);
 
+    TF_END(tf, "PostProcess: ");
     return 0;
 }
 
@@ -108,6 +113,7 @@ VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt,
 
     filter->vf.filter = &pp;
     filter->vf.cleanup = &cleanup;
+    TF_INIT(filter);
     return (VideoFilter *)filter;
 }
 

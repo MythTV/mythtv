@@ -9,11 +9,22 @@
 #include "filter.h"
 #include "frame.h"
 
+typedef struct ThisFilter
+{
+    VideoFilter vf;
+    TF_STRUCT;
+} ThisFilter;
+
 int invert(VideoFilter *vf, VideoFrame *frame)
 {  
     int size = frame->size;
     unsigned char *buf = frame->buf;
+    TF_VARS;
+
     (void)vf;
+
+    TF_START;
+
 
     while (size--)
     {
@@ -21,13 +32,15 @@ int invert(VideoFilter *vf, VideoFrame *frame)
         buf++;
     }
 
+    TF_END((ThisFilter *)vf, "Invert");
+
     return 0;
 }
 
 VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt, 
                         int *width, int *height, char *options)
 {
-    VideoFilter *filter;
+    ThisFilter *filter;
     
     (void)width;
     (void)height;
@@ -38,16 +51,17 @@ VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt,
          inpixfmt != FMT_YUV422P) )
         return NULL;
     
-    filter = malloc(sizeof(VideoFilter));
+    filter = malloc(sizeof(ThisFilter));
 
     if (filter == NULL)
     {
         fprintf(stderr,"Couldn't allocate memory for filter\n");
         return NULL;
     }
-    filter->filter = &invert;
-    filter->cleanup = NULL;
-    return filter;
+    filter->vf.filter = &invert;
+    filter->vf.cleanup = NULL;
+    TF_INIT(filter)
+    return (VideoFilter *) filter;
 }
 
 static FmtConv FmtList[] =

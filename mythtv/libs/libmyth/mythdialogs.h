@@ -57,6 +57,9 @@ class ExitToMainMenuEvent : public QCustomEvent
 #define REG_KEY(a, b, c, d) gContext->GetMainWindow()->RegisterKey(a, b, c, d)
 #define REG_JUMP(a, b, c, d) gContext->GetMainWindow()->RegisterJump(a, b, c, d)
 #define REG_MEDIA_HANDLER(a, b, c, d, e) gContext->GetMainWindow()->RegisterMediaHandler(a, b, c, d, e)
+#define REG_MEDIAPLAYER(a,b,c) gContext->GetMainWindow()->RegisterMediaPlugin(a, b, c)
+
+typedef  int (*MediaPlayCallback)(const char*);
 
 class MythMainWindowPrivate;
 
@@ -85,6 +88,10 @@ class MythMainWindow : public QDialog
     void RegisterMediaHandler(const QString &destination, 
                               const QString &description, const QString &key, 
                               void (*callback)(void), int mediaType);
+
+    void RegisterMediaPlugin(const QString &name, const QString &desc, 
+                             MediaPlayCallback fn);
+    bool HandleMedia(QString &handler, const QString &mrl);
 
   protected:
     void keyPressEvent(QKeyEvent *e);

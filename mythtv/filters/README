@@ -33,17 +33,18 @@ its interpretation depends on the filter.
 
 FilterChain *LoadFilters(QString filters, VideoFrameType &inpixfmt,
                          VideoFrameType &outpixfmt, int &width,
-                         int &height):
-Returns a pointer to a FilterChain object for the requested filters, or 
-NULL if such a chain can not be built.  Filters is a comma-separated 
-list of filter names, which may each optionally be followed by 
-=<options> to specify filter options.  Inpixfmt and outpixfmt specify 
-input and output pixelf formats for the filter chain.  If either is set 
-to -1 (or FMT_NONE), FilterManager will attempt to choose the format 
-that best fits the requested chain.  These will only be modified if they 
-are set to FMT_NONE.  This is the preferred method for loading filters, 
-the FilterChain object provides methods for using and destroying the 
-filters.
+                         int &height, int &bufsize):
+Returns a pointer to a FilterChain object for the requested filters, or
+NULL if such a chain can not be built.  Filters is a comma-separated
+list of filter names, which may each optionally be followed by
+=<options> to specify filter options.  Inpixfmt and outpixfmt specify
+input and output pixelf formats for the filter chain.  If either is set
+to -1 (or FMT_NONE), FilterManager will attempt to choose the format
+that best fits the requested chain.  These will only be modified if they
+are set to FMT_NONE.  Bufsize will be set to the largest buffer size, in
+bytes, required by the filter chain.  This is the preferred method for
+loading filters, the FilterChain object provides methods for using and
+destroying the filters.
 
 
 FilterChain objects provide the following method:
@@ -227,9 +228,30 @@ FilterInfo filter_table[] =
 
 Because only the name of the filter's new filter function is needed, and
 not a pointer to the function itself, multi-filter libraries can easily
-put all of the filter definitions together in a separate source file.
+put all of the filter definitions together in a separate source file 
+from filter implementations.
+
+filter.h also provides several macros for use in benchmarking filters. 
+To support benchmarking of your filter, add TF_STRUCT in your filter
+structure definition, call TF_INIT() with a pointer to your filter
+structure in your filter init, add TF_VARS to the variable declaration 
+of your filter function, and TF_START before the actual filter code, and 
+call TF_END with a pointer to the filter structure and an informational 
+string to be prefix to the output before your filter function returns.  
+Look at the quickdnr, kerneldeint, and denoise3d filters for examples.
+
+The benchmarking macros will do nothing unless activated by defining
+TIME_FILTER.  You can also adjust the reporting interval, in frames, by
+defining TF_INTERVAL.  If you set TF_TYPE_TSC, the P5 TSC registers are
+use for timing, otherwise gettimeofday is used.  If you use the TSC
+method, you can use /contrib/tsc-calibrate.c to determine the correct
+value for TF_TSC_TICKS for your system.  If this value is set, TSC
+benchmarking will report speeds in frames per second.  Otherwise, they
+will be reported in ticks per frame.  The gettimeofday benchmark will
+always report in frames per second, but may incur more overhead and/or
+be slightly less accurate.
 
 This API is subject to change, as the needs of MythTV and of filter 
-writers may chane in the future.
+writers may change in the future.
 
 Please email any suggestions or questions to andrewmahone AT eml DOT cc

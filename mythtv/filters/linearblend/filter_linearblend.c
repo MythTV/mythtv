@@ -24,6 +24,7 @@ typedef struct LBFilter
     /* functions and variables below here considered "private" */
     int mm_flags;
     void (*subfilter)(unsigned char *, int);
+    TF_STRUCT;
 } LBFilter;
 
 #define cpuid(index,eax,ebx,ecx,edx)\
@@ -298,6 +299,9 @@ int linearBlendFilter(VideoFilter *f, VideoFrame *frame)
     unsigned char *uoff;
     unsigned char *voff;
     LBFilter *vf = (LBFilter *)f;
+    TF_VARS;
+
+    TF_START;
 
     for (y = 0; y < ymax; y+=8)
     {  
@@ -329,6 +333,7 @@ int linearBlendFilter(VideoFilter *f, VideoFrame *frame)
     if ((vf->mm_flags & MM_MMXEXT) || (vf->mm_flags & MM_3DNOW))
         emms();
 
+    TF_END(vf, "LinearBlend: ");
     return 0;
 }
 
@@ -361,6 +366,7 @@ VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt,
         filter->subfilter = &linearBlend;
 
     filter->cleanup = NULL;
+    TF_INIT(filter);
     return (VideoFilter *)filter;
 }
 

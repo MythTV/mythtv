@@ -504,6 +504,35 @@ QString RandTheme(QString &themename, QSqlDatabase *db)
     return themename;
 }
 
+int internal_play_media(const char *mrl) 
+{
+    int res = -1;
+    QSqlDatabase *db = QSqlDatabase::database();
+    TV *tv = new TV(db);
+
+    tv->Init();
+    ProgramInfo *pginfo = new ProgramInfo();
+    pginfo->endts = QDateTime::currentDateTime().addSecs(-180);
+    pginfo->pathname = mrl;
+
+    if (tv->Playback(pginfo)) 
+    {
+       while (tv->GetState() != kState_None) 
+       {
+           qApp->unlock();
+           qApp->processEvents();
+           usleep(50);
+           qApp->lock();
+       }
+       res = 0;
+    }
+
+    delete tv;
+    delete pginfo;
+
+    return res;
+}
+
 void InitJumpPoints(void)
 {
     REG_JUMP("Program Guide", "", "", startGuide);
@@ -520,6 +549,13 @@ void InitJumpPoints(void)
     TV::InitKeys();
 }
 
+int internal_media_init() 
+{
+    REG_MEDIAPLAYER("Internal", "MythTV's native media player.", 
+                    internal_play_media);
+    return 0;
+}
+   
 int main(int argc, char **argv)
 {
     QString lcd_host;
@@ -737,6 +773,8 @@ int main(int argc, char **argv)
     gContext->SetMainWindow(mainWindow);
 
     InitJumpPoints();
+
+    internal_media_init();
 
     MythPluginManager::init();
 
