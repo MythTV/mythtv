@@ -30,17 +30,16 @@ extern "C" {
 #include "gallerysettings.h"
 #include "thumbgenerator.h"
 #include "singleview.h"
-#include "regslideshow.h"
 #include "iconview.h"
 
 #include "config.h"
 
 #ifdef OPENGL_SUPPORT
-#include "glslideshow.h"
+#include "glsingleview.h"
 #endif
 
 IconView::IconView(QSqlDatabase *db, const QString& galleryDir,
-                     MythMainWindow* parent, const char* name )
+                   MythMainWindow* parent, const char* name )
     : MythDialog(parent, name)
 {
     m_db         = db;
@@ -251,7 +250,7 @@ void IconView::keyPressEvent(QKeyEvent *e)
         else if (action == "PAGEUP") {
             bool h = true;
             for (int i = 0; i < m_nRows && h; i++) 
-                  h = moveUp();
+                h = moveUp();
             handled = true;
         }
         else if (action == "PAGEDOWN") {
@@ -295,25 +294,17 @@ void IconView::keyPressEvent(QKeyEvent *e)
                     handled = true;
                     
                     bool slideShow = (action == "PLAY");
-                    if (slideShow) {
 #ifdef OPENGL_SUPPORT
-                        int useOpenGL = gContext->GetNumSetting("SlideshowUseOpenGL");
-                        if (useOpenGL) {
-                            GLSSDialog gv(m_db, m_itemList, pos,
-                                          gContext->GetMainWindow());
-                            gv.exec();
-                        }
-                        else 
-#endif
-                            
-                        {
-                            RegSlideShow rv(m_db, m_itemList, pos, 
-                                            gContext->GetMainWindow());
-                            rv.exec();
-                        }
+                    int useOpenGL = gContext->GetNumSetting("SlideshowUseOpenGL");
+                    if (useOpenGL) {
+                        GLSDialog gv(m_db, m_itemList, pos, slideShow,
+                                     gContext->GetMainWindow());
+                        gv.exec();
                     }
-                    else {
-                        SingleView sv(m_db, m_itemList, pos, m_thumbGen,
+                    else 
+#endif
+                    {
+                        SingleView sv(m_db, m_itemList, pos, slideShow,
                                       gContext->GetMainWindow());
                         sv.exec();
                     }                         
@@ -338,15 +329,15 @@ void IconView::keyPressEvent(QKeyEvent *e)
 
                     // make sure up-directory is visible and selected
                     ThumbItem* item = m_itemDict.find(oldDirName);
-                     if (item) {
-                         int pos = m_itemList.find(item);
-                         if (pos != -1) {
-                             m_currRow = pos/m_nCols;
-                             m_currCol = pos-m_currRow*m_nCols;
-                             m_topRow  = QMAX(0, m_currRow-(m_nRows-1));
-                         }
-                     }
-                     handled = true;
+                    if (item) {
+                        int pos = m_itemList.find(item);
+                        if (pos != -1) {
+                            m_currRow = pos/m_nCols;
+                            m_currCol = pos-m_currRow*m_nCols;
+                            m_topRow  = QMAX(0, m_currRow-(m_nRows-1));
+                        }
+                    }
+                    handled = true;
                 }
             }
         }
@@ -582,9 +573,9 @@ void IconView::loadDirectory(const QString& dir)
 
         // remove these already-resized pictures.  
         if (isGallery && (
-            (fi->fileName().find(".thumb.") > 0) ||
-            (fi->fileName().find(".sized.") > 0) ||
-            (fi->fileName().find(".highlight.") > 0)))
+                (fi->fileName().find(".thumb.") > 0) ||
+                (fi->fileName().find(".sized.") > 0) ||
+                (fi->fileName().find(".highlight.") > 0)))
             continue;
         
         ThumbItem* item = new ThumbItem;
@@ -755,17 +746,17 @@ void IconView::actionSlideShow()
 #ifdef OPENGL_SUPPORT
     int useOpenGL = gContext->GetNumSetting("SlideshowUseOpenGL");
     if (useOpenGL) {
-        GLSSDialog gv(m_db, m_itemList, pos,
-                      gContext->GetMainWindow());
+        GLSDialog gv(m_db, m_itemList, pos, true,
+                     gContext->GetMainWindow());
         gv.exec();
     }
     else 
 #endif
     {
-        RegSlideShow rv(m_db, m_itemList, pos, 
-                        gContext->GetMainWindow());
-        rv.exec();
-    }
+        SingleView sv(m_db, m_itemList, pos, true,
+                      gContext->GetMainWindow());
+        sv.exec();
+    }                         
 }
 
 void IconView::actionSettings()
@@ -786,7 +777,7 @@ void IconView::actionImport()
         return;
 
     QStringList paths = QStringList::split(":",
-                                    gContext->GetSetting("GalleryImportDirs"));
+                                           gContext->GetSetting("GalleryImportDirs"));
 
     QString idirname(m_currDir + "/" +
                      (QDateTime::currentDateTime()).toString(Qt::ISODate));

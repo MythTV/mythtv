@@ -52,6 +52,7 @@ public:
     SlideshowOpenGLTransition() : 
         GlobalSetting("SlideshowOpenGLTransition") {
         setLabel(QObject::tr("Type of OpenGL transition"));
+        addSelection("none");
         addSelection("blend (gl)");
         addSelection("fade (gl)");
         addSelection("rotate (gl)");

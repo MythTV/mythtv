@@ -26,6 +26,6 @@ INSTALLS += installimages uifiles
 
 # Input
 HEADERS += iconview.h singleview.h gallerysettings.h dbcheck.h \
-           thumbgenerator.h qtiffio.h regslideshow.h
+           thumbgenerator.h qtiffio.h
 SOURCES += iconview.cpp main.cpp singleview.cpp gallerysettings.cpp dbcheck.cpp \
-           thumbgenerator.cpp qtiffio.cpp regslideshow.cpp
+           thumbgenerator.cpp qtiffio.cpp
