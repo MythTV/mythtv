@@ -549,39 +549,6 @@
       <bold>no</bold>
     </font>
 
-    <container name="menu">
-      <area>20,20,160,560</area>
-
-      <textarea name="subdir" draworder="0" align="right">
-        <area>0,0,160,30</area>
-	<font>menu</font>
-      </textarea>
-
-      <listbtnarea name="menu" draworder="0">
-        <area>0,30,160,200</area>
-        <gradient type="unselected" start="#000000" end="#505050" alpha="100">
-        </gradient>
-        <gradient type="selected" start="#52CA38" end="#349838" alpha="255">
-        </gradient>
-        <fcnfont name="active" function="active"></fcnfont>
-        <fcnfont name="inactive" function="inactive"></fcnfont>
-        <showarrow>no</showarrow>
-        <showscrollarrows>no</showscrollarrows>
-      </listbtnarea>
-
-      <textarea name="pl_label" draworder="0" align="left">
-        <area>0,540,30,20</area>
-        <font>subtitle</font>
-        <value>PL</value>
-      </textarea>
-      <textarea name="pl_value" draworder="0" align="left">
-        <area>30,540,30,20</area>
-        <font>subtitle</font>
-        <value>1</value>
-      </textarea>
-
-    </container>
-
     <container name="arrows">
       <area>760,530,780,60</area>
 
@@ -611,11 +578,11 @@
 
     </container>
 
-    <container name="text">
+<container name="text">
 
-      <area>210,20,540,30</area>
+      <area>50,20,700,30</area>
       <textarea name="text" draworder="0">
-        <area>0,0,540,30</area>
+        <area>0,0,700,30</area>
         <font>title</font>
         <cutdown>yes</cutdown>
         <multiline>no</multiline>
@@ -624,10 +591,10 @@
     </container>
 
     <container name="view">
-      <area>210,50,540,530</area>
+      <area>50,50,700,530</area>
 
       <blackhole name="view" draworder="0">
-            <area>0,0,540,530</area>
+            <area>0,0,700,530</area>
       </blackhole>
 
       <textarea name="icontext" draworder="1" align="left">
@@ -645,7 +612,6 @@
       </textarea>
 
     </container>
-
   </window>
 
   <window name="selected">
