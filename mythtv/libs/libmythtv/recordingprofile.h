@@ -276,7 +276,7 @@ public:
     class Width: public SpinBoxSetting, public CodecParam {
     public:
         Width(const RecordingProfile& parent, int maxwidth=704):
-            SpinBoxSetting(120,maxwidth,4),
+            SpinBoxSetting(120,maxwidth,16),
             CodecParam(parent, "width") {
             setLabel("Width");
             setValue(maxwidth);
@@ -286,7 +286,7 @@ public:
     class Height: public SpinBoxSetting, public CodecParam {
     public:
         Height(const RecordingProfile& parent, int maxheight=576):
-            SpinBoxSetting(120,maxheight,4),
+            SpinBoxSetting(120,maxheight,16),
             CodecParam(parent, "height") {
             setLabel("Height");
             setValue(maxheight);
