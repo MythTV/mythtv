@@ -1654,10 +1654,10 @@ void ThemedMenuPrivate::layoutButtons(void)
     
     maxrows = buttonArea.height() / buttonnormal->height();
 
-    if (maxrows < 2)
+    if (maxrows < 1)
     {
         VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Must have "
-                "room for at least 2 rows of buttons");
+                "room for at least 1 row of buttons");
         exit(-43);
     }
     
