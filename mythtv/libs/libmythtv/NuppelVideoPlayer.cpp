@@ -927,16 +927,12 @@ bool NuppelVideoPlayer::DecodeFrame(struct rtframeheader *frameheader,
             InitAVCodec(frameheader->comptype - '3');
 
         int gotpicture = 0;
-#ifdef EXTRA_LOCKING
         pthread_mutex_lock(&avcodeclock);
-#endif
         // if directrendering, writes into buf
         directbuf = outbuf;
         int ret = avcodec_decode_video(mpa_ctx, mpa_pic, &gotpicture,
                                        lstrm, frameheader->packetlength);
-#ifdef EXTRA_LOCKING
         pthread_mutex_unlock(&avcodeclock);
-#endif
         if (ret < 0)
         {
             cout << "decoding error\n";

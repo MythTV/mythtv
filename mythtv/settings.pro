@@ -12,8 +12,6 @@ DEFINES += _GNU_SOURCE
 DEFINES += _FILE_OFFSET_BITS=64
 DEFINES += PREFIX=\"$${PREFIX}\"
 
-DEFINES += EXTRA_LOCKING
-
 release {
         DEFINES += MMX
         QMAKE_CXXFLAGS_RELEASE = -O6 -march=pentiumpro -fomit-frame-pointer -funroll-loops -fexpensive-optimizations

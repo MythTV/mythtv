@@ -2025,14 +2025,10 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int len, int fnum,
 
 	if (!hardware_encode)
 	{
-#ifdef EXTRA_LOCKING
             pthread_mutex_lock(&avcodeclock);
-#endif
             tmp = avcodec_encode_video(mpa_ctx, (unsigned char *)strm, 
                                        video_buffer_size, &mpa_picture); 
-#ifdef EXTRA_LOCKING
             pthread_mutex_unlock(&avcodeclock);
-#endif
 	}
     }
     else
