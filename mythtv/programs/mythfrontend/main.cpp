@@ -629,8 +629,8 @@ int main(int argc, char **argv)
 
     gContext->UpdateImageCache();
 
-    lcd_host = gContext->GetSetting("LCDHost");
-    lcd_port = gContext->GetNumSetting("LCDPort");
+    lcd_host = gContext->GetSetting("LCDHost", "localhost");
+    lcd_port = gContext->GetNumSetting("LCDPort", 13666);
 
     if (lcd_host.length() > 0 && lcd_port > 1024 && gContext->GetLCDDevice())
     {
