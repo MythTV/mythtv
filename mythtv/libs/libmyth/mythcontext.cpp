@@ -38,7 +38,12 @@ MythContext::MythContext(const QString &binversion, bool gui, bool lcd)
         exit(1);
     }
 
-    m_installprefix = PREFIX;
+    char *tmp_installprefix = getenv("MYTHTVDIR");
+    if (tmp_installprefix)
+        m_installprefix = tmp_installprefix;
+    else
+        m_installprefix = PREFIX;
+
     m_settings = new Settings;
     m_qtThemeSettings = new Settings;
 
