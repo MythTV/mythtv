@@ -296,15 +296,15 @@
     </message>
     <message>
         <source>0-9: Edit</source>
-        <translation>0-9: Editar</translation>
+        <translation type="obsolete">0-9: Editar</translation>
     </message>
     <message>
         <source>Menu/Info: Manual IMDB</source>
-        <translation>Menu/Info: IMDB Manual</translation>
+        <translation type="obsolete">Menu/Info: IMDB Manual</translation>
     </message>
     <message>
         <source>Enter/OK: Auto IMDB</source>
-        <translation>Enter/OK: IMDB Automático</translation>
+        <translation type="obsolete">Enter/OK: IMDB Automático</translation>
     </message>
     <message>
         <source>retrieving data...</source>
@@ -328,7 +328,7 @@
     </message>
     <message>
         <source>Use the left and right arrows</source>
-        <translation>Use os cursores Esquerda e Direita</translation>
+        <translation type="obsolete">Use os cursores Esquerda e Direita</translation>
     </message>
     <message>
         <source>Directed by</source>
@@ -399,16 +399,8 @@
         <translation>/directoria/para/a/imagem.jpg</translation>
     </message>
     <message>
-        <source>PL</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>1</source>
         <translation type="unfinished">1</translation>
-    </message>
-    <message>
-        <source>UserRating:</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Category:</source>
@@ -454,6 +446,46 @@
         <source>Aucune video</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>SELECT: Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source></source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MENU: Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Up/Down, Page Up/Down - Browse</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu - Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Parental</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Year</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Runtime</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User Rating</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>VideoBrowser</name>
@@ -485,6 +517,26 @@
         <source>Ok</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Select action</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watch This Video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>View Full Plot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter Display</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch to Video Listings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>VideoManager</name>
@@ -494,7 +546,7 @@
     </message>
     <message>
         <source>Manually Enter IMDB #</source>
-        <translation type="obsolete">Introduza Chave IMDB #</translation>
+        <translation type="unfinished">Introduza Chave IMDB #</translation>
     </message>
     <message>
         <source>Reset Entry</source>
@@ -502,7 +554,7 @@
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="obsolete">Cancelar</translation>
+        <translation type="unfinished">Cancelar</translation>
     </message>
     <message>
         <source>minutes</source>
@@ -537,11 +589,39 @@
         <translation>SC</translation>
     </message>
     <message>
-        <source>Delete this file ?</source>
+        <source>delete failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>delete failed</source>
+        <source>Select action:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Metadata</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search IMDB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset Metadata</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle Browseable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter Display</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete this file?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
