@@ -192,7 +192,7 @@ public:
 
         setLabel("Max quality difference between frames");
         setValue(3);
-        setLabel("Modifying the default may have severe consequences.");
+        setHelpText("Modifying the default may have severe consequences.");
     };
 };
 
