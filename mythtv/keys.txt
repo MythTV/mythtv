@@ -106,8 +106,7 @@ While watching a recording:
   - Space/Enter allows you to set or delete a cut point.
   - 'Z' loads the commercial skip list (if one exists) into the cutlist.
   - 'C' clears all cut points in the cutlist.
-- X queues the current recording for transcoding (only works if 
-    Transcoder w/ cutlist processing is enabled)
+- X queues the current recording for transcoding.
 
 EPG
 ---

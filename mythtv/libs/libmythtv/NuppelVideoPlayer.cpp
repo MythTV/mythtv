@@ -2648,6 +2648,8 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
         return REENCODE_ERROR;
     }
 
+    keyframedist = 30;
+
     if (arb->eff_audiorate > 0)
         audio_samplerate = arb->eff_audiorate;
 
@@ -2793,7 +2795,8 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
         }
     }
 
-    frame.frameNumber = 0;
+    long curFrameNum = 0;
+    frame.frameNumber = 1;
     long lastKeyFrame = 0;
     long totalAudio = 0;
     int dropvideo = 0;
@@ -2804,12 +2807,6 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
 
     while (!eof)
     {
-        decoder->GetFrame(0);
-        frame.frameNumber++;
-
-        if (eof)
-            break;
-
         VideoFrame *lastDecode = videoOutput->GetLastDecodedFrame();
         frame.buf = lastDecode->buf;
         frame.timecode = lastDecode->timecode;
@@ -2846,7 +2843,7 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
             totalAudio += arb->audiobuffer_len;
             int audbufTime = (int)(totalAudio / rateTimeConv);
             int auddelta = arb->last_audiotime - audbufTime;
-            int vidTime = (int) (frame.frameNumber * vidFrameTime + 0.5);
+            int vidTime = (int)(curFrameNum * vidFrameTime + 0.5);
             int viddelta = frame.timecode - vidTime;
             int delta = viddelta - auddelta;
             if (abs(delta) < 500 && abs(delta) >= vidFrameTime)
@@ -2854,7 +2851,7 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
                QString msg = QString("Audio is %1ms %2 video at # %3")
                           .arg(abs(delta))
                           .arg(((delta > 0) ? "ahead of" : "behind"))
-                          .arg((int)frame.frameNumber);
+                          .arg((int)curFrameNum);
                 VERBOSE(VB_GENERAL, msg);
                 dropvideo = (delta > 0) ? 1 : -1;
                 wait_recover = 0;
@@ -2878,7 +2875,7 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
                     }
                     QString msg = QString("Added %1 blank video frames")
                                   .arg(count);
-                    frame.frameNumber += count;
+                    curFrameNum += count;
                     dropvideo = 0;
                     wait_recover = 0;
                 }
@@ -2892,7 +2889,7 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
             }
 
             // int buflen = (int)(arb->audiobuffer_len / rateTimeConv);
-            // cout << frame.frameNumber << ": video time: " << frame.timecode
+            // cout << curFrameNum << ": video time: " << frame.timecode
             //      << " audio time: " << arb->last_audiotime << " buf: "
             //      << buflen << " exp: "
             //      << audbufTime << " delta: " << delta << endl;
@@ -2901,7 +2898,7 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
             if (dropvideo < 0)
             {
                 dropvideo++;
-                frame.frameNumber--;
+                curFrameNum--;
             }
             else
             {
@@ -2909,7 +2906,7 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
                 if (dropvideo)
                 {
                     fifow->FIFOWrite(0, frame.buf, frame.size);
-                    frame.frameNumber++;
+                    curFrameNum++;
                     dropvideo--;
                 }
             }
@@ -2946,12 +2943,12 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
 
                     //need to correct the frame# and timecode here
                     // Question:  Is it necessary to change the timecodes?
-                    decoder->UpdateFrameNumber(frame.frameNumber);
+                    decoder->UpdateFrameNumber(curFrameNum);
                     nvr->UpdateSeekTable(num_keyframes, false);
-                    ReencoderAddKFA(&kfa_table, frame.frameNumber,lastKeyFrame,
+                    ReencoderAddKFA(&kfa_table, curFrameNum, lastKeyFrame,
                                     num_keyframes);
                     num_keyframes++;
-                    lastKeyFrame = frame.frameNumber;
+                    lastKeyFrame = curFrameNum;
 
                     if (did_ff)
                         did_ff = 0;
@@ -3047,6 +3044,10 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
             curtime = QDateTime::currentDateTime();
             curtime = curtime.addSecs(60);
         }
+
+        decoder->GetFrame(0);
+        curFrameNum++;
+        frame.frameNumber = 1 + (curFrameNum << 1);
     }
 
     nvr->WriteSeekTable();
