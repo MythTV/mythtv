@@ -1513,8 +1513,10 @@ bool fillData(QValueList<Source> &sourcelist)
     if (query.isActive() && query.numRowsAffected())
     {
         query.next();
-        GuideDataBefore = QDateTime::fromString(query.value(0).toString(),
-                                                Qt::ISODate);
+
+        if (!query.isNull(0))
+            GuideDataBefore = QDateTime::fromString(query.value(0).toString(),
+                                                    Qt::ISODate);
     }
 
     int failures = 0;
@@ -1722,8 +1724,10 @@ bool fillData(QValueList<Source> &sourcelist)
     if (query.isActive() && query.numRowsAffected())
     {
         query.next();
-        GuideDataAfter = QDateTime::fromString(query.value(0).toString(),
-                                               Qt::ISODate);
+
+        if (!query.isNull(0))
+            GuideDataAfter = QDateTime::fromString(query.value(0).toString(),
+                                                   Qt::ISODate);
     }
 
     if (failures == 0)
