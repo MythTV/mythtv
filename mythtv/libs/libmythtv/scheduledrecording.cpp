@@ -232,7 +232,7 @@ public:
 class SRRecPriority: public SpinBoxSetting, public SRSetting {
 public:
     SRRecPriority(const ScheduledRecording& parent): 
-        SpinBoxSetting(-99, 99, 1),
+        SpinBoxSetting(-99, 99, 5, true),
         SRSetting(parent, "recpriority") {
         setLabel(QObject::tr("Priority"));
         setValue(0);
