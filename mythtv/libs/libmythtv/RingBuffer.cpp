@@ -20,9 +20,9 @@ using namespace std;
 #include "remotefile.h"
 #include "remoteencoder.h"
 
-#define TFW_BUF_SIZE (2*1024*1024)
-#define TFW_MAX_WRITE_SIZE (TFW_BUF_SIZE / 4)
-#define TFW_MIN_WRITE_SIZE (TFW_BUF_SIZE / 16)
+#define TFW_DEF_BUF_SIZE (2*1024*1024)
+#define TFW_MAX_WRITE_SIZE (TFW_DEF_BUF_SIZE / 4)
+#define TFW_MIN_WRITE_SIZE (TFW_DEF_BUF_SIZE / 8)
 
 #ifndef O_STREAMING
 #define O_STREAMING 0
@@ -49,6 +49,9 @@ public:
     // data which has already been sent to the kernel is written to disk
     void Sync(void);
 
+    void SetWriteBufferSize(int newSize = TFW_DEF_BUF_SIZE);
+    void SetWriteBufferMinWriteSize(int newMinSize = TFW_MIN_WRITE_SIZE);
+
     unsigned BufUsed();  /* # of bytes queued for write by the write thread */
     unsigned BufFree();  /* # of bytes that can be written, without blocking */
 
@@ -60,6 +63,8 @@ private:
     // allow DiskLoop() to flush buffer completely ignoring low watermark
     void Flush(void);
 
+    unsigned long tfw_buf_size;
+    unsigned long tfw_min_write_size;
     int fd;
     char *buf;
     unsigned rpos,wpos;
@@ -134,7 +139,9 @@ ThreadedFileWriter::ThreadedFileWriter(const char *filename,
     }
     else
     {
-        buf = new char[TFW_BUF_SIZE + 20];
+        buf = new char[TFW_DEF_BUF_SIZE + 20];
+        tfw_buf_size = TFW_DEF_BUF_SIZE;
+        tfw_min_write_size = TFW_MIN_WRITE_SIZE;
         pthread_create(&writer, NULL, boot_writer, this);
     }
 }
@@ -176,9 +183,9 @@ unsigned ThreadedFileWriter::Write(const void *data, unsigned count)
     if (no_writes)
         return 0;
  
-    if ((wpos + count) > TFW_BUF_SIZE)
+    if ((wpos + count) > tfw_buf_size)
     {
-        int first_chunk_size = TFW_BUF_SIZE - wpos;
+        int first_chunk_size = tfw_buf_size - wpos;
         int second_chunk_size = count - first_chunk_size;
         memcpy(buf + wpos, data, first_chunk_size );
         memcpy(buf, (char *)data + first_chunk_size, second_chunk_size );
@@ -189,7 +196,7 @@ unsigned ThreadedFileWriter::Write(const void *data, unsigned count)
     }
 
     pthread_mutex_lock(&buflock);
-    wpos = (wpos + count) % TFW_BUF_SIZE;
+    wpos = (wpos + count) % tfw_buf_size;
     pthread_mutex_unlock(&buflock);
 
     return count;
@@ -222,6 +229,29 @@ void ThreadedFileWriter::Sync(void)
 #endif
 }
 
+void ThreadedFileWriter::SetWriteBufferSize(int newSize)
+{
+    if (newSize <= 0)
+        return;
+
+    Flush();
+
+    pthread_mutex_lock(&buflock);
+    delete [] buf;
+    rpos = wpos = 0;
+    buf = new char[newSize + 20];
+    tfw_buf_size = newSize;
+    pthread_mutex_unlock(&buflock);
+}
+
+void ThreadedFileWriter::SetWriteBufferMinWriteSize(int newMinSize)
+{
+    if (newMinSize <= 0)
+        return;
+
+    tfw_min_write_size = newMinSize;
+}
+
 void ThreadedFileWriter::DiskLoop()
 {
     int size;
@@ -234,7 +264,7 @@ void ThreadedFileWriter::DiskLoop()
         
         if ((!in_dtor) &&
             (!flush) &&
-            (size <= TFW_MIN_WRITE_SIZE))
+            (size < tfw_min_write_size))
         {
             usleep(500);
             continue;
@@ -253,9 +283,9 @@ void ThreadedFileWriter::DiskLoop()
         if (size > TFW_MAX_WRITE_SIZE)
             size = TFW_MAX_WRITE_SIZE;
 
-        if ((rpos + size) > TFW_BUF_SIZE)
+        if ((rpos + size) > tfw_buf_size)
         {
-            int first_chunk_size  = TFW_BUF_SIZE - rpos;
+            int first_chunk_size  = tfw_buf_size - rpos;
             int second_chunk_size = size - first_chunk_size;
             size = safe_write(fd, buf+rpos, first_chunk_size);
             if (size == first_chunk_size)
@@ -267,7 +297,7 @@ void ThreadedFileWriter::DiskLoop()
         }
 
         pthread_mutex_lock(&buflock);
-        rpos = (rpos + size) % TFW_BUF_SIZE;
+        rpos = (rpos + size) % tfw_buf_size;
         pthread_mutex_unlock(&buflock);
     }
 }
@@ -280,7 +310,7 @@ unsigned ThreadedFileWriter::BufUsed()
     if (wpos >= rpos)
         ret = wpos - rpos;
     else
-        ret = TFW_BUF_SIZE - rpos + wpos;
+        ret = tfw_buf_size - rpos + wpos;
 
     pthread_mutex_unlock(&buflock);
     return ret;
@@ -292,7 +322,7 @@ unsigned ThreadedFileWriter::BufFree()
     pthread_mutex_lock(&buflock);
 
     if (wpos >= rpos)
-        ret = rpos + TFW_BUF_SIZE - wpos - 1;
+        ret = rpos + tfw_buf_size - wpos - 1;
     else
         ret = rpos - wpos - 1;
 
@@ -1206,6 +1236,16 @@ long long RingBuffer::WriterSeek(long long pos, int whence)
     }
 
     return ret;
+}
+
+void RingBuffer::SetWriteBufferSize(int newSize)
+{
+    tfw->SetWriteBufferSize(newSize);
+}
+
+void RingBuffer::SetWriteBufferMinWriteSize(int newMinSize)
+{
+    tfw->SetWriteBufferMinWriteSize(newMinSize);
 }
 
 long long RingBuffer::GetFreeSpace(void)

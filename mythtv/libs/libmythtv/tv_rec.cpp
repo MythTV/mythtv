@@ -596,6 +596,7 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
     }
     else if (cardtype == "HDTV")
     {
+        rbuffer->SetWriteBufferSize(4*1024*1024);
         nvr = new HDTVRecorder();
         nvr->SetRingBuffer(rbuffer);
 
@@ -1728,6 +1729,7 @@ void TVRec::SetupRingBuffer(QString &path, long long &filesize,
     fillamount = fillamount * 1024 * 1024;
 
     rbuffer = new RingBuffer(path, filesize, fillamount);
+    rbuffer->SetWriteBufferMinWriteSize(1);
 }
 
 void TVRec::SpawnLiveTV(void)

@@ -30,6 +30,9 @@ class RingBuffer
     long long Seek(long long pos, int whence);
     long long WriterSeek(long long pos, int whence);
 
+    void SetWriteBufferSize(int newSize);
+    void SetWriteBufferMinWriteSize(int newMinSize);
+
     long long GetReadPosition(void);
     long long GetTotalReadPosition(void);
     long long GetWritePosition(void);
