@@ -915,6 +915,17 @@ void PlaybackBoxMusic::CycleVisualizer()
         visual_mode_timer->stop();
         mainvisual->setVisual("Blank");
         mainvisual->setVisual(new_visualizer);
+    } 
+    else if (mainvisual->numVisualizers() == 1 && visual_mode == "AlbumArt" && 
+             visualizer_status > 0) 
+    {
+        // If only the AlbumArt visualization is selected, then go ahead and
+        // restart the visualization.  This will give AlbumArt the opportunity
+        // to change images if there are multiple images available.
+        new_visualizer = visual_mode;
+        visual_mode_timer->stop();
+        mainvisual->setVisual("Blank");
+        mainvisual->setVisual(new_visualizer);
     }
 }
 
