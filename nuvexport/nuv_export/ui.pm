@@ -203,6 +203,7 @@ package nuv_export::ui;
         foreach $episode (@{$Shows{$show}}) {
         # Figure out if there are any episodes of this program that haven't already been selected
             my $found = 0;
+            my $aspect = "";
             foreach my $selected (@episodes) {
                 next unless ($selected->{'channel'} == $episode->{'channel'}
                              && $selected->{'start_time'} eq $episode->{'start_time'});
@@ -221,7 +222,15 @@ package nuv_export::ui;
             $query .= "$count. ";
         # Print out the show name
             $query .= "$episode->{'title'} " if ($episode->{'title'} && $episode->{'title'} ne 'Untitled');
-            $query .= "($episode->{'showtime'}) ".$episode->{'finfo'}{'width'}.'x'.$episode->{'finfo'}->{'height'}.' '.$episode->{'finfo'}{'video_type'};
+            if($episode->{'finfo'}{'aspect'} == "1.3333") {
+                $aspect = "4:3";
+            } elsif($episode->{'finfo'}{'aspect'} == "1.7777" ||
+                    $episode->{'finfo'}{'aspect'} == "1.7778" ) {
+                $aspect = "16:9";
+            } else {
+                $aspect = "$episode->{'finfo'}{'aspect'}:1"
+            }
+            $query .= "($episode->{'showtime'}) ".$episode->{'finfo'}{'width'}.'x'.$episode->{'finfo'}->{'height'}.' '.$episode->{'finfo'}{'video_type'}." ($aspect)";
             $query .= wrap($episode->{'description'}, 80, $newline, '', $newline) if ($episode->{'description'});
             $query .= "\n";
             $episode_choices[$count-1] = $episode;
@@ -270,6 +279,7 @@ package nuv_export::ui;
     # Build the query
         my $count = 0;
         my $query = "\nYou have chosen to export $num_episodes episode" . ($num_episodes == 1 ? '' : 's') . ":\n\n";
+        my $aspect;
         foreach my $episode (@episodes) {
             $count++;
         # Make sure we have finfo
@@ -282,7 +292,15 @@ package nuv_export::ui;
         # Print out the show name
             $query .= "$episode->{'show_name'}:$newline";
             $query .= "$episode->{'title'} " if ($episode->{'title'} && $episode->{'title'} ne 'Untitled');
-            $query .= "($episode->{'showtime'}) ".$episode->{'finfo'}{'width'}.'x'.$episode->{'finfo'}->{'height'}.' '.$episode->{'finfo'}{'video_type'};
+            if($episode->{'finfo'}{'aspect'} == "1.3333") {
+                $aspect = "4:3";
+            } elsif($episode->{'finfo'}{'aspect'} == "1.7777" ||
+                    $episode->{'finfo'}{'aspect'} == "1.7778" ) {
+                $aspect = "16:9";
+            } else {
+                $aspect = "$episode->{'finfo'}{'aspect'}:1"
+            }
+            $query .= "($episode->{'showtime'}) ".$episode->{'finfo'}{'width'}.'x'.$episode->{'finfo'}->{'height'}.' '.$episode->{'finfo'}{'video_type'}." (".$aspect.")";
             $query .= wrap($episode->{'description'}, 80, $newline, '', $newline) if ($episode->{'description'});
             $query .= "\n";
         }

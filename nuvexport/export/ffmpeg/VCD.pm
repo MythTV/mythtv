@@ -67,14 +67,17 @@ package export::ffmpeg::VCD;
         my $episode = shift;
     # Load nuv info
         load_finfo($episode);
+    # Force to 4:3 aspect ratio
+        $self->{'out_aspect'} = 1.3333;
+        $self->{'aspect_stretched'} = 1;
     # PAL or NTSC?
         my $standard = ($episode->{'finfo'}{'fps'} =~ /^2(?:5|4\.9)/) ? 'PAL' : 'NTSC';
-        my $res = ($standard eq 'PAL') ? '352x288' : '352x240';
+        $self->{'width'} = 352;
+        $self->{'height'} = ($standard eq 'PAL') ? '288' : '240';
     # Build the transcode string
         $self->{'ffmpeg_xtra'}  = " -b 1150 -vcodec mpeg1video"
                                  ." -ab 224 -ar 44100 -acodec mp2"
-                                 ." -aspect 4:3"
-                                 ." -s $res -f vcd";
+                                 ." -f vcd";
     # Execute the parent method
         $self->SUPER::export($episode, ".mpg");
     }

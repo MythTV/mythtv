@@ -111,7 +111,10 @@ package export::ffmpeg::XviD;
                         }
                     }
                 }
+            } else {
+                $self->{'multipass'} = 0;
             }
+
         # Ask the user what video bitrate he/she wants
             if ($self->{'multipass'} || !$self->{'vbr'}) {
                 $self->{'v_bitrate'} = query_text('Video bitrate?',
@@ -140,8 +143,8 @@ package export::ffmpeg::XviD;
             $self->{'ffmpeg_xtra'} = ' -vcodec xvid'
                                    . ' -b ' . $self->{'v_bitrate'}
                                    . ' -minrate 32 -maxrate '.(2*$self->{'v_bitrate'}).' -bt 32'
+                                   . ' -bufsize 65535'
                                    . ' -lumi_mask 0.05 -dark_mask 0.02 -scplx_mask 0.7'
-                                   . " -s $self->{'width'}x$self->{'height'}"
                                    . " -pass 1 -passlogfile '/tmp/xvid.$$.log'"
                                    . ' -f avi';
             $self->SUPER::export($episode, '');
@@ -152,10 +155,10 @@ package export::ffmpeg::XviD;
             $self->{'ffmpeg_xtra'} = ' -vcodec xvid'
                                    . ' -b ' . $self->{'v_bitrate'}
                                    . ' -minrate 32 -maxrate '.(2*$self->{'v_bitrate'}).' -bt 32'
+                                   . ' -bufsize 65535'
                                    . ' -lumi_mask 0.05 -dark_mask 0.02 -scplx_mask 0.7'
                                    . ' -acodec mp3'
                                    . ' -ab ' . $self->{'a_bitrate'}
-                                   . " -s $self->{'width'}x$self->{'height'}"
                                    . " -pass 2 -passlogfile '/tmp/xvid.$$.log'"
                                    . ' -f avi';
         }
@@ -163,13 +166,16 @@ package export::ffmpeg::XviD;
         else {
             $self->{'ffmpeg_xtra'} = ' -vcodec xvid'
                                    . ' -b ' . $self->{'v_bitrate'}
-                                   . ' -minrate 32 -maxrate '.(2*$self->{'v_bitrate'}).' -bt 32'
+                                   . (($self->{'vbr'}) 
+                                      ? " -qmin $self->{'quantisation'}"
+                                      . ' -qmax 31 -minrate 32'
+                                      . ' -maxrate '.(2*$self->{'v_bitrate'})
+                                      . ' -bt 32'
+                                      . ' -bufsize 65535'
+                                      : '')
                                    . ' -lumi_mask 0.05 -dark_mask 0.02 -scplx_mask 0.7'
-                                   . (($self->{'vbr'}) ?
-                                     " -qmin $self->{'quantisation'} -qmax 31" : '')
                                    . ' -acodec mp3'
                                    . ' -ab ' . $self->{'a_bitrate'}
-                                   . " -s $self->{'width'}x$self->{'height'}"
                                    . ' -f avi';
         }
     # Execute the (final pass) encode

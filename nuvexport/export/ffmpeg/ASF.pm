@@ -129,8 +129,8 @@ package export::ffmpeg::ASF;
             $self->{'ffmpeg_xtra'} = ' -vcodec msmpeg4'
                                    . ' -b ' . $self->{'v_bitrate'}
                                    . ' -minrate 32 -maxrate '.(2*$self->{'v_bitrate'}).' -bt 32'
-                                   . ' -lumi_mask 0.05 -dark_mask 0.02 -scplx_mask 0.7'
-                                   . " -s $self->{'width'}x$self->{'height'}"
+                                   . ' -bufsize 65535'
+#                                   . ' -lumi_mask 0.05 -dark_mask 0.02 -scplx_mask 0.7'
                                    . " -pass 1 -passlogfile '/tmp/asf.$$.log'"
                                    . ' -f asf';
             $self->SUPER::export($episode, '');
@@ -141,10 +141,10 @@ package export::ffmpeg::ASF;
             $self->{'ffmpeg_xtra'} = ' -vcodec msmpeg4'
                                    . ' -b ' . $self->{'v_bitrate'}
                                    . ' -minrate 32 -maxrate '.(2*$self->{'v_bitrate'}).' -bt 32'
-                                   . ' -lumi_mask 0.05 -dark_mask 0.02 -scplx_mask 0.7'
+                                   . ' -bufsize 65535'
+#                                   . ' -lumi_mask 0.05 -dark_mask 0.02 -scplx_mask 0.7'
                                    . ' -acodec mp3'
                                    . ' -ab ' . $self->{'a_bitrate'}
-                                   . " -s $self->{'width'}x$self->{'height'}"
                                    . " -pass 2 -passlogfile '/tmp/asf.$$.log'"
                                    . ' -f asf';
         }
@@ -152,13 +152,16 @@ package export::ffmpeg::ASF;
         else {
             $self->{'ffmpeg_xtra'} = ' -vcodec msmpeg4'
                                    . ' -b ' . $self->{'v_bitrate'}
-                                   . ' -minrate 32 -maxrate '.(2*$self->{'v_bitrate'}).' -bt 32'
-                                   . ' -lumi_mask 0.05 -dark_mask 0.02 -scplx_mask 0.7'
-                                   . (($self->{'vbr'}) ?
-                                     " -qmin $self->{'quantisation'} -qmax 31" : '')
+                                   . (($self->{'vbr'}) 
+                                      ? " -qmin $self->{'quantisation'}"
+                                      . ' -qmax 31 -minrate 32'
+                                      . ' -maxrate '.(2*$self->{'v_bitrate'})
+                                      . ' -bt 32 -bufsize 65535'
+                                      : '')
+#                                   . ' -lumi_mask 0.05 -dark_mask 0.02'
+#                                   . ' -scplx_mask 0.7' 
                                    . ' -acodec mp3'
                                    . ' -ab ' . $self->{'a_bitrate'}
-                                   . " -s $self->{'width'}x$self->{'height'}"
                                    . ' -f asf';
         }
     # Execute the (final pass) encode

@@ -132,8 +132,8 @@ package export::ffmpeg::DivX;
                                    . ' -b ' . $self->{'v_bitrate'}
                                    . ' -minrate 32 -maxrate '.(2*$self->{'v_bitrate'}).' -bt 32'
                                    . ' -lumi_mask 0.05 -dark_mask 0.02 -scplx_mask 0.7'
+                                   . ' -bufsize 65535'
                                    . ' -vtag divx'
-                                   . " -s $self->{'width'}x$self->{'height'}"
                                    . " -pass 1 -passlogfile '/tmp/divx.$$.log'"
                                    . ' -f avi';
             $self->SUPER::export($episode, '');
@@ -145,10 +145,10 @@ package export::ffmpeg::DivX;
                                    . ' -b ' . $self->{'v_bitrate'}
                                    . ' -minrate 32 -maxrate '.(2*$self->{'v_bitrate'}).' -bt 32'
                                    . ' -lumi_mask 0.05 -dark_mask 0.02 -scplx_mask 0.7'
+                                   . ' -bufsize 65535'
                                    . ' -vtag divx'
                                    . ' -acodec mp3'
                                    . ' -ab ' . $self->{'a_bitrate'}
-                                   . " -s $self->{'width'}x$self->{'height'}"
                                    . " -pass 2 -passlogfile '/tmp/divx.$$.log'"
                                    . ' -f avi';
         }
@@ -156,15 +156,17 @@ package export::ffmpeg::DivX;
         else {
             $self->{'ffmpeg_xtra'} = ' -vcodec mpeg4'
                                    . ' -b ' . $self->{'v_bitrate'}
-                                   . ' -minrate 32 -maxrate '.(2*$self->{'v_bitrate'}).' -bt 32'
                                    . ($self->{'vbr'}
-                                       ? " -qmin $self->{'quantisation'} -qmax 31"
+                                       ? " -qmin $self->{'quantisation'}"
+                                       . ' -qmax 31 -minrate 32'
+                                       . ' -maxrate '.(2*$self->{'v_bitrate'})
+                                       . ' -bt 32'
+                                       . ' -bufsize 65535'
                                        : '')
                                    . ' -lumi_mask 0.05 -dark_mask 0.02 -scplx_mask 0.7'
                                    . ' -vtag divx'
                                    . ' -acodec mp3'
                                    . ' -ab ' . $self->{'a_bitrate'}
-                                   . " -s $self->{'width'}x$self->{'height'}"
                                    . ' -f avi';
         }
     # Execute the (final pass) encode

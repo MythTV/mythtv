@@ -92,6 +92,11 @@ package export::ffmpeg;
         my $videotype = 'rawvideo';
         my $crop_w;
         my $crop_h;
+        my $pad_w;
+        my $pad_h;
+        my $aspect;
+        my $height;
+        my $width;
 
         if ($self->{'crop'}) {
             $crop_w = sprintf('%.0f', .02 * $episode->{'finfo'}{'width'});
@@ -141,6 +146,48 @@ package export::ffmpeg;
         if (!$self->{'audioonly'}) {
             $ffmpeg .= " -f $videotype";
             $ffmpeg .= " -s " . $episode->{'finfo'}{'width'} . "x" . $episode->{'finfo'}{'height'};
+            if ($self->{'out_aspect'}) {
+                $aspect = $self->{'out_aspect'};
+            } else {
+                $aspect = $episode->{'finfo'}{'aspect'};
+            }
+
+            if ($self->{'aspect_stretched'}) {
+                # The output is actually a stretched aspect ratio
+                # (like 480x480 for SVCD, which is 4:3)
+
+                # Stretch the width to the full aspect ratio for calculating
+                $width = int($self->{'height'} * $aspect + 0.5);
+                # Calculate the height required to keep the source in aspect
+                $height = $width / $episode->{'finfo'}{'aspect'};
+                # Round to nearest even number
+                $height = int(($height + 2) / 4) * 4;
+                # Calculate how much to pad the height (both top & bottom)
+                $pad_h = int(($self->{'height'} - $height) / 2);
+                # Set the real width again
+                $width = $self->{'width'};
+                # No padding on the width
+                $pad_w = 0;
+            } else {
+                # The output will need letter/pillarboxing
+                if ($self->{'width'} / $self->{'height'} <= $aspect) {
+                    # We need to letterbox
+                    $width = $self->{'width'};
+                    $height = $width / $episode->{'finfo'}{'aspect'};
+                    $height = int(($height + 2) / 4) * 4;
+                    $pad_h = int(($self->{'height'} - $height) / 2);
+                    $pad_w = 0;
+                } else {
+                    # We need to pillarbox
+                    $height = $self->{'height'};
+                    $width = $height * $episode->{'finfo'}{'aspect'};
+                    $width = int(($width + 2) / 4) * 4;
+                    $pad_w = int(($self->{'width'} - $width) / 2);
+                    $pad_h = 0;
+                }
+            }
+
+            $ffmpeg .= " -aspect " . $aspect;
             $ffmpeg .= " -r " . $episode->{'finfo'}{'fps'};
             $ffmpeg .= " -i $videofifo";
 
@@ -153,6 +200,15 @@ package export::ffmpeg;
                 $ffmpeg .= " -croptop $crop_h -cropbottom $crop_h";
                 $ffmpeg .= " -cropleft $crop_w -cropright $crop_w";
             }
+
+        # Letter/Pillarboxing as appropriate
+            if ($pad_h) {
+                $ffmpeg .= " -padtop $pad_h -padbottom $pad_h";
+            }
+            if ($pad_w) {
+                $ffmpeg .= " -padleft $pad_w -padright $pad_w";
+            }
+            $ffmpeg .= " -s $width" . "x$height";
         }
 
     # Add any additional settings from the child module

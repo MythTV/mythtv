@@ -125,6 +125,7 @@ package export::generic;
         if (!$self->val('width') || $self->val('width') =~ /^\s*\D/) {
             $self->{'width'} = $episodes[0]->{'finfo'}{'width'};
         }
+        print "Default resolution based on 4:3 aspect ratio.\n";
     # Ask the user what resolution he/she wants
         while (1) {
             my $w = query_text('Width?',
@@ -137,21 +138,13 @@ package export::generic;
             }
         # Alert the user
             print "Width must be a multiple of 16.\n";
+            $self->{'width'} = int(($w + 8) / 16) * 16;
         }
     # Height will default to whatever is the appropriate aspect ratio for the width
     # someday, we should check the aspect ratio here, too...  Round up/down as needed.
         if (!$self->val('height') || $self->val('height') =~ /^\s*\D/) {
-            $self->{'height'} = sprintf('%.0f', $self->{'width'} * 3/4);
-            if ($self->{'height'} % 16 > 8) {
-                while ($self->{'height'} % 16 > 0) {
-                    $self->{'height'}++;
-                }
-            }
-            elsif ($self->{'height'} % 16 > 0) {
-                while ($self->{'height'} % 16 > 0) {
-                    $self->{'height'}--;
-                }
-            }
+            $self->{'height'} = $self->{'width'} / 4 * 3;
+            $self->{'height'} = int(($self->{'height'} + 8) / 16) * 16;
         }
     # Ask about the height
         while (1) {
@@ -165,6 +158,7 @@ package export::generic;
             }
         # Alert the user
             print "Height must be a multiple of 16.\n";
+            $self->{'height'} = int(($h + 8) / 16) * 16;
         }
     }
 
