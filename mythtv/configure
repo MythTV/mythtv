@@ -920,6 +920,8 @@ if test x"$tune" = x"generic" -a x"$cpu_overide" != x"yes"; then
        ARCHFLAGS="-march=pentium3"
    elif expr "$processor" : ".*Pentium III" > /dev/null ; then
        ARCHFLAGS="-march=pentium3"
+   elif expr "$processor" : ".*Intel(R) Pentium(R) III" > /dev/null ; then
+       ARCHFLAGS="-march=pentium3"
    elif expr "$processor" : ".*Celeron (Coppermine)" > /dev/null ; then
        ARCHFLAGS="-march=pentium3"
    elif expr "$processor" : ".*Intel(R) Celeron(R) CPU" > /dev/null ; then
@@ -946,6 +948,8 @@ if test x"$tune" = x"generic" -a x"$cpu_overide" != x"yes"; then
        ARCHFLAGS="-march=athlon"
    elif expr "$processor" : "athlon" > /dev/null ; then
        ARCHFLAGS="-march=athlon"
+   elif expr "$processor" : ".*Crusoe(m) Processor TM5600" > /dev/null ; then
+       ARCHFLAGS="-march=pentium2"
    elif expr "$processor" : ".*VIA C3 Ezra" > /dev/null ; then
        ARCHFLAGS="-march=c3"
        optimize="small"
