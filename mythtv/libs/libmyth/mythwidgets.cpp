@@ -1021,7 +1021,9 @@ void MythListView::keyPressEvent(QKeyEvent *e)
                 setSelected(currentItem(), true);
             }
         }
-        if (e->key() == Key_Space && fixspace)
+        if (e->key() == Key_Space ||
+            e->key() == Key_Return ||
+            e->key() == Key_Enter)
         {
             emit spacePressed(currentItem());
             return;
