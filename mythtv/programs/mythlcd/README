@@ -1,9 +1,14 @@
 This is the README file for the MythLCD package.
-September 21, 2002
 
-Version: 0.1 (still)
-(c) 2002 Thor Sigvaldason (mythtv@lamedomainname.com) 
-and Isaac Richards (ijr@po.cwru.edu)
+Most Recent Update to this README: February 4, 2003
+
+Version: 0.8 
+
+	(that is, working on a version that will "ship" as part of
+	MythTV version 0.8)
+
+(c) 2002, 2003 	Thor Sigvaldason (mythtv@lamedomainname.com) 
+		and Isaac Richards (ijr@po.cwru.edu)
 
 
 MythLCD is distributed under the GNU GENERAL PUBLIC LICENSE version 2 (see
@@ -26,7 +31,7 @@ Contents
 =========
 
 	MythLCD is a little toy application that demonstrates how to use an
-lcddevice which is an object available in libmyth.
+lcddevice which is an object available in libmyth. 
 
 
 2.0 Installation
@@ -40,33 +45,34 @@ which you can find at or around:
 	There are links from that URL to sites where you can order LCD
 hardware that works with LCDproc. Note that even if you don't have hardware,
 you can easily build a curses version of LCDproc that will let you
-use/debug/play with mythLCD code.
+use/debug/play with mythLCD code and see the results in a terminal. This can
+be surprisingly useful, as it's an easy way to see the status of a mythbox
+on the display of another computer.
+ 
+	****IMPORTANT****: a standard ./configure, make, make install at the
+MC/ level of the main MythTV source code does **not** currently declare
+-DLCD_DEVICE in the compile and linking lines for libmyth. You're configure
+line needs to be:
 
-	Once LCDproc is up and running, go into the mythlcd subdirectory and
-type make. You may want to remove -DLCD_DEVICE_DEBUG from the CXXFLAGS line
-in the Makefile, as it generates a lot of output. Note that the Makefile is
-hand assembled and has nothing to do with higher level MythTV Makefiles.
-This will (hopefully) change soon.
-	
-	IMPORTANT: a standard ./configure, make, make install at the MC/
-level does not currently declare -DLCD_DEVICE in the compile and linking
-lines for libmyth. To actually use mythlcd and/or the lcddevice object in
-libmyth, you need to go into the libmyth subdirectory, do a Make clean, hand
-edit the Makefile to add -DLCD_DEVICE to the CXXFLAGS definition, and then
-make again. Then come back to MC/programs/mythlcd and do a make. You may
-also need to fiddle with your LD_LIBRARY_PATH if libmyth is only built and
-not installed anywhere. This will (hopefully) change soon.
+	./configure --enable-lcd
 
+	Once LCDproc is up and running, go into programs/mythlcd and type
+make. Now just run the program (i.e. ./mythlcd). There is no "make install".
+Note that the Makefile is hand assembled and has nothing to do with higher
+level MythTV Makefiles.
 
 3.0 FAQs
 ========
 
-	First release, so no questions (and nothing frequent).
+Q: What's the point of a tiny little program that is not part of any mythTV
+executable code?
+
+A: It's a useful reference for people who want to incorporate LCD device
+output to their myth* software (e.g. mythGame, mythWeather, etc.).
 
 
 4.0 Plans/TODO
 =============	
 	
-	Debug code and extend features
 	Make the Myth programs actually use the object
 
