@@ -92,6 +92,10 @@ TVRec::TVRec(int capturecardnum)
         exit(-1);
 #endif
     }
+    else if ((cardtype == "MPEG") && (videodev.lower().left(5) == "file:"))
+    {
+        channel = NULL;
+    }
     else // "V4L" or "MPEG", ie, analog TV, or "HDTV"
     {
         Channel *achannel = new Channel(this, videodev, (cardtype == "HDTV"));
@@ -397,7 +401,8 @@ void TVRec::HandleStateChange(void)
     else if (tmpInternalState == kState_WatchingLiveTV && 
              nextState == kState_None)
     {
-        channel->StoreInputChannels();
+        if (channel)
+            channel->StoreInputChannels();
 
         closeRecorder = true;
 
@@ -513,16 +518,18 @@ void TVRec::HandleStateChange(void)
             nvr->SetRecording(curRecording);
             nvr->SetDB(db_conn, &db_lock);
             if (channel != NULL)
+            {
                 nvr->ChannelNameChanged(channel->GetCurrentName());
 
-            SetVideoFiltersForChannel(channel, channel->GetCurrentName());
-            if (channel->Open())
-            {
-                channel->SetBrightness();
-                channel->SetContrast();
-                channel->SetColour();
-                channel->SetHue();
-                channel->Close();
+                SetVideoFiltersForChannel(channel, channel->GetCurrentName());
+                if (channel->Open())
+                {
+                    channel->SetBrightness();
+                    channel->SetContrast();
+                    channel->SetColour();
+                    channel->SetHue();
+                    channel->Close();
+                }
             }
             pthread_create(&encode, NULL, SpawnEncode, nvr);
 
@@ -535,7 +542,8 @@ void TVRec::HandleStateChange(void)
         if (nvr->IsRecording())
         {
             // evil.
-            channel->SetFd(nvr->GetVideoFd());
+            if (channel)
+                channel->SetFd(nvr->GetVideoFd());
             frameRate = nvr->GetFrameRate();
         }
         else
@@ -552,7 +560,8 @@ void TVRec::HandleStateChange(void)
     if (closeRecorder)
     {
         TeardownRecorder(killRecordingFile);
-        channel->SetFd(-1);
+        if (channel)
+            channel->SetFd(-1);
     }
 
     internalState = tmpInternalState;
@@ -772,7 +781,7 @@ char *TVRec::GetScreenGrab(ProgramInfo *pginfo, const QString &filename,
 
 void TVRec::SetChannel(bool needopen)
 {
-    if (needopen)
+    if (needopen && channel)
         channel->Open();
 
     pthread_mutex_lock(&db_lock);
@@ -805,9 +814,10 @@ void TVRec::SetChannel(bool needopen)
 
     pthread_mutex_unlock(&db_lock);
 
-    channel->SwitchToInput(inputname, chanstr);
+    if (channel)
+        channel->SwitchToInput(inputname, chanstr);
 
-    if (needopen)
+    if (needopen && channel)
         channel->Close();
 }
 
@@ -924,6 +934,9 @@ void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
     char curtimestr[128];
     time_t curtime;
     struct tm *loctime;
+
+    if (!chan)
+        return;
 
     curtime = time(NULL);
     loctime = localtime(&curtime);
@@ -1120,6 +1133,9 @@ void TVRec::GetDevices(int cardnum, QString &video, QString &vbi,
 
 bool TVRec::CheckChannel(QString name)
 {
+    if (!channel)
+        return false;
+
     QSqlDatabase* dummy1;
     pthread_mutex_t* dummy2;
     QString dummyID;
@@ -1129,6 +1145,9 @@ bool TVRec::CheckChannel(QString name)
 bool TVRec::CheckChannel(ChannelBase *chan, const QString &channum, 
                          QSqlDatabase *&a_db_conn, pthread_mutex_t *&a_db_lock, QString& inputName)
 {
+    if (!chan)
+        return false;
+
     if (!db_conn)
         return true;
 
@@ -1227,6 +1246,9 @@ bool TVRec::CheckChannel(ChannelBase *chan, const QString &channum,
  */
 bool TVRec::CheckChannelPrefix(QString name, bool &unique)
 {
+    if (!channel)
+        return false;
+
     if (!db_conn)
         return true;
 
@@ -1282,6 +1304,8 @@ bool TVRec::CheckChannelPrefix(QString name, bool &unique)
 
 bool TVRec::SetVideoFiltersForChannel(ChannelBase *chan, const QString &channum)
 {
+    if (!chan)
+        return false;
 
     if (!db_conn)
         return true;
@@ -1340,6 +1364,9 @@ bool TVRec::SetVideoFiltersForChannel(ChannelBase *chan, const QString &channum)
 int TVRec::GetChannelValue(const QString &channel_field, ChannelBase *chan, 
                            const QString &channum)
 {
+    if (!chan)
+        return -1;
+
     int retval = -1;
 
     if (!db_conn)
@@ -1381,6 +1408,8 @@ int TVRec::GetChannelValue(const QString &channel_field, ChannelBase *chan,
 void TVRec::SetChannelValue(QString &field_name,int value, ChannelBase *chan,
                             const QString &channum)
 {
+    if (!chan)
+        return;
 
     if (!db_conn)
         return;
@@ -1433,6 +1462,9 @@ QString TVRec::GetNextChannel(ChannelBase *chan, int channeldirection)
 {
     QString ret = "";
 
+    if (!chan)
+        return ret;
+
     // Get info on the current channel we're on
     QString channum = chan->GetCurrentName();
     QString chanid = "";
@@ -1445,10 +1477,12 @@ QString TVRec::GetNextChannel(ChannelBase *chan, int channeldirection)
 
 QString TVRec::GetNextRelativeChanID(QString channum, int channeldirection)
 {
-
     // Get info on the current channel we're on
     QString channum_out = channum;
     QString chanid = "";
+
+    if (!channel)
+        return chanid;
 
     DoGetNextChannel(channum_out, channel->GetCurrentInput(), 
                      m_capturecardnum, channel->GetOrdering(),
@@ -1776,6 +1810,9 @@ void TVRec::ChangeChannel(int channeldirection)
 
 void TVRec::ToggleChannelFavorite(void)
 {
+    if (!channel)
+        return;
+
     // Get current channel id...
     QString channum = channel->GetCurrentName();
     QString channelinput = channel->GetCurrentInput();
@@ -1851,24 +1888,36 @@ void TVRec::ToggleChannelFavorite(void)
 
 int TVRec::ChangeContrast(bool direction)
 {
+    if (!channel)
+        return -1;
+
     int ret = channel->ChangeContrast(direction);
     return ret;
 }
 
 int TVRec::ChangeBrightness(bool direction)
 {
+    if (!channel)
+        return -1;
+
     int ret = channel->ChangeBrightness(direction);
     return ret;
 }
 
 int TVRec::ChangeColour(bool direction)
 {
+    if (!channel)
+        return -1;
+
     int ret = channel->ChangeColour(direction);
     return ret;
 }
 
 int TVRec::ChangeHue(bool direction)
 {
+    if (!channel)
+        return -1;
+
     int ret = channel->ChangeHue(direction);
     return ret;
 }
@@ -2007,6 +2056,9 @@ void TVRec::GetChannelInfo(QString &title, QString &subtitle, QString &desc,
                         QString &channelname, QString &chanid,
                         QString &seriesid, QString &programid)
 {
+    if (!channel)
+        return;
+
     GetChannelInfo(channel, title, subtitle, desc, category, starttime,
                    endtime, callsign, iconpath, channelname, chanid,
                    seriesid, programid);
@@ -2014,6 +2066,9 @@ void TVRec::GetChannelInfo(QString &title, QString &subtitle, QString &desc,
 
 void TVRec::GetInputName(QString &inputname)
 {
+    if (!channel)
+        return;
+
     inputname = channel->GetCurrentInput();
 }
 
@@ -2134,6 +2189,9 @@ void TVRec::RetrieveInputChannels(map<int, QString> &inputChannel,
                                   map<int, QString> &externalChanger,
                                   map<int, QString> &sourceid)
 {
+    if (!channel)
+        return;
+
     pthread_mutex_lock(&db_lock);
     MythContext::KickDatabase(db_conn);
 
@@ -2173,6 +2231,9 @@ void TVRec::RetrieveInputChannels(map<int, QString> &inputChannel,
 
 void TVRec::StoreInputChannels(map<int, QString> &inputChannel)
 {
+    if (!channel)
+        return;
+
     QString query, input;
 
     pthread_mutex_lock(&db_lock);

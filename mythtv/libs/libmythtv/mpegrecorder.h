@@ -47,6 +47,12 @@ class MpegRecorder : public RecorderBase
     bool PacketHasHeader(unsigned char *buf, int len, unsigned int startcode);
     void ProcessData(unsigned char *buffer, int len);
 
+    void openMpegFileAsInput(void);
+    void openV4L2DeviceAsInput(void);
+
+    bool deviceIsMpegFile;
+    int bufferSize;
+
     bool recording;
     bool encoding;
 

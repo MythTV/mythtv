@@ -9,6 +9,7 @@
 #include <sys/ioctl.h>
 #include <sys/time.h>
 #include <ctime>
+#include <qregexp.h>
 #include "videodev_myth.h"
 
 extern "C" {
@@ -68,6 +69,9 @@ MpegRecorder::MpegRecorder()
     audbitratel1 = 14;
     audbitratel2 = 14;
     audvolume = 80;
+
+    deviceIsMpegFile = false;
+    bufferSize = 256000;
 }
 
 MpegRecorder::~MpegRecorder()
@@ -178,7 +182,19 @@ void MpegRecorder::SetOptionsFromProfile(RecordingProfile *profile,
     (void)audiodev;
     (void)vbidev;
 
-    SetOption("videodevice", videodev);
+    if (videodev.lower().left(5) == "file:")
+    {
+        deviceIsMpegFile = true;
+        bufferSize = 64000;
+        QString newVideoDev = videodev;
+        newVideoDev.replace(QRegExp("^file:", false), QString(""));
+        SetOption("videodevice", newVideoDev);
+    }
+    else
+    {
+        SetOption("videodevice", videodev);
+    }
+
     SetOption("tvformat", gContext->GetSetting("TVFormat"));
     SetOption("vbiformat", gContext->GetSetting("VbiFormat"));
 
@@ -207,7 +223,19 @@ void MpegRecorder::SetOptionsFromProfile(RecordingProfile *profile,
     }
 }
 
-void MpegRecorder::StartRecording(void)
+void MpegRecorder::openMpegFileAsInput(void)
+{
+    chanfd = readfd = open(videodevice.ascii(), O_RDONLY);
+
+    if (readfd <= 0)
+    {
+        cerr << "Can't open MPEG File: " << videodevice << endl;
+        perror("open mpeg file:");
+        return;
+    }
+}
+
+void MpegRecorder::openV4L2DeviceAsInput(void)
 {
     chanfd = open(videodevice.ascii(), O_RDWR);
     if (chanfd <= 0)
@@ -318,6 +346,17 @@ void MpegRecorder::StartRecording(void)
         perror("open video:");
         return;
     }
+}
+
+void MpegRecorder::StartRecording(void)
+{
+    if (deviceIsMpegFile)
+        openMpegFileAsInput();
+    else
+        openV4L2DeviceAsInput();
+
+    if ((chanfd <= 0) || (readfd <= 0))
+        return;
 
     if (!SetupRecording())
     {
@@ -327,8 +366,14 @@ void MpegRecorder::StartRecording(void)
 
     encoding = true;
     recording = true;
-    unsigned char *buffer = new unsigned char[256001];
+    unsigned char *buffer = new unsigned char[bufferSize + 1];
     int ret;
+
+    QTime elapsedTimer;
+    float elapsed;
+
+    if (deviceIsMpegFile)
+        elapsedTimer.start();
 
     while (encoding)
     {
@@ -337,7 +382,8 @@ void MpegRecorder::StartRecording(void)
             mainpaused = true;
             pauseWait.wakeAll();
 
-            if (readfd > 0)
+            if ((!deviceIsMpegFile) &&
+                (readfd > 0))
             {
                 close(readfd);
                 readfd = -1;
@@ -346,12 +392,36 @@ void MpegRecorder::StartRecording(void)
             continue;
         }
 
+        if ((deviceIsMpegFile) && (framesWritten))
+        {
+            elapsed = (elapsedTimer.elapsed() / 1000.0) + 1;
+            while ((framesWritten / elapsed) > 30)
+            {
+                usleep(50000);
+                elapsed = (elapsedTimer.elapsed() / 1000.0) + 1;
+            }
+        }
+
         if (readfd < 0)
             readfd = open(videodevice.ascii(), O_RDWR);
 
-        ret = read(readfd, buffer, 256000);
+        ret = read(readfd, buffer, bufferSize);
 
-        if (ret < 0)
+        if ((ret == 0) &&
+            (deviceIsMpegFile))
+        {
+            close(readfd);
+            readfd = open(videodevice.ascii(), O_RDONLY);
+
+            if (readfd > 0)
+                ret = read(readfd, buffer, bufferSize);
+            if (ret <= 0)
+            {
+                encoding = false;
+                continue;
+            }
+        }
+        else if (ret < 0)
         {
             cerr << "error reading from: " << videodevice << endl;
             perror("read");
@@ -413,7 +483,7 @@ bool MpegRecorder::SetupRecording(void)
     char *cfilename = (char *)filename.ascii();
     AVFormatParameters params;
 
-    ic->pb.buffer_size = 256001;
+    ic->pb.buffer_size = bufferSize + 1;
     ic->pb.buffer = NULL;
     ic->pb.buf_ptr = NULL;
     ic->pb.write_flag = 0;
