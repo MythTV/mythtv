@@ -44,6 +44,7 @@ class VideoDialog : public MythDialog
         virtual void slotWatchVideo();
             
     protected:
+        virtual void updateBackground(void);
         virtual void parseContainer(QDomElement&) = 0;
         virtual void loadWindow(QDomElement &element);
         virtual void handleMetaFetch(Metadata*){}
@@ -52,8 +53,10 @@ class VideoDialog : public MythDialog
         void shiftParental(int amount);
         bool createPopup();
         void cancelPopup(void);
+        void doMenu(bool info);
         QButton* addDests(MythPopupBox* _popup = NULL);
         
+        QPixmap myBackground;
         int currentParentalLevel;        
         QSqlDatabase *db;
         Metadata* curitem;

@@ -137,22 +137,6 @@ void VideoBrowser::doMenu(bool info)
     
 }
 
-void VideoBrowser::updateBackground(void)
-{
-    QPixmap bground(size());
-    bground.fill(this, 0, 0);
-
-    QPainter tmp(&bground);
-
-    LayerSet *container = theme->GetSet("background");
-    if (container)
-        container->Draw(&tmp, 0, 0);
-
-    tmp.end();
-    myBackground = bground;
-
-    setPaletteBackgroundPixmap(myBackground);
-}
 
 void VideoBrowser::fetchVideos()
 {

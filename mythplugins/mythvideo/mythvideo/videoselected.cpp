@@ -421,14 +421,15 @@ void VideoSelected::selected(Metadata *someItem)
         }
     }
     
-
+    QString year = QString("%1").arg(someItem->Year());
     // See if this is being handled by a plugin..
-    if(gContext->GetMainWindow()->HandleMedia(handler, filename))
-	return;
-
-    // See if this is being handled by a plugin..
-    if (gContext->GetMainWindow()->HandleMedia(handler, filename))
-	return;
+    if(gContext->GetMainWindow()->HandleMedia(handler, filename, someItem->Plot(), 
+                                              someItem->Title(), someItem->Director(),
+                                                  someItem->Length(), year))
+    {
+        return;
+    }
+    
  
     QString arg;
     arg.sprintf("\"%s\"",

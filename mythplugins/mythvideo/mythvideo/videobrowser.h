@@ -49,7 +49,6 @@ class VideoBrowser : public VideoDialog
     void jumpSelection(int amount);
     void RefreshMovieList();
     void SetCurrentItem();
-    void updateBackground(void);
     void updateInfo(QPainter *);
     void updateBrowsing(QPainter *);
     void updatePlayWait(QPainter *);
@@ -61,7 +60,7 @@ class VideoBrowser : public VideoDialog
     ValueMetadata m_list;
     
     QPixmap *bgTransBackup;
-    QPixmap myBackground;
+    
 
     QPainter backup;
 

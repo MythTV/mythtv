@@ -11,6 +11,7 @@
 #include "metadata.h"
 
 class QSqlDatabase;
+class VideoFilterSettings;
 
 class VideoTree : public MythThemedDialog
 {
@@ -29,8 +30,18 @@ class VideoTree : public MythThemedDialog
     void buildFileList(QString directory);
     bool ignoreExtension(QString extension);
     
+    virtual void playVideo(Metadata *someItem);
+    QString getHandler(Metadata *someItem);
+    QString getCommand(Metadata *someItem);
+        
   public slots:
-  
+    void slotDoCancel();
+    void slotVideoGallery();
+    void slotVideoBrowser();
+    void slotViewPlot();
+    void slotDoFilter();
+    virtual void slotWatchVideo();
+    
     void handleTreeListSelection(int, IntVector*);
     void handleTreeListEntry(int, IntVector*);
     void playVideo(int node_number);
@@ -39,9 +50,15 @@ class VideoTree : public MythThemedDialog
 
   protected:
     void keyPressEvent(QKeyEvent *e);
-
+    bool createPopup();
+    void cancelPopup(void);
+    void doMenu(bool info);
+    
   private:
-
+    VideoFilterSettings *currentVideoFilter;
+    MythPopupBox* popup;
+    bool expectingPopup;
+    Metadata* curitem;    
     void         wireUpTheme();
     int          current_parental_level;
     QSqlDatabase *db;
@@ -57,6 +74,7 @@ class VideoTree : public MythThemedDialog
     GenericTree           *video_tree_data;
     UITextType            *video_title;
     UITextType            *video_file;
+    UITextType            *video_plot;
     UITextType            *video_player;
     UITextType            *pl_value;
     UIImageType           *video_poster;

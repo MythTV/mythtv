@@ -13,12 +13,21 @@ using namespace std;
 #include <mythtv/uitypes.h>
 #include <mythtv/util.h>
 
+#include "videofilter.h"
+const long WATCHED_WATERMARK = 10000; // Less than this and the chain of videos will 
+                                      // not be followed when playing.
+
+
 VideoTree::VideoTree(MythMainWindow *parent, QSqlDatabase *ldb,
                      QString window_name, QString theme_filename,
                      const char *name)
          : MythThemedDialog(parent, window_name, theme_filename, name)
 {
+    curitem = NULL;
     db = ldb;
+    popup = NULL;
+    expectingPopup = false;
+    
     current_parental_level = gContext->GetNumSetting("VideoDefaultParentalLevel", 1);
 
     file_browser = gContext->GetNumSetting("VideoTreeNoDB", 0);
@@ -31,7 +40,9 @@ VideoTree::VideoTree(MythMainWindow *parent, QSqlDatabase *ldb,
     wireUpTheme();
     video_tree_root = new GenericTree("video root", -2, false);
     video_tree_data = video_tree_root->addNode("videos", -2, false);
-
+    
+    currentVideoFilter = new VideoFilterSettings(db, true);
+    
     buildVideoList();
     
     //  
@@ -44,11 +55,18 @@ VideoTree::VideoTree(MythMainWindow *parent, QSqlDatabase *ldb,
     {
         video_tree_list->setCurrentNode(video_tree_data->getChildAt(0, 0));
     }
+
     updateForeground();
 }
 
 VideoTree::~VideoTree()
 {
+    if (currentVideoFilter)
+        delete currentVideoFilter;
+
+    if (curitem)
+        delete curitem;
+        
     delete video_tree_root;
 }
 
@@ -77,6 +95,11 @@ void VideoTree::keyPressEvent(QKeyEvent *e)
             video_tree_list->pageUp();
         else if (action == "PAGEDOWN")
             video_tree_list->pageDown();
+        else if (action == "INFO")
+            doMenu(true);            
+        else if (action == "MENU")
+            doMenu(false);
+
         else if (action == "1" || action == "2" || action == "3" ||
                  action == "4")
         {
@@ -319,7 +342,12 @@ void VideoTree::buildVideoList()
         //  widget that handles navigation
         //
 
-        QSqlQuery query("SELECT intid FROM videometadata ;", db);
+        QString thequery = QString("SELECT intid FROM %1 %2 %3")
+                    .arg(currentVideoFilter->BuildClauseFrom())
+                    .arg(currentVideoFilter->BuildClauseWhere())
+                    .arg(currentVideoFilter->BuildClauseOrderBy());
+        
+        QSqlQuery query(thequery,db);
         Metadata *myData;
     
         if(!query.isActive())
@@ -416,26 +444,42 @@ void VideoTree::handleTreeListEntry(int node_int, IntVector*)
             }
             else
             {
+                if (!curitem)
+                    curitem = new Metadata();
+                else
+                    curitem->reset();
+                    
                 QString the_file = *(browser_mode_files.at(node_int));
                 QString base_name = the_file.section("/", -1);
                 video_title->SetText(base_name.section(".", 0, -2));
                 video_file->SetText(base_name);
                 extension = the_file.section(".", -1);
                 player = gContext->GetSetting("VideoDefaultPlayer");
+                
+                curitem->setFilename(the_file);
+                curitem->setTitle(base_name.section(".", 0, -2));
+                curitem->setPlayer(player);
+                if (video_plot)
+                    video_plot->SetText(" ");
             }
         }
         else
         {
-            Metadata *node_data;
-            node_data = new Metadata();
-            node_data->setID(node_int);
-            node_data->fillDataFromID(db);
-            video_title->SetText(node_data->Title());
-            video_file->SetText(node_data->Filename().section("/", -1));
-            video_poster->SetImage(node_data->CoverFile());
+            if (!curitem)
+                curitem = new Metadata();
+                            
+            curitem->setID(node_int);
+            curitem->fillDataFromID(db);
+            video_title->SetText(curitem->Title());
+            video_file->SetText(curitem->Filename().section("/", -1));
+            video_poster->SetImage(curitem->CoverFile());
             video_poster->LoadImage();
-            extension = node_data->Filename().section(".", -1, -1);
-            unique_player = node_data->PlayCommand();
+            extension = curitem->Filename().section(".", -1, -1);
+            if (video_plot)
+                    video_plot->SetText(curitem->Plot());
+                    
+            unique_player = curitem->PlayCommand();
+            
             if(unique_player.length() > 0)
             {
                 player = unique_player;
@@ -444,7 +488,7 @@ void VideoTree::handleTreeListEntry(int node_int, IntVector*)
             {
                 player = gContext->GetSetting("VideoDefaultPlayer");
             }
-            delete node_data;
+
         }
 
         //
@@ -494,119 +538,7 @@ void VideoTree::playVideo(int node_number)
 {
     if(node_number > -1)
     {
-        //
-        //  User has selected a video file
-        //
-    
-        QString filename = "";
-        QString handler = gContext->GetSetting("VideoDefaultPlayer");
-        QString unique_handler = "";
-        
-        if(file_browser)
-        {
-            filename = *(browser_mode_files.at(node_number));
-        }
-        else
-        {
-            Metadata *node_data;
-            node_data = new Metadata();
-            node_data->setID(node_number);
-            node_data->fillDataFromID(db);
-            filename = node_data->Filename();
-            
-            //
-            //  Player command unique to this file?
-            //
-
-            unique_handler = node_data->PlayCommand();
-            if(unique_handler.length() > 0)
-            {
-                handler = unique_handler;
-            }
-            delete node_data;
-        }
-        
-
-        //
-        //  Do we have a specialized player for this
-        //  type of file?
-        //
-        
-        QString extension = filename.section(".", -1, -1);
-
-        QString q_string = QString("SELECT playcommand, use_default FROM "
-                                   "videotypes WHERE extension = \"%1\" ;")
-                                   .arg(extension);
-
-        QSqlQuery a_query(q_string, db);
-        
-        if( a_query.isActive() && 
-            a_query.numRowsAffected() > 0 && 
-            unique_handler.length() < 1)
-        {
-            a_query.next();
-            if(!a_query.value(1).toBool())
-            {
-                //
-                //  This file type is defined and
-                //  it is not set to use default player
-                //
-                handler = a_query.value(0).toString();                
-            }
-        }
-
-        // See if this is being handled by a plugin..
-        if (gContext->GetMainWindow()->HandleMedia(handler, filename))
-            return;
-
-        QString arg;
-        arg.sprintf("\"%s\"", 
-                    filename.replace(QRegExp("\""), "\\\"").utf8().data());
-
-        //
-        //  Did the user specify %s in the player
-        //  command?
-        //
-
-        QString command = "";
-
-    	// If handler contains %d, substitute default player command
-    	// This would be used to add additional switches to the default without
-    	// needing to retype the whole default command.  But, if the
-    	// command and the default command both contain %s, drop the %s from
-    	// the default since the new command already has it
-    	//
-    	// example: default: mplayer -fs %s
-    	//          custom : %d -ao alsa9:spdif %s
-    	//          result : mplayer -fs -ao alsa9:spdif %s
-    	if(handler.contains("%d"))
-    	{
-        	QString default_handler = gContext->GetSetting("VideoDefaultPlayer");
-        	if(handler.contains("%s") && default_handler.contains("%s"))
-        	{
-                	default_handler = default_handler.replace(QRegExp("%s"), "");
-        	}
-        	command = handler.replace(QRegExp("%d"), default_handler);
-    	}
-
-        if(handler.contains("%s"))
-        {
-            command = handler.replace(QRegExp("%s"), arg);
-        }
-        else
-        {
-            command = handler + " " + arg;
-        }
-
-        // cout << "command:" << command << endl;
-        
-        //
-        //  Run the player
-        //
-        
-        myth_system((QString("%1 ").arg(command)).local8Bit());
-
-        
+        playVideo(curitem);        
     }
 }
 
@@ -726,5 +658,310 @@ void VideoTree::wireUpTheme()
         pl_value->SetText(QString("%1").arg(current_parental_level));
     }
     
+    video_plot = getUITextType("plot");
 }
 
+bool VideoTree::createPopup()
+{
+    if (!popup)
+    {
+        //allowPaint = false;
+        popup = new MythPopupBox(gContext->GetMainWindow(), "video popup");
+    
+        expectingPopup = true;
+    
+        popup->addLabel(tr("Select action"));
+        popup->addLabel("");
+    }
+    
+    return (popup != NULL);
+}
+
+
+void VideoTree::doMenu(bool info)
+{
+    if (createPopup())
+    {
+        QButton *focusButton = NULL;
+        if(info)
+        {
+            focusButton = popup->addButton(tr("Watch This Video"), this, SLOT(slotWatchVideo())); 
+            popup->addButton(tr("View Full Plot"), this, SLOT(slotViewPlot()));
+        }
+        else
+        {
+            QButton *tempButton = NULL;
+            focusButton = popup->addButton(tr("Filter Display"), this, SLOT(slotDoFilter()));
+            tempButton = popup->addButton(tr("Switch to Browse View"), this, SLOT(slotVideoBrowser()));  
+            popup->addButton(tr("Switch to Gallery View"), this, SLOT(slotVideoGallery()));
+        }
+        
+        popup->addButton(tr("Cancel"), this, SLOT(slotDoCancel()));
+        
+        popup->ShowPopup(this, SLOT(slotDoCancel()));
+    
+        focusButton->setFocus();
+    }
+    
+}
+
+
+void VideoTree::slotVideoBrowser()
+{
+    cancelPopup();
+    gContext->GetMainWindow()->JumpTo("Video Browser");
+}
+
+void VideoTree::slotVideoGallery()
+{
+    cancelPopup();
+    gContext->GetMainWindow()->JumpTo("Video Gallery");
+}
+
+void VideoTree::slotDoCancel(void)
+{
+    if (!expectingPopup)
+        return;
+
+    cancelPopup();
+}
+
+void VideoTree::cancelPopup(void)
+{
+    //allowPaint = true;
+    expectingPopup = false;
+
+    if (popup)
+    {
+        popup->hide();
+        delete popup;
+
+        popup = NULL;
+
+        updateForeground();
+        qApp->processEvents();
+        setActiveWindow();
+    }
+}
+
+
+void VideoTree::slotViewPlot()
+{
+    cancelPopup();
+    
+    if (curitem)
+    {
+        //allowPaint = false;
+        MythPopupBox * plotbox = new MythPopupBox(gContext->GetMainWindow());
+        
+        QLabel *plotLabel = plotbox->addLabel(curitem->Plot(),MythPopupBox::Small,true);
+        plotLabel->setAlignment(Qt::AlignJustify | Qt::WordBreak);
+        
+        QButton * okButton = plotbox->addButton(tr("Ok"));
+        okButton->setFocus();
+        
+        plotbox->ExecPopup();
+        delete plotbox;
+        //allowPaint = true;
+    }
+    else
+    {
+        cerr << "no Item to view" << endl;
+    }
+}
+
+void VideoTree::slotWatchVideo()
+{
+    cancelPopup();
+    
+    if (curitem)
+        playVideo(curitem);
+    else
+        cerr << "no Item to watch" << endl;
+
+}
+
+
+void VideoTree::playVideo(Metadata *someItem)
+{
+    if (!someItem)
+        return;
+        
+    QString filename = someItem->Filename();
+    QString handler = getHandler(someItem);
+    QString year = QString("%1").arg(someItem->Year());
+    // See if this is being handled by a plugin..
+    if(gContext->GetMainWindow()->HandleMedia(handler, filename, someItem->Plot(), 
+                                              someItem->Title(), someItem->Director(),
+                                              someItem->Length(), year))
+    {
+        return;
+    }
+
+    QString command = getCommand(someItem);
+        
+    
+    QTime playing_time;
+    playing_time.start();
+    
+    // Play the movie
+    myth_system((QString("%1 ").arg(command)).local8Bit());
+
+    // Show a please wait message
+    
+/*    LayerSet *container = getTheme()->GetSet("playwait");
+    
+    if (container)
+    {
+         UITextType *type = (UITextType *)container->GetType("title");
+         if (type)
+             type->SetText(someItem->Title());
+    }
+    updateForeground();
+    */
+    //allowPaint = false;        
+    Metadata *childItem = new Metadata;
+    Metadata *parentItem = new Metadata(*someItem);
+
+    while (parentItem->ChildID() > 0 && playing_time.elapsed() > WATCHED_WATERMARK)
+    {
+        childItem->setID(parentItem->ChildID());
+        childItem->fillDataFromID(db);
+
+        if (parentItem->ChildID() > 0)
+        {
+            //Load up data about this child
+            command = getCommand(someItem);
+            playing_time.start();
+            myth_system((QString("%1 ") .arg(command)).local8Bit());
+        }
+
+        delete parentItem;
+        parentItem = new Metadata(*childItem);
+    }
+
+    delete childItem;
+    delete parentItem;
+    
+    gContext->GetMainWindow()->raise();
+    gContext->GetMainWindow()->setActiveWindow();
+    gContext->GetMainWindow()->currentWidget()->setFocus();
+    
+    //allowPaint = true;
+    
+    updateForeground();
+}
+
+
+QString VideoTree::getHandler(Metadata *someItem)
+{
+    
+    if (!someItem)
+        return "";
+        
+    QString filename = someItem->Filename();
+    QString ext = someItem->Filename().section('.',-1);
+
+    QString handler = gContext->GetSetting("VideoDefaultPlayer");
+    QString special_handler = someItem->PlayCommand();
+ 
+    //
+    //  Does this specific metadata have its own
+    //  unique player command?
+    //
+    if(special_handler.length() > 1)
+    {
+        handler = special_handler;
+    }
+    
+    else
+    {
+        //
+        //  Do we have a specialized player for this
+        //  type of file?
+        //
+        
+        QString extension = filename.section(".", -1, -1);
+
+        QString q_string = QString("SELECT playcommand, use_default FROM "
+                                   "videotypes WHERE extension = \"%1\" ;")
+                                   .arg(extension);
+
+        QSqlQuery a_query(q_string, db);
+    
+        if(a_query.isActive() && a_query.numRowsAffected() > 0)
+        {
+            a_query.next();
+            if(!a_query.value(1).toBool())
+            {
+                //
+                //  This file type is defined and
+                //  it is not set to use default player
+                //
+
+                handler = a_query.value(0).toString();                
+            }
+        }
+    }
+    
+    return handler;
+}
+
+QString VideoTree::getCommand(Metadata *someItem)
+{
+    if (!someItem)
+        return "";
+        
+    QString filename = someItem->Filename();
+    QString handler = getHandler(someItem);
+    QString arg;
+    arg.sprintf("\"%s\"",
+                filename.replace(QRegExp("\""), "\\\"").utf8().data());
+
+    QString command = "";
+    
+    // If handler contains %d, substitute default player command
+    // This would be used to add additional switches to the default without
+    // needing to retype the whole default command.  But, if the
+    // command and the default command both contain %s, drop the %s from
+    // the default since the new command already has it
+    //
+    // example: default: mplayer -fs %s
+    //          custom : %d -ao alsa9:spdif %s
+    //          result : mplayer -fs -ao alsa9:spdif %s
+    if (handler.contains("%d"))
+    {
+        QString default_handler = gContext->GetSetting("VideoDefaultPlayer");
+        if (handler.contains("%s") && default_handler.contains("%s"))
+        {
+            default_handler = default_handler.replace(QRegExp("%s"), "");
+        }
+        command = handler.replace(QRegExp("%d"), default_handler);
+    }
+
+    if (handler.contains("%s"))
+    {
+        command = handler.replace(QRegExp("%s"), arg);
+    }
+    else
+    {
+        command = handler + " " + arg;
+    }
+    
+    return command;
+}
+
+void VideoTree::slotDoFilter()
+{
+    cancelPopup();
+    VideoFilterDialog * vfd = new VideoFilterDialog(db, currentVideoFilter,
+                                                    gContext->GetMainWindow(),
+                                                    "filter", "video-",
+                                                    "Video Filter Dialog");
+    vfd->exec();
+    delete vfd;
+    
+    video_tree_data->deleteAllChildren();
+    buildVideoList();
+    updateForeground();
+}

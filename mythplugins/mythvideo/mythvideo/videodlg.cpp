@@ -179,10 +179,14 @@ void VideoDialog::playVideo(Metadata *someItem)
 {
     QString filename = someItem->Filename();
     QString handler = getHandler(someItem);
-    
+    QString year = QString("%1").arg(someItem->Year());
     // See if this is being handled by a plugin..
-    if(gContext->GetMainWindow()->HandleMedia(handler, filename))
+    if(gContext->GetMainWindow()->HandleMedia(handler, filename, someItem->Plot(), 
+                                              someItem->Title(), someItem->Director(),
+                                              someItem->Length(), year))
+    {
         return;
+    }
 
     QString command = getCommand(someItem);
         
@@ -510,4 +514,22 @@ void VideoDialog::loadWindow(QDomElement &element)
             }
         }
     }
+}
+
+
+void VideoDialog::updateBackground(void)
+{
+    QPixmap bground(size());
+    bground.fill(this, 0, 0);
+
+    QPainter tmp(&bground);
+
+    LayerSet *container = theme->GetSet("background");
+    if (container)
+        container->Draw(&tmp, 0, 0);
+
+    tmp.end();
+    myBackground = bground;
+
+    setPaletteBackgroundPixmap(myBackground);
 }

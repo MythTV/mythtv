@@ -251,7 +251,8 @@ void runVideoTree(void)
                                     QSqlDatabase::database(),
                                     "videotree",
                                     "video-",
-                                    "video tree");
+                                    "video tree"); 
+
     qApp->unlock();
     tree->exec();
     qApp->lock();

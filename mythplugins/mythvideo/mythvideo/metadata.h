@@ -44,7 +44,7 @@ class Metadata
         genres = lgenres;
         countries = lcountries;
     }
-
+    
     Metadata(const Metadata &other) 
     {
         coverImage = NULL;
@@ -69,7 +69,35 @@ class Metadata
         countries = other.countries;
     }
 
+    void reset()
+    {
+        if (coverImage) delete coverImage;
+        coverImage = NULL;
+        coverPixmap = NULL;
+        filename = "";
+        coverfile = "";
+        title = "";
+        year = 1895;
+        inetref = "";
+        director = "";
+        plot = "";
+        userrating = 0;
+        rating = "";
+        length = 0;
+        showlevel = 1;
+        id = 0;
+        childID = 1;
+        browse = 1;
+        playcommand = "";
+        category = "";
+        genres = QStringList();
+        countries = QStringList();
+        player = "";
+
+    }
+    
     ~Metadata() { if (coverImage) delete coverImage; }
+
 
     QString Title() { return title; }
     void setTitle(const QString &ltitle) { title = ltitle; }
@@ -115,6 +143,9 @@ class Metadata
 
     QString CoverFile() const { return coverfile; }
     void setCoverFile(QString &lcoverfile) { coverfile = lcoverfile; }
+    
+    QString Player() const { return player; }
+    void setPlayer(const QString &_player) { player = _player; }
 
     QString Category() const { return category;}
     void setCategory(QString lcategory){category = lcategory;}
@@ -162,7 +193,7 @@ class Metadata
     QString category;
     QStringList genres;
     QStringList countries;
-
+    QString player;
     unsigned int id;
     
     QString filename;
