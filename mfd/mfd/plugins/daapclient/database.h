@@ -64,8 +64,8 @@ class Database
     
     int     getKnownGeneration(){return generation_delta;}
     void    beIgnorant();
-    void    checkUpdate(u8 update_type, bool set_type=false);
-    void    checkUpdateType(int new_numb_items, int new_received_numb_items);
+    void    checkUpdate(u8 update_type);
+    //void    checkUpdateType(int new_numb_items, int new_received_numb_items);
          
   private:   
 
@@ -104,5 +104,6 @@ class Database
 
     int     generation_delta;
     bool    full_data_update;
+    bool    update_type_set;
 };
 #endif  // database_h_

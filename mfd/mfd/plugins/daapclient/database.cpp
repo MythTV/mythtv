@@ -72,6 +72,7 @@ Database::Database(
     new_playlists = new QIntDict<Playlist>;
     new_metadata->setAutoDelete(true);
     full_data_update = true;
+    update_type_set = false;
     
     
     metadata_additions.clear();
@@ -147,7 +148,7 @@ void Database::doDatabaseItemsResponse(TagInput& dmap_data)
                 //
                 
                 dmap_data >> a_u8_variable;
-                checkUpdate(a_u8_variable, true);
+                checkUpdate(a_u8_variable);
                 break;
                 
             case 'mtco':
@@ -158,7 +159,7 @@ void Database::doDatabaseItemsResponse(TagInput& dmap_data)
                 
                 dmap_data >> a_u32_variable;
                 new_numb_items = a_u32_variable;
-                checkUpdateType(new_numb_items, new_received_numb_items);
+                //checkUpdateType(new_numb_items, new_received_numb_items);
                 break;
                 
             case 'mrco':
@@ -169,7 +170,7 @@ void Database::doDatabaseItemsResponse(TagInput& dmap_data)
                 
                 dmap_data >> a_u32_variable;
                 new_received_numb_items = a_u32_variable;
-                checkUpdateType(new_numb_items, new_received_numb_items);
+                //checkUpdateType(new_numb_items, new_received_numb_items);
                 break;
                 
             case 'mlcl':
@@ -212,6 +213,7 @@ void Database::doDatabaseItemsResponse(TagInput& dmap_data)
 }
 
 
+/*
 void Database::checkUpdateType(int new_numb_items, int new_received_numb_items)
 {
     if(new_numb_items == -1 || new_received_numb_items == -1)
@@ -234,11 +236,13 @@ void Database::checkUpdateType(int new_numb_items, int new_received_numb_items)
         }
     }
 }    
+*/
 
-void Database::checkUpdate(u8 update_type, bool set_type)
+void Database::checkUpdate(u8 update_type)
 {
-    if(set_type)
+    if(!update_type_set)
     {
+        update_type_set = true;
         if(update_type == 0)
         {
             //
@@ -264,19 +268,6 @@ void Database::checkUpdate(u8 update_type, bool set_type)
         else
         {
             warning("unknown update type");
-        }
-    }
-    else
-    {
-        if(update_type == 0 && ! full_data_update)
-        {
-            warning("I thought we were supposed to be getting "
-                    "a partial update");
-        }
-        if(update_type == 1 && full_data_update)
-        {
-            warning("I thought we were supposed to be getting "
-                    "a full update");
         }
     }
 }    
@@ -802,13 +793,12 @@ void Database::parseDeletions(TagInput& dmap_data)
 {
     if(full_data_update)
     {
-        warning("Got deltas (deletions), but "
+        warning("got deltas (deletions), but "
                 "am in full data mode (?)");
     }
 
     while(!dmap_data.isFinished())
     {
-    
         u32 a_u32_variable;
 
         Tag a_tag;
@@ -893,7 +883,7 @@ void Database::doDatabaseListPlaylistsResponse(TagInput &dmap_data, int new_gene
                 //
                 
                 dmap_data >> a_u8_variable;
-                checkUpdate(a_u8_variable, true);
+                checkUpdate(a_u8_variable);
                 break;
                 
             case 'mtco':
@@ -1088,13 +1078,12 @@ void Database::parseDeletedContainers(TagInput& dmap_data, int new_generation)
 
     if(full_data_update)
     {
-        warning("Got deltas (deletions) for playlists/containers, but "
-                "am in full data mode (?)");
+        log("got deltas (deletions) for playlists/containers, but "
+                "am in full data mode, will deal with it", 10);
     }
 
     while(!dmap_data.isFinished())
     {
-    
         u32 a_u32_variable;
 
         Tag a_tag;
@@ -1217,6 +1206,7 @@ void Database::doDatabasePlaylistResponse(TagInput &dmap_data, int which_playlis
                 
                 dmap_data >> a_u8_variable;
                 update_type = (int) a_u8_variable;
+                checkUpdate(a_u8_variable);
                 break;
                 
             case 'mtco':
@@ -1710,6 +1700,7 @@ void Database::doTheMetadataSwap(int new_generation)
     new_playlists->setAutoDelete(true);
     
     generation_delta = new_generation;
+    update_type_set = false;
 }
 
 void Database::beIgnorant()
@@ -1723,6 +1714,7 @@ void Database::beIgnorant()
     have_items = false;
     have_playlist_list = false;
     have_playlists = false;
+    update_type_set = false;
     
     //
     //  We also need to get rid of any metadata and playlists if we have any 
