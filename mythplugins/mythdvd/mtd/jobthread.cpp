@@ -135,7 +135,7 @@ void JobThread::setSubName(const QString &new_name, uint priority)
             subjob_name = new_name;
         }
     }
-    cout << "SUBJOB name is now: " << subjob_name << endl;
+    //cout << "SUBJOB name is now: " << subjob_name << endl;
     sub_name_mutex.unlock();
     
 }
@@ -1050,7 +1050,7 @@ bool DVDTranscodeThread::runTranscode(int which_run)
                         overall_progress = 0.333333 + (0.333333 * percent_transcoded);
                         updateSubjobString(job_time.elapsed() / 1000, "Transcoding Pass 1 of 2 ~");
                     }
-                    else if(which_run == 1)
+                    else if(which_run == 2)
                     {
                         setSubProgress(percent_transcoded, 1);
                         overall_progress = 0.666666 + (0.333333 * percent_transcoded);
