@@ -4956,6 +4956,30 @@ som du startade detta programmet i.</translation>
         <source>Remove all episodes for this title</source>
         <translation>Ta bort alla avsnitt för denna titel</translation>
     </message>
+    <message>
+        <source>(New Channel)</source>
+        <translation>(Ny kanal)</translation>
+    </message>
+    <message>
+        <source>Stop recording</source>
+        <translation>Avsluta inspelning</translation>
+    </message>
+    <message>
+        <source>Commercial Flag new recordings</source>
+        <translation>Markera reklam i nya inspelningar</translation>
+    </message>
+    <message>
+        <source>Do not Commercial Flag new recordings</source>
+        <translation>Markera inte reklam i nya inspelningar</translation>
+    </message>
+    <message>
+        <source>Run &apos;%1&apos;</source>
+        <translation>Kör &apos;%1&apos;</translation>
+    </message>
+    <message>
+        <source>Do not run &apos;%1&apos; for new recordings</source>
+        <translation>Kör inte &apos;%1&apos; för nya inspelningar</translation>
+    </message>
 </context>
 <context>
     <name>ScheduledRecording</name>
@@ -5075,7 +5099,7 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>Speed 5X</source>
-        <translation>Hastighet 5X</translation>
+        <translation type="obsolete">Hastighet 5X</translation>
     </message>
     <message>
         <source>Speed 3X</source>
