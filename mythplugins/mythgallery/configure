@@ -61,6 +61,10 @@ if test "$exif" = "yes" ; then
   echo "        EXIF support will be included"
   echo "#define EXIF_SUPPORT 1" >> ./mythgallery/config.h
   echo "LIBS += -lexif" >> ./mythgallery/config.pro
+
+  if `pkg-config --atleast-version 0.6.9 libexif` ; then
+     echo "#define NEW_LIB_EXIF 1" >> ./mythgallery/config.h
+  fi
 fi
 
 if test "$exif" = "no" ; then

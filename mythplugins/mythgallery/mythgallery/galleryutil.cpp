@@ -48,6 +48,7 @@ long GalleryUtil::getNaturalRotation(const char* filePath)
     try
     {
 #ifdef EXIF_SUPPORT
+        char *exifvalue = new char[1024];
         ExifData *data = exif_data_new_from_file (filePath);
         if (data)
         {
@@ -57,7 +58,12 @@ long GalleryUtil::getNaturalRotation(const char* filePath)
                                                         EXIF_TAG_ORIENTATION);
                     if (entry)
                     {
+#if NEW_LIB_EXIF
+                        exif_entry_get_value(entry, exifvalue, 1023);
+                        QString value = exifvalue;
+#else
                         QString value = exif_entry_get_value(entry);
+#endif
                         if (value == "left - bottom")
                         {
                           rotateAngle = -90;
@@ -76,7 +82,7 @@ long GalleryUtil::getNaturalRotation(const char* filePath)
                 std::cerr << "Could not load exif data from " << filePath << std::endl;
         }
         
-        
+        delete [] exifvalue;
         
         /*
         Exiv2::ExifData exifData;
