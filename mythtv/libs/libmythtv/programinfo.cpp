@@ -1019,6 +1019,33 @@ void ProgramInfo::SetPositionMap(QMap<long long, long long> &posMap, int type,
     }
 }
 
+void ProgramInfo::DeleteHistory(QSqlDatabase *db)
+{
+    QString escaped_title;
+    QString escaped_subtitle;
+    QString escaped_description;
+
+    escaped_title = title;
+    escaped_title.replace(QRegExp("\""), QString("\\\""));
+
+    escaped_subtitle = subtitle;
+    escaped_subtitle.replace(QRegExp("\""), QString("\\\""));
+
+    escaped_description = description;
+    escaped_description.replace(QRegExp("\""), QString("\\\""));
+
+    QString querystr = QString("DELETE FROM oldrecorded "
+                               "WHERE title = '%1' AND subtitle = '%2' "
+                               "AND description = '%3';")
+                               .arg(escaped_title)
+                               .arg(escaped_subtitle)
+                               .arg(escaped_description);
+
+    QSqlQuery subquery = db->exec(querystr.utf8().data());
+    if (!subquery.isActive())
+         MythContext::DBError("DeleteHistory", querystr);
+}
+
 void ProgramInfo::Save(void)
 {
     QSqlQuery query;

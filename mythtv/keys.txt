@@ -8,6 +8,7 @@ mythfrontend
 - Space or Enter to take action on the item under the highlight point.
 - P to play in both "Watch a Recording" and "Delete a Recording".
 - D to delete in both "Watch a Recording" and "Delete a Recording".
+- I to edit a recording in the "Fix Scheduling Conflicts" screen.
 
 
 Watching TV or a recording

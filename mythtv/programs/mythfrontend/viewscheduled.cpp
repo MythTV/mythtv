@@ -14,6 +14,8 @@
 using namespace std;
 
 #include "viewscheduled.h"
+#include "scheduledrecording.h"
+#include "infodialog.h"
 #include "tv.h"
 #include "programlistitem.h"
 #include "setrectime.h"
@@ -53,12 +55,14 @@ ViewScheduled::ViewScheduled(QSqlDatabase *ldb, QWidget *parent,
     space_itemid = accel->insertItem(Key_Space);
     enter_itemid = accel->insertItem(Key_Enter);
     return_itemid = accel->insertItem(Key_Return);
+    edit_itemid = accel->insertItem(Key_I);
 
     accel->connectItem(accel->insertItem(Key_Down), this, SLOT(cursorDown()));
     accel->connectItem(accel->insertItem(Key_Up), this, SLOT(cursorUp()));
     accel->connectItem(space_itemid, this, SLOT(selected()));
     accel->connectItem(enter_itemid, this, SLOT(selected()));
     accel->connectItem(return_itemid, this, SLOT(selected()));
+    accel->connectItem(edit_itemid, this, SLOT(edit()));
     accel->connectItem(accel->insertItem(Key_PageUp), this, SLOT(pageUp()));
     accel->connectItem(accel->insertItem(Key_3), this, SLOT(pageUp()));
     accel->connectItem(accel->insertItem(Key_PageDown), this, SLOT(pageDown()));
@@ -667,10 +671,40 @@ void ViewScheduled::updateInfo(QPainter *p)
         accel->setItemEnabled(space_itemid, false);
         accel->setItemEnabled(enter_itemid, false);
         accel->setItemEnabled(return_itemid, false);
+        accel->setItemEnabled(edit_itemid, false);
     }
 
     tmp.end();
     p->drawPixmap(pr.topLeft(), pix);
+}
+
+void ViewScheduled::edit()
+{
+    if (doingSel)
+        return;
+
+    doingSel = true;
+
+    ProgramInfo *rec = curitem;
+
+    MythContext::KickDatabase(db);
+
+    if (rec)
+    {
+        InfoDialog diag(rec, this, "Program Info");
+        diag.setCaption("BLAH!!!");
+        diag.exec();
+
+        QString thequery = "UPDATE settings SET data = \"yes\" WHERE value = "
+                           "\"RecordChanged\";";
+
+        db->exec(thequery);
+
+        FillList();
+        update(fullRect);
+    }
+
+    doingSel = false;
 }
 
 void ViewScheduled::selected()
@@ -694,6 +728,20 @@ void ViewScheduled::selected()
     else if (rec->conflicting)
     {
         handleConflicting(rec);
+    }
+    else if (rec)
+    {
+        InfoDialog diag(rec, this, "Program Info");
+        diag.setCaption("BLAH!!!");
+        diag.exec();
+
+        QString thequery = "UPDATE settings SET data = \"yes\" WHERE value = "
+                           "\"RecordChanged\";";
+
+        db->exec(thequery);
+
+        FillList();
+        update(fullRect);
     }
 
     doingSel = false;
@@ -810,8 +858,21 @@ void ViewScheduled::handleDuplicate(ProgramInfo *rec)
 
     DialogBox diag(message);
     diag.AddButton(tr("OK"));
+    diag.AddButton(tr("Unsuppress recording"));
     diag.Show();
-    diag.exec();
+    int ret = diag.exec();
+    if (ret == 2)
+    {
+        rec->DeleteHistory(db);
+
+        QString thequery = "UPDATE settings SET data = \"yes\" WHERE value = "
+                           "\"RecordChanged\";";
+
+        db->exec(thequery);
+
+        FillList();
+        update(fullRect);
+    }
 }
 
 void ViewScheduled::chooseConflictingProgram(ProgramInfo *rec)

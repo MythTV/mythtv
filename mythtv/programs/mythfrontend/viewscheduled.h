@@ -22,6 +22,7 @@ class ViewScheduled : public MythDialog
     void killTheApp();
 
   protected slots:
+    void edit();
     void selected();
     void cursorDown(bool page = false);
     void cursorUp(bool page = false);
@@ -85,6 +86,7 @@ class ViewScheduled : public MythDialog
     int space_itemid;
     int enter_itemid;
     int return_itemid;
+    int edit_itemid;
 
     int listsize;
     int titleitems;

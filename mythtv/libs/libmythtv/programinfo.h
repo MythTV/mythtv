@@ -91,6 +91,8 @@ class ProgramInfo
                         QSqlDatabase *db,
                         long long min_frame = -1, long long max_frame = -1);
 
+    void DeleteHistory(QSqlDatabase *db);
+
     static void GetProgramRangeDateTime(QPtrList<ProgramInfo> *proglist, 
                                         QString channel, 
                                         const QString &ltime, 
