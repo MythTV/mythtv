@@ -3435,6 +3435,8 @@ unsigned int NuppelVideoPlayer::GetFrameVariance(int vposition)
 
 void NuppelVideoPlayer::AutoCommercialSkip(void)
 {
+    int vpos = 0;
+
     PauseVideo();
 
     while (!GetVideoPause())
@@ -3453,9 +3455,12 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
 
                 // search a 10-frame window for another blank
                 int tries = 10;
+
+                vpos = wpos;
                 GetFrame(1, true);
-                while ((tries > 0) && (GetFrameVariance(wpos) >= 20))
+                while ((tries > 0) && (GetFrameVariance(vpos) >= 20))
                 {
+                     vpos = wpos;
                      GetFrame(1, true);
                      tries--;
                 }
@@ -3494,6 +3499,7 @@ void NuppelVideoPlayer::SkipCommercialsByBlanks(void)
     int first_blank_frame;
     int saved_position;
     int min_blank_frame_seq = 1;
+    int vpos = 0;
 
     // rewind 2 seconds in case user hit Skip right after a break
     JumpToNetFrame((long long int)(-2 * video_frame_rate));
@@ -3505,8 +3511,9 @@ void NuppelVideoPlayer::SkipCommercialsByBlanks(void)
 
     while (scanned_frames < (64 * video_frame_rate))
     {
+        vpos = wpos;
         GetFrame(1, true);
-        if (GetFrameVariance(wpos) < 20)
+        if (GetFrameVariance(vpos) < 20)
         {
             blanks_found++;
             if (!first_blank_frame)
@@ -3551,8 +3558,9 @@ void NuppelVideoPlayer::SkipCommercialsByBlanks(void)
             first_blank_frame = 0;
             while (scanned_frames < (3 * video_frame_rate))
             {
+                vpos = wpos;
                 GetFrame(1, true);
-                if (GetFrameVariance(wpos) < 20)
+                if (GetFrameVariance(vpos) < 20)
                 {
                     blanks_found++;
                     if (!first_blank_frame)
