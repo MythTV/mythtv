@@ -1655,6 +1655,11 @@ void ThemedMenu::handleAction(QString &action)
  
         parseMenu(file, row, col);
     }
+    else if (action.left(12) == "CONFIGPLUGIN")
+    {
+        QString rest = action.right(action.length() - 13);
+        MythPluginManager::config_plugin(rest.stripWhiteSpace());
+    }
     else if (action.left(6) == "PLUGIN")
     {
         QString rest = action.right(action.length() - 7);
@@ -1673,7 +1678,15 @@ void ThemedMenu::handleAction(QString &action)
 bool ThemedMenu::findDepends(QString file)
 {
     QString filename = findMenuFile(file);
-    if (filename == "")
-        return false;
-    return true;
+    if (filename != "")
+        return true;
+
+    QString newname = QString(PREFIX) + "/lib/mythtv/plugins/lib" + file +
+                      ".so";
+
+    QFile checkFile(newname);
+    if (checkFile.exists())
+        return true;
+
+    return false;
 }

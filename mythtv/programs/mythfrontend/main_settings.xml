@@ -37,6 +37,13 @@
      <depends>musicmenu.xml</depends>
    </button>
 
+   <button>
+      <type>IMAGES</type>
+      <text>Images Settings</text>
+      <action>CONFIGPLUGIN mythgallery</action>
+      <depends>mythgallery</depends>
+   </button>
+
 <!--
    <button>
      <type>WEATHER</type>

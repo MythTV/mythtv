@@ -42,7 +42,7 @@
      <text lang="FR">Images</text>
      <text lang="DE">Photos</text>
      <action>PLUGIN mythgallery</action>
-     <depends>mythgallery-settings.txt</depends>
+     <depends>mythgallery</depends>
    </button>
 
    <button>
