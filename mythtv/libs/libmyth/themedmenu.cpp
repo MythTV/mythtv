@@ -2218,13 +2218,20 @@ bool ThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
 
         if (action == "UP")
         { 
-            if (currentrow > 0)
-                currentrow--;
-            else if (columns == 1)
-                currentrow = buttonRows.size() - 1;
-
-            if (currentcolumn >= buttonRows[currentrow].numitems)
-                currentcolumn = buttonRows[currentrow].numitems - 1;
+            if( maxrows > 1)
+            {
+                if (currentrow > 0)
+                    currentrow--;
+                else if (columns == 1)
+                    currentrow = buttonRows.size() - 1;
+    
+                if (currentcolumn >= buttonRows[currentrow].numitems)
+                    currentcolumn = buttonRows[currentrow].numitems - 1;
+            }
+            else
+            {
+                handled = false;
+            }
         }
         else if (action == "PAGEUP")
         {
@@ -2239,17 +2246,24 @@ bool ThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
                 currentcolumn--;
             else
                 currentcolumn = buttonRows[currentrow].numitems - 1;
-            clearToBackground();                
+            
         }
         else if (action == "DOWN")
         {
-            if (currentrow < (int)buttonRows.size() - 1)
-                currentrow++;
-            else if (columns == 1)
-                currentrow = 0;
-
-            if (currentcolumn >= buttonRows[currentrow].numitems)
-                currentcolumn = buttonRows[currentrow].numitems - 1;
+            if( maxrows > 1)
+            {
+                if (currentrow < (int)buttonRows.size() - 1)
+                    currentrow++;
+                else if (columns == 1)
+                    currentrow = 0;
+    
+                if (currentcolumn >= buttonRows[currentrow].numitems)
+                    currentcolumn = buttonRows[currentrow].numitems - 1;
+            }
+            else
+            {
+                handled = false;
+            }
         }
         else if (action == "PAGEDOWN")
         {
@@ -2265,7 +2279,7 @@ bool ThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
                 currentcolumn++;
             else
                 currentcolumn = 0;
-            clearToBackground();                
+            
         }
         else if (action == "SELECT")
         {
