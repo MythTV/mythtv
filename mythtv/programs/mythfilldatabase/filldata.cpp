@@ -2829,9 +2829,10 @@ bool fillData(QValueList<Source> &sourcelist)
 
             int maxday = 9;
 
-            if (xmltv_grabber == "datadirect" ||
-                xmltv_grabber == "tv_grab_no")
+            if (xmltv_grabber == "datadirect")
                 maxday = 14;
+            else if (xmltv_grabber == "tv_grab_no")
+                maxday = 7;
             else if (xmltv_grabber == "tv_grab_se_swedb")
                 maxday = 10;
 
