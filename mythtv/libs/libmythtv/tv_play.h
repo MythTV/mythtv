@@ -95,6 +95,7 @@ class TV : public QObject
     void UnMute(void);
     void KeyRepeatOK(void);
     void BrowseEndTimer(void) { BrowseEnd(false); }
+    void SleepEndTimer(void);
     void TreeMenuEntered(OSDGenericTree *item);
     void TreeMenuSelected(OSDGenericTree *item);
 
@@ -133,6 +134,8 @@ class TV : public QObject
     void ToggleInputs(void); 
 
     void SwitchCards(void);
+
+    void ToggleSleepTimer(void);
 
     void DoInfo(void);
     void DoPause(void);
@@ -299,6 +302,9 @@ class TV : public QObject
     bool switchingCards;
 
     OSDGenericTree *treeMenu;
+
+    int sleep_index;
+    QTimer *sleepTimer;
 };
 
 #endif

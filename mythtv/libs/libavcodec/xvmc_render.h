@@ -46,5 +46,5 @@ typedef   struct{
   int filled_mv_blocks_num;//processed mv block in this slice,change by decoder
   
   int next_free_data_block_num;//used in add_mv_block, pointer to next free block
-
+  int pict_type; //this is for skipping frames
 } xvmc_render_state_t;

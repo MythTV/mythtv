@@ -1292,7 +1292,7 @@ void CommDetect::SearchForLogo(NuppelVideoPlayer *nvp, bool fullSpeed,
                                bool verbose)
 {
 	int secs = 10;
-	int loops = 8;
+	const int loops = 8;
 	int maxLoops = 12;
 	int loop = 0;
 	int sampleSpacing = 1;
@@ -1300,7 +1300,10 @@ void CommDetect::SearchForLogo(NuppelVideoPlayer *nvp, bool fullSpeed,
 	long long seekFrame = seekIncrement;
 	long long endFrame = seekFrame + (long long)(secs * fps);
 	int counter = 0;
-	unsigned char mask[loops][height * width];
+	unsigned char *mask[loops];
+
+        for (int i = 0; i < loops; i++)
+            mask[i] = new unsigned char[height * width];
 
 	if (verbose)
 	{
@@ -1365,5 +1368,8 @@ void CommDetect::SearchForLogo(NuppelVideoPlayer *nvp, bool fullSpeed,
 		printf( "\b\b\b\b\b\b\b\b\b\b\b" );
 		fflush( stdout );
 	}
+
+        for (int i = 0; i < loops; i++)
+            delete [] mask[i];
 }
 

@@ -19,17 +19,31 @@
 #ifdef __KERNEL__
 
 #include <linux/poll.h>
+#include <linux/mm.h>
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,5,69)
 #include <linux/devfs_fs_kernel.h>
+#endif
+#if LINUX_VERSION_CODE > KERNEL_VERSION(2,5,0)
+#include <linux/device.h>
+#endif
 
 struct video_device
 {
-	struct module *owner;
+	/* device info */
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,0)
+	struct device *dev;
+#endif
      	char name[32];
  	int type;       /* v4l1 */
  	int type2;      /* v4l2 */
 	int hardware;
 	int minor;
 
+	/* device ops + callbacks */
+	struct file_operations *fops;
+	void (*release)(struct video_device *vfd);
+
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,5,0)
 	/* old, obsolete interface -- dropped in 2.5.x, don't use it */
 	int (*open)(struct video_device *, int mode);
 	void (*close)(struct video_device *);
@@ -39,28 +53,73 @@ struct video_device
 	int (*ioctl)(struct video_device *, unsigned int , void *);
 	int (*mmap)(struct video_device *, const char *, unsigned long);
 	int (*initialize)(struct video_device *);       
+#endif
 
- 	/* new interface -- we will use file_operations directly
- 	 * like soundcore does. */
- 	struct file_operations *fops;
-	void *priv;		/* Used to be 'private' but that upsets C++ */
+#if 1 /* to be removed in 2.7.x */
+	/* obsolete -- fops->owner is used instead */
+	struct module *owner;
+	/* dev->driver_data will be used instead some day.
+	 * Use the video_{get|set}_drvdata() helper functions,
+	 * so the switch over will be transparent for you.
+	 * Or use {pci|usb}_{get|set}_drvdata() directly. */
+	void *priv;
+#endif
 
-	/* for videodev.c intenal usage -- don't touch */
-	int users;
-	struct semaphore lock;
-	devfs_handle_t devfs_handle;
+	/* for videodev.c intenal usage -- please don't touch */
+	int users;                     /* video_exclusive_{open|close} ... */
+	struct semaphore lock;         /* ... helper function uses these   */
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,5,69)
+	devfs_handle_t devfs_handle;   /* devfs */
+#else
+	char devfs_name[64];           /* devfs */
+#endif
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,0)
+	struct class_device class_dev; /* sysfs */
+#endif
 };
 
 #define VIDEO_MAJOR	81
-extern int video_register_device(struct video_device *, int type, int nr);
 
 #define VFL_TYPE_GRABBER	0
 #define VFL_TYPE_VBI		1
 #define VFL_TYPE_RADIO		2
 #define VFL_TYPE_VTX		3
 
+extern int video_register_device(struct video_device *, int type, int nr);
 extern void video_unregister_device(struct video_device *);
 extern struct video_device* video_devdata(struct file*);
+
+#if LINUX_VERSION_CODE > KERNEL_VERSION(2,5,0)
+#define to_video_device(cd) container_of(cd, struct video_device, class_dev)
+static inline void
+video_device_create_file(struct video_device *vfd,
+			 struct class_device_attribute *attr)
+{
+	class_device_create_file(&vfd->class_dev, attr);
+}
+static inline void
+video_device_remove_file(struct video_device *vfd,
+			 struct class_device_attribute *attr)
+{
+	class_device_remove_file(&vfd->class_dev, attr);
+}
+#endif
+
+/* helper functions to alloc / release struct video_device, the
+   later can be used for video_device->release() */
+struct video_device *video_device_alloc(void);
+void video_device_release(struct video_device *vfd);
+
+/* helper functions to access driver private data. */
+static inline void *video_get_drvdata(struct video_device *dev)
+{
+	return dev->priv;
+}
+
+static inline void video_set_drvdata(struct video_device *dev, void *data)
+{
+	dev->priv = data;
+}
 
 extern int video_exclusive_open(struct inode *inode, struct file *file);
 extern int video_exclusive_release(struct inode *inode, struct file *file);
@@ -97,6 +156,7 @@ struct video_capability
 	int minheight;	/* And height */
 };
 
+#define VIDEO_RF_AUX_INPUT      0x100       /* dtv */
 
 struct video_channel
 {
@@ -131,7 +191,7 @@ struct video_tuner
 #define VIDEO_MODE_NTSC		1
 #define VIDEO_MODE_SECAM	2
 #define VIDEO_MODE_AUTO		3
-#define VIDEO_MODE_ATSC         4
+#define VIDEO_MODE_ATSC		4       /* dtv */
 	__u16 signal;			/* Signal strength 16bit scale */
 };
 
@@ -260,6 +320,13 @@ struct video_unit
 	int	radio;		/* Radio minor */
 	int	audio;		/* Audio minor */
 	int	teletext;	/* Teletext minor */
+	int     dtv;            /* Digital video minor */
+};
+
+struct video_signal
+{
+	int 	strength;	/* signal strength */
+        int 	aux;    	/* aux signal strength */
 };
 
 struct vbi_format {
@@ -332,6 +399,7 @@ struct video_code
 #define VIDIOCSMICROCODE	_IOW('v',27, struct video_code)		/* Load microcode into hardware */
 #define	VIDIOCGVBIFMT		_IOR('v',28, struct vbi_format)		/* Get VBI information */
 #define	VIDIOCSVBIFMT		_IOW('v',29, struct vbi_format)		/* Set VBI information */
+#define	VIDIOCGSIGNAL		_IOR('v',30, struct video_signal)     	/* Get signal strength */
 
 
 #define BASE_VIDIOCPRIVATE	192		/* 192-255 are private */
@@ -404,7 +472,9 @@ struct video_code
 #define VID_HARDWARE_PWC	31	/* Philips webcams */
 #define VID_HARDWARE_MEYE	32	/* Sony Vaio MotionEye cameras */
 #define VID_HARDWARE_CPIA2	33
-
+#define VID_HARDWARE_VICAM	34	/* ViCam, 3Com Homeconnect */
+#define VID_HARDWARE_SF16FMR2	35
+#define VID_HARDWARE_W9968CF	36
 #endif /* __LINUX_VIDEODEV_H */
 
 /*

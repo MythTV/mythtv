@@ -51,6 +51,22 @@ SeekSpeedInfo seek_speed_array[] =
 const int SSPEED_NORMAL = 3;
 const int SSPEED_MAX = sizeof seek_speed_array / sizeof seek_speed_array[0];
 
+struct SleepTimer {
+    QString   dispString;
+    unsigned long seconds;
+};
+
+SleepTimer sleep_timer_array[] =
+{
+    {QObject::tr("Off"),       0},
+    {QObject::tr("30m"),   30*60},
+    {QObject::tr("1h"),    60*60},
+    {QObject::tr("1h30m"), 90*60},
+    {QObject::tr("2h"),   120*60},
+};
+
+const int SSLEEP_MAX = sizeof sleep_timer_array / sizeof sleep_timer_array[0];
+
 const int kMuteTimeout = 800;
 
 void TV::InitKeys(void)
@@ -123,6 +139,7 @@ void TV::InitKeys(void)
             "adjustment controls", "G");
     REG_KEY("TV Playback", "TOGGLEEDIT", "Start Edit Mode", "E");
     REG_KEY("TV Playback", "GUIDE", "Show the Program Guide", "S");
+    REG_KEY("TV Playback", "TOGGLESLEEP", "Toggle the Sleep Timer", "F8");
 
 
     REG_KEY("TV Editing", "CLEARMAP", "Clear editing cut points", "C,Q,Home");
@@ -202,6 +219,9 @@ TV::TV(void)
 
     browseTimer = new QTimer(this);
     connect(browseTimer, SIGNAL(timeout()), SLOT(BrowseEndTimer()));
+
+    sleepTimer = new QTimer(this);
+    connect(sleepTimer, SIGNAL(timeout()), SLOT(SleepEndTimer()));
 }
 
 void TV::Init(bool createWindow)
@@ -652,6 +672,18 @@ void TV::HandleStateChange(void)
                 .arg(origname).arg(statename));
     }
 
+    if (kState_None != nextState && !activenvp->IsDecoderThreadAlive())
+    {
+        VERBOSE(VB_IMPORTANT, "Decoder not alive, and trying to play..");
+        if (nextState == kState_WatchingLiveTV)
+        {
+            StopPlayerAndRecorder(false, true);
+            recorder = NULL;
+        }
+
+        tmpInternalState = kState_None;
+    }
+
     internalState = tmpInternalState;
     changeState = false;
 
@@ -831,6 +863,7 @@ void TV::TeardownPlayer(void)
     doing_ff_rew = 0;
     ff_rew_index = SSPEED_NORMAL;
     speed_index = 0;
+    sleep_index = 0;
 
     nvp = NULL;
     osd = NULL;
@@ -887,6 +920,7 @@ void TV::RunTV(void)
     doing_ff_rew = 0;
     ff_rew_index = SSPEED_NORMAL;
     speed_index = 0;
+    sleep_index = 0;
 
     int updatecheck = 0;
     update_osd_pos = false;
@@ -1517,6 +1551,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 BrowseStart();
             else if (action == "PREVCHAN")
                 PreviousChannel();
+            else if (action == "TOGGLESLEEP")
+                ToggleSleepTimer();
             else
                 handled = false;
         }
@@ -2789,6 +2825,42 @@ void TV::ToggleMute(void)
  
     if (osd && !browsemode)
         osd->SetSettingsText(text, 5);
+}
+
+void TV::ToggleSleepTimer(void)
+{
+    QString text;
+
+    // increment sleep index, cycle through
+    if (++sleep_index == SSLEEP_MAX) 
+        sleep_index = 0;
+
+    // turn sleep timer off
+    if (sleep_timer_array[sleep_index].seconds == 0)
+        sleepTimer->stop();
+    else
+    {
+        if (sleepTimer->isActive())
+            // sleep timer is active, adjust interval
+            sleepTimer->changeInterval(sleep_timer_array[sleep_index].seconds *
+                                       1000);
+        else
+            // sleep timer is not active, start it
+            sleepTimer->start(sleep_timer_array[sleep_index].seconds * 1000, 
+                              TRUE);
+    }
+
+    text = tr("Sleep ") + sleep_timer_array[sleep_index].dispString;
+
+    // display OSD
+    if (osd && !browsemode)
+        osd->SetSettingsText(text, 3);
+}
+
+void TV::SleepEndTimer(void)
+{
+    exitPlayer = true;
+    wantsToQuit = true;
 }
 
 void TV::ToggleLetterbox(void)
