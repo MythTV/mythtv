@@ -40,7 +40,7 @@ extern "C" {
 
 #include "programinfo.h"
 
-pthread_mutex_t avcodeclock = PTHREAD_MUTEX_INITIALIZER;
+extern pthread_mutex_t avcodeclock;
 
 NuppelVideoRecorder::NuppelVideoRecorder(ChannelBase *channel)
                    : RecorderBase()

@@ -25,8 +25,9 @@ using namespace std;
 
 #include "transform.h"
 
-#define MPEG_TS_SIZE 188
-#define DMX_BUF_SIZE  64 * 1024
+#define MPEG_TS_PKT_SIZE 188
+#define DEF_DMX_BUF_SIZE  64 * 1024
+#define MAX_SECTION_SIZE 4096
 #define DMX_DONT_FILTER 0x2000
 
 typedef vector<uint16_t> dvb_pid_t;
@@ -69,6 +70,16 @@ typedef struct dvbchannel
     uint8_t        version;
     pthread_mutex_t lock;
 } dvb_channel_t;
+
+typedef struct dvbstats
+{
+    unsigned int snr;
+    unsigned int ss;
+    unsigned int ber;
+    unsigned int ub;
+
+    fe_status_t  status;
+} dvb_stats_t;
 
 typedef map<uint16_t, ipack*> pid_ipack_t;
 

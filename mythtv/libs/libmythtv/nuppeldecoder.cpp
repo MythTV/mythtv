@@ -14,7 +14,7 @@ using namespace std;
 
 #include "minilzo.h"
 
-extern pthread_mutex_t avcodeclock;
+pthread_mutex_t avcodeclock = PTHREAD_MUTEX_INITIALIZER;
 
 NuppelDecoder::NuppelDecoder(NuppelVideoPlayer *parent, QSqlDatabase *db,
                              ProgramInfo *pginfo)

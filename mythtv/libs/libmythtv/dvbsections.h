@@ -66,6 +66,8 @@ public:
     DVBSections(int cardnum);
     ~DVBSections();
 
+    void AddPid(int pid);
+    void DelPid(int pid);
 
     void Start();
     void Stop();
@@ -80,8 +82,6 @@ signals:
     void ChannelChanged(dvb_channel_t& chan, uint8_t* pmt, int len);
 
 private:
-    void AllocateAndConvert(uint8_t*& buffer, int& len);
-
     int cardnum;
     bool exitSectionThread;
     bool sectionThreadRunning;
@@ -90,7 +90,7 @@ private:
 
     int             pollLength;
     pollfd         *pollArray;
-    pthread_mutex_t pollMutex;
+    pthread_mutex_t poll_lock;
 
     dvb_channel_t  chan_opts;
 

@@ -36,6 +36,10 @@ bool quiet = false;
 bool no_delete = false;
 bool isNorthAmerica = false;
 bool interrupted = false;
+bool refresh_today = false;
+bool refresh_tomorrow = true;
+bool refresh_second = false;
+int listing_wrap_offset = 0;
 
 MythContext *gContext;
 
@@ -1019,7 +1023,7 @@ void clearDBAtOffset(int offset, int chanid, QDate *qCurrentDate)
         qCurrentDate = &newDate;
     }
 
-    int nextoffset = offset + 1;
+    int nextoffset = 1;
 
     if (offset == -1)
     {
@@ -1027,33 +1031,35 @@ void clearDBAtOffset(int offset, int chanid, QDate *qCurrentDate)
         nextoffset = 10;
     }
 
+    QDateTime from, to;
+    from.setDate(*qCurrentDate);
+    from.addDays(offset);
+    from.addSecs(listing_wrap_offset);
+    to = from;
+    to.addDays(nextoffset);
+
     QSqlQuery query;
     QString querystr;
 
-    querystr.sprintf("DELETE FROM program WHERE starttime >= "
-                     "DATE_ADD('%s', INTERVAL %d DAY) "
-                     "AND starttime < DATE_ADD('%s', INTERVAL "
-                     "%d DAY) AND chanid = %d;", 
-                     qCurrentDate->toString("yyyyMMdd").ascii(), offset, 
-                     qCurrentDate->toString("yyyyMMdd").ascii(), nextoffset, 
+    querystr.sprintf("DELETE FROM program "
+                    "WHERE starttime >= '%s' AND starttime < '%s' "
+                    "AND chanid = %d;",
+                     from.toString("yyyyMMddhhmmss").ascii(), 
+                     to.toString("yyyyMMddhhmmss").ascii(),
                      chanid);
     query.exec(querystr);
 
-    querystr.sprintf("DELETE FROM programrating WHERE starttime >= "
-                     "DATE_ADD('%s', INTERVAL %d DAY) "
-                     "AND starttime < DATE_ADD('%s', INTERVAL "
-                     "%d DAY) AND chanid = %d;", 
-                     qCurrentDate->toString("yyyyMMdd").ascii(), offset, 
-                     qCurrentDate->toString("yyyyMMdd").ascii(), nextoffset, 
+    querystr.sprintf("DELETE FROM programrating WHERE starttime >= '%s' "
+                     " AND starttime < '%s' AND chanid = %d;", 
+                     from.toString("yyyyMMddhhmmss").ascii(), 
+                     to.toString("yyyyMMddhhmmss").ascii(),
                      chanid);
     query.exec(querystr);
 
-    querystr.sprintf("DELETE FROM credits WHERE starttime >= "
-                     "DATE_ADD('%s', INTERVAL %d DAY) "
-                     "AND starttime < DATE_ADD('%s', INTERVAL "
-                     "%d DAY) AND chanid = %d;", 
-                     qCurrentDate->toString("yyyyMMdd").ascii(), offset, 
-                     qCurrentDate->toString("yyyyMMdd").ascii(), nextoffset, 
+    querystr.sprintf("DELETE FROM credits WHERE starttime >= '%s' "
+                     "AND starttime < '%s' AND chanid = %d;", 
+                     from.toString("yyyyMMddhhmmss").ascii(), 
+                     to.toString("yyyyMMddhhmmss").ascii(), 
                      chanid);
     query.exec(querystr);
 }
@@ -1369,8 +1375,8 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
                         configfile.ascii(), filename.ascii());
     else if (xmltv_grabber == "tv_grab_sn")
         // Use fixed interval of 14 days for Swedish/Norwegian grabber
-        command.sprintf("nice %s --days 14 --config-file '%s' --output %s",
-                        xmltv_grabber.ascii(), configfile.ascii(),
+        command.sprintf("nice %s --days 1 --offset %d --config-file '%s' --output %s",
+                        xmltv_grabber.ascii(), offset, configfile.ascii(),
                         filename.ascii());
     else if (xmltv_grabber == "tv_grab_dk")
         // Use fixed interval of 7 days for Danish grabber
@@ -1511,16 +1517,6 @@ bool fillData(QValueList<Source> &sourcelist)
             if (!grabData(*it, -1))
                 ++failures;
         }
-        else if (xmltv_grabber == "tv_grab_sn")
-        {
-            // tv_grab_sn has problems grabbing one day at a time as the site
-            // (dagenstv.com) "wraps" the day-listings at 06:00am. This means
-            // that programs starting at 02:00am on jul 19 gets "grabbed" in
-            // the xmltv-file for jul 18, causing all sorts of trouble.
-            // The simple solution is to grab the full two weeks every time.
-            if (!grabData(*it, 0))
-                ++failures;
-        }
         else if (xmltv_grabber == "tv_grab_dk")
         {
             if (!grabData(*it, 0))
@@ -1562,15 +1558,35 @@ bool fillData(QValueList<Source> &sourcelist)
             }
         }
         else if (xmltv_grabber == "tv_grab_na" || 
-                 xmltv_grabber == "tv_grab_uk_rt")
+                 xmltv_grabber == "tv_grab_uk_rt" ||
+                 xmltv_grabber == "tv_grab_sn")
         {
+            if (xmltv_grabber == "tv_grab_sn")
+                listing_wrap_offset = 6 * 3600;
+
             QDate qCurrentDate = QDate::currentDate();
 
-            if (!grabData(*it, 1, &qCurrentDate))
-                ++failures;
+            if (refresh_today)
+            {
+                if (!grabData(*it, 0, &qCurrentDate))
+                    ++failures;
+            }
+
+            if (refresh_tomorrow)
+            {
+                if (!grabData(*it, 1, &qCurrentDate))
+                    ++failures;
+            }
+
+            if (refresh_second)
+            {
+                if (!grabData(*it, 2, &qCurrentDate))
+                    ++failures;
+            }
 
             int maxday = 9;
-            if (xmltv_grabber == "tv_grab_uk_rt")
+            if (xmltv_grabber == "tv_grab_uk_rt" ||
+                xmltv_grabber == "tv_grab_sn")
                 maxday = 14;
 
             for (int i = 0; i < maxday; i++)
@@ -1920,6 +1936,18 @@ int main(int argc, char *argv[])
                  cout << "### reading channels from xawtv configfile\n";
             from_xawfile = true;
         }
+        else if (!strcmp(a.argv()[argpos], "--refresh-today"))
+        {
+            refresh_today = true;
+        }
+        else if (!strcmp(a.argv()[argpos], "--dont-refresh-tomorrow"))
+        {
+            refresh_tomorrow = false;
+        }
+        else if (!strcmp(a.argv()[argpos], "--refresh-second"))
+        {
+            refresh_second = true;
+        }
         else if (!strcmp(a.argv()[argpos], "--quiet"))
         {
              quiet = true;
@@ -1960,6 +1988,12 @@ int main(int argc, char *argv[])
             cout << "   <sourceid>    = cardinput\n";
             cout << "   <xawtvrcfile> = file to read\n";
             cout << "\n";
+            cout << "--refresh-today\n";
+            cout << "--refresh-second\n";
+            cout << "   (Only valid for grabbers: na/uk_rt/sn)\n";
+            cout << "   Force a refresh today or two days from now, to catch the latest changes\n";
+            cout << "--dont-refresh-tomorrow\n";
+            cout << "   Tomorrow will be refreshed always unless this argument is used\n";
             cout << "--help\n";
             cout << "   This text\n";
             cout << "\n";

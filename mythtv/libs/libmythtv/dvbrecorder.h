@@ -72,6 +72,7 @@ private:
 
     void FinishRecording();
 
+    void ReadFromDMX();
     static void ProcessData(unsigned char *buffer, int len, void *priv);
     void LocalProcessData(unsigned char *buffer, int len);
 
@@ -103,6 +104,11 @@ private:
     bool    swfilter_open;
     bool    recordts;
     bool    channel_changed;
+    bool    receiving;
+    
+    int     dmx_buf_size;
+    int     pkt_buf_size;
+    unsigned char* pktbuffer;
 
     int fd_dvr;
     vector<int> fd_demux;

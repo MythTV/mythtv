@@ -73,9 +73,9 @@ DVBChannel::DVBChannel(int aCardNum, TVRec *parent)
 
 DVBChannel::~DVBChannel()
 {
-    if (!dvbsct)
+    if (dvbsct)
         delete dvbsct;
-    if (!dvbcam)
+    if (dvbcam)
         delete dvbcam;
 
     if (isOpen && (fd_frontend > 0))
@@ -100,6 +100,9 @@ bool DVBChannel::Open()
         ERRNO("Failed to get frontend information.")
         return false;
     }
+
+    GENERAL(QString("Using DVB card %1, with frontend %2.")
+            .arg(cardnum).arg(info.name));
 
     dvbsct = new DVBSections(cardnum);
     connect(this, SIGNAL(ChannelChanged(dvb_channel_t&)),
@@ -128,9 +131,6 @@ bool DVBChannel::Open()
         connect(dvbsct, SIGNAL(ChannelChanged(dvb_channel_t&, uint8_t*, int)),
                 dvbcam, SLOT(ChannelChanged(dvb_channel_t&, uint8_t*, int)));
     }
-
-    GENERAL(QString("Using DVB card %1, with frontend %2.")
-            .arg(cardnum).arg(info.name));
 
     return isOpen = true;
 }
@@ -195,6 +195,8 @@ bool DVBChannel::GetChannelOptions(QString channum)
         ERROR("Failed to verify channel integrity.");
         return false;
     }
+
+    dvbcam->SetDatabase(db_conn, &db_lock);
 
     pthread_mutex_lock(&db_lock);
     MythContext::KickDatabase(db_conn);
@@ -576,6 +578,20 @@ bool DVBChannel::CheckModulation(fe_modulation_t& modulation)
     return false;
 }
 
+bool DVBChannel::FillFrontendStats(dvb_stats_t& stats)
+{
+    if (fd_frontend <= 0)
+        return false;
+
+    ioctl(fd_frontend, FE_READ_SNR, &stats.snr);
+    ioctl(fd_frontend, FE_READ_SIGNAL_STRENGTH, &stats.ss);
+    ioctl(fd_frontend, FE_READ_BER, &stats.ber);
+    ioctl(fd_frontend, FE_READ_UNCORRECTED_BLOCKS, &stats.ub);
+    ioctl(fd_frontend, FE_READ_STATUS, &stats.status);
+
+    return true;
+}
+
 void* DVBChannel::StatusMonitorHelper(void* self)
 {
     ((DVBChannel*)self)->StatusMonitorLoop();
@@ -584,11 +600,11 @@ void* DVBChannel::StatusMonitorHelper(void* self)
 
 void DVBChannel::StatusMonitorLoop()
 {
-    unsigned int snr=1, ss=1, ber=1, ub=1;
-    fe_status_t status;
+    dvb_stats_t stats;
 
     monitorRunning = true;
-        
+    GENERAL("StatusMonitor Starting");
+
     while (monitorClients > 0)
     {
         if (!isOpen)
@@ -597,43 +613,38 @@ void DVBChannel::StatusMonitorLoop()
             continue;
         }
         
-        ioctl(fd_frontend, FE_READ_SNR, &snr);
-        emit StatusSignalToNoise(snr);
-        
-        ioctl(fd_frontend, FE_READ_SIGNAL_STRENGTH, &ss);
-        emit StatusSignalStrength(ss);
+        if (FillFrontendStats(stats))
+        {
+            emit Status(stats);
 
-        ioctl(fd_frontend, FE_READ_BER, &ber);
-        emit StatusBitErrorRate(ber);
-        
-        ioctl(fd_frontend, FE_READ_UNCORRECTED_BLOCKS, &ub);
-        emit StatusUncorrectedBlocks(ub);
-        
-        ioctl(fd_frontend, FE_READ_STATUS, &status);
-        emit Status(status);
-       
-        QString str = "";
-        if (status & FE_TIMEDOUT) {
-            str = "Timed out waiting for signal.";
-        } else {
-            if (status & FE_HAS_SIGNAL)  str += "SIGNAL ";
-            if (status & FE_HAS_CARRIER) str += "CARRIER ";
-            if (status & FE_HAS_VITERBI) str += "VITERBI ";
-            if (status & FE_HAS_SYNC) str += "SYNC ";
-            if (status & FE_HAS_LOCK) str += "LOCK ";
+            QString str = "";
+            if (stats.status & FE_TIMEDOUT)
+            {
+                str = "Timed out waiting for signal.";
+            }
+            else
+            {
+                if (stats.status & FE_HAS_SIGNAL)  str += "SIGNAL ";
+                if (stats.status & FE_HAS_CARRIER) str += "CARRIER ";
+                if (stats.status & FE_HAS_VITERBI) str += "VITERBI ";
+                if (stats.status & FE_HAS_SYNC) str += "SYNC ";
+                if (stats.status & FE_HAS_LOCK) str += "LOCK ";
+            }
+            emit Status(str);
         }
-        emit Status(str);
 
         usleep(250*1000);
     }
 
     monitorRunning = false;
+    GENERAL("StatusMonitor Stopping");
 }
 
 void DVBChannel::connectNotify(const char* signal)
 {
     QString sig = signal;
-    if (sig != SIGNAL(ChannelChanged()))
+    if (sig == SIGNAL(Status(dvb_stats_t &)) ||
+        sig == SIGNAL(Status(QString)))
     {
         monitorClients++;
         if (!monitorRunning)
@@ -645,7 +656,8 @@ void DVBChannel::connectNotify(const char* signal)
 void DVBChannel::disconnectNotify(const char* signal)
 {
     QString sig = signal;
-    if (sig != SIGNAL(ChannelChanged()))
+    if (sig == SIGNAL(Status(dvb_stats_t &)) ||
+        sig == SIGNAL(Status(QString)))
     {
         monitorClients--;
         if (monitorClients < 1)

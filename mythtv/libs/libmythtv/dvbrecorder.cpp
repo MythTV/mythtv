@@ -70,12 +70,18 @@ DVBRecorder::DVBRecorder(DVBChannel* advbchannel): RecorderBase()
 
     wait_for_seqstart = true;
     wait_for_seqstart_enabled = true;
+    dmx_buf_size = DEF_DMX_BUF_SIZE;
+    pkt_buf_size = MPEG_TS_PKT_SIZE * 50;
+    pktbuffer = (unsigned char*)malloc(pkt_buf_size);
 }
 
 DVBRecorder::~DVBRecorder()
 {
     if (isopen)
         Close();
+
+    if (pktbuffer)
+        free(pktbuffer);
 }
 
 void DVBRecorder::SetOption(const QString &name, int value)
@@ -85,9 +91,26 @@ void DVBRecorder::SetOption(const QString &name, int value)
     else if (name == "swfilter")
         swfilter = (value == 1);
     else if (name == "recordts")
-        recordts = (value == 1);
+    {
+        GENERAL("Was told to record transport stream,"
+                " but this feature is broken, not enabling.");
+//        recordts = (value == 1);
+    }
     else if (name == "wait_for_seqstart")
         wait_for_seqstart_enabled = (value == 1);
+    else if (name == "dmx_buf_size")
+    {
+        if (value != 0)
+            dmx_buf_size = value;
+    }
+    else if (name == "pkt_buf_size")
+    {
+        if (value != 0)
+        {
+            pkt_buf_size = value - (value % MPEG_TS_PKT_SIZE);
+            pktbuffer = (unsigned char*)realloc(pktbuffer, pkt_buf_size);
+        }
+    }
     else
         RecorderBase::SetOption(name, value);
 }
@@ -171,6 +194,7 @@ void DVBRecorder::CloseFilters()
         free((void*)(*iter).second);
     }
     pid_ipack.clear();
+    contcounter.clear();
 }
 
 void DVBRecorder::OpenFilters(dvb_pid_t& pids, dmx_pes_type_t type)
@@ -203,7 +227,7 @@ void DVBRecorder::OpenFilters(dvb_pid_t& pids, dmx_pes_type_t type)
                 continue;
             }
 
-            if (ioctl(fd_tmp, DMX_SET_BUFFER_SIZE, DMX_BUF_SIZE) == -1)
+            if (ioctl(fd_tmp, DMX_SET_BUFFER_SIZE, dmx_buf_size) == -1)
             {
                 ERRNO("DMX_SET_BUFFER_SIZE failed for pid " << this_pid);
             }
@@ -259,6 +283,8 @@ void DVBRecorder::OpenFilters(dvb_pid_t& pids, dmx_pes_type_t type)
             pid_ipack[this_pid] = ip;
         } else
             pid_ipack[this_pid] = NULL;
+
+        contcounter[this_pid] = 16;
     }
 }
 
@@ -269,15 +295,21 @@ void DVBRecorder::SetDemuxFilters(dvb_pids_t& pids)
     if (swfilter)
         swfilter_open = false;
 
+/*
+    // FIXME: This should add the pid with PMT not PAT
+    // NOTE: The section filter could report back what pid it's on.
     if (recordts)
         pids.other.push_back(0);
-
+*/
     OpenFilters(pids.audio,       DMX_PES_AUDIO);
     OpenFilters(pids.video,       DMX_PES_VIDEO);
     OpenFilters(pids.teletext,    DMX_PES_TELETEXT);
     OpenFilters(pids.subtitle,    DMX_PES_SUBTITLE);
     OpenFilters(pids.pcr,         DMX_PES_PCR);
     OpenFilters(pids.other,       DMX_PES_OTHER);
+
+    if (fd_demux.size() == 0 && pid_ipack.size() == 0)
+        ERROR("No PIDS set, please correct your channel setup.");
 
     pid_ipack[pids.audio[0]]->pv = (struct ipack_s *)pid_ipack[pids.video[0]];
     pid_ipack[pids.video[0]]->pa = (struct ipack_s *)pid_ipack[pids.audio[0]];
@@ -299,12 +331,9 @@ void DVBRecorder::StartRecording()
     if (!Open())
         return;
 
-    int readsz = 0;
     int ret, dataflow = -1;
-    bool receiving = false;
-    unsigned char pktbuf[MPEG_TS_SIZE];
+    receiving = false;
     struct pollfd polls;
-    map<uint16_t, bool> pid_valid;
 
     polls.fd = fd_dvr;
     polls.events = POLLIN;
@@ -353,89 +382,10 @@ void DVBRecorder::StartRecording()
             if (paused)
                 continue;
 
-            readsz = read(fd_dvr, pktbuf, MPEG_TS_SIZE);
-            if (readsz > 0)
-            {
-                int pes_offset = 0;
-                int pid = ((pktbuf[1]&0x1f) << 8) | pktbuf[2];
-                uint8_t cc = pktbuf[3] & 0xf;
-                uint8_t content = (pktbuf[3] & 0x30) >> 4;
-
-                if (pktbuf[1] & 0x80){
-                    WARNING("Uncorrectable error in packet, dropped.");
-                    continue;
-                }
-
-                if (pid_ipack.find(pid) == pid_ipack.end())
-                    continue;
-            
-                if (!receiving)
-                {
-                    receiving = true;
-                    emit Receiving();
-                }
-            
-                if (content & 0x1)
-                {
-                    if (pid_valid[pid] == false) {
-                        pid_valid[pid] = true;
-                        contcounter[pid] = cc;
-                    }
-                    else {
-                        contcounter[pid]++;
-                        if (contcounter[pid] > 15)
-                            contcounter[pid] = 0;
-
-                        if (contcounter[pid] != cc)
-                        {
-                            WARNING("Transport Stream Continuity Error. PID = " << pid );
-                            RECORD(QString("PID %1 contcounter %2 cc %3")
-                                   .arg(pid).arg(contcounter[pid]).arg(cc));
-                            contcounter[pid] = cc;
-                        }            
-                    }
-                }
-            
-                if (recordts)
-                {
-                    LocalProcessData(&pktbuf[0], readsz);
-                    continue;
-                }
-            
-                ipack *ip = pid_ipack[pid];
-                if (ip == NULL)
-                    continue;
-            
-                CorrectStreamNumber(ip,pid);
-                ip->ps = 1;
-                
-                if ( (pktbuf[1] & 0x40) && (ip->plength == MMAX_PLENGTH-6) )
-                {
-                    ip->plength = ip->found-6;
-                    ip->found = 0;
-                    send_ipack(ip);
-                    reset_ipack(ip);
-                }
-            
-                if (content & 0x2)
-                    pes_offset = pktbuf[4] + 1;
-
-                if (pes_offset > 183)
-                    continue;
-            
-                instant_repack(pktbuf + 4 + pes_offset,
-                               MPEG_TS_SIZE - 4 - pes_offset, ip);
-            }
-            else if (readsz < 0)
-            {
-                if (errno == EOVERFLOW || errno == EAGAIN)
-                    continue;
-
-                ERRNO("Error reading from DVB device.");
-                continue;
-            }
-        } else if (ret < 0)
-                ERRNO("Poll failed waiting for data.");
+            ReadFromDMX();
+        }
+        else if ((ret < 0) || (ret == 1 && polls.revents & POLLERR))
+            ERRNO("Poll failed while waiting for data.");
     }
 
     Close();
@@ -445,6 +395,109 @@ void DVBRecorder::StartRecording()
     recording = false;
 
     emit Stopped();
+}
+
+void DVBRecorder::ReadFromDMX()
+{
+    int readsz = 1;
+    unsigned char *pktbuf;
+
+    while (readsz > 0)
+    {
+        readsz = read(fd_dvr, pktbuffer, pkt_buf_size);
+
+        if (readsz < 0)
+        {
+            if (errno == EAGAIN)
+                break;
+            ERRNO("Error reading from DVB device.");
+            break;
+        } else if (readsz == 0)
+            break;
+
+        if (readsz % MPEG_TS_PKT_SIZE)
+        {
+            ERROR("Incomplete packet received.");
+            readsz = readsz - (readsz % MPEG_TS_PKT_SIZE);
+        }
+
+        int pkts = readsz / MPEG_TS_PKT_SIZE;
+        int curpkt = 0;
+        while (curpkt < pkts)
+        {
+            pktbuf = pktbuffer + (curpkt * MPEG_TS_PKT_SIZE);
+            curpkt++;
+
+            int pes_offset = 0;
+            int pid = ((pktbuf[1]&0x1f) << 8) | pktbuf[2];
+            uint8_t cc = pktbuf[3] & 0xf;
+            uint8_t content = (pktbuf[3] & 0x30) >> 4;
+
+            if (pktbuf[1] & 0x80)
+            {
+                WARNING("Uncorrectable error in packet, dropped.");
+                continue;
+            }
+
+            if (pid_ipack.find(pid) == pid_ipack.end())
+                continue;
+            
+            if (!receiving)
+            {
+                receiving = true;
+                emit Receiving();
+            }
+            
+            if (content & 0x1)
+            {
+                if (contcounter[pid] == 16)
+                    contcounter[pid] = cc;
+                else
+                    contcounter[pid]++;
+
+                if (contcounter[pid] > 15)
+                    contcounter[pid] = 0;
+
+                if (contcounter[pid] != cc)
+                {
+                    WARNING("Transport Stream Continuity Error. PID = " << pid );
+                    RECORD(QString("PID %1 contcounter %2 cc %3")
+                           .arg(pid).arg(contcounter[pid]).arg(cc));
+                    contcounter[pid] = cc;
+                }            
+            }
+
+            if (recordts)
+            {
+                LocalProcessData(&pktbuf[0], readsz);
+                continue;
+            }
+
+            ipack *ip = pid_ipack[pid];
+            if (ip == NULL)
+                continue;
+
+            CorrectStreamNumber(ip,pid);
+            ip->ps = 1;
+
+            if ( (pktbuf[1] & 0x40) && (ip->plength == MMAX_PLENGTH-6) )
+            {
+                ip->plength = ip->found-6;
+                ip->found = 0;
+                send_ipack(ip);
+                reset_ipack(ip);
+            }
+
+            if (content & 0x2)
+                pes_offset = pktbuf[4] + 1;
+
+            if (pes_offset > 183)
+                continue;
+
+            instant_repack(pktbuf + 4 + pes_offset,
+                           MPEG_TS_PKT_SIZE - 4 - pes_offset, ip);
+        }
+    }
 }
 
 int DVBRecorder::GetVideoFd(void)
@@ -487,6 +540,8 @@ void DVBRecorder::LocalProcessData(unsigned char *buffer, int len)
 {
     if (recordts)
     {
+        // FIXME: Mark gop positions (Combine with HDTVRecorder?)
+        // FIXME: Rewrite PMT/PAT
         ringBuffer->Write(buffer, len);
         return;
     }

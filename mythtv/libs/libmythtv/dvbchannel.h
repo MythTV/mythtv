@@ -65,14 +65,12 @@ public:
                    const QString& hierarchy, dvb_tuning_t& p);
 
     void RecorderStarted();
+    bool FillFrontendStats(dvb_stats_t &stats);
 
 signals:
     void ChannelChanged(dvb_channel_t& chan);
-    void StatusSignalToNoise(int val);
-    void StatusSignalStrength(int val);
-    void StatusBitErrorRate(int val);
-    void StatusUncorrectedBlocks(int val);
-    void Status(fe_status_t status);
+
+    void Status(dvb_stats_t &stats);
     void Status(QString val);
 
 protected:

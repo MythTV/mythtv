@@ -227,8 +227,10 @@ public:
     {
         clearSelections();
         QSqlQuery query = db->exec(QString(
-            "SELECT dvb_sat.name,dvb_sat.satid FROM dvb_sat,channel"
-            " WHERE dvb_sat.sourceid=channel.sourceid AND channel.chanid='%1'")
+            "SELECT dvb_sat.name,dvb_sat.satid FROM dvb_sat,channel,cardinput"
+            " WHERE dvb_sat.cardid=cardinput.cardid"
+            " AND cardinput.sourceid=channel.sourceid"
+            " AND channel.chanid='%1'")
             .arg(id.getValue()));
         if (!query.isActive())
             MythContext::DBError("DvbSatellite::fillSelections", query);

@@ -57,6 +57,10 @@ DVBSections::DVBSections(int cardNum)
     curpmtsize  = 0;
     curpmtbuf   = NULL;
 
+    pollArray = NULL;
+    pollLength = 0;
+
+    pthread_mutex_init(&poll_lock, NULL);
     pthread_mutex_init(&pmap_lock, NULL);
 }
 
@@ -66,38 +70,53 @@ DVBSections::~DVBSections()
         Stop();
 }
 
-void DVBSections::Start()
+// Need a filtermanager...
+void DVBSections::AddPid(int pid)
 {
-    pollLength = 2;
-    pollArray = (pollfd*)malloc(sizeof(pollfd)*pollLength);
-
+    // FIXME: Check if pid already filtered.
     struct dmx_sct_filter_params params;
+    int fd;
+
     memset(&params, 0, sizeof(struct dmx_sct_filter_params));
-    params.flags    = DMX_IMMEDIATE_START | DMX_CHECK_CRC;
+    params.flags = DMX_IMMEDIATE_START | DMX_CHECK_CRC;
+    params.pid = pid;
 
-    for (int i=0; i<pollLength; i++)
+    fd = open(dvbdevice(DVB_DEV_DEMUX, cardnum), O_RDWR | O_NONBLOCK);
+
+    if (fd == -1)
     {
-        pollArray[i].fd = open(dvbdevice(DVB_DEV_DEMUX, cardnum),
-                                O_RDWR | O_NONBLOCK);
-        if (pollArray[i].fd == -1)
-            ERRNO("Failed to open DVBSections filter.");
-
-        pollArray[i].events = POLLIN | POLLPRI;
-        pollArray[i].revents = 0;
-
-        switch(i)
-        {
-            case 0: params.pid = 0x0; break;
-            case 1: params.pid = 0x0; break;
-            case 2: params.pid = 0x11; break;
-            case 3: params.pid = 0x12; break;
-            case 4: params.pid = 0x13; break;
-        }
-
-        if (ioctl(pollArray[i].fd, DMX_SET_FILTER, &params) > 0)
-            ERRNO("Failed to set DVBSections filter.");
+        ERRNO(QString("Failed to open section filter (pid %1)").arg(pid));
+        return;
     }
 
+    if (ioctl(fd, DMX_SET_FILTER, &params) < 0)
+    {
+        ERRNO(QString("Failed to set section filter (pid %1)").arg(pid));
+        return;
+    }
+
+    pthread_mutex_lock(&poll_lock);
+    
+    pollArray = (pollfd*)realloc((void*)pollArray, sizeof(pollfd) * (pollLength+1));
+
+    pollArray[pollLength].fd = fd;
+    pollArray[pollLength].events = POLLIN | POLLPRI;
+    pollArray[pollLength].revents = 0;
+    pollLength++;
+
+    pthread_mutex_unlock(&poll_lock);
+}
+
+void DVBSections::DelPid(int pid)
+{
+    pthread_mutex_lock(&poll_lock);
+    (void)pid;
+    pthread_mutex_unlock(&poll_lock);
+}
+
+void DVBSections::Start()
+{
+    AddPid(0);
     pthread_create(&thread, NULL, ThreadHelper, this);
 }
 
@@ -128,7 +147,7 @@ void DVBSections::ChannelChanged(dvb_channel_t& chan)
 
     struct dmx_sct_filter_params params;
     memset(&params, 0, sizeof(struct dmx_sct_filter_params));
-    params.flags    = DMX_IMMEDIATE_START;
+    params.flags = DMX_IMMEDIATE_START;
 
     curpmtsize = 0;
 
@@ -141,43 +160,13 @@ void DVBSections::ChannelChanged(dvb_channel_t& chan)
     else
         pmap.pat_version = 33;
 
-    pollArray[1].events = POLLIN | POLLPRI;
-    pollArray[1].revents = 0;
-    if (ioctl(pollArray[1].fd, DMX_SET_FILTER, &params) == -1)
+    pollArray[0].events = POLLIN | POLLPRI;
+    pollArray[0].revents = 0;
+
+    if (ioctl(pollArray[0].fd, DMX_SET_FILTER, &params) < 0)
         ERRNO("Failed to set DVBSections filter");
 
     pthread_mutex_unlock(&pmap_lock);
-}
-
-void DVBSections::AllocateAndConvert(uint8_t*& buffer, int& len)
-{
-    uint8_t* buf = (uint8_t*)malloc(len + 1);
-
-    memcpy(buf, buffer, len);
-
-    uint8_t* bufptr = buf - 1;
-    while (++bufptr <= buf + len)
-        if (*bufptr < 0x20 || *bufptr > 0x7F)
-            *bufptr = '_';
-
-    buf[len] = 0;
-    len += 1;
-
-    if (buf[0] > 0x20)
-    {
-        buffer = buf;
-        return;
-    }
-
-    // FIXME: This is where we should handle locale conversion.
-    static bool warning_printed = false;
-    if (!warning_printed)
-    {
-        warning_printed = true;
-        WARNING("Conversion of locale is not yet implemented.");
-    }
-
-    buffer = buf;
 }
 
 void *DVBSections::ThreadHelper(void* cls)
@@ -188,30 +177,38 @@ void *DVBSections::ThreadHelper(void* cls)
 
 void DVBSections::ThreadLoop()
 {
-    uint8_t    buffer[4096];
+    uint8_t    buffer[MAX_SECTION_SIZE];
     tablehead_t head;
 
     sectionThreadRunning = true;
 
     while (!exitSectionThread)
     {
-        int ret = poll(pollArray, pollLength, 100);
+        usleep(250);
+        pthread_mutex_lock(&poll_lock);
+        int ret = poll(pollArray, pollLength, 1000);
 
         if (ret == 0)
+        {
+            pthread_mutex_unlock(&poll_lock);
             continue;
+        }
 
         if (ret < 0)
         {
             ERRNO("Poll failed while waiting for Section");
+            pthread_mutex_unlock(&poll_lock);
             continue;
         }
 
         for (int i=0; i<pollLength; i++)
         {
+            // FIXME: Handle POLLERR
             if (! (pollArray[i].revents & POLLIN || pollArray[i].revents & POLLPRI) )
+            // FIXME: does this jump to for or while? it should go to for
                 continue;
 
-            int rsz = read(pollArray[i].fd, &buffer, 4096);
+            int rsz = read(pollArray[i].fd, &buffer, MAX_SECTION_SIZE);
 
             if (rsz > 0)
             {
@@ -228,10 +225,9 @@ void DVBSections::ThreadLoop()
                 continue;
             }
 
-            if (rsz == -1 && (errno == EOVERFLOW || errno == EAGAIN))
+            if (rsz == -1 && errno == EAGAIN)
             {
                 i--;
-                usleep(10);
                 continue;
             }
 
@@ -243,8 +239,7 @@ void DVBSections::ThreadLoop()
             pollArray[i].events = POLLIN | POLLPRI;
             pollArray[i].revents = 0;
         }
-
-        usleep(50);
+        pthread_mutex_unlock(&poll_lock);
     }
 
     sectionThreadRunning = false;
@@ -260,7 +255,7 @@ void DVBSections::ParseTable(tablehead_t* head, uint8_t* buffer, int size)
         case 0:     ParsePAT(head, buffer, size); break;
         case 2:     ParsePMT(head, buffer, size); break;
         default:
-            WARNING("Unknown table with id " << head->table_id);
+            // Ignore other tables
             break;
     }
 }
@@ -299,9 +294,9 @@ void DVBSections::ParsePAT(tablehead_t* head, uint8_t* buffer, int size)
                 params.filter.mask[0] = 0xff;
                 params.flags = DMX_IMMEDIATE_START | DMX_CHECK_CRC;
 
-                pollArray[1].events = POLLIN | POLLPRI;
-                pollArray[1].revents = 0;
-                if (ioctl(pollArray[1].fd, DMX_SET_FILTER, &params)<0)
+                pollArray[0].events = POLLIN | POLLPRI;
+                pollArray[0].revents = 0;
+                if (ioctl(pollArray[0].fd, DMX_SET_FILTER, &params)<0)
                     ERRNO("Failed to set PMAP Filter");
 
                 pmap.pat_version = head->version;
@@ -320,7 +315,6 @@ void DVBSections::ParsePMT(tablehead_t* head, uint8_t* buffer, int size)
         curpmtbuf = (uint8_t*)realloc(curpmtbuf, size - 4);
         memcpy(curpmtbuf, &buffer[4], size - 4);
         curpmtsize = size - 4;
-        ERROR(QString("Saved %1 PMT bytes.").arg(size-4));
         pthread_mutex_unlock(&pmap_lock);
 
         ChannelChanged(chan_opts, curpmtbuf, curpmtsize);

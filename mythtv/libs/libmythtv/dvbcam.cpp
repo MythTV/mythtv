@@ -60,7 +60,9 @@ DVBCam::DVBCam(int cardNum): cardnum(cardNum)
     exitCiThread = false;
     ciThreadRunning = false;
     ciHandler = NULL;
-    cachedpmtbuf = NULL;
+    pmtbuf = cachedpmtbuf = NULL;
+    pmtlen = 0;
+    first_send = false;
     pthread_mutex_init(&pmt_lock, NULL);
 }
 
@@ -98,13 +100,15 @@ bool DVBCam::Close()
 
 void DVBCam::ChannelChanged(dvb_channel_t& chan)
 {
-    QSqlDatabase *db = QSqlDatabase::database();
+    pthread_mutex_lock(db_lock);
+
+    MythContext::KickDatabase(db);
     QSqlQuery query = db->exec(QString("SELECT pmtcache FROM dvb_channel"
                                " WHERE serviceid=%1").arg(chan.serviceID));
 
     if (!query.isActive())
     {
-        MythContext::DBError("pmtcache", query);
+        MythContext::DBError("DVBCam PMT Query", query);
         return;
     }
 
@@ -114,17 +118,20 @@ void DVBCam::ChannelChanged(dvb_channel_t& chan)
         if (!query.value(0).isNull())
         {
             pthread_mutex_lock(&pmt_lock);
-            QByteArray ba = query.value(0).toByteArray();
             GENERAL("CAM - Cached PMT found.");
+            QByteArray ba = query.value(0).toByteArray();
             if (cachedpmtbuf)
                 delete cachedpmtbuf;
             chan_opts = chan;
             pmtbuf = cachedpmtbuf = new uint8_t [ba.size()];
             memcpy(pmtbuf, ba.data(), ba.size());
             pmtlen = ba.size();
+            first_send = true;
             pthread_mutex_unlock(&pmt_lock);
         }
     }
+
+    pthread_mutex_unlock(db_lock);
 }
 
 void DVBCam::ChannelChanged(dvb_channel_t& chan, uint8_t* pmt, int len)
@@ -138,15 +145,19 @@ void DVBCam::ChannelChanged(dvb_channel_t& chan, uint8_t* pmt, int len)
     pthread_mutex_lock(&pmt_lock);
 
     bool setpmt = true;
-    if (len == pmtlen && chan.serviceID == chan_opts.serviceID)
+    if (len == pmtlen && pmtbuf != NULL &&
+        chan.serviceID == chan_opts.serviceID)
+    {
         if (!memcmp(pmt, pmtbuf, len))
             setpmt = false;
+    }
 
     if (setpmt)
     {
         chan_opts = chan;
         pmtbuf = pmt;
         pmtlen = len;
+        first_send = true;
     }
 
     pthread_mutex_unlock(&pmt_lock);
@@ -155,15 +166,19 @@ void DVBCam::ChannelChanged(dvb_channel_t& chan, uint8_t* pmt, int len)
     ba.resize(len);
     memcpy(ba.data(), pmt, len);
 
-    QSqlQuery query;
+    pthread_mutex_lock(db_lock);
+    QSqlQuery query(QString::null, db);
     query.prepare(QString("UPDATE dvb_channel SET pmtcache=?"
-                  " WHERE serviceid=%2").arg(chan.serviceID));
+                  " WHERE serviceid=%1").arg(chan.serviceID));
     query.bindValue(0, QVariant(ba));
+
+    MythContext::KickDatabase(db);
     query.exec();
+    pthread_mutex_unlock(db_lock);
 
     if (!query.isActive())
     {
-        MythContext::DBError("pmtcache", query);
+        MythContext::DBError("DVBCam PMT Update", query);
         return;
     }
 
@@ -193,14 +208,16 @@ void DVBCam::CiHandlerLoop()
             // TODO: Only set cam with correct id.
 
             pthread_mutex_lock(&pmt_lock);
-            if (caids != NULL)
+            if (caids != NULL && pmtbuf != NULL)
             {
-//                GENERAL(QString("CAM - Sending PMT to slot %1.").arg(s));
+                if (first_send)
+                {
+                    GENERAL(QString("CAM - Sending PMT to slot %1.").arg(s));
+                    first_send = false;
+                }
 
                 cCiCaPmt capmt(chan_opts.serviceID);
-
                 capmt.AddCaDescriptor(pmtlen, pmtbuf);
-
                 SetPids(capmt, chan_opts.pids);
 
                 ciHandler->SetCaPmt(capmt,s);
