@@ -1790,7 +1790,9 @@ void NuppelVideoPlayer::ClearAfterSeek(void)
 
     if (usedVideoBuffers.count() > 0)
     {
-        vpos = vbufferMap[usedVideoBuffers.head()];
+        unsigned char *buffer = usedVideoBuffers.dequeue();
+        availableVideoBuffers.enqueue(buffer);
+        vpos = vbufferMap[buffer];
         rpos = vpos;
     }
     else

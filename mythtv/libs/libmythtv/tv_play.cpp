@@ -59,6 +59,8 @@ SeekSpeedInfo seek_speed_array[] =
     {"16X", 16.72, 132.00, 84.00}
 };
 
+const int kMuteTimeout = 800;
+
 void *SpawnDecode(void *param)
 {
     NuppelVideoPlayer *nvp = (NuppelVideoPlayer *)param;
@@ -1383,7 +1385,7 @@ void TV::DoFF(int time)
         StopFFRew(false);
 
     if (muted) 
-        muteTimer->start(600, true);
+        muteTimer->start(kMuteTimeout, true);
 
     if (activenvp->GetLimitKeyRepeat())
     {
@@ -1424,7 +1426,7 @@ void TV::DoRew(int time)
         StopFFRew(false);
 
     if (muted) 
-        muteTimer->start(600, true);
+        muteTimer->start(kMuteTimeout, true);
 
     if (activenvp->GetLimitKeyRepeat())
     {
@@ -1478,7 +1480,7 @@ void TV::DoJumpAhead(void)
     activenvp->FastForward(jumptime * 60);
 
     if (muted) 
-        muteTimer->start(600, true);
+        muteTimer->start(kMuteTimeout, true);
 
     if (activenvp->GetLimitKeyRepeat())
     {
@@ -1514,7 +1516,7 @@ void TV::DoJumpBack(void)
     activenvp->Rewind(jumptime * 60);
 
     if (muted) 
-        muteTimer->start(600, true);
+        muteTimer->start(kMuteTimeout, true);
 
     if (activenvp->GetLimitKeyRepeat())
     {
@@ -1565,7 +1567,7 @@ void TV::DoSkipCommercials(int direction)
     activenvp->SkipCommercials(direction);
 
     if (muted) 
-        muteTimer->start(600, true);
+        muteTimer->start(kMuteTimeout, true);
 }
 
 void TV::ToggleInputs(void)
@@ -1602,7 +1604,7 @@ void TV::ChangeChannel(int direction)
 {
     bool muted = false;
 
-    if (volumeControl && !volumeControl->GetMute())
+    if (volumeControl && !volumeControl->GetMute() && activenvp == nvp)
     {
         volumeControl->ToggleMute();
         muted = true;
@@ -1641,7 +1643,7 @@ void TV::ChangeChannel(int direction)
     channelkeysstored = 0;
 
     if (muted)
-        muteTimer->start(600, true);
+        muteTimer->start(kMuteTimeout * 2, true);
 }
 
 void TV::ChannelKey(int key)
@@ -1701,6 +1703,14 @@ void TV::ChannelCommit(void)
 
 void TV::ChangeChannelByString(QString &name)
 {
+    bool muted = false;
+
+    if (volumeControl && !volumeControl->GetMute() && activenvp == nvp)
+    {
+        volumeControl->ToggleMute();
+        muted = true;
+    }
+
     if (!activerecorder->CheckChannel(name))
         return;
 
@@ -1731,6 +1741,9 @@ void TV::ChangeChannelByString(QString &name)
         UpdateOSD();
 
     activenvp->Unpause(false);
+
+    if (muted)
+        muteTimer->start(kMuteTimeout * 2, true);
 }
 
 void TV::AddPreviousChannel(void)
