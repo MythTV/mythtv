@@ -195,6 +195,17 @@ Recording Profiles Setup Screen
 
 - D on a custom profile group displays a popup to delete the group.
 
+Recording Groups
+----------------
+
+Recording Groups allow you to separate programs into user-defined
+categories, such as "Kids", "Alice", "Bob", etc.  This can be used to reduce
+clutter in the Default Watch Recordings screen.
+
+In the Watch Recordings Screen
+- M to change the view or to set a group password
+- I to move a program from one Recording Group to another
+
 Remote Controls
 ---------------
 
