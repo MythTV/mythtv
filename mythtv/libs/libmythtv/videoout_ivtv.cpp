@@ -230,7 +230,7 @@ void VideoOutputIvtv::Open(void)
         return;
 
     if ((videofd = open(videoDevice.ascii(), 
-        O_WRONLY | O_LARGEFILE | O_NONBLOCK, 0555)) < 0)
+        O_WRONLY | O_NONBLOCK, 0555)) < 0)
     {
         perror("Cannot open ivtv video out device");
         return;
