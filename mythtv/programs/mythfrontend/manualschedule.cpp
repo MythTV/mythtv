@@ -387,13 +387,13 @@ void ManualSchedule::durationChanged(void)
         m_description->setText( m_startDateTime.toString(dateformat) + 
                         " - (" +
 			m_duration->text() +
-			tr(" mins.) - ") +
+			") - " +
 			userText );
       
    } else
    m_description->setText( m_startDateTime.toString(dateformat) + " - (" +
 			m_duration->text() +
-			tr(" mins.) - ") +
+			") - " +
 			tr("Manual recording") );
 }
 

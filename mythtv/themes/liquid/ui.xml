@@ -434,6 +434,7 @@
         <area>20,10,800,40</area>
         <font>info</font>
         <value>Scheduled Recordings:</value>
+        <value lang="DK">Planlagte optagelser:</value>
       </textarea>
       <image name="filler" draworder="0" fleximage="yes">
         <filename>cr-background.png</filename>
@@ -443,21 +444,25 @@
         <area>20,330,800,40</area>
         <font>message</font>
         <value>Conflicting recordings are highlighted in</value>
+        <value lang="DK">Optagelser med konflikter er markeret med</value>
       </textarea>
       <textarea name="conyellow" draworder="0">
         <area>452,330,800,40</area>
         <font>messageyellow</font>
         <value>red</value>
+        <value lang="DK>rød</value>
       </textarea>
       <textarea name="disingray" draworder="0">
         <area>20,357,800,40</area>
         <font>message</font>
         <value>Deactivated recordings are highlighted in</value>
+        <value lang="DK">Deaktiverede optagelser er markeret med</value>
       </textarea>
       <textarea name="disgray" draworder="0">
         <area>458,357,800,40</area>
         <font>messagegray</font>
         <value>black</value>
+        <value lang="DK">sort</value>
       </textarea>
     </container>
 
@@ -507,6 +512,7 @@
         <area>20,70,160,30</area>
         <font>info</font>
         <value>Airdate:</value>
+        <value lang="DK">Sendt:</value>
       </textarea>
       <textarea name="timedate" draworder="6">
         <area>180,70,430,30</area>
@@ -516,6 +522,7 @@
         <area>20,100,160,30</area>
         <font>info</font>
         <value>Channel:</value>
+        <value lang="DK">Kanal:</value>
       </textarea>
       <textarea name="channel" draworder="6">
         <area>180,100,400,30</area>
@@ -525,6 +532,7 @@
         <area>20,130,160,30</area>
         <font>info</font>
         <value>Description:</value>
+        <value lang="DK">Beskrivelse:</value>
       </textarea>
       <textarea name="description" draworder="6">
         <area>180,130,600,120</area>
@@ -538,6 +546,7 @@
          <area>0,110,800,70</area>
          <font>info</font>
          <value>You Haven't Scheduled Any Programs To Be Recorded</value>
+         <value lang="DK">Du har ikke optaget nogen udsendelser</value>
          <multiline>yes</multiline>
       </textarea>
     </container>
@@ -547,11 +556,13 @@
          <area>20,40,760,30</area>
          <font>info</font>
          <value>To schedule a recording, exit this screen and</value>
+         <value lang="DK">For at optage en udsendelse, forlad denne skærm og</value>
       </textarea>
       <textarea name="botline" align="center" draworder="8">
          <area>20,70,760,30</area>
          <font>info</font>
          <value>Select 'Program Guide' or 'Program Finder'</value>
+         <value lang="DK">vælg 'Program Guide' eller 'Program Finder'</value>
       </textarea>
     </container>
 
@@ -623,12 +634,14 @@
         <area>20,15,800,35</area>
         <font>message</font>
         <value>Select a recording to permanently delete:</value>
+        <value lang="DK">Vælg en optagelse du vil slette permanent:</value>
         <context>1</context>
       </textarea>
       <textarea name="messageplay" draworder="0">
         <area>20,15,800,35</area>
         <font>message</font>
         <value>Select a recording to view:</value>
+        <value lang="DK">Vælg den optagelse du ønsker at se:</value>
         <context>0</context>
       </textarea>
     </container>
@@ -692,6 +705,7 @@
         <area>20,70,160,30</area>
         <font>info</font>
         <value>Airdate:</value>
+        <value lang="DK">Sendt:</value>
       </textarea>
       <textarea name="timedate" draworder="6">
         <area>180,70,430,30</area>
@@ -701,6 +715,7 @@
         <area>20,100,160,30</area>
         <font>info</font>
         <value>Channel:</value>
+        <value lang="DK">Kanal:</value>
       </textarea>
       <textarea name="channel" draworder="6">
         <area>180,100,400,30</area>
@@ -710,6 +725,7 @@
         <area>20,130,160,30</area>
         <font>info</font>
         <value>Description:</value>
+        <value lang="DK">Beskrivelse:</value>
       </textarea>
       <textarea name="description" draworder="6">
         <area>180,130,400,120</area>
@@ -733,6 +749,7 @@
         <area>20,70,160,30</area>
         <font>info</font>
         <value>Airdate:</value>
+        <value lang="DK">Sendt:</value>
       </textarea>
       <textarea name="timedate" draworder="6">
         <area>180,70,430,30</area>
@@ -742,6 +759,7 @@
         <area>20,100,160,30</area>
         <font>info</font>
         <value>Channel:</value>
+        <value lang="DK">Kanal:</value>
       </textarea>
       <textarea name="channel" draworder="6">
         <area>180,100,400,30</area>
@@ -751,6 +769,7 @@
         <area>20,130,160,30</area>
         <font>info</font>
         <value>Description:</value>
+        <value lang="DK">Beskrivelse:</value>
       </textarea>
       <textarea name="description" draworder="6">
         <area>180,130,400,90</area>
@@ -788,6 +807,7 @@
          <area>200,140,600,30</area>
          <font>info</font>
          <value>Sorry, No Recordings Available</value>
+         <value lang="DK">Beklager, ingen optagelser fundet</value>
       </textarea>
     </container>
 
@@ -796,11 +816,13 @@
          <area>20,80,580,30</area>
          <font>info</font>
          <value>To schedule a recording, exit this screen and</value>
+         <value lang="DK">For at optage en udsendelse, forlad denne skærm og</value>
       </textarea>
       <textarea name="botline" align="center" draworder="8">
          <area>20,110,580,30</area>
          <font>info</font>
          <value>Select 'Schedule a Recording' from the Main Menu</value>
+         <value lang="DK">vælg 'Optag en udsendelse'</value>
       </textarea>
     </container>
 
@@ -875,6 +897,7 @@
         <area>0,570,800,30</area>
         <font>info</font>
         <value>(4) Program Guide   **(6) Program Finder **</value>
+        <value lang="DK">(4) Program Guide     **(6) Program Finder **</value>
         <context>1</context>
       </textarea>
     </container>
@@ -952,11 +975,13 @@
         <area>10,5,500,30</area>
         <font>info</font>
         <value>Select a letter...</value>
+        <value lang="DK">Vælg et bogstav...</value>
       </textarea>
       <textarea name="pickinfo" draworder="6">
         <area>10,75,500,60</area>
         <font>info</font>
         <value>Pick the letter in which the show starts with, then hit ENTER or the right arrow</value>
+        <value lang="DK">Vælg det bogstav udsendelsen starter med og tryk ENTER eller pil til højre</value>
         <multiline>yes</multiline>
       </textarea>
     </container>
@@ -967,11 +992,13 @@
         <area>10,5,500,30</area>
         <font>info</font>
         <value>Select a program...</value>
+        <value lang="DK">Vælg en udsendelse...</value>
       </textarea>
       <textarea name="pickprog" draworder="6">
         <area>10,75,500,120</area>
         <font>info</font>
         <value>Select the title of the program you wish to find. When finished return with the left arrow key. Hitting 'info' will allow you to setup recording options.</value>
+        <value lang="DK">Vælg titlen på det den udsendelse du ønsker at finde og tryk ENTER eller Pil til venstre. Med 'Info' kan du vælge optagelsetype.</value>
         <multiline>yes</multiline>
       </textarea>
     </container>
@@ -982,11 +1009,13 @@
         <area>10,5,500,30</area>
         <font>info</font>
         <value>No Programs</value>
+        <value lang="DK">Ingen udsendelser</value>
       </textarea>
       <textarea name="research" draworder="6">
         <area>10,75,500,120</area>
         <font>info</font>
         <value>There are no available programs under this search. Please select another search.</value>
+        <value lang="DK">Ingen udsendelser under denne søgning. Prøv venligst en anden.</value>
         <multiline>yes</multiline>
       </textarea>
     </container>

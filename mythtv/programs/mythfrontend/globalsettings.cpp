@@ -941,6 +941,7 @@ public:
         addSelection("Dutch", "NL");
         addSelection("French", "FR");
         addSelection("German", "DE");
+        addSelection("Danish", "DK");
         setHelpText("Your preferred language.");
     };
 };

@@ -299,8 +299,8 @@ bool Channel::SetChannelByString(const QString &chan)
         return false;
 
     pthread_mutex_lock(&db_lock);
-    QString thequery = QString("SELECT finetune "
-                               " FROM channel WHERE channum = \"%1\";")
+    QString thequery = QString("SELECT finetune, freqid "
+                               "FROM channel WHERE channum = \"%1\";")
                                .arg(chan);
 
     QSqlQuery query = db_conn->exec(thequery);
@@ -314,13 +314,14 @@ bool Channel::SetChannelByString(const QString &chan)
     query.next();
 
     int finetune = query.value(0).toInt();
+    QString freqid = query.value(1).toString();
 
     pthread_mutex_unlock(&db_lock);
 
     // Tune
     if (externalChanger[currentcapchannel].isEmpty())
     {
-        if (!TuneTo(chan, finetune))
+        if (!TuneTo(freqid, finetune))
             return false;
     }
     else if (!ChangeExternalChannel(chan))

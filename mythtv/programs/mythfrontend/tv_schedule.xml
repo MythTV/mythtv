@@ -9,10 +9,12 @@
       <text lang="NL">Programma Gids</text>
       <text lang="FR">Grille Horaire</text>
       <text lang="DE">TV Planer</text>
+      <text lang="DK">Program Guide</text>
       <alttext>Guide</alttext>
       <alttext lang="FR">Grille</alttext>
       <alttext lang="ES">Parilla</alttext>
       <alttext lang="CA">Guia</alttext>
+      <alttext lang="DK">Guide</alttext>
       <action>TV_SCHEDULE</action>
    </button>
 
@@ -25,10 +27,12 @@
       <text lang="NL">Programma Zoeker</text>
       <text lang="FR">Recherche de programmes</text>
       <text lang="DE">Sendung suchen</text>
+      <text lang="DK">Program Finder</text>
       <alttext>Finder</alttext>
       <alttext lang="FR">Recherche</alttext>
       <alttext lang="ES">Buscar</alttext>
       <alttext lang="CA">Cercar</alttext>
+      <alttext lang="DK">Finder</alttext>
       <action>TV_PROGFIND</action>
    </button>
 
@@ -40,11 +44,13 @@
       <text lang="CA">Gravar ara</text>
       <text lang="NL">Manuele opname</text>
       <text lang="FR">Enregistrement manuel</text>
-      <text lang="DE">Manuelle Aufnahme</text>
+      <text lang="DE">Sofortige Aufnahme</text>
+      <text lang="DK">Optag lige nu</text>
       <alttext>Instant Record</alttext>
       <alttext lang="FR">Enreg. manuel</alttext>
       <alttext lang="ES">Grab. inst.</alttext>
       <alttext lang="CA">Grav. inst.</alttext>
+      <alttext lang="DK">Opt. lige nu</alttext>
       <action>TV_MANUAL</action>
    </button>
 
@@ -53,16 +59,26 @@
       <text>Manual Schedule</text>
       <text lang="ES">Programar Grabaciones</text>
       <text lang="CA">Programar Gravacions</text>
+      <text lang="DE">Manuelle Planung</text>
+      <text lang="DK">Manuel programmering</text>
       <alttext>Man. Sched.</alttext>
       <alttext lang="ES">Programar</alttext>
       <alttext lang="CA">Programar</alttext>
+      <alttext lang="DK">Man. prog.</alttext>
       <action>TV_MANUALSCHEDULE</action>
    </button>
 
    <button>
       <type>TV_RANKINGS</type>
       <text>Set Program Rankings</text>
+      <text lang="ES">Prioridades de programas</text>
+      <text lang="CA">Prioritats de programes</text>
+      <text lang="DE">Sendungen bewerten</text>
+      <text lang="DK">Sæt program rangering</text>
       <alttext>Set Rankings</alttext>
+      <alttext lang="ES">Por programas</alttext>
+      <alttext lang="CA">Per programes</alttext>
+      <alttext lang="DK">Sæt rangering</alttext>
       <action>TV_SET_RANKINGS</action>
    </button>
 
@@ -75,10 +91,12 @@
       <text lang="NL">Conflicten Oplossen</text>
       <text lang="FR">Gestion des conflits</text>
       <text lang="DE">Konflikte beheben</text>
+      <text lang="DK">Løs optagelseskonflikter</text>
       <alttext>Fix Conflicts</alttext>
       <alttext lang="FR">Conflits</alttext>
       <alttext lang="ES">Conflictos</alttext>
       <alttext lang="FR">Conflictes</alttext>
+      <alttext lang="DK">Løs konflikter</alttext>
       <action>TV_FIX_CONFLICTS</action>
    </button>
 

@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS channel
 (
     chanid INT UNSIGNED NOT NULL PRIMARY KEY,
     channum VARCHAR(5) NOT NULL,
+    freqid VARCHAR(5) NOT NULL,
     sourceid INT UNSIGNED,
     callsign VARCHAR(20) NULL,
     name VARCHAR(20) NULL,
@@ -238,7 +239,7 @@ CREATE TABLE IF NOT EXISTS transcoding (
     hostname VARCHAR(255)
 );
 
-INSERT INTO settings VALUES ('DBSchemaVer', 903, NULL);
+INSERT INTO settings VALUES ('DBSchemaVer', 1000, NULL);
 
 INSERT INTO recordingprofiles (name) VALUES ('Default');
 INSERT INTO recordingprofiles (name) VALUES ('Live TV');

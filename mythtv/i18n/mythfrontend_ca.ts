@@ -93,6 +93,65 @@
     </message>
 </context>
 <context>
+    <name>ManualSchedule</name>
+    <message>
+        <source>Manual Recording Scheduler</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Date:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>hr</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>min</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Duration:</source>
+        <translation type="unfinished">Duració:</translation>
+    </message>
+    <message>
+        <source>Title:</source>
+        <translation type="unfinished">Programa:</translation>
+    </message>
+    <message>
+        <source>Subtitle:</source>
+        <translation type="unfinished">Títol:</translation>
+    </message>
+    <message>
+        <source>Description:</source>
+        <translation type="unfinished">Descripció:</translation>
+    </message>
+    <message>
+        <source>Save this scheduled recording and exit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save this scheduled recording and set another</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Cancel·lar</translation>
+    </message>
+    <message>
+        <source>Manual recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>NuppelVideoPlayer</name>
     <message>
         <source>You are close to an existing cut point.  Would you like to:</source>
@@ -410,6 +469,41 @@
     <message>
         <source>(unspecified)</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rank</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>RankPrograms</name>
+    <message>
+        <source>Recording just this showing</source>
+        <translation type="unfinished">Gravar només aquest programa</translation>
+    </message>
+    <message>
+        <source>Recording every week</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording when shown in this timeslot</source>
+        <translation type="unfinished">Gravar en aquesta hora</translation>
+    </message>
+    <message>
+        <source>Recording when shown on this channel</source>
+        <translation type="unfinished">Gravar quan aparegui en aquest canal</translation>
+    </message>
+    <message>
+        <source>Recording all showings</source>
+        <translation type="unfinished">Gravar sempre que aparegui</translation>
+    </message>
+    <message>
+        <source>Not recording this showing</source>
+        <translation type="unfinished">No gravar aquest programa</translation>
+    </message>
+    <message>
+        <source>Error!</source>
+        <translation type="unfinished">Error!</translation>
     </message>
 </context>
 <context>

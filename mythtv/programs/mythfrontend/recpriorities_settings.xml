@@ -3,12 +3,18 @@
    <button>
       <type>TV_RANKINGS</type>
       <text>General</text>
+      <text lang="DE">Allgemeines</text>
+      <text lang="DK">Generelt</text>
       <action>SETTINGS GENERALRANKING</action>
    </button>
 
    <button>
       <type>TV_RANKINGS</type>
       <text>Set Channel Rankings</text>
+      <text lang="ES">Prioridades de Canales</text>
+      <text lang="CA">Prioritats de Canals</text>
+      <text lang="DE">Sender bewerten</text>
+      <text lang="DK">Sæt kanal rangering</text>
       <action>SETTINGS CHANNELRANKING</action>
    </button>
 

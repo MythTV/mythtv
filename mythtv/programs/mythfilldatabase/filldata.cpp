@@ -25,6 +25,7 @@
 using namespace std;
 
 bool interactive = false;
+bool channel_preset = false;
 bool non_us_updating = false;
 bool from_file = false;
 bool quiet = false;
@@ -42,6 +43,7 @@ class ChanInfo
                                       chanstr = other.chanstr;
                                       xmltvid = other.xmltvid;
                                       name = other.name;
+                                      freqid = other.freqid;
                                       finetune = other.finetune;
                                     }
 
@@ -50,6 +52,7 @@ class ChanInfo
     QString chanstr;
     QString xmltvid;
     QString name;
+    QString freqid;
     QString finetune;
 };
 
@@ -241,6 +244,7 @@ ChanInfo *parseChannel(QDomElement &element, QUrl baseUrl)
         }
     }
 
+    chaninfo->freqid = chaninfo->chanstr;
     return chaninfo;
 }
 
@@ -638,8 +642,20 @@ unsigned int promptForChannelUpdates(QValueList<ChanInfo>::iterator chaninfo,
     (*chaninfo).callsign = getResponse("Choose a channel callsign (any string, "
                                        "short version) ",(*chaninfo).callsign);
 
-    (*chaninfo).chanstr  = getResponse("Choose a channel number (just like "
-                                       "xawtv) ",(*chaninfo).chanstr);
+    if (channel_preset)
+    {
+        (*chaninfo).chanstr = getResponse("Choose a channel preset (0..999) ",
+                                         (*chaninfo).chanstr);
+        (*chaninfo).freqid  = getResponse("Choose a frequency id (just like "
+                                          "xawtv) ",(*chaninfo).freqid);
+    }
+    else
+    {
+        (*chaninfo).chanstr  = getResponse("Choose a channel number (just like "
+                                           "xawtv) ",(*chaninfo).chanstr);
+        (*chaninfo).freqid = (*chaninfo).chanstr;
+    }
+
     (*chaninfo).finetune = getResponse("Choose a channel fine tune offset (just"
                                        " like xawtv) ",(*chaninfo).finetune);
 
@@ -690,8 +706,8 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
         QSqlQuery query;
 
         QString querystr;
-        querystr.sprintf("SELECT chanid,name,callsign,channum,finetune,icon "
-                         "FROM channel WHERE xmltvid = \"%s\" AND "
+        querystr.sprintf("SELECT chanid,name,callsign,channum,finetune,"
+                         "icon,freqid FROM channel WHERE xmltvid = \"%s\" AND "
                          "sourceid = %d;", (*i).xmltvid.ascii(), id); 
 
         query.exec(querystr);
@@ -707,6 +723,7 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                 QString chanstr  = QString::fromUtf8(query.value(3).toString());
                 QString finetune = QString::fromUtf8(query.value(4).toString());
                 QString icon     = QString::fromUtf8(query.value(5).toString());
+                QString freqid   = QString::fromUtf8(query.value(6).toString());
 
                 cout << "### " << endl;
                 cout << "### Existing channel found" << endl;
@@ -716,6 +733,8 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                 cout << "### name     = " << name.ascii()         << endl;
                 cout << "### callsign = " << callsign.ascii()     << endl;
                 cout << "### channum  = " << chanstr.ascii()      << endl;
+                if (channel_preset)
+                    cout << "### freqid   = " << freqid.ascii()   << endl;
                 cout << "### finetune = " << finetune.ascii()     << endl;
                 cout << "### icon     = " << icon.ascii()         << endl;
                 cout << "### " << endl;
@@ -724,6 +743,7 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                 (*i).callsign = callsign;
                 (*i).chanstr  = chanstr;
                 (*i).finetune = finetune;
+                (*i).freqid = freqid;
 
                 promptForChannelUpdates(i, atoi(chanid.ascii()));
 
@@ -731,12 +751,14 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                     callsign != (*i).callsign ||
                     chanstr  != (*i).chanstr ||
                     finetune != (*i).finetune ||
+                    freqid   != (*i).freqid ||
                     icon     != localfile)
                 {
                     querystr.sprintf("UPDATE channel SET chanid = %s, "
                                      "name = \"%s\", callsign = \"%s\", "
                                      "channum = \"%s\", finetune = %d, "
-                                     "icon = \"%s\" WHERE xmltvid = \"%s\" "
+                                     "icon = \"%s\", freqid = \"%s\" "
+                                     " WHERE xmltvid = \"%s\" "
                                      "AND sourceid = %d;",
                                      chanid.ascii(),
                                      (*i).name.ascii(),
@@ -744,6 +766,7 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                                      (*i).chanstr.ascii(),
                                      atoi((*i).finetune.ascii()),
                                      localfile.ascii(),
+                                     (*i).freqid.ascii(),
                                      (*i).xmltvid.ascii(),
                                      id);
 
@@ -794,6 +817,8 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                 cout << "### name     = " << (*i).name.ascii()         << endl;
                 cout << "### callsign = " << (*i).callsign.ascii()     << endl;
                 cout << "### channum  = " << (*i).chanstr.ascii()      << endl;
+                if (channel_preset)
+                    cout << "### freqid   = " << (*i).freqid.ascii()   << endl;
                 cout << "### finetune = " << (*i).finetune.ascii()     << endl;
                 cout << "### icon     = " << localfile.ascii()         << endl;
                 cout << "### " << endl;
@@ -804,8 +829,9 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                 {
                     querystr.sprintf("INSERT INTO channel (chanid,name,"
                                      "callsign,channum,finetune,icon,"
-                                     "xmltvid,sourceid) VALUES(%d,\"%s\","
-                                     "\"%s\",\"%s\",%d,\"%s\",\"%s\",%d);", 
+                                     "xmltvid,sourceid,freqid) "
+                                     "VALUES(%d,\"%s\",\"%s\",\"%s\",%d,"
+                                     "\"%s\",\"%s\",%d,\"%s\");", 
                                      chanid,
                                      (*i).name.ascii(),
                                      (*i).callsign.ascii(),
@@ -813,7 +839,7 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                                      atoi((*i).finetune.ascii()),
                                      localfile.ascii(),
                                      (*i).xmltvid.ascii(),
-                                     id);
+                                     id, (*i).freqid.ascii());
 
                     if (!query.exec(querystr))
                     {
@@ -858,9 +884,9 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                 }
 
                 querystr.sprintf("INSERT INTO channel (chanid,name,callsign,"
-                                 "channum,finetune,icon,xmltvid,sourceid) "
+                                 "channum,finetune,icon,xmltvid,sourceid,freqid) "
                                  "VALUES(%d,\"%s\",\"%s\",\"%s\",%d,\"%s\","
-                                 "\"%s\",%d);", 
+                                 "\"%s\",%d,\"%s\");", 
                                  chanid,
                                  (*i).name.ascii(),
                                  (*i).callsign.ascii(),
@@ -868,7 +894,7 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                                  atoi((*i).finetune.ascii()),
                                  localfile.ascii(),
                                  (*i).xmltvid.ascii(),
-                                 id);
+                                 id, (*i).freqid.ascii());
 
                 if (!query.exec(querystr))
                     MythContext::DBError("channel insert", query);
@@ -1375,9 +1401,12 @@ ChanInfo *xawtvChannel(QString &id, QString &channel, QString &fine)
     chaninfo->xmltvid = id;
     chaninfo->name = id;
     chaninfo->callsign = id;
-    chaninfo->chanstr = channel;
+    if (channel_preset)
+        chaninfo->chanstr = id;
+    else
+        chaninfo->chanstr = channel;
     chaninfo->finetune = fine;
-
+    chaninfo->freqid = channel;
     chaninfo->iconpath = "";
 
     return chaninfo;
@@ -1523,6 +1552,16 @@ int main(int argc, char *argv[])
             cout << "###\n";
             interactive = true;
         }
+        else if (!strcmp(a.argv()[argpos], "--preset"))
+        {
+            // For using channel preset values instead of channel numbers.
+            cout << "###\n";
+            cout << "### Running in preset channel configuration mode.\n";
+            cout << "### This will assign channel ";
+            cout << "preset numbers to every channel.\n";
+            cout << "###\n";
+            channel_preset = true;
+        }
         else if (!strcmp(a.argv()[argpos], "--update"))
         {
             // For running non-destructive updates on the database for
@@ -1586,6 +1625,12 @@ int main(int argc, char *argv[])
             cout << "--update\n";
             cout << "   For running non-destructive updates on the database for\n";
             cout << "   users in xmltv zones that do not provide channel data\n";
+            cout << "\n";
+            cout << "--preset\n";
+            cout << "   Use it in case that you want to assign a preset number for\n";
+            cout << "   each channel, useful for non US countries where the people\n";
+            cout << "   is used to assign a sequenced number for each channel, i.e.:\n";
+            cout << "   1->TVE1(S41), 2->La 2(SE18), 3->TV3(21), 4->Canal 33(60)...\n";
             cout << "\n";
             cout << "--no-delete\n";
             cout << "   Do not delete old programs from the database until 7 days old.\n";

@@ -8,6 +8,7 @@
       <text lang="NL">Algemeen</text>
       <text lang="FR">Général</text>
       <text lang="DE">Allgemeines</text>
+      <text lang="DK">Generelt</text>
       <action>SETTINGS GENERAL</action>
    </button>
 
@@ -20,6 +21,7 @@
       <text lang="NL">Programma Gids</text>
       <text lang="FR">Grille horaire</text>
       <text lang="DE">Programmheft</text>
+      <text lang="DK">Program Guide</text>
       <action>SETTINGS EPG</action>
    </button>
 
@@ -32,6 +34,7 @@
       <text lang="NL">Afspelen</text>
       <text lang="FR">Visionnement</text>
       <text lang="DE">Wiedergabe</text>
+      <text lang="DK">Afspilning</text>
       <action>SETTINGS PLAYBACK</action>
    </button>
 
@@ -44,12 +47,17 @@
       <text lang="NL">Opnemen</text>
       <text lang="FR">Enregistrement</text>
       <text lang="DE">Aufnahmen</text>
+      <text lang="DK">Optagelse</text>
       <action>SETTINGS RECORDING</action>
    </button>
 
    <button>
       <type>TV_RANKINGS</type>
       <text>Rankings</text>
+      <text lang="ES">Prioridades</text>
+      <text lang="CA">Prioritats</text>
+      <text lang="DE">Bewertungen</text>
+      <text lang="DK">Rangering</text>
       <action>MENU rank_settings.xml</action>
    </button>
 
