@@ -713,6 +713,13 @@ int main(int argc, char **argv)
 {
     QString lcd_host;
     int lcd_port;
+    QString geometry = "";
+#ifdef Q_WS_X11
+    // Remember any -geometry argument which QApplication init will remove
+    for(int argpos = 1; argpos + 1 < argc; ++argpos)
+        if (!strcmp(argv[argpos],"-geometry"))
+            geometry = argv[argpos+1];
+#endif
 
 #ifdef Q_WS_MACX
     // Without this, we can't set focus to any of the CheckBoxSetting, and most
@@ -725,7 +732,6 @@ int main(int argc, char **argv)
     QString verboseString = QString(" important general");
 
     QString pluginname = "";
-    QString geometry = "";
 
     QFileInfo finfo(a.argv()[0]);
 
@@ -886,10 +892,15 @@ int main(int argc, char **argv)
         else
         {
             if (!(!strcmp(a.argv()[argpos],"-h") ||
-                !strcmp(a.argv()[argpos],"--help")))
+                !strcmp(a.argv()[argpos],"--help") ||
+                !strcmp(a.argv()[argpos],"--usage")))
                 cerr << "Invalid argument: " << a.argv()[argpos] << endl;
             cerr << "Valid options are: " << endl <<
+#ifdef Q_WS_X11
+                    "-display X-server              Create GUI on X-server, not localhost\n" <<
                     "-geometry WxH+X+Y              Override window size settings\n" <<
+#endif
+                    "--geometry WxH+X+Y             Override window size settings\n" <<
                     "-l or --logfile filename       Writes STDERR and STDOUT messages to filename" << endl <<
                     "-v or --verbose debug-level    Prints more information" << endl <<
                     "                               Accepts any combination (separated by comma)" << endl << 
