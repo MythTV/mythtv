@@ -440,9 +440,9 @@ void GuideGrid::fillChannelInfos(int &maxchannel, bool gotostartchannel)
                     val.callsign = "";
                 val.iconpath = query.value(2).toString();
                 if (val.iconpath == QString::null)
-                    val.iconpath = "(null)";
+                    val.iconpath = "none";
                 if (val.iconpath.stripWhiteSpace().length() == 0)
-                    val.iconpath = "(null)";
+                    val.iconpath = "none";
                 val.chanstr = query.value(0).toString();
                 if (val.chanstr == QString::null)
                 val.chanstr = "";

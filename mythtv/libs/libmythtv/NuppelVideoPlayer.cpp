@@ -111,6 +111,8 @@ NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
 
     totalLength = 0;
     totalFrames = 0;
+    play_speed = 1.0;
+    normal_speed = true;
 
     osdtheme = "none";
 
@@ -276,6 +278,15 @@ void NuppelVideoPlayer::UnpauseVideo(void)
     pausevideo = false;
 }
 
+void NuppelVideoPlayer::SetPlaySpeed(float speed)
+{
+    play_speed = speed;
+    normal_speed = (speed == 1.0);
+    frame_interval = (int)(1000000.0 / video_frame_rate / speed);
+    if (osd)
+        osd->SetFPS((int)ceil(video_frame_rate * speed));
+}
+
 void NuppelVideoPlayer::setPrebuffering(bool prebuffer)
 {
     if (prebuffer != prebuffering)
@@ -342,7 +353,8 @@ void NuppelVideoPlayer::ReinitVideo(void)
 
     videoOutput->GetDrawSize(dispx, dispy, dispw, disph);
 
-    osd->Reinit(video_width, video_height, (int)ceil(video_frame_rate),
+    osd->Reinit(video_width, video_height, 
+                (int)ceil(video_frame_rate * play_speed),
                 dispx, dispy, dispw, disph);
 
     VideoFrame *scratchFrame = &(vbuffers[MAXVBUFFER]);
@@ -376,7 +388,10 @@ void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps,
     if (height > 0)
         video_height = height;
     if (fps > 0)
+    {
         video_frame_rate = fps;
+        frame_interval = (int)(1000000.0 / video_frame_rate / play_speed);
+    }
 
     video_size = video_height * video_width * 3 / 2;
     keyframedist = keyframedistance;
@@ -670,7 +685,7 @@ void NuppelVideoPlayer::ResetNexttrigger(struct timeval *nexttrigger)
        the video will play really fast for a while.*/
     
     gettimeofday(nexttrigger, NULL);
-    nexttrigger->tv_usec += (int)(1000000 / video_frame_rate / play_speed);
+    nexttrigger->tv_usec += frame_interval;
     NormalizeTimeval(nexttrigger);
 }
 
@@ -1011,15 +1026,15 @@ void NuppelVideoPlayer::ExAVSync(void)
         {
             // If delay is sometwhat more than a frame or < 0ms,
             // we clip it to these amounts and reset nexttrigger
-            if (delay > frame_interval / play_speed * 2)
+            if (delay > frame_interval * 2)
             {
                 // cerr << "Delaying to next trigger: " << delay << endl;
-                usleep((int)(frame_interval / play_speed));
+                usleep(frame_interval);
                 delay = 0;
                 avsync_avg = 0;
                 gettimeofday(&nexttrigger, NULL);
             }
-            else if (delay < 0 - frame_interval / play_speed)
+            else if (delay < 0 - frame_interval)
             {
                 // cerr << "clipped negative delay " << delay << endl;
                 delay = 0;
@@ -1027,7 +1042,7 @@ void NuppelVideoPlayer::ExAVSync(void)
                 gettimeofday(&nexttrigger, NULL);
             }
 
-            if (reducejitter && play_speed == 1.0)
+            if (reducejitter && normal_speed) 
                 ReduceJitter(&nexttrigger);
             else
             {
@@ -1046,9 +1061,9 @@ void NuppelVideoPlayer::ExAVSync(void)
        be exactly one frame time after the previous frame,
        Show frames at the frame rate as long as audio is in sync */
 
-    nexttrigger.tv_usec += (int)(frame_interval / play_speed);
+    nexttrigger.tv_usec += frame_interval;
 
-    if (audioOutput && play_speed == 1.0)
+    if (audioOutput && normal_speed)
     {
         lastaudiotime = audioOutput->GetAudiotime(); // ms, same scale as timecodes
 
@@ -1108,11 +1123,11 @@ void NuppelVideoPlayer::OldAVSync(void)
     delay = (nexttrigger.tv_sec - now.tv_sec) * 1000000 +
             (nexttrigger.tv_usec - now.tv_usec); // uSecs
 
-    if (reducejitter && play_speed == 1.0)
+    if (reducejitter && normal_speed)
     {
         /* If delay is sometwhat more than a frame or < 0ms,
            we clip it to these amounts and reset nexttrigger */
-        if ( delay > frame_interval )
+        if (delay > frame_interval)
         {
             // cerr << "Delaying to next trigger: " << delay << endl;
             delay = frame_interval;
@@ -1185,7 +1200,7 @@ void NuppelVideoPlayer::OldAVSync(void)
         be exactly one frame time after the previous frame,
         plus just enough feedback to stay synchronized with audio. */
 
-    nexttrigger.tv_usec += (int)(1000000 / video_frame_rate / play_speed);
+    nexttrigger.tv_usec += frame_interval;
 
     /* Apply just a little feedback. The ComputeAudiotime() function is
        jittery, so if we try to correct our entire A/V drift on each frame,
@@ -1195,7 +1210,7 @@ void NuppelVideoPlayer::OldAVSync(void)
        In steady state, very little feedback is needed. However, if we are
        far out of sync, we need more feedback. So, we case on this. */
 
-    if (audioOutput && play_speed == 1.0)
+    if (audioOutput && normal_speed)
     {
         lastaudiotime = audioOutput->GetAudiotime(); // ms, same scale as timecodes
         if (lastaudiotime != 0) // lastaudiotime = 0 after a seek
@@ -1237,7 +1252,6 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
     output_jmeter = NULL;
     //output_jmeter = new Jitterometer("video_output", 100);
 
-    frame_interval = (int)(1000000.0/video_frame_rate);
     refreshrate = frame_interval;
 
     VideoFrame *scratchFrame = &(vbuffers[MAXVBUFFER]);
@@ -1402,7 +1416,6 @@ void NuppelVideoPlayer::ResetPlaying(void)
     ClearAfterSeek();
 
     framesPlayed = 0;
-    play_speed = 1.0;
 
     decoder->Reset();
 }
@@ -1412,7 +1425,6 @@ void NuppelVideoPlayer::StartPlaying(void)
     consecutive_blanks = 0;
     killplayer = false;
     framesPlayed = 0;
-    play_speed = 1.0;
 
     if (OpenFile() < 0)
         return;
@@ -1430,7 +1442,8 @@ void NuppelVideoPlayer::StartPlaying(void)
         InitVideo();
         int dispx = 0, dispy = 0, dispw = video_width, disph = video_height;
         videoOutput->GetDrawSize(dispx, dispy, dispw, disph);
-        osd = new OSD(video_width, video_height, (int)ceil(video_frame_rate),
+        osd = new OSD(video_width, video_height, 
+                      (int)ceil(video_frame_rate * play_speed),
                       osdfontname, osdccfontname, osdprefix, osdtheme,
                       dispx, dispy, dispw, disph);
     }
@@ -1482,7 +1495,7 @@ void NuppelVideoPlayer::StartPlaying(void)
 
     if (bookmarkseek > 30)
     {
-        GetFrame(audioOutput == NULL || play_speed != 1.0);
+        GetFrame(audioOutput == NULL || !normal_speed);
 
         bool seeks = exactseeks;
 
@@ -1535,7 +1548,7 @@ void NuppelVideoPlayer::StartPlaying(void)
             {   
                 DoRewind();
                 
-                GetFrame(audioOutput == NULL || play_speed != 1.0);
+                GetFrame(audioOutput == NULL || !normal_speed);
                 resetvideo = true;
                 while (resetvideo)
                     usleep(50);
@@ -1548,7 +1561,7 @@ void NuppelVideoPlayer::StartPlaying(void)
                 fftime = CalcMaxFFTime(fftime);
                 DoFastForward();
 
-                GetFrame(audioOutput == NULL || play_speed != 1.0);
+                GetFrame(audioOutput == NULL || !normal_speed);
                 resetvideo = true;
                 while (resetvideo)
                     usleep(50);
@@ -1605,7 +1618,7 @@ void NuppelVideoPlayer::StartPlaying(void)
             continue;
         }
 
-        GetFrame(audioOutput == NULL || play_speed != 1.0);
+        GetFrame(audioOutput == NULL || !normal_speed);
 
         if (!hasdeletetable && autocommercialskip)
             AutoCommercialSkip();

@@ -79,11 +79,7 @@ class NuppelVideoPlayer
     bool GetPause(void);
 
     float GetPlaySpeed(void) { return play_speed; };
-    void SetPlaySpeed(float speed) 
-    { 
-        play_speed = speed;
-        if (osd) osd->SetFPS((int)ceil(video_frame_rate*speed));
-    }
+    void SetPlaySpeed(float speed);
 
     bool FastForward(float seconds);
     bool Rewind(float seconds);
@@ -399,8 +395,9 @@ class NuppelVideoPlayer
     int avsync_delay;
     int avsync_avg;
     int refreshrate;
-    int frame_interval;
+    int frame_interval; // always adjusted for play_speed
     float play_speed;  
+    bool normal_speed;
  
     bool delay_clipping;
     struct timeval nexttrigger, now;
