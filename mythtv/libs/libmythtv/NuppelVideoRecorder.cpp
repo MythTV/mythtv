@@ -668,17 +668,16 @@ void NuppelVideoRecorder::StartRecording(void)
 
     if (ioctl(fd, VIDIOC_QUERYCAP, &vcap) < 0)
     {
-        perror("vidioc_querycap:");
         usingv4l2 = false;
     }
 
-    if (!(vcap.capabilities & V4L2_CAP_VIDEO_CAPTURE))
+    if (usingv4l2 && !(vcap.capabilities & V4L2_CAP_VIDEO_CAPTURE))
     {
         cerr << "Not a v4l2 capture device, falling back to v4l\n";
         usingv4l2 = false;
     }
 
-    if (!(vcap.capabilities & V4L2_CAP_STREAMING))
+    if (usingv4l2 && !(vcap.capabilities & V4L2_CAP_STREAMING))
     {
         cerr << "Won't work with the streaming interface, falling back\n";
         usingv4l2 = false;
