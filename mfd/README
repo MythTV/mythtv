@@ -1,0 +1,98 @@
+                    mfd - Myth Frontend Daemon
+                           Release 0.??
+
+
+GENERAL INFO
+------------
+
+	The mfd is really cool. Audio, networking, zeroconfig.
+
+
+INFORMATION FOR DEVELOPERS
+--------------------------
+
+	The mfd is not terribly complicated. There is a core little object
+(called MFD) that main() creates and hands over control to. It loads in
+plugins. Plugins can either present their own (socket-based) interface to
+the world, or get passed commands that begin with a given token from the
+mfd. For example, the audio plugin has it's own interface, while the dummy
+plugin just uses the mfd's interface and asks for any string of command
+tokens that begin with the term "dummy". The former is called a "service",
+the latter a "capability".
+
+Every plugin (can! must?) run as a separate thread. They can and do create
+their own sub-threads. Any information they want to pass up to the mfd is
+send by QCustomEvents (see events.h/.cpp).
+
+The mfd itself speaks a protocol called mfdp (mfd protocol). This is a
+classic example of YAMUP (yet another made up protocol). The audio plugin
+speaks macp (myth audio control protocol ... which is also YAMUP).
+
+Here's a list of client side mfdp commands (by the time you read this, it
+will probably be out of date). Note that you can play with these at a telnet
+prompt (e.g. telnet localhost 2342).
+
+
+hello             Ask the mfd to say hello.  Should send back "greetings".
+
+
+halt              Make the mfd shut down and exit.
+quit              "                              "
+shutdown          "                              "
+
+
+dummy             This just gets passed to the dummy plugin.  It will
+                  respond with "dummy exists" (assuming the dummy plugin
+                  exists, which it should.) You can also send it the command
+                  "dummy die". It will then generate a FatalEvent, causing
+                  the plugin manager to unload it.
+
+
+reload            Ask the mfd to make the plugin manager reload all plugins. 
+                  This will send "restart" to every connected client and
+                  anything the plugins were in the process of doing will be
+                  shutdown and cleaned out. Normal clients should not do
+                  this.
+
+
+services list     Ask the mfd to send "services found ... " messages to you
+                  listing all the services it is aware of. These are things
+                  that plugins do on their own sockets.
+
+capabilities list This is a list of first tokens that either the mfd itself
+                  or one of its plugins can handle via the mfd's socket
+                  interface. These obviously have the effect of increasing
+                  this list of client side commands (!).
+
+The following are commands that the mfd can send to any client **at any
+time**. That means your code (where "you" are a myth client developer) needs
+to be able to act appropriately:
+
+huh                 If you send something that the mfd (and/or its plugins)
+                    can't parse, you'll (probably?) get back "huh", followed
+                    by the set of tokens it didn't understand.
+
+bye                 Your socket connection is about to be closed because the
+                    mfd is exiting (user killed it, machine is shutting
+                    down, etc.)
+
+restart             All the plugins are being killed and reloaded (mfd
+                    probably got a reload command). Anything you had going
+                    on (a video transcode, music playing, etc.) will get
+                    killed and cleaned up. The socket will stay open,
+                    however, so you can rebuild whatever you need to get
+                    back to where you were.
+
+fatal               Some plugin had a fatal event (it freaked out and had to
+                    be unloaded). If it didn't happen to be (one of) the
+                    plugin(s) handling your requests, then nothing should
+                    change.  However, it may well be that something you were
+                    expecting to happen will not.
+
+services found ...  Some new service has been automagically discovered.
+
+services lost ...   Some service that used to exist has gone away. You may
+                    have to update *lots* of internal data.
+
+capability foo      If you send some commands beginning with the token foo,
+                    there is a plugin that will swallow them.

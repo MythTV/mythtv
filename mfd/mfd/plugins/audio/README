@@ -1,0 +1,9 @@
+
+The mfd audio plugin plays audio.
+
+try telnet 2343
+play file:///wherever/whatever/content.ogg
+pause on
+pause off
+stop
+seek foo    {where foo is a signed integer, seconds}

@@ -1,0 +1,15 @@
+
+The mfd daap server plugin serves audio files via the daap protocol.
+
+The code here is very closely based on the daapd project:
+
+        (c) deleet 2003, Alexander Oberdoerster
+        http://www.deleet.de/projekte/daap/daapd/
+
+It also uses a bunch of routines from libhttpd, a small library for http
+connections (which is how DAAP works). This library is originally Copyright
+(c) 2002 Hughes Technologies Pty Ltd. It was modified by Alexander
+Oberdoerster (for persistence).
+
+    Note that this plugin does not build the stuff in httpd_persistent as a
+library. It uses the code directly in the plugin.
