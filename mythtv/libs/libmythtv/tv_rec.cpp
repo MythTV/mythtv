@@ -1661,9 +1661,18 @@ void TVRec::PauseRecorder(void)
 
 void TVRec::ToggleInputs(void)
 {
+    if (!nvr || !channel || !rbuffer)
+        return;
+
     nvr->WaitForPause();
 
     PauseClearRingBuffer();
+
+    if (!rbuffer)
+    {
+        UnpauseRingBuffer();
+        return;
+    }
 
     rbuffer->Reset();
 
@@ -1677,9 +1686,18 @@ void TVRec::ToggleInputs(void)
 
 void TVRec::ChangeChannel(int channeldirection)
 {
+    if (!nvr || !channel || !rbuffer)
+        return;
+
     nvr->WaitForPause();
 
     PauseClearRingBuffer();
+
+    if (!rbuffer)
+    {
+        UnpauseRingBuffer();
+        return;
+    }
 
     rbuffer->Reset();
 
@@ -1798,9 +1816,18 @@ int TVRec::ChangeHue(bool direction)
 
 void TVRec::SetChannel(QString name)
 {
+    if (!nvr || !channel || !rbuffer)
+        return;
+
     nvr->WaitForPause();
 
     PauseClearRingBuffer();
+
+    if (!rbuffer)
+    {
+        UnpauseRingBuffer();
+        return;
+    }
 
     rbuffer->Reset();
 
@@ -1938,30 +1965,30 @@ void TVRec::GetInputName(QString &inputname)
 
 void TVRec::UnpauseRingBuffer(void)
 {
-    if (!rbuffer)
-        return;
-
-    rbuffer->StartReads();
+    if (rbuffer)
+        rbuffer->StartReads();
     readthreadLock.unlock();
 }
 
 void TVRec::PauseClearRingBuffer(void)
 {
+    readthreadLock.lock();
+
     if (!rbuffer)
         return;
 
     rbuffer->StopReads();
-    readthreadLock.lock();
 }
 
 long long TVRec::SeekRingBuffer(long long curpos, long long pos, int whence)
 {
-    if (!rbuffer)
-        return -1;
-    if (!readthreadlive)
-        return -1;
-
     PauseClearRingBuffer();
+
+    if (!rbuffer || !readthreadlive)
+    {
+        UnpauseRingBuffer();
+        return -1;
+    }
 
     if (whence == SEEK_CUR)
     {
@@ -2003,14 +2030,18 @@ void TVRec::SetReadThreadSock(QSocket *sock)
 
 int TVRec::RequestRingBufferBlock(int size)
 {
-    if (!readthreadlive || !rbuffer)
-        return -1;
-
     char buffer[256001];
     int tot = 0;
     int ret = 0;
 
     readthreadLock.lock();
+
+    if (!readthreadlive || !rbuffer)
+    {
+        readthreadLock.unlock();
+        return -1;
+    }
+
     while (tot < size && !rbuffer->GetStopReads() && readthreadlive)
     {
         int request = size - tot;

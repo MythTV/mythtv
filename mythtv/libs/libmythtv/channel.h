@@ -14,7 +14,7 @@ class TVRec;
 class Channel : public ChannelBase
 {
  public:
-    Channel(TVRec *parent, const QString &videodevice);
+    Channel(TVRec *parent, const QString &videodevice, bool strength = false);
     virtual ~Channel(void);
 
     bool Open(void);
@@ -27,6 +27,9 @@ class Channel : public ChannelBase
     bool ChannelUp(void);
     bool ChannelDown(void);
 
+    bool CheckSignal(int msecWait = 5000, 
+                     int requiredSignalPercentage = 65,
+                     int input = 0);
     unsigned short *Channel::GetV4L1Field(int attrib, 
                                           struct video_picture &vid_pic);
     int Channel::ChangeColourAttribute(int attrib, const char *name, bool up);
@@ -68,6 +71,8 @@ class Channel : public ChannelBase
     int defaultFreqTable;
 
     bool commfree;
+
+    bool usingstrength;
 };
 
 #endif

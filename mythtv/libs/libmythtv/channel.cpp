@@ -17,7 +17,7 @@
 #include <iostream>
 using namespace std;
 
-Channel::Channel(TVRec *parent, const QString &videodevice)
+Channel::Channel(TVRec *parent, const QString &videodevice, bool strength)
        : ChannelBase(parent)
 {
     device = videodevice;
@@ -29,6 +29,7 @@ Channel::Channel(TVRec *parent, const QString &videodevice)
     usingv4l2 = false;
     videomode = VIDEO_MODE_NTSC;
     currentFormat = "";
+    usingstrength = strength;
 }
 
 Channel::~Channel(void)
@@ -401,6 +402,56 @@ bool Channel::SetChannelByString(const QString &chan)
     return true;
 }
 
+template<typename V>
+V clamp(V val, V minv, V maxv) { return std::min(maxv, std::max(minv, val)); }
+
+// Returns ATSC signal strength 0-100. >75 is good.
+int signalStrengthATSC(int device, int input) 
+{
+    struct video_signal vsig;
+
+    int ioctlval = ioctl(device,VIDIOCGSIGNAL,&vsig);
+    if (ioctlval == -1) 
+    {
+        perror("VIDIOCGSIGNAL problem in channel.h's signalStrengthATSC()");
+        return 0;
+    }
+
+    int signal = (input == 0) ? vsig.strength : vsig.aux;
+
+    if ((signal & 0xff) != 0x43) 
+        return 0;
+    else 
+        return clamp(101 - (signal >> 9), 0, 100);
+}
+
+bool Channel::CheckSignal(int msecTotal, int reqSignal, int input) 
+{
+    int msecSleep = 100, maxSignal = 0, i = 0;
+
+    msecTotal = max(msecSleep, msecTotal);
+
+    if (usingstrength) 
+    {
+        for (i = 0; i < (msecTotal / msecSleep) + 1; i++) 
+        {
+            if (i != 0) 
+                usleep(msecSleep);
+            maxSignal = max(maxSignal, signalStrengthATSC(videofd, input));
+            if (maxSignal >= reqSignal) 
+                break;
+        }
+        VERBOSE(VB_IMPORTANT, QString("Maximum signal strength detected: %1\% "
+                                      "after %2 msec wait")
+                                      .arg(maxSignal).arg(i * msecSleep));
+
+        if (maxSignal < reqSignal) 
+            return false;
+    }
+
+    return true;
+}
+
 bool Channel::TuneTo(const QString &channum, int finetune)
 {
     int i = GetCurrentChannelNum(channum);
@@ -409,6 +460,9 @@ bool Channel::TuneTo(const QString &channum, int finetune)
 
     int frequency = curList[i].freq * 16 / 1000 + finetune;
 
+    VERBOSE(VB_CHANNEL, QString("TuneTo(%1) curList[i].freq(%2) freq*16(%3)")
+                                .arg(channum).arg(curList[i].freq)
+                                .arg(frequency));
     if (usingv4l2)
     {
         struct v4l2_frequency vf;
@@ -421,7 +475,7 @@ bool Channel::TuneTo(const QString &channum, int finetune)
             perror("VIDIOC_S_FREQUENCY");
             return false;
         }
-        return true;
+        return CheckSignal();
     }
 
     if (ioctl(videofd, VIDIOCSFREQ, &frequency) == -1)
@@ -430,7 +484,7 @@ bool Channel::TuneTo(const QString &channum, int finetune)
         return false;
     }
 
-    return true;
+    return CheckSignal();
 }
 
 void Channel::SwitchToInput(int newcapchannel, bool setstarting)
