@@ -10,7 +10,7 @@ target.path = $${PREFIX}/bin
 INSTALLS = target
 
 INCLUDEPATH += ../../libs/ ../../libs/libmyth
-LIBS += -L../../libs/libmyth -L../../libs/libmythtv
+LIBS += -L../../libs/libmyth -L../../libs/libmythtv -L../../libs/libavcodec
 LIBS += -lmythtv -lavcodec -lmyth-$$LIBVERSION -lXinerama
 
 DEPENDPATH += ../../libs/libmyth

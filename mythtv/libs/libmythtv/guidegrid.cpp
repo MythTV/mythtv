@@ -73,8 +73,8 @@ GuideGrid::GuideGrid(MythContext *context, const QString &channel,
 
     channelOrdering = context->GetSetting("ChannelSorting", "channum + 0");
 
-    dateformat = m_context->settings()->GetSetting("DateFormat", "ddd MMMM d");
-    timeformat = m_context->settings()->GetSetting("TimeFormat", "h:mm AP");
+    dateformat = m_context->GetSetting("DateFormat", "ddd MMMM d");
+    timeformat = m_context->GetSetting("TimeFormat", "h:mm AP");
 
     unknownTitle = m_context->GetSetting("UnknownTitle", "Unknown");
     unknownCategory = m_context->GetSetting("UnknownCategory", "Unknown");
