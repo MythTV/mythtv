@@ -24,13 +24,17 @@ class CustomRecord : public MythDialog
 
   protected slots:
     void textChanged(void);
+    void clauseChanged(void);
     void addClicked(void);
     void testClicked(void);
     void recordClicked(void);
     void cancelClicked(void);
 
   private:
+    bool checkSyntax(void);
+
     MythRemoteLineEdit *m_title;
+    MythRemoteLineEdit *m_preview;
     MythComboBox *m_clause;
     QStringList m_csql;
     MythRemoteLineEdit *m_description;

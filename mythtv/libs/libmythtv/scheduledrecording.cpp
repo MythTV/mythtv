@@ -116,10 +116,10 @@ void ScheduledRecording::loadBySearch(RecSearchType lsearch,
     MSqlQuery query(MSqlQuery::InitCon());
 
     int rid = 0;
-    QString thequery = QString("SELECT recordid FROM record WHERE "
-                               "search = %1 AND description LIKE '%2'")
-                               .arg(lsearch).arg(forwhat);
-    query.prepare(thequery);
+    query.prepare("SELECT recordid FROM record WHERE "
+                  "search = :SEARCH AND description LIKE :FORWHAT");
+    query.bindValue(":SEARCH", lsearch);
+    query.bindValue(":FORWHAT", forwhat);
 
     if (query.exec() && query.isActive())
     {
