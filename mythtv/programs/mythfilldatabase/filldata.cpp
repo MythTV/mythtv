@@ -1445,13 +1445,6 @@ void parseFile(QString filename, QValueList<ChanInfo> *chanlist,
                     if (!pginfo->desc.isEmpty())
                         groupingDesc = pginfo->desc + " : ";
                 }
-                else if (pginfo->start > pginfo->end)
-                {
-                    cerr << "invalid program (start > end): "
-                         << pginfo->channel << " "
-                         << pginfo->title.local8Bit() << " "
-                         << pginfo->startts << "-" << pginfo->endts << endl;
-                }
                 else
                 {
                     if (pginfo->clumpidx.isEmpty())
@@ -1529,7 +1522,7 @@ void fixProgramList(QValueList<ProgInfo> *fixlist)
         cur = i;
         i++;
         // fill in miss stop times
-        if ((*cur).endts == "")
+        if ((*cur).endts == "" || (*cur).startts > (*cur).endts)
         {
             if (i != fixlist->end())
             {
@@ -1539,8 +1532,15 @@ void fixProgramList(QValueList<ProgInfo> *fixlist)
             else
             {
                 (*cur).end = (*cur).start;
-                (*cur).end.setTime(QTime(0, 0));
-                (*cur).end.setDate((*cur).end.date().addDays(1));
+                if ((*cur).end < QDateTime((*cur).end.date(), QTime(6, 0)))
+                {
+                    (*cur).end.setTime(QTime(6, 0));
+                }
+                else
+                {
+                   (*cur).end.setTime(QTime(0, 0));
+                   (*cur).end.setDate((*cur).end.date().addDays(1));
+                }
 
                 (*cur).endts = (*cur).end.toString("yyyyMMddhhmmss").ascii();
             }
@@ -2105,7 +2105,7 @@ void handlePrograms(int id, int offset, QMap<QString,
             query.bindValue(":STARS", (*i).stars.utf8());
             query.bindValue(":PREVIOUSLYSHOWN", (*i).repeat);
 
-            if (!query.exec(querystr))
+            if (!query.exec())
             {
                 MythContext::DBError("program insert", query);
             }

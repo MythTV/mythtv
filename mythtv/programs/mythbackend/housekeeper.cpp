@@ -70,6 +70,14 @@ bool HouseKeeper::wantToRun(const QString &dbTag, int period, int minhour,
                     runOK = true;
             }
         }
+        else
+        {
+            query = QString("INSERT INTO housekeeping(tag,lastrun) "
+                            "values(\"%1\",now())").arg(dbTag);
+            db->exec(query);
+
+            runOK = true;
+        }
     }
 
     return runOK;

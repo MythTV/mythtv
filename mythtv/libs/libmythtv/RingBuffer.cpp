@@ -7,6 +7,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <errno.h>
 #include <pthread.h>
 #include <qsocket.h>
 #include <qfile.h>

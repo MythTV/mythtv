@@ -331,7 +331,7 @@ bool DVBDiSEqC::Diseqc1xSwitch(dvb_tuning_t& tuning, bool reset,
         cmd.msg[DATA_1] = 0xF0 
                           | (((tuning.diseqc_port) * 4) & 0x0F) 
                           | ((tuning.voltage == SEC_VOLTAGE_18) ? 2 : 0) 
-                          | ((tuning.tone == SEC_TONE_ON) ? 0 : 1);
+                          | ((tuning.tone == SEC_TONE_ON) ? 1 : 0);
 
         if(!SendDiSEqCMessage(tuning,cmd)) 
         {
