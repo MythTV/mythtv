@@ -213,13 +213,13 @@ class MPEG4Option4MV: public CodecParam, public CheckBoxSetting {
 public:
     MPEG4Option4MV(const RecordingProfile& parent):
         CodecParam(parent, "mpeg4option4mv") {
-        setLabel("Enable 4mv encoding");
+        setLabel("Enable 4MV encoding");
         setValue(false);
         setHelpText("If set, the MPEG4 encoder will use '4MV' "
-                    "motion-vecotr encoding option.  This requires "
+                    "motion-vector encoding.  This requires "
                     "much more processing, but can result in better "
-                    "video. It is highly recomended that the HQ option is "
-                    "enabled whenever 4MV is enabled.");
+                    "video. It is highly recommended that the HQ option is "
+                    "enabled if 4MV is enabled.");
     };
 };
 
