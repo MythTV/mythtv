@@ -77,7 +77,10 @@ private slots:
 
     bool validArea;
     bool readReadme;
+    bool pastTime;
     bool convertData;
+    bool firstRun;
+    bool conError;
     int updateInterval;
     int nextpageInterval;
     int nextpageIntArrow;
@@ -87,10 +90,11 @@ private slots:
 
     int con_attempt;
     QTimer *nextpage_Timer;
+    QTimer *update_Timer;
     QTimer *status_Timer;
     QSocket *httpSock;
     void fillList();
-    void GetWeatherData();
+    int GetWeatherData();
     bool gotDataHook;
     void setWeatherTypeIcon(QString[]);
     void setWeatherIcon(QString);
@@ -109,6 +113,7 @@ private slots:
     void setupLayout(int);
     void showLayout(int);
 
+    QFrame *page0Dia;
     QFrame *page1Dia;
     QFrame *page2Dia;
     QFrame *page3Dia;
@@ -116,6 +121,7 @@ private slots:
  
     QVBoxLayout *mid;
     QVBoxLayout *main;
+    QHBoxLayout *page0; 
     QHBoxLayout *page1;
     QHBoxLayout *page2;
     QHBoxLayout *page3;
@@ -146,10 +152,12 @@ private slots:
     QString lowTemp[5];
     QString precip[5];
 
+    QLabel *lbPic0;
     QLabel *lbPic1;
     QLabel *lbPic2;
     QLabel *lbPic3;
     QLabel *lbPic4;
+    QLabel *lbPic5;
     QLabel *date1;
     QLabel *date2;
     QLabel *date3;
@@ -169,6 +177,7 @@ private slots:
     QLabel *tempType;
     QLabel *lbCond;
     QLabel *lbDesc;
+    QLabel *lbTDesc;
     QLabel *lbHumid;
     QLabel *lbPress;
     QLabel *lbWind;

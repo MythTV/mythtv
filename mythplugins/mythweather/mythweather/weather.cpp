@@ -39,6 +39,9 @@ Weather::Weather(MythContext *context,
     validArea = true;
     convertData = false;
     readReadme = false;
+    pastTime = false;
+    firstRun = true;
+    conError = false;
     locale = context->GetSetting("locale");
     if (locale.length() == 0)
     {
@@ -53,7 +56,7 @@ Weather::Weather(MythContext *context,
 
     baseDir = context->GetInstallPrefix();
 
-    updateInterval = 1;
+    updateInterval = 30;
     nextpageInterval = 10;
     nextpageIntArrow = 20;
 
@@ -63,41 +66,45 @@ Weather::Weather(MythContext *context,
 
     firstLayout();
 
+    page0Dia = new QFrame(this);
     page1Dia = new QFrame(this);
     page2Dia = new QFrame(this);
     page3Dia = new QFrame(this);
     page4Dia = new QFrame(this);
 
+    page0Dia->setPaletteForegroundColor(QColor(255, 255, 255));
     page1Dia->setPaletteForegroundColor(QColor(255, 255, 255));
     page2Dia->setPaletteForegroundColor(QColor(255, 255, 255));
     page3Dia->setPaletteForegroundColor(QColor(255, 255, 255));
     page4Dia->setPaletteForegroundColor(QColor(255, 255, 255));
    
+    page0 = new QHBoxLayout(page0Dia, 0);
     page1 = new QHBoxLayout(page1Dia, 0);
     page2 = new QHBoxLayout(page2Dia, 0);
     page3 = new QHBoxLayout(page3Dia, 0);
     page4 = new QHBoxLayout(page4Dia, 0);
 
-    currentPage = 1;
+    currentPage = 0;
+    setupLayout(0);
     setupLayout(1);
     setupLayout(2);
     setupLayout(3);
+    setupLayout(4);
 
     lastLayout();
 
-    showLayout(1);
+    showLayout(0);
 
     QTimer *showtime_Timer = new QTimer(this);
     connect(showtime_Timer, SIGNAL(timeout()), SLOT(showtime_timeout()) );
     showtime_Timer->start(1000);
 
-    QTimer *update_Timer = new QTimer(this);
+    update_Timer = new QTimer(this);
     connect(update_Timer, SIGNAL(timeout()), SLOT(update_timeout()) );
-    update_Timer->start((int)(1000 * 60 * updateInterval));   
+    update_Timer->start((int)(200));   
 
     nextpage_Timer = new QTimer(this);
     connect(nextpage_Timer, SIGNAL(timeout()), SLOT(nextpage_timeout()) );
-    nextpage_Timer->start((int)(1000 * nextpageInterval));
 
     status_Timer = new QTimer(this);
     connect(status_Timer, SIGNAL(timeout()), SLOT(status_timeout()) );
@@ -120,8 +127,6 @@ Weather::Weather(MythContext *context,
     accel->connectItem(accel->insertItem(Key_8), this, SLOT(newLocale8()));
     accel->connectItem(accel->insertItem(Key_9), this, SLOT(newLocale9()));
 
-    update_timeout();
-
 }
 
 void Weather::loadWeatherTypes()
@@ -133,7 +138,7 @@ void Weather::loadWeatherTypes()
    ifstream weather_data(baseDir + "/share/mythtv/mythweather/weathertypes.dat", ios::in);
    if (weather_data == NULL)
    {
-	cerr << "Error reading " << baseDir << "/share/mythtv/mythweather/weathertypes.dat...exiting...\n";
+	cerr << "MythWeather: Error reading " << baseDir << "/share/mythtv/mythweather/weathertypes.dat...exiting...\n";
 	exit(-1); 
    }
 
@@ -330,8 +335,6 @@ void Weather::convertFlip()
 	else
 		convertData = false;
 
- 	locale = m_context->GetSetting("locale");
-
 	update_timeout();
 }
 
@@ -340,8 +343,15 @@ void Weather::cursorLeft()
    nextpage_Timer->changeInterval((int)(1000 * nextpageIntArrow));
    int tp = currentPage;
    tp--;
+
    if (tp == 0)
-        tp = 3;
+        tp = 4;
+
+   if (tp == 3 && pastTime == true)
+	tp = 2;
+
+   if (tp == 4 && pastTime == false)
+	tp = 3;
 
    showLayout(tp);
 }
@@ -351,8 +361,13 @@ void Weather::cursorRight()
    nextpage_Timer->changeInterval((int)(1000 * nextpageIntArrow));
    int tp = currentPage;
    tp++;
-   if (tp == 4)
+   if (tp > 4)
         tp = 1;
+
+   if (tp == 3 && pastTime == true)
+        tp = 4;
+   if (tp == 4 && pastTime == false)
+	tp = 1;
 
    showLayout(tp);
 }
@@ -386,8 +401,13 @@ void Weather::nextpage_timeout()
 
    int tp = currentPage;
    tp++;
-   if (tp == 4)
-        tp = 1;
+   if (tp > 4) 
+	tp = 1;
+
+   if (tp == 3 && pastTime == true)
+	tp = 4;
+   if (tp == 4 && pastTime == false)
+	tp = 1;
 
    showLayout(tp);
 
@@ -397,7 +417,18 @@ void Weather::nextpage_timeout()
 
 void Weather::update_timeout()
 {
+    if (firstRun == true)
+    	update_Timer->changeInterval((int)(1000 * 60 * updateInterval));
+
     UpdateData();
+
+    if (pastTime == true && currentPage == 3)
+	nextpage_timeout();
+    if (pastTime == false && currentPage == 4)
+	nextpage_timeout();
+
+    if (firstRun == true)
+	nextpage_Timer->start((int)(1000 * nextpageInterval));
 
     QFont timeFont("Arial", (int)(18 * hmult), QFont::Bold);
     QFontMetrics fontMet(timeFont);
@@ -466,6 +497,15 @@ void Weather::update_timeout()
 
 
     lbDesc->setText(todayDesc);
+
+    QString tomDesc;
+ 
+    tomDesc = "Forecast for " + date[0] + "...\n\n";
+
+    tomDesc += "Tomorrow expect a high of " + highTemp[0] + " and a low of ";
+    tomDesc += lowTemp[0] + ".\n\nExpected conditions: " + weatherType[0];
+ 
+    lbTDesc->setText(tomDesc);
 
     lbUpdated->setText("Last Update: " + updated);
 
@@ -568,10 +608,28 @@ void Weather::update_timeout()
     }
     delete tempimageD;
 
+    QImage *tempimageE = new QImage();
+    QPixmap pic5;
+    if (tempimageE->load(weatherIcon[0]))
+    {
+    QImage tmp2e;
+    tmp2e = tempimageE->smoothScale((int)(200 * wmult),
+                                 (int)(150 * hmult));
+    pic5.convertFromImage(tmp2e);
+    }
+    delete tempimageE;
+
     lbPic1->setPixmap(pic1);
     lbPic2->setPixmap(pic2);
     lbPic3->setPixmap(pic3);
     lbPic4->setPixmap(pic4);
+    lbPic5->setPixmap(pic5);
+
+    if (firstRun == true)
+    {
+    	firstRun = false;
+	nextpage_timeout();
+    }
 
 }
 
@@ -579,7 +637,8 @@ void Weather::showLayout(int pageNum)
 {
 
    QString pageDesc;
-   
+   if (pageNum == 0)
+	hdPart1->setText("please wait...");
    if (pageNum == 1)
 	hdPart1->setText("current conditions");
    if (pageNum == 2)
@@ -587,12 +646,13 @@ void Weather::showLayout(int pageNum)
    if (pageNum == 3)
 	hdPart1->setText("today's forecast");
    if (pageNum == 4)
-	hdPart1->setText("radar map");
+	hdPart1->setText("tomorrow's forecast");
 
    switch (currentPage)
    {
-	case 1:	
-		page1Dia->hide();
+	case 0:	page0Dia->hide();
+		break;
+	case 1:	page1Dia->hide();
 		break;
 	case 2: page2Dia->hide();
 		break;
@@ -606,6 +666,9 @@ void Weather::showLayout(int pageNum)
 
    switch (currentPage)
    {
+	case 0:
+		page0Dia->show();
+		break;
 	case 1: 
 		page1Dia->show();
                 break;
@@ -704,26 +767,10 @@ void Weather::firstLayout()
    topLine->addWidget(lbLocale, 0, 0);
    topLine->addWidget(lbStatus, 0, 0);
 
-   QString txtLocale = city + ", ";
-   if (state.length() == 0)
-   {
-	txtLocale += country + " (" + locale;
-                if (validArea == false)
-                        txtLocale += " is invalid)";
-                else
-                        txtLocale += ")";
-   }
-   else
-   {
-        txtLocale += state + ", " + country + " (" + locale;
-                if (validArea == false)
-                        txtLocale += " is invalid)";
-                else
-                        txtLocale += ")";
-   }
+   QString txtLocale = "Location: " + locale;
 
    if (readReadme == true)
-       txtLocale += "   No Location Set, Please read the README";
+       txtLocale = "No Location Set, Please read the README";
 
    lbLocale->setText(txtLocale);
 
@@ -757,7 +804,7 @@ void Weather::lastLayout()
    QFont lohiFont("Arial", (int)(16 * hmult), QFont::Bold);
    QFontMetrics lohiFM(lohiFont);
 
-   lbUpdated = new QLabel("Last Update: " + updated, this);
+   lbUpdated = new QLabel("Updating ... ", this);
    lbUpdated->setAlignment( Qt::AlignVCenter);
    lbUpdated->setPaletteBackgroundColor(QColor(20, 40, 255));
    lbUpdated->setPaletteForegroundColor(QColor(240, 200, 0));
@@ -785,6 +832,37 @@ void Weather::setupLayout(int pageNum)
 
    QFont bigtFont("Arial", (int)(48 * hmult), QFont::Bold);
    QFontMetrics bigtMet(bigtFont);
+
+   if (pageNum == 0)
+   {
+	hdPart1->setText("current conditions");
+   	QHBoxLayout *ext0  = new QHBoxLayout(0, 0, 0);
+
+   	ext0->addStrut((int)(310*hmult));
+
+   	page0->addLayout(ext0, 0);
+
+ 	hdPart1->setText("please wait...");
+
+  	QImage *tempimage0 = new QImage();
+   	QPixmap pic0;
+   	if (tempimage0->load(baseDir + "/share/mythtv/mythweather/images/mwmain.png"))
+   	{
+   	QImage tmp20;
+   	tmp20 = tempimage0->smoothScale((int)(750 * wmult),
+   	                              (int)(296 * hmult));
+   	pic0.convertFromImage(tmp20);
+   	}
+   	delete tempimage0;
+
+   	lbPic0 = new QLabel(" ", page0Dia);
+   	lbPic0->setPaletteBackgroundColor(QColor(20, 40, 255));
+   	lbPic0->setPixmap(pic0);
+   	lbPic0->setFrameStyle( QFrame::Panel | QFrame::Raised );
+
+	ext0->addWidget(lbPic0, 0);
+
+   }
  
    if (pageNum == 1)
    {
@@ -1278,25 +1356,25 @@ if (pageNum == 3)
    hdPart1->setText("today's forecast");
    QString todayDesc;
 
-   todayDesc = "Today a high of " + highTemp[0] + " and a low of ";
-   todayDesc += lowTemp[0] + ". Currently there is a humidity of ";
-   todayDesc += curHumid + "% and the winds are";
-   if (winddir == "CALM")
-         todayDesc += " calm.";
-    else
-    {
-        if (convertData == false)
-                todayDesc += " coming in at " + curWind + " mph from the " + winddir + ".";
-        else
-                todayDesc += " coming in at " + curWind + " Km/h from the " + winddir + ".";
-    }
-
-   if (visibility.toFloat() == 999.00)
-        todayDesc += " Visibility will be unlimited for today.";
+  todayDesc = "Today a high of " + highTemp[0] + " and a low of ";
+  todayDesc += lowTemp[0] + ". Currently there is a humidity of ";
+  todayDesc += curHumid + "% and the winds are";
+  if (winddir == "CALM")
+        todayDesc += " calm.";
    else
    {
+       if (convertData == false)
+               todayDesc += " coming in at " + curWind + " mph from the " + winddir + ".";
+       else
+               todayDesc += " coming in at " + curWind + " Km/h from the " + winddir + ".";
+   }
+
+ if (visibility.toFloat() == 999.00)
+       todayDesc += " Visibility will be unlimited for today.";
+  else
+  {
 	if (convertData == false)
-            todayDesc += " There will be a visibility of " + visibility + " miles.";
+       	    todayDesc += " There will be a visibility of " + visibility + " miles.";
 	else
 	    todayDesc += " There will be a visibility of " + visibility + " kilometers.";
    }
@@ -1312,8 +1390,58 @@ if (pageNum == 3)
    ext3->addWidget(lbDesc, 0);
 }
 
+if (pageNum == 4)
+{
+   QHBoxLayout *ext4  = new QHBoxLayout(0, 0, 0);
+
+   ext4->addStrut((int)(310*wmult));
+
+   page4->addLayout(ext4, 0);
+
+   hdPart1->setText("tomorrow's forecast");
+
+   QString tomDesc;
+
+   tomDesc = "Forecast for " + date[0] + "...\n\n";
+   tomDesc += "Tomorrow expect a high of " + highTemp[0] + " and a low of ";
+   tomDesc += lowTemp[0] + ".\n\nExpected conditions: " + weatherType[0];
+
+   QImage *tempimageE = new QImage();
+   QPixmap pic5;
+   if (tempimageE->load(weatherIcon[0]))
+   {
+   QImage tmp2e;
+   tmp2e = tempimageE->smoothScale((int)(200 * wmult),
+                                 (int)(150 * hmult));
+   pic5.convertFromImage(tmp2e);
+   }
+   delete tempimageE;
+
+   lbPic5 = new QLabel(" ", page4Dia);
+   lbPic5->setPaletteBackgroundColor(QColor(20, 40, 255));
+   lbPic5->setPixmap(pic5);
+   lbPic5->setFrameStyle( QFrame::Panel | QFrame::Raised );
+
+
+   lbTDesc = new QLabel(tomDesc, page4Dia);
+   lbTDesc->setAlignment( Qt::AlignTop | Qt::AlignLeft | Qt::WordBreak);
+   lbTDesc->setPaletteBackgroundColor(QColor(20, 40, 255));
+   lbTDesc->setFont(headFont);
+   lbTDesc->setMinimumWidth((int)(550*wmult));
+   lbTDesc->setMaximumWidth((int)(750*wmult));
+   lbTDesc->setFrameStyle( QFrame::Panel | QFrame::Raised );
+
+   ext4->addWidget(lbPic5, 0);
+   ext4->addWidget(lbTDesc, 0);
+}
+
    switch (pageNum)
    {
+
+	case 0:
+		page0Dia->hide();
+		mid->addWidget(page0Dia, 0, 0);
+		break;
 	case 1:
 		page1Dia->hide();
 		mid->addWidget(page1Dia, 0, 0);
@@ -1343,8 +1471,34 @@ void Weather::Show()
 
 void Weather::UpdateData()
 {
+	int check = -1;
+	int cnt = 0;
 	accel->setEnabled(false);
-	GetWeatherData();
+	while (check != 0)
+	{
+		check = GetWeatherData();
+		if (check == -2)
+		{
+			cnt = 0;
+			while (cnt < 250)
+			{
+				qApp->processEvents();
+				usleep(50);
+				cnt++;
+			}
+		}
+		if (check == 1)
+		{
+			cnt = 0;
+			while (cnt < 750)
+			{
+				qApp->processEvents();
+				usleep(50);
+				cnt++;
+			}
+		}	
+		
+	}
 	accel->setEnabled(true);
 
 	if (httpData.find("<html>", 0) > 0 || 
@@ -1365,17 +1519,27 @@ void Weather::UpdateData()
 
 	//cout << "HTTP DATA: " << httpData << endl;
 
+	updated = GetString("this.swLastUp");
+
 	city = GetString("this.swCity");
 	state = GetString("this.swSubDiv");
 	country = GetString("this.swCountry");
 	curTemp = GetString("this.swTemp");
-	if (convertData == true)
+	if (curTemp.length() == 0)
 	{
+		curTemp = "-na-";
+		updated = updated + " (Not All Information Available)";
+	}
+	else
+	{
+	    if (convertData == true)
+	    {
 		char tempHold[32];
 		double tTemp = curTemp.toDouble();
 		double nTemp = (double)(5.0/9.0)*(tTemp - 32.0);
 		sprintf (tempHold, "%.1f", nTemp);
 		curTemp = tempHold;
+	    }
 	}
 
 	curIcon = GetString("this.swCIcon");
@@ -1420,7 +1584,6 @@ void Weather::UpdateData()
                 sprintf (tempHold, "%.1f", nTemp);
                 visibility = tempHold;
         }
-	updated = GetString("this.swLastUp");
 	description = GetString("this.swConText");
    	if (description.length() == 0)
 		description = curIcon;
@@ -1431,6 +1594,19 @@ void Weather::UpdateData()
   	QStringList holdings = QStringList::split("|", forecastData);
   
  	int years, mons, days;
+
+	int dayNum = (holdings[0]).toInt();
+	QDate curDay(QDate::currentDate());
+	int curDayNum = curDay.dayOfWeek();
+	if (curDayNum == 7)
+		curDayNum = 1;
+	else
+		curDayNum++;
+
+	if (curDayNum != dayNum)
+		pastTime = true;
+	else
+		pastTime = false;
 
 	for (int i = 5; i < 9; i++)
         {
@@ -1486,7 +1662,11 @@ void Weather::UpdateData()
 void Weather::setWeatherTypeIcon(QString wt[5])
 {
 	bool isSet = false;
-	for (int i = 1; i < 5; i++)
+        int start = 1;
+	if (pastTime == true)
+		start = 0;
+
+	for (int i = start; i < 5; i++)
 	{
 		isSet = false;
 		for (int j = 0; j < 128; j++)
@@ -1512,7 +1692,7 @@ void Weather::setWeatherIcon(QString txtType)
 {
 	for (int j = 0; j < 128; j++)
 	{
-		if (txtType == wData[j].typeName)
+		if (txtType.remove(" ") == (wData[j].typeName).remove(" "))
 		{
 			curIcon = wData[j].typeIcon;
 			return;
@@ -1573,7 +1753,7 @@ return ret;
 
 }
 
-void Weather::GetWeatherData()
+int Weather::GetWeatherData()
 {
 	status_Timer->start(100);
 	gotDataHook = false;
@@ -1588,8 +1768,11 @@ void Weather::GetWeatherData()
         connect( httpSock, SIGNAL(error(int)),
                 SLOT(socketError(int)) );
 
-	//cerr << "Connecting to host..." << endl;
+	//cerr << "MythWeather: Connecting to host..." << endl;
+	lbUpdated->setText("Contacting Host...");
 	httpSock->connectToHost("www.msnbc.com", 80);
+
+	con_attempt++;
 
 	int num = 0;
         while (httpSock->state() == QSocket::HostLookup ||
@@ -1598,65 +1781,79 @@ void Weather::GetWeatherData()
          qApp->processEvents();
          usleep(50);
          num++;
-         if (num > 1000)
+         if (num > 500)
          {
-             cerr << "Connection timed out.\n";
-	     con_attempt++;
-	     updated = "Connection Timed Out ... Attempt #" + con_attempt;
+	     char tMsg[1024];
+	     sprintf (tMsg, "Connection Timed Out ... Attempt #%d", con_attempt);
+	     updated = tMsg;
    	     lbUpdated->setText(updated);
 	     closeConnection();
 
 	     if (httpData.length() == 0)
 	     {
-			cerr << "No Data ... Trying Again ...\n";
+			cerr << "MythWeather: (2) No Data ... Trying Again ...\n";
 			lbStatus->setText(" ");
 			status_Timer->stop();
 			delete httpSock;
-			GetWeatherData();
-			return;
+			return -2;
  	     }
 	     else
 	     {
 		lbStatus->setText(" ");
 		status_Timer->stop();
-	     	return;
+	     	return 1;
 	     }
          }
         }
 
         if (httpSock->state() != QSocket::Connected)
         {
-		con_attempt++;
-                updated = "Error Connecting ... Attempt #" + con_attempt;
+		char tMsg[1024];
+	        sprintf (tMsg, "Error Connecting ... Attempt #%d", con_attempt);
+             	updated = tMsg;
 		lbUpdated->setText(updated);
 	        closeConnection();
 
 		if (httpData.length() == 0)
-             {
-                        cerr << "No Data ... Trying Again ...\n";
+                {
+			char tMsg[1024];
+                	sprintf (tMsg, "Error Connecting ... Attempt #%d", con_attempt);
+                	updated = tMsg;
+                	lbUpdated->setText(updated);
+                        cerr << "MythWeather: (1) No Data ... Trying Again ...\n";
 			lbStatus->setText(" ");
 			status_Timer->stop();
+			con_attempt++;
 			delete httpSock;
-                        GetWeatherData();
-             }
-             else
-	     {
-		lbStatus->setText(" ");
-	        status_Timer->stop();
-                return;
-	     }
+			return 1;
+                }
+                else
+	        {
+			delete httpSock;
+			lbStatus->setText(" ");
+	        	status_Timer->stop();
+                	return 1;
+	     	}
         }
 
   	while (gotDataHook == false)
 	{
 		qApp->processEvents();
 		usleep(50);
+		if (conError == true)
+		{
+			conError = false;
+			delete httpSock;
+			return 1;
+		}
 	}
 
 	con_attempt = 0;
 	lbStatus->setText(" ");
         status_Timer->stop();
  	delete httpSock;
+
+	return 0;
 }
 
 void Weather::closeConnection()
@@ -1674,18 +1871,26 @@ void Weather::closeConnection()
 
     void Weather::socketReadyRead()
     {
-	//cerr << "Reading Data From Host [";
+	char tMsg[1024];
+        sprintf (tMsg, "Reading data [%d bytes read]...", httpData.length());
+        updated = tMsg;
+	lbUpdated->setText(updated);
+	//cerr << "MythWeather: Reading Data From Host [";
         while ( httpSock->canReadLine() ) {
 	    //cerr << ".";
             httpData = httpData + httpSock->readLine();
+	    sprintf (tMsg, "Reading data [%d bytes read]...", httpData.length());
+            updated = tMsg;
+            lbUpdated->setText(updated);
         }
 	//cerr << "]\n";
     }
 
     void Weather::socketConnected()
     {
+	lbUpdated->setText("Connected, requesting weather data...");
 	QTextStream os(httpSock);
-	//cerr << "Connected! Requesting Weather Data ...\n";
+	//cerr << "MythWeather: Connected! Requesting Weather Data ...\n";
         os << "GET /m/chnk/d/weather_d_src.asp?acid=" 
 	   << locale << " HTTP/1.1\n"
 	   << "Connection: close\n"
@@ -1704,9 +1909,11 @@ void Weather::closeConnection()
 
     void Weather::socketError( int e )
     {
-	con_attempt++;
-        updated = "Error Connecting ... Attempt #" + con_attempt;
- 	lbUpdated->setText(updated);
+	conError = true;
+	char tMsg[1024];
+        sprintf (tMsg, "Error Connecting ... Attempt #%d", con_attempt);
+        updated = tMsg;
+        lbUpdated->setText(updated);
         closeConnection();
 	e = 0;
     }
