@@ -55,8 +55,8 @@ private:
     void updateInfoView();
     
     void keyPressEvent(QKeyEvent *e);
-    void cursorUp();
-    void cursorDown();
+    void cursorUp(bool page=false);
+    void cursorDown(bool page=false);
     void cursorRight();
     void cursorLeft();
 

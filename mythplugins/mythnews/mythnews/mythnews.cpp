@@ -346,8 +346,12 @@ void MythNews::keyPressEvent(QKeyEvent *e)
 
         if (action == "UP")
             cursorUp();
+        else if (action == "PAGEUP")
+             cursorUp(true);
         else if (action == "DOWN")
             cursorDown();
+        else if (action == "PAGEDOWN")
+             cursorDown(true);
         else if (action == "LEFT")
             cursorLeft();
         else if (action == "RIGHT")
@@ -366,23 +370,27 @@ void MythNews::keyPressEvent(QKeyEvent *e)
         MythDialog::keyPressEvent(e);
 }
 
-void MythNews::cursorUp()
+void MythNews::cursorUp(bool page)
 {
+    UIListBtnType::MovementUnit unit = page ? UIListBtnType::MovePage : UIListBtnType::MoveItem;
+
     if (m_InColumn == 0) {
-        m_UISites->MoveUp();
+        m_UISites->MoveUp(unit);
     }
     else {
-        m_UIArticles->MoveUp();
+        m_UIArticles->MoveUp(unit);
     }
 }
 
-void MythNews::cursorDown()
+void MythNews::cursorDown(bool page)
 {
+    UIListBtnType::MovementUnit unit = page ? UIListBtnType::MovePage : UIListBtnType::MoveItem;
+
     if (m_InColumn == 0) {
-        m_UISites->MoveDown();
+        m_UISites->MoveDown(unit);
     }
     else {
-        m_UIArticles->MoveDown();
+        m_UIArticles->MoveDown(unit);
     }
 }
 
