@@ -34,6 +34,10 @@ DEFINES += USING_IVTV
 # LCDProc support
 #DEFINES += LCD_DEVICE
 
+# Default audio output, OSS
+CONFIG += using_oss
+DEFINES += USING_OSS
+
 # Native ALSA support
 #CONFIG += using_alsa
 #ALSA_LIBS = -lasound

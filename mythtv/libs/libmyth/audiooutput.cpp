@@ -40,16 +40,16 @@ AudioOutput *AudioOutput::OpenAudio(QString audiodevice, int audio_bits,
         return NULL;
 #endif
     }
-#ifdef USING_DIRECTX
+#if defined(USING_DIRECTX)
     else
         return new AudioOutputDX(audiodevice, audio_bits,
                                   audio_channels, audio_samplerate);
-#endif
-
-#ifndef _WIN32
+#elif defined(USING_OSS)
     else
         return new AudioOutputOSS(audiodevice, audio_bits,
                                   audio_channels, audio_samplerate);
+#else
+#error Need a default audio driver
 #endif
 
     return NULL;
