@@ -380,6 +380,7 @@ void fixProgramList(QValueList<ProgInfo> *fixlist)
             }
             else
             {
+                (*cur).end = (*cur).start;
                 (*cur).end.setTime(QTime(0, 0));
                 (*cur).end.setDate((*cur).end.date().addDays(1));
 
