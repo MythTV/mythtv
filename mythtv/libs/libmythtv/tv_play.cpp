@@ -933,8 +933,7 @@ void TV::RunTV(void)
             OSDSet *set = osd->GetSet("channel_number");
             if (set && !set->Displaying())
             {
-                if (internalState == kState_WatchingLiveTV ||
-                    internalState == kState_WatchingRecording)
+                if (internalState == kState_WatchingLiveTV)
                     ChannelCommit();
                 else
                     ChannelClear();
