@@ -1611,7 +1611,7 @@ void Scheduler::AddFuturePrograms(const QDateTime &now) {
 "record.recordid, recordoverride.type, "
 "program.starttime - INTERVAL record.startoffset minute, "
 "program.endtime + INTERVAL record.endoffset minute, "
-"program.previouslyshown, record.recgroup, record.dupmethod "
+"program.previouslyshown, record.recgroup, record.dupmethod, channel.commfree "
 "FROM record "
 " INNER JOIN channel ON (channel.chanid = program.chanid) "
 " INNER JOIN program ON (program.title = record.title) "
@@ -1711,7 +1711,8 @@ void Scheduler::AddFuturePrograms(const QDateTime &now) {
 
         proginfo->recstartts = result.value(18).toDateTime();
         proginfo->recendts = result.value(19).toDateTime();
-
+        proginfo->chancommfree = result.value(23).toInt();
+        
         if (!recTypeRecPriorityMap.contains(proginfo->rectype))
             recTypeRecPriorityMap[proginfo->rectype] = 
                 proginfo->GetRecordingTypeRecPriority(proginfo->rectype);
@@ -1801,7 +1802,7 @@ void Scheduler::findAllScheduledPrograms(list<ProgramInfo*>& proglist)
 "record.startdate, record.endtime, record.enddate, record.title, "
 "record.subtitle, record.description, record.recpriority, record.type, "
 "channel.name, record.recordid, record.recgroup, record.dupin, "
-"record.dupmethod FROM record "
+"record.dupmethod, channel.commfree FROM record "
 "LEFT JOIN channel ON (channel.chanid = record.chanid) "
 "ORDER BY title ASC;");
 
@@ -1852,7 +1853,8 @@ void Scheduler::findAllScheduledPrograms(list<ProgramInfo*>& proglist)
             proginfo->dupin = RecordingDupInType(result.value(13).toInt());
             proginfo->dupmethod =
                 RecordingDupMethodType(result.value(14).toInt());
-
+            proginfo->chancommfree = result.value(15).toInt();
+            
             proginfo->recstartts = proginfo->startts;
             proginfo->recendts = proginfo->endts;
 
