@@ -18,7 +18,7 @@
 <A HREF="http://www.mythtv.org">mythtv.org</A>
 web site.  Save the tarball to a directory you can find.</P>
 <P>Get XMLTV from 
-<A HREF="http://xmltv.sourceforge.net">http://xmltv.sourceforge.net</A>.  Download version 0.5.2</P>
+<A HREF="http://xmltv.sourceforge.net">http://xmltv.sourceforge.net</A>.  Download version 0.5.3</P>
 <P>Get lame from 
 <A HREF="http://www.mp3dev.org/mp3">http://www.mp3dev.org/mp3</A>.  Download the source code to v3.92 by
 following the links to sourceforge.net</P>
@@ -105,8 +105,8 @@ xmltv file.</P>
 <P>Untar the xmltv file:
 <BLOCKQUOTE><CODE>
 <PRE>
-% tar -xjf xmltv-0.5.2.tar.bz2
-% cd xmltv-0.5.2
+% tar -xjf xmltv-0.5.3.tar.bz2
+% cd xmltv-0.5.3
 </PRE>
 </CODE></BLOCKQUOTE>
 
@@ -127,7 +127,7 @@ cpan> exit
 <P>Change to the XMLTV directory and compile it:
 <BLOCKQUOTE><CODE>
 <PRE>
-% cd xmltv-0.5.2
+% cd xmltv-0.5.3
 % perl Makefile.PL
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -174,11 +174,27 @@ Switch to superuser:
 <H2><A NAME="Gentoo_build"></A> <A NAME="ss5.5">5.5</A> <A HREF="mythtv-HOWTO.html#toc5.5">Gentoo. </A>
 </H2>
 
+<P>[Documentation being finalized]</P>
 <P>There are ebuilds setup for mythtv and for XMLTV.  To use them, do the
-following:</P>
-<P>Create a local portage directory and specify it in <CODE>/etc/make.conf</CODE>
+following.</P>
+<P>First, edit your <CODE>/etc/make.conf</CODE> file so that it looks like this:
 <BLOCKQUOTE><CODE>
 <PRE>
+# Build-time functionality
+# ========================
+#
+# The USE variable is used to enable optional build-time functionality. For
+# example, quite a few packages have optional X, gtk or GNOME functionality
+# that can only be enabled or disabled at compile-time. Gentoo Linux has a
+# very extensive set of USE variables described in our USE variable HOWTO at
+# http://www.gentoo.org/doc/use-howto.html
+#
+# The available list of use flags with descriptions is in your portage tree.
+# Use 'less' to view them:  --> less /usr/portage/profiles/use.desc &lt;--
+#
+# Example:
+#USE="X gtk gnome -alsa"
+USE="mysql qt dvd X -alsa gtk gnome -esd oss"
 # PORTDIR_OVERLAY is a directory where local ebuilds may be stored without
 #     concern that they will be deleted by rsync updates. Default is not
 #     defined.
@@ -186,7 +202,7 @@ PORTDIR_OVERLAY=/home/[yourusername]/portage
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>Next:
+<P>Next, create the following directories:
 <BLOCKQUOTE><CODE>
 <PRE>
 mkdir -p /home/[yourusername]/portage/video-media/mythtv
@@ -206,6 +222,9 @@ ebuild names are wrong.  The two ebuilds are:</P>
 <A HREF="http://bugs.gentoo.org/show_bug.cgi?id=10536">http://bugs.gentoo.org/show_bug.cgi?id=10536</A></LI>
 </UL>
 </P>
+<P>By default, Gentoo doesn't build QT libraries with SQL support.  To
+enable SQL support you need to rebuild QT by running "emerge qt".</P>
+<P>You will also need to perform an "emerge mysql" step.</P>
 <P>emerge mythtv.  It should download the source then complain about a missing 
 digest.  To fix this </P>
 <P>
@@ -225,7 +244,7 @@ it into thinking XML-Twig is installed.  To achieve this: </P>
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>Build XML-Twig the long way and install.</P>
+
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -234,7 +253,7 @@ it into thinking XML-Twig is installed.  To achieve this: </P>
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss5.6">5.6</A> <A HREF="mythtv-HOWTO.html#toc5.6">Debian</A>
+<H2><A NAME="ss5.6">5.6</A> <A HREF="mythtv-HOWTO.html#toc5.6">Debian.</A>
 </H2>
 
 <P>Debian packages for MythTV and some of its add-on modules have been

@@ -1,6 +1,6 @@
   Installing and using mythtv
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2002-11-28, v1.037
+  2002-11-28, v1.038
 
   Initially, installation of mythtv seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -28,7 +28,6 @@
      4.1 Distribution-specific information.
         4.1.1 Mandrake 9.0
         4.1.2 Red Hat Linux 8.0
-        4.1.3 Gentoo.
      4.2 Checking that it worked.
      4.3 Modifying /etc/ld.so.conf
 
@@ -38,7 +37,7 @@
      5.3 Building XMLTV.
      5.4 Manually building mythtv.
      5.5 Gentoo.
-     5.6 Debian
+     5.6 Debian.
 
   6. MySQL.
      6.1 Mandrake 9.0
@@ -373,10 +372,6 @@
   distributions" instructions in the "Configuring mythtv" section later
   in this document.
 
-  [1m4.1.3.  Gentoo.[0m
-
-  [Please submit instructions]
-
   [1m4.2.  Checking that it worked.[0m
 
   Open a shell and switch to superuser mode again.
@@ -412,7 +407,7 @@
   the tarball to a directory you can find.
 
   Get XMLTV from http://xmltv.sourceforge.net
-  <http://xmltv.sourceforge.net>.  Download version 0.5.2
+  <http://xmltv.sourceforge.net>.  Download version 0.5.3
 
   Get lame from http://www.mp3dev.org/mp3 <http://www.mp3dev.org/mp3>.
   Download the source code to v3.92 by following the links to
@@ -488,8 +483,8 @@
 
   Untar the xmltv file:
 
-       % tar -xjf xmltv-0.5.2.tar.bz2
-       % cd xmltv-0.5.2
+       % tar -xjf xmltv-0.5.3.tar.bz2
+       % cd xmltv-0.5.3
 
   Install the xmltv prerequisites:
 
@@ -504,7 +499,7 @@
 
   Change to the XMLTV directory and compile it:
 
-       % cd xmltv-0.5.2
+       % cd xmltv-0.5.3
        % perl Makefile.PL
 
   You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes"
@@ -514,11 +509,11 @@
   matter if you're installing North America and have followed the
   instructions to this point.
 
-  % make
-  % make test
-  % su
-  # make install
-  # exit
+       % make
+       % make test
+       % su
+       # make install
+       # exit
 
   [1m5.4.  Manually building mythtv.[0m
 
@@ -537,17 +532,34 @@
 
   [1m5.5.  Gentoo.[0m
 
+  [Documentation being finalized]
+
   There are ebuilds setup for mythtv and for XMLTV.  To use them, do the
-  following:
+  following.
 
-  Create a local portage directory and specify it in /etc/make.conf
+  First, edit your /etc/make.conf file so that it looks like this:
 
+       # Build-time functionality
+       # ========================
+       #
+       # The USE variable is used to enable optional build-time functionality. For
+       # example, quite a few packages have optional X, gtk or GNOME functionality
+       # that can only be enabled or disabled at compile-time. Gentoo Linux has a
+       # very extensive set of USE variables described in our USE variable HOWTO at
+       # http://www.gentoo.org/doc/use-howto.html
+       #
+       # The available list of use flags with descriptions is in your portage tree.
+       # Use 'less' to view them:  --> less /usr/portage/profiles/use.desc <--
+       #
+       # Example:
+       #USE="X gtk gnome -alsa"
+       USE="mysql qt dvd X -alsa gtk gnome -esd oss"
        # PORTDIR_OVERLAY is a directory where local ebuilds may be stored without
        #     concern that they will be deleted by rsync updates. Default is not
        #     defined.
        PORTDIR_OVERLAY=/home/[yourusername]/portage
 
-  Next:
+  Next, create the following directories:
 
        mkdir -p /home/[yourusername]/portage/video-media/mythtv
        mkdir -p /home/[yourusername]/portage/dev-perl/xmltv
@@ -563,6 +575,11 @@
   +o  XMLTV: http://bugs.gentoo.org/show_bug.cgi?id=10536
      <http://bugs.gentoo.org/show_bug.cgi?id=10536>
 
+  By default, Gentoo doesn't build QT libraries with SQL support.  To
+  enable SQL support you need to rebuild QT by running "emerge qt".
+
+  You will also need to perform an "emerge mysql" step.
+
   emerge mythtv.  It should download the source then complain about a
   missing digest.  To fix this
 
@@ -575,11 +592,9 @@
 
        % emerge inject dev-perl/XML-Twig
 
-  Build XML-Twig the long way and install.
-
        % emerge mysql
 
-  [1m5.6.  Debian[0m
+  [1m5.6.  Debian.[0m
 
   Debian packages for MythTV and some of its add-on modules have been
   packaged by Matt Zimmerman  <mailto:mdz@debian.org> and are available
@@ -637,10 +652,10 @@
 
   if this returns an error message try switching to root first.
 
-  % su
-  # mysql < mc.sql
-  # exit
-  %
+       % su
+       # mysql < mc.sql
+       # exit
+       %
 
   [1m7.  Setting up ALSA and the mixer.[0m
 

@@ -22,6 +22,8 @@ v1.035, 2002-11-25.  Added information on Gentoo.
 v1.036, 2002-11-27.  Added information on using an IR Blaster.
 v1.037, 2002-11-28.  Added information on RH 8.0 environment setting by Mike
 Cencula, additional modifications on Genoo by Tony Clark.
+v1.038, 2002-11-28.  Modified the XMLTV version to get, still working on the
+Gentoo instructions.
 -->
 <!--
 To create documentation, execute "% linuxdoc -B html mythtv-HOWTO.sgml" or
@@ -32,7 +34,7 @@ To create documentation, execute "% linuxdoc -B html mythtv-HOWTO.sgml" or
 
 <title>Installing and using mythtv
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2002-11-28, v1.037
+<date>2002-11-28, v1.038
 <abstract>
 Initially, installation of mythtv seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -298,10 +300,6 @@ LANG="en_US"
 By making these modifications, you can follow the "other distributions"
 instructions in the "Configuring mythtv" section later in this document.
 
-<sect2>Gentoo.
-
-<p>[Please submit instructions]
-
 <sect1>Checking that it worked.
 <p>Open a shell and switch to superuser mode again.
 <tscreen><verb>
@@ -336,7 +334,7 @@ found when we need them.
 web site.  Save the tarball to a directory you can find.
 
 Get XMLTV from <url url="http://xmltv.sourceforge.net"
-name="http://xmltv.sourceforge.net">.  Download version 0.5.2
+name="http://xmltv.sourceforge.net">.  Download version 0.5.3
 
 Get lame from <url url="http://www.mp3dev.org/mp3"
 name="http://www.mp3dev.org/mp3">.  Download the source code to v3.92 by
@@ -410,8 +408,8 @@ Open a shell prompt:
 
 Untar the xmltv file:
 <tscreen><verb>
-% tar -xjf xmltv-0.5.2.tar.bz2
-% cd xmltv-0.5.2
+% tar -xjf xmltv-0.5.3.tar.bz2
+% cd xmltv-0.5.3
 </verb></tscreen>
 Install the xmltv prerequisites:
 <tscreen><verb>
@@ -427,7 +425,7 @@ cpan> exit
 
 Change to the XMLTV directory and compile it:
 <tscreen><verb>
-% cd xmltv-0.5.2
+% cd xmltv-0.5.3
 % perl Makefile.PL
 </verb></tscreen>
 You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes" to
@@ -460,18 +458,34 @@ Switch to superuser:
 </verb></tscreen>
 
 <sect1>Gentoo. <label id="Gentoo_build">
+<p>[Documentation being finalized]
 <p>There are ebuilds setup for mythtv and for XMLTV.  To use them, do the
-following:
+following.
 
-Create a local portage directory and specify it in <tt>/etc/make.conf</tt>
+First, edit your <tt>/etc/make.conf</tt> file so that it looks like this:
 <tscreen><verb>
+# Build-time functionality
+# ========================
+#
+# The USE variable is used to enable optional build-time functionality. For
+# example, quite a few packages have optional X, gtk or GNOME functionality
+# that can only be enabled or disabled at compile-time. Gentoo Linux has a
+# very extensive set of USE variables described in our USE variable HOWTO at
+# http://www.gentoo.org/doc/use-howto.html
+#
+# The available list of use flags with descriptions is in your portage tree.
+# Use 'less' to view them:  --> less /usr/portage/profiles/use.desc <--
+#
+# Example:
+#USE="X gtk gnome -alsa"
+USE="mysql qt dvd X -alsa gtk gnome -esd oss"
 # PORTDIR_OVERLAY is a directory where local ebuilds may be stored without
 #     concern that they will be deleted by rsync updates. Default is not
 #     defined.
 PORTDIR_OVERLAY=/home/[yourusername]/portage
 </verb></tscreen>
 
-Next:
+Next, create the following directories:
 <tscreen><verb>
 mkdir -p /home/[yourusername]/portage/video-media/mythtv
 mkdir -p /home/[yourusername]/portage/dev-perl/xmltv
@@ -489,6 +503,11 @@ name="http://bugs.gentoo.org/show_bug.cgi?id=10533">
 name="http://bugs.gentoo.org/show_bug.cgi?id=10536">
 </itemize>
 
+By default, Gentoo doesn't build QT libraries with SQL support.  To
+enable SQL support you need to rebuild QT by running "emerge qt".
+
+You will also need to perform an "emerge mysql" step.
+
 emerge mythtv.  It should download the source then complain about a missing 
 digest.  To fix this 
 
@@ -505,13 +524,13 @@ it into thinking XML-Twig is installed.  To achieve this:
 % emerge inject dev-perl/XML-Twig
 </verb></tscreen>
 
-Build XML-Twig the long way and install.
+<!-- Build XML-Twig the long way and install. -->
 
 <tscreen><verb>
 % emerge mysql
 </verb></tscreen>
 
-<sect1>Debian
+<sect1>Debian.
 <p>Debian packages for MythTV and some of its add-on modules have been
 packaged by Matt Zimmerman <url url="mailto:mdz@debian.org"> and are
 available at <url
