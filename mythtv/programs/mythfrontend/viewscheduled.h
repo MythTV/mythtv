@@ -67,6 +67,8 @@ class ViewScheduled : public MythDialog
     bool pageDowner;
     QString dateformat;
     QString timeformat;
+    QString shortdateformat;
+
     QAccel *accel;
 
     int inList;

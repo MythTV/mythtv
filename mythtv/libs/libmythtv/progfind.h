@@ -29,8 +29,8 @@ void RunProgramFind(bool thread = false);
 
 class ProgFinder : public MythDialog
 {
-  struct showRecord {
-
+    struct showRecord 
+    {
         QString title;
         QString subtitle;
         QString description;
@@ -44,23 +44,22 @@ class ProgFinder : public MythDialog
 	QDateTime startdatetime;
 	int recording;
 	QString recText;
+    };
 
-};
-
-struct recordingRecord {
-
+    struct recordingRecord 
+    {
         QString chanid;
         QDateTime startdatetime;
         QString title;
         QString subtitle;
         QString description;
         int type;
+    };
 
-};
     Q_OBJECT
   public:
     ProgFinder(QWidget *parent = 0, const char *name = 0);
-    ~ProgFinder();
+   ~ProgFinder();
 
   protected:
     void hideEvent(QHideEvent *e);
@@ -126,15 +125,6 @@ struct recordingRecord {
 
     QSqlDatabase *m_db;
 
-    int rectListLeft;
-    int rectListTop;
-    int rectListWidth;
-    int rectListHeight;
-    int rectInfoLeft;
-    int rectInfoTop;
-    int rectInfoWidth;
-    int rectInfoHeight;
-
     void showSearchList();
     void showProgramList();
     void showShowingList();
@@ -147,8 +137,11 @@ struct recordingRecord {
     void getSearchData(int);
     void getInitialProgramData();
 
-    QRect infoRect() const;
-    QRect listRect() const;
+    QRect listRect;
+    QRect infoRect;
+
+    QString dateFormat;
+    QString timeFormat;
 };
 
 #endif

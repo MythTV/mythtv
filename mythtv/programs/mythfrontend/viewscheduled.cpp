@@ -38,6 +38,10 @@ ViewScheduled::ViewScheduled(QSqlDatabase *ldb, QWidget *parent,
     listCount = 0;
     dataCount = 0;
 
+    dateformat = gContext->GetSetting("DateFormat", "ddd MMMM d");
+    shortdateformat = gContext->GetSetting("ShortDateFormat", "M/d");
+    timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
+
     fullRect = QRect(0, 0, size().width(), size().height());
     listRect = QRect(0, 0, 0, 0);
     infoRect = QRect(0, 0, 0, 0);
@@ -430,8 +434,6 @@ void ViewScheduled::updateList(QPainter *p)
   
     QString tempSubTitle = "";
     QString tempDate = "";
-    QString showDateFormat = "M/d";
-    QString showTimeFormat = "h:mm AP";
     QString tempTime = "";
     QString tempChan = "";
 
@@ -466,8 +468,8 @@ void ViewScheduled::updateList(QPainter *p)
                             tempSubTitle = tempSubTitle + " - \"" + 
                                            tempInfo->subtitle + "\"";
 
-                        tempDate = (tempInfo->startts).toString(showDateFormat);
-                        tempTime = (tempInfo->startts).toString(showTimeFormat);
+                        tempDate = (tempInfo->startts).toString(shortdateformat);
+                        tempTime = (tempInfo->startts).toString(timeformat);
 
                         tempChan = tempInfo->chanstr;
 
@@ -585,9 +587,6 @@ void ViewScheduled::updateInfo(QPainter *p)
         QDateTime startts = curitem->startts;
         QDateTime endts = curitem->endts;
 
-        QString dateformat = gContext->GetSetting("DateFormat", "ddd MMMM d");
-        QString timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
-        
         QString timedate = startts.date().toString(dateformat) + ", " +
                            startts.time().toString(timeformat) + " - " +
                            endts.time().toString(timeformat);
@@ -812,9 +811,6 @@ void ViewScheduled::handleDuplicate(ProgramInfo *rec)
 void ViewScheduled::chooseConflictingProgram(ProgramInfo *rec)
 {
     vector<ProgramInfo *> *conflictlist = RemoteGetConflictList(rec, true);
-
-    QString dateformat = gContext->GetSetting("DateFormat", "ddd MMMM d");
-    QString timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
 
     QString message = tr("The follow scheduled recordings conflict with each "
                          "other.  Which would you like to record?");

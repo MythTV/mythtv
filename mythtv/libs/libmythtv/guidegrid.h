@@ -97,46 +97,17 @@ class GuideGrid : public MythDialog
 
     int m_context;
 
-    int rectProgLeft;
-    int rectProgTop;
-    int rectProgWidth;
-    int rectProgHeight;
-    int rectInfoLeft;
-    int rectInfoTop;
-    int rectInfoWidth;
-    int rectInfoHeight;
-    int rectDateLeft;
-    int rectDateTop;
-    int rectDateWidth;
-    int rectDateHeight;
-    int rectChanLeft;
-    int rectChanTop;
-    int rectChanWidth;
-    int rectChanHeight;
-    int rectTimeLeft;
-    int rectTimeTop;
-    int rectTimeWidth;
-    int rectTimeHeight;
-    int rectCurILeft;
-    int rectCurITop;
-    int rectCurIWidth;
-    int rectCurIHeight;
-    int rectVideoLeft;
-    int rectVideoTop;
-    int rectVideoWidth;
-    int rectVideoHeight;
-
     int gridfilltype;
     int scrolltype;
 
-    QRect fullRect() const;
-    QRect dateRect() const;
-    QRect channelRect() const;
-    QRect timeRect() const;
-    QRect programRect() const;
-    QRect infoRect() const;
-    QRect curInfoRect() const;
-    QRect videoRect() const;
+    QRect fullRect;
+    QRect dateRect;
+    QRect channelRect;
+    QRect timeRect;
+    QRect programRect;
+    QRect infoRect;
+    QRect curInfoRect;
+    QRect videoRect;
 
     void fillChannelInfos(int &maxchannel, bool gotostartchannel = true);
 

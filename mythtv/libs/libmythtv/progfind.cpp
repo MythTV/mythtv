@@ -1,6 +1,6 @@
 /*
         MythProgramFind
-	January 19th, 2003
+        January 19th, 2003
         Updated: 4/8/2003, John Danner
                  Updated code to use new ui.xml file.
 
@@ -31,7 +31,6 @@ using namespace std;
 
 #include "libmyth/mythcontext.h"
 
-
 void RunProgramFind(bool thread)
 {
     if (thread)
@@ -53,14 +52,19 @@ void RunProgramFind(bool thread)
     return;
 }
 
-
 ProgFinder::ProgFinder(QWidget *parent, const char *name)
-           : MythDialog(parent, name)
+          : MythDialog(parent, name)
 {
     running = true;
     m_db = QSqlDatabase::database();
 
     baseDir = gContext->GetInstallPrefix();
+
+    listRect = QRect(0, 0, 0, 0);
+    infoRect = QRect(0, 0, 0, 0);
+
+    timeFormat = gContext->GetSetting("TimeFormat");
+    dateFormat = gContext->GetSetting("DateFormat");
 
     accel = new QAccel(this);
     accel->connectItem(accel->insertItem(Key_Left), this, SLOT(cursorLeft()));
@@ -99,6 +103,7 @@ ProgFinder::ProgFinder(QWidget *parent, const char *name)
         cerr << "Failed to get selector object.\n";
         exit(0);
     }
+
     updateBackground();
 
     curSearch = 10;
@@ -107,7 +112,7 @@ ProgFinder::ProgFinder(QWidget *parent, const char *name)
     if (showsPerListing < 1)
         showsPerListing = 7;
     if (showsPerListing % 2 == 0)
-	showsPerListing = showsPerListing + 1;
+        showsPerListing = showsPerListing + 1;
 
     inSearch = 0;
     pastInitial = false;
@@ -122,11 +127,11 @@ ProgFinder::ProgFinder(QWidget *parent, const char *name)
     for (int charNum = 48; charNum < 91; charNum++)
     {
         if (charNum == 58)
-        	charNum = 65;
+                charNum = 65;
 
-	gotInitData[curLabel] = 0; 
+        gotInitData[curLabel] = 0; 
         searchData[curLabel] = (char)charNum;
-	curLabel++;
+        curLabel++;
     }
 
     update_Timer = new QTimer(this);
@@ -145,18 +150,14 @@ ProgFinder::ProgFinder(QWidget *parent, const char *name)
 
     showFullScreen();
     setActiveWindow();
-//    raise();
-//    setFocus();
-
 }
 
 ProgFinder::~ProgFinder()
 {
-
     if (inSearch > 0)
         delete [] progData;
     if (inSearch == 2)
-    	delete [] showData;
+            delete [] showData;
     delete [] searchData;
     delete [] initData; 
 
@@ -166,7 +167,6 @@ ProgFinder::~ProgFinder()
 
     delete theme;
     delete accel;
-
 }
 
 void ProgFinder::updateBackground(void)
@@ -195,11 +195,11 @@ void ProgFinder::paintEvent(QPaintEvent *e)
     QRect r = e->rect();
     QPainter p(this);
 
-    if (r.intersects(listRect()))
+    if (r.intersects(listRect))
     {
         updateList(&p);
     }
-    if (r.intersects(infoRect()))
+    if (r.intersects(infoRect))
     {
         updateInfo(&p);
     }
@@ -207,7 +207,7 @@ void ProgFinder::paintEvent(QPaintEvent *e)
 
 void ProgFinder::updateList(QPainter *p)
 {
-    QRect pr = listRect();
+    QRect pr = listRect;
     QPixmap pix(pr.size());
     pix.fill(this, pr.topLeft());
     QPainter tmp(&pix);
@@ -278,7 +278,7 @@ void ProgFinder::updateList(QPainter *p)
 
 void ProgFinder::updateInfo(QPainter *p)
 {
-    QRect pr = infoRect();
+    QRect pr = infoRect;
     QPixmap pix(pr.size());
     pix.fill(this, pr.topLeft());
     QPainter tmp(&pix);
@@ -311,7 +311,8 @@ void ProgFinder::updateInfo(QPainter *p)
         channum = showData[curShow].channelNum;
         channame = showData[curShow].channelCallsign;
         title = progData[curProgram];
-        timedate = showData[curShow].startDisplay + " - " + showData[curShow].endDisplay;
+        timedate = showData[curShow].startDisplay + " - " + 
+                   showData[curShow].endDisplay;
         if (showData[curShow].subtitle.stripWhiteSpace().length() > 0)
             subtitle = "\"" + showData[curShow].subtitle + "\"";
         else 
@@ -321,8 +322,9 @@ void ProgFinder::updateInfo(QPainter *p)
 
         if (gotInitData[curSearch] == 1)
         {
-            title = "No Programs";
-            description = "There are no available programs under this search. Please select another search.";
+            title = tr("No Programs");
+            description = tr("There are no available programs under this "
+                             "search. Please select another search.");
         }
 
         container = theme->GetSet("program_info");
@@ -388,10 +390,8 @@ void ProgFinder::showGuide()
     emit killTheApp();
 }
 
-
 void ProgFinder::LoadWindow(QDomElement &element)
 {
-
     for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling())
     {
@@ -423,19 +423,9 @@ void ProgFinder::parseContainer(QDomElement &element)
     theme->parseContainer(element, name, context, area);
 
     if (name.lower() == "selector")
-    {
-        rectListLeft = area.left();
-        rectListTop = area.top();
-        rectListWidth = area.width();
-        rectListHeight = area.height();
-    }
+        listRect = area;
     if (name.lower() == "program_info")
-    {
-        rectInfoLeft = area.left();
-        rectInfoTop = area.top();
-        rectInfoWidth = area.width();
-        rectInfoHeight = area.height();
-    }
+        infoRect = area;
 }
 
 void ProgFinder::getInfo()
@@ -444,86 +434,86 @@ void ProgFinder::getInfo()
     QString data = "";
     if (inSearch == 2)
     {
-	showInfo = 1;
-	ProgramInfo *curPick = ProgramInfo::GetProgramAtDateTime(curChannel,curDateTime + "50");
+        showInfo = 1;
+        ProgramInfo *curPick = ProgramInfo::GetProgramAtDateTime(curChannel,
+                                                            curDateTime + "50");
 
-  	if (curPick)
-    	{
-        	InfoDialog diag(curPick, this, "Program Info");
-        	diag.setCaption("BLAH!!!");
-        	diag.exec();
-    	}
-    	else
-	{
-        	return;
-	}
-	showInfo = 0;
+        if (curPick)
+        {
+            InfoDialog diag(curPick, this, "Program Info");
+            diag.setCaption("BLAH!!!");
+            diag.exec();
+        }
+        else
+        {
+            return;
+        }
+        showInfo = 0;
 
-    	curPick->GetProgramRecordingStatus(m_db);
+        curPick->GetProgramRecordingStatus(m_db);
 
-	getRecordingInfo();
+        getRecordingInfo();
 
-	for (int i = 0; i < showCount; i++)
-	{
-		rectype = checkRecordingStatus(i);
-                showData[i].recording = rectype;
+        for (int i = 0; i < showCount; i++)
+        {
+            rectype = checkRecordingStatus(i);
+            showData[i].recording = rectype;
 
-                switch (rectype)
-                {
-                        case ScheduledRecording::SingleRecord:
-                            data = tr("Recording just this showing");
-                            break;
-                        case ScheduledRecording::TimeslotRecord:
-                            data = tr("Recording when shown in this timeslot");
-                            break;
-                        case ScheduledRecording::ChannelRecord:
-                            data = tr("Recording when shown on this channel");
-                            break;
-                        case ScheduledRecording::AllRecord:
-                            data = tr("Recording all showings");
-                            break;
-                        case ScheduledRecording::NotRecording:
-                            data = tr("Not recording this showing");
-                            break;
-                        default:
-                            data = "Error!";
-                }
+            switch (rectype)
+            {
+                case ScheduledRecording::SingleRecord:
+                    data = tr("Recording just this showing");
+                    break;
+                case ScheduledRecording::TimeslotRecord:
+                    data = tr("Recording when shown in this timeslot");
+                    break;
+                case ScheduledRecording::ChannelRecord:
+                    data = tr("Recording when shown on this channel");
+                    break;
+                case ScheduledRecording::AllRecord:
+                    data = tr("Recording all showings");
+                    break;
+                case ScheduledRecording::NotRecording:
+                    data = tr("Not recording this showing");
+                    break;
+                default:
+                    data = tr("Error!");
+                    break;
+            }
 
-                showData[i].recText = data;
-	}
+            showData[i].recText = data;
+        }
 
-	showShowingList();
-
-    	setActiveWindow();
-    	setFocus();
-
+        showShowingList();
+        setActiveWindow();
+        setFocus();
     }
-
 }
 
 void ProgFinder::update_timeout()
 {
-	if (pastInitial == false)
-	{
-		update_Timer->stop();
-		pastInitial = true;
-		getInitialProgramData();
-	}
-	else
-	{
-	  if (inSearch == 0 && gotInitData[curSearch] == 0)
-	  {
-	    int cnt = 0;
+    if (pastInitial == false)
+    {
+        update_Timer->stop();
+        pastInitial = true;
+        getInitialProgramData();
+    }
+    else
+    {
+        if (inSearch == 0 && gotInitData[curSearch] == 0)
+        {
+            int cnt = 0;
 
-    	    for (int j = 0; j < searchCount; j++)
-   	    {
-        	  if (gotInitData[j] > 1)
-        	        cnt++;
- 	    } 
+            for (int j = 0; j < searchCount; j++)
+            {
+                if (gotInitData[j] > 1)
+                    cnt++;
+            } 
 
- 	    int amountDone = (int)(100.0 * (float)((float)cnt / (float)searchCount));
-
- 	    QString data = QString(" Loading Data...%1% Complete").arg(amountDone);
+            int amountDone = (int)(100.0 * (float)((float)cnt / 
+                                   (float)searchCount));
+            QString data = QString(" Loading Data...%1% Complete")
+                                  .arg(amountDone);
             cout << data << endl;
           
             LayerSet *container = theme->GetSet("selector");
@@ -533,11 +523,10 @@ void ProgFinder::update_timeout()
                 if (ltype)
                     ltype->SetItemText((int)(showsPerListing / 2), data);
             }
-            update(listRect());
-   	  }
-	}
+            update(listRect);
+        }
+    }
 }
-
 
 void ProgFinder::cursorLeft()
 {
@@ -554,14 +543,15 @@ void ProgFinder::cursorLeft()
             clearShowData();
         }
     }
-    update(infoRect());
-    update(listRect());
+    update(infoRect);
+    update(listRect);
 }
 
 void ProgFinder::cursorRight()
 {
-    if (inSearch == 2) {
-        getInfo();
+    if (inSearch == 2) 
+    {
+    //    getInfo();
     }
     else
     {
@@ -569,7 +559,7 @@ void ProgFinder::cursorRight()
         if (inSearch == 1)
         {
             if (gotInitData[curSearch] == 0)
-		getSearchData(curSearch);
+                getSearchData(curSearch);
             if (gotInitData[curSearch] >= 10)
                 selectSearchData();
             if (gotInitData[curSearch] == 1)
@@ -579,190 +569,181 @@ void ProgFinder::cursorRight()
                 {
                     UIListType *ltype = (UIListType *)container->GetType("shows");
                     if (ltype)
-                        ltype->SetItemText((int)(showsPerListing / 2), "       !! No Programs !!");
+                        ltype->SetItemText((int)(showsPerListing / 2), 
+                                           tr("       !! No Programs !!"));
                 }
-		inSearch = 0;
-	    }
+                inSearch = 0;
+            }
         }
         if (inSearch == 2)
         {
             if (gotInitData[curSearch] > 10)
                 selectShowData(progData[curProgram]);
             else
-	        inSearch = 1;
+                inSearch = 1;
         }
     }
-    update(infoRect());
-    update(listRect());
+    update(infoRect);
+    update(listRect);
 }
 
 void ProgFinder::pageUp()
 {
-   if (inSearch == 0)
-   {
+    if (inSearch == 0)
+    {
         curSearch = curSearch - showsPerListing;
         if (curSearch <= -1)
-                curSearch = searchCount + curSearch;
+            curSearch = searchCount + curSearch;
 
-	if (gotInitData[curSearch] <= 1)
-		clearProgramList();
+        if (gotInitData[curSearch] <= 1)
+            clearProgramList();
         else
-        	showSearchList();
-   }
-   if (inSearch == 1)
-   {
+            showSearchList();
+    }
+    if (inSearch == 1)
+    {
         curProgram = curProgram - showsPerListing;
         if (curProgram <= -1)
-                curProgram = listCount + curProgram;
+            curProgram = listCount + curProgram;
 
         showProgramList();
-   }
-   if (inSearch == 2)
-   {
-	curShow = curShow - showsPerListing;
-	if (curShow <= -1)
-		curShow = showCount + curShow;
+    }
+    if (inSearch == 2)
+    {
+        curShow = curShow - showsPerListing;
+        if (curShow <= -1)
+            curShow = showCount + curShow;
 
-	showShowingList();
-   }
+        showShowingList();
+    }
 }
 
 void ProgFinder::pageDown()
 {
-   if (inSearch == 0)
-   {
+    if (inSearch == 0)
+    {
         curSearch = curSearch + showsPerListing;
 
         if (curSearch >= searchCount)
-                curSearch = curSearch - searchCount;
+            curSearch = curSearch - searchCount;
 
-	if (gotInitData[curSearch] <= 1)
-		clearProgramList();
+        if (gotInitData[curSearch] <= 1)
+            clearProgramList();
         else
-        	showSearchList();
-   }
-   if (inSearch == 1)
-   {
+            showSearchList();
+    }
+    if (inSearch == 1)
+    {
         curProgram = curProgram + showsPerListing;
         if (curProgram >= listCount)
-                curProgram = curProgram - listCount;
+            curProgram = curProgram - listCount;
 
         showProgramList();
-   }
-   if (inSearch == 2)
-   {
+    }
+    if (inSearch == 2)
+    {
         curShow = curShow + showsPerListing;
         if (curShow >= showCount)
-                curShow = curShow - showCount;
+            curShow = curShow - showCount;
 
         showShowingList();
-   }
+    }
 }
 
 void ProgFinder::cursorUp()
 {
+    if (inSearch == 0)
+    {
+        curSearch--;
+        if (curSearch == -1)
+            curSearch = searchCount - 1;
 
-   if (inSearch == 0)
-   {
-	curSearch--;
-	if (curSearch == -1)
-		curSearch = searchCount - 1;
-
-	if (gotInitData[curSearch] <= 1)
-		clearProgramList();
+        if (gotInitData[curSearch] <= 1)
+            clearProgramList();
         else
-		showSearchList();
-   }
-   if (inSearch == 1)
-   {
-	curProgram--;
+            showSearchList();
+    }
+    if (inSearch == 1)
+    {
+        curProgram--;
         if (curProgram == -1)
-	{
-              curProgram = listCount - 1;
-	      while (progData[curProgram] == "**!0")
-		   curProgram--;
+        {
+            curProgram = listCount - 1;
+            while (progData[curProgram] == "**!0")
+                curProgram--;
+        }
 
-	}
+        showProgramList();
+    }
+    if (inSearch == 2)
+    {
+        curShow--;
+        if (curShow == -1)
+        {
+            curShow = showCount - 1;
+            while (showData[curShow].title == "**!0")
+                curShow--;
+        }
 
-	showProgramList();
-   }
-   if (inSearch == 2)
-   {
-	curShow--;
-	if (curShow == -1)
-	{
-		curShow = showCount - 1;
-		while (showData[curShow].title == "**!0")
-			curShow--;
-	}
-
-	showShowingList();
-   }
+        showShowingList();
+    }
 }
 
 void ProgFinder::cursorDown()
 {
-   if (inSearch == 0)
-   {
-	curSearch++;
-	if (curSearch >= searchCount)
-		curSearch = 0;
+    if (inSearch == 0)
+    {
+        curSearch++;
+        if (curSearch >= searchCount)
+            curSearch = 0;
 
-	if (gotInitData[curSearch] <= 1)
-		clearProgramList();
+        if (gotInitData[curSearch] <= 1)
+            clearProgramList();
         else
-		showSearchList();
-   }
-   if (inSearch == 1)
-   {
+            showSearchList();
+    }
+    if (inSearch == 1)
+    {
         if ((curProgram + 1) >= listCount)
-		curProgram = -1;
+            curProgram = -1;
 
-	if (progData[curProgram + 1] != "**!0")
-	{
-		curProgram++;
-		if (curProgram == listCount)
-			curProgram = 0;
+        if (progData[curProgram + 1] != "**!0")
+        {
+            curProgram++;
+            if (curProgram == listCount)
+                curProgram = 0;
 
-		showProgramList();
-	}
-	else
-	{
-		curProgram = 0;
-		showProgramList();
-	}
-   }
-   if (inSearch == 2)
-   {
+            showProgramList();
+        }
+        else
+        {
+            curProgram = 0;
+            showProgramList();
+        }
+    }
+    if (inSearch == 2)
+    {
         if ((curShow + 1) >= showCount)
-		curShow = -1;
-	
-	if (showData[curShow + 1].title != "**!0")
-	{
-		curShow++;
-		if (curShow == showCount)
-			curShow = 0;
+            curShow = -1;
+        
+        if (showData[curShow + 1].title != "**!0")
+        {
+            curShow++;
+            if (curShow == showCount)
+                curShow = 0;
 
-		showShowingList();
-	}
-	else
-	{
-		curShow = 0;
-		showShowingList();
-	}
-   }
+            showShowingList();
+        }
+        else
+        {
+            curShow = 0;
+            showShowingList();
+        }
+    }
 }
 
 void ProgFinder::showSearchList()
 {
-/*
-	if (programTitle->text() == "No Programs")
-	{
-		programTitle->setText(tr("Select a program..."));
-    		description->setText(tr("Select the title of the program you wish to find. When finished return with the left arrow key. Hitting 'Info' will allow you to setup recording options"));
-	}
-*/
-
     int curLabel = 0;
     int t = 0;
     int tempSearch;
@@ -774,115 +755,116 @@ void ProgFinder::showSearchList()
     container = theme->GetSet("selector");
     if (container)
     {
-
         UIListType *ltype = (UIListType *)container->GetType("alphabet");
         if (ltype)
         {
             ltype->ResetList();
-	    for (int i = (tempSearch - ((showsPerListing - 1) / 2));
-	         i < (tempSearch + ((showsPerListing + 1) / 2)); i++)
-	    {
-		t = i;
+            for (int i = (tempSearch - ((showsPerListing - 1) / 2));
+                 i < (tempSearch + ((showsPerListing + 1) / 2)); i++)
+            {
+                t = i;
                 if (i < 0)
-                        t = i + searchCount;
+                    t = i + searchCount;
                 if (i >= searchCount)
-                        t = i - searchCount;
-		if (t < 0)
-			cerr << "MythProgFind: -1 Error in showSearchList()\n";
+                    t = i - searchCount;
+                if (t < 0)
+                    cerr << "MythProgFind: -1 Error in showSearchList()\n";
 
                 if (searchData[t] != NULL)
                 {
-			if (curLabel == (int)(showsPerListing / 2))
-                                ltype->SetItemText(curLabel, " " + searchData[t] + " ");
-		        else
-                                ltype->SetItemText(curLabel, " " + searchData[t] + " ");
+                    if (curLabel == (int)(showsPerListing / 2))
+                        ltype->SetItemText(curLabel, " " + searchData[t] + " ");
+                    else
+                        ltype->SetItemText(curLabel, " " + searchData[t] + " ");
                 }
                 else
-                        ltype->SetItemText(curLabel, "");
+                    ltype->SetItemText(curLabel, "");
                 curLabel++;
             }
-	}
+        }
 
         ltype = (UIListType *)container->GetType("shows");
         if (ltype)
         {
             ltype->ResetList();
-	    if (gotInitData[curSearch] > 1)
-	    {
+            if (gotInitData[curSearch] > 1)
+            {
                 if (update_Timer->isActive() == true)
-		   update_Timer->stop();
+                    update_Timer->stop();
 
                 curLabel = 0; 
 
-	        for (int i = (int)(tempSearch*showsPerListing); i < (int)((tempSearch+1)*showsPerListing); i++)
-	        {    
-		     if (initData[i] != NULL)
-		     {
-			if (curLabel == (int)(showsPerListing / 2))
-                            ltype->SetItemText(curLabel, " " + initData[i] + " ");
+                for (int i = (int)(tempSearch * showsPerListing); 
+                     i < (int)((tempSearch + 1) * showsPerListing); i++)
+                {    
+                    if (initData[i] != NULL)
+                    {
+                        if (curLabel == (int)(showsPerListing / 2))
+                            ltype->SetItemText(curLabel, " " + initData[i] + 
+                                               " ");
                         else
-                            ltype->SetItemText(curLabel, " " + initData[i] + " ");
-		     }
-		     else
-                        ltype->SetItemText(curLabel, "");
-		     curLabel++;
-	        }
+                            ltype->SetItemText(curLabel, " " + initData[i] + 
+                                               " ");
+                     }
+                     else
+                         ltype->SetItemText(curLabel, "");
+                     curLabel++;
+                }
             }
-	}
-	else
-	{
-		update_Timer->start((int)250);
-	}
+        }
+        else
+        {
+            update_Timer->start((int)250);
+        }
     }
-    update(listRect());
-    update(infoRect());
+
+    update(listRect);
+    update(infoRect);
 }
 
 void ProgFinder::showProgramList()
 {
-
     if (gotInitData[curSearch] > 1)
     {
-         LayerSet *container = NULL;
+        LayerSet *container = NULL;
         container = theme->GetSet("selector");
         if (container)
         {
-
             UIListType *ltype = (UIListType *)container->GetType("shows");
             if (ltype)
             {
-
-	        int curLabel = 0;
-	        int t = 0;
-	        for (int i = (curProgram - ((showsPerListing - 1) / 2)); 
-   	             i < (curProgram + ((showsPerListing + 1) / 2)); i++)
-	        {
-		     t = i;
-		     if (i < 0)
-			 t = i + listCount;
-		     if (i >= listCount)
-			 t = i - listCount;
-	
-                     if (progData[t] != NULL)
-                     {
-		         if (progData[t] != "**!0")
-		         {
-		             if (curLabel == (int)(showsPerListing / 2))
-                                 ltype->SetItemText(curLabel, " " + progData[t] + " ");
-			     else
-                                ltype->SetItemText(curLabel, " " + progData[t] + " ");
-  		         }
-		         else
-	                     ltype->SetItemText(curLabel, "");
-		     }
-		     else
-                         ltype->SetItemText(curLabel, "");
-		     curLabel++;
+                int curLabel = 0;
+                int t = 0;
+                for (int i = (curProgram - ((showsPerListing - 1) / 2)); 
+                        i < (curProgram + ((showsPerListing + 1) / 2)); i++)
+                {
+                    t = i;
+                    if (i < 0)
+                        t = i + listCount;
+                    if (i >= listCount)
+                        t = i - listCount;
+        
+                    if (progData[t] != NULL)
+                    {
+                        if (progData[t] != "**!0")
+                        {
+                            if (curLabel == (int)(showsPerListing / 2))
+                                ltype->SetItemText(curLabel, " " + progData[t] 
+                                                   + " ");
+                            else
+                                ltype->SetItemText(curLabel, " " + progData[t] 
+                                                   + " ");
+                        }
+                        else
+                            ltype->SetItemText(curLabel, "");
+                    }
+                    else
+                        ltype->SetItemText(curLabel, "");
+                    curLabel++;
                 }
             }
         }
-        update(listRect());
-
+        update(listRect);
     }
 }
 
@@ -905,45 +887,46 @@ void ProgFinder::showShowingList()
                 for (int i = (curShow - ((showsPerListing - 1) / 2));
                      i < (curShow + ((showsPerListing + 1) / 2)); i++)
                 {
-                     t = i;
-                     if (i < 0)
-                         t = i + showCount;
-                     if (i >= showCount)
-                         t = i - showCount;
+                    t = i;
+                    if (i < 0)
+                        t = i + showCount;
+                    if (i >= showCount)
+                        t = i - showCount;
 
-	  	     if ((&showData[t]) != NULL)
-		     {
-		         if (showData[t].title != "**!0")
-		         {
-                             ltype->SetItemText(curLabel, " " + showData[t].startDisplay);
-			
-		  	     if (curLabel != (int)(showsPerListing / 2) &&
-                                 showData[t].recording > 0)
-                                 ltype->EnableForcedFont(curLabel, "recording");
+                    if ((&showData[t]) != NULL)
+                    {
+                        if (showData[t].title != "**!0")
+                        {
+                            ltype->SetItemText(curLabel, " " + 
+                                               showData[t].startDisplay);
+                        
+                            if (curLabel != (int)(showsPerListing / 2) &&
+                                showData[t].recording > 0)
+                                ltype->EnableForcedFont(curLabel, "recording");
 
-                         }  
-		         else
-                             ltype->SetItemText(curLabel, "");
-		      }	
-		      else
-		      {
+                        }  
+                        else
+                            ltype->SetItemText(curLabel, "");
+                    }        
+                    else
+                    {
                         ltype->SetItemText(curLabel, "");
-		      }
-		      curLabel++;
-                 }
-             } 
+                    }
+                    curLabel++;
+                }
+            } 
         }
-	curChannel = showData[curShow].channelID;
+        curChannel = showData[curShow].channelID;
         curDateTime = showData[curShow].starttime;
     }
-    update(infoRect());
-    update(listRect());
+    update(infoRect);
+    update(listRect);
 }
 
 void ProgFinder::selectSearchData()
 {
     if (running == false)
-	return;
+        return;
 
     accel->setEnabled(false);
     QDateTime progStart = QDateTime::currentDateTime();
@@ -952,13 +935,14 @@ void ProgFinder::selectSearchData()
 
     thequery = QString("SELECT DISTINCT title "
                        "FROM program "
-                       "WHERE ( title LIKE '%1%' OR title LIKE 'The %2%' OR title LIKE 'A %3%' ) "
-		       "AND starttime > %4 "
+                       "WHERE ( title LIKE '%1%' OR title LIKE 'The %2%' "
+                       "OR title LIKE 'A %3%' ) "
+                       "AND starttime > %4 "
                        "ORDER BY title;")
                         .arg(searchData[curSearch])
-			.arg(searchData[curSearch])
-			.arg(searchData[curSearch])
-			.arg(progStart.toString("yyyyMMddhhmm50"));
+                        .arg(searchData[curSearch])
+                        .arg(searchData[curSearch])
+                        .arg(progStart.toString("yyyyMMddhhmm50"));
 
     QSqlQuery query = m_db->exec(thequery);
  
@@ -977,89 +961,89 @@ void ProgFinder::selectSearchData()
 
     if (query.isActive() && rows > 0)
     {
-	typedef QMap<QString,QString> ShowData;
-	ShowData tempList;
+        typedef QMap<QString,QString> ShowData;
+        ShowData tempList;
 
         while (query.next())
         {
-		if (running == false)
-			return;
-		data = QString::fromUtf8(query.value(0).toString());
+            if (running == false)
+                return;
+            data = QString::fromUtf8(query.value(0).toString());
 
-		if (searchData[curSearch] == "T" || searchData[curSearch] == "A")
-		{
-
-		    if (data.left(5) == "The T" && searchData[curSearch] == "T")
-		    {
-			data = data.mid(4) + ", The";
-			tempList[data.lower()] = data;
-                	listCount++;
-		    }
-		    else if (data.left(5) == "The A" && searchData[curSearch] == "A")
-                    {
-                        data = data.mid(4) + ", The";
-			tempList[data.lower()] = data;
-                        listCount++;
-                    }
-		    else if (data.left(3) == "A T" && searchData[curSearch] == "T")
-		    {
-			data = data.mid(2) + ", A";
-			tempList[data.lower()] = data;
-                        listCount++;
-		    }
-		    else if (data.left(3) == "A A" && searchData[curSearch] == "A")
-                    {
-                        data = data.mid(2) + ", A";
-			tempList[data.lower()] = data;
-                        listCount++;
-                    }
-		   else if (data.left(4) != "The " && data.left(2) != "A ")
-		    {
-			tempList[data.lower()] = data;
-                        listCount++;
-                    }
-
-		}	
-		else
-		{
-		    if (data.left(4) == "The ")
-                        data = data.mid(4) + ", The";
-		    if (data.left(2) == "A ")
-			data = data.mid(2) + ", A";
-
-		    tempList[data.lower()] = data;
+            if (searchData[curSearch] == "T" || searchData[curSearch] == "A")
+            {
+                if (data.left(5) == "The T" && searchData[curSearch] == "T")
+                {
+                    data = data.mid(4) + ", The";
+                    tempList[data.lower()] = data;
                     listCount++;
+                }
+                else if (data.left(5) == "The A" && 
+                         searchData[curSearch] == "A")
+                {
+                    data = data.mid(4) + ", The";
+                    tempList[data.lower()] = data;
+                    listCount++;
+                }
+                else if (data.left(3) == "A T" && searchData[curSearch] == "T")
+                {
+                    data = data.mid(2) + ", A";
+                    tempList[data.lower()] = data;
+                    listCount++;
+                }
+                else if (data.left(3) == "A A" && searchData[curSearch] == "A")
+                {
+                    data = data.mid(2) + ", A";
+                    tempList[data.lower()] = data;
+                    listCount++;
+                }
+                else if (data.left(4) != "The " && data.left(2) != "A ")
+                {
+                    tempList[data.lower()] = data;
+                    listCount++;
+                }
+            }        
+            else
+            {
+                if (data.left(4) == "The ")
+                    data = data.mid(4) + ", The";
+                if (data.left(2) == "A ")
+                    data = data.mid(2) + ", A";
 
-		}
-	}
+                tempList[data.lower()] = data;
+                listCount++;
+            }
+        }
 
-	if (listCount < showsPerListing)
-    	{
-       	 	progData = new QString[showsPerListing];
-       	 	for (int i = 0; i < showsPerListing; i++)
-               	progData[i] = "**!0";
-    	}
-    	else
-        	progData = new QString[(int)listCount];
+        if (listCount < showsPerListing)
+        {
+            progData = new QString[showsPerListing];
+            for (int i = 0; i < showsPerListing; i++)
+                progData[i] = "**!0";
+        }
+        else
+            progData = new QString[(int)listCount];
 
-	int cnt = 0;
+        int cnt = 0;
 
-	ShowData::Iterator it;
-	for ( it = tempList.begin(); it != tempList.end(); ++it )
-	{
-		progData[cnt] = it.data();
+        ShowData::Iterator it;
+        for (it = tempList.begin(); it != tempList.end(); ++it)
+        {
+            progData[cnt] = it.data();
 
-		if (progData[cnt].right(5) == ", The")
-			progData[cnt] = "The " + progData[cnt].left(progData[cnt].length() - 5);
-		if (progData[cnt].right(3) == ", A")
-		        progData[cnt] = "A " + progData[cnt].left(progData[cnt].length() - 3);
+            if (progData[cnt].right(5) == ", The")
+                progData[cnt] = "The " + 
+                                progData[cnt].left(progData[cnt].length() - 5);
+            if (progData[cnt].right(3) == ", A")
+                progData[cnt] = "A " + 
+                                progData[cnt].left(progData[cnt].length() - 3);
 
-		cnt++;
-	}
+            cnt++;
+        }
     }
 
     if (rows < showsPerListing)
-	listCount = showsPerListing;
+        listCount = showsPerListing;
 
     curProgram = 0;
     accel->setEnabled(true);
@@ -1068,42 +1052,43 @@ void ProgFinder::selectSearchData()
 
 void ProgFinder::clearProgramList()
 {
-  if (gotInitData[curSearch] == 0)
-  {
-    int cnt = 0;
-    LayerSet *container = theme->GetSet("selector");
-    if (container)
+    if (gotInitData[curSearch] == 0)
     {
-        UIListType *ltype = (UIListType *)container->GetType("shows");
-        if (ltype)
-            for (int i = 0; i < showsPerListing; i++)
-            {
-                ltype->SetItemText(i, "");
-            }
-    }
+        int cnt = 0;
+        LayerSet *container = theme->GetSet("selector");
+        if (container)
+        {
+            UIListType *ltype = (UIListType *)container->GetType("shows");
+            if (ltype)
+                for (int i = 0; i < showsPerListing; i++)
+                {
+                    ltype->SetItemText(i, "");
+                }
+        }
 
-    for (int j = 0; j < searchCount; j++)
+        for (int j = 0; j < searchCount; j++)
+        {
+            if (gotInitData[j] > 0)
+                cnt++;
+        }
+
+        int amountDone = (int)(100.0 * (float)((float)cnt / 
+                                               (float)searchCount));
+
+        QString data = QString(" Loading Data...%1% Complete").arg(amountDone);
+
+        if (container)
+        {
+            UIListType *ltype = (UIListType *)container->GetType("shows");
+            if (ltype)
+                ltype->SetItemText((int)(showsPerListing / 2), data);
+        }
+        showSearchList();
+    }
+    else
     {
-	if (gotInitData[j] > 0)
-		cnt++;
+        showSearchList();
     }
-
-    int amountDone = (int)(100.0 * (float)((float)cnt / (float)searchCount));
-
-    QString data = QString(" Loading Data...%1% Complete").arg(amountDone);
-
-    if (container)
-    {
-        UIListType *ltype = (UIListType *)container->GetType("shows");
-        if (ltype)
-            ltype->SetItemText((int)(showsPerListing / 2), data);
-    }
-    showSearchList();
-  }
-  else
-  {
-    showSearchList();
-  }
 }
 
 void ProgFinder::clearShowData()
@@ -1116,68 +1101,67 @@ void ProgFinder::clearShowData()
         UIListType *ltype = (UIListType *)container->GetType("times");
         if (ltype)
         {
-
             for (int i = 0; i < showsPerListing; i++)
             {
-                 ltype->SetItemText(i, "");
+                ltype->SetItemText(i, "");
             }
         }
     }
-    update(infoRect());
+    update(infoRect);
 }
 
 int ProgFinder::checkRecordingStatus(int showNum)
 {
     for (int j = 0; j < recordingCount; j++)
     {
-	if (showData[showNum].title == curRecordings[j].title)
-	{
-	    	if (showData[showNum].subtitle == curRecordings[j].subtitle &&
-	    	    showData[showNum].description == curRecordings[j].description)
-	    	{
-
-			if (curRecordings[j].type == ScheduledRecording::SingleRecord)
-			{
-				if (showData[showNum].startdatetime == curRecordings[j].startdatetime)	
-				{
-					return curRecordings[j].type;
-				}
-			}
-		}
-	 	if (curRecordings[j].type == ScheduledRecording::TimeslotRecord)
-		{
-			if ((showData[showNum].startdatetime).time() == (curRecordings[j].startdatetime).time()
-			  && showData[showNum].channelID == curRecordings[j].chanid)
-			{
-				return curRecordings[j].type;
-			}
-		}
-		if (curRecordings[j].type == ScheduledRecording::ChannelRecord)
+        if (showData[showNum].title == curRecordings[j].title)
+        {
+            if (showData[showNum].subtitle == curRecordings[j].subtitle &&
+                showData[showNum].description == curRecordings[j].description)
+            {
+                if (curRecordings[j].type == ScheduledRecording::SingleRecord)
                 {
-                        if (showData[showNum].channelID == curRecordings[j].chanid)
-                        {
-                                return curRecordings[j].type;
-                        }
+                    if (showData[showNum].startdatetime == 
+                        curRecordings[j].startdatetime)        
+                    {
+                        return curRecordings[j].type;
+                    }
                 }
-		if (curRecordings[j].type == ScheduledRecording::AllRecord)
+            }
+            if (curRecordings[j].type == ScheduledRecording::TimeslotRecord)
+            {
+                if ((showData[showNum].startdatetime).time() == 
+                     (curRecordings[j].startdatetime).time()
+                    && showData[showNum].channelID == curRecordings[j].chanid)
                 {
-			return curRecordings[j].type;
+                    return curRecordings[j].type;
                 }
-	}
+            }
+            if (curRecordings[j].type == ScheduledRecording::ChannelRecord)
+            {
+                if (showData[showNum].channelID == curRecordings[j].chanid)
+                {
+                    return curRecordings[j].type;
+                }
+            }
+            if (curRecordings[j].type == ScheduledRecording::AllRecord)
+            {
+                return curRecordings[j].type;
+            }
+        }
     }
     return 0;
-
 }
 
 void ProgFinder::getRecordingInfo()
 {
     if (running == false)
-	return;
+        return;
     QDateTime recDateTime;
     QString thequery;
     QString data;
-    thequery = QString("SELECT chanid,starttime,startdate,title,subtitle,description,type "
-                       "FROM record ");
+    thequery = QString("SELECT chanid,starttime,startdate,title,subtitle,"
+                       "description,type FROM record;");
 
     QSqlQuery query = m_db->exec(thequery);
 
@@ -1193,22 +1177,23 @@ void ProgFinder::getRecordingInfo()
     recordingCount = 0;
     if (rows > 0)
     {
+        curRecordings = new recordingRecord[(int)rows];
 
-    curRecordings = new recordingRecord[(int)rows];
-
-    if (query.isActive() && rows > 0)
-    {
-        while (query.next())
+        if (query.isActive() && rows > 0)
         {
-		recDateTime = QDateTime::fromString(query.value(2).toString() + "T" + query.value(1).toString(),
-                                                  Qt::ISODate);
+            while (query.next())
+            {
+                recDateTime = QDateTime::fromString(query.value(2).toString() +
+                                                    "T" + 
+                                                    query.value(1).toString(),
+                                                    Qt::ISODate);
 
-		curRecordings[recordingCount].chanid = query.value(0).toString();
-		curRecordings[recordingCount].startdatetime = recDateTime;
-		curRecordings[recordingCount].title = QString::fromUtf8(query.value(3).toString());
-		curRecordings[recordingCount].subtitle = QString::fromUtf8(query.value(4).toString());
-		curRecordings[recordingCount].description = QString::fromUtf8(query.value(5).toString());
-		curRecordings[recordingCount].type = query.value(6).toInt();
+                curRecordings[recordingCount].chanid = query.value(0).toString();
+                curRecordings[recordingCount].startdatetime = recDateTime;
+                curRecordings[recordingCount].title = QString::fromUtf8(query.value(3).toString());
+                curRecordings[recordingCount].subtitle = QString::fromUtf8(query.value(4).toString());
+                curRecordings[recordingCount].description = QString::fromUtf8(query.value(5).toString());
+                curRecordings[recordingCount].type = query.value(6).toInt();
 
                 if (curRecordings[recordingCount].title == QString::null)
                     curRecordings[recordingCount].title = "";
@@ -1217,17 +1202,17 @@ void ProgFinder::getRecordingInfo()
                 if (curRecordings[recordingCount].description == QString::null)
                     curRecordings[recordingCount].description = "";
 
-		recordingCount++;
-	}
-    }
-   
+                recordingCount++;
+            }
+        }
     }
 }
 
 void ProgFinder::selectShowData(QString progTitle)
 {
     if (running == false)
-	return;
+        return;
+
     accel->setEnabled(false);
     QDateTime progStart = QDateTime::currentDateTime();
     QDateTime progEnd;
@@ -1236,12 +1221,14 @@ void ProgFinder::selectShowData(QString progTitle)
     int rectype = 0;
 
     thequery = QString("SELECT subtitle,starttime,channel.channum,"
-		       "channel.callsign,description,endtime,channel.chanid "
+                       "channel.callsign,description,endtime,channel.chanid "
                        "FROM program,channel "
-                       "WHERE program.title = \"%1\" AND program.chanid = channel.chanid "
-		       "AND program.starttime > %2 "
+                       "WHERE program.title = \"%1\" AND "
+                       "program.chanid = channel.chanid "
+                       "AND program.starttime > %2 "
                        "ORDER BY program.starttime;")
-                        .arg(progTitle.utf8()).arg(progStart.toString("yyyyMMddhhmm50"));
+                       .arg(progTitle.utf8())
+                       .arg(progStart.toString("yyyyMMddhhmm50"));
 
     QSqlQuery query = m_db->exec(thequery);
 
@@ -1249,99 +1236,85 @@ void ProgFinder::selectShowData(QString progTitle)
 
     if (rows == -1)
     {
-	cerr << "MythProgFind: Error executing query! (selectShowData)\n";
-	cerr << "MythProgFind: QUERY = " << thequery << endl;
-	return;
+        cerr << "MythProgFind: Error executing query! (selectShowData)\n";
+        cerr << "MythProgFind: QUERY = " << thequery << endl;
+        return;
     }
 
     showCount = 0;
  
     if (rows < showsPerListing)
     {
-	showData = new showRecord[showsPerListing];
-	for (int i = 0; i < showsPerListing; i++)
-		showData[i].title = "**!0";
+        showData = new showRecord[showsPerListing];
+        for (int i = 0; i < showsPerListing; i++)
+            showData[i].title = "**!0";
     }
     else
     {
-    	showData = new showRecord[rows];
+        showData = new showRecord[rows];
     }
 
     if (query.isActive() && rows > 0)
     {
         while (query.next())
         {
-                progStart = QDateTime::fromString(query.value(1).toString(),
-                                                  Qt::ISODate);
-		progEnd = QDateTime::fromString(query.value(5).toString(),
-						  Qt::ISODate);
+            progStart = QDateTime::fromString(query.value(1).toString(),
+                                              Qt::ISODate);
+            progEnd = QDateTime::fromString(query.value(5).toString(),
+                                            Qt::ISODate);
 
-		// DATE, CHANNEL NUM, CHANNEL CALLSIGN, SUBTITLE, DESCRIPTION, SQL START, SQL END
+            // DATE, CHANNEL NUM, CHANNEL CALLSIGN, SUBTITLE, DESCRIPTION, SQL START, SQL END
 
-		showData[showCount].startdatetime = progStart;
-		QString DateTimeFormat = gContext->GetSetting("DateFormat")+" "+gContext->GetSetting("TimeFormat");
+            showData[showCount].startdatetime = progStart;
+            QString DateTimeFormat = dateFormat + " " + timeFormat;
 
-		showData[showCount].startDisplay = progStart.toString(DateTimeFormat);
-		showData[showCount].endDisplay = progEnd.toString(gContext->GetSetting("TimeFormat"));
-		showData[showCount].channelNum = query.value(2).toString();
-		showData[showCount].channelCallsign = query.value(3).toString();
-		showData[showCount].title = progTitle;
-		showData[showCount].subtitle = QString::fromUtf8(query.value(0).toString());
-		showData[showCount].description = QString::fromUtf8(query.value(4).toString());
-		showData[showCount].channelID = query.value(6).toString();
-		showData[showCount].starttime = progStart.toString("yyyyMMddhhmm");
-		showData[showCount].endtime = progEnd.toString("yyyyMMddhhmm");
-		rectype = checkRecordingStatus(showCount);
-		showData[showCount].recording = rectype;
+            showData[showCount].startDisplay = progStart.toString(DateTimeFormat);
+            showData[showCount].endDisplay = progEnd.toString(timeFormat);
+            showData[showCount].channelNum = query.value(2).toString();
+            showData[showCount].channelCallsign = query.value(3).toString();
+            showData[showCount].title = progTitle;
+            showData[showCount].subtitle = QString::fromUtf8(query.value(0).toString());
+            showData[showCount].description = QString::fromUtf8(query.value(4).toString());
+            showData[showCount].channelID = query.value(6).toString();
+            showData[showCount].starttime = progStart.toString("yyyyMMddhhmm");
+            showData[showCount].endtime = progEnd.toString("yyyyMMddhhmm");
+            rectype = checkRecordingStatus(showCount);
+            showData[showCount].recording = rectype;
 
-                if (showData[showCount].subtitle == QString::null)
-                    showData[showCount].subtitle = "";
-                if (showData[showCount].description == QString::null)
-                    showData[showCount].description = "";
+            if (showData[showCount].subtitle == QString::null)
+                showData[showCount].subtitle = "";
+            if (showData[showCount].description == QString::null)
+                showData[showCount].description = "";
+            switch (rectype)
+            {
+                case ScheduledRecording::SingleRecord:
+                    data = tr("Recording just this showing");
+                    break;
+                case ScheduledRecording::TimeslotRecord:
+                    data = tr("Recording when shown in this timeslot");
+                    break;
+                case ScheduledRecording::ChannelRecord:
+                    data = tr("Recording when shown on this channel");
+                    break;
+                case ScheduledRecording::AllRecord:
+                    data = tr("Recording all showings");
+                    break;
+                case ScheduledRecording::NotRecording:
+                    data = tr("Not recording this showing");
+                    break;
+                default:
+                    data = tr("Error!");
+                    break;
+            }
+                
+            showData[showCount].recText = data;
 
-		switch (rectype)
-		{
-			case ScheduledRecording::SingleRecord:
-                            data = tr("Recording just this showing");
-                            break;
-                        case ScheduledRecording::TimeslotRecord:
-                            data = tr("Recording when shown in this timeslot");
-                            break;
-                        case ScheduledRecording::ChannelRecord:
-                            data = tr("Recording when shown on this channel");
-                            break;
-                        case ScheduledRecording::AllRecord:
-                            data = tr("Recording all showings");
-                            break;
-                        case ScheduledRecording::NotRecording:
-			    data = tr("Not recording this showing");
-                            break;
-			default:
-			    data = "Error!";
-		}
-		
-		showData[showCount].recText = data;
-
-		/*
-                data = progStart.toString("ddd M/dd     h:mm ap") + "~" + 
-			progEnd.toString("hh:mm ap") + "~" +
-                        query.value(2).toString() + "~" + 
-			query.value(3).toString() + "~" +
-			query.value(0).toString() + " ~" + 
-			query.value(4).toString() + 
-			progStart.toString(" ~yyyyMMddhhmm") + 
-			progEnd.toString("~yyyyMMddhhmm~") +
-			query.value(6).toString();
-
-                showData[showCount] = data;
-		*/
-
-                showCount++;
+            showCount++;
         }
     }
 
     if (rows < showsPerListing)
-	showCount = showsPerListing;
+        showCount = showsPerListing;
 
     curShow = 0;
     accel->setEnabled(true);
@@ -1359,18 +1332,18 @@ void ProgFinder::getInitialProgramData()
 
     for (int charNum = 0; charNum < searchCount; charNum++)
     {
-	if (charNum == 8)
+        if (charNum == 8)
             charNum = 13;
 
-	getSearchData(charNum);
+        getSearchData(charNum);
     }
-
 }
 
 void ProgFinder::getSearchData(int charNum)
 {
     if (running == false)
-	return;
+        return;
+
     int cnts = 0;
     int dataNum = 0;
     int startPlace = 0;
@@ -1380,13 +1353,14 @@ void ProgFinder::getSearchData(int charNum)
 
     thequery = QString("SELECT DISTINCT title "
                        "FROM program "
-                       "WHERE ( title LIKE '%1%' OR title LIKE 'The %2%' OR title LIKE 'A %3%' ) "
-		       "AND starttime > %4 "
+                       "WHERE ( title LIKE '%1%' OR title LIKE 'The %2%' OR "
+                       "title LIKE 'A %3%' ) "
+                       "AND starttime > %4 "
                        "ORDER BY title;")
-			.arg(searchData[charNum])
-			.arg(searchData[charNum])
-			.arg(searchData[charNum])
-			.arg(progStart.toString("yyyyMMddhhmm50"));
+                       .arg(searchData[charNum])
+                       .arg(searchData[charNum])
+                       .arg(searchData[charNum])
+                       .arg(progStart.toString("yyyyMMddhhmm50"));
 
     QSqlQuery query = m_db->exec(thequery);
 
@@ -1404,141 +1378,102 @@ void ProgFinder::getSearchData(int charNum)
 
     if (query.isActive() && rows > 0)
     {
-	typedef QMap<QString,QString> ShowData;
+        typedef QMap<QString,QString> ShowData;
         ShowData tempList;
 
         while (query.next())
         {
-		data = QString::fromUtf8(query.value(0).toString());
-		
-		if (charNum == 29 || charNum == 10)
+            data = QString::fromUtf8(query.value(0).toString());
+                
+            if (charNum == 29 || charNum == 10)
+            {
+                if (data.left(5) == "The T" && charNum == 29)
                 {
-		   if (data.left(5) == "The T" && charNum == 29)
-                   {
-                        data = data.mid(4) + ", The";
-                        tempList[data.lower()] = data;
-                        cnts++;
-                   }
-                   else if (data.left(5) == "The A" && charNum == 10)
-                   {
-                        data = data.mid(4) + ", The";
-			tempList[data.lower()] = data;
-                        cnts++;
-                   }
-                   else if (data.left(3) == "A T" && charNum == 29)
-                   {
-                        data = data.mid(2) + ", A";
-			tempList[data.lower()] = data;
-                        cnts++;
-                   }
-                   else if (data.left(3) == "A A" && charNum == 10)
-                   {
-                        data = data.mid(2) + ", A";
-			tempList[data.lower()] = data;
-                        cnts++;
-                   }
-                   else if (data.left(4) != "The " && data.left(2) != "A ")
-                   {
-			tempList[data.lower()] = data;
-                        cnts++;
-                   }
-		}
-		else
-                {
-                    if (data.left(4) == "The ")
-                        data = data.mid(4) + ", The";
-		    if (data.left(2) == "A ")
-			data = data.mid(2) + ", A";
-
-		    tempList[data.lower()] = data;
-		    cnts++;
-
+                    data = data.mid(4) + ", The";
+                    tempList[data.lower()] = data;
+                    cnts++;
                 }
-	}
+                else if (data.left(5) == "The A" && charNum == 10)
+                {
+                    data = data.mid(4) + ", The";
+                    tempList[data.lower()] = data;
+                    cnts++;
+                }
+                else if (data.left(3) == "A T" && charNum == 29)
+                {
+                    data = data.mid(2) + ", A";
+                    tempList[data.lower()] = data;
+                    cnts++;
+                }
+                else if (data.left(3) == "A A" && charNum == 10)
+                {
+                    data = data.mid(2) + ", A";
+                    tempList[data.lower()] = data;
+                    cnts++;
+                }
+                else if (data.left(4) != "The " && data.left(2) != "A ")
+                {
+                    tempList[data.lower()] = data;
+                    cnts++;
+                }
+            }
+            else
+            {
+                if (data.left(4) == "The ")
+                    data = data.mid(4) + ", The";
+                if (data.left(2) == "A ")
+                    data = data.mid(2) + ", A";
 
-        int cnt = 0;
-	int dNum = 0;
-
-	ShowData::Iterator it;
-        for ( it = tempList.begin(); it != tempList.end(); ++it )
-        {
-		if (cnt <= (int)(showsPerListing / 2))
-		{
-			data = it.data();
-
-			if (data.right(5) == ", The")
-				data = "The " + data.left(data.length() - 5);
-			if (data.right(3) == ", A")
-                                data = "A " + data.left(data.length() - 3);
-
-			initData[startPlace + dataNum] = data;
-			dataNum++;
-		}	
-
-		if (cnt >= (cnts - (int)(showsPerListing / 2)) && rows >= showsPerListing)
-		{
-			data = it.data();
-
-                        if (data.right(5) == ", The")
-                                data = "The " + data.left(data.length() - 5);
-			if (data.right(3) == ", A")
-                                data = "A " + data.left(data.length() - 3);
-
-                        initData[startPlace + dNum] = data;
-                        dNum++;
-		}
-
-                cnt++;
+                tempList[data.lower()] = data;
+                cnts++;
+            }
         }
 
+        int cnt = 0;
+        int dNum = 0;
+
+        ShowData::Iterator it;
+        for (it = tempList.begin(); it != tempList.end(); ++it)
+        {
+            if (cnt <= (int)(showsPerListing / 2))
+            {
+                data = it.data();
+
+                if (data.right(5) == ", The")
+                    data = "The " + data.left(data.length() - 5);
+                if (data.right(3) == ", A")
+                    data = "A " + data.left(data.length() - 3);
+
+                initData[startPlace + dataNum] = data;
+                dataNum++;
+            }        
+
+            if (cnt >= (cnts - (int)(showsPerListing / 2)) && 
+                rows >= showsPerListing)
+            {
+                data = it.data();
+
+                if (data.right(5) == ", The")
+                    data = "The " + data.left(data.length() - 5);
+                if (data.right(3) == ", A")
+                    data = "A " + data.left(data.length() - 3);
+
+                initData[startPlace + dNum] = data;
+                dNum++;
+            }
+
+            cnt++;
+        }
     }
 
-
     if (cnts == 0)
-         gotInitData[charNum] = 1;
+        gotInitData[charNum] = 1;
     else
     {
-         gotInitData[charNum] = 10 + cnts;
+        gotInitData[charNum] = 10 + cnts;
     }
 
     if (charNum == curSearch)
-	showSearchList();
-
+        showSearchList();
 }
 
-
-QRect ProgFinder::listRect() const
-{
-    QRect r(rectListLeft, rectListTop, rectListWidth, rectListHeight);
-    return r;
-}
-
-QRect ProgFinder::infoRect() const
-{
-    QRect r(rectInfoLeft, rectInfoTop, rectInfoWidth, rectInfoHeight);
-    return r;
-}
-
-/*
-
-QStringList sortedList, KeyValuePair;
-QString sortKey, IP;
-int hits;
-
-sortedList.clear();
-IPLIST::iterator it = myList.begin();
-while (it != myList.end()){
-	sortKey = "0000000000|"+QString::number(it.data());
-	sortKey = sortKey.rightJustify(10)+"|"+it.key();
-	sortedList << sortKey;
-}
-sortedList.sort();
-QStringList::iterator sit = sortedList.end();
-while (sit != sortedList.begin()){
-	KeyValuePair = QStringList::split(QRegExp("|"),*sit);
-	hits = KeyValuePair.begin().toInt();
-	IP = KeyValuePair.end();
-	it--;
-}
-
-*/
