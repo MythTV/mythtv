@@ -12,6 +12,7 @@
 #include <iostream>
 #include <map>
 #include <vector>
+#include <algorithm>
 using namespace std;
 
 #include "rankprograms.h"

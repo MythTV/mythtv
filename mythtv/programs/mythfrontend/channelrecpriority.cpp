@@ -12,6 +12,7 @@
 #include <iostream>
 #include <map>
 #include <vector>
+#include <algorithm>
 using namespace std;
 
 #include "rankchannels.h"
@@ -351,8 +352,8 @@ void RankChannels::changeRank(int howMuch)
 void RankChannels::applyChannelRankChange(QSqlDatabase *db, QString chanid, 
                                           const QString &newrank) 
 {
-    QString query = QString("UPDATE 'channel' SET 'rank' = '%1' "
-                            "WHERE 'chanid' = '%2';").arg(newrank).arg(chanid);
+    QString query = QString("UPDATE channel SET rank = '%1' "
+                            "WHERE chanid = '%2';").arg(newrank).arg(chanid);
     QSqlQuery result = db->exec(query);
 }
 

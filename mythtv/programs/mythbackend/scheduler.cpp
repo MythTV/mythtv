@@ -679,7 +679,7 @@ void Scheduler::MarkConflictsToRemove(void)
     bool doRank = (bool)gContext->GetNumSetting("RankingActive");
     bool doRankFirst = (bool)gContext->GetNumSetting("RankingOrder");
 
-    if (doRank and doRankFirst) 
+    if (doRank && doRankFirst) 
     {
         i = recordingList.begin();
         for (; i != recordingList.end(); i++)
@@ -723,7 +723,7 @@ void Scheduler::MarkConflictsToRemove(void)
             first->conflicting = false;
     }
 
-    if (doRank and !doRankFirst) 
+    if (doRank && !doRankFirst) 
     {
         i = recordingList.begin();
         for (; i != recordingList.end(); i++)
