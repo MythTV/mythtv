@@ -8,6 +8,8 @@ PREFIX = /usr/local
 INCLUDEPATH += $${PREFIX}/include
 INCLUDEPATH *= /usr/local/include
 
+LIBPATH += $${PREFIX}/lib
+
 DEFINES += _GNU_SOURCE
 DEFINES += PREFIX=\"$${PREFIX}\"
 release {
