@@ -426,11 +426,11 @@ void VideoOutput::MoveResize(void)
     displayAspect = GetDisplayAspect();
 
     // Check if close to 4:3
-    if(fabs(displayAspect - 1.333333) < 0.1)
+    if(fabs(displayAspect - 1.333333) < 0.05)
         displayAspect = 1.333333;
 
     // Check if close to 16:9
-    if(fabs(displayAspect - 1.777777) < 0.1)
+    if(fabs(displayAspect - 1.777777) < 0.05)
         displayAspect = 1.777777;
 
 /*
