@@ -27,6 +27,9 @@ package export_Trans_XviD;
 					 @_		#allows user-specified attributes to override the defaults
 					};
 		bless($self, $class);
+	# Make sure we have transcode
+		$Prog{transcode} = find_program('transcode');
+		push @{$self->{errors}}, 'You need transcode to use this exporter.' unless ($Prog{transcode});
 	# Return
 		return $self;
 	}

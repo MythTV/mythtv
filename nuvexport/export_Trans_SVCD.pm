@@ -28,6 +28,10 @@ package export_Trans_SVCD;
 					};
 		bless($self, $class);
 
+	# Make sure we have transcode
+		$Prog{transcode} = find_program('transcode');
+		push @{$self->{errors}}, 'You need transcode to use this exporter.' unless ($Prog{transcode});
+
 	# Make sure that we have an mplexer
 		$Prog{mplexer} = find_program('tcmplex', 'mplex');
 		push @{$self->{errors}}, 'You need tcmplex or mplex to export an svcd.' unless ($Prog{mplexer});

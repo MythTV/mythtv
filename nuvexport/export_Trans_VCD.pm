@@ -24,6 +24,9 @@ package export_Trans_VCD;
 					 @_		#allows user-specified attributes to override the defaults
 					};
 		bless($self, $class);
+	# Make sure we have transcode
+		$Prog{transcode} = find_program('transcode');
+		push @{$self->{errors}}, 'You need transcode to use this exporter.' unless ($Prog{transcode});
 	# Make sure that we have an mp2 encoder
 		$Prog{mp2_encoder} = find_program('toolame', 'mp2enc');
 		push @{$self->{errors}}, 'You need toolame or mp2enc to export an svcd.' unless ($Prog{mp2_encoder});
