@@ -2433,7 +2433,7 @@ void MainServer::PrintStatus(QSocket *socket)
        << "    color:#ccc;\r\n"
        << "    letter-spacing:0.5em;\r\n"
        << "    margin-bottom:30px;\r\n"
-       << "    width:750px;\r\n"
+       << "    width:650px;\r\n"
        << "    text-align:center;\r\n"
        << "  }\r\n"
        << "  h2 {\r\n"
@@ -2446,8 +2446,11 @@ void MainServer::PrintStatus(QSocket *socket)
        << "    margin-bottom:10px;\r\n"
        << "    margin-top:0px;\r\n"
        << "  }\r\n"
+       << "  hr {\r\n"
+       << "    display:none;\r\n"
+       << "  }\r\n"
        << "  div.content {\r\n"
-       << "    width:750px;\r\n"
+       << "    width:650px;\r\n"
        << "    border-top:1px solid #000;\r\n"
        << "    border-right:1px solid #000;\r\n"
        << "    border-bottom:1px solid #000;\r\n"
@@ -2462,6 +2465,7 @@ void MainServer::PrintStatus(QSocket *socket)
        << "    text-decoration:none;\r\n"
        << "    padding:.2em .8em;\r\n"
        << "    border:thin solid #fff;\r\n"
+       << "    width:350px;\r\n"
        << "  }\r\n"
        << "  div#schedule a span {\r\n"
        << "    display:none;\r\n"
@@ -2478,19 +2482,19 @@ void MainServer::PrintStatus(QSocket *socket)
        << "    position:absolute;\r\n"
        << "    background-color:#F4F4F4;\r\n"
        << "    color:#000;\r\n"
-       << "    left:439px;\r\n"
+       << "    left:400px;\r\n"
        << "    margin-top:-20px;\r\n"
-       << "    width:340px;\r\n"
+       << "    width:280px;\r\n"
        << "    padding:5px;\r\n"
        << "    border:thin dashed #000;\r\n"
        << "  }\r\n"
        << "  div.diskstatus {\r\n"
-       << "    width:375px;\r\n"
+       << "    width:325px;\r\n"
        << "    height:7em;\r\n"
        << "    float:left;\r\n"
        << "  }\r\n"
        << "  div.loadstatus {\r\n"
-       << "    width:375px;\r\n"
+       << "    width:325px;\r\n"
        << "    height:7em;\r\n"
        << "    float:right;\r\n"
        << "  }\r\n"
@@ -2524,7 +2528,10 @@ void MainServer::PrintStatus(QSocket *socket)
             os << "    Encoder " << elink->getCardId() << " is remote on "
                << elink->getHostname();
             if (!elink->isConnected())
-                os << " (currently not connected)";
+            {
+                os << " (currently not connected).<br>";
+                continue;
+            }
         }
 
         TVState encstate = elink->GetState();
@@ -2564,7 +2571,7 @@ void MainServer::PrintStatus(QSocket *socket)
             os << " <strong>WARNING</strong>:"
                << " This backend is low on free disk space!";
 
-        os << "\r\n";
+        os << "<br>\r\n";
     }
 
     os << "  </div>\r\n\r\n"
@@ -2640,19 +2647,25 @@ void MainServer::PrintStatus(QSocket *socket)
                    timeToRecstart = "soon";
 
                os << "      <a href=\"#\">"
-                  << ((*iter)->recstartts).toString(shortdateformat)
-                  << " " << ((*iter)->recstartts).toString(timeformat) << " - "
-                  << (*iter)->channame << " - "
-                  << qstrTitle << "<span><strong>" << qstrTitle << "</strong>"
-                  << (qstrSubtitle == "" ? QString("") : " (" + qstrSubtitle +
-                     ")" )
-                  << "<br /><br />" << qstrDescription << "<br /><br />"
+                  << ((*iter)->recstartts).addSecs(-preRollSeconds)
+                                          .toString("ddd") << " "
+                  << ((*iter)->recstartts).addSecs(-preRollSeconds)
+                                          .toString(shortdateformat) << " "
+                  << ((*iter)->recstartts).addSecs(-preRollSeconds)
+                                          .toString(timeformat) << " - "
+                  << (*iter)->channame << " - " << qstrTitle << "<br />"
+                  << "<span><strong>" << qstrTitle << "</strong> ("
+                  << (*iter)->startts.toString(timeformat) << "-"
+                  << (*iter)->endts.toString(timeformat) << ")<br />"
+                  << (qstrSubtitle == "" ? QString("") : "<em>" + qstrSubtitle
+                                                          + "</em><br /><br />")
+                  << qstrDescription << "<br /><br />"
                   << "This recording will start "  << timeToRecstart
                   << " using encoder " << (*iter)->cardid << " with the '";
                dblock.lock();
                os << (*iter)->GetProgramRecordingProfile(m_db);
                dblock.unlock();
-               os << "' profile.</span></a>\r\n";
+               os << "' profile.</span></a><hr />\r\n";
            }
        }
        os  << "    </div>\r\n";
