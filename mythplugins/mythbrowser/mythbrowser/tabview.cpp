@@ -192,23 +192,23 @@ void TabView::actionAddBookmark()
 
 void TabView::finishAddBookmark(const char* group, const char* desc, const char* url)
 {
-    QString *groupStr = new QString(group);
-    QString *descStr = new QString(desc);
-    QString *urlStr = new QString(url);
+    QString groupStr = QString(group);
+    QString descStr = QString(desc);
+    QString urlStr = QString(url);
 
     printf("finish bookmark menu\n");
 
-    if(groupStr->isEmpty() || urlStr->isEmpty())
+    if(groupStr.isEmpty() || urlStr.isEmpty())
         return;
 
     // Check if already in DB
-    QSqlQuery query( "SELECT url FROM websites WHERE url='" + *urlStr + "'", myDb);
+    QSqlQuery query( "SELECT url FROM websites WHERE url='" + urlStr + "'", myDb);
     if (!query.isActive()) {
         cerr << "MythBookmarksConfig: Error in finding in DB" << endl;
         return;
     } else if( query.numRowsAffected() == 0 ) { // Insert if not yet in DB
-        QSqlQuery query( "INSERT INTO websites (grp,dsc,url) VALUES( '" + *groupStr + "', '" +
-             *descStr + "', '" + *urlStr + "' );",myDb);
+        QSqlQuery query( "INSERT INTO websites (grp,dsc,url) VALUES( '" + groupStr + "', '" +
+             descStr + "', '" + urlStr + "' );",myDb);
         if (!query.isActive()) {
             cerr << "MythBookmarksConfig: Error in inserting in DB" << endl;
         }
