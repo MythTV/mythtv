@@ -97,8 +97,12 @@ void TV::LiveTV(void)
 {
     if (internalState == kState_RecordingOnly)
     {
+        string title, channum;
+        curRecording->GetTitle(title);
+        curRecording->GetChannel(channum);
         char cmdline[4096];
-        sprintf(cmdline, "mythdialog \"MythTV is already recording something.  Do you want to:\" \"Stop recording and watch TV\" \"Watch the in-progress recording\" \"Cancel\"");
+
+        sprintf(cmdline, "mythdialog \"MythTV is already recording '%s' on channel %s.  Do you want to:\" \"Stop recording and watch TV\" \"Watch the in-progress recording\" \"Cancel\"", title.c_str(), channum.c_str());
 
         int result = system(cmdline);
 
@@ -127,7 +131,7 @@ void TV::LiveTV(void)
 int TV::AllowRecording(RecordingInfo *rcinfo, int timeuntil)
 {
     if (internalState != kState_WatchingLiveTV)
-        return true;
+        return 1;
 
     string channame;
     rcinfo->GetChannel(channame);

@@ -37,6 +37,7 @@ class TV
     int AllowRecording(RecordingInfo *rcinfo, int timeuntil);
     void StartRecording(RecordingInfo *rcinfo);
     void StopRecording(void);
+    RecordingInfo *GetRecording(void) { return curRecording; }
 
     // next two functions only work on recorded programs.
     void Playback(RecordingInfo *rcinfo);
