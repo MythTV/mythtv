@@ -582,15 +582,18 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
             }
             else
             {
-                querystr.sprintf("UPDATE channel SET icon = \"%s\" WHERE "
-                                 "chanid = \"%s\"",
-                                 localfile.ascii(), chanid.ascii());
-
-                if (!query.exec(querystr))
+                if (!non_us_updating)
                 {
-                    cerr << "DB Error: Channel icon change failed, SQL query "
-                         << "was:" << endl;
-                    cerr << querystr << endl;
+                    querystr.sprintf("UPDATE channel SET icon = \"%s\" WHERE "
+                                     "chanid = \"%s\"",
+                                     localfile.ascii(), chanid.ascii());
+
+                    if (!query.exec(querystr))
+                    {
+                        cerr << "DB Error: Channel icon change failed, SQL query "
+                             << "was:" << endl;
+                        cerr << querystr << endl;
+                    }
                 }
             }
         }
