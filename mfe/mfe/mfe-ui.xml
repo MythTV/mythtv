@@ -1,0 +1,103 @@
+<mythuitheme>
+    <window name="mfe_dialog">
+
+        <font name="active" face="Arial">
+            <color>#ffffff</color>
+            <size>16</size>
+            <bold>yes</bold>
+        </font>
+
+        <font name="inactive" face="Arial">
+            <color>#9999cc</color>
+            <size>16</size>
+            <bold>yes</bold>
+        </font>
+    
+        <font name="title" face="Arial">
+            <color>#ffffff</color>
+            <size>19</size>
+            <bold>no</bold>
+        </font>
+
+        <container name="musicselector">
+            <area>0,0,800,310</area>
+            <managedtreelist name="musictreelist" draworder="1" bins="2">
+                <area>0,0,800,310</area>
+                <image function="selectionbar" filename="selectionbar.png"></image>
+                <image function="uparrow" filename="mm_up_arrow.png"></image>
+                <image function="downarrow" filename="mm_down_arrow.png"></image>
+                <image function="leftarrow" filename="mm_left_arrow.png"></image>
+                <image function="rightarrow" filename="mm_right_arrow.png"></image>
+                <bin number="1">
+                    <area>10,16,230,250</area>
+                    <fcnfont name="active" function="active"></fcnfont>
+                    <fcnfont name="inactive" function="inactive"></fcnfont>
+                    <fcnfont name="selected" function="selected"></fcnfont>
+                </bin>
+                <bin number="2">
+                    <area>240,10,550,270</area>
+                    <fcnfont name="active" function="active"></fcnfont>
+                    <fcnfont name="selected" function="selected"></fcnfont>
+                    <fcnfont name="inactive" function="inactive"></fcnfont>
+                </bin>
+            </managedtreelist>
+        </container>
+
+        <container name="status">
+            <area>0,350,800,250</area>
+
+            <textarea name="mfd_text_label" draworder="1" align="right">
+                <font>inactive</font>
+                <area>100,10,190,40</area>
+                <value>(1) Current MFD:</value>
+            </textarea>
+            <textarea name="mfd_text" draworder="1" align="lfet">
+                <font>active</font>
+                <area>300,10,490,40</area>
+                <value>--none--</value>
+            </textarea>
+
+            <textarea name="playlist_text_label" draworder="1" align="right">
+                <font>inactive</font>
+                <area>100,50,190,40</area>
+                <value>Playlist id:</value>
+            </textarea>
+            <textarea name="playlist_text" draworder="1" align="lfet">
+                <font>active</font>
+                <area>300,50,490,40</area>
+            </textarea>
+
+            <textarea name="container_text_label" draworder="1" align="right">
+                <font>inactive</font>
+                <area>100,90,190,40</area>
+                <value>Container id:</value>
+            </textarea>
+            <textarea name="container_text" draworder="1" align="lfet">
+                <font>active</font>
+                <area>300,90,490,40</area>
+            </textarea>
+
+            <textarea name="metadata_text_label" draworder="1" align="right">
+                <font>inactive</font>
+                <area>100,130,190,40</area>
+                <value>Metadata id:</value>
+            </textarea>
+            <textarea name="metadata_text" draworder="1" align="lfet">
+                <font>active</font>
+                <area>300,130,490,40</area>
+            </textarea>
+
+            <textarea name="audio_text_label" draworder="1" align="right">
+                <font>inactive</font>
+                <area>100,170,190,40</area>
+                <value>Audio data:</value>
+            </textarea>
+            <textarea name="audio_text" draworder="1" align="lfet">
+                <font>active</font>
+                <area>300,170,490,40</area>
+            </textarea>
+
+
+        </container>
+    </window>
+</mythuitheme>
