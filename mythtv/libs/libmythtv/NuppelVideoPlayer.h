@@ -32,6 +32,7 @@ using namespace std;
 class NuppelVideoRecorder;
 class NuppelVideoPlayer;
 class XvVideoOutput;
+class OSDSet;
 
 class NuppelVideoPlayer
 {
@@ -151,6 +152,9 @@ class NuppelVideoPlayer
     void ResetNexttrigger(struct timeval *tv);
 
     void ShowPip(unsigned char *xvidbuf);
+
+    void UpdateTimeDisplay(void);
+    void UpdateSeekAmount(bool up);
 
     int audiofd;
 
@@ -282,6 +286,10 @@ class NuppelVideoPlayer
     XvVideoOutput *videoOutput;
     pthread_mutex_t eventLock;
     bool eventvalid;
+
+    int seekamount;
+    int seekamountpos;
+    OSDSet *timedisplay;
 };
 
 #endif

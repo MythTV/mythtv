@@ -19,8 +19,28 @@ using namespace std;
 #include "XJ.h"
 #include "effects.h"
 #include "yuv2rgb.h"
+#include "osdtypes.h"
 
 extern pthread_mutex_t avcodeclock;
+
+#define wsUp            0x52 + 256
+#define wsDown          0x54 + 256
+#define wsLeft          0x51 + 256
+#define wsRight         0x53 + 256
+#define wsEscape        0x1b + 256
+#define wsZero          0xb0 + 256
+#define wsOne           0xb1 + 256
+#define wsTwo           0xb2 + 256
+#define wsThree         0xb3 + 256
+#define wsFour          0xb4 + 256
+#define wsFive          0xb5 + 256
+#define wsSix           0xb6 + 256
+#define wsSeven         0xb7 + 256
+#define wsEight         0xb8 + 256
+#define wsNine          0xb9 + 256
+#define wsEnter         0x8d + 256
+#define wsReturn        0x0d + 256
+
 
 NuppelVideoPlayer::NuppelVideoPlayer(void)
 {
@@ -88,6 +108,11 @@ NuppelVideoPlayer::NuppelVideoPlayer(void)
     exactseeks = false;
 
     eventvalid = false;
+
+    timedisplay = NULL;
+    seekamount = 30;
+    seekamountpos = 2;
+
     pthread_mutex_init(&eventLock, NULL);
 }
 
@@ -1165,7 +1190,10 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
             else
             {
                 //printf("video waiting for unpause\n");
-                usleep(50);
+                usleep(50); 
+                if (editmode)
+                    UpdateTimeDisplay();
+
                 if (!disablevideo)
                 {
                     memcpy(X11videobuf, vbuffer[pause_rpos], videosize);
@@ -1483,6 +1511,7 @@ void NuppelVideoPlayer::StartPlaying(void)
                 rewindtime = 0;
                 GetFrame(audiofd <= 0);
                 resetvideo = true;
+                continue;
             }       
             else if (fftime > 0)
             {
@@ -1493,6 +1522,7 @@ void NuppelVideoPlayer::StartPlaying(void)
                 fftime = 0;
                 GetFrame(audiofd <= 0);
                 resetvideo = true;
+                continue;
             }
             else
             {
@@ -1562,7 +1592,7 @@ void NuppelVideoPlayer::SetBookmark(void)
 
 bool NuppelVideoPlayer::DoRewind(void)
 {
-    long long number = rewindtime;
+    long long number = rewindtime + 1;
 
     long long desiredFrame = framesPlayed - number;
 
@@ -1676,7 +1706,7 @@ long long NuppelVideoPlayer::CalcMaxFFTime(long long ff)
 
 bool NuppelVideoPlayer::DoFastForward(void)
 {
-    long long number = fftime;
+    long long number = fftime - 1;
 
     long long desiredFrame = framesPlayed + number;
     long long desiredKey = lastKey;
@@ -1690,7 +1720,11 @@ bool NuppelVideoPlayer::DoFastForward(void)
     int normalframes = desiredFrame - desiredKey;
     int fileend = 0;
 
-    if (positionMap->find(desiredKey / keyframedist) != positionMap->end())
+    if (desiredKey == lastKey)
+        normalframes = number;
+
+    if (positionMap->find(desiredKey / keyframedist) != positionMap->end() &&
+        desiredKey != lastKey)
     {
         lastKey = desiredKey;
         long long keyPos = (*positionMap)[lastKey / keyframedist];
@@ -1808,12 +1842,129 @@ bool NuppelVideoPlayer::EnableEdit(void)
     if (haspositionmap)
     {
         editmode = true;
+        Pause();
+        while (!GetPause())
+            usleep(50);
+        seekamount = keyframedist;
+        seekamountpos = 2;
     }
     return editmode;   
 }
 
 void NuppelVideoPlayer::DoKeypress(int keypress)
 {
+    bool exactstore = exactseeks;
+    exactseeks = true;
+    switch (keypress)
+    {
+        case wsLeft: case 'a': case 'A': 
+        {
+            rewindtime = seekamount;
+            while (rewindtime != 0)
+                usleep(50);
+            break;           
+        }
+        case wsRight: case 'd': case 'D':
+        {
+            fftime = seekamount;
+            while (fftime != 0)
+                usleep(50);
+            break;
+        }
+        case wsUp: 
+        {
+            UpdateSeekAmount(true);
+            break;
+        }
+        case wsDown:
+        {
+            UpdateSeekAmount(false);
+            break; 
+        }
+    }
+    exactseeks = exactstore;
+}
+
+void NuppelVideoPlayer::UpdateSeekAmount(bool up)
+{
+    QRect rect;
+    rect.setTop(video_height * 3 / 16);
+    rect.setBottom(video_height * 5 / 16);
+    rect.setLeft(video_width * 3 / 8);
+    rect.setRight(video_width * 15 / 16);
+
+    if (seekamountpos > 0 && !up)
+        seekamountpos--;
+    if (seekamountpos < 7 && up) 
+        seekamountpos++;
+
+    QString text = "";
+
+    int fps = (int)ceil(video_frame_rate);
+
+    switch (seekamountpos)
+    {
+        case 0: text = "1 frame"; seekamount = 1; break;
+        case 1: text = "0.5 seconds"; seekamount = fps / 2; break;
+        case 2: text = "1 second"; seekamount = fps; break;
+        case 3: text = "5 seconds"; seekamount = fps * 5; break;
+        case 4: text = "20 seconds"; seekamount = fps * 20; break;
+        case 5: text = "1 minute"; seekamount = fps * 60; break;
+        case 6: text = "5 mintues"; seekamount = fps * 300; break;
+        case 7: text = "10 minutes"; seekamount = fps * 600; break;
+        default: text = "error"; seekamount = fps; break;
+    }
+
+    osd->ShowText("seek_desc", text, rect.left(), rect.top(), rect.width(),
+                  rect.height(), 2);
+}
+
+void NuppelVideoPlayer::UpdateTimeDisplay(void)
+{
+    if (!timedisplay)
+    {
+        timedisplay = new OSDSet("edittime_display", true, video_width, 
+                                 video_height, video_width / 640.0, 
+                                 video_height / 480.0);
+
+        TTFFont *font = osd->GetFont("channel_font");
+        QRect rect;
+        rect.setTop(video_height * 1 / 16);
+        rect.setBottom(video_height * 2 / 8);
+        rect.setLeft(video_width / 2 - 50);
+        rect.setRight(video_width * 15 / 16);
+
+        OSDTypeText *text = new OSDTypeText("timedisp", font, "", rect);
+        timedisplay->AddType(text);
+
+        osd->AddSet(timedisplay, "edittime_display");
+    }
+
+    if (!timedisplay)
+        return;
+
+    OSDTypeText *text = (OSDTypeText *)timedisplay->GetType("timedisp");
+    if (text)
+    {
+        int hours = 0;
+        int mins = 0;
+        int secs = 0;
+        int frames = 0;
+
+        int fps = (int)ceil(video_frame_rate);
+
+        hours = (framesPlayed / fps) / 60 / 60;
+        mins = (framesPlayed / fps) / 60 - (hours * 60);
+        secs = (framesPlayed / fps) - (mins * 60) - (hours * 60 * 60);
+        frames = framesPlayed - ((secs * fps) + (mins * 60 * fps) + 
+                                 (hours * 60 * 60 * fps));
+
+        char timestr[128];
+        sprintf(timestr, "%1d:%02d:%02d.%02d", hours, mins, secs, frames);
+        text->SetText(timestr);
+
+        osd->SetVisible(timedisplay, -1);
+    }
 }
 
 char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,

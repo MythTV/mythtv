@@ -1048,6 +1048,12 @@ void TV::RunTV(void)
 
 void TV::ProcessKeypress(int keypressed)
 {
+    if (editmode)
+    {   
+        nvp->DoKeypress(keypressed);
+        return;
+    }
+
     if (nvp->GetOSD() && osd->DialogShowing(dialogname))
     {
         switch (keypressed)
@@ -1161,12 +1167,6 @@ void TV::ProcessKeypress(int keypressed)
     }
     else if (StateIsPlaying(internalState))
     {
-        if (editmode)
-        {
-            nvp->DoKeypress(keypressed);
-            return;
-        }
-       
         switch (keypressed)
         {
             case 'i': case 'I': DoPosition(); break;

@@ -830,7 +830,23 @@ OSDSet *OSD::ShowText(const QString &name, const QString &message, int xpos,
 {
     pthread_mutex_lock(&osdlock);
 
-    OSDSet *set = new OSDSet(name, false, vid_width, vid_height, wmult, hmult);
+    OSDSet *set = GetSet(name);
+    if (set)
+    {
+        OSDTypeText *text = (OSDTypeText *)set->GetType("message");
+        if (text)
+            text->SetText(message);
+
+        if (secs > 0)
+            set->DisplayFor(secs * fps);
+        else
+            set->Display();
+        m_setsvisible = true;
+        pthread_mutex_unlock(&osdlock);
+        return set;
+    }
+
+    set = new OSDSet(name, false, vid_width, vid_height, wmult, hmult);
     set->SetPriority(3);
     set->SetFrameRate(fps);
     AddSet(set, name, false);
@@ -848,11 +864,25 @@ OSDSet *OSD::ShowText(const QString &name, const QString &message, int xpos,
     text->SetMultiLine(true);
     set->AddType(text);
 
-    set->DisplayFor(secs * fps);
+    if (secs > 0)
+        set->DisplayFor(secs * fps);
+    else
+        set->Display();
     m_setsvisible = true;
 
     pthread_mutex_unlock(&osdlock);
     return set;
+}
+
+void OSD::SetVisible(OSDSet *set, int length)
+{
+    pthread_mutex_lock(&osdlock);
+    if (length > 0)
+        set->DisplayFor(length * fps);
+    else
+        set->Display();
+    m_setsvisible = true;
+    pthread_mutex_unlock(&osdlock);
 }
 
 void OSD::Display(unsigned char *yuvptr)

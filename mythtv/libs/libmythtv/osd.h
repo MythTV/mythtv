@@ -51,6 +51,11 @@ class OSD
     OSDSet *ShowText(const QString &name, const QString &message, int xpos,
                      int ypos, int width, int height, int secs);
     void AddSet(OSDSet *set, QString name, bool withlock = true);
+  
+    void SetVisible(OSDSet *set, int length);
+ 
+    OSDSet *GetSet(const QString &text);
+    TTFFont *GetFont(const QString &text);
  
  private:
     void SetNoThemeDefaults();
@@ -61,9 +66,6 @@ class OSD
     void normalizeRect(QRect *rect);
     QPoint parsePoint(QString text);
     QRect parseRect(QString text);
-
-    OSDSet *GetSet(const QString &text);
-    TTFFont *GetFont(const QString &text);
 
     void RemoveSet(OSDSet *set);
 
