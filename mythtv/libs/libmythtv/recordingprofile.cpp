@@ -6,6 +6,8 @@
 #include <qlayout.h>
 #include <iostream>
 
+#define TRANSCODER_GROUP 6
+
 QString RecordingProfileParam::whereClause(void) {
   return QString("id = %1").arg(parentProfile.getProfileNum());
 }
@@ -807,11 +809,24 @@ void RecordingProfile::fillSelections(QSqlDatabase* db, SelectSetting* setting,
         QString query = QString("SELECT name, id FROM recordingprofiles "
                                 "WHERE profilegroup = %1 ORDER BY id;")
                                 .arg(group);
-       QSqlQuery result = db->exec(query);
+
+        QSqlQuery result = db->exec(query);
         if (result.isActive() && result.numRowsAffected() > 0)
+        {
             while (result.next())
-                setting->addSelection(result.value(0).toString(),
-                                      result.value(1).toString());
+            {
+                if(group == TRANSCODER_GROUP)
+                {
+                    setting->addSelection(QString( "From %1").arg(result.value(0).toString()),
+                                          result.value(1).toString());
+                }
+                else
+                {
+                    setting->addSelection(result.value(0).toString(),
+                                          result.value(1).toString());    
+                }
+            }
+        }
     }
 }
 
