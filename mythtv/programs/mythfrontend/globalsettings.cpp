@@ -65,7 +65,7 @@ public:
         setHelpText("MythTV can control the PCM and master "
                     "mixer volume.  If you prefer to use an external mixer "
                     "program, uncheck this box.  If you uncheck the box, "
-                    "then ignore the next two settings.");
+                    "then ignore the next three settings.");
     };
 };
 
@@ -189,8 +189,9 @@ public:
         setLabel("Commercial Skip Method");
         addSelection("Blank Screen Detection (default)", "1");
         setHelpText("This determines the method used by MythTV to detect when "
-                    "commercials start and end.  It is used by both the manual "
-                    "and automatic commercial skip functions of MythTV." );
+                    "commercials start and end.  The manual "
+                    "and automatic commercial skip modes of MythTV will "
+                    "both use this function." );
     };
 };
 
@@ -245,7 +246,7 @@ public:
     OSDDisplayTime():
         SpinBoxSetting(0, 30, 1),
         GlobalSetting("OSDDisplayTime") {
-        setLabel("Number of seconds for which OSD should be displayed");
+        setLabel("Number of seconds for OSD information");
         setValue(3);
         setHelpText("How long the program information remains on the On "
                     "Screen Display after a channel change.");
@@ -361,7 +362,7 @@ public:
        setLabel("Aggressive Soundcard Buffering");
        setValue(false);
        setHelpText("If this is set, MythTV will pretend to have a smaller "
-                   "soundcard buffer than is really present.  Can speed up "
+                   "soundcard buffer than is really present.  This may speed up "
                    "seeking, but can also cause playback problems.");
     };
 };
@@ -397,7 +398,7 @@ public:
         GlobalSetting("EndOfRecordingExitPrompt") {
         setLabel("Prompt at end of recording");
         setValue(false);
-        setHelpText("If this is set, a "
+        setHelpText("If set, a "
                     "menu will be displayed allowing you to delete the "
                     "recording when it has finished playing.");
     };
