@@ -2531,7 +2531,7 @@ bool fillData(QValueList<Source> &sourcelist)
                 xmltv_grabber == "tv_grab_sn")
                 maxday = 14;
             if (xmltv_grabber == "datadirect")
-                maxday = 12;
+                maxday = 14;
 
             for (int i = 0; i < maxday; i++)
             {
@@ -2559,7 +2559,7 @@ bool fillData(QValueList<Source> &sourcelist)
                 querystr.sprintf("SELECT COUNT(*) as 'hits' "
                                  "FROM channel LEFT JOIN program USING (chanid) "
                                  "WHERE sourceid = %d AND starttime >= "
-                                 "DATE_ADD(CURRENT_DATE(), INTERVAL '%d 12' "
+                                 "DATE_ADD(CURRENT_DATE(), INTERVAL '%d 18' "
                                  "DAY_HOUR) AND "
                                  "starttime < DATE_ADD(CURRENT_DATE(), "
                                  "INTERVAL 1+%d DAY) "
@@ -2574,7 +2574,7 @@ bool fillData(QValueList<Source> &sourcelist)
                     // We also need to get this day's data if there's only a 
                     // suspiciously small amount in the DB.
                     if (!query.numRowsAffected() ||
-                        (query.next() && query.value(0).toInt() <= 20)) 
+                        (query.next() && query.value(0).toInt() <= 10))
                     {
                         download_needed = true;
                     }
