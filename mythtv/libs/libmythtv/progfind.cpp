@@ -100,6 +100,7 @@ ProgFinder::ProgFinder(MythContext *context,
     inSearch = 0;
     pastInitial = false;
     searchCount = 37;
+    recordingCount = 0;
 
     initData = new QString[(int)(searchCount*showsPerListing)];
     gotInitData = new int[searchCount];
@@ -1086,7 +1087,6 @@ void ProgFinder::clearShowData()
 
 int ProgFinder::checkRecordingStatus(int showNum)
 {
-
     for (int j = 0; j < recordingCount; j++)
     {
 	if (showData[showNum].title == curRecordings[j].title)
@@ -1147,12 +1147,11 @@ void ProgFinder::getRecordingInfo()
         return;
     }
 
+    recordingCount = 0;
     if (query.numRowsAffected() > 0)
     {
 
-    recordingCount =1;
     curRecordings = new recordingRecord[(int)query.numRowsAffected()];
-    recordingCount = 0;
 
     if (query.isActive() && query.numRowsAffected() > 0)
     {
