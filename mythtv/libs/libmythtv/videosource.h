@@ -338,36 +338,152 @@ public slots:
     void fillSelections(const QString& device);
 };
 
+class DVBCardNum: public SpinBoxSetting, public CCSetting {
+public:
+    DVBCardNum(const CaptureCard& parent):
+        SpinBoxSetting(0,3,1),
+        CCSetting(parent, "videodevice") {
+        setLabel("DVB Card Number");
+    };
+};
+
+class DVBCardType: public LabelSetting {
+    Q_OBJECT
+public:
+    DVBCardType():
+        LabelSetting() {
+        setLabel("Card Type");
+        setValue("Unknown");
+    };
+
+    void save(QSqlDatabase* db) { (void)db; };
+    void load(QSqlDatabase* db) { (void)db; };
+
+public slots:
+    void setString(const QString& string) {
+        setValue(string);
+    };
+};
+
+class DVBCardName: public LabelSetting {
+    Q_OBJECT
+public:
+    DVBCardName():
+        LabelSetting() {
+        setLabel("Card Name");
+        setValue("Unknown");
+    };
+
+    void save(QSqlDatabase* db) { (void)db; };
+    void load(QSqlDatabase* db) { (void)db; };
+
+public slots:
+    void setString(const QString& string) {
+        setValue(string);
+    };
+};
+
+class DVBUseTS: public CheckBoxSetting, public CCSetting {
+public:
+    DVBUseTS(const CaptureCard& parent):
+        CCSetting(parent, "use_ts") {
+        setLabel("Use Transport Stream for recording");
+    };
+};
+
 class CardType: public ComboBoxSetting, public CCSetting {
 public:
     CardType(const CaptureCard& parent);
     static void fillSelections(SelectSetting* setting);
 };
 
-class CaptureCard: public ConfigurationWizard {
+class CaptureCardGroup: public VerticalConfigurationGroup,
+                        public TriggeredConfigurationGroup {
 public:
-    CaptureCard() {
+    CaptureCardGroup() {};
+};
+
+class V4LConfigurationGroup: public VerticalConfigurationGroup {
+public:
+    V4LConfigurationGroup(CaptureCard& a_parent):
+        VerticalConfigurationGroup(),
+        parent(a_parent) {
+
         VideoDevice* device;
         TunerCardInput* input;
 
-        // must be first
-        addChild(id = new ID());
-
-        ConfigurationGroup *devices = new VerticalConfigurationGroup(false);
-        devices->setLabel("Capture card");
-        devices->addChild(device = new VideoDevice(*this));
-        devices->addChild(new VbiDevice(*this));
-        devices->addChild(new AudioDevice(*this));
-        devices->addChild(new AudioRateLimit(*this));
-        devices->addChild(input = new TunerCardInput(*this));
-        devices->addChild(new CardType(*this));
-        addChild(devices);
-
-        addChild(new Hostname(*this));
+        addChild(device = new VideoDevice(parent));
+        addChild(new VbiDevice(parent));
+        addChild(new AudioDevice(parent));
+        addChild(new AudioRateLimit(parent));
+        addChild(input = new TunerCardInput(parent));
 
         connect(device, SIGNAL(valueChanged(const QString&)),
                 input, SLOT(fillSelections(const QString&)));
         input->fillSelections(device->getValue());
+    };
+private:
+    CaptureCard& parent;
+};
+
+class DVBConfigurationGroup: public VerticalConfigurationGroup {
+    Q_OBJECT
+public:
+    DVBConfigurationGroup(CaptureCard& a_parent):
+        VerticalConfigurationGroup(),
+        parent(a_parent) {
+
+        DVBCardNum* cardnum = new DVBCardNum(parent);
+        cardname = new DVBCardName();
+        cardtype = new DVBCardType();
+
+        addChild(cardnum);
+        addChild(cardname);
+        addChild(cardtype);
+        addChild(new DVBUseTS(parent));
+
+        connect(cardnum, SIGNAL(valueChanged(const QString&)),
+                this, SLOT(probeCard(const QString&)));
+    };
+
+public slots:
+    void probeCard(const QString& cardNumber);
+
+private:
+    CaptureCard& parent;
+
+    DVBCardName* cardname;
+    DVBCardType* cardtype;
+};
+
+class CaptureCard: public ConfigurationWizard {
+public:
+    CaptureCard() {
+        // must be first
+        addChild(id = new ID());
+
+        CaptureCardGroup *cardgroup = new CaptureCardGroup();
+        cardgroup->setLabel("Capture card");
+
+        CardType* cardtype = new CardType(*this);
+        cardgroup->addChild(cardtype);
+        cardgroup->setTrigger(cardtype);
+
+        V4LConfigurationGroup* v4l_group = new V4LConfigurationGroup(*this);
+        DVBConfigurationGroup* dvb_group = new DVBConfigurationGroup(*this);
+        V4LConfigurationGroup* mpeg_group = new V4LConfigurationGroup(*this);
+        V4LConfigurationGroup* mjpeg_group = new V4LConfigurationGroup(*this);
+        V4LConfigurationGroup* hdtv_group = new V4LConfigurationGroup(*this);
+
+        cardgroup->addTarget("V4L", v4l_group);
+        cardgroup->addTarget("DVB", dvb_group);
+        cardgroup->addTarget("MPEG", mpeg_group);
+        cardgroup->addTarget("MJPEG", mjpeg_group);
+        cardgroup->addTarget("HDTV", hdtv_group);
+
+        addChild(cardgroup);
+
+        addChild(new Hostname(*this));
     };
 
     int getCardID(void) const {

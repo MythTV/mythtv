@@ -16,3 +16,11 @@ DEPENDPATH += ../../libs/libmyth
 HEADERS += mythlcd.h
 
 SOURCES += main.cpp mythlcd.cpp
+
+using_dvb {
+    LIBS += -ldvbdev
+    LIBS += -L../../libs/libdvbdev
+    TARGETDEPS += ../../libs/libdvbdev/libdvbdev.a
+    DEPENDPATH += ../../libs/libdvbdev
+}
+

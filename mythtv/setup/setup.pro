@@ -13,7 +13,7 @@ include ( ../settings.pro )
 
 LIBS += -lmyth-$$LIBVERSION -lmythtv $$EXTRA_LIBS
 
-DEPENDPATH += ../../libs/libmyth
+DEPENDPATH += ../libs/libmyth ../libs/libmythtv
 
 # Input
 SOURCES += main.cpp backendsettings.cpp
@@ -22,3 +22,11 @@ menu.path = $${PREFIX}/share/mythtv/
 menu.files += setup.xml
 
 INSTALLS += menu
+
+using_dvb {
+    LIBS += -ldvbdev
+    LIBS += -L../libs/libdvbdev
+    TARGETDEPS += ../libs/libdvbdev/libdvbdev.a
+    DEPENDPATH += ../libs/libdvbdev
+}
+

@@ -24,3 +24,11 @@ DEPENDPATH += ../../libs/libvbitext ../../libs/libavformat
 
 # Input
 SOURCES += main.cpp
+
+using_dvb {
+    LIBS += -ldvbdev
+    LIBS += -L../../libs/libdvbdev
+    TARGETDEPS += ../../libs/libdvbdev/libdvbdev.a
+    DEPENDPATH += ../../libs/libdvbdev
+}
+

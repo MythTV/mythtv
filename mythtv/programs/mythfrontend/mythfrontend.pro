@@ -35,3 +35,11 @@ HEADERS += manualschedule.h rankprograms.h rankchannels.h
 SOURCES += main.cpp manualbox.cpp playbackbox.cpp viewscheduled.cpp
 SOURCES += globalsettings.cpp manualschedule.cpp rankprograms.cpp 
 SOURCES += rankchannels.cpp
+
+using_dvb {
+    LIBS += -ldvbdev
+    LIBS += -L../../libs/libdvbdev
+    TARGETDEPS += ../../libs/libdvbdev/libdvbdev.a
+    DEPENDPATH += ../../libs/libdvbdev
+}
+

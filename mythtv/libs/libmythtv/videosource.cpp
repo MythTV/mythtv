@@ -9,6 +9,11 @@
 #include <qfile.h>
 #include <iostream>
 
+#ifdef USING_DVB
+#include <linux/dvb/frontend.h>
+#include "dvbdev.h"
+#endif
+
 #include <unistd.h>
 #include <stdio.h>
 #include <fcntl.h>
@@ -217,6 +222,7 @@ void CardType::fillSelections(SelectSetting* setting)
     setting->addSelection("MJPEG capture card (Matrox G200, DC10)", "MJPEG");
     setting->addSelection("MPEG-2 Encoder card (PVR-250, PVR-350)", "MPEG");
     setting->addSelection("pcHDTV ATSC capture card", "HDTV");
+    setting->addSelection("Digital Video Broadcast card (DVB)", "DVB");
 }
 
 void CardInput::loadByID(QSqlDatabase* db, int inputid) {
@@ -392,6 +398,45 @@ QStringList VideoDevice::probeInputs(QString device) {
 
     close(videofd);
     return ret;
+}
+
+void DVBConfigurationGroup::probeCard(const QString& cardNumber)
+{
+#ifdef USING_DVB
+    int fd = open(dvbdevice(DVB_DEV_FRONTEND, cardNumber.toInt()), O_RDWR);
+    if (fd == -1)
+    {
+        cardname->setValue(QString("Could not open card #%1!")
+                            .arg(cardNumber));
+        cardtype->setValue(strerror(errno));
+    }
+    else
+    {
+        struct dvb_frontend_info info;
+
+        if (ioctl(fd, FE_GET_INFO, &info) < 0)
+        {
+            cardname->setValue(QString("Could not get card info for card #%1!")
+                                      .arg(cardNumber));
+            cardtype->setValue(strerror(errno));
+        }
+        else
+        {
+            switch(info.type)
+            {
+                case FE_QPSK:   cardtype->setValue("DVB-S"); break;
+                case FE_QAM:    cardtype->setValue("DVB-C"); break;
+                case FE_OFDM:   cardtype->setValue("DVB-T"); break;
+            }
+
+            cardname->setValue(info.name);
+        }
+        close(fd);
+    }
+#else
+    (void)cardNumber;
+    cardtype->setValue(QString("Recompile with DVB-Support!"));
+#endif
 }
 
 void TunerCardInput::fillSelections(const QString& device) {
