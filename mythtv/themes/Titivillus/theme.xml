@@ -1,4 +1,86 @@
 <myththeme>
+    <font name="basefont"  face="Trebuchet Ms">
+      <color>#ffffff</color>
+      <dropcolor>#000000</dropcolor>
+      <size>17</size>
+      <size:small>14</size:small>
+      <size:big>20</size:big>
+      <shadow>2,2</shadow>
+      <bold>yes</bold>
+    </font>
+   <font name="title" base="basefont" face="Arial Black">
+      <color>#ffffdd</color>
+      <size>22</size>
+      <bold>yes</bold>
+      <size:big>24</size:big>
+      <size:small>18</size:small>
+    </font>
+    
+    <font name="subtitle" base="basefont">
+      <color>#ffffdd</color>
+      <size>18</size>
+      <size:big>20</size:big>
+      <size:small>14</size:small>
+    </font>
+    
+    <font name="info" base="basefont">
+      <shadow>1,1</shadow>
+    </font>
+    
+    <font name="metadata" base="info">
+      <color>#ffffdd</color>
+      <shadow>1,1</shadow>
+    </font>
+    
+    <font name="help" base="info">
+      <shadow>2,2</shadow>
+      <color>#aaaaee</color>
+    </font>
+    
+    <font name="description" base="info">
+      <shadow>1,1</shadow>
+    </font>
+    
+    <font name="small-info" base="info">
+      <size>14</size>
+      <size:small>12</size:small>
+      <size:big>17</size:big>
+    </font>
+
+    <font name="list-active" base="basefont" face="Freesans">
+      <shadow>1,1</shadow>
+      <color>#ddddff</color>
+    </font>
+
+    <font name="list-inactive" base="list-active">
+      <color>#aaaaee</color>
+    </font>
+  
+    <font name="list-record" base="list-active">
+      <color>#33ff33</color>
+    </font>
+    
+    <font name="list-norecord" base="list-active">
+      <color>#999999</color>
+    </font>
+
+    <font name="list-conflict"  base="list-active">
+      <color>#dddd33</color>
+    </font>
+    
+    <font name="list-selected"  base="list-active">
+      <color>#ffffff</color>
+    </font>
+
+    <font name="list-selectable" base="list-active">
+        <color>#ddddff</color>
+    </font>
+
+        
+    <font name="recstatus" base="info">
+      <color>#ffff33</color>
+      <shadow>2,2</shadow>
+    </font>
 
   <background style="normal">
     <image>background.jpg</image>
@@ -36,10 +118,10 @@
   <genericbutton>
     <watermarkposition>524,105</watermarkposition> <!-- 20px right margin -->
     <normal>text-blank.png</normal>
-    <active>text-blank.png</active>
+    <active>forward.png</active>
     <text>
-    <area>1,3,3,3</area>
-    <color>white</color>
+      <area>60,15,3,3</area>
+      <color>white</color>
       <fontname>Trebuchet Ms</fontname>
       <fontsize>28</fontsize>
       <bold>yes</bold>
@@ -56,7 +138,7 @@
       </shadow>-->
     </text>
     <activetext>
-      <area>1,3,3,3</area>
+      <area>60,15,3,3</area>
       <color>#0086FF</color>
       <fontname>Trebuchet Ms</fontname>
       <fontsize>28</fontsize>

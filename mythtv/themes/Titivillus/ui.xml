@@ -2,24 +2,6 @@
 
   <window name="programguide">
 
-    <font name="title" face="Trebuchet Ms">
-      <color>#DDDDff</color>
-      <dropcolor>#000000</dropcolor>
-      <size>24</size>
-      <size:small>14</size:small>
-      <size:big>24</size:big>
-      <shadow>5,5</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="info" face="Trebuchet Ms">
-      <color>#ffffee</color>
-      <size>17</size>
-      <size:small>13</size:small>
-      <size:big>19</size:big>
-      <shadow>4,4</shadow>
-      <bold>yes</bold>
-    </font>
 
     <font name="descinfo2" face="Trebuchet Ms">
       <color>#ffffee</color>
@@ -280,8 +262,8 @@
         <recordstatus type="WeekslotRecord" image="guide/gg-rs-weekslot.png"></recordstatus>
         <recordstatus type="FindOneRecord" image="guide/gg-rs-findone.png"></recordstatus>
 
-        <arrow direction="left" image="guide/gg-arrow-left.png"></arrow>
-        <arrow direction="right" image="guide/gg-arrow-right.png"></arrow>
+        <!--<arrow direction="left" image="guide/gg-arrow-left.png"></arrow>
+        <arrow direction="right" image="guide/gg-arrow-right.png"></arrow> -->
         <font>descinfo2</font>
       </guidegrid>
     </container>
@@ -323,25 +305,6 @@
   </window>
 
    <window name="programguide-video">
-
-    <font name="title" face="Trebuchet Ms">
-      <color>#DDDDff</color>
-      <dropcolor>#000000</dropcolor>
-      <size>22</size>
-      <size:small>14</size:small>
-      <size:big>24</size:big>
-      <shadow>4,4</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="info" face="Trebuchet Ms">
-      <color>#ffffee</color>
-      <size>17</size>
-      <size:small>13</size:small>
-      <size:big>19</size:big>
-      <shadow>4,4</shadow>
-      <bold>yes</bold>
-    </font>
 
     <font name="descinfo2" face="Trebuchet Ms">
       <color>#ffffee</color>
@@ -592,8 +555,8 @@
         <recordstatus type="AllRecord" image="guide/gg-rs-all.png"></recordstatus>
         <recordstatus type="WeekslotRecord" image="guide/gg-rs-weekslot.png"></recordstatus>
         <recordstatus type="FindOneRecord" image="guide/gg-rs-findone.png"></recordstatus>
-        <arrow direction="left" image="guide/gg-arrow-left.png"></arrow>
-        <arrow direction="right" image="guide/gg-arrow-right.png"></arrow>
+        <!--<arrow direction="left" image="guide/gg-arrow-left.png"></arrow>
+        <arrow direction="right" image="guide/gg-arrow-right.png"></arrow>-->
         <font>descinfo</font>
       </guidegrid>
     </container>
@@ -636,32 +599,6 @@
 
   <window name="conflict">
 
-    <font name="active_font" face="Trebuchet Ms">
-      <color>#ffffff</color>
-      <size>15</size>
-      <size:small>11</size:small>
-      <size:big>17</size:big>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="inactive_font" face="Trebuchet Ms">
-      <color>#9999cc</color>
-      <size>15</size>
-      <size:small>11</size:small>
-      <size:big>17</size:big>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="record_font" face="Trebuchet Ms">
-      <color>#F7862B</color>
-      <size>15</size>
-      <size:small>11</size:small>
-      <size:big>17</size:big>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
 
     <font name="norecordfnt" face="Trebuchet Ms">
       <color>#9999cc</color>
@@ -689,79 +626,8 @@
       <bold>yes</bold>
     </font>
 
-    <font name="title" face="Trebuchet Ms">
-      <color>#DDDDff</color>
-      <dropcolor>#000000</dropcolor>
-      <size>24</size>
-      <size:small>14</size:small>
-      <shadow>4,4</shadow>
-      <bold>yes</bold>
-    </font>
 
 
-    <font name="subtitle" face="Trebuchet Ms">
-      <color>#ffffdd</color>
-      <size>17</size>
-      <size:small>15</size:small>
-      <size:big>19</size:big>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
-
-
-    <font name="info" face="Trebuchet Ms">
-      <color>#ffffff</color>
-      <size>17</size>
-      <size:small>15</size:small>
-      <size:big>19</size:big>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="infob" face="Trebuchet Ms">
-      <color>#ffffff</color>
-      <size>17</size>
-      <size:small>15</size:small>
-      <size:big>19</size:big>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="infoyb" face="Trebuchet Ms">
-      <color>#ffff33</color>
-      <size>17</size>
-      <size:small>10</size:small>
-      <size:big>19</size:big>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="message" face="Trebuchet Ms">
-      <color>#ffffdd</color>
-      <size>16</size>
-      <size:small>10</size:small>
-      <size:big>18</size:big>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="messagegray" face="Trebuchet Ms">
-      <color>#999999</color>
-      <size>16</size>
-      <size:small>10</size:small>
-      <size:big>18</size:big>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="messageyellow" face="Trebuchet Ms">
-      <color>#ffff33</color>
-      <size>16</size>
-      <size:small>10</size:small>
-      <size:big>18</size:big>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
 
     <container name="background">
       <image name="filler" draworder="0" fleximage="no">
@@ -772,7 +638,7 @@
 
       <textarea name="showinstr" align="left" draworder="0">
         <area>500,558,800,30</area>
-        <font>message</font>
+        <font>help</font>
         <value>Show  (1) All  (2) Important</value>
       </textarea>
     </container>
@@ -789,12 +655,12 @@
       <area>20,10,280,30</area>
       <textarea name="showing" draworder="4">
         <area>0,0,105,30</area>
-        <font>message</font>
+        <font>info</font>
         <value>Showing:</value>
       </textarea>
       <textarea name="showlevel" draworder="4">
         <area>110,0,110,30</area>
-        <font>message</font>
+        <font>info</font>
       </textarea>
     </container>
 
@@ -802,12 +668,12 @@
       <area>0,39,800,290</area>
       <listarea name="conflictlist" draworder="4">
         <area>20,12,760,265</area>
-        <fcnfont name="conflictfnt" function="conflictingrecording"></fcnfont>
+        <fcnfont name="list-conflict" function="conflictingrecording"></fcnfont>
         <fcnfont name="norecordfnt" function="disabledrecording"></fcnfont>
-        <fcnfont name="active_font" function="active"></fcnfont>
-        <fcnfont name="inactive_font" function="inactive"></fcnfont>
-        <fcnfont name="record_font" function="recording"></fcnfont>
-        <fcnfont name="active_font" function="selected"></fcnfont>
+        <fcnfont name="list-active" function="active"></fcnfont>
+        <fcnfont name="list-inactive" function="inactive"></fcnfont>
+        <fcnfont name="list-record" function="recording"></fcnfont>
+        <fcnfont name="list-selected" function="selected"></fcnfont>
         <columnpadding>10</columnpadding>
         <column number="1" width="145" context="-1"></column>
         <column number="2" width="137" context="-1"></column>
@@ -856,7 +722,7 @@
       <area>20,558,480,30</area>
       <textarea name="recordingstatus" align="left" draworder="6">
         <area>0,0,480,30</area>
-        <font>infoyb</font>
+        <font>recstatus</font>
       </textarea>
     </container>
  
@@ -887,21 +753,6 @@
 
   <window name="recprioritychannels">
 
-    <font name="active_font" face="Trebuchet Ms">
-      <color>#ffffff</color>
-      <size>15</size>
-      <size:small>13</size:small>
-      <size:big>17</size:big>
-      <shadow>1,1</shadow>
-    </font>
-
-    <font name="inactive_font" face="Trebuchet Ms">
-      <color>#9999cc</color>
-      <size>15</size>
-      <size:small>13</size:small>
-      <size:big>17</size:big>
-      <shadow>1,1</shadow>
-    </font>
 
     <font name="currenttitle" face="Trebuchet Ms">
       <color>#ffff33</color>
@@ -911,32 +762,7 @@
       <shadow>1,1</shadow>
     </font>
 
-    <font name="title" face="Trebuchet Ms">
-      <color>#DDDDff</color>
-      <dropcolor>#000000</dropcolor>
-      <size>24</size>
-      <size:small>22</size:small>
-      <shadow>4,4</shadow>
-      <bold>yes</bold>
-    </font>
 
-
-    <font name="info" face="Trebuchet Ms">
-      <color>#ffffff</color>
-      <size>17</size>
-      <size:small>15</size:small>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="message" face="Trebuchet Ms">
-      <color>#ffffff</color>
-      <size>16</size>
-      <size:small>14</size:small>
-      <size:big>18</size:big>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
 
     <container name="background">
       <textarea name="sched" draworder="0">
@@ -950,7 +776,7 @@
       </image>
       <textarea name="keyinstr" align="center" draworder="0">
         <area>0,570,800,30</area>
-        <font>message</font>
+        <font>help</font>
         <value>(1) Sort by Channel    (2) Sort by Priority</value>
       </textarea>
     </container>
@@ -959,9 +785,9 @@
      <area>0,39,800,375</area>
       <listarea name="recprioritylist" draworder="4">
         <area>20,12,760,330</area>
-        <fcnfont name="active_font" function="active"></fcnfont>
-        <fcnfont name="inactive_font" function="inactive"></fcnfont>
-        <fcnfont name="active_font" function="selected"></fcnfont>
+        <fcnfont name="list-active" function="active"></fcnfont>
+        <fcnfont name="list-inactive" function="inactive"></fcnfont>
+        <fcnfont name="list-selected" function="selected"></fcnfont>
         <columnpadding>1</columnpadding>
         <column number="1" width="75" context="-1"></column>
         <column number="2" width="590" context="-1"></column>
@@ -1027,24 +853,6 @@
 
   <window name="recpriorityprograms">
 
-    <font name="active_font" face="Trebuchet Ms">
-      <color>#ffffff</color>
-      <size>17</size>
-      <bold>yes</bold>
-      <size:small>13</size:small>
-      <size:big>17</size:big>
-      <shadow>1,1</shadow>
-    </font>
-
-    <font name="inactive_font" face="Trebuchet Ms">
-      <color>#9999cc</color>
-      <size>17</size>
-      <bold>yes</bold>
-      <size:small>13</size:small>
-      <size:big>17</size:big>
-      <shadow>1,1</shadow>
-    </font>
-
     <font name="currenttitle" face="Trebuchet Ms">
       <color>#ffff33</color>
       <size>15</size>
@@ -1054,34 +862,6 @@
       <bold>yes</bold>
     </font>
 
-    <font name="title" face="Trebuchet Ms">
-      <color>#DDDDff</color>
-      <dropcolor>#000000</dropcolor>
-      <size>24</size>
-      <size:small>20</size:small>
-      <size:big>24</size:big>
-      <shadow>4,4</shadow>
-      <bold>yes</bold>
-    </font>
-
-
-    <font name="subtitle" face="Trebuchet Ms">
-      <color>#ffffdd</color>
-      <size>17</size>
-      <size:small>15</size:small>
-      <size:big>19</size:big>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="info" face="Trebuchet Ms">
-      <color>#ffffff</color>
-      <size>17</size>
-      <size:small>10</size:small>
-      <size:big>19</size:big>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
 
     <font name="tinyinfo" face="Trebuchet Ms">
       <color>#cccccc</color>
@@ -1101,23 +881,7 @@
       <bold>yes</bold>
     </font>
 
-    <font name="yellowinfo" face="Trebuchet Ms">
-      <color>#ffff33</color>
-      <size>17</size>
-      <size:small>15</size:small>
-      <size:big>19</size:big>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
 
-    <font name="message" face="Trebuchet Ms">
-      <color>#ffffDD</color>
-      <size>15</size>
-      <size:small>13</size:small>
-      <size:big>17</size:big>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
 
     <container name="background">
       <image name="backgroundimg" draworder="0" fleximage="no">
@@ -1143,7 +907,7 @@
       
       <textarea name="keyinstr" align="center" draworder="0">
         <area>0,563,800,30</area>
-        <font>message</font>
+        <font>help</font>
         <value>(1) Sort by Title    (2) Sort by Priority</value>
       </textarea>
     </container>
@@ -1152,9 +916,9 @@
       <area>0,39,800,375</area>
       <listarea name="recprioritylist" draworder="4">
         <area>20,12,760,330</area>
-        <fcnfont name="active_font" function="active"></fcnfont>
-        <fcnfont name="inactive_font" function="inactive"></fcnfont>
-        <fcnfont name="active_font" function="selected"></fcnfont>
+        <fcnfont name="list-active" function="active"></fcnfont>
+        <fcnfont name="list-inactive" function="inactive"></fcnfont>
+        <fcnfont name="list-selected" function="selected"></fcnfont>
         <columnpadding>1</columnpadding>
         <column number="1" width="35" context="-1"></column>
         <column number="2" width="570" context="-1"></column>
@@ -1266,7 +1030,7 @@
       </textarea>
       <textarea name="finalrecpriority" draworder="6">
         <area>709,130,150,30</area>
-        <font>yellowinfo</font>
+        <font>recstatus</font>
       </textarea>
     </container>
 
@@ -1341,44 +1105,7 @@
       <bold>yes</bold>
     </font>
 
-    <font name="title" face="Trebuchet Ms">
-      <color>#DDDDff</color>
-      <dropcolor>#000000</dropcolor>
-      <size>24</size>
-      <size:big>26</size:big>
-      <size:small>14</size:small>
-      <shadow>4,4</shadow>
-      <bold>yes</bold>
-    </font>
 
-    <font name="subtitle" face="Trebuchet Ms">
-      <color>#ffffee</color>
-      <size>17</size>
-      <size:big>20</size:big>
-      <size:small>13</size:small>
-      <shadow>3,3</shadow>
-      <bold>yes</bold>
-    </font>
-
-
-
-    <font name="info" face="Trebuchet Ms">
-      <color>#ffffff</color>
-      <size>17</size>
-      <size:big>20</size:big>
-      <size:small>10</size:small>
-      <shadow>2,2</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="message" face="Trebuchet Ms">
-      <color>#FFFFDD</color>
-      <size>17</size>
-      <size:big>20</size:big>
-      <size:small>12</size:small>
-      <shadow>2,2</shadow>
-      <bold>yes</bold>
-    </font>
 
     <container name="background">
       <image name="filler" draworder="0" fleximage="yes">
@@ -1387,13 +1114,13 @@
       </image>
       <textarea name="messagedel" draworder="0" align="hcenter">
         <area>20,10,760,35</area>
-        <font>message</font>
+        <font>info</font>
         <value>Select a recording to permanently erase.</value>
         <context>1</context>
       </textarea>
       <textarea name="messageplay" draworder="0" align ="hcenter">
         <area>20,10,760,35</area>
-        <font>message</font>
+        <font>info</font>
         <value>Select a recording to watch.</value>
         <context>0</context>
       </textarea>
@@ -1834,86 +1561,15 @@
 
   <window name="programlist">
 
-    <font name="active_font" face="Trebuchet Ms">
-      <color>#ffffff</color>
-      <size>15</size>
-      <size:small>11</size:small>
-      <shadow>2,2</shadow>
-      <bold>yes</bold>
-    </font>
 
-    <font name="inactive_font" face="Trebuchet Ms">
-      <color>#9999cc</color>
-      <size>15</size>
-      <size:small>11</size:small>
-      <shadow>2,2</shadow>
-      <bold>yes</bold>
 
-    </font>
-
-    <font name="record_font" face="Trebuchet Ms">
-      <color>#F7862B</color>
-      <size>15</size>
-      <size:small>11</size:small>
-      <shadow>2,2</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="conflict_font" face="Trebuchet Ms">
-      <color>#ffff33</color>
-      <size>15</size>
-      <size:small>11</size:small>
-      <shadow>2,2</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="title" face="Trebuchet Ms">
-      <color>#DDDDff</color>
-      <dropcolor>#000000</dropcolor>
-      <size>24</size>
-      <size:small>14</size:small>
-      <shadow>4,4</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="subtitle" face="Trebuchet Ms">
-      <color>#ffffee</color>
-      <size>17</size>
-      <size:small>13</size:small>
-      <shadow>3,3</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="info" face="Trebuchet Ms">
-      <color>#ffffff</color>
-      <size>15</size>
-      <size:small>10</size:small>
-      <shadow>2,2</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="yellowinfo" face="Trebuchet Ms">
-      <color>#ffff33</color>
-      <size>15</size>
-      <size:small>10</size:small>
-      <shadow>2,2</shadow>
-      <bold>yes</bold>
-
-    </font>
-
-    <font name="message" face="Trebuchet Ms">
-      <color>#ffffff</color>
-      <size>16</size>
-      <size:small>10</size:small>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
 
     <container name="background">
-      <image name="backgroundimg" draworder="0" fleximage="no">
-        <filename>rec_priority/rk-background.jpg</filename>
-        <position>0,0</position>
+      <image name="filler" draworder="0" fleximage="yes">
+        <filename>rec_priority/rk-background.png</filename>
+        <position>0,35</position>
       </image>
+
  
        <textarea name="sched" draworder="0">
         <area>20,10,800,40</area>
@@ -1932,22 +1588,22 @@
     </container>
 
     <container name="selector">
-      <area>0,39,800,375</area>
+      <area>0,40,800,300</area>
       <listarea name="proglist" draworder="4">
-        <area>20,12,760,330</area>
-        <fcnfont name="active_font" function="active"></fcnfont>
-        <fcnfont name="inactive_font" function="inactive"></fcnfont>
-        <fcnfont name="active_font" function="selected"></fcnfont>
-        <fcnfont name="record_font" function="recording"></fcnfont>
-        <fcnfont name="conflict_font" function="conflicting"></fcnfont>
+        <area>20,15,760,265</area>
+        <fcnfont name="list-active" function="active"></fcnfont>
+        <fcnfont name="list-inactive" function="inactive"></fcnfont>
+        <fcnfont name="list-selected" function="selected"></fcnfont>
+        <fcnfont name="list-record" function="recording"></fcnfont>
+        <fcnfont name="list-conflict" function="conflicting"></fcnfont>
         <columnpadding>5</columnpadding>
         <column number="1" width="155" context="-1"></column>
         <column number="2" width="142" context="-1"></column>
         <column number="3" width="420" context="-1"></column>
-        <items>11</items>
-        <image function="selectionbar" filename="rec_priority/tit-trk-selectbar.png" location="-6,-2"></image>
-        <image function="uparrow" filename="shared/up_arrow.png" location="755,22"></image>
-        <image function="downarrow" filename="shared/down_arrow.png" location="755,290"></image>
+        <items>8</items>
+        <image function="selectionbar" filename="conflict/tit-cr-selectbar.png" location="-10,-6"></image>
+        <image function="uparrow" filename="shared/up_arrow.png" location="745,10"></image>
+        <image function="downarrow" filename="shared/down_arrow.png" location="745,250"></image>
       </listarea>
       <image name="showinglines" draworder="5" fleximage="no">
         <filename>rec_priority/rk-lines.png</filename>
@@ -1955,37 +1611,38 @@
       </image>
     </container>
 
-    <container name="program_info">
-      <area>0,410,800,280</area>
+        <container name="program_info">
+      <area>30,355,800,240</area>
+      
       <textarea name="title" draworder="6">
-        <area>20,0,780,50</area>
+        <area>0,0,760,50</area>
         <font>title</font>
       </textarea>
-
-      <textarea name="subtitle" draworder="6">
-        <area>20,40,780,50</area>
-        <font>subtitle</font>
-      </textarea>
-
-      <textarea name="channel" draworder="6" align="right">
-        <area>390,0,390,30</area>
+      <textarea name="channel" draworder="6">
+        <area>0,40,160,30</area>
         <font>info</font>
       </textarea>
-      <textarea name="timedate" draworder="6" align="right">
-        <area>390,150,390,30</area>
+      <textarea name="timedate" draworder="6">
+        <area>180,40,420,30</area>
         <font>info</font>
       </textarea>
-      <textarea name="description" draworder="6">
-        <area>20,70,760,100</area>
-        <font>info</font>
-	<multiline>yes</multiline>
-	<value>%LONGREPEAT%%STARS%%DESCRIPTION%</value>
+      <textarea name="subdescr" draworder="6">
+        <area>0,70,720,90</area>
+        <font>description</font>
+        <multiline>yes</multiline>
+        <value>%SUBTITLE|"|"
+%%STARS%%DESCRIPTION%</value>
       </textarea>
       <textarea name="type" draworder="6">
-        <area>20,150,430,30</area>
-        <font>yellowinfo</font>
+        <area>0,175,560,30</area>
+        <font>recstatus</font>
+      </textarea>
+      <textarea name="programid" draworder="6" align="right">
+        <area>530,175,200,30</area>
+        <font>info</font>
       </textarea>
     </container>
+
 
     <container name="noprograms_list">
       <textarea name="msg" align="center" draworder="8">
@@ -2001,42 +1658,12 @@
 
   <window name="recording_options">
 
-    <font name="active_font" face="Trebuchet Ms">
+    
+    <font name="enabled_state_0_font" base="list-active">
       <color>#ffffff</color>
-      <size:big>18</size:big>
-      <size>15</size>
-      <size:small>11</size:small>
-      <shadow>2,2</shadow>
-      <bold>yes</bold>      
-    </font>
-
-    <font name="enabled_state_0_font" face="Trebuchet Ms">
-      <color>#ffffff</color>
-      <size:big>22</size:big>
-      <size>17</size>
-      <size:small>11</size:small>
-      <shadow>1,1</shadow>
       <bold>yes</bold>
     </font>
-
-    <font name="infob" face="Trebuchet Ms">
-      <color>#ffffff</color>
-      <size:big>17</size:big>
-      <size>15</size>
-      <size:small>10</size:small>
-      <shadow>2,2</shadow>
-      <bold>yes</bold>
-    </font>
-
-
-    <font name="inactive_font" face="Trebuchet Ms">
-      <color>#9999cc</color>
-      <size:big>18</size:big>
-      <size>15</size>
-      <size:small>11</size:small>
-      <shadow>2,2</shadow>
-      <bold>yes</bold>
-    </font>
+    
 
     <font name="currenttitle" face="Trebuchet Ms">
       <color>#ffff33</color>
@@ -2046,31 +1673,6 @@
       <bold>yes</bold>
     </font>
 
-    <font name="title" face="Trebuchet Ms">
-      <color>#DDDDff</color>
-      <dropcolor>#000000</dropcolor>
-      <size>24</size>
-      <size:small>14</size:small>
-      <shadow>4,4</shadow>
-      <bold>yes</bold>
-    </font>
-
-
-    <font name="subtitle" face="Trebuchet Ms">
-      <color>#ffffdd</color>
-      <size>17</size>
-      <size:small>12</size:small>
-      <shadow>2,2</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="info" face="Trebuchet Ms">
-      <color>#ffffee</color>
-      <size>16</size>
-      <size:small>10</size:small>
-      <shadow>2,2</shadow>
-      <bold>yes</bold>
-    </font>
 
     <font name="tinyinfo" face="Trebuchet Ms">
       <color>#cccccc</color>
@@ -2088,21 +1690,7 @@
       <bold>yes</bold>
     </font>
 
-    <font name="yellowinfo" face="Trebuchet Ms">
-      <color>#ffff33</color>
-      <size>17</size>
-      <size:small>10</size:small>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
 
-    <font name="message" face="Trebuchet Ms">
-      <color>#ffffDD</color>
-      <size>15</size>
-      <size:small>10</size:small>
-       <shadow>2,2</shadow>
-      <bold>yes</bold>
-    </font>
 
     <container name="background">
       <image name="backgroundimg" draworder="0" fleximage="no">
@@ -2115,10 +1703,10 @@
       <area>0,300,800,300</area>
       <listarea name="menu_list" draworder="4">
         <area>20,10,760,274</area>
-        <fcnfont name="active_font" function="active"></fcnfont>
-        <fcnfont name="inactive_font" function="inactive"></fcnfont>
-        <fcnfont name="inactive_font" function="disabled"></fcnfont>
-        <fcnfont name="active_font" function="selected"></fcnfont>
+        <fcnfont name="list-active" function="active"></fcnfont>
+        <fcnfont name="list-inactive" function="inactive"></fcnfont>
+        <fcnfont name="list-inactive" function="disabled"></fcnfont>
+        <fcnfont name="list-selected" function="selected"></fcnfont>
         <fcnfont name="enabled_state_0_font" function="enabled_state_0"></fcnfont>
         <columnpadding>1</columnpadding>
         <column number="1" width="745" context="-1"></column>
@@ -2147,7 +1735,7 @@
       </textarea>
       <textarea name="infotime" draworder="6" align="right">
         <area>20,66,125,30</area>
-        <font>infob</font>
+        <font>info</font>
         <value>Airdate:</value>
       </textarea>
       <textarea name="timedate" draworder="6">
@@ -2156,7 +1744,7 @@
       </textarea>
       <textarea name="infochan" draworder="6" align="right">
         <area>20,95,125,30</area>
-        <font>infob</font>
+        <font>info</font>
         <value>Channel:</value>
       </textarea>
       <textarea name="longchannel" draworder="6">
@@ -2165,7 +1753,7 @@
       </textarea>
       <textarea name="infodesc" draworder="6" align="right">
         <area>20,125,125,30</area>
-        <font>infob</font>
+        <font>info</font>
         <value>Description:</value>
       </textarea>
       <textarea name="description" draworder="6">
