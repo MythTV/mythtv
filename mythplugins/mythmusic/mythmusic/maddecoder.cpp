@@ -5,6 +5,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <qregexp.h>
+#include <sys/stat.h>
 using namespace std;
 
 #include <mad.h>
@@ -631,9 +632,17 @@ Metadata *MadDecoder::getMetadata(QSqlDatabase *db)
    
     timer = mad_timer_zero;
 
-    FILE *input = fopen(filename.ascii(), "r");
 
-    while (1) 
+    FILE *input = fopen(filename.ascii(), "r");
+    struct stat s;
+    fstat(fileno(input), &s);
+    unsigned long old_bitrate = 0;
+    bool vbr = false;
+    int amount_checked = 0;
+    int alt_length = 0;
+    bool loop_de_doo = true;
+    
+    while (loop_de_doo) 
     {
         if (buflen < sizeof(buffer)) 
         {
@@ -651,17 +660,41 @@ Metadata *MadDecoder::getMetadata(QSqlDatabase *db)
             if (mad_header_decode(&header, &stream) == -1)
             {
                 if (!MAD_RECOVERABLE(stream.error))
+                {
                     break;
+                }
                 if (stream.error == MAD_ERROR_LOSTSYNC)
                 {
                     int tagsize = id3_tag_query(stream.this_frame,
                                                 stream.bufend - 
                                                 stream.this_frame);
                     if (tagsize > 0)
+                    {
                         mad_stream_skip(&stream, tagsize);
+                        s.st_size -= tagsize;
+                    }
                 }
             }
-            mad_timer_add(&timer, header.duration);
+            else
+            {
+                if(amount_checked == 0)
+                {
+                    old_bitrate = header.bitrate;
+                }
+                else if(header.bitrate != old_bitrate)
+                {
+                    vbr = true;
+                }
+                if(amount_checked == 32)
+                {
+                    alt_length = (s.st_size * 8) / (old_bitrate / 1000);
+                    loop_de_doo = false;
+                    break;
+                }
+                amount_checked++;
+                mad_timer_add(&timer, header.duration);
+            }
+            
         }
         
         if (stream.error != MAD_ERROR_BUFLEN)
@@ -676,7 +709,14 @@ Metadata *MadDecoder::getMetadata(QSqlDatabase *db)
 
     fclose(input);
 
-    length = mad_timer_count(timer, MAD_UNITS_MILLISECONDS);
+    if(vbr)
+    {
+        length = mad_timer_count(timer, MAD_UNITS_MILLISECONDS);
+    }
+    else
+    {
+        length = alt_length;
+    }
 
     Metadata *retdata = new Metadata(filename, artist, album, title, genre,
                                      year, tracknum, length);

@@ -436,12 +436,25 @@ int main(int argc, char *argv[])
         }
 
         QSqlQuery count_query("SELECT COUNT(*) FROM musicmetadata;", db);
-        bool musicdata_exists = false;
 
-        if (count_query.isActive() && count_query.next()
-            && 0 != count_query.value(0).toInt())
+        bool musicdata_exists = false;
+        if (count_query.isActive())
         {
-            musicdata_exists = true;
+            if(count_query.next() && 
+               0 != count_query.value(0).toInt())
+            {
+                musicdata_exists = true;
+            }
+        }
+        else
+        {
+            DialogBox *no_db_dialog = new DialogBox("\n\nYou have no MythMusic tables in your database.");
+            no_db_dialog->AddButton("OK, I'll read the documentation");
+            no_db_dialog->Show();
+            no_db_dialog->exec();
+            db->close();
+            delete gContext;
+            exit(0);
         }
 
         //  Load all available info about songs (once!)

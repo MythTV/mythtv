@@ -266,6 +266,7 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
                 case Key_0:
                 case Key_Home:
                     music_tree_list->syncCurrentWithActive();
+                    music_tree_list->forceLastBin();
                     handled = true;
                     break;
                 case Key_4:
@@ -517,40 +518,6 @@ void PlaybackBox::CycleVisualizer()
     }
 }
 
-void PlaybackBox::createVisual()
-{
-    cout << "NOT HERE YOU IDIOT" << endl;
-/*
-    if(!isplaying)
-    {
-        return;
-    }
-    if(vis_is_big)
-    {
-        cout << " Creating big visual " << endl ;
-    }
-    else
-    {
-        cout << "Creating small visual " << endl ;
-    }
-    if(mainvisual)
-    {
-        mainvisual->setDecoder(0);
-        mainvisual->setOutput(0);
-        delete mainvisual;
-    }
-
-    mainvisual = new MainVisual(this);
-    mainvisual->setVisual("Blank");
-    mainvisual->setGeometry(visual_blackhole->getScreenArea());
-    mainvisual->show();
-    output->addListener(mainvisual);
-    output->addVisual(mainvisual);
-    mainvisual->setDecoder(decoder);
-    mainvisual->setOutput(output);
-    mainvisual->setVisual(visual_mode);
-*/
-}
 
 void PlaybackBox::pause(void)
 {
@@ -648,9 +615,17 @@ void PlaybackBox::stop(void)
     input = 0;
 
     QString time_string;
+    int maxh = maxTime / 3600;
     int maxm = (maxTime / 60) % 60;
     int maxs = maxm % 60;
-    time_string.sprintf("%02d:%02d", maxm, maxs);
+    if(maxh > 0)
+    {
+        time_string.sprintf("%d:%02d:%02d", maxh, maxm, maxs);
+    }
+    else
+    {
+        time_string.sprintf("%02d:%02d", maxm, maxs);
+    }
     time_text->SetText(time_string);
     info_text->SetText("");
     //ratinglabel->setText(" ");
@@ -999,9 +974,18 @@ void PlaybackBox::customEvent(QCustomEvent *event)
 
             QString time_string;
             
+            int maxh = maxTime / 3600;
             int maxm = (maxTime / 60) % 60;
             int maxs = maxTime % 60;
-            time_string.sprintf("%02d:%02d / %02d:%02d", em, es, maxm, maxs);
+            
+            if(maxh > 0)
+            {
+                time_string.sprintf("%d:%02d:%02d / %02d:%02d:%02d", eh, em, es, maxh, maxm, maxs);
+            }
+            else
+            {
+                time_string.sprintf("%02d:%02d / %02d:%02d", em, es, maxm, maxs);
+            }
             
             //percent_heard = ((float)rs / (float)curMeta->Length()) * 1000.0;
             //gContext->LCDsetChannelProgress(percent_heard);
@@ -1013,15 +997,15 @@ void PlaybackBox::customEvent(QCustomEvent *event)
             //
             if(oe->bitrate() < 2000)
             {
-                info_string.sprintf("%d kbps   %.1f kHz   %s",
+                info_string.sprintf("%d kbps   %.1f kHz   %s ch",
                                    oe->bitrate(), float(oe->frequency()) / 1000.0,
-                                   oe->channels() > 1 ? "stereo" : "mono");
+                                   oe->channels() > 1 ? "2" : "1");
             }
             else
             {
-                info_string.sprintf("%.1f kHz   %s",
+                info_string.sprintf("%.1f kHz   %s ch",
                                    float(oe->frequency()) / 1000.0,
-                                   oe->channels() > 1 ? "stereo" : "mono");
+                                   oe->channels() > 1 ? "2" : "1");
             }
 
             time_text->SetText(time_string);
@@ -1097,9 +1081,17 @@ void PlaybackBox::handleTreeListSignals(int node_int, IntVector *attributes)
         maxTime = curMeta->Length() / 1000;
 
         QString time_string;
+        int maxh = maxTime / 3600;
         int maxm = (maxTime / 60) % 60;
         int maxs = maxm % 60;
-        time_string.sprintf("%02d:%02d", maxm, maxs);
+        if(maxh > 0)
+        {
+            time_string.sprintf("%d:%02d:%02d", maxh, maxm, maxs);
+        }
+        else
+        {
+            time_string.sprintf("%02d:%02d", maxm, maxs);
+        }
         time_text->SetText(time_string);
         if(showrating)
         {

@@ -62,7 +62,6 @@ class PlaybackBox : public MythThemedDialog
     void nextAuto();
     void checkForPlaylists();
     void handleTreeListSignals(int, IntVector*);
-    void createVisual();
     void visEnable();
     
   signals:

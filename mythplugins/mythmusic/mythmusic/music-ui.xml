@@ -52,7 +52,7 @@
 
         <font name="infotext" face="Arial">
             <color>#ffffff</color>
-            <size>14</size>
+            <size>12</size>
             <bold>yes</bold>
         </font>
 
@@ -222,7 +222,7 @@
 
             <textarea name="info_text" draworder="1" align="left">
                 <font>infotext</font>
-                <area>270,127,250,25</area>
+                <area>270,129,250,25</area>
             </textarea>
 
             <textarea name="time_text" draworder="1" align="right">
