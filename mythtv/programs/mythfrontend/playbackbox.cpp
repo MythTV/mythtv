@@ -428,6 +428,26 @@ void PlaybackBox::play(QListViewItem *lvitem)
     qApp->lock();
     listview->SetAllowKeypress(true);
 
+    if (tv->getRequestDelete())
+    {
+        m_context->DeleteRecording(rec);
+
+        if (lvitem->itemBelow())
+        {
+            listview->setCurrentItem(lvitem->itemBelow());
+            listview->setSelected(lvitem->itemBelow(), true);
+        }
+        else if (lvitem->itemAbove())
+        {
+            listview->setCurrentItem(lvitem->itemAbove());
+            listview->setSelected(lvitem->itemAbove(), true);
+        }
+        else
+            changed(NULL);
+
+        delete lvitem;
+    }
+
     delete tv;
 
     FillList(true);

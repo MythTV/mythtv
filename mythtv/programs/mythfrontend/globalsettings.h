@@ -274,6 +274,15 @@ public:
     };
 };
 
+class PlaybackExitPrompt: public CheckBoxSetting, public GlobalSetting {
+public:
+    PlaybackExitPrompt():
+        GlobalSetting("PlaybackExitPrompt") {
+        setLabel("Prompt on playback exit");
+        setValue(false);
+    };
+};
+
 class ExternalChannelCommand: public LineEditSetting, public GlobalSetting {
 public:
     ExternalChannelCommand():
@@ -530,7 +539,7 @@ class PIPBufferName: public LineEditSetting, public GlobalSetting {
 public:
     PIPBufferName():
         GlobalSetting("PIPBufferName") {
-        setLabel("Buffer size");
+        setLabel("Buffer name");
         setValue("/mnt/store/ringbuf2.nuv");
     };
 };
@@ -551,6 +560,7 @@ public:
         general->addChild(new HorizScanPercentage());
         general->addChild(new XScanDisplacement());
         general->addChild(new YScanDisplacement());
+        general->addChild(new PlaybackExitPrompt());
         addChild(general);
 
         VerticalConfigurationGroup* osd = new VerticalConfigurationGroup();

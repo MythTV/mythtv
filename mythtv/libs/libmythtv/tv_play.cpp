@@ -47,6 +47,7 @@ TV::TV(MythContext *lcontext)
     editmode = false;
     prbuffer = NULL;
     nvp = NULL;
+    requestDelete = false;
 
     m_context->addListener(this);
 }
@@ -676,7 +677,34 @@ void TV::ProcessKeypress(int keypressed)
             case wsUp: osd->DialogUp(dialogname); break;
             case wsDown: osd->DialogDown(dialogname); break;
             case ' ': case wsEnter: case wsReturn: 
-                          osd->TurnDialogOff(dialogname); break;
+            {
+                osd->TurnDialogOff(dialogname);
+                if (dialogname == "exitplayoptions") 
+                {
+                    int result = osd->GetDialogResponse(dialogname);
+                    dialogname = "";
+
+                    if (result == 3)
+                    {
+                        nvp->Unpause();
+                    }
+                    else if (result == 1)
+                    {
+                        nvp->SetBookmark();
+                        exitPlayer = true;
+                    }
+                    else if (result == 4)
+                    {
+                        exitPlayer = true;
+                        requestDelete = true;
+                    }
+                    else
+                    {
+                        exitPlayer = true;
+                    }
+                }
+                break;
+            }
             default: break;
         }
         
@@ -712,8 +740,31 @@ void TV::ProcessKeypress(int keypressed)
             DoRew(); 
             break;
         }
-        case wsEscape: exitPlayer = true; break;
+        case wsEscape:
+        {
+            if (StateIsPlaying(internalState) && 
+                m_context->GetNumSetting("PlaybackExitPrompt")) 
+            {
+                nvp->Pause();
 
+                QString message = QString("You are exiting this recording");
+
+                QString option1 = "Save this position and go to the menu";
+                QString option2 = "Do not save, just exit to the menu";
+                QString option3 = "Keep watching";
+                QString option4 = "Delete this recording";
+
+                dialogname = "exitplayoptions";
+                osd->NewDialogBox(dialogname, message, option1, option2, 
+                                  option3, option4, 0);
+            } 
+            else 
+            {
+                exitPlayer = true;
+                break;
+            }
+            break;
+        }
         default: 
         {
             if (doing_ff || doing_rew)
