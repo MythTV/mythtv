@@ -1,4 +1,5 @@
 <mythmenu name="TVSETUP">
+
    <button>
       <type>TV_SETTINGS_GENERAL</type>
       <text>General</text>

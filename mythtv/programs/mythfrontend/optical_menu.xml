@@ -22,7 +22,7 @@
       <text lang="DK">Afspil DVD</text>
       <text lang="PT">Tocar DVD</text>
       <text lang="DE">VCD spielen</text>
-      <text lang="SV">Spela DVD</text>
+      <text lang="SV">Spela VCD</text>
       <text lang="ES">Ver DVD</text>
       <text lang="CA">Veure DVD</text>
       <text lang="FR">Lecture DVD</text>
@@ -36,6 +36,7 @@
       <type>DVD_RIP</type>
       <text>Archive DVD</text>
       <text lang="DE">DVD archivieren</text>
+      <text lang="SV">Arkivera DVD</text>
       <action>JUMP Rip DVD</action>
       <depends>mythdvd</depends>
    </button>
@@ -44,6 +45,7 @@
       <type>MUSIC_RIP</type>
       <text>Archive CD</text>
       <text lang="DE">CD archivieren</text>
+      <text lang="SV">Arkivera CD</text>
       <action>JUMP Rip CD</action>
       <depends>mythmusic</depends>
    </button>

@@ -14,7 +14,7 @@
       <type>TV_SEARCH_KEYWORDS</type>
       <text>Keywords</text>
       <text lang="DE">Inhalt</text>
-      <text lang="SV">Beskrivning</text>
+      <text lang="SV">Nyckelord</text>
       <text lang="NL">Beschrijving</text>      
       <text lang="JA">å†…å®¹</text>
       <action>TV_SEARCH_KEYWORD</action>
@@ -23,6 +23,7 @@
    <button>
       <type>TV_SEARCH_PEOPLE</type>
       <text>People</text>
+      <text lang="SV">Person</text>
       <action>TV_SEARCH_PEOPLE</action>
    </button>
 

@@ -1,4 +1,5 @@
 <mythmenu name="INFO">
+
    <button>
      <type>NEWS</type>
      <text>News Feeds</text>
@@ -42,6 +43,7 @@
     <button>
      <type>RECIPE</type>
      <text>Recipes</text>
+     <text lang="SV">Recept</text>
      <action>PLUGIN mythRecipe</action>
      <depends>mythrecipe</depends>
    </button>

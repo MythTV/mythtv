@@ -1,4 +1,5 @@
 <mythmenu name="SETUP">
+
    <button>
       <type>SETTINGS_GENERAL</type>
       <text>General</text>
@@ -35,6 +36,7 @@
      <type>SETTINGS_TV</type>
      <text>TV Settings</text>
      <text lang="DE">Fernsehen</text>
+     <text lang="SV">TV</text>
      <action>MENU tv_settings.xml</action>
    </button>
 
@@ -42,6 +44,7 @@
      <type>SETTINGS_MEDIA</type>
      <text>Media Settings</text>
      <text lang="DE">Medien</text>
+     <text lang="SV">Media</text>
      <action>MENU media_settings.xml</action>
      <depends>mythvideo mythmusic mythgallery mythfm mythgame</depends>
    </button>
@@ -50,6 +53,7 @@
      <type>SETTINGS_INFO_CENTER</type>
      <text>Info Center Settings</text>
      <text lang="DE">Informationszentrale</text>
+     <text lang="SV">Informationscenter</text>
      <action>MENU info_settings.xml</action>
      <depends>mythnews mythweather mythbookmarkmanager mythrecipe</depends> 
    </button>
@@ -62,12 +66,10 @@
      <text lang="ES">Configurar XBox</text>
      <text lang="DE">Xbox Einstellungen</text>
      <text lang="NL">Xbox Instellingen</text>
-     <text lang="SV">Xbox-inställningar</text>
+     <text lang="SV">Xbox</text>
      <text lang="JA">XBox設定</text>
      <action>SETTINGS XBOXSETTINGS</action>
      <dependssetting>EnableXbox</dependssetting>
    </button>
-
-
 
 </mythmenu>

@@ -1,4 +1,5 @@
 <mythmenu name="SETUP">
+
    <button>
      <type>SETTINGS_WEATHER</type>
      <text>Weather Settings</text>
@@ -40,8 +41,10 @@
    <button>
      <type>SETTINGS_RECIPE</type>
      <text>Recipe Settings</text>
+      <text lang="SV">ReceptinstÃ¤llningar</text>
      <action>CONFIGPLUGIN mythrecipe</action>
      <depends>mythrecipe</depends>
    </button>
 
 </mythmenu>
+

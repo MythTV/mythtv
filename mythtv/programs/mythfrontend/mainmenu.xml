@@ -20,6 +20,7 @@
      <type>MENU_MEDIA_LIBRARY</type>
      <text>Media Library</text>
      <text lang="DE">Medienbibliothek</text>
+     <text lang="SV">Mediabibliotek</text>
      <action>MENU library.xml</action>
    </button>
    
@@ -34,7 +35,7 @@
       <text lang="DE">Aufnahmen planen</text>
       <text lang="DK">Optag udsendelse</text>
       <text lang="PT">Gravação Programada</text>
-      <text lang="SV">Schemalägg inspelningar</text>
+      <text lang="SV">Hantera inspelningar</text>
       <text lang="JA">録画予約</text>
       <action>MENU manage_recordings.xml</action>
    </button>
@@ -43,6 +44,7 @@
      <type>MENU_INFO_CENTER</type>
      <text>Information Center</text>
      <text lang="DE">Informationszentrale</text>
+     <text lang="SV">Informationscenter</text>
      <action>MENU info_menu.xml</action>
      <depends>mythnews mythweather mythbookmarkmanager mythrecipe</depends>
    </button>
@@ -51,6 +53,7 @@
      <type>MENU_OPTICAL_DISKS</type>
      <text>Optical Disks</text>
      <text lang="DE">Optische Medien</text>
+     <text lang="SV">Optiska diskar</text>
      <action>MENU optical_menu.xml</action>
      <depends>mythmusic mythdvd</depends>
    </button>
@@ -66,10 +69,9 @@
      <text lang="DK">Konfiguration</text>
      <text lang="NL">Instellingen</text>
      <text lang="PT">Configurações</text>
-     <text lang="SV">Inställningar</text>
+     <text lang="SV">Verktyg/Setup</text>
      <text lang="JA">設定</text>
      <action>MENU util_menu.xml</action>
-     
    </button>
 
    <!-- <button>
@@ -78,4 +80,5 @@
      <text lang="SV">Avstängning</text>
      <action>SHUTDOWN</action>
    </button> -->
+
 </mythmenu>

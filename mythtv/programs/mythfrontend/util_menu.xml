@@ -1,8 +1,10 @@
 <mythmenu name="UTIL">
+
    <button>
       <type>MUSIC_PLAYLIST</type>
       <text>Music Tools</text>
       <text lang="DE">Musik-Manager</text>
+      <text lang="SV">Musikverktyg</text>
       <action>PLUGIN mythmusic</action>
       <depends>mythmusic</depends>	
    </button>
@@ -38,4 +40,5 @@
      <text lang="JA">設定</text>
      <action>MENU main_settings.xml</action>
    </button>
+
 </mythmenu>

@@ -1,4 +1,5 @@
 <mythmenu name="MANAGE_RECORDINGS">
+
    <button>
       <type>TV_SCHEDULE_RECORDINGS</type>
       <text>Schedule Recordings</text>
@@ -14,11 +15,12 @@
       <text lang="JA">録画予約</text>
       <action>MENU tv_schedule.xml</action>
    </button>
+
    <button>
       <type>TV_RECPRIORITIES</type>
       <text>Set Priorities</text>
       <text lang="DE">Prioritäten</text>
-      <text lang="SV">Inspelningsprioriteter</text>
+      <text lang="SV">Prioriteter</text>
       <text lang="JA">録画優先順位</text>
       <action>TV_SET_RECPRIORITIES</action>
    </button>
@@ -34,7 +36,7 @@
       <text lang="DE">Aufnahmeplan</text>
       <text lang="DK">Løs optagelseskonflikter</text>
       <text lang="PT">Resolver Conflitos</text>
-      <text lang="SV">Åtgärda schemakonflikter</text>
+      <text lang="SV">Kommande inspelningar</text>
       <text lang="JA">予約衝突修正</text>
       <action>TV_FIX_CONFLICTS</action>
    </button>
@@ -63,6 +65,5 @@
       <text lang="JA">システムステータス</text>
       <action>TV_STATUS</action>
    </button>
-
 
 </mythmenu>

@@ -76,6 +76,7 @@
    <button>
      <type>SETTINGS_FM</type>
      <text>Radio Settings</text>
+     <text lang="SV">Radioinställningar</text>
      <action>CONFIGPLUGIN mythfm</action>
      <depends>mythfm</depends>
    </button>

@@ -16,13 +16,11 @@
       <type>TV_RECPRIORITIES_CHANNEL</type>
       <text>Set Channel Recording Priorities</text>
       <text lang="DE">Aufnahme- prioritäten</text>
-      <text lang="SV">Kanalinspelningsprioriteter</text>
+      <text lang="SV">Kanalprioriteter</text>
       <text lang="JA">チャンネル録画優先順位設定</text>
       <alttext>Channel Priorities</alttext>
-      <alttext lang="SV">Kanalprioriteter</alttext>
       <alttext lang="JA">チャンネル優先順位</alttext>
       <action>SETTINGS CHANNELRECPRIORITIES</action>
    </button>
 
 </mythmenu>
-

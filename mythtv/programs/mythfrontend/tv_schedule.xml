@@ -56,17 +56,19 @@
       <type>TV_SEARCH_WORDS</type>
       <text>Search Words</text>
       <text lang="DE">Suche</text>
-      <text lang="SV">Sök i TV-tablå</text>
+      <text lang="SV">Sök ord</text>
       <text lang="JA">リスト検索</text>
       <alttext>Search</alttext>
-      <alttext lang="SV">Sök tablå</alttext>
+      <alttext lang="SV">Sök</alttext>
       <action>MENU tv_search.xml</action>
    </button>
 
    <button>
       <type>TV_SEARCH_LISTS</type>
       <text>Search Lists</text>
+      <text lang="SV">Sök listor</text>
       <alttext>Lists</alttext>
+      <alttext lang="SV">Listor</alttext>
       <action>MENU tv_lists.xml</action>
    </button>
 
@@ -119,6 +121,5 @@
       <alttext lang="JA">手動</alttext>
       <action>TV_MANUALSCHEDULE</action>
    </button>
-
 
 </mythmenu>
