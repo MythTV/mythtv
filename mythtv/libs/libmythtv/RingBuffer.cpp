@@ -21,7 +21,7 @@ using namespace std;
 
 #define TFW_BUF_SIZE (2*1024*1024)
 #define TFW_MAX_WRITE_SIZE (TFW_BUF_SIZE / 4)
-#define TFW_MIN_WRITE_SIZE (TFW_BUF_SIZE / 8)
+#define TFW_MIN_WRITE_SIZE (TFW_BUF_SIZE / 16)
 
 #ifndef O_STREAMING
 #define O_STREAMING 0
