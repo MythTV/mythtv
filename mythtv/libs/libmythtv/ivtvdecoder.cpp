@@ -129,10 +129,16 @@ int IvtvDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     m_parent->ForceVideoOutputType(kVideoOutput_IVTV);
 
-    if (ntsc)
-        m_parent->SetVideoParams(720, 480, 29.97, 15, 1.33);
-    else
-        m_parent->SetVideoParams(720, 576, 25.00, 15, 1.33);
+    int video_width = 720;
+    int video_height = 480;
+    if (!ntsc)
+    {
+        video_height = 576;
+        fps = 25.00;
+        keyframedist = 12;
+    }
+    m_parent->SetVideoParams(video_width, video_height, 
+                             fps, keyframedist, 1.33);
      
     ringBuffer->CalcReadAheadThresh(8000);
 
