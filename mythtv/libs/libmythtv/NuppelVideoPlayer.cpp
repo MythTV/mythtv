@@ -509,6 +509,8 @@ void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps,
                                 .arg(toQString(m_scan)).arg(video_height).arg(fps));
     // Set up deinterlacing in the video output method
     m_double_framerate = false;
+    if (videoOutput)
+        videoOutput->SetupDeinterlace(false);
     if (m_scan == kScan_Interlaced &&
         gContext->GetNumSetting("Deinterlace")) {
         if (videoOutput && videoOutput->SetupDeinterlace(true)) {

@@ -203,6 +203,17 @@ bool VideoOutput::SetupDeinterlace(bool interlaced)
     if (m_deinterlacing == interlaced)
         return m_deinterlacing;
 
+    if (m_deintFiltMan)
+    {
+        delete m_deintFiltMan;
+        m_deintFiltMan = NULL;
+    }
+    if (m_deintFilter)
+    {
+        delete m_deintFilter;
+        m_deintFilter = NULL;
+    }
+
     m_deinterlacing = interlaced;
 
     if (m_deinterlacing) 
@@ -237,19 +248,6 @@ bool VideoOutput::SetupDeinterlace(bool interlaced)
 
         if (m_deintfiltername == "bobdeint")
             m_deinterlaceBeforeOSD = false;
-    }
-    else 
-    {
-        if (m_deintFiltMan)
-        {
-            delete m_deintFiltMan;
-            m_deintFiltMan = NULL;
-        }
-        if (m_deintFilter)
-        {
-            delete m_deintFilter;
-            m_deintFilter = NULL;
-        }
     }
 
     return m_deinterlacing;
