@@ -368,12 +368,15 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
 
     progMap["time"] = timeNow.time().toString(timeFormat);
 
-    QString thequery = QString("SELECT icon FROM channel WHERE chanid = %1")
-                               .arg(chanid);
-    QSqlQuery query = db->exec(thequery);
-    if (query.isActive() && query.numRowsAffected() > 0)
-        if (query.next())
-            progMap["iconpath"] = query.value(0).toString();
+    if(db)
+    {
+        QString thequery = QString("SELECT icon FROM channel WHERE chanid = %1")
+                                   .arg(chanid);
+        QSqlQuery query = db->exec(thequery);
+        if (query.isActive() && query.numRowsAffected() > 0)
+            if (query.next())
+                progMap["iconpath"] = query.value(0).toString();
+    }
 
     progMap["RECSTATUS"] = RecStatusText();
 
