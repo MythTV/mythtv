@@ -498,7 +498,7 @@ void VideoBrowser::selected()
     QString command = handler.replace(QRegExp("%s"), QString("\"%1\"")
                       .arg(filename.replace(QRegExp("\""), "\\\"")));
 
-    //cout << "command:" << command << endl;
+    cout << "command:" << command << endl;
 
     m_title = curitem->Title();
     LayerSet *container = NULL;

@@ -490,4 +490,117 @@
 
     </window>
 
+    <window name="videotree">
+
+        <font name="active" face="Arial">
+            <color>#ffffff</color>
+            <size>18</size>
+            <bold>yes</bold>
+        </font>
+        
+        <font name="inactive" face="Arial">
+            <color>#9999cc</color>
+            <size>18</size>
+            <bold>yes</bold>
+        </font>
+        
+        <font name="largetitle" face="Arial">
+            <color>#ffffff</color>
+            <dropcolor>#000000</dropcolor>
+            <size>32</size>
+            <shadow>3,3</shadow>
+            <bold>yes</bold>
+        </font>
+        
+        <font name="labelfont" face="Arial">
+            <color>#ffffff</color>
+            <dropcolor>#000000</dropcolor>
+            <size>16</size>
+            <shadow>2,2</shadow>
+            <bold>yes</bold>
+        </font>
+        
+        <font name="infofont" face="Arial">
+            <color>#ffff33</color>
+            <size>16</size>
+            <bold>yes</bold>
+        </font>
+        
+        <container name="background">
+            <image name="filler" draworder="0" fleximage="yes">
+                <filename>background.png</filename>
+                <position>0,10</position>
+            </image>
+            <image name="titlelines" draworder="0" fleximage="no">
+                <filename>trans-titles.png</filename>
+                <position>0,10</position>
+            </image>
+            <image name="morefiller" draworder="0" fleximage="no">
+                <filename>mv_other_background.png</filename>
+                <position>0,300</position>
+            </image>
+        </container>
+
+        <container name="videoselector">
+            <area>0,10,800,310</area>
+            <managedtreelist name="videotreelist" draworder="1" bins="2">
+                <area>40,10,720,270</area>
+                <image function="selectionbar" filename="mv_selectionbar.png"></image>
+                <image function="uparrow" filename="mv_up_arrow.png"></image>
+                <image function="downarrow" filename="mv_down_arrow.png"></image>
+                <image function="leftarrow" filename="mv_left_arrow.png"></image>
+                <image function="rightarrow" filename="mv_right_arrow.png"></image>
+                <bin number="1">
+                    <area>30,16,190,250</area>
+                    <fcnfont name="active" function="active"></fcnfont>
+                    <fcnfont name="inactive" function="inactive"></fcnfont>
+                    <fcnfont name="active" function="selected"></fcnfont>
+                </bin>
+                <bin number="2">
+                    <area>235,10,535,270</area>
+                    <fcnfont name="active" function="active"></fcnfont>
+                    <fcnfont name="active" function="selected"></fcnfont>
+                    <fcnfont name="inactive" function="inactive"></fcnfont>
+                </bin>
+            </managedtreelist>
+
+            <image name="showinglines" draworder="2" fleximage="yes">
+                <filename>showings.png</filename>
+                <position>0,0</position>
+            </image>
+    
+        </container>
+
+        <container name="videoinfo">
+            <area>0,300,800,300</area>
+            <textarea name="video_title" draworder="0">
+                <area>50,70,530,60</area>
+                <font>largetitle</font>
+            </textarea>
+            <textarea name="file_label" draworder="0" align="right">
+                <area>30,153,90,40</area>
+                <font>labelfont</font>
+                <value>File:</value>
+            </textarea>
+            <textarea name="player_label" draworder="0" align="right">
+                <area>30,196,90,40</area>
+                <font>labelfont</font>
+                <value>Player:</value>
+            </textarea>
+            <textarea name="video_file" draworder="0">
+                <area>130,155,380,40</area>
+                <font>infofont</font>
+            </textarea>
+            <textarea name="video_player" draworder="0">
+                <area>130,198,380,40</area>
+                <font>infofont</font>
+            </textarea>
+            <image name="video_poster" draworder="1" fleximage="no">
+                <position>551,18</position>
+                <staticsize>166,260</staticsize>
+            </image>
+        </container>
+
+    </window>
+
 </mythuitheme>

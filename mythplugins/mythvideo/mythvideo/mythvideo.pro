@@ -26,7 +26,7 @@ LIBS += -L$${PREFIX}/lib -lmyth-$$LIBVERSION
 
 # Input
 
-HEADERS += metadata.h videomanager.h inetcomms.h videobrowser.h globalsettings.h
+HEADERS += metadata.h videomanager.h inetcomms.h videobrowser.h globalsettings.h videotree.h
 
-SOURCES += main.cpp metadata.cpp videomanager.cpp inetcomms.cpp videobrowser.cpp globalsettings.cpp
+SOURCES += main.cpp metadata.cpp videomanager.cpp inetcomms.cpp videobrowser.cpp globalsettings.cpp videotree.cpp
 TRANSLATIONS = mythvideo_it.ts

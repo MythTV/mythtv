@@ -19,6 +19,7 @@ using namespace std;
 #include "metadata.h"
 #include "videomanager.h"
 #include "videobrowser.h"
+#include "videotree.h"
 #include "globalsettings.h"
 
 #include <mythtv/themedmenu.h>
@@ -151,7 +152,13 @@ void VideoCallback(void *data, QString &selection)
         browse->Show();
         browse->exec();
     }
-    if (sel == "settings_general")
+    else if (sel == "listing")
+    {
+        VideoTree *tree = new VideoTree(mdata->db, "videotree", "video-");
+        tree->Show();
+        tree->exec();
+    }
+    else if (sel == "settings_general")
     {
         GeneralSettings settings;
         settings.exec(QSqlDatabase::database());
