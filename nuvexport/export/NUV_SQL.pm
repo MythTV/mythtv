@@ -1,11 +1,12 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.12.26 (xris)
+#Last Updated: 2005.01.17 (xris)
 #
 #  export::NUV_SQL
 #  Maintained by Chris Petersen <mythtv@forevermore.net>
 #
 
 package export::NUV_SQL;
+    use base 'export::generic';
 
 	use File::Copy;
     use File::Basename;
