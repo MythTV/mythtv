@@ -90,8 +90,8 @@ void XvVideoOutput::sizehint(int x, int y, int width, int height, int max)
         data->hints.max_width = 0; 
         data->hints.max_height = 0; 
     }
-    data->hints.base_width = width; 
-    data->hints.base_height = height;
+    data->hints.base_width = 160;
+    data->hints.base_height = 120;
     data->hints.win_gravity = StaticGravity;
     XSetWMNormalHints(data->XJ_disp, data->XJ_win, &(data->hints));
 }
@@ -164,8 +164,11 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
   
     data->XJ_root = DefaultRootWindow(data->XJ_disp);
 
-    GetMythTVGeometry(m_context, data->XJ_disp, XJ_screen_num, &curx, &cury, 
+    GetMythTVGeometry(m_context, data->XJ_disp, XJ_screen_num,
+                      &XJ_screenx, &XJ_screeny, 
                       &XJ_screenwidth, &XJ_screenheight);
+
+    curx = XJ_screenx + 4; cury = XJ_screeny + 20;
     curw = XJ_width; curh = XJ_height;
 
     dispx = 0; dispy = 0;
@@ -214,7 +217,8 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
                          &windowName, &iconName,
                          NULL, 0, &(data->hints), &wmhints, NULL);
   
-        XSelectInput(data->XJ_disp, data->XJ_win, ExposureMask|KeyPressMask);
+        XSelectInput(data->XJ_disp, data->XJ_win,
+                     ExposureMask|KeyPressMask|StructureNotifyMask);
         XMapRaised(data->XJ_disp, data->XJ_win);
     }
  
@@ -414,6 +418,8 @@ void XvVideoOutput::ToggleFullScreen(void)
         XJ_fullscreen = 1;
         oldx = curx; oldy = cury; oldw = curw; oldh = curh;
 
+        curx = XJ_screenx;
+        cury = XJ_screeny;
         curw = XJ_screenwidth;
         curh = XJ_screenheight;
         hide_cursor();
@@ -518,8 +524,14 @@ int XvVideoOutput::CheckEvents(void)
         {
             case KeyPress: 
             {
-	        XLookupString(&Event.xkey, buf, sizeof(buf), &keySym, &stat);
+                XLookupString(&Event.xkey, buf, sizeof(buf), &keySym, &stat);
                 key = ((keySym&0xff00) != 0?((keySym&0x00ff) + 256):(keySym));
+                return key;
+            } break;
+            case ConfigureNotify: 
+            {
+                ReConfigure(Event.xconfigure.x, Event.xconfigure.y,
+                            Event.xconfigure.width, Event.xconfigure.height);
                 return key;
             } break;
             default: break;
@@ -527,6 +539,43 @@ int XvVideoOutput::CheckEvents(void)
     }
 
     return key;
+}
+
+void XvVideoOutput::ReConfigure(int x, int y, int w, int h)
+{
+    if (XEventsQueued(data->XJ_disp, QueuedAlready))
+        return;
+
+    if (XJ_fullscreen || h >= XJ_screenheight && w >= XJ_screenwidth)
+        return;
+
+    if (oldx == x && oldy == y && oldw == w && oldh == h)
+        return;
+
+    if (XJ_aspect)
+    {
+        if (w * 3 / 4 > h)
+        {
+            w = (int) (h * 4 / 3);
+        }
+        else
+        {
+            h = (int) (w * 3 / 4);
+        }
+    }
+
+    oldx = curx = x;
+    oldy = cury = y;
+    oldw = curw = w;
+    oldh = curh = h;
+
+    dispx = 0;
+    dispy = 0;
+    dispw = curw;
+    disph = curh;
+    
+    MoveResize();
+    return;
 }
 
 void XvVideoOutput::MoveResize(void)

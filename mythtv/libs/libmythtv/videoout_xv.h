@@ -24,6 +24,7 @@ class XvVideoOutput
 
     void EmbedInWidget(unsigned long wid, int x, int y, int w, int h);
     void StopEmbedding(void);
+    void ReConfigure(int x, int y, int w, int h);
     void MoveResize(void);
 
   private:
@@ -42,6 +43,7 @@ class XvVideoOutput
     int XJ_depth;
     int XJ_caught_error;
     int XJ_width, XJ_height;
+    int XJ_screenx, XJ_screeny;
     int XJ_screenwidth, XJ_screenheight;
     int XJ_fullscreen;
     int XJ_aspect;
