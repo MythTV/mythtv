@@ -425,7 +425,7 @@ class UIStatusBarType : public UIType
     UIStatusBarType(QString &, QPoint, int);
     ~UIStatusBarType();
 
-    void SetUsed(int used) { m_used = used; }
+    void SetUsed(int used) { m_used = used; refresh();}
     void SetTotal(int total) { m_total = total; }
 
     void SetLocation(QPoint loc) { m_location = loc; }
