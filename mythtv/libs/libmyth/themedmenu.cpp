@@ -2048,6 +2048,8 @@ void ThemedMenuPrivate::drawText(QPainter *p, const QRect &rect,
 
 void ThemedMenuPrivate::ReloadTheme(void)
 {
+    globalFontMap.clear();
+    parseFonts = true;
     buttonList.clear();
     buttonRows.clear();
 
