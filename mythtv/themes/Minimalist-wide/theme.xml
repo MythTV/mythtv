@@ -1,5 +1,6 @@
 <myththeme>
-    <font name="basefont"  face="Trebuchet Ms">
+<!--     <font name="basefont"  face="Trebuchet Ms"> -->
+    <font name="basefont"  face="Nimbus Sans L"> -->
       <color>#ffffff</color>
       <dropcolor>#3B4045</dropcolor>
       <size>20</size>
@@ -48,10 +49,10 @@
       <size:big>17</size:big>
     </font>
 
-    <font name="list-active" base="basefont" face="Freesans">
-      <size>18</size>
-      <size:small>14</size:small>
-      <size:big>20</size:big>
+    <font name="list-active" base="basefont" face="Nimbus Sans L">
+      <size>19</size>
+      <size:small>15</size:small>
+      <size:big>21</size:big>
       <shadow>2,2</shadow>
       <color>#ddddff</color>
     </font>
@@ -126,11 +127,13 @@
     <normal>button_off.png</normal>
     <active>button_off.png</active>
     <text>
-      <area>50,8,3,0</area>
+      <area>0,0,0,0</area>
+<!--       <area>50,8,3,0</area> -->
       <color>#DEEAF9</color>
 <!--       <color>white</color> -->
-      <fontname>Trebuchet Ms</fontname>
-      <fontsize>21</fontsize>
+<!--       <fontname>Kimberley</fontname> -->
+      <fontname>Neuropolitical</fontname>
+      <fontsize>23</fontsize>
       <bold>yes</bold>
       <italics>no</italics>
       <centered>yes</centered>
@@ -141,21 +144,22 @@
       <shadow>
          <color>black</color>
          <offset>2,2</offset>
-         <alpha>128</alpha>
+         <alpha>255</alpha>
       </shadow>
     </text>
     <activetext>
-      <area>50,8,3,0</area>
+    <area>0,0,0,0</area>
+<!--       <area>50,8,3,0</area> -->
 <!--       <color>#000000</color> -->
       <color>#3C5574</color>
-      <fontname>Trebuchet Ms</fontname>
-      <fontsize>21</fontsize>
+      <fontname>Neuropolitical</fontname>
+      <fontsize>23</fontsize>
       <bold>yes</bold>
       <italics>no</italics>
       <centered>yes</centered>
     <outline>
          <color>black</color>
-         <size>1</size>
+         <size>2</size>
       </outline>
       <!--<shadow>
          <color>black</color>
@@ -561,9 +565,10 @@
   </buttondef>
 
   <buttondef name="TV_RECPRIORITIES">
-    <image>text-blank.png</image>
+    <image>buttons/TV_RECPRIORITIES_off.png</image>
+    <activeimage>buttons/TV_RECPRIORITIES.png</activeimage>
 <!--     <watermarkimage>watermark/tv_recpriorities.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <offset>50,-100</offset>
   </buttondef>
 
   <buttondef name="TV_CONFLICTS">
@@ -693,9 +698,10 @@
   </buttondef>
 
   <buttondef name="TV_SCHEDULE_RECORDINGS">
-    <image>text-blank.png</image>
+    <image>buttons/TV_SCHEDULE_RECORDINGS_off.png</image>
+    <activeimage>buttons/TV_SCHEDULE_RECORDINGS.png</activeimage>
 <!--     <watermarkimage>watermark/tv_schedule.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <offset>50,-100</offset>
   </buttondef>
 
   <buttondef name="TV_WATCH_RECORDINGS">
@@ -706,15 +712,17 @@
   </buttondef>
 
   <buttondef name="TV_DELETE">
-    <image>text-blank.png</image>
+    <image>buttons/TV_DELETE_off.png</image>
+    <activeimage>buttons/TV_DELETE.png</activeimage>
 <!--     <watermarkimage>watermark/tv_delete.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <offset>50,-100</offset>
   </buttondef>
 
   <buttondef name="TV_PREVIOUS">
-    <image>text-blank.png</image>
+    <image>buttons/TV_PREVIOUS_off.png</image>
+    <activeimage>buttons/TV_PREVIOUS.png</activeimage>
 <!--     <watermarkimage>watermark/tv_previous.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <offset>50,-100</offset>
   </buttondef>
 
   <buttondef name="TV_STATUS">
@@ -773,9 +781,10 @@
 <!-- ###########################################-->
 
   <buttondef name="TV_UPCOMING_RECORDINGS">
-    <image>text-blank.png</image>
+    <image>buttons/TV_UPCOMING_RECORDINGS_off.png</image>
+    <activeimage>buttons/TV_UPCOMING_RECORDINGS.png</activeimage>
 <!--     <watermarkimage>watermark/tv_progfind.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <offset>50,-100</offset>
   </buttondef>
 
   <buttondef name="SETTINGS_MEDIA">
