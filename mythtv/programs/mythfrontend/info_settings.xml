@@ -13,7 +13,7 @@
      <text lang="JA">天気設定</text>
      <text lang="FI">Sään Asetukset</text>
      <text lang="ZH_TW">天氣報告設定</text>
-     <alttext lang="DE">Wetter</text>
+     <alttext lang="DE">Wetter</alttext>
      <action>CONFIGPLUGIN mythweather</action>
      <depends>mythweather</depends>
    </button>

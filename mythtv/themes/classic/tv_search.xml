@@ -7,47 +7,41 @@
       <text lang="SV">Titel</text>
       <text lang="JA">タイトル</text>
       <text lang="NL">Titels</text>
+      <text lang="FI">Nimikkeet</text>
+      <text lang="ZH_TW">標題</text>
       <action>TV_SEARCH_TITLE</action>
    </button>
-
+   
    <button>
       <type>TV_SEARCH_KEYWORDS</type>
-      <text>Descriptions</text>
+      <text>Keywords</text>
       <text lang="DE">Inhalt</text>
-      <text lang="SV">Beskrivning</text>
+      <text lang="SV">Nyckelord</text>
       <text lang="NL">Beschrijving</text>      
-      <text lang="JA">内容</text>
-      <action>TV_SEARCH_DESC</action>
+      <text lang="JA">キーワード</text>
+      <text lang="FI">Avainsanat</text>
+      <text lang="ZH_TW">關鍵字</text>
+      <action>TV_SEARCH_KEYWORD</action>
    </button>
-
+   
    <button>
-      <type>TV_SEARCH_CHANNELS</type>
-      <text>Channels</text>
-      <text lang="DE">Sender</text>
-      <text lang="SV">Kanal</text>
-      <text lang="NL">Zender</text>
-      <text lang="JA">チャンネル</text>
-      <action>TV_SEARCH_CHANNEL</action>
+      <type>TV_SEARCH_PEOPLE</type>
+      <text>People</text>
+      <text lang="SV">Person</text>
+      <text lang="JA">人</text>
+      <text lang="DE">Personen</text>
+      <text lang="FI">Ihmiset</text>
+      <action>TV_SEARCH_PEOPLE</action>
    </button>
-
+   
    <button>
-      <type>TV_SEARCH_CATEGORIES</type>
-      <text>Categories</text>
-      <text lang="DE">Kategorien</text>
-      <text lang="SV">Kategori</text>
-      <text lang="NL">Catergorie</text>
-      <text lang="JA">カテゴリー</text>
-      <action>TV_SEARCH_CATEGORY</action>
-   </button>
-
-   <button>
-      <type>TV_SEARCH_MOVIES</type>
-      <text>Movies</text>
-      <text lang="DE">Filme</text>
-      <text lang="SV">Filmer</text>
-      <text lang="NL">Films</text>
-      <text lang="JA">映画</text>
-      <action>TV_SEARCH_MOVIE</action>
+      <type>TV_SEARCH_POWER</type>
+      <text>Advanced</text>
+      <text lang="SV">Avancerad</text>
+      <text lang="JA">アドバンスト</text>
+      <text lang="DE">Erweitert</text>
+      <text lang="FI">Lisävalinnat</text>
+      <action>TV_SEARCH_POWER</action>
    </button>
 
    <button>
@@ -57,15 +51,57 @@
       <text lang="SV">Nya titlar</text>
       <text lang="JA">新タイトル</text>
       <text lang="NL">Nieuwe Titels</text>
+      <text lang="FI">Uudet Ohjelmat</text>
+      <text lang="ZH_TW">新標題</text>
       <action>TV_SEARCH_NEW</action>
    </button>
 
    <button>
-      <type>TV_SEARCH_POWER</type>
-      <text>Advanced</text>
-      <text lang="SV">Avancerad</text>
-      <text lang="DE">Erweitert</text>
-      <action>TV_SEARCH_POWER</action>
+      <type>TV_SEARCH_MOVIES</type>
+      <text>Movies</text>
+      <text lang="DE">Spielfilme</text>
+      <text lang="SV">Filmer</text>
+      <text lang="JA">映画</text>
+      <text lang="NL">Films</text>
+      <text lang="FI">Elokuvat</text>
+      <text lang="ZH_TW">電影</text>
+      <action>TV_SEARCH_MOVIE</action>
+   </button>
+
+   <button>
+      <type>TV_SEARCH_CATEGORIES</type>
+      <text>Categories</text>
+      <text lang="DE">Kategorie</text>
+      <text lang="SV">Kategori</text>
+      <text lang="JA">カテゴリー</text>
+      <text lang="NL">Categorie</text>
+      <text lang="FI">Kategoriat</text>
+      <text lang="ZH_TW">種類</text>
+      <action>TV_SEARCH_CATEGORY</action>
+   </button>
+   
+   <button>
+      <type>TV_SEARCH_CHANNELS</type>
+      <text>Channels</text>
+      <text lang="DE">Sender</text>
+      <text lang="SV">Kanal</text>
+      <text lang="NL">Zender</text>
+      <text lang="JA">チャンネル</text>
+      <text lang="FI">Kanavat</text>
+      <text lang="ZH_TW">電視台</text>
+      <action>TV_SEARCH_CHANNEL</action>
+   </button>
+
+   <button>
+      <type>TV_SEARCH_TIMES</type>
+      <text>Time</text>
+      <text lang="NL">Tijdstip</text>
+      <text lang="SV">Tid</text>
+      <text lang="JA">時間</text>
+      <text lang="DE">Sendezeit</text>
+      <text lang="FI">Aika</text>
+      <text lang="ZH_TW">時間</text>
+      <action>TV_SEARCH_TIME</action>
    </button>
 
 </mythmenu>
