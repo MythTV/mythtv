@@ -451,7 +451,9 @@ void NuppelVideoPlayer::ReinitVideo(void)
     InitFilters();
     videoOutput->InputChanged(video_width, video_height, video_aspect);
 
+    videofiltersLock.lock();
     ReinitOSD();
+    videofiltersLock.unlock();
 
     ClearAfterSeek();
 }
@@ -534,9 +536,12 @@ void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps,
     if (reinit)
         ReinitVideo();
 
+    videofiltersLock.lock();
+
     m_scan = detectInterlace(scan, m_scan, video_frame_rate, video_height);
     VERBOSE(VB_PLAYBACK, QString("Interlaced: %1  video_height: %2  fps: %3")
                                 .arg(toQString(m_scan)).arg(video_height).arg(fps));
+
     // Set up deinterlacing in the video output method
     m_double_framerate = false;
     if (videoOutput)
@@ -561,6 +566,7 @@ void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps,
         }
     }
 
+    videofiltersLock.unlock();
 }
 
 void NuppelVideoPlayer::SetFileLength(int total, int frames)
