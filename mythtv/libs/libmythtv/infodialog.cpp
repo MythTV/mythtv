@@ -119,7 +119,7 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, MythMainWindow *parent,
 
         if (recordstatus == kFindOneRecord)
         {
-            msg = tr("Record one showing of this program");
+            msg = tr("Record one showing of this title");
             rt = kFindOneRecord;
             item = new RecListItem(lview, msg, kFindOneRecord);
             selectItem = item;

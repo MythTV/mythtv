@@ -178,7 +178,7 @@ class SRRecordingType : public SRSelectSetting
             if (haschannel)
                 addSelection(QObject::tr("Record only this showing"), kSingleRecord);
 
-            addSelection(QObject::tr("Record one showing of this program"), kFindOneRecord);
+            addSelection(QObject::tr("Record one showing of this title"), kFindOneRecord);
 
             if (haschannel)
             {
