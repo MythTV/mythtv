@@ -20,11 +20,13 @@
 #include <qstringlist.h>
 #include <qlayout.h>
 
+#include <mythtv/oldsettings.h>
 #include <mythtv/mythwidgets.h>
 
 class QLabel;
 class QListView;
 class MythContext;
+class Settings;
 
 struct weatherTypes {
 	int typeNum;
@@ -111,6 +113,7 @@ private slots:
     void lastLayout();
     void setupLayout(int);
     void showLayout(int);
+    void setupColorScheme();
 
     QFrame *page0Dia;
     QFrame *page1Dia;
@@ -192,24 +195,13 @@ private slots:
 
     QString httpData;
     QString oldhttpData;
+
+    QColor topbot_bgColor;
+    QColor topbot_fgColor;
+    QColor main_bgColor;
+    QColor main_fgColor;
+    QColor lohi_fgColor;
 };
 
 
-/*
-
-function makeWeatherObj() { this.swCity = "Cincinnati"; this.swSubDiv = "OH"; this.swCountry = "USA"; this.swRegion = "United States"; this.swTemp = "37"; this.swTempCel = Math.round((5/9)*(this.swTemp-32)); this.swCIcon = "26"; this.swWindS = "12"; this.swWindD = "W"; this.swBaro = "30.06"; this.swHumid = "89"; this.swReal = "29"; this.swUV = "0"; this.swVis = "6.00"; this.swLastUp = "01/05/2003 22:53:00"; this.swConText = "Cloudy"; this.swFore = "2|3|4|5|6|01/06/2003|01/07/2003|01/08/2003|01/09/2003|01/10/2003|
-
----14|34|24|24
-
-|24|98|22|35|33|37|
-
----35|40|44|50
-
-|32|60|0|10|10|10|29|27|27|29|27|42|3|3|42|3|
-
----22|32|35|30
-
-|22|"; this.swAcid = "USOH0188"; }
-
-*/
 #endif

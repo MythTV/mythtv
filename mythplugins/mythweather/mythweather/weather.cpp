@@ -45,6 +45,7 @@ Weather::Weather(MythContext *context,
     pastTime = false;
     firstRun = true;
     conError = false;
+
     if (debug == true)
 	cout << "MythWeather: Reading 'locale' from context.\n";
     locale = context->GetSetting("locale");
@@ -84,6 +85,8 @@ Weather::Weather(MythContext *context,
     nextpageInterval = 10;
     nextpageIntArrow = 20;
 
+    setupColorScheme();
+
     if (debug == true)
 	cout << "MythWeather: Loading Weather Types.\n";
     loadWeatherTypes();
@@ -102,11 +105,11 @@ Weather::Weather(MythContext *context,
     page3Dia = new QFrame(this);
     page4Dia = new QFrame(this);
 
-    page0Dia->setPaletteForegroundColor(QColor(255, 255, 255));
-    page1Dia->setPaletteForegroundColor(QColor(255, 255, 255));
-    page2Dia->setPaletteForegroundColor(QColor(255, 255, 255));
-    page3Dia->setPaletteForegroundColor(QColor(255, 255, 255));
-    page4Dia->setPaletteForegroundColor(QColor(255, 255, 255));
+    page0Dia->setPaletteForegroundColor(main_fgColor);
+    page1Dia->setPaletteForegroundColor(main_fgColor);
+    page2Dia->setPaletteForegroundColor(main_fgColor);
+    page3Dia->setPaletteForegroundColor(main_fgColor);
+    page4Dia->setPaletteForegroundColor(main_fgColor);
    
     page0 = new QHBoxLayout(page0Dia, 0);
     page1 = new QHBoxLayout(page1Dia, 0);
@@ -174,6 +177,32 @@ Weather::Weather(MythContext *context,
     if (debug == true)
 	cout << "MythWeather: Finish Object Initialization.\n";
 
+}
+
+void Weather::setupColorScheme()
+{
+
+    Settings *themed = m_context->qtconfig();
+    QString curColor = "";
+    curColor = themed->GetSetting("time_bgColor");
+    if (curColor != "")
+        topbot_bgColor = QColor(curColor);
+
+    curColor = themed->GetSetting("time_fgColor");
+    if (curColor != "")
+        topbot_fgColor = QColor(curColor);
+
+    curColor = themed->GetSetting("prog_bgColor");
+    if (curColor != "")
+        main_bgColor = QColor(curColor);
+
+    curColor = themed->GetSetting("prog_fgColor");
+    if (curColor != "")
+        main_fgColor = QColor(curColor);
+
+    curColor = themed->GetSetting("curProg_fgColor");
+    if (curColor != "")
+        lohi_fgColor = QColor(curColor);
 }
 
 void Weather::loadWeatherTypes()
@@ -841,8 +870,8 @@ void Weather::firstLayout()
 
    lbLocale->setBackgroundOrigin(WindowOrigin);
    lbLocale->setAlignment( Qt::AlignVCenter);
-   lbLocale->setPaletteBackgroundColor(QColor(20, 40, 255));
-   lbLocale->setPaletteForegroundColor(QColor(240, 200, 0));
+   lbLocale->setPaletteBackgroundColor(topbot_bgColor);
+   lbLocale->setPaletteForegroundColor(topbot_fgColor);
    lbLocale->setFont(lohiFont);
    lbLocale->setMinimumWidth((int)(700*wmult));
    lbLocale->setMaximumWidth((int)(700*wmult));
@@ -851,8 +880,8 @@ void Weather::firstLayout()
    lbLocale->setFrameStyle( QFrame::Panel | QFrame::Raised );
 
    lbStatus->setAlignment( Qt::AlignHCenter | Qt::AlignVCenter);
-   lbStatus->setPaletteBackgroundColor(QColor(20, 40, 255));
-   lbStatus->setPaletteForegroundColor(QColor(240, 200, 0));
+   lbStatus->setPaletteBackgroundColor(topbot_bgColor);
+   lbStatus->setPaletteForegroundColor(topbot_fgColor);
    lbStatus->setFont(lohiFont);
    lbStatus->setMinimumWidth((int)(50*wmult));
    lbStatus->setMaximumWidth((int)(50*wmult));
@@ -871,8 +900,8 @@ void Weather::lastLayout()
 
    lbUpdated = new QLabel("Updating ... ", this);
    lbUpdated->setAlignment( Qt::AlignVCenter);
-   lbUpdated->setPaletteBackgroundColor(QColor(20, 40, 255));
-   lbUpdated->setPaletteForegroundColor(QColor(240, 200, 0));
+   lbUpdated->setPaletteBackgroundColor(topbot_bgColor);
+   lbUpdated->setPaletteForegroundColor(topbot_fgColor);
    lbUpdated->setFont(lohiFont);
    lbUpdated->setMinimumWidth((int)(750*wmult));
    lbUpdated->setMaximumWidth((int)(750*wmult));
@@ -903,6 +932,7 @@ void Weather::setupLayout(int pageNum)
 
    if (pageNum == 0)
    {
+	page0Dia->setMaximumWidth((int)(750*wmult));
 	hdPart1->setText("current conditions");
    	QHBoxLayout *ext0  = new QHBoxLayout(0, 0, 0);
 
@@ -924,7 +954,7 @@ void Weather::setupLayout(int pageNum)
    	delete tempimage0;
 
    	lbPic0 = new QLabel(" ", page0Dia);
-   	lbPic0->setPaletteBackgroundColor(QColor(20, 40, 255));
+   	lbPic0->setPaletteBackgroundColor(main_bgColor);
    	lbPic0->setPixmap(pic0);
    	lbPic0->setFrameStyle( QFrame::Panel | QFrame::Raised );
 
@@ -934,6 +964,7 @@ void Weather::setupLayout(int pageNum)
  
    if (pageNum == 1)
    {
+	page1Dia->setMaximumWidth((int)(750*wmult));
    hdPart1->setText("current conditions");
    QHBoxLayout *ext1  = new QHBoxLayout(0, 0, 0);
 
@@ -965,7 +996,7 @@ void Weather::setupLayout(int pageNum)
 
 */
    lbHumid = new QLabel(curHumid + "%  ", page1Dia);
-   lbHumid->setPaletteBackgroundColor(QColor(20, 40, 255));
+   lbHumid->setPaletteBackgroundColor(main_bgColor);
    lbHumid->setAlignment( Qt::AlignRight | Qt::AlignVCenter );
    lbHumid->setFont(timeFont);
    if (convertData == false)
@@ -973,7 +1004,7 @@ void Weather::setupLayout(int pageNum)
     else
 	lbPress = new QLabel(barometer + " kPa ", page1Dia);
    lbPress = new QLabel(barometer + "   ", page1Dia);
-   lbPress->setPaletteBackgroundColor(QColor(20, 40, 255));
+   lbPress->setPaletteBackgroundColor(main_bgColor);
    lbPress->setAlignment( Qt::AlignRight | Qt::AlignVCenter );
    lbPress->setFont(timeFont);
 
@@ -987,7 +1018,7 @@ void Weather::setupLayout(int pageNum)
 		lbWind = new QLabel(winddir + " at " + curWind + " Km/h  ", page1Dia);
    }
 
-   lbWind->setPaletteBackgroundColor(QColor(20, 40, 255));
+   lbWind->setPaletteBackgroundColor(main_bgColor);
    lbWind->setAlignment( Qt::AlignRight | Qt::AlignVCenter );
    lbWind->setFont(timeFont);
    if (visibility.toFloat() != 999.00)
@@ -999,7 +1030,7 @@ void Weather::setupLayout(int pageNum)
    }
    else
 	lbVisi = new QLabel("Unlimited  ", page1Dia);
-   lbVisi->setPaletteBackgroundColor(QColor(20, 40, 255));
+   lbVisi->setPaletteBackgroundColor(main_bgColor);
    lbVisi->setAlignment( Qt::AlignRight | Qt::AlignVCenter );
    lbVisi->setFont(timeFont);
    if (convertData == false)
@@ -1007,7 +1038,7 @@ void Weather::setupLayout(int pageNum)
    else
 	lbWindC = new QLabel(curFeel + " C   ", page1Dia);
    
-   lbWindC->setPaletteBackgroundColor(QColor(20, 40, 255));
+   lbWindC->setPaletteBackgroundColor(main_bgColor);
    lbWindC->setAlignment( Qt::AlignRight  | Qt::AlignVCenter );
    lbWindC->setFont(timeFont);
    if (uvIndex.toInt() < 3)
@@ -1018,27 +1049,27 @@ void Weather::setupLayout(int pageNum)
 	lbUVIndex = new QLabel(uvIndex + " (high)  ", page1Dia);
    else if (uvIndex.toInt() >= 8)
 	lbUVIndex = new QLabel(uvIndex + " (extreme)  ", page1Dia);
-   lbUVIndex->setPaletteBackgroundColor(QColor(20, 40, 255));
+   lbUVIndex->setPaletteBackgroundColor(main_bgColor);
    lbUVIndex->setAlignment( Qt::AlignRight  | Qt::AlignVCenter );
    lbUVIndex->setFont(timeFont);
 
    QLabel *lbHum = new QLabel("  Humidity", page1Dia);
-   lbHum->setPaletteBackgroundColor(QColor(20, 40, 255));
+   lbHum->setPaletteBackgroundColor(main_bgColor);
    lbHum->setFont(timeFont);
    QLabel *lbPrs = new QLabel("  Pressure", page1Dia);
-   lbPrs->setPaletteBackgroundColor(QColor(20, 40, 255));
+   lbPrs->setPaletteBackgroundColor(main_bgColor);
    lbPrs->setFont(timeFont);
    QLabel *lbWnd = new QLabel("  Wind", page1Dia);
-   lbWnd->setPaletteBackgroundColor(QColor(20, 40, 255));
+   lbWnd->setPaletteBackgroundColor(main_bgColor);
    lbWnd->setFont(timeFont);
    QLabel *lbVis = new QLabel("  Visibility", page1Dia);
-   lbVis->setPaletteBackgroundColor(QColor(20, 40, 255));
+   lbVis->setPaletteBackgroundColor(main_bgColor);
    lbVis->setFont(timeFont);
    QLabel *lbWCh = new QLabel("  Wind Chill", page1Dia);
-   lbWCh->setPaletteBackgroundColor(QColor(20, 40, 255));
+   lbWCh->setPaletteBackgroundColor(main_bgColor);
    lbWCh->setFont(timeFont);
    QLabel *lbUVI = new QLabel("  UV Index", page1Dia);
-   lbUVI->setPaletteBackgroundColor(QColor(20, 40, 255));
+   lbUVI->setPaletteBackgroundColor(main_bgColor);
    lbUVI->setFont(timeFont);
 
    lbls->addWidget(lbHum, 0, 0);
@@ -1056,7 +1087,7 @@ void Weather::setupLayout(int pageNum)
 
 
    lbCond = new QLabel(description, page1Dia);
-   lbCond->setPaletteBackgroundColor(QColor(20, 40, 255));  
+   lbCond->setPaletteBackgroundColor(main_bgColor);  
    lbCond->setFont(timeFont);
    lbCond->setMaximumHeight((int)(2*fontMet.height()));
    lbCond->setAlignment( Qt::AlignVCenter | Qt::AlignHCenter );
@@ -1067,10 +1098,10 @@ void Weather::setupLayout(int pageNum)
    QLabel *space1 = new QLabel("  ", page1Dia);
    space1->setMaximumHeight(fontMet.height());
    space1->setMinimumHeight(fontMet.height());
-   space1->setPaletteBackgroundColor(QColor(20, 40, 255));
+   space1->setPaletteBackgroundColor(main_bgColor);
 
    lbTemp = new QLabel(curTemp, page1Dia);
-   lbTemp->setPaletteBackgroundColor(QColor(20, 40, 255));
+   lbTemp->setPaletteBackgroundColor(main_bgColor);
    lbTemp->setFont(bigtFont);
    lbTemp->setAlignment( Qt::AlignVCenter | Qt::AlignRight );
 
@@ -1080,7 +1111,7 @@ void Weather::setupLayout(int pageNum)
 	tempType = new QLabel("oC", page1Dia);
 
    tempType->setMaximumWidth((int)(2*fontMet.width(tempType->text())));
-   tempType->setPaletteBackgroundColor(QColor(20, 40, 255));
+   tempType->setPaletteBackgroundColor(main_bgColor);
    tempType->setFont(timeFont);
    tempType->setAlignment(Qt::AlignLeft);
 
@@ -1094,8 +1125,8 @@ void Weather::setupLayout(int pageNum)
 
    QLabel *spc4a = new QLabel(" ", page1Dia);
    QLabel *spc4b = new QLabel(" ", page1Dia);
-   spc4a->setPaletteBackgroundColor(QColor(20, 40, 255));
-   spc4b->setPaletteBackgroundColor(QColor(20, 40, 255));
+   spc4a->setPaletteBackgroundColor(main_bgColor);
+   spc4b->setPaletteBackgroundColor(main_bgColor);
    spc4a->setMaximumWidth((int)(wmult*25));
    spc4b->setMaximumWidth((int)(wmult*25));
 
@@ -1111,7 +1142,7 @@ void Weather::setupLayout(int pageNum)
    delete tempimageD;
 
    lbPic4 = new QLabel(" ", page1Dia);
-   lbPic4->setPaletteBackgroundColor(QColor(20, 40, 255));
+   lbPic4->setPaletteBackgroundColor(main_bgColor);
    lbPic4->setMaximumWidth((int)(200*wmult));
    lbPic4->setMaximumHeight((int)(150*hmult));
    lbPic4->setMinimumHeight((int)(150*hmult));
@@ -1128,6 +1159,7 @@ void Weather::setupLayout(int pageNum)
 
 if (pageNum == 2)
 {
+   page2Dia->setMaximumWidth((int)(750*wmult));
    hdPart1->setText("extended forecast");
    QHBoxLayout *ext2  = new QHBoxLayout(0, 0, 0);
 
@@ -1147,7 +1179,7 @@ if (pageNum == 2)
    date1->setBackgroundOrigin(WindowOrigin);
    date1->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
    date1->setMaximumWidth((int)(250*wmult));
-   date1->setPaletteBackgroundColor(QColor(20, 40, 255));
+   date1->setPaletteBackgroundColor(main_bgColor);
    date1->setMaximumHeight((int)(2*fontMet.height()));
    date1->setFont(timeFont);
 
@@ -1155,7 +1187,7 @@ if (pageNum == 2)
    desc1->setBackgroundOrigin(WindowOrigin);
    desc1->setAlignment(Qt::WordBreak | Qt::AlignHCenter | Qt::AlignVCenter);
    desc1->setMaximumWidth((int)(250*wmult));
-   desc1->setPaletteBackgroundColor(QColor(20, 40, 255));
+   desc1->setPaletteBackgroundColor(main_bgColor);
    //desc1->setMaximumHeight((int)(2*fontMet.height()));
    desc1->setFont(timeFont);
 
@@ -1163,7 +1195,7 @@ if (pageNum == 2)
    date2->setBackgroundOrigin(WindowOrigin);
    date2->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
    date2->setMaximumWidth((int)(250*wmult));
-   date2->setPaletteBackgroundColor(QColor(20, 40, 255));
+   date2->setPaletteBackgroundColor(main_bgColor);
    date2->setMaximumHeight((int)(2*fontMet.height()));
    date2->setFont(timeFont);
 
@@ -1171,7 +1203,7 @@ if (pageNum == 2)
    desc2->setBackgroundOrigin(WindowOrigin);
    desc2->setAlignment(Qt::WordBreak | Qt::AlignHCenter | Qt::AlignVCenter);
    desc2->setMaximumWidth((int)(250*wmult));
-   desc2->setPaletteBackgroundColor(QColor(20, 40, 255));
+   desc2->setPaletteBackgroundColor(main_bgColor);
    //desc2->setMaximumHeight((int)(2*fontMet.height()));
    desc2->setFont(timeFont);
 
@@ -1179,7 +1211,7 @@ if (pageNum == 2)
    date3->setBackgroundOrigin(WindowOrigin);
    date3->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
    date3->setMaximumWidth((int)(250*wmult));
-   date3->setPaletteBackgroundColor(QColor(20, 40, 255));
+   date3->setPaletteBackgroundColor(main_bgColor);
    date3->setMaximumHeight((int)(2*fontMet.height()));
    date3->setFont(timeFont);
 
@@ -1187,7 +1219,7 @@ if (pageNum == 2)
    desc3->setBackgroundOrigin(WindowOrigin);
    desc3->setAlignment(Qt::WordBreak | Qt::AlignHCenter | Qt::AlignVCenter);
    desc3->setMaximumWidth((int)(250*wmult));
-   desc3->setPaletteBackgroundColor(QColor(20, 40, 255));
+   desc3->setPaletteBackgroundColor(main_bgColor);
    //desc3->setMaximumHeight((int)(2*fontMet.height()));
    desc3->setFont(timeFont);
 
@@ -1195,7 +1227,7 @@ if (pageNum == 2)
    high1->setBackgroundOrigin(WindowOrigin);
    high1->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
    high1->setMaximumWidth((int)(250*wmult));
-   high1->setPaletteBackgroundColor(QColor(20, 40, 255));
+   high1->setPaletteBackgroundColor(main_bgColor);
    high1->setMaximumHeight(fontMet.height());
    high1->setFont(headFont);
 
@@ -1203,7 +1235,7 @@ if (pageNum == 2)
    high2->setBackgroundOrigin(WindowOrigin);
    high2->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
    high2->setMaximumWidth((int)(250*wmult));
-   high2->setPaletteBackgroundColor(QColor(20, 40, 255));
+   high2->setPaletteBackgroundColor(main_bgColor);
    high2->setMaximumHeight(fontMet.height());
    high2->setFont(headFont);
 
@@ -1211,7 +1243,7 @@ if (pageNum == 2)
    high3->setBackgroundOrigin(WindowOrigin);
    high3->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
    high3->setMaximumWidth((int)(250*wmult));
-   high3->setPaletteBackgroundColor(QColor(20, 40, 255));
+   high3->setPaletteBackgroundColor(main_bgColor);
    high3->setMaximumHeight(fontMet.height());
    high3->setFont(headFont);
 
@@ -1219,7 +1251,7 @@ if (pageNum == 2)
    low1->setBackgroundOrigin(WindowOrigin);
    low1->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
    low1->setMaximumWidth((int)(250*wmult));
-   low1->setPaletteBackgroundColor(QColor(20, 40, 255));
+   low1->setPaletteBackgroundColor(main_bgColor);
    low1->setMaximumHeight(fontMet.height());
    low1->setFont(headFont);
 
@@ -1227,7 +1259,7 @@ if (pageNum == 2)
    low2->setBackgroundOrigin(WindowOrigin);
    low2->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
    low2->setMaximumWidth((int)(250*wmult));
-   low2->setPaletteBackgroundColor(QColor(20, 40, 255));
+   low2->setPaletteBackgroundColor(main_bgColor);
    low2->setMaximumHeight(fontMet.height());
    low2->setFont(headFont);
 
@@ -1235,7 +1267,7 @@ if (pageNum == 2)
    low3->setBackgroundOrigin(WindowOrigin);
    low3->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
    low3->setMaximumWidth((int)(250*wmult));
-   low3->setPaletteBackgroundColor(QColor(20, 40, 255));
+   low3->setPaletteBackgroundColor(main_bgColor);
    low3->setMaximumHeight(fontMet.height());
    low3->setFont(headFont);
   
@@ -1243,8 +1275,8 @@ if (pageNum == 2)
 
    QLabel *spc1a = new QLabel(" ", page2Dia);
    QLabel *spc1b = new QLabel(" ", page2Dia);
-   spc1a->setPaletteBackgroundColor(QColor(20, 40, 255));
-   spc1b->setPaletteBackgroundColor(QColor(20, 40, 255));
+   spc1a->setPaletteBackgroundColor(main_bgColor);
+   spc1b->setPaletteBackgroundColor(main_bgColor);
    spc1a->setMaximumWidth((int)(25 * wmult));
    spc1b->setMaximumWidth((int)(25 * wmult));
 
@@ -1260,7 +1292,7 @@ if (pageNum == 2)
    delete tempimageA;
 
    lbPic1 = new QLabel(" ", page2Dia);
-   lbPic1->setPaletteBackgroundColor(QColor(20, 40, 255));
+   lbPic1->setPaletteBackgroundColor(main_bgColor);
    lbPic1->setMaximumWidth((int)(200*wmult));
    lbPic1->setMaximumHeight((int)(150*hmult));
    lbPic1->setMinimumHeight((int)(150*hmult));
@@ -1274,8 +1306,8 @@ if (pageNum == 2)
 
    QLabel *spc2a = new QLabel(" ", page2Dia);
    QLabel *spc2b = new QLabel(" ", page2Dia);
-   spc2a->setPaletteBackgroundColor(QColor(20, 40, 255));
-   spc2b->setPaletteBackgroundColor(QColor(20, 40, 255));
+   spc2a->setPaletteBackgroundColor(main_bgColor);
+   spc2b->setPaletteBackgroundColor(main_bgColor);
    spc2a->setMaximumWidth((int)(25 * wmult));
    spc2b->setMaximumWidth((int)(25 * wmult));
 
@@ -1291,7 +1323,7 @@ if (pageNum == 2)
    delete tempimageB;
 
    lbPic2 = new QLabel(" ", page2Dia);
-   lbPic2->setPaletteBackgroundColor(QColor(20, 40, 255));
+   lbPic2->setPaletteBackgroundColor(main_bgColor);
    lbPic2->setMaximumWidth((int)(200*wmult));
    lbPic2->setMaximumHeight((int)(150*hmult));
    lbPic2->setMinimumHeight((int)(150*hmult));
@@ -1305,8 +1337,8 @@ if (pageNum == 2)
 
    QLabel *spc3a = new QLabel(" ", page2Dia);
    QLabel *spc3b = new QLabel(" ", page2Dia);
-   spc3a->setPaletteBackgroundColor(QColor(20, 40, 255));
-   spc3b->setPaletteBackgroundColor(QColor(20, 40, 255));
+   spc3a->setPaletteBackgroundColor(main_bgColor);
+   spc3b->setPaletteBackgroundColor(main_bgColor);
    spc3a->setMaximumWidth((int)(25 * wmult));
    spc3b->setMaximumWidth((int)(25 * wmult));
 
@@ -1322,7 +1354,7 @@ if (pageNum == 2)
    delete tempimageC;
 
    lbPic3 = new QLabel(" ", page2Dia);
-   lbPic3->setPaletteBackgroundColor(QColor(20, 40, 255));
+   lbPic3->setPaletteBackgroundColor(main_bgColor);
    lbPic3->setMaximumWidth((int)(200*wmult));
    lbPic3->setMaximumHeight((int)(150*hmult));
    lbPic3->setMinimumHeight((int)(150*hmult));
@@ -1338,39 +1370,39 @@ if (pageNum == 2)
 
    QLabel *lbLow1 =  new QLabel("LO", page2Dia);
    lbLow1->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-   lbLow1->setPaletteForegroundColor(QColor(240, 200, 0));
+   lbLow1->setPaletteForegroundColor(lohi_fgColor);
    lbLow1->setMaximumHeight(lohiFM.height());
-   lbLow1->setPaletteBackgroundColor(QColor(20, 40, 255));
+   lbLow1->setPaletteBackgroundColor(main_bgColor);
    lbLow1->setFont(lohiFont);
    QLabel *lbLow2 =  new QLabel("LO", page2Dia);
    lbLow2->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-   lbLow2->setPaletteForegroundColor(QColor(240, 200, 0));
+   lbLow2->setPaletteForegroundColor(lohi_fgColor);
    lbLow2->setMaximumHeight(lohiFM.height());
-   lbLow2->setPaletteBackgroundColor(QColor(20, 40, 255));
+   lbLow2->setPaletteBackgroundColor(main_bgColor);
    lbLow2->setFont(lohiFont);
    QLabel *lbLow3 =  new QLabel("LO", page2Dia);
    lbLow3->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-   lbLow3->setPaletteForegroundColor(QColor(240, 200, 0));
+   lbLow3->setPaletteForegroundColor(lohi_fgColor);
    lbLow3->setMaximumHeight(lohiFM.height());
-   lbLow3->setPaletteBackgroundColor(QColor(20, 40, 255));
+   lbLow3->setPaletteBackgroundColor(main_bgColor);
    lbLow3->setFont(lohiFont);
    QLabel *lbHi1 = new QLabel("HI", page2Dia);
    lbHi1->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-   lbHi1->setPaletteForegroundColor(QColor(240, 200, 0));
+   lbHi1->setPaletteForegroundColor(lohi_fgColor);
    lbHi1->setMaximumHeight(lohiFM.height());
-   lbHi1->setPaletteBackgroundColor(QColor(20, 40, 255));
+   lbHi1->setPaletteBackgroundColor(main_bgColor);
    lbHi1->setFont(lohiFont);
    QLabel *lbHi2 = new QLabel("HI", page2Dia);
    lbHi2->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-   lbHi2->setPaletteForegroundColor(QColor(240, 200, 0));
+   lbHi2->setPaletteForegroundColor(lohi_fgColor);
    lbHi2->setMaximumHeight(lohiFM.height());
-   lbHi2->setPaletteBackgroundColor(QColor(20, 40, 255));
+   lbHi2->setPaletteBackgroundColor(main_bgColor);
    lbHi2->setFont(lohiFont);
    QLabel *lbHi3 = new QLabel("HI", page2Dia);
    lbHi3->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-   lbHi3->setPaletteForegroundColor(QColor(240, 200, 0));
+   lbHi3->setPaletteForegroundColor(lohi_fgColor);
    lbHi3->setMaximumHeight(lohiFM.height());
-   lbHi3->setPaletteBackgroundColor(QColor(20, 40, 255));
+   lbHi3->setPaletteBackgroundColor(main_bgColor);
    lbHi3->setFont(lohiFont);
 
    loHi1->addWidget(lbLow1, 0, 0);
@@ -1415,6 +1447,7 @@ if (pageNum == 2)
 
 if (pageNum == 3)
 {
+   page3Dia->setMaximumWidth((int)(750*wmult));
    QHBoxLayout *ext3  = new QHBoxLayout(0, 0, 0);
 
    ext3->addStrut((int)(310*wmult));
@@ -1449,7 +1482,7 @@ if (pageNum == 3)
 
    lbDesc = new QLabel(todayDesc, page3Dia);
    lbDesc->setAlignment( Qt::AlignTop | Qt::AlignLeft | Qt::WordBreak);
-   lbDesc->setPaletteBackgroundColor(QColor(20, 40, 255));
+   lbDesc->setPaletteBackgroundColor(main_bgColor);
    lbDesc->setFont(headFont);
    lbDesc->setMinimumWidth((int)(750*wmult));
    lbDesc->setMaximumWidth((int)(750*wmult));
@@ -1460,6 +1493,7 @@ if (pageNum == 3)
 
 if (pageNum == 4)
 {
+   page4Dia->setMaximumWidth((int)(750*wmult));
    QHBoxLayout *ext4  = new QHBoxLayout(0, 0, 0);
 
    ext4->addStrut((int)(310*wmult));
@@ -1486,14 +1520,14 @@ if (pageNum == 4)
    delete tempimageE;
 
    lbPic5 = new QLabel(" ", page4Dia);
-   lbPic5->setPaletteBackgroundColor(QColor(20, 40, 255));
+   lbPic5->setPaletteBackgroundColor(main_bgColor);
    lbPic5->setPixmap(pic5);
    lbPic5->setFrameStyle( QFrame::Panel | QFrame::Raised );
 
 
    lbTDesc = new QLabel(tomDesc, page4Dia);
    lbTDesc->setAlignment( Qt::AlignTop | Qt::AlignLeft | Qt::WordBreak);
-   lbTDesc->setPaletteBackgroundColor(QColor(20, 40, 255));
+   lbTDesc->setPaletteBackgroundColor(main_bgColor);
    lbTDesc->setFont(headFont);
    lbTDesc->setMinimumWidth((int)(550*wmult));
    lbTDesc->setMaximumWidth((int)(750*wmult));
