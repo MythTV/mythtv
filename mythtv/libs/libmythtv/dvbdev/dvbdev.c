@@ -97,17 +97,17 @@ void set_ts_filt(int fd,uint16_t pid, dmx_pes_type_t pestype)
   }
 }
 
-typedef struct append_buffer_st
+struct append_buffer
 {
   uint8_t* memory;
   int buf_len;
   int content_len;
-} append_buffer;
+};
 
 // utility for ts_to_ps
 void ts_to_ps_write_out(uint8_t *buf, int count, void *p)
 {
-  append_buffer* app_buf = (append_buffer*)p;
+  struct append_buffer* app_buf = (struct append_buffer*)p;
   if (app_buf->content_len + count > app_buf->buf_len)
   {
     fprintf(stderr, "ts_to_ps() output buffer too short\n");
@@ -164,7 +164,7 @@ void ts_to_ps(uint8_t* buf, uint16_t *pids, int npids, ipack **ipacks,
   if (p == 0)
     return;
 
-  append_buffer app_buf;
+  struct append_buffer app_buf;
   app_buf.memory = out_buf;
   app_buf.buf_len = out_buf_max_len;
   app_buf.content_len = 0;
