@@ -22,6 +22,7 @@ extern "C" {
 
 #include "cdrip.h"
 #include "cddecoder.h"
+#include "encoder.h"
 #include "vorbisencoder.h"
 #include "flacencoder.h"
 
@@ -251,7 +252,7 @@ void Ripper::ripthedisc(void)
     totallabel->setAlignment(AlignAuto | AlignVCenter | ExpandTabs | WordBreak);
     vb->addWidget(totallabel);
 
-    overall = new QProgressBar(totaltracks * 2, newdiag);
+    overall = new QProgressBar(totaltracks, newdiag);
     overall->setBackgroundOrigin(WindowOrigin);
     overall->setProgress(0);
     vb->addWidget(overall);
@@ -274,16 +275,17 @@ void Ripper::ripthedisc(void)
     QString textstatus;
     QString cddevice = gContext->GetSetting("CDDevice");
 
-    QString tempfile, outfile;
+    QString outfile;
     CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
 
     int encodequal = qualitygroup->id(qualitygroup->selected());
 
-    QString tempdir = gContext->GetSetting("TemporarySpace");
     QString findir = gContext->GetSetting("MusicLocation");
 
     for (int i = 0; i < totaltracks; i++)
     {
+        Encoder *encoder;
+
         current->setProgress(0);
         current->reset();
 
@@ -292,16 +294,10 @@ void Ripper::ripthedisc(void)
         textstatus = "Copying from CD:\n" + track->Title();       
         statusline->setText(textstatus);
 
-        tempfile = QString("/%1/%2.raw").arg(tempdir).arg(i + 1);
-        long totalbytes = ripTrack(cddevice, tempfile, i + 1);
- 
-        overall->setProgress((i * 2) + 1);
-
         current->setProgress(0);
         current->reset();
 
-        textstatus = "Compressing:\n" + track->Title();
-        statusline->setText(textstatus);
+        qApp->processEvents();
 
         outfile = findir;
 
@@ -314,21 +310,20 @@ void Ripper::ripthedisc(void)
         if (encodequal < 3)
         {
             outfile += ".ogg";
-            VorbisEncode(tempfile, outfile, encodequal, track, totalbytes, 
-                         current);
+            encoder = new VorbisEncoder(outfile, encodequal, track); 
         }
         else
         {
             outfile += ".flac";
-            FlacEncode(tempfile, outfile, encodequal, track, totalbytes, 
-                       current);
+            encoder = new FlacEncoder(outfile, encodequal, track); 
         }
 
-        unlink(tempfile.ascii());
+        ripTrack(cddevice, encoder, i + 1);
 
-        overall->setProgress((i + 1) * 2);
+        overall->setProgress(i + 1);
         qApp->processEvents();
 
+        delete encoder;
         delete track;
     }
 
@@ -342,7 +337,7 @@ static void paranoia_cb(long inpos, int function)
     inpos = inpos; function = function;
 }
 
-int Ripper::ripTrack(QString &cddevice, QString &outputfilename, int tracknum)
+int Ripper::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
 {
     cdrom_drive *device = cdda_identify(cddevice.ascii(), 0, NULL);
 
@@ -350,13 +345,6 @@ int Ripper::ripTrack(QString &cddevice, QString &outputfilename, int tracknum)
         return -1;
 
     if (cdda_open(device))
-    {
-        cdda_close(device);
-        return -1;
-    }
-
-    FILE *output = fopen(outputfilename.ascii(), "w");
-    if (!output)
     {
         cdda_close(device);
         return -1;
@@ -381,7 +369,10 @@ int Ripper::ripTrack(QString &cddevice, QString &outputfilename, int tracknum)
     while (curpos < end)
     {
         buffer = paranoia_read(paranoia, paranoia_cb);
-        fwrite(buffer, CD_FRAMESIZE_RAW, 1, output);
+
+        if (encoder->addSamples(buffer, CD_FRAMESIZE_RAW))
+            break;
+
         curpos++;
 
         every15--;
@@ -399,7 +390,6 @@ int Ripper::ripTrack(QString &cddevice, QString &outputfilename, int tracknum)
         
     paranoia_free(paranoia);
     cdda_close(device);
-    fclose(output);
 
-    return (end - start + 1) * CD_FRAMESIZE_RAW;
+    return (curpos - start + 1) * CD_FRAMESIZE_RAW;
 }

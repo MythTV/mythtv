@@ -15,6 +15,7 @@ class QVBoxLayout;
 class QPushButton;
 class QLabel;
 class QProgressBar;
+class Encoder;
 
 class Ripper : public MythDialog
 {
@@ -32,7 +33,7 @@ class Ripper : public MythDialog
     void tableChanged(int row, int col);
 
   private:
-    int ripTrack(QString &cddevice, QString &outputfilename, int tracknum);
+    int ripTrack(QString &cddevice, Encoder *encoder, int tracknum);
     void fixFilename(QString &filename, const QString &addition);
 
     QSqlDatabase *db;

@@ -22,12 +22,12 @@ LIBS += -lcdda_paranoia -lcdda_interface -L$${PREFIX}/lib -lmyth-$$LIBVERSION
 HEADERS += audiooutput.h buffer.h cddecoder.h cdrip.h constants.h databasebox.h 
 HEADERS += decoder.h flacdecoder.h flacencoder.h maddecoder.h mainvisual.h
 HEADERS += metadata.h playbackbox.h playlist.h polygon.h output.h recycler.h 
-HEADERS += scrolllabel.h streaminput.h synaesthesia.h 
+HEADERS += scrolllabel.h streaminput.h synaesthesia.h encoder.h
 HEADERS += treecheckitem.h visual.h vorbisdecoder.h vorbisencoder.h polygon.h
 
 SOURCES += audiooutput.cpp cddecoder.cpp cdrip.cpp databasebox.cpp decoder.cpp 
 SOURCES += flacdecoder.cpp flacencoder.cpp maddecoder.cpp main.cpp 
 SOURCES += mainvisual.cpp metadata.cpp playbackbox.cpp playlist.cpp output.cpp 
-SOURCES += recycler.cpp scrolllabel.cpp streaminput.cpp 
+SOURCES += recycler.cpp scrolllabel.cpp streaminput.cpp encoder.cpp
 SOURCES += synaesthesia.cpp treecheckitem.cpp vorbisdecoder.cpp 
 SOURCES += vorbisencoder.cpp

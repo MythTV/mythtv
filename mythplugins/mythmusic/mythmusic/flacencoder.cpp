@@ -1,7 +1,4 @@
 #include <qstring.h>
-#include <qcstring.h>
-#include <qapplication.h>
-#include <qprogressbar.h>
 
 #include <iostream>
 #include <unistd.h>
@@ -10,69 +7,18 @@ using namespace std;
 
 #include "metadata.h"
 #include "flacdecoder.h"
+#include "encoder.h"
 #include "flacencoder.h"
 
 #include <FLAC/file_encoder.h>
 #include <FLAC/assert.h>
 
-struct clientdata
+FlacEncoder::FlacEncoder(const QString &outfile, int qualitylevel,
+                         Metadata *metadata)
+           : Encoder(outfile, qualitylevel, metadata)
 {
-    QProgressBar *progressbar;
-    int writes;
-    long long samplesdone;
-};
+    sampleindex = 0;
 
-void progress_callback(const FLAC__FileEncoder *encoder, 
-                       FLAC__uint64 bytes_written, 
-                       FLAC__uint64 samples_written, unsigned frames_written, 
-                       unsigned total_frames_estimate, void *client_data)
-{
-    encoder = encoder;
-    bytes_written = bytes_written;
-    frames_written = frames_written;
-    total_frames_estimate = total_frames_estimate;
-
-    clientdata *clidata = (clientdata *)client_data;
-
-    clidata->samplesdone = samples_written;
-
-    clidata->writes++;
-    if (clidata->writes == 5)
-    {
-        clidata->writes = 0;
-        clidata->progressbar->setProgress(clidata->samplesdone);
-        qApp->processEvents();
-    }
-}
-
-void format_input(FLAC__int32 *dest[], FLAC__int16 *ssbuffer, 
-                  unsigned char *ucbuffer, unsigned wide_samples, 
-                  FLAC__bool is_big_endian, FLAC__bool is_unsigned_samples, 
-                  unsigned channels, unsigned bps)
-{       
-    is_big_endian = is_big_endian;
-    is_unsigned_samples = is_unsigned_samples;
-    bps = bps;
-    unsigned wide_sample, sample, channel;
-        
-    ucbuffer = ucbuffer;
-            
-    for (sample = wide_sample = 0; wide_sample < wide_samples; wide_sample++)
-        for (channel = 0; channel < channels; channel++, sample++)
-            dest[channel][wide_sample] = (FLAC__int32)ssbuffer[sample];
-}
-
-void FlacEncode(const QString &infile, const QString &outfile, int qualitylevel,
-                Metadata *metadata, int totalbytes, QProgressBar *progressbar)
-{
-    qualitylevel = qualitylevel;
-
-    long int totalsamples = (totalbytes / 4);
-    progressbar->setTotalSteps(totalsamples);
-    progressbar->setProgress(0);
-    qApp->processEvents();
-
-    totalsamples = totalbytes / 4;
     int blocksize = 4608;
     bool do_exhaustive_model_search = false;
     bool do_escape_coding = false;
@@ -83,14 +29,12 @@ void FlacEncode(const QString &infile, const QString &outfile, int qualitylevel,
     int rice_parameter_search_dist = 0;
     int max_lpc_order = 8;
 
-    FILE *in = fopen(infile.ascii(), "r");
-
-    FLAC__FileEncoder *encoder = FLAC__file_encoder_new();
+    encoder = FLAC__file_encoder_new();
 
     FLAC__file_encoder_set_streamable_subset(encoder, true);
     FLAC__file_encoder_set_do_mid_side_stereo(encoder, do_mid_side);
     FLAC__file_encoder_set_loose_mid_side_stereo(encoder, loose_mid_side);
-    FLAC__file_encoder_set_channels(encoder, 2);
+    FLAC__file_encoder_set_channels(encoder, NUM_CHANNELS);
     FLAC__file_encoder_set_bits_per_sample(encoder, 16);
     FLAC__file_encoder_set_sample_rate(encoder, 44100);
     FLAC__file_encoder_set_blocksize(encoder, blocksize);
@@ -106,63 +50,21 @@ void FlacEncode(const QString &infile, const QString &outfile, int qualitylevel,
                                                   max_residual_partition_order);
     FLAC__file_encoder_set_rice_parameter_search_dist(encoder, 
                                                     rice_parameter_search_dist);
-    FLAC__file_encoder_set_total_samples_estimate(encoder, totalsamples);
 
-    struct clientdata clidata;
-    clidata.progressbar = progressbar;
-    clidata.writes = 0;
-    clidata.samplesdone = 0;
-
-    FLAC__file_encoder_set_client_data(encoder, &clidata);
-    FLAC__file_encoder_set_progress_callback(encoder, progress_callback);
     FLAC__file_encoder_set_filename(encoder, outfile.ascii());
 
     if (FLAC__file_encoder_init(encoder) != FLAC__FILE_ENCODER_OK)
     {
         cout << "Couldn't init encoder.\n";
-        goto abort;
     }
 
-    int bytes_read;
-    unsigned char ucbuffer[2048 * FLAC__MAX_CHANNELS * 
-                           ((FLAC__REFERENCE_CODEC_MAX_BITS_PER_SAMPLE + 7) 
-                           / 8)];
-    static FLAC__int32 inputin[FLAC__MAX_CHANNELS][2048];
-    static FLAC__int32 *input[FLAC__MAX_CHANNELS];
-
-    for (int i = 0; i < (int)FLAC__MAX_CHANNELS; i++)
+    for (int i = 0; i < NUM_CHANNELS; i++)
         input[i] = &(inputin[i][0]); 
+}
 
-    while (!feof(in))
-    {
-        bytes_read = fread(ucbuffer, sizeof(unsigned char), 2048 * 2, in);
-
-        if (bytes_read == 0)
-        {
-            if (ferror(in)) 
-            {
-                cout << "error during read\n";
-                goto abort;
-            }
-        }
-        else if (bytes_read % 2 != 0) 
-        {
-            cout << "got partial sample\n";
-            goto abort;
-        }
-
-        unsigned wide_samples = bytes_read / 4;
-        format_input(input, (FLAC__int16 *)ucbuffer, ucbuffer, wide_samples, 
-                     false, false, 2, 16);
-
-        if (!FLAC__file_encoder_process(encoder, 
-                                        (const FLAC__int32 * const *) input, 
-                                        wide_samples)) 
-        {
-            cout << "error during encoding\n";
-            goto abort;
-        }
-    }
+FlacEncoder::~FlacEncoder()
+{
+    addSamples(0, 0); // flush buffer
 
     if (encoder)
     {
@@ -170,20 +72,42 @@ void FlacEncode(const QString &infile, const QString &outfile, int qualitylevel,
         FLAC__file_encoder_delete(encoder);
     }
 
-    fclose(in);
-
     if (metadata)
     {
-        FlacDecoder *decoder = new FlacDecoder(outfile, NULL, NULL, NULL);
+        FlacDecoder *decoder = new FlacDecoder(outfile->ascii(), NULL, NULL, 
+                                               NULL);
         decoder->commitMetadata(metadata);
 
         delete decoder;
     }
-
-    return;
-abort:
-    FLAC__file_encoder_finish(encoder);
-    FLAC__file_encoder_delete(encoder);
-
-    fclose(in);
 }
+
+int FlacEncoder::addSamples(int16_t *bytes, unsigned int length)
+{
+    unsigned int index = 0;
+
+    length /= sizeof(int16_t);
+
+    do {
+        while (index < length && sampleindex < MAX_SAMPLES) 
+        {
+            input[0][sampleindex] = (FLAC__int32)(bytes[index++]);
+            input[1][sampleindex] = (FLAC__int32)(bytes[index++]);
+            sampleindex += 1;
+        }
+
+        if(sampleindex == MAX_SAMPLES || (length == 0 && sampleindex > 0) ) 
+        {
+            if (!FLAC__file_encoder_process(encoder,
+                                            (const FLAC__int32 * const *) input,
+                                            sampleindex))
+            {
+                return EENCODEERROR;
+            }
+            sampleindex = 0;
+        }
+    } while (index < length);
+
+    return 0;
+}
+

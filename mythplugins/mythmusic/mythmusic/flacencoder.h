@@ -3,10 +3,25 @@
 
 #include <qstring.h>
 
-class QProgressBar;
+#include <FLAC/file_encoder.h>
+
+#define MAX_SAMPLES 588 * 4
+#define NUM_CHANNELS 2
+
 class Metadata;
 
-void FlacEncode(const QString &infile, const QString &outfile, int qualitylevel,
-                Metadata *metadata, int totalbytes, QProgressBar *progressbar);
+class FlacEncoder : public Encoder 
+{
+  public:
+    FlacEncoder(const QString &outfile, int qualitylevel, Metadata *metadata);
+   ~FlacEncoder();
+    int addSamples(int16_t *bytes, unsigned int len);
+
+  private:
+    FLAC__FileEncoder *encoder;
+    unsigned int sampleindex;
+    FLAC__int32 inputin[NUM_CHANNELS][MAX_SAMPLES];
+    FLAC__int32 *input[NUM_CHANNELS];
+};
 
 #endif

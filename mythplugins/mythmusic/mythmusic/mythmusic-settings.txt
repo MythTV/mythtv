@@ -8,9 +8,6 @@ CDDevice=/dev/cdrom
 # What dsp device to output to
 AudioDevice=/dev/dsp
 
-# Place to store the temporary output from the CD.  Gotta be able to write.
-TemporarySpace=/tmp/
-
 # Order in which to sort the Music Selection Tree.
 # Possible values are space-separated list of genre, artist, album, and title
 #     OR the keyword "directory" to indicate that onscreen tree mirrors
@@ -35,7 +32,7 @@ NonID3FileNameFormat=GENRE/ARTIST/ALBUM/TRACK_TITLE
 
 # Automatically lookup an audio CD if it's present and show its information in
 # the Music Selection Tree
-#AutoLookupCD=1
+AutoLookupCD=1
 
 # Shuffle mode for the player.  Can be either normal(the default) or random.
 #PlayMode=random
