@@ -16,8 +16,8 @@
 #include <iostream>
 #include <vector>
 
-#include <mythtv/mythmediamonitor.h>
-#include <mythtv/mythmedia.h>
+#include <mythmediamonitor.h>
+#include <mythmedia.h>
 
 using namespace std;
 
