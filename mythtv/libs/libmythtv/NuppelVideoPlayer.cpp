@@ -2775,11 +2775,12 @@ bool NuppelVideoPlayer::EnableEdit(void)
         usleep(50);
 
     seekamount = keyframedist;
-    seekamountpos = 4;
+    seekamountpos = 3;
 
     dialogname = "";
     UpdateEditSlider();
     UpdateTimeDisplay();
+    UpdateSeekAmount(true);
 
     if (hasdeletetable)
     {
