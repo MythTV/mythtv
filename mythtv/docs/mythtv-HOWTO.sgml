@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2005-02-06, v0.17.00
+<date>2005-02-09, v0.17.00
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -71,8 +71,8 @@ like to install a custom version of Knoppix optimized for MythTV.
 See <url url="http://linpvr.org/" name="http://linpvr.org/"> if you'd like
 to install MythTV onto a VIA Epia M machine.
 
-<!-- See <url url="http://bit.blkbk.com/" name="http://bit.blkbk.com/"> if you'd
-like to install MythTV on an XBox. -->
+See <url url="http://bit.blkbk.com/" name="http://bit.blkbk.com/"> if you'd
+like to install MythTV on an XBox.
 
 See <url url="http://wilsonet.com/mythtv/"
 name="http://wilsonet.com/mythtv/"> for instructions tailored to RedHat's
@@ -2454,9 +2454,14 @@ move to the next page by pressing the space bar.  If you need to move around
 the screen, use the arrow keys to move focus between settings, not the
 mouse.
 
-If you will have multiple backends, or if your backend is on one system and
-you're running the frontend on another machine then <em>do not</em> use the
-"127.0.0.1" IP address.
+If you will be deploying multiple backends, or if your backend is on one
+system and you're running the frontend on another machine then <em>do
+not</em> use the "127.0.0.1" IP address.
+
+<bf>NOTE</bf>: If you modify the 127.0.0.1 address and use a "real" IP
+address, you must use real IP addresses in both fields, otherwise your
+frontend machines will generate "Unexpected response to MYTH_PROTO_VERSION"
+errors.
 
 It is very strongly discouraged that you make any changes to the port
 settings from the defaults.
@@ -4773,6 +4778,10 @@ first choice is the better solution.
 <p>You didn't set your <tt>QTDIR</tt>.  Re-read the section on <ref
 id="Setting_up_paths" name="Setting up paths">.
 
+<sect2>Internal Segmentation Fault.
+<p>This is most likely to be caused by an overheating processor rather than
+an actual programming fault within gcc.
+
 <sect1>Debugging
 <sect2>MythTV segfaults
 <sect2>MythTV isn't doing anything
@@ -4858,11 +4867,16 @@ deinterlace support.  You may check this by doing a <tt>$ cat
 </itemize>
 
 <sect2>MythTV is crashing your system
-<p>MythTV <em>can not</em> crash your system - it is a user-level program. 
-If your system is crashing when you run MythTV, then you have some
+<p>When run as a non-privileged user, MythTV <em>can not</em> crash your
+system.  If your system is crashing when you run MythTV, then you have some
 issue with the drivers for your capture card or other hardware, or the CPU
 fan has fallen off/broken and your system is overheating when asked to
 perform a CPU intensive task like encoding video.
+
+If you are running as root, which is <bf>strongly discouraged</bf>, it is
+possible that your system may crash due to the real-time thread using all
+available CPU.  You will not be able to interrupt the process, so for all
+intents and purposes your computer will have crashed.
 
 <sect1>Installing
 <sect2>When trying to run setup, you get an error like this: "./setup: error while loading shared libraries:"
@@ -7207,17 +7221,40 @@ higher I/O rates than JFS, albeit at a higher CPU loading.  This may cause
 issues if you do not have the spare CPU capacity to handle XFS, potentially
 leading to dropped frames.
 
+<sect1>HDTV with the Air2PC-ATSC-PCI card
+
+<p>The Air2PC card has the capability to capture over-the-air HDTV signals
+(8VSB) and unencrypted HDTV (QAM) off of cable TV.  The Air2PC card is
+installed as a DVB device and is supported within MythTV.  
+
+First, you must compile a version of the Linux kernel to support the new
+tuner device.  Version 2.6.11 supports the card in 8VSB mode.  If you wish
+to use QAM, you will need to patch the kernel, or wait until 2.6.12.
+
+Download the source to 2.6.11.  At the time of this writing (2005-02-09), the latest
+is 2.6.11-rc3.
+<tscreen><verb>
+$ su
+# cd /usr/src
+# wget http://www.kernel.org/pub/linux/kernel/v2.6/testing/linux-2.6.11-rc3.tar.bz2
+# tar -xjf linux-2.6.11-rc3.tar.bz2
+# cd linux-2.6.11-rc3
+</verb></tscreen>
+
+To be continued...
+
 </article>
 <!-- Revision History
 
-v0.17.00, 2005-02-05.  Version bump. Update LAME information.  Change case on
-march= line. Spelling error.  DTK's update to setup keys.  Update make -j
+v0.17.00, 2005-02-09.  Version bump. Update LAME information.  Change case
+on march= line. Spelling error.  DTK's update to setup keys.  Update make -j
 stuff.  Add update to ALSA sound output.  Remove all the stuff about
 compiling ALSA.  Add another source for the Air2PC-ATSC card.  Add a section
-for Firewire "tuner".  Expand on HDTV - Air2PC can now talk QAM.  Comment
-out the xbox linux site; it appears to be dead?  Rework section 6 slightly
-(Suggestions from Max Waterman).  Add a little extra hint in LVM section
-about boot-time messages.  (Wendy Seltzer)
+for Firewire "tuner".  Expand on HDTV - Air2PC can now talk QAM.  Rework
+section 6 slightly (Suggestions from Max Waterman).  Add a little extra hint
+in LVM section about boot-time messages.  (Wendy Seltzer).  Add caveat about
+IP addresses on general setup page. (James Casbon).  Update "mythtv is
+crashing my system".
 
 
 -->

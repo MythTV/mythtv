@@ -142,9 +142,13 @@ you've only got one machine, then the default values are fine and you can
 move to the next page by pressing the space bar.  If you need to move around
 the screen, use the arrow keys to move focus between settings, not the
 mouse.</P>
-<P>If you will have multiple backends, or if your backend is on one system and
-you're running the frontend on another machine then <EM>do not</EM> use the
-"127.0.0.1" IP address.</P>
+<P>If you will be deploying multiple backends, or if your backend is on one
+system and you're running the frontend on another machine then <EM>do
+not</EM> use the "127.0.0.1" IP address.</P>
+<P><B>NOTE</B>: If you modify the 127.0.0.1 address and use a "real" IP
+address, you must use real IP addresses in both fields, otherwise your
+frontend machines will generate "Unexpected response to MYTH_PROTO_VERSION"
+errors.</P>
 <P>It is very strongly discouraged that you make any changes to the port
 settings from the defaults.</P>
 <P>Once you're satisfied with the values, move the focus down to Next and hit

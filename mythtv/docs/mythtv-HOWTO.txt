@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2005-02-06, v0.17.00
+  2005-02-09, v0.17.00
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -219,6 +219,7 @@
         20.1.2 error: can't find a register in class 'BREG' while reloading 'asm'
         20.1.3 make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
         20.1.4 make: *** No rule to make target /mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
+        20.1.5 Internal Segmentation Fault.
      20.2 Debugging
         20.2.1 MythTV segfaults
         20.2.2 MythTV isn't doing anything
@@ -308,6 +309,7 @@
         22.4.3 ReiserFS
         22.4.4 JFS
         22.4.5 XFS
+     22.5 HDTV with the Air2PC-ATSC-PCI card
 
 
   ______________________________________________________________________
@@ -342,8 +344,6 @@
      MPEG-2, MJPEG, DVB or HDTV capture devices.  With appropriate
      hardware, MythTV can control set top boxes, often found in digital
      cable and satellite TV systems.
-
-
   +o  Program Guide Data in North America is downloaded from Zap2It.com,
      a subsidiary of Tribune Media Services.  This free service is
      called DataDirect, and provides MythTV almost two weeks of
@@ -392,6 +392,8 @@
   See http://linpvr.org/ <http://linpvr.org/> if you'd like to install
   MythTV onto a VIA Epia M machine.
 
+  See http://bit.blkbk.com/ <http://bit.blkbk.com/> if you'd like to
+  install MythTV on an XBox.
 
   See http://wilsonet.com/mythtv/ <http://wilsonet.com/mythtv/> for
   instructions tailored to RedHat's Fedora Core distribution.
@@ -3134,16 +3136,20 @@
   you need to move around the screen, use the arrow keys to move focus
   between settings, not the mouse.
 
-  If you will have multiple backends, or if your backend is on one
-  system and you're running the frontend on another machine then [4mdo[24m [4mnot[0m
-  use the "127.0.0.1" IP address.
+  If you will be deploying multiple backends, or if your backend is on
+  one system and you're running the frontend on another machine then [4mdo[0m
+  [4mnot[24m use the "127.0.0.1" IP address.
+
+  [1mNOTE[22m: If you modify the 127.0.0.1 address and use a "real" IP address,
+  you must use real IP addresses in both fields, otherwise your frontend
+  machines will generate "Unexpected response to MYTH_PROTO_VERSION"
+  errors.
 
   It is very strongly discouraged that you make any changes to the port
   settings from the defaults.
 
   Once you're satisfied with the values, move the focus down to Next and
   hit the space bar.
-
   The next screen details the Host-specific Backend setup.  This is
   where you will set the specific directory paths for this particular
   backend.  Make sure that you've followed the steps at the beginning of
@@ -3272,8 +3278,6 @@
   the console or the log file it is normal to see a "401 Unauthorized"
   error followed by a "200 OK" when the connection to Zap2It is being
   established.
-
-
 
   From : Sun Jun 13 05:00:00 2004 To : Mon Jun 14 05:00:00 2004 (UTC)
   --02:58:01--
@@ -5672,6 +5676,12 @@
   paths''.
 
 
+  [1m20.1.5.  Internal Segmentation Fault.[0m
+
+  This is most likely to be caused by an overheating processor rather
+  than an actual programming fault within gcc.
+
+
   [1m20.2.  Debugging[0m
 
   [1m20.2.1.  MythTV segfaults[0m
@@ -5776,11 +5786,16 @@
 
   [1m20.2.5.  MythTV is crashing your system[0m
 
-  MythTV [4mcan[24m [4mnot[24m crash your system - it is a user-level program.  If
-  your system is crashing when you run MythTV, then you have some issue
-  with the drivers for your capture card or other hardware, or the CPU
-  fan has fallen off/broken and your system is overheating when asked to
-  perform a CPU intensive task like encoding video.
+  When run as a non-privileged user, MythTV [4mcan[24m [4mnot[24m crash your system.
+  If your system is crashing when you run MythTV, then you have some
+  issue with the drivers for your capture card or other hardware, or the
+  CPU fan has fallen off/broken and your system is overheating when
+  asked to perform a CPU intensive task like encoding video.
+
+  If you are running as root, which is [1mstrongly discouraged[22m, it is
+  possible that your system may crash due to the real-time thread using
+  all available CPU.  You will not be able to interrupt the process, so
+  for all intents and purposes your computer will have crashed.
 
 
   [1m20.3.  Installing[0m
@@ -5844,11 +5859,12 @@
 
   Edit your /etc/X11/XF86Config-4 file, and look for:
 
-  Section "ServerFlags"
-      #DontZap # disable <Crtl><Alt><BS> (server abort)
-      #DontZoom # disable <Crtl><Alt><KP_+>/<KP_-> (resolution switching)
-      AllowMouseOpenFail # allows the server to start up even if the mouse doesn't work
-  EndSection
+
+       Section "ServerFlags"
+           #DontZap # disable <Crtl><Alt><BS> (server abort)
+           #DontZoom # disable <Crtl><Alt><KP_+>/<KP_-> (resolution switching)
+           AllowMouseOpenFail # allows the server to start up even if the mouse doesn't work
+       EndSection
 
 
 
@@ -5901,7 +5917,7 @@
   survive a reboot.
 
 
-       $ xset -dpms
+  $ xset -dpms
 
 
 
@@ -5960,12 +5976,11 @@
   being enabled, you may need to recompile your kernel. Check your
   motherboard's chipset (look in the "ATA/IDE/MFM/RLL support" section
   in "make menuconfig") for more information.
-
   Next, check that the hard drive has DMA enabled.  Use the [1mhdparm[0m
   program to check and enable DMA.
 
 
-  # hdparm -d /dev/hd?
+       # hdparm -d /dev/hd?
 
 
 
@@ -6023,11 +6038,13 @@
   should work correctly because it writes to and read from /dev/dsp in
   the same way that [1maplay [22mdoes.
 
+
   To record audio along with video the audio signal must be digitized by
   a DSP so that the audio data can be stored in a file. On playback, the
   audio data is written to /dev/dsp and converted back to an analog
   signal. This analog signal should then be sent to your speakers. Here
   is what is needed in alsamixer:
+
   CAPTUR source - the analog source to be sent to the DSP. This should
   be set to the input source from the tuner card to the sound card. In
   most cases this is Line but this could also be Aux, CD, Mic, etc.,
@@ -6150,11 +6167,9 @@
   <https://listman.redhat.com/mailman/listinfo/video4linux-list>) for
   more information.
 
-
   [1m20.5.11.  Mythweb is showing a db_open error when I connect to it[0m
 
   Find your php.ini file. Make sure you've got a line in it like this:
-
 
   extension=mysql.so
 
@@ -6218,7 +6233,7 @@
   In KDE, you may want to perform the following:
 
 
-       $ rm ~/.kde/Autostart/Autorun.desktop
+  $ rm ~/.kde/Autostart/Autorun.desktop
 
 
 
@@ -8387,6 +8402,32 @@
   higher I/O rates than JFS, albeit at a higher CPU loading.  This may
   cause issues if you do not have the spare CPU capacity to handle XFS,
   potentially leading to dropped frames.
+
+
+  [1m22.5.  HDTV with the Air2PC-ATSC-PCI card[0m
+
+  The Air2PC card has the capability to capture over-the-air HDTV
+  signals (8VSB) and unencrypted HDTV (QAM) off of cable TV.  The Air2PC
+  card is installed as a DVB device and is supported within MythTV.
+
+  First, you must compile a version of the Linux kernel to support the
+  new tuner device.  Version 2.6.11 supports the card in 8VSB mode.  If
+  you wish to use QAM, you will need to patch the kernel, or wait until
+  2.6.12.
+
+  Download the source to 2.6.11.  At the time of this writing
+  (2005-02-09), the latest is 2.6.11-rc3.
+
+
+       $ su
+       # cd /usr/src
+       # wget http://www.kernel.org/pub/linux/kernel/v2.6/testing/linux-2.6.11-rc3.tar.bz2
+       # tar -xjf linux-2.6.11-rc3.tar.bz2
+       # cd linux-2.6.11-rc3
+
+
+
+  To be continued...
 
 
 

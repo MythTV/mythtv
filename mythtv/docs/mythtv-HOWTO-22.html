@@ -857,6 +857,29 @@ higher I/O rates than JFS, albeit at a higher CPU loading.  This may cause
 issues if you do not have the spare CPU capacity to handle XFS, potentially
 leading to dropped frames.</P>
 
+<H2><A NAME="ss22.5">22.5</A> <A HREF="mythtv-HOWTO.html#toc22.5">HDTV with the Air2PC-ATSC-PCI card</A>
+</H2>
+
+<P>The Air2PC card has the capability to capture over-the-air HDTV signals
+(8VSB) and unencrypted HDTV (QAM) off of cable TV.  The Air2PC card is
+installed as a DVB device and is supported within MythTV.  </P>
+<P>First, you must compile a version of the Linux kernel to support the new
+tuner device.  Version 2.6.11 supports the card in 8VSB mode.  If you wish
+to use QAM, you will need to patch the kernel, or wait until 2.6.12.</P>
+<P>Download the source to 2.6.11.  At the time of this writing (2005-02-09), the latest
+is 2.6.11-rc3.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# cd /usr/src
+# wget http://www.kernel.org/pub/linux/kernel/v2.6/testing/linux-2.6.11-rc3.tar.bz2
+# tar -xjf linux-2.6.11-rc3.tar.bz2
+# cd linux-2.6.11-rc3
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>To be continued...</P>
+
 <HR>
 Next
 <A HREF="mythtv-HOWTO-21.html">Previous</A>

@@ -69,6 +69,11 @@ first choice is the better solution.</P>
 <P>You didn't set your <CODE>QTDIR</CODE>.  Re-read the section on 
 <A HREF="mythtv-HOWTO-4.html#Setting_up_paths">Setting up paths</A>.</P>
 
+<H3>Internal Segmentation Fault.</H3>
+
+<P>This is most likely to be caused by an overheating processor rather than
+an actual programming fault within gcc.</P>
+
 <H2><A NAME="ss20.2">20.2</A> <A HREF="mythtv-HOWTO.html#toc20.2">Debugging</A>
 </H2>
 
@@ -168,11 +173,15 @@ deinterlace support.  You may check this by doing a <CODE>$ cat
 
 <H3>MythTV is crashing your system</H3>
 
-<P>MythTV <EM>can not</EM> crash your system - it is a user-level program. 
-If your system is crashing when you run MythTV, then you have some
+<P>When run as a non-privileged user, MythTV <EM>can not</EM> crash your
+system.  If your system is crashing when you run MythTV, then you have some
 issue with the drivers for your capture card or other hardware, or the CPU
 fan has fallen off/broken and your system is overheating when asked to
 perform a CPU intensive task like encoding video.</P>
+<P>If you are running as root, which is <B>strongly discouraged</B>, it is
+possible that your system may crash due to the real-time thread using all
+available CPU.  You will not be able to interrupt the process, so for all
+intents and purposes your computer will have crashed.</P>
 
 <H2><A NAME="ss20.3">20.3</A> <A HREF="mythtv-HOWTO.html#toc20.3">Installing</A>
 </H2>

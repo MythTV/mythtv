@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2005-02-06, v0.17.00
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2005-02-09, v0.17.00
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -211,6 +211,7 @@ necessary.</EM>
 <LI><A NAME="toc22.2">22.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss22.2">Hauppauge PVR-250 remote and MythTV's native LIRC support</A>
 <LI><A NAME="toc22.3">22.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss22.3">Logical Volume Manager (LVM) </A>
 <LI><A NAME="toc22.4">22.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss22.4">Advanced Partition Formatting </A>
+<LI><A NAME="toc22.5">22.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss22.5">HDTV with the Air2PC-ATSC-PCI card</A>
 </UL>
 
 <HR>
@@ -278,7 +279,9 @@ like to install a custom version of Knoppix optimized for MythTV.</P>
 <P>See 
 <A HREF="http://linpvr.org/">http://linpvr.org/</A> if you'd like
 to install MythTV onto a VIA Epia M machine.</P>
-
+<P>See 
+<A HREF="http://bit.blkbk.com/">http://bit.blkbk.com/</A> if you'd
+like to install MythTV on an XBox.</P>
 <P>See 
 <A HREF="http://wilsonet.com/mythtv/">http://wilsonet.com/mythtv/</A> for instructions tailored to RedHat's
 Fedora Core distribution.</P>
@@ -2898,9 +2901,13 @@ you've only got one machine, then the default values are fine and you can
 move to the next page by pressing the space bar.  If you need to move around
 the screen, use the arrow keys to move focus between settings, not the
 mouse.</P>
-<P>If you will have multiple backends, or if your backend is on one system and
-you're running the frontend on another machine then <EM>do not</EM> use the
-"127.0.0.1" IP address.</P>
+<P>If you will be deploying multiple backends, or if your backend is on one
+system and you're running the frontend on another machine then <EM>do
+not</EM> use the "127.0.0.1" IP address.</P>
+<P><B>NOTE</B>: If you modify the 127.0.0.1 address and use a "real" IP
+address, you must use real IP addresses in both fields, otherwise your
+frontend machines will generate "Unexpected response to MYTH_PROTO_VERSION"
+errors.</P>
 <P>It is very strongly discouraged that you make any changes to the port
 settings from the defaults.</P>
 <P>Once you're satisfied with the values, move the focus down to Next and hit
@@ -5282,6 +5289,11 @@ first choice is the better solution.</P>
 <P>You didn't set your <CODE>QTDIR</CODE>.  Re-read the section on 
 <A HREF="#Setting_up_paths">Setting up paths</A>.</P>
 
+<H3>Internal Segmentation Fault.</H3>
+
+<P>This is most likely to be caused by an overheating processor rather than
+an actual programming fault within gcc.</P>
+
 <H2><A NAME="ss20.2">20.2</A> <A HREF="#toc20.2">Debugging</A>
 </H2>
 
@@ -5381,11 +5393,15 @@ deinterlace support.  You may check this by doing a <CODE>$ cat
 
 <H3>MythTV is crashing your system</H3>
 
-<P>MythTV <EM>can not</EM> crash your system - it is a user-level program. 
-If your system is crashing when you run MythTV, then you have some
+<P>When run as a non-privileged user, MythTV <EM>can not</EM> crash your
+system.  If your system is crashing when you run MythTV, then you have some
 issue with the drivers for your capture card or other hardware, or the CPU
 fan has fallen off/broken and your system is overheating when asked to
 perform a CPU intensive task like encoding video.</P>
+<P>If you are running as root, which is <B>strongly discouraged</B>, it is
+possible that your system may crash due to the real-time thread using all
+available CPU.  You will not be able to interrupt the process, so for all
+intents and purposes your computer will have crashed.</P>
 
 <H2><A NAME="ss20.3">20.3</A> <A HREF="#toc20.3">Installing</A>
 </H2>
@@ -7866,6 +7882,29 @@ results shown at (
 higher I/O rates than JFS, albeit at a higher CPU loading.  This may cause
 issues if you do not have the spare CPU capacity to handle XFS, potentially
 leading to dropped frames.</P>
+
+<H2><A NAME="ss22.5">22.5</A> <A HREF="#toc22.5">HDTV with the Air2PC-ATSC-PCI card</A>
+</H2>
+
+<P>The Air2PC card has the capability to capture over-the-air HDTV signals
+(8VSB) and unencrypted HDTV (QAM) off of cable TV.  The Air2PC card is
+installed as a DVB device and is supported within MythTV.  </P>
+<P>First, you must compile a version of the Linux kernel to support the new
+tuner device.  Version 2.6.11 supports the card in 8VSB mode.  If you wish
+to use QAM, you will need to patch the kernel, or wait until 2.6.12.</P>
+<P>Download the source to 2.6.11.  At the time of this writing (2005-02-09), the latest
+is 2.6.11-rc3.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# cd /usr/src
+# wget http://www.kernel.org/pub/linux/kernel/v2.6/testing/linux-2.6.11-rc3.tar.bz2
+# tar -xjf linux-2.6.11-rc3.tar.bz2
+# cd linux-2.6.11-rc3
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>To be continued...</P>
 
 </BODY>
 </HTML>
