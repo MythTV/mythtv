@@ -452,14 +452,16 @@ bool VideoOutputXv::CreateXvBuffers(void)
         image->data = (data->XJ_SHMInfo)[i].shmaddr =
                                (char *)shmat((data->XJ_SHMInfo)[i].shmid, 0, 0);
 
-        // mark for delete immediately - it won't be removed until detach
-        shmctl((data->XJ_SHMInfo)[i].shmid, IPC_RMID, 0);
-
         data->buffers[(unsigned char *)image->data] = image;
 
         (data->XJ_SHMInfo)[i].readOnly = False;
 
         XShmAttach(data->XJ_disp, &(data->XJ_SHMInfo)[i]);
+
+        XSync(data->XJ_disp, 0); // needed for FreeBSD?
+        // mark for delete immediately - it won't be removed until detach
+        shmctl((data->XJ_SHMInfo)[i].shmid, IPC_RMID, 0);
+
 
         vbuffers[i].buf = (unsigned char *)image->data;
         vbuffers[i].height = XJ_height;
